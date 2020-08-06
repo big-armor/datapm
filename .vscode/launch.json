@@ -1,0 +1,46 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Start Registry",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run-script", "start"],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "",
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "env": {
+                
+                "APOLLO_KEY":"service:family-connections:asdfasdfasdfasdf",
+                "APOLLO_GRAPH_VARIANT":"dev",
+                "GCLOUD_STORAGE_BUCKET_NAME":"media",
+                "GOOGLE_CLOUD_PROJECT":"adsfasdf",
+                "GRAPHQL_CONTEXT_USER_SUB":"auth0|adsfasdfasdfasdf",
+                "FILESYSTEM_STORAGE_DIRECTORY":"local_storage",
+                "MIXPANEL_TOKEN":"asdfasdfasdf",
+                "TYPEORM_PORT":"5432",
+                "TYPEORM_DATABASE":"postgres",
+                "TYPEORM_SCHEMA":"public",
+                "TYPEORM_USERNAME":"postgres",
+                "TYPEORM_PASSWORD":"postgres",
+                "SENDGRID_API_KEY":"asdfasdfa",
+            
+                "GOOGLE_LOGIN_CLIENT_ID":"832769547626-tnldssk3ljco2icmss266tnn5epalheb.apps.googleusercontent.com",
+                "GOOGLE_LOGIN_SECRET":"asdfadfasdf",
+            
+                "REGISTRY_HOSTNAME":"localhost",
+                "REGISTRY_PORT":"4000"
+                
+            },
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ]
+        },
+    ]
+}

@@ -1,0 +1,502 @@
+scalar Date
+scalar JSON
+scalar Void
+scalar Long
+scalar Object
+
+enum Permission {
+  MANAGE
+  CREATE
+  VIEW
+  EDIT
+  DELETE
+  NONE
+}
+
+enum ValueType {
+  Number
+  String
+  Boolean
+  Enumeration
+  Date
+  Object
+  Null
+}
+
+enum Protocol {
+  HTTP
+  LOCAL_FILE
+}
+
+directive @isAuthenticated on OBJECT | FIELD_DEFINITION
+directive @hasCatalogPermission(permission: Permission) on OBJECT | FIELD_DEFINITION
+directive @hasPackagePermission(permission: Permission) on OBJECT | FIELD_DEFINITION
+directive @isSiteAdmin on OBJECT | FIELD_DEFINITION
+directive @isUserOrAdmin on OBJECT | FIELD_DEFINITION
+
+
+
+type User {
+  username: String!
+  firstName: String
+  lastName: String
+  location: String
+  twitterHandle: String
+  website: String
+  emailAddress: String
+  gitHubHandle: String
+  nameIsPublic: Boolean!
+
+}
+
+type Catalog {
+    identifier: CatalogIdentifier!
+    displayName: String!
+    description: String!
+    website: String!
+    isPublic: Boolean!
+    userPermissions: [UserCatalog!]
+    packages: [Package]!
+}
+
+type MyCatalog {
+  catalog: Catalog!
+  permission: [Permission!]
+}
+
+type Package {
+    identifier: PackageIdentifier!
+    catalog: Catalog!
+    displayName: String!
+    description: String!
+    versions: [Version]!
+}
+
+
+
+type UserPackage {
+    user: User!
+    package: Package!
+    permissions: [Permission!]
+}
+
+type UserCatalog {
+    user: User!
+    catalog: Catalog!
+    permissions: [Permission!]
+}
+
+type Collection {
+    identifier: CollectionIdentifier!
+    displayName: String!
+    description: String!
+    packages: [Package!]
+}
+
+type SearchResponse {
+    catalogs: [Catalog]
+    packages: [Package]
+}
+
+
+type UserPackagePermissions {
+  package: Package!
+  username: String!
+  permissions: [Permission!]!
+}
+
+type APIKey {
+  key: String!
+  createdAt: Date
+  lastUsed: Date
+}
+
+type APIKeyWithSecret {
+  key: String!
+  secret: String!
+  createdAt: Date
+}
+
+
+type Version {
+  identifier: VersionIdentifier!
+  createdAt: Date!
+  updatedAt: Date!
+  package: Package!
+  dataTypes: [DataType!]!
+}
+
+
+type DataType {
+  identifier: DataTypeIdentifier!
+  displayName: String
+  createdAt: Date!
+  updatedAt: Date!
+  attributes: [Attribute!]!
+  statistics: DataTypeStatistics!
+  transfer: Transfer!
+  format: Format!
+}
+
+
+type Format {
+  mimeType: String!
+  configuration: Object
+}
+
+type Transfer {
+  protocol: Protocol!
+  configuration: Object
+}
+
+type AccessDetailsHTTP {
+  url: String!
+}
+
+type DataTypeStatistics {
+  recordCount: Long!
+  recordCountApproximate: Boolean!
+  byteCount: Long!
+  byteCountApproximate: Boolean!
+}
+
+type Attribute {
+  identifier: AttributeIdentifier!
+  createdAt: Date!
+  updatedAt: Date!
+  displayName: String
+  description: String
+  valueTypes: [ValueType!]!
+  valueTypeStats: [ValueTypeStat!]
+  isList: Boolean!
+}
+
+type ValueTypeStat {
+  valueType: ValueType!
+  recordCount: Long!
+  options: [StringOption!]
+  stringMaxLength: Long
+  stringMinLength: Long
+  numberMaxValue: Long
+  numberMinValue: Long
+  dateMaxValue: Date
+  dateMinValue: Date
+}
+
+type StringOption {
+  option: String!
+  count: Long!
+}
+
+type AttributeIdentifier {
+  registryHostname: String!
+  registryPort: Int!
+  catalogSlug: String!
+  packageSlug: String!
+  versionMajor: Int!
+  versionMinor: Int!
+  versionPatch: Int!
+  dataTypeSlug: String!
+  attributeSlug: String!
+}
+
+type DataTypeIdentifier {
+  registryHostname: String!
+  registryPort: Int!
+  catalogSlug: String!
+  packageSlug: String!
+  versionMajor: Int!
+  versionMinor: Int!
+  versionPatch: Int!
+  dataTypeSlug: String!
+}
+
+type VersionIdentifier {
+  registryHostname: String!
+  registryPort: Int!
+  catalogSlug: String!
+  packageSlug: String!
+  versionMajor: Int!
+  versionMinor: Int!
+  versionPatch: Int!
+}
+
+type PackageIdentifier {
+  registryHostname: String!
+  registryPort: Int!
+  catalogSlug: String!
+  packageSlug: String!
+}
+
+type CatalogIdentifier {
+  registryHostname: String!
+  registryPort: Int!
+  catalogSlug: String!
+}
+
+type RegistryIdentifier {
+  registryHostname: String!
+  registryPort: Int!
+}
+
+type CollectionIdentifier {
+  registryHostname: String!
+  registryPort: Int!
+  collectionSlug: String!
+}
+
+
+
+
+
+input StringWrapper {
+  val: String
+}
+
+input IntWrapper {
+  val: Int
+}
+
+input DateWrapper {
+  val: Date
+}
+
+input BooleanWrapper {
+  val: Boolean!
+}
+
+
+input AttributeIdentifierInput {
+  registryHostname: String!
+  registryPort: Int!
+  catalogSlug: String!
+  packageSlug: String!
+  versionMajor: Int!
+  versionMinor: Int!
+  versionPatch: Int!
+  dataTypeSlug: String!
+  attributeSlug: String!
+}
+
+input DataTypeIdentifierInput {
+  registryHostname: String!
+  registryPort: Int!
+  catalogSlug: String!
+  packageSlug: String!
+  versionMajor: Int!
+  versionMinor: Int!
+  versionPatch: Int!
+  dataTypeSlug: String!
+}
+
+input VersionIdentifierInput {
+  registryHostname: String!
+  registryPort: Int!
+  catalogSlug: String!
+  packageSlug: String!
+  versionMajor: Int!
+  versionMinor: Int!
+  versionPatch: Int!
+}
+
+input PackageIdentifierInput {
+  registryHostname: String!
+  registryPort: Int!
+  catalogSlug: String!
+  packageSlug: String!
+}
+
+input CatalogIdentifierInput {
+  registryHostname: String!
+  registryPort: Int!
+  catalogSlug: String!
+}
+
+input RegistryIdentifierInput {
+  registryHostname: String!
+  registryPort: Int!
+}
+
+input CollectionIdentifierInput {
+  registryHostname: String!
+  registryPort: Int!
+  collectionSlug: String!
+}
+
+
+input CreateUserInputAdmin {
+  firstName: String!
+  lastName: String!
+  emailAddress: String!
+  username: String!
+  isSiteAdmin: Boolean!
+}
+
+input CreateUserInput {
+  firstName: String!
+  lastName: String!
+  emailAddress: String!
+  username: String!
+}
+
+input UpdateUserInput {
+    newUsername: String
+    firstName: String
+    lastName: String
+    email: String
+}
+
+input CreateCatalogInput {
+    slug: String!
+    displayName: String!
+    description: String!
+    website: String
+    isPublic: Boolean!
+}
+
+input UpdateCatalogInput {
+    newSlug: String
+    displayName: String
+    description: String
+}
+
+input CreatePackageInput {
+    packageSlug: String!
+    catalogSlug: String!
+    displayName: String!
+    description: String!
+
+}
+
+input TransferInput {
+  protocol: Protocol!
+  configuration: Object
+}
+
+input UpdatePackageInput {
+    newCatalogSlug: String
+    newPackageSlug: String
+    displayName: String
+    description: String
+    isPublic: Boolean
+}
+
+input SetPackagePermissionInput {
+    username: String!
+    permissions: [Permission!]!
+}
+
+input CreateVersionInput {
+  majorVersion: Int!
+  minorVersion: Int!
+  patchVersion: Int!
+  description: String!
+  dataTypes: [CreateDataTypeInput!]!
+}
+
+input CreateDataTypeInput {
+  slug: String!
+  displayName: String
+  description: String!
+  attributes: [CreateAttributeInput!]!
+  statistics: UpdateDataStatisticsInput!
+  transfer: TransferInput!
+  format: FormatInput!
+}
+
+input FormatInput {
+  mimeType: String!
+  configuration: Object
+}
+
+
+
+input UpdateDataStatisticsInput {
+  recordCount: Long!
+  recordCountApproximate: Boolean!
+  byteCount: Long!
+  byteCountApproximate: Boolean!
+
+}
+
+input CreateAttributeInput {
+  slug: String!
+  displayName: String
+  description: String
+  valueTypes: [ValueType!]!
+  valueTypeStats: [ValueTypeStatInput!]
+  isList: Boolean!
+}
+
+input ValueTypeStatInput {
+  valueType: ValueType!
+  recordCount: Long!
+  options: [StringOptionInput!]
+  stringMaxLength: Long
+  stringMinLength: Long
+  numberMaxValue: Long
+  numberMinValue: Long
+  dateMaxValue: Date
+  dateMinValue: Date
+
+}
+
+input StringOptionInput {
+  option: String!
+  count: Long
+}
+
+
+type Query {
+
+    me: User!
+    
+    search(search: String!): SearchResponse
+    
+    user(username: String!):User
+
+    myCatalogs: [Catalog]!
+
+    usersByCatalog(identifier: CatalogIdentifierInput!):[User]!
+
+    catalog(identifier: CatalogIdentifierInput!): Catalog
+    
+    package(identifier: PackageIdentifierInput!): Package
+
+    collections: [Collection!]
+
+}
+
+type Mutation  {
+
+    createMe(value: CreateUserInput!): User!
+    updateMe(value: UpdateUserInput!): User! @isAuthenticated
+    disableMe: User! @isAuthenticated
+
+    createAPIKey: APIKeyWithSecret! @isAuthenticated
+    deleteAPIKey(key: String!): APIKey @isAuthenticated
+
+    removeUserFromCatalog(username: String!, catalogSlug: String!): User! @hasCatalogPermission(permission: MANAGE)
+
+    createCatalog(value: CreateCatalogInput!): Catalog!
+    updateCatalog(identifier: CatalogIdentifierInput!, value: UpdateCatalogInput!): Catalog! @hasCatalogPermission(permission: EDIT)
+    disableCatalog(identifier: CatalogIdentifierInput!): Catalog! @hasCatalogPermission(permission: DELETE)
+
+    createPackage(value: CreatePackageInput!): Package! @hasCatalogPermission(permission: CREATE)
+    updatePackage(identifier: PackageIdentifierInput!, value: UpdatePackageInput!): Package! @hasPackagePermission(permission: EDIT)
+    disablePackage(identifier: PackageIdentifierInput!): Package! @hasPackagePermission(permission: DELETE)
+
+    setPackagePermissions(identifier: PackageIdentifierInput!, value: SetPackagePermissionInput!): UserPackagePermissions! @hasPackagePermission(permission: MANAGE)
+    removePackagePermissions(identifier: PackageIdentifierInput!, username: String!):Void  @hasPackagePermission(permission: MANAGE)
+
+    createVersion(identifier: PackageIdentifierInput!, value: CreateVersionInput!): Version! @hasPackagePermission(permission: CREATE)
+    disableVersion(identifier: VersionIdentifierInput! ): Void! @hasPackagePermission(permission: EDIT)
+
+    mixpanelTrack(actions: JSON!): Int!
+    mixpanelEngage(userInfo: JSON!): Int!
+
+}
+
+
+
+

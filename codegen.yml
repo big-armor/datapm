@@ -1,0 +1,17 @@
+overwrite: true
+schema: src/schema.gql
+documents: null
+generates:
+  src/generated/graphql.ts:
+    plugins:
+      - add:
+          content:
+            - import { FileUpload } from 'graphql-upload'
+      - typescript
+      - typescript-resolvers
+    config:
+      scalars:
+        Date: Date
+        JSON: "{ [key: string]: any }"
+        Upload: Promise<FileUpload>
+      useIndexSignature: true # required for Apollo. See https://github.com/dotansimha/graphql-code-generator/issues/1133#issuecomment-456812621
