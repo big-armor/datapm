@@ -1,10 +1,8 @@
 import { Catalog } from "../entity/Catalog";
 import { Package } from "../entity/Package";
 import { Version } from "../entity/Version";
-import { CatalogIdentifier, PackageIdentifier, VersionIdentifier, DataTypeIdentifier, AttributeIdentifier } from "../generated/graphql";
+import { CatalogIdentifier, PackageIdentifier, VersionIdentifier } from "../generated/graphql";
 import { getEnvVariable } from "./getEnvVariable";
-import { DataType } from "../entity/DataType";
-import { Attribute } from "../entity/Attribute";
 
 export class Identifier {
     registryHostname: String;
@@ -89,34 +87,5 @@ export function versionIdentifier(version: Version): VersionIdentifier {
         versionPatch: version.patchVersion
     }
 
-}
-
-export function dataTypeIdentifier(dataType: DataType): DataTypeIdentifier {
-
-    return {
-        registryHostname: getEnvVariable("REGISTRY_NAME"),
-        registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
-        catalogSlug: dataType.version.package.catalog.slug,
-        packageSlug: dataType.version.package.slug,
-        versionMajor: dataType.version.majorVersion,
-        versionMinor: dataType.version.minorVersion,
-        versionPatch: dataType.version.patchVersion,
-        dataTypeSlug: dataType.slug
-    }
-}
-
-export function attributeIdentifier(attribute: Attribute): AttributeIdentifier {
-
-    return {
-        registryHostname: getEnvVariable("REGISTRY_NAME"),
-        registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
-        catalogSlug: attribute.dataType.version.package.catalog.slug,
-        packageSlug: attribute.dataType.version.package.slug,
-        versionMajor: attribute.dataType.version.majorVersion,
-        versionMinor: attribute.dataType.version.minorVersion,
-        versionPatch: attribute.dataType.version.patchVersion,
-        dataTypeSlug: attribute.dataType.slug,
-        attributeSlug: attribute.slug
-    }
 }
 

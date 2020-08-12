@@ -1,21 +1,16 @@
 import { EntityRepository, EntityManager } from "typeorm";
 import { Version } from "../entity/Version";
-import { VersionIdentifier, PackageIdentifier, VersionIdentifierInput, CreateVersionInput, PackageIdentifierInput } from "../generated/graphql";
-import { Package } from "../entity/Package";
+import { VersionIdentifierInput, CreateVersionInput, PackageIdentifierInput } from "../generated/graphql";
 import { PackageRepository } from "./PackageRepository";
-import { DataType } from "../entity/DataType";
-import { DataTypeRepository } from "./DataTypeRepository";
 
 
 
 @EntityRepository()
 export class VersionRepository {
 
+  constructor(private manager: EntityManager) {}
 
   async save(identifier: PackageIdentifierInput, value: CreateVersionInput) {
-
-
-    console.log("Saving version");
 
     return await this.manager.nestedTransaction(async (transaction) => {
       const packageEntity = await transaction.getCustomRepository(PackageRepository)
@@ -30,29 +25,17 @@ export class VersionRepository {
           patchVersion: value.patchVersion,
           description: value.description || undefined,
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
+          packageFile: value.packageFile
         });
 
-        
-        version = await transaction.save(version);
+        return  await transaction.save(version);
 
-        // Save the data types
-        const versionIdenfier: VersionIdentifierInput = {
-          ...identifier,
-          versionMajor: value.majorVersion,
-          versionMinor: value.minorVersion,
-          versionPatch: value.patchVersion,
-        }
-
-        let dataTypes = await transaction
-          .getCustomRepository(DataTypeRepository).save(versionIdenfier, value.dataTypes);
-
-        return await transaction.getRepository(Version).findOneOrFail({id: version.id});
     });
 
     
   }
-  constructor(private manager: EntityManager) {}
+
 
 
   async findOneOrFail({

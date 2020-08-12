@@ -18,8 +18,6 @@ import {
   PackageResolvers,
   PackageIdentifier,
   VersionResolvers,
-  DataTypeResolvers,
-  AttributeResolvers,
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName } from "./util/relationNames";
@@ -37,8 +35,9 @@ import { Package } from "./entity/Package";
 import { catalogIdentifier } from "./util/IdentifierUtil";
 import { VersionRepository } from "./repository/VersionRepository";
 import { getEnvVariable } from "./util/getEnvVariable";
-import { DataType } from "./entity/DataType";
-import { Attribute } from "./entity/Attribute";
+import fs from 'fs';
+
+import AJV from 'ajv';
 
 
 export const resolvers: {
@@ -50,9 +49,36 @@ export const resolvers: {
   Catalog: CatalogResolvers;
   Package: PackageResolvers;
   Version: VersionResolvers;
-  DataType: DataTypeResolvers;
-  Attribute: AttributeResolvers;
+  PackageFileJSON: GraphQLScalarType;
 } = {
+  PackageFileJSON: new GraphQLScalarType({
+    name: "PackageFileJSON",
+    serialize: (value: any) => {
+      return JSON.stringify(value);
+    },
+    parseValue: (value: any) => {
+
+      const packageObject = JSON.parse(value);
+
+      const ajv = new AJV();
+
+      const schema = fs.readFileSync('src/packageFileSchema.json', 'utf8');
+
+      const schemaObject = JSON.parse(schema);
+
+      if(!ajv.validateSchema(schemaObject)) {
+        throw new Error("AJV could not validate the schema");
+      }
+
+      const response = ajv.validate(schemaObject, packageObject);
+
+      if(!response) {
+        throw new Error("Error parsing Package File JSON: " + ajv.errors![0].message);
+      }
+
+      return JSON.parse(value);
+    },
+  }),
   
   Date: new GraphQLScalarType({
     name: "Date",
@@ -157,59 +183,6 @@ export const resolvers: {
     }
   },
 
-  DataType: {
-    identifier: async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
-
-      const dataType = parent as DataType;
-
-      const version = await context.connection.getRepository(Version).findOneOrFail({id: dataType.versionId});
-
-      const packageEntity = await context.connection.getRepository(Package).findOneOrFail({id: version.packageId});
-
-      const catalog = await context.connection.getRepository(Catalog).findOneOrFail({id: packageEntity.catalogId });
-
-      return {
-        registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
-        registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
-        catalogSlug: catalog.slug,
-        packageSlug: packageEntity.slug,
-        versionMajor: version.majorVersion,
-        versionMinor: version.minorVersion,
-        versionPatch: version.patchVersion,
-        dataTypeSlug: dataType.slug
-      };
-
-    }
-  },
-
-  Attribute: {
-    identifier: async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
-
-      const attribute = parent as Attribute;
-
-      const dataType = await context.connection.getRepository(DataType).findOneOrFail({id: attribute.dataTypeId});
-
-      const version = await context.connection.getRepository(Version).findOneOrFail({id: dataType.versionId});
-
-      const packageEntity = await context.connection.getRepository(Package).findOneOrFail({id: version.packageId});
-
-      const catalog = await context.connection.getRepository(Catalog).findOneOrFail({id: packageEntity.catalogId });
-
-      return {
-        registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
-        registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
-        catalogSlug: catalog.slug,
-        packageSlug: packageEntity.slug,
-        versionMajor: version.majorVersion,
-        versionMinor: version.minorVersion,
-        versionPatch: version.patchVersion,
-        dataTypeSlug: dataType.slug,
-        attributeSlug: attribute.slug
-      };
-
-    }
-  },
-
   Query: {
     me: async (_0: any, _1: any, context: AuthenticatedContext, info: any) => {
       
@@ -273,7 +246,6 @@ export const resolvers: {
         identifier,
         relations: getGraphQlRelationName(info),
       });
-
 
       console.log(`package found - ${JSON.stringify(packageEntity)}`);
 

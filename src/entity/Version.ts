@@ -10,9 +10,7 @@ import {
   
   import { BaseModel } from "./BaseModel";
 import { Package } from "./Package";
-import { DataType } from "./DataType";
 import { VersionIdentifier } from "../generated/graphql";
-import { getEnvVariable } from "../util/getEnvVariable";
   
   @Entity({
     name: "version",
@@ -45,8 +43,8 @@ import { getEnvVariable } from "../util/getEnvVariable";
     @Column({length: 2048})
     description: string;
 
-    @OneToMany(() => DataType, (dataType) => dataType.version, { cascade: true })
-    dataTypes:DataType[]  
+    @Column({type:"jsonb",name:"packageFile"})
+    packageFile:Object | null;
 
     identifier: VersionIdentifier;
 

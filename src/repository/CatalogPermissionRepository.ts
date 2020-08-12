@@ -2,16 +2,12 @@ import {
     EntityRepository,
     Repository,
     EntityManager,
-    SelectQueryBuilder,
   } from "typeorm";
   
-  import { User } from "../entity/User";
-  import { UpdateCatalogInput, CreateCatalogInput, Permission } from "../generated/graphql";
-  import { deleteNoThrow } from "../util/deleteHelpers";
-  import { Catalog } from "../entity/Catalog";
-  import { Package } from "../entity/Package";
-  import { UserCatalogPermission } from "../entity/UserCatalogPermission";
-  import { Permissions } from "../entity/Permissions";
+import { User } from "../entity/User";
+import { Permission } from "../generated/graphql";
+import { Catalog } from "../entity/Catalog";
+import { UserCatalogPermission } from "../entity/UserCatalogPermission";
 import { UserRepository } from "./UserRepository";
 import { CatalogRepository } from "./CatalogRepository";
   
