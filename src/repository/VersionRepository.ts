@@ -2,6 +2,9 @@ import { EntityRepository, EntityManager } from "typeorm";
 import { Version } from "../entity/Version";
 import { VersionIdentifierInput, CreateVersionInput, PackageIdentifierInput } from "../generated/graphql";
 import { PackageRepository } from "./PackageRepository";
+import { Package } from "../entity/Package";
+import Maybe from "graphql/tsutils/Maybe";
+import { SemVer } from "semver";
 
 
 
@@ -16,16 +19,19 @@ export class VersionRepository {
       const packageEntity = await transaction.getCustomRepository(PackageRepository)
         .findOrFail({identifier});
 
+
+        let semVer = new SemVer(value.packageFile.version);
+
        let version = transaction
         .getRepository(Version)
         .create({
           packageId: packageEntity.id,
-          majorVersion:  value.majorVersion,
-          minorVersion: value.minorVersion,
-          patchVersion: value.patchVersion,
-          description: value.description || undefined,
+          majorVersion:  semVer.major,
+          minorVersion: semVer.minor,
+          patchVersion: semVer.patch,
+          description: value.packageFile.description || undefined,
           createdAt: new Date(),
-          updatedAt: new Date(),
+          updatedAt: new Date(value.packageFile.updatedDate),
           packageFile: value.packageFile
         });
 
@@ -36,6 +42,33 @@ export class VersionRepository {
     
   }
 
+  async findLatestVersion({
+    identifier,
+    relations = []
+  }: {
+    identifier: PackageIdentifierInput;
+    relations?: string[]
+  }): Promise<Maybe<Version>> {
+
+    const ALIAS = "findLatestVersion";
+
+    const packageRef = await this.manager
+      .getCustomRepository(PackageRepository)
+      .findPackageOrFail({identifier});
+      
+
+    return this.manager
+      .getRepository(Version)
+      .createQueryBuilder(ALIAS)
+      .where({packageId: packageRef.id})
+      .orderBy({
+         "findLatestVersion.majorVersion": "DESC",
+        "findLatestVersion.minorVersion": "DESC",
+        "findLatestVersion.patchVersion": "DESC"
+      })
+      .addRelations(ALIAS,relations)
+      .getOne();
+  }
 
 
   async findOneOrFail({

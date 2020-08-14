@@ -5,6 +5,11 @@ scalar Void
 scalar Long
 scalar Object
 
+enum VersionConflict {
+  VERSION_EXISTS,
+  HIGHER_VERSION_EXISTS
+}
+
 enum Permission {
   MANAGE
   CREATE
@@ -143,10 +148,6 @@ type CatalogIdentifier {
   catalogSlug: String!
 }
 
-type RegistryIdentifier {
-  registryHostname: String!
-  registryPort: Int!
-}
 
 type CollectionIdentifier {
   registryHostname: String!
@@ -197,10 +198,6 @@ input CatalogIdentifierInput {
   catalogSlug: String!
 }
 
-input RegistryIdentifierInput {
-  registryHostname: String!
-  registryPort: Int!
-}
 
 input CollectionIdentifierInput {
   registryHostname: String!
@@ -268,10 +265,6 @@ input SetPackagePermissionInput {
 }
 
 input CreateVersionInput {
-  majorVersion: Int!
-  minorVersion: Int!
-  patchVersion: Int!
-  description: String!
   packageFile: PackageFileJSON
 }
 

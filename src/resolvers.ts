@@ -16,8 +16,8 @@ import {
   CatalogResolvers,
   Permission,
   PackageResolvers,
-  PackageIdentifier,
   VersionResolvers,
+  VersionConflict
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName } from "./util/relationNames";
@@ -38,6 +38,8 @@ import { getEnvVariable } from "./util/getEnvVariable";
 import fs from 'fs';
 
 import AJV from 'ajv';
+import { SemVer } from "semver";
+import { ApolloError } from "apollo-server";
 
 
 export const resolvers: {
@@ -501,18 +503,53 @@ export const resolvers: {
     ) => {
 
         return await context.connection.manager.nestedTransaction(async (transaction) => {
-          const version = await transaction
+
+          const proposedNewVersion = new SemVer(
+            value.packageFile.version
+          );
+
+          // get the latest version
+          const latestVersion = await transaction.getCustomRepository(VersionRepository)
+            .findLatestVersion({identifier});
+
+          if(latestVersion != null) {
+            const semver = new SemVer(latestVersion.packageFile!.version);
+            const versionComparison = semver.compare(proposedNewVersion);
+
+            if(versionComparison == 0) {
+              throw new ApolloError(
+                identifier.catalogSlug + "/" + identifier.packageSlug + " version " + proposedNewVersion.raw + " already exists",
+                VersionConflict.VersionExists
+              );
+            }
+
+            if(versionComparison == 1) {
+              throw new ApolloError(
+                identifier.catalogSlug + "/" + identifier.packageSlug + " has current version " + semver.raw + " which is higher than your proposed version " + proposedNewVersion.raw,
+                VersionConflict.HigherVersionExists,
+                {existingVersion: semver.raw}
+                )
+            }
+
+          }
+
+
+          const savedVersion = await transaction
           .getCustomRepository(VersionRepository)
           .save(identifier,value);
-  
-          const savedVersion = await transaction
-            .getRepository(Version)
-            .findOne({where: {id: version.id}, relations: getGraphQlRelationName(info)});
-  
-          if(savedVersion === undefined)
-            throw new Error(`Could not find resolved version ${version.id} - this should never happen!`);
-  
-            return savedVersion;
+
+          const ALIAS = "findVersion";
+          const recalledVersion = transaction
+          .getRepository(Version)
+          .createQueryBuilder(ALIAS)
+          .addRelations(ALIAS, getGraphQlRelationName(info))
+          .where({ id: savedVersion.id })
+          .getOne();
+
+          if(recalledVersion)
+            throw new Error("Could not find the version after saving. This should never happen!");
+          
+          return recalledVersion;
         });
 
     },

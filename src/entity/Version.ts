@@ -11,6 +11,7 @@ import {
   import { BaseModel } from "./BaseModel";
 import { Package } from "./Package";
 import { VersionIdentifier } from "../generated/graphql";
+import { PackageFile } from 'datapm-package-file';
   
   @Entity({
     name: "version",
@@ -44,7 +45,7 @@ import { VersionIdentifier } from "../generated/graphql";
     description: string;
 
     @Column({type:"jsonb",name:"packageFile"})
-    packageFile:Object | null;
+    packageFile:PackageFile;
 
     identifier: VersionIdentifier;
 
