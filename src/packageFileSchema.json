@@ -75,12 +75,14 @@
                         "additionalItems": true,
                         "properties": {
                             "properties": {
-                                "allOf": [
-                                    { "$ref": "http://json-schema.org/draft-07/schema" },
-                                    {
-                                        "required": ["type"]
-                                    }
-                                ]
+                                "items": {
+                                    "allOf": [
+                                        { "$ref": "http://json-schema.org/draft-07/schema" },
+                                        {
+                                            "required": ["type"]
+                                        }
+                                    ]
+                                }
                             },
                             "parser": {
                                 "$id": "#/schemas/parser",

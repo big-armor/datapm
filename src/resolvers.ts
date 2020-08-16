@@ -76,7 +76,7 @@ export const resolvers: {
       const response = ajv.validate(schemaObject, packageObject);
 
       if(!response) {
-        throw new Error("Error parsing Package File JSON: " + ajv.errors![0].message);
+        throw new ApolloError("Error parsing Package File JSON: " + ajv.errors![0].message, "INVALID_PACKAGE_FILE", {path: ajv.errors![0].schemaPath});
       }
 
       return JSON.parse(value);
@@ -154,7 +154,7 @@ export const resolvers: {
 
       if(catalog === undefined)
         throw new Error('Could not find catalog ' + packageEntity.catalogId);
-        
+
       const identifier:PackageIdentifier = {
         registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
         registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
