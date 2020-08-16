@@ -17,7 +17,8 @@ import {
   Permission,
   PackageResolvers,
   VersionResolvers,
-  VersionConflict
+  VersionConflict,
+  PackageIdentifier
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName } from "./util/relationNames";
@@ -144,6 +145,29 @@ export const resolvers: {
   },
 
   Package: {
+
+    latestVersion: async(parent: any, _1: any, context: AuthenticatedContext, info: any) =>{
+
+      const packageEntity = parent as Package;
+
+      const catalog = await context.connection.getCustomRepository(CatalogRepository).findOne({where: {id: packageEntity.catalogId}});
+
+      if(catalog === undefined)
+        throw new Error('Could not find catalog ' + packageEntity.catalogId);
+        
+      const identifier:PackageIdentifier = {
+        registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
+        registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
+        catalogSlug: catalog.slug,
+        packageSlug: packageEntity.slug
+      }
+
+      const version = await context.connection.getCustomRepository(VersionRepository).findLatestVersion({identifier: identifier, relations: getGraphQlRelationName(info)});
+
+      if(version == null)
+        throw new ApolloError('Could not find the latest version for ' + packageEntity.catalog.slug + "/" + packageEntity.slug);
+      return version;
+    },
 
     identifier: async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
 
@@ -539,14 +563,14 @@ export const resolvers: {
           .save(identifier,value);
 
           const ALIAS = "findVersion";
-          const recalledVersion = transaction
+          const recalledVersion = await transaction
           .getRepository(Version)
           .createQueryBuilder(ALIAS)
           .addRelations(ALIAS, getGraphQlRelationName(info))
           .where({ id: savedVersion.id })
           .getOne();
 
-          if(recalledVersion)
+          if(recalledVersion === undefined)
             throw new Error("Could not find the version after saving. This should never happen!");
           
           return recalledVersion;

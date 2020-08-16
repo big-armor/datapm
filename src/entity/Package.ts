@@ -61,6 +61,9 @@ export class Package extends BaseModel {
   versions: Version[];
 
 
-  identifier: PackageIdentifier 
+  /** These are dummy values that are filled in by graphql responses */
+  latestVersion:Version;
+
+  identifier: PackageIdentifier;
 
 }

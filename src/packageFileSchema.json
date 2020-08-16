@@ -74,6 +74,14 @@
                         "description": "A schema of data available in the package. ",
                         "additionalItems": true,
                         "properties": {
+                            "properties": {
+                                "allOf": [
+                                    { "$ref": "http://json-schema.org/draft-07/schema" },
+                                    {
+                                        "required": ["type"]
+                                    }
+                                ]
+                            },
                             "parser": {
                                 "$id": "#/schemas/parser",
                                 "type": "object",
