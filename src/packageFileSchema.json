@@ -51,6 +51,33 @@
             "default": "1.0.0",
             "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
         },
+        "registries": {
+            "$id": "#/registries",
+            "type": "array",
+            "title": "Registries",
+            "description": "The registries to which this package file is published",
+            "default": [{
+                "hostname": "datapm.io",
+                "port": 443
+            }],
+            "items": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": ["local","datapm","DoNotPublish"]
+                    },
+                    "hostname": {
+                        "type": "string"
+                    },
+                    "port": {
+                        "type": "integer"
+                    }
+                    
+                }
+            }
+
+        },
         "description": {
             "$id": "#/description",
             "type": "string",
@@ -142,27 +169,27 @@
                                 "description": "Whether the provided byte count is approximate or exact.",
                                 "default": false
                             },
-                            "transfer": {
-                                "$id": "#/schemas/transfer",
+                            "source": {
+                                "$id": "#/schemas/source",
                                 "type": "object",
-                                "title": "Data Transfer",
-                                "description": "A description of how the data is transfered",
+                                "title": "Data Source",
+                                "description": "A description of how the data is sourceed",
                                 "default": {},
                                 "required": [
                                     "protocol"
                                 ],
                                 "properties": {
                                     "protocol": {
-                                        "$id": "#/schemas/transfer/protocol",
+                                        "$id": "#/schemas/source/protocol",
                                         "type": "string",
-                                        "title": "Transfer Protocol",
-                                        "description": "The protocol that is used to transfer the data. This defines the transport method.",
+                                        "title": "Source Protocol",
+                                        "description": "The protocol that is used to source the data. This defines the transport method.",
                                         "default": ""
                                     },
                                     "configuration": {
-                                        "$id": "#/schemas/transfer/configuration",
+                                        "$id": "#/schemas/source/configuration",
                                         "type": "object",
-                                        "title": "Transfer Configuration",
+                                        "title": "Source Configuration",
                                         "description": "The configuration used by the transport implementation to aquire the data stream.",
                                         "default": {},
                                         "required": [

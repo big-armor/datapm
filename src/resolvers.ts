@@ -42,6 +42,8 @@ import AJV from 'ajv';
 import { SemVer } from "semver";
 import { ApolloError } from "apollo-server";
 
+import {compatibilityToString,comparePackages,diffCompatibility,nextVersion, PackageFile} from 'datapm-package-file';
+
 
 export const resolvers: {
   Query: QueryResolvers;
@@ -532,27 +534,34 @@ export const resolvers: {
             value.packageFile.version
           );
 
+          const newPackageFile = value.packageFile as PackageFile;
+
           // get the latest version
           const latestVersion = await transaction.getCustomRepository(VersionRepository)
             .findLatestVersion({identifier});
 
+      
+
           if(latestVersion != null) {
-            const semver = new SemVer(latestVersion.packageFile!.version);
-            const versionComparison = semver.compare(proposedNewVersion);
 
-            if(versionComparison == 0) {
-              throw new ApolloError(
-                identifier.catalogSlug + "/" + identifier.packageSlug + " version " + proposedNewVersion.raw + " already exists",
-                VersionConflict.VersionExists
-              );
-            }
+            const latestVersionSemVer = new SemVer(latestVersion.packageFile!.version);
 
-            if(versionComparison == 1) {
+            const versionComparison = latestVersionSemVer.compare(proposedNewVersion);
+            
+            const diff = comparePackages(latestVersion.packageFile, newPackageFile);
+
+            const compatibility = diffCompatibility(diff);
+
+            const minNextVersion = nextVersion(latestVersionSemVer,compatibility);
+
+            const minVersionCompare = minNextVersion.compare(proposedNewVersion);
+
+            if(minVersionCompare == 1) {
               throw new ApolloError(
-                identifier.catalogSlug + "/" + identifier.packageSlug + " has current version " + semver.raw + " which is higher than your proposed version " + proposedNewVersion.raw,
-                VersionConflict.HigherVersionExists,
-                {existingVersion: semver.raw}
-                )
+                identifier.catalogSlug + "/" + identifier.packageSlug + " has current version " + latestVersionSemVer.version + ", and this new version has " + compatibilityToString(compatibility) + " changes - requiring a minimum version number of " + minNextVersion.version + ", but you submitted version number " + proposedNewVersion.version,
+                VersionConflict.HigherVersionRequired,
+                {existingVersion: latestVersionSemVer.version, minNextVersion: minNextVersion.version}
+              )
             }
 
           }
