@@ -42,7 +42,6 @@
     "ajv": "^6.12.3",
     "apollo-server": "^2.11.0",
     "dataloader": "^2.0.0",
-    "datapm-package-file": "file:../datapm-package-file",
     "express-enforces-ssl": "^1.1.0",
     "express-http-proxy": "^1.6.0",
     "graphql": "^14.6.0",
