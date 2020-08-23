@@ -4,17 +4,25 @@ This is a data schema registery service for the datapm ecosystem. It is based on
 
 Visit datapm.io for more information.
 
+## Developer Prerequisites:
+1. node 12 or newer
+2. npm
+3. An accessible postgresql database (see docker-compose)
+
 ## Steps to run this registry server
 
 1. Run `npm ci` command
 2. Set the following environment variables (see env.sh or launch.json for example values for local development)
 4. Run `npm run start` command
 
-Prerequisites:
+## Steps to build production
 
-1. node 12 or newer
-2. npm
-3. An accessible postgresql database
+1. Run `npm ci` command
+2. Set the environment variables (see env.sh or launch.json)
+3. Set environment variable TYPEORM_IS_DIST=true
+4. Run `npm run build`
+5. Run `cd dist && node main.js`
+
 
 ## Docker Image
 

@@ -5,7 +5,6 @@ import { Package } from "../entity/Package";
 import { UserRepository } from "./UserRepository";
 import { Permission, PackageIdentifier } from "../generated/graphql";
 import { PackageRepository } from "./PackageRepository";
-import { User } from "../entity/User";
 
 async function getPackage({
   manager,
