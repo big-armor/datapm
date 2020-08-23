@@ -4,7 +4,7 @@ import { Version } from "../entity/Version";
 import { CatalogIdentifier, PackageIdentifier, VersionIdentifier } from "../generated/graphql";
 import { getEnvVariable } from "./getEnvVariable";
 
-export class Identifier {
+export interface Identifier {
     registryHostname: String;
     registryPort:number;
     catalogSlug: String;
@@ -21,7 +21,7 @@ export class Identifier {
 
 export function parseIdentifierString(identifier: String) {
     const parts = identifier.split("/");
-    const returnValue = new Identifier();
+    const returnValue = {} as Identifier;
 
     const hostPortParts = identifier[0].split(":")
     returnValue.registryHostname = hostPortParts[0];

@@ -7,7 +7,6 @@ import { GraphQLObjectType, GraphQLField, defaultFieldResolver } from "graphql";
 import { Context } from "../context";
 import { Permission } from "../generated/graphql";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
-import { Catalog } from "../entity/Catalog";
 import { CatalogRepository } from "../repository/CatalogRepository";
 
 export class HasCatalogPermissionDirective extends SchemaDirectiveVisitor {

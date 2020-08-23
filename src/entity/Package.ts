@@ -12,7 +12,6 @@ import { BaseModel } from "./BaseModel";
 import { Catalog } from "./Catalog";
 import { Version } from "./Version";
 import { PackageIdentifier } from "../generated/graphql";
-import { getEnvVariable } from "../util/getEnvVariable";
 
 @Entity({
   name: "package",

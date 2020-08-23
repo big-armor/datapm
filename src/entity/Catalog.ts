@@ -1,10 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn, Unique, OneToMany, ManyToOne, ManyToMany, JoinTable } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, Unique, OneToMany } from "typeorm";
 import { BaseModel } from "./BaseModel";
-import { User } from "./User";
 import { UserCatalogPermission } from "./UserCatalogPermission";
 import { Package } from "./Package";
 import { CatalogIdentifier } from "../generated/graphql";
-import { getEnvVariable } from "../util/getEnvVariable";
 
 @Entity({
   name: "catalog",

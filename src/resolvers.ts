@@ -42,7 +42,7 @@ import AJV from 'ajv';
 import { SemVer } from "semver";
 import { ApolloError } from "apollo-server";
 
-import {compatibilityToString,comparePackages,diffCompatibility,nextVersion, PackageFile} from 'datapm-lib';
+import {compatibilityToString,comparePackages,diffCompatibility,nextVersion, PackageFile} from '@datapm/datapm-lib';
 
 
 export const resolvers: {

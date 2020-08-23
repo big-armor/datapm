@@ -1,5 +1,5 @@
 import { createDatabase } from 'pg-god'
-import { createConnection, Connection, getConnection, getConnectionOptions } from 'typeorm'
+import { createConnection, Connection, getConnectionOptions } from 'typeorm'
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions'
 
 let conn: Connection | undefined

@@ -1,8 +1,10 @@
 {
-  "name": "datapm-registry",
+  "name": "@datapm/datapm-registry",
   "version": "0.1.0",
-  "description": "Data Beam is the easiest way to discover, obtain, manage, and publish data sets. This server acts as a registry (not a repository) of catalogs of packages. Features of datapm-registry include CRUD operations on catalogs and packages, and authorization for each operation. ",
+  "description": "datapm is the easiest way to discover, obtain, manage, and publish data sets. This server acts as a registry (not a repository) of catalogs of packages. Features of datapm-registry include CRUD operations on catalogs and packages, and authorization for each operation. ",
   "main": "dist/main.js",
+  "typings": "dist/main.d.ts",
+  "module": "dist/main.js",
   "scripts": {
     "prestart": "rm -rf dist; npm run codegen",
     "start": "ts-node src/main.ts",
@@ -26,6 +28,7 @@
   },
   "homepage": "https://github.com/big-armor/datapm-registry#readme",
   "dependencies": {
+    "@datapm/datapm-lib": "^0.1.5",
     "@google-cloud/secret-manager": "^3.1.0",
     "@google-cloud/storage": "^5.1.1",
     "@sendgrid/helpers": "^7.2.0",

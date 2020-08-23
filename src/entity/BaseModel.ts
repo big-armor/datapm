@@ -1,5 +1,4 @@
-import { PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne } from "typeorm";
-import { User } from "./User";
+import { Column } from "typeorm";
 
 export abstract class BaseModel {
   @Column({ name: "created_at", default: () => "CURRENT_TIMESTAMP" })

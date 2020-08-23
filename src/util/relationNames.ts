@@ -1,4 +1,4 @@
-import graphqlFields = require("graphql-fields");
+import graphqlFields  from "graphql-fields";
 
 function isEmpty(obj: any): boolean {
   for (var x in obj) {

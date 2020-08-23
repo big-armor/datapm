@@ -14,5 +14,5 @@ RUN npm ci --only=production
 
 EXPOSE 4000
 
-CMD [ "npm", "run", "start:production" ]
+CMD [ "npm", "run", "start" ]
 

@@ -3,15 +3,8 @@ import { EntityManager } from "typeorm";
 
 import { Jwt, parseJwt, ensureAuth0UserExistsOrCreate } from "./jwt";
 import { User } from "../entity/User";
-import { Permissions } from "../entity/Permissions";
-import { UserCatalogPermission } from "../entity/UserCatalogPermission";
 import { Catalog } from "../entity/Catalog";
-import { getEnvVariable } from "./getEnvVariable";
 
-interface UserCatalogResponse {
-  id: number;
-  permissions: Permissions[];
-}
 
 export interface MeJwt {
   jwt: Jwt;
@@ -54,7 +47,7 @@ export async function getMeSub(sub: string, manager: EntityManager) {
 
 // takes a Jwt and retrieves the corresponding user from the database
 // also retrieves permissions for that user
-async function getMeJwt(
+export async function getMeJwt(
   jwt: Jwt,
   manager: EntityManager
 ): Promise<MeJwt | undefined> {
