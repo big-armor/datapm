@@ -9,7 +9,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "4001:4000"
+      - "4000:4000"
     environment:
       - APOLLO_GRAPH_VARIANT=dev
       - GCLOUD_STORAGE_BUCKET_NAME=media
