@@ -5,7 +5,6 @@ import helmet from "helmet";
 import querystring from "querystring";
 import express_enforces_ssl from "express-enforces-ssl";
 import proxy from "express-http-proxy";
-import { createConnection } from "typeorm";
 import { ApolloServer } from "apollo-server-express";
 
 import { Context } from "./context";

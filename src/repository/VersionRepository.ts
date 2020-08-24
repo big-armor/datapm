@@ -1,58 +1,74 @@
 import { EntityRepository, EntityManager } from "typeorm";
 import { Version } from "../entity/Version";
-import { VersionIdentifier, PackageIdentifier, VersionIdentifierInput, CreateVersionInput, PackageIdentifierInput } from "../generated/graphql";
-import { Package } from "../entity/Package";
+import { VersionIdentifierInput, CreateVersionInput, PackageIdentifierInput } from "../generated/graphql";
 import { PackageRepository } from "./PackageRepository";
-import { DataType } from "../entity/DataType";
-import { DataTypeRepository } from "./DataTypeRepository";
+import { Package } from "../entity/Package";
+import Maybe from "graphql/tsutils/Maybe";
+import { SemVer } from "semver";
 
 
 
 @EntityRepository()
 export class VersionRepository {
 
+  constructor(private manager: EntityManager) {}
 
   async save(identifier: PackageIdentifierInput, value: CreateVersionInput) {
-
-
-    console.log("Saving version");
 
     return await this.manager.nestedTransaction(async (transaction) => {
       const packageEntity = await transaction.getCustomRepository(PackageRepository)
         .findOrFail({identifier});
 
+
+        let semVer = new SemVer(value.packageFile.version);
+
        let version = transaction
         .getRepository(Version)
         .create({
           packageId: packageEntity.id,
-          majorVersion:  value.majorVersion,
-          minorVersion: value.minorVersion,
-          patchVersion: value.patchVersion,
-          description: value.description || undefined,
+          majorVersion:  semVer.major,
+          minorVersion: semVer.minor,
+          patchVersion: semVer.patch,
+          description: value.packageFile.description || undefined,
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(value.packageFile.updatedDate),
+          packageFile: value.packageFile
         });
 
-        
-        version = await transaction.save(version);
+        return  await transaction.save(version);
 
-        // Save the data types
-        const versionIdenfier: VersionIdentifierInput = {
-          ...identifier,
-          versionMajor: value.majorVersion,
-          versionMinor: value.minorVersion,
-          versionPatch: value.patchVersion,
-        }
-
-        let dataTypes = await transaction
-          .getCustomRepository(DataTypeRepository).save(versionIdenfier, value.dataTypes);
-
-        return await transaction.getRepository(Version).findOneOrFail({id: version.id});
     });
 
     
   }
-  constructor(private manager: EntityManager) {}
+
+  async findLatestVersion({
+    identifier,
+    relations = []
+  }: {
+    identifier: PackageIdentifierInput;
+    relations?: string[]
+  }): Promise<Maybe<Version>> {
+
+    const ALIAS = "findLatestVersion";
+
+    const packageRef = await this.manager
+      .getCustomRepository(PackageRepository)
+      .findPackageOrFail({identifier});
+      
+
+    return this.manager
+      .getRepository(Version)
+      .createQueryBuilder(ALIAS)
+      .where({packageId: packageRef.id})
+      .orderBy({
+         "findLatestVersion.majorVersion": "DESC",
+        "findLatestVersion.minorVersion": "DESC",
+        "findLatestVersion.patchVersion": "DESC"
+      })
+      .addRelations(ALIAS,relations)
+      .getOne();
+  }
 
 
   async findOneOrFail({

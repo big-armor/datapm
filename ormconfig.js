@@ -12,10 +12,10 @@ module.exports = {
   schema: process.env.TYPEORM_SCHEMA || "public",
   database: process.env.TYPEORM_DATABASE || "postgres",
   username: process.env.TYPEORM_USERNAME || "postgres",
-  createSchema: true,
+  createSchema: process.env.TYPEORM_CREATE_SCHEMA || false,
   password: process.env.TYPEORM_PASSWORD,
-  synchronize: true,
-  logging: ["schema", "query", "error"],
+  synchronize: process.env.TYPEORM_SYNCHRONIZE || false,
+  logging: ["schema", "error"],
   entities: [
     `${
       process.env.RUN_MIGRATION || ""

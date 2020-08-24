@@ -12,7 +12,6 @@ import { BaseModel } from "./BaseModel";
 import { Catalog } from "./Catalog";
 import { Version } from "./Version";
 import { PackageIdentifier } from "../generated/graphql";
-import { getEnvVariable } from "../util/getEnvVariable";
 
 @Entity({
   name: "package",
@@ -61,6 +60,9 @@ export class Package extends BaseModel {
   versions: Version[];
 
 
-  identifier: PackageIdentifier 
+  /** These are dummy values that are filled in by graphql responses */
+  latestVersion:Version;
+
+  identifier: PackageIdentifier;
 
 }

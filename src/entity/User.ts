@@ -5,7 +5,6 @@ import {
     PrimaryGeneratedColumn,
     Unique,
   } from "typeorm";
-  import { UserPackagePermission } from "./UserPackagepermission";
   import { BaseModel } from "./BaseModel";
 import { UserCatalogPermission } from "./UserCatalogPermission";
   

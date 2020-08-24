@@ -6,9 +6,7 @@ import {
 import { GraphQLObjectType, GraphQLField, defaultFieldResolver } from "graphql";
 import { Context } from "../context";
 import { Permission, PackageIdentifier } from "../generated/graphql";
-import { MeCatalog } from "../util/me";
 import { PackageRepository } from "../repository/PackageRepository";
-import { UserPackagePermission } from "../entity/UserPackagePermission";
 import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 
 async function hasPermission(permission: Permission, context: Context, identifier: PackageIdentifier): Promise<boolean> {

@@ -1,5 +1,5 @@
 import { Connection } from "typeorm";
-import { MeJwt, MeCatalog } from "./util/me";
+import { MeJwt } from "./util/me";
 import { Request } from "express";
 import { DataLoaders } from "./dataLoaders";
 

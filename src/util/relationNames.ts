@@ -1,4 +1,4 @@
-import graphqlFields = require("graphql-fields");
+import graphqlFields  from "graphql-fields";
 
 function isEmpty(obj: any): boolean {
   for (var x in obj) {
@@ -35,7 +35,8 @@ function isEmpty(obj: any): boolean {
 function getRelationNames(obj: object, parentNames: string = ""): string[] {
   let out: string[] = [];
   
-  const skipRelations = ["identifier"];
+  // TODO - This is hacky
+  const skipRelations = ["identifier","latestVersion"];
 
   for (let [key, val] of Object.entries(obj)) {
     if (!isEmpty(val) && skipRelations.indexOf(key) == -1) {

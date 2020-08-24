@@ -1,8 +1,15 @@
 scalar Date
 scalar JSON
+scalar PackageFileJSON
 scalar Void
 scalar Long
 scalar Object
+
+enum VersionConflict {
+  VERSION_EXISTS,
+  HIGHER_VERSION_EXISTS,
+  HIGHER_VERSION_REQUIRED
+}
 
 enum Permission {
   MANAGE
@@ -11,16 +18,6 @@ enum Permission {
   EDIT
   DELETE
   NONE
-}
-
-enum ValueType {
-  Number
-  String
-  Boolean
-  Enumeration
-  Date
-  Object
-  Null
 }
 
 enum Protocol {
@@ -69,6 +66,7 @@ type Package {
     catalog: Catalog!
     displayName: String!
     description: String!
+    latestVersion: Version
     versions: [Version]!
 }
 
@@ -123,93 +121,10 @@ type Version {
   createdAt: Date!
   updatedAt: Date!
   package: Package!
-  dataTypes: [DataType!]!
+  packageFile: PackageFileJSON
 }
 
 
-type DataType {
-  identifier: DataTypeIdentifier!
-  displayName: String
-  createdAt: Date!
-  updatedAt: Date!
-  attributes: [Attribute!]!
-  statistics: DataTypeStatistics!
-  transfer: Transfer!
-  format: Format!
-}
-
-
-type Format {
-  mimeType: String!
-  configuration: Object
-}
-
-type Transfer {
-  protocol: Protocol!
-  configuration: Object
-}
-
-type AccessDetailsHTTP {
-  url: String!
-}
-
-type DataTypeStatistics {
-  recordCount: Long!
-  recordCountApproximate: Boolean!
-  byteCount: Long!
-  byteCountApproximate: Boolean!
-}
-
-type Attribute {
-  identifier: AttributeIdentifier!
-  createdAt: Date!
-  updatedAt: Date!
-  displayName: String
-  description: String
-  valueTypes: [ValueType!]!
-  valueTypeStats: [ValueTypeStat!]
-  isList: Boolean!
-}
-
-type ValueTypeStat {
-  valueType: ValueType!
-  recordCount: Long!
-  options: [StringOption!]
-  stringMaxLength: Long
-  stringMinLength: Long
-  numberMaxValue: Long
-  numberMinValue: Long
-  dateMaxValue: Date
-  dateMinValue: Date
-}
-
-type StringOption {
-  option: String!
-  count: Long!
-}
-
-type AttributeIdentifier {
-  registryHostname: String!
-  registryPort: Int!
-  catalogSlug: String!
-  packageSlug: String!
-  versionMajor: Int!
-  versionMinor: Int!
-  versionPatch: Int!
-  dataTypeSlug: String!
-  attributeSlug: String!
-}
-
-type DataTypeIdentifier {
-  registryHostname: String!
-  registryPort: Int!
-  catalogSlug: String!
-  packageSlug: String!
-  versionMajor: Int!
-  versionMinor: Int!
-  versionPatch: Int!
-  dataTypeSlug: String!
-}
 
 type VersionIdentifier {
   registryHostname: String!
@@ -234,10 +149,6 @@ type CatalogIdentifier {
   catalogSlug: String!
 }
 
-type RegistryIdentifier {
-  registryHostname: String!
-  registryPort: Int!
-}
 
 type CollectionIdentifier {
   registryHostname: String!
@@ -265,30 +176,6 @@ input BooleanWrapper {
   val: Boolean!
 }
 
-
-input AttributeIdentifierInput {
-  registryHostname: String!
-  registryPort: Int!
-  catalogSlug: String!
-  packageSlug: String!
-  versionMajor: Int!
-  versionMinor: Int!
-  versionPatch: Int!
-  dataTypeSlug: String!
-  attributeSlug: String!
-}
-
-input DataTypeIdentifierInput {
-  registryHostname: String!
-  registryPort: Int!
-  catalogSlug: String!
-  packageSlug: String!
-  versionMajor: Int!
-  versionMinor: Int!
-  versionPatch: Int!
-  dataTypeSlug: String!
-}
-
 input VersionIdentifierInput {
   registryHostname: String!
   registryPort: Int!
@@ -312,10 +199,6 @@ input CatalogIdentifierInput {
   catalogSlug: String!
 }
 
-input RegistryIdentifierInput {
-  registryHostname: String!
-  registryPort: Int!
-}
 
 input CollectionIdentifierInput {
   registryHostname: String!
@@ -368,10 +251,6 @@ input CreatePackageInput {
 
 }
 
-input TransferInput {
-  protocol: Protocol!
-  configuration: Object
-}
 
 input UpdatePackageInput {
     newCatalogSlug: String
@@ -387,65 +266,8 @@ input SetPackagePermissionInput {
 }
 
 input CreateVersionInput {
-  majorVersion: Int!
-  minorVersion: Int!
-  patchVersion: Int!
-  description: String!
-  dataTypes: [CreateDataTypeInput!]!
+  packageFile: PackageFileJSON
 }
-
-input CreateDataTypeInput {
-  slug: String!
-  displayName: String
-  description: String!
-  attributes: [CreateAttributeInput!]!
-  statistics: UpdateDataStatisticsInput!
-  transfer: TransferInput!
-  format: FormatInput!
-}
-
-input FormatInput {
-  mimeType: String!
-  configuration: Object
-}
-
-
-
-input UpdateDataStatisticsInput {
-  recordCount: Long!
-  recordCountApproximate: Boolean!
-  byteCount: Long!
-  byteCountApproximate: Boolean!
-
-}
-
-input CreateAttributeInput {
-  slug: String!
-  displayName: String
-  description: String
-  valueTypes: [ValueType!]!
-  valueTypeStats: [ValueTypeStatInput!]
-  isList: Boolean!
-}
-
-input ValueTypeStatInput {
-  valueType: ValueType!
-  recordCount: Long!
-  options: [StringOptionInput!]
-  stringMaxLength: Long
-  stringMinLength: Long
-  numberMaxValue: Long
-  numberMinValue: Long
-  dateMaxValue: Date
-  dateMinValue: Date
-
-}
-
-input StringOptionInput {
-  option: String!
-  count: Long
-}
-
 
 type Query {
 
