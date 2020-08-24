@@ -6,16 +6,17 @@
   "typings": "dist/main.d.ts",
   "module": "dist/main.js",
   "scripts": {
-    "prestart": "rm -rf dist; npm run codegen",
-    "start": "ts-node src/main.ts",
+    "start": "docker-compose up -d postgres && npx nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/main.ts",
+    "start:server": "npm run build && docker-compose up -d postgres && cd dist && node main.js",
+    "start:docker": "npm run build && TYPEORM_IS_DIST=true docker-compose up --build",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "prebuild": "rm -rf dist; npm run codegen",
     "build": "tsc",
+    "build:docker": "docker build -t datapm/datapm-registry .",
     "postbuild": "gulp",
-    "postbuild:packageion": "gulp packageion",
-    "apollo:publish:dev": "npx apollo service:push --localSchemaFile=./src/schema.gql --key=service:family-connections:RukxvKpgG6hFakDKG8mYhQ --tag=dev",
-    "apollo:publish:staging": "npx apollo service:push --localSchemaFile=./src/schema.gql --key=service:family-connections:RukxvKpgG6hFakDKG8mYhQ --tag=staging",
-    "apollo:publish:packageion": "npx apollo service:push --localSchemaFile=./src/schema.gql --key=service:family-connections:RukxvKpgG6hFakDKG8mYhQ --tag=packageion",
-    "codegen": "graphql-codegen --config codegen.yml"
+    "apollo:publish": "npx apollo service:push --localSchemaFile=./src/schema.gql --key=service:family-connections:asdfasdfasdf --tag=dev",
+    "codegen": "graphql-codegen --config codegen.yml",
+    "publish": "npm run build && npm run build:docker && docker push datapm/datapm-registry"
   },
   "repository": {
     "type": "git",

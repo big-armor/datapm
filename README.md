@@ -4,29 +4,41 @@ This is a data schema registery service for the datapm ecosystem. It is based on
 
 Visit datapm.io for more information.
 
+# How Run This Service
+This service is available on docker hub, but requires setting some environment variables. 
+
+1. Review `env.sh` and edit as necessary to set the appropriate values. 
+2. `source ./env.sh` to apply the environment variables to your session. 
+3. `docker run datapm/datapm-registry` to start the registry service
+4. See the command line output for next steps, or visit datapm.io for more documentation.
+
+
 ## Developer Prerequisites:
 1. node 12 or newer
-2. npm
-3. An accessible postgresql database (see docker-compose)
+2. npm latest
+3. Docker with docker-compose or an accessible postgresql database
 
-## Steps to run this registry server
+## Steps to run this registry server in developer mode
 
-1. Run `npm ci` command
-2. Set the following environment variables (see env.sh or launch.json for example values for local development)
-4. Run `npm run start` command
+1. `npm ci` command will install and build dependencies
+2. `source ./env.sh` will set the local environment variables for the dev setup
+4. `npm run start` command will start the docker based postgres server, and start the registry server with auto-restarts when code files are changed.
 
-## Steps to build production
+## Steps to build and run production server
 
-1. Run `npm ci` command
-2. Set the environment variables (see env.sh or launch.json)
-3. Set environment variable TYPEORM_IS_DIST=true
-4. Run `npm run build`
-5. Run `cd dist && node main.js`
+This registry service can be built and run locally with the native node client. This still requires the use of docker compose to start a postgres server (or you can modify the environment variables to point to an external postgres server)
 
+1. `npm ci` command will install and build dependencies
+2. `source ./env.sh` will set the local environment variables for the dev setup
+4. `npm run start:production` will compile the typescript, copy assets into the "dist" folder, start the docker based postgres server, and start the registry server from the "dist" folder. 
 
-## Docker Image
+## Steps to run docker image locally
 
-*Need docker image info here*
+This registry service can be built and run locally via docker-compose. This command will build the registry service, and then use the docker-compose command to start the service. 
+
+1. `npm ci` command will install and build dependencies
+2. `npm run start:docker` will compile the typescript, copy assets into the "dist" folder, and then use docker compose to build a docker image and start the postgres server.
+
 
 ## Database Migrations
 
