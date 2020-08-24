@@ -1,6 +1,6 @@
 # Data Package Manager (datapm) Registery Server
 
-This is a data schema registery service for the datapm ecosystem. It is based on graphql and runs in an express middleware server. This server holds only the schema information - and is not a repository for data.
+This is a data schema registery service for the Data Package Manager (datapm) ecosystem. It is based on graphql and runs in an express middleware server. This server holds only the schema information - and is not a repository for data.
 
 Visit datapm.io for more information.
 
@@ -11,6 +11,10 @@ This service is available on docker hub, but requires setting some environment v
 2. `source ./env.sh` to apply the environment variables to your session. 
 3. `docker run datapm/datapm-registry` to start the registry service
 4. See the command line output for next steps, or visit datapm.io for more documentation.
+
+# Developer Instructions
+
+You can offer pull requests for this project. Instructions to build and run the project are below.
 
 
 ## Developer Prerequisites:
