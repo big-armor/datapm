@@ -23,6 +23,9 @@ import { superCreateConnection } from "./util/databaseCreation";
 
 const REFERER_REGEX = /\/graphql\/?$/;
 
+const app = express();
+exports.graphqlHandler = serverless(app);
+
 async function main() {
   // get secrets from environment variable or from secret manager
   // NOTE: getSecretVariable does not throw/fail. If the secret is unable
@@ -105,7 +108,6 @@ async function main() {
     },
   });
 
-  const app = express();
   // security middleware for headers. See https://helmetjs.github.io/
   app.use(helmet());
   app.disable("x-powered-by");
@@ -187,7 +189,6 @@ async function main() {
     console.log(`🚀 Server ready at http://localhost:${port}`);
   });
 
-  exports.graphqlHandler = serverless(app);
 }
 
 main().catch((error) => console.log(error));

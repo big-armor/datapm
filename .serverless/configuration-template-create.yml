@@ -1,3 +1,0 @@
-resources:
-  - type: storage.v1.bucket
-    name: sls-datapm-registry-dev-1598313883514

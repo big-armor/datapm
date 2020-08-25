@@ -1,6 +1,10 @@
 /dist/
-/node_modules/
+node_modules/
 /src/generated/
-
+.serverless/
+.terraform/
+terraform.tfstate*
+terraform.tfstate
+terraform.tfvars*
 
 .DS_Store

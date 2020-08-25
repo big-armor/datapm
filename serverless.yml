@@ -10,7 +10,6 @@ provider:
     APOLLO_GRAPH_VARIANT: dev
     GCLOUD_STORAGE_BUCKET_NAME: "datapm-registry"
     GOOGLE_CLOUD_PROJECT: adsfasdf
-    GCLOUD_CASE_EXPORT_BUCKET_NAME: case-export
     GRAPHQL_CONTEXT_USER_SUB: auth0|adsfasdfasdfasdf
     FILESYSTEM_STORAGE_DIRECTORY: local_storage
     MIXPANEL_TOKEN: asdfasdfasdf

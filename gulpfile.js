@@ -26,6 +26,18 @@ function npm() {
   return exec("npm ci --only=packageion", { cwd: DESTINATION_DIR });
 }
 
+function tagDockerImage() {
+  return exec("docker tag datapm/datapm-registry gcr.io/datapm-test-terraform/datapm-registry:latest")
+}
+
+function pushToGCR() {
+  return exec("docker push gcr.io/datapm-test-terraform/datapm-registry:latest")
+}
+
+function terraFormApply() {
+  return exec("docker push gcr.io/datapm-test-terraform/datapm-registry:latest")
+}
+
 exports.default = series(copy, copyOthers, copyModules);
 exports.local = series(copy, copyOthers, copyModules);
-exports.packageion = series(copy, copyOthers, copyModules);
+exports.deploy = series(copy,copyOthers,copyModules,tagDockerImage,pushToGCR,terraFormApply)
