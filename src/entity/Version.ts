@@ -11,7 +11,7 @@ import {
   import { BaseModel } from "./BaseModel";
 import { Package } from "./Package";
 import { VersionIdentifier } from "../generated/graphql";
-import { PackageFile } from '@datapm/datapm-lib';
+import { PackageFile } from 'datapm-lib';
   
   @Entity({
     name: "version",

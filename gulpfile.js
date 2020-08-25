@@ -19,9 +19,7 @@ function copyOthers() {
 }
 
 function copyModules() {
-  return src([
-    path.join(__dirname, "node_modules","**/*"),
-  ]).pipe(dest(path.join(DESTINATION_DIR, "node_modules")));
+  return exec("npx distize --no-files");
 }
 
 function npm() {

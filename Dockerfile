@@ -11,5 +11,5 @@ COPY dist ./
 
 EXPOSE 4000
 
-CMD [ "node", "main.js" ]
+CMD [ "node", "index.js" ]
 
