@@ -22,12 +22,12 @@ function copyModules() {
   return exec("npx distize --no-files");
 }
 
-function npm() {
-  return exec("npm ci --only=packageion", { cwd: DESTINATION_DIR });
+function buildDockerImage() {
+  return exec("docker build -t datapm-registry .")
 }
 
 function tagDockerImage() {
-  return exec("docker tag datapm/datapm-registry gcr.io/datapm-test-terraform/datapm-registry:latest")
+  return exec("docker tag datapm-registry gcr.io/datapm-test-terraform/datapm-registry:latest")
 }
 
 function pushToGCR() {
@@ -35,9 +35,9 @@ function pushToGCR() {
 }
 
 function terraFormApply() {
-  return exec("docker push gcr.io/datapm-test-terraform/datapm-registry:latest")
+  return exec("terraform appy -auto-approve")
 }
 
 exports.default = series(copy, copyOthers, copyModules);
 exports.local = series(copy, copyOthers, copyModules);
-exports.deploy = series(copy,copyOthers,copyModules,tagDockerImage,pushToGCR,terraFormApply)
+exports.deploy = series(buildDockerImage,tagDockerImage,pushToGCR,terraFormApply)

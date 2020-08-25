@@ -133,7 +133,10 @@ resource "google_cloud_run_service" "default" {
           name = "REGISTRY_PORT"
           value="443"
           }
-        
+        env { 
+          name = "TYPEORM_IS_DIST"
+          value="true"
+          }        
         }
     }
 

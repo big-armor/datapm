@@ -22,21 +22,21 @@ You can offer pull requests for this project. Instructions to build and run the 
 2. npm latest
 3. Docker with docker-compose or an accessible postgresql database
 
-## Steps to run this registry server in developer mode
+## Run registry server in developer mode
 
 1. `npm ci` command will install and build dependencies
 2. `source ./env.sh` will set the local environment variables for the dev setup
 4. `npm run start` command will start the docker based postgres server, and start the registry server with auto-restarts when code files are changed.
 
-## Steps to build and run production server
+## Build and run production server
 
 This registry service can be built and run locally with the native node client. This still requires the use of docker compose to start a postgres server (or you can modify the environment variables to point to an external postgres server)
 
 1. `npm ci` command will install and build dependencies
 2. `source ./env.sh` will set the local environment variables for the dev setup
-4. `npm run start:production` will compile the typescript, copy assets into the "dist" folder, start the docker based postgres server, and start the registry server from the "dist" folder. 
+4. `npm run start:server` will compile the typescript, copy assets into the "dist" folder, start the docker based postgres server, and start the registry server from the "dist" folder. 
 
-## Steps to run docker image locally
+## Buildl and run docker image locally
 
 This registry service can be built and run locally via docker-compose. This command will build the registry service, and then use the docker-compose command to start the service. 
 
