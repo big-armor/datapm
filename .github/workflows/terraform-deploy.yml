@@ -4,7 +4,7 @@ on:
   push:
     branches:
     - master
-  pull_request:
+    - v*
 
 jobs:
   terraform:
@@ -25,7 +25,13 @@ jobs:
 
     - name: Terraform Plan
       run: terraform plan
+      env:
+        PROJECT_ID: data-test
+        APPLICATION_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}} 
 
     - name: Terraform Apply
       if: github.ref == 'refs/heads/master' && github.event_name == 'push'
       run: terraform apply -auto-approve
+      env:
+        PROJECT_ID: data-test
+        APPLICATION_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}} 
