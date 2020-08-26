@@ -24,7 +24,10 @@ jobs:
       run: npm ci
 
     - name: Build
-      run: npm run build      
+      run: npm run build
+      
+    - name: Authorize GCR
+      run: gcloud auth activate-service-account deployment@datapm-test-terraform.iam.gserviceaccount.com --key-file=~/gcloud.key
 
     - name: Deploy Assets
       run: npm run deploy

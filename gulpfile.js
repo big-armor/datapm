@@ -24,10 +24,6 @@ function tagDockerImage() {
   return exec("docker tag datapm-registry gcr.io/datapm-test-terraform/datapm-registry:latest")
 }
 
-function authorizeGCR() {
-  return exec("gcloud auth configure-docker --quiet")
-}
-
 function pushToGCR() {
   return exec("docker push gcr.io/datapm-test-terraform/datapm-registry:latest")
 }
@@ -37,4 +33,4 @@ function terraFormApply() {
 }
 
 exports.default = series(copyFiles,copyModules,buildDockerImage);
-exports.deploy = series(tagDockerImage,authorizeGCR,pushToGCR,terraFormApply)
+exports.deploy = series(tagDockerImage,pushToGCR,terraFormApply)
