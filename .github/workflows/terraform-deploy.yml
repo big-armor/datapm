@@ -26,8 +26,11 @@ jobs:
     - name: Build
       run: npm run build
       
-    - name: Authorize GCR
+    - name: Authenticate to Google Cloud
       run: gcloud auth activate-service-account deployment@datapm-test-terraform.iam.gserviceaccount.com --key-file=gcloud.key
+
+    - name: Authorize Docker
+      run: gcloud auth configure-docker --quiet
 
     - name: Deploy Assets
       run: npm run deploy
