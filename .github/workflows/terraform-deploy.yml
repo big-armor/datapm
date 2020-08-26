@@ -26,12 +26,18 @@ jobs:
     - name: Terraform Plan
       run: terraform plan
       env:
-        PROJECT_ID: data-test
+        PROJECT_ID: data-test-terraform
         GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}} 
 
     - name: Terraform Apply
       if: github.ref == 'refs/heads/master' && github.event_name == 'push'
       run: terraform apply -auto-approve
       env:
-        PROJECT_ID: data-test
+        PROJECT_ID: data-test-terraform
         GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}} 
+
+#    - name: Google Run Update
+#      run: gcloud run deploy datapm-registry --project datapm-test-terraform --image gcr.io/datapm-test-terraform/datapm-registry --region us-central1 --platform managed
+#      env:
+#        PROJECT_ID: data-test-terraform
+#        GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}} 
