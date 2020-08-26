@@ -14,6 +14,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
+    - name: Write Credentials file
+      run: echo $GOOGLE_CREDENTIALS > ~/gcloud.key
+      env:
+        PROJECT_ID: data-test-terraform
+        GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}  
 
     - name: NPM Dependencies Install
       run: npm ci
@@ -23,15 +28,12 @@ jobs:
 
     - name: Deploy Assets
       run: npm run deploy
-
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v1
-
-    - name: Write Credentials file
-      run: echo $GOOGLE_CREDENTIALS > ~/gcloud.key
       env:
         PROJECT_ID: data-test-terraform
-        GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}       
+        GOOGLE_CREDENTIALS: ~/gcloud.key
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1     
 
     - name: Terraform Init
       run: terraform init
