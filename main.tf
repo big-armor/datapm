@@ -33,7 +33,8 @@ resource "google_project_service" "service" {
     "iam.googleapis.com",
     "cloudtrace.googleapis.com",
     "servicemanagement.googleapis.com",
-    "run.googleapis.com"
+    "run.googleapis.com",
+    "dns.googleapis.com"
   ])
 
   service = each.key
@@ -75,7 +76,7 @@ resource "google_cloud_run_service" "default" {
           }
         env { 
           name = "GOOGLE_CLOUD_PROJECT"
-          value="adsfasdf"
+          value=google_project.project.project_id
           }
         env { 
           name = "GRAPHQL_CONTEXT_USER_SUB"
@@ -141,6 +142,7 @@ resource "google_cloud_run_service" "default" {
     }
 
     metadata {
+      namespace = google_project.project.project_id
       annotations = {
         "autoscaling.knative.dev/maxScale"      = "2"
         "run.googleapis.com/cloudsql-instances" = "${google_project.project.project_id}:us-central1:${google_sql_database_instance.instance.name}"
@@ -200,4 +202,18 @@ resource "google_sql_database" "database" {
   name     = "public"
   instance = google_sql_database_instance.instance.name
   project = google_project.project.project_id
+}
+
+resource "google_cloud_run_domain_mapping" "default" {
+  location = "us-central1"
+  name     = "test.datapm.io"
+  project = google_project.project.project_id
+
+  metadata {
+    namespace = google_project.project.project_id
+  }
+
+  spec {
+    route_name = google_cloud_run_service.default.name
+  }
 }

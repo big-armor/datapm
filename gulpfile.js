@@ -5,13 +5,7 @@ const path = require("path");
 const DESTINATION_DIR = path.join(__dirname, "dist");
 console.log(DESTINATION_DIR);
 
-function copy() {
-  return src([
-    "package*.json",
-  ]).pipe(dest(path.join(DESTINATION_DIR, "src")));
-}
-
-function copyOthers() {
+function copyFiles() {
   return src([
     "ormconfig.js",
     path.join(__dirname, "src", "schema.gql"),
@@ -35,9 +29,8 @@ function pushToGCR() {
 }
 
 function terraFormApply() {
-  return exec("terraform appy -auto-approve")
+  return exec("terraform apply -auto-approve")
 }
 
-exports.default = series(copy, copyOthers, copyModules);
-exports.local = series(copy, copyOthers, copyModules);
-exports.deploy = series(buildDockerImage,tagDockerImage,pushToGCR,terraFormApply)
+exports.default = series(copyFiles,copyModules,buildDockerImage);
+exports.deploy = series(tagDockerImage,pushToGCR,terraFormApply)
