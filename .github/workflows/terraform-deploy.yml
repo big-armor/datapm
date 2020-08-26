@@ -16,24 +16,28 @@ jobs:
 
     - name: Write Credentials file
       run: echo $GOOGLE_CREDENTIALS > gcloud.key
+      working-directory: backend
       env:
         PROJECT_ID: data-test-terraform
         GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}  
 
     - name: NPM Dependencies Install
       run: npm ci
-
+      working-directory: backend
     - name: Build
       run: npm run build
-      
+      working-directory: backend
+
     - name: Authenticate to Google Cloud
       run: gcloud auth activate-service-account deployment@datapm-test-terraform.iam.gserviceaccount.com --key-file=gcloud.key
+      working-directory: backend
 
     - name: Authorize Docker
       run: gcloud auth configure-docker --quiet
 
     - name: Deploy Assets
       run: npm run deploy:docker
+      working-directory: backend
       env:
         PROJECT_ID: data-test-terraform
         GOOGLE_CREDENTIALS: ~/gcloud.key
@@ -43,15 +47,19 @@ jobs:
 
     - name: Terraform Init
       run: terraform init
+      working-directory: backend
       env:
         PROJECT_ID: data-test-terraform
         GOOGLE_CREDENTIALS: gcloud.key 
 
     - name: Terraform Format
       run: terraform fmt -check
+      working-directory: backend
+
 
     - name: Terraform Plan
       run: terraform plan
+      working-directory: backend
       env:
         PROJECT_ID: data-test-terraform
         GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}} 
@@ -59,12 +67,14 @@ jobs:
     - name: Terraform Apply
       if: github.ref == 'refs/heads/master' && github.event_name == 'push'
       run: terraform apply -auto-approve
+      working-directory: backend
       env:
         PROJECT_ID: data-test-terraform
         GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}} 
 
     - name: Google Run Update
       run: gcloud run deploy datapm-registry --project datapm-test-terraform --image gcr.io/datapm-test-terraform/datapm-registry --region us-central1 --platform managed
+      working-directory: backend
       env:
         PROJECT_ID: data-test-terraform
         GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}

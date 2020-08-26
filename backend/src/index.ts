@@ -1,6 +1,5 @@
 import "reflect-metadata";
 
-import serverless from "serverless-http";
 import express from "express";
 import helmet from "helmet";
 import querystring from "querystring";
@@ -24,7 +23,6 @@ import { superCreateConnection } from "./util/databaseCreation";
 const REFERER_REGEX = /\/graphql\/?$/;
 
 const app = express();
-exports.graphqlHandler = serverless(app);
 
 async function main() {
   // get secrets from environment variable or from secret manager

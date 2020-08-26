@@ -1,41 +1,54 @@
 const { series, src, dest } = require("gulp");
 const exec = require("child_process").exec;
+const spawn = require("child_process").spawn;
+
 const path = require("path");
+const log = require('fancy-log');
 
 const DESTINATION_DIR = path.join(__dirname, "dist");
 console.log(DESTINATION_DIR);
 
-function copyFiles() {
-  return src([
-    "ormconfig.js",
-    path.join(__dirname, "src", "schema.gql"),
-  ]).pipe(dest(DESTINATION_DIR));
+function installBackendDepdendencies() {
+  return spawnAndLog("npm",["ci"], {cwd: "backend"});
+
 }
 
-function copyModules() {
-  return exec("npx distize --no-files");
+function buildBackend() {
+  return spawnAndLog("npm",["run","build"], {cwd: "backend"});
 }
 
 function buildDockerImage() {
-  return exec("docker build -t datapm-registry .")
+  return spawnAndLog("docker", ["build","-t","datapm-registry", "."])
 }
 
 function tagDockerImage() {
-  return exec("docker tag datapm-registry gcr.io/datapm-test-terraform/datapm-registry:latest")
+  return spawnAndLog("docker", ["tag","datapm-registry", "gcr.io/datapm-test-terraform/datapm-registry:latest"])
 }
 
 function pushToGCR() {
-  return exec("docker push gcr.io/datapm-test-terraform/datapm-registry:latest")
+  return spawnAndLog("docker", ["push", "gcr.io/datapm-test-terraform/datapm-registry:latest"])
 }
 
-function terraFormApply() {
-  return exec("terraform apply -auto-approve")
+function spawnAndLog(command,args,opts) {
+  const child = spawn(command,args,opts)
+  
+  child.stdout.on('data', function(chunk) {
+    console.log(chunk.toString())
+  });
+
+  child.stderr.on('data', function(chunk) {
+    console.error(chunk.toString())
+  });
+
+  return child;
 }
 
-function updateRunToLatest() {
-  return execute("gcloud run deploy datapm-registry --project datapm-test-terraform --image gcr.io/datapm-test-terraform/datapm-registry --region us-central1 --platform managed")
-}
-
-exports.default = series(copyFiles,copyModules,buildDockerImage);
-exports.deployDockerImage = series(tagDockerImage,pushToGCR)
-exports.deploy = series(tagDockerImage,pushToGCR,terraFormApply,updateRunToLatest)
+exports.default = series(
+  installBackendDepdendencies,
+  buildBackend,
+  buildDockerImage
+  );
+exports.deployDockerImage = series(
+  tagDockerImage,
+  pushToGCR
+  )
