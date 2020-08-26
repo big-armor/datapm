@@ -25,7 +25,7 @@ function tagDockerImage() {
 }
 
 function authorizeGCR() {
-  return execute("gcloud auth configure-docker")
+  return execute("gcloud auth configure-docker --quiet")
 }
 
 function pushToGCR() {
