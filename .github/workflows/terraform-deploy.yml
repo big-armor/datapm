@@ -33,7 +33,7 @@ jobs:
       run: gcloud auth configure-docker --quiet
 
     - name: Deploy Assets
-      run: npm run deploy
+      run: npm run deploy:docker
       env:
         PROJECT_ID: data-test-terraform
         GOOGLE_CREDENTIALS: ~/gcloud.key

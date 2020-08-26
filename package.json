@@ -15,6 +15,7 @@
     "build:docker": "docker build -t datapm/datapm-registry .",
     "postbuild": "gulp",
     "deploy": "gulp deploy",
+    "deploy:docker": "gulp deployDockerImage",
     "apollo:publish": "npx apollo service:push --localSchemaFile=./src/schema.gql --key=service:family-connections:asdfasdfasdf --tag=dev",
     "codegen": "graphql-codegen --config codegen.yml",
     "publish": "npm run build && npm run build:docker && docker push datapm/datapm-registry"

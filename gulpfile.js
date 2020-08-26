@@ -32,5 +32,10 @@ function terraFormApply() {
   return exec("terraform apply -auto-approve")
 }
 
+function updateRunToLatest() {
+  return execute("gcloud run deploy datapm-registry --project datapm-test-terraform --image gcr.io/datapm-test-terraform/datapm-registry --region us-central1 --platform managed")
+}
+
 exports.default = series(copyFiles,copyModules,buildDockerImage);
-exports.deploy = series(tagDockerImage,pushToGCR,terraFormApply)
+exports.deployDockerImage = series(tagDockerImage,pushToGCR)
+exports.deploy = series(tagDockerImage,pushToGCR,terraFormApply,updateRunToLatest)
