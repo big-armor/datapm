@@ -8,7 +8,7 @@ RUN mkdir -p /usr/src/static
 
 COPY backend/dist /usr/src/app/
 
-# COPY frontend/dist /usr/src/static/
+COPY frontend/dist /usr/src/static/
 
 EXPOSE 4000
 

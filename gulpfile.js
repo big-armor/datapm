@@ -3,18 +3,24 @@ const exec = require("child_process").exec;
 const spawn = require("child_process").spawn;
 
 const path = require("path");
-const log = require('fancy-log');
 
 const DESTINATION_DIR = path.join(__dirname, "dist");
 console.log(DESTINATION_DIR);
 
 function installBackendDepdendencies() {
   return spawnAndLog("npm",["ci"], {cwd: "backend"});
-
 }
 
 function buildBackend() {
   return spawnAndLog("npm",["run","build"], {cwd: "backend"});
+}
+
+function installFrontendDepdendencies() {
+  return spawnAndLog("npm",["ci"], {cwd: "frontend"});
+}
+
+function buildFrontend() {
+  return spawnAndLog("npm",["run","build"], {cwd: "frontend"});
 }
 
 function buildDockerImage() {
@@ -44,11 +50,14 @@ function spawnAndLog(command,args,opts) {
 }
 
 exports.default = series(
+  installFrontendDepdendencies,
+  buildFrontend,
   installBackendDepdendencies,
   buildBackend,
   buildDockerImage
-  );
+);
+
 exports.deployDockerImage = series(
   tagDockerImage,
   pushToGCR
-  )
+);
