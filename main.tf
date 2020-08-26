@@ -13,7 +13,6 @@ data "google_billing_account" "acct" {
 resource "google_project" "project" {
   name            = "datapm TEST"
   project_id      = "datapm-test-terraform"
-  org_id          = "933169977231"
   billing_account = data.google_billing_account.acct.id
   lifecycle {
     prevent_destroy = true
