@@ -21,8 +21,8 @@
   },
   "homepage": "https://github.com/big-armor/datapm-registry#readme",
   "dependencies": {
-    "datapm-registry-backend": "file:/backend",
-    "datapm-registry-frontend": "file:/frontend"
+    "datapm-registry-backend": "file:backend",
+    "datapm-registry-frontend": "file:frontend"
   },
   "devDependencies": {
     "gulp": "^4.0.2"
