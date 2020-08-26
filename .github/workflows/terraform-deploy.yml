@@ -17,11 +17,16 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
 
+    - name: Write Credentials file
+      uses: echo $GOOGLE_CREDENTIALS > ~/gcloud.key
+        PROJECT_ID: data-test-terraform
+        GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}       
+
     - name: Terraform Init
       run: terraform init
       env:
         PROJECT_ID: data-test-terraform
-        GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}} 
+        GOOGLE_CREDENTIALS: ~/gcloud.key 
 
     - name: Terraform Format
       run: terraform fmt -check
