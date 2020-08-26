@@ -1,7 +1,7 @@
 resource "google_project" "project" {
-  name            = "datapm TEST"
-  project_id      = "datapm-test-terraform"
-  org_id          = "933169977231"
+  name       = "datapm TEST"
+  project_id = "datapm-test-terraform"
+  org_id     = "933169977231"
 }
 
 resource "google_project_service" "service" {
