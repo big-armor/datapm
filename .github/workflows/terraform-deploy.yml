@@ -37,6 +37,9 @@ jobs:
       run: npm run build
       working-directory: frontend
 
+    - name: Install Docker Dependencies
+      run: npm ci      
+
     - name: Build Docker Container
       run: npm run build
 
