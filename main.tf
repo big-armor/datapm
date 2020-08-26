@@ -1,7 +1,23 @@
+terraform {
+  backend "gcs" {
+    bucket = "datapm-registry-test"
+    prefix = "test/state"
+  }
+}
+
+data "google_billing_account" "acct" {
+  display_name = "Big Armor Corporate"
+  open         = true
+}
+
 resource "google_project" "project" {
-  name       = "datapm TEST"
-  project_id = "datapm-test-terraform"
-  org_id     = "933169977231"
+  name            = "datapm TEST"
+  project_id      = "datapm-test-terraform-v2"
+  org_id          = "933169977231"
+  billing_account = data.google_billing_account.acct.id
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "google_project_service" "service" {
@@ -172,12 +188,16 @@ resource "random_password" "dbpassword" {
 }
 
 resource "google_sql_database_instance" "instance" {
-  name             = "registry-v2"
+  name             = "registry-v3"
   project          = google_project.project.project_id
   region           = "us-central1"
   database_version = "POSTGRES_12"
   settings {
     tier = "db-f1-micro"
+  }
+
+  lifecycle {
+    prevent_destroy = true
   }
 }
 
