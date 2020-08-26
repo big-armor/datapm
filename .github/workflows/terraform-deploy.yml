@@ -19,6 +19,8 @@ jobs:
 
     - name: Terraform Init
       run: terraform init
+        PROJECT_ID: data-test-terraform
+        GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}} 
 
     - name: Terraform Format
       run: terraform fmt -check
