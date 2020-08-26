@@ -19,6 +19,7 @@ jobs:
 
     - name: Terraform Init
       run: terraform init
+      env:
         PROJECT_ID: data-test-terraform
         GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}} 
 
