@@ -36,7 +36,7 @@ jobs:
       run: gcloud auth configure-docker --quiet
 
     - name: Deploy Assets
-      run: npm run deploy:docker
+      run: npm run deploy
       working-directory: backend
       env:
         PROJECT_ID: data-test-terraform

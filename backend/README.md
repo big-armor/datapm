@@ -41,7 +41,7 @@ This registry service can be built and run locally with the native node client. 
 This registry service can be built and run locally via docker-compose. This command will build the registry service, and then use the docker-compose command to start the service. 
 
 1. `npm ci` command will install and build dependencies
-2. `npm run start:docker` will compile the typescript, copy assets into the "dist" folder, and then use docker compose to build a docker image and start the postgres server.
+2. `npm run start` will compile the typescript, copy assets into the "dist" folder, and then use docker compose to build a docker image and start the postgres server.
 
 
 ## Database Migrations
