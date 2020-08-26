@@ -16,26 +16,9 @@ jobs:
 
     - name: Write Credentials file
       run: echo $GOOGLE_CREDENTIALS > gcloud.key
-      working-directory: backend
       env:
         PROJECT_ID: data-test-terraform
         GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}  
-
-    - name: Install Backend Dependencies
-      run: npm ci
-      working-directory: backend
-
-    - name: Build Frontend
-      run: npm run build
-      working-directory: backend
-
-    - name: Install Frontend Dependencies
-      run: npm ci
-      working-directory: frontend
-
-    - name: Build Frontend
-      run: npm run build
-      working-directory: frontend
 
     - name: Install Docker Dependencies
       run: npm ci      
