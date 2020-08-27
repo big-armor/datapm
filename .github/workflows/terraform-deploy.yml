@@ -68,3 +68,8 @@ jobs:
       env:
         PROJECT_ID: data-test-terraform
         GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
+
+    - name: Publish Apollo Graphql Update
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+      run: npx apollo service:push --graph=datapm-registry --key=${{secrets.APOLLO_KEY}} --variant=test --localSchemaFile=/Users/wildag/Git/datapm-registry/frontend/node_modules/datapm-lib/schema.gql
+      

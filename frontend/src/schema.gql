@@ -1,0 +1,324 @@
+scalar Date
+scalar JSON
+scalar PackageFileJSON
+scalar Void
+scalar Long
+scalar Object
+
+enum VersionConflict {
+  VERSION_EXISTS,
+  HIGHER_VERSION_EXISTS,
+  HIGHER_VERSION_REQUIRED
+}
+
+enum Permission {
+  MANAGE
+  CREATE
+  VIEW
+  EDIT
+  DELETE
+  NONE
+}
+
+enum Protocol {
+  HTTP
+  LOCAL_FILE
+}
+
+directive @isAuthenticated on OBJECT | FIELD_DEFINITION
+directive @hasCatalogPermission(permission: Permission) on OBJECT | FIELD_DEFINITION
+directive @hasPackagePermission(permission: Permission) on OBJECT | FIELD_DEFINITION
+directive @isSiteAdmin on OBJECT | FIELD_DEFINITION
+directive @isUserOrAdmin on OBJECT | FIELD_DEFINITION
+
+
+
+type User {
+  username: String!
+  firstName: String
+  lastName: String
+  location: String
+  twitterHandle: String
+  website: String
+  emailAddress: String
+  gitHubHandle: String
+  nameIsPublic: Boolean!
+
+}
+
+type Catalog {
+    identifier: CatalogIdentifier!
+    displayName: String!
+    description: String!
+    website: String!
+    isPublic: Boolean!
+    userPermissions: [UserCatalog!]
+    packages: [Package]!
+}
+
+type MyCatalog {
+  catalog: Catalog!
+  permission: [Permission!]
+}
+
+type Package {
+    identifier: PackageIdentifier!
+    catalog: Catalog!
+    displayName: String!
+    description: String!
+    latestVersion: Version
+    versions: [Version]!
+}
+
+
+
+type UserPackage {
+    user: User!
+    package: Package!
+    permissions: [Permission!]
+}
+
+type UserCatalog {
+    user: User!
+    catalog: Catalog!
+    permissions: [Permission!]
+}
+
+type Collection {
+    identifier: CollectionIdentifier!
+    displayName: String!
+    description: String!
+    packages: [Package!]
+}
+
+type SearchResponse {
+    catalogs: [Catalog]
+    packages: [Package]
+}
+
+
+type UserPackagePermissions {
+  package: Package!
+  username: String!
+  permissions: [Permission!]!
+}
+
+type APIKey {
+  key: String!
+  createdAt: Date
+  lastUsed: Date
+}
+
+type APIKeyWithSecret {
+  key: String!
+  secret: String!
+  createdAt: Date
+}
+
+
+type Version {
+  identifier: VersionIdentifier!
+  createdAt: Date!
+  updatedAt: Date!
+  package: Package!
+  packageFile: PackageFileJSON
+}
+
+
+
+type VersionIdentifier {
+  registryHostname: String!
+  registryPort: Int!
+  catalogSlug: String!
+  packageSlug: String!
+  versionMajor: Int!
+  versionMinor: Int!
+  versionPatch: Int!
+}
+
+type PackageIdentifier {
+  registryHostname: String!
+  registryPort: Int!
+  catalogSlug: String!
+  packageSlug: String!
+}
+
+type CatalogIdentifier {
+  registryHostname: String!
+  registryPort: Int!
+  catalogSlug: String!
+}
+
+
+type CollectionIdentifier {
+  registryHostname: String!
+  registryPort: Int!
+  collectionSlug: String!
+}
+
+
+
+
+
+input StringWrapper {
+  val: String
+}
+
+input IntWrapper {
+  val: Int
+}
+
+input DateWrapper {
+  val: Date
+}
+
+input BooleanWrapper {
+  val: Boolean!
+}
+
+input VersionIdentifierInput {
+  registryHostname: String!
+  registryPort: Int!
+  catalogSlug: String!
+  packageSlug: String!
+  versionMajor: Int!
+  versionMinor: Int!
+  versionPatch: Int!
+}
+
+input PackageIdentifierInput {
+  registryHostname: String!
+  registryPort: Int!
+  catalogSlug: String!
+  packageSlug: String!
+}
+
+input CatalogIdentifierInput {
+  registryHostname: String!
+  registryPort: Int!
+  catalogSlug: String!
+}
+
+
+input CollectionIdentifierInput {
+  registryHostname: String!
+  registryPort: Int!
+  collectionSlug: String!
+}
+
+
+input CreateUserInputAdmin {
+  firstName: String!
+  lastName: String!
+  emailAddress: String!
+  username: String!
+  isSiteAdmin: Boolean!
+}
+
+input CreateUserInput {
+  firstName: String!
+  lastName: String!
+  emailAddress: String!
+  username: String!
+}
+
+input UpdateUserInput {
+    newUsername: String
+    firstName: String
+    lastName: String
+    email: String
+}
+
+input CreateCatalogInput {
+    slug: String!
+    displayName: String!
+    description: String!
+    website: String
+    isPublic: Boolean!
+}
+
+input UpdateCatalogInput {
+    newSlug: String
+    displayName: String
+    description: String
+}
+
+input CreatePackageInput {
+    packageSlug: String!
+    catalogSlug: String!
+    displayName: String!
+    description: String!
+
+}
+
+
+input UpdatePackageInput {
+    newCatalogSlug: String
+    newPackageSlug: String
+    displayName: String
+    description: String
+    isPublic: Boolean
+}
+
+input SetPackagePermissionInput {
+    username: String!
+    permissions: [Permission!]!
+}
+
+input CreateVersionInput {
+  packageFile: PackageFileJSON
+}
+
+type Query {
+
+    me: User!
+    
+    search(search: String!): SearchResponse
+    
+    user(username: String!):User
+
+    myCatalogs: [Catalog]!
+
+    usersByCatalog(identifier: CatalogIdentifierInput!):[User]!
+
+    catalog(identifier: CatalogIdentifierInput!): Catalog
+    
+    package(identifier: PackageIdentifierInput!): Package
+
+    collections: [Collection!]
+
+}
+
+type Mutation  {
+
+    createMe(value: CreateUserInput!): User!
+    updateMe(value: UpdateUserInput!): User! @isAuthenticated
+    disableMe: User! @isAuthenticated
+
+    createAPIKey: APIKeyWithSecret! @isAuthenticated
+    deleteAPIKey(key: String!): APIKey @isAuthenticated
+
+    removeUserFromCatalog(username: String!, catalogSlug: String!): User! @hasCatalogPermission(permission: MANAGE)
+
+    createCatalog(value: CreateCatalogInput!): Catalog!
+    updateCatalog(identifier: CatalogIdentifierInput!, value: UpdateCatalogInput!): Catalog! @hasCatalogPermission(permission: EDIT)
+    disableCatalog(identifier: CatalogIdentifierInput!): Catalog! @hasCatalogPermission(permission: DELETE)
+
+    createPackage(value: CreatePackageInput!): Package! @hasCatalogPermission(permission: CREATE)
+    updatePackage(identifier: PackageIdentifierInput!, value: UpdatePackageInput!): Package! @hasPackagePermission(permission: EDIT)
+    disablePackage(identifier: PackageIdentifierInput!): Package! @hasPackagePermission(permission: DELETE)
+
+    setPackagePermissions(identifier: PackageIdentifierInput!, value: SetPackagePermissionInput!): UserPackagePermissions! @hasPackagePermission(permission: MANAGE)
+    removePackagePermissions(identifier: PackageIdentifierInput!, username: String!):Void  @hasPackagePermission(permission: MANAGE)
+
+    createVersion(identifier: PackageIdentifierInput!, value: CreateVersionInput!): Version! @hasPackagePermission(permission: CREATE)
+    disableVersion(identifier: VersionIdentifierInput! ): Void! @hasPackagePermission(permission: EDIT)
+
+    mixpanelTrack(actions: JSON!): Int!
+    mixpanelEngage(userInfo: JSON!): Int!
+
+}
+
+
+
+

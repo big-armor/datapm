@@ -1,0 +1,9 @@
+overwrite: true
+schema: node_modules/datapm-lib/schema.gql
+documents: null
+generates:
+  src/generated/fragmentTypes.ts:
+    plugins:
+      - fragment-matcher
+  src/generated/version.ts:
+    - git-version.js
