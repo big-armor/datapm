@@ -26,7 +26,11 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "node_modules/datapm-lib/packageFileSchema.json"
+              {
+                "glob": "packageFileSchema.json",
+                "input": "node_modules/datapm-lib/",
+                "output": ""
+              }
             ],
             "styles": [
               "src/styles.scss"
