@@ -9,7 +9,7 @@ function copyFiles() {
   return src([
     "ormconfig.js",
     "package.json",
-    "package-lock.json",
+    "package-lock.json",    
     path.join(__dirname, "node_modules", "datapm-lib", "schema.gql"),
   ]).pipe(dest(DESTINATION_DIR));
 }

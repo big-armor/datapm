@@ -64,7 +64,7 @@ export const resolvers: {
 
       const ajv = new AJV();
 
-      const schema = fs.readFileSync('src/packageFileSchema.json', 'utf8');
+      const schema = fs.readFileSync('node_modules/datapm-lib/packageFileSchema.json', 'utf8');
 
       const schemaObject = JSON.parse(schema);
 

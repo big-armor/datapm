@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/big-armor/datapm-registry#readme",
   "dependencies": {
-    "datapm-lib": "^0.1.12",
+    "datapm-lib": "^0.1.13",
     "@google-cloud/secret-manager": "^3.1.0",
     "@google-cloud/storage": "^5.1.1",
     "@sendgrid/helpers": "^7.2.0",
