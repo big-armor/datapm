@@ -1,0 +1,42 @@
+{
+  "/api/v1": {
+    "target": "https://family-staging.connectourkids.org",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/_mixpanel": {
+    "target": "https://family-staging.connectourkids.org",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/_peoplesearch": {
+    "target": "https://family-staging.connectourkids.org",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/_sentry": {
+    "target": "https://family-staging.connectourkids.org",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/media": {
+    "target": "https://family-staging.connectourkids.org",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/static": {
+    "target": "https://family-staging.connectourkids.org",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/__debug__": {
+    "target": "https://family-staging.connectourkids.org",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/graphql": {
+    "target": "https://family-staging.connectourkids.org",
+    "secure": false,
+    "changeOrigin": true
+  }
+}

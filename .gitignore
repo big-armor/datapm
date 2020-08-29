@@ -1,6 +1,6 @@
 dist
 node_modules/
-src/generated/
+**/src/generated/
 .serverless/
 .terraform/
 terraform.tfstate*

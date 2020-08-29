@@ -14,7 +14,7 @@ const readFile = promisify(fs.readFile);
 
 export async function makeSchema() {
   const typeDefs = (
-    await readFile(path.join(__dirname, "schema.gql"))
+    await readFile(path.join(__dirname, "..","node_modules", "datapm-lib", "schema.gql"))
   ).toString();
 
   return makeExecutableSchema({

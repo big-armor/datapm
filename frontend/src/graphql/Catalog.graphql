@@ -1,0 +1,36 @@
+query GetCatalog($identifier:CatalogIdentifierInput!) {
+  catalog(identifier:$identifier) {
+    identifier {
+      registryHostname
+      registryPort
+      catalogSlug
+    }
+    displayName
+    description
+    website
+    packages {
+      identifier {
+        registryHostname
+        registryPort
+        catalogSlug
+        packageSlug
+      }
+      displayName
+      description
+      latestVersion {
+        identifier {
+          registryHostname
+          registryPort
+          catalogSlug
+          packageSlug
+          versionMajor
+          versionMinor
+          versionPatch
+        }
+        createdAt
+        updatedAt
+        packageFile
+      }
+    }
+  }
+}

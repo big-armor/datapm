@@ -1,9 +1,9 @@
 overwrite: true
-schema: node_modules/datapm-lib/schema.gql
-documents: null
+schema: "node_modules/datapm-lib/schema.gql"
+documents: src/graphql/*.graphql
 generates:
-  src/generated/fragmentTypes.ts:
+  src/generated/graphql.ts:
     plugins:
-      - fragment-matcher
-  src/generated/version.ts:
-    - git-version.js
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-apollo-angular"
