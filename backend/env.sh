@@ -1,3 +1,4 @@
+export NODE_MODULES_DIRECTORY="../node_modules"
 export APOLLO_KEY="service:family-connections:asdfasdfasdfasdf"
 export APOLLO_GRAPH_VARIANT="dev"
 export GCLOUD_STORAGE_BUCKET_NAME="media"

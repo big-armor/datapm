@@ -9,12 +9,15 @@ import { HasCatalogPermissionDirective } from "./directive/hasCatalogPermissionD
 import { HasPackagePermissionDirective } from "./directive/hasPackagePermissionDirective";
 import { IsSiteAdminDirective } from "./directive/isSiteAdminDirective";
 import { IsUserOrAdminDirective } from "./directive/isUserOrAdminDirective";
+import { getEnvVariable } from "./util/getEnvVariable";
 
 const readFile = promisify(fs.readFile);
 
+const nodeModulesDirectory = getEnvVariable("NODE_MODULES_DIRECTORY") || "node_modules";
+
 export async function makeSchema() {
   const typeDefs = (
-    await readFile(path.join(__dirname, "..","node_modules", "datapm-lib", "schema.gql"))
+    await readFile(nodeModulesDirectory + "/datapm-lib/schema.gql")
   ).toString();
 
   return makeExecutableSchema({
