@@ -50,10 +50,6 @@ function spawnAndLog(command,args,opts) {
 }
 
 exports.default = series(
-  installFrontendDepdendencies,
-  buildFrontend,
-  installBackendDepdendencies,
-  buildBackend,
   buildDockerImage
 );
 

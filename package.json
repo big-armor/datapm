@@ -6,6 +6,7 @@
   "typings": "backend/dist/index.d.ts",
   "module": "backend/dist/index.js",
   "scripts": {
+    "clean": "rm -rf node_modules frontend/dist frontend/node_modules backend/dist frontend/node_modules",
     "build": "gulp",
     "start": "TYPEORM_IS_DIST=true docker-compose up --build",
     "deploy": "gulp deployDockerImage"
