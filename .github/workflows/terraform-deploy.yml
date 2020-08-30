@@ -77,5 +77,5 @@ jobs:
 
     - name: Publish Apollo Graphql Update
       if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-      run: npx apollo service:push --graph=datapm --key=${{secrets.APOLLO_KEY}} --variant=test --localSchemaFile=backend/node_modules/datapm-lib/schema.gql
+      run: npx apollo service:push --graph=datapm --key=${{secrets.APOLLO_KEY}} --variant=test --localSchemaFile=node_modules/datapm-lib/schema.gql
       
