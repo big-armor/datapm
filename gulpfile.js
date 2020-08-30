@@ -24,7 +24,7 @@ function buildFrontend() {
 }
 
 function buildDockerImage() {
-  return spawnAndLog("docker", ["build","-t","datapm-registry", "."])
+  return spawnAndLog("docker", ["build","-t","datapm-registry", ".", "--no-cache"])
 }
 
 function tagDockerImage() {
