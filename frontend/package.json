@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --aot --proxy-config proxy.conf.json ",
+    "prebuild": "rm -rf dist; npm run codegen",
     "build": "NODE_OPTIONS=--max_old_space_size=4096 npx ng build --prod",
     "test": "ng test",
     "lint": "ng lint",
