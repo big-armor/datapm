@@ -23,8 +23,6 @@ RUN cp  -R ./dist/* /usr/src/app
 
 WORKDIR /usr/src/build/frontend/
 
-RUN ls src/environments/*
-
 RUN npm ci
 
 RUN npm run build

@@ -13,7 +13,7 @@ import { getEnvVariable } from "./util/getEnvVariable";
 
 const readFile = promisify(fs.readFile);
 
-const nodeModulesDirectory = getEnvVariable("NODE_MODULES_DIRECTORY") || "node_modules";
+const nodeModulesDirectory = getEnvVariable("NODE_MODULES_DIRECTORY", "node_modules");
 
 export async function makeSchema() {
   const typeDefs = (

@@ -17,13 +17,13 @@
             "type": "node",
             "request": "launch",
             "name": "Start Registry",
+            "cwd": "${workspaceFolder}/backend",
             "runtimeExecutable": "npm",
             "runtimeArgs": ["run-script", "start"],
             "skipFiles": [
                 "<node_internals>/**"
             ],
             "program": "",
-            "preLaunchTask": "tsc: build - tsconfig.json",
             "env": {
                 "APOLLO_KEY":"service:family-connections:asdfasdfasdfasdf",
                 "APOLLO_GRAPH_VARIANT":"dev",
