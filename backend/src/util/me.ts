@@ -1,7 +1,7 @@
 import express from "express";
 import { EntityManager } from "typeorm";
 
-import { Jwt, parseJwt, ensureAuth0UserExistsOrCreate } from "./jwt";
+import { Jwt, parseJwt as ensureUserExistsOrCreate, parseJwt } from "./jwt";
 import { User } from "../entity/User";
 import { Catalog } from "../entity/Catalog";
 
@@ -32,7 +32,6 @@ export async function getMeRequest(
   try {
     return getMeJwt(await parseJwt(req), manager);
   } catch (err) {
-    //console.error(`Error getting user from JWT. ${err}`);
     return undefined;
   }
 }
@@ -53,26 +52,18 @@ export async function getMeJwt(
 ): Promise<MeJwt | undefined> {
   try {
     const me = await manager.nestedTransaction(async (transaction) => {
-      const user = await ensureAuth0UserExistsOrCreate(jwt, transaction);
 
-      // update user last_login to NOW
+      const sub = jwt.sub;
+      const userRepo = manager.getRepository(User);
+    
+      const user = await userRepo.findOneOrFail({ where: { id: sub,isActive: true } });
 
-      
       user.lastLogin = new Date();
 
       await transaction.save(user);
 
-      /*
-        // use raw sql to avoid calling subscribers
-        await transaction.query(
-        'UPDATE "user" SET last_login = NOW() WHERE is_active=true AND id = $1',
-        [user.id]
-      ); */
-
-      return transaction.getRepository(User).findOneOrFail({
-        where: { sub: jwt.sub, isActive: true },
-        relations: [],
-      });
+      return user;
+      
     });
 
     // build result

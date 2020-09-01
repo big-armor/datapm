@@ -62,5 +62,12 @@ import { UserCatalogPermission } from "./UserCatalogPermission";
 
     @Column({nullable: false, default: false})
     nameIsPublic: boolean;
+
+    @Column({nullable: false, name: "password_hash"})
+    passwordHash: string;
+  
+    @Column({nullable: false, name: "password_salt"})
+    passwordSalt: string;
+    
   }
   

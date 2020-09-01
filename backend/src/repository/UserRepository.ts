@@ -16,6 +16,7 @@ import {
   CreateUserInputAdmin,
   Permission,
   UpdateUserInput,
+  CreateUserInput,
 } from "../generated/graphql";
 import { mediaStorage, uploadFile } from "../util/storage";
 import { Catalog } from "../entity/Catalog";
@@ -24,6 +25,7 @@ import { mixpanel } from "../util/mixpanel";
 import { UserCatalogPermission } from "../entity/UserCatalogPermission";
 import { CatalogRepository } from "./CatalogRepository";
 import { MeJwt } from "../util/me";
+import { hashPassword } from "../util/PasswordUtil";
 
 // https://stackoverflow.com/a/52097700
 export function isDefined<T>(value: T | undefined | null): value is T {
@@ -35,12 +37,6 @@ export interface UserCatalogInput {
   permission: Permission[];
 }
 
-export interface CreateMeInput {
-  firstName: string;
-  lastName: string;
-  emailAddress: string;
-  username: string;
-}
 
 
 const SELECTED_WORKPAD_REGEX = /^selected_workpad_id_person_(\d+)$/;
@@ -225,9 +221,24 @@ function addUserToMixpanel(user: User, invitedByUserEmail: string) {
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
+
+
+
   constructor() {
     super();
     sgMail.setApiKey(process.env.SENDGRID_API_KEY || "SG.DUMMY");
+  }
+
+  getUserByLogin(username: string, relations:string[] = [] ) {
+    const ALIAS = "getByLogin";
+
+    const user = this.createQueryBuilder(ALIAS)
+    .where([{username}, {emailAddress: username}])
+    .addRelations(ALIAS, relations)
+    .getOne();
+
+    return user;
+
   }
 
   findMe({ id, relations = [] }: { id: number; relations?: string[] }) {
@@ -304,13 +315,13 @@ export class UserRepository extends Repository<User> {
     value,
     relations = [],
   }: {
-    value: CreateMeInput;
+    value: CreateUserInput;
     relations?: string[];
   }): Promise<User> {
     return this.manager.nestedTransaction(async (transaction) => {
 
       const isAdmin = (
-        input: CreateMeInput | CreateUserInputAdmin
+        input: CreateUserInput | CreateUserInputAdmin
       ): input is CreateUserInputAdmin => {
         return (input as CreateUserInputAdmin) !== undefined;
       };
@@ -322,6 +333,8 @@ export class UserRepository extends Repository<User> {
       user.lastName = value.lastName.trim();
       user.emailAddress = value.emailAddress.trim();
       user.username = value.username.trim();
+      user.passwordSalt = uuid();
+      user.passwordHash = hashPassword(value.password,user.passwordSalt);
 
       const now = new Date();
       user.createdAt = now;
@@ -396,6 +409,10 @@ export class UserRepository extends Repository<User> {
 
       if(value.email) {
         user.emailAddress = value.email.trim();
+      }
+
+      if(value.password) {
+        user.passwordHash = hashPassword(value.password,user.passwordSalt);
       }
       
 

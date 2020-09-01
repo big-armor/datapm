@@ -2,7 +2,6 @@
   "compilerOptions": {
     "target": "es2017",
     "outDir": "dist",
-    "rootDir": "src",
     "moduleResolution": "node",
     "module": "commonjs",
     "declaration": true,
@@ -36,10 +35,9 @@
     "emitDecoratorMetadata": true /* Enables experimental support for emitting type metadata for decorators. */,
 
     "lib": ["es2017"],
-    "types": ["node"],
     "typeRoots": ["node_modules/@types", "src/types"]
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts","test/*.ts"],
   "exclude": ["node_modules/**"],
   "compileOnSave": false
 }

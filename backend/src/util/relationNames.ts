@@ -32,11 +32,11 @@ function isEmpty(obj: any): boolean {
       'f'
     ]
   */
-function getRelationNames(obj: object, parentNames: string = ""): string[] {
+export function getRelationNames(obj: object, parentNames: string = ""): string[] {
   let out: string[] = [];
   
   // TODO - This is hacky
-  const skipRelations = ["identifier","latestVersion"];
+  const skipRelations = ["identifier","latestVersion","packages"];
 
   for (let [key, val] of Object.entries(obj)) {
     if (!isEmpty(val) && skipRelations.indexOf(key) == -1) {
@@ -49,5 +49,8 @@ function getRelationNames(obj: object, parentNames: string = ""): string[] {
 }
 
 export function getGraphQlRelationName(info: any): string[] {
-  return getRelationNames(graphqlFields(info));
+
+  const fields = graphqlFields(info);
+  
+  return getRelationNames(fields);
 }

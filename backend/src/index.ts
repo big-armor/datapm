@@ -19,6 +19,8 @@ import {
 import { createDataLoaders } from "./dataLoaders";
 import { GraphQLError } from "graphql";
 import { superCreateConnection } from "./util/databaseCreation";
+import jwt from 'express-jwt';
+import { getEnvVariable } from "./util/getEnvVariable";
 
 const REFERER_REGEX = /\/graphql\/?$/;
 

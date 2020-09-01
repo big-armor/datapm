@@ -1,11 +1,5 @@
-<h3 *ngIf="meQuery">{{meQuery.me.firstName}} {{meQuery.me.lastName}}</h3>
 
-<div *ngIf="myCatalogsQuery">
-    <ul>
-        <li *ngFor="let catalog of myCatalogsQuery.myCatalogs">
-            <a [routerLink]="[catalog.identifier.catalogSlug]">{{catalog.displayName}}</a>
-        </li>
-    </ul>
-</div>
+
+<h3 *ngIf="meQuery">{{meQuery.me.firstName}} {{meQuery.me.lastName}}</h3>
 
 <router-outlet></router-outlet>

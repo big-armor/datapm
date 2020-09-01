@@ -18,6 +18,7 @@ import { PackageIdentifier } from "../generated/graphql";
 })
 @Unique(["slug","catalogId"])
 export class Package extends BaseModel {
+
   @PrimaryGeneratedColumn()
   id: number;
 

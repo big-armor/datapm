@@ -1,4 +1,4 @@
-import { EntityRepository, EntityManager } from "typeorm";
+import { EntityRepository, EntityManager, Like } from "typeorm";
 import { v4 as uuid } from "uuid";
 
 import {
@@ -317,6 +317,34 @@ export class PackageRepository {
 
       return returnValue;
     });
+
+  }
+
+  async search({
+    query, 
+    limit, 
+    offSet,
+    relations = [],
+  }: {
+    query: string;
+    limit: number;
+    offSet: number;
+    relations?: string[];
+  }):Promise<[Package[],number]>  {
+
+    const ALIAS = "search";
+
+    return await this.manager
+    .getRepository(Package)
+    .createQueryBuilder(ALIAS)
+    .where({slug: Like('%' + query + '%')})
+    .skip(offSet)
+    .take(limit)
+    .addRelations(ALIAS, [
+      ...relations,
+    ])
+    .getManyAndCount();
+
 
   }
 

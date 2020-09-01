@@ -21,7 +21,7 @@ import {
   PackageIdentifier
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
-import { getGraphQlRelationName } from "./util/relationNames";
+import { getGraphQlRelationName , getRelationNames} from "./util/relationNames";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { Catalog } from "./entity/Catalog";
 import { APIKeyRepository } from "./repository/APIKeyRepository";
@@ -40,6 +40,9 @@ import { SemVer } from "semver";
 import { ApolloError } from "apollo-server";
 
 import {compatibilityToString,comparePackages,diffCompatibility,nextVersion, PackageFile} from 'datapm-lib';
+import graphqlFields from "graphql-fields";
+import { hashPassword } from "./util/PasswordUtil";
+import * as jwt from 'jsonwebtoken'
 
 
 export const resolvers: {
@@ -145,14 +148,14 @@ export const resolvers: {
 
   Package: {
 
-    latestVersion: async(parent: any, _1: any, context: AuthenticatedContext, info: any) =>{
+    latestVersion: async(parent: any, _1: any, context: AuthenticatedContext, info: any): Promise<Version | null> =>{
 
       const packageEntity = parent as Package;
 
       const catalog = await context.connection.getCustomRepository(CatalogRepository).findOne({where: {id: packageEntity.catalogId}});
 
       if(catalog === undefined)
-        throw new Error('Could not find catalog ' + packageEntity.catalogId);
+        throw new ApolloError('Could not find catalog ' + packageEntity.catalogId, "CATALOG_NOT_FOUND");
 
       const identifier:PackageIdentifier = {
         registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
@@ -163,8 +166,10 @@ export const resolvers: {
 
       const version = await context.connection.getCustomRepository(VersionRepository).findLatestVersion({identifier: identifier, relations: getGraphQlRelationName(info)});
 
-      if(version == null)
-        throw new ApolloError('Could not find the latest version for ' + packageEntity.catalog.slug + "/" + packageEntity.slug);
+      
+      if(version == undefined)
+        return null;
+
       return version;
     },
 
@@ -275,12 +280,61 @@ export const resolvers: {
       console.log(`package found - ${JSON.stringify(packageEntity)}`);
 
       return packageEntity;
-    }
+    },
 
+    searchPackages: async(
+      _0: any,
+      {query, limit, offSet},
+      context: AuthenticatedContext,
+      info: any
+    ) => {
+
+      const [searchResponse,count] = await context.connection.manager.getCustomRepository(PackageRepository).search({query,limit, offSet, relations: getRelationNames(graphqlFields(info).packages)});
+
+      return {
+        hasMore: count - (offSet + limit) > 0,
+        packages: searchResponse
+      }
+    },
 
   },
 
   Mutation: {
+
+    login: async (
+      _0: any,
+      { username,password },
+      context: AuthenticatedContext,
+      info: any
+    ) => {
+      const user = await context.connection.manager
+        .getCustomRepository(UserRepository)
+        .getUserByLogin(
+          username,
+          getGraphQlRelationName(info)
+        );
+      if(user == null)
+          throw new ApolloError("Login incorreect","LOGIN_FAILED");
+
+      const hash = hashPassword(password,user.passwordSalt);
+
+      if(hash != user.passwordHash)
+        throw new ApolloError("Login incorreect","LOGIN_FAILED");
+
+
+      const localUrl = "http" + (getEnvVariable("REGISTRY_PORT") == "443" ?"s":"")+ "://" + getEnvVariable("REGISTRY_HOSTNAME") + "/graphql";
+
+      return jwt.sign(
+        { localUrl : {  } },
+        getEnvVariable("JWT_KEY"),
+        { 
+          algorithm: "HS256", 
+          subject: user.id.toString(), 
+          expiresIn: "1d",
+          keyid: "JWT_KEY"
+         }
+      );
+    },
 
     createMe: async (
       _0: any,

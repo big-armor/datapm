@@ -72,17 +72,8 @@ export async function parseJwt(req: express.Request): Promise<Jwt> {
     throw new AuthenticationError("invalid token");
   }
 
-  // get token public key
-  const key = await getSigningKey(decoded.header.kid);
-  const signingKey =
-    (key as jwks.CertSigningKey).publicKey ||
-    (key as jwks.RsaSigningKey).rsaPublicKey;
-  if (!signingKey) {
-    throw new AuthenticationError("failed to get signing key");
-  }
-
   // verify JWT is valid (signature/aud/iss/exp)
-  const verifiedJwt = await verifyToken(token, signingKey, jwtOptions);
+  const verifiedJwt = await verifyToken(token, getEnvVariable("JWT_KEY"), jwtOptions);
 
   return {
     token: token,
@@ -103,67 +94,3 @@ interface UserInfo {
   email_verified: boolean;
 }
 
-async function getUserInfo(token: string): Promise<UserInfo> {
-  const USERINFO_URL = `${getEnvVariable("AUTH0_ISSUER")}userinfo`;
-  const result = await fetch(USERINFO_URL, {
-    method: "GET",
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  if (result.status !== 200) {
-    throw new Error(
-      `Failed to get userinfo - bad status code ${result.status}`
-    );
-  }
-
-  return await result.json();
-}
-
-export async function ensureAuth0UserExistsOrCreate(
-  jwt: Jwt,
-  manager: EntityManager
-): Promise<User> {
-  const sub = jwt.sub;
-  const userRepo = manager.getRepository(User);
-
-  const user = await userRepo.find({ where: { sub } });
-  if (user.length > 0) return user[0]; // user exists - good to go
-
-  // retrieve user info from jwt - used to update existing or create new user
-  const userInfo = await getUserInfo(jwt.token);
-  if (!userInfo.email_verified) {
-    throw new Error("Email is not verified");
-  }
-
-  // get all users whose email matches
-  const existingUsers = await userRepo
-    .createQueryBuilder()
-    .where("LOWER(email) = :email", {
-      email: userInfo.emailAddress.toLocaleLowerCase(),
-    })
-    .getMany();
-
-  if (existingUsers.length > 1) {
-    // database is in a bad state - this should never happen
-    throw new Error(
-      `Multiple users with email ${userInfo.emailAddress} already exists`
-    );
-  } else if (existingUsers.length === 1) {
-    // attempt to migrate existing user to include auth0 sub
-    const existingUser = existingUsers[0];
-    if (existingUser.sub) {
-      throw new Error(`User with email ${userInfo.emailAddress} already taken`);
-    }
-
-    existingUser.sub = sub;
-    return await userRepo.save(existingUser);
-  } else {
-    // create new user
-    const newUser = userRepo.create();
-    newUser.sub = userInfo.sub;
-    newUser.firstName = userInfo.given_name || "";
-    newUser.lastName = userInfo.family_name || "";
-    newUser.emailAddress = userInfo.emailAddress;
-    return await userRepo.save(newUser);
-  }
-}
