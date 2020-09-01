@@ -322,18 +322,28 @@ export const resolvers: {
         throw new ApolloError("Login incorreect","LOGIN_FAILED");
 
 
-      const localUrl = "http" + (getEnvVariable("REGISTRY_PORT") == "443" ?"s":"")+ "://" + getEnvVariable("REGISTRY_HOSTNAME") + "/graphql";
 
       return jwt.sign(
-        { localUrl : {  } },
+        {  },
         getEnvVariable("JWT_KEY"),
         { 
           algorithm: "HS256", 
           subject: user.id.toString(), 
           expiresIn: "1d",
-          keyid: "JWT_KEY"
+          keyid: "JWT_KEY",
+          audience: getEnvVariable("JWT_AUDIENCE"),
+          issuer: getEnvVariable("JWT_ISSUER")
          }
       );
+    },
+
+    logout: async (
+      _0: any,
+      { },
+      context: AuthenticatedContext,
+      info: any
+    ) => {
+      throw new ApolloError("Logout is not implemented on the server side. Simply discard the JWT on the client side.")
     },
 
     createMe: async (

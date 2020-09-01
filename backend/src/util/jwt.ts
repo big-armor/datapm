@@ -1,5 +1,5 @@
 import { promisify } from "util";
-import { AuthenticationError } from "apollo-server";
+import { AuthenticationError, ApolloError } from "apollo-server";
 import { EntityManager } from "typeorm";
 import jwks from "jwks-rsa";
 import jwt from "jsonwebtoken";
@@ -9,19 +9,27 @@ import fetch from "node-fetch";
 import { User } from "../entity/User";
 import { getEnvVariable } from "./getEnvVariable";
 
-const client = jwks({
-  cache: true,
-  rateLimit: true,
-  jwksRequestsPerMinute: 10, // Default value
-  jwksUri: `${process.env.AUTH0_ISSUER}.well-known/jwks.json`,
-});
+
+export class InvalidAuthenticationError extends ApolloError {
+  constructor(message: string,extensions?: Record<string, any>,) {
+    super(message, 'INVALID_AUTHENTICATION',extensions);
+
+    Object.defineProperty(this, 'name', { value: 'InvalidAuthenticationError' });
+  }
+}
+
+export class NoAuthenticationError extends ApolloError {
+  constructor(message: string,extensions?: Record<string, any>,) {
+    super(message, 'NO_AUTHENTICATION_TOKEN',extensions);
+
+    Object.defineProperty(this, 'name', { value: 'NoAuthenticationError' });
+  }
+}
 
 const jwtOptions = {
-  audience: process.env.AUTH0_AUDIENCE,
-  issuer: process.env.AUTH0_ISSUER,
+  audience: getEnvVariable("JWT_AUDIENCE"),
+  issuer: getEnvVariable("JWT_ISSUER"),
 };
-
-const getSigningKey = promisify(client.getSigningKey);
 
 const verifyToken = (
   token: string,
@@ -30,8 +38,10 @@ const verifyToken = (
 ) => {
   return new Promise<DecodedJwt>((resolve, reject) => {
     jwt.verify(token, secretOrPublicKey, options, (err, result) => {
-      if (err) reject(new AuthenticationError(err.message));
-      resolve(result as DecodedJwt);
+      if (err) 
+        reject(new InvalidAuthenticationError(err.message))
+      else
+        resolve(result as DecodedJwt);
     });
   });
 };
@@ -41,8 +51,8 @@ function getToken(req: express.Request): string {
 
   const match = authHeader.match(/^Bearer (.*)$/);
   if (!match || match.length < 2) {
-    throw new AuthenticationError(
-      `Invalid Authorization token - ${authHeader} does not match "Bearer .*"`
+    throw new NoAuthenticationError(
+      `Authorization token not prepsent- ${authHeader} does not match "Bearer .*"`
     );
   }
   return match[1];

@@ -32,7 +32,10 @@ export async function getMeRequest(
   try {
     return getMeJwt(await parseJwt(req), manager);
   } catch (err) {
-    return undefined;
+    if(err.name == 'NoAuthenticationError')
+      return undefined;
+    else 
+      throw err;
   }
 }
 
