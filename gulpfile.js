@@ -23,6 +23,10 @@ function buildFrontend() {
   return spawnAndLog("npm",["run","build"], {cwd: "frontend"});
 }
 
+function cleanNodeModules() {
+  return spawnAndLog("npm",["run","clean:node_Modules"]);
+}
+
 function buildDockerImage() {
   return spawnAndLog("docker", ["build","-t","datapm-registry", ".", "--no-cache"])
 }
@@ -50,6 +54,10 @@ function spawnAndLog(command,args,opts) {
 }
 
 exports.default = series(
+  installBackendDepdendencies,
+  buildBackend,
+  installFrontendDepdendencies,
+  buildFrontend,
   buildDockerImage
 );
 

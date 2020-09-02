@@ -10,24 +10,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4000:4000"
-    environment:
-      - APOLLO_GRAPH_VARIANT=dev
-      - GCLOUD_STORAGE_BUCKET_NAME=media
-      - GOOGLE_CLOUD_PROJECT=adsfasdf
-      - GCLOUD_CASE_-_BUCKET_NAME=case--
-      - GRAPHQL_CONTEXT_USER_SUB=auth0|adsfasdfasdfasdf
-      - FILESYSTEM_STORAGE_DIRECTORY=local_storage
-      - MIXPANEL_TOKEN=asdfasdfasdf
-      - TYPEORM_IS_DIST=true
-      - TYPEORM_PORT=5432
-      - TYPEORM_HOST=postgres
-      - TYPEORM_DATABASE=postgres
-      - TYPEORM_SCHEMA=public
-      - TYPEORM_USERNAME=postgres
-      - TYPEORM_PASSWORD=postgres
-      - SENDGRID_API_KEY=asdfasdfa
-      - REGISTRY_HOSTNAME=localhost
-      - REGISTRY_PORT=4000
+    env_file: 
+      - Docker-env
   postgres:
     image: postgres:11
     volumes:

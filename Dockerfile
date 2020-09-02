@@ -1,37 +1,15 @@
 FROM node:12
 
-RUN node --version
-RUN npm --version
-
-RUN mkdir -p /usr/src/build
-RUN mkdir -p /usr/src/build
+WORKDIR /usr/src/app
 
 RUN mkdir -p /usr/src/app
 RUN mkdir -p /usr/src/static
 
-WORKDIR /usr/src/build
+COPY backend/dist/ /usr/src/app/
 
-COPY ./ /usr/src/build
+COPY frontend/dist/ /usr/src/static/
 
-WORKDIR /usr/src/build/backend/
 
-RUN npm ci
-
-RUN npm run build
-
-RUN cp  -R ./dist/* /usr/src/app
-
-WORKDIR /usr/src/build/frontend/
-
-RUN npm ci
-
-RUN npm run build
-
-RUN cp  -R ./dist/* /usr/src/static
-
-RUN rm -rf /usr/src/build
-
-WORKDIR /usr/src/app
 
 EXPOSE 4000
 

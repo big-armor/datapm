@@ -7,6 +7,7 @@
   "module": "backend/dist/index.js",
   "scripts": {
     "clean": "rm -rf node_modules frontend/dist frontend/node_modules backend/dist frontend/node_modules",
+    "clean:node_modules": "rm -rf node_modules frontend/node_modules frontend/node_modules",
     "build": "gulp",
     "start": "TYPEORM_IS_DIST=true docker-compose up",
     "deploy": "gulp deployDockerImage"
@@ -21,10 +22,7 @@
     "url": "https://github.com/big-armor/datapm-registry/issues"
   },
   "homepage": "https://github.com/big-armor/datapm-registry#readme",
-  "dependencies": {
-    "datapm-registry-backend": "file:backend",
-    "datapm-registry-frontend": "file:frontend"
-  },
+  "dependencies": {},
   "devDependencies": {
     "gulp": "^4.0.2"
   }

@@ -26,8 +26,8 @@ jobs:
         PROJECT_ID: data-test-terraform
         GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}  
 
-    - name: Install Docker Dependencies
-      run: npm ci      
+    - name: Install Docker Build Dependencies
+      run: npm install gulp      
 
     - name: Build Docker Container
       run: npm run build

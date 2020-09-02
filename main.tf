@@ -72,6 +72,18 @@ resource "google_cloud_run_service" "default" {
       containers {
         image = "gcr.io/${google_project.project.project_id}/datapm-registry"
         env {
+          name  = "JWT_AUDIENCE"
+          value = "test.datapm.io"
+        }
+        env {
+          name  = "JWT_ISSUER"
+          value = "test.datapm.io"
+        }
+        env {
+          name  = "JWT_KEY"
+          value = random_password.jwt_key.result
+        }                
+        env {
           name  = "APOLLO_KEY"
           value = "service:family-connections:asdfasdfasdfasdf"
         }
@@ -179,6 +191,11 @@ resource "google_cloud_run_service_iam_policy" "noauth" {
   policy_data = data.google_iam_policy.noauth.policy_data
 }
 
+resource "random_password" "jwt_key" {
+  length           = 16
+  special          = true
+  override_special = "_%@"
+}
 
 resource "random_password" "dbpassword" {
   length           = 16
