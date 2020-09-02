@@ -3,5 +3,7 @@ query Me {
     emailAddress
     firstName
     lastName
+    username
+    nameIsPublic
   }
 }

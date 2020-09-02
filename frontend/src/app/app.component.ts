@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { MyCatalogsGQL, MyCatalogsQuery, MeGQL, MeQuery } from '../generated/graphql'
-import { pluck } from 'rxjs/operators'
+import { User } from '../generated/graphql'
+import {AuthenticationService} from './services/authentication.service'
 
 @Component({
   selector: 'app-root',
@@ -10,21 +10,20 @@ import { pluck } from 'rxjs/operators'
 export class AppComponent {
   title = 'datapm-registry-frontend';
 
+  currentUser:User;
 
-  meQuery:MeQuery;
-  myCatalogsQuery:MyCatalogsQuery;
-  
   constructor(
-    private meGql: MeGQL,
-    private myCatalogsGql: MyCatalogsGQL) {}
+    private authenticationService:AuthenticationService) {}
 
   ngOnInit() {
-    this.meGql.watch().valueChanges.subscribe(({ data, loading }) => {
-      this.meQuery = data;
+
+    this.authenticationService.currentUser.subscribe((userPromise)=> {
+      userPromise.then((user) => {
+        this.currentUser = user;
+      }).catch(error => {
+        // nothing to do
+      })
     });
 
-    this.myCatalogsGql.watch().valueChanges.subscribe(({data,loading}) => {
-      this.myCatalogsQuery = data;
-    });
   }
 }

@@ -1,0 +1,9 @@
+
+<form [formGroup]="loginForm" (ngSubmit)="formSubmit()">
+    <input type="text" placeholder="Username or Email Address" name="username" formControlName="username" autocomplete="username">
+    <input type="password" placeholder="Password" name="password" formControlName="password" autocomplete="current-password">
+    <input type="submit" value="Login" [disabled]="!loginForm.valid">
+</form>
+<div class="alert-warn" *ngIf="state == State.INCORRECT_LOGIN">
+    Incorrect login information.
+</div>

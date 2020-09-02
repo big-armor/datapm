@@ -1,5 +1,4 @@
 
-
-<h3 *ngIf="meQuery">{{meQuery.me.firstName}} {{meQuery.me.lastName}}</h3>
-
+<h3 *ngIf="currentUser">{{currentUser.firstName}} {{currentUser.lastName}}</h3>
+<button *ngIf="!currentUser" routerLink="/login" >Login</button>
 <router-outlet></router-outlet>
