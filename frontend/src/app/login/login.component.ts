@@ -2,12 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { LoginGQL } from 'src/generated/graphql';
 import { AuthenticationService } from '../services/authentication.service';
+import { Router } from '@angular/router';
 
 enum State {
-  INIT,
+  LOGGED_OUT,
   AWAITING_RESPONSE,
   INCORRECT_LOGIN,
-  LOGIN_SUCCESS
+  LOGGED_IN
 }
 
 @Component({
@@ -19,7 +20,7 @@ export class LoginComponent implements OnInit {
 
   State = State;
 
-  public state = State.INIT;
+  public state = State.LOGGED_OUT;
 
   loginForm = new FormGroup({
     username: new FormControl(''),
@@ -28,24 +29,44 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private loginGQL:LoginGQL,
-    private authenticationService:AuthenticationService
+    private authenticationService:AuthenticationService,
+    private router:Router
   ) { }
 
   ngOnInit(): void {
+
+    if(this.authenticationService.currentUserValue != null)
+      this.state = State.LOGGED_IN;
+
+    this.authenticationService.getUserObservable().subscribe((userPromise) => {
+
+      if(userPromise == null) {
+        this.state = State.LOGGED_OUT;
+        return;
+      }
+
+      userPromise.then((user) => {
+        if(user != null)
+          this.state = State.LOGGED_IN;
+        else {
+          if(this.state == State.LOGGED_IN)
+            this.state = State.LOGGED_OUT;
+        }
+      })
+    });
   }
 
   formSubmit() {
 
     this.state = State.AWAITING_RESPONSE;
 
-    this.loginGQL.mutate({username: this.loginForm.value.username, password: this.loginForm.value.password})
-      .subscribe((value) => {
-        this.authenticationService.setJwt(value.data.login);
-        this.state = State.LOGIN_SUCCESS;
-      },(error)=> {
+    this.authenticationService
+      .login(this.loginForm.value.username, this.loginForm.value.password)
+      .then((user) => {
+        this.state = State.LOGGED_IN;
+        this.router.navigate(['/']);
+      }).catch(error => {
         this.state = State.INCORRECT_LOGIN;
-        console.error(error);
-
       });
 
 

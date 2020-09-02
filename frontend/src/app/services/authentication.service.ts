@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 
 import { User, LoginGQL, MeGQL } from '../../generated/graphql';
 import Maybe from 'graphql/tsutils/Maybe';
@@ -10,16 +8,18 @@ import Maybe from 'graphql/tsutils/Maybe';
 export class AuthenticationService {
 
     private currentUserSubject: BehaviorSubject<Promise<Maybe<User>>>;
-    public currentUser: Observable<Promise<User>>;
 
     constructor(private loginGQL:LoginGQL,
         private meGQL:MeGQL) {
             this.currentUserSubject = new BehaviorSubject(this.refreshUserInfo());
-            this.currentUser = this.currentUserSubject.asObservable();
         }
 
     public get currentUserValue(): Promise<Maybe<User>> {
         return this.currentUserSubject.value;
+    }
+    
+    public getUserObservable() {
+        return this.currentUserSubject.asObservable();
     }
 
     refreshUserInfo():Promise<Maybe<User>> {
@@ -38,6 +38,7 @@ export class AuthenticationService {
                     reject(observer.error);
                 } else {
                     const me = observer.data.me;
+                    this.currentUserSubject.next(Promise.resolve(me));
                     result(me);
                 }
 
@@ -48,17 +49,24 @@ export class AuthenticationService {
         })
     }
 
-    login(username: string, password: string) {
+    login(username: string, password: string):Promise<Maybe<User>> {
 
-        this.loginGQL.mutate({username,password}).subscribe((result) => {
-            if(result.errors) {
+        return new Promise((result, reject) => {
 
-            } else {
-                const jwt = result.data.login;
-                localStorage.setItem('jwt',jwt);
+            this.loginGQL.mutate({username,password}).subscribe((graphqlResult) => {
+                if(graphqlResult.errors) {
+                    console.error(graphqlResult)
+                    reject(graphqlResult.errors);
+                } else {
+                    const jwt = graphqlResult.data.login;
+                    localStorage.setItem('jwt',jwt);
+    
+                    this.refreshUserInfo().then(user => {result(user)});
+                }
+            });
 
-            }
-        });
+        })
+
         
     }
 

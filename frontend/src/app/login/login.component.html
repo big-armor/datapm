@@ -1,5 +1,5 @@
 
-<form [formGroup]="loginForm" (ngSubmit)="formSubmit()">
+<form [formGroup]="loginForm" (ngSubmit)="formSubmit()" *ngIf="state != State.LOGGED_IN">
     <input type="text" placeholder="Username or Email Address" name="username" formControlName="username" autocomplete="username">
     <input type="password" placeholder="Password" name="password" formControlName="password" autocomplete="current-password">
     <input type="submit" value="Login" [disabled]="!loginForm.valid">

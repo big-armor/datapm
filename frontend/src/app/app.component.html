@@ -1,4 +1,8 @@
 
-<h3 *ngIf="currentUser">{{currentUser.firstName}} {{currentUser.lastName}}</h3>
-<button *ngIf="!currentUser" routerLink="/login" >Login</button>
+<h1 routerLink="/">datapm</h1>
+<h3>Less Wrangling, More Data</h3>
+<p *ngIf="currentUser">Welcome {{currentUser.firstName}} {{currentUser.lastName}}</p>
+<a *ngIf="!currentUser && router.url != '/login'" routerLink="/login">Login</a>
+<button *ngIf="currentUser" (click)="logoutClicked()" >Logout</button>
+
 <router-outlet></router-outlet>

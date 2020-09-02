@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { User } from '../generated/graphql'
 import {AuthenticationService} from './services/authentication.service'
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -13,17 +14,36 @@ export class AppComponent {
   currentUser:User;
 
   constructor(
-    private authenticationService:AuthenticationService) {}
+    private authenticationService:AuthenticationService,
+    private router:Router) {}
 
   ngOnInit() {
 
-    this.authenticationService.currentUser.subscribe((userPromise)=> {
+    let currentPromise:Promise<User>;
+
+    this.authenticationService.getUserObservable().subscribe((userPromise)=> {
+      currentPromise = userPromise;
+
+      if(userPromise == null){
+        this.currentUser = null;
+        return;
+      }
+
       userPromise.then((user) => {
+
+        // Race condition consideration
+        if(currentPromise != userPromise)
+          return;
+
         this.currentUser = user;
       }).catch(error => {
         // nothing to do
       })
     });
 
+  }
+
+  logoutClicked() {
+    this.authenticationService.logout();
   }
 }
