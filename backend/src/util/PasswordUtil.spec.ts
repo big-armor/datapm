@@ -1,6 +1,6 @@
 
 import { SemVer } from 'semver';
-import { hashPassword } from '../src/util/PasswordUtil';
+import { hashPassword } from './PasswordUtil';
 /// <reference types="jest" />
 
 describe("Passwordhasing", () => {
