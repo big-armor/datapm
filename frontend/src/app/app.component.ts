@@ -15,7 +15,7 @@ export class AppComponent {
 
   constructor(
     private authenticationService:AuthenticationService,
-    private router:Router) {}
+    public router:Router) {}
 
   ngOnInit() {
 
