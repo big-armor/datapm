@@ -82,7 +82,7 @@ resource "google_cloud_run_service" "default" {
         env {
           name  = "JWT_KEY"
           value = random_password.jwt_key.result
-        }                
+        }
         env {
           name  = "APOLLO_KEY"
           value = "service:family-connections:asdfasdfasdfasdf"
