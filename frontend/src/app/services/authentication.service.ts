@@ -53,17 +53,15 @@ export class AuthenticationService {
 
         return new Promise((result, reject) => {
 
-            this.loginGQL.mutate({username,password}).subscribe((graphqlResult) => {
-                if(graphqlResult.errors) {
-                    console.error(graphqlResult)
-                    reject(graphqlResult.errors);
-                } else {
-                    const jwt = graphqlResult.data.login;
-                    localStorage.setItem('jwt',jwt);
-    
-                    this.refreshUserInfo().then(user => {result(user)});
-                }
-            });
+            this.loginGQL.mutate({username,password}).toPromise().then((response) => {
+                const jwt = response.data.login;
+                localStorage.setItem('jwt',jwt);
+
+                this.refreshUserInfo().then(user => {result(user)});
+            }).catch((error) => {
+                console.error(error)
+                reject(error);
+            })
 
         })
 

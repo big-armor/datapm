@@ -3,12 +3,14 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { LoginGQL } from 'src/generated/graphql';
 import { AuthenticationService } from '../services/authentication.service';
 import { Router } from '@angular/router';
+import { ApolloError } from '@apollo/client/core';
 
 enum State {
   LOGGED_OUT,
   AWAITING_RESPONSE,
   INCORRECT_LOGIN,
-  LOGGED_IN
+  LOGGED_IN,
+  LOGIN_ERROR
 }
 
 @Component({
@@ -65,8 +67,13 @@ export class LoginComponent implements OnInit {
       .then((user) => {
         this.state = State.LOGGED_IN;
         this.router.navigate(['/']);
-      }).catch(error => {
-        this.state = State.INCORRECT_LOGIN;
+      }).catch((error: ApolloError) => {
+
+        if(error.graphQLErrors.find(e => e.extensions.code == "LOGIN_FAILED") != null)
+          this.state = State.INCORRECT_LOGIN;
+        else 
+          this.state = State.LOGIN_ERROR;
+          
       });
 
 

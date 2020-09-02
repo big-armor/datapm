@@ -314,12 +314,12 @@ export const resolvers: {
           getGraphQlRelationName(info)
         );
       if(user == null)
-          throw new ApolloError("Login incorreect","LOGIN_FAILED");
+          throw new ApolloError("Login incorrect","LOGIN_FAILED");
 
       const hash = hashPassword(password,user.passwordSalt);
 
       if(hash != user.passwordHash)
-        throw new ApolloError("Login incorreect","LOGIN_FAILED");
+        throw new ApolloError("Login incorrect","LOGIN_FAILED");
 
 
 

@@ -7,3 +7,6 @@
 <div class="alert-warn" *ngIf="state == State.INCORRECT_LOGIN">
     Incorrect login information.
 </div>
+<div class="alert-warn" *ngIf="state == State.LOGIN_ERROR">
+    There was a problem communicating or with the server. Please try again, or contact support.
+</div>
