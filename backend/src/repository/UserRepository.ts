@@ -177,7 +177,7 @@ async function sendInviteEmail(
     initial_last_name: user.lastName,
   };
 
-  const link = `${process.env.AUTH0_ISSUER}authorize?${querystring.stringify(
+  const link = `${process.env.JWT_ISSUER}authorize?${querystring.stringify(
     params
   )}`;
 
