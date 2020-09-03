@@ -34,9 +34,9 @@ export async function makeSchema() {
       hasCatalogPermission: HasCatalogPermissionDirective,
       hasPackagePermission: HasPackagePermissionDirective,
       isSiteAdmin: IsSiteAdminDirective,
-      validEmailAddressDirective: ValidEmailDirective,
-      validUsernameDirective: ValidUsernameDirective,
-      validPasswordDirective: ValidPasswordDirective
+      validEmailAddress: ValidEmailDirective,
+      validUsername: ValidUsernameDirective,
+      validPassword: ValidPasswordDirective
 
     },
   });

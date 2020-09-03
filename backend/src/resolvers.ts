@@ -306,6 +306,22 @@ export const resolvers: {
       return user == null;
     },
 
+    emailAddressAvailable: async(
+      _0: any,
+      {emailAddress},
+      context: AuthenticatedContext,
+      info: any
+    ) => {
+  
+      const user = await context
+        .connection
+        .manager
+        .getCustomRepository(UserRepository)
+        .getUserByEmail(emailAddress);
+  
+      return user == null;
+    }
+
   },
 
   Mutation: {

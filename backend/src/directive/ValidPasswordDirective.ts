@@ -1,37 +1,59 @@
 import { SchemaDirectiveVisitor, ApolloError, ValidationError } from "apollo-server";
-import { GraphQLField, defaultFieldResolver } from "graphql";
+import { GraphQLField, defaultFieldResolver, GraphQLInputField, GraphQLInputObjectType, GraphQLArgument, GraphQLInterfaceType, GraphQLObjectType } from "graphql";
 import { Context } from "../context";
 
 export class ValidPasswordDirective extends SchemaDirectiveVisitor {
-    visitFieldDefinition(field: GraphQLField<any, any>) {
-        const { resolve = defaultFieldResolver } = field;
-
-        field.resolve = function (source, args, context: Context, info) {
     
-            const regex = /^[0-9@#$%]$/;
-
+    visitArgumentDefinition(
+        argument: GraphQLArgument,
+        details: {
+          field: GraphQLField<any, any>;
+          objectType: GraphQLObjectType | GraphQLInterfaceType;
+        }
+      ): GraphQLArgument | void | null {
+        const { resolve = defaultFieldResolver } = details.field;
+        const self = this;
+        details.field.resolve = function (source, args, context: Context, info) {
+          
+    
             const password: string | undefined = args.username || args.value.username || undefined;
     
-            if(password === undefined)
-                throw new ValidationError(`Password must be provided`);
-
-            if(password.length == 0)
-                throw new ValidationError(`Password must be provided`);    
-
-            if(password.length > 99)
-                throw new ValidationError(`Password must be less than 100 characters`);
-
-            if(password.length < 8)
-                throw new ValidationError(`Password must be at least 8 characters long`);
-
-            if(password.length < 16
-                && password.match(regex) == null) {
-                throw new ValidationError(`Passwords less than 16 characters must contain a number or a special character (@#$%)`);
-            }
-
-            return resolve.apply(this, [source, args, context, info]);
-            
+            self.validatePassword(password)
     
+            return resolve.apply(this, [source, args, context, info]);
         };
+      }
+      
+    validatePassword(password:String | undefined) {
+        const regex = /^[0-9@#$%]$/;
+
+        if(password === undefined)
+            throw new ValidationError(`REQUIRED`);
+
+        if(password.length == 0)
+            throw new ValidationError(`REQUIRED`);    
+
+        if(password.length > 99)
+            throw new ValidationError(`TO_LONG`);
+
+        if(password.length < 8)
+            throw new ValidationError(`TO_SHORT`);
+
+        if(password.length < 16
+            && password.match(regex) == null) {
+            throw new ValidationError(`INVALID_CHARACTERS`);
+        }
+
     }
+
+
+  visitInputFieldDefinition(
+    field: GraphQLInputField,
+    details: {
+      objectType: GraphQLInputObjectType;
+    }
+  ): GraphQLInputField | void | null {
+
+    return field;
+  }
 }

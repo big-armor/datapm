@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthenticationService } from '../services/authentication.service';
 import { FormGroup, FormControl, AbstractControl, ValidationErrors, AsyncValidatorFn, MaxLengthValidator } from '@angular/forms';
@@ -12,31 +12,65 @@ enum State {
 }
 
 
-function usernameValidator(usernameAvailableGQL: UsernameAvailableGQL): AsyncValidatorFn {
+function usernameValidator(usernameAvailableGQL: UsernameAvailableGQL,componentChangeDetector:ChangeDetectorRef): AsyncValidatorFn {
   return (control: AbstractControl): Promise<ValidationErrors | null> => {
     return new Promise<ValidationErrors | null>((success,error) => {
-      if(control.value == null) {
+      if(control.value == "" || control.value == null) {
         success({
-          usernameAvailable: true
+          REQUIRED: true
         });
         return;
       }
       usernameAvailableGQL.fetch({username: control.value}).subscribe(result => {
-        if(result.error) {
-          error(result.error);
+        if(result.errors?.length > 0) {
+          success({
+            [result.errors[0].message] : true
+          });
         } else {
           if(result.data.usernameAvailable) {
             success(null)
           } else {
             success({
-              usernameAvailable: true
+              NOT_AVAILABLE: true
             })
           }
         }
+        control.markAsDirty();
+        componentChangeDetector.detectChanges();
       })
     })
   };
-} 
+}
+
+function emailAddressValidator(emailAddressAvailableGQL: EmailAddressAvailableGQL,componentChangeDetector:ChangeDetectorRef): AsyncValidatorFn {
+  return (control: AbstractControl): Promise<ValidationErrors | null> => {
+    return new Promise<ValidationErrors | null>((success,error) => {
+      if(control.value == "" || control.value == null) {
+        success({
+          REQUIRED: true
+        });
+        return;
+      }
+      emailAddressAvailableGQL.fetch({emailAddress: control.value}).subscribe(result => {
+        if(result.errors?.length > 0) {
+          success({
+            [result.errors[0].message] : true
+          });
+        } else {
+          if(result.data.emailAddressAvailable) {
+            success(null)
+          } else {
+            success({
+              NOT_AVAILABLE: true
+            })
+          }
+        }
+        control.markAllAsTouched();
+        componentChangeDetector.detectChanges();
+      })
+    })
+  };
+}
 
 @Component({
   selector: 'app-signup',
@@ -48,23 +82,28 @@ export class SignupComponent implements OnInit {
 
   state = State.INIT;
 
-  signUpForm = new FormGroup({
-    username: new FormControl('',[],[usernameValidator(this.usernameAvailableGQL)]),
-    emailAddress: new FormControl(''),
-    password: new FormControl('')
-  });
+  signUpForm:FormGroup
+
 
   constructor(
     private router:Router,
     private authenticationService:AuthenticationService,
     private createMeGQL:CreateMeGQL,
     private usernameAvailableGQL:UsernameAvailableGQL,
-    private emailAddressAvailableGQL:EmailAddressAvailableGQL
+    private emailAddressAvailableGQL:EmailAddressAvailableGQL,
+    private componentChangeDetector:ChangeDetectorRef
   ) {
     
   }
 
   ngOnInit(): void {
+    this.signUpForm = new FormGroup({
+      username: new FormControl('',{asyncValidators: [usernameValidator(this.usernameAvailableGQL,this.componentChangeDetector)],updateOn: 'blur'}),
+      emailAddress: new FormControl('',{asyncValidators: [emailAddressValidator(this.emailAddressAvailableGQL,this.componentChangeDetector)],updateOn: 'blur'}),
+      password: new FormControl('')
+    });
+
+    
   }
 
   formSubmit() {

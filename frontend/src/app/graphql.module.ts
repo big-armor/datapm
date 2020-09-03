@@ -51,7 +51,18 @@ export function provideApollo(httpLink: HttpLink) {
 
   return {
     link,
-    cache
+    cache,
+    defaultOptions: {
+      query: {
+        errorPolicy: 'all'
+      },
+      watchQuery: {
+        errorPolicy: 'all'
+      },
+      mutate: {
+        errorPolicy: 'all'
+      }
+    }
   }
 }
 

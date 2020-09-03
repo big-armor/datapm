@@ -5,6 +5,25 @@
     <input type="password" placeholder="Password" name="password" formControlName="password" autocomplete="new-password" minlength="8">
     <input type="submit" value="Sign Up" [disabled]="!signUpForm.valid">
 </form>
+<div class="alert-warn" *ngIf="signUpForm.get('username').errors?.INVALID_CHARACTERS">
+    Username must contain only numbers, letters, and hyphens, and may not start or end with a hyphen.
+</div>
+<div class="alert-warn" *ngIf="signUpForm.get('username').errors?.TOO_LONG">
+    Username must be less than 40 characters long.
+</div>
+<div class="alert-warn" *ngIf="signUpForm.get('username').errors?.NOT_AVAILABLE">
+    That username is not available. Try a different username.
+</div>
+<div class="alert-warn" *ngIf="signUpForm.get('emailAddress').errors?.INVALID_FORMAT">
+    Username must contain only numbers, letters, and hyphens, and may not start or end with a hyphen.
+</div>
+<div class="alert-warn" *ngIf="signUpForm.get('emailAddress').errors?.TOO_LONG">
+    Email address must be less than 100 characters long.
+</div>
+<div class="alert-warn" *ngIf="signUpForm.get('emailAddress').errors?.NOT_AVAILABLE">
+    That email address already has an account. Please use the forgot password feature on the login page.
+</div>
+
 <div class="alert-warn" *ngIf="state == State.REJECTED">
     The server rejected the request.
 </div>
