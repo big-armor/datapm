@@ -172,7 +172,7 @@ export class PackageRepository {
       packageEntity.catalogId = catalog.id;
       packageEntity.displayName = packageInput.displayName;
       packageEntity.slug = packageInput.packageSlug;
-      packageEntity.description = packageInput.description;
+      packageEntity.description = packageInput.description || null;
       packageEntity.createdAt = new Date();
       packageEntity.updatedAt = new Date();
       packageEntity.isActive = true;

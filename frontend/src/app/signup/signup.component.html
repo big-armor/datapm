@@ -1,1 +1,13 @@
-<p>signup works!</p>
+
+<form [formGroup]="signUpForm" (ngSubmit)="formSubmit()">
+    <input type="text" placeholder="Email Address" name="emailAddress" formControlName="emailAddress" autocomplete="email" email minlength="5">
+    <input type="text" placeholder="Username" name="username" formControlName="username" autocomplete="username">
+    <input type="password" placeholder="Password" name="password" formControlName="password" autocomplete="new-password" minlength="8">
+    <input type="submit" value="Sign Up" [disabled]="!signUpForm.valid">
+</form>
+<div class="alert-warn" *ngIf="state == State.REJECTED">
+    The server rejected the request.
+</div>
+<div class="alert-error" *ngIf="state == State.ERROR">
+    There was a problem communicating or with the server. Please try again, or contact support.
+</div>

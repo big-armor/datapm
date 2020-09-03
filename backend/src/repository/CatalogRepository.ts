@@ -149,7 +149,7 @@ export class CatalogRepository extends Repository<Catalog> {
       const catalog = transaction.create(Catalog);
       catalog.slug = value.slug
       catalog.displayName = value.displayName;
-      catalog.description = value.description;
+      catalog.description = value.description || null;
       catalog.isPublic = value.isPublic;
       catalog.createdAt = now;
       catalog.website = value.website ? value.website : "";

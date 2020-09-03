@@ -138,8 +138,6 @@ export const resolvers: {
       const catalog = parent as Catalog;
 
       return {
-        registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
-        registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
         catalogSlug: catalog.slug,
       };
 
@@ -158,8 +156,6 @@ export const resolvers: {
         throw new ApolloError('Could not find catalog ' + packageEntity.catalogId, "CATALOG_NOT_FOUND");
 
       const identifier:PackageIdentifier = {
-        registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
-        registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
         catalogSlug: catalog.slug,
         packageSlug: packageEntity.slug
       }
@@ -181,8 +177,6 @@ export const resolvers: {
       const catalog = await context.connection.getRepository(Catalog).findOneOrFail({id: packageEntity.catalogId });
 
       return {
-        registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
-        registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
         catalogSlug: catalog.slug,
         packageSlug: packageEntity.slug
       };
@@ -201,8 +195,6 @@ export const resolvers: {
       const catalog = await context.connection.getRepository(Catalog).findOneOrFail({id: packageEntity.catalogId });
 
       return {
-        registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
-        registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
         catalogSlug: catalog.slug,
         packageSlug: packageEntity.slug,
         versionMajor: version.majorVersion,
@@ -295,6 +287,23 @@ export const resolvers: {
         hasMore: count - (offSet + limit) > 0,
         packages: searchResponse
       }
+    },
+
+
+    usernameAvailable: async(
+      _0: any,
+      {username},
+      context: AuthenticatedContext,
+      info: any
+    ) => {
+
+      const user = await context
+        .connection
+        .manager
+        .getCustomRepository(UserRepository)
+        .getUserByUsername(username);
+
+      return user == null;
     },
 
   },

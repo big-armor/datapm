@@ -222,11 +222,29 @@ function addUserToMixpanel(user: User, invitedByUserEmail: string) {
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
 
-
-
   constructor() {
     super();
     sgMail.setApiKey(process.env.SENDGRID_API_KEY || "SG.DUMMY");
+  }
+
+  getUserByUsername(username: string) {
+    const ALIAS = "getUsername";
+
+    const user = this.createQueryBuilder(ALIAS)
+    .where([{username}])
+    .getOne();
+
+    return user;
+  }
+
+  getUserByEmail(emailAddress: string) {
+    const ALIAS = "getByEmailAddress";
+
+    const user = this.createQueryBuilder(ALIAS)
+    .where([{emailAddress}])
+    .getOne();
+
+    return user;
   }
 
   getUserByLogin(username: string, relations:string[] = [] ) {
@@ -408,8 +426,8 @@ export class UserRepository extends Repository<User> {
       }
 
       const finalUserName = me.username;
-      if(value.newUsername) {
-        user.username = value.newUsername.trim();
+      if(value.username) {
+        user.username = value.username.trim();
       }
 
       if(value.email) {

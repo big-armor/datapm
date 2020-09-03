@@ -10,6 +10,10 @@ import { HasPackagePermissionDirective } from "./directive/hasPackagePermissionD
 import { IsSiteAdminDirective } from "./directive/isSiteAdminDirective";
 import { IsUserOrAdminDirective } from "./directive/isUserOrAdminDirective";
 import { getEnvVariable } from "./util/getEnvVariable";
+import { ValidEmailDirective } from "./directive/ValidEmailDirective";
+import { ValidUsernameDirective } from "./directive/ValidUsernameDirective";
+import { ValidPasswordDirective } from "./directive/ValidPasswordDirective";
+const ConstraintDirective = require('apollo-server-constraint-directive');
 
 const readFile = promisify(fs.readFile);
 
@@ -24,11 +28,16 @@ export async function makeSchema() {
     typeDefs,
     resolvers,
     schemaDirectives: {
+      constraint: ConstraintDirective,
       isUserOrAdmin: IsUserOrAdminDirective,
       isAuthenticated: IsAuthenticatedDirective,
       hasCatalogPermission: HasCatalogPermissionDirective,
       hasPackagePermission: HasPackagePermissionDirective,
       isSiteAdmin: IsSiteAdminDirective,
+      validEmailAddressDirective: ValidEmailDirective,
+      validUsernameDirective: ValidUsernameDirective,
+      validPasswordDirective: ValidPasswordDirective
+
     },
   });
 }

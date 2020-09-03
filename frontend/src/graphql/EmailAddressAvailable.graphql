@@ -1,0 +1,3 @@
+query EmailAddressAvailable($emailAddress:String!) {
+  emailAddressAvailable(emailAddress:$emailAddress)
+}

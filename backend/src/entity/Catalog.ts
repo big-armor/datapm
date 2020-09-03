@@ -24,8 +24,8 @@ export class Catalog extends BaseModel {
   @Column()
   isPublic: boolean;
 
-  @Column({ type: "text" })
-  description: string;
+  @Column({ type: "text", nullable: true })
+  description: string | null;
 
   @Column({nullable: false, default: true})
   isActive: boolean;

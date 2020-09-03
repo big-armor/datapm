@@ -39,9 +39,11 @@ export class Package extends BaseModel {
   displayName: string
 
   @Column({
-    name: "description"
+    name: "description",
+    nullable: true,
+    type: "text"
   })
-  description: string
+  description: string | null
 
   @ManyToOne(() => Catalog)
   @JoinColumn({ name: "catalog_id" })
