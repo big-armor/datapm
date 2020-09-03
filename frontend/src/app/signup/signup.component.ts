@@ -8,7 +8,8 @@ enum State {
   AWAITING_RESPONSE,
   REJECTED,
   ERROR,
-  SUCCESS
+  SUCCESS,
+  ERROR_AFTER_SIGNUP
 }
 
 
@@ -116,7 +117,14 @@ export class SignupComponent implements OnInit {
         }
       }
     ).toPromise().then((result) => {
-      this.state = State.ERROR;
+      this.state = State.SUCCESS;
+      this.authenticationService
+        .setJwt(result.data.createMe)
+        .then(user => {
+          setTimeout(()=>{this.router.navigate(["/"])},1000)
+        }).catch(error => {
+          this.state = State.ERROR_AFTER_SIGNUP;
+        });
     }).catch(error => {
 
     });

@@ -1,7 +1,12 @@
 
 <h1 routerLink="/">datapm</h1>
 <h3>Less Wrangling, More Data</h3>
-<p *ngIf="currentUser">Welcome <a routerLink="/me">{{currentUser.firstName}} {{currentUser.lastName}}</a></p>
-<a *ngIf="!currentUser && router.url != '/login'" routerLink="/login">Log In</a><br/>
-<a *ngIf="!currentUser && router.url != '/signup'" routerLink="/signup">Sign Up</a>
+
+<a routerLink="/" *ngIf="router.url != '/'">Search</a>
+&nbsp;&nbsp;<a *ngIf="!currentUser && router.url != '/login'" routerLink="/login">Log In</a>
+&nbsp;&nbsp;<a *ngIf="!currentUser && router.url != '/signup'" routerLink="/signup">Sign Up</a>
+&nbsp;&nbsp;<span *ngIf="currentUser">Welcome <a routerLink="/me">{{getWelcomeString(this.currentUser)}}</a></span>
+
+<hr/>
+<br/>
 <router-outlet></router-outlet>

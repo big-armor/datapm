@@ -43,6 +43,7 @@ import {compatibilityToString,comparePackages,diffCompatibility,nextVersion, Pac
 import graphqlFields from "graphql-fields";
 import { hashPassword } from "./util/PasswordUtil";
 import * as jwt from 'jsonwebtoken'
+import { createJwt } from "./util/jwt";
 
 
 export const resolvers: {
@@ -348,18 +349,7 @@ export const resolvers: {
 
 
 
-      return jwt.sign(
-        {  },
-        getEnvVariable("JWT_KEY"),
-        { 
-          algorithm: "HS256", 
-          subject: user.id.toString(), 
-          expiresIn: "1d",
-          keyid: "JWT_KEY",
-          audience: getEnvVariable("JWT_AUDIENCE"),
-          issuer: getEnvVariable("JWT_ISSUER")
-         }
-      );
+      return createJwt(user);
     },
 
     logout: async (
@@ -382,9 +372,10 @@ export const resolvers: {
         .createUser({
           value,
           relations: getGraphQlRelationName(info),
-        })
+        });
 
-      return user;
+      return createJwt(user);
+
     },
 
 

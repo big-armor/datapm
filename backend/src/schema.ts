@@ -13,6 +13,7 @@ import { getEnvVariable } from "./util/getEnvVariable";
 import { ValidEmailDirective } from "./directive/ValidEmailDirective";
 import { ValidUsernameDirective } from "./directive/ValidUsernameDirective";
 import { ValidPasswordDirective } from "./directive/ValidPasswordDirective";
+import { ValidSlugDirective } from "./directive/ValidSlugDirective";
 const ConstraintDirective = require('apollo-server-constraint-directive');
 
 const readFile = promisify(fs.readFile);
@@ -36,7 +37,8 @@ export async function makeSchema() {
       isSiteAdmin: IsSiteAdminDirective,
       validEmailAddress: ValidEmailDirective,
       validUsername: ValidUsernameDirective,
-      validPassword: ValidPasswordDirective
+      validPassword: ValidPasswordDirective,
+      validSlug: ValidSlugDirective
 
     },
   });

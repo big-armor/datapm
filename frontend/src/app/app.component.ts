@@ -43,4 +43,11 @@ export class AppComponent {
 
   }
 
+  getWelcomeString() {
+    if(this.currentUser.firstName != null)
+      return this.currentUser.firstName;
+
+    return this.currentUser.username;
+  }
+
 }

@@ -76,8 +76,8 @@ export class AuthenticationService {
         this.currentUserSubject.next(null);
     }
 
-    setJwt(login: string) {
+    setJwt(login: string):Promise<User | null> {
         localStorage.setItem('jwt',login);
-        this.refreshUserInfo();
+        return this.refreshUserInfo();
       }
 }

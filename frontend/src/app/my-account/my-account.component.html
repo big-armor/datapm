@@ -1,2 +1,6 @@
 <button *ngIf="currentUser" (click)="logoutClicked()" >Logout</button>
 
+<h3>My Catalogs</h3>
+<ul>
+    <li *ngFor="let catalog of myCatalogs"><a routerLink="/{{catalog.identifier.catalogSlug}}">{{catalog.displayName || catalog.identifier.catalogSlug}}</a></li>
+</ul>

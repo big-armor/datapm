@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthenticationService } from '../services/authentication.service';
 import { Router } from '@angular/router';
-import { User } from 'src/generated/graphql';
+import { User, MyCatalogsGQL, Catalog } from 'src/generated/graphql';
 
 enum State {
   LOADING,
@@ -18,11 +18,16 @@ export class MyAccountComponent implements OnInit {
   State = State;
   state = State.LOADING;
 
+  catalogState = State.LOADING;
+
   currentUser:User;
+
+  public myCatalogs:Catalog[];
 
   constructor(
     private authenticationService:AuthenticationService,
-    private router:Router
+    private router:Router,
+    private myCatalogsGQL:MyCatalogsGQL
   ) {
 
   }
@@ -41,6 +46,15 @@ export class MyAccountComponent implements OnInit {
       })
       .catch(error => this.state = State.ERROR )
     });
+
+    this.myCatalogsGQL.fetch().subscribe(response => {
+      if(response.errors?.length > 0) {
+        this.catalogState = State.ERROR;
+        return;
+      }
+
+      this.myCatalogs = response.data.myCatalogs;
+    })
   }
 
 

@@ -1,5 +1,11 @@
 <div *ngIf="getCatalogQuery">
-    <h3>{{getCatalogQuery.catalog.displayName}}</h3>
-    <p>{{getCatalogQuery.catalog.identifier.catalogSlug}}</p>
+    <b>{{getCatalogQuery.catalog.displayName}}</b>
+    <div *ngIf="getCatalogQuery.catalog.identifier.catalogSlug != getCatalogQuery.catalog.displayName">{{getCatalogQuery.catalog.identifier.catalogSlug}}</div>
     <p>{{getCatalogQuery.catalog.description}}</p>
+    <h3>Packages</h3>
+    <ul>
+        <li *ngFor="let package of getCatalogQuery.catalog.packages">
+            <a routerLink="/{{getCatalogQuery.catalog.identifier.catalogSlug}}/{{package.identifier.packageSlug}}">{{package.displayName || package.identifier.packageSlug}}</a>
+        </li>
+    </ul>
 </div>

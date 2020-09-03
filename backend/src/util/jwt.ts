@@ -92,6 +92,21 @@ export async function parseJwt(req: express.Request): Promise<Jwt> {
   };
 }
 
+export function createJwt(user:User): string {
+  return jwt.sign(
+    {  },
+    getEnvVariable("JWT_KEY"),
+    { 
+      algorithm: "HS256", 
+      subject: user.id.toString(), 
+      expiresIn: "1d",
+      keyid: "JWT_KEY",
+      audience: getEnvVariable("JWT_AUDIENCE"),
+      issuer: getEnvVariable("JWT_ISSUER")
+     }
+  );
+}
+
 interface UserInfo {
   sub: string;
   given_name?: string;

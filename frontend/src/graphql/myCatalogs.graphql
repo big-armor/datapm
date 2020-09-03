@@ -4,5 +4,8 @@ query MyCatalogs {
       catalogSlug
     }
     displayName
+    description
+    website
+    isPublic
   }
 }
