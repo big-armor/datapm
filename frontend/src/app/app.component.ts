@@ -43,7 +43,4 @@ export class AppComponent {
 
   }
 
-  logoutClicked() {
-    this.authenticationService.logout();
-  }
 }

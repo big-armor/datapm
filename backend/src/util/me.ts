@@ -9,8 +9,8 @@ import { Catalog } from "../entity/Catalog";
 export interface MeJwt {
   jwt: Jwt;
   id: number;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   fullName: string;
   email: string;
   isSiteAdmin: boolean;

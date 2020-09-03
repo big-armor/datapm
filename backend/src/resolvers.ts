@@ -106,12 +106,12 @@ export const resolvers: {
       const user = parent as User;
 
       if(user.nameIsPublic)
-        return user.firstName;
+        return user.firstName || null;
 
       if(isAuthenticatedContext(context)
           && (context.me?.isSiteAdmin
             || context.me?.username === user.username))
-        return user.firstName;
+        return user.firstName || null;
 
       return null;
       
@@ -120,12 +120,12 @@ export const resolvers: {
       const user = parent as User;
       
       if(user.nameIsPublic)
-        return user.lastName;
+        return user.lastName || null;
 
       if(isAuthenticatedContext(context)
           && (context.me?.isSiteAdmin
             || context.me?.username === user.username))
-        return user.lastName;
+        return user.lastName || null;
 
       return null;
       

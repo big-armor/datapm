@@ -37,7 +37,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
 
-    if(this.authenticationService.currentUserValue != null)
+    if(this.authenticationService.currentUser != null)
       this.state = State.LOGGED_IN;
 
     this.authenticationService.getUserObservable().subscribe((userPromise) => {
@@ -66,7 +66,15 @@ export class LoginComponent implements OnInit {
       .login(this.loginForm.value.username, this.loginForm.value.password)
       .then((user) => {
         this.state = State.LOGGED_IN;
-        this.router.navigate(['/']);
+
+        const returnUrl = this.router.parseUrl(this.router.url).queryParams["returnUrl"] || null;
+
+        if(returnUrl) {
+          this.router.navigate([returnUrl]);
+        } else {
+          this.router.navigate(['/']);
+        }
+        
       }).catch((error: ApolloError) => {
 
         if(error.graphQLErrors.find(e => e.extensions.code == "LOGIN_FAILED") != null)

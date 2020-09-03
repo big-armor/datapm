@@ -38,7 +38,7 @@
     "ajv": "^6.12.3",
     "apollo-server": "^2.11.0",
     "dataloader": "^2.0.0",
-    "datapm-lib": "^0.1.23",
+    "datapm-lib": "^0.1.24",
     "express-enforces-ssl": "^1.1.0",
     "express-http-proxy": "^1.6.0",
     "express-jwt": "^6.0.0",

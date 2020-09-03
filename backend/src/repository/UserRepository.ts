@@ -329,8 +329,13 @@ export class UserRepository extends Repository<User> {
       // user does not exist, create it
 
       let user = transaction.create(User);
-      user.firstName = value.firstName.trim();
-      user.lastName = value.lastName.trim();
+
+      if(value.firstName != null)
+        user.firstName = value.firstName.trim();
+
+      if(value.lastName != null)
+        user.lastName = value.lastName.trim();
+  
       user.emailAddress = value.emailAddress.trim();
       user.username = value.username.trim();
       user.passwordSalt = uuid();

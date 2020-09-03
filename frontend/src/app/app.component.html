@@ -1,8 +1,7 @@
 
 <h1 routerLink="/">datapm</h1>
 <h3>Less Wrangling, More Data</h3>
-<p *ngIf="currentUser">Welcome {{currentUser.firstName}} {{currentUser.lastName}}</p>
-<a *ngIf="!currentUser && router.url != '/login'" routerLink="/login">Login</a>
-<button *ngIf="currentUser" (click)="logoutClicked()" >Logout</button>
-
+<p *ngIf="currentUser">Welcome <a routerLink="/me">{{currentUser.firstName}} {{currentUser.lastName}}</a></p>
+<a *ngIf="!currentUser && router.url != '/login'" routerLink="/login">Log In</a><br/>
+<a *ngIf="!currentUser && router.url != '/signup'" routerLink="/signup">Sign Up</a>
 <router-outlet></router-outlet>

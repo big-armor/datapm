@@ -8,14 +8,15 @@ import Maybe from 'graphql/tsutils/Maybe';
 export class AuthenticationService {
 
     private currentUserSubject: BehaviorSubject<Promise<Maybe<User>>>;
+    private _currentUser: User;
 
     constructor(private loginGQL:LoginGQL,
         private meGQL:MeGQL) {
             this.currentUserSubject = new BehaviorSubject(this.refreshUserInfo());
         }
 
-    public get currentUserValue(): Promise<Maybe<User>> {
-        return this.currentUserSubject.value;
+    public get currentUser(): Maybe<User> {
+        return this._currentUser;
     }
     
     public getUserObservable() {
@@ -38,6 +39,7 @@ export class AuthenticationService {
                     reject(observer.error);
                 } else {
                     const me = observer.data.me;
+                    this._currentUser = me;
                     this.currentUserSubject.next(Promise.resolve(me));
                     result(me);
                 }

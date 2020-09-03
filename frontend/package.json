@@ -24,7 +24,7 @@
     "@apollo/client": "^3.0.0",
     "apollo-angular": "^2.0.3",
     "component": "^1.1.0",
-    "datapm-lib": "^0.1.15",
+    "datapm-lib": "^0.1.24",
     "rxjs": "^6.5.5",
     "tslib": "^2.0.0",
     "zone.js": "~0.10.3"

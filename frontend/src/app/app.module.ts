@@ -8,12 +8,16 @@ import { HttpClientModule } from '@angular/common/http';
 import { CatalogDetailsComponent } from './catalog-details/catalog-details.component';
 import { LoginComponent } from './login/login.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { SignupComponent } from './signup/signup.component';
+import { MyAccountComponent } from './my-account/my-account.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     CatalogDetailsComponent,
-    LoginComponent
+    LoginComponent,
+    SignupComponent,
+    MyAccountComponent
   ],
   imports: [
     BrowserModule,

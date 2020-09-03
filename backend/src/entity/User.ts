@@ -23,11 +23,11 @@ import { UserCatalogPermission } from "./UserCatalogPermission";
     @Column({ name: "is_site_admin" })
     isSiteAdmin: boolean;
   
-    @Column({ length: 30, name: "first_name", type: "varchar" })
-    firstName: string;
+    @Column({ length: 30, name: "first_name", type: "varchar", nullable: true })
+    firstName?: string;
   
-    @Column({ length: 150, name: "last_name", type: "varchar" })
-    lastName: string;
+    @Column({ length: 150, name: "last_name", type: "varchar", nullable: true })
+    lastName?: string;
   
     get name(): string {
       return `${this.firstName || ""} ${this.lastName || ""}`.trim();
@@ -42,7 +42,7 @@ import { UserCatalogPermission } from "./UserCatalogPermission";
     @Column({ nullable: true, length: 255, type: "varchar" })
     sub: string | null;
 
-    @Column({ length: 256, type: "varchar" })
+    @Column({ length: 39, type: "varchar" })
     username: string ;
   
     @OneToMany(() => UserCatalogPermission, (userCatalogPermission) => userCatalogPermission.user, { cascade: true })
