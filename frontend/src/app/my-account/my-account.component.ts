@@ -1,13 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { AuthenticationService } from '../services/authentication.service';
 import { Router } from '@angular/router';
-import { User, MyCatalogsGQL, Catalog, CreateApiKeyGQL, MyApiKeysGQL, DeleteApiKeyGQL, Scope, ApiKey } from 'src/generated/graphql';
+import { User, MyCatalogsGQL, Catalog, CreateApiKeyGQL, MyApiKeysGQL, DeleteApiKeyGQL, Scope, ApiKey, ApiKeyWithSecret } from 'src/generated/graphql';
 import { FormGroup, FormControl } from '@angular/forms';
 
 enum State {
+  INIT,
   LOADING,
   ERROR,
-  SUCCESS
+  SUCCESS,
+  ERROR_NOT_UNIQUE
 }
 @Component({
   selector: 'app-my-account',
@@ -17,13 +19,16 @@ enum State {
 export class MyAccountComponent implements OnInit {
 
   State = State;
-  state = State.LOADING;
+  state = State.INIT;
 
-  catalogState = State.LOADING;
-  apiKeysState = State.LOADING;
-  createAPIKeyState = State.LOADING;
+  catalogState = State.INIT;
+  apiKeysState = State.INIT;
+  createAPIKeyState = State.INIT;
+  deleteAPIKeyState = State.INIT;
 
   currentUser:User;
+
+  newAPIKey:string;
 
   public myCatalogs:Catalog[];
   public myAPIKeys:ApiKey[];
@@ -36,10 +41,13 @@ export class MyAccountComponent implements OnInit {
     private myCatalogsGQL:MyCatalogsGQL,
     private createAPIKeyGQL:CreateApiKeyGQL,
     private myAPIKeysGQL:MyApiKeysGQL,
-    private deleteAPIKeyGQL:DeleteApiKeyGQL
+    private deleteAPIKeyGQL:DeleteApiKeyGQL,
+    private changeDectorRef:ChangeDetectorRef
   ) {  }
 
   ngOnInit(): void {
+
+    this.state = State.INIT;
 
     this.createAPIKeyForm = new FormGroup({
       label: new FormControl('')
@@ -96,10 +104,21 @@ export class MyAccountComponent implements OnInit {
       }
     }).subscribe(response => {
       if(response.errors?.length > 0) {
+
+        if(response.errors.find(e => e.message == "NOT_UNIQUE")) {
+          this.createAPIKeyState = State.ERROR_NOT_UNIQUE;
+          return;
+        }
+
         this.createAPIKeyState = State.ERROR;
         return;
       }
 
+      const key = response.data.createAPIKey;
+
+      
+      this.newAPIKey = btoa(key.id + "." + key.secret);
+      
       this.createAPIKeyForm.get('label').setValue('');
       this.refreshAPIKeys();
       this.createAPIKeyState = State.SUCCESS;
@@ -107,15 +126,17 @@ export class MyAccountComponent implements OnInit {
   }
 
   deleteApiKey(id:string) {
+    this.deleteAPIKeyState = State.LOADING;
+    
     this.deleteAPIKeyGQL.mutate({id: id}).subscribe(response => {
       if(response.errors?.length > 0) {
-        this.createAPIKeyState = State.ERROR;
+        this.deleteAPIKeyState = State.ERROR;
         return;
       }
 
       this.createAPIKeyForm.get('label').setValue('');
       this.refreshAPIKeys();
-      this.createAPIKeyState = State.SUCCESS;
+      this.deleteAPIKeyState = State.SUCCESS;
     });
   }
 

@@ -6,9 +6,21 @@
 </ul>
 
 <form [formGroup]="createAPIKeyForm" (ngSubmit)="createAPIKey()">
-    <input type="text" placeholder="Label" name="label" formControlName="label" minlength="1">
+    <input type="text" placeholder="Label" name="label" formControlName="label" minlength="1" autocomplete="off">
     <input type="submit" value="Create API Key" [disabled]="!createAPIKeyForm.valid">
 </form>
+<div *ngIf="createAPIKeyState == State.ERROR_NOT_UNIQUE">
+    You already have a key with that label. Please choose a different label.
+</div>
+<div *ngIf="createAPIKeyState == State.ERROR">
+    There was a problem communicating with the server. Please try again.
+</div>
+
+<div *ngIf="createAPIKeyState == State.SUCCESS">
+    The command to use your new key is below
+    <br/><br/>
+    datapm registry add datapm.io 443 {{newAPIKey}}
+</div>
 
 
 <h3>My Catalogs</h3>

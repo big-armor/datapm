@@ -14,6 +14,7 @@ import { User } from "../entity/User";
 import { APIKey } from "../entity/APIKey";
 import { hashPassword } from "../util/PasswordUtil";
 import { ApiKeyWithSecret, Scope } from "../generated/graphql";
+import { ApolloError, ValidationError } from "apollo-server";
 
 // https://stackoverflow.com/a/52097700
 export function isDefined<T>(value: T | undefined | null): value is T {
@@ -105,6 +106,17 @@ export class APIKeyRepository extends Repository<APIKey> {
     return this.manager.nestedTransaction(async (transaction) => {
 
     
+
+      const existingKey = await transaction
+      .getRepository(APIKey)
+      .createQueryBuilder()
+      .where({userId: user.id, label: label})
+      .getOne();
+
+      if(existingKey != undefined) {
+        throw new ValidationError("NOT_UNIQUE");
+      }
+
       // user does not exist, create it
 
       const secret = uuidv4();
@@ -120,8 +132,15 @@ export class APIKeyRepository extends Repository<APIKey> {
       apiKey.createdAt = now;
       apiKey.updatedAt = now;
 
-      const savedKey = await transaction.save(apiKey);
+      try {
+        const savedKey = await transaction.save(apiKey);
+      } catch(error) {
 
+        if(error.code == 23505)
+          throw new ValidationError("NOT_UNIQUE");
+        console.error(error);
+        throw error;
+      }
       // do allow secret to be returned when a new key is created
       
       return {
