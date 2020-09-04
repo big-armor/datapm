@@ -1,0 +1,6 @@
+mutation CreateAPIKey {
+  createAPIKey {
+    key
+    secret
+  }
+}

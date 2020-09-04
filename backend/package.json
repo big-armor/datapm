@@ -39,7 +39,7 @@
     "apollo-server": "^2.11.0",
     "apollo-server-constraint-directive": "^1.2.5",
     "dataloader": "^2.0.0",
-    "datapm-lib": "^0.1.32",
+    "datapm-lib": "^0.1.35",
     "express-enforces-ssl": "^1.1.0",
     "express-http-proxy": "^1.6.0",
     "express-jwt": "^6.0.0",

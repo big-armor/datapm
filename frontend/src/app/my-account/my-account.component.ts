@@ -27,7 +27,8 @@ export class MyAccountComponent implements OnInit {
   constructor(
     private authenticationService:AuthenticationService,
     private router:Router,
-    private myCatalogsGQL:MyCatalogsGQL
+    private myCatalogsGQL:MyCatalogsGQL,
+    private createAPIKeyGQL:CreateAPIKeyGQL,
   ) {
 
   }

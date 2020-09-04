@@ -11,20 +11,15 @@ import { MailDataRequired } from "@sendgrid/helpers/classes/mail";
 import { v4 as uuid } from "uuid";
 
 import { User } from "../entity/User";
-import { Package } from "../entity/Package";
 import {
   CreateUserInputAdmin,
   Permission,
   UpdateUserInput,
   CreateUserInput,
 } from "../generated/graphql";
-import { mediaStorage, uploadFile } from "../util/storage";
-import { Catalog } from "../entity/Catalog";
-import { FileUpload } from "graphql-upload";
 import { mixpanel } from "../util/mixpanel";
 import { UserCatalogPermission } from "../entity/UserCatalogPermission";
 import { CatalogRepository } from "./CatalogRepository";
-import { MeJwt } from "../util/me";
 import { hashPassword } from "../util/PasswordUtil";
 
 // https://stackoverflow.com/a/52097700
@@ -402,49 +397,49 @@ export class UserRepository extends Repository<User> {
   }
 
   updateUser({
-    me,
+    username,
     value,
     relations = [],
   }: {
-    me: MeJwt;
+    username: string;
     value: UpdateUserInput;
     relations?: string[];
   }): Promise<User> {
     return this.manager.nestedTransaction(async (transaction) => {
-      const user = await getUserByUsernameOrFail({
-        username: me.username,
+      const dbUser = await getUserByUsernameOrFail({
+        username,
         manager: transaction,
         relations: [...relations],
       });
 
       if (value.firstName) {
-        user.firstName = value.firstName.trim();
+        dbUser.firstName = value.firstName.trim();
       }
 
       if (value.lastName) {
-        user.lastName = value.lastName.trim();
+        dbUser.lastName = value.lastName.trim();
       }
 
-      const finalUserName = me.username;
+      const finalUserName = value.username;
       if(value.username) {
-        user.username = value.username.trim();
+        dbUser.username = value.username.trim();
       }
 
       if(value.email) {
-        user.emailAddress = value.email.trim();
+        dbUser.emailAddress = value.email.trim();
       }
 
       if(value.password) {
-        user.passwordHash = hashPassword(value.password,user.passwordSalt);
+        dbUser.passwordHash = hashPassword(value.password,dbUser.passwordSalt);
       }
       
 
-      user.updatedAt = new Date();
-      await transaction.save(user);
+      dbUser.updatedAt = new Date();
+      await transaction.save(dbUser);
 
       // return result with requested relations
       return getUserByUsernameOrFail({
-        username: user.username,
+        username: dbUser.username,
         manager: transaction,
         relations,
       });

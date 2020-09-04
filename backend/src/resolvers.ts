@@ -110,8 +110,7 @@ export const resolvers: {
         return user.firstName || null;
 
       if(isAuthenticatedContext(context)
-          && (context.me?.isSiteAdmin
-            || context.me?.username === user.username))
+          && (context.me?.username === user.username))
         return user.firstName || null;
 
       return null;
@@ -124,8 +123,7 @@ export const resolvers: {
         return user.lastName || null;
 
       if(isAuthenticatedContext(context)
-          && (context.me?.isSiteAdmin
-            || context.me?.username === user.username))
+          && (context.me?.username === user.username))
         return user.lastName || null;
 
       return null;
@@ -209,8 +207,8 @@ export const resolvers: {
   Query: {
     me: async (_0: any, _1: any, context: AuthenticatedContext, info: any) => {
       
-      const user = await context.connection.getCustomRepository(UserRepository).findMe({
-        id: context.me.id,
+      const user = await context.connection.getCustomRepository(UserRepository).findUserByUserName({
+        username: context.me.username,
         relations: getGraphQlRelationName(info),
       })
 
@@ -388,7 +386,7 @@ export const resolvers: {
         const user = await context.connection.manager
         .getCustomRepository(UserRepository)
         .updateUser({
-          me: context.me, 
+          username: context.me.username, 
           value,
           relations: getGraphQlRelationName(info),
         })
@@ -399,7 +397,7 @@ export const resolvers: {
 
     createAPIKey: async (
       _0: any,
-      {},
+      { value },
       context: AuthenticatedContext, 
       info: any
     ) => {
@@ -418,19 +416,21 @@ export const resolvers: {
       .getCustomRepository(APIKeyRepository)
       .createAPIKey({
         user,
+        label: value.label,
+        scopes: value.scopes,   
         relations: getGraphQlRelationName(info)
       })
     },
 
     deleteAPIKey: (
       _0: any,
-      { key },
+      { id },
       context: AuthenticatedContext,
       info: any
     ) =>
       context.connection.manager
         .getCustomRepository(APIKeyRepository)
-        .deleteAPIKey({key,relations : getGraphQlRelationName(info)})
+        .deleteAPIKey({id, relations : getGraphQlRelationName(info)})
     ,
 
     removeUserFromCatalog: (
@@ -684,10 +684,8 @@ export const resolvers: {
     },
 
   
-    mixpanelTrack: (_, { actions }, context: Context) =>
+    track: (_, { actions }, context: Context) =>
       mixpanel.track(actions, context.request),
-    mixpanelEngage: (_, { userInfo }, context: Context) =>
-      mixpanel.engage(userInfo, context.request),
 
   },
 

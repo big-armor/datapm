@@ -4,23 +4,10 @@ import { EntityManager } from "typeorm";
 import { Jwt, parseJwt as ensureUserExistsOrCreate, parseJwt } from "./jwt";
 import { User } from "../entity/User";
 import { Catalog } from "../entity/Catalog";
+import { UserRepository } from "../repository/UserRepository";
+import { APIKeyRepository } from "../repository/APIKeyRepository";
+import { APIKey } from "../entity/APIKey";
 
-
-export interface MeJwt {
-  jwt: Jwt;
-  id: number;
-  firstName?: string;
-  lastName?: string;
-  fullName: string;
-  email: string;
-  isSiteAdmin: boolean;
-  username: string;
-
-}
-
-export interface MeCatalog extends MeJwt {
-  catalog: Catalog;
-}
 
 // get Me object based on express request
 // parses JWT from Authorization header
@@ -28,15 +15,34 @@ export interface MeCatalog extends MeJwt {
 export async function getMeRequest(
   req: express.Request,
   manager: EntityManager
-) {
-  try {
-    return getMeJwt(await parseJwt(req), manager);
-  } catch (err) {
-    if(err.name == 'NoAuthenticationError')
-      return undefined;
-    else 
-      throw err;
+):Promise<User | undefined> {
+
+  let user;
+
+  if(req.header("X-API-Key") != null) {
+
+      return await manager.nestedTransaction(async (transaction) => {
+        return (await transaction.getRepository(APIKey).findOneOrFail({where: {secret: req.header("X-API-Key")}})).user
+      });
+
+
+  } else if(req.header("Authorization") != null) {
+
+    return new Promise<User | undefined>(async (success,error) => {
+      try {
+        success(getMeJwt(await parseJwt(req), manager));
+      } catch (err) {
+        if(err.name == 'NoAuthenticationError')
+          return success(undefined);
+        else 
+          error(err);
+      }
+    });
+
+  } else {
+    return Promise.resolve(undefined);
   }
+
 }
 
 // get Me object based on user sub
@@ -52,14 +58,15 @@ export async function getMeSub(sub: string, manager: EntityManager) {
 export async function getMeJwt(
   jwt: Jwt,
   manager: EntityManager
-): Promise<MeJwt | undefined> {
+): Promise<User | undefined> {
   try {
-    const me = await manager.nestedTransaction(async (transaction) => {
 
-      const sub = jwt.sub;
+    return await manager.nestedTransaction(async (transaction) => {
+
+      const userId = jwt.sub;
       const userRepo = manager.getRepository(User);
     
-      const user = await userRepo.findOneOrFail({ where: { id: sub,isActive: true } });
+      const user = await userRepo.findOneOrFail({ where: { id: userId,isActive: true } });
 
       user.lastLogin = new Date();
 
@@ -69,17 +76,7 @@ export async function getMeJwt(
       
     });
 
-    // build result
-    return {
-      jwt: jwt,
-      id: me.id,
-      firstName: me.firstName,
-      lastName: me.lastName,
-      fullName: me.name,
-      email: me.emailAddress,
-      isSiteAdmin: me.isSiteAdmin,
-      username: me.username
-    };
+
   } catch (e) {
     console.error(`Error getting user from JWT. ${e}`);
     return undefined;

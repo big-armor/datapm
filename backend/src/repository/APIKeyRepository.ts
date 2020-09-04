@@ -12,6 +12,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { User } from "../entity/User";
 
 import { APIKey } from "../entity/APIKey";
+import { hashPassword } from "../util/PasswordUtil";
+import { ApiKeyWithSecret, Scope } from "../generated/graphql";
 
 // https://stackoverflow.com/a/52097700
 export function isDefined<T>(value: T | undefined | null): value is T {
@@ -19,11 +21,11 @@ export function isDefined<T>(value: T | undefined | null): value is T {
 }
 
 async function getAPIKey({
-  key,
+  id,
   manager,
   relations = [],
 }: {
-  key: string;
+  id: string;
   catalogId?: number;
   manager: EntityManager;
   relations?: string[];
@@ -32,7 +34,7 @@ async function getAPIKey({
   let query = manager
     .getRepository(APIKey)
     .createQueryBuilder(ALIAS)
-    .where({ key: key })
+    .where({ id: id })
     .addRelations(ALIAS, relations);
 
   const val = await query.getOne();
@@ -44,25 +46,26 @@ async function getAPIKey({
 
 
 async function getAPIKeyOrFail({
-  key,
+  id,
   manager,
   relations = [],
 }: {
-  key: string;
+  id: string;
   manager: EntityManager;
   relations?: string[];
 }): Promise<APIKey> {
   const apiKey = await getAPIKey({
-    key,
+    id,
     manager,
     relations,
   });
-  if (!apiKey) throw new Error(`Failed to get api key ${key}`);
+  if (!apiKey) throw new Error(`Failed to get api id ${id}`);
   return apiKey;
 }
 
 @EntityRepository(User)
 export class APIKeyRepository extends Repository<APIKey> {
+
   constructor() {
     super();
     sgMail.setApiKey(process.env.SENDGRID_API_KEY || "SG.DUMMY");
@@ -83,40 +86,50 @@ export class APIKeyRepository extends Repository<APIKey> {
       .addRelations(ALIAS, relations)
       .getMany();
 
-    // Never return the secret
-    keys.forEach(k => delete k.secret)
+    // Never return the hash
+    keys.forEach(k => delete k.hash)
   }
 
 
   async createAPIKey({
     user,
+    label,
+    scopes,
     relations = [],
   }: {
     user: User;
+    label: string;
+    scopes: Scope[]
     relations?: string[];
-  }): Promise<APIKey> {
+  }): Promise<ApiKeyWithSecret> {
     return this.manager.nestedTransaction(async (transaction) => {
 
     
       // user does not exist, create it
 
+      const secret = uuidv4();
+
       const apiKey = transaction.create(APIKey);
       apiKey.user = user;
-      apiKey.key = uuidv4();
-      apiKey.secret = uuidv4();
-
+      apiKey.label = label;
+      apiKey.id = uuidv4();
+      apiKey.hash = hashPassword(secret,apiKey.id);
+      apiKey.scopes = scopes;
 
       const now = new Date();
       apiKey.createdAt = now;
       apiKey.updatedAt = now;
 
-
-     
       const savedKey = await transaction.save(apiKey);
 
       // do allow secret to be returned when a new key is created
       
-      return savedKey;
+      return {
+        id: apiKey.id,
+        secret: secret,
+        label: label,
+        scopes: scopes,
+      };
       
     });
 
@@ -125,24 +138,33 @@ export class APIKeyRepository extends Repository<APIKey> {
   }
 
 
+  async findByUser(userId: number):Promise<APIKey[]> {
+    return await this.manager
+      .getRepository(APIKey)
+      .createQueryBuilder("findUsersAPIKeys")
+      .where({userId})
+      .getMany();
+      
+  }
 
   deleteAPIKey({
-    key,
+    id,
     relations = []
   }: {
-    key: string,
+    id: string,
     relations?: string[]
   }): Promise<APIKey> {
 
-    const apiKey = getAPIKeyOrFail({
-      key: key,
-      manager: this.manager,
-      relations
-    });
-
     return this.manager.nestedTransaction(async (transaction) => {
-      await transaction.delete(APIKey, { key: (await apiKey).key });
-      delete (await apiKey).secret;
+
+      const apiKey = getAPIKeyOrFail({
+        id,
+        manager: this.manager,
+        relations
+      });
+      
+      await transaction.delete(APIKey, { id: (await apiKey).id });
+      delete (await apiKey).hash; // never return the hash
       return apiKey;
     });
 
