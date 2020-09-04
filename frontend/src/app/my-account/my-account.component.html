@@ -19,7 +19,7 @@
 <div *ngIf="createAPIKeyState == State.SUCCESS">
     The command to use your new key is below
     <br/><br/>
-    datapm registry add datapm.io 443 {{newAPIKey}}
+    datapm registry add {{apiKeyDomain}} {{apiKeyPort}} {{newAPIKey}}
 </div>
 
 

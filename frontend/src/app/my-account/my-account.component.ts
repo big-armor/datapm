@@ -3,6 +3,7 @@ import { AuthenticationService } from '../services/authentication.service';
 import { Router } from '@angular/router';
 import { User, MyCatalogsGQL, Catalog, CreateApiKeyGQL, MyApiKeysGQL, DeleteApiKeyGQL, Scope, ApiKey, ApiKeyWithSecret } from 'src/generated/graphql';
 import { FormGroup, FormControl } from '@angular/forms';
+import * as URLParse from 'url-parse';
 
 enum State {
   INIT,
@@ -29,6 +30,8 @@ export class MyAccountComponent implements OnInit {
   currentUser:User;
 
   newAPIKey:string;
+  apiKeyDomain:string;
+  apiKeyPort:string;
 
   public myCatalogs:Catalog[];
   public myAPIKeys:ApiKey[];
@@ -114,9 +117,12 @@ export class MyAccountComponent implements OnInit {
         return;
       }
 
+      const urlParse = URLParse(window.location.href);
       const key = response.data.createAPIKey;
+     
+      this.apiKeyDomain = urlParse.hostname;
+      this.apiKeyPort = urlParse.port;
 
-      
       this.newAPIKey = btoa(key.id + "." + key.secret);
       
       this.createAPIKeyForm.get('label').setValue('');
