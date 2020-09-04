@@ -1,0 +1,7 @@
+mutation DeleteAPIKey($id: String!) {
+    deleteAPIKey(id:$id) {
+        label
+        scopes
+        id
+    }
+}

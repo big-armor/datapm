@@ -15,6 +15,7 @@ import { Scope } from "../generated/graphql";
 })
 @Unique(["id"])
 export class APIKey extends BaseModel {
+
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
@@ -34,7 +35,7 @@ export class APIKey extends BaseModel {
   @JoinColumn({ name: "user_id" })
   user: User;
 
-  @Column('enum', { array: true, name: 'permission', enum: Scope})
+  @Column('enum', { array: true, name: 'scopes', enum: Scope})
   scopes: Scope[]
 
   

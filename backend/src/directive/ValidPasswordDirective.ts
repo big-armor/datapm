@@ -16,7 +16,7 @@ export class ValidPasswordDirective extends SchemaDirectiveVisitor {
         details.field.resolve = function (source, args, context: Context, info) {
           
     
-            const password: string | undefined = args.username || args.value.username || undefined;
+            const password: string | undefined = args.password || args.value.password || undefined;
     
             self.validatePassword(password)
     
@@ -25,7 +25,7 @@ export class ValidPasswordDirective extends SchemaDirectiveVisitor {
       }
       
     validatePassword(password:String | undefined) {
-        const regex = /^[0-9@#$%]$/;
+        const regex = /[0-9@#$%]/;
 
         if(password === undefined)
             throw new ValidationError(`REQUIRED`);

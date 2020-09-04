@@ -1,8 +1,12 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class APIKeyChanges1599181511315 implements MigrationInterface {
+const SQL = `
+ALTER TABLE "apiKey" ALTER COLUMN id TYPE text;
+`
+export class APIKeyChanges21599184202352 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
+        queryRunner.query(SQL);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {

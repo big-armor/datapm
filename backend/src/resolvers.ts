@@ -44,6 +44,7 @@ import graphqlFields from "graphql-fields";
 import { hashPassword } from "./util/PasswordUtil";
 import * as jwt from 'jsonwebtoken'
 import { createJwt } from "./util/jwt";
+import { APIKey } from "./entity/APIKey";
 
 
 export const resolvers: {
@@ -258,6 +259,21 @@ export const resolvers: {
         const permissions = await context.connection.manager.getCustomRepository(UserCatalogPermissionRepository).findByUser({username: context.me?.username, relations: ["catalog"]});
         
         return permissions.filter(p => p.catalog != null).map(p => p.catalog);
+  
+      },
+
+      myAPIKeys: async (
+        _0: any,
+        {},
+        context: AuthenticatedContext,
+        info: any
+      ) => {
+
+        const apiKeys = await context.connection.manager
+        .getCustomRepository(APIKeyRepository)
+        .findByUser(context.me?.id);
+        
+        return apiKeys;
   
       },
 

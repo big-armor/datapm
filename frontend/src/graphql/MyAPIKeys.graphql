@@ -1,0 +1,7 @@
+query MyAPIKeys {
+    myAPIKeys {
+        id
+        label
+        scopes
+    }
+}

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthenticationService } from '../services/authentication.service';
 import { Router } from '@angular/router';
-import { User, MyCatalogsGQL, Catalog } from 'src/generated/graphql';
+import { User, MyCatalogsGQL, Catalog, CreateApiKeyGQL, MyApiKeysGQL, DeleteApiKeyGQL, Scope, ApiKey } from 'src/generated/graphql';
+import { FormGroup, FormControl } from '@angular/forms';
 
 enum State {
   LOADING,
@@ -19,21 +20,30 @@ export class MyAccountComponent implements OnInit {
   state = State.LOADING;
 
   catalogState = State.LOADING;
+  apiKeysState = State.LOADING;
+  createAPIKeyState = State.LOADING;
 
   currentUser:User;
 
   public myCatalogs:Catalog[];
+  public myAPIKeys:ApiKey[];
+
+  createAPIKeyForm:FormGroup;
 
   constructor(
     private authenticationService:AuthenticationService,
     private router:Router,
     private myCatalogsGQL:MyCatalogsGQL,
-    private createAPIKeyGQL:CreateAPIKeyGQL,
-  ) {
-
-  }
+    private createAPIKeyGQL:CreateApiKeyGQL,
+    private myAPIKeysGQL:MyApiKeysGQL,
+    private deleteAPIKeyGQL:DeleteApiKeyGQL
+  ) {  }
 
   ngOnInit(): void {
+
+    this.createAPIKeyForm = new FormGroup({
+      label: new FormControl('')
+    });
 
     this.authenticationService.getUserObservable().subscribe(u => {
 
@@ -55,7 +65,58 @@ export class MyAccountComponent implements OnInit {
       }
 
       this.myCatalogs = response.data.myCatalogs;
+      this.catalogState = State.SUCCESS;
+
+    });
+
+    this.refreshAPIKeys();
+    
+
+  }
+
+  refreshAPIKeys() {
+    this.apiKeysState = State.LOADING;
+
+    this.myAPIKeysGQL.fetch({},{fetchPolicy: 'no-cache'}).subscribe(response => {
+      if(response.errors?.length > 0) {
+        this.apiKeysState = State.ERROR;
+        return;
+      }
+      this.myAPIKeys = response.data.myAPIKeys;
+      this.apiKeysState = State.SUCCESS;
+
+    });
+  }
+
+  createAPIKey() {
+    this.createAPIKeyGQL.mutate({
+      value: {
+        label: this.createAPIKeyForm.value.label,
+        scopes: [Scope.ManageApiKeys,Scope.ManagePrivateAssets,Scope.ReadPrivateAssets]
+      }
+    }).subscribe(response => {
+      if(response.errors?.length > 0) {
+        this.createAPIKeyState = State.ERROR;
+        return;
+      }
+
+      this.createAPIKeyForm.get('label').setValue('');
+      this.refreshAPIKeys();
+      this.createAPIKeyState = State.SUCCESS;
     })
+  }
+
+  deleteApiKey(id:string) {
+    this.deleteAPIKeyGQL.mutate({id: id}).subscribe(response => {
+      if(response.errors?.length > 0) {
+        this.createAPIKeyState = State.ERROR;
+        return;
+      }
+
+      this.createAPIKeyForm.get('label').setValue('');
+      this.refreshAPIKeys();
+      this.createAPIKeyState = State.SUCCESS;
+    });
   }
 
 

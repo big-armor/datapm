@@ -1,5 +1,16 @@
 <button *ngIf="currentUser" (click)="logoutClicked()" >Logout</button>
 
+<h3>My API Keys</h3>
+<ul>
+    <li *ngFor="let apiKey of myAPIKeys">{{apiKey.label}} <button (click)="deleteApiKey(apiKey.id)">Delete</button></li>
+</ul>
+
+<form [formGroup]="createAPIKeyForm" (ngSubmit)="createAPIKey()">
+    <input type="text" placeholder="Label" name="label" formControlName="label" minlength="1">
+    <input type="submit" value="Create API Key" [disabled]="!createAPIKeyForm.valid">
+</form>
+
+
 <h3>My Catalogs</h3>
 <ul>
     <li *ngFor="let catalog of myCatalogs"><a routerLink="/{{catalog.identifier.catalogSlug}}">{{catalog.displayName || catalog.identifier.catalogSlug}}</a></li>
