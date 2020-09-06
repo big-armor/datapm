@@ -6,7 +6,7 @@ import {
 } from "typeorm";
 
 import { User } from "../entity/User";
-import { UpdateCatalogInput, CreateCatalogInput, Permission, CatalogIdentifier } from "../generated/graphql";
+import { UpdateCatalogInput, CreateCatalogInput, Permission, CatalogIdentifier, CatalogIdentifierInput } from "../generated/graphql";
 import { deleteNoThrow } from "../util/deleteHelpers";
 import { Catalog } from "../entity/Catalog";
 import { Package } from "../entity/Package";
@@ -174,7 +174,7 @@ export class CatalogRepository extends Repository<Catalog> {
     value,
     relations = [],
   }: {
-    identifier:CatalogIdentifier;
+    identifier:CatalogIdentifierInput;
     value: UpdateCatalogInput;
     relations?: string[];
   }): Promise<Catalog> {

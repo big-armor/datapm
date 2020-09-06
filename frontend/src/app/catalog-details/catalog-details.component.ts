@@ -23,9 +23,12 @@ export class CatalogDetailsComponent implements OnInit {
     .subscribe((params) => {
       this.urlParams = params;
 
-      this.getCatalogGQL.watch({identifier: {catalogSlug: this.urlParams.params.catalogSlug}}).valueChanges.subscribe(({data}) => {
-        this.getCatalogQuery = data;
-      });
+      this.getCatalogGQL
+        .watch(
+          {identifier: {catalogSlug: this.urlParams.params.catalogSlug}}
+        ).valueChanges.subscribe(({data}) => {
+          this.getCatalogQuery = data;
+        });
     });
 
 

@@ -3,7 +3,7 @@ import { EntityRepository, EntityManager } from "typeorm";
 import { UserPackagePermission } from "../entity/UserPackagePermission";
 import { Package } from "../entity/Package";
 import { UserRepository } from "./UserRepository";
-import { Permission, PackageIdentifier } from "../generated/graphql";
+import { Permission, PackageIdentifier, PackageIdentifierInput } from "../generated/graphql";
 import { PackageRepository } from "./PackageRepository";
 
 async function getPackage({
@@ -78,7 +78,7 @@ export class PackagePermissionRepository {
     permissions,
     relations = [],
   }: {
-    identifier: PackageIdentifier;
+    identifier: PackageIdentifierInput;
     username: string;
     permissions: Permission[];
     relations?: string[];
@@ -134,7 +134,7 @@ export class PackagePermissionRepository {
     identifier,
     username
   }: {
-    identifier: PackageIdentifier;
+    identifier: PackageIdentifierInput;
     username: string;
     relations?: string[];
   }): void {

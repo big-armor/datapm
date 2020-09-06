@@ -1,4 +1,4 @@
-import { EntityRepository, EntityManager, Like } from "typeorm";
+import { EntityRepository, EntityManager, Like, Brackets } from "typeorm";
 import { v4 as uuid } from "uuid";
 
 import {
@@ -6,6 +6,7 @@ import {
   UpdatePackageInput,
   Permission,
   PackageIdentifier,
+  PackageIdentifierInput,
 } from "../generated/graphql";
 import { Package } from "../entity/Package";
 
@@ -17,6 +18,7 @@ import { VersionRepository } from "./VersionRepository"
 import { Permissions } from "../entity/Permissions";
 import { allPermissions } from "../util/PermissionsUtil";
 import { catalogIdentifier } from "../util/IdentifierUtil";
+import { User } from "../entity/User";
 
 async function findPackageById(
   manager: EntityManager,
@@ -78,6 +80,7 @@ function setPackageDisabled(packageEntity: Package, transaction:EntityManager) {
 
 @EntityRepository()
 export class PackageRepository {
+
   constructor(private manager: EntityManager) {}
 
 
@@ -85,7 +88,7 @@ export class PackageRepository {
     identifier,
     relations = [],
   }: {
-    identifier: PackageIdentifier,
+    identifier: PackageIdentifierInput,
     relations?: string[]
   }): Promise<Package> {
 
@@ -96,6 +99,46 @@ export class PackageRepository {
     return packageEntity;
   }
   
+  async catalogPackagesForUser(
+    {
+      catalogId,
+      user,
+      relations = []
+    }:{
+      catalogId:number,
+      user:User,
+      relations?:string[]
+
+    }):Promise<Package[]> {
+    const ALIAS = "packagesForUser"
+
+    const packageIds = (await this
+      .manager
+      .getRepository(Package)
+      .query(
+        `select id from "package" p where p.catalog_id = $1 
+        and (p."isPublic" is true 
+        or (p."isPublic" is false and p.catalog_id in (select uc.catalog_id from user_catalog uc where uc.user_id = $2))
+        or (p."isPublic" is false and p.id in (select up.package_id from user_package_permission up where up.user_id = $2))
+      )`,
+        [
+          catalogId,
+          user.id
+        ]
+      )).map((p:{id:number})=> p.id);
+
+    const packageEntity = await this
+      .manager
+      .getRepository(Package)
+      .createQueryBuilder()
+      .whereInIds(packageIds)
+      .addRelations(ALIAS,relations)
+      .getMany();
+      
+
+    return packageEntity;
+  }
+
   async findPackageByIdOrFail({
     packageId,
     relations = [],
@@ -116,7 +159,7 @@ export class PackageRepository {
     identifier,
     relations = [],
   }: {
-    identifier: PackageIdentifier,
+    identifier: PackageIdentifierInput,
     relations?: string[];
 
   }): Promise<Package> {
@@ -268,7 +311,7 @@ export class PackageRepository {
     identifier,
     relations = [],
   }: {
-    identifier: PackageIdentifier;
+    identifier: PackageIdentifierInput;
     relations?: string[];
   }): Promise<Package> {
     const package_ = await this.manager.nestedTransaction(async (transaction) => {

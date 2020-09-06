@@ -45,6 +45,8 @@ export function parseIdentifierString(identifier: String) {
 export function catalogIdentifier(catalog: Catalog): CatalogIdentifier {
 
     return {
+        registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
+        registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
         catalogSlug: catalog.slug
     }
 
@@ -54,6 +56,8 @@ export function catalogIdentifier(catalog: Catalog): CatalogIdentifier {
 export function packageIdentifier(packageEntity: Package): PackageIdentifier {
 
     return {
+        registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
+        registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
         catalogSlug: packageEntity.catalog.slug,
         packageSlug: packageEntity.slug
     }
@@ -62,6 +66,8 @@ export function packageIdentifier(packageEntity: Package): PackageIdentifier {
 
 export function versionIdentifier(version: Version): VersionIdentifier {
     return {
+        registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
+        registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
         catalogSlug: version.package.catalog.slug,
         packageSlug: version.package.slug,
         versionMajor: version.majorVersion,

@@ -54,12 +54,15 @@ export function provideApollo(httpLink: HttpLink) {
     cache,
     defaultOptions: {
       query: {
+        fetchPolicy: 'no-cache',
         errorPolicy: 'all'
       },
       watchQuery: {
+        fetchPolicy: 'no-cache',
         errorPolicy: 'all'
       },
       mutate: {
+        fetchPolicy: 'no-cache',
         errorPolicy: 'all'
       }
     }

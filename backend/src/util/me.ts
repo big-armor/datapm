@@ -7,6 +7,8 @@ import { Catalog } from "../entity/Catalog";
 import { UserRepository } from "../repository/UserRepository";
 import { APIKeyRepository } from "../repository/APIKeyRepository";
 import { APIKey } from "../entity/APIKey";
+import { hashPassword } from "./PasswordUtil";
+import atob from 'atob';
 
 
 // get Me object based on express request
@@ -22,9 +24,25 @@ export async function getMeRequest(
   if(req.header("X-API-Key") != null) {
 
       return await manager.nestedTransaction(async (transaction) => {
-        return (await transaction.getRepository(APIKey).findOneOrFail({where: {secret: req.header("X-API-Key")}})).user
-      });
 
+        const decodedKey = atob(req.header("X-API-Key")!);
+
+        const keyParts = decodedKey.split(".");
+        const keyId = keyParts[0];
+        const secret = keyParts[1];
+
+        const hash = hashPassword(secret,keyId);
+
+        const apiKeyRecord = (await transaction
+          .getRepository(APIKey)
+          .findOneOrFail({where: {id: keyId, hash: hash },
+             relations: ["user"] 
+            }));
+
+        const user = apiKeyRecord.user
+
+        return user;
+      });
 
   } else if(req.header("Authorization") != null) {
 

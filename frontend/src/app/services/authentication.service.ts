@@ -56,6 +56,12 @@ export class AuthenticationService {
         return new Promise((result, reject) => {
 
             this.loginGQL.mutate({username,password}).toPromise().then((response) => {
+                
+                if(response.errors) {
+                    reject(response.errors);
+                    return;
+                }
+
                 const jwt = response.data.login;
                 localStorage.setItem('jwt',jwt);
 

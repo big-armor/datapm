@@ -10,6 +10,7 @@ import { LoginComponent } from './login/login.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SignupComponent } from './signup/signup.component';
 import { MyAccountComponent } from './my-account/my-account.component';
+import { PackageDetailComponent } from './package-detail/package-detail.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { MyAccountComponent } from './my-account/my-account.component';
     CatalogDetailsComponent,
     LoginComponent,
     SignupComponent,
-    MyAccountComponent
+    MyAccountComponent,
+    PackageDetailComponent
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,8 @@
+<h3 *ngIf="state == State.LOADING">Loading</h3>
+
+<div *ngIf="state == State.SUCCESS">
+    <h3>{{packageQuery.package.displayName}}</h3>
+    <div *ngIf="packageQuery.package.identifier.packageSlug != packageQuery.package.displayName">{{packageQuery.package.identifier.packageSlug}}</div>
+
+    <p>{{packageQuery.package.description}}</p>
+</div>

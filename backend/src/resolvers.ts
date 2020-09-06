@@ -37,7 +37,7 @@ import fs from 'fs';
 
 import AJV from 'ajv';
 import { SemVer } from "semver";
-import { ApolloError } from "apollo-server";
+import { ApolloError, ValidationError } from "apollo-server";
 
 import {compatibilityToString,comparePackages,diffCompatibility,nextVersion, PackageFile} from 'datapm-lib';
 import graphqlFields from "graphql-fields";
@@ -80,7 +80,7 @@ export const resolvers: {
       const response = ajv.validate(schemaObject, packageObject);
 
       if(!response) {
-        throw new ApolloError("Error parsing Package File JSON: " + ajv.errors![0].message, "INVALID_PACKAGE_FILE", {path: ajv.errors![0].schemaPath});
+        throw new Error("Error parsing Package File JSON: " + ajv.errors![0].message);//, "INVALID_PACKAGE_FILE", {path: ajv.errors![0].schemaPath});
       }
 
       return JSON.parse(value);
@@ -138,9 +138,27 @@ export const resolvers: {
       const catalog = parent as Catalog;
 
       return {
+        registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
+        registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
         catalogSlug: catalog.slug,
       };
 
+    },
+    packages: async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+      
+      const catalog = parent as Catalog;
+
+      const packages = await context
+        .connection
+        .getCustomRepository(PackageRepository)
+        .catalogPackagesForUser(
+          {
+            catalogId: catalog.id, 
+            user: context.me,
+            relations: getGraphQlRelationName(info)
+          });
+
+      return packages;
     }
   },
 
@@ -156,6 +174,8 @@ export const resolvers: {
         throw new ApolloError('Could not find catalog ' + packageEntity.catalogId, "CATALOG_NOT_FOUND");
 
       const identifier:PackageIdentifier = {
+        registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
+        registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
         catalogSlug: catalog.slug,
         packageSlug: packageEntity.slug
       }
@@ -177,6 +197,8 @@ export const resolvers: {
       const catalog = await context.connection.getRepository(Catalog).findOneOrFail({id: packageEntity.catalogId });
 
       return {
+        registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
+        registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
         catalogSlug: catalog.slug,
         packageSlug: packageEntity.slug
       };
@@ -195,6 +217,8 @@ export const resolvers: {
       const catalog = await context.connection.getRepository(Catalog).findOneOrFail({id: packageEntity.catalogId });
 
       return {
+        registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
+        registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
         catalogSlug: catalog.slug,
         packageSlug: packageEntity.slug,
         versionMajor: version.majorVersion,
@@ -240,10 +264,12 @@ export const resolvers: {
     ) =>
       {
 
+        const graphQLRelationName = getGraphQlRelationName(info);
+
         const catalog = await context.connection.getCustomRepository(CatalogRepository)
           .findCatalogBySlug({
             slug: identifier.catalogSlug,
-            relations: getGraphQlRelationName(info),
+            relations: graphQLRelationName,
           });
           
         return  catalog;
@@ -283,8 +309,6 @@ export const resolvers: {
         identifier,
         relations: getGraphQlRelationName(info),
       });
-
-      console.log(`package found - ${JSON.stringify(packageEntity)}`);
 
       return packageEntity;
     },
@@ -532,7 +556,10 @@ export const resolvers: {
       context: AuthenticatedContext,
       info: any
     ) => {
-      return context.connection.getCustomRepository(PackageRepository).createPackage({
+      return context
+      .connection
+      .getCustomRepository(PackageRepository)
+      .createPackage({
         userId: context.me?.id,
         packageInput: value,
         relations: getGraphQlRelationName(info),

@@ -5,6 +5,7 @@ import { LoginComponent } from './login/login.component';
 import { SignupComponent } from './signup/signup.component';
 import { MyAccountComponent } from './my-account/my-account.component';
 import { AuthGuard } from './helpers/auth-guard';
+import { PackageDetailComponent } from './package-detail/package-detail.component';
 
 const staticRoutes:Route[] = [
   {
@@ -19,29 +20,23 @@ const staticRoutes:Route[] = [
     path: "me",
     component: MyAccountComponent,
     canActivate: [AuthGuard]
+  },
+  {
+    path: ":catalogSlug",
+    component: CatalogDetailsComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: ":catalogSlug/:packageSlug",
+    component: PackageDetailComponent,
+    canActivate: [AuthGuard]
   }
 ]
 
-const allRoutes: Routes = [
-  {
-    matcher: (url) => {
-      if (url.length > 0 && !staticRoutes.find(s => s.path == url[0].path)) {
-        return {
-          consumed: url,
-          posParams: {
-            catalogSlug:url[0]
-          }
-        };
-      }
-      return null;
-    },
-    component: CatalogDetailsComponent
-  } as Route
-].concat(staticRoutes);
 
 @NgModule({
   providers: [AuthGuard],
-  imports: [RouterModule.forRoot(allRoutes)],
+  imports: [RouterModule.forRoot(staticRoutes)],
   exports: [RouterModule]
 })
 export class AppRoutingModule {
