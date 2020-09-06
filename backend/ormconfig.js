@@ -15,7 +15,7 @@ module.exports = {
   createSchema: process.env.TYPEORM_CREATE_SCHEMA || false,
   password: process.env.TYPEORM_PASSWORD,
   synchronize: process.env.TYPEORM_SYNCHRONIZE || false,
-  logging: ["schema", "error"],
+  logging: ["schema", "query", "error"],
   entities: [
     `${
       process.env.RUN_MIGRATION || ""

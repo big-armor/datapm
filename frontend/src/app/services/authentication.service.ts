@@ -9,6 +9,7 @@ export class AuthenticationService {
 
     private currentUserSubject: BehaviorSubject<Promise<Maybe<User>>>;
     private _currentUser: User;
+    private _currentUserPromise: Promise<User>;
 
     constructor(private loginGQL:LoginGQL,
         private meGQL:MeGQL) {
@@ -19,12 +20,16 @@ export class AuthenticationService {
         return this._currentUser;
     }
     
+    public get currentUserPromise():Promise<Maybe<User>> {
+        return this._currentUserPromise;
+    }
+
     public getUserObservable() {
         return this.currentUserSubject.asObservable();
     }
 
     refreshUserInfo():Promise<Maybe<User>> {
-        return new Promise((result,reject) => {
+        this._currentUserPromise = new Promise((result,reject) => {
 
             const jwt = localStorage.getItem('jwt');
 
@@ -48,7 +53,9 @@ export class AuthenticationService {
             });
 
 
-        })
+        });
+
+        return this._currentUserPromise;
     }
 
     login(username: string, password: string):Promise<Maybe<User>> {
