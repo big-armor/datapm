@@ -75,15 +75,13 @@ export class LoginComponent implements OnInit {
           this.router.navigate(['/']);
         }
         
-      }).catch((error: ApolloError) => {
-
-        if(error.graphQLErrors.find(e => e.extensions.code == "LOGIN_FAILED") != null)
+      }).catch((error: any) => {
+        if(error.errors.find(e => e.extensions.code == "LOGIN_FAILED") != null)
           this.state = State.INCORRECT_LOGIN;
         else 
           this.state = State.LOGIN_ERROR;
           
       });
-
 
   }
 

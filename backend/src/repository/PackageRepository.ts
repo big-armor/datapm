@@ -150,9 +150,24 @@ export class PackageRepository {
     const packageEntity = await findPackageById(this.manager,packageId,relations);
   
     if(packageEntity === null)
-      throw new Error("Package not found");
+      throw new Error("NOT_FOUND");
   
     return packageEntity;
+  }
+
+  async findPackage({
+    identifier,
+    relations = [],
+  }: {
+    identifier: PackageIdentifierInput,
+    relations?: string[];
+
+  }): Promise<Package | null> {
+
+    const packageEntity = await findPackage(this.manager,identifier.catalogSlug,identifier.packageSlug, relations);
+  
+    return packageEntity;
+
   }
 
   async findPackageOrFail({
@@ -164,10 +179,10 @@ export class PackageRepository {
 
   }): Promise<Package> {
 
-    const packageEntity = await findPackage(this.manager,identifier.catalogSlug,identifier.packageSlug, relations);
+    const packageEntity = await this.findPackage({identifier,relations});
   
-    if(packageEntity === null)
-      throw new Error("Package not found");
+    if(packageEntity == null)
+      throw new Error("NOT_FOUND");
   
     return packageEntity;
 

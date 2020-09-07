@@ -37,7 +37,7 @@ import fs from 'fs';
 
 import AJV from 'ajv';
 import { SemVer } from "semver";
-import { ApolloError, ValidationError } from "apollo-server";
+import { ApolloError, ValidationError, UserInputError } from "apollo-server";
 
 import {compatibilityToString,comparePackages,diffCompatibility,nextVersion, PackageFile} from 'datapm-lib';
 import graphqlFields from "graphql-fields";
@@ -305,10 +305,13 @@ export const resolvers: {
 
     package: async (_0: any, { identifier }, context: AuthenticatedContext, info: any) => {
       
-      const packageEntity = await context.connection.getCustomRepository(PackageRepository).findPackageOrFail({
+      const packageEntity = await context.connection.getCustomRepository(PackageRepository).findPackage({
         identifier,
         relations: getGraphQlRelationName(info),
       });
+
+      if(packageEntity == null)
+        throw new UserInputError("NOT_FOUND");
 
       return packageEntity;
     },

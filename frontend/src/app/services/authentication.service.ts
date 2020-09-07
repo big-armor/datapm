@@ -65,7 +65,7 @@ export class AuthenticationService {
             this.loginGQL.mutate({username,password}).toPromise().then((response) => {
                 
                 if(response.errors) {
-                    reject(response.errors);
+                    reject(response);
                     return;
                 }
 
