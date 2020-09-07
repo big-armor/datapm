@@ -100,10 +100,6 @@ resource "google_cloud_run_service" "default" {
           value = google_project.project.project_id
         }
         env {
-          name  = "GRAPHQL_CONTEXT_USER_SUB"
-          value = "auth0|adsfasdfasdfasdf"
-        }
-        env {
           name  = "FILESYSTEM_STORAGE_DIRECTORY"
           value = "local_storage"
         }
