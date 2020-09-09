@@ -47,6 +47,12 @@ const verifyToken = (
 };
 
 function getToken(req: express.Request): string {
+
+  if(req.cookies != null && req.cookies["token"] != null) {
+    const token = req.cookies["token"] || "";
+    return token;
+  }
+
   const authHeader = req.headers.authorization || "";
 
   const match = authHeader.match(/^Bearer (.*)$/);

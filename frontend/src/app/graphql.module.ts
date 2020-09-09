@@ -6,8 +6,7 @@ import { InMemoryCache,ApolloLink } from '@apollo/client/core';
 import { setContext } from '@apollo/client/link/context';
 import { getTokenDesc } from 'graphql/language/lexer';
 import { onError } from "@apollo/client/link/error";
-
-
+import JwtDecode from 'jwt-decode';
 const uri = '/graphql';
 
 export function provideApollo(httpLink: HttpLink) {
@@ -22,8 +21,26 @@ export function provideApollo(httpLink: HttpLink) {
   const getHeaders = () => {
     const token = localStorage.getItem('jwt');
 
+
     if(token == null)
       return {}
+
+    
+
+    const tokenData = JwtDecode<{exp:number}>(token);
+
+
+    if(tokenData) {
+      const date = new Date(tokenData.exp * 1000);
+      const currentDate = new Date();
+
+
+      if(date.getTime() < currentDate.getTime())  {
+        localStorage.removeItem('jwt');
+        return {};
+      }
+    }
+
 
     return {
       Authorization: `Bearer ${token}`

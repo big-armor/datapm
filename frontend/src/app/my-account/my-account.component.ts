@@ -152,4 +152,8 @@ export class MyAccountComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
+  apiKeyCommandString() {
+    return `datapm registry add ${this.apiKeyDomain}` + (( this.apiKeyPort != "443") ?  ` --port ${this.apiKeyPort} ` : "") +` ${this.newAPIKey}`
+  }
+
 }

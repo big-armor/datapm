@@ -38,6 +38,12 @@ export class AuthenticationService {
                 return;
             }
 
+            // TODO Determine if the jwt is expired
+
+            
+
+            // TODO - implement refresh tokens
+
             this.meGQL.fetch().subscribe(observer => {
 
                 if(observer.errors?.length > 0) {
