@@ -5,4 +5,11 @@
     <div *ngIf="packageQuery.package.identifier.packageSlug != packageQuery.package.displayName">{{packageQuery.package.identifier.packageSlug}}</div>
 
     <p>{{packageQuery.package.description}}</p>
+
+    <p>{{packageQuery.package.latestVersion.identifier.versionMajor}}.{{packageQuery.package.latestVersion.identifier.versionMinor}}.{{packageQuery.package.latestVersion.identifier.versionPatch}}</p>
+
+    <p>Use the following command to fetch this package</p>
+    <p>{{generateFetchCommand()}}</p>
+
+
 </div>

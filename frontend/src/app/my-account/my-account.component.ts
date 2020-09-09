@@ -30,8 +30,6 @@ export class MyAccountComponent implements OnInit {
   currentUser:User;
 
   newAPIKey:string;
-  apiKeyDomain:string;
-  apiKeyPort:string;
 
   public myCatalogs:Catalog[];
   public myAPIKeys:ApiKey[];
@@ -117,11 +115,8 @@ export class MyAccountComponent implements OnInit {
         return;
       }
 
-      const urlParse = URLParse(window.location.href);
       const key = response.data.createAPIKey;
-     
-      this.apiKeyDomain = urlParse.hostname;
-      this.apiKeyPort = urlParse.port;
+
 
       this.newAPIKey = btoa(key.id + "." + key.secret);
       
@@ -153,7 +148,27 @@ export class MyAccountComponent implements OnInit {
   }
 
   apiKeyCommandString() {
-    return `datapm registry add ${this.apiKeyDomain}` + (( this.apiKeyPort != "443") ?  ` --port ${this.apiKeyPort} ` : "") +` ${this.newAPIKey}`
+
+    const urlParse = URLParse(window.location.href);
+
+
+    let port = "";
+    
+    if(urlParse.protocol == "https:"
+        && (urlParse.port != "" && urlParse.port != "443")) {
+          port = "--port " + urlParse.port;
+    } else if(urlParse.protocol == "http:"
+        && (urlParse.port != "" && urlParse.port != "80")) {
+          port = " --port " + urlParse.port;
+    }
+
+    let protocol = "";
+
+    if(urlParse.protocol != "https" ) {
+      protocol = " --protocol " + urlParse.protocol.substr(0,urlParse.protocol.length -1 );
+    }
+
+    return `datapm registry add ${urlParse.hostname}` + port + protocol + ` ${this.newAPIKey}`
   }
 
 }

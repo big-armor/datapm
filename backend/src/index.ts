@@ -21,6 +21,13 @@ import { GraphQLError } from "graphql";
 import { superCreateConnection } from "./util/databaseCreation";
 import jwt from 'express-jwt';
 import { getEnvVariable } from "./util/getEnvVariable";
+import fs from 'fs';
+
+const nodeModulesDirectory = getEnvVariable("NODE_MODULES_DIRECTORY", "node_modules");
+const dataLibPackageFile = fs.readFileSync(nodeModulesDirectory + "/datapm-lib/package.json")
+const dataLibPackageJSON = JSON.parse(dataLibPackageFile.toString());
+const REGISTRY_API_VERSION = dataLibPackageJSON.version;
+
 
 const REFERER_REGEX = /\/graphql\/?$/;
 
@@ -181,8 +188,12 @@ async function main() {
   
 
   // any route not yet defined goes to index.html
-  app.use("*", (req, res) => {
+  app.use("*", (req, res,next) => {
+
+    res.setHeader("x-datapm-version",REGISTRY_API_VERSION);
+    res.setHeader("x-datapm-graphql-path","/grahql");
     res.sendFile(path.join(__dirname, "..", "static", "index.html"));
+
   });
 
   app.listen({ port }, () => {

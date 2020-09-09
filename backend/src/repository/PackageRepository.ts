@@ -127,6 +127,10 @@ export class PackageRepository {
         ]
       )).map((p:{id:number})=> p.id);
 
+    if(packageIds == null
+        || packageIds.length == 0)
+        return [];
+        
     const packageEntity = await this
       .manager
       .getRepository(Package)
