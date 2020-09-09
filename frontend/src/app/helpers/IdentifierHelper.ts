@@ -6,11 +6,7 @@ import { environment } from 'src/environments/environment';
 
 export function packageToIdentifier(identifier:PackageIdentifierInput) {
 
-
-
-
     const urlParsed = URLParse(window.location.href);
-
 
     if(urlParsed.hostname == "datapm.io") 
         return identifier.catalogSlug + "/" + identifier.packageSlug;
@@ -23,8 +19,6 @@ export function packageToIdentifier(identifier:PackageIdentifierInput) {
         hostname = urlParsed.hostname;
     }
 
-
-
     let port = "";
 
     if(environment.registryPort) {
@@ -32,15 +26,15 @@ export function packageToIdentifier(identifier:PackageIdentifierInput) {
         port = ":" + environment.registryPort.toString();
     } else {
     
-    if(urlParsed.protocol == "https:"
-        && (urlParsed.port == "" || urlParsed.port == "443")) {
+        if(urlParsed.protocol == "https:"
+            && (urlParsed.port == "" || urlParsed.port == "443")) {
 
-    } else if(urlParsed.protocol == "http:"
-        && (urlParsed.port == "" || urlParsed.port == "80")) {
+        } else if(urlParsed.protocol == "http:"
+            && (urlParsed.port == "" || urlParsed.port == "80")) {
 
-    } else {
-        port = ":" + urlParsed.port
-    }
+        } else {
+            port = ":" + urlParsed.port
+        }
 
     }
 
