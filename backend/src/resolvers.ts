@@ -679,6 +679,14 @@ export const resolvers: {
 
             const minVersionCompare = minNextVersion.compare(proposedNewVersion);
 
+
+            if(minVersionCompare == 0) {
+              throw new ApolloError(
+                identifier.catalogSlug + "/" + identifier.packageSlug + "/" + latestVersionSemVer.version + " already exists, and the submission is identical to it",
+                VersionConflict.VersionExists,
+                {existingVersion: latestVersionSemVer.version}
+              )
+            }
             if(minVersionCompare == 1) {
               throw new ApolloError(
                 identifier.catalogSlug + "/" + identifier.packageSlug + " has current version " + latestVersionSemVer.version + ", and this new version has " + compatibilityToString(compatibility) + " changes - requiring a minimum version number of " + minNextVersion.version + ", but you submitted version number " + proposedNewVersion.version,
