@@ -39,7 +39,7 @@ import AJV from 'ajv';
 import { SemVer } from "semver";
 import { ApolloError, ValidationError, UserInputError } from "apollo-server";
 
-import {compatibilityToString,comparePackages,diffCompatibility,nextVersion, PackageFile} from 'datapm-lib';
+import {compatibilityToString,comparePackages,diffCompatibility,nextVersion, PackageFile, Compability} from 'datapm-lib';
 import graphqlFields from "graphql-fields";
 import { hashPassword } from "./util/PasswordUtil";
 import * as jwt from 'jsonwebtoken'
@@ -680,7 +680,7 @@ export const resolvers: {
             const minVersionCompare = minNextVersion.compare(proposedNewVersion);
 
 
-            if(minVersionCompare == 0) {
+            if(compatibility == Compability.Identical) {
               throw new ApolloError(
                 identifier.catalogSlug + "/" + identifier.packageSlug + "/" + latestVersionSemVer.version + " already exists, and the submission is identical to it",
                 VersionConflict.VersionExists,
