@@ -46,7 +46,11 @@ export function packageToIdentifier(identifier:PackageIdentifierInput) {
         protocol = urlParsed.protocol;
     }
 
-    return protocol+ "://" + hostname + port + "/" + identifier.catalogSlug + "/" + identifier.packageSlug
+    if(!protocol.endsWith(":")) {
+        protocol += ":";
+    }
+
+    return protocol+ "//" + hostname + port + "/" + identifier.catalogSlug + "/" + identifier.packageSlug
 
 
 }

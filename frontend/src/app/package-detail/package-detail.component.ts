@@ -3,6 +3,7 @@ import { Package, PackageGQL, PackageQuery } from 'src/generated/graphql';
 import { Route, ActivatedRoute } from '@angular/router';
 import * as URLParse from 'url-parse';
 import { packageToIdentifier } from '../helpers/IdentifierHelper' 
+import {PackageFile} from 'datapm-lib'
 
 enum State {
   LOADING,
@@ -25,6 +26,7 @@ export class PackageDetailComponent implements OnInit {
   package:Package;
   urlParams:any;
   packageQuery:PackageQuery;
+  public packageFile:PackageFile
 
   constructor(
     private packageGQL:PackageGQL,
@@ -47,6 +49,7 @@ export class PackageDetailComponent implements OnInit {
         }).valueChanges.subscribe(({data}) => {
           this.state = State.SUCCESS;
           this.packageQuery = data;
+          this.packageFile = JSON.parse(data.package.latestVersion.packageFile);
         });
     });
 

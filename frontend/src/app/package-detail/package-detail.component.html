@@ -2,7 +2,8 @@
 
 <div *ngIf="state == State.SUCCESS">
     <h3>{{packageQuery.package.displayName}}</h3>
-    <div *ngIf="packageQuery.package.identifier.packageSlug != packageQuery.package.displayName">{{packageQuery.package.identifier.packageSlug}}</div>
+    <div>
+        <a routerLink="/{{packageQuery.package.identifier.catalogSlug}}">{{packageQuery.package.identifier.catalogSlug}}</a>/{{packageQuery.package.identifier.packageSlug}}</div>
 
     <p>{{packageQuery.package.description}}</p>
 
@@ -11,5 +12,17 @@
     <p>Use the following command to fetch this package</p>
     <p>{{generateFetchCommand()}}</p>
 
-
+    <hr>
+    <div *ngFor="let schema of packageFile.schemas">
+        <h3>{{schema.$id}}</h3>
+        <ul>
+            <li *ngFor="let property of schema.properties | keyvalue">
+                {{property.key}} -
+                [<span *ngFor="let valueType of property.value.valueTypes | keyvalue">{{valueType.key}} {{(valueType.value.recordCount/schema.recordCount)* 100}}%</span>]
+                <ul>
+                    <li *ngIf="property.value.description != null">{{property.value.description}}</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
 </div>
