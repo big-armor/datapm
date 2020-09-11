@@ -1,11 +1,11 @@
-name: 'Terraform'
+name: 'Build & Deploy'
 
 on:
   push:
 
 jobs:
-  terraform:
-    name: 'Terraform'
+  buildAndDeploy:
+    name: 'Build And Deploy'
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
