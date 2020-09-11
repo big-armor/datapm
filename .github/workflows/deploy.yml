@@ -49,6 +49,7 @@ jobs:
       uses: hashicorp/setup-terraform@v1     
 
     - name: Terraform Init
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
       run: terraform init
       env:
         PROJECT_ID: data-test-terraform
