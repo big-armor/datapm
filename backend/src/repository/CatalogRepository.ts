@@ -3,6 +3,7 @@ import {
   Repository,
   EntityManager,
   SelectQueryBuilder,
+  Like,
 } from "typeorm";
 
 import { User } from "../entity/User";
@@ -88,8 +89,27 @@ async function getCatalogBySlugOrFail({
   return catalog;
 }
 
+
 @EntityRepository(Catalog)
 export class CatalogRepository extends Repository<Catalog> {
+
+  /** Use this function to create a user scoped query that returns only catalogs that should be visible to that user */
+  createQueryBuilderWithUserConditions(user:User) {
+      
+    if(user == null) {
+      return this.manager.getRepository(Catalog)
+      .createQueryBuilder().where(
+        `("Catalog"."isPublic" is true)`);
+
+    } else {
+      return this.manager.getRepository(Catalog)
+      .createQueryBuilder().where(
+        `("Catalog"."isPublic" is true 
+        or ("Catalog"."isPublic" is false and "Catalog"."id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId)))`,
+          {userId: user.id})
+    }
+
+  }
 
   async findCatalog({
     slug,
@@ -247,5 +267,61 @@ export class CatalogRepository extends Repository<Catalog> {
     }
 
     return catalog_;
+  }
+
+  async autocomplete({
+    user,
+    startsWith,
+    relations = [],
+  }: {
+    user: User,
+    startsWith: string;
+    relations?: string[];
+  }):Promise<Catalog[]> {
+    
+    const ALIAS = "autoCompleteCatalog";
+
+    const entities = this.createQueryBuilderWithUserConditions(user)
+      .andWhere('LOWER("Catalog"."displayName") LIKE \'' + startsWith.toLowerCase() + '%\'')
+      .addRelations(ALIAS,relations)
+      .getMany();
+
+    return entities;
+  }
+
+
+  async search({
+    user,
+    query, 
+    limit, 
+    offSet,
+    relations = [],
+  }: {
+    user: User,
+    query: string;
+    limit: number;
+    offSet: number;
+    relations?: string[];
+  }):Promise<[Catalog[],number]>  {
+
+    const ALIAS = "search";
+
+    const count = this
+      .createQueryBuilderWithUserConditions(user)
+      .andWhere(
+        `displayName_tokens @@ to_tsquery(:query) OR description_tokens @@ to_tsquery(:query)`,
+        {
+          query
+        }
+      )
+      .limit(limit)
+      .offset(offSet)
+      .addRelations(ALIAS,relations)
+      .getManyAndCount();
+
+  
+      return count;
+
+
   }
 }

@@ -1,4 +1,4 @@
-import { EntityRepository, EntityManager, Like, Brackets } from "typeorm";
+import { EntityRepository, EntityManager, Like, Brackets, SelectQueryBuilder } from "typeorm";
 import { v4 as uuid } from "uuid";
 
 import {
@@ -81,8 +81,27 @@ function setPackageDisabled(packageEntity: Package, transaction:EntityManager) {
 @EntityRepository()
 export class PackageRepository {
 
+
   constructor(private manager: EntityManager) {}
 
+  /** Use this function to create a user scoped query that returns only packages that should be visible to that user */
+  createQueryBuilderWithUserConditions(user:User) {
+    
+    if(user == null) {
+      return this.manager.getRepository(Package)
+      .createQueryBuilder().where(
+        `("Package"."isPublic" is true)`);
+
+    } else {
+      return this.manager.getRepository(Package)
+      .createQueryBuilder().where(
+        `("Package"."isPublic" is true 
+        or ("Package"."isPublic" is false and "Package"."catalog_id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId))
+        or ("Package"."isPublic" is false and "Package".id in (select up.package_id from user_package_permission up where up.user_id = :userId)))`,
+          {userId: user.id})
+    }
+
+  }
 
   async findOrFail({
     identifier,
@@ -112,35 +131,16 @@ export class PackageRepository {
     }):Promise<Package[]> {
     const ALIAS = "packagesForUser"
 
-    const packageIds = (await this
-      .manager
-      .getRepository(Package)
-      .query(
-        `select id from "package" p where p.catalog_id = $1 
-        and (p."isPublic" is true 
-        or (p."isPublic" is false and p.catalog_id in (select uc.catalog_id from user_catalog uc where uc.user_id = $2))
-        or (p."isPublic" is false and p.id in (select up.package_id from user_package_permission up where up.user_id = $2))
-      )`,
-        [
-          catalogId,
-          user.id
-        ]
-      )).map((p:{id:number})=> p.id);
-
-    if(packageIds == null
-        || packageIds.length == 0)
-        return [];
-        
-    const packageEntity = await this
-      .manager
-      .getRepository(Package)
-      .createQueryBuilder()
-      .whereInIds(packageIds)
+    const packages = this.createQueryBuilderWithUserConditions(user)
+      .andWhere(
+        `"Package"."catalog_id" = :catalogId `,
+        {catalogId: catalogId})
       .addRelations(ALIAS,relations)
       .getMany();
+
       
 
-    return packageEntity;
+    return packages;
   }
 
   async findPackageByIdOrFail({
@@ -382,12 +382,34 @@ export class PackageRepository {
 
   }
 
+  async autocomplete({
+    user,
+    startsWith,
+    relations = [],
+  }: {
+    user:User,
+    startsWith: string;
+    relations?: string[];
+  }):Promise<Package[]> {
+    
+    const ALIAS = "autoCompletePackage";
+
+    const entities = this.createQueryBuilderWithUserConditions(user)
+      .andWhere('LOWER("Package"."displayName") LIKE \'' + startsWith.toLowerCase() + '%\'')
+      .addRelations(ALIAS,relations)
+      .getMany();
+
+    return entities;
+  }
+
   async search({
+    user,
     query, 
     limit, 
     offSet,
     relations = [],
   }: {
+    user: User,
     query: string;
     limit: number;
     offSet: number;
@@ -396,16 +418,18 @@ export class PackageRepository {
 
     const ALIAS = "search";
 
-    return await this.manager
-    .getRepository(Package)
-    .createQueryBuilder(ALIAS)
-    .where({slug: Like('%' + query + '%')})
-    .skip(offSet)
-    .take(limit)
-    .addRelations(ALIAS, [
-      ...relations,
-    ])
-    .getManyAndCount();
+
+     const packages = this.createQueryBuilderWithUserConditions(user)
+        .andWhere(
+        `displayName_tokens @@ to_tsquery(:query) OR description_tokens @@ to_tsquery(:query)`,
+        {
+          query
+        }).limit(limit).offset(offSet)
+        .addRelations(ALIAS,relations)
+        .getManyAndCount();
+
+  
+      return packages;
 
 
   }

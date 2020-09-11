@@ -1,0 +1,17 @@
+query AutoComplete($startsWith:String!) {
+  autoComplete(startsWith:$startsWith) {
+    catalogs {
+      identifier {
+        catalogSlug
+      }
+      displayName
+    }
+    packages {
+      identifier {
+        catalogSlug
+        packageSlug
+      }
+      displayName
+    }
+  }
+}
