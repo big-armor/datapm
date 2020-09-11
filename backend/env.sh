@@ -1,6 +1,6 @@
 export JWT_AUDIENCE="localhost"
 export JWT_ISSUER="localhost"
-export JWT_KEY="abc123"
+export JWT_KEY="!!!!REPLACE_ME!!!"
 export NODE_MODULES_DIRECTORY="node_modules"
 export APOLLO_KEY="service:family-connections:asdfasdfasdfasdf"
 export APOLLO_GRAPH_VARIANT="dev"
