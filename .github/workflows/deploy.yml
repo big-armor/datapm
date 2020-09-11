@@ -2,9 +2,6 @@ name: 'Terraform'
 
 on:
   push:
-    branches:
-    - master
-    - v*
 
 jobs:
   terraform:
@@ -20,25 +17,29 @@ jobs:
     - name: Print node verion
       run: node --version
 
-    - name: Write Credentials file
-      run: echo $GOOGLE_CREDENTIALS > gcloud.key
-      env:
-        PROJECT_ID: data-test-terraform
-        GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}  
-
     - name: Install Docker Build Dependencies
       run: npm install gulp      
 
     - name: Build Docker Container
       run: npm run build
 
+    - name: Write Credentials file
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+      run: echo $GOOGLE_CREDENTIALS > gcloud.key
+      env:
+        PROJECT_ID: data-test-terraform
+        GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}  
+
     - name: Authenticate to Google Cloud
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
       run: gcloud auth activate-service-account deployment@datapm-test-terraform.iam.gserviceaccount.com --key-file=gcloud.key
 
     - name: Authorize Docker
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
       run: gcloud auth configure-docker --quiet
 
     - name: Deploy Assets
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
       run: npm run deploy
       env:
         PROJECT_ID: data-test-terraform
