@@ -316,6 +316,53 @@ export const resolvers: {
       return packageEntity;
     },
 
+
+
+    
+    autoComplete: async(
+      _0: any,
+      {startsWith},
+      context: AuthenticatedContext,
+      info: any
+    ) => {
+
+      const catalogs = context
+        .connection
+        .manager
+        .getCustomRepository(CatalogRepository)
+        .autocomplete({user: context.me, startsWith, relations: getRelationNames(graphqlFields(info).catalogs)});
+
+      const packages = context
+        .connection
+        .manager
+        .getCustomRepository(PackageRepository)
+        .autocomplete({user: context.me,startsWith, relations: getRelationNames(graphqlFields(info).packages)});
+
+      return {
+        catalogs: await catalogs,
+        packages: await packages
+      }
+    },
+
+    searchCatalogs: async(
+      _0: any,
+      {query, limit, offSet},
+      context: AuthenticatedContext,
+      info: any
+    ) => {
+
+      const [searchResponse,count] = await context
+        .connection
+        .manager
+        .getCustomRepository(CatalogRepository)
+        .search({user: context.me, query,limit, offSet, relations: getRelationNames(graphqlFields(info).catalogs)});
+
+      return {
+        hasMore: count - (offSet + limit) > 0,
+        catalogs: searchResponse
+      }
+    },
+
     searchPackages: async(
       _0: any,
       {query, limit, offSet},
@@ -323,7 +370,11 @@ export const resolvers: {
       info: any
     ) => {
 
-      const [searchResponse,count] = await context.connection.manager.getCustomRepository(PackageRepository).search({query,limit, offSet, relations: getRelationNames(graphqlFields(info).packages)});
+      const [searchResponse,count] = await context
+        .connection
+        .manager
+        .getCustomRepository(PackageRepository)
+        .search({user: context.me, query,limit, offSet, relations: getRelationNames(graphqlFields(info).packages)});
 
       return {
         hasMore: count - (offSet + limit) > 0,

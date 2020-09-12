@@ -1,56 +1,29 @@
-import * as URLParse from 'url-parse';
-import { PackageIdentifier, PackageGQL, PackageQuery, PackageIdentifierInput } from '../../../src/generated/graphql';
-import { url } from 'inspector';
-import { environment } from 'src/environments/environment';
-
+import { PackageIdentifierInput } from '../../../src/generated/graphql';
+import { getRegistryHostname, getRegistryProtocol, getRegistryPort } from './RegistryAccessHelper';
 
 export function packageToIdentifier(identifier:PackageIdentifierInput) {
 
-    const urlParsed = URLParse(window.location.href);
+    const hostname = getRegistryHostname();
 
-    if(urlParsed.hostname == "datapm.io") 
-        return identifier.catalogSlug + "/" + identifier.packageSlug;
+    if(hostname == "datapm.io") 
+    return identifier.catalogSlug + "/" + identifier.packageSlug;
 
 
-    let hostname = "";
-    if(environment.registryHostname) {
-        hostname = environment.registryHostname;
-    } else {
-        hostname = urlParsed.hostname;
+
+    const protocol = getRegistryProtocol();
+    const port = getRegistryPort();;
+
+    let portStr = "";
+
+    if((protocol == "https" && port == 443) || (protocol == "http" && port == 80)) {
+        portStr = ""
+    }  else {
+        portStr = ":" + port.toString();
     }
 
-    let port = "";
-
-    if(environment.registryPort) {
-
-        port = ":" + environment.registryPort.toString();
-    } else {
     
-        if(urlParsed.protocol == "https:"
-            && (urlParsed.port == "" || urlParsed.port == "443")) {
 
-        } else if(urlParsed.protocol == "http:"
-            && (urlParsed.port == "" || urlParsed.port == "80")) {
-
-        } else {
-            port = ":" + urlParsed.port
-        }
-
-    }
-
-    let protocol  = "";
-
-    if(environment.registryProtocol) {
-        protocol = environment.registryProtocol;
-    } else {
-        protocol = urlParsed.protocol;
-    }
-
-    if(!protocol.endsWith(":")) {
-        protocol += ":";
-    }
-
-    return protocol+ "//" + hostname + port + "/" + identifier.catalogSlug + "/" + identifier.packageSlug
+    return protocol+ "://" + hostname + portStr + "/" + identifier.catalogSlug + "/" + identifier.packageSlug
 
 
 }

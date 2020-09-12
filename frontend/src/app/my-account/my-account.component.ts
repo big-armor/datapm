@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { User, MyCatalogsGQL, Catalog, CreateApiKeyGQL, MyApiKeysGQL, DeleteApiKeyGQL, Scope, ApiKey, ApiKeyWithSecret } from 'src/generated/graphql';
 import { FormGroup, FormControl } from '@angular/forms';
 import * as URLParse from 'url-parse';
+import { getRegistryPort, getRegistryProtocol, getRegistryHostname } from '../helpers/RegistryAccessHelper';
 
 enum State {
   INIT,
@@ -149,26 +150,26 @@ export class MyAccountComponent implements OnInit {
 
   apiKeyCommandString() {
 
-    const urlParse = URLParse(window.location.href);
 
 
-    let port = "";
+    const hostname = getRegistryHostname();
+    const protocol = getRegistryProtocol();
+    const port =  getRegistryPort();
+    let protocolOption = "";
+    let portOption = "";
+
     
-    if(urlParse.protocol == "https:"
-        && (urlParse.port != "" && urlParse.port != "443")) {
-          port = "--port " + urlParse.port;
-    } else if(urlParse.protocol == "http:"
-        && (urlParse.port != "" && urlParse.port != "80")) {
-          port = " --port " + urlParse.port;
+    if(protocol == "https" && port != 443) {
+          portOption = "--port " + port;
+    } else if(protocol == "http" && port != 80) {
+          portOption = " --port " + port;
     }
 
-    let protocol = "";
-
-    if(urlParse.protocol != "https" ) {
-      protocol = " --protocol " + urlParse.protocol.substr(0,urlParse.protocol.length -1 );
+    if(protocol != "https" ) {
+      protocolOption = " --protocol " + protocol;
     }
 
-    return `datapm registry add ${urlParse.hostname}` + port + protocol + ` ${this.newAPIKey}`
+    return `datapm registry add ${hostname}` + portOption + protocolOption + ` ${this.newAPIKey}`
   }
 
 }
