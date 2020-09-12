@@ -165,7 +165,7 @@ export class MyAccountComponent implements OnInit {
           portOption = " --port " + port;
     }
 
-    if(protocol != "https" ) {
+    if(protocol == "http" ) {
       protocolOption = " --protocol " + protocol;
     }
 
