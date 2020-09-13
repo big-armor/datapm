@@ -2,7 +2,7 @@ import { environment } from '../../environments/environment';
 import * as URLParse from 'url-parse';
 
 export function getRegistryPort():number {
-    const urlParsed = URLParse(window.location.href);
+    const urlParsed = URLParse(currentLocation());
 
     let port:number = 443;
 
@@ -28,7 +28,7 @@ export function getRegistryPort():number {
 }
 
 export function getRegistryHostname():string {
-    const urlParsed = URLParse(window.location.href);
+    const urlParsed = URLParse(currentLocation());
 
     let hostname = "";
     if(environment.registryHostname) {
@@ -42,9 +42,9 @@ export function getRegistryHostname():string {
 
 export function getRegistryProtocol(): "https" | "http" {
 
-    const urlParsed = URLParse(window.location.href);
+    const urlParsed = URLParse(currentLocation());
 
-    let protocol: "http" | "https"  = "https";
+    let protocol = "https";
 
     if(environment.registryProtocol) {
         protocol = environment.registryProtocol;
@@ -52,22 +52,26 @@ export function getRegistryProtocol(): "https" | "http" {
         const parsedProtocol = urlParsed.protocol;
 
         if(parsedProtocol.endsWith(":")) {
-            protocol = parsedProtocol.substr(0,length -1) as "http" | "https";
+            protocol = parsedProtocol.substr(0,parsedProtocol.length - 1);
         }
 
     }
 
-    if(protocol == null ) {
+    if(protocol == null || protocol == "" ) {
         const port = getRegistryPort();
 
-        if(port == 443)
-            protocol = "https"
-        
         if(port == 80)
             protocol = "http"
+
+        else 
+            protocol = "https"
     }
 
 
     
-    return protocol;
+    return protocol as "https" | "http";
+}
+
+export function currentLocation() {
+    return window.location.href;
 }

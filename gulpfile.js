@@ -11,12 +11,20 @@ function installBackendDepdendencies() {
   return spawnAndLog("npm",["ci"], {cwd: "backend"});
 }
 
+function testBackend() {
+  return spawnAndLog("npm",["run","test"], {cwd: "backend"});
+}
+
 function buildBackend() {
   return spawnAndLog("npm",["run","build"], {cwd: "backend"});
 }
 
 function installFrontendDepdendencies() {
   return spawnAndLog("npm",["ci"], {cwd: "frontend"});
+}
+
+function testFrontend() {
+  return spawnAndLog("npm",["run","test:ci"], {cwd: "frontend"});
 }
 
 function buildFrontend() {
@@ -55,8 +63,10 @@ function spawnAndLog(command,args,opts) {
 
 exports.default = series(
   installBackendDepdendencies,
+  testBackend,
   buildBackend,
   installFrontendDepdendencies,
+  testFrontend,
   buildFrontend,
   buildDockerImage
 );
