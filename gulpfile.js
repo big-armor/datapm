@@ -63,11 +63,11 @@ function spawnAndLog(command,args,opts) {
 
 exports.default = series(
   installBackendDepdendencies,
-  testBackend,
   buildBackend,
+  testBackend,
   installFrontendDepdendencies,
-  testFrontend,
   buildFrontend,
+  testFrontend,
   buildDockerImage
 );
 
