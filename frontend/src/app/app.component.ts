@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { User } from '../generated/graphql'
 import {AuthenticationService} from './services/authentication.service'
 import { Router } from '@angular/router';
+import { FormGroup, FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
@@ -12,6 +13,7 @@ export class AppComponent {
   title = 'datapm-registry-frontend';
 
   currentUser:User;
+  searchFormGroup:FormGroup;
 
   constructor(
     private authenticationService:AuthenticationService,
@@ -20,6 +22,10 @@ export class AppComponent {
   ngOnInit() {
 
     let currentPromise:Promise<User>;
+
+    this.searchFormGroup = new FormGroup({
+      search: new FormControl('')
+    });
 
     this.authenticationService.getUserObservable().subscribe((userPromise)=> {
       currentPromise = userPromise;
@@ -48,6 +54,13 @@ export class AppComponent {
       return this.currentUser.firstName;
 
     return this.currentUser.username;
+  }
+
+  search() {
+    const query = this.searchFormGroup.value.search;
+
+    this.router.navigate(['/search',{q: query}])
+
   }
 
 }

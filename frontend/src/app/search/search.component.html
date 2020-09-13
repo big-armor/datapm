@@ -1,0 +1,17 @@
+
+
+<div *ngIf="state == State.SUCCESS && packageResult?.searchPackages?.packages?.length > 0">
+
+    <div *ngFor="let package of packageResult.searchPackages.packages" >
+
+        <div><a routerLink="/{{package.identifier.catalogSlug}}/{{package.identifier.packageSlug}}">{{package.displayName}}</a></div>
+        <span><a routerLink="/{{package.identifier.catalogSlug}}">{{package.identifier.catalogSlug}}</a>/<a routerLink="/{{package.identifier.catalogSlug}}/{{package.identifier.packageSlug}}">{{package.identifier.packageSlug}}</a></span>
+        <div>{{package.description}}</div>
+        <br/><br/>
+    </div>
+
+</div>
+
+<div *ngIf="state == State.SUCCESS && !(packageResult?.searchPackages?.packages?.length > 0)">
+    No results found
+</div>
