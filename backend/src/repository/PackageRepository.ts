@@ -421,7 +421,7 @@ export class PackageRepository {
 
      const packages = this.createQueryBuilderWithUserConditions(user)
         .andWhere(
-        `displayName_tokens @@ to_tsquery(:query) OR description_tokens @@ to_tsquery(:query) OR slug LIKE :queryLike`,
+        `(displayName_tokens @@ to_tsquery(:query) OR description_tokens @@ to_tsquery(:query) OR slug LIKE :queryLike)`,
         {
           query,
           queryLike: query + "%"
