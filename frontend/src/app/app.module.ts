@@ -11,6 +11,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { SignupComponent } from './signup/signup.component';
 import { MyAccountComponent } from './my-account/my-account.component';
 import { PackageDetailComponent } from './package-detail/package-detail.component';
+import { SearchComponent } from './search/search.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { PackageDetailComponent } from './package-detail/package-detail.componen
     LoginComponent,
     SignupComponent,
     MyAccountComponent,
-    PackageDetailComponent
+    PackageDetailComponent,
+    SearchComponent
   ],
   imports: [
     BrowserModule,
