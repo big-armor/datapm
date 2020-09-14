@@ -1,12 +1,22 @@
 
 <h1 class="title" routerLink="/">datapm</h1>
-<h3 class="slogan">Less Wrangling, More Data</h3>
+<strong>Less Wrangling, More Data</strong>
+<br/>
 
-<a routerLink="/" *ngIf="router.url != '/'">Search</a>
-&nbsp;&nbsp;<a *ngIf="!currentUser && router.url != '/login'" routerLink="/login">Log In</a>
+<span *ngIf="!currentUser">
+    <a *ngIf="!currentUser && router.url != '/login'" routerLink="/login">Log In</a>
 &nbsp;&nbsp;<a *ngIf="!currentUser && router.url != '/signup'" routerLink="/signup">Sign Up</a>
-&nbsp;&nbsp;<span *ngIf="currentUser">Welcome <a routerLink="/me">{{getWelcomeString(this.currentUser)}}</a></span>
+</span>
+
+<span *ngIf="currentUser">Welcome <a routerLink="/me">{{getWelcomeString(this.currentUser)}}</a></span>
+
+<form [formGroup]="searchFormGroup" (ngSubmit)="search()">
+    <input type="text" placeholder="Search" name="search" formControlName="search" minlength="1" autocomplete="off">
+</form>
 
 <hr/>
 <br/>
 <router-outlet></router-outlet>
+<Br/>
+<hr/>
+Footer
