@@ -68,28 +68,6 @@ async function getCatalogOrFail({
 }
 
 
-async function getCatalogBySlugOrFail({
-  slug,
-  manager,
-  relations = []
-}: {
-  slug: string;
-  manager: EntityManager;
-  relations?: string[];
-}): Promise<Catalog> {
-  const ALIAS = "catalog";
-
-  let query = manager
-    .getRepository(Catalog)
-    .findOne({where: { slug: slug, isActive: true }, relations: relations});
-
-  const catalog = await query;
-    if (!catalog) throw new Error(`Failed to get catalog slug ${slug}`);
-
-  return catalog;
-}
-
-
 @EntityRepository(Catalog)
 export class CatalogRepository extends Repository<Catalog> {
 
@@ -134,11 +112,11 @@ export class CatalogRepository extends Repository<Catalog> {
     relations?: string[];
     includeInactive?: boolean;
   }) {
-    return getCatalogBySlugOrFail({
-      slug: slug,
-      manager: this.manager,
-      relations
-    });
+    let query = this.manager
+      .getRepository(Catalog)
+      .findOne({where: { slug: slug, isActive: true }, relations: relations});
+    
+    return query;
   }
 
   createCatalog({
@@ -282,7 +260,7 @@ export class CatalogRepository extends Repository<Catalog> {
     const ALIAS = "autoCompleteCatalog";
 
     const entities = this.createQueryBuilderWithUserConditions(user)
-      .andWhere('LOWER("Catalog"."displayName") LIKE \'' + startsWith.toLowerCase() + '%\'')
+      .andWhere('(LOWER("Catalog"."displayName") LIKE \'' + startsWith.toLowerCase() + '%\')')
       .addRelations(ALIAS,relations)
       .getMany();
 
@@ -309,7 +287,7 @@ export class CatalogRepository extends Repository<Catalog> {
     const count = this
       .createQueryBuilderWithUserConditions(user)
       .andWhere(
-        `displayName_tokens @@ to_tsquery(:query) OR description_tokens @@ to_tsquery(:query)`,
+        `(displayName_tokens @@ to_tsquery(:query) OR description_tokens @@ to_tsquery(:query))`,
         {
           query
         }

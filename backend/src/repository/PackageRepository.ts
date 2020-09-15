@@ -228,6 +228,10 @@ export class PackageRepository {
     return this.manager.nestedTransaction(async (transaction) => {
 
       const catalog = await transaction.getCustomRepository(CatalogRepository).findCatalogBySlug({slug: packageInput.catalogSlug});
+      
+      if(catalog == undefined) {
+        throw new Error("CATALOG_NOT_FOUND");
+      }
 
       const packageEntity = transaction.getRepository(Package).create();
 

@@ -20,7 +20,7 @@ async function hasPermission(permission: Permission, context: Context, identifie
     return true;
 
   if(context.me === undefined) {
-    throw new Error(`No user session found`);
+    throw new Error(`NOT_AUTHENTICATED`);
   }
 
 
@@ -57,8 +57,6 @@ export class HasPackagePermissionDirective extends SchemaDirectiveVisitor {
     const { resolve = defaultFieldResolver } = field;
     const permission: Permission = this.args.permission;
     field.resolve = function (source, args, context: Context, info) {
-
-      if (!context.me) throw new AuthenticationError("No active user session");
 
       const identifier: PackageIdentifier | undefined = args.identifier || undefined;
 
