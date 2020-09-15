@@ -28,13 +28,11 @@ const staticRoutes:Route[] = [
   },
   {
     path: ":catalogSlug",
-    component: CatalogDetailsComponent,
-    canActivate: [AuthGuard]
+    component: CatalogDetailsComponent
   },
   {
     path: ":catalogSlug/:packageSlug",
-    component: PackageDetailComponent,
-    canActivate: [AuthGuard]
+    component: PackageDetailComponent
   }
 ]
 

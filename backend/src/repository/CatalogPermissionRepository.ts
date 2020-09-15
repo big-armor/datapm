@@ -10,6 +10,7 @@ import { Catalog } from "../entity/Catalog";
 import { UserCatalogPermission } from "../entity/UserCatalogPermission";
 import { UserRepository } from "./UserRepository";
 import { CatalogRepository } from "./CatalogRepository";
+import { UserInputError } from "apollo-server";
   
 
 async function getUserCatalogPermissionOrFail({
@@ -60,7 +61,11 @@ export async function grantUserCatalogPermission({
         // find the catalog
         const catalog = await transaction.getCustomRepository(CatalogRepository).findCatalogBySlug({slug: catalogSlug});
 
-      // Check that the user does not already have this permission. 
+        if(catalog == null) {
+          throw new UserInputError("CATALOG_NOT_FOUND");
+        }
+        
+        // Check that the user does not already have this permission. 
         let returnValue = await getUserCatalogPermission({
             userId: user.id,
             catalogId: catalog.id,
