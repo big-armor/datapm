@@ -1,7 +1,7 @@
 import {
   SchemaDirectiveVisitor,
   AuthenticationError,
-  ForbiddenError,
+  ForbiddenError, UserInputError
 } from "apollo-server";
 import { GraphQLObjectType, GraphQLField, defaultFieldResolver } from "graphql";
 import { Context } from "../context";
@@ -12,9 +12,12 @@ import { PackagePermissionRepository } from "../repository/PackagePermissionRepo
 async function hasPermission(permission: Permission, context: Context, identifier: PackageIdentifier): Promise<boolean> {
 
   // Check that the package exists
-  const packageEntity = await context.connection.getCustomRepository(PackageRepository).findPackageOrFail({
+  const packageEntity = await context.connection.getCustomRepository(PackageRepository).findPackage({
     identifier
   });
+
+  if(packageEntity == null) 
+    throw new UserInputError("PACKAGE_NOT_FOUND");
 
   if(packageEntity.isPublic)
     return true;

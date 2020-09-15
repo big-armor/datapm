@@ -154,7 +154,7 @@ export class PackageRepository {
     const packageEntity = await findPackageById(this.manager,packageId,relations);
   
     if(packageEntity === null)
-      throw new Error("NOT_FOUND");
+      throw new Error("PACKAGE_NOT_FOUND");
   
     return packageEntity;
   }
@@ -186,7 +186,7 @@ export class PackageRepository {
     const packageEntity = await this.findPackage({identifier,relations});
   
     if(packageEntity == null)
-      throw new Error("NOT_FOUND");
+      throw new Error("PACKAGE_NOT_FOUND");
   
     return packageEntity;
 
@@ -246,8 +246,6 @@ export class PackageRepository {
       validation(packageEntity);
 
       const insertedPackage = await transaction.save(packageEntity);
-
-
 
       // add user as package manager of new package
       await transaction
