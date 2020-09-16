@@ -9,6 +9,7 @@ const SQL = `
         description text,
         is_recommended boolean DEFAULT FALSE NOT NULL,
         is_public boolean DEFAULT FALSE NOT NULL,
+        author_id integer NOT NULL,
         created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
         updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
     );
@@ -18,6 +19,7 @@ const SQL = `
     CREATE INDEX idx_collection_slug ON collection (slug);
     CREATE INDEX idx_collection_is_recommended ON collection (is_recommended);
     CREATE INDEX idx_collection_is_public ON collection (is_public);
+    CREATE INDEX idx_collection_author_id ON collection (author_id);
 
     -- Create and add ID generation sequence to the id column so the numerical ID gets generated automatically by the database
     CREATE SEQUENCE public.collection_id_seq AS INTEGER
