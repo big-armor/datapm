@@ -1,7 +1,7 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
 const SQL = `
-    -- Create collecitons table
+    -- Create collections table
     CREATE TABLE public."collection" (
         id integer NOT NULL PRIMARY KEY UNIQUE,
         name character varying(255) NOT NULL,
@@ -9,7 +9,6 @@ const SQL = `
         description text,
         is_recommended boolean DEFAULT FALSE NOT NULL,
         is_public boolean DEFAULT FALSE NOT NULL,
-        author_id integer NOT NULL,
         created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
         updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
     );
@@ -19,7 +18,6 @@ const SQL = `
     CREATE INDEX idx_collection_slug ON collection (slug);
     CREATE INDEX idx_collection_is_recommended ON collection (is_recommended);
     CREATE INDEX idx_collection_is_public ON collection (is_public);
-    CREATE INDEX idx_collection_author_id ON collection (author_id);
 
     -- Create and add ID generation sequence to the id column so the numerical ID gets generated automatically by the database
     CREATE SEQUENCE public.collection_id_seq AS INTEGER
@@ -31,8 +29,20 @@ const SQL = `
     OWNED BY public.collection.id;
 
     ALTER TABLE public.collection_id_seq OWNER TO postgres;
-
     ALTER TABLE public.collection ALTER COLUMN id SET DEFAULT nextval('public.collection_id_seq');
+
+    -- Link the collections and users with permissions
+    CREATE TABLE public."collection_user" (
+        user_id integer NOT NULL REFERENCES public."user" (id) ON DELETE CASCADE,
+        collection_id integer NOT NULL REFERENCES collection (id) ON DELETE CASCADE,
+        permissions TEXT,
+        created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+    );
+
+    -- Create indexes for the relation table
+    CREATE INDEX idx_collection_user_user_id ON collection_user (user_id);
+    CREATE UNIQUE INDEX idx_collection_user_user_id_and_collection_id ON collection_user (user_id, collection_id);
 `;
 
 export class CollectionsTableCreation1600181943280 implements MigrationInterface {
