@@ -5,6 +5,7 @@ const SQL = `
     CREATE TABLE public."collection" (
         id integer NOT NULL PRIMARY KEY UNIQUE,
         name character varying(255) NOT NULL,
+        slug character varying(256) NOT NULL,
         description text,
         is_recommended boolean DEFAULT FALSE NOT NULL,
         is_public boolean DEFAULT FALSE NOT NULL,
@@ -14,6 +15,7 @@ const SQL = `
 
     -- Create indexes on the name, is_recommended and is_public columns for faster queries
     CREATE INDEX idx_collection_name ON collection (name);
+    CREATE INDEX idx_collection_slug ON collection (slug);
     CREATE INDEX idx_collection_is_recommended ON collection (is_recommended);
     CREATE INDEX idx_collection_is_public ON collection (is_public);
 
