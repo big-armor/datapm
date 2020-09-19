@@ -9,6 +9,7 @@ const SQL = `
         description text,
         is_recommended boolean DEFAULT FALSE NOT NULL,
         is_public boolean DEFAULT FALSE NOT NULL,
+        is_active boolean DEFAULT TRUE NOT NULL,
         created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
         updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
     );
@@ -18,6 +19,7 @@ const SQL = `
     CREATE INDEX idx_collection_slug ON collection (slug);
     CREATE INDEX idx_collection_is_recommended ON collection (is_recommended);
     CREATE INDEX idx_collection_is_public ON collection (is_public);
+    CREATE INDEX idx_collection_is_active ON collection (is_active);
 
     -- Create and add ID generation sequence to the id column so the numerical ID gets generated automatically by the database
     CREATE SEQUENCE public.collection_id_seq AS INTEGER
@@ -31,11 +33,24 @@ const SQL = `
     ALTER TABLE public.collection_id_seq OWNER TO postgres;
     ALTER TABLE public.collection ALTER COLUMN id SET DEFAULT nextval('public.collection_id_seq');
 
+
+    -- Create permission type
+    CREATE TYPE public.user_collection_permission_type AS ENUM (
+        'NONE',
+        'VIEW',
+        'EDIT',
+        'CREATE',
+        'MANAGE',
+        'DELETE'
+    );
+
+    ALTER TYPE public.user_collection_permission_type OWNER TO postgres;
+
     -- Link the collections and users with permissions
     CREATE TABLE public."collection_user" (
         user_id integer NOT NULL REFERENCES public."user" (id) ON DELETE CASCADE,
         collection_id integer NOT NULL REFERENCES collection (id) ON DELETE CASCADE,
-        permissions TEXT,
+        permissions public.user_collection_permission_type[] NOT NULL DEFAULT '{NONE}',
         created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
         updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
     );
