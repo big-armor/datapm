@@ -357,7 +357,8 @@ export const resolvers: {
 
       return {
         hasMore: count - (offSet + limit) > 0,
-        catalogs: searchResponse
+        catalogs: searchResponse,
+        count
       }
     },
 
@@ -376,7 +377,8 @@ export const resolvers: {
 
       return {
         hasMore: count - (offSet + limit) > 0,
-        packages: searchResponse
+        packages: searchResponse,
+        count
       }
     },
     
