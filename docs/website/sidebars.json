@@ -1,0 +1,8 @@
+{
+  "docs": {
+    "Overview": ["quick-start","concepts","about"],
+    "Use Cases": ["find-data","consume-batch","publish-batch"],
+    "Command Line Client": ["cheatsheet", "command-line-client"],
+    "Registry": ["registry-self-host","registry-api"]
+  }
+}
