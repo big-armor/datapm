@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { LoginDialogComponent } from './login-dialog.component';
 
@@ -8,7 +9,8 @@ describe('LoginDialogComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ LoginDialogComponent ]
+      declarations: [ LoginDialogComponent ],
+      imports: [ReactiveFormsModule]
     })
     .compileComponents();
   }));
