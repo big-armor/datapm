@@ -271,6 +271,10 @@ export const resolvers: {
             slug: identifier.catalogSlug,
             relations: graphQLRelationName,
           });
+
+        if(catalog == null) {
+          throw new UserInputError("CATALOG_NOT_FOUND");
+        }
           
         return  catalog;
       },
@@ -311,7 +315,7 @@ export const resolvers: {
       });
 
       if(packageEntity == null)
-        throw new UserInputError("NOT_FOUND");
+        throw new UserInputError("PACKAGE_NOT_FOUND");
 
       return packageEntity;
     },
@@ -527,20 +531,30 @@ export const resolvers: {
         .deleteAPIKey({id, relations : getGraphQlRelationName(info)})
     ,
 
-    removeUserFromCatalog: (
+    removeUserFromCatalog: async (
       _0: any,
       { username, catalogSlug },
       context: AuthenticatedContext,
       info: any
-    ) =>
-      context.connection.manager
+    ) => {
+
+      const catalog = await context.connection.manager.getCustomRepository(CatalogRepository)
+        .findCatalogBySlug({slug: catalogSlug});
+
+      if(catalog === undefined) {
+        throw new UserInputError("CATALOG_NOT_FOUND");
+      }
+
+      return context.connection.manager
         .getCustomRepository(UserRepository)
         .removeUserFromCatalog({
           username: username,
-          catalogSlug: catalogSlug,
+          catalog: catalog,
           relations: getGraphQlRelationName(info),
-        }),
+        });
 
+    },
+      
     disableMe: async (
       _0: any,
       { },
@@ -610,14 +624,22 @@ export const resolvers: {
       context: AuthenticatedContext,
       info: any
     ) => {
-      return context
-      .connection
-      .getCustomRepository(PackageRepository)
-      .createPackage({
-        userId: context.me?.id,
-        packageInput: value,
-        relations: getGraphQlRelationName(info),
-      });
+      try {
+        return context
+        .connection
+        .getCustomRepository(PackageRepository)
+        .createPackage({
+          userId: context.me?.id,
+          packageInput: value,
+          relations: getGraphQlRelationName(info),
+        });
+      } catch(error) {
+        if(error.message == "CATALOG_NOT_FOUND") {
+          throw new UserInputError("CATALOG_NOT_FOUND");
+        }
+        
+        throw new ApolloError("UNKNOWN_ERROR");
+      }
     },
 
     updatePackage: async (

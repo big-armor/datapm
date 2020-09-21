@@ -154,7 +154,7 @@ export class PackageRepository {
     const packageEntity = await findPackageById(this.manager,packageId,relations);
   
     if(packageEntity === null)
-      throw new Error("NOT_FOUND");
+      throw new Error("PACKAGE_NOT_FOUND");
   
     return packageEntity;
   }
@@ -186,7 +186,7 @@ export class PackageRepository {
     const packageEntity = await this.findPackage({identifier,relations});
   
     if(packageEntity == null)
-      throw new Error("NOT_FOUND");
+      throw new Error("PACKAGE_NOT_FOUND");
   
     return packageEntity;
 
@@ -228,6 +228,10 @@ export class PackageRepository {
     return this.manager.nestedTransaction(async (transaction) => {
 
       const catalog = await transaction.getCustomRepository(CatalogRepository).findCatalogBySlug({slug: packageInput.catalogSlug});
+      
+      if(catalog == undefined) {
+        throw new Error("CATALOG_NOT_FOUND");
+      }
 
       const packageEntity = transaction.getRepository(Package).create();
 
@@ -242,8 +246,6 @@ export class PackageRepository {
       validation(packageEntity);
 
       const insertedPackage = await transaction.save(packageEntity);
-
-
 
       // add user as package manager of new package
       await transaction
@@ -421,10 +423,13 @@ export class PackageRepository {
 
      const packages = this.createQueryBuilderWithUserConditions(user)
         .andWhere(
-        `displayName_tokens @@ to_tsquery(:query) OR description_tokens @@ to_tsquery(:query)`,
+        `(displayName_tokens @@ to_tsquery(:query) OR description_tokens @@ to_tsquery(:query) OR slug LIKE :queryLike)`,
         {
-          query
-        }).limit(limit).offset(offSet)
+          query,
+          queryLike: query + "%"
+        })
+        
+        .limit(limit).offset(offSet)
         .addRelations(ALIAS,relations)
         .getManyAndCount();
 

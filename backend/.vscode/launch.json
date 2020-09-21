@@ -5,16 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "node",
+            "trace": true,
+            "command": "npm start",
+            "name": "Run npm start",
             "request": "launch",
-            "name": "Start Registry",
-            "cwd": "${workspaceFolder}/backend",
-            "runtimeExecutable": "npm",
-            "runtimeArgs": ["run-script", "start"],
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "",
+            "type": "node-terminal",
             "env": {
                 "APOLLO_KEY":"service:family-connections:asdfasdfasdfasdf",
                 "APOLLO_GRAPH_VARIANT":"dev",
@@ -36,13 +31,12 @@
                 "JWT_KEY":"!!!!REPLACE_ME!!!",
                 "JWT_AUDIENCE":"localhost",
                 "JWT_ISSUER":"localhost"
-
-                
             },
             "outFiles": [
-                "${workspaceFolder}/backend/dist/**/*.js",
-                "${workspaceFolder}/backend/node_modules/"
+                "${workspaceFolder}/dist/**/*.js",
+                "!**/node_modules/**"
             ]
-        },
+
+        }
     ]
 }

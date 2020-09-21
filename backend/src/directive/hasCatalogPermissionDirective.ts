@@ -1,7 +1,7 @@
 import {
   SchemaDirectiveVisitor,
   AuthenticationError,
-  ForbiddenError,
+  ForbiddenError, UserInputError
 } from "apollo-server";
 import { GraphQLObjectType, GraphQLField, defaultFieldResolver } from "graphql";
 import { Context } from "../context";
@@ -22,15 +22,26 @@ export class HasCatalogPermissionDirective extends SchemaDirectiveVisitor {
     const permission: Permission = this.args.permission;
     field.resolve = async function (source, args, context: Context, info) {
       
-      if (!context.me) throw new AuthenticationError("No active user session");
 
-      const catalogSlug: string | undefined = args.catalogSlug || (args.value && args.value.catalogSlug) || undefined;
+      const catalogSlug: string | undefined = args.catalogSlug || (args.value && args.value.catalogSlug) || (args.identifier && args.identifier.catalogSlug) || undefined;
 
       if(catalogSlug === undefined)
         throw new Error('No catalog slug defined in the request');
 
       // Check that the requested catalog exists
       const catalog = await context.connection.getCustomRepository(CatalogRepository).findCatalogBySlug({slug: catalogSlug});
+
+      if(catalog == null) {
+        throw new UserInputError("CATALOG_NOT_FOUND");
+      }
+
+      if(permission == Permission.View
+          && catalog.isPublic) {
+          return resolve.apply(this,[source,args,context,info]);
+      }
+
+
+      if (!context.me) throw new AuthenticationError("NOT_AUTHENTICATED");
 
       const catalogPermission = await context.connection.getCustomRepository(UserCatalogPermissionRepository).findOne({
         catalogId: catalog.id,

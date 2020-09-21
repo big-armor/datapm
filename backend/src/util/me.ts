@@ -9,7 +9,7 @@ import { APIKeyRepository } from "../repository/APIKeyRepository";
 import { APIKey } from "../entity/APIKey";
 import { hashPassword } from "./PasswordUtil";
 import atob from 'atob';
-import { ApolloError } from "apollo-server";
+import { ApolloError, UserInputError } from "apollo-server";
 
 
 // get Me object based on express request
@@ -41,7 +41,7 @@ export async function getMeRequest(
             }));
 
         if(apiKeyRecord == null) {
-          throw new ApolloError("API Key not found", "API_KEY_NOT_FOUND");
+          throw new UserInputError("API_KEY_NOT_FOUND");
         }
 
         const user = apiKeyRecord.user
