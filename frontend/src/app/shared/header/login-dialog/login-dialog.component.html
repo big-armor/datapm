@@ -1,0 +1,66 @@
+<div class="dialog-wrapper" id="logIn">
+    <h1 mat-dialog-title class="dialog-title">datapm</h1>
+    <p class="dialog-description">to follow your areas of interest create <br> a datapm account with</p>
+    <mat-horizontal-stepper labelPosition="bottom" #stepper>
+        <mat-step [stepControl]="firstFormGroup">
+            <div mat-dialog-content>
+                <p class="text-center button-wrapper">
+                    <button mat-flat-button>
+                        <div class="d-flex flex-row bd-highlight">
+                            <div class="bd-highlight btn-image">
+                                <img src="../../../../assets/images/google-glass-logo.png" style="width: 20px; height: 20px;">
+                            </div>
+                            <div class="bd-highlight">
+                                <span class="btn-text">google</span>
+                            </div>
+                          </div>
+                    </button>
+                </p>
+                <p class="text-center button-wrapper">
+                    <button mat-flat-button>
+                        <div class="d-flex flex-row bd-highlight">
+                            <div class="bd-highlight btn-image">
+                                <img src="../../../../assets/images/github.png" style="width: 20px; height: 20px;">
+                            </div>
+                            <div class="bd-highlight">
+                                <span class="btn-text">github</span>
+                            </div>
+                          </div>
+                    </button>
+                </p>
+                <p class="text-center button-wrapper">
+                    <button mat-flat-button matStepperNext>
+                        <div class="d-flex flex-row bd-highlight">
+                            <div class="bd-highlight btn-image">
+                                <img src="../../../../assets/images/envelope.png" style="width: 20px; height: 20px;">
+                            </div>
+                            <div class="bd-highlight">
+                                <span class="btn-text">email</span>
+                            </div>
+                          </div>
+                    </button>
+                </p>
+            </div>
+            <div mat-dialog-actions class="button-wrapper text-center">
+                <button mat-button mat-dialog-close><span class="btn-text">back to browse</span></button>
+              </div>
+        </mat-step>
+        <mat-step [stepControl]="secondFormGroup" optional>
+          <form [formGroup]="secondFormGroup" style="margin-top: 15px;">
+            <mat-form-field appearance="fill" class="outline-input">
+                <mat-label>email</mat-label>
+                <input matInput>
+            </mat-form-field>
+            <br>
+            <mat-form-field appearance="fill" class="outline-input">
+                <mat-label>password</mat-label>
+                <input matInput>
+            </mat-form-field>
+                <div mat-dialog-actions class="button-wrapper less-pd text-center">
+                    <button mat-button><span class="btn-text">Login</span></button><br>
+                    <button mat-button matStepperPrevious><span class="btn-text">Back</span></button>
+                </div>
+          </form>
+        </mat-step>
+      </mat-horizontal-stepper>
+</div>

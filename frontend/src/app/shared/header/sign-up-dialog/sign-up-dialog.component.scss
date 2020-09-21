@@ -1,0 +1,120 @@
+.dialog-wrapper {
+    padding: 20px 30px;
+    .dialog-title {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 42px;
+        line-height: 55px;
+        text-align: center;
+        margin: 0px 0 30px;
+        color: #333333;
+        text-shadow: 0px -4px 4px rgba(255, 255, 255, 0.25), -4px 0px 4px rgba(255, 255, 255, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25), 0px 4px 4px rgba(183, 183, 183, 0.25);
+    }
+    .dialog-subtile {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: 300;
+        font-size: 13px;
+        line-height: 18px;
+        padding-left: 15px;
+        padding-bottom: 15px;
+        letter-spacing: -0.28px;
+        color: #828282;
+    }
+}
+
+.first-dialog-div {
+    padding-bottom: 30px;
+}
+
+::ng-deep.mat-dialog-container {
+    border-radius: 24px;
+    box-shadow: -4px 0px 4px rgba(130, 130, 130, 0.25), 0px -4px 4px rgba(130, 130, 130, 0.25), 4px 0px 4px rgba(51, 51, 51, 0.25), 0px 4px 4px rgba(51, 51, 51, 0.25);
+    #signUp {
+        .mat-dialog-actions {
+            display: block;
+            margin-bottom: 10px;
+            margin-top: 15px;
+            button {
+                outline: #fff solid 0px;
+                box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
+                border-radius: 24px;
+                min-width: 200px;
+                height: 36px;
+                margin-top: 15px;
+                .btn-text {
+                    font-family: Roboto Mono;
+                    font-style: normal;
+                    font-weight: 300;
+                    font-size: 17px;
+                    align-items: center;
+                    text-align: center;
+                    color: #828282;
+                }
+            }
+        }
+        .outline-input {
+            min-width: 348px;
+            max-width: 380px;
+            .mat-form-field-flex {
+                border-radius: 24px;
+                padding: .75em .75em 0 .75em;
+                background-color: #fff;
+                box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25), inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
+                height: 49px;
+            }
+            .mat-form-field-underline::before {
+                display: none;
+            }
+            .mat-form-field-ripple {
+                display: none;
+            }
+            .mat-form-field-empty.mat-form-field-label,
+            .mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
+                font-family: Roboto Mono;
+                font-style: normal;
+                font-weight: 300;
+                font-size: 13px;
+                color: #BDBDBD;
+                margin-top: -0.6em !important;
+            }
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    ::ng-deep.mat-dialog-container {
+        max-height: calc(100vh - 43px);
+        #signUp {
+            padding: 0px;
+            .dialog-title {
+                font-size: 34px;
+                line-height: 40px;
+                margin: 0px 0 15px;
+            }
+            .mat-dialog-content {
+                overflow: hidden;
+                max-height: unset;
+                .dialog-subtile {
+                    margin-bottom: 0px;
+                }
+                .outline-input {
+                    min-width: 210px;
+                    max-width: 280px;
+                }
+                .first-dialog-div {
+                    padding-bottom: 0px;
+                }
+            }
+            .mat-dialog-actions {
+                margin-top: 0px;
+                button {
+                    .btn-text {
+                        font-size: 15px;
+                    }
+                }
+            }
+        }
+    }
+}
