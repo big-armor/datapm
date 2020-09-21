@@ -15,9 +15,5 @@ export TYPEORM_SCHEMA="public"
 export TYPEORM_USERNAME="postgres"
 export TYPEORM_PASSWORD="postgres"
 export SENDGRID_API_KEY="asdfasdfa"
-
-export GOOGLE_LOGIN_CLIENT_ID="832769547626-tnldssk3ljco2icmss266tnn5epalheb.apps.googleusercontent.com"
-export GOOGLE_LOGIN_SECRET="p1YiHnsuBMHcyltiWL_1h5yt"
-
 export REGISTRY_HOSTNAME="localhost"
 export REGISTRY_PORT="4000"

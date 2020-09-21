@@ -24,8 +24,6 @@
                 "TYPEORM_PASSWORD":"postgres",
                 "TYPEORM_CREATE_SCHEMA": "false",
                 "SENDGRID_API_KEY":"asdfasdfa",
-                "GOOGLE_LOGIN_CLIENT_ID":"832769547626-tnldssk3ljco2icmss266tnn5epalheb.apps.googleusercontent.com",
-                "GOOGLE_LOGIN_SECRET":"asdfadfasdf",
                 "REGISTRY_HOSTNAME":"localhost",
                 "REGISTRY_PORT":"4000",
                 "JWT_KEY":"!!!!REPLACE_ME!!!",
