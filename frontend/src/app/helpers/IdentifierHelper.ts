@@ -11,7 +11,7 @@ export function packageToIdentifier(identifier:PackageIdentifierInput) {
 
 
     const protocol = getRegistryProtocol();
-    const port = getRegistryPort();;
+    const port = getRegistryPort();
 
     let portStr = "";
 
