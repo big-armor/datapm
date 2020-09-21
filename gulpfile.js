@@ -35,8 +35,12 @@ function cleanNodeModules() {
   return spawnAndLog("npm",["run","clean:node_Modules"]);
 }
 
+function removeNodeModules() {
+  return spawnAndLog("rm", ["-rf", "backend/node_modules", "frontend/node_modules"]);
+}
+
 function buildDockerImage() {
-  return spawnAndLog("docker", ["build","-t","datapm-registry", ".", "--no-cache"])
+  return spawnAndLog("docker", ["build","-t","datapm-registry", ".", "-f", "docker/Dockerfile", "--no-cache"])
 }
 
 function tagDockerImage() {
@@ -68,6 +72,7 @@ exports.default = series(
   installFrontendDepdendencies,
   buildFrontend,
   testFrontend,
+  removeNodeModules,
   buildDockerImage
 );
 

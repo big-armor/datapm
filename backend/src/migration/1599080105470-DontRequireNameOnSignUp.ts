@@ -1,9 +1,9 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
 const SQL = `
-    ALTER TABLE "user" ALTER COLUMN first_name DROP NOT NULL;
-    ALTER TABLE "user" ALTER COLUMN last_name DROP NOT NULL;
-    ALTER TABLE "user" ALTER COLUMN username TYPE varchar(39);
+    ALTER TABLE "public"."user" ALTER COLUMN first_name DROP NOT NULL;
+    ALTER TABLE "public"."user" ALTER COLUMN last_name DROP NOT NULL;
+    ALTER TABLE "public"."user" ALTER COLUMN username TYPE varchar(39);
 `;
 export class DontRequireNameOnSignUp1599080105470 implements MigrationInterface {
 
