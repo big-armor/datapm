@@ -1,6 +1,7 @@
 import { AuthenticatedContext } from "../context";
 import { CollectionIdentifierInput, CreateCollectionInput, UpdateCollectionInput } from "../generated/graphql";
 import { CollectionRepository } from "../repository/CollectionRepository";
+import { getGraphQlRelationName } from "../util/relationNames";
 import { grantAllCollectionPermissionsForUser } from "./UserCollectionPermissionResolver";
 
 export const createCollection = async (_0: any, { value }: { value: CreateCollectionInput }, context: AuthenticatedContext, info: any) => {
@@ -12,7 +13,8 @@ export const createCollection = async (_0: any, { value }: { value: CreateCollec
     throw new Error("Collection slug is taken");
   }
 
-  const createdCollection = await repository.createCollection(value);
+  const relations = getGraphQlRelationName(info);
+  const createdCollection = await repository.createCollection(value, relations);
   await grantAllCollectionPermissionsForUser(context, createdCollection.id);
   return createdCollection;
 }
@@ -28,23 +30,27 @@ export const updateCollection = async (_0: any, { identifier, value }: { identif
     }
   }
 
-  return repository.updateCollection(identifier.collectionSlug, value);
+  const relations = getGraphQlRelationName(info);
+  return repository.updateCollection(identifier.collectionSlug, value, relations);
 }
 
 export const disableCollection = async (_0: any, { identifier }: { identifier: CollectionIdentifierInput }, context: AuthenticatedContext, info: any) => {
+  const relations = getGraphQlRelationName(info);
   return context.connection.manager
     .getCustomRepository(CollectionRepository)
-    .disableCollection(identifier.collectionSlug);
+    .disableCollection(identifier.collectionSlug, relations);
 }
 
 export const findCollectionsForAuthenticatedUser = async (_0: any, { }, context: AuthenticatedContext, info: any) => {
+  const relations = getGraphQlRelationName(info);
   return context.connection.manager
     .getCustomRepository(CollectionRepository)
-    .findCollectionsForAuthenticatedUser(context.me.id);
+    .findCollectionsForAuthenticatedUser(context.me.id, relations);
 }
 
 export const findCollectionBySlug = async (_0: any, { identifier }: { identifier: CollectionIdentifierInput }, context: AuthenticatedContext, info: any) => {
+  const relations = getGraphQlRelationName(info);
   return context.connection.manager
     .getCustomRepository(CollectionRepository)
-    .findCollectionBySlugOrFail(identifier.collectionSlug);
+    .findCollectionBySlugOrFail(identifier.collectionSlug, relations);
 }

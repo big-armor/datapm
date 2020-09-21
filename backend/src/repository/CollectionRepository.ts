@@ -6,16 +6,20 @@ import { CreateCollectionInput, UpdateCollectionInput } from "../generated/graph
 @EntityRepository(Collection)
 export class CollectionRepository extends Repository<Collection> {
 
-  public async createCollection(collection: CreateCollectionInput): Promise<Collection> {
+  private static readonly COLLECTION_RELATION_ALIAS = "collection";
+
+  public async createCollection(collection: CreateCollectionInput, relations?: string[]): Promise<Collection> {
     const entity = new Collection();
     entity.name = collection.name;
     entity.collectionSlug = collection.collectionSlug;
     entity.description = collection.description;
-    return this.save(entity);
+
+    await this.save(entity);
+    return this.findCollectionBySlugOrFail(collection.collectionSlug, relations);
   }
 
-  public async updateCollection(collectionSlug: String, collection: UpdateCollectionInput): Promise<Collection> {
-    const collectionIdDb = await this.findCollectionBySlugOrFail(collectionSlug);
+  public async updateCollection(collectionSlug: String, collection: UpdateCollectionInput, relations?: string[]): Promise<Collection> {
+    const collectionIdDb = await this.findCollectionBySlugOrFail(collectionSlug, relations);
 
     if (collection.collectionSlug) {
       collectionIdDb.collectionSlug = collection.collectionSlug;
@@ -36,16 +40,17 @@ export class CollectionRepository extends Repository<Collection> {
     return this.save(collectionIdDb);
   }
 
-  public async disableCollection(collectionSlug: String): Promise<Collection> {
-    const collectionIdDb = await this.findCollectionBySlugOrFail(collectionSlug);
+  public async disableCollection(collectionSlug: String, relations?: string[]): Promise<Collection> {
+    const collectionIdDb = await this.findCollectionBySlugOrFail(collectionSlug, relations);
     collectionIdDb.isActive = false;
     return this.save(collectionIdDb);
   }
 
-  public async findCollectionBySlugOrFail(collectionSlug: String): Promise<Collection> {
+  public async findCollectionBySlugOrFail(collectionSlug: String, relations?: string[]): Promise<Collection> {
     const collection = await this.createQueryBuilder()
       .where('"Collection"."slug" = :slug')
       .setParameter("slug", collectionSlug)
+      .addRelations(CollectionRepository.COLLECTION_RELATION_ALIAS, relations)
       .getOne();
 
     if (collection == null) {
@@ -55,18 +60,20 @@ export class CollectionRepository extends Repository<Collection> {
     return collection;
   }
 
-  public async findCollectionBySlug(collectionSlug: String): Promise<Collection | undefined> {
+  public async findCollectionBySlug(collectionSlug: String, relations?: string[]): Promise<Collection | undefined> {
     return await this.createQueryBuilder()
       .where('"Collection"."slug" = :slug')
       .setParameter("slug", collectionSlug)
+      .addRelations(CollectionRepository.COLLECTION_RELATION_ALIAS, relations)
       .getOne();
   }
 
-  public async findCollectionsForAuthenticatedUser(userId: number): Promise<Collection[]> {
+  public async findCollectionsForAuthenticatedUser(userId: number, relations?: string[]): Promise<Collection[]> {
     return this.createQueryBuilder()
       .where('("Collection"."is_public" and "Collection"."is_active")')
       .orWhere(`("Collection"."is_active" AND "Collection"."id" IN (SELECT collection_id FROM collection_user WHERE user_id = :userId AND 'VIEW' = any(permissions)))`)
       .setParameter("userId", userId)
+      .addRelations(CollectionRepository.COLLECTION_RELATION_ALIAS, relations)
       .getMany();
   }
 }
