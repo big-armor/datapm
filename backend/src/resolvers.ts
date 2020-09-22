@@ -37,15 +37,13 @@ import fs from 'fs';
 
 import AJV from 'ajv';
 import { SemVer } from "semver";
-import { ApolloError, ValidationError, UserInputError } from "apollo-server";
+import { ApolloError, UserInputError } from "apollo-server";
 
 import {compatibilityToString,comparePackages,diffCompatibility,nextVersion, PackageFile, Compability} from 'datapm-lib';
 import graphqlFields from "graphql-fields";
 import { hashPassword } from "./util/PasswordUtil";
-import * as jwt from 'jsonwebtoken'
 import { createJwt } from "./util/jwt";
-import { APIKey } from "./entity/APIKey";
-
+import { createCollection, disableCollection, findCollectionBySlug, findCollectionsForAuthenticatedUser, updateCollection } from "./resolvers/CollectionResolver";
 
 export const resolvers: {
   Query: QueryResolvers;
@@ -93,7 +91,7 @@ export const resolvers: {
     parseValue: (value: any) => new Date(value),
   }),
   UserCatalog: {
-      permissions: (parent: any, _1: any, context: Context, info: any) => {
+      permissions: (parent: any, _1: any, context: Context) => {
         const userCatalogPermission = parent as UserCatalogPermission;
         
         if(userCatalogPermission.user.username !== context.me?.username)
@@ -104,7 +102,7 @@ export const resolvers: {
   },
   User: {
 
-    firstName: (parent: any, _1: any, context: Context, info: any) => {
+    firstName: (parent: any, _1: any, context: Context) => {
       const user = parent as User;
 
       if(user.nameIsPublic)
@@ -117,7 +115,7 @@ export const resolvers: {
       return null;
       
     },
-    lastName: (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+    lastName: (parent: any, _1: any, context: AuthenticatedContext) => {
       const user = parent as User;
       
       if(user.nameIsPublic)
@@ -133,7 +131,7 @@ export const resolvers: {
   },
   Catalog: {
    
-    identifier: async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+    identifier: async (parent: any, _1: any) => {
 
       const catalog = parent as Catalog;
 
@@ -189,7 +187,7 @@ export const resolvers: {
       return version;
     },
 
-    identifier: async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+    identifier: async (parent: any, _1: any, context: AuthenticatedContext) => {
 
       const packageEntity = parent as Package;
 
@@ -208,7 +206,7 @@ export const resolvers: {
 
   Version: {
 
-    identifier: async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+    identifier: async (parent: any, _1: any, context: AuthenticatedContext) => {
 
       const version = parent as Version;
 
@@ -277,35 +275,31 @@ export const resolvers: {
         }
           
         return  catalog;
-      },
+    },
 
-      myCatalogs: async (
-        _0: any,
-        {},
-        context: AuthenticatedContext,
-        info: any
-      ) => {
+    myCatalogs: async (
+      _0: any,
+      {},
+      context: AuthenticatedContext) => {
 
-        const permissions = await context.connection.manager.getCustomRepository(UserCatalogPermissionRepository).findByUser({username: context.me?.username, relations: ["catalog"]});
-        
-        return permissions.filter(p => p.catalog != null).map(p => p.catalog);
-  
-      },
+      const permissions = await context.connection.manager.getCustomRepository(UserCatalogPermissionRepository).findByUser({username: context.me?.username, relations: ["catalog"]});
+      
+      return permissions.filter(p => p.catalog != null).map(p => p.catalog);
 
-      myAPIKeys: async (
-        _0: any,
-        {},
-        context: AuthenticatedContext,
-        info: any
-      ) => {
+    },
 
-        const apiKeys = await context.connection.manager
-        .getCustomRepository(APIKeyRepository)
-        .findByUser(context.me?.id);
-        
-        return apiKeys;
-  
-      },
+    myAPIKeys: async (
+      _0: any,
+      {},
+      context: AuthenticatedContext) => {
+
+      const apiKeys = await context.connection.manager
+      .getCustomRepository(APIKeyRepository)
+      .findByUser(context.me?.id);
+      
+      return apiKeys;
+
+    },
 
     package: async (_0: any, { identifier }, context: AuthenticatedContext, info: any) => {
       
@@ -320,8 +314,8 @@ export const resolvers: {
       return packageEntity;
     },
 
-
-
+    collection: findCollectionBySlug,
+    collections: findCollectionsForAuthenticatedUser,
     
     autoComplete: async(
       _0: any,
@@ -387,14 +381,11 @@ export const resolvers: {
         count
       }
     },
-
-
+    
     usernameAvailable: async(
       _0: any,
       {username},
-      context: AuthenticatedContext,
-      info: any
-    ) => {
+      context: AuthenticatedContext) => {
 
       const user = await context
         .connection
@@ -408,9 +399,7 @@ export const resolvers: {
     emailAddressAvailable: async(
       _0: any,
       {emailAddress},
-      context: AuthenticatedContext,
-      info: any
-    ) => {
+      context: AuthenticatedContext) => {
   
       const user = await context
         .connection
@@ -452,10 +441,7 @@ export const resolvers: {
 
     logout: async (
       _0: any,
-      { },
-      context: AuthenticatedContext,
-      info: any
-    ) => {
+      { }) => {
       throw new ApolloError("Logout is not implemented on the server side. Simply discard the JWT on the client side.")
     },
 
@@ -707,9 +693,7 @@ export const resolvers: {
     removePackagePermissions: async (
       _0: any,
       { identifier, username },
-      context: AuthenticatedContext,
-      info: any
-    ) => {
+      context: AuthenticatedContext) => {
       
       context.connection
         .getCustomRepository(PackagePermissionRepository)
@@ -718,6 +702,10 @@ export const resolvers: {
           username
         });
     },
+
+    createCollection: createCollection,
+    updateCollection: updateCollection,
+    disableCollection: disableCollection,
 
     createVersion: async(
       _0: any,
@@ -744,7 +732,6 @@ export const resolvers: {
 
             const latestVersionSemVer = new SemVer(latestVersion.packageFile!.version);
 
-            const versionComparison = latestVersionSemVer.compare(proposedNewVersion);
             
             const diff = comparePackages(latestVersion.packageFile, newPackageFile);
 
@@ -796,9 +783,7 @@ export const resolvers: {
     disableVersion: async(
       _0: any,
       {identifier},
-      context: AuthenticatedContext,
-      info: any
-    ) => {
+      context: AuthenticatedContext) => {
 
       await context.connection.manager.nestedTransaction( async (transaction) => {
         const version = await transaction.getCustomRepository(VersionRepository)
