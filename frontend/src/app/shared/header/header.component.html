@@ -1,0 +1,63 @@
+
+<div class="row pt-3 desktop-menu">
+    <div class="col-md-8 col-sm-12">
+        <div class="d-flex flex-row bd-highlight">
+            <div class="p-2 bd-highlight align-self-center"><h1 class="title mr-4 mb-0" routerLink="/">datapm</h1></div>
+            <div class="p-2 bd-highlight w-100">
+                <div class="input-group mt-1 search-box">
+                    <input type="text" class="form-control search-input" placeholder="Search this blog">
+                    <button class="material-icons">
+                        search
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-12">
+        <div class="d-flex flex-row bd-highlight justify-content-end">
+            <div class="p-2 ml-4 bd-highlight main-menu-title d-flex align-items-end">collections</div>
+            <div class="p-2 ml-4 bd-highlight main-menu-title d-flex align-items-end">publish</div>
+             <div class="p-2 ml-4 bd-highlight">
+                <button mat-fab class="person-menu" [matMenuTriggerFor]="beforeMenu" aria-label="Example icon button with a delete icon">
+                    <mat-icon>person</mat-icon>
+                </button>
+                <mat-menu #beforeMenu="matMenu" xPosition="before">
+                    <button mat-menu-item>My profile</button>
+                    <button mat-menu-item (click)="openLoginDialog()">Log In</button>
+                    <button mat-menu-item (click)="openSignUpDialog()">Sign Up</button>
+                </mat-menu>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row pt-3 mobile-menu">
+    <div class="col-7">
+        <h1 class="title" routerLink="/">datapm</h1>
+    </div>
+    <div class="col-5 text-right">
+        <div class="d-flex flex-row bd-highlight d-flex justify-content-end">
+            <div class="bd-highlight mobile-collection mr-2">
+                <button mat-fab class="collection-menu" aria-label="Example icon button with a collection icon">
+                    <mat-icon>collections</mat-icon>
+                </button>
+            </div>
+            <div class="bd-highlight mobile-person">
+                <button mat-fab class="person-menu" [matMenuTriggerFor]="beforeMenu" aria-label="Example icon button with a delete icon">
+                    <mat-icon>person</mat-icon>
+                </button>
+                <mat-menu #beforeMenu="matMenu" xPosition="before">
+                    <button mat-menu-item>My profile</button>
+                    <button mat-menu-item (click)="openLoginDialog()">Log In</button>
+                    <button mat-menu-item (click)="openSignUpDialog()">Sign Up</button>
+                </mat-menu>
+            </div>
+          </div>
+    </div>
+    <div class="col-12 mobile-search-box mt-3">
+        <input type="text" class="form-control search-input" placeholder="Search this blog">
+        <button class="material-icons">
+            search
+        </button>
+    </div>
+</div>

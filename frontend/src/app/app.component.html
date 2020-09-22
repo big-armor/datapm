@@ -1,4 +1,4 @@
-
+<!--
 <h1 class="title" routerLink="/">datapm</h1>
 <strong>Less Wrangling, More Data</strong>
 <br/>
@@ -12,11 +12,12 @@
 
 <form [formGroup]="searchFormGroup" (ngSubmit)="search()">
     <input type="text" placeholder="Search" name="search" formControlName="search" minlength="1" autocomplete="off">
-</form>
+</form> -->
 
-<hr/>
-<br/>
-<router-outlet></router-outlet>
-<Br/>
-<hr/>
-Footer
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>

@@ -2,10 +2,12 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { LoginComponent } from './login.component';
 import { RouterModule } from '@angular/router';
+import { MaterialModule } from '../material.module';
 import {
   ApolloTestingModule,
   ApolloTestingController,
 } from 'apollo-angular/testing';
+import { ReactiveFormsModule } from '@angular/forms';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -14,9 +16,12 @@ describe('LoginComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ LoginComponent ],
-      imports: [RouterModule.forRoot([]),ApolloTestingModule]
-    })
+      declarations: [ LoginComponent],
+      imports: [RouterModule.forRoot([]),
+      ApolloTestingModule,
+      MaterialModule,
+      ReactiveFormsModule]
+    },)
     .compileComponents();
 
     controller = TestBed.inject(ApolloTestingController);
@@ -32,7 +37,7 @@ describe('LoginComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  
+
 
   afterEach(() => {
     controller.verify();
