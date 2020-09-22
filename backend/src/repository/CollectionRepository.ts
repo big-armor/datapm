@@ -1,5 +1,5 @@
 import { UserInputError } from "apollo-server";
-import { EntityRepository, Repository } from "typeorm";
+import { EntityRepository, Repository, SelectQueryBuilder } from "typeorm";
 import { Collection } from "../entity/Collection";
 import { CreateCollectionInput, UpdateCollectionInput } from "../generated/graphql";
 
@@ -36,7 +36,7 @@ export class CollectionRepository extends Repository<Collection> {
     if (collection.isPublic != null && collection.isPublic != undefined) {
       collectionIdDb.isPublic = collection.isPublic;
     }
-    
+
     return this.save(collectionIdDb);
   }
 
@@ -69,11 +69,31 @@ export class CollectionRepository extends Repository<Collection> {
   }
 
   public async findCollectionsForAuthenticatedUser(userId: number, relations?: string[]): Promise<Collection[]> {
-    return this.createQueryBuilder()
-      .where('("Collection"."is_public" and "Collection"."is_active")')
-      .orWhere(`("Collection"."is_active" AND "Collection"."id" IN (SELECT collection_id FROM collection_user WHERE user_id = :userId AND 'VIEW' = any(permissions)))`)
+    return this.createQueryBuilderWithUserConditions(userId)
       .setParameter("userId", userId)
       .addRelations(CollectionRepository.COLLECTION_RELATION_ALIAS, relations)
       .getMany();
+  }
+
+  public async search(userId: number, query: string, limit: number, offSet: number, relations?: string[]): Promise<[Collection[], number]> {
+    return this
+      .createQueryBuilderWithUserConditions(userId)
+      .andWhere("(name_tokens @@ to_tsquery(:query) OR description_tokens @@ to_tsquery(:query))")
+      .setParameter("query", query)
+      .limit(limit)
+      .offset(offSet)
+      // .addRelations(CollectionRepository.COLLECTION_RELATION_ALIAS, relations) - Will fix this in another PR when I add collecition packages
+      .getManyAndCount();
+  }
+
+  private createQueryBuilderWithUserConditions(userId: number): SelectQueryBuilder<Collection> {
+    const publicCollectionQueryBuilder = this.createQueryBuilder().where('("Collection"."is_public" and "Collection"."is_active")');
+    if (!userId) {
+      return publicCollectionQueryBuilder;
+    }
+
+    return publicCollectionQueryBuilder
+      .orWhere(`("Collection"."is_active" AND "Collection"."id" IN (SELECT collection_id FROM collection_user WHERE user_id = :userId AND 'VIEW' = any(permissions)))`)
+      .setParameter("userId", userId);
   }
 }

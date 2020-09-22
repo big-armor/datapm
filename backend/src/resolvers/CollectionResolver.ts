@@ -54,3 +54,18 @@ export const findCollectionBySlug = async (_0: any, { identifier }: { identifier
     .getCustomRepository(CollectionRepository)
     .findCollectionBySlugOrFail(identifier.collectionSlug, relations);
 }
+
+export const searchCollections = async (_0: any, { query, limit, offset }: { query: string, limit: number, offset: number }, context: AuthenticatedContext, info: any) => {
+  const relations = getGraphQlRelationName(info);
+  const [searchResponse, count] = await context
+    .connection
+    .manager
+    .getCustomRepository(CollectionRepository)
+    .search(context.me.id, query, limit, offset, relations);
+
+  return {
+    hasMore: count - (offset + limit) > 0,
+    collections: searchResponse,
+    count
+  }
+}
