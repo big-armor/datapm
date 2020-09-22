@@ -1,8 +1,8 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
 const SQL = `
-    ALTER TABLE collection ADD COLUMN name_tokens TSVECTOR;
-    ALTER TABLE collection ADD COLUMN description_tokens TSVECTOR;
+    ALTER TABLE collection ADD COLUMN IF NOT EXISTS name_tokens TSVECTOR;
+    ALTER TABLE collection ADD COLUMN IF NOT EXISTS description_tokens TSVECTOR;
 
     UPDATE collection SET name_tokens = to_tsvector(name), description_tokens = to_tsvector(description);
 
@@ -22,6 +22,9 @@ const SQL = `
         RETURN NEW;
         END'
     LANGUAGE 'plpgsql';
+
+    DROP TRIGGER IF EXISTS updateCollectionTokens ON collection;
+    CREATE TRIGGER updateCollectionTokens BEFORE INSERT or UPDATE on collection FOR EACH ROW EXECUTE PROCEDURE updateCollectionTokens();
 `;
 
 export class CollectionsSearchColumns1600757487059 implements MigrationInterface {
