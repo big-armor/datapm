@@ -4,7 +4,7 @@ title: Quick Start Guide
 sidebar_label: Quick Start
 ---
 
-DataPM helps you quickly publish and consume data. Let's start with consuming. 
+DataPM helps you quickly publish and consume data. Let's start with some concepts. 
 
 ## Quick Concepts
 
@@ -21,13 +21,13 @@ If you do not already have NodeJS and NPM, install them using the following link
 
 https://nodejs.org/en/
 
-Verify that you have installed Node 12, and the latest npm client. 
+Verify that you have installed Node 12 or greater, and the latest npm client. 
 
 ```node -v```
 
 ```npm -v```
 
-Install the datapm-client package globally.
+Install the datapm-client package globally. This allows you to run the datapm command from any working directory.
 
 ```npm install -g datapm-client```
 
@@ -36,15 +36,15 @@ Verify that the datapm-client package is installed
 ```datapm --version```
 
 
-## Searching DataPM Registries
+## Search DataPM Registries
 
-You can search the public datapm.io registry using a modern web browser. Or use the following command to search via the command line client. 
+You can search the public [datapm.io](https://datapm.io) registry using a modern web browser. Or use the following command to search via the command line client. 
 
 ```datapm search example```
 
 Your search result will include packages with titles, descriptions, or keywords that match your search terms. 
 
-## Consuming Data with DataPM
+## Consume Data
 
 Use the following command to retrieve a batch data package from the datapm.io public registry. 
 
@@ -54,9 +54,9 @@ You can also fetch packages from other registries by specifying the package URL.
 
 ```datapm fetch https://datapm-example.company.com/catalog/package```
 
-## Publishing Data to DataPM
+## Publish Data
 
-*Important Note:* Right now, datapm only supports publishing the schema. So you must host the actual dataset in another location - such as github or a public webserver. And that hosting must be publically available. In the future, DataPM will also support hosting the data itself. 
+*Important Note:* Right now, DataPM only supports publishing data schemas. So you must host the actual data in another location - such as GitHub or a public webserver. And that hosting must be publically available. In the future, DataPM will also support hosting the data itself for public and private data hosting.
 
 Use the command line client to create a data package file based on any publically avialable data set. 
 

@@ -33,6 +33,14 @@ DataPM is an ecosystem of free and (soon to be) open source tools that are used 
 
 DataPM also plans to offer free and paid tools that help publishers and consumers better understand the contents of their data packages. We will make announcements about these additional free and paid tools in the future.
 
+## Is DataPM secure?
+
+DataPM is based on open source tools, and itself will be open source in the future. DataPM is specifically architected to be simple, and therefore easy to secure and maintain. And DataPM is flexible - allowing for a wide variety of use cases. 
+
+DataPM can be used to store only the schema - and not the data itself. This is useful when you want to first share the schema to potential buyers, or vette the consumers of your data offerings.
+
+While DataPM's core focus is the profliferation of high quality data packages, it can also be used to track and inventory your own datasets. Implementing DataPM in your organization will give you visibility into who has access to each of your data sets - without making copies of your data, and without changing your existing architecture. Think more visbility, more control. 
+
 ## What is the DataPM software license?
 
 DataPM is offered under the Creative Commons Attribution-NoDerivatives 4.0 International license. Please see the CC-A-ND-4.0 license description for more details. 
