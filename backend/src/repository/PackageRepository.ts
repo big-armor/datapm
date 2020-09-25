@@ -20,6 +20,11 @@ import { allPermissions } from "../util/PermissionsUtil";
 import { catalogIdentifier } from "../util/IdentifierUtil";
 import { User } from "../entity/User";
 
+const UNAUTHENTICATED_USER_PACKAGE_QUERY = '("Package"."isPublic" is true)';
+const AUTHENTICATED_USER_PACKAGE_QUERY = `("Package"."isPublic" is true 
+          or ("Package"."isPublic" is false and "Package"."catalog_id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId))
+          or ("Package"."isPublic" is false and "Package".id in (select up.package_id from user_package_permission up where up.user_id = :userId)))`;
+
 async function findPackageById(
   manager: EntityManager,
   packageId: number,
@@ -84,23 +89,33 @@ export class PackageRepository {
 
   constructor(private manager: EntityManager) {}
 
-  /** Use this function to create a user scoped query that returns only packages that should be visible to that user */
-  createQueryBuilderWithUserConditions(user:User) {
-    
-    if(user == null) {
-      return this.manager.getRepository(Package)
-      .createQueryBuilder().where(
-        `("Package"."isPublic" is true)`);
+  public async findPackagesForCollection(userId: number, collectionId: number, relations?: string[]): Promise<Package[]> {
+    return this.manager.getRepository(Package)
+      .createQueryBuilder()
+      .andWhere('("Package"."id" IN (SELECT package_id FROM collection_package WHERE collection_id = :collectionId))', { collectionId: collectionId })
+      .addRelations("package", relations)
+      .getMany();
+  }
 
-    } else {
-      return this.manager.getRepository(Package)
-      .createQueryBuilder().where(
-        `("Package"."isPublic" is true 
-        or ("Package"."isPublic" is false and "Package"."catalog_id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId))
-        or ("Package"."isPublic" is false and "Package".id in (select up.package_id from user_package_permission up where up.user_id = :userId)))`,
-          {userId: user.id})
+  /** Use this function to create a user scoped query that returns only packages that should be visible to that user */
+  public createQueryBuilderWithUserConditions(user: User) {
+    if (user != null) {
+      return this.createQueryBuilderWithUserConditionsByUserId(user.id);
     }
 
+    return this.manager.getRepository(Package)
+      .createQueryBuilder()
+      .where('("Package"."isPublic" is true)');
+  }
+
+  public createQueryBuilderWithUserConditionsByUserId(userId: number) {
+    return this.manager.getRepository(Package)
+      .createQueryBuilder()
+      .where(AUTHENTICATED_USER_PACKAGE_QUERY, { userId: userId });
+  }
+
+  private getUserPackageQuery(isAuthenticated: boolean): string {
+    return isAuthenticated ? AUTHENTICATED_USER_PACKAGE_QUERY : UNAUTHENTICATED_USER_PACKAGE_QUERY;
   }
 
   async findOrFail({

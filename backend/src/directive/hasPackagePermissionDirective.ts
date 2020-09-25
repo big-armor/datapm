@@ -61,7 +61,7 @@ export class HasPackagePermissionDirective extends SchemaDirectiveVisitor {
     const permission: Permission = this.args.permission;
     field.resolve = function (source, args, context: Context, info) {
 
-      const identifier: PackageIdentifier | undefined = args.identifier || undefined;
+      const identifier: PackageIdentifier | undefined = args.identifier || args.packageIdentifier || undefined;
 
       if(identifier === undefined)
         throw new Error(`No package identifier defined`);
