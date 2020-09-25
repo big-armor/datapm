@@ -9,9 +9,15 @@ enum State {
   ERROR
 }
 
+enum Filter {
+  COLLECTIONS,
+  PACKAGES,
+  USERS
+}
+
 
 @Component({
-  selector: 'app-search',
+  selector: 'search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']
 })
@@ -19,12 +25,16 @@ export class SearchComponent implements OnInit {
 
 
   State = State;
+  public Filter = Filter;
 
   state = State.LOADING;
 
   urlParams:any;
+  public isStarClicked:boolean = false;
 
-  packageResult:SearchPackagesQuery
+  packageResult:SearchPackagesQuery;
+
+  public selectedFilter: Filter = Filter.COLLECTIONS;
 
   constructor(
     private route:ActivatedRoute,
@@ -50,4 +60,19 @@ export class SearchComponent implements OnInit {
     });
   }
 
+  public get isPackageSelected() {
+    return this.selectedFilter == Filter.PACKAGES;
+  }
+
+  public get isUserSelected() {
+    return this.selectedFilter == Filter.USERS;
+  }
+
+  public get isCollectionSelected() {
+    return this.selectedFilter == Filter.COLLECTIONS;
+  }
+
+  public clickStar(): void {
+    this.isStarClicked = !this.isStarClicked;
+  }
 }

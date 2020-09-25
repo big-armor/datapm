@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { User } from 'src/generated/graphql';
 import { LoginDialogComponent } from './login-dialog/login-dialog.component';
 import { SignUpDialogComponent } from './sign-up-dialog/sign-up-dialog.component';
 
@@ -10,7 +13,18 @@ import { SignUpDialogComponent } from './sign-up-dialog/sign-up-dialog.component
 })
 export class HeaderComponent implements OnInit {
 
-  constructor(public dialog: MatDialog) {}
+  currentUser:User;
+  searchFormGroup:FormGroup;
+
+  constructor(
+    public dialog: MatDialog,
+    private router: Router) {}
+
+  ngOnInit(): void {
+    this.searchFormGroup = new FormGroup({
+      search: new FormControl('')
+    });
+  }
 
   openLoginDialog() {
     this.dialog.open(LoginDialogComponent);
@@ -20,8 +34,16 @@ export class HeaderComponent implements OnInit {
     this.dialog.open(SignUpDialogComponent);
   }
 
+  goToSearch() {
+    this.router.navigate(['/search']);
+    console.log("hello")
+  }
 
-  ngOnInit(): void {
+  search() {
+    const query = this.searchFormGroup.value.search;
+
+    this.router.navigate(['/search',{q: query}])
+
   }
 
 }

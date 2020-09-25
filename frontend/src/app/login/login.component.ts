@@ -74,13 +74,13 @@ export class LoginComponent implements OnInit {
         } else {
           this.router.navigate(['/']);
         }
-        
+
       }).catch((error: any) => {
         if(error.errors?.find(e => e.extensions.code == "LOGIN_FAILED") != null)
           this.state = State.INCORRECT_LOGIN;
-        else 
+        else
           this.state = State.LOGIN_ERROR;
-          
+
       });
 
   }

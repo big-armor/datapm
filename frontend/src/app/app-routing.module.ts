@@ -8,19 +8,31 @@ import { AuthGuard } from './helpers/auth-guard';
 import { PackageDetailComponent } from './package-detail/package-detail.component';
 import { HomepageComponent } from './homepage/homepage.component';
 import { SearchComponent } from './search/search.component';
+import { TrendingComponent } from './homepage/trending/trending.component';
+import { LatestComponent } from './homepage/latest/latest.component';
 
 const staticRoutes:Route[] = [
   {
     path: '',
-    redirectTo: "/homepage",
+    redirectTo: "/home",
     pathMatch: "full"
   },
   {
-    path:'homepage',
-    component: HomepageComponent
+    path:'home',
+    component: HomepageComponent,
+    children:[
+      {
+        path:'trending',
+        component: TrendingComponent
+      },
+      {
+        path:'latest',
+        component: LatestComponent
+      },
+    ]
   },
   {
-    path: "search",
+    path: 'search',
     component: SearchComponent
   },
   {

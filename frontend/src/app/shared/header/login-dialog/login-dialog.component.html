@@ -42,25 +42,34 @@
                 </p>
             </div>
             <div mat-dialog-actions class="button-wrapper text-center">
-                <button mat-button mat-dialog-close><span class="btn-text">back to browse</span></button>
+                <button mat-button mat-dialog-close><span class="btn-text">Back to browse</span></button>
               </div>
         </mat-step>
-        <mat-step [stepControl]="secondFormGroup" optional>
-          <form [formGroup]="secondFormGroup" style="margin-top: 15px;">
-            <mat-form-field appearance="fill" class="outline-input">
-                <mat-label>email</mat-label>
-                <input matInput>
-            </mat-form-field>
-            <br>
-            <mat-form-field appearance="fill" class="outline-input">
-                <mat-label>password</mat-label>
-                <input matInput>
-            </mat-form-field>
-                <div mat-dialog-actions class="button-wrapper less-pd text-center">
-                    <button mat-button><span class="btn-text">Login</span></button><br>
-                    <button mat-button matStepperPrevious><span class="btn-text">Back</span></button>
+        <mat-step optional>
+            <form [formGroup]="loginForm" (ngSubmit)="formSubmit()" >
+                <input type="text" placeholder="username or email address" name="username" formControlName="username" autocomplete="username" class="light-inputs">
+                <br>
+                <input type="password" placeholder="Password" name="password" formControlName="password" autocomplete="current-password" class="light-inputs">
+                <p class="forgot-pass"><a href="#">Forgot password?</a></p>
+                <br>
+                <div class="alert-div">
+                    <div class="alert-warn" *ngIf="state == State.INCORRECT_LOGIN">
+                        Incorrect login information.
+                    </div>
+                    <div class="alert-warn" *ngIf="state == State.LOGIN_ERROR">
+                        There was a problem communicating or with the server. Please try again, or contact support.
+                    </div>
                 </div>
-          </form>
+                <div class="content-btn text-center">
+                    <button type="submit" [class.disabled]="!loginForm.valid" class="submit-btn">
+                        <span class="btn-text">Login</span>
+                    </button>
+                    <br>
+                    <button matStepperPrevious class="back-btn">
+                        <span class="btn-text">Back</span>
+                    </button>
+                </div>
+            </form>
         </mat-step>
       </mat-horizontal-stepper>
 </div>

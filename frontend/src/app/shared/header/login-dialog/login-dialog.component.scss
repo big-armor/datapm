@@ -1,11 +1,14 @@
 ::ng-deep.dialog-wrapper {
     padding: 20px 30px;
+
     .mat-stepper-label-position-bottom .mat-horizontal-stepper-header-container{
         display: none;
     }
+
     .mat-horizontal-content-container {
         padding: 0px;
     }
+
     .dialog-title {
         font-family: Roboto Mono;
         font-style: normal;
@@ -17,6 +20,7 @@
         color: #333333;
         text-shadow: 0px -4px 4px rgba(255, 255, 255, 0.25), -4px 0px 4px rgba(255, 255, 255, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25), 0px 4px 4px rgba(183, 183, 183, 0.25);
     }
+
     .dialog-description {
         font-family: Roboto Mono;
         font-style: normal;
@@ -25,38 +29,130 @@
         line-height: 18px;
         letter-spacing: -0.28px;
         color: #828282;
+        margin-bottom: 20px;
     }
-    .outline-input {
+
+    ::ng-deep .light-inputs {
         min-width: 348px;
         max-width: 380px;
-        .mat-form-field-flex {
-            border-radius: 24px;
-            padding: .75em .75em 0 .75em;
-            background-color: #fff;
-            box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25), inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
-            height: 49px;
-        }
-        .mat-form-field-underline::before {
-            display: none;
-        }
-        .mat-form-field-ripple {
-            display: none;
-        }
-        .mat-form-field-empty.mat-form-field-label,
-        .mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
+        border: none;
+        border-radius: 24px;
+        padding: 10px 20px;
+        background-color: #fff;
+        box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25), inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
+        height: 49px;
+        margin-top: 20px;
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: 300;
+        font-size: 14px;
+        line-height: 18px;
+        letter-spacing: -0.28px;
+        outline: solid transparent 0px;
+
+        &::placeholder {
+            color: #BDBDBD;
             font-family: Roboto Mono;
             font-style: normal;
             font-weight: 300;
-            font-size: 13px;
-            color: #BDBDBD;
-            margin-top: -0.6em !important;
+            font-size: 14px;
+            line-height: 18px;
+            letter-spacing: -0.28px;
         }
+    }
+
+    .forgot-pass {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 18px;
+        padding-left: 15px;
+        padding-top: 4px;
+        margin-bottom: 0px;
+        letter-spacing: -0.3px;
+        color: #3a80ca;
+    }
+
+    .submit-btn {
+        outline: #fff solid 0px;
+        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
+        border-radius: 24px;
+        min-width: 200px;
+        height: 36px;
+        margin-top: 15px;
+        border: none;
+        background: #fff;
+
+        .btn-text {
+            font-family: Roboto Mono;
+            font-style: normal;
+            font-weight: 300;
+            font-size: 18px;
+            align-items: center;
+            text-align: center;
+            color: #828282;
+        }
+
+        &:hover {
+            background-color: #dddddd9c;
+        }
+    }
+
+    .disabled {
+        background-color: #cccccc85;
+        pointer-events: none;
+        opacity: 0.6;
+        .btn-text {
+            color: #82828273;
+        }
+    }
+
+    .back-btn {
+        outline: #fff solid 0px;
+        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
+        border-radius: 24px;
+        min-width: 200px;
+        height: 36px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+        border: none;
+        background: #fff;
+
+        &:hover {
+            background-color: #dddddd9c;
+        }
+
+        .btn-text {
+            font-family: Roboto Mono;
+            font-style: normal;
+            font-weight: 300;
+            font-size: 18px;
+            align-items: center;
+            text-align: center;
+            color: #828282;
+        }
+    }
+
+    .alert-div {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 11px;
+        align-items: center;
+        text-align: center;
+        color: #ce5959;
+        max-width: 347px;
+        position: relative;
+        top: -14px;
+        line-height: 14px;
     }
 }
 
 ::ng-deep.mat-dialog-container {
     border-radius: 24px;
     box-shadow: -4px 0px 4px rgba(130, 130, 130, 0.25), 0px -4px 4px rgba(130, 130, 130, 0.25), 4px 0px 4px rgba(51, 51, 51, 0.25), 0px 4px 4px rgba(51, 51, 51, 0.25);
+
     #logIn {
         .button-wrapper {
             button {
@@ -66,8 +162,10 @@
                 min-width: 200px;
                 height: 36px;
                 margin-top: 15px;
+
                 .flex-row {
                     line-height: 27px;
+
                     .btn-text {
                         font-family: Roboto Mono;
                         font-style: normal;
@@ -77,6 +175,7 @@
                         text-align: center;
                         color: #828282;
                     }
+
                     .btn-image {
                         margin-right: 30px;
                     }
@@ -86,7 +185,8 @@
         .mat-dialog-actions {
             display: block;
             margin-bottom: 10px;
-            margin-top: 40px;
+            margin-top: 30px;
+
             .btn-text {
                 font-family: Roboto Mono;
                 font-style: normal;
@@ -97,6 +197,7 @@
                 color: #828282;
             }
         }
+
         .mat-dialog-actions.less-pd {
             margin-top: 0px;
         }
@@ -106,9 +207,26 @@
 @media (max-width: 576px) {
     #logIn {
         padding: 0px;
-        .outline-input {
-            min-width: 210px;
+        .light-inputs  {
+            min-width: 244px;
             max-width: 280px;
+            height: 38px;
+            font-size: 13px;
+            &::placeholder {
+                font-size: 12px;
+            }
+        }
+        .submit-btn {
+            height: 30px;
+            .btn-text {
+                font-size: 14px;
+            }
+        }
+        .back-btn {
+            height: 30px;
+            .btn-text {
+                font-size: 14px;
+            }
         }
         .button-wrapper {
             button {
@@ -124,6 +242,7 @@
         .dialog-description {
             font-size: 12px;
             text-align: center;
+            margin-bottom: 0px;
         }
         .dialog-title {
             font-size: 34px;
@@ -135,6 +254,10 @@
             .btn-text {
                 font-size: 12px;
             }
+        }
+        .forgot-pass {
+            font-size: 10px;
+            padding-left: 10px;
         }
     }
 }

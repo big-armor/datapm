@@ -1,0 +1,614 @@
+.header-border {
+  border-bottom: none;
+  height: 12px;
+  border: 0;
+  margin: 0px;
+  box-shadow: 0 6px 8px -2px rgba(189, 189, 189, 0.25);
+}
+
+.example-section {
+  padding-top: 20px;
+
+  ::ng-deep.span-radio-btn {
+    font-family: Roboto Mono;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 18px;
+    text-align: center;
+    padding: 0px 30px;
+    color: #333333;
+
+    .mat-checkbox-layout {
+      margin-bottom: 0px;
+
+      .mat-checkbox-frame {
+        box-sizing: border-box;
+        height: 16px;
+        width: 16px;
+        left: 0;
+        position: absolute;
+        top: 0;
+        transition: border-color ease 280ms;
+        width: 16px;
+        border-width: 0px;
+        border-style: solid;
+        border-radius: 50%;
+        box-shadow: inset -2px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -2px 4px rgba(255, 255, 255, 0.25), inset 0px 2px 4px rgba(189, 189, 189, 0.25), inset 2px 0px 4px rgba(189, 189, 189, 0.25);
+      }
+
+      .mat-checkbox-checkmark-path {
+        stroke: #310c0c !important;
+        stroke-width: 1.4333333333px;
+      }
+
+      .mat-checkbox-background {
+        background-color: unset !important;
+        border-radius: 12px !important;
+      }
+    }
+  }
+}
+
+::ng-deep .sorting-mat {
+  border: 1px solid transparent;
+  padding: 15px;
+  box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+  border-radius: 4px;
+  margin-bottom: 20px;
+
+  .bd-highlight {
+    .mat-checkbox-layout {
+      margin-bottom: 0px;
+      font-family: Roboto Mono;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 18px;
+      text-align: center;
+      color: #333333;
+
+      .mat-checkbox-frame {
+        box-sizing: border-box;
+        height: 16px;
+        width: 16px;
+        left: 0;
+        position: absolute;
+        top: 0;
+        transition: border-color ease 280ms;
+        width: 16px;
+        border-width: 0px;
+        border-style: solid;
+        border-radius: 50%;
+        box-shadow: inset -2px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -2px 4px rgba(255, 255, 255, 0.25), inset 0px 2px 4px rgba(189, 189, 189, 0.25), inset 2px 0px 4px rgba(189, 189, 189, 0.25);
+      }
+
+      .mat-checkbox-checkmark-path {
+        stroke: #310c0c !important;
+        stroke-width: 1.4333333333px;
+      }
+
+      .mat-checkbox-background {
+        background-color: unset !important;
+        border-radius: 12px !important;
+      }
+    }
+
+    .mat-radio-label-content {
+      margin-bottom: 0px;
+      font-family: Roboto Mono;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 14px;
+      line-height: 18px;
+      text-align: center;
+      color: #333333;
+    }
+
+    .mat-radio-checked {
+      .mat-radio-inner-circle {
+        background-color: rgb(0 0 0 / 37%);
+      }
+    }
+
+    .mat-radio-outer-circle {
+      border-color: #6c757d;
+      border-width: 0px;
+      box-shadow: inset -2px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -2px 4px rgba(255, 255, 255, 0.25), inset 0px 2px 4px rgba(189, 189, 189, 0.25), inset 2px 0px 4px rgba(189, 189, 189, 0.25);
+    }
+  }
+}
+
+.not-found {
+  height: 50vh;
+  text-align: center;
+  padding-top: 50px;;
+
+  p {
+    margin: 0 auto;
+    font-family: Roboto Mono;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 18px;
+    line-height: 28px;
+    text-align: center;
+    padding: 0px 30px;
+
+    span {
+      font-size: 40px;
+    }
+  }
+
+  .small-txt {
+    font-size: 14px;
+    padding-top: 15px;
+  }
+}
+
+.d-none {
+  display: none !important;
+}
+
+.page-result-name {
+  margin: 0 auto;
+  font-family: Roboto Mono;
+  font-style: normal;
+  font-weight: 300;
+  font-size: 18px;
+  line-height: 28px;
+  color: #828282;
+  padding: 5px 0px 30px 0px;
+}
+
+#searchUser {
+  .search-title {
+    font-family: Roboto Mono;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    color: #4F4F4F;
+    padding-bottom: 20px;
+
+    span{
+      text-decoration: underline;
+    }
+  }
+  .mat-list-item {
+    height: unset;
+    padding: 10px 0px;
+
+    .user-image {
+      width: 25px;
+      height: 25px;
+      margin-right: 10px;
+      border-radius: 50%;
+      box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+    }
+
+    .user-name {
+      font-family: Roboto Mono;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 14px;
+      color: #4F4F4F;
+    }
+
+    .user-location {
+      font-family: Roboto Mono;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 12px;
+      line-height: 10px;
+      letter-spacing: -0.28px;
+      color: #828282;
+    }
+
+    .follow-btn {
+      line-height: 25px;
+      padding: 0px 10px;
+      border-radius: 24px;
+      box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+
+      .follow-txt {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 11px;
+        color: #828282;
+        position: relative;
+        bottom: 2px;
+      }
+
+      .follow-icon {
+        font-size: 15px;
+        width: 17px;
+        height: 17px;
+        color: #828282;
+      }
+
+      &:focus {
+        outline: solid transparent 0px;
+      }
+    }
+
+    ::ng-deep .star-btn {
+      position: relative;
+      top: 2px;
+      line-height: 10px;
+      padding: 2px 7px;
+      border-radius: 24px;
+      pointer-events: none;
+      opacity: 0.4;
+      background-color: #545454;
+      box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+
+      .star-txt {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 10px;
+        color: #fff;
+        position: relative;
+        bottom: 2px;
+      }
+
+      .star-icon {
+        font-size: 13px;
+        width: 12px;
+        height: 16px;
+        margin-right: 1px;
+        color: #fff;
+      }
+
+      &:focus {
+        outline: solid transparent 0px;
+      }
+    }
+  }
+}
+
+#searchCollections {
+  .search-title {
+    font-family: Roboto Mono;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    color: #4F4F4F;
+    padding-bottom: 20px;
+
+    span{
+      text-decoration: underline;
+    }
+  }
+
+  .mat-list-item {
+    height: unset;
+    padding: 10px 0px;
+
+    .collection-image {
+      width: 75px;
+      height: 65px;
+      object-fit: cover;
+      margin-right: 10px;
+      border-radius: 6px;
+      box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+    }
+
+    .user-title {
+      a {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 14px;
+        color: #4F4F4F;
+      }
+    }
+
+    .user-name {
+      font-family: Roboto Mono;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 11px;
+      line-height: 10px;
+      letter-spacing: -0.28px;
+      color: #828282;
+    }
+
+    .user-description {
+      font-family: Roboto Mono;
+      font-style: normal;
+      font-weight: 300;
+      font-size: 10px;
+      line-height: 14px;
+      color: #828282;
+    }
+
+    .rounded-star {
+      span {
+        font-family: Roboto Mono;
+        font-weight: 400;
+        font-size: 11px;
+        position: relative;
+        bottom: 8px;
+        padding-left: 7px;
+        text-transform: uppercase;
+        color: #828282;
+      }
+
+      .yellow {
+        background-color: #f49636c7 !important;
+
+        .mat-icon {
+            color: #fff;
+        }
+      }
+
+      button {
+        width: 22px;
+        height: 22px;
+        background-color: #fff;
+        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+
+        &:focus {
+            outline: #fff auto 0px !important;
+        }
+
+        ::ng-deep.mat-button-wrapper {
+          padding: 0px 0;
+          line-height: 20px;
+
+          .mat-icon {
+            height: 35px;
+            font-size: 17px;
+            color: #828282;
+
+            &:focus {
+              outline: #fff auto 0px !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+#searchPackages {
+  .search-title {
+    font-family: Roboto Mono;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    color: #4F4F4F;
+    padding-bottom: 20px;
+
+    span{
+      text-decoration: underline;
+    }
+  }
+
+  .mat-list-item {
+    height: unset;
+    padding: 10px 0px;
+
+    .collection-image {
+      width: 85px;
+      height: 87px;
+      object-fit: cover;
+      margin-right: 10px;
+      border-radius: 6px;
+      box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+    }
+
+    .user-title {
+      a {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 14px;
+        color: #4F4F4F;
+      }
+    }
+
+    .description-wrapper {
+      overflow: hidden;
+      max-width: 300px;
+      height: 27px;
+      line-height: 12px;
+
+      .user-description {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: 300;
+        font-size: 10px;
+        line-height: 10px !important;
+        color: #828282;
+      }
+    }
+
+    .user-name {
+      font-family: Roboto Mono;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 10px;
+      line-height: 10px;
+      color: #828282;
+    }
+
+    .user-right-description {
+      font-family: Roboto Mono;
+      font-style: normal;
+      font-weight: 300;
+      font-size: 10px;
+      line-height: 14px;
+      color: #828282;
+    }
+
+    .rounded-star-package {
+      span {
+        font-family: Roboto Mono;
+        font-weight: 400;
+        font-size: 11px;
+        position: relative;
+        bottom: 8px;
+        padding-left: 7px;
+        text-transform: uppercase;
+        color: #828282;
+      }
+
+      .yellow {
+        background-color: #f49636c7 !important;
+
+        .mat-icon {
+            color: #fff;
+        }
+      }
+
+      button {
+        width: 22px;
+        height: 22px;
+        background-color: #fff;
+        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+
+        &:focus {
+            outline: #fff auto 0px !important;
+        }
+
+        ::ng-deep.mat-button-wrapper {
+          padding: 0px 0;
+          line-height: 20px;
+
+          .mat-icon {
+            height: 35px;
+            font-size: 17px;
+            color: #828282;
+
+            &:focus {
+              outline: #fff auto 0px !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.disabledDiv{
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.padding-desktop {
+  padding: 50px 30px;
+}
+
+@media (max-width: 992px) {
+  .padding-desktop {
+    padding: 10px 0px !important;
+    #searchPackages {
+      .search-title {
+        font-size: 14px;
+        text-align: left;
+        padding-left: 15px;
+        padding-bottom: 10px;
+      }
+      .mat-list-item {
+        padding: 0px 0px;
+        .mobile-row {
+          flex-direction: row !important;
+          display: unset !important;
+          .collection-image {
+            width: 160px!important;
+            height: 70px !important;
+          }
+          .user-right-description {
+            line-height: 12px;
+            margin-right: auto;
+          }
+          .rounded-star-package {
+            position: relative;
+            top: 10px;
+            margin-top: 0px !important;
+          }
+        }
+      }
+    }
+    #searchUser {
+      .search-title {
+        font-size: 14px;
+        text-align: left;
+        padding-left: 15px;
+        padding-bottom: 10px;
+      }
+    }
+    #searchCollections {
+      .search-title {
+        font-size: 14px;
+        text-align: left;
+        padding-left: 15px;
+        padding-bottom: 0px;
+      }
+      .mat-list-item {
+        .mobile-row {
+          flex-direction: row !important;
+          display: unset !important;
+          .collection-image {
+            width: 160px!important;
+            height: 70px !important;
+          }
+          .user-description {
+            margin-right: auto;
+            line-height: 12px;
+          }
+          .rounded-star {
+            position: relative;
+            top: 5px;
+            margin-top: 0px !important;
+          }
+        }
+      }
+    }
+  }
+  ::ng-deep .sorting-mat {
+    padding: 0px;
+    box-shadow: none;
+    flex-direction: row !important;
+    &:first-child {
+      margin-bottom: 0px;
+    }
+    &:last-child {
+      border-bottom: 1px solid #66666661;
+      border-radius: 0px;
+    }
+    .mat-radio-group {
+      display: flex;
+      .mat-radio-label {
+        margin-bottom: 0px;
+        .mat-radio-label-content {
+          font-size: 12px;
+        }
+      }
+    }
+    .mat-checkbox {
+      .mat-checkbox-layout {
+        font-size: 12px;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  ::ng-deep .sorting-mat {
+    .mat-radio-group {
+      .mat-radio-label {
+        .mat-radio-label-content {
+          font-size: 10px;
+        }
+      }
+    }
+    .mat-checkbox {
+      .mat-checkbox-layout {
+        font-size: 9px;
+      }
+    }
+  }
+}
