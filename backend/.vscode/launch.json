@@ -5,11 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "trace": true,
             "command": "npm start",
             "name": "Run npm start",
             "request": "launch",
             "type": "node-terminal",
+            "cwd": "${workspaceFolder}/backend",
             "env": {
                 "APOLLO_KEY":"service:family-connections:asdfasdfasdfasdf",
                 "APOLLO_GRAPH_VARIANT":"dev",
@@ -18,24 +18,18 @@
                 "FILESYSTEM_STORAGE_DIRECTORY":"local_storage",
                 "MIXPANEL_TOKEN":"asdfasdfasdf",
                 "TYPEORM_PORT":"5432",
-                "TYPEORM_DATABASE":"postgres",
+                "TYPEORM_DATABASE":"datapm",
                 "TYPEORM_SCHEMA":"public",
                 "TYPEORM_USERNAME":"postgres",
                 "TYPEORM_PASSWORD":"postgres",
                 "TYPEORM_CREATE_SCHEMA": "false",
                 "SENDGRID_API_KEY":"asdfasdfa",
-                "GOOGLE_LOGIN_CLIENT_ID":"832769547626-tnldssk3ljco2icmss266tnn5epalheb.apps.googleusercontent.com",
-                "GOOGLE_LOGIN_SECRET":"asdfadfasdf",
                 "REGISTRY_HOSTNAME":"localhost",
                 "REGISTRY_PORT":"4000",
                 "JWT_KEY":"!!!!REPLACE_ME!!!",
                 "JWT_AUDIENCE":"localhost",
                 "JWT_ISSUER":"localhost"
-            },
-            "outFiles": [
-                "${workspaceFolder}/dist/**/*.js",
-                "!**/node_modules/**"
-            ]
+            }
 
         }
     ]

@@ -4,7 +4,6 @@ import {
   EntityRepository,
   Repository,
   EntityManager,
-  SelectQueryBuilder,
 } from "typeorm";
 import sgMail from "@sendgrid/mail";
 import { v4 as uuidv4 } from 'uuid';
@@ -14,7 +13,7 @@ import { User } from "../entity/User";
 import { APIKey } from "../entity/APIKey";
 import { hashPassword } from "../util/PasswordUtil";
 import { ApiKeyWithSecret, Scope } from "../generated/graphql";
-import { ApolloError, ValidationError } from "apollo-server";
+import { ValidationError } from "apollo-server";
 
 // https://stackoverflow.com/a/52097700
 export function isDefined<T>(value: T | undefined | null): value is T {
@@ -42,9 +41,6 @@ async function getAPIKey({
 
   return val || null;
 }
-
-
-
 
 async function getAPIKeyOrFail({
   id,
@@ -127,10 +123,6 @@ export class APIKeyRepository extends Repository<APIKey> {
       apiKey.id = uuidv4();
       apiKey.hash = hashPassword(secret,apiKey.id);
       apiKey.scopes = scopes;
-
-      const now = new Date();
-      apiKey.createdAt = now;
-      apiKey.updatedAt = now;
 
       try {
         const savedKey = await transaction.save(apiKey);

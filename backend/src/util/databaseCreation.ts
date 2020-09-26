@@ -2,22 +2,21 @@ import { createDatabase } from 'pg-god'
 import { createConnection, Connection, getConnectionOptions } from 'typeorm'
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions'
 
-let conn: Connection | undefined
+let connection: Connection | undefined
 
 export async function superCreateConnection(): Promise<Connection> {
 
-  if (conn) return conn
+  if (connection) {
+    return connection;
+  }
 
   // may either read from ormconfig or hardcode your options here
   const ormOpts: PostgresConnectionOptions = await getConnectionOptions() as PostgresConnectionOptions;
 
   try {
-
-    conn = await createConnection(ormOpts)
-    console.log("DataBaseCreation.superCreateConnection2");
-
+    connection = await createConnection(ormOpts)
     console.log("Found: " + ormOpts.database!);
-    return conn
+    return connection
   } catch (error) {
     console.log("Database creation error : " + JSON.stringify(error));
 

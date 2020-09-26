@@ -14,6 +14,7 @@ import { ValidEmailDirective } from "./directive/ValidEmailDirective";
 import { ValidUsernameDirective } from "./directive/ValidUsernameDirective";
 import { ValidPasswordDirective } from "./directive/ValidPasswordDirective";
 import { ValidSlugDirective } from "./directive/ValidSlugDirective";
+import { HasCollectionPermissionDirective } from "./directive/hasCollectionPermissionDirective";
 const ConstraintDirective = require('apollo-server-constraint-directive');
 
 const readFile = promisify(fs.readFile);
@@ -33,13 +34,13 @@ export async function makeSchema() {
       isUserOrAdmin: IsUserOrAdminDirective,
       isAuthenticated: IsAuthenticatedDirective,
       hasCatalogPermission: HasCatalogPermissionDirective,
+      hasCollectionPermission: HasCollectionPermissionDirective,
       hasPackagePermission: HasPackagePermissionDirective,
       isSiteAdmin: IsSiteAdminDirective,
       validEmailAddress: ValidEmailDirective,
       validUsername: ValidUsernameDirective,
       validPassword: ValidPasswordDirective,
       validSlug: ValidSlugDirective
-
     },
   });
 }
