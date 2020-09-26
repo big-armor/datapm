@@ -171,7 +171,7 @@ async function main() {
     }
   })
 
-  // these two routes serve angular static content
+  // these three routes serve angular static content
   app.use(
     "/static",
     express.static(path.join(__dirname, "..", "static"), {
@@ -182,6 +182,20 @@ async function main() {
       },
     })
   );
+
+  app.use(
+    "/docs",
+    express.static(path.join(__dirname, "..", "static/docs"), {
+      setHeaders: (res, path) => {
+        // set cache to 1 year for anything that includes a hash
+        const maxAge = path.match(/\.[a-fA-F0-9]{20}\.[^\/]+$/) ? 31536000 : 0;
+        res.setHeader("Cache-Control", `public, max-age=${maxAge}`);
+      },
+    })
+  );
+
+
+
   app.use(
     "/assets",
     express.static(path.join(__dirname, "..", "static", "assets"))

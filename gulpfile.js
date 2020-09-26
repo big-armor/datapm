@@ -31,8 +31,8 @@ function buildFrontend() {
   return spawnAndLog("npm",["run","build"], {cwd: "frontend"});
 }
 
-function cleanNodeModules() {
-  return spawnAndLog("npm",["run","clean:node_Modules"]);
+function buildDocs() {
+  return spawnAndLog("npm",["run","build"], {cwd: "docs/website"});
 }
 
 function removeNodeModules() {
