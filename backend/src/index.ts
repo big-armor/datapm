@@ -164,6 +164,14 @@ async function main() {
     })
   );
 
+  app.use("/docs/schema.gql",function( req, res, next ) {
+    res.sendFile(path.join(__dirname, "node_modules/datapm-lib/schema.gql"));
+  });
+
+  app.use("/docs/package-file-schema-v1.json",function( req, res, next ) {
+    res.sendFile(path.join(__dirname, "node_modules/datapm-lib/packageFileSchema.json"));
+  });
+
   app.use("/robots.txt",function( req, res, next ) {
     switch( req.hostname ) {
         case 'datapm.io': res.sendFile(path.join(__dirname, "robots-production.txt")); break;
@@ -193,8 +201,6 @@ async function main() {
       },
     })
   );
-
-
 
   app.use(
     "/assets",
