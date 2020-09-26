@@ -164,6 +164,13 @@ async function main() {
     })
   );
 
+  app.use("/robots.txt",function( req, res, next ) {
+    switch( req.hostname ) {
+        case 'datapm.io': res.sendFile(path.join(__dirname, "robots-production.txt")); break;
+        default: res.sendFile(path.join(__dirname, "robots.txt"));
+    }
+  })
+
   // these two routes serve angular static content
   app.use(
     "/static",
