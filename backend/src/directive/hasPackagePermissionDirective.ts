@@ -1,7 +1,7 @@
 import {
   SchemaDirectiveVisitor,
   AuthenticationError,
-  ForbiddenError,
+  ForbiddenError, UserInputError
 } from "apollo-server";
 import { GraphQLObjectType, GraphQLField, defaultFieldResolver } from "graphql";
 import { Context } from "../context";
@@ -12,15 +12,18 @@ import { PackagePermissionRepository } from "../repository/PackagePermissionRepo
 async function hasPermission(permission: Permission, context: Context, identifier: PackageIdentifier): Promise<boolean> {
 
   // Check that the package exists
-  const packageEntity = await context.connection.getCustomRepository(PackageRepository).findPackageOrFail({
+  const packageEntity = await context.connection.getCustomRepository(PackageRepository).findPackage({
     identifier
   });
+
+  if(packageEntity == null) 
+    throw new UserInputError("PACKAGE_NOT_FOUND");
 
   if(packageEntity.isPublic)
     return true;
 
   if(context.me === undefined) {
-    throw new Error(`No user session found`);
+    throw new Error(`NOT_AUTHENTICATED`);
   }
 
 
@@ -57,8 +60,6 @@ export class HasPackagePermissionDirective extends SchemaDirectiveVisitor {
     const { resolve = defaultFieldResolver } = field;
     const permission: Permission = this.args.permission;
     field.resolve = function (source, args, context: Context, info) {
-
-      if (!context.me) throw new AuthenticationError("No active user session");
 
       const identifier: PackageIdentifier | undefined = args.identifier || undefined;
 

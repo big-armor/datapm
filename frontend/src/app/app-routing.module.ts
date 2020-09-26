@@ -6,9 +6,19 @@ import { SignupComponent } from './signup/signup.component';
 import { MyAccountComponent } from './my-account/my-account.component';
 import { AuthGuard } from './helpers/auth-guard';
 import { PackageDetailComponent } from './package-detail/package-detail.component';
+import { HomepageComponent } from './homepage/homepage.component';
 import { SearchComponent } from './search/search.component';
 
 const staticRoutes:Route[] = [
+  {
+    path: '',
+    redirectTo: "/homepage",
+    pathMatch: "full"
+  },
+  {
+    path:'homepage',
+    component: HomepageComponent
+  },
   {
     path: "search",
     component: SearchComponent
@@ -28,13 +38,11 @@ const staticRoutes:Route[] = [
   },
   {
     path: ":catalogSlug",
-    component: CatalogDetailsComponent,
-    canActivate: [AuthGuard]
+    component: CatalogDetailsComponent
   },
   {
     path: ":catalogSlug/:packageSlug",
-    component: PackageDetailComponent,
-    canActivate: [AuthGuard]
+    component: PackageDetailComponent
   }
 ]
 

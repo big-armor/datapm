@@ -1,30 +1,9 @@
 import { EntityRepository, EntityManager } from "typeorm";
 
 import { UserPackagePermission } from "../entity/UserPackagePermission";
-import { Package } from "../entity/Package";
 import { UserRepository } from "./UserRepository";
 import { Permission, PackageIdentifier, PackageIdentifierInput } from "../generated/graphql";
 import { PackageRepository } from "./PackageRepository";
-
-async function getPackage({
-  manager,
-  packageId,
-}: {
-  manager: EntityManager;
-  packageId: number;
-}): Promise<Package> {
-  const caseChild = await manager
-    .getRepository(Package)
-    .createQueryBuilder("package")
-    .where({ id: packageId })
-    .getOne();
-
-  if (!caseChild) {
-    throw new Error(`Case with ID ${packageId} not found`);
-  }
-
-  return caseChild;
-}
 
 async function getPackagePermissions({
   manager,
@@ -44,9 +23,6 @@ async function getPackagePermissions({
     .addRelations(ALIAS, relations)
     .where({ packageId, userId })
     .getOne();
-
-  
-  
 }
 
 @EntityRepository()
@@ -68,8 +44,6 @@ export class PackagePermissionRepository {
       userId,
       relations,
     });
-
-
   }
 
   setPackagePermissions({

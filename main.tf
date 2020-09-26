@@ -136,14 +136,6 @@ resource "google_cloud_run_service" "default" {
           value = "asdfasdfa"
         }
         env {
-          name  = "GOOGLE_LOGIN_CLIENT_ID"
-          value = "832769547626-tnldssk3ljco2icmss266tnn5epalheb.apps.googleusercontent.com"
-        }
-        env {
-          name  = "GOOGLE_LOGIN_SECRET"
-          value = "p1YiHnsuBMHcyltiWL_1h5yt"
-        }
-        env {
           name  = "REGISTRY_HOSTNAME"
           value = "test.datapm.io"
         }

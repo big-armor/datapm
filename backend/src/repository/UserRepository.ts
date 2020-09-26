@@ -21,6 +21,7 @@ import { mixpanel } from "../util/mixpanel";
 import { UserCatalogPermission } from "../entity/UserCatalogPermission";
 import { CatalogRepository } from "./CatalogRepository";
 import { hashPassword } from "../util/PasswordUtil";
+import { Catalog } from "../entity/Catalog";
 
 // https://stackoverflow.com/a/52097700
 export function isDefined<T>(value: T | undefined | null): value is T {
@@ -511,11 +512,11 @@ export class UserRepository extends Repository<User> {
   
   removeUserFromCatalog({
     username,
-    catalogSlug,
+    catalog,
     relations = [],
   }: {
     username: string;
-    catalogSlug: string;
+    catalog: Catalog;
     relations?: string[];
   }): Promise<User> {
     return this.manager.nestedTransaction(async (transaction) => {
@@ -523,11 +524,6 @@ export class UserRepository extends Repository<User> {
         username: username,
         manager: transaction
       });
-
-      const catalog = await this.manager.getCustomRepository(CatalogRepository)
-        .findCatalogBySlug({
-          slug: catalogSlug
-        });
 
       // remove user from catalog, remove all user settings
       await transaction.delete(UserCatalogPermission, { userId: user.id, catalogId: catalog.id });
