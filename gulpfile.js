@@ -36,7 +36,7 @@ function buildDocs() {
 }
 
 function removeNodeModules() {
-  return spawnAndLog("rm", ["-rf", "backend/node_modules", "frontend/node_modules"]);
+  return spawnAndLog("rm", ["-rf", "backend/node_modules", "frontend/node_modules","docs/website/node_modules"]);
 }
 
 function buildDockerImage() {
@@ -72,6 +72,7 @@ exports.default = series(
   installFrontendDepdendencies,
   buildFrontend,
   testFrontend,
+  buildDocs,
   removeNodeModules,
   buildDockerImage
 );
