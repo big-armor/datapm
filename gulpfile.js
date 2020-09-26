@@ -31,6 +31,10 @@ function buildFrontend() {
   return spawnAndLog("npm",["run","build"], {cwd: "frontend"});
 }
 
+function installDocsDepdendencies() {
+  return spawnAndLog("npm",["ci"], {cwd: "docs/website"});
+}
+
 function buildDocs() {
   return spawnAndLog("npm",["run","build"], {cwd: "docs/website"});
 }
@@ -72,6 +76,7 @@ exports.default = series(
   installFrontendDepdendencies,
   buildFrontend,
   testFrontend,
+  installDocsDepdendencies,
   buildDocs,
   removeNodeModules,
   buildDockerImage
