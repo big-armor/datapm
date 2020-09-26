@@ -8,9 +8,9 @@ DataPM helps you quickly publish and consume data. Let's start with some concept
 
 ## Quick Concepts
 
- DataPM (Data Package Manager) is a collection of public and private registries that contain schema descriptions for data packages. You will use the DataPM command-line and/or web clients to search the registry, learn about package contents, and fetch or stream the package. You can can also publish data packages to a registry using the same clients. 
+Visit [datapm.io](https://datapm.io) to search and discover packages of data. Then use the command line client to fetch those packages, and upload your own. 
 
- DataPM currently supports batch transfer, and will in the future support streaming transfer of data packages. 
+DataPM currently supports batch transfer, and will in the future support streaming transfer of data packages. 
 
 You can also host your own private or public data registries. See the software license for allowed and prohbited use cases.
 

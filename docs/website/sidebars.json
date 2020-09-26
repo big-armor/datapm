@@ -1,6 +1,6 @@
 {
   "docs": {
-    "Overview": ["quick-start","concepts","about"],
+    "TLDR": ["quick-start","concepts","about"],
     "Use Cases": ["find-data","devops"],
     "Command Line Client": ["cheatsheet", "command-line-client"],
     "Registry": ["registry-self-host","registry-api"],
