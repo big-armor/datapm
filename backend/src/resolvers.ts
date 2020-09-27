@@ -1,5 +1,4 @@
 import "./util/prototypeExtensions";
-
 import { GraphQLScalarType } from "graphql";
 import { UserRepository } from "./repository/UserRepository";
 import {
@@ -41,9 +40,10 @@ import { ApolloError, UserInputError } from "apollo-server";
 
 import {compatibilityToString,comparePackages,diffCompatibility,nextVersion, PackageFile, Compability} from 'datapm-lib';
 import graphqlFields from "graphql-fields";
-import { hashPassword } from "./util/PasswordUtil";
-import { createJwt } from "./util/jwt";
 import { createCollection, disableCollection, findCollectionBySlug, findCollectionsForAuthenticatedUser, searchCollections, updateCollection } from "./resolvers/CollectionResolver";
+import { login, logout } from "./resolvers/AuthResolver";
+import { createMe, disableMe, updateMe } from "./resolvers/UserResolver";
+import { createAPIKey, deleteAPIKey } from "./resolvers/ApiKeyResolver";
 
 export const resolvers: {
   Query: QueryResolvers;
@@ -414,111 +414,18 @@ export const resolvers: {
   },
 
   Mutation: {
+    // Auth
+    login: login,
+    logout: logout,
 
-    login: async (
-      _0: any,
-      { username,password },
-      context: AuthenticatedContext,
-      info: any
-    ) => {
-      const user = await context.connection.manager
-        .getCustomRepository(UserRepository)
-        .getUserByLogin(
-          username,
-          getGraphQlRelationName(info)
-        );
-      if(user == null)
-          throw new ApolloError("Login incorrect","LOGIN_FAILED");
+    // User
+    createMe: createMe,
+    updateMe: updateMe,
+    disableMe: disableMe,
 
-      const hash = hashPassword(password,user.passwordSalt);
-
-      if(hash != user.passwordHash)
-        throw new ApolloError("Login incorrect","LOGIN_FAILED");
-
-
-
-      return createJwt(user);
-    },
-
-    logout: async (
-      _0: any,
-      { }) => {
-      throw new ApolloError("Logout is not implemented on the server side. Simply discard the JWT on the client side.")
-    },
-
-    createMe: async (
-      _0: any,
-      { value },
-      context: AuthenticatedContext,
-      info: any
-    ) => {
-      const user = await context.connection.manager
-        .getCustomRepository(UserRepository)
-        .createUser({
-          value,
-          relations: getGraphQlRelationName(info),
-        });
-
-      return createJwt(user);
-
-    },
-
-
-    updateMe: async (
-      _0: any,
-      { value },
-      context: AuthenticatedContext,
-      info: any
-    ) =>{
-        const user = await context.connection.manager
-        .getCustomRepository(UserRepository)
-        .updateUser({
-          username: context.me.username, 
-          value,
-          relations: getGraphQlRelationName(info),
-        })
-
-        return user;
-    },
-      
-
-    createAPIKey: async (
-      _0: any,
-      { value },
-      context: AuthenticatedContext, 
-      info: any
-    ) => {
-
-      const user = await context.connection.manager
-        .getCustomRepository(UserRepository)
-        .findUser({
-          username: context.me.username,
-        });
-
-      if(!user) {
-        throw new Error("User not found - this should not happen");
-      }
-
-      return context.connection.manager
-      .getCustomRepository(APIKeyRepository)
-      .createAPIKey({
-        user,
-        label: value.label,
-        scopes: value.scopes,   
-        relations: getGraphQlRelationName(info)
-      })
-    },
-
-    deleteAPIKey: (
-      _0: any,
-      { id },
-      context: AuthenticatedContext,
-      info: any
-    ) =>
-      context.connection.manager
-        .getCustomRepository(APIKeyRepository)
-        .deleteAPIKey({id, relations : getGraphQlRelationName(info)})
-    ,
+    // API Keys
+    createAPIKey: createAPIKey,
+    deleteAPIKey: deleteAPIKey,
 
     removeUserFromCatalog: async (
       _0: any,
@@ -542,22 +449,6 @@ export const resolvers: {
           relations: getGraphQlRelationName(info),
         });
 
-    },
-      
-    disableMe: async (
-      _0: any,
-      { },
-      context: AuthenticatedContext,
-      info: any
-    ) => {
-      const user = await context.connection.manager
-        .getCustomRepository(UserRepository)
-        .markUserActiveStatus({
-          username: context.me.username,
-          active: false,
-          relations: getGraphQlRelationName(info),
-        })
-      return user;
     },
 
     createCatalog: async (
@@ -643,7 +534,7 @@ export const resolvers: {
         const hasPermission = await context.connection.getCustomRepository(UserCatalogPermissionRepository).userHasPermission({
           username: context.me.username,
           catalogSlug: value.newCatalogSlug,
-          permission: Permission.Create,
+          permission: Permission.CREATE,
         });
 
         if(!hasPermission)
@@ -746,14 +637,14 @@ export const resolvers: {
             if(compatibility == Compability.Identical) {
               throw new ApolloError(
                 identifier.catalogSlug + "/" + identifier.packageSlug + "/" + latestVersionSemVer.version + " already exists, and the submission is identical to it",
-                VersionConflict.VersionExists,
+                VersionConflict.VERSION_EXISTS,
                 {existingVersion: latestVersionSemVer.version}
               )
             }
             if(minVersionCompare == 1) {
               throw new ApolloError(
                 identifier.catalogSlug + "/" + identifier.packageSlug + " has current version " + latestVersionSemVer.version + ", and this new version has " + compatibilityToString(compatibility) + " changes - requiring a minimum version number of " + minNextVersion.version + ", but you submitted version number " + proposedNewVersion.version,
-                VersionConflict.HigherVersionRequired,
+                VersionConflict.HIGHER_VERSION_REQUIRED,
                 {existingVersion: latestVersionSemVer.version, minNextVersion: minNextVersion.version}
               )
             }

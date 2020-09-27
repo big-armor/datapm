@@ -12,7 +12,7 @@ import { User } from "../entity/User";
 
 import { APIKey } from "../entity/APIKey";
 import { hashPassword } from "../util/PasswordUtil";
-import { ApiKeyWithSecret, Scope } from "../generated/graphql";
+import { APIKeyWithSecret, Scope } from "../generated/graphql";
 import { ValidationError } from "apollo-server";
 
 // https://stackoverflow.com/a/52097700
@@ -98,7 +98,7 @@ export class APIKeyRepository extends Repository<APIKey> {
     label: string;
     scopes: Scope[]
     relations?: string[];
-  }): Promise<ApiKeyWithSecret> {
+    }): Promise<APIKeyWithSecret> {
     return this.manager.nestedTransaction(async (transaction) => {
 
     

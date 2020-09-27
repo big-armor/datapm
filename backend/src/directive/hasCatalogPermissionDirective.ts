@@ -35,7 +35,7 @@ export class HasCatalogPermissionDirective extends SchemaDirectiveVisitor {
         throw new UserInputError("CATALOG_NOT_FOUND");
       }
 
-      if(permission == Permission.View
+      if(permission == Permission.VIEW
           && catalog.isPublic) {
           return resolve.apply(this,[source,args,context,info]);
       }

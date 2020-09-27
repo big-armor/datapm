@@ -27,7 +27,7 @@ export class HasCollectionPermissionDirective extends SchemaDirectiveVisitor {
       }
 
       const collection = await context.connection.getCustomRepository(CollectionRepository).findCollectionBySlugOrFail(collectionSlug);
-      if (permission == Permission.View && collection.isPublic) {
+      if (permission == Permission.VIEW && collection.isPublic) {
         return resolve.apply(this, [source, args, context, info]);
       }
 
