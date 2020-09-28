@@ -10,10 +10,12 @@
 
 .div-collect {
     margin-bottom: 50px;
+
     .example-card {
         box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
         border-radius: 4px;
         height: 530px;
+
         .mat-card-image {
             margin: 0 -16px 0px -16px !important;
             object-fit: cover;
@@ -57,6 +59,7 @@
     .mat-card-header-text {
         margin: 6px 0px;
     }
+
     .mat-card-avatar {
         height: 35px;
     }
@@ -84,6 +87,7 @@
             color: #4F4F4F;
             margin-top: 20px;
         }
+
         li:first-child {
             margin-top: 10px;
         }
@@ -99,20 +103,25 @@
         text-transform: uppercase;
         color: #828282;
     }
+
     button {
         width: 32px;
         height: 32px;
         background-color: #fff;
         box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+
         &:focus {
             outline: #fff auto 0px !important;
         }
+
         ::ng-deep.mat-button-wrapper {
             padding: 0px 0;
             line-height: 20px;
+
             .mat-icon {
                 height: 30px;
                 color: #828282;
+
                 &:focus {
                     outline: #fff auto 0px !important;
                 }
@@ -121,6 +130,7 @@
     }
     .yellow {
         background-color: #f49636c7 !important;
+
         .mat-icon {
             color: #fff;
         }
@@ -130,12 +140,14 @@
 .big-div-package {
     .mat-card {
         box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+
         .mat-card-image {
             width: 100%;
             height: 150px;
             object-fit: cover;
             margin: 0px !important;
         }
+
         .content-description {
             font-family: Roboto Mono;
             font-style: normal;
@@ -169,6 +181,7 @@
 
 .package-div {
     margin-bottom: 20px;
+
     .content-text {
         margin-bottom: 15px;
     }

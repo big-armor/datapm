@@ -13,6 +13,9 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatInputModule} from '@angular/material/input';
 import {MatStepperModule} from '@angular/material/stepper';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import {MatListModule} from '@angular/material/list';
+import {MatDividerModule} from '@angular/material/divider';
 
 @NgModule({
   declarations: [],
@@ -30,7 +33,10 @@ import {MatStepperModule} from '@angular/material/stepper';
     MatSelectModule,
     MatDialogModule,
     MatInputModule,
-    MatStepperModule
+    MatStepperModule,
+    MatCheckboxModule,
+    MatListModule,
+    MatDividerModule
   ],
   exports: [
     MatRadioModule,
@@ -44,7 +50,10 @@ import {MatStepperModule} from '@angular/material/stepper';
     MatSelectModule,
     MatDialogModule,
     MatInputModule,
-    MatStepperModule
+    MatStepperModule,
+    MatCheckboxModule,
+    MatListModule,
+    MatDividerModule
   ]
 })
 export class MaterialModule { }

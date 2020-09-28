@@ -1,6 +1,11 @@
+.search-form {
+  display: flex;
+  width: 100%;
+
   .search-input {
     max-width: 699px;
   }
+}
 
 h1.title {
   font-family: Roboto Mono;
@@ -10,6 +15,10 @@ h1.title {
   line-height: 42px;
   letter-spacing: -0.28px;
   color: #333333;
+
+  a {
+    cursor: pointer;
+  }
 }
 
 .main-menu-title {
@@ -28,8 +37,10 @@ h1.title {
   height: 35px;
   box-shadow: 0px 1px 7px 4px rgb(90 88 88 / 25%);
   background: white;
+
   ::ng-deep .mat-button-wrapper {
     padding: 0 !important;
+
     .mat-icon {
       color: #828282;
       font-size: 32px;
@@ -48,6 +59,7 @@ h1.title {
     height: 44px;
     border: none;
     box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25), inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
+
     &::placeholder {
       font-family: Roboto Mono;
       font-style: normal;
@@ -57,6 +69,7 @@ h1.title {
       color: #BDBDBD;
     }
   }
+
   button {
     border: none;
     background: none;
@@ -64,14 +77,20 @@ h1.title {
     right: 50px;
     z-index: 999;
     color: #828282;
+
     &:active {
       color: #828282;
+    }
+
+    &:focus {
+      outline: auto transparent 0px !important;
     }
   }
 }
 
 .mobile-search-box {
   display: flex;
+
   input {
     border-top-right-radius: 24px;
     border-bottom-right-radius: 24px;
@@ -81,6 +100,7 @@ h1.title {
     height: 36px;
     border: none;
     box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25), inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
+
     &::placeholder {
       font-family: Roboto Mono;
       font-style: normal;
@@ -90,6 +110,7 @@ h1.title {
       color: #BDBDBD;
     }
   }
+
   button {
     border: none;
     background: none;
@@ -98,6 +119,7 @@ h1.title {
     z-index: 999;
     color: #828282;
     top: 6px;
+
     &:active {
       color: #828282;
     }
@@ -109,6 +131,7 @@ h1.title {
     width: 30px;
     height: 30px;
     box-shadow: 0px 1px 7px 4px rgb(90 88 88 / 15%);
+
     ::ng-deep .mat-button-wrapper {
       .mat-icon {
       font-size: 26px !important;
@@ -124,8 +147,10 @@ h1.title {
     height: 30px;
     background: #fff;
     box-shadow: 0px 1px 7px 4px rgb(90 88 88 / 15%);
+
     ::ng-deep .mat-button-wrapper {
        padding: 0 !important;
+
       .mat-icon {
         font-size: 20px !important;
         height: 30px;

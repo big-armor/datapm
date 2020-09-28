@@ -10,17 +10,20 @@
 
 ::ng-deep #matPages .mat-tab-header {
   border-bottom: none;
+
   .mat-ink-bar {
     display: none;
     width: 90px !important;
     background-color: white;
   }
+
   .mat-tab-labels {
     .mat-tab-label {
       height: 30px;
       padding: 0 10px;
       margin: 0px 10px;
       min-width: 90px;
+
       .mat-tab-label-content {
         font-family: Roboto Mono;
         font-style: normal;
@@ -32,12 +35,15 @@
         color: #828282;
       }
     }
+
     .mat-tab-label-active {
       opacity: 1;
       border-bottom: 2px solid #000;
+
       &:active {
         color: #000 !important;
       }
+
       .mat-tab-label-content {
         color: #000 !important;
       }

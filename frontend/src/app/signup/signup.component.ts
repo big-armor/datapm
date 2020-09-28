@@ -94,7 +94,7 @@ export class SignupComponent implements OnInit {
     private emailAddressAvailableGQL:EmailAddressAvailableGQL,
     private componentChangeDetector:ChangeDetectorRef
   ) {
-    
+
   }
 
   ngOnInit(): void {
@@ -104,12 +104,12 @@ export class SignupComponent implements OnInit {
       password: new FormControl('')
     });
 
-    
+
   }
 
   formSubmit() {
     this.createMeGQL.mutate(
-      {value: 
+      {value:
         {
           username: this.signUpForm.value.username,
           password: this.signUpForm.value.password,
