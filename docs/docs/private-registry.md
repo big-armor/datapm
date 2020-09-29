@@ -23,19 +23,19 @@ services:
     ports:
       - "4000:4000"
     environment:
-    - JWT_KEY=!!!!REPLACE_ME!!!
-    - JWT_AUDIENCE=localhost
-    - JWT_ISSUER=localhost
-    - FILESYSTEM_STORAGE_DIRECTORY=local_storage
-    - TYPEORM_IS_DIST=true
-    - TYPEORM_PORT=5432
-    - TYPEORM_HOST=postgres
-    - TYPEORM_DATABASE=postgres
-    - TYPEORM_SCHEMA=public
-    - TYPEORM_USERNAME=postgres
-    - TYPEORM_PASSWORD=postgres
-    - REGISTRY_HOSTNAME=localhost
-    - REGISTRY_PORT=4000
+      - JWT_KEY=!!!!REPLACE_ME!!!
+      - JWT_AUDIENCE=localhost
+      - JWT_ISSUER=localhost
+      - FILESYSTEM_STORAGE_DIRECTORY=local_storage
+      - TYPEORM_IS_DIST=true
+      - TYPEORM_PORT=5432
+      - TYPEORM_HOST=postgres
+      - TYPEORM_DATABASE=postgres
+      - TYPEORM_SCHEMA=public
+      - TYPEORM_USERNAME=postgres
+      - TYPEORM_PASSWORD=postgres
+      - REGISTRY_HOSTNAME=localhost
+      - REGISTRY_PORT=4000
   postgres:
     image: postgres:11
     volumes:
