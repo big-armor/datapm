@@ -2,8 +2,6 @@
   "docs": {
     "TLDR": ["quick-start","concepts","about"],
     "Use Cases": ["find-data","devops"],
-    "Command Line Client": ["cheatsheet", "command-line-client"],
-    "Registry": ["registry-self-host","registry-api"],
-    "Package Files": ["package-files-overview"]
+    "Documentation": ["command-line-client","package-files-overview","registry-api","private-registry"]
   }
 }
