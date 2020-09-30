@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'latest',
-  templateUrl: './latest.component.html',
-  styleUrls: ['./latest.component.scss']
+  selector: 'following',
+  templateUrl: './following.component.html',
+  styleUrls: ['./following.component.scss']
 })
-export class LatestComponent implements OnInit {
+export class FollowingComponent implements OnInit {
 
   public isFavorite = false;
 
@@ -17,4 +17,5 @@ export class LatestComponent implements OnInit {
   public makeFavorite(): void {
     this.isFavorite = !this.isFavorite;
   }
+
 }

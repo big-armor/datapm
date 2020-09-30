@@ -21,6 +21,7 @@ import { LoginDialogComponent } from './shared/header/login-dialog/login-dialog.
 import { SignUpDialogComponent } from './shared/header/sign-up-dialog/sign-up-dialog.component';
 import { LatestComponent } from './homepage/latest/latest.component';
 import { SearchComponent } from './search/search.component';
+import { FollowingComponent } from './homepage/following/following.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,8 @@ import { SearchComponent } from './search/search.component';
     LoginDialogComponent,
     SignUpDialogComponent,
     LatestComponent,
-    SearchComponent
+    SearchComponent,
+    FollowingComponent
   ],
   imports: [
     BrowserModule,
