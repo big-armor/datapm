@@ -85,7 +85,7 @@ DataPM Registry server scales both horizontally and vertically with-in reason. Y
 * No session or connection affinity
 
 
-## Maintaing The Registry
+## Maintaining The Registry
 
 DataPM like all software requires regular software updates. If you are using our published Docker images, upgrading is as simple as referencing the "latest" tag during a container version update. This works well in a Kubernetes or Docker Swarm cluster. 
 
