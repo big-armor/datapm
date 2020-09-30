@@ -1,10 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { AuthenticationService } from '../services/authentication.service';
 import { Router } from '@angular/router';
-import { User, MyCatalogsGQL, Catalog, CreateApiKeyGQL, MyApiKeysGQL, DeleteApiKeyGQL, Scope, ApiKey, ApiKeyWithSecret } from 'src/generated/graphql';
 import { FormGroup, FormControl } from '@angular/forms';
-import * as URLParse from 'url-parse';
 import { getRegistryPort, getRegistryProtocol, getRegistryHostname } from '../helpers/RegistryAccessHelper';
+import { APIKey, Catalog, CreateAPIKeyGQL, DeleteAPIKeyGQL, MyAPIKeysGQL, MyCatalogsGQL, Scope, User } from 'src/generated/graphql';
 
 enum State {
   INIT,
@@ -33,7 +32,7 @@ export class MyAccountComponent implements OnInit {
   newAPIKey:string;
 
   public myCatalogs:Catalog[];
-  public myAPIKeys:ApiKey[];
+  public myAPIKeys:APIKey[];
 
   createAPIKeyForm:FormGroup;
 
@@ -41,9 +40,9 @@ export class MyAccountComponent implements OnInit {
     private authenticationService:AuthenticationService,
     private router:Router,
     private myCatalogsGQL:MyCatalogsGQL,
-    private createAPIKeyGQL:CreateApiKeyGQL,
-    private myAPIKeysGQL:MyApiKeysGQL,
-    private deleteAPIKeyGQL:DeleteApiKeyGQL,
+    private createAPIKeyGQL:CreateAPIKeyGQL,
+    private myAPIKeysGQL:MyAPIKeysGQL,
+    private deleteAPIKeyGQL:DeleteAPIKeyGQL,
     private changeDectorRef:ChangeDetectorRef
   ) {  }
 
@@ -102,7 +101,7 @@ export class MyAccountComponent implements OnInit {
     this.createAPIKeyGQL.mutate({
       value: {
         label: this.createAPIKeyForm.value.label,
-        scopes: [Scope.ManageApiKeys,Scope.ManagePrivateAssets,Scope.ReadPrivateAssets]
+        scopes: [Scope.MANAGE_API_KEYS,Scope.MANAGE_PRIVATE_ASSETS,Scope.READ_PRIVATE_ASSETS]
       }
     }).subscribe(response => {
       if(response.errors?.length > 0) {
