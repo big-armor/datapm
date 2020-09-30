@@ -8,69 +8,56 @@ DataPM helps you quickly publish and consume data. Let's start with some concept
 
 ## Quick Concepts
 
-Visit [datapm.io](https://datapm.io) to search and discover packages of data. Then use the command line client to fetch those packages, and upload your own. 
+Visit [datapm.io](https://datapm.io) to search and discover packages of data. Then use the command line client to fetch those packages. You can publish your own data packages, and host your own private registry!
 
-DataPM currently supports batch transfer, and will in the future support streaming transfer of data packages. 
-
-You can also host your own private or public data registries. See the software license for allowed and prohbited use cases.
-
+[View full concepts documentation](concepts.md)
 
 ## Install the DataPM Command Line Client
 
-If you do not already have NodeJS and NPM, install them using the following link
+If you do not already have NodeJS and NPM, [install NodeJS and NPM](https://nodejs.org/en/). Then use the following command to install the datapm-client.
 
-https://nodejs.org/en/
+```text
+npm install -g datapm-client
+```
 
-Verify that you have installed Node 12 or greater, and the latest npm client. 
+[View full install instructions](command-line-client.md)
 
-```node -v```
-
-```npm -v```
-
-Install the datapm-client package globally. This allows you to run the datapm command from any working directory.
-
-```npm install -g datapm-client```
-
-Verify that the datapm-client package is installed
-
-```datapm --version```
-
-
-## Search DataPM Registries
+## Search, Consume, and Publish Data Packages
 
 You can search the public [datapm.io](https://datapm.io) registry using a modern web browser. Or use the following command to search via the command line client. 
 
-```datapm search example```
+```text
+datapm search "example search"
+```
 
-Your search result will include packages with titles, descriptions, or keywords that match your search terms. 
+Then fetch a specific data package. 
 
-## Consume Data
+```text
+datapm fetch datapm/example
+```
 
-Use the following command to retrieve a batch data package from the datapm.io public registry. 
+Generate your own packages from a publically avialable data set. 
 
-```datapm fetch datapm/example```
+```text
+datapm generate-package https://some-web-server.com/path/to/data.csv
 
-You can also fetch packages from other registries by specifying the package URL. 
-
-```datapm fetch https://datapm-example.company.com/catalog/package```
-
-## Publish Data
-
-*Important Note:* Right now, DataPM only supports publishing data schemas. So you must host the actual data in another location - such as GitHub or a public webserver. And that hosting must be publically available. In the future, DataPM will also support hosting the data itself for public and private data hosting.
-
-Use the command line client to create a data package file based on any publically avialable data set. 
-
-```datapm generate-package https://some-web-server.com/path/to/data.csv```
-
-Follow the prompts to complete the package file. Then use the following command to publish the package. 
-
-```datapm publish my-package-file.datapm.json```
+datapm publish my-package-file.datapm.json
+```
 
 You can update the schema and statistics in the package file using the following command. 
 
-```datapm update my-package-file.datapm.json```
+```text
+datapm update my-package-file.datapm.json
+
+datapm publish my-package-file.datapm.json
+```
 
 And then you can re-publish the updates using the same publish command above. 
 
+[View full command line documentation](command-line-client.md)
 
+## Host A Private Registry
 
+DataPM offers the Registry as a free, and soon to be open source Docker image. The registry server requires a PostgreSQL version 12 database. We suggest a minimum of 2GB of RAM, two modern CPU cores, and 1GB+ for the PostgreSQL database.
+
+[View full private registry documentation](private-registry.md) for a detailed description of how to host your own registry.

@@ -1,6 +1,6 @@
 ---
 id: find-data
-title: Use Case: Find Data
+title: DataPM Use Case: Find Data
 sidebar_label: Find Data
 ---
 
@@ -18,7 +18,9 @@ The global public registry at [datapm.io](https://datapm.io), and the similarly 
 
 The command line client includes a basic search feature for discovering packages. 
 
-``` datapm search "<keywords>"```
+```text
+datapm search "example keywords"
+```
 
 
 ## Inspect Packages
@@ -40,9 +42,15 @@ Each package on the registry contains detailed descriptions of the data availabl
 
 The command line client can also be used view this information about any package. 
 
-``` datapm info <packageIdentifier> ```
+```text
+datapm info catalog-name/package-name
+```
 
+Private registries require a full URL for the package. 
 
+```text
+datapm info https://private.server.net/catalog-name/package-name
+```
 
 ## Fetch Data 
 
@@ -50,8 +58,16 @@ Currently, you must use the command line client to fetch data. In the future, yo
 
 The following command will help you identify the repository and format for storing the data fetched. 
 
-``` datapm fetch <packageIdentifier> ```
+```text
+datapm fetch catalog-name/package-name
+```
 
+Private registries require a full URL for the package. 
+
+
+```text
+datapm fetch https://private.server.net/catalog-name/package-name
+```
 
 
 
