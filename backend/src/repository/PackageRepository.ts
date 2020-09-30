@@ -88,13 +88,13 @@ export class PackageRepository {
     return this.manager.getRepository(Package)
       .createQueryBuilder()
       .where('("Package"."id" IN (SELECT package_id FROM collection_package WHERE collection_id = :collectionId))', { collectionId: collectionId })
-      .andWhere(AUTHENTICATED_USER_OR_PUBLIC_PACKAGES_QUERY, { userId: userId, permission: Permission.View})
+      .andWhere(AUTHENTICATED_USER_OR_PUBLIC_PACKAGES_QUERY, { userId: userId, permission: Permission.VIEW})
       .addRelations("package", relations)
       .getMany();
   }
 
   /** Use this function to create a user scoped query that returns only packages that should be visible to that user */
-  public createQueryBuilderWithUserConditions(user: User, permission: Permission = Permission.View) {
+  public createQueryBuilderWithUserConditions(user: User, permission: Permission = Permission.VIEW) {
     if (user != null) {
       return this.createQueryBuilderWithUserConditionsByUserId(user.id, permission);
     }

@@ -1,5 +1,4 @@
 import fs from "fs";
-import path from "path";
 import { promisify } from "util";
 import { makeExecutableSchema } from "apollo-server";
 
@@ -17,14 +16,14 @@ import { ValidSlugDirective } from "./directive/ValidSlugDirective";
 import { HasCollectionPermissionDirective } from "./directive/hasCollectionPermissionDirective";
 const ConstraintDirective = require('apollo-server-constraint-directive');
 
+const NODE_MODULES_DIRECTORY = getEnvVariable("NODE_MODULES_DIRECTORY", "node_modules");
+const SCHEMAS_DIRECTORY = NODE_MODULES_DIRECTORY + "/datapm-lib/";
+const SCHEMA_FILES = ["schema.gql", "auth-schema.gql", "user-schema.gql", "api-key-schema.gql"];
+
 const readFile = promisify(fs.readFile);
 
-const nodeModulesDirectory = getEnvVariable("NODE_MODULES_DIRECTORY", "node_modules");
-
 export async function makeSchema() {
-  const typeDefs = (
-    await readFile(nodeModulesDirectory + "/datapm-lib/schema.gql")
-  ).toString();
+  const typeDefs = await buildSchemas();
 
   return makeExecutableSchema({
     typeDefs,
@@ -43,4 +42,18 @@ export async function makeSchema() {
       validSlug: ValidSlugDirective
     },
   });
+}
+
+async function buildSchemas() {
+  const schemas = [];
+  for (let i = 0; i < SCHEMA_FILES.length; i++) {
+    const schema = await readSchemaFile(SCHEMA_FILES[i]);
+    schemas.push(schema);
+  }
+  return schemas;
+}
+
+async function readSchemaFile(name: string) {
+  const content = await readFile(SCHEMAS_DIRECTORY + name);
+  return content.toString();
 }

@@ -10,7 +10,7 @@ import { UserCollectionPermission } from "../entity/UserCollectionPermission";
 export class UserCollectionPermissionRepository extends Repository<UserCollectionPermission> {
 
   public async grantAllPermissionsForUser(userId: number, collectionId: number): Promise<UserCollectionPermission> {
-    return this.setPermissionsForUser(userId, collectionId, [Permission.View, Permission.Edit, Permission.Manage, Permission.Delete]);
+    return this.setPermissionsForUser(userId, collectionId, [Permission.VIEW, Permission.EDIT, Permission.MANAGE, Permission.DELETE]);
   }
 
   public async setPermissionsForUser(userId: number, collectionId: number, permissions: Permission[]): Promise<UserCollectionPermission> {
