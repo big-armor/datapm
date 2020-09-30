@@ -76,6 +76,7 @@ async function main() {
     introspection: true,
     playground: true,
     tracing: true,
+    uploads: false,
     engine: {
       sendVariableValues: { none: true },
       rewriteError: (err: GraphQLError) => {
