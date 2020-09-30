@@ -1,6 +1,8 @@
 import { AuthenticatedContext } from "../context";
-import { CollectionIdentifierInput, CreateCollectionInput, UpdateCollectionInput } from "../generated/graphql";
+import { CollectionIdentifierInput, CreateCollectionInput, PackageIdentifier, PackageIdentifierInput, UpdateCollectionInput } from "../generated/graphql";
+import { CollectionPackageRepository } from "../repository/CollectionPackageRepository";
 import { CollectionRepository } from "../repository/CollectionRepository";
+import { PackageRepository } from "../repository/PackageRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { grantAllCollectionPermissionsForUser } from "./UserCollectionPermissionResolver";
 
@@ -39,6 +41,30 @@ export const disableCollection = async (_0: any, { identifier }: { identifier: C
   return context.connection.manager
     .getCustomRepository(CollectionRepository)
     .disableCollection(identifier.collectionSlug, relations);
+}
+
+export const addPackageToCollection = async (_0: any, { collectionIdentifier, packageIdentifier }: { collectionIdentifier: CollectionIdentifierInput, packageIdentifier: PackageIdentifierInput }, context: AuthenticatedContext, info: any) => {
+  const repository = context.connection.manager
+    .getCustomRepository(CollectionRepository);
+  const collectionEntity = await repository.findCollectionBySlugOrFail(collectionIdentifier.collectionSlug);
+  const identifier = packageIdentifier;
+  const packageEntity = await context.connection.getCustomRepository(PackageRepository).findPackageOrFail({ identifier });
+
+  return context.connection.manager
+    .getCustomRepository(CollectionPackageRepository)
+    .addPackageToCollection(context.me.id, collectionEntity.id, packageEntity.id);
+}
+
+export const removePackageFromCollection = async (_0: any, { collectionIdentifier, packageIdentifier }: { collectionIdentifier: CollectionIdentifierInput, packageIdentifier: PackageIdentifierInput }, context: AuthenticatedContext, info: any) => {
+  const repository = context.connection.manager
+    .getCustomRepository(CollectionRepository);
+  const collectionEntity = await repository.findCollectionBySlugOrFail(collectionIdentifier.collectionSlug);
+  const identifier = packageIdentifier;
+  const packageEntity = await context.connection.getCustomRepository(PackageRepository).findPackageOrFail({ identifier });
+
+  await context.connection.manager
+    .getCustomRepository(CollectionPackageRepository)
+    .removePackageToCollection(collectionEntity.id, packageEntity.id);
 }
 
 export const findCollectionsForAuthenticatedUser = async (_0: any, { }, context: AuthenticatedContext, info: any) => {

@@ -1,24 +1,24 @@
 import { EntityRepository, EntityManager, Like, Brackets, SelectQueryBuilder } from "typeorm";
-import { v4 as uuid } from "uuid";
 
 import {
   CreatePackageInput,
   UpdatePackageInput,
-  Permission,
-  PackageIdentifier,
   PackageIdentifierInput,
+  Permission
 } from "../generated/graphql";
 import { Package } from "../entity/Package";
 
 import { UserPackagePermission } from "../entity/UserPackagePermission";
 import { Catalog } from "../entity/Catalog";
 import { CatalogRepository } from "./CatalogRepository";
-import { UserCatalogPermission } from "../entity/UserCatalogPermission";
 import { VersionRepository } from "./VersionRepository"
-import { Permissions } from "../entity/Permissions";
 import { allPermissions } from "../util/PermissionsUtil";
-import { catalogIdentifier } from "../util/IdentifierUtil";
 import { User } from "../entity/User";
+
+const PUBLIC_PACKAGES_QUERY = '("Package"."isPublic" is true)';
+const AUTHENTICATED_USER_PACKAGES_QUERY = `(("Package"."isPublic" is false and "Package"."catalog_id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId))
+          or ("Package"."isPublic" is false and "Package".id in (select up.package_id from user_package_permission up where up.user_id = :userId and :permission = ANY(up.permission))))`;
+const AUTHENTICATED_USER_OR_PUBLIC_PACKAGES_QUERY = `(${PUBLIC_PACKAGES_QUERY} or ${AUTHENTICATED_USER_PACKAGES_QUERY})`;
 
 async function findPackageById(
   manager: EntityManager,
@@ -84,23 +84,30 @@ export class PackageRepository {
 
   constructor(private manager: EntityManager) {}
 
-  /** Use this function to create a user scoped query that returns only packages that should be visible to that user */
-  createQueryBuilderWithUserConditions(user:User) {
-    
-    if(user == null) {
-      return this.manager.getRepository(Package)
-      .createQueryBuilder().where(
-        `("Package"."isPublic" is true)`);
+  public async findPackagesForCollection(userId: number, collectionId: number, relations?: string[]): Promise<Package[]> {
+    return this.manager.getRepository(Package)
+      .createQueryBuilder()
+      .where('("Package"."id" IN (SELECT package_id FROM collection_package WHERE collection_id = :collectionId))', { collectionId: collectionId })
+      .andWhere(AUTHENTICATED_USER_OR_PUBLIC_PACKAGES_QUERY, { userId: userId, permission: Permission.View})
+      .addRelations("package", relations)
+      .getMany();
+  }
 
-    } else {
-      return this.manager.getRepository(Package)
-      .createQueryBuilder().where(
-        `("Package"."isPublic" is true 
-        or ("Package"."isPublic" is false and "Package"."catalog_id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId))
-        or ("Package"."isPublic" is false and "Package".id in (select up.package_id from user_package_permission up where up.user_id = :userId)))`,
-          {userId: user.id})
+  /** Use this function to create a user scoped query that returns only packages that should be visible to that user */
+  public createQueryBuilderWithUserConditions(user: User, permission: Permission = Permission.View) {
+    if (user != null) {
+      return this.createQueryBuilderWithUserConditionsByUserId(user.id, permission);
     }
 
+    return this.manager.getRepository(Package)
+      .createQueryBuilder()
+      .where(PUBLIC_PACKAGES_QUERY);
+  }
+
+  public createQueryBuilderWithUserConditionsByUserId(userId: number, permission: Permission) {
+    return this.manager.getRepository(Package)
+      .createQueryBuilder()
+      .where(AUTHENTICATED_USER_PACKAGES_QUERY, { userId: userId, permission: permission });
   }
 
   async findOrFail({
