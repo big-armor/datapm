@@ -31,12 +31,16 @@ function buildFrontend() {
   return spawnAndLog("npm",["run","build"], {cwd: "frontend"});
 }
 
-function cleanNodeModules() {
-  return spawnAndLog("npm",["run","clean:node_Modules"]);
+function installDocsDepdendencies() {
+  return spawnAndLog("npm",["ci"], {cwd: "docs/website"});
+}
+
+function buildDocs() {
+  return spawnAndLog("npm",["run","build"], {cwd: "docs/website"});
 }
 
 function removeNodeModules() {
-  return spawnAndLog("rm", ["-rf", "backend/node_modules", "frontend/node_modules"]);
+  return spawnAndLog("rm", ["-rf", "backend/node_modules", "frontend/node_modules","docs/website/node_modules"]);
 }
 
 function buildDockerImage() {
@@ -72,6 +76,8 @@ exports.default = series(
   installFrontendDepdendencies,
   buildFrontend,
   testFrontend,
+  installDocsDepdendencies,
+  buildDocs,
   removeNodeModules,
   buildDockerImage
 );

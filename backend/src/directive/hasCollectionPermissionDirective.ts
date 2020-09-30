@@ -17,11 +17,16 @@ export class HasCollectionPermissionDirective extends SchemaDirectiveVisitor {
     }
   }
 
-  public visitFieldDefinition(field: GraphQLField<any, any>) {
+  public visitFieldDefinition(field: GraphQLField<any, any>): void {
     const { resolve = defaultFieldResolver } = field;
     const permission: Permission = this.args.permission;
     field.resolve = async (source, args, context: AuthenticatedContext, info) => {
-      const collectionSlug: string | undefined = args.collectionSlug || (args.value && args.value.collectionSlug) || (args.identifier && args.identifier.collectionSlug) || undefined;
+      const collectionSlug: string | undefined = args.collectionSlug
+        || (args.value && args.value.collectionSlug)
+        || (args.identifier && args.identifier.collectionSlug)
+        || (args.collectionIdentifier && args.collectionIdentifier.collectionSlug)
+        || undefined;
+
       if (!collectionSlug) {
         throw new Error('No collection slug defined in the request');
       }

@@ -17,7 +17,8 @@ import {
   PackageResolvers,
   VersionResolvers,
   VersionConflict,
-  PackageIdentifier
+  PackageIdentifier,
+  CollectionResolvers
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName , getRelationNames} from "./util/relationNames";
@@ -40,10 +41,11 @@ import { ApolloError, UserInputError } from "apollo-server";
 
 import {compatibilityToString,comparePackages,diffCompatibility,nextVersion, PackageFile, Compability} from 'datapm-lib';
 import graphqlFields from "graphql-fields";
-import { createCollection, disableCollection, findCollectionBySlug, findCollectionsForAuthenticatedUser, searchCollections, updateCollection } from "./resolvers/CollectionResolver";
+import { addPackageToCollection, createCollection, disableCollection, findCollectionBySlug, findCollectionsForAuthenticatedUser, removePackageFromCollection, searchCollections, updateCollection } from "./resolvers/CollectionResolver";
 import { login, logout } from "./resolvers/AuthResolver";
 import { createMe, disableMe, updateMe } from "./resolvers/UserResolver";
 import { createAPIKey, deleteAPIKey } from "./resolvers/ApiKeyResolver";
+import { Collection } from "./entity/Collection";
 
 export const resolvers: {
   Query: QueryResolvers;
@@ -52,6 +54,7 @@ export const resolvers: {
   User: UserResolvers;
   UserCatalog: UserCatalogResolvers;
   Catalog: CatalogResolvers;
+  Collection: CollectionResolvers;
   Package: PackageResolvers;
   Version: VersionResolvers;
   PackageFileJSON: GraphQLScalarType;
@@ -130,7 +133,7 @@ export const resolvers: {
     }
   },
   Catalog: {
-   
+
     identifier: async (parent: any, _1: any) => {
 
       const catalog = parent as Catalog;
@@ -143,7 +146,7 @@ export const resolvers: {
 
     },
     packages: async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
-      
+
       const catalog = parent as Catalog;
 
       const packages = await context
@@ -151,12 +154,30 @@ export const resolvers: {
         .getCustomRepository(PackageRepository)
         .catalogPackagesForUser(
           {
-            catalogId: catalog.id, 
+            catalogId: catalog.id,
             user: context.me,
             relations: getGraphQlRelationName(info)
           });
 
       return packages;
+    }
+  },
+  Collection: {
+    identifier: async (parent: any, _1: any) => {
+      const collection = parent as Collection;
+      return {
+        registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
+        registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
+        collectionSlug: collection.collectionSlug,
+      };
+    },
+    packages: async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+      const collection = parent as Collection;
+
+      return await context
+        .connection
+        .getCustomRepository(PackageRepository)
+        .findPackagesForCollection(context.me.id, collection.id, getGraphQlRelationName(info));
     }
   },
 
@@ -598,6 +619,8 @@ export const resolvers: {
     createCollection: createCollection,
     updateCollection: updateCollection,
     disableCollection: disableCollection,
+    addPackageToCollection: addPackageToCollection,
+    removePackageFromCollection: removePackageFromCollection,
 
     createVersion: async(
       _0: any,
