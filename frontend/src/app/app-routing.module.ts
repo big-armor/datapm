@@ -23,11 +23,6 @@ const staticRoutes:Route[] = [
     component: HomepageComponent,
     children:[
       {
-        path: '',
-        redirectTo: "trending",
-        pathMatch: "full"
-      },
-      {
         path:'trending',
         component: TrendingComponent
       },
