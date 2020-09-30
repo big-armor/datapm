@@ -3,9 +3,12 @@ import {
   Column,
   PrimaryColumn,
   Index,
-  Unique
+  Unique,
+  ManyToOne,
+  JoinColumn
 } from "typeorm";
 import { BaseModel } from "./BaseModel";
+import { User } from "./User";
 
 @Entity({
   name: "collection_package",
@@ -22,5 +25,9 @@ export class CollectionPackage extends BaseModel {
 
   @Column({ name: "added_by", nullable: false })
   public addedBy: number;
+
+  @ManyToOne(type => User)
+  @JoinColumn({ name: "added_by" })
+  public addedByUser: User;
 
 }

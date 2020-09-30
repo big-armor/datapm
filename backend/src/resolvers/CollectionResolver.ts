@@ -55,7 +55,7 @@ export const addPackageToCollection = async (_0: any, { collectionIdentifier, pa
     .addPackageToCollection(context.me.id, collectionEntity.id, packageEntity.id);
 }
 
-export const removePackageToCollection = async (_0: any, { collectionIdentifier, packageIdentifier }: { collectionIdentifier: CollectionIdentifierInput, packageIdentifier: PackageIdentifierInput }, context: AuthenticatedContext, info: any) => {
+export const removePackageFromCollection = async (_0: any, { collectionIdentifier, packageIdentifier }: { collectionIdentifier: CollectionIdentifierInput, packageIdentifier: PackageIdentifierInput }, context: AuthenticatedContext, info: any) => {
   const repository = context.connection.manager
     .getCustomRepository(CollectionRepository);
   const collectionEntity = await repository.findCollectionBySlugOrFail(collectionIdentifier.collectionSlug);

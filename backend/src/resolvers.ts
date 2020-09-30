@@ -44,7 +44,7 @@ import {compatibilityToString,comparePackages,diffCompatibility,nextVersion, Pac
 import graphqlFields from "graphql-fields";
 import { hashPassword } from "./util/PasswordUtil";
 import { createJwt } from "./util/jwt";
-import { addPackageToCollection, createCollection, disableCollection, findCollectionBySlug, findCollectionsForAuthenticatedUser, removePackageToCollection, searchCollections, updateCollection } from "./resolvers/CollectionResolver";
+import { addPackageToCollection, createCollection, disableCollection, findCollectionBySlug, findCollectionsForAuthenticatedUser, removePackageFromCollection, searchCollections, updateCollection } from "./resolvers/CollectionResolver";
 import { Collection } from "./entity/Collection";
 
 export const resolvers: {
@@ -729,7 +729,7 @@ export const resolvers: {
     updateCollection: updateCollection,
     disableCollection: disableCollection,
     addPackageToCollection: addPackageToCollection,
-    removePackageToCollection: removePackageToCollection,
+    removePackageFromCollection: removePackageFromCollection,
 
     createVersion: async(
       _0: any,
