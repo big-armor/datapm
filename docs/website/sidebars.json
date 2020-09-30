@@ -1,6 +1,6 @@
 {
   "docs": {
-    "TLDR": ["quick-start","concepts","about"],
+    "Overview": ["quick-start","concepts","about"],
     "Use Cases": ["find-data","publish-data","devops"],
     "Documentation": ["command-line-client","package-files","registry-api","private-registry"]
   }
