@@ -4,7 +4,7 @@ title: Host A Private DataPM Registry
 sidebar_label: Private Registry
 ---
 
-You can host your own DataPM registry for private or public use. Be sure to read the DataPM Software License page to learn about allowed and unallowed uses of DataPM software. 
+You can host your own DataPM registry for private or public use. Be sure to read the DataPM Software License page to learn about allowed and not allowed uses of DataPM software. 
 
 
 ## How To Deploy
@@ -59,7 +59,7 @@ services:
 
 DataPM is a tool that dramatically simplifies data collaborations with other teams inside and outside your organization. While [datapm.io](https://datapm.io) offers a fantastic method to publish data packages privately on the public repository - you may not wish to move your data outside of your network. 
 
-Therefore, DataPM offers you the ability to host your own private registry. This private registry will be entirely in your control at a network firewall level, and thus the risk of an inadevertent data leak is greatly reduced. 
+Therefore, DataPM offers you the ability to host your own private registry. This private registry will be entirely in your control at a network firewall level, and thus the risk of an inadvertent data leak is greatly reduced. 
 
 When using a private DataPM registry, you'll still have access with all the great tools in the DataPM ecosystem, and you'll be able to dramatically improve your organization's collaborations around data. 
 
@@ -73,13 +73,13 @@ DataPM Registry requires a PostgreSQL version 12 database server. Your choose to
 
 ### Hardware requirements
 
-DataPM Registry server does not require signficant hardware resources, and runs well in a virtualized environment. These specs are given a simple minimum requirements set. 
+DataPM Registry server does not require significant hardware resources, and runs well in a virtualized environment. These specs are given a simple minimum requirements set. 
 
 
 ## Scaling The Registry
 
 
-DataPM Registry server scales both horizontally and vertically with-in reason. You may create a cluster of DataPM Registry server instances bethind a loadbalancer to scale horizontally. The loadbalancer should be configured with
+DataPM Registry server scales both horizontally and vertically with-in reason. You may create a cluster of DataPM Registry server instances behind a load balancer to scale horizontally. The load balancer should be configured with
 
 * Terminate SSL
 * No session or connection affinity

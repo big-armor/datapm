@@ -17,7 +17,7 @@ DevOps tools such as puppet, chef, and others enable you to write pipelines of i
 
 ### Example: Command To Update Batch Data Set
 
-The following command will fetch the datapm/example data set and place it in a JSON formated file in the current working directory.
+The following command will fetch the datapm/example data set and place it in a JSON formatted file in the current working directory.
 
 ``` datapm fetch datapm/example TODO INSERT COMPLETE JSON FETCH HERE ```
 

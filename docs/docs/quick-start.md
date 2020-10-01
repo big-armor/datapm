@@ -36,7 +36,7 @@ Then fetch a specific data package.
 datapm fetch datapm/example
 ```
 
-Generate your own packages from a publically avialable data set. 
+Generate your own packages from a publicly available data set. 
 
 ```text
 datapm generate-package https://some-web-server.com/path/to/data.csv
