@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Package, PackageGQL, PackageQuery } from 'src/generated/graphql';
 import { Route, ActivatedRoute } from '@angular/router';
 import * as URLParse from 'url-parse';
-import { packageToIdentifier } from '../helpers/IdentifierHelper' 
+import { packageToIdentifier } from '../../helpers/IdentifierHelper'
 import {PackageFile} from 'datapm-lib'
 
 enum State {
