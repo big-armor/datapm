@@ -22,7 +22,7 @@ Data Scientists, Data Engineers, Researchers, Analysts, and any other data-orien
 
 Data publishers, such as researchers or analyst, use simple DataPM tools that automatically read existing data sets, and produce a Data Package File. The publisher then enhances this package file with simple documentation and other supporting materials. Finally, with a single command, the package file is published to a public or private DataPM registry. 
 
-Data consumers, such as Data Scientists or Financial Managers, use the public or private DataPM registries to obtain data packages. These conusmers can search for topcis of interest, subscribe to publishers or package files, and of course fetch or stream those data packages as needed. 
+Data consumers, such as Data Scientists or Financial Managers, use the public or private DataPM registries to obtain data packages. These consumers can search for topics of interest, subscribe to publishers or package files, and of course fetch or stream those data packages as needed. 
 
 Data Engineers can use DataPM tools to dramatically simplify and automate the publishing and consuming of data packages. DataOps (like DevOps) can greatly improve the quality of a publishing and consuming process! 
 
@@ -37,9 +37,9 @@ DataPM also plans to offer free and paid tools that help publishers and consumer
 
 DataPM is based on open source tools, and itself will be open source in the future. DataPM is specifically architected to be simple, and therefore easy to secure and maintain. And DataPM is flexible - allowing for a wide variety of use cases. 
 
-DataPM can be used to store only the schema - and not the data itself. This is useful when you want to first share the schema to potential buyers, or vette the consumers of your data offerings.
+DataPM can be used to store only the schema - and not the data itself. This is useful when you want to first share the schema to potential buyers, or vet the consumers of your data offerings.
 
-While DataPM's core focus is the profliferation of high quality data packages, it can also be used to track and inventory your own datasets. Implementing DataPM in your organization will give you visibility into who has access to each of your data sets - without making copies of your data, and without changing your existing architecture. Think more visbility, more control. 
+While DataPM's core focus is the proliferation of high quality data packages, it can also be used to track and inventory your own datasets. Implementing DataPM in your organization will give you visibility into who has access to each of your data sets - without making copies of your data, and without changing your existing architecture. Think more visibility, more control. 
 
 ## What is the DataPM software license?
 
@@ -50,7 +50,7 @@ Things you may do with DataPM software:
 - Offer free or non-free data as a publisher on the datapm.io public registry
   - Including 3rd party licensed or purchased data
   - Including transactions of any number of parties
-- Privately or publically exchange free data packages between any number of parties
+- Privately or publicly exchange free data packages between any number of parties
 - Privately exchange non-free data packages between a data originator and many individual direct end-consumers
   - No 3 or more party transactions
   - The data provider must have substantially generated (not purchased or licensed) all of the data provided

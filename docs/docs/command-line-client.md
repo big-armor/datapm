@@ -79,9 +79,9 @@ datapm fetch https://datapm-example.company.com/catalog/package
 
 ## Publish Data
 
-*Important Note:* Right now, DataPM only supports publishing data schemas. So you must host the actual data in another location - such as GitHub or a public webserver. And that hosting must be publically available. In the future, DataPM will also support hosting the data itself for public and private data hosting.
+*Important Note:* Right now, DataPM only supports publishing data schemas. So you must host the actual data in another location - such as GitHub or a public web server. And that hosting must be publicly available. In the future, DataPM will also support hosting the data itself for public and private data hosting.
 
-Use the command line client to create a data package file based on any publically avialable data set. 
+Use the command line client to create a data package file based on any publicly available data set. 
 
 ```text
 datapm generate-package https://some-web-server.com/path/to/data.csv

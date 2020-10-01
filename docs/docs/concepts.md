@@ -22,7 +22,7 @@ The public global registry is available at [datapm.io](https://datapm.io) - and 
 
 A DataPM registry holds "Package Files". These package files contain the descriptions, schemas, formats, and locations of available data. Think of a registry like a library index. It doesn't hold the data - just what it is, and where to get it. 
 
-*Important Note:* Right now, DataPM only supports publishing data schemas. So you must host the actual dataset in another location - such as GitHub or a public webserver. And that hosting must be publically available. In the future, DataPM will also support hosting the data itself. 
+*Important Note:* Right now, DataPM only supports publishing data schemas. So you must host the actual dataset in another location - such as GitHub or a public web server. And that hosting must be publicly available. In the future, DataPM will also support hosting the data itself. 
 
 ### Where are the registries?
 
@@ -34,7 +34,7 @@ You can also run your own private registry - which requires providing your own c
 
 Hosting your own DataPM registry allows your team to combine private and 3rd party data to create rich insights and competitive advantages. 
 
-Also, a private DataPM registry is a great way to create catalogs of your organization's data, while maintaing absolute control over every aspect of the data's presence. Imagine having a complete index of all of the data in your organization - without copying data or changing your existing architecture. 
+Also, a private DataPM registry is a great way to create catalogs of your organization's data, while maintaining absolute control over every aspect of the data's presence. Imagine having a complete index of all of the data in your organization - without copying data or changing your existing architecture. 
 
 
 
@@ -76,7 +76,7 @@ DataPM offers both a web and command line client - each with their own use cases
 
 ### Web client
 
-When you view a DataPM registry, you are using the web client. This client is searching the registry, providing details about the packages avialable, and will in the future provide easy to use fetch/stream mechanisms for the data packages. 
+When you view a DataPM registry, you are using the web client. This client is searching the registry, providing details about the packages available, and will in the future provide easy to use fetch/stream mechanisms for the data packages. 
 
 The web client is intended to be user friendly, but does not provide all of the features available in the command line client. 
 
@@ -104,7 +104,7 @@ DataPM takes care of the entire ETL process for every data package in a registry
 
 #### Automated Data Delivery
 
-Use the DataPM client in your devops processes to automate the publishing and consuming of data packages. DataPM ensures that your publishing process provides high quality results, and that your consuming processes deliver clean fault tollerant data. 
+Use the DataPM client in your devops processes to automate the publishing and consuming of data packages. DataPM ensures that your publishing process provides high quality results, and that your consuming processes deliver clean fault tolerant data. 
 
 
 

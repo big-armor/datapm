@@ -8,7 +8,7 @@ DataPM is the easiest way to discover new data. And all DataPM listings include 
 
 ## Discover Data
 
-The global public registry at [datapm.io](https://datapm.io), and the similarly hosted priviate registries, feature several methods to discover data. 
+The global public registry at [datapm.io](https://datapm.io), and the similarly hosted private registries, feature several methods to discover data. 
 
 
 * Search by tile, description, and keywords
@@ -16,7 +16,7 @@ The global public registry at [datapm.io](https://datapm.io), and the similarly 
 * Browse curated collections 
 
 
-The command line client includes a basic search feature for discovering packages. 
+The [command line client](command-line-client.md) includes a basic search feature for discovering packages. 
 
 ```text
 datapm search "example keywords"
@@ -25,7 +25,7 @@ datapm search "example keywords"
 
 ## Inspect Packages
 
-Each package on the registry contains detailed descriptions of the data available. The following is available directly in the web interface, and in the command line client. 
+Each package on the registry contains detailed descriptions of the data available. The following is available directly in the web interface, and in the [command line client](command-line-client.md). 
 
 * Name
 * Version
@@ -40,7 +40,7 @@ Each package on the registry contains detailed descriptions of the data availabl
 * Data Schema & Format
 
 
-The command line client can also be used view this information about any package. 
+The [command line client](command-line-client.md) can also be used view this information about any package. 
 
 ```text
 datapm info catalog-name/package-name

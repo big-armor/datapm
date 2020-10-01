@@ -27,9 +27,7 @@ Use the following command from the root directory of this project to use docker-
 
 
 ```
-
-docker-compose -f docker/docker-compose.yml up
-
+npm run start
 ```
 
 
