@@ -10,11 +10,12 @@ import { HomepageComponent } from './homepage/homepage.component';
 import { SearchComponent } from './search/search.component';
 import { TrendingComponent } from './homepage/trending/trending.component';
 import { LatestComponent } from './homepage/latest/latest.component';
+import { FollowingComponent } from './homepage/following/following.component';
 
 const staticRoutes:Route[] = [
   {
     path: '',
-    redirectTo: "/home",
+    redirectTo: "home",
     pathMatch: "full"
   },
   {
@@ -28,6 +29,10 @@ const staticRoutes:Route[] = [
       {
         path:'latest',
         component: LatestComponent
+      },
+      {
+        path:'following',
+        component: FollowingComponent
       },
     ]
   },
