@@ -1,0 +1,805 @@
+{
+ "generatedBy": "`datapm generate-package` command. Visit datapm.io to learn about the open source tools and to discover other data packages",
+ "updatedDate": "2020-10-01T15:34:49.789Z",
+ "displayName": "US Congressional Legislators",
+ "packageSlug": "us-congressional-legislators",
+ "version": "1.0.0",
+ "description": "Legislators of the US congress",
+ "schemas": [
+  {
+   "$schema": "http://json-schema.org/draft-07/schema",
+   "$id": "legislators-current.csv",
+   "properties": {
+    "last_name": {
+     "title": "last_name",
+     "recordCount": 537,
+     "byteCount": 7126,
+     "valueTypes": {
+      "string": {
+       "recordCount": 537,
+       "valueType": "string",
+       "stringMaxLength": 17,
+       "stringMinLength": 3
+      }
+     },
+     "type": [
+      "string"
+     ]
+    },
+    "first_name": {
+     "title": "first_name",
+     "recordCount": 537,
+     "byteCount": 5332,
+     "valueTypes": {
+      "string": {
+       "recordCount": 537,
+       "valueType": "string",
+       "stringMaxLength": 11,
+       "stringMinLength": 2
+      }
+     },
+     "type": [
+      "string"
+     ]
+    },
+    "middle_name": {
+     "title": "middle_name",
+     "recordCount": 537,
+     "byteCount": 1094,
+     "valueTypes": {
+      "null": {
+       "recordCount": 341,
+       "valueType": "null",
+       "stringOptions": {
+        "": 341
+       }
+      },
+      "string": {
+       "recordCount": 196,
+       "valueType": "string",
+       "stringMaxLength": 14,
+       "stringMinLength": 2
+      }
+     },
+     "type": [
+      "null",
+      "string"
+     ]
+    },
+    "suffix": {
+     "title": "suffix",
+     "recordCount": 537,
+     "byteCount": 102,
+     "valueTypes": {
+      "null": {
+       "recordCount": 519,
+       "valueType": "null",
+       "stringOptions": {
+        "": 519
+       }
+      },
+      "string": {
+       "recordCount": 18,
+       "valueType": "string",
+       "stringOptions": {
+        "Jr.": 13,
+        "III": 2,
+        "II": 2,
+        "IV": 1
+       },
+       "stringMaxLength": 3,
+       "stringMinLength": 2
+      }
+     },
+     "type": [
+      "null",
+      "string"
+     ]
+    },
+    "nickname": {
+     "title": "nickname",
+     "recordCount": 537,
+     "byteCount": 230,
+     "valueTypes": {
+      "null": {
+       "recordCount": 507,
+       "valueType": "null",
+       "stringOptions": {
+        "": 507
+       }
+      },
+      "string": {
+       "recordCount": 30,
+       "valueType": "string",
+       "stringOptions": {
+        "Bob": 2,
+        "Bernie": 1,
+        "Jim": 4,
+        "Jack": 1,
+        "G.K.": 1,
+        "Rick": 1,
+        "Ted": 1,
+        "Mike": 2,
+        "Chuck": 3,
+        "Hank": 1,
+        "Pete": 1,
+        "Ed": 1,
+        "Rob": 1,
+        "Phil": 1,
+        "Hal": 1,
+        "Jan": 1,
+        "Bobby": 1,
+        "Chris": 1,
+        "Pat": 1,
+        "Andy": 1,
+        "Tim": 1,
+        "Maggie": 1,
+        "Brad": 1
+       },
+       "stringMaxLength": 6,
+       "stringMinLength": 2
+      }
+     },
+     "type": [
+      "null",
+      "string"
+     ]
+    },
+    "full_name": {
+     "title": "full_name",
+     "recordCount": 537,
+     "byteCount": 14990,
+     "valueTypes": {
+      "string": {
+       "recordCount": 537,
+       "valueType": "string",
+       "stringMaxLength": 30,
+       "stringMinLength": 6
+      }
+     },
+     "type": [
+      "string"
+     ]
+    },
+    "birthday": {
+     "title": "birthday",
+     "recordCount": 537,
+     "byteCount": 10740,
+     "valueTypes": {
+      "string": {
+       "recordCount": 537,
+       "valueType": "string",
+       "stringMaxLength": 10,
+       "stringMinLength": 10
+      }
+     },
+     "type": [
+      "string"
+     ]
+    },
+    "gender": {
+     "title": "gender",
+     "recordCount": 537,
+     "byteCount": 1074,
+     "valueTypes": {
+      "string": {
+       "recordCount": 537,
+       "valueType": "string",
+       "stringOptions": {
+        "M": 406,
+        "F": 131
+       },
+       "stringMaxLength": 1,
+       "stringMinLength": 1
+      }
+     },
+     "type": [
+      "string"
+     ]
+    },
+    "type": {
+     "title": "type",
+     "recordCount": 537,
+     "byteCount": 3222,
+     "valueTypes": {
+      "string": {
+       "recordCount": 537,
+       "valueType": "string",
+       "stringOptions": {
+        "sen": 100,
+        "rep": 437
+       },
+       "stringMaxLength": 3,
+       "stringMinLength": 3
+      }
+     },
+     "type": [
+      "string"
+     ]
+    },
+    "state": {
+     "title": "state",
+     "recordCount": 537,
+     "byteCount": 2148,
+     "valueTypes": {
+      "string": {
+       "recordCount": 537,
+       "valueType": "string",
+       "stringMaxLength": 2,
+       "stringMinLength": 2
+      }
+     },
+     "type": [
+      "string"
+     ]
+    },
+    "district": {
+     "title": "district",
+     "recordCount": 537,
+     "byteCount": 1174,
+     "valueTypes": {
+      "null": {
+       "recordCount": 100,
+       "valueType": "null",
+       "stringOptions": {
+        "": 100
+       }
+      },
+      "number": {
+       "recordCount": 437,
+       "valueType": "number",
+       "numberMaxValue": "9",
+       "numberMinValue": "0"
+      }
+     },
+     "type": [
+      "null",
+      "number"
+     ]
+    },
+    "senate_class": {
+     "title": "senate_class",
+     "recordCount": 537,
+     "byteCount": 200,
+     "valueTypes": {
+      "number": {
+       "recordCount": 100,
+       "valueType": "number",
+       "stringOptions": {
+        "1": 33,
+        "2": 33,
+        "3": 34
+       },
+       "numberMaxValue": "3",
+       "numberMinValue": "1"
+      },
+      "null": {
+       "recordCount": 437,
+       "valueType": "null",
+       "stringOptions": {
+        "": 437
+       }
+      }
+     },
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "party": {
+     "title": "party",
+     "recordCount": 537,
+     "byteCount": 9622,
+     "valueTypes": {
+      "string": {
+       "recordCount": 537,
+       "valueType": "string",
+       "stringOptions": {
+        "Democrat": 281,
+        "Independent": 2,
+        "Republican": 253,
+        "Libertarian": 1
+       },
+       "stringMaxLength": 11,
+       "stringMinLength": 8
+      }
+     },
+     "type": [
+      "string"
+     ]
+    },
+    "url": {
+     "title": "url",
+     "recordCount": 537,
+     "byteCount": 28034,
+     "valueTypes": {
+      "string": {
+       "recordCount": 533,
+       "valueType": "string",
+       "stringMaxLength": 39,
+       "stringMinLength": 21
+      },
+      "null": {
+       "recordCount": 4,
+       "valueType": "null",
+       "stringOptions": {
+        "": 4
+       }
+      }
+     },
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "address": {
+     "title": "address",
+     "recordCount": 537,
+     "byteCount": 62204,
+     "valueTypes": {
+      "string": {
+       "recordCount": 537,
+       "valueType": "string",
+       "stringMaxLength": 61,
+       "stringMinLength": 51
+      }
+     },
+     "type": [
+      "string"
+     ]
+    },
+    "phone": {
+     "title": "phone",
+     "recordCount": 537,
+     "byteCount": 12888,
+     "valueTypes": {
+      "string": {
+       "recordCount": 537,
+       "valueType": "string",
+       "stringMaxLength": 12,
+       "stringMinLength": 12
+      }
+     },
+     "type": [
+      "string"
+     ]
+    },
+    "contact_form": {
+     "title": "contact_form",
+     "recordCount": 537,
+     "byteCount": 9616,
+     "valueTypes": {
+      "string": {
+       "recordCount": 102,
+       "valueType": "string",
+       "stringMaxLength": 73,
+       "stringMinLength": 31
+      },
+      "null": {
+       "recordCount": 435,
+       "valueType": "null",
+       "stringOptions": {
+        "": 435
+       }
+      }
+     },
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "rss_url": {
+     "title": "rss_url",
+     "recordCount": 537,
+     "byteCount": 24866,
+     "valueTypes": {
+      "string": {
+       "recordCount": 289,
+       "valueType": "string",
+       "stringMaxLength": 106,
+       "stringMinLength": 28
+      },
+      "null": {
+       "recordCount": 248,
+       "valueType": "null",
+       "stringOptions": {
+        "": 248
+       }
+      }
+     },
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "twitter": {
+     "title": "twitter",
+     "recordCount": 537,
+     "byteCount": 12700,
+     "valueTypes": {
+      "string": {
+       "recordCount": 525,
+       "valueType": "string",
+       "stringMaxLength": 15,
+       "stringMinLength": 5
+      },
+      "null": {
+       "recordCount": 12,
+       "valueType": "null",
+       "stringOptions": {
+        "": 12
+       }
+      }
+     },
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "facebook": {
+     "title": "facebook",
+     "recordCount": 537,
+     "byteCount": 12196,
+     "valueTypes": {
+      "string": {
+       "recordCount": 402,
+       "valueType": "string",
+       "stringMaxLength": 32,
+       "stringMinLength": 6
+      },
+      "null": {
+       "recordCount": 115,
+       "valueType": "null",
+       "stringOptions": {
+        "": 115
+       }
+      },
+      "number": {
+       "recordCount": 20,
+       "valueType": "number",
+       "stringOptions": {
+        "70063393423": 1,
+        "109135405838588": 1,
+        "152569121550": 1,
+        "50375006903": 1,
+        "118514606128": 1,
+        "95696782238": 1,
+        "115356957005": 1,
+        "191056827594903": 1,
+        "81125319109": 1,
+        "153423912663": 1,
+        "113303673339": 1,
+        "63158229861": 1,
+        "96007744606": 1,
+        "81058818750": 1,
+        "116058275133542": 1,
+        "8037068318": 1,
+        "214258646163": 1,
+        "301936109927957": 1,
+        "326420614138023": 1,
+        "395759603917487": 1
+       },
+       "numberMaxValue": "96007744606",
+       "numberMinValue": "109135405838588"
+      }
+     },
+     "type": [
+      "string",
+      "null",
+      "number"
+     ]
+    },
+    "youtube": {
+     "title": "youtube",
+     "recordCount": 537,
+     "byteCount": 8386,
+     "valueTypes": {
+      "string": {
+       "recordCount": 305,
+       "valueType": "string",
+       "stringMaxLength": 20,
+       "stringMinLength": 6
+      },
+      "null": {
+       "recordCount": 232,
+       "valueType": "null",
+       "stringOptions": {
+        "": 232
+       }
+      }
+     },
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "youtube_id": {
+     "title": "youtube_id",
+     "recordCount": 537,
+     "byteCount": 18864,
+     "valueTypes": {
+      "string": {
+       "recordCount": 393,
+       "valueType": "string",
+       "stringMaxLength": 24,
+       "stringMinLength": 24
+      },
+      "null": {
+       "recordCount": 144,
+       "valueType": "null",
+       "stringOptions": {
+        "": 144
+       }
+      }
+     },
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "bioguide_id": {
+     "title": "bioguide_id",
+     "recordCount": 537,
+     "byteCount": 7518,
+     "valueTypes": {
+      "string": {
+       "recordCount": 537,
+       "valueType": "string",
+       "stringMaxLength": 7,
+       "stringMinLength": 7
+      }
+     },
+     "type": [
+      "string"
+     ]
+    },
+    "thomas_id": {
+     "title": "thomas_id",
+     "recordCount": 537,
+     "byteCount": 3740,
+     "valueTypes": {
+      "number": {
+       "recordCount": 374,
+       "valueType": "number",
+       "numberMaxValue": "02296",
+       "numberMinValue": "00091"
+      },
+      "null": {
+       "recordCount": 163,
+       "valueType": "null",
+       "stringOptions": {
+        "": 163
+       }
+      }
+     },
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "opensecrets_id": {
+     "title": "opensecrets_id",
+     "recordCount": 537,
+     "byteCount": 9648,
+     "valueTypes": {
+      "string": {
+       "recordCount": 536,
+       "valueType": "string",
+       "stringMaxLength": 9,
+       "stringMinLength": 9
+      },
+      "null": {
+       "recordCount": 1,
+       "valueType": "null",
+       "stringOptions": {
+        "": 1
+       }
+      }
+     },
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "lis_id": {
+     "title": "lis_id",
+     "recordCount": 537,
+     "byteCount": 800,
+     "valueTypes": {
+      "string": {
+       "recordCount": 100,
+       "valueType": "string",
+       "stringMaxLength": 4,
+       "stringMinLength": 4
+      },
+      "null": {
+       "recordCount": 437,
+       "valueType": "null",
+       "stringOptions": {
+        "": 437
+       }
+      }
+     },
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "fec_ids": {
+     "title": "fec_ids",
+     "recordCount": 537,
+     "byteCount": 11126,
+     "valueTypes": {
+      "string": {
+       "recordCount": 537,
+       "valueType": "string",
+       "stringMaxLength": 29,
+       "stringMinLength": 9
+      }
+     },
+     "type": [
+      "string"
+     ]
+    },
+    "cspan_id": {
+     "title": "cspan_id",
+     "recordCount": 537,
+     "byteCount": 4766,
+     "valueTypes": {
+      "number": {
+       "recordCount": 431,
+       "valueType": "number",
+       "numberMaxValue": "994",
+       "numberMinValue": "1000222"
+      },
+      "null": {
+       "recordCount": 106,
+       "valueType": "null",
+       "stringOptions": {
+        "": 106
+       }
+      }
+     },
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "govtrack_id": {
+     "title": "govtrack_id",
+     "recordCount": 537,
+     "byteCount": 6444,
+     "valueTypes": {
+      "number": {
+       "recordCount": 537,
+       "valueType": "number",
+       "numberMaxValue": "456793",
+       "numberMinValue": "300002"
+      }
+     },
+     "type": [
+      "number"
+     ]
+    },
+    "votesmart_id": {
+     "title": "votesmart_id",
+     "recordCount": 537,
+     "byteCount": 5316,
+     "valueTypes": {
+      "number": {
+       "recordCount": 514,
+       "valueType": "number",
+       "numberMaxValue": "99345",
+       "numberMinValue": "101632"
+      },
+      "null": {
+       "recordCount": 23,
+       "valueType": "null",
+       "stringOptions": {
+        "": 23
+       }
+      }
+     },
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "ballotpedia_id": {
+     "title": "ballotpedia_id",
+     "recordCount": 537,
+     "byteCount": 8542,
+     "valueTypes": {
+      "string": {
+       "recordCount": 324,
+       "valueType": "string",
+       "stringMaxLength": 37,
+       "stringMinLength": 6
+      },
+      "null": {
+       "recordCount": 213,
+       "valueType": "null",
+       "stringOptions": {
+        "": 213
+       }
+      }
+     },
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "washington_post_id": {
+     "title": "washington_post_id",
+     "recordCount": 537,
+     "byteCount": 0,
+     "valueTypes": {
+      "null": {
+       "recordCount": 537,
+       "valueType": "null",
+       "stringOptions": {
+        "": 537
+       }
+      }
+     },
+     "type": [
+      "null"
+     ]
+    },
+    "icpsr_id": {
+     "title": "icpsr_id",
+     "recordCount": 537,
+     "byteCount": 5270,
+     "valueTypes": {
+      "number": {
+       "recordCount": 527,
+       "valueType": "number",
+       "numberMaxValue": "94659",
+       "numberMinValue": "14066"
+      },
+      "null": {
+       "recordCount": 10,
+       "valueType": "null",
+       "stringOptions": {
+        "": 10
+       }
+      }
+     },
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "wikipedia_id": {
+     "title": "wikipedia_id",
+     "recordCount": 537,
+     "byteCount": 16204,
+     "valueTypes": {
+      "string": {
+       "recordCount": 537,
+       "valueType": "string",
+       "stringMaxLength": 39,
+       "stringMinLength": 6
+      }
+     },
+     "type": [
+      "string"
+     ]
+    }
+   },
+   "recordCount": 537,
+   "byteCount": 182453,
+   "type": "object",
+   "parser": {
+    "mimeType": "text/csv"
+   },
+   "title": "legislators-current.csv",
+   "source": {
+    "protocol": "HTTP",
+    "configuration": {
+     "url": "https://theunitedstates.io/congress-legislators/legislators-current.csv"
+    }
+   }
+  }
+ ]
+}
