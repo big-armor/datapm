@@ -1,5 +1,9 @@
 overwrite: true
-schema: node_modules/datapm-lib/schema.gql
+schema:
+  - node_modules/datapm-lib/schema.gql
+  - node_modules/datapm-lib/auth-schema.gql
+  - node_modules/datapm-lib/user-schema.gql
+  - node_modules/datapm-lib/api-key-schema.gql
 documents: null
 generates:
   src/generated/graphql.ts:
@@ -14,4 +18,7 @@ generates:
         Date: Date
         JSON: "{ [key: string]: any }"
         Upload: Promise<FileUpload>
+      namingConvention:
+        typeNames: keep
+        enumValues: upper-case#upperCase
       useIndexSignature: true # required for Apollo. See https://github.com/dotansimha/graphql-code-generator/issues/1133#issuecomment-456812621

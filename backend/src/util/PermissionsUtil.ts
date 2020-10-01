@@ -2,10 +2,10 @@ import { Permission } from "../generated/graphql";
 
 export function allPermissions(): Permission[] {
     return [
-        Permission.Create,
-        Permission.Delete,
-        Permission.Edit,
-        Permission.Manage,
-        Permission.View
+        Permission.CREATE,
+        Permission.DELETE,
+        Permission.EDIT,
+        Permission.MANAGE,
+        Permission.VIEW
     ]
 }

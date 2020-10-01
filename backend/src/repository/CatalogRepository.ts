@@ -156,7 +156,7 @@ export class CatalogRepository extends Repository<Catalog> {
 
       const savedCatalog = await transaction.save(catalog);
 
-      await grantUserCatalogPermission({username,catalogSlug: value.slug,permissions: [Permission.Manage, Permission.Edit, Permission.Delete, Permission.View, Permission.Create], manager: transaction})
+      await grantUserCatalogPermission({username,catalogSlug: value.slug,permissions: [Permission.MANAGE, Permission.EDIT, Permission.DELETE, Permission.VIEW, Permission.CREATE], manager: transaction})
 
       return getCatalogOrFail({
         slug: savedCatalog.slug,
