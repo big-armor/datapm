@@ -26,7 +26,7 @@ A DataPM registry holds "Data Packages". These package contain the descriptions,
 
 ### Where are the registries?
 
-The primary global public registry is hosted at [datapm.io](https://datapm.io) - try it out! It's free to use, and offers tons of great data packages. 
+The primary global public registry is [datapm.io](https://datapm.io) - try it out! It's free to use, and offers tons of great data packages. 
 
 You can also run your own private registry - which requires providing your own cloud or on-premises hosting using a Kubernetes, Docker, VMware, or some other similar container service. 
 
