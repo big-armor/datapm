@@ -27,7 +27,7 @@ In the future, DataPM will support publishing the data along with the schema to 
 
 ## Generate A Package File
 
-DataPM registries hold package files that contain only the schema of one or more data sets (which we call a data package). These package files also contain human descriptions, and the basic information necessary to access publically avialable data. 
+DataPM registries hold package files that contain only the schema of one or more data sets (which we call a data package). These package files also contain human descriptions, and the basic information necessary to access publicly avialable data. 
 
 To generate your first package file, install the [command line client](command-line-client.md).
 
@@ -48,7 +48,7 @@ cat state-codes.datapm.json
 
 ## Publish The Package File
 
-When you are satisified with the contents of the package file, you can publish it to a registry. 
+When you are satisfied with the contents of the package file, you can publish it to a registry. 
 
 ```text
 datapm publish state-codes.datapm.json
