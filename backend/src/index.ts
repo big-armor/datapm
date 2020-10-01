@@ -168,7 +168,7 @@ async function main() {
     res.sendFile(path.join(__dirname, "node_modules/datapm-lib/schema.gql"));
   });
 
-  app.use("/docs/package-file-schema-v1.json",function( req, res, next ) {
+  app.use("/docs/datapm-package-file-schema-v1.json",function( req, res, next ) {
     res.sendFile(path.join(__dirname, "node_modules/datapm-lib/packageFileSchema.json"));
   });
 
