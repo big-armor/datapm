@@ -4,7 +4,7 @@ title: DataPM Package Files
 sidebar_label: Package Files
 ---
 
-DataPM Packge Files contain the description, schema, and access information for one or more available data sets. 
+DataPM Package Files contain the description, schema, and access information for one or more available data sets. 
 
 
 ## Concepts
@@ -52,14 +52,14 @@ The following are the top level properties in the DataPM Package File JSON file 
 
 | Property | Type | Required |  Description |
 | :-- | :--: | :--: | :-- |
-| description | String | Required | A short scentence or two about the package. Use readmeFile to reference a longer markdown based description. |
+| description | String | Required | A short sentence or two about the package. Use readmeFile to reference a longer markdown based description. |
 | displayName | String | Required | A short user friendly name for the package | 
 | packageSlug | String | Required | The unique identifier for this package. lower case letters, numbers, and hyphens only. Must not start or end in a hyphen|
-| schemas | Array | Required | A set of schemas of the data that are avialable in the package. See Schemas section below.|
+| schemas | Array | Required | A set of schemas of the data that are available in the package. See Schemas section below.|
 | updatedDate | String | Required | The last updated date of the package file - not the data! In the ISO 8601 format| 
 | version | String | Required | Semantic Versioning format of major.minor.patch |
 | contributors | Array | Optional | A list of contributors for this package. See Contributors below | 
-| generatedBy | String | Optional | The name of the person or system that generated the pacakge file. |
+| generatedBy | String | Optional | The name of the person or system that generated the package file. |
 | licenseFile | String | Optional | Relative path to the LICENSE file for this package. Defaults to package-file-name-license.md or README.md in that order. | 
 | readmeFile | String | Optional | Relative path to the README for this package. Defaults to package-file-name.md or README.md in that order. | 
 | registries | Array | Optional | See Registries properties below | 
@@ -77,7 +77,7 @@ These are the properties for the "schemas" top level array property. These schem
 | source | Object | Required | See Source properties below | 
 | byteCount | Integer | Optional | The exact or approximate number of bytes in the raw dataset. This should include only the 'values' and not the format, schema, or keys | 
 | byteCountApproximate | Boolean | Optional | Whether the provided byte count is approximate (true) or exact (false). Default is false (exact).
-| recordCount | Integer | Optional | The exact or estamated number of records in the data set.
+| recordCount | Integer | Optional | The exact or estimated number of records in the data set.
 | recordCountApproximate | Boolean | Optional | Whether the recordCount property value is exact (false) or approximate (true). Defaults false (exact).|
 
 ## Schema Properties
@@ -97,7 +97,7 @@ These are the properties of the parser property of the top level schema object.
 
 ## Registries
 
-These are the properties for the registry objects in the top level "regisitries" array property. 
+These are the properties for the registry objects in the top level "registries" array property. 
 
 | Property | Type | Required |  Description |
 | :-- | :--: | :--: | :-- |
