@@ -13,29 +13,30 @@ import { LatestComponent } from './homepage/latest/latest.component';
 import { FollowingComponent } from './homepage/following/following.component';
 import { PackageComponent } from './package/package.component';
 import { PackageVersionComponent } from './package/package-version/package-version.component';
+import { PackageSchemaComponent } from './package/package-schema/package-schema.component';
 
 const staticRoutes:Route[] = [
   {
-    path: '',
-    redirectTo: "home",
-    pathMatch: "full"
-  },
-  {
-    path:'home',
+    path:'',
     component: HomepageComponent,
     children:[
       {
-        path:'trending',
-        component: TrendingComponent
+        path: '',
+        redirectTo: "trending",
+        pathMatch: "full"
       },
+      // {
+      //   path:'trending',
+      //   component: TrendingComponent
+      // },
       {
         path:'latest',
         component: LatestComponent
       },
-      {
-        path:'following',
-        component: FollowingComponent
-      },
+      // {
+      //   path:'following',
+      //   component: FollowingComponent
+      // },
     ]
   },
   {
@@ -70,6 +71,10 @@ const staticRoutes:Route[] = [
       {
         path: "package-version",
         component: PackageVersionComponent
+      },
+      {
+        path: "package-schema",
+        component: PackageSchemaComponent
       }
     ]
   }

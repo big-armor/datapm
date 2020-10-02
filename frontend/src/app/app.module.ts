@@ -24,6 +24,7 @@ import { SearchComponent } from './search/search.component';
 import { FollowingComponent } from './homepage/following/following.component';
 import { PackageComponent } from './package/package.component';
 import { PackageVersionComponent } from './package/package-version/package-version.component';
+import { PackageSchemaComponent } from './package/package-schema/package-schema.component';
 
 @NgModule({
   declarations: [
@@ -42,7 +43,8 @@ import { PackageVersionComponent } from './package/package-version/package-versi
     SearchComponent,
     FollowingComponent,
     PackageComponent,
-    PackageVersionComponent
+    PackageVersionComponent,
+    PackageSchemaComponent
   ],
   imports: [
     BrowserModule,
