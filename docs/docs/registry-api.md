@@ -40,7 +40,7 @@ You can submit an API key in the "Authorization" HTTP request header to authenti
 
 ```
 {
-    "Authoriztion": "Bearer YOUR-API-TOKEN-HERE"
+    "Authorization": "Bearer YOUR-API-TOKEN-HERE"
 }
 ```
 
