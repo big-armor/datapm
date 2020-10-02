@@ -12,7 +12,7 @@ function installBackendDepdendencies() {
 }
 
 function testBackend() {
-  return spawnAndLog("npm",["run","test"], {cwd: "backend"});
+  return spawnAndLog("npm",["run","test:unit"], {cwd: "backend"});
 }
 
 function buildBackend() {
@@ -38,11 +38,6 @@ function installDocsDepdendencies() {
 function buildDocs() {
   return spawnAndLog("npm",["run","build"], {cwd: "docs/website"});
 }
-
-function removeNodeModules() {
-  return spawnAndLog("rm", ["-rf", "backend/node_modules", "frontend/node_modules","docs/website/node_modules"]);
-}
-
 function buildDockerImage() {
   return spawnAndLog("docker", ["build","-t","datapm-registry", ".", "-f", "docker/Dockerfile", "--no-cache"])
 }
@@ -78,7 +73,6 @@ exports.default = series(
   testFrontend,
   installDocsDepdendencies,
   buildDocs,
-  removeNodeModules,
   buildDockerImage
 );
 
