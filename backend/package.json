@@ -28,6 +28,7 @@
     "@google-cloud/storage": "^5.1.1",
     "@sendgrid/helpers": "^7.2.0",
     "@sendgrid/mail": "^7.2.1",
+    "@types/node": "^14.11.2",
     "ajv": "^6.12.3",
     "apollo-server": "^2.11.0",
     "apollo-server-constraint-directive": "^1.2.5",

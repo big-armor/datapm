@@ -11,6 +11,29 @@ import { PackageRepository } from "../repository/PackageRepository";
 import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 
+export const getLatestPackages = async (
+    _0: any,
+    { limit, offSet }: { limit: number, offSet: number },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    console.log("hmm");
+    const relations = getGraphQlRelationName(info);
+    console.log("hmm2", relations);
+    const [searchResponse, count] = await context
+        .connection
+        .manager
+        .getCustomRepository(PackageRepository)
+        .getLatestPackages(context.me, limit, offSet, relations);
+
+    console.log("hmm3", searchResponse);
+    return {
+        hasMore: count - (offSet + limit) > 0,
+        packages: searchResponse,
+        count
+    }
+}
+
 export const catalogPackagesForUser = async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
     const catalog = parent as Catalog;
 

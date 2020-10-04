@@ -46,7 +46,7 @@ import { login, logout } from "./resolvers/AuthResolver";
 import { createMe, disableMe, updateMe } from "./resolvers/UserResolver";
 import { createAPIKey, deleteAPIKey } from "./resolvers/ApiKeyResolver";
 import { Collection } from "./entity/Collection";
-import { catalogPackagesForUser, createPackage, disablePackage, findPackage, findPackageIdentifier, findPackagesForCollection, removePackagePermissions, searchPackages, setPackagePermissions, updatePackage } from "./resolvers/PackageResolver";
+import { catalogPackagesForUser, createPackage, disablePackage, findPackage, findPackageIdentifier, findPackagesForCollection, getLatestPackages, removePackagePermissions, searchPackages, setPackagePermissions, updatePackage } from "./resolvers/PackageResolver";
 
 export const resolvers: {
   Query: QueryResolvers;
@@ -288,6 +288,7 @@ export const resolvers: {
     },
 
     package: findPackage,
+    latestPackages: getLatestPackages,
 
     collection: findCollectionBySlug,
     collections: findCollectionsForAuthenticatedUser,
@@ -453,12 +454,10 @@ export const resolvers: {
         });
     },
 
-    
-   
     createPackage: createPackage,
     updatePackage: updatePackage,
     disablePackage: disablePackage,
-    
+
     setPackagePermissions: setPackagePermissions,
     removePackagePermissions: removePackagePermissions,
 
