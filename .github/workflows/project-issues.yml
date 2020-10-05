@@ -7,7 +7,7 @@ on:
     types: [opened]
 env:
   MY_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  INITIAL_COLUMN_ID: 10793073
+  INPUT_COLUMN_NAME: "To do"
 
 jobs:
   assign_one_project:
