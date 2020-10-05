@@ -11,7 +11,7 @@ export class HomepageComponent implements OnInit {
     // {linkName:'trending',url:'/trending'},
     {linkName:'latest',url:'/latest'},
     // {linkName:'following',url:'/following'},
-    {linkName:'premium',url:'/premium'},
+    // {linkName:'premium',url:'/premium'},
   ]
 
   constructor() { }

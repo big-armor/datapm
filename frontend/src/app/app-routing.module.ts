@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule, UrlSegment, Route } from '@angular/router';
-import { CatalogDetailsComponent } from './package/catalog-details/catalog-details.component';
+import { CatalogDetailsComponent } from './catalog-details/catalog-details.component';
 import { LoginComponent } from './login/login.component';
 import { SignupComponent } from './signup/signup.component';
 import { MyAccountComponent } from './my-account/my-account.component';
@@ -57,23 +57,28 @@ const staticRoutes:Route[] = [
     canActivate: [AuthGuard]
   },
   {
-    path:"package",
+    path: ":catalogSlug",
+    component: CatalogDetailsComponent
+  },
+  {
+    path:":catalogSlug/:packageSlug",
     component: PackageComponent,
     children: [
       {
-        path: ":catalogSlug",
-        component: CatalogDetailsComponent
-      },
-      {
-        path: ":catalogSlug/:packageSlug",
+        path: "package-details",
+        redirectTo: "",
         component: PackageDetailComponent
       },
       {
-        path: "package-version",
+        path: "",
+        component: PackageDetailComponent
+      },
+      {
+        path: "version",
         component: PackageVersionComponent
       },
       {
-        path: "package-schema",
+        path: "schema",
         component: PackageSchemaComponent
       }
     ]

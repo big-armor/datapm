@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'package-version',
+  selector: 'version',
   templateUrl: './package-version.component.html',
   styleUrls: ['./package-version.component.scss']
 })
