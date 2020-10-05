@@ -22,7 +22,7 @@ const staticRoutes:Route[] = [
     children:[
       {
         path: '',
-        redirectTo: "trending",
+        redirectTo: "latest",
         pathMatch: "full"
       },
       // {

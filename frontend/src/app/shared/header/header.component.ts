@@ -36,7 +36,7 @@ export class HeaderComponent implements OnInit {
 
   goToSearch() {
     this.router.navigate(['/search']);
-    console.log("hello")
+
   }
 
   search() {
