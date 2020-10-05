@@ -1,0 +1,91 @@
+.cover-image {
+    height: 240px;
+    object-fit: cover;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-image: url('../../assets/images/cover-image.png');
+}
+
+#userProfile {
+    .profile-div {
+        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+        border-radius: 4px;
+        background-color: #fff;
+        position: relative;
+        top: -160px;
+
+        .user-img {
+            img {
+                width: 100px;
+                height: 100px;
+                top: -60px;
+                position: relative;
+                border-radius: 100%;
+                box-shadow: 1px 0px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+            }
+        }
+
+        .user-fullname {
+            font-family: Roboto Mono;
+            font-style: normal;
+            font-weight: normal;
+            font-size: 20px;
+            line-height: 26px;
+            letter-spacing: -0.28px;
+            color: #333333;
+        }
+
+        .user-name {
+            font-family: Roboto Mono;
+            font-style: normal;
+            font-weight: 300;
+            font-size: 14px;
+            line-height: 18px;
+            letter-spacing: -0.28px;
+            color: #828282;
+        }
+
+        .follow-btn {
+            border-radius: 24px;
+            padding: 5px 45px;
+            cursor: pointer;
+            outline: transparent solid 0px !important;
+            box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+
+            span {
+                font-family: Roboto Mono;
+                font-style: normal;
+                font-weight: normal;
+                font-size: 21px;
+                line-height: 28px;
+                text-align: center;
+                letter-spacing: -0.28px;
+                color: #333333;
+            }
+        }
+
+        .user-bio {
+            font-family: Roboto Mono;
+            font-style: normal;
+            font-weight: 300;
+            font-size: 10px;
+            line-height: 13px;
+            letter-spacing: -0.28px;
+            color: #4F4F4F;
+            max-width: 28%;
+        }
+
+        .user-following {
+            div {
+               font-family: Roboto Mono;
+                font-style: normal;
+                font-weight: normal;
+                font-size: 10px;
+                line-height: 13px;
+                letter-spacing: -0.28px;
+                color: #4F4F4F;
+            }
+        }
+
+    }
+}
