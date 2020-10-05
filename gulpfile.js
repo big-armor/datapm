@@ -38,8 +38,13 @@ function installDocsDepdendencies() {
 function buildDocs() {
   return spawnAndLog("npm",["run","build"], {cwd: "docs/website"});
 }
+
 function buildDockerImage() {
   return spawnAndLog("docker", ["build","-t","datapm-registry", ".", "-f", "docker/Dockerfile", "--no-cache"])
+}
+
+function runE2ETests() {
+  // TODO make an e2e test setup
 }
 
 function tagDockerImage() {

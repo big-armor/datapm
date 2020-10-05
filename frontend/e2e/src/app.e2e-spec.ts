@@ -10,7 +10,7 @@ describe('workspace-project App', () => {
 
   it('should display welcome message', () => {
     page.navigateTo();
-    expect(page.getTitleText()).toEqual('datapm-registry-frontend app is running!');
+    expect(page.getLogoText()).toEqual('datapm');
   });
 
   afterEach(async () => {
