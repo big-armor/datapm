@@ -11,8 +11,10 @@ export class PackageComponent implements OnInit {
   public routes=[];
   public selectedTab = 0;
 
-  constructor(private router: Router,
-    private route: ActivatedRoute,) {
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute
+    ) {
       let prefix = this.route.snapshot.params.catalogSlug + "/" + this.route.snapshot.params.packageSlug;
       this.routes = [
         {linkName:'details', url: prefix},
@@ -26,7 +28,7 @@ export class PackageComponent implements OnInit {
   }
 
   public selectTab(index) {
-    this.router.navigate([this.routes[index].url])
+    this.router.navigate([this.routes[index].url]);
     this.selectedTab = index;
   }
 
