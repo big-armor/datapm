@@ -522,7 +522,7 @@ export const resolvers: {
 
           const savedVersion = await transaction
           .getCustomRepository(VersionRepository)
-          .save(identifier,value);
+            .save(context.me.id, identifier, value);
 
           const ALIAS = "findVersion";
           const recalledVersion = await transaction

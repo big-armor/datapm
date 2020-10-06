@@ -7,7 +7,8 @@
               <h1 class="h1-title">Recent activity</h1>
             </div>
 
-            <div class="col-md-12 col-lg-12 pb-2 latest-div">
+            <!-- Package without thumbnail -->
+            <div class="col-md-12 col-lg-12 pb-2 latest-div" *ngFor="let packageWithModifiedDate of packagesWithModifiedDate">
               <mat-card class="example-card">
                 <div class="d-flex bd-highlight up-header mt-1">
                   <div class="bd-highlight">
@@ -18,20 +19,20 @@
                         </div>
                       </mat-card-header>
                   </div>
-                  <div class="ml-auto bd-highlight">Updated 5 min. <br> 2 downloaded</div>
+                  <div class="ml-auto bd-highlight">{{packageWithModifiedDate.lastActivityLabel}} <br> 2 downloaded</div>
                 </div>
 
                 <mat-card-content>
                   <div class="d-flex flex-row bd-highlight content-text">
                     <div class="bd-highlight" style="width: 100%;">
-                      <div class="content-title mb-2">activity name / package</div>
+                      <div class="content-title mb-2">{{packageWithModifiedDate.package.displayName}}</div>
                       <div class="content-description package-height">
-                        Short description preview of the product and some, lorem ipsum dolor sit amet, consectetur adipiscing elit. Risus orci, sem nullam maecenas sed mauris. Sed turpis lorem vitae sit. Amet, in aliquet odio id orci...
+                        {{packageWithModifiedDate.package.description}}
                       </div>
                     </div>
                   </div>
 
-                  <div class="content-actions">
+                  <!-- <div class="content-actions">
                     <div class="latest-chips">
                       <mat-chip-list aria-label="Fish selection">
                         <mat-chip>weather</mat-chip>
@@ -57,12 +58,13 @@
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </div> -->
                 </mat-card-content>
               </mat-card>
             </div>
 
-            <div class="col-md-12 col-lg-12 pb-2 latest-div">
+            <!-- Package with thumbnail -->
+            <!-- <div class="col-md-12 col-lg-12 pb-2 latest-div">
                 <mat-card class="example-card">
                   <div class="d-flex bd-highlight up-header mt-1">
                     <div class="bd-highlight">
@@ -125,9 +127,10 @@
                     </div>
                   </mat-card-content>
                 </mat-card>
-            </div>
+            </div> -->
 
-            <div class="col-md-12 col-lg-12 pb-2 latest-div">
+            <!-- Collection without thumbnail -->
+            <!-- <div class="col-md-12 col-lg-12 pb-2 latest-div">
               <mat-card class="example-card">
                 <div class="d-flex bd-highlight up-header mt-1">
                   <div class="bd-highlight">
@@ -179,9 +182,10 @@
                   </div>
                 </mat-card-content>
               </mat-card>
-            </div>
+            </div> -->
 
-            <div class="col-md-12 col-lg-12 pb-2 latest-div">
+            <!-- Collection with thumbnail -->
+            <!-- <div class="col-md-12 col-lg-12 pb-2 latest-div">
               <mat-card class="example-card">
                 <div class="d-flex bd-highlight up-header mt-1">
                   <div class="bd-highlight">
@@ -236,7 +240,7 @@
                   </div>
                 </mat-card-content>
               </mat-card>
-            </div>
+            </div> -->
           </div>
         </div>
     </div>
