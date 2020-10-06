@@ -17,7 +17,7 @@ export const createCollection = async (_0: any, { value }: { value: CreateCollec
   }
 
   const relations = getGraphQlRelationName(info);
-  const createdCollection = await repository.createCollection(value, relations);
+  const createdCollection = await repository.createCollection( context.me, value, relations);
   await grantAllCollectionPermissionsForUser(context, createdCollection.id);
   return createdCollection;
 }

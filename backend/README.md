@@ -1,6 +1,6 @@
-# Data Package Manager (datapm) Registery Server
+# Data Package Manager (datapm) Registry Server
 
-This is a data schema registery service for the Data Package Manager (datapm) ecosystem. It is based on graphql and runs in an express middleware server. This server holds only the schema information - and is not a repository for data.
+This is a data schema registry service for the Data Package Manager (datapm) ecosystem. It is based on graphql and runs in an express middleware server. This server holds only the schema information - and is not a repository for data.
 
 Visit datapm.io for more information.
 
@@ -36,7 +36,7 @@ This registry service can be built and run locally with the native node client. 
 2. `source ./env.sh` will set the local environment variables for the dev setup
 4. `npm run start:server` will compile the typescript, copy assets into the "dist" folder, start the docker based postgres server, and start the registry server from the "dist" folder. 
 
-## Buildl and run docker image locally
+## Build and run docker image locally
 
 This registry service can be built and run locally via docker-compose. This command will build the registry service, and then use the docker-compose command to start the service. 
 

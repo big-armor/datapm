@@ -178,6 +178,15 @@ export const resolvers: {
         .connection
         .getCustomRepository(PackageRepository)
         .findPackagesForCollection(context.me.id, collection.id, getGraphQlRelationName(info));
+    },
+    creator: async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+      const collection = parent as Collection;
+
+      return await context
+        .connection
+        .getCustomRepository(UserRepository)
+        .findOneOrFail({where: {id: collection.creatorId}, relations: getGraphQlRelationName(info)
+      })
     }
   },
 
