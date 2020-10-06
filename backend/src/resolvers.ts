@@ -231,6 +231,16 @@ export const resolvers: {
         packageSlug: packageEntity.slug
       };
 
+    },
+
+    creator: async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+      const packageEntity = parent as Package;
+
+      return await context
+        .connection
+        .getCustomRepository(UserRepository)
+        .findOneOrFail({where: {id: packageEntity.creatorId}, relations: getGraphQlRelationName(info)
+      })
     }
   },
 
