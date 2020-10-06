@@ -1,4 +1,7 @@
 <div class="dialog-wrapper" id="logIn">
+  <div class="dialog-close-wrapper">
+    <button mat-button mat-dialog-close class="dialog-close">close</button>
+  </div>
   <h1 mat-dialog-title class="dialog-title">datapm</h1>
   <p class="dialog-description">Welcome back!</p>
   <mat-horizontal-stepper labelPosition="bottom" #stepper>
@@ -46,6 +49,7 @@
         </p> -->
         <form [formGroup]="loginForm" (ngSubmit)="formSubmit()">
           <input
+            cdkFocusInitial
             type="text"
             placeholder="username or email address"
             name="username"
