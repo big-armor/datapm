@@ -232,6 +232,14 @@
         color: #828282;
       }
     }
+    .mat-spinner circle {
+      stroke: #828282;
+    }
+    .loading-spinner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
     .mat-dialog-actions.less-pd {
       margin-top: 0px;

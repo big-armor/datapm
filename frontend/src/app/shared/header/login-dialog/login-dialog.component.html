@@ -70,10 +70,10 @@
           <br />
           <div class="alert-div">
             <div class="alert-warn" *ngIf="state == State.INCORRECT_LOGIN">
-              Incorrect login information.
+              Your username and password were not correct.
             </div>
             <div class="alert-warn" *ngIf="state == State.LOGIN_ERROR">
-              There was a problem communicating or with the server. Please try
+              There was a problem communicating with the server. Please try
               again, or contact support.
             </div>
           </div>
@@ -83,11 +83,19 @@
               [class.disabled]="!loginForm.valid"
               class="submit-btn"
             >
-              <span class="btn-text">Login</span>
+              <span *ngIf="state != State.AWAITING_RESPONSE" class="btn-text"
+                >Login</span
+              >
+              <span
+                *ngIf="state == State.AWAITING_RESPONSE"
+                class="loading-spinner"
+              >
+                <mat-spinner diameter="25"></mat-spinner>
+              </span>
             </button>
             <br />
             <!-- <button matStepperPrevious class="back-btn">
-              <span class="btn-text">Back</span>
+                <span class="btn-text">Back</span>
             </button> -->
           </div>
         </form>
