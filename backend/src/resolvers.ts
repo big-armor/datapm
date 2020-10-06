@@ -352,7 +352,14 @@ export const resolvers: {
         .getCustomRepository(UserRepository)
         .getUserByUsername(username);
 
-      return user == null;
+
+      const catalog = await context
+        .connection
+        .manager
+        .getCustomRepository(CatalogRepository)
+        .findCatalogBySlug({slug: username});
+
+      return user == null && catalog == null;
     },
 
     emailAddressAvailable: async(

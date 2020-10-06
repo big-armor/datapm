@@ -1,6 +1,6 @@
 .footer-bg {
     background: #f2f2f247;
-    padding: 15px;
+    padding: 15px 15px 25px 15px;
     width: 100%;
 }
 
@@ -12,6 +12,7 @@
     line-height: 18px;
     letter-spacing: -0.28px;
     color: #4F4F4F;
+    margin-bottom: 8px;
 }
 
 .footer-subtitle {
@@ -21,7 +22,13 @@
     font-size: 10px;
     line-height: 13px;
     letter-spacing: -0.28px;
-    color: #4F4F4F;
+    a {
+        color: #4F4F4F;
+    }
+}
+
+.main-col-footer {
+    padding: 0px 30px;
 }
 
 @media (max-width: 992px) {
