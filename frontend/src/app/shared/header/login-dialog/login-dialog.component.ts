@@ -79,11 +79,17 @@ export class LoginDialogComponent implements OnInit {
         }
       })
       .catch((error: any) => {
-        console.log(error.errors);
         if (
           error.errors?.find(
-            (e) => e.extensions.code == 'GRAPHQL_VALIDATION_FAILED'
-          ) != null
+            (e) => (e.extensions.code == 'GRAPHQL_VALIDATION_FAILED') != null
+          )
+        )
+          this.state = State.INCORRECT_LOGIN;
+
+        if (
+          error.errors?.find(
+            (e) => (e.extensions.code == 'WRONG_CREDENTIALS') != null
+          )
         )
           this.state = State.INCORRECT_LOGIN;
         else this.state = State.LOGIN_ERROR;
