@@ -55,7 +55,9 @@ export class HeaderComponent implements OnInit {
   }
 
   openSignUpDialog() {
-    this.dialog.open(SignUpDialogComponent);
+    this.dialog.open(SignUpDialogComponent, {
+      disableClose: true,
+    });
   }
 
   goToSearch() {
@@ -69,5 +71,10 @@ export class HeaderComponent implements OnInit {
 
   goHome() {
     this.router.navigate(['/latest']);
+  }
+
+  logout() {
+    localStorage.removeItem('jwt');
+    this.goHome();
   }
 }

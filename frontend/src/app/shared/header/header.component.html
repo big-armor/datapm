@@ -44,7 +44,7 @@
           <mat-icon>person</mat-icon>
         </button>
         <mat-menu #beforeMenu="matMenu" xPosition="before">
-          <button *ngIf="currentUser" mat-menu-item>My profile</button>
+          <button *ngIf="currentUser" mat-menu-item>My Profile</button>
           <button
             *ngIf="!currentUser"
             mat-menu-item
@@ -58,6 +58,9 @@
             (click)="openSignUpDialog()"
           >
             Sign Up
+          </button>
+          <button *ngIf="currentUser" mat-menu-item (click)="logout()">
+            Log Out
           </button>
         </mat-menu>
       </div>
@@ -90,7 +93,7 @@
           <mat-icon>person</mat-icon>
         </button>
         <mat-menu #beforeMenu="matMenu" xPosition="before">
-          <button mat-menu-item>My profile</button>
+          <button mat-menu-item>My Profile</button>
           <button mat-menu-item (click)="openLoginDialog()">Log In</button>
           <button mat-menu-item (click)="openSignUpDialog()">Sign Up</button>
         </mat-menu>
