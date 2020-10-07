@@ -74,7 +74,7 @@ export class HeaderComponent implements OnInit {
   }
 
   logout() {
-    localStorage.removeItem('jwt');
-    this.goHome();
+    this.authenticationService.logout();
+    setTimeout(() => (this.currentUser = null), 500);
   }
 }
