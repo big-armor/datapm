@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -6,6 +6,7 @@ import { User } from 'src/generated/graphql';
 import { LoginDialogComponent } from './login-dialog/login-dialog.component';
 import { SignUpDialogComponent } from './sign-up-dialog/sign-up-dialog.component';
 import { AuthenticationService } from '../../services/authentication.service';
+import { Subscription } from 'rxjs';
 
 enum State {
   INIT,
@@ -19,11 +20,12 @@ enum State {
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   state = State.INIT;
 
-  currentUser: User;
+  currentUser: Promise<User>;
   searchFormGroup: FormGroup;
+  private subscription: Subscription;
 
   constructor(
     public dialog: MatDialog,
@@ -32,20 +34,22 @@ export class HeaderComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.authenticationService.getUserObservable().subscribe((u) => {
-      if (u == null) {
-        return;
-      }
-
-      u.then((user) => {
-        this.currentUser = user;
-        this.state = State.SUCCESS;
-      }).catch((error) => (this.state = State.ERROR));
-    });
+    this.subscription = this.authenticationService
+      .getUserObservable()
+      .subscribe((user) => {
+        if (user == null) {
+          return;
+        }
+        return (this.currentUser = user), (this.state = State.SUCCESS);
+      });
 
     this.searchFormGroup = new FormGroup({
       search: new FormControl(''),
     });
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   openLoginDialog() {
