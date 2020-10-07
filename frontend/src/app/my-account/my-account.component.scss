@@ -77,6 +77,23 @@
                 max-width: 35%;
             }
 
+            .edit-profile {
+                font-family: Roboto Mono;
+                font-style: normal;
+                font-weight: 400;
+                font-size: 12px;
+                line-height: 13px;
+                letter-spacing: -0.28px;
+                color: #017FB9;
+                border: 1px solid #ddd;
+                padding: 3px 15px;
+                border-radius: 4px;
+                cursor: pointer;
+                &:hover {
+                    text-decoration: none;
+                }
+            }
+
             .user-following {
                 div {
                    font-family: Roboto Mono;
@@ -126,6 +143,9 @@
             }
         }
     }
+    .mat-dialog-container {
+        padding: 20px;
+    }
 }
 
 @media (max-width: 576px) {
@@ -142,13 +162,16 @@
                 .user-img {
                     img {
                         top: 0px;
+                        width: 60px;
+                        height: 60px;
                     }
                 }
                 .follow-btn {
                     padding: 0px 40px;
                     line-height: 30px;
+                    margin-bottom: 10px;
                     span {
-                        font-size: 16px;
+                        font-size: 14px;
                     }
                 }
                 #homeRoutes {
@@ -159,6 +182,14 @@
                             margin: 0px 6px;
                         }
                     }
+                }
+                .user-following {
+                    div {
+                        font-size: 10px;
+                    }
+                }
+                .user-bio {
+                    font-size: 10px;
                 }
             }
         }

@@ -1,0 +1,73 @@
+#editAccount {
+    min-width: 700px;
+    max-width: 800px;
+    position: relative;
+    top: -24px;
+    .mat-dialog-content {
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+        .big-img-dialog {
+            height: 140px;
+            object-fit: cover;
+            background-size: 100%;
+            background-repeat: no-repeat;
+            background-image: url('../../../assets/images/cover-image.png');
+            height: 150px;
+            display: flex;
+            align-items: center;
+            .add-img-btn {
+                margin: 0 auto;
+                border: none;
+                background: transparent;
+                outline: transparent solid 0px;
+                color: #fff;
+                span {
+                    font-size: 48px;
+                }
+            }
+        }
+    }
+    .shadow-div {
+        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+        .div-question {
+            font-family: Roboto Mono;
+            font-style: normal;
+            font-weight: normal;
+            font-size: 14px;
+            line-height: 18px;
+            letter-spacing: -0.28px;
+            color: #4F4F4F;
+            width: 130px;
+        }
+        .div-answer {
+            input {
+                height: 35px;
+                border: none !important;
+                font-family: Roboto Mono;
+                font-style: normal;
+                font-weight: normal;
+                font-size: 14px;
+                line-height: 18px;
+                display: flex;
+                align-items: flex-end;
+                letter-spacing: -0.28px;
+                color: #017FB9;
+                &:focus {
+                    outline: transparent solid 0px;
+                    box-shadow: none;
+                }
+                &::placeholder {
+                    font-family: Roboto Mono;
+                    font-style: normal;
+                    font-weight: 300;
+                    font-size: 14px;
+                    line-height: 18px;
+                    display: flex;
+                    align-items: flex-end;
+                    letter-spacing: -0.28px;
+                    color: #828282;
+                }
+            }
+        }
+    }
+}

@@ -4,6 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormGroup, FormControl } from '@angular/forms';
 import { getRegistryPort, getRegistryProtocol, getRegistryHostname } from '../helpers/RegistryAccessHelper';
 import { APIKey, Catalog, CreateAPIKeyGQL, DeleteAPIKeyGQL, MyAPIKeysGQL, MyCatalogsGQL, Scope, User } from 'src/generated/graphql';
+import { EditAccountDialogComponent } from './edit-account-dialog/edit-account-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 enum State {
   INIT,
@@ -18,12 +20,6 @@ enum State {
   styleUrls: ['./my-account.component.scss']
 })
 export class MyAccountComponent implements OnInit {
-
-  // public routes=[
-  //   {linkName:'details',url:'details'},
-  //   {linkName:'packages',url:'packages'},
-  //   {linkName:'activity',url:'activity'},
-  // ]
 
   State = State;
   state = State.INIT;
@@ -53,6 +49,7 @@ export class MyAccountComponent implements OnInit {
     private deleteAPIKeyGQL:DeleteAPIKeyGQL,
     private changeDectorRef:ChangeDetectorRef,
     private route: ActivatedRoute,
+    public dialog: MatDialog
   ) {
     let prefix = "/me";
     this.routes = [
@@ -97,6 +94,10 @@ export class MyAccountComponent implements OnInit {
     this.refreshAPIKeys();
 
 
+  }
+
+  openEditDialog() {
+    this.dialog.open(EditAccountDialogComponent);
   }
 
   public selectTab(index) {

@@ -28,6 +28,8 @@ import { PackageSchemaComponent } from './package/package-schema/package-schema.
 import { DetailsComponent } from './my-account/details/details.component';
 import { PackagesComponent } from './my-account/packages/packages.component';
 import { ActivityComponent } from './my-account/activity/activity.component';
+import { EditAccountDialogComponent } from './my-account/edit-account-dialog/edit-account-dialog.component';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @NgModule({
   declarations: [
@@ -50,7 +52,8 @@ import { ActivityComponent } from './my-account/activity/activity.component';
     PackageSchemaComponent,
     DetailsComponent,
     PackagesComponent,
-    ActivityComponent
+    ActivityComponent,
+    EditAccountDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -61,6 +64,7 @@ import { ActivityComponent } from './my-account/activity/activity.component';
     FormsModule,
     SharedModule,
     MaterialModule,
+    MatSlideToggleModule
   ],
   providers: [],
   bootstrap: [AppComponent],
