@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { LoginGQL } from 'src/generated/graphql';
+import { Subscription } from 'rxjs';
 enum State {
   LOGGED_OUT,
   AWAITING_RESPONSE,
@@ -22,10 +23,11 @@ enum State {
   templateUrl: './login-dialog.component.html',
   styleUrls: ['./login-dialog.component.scss'],
 })
-export class LoginDialogComponent implements OnInit {
+export class LoginDialogComponent implements OnInit, OnDestroy {
   State = State;
 
   public state = State.LOGGED_OUT;
+  private subscription: Subscription;
 
   loginForm = new FormGroup({
     username: new FormControl('', Validators.required),
@@ -40,22 +42,31 @@ export class LoginDialogComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    if (this.authenticationService.currentUser != null)
+    if (this.authenticationService.currentUser != null) {
       this.state = State.LOGGED_IN;
+    }
 
-    this.authenticationService.getUserObservable().subscribe((userPromise) => {
-      if (userPromise == null) {
-        this.state = State.LOGGED_OUT;
-        return;
-      }
-
-      userPromise.then((user) => {
-        if (user != null) this.state = State.LOGGED_IN;
-        else {
-          if (this.state == State.LOGGED_IN) this.state = State.LOGGED_OUT;
+    this.subscription = this.authenticationService
+      .getUserObservable()
+      .subscribe((userPromise) => {
+        if (userPromise == null) {
+          this.state = State.LOGGED_OUT;
+          return;
         }
+
+        userPromise.then((user) => {
+          if (user != null) {
+            this.state = State.LOGGED_IN;
+          }
+          if (this.state == State.LOGGED_IN) {
+            this.state = State.LOGGED_OUT;
+          }
+        });
       });
-    });
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   formSubmit() {
@@ -67,32 +78,29 @@ export class LoginDialogComponent implements OnInit {
         this.state = State.LOGGED_IN;
 
         const returnUrl =
-          this.router.parseUrl(this.router.url).queryParams['returnUrl'] ||
-          null;
+          this.router.parseUrl(this.router.url).queryParams['returnUrl'] || '/';
 
-        if (returnUrl) {
-          this.dialog.closeAll();
-          this.router.navigate([returnUrl]);
-        } else {
-          this.dialog.closeAll();
-          this.router.navigate(['/']);
-        }
+        this.dialog.closeAll();
+        this.router.navigate([returnUrl]);
       })
       .catch((error: any) => {
         if (
           error.errors?.find(
             (e) => (e.extensions.code == 'GRAPHQL_VALIDATION_FAILED') != null
           )
-        )
+        ) {
           this.state = State.INCORRECT_LOGIN;
+        }
 
         if (
           error.errors?.find(
             (e) => (e.extensions.code == 'WRONG_CREDENTIALS') != null
           )
-        )
+        ) {
           this.state = State.INCORRECT_LOGIN;
-        else this.state = State.LOGIN_ERROR;
+        } else {
+          this.state = State.LOGIN_ERROR;
+        }
       });
   }
 }
