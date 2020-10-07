@@ -38,11 +38,21 @@ Verify that the datapm-client package is installed
 datapm --version
 ```
 
-## Add Keys and Private Registries
+## View Help Options
 
-To access or publish private packages, and to communicate with private registries, you'll need to add a registry and API key to your command line client. Here are the instructions to generate an API Key
+The command line client has a standard "--help" option that shows the available commands, and outputs help when you enter an unrecognized command option. Just append "--help" to any command to view more information.
 
-1. Using a web browser, visit [datapm.io](https://datapm.io) or a private registry
+```text
+datapm --help
+
+datapm publish --help
+```
+
+## Generate An API Key
+
+To publish packages or perform any authenticated tasks, you'll need to add an API key to your command line client. Here are the instructions to generate an API Key.
+
+1. Using a web browser, [visit the registry] (/)
 1. Log in or sign up as a new user
 1. Click your profile icon in the upper right
 1. Click "API Keys"
@@ -50,12 +60,11 @@ To access or publish private packages, and to communicate with private registrie
 1. Copy the command provided
 1. Paste the command into your terminal
 
-
 You will now have an API Key associated with the registry. Your command line client will authenticate as your user, and perform actions on your behalf. If the registry is private, it will also have been added to the DataPM command line client configuration - so it will be used for searches, etc. 
 
-## Search DataPM Registries
+## Search Registries
 
-You can search the public [datapm.io](https://datapm.io) registry using a modern web browser. Or use the following command to search via the command line client. 
+You can [search the registry](/) registry using a modern web browser. Or use the following command to search via the command line client. 
 
 ```text
 datapm search "example search terms"
@@ -79,9 +88,9 @@ datapm fetch https://datapm-example.company.com/catalog/package
 
 ## Publish Data
 
-*Important Note:* Right now, DataPM only supports publishing data schemas. So you must host the actual data in another location - such as GitHub or a public webserver. And that hosting must be publically available. In the future, DataPM will also support hosting the data itself for public and private data hosting.
+*Important Note:* Right now, DataPM only supports publishing data schemas. So you must host the actual data in another location - such as GitHub or a public web server. And that hosting must be publicly available. In the future, DataPM will also support hosting the data itself for public and private data hosting.
 
-Use the command line client to create a data package file based on any publically avialable data set. 
+Use the command line client to create a data package file based on any publicly available data set. 
 
 ```text
 datapm generate-package https://some-web-server.com/path/to/data.csv
@@ -100,3 +109,30 @@ datapm update my-package-file.datapm.json
 ```
 
 And then you can re-publish the updates using the same publish command above. 
+
+
+### Add Registries
+
+By default the command line client only interacts with the the [datapm.io](https://datapm.io) registry. You can host your own private or public registries, and you will want to add those registries to your command line client. 
+
+```
+datapm registry add datapm.my-domain.com 443
+```
+
+Use the [Generate An API Key](#generate-an-api-key) section above to add a specific API for that registry.
+
+You can also remove a registry with the following command
+
+```
+datapm registry remove datapm.my-domain.com 443
+```
+
+### Manage Configuration
+
+You can view and remove the local configuration using the following commands. 
+
+```
+datapm configuration show
+
+datapm configuration reset
+```

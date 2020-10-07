@@ -21,6 +21,17 @@
             object-fit: cover;
             height: 168px;
         }
+
+        ::ng-deep.card-header-mat {
+            .mat-card-header-text {
+                margin: 6px 0px;
+            }
+
+            .mat-card-avatar {
+                height: 35px;
+                width: unset;
+            }
+        }
     }
 }
 
@@ -52,17 +63,8 @@
     line-height: 18px;
     letter-spacing: -0.28px;
     color: #828282;
+    padding: 4px 10px;
     margin-bottom: 0px !important;
-}
-
-::ng-deep.card-header-mat {
-    .mat-card-header-text {
-        margin: 6px 0px;
-    }
-
-    .mat-card-avatar {
-        height: 35px;
-    }
 }
 
 .content-title {
@@ -156,6 +158,17 @@
             line-height: 18px;
             letter-spacing: -0.28px;
             color: #4F4F4F;
+        }
+
+        ::ng-deep.card-header-mat {
+            .mat-card-header-text {
+                margin: 6px 0px;
+            }
+
+            .mat-card-avatar {
+                height: 35px;
+                width: unset;
+            }
         }
     }
 }

@@ -36,14 +36,16 @@ export class HeaderComponent implements OnInit {
 
   goToSearch() {
     this.router.navigate(['/search']);
-    console.log("hello")
+
   }
 
   search() {
     const query = this.searchFormGroup.value.search;
-
     this.router.navigate(['/search',{q: query}])
+  }
 
+  goHome() {
+    this.router.navigate(['/latest'])
   }
 
 }

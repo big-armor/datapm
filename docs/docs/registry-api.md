@@ -4,7 +4,7 @@ title: DataPM Registry GraphQL API
 sidebar_label: Registry API
 ---
 
-DataPM registries provide an [Apollo GraphQL](https://www.apollographql.com) based GraphQL API. This API is used by the webclient and DataPM Command Line Client, and you can write your own integrations using this same API.
+DataPM registries provide an [Apollo GraphQL](https://www.apollographql.com) based GraphQL API. This API is used by the web client and DataPM Command Line Client, and you can write your own integrations using this same API.
 
 Apollo has a great ["Why GraphQL?"](https://www.apollographql.com/docs/intro/benefits/) article with an introduction to the concepts and benefits of GraphQL. 
 
@@ -19,7 +19,7 @@ Use the "docs" and "schema" tabs on the right side of the playground window to a
 
 DataPM provides a simple token based API key for machine-to-machine access to the registry graphql API. 
 
-**Note: API Keys are secrets!** Never share your API Keys. Never check API Keys into code repos, email them, or send them in unsecure chat messages. 
+**Note: API Keys are secrets!** Never share your API Keys. Never check API Keys into code repos, email them, or send them in non-secure chat messages. 
 
 ### Generate an API Key
 
@@ -40,18 +40,18 @@ You can submit an API key in the "Authorization" HTTP request header to authenti
 
 ```
 {
-    "Authoriztion": "Bearer YOUR-API-TOKEN-HERE"
+    "Authorization": "Bearer YOUR-API-TOKEN-HERE"
 }
 ```
 
 ## Object Overview
 
-The [DataPM Concepts](concepts.md) page contains details about logical of a DataPM registry. The following describes the highlevel concepts of the registry API GraphQL object types and how they map to those concepts. 
+The [DataPM Concepts](concepts.md) page contains details about logical of a DataPM registry. The following describes the high level concepts of the registry API GraphQL object types and how they map to those concepts. 
 
 
 ### Object: Catalog
 
-A catalog is, like a real world magazine catalog, published by a person or organization and contains a list of available DataPM Packages. Catalogs are uniquily identified by their "slug" or "catalogSlug" reference. 
+A catalog is, like a real world magazine catalog, published by a person or organization and contains a list of available DataPM Packages. Catalogs are uniquely identified by their "slug" or "catalogSlug" reference. 
 
 Catalogs may be public or private, and may have one or more user with a Permission to access or edit them. Every user has a catalog that matches their username. 
 
@@ -198,7 +198,7 @@ disableCollection(identifier: CollectionIdentifierInput!): Collection!
 
 ### Object: User
 
-A user is a real world person account on a DataPM registry. You will only be able to access fileds such as firstName, lastName, etc if the corresponding "isPublic" property is true for users other than yourself. 
+A user is a real world person account on a DataPM registry. You will only be able to access fields such as firstName, lastName, etc if the corresponding "isPublic" property is true for users other than yourself. 
 
 ```text
 type User {

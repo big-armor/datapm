@@ -8,7 +8,7 @@ DataPM is the easiest way to discover new data. And all DataPM listings include 
 
 ## Discover Data
 
-The global public registry at [datapm.io](https://datapm.io), and the similarly hosted priviate registries, feature several methods to discover data. 
+The global public registry at [datapm.io](https://datapm.io), and the similarly hosted private registries, feature several methods to discover data. 
 
 
 * Search by tile, description, and keywords
