@@ -35,7 +35,7 @@ export class CollectionPackageRepository extends Repository<CollectionPackage> {
   }
 
 
-  findByCollectionIdPackageId(collectionId: number, packageId: number, relations: string[]): PromiseLike<CollectionPackage | undefined> {
+  findByCollectionIdAndPackageId(collectionId: number, packageId: number, relations: string[]): PromiseLike<CollectionPackage | undefined> {
     const value = this.createQueryBuilder(CollectionPackageRepository.TABLE_RELATIONS_ALIAS)
     .where({ collectionId: collectionId , packageId: packageId})
     .addRelations(CollectionPackageRepository.TABLE_RELATIONS_ALIAS, relations)

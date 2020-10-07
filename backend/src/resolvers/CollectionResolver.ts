@@ -59,7 +59,7 @@ export const addPackageToCollection = async (_0: any, { collectionIdentifier, pa
 
   const value = await context.connection.manager
     .getCustomRepository(CollectionPackageRepository)
-    .findByCollectionIdPackageId(collectionEntity.id, packageEntity.id, relations);
+    .findByCollectionIdAndPackageId(collectionEntity.id, packageEntity.id, relations);
 
 
   if(value == undefined) 
