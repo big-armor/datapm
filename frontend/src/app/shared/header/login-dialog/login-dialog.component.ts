@@ -5,7 +5,7 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { LoginGQL } from 'src/generated/graphql';
@@ -37,6 +37,7 @@ export class LoginDialogComponent implements OnInit, OnDestroy {
   constructor(
     private loginGQL: LoginGQL,
     private authenticationService: AuthenticationService,
+    private route: ActivatedRoute,
     private router: Router,
     private dialog: MatDialog
   ) {}
@@ -77,8 +78,7 @@ export class LoginDialogComponent implements OnInit, OnDestroy {
       .then((user) => {
         this.state = State.LOGGED_IN;
 
-        const returnUrl =
-          this.router.parseUrl(this.router.url).queryParams['returnUrl'] || '/';
+        const returnUrl = this.route.queryParams['returnUrl'] || '/';
 
         this.dialog.closeAll();
         this.router.navigate([returnUrl]);
