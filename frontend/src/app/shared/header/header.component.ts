@@ -23,7 +23,7 @@ enum State {
 export class HeaderComponent implements OnInit, OnDestroy {
   state = State.INIT;
 
-  currentUser: Promise<User>;
+  currentUser: User;
   searchFormGroup: FormGroup;
   private subscription: Subscription;
 
@@ -36,11 +36,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscription = this.authenticationService
       .getUserObservable()
-      .subscribe((user) => {
-        if (user == null) {
+      .subscribe((u) => {
+        if (u == null) {
           return;
         }
-        return (this.currentUser = user), (this.state = State.SUCCESS);
+
+        u.then((user) => {
+          this.currentUser = user;
+          this.state = State.SUCCESS;
+        }).catch((error) => (this.state = State.ERROR));
       });
 
     this.searchFormGroup = new FormGroup({
