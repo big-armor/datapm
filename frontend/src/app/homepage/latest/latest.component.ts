@@ -28,23 +28,38 @@ export class LatestComponent implements OnInit {
   }
 
   private loadLatestPackages(): void {
-    this.latestPackages.fetch({limit: 5, offset: 0}).subscribe((a) => {
+    this.latestPackages.fetch({offset: 0, limit: 5}).subscribe((a) => {
       const dateNow = new Date();
       this.packagesWithModifiedDate = a.data.latestPackages.packages.map((p) => {
+        const changeDates = this.getLastChangedDates(p);
         return {
           package: p,
-          lastActivityLabel: this.getUpdatedDateLabel(new Date(p.createdAt), new Date(p.updatedAt), dateNow)
+          lastActivityLabel: this.getUpdatedDateLabel(new Date(changeDates.createdAt), new Date(changeDates.updatedAt), dateNow)
         }
       });
     });
   }
 
+  private getLastChangedDates(pkg: any): { createdAt: Date, updatedAt: Date} {
+    if (pkg.latestVersion != null) {
+      return {
+        createdAt: pkg.latestVersion.createdAt,
+        updatedAt: pkg.latestVersion.updatedAt
+      }
+    } else {
+        return {
+          createdAt: pkg.createdAt,
+          updatedAt: pkg.updatedAt
+        }
+    }
+  }
+
   private getUpdatedDateLabel(createdAtDate: Date, updatedAtDate: Date, dateNow: Date): string {
     let actionLabel;
-    if (createdAtDate == updatedAtDate) {
-      actionLabel = "Created";
+    if (createdAtDate.getTime() == updatedAtDate.getTime()) {
+      actionLabel = "Created ";
     } else {
-      actionLabel = "Updated";
+      actionLabel = "Updated ";
     }
 
     const differenceLabel = getTimeDifferenceLabel(updatedAtDate, dateNow);

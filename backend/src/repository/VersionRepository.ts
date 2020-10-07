@@ -27,7 +27,7 @@ export class VersionRepository {
           minorVersion: semVer.minor,
           patchVersion: semVer.patch,
           description: value.packageFile.description || undefined,
-          // modifiedById: userId,
+          authorId: userId,
           createdAt: new Date(),
           updatedAt: new Date(value.packageFile.updatedDate),
           packageFile: value.packageFile

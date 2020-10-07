@@ -10,6 +10,7 @@ import { BaseModel } from "./BaseModel";
 import { Package } from "./Package";
 import { VersionIdentifier } from "../generated/graphql";
 import { PackageFile } from 'datapm-lib';
+import { User } from "./User";
 
 @Entity({
   name: "version",
@@ -33,15 +34,15 @@ export class Version extends BaseModel {
   @JoinColumn({ name: "package_id" })
   package: Package;
 
-  // @ManyToOne(() => User)
-  // @JoinColumn({ name: "modified_by" })
-  // modifiedBy: User;
+  @ManyToOne(() => User)
+  @JoinColumn({ name: "author_id" })
+  author: User;
 
   @Column({ name: "package_id" })
   packageId: number;
 
-  // @Column({ name: "modified_by" })
-  // modifiedById: number;
+  @Column({ name: "author_id" })
+  authorId: number;
 
   @Column({ nullable: false, default: true })
   isActive: boolean;

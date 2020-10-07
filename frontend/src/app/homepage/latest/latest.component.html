@@ -14,8 +14,10 @@
                   <div class="bd-highlight">
                     <mat-card-header class="card-header-mat">
                         <div mat-card-avatar class="example-header-image">
+                          <!-- TODO: Store user profile image somewhere -->
                           <img src='../../../assets/images/user-female.png' alt="User image card" class="person-card-photo">
-                          <span class="person-card-name">Andrew Smith</span>
+                          <!-- TODO: Validate that every package should be a published latest version -->
+                          <span class="person-card-name">{{packageWithModifiedDate.package.latestVersion?.author?.username}}</span>
                         </div>
                       </mat-card-header>
                   </div>

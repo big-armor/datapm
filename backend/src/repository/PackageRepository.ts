@@ -442,7 +442,7 @@ export class PackageRepository {
     limit: number,
     offSet: number,
     relations?: string[]): Promise<[Package[], number]> {
-    const ALIAS = "search";
+    const ALIAS = "latestPackages";
     return this.createQueryBuilderWithUserConditions(user)
       .orderBy('"Package"."created_at"', 'DESC')
       .limit(limit)

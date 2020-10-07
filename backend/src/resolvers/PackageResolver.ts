@@ -17,16 +17,13 @@ export const getLatestPackages = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    console.log("hmm");
     const relations = getGraphQlRelationName(info);
-    console.log("hmm2", relations);
     const [searchResponse, count] = await context
         .connection
         .manager
         .getCustomRepository(PackageRepository)
         .getLatestPackages(context.me, limit, offSet, relations);
 
-    console.log("hmm3", searchResponse);
     return {
         hasMore: count - (offSet + limit) > 0,
         packages: searchResponse,

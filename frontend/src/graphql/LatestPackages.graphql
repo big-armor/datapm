@@ -8,13 +8,16 @@ query GetLatestPackages($offset: Int!, $limit: Int!) {
       displayName
       description
       description
-      createdAt
-      updatedAt
       latestVersion {
         identifier {
           versionMajor
           versionMinor
           versionPatch
+        }
+        createdAt
+        updatedAt
+        author {
+          username
         }
       }
     }
