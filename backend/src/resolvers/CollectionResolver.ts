@@ -7,6 +7,8 @@ import { getGraphQlRelationName } from "../util/relationNames";
 import { grantAllCollectionPermissionsForUser } from "./UserCollectionPermissionResolver";
 
 export const createCollection = async (_0: any, { value }: { value: CreateCollectionInput }, context: AuthenticatedContext, info: any) => {
+  // const val = { ...value, creatorId: context.me?.id };
+  
   const repository = context.connection.manager
     .getCustomRepository(CollectionRepository);
 

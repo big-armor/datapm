@@ -12,6 +12,7 @@ import { BaseModel } from "./BaseModel";
 import { Catalog } from "./Catalog";
 import { Version } from "./Version";
 import { PackageIdentifier } from "../generated/graphql";
+import { User } from "./User";
 
 @Entity({
   name: "package",
@@ -44,6 +45,13 @@ export class Package extends BaseModel {
     type: "text"
   })
   description: string | null
+
+  // @ManyToOne(() => User)
+  // @JoinColumn({ name: "managed_by_id" })
+  // creator: User;
+
+  // @Column({ name: "managed_by_id"})
+  // creatorId: number;
 
   @ManyToOne(() => Catalog)
   @JoinColumn({ name: "catalog_id" })

@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryColumn, Index, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, Index, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
 import { CollectionIdentifier } from "../generated/graphql";
+import { User } from './User';
 
 import { BaseModel } from "./BaseModel";
 
@@ -22,6 +23,13 @@ export class Collection extends BaseModel {
 
   @Column({ name: "description", nullable: true, type: "text" })
   public description: string | null | undefined;
+
+  // @ManyToOne(() => User)
+  // @JoinColumn({ name: "managed_by_id"})
+  // creator: User;
+
+  // @Column({ name: "managed_by_id"})
+  // creatorId: number;
 
   @Column({ name: "is_public", nullable: false, default: false })
   public isPublic: boolean;
