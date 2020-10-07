@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { AuthenticationService } from '../services/authentication.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormGroup, FormControl } from '@angular/forms';
 import { getRegistryPort, getRegistryProtocol, getRegistryHostname } from '../helpers/RegistryAccessHelper';
 import { APIKey, Catalog, CreateAPIKeyGQL, DeleteAPIKeyGQL, MyAPIKeysGQL, MyCatalogsGQL, Scope, User } from 'src/generated/graphql';
@@ -19,6 +19,12 @@ enum State {
 })
 export class MyAccountComponent implements OnInit {
 
+  // public routes=[
+  //   {linkName:'details',url:'details'},
+  //   {linkName:'packages',url:'packages'},
+  //   {linkName:'activity',url:'activity'},
+  // ]
+
   State = State;
   state = State.INIT;
 
@@ -33,6 +39,8 @@ export class MyAccountComponent implements OnInit {
 
   public myCatalogs:Catalog[];
   public myAPIKeys:APIKey[];
+  public routes=[];
+  public selectedTab = 0;
 
   createAPIKeyForm:FormGroup;
 
@@ -43,11 +51,19 @@ export class MyAccountComponent implements OnInit {
     private createAPIKeyGQL:CreateAPIKeyGQL,
     private myAPIKeysGQL:MyAPIKeysGQL,
     private deleteAPIKeyGQL:DeleteAPIKeyGQL,
-    private changeDectorRef:ChangeDetectorRef
-  ) {  }
+    private changeDectorRef:ChangeDetectorRef,
+    private route: ActivatedRoute,
+  ) {
+    let prefix = "/me";
+    this.routes = [
+      {linkName:'details', url: prefix},
+      {linkName:'packages', url:prefix + '/packages'},
+      {linkName:'activity', url:prefix +'/activity'},
+    ]
+    }
 
   ngOnInit(): void {
-
+    this.selectTab(0);
     this.state = State.INIT;
 
     this.createAPIKeyForm = new FormGroup({
@@ -59,7 +75,7 @@ export class MyAccountComponent implements OnInit {
       if(u == null) {
         return;
       }
-      
+
       u.then(user => {
         this.currentUser = user;
         this.state = State.SUCCESS
@@ -79,8 +95,13 @@ export class MyAccountComponent implements OnInit {
     });
 
     this.refreshAPIKeys();
-    
 
+
+  }
+
+  public selectTab(index) {
+    this.router.navigate([this.routes[index].url])
+    this.selectedTab = index;
   }
 
   refreshAPIKeys() {
@@ -119,7 +140,7 @@ export class MyAccountComponent implements OnInit {
 
 
       this.newAPIKey = btoa(key.id + "." + key.secret);
-      
+
       this.createAPIKeyForm.get('label').setValue('');
       this.refreshAPIKeys();
       this.createAPIKeyState = State.SUCCESS;
@@ -128,7 +149,7 @@ export class MyAccountComponent implements OnInit {
 
   deleteApiKey(id:string) {
     this.deleteAPIKeyState = State.LOADING;
-    
+
     this.deleteAPIKeyGQL.mutate({id: id}).subscribe(response => {
       if(response.errors?.length > 0) {
         this.deleteAPIKeyState = State.ERROR;
@@ -157,7 +178,7 @@ export class MyAccountComponent implements OnInit {
     let protocolOption = "";
     let portOption = "";
 
-    
+
     if(protocol == "https" && port != 443) {
           portOption = "--port " + port;
     } else if(protocol == "http" && port != 80) {
