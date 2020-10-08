@@ -25,5 +25,4 @@ export class CreateCollectionAndPackageRelation1600840245777 implements Migratio
 
     public async down(queryRunner: QueryRunner): Promise<void> {
     }
-
 }

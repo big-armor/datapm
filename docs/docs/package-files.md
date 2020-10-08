@@ -31,6 +31,12 @@ A DataPM package file is stored in JSON format, and adheres to the published [Da
 
 DataPM registries validate submitted package files against the specification linked above. Therefore you may wish to use a [JSON Schema validator](https://json-schema.org/implementations.html#validators) in your pre-publishing process. 
 
+### Online Validation
+
+[https://jsonschema.dev](https://jsonschema.dev) is the official JSON Schema validator. You can copy the contents of [datapm-package-file-schema-v1.json](/docs/datapm-package-file-schema-v1.json) into the "JSON Schema" field, and your package file into the "JSON instance" to validate.
+
+### Command Line Validation
+
 [Ajv-cli](https://www.npmjs.com/package/ajv-cli) is a simple validator to implement and use. 
 
 ```text

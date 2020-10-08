@@ -21,7 +21,7 @@ import { UserCatalogPermission } from "./UserCatalogPermission";
     lastLogin: Date | null;
   
     @Column({ name: "is_site_admin" })
-    isSiteAdmin: boolean;
+    isAdmin: boolean;
   
     @Column({ length: 30, name: "first_name", type: "varchar", nullable: true })
     firstName?: string;

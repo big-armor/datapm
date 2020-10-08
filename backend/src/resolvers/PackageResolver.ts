@@ -8,6 +8,7 @@ import { CreatePackageInput, PackageIdentifierInput, Permission, UpdatePackageIn
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { PackageRepository } from "../repository/PackageRepository";
+import { UserRepository } from "../repository/UserRepository";
 import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 
@@ -64,6 +65,17 @@ export const findPackageIdentifier = async (parent: any, _1: any, context: Authe
         catalogSlug: catalog.slug,
         packageSlug: packageEntity.slug
     };
+}
+
+export const findPackageCreator = async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+    const packageEntity = parent as Package;
+
+    return await context
+        .connection
+        .getCustomRepository(UserRepository)
+        .findOneOrFail({
+            where: { id: packageEntity.creatorId }, relations: getGraphQlRelationName(info)
+        });
 }
 
 export const findPackage = async (_0: any, { identifier }: { identifier: PackageIdentifierInput }, context: AuthenticatedContext, info: any) => {

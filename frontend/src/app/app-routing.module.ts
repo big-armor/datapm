@@ -5,35 +5,38 @@ import { LoginComponent } from './login/login.component';
 import { SignupComponent } from './signup/signup.component';
 import { MyAccountComponent } from './my-account/my-account.component';
 import { AuthGuard } from './helpers/auth-guard';
-import { PackageDetailComponent } from './package-detail/package-detail.component';
+import { PackageDetailComponent } from './package/package-detail/package-detail.component';
 import { HomepageComponent } from './homepage/homepage.component';
 import { SearchComponent } from './search/search.component';
 import { TrendingComponent } from './homepage/trending/trending.component';
 import { LatestComponent } from './homepage/latest/latest.component';
 import { FollowingComponent } from './homepage/following/following.component';
+import { PackageComponent } from './package/package.component';
+import { PackageVersionComponent } from './package/package-version/package-version.component';
+import { PackageSchemaComponent } from './package/package-schema/package-schema.component';
 
 const staticRoutes:Route[] = [
   {
-    path: '',
-    redirectTo: "home",
-    pathMatch: "full"
-  },
-  {
-    path:'home',
+    path:'',
     component: HomepageComponent,
     children:[
       {
-        path:'trending',
-        component: TrendingComponent
+        path: '',
+        redirectTo: "latest",
+        pathMatch: "full"
       },
+      // {
+      //   path:'trending',
+      //   component: TrendingComponent
+      // },
       {
         path:'latest',
         component: LatestComponent
       },
-      {
-        path:'following',
-        component: FollowingComponent
-      },
+      // {
+      //   path:'following',
+      //   component: FollowingComponent
+      // },
     ]
   },
   {
@@ -58,8 +61,27 @@ const staticRoutes:Route[] = [
     component: CatalogDetailsComponent
   },
   {
-    path: ":catalogSlug/:packageSlug",
-    component: PackageDetailComponent
+    path:":catalogSlug/:packageSlug",
+    component: PackageComponent,
+    children: [
+      {
+        path: "package-details",
+        redirectTo: "",
+        component: PackageDetailComponent
+      },
+      {
+        path: "",
+        component: PackageDetailComponent
+      },
+      {
+        path: "version",
+        component: PackageVersionComponent
+      },
+      {
+        path: "schema",
+        component: PackageSchemaComponent
+      }
+    ]
   }
 ]
 

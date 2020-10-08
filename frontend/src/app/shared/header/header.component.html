@@ -3,7 +3,7 @@
     <div class="col-md-8 col-sm-12">
         <div class="d-flex flex-row bd-highlight">
             <div class="p-2 bd-highlight align-self-center">
-                <h1 class="title mr-4 mb-0"><a routerLink="/home">datapm</a></h1></div>
+                <h1 class="title mr-4 mb-0"><a (click)="goHome()">datapm</a></h1></div>
             <div class="p-2 bd-highlight w-100">
                 <div class="input-group mt-1 search-box">
                     <form [formGroup]="searchFormGroup" (ngSubmit)="search()" class="search-form">

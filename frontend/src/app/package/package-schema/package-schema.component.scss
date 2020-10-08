@@ -1,0 +1,206 @@
+#packageSchema {
+    padding: 40px 10px;
+
+    .package-details {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 10px;
+        line-height: 13px;
+        letter-spacing: -0.28px;
+        color: #828282;
+    }
+
+    .package-privacy {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 10px;
+        line-height: 13px;
+        letter-spacing: -0.28px;
+        color: #00A896;
+    }
+
+    .package-title {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 20px;
+        line-height: 26px;
+        letter-spacing: -0.28px;
+        color: #4F4F4F;
+        margin-bottom: 10px;
+    }
+
+    .package-light-gray {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: 300;
+        font-size: 14px;
+        line-height: 18px;
+        letter-spacing: -0.28px;
+        color: #828282;
+        margin-bottom: 5px;
+    }
+
+    .package-dark-gray {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 18px;
+        letter-spacing: -0.28px;
+        color: #4F4F4F;
+        margin-bottom: 5px;
+    }
+
+    .first-div {
+        padding-top: 15px;
+
+        .first-div-title {
+            font-family: Roboto Mono;
+            font-style: normal;
+            font-weight: 300;
+            font-size: 20px;
+            line-height: 26px;
+            letter-spacing: -0.28px;
+            color: #828282;
+            margin-bottom: 5px;
+        }
+
+        .first-div-text {
+            font-family: Roboto Mono;
+            font-style: normal;
+            font-weight: 300;
+            font-size: 10px;
+            line-height: 13px;
+            letter-spacing: -0.28px;
+            color: #4F4F4F;
+        }
+    }
+
+    .second-div {
+        padding-top: 15px;
+
+        .second-div-title {
+            font-family: Roboto Mono;
+            font-style: normal;
+            font-weight: 300;
+            font-size: 20px;
+            line-height: 26px;
+            letter-spacing: -0.28px;
+            color: #828282;
+            margin-bottom: 5px;
+        }
+
+        .second-div-text {
+            font-family: Roboto Mono;
+            font-style: normal;
+            font-weight: 300;
+            font-size: 10px;
+            line-height: 13px;
+            letter-spacing: -0.28px;
+            color: #4F4F4F;
+        }
+    }
+
+    .example-action-buttons {
+        padding-bottom: 20px;
+    }
+
+    .example-headers-align {
+        .mat-expansion-panel {
+            box-shadow: none;
+            .mat-expansion-panel-header {
+                padding: 0px 4px 0px 0px;
+                .mat-expansion-panel-header-title {
+                    flex-basis: 0;
+                    font-family: Roboto Mono;
+                    font-style: normal;
+                    font-weight: normal;
+                    font-size: 14px;
+                    line-height: 18px;
+                    letter-spacing: -0.28px;
+                    color: #4F4F4F;
+                }
+            }
+            .mat-expansion-panel-header-description {
+                flex-basis: 0;
+                justify-content: flex-end;
+                align-items: center;
+                margin-right: 4px;
+                span {
+                    flex-basis: 0;
+                    font-family: Roboto Mono;
+                    font-style: normal;
+                    font-weight: normal;
+                    font-size: 14px;
+                    line-height: 18px;
+                    letter-spacing: -0.28px;
+                    color: #4F4F4F;
+                    padding-right: 30px;
+                }
+                a {
+                    font-family: Roboto Mono;
+                    font-style: normal;
+                    font-weight: normal;
+                    font-size: 14px;
+                    line-height: 18px;
+                    display: flex;
+                    align-items: center;
+                    text-align: right;
+                    letter-spacing: -0.28px;
+                    color: #828282;
+                    padding-right: 6px;
+                    border-bottom: 1px solid #ddd;
+                }
+            }
+            .mat-form-field {
+                + {
+                    .mat-form-field {
+                        margin-left: 8px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+::ng-deep #packageSchema {
+    .mat-expansion-panel-content {
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        .mat-expansion-panel-body {
+            padding: 16px 22px 6px 22px;
+        }
+    }
+    .mat-expansion-indicator::after {
+        position: relative;
+        bottom: 3px;
+    }
+}
+
+@media (max-width: 576px) {
+    #packageSchema {
+        .package-title {
+            font-size: 18px;
+        }
+        .example-headers-align {
+            .mat-expansion-panel {
+                .mat-expansion-panel-header {
+                    .mat-expansion-panel-header-title {
+                        font-size: 12px;
+                    }
+                }
+                .mat-expansion-panel-header-description {
+                    span {
+                        font-size: 12px;
+                    }
+                    a {
+                        font-size: 12px;
+                    }
+                }
+            }
+        }
+    }
+}

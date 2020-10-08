@@ -6,7 +6,6 @@ import {
   Context,
 } from "./context";
 import { PackageRepository } from "./repository/PackageRepository";
-import { PackagePermissionRepository } from "./repository/PackagePermissionRepository";
 import {
   MutationResolvers,
   QueryResolvers,
@@ -46,7 +45,7 @@ import { login, logout } from "./resolvers/AuthResolver";
 import { createMe, disableMe, updateMe } from "./resolvers/UserResolver";
 import { createAPIKey, deleteAPIKey } from "./resolvers/ApiKeyResolver";
 import { Collection } from "./entity/Collection";
-import { catalogPackagesForUser, createPackage, disablePackage, findPackage, findPackageIdentifier, findPackagesForCollection, getLatestPackages, removePackagePermissions, searchPackages, setPackagePermissions, updatePackage } from "./resolvers/PackageResolver";
+import { catalogPackagesForUser, createPackage, disablePackage, findPackage, findPackageCreator, findPackageIdentifier, findPackagesForCollection, getLatestPackages, removePackagePermissions, searchPackages, setPackagePermissions, updatePackage } from "./resolvers/PackageResolver";
 
 export const resolvers: {
   Query: QueryResolvers;
@@ -157,7 +156,16 @@ export const resolvers: {
         collectionSlug: collection.collectionSlug,
       };
     },
-    packages: findPackagesForCollection
+    packages: findPackagesForCollection,
+    creator: async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+      const collection = parent as Collection;
+
+      return await context
+        .connection
+        .getCustomRepository(UserRepository)
+        .findOneOrFail({where: {id: collection.creatorId}, relations: getGraphQlRelationName(info)
+      })
+    }
   },
 
   Package: {
@@ -187,7 +195,8 @@ export const resolvers: {
       return version;
     },
 
-    identifier: findPackageIdentifier
+    identifier: findPackageIdentifier,
+    creator: findPackageCreator
   },
 
   Version: {

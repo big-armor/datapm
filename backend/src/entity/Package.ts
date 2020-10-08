@@ -12,6 +12,7 @@ import { BaseModel } from "./BaseModel";
 import { Catalog } from "./Catalog";
 import { Version } from "./Version";
 import { PackageIdentifier } from "../generated/graphql";
+import { User } from "./User";
 
 @Entity({
   name: "package",
@@ -62,6 +63,12 @@ export class Package extends BaseModel {
   @JoinColumn({ name: "catalog_id" })
   versions: Version[];
 
+  @ManyToOne(() => User)
+  @JoinColumn({ name: "creator_id" })
+  creator: User;
+
+  @Column({ name: "creator_id", nullable: false })
+  public creatorId: number;
 
   /** These are dummy values that are filled in by graphql responses */
   latestVersion:Version;

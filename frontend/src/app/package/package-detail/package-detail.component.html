@@ -1,0 +1,101 @@
+<!-- <h3 *ngIf="state == State.LOADING">Loading</h3>
+
+<div>
+    <h3>{{packageQuery.package.displayName}}</h3>
+    <div>
+        <a routerLink="/{{packageQuery.package.identifier.catalogSlug}}">{{packageQuery.package.identifier.catalogSlug}}</a>/{{packageQuery.package.identifier.packageSlug}}</div>
+
+    <p>{{packageQuery.package.description}}</p>
+
+    <p>{{packageQuery.package.latestVersion.identifier.versionMajor}}.{{packageQuery.package.latestVersion.identifier.versionMinor}}.{{packageQuery.package.latestVersion.identifier.versionPatch}}</p>
+
+    <p>Use the following command to fetch this package</p>
+    <p>{{generateFetchCommand()}}</p>
+
+    <hr>
+    <div *ngFor="let schema of packageFile.schemas">
+        <h3>{{schema.$id}}</h3>
+        <ul>
+            <li *ngFor="let property of schema.properties | keyvalue">
+                {{property.key}} -
+                [<span *ngFor="let valueType of property.value.valueTypes | keyvalue">{{valueType.key}} {{(valueType.value.recordCount/schema.recordCount)* 100}}%</span>]
+                <ul>
+                    <li *ngIf="property.value.description != null">{{property.value.description}}</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div> -->
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-11 col-md-12" id="packageDetails">
+            <div class="row">
+                <div class="col-lg-7 col-md-7 col-sm-12 left-div">
+                    <div class="d-flex bd-highlight mb-3">
+                        <div class="py-2 bd-highlight package-details">3.4.0</div>
+                        <div class="p-2 bd-highlight package-privacy"> ·</div>
+                        <div class="py-2 bd-highlight package-privacy">public</div>
+                        <div class="ml-auto p-2 bd-highlight package-details">Updated 5 min.</div>
+                      </div>
+                      <div class="package-info">
+                        <div class="package-title">catalog-name/package-name</div>
+                        <div class="package-light-gray">About</div>
+                        <div class="package-dark-gray">Longer description, lorem ipsum dolor sit amet, consectetur adipiscing elit. Bibendum morbi tincidunt ultrices vitae nisl pulvinar enim mauris aenean. Tristique justo et ipsum turpis tellus faucibus vel. Venenatis, tristique at amet enim mauris nulla facilisis. Pharetra blandit non consequat curabitur nunc, condimentum id mauris. At leo enim dolor faucibus felis, nunc fermentum et magnis. Amet eu volutpat at cras sit interdum facilisis nec. Sed mauris elit in et habitant commodo sem condimentum. Adipiscing feugiat diam turpis faucibus. Odio curabitur auctor quis sit tortor.</div>
+                        <div class="package-light-gray mt-4">Availability</div>
+                        <div class="package-dark-gray">free / batch</div>
+                        <div class="package-light-gray mt-3">Keywords</div>
+                        <div class="package-dark-gray">none</div>
+                      </div>
+                </div>
+                <div class="col-lg-5 col-md-5 col-sm-12 right-div">
+
+                    <div class="package-light-gray">Install</div>
+                    <div class="rounded-div">
+                        <span class="install-txt">> sample code?</span>
+                    </div>
+
+                    <div class="package-actions py-2">
+                        <div class="d-flex bd-highlight py-2">
+                          <div class="bd-highlight mr-4">
+                            <button mat-fab class="person-menu" aria-label="Example icon button with a delete icon">
+                              <mat-icon>star_border</mat-icon>
+                            </button>
+                            <span class="px-2 content-nr">47</span>
+                          </div>
+                          <div class="bd-highlight">
+                            <button mat-fab class="person-menu" aria-label="Example icon button with a delete icon">
+                              <mat-icon>collections</mat-icon>
+                            </button>
+                            <span class="px-2 content-nr">add to collection</span>
+                          </div>
+                        </div>
+                    </div>
+
+                    <div class="row p-2">
+                        <div class="col-lg-6 col-md-6 col-sm-4 mb-4">
+                            <p class="package-light-gray">version</p>
+                            <p class="package-dark-gray">3.4.0</p>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-8 mb-4">
+                            <p class="package-light-gray">license</p>
+                            <p class="package-dark-gray">MIT</p>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-4 mb-4">
+                            <p class="package-light-gray">unpacked size</p>
+                            <p class="package-dark-gray">24.7 kB</p>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-8 mb-4">
+                            <p class="package-light-gray">data types</p>
+                            <p class="package-dark-gray">5</p>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 mb-4">
+                            <p class="package-light-gray">issues</p>
+                            <p class="package-dark-gray">4</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
