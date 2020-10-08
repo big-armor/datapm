@@ -24,6 +24,7 @@
   "homepage": "https://github.com/big-armor/datapm-registry#readme",
   "dependencies": {},
   "devDependencies": {
+    "prettier": "^2.1.2",
     "gulp": "^4.0.2"
   }
 }
