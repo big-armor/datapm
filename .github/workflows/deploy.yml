@@ -20,11 +20,11 @@ jobs:
     - name: Install Docker Build Dependencies
       run: npm install gulp      
 
-    - name: Run Prettier linter 
-      uses: wearerequired/lint-action@v1.6.0
-      with:
-        github_token: ${{ secrets.github_token }}
-        prettier: true
+    # - name: Run Prettier linter 
+    #   uses: wearerequired/lint-action@v1.6.0
+    #   with:
+    #     github_token: ${{ secrets.github_token }}
+    #     prettier: true
 
 
     - name: Build Docker Container
