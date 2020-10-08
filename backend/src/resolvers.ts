@@ -6,14 +6,12 @@ import {
   Context,
 } from "./context";
 import { PackageRepository } from "./repository/PackageRepository";
-import { PackagePermissionRepository } from "./repository/PackagePermissionRepository";
 import {
   MutationResolvers,
   QueryResolvers,
   UserResolvers,
   UserCatalogResolvers,
   CatalogResolvers,
-  Permission,
   PackageResolvers,
   VersionResolvers,
   VersionConflict,
@@ -46,6 +44,7 @@ import { login, logout } from "./resolvers/AuthResolver";
 import { createMe, disableMe, updateMe } from "./resolvers/UserResolver";
 import { createAPIKey, deleteAPIKey } from "./resolvers/ApiKeyResolver";
 import { Collection } from "./entity/Collection";
+import { catalogPackagesForUser, createPackage, disablePackage, findPackage, findPackageCreator, findPackageIdentifier, findPackagesForCollection, getLatestPackages, removePackagePermissions, searchPackages, setPackagePermissions, updatePackage } from "./resolvers/PackageResolver";
 
 export const resolvers: {
   Query: QueryResolvers;
@@ -145,22 +144,7 @@ export const resolvers: {
       };
 
     },
-    packages: async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
-
-      const catalog = parent as Catalog;
-
-      const packages = await context
-        .connection
-        .getCustomRepository(PackageRepository)
-        .catalogPackagesForUser(
-          {
-            catalogId: catalog.id,
-            user: context.me,
-            relations: getGraphQlRelationName(info)
-          });
-
-      return packages;
-    }
+    packages: catalogPackagesForUser
   },
   Collection: {
     identifier: async (parent: any, _1: any) => {
@@ -171,14 +155,7 @@ export const resolvers: {
         collectionSlug: collection.collectionSlug,
       };
     },
-    packages: async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
-      const collection = parent as Collection;
-
-      return await context
-        .connection
-        .getCustomRepository(PackageRepository)
-        .findPackagesForCollection(context.me.id, collection.id, getGraphQlRelationName(info));
-    },
+    packages: findPackagesForCollection,
     creator: async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
       const collection = parent as Collection;
 
@@ -217,31 +194,8 @@ export const resolvers: {
       return version;
     },
 
-    identifier: async (parent: any, _1: any, context: AuthenticatedContext) => {
-
-      const packageEntity = parent as Package;
-
-      // Find the catalog
-      const catalog = await context.connection.getRepository(Catalog).findOneOrFail({id: packageEntity.catalogId });
-
-      return {
-        registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
-        registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
-        catalogSlug: catalog.slug,
-        packageSlug: packageEntity.slug
-      };
-
-    },
-
-    creator: async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
-      const packageEntity = parent as Package;
-
-      return await context
-        .connection
-        .getCustomRepository(UserRepository)
-        .findOneOrFail({where: {id: packageEntity.creatorId}, relations: getGraphQlRelationName(info)
-      })
-    }
+    identifier: findPackageIdentifier,
+    creator: findPackageCreator
   },
 
   Version: {
@@ -341,18 +295,8 @@ export const resolvers: {
 
     },
 
-    package: async (_0: any, { identifier }, context: AuthenticatedContext, info: any) => {
-      
-      const packageEntity = await context.connection.getCustomRepository(PackageRepository).findPackage({
-        identifier,
-        relations: getGraphQlRelationName(info),
-      });
-
-      if(packageEntity == null)
-        throw new UserInputError("PACKAGE_NOT_FOUND");
-
-      return packageEntity;
-    },
+    package: findPackage,
+    latestPackages: getLatestPackages,
 
     collection: findCollectionBySlug,
     collections: findCollectionsForAuthenticatedUser,
@@ -403,25 +347,7 @@ export const resolvers: {
       }
     },
 
-    searchPackages: async(
-      _0: any,
-      {query, limit, offSet},
-      context: AuthenticatedContext,
-      info: any
-    ) => {
-
-      const [searchResponse,count] = await context
-        .connection
-        .manager
-        .getCustomRepository(PackageRepository)
-        .search({user: context.me, query,limit, offSet, relations: getRelationNames(graphqlFields(info).packages)});
-
-      return {
-        hasMore: count - (offSet + limit) > 0,
-        packages: searchResponse,
-        count
-      }
-    },
+    searchPackages: searchPackages,
     
     usernameAvailable: async(
       _0: any,
@@ -543,104 +469,12 @@ export const resolvers: {
         });
     },
 
-    
-   
-    createPackage: async (
-      _0: any,
-      { value },
-      context: AuthenticatedContext,
-      info: any
-    ) => {
-      try {
-        return context
-        .connection
-        .getCustomRepository(PackageRepository)
-        .createPackage({
-          userId: context.me?.id,
-          packageInput: value,
-          relations: getGraphQlRelationName(info),
-        });
-      } catch(error) {
-        if(error.message == "CATALOG_NOT_FOUND") {
-          throw new UserInputError("CATALOG_NOT_FOUND");
-        }
-        
-        throw new ApolloError("UNKNOWN_ERROR");
-      }
-    },
+    createPackage: createPackage,
+    updatePackage: updatePackage,
+    disablePackage: disablePackage,
 
-    updatePackage: async (
-      _0: any,
-      { identifier, value },
-      context: AuthenticatedContext,
-      info: any
-    ) => {
-
-      if(value.newCatalogSlug) {
-        // check that this user has the right to move this package to a different catalog
-        const hasPermission = await context.connection.getCustomRepository(UserCatalogPermissionRepository).userHasPermission({
-          username: context.me.username,
-          catalogSlug: value.newCatalogSlug,
-          permission: Permission.CREATE,
-        });
-
-        if(!hasPermission)
-          throw new Error("You do not have Edit permission for this package");
-
-      }
-
-
-      return context.connection.getCustomRepository(PackageRepository).updatePackage({
-        catalogSlug: identifier.catalogSlug,
-        packageSlug: identifier.packageSlug,
-        packageInput: value,
-        relations: getGraphQlRelationName(info),
-      });
-    },
-
-    disablePackage: async (
-      _0: any,
-      { identifier },
-      context: AuthenticatedContext,
-      info: any
-    ) => {
-      return context.connection.getCustomRepository(PackageRepository).disablePackage({
-        identifier,
-        relations: getGraphQlRelationName(info),
-      });
-
-
-    },
-
-    setPackagePermissions: async (
-      _0: any,
-      { identifier, value: { username, permissions }},
-      context: AuthenticatedContext,
-      info: any
-    ) => {
-       return context.connection
-        .getCustomRepository(PackagePermissionRepository)
-        .setPackagePermissions({
-          identifier,
-          username,
-          permissions,
-          relations: getGraphQlRelationName(info),
-        });
-
-    },
-
-    removePackagePermissions: async (
-      _0: any,
-      { identifier, username },
-      context: AuthenticatedContext) => {
-      
-      context.connection
-        .getCustomRepository(PackagePermissionRepository)
-        .removePackagePermission({
-          identifier,
-          username
-        });
-    },
+    setPackagePermissions: setPackagePermissions,
+    removePackagePermissions: removePackagePermissions,
 
     createCollection: createCollection,
     updateCollection: updateCollection,
@@ -703,7 +537,7 @@ export const resolvers: {
 
           const savedVersion = await transaction
           .getCustomRepository(VersionRepository)
-          .save(identifier,value);
+            .save(context.me.id, identifier, value);
 
           const ALIAS = "findVersion";
           const recalledVersion = await transaction
