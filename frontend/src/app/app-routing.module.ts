@@ -14,6 +14,9 @@ import { FollowingComponent } from './homepage/following/following.component';
 import { PackageComponent } from './package/package.component';
 import { PackageVersionComponent } from './package/package-version/package-version.component';
 import { PackageSchemaComponent } from './package/package-schema/package-schema.component';
+import { DetailsComponent } from './my-account/details/details.component';
+import { PackagesComponent } from './my-account/packages/packages.component';
+import { ActivityComponent } from './my-account/activity/activity.component';
 
 const staticRoutes:Route[] = [
   {
@@ -54,7 +57,26 @@ const staticRoutes:Route[] = [
   {
     path: "me",
     component: MyAccountComponent,
-    canActivate: [AuthGuard]
+    // canActivate: [AuthGuard]
+    children: [
+      {
+        path: 'details',
+        redirectTo: "",
+        pathMatch: "full"
+      },
+      {
+        path: "",
+        component: DetailsComponent
+      },
+      {
+        path: "packages",
+        component: PackagesComponent
+      },
+      {
+        path: "activity",
+        component: ActivityComponent
+      },
+    ]
   },
   {
     path: ":catalogSlug",
