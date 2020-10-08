@@ -12,7 +12,6 @@ import {
   UserResolvers,
   UserCatalogResolvers,
   CatalogResolvers,
-  Permission,
   PackageResolvers,
   VersionResolvers,
   VersionConflict,
