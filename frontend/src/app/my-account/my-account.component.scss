@@ -177,19 +177,24 @@
                 #homeRoutes {
                     li {
                         a {
-                            font-size: 13px;
+                            font-size: 11px;
                             padding: 0px 8px 4px 8px;
                             margin: 0px 6px;
                         }
                     }
                 }
                 .user-following {
+                    padding-left: 10px !important;
                     div {
                         font-size: 10px;
                     }
                 }
                 .user-bio {
                     font-size: 10px;
+                    padding-left: 10px !important;
+                }
+                .edit-profile {
+                    margin-left: 10px !important;
                 }
             }
         }
