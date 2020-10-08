@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ApolloTestingModule } from 'apollo-angular/testing';
 
 import { LatestComponent } from './latest.component';
 
@@ -8,7 +9,8 @@ describe('LatestComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ LatestComponent ]
+      declarations: [ LatestComponent ],
+      imports: [ ApolloTestingModule ]
     })
     .compileComponents();
   }));
