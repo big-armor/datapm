@@ -49,8 +49,8 @@ async function findPackage(
     .findOneOrFail({where: {slug: catalogSlug }});
 
   const packageEntity = await manager
-    .getRepository(Package)
-    .findOne({where: {catalogId: catalog.id, slug: packageSlug, isActive: true}, relations: relations});
+  .getRepository(Package)
+  .findOne({where: {catalogId: catalog.id, slug: packageSlug, isActive: true}, relations: relations});
 
   return packageEntity || null;
 }
@@ -234,14 +234,14 @@ export class PackageRepository {
   }): Promise<Package> {
     return this.manager.nestedTransaction(async (transaction) => {
       const catalog = await transaction.getCustomRepository(CatalogRepository).findCatalogBySlug({slug: packageInput.catalogSlug});
-
+      
       if(catalog == undefined) {
         throw new Error("CATALOG_NOT_FOUND");
       }
 
       const packageEntity = transaction.getRepository(Package).create();
 
-      // packageEntity.creatorId = userId;
+      packageEntity.creatorId = userId;
       packageEntity.catalogId = catalog.id;
       packageEntity.displayName = packageInput.displayName;
       packageEntity.slug = packageInput.packageSlug;
@@ -423,28 +423,20 @@ export class PackageRepository {
     limit: number;
     offSet: number;
     relations?: string[];
-  }):Promise<[Package[],number]>  {
-
+  }): Promise<[Package[], number]>  {
     const ALIAS = "search";
-
 
      const packages = this.createQueryBuilderWithUserConditions(user)
         .andWhere(
         `(displayName_tokens @@ to_tsquery(:query) OR description_tokens @@ to_tsquery(:query) OR slug LIKE :queryLike)`,
         {
           query,
-          queryLike: query + "%"
+          queryLike: query + "%",
         })
-        
         .limit(limit).offset(offSet)
-        .addRelations(ALIAS,relations)
+        .addRelations(ALIAS, relations)
         .getManyAndCount();
 
-  
       return packages;
-
-
   }
-
-
 }

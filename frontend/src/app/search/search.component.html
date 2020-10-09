@@ -475,18 +475,18 @@
         </mat-list>
       </div>
       <div id="searchPackages" *ngIf="isPackageSelected">
-        <mat-list *ngIf="data?.searchPackages?.length; else noPackagesFound">
+        <mat-list *ngIf="packageResult?.searchPackages?.packages?.length; else noPackagesFound">
           <ng-container
-            *ngFor="let package of data.searchPackages; first as isFirst"
+            *ngFor="let package of packageResult?.searchPackages?.packages"
           >
-            <div *ngIf="isFirst" class="search-title">
+            <!-- <div class="search-title">
               Your search results for '{{ urlParams?.params?.q }}'
-            </div>
+            </div> -->
 
             <mat-list-item>
               <div class="d-flex bd-highlight mobile-row" style="width: 100%">
                 <div
-                  ngIf="package.imageUrl"
+                  *ngIf="package.imageUrl"
                   class="d-flex bd-highlight mobile-row"
                   style="width: 100%"
                 >
@@ -498,7 +498,7 @@
                 </div>
                 <div class="py-2 bd-highlight">
                   <div class="d-flex flex-column bd-highlight pt-2">
-                    <div class="bd-highlight user-name"></div>
+                    <div class="bd-highlight user-name">{{getPackageCreator(package.identifier)}}</div>
                     <div class="bd-highlight user-title">
                       <a
                         routerLink="/{{ package.identifier.catalogSlug }}/{{

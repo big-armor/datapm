@@ -7,18 +7,18 @@ import { getGraphQlRelationName } from "../util/relationNames";
 import { grantAllCollectionPermissionsForUser } from "./UserCollectionPermissionResolver";
 
 export const createCollection = async (_0: any, { value }: { value: CreateCollectionInput }, context: AuthenticatedContext, info: any) => {
-  // const val = { ...value, creatorId: context.me?.id };
+  const val = { ...value, creatorId: context.me?.id };
   
   const repository = context.connection.manager
     .getCustomRepository(CollectionRepository);
 
-  const existingCollection = await repository.findCollectionBySlug(value.collectionSlug);
+  const existingCollection = await repository.findCollectionBySlug(val.collectionSlug);
   if (existingCollection) {
     throw new Error("Collection slug is taken");
   }
 
   const relations = getGraphQlRelationName(info);
-  const createdCollection = await repository.createCollection(value, relations);
+  const createdCollection = await repository.createCollection(val, relations);
   await grantAllCollectionPermissionsForUser(context, createdCollection.id);
   return createdCollection;
 }

@@ -7,7 +7,8 @@ import { catchError, takeUntil } from 'rxjs/operators';
 import {
   SearchPackagesGQL,
   Package,
-  SearchPackagesQuery,
+  SearchPackagesQuery, 
+  PackageIdentifier
 } from 'src/generated/graphql';
 
 enum State {
@@ -36,7 +37,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   urlParams: any;
   public isStarClicked: boolean = false;
 
-  packageResult: SearchPackagesQuery;
+  public packageResult: SearchPackagesQuery;
 
   public selectedFilter: Filter = Filter.PACKAGES;
 
@@ -65,7 +66,6 @@ export class SearchComponent implements OnInit, OnDestroy {
             ({ data }) => {
               this.state = State.SUCCESS;
               this.packageResult = data;
-              console.log(data);
             },
             (_error) => (this.state = State.ERROR)
           );
@@ -86,6 +86,14 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   public get isCollectionSelected() {
     return this.selectedFilter == Filter.COLLECTIONS;
+  }
+
+  public getPackageCreator(identifier: PackageIdentifier) {
+    const pkg = this.packageResult.searchPackages.packages.find((pkg: Package) => pkg.identifier.packageSlug === identifier.packageSlug && pkg.identifier.catalogSlug === identifier.catalogSlug) as Package;
+
+    const { creator: { firstName, lastName }} = pkg;
+
+    return `${firstName ? firstName : ''} ${lastName ? lastName : ''}`.trim();
   }
 
   public clickStar(): void {

@@ -8,8 +8,9 @@ export class CollectionRepository extends Repository<Collection> {
 
   private static readonly COLLECTION_RELATION_ALIAS = "collection";
 
-  public async createCollection(collection: CreateCollectionInput, relations?: string[]): Promise<Collection> {
+  public async createCollection(collection: any, relations?: string[]): Promise<Collection> {
     const entity = new Collection();
+    entity.creatorId = collection.creatorId;
     entity.name = collection.name;
     entity.collectionSlug = collection.collectionSlug;
     entity.description = collection.description;
