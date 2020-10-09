@@ -1,19 +1,21 @@
 import { UserInputError } from "apollo-server";
 import { EntityRepository, Repository, SelectQueryBuilder } from "typeorm";
 import { Collection } from "../entity/Collection";
+import { User } from "../entity/User";
 import { CreateCollectionInput, UpdateCollectionInput } from "../generated/graphql";
 
 @EntityRepository(Collection)
 export class CollectionRepository extends Repository<Collection> {
 
-  private static readonly COLLECTION_RELATION_ALIAS = "collection";
+  private static readonly COLLECTION_RELATION_ALIAS = "Collection";
 
-  public async createCollection(collection: any, relations?: string[]): Promise<Collection> {
+  public async createCollection(creator: User, collection: CreateCollectionInput, relations?: string[]): Promise<Collection> {
     const entity = new Collection();
-    entity.creatorId = collection.creatorId;
+    entity.creatorId = creator.id;
     entity.name = collection.name;
     entity.collectionSlug = collection.collectionSlug;
     entity.description = collection.description;
+    entity.creatorId = creator.id;
 
     await this.save(entity);
     return this.findCollectionBySlugOrFail(collection.collectionSlug, relations);

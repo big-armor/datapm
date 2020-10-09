@@ -70,6 +70,12 @@ export class Package extends BaseModel {
   @JoinColumn({ name: "catalog_id" })
   versions: Version[];
 
+  @ManyToOne(() => User)
+  @JoinColumn({ name: "creator_id" })
+  creator: User;
+
+  @Column({ name: "creator_id", nullable: false })
+  public creatorId: number;
 
   /** These are dummy values that are filled in by graphql responses */
   latestVersion:Version;
