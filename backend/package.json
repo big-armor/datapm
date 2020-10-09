@@ -8,9 +8,9 @@
 		"prebuild": "rm -rf dist; npm run codegen",
 		"build": "tsc",
 		"postbuild": "gulp",
-		"start": "npx nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts",
+		"start": "nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts",
 		"start:server": "cd dist && TYPEORM_IS_DIST=true  node index.js",
-		"test": "npx jest",
+		"test": "jest",
 		"codegen": "graphql-codegen --config codegen.yml"
 	},
 	"repository": {
@@ -78,6 +78,7 @@
 		"@types/uuid": "^8.0.0",
 		"husky": "^4.3.0",
 		"jest": "^26.3.0",
+		"nodemon": "^2.0.4",
 		"pretty-quick": "^3.0.2",
 		"source-map-support": "^0.5.16",
 		"ts-jest": "^26.2.0",
