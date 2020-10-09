@@ -1,75 +1,111 @@
 <div class="dialog-wrapper" id="logIn">
-    <h1 mat-dialog-title class="dialog-title">datapm</h1>
-    <p class="dialog-description">to follow your areas of interest create <br> a datapm account with</p>
-    <mat-horizontal-stepper labelPosition="bottom" #stepper>
-        <mat-step>
-            <div mat-dialog-content>
-                <p class="text-center button-wrapper">
-                    <button mat-flat-button>
-                        <div class="d-flex flex-row bd-highlight">
-                            <div class="bd-highlight btn-image">
-                                <img src="../../../../assets/images/google-glass-logo.png" style="width: 20px; height: 20px;" alt="Button google image">
-                            </div>
-                            <div class="bd-highlight">
-                                <span class="btn-text">google</span>
-                            </div>
-                          </div>
-                    </button>
-                </p>
-                <p class="text-center button-wrapper">
-                    <button mat-flat-button>
-                        <div class="d-flex flex-row bd-highlight">
-                            <div class="bd-highlight btn-image">
-                                <img src="../../../../assets/images/github.png" style="width: 20px; height: 20px;" alt="Button github image">
-                            </div>
-                            <div class="bd-highlight">
-                                <span class="btn-text">github</span>
-                            </div>
-                          </div>
-                    </button>
-                </p>
-                <p class="text-center button-wrapper">
-                    <button mat-flat-button matStepperNext>
-                        <div class="d-flex flex-row bd-highlight">
-                            <div class="bd-highlight btn-image">
-                                <img src="../../../../assets/images/envelope.png" style="width: 20px; height: 20px;" alt="Button envelope image">
-                            </div>
-                            <div class="bd-highlight">
-                                <span class="btn-text">email</span>
-                            </div>
-                          </div>
-                    </button>
-                </p>
-            </div>
-            <div mat-dialog-actions class="button-wrapper text-center">
-                <button mat-button mat-dialog-close><span class="btn-text">Back to browse</span></button>
+  <h1 mat-dialog-title class="dialog-title">datapm</h1>
+  <p class="dialog-description">
+    to follow your areas of interest create <br />
+    a datapm account with
+  </p>
+  <mat-horizontal-stepper labelPosition="bottom" #stepper>
+    <mat-step>
+      <div mat-dialog-content>
+        <p class="text-center button-wrapper">
+          <button mat-flat-button>
+            <div class="d-flex flex-row bd-highlight">
+              <div class="bd-highlight btn-image">
+                <img
+                  src="../../../../assets/images/google-glass-logo.png"
+                  style="width: 20px; height: 20px"
+                  alt="Button google image"
+                />
               </div>
-        </mat-step>
-        <mat-step optional>
-            <form [formGroup]="loginForm" (ngSubmit)="formSubmit()" >
-                <input type="text" placeholder="username or email address" name="username" formControlName="username" autocomplete="username" class="light-inputs">
-                <br>
-                <input type="password" placeholder="Password" name="password" formControlName="password" autocomplete="current-password" class="light-inputs">
-                <p class="forgot-pass"><a href="#">Forgot password?</a></p>
-                <br>
-                <div class="alert-div">
-                    <div class="alert-warn" *ngIf="state == State.INCORRECT_LOGIN">
-                        Incorrect login information.
-                    </div>
-                    <div class="alert-warn" *ngIf="state == State.LOGIN_ERROR">
-                        There was a problem communicating or with the server. Please try again, or contact support.
-                    </div>
-                </div>
-                <div class="content-btn text-center">
-                    <button type="submit" [class.disabled]="!loginForm.valid" class="submit-btn">
-                        <span class="btn-text">Login</span>
-                    </button>
-                    <br>
-                    <button matStepperPrevious class="back-btn">
-                        <span class="btn-text">Back</span>
-                    </button>
-                </div>
-            </form>
-        </mat-step>
-      </mat-horizontal-stepper>
+              <div class="bd-highlight">
+                <span class="btn-text">google</span>
+              </div>
+            </div>
+          </button>
+        </p>
+        <p class="text-center button-wrapper">
+          <button mat-flat-button>
+            <div class="d-flex flex-row bd-highlight">
+              <div class="bd-highlight btn-image">
+                <img
+                  src="../../../../assets/images/github.png"
+                  style="width: 20px; height: 20px"
+                  alt="Button github image"
+                />
+              </div>
+              <div class="bd-highlight">
+                <span class="btn-text">github</span>
+              </div>
+            </div>
+          </button>
+        </p>
+        <p class="text-center button-wrapper">
+          <button mat-flat-button matStepperNext>
+            <div class="d-flex flex-row bd-highlight">
+              <div class="bd-highlight btn-image">
+                <img
+                  src="../../../../assets/images/envelope.png"
+                  style="width: 20px; height: 20px"
+                  alt="Button envelope image"
+                />
+              </div>
+              <div class="bd-highlight">
+                <span class="btn-text">email</span>
+              </div>
+            </div>
+          </button>
+        </p>
+      </div>
+      <div mat-dialog-actions class="button-wrapper text-center">
+        <button mat-button mat-dialog-close>
+          <span class="btn-text">Back to browse</span>
+        </button>
+      </div>
+    </mat-step>
+    <mat-step optional>
+      <form [formGroup]="loginForm" (ngSubmit)="formSubmit()">
+        <input
+          type="text"
+          placeholder="username or email address"
+          name="username"
+          formControlName="username"
+          autocomplete="username"
+          class="light-inputs"
+        />
+        <br />
+        <input
+          type="password"
+          placeholder="Password"
+          name="password"
+          formControlName="password"
+          autocomplete="current-password"
+          class="light-inputs"
+        />
+        <p class="forgot-pass"><a href="#">Forgot password?</a></p>
+        <br />
+        <div class="alert-div">
+          <div class="alert-warn" *ngIf="state == State.INCORRECT_LOGIN">
+            Incorrect login information.
+          </div>
+          <div class="alert-warn" *ngIf="state == State.LOGIN_ERROR">
+            There was a problem communicating or with the server. Please try
+            again, or contact support.
+          </div>
+        </div>
+        <div class="content-btn text-center">
+          <button
+            type="submit"
+            [class.disabled]="!loginForm.valid"
+            class="submit-btn"
+          >
+            <span class="btn-text">Login</span>
+          </button>
+          <br />
+          <button matStepperPrevious class="back-btn">
+            <span class="btn-text">Back</span>
+          </button>
+        </div>
+      </form>
+    </mat-step>
+  </mat-horizontal-stepper>
 </div>

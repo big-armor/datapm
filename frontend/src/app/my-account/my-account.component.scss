@@ -74,7 +74,8 @@
                 line-height: 13px;
                 letter-spacing: -0.28px;
                 color: #4F4F4F;
-                max-width: 35%;
+                max-width: 50%;
+                margin-bottom: 15px;
             }
 
             .edit-profile {
@@ -95,6 +96,7 @@
             }
 
             .user-following {
+                margin-top: 10px;
                 div {
                    font-family: Roboto Mono;
                     font-style: normal;
@@ -151,6 +153,7 @@
 @media (max-width: 576px) {
     .cover-image {
         margin-top: 20px;
+        height: 100px;
     }
     .user-header {
         height: unset;
@@ -158,6 +161,7 @@
     }
     #userProfile {
         .top-row {
+            top: -30px;
             .profile-div {
                 .user-img {
                     img {
@@ -169,7 +173,7 @@
                 .follow-btn {
                     padding: 0px 40px;
                     line-height: 30px;
-                    margin-bottom: 10px;
+                    margin-bottom: 5px;
                     span {
                         font-size: 14px;
                     }
@@ -185,12 +189,14 @@
                 }
                 .user-following {
                     padding-left: 10px !important;
+                    margin-top: 4px;
                     div {
                         font-size: 10px;
                     }
                 }
                 .user-bio {
                     font-size: 10px;
+                    margin-bottom: 10px;
                     padding-left: 10px !important;
                 }
                 .edit-profile {

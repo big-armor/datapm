@@ -6,6 +6,7 @@ import {
   ApolloTestingModule,
   ApolloTestingController,
 } from 'apollo-angular/testing';
+import { MaterialModule } from '../material.module';
 
 describe('MyAccountComponent', () => {
   let component: MyAccountComponent;
@@ -15,7 +16,7 @@ describe('MyAccountComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ MyAccountComponent ],
-      imports: [RouterModule.forRoot([]),ApolloTestingModule]
+      imports: [RouterModule.forRoot([]),ApolloTestingModule, MaterialModule]
     })
     .compileComponents();
   }));

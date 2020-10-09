@@ -57,7 +57,7 @@ const staticRoutes:Route[] = [
   {
     path: "me",
     component: MyAccountComponent,
-    // canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
     children: [
       {
         path: 'details',

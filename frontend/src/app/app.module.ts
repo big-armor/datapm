@@ -29,7 +29,6 @@ import { DetailsComponent } from './my-account/details/details.component';
 import { PackagesComponent } from './my-account/packages/packages.component';
 import { ActivityComponent } from './my-account/activity/activity.component';
 import { EditAccountDialogComponent } from './my-account/edit-account-dialog/edit-account-dialog.component';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @NgModule({
   declarations: [
@@ -63,8 +62,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     ReactiveFormsModule,
     FormsModule,
     SharedModule,
-    MaterialModule,
-    MatSlideToggleModule
+    MaterialModule
   ],
   providers: [],
   bootstrap: [AppComponent],
