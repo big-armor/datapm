@@ -12,7 +12,7 @@ function installBackendDepdendencies() {
 }
 
 function testBackend() {
-  return spawnAndLog("npm",["run","test:unit"], {cwd: "backend"});
+  return spawnAndLog("npm",["run","test"], {cwd: "backend"});
 }
 
 function buildBackend() {
@@ -43,8 +43,8 @@ function buildDockerImage() {
   return spawnAndLog("docker", ["build","-t","datapm-registry", ".", "-f", "docker/Dockerfile", "--no-cache"])
 }
 
-function runE2ETests() {
-  // TODO make an e2e test setup
+function runIntegrationTests() {
+  return spawnAndLog("npm",["run","test"]);
 }
 
 function tagDockerImage() {
@@ -78,7 +78,8 @@ exports.default = series(
   testFrontend,
   installDocsDepdendencies,
   buildDocs,
-  buildDockerImage
+  buildDockerImage,
+  runIntegrationTests
 );
 
 exports.deployDockerImage = series(

@@ -22,6 +22,7 @@ import { superCreateConnection } from "./util/databaseCreation";
 import jwt from 'express-jwt';
 import { getEnvVariable } from "./util/getEnvVariable";
 import fs from 'fs';
+import { Connection } from "typeorm";
 
 const nodeModulesDirectory = getEnvVariable("NODE_MODULES_DIRECTORY", "node_modules");
 const dataLibPackageFile = fs.readFileSync(nodeModulesDirectory + "/datapm-lib/package.json")
@@ -43,8 +44,26 @@ async function main() {
   await getSecretVariable("SENDGRID_API_KEY");
   await setAppEngineServiceAccountJson();
 
-  const connection = await superCreateConnection();
 
+  let connection:Connection;
+
+  try {
+
+    connection = await superCreateConnection();
+
+  } catch (err) {
+    console.error("Error connecting to database, waiting 5 seconds and retrying one time");
+    console.error(err);
+    setTimeout(async ()=> {
+
+      try {
+        connection = await superCreateConnection();
+      } catch(error) {
+        console.error("Error connecting to database a second time. exiting");
+        console.error(err);
+      }
+    }, 5000);
+  }
   // if the GRAPHQL_CONTEXT_USER_SUB environment variable is set, get me context
   // from GRAPHQL_CONTEXT_USER_SUB, else, get it from the express request object
   // GRAPHQL_CONTEXT_USER_SUB should not be set in packageion

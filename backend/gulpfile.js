@@ -1,11 +1,19 @@
 const { series, src, dest } = require("gulp");
 const exec = require("child_process").exec;
 const path = require("path");
+var del = require('del');
 
 const DESTINATION_DIR = path.join(__dirname, "dist");
 console.log(DESTINATION_DIR);
 
-function copyFiles() {
+function moveBuiltFiles() {
+  return src("dist/src/*").pipe(dest(DESTINATION_DIR));
+}
+function deleteBuildDirectories() {
+  return   del(["dist/src","dist/test"]);
+}
+
+function copyResources() {
   return src([
     "ormconfig.js",
     "package.json",
@@ -28,4 +36,4 @@ function execLogCb(err, stdout, stderr) {
 
 
 
-exports.default = series(copyFiles,copyModules);
+exports.default = series(moveBuiltFiles,deleteBuildDirectories,copyResources,copyModules);
