@@ -40,7 +40,9 @@
       <div class="d-flex bd-highlight user-header" style="height: 80px">
         <div class="p-2 bd-highlight">
           <a class="user-img"
-            ><img src="../../assets/images/user-female.jpg" alt="User profile image"
+            ><img
+              src="../../assets/images/user-female.jpg"
+              alt="User profile image"
           /></a>
         </div>
         <div class="p-2 bd-highlight">
@@ -69,10 +71,14 @@
       </div>
       <div class="user-menu">
         <ul class="p-0" id="homeRoutes">
-          <li *ngFor="let route of routes; let i = index" class="list-names" (click)="selectTab(i)">
-                <a class="cursor-pointer" [class.active]="i == selectedTab">
-                  {{route.linkName}}
-                </a>
+          <li
+            *ngFor="let route of routes; let i = index"
+            class="list-names"
+            (click)="selectTab(i)"
+          >
+            <a class="cursor-pointer" [class.active]="i == selectedTab">
+              {{ route.linkName }}
+            </a>
           </li>
         </ul>
       </div>
