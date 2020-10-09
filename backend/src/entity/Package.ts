@@ -46,13 +46,6 @@ export class Package extends BaseModel {
   })
   description: string | null
 
-  @ManyToOne(() => User, { eager: true })
-  @JoinColumn({ name: "managed_by_id", referencedColumnName: "id"})
-  creator: User;
-
-  @Column({ name: "managed_by_id"})
-  creatorId: number;
-
   @ManyToOne(() => Catalog)
   @JoinColumn({ name: "catalog_id" })
   catalog: Catalog;
