@@ -22,6 +22,12 @@ h1.title {
   }
 }
 
+button.mat-menu-item {
+  &:focus {
+    outline: transparent solid 0px !important;
+  }
+}
+
 .main-menu-title {
   font-family: Roboto Mono;
   font-style: normal;
@@ -48,6 +54,9 @@ h1.title {
       font-size: 32px;
       width: unset;
       height: 35px;
+      &:focus {
+        outline: transparent solid 0px !important;
+      }
     }
   }
 }

@@ -47,7 +47,7 @@
         min-height: unset;
         .save-btn {
             position: relative;
-            top: 4px;
+            top: 10px;
             padding: 5px 20px;
             box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
             border-radius: 24px;
@@ -118,10 +118,39 @@
                 line-height: 18px;
                 letter-spacing: -0.28px;
                 color: #4F4F4F;
-                width: 130px;
+                width: 135px;
             }
 
             .div-answer {
+                width: 100%;
+                textarea {
+                    border: none !important;
+                    font-family: Roboto Mono;
+                    font-style: normal;
+                    font-weight: normal;
+                    font-size: 14px;
+                    display: flex;
+                    align-items: flex-end;
+                    letter-spacing: -0.28px;
+                    color: #017FB9;
+
+                    &:focus {
+                        outline: transparent solid 0px;
+                        box-shadow: none;
+                    }
+
+                    &::placeholder {
+                        font-family: Roboto Mono;
+                        font-style: normal;
+                        font-weight: 300;
+                        font-size: 14px;
+                        line-height: 18px;
+                        display: flex;
+                        align-items: flex-end;
+                        letter-spacing: -0.28px;
+                        color: #828282;
+                    }
+                }
                 input {
                     height: 35px;
                     border: none !important;
