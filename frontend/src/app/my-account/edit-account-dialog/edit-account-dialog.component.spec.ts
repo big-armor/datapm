@@ -1,4 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { MaterialModule } from 'src/app/material.module';
 
 import { EditAccountDialogComponent } from './edit-account-dialog.component';
 
@@ -8,7 +10,8 @@ describe('EditAccountDialogComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ EditAccountDialogComponent ]
+      declarations: [ EditAccountDialogComponent ],
+      imports: [MaterialModule, RouterTestingModule]
     })
     .compileComponents();
   }));
