@@ -18,13 +18,19 @@
       <p class="small-paragraph">public</p>
 
       <div class="d-flex bd-highlight shadow-div mb-3">
-        <div class="pl-4 py-2 bd-highlight div-question">name</div>
+        <div class="px-4 py-2 bd-highlight div-question">first name </div>
         <div class="bd-highlight div-answer">
-          <input
-            type="email"
-            class="form-control"
-            placeholder="Add your name"
-          />
+          <input [formControl]="firstName" type="text" class="form-control" placeholder="First name">
+        </div>
+        <div class="ml-auto px-4 py-2 bd-highlight slide-right">
+          <mat-slide-toggle [formControl]="nameIsPublic" isChecked="nameIsPublic"></mat-slide-toggle>
+        </div>
+      </div>
+
+      <div class="d-flex bd-highlight shadow-div mb-3">
+        <div class="px-4 py-2 bd-highlight div-question">last name </div>
+        <div class="bd-highlight div-answer">
+          <input [formControl]="lastName" type="text" class="form-control" placeholder="Last name">
         </div>
         <div class="ml-auto px-4 py-2 bd-highlight slide-right">
           <mat-slide-toggle></mat-slide-toggle>
@@ -32,13 +38,9 @@
       </div>
 
       <div class="d-flex bd-highlight shadow-div mb-3">
-        <div class="pl-4 py-2 bd-highlight div-question">user name</div>
+        <div class="px-4 py-2 bd-highlight div-question">username </div>
         <div class="bd-highlight div-answer">
-          <input
-            type="email"
-            class="form-control"
-            placeholder="Add your user-name"
-          />
+          <input [formControl]="username" type="text" class="form-control" placeholder="Add your username">
         </div>
         <div class="ml-auto px-4 py-2 bd-highlight slide-right">
           <mat-slide-toggle></mat-slide-toggle>
@@ -56,13 +58,9 @@
       </div>
 
       <div class="d-flex bd-highlight shadow-div mb-3">
-        <div class="pl-4 py-2 bd-highlight div-question">location</div>
+        <div class="px-4 py-2 bd-highlight div-question">location </div>
         <div class="bd-highlight div-answer">
-          <input
-            type="email"
-            class="form-control"
-            placeholder="Add your location"
-          />
+          <input [formControl]="location" type="email" class="form-control" placeholder="Add your location">
         </div>
         <div class="ml-auto px-4 py-2 bd-highlight slide-right">
           <mat-slide-toggle></mat-slide-toggle>
@@ -70,13 +68,9 @@
       </div>
 
       <div class="d-flex bd-highlight shadow-div mb-3">
-        <div class="pl-4 py-2 bd-highlight div-question">website</div>
+        <div class="px-4 py-2 bd-highlight div-question">website </div>
         <div class="bd-highlight div-answer">
-          <input
-            type="email"
-            class="form-control"
-            placeholder="Add your website"
-          />
+          <input [formControl]="website" type="email" class="form-control" placeholder="Add your website">
         </div>
         <div class="ml-auto px-4 py-2 bd-highlight slide-right">
           <mat-slide-toggle></mat-slide-toggle>
@@ -84,13 +78,9 @@
       </div>
 
       <div class="d-flex bd-highlight shadow-div mb-3">
-        <div class="pl-4 py-2 bd-highlight div-question">email</div>
+        <div class="px-4 py-2 bd-highlight div-question">email </div>
         <div class="bd-highlight div-answer">
-          <input
-            type="email"
-            class="form-control"
-            placeholder="Add your email"
-          />
+          <input [formControl]="emailAddress" type="email" class="form-control" placeholder="Add your email">
         </div>
         <div class="ml-auto px-4 py-2 bd-highlight slide-right">
           <mat-slide-toggle></mat-slide-toggle>
@@ -100,11 +90,7 @@
       <div class="d-flex bd-highlight shadow-div mb-3">
         <div class="pl-4 py-2 bd-highlight div-question">company</div>
         <div class="bd-highlight div-answer">
-          <input
-            type="email"
-            class="form-control"
-            placeholder="Add your company"
-          />
+          <input type="email" class="form-control" placeholder="Add your company" />
         </div>
         <div class="ml-auto px-4 py-2 bd-highlight slide-right">
           <mat-slide-toggle></mat-slide-toggle>
@@ -114,11 +100,7 @@
       <div class="d-flex bd-highlight shadow-div">
         <div class="pl-4 py-2 bd-highlight div-question">title</div>
         <div class="bd-highlight div-answer">
-          <input
-            type="email"
-            class="form-control"
-            placeholder="Add your title"
-          />
+          <input type="email" class="form-control" placeholder="Add your title" />
         </div>
         <div class="ml-auto px-4 py-2 bd-highlight slide-right">
           <mat-slide-toggle></mat-slide-toggle>

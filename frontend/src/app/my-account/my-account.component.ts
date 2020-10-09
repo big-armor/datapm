@@ -29,35 +29,35 @@ export class MyAccountComponent implements OnInit {
   createAPIKeyState = State.INIT;
   deleteAPIKeyState = State.INIT;
 
-  currentUser:User;
+  currentUser: User;
 
-  newAPIKey:string;
+  newAPIKey: string;
 
-  public myCatalogs:Catalog[];
-  public myAPIKeys:APIKey[];
-  public routes=[];
+  public myCatalogs: Catalog[];
+  public myAPIKeys: APIKey[];
+  public routes = [];
   public selectedTab = 0;
 
-  createAPIKeyForm:FormGroup;
+  createAPIKeyForm: FormGroup;
 
   constructor(
-    private authenticationService:AuthenticationService,
-    private router:Router,
-    private myCatalogsGQL:MyCatalogsGQL,
-    private createAPIKeyGQL:CreateAPIKeyGQL,
-    private myAPIKeysGQL:MyAPIKeysGQL,
-    private deleteAPIKeyGQL:DeleteAPIKeyGQL,
-    private changeDectorRef:ChangeDetectorRef,
+    private authenticationService: AuthenticationService,
+    private router: Router,
+    private myCatalogsGQL: MyCatalogsGQL,
+    private createAPIKeyGQL: CreateAPIKeyGQL,
+    private myAPIKeysGQL: MyAPIKeysGQL,
+    private deleteAPIKeyGQL: DeleteAPIKeyGQL,
+    private changeDectorRef: ChangeDetectorRef,
     private route: ActivatedRoute,
     public dialog: MatDialog
   ) {
     let prefix = "/me";
     this.routes = [
-      {linkName:'details', url: prefix},
-      {linkName:'packages', url:prefix + '/packages'},
-      {linkName:'activity', url:prefix +'/activity'},
+      { linkName: 'details', url: prefix },
+      { linkName: 'packages', url: prefix + '/packages' },
+      { linkName: 'activity', url: prefix + '/activity' },
     ]
-    }
+  }
 
   ngOnInit(): void {
     this.selectTab(0);
@@ -69,7 +69,7 @@ export class MyAccountComponent implements OnInit {
 
     this.authenticationService.getUserObservable().subscribe(u => {
 
-      if(u == null) {
+      if (u == null) {
         return;
       }
 
@@ -77,11 +77,11 @@ export class MyAccountComponent implements OnInit {
         this.currentUser = user;
         this.state = State.SUCCESS
       })
-      .catch(error => this.state = State.ERROR )
+        .catch(error => this.state = State.ERROR)
     });
 
     this.myCatalogsGQL.fetch().subscribe(response => {
-      if(response.errors?.length > 0) {
+      if (response.errors?.length > 0) {
         this.catalogState = State.ERROR;
         return;
       }
@@ -97,7 +97,9 @@ export class MyAccountComponent implements OnInit {
   }
 
   openEditDialog() {
-    this.dialog.open(EditAccountDialogComponent);
+    this.dialog.open(EditAccountDialogComponent, {
+      data: this.currentUser
+    });
   }
 
   public selectTab(index) {
@@ -108,8 +110,8 @@ export class MyAccountComponent implements OnInit {
   refreshAPIKeys() {
     this.apiKeysState = State.LOADING;
 
-    this.myAPIKeysGQL.fetch({},{fetchPolicy: 'no-cache'}).subscribe(response => {
-      if(response.errors?.length > 0) {
+    this.myAPIKeysGQL.fetch({}, { fetchPolicy: 'no-cache' }).subscribe(response => {
+      if (response.errors?.length > 0) {
         this.apiKeysState = State.ERROR;
         return;
       }
@@ -123,12 +125,12 @@ export class MyAccountComponent implements OnInit {
     this.createAPIKeyGQL.mutate({
       value: {
         label: this.createAPIKeyForm.value.label,
-        scopes: [Scope.MANAGE_API_KEYS,Scope.MANAGE_PRIVATE_ASSETS,Scope.READ_PRIVATE_ASSETS]
+        scopes: [Scope.MANAGE_API_KEYS, Scope.MANAGE_PRIVATE_ASSETS, Scope.READ_PRIVATE_ASSETS]
       }
     }).subscribe(response => {
-      if(response.errors?.length > 0) {
+      if (response.errors?.length > 0) {
 
-        if(response.errors.find(e => e.message == "NOT_UNIQUE")) {
+        if (response.errors.find(e => e.message == "NOT_UNIQUE")) {
           this.createAPIKeyState = State.ERROR_NOT_UNIQUE;
           return;
         }
@@ -148,11 +150,11 @@ export class MyAccountComponent implements OnInit {
     })
   }
 
-  deleteApiKey(id:string) {
+  deleteApiKey(id: string) {
     this.deleteAPIKeyState = State.LOADING;
 
-    this.deleteAPIKeyGQL.mutate({id: id}).subscribe(response => {
-      if(response.errors?.length > 0) {
+    this.deleteAPIKeyGQL.mutate({ id: id }).subscribe(response => {
+      if (response.errors?.length > 0) {
         this.deleteAPIKeyState = State.ERROR;
         return;
       }
@@ -175,18 +177,18 @@ export class MyAccountComponent implements OnInit {
 
     const hostname = getRegistryHostname();
     const protocol = getRegistryProtocol();
-    const port =  getRegistryPort();
+    const port = getRegistryPort();
     let protocolOption = "";
     let portOption = "";
 
 
-    if(protocol == "https" && port != 443) {
-          portOption = "--port " + port;
-    } else if(protocol == "http" && port != 80) {
-          portOption = " --port " + port;
+    if (protocol == "https" && port != 443) {
+      portOption = "--port " + port;
+    } else if (protocol == "http" && port != 80) {
+      portOption = " --port " + port;
     }
 
-    if(protocol == "http" ) {
+    if (protocol == "http") {
       protocolOption = " --protocol " + protocol;
     }
 
