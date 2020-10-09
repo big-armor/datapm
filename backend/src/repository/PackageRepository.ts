@@ -30,7 +30,7 @@ async function findPackageById(
     .getRepository(Package)
     .createQueryBuilder(ALIAS)
     .where({ id: packageId, isActive: true })
-    .addRelations(ALIAS,relations)
+    .addRelations(ALIAS, relations)
     .getOne();
 
   return packageEntity || null;
@@ -46,11 +46,11 @@ async function findPackage(
 
   const catalog = await manager
     .getRepository(Catalog)
-    .findOneOrFail({where: {slug: catalogSlug }});
+    .findOneOrFail({ where: { slug: catalogSlug } });
 
   const packageEntity = await manager
     .getRepository(Package)
-    .findOne({where: {catalogId: catalog.id, slug: packageSlug, isActive: true}, relations: relations});
+    .findOne({ where: { catalogId: catalog.id, slug: packageSlug, isActive: true }, relations: relations });
 
   return packageEntity || null;
 }
@@ -69,7 +69,7 @@ function validation(packageEntity: Package) {
   }
 }
 
-function setPackageDisabled(packageEntity: Package, transaction:EntityManager) {
+function setPackageDisabled(packageEntity: Package, transaction: EntityManager) {
   transaction.getCustomRepository(VersionRepository).disableVersions(packageEntity.versions);
 
   packageEntity.isActive = false;
@@ -82,13 +82,13 @@ function setPackageDisabled(packageEntity: Package, transaction:EntityManager) {
 export class PackageRepository {
 
 
-  constructor(private manager: EntityManager) {}
+  constructor(private manager: EntityManager) { }
 
   public async findPackagesForCollection(userId: number, collectionId: number, relations?: string[]): Promise<Package[]> {
     return this.manager.getRepository(Package)
       .createQueryBuilder()
       .where('("Package"."id" IN (SELECT package_id FROM collection_package WHERE collection_id = :collectionId))', { collectionId: collectionId })
-      .andWhere(AUTHENTICATED_USER_OR_PUBLIC_PACKAGES_QUERY, { userId: userId, permission: Permission.VIEW})
+      .andWhere(AUTHENTICATED_USER_OR_PUBLIC_PACKAGES_QUERY, { userId: userId, permission: Permission.VIEW })
       .addRelations("package", relations)
       .getMany();
   }
@@ -118,34 +118,34 @@ export class PackageRepository {
     relations?: string[]
   }): Promise<Package> {
 
-    const catalog = await this.manager.getRepository(Catalog).findOneOrFail({slug: identifier.catalogSlug});
+    const catalog = await this.manager.getRepository(Catalog).findOneOrFail({ slug: identifier.catalogSlug });
 
-    const packageEntity = await this.manager.getRepository(Package).findOneOrFail({where: {catalogId: catalog.id, slug: identifier.packageSlug}, relations});
+    const packageEntity = await this.manager.getRepository(Package).findOneOrFail({ where: { catalogId: catalog.id, slug: identifier.packageSlug }, relations });
 
     return packageEntity;
   }
-  
+
   async catalogPackagesForUser(
     {
       catalogId,
       user,
       relations = []
-    }:{
-      catalogId:number,
-      user:User,
-      relations?:string[]
+    }: {
+      catalogId: number,
+      user: User,
+      relations?: string[]
 
-    }):Promise<Package[]> {
+    }): Promise<Package[]> {
     const ALIAS = "packagesForUser"
 
     const packages = this.createQueryBuilderWithUserConditions(user)
       .andWhere(
         `"Package"."catalog_id" = :catalogId `,
-        {catalogId: catalogId})
-      .addRelations(ALIAS,relations)
+        { catalogId: catalogId })
+      .addRelations(ALIAS, relations)
       .getMany();
 
-      
+
 
     return packages;
   }
@@ -158,11 +158,11 @@ export class PackageRepository {
     relations?: string[];
   }): Promise<Package> {
 
-    const packageEntity = await findPackageById(this.manager,packageId,relations);
-  
-    if(packageEntity === null)
+    const packageEntity = await findPackageById(this.manager, packageId, relations);
+
+    if (packageEntity === null)
       throw new Error("PACKAGE_NOT_FOUND");
-  
+
     return packageEntity;
   }
 
@@ -175,8 +175,8 @@ export class PackageRepository {
 
   }): Promise<Package | null> {
 
-    const packageEntity = await findPackage(this.manager,identifier.catalogSlug,identifier.packageSlug, relations);
-  
+    const packageEntity = await findPackage(this.manager, identifier.catalogSlug, identifier.packageSlug, relations);
+
     return packageEntity;
 
   }
@@ -190,11 +190,11 @@ export class PackageRepository {
 
   }): Promise<Package> {
 
-    const packageEntity = await this.findPackage({identifier,relations});
-  
-    if(packageEntity == null)
+    const packageEntity = await this.findPackage({ identifier, relations });
+
+    if (packageEntity == null)
       throw new Error("PACKAGE_NOT_FOUND");
-  
+
     return packageEntity;
 
   }
@@ -234,9 +234,9 @@ export class PackageRepository {
   }): Promise<Package> {
     return this.manager.nestedTransaction(async (transaction) => {
 
-      const catalog = await transaction.getCustomRepository(CatalogRepository).findCatalogBySlug({slug: packageInput.catalogSlug});
-      
-      if(catalog == undefined) {
+      const catalog = await transaction.getCustomRepository(CatalogRepository).findCatalogBySlug({ slug: packageInput.catalogSlug });
+
+      if (catalog == undefined) {
         throw new Error("CATALOG_NOT_FOUND");
       }
 
@@ -289,30 +289,30 @@ export class PackageRepository {
   }): Promise<Package> {
     return this.manager.nestedTransaction(async (transaction) => {
       const ALIAS = "package";
-      
+
       const packageEntity = await findPackage(this.manager, catalogSlug, packageSlug, relations);
 
-      if(packageEntity === null) {
+      if (packageEntity === null) {
         throw new Error("Could not find package");
       }
 
-      if(packageInput.newCatalogSlug) {
-        packageEntity.catalogId = (await transaction.getCustomRepository(CatalogRepository).findOneOrFail({slug: packageInput.newCatalogSlug})).id;
+      if (packageInput.newCatalogSlug) {
+        packageEntity.catalogId = (await transaction.getCustomRepository(CatalogRepository).findOneOrFail({ slug: packageInput.newCatalogSlug })).id;
       }
 
-      if(packageInput.newPackageSlug) {
+      if (packageInput.newPackageSlug) {
         packageEntity.slug = packageInput.newPackageSlug;
       }
 
-      if(packageInput.displayName)
+      if (packageInput.displayName)
         packageEntity.displayName = packageInput.displayName;
 
-      if(packageInput.description)
+      if (packageInput.description)
         packageEntity.description = packageInput.description;
 
-      if(packageInput.isPublic?.valueOf() !== undefined)
+      if (packageInput.isPublic?.valueOf() !== undefined)
         packageEntity.isPublic = packageInput.isPublic?.valueOf();
-      
+
 
       validation(packageEntity);
 
@@ -347,7 +347,7 @@ export class PackageRepository {
 
       const catalogSlug = identifier.catalogSlug;
       const packageSlug = identifier.packageSlug;
-      
+
       const package_ = await transaction
         .getRepository(Package)
         .createQueryBuilder(ALIAS)
@@ -379,9 +379,9 @@ export class PackageRepository {
     relations?: string[];
   }): Promise<Package[]> {
     return this.manager.nestedTransaction(async (transaction) => {
-      
-      const returnValue:Package[] = [];
-      packages.forEach(async p =>{
+
+      const returnValue: Package[] = [];
+      packages.forEach(async p => {
         setPackageDisabled(p, transaction);
         returnValue.push(await transaction.save(p));
       })
@@ -396,16 +396,16 @@ export class PackageRepository {
     startsWith,
     relations = [],
   }: {
-    user:User,
+    user: User,
     startsWith: string;
     relations?: string[];
-  }):Promise<Package[]> {
-    
+  }): Promise<Package[]> {
+
     const ALIAS = "autoCompletePackage";
 
     const entities = this.createQueryBuilderWithUserConditions(user)
       .andWhere('LOWER("Package"."displayName") LIKE \'' + startsWith.toLowerCase() + '%\'')
-      .addRelations(ALIAS,relations)
+      .addRelations(ALIAS, relations)
       .getMany();
 
     return entities;
@@ -413,8 +413,8 @@ export class PackageRepository {
 
   async search({
     user,
-    query, 
-    limit, 
+    query,
+    limit,
     offSet,
     relations = [],
   }: {
@@ -423,28 +423,31 @@ export class PackageRepository {
     limit: number;
     offSet: number;
     relations?: string[];
-  }):Promise<[Package[],number]>  {
-
+  }): Promise<[Package[], number]> {
     const ALIAS = "search";
-
-
-     const packages = this.createQueryBuilderWithUserConditions(user)
-        .andWhere(
+    return this.createQueryBuilderWithUserConditions(user)
+      .andWhere(
         `(displayName_tokens @@ to_tsquery(:query) OR description_tokens @@ to_tsquery(:query) OR slug LIKE :queryLike)`,
         {
           query,
           queryLike: query + "%"
         })
-        
-        .limit(limit).offset(offSet)
-        .addRelations(ALIAS,relations)
-        .getManyAndCount();
-
-  
-      return packages;
-
-
+      .limit(limit).offset(offSet)
+      .addRelations(ALIAS, relations)
+      .getManyAndCount();
   }
 
-
+  async getLatestPackages(
+    user: User,
+    limit: number,
+    offSet: number,
+    relations?: string[]): Promise<[Package[], number]> {
+    const ALIAS = "latestPackages";
+    return this.createQueryBuilderWithUserConditions(user)
+      .orderBy('"Package"."created_at"', 'DESC')
+      .limit(limit)
+      .offset(offSet)
+      .addRelations(ALIAS, relations)
+      .getManyAndCount();
+  }
 }
