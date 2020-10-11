@@ -1,5 +1,6 @@
+import { ApolloError } from "apollo-server";
 import { AuthenticatedContext } from "../context";
-import { CollectionIdentifierInput, CreateCollectionInput, PackageIdentifier, PackageIdentifierInput, UpdateCollectionInput } from "../generated/graphql";
+import { CollectionIdentifierInput, CollectionPackage, CreateCollectionInput, PackageIdentifier, PackageIdentifierInput, UpdateCollectionInput } from "../generated/graphql";
 import { CollectionPackageRepository } from "../repository/CollectionPackageRepository";
 import { CollectionRepository } from "../repository/CollectionRepository";
 import { PackageRepository } from "../repository/PackageRepository";
@@ -16,7 +17,7 @@ export const createCollection = async (_0: any, { value }: { value: CreateCollec
   }
 
   const relations = getGraphQlRelationName(info);
-  const createdCollection = await repository.createCollection(value, relations);
+  const createdCollection = await repository.createCollection( context.me, value, relations);
   await grantAllCollectionPermissionsForUser(context, createdCollection.id);
   return createdCollection;
 }
@@ -43,16 +44,28 @@ export const disableCollection = async (_0: any, { identifier }: { identifier: C
     .disableCollection(identifier.collectionSlug, relations);
 }
 
-export const addPackageToCollection = async (_0: any, { collectionIdentifier, packageIdentifier }: { collectionIdentifier: CollectionIdentifierInput, packageIdentifier: PackageIdentifierInput }, context: AuthenticatedContext, info: any) => {
+export const addPackageToCollection = async (_0: any, { collectionIdentifier, packageIdentifier }: { collectionIdentifier: CollectionIdentifierInput, packageIdentifier: PackageIdentifierInput }, context: AuthenticatedContext, info: any):Promise<CollectionPackage> => {
   const repository = context.connection.manager
     .getCustomRepository(CollectionRepository);
   const collectionEntity = await repository.findCollectionBySlugOrFail(collectionIdentifier.collectionSlug);
   const identifier = packageIdentifier;
   const packageEntity = await context.connection.getCustomRepository(PackageRepository).findPackageOrFail({ identifier });
 
-  return context.connection.manager
+  await context.connection.manager
     .getCustomRepository(CollectionPackageRepository)
     .addPackageToCollection(context.me.id, collectionEntity.id, packageEntity.id);
+  
+  const relations = getGraphQlRelationName(info);
+
+  const value = await context.connection.manager
+    .getCustomRepository(CollectionPackageRepository)
+    .findByCollectionIdAndPackageId(collectionEntity.id, packageEntity.id, relations);
+
+
+  if(value == undefined) 
+    throw new ApolloError("Not able to find the CollectionPackage entry after entry. This should never happen!")
+
+  return value;
 }
 
 export const removePackageFromCollection = async (_0: any, { collectionIdentifier, packageIdentifier }: { collectionIdentifier: CollectionIdentifierInput, packageIdentifier: PackageIdentifierInput }, context: AuthenticatedContext, info: any) => {

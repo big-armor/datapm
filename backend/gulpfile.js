@@ -4,7 +4,7 @@ const path = require("path");
 var del = require('del');
 
 const DESTINATION_DIR = path.join(__dirname, "dist");
-console.log(DESTINATION_DIR);
+const SCHEMA_DIR = path.join(__dirname, "node_modules", "datapm-lib");
 
 function moveBuiltFiles() {
   return src("dist/src/*").pipe(dest(DESTINATION_DIR));
@@ -19,8 +19,11 @@ function copyResources() {
     "package.json",
     "static/robots.txt",
     "static/robots-production.txt",
-    "package-lock.json",    
-    path.join(__dirname, "node_modules", "datapm-lib", "schema.gql"),
+    "package-lock.json",
+    path.join(SCHEMA_DIR, "schema.gql"),
+    path.join(SCHEMA_DIR, "auth-schema.gql"),
+    path.join(SCHEMA_DIR, "user-schema.gql"),
+    path.join(SCHEMA_DIR, "api-key-schema.gql"),
   ]).pipe(dest(DESTINATION_DIR));
 }
 

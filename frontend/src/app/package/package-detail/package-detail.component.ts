@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Package, PackageGQL, PackageQuery } from 'src/generated/graphql';
 import { Route, ActivatedRoute } from '@angular/router';
 import * as URLParse from 'url-parse';
-import { packageToIdentifier } from '../helpers/IdentifierHelper' 
+import { packageToIdentifier } from '../../helpers/IdentifierHelper'
 import {PackageFile} from 'datapm-lib'
 
 enum State {
@@ -13,7 +13,7 @@ enum State {
 
 
 @Component({
-  selector: 'app-package-detail',
+  selector: 'package-detail',
   templateUrl: './package-detail.component.html',
   styleUrls: ['./package-detail.component.scss']
 })
@@ -49,7 +49,9 @@ export class PackageDetailComponent implements OnInit {
         }).valueChanges.subscribe(({data}) => {
           this.state = State.SUCCESS;
           this.packageQuery = data;
-          this.packageFile = JSON.parse(data.package.latestVersion.packageFile);
+          if (data.package && data.package.latestVersion) {
+            this.packageFile = JSON.parse(data.package.latestVersion.packageFile);
+          }
         });
     });
 

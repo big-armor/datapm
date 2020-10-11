@@ -2,18 +2,15 @@ import { EntityRepository, EntityManager } from "typeorm";
 import { Version } from "../entity/Version";
 import { VersionIdentifierInput, CreateVersionInput, PackageIdentifierInput } from "../generated/graphql";
 import { PackageRepository } from "./PackageRepository";
-import { Package } from "../entity/Package";
 import Maybe from "graphql/tsutils/Maybe";
 import { SemVer } from "semver";
-
-
 
 @EntityRepository()
 export class VersionRepository {
 
   constructor(private manager: EntityManager) {}
 
-  async save(identifier: PackageIdentifierInput, value: CreateVersionInput) {
+  async save(userId: number, identifier: PackageIdentifierInput, value: CreateVersionInput) {
 
     return await this.manager.nestedTransaction(async (transaction) => {
       const packageEntity = await transaction.getCustomRepository(PackageRepository)
@@ -30,6 +27,7 @@ export class VersionRepository {
           minorVersion: semVer.minor,
           patchVersion: semVer.patch,
           description: value.packageFile.description || undefined,
+          authorId: userId,
           createdAt: new Date(),
           updatedAt: new Date(value.packageFile.updatedDate),
           packageFile: value.packageFile

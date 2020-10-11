@@ -9,7 +9,9 @@ describe('AppComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule,
+        RouterTestingModule.withRoutes([
+          { path: '', component: AppComponent }
+        ]),
         MaterialModule,
         ReactiveFormsModule,
       ],

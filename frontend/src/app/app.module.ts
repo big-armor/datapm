@@ -10,7 +10,7 @@ import { LoginComponent } from './login/login.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SignupComponent } from './signup/signup.component';
 import { MyAccountComponent } from './my-account/my-account.component';
-import { PackageDetailComponent } from './package-detail/package-detail.component';
+import { PackageDetailComponent } from './package/package-detail/package-detail.component';
 import { FormsModule } from '@angular/forms';
 import { MaterialModule } from './material.module';
 import { HomepageComponent } from './homepage/homepage.component';
@@ -21,6 +21,10 @@ import { LoginDialogComponent } from './shared/header/login-dialog/login-dialog.
 import { SignUpDialogComponent } from './shared/header/sign-up-dialog/sign-up-dialog.component';
 import { LatestComponent } from './homepage/latest/latest.component';
 import { SearchComponent } from './search/search.component';
+import { FollowingComponent } from './homepage/following/following.component';
+import { PackageComponent } from './package/package.component';
+import { PackageVersionComponent } from './package/package-version/package-version.component';
+import { PackageSchemaComponent } from './package/package-schema/package-schema.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +40,11 @@ import { SearchComponent } from './search/search.component';
     LoginDialogComponent,
     SignUpDialogComponent,
     LatestComponent,
-    SearchComponent
+    SearchComponent,
+    FollowingComponent,
+    PackageComponent,
+    PackageVersionComponent,
+    PackageSchemaComponent
   ],
   imports: [
     BrowserModule,

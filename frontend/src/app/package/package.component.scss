@@ -1,0 +1,154 @@
+#packagePage {
+  ::ng-deep #matTabs .mat-tab-header {
+    border-bottom: none;
+
+    .mat-ink-bar {
+      display: none;
+      width: 90px !important;
+      background-color: white;
+    }
+
+    .mat-tab-labels {
+      .mat-tab-label {
+        height: 30px;
+        padding: 0 10px;
+        margin: 0px 10px;
+        min-width: 90px;
+
+        .mat-tab-label-content {
+          font-family: Roboto Mono;
+          font-style: normal;
+          font-weight: 300;
+          font-size: 16px;
+          line-height: 21px;
+          text-align: center;
+          letter-spacing: -0.28px;
+          color: #828282;
+        }
+      }
+
+      .mat-tab-label-active {
+        opacity: 1;
+        border-bottom: 2px solid #000;
+
+        &:active {
+          color: #000 !important;
+        }
+
+        .mat-tab-label-content {
+          color: #000 !important;
+        }
+      }
+    }
+  }
+}
+
+#packageRoutes {
+  list-style-type: none;
+  margin-bottom: 0px;
+  display: flex;
+
+  li {
+    a {
+      font-family: Roboto Mono;
+      font-style: normal;
+      font-weight: 300;
+      font-size: 16px;
+      line-height: 21px;
+      text-align: center;
+      letter-spacing: -0.28px;
+      color: #828282;
+      text-decoration: none;
+      padding: 0px 10px 4px 10px;
+      margin: 0px 10px;
+      cursor: pointer;
+    }
+  }
+
+  .active {
+    opacity: 1;
+    color: #333333 !important;
+    border-bottom: 2px solid #333333;
+  }
+}
+
+.example-large-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 16px;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.example-large-box {
+  height: 300px;
+  width: 300px;
+}
+
+.header-border {
+  border-bottom: none;
+  position: relative;
+  top: 2.18rem;
+  height: 14px;
+  border: 0;
+  margin: 6px;
+  box-shadow: 0 6px 8px -2px rgba(189, 189, 189, 0.25);
+}
+
+@media (max-width: 576px) {
+  #packagePage {
+    #packageRoutes {
+      li {
+        a {
+          font-size: 13px;
+          padding: 0px 8px 4px 8px;
+          margin: 0px 6px;
+        }
+      }
+    }
+    ::ng-deep #matTabs .mat-tab-header {
+      border-bottom: none;
+      .mat-ink-bar {
+        display: none;
+        width: 90px !important;
+      }
+      .mat-tab-labels {
+        .mat-tab-label {
+          height: 20px !important;
+          padding: 0 0px !important;
+          margin: 0px 10px !important;
+          min-width: 50px !important;
+          .mat-tab-label-content {
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  }
+  ::ng-deep #matTabs .mat-tab-header-pagination-controls-enabled .mat-tab-header-pagination {
+    display: none;
+  }
+  .no-pd-mobile {
+    padding: 0px !important;
+  }
+  .header-border {
+    top: 1.60rem;
+    height: 9px;
+    border: 0;
+    margin: 3px;
+  }
+}
+
+@media (max-width: 480px) {
+  #packageRoutes {
+    li {
+      &:first-child {
+        a {
+          margin-left: 0px !important;
+          padding-left: 0px;
+        }
+      }
+    }
+  }
+}

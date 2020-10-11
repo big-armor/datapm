@@ -1,0 +1,93 @@
+{
+ "generatedBy": "`datapm generate-package` command. Visit datapm.io to learn about the open source tools and to discover other data packages",
+ "updatedDate": "2020-10-01T15:41:58.061Z",
+ "displayName": "Country Year GDP",
+ "packageSlug": "country-year-gdp",
+ "version": "1.0.0",
+ "description": "GDP by country from 1968 to 2016",
+ "schemas": [
+  {
+   "$schema": "http://json-schema.org/draft-07/schema",
+   "$id": "gdp.csv",
+   "properties": {
+    "Country Name": {
+     "title": "Country Name",
+     "recordCount": 11507,
+     "byteCount": 276538,
+     "valueTypes": {
+      "string": {
+       "recordCount": 11507,
+       "valueType": "string",
+       "stringMaxLength": 52,
+       "stringMinLength": 4
+      }
+     },
+     "type": [
+      "string"
+     ]
+    },
+    "Country Code": {
+     "title": "Country Code",
+     "recordCount": 11507,
+     "byteCount": 69042,
+     "valueTypes": {
+      "string": {
+       "recordCount": 11507,
+       "valueType": "string",
+       "stringMaxLength": 3,
+       "stringMinLength": 3
+      }
+     },
+     "type": [
+      "string"
+     ]
+    },
+    "Year": {
+     "title": "Year",
+     "recordCount": 11507,
+     "byteCount": 92056,
+     "valueTypes": {
+      "number": {
+       "recordCount": 11507,
+       "valueType": "number",
+       "numberMaxValue": "2016",
+       "numberMinValue": "1960"
+      }
+     },
+     "type": [
+      "number"
+     ]
+    },
+    "Value": {
+     "title": "Value",
+     "recordCount": 11507,
+     "byteCount": 353430,
+     "valueTypes": {
+      "number": {
+       "recordCount": 11507,
+       "valueType": "number",
+       "numberMaxValue": "99955845906.0715",
+       "numberMinValue": "100005323301.867"
+      }
+     },
+     "type": [
+      "number"
+     ]
+    }
+   },
+   "recordCount": 11507,
+   "byteCount": 454342,
+   "type": "object",
+   "parser": {
+    "mimeType": "text/csv"
+   },
+   "title": "gdp.csv",
+   "source": {
+    "protocol": "HTTP",
+    "configuration": {
+     "url": "https://raw.githubusercontent.com/datasets/gdp/master/data/gdp.csv"
+    }
+   }
+  }
+ ]
+}
