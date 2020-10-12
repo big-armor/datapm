@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'package-schema',
+  selector: 'schema',
   templateUrl: './package-schema.component.html',
   styleUrls: ['./package-schema.component.scss']
 })

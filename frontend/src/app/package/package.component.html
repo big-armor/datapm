@@ -2,17 +2,16 @@
 <div class="container pb-5" id="packagePage">
   <div class="row">
     <div class="col-md-12 no-pd-mobile">
-      <mat-tab-group id="matTabs" mat-align-tabs="left">
-        <mat-tab label="detail">
-          <app-package-detail></app-package-detail>
-        </mat-tab>
-        <mat-tab label="schema">
-          <package-schema></package-schema>
-        </mat-tab>
-        <mat-tab label="version">
-          <package-version></package-version>
-        </mat-tab>
-      </mat-tab-group>
+      <ul class="p-0" id="packageRoutes">
+        <li *ngFor="let route of routes; let i = index" class="list-names" (click)="selectTab(i)">
+              <a class="cursor-pointer" [class.active]="i == selectedTab">
+                {{route.linkName}}
+              </a>
+        </li>
+      </ul>
+    </div>
+    <div class="col-lg-12">
+      <router-outlet></router-outlet>
     </div>
   </div>
 </div>

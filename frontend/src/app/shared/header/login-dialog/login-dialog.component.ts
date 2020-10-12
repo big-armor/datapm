@@ -1,63 +1,76 @@
-import { Component, OnInit } from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-import { Router } from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { LoginGQL } from 'src/generated/graphql';
+import { Subscription } from 'rxjs';
 enum State {
   LOGGED_OUT,
   AWAITING_RESPONSE,
   INCORRECT_LOGIN,
   LOGGED_IN,
-  LOGIN_ERROR
+  LOGIN_ERROR,
 }
 
 @Component({
   selector: 'app-login-dialog',
   templateUrl: './login-dialog.component.html',
-  styleUrls: ['./login-dialog.component.scss']
+  styleUrls: ['./login-dialog.component.scss'],
 })
-export class LoginDialogComponent implements OnInit {
-
+export class LoginDialogComponent implements OnInit, OnDestroy {
   State = State;
 
   public state = State.LOGGED_OUT;
+  private subscription: Subscription;
 
   loginForm = new FormGroup({
     username: new FormControl('', Validators.required),
-    password: new FormControl('', Validators.required)
+    password: new FormControl('', Validators.required),
   });
 
   constructor(
-    private loginGQL:LoginGQL,
-    private authenticationService:AuthenticationService,
-    private router:Router
-  ) { }
+    private loginGQL: LoginGQL,
+    private authenticationService: AuthenticationService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
-
-    if(this.authenticationService.currentUser != null)
+    if (this.authenticationService.currentUser != null) {
       this.state = State.LOGGED_IN;
+    }
 
-    this.authenticationService.getUserObservable().subscribe((userPromise) => {
-
-      if(userPromise == null) {
-        this.state = State.LOGGED_OUT;
-        return;
-      }
-
-      userPromise.then((user) => {
-        if(user != null)
-          this.state = State.LOGGED_IN;
-        else {
-          if(this.state == State.LOGGED_IN)
-            this.state = State.LOGGED_OUT;
+    this.subscription = this.authenticationService
+      .getUserObservable()
+      .subscribe((userPromise) => {
+        if (userPromise == null) {
+          this.state = State.LOGGED_OUT;
+          return;
         }
-      })
-    });
+
+        userPromise.then((user) => {
+          if (user != null) {
+            this.state = State.LOGGED_IN;
+          }
+          if (this.state == State.LOGGED_IN) {
+            this.state = State.LOGGED_OUT;
+          }
+        });
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   formSubmit() {
-
     this.state = State.AWAITING_RESPONSE;
 
     this.authenticationService
@@ -65,22 +78,29 @@ export class LoginDialogComponent implements OnInit {
       .then((user) => {
         this.state = State.LOGGED_IN;
 
-        const returnUrl = this.router.parseUrl(this.router.url).queryParams["returnUrl"] || null;
+        const returnUrl = this.route.queryParams['returnUrl'] || '/';
 
-        if(returnUrl) {
-          this.router.navigate([returnUrl]);
-        } else {
-          this.router.navigate(['/']);
+        this.dialog.closeAll();
+        this.router.navigate([returnUrl]);
+      })
+      .catch((error: any) => {
+        if (
+          error.errors?.find(
+            (e) => (e.extensions.code == 'GRAPHQL_VALIDATION_FAILED') != null
+          )
+        ) {
+          this.state = State.INCORRECT_LOGIN;
         }
 
-      }).catch((error: any) => {
-        if(error.errors?.find(e => e.extensions.code == "LOGIN_FAILED") != null)
+        if (
+          error.errors?.find(
+            (e) => (e.extensions.code == 'WRONG_CREDENTIALS') != null
+          )
+        ) {
           this.state = State.INCORRECT_LOGIN;
-        else
+        } else {
           this.state = State.LOGIN_ERROR;
-
+        }
       });
-
   }
-
 }

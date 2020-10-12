@@ -8,7 +8,7 @@ DataPM makes publishing data simple, and gives your consumers free powerful tool
 
 ## Powerful Publishing
 
-When you publish your DataPM Package File into a DataPM registry, you are enabling your customers to easily discover and consume your data. Your data schema becomes instantly avialable in the search index. You have control over the keywords, names, and descriptions.
+When you publish your DataPM Package File into a DataPM registry, you are enabling your customers to easily discover and consume your data. Your data schema becomes instantly available in the search index. You have control over the keywords, names, and descriptions.
 
 Your customers can use the standards based and open source DataPM tools to easily consume your data. These powerful tools reliably deliver your data into the systems that the consumers need - in a single step. No ETL coding needed!
 
@@ -27,7 +27,7 @@ In the future, DataPM will support publishing the data along with the schema to 
 
 ## Generate A Package File
 
-DataPM registries hold package files that contain only the schema of one or more data sets (which we call a data package). These package files also contain human descriptions, and the basic information necessary to access publicly avialable data. 
+DataPM registries hold package files that contain only the schema of one or more data sets (which we call a data package). These package files also contain human descriptions, and the basic information necessary to access publicly available data. 
 
 To generate your first package file, install the [command line client](command-line-client.md).
 

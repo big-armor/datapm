@@ -43,6 +43,35 @@
   }
 }
 
+#packageRoutes {
+  list-style-type: none;
+  margin-bottom: 0px;
+  display: flex;
+
+  li {
+    a {
+      font-family: Roboto Mono;
+      font-style: normal;
+      font-weight: 300;
+      font-size: 16px;
+      line-height: 21px;
+      text-align: center;
+      letter-spacing: -0.28px;
+      color: #828282;
+      text-decoration: none;
+      padding: 0px 10px 4px 10px;
+      margin: 0px 10px;
+      cursor: pointer;
+    }
+  }
+
+  .active {
+    opacity: 1;
+    color: #333333 !important;
+    border-bottom: 2px solid #333333;
+  }
+}
+
 .example-large-box {
   display: flex;
   align-items: center;
@@ -69,6 +98,15 @@
 
 @media (max-width: 576px) {
   #packagePage {
+    #packageRoutes {
+      li {
+        a {
+          font-size: 13px;
+          padding: 0px 8px 4px 8px;
+          margin: 0px 6px;
+        }
+      }
+    }
     ::ng-deep #matTabs .mat-tab-header {
       border-bottom: none;
       .mat-ink-bar {
@@ -95,9 +133,22 @@
     padding: 0px !important;
   }
   .header-border {
-    top: 1.38rem;
+    top: 1.60rem;
     height: 9px;
     border: 0;
     margin: 3px;
+  }
+}
+
+@media (max-width: 480px) {
+  #packageRoutes {
+    li {
+      &:first-child {
+        a {
+          margin-left: 0px !important;
+          padding-left: 0px;
+        }
+      }
+    }
   }
 }

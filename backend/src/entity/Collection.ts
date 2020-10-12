@@ -1,7 +1,8 @@
-import { Entity, Column, PrimaryColumn, Index, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, PrimaryColumn, Index, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
 import { CollectionIdentifier } from "../generated/graphql";
 
 import { BaseModel } from "./BaseModel";
+import { User } from "./User";
 
 @Entity()
 @Index("name")
@@ -31,6 +32,13 @@ export class Collection extends BaseModel {
 
   @Column({ name: "is_recommended", nullable: false, default: false })
   public isRecommended: boolean;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: "creator_id" })
+  creator: User;
+
+  @Column({ name: "creator_id", nullable: false })
+  public creatorId: number;
 
   public identifier: CollectionIdentifier;
 

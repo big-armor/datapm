@@ -362,10 +362,10 @@ export class UserRepository extends Repository<User> {
 
       user.isActive = true;
 
-      if (isAdmin(value) && value.isSiteAdmin) {
-        user.isSiteAdmin = value.isSiteAdmin;
+      if (isAdmin(value) && value.isAdmin) {
+        user.isAdmin = value.isAdmin;
       } else {
-        user.isSiteAdmin = false;
+        user.isAdmin = false;
       }
 
       user = await transaction.save(user);

@@ -39,14 +39,29 @@
           mat-fab
           class="person-menu"
           [matMenuTriggerFor]="beforeMenu"
-          aria-label="Example icon button with a delete icon"
+          aria-label="Person"
         >
           <mat-icon>person</mat-icon>
         </button>
         <mat-menu #beforeMenu="matMenu" xPosition="before">
-          <button mat-menu-item (click)="goToMyDetails()">My profile</button>
-          <button mat-menu-item (click)="openLoginDialog()">Log In</button>
-          <button mat-menu-item (click)="openSignUpDialog()">Sign Up</button>
+          <button *ngIf="currentUser" mat-menu-item>My Profile</button>
+          <button
+            *ngIf="!currentUser"
+            mat-menu-item
+            (click)="openLoginDialog()"
+          >
+            Log In
+          </button>
+          <button
+            *ngIf="!currentUser"
+            mat-menu-item
+            (click)="openSignUpDialog()"
+          >
+            Sign Up
+          </button>
+          <button *ngIf="currentUser" mat-menu-item (click)="logout()">
+            Log Out
+          </button>
         </mat-menu>
       </div>
     </div>
@@ -60,11 +75,7 @@
   <div class="col-5 text-right">
     <div class="d-flex flex-row bd-highlight d-flex justify-content-end">
       <div class="bd-highlight mobile-collection mr-2">
-        <button
-          mat-fab
-          class="collection-menu"
-          aria-label="Example icon button with a collection icon"
-        >
+        <button mat-fab class="collection-menu" aria-label="Collections">
           <mat-icon>collections</mat-icon>
         </button>
       </div>
@@ -73,14 +84,29 @@
           mat-fab
           class="person-menu"
           [matMenuTriggerFor]="beforeMenu"
-          aria-label="Example icon button with a delete icon"
+          aria-label="Person"
         >
           <mat-icon>person</mat-icon>
         </button>
         <mat-menu #beforeMenu="matMenu" xPosition="before">
-          <button mat-menu-item>My profile</button>
-          <button mat-menu-item (click)="openLoginDialog()">Log In</button>
-          <button mat-menu-item (click)="openSignUpDialog()">Sign Up</button>
+          <button *ngIf="currentUser" mat-menu-item>My Profile</button>
+          <button
+            *ngIf="!currentUser"
+            mat-menu-item
+            (click)="openLoginDialog()"
+          >
+            Log In
+          </button>
+          <button
+            *ngIf="!currentUser"
+            mat-menu-item
+            (click)="openSignUpDialog()"
+          >
+            Sign Up
+          </button>
+          <button *ngIf="currentUser" mat-menu-item (click)="logout()">
+            Log Out
+          </button>
         </mat-menu>
       </div>
     </div>

@@ -6,14 +6,14 @@ import { resolvers } from "./resolvers";
 import { IsAuthenticatedDirective } from "./directive/isAuthenticatedDirective";
 import { HasCatalogPermissionDirective } from "./directive/hasCatalogPermissionDirective";
 import { HasPackagePermissionDirective } from "./directive/hasPackagePermissionDirective";
-import { IsSiteAdminDirective } from "./directive/isSiteAdminDirective";
-import { IsUserOrAdminDirective } from "./directive/isUserOrAdminDirective";
+import { IsAdminDirective } from "./directive/isSiteAdminDirective";
 import { getEnvVariable } from "./util/getEnvVariable";
 import { ValidEmailDirective } from "./directive/ValidEmailDirective";
 import { ValidUsernameDirective } from "./directive/ValidUsernameDirective";
 import { ValidPasswordDirective } from "./directive/ValidPasswordDirective";
 import { ValidSlugDirective } from "./directive/ValidSlugDirective";
 import { HasCollectionPermissionDirective } from "./directive/hasCollectionPermissionDirective";
+import { IsUserOrAdminDirective } from "./directive/isUserOrAdminDirective";
 const ConstraintDirective = require('apollo-server-constraint-directive');
 
 const NODE_MODULES_DIRECTORY = getEnvVariable("NODE_MODULES_DIRECTORY", "node_modules");
@@ -35,7 +35,7 @@ export async function makeSchema() {
       hasCatalogPermission: HasCatalogPermissionDirective,
       hasCollectionPermission: HasCollectionPermissionDirective,
       hasPackagePermission: HasPackagePermissionDirective,
-      isSiteAdmin: IsSiteAdminDirective,
+      isAdmin: IsAdminDirective,
       validEmailAddress: ValidEmailDirective,
       validUsername: ValidUsernameDirective,
       validPassword: ValidPasswordDirective,

@@ -16,7 +16,7 @@ npm run build
 
 ```
 
-This produces a docker image labled datapm-registry
+This produces a docker image labeled datapm-registry
 
 
 ## How to run in Docker
@@ -30,6 +30,11 @@ Use the following command from the root directory of this project to use docker-
 npm run start
 ```
 
+You can run only postgres with the following command
+
+```
+docker-compose -f docker/docker-compose.yml up -d postgres
+```
 
 ## License
 
