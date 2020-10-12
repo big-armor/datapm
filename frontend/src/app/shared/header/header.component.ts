@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { User } from 'src/generated/graphql';
 import { LoginDialogComponent } from './login-dialog/login-dialog.component';
 import { SignUpDialogComponent } from './sign-up-dialog/sign-up-dialog.component';
@@ -30,8 +30,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   constructor(
     public dialog: MatDialog,
     private router: Router,
-    private authenticationService: AuthenticationService
-  ) {}
+    private route: ActivatedRoute,
+    private authenticationService: AuthenticationService) {}
 
   ngOnInit(): void {
     this.subscription = this.authenticationService
@@ -79,6 +79,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   goHome() {
     this.router.navigate(['/latest']);
+  }
+
+  goToMyDetails() {
+    this.router.navigate(['/me'], {relativeTo: this.route})
   }
 
   logout() {

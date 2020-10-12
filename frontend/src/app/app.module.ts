@@ -25,6 +25,10 @@ import { FollowingComponent } from './homepage/following/following.component';
 import { PackageComponent } from './package/package.component';
 import { PackageVersionComponent } from './package/package-version/package-version.component';
 import { PackageSchemaComponent } from './package/package-schema/package-schema.component';
+import { DetailsComponent } from './my-account/details/details.component';
+import { PackagesComponent } from './my-account/packages/packages.component';
+import { ActivityComponent } from './my-account/activity/activity.component';
+import { EditAccountDialogComponent } from './my-account/edit-account-dialog/edit-account-dialog.component';
 
 @NgModule({
   declarations: [
@@ -44,7 +48,11 @@ import { PackageSchemaComponent } from './package/package-schema/package-schema.
     FollowingComponent,
     PackageComponent,
     PackageVersionComponent,
-    PackageSchemaComponent
+    PackageSchemaComponent,
+    DetailsComponent,
+    PackagesComponent,
+    ActivityComponent,
+    EditAccountDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -54,7 +62,7 @@ import { PackageSchemaComponent } from './package/package-schema/package-schema.
     ReactiveFormsModule,
     FormsModule,
     SharedModule,
-    MaterialModule,
+    MaterialModule
   ],
   providers: [],
   bootstrap: [AppComponent],

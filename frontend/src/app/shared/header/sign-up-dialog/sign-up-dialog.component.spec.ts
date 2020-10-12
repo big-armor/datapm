@@ -1,5 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
+import { MaterialModule } from 'src/app/material.module';
 
 import { SignUpDialogComponent } from './sign-up-dialog.component';
 
@@ -10,7 +12,7 @@ describe('SignUpDialogComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ SignUpDialogComponent ],
-      imports: [RouterTestingModule]
+      imports: [ReactiveFormsModule, RouterTestingModule, MaterialModule]
     })
     .compileComponents();
   }));
