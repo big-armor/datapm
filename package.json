@@ -10,7 +10,8 @@
     "clean:node_modules": "rm -rf node_modules frontend/node_modules frontend/node_modules",
     "build": "gulp",
     "start": "TYPEORM_IS_DIST=true docker-compose -f docker/docker-compose.yml up --build",
-    "deploy": "gulp deployDockerImage"
+    "deploy": "gulp deployDockerImage",
+    "test": "snyk test"
   },
   "repository": {
     "type": "git",
@@ -27,6 +28,7 @@
     "git-format-staged": "^2.1.0",
     "gulp": "^4.0.2",
     "husky": "^4.3.0",
-    "prettier": "^2.1.2"
+    "prettier": "^2.1.2",
+    "snyk": "^1.413.2"
   }
 }
