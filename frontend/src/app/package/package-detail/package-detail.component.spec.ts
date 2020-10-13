@@ -6,6 +6,7 @@ import {
   ApolloTestingController,
 } from 'apollo-angular/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { MaterialModule } from 'src/app/material.module';
 
 describe('PackageDetailComponent', () => {
   let component: PackageDetailComponent;
@@ -15,7 +16,7 @@ describe('PackageDetailComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ PackageDetailComponent ],
-      imports: [RouterTestingModule, ApolloTestingModule]
+      imports: [RouterTestingModule, ApolloTestingModule, MaterialModule]
     })
     .compileComponents();
   }));
@@ -29,5 +30,5 @@ describe('PackageDetailComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-  
+
 });
