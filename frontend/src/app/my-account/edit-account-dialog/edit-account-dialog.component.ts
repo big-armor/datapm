@@ -1,11 +1,41 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
+import { Component, OnInit, Inject, ChangeDetectorRef } from '@angular/core';
+import { FormGroup, FormBuilder, FormControl, AsyncValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { UpdateMeGQL, User } from '../../../generated/graphql';
+import { UpdateMeGQL, UsernameAvailableGQL, User } from '../../../generated/graphql';
 
-import { Apollo } from 'apollo-angular'
-import gql from 'graphql-tag';
-import { AuthenticationService } from 'src/app/services/authentication.service';
+function usernameValidator(usernameAvailableGQL: UsernameAvailableGQL, componentChangeDetector: ChangeDetectorRef, currentUsername: string): AsyncValidatorFn {
+  return (control: AbstractControl): Promise<ValidationErrors | null> => {
+    return new Promise<ValidationErrors | null>((success, error) => {
+      if (control.value == currentUsername) {
+        success(null)
+        return;
+      }
+      if (control.value == "" || control.value == null) {
+        success({
+          REQUIRED: true
+        });
+        return;
+      }
+      usernameAvailableGQL.fetch({ username: control.value }).subscribe(result => {
+        if (result.errors?.length > 0) {
+          success({
+            [result.errors[0].message]: true
+          });
+        } else {
+          if (result.data.usernameAvailable) {
+            success(null)
+          } else {
+            success({
+              NOT_AVAILABLE: true
+            })
+          }
+        }
+        control.markAsDirty();
+        componentChangeDetector.detectChanges();
+      })
+    })
+  };
+}
 
 @Component({
   selector: 'app-edit-account-dialog',
@@ -15,27 +45,31 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 export class EditAccountDialogComponent implements OnInit {
   public form: FormGroup;
   private currentUser: User;
+  public submitDisabled: boolean = false;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: User,
     public dialogRef: MatDialogRef<EditAccountDialogComponent>,
     private formBuilder: FormBuilder,
     private updateMeGQL: UpdateMeGQL,
+    private usernameAvailableGQL: UsernameAvailableGQL,
+    private componentChangeDetector: ChangeDetectorRef
+
   ) { }
 
   ngOnInit(): void {
     this.currentUser = this.data;
 
-    this.form = this.formBuilder.group({
-      username: [this.currentUser.username],
-      firstName: [this.currentUser.firstName],
-      lastName: [this.currentUser.lastName],
-      location: [this.currentUser.location],
-      twitterHandle: [this.currentUser.twitterHandle],
-      website: [this.currentUser.website],
-      emailAddress: [this.currentUser.emailAddress],
-      gitHubHandle: [this.currentUser.gitHubHandle],
-      nameIsPublic: [this.currentUser.nameIsPublic]
+    this.form = new FormGroup({
+      username: new FormControl(this.currentUser.username, { asyncValidators: [usernameValidator(this.usernameAvailableGQL, this.componentChangeDetector, this.data.username)] }),
+      firstName: new FormControl(this.currentUser.firstName),
+      lastName: new FormControl(this.currentUser.lastName),
+      location: new FormControl(this.currentUser.location),
+      twitterHandle: new FormControl(this.currentUser.twitterHandle),
+      website: new FormControl(this.currentUser.website),
+      emailAddress: new FormControl(this.currentUser.emailAddress),
+      gitHubHandle: new FormControl(this.currentUser.gitHubHandle),
+      nameIsPublic: new FormControl(this.currentUser.nameIsPublic)
     })
   }
 
@@ -53,7 +87,7 @@ export class EditAccountDialogComponent implements OnInit {
         // location: this.location.value,
         // twitterHandle: this.twitterHandle.value,
         // website: this.website.value,
-        // emailAddress: this.emailAddress.value,
+        email: this.emailAddress.value,
         // gitHubHandle: this.gitHubHandle.value,
         // nameIsPublic: this.nameIsPublic.value
       }

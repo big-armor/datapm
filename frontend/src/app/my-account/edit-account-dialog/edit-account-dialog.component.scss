@@ -118,7 +118,7 @@
                 line-height: 18px;
                 letter-spacing: -0.28px;
                 color: #4F4F4F;
-                width: 135px;
+                width: 165px;
             }
 
             .div-answer {
@@ -182,6 +182,25 @@
                     }
                 }
             }
+            .div-with-errors {
+                max-width: 346px;
+                font-family: Roboto Mono;
+                font-style: normal;
+                font-weight: 400;
+                padding-left: 10px;
+                font-size: 10px;
+                // margin-top: 5px;
+                color: #f44336;
+                line-height: 12px;
+            }
+        }
+    }
+    .disabled {
+        background-color: #cccccc85;
+        pointer-events: none;
+        opacity: 0.6;
+        .btn-text {
+        color: #82828273;
         }
     }
 }
@@ -206,6 +225,13 @@
                 .div-answer {
                     input {
                         height: 35px;
+                        font-size: 11px;
+                        &::placeholder {
+                            font-size: 11px;
+                        }
+                    }
+                    textarea {
+                        height: 45px;
                         font-size: 11px;
                         &::placeholder {
                             font-size: 11px;
@@ -259,6 +285,13 @@
                 .div-answer {
                     input {
                         height: 35px;
+                        font-size: 9px;
+                        &::placeholder {
+                            font-size: 9px;
+                        }
+                    }
+                    textarea {
+                        height: 45px;
                         font-size: 9px;
                         &::placeholder {
                             font-size: 9px;
