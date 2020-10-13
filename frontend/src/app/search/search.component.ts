@@ -1,102 +1,129 @@
-import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { Subject, throwError } from 'rxjs';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { Component, OnInit, OnDestroy } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 import {
-  SearchPackagesGQL,
-  Package,
-  SearchPackagesQuery, 
-  PackageIdentifier
-} from 'src/generated/graphql';
+	SearchPackagesGQL,
+	SearchCollectionsGQL,
+	SearchPackagesQuery,
+	SearchCollectionsQuery
+} from "src/generated/graphql";
 
 enum State {
-  LOADING,
-  SUCCESS,
-  ERROR,
+	LOADING,
+	SUCCESS,
+	ERROR
 }
 
 enum Filter {
-  COLLECTIONS,
-  PACKAGES,
-  USERS,
+	COLLECTIONS,
+	PACKAGES,
+	USERS
 }
 
 @Component({
-  selector: 'search',
-  templateUrl: './search.component.html',
-  styleUrls: ['./search.component.scss'],
+	selector: "search",
+	templateUrl: "./search.component.html",
+	styleUrls: ["./search.component.scss"]
 })
 export class SearchComponent implements OnInit, OnDestroy {
-  State = State;
-  public Filter = Filter;
+	public Filter = Filter;
+	public isStarClicked: boolean = false;
+	public selectedFilter: Filter = Filter.PACKAGES;
+	public state = State.LOADING;
+	public urlParams: any;
+	public limit: number = 10;
+	public offset: number = 0;
 
-  public state = State.LOADING;
+	public packageResult: SearchPackagesQuery;
+	public collectionResult: SearchCollectionsQuery;
 
-  urlParams: any;
-  public isStarClicked: boolean = false;
+	private State = State;
+	private subscription = new Subject();
 
-  public packageResult: SearchPackagesQuery;
+	constructor(
+		private route: ActivatedRoute,
+		private searchPackagesGQL: SearchPackagesGQL,
+		private searchCollectionsGQL: SearchCollectionsGQL
+	) {}
 
-  public selectedFilter: Filter = Filter.PACKAGES;
+	ngOnInit(): void {
+		this.route.paramMap.pipe(takeUntil(this.subscription)).subscribe((params) => {
+			this.urlParams = params;
 
-  private subscription = new Subject();
+			if (this.selectedFilter === Filter.PACKAGES) this.onPackageFilterChange();
+			if (this.selectedFilter == Filter.COLLECTIONS) this.onCollectionFilterChange();
+		});
+	}
 
-  constructor(
-    private route: ActivatedRoute,
-    private searchPackagesGQL: SearchPackagesGQL
-  ) {}
+	ngOnDestroy() {
+		this.subscription.unsubscribe();
+	}
 
-  ngOnInit(): void {
-    this.route.paramMap
-      .pipe(takeUntil(this.subscription))
-      .subscribe((params) => {
-        this.urlParams = params;
+	public get isPackageSelected() {
+		return this.selectedFilter == Filter.PACKAGES;
+	}
 
-        this.state = State.LOADING;
-        this.searchPackagesGQL
-          .fetch({
-            query: this.urlParams.params.q,
-            limit: 10,
-            offset: 0,
-          })
-          .pipe(takeUntil(this.subscription))
-          .subscribe(
-            ({ data }) => {
-              this.state = State.SUCCESS;
-              this.packageResult = data;
-            },
-            (_error) => (this.state = State.ERROR)
-          );
-      });
-  }
+	public get isUserSelected() {
+		return this.selectedFilter == Filter.USERS;
+	}
 
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
-  }
+	public get isCollectionSelected() {
+		return this.selectedFilter == Filter.COLLECTIONS;
+	}
 
-  public get isPackageSelected() {
-    return this.selectedFilter == Filter.PACKAGES;
-  }
+	public clickStar(): void {
+		this.isStarClicked = !this.isStarClicked;
+	}
 
-  public get isUserSelected() {
-    return this.selectedFilter == Filter.USERS;
-  }
+	public onPackageFilterChange(): void {
+		this.state = State.LOADING;
+		this.searchPackagesGQL
+			.fetch({
+				query: this.urlParams.params.q,
+				limit: this.limit,
+				offset: this.offset
+			})
+			.pipe(takeUntil(this.subscription))
+			.subscribe(
+				({ data }) => {
+					this.state = State.SUCCESS;
+					this.packageResult = data;
+				},
+				(_) => (this.state = State.ERROR)
+			);
+	}
 
-  public get isCollectionSelected() {
-    return this.selectedFilter == Filter.COLLECTIONS;
-  }
+	public onCollectionFilterChange(): void {
+		this.state = State.LOADING;
+		this.searchCollectionsGQL
+			.fetch({
+				query: this.urlParams.params.q,
+				limit: this.limit,
+				offset: this.offset
+			})
+			.pipe(takeUntil(this.subscription))
+			.subscribe(
+				({ data }) => {
+					this.state = State.SUCCESS;
+					this.collectionResult = data;
+				},
+				(_) => (this.state = State.ERROR)
+			);
+	}
 
-  public getPackageCreator(identifier: PackageIdentifier) {
-    const pkg = this.packageResult.searchPackages.packages.find((pkg: Package) => pkg.identifier.packageSlug === identifier.packageSlug && pkg.identifier.catalogSlug === identifier.catalogSlug) as Package;
+	public previous(): void {
+		this.offset = this.offset - 10;
 
-    const { creator: { firstName, lastName }} = pkg;
+		if (this.selectedFilter === Filter.PACKAGES) this.onPackageFilterChange();
+		if (this.selectedFilter == Filter.COLLECTIONS) this.onCollectionFilterChange();
+	}
 
-    return `${firstName ? firstName : ''} ${lastName ? lastName : ''}`.trim();
-  }
+	public next(): void {
+		this.offset = this.offset + 10;
 
-  public clickStar(): void {
-    this.isStarClicked = !this.isStarClicked;
-  }
+		if (this.selectedFilter === Filter.PACKAGES) this.onPackageFilterChange();
+		if (this.selectedFilter == Filter.COLLECTIONS) this.onCollectionFilterChange();
+	}
 }
