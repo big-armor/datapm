@@ -1,12 +1,14 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
 import { FormControl, FormGroup } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
-import { ActivatedRoute, Router } from "@angular/router";
-import { User } from "src/generated/graphql";
+import { takeUntil } from "rxjs/operators";
+import { Subject } from "rxjs";
+
+import { AuthenticationService } from "../../services/authentication.service";
 import { LoginDialogComponent } from "./login-dialog/login-dialog.component";
 import { SignUpDialogComponent } from "./sign-up-dialog/sign-up-dialog.component";
-import { AuthenticationService } from "../../services/authentication.service";
-import { Subscription } from "rxjs";
+import { User } from "src/generated/graphql";
 
 enum State {
 	INIT,
@@ -25,7 +27,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
 	currentUser: User;
 	searchFormGroup: FormGroup;
-	private subscription: Subscription;
+	private subscription = new Subject();
 
 	constructor(
 		public dialog: MatDialog,
@@ -35,16 +37,19 @@ export class HeaderComponent implements OnInit, OnDestroy {
 	) {}
 
 	ngOnInit(): void {
-		this.subscription = this.authenticationService.getUserObservable().subscribe((u) => {
-			if (u == null) {
-				return;
-			}
+		this.authenticationService
+			.getUserObservable()
+			.pipe(takeUntil(this.subscription))
+			.subscribe((u) => {
+				if (u == null) {
+					return;
+				}
 
-			u.then((user) => {
-				this.currentUser = user;
-				this.state = State.SUCCESS;
-			}).catch((error) => (this.state = State.ERROR));
-		});
+				u.then((user) => {
+					this.currentUser = user;
+					this.state = State.SUCCESS;
+				}).catch((error) => (this.state = State.ERROR));
+			});
 
 		this.searchFormGroup = new FormGroup({
 			search: new FormControl("")
@@ -81,7 +86,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 	}
 
 	goToMyDetails() {
-		this.router.navigate(["/me"], { relativeTo: this.route });
+		this.router.navigate(["/me"]);
 	}
 
 	logout() {

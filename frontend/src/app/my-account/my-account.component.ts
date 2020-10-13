@@ -61,7 +61,7 @@ export class MyAccountComponent implements OnInit {
 	) {
 		let prefix = "/me";
 		this.routes = [
-			{ linkName: "details", url: prefix },
+			{ linkName: "details", url: prefix + "/" },
 			{ linkName: "packages", url: prefix + "/packages" },
 			{ linkName: "activity", url: prefix + "/activity" }
 		];
@@ -104,7 +104,7 @@ export class MyAccountComponent implements OnInit {
 	}
 
 	public selectTab(index) {
-		this.router.navigate([this.routes[index].url]);
+		this.router.navigate([this.routes[index].url], { relativeTo: this.route.parent });
 		this.selectedTab = index;
 	}
 

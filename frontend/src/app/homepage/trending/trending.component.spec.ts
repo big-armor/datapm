@@ -1,25 +1,27 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { TrendingComponent } from './trending.component';
+import { TrendingComponent } from "./trending.component";
 
-describe('TrendingComponent', () => {
-  let component: TrendingComponent;
-  let fixture: ComponentFixture<TrendingComponent>;
+import { MaterialModule } from "../../material.module";
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ TrendingComponent ]
-    })
-    .compileComponents();
-  }));
+describe("TrendingComponent", () => {
+	let component: TrendingComponent;
+	let fixture: ComponentFixture<TrendingComponent>;
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(TrendingComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+	beforeEach(async(() => {
+		TestBed.configureTestingModule({
+			declarations: [TrendingComponent],
+			imports: [MaterialModule]
+		}).compileComponents();
+	}));
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+	beforeEach(() => {
+		fixture = TestBed.createComponent(TrendingComponent);
+		component = fixture.componentInstance;
+		fixture.detectChanges();
+	});
+
+	it("should create", () => {
+		expect(component).toBeTruthy();
+	});
 });
