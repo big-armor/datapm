@@ -109,7 +109,7 @@
     </div>
   </div>
   <div mat-dialog-actions>
-    <button mat-button [mat-dialog-close]="true" class="ml-auto save-btn">
+    <button mat-button [mat-dialog-close]="true" (click)="submit()" class="ml-auto save-btn">
       <span>save</span>
     </button>
   </div>

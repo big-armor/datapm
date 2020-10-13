@@ -7,6 +7,7 @@ import {
   ApolloTestingController,
 } from 'apollo-angular/testing';
 import { MaterialModule } from '../material.module';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog'
 
 describe('MyAccountComponent', () => {
   let component: MyAccountComponent;
@@ -15,10 +16,20 @@ describe('MyAccountComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ MyAccountComponent ],
-      imports: [RouterModule.forRoot([]),ApolloTestingModule, MaterialModule]
+      declarations: [MyAccountComponent],
+      imports: [RouterModule.forRoot([]), ApolloTestingModule, MaterialModule],
+      providers: [
+        {
+          provide: MatDialog,
+          useValue: {}
+        },
+        {
+          provide: MatDialogConfig,
+          useValue: {}
+        }
+      ]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

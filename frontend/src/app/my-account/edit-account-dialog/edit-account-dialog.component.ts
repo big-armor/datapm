@@ -1,10 +1,11 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { User } from '../../../generated/graphql';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { UpdateMeGQL, User } from '../../../generated/graphql';
 
 import { Apollo } from 'apollo-angular'
 import gql from 'graphql-tag';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 
 @Component({
   selector: 'app-edit-account-dialog',
@@ -17,9 +18,9 @@ export class EditAccountDialogComponent implements OnInit {
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: User,
-    private apollo: Apollo,
+    public dialogRef: MatDialogRef<EditAccountDialogComponent>,
     private formBuilder: FormBuilder,
-    // private updateMeGQL: UpdateMeGQL
+    private updateMeGQL: UpdateMeGQL,
   ) { }
 
   ngOnInit(): void {
@@ -36,8 +37,6 @@ export class EditAccountDialogComponent implements OnInit {
       gitHubHandle: [this.currentUser.gitHubHandle],
       nameIsPublic: [this.currentUser.nameIsPublic]
     })
-
-    console.log(this.form.value)
   }
 
   submit() {
@@ -46,6 +45,31 @@ export class EditAccountDialogComponent implements OnInit {
     if (this.form.invalid) {
       return;
     }
+    this.updateMeGQL.mutate({
+      value: {
+        username: this.username.value,
+        firstName: this.firstName.value,
+        lastName: this.lastName.value,
+        // location: this.location.value,
+        // twitterHandle: this.twitterHandle.value,
+        // website: this.website.value,
+        // emailAddress: this.emailAddress.value,
+        // gitHubHandle: this.gitHubHandle.value,
+        // nameIsPublic: this.nameIsPublic.value
+      }
+    }).subscribe(response => {
+      if (response.errors) {
+        console.warn(response.errors)
+      }
+      if (response.data) {
+        console.log(response.data.updateMe)
+      }
+    })
+    this.closeDialog()
+  }
+
+  closeDialog() {
+    this.dialogRef.close();
   }
 
   get username() {

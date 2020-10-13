@@ -36,7 +36,7 @@
 
 <div class="container" id="userProfile">
     <div class="row top-row">
-        <div class="col-lg-10 col-md-12 col-sm-12 profile-div">
+        <div *ngIf="currentUser" class="col-lg-10 col-md-12 col-sm-12 profile-div">
             <div class="d-flex bd-highlight user-header" style="height: 80px">
                 <div class="p-2 bd-highlight">
                     <a class="user-img"><img src="../../assets/images/user-female.jpg" alt="User profile image" /></a>

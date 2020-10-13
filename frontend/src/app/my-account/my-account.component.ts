@@ -5,7 +5,7 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { getRegistryPort, getRegistryProtocol, getRegistryHostname } from '../helpers/RegistryAccessHelper';
 import { APIKey, Catalog, CreateAPIKeyGQL, DeleteAPIKeyGQL, MyAPIKeysGQL, MyCatalogsGQL, Scope, User } from 'src/generated/graphql';
 import { EditAccountDialogComponent } from './edit-account-dialog/edit-account-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 
 enum State {
   INIT,
@@ -72,7 +72,6 @@ export class MyAccountComponent implements OnInit {
       if (u == null) {
         return;
       }
-
       u.then(user => {
         this.currentUser = user;
         this.state = State.SUCCESS
@@ -97,8 +96,13 @@ export class MyAccountComponent implements OnInit {
   }
 
   openEditDialog() {
-    this.dialog.open(EditAccountDialogComponent, {
-      data: this.currentUser
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.data = this.currentUser
+
+    this.dialog.open(EditAccountDialogComponent, dialogConfig);
+
+    this.dialog.afterAllClosed.subscribe(result => {
+      this.authenticationService.refreshUserInfo()
     });
   }
 
