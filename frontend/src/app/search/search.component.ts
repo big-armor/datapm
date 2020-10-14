@@ -3,11 +3,15 @@ import { ActivatedRoute } from "@angular/router";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
+import { TimeAgoPipe } from "../shared/pipes/time-ago.pipe";
+
 import {
 	SearchPackagesGQL,
 	SearchCollectionsGQL,
 	SearchPackagesQuery,
-	SearchCollectionsQuery
+	SearchCollectionsQuery,
+	Package,
+	Collection
 } from "src/generated/graphql";
 
 enum State {
@@ -45,15 +49,16 @@ export class SearchComponent implements OnInit, OnDestroy {
 	constructor(
 		private route: ActivatedRoute,
 		private searchPackagesGQL: SearchPackagesGQL,
-		private searchCollectionsGQL: SearchCollectionsGQL
+		private searchCollectionsGQL: SearchCollectionsGQL,
+		private timeAgoPipe: TimeAgoPipe
 	) {}
 
 	ngOnInit(): void {
 		this.route.paramMap.pipe(takeUntil(this.subscription)).subscribe((params) => {
 			this.urlParams = params;
 
-			if (this.selectedFilter === Filter.PACKAGES) this.onPackageFilterChange();
-			if (this.selectedFilter == Filter.COLLECTIONS) this.onCollectionFilterChange();
+			this.onPackageFilterChange();
+			this.onCollectionFilterChange();
 		});
 	}
 
@@ -111,6 +116,37 @@ export class SearchComponent implements OnInit, OnDestroy {
 				},
 				(_) => (this.state = State.ERROR)
 			);
+	}
+
+	public getPackageDateLabel(pkg: Package) {
+		let label;
+
+		if (pkg.latestVersion?.createdAt && pkg.latestVersion?.updatedAt) {
+			label =
+				pkg.latestVersion.createdAt === pkg.latestVersion.updatedAt
+					? `Created ${this.timeAgoPipe.transform(pkg.latestVersion.createdAt)}`
+					: `Updated ${this.timeAgoPipe.transform(pkg.latestVersion.updatedAt)}`;
+
+			return label;
+		}
+
+		return pkg.createdAt === pkg.updatedAt
+			? `Created ${this.timeAgoPipe.transform(pkg.createdAt)}`
+			: `Updated ${this.timeAgoPipe.transform(pkg.updatedAt)}`;
+	}
+
+	public getCollectionDateLabel(collection: Collection) {
+		let label;
+
+		if (collection.packages?.length) {
+			collection.packages.forEach((pkg) => (label = this.getPackageDateLabel(pkg)));
+
+			return label;
+		}
+
+		return collection.createdAt === collection.updatedAt
+			? `Created ${this.timeAgoPipe.transform(collection.createdAt)}`
+			: `Updated ${this.timeAgoPipe.transform(collection.updatedAt)}`;
 	}
 
 	public previous(): void {

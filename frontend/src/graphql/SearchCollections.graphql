@@ -31,7 +31,11 @@ query SearchCollections($query: String!, $limit: Int!, $offset: Int!) {
 						versionMinor
 						versionPatch
 					}
+					createdAt
+					updatedAt
 				}
+				createdAt
+				updatedAt
 			}
 			createdAt
 			updatedAt

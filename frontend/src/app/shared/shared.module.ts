@@ -10,6 +10,7 @@ import { TimeAgoPipe } from "./pipes/time-ago.pipe";
 @NgModule({
 	declarations: [HeaderComponent, FooterComponent, TimeAgoPipe],
 	imports: [CommonModule, MaterialModule, BrowserModule, FormsModule, ReactiveFormsModule],
-	exports: [HeaderComponent, FooterComponent, TimeAgoPipe]
+	exports: [HeaderComponent, FooterComponent, TimeAgoPipe],
+	providers: [TimeAgoPipe]
 })
 export class SharedModule {}

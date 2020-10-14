@@ -35,7 +35,7 @@
 							last as isLast
 						"
 					>
-						<div *ngIf="isFirst" class="search-title">
+						<div *ngIf="isFirst" class="search-title pl-3">
 							Your search results for '{{ urlParams?.params?.q }}'
 						</div>
 
@@ -82,7 +82,7 @@
 								<div class="ml-auto bd-highlight align-self-center">
 									<div class="d-flex flex-column bd-highlight text-right">
 										<div class="bd-highlight user-description">
-											{{ "Created " + (collection.createdAt | timeAgo) }}
+											{{ getCollectionDateLabel(collection) }}
 										</div>
 										<div *ngIf="collection.packages?.length" class="bd-highlight user-description">
 											{{
@@ -108,9 +108,10 @@
 							<mat-divider></mat-divider>
 							<mat-list-item class="d-flex d-row justify-content-end">
 								<a class="navigation-link" *ngIf="offset > 0" (click)="previous()">previous</a>
-								<span *ngIf="offset > 0 && collectionResult.searchCollections.hasMore"
-									>&nbsp;&nbsp;</span
-								>
+								<span
+									*ngIf="offset > 0 && collectionResult.searchCollections.hasMore"
+									class="mr-2"
+								></span>
 								<a
 									class="navigation-link"
 									*ngIf="collectionResult.searchCollections.hasMore"
@@ -131,7 +132,7 @@
 							last as isLast
 						"
 					>
-						<div *ngIf="isFirst" class="search-title">
+						<div *ngIf="isFirst" class="search-title pl-3">
 							Your search results for '{{ urlParams?.params?.q }}'
 						</div>
 
@@ -184,7 +185,7 @@
 								<div class="ml-auto py-2 bd-highlight align-self-center">
 									<div class="d-flex flex-column bd-highlight text-right">
 										<div class="bd-highlight user-right-description">
-											{{ "Created " + (package.createdAt | timeAgo) }}
+											{{ getPackageDateLabel(package) }}
 										</div>
 										<!-- <div class="bd-highlight user-right-description">
                       2 downloaded
