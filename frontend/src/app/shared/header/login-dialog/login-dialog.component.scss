@@ -11,6 +11,10 @@
 
   .dialog-close-wrapper {
     display: flex;
+    position: relative;
+    bottom: 30px;
+    left: 40px;
+    margin-bottom: -26px;
     justify-content: flex-end;
 
     .dialog-close {
@@ -23,6 +27,7 @@
       line-height: 18px;
       letter-spacing: -0.28px;
       color: #828282;
+      outline: transparent solid 0px;
     }
   }
 
@@ -33,7 +38,7 @@
     font-size: 42px;
     line-height: 55px;
     text-align: center;
-    margin: 0px 0 30px;
+    margin: 20px 0 10px;
     color: #333333;
     text-shadow: 0px -4px 4px rgba(255, 255, 255, 0.25),
       -4px 0px 4px rgba(255, 255, 255, 0.25),
@@ -50,7 +55,7 @@
     line-height: 18px;
     letter-spacing: -0.28px;
     color: #828282;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
   }
 
   ::ng-deep .light-inputs {
@@ -86,16 +91,19 @@
   }
 
   .forgot-pass {
-    font-family: Roboto Mono;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 18px;
-    padding-left: 15px;
-    padding-top: 4px;
-    margin-bottom: 0px;
-    letter-spacing: -0.3px;
-    color: #3a80ca;
+    margin-top: 15px;
+    a {
+      font-family: Roboto Mono;
+      font-style: normal;
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 18px;
+      padding-left: 15px;
+      padding-top: 4px;
+      margin-bottom: 0px;
+      letter-spacing: -0.3px;
+      color: #3a80ca;
+    }
   }
 
   .submit-btn {
@@ -107,7 +115,7 @@
     border-radius: 24px;
     min-width: 200px;
     height: 36px;
-    margin: 15px 0 15px;
+    margin: 30px 0 15px;
     border: none;
     background: #fff;
 
@@ -168,7 +176,7 @@
     font-family: Roboto Mono;
     font-style: normal;
     font-weight: 500;
-    font-size: 11px;
+    font-size: 10px;
     align-items: center;
     text-align: center;
     color: #ce5959;
@@ -251,7 +259,7 @@
   #logIn {
     padding: 0px;
     .light-inputs {
-      min-width: 244px;
+      min-width: 228px;
       max-width: 280px;
       height: 38px;
       font-size: 13px;
@@ -261,6 +269,7 @@
     }
     .submit-btn {
       height: 30px;
+      margin: 15px 0 15px;
       .btn-text {
         font-size: 14px;
       }
@@ -287,13 +296,17 @@
       text-align: center;
       margin-bottom: 0px;
     }
-    .dialog-close {
-      font-size: 12px;
+    .dialog-close-wrapper {
+      bottom: 19px;
+      left: 22px;
+      .dialog-close {
+        font-size: 12px;
+      }
     }
     .dialog-title {
       font-size: 34px;
       line-height: 40px;
-      margin: 0px 0 15px;
+      margin: 15px 0 5px;
     }
     .mat-dialog-actions {
       margin-top: 15px;

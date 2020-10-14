@@ -2,3 +2,24 @@
 @import '~bootstrap/dist/css/bootstrap.min.css';
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.mat-menu-content:not(:empty) {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+}
+
+.mat-menu-content {
+    button.mat-menu-item {
+        border-bottom: 1px solid rgb(0 0 0 / 5%) !important;
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 18px;
+        letter-spacing: -0.28px;
+        color: #4F4F4F;
+        &:last-child {
+            border-bottom: none !important;
+        }
+    }
+}
