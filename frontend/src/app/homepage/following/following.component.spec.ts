@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { MaterialModule } from 'src/app/material.module';
 
 import { FollowingComponent } from './following.component';
 
@@ -8,7 +9,8 @@ describe('FollowingComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ FollowingComponent ]
+      declarations: [ FollowingComponent ],
+      imports: [ MaterialModule ]
     })
     .compileComponents();
   }));

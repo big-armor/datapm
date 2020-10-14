@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { MaterialModule } from 'src/app/material.module';
 
 import { TrendingComponent } from './trending.component';
 
@@ -8,7 +9,8 @@ describe('TrendingComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TrendingComponent ]
+      declarations: [ TrendingComponent ],
+      imports: [ MaterialModule ]
     })
     .compileComponents();
   }));
