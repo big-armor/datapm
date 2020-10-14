@@ -1,5 +1,17 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { EditPasswordDialogComponent } from '../edit-password-dialog/edit-password-dialog.component'
+import { AuthenticationService } from '../../services/authentication.service';
+import { APIKey, Catalog, User, CreateAPIKeyGQL, MyCatalogsGQL, MyAPIKeysGQL, DeleteAPIKeyGQL, Scope } from 'src/generated/graphql';
+import { FormControl, FormGroup } from '@angular/forms';
 
+enum State {
+  INIT,
+  LOADING,
+  ERROR,
+  SUCCESS,
+  ERROR_NOT_UNIQUE
+}
 @Component({
   selector: 'me-details',
   templateUrl: './details.component.html',
@@ -7,9 +19,129 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DetailsComponent implements OnInit {
 
-  constructor() { }
+  State = State;
+  state = State.INIT;
+
+  currentUser: User
+  apiKeysOpenState: boolean = false;
+  catalogsOpenState: boolean = false;
+  apiKeysState = State.INIT;
+  catalogState = State.INIT;
+  createAPIKeyState = State.INIT;
+  deleteAPIKeyState = State.INIT;
+  newAPIKey: string;
+
+  public myCatalogs: Catalog[];
+  public myAPIKeys: APIKey[];
+
+  createAPIKeyForm: FormGroup;
+
+  constructor(
+    public dialog: MatDialog,
+    private authenticationService: AuthenticationService,
+    private myCatalogsGQL: MyCatalogsGQL,
+    private createAPIKeyGQL: CreateAPIKeyGQL,
+    private myAPIKeysGQL: MyAPIKeysGQL,
+    private deleteAPIKeyGQL: DeleteAPIKeyGQL,
+  ) { }
 
   ngOnInit(): void {
+    this.authenticationService.getUserObservable().subscribe(u => {
+
+      if (u == null) {
+        return;
+      }
+      u.then(user => {
+        this.currentUser = user;
+        this.state = State.SUCCESS
+      })
+        .catch(error => this.state = State.ERROR)
+    });
+
+    this.refreshAPIKeys();
+
+    this.myCatalogsGQL.fetch().subscribe(response => {
+      if (response.errors?.length > 0) {
+        this.catalogState = State.ERROR;
+        return;
+      }
+
+      this.myCatalogs = response.data.myCatalogs;
+      this.catalogState = State.SUCCESS;
+
+    });
+
+    this.createAPIKeyForm = new FormGroup({
+      label: new FormControl('')
+    });
   }
 
+  openPasswordDialog() {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.data = this.currentUser
+
+    this.dialog.open(EditPasswordDialogComponent, dialogConfig);
+
+    this.dialog.afterAllClosed.subscribe(result => {
+      this.authenticationService.refreshUserInfo()
+    });
+  }
+
+  createAPIKey() {
+    this.createAPIKeyGQL.mutate({
+      value: {
+        label: this.createAPIKeyForm.value.label,
+        scopes: [Scope.MANAGE_API_KEYS, Scope.MANAGE_PRIVATE_ASSETS, Scope.READ_PRIVATE_ASSETS]
+      }
+    }).subscribe(response => {
+      if (response.errors?.length > 0) {
+
+        if (response.errors.find(e => e.message == "NOT_UNIQUE")) {
+          this.createAPIKeyState = State.ERROR_NOT_UNIQUE;
+          return;
+        }
+
+        this.createAPIKeyState = State.ERROR;
+        return;
+      }
+
+      const key = response.data.createAPIKey;
+
+
+      this.newAPIKey = btoa(key.id + "." + key.secret);
+
+      this.createAPIKeyForm.get('label').setValue('');
+      this.refreshAPIKeys();
+      this.createAPIKeyState = State.SUCCESS;
+    })
+  }
+
+  deleteApiKey(id: string) {
+    this.deleteAPIKeyState = State.LOADING;
+
+    this.deleteAPIKeyGQL.mutate({ id: id }).subscribe(response => {
+      if (response.errors?.length > 0) {
+        this.deleteAPIKeyState = State.ERROR;
+        return;
+      }
+
+      this.createAPIKeyForm.get('label').setValue('');
+      this.refreshAPIKeys();
+      this.deleteAPIKeyState = State.SUCCESS;
+    });
+  }
+
+  refreshAPIKeys() {
+    this.apiKeysState = State.LOADING;
+
+    this.myAPIKeysGQL.fetch({}, { fetchPolicy: 'no-cache' }).subscribe(response => {
+      if (response.errors?.length > 0) {
+        this.apiKeysState = State.ERROR;
+        return;
+      }
+      this.myAPIKeys = response.data.myAPIKeys;
+      this.apiKeysState = State.SUCCESS;
+
+    });
+  }
 }

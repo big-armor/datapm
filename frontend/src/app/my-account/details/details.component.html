@@ -1,5 +1,104 @@
 <div id="detailsPage" class="big-div-package">
   <div class="package-div">
+    <mat-card>
+      <div class="d-flex flex-row">
+        <div>
+          <a class="edit-password ml-3" (click)="openPasswordDialog()">Update Password</a>
+        </div>
+        <div>
+          <a class="edit-password ml-3" (click)="openPasswordDialog()">Manage API Keys</a>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+
+  <div class="package-div panel-div">
+    <mat-accordion>
+      <mat-expansion-panel (opened)="apiKeysOpenState = true" (closed)="apiKeysOpenState = false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            My API Keys
+          </mat-panel-title>
+          <mat-panel-description>
+            You have {{myAPIKeys.length}} API Key(s)
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <ul>
+          <li *ngFor="let apiKey of myAPIKeys">
+            {{apiKey.label}}
+            <button (click)="deleteApiKey(apiKey.id)">Delete</button>
+          </li>
+        </ul>
+        <form [formGroup]="createAPIKeyForm">
+          <div class="bd-highlight div-answer">
+            <input type="text" placeholder="API Key Label" name="label" formControlName="label" minlength="1"
+              autocomplete="off">
+            <div>
+              <!--[disabled]="!createAPIKeyForm.valid"-->
+              <a class="edit-password ml-3" (click)="createAPIKey()">create API key</a>
+            </div>
+          </div>
+        </form>
+        <div *ngIf="createAPIKeyState == State.ERROR_NOT_UNIQUE">
+          You already have a key with that label. Please choose a different label.
+        </div>
+        <div *ngIf="createAPIKeyState == State.ERROR">
+          There was a problem communicating with the server. Please try again.
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+
+  <!-- <button mat-button [mat-dialog-close]="true" (click)="submit()" class="ml-auto save-btn"
+      [class.disabled]="form.invalid">
+      <span>save</span>
+    </button> -->
+  <div class="package-div panel-div">
+    <mat-accordion>
+      <mat-expansion-panel (opened)="catalogsOpenState = true" (closed)="catalogsOpenState = false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            My Catalogs
+          </mat-panel-title>
+          <mat-panel-description>
+            You have {{myCatalogs.length}} Catalog(s)
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <!-- <ul>
+          <li *ngFor="let catalog of myCatalogs">{{catalog.displayName || catalog.identifier.catalogSlug}} <button
+              (click)="deleteApiKey(apiKey.id)">Delete</button>
+          </li>
+        </ul> -->
+        <!-- <form [formGroup]="createAPIKeyForm" (ngSubmit)="createAPIKey()">
+          <input type="text" placeholder="Label" name="label" formControlName="label" minlength="1" autocomplete="off">
+          <input type="submit" value="Create API Key" [disabled]="!createAPIKeyForm.valid">
+        </form> -->
+        <ul>
+          <li *ngFor="let catalog of myCatalogs"><a
+              routerLink="/{{catalog.identifier.catalogSlug}}">{{catalog.displayName || catalog.identifier.catalogSlug}}</a>
+          </li>
+        </ul>
+        <div *ngIf="createAPIKeyState == State.ERROR_NOT_UNIQUE">
+          You already have a key with that label. Please choose a different label.
+        </div>
+        <div *ngIf="createAPIKeyState == State.ERROR">
+          There was a problem communicating with the server. Please try again.
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+  <div class="package-div">
     <mat-card class="example-card">
       <div class="d-flex bd-highlight up-header mt-1 mb-3">
         <div class="bd-highlight">Updated 5 min.</div>
@@ -7,11 +106,7 @@
       </div>
       <mat-card-header class="card-header-mat">
         <div mat-card-avatar class="example-header-image">
-          <img
-            src="../../../assets/images/user-female.png"
-            alt="User image card"
-            class="person-card-photo"
-          />
+          <img src="../../../assets/images/user-female.png" alt="User image card" class="person-card-photo" />
           <span class="person-card-name">Tyler Williams</span>
         </div>
       </mat-card-header>
@@ -19,11 +114,7 @@
       <mat-card-content>
         <div class="d-flex flex-row bd-highlight mb-3">
           <div class="bd-highlight" style="width: 50%">
-            <img
-              mat-card-image
-              src="../../../assets/images/galaxy.jpg"
-              alt="Photo of a Shiba Inu"
-            />
+            <img mat-card-image src="../../../assets/images/galaxy.jpg" alt="Photo of a Shiba Inu" />
           </div>
           <div class="bd-highlight px-3 py-1" style="width: 50%">
             <div class="content-title mb-2">nasa/light-polution</div>
@@ -51,21 +142,13 @@
           <div class="package-actions pt-2">
             <div class="d-flex bd-highlight">
               <div class="p-2 bd-highlight">
-                <button
-                  mat-fab
-                  class="person-menu"
-                  aria-label="Example icon button with a delete icon"
-                >
+                <button mat-fab class="person-menu" aria-label="Example icon button with a delete icon">
                   <mat-icon>star_border</mat-icon>
                 </button>
                 <span class="px-2 content-nr">47</span>
               </div>
               <div class="p-2 bd-highlight">
-                <button
-                  mat-fab
-                  class="person-menu"
-                  aria-label="Example icon button with a delete icon"
-                >
+                <button mat-fab class="person-menu" aria-label="Example icon button with a delete icon">
                   <mat-icon>collections</mat-icon>
                 </button>
                 <span class="px-2 content-nr">add to collection</span>
@@ -77,7 +160,7 @@
     </mat-card>
   </div>
 
-  <div class="package-div">
+  <!-- <div class="package-div">
     <mat-card class="example-card">
       <div class="d-flex bd-highlight up-header mt-1 mb-3">
         <div class="bd-highlight">Updated 5 min.</div>
@@ -85,11 +168,7 @@
       </div>
       <mat-card-header class="card-header-mat">
         <div mat-card-avatar class="example-header-image">
-          <img
-            src="../../../assets/images/user-female.png"
-            alt="User image card"
-            class="person-card-photo"
-          />
+          <img src="../../../assets/images/user-female.png" alt="User image card" class="person-card-photo" />
           <span class="person-card-name">Tyler Williams</span>
         </div>
       </mat-card-header>
@@ -97,11 +176,7 @@
       <mat-card-content>
         <div class="d-flex flex-row bd-highlight mb-3">
           <div class="bd-highlight" style="width: 50%">
-            <img
-              mat-card-image
-              src="../../../assets/images/galaxy.jpg"
-              alt="Photo of a Shiba Inu"
-            />
+            <img mat-card-image src="../../../assets/images/galaxy.jpg" alt="Photo of a Shiba Inu" />
           </div>
           <div class="bd-highlight px-3 py-1" style="width: 50%">
             <div class="content-title mb-2">nasa/atmospheric-changes</div>
@@ -128,21 +203,13 @@
           <div class="package-actions pt-2">
             <div class="d-flex bd-highlight">
               <div class="p-2 bd-highlight">
-                <button
-                  mat-fab
-                  class="person-menu"
-                  aria-label="Example icon button with a delete icon"
-                >
+                <button mat-fab class="person-menu" aria-label="Example icon button with a delete icon">
                   <mat-icon>star_border</mat-icon>
                 </button>
                 <span class="px-2 content-nr">47</span>
               </div>
               <div class="p-2 bd-highlight">
-                <button
-                  mat-fab
-                  class="person-menu"
-                  aria-label="Example icon button with a delete icon"
-                >
+                <button mat-fab class="person-menu" aria-label="Example icon button with a delete icon">
                   <mat-icon>collections</mat-icon>
                 </button>
                 <span class="px-2 content-nr">add to collection</span>
@@ -152,9 +219,9 @@
         </div>
       </mat-card-content>
     </mat-card>
-  </div>
+  </div> -->
 
-  <div class="package-div">
+  <!-- <div class="package-div">
     <mat-card class="example-card">
       <div class="d-flex bd-highlight up-header mt-1 mb-3">
         <div class="bd-highlight">Updated 5 min.</div>
@@ -162,11 +229,7 @@
       </div>
       <mat-card-header class="card-header-mat">
         <div mat-card-avatar class="example-header-image">
-          <img
-            src="../../../assets/images/user-female.png"
-            alt="User image card"
-            class="person-card-photo"
-          />
+          <img src="../../../assets/images/user-female.png" alt="User image card" class="person-card-photo" />
           <span class="person-card-name">Tyler Williams</span>
         </div>
       </mat-card-header>
@@ -196,21 +259,13 @@
           <div class="package-actions">
             <div class="d-flex bd-highlight">
               <div class="p-2 bd-highlight">
-                <button
-                  mat-fab
-                  class="person-menu"
-                  aria-label="Example icon button with a delete icon"
-                >
+                <button mat-fab class="person-menu" aria-label="Example icon button with a delete icon">
                   <mat-icon>star_border</mat-icon>
                 </button>
                 <span class="px-2 content-nr">47</span>
               </div>
               <div class="p-2 bd-highlight">
-                <button
-                  mat-fab
-                  class="person-menu"
-                  aria-label="Example icon button with a delete icon"
-                >
+                <button mat-fab class="person-menu" aria-label="Example icon button with a delete icon">
                   <mat-icon>collections</mat-icon>
                 </button>
                 <span class="px-2 content-nr">add to collection</span>
@@ -220,5 +275,5 @@
         </div>
       </mat-card-content>
     </mat-card>
-  </div>
+  </div> -->
 </div>

@@ -29,6 +29,7 @@ import { DetailsComponent } from './my-account/details/details.component';
 import { PackagesComponent } from './my-account/packages/packages.component';
 import { ActivityComponent } from './my-account/activity/activity.component';
 import { EditAccountDialogComponent } from './my-account/edit-account-dialog/edit-account-dialog.component';
+import { EditPasswordDialogComponent } from './my-account/edit-password-dialog/edit-password-dialog.component';
 
 @NgModule({
   declarations: [
@@ -52,7 +53,8 @@ import { EditAccountDialogComponent } from './my-account/edit-account-dialog/edi
     DetailsComponent,
     PackagesComponent,
     ActivityComponent,
-    EditAccountDialogComponent
+    EditAccountDialogComponent,
+    EditPasswordDialogComponent,
   ],
   imports: [
     BrowserModule,
