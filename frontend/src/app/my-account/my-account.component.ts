@@ -43,10 +43,16 @@ export class MyAccountComponent implements OnInit {
 
 	public myCatalogs: Catalog[];
 	public myAPIKeys: APIKey[];
-	public routes = [];
 	public selectedTab = 0;
 
 	createAPIKeyForm: FormGroup;
+
+	private prefix = "me";
+	public routes = [
+		{ linkName: "details", url: this.prefix },
+		{ linkName: "packages", url: this.prefix + "/packages" },
+		{ linkName: "activity", url: this.prefix + "/activity" }
+	];
 
 	constructor(
 		private authenticationService: AuthenticationService,
@@ -58,14 +64,7 @@ export class MyAccountComponent implements OnInit {
 		private changeDectorRef: ChangeDetectorRef,
 		private route: ActivatedRoute,
 		public dialog: MatDialog
-	) {
-		let prefix = "/me";
-		this.routes = [
-			{ linkName: "details", url: prefix + "/" },
-			{ linkName: "packages", url: prefix + "/packages" },
-			{ linkName: "activity", url: prefix + "/activity" }
-		];
-	}
+	) {}
 
 	ngOnInit(): void {
 		this.selectTab(0);
@@ -104,7 +103,7 @@ export class MyAccountComponent implements OnInit {
 	}
 
 	public selectTab(index) {
-		this.router.navigate([this.routes[index].url], { relativeTo: this.route.parent });
+		this.router.navigate([this.routes[index].url]);
 		this.selectedTab = index;
 	}
 
