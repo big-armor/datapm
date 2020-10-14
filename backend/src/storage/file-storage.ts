@@ -1,28 +1,18 @@
-import { Storage } from "./storage";
+import { DPMStorage } from "./dpm-storage";
 import * as Stream from "stream";
 import * as fs from "fs";
-import { ReadStream, WriteStream } from "fs";
+import crypto from "crypto";
+import { DpmStorageStreamHolder } from "./dpm-storage-stream-holder";
 
-export class FileStorage implements Storage {
+export class FileStorage implements DPMStorage {
+	public static readonly SCHEMA_URL_PREFIX = "file";
+
 	private readonly SCHEMA_URL: string;
-
-	private readonly OPEN_READ_STREAMS: ReadStream[] = [];
-	private readonly OPEN_WRITE_STREAMS: WriteStream[] = [];
+	private readonly streamHelper = new DpmStorageStreamHolder();
 
 	public constructor(url: string) {
-		this.ensureAccessToUrl(url);
+		this.start(url);
 		this.SCHEMA_URL = url;
-	}
-
-	public claimSchema(url: string): boolean {
-		return FileStorage.hasReadWriteAccessInDirectory(url);
-	}
-
-	public getItem(namespace: string, itemId: string): Promise<Stream> {
-		const path = this.buildPath(namespace, itemId);
-		const readStream = fs.createReadStream(path);
-		this.registerReadStream(readStream);
-		return Promise.resolve(readStream);
 	}
 
 	public start(url: string): void {
@@ -31,44 +21,22 @@ export class FileStorage implements Storage {
 		}
 	}
 
-	public stop(): boolean {
-		try {
-			if (this.OPEN_READ_STREAMS.length) {
-				this.OPEN_READ_STREAMS.forEach((stream) => stream.destroy());
-			}
-
-			if (this.OPEN_WRITE_STREAMS.length) {
-				this.OPEN_WRITE_STREAMS.forEach((stream) => stream.destroy());
-			}
-			return true;
-		} catch (e) {
-			console.error("Could not flush read and write streams", e);
-			return false;
-		}
+	public getItem(namespace: string, itemId: string): Promise<Stream> {
+		const path = this.buildPath(namespace, itemId);
+		const readStream = fs.createReadStream(path);
+		return this.streamHelper.resolveReadStream(readStream);
 	}
 
 	public writeItem(namespace: string, itemId: string, byteStream: Stream): Promise<void> {
-		const path = this.buildPath(namespace, itemId);
+		const hash = this.hashItemId(itemId);
+		this.createItemDirectoryIfMissing(namespace, hash);
+		const path = this.buildPathWithHash(namespace, hash, itemId);
 		const writeStream = fs.createWriteStream(path);
-		this.registerWriteStream(writeStream);
-		return new Promise<void>((resolve, reject) => {
-			byteStream.on("data", (data) => writeStream.write(data));
-			byteStream.on("end", () => {
-				writeStream.end();
-				resolve();
-			});
-			byteStream.on("error", (error) => {
-				writeStream.destroy();
-				reject(error);
-			});
-		});
+		return this.streamHelper.copyToStream(byteStream, writeStream);
 	}
 
-	private ensureAccessToUrl(url: string): void {
-		const hasAccessToUrl = this.claimSchema(url);
-		if (!hasAccessToUrl) {
-			throw new Error("Access denied to url: " + url);
-		}
+	public stop(): boolean {
+		return this.streamHelper.destroyOpenStreams();
 	}
 
 	private static hasReadWriteAccessInDirectory(url: string): boolean {
@@ -81,20 +49,23 @@ export class FileStorage implements Storage {
 		}
 	}
 
+	private createItemDirectoryIfMissing(namespace: string, hash: string): void {
+		const path = `${this.SCHEMA_URL}/${namespace}/${hash}`;
+		if (!fs.existsSync(path)) {
+			fs.mkdirSync(path);
+		}
+	}
+
 	private buildPath(namespace: string, itemId: string): string {
-		return `${this.SCHEMA_URL}/${namespace}/${itemId}`; // TODO: Add hashing function
+		const hash = this.hashItemId(itemId);
+		return this.buildPathWithHash(namespace, hash, itemId);
 	}
 
-	private registerReadStream(stream: ReadStream): void {
-		this.registerStream(stream, this.OPEN_READ_STREAMS);
+	private buildPathWithHash(namespace: string, hash: string, itemId: string): string {
+		return `${this.SCHEMA_URL}/${namespace}/${hash}/${itemId}`;
 	}
 
-	private registerWriteStream(stream: WriteStream): void {
-		this.registerStream(stream, this.OPEN_WRITE_STREAMS);
-	}
-
-	private registerStream(stream: Stream, streamCollection: Stream[]): void {
-		const streamIndex = streamCollection.push(stream) - 1;
-		stream.on("close", () => streamCollection.splice(streamIndex, 1));
+	private hashItemId(itemId: string): string {
+		return crypto.createHash("md5").update(itemId).digest("hex").substr(0, 3);
 	}
 }
