@@ -50,7 +50,6 @@ export class EditAccountDialogComponent implements OnInit {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: User,
     public dialogRef: MatDialogRef<EditAccountDialogComponent>,
-    private formBuilder: FormBuilder,
     private updateMeGQL: UpdateMeGQL,
     private usernameAvailableGQL: UsernameAvailableGQL,
     private componentChangeDetector: ChangeDetectorRef
@@ -94,9 +93,6 @@ export class EditAccountDialogComponent implements OnInit {
     }).subscribe(response => {
       if (response.errors) {
         console.warn(response.errors)
-      }
-      if (response.data) {
-        console.log(response.data.updateMe)
       }
     })
     this.closeDialog()

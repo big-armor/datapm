@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, ChangeDetectorRef } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { FormGroup, FormBuilder, FormControl, AsyncValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
+import { FormGroup, FormControl, AbstractControl, ValidationErrors } from '@angular/forms';
 
 import { User, UpdateMeGQL } from 'src/generated/graphql';
 import { AuthenticationService } from 'src/app/services/authentication.service';
@@ -70,7 +70,6 @@ export class EditPasswordDialogComponent implements OnInit {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: User,
     private updateMeGQL: UpdateMeGQL,
-    private componentChangeDetector: ChangeDetectorRef,
     private authenticationService: AuthenticationService,
 
   ) { }
