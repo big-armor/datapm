@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { MaterialModule } from 'src/app/material.module';
 
 import { EditPasswordDialogComponent } from './edit-password-dialog.component';
 
@@ -8,9 +9,10 @@ describe('EditPasswordDialogComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ EditPasswordDialogComponent ]
+      declarations: [EditPasswordDialogComponent],
+      imports: [MaterialModule]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
