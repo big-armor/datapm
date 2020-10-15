@@ -55,6 +55,7 @@ export class MyAccountComponent implements OnInit {
     this.routes = [
       { linkName: 'details', url: prefix },
       { linkName: 'packages', url: prefix + '/packages' },
+      { linkName: 'collections', url: prefix + '/collections' },
       { linkName: 'activity', url: prefix + '/activity' },
     ]
   }
