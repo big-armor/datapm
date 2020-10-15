@@ -30,6 +30,7 @@
     "@graphql-codegen/cli": "1.17.8",
     "@graphql-codegen/fragment-matcher": "1.17.8",
     "@graphql-codegen/introspection": "1.17.8",
+    "@graphql-codegen/typed-document-node": "^1.17.9",
     "@graphql-codegen/typescript": "^1.17.8",
     "@graphql-codegen/typescript-operations": "1.17.8",
     "@types/chai": "^4.2.13",

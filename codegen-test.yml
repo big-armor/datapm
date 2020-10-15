@@ -9,5 +9,6 @@ generates:
      plugins:
        - typescript
        - typescript-operations
+       - typed-document-node
      config:
        rawRequest: true
