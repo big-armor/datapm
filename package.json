@@ -9,6 +9,7 @@
     "clean": "rm -rf node_modules frontend/dist frontend/node_modules backend/dist backend/node_modules docs/website/node_modules docs/website/build",
     "clean:node_modules": "rm -rf node_modules frontend/node_modules frontend/node_modules",
     "build": "gulp",
+    "pretest": "graphql-codegen --config codegen-test.yml",
     "test": "mocha -r ts-node/register test/*.ts",
     "start": "TYPEORM_IS_DIST=true docker-compose -f docker/docker-compose.yml up --build",
     "deploy": "gulp deployDockerImage"
@@ -25,17 +26,26 @@
   "homepage": "https://github.com/big-armor/datapm-registry#readme",
   "dependencies": {},
   "devDependencies": {
+    "@apollo/client": "^3.0.0",
+    "@graphql-codegen/cli": "1.17.8",
+    "@graphql-codegen/fragment-matcher": "1.17.8",
+    "@graphql-codegen/introspection": "1.17.8",
+    "@graphql-codegen/typescript": "^1.17.8",
+    "@graphql-codegen/typescript-operations": "1.17.8",
     "@types/chai": "^4.2.13",
     "@types/mocha": "^8.0.3",
     "chai": "^4.2.0",
+    "cross-fetch": "^3.0.6",
+    "datapm-lib": "^0.2.8",
+    "git-format-staged": "^2.1.0",
+    "graphql": "^15.3.0",
     "gulp": "^4.0.2",
+    "husky": "^4.3.0",
     "mocha": "^8.1.3",
+    "prettier": "^2.1.2",
     "testcontainers": "^4.3.0",
     "ts-node": "^9.0.0",
-    "typescript": "^4.0.3",
-    "git-format-staged": "^2.1.0",
-    "husky": "^4.3.0",
-    "prettier": "^2.1.2"
+    "typescript": "^4.0.3"
   },
   "mocha": {
     "timeout": "300000",

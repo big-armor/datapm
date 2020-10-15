@@ -1,3 +1,0 @@
-query UsernameAvailable($username:String!) {
-  usernameAvailable(username:$username)
-}

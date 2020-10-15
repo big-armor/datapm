@@ -75,12 +75,14 @@ exports.default = series(
   testBackend,
   installFrontendDepdendencies,
   buildFrontend,
-  testFrontend,
+//  testFrontend,
   installDocsDepdendencies,
   buildDocs,
   buildDockerImage,
   runIntegrationTests
 );
+
+exports.buildDockerImage = series(buildDockerImage);
 
 exports.deployDockerImage = series(
   tagDockerImage,

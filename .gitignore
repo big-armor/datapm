@@ -8,3 +8,5 @@ terraform.tfstate
 terraform.tfvars*
 
 .DS_Store
+
+test/registry-client.ts

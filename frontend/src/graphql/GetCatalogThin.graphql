@@ -1,0 +1,10 @@
+query GetCatalogThin($identifier:CatalogIdentifierInput!) {
+  catalog(identifier:$identifier) {
+    identifier {
+      catalogSlug
+    }
+    displayName
+    description
+    website
+  }
+}

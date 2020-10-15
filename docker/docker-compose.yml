@@ -20,9 +20,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
   datapm-registry:
-    build:
-      context: ../
-      dockerfile: docker/Dockerfile
+    image: datapm-registry
     ports:
       - "4000:4000"
     env_file: 

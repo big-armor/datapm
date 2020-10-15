@@ -1,9 +1,0 @@
-query Me {
-  me {
-    emailAddress
-    firstName
-    lastName
-    username
-    nameIsPublic
-  }
-}
