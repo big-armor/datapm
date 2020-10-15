@@ -37,7 +37,7 @@
     "@types/mocha": "^8.0.3",
     "chai": "^4.2.0",
     "cross-fetch": "^3.0.6",
-    "datapm-lib": "^0.2.8",
+    "datapm-lib": "^0.3.3",
     "git-format-staged": "^2.1.0",
     "graphql": "^15.3.0",
     "gulp": "^4.0.2",
