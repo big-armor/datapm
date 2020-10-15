@@ -1,23 +1,22 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
-import { ReactiveFormsModule } from "@angular/forms";
 import { RouterTestingModule } from "@angular/router/testing";
 import { MaterialModule } from "src/app/material.module";
 
-import { HeaderComponent } from "./header.component";
+import { PackagesComponent } from "./packages.component";
 
-describe("HeaderComponent", () => {
-	let component: HeaderComponent;
-	let fixture: ComponentFixture<HeaderComponent>;
+describe("PackagesComponent", () => {
+	let component: PackagesComponent;
+	let fixture: ComponentFixture<PackagesComponent>;
 
 	beforeEach(async(() => {
 		TestBed.configureTestingModule({
-			declarations: [HeaderComponent],
-			imports: [ReactiveFormsModule, RouterTestingModule, MaterialModule]
+			declarations: [PackagesComponent],
+			imports: [MaterialModule, RouterTestingModule]
 		}).compileComponents();
 	}));
 
 	beforeEach(() => {
-		fixture = TestBed.createComponent(HeaderComponent);
+		fixture = TestBed.createComponent(PackagesComponent);
 		component = fixture.componentInstance;
 		fixture.detectChanges();
 	});
