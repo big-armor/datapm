@@ -1,7 +1,7 @@
 # Reference: https://prettier.io/docs/en/options.html
 
 tabWidth: 4
-useTabs: true
+useTabs: false
 printWidth: 120
 
 trailingComma: none
