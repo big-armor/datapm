@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
 import { ApolloTestingModule } from 'apollo-angular/testing';
+import { MaterialModule } from '../material.module';
 
 import { SearchComponent } from './search.component';
 
@@ -11,7 +12,7 @@ describe('SearchComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ SearchComponent ],
-      imports: [RouterModule.forRoot([]),ApolloTestingModule]
+      imports: [RouterModule.forRoot([]),ApolloTestingModule, MaterialModule]
     })
     .compileComponents();
   }));

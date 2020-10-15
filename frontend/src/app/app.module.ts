@@ -1,14 +1,12 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { GraphQLModule } from './graphql.module';
 import { HttpClientModule } from '@angular/common/http';
 import { CatalogDetailsComponent } from './catalog-details/catalog-details.component';
-import { LoginComponent } from './login/login.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { SignupComponent } from './signup/signup.component';
 import { MyAccountComponent } from './my-account/my-account.component';
 import { PackageDetailComponent } from './package/package-detail/package-detail.component';
 import { FormsModule } from '@angular/forms';
@@ -34,8 +32,6 @@ import { EditAccountDialogComponent } from './my-account/edit-account-dialog/edi
   declarations: [
     AppComponent,
     CatalogDetailsComponent,
-    LoginComponent,
-    SignupComponent,
     MyAccountComponent,
     PackageDetailComponent,
     HomepageComponent,
@@ -61,11 +57,14 @@ import { EditAccountDialogComponent } from './my-account/edit-account-dialog/edi
     HttpClientModule,
     ReactiveFormsModule,
     FormsModule,
+    MaterialModule,
     SharedModule,
-    MaterialModule
   ],
   providers: [],
   bootstrap: [AppComponent],
-  entryComponents: [LoginDialogComponent, SignUpDialogComponent]
+  entryComponents: [LoginDialogComponent, SignUpDialogComponent],
+  schemas: [
+    CUSTOM_ELEMENTS_SCHEMA
+  ]
 })
 export class AppModule { }

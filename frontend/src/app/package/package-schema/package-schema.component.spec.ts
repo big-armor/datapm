@@ -1,6 +1,11 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { MaterialModule } from 'src/app/material.module';
 
 import { PackageSchemaComponent } from './package-schema.component';
+import {
+  ApolloTestingModule,
+} from 'apollo-angular/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('PackageSchemaComponent', () => {
   let component: PackageSchemaComponent;
@@ -8,7 +13,8 @@ describe('PackageSchemaComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PackageSchemaComponent ]
+      declarations: [ PackageSchemaComponent ],
+      imports: [RouterTestingModule, ApolloTestingModule, MaterialModule]
     })
     .compileComponents();
   }));
