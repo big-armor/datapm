@@ -1,5 +1,5 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { BrowserModule } from "@angular/platform-browser";
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -30,7 +30,6 @@ import { PackagesComponent } from './my-account/packages/packages.component';
 import { ActivityComponent } from './my-account/activity/activity.component';
 import { EditAccountDialogComponent } from './my-account/edit-account-dialog/edit-account-dialog.component';
 import { EditPasswordDialogComponent } from './my-account/edit-password-dialog/edit-password-dialog.component';
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -68,6 +67,7 @@ import { EditPasswordDialogComponent } from './my-account/edit-password-dialog/e
   ],
   providers: [],
   bootstrap: [AppComponent],
-  entryComponents: [LoginDialogComponent, SignUpDialogComponent]
+  entryComponents: [LoginDialogComponent, SignUpDialogComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AppModule { }

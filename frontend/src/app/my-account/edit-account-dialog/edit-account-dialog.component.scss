@@ -1,304 +1,305 @@
 #editAccount {
-    position: relative;
-    top: -24px;
-    min-width: 700px;
-    ::ng-deep.mat-checked {
-        .mat-slide-toggle-bar {
-            background-color: #00A896;
-        }
+	position: relative;
+	top: -24px;
+	min-width: 700px;
+	::ng-deep.mat-checked {
+		.mat-slide-toggle-bar {
+			background-color: #00a896;
+		}
 
-        .mat-slide-toggle-thumb {
-            background-color: #fff;
-        }
-    }
+		.mat-slide-toggle-thumb {
+			background-color: #fff;
+		}
+	}
 
-    .mat-dialog-content {
-        padding-left: 0px !important;
-        padding-right: 0px !important;
-        padding-bottom: 0px !important;
-        max-height: calc(100vh - 130px);
+	.mat-dialog-content {
+		padding-left: 0px !important;
+		padding-right: 0px !important;
+		padding-bottom: 0px !important;
+		max-height: calc(100vh - 130px);
 
-        .big-img-dialog {
-            height: 140px;
-            object-fit: cover;
-            background-size: 100%;
-            background-repeat: no-repeat;
-            background-image: url('../../../assets/images/cover-image.png');
-            height: 150px;
-            display: flex;
-            align-items: center;
+		.big-img-dialog {
+			height: 140px;
+			object-fit: cover;
+			background-size: 100%;
+			background-repeat: no-repeat;
+			background-image: url("../../../assets/images/cover-image.png");
+			height: 150px;
+			display: flex;
+			align-items: center;
 
-            .add-img-btn {
-                margin: 0 auto;
-                border: none;
-                background: transparent;
-                outline: transparent solid 0px;
-                color: #fff;
+			.add-img-btn {
+				margin: 0 auto;
+				border: none;
+				background: transparent;
+				outline: transparent solid 0px;
+				color: #fff;
 
-                span {
-                    font-size: 48px;
-                }
-            }
-        }
-    }
+				span {
+					font-size: 48px;
+				}
+			}
+		}
+	}
 
-    .mat-dialog-actions {
-        padding: 0px;
-        min-height: unset;
-        .save-btn {
-            position: relative;
-            top: 10px;
-            padding: 5px 20px;
-            box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
-            border-radius: 24px;
-            span {
-                font-family: Roboto Mono;
-                font-style: normal;
-                font-weight: 300;
-                font-size: 18px;
-                line-height: 24px;
-                display: flex;
-                align-items: center;
-                text-align: center;
-                letter-spacing: -0.28px;
-                color: #828282;
-            }
-        }
-    }
+	.mat-dialog-actions {
+		padding: 0px;
+		min-height: unset;
+		.save-btn {
+			position: relative;
+			top: 10px;
+			padding: 5px 20px;
+			box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
+				0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
+			border-radius: 24px;
+			span {
+				font-family: Roboto Mono;
+				font-style: normal;
+				font-weight: 300;
+				font-size: 18px;
+				line-height: 24px;
+				display: flex;
+				align-items: center;
+				text-align: center;
+				letter-spacing: -0.28px;
+				color: #828282;
+			}
+		}
+	}
 
-    .dialog-content-text {
-        position: relative;
-        top: -45px;
+	.dialog-content-text {
+		position: relative;
+		top: -45px;
 
-        .img-wrapper {
-            width: 100px;
-            height: 100px;
-            margin-left: 30px;
-            .profile-img {
-                height: 100%;
-                object-fit: cover;
-                background-size: 100%;
-                background-repeat: no-repeat;
-                box-shadow: inset 0 0 0 1000px rgb(0 0 0 / 45%);
-                background-image: url('../../../assets/images/user-female.jpg');
-                display: flex;
-                align-items: center;
-                border-radius: 50%;
-                button {
-                    margin: 0 auto;
-                    border: none;
-                    background: transparent;
-                    outline: transparent solid 0px;
-                    color: #fff;
-                }
-            }
-        }
+		.img-wrapper {
+			width: 100px;
+			height: 100px;
+			margin-left: 30px;
+			.profile-img {
+				height: 100%;
+				object-fit: cover;
+				background-size: 100%;
+				background-repeat: no-repeat;
+				box-shadow: inset 0 0 0 1000px rgb(0 0 0 / 45%);
+				background-image: url("../../../assets/images/user-female.jpg");
+				display: flex;
+				align-items: center;
+				border-radius: 50%;
+				button {
+					margin: 0 auto;
+					border: none;
+					background: transparent;
+					outline: transparent solid 0px;
+					color: #fff;
+				}
+			}
+		}
 
-        .small-paragraph {
-            margin-bottom: 3px;
-            font-family: Roboto Mono;
-            font-style: normal;
-            font-weight: normal;
-            font-size: 10px;
-            line-height: 13px;
-            text-align: right;
-            letter-spacing: -0.28px;
-            padding-right: 24px;
-            color: #BDBDBD;
-        }
+		.small-paragraph {
+			margin-bottom: 3px;
+			font-family: Roboto Mono;
+			font-style: normal;
+			font-weight: normal;
+			font-size: 10px;
+			line-height: 13px;
+			text-align: right;
+			letter-spacing: -0.28px;
+			padding-right: 24px;
+			color: #bdbdbd;
+		}
 
-        .shadow-div {
-            box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+		.shadow-div {
+			box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+				0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
 
-            .div-question {
-                font-family: Roboto Mono;
-                font-style: normal;
-                font-weight: normal;
-                font-size: 14px;
-                line-height: 18px;
-                letter-spacing: -0.28px;
-                color: #4F4F4F;
-                width: 165px;
-            }
+			.div-question {
+					font-family: Roboto Mono;
+					font-style: normal;
+					font-weight: normal;
+					font-size: 14px;
+					line-height: 18px;
+					letter-spacing: -0.28px;
+					color: #4F4F4F;
+					width: 165px;
+			}
 
-            .div-answer {
-                width: 100%;
-                textarea {
-                    border: none !important;
-                    font-family: Roboto Mono;
-                    font-style: normal;
-                    font-weight: normal;
-                    font-size: 14px;
-                    display: flex;
-                    align-items: flex-end;
-                    letter-spacing: -0.28px;
-                    color: #017FB9;
+			.div-answer {
+				width: 100%;
+				textarea {
+					border: none !important;
+					font-family: Roboto Mono;
+					font-style: normal;
+					font-weight: normal;
+					font-size: 14px;
+					display: flex;
+					align-items: flex-end;
+					letter-spacing: -0.28px;
+					color: #017fb9;
 
-                    &:focus {
-                        outline: transparent solid 0px;
-                        box-shadow: none;
-                    }
+					&:focus {
+						outline: transparent solid 0px;
+						box-shadow: none;
+					}
 
-                    &::placeholder {
-                        font-family: Roboto Mono;
-                        font-style: normal;
-                        font-weight: 300;
-                        font-size: 14px;
-                        line-height: 18px;
-                        display: flex;
-                        align-items: flex-end;
-                        letter-spacing: -0.28px;
-                        color: #828282;
-                    }
-                }
-                input {
-                    height: 35px;
-                    border: none !important;
-                    font-family: Roboto Mono;
-                    font-style: normal;
-                    font-weight: normal;
-                    font-size: 14px;
-                    line-height: 18px;
-                    display: flex;
-                    align-items: flex-end;
-                    letter-spacing: -0.28px;
-                    color: #017FB9;
+					&::placeholder {
+						font-family: Roboto Mono;
+						font-style: normal;
+						font-weight: 300;
+						font-size: 14px;
+						line-height: 18px;
+						display: flex;
+						align-items: flex-end;
+						letter-spacing: -0.28px;
+						color: #828282;
+					}
+				}
+				input {
+					height: 35px;
+					border: none !important;
+					font-family: Roboto Mono;
+					font-style: normal;
+					font-weight: normal;
+					font-size: 14px;
+					line-height: 18px;
+					display: flex;
+					align-items: flex-end;
+					letter-spacing: -0.28px;
+					color: #017fb9;
 
-                    &:focus {
-                        outline: transparent solid 0px;
-                        box-shadow: none;
-                    }
+					&:focus {
+						outline: transparent solid 0px;
+						box-shadow: none;
+					}
 
-                    &::placeholder {
-                        font-family: Roboto Mono;
-                        font-style: normal;
-                        font-weight: 300;
-                        font-size: 14px;
-                        line-height: 18px;
-                        display: flex;
-                        align-items: flex-end;
-                        letter-spacing: -0.28px;
-                        color: #828282;
-                    }
-                }
-            }
-            .div-with-errors {
-                max-width: 346px;
-                font-family: Roboto Mono;
-                font-style: normal;
-                font-weight: 400;
-                padding-left: 10px;
-                font-size: 10px;
-                // margin-top: 5px;
-                color: #f44336;
-                line-height: 12px;
-            }
-        }
-    }
-    .disabled {
-        background-color: #cccccc85;
-        pointer-events: none;
-        opacity: 0.6;
-        .btn-text {
-        color: #82828273;
-        }
-    }
+					&::placeholder {
+							font-family: Roboto Mono;
+							font-style: normal;
+							font-weight: 300;
+							font-size: 14px;
+							line-height: 18px;
+							display: flex;
+							align-items: flex-end;
+							letter-spacing: -0.28px;
+							color: #828282;
+					}
+				}
+			}
+			.div-with-errors {
+					max-width: 346px;
+					font-family: Roboto Mono;
+					font-style: normal;
+					font-weight: 400;
+					padding-left: 10px;
+					font-size: 10px;
+					color: #f44336;
+					line-height: 12px;
+			}
+		}
+	}
+	.disabled {
+			background-color: #cccccc85;
+			pointer-events: none;
+			opacity: 0.6;
+			.btn-text {
+			color: #82828273;
+			}
+	}
 }
 
 @media (max-width: 992px) {
-    #editAccount {
-        min-width: 400px;
-    }
+	#editAccount {
+		min-width: 400px;
+	}
 }
 
 @media (max-width: 576px) {
-    #editAccount {
-        min-width: 300px;
-        .dialog-content-text {
-            .shadow-div {
-                .div-question {
-                    width: 70px;
-                    font-size: 11px;
-                    padding-left: 5px !important;
-                    padding-right: 0px !important;
-                }
-                .div-answer {
-                    input {
-                        height: 35px;
-                        font-size: 11px;
-                        &::placeholder {
-                            font-size: 11px;
-                        }
-                    }
-                    textarea {
-                        height: 45px;
-                        font-size: 11px;
-                        &::placeholder {
-                            font-size: 11px;
-                        }
-                    }
-                }
-                .slide-right {
-                    padding-right: 10px !important;
-                    padding-left: 0px !important;
-                }
-            }
-            .img-wrapper {
-                width: 75px;
-                height: 75px;
-                margin-left: 16px;
-            }
-            .small-paragraph {
-                font-size: 9px;
-                padding-right: 6px;
-            }
-        }
-        .mat-dialog-actions {
-            .save-btn {
-                position: relative;
-                top: 10px;
-                padding: 0px 16px;
-                span {
-                    font-size: 14px;
-                }
-            }
-        }
-        .mat-dialog-content {
-            .big-img-dialog {
-                height: 100px;
-            }
-        }
-    }
+	#editAccount {
+		min-width: 300px;
+		.dialog-content-text {
+			.shadow-div {
+				.div-question {
+					width: 70px;
+					font-size: 11px;
+					padding-left: 5px !important;
+					padding-right: 0px !important;
+				}
+				.div-answer {
+					input {
+						height: 35px;
+						font-size: 11px;
+						&::placeholder {
+							font-size: 11px;
+						}
+					}
+					textarea {
+						height: 45px;
+						font-size: 9px;
+						&::placeholder {
+							font-size: 9px;
+						}
+					}
+				}
+				.slide-right {
+					padding-right: 10px !important;
+					padding-left: 0px !important;
+				}
+			}
+			.img-wrapper {
+				width: 75px;
+				height: 75px;
+				margin-left: 16px;
+			}
+			.small-paragraph {
+				font-size: 9px;
+				padding-right: 6px;
+			}
+		}
+		.mat-dialog-actions {
+			.save-btn {
+				position: relative;
+				top: 10px;
+				padding: 0px 16px;
+				span {
+					font-size: 14px;
+				}
+			}
+		}
+		.mat-dialog-content {
+			.big-img-dialog {
+				height: 100px;
+			}
+		}
+	}
 }
 
 @media (max-width: 480px) {
-    #editAccount {
-        min-width: 210px;
-        .dialog-content-text {
-            .shadow-div {
-                .div-question {
-                    width: 58px;
-                    font-size: 10px;
-                    padding-left: 5px !important;
-                    padding-right: 0px !important;
-                }
-                .div-answer {
-                    input {
-                        height: 35px;
-                        font-size: 9px;
-                        &::placeholder {
-                            font-size: 9px;
-                        }
-                    }
-                    textarea {
-                        height: 45px;
-                        font-size: 9px;
-                        &::placeholder {
-                            font-size: 9px;
-                        }
-                    }
-                }
-            }
-        }
-    }
+	#editAccount {
+		min-width: 210px;
+		.dialog-content-text {
+			.shadow-div {
+				.div-question {
+					width: 58px;
+					font-size: 10px;
+					padding-left: 5px !important;
+					padding-right: 0px !important;
+				}
+				.div-answer {
+					input {
+						height: 35px;
+						font-size: 9px;
+						&::placeholder {
+							font-size: 9px;
+						}
+					}
+					textarea {
+						height: 45px;
+						font-size: 9px;
+						&::placeholder {
+							font-size: 9px;
+						}
+					}
+				}
+			}
+		}
+	}
 }

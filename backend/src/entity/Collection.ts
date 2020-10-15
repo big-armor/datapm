@@ -1,8 +1,8 @@
 import { Entity, Column, PrimaryColumn, Index, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
 import { CollectionIdentifier } from "../generated/graphql";
+import { User } from './User';
 
 import { BaseModel } from "./BaseModel";
-import { User } from "./User";
 
 @Entity()
 @Index("name")

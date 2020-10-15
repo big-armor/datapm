@@ -18,12 +18,11 @@ enum State {
   ERROR_NO_LABEL
 }
 @Component({
-  selector: 'me-details',
-  templateUrl: './details.component.html',
-  styleUrls: ['./details.component.scss']
+  selector: "me-details",
+  templateUrl: "./details.component.html",
+  styleUrls: ["./details.component.scss"]
 })
 export class DetailsComponent implements OnInit {
-
   State = State;
   state = State.INIT;
 
@@ -36,7 +35,7 @@ export class DetailsComponent implements OnInit {
   deleteAPIKeyState = State.INIT;
   newAPIKey: string;
 
-  columnsToDisplay = ['label', 'key', 'actions'];
+  columnsToDisplay = ['label', 'scopes', 'actions'];
 
   public myCatalogs: Catalog[];
   public myAPIKeys: APIKey[];
@@ -108,7 +107,6 @@ export class DetailsComponent implements OnInit {
       }
 
       const key = response.data.createAPIKey;
-
 
       this.newAPIKey = btoa(key.id + "." + key.secret);
 

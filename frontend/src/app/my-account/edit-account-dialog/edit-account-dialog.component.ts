@@ -38,9 +38,9 @@ function usernameValidator(usernameAvailableGQL: UsernameAvailableGQL, component
 }
 
 @Component({
-  selector: 'app-edit-account-dialog',
-  templateUrl: './edit-account-dialog.component.html',
-  styleUrls: ['./edit-account-dialog.component.scss']
+  selector: "app-edit-account-dialog",
+  templateUrl: "./edit-account-dialog.component.html",
+  styleUrls: ["./edit-account-dialog.component.scss"]
 })
 export class EditAccountDialogComponent implements OnInit {
   public form: FormGroup;

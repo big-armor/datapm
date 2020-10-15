@@ -1,25 +1,27 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { PackageSchemaComponent } from './package-schema.component';
+import { PackageSchemaComponent } from "./package-schema.component";
 
-describe('PackageSchemaComponent', () => {
-  let component: PackageSchemaComponent;
-  let fixture: ComponentFixture<PackageSchemaComponent>;
+import { MaterialModule } from "../../material.module";
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ PackageSchemaComponent ]
-    })
-    .compileComponents();
-  }));
+describe("PackageSchemaComponent", () => {
+	let component: PackageSchemaComponent;
+	let fixture: ComponentFixture<PackageSchemaComponent>;
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(PackageSchemaComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+	beforeEach(async(() => {
+		TestBed.configureTestingModule({
+			declarations: [PackageSchemaComponent],
+			imports: [MaterialModule]
+		}).compileComponents();
+	}));
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+	beforeEach(() => {
+		fixture = TestBed.createComponent(PackageSchemaComponent);
+		component = fixture.componentInstance;
+		fixture.detectChanges();
+	});
+
+	it("should create", () => {
+		expect(component).toBeTruthy();
+	});
 });

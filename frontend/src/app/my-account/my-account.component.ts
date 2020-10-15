@@ -1,11 +1,10 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { AuthenticationService } from '../services/authentication.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { FormGroup, FormControl } from '@angular/forms';
-import { getRegistryPort, getRegistryProtocol, getRegistryHostname } from '../helpers/RegistryAccessHelper';
-import { APIKey, Catalog, CreateAPIKeyGQL, DeleteAPIKeyGQL, MyAPIKeysGQL, MyCatalogsGQL, Scope, User } from 'src/generated/graphql';
-import { EditAccountDialogComponent } from './edit-account-dialog/edit-account-dialog.component';
+import { Component, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
+import { FormGroup, FormControl } from "@angular/forms";
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { AuthenticationService } from "../services/authentication.service";
+import { APIKey, Catalog, User } from 'src/generated/graphql';
+import { EditAccountDialogComponent } from "./edit-account-dialog/edit-account-dialog.component";
 
 enum State {
   INIT,
@@ -15,9 +14,9 @@ enum State {
   ERROR_NOT_UNIQUE
 }
 @Component({
-  selector: 'app-my-account',
-  templateUrl: './my-account.component.html',
-  styleUrls: ['./my-account.component.scss']
+  selector: "app-my-account",
+  templateUrl: "./my-account.component.html",
+  styleUrls: ["./my-account.component.scss"]
 })
 export class MyAccountComponent implements OnInit {
   State = State;

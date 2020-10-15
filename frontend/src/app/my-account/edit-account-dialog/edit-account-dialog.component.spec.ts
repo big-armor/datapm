@@ -4,9 +4,9 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { RouterTestingModule } from '@angular/router/testing';
 import { MaterialModule } from 'src/app/material.module';
 
-import { EditAccountDialogComponent } from './edit-account-dialog.component';
+import { EditAccountDialogComponent } from "./edit-account-dialog.component";
 
-describe('EditAccountDialogComponent', () => {
+describe("EditAccountDialogComponent", () => {
   let component: EditAccountDialogComponent;
   let fixture: ComponentFixture<EditAccountDialogComponent>;
 
@@ -38,7 +38,7 @@ describe('EditAccountDialogComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });
