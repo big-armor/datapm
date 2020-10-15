@@ -78,6 +78,13 @@ jobs:
           PROJECT_ID: data-test-terraform
           GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
 
+      - name: Google Run Update
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        run: gcloud run services update-traffic datapm-registry --project datapm-test-terraform --region us-central1 --platform managed --to-latest
+        env:
+          PROJECT_ID: data-test-terraform
+          GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
+
       - name: Publish Apollo Graphql Update
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         run: npx apollo service:push --graph=datapm --key=${{secrets.APOLLO_KEY}} --variant=test --localSchemaFile=backend/dist/schema.gql,backend/dist/auth-schema.gql,backend/dist/user-schema.gql,backend/dist/api-key-schema.gql
