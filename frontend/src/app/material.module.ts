@@ -20,6 +20,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table'
+import { MatTooltipModule } from '@angular/material/tooltip'
 @NgModule({
   declarations: [],
   imports: [
@@ -43,9 +44,11 @@ import { MatTableModule } from '@angular/material/table'
     MatExpansionModule,
     MatSlideToggleModule,
     MatProgressSpinnerModule,
-    MatTableModule
+    MatTableModule,
+    MatTooltipModule
   ],
   exports: [
+    BrowserAnimationsModule,
     MatRadioModule,
     MatIconModule,
     MatButtonModule,
@@ -64,7 +67,8 @@ import { MatTableModule } from '@angular/material/table'
     MatExpansionModule,
     MatSlideToggleModule,
     MatProgressSpinnerModule,
-    MatTableModule
+    MatTableModule,
+    MatTooltipModule
   ],
 })
 export class MaterialModule { }

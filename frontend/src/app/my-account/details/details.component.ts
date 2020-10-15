@@ -7,6 +7,7 @@ import { getRegistryPort, getRegistryProtocol, getRegistryHostname } from '../..
 import { APIKey, Catalog, User, CreateAPIKeyGQL, MyCatalogsGQL, MyAPIKeysGQL, DeleteAPIKeyGQL, Scope } from 'src/generated/graphql';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
+import { Clipboard } from '@angular/cdk/clipboard'
 
 enum State {
   INIT,
@@ -49,6 +50,7 @@ export class DetailsComponent implements OnInit {
     private createAPIKeyGQL: CreateAPIKeyGQL,
     private myAPIKeysGQL: MyAPIKeysGQL,
     private deleteAPIKeyGQL: DeleteAPIKeyGQL,
+    private clipboard: Clipboard
   ) { }
 
   ngOnInit(): void {
@@ -151,8 +153,6 @@ export class DetailsComponent implements OnInit {
       }
       this.myAPIKeys = response.data.myAPIKeys;
       this.apiKeysState = State.SUCCESS;
-      console.log(this.myAPIKeys)
-
     });
   }
 
@@ -174,5 +174,9 @@ export class DetailsComponent implements OnInit {
     }
 
     return `datapm registry add ${hostname}` + portOption + protocolOption + ` ${this.newAPIKey}`
+  }
+
+  copyKeyToClipboard() {
+    this.clipboard.copy(this.apiKeyCommandString())
   }
 }
