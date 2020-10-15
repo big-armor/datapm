@@ -80,7 +80,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   goHome() {
-    this.router.navigate(['/latest']);
+    this.router.navigate(['/']);
   }
 
   goToMyDetails() {

@@ -56,14 +56,19 @@ button.mat-menu-item {
   box-shadow: 0px 1px 7px 4px rgb(90 88 88 / 25%);
   background: white;
 
+  &:focus {
+    outline: transparent solid 0px !important;
+  }
+
   ::ng-deep .mat-button-wrapper {
     padding: 0 !important;
 
     .mat-icon {
       color: #828282;
-      font-size: 32px;
+      font-size: 26px;
       width: unset;
-      height: 35px;
+      height: 32px;
+
       &:focus {
         outline: transparent solid 0px !important;
       }

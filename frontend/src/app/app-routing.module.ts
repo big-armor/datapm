@@ -22,8 +22,8 @@ const staticRoutes:Route[] = [
     component: HomepageComponent,
     children:[
       {
-        path: '',
-        redirectTo: "latest",
+        path: 'latest',
+        redirectTo: "",
         pathMatch: "full"
       },
       // {
@@ -31,7 +31,7 @@ const staticRoutes:Route[] = [
       //   component: TrendingComponent
       // },
       {
-        path:'latest',
+        path:'',
         component: LatestComponent
       },
       // {
