@@ -41,6 +41,58 @@
         color: #333333;
     }
 
+    .no-keys-div {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 26px;
+        letter-spacing: -0.28px;
+        color: #333333;
+        padding: 24px;
+        padding-bottom: 0;
+    }
+
+    .table-title {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 20px;
+        line-height: 26px;
+        letter-spacing: -0.28px;
+        color: #333333;
+        padding: 24px;
+        padding-bottom: 0;
+    }
+
+    th, td {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: normal;
+        line-height: 26px;
+        letter-spacing: -0.28px;
+    }
+
+    td {
+        font-size: 12px;
+        color: #333333;
+    }
+
+    .api-key-form {
+        padding: 24px;
+        .div-with-errors {
+            max-width: 346px;
+            font-family: Roboto Mono;
+            font-style: normal;
+            font-weight: 400;
+            padding-left: 2px;
+            font-size: 10px;
+            margin-top: 5px;
+            color: #f44336;
+            line-height: 12px;
+        }
+    }
+
     .content-list {
         ul {
             li {
