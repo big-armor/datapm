@@ -19,6 +19,9 @@ h1.title {
 
   a {
     cursor: pointer;
+    &:hover {
+      text-decoration: none;
+    }
   }
 }
 
@@ -28,16 +31,23 @@ button.mat-menu-item {
   }
 }
 
+.desktop-menu {
+  max-width: 1450px;
+  margin: 0 auto;
+}
+
 .main-menu-title {
-  font-family: Roboto Mono;
-  font-style: normal;
-  font-weight: 300;
-  font-size: 16px;
-  line-height: 21px;
-  text-align: center;
-  cursor: pointer;
-  letter-spacing: -0.28px;
-  color: #828282;
+  a {
+    font-family: Roboto Mono;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 21px;
+    text-align: center;
+    cursor: pointer;
+    letter-spacing: -0.28px;
+    color: #828282;
+  }
 }
 
 .mat-fab.person-menu {
