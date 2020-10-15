@@ -53,7 +53,7 @@
         padding-bottom: 0;
     }
 
-    .table-title {
+    .section-title {
         font-family: Roboto Mono;
         font-style: normal;
         font-weight: 500;
@@ -62,6 +62,9 @@
         letter-spacing: -0.28px;
         color: #333333;
         padding: 24px;
+    }
+
+    .api-keys-title {
         padding-bottom: 0;
     }
 
@@ -191,6 +194,17 @@
     .mat-card {
         box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
 
+        .mat-card-title {
+            font-family: Roboto Mono;
+            font-style: normal;
+            font-weight: 500;
+            font-size: 18px;
+            line-height: 18px;
+            letter-spacing: -0.28px;
+            color: #333333;
+            padding: 8px;
+        }
+
         .mat-card-image {
             width: 100%;
             height: 150px;
@@ -208,6 +222,7 @@
             color: #4F4F4F;
             max-height: 111px;
             overflow: hidden;
+            padding: 8px;
         }
 
         ::ng-deep.card-header-mat {

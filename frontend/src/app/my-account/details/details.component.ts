@@ -67,17 +67,7 @@ export class DetailsComponent implements OnInit {
     });
 
     this.refreshAPIKeys();
-    // this.dataSource = this.myAPIKeys;
-    this.myCatalogsGQL.fetch().subscribe(response => {
-      if (response.errors?.length > 0) {
-        this.catalogState = State.ERROR;
-        return;
-      }
-
-      this.myCatalogs = response.data.myCatalogs;
-      this.catalogState = State.SUCCESS;
-
-    });
+    this.refreshCatalogs();
 
     this.createAPIKeyForm = new FormGroup({
       label: new FormControl('')
@@ -153,6 +143,18 @@ export class DetailsComponent implements OnInit {
       }
       this.myAPIKeys = response.data.myAPIKeys;
       this.apiKeysState = State.SUCCESS;
+    });
+  }
+
+  refreshCatalogs() {
+    this.myCatalogsGQL.fetch().subscribe(response => {
+      if (response.errors?.length > 0) {
+        this.catalogState = State.ERROR;
+        return;
+      }
+      this.myCatalogs = response.data.myCatalogs;
+      this.catalogState = State.SUCCESS;
+      console.log(this.myCatalogs)
     });
   }
 
