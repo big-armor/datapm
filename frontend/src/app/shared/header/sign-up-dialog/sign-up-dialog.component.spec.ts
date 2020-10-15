@@ -1,29 +1,28 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
-import { RouterTestingModule } from '@angular/router/testing';
-import { MaterialModule } from 'src/app/material.module';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { RouterTestingModule } from "@angular/router/testing";
+import { MaterialModule } from "src/app/material.module";
 
-import { SignUpDialogComponent } from './sign-up-dialog.component';
+import { SignUpDialogComponent } from "./sign-up-dialog.component";
 
-describe('SignUpDialogComponent', () => {
-  let component: SignUpDialogComponent;
-  let fixture: ComponentFixture<SignUpDialogComponent>;
+describe("SignUpDialogComponent", () => {
+	let component: SignUpDialogComponent;
+	let fixture: ComponentFixture<SignUpDialogComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ SignUpDialogComponent ],
-      imports: [ReactiveFormsModule, RouterTestingModule, MaterialModule]
-    })
-    .compileComponents();
-  }));
+	beforeEach(async(() => {
+		TestBed.configureTestingModule({
+			declarations: [SignUpDialogComponent],
+			imports: [FormsModule, ReactiveFormsModule, RouterTestingModule, MaterialModule]
+		}).compileComponents();
+	}));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(SignUpDialogComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+	beforeEach(() => {
+		fixture = TestBed.createComponent(SignUpDialogComponent);
+		component = fixture.componentInstance;
+		fixture.detectChanges();
+	});
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+	it("should create", () => {
+		expect(component).toBeTruthy();
+	});
 });
