@@ -6,9 +6,7 @@ import { AppComponent } from './app.component';
 import { GraphQLModule } from './graphql.module';
 import { HttpClientModule } from '@angular/common/http';
 import { CatalogDetailsComponent } from './catalog-details/catalog-details.component';
-import { LoginComponent } from './login/login.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { SignupComponent } from './signup/signup.component';
 import { MyAccountComponent } from './my-account/my-account.component';
 import { PackageDetailComponent } from './package/package-detail/package-detail.component';
 import { FormsModule } from '@angular/forms';
@@ -34,8 +32,6 @@ import { EditPasswordDialogComponent } from './my-account/edit-password-dialog/e
   declarations: [
     AppComponent,
     CatalogDetailsComponent,
-    LoginComponent,
-    SignupComponent,
     MyAccountComponent,
     PackageDetailComponent,
     HomepageComponent,

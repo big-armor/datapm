@@ -4,7 +4,16 @@ import { EditPasswordDialogComponent } from '../edit-password-dialog/edit-passwo
 import { AuthenticationService } from '../../services/authentication.service';
 import { getRegistryPort, getRegistryProtocol, getRegistryHostname } from '../../helpers/RegistryAccessHelper';
 
-import { APIKey, Catalog, User, CreateAPIKeyGQL, MyCatalogsGQL, MyAPIKeysGQL, DeleteAPIKeyGQL, Scope } from 'src/generated/graphql';
+import {
+  APIKey,
+  Catalog,
+  User,
+  CreateAPIKeyGQL,
+  MyCatalogsGQL,
+  MyAPIKeysGQL,
+  DeleteAPIKeyGQL,
+  Scope
+} from 'src/generated/graphql';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { Clipboard } from '@angular/cdk/clipboard'
