@@ -1,5 +1,5 @@
-import { Component, OnInit, Inject, ChangeDetectorRef, AfterViewInit, ElementRef, HostListener, Output, EventEmitter, OnDestroy } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, AsyncValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
+import { Component, OnInit, Inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { FormGroup, FormControl, AsyncValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -61,7 +61,6 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
     private usernameAvailableGQL: UsernameAvailableGQL,
     private updateCatalogGQL: UpdateCatalogGQL,
     private componentChangeDetector: ChangeDetectorRef,
-    private elementRef: ElementRef
   ) { }
 
   ngOnInit(): void {

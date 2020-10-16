@@ -7,7 +7,7 @@ import {
   ApolloTestingController,
 } from 'apollo-angular/testing';
 import { MaterialModule } from '../material.module';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog'
+import { MatDialog, MatDialogConfig, MAT_DIALOG_DATA } from '@angular/material/dialog'
 
 describe('MyAccountComponent', () => {
   let component: MyAccountComponent;
@@ -19,6 +19,10 @@ describe('MyAccountComponent', () => {
       declarations: [MyAccountComponent],
       imports: [RouterModule.forRoot([]), ApolloTestingModule, MaterialModule],
       providers: [
+        {
+          provide: MAT_DIALOG_DATA,
+          useValue: {}
+        },
         {
           provide: MatDialog,
           useValue: {}
