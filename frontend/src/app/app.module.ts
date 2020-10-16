@@ -28,6 +28,7 @@ import { PackagesComponent } from './my-account/packages/packages.component';
 import { ActivityComponent } from './my-account/activity/activity.component';
 import { EditAccountDialogComponent } from './my-account/edit-account-dialog/edit-account-dialog.component';
 import { EditPasswordDialogComponent } from './my-account/edit-password-dialog/edit-password-dialog.component';
+import { ConfirmationDialogComponent } from './my-account/confirmation-dialog/confirmation-dialog.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -50,6 +51,7 @@ import { EditPasswordDialogComponent } from './my-account/edit-password-dialog/e
     ActivityComponent,
     EditAccountDialogComponent,
     EditPasswordDialogComponent,
+    ConfirmationDialogComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,7 +1,8 @@
-import { Component, OnInit, Inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectorRef, AfterViewInit, ElementRef, HostListener } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, AsyncValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { UpdateMeGQL, UsernameAvailableGQL, User } from '../../../generated/graphql';
+import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 
 function usernameValidator(usernameAvailableGQL: UsernameAvailableGQL, componentChangeDetector: ChangeDetectorRef, currentUsername: string): AsyncValidatorFn {
   return (control: AbstractControl): Promise<ValidationErrors | null> => {
@@ -42,19 +43,25 @@ function usernameValidator(usernameAvailableGQL: UsernameAvailableGQL, component
   templateUrl: "./edit-account-dialog.component.html",
   styleUrls: ["./edit-account-dialog.component.scss"]
 })
-export class EditAccountDialogComponent implements OnInit {
+export class EditAccountDialogComponent implements OnInit, AfterViewInit {
   public form: FormGroup;
   private currentUser: User;
   public submitDisabled: boolean = false;
+  private confirmDialogOpened: boolean = false;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: User,
     public dialogRef: MatDialogRef<EditAccountDialogComponent>,
+    public dialog: MatDialog,
     private updateMeGQL: UpdateMeGQL,
     private usernameAvailableGQL: UsernameAvailableGQL,
-    private componentChangeDetector: ChangeDetectorRef
-
+    private componentChangeDetector: ChangeDetectorRef,
+    private elementRef: ElementRef
   ) { }
+
+  // @HostListener('touchstart', ['$event']) ontouchstart() {
+  //   this.openConfirmDialog()
+  // }
 
   ngOnInit(): void {
     this.currentUser = this.data;
@@ -70,6 +77,11 @@ export class EditAccountDialogComponent implements OnInit {
       gitHubHandle: new FormControl(this.currentUser.gitHubHandle),
       nameIsPublic: new FormControl(this.currentUser.nameIsPublic)
     })
+  }
+
+  ngAfterViewInit() {
+    //   @HostListener('window:keydown', ['$event'])
+    // this.elementRef.nativeElement.querySelector('confirmTrigger').addEventListener('touchstart', this.openConfirmDialog.bind(this))
   }
 
   submit() {
@@ -100,6 +112,13 @@ export class EditAccountDialogComponent implements OnInit {
 
   closeDialog() {
     this.dialogRef.close();
+  }
+
+  openConfirmDialog() {
+    if (this.confirmDialogOpened === false) {
+      this.dialog.open(ConfirmationDialogComponent);
+      this.confirmDialogOpened = true;
+    }
   }
 
   get username() {

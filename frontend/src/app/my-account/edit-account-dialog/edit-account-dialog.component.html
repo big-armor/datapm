@@ -40,7 +40,8 @@
       <div class="d-flex bd-highlight shadow-div mb-3">
         <div class="px-4 py-2 bd-highlight div-question">username </div>
         <div class="bd-highlight div-answer">
-          <input [formControl]="username" type="text" class="form-control" placeholder="Add your username">
+          <input (focus)="openConfirmDialog()" [formControl]="username" type="text" class="form-control"
+            placeholder="Add your username">
           <div class="div-with-errors">
             <div class="alert-warn" *ngIf="username.errors?.REQUIRED">
               Username is required.
