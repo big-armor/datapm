@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { EditPasswordDialogComponent } from '../edit-password-dialog/edit-password-dialog.component'
+import { EditPasswordDialogComponent } from '../edit-password-dialog/edit-password-dialog.component';
 import { AuthenticationService } from '../../services/authentication.service';
 import { getRegistryPort, getRegistryProtocol, getRegistryHostname } from '../../helpers/RegistryAccessHelper';
 
@@ -17,6 +17,8 @@ import {
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { Clipboard } from '@angular/cdk/clipboard'
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 enum State {
   INIT,
@@ -31,7 +33,7 @@ enum State {
   templateUrl: "./details.component.html",
   styleUrls: ["./details.component.scss"]
 })
-export class DetailsComponent implements OnInit {
+export class DetailsComponent implements OnInit, OnDestroy {
   State = State;
   state = State.INIT;
 
@@ -51,6 +53,8 @@ export class DetailsComponent implements OnInit {
   dataSource = new MatTableDataSource<APIKey>()
   createAPIKeyForm: FormGroup;
 
+  private subscription = new Subject();
+
   constructor(
     public dialog: MatDialog,
     private authenticationService: AuthenticationService,
@@ -62,7 +66,7 @@ export class DetailsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.authenticationService.getUserObservable().subscribe(u => {
+    this.authenticationService.getUserObservable().pipe(takeUntil(this.subscription)).subscribe(u => {
 
       if (u == null) {
         return;
@@ -80,6 +84,15 @@ export class DetailsComponent implements OnInit {
     this.createAPIKeyForm = new FormGroup({
       label: new FormControl('')
     });
+
+    this.dialog.afterAllClosed.pipe(takeUntil(this.subscription)).subscribe(result => {
+      this.authenticationService.refreshUserInfo();
+      this.refreshCatalogs();
+    })
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
   openPasswordDialog() {
@@ -87,10 +100,6 @@ export class DetailsComponent implements OnInit {
     dialogConfig.data = this.currentUser
 
     this.dialog.open(EditPasswordDialogComponent, dialogConfig);
-
-    this.dialog.afterAllClosed.subscribe(result => {
-      this.authenticationService.refreshUserInfo()
-    });
   }
 
   createAPIKey() {
@@ -103,7 +112,7 @@ export class DetailsComponent implements OnInit {
         label: this.createAPIKeyForm.value.label,
         scopes: [Scope.MANAGE_API_KEYS, Scope.MANAGE_PRIVATE_ASSETS, Scope.READ_PRIVATE_ASSETS]
       }
-    }).subscribe(response => {
+    }).pipe(takeUntil(this.subscription)).subscribe(response => {
       if (response.errors?.length > 0) {
 
         if (response.errors.find(e => e.message == "NOT_UNIQUE")) {
@@ -128,7 +137,7 @@ export class DetailsComponent implements OnInit {
   deleteApiKey(id: string) {
     this.deleteAPIKeyState = State.LOADING;
 
-    this.deleteAPIKeyGQL.mutate({ id: id }).subscribe(response => {
+    this.deleteAPIKeyGQL.mutate({ id: id }).pipe(takeUntil(this.subscription)).subscribe(response => {
       if (response.errors?.length > 0) {
         this.deleteAPIKeyState = State.ERROR;
         return;
@@ -143,7 +152,7 @@ export class DetailsComponent implements OnInit {
   refreshAPIKeys() {
     this.apiKeysState = State.LOADING;
 
-    this.myAPIKeysGQL.fetch({}, { fetchPolicy: 'no-cache' }).subscribe(response => {
+    this.myAPIKeysGQL.fetch({}, { fetchPolicy: 'no-cache' }).pipe(takeUntil(this.subscription)).subscribe(response => {
       if (response.errors?.length > 0) {
         this.apiKeysState = State.ERROR;
         return;
@@ -154,14 +163,13 @@ export class DetailsComponent implements OnInit {
   }
 
   refreshCatalogs() {
-    this.myCatalogsGQL.fetch().subscribe(response => {
+    this.myCatalogsGQL.fetch().pipe(takeUntil(this.subscription)).subscribe(response => {
       if (response.errors?.length > 0) {
         this.catalogState = State.ERROR;
         return;
       }
       this.myCatalogs = response.data.myCatalogs;
       this.catalogState = State.SUCCESS;
-      console.log(this.myCatalogs)
     });
   }
 

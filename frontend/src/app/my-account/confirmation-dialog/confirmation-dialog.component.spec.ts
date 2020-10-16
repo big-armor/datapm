@@ -4,6 +4,7 @@ import { RouterTestingModule } from "@angular/router/testing";
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { ConfirmationDialogComponent } from './confirmation-dialog.component';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 describe('ConfirmationDialogComponent', () => {
   let component: ConfirmationDialogComponent;
@@ -13,6 +14,20 @@ describe('ConfirmationDialogComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ConfirmationDialogComponent],
       imports: [MaterialModule, RouterTestingModule, FormsModule, ReactiveFormsModule],
+      providers: [
+        {
+          provide: MAT_DIALOG_DATA,
+          useValue: {}
+        },
+        {
+          provide: MatDialog,
+          useValue: {}
+        },
+        {
+          provide: MatDialogRef,
+          useValue: {}
+        }
+      ]
     })
       .compileComponents();
   }));

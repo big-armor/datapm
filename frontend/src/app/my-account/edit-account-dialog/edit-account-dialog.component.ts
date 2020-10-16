@@ -1,7 +1,9 @@
-import { Component, OnInit, Inject, ChangeDetectorRef, AfterViewInit, ElementRef, HostListener } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectorRef, AfterViewInit, ElementRef, HostListener, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, AsyncValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { UpdateMeGQL, UsernameAvailableGQL, User } from '../../../generated/graphql';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { UpdateMeGQL, UsernameAvailableGQL, UpdateCatalogGQL, User } from '../../../generated/graphql';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 
 function usernameValidator(usernameAvailableGQL: UsernameAvailableGQL, componentChangeDetector: ChangeDetectorRef, currentUsername: string): AsyncValidatorFn {
@@ -17,7 +19,7 @@ function usernameValidator(usernameAvailableGQL: UsernameAvailableGQL, component
         });
         return;
       }
-      usernameAvailableGQL.fetch({ username: control.value }).subscribe(result => {
+      usernameAvailableGQL.fetch({ username: control.value }).pipe(takeUntil(this.subscription)).subscribe(result => {
         if (result.errors?.length > 0) {
           success({
             [result.errors[0].message]: true
@@ -43,11 +45,13 @@ function usernameValidator(usernameAvailableGQL: UsernameAvailableGQL, component
   templateUrl: "./edit-account-dialog.component.html",
   styleUrls: ["./edit-account-dialog.component.scss"]
 })
-export class EditAccountDialogComponent implements OnInit, AfterViewInit {
+export class EditAccountDialogComponent implements OnInit, OnDestroy {
   public form: FormGroup;
   private currentUser: User;
   public submitDisabled: boolean = false;
   private confirmDialogOpened: boolean = false;
+
+  private subscription = new Subject();
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: User,
@@ -55,13 +59,10 @@ export class EditAccountDialogComponent implements OnInit, AfterViewInit {
     public dialog: MatDialog,
     private updateMeGQL: UpdateMeGQL,
     private usernameAvailableGQL: UsernameAvailableGQL,
+    private updateCatalogGQL: UpdateCatalogGQL,
     private componentChangeDetector: ChangeDetectorRef,
     private elementRef: ElementRef
   ) { }
-
-  // @HostListener('touchstart', ['$event']) ontouchstart() {
-  //   this.openConfirmDialog()
-  // }
 
   ngOnInit(): void {
     this.currentUser = this.data;
@@ -79,9 +80,8 @@ export class EditAccountDialogComponent implements OnInit, AfterViewInit {
     })
   }
 
-  ngAfterViewInit() {
-    //   @HostListener('window:keydown', ['$event'])
-    // this.elementRef.nativeElement.querySelector('confirmTrigger').addEventListener('touchstart', this.openConfirmDialog.bind(this))
+  ngOnDestroy() {
+    this.subscription.unsubscribe()
   }
 
   submit() {
@@ -102,11 +102,30 @@ export class EditAccountDialogComponent implements OnInit, AfterViewInit {
         // gitHubHandle: this.gitHubHandle.value,
         // nameIsPublic: this.nameIsPublic.value
       }
-    }).subscribe(response => {
+    }).pipe(takeUntil(this.subscription)).subscribe(response => {
       if (response.errors) {
-        console.warn(response.errors)
+        console.error(response.errors)
       }
     })
+
+    if (this.username.value != this.currentUser.username) {
+      this.updateCatalogGQL.mutate({
+        identifier: {
+          catalogSlug: this.currentUser.username
+        },
+        value: {
+          newSlug: this.username.value,
+          displayName: this.username.value
+        }
+      }).pipe(takeUntil(this.subscription)).subscribe(response => {
+        if (response.errors) {
+          console.error(response.errors)
+        }
+        if (response.data) {
+          console.log(response.data.updateCatalog)
+        }
+      })
+    }
     this.closeDialog()
   }
 
