@@ -9,13 +9,16 @@ export function createAnonymousClient() {
 
 		defaultOptions: {
 			query: {
-				errorPolicy: "all"
+				errorPolicy: "all",
+				fetchPolicy: "no-cache"
 			},
 			mutate: {
-				errorPolicy: "all"
+				errorPolicy: "all",
+				fetchPolicy: "no-cache"
 			},
 			watchQuery: {
-				errorPolicy: "all"
+				errorPolicy: "all",
+				fetchPolicy: "no-cache"
 			}
 		}
 	});
@@ -61,13 +64,16 @@ export async function createUser(
 					cache: new InMemoryCache(),
 					defaultOptions: {
 						query: {
-							errorPolicy: "all"
+							errorPolicy: "all",
+							fetchPolicy: "no-cache"
 						},
 						mutate: {
-							errorPolicy: "all"
+							errorPolicy: "all",
+							fetchPolicy: "no-cache"
 						},
 						watchQuery: {
-							errorPolicy: "all"
+							errorPolicy: "all",
+							fetchPolicy: "no-cache"
 						}
 					},
 					link: new HttpLink({

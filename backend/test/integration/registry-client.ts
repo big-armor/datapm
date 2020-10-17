@@ -62,14 +62,14 @@ export enum INVALID_PASSWORD_ERROR {
 	INVALID_CHARACTERS = "INVALID_CHARACTERS"
 }
 
-/**  Potential responses when creating a new version on a package  */
+/** Potential responses when creating a new version on a package */
 export enum VersionConflict {
 	VERSION_EXISTS = "VERSION_EXISTS",
 	HIGHER_VERSION_EXISTS = "HIGHER_VERSION_EXISTS",
 	HIGHER_VERSION_REQUIRED = "HIGHER_VERSION_REQUIRED"
 }
 
-/**  General permission values, which are applied to users for catalogs, package, and other access */
+/** General permission values, which are applied to users for catalogs, package, and other access */
 export enum Permission {
 	MANAGE = "MANAGE",
 	CREATE = "CREATE",
@@ -79,14 +79,14 @@ export enum Permission {
 	NONE = "NONE"
 }
 
-/**  Scopes for an API Key  */
+/** Scopes for an API Key */
 export enum Scope {
 	MANAGE_API_KEYS = "MANAGE_API_KEYS",
 	READ_PRIVATE_ASSETS = "READ_PRIVATE_ASSETS",
 	MANAGE_PRIVATE_ASSETS = "MANAGE_PRIVATE_ASSETS"
 }
 
-/**  A collection of packages offered by a person or an organization. */
+/** A collection of packages offered by a person or an organization. */
 export type Catalog = {
 	__typename?: "Catalog";
 	identifier: CatalogIdentifier;
@@ -115,7 +115,7 @@ export type Package = {
 	updatedAt: Scalars["Date"];
 };
 
-/**  Represents a user, and their permission to a catalog  */
+/** Represents a user, and their permission to a catalog */
 export type UserCatalog = {
 	__typename?: "UserCatalog";
 	user: User;
@@ -138,7 +138,7 @@ export type Collection = {
 	updatedAt: Scalars["Date"];
 };
 
-/**  Represents a single package's listing in a collection, and information about how it was added */
+/** Represents a single package's listing in a collection, and information about how it was added */
 export type CollectionPackage = {
 	__typename?: "CollectionPackage";
 	collection: Collection;
@@ -146,7 +146,7 @@ export type CollectionPackage = {
 	addedByUser?: Maybe<User>;
 };
 
-/**  Represents a user, and their permissions on a package */
+/** Represents a user, and their permissions on a package */
 export type UserPackagePermissions = {
 	__typename?: "UserPackagePermissions";
 	package: Package;
@@ -165,7 +165,7 @@ export type Version = {
 	packageFile?: Maybe<Scalars["PackageFileJSON"]>;
 };
 
-/**  The complete identifier for a version of a package on a registry */
+/** The complete identifier for a version of a package on a registry */
 export type VersionIdentifier = {
 	__typename?: "VersionIdentifier";
 	registryHostname: Scalars["String"];
@@ -177,7 +177,7 @@ export type VersionIdentifier = {
 	versionPatch: Scalars["Int"];
 };
 
-/**  The complete identifier for a package on a registry  */
+/** The complete identifier for a package on a registry */
 export type PackageIdentifier = {
 	__typename?: "PackageIdentifier";
 	registryHostname: Scalars["String"];
@@ -186,7 +186,7 @@ export type PackageIdentifier = {
 	packageSlug: Scalars["String"];
 };
 
-/**  The complete identifier for a catalog on a registry  */
+/** The complete identifier for a catalog on a registry */
 export type CatalogIdentifier = {
 	__typename?: "CatalogIdentifier";
 	registryHostname: Scalars["String"];
@@ -194,7 +194,7 @@ export type CatalogIdentifier = {
 	catalogSlug: Scalars["String"];
 };
 
-/**  The complete identifier for a collections on a registry  */
+/** The complete identifier for a collections on a registry */
 export type CollectionIdentifier = {
 	__typename?: "CollectionIdentifier";
 	registryHostname: Scalars["String"];
@@ -202,7 +202,7 @@ export type CollectionIdentifier = {
 	collectionSlug: Scalars["String"];
 };
 
-/**  The response for a catalog search request  */
+/** The response for a catalog search request */
 export type SearchCatalogsResult = {
 	__typename?: "SearchCatalogsResult";
 	catalogs?: Maybe<Array<Catalog>>;
@@ -210,7 +210,7 @@ export type SearchCatalogsResult = {
 	count: Scalars["Int"];
 };
 
-/** " The response for a collection search request  */
+/** " The response for a collection search request */
 export type SearchCollectionResult = {
 	__typename?: "SearchCollectionResult";
 	collections?: Maybe<Array<Collection>>;
@@ -218,7 +218,7 @@ export type SearchCollectionResult = {
 	count: Scalars["Int"];
 };
 
-/**  The response for a package search request  */
+/** The response for a package search request */
 export type SearchPackagesResult = {
 	__typename?: "SearchPackagesResult";
 	packages?: Maybe<Array<Package>>;
@@ -234,14 +234,14 @@ export type LatestPackagesResult = {
 	count: Scalars["Int"];
 };
 
-/**  The response for a search term auto-complete request  */
+/** The response for a search term auto-complete request */
 export type AutoCompleteResult = {
 	__typename?: "AutoCompleteResult";
 	catalogs?: Maybe<Array<Catalog>>;
 	packages?: Maybe<Array<Package>>;
 };
 
-/**  The complete identifier for a version of a package, assuming the registry is based on the HTTP request URL */
+/** The complete identifier for a version of a package, assuming the registry is based on the HTTP request URL */
 export type VersionIdentifierInput = {
 	catalogSlug: Scalars["String"];
 	packageSlug: Scalars["String"];
@@ -250,23 +250,23 @@ export type VersionIdentifierInput = {
 	versionPatch: Scalars["Int"];
 };
 
-/**  The complete identifier for a package, assuming the registry is based on the HTTP request URL */
+/** The complete identifier for a package, assuming the registry is based on the HTTP request URL */
 export type PackageIdentifierInput = {
 	catalogSlug: Scalars["String"];
 	packageSlug: Scalars["String"];
 };
 
-/**  The complete identifier for a catalog assuming the registry is based on the HTTP request URL */
+/** The complete identifier for a catalog assuming the registry is based on the HTTP request URL */
 export type CatalogIdentifierInput = {
 	catalogSlug: Scalars["String"];
 };
 
-/**  The complete identifier for a collection assuming the registry is based on the HTTP request URL */
+/** The complete identifier for a collection assuming the registry is based on the HTTP request URL */
 export type CollectionIdentifierInput = {
 	collectionSlug: Scalars["String"];
 };
 
-/**  The properties for creating a catalog  */
+/** The properties for creating a catalog */
 export type CreateCatalogInput = {
 	slug: Scalars["String"];
 	displayName: Scalars["String"];
@@ -275,14 +275,14 @@ export type CreateCatalogInput = {
 	isPublic: Scalars["Boolean"];
 };
 
-/**  The properties of a catalog that can be updated. All are optional. Only the ones specified are applied.   */
+/** The properties of a catalog that can be updated. All are optional. Only the ones specified are applied. */
 export type UpdateCatalogInput = {
 	newSlug?: Maybe<Scalars["String"]>;
 	displayName?: Maybe<Scalars["String"]>;
 	description?: Maybe<Scalars["String"]>;
 };
 
-/**  The properties for creating a package list.  */
+/** The properties for creating a package list. */
 export type CreatePackageInput = {
 	packageSlug: Scalars["String"];
 	catalogSlug: Scalars["String"];
@@ -290,7 +290,7 @@ export type CreatePackageInput = {
 	description?: Maybe<Scalars["String"]>;
 };
 
-/**  The properties for updating an existing package. All are optional. Only the ones specified are applied.  */
+/** The properties for updating an existing package. All are optional. Only the ones specified are applied. */
 export type UpdatePackageInput = {
 	newCatalogSlug?: Maybe<Scalars["String"]>;
 	newPackageSlug?: Maybe<Scalars["String"]>;
@@ -299,25 +299,25 @@ export type UpdatePackageInput = {
 	isPublic?: Maybe<Scalars["Boolean"]>;
 };
 
-/**  The properties for updating a specific user's permissions on a package  */
+/** The properties for updating a specific user's permissions on a package */
 export type SetPackagePermissionInput = {
 	username: Scalars["String"];
 	permissions: Array<Permission>;
 };
 
-/**  To create a new package version, submit a valid package file  */
+/** To create a new package version, submit a valid package file */
 export type CreateVersionInput = {
 	packageFile?: Maybe<Scalars["PackageFileJSON"]>;
 };
 
-/**  For creating a new collection on the registry.  */
+/** For creating a new collection on the registry. */
 export type CreateCollectionInput = {
 	collectionSlug: Scalars["String"];
 	name: Scalars["String"];
 	description?: Maybe<Scalars["String"]>;
 };
 
-/**  For updating an existing collection. All properties are optional, and only the ones specified are applied */
+/** For updating an existing collection. All properties are optional, and only the ones specified are applied */
 export type UpdateCollectionInput = {
 	collectionSlug?: Maybe<Scalars["String"]>;
 	name?: Maybe<Scalars["String"]>;
@@ -327,39 +327,39 @@ export type UpdateCollectionInput = {
 
 export type Query = {
 	__typename?: "Query";
-	/**  Whether the specified username is available for sign up */
+	/** Whether the specified username is available for sign up */
 	usernameAvailable: Scalars["Boolean"];
-	/**   Whether the specified email address is avialable for sign up  */
+	/** Whether the specified email address is avialable for sign up */
 	emailAddressAvailable: Scalars["Boolean"];
-	/**  Who am i */
+	/** Who am i */
 	me: User;
-	/**  A list of the requesting user's exisiting API key information  */
+	/** A list of the requesting user's exisiting API key information */
 	myAPIKeys?: Maybe<Array<APIKey>>;
-	/**  Returns all of the users for a given catalog  */
+	/** Returns all of the users for a given catalog */
 	usersByCatalog: Array<Maybe<User>>;
-	/**  Return a user by a given username, and returns only the properties on that user the requester should be able to view  */
-	user?: Maybe<User>;
-	/**  Returns package and collections with slugs that start with the given parameter  */
+	/** Return a user by a given username, and returns only the properties on that user the requester should be able to view */
+	user: User;
+	/** Returns package and collections with slugs that start with the given parameter */
 	autoComplete: AutoCompleteResult;
-	/**  For testing whether a given catalog slug is available to be reserved  */
+	/** For testing whether a given catalog slug is available to be reserved */
 	catalogSlugAvailable: Scalars["Boolean"];
-	/**  Returns the catalogs the requesting user either owns or has edit or manage permission to */
+	/** Returns the catalogs the requesting user either owns or has edit or manage permission to */
 	myCatalogs: Array<Maybe<Catalog>>;
-	/**  Returns catalogs matching the query string (which can include boolean logic combinations) with pagination  */
+	/** Returns catalogs matching the query string (which can include boolean logic combinations) with pagination */
 	searchCatalogs: SearchCatalogsResult;
-	/**  Returns the catalog of the given identifier. Requires permission to view the catalog  */
+	/** Returns the catalog of the given identifier. Requires permission to view the catalog */
 	catalog?: Maybe<Catalog>;
-	/**  Returns the package for the given identifier. Requires permission to view the package  */
+	/** Returns the package for the given identifier. Requires permission to view the package */
 	package?: Maybe<Package>;
-	/**  Returns packages that match the given search query (which can contain boolean search logic). This request is paginated.  */
+	/** Returns packages that match the given search query (which can contain boolean search logic). This request is paginated. */
 	searchPackages: SearchPackagesResult;
-	/**  Returns the latest packages  */
+	/** Returns the latest packages */
 	latestPackages: LatestPackagesResult;
-	/**  Returns the collection specified only if the user has permission to view it  */
+	/** Returns the collection specified only if the user has permission to view it */
 	collection?: Maybe<Collection>;
-	/**  Returns all of the collections the user has permission to view  */
+	/** Returns all of the collections the user has permission to view */
 	collections?: Maybe<Array<Collection>>;
-	/**  Returns collections whos names match the given query. This request is paginated  */
+	/** Returns collections whos names match the given query. This request is paginated */
 	searchCollections: SearchCollectionResult;
 };
 
@@ -424,53 +424,53 @@ export type QuerysearchCollectionsArgs = {
 
 export type Mutation = {
 	__typename?: "Mutation";
-	/**  Creates a new user with the given input. Returns the user's authorization token.  */
+	/** Creates a new user with the given input. Returns the user's authorization token. */
 	createMe: Scalars["String"];
-	/**  Updates the requesting user's information. All fields optional.  */
+	/** Updates the requesting user's information. All fields optional. */
 	updateMe: User;
-	/**  Disables the requesting user's account  */
+	/** Disables the requesting user's account */
 	disableMe: User;
-	/**  Using a username or email address and a password, requests authentication information for the given user  */
+	/** Using a username or email address and a password, requests authentication information for the given user */
 	login: Scalars["String"];
-	/**  Destorys the current user's session.  */
+	/** Destorys the current user's session. */
 	logout?: Maybe<Scalars["Void"]>;
-	/**  Generates a new API Key for the requesting user  */
+	/** Generates a new API Key for the requesting user */
 	createAPIKey: APIKeyWithSecret;
-	/**  Deletes an existing API Key for the requesting user  */
+	/** Deletes an existing API Key for the requesting user */
 	deleteAPIKey?: Maybe<APIKey>;
-	/**  Removes a specified user from the specified catalog, and all of their permissions  */
+	/** Removes a specified user from the specified catalog, and all of their permissions */
 	removeUserFromCatalog: User;
-	/**  Creates a new catalog which is owned by the requesting user  */
+	/** Creates a new catalog which is owned by the requesting user */
 	createCatalog: Catalog;
-	/**  Updates an existing catalog.  */
+	/** Updates an existing catalog. */
 	updateCatalog: Catalog;
-	/**  Disables and existing catalog. All packages in the catalog are then disabled  */
+	/** Disables and existing catalog. All packages in the catalog are then disabled */
 	disableCatalog: Catalog;
-	/**  Creates a new package based on the information provided, and gives the requesting user all permissions to the package  */
+	/** Creates a new package based on the information provided, and gives the requesting user all permissions to the package */
 	createPackage: Package;
-	/**  Updates an existing package's descriptive information. See createVersion for how to update the package data definitions  */
+	/** Updates an existing package's descriptive information. See createVersion for how to update the package data definitions */
 	updatePackage: Package;
-	/**  Disables an existing package  */
+	/** Disables an existing package */
 	disablePackage: Package;
-	/**  Creates a new collection, which is managed by the requesting user  */
+	/** Creates a new collection, which is managed by the requesting user */
 	createCollection: Collection;
-	/**  Updates an existing collection */
+	/** Updates an existing collection */
 	updateCollection: Collection;
-	/**  Disables an existing collection.  */
+	/** Disables an existing collection. */
 	disableCollection: Collection;
-	/**  Includes an existing package in an existing collection */
+	/** Includes an existing package in an existing collection */
 	addPackageToCollection: CollectionPackage;
-	/**  Removes an existing package from a collection */
+	/** Removes an existing package from a collection */
 	removePackageFromCollection?: Maybe<Scalars["Void"]>;
-	/**  Sets the permissions for a given user  */
+	/** Sets the permissions for a given user */
 	setPackagePermissions: UserPackagePermissions;
-	/**  Removes all permissions for a user on a given package. Requires the manage package permission  */
+	/** Removes all permissions for a user on a given package. Requires the manage package permission */
 	removePackagePermissions?: Maybe<Scalars["Void"]>;
-	/**  Creates a new version of the package file on a package listing. There is no update, as any update should also be published as a new version  */
+	/** Creates a new version of the package file on a package listing. There is no update, as any update should also be published as a new version */
 	createVersion: Version;
-	/**  Disables a given version from a package. Use this sparingly, to allow for a viewable history of change for the package  */
+	/** Disables a given version from a package. Use this sparingly, to allow for a viewable history of change for the package */
 	disableVersion: Scalars["Void"];
-	/**  For proxying user activity tracking outside of other API requests  */
+	/** For proxying user activity tracking outside of other API requests */
 	track: Scalars["Int"];
 };
 
@@ -572,7 +572,7 @@ export type MutationtrackArgs = {
 	actions: Scalars["JSON"];
 };
 
-/**  Represents one real world person, and their information  */
+/** Represents one real world person, and their information */
 export type User = {
 	__typename?: "User";
 	username: Scalars["String"];
@@ -586,7 +586,7 @@ export type User = {
 	nameIsPublic: Scalars["Boolean"];
 };
 
-/**  For creating an new user for other people as an administrator  */
+/** For creating an new user for other people as an administrator */
 export type CreateUserInputAdmin = {
 	firstName?: Maybe<Scalars["String"]>;
 	lastName?: Maybe<Scalars["String"]>;
@@ -595,7 +595,7 @@ export type CreateUserInputAdmin = {
 	isAdmin: Scalars["Boolean"];
 };
 
-/**  For self service new user sign up  */
+/** For self service new user sign up */
 export type CreateUserInput = {
 	firstName?: Maybe<Scalars["String"]>;
 	lastName?: Maybe<Scalars["String"]>;
@@ -604,13 +604,18 @@ export type CreateUserInput = {
 	password: Scalars["String"];
 };
 
-/**  For updating a user, or your own user. All values are optional, and only those specified are applied.  */
+/** For updating a user, or your own user. All values are optional, and only those specified are applied. */
 export type UpdateUserInput = {
 	username?: Maybe<Scalars["String"]>;
 	firstName?: Maybe<Scalars["String"]>;
 	lastName?: Maybe<Scalars["String"]>;
 	email?: Maybe<Scalars["String"]>;
 	password?: Maybe<Scalars["String"]>;
+	nameIsPublic?: Maybe<Scalars["Boolean"]>;
+	location?: Maybe<Scalars["String"]>;
+	twitterHandle?: Maybe<Scalars["String"]>;
+	gitHubHandle?: Maybe<Scalars["String"]>;
+	website?: Maybe<Scalars["String"]>;
 };
 
 export type AutoCompleteQueryVariables = Exact<{
@@ -752,7 +757,18 @@ export type LogoutMutation = { __typename?: "Mutation" } & Pick<Mutation, "logou
 export type MeQueryVariables = Exact<{ [key: string]: never }>;
 
 export type MeQuery = { __typename?: "Query" } & {
-	me: { __typename?: "User" } & Pick<User, "emailAddress" | "firstName" | "lastName" | "username" | "nameIsPublic">;
+	me: { __typename?: "User" } & Pick<
+		User,
+		| "emailAddress"
+		| "firstName"
+		| "lastName"
+		| "username"
+		| "nameIsPublic"
+		| "location"
+		| "twitterHandle"
+		| "gitHubHandle"
+		| "website"
+	>;
 };
 
 export type MyAPIKeysQueryVariables = Exact<{ [key: string]: never }>;
@@ -845,6 +861,44 @@ export type SearchPackagesQuery = { __typename?: "Query" } & {
 			>
 		>;
 	};
+};
+
+export type UpdateMeMutationVariables = Exact<{
+	value: UpdateUserInput;
+}>;
+
+export type UpdateMeMutation = { __typename?: "Mutation" } & {
+	updateMe: { __typename?: "User" } & Pick<
+		User,
+		| "emailAddress"
+		| "firstName"
+		| "lastName"
+		| "username"
+		| "nameIsPublic"
+		| "location"
+		| "twitterHandle"
+		| "gitHubHandle"
+		| "website"
+	>;
+};
+
+export type UserQueryVariables = Exact<{
+	username: Scalars["String"];
+}>;
+
+export type UserQuery = { __typename?: "Query" } & {
+	user: { __typename?: "User" } & Pick<
+		User,
+		| "emailAddress"
+		| "firstName"
+		| "lastName"
+		| "username"
+		| "nameIsPublic"
+		| "location"
+		| "twitterHandle"
+		| "gitHubHandle"
+		| "website"
+	>;
 };
 
 export type UsernameAvailableQueryVariables = Exact<{
@@ -1656,6 +1710,30 @@ export const MeDocument: DocumentNode<MeQuery, MeQueryVariables> = {
 									name: { kind: "Name", value: "nameIsPublic" },
 									arguments: [],
 									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "location" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "twitterHandle" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "gitHubHandle" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "website" },
+									arguments: [],
+									directives: []
 								}
 							]
 						}
@@ -2172,6 +2250,199 @@ export const SearchPackagesDocument: DocumentNode<SearchPackagesQuery, SearchPac
 											}
 										]
 									}
+								}
+							]
+						}
+					}
+				]
+			}
+		}
+	]
+};
+export const UpdateMeDocument: DocumentNode<UpdateMeMutation, UpdateMeMutationVariables> = {
+	kind: "Document",
+	definitions: [
+		{
+			kind: "OperationDefinition",
+			operation: "mutation",
+			name: { kind: "Name", value: "UpdateMe" },
+			variableDefinitions: [
+				{
+					kind: "VariableDefinition",
+					variable: { kind: "Variable", name: { kind: "Name", value: "value" } },
+					type: {
+						kind: "NonNullType",
+						type: { kind: "NamedType", name: { kind: "Name", value: "UpdateUserInput" } }
+					},
+					directives: []
+				}
+			],
+			directives: [],
+			selectionSet: {
+				kind: "SelectionSet",
+				selections: [
+					{
+						kind: "Field",
+						name: { kind: "Name", value: "updateMe" },
+						arguments: [
+							{
+								kind: "Argument",
+								name: { kind: "Name", value: "value" },
+								value: { kind: "Variable", name: { kind: "Name", value: "value" } }
+							}
+						],
+						directives: [],
+						selectionSet: {
+							kind: "SelectionSet",
+							selections: [
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "emailAddress" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "firstName" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "lastName" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "username" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "nameIsPublic" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "location" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "twitterHandle" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "gitHubHandle" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "website" },
+									arguments: [],
+									directives: []
+								}
+							]
+						}
+					}
+				]
+			}
+		}
+	]
+};
+export const UserDocument: DocumentNode<UserQuery, UserQueryVariables> = {
+	kind: "Document",
+	definitions: [
+		{
+			kind: "OperationDefinition",
+			operation: "query",
+			name: { kind: "Name", value: "User" },
+			variableDefinitions: [
+				{
+					kind: "VariableDefinition",
+					variable: { kind: "Variable", name: { kind: "Name", value: "username" } },
+					type: { kind: "NonNullType", type: { kind: "NamedType", name: { kind: "Name", value: "String" } } },
+					directives: []
+				}
+			],
+			directives: [],
+			selectionSet: {
+				kind: "SelectionSet",
+				selections: [
+					{
+						kind: "Field",
+						name: { kind: "Name", value: "user" },
+						arguments: [
+							{
+								kind: "Argument",
+								name: { kind: "Name", value: "username" },
+								value: { kind: "Variable", name: { kind: "Name", value: "username" } }
+							}
+						],
+						directives: [],
+						selectionSet: {
+							kind: "SelectionSet",
+							selections: [
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "emailAddress" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "firstName" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "lastName" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "username" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "nameIsPublic" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "location" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "twitterHandle" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "gitHubHandle" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "website" },
+									arguments: [],
+									directives: []
 								}
 							]
 						}

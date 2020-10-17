@@ -12,9 +12,9 @@
 		"start": ". ./env.sh && nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts",
 		"start-nowatch": ". ./env.sh && ts-node src/index.ts",
 		"start:server": ". ./env.sh && cd dist && TYPEORM_IS_DIST=true  node index.js",
-		"pretest": "graphql-codegen --config codegen-test.yml",
+		"pretest": "npm run codegen",
 		"test": "mocha -r ts-node/register test/integration/*.ts src/**/*.spec.ts",
-		"codegen": "graphql-codegen --config codegen.yml"
+		"codegen": "graphql-codegen --config codegen.yml && graphql-codegen --config codegen-test.yml"
 	},
 	"repository": {
 		"type": "git",
