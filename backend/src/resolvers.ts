@@ -149,7 +149,47 @@ export const resolvers: {
 		emailAddress: (parent: any, _1: any, context: AuthenticatedContext) => {
 			const user = parent as User;
 
+			if (user.emailAddressIsPublic) return user.emailAddress;
+
 			if (isAuthenticatedContext(context) && context.me?.username === user.username) return user.emailAddress;
+
+			return null;
+		},
+		twitterHandle: (parent: any, _1: any, context: AuthenticatedContext) => {
+			const user = parent as User;
+
+			if (user.twitterHandleIsPublic) return user.twitterHandle || null;
+
+			if (isAuthenticatedContext(context) && context.me?.username === user.username)
+				return user.twitterHandle || null;
+
+			return null;
+		},
+		gitHubHandle: (parent: any, _1: any, context: AuthenticatedContext) => {
+			const user = parent as User;
+
+			if (user.gitHubHandleIsPublic) return user.gitHubHandle || null;
+
+			if (isAuthenticatedContext(context) && context.me?.username === user.username)
+				return user.gitHubHandle || null;
+
+			return null;
+		},
+		website: (parent: any, _1: any, context: AuthenticatedContext) => {
+			const user = parent as User;
+
+			if (user.websiteIsPublic) return user.website || null;
+
+			if (isAuthenticatedContext(context) && context.me?.username === user.username) return user.website || null;
+
+			return null;
+		},
+		location: (parent: any, _1: any, context: AuthenticatedContext) => {
+			const user = parent as User;
+
+			if (user.locationIsPublic) return user.location || null;
+
+			if (isAuthenticatedContext(context) && context.me?.username === user.username) return user.location || null;
 
 			return null;
 		}
@@ -303,21 +343,17 @@ export const resolvers: {
 		searchCollections: searchCollections,
 
 		autoComplete: async (_0: any, { startsWith }, context: AuthenticatedContext, info: any) => {
-			const catalogs = context.connection.manager
-				.getCustomRepository(CatalogRepository)
-				.autocomplete({
-					user: context.me,
-					startsWith,
-					relations: getRelationNames(graphqlFields(info).catalogs)
-				});
+			const catalogs = context.connection.manager.getCustomRepository(CatalogRepository).autocomplete({
+				user: context.me,
+				startsWith,
+				relations: getRelationNames(graphqlFields(info).catalogs)
+			});
 
-			const packages = context.connection.manager
-				.getCustomRepository(PackageRepository)
-				.autocomplete({
-					user: context.me,
-					startsWith,
-					relations: getRelationNames(graphqlFields(info).packages)
-				});
+			const packages = context.connection.manager.getCustomRepository(PackageRepository).autocomplete({
+				user: context.me,
+				startsWith,
+				relations: getRelationNames(graphqlFields(info).packages)
+			});
 
 			return {
 				catalogs: await catalogs,

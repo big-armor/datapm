@@ -580,10 +580,16 @@ export type User = {
 	lastName?: Maybe<Scalars["String"]>;
 	location?: Maybe<Scalars["String"]>;
 	twitterHandle?: Maybe<Scalars["String"]>;
+	description?: Maybe<Scalars["String"]>;
 	website?: Maybe<Scalars["String"]>;
 	emailAddress?: Maybe<Scalars["String"]>;
 	gitHubHandle?: Maybe<Scalars["String"]>;
 	nameIsPublic: Scalars["Boolean"];
+	locationIsPublic: Scalars["Boolean"];
+	twitterHandleIsPublic: Scalars["Boolean"];
+	gitHubHandleIsPublic: Scalars["Boolean"];
+	emailAddressIsPublic: Scalars["Boolean"];
+	websiteIsPublic: Scalars["Boolean"];
 };
 
 /** For creating an new user for other people as an administrator */
@@ -609,13 +615,19 @@ export type UpdateUserInput = {
 	username?: Maybe<Scalars["String"]>;
 	firstName?: Maybe<Scalars["String"]>;
 	lastName?: Maybe<Scalars["String"]>;
-	email?: Maybe<Scalars["String"]>;
+	emailAddress?: Maybe<Scalars["String"]>;
 	password?: Maybe<Scalars["String"]>;
-	nameIsPublic?: Maybe<Scalars["Boolean"]>;
 	location?: Maybe<Scalars["String"]>;
+	description?: Maybe<Scalars["String"]>;
 	twitterHandle?: Maybe<Scalars["String"]>;
 	gitHubHandle?: Maybe<Scalars["String"]>;
 	website?: Maybe<Scalars["String"]>;
+	websiteIsPublic?: Maybe<Scalars["Boolean"]>;
+	nameIsPublic?: Maybe<Scalars["Boolean"]>;
+	locationIsPublic?: Maybe<Scalars["Boolean"]>;
+	twitterHandleIsPublic?: Maybe<Scalars["Boolean"]>;
+	gitHubHandleIsPublic?: Maybe<Scalars["Boolean"]>;
+	emailAddressIsPublic?: Maybe<Scalars["Boolean"]>;
 };
 
 export type AutoCompleteQueryVariables = Exact<{
@@ -768,6 +780,11 @@ export type MeQuery = { __typename?: "Query" } & {
 		| "twitterHandle"
 		| "gitHubHandle"
 		| "website"
+		| "locationIsPublic"
+		| "twitterHandleIsPublic"
+		| "gitHubHandleIsPublic"
+		| "emailAddressIsPublic"
+		| "websiteIsPublic"
 	>;
 };
 
@@ -879,6 +896,11 @@ export type UpdateMeMutation = { __typename?: "Mutation" } & {
 		| "twitterHandle"
 		| "gitHubHandle"
 		| "website"
+		| "locationIsPublic"
+		| "twitterHandleIsPublic"
+		| "gitHubHandleIsPublic"
+		| "emailAddressIsPublic"
+		| "websiteIsPublic"
 	>;
 };
 
@@ -898,6 +920,11 @@ export type UserQuery = { __typename?: "Query" } & {
 		| "twitterHandle"
 		| "gitHubHandle"
 		| "website"
+		| "locationIsPublic"
+		| "twitterHandleIsPublic"
+		| "gitHubHandleIsPublic"
+		| "emailAddressIsPublic"
+		| "websiteIsPublic"
 	>;
 };
 
@@ -1734,6 +1761,36 @@ export const MeDocument: DocumentNode<MeQuery, MeQueryVariables> = {
 									name: { kind: "Name", value: "website" },
 									arguments: [],
 									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "locationIsPublic" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "twitterHandleIsPublic" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "gitHubHandleIsPublic" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "emailAddressIsPublic" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "websiteIsPublic" },
+									arguments: [],
+									directives: []
 								}
 							]
 						}
@@ -2348,6 +2405,36 @@ export const UpdateMeDocument: DocumentNode<UpdateMeMutation, UpdateMeMutationVa
 									name: { kind: "Name", value: "website" },
 									arguments: [],
 									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "locationIsPublic" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "twitterHandleIsPublic" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "gitHubHandleIsPublic" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "emailAddressIsPublic" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "websiteIsPublic" },
+									arguments: [],
+									directives: []
 								}
 							]
 						}
@@ -2441,6 +2528,36 @@ export const UserDocument: DocumentNode<UserQuery, UserQueryVariables> = {
 								{
 									kind: "Field",
 									name: { kind: "Name", value: "website" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "locationIsPublic" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "twitterHandleIsPublic" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "gitHubHandleIsPublic" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "emailAddressIsPublic" },
+									arguments: [],
+									directives: []
+								},
+								{
+									kind: "Field",
+									name: { kind: "Name", value: "websiteIsPublic" },
 									arguments: [],
 									directives: []
 								}

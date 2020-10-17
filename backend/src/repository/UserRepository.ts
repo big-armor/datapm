@@ -354,8 +354,8 @@ export class UserRepository extends Repository<User> {
 				dbUser.username = value.username.trim();
 			}
 
-			if (value.email) {
-				dbUser.emailAddress = value.email.trim();
+			if (value.emailAddress) {
+				dbUser.emailAddress = value.emailAddress.trim();
 			}
 
 			if (value.password) {
@@ -364,6 +364,42 @@ export class UserRepository extends Repository<User> {
 
 			if (value.nameIsPublic != null) {
 				dbUser.nameIsPublic = value.nameIsPublic;
+			}
+
+			if (value.twitterHandle != null) {
+				dbUser.twitterHandle = value.twitterHandle;
+			}
+
+			if (value.twitterHandleIsPublic != null) {
+				dbUser.twitterHandleIsPublic = value.twitterHandleIsPublic;
+			}
+
+			if (value.gitHubHandle != null) {
+				dbUser.gitHubHandle = value.gitHubHandle;
+			}
+
+			if (value.gitHubHandleIsPublic != null) {
+				dbUser.gitHubHandleIsPublic = value.gitHubHandleIsPublic;
+			}
+
+			if (value.location != null) {
+				dbUser.location = value.location;
+			}
+
+			if (value.locationIsPublic != null) {
+				dbUser.locationIsPublic = value.locationIsPublic;
+			}
+
+			if (value.website != null) {
+				dbUser.website = value.website;
+			}
+
+			if (value.websiteIsPublic != null) {
+				dbUser.websiteIsPublic = value.websiteIsPublic;
+			}
+
+			if (value.emailAddressIsPublic != null) {
+				dbUser.emailAddressIsPublic = value.emailAddressIsPublic;
 			}
 
 			dbUser.updatedAt = new Date();
