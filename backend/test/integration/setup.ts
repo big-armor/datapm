@@ -36,7 +36,7 @@ import { execute } from "graphql";
 import { Stream } from "stream";
 import * as readline from "readline";
 import { ErrorResponse, onError } from "apollo-link-error";
-
+import pidtree from "pidtree";
 import { exit } from "process";
 
 let container: StartedTestContainer;
@@ -110,7 +110,7 @@ before(async function () {
 });
 
 after(async function () {
-	this.timeout(20000);
+	this.timeout(30000);
 
 	if (container) await container.stop();
 
@@ -119,15 +119,13 @@ after(async function () {
 	serverProcess.stdout!.destroy();
 	serverProcess.stderr!.destroy();
 
-	serverProcess.cancel();
+	let pids = pidtree(serverProcess.pid, { root: true });
 
-	try {
-		await serverProcess;
-	} catch (error) {
-		console.log(JSON.stringify(error, null, 1));
-		console.log("registry process killed: " + serverProcess.killed); // true
-		console.log("error is canceled: " + error.isCanceled); // true
-	}
+	// recursively kill all child processes
+	(await pids).map((p) => {
+		console.log("Killing process " + p);
+		process.kill(p);
+	});
 });
 
 function createAnonymousClient() {
