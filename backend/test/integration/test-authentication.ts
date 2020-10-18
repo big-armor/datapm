@@ -1,14 +1,7 @@
 import { ApolloClient, NormalizedCacheObject, ServerError } from "@apollo/client/core";
 import { ErrorResponse } from "apollo-link-error";
 import { expect } from "chai";
-import {
-	LoginDocument,
-	MeDocument,
-	MyCatalogsDocument,
-	MyCatalogsQuery,
-	MyCatalogsQueryVariables,
-	UserDocument
-} from "./registry-client";
+import { LoginDocument, UpdateMyPasswordDocument } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 
 describe("Authentication Tests", async () => {
@@ -99,7 +92,62 @@ describe("Authentication Tests", async () => {
 		expect(userBClient).to.exist;
 	});
 
-	// TODO Test user login failures
+	it("Login user A", async () => {
+		let result = await anonymousClient.mutate({
+			mutation: LoginDocument,
+			variables: {
+				username: "testA-authentication",
+				password: "passwordA!"
+			}
+		});
+
+		expect(result.errors === undefined, "no errors").equal(true);
+		expect(result.data!.login != null, "should have login key value").equal(true);
+	});
+
+	it("Change User A password", async function () {
+		let response = await userAClient.mutate({
+			mutation: UpdateMyPasswordDocument,
+			variables: {
+				value: {
+					oldPassword: "passwordA!",
+					newPassword: "newPasswordA!"
+				}
+			}
+		});
+
+		expect(response.errors === undefined);
+	});
+
+	it("Login user A with new password", async () => {
+		let result = await anonymousClient.mutate({
+			mutation: LoginDocument,
+			variables: {
+				username: "testA-authentication",
+				password: "newPasswordA!"
+			}
+		});
+
+		expect(result.errors === undefined, "no errors").equal(true);
+		expect(result.data!.login != null, "should have jwt value").equal(true);
+	});
+
+	it("Login user A with new old password should fail", async () => {
+		let result = await anonymousClient.mutate({
+			mutation: LoginDocument,
+			variables: {
+				username: "testA-authentication",
+				password: "passwordA!"
+			}
+		});
+
+		expect(result.errors!.length > 0, "should have errors").equal(true);
+		expect(
+			result.errors!.find((e) => e.message == "WRONG_CREDENTIALS") != null,
+			"should have invalid login error"
+		).equal(true);
+	});
+
 	// TODO Implement and test password reset
 	// TODO Implement and test 2FA
 });

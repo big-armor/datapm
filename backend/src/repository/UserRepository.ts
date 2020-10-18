@@ -325,6 +325,18 @@ export class UserRepository extends Repository<User> {
 		});
 	}
 
+	updateUserPassword({ username, passwordHash }: { username: string; passwordHash: string }): Promise<void> {
+		return this.manager.nestedTransaction(async (transaction) => {
+			const dbUser = await getUserByUsernameOrFail({
+				username,
+				manager: transaction
+			});
+
+			dbUser.passwordHash = passwordHash;
+			await transaction.save(dbUser);
+		});
+	}
+
 	updateUser({
 		username,
 		value,
@@ -356,10 +368,6 @@ export class UserRepository extends Repository<User> {
 
 			if (value.emailAddress) {
 				dbUser.emailAddress = value.emailAddress.trim();
-			}
-
-			if (value.password) {
-				dbUser.passwordHash = hashPassword(value.password, dbUser.passwordSalt);
 			}
 
 			if (value.nameIsPublic != null) {

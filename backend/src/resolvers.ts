@@ -54,7 +54,7 @@ import {
 	updateCollection
 } from "./resolvers/CollectionResolver";
 import { login, logout } from "./resolvers/AuthResolver";
-import { createMe, disableMe, updateMe } from "./resolvers/UserResolver";
+import { createMe, disableMe, updateMe, updateMyPassword } from "./resolvers/UserResolver";
 import { createAPIKey, deleteAPIKey } from "./resolvers/ApiKeyResolver";
 import { Collection } from "./entity/Collection";
 import {
@@ -410,6 +410,7 @@ export const resolvers: {
 		// User
 		createMe: createMe,
 		updateMe: updateMe,
+		updateMyPassword: updateMyPassword,
 		disableMe: disableMe,
 
 		// API Keys

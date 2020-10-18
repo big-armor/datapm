@@ -79,6 +79,8 @@ describe("Catalog Tests", async () => {
 			});
 	});
 
+	it("User A Create Catalog", async function () {});
+
 	// TODO Test private and public catalog retrieval
 	// TODO Test package and catalog associations
 });
