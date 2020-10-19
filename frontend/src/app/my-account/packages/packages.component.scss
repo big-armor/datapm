@@ -1,196 +1,199 @@
 #packagesPage {
-    .up-header {
-        div {
-            font-family: Roboto Mono;
-            font-style: normal;
-            font-weight: 300;
-            font-size: 10px;
-            line-height: 13px;
-            text-align: right;
-            letter-spacing: -0.28px;
-            color: #828282;
-        }
-    }
+	.up-header {
+		div {
+			font-family: Roboto Mono;
+			font-style: normal;
+			font-weight: 300;
+			font-size: 10px;
+			line-height: 13px;
+			text-align: right;
+			letter-spacing: -0.28px;
+			color: #828282;
+		}
+	}
 
-    .person-card-photo {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        box-shadow: 0px 0px 5px 1px #666666a1;
-    }
+	.person-card-photo {
+		width: 24px;
+		height: 24px;
+		border-radius: 50%;
+		box-shadow: 0px 0px 5px 1px #666666a1;
+	}
 
-    .person-card-name {
-        font-family: Roboto Mono;
-        font-style: normal;
-        font-weight: 300;
-        font-size: 14px;
-        line-height: 18px;
-        letter-spacing: -0.28px;
-        color: #828282;
-        padding: 4px 10px;
-        margin-bottom: 0px !important;
-    }
+	.person-card-name {
+		font-family: Roboto Mono;
+		font-style: normal;
+		font-weight: 300;
+		font-size: 14px;
+		line-height: 18px;
+		letter-spacing: -0.28px;
+		color: #828282;
+		padding: 4px 10px;
+		margin-bottom: 0px !important;
+	}
 
-    .content-title {
-        font-family: Roboto Mono;
-        font-style: normal;
-        font-weight: 500;
-        font-size: 20px;
-        line-height: 26px;
-        letter-spacing: -0.28px;
-        color: #333333;
-    }
+	.content-title {
+		font-family: Roboto Mono;
+		font-style: normal;
+		font-weight: 500;
+		font-size: 20px;
+		line-height: 26px;
+		letter-spacing: -0.28px;
+		color: #333333;
+	}
 
-    .content-list {
-        ul {
-            li {
-                font-family: Roboto Mono;
-                font-style: normal;
-                font-weight: 300;
-                font-size: 14px;
-                line-height: 18px;
-                letter-spacing: -0.28px;
-                color: #4F4F4F;
-                margin-top: 20px;
-            }
+	.content-list {
+		ul {
+			li {
+				font-family: Roboto Mono;
+				font-style: normal;
+				font-weight: 300;
+				font-size: 14px;
+				line-height: 18px;
+				letter-spacing: -0.28px;
+				color: #4f4f4f;
+				margin-top: 20px;
+			}
 
-            li:first-child {
-                margin-top: 10px;
-            }
-        }
-    }
+			li:first-child {
+				margin-top: 10px;
+			}
+		}
+	}
 
-    .content-actions {
-        .content-nr {
-            font-family: Roboto Mono;
-            font-style: normal;
-            font-weight: 500;
-            font-size: 10px;
-            text-transform: uppercase;
-            color: #828282;
-        }
+	.content-actions {
+		.content-nr {
+			font-family: Roboto Mono;
+			font-style: normal;
+			font-weight: 500;
+			font-size: 10px;
+			text-transform: uppercase;
+			color: #828282;
+		}
 
-        button {
-            width: 32px;
-            height: 32px;
-            background-color: #fff;
-            box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+		button {
+			width: 32px;
+			height: 32px;
+			background-color: #fff;
+			box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+				0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
 
-            &:focus {
-                outline: #fff auto 0px !important;
-            }
+			&:focus {
+				outline: #fff auto 0px !important;
+			}
 
-            ::ng-deep.mat-button-wrapper {
-                padding: 0px 0;
-                line-height: 20px;
+			::ng-deep.mat-button-wrapper {
+				padding: 0px 0;
+				line-height: 20px;
 
-                .mat-icon {
-                    height: 30px;
-                    color: #828282;
+				.mat-icon {
+					height: 30px;
+					color: #828282;
 
-                    &:focus {
-                        outline: #fff auto 0px !important;
-                    }
-                }
-            }
-        }
-        .yellow {
-            background-color: #f49636c7 !important;
+					&:focus {
+						outline: #fff auto 0px !important;
+					}
+				}
+			}
+		}
+		.yellow {
+			background-color: #f49636c7 !important;
 
-            .mat-icon {
-                color: #fff;
-            }
-        }
-    }
+			.mat-icon {
+				color: #fff;
+			}
+		}
+	}
 
-    .mat-card {
-        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+	.mat-card {
+		box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+			0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
 
-        .mat-card-image {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            margin: 0px !important;
-        }
+		.mat-card-image {
+			width: 100%;
+			height: 150px;
+			object-fit: cover;
+			margin: 0px !important;
+		}
 
-        .content-description {
-            font-family: Roboto Mono;
-            font-style: normal;
-            font-weight: 300;
-            font-size: 14px;
-            line-height: 18px;
-            letter-spacing: -0.28px;
-            color: #4F4F4F;
-            max-height: 111px;
-            overflow: hidden;
-        }
+		.content-description {
+			font-family: Roboto Mono;
+			font-style: normal;
+			font-weight: 300;
+			font-size: 14px;
+			line-height: 18px;
+			letter-spacing: -0.28px;
+			color: #4f4f4f;
+			max-height: 111px;
+			overflow: hidden;
+		}
 
-        ::ng-deep.card-header-mat {
-            .mat-card-header-text {
-                margin: 6px 0px;
-            }
+		::ng-deep.card-header-mat {
+			.mat-card-header-text {
+				margin: 6px 0px;
+			}
 
-            .mat-card-avatar {
-                height: 35px;
-                width: unset;
-            }
-        }
-    }
+			.mat-card-avatar {
+				height: 35px;
+				width: unset;
+			}
+		}
+	}
 
-    .package-chips {
-        ::ng-deep.mat-chip {
-            font-family: Roboto Mono;
-            font-style: normal;
-            font-weight: normal;
-            font-size: 10px;
-            line-height: 13px;
-            letter-spacing: -0.28px;
-            color: #000000;
-            padding: 0px 9px;
-            min-height: 18px;
-            border-radius: 24px;
-            cursor: pointer;
-            margin: 0px 8px;
-            background-color: #fff;
-            box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25), inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
-        }
-    }
+	.package-chips {
+		::ng-deep.mat-chip {
+			font-family: Roboto Mono;
+			font-style: normal;
+			font-weight: normal;
+			font-size: 10px;
+			line-height: 13px;
+			letter-spacing: -0.28px;
+			color: #000000;
+			padding: 0px 9px;
+			min-height: 18px;
+			border-radius: 24px;
+			cursor: pointer;
+			margin: 0px 8px;
+			background-color: #fff;
+			box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25),
+				inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
+		}
+	}
 
-    .package-div {
-        margin-top: 30px;
+	.package-div {
+		margin-top: 30px;
 
-        .content-text {
-            margin-bottom: 15px;
-        }
-    }
+		.content-text {
+			margin-bottom: 15px;
+		}
+	}
 }
 
-@media (max-width:767px){
-    .package-div {
-        margin-bottom: 0px !important;
-        .flex-row {
-            flex-direction: column !important;
-            div {
-                width: 100% !important;
-                padding-left: 0px !important;
-                padding-right: 0px !important;
-            }
-        }
-        .package-chips {
-            .mat-chip {
-                margin: 4px 4px !important;
-            }
-        }
-    }
+@media (max-width: 767px) {
+	.package-div {
+		margin-bottom: 0px !important;
+		.flex-row {
+			flex-direction: column !important;
+			div {
+				width: 100% !important;
+				padding-left: 0px !important;
+				padding-right: 0px !important;
+			}
+		}
+		.package-chips {
+			.mat-chip {
+				margin: 4px 4px !important;
+			}
+		}
+	}
 }
 
 @media (max-width: 480px) {
-    .package-actions {
-        .d-flex {
-            flex-direction: column !important;
-            div {
-                padding: 4px 0px !important;
-            }
-        }
-    }
+	.package-actions {
+		.d-flex {
+			flex-direction: column !important;
+			div {
+				padding: 4px 0px !important;
+			}
+		}
+	}
 }

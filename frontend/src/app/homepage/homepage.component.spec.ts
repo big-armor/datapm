@@ -1,27 +1,27 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HomepageComponent } from './homepage.component';
-import {AppModule} from './../app.module';
-import { MaterialModule } from '../material.module';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { HomepageComponent } from "./homepage.component";
+import { AppModule } from "./../app.module";
 
-describe('HomepageComponent', () => {
-  let component: HomepageComponent;
-  let fixture: ComponentFixture<HomepageComponent>;
+import { MaterialModule } from "../material.module";
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [AppModule, MaterialModule],
-      declarations: [ HomepageComponent ],
-    })
-    .compileComponents();
-  }));
+describe("HomepageComponent", () => {
+	let component: HomepageComponent;
+	let fixture: ComponentFixture<HomepageComponent>;
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(HomepageComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+	beforeEach(async(() => {
+		TestBed.configureTestingModule({
+			declarations: [HomepageComponent],
+			imports: [AppModule, MaterialModule]
+		}).compileComponents();
+	}));
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+	beforeEach(() => {
+		fixture = TestBed.createComponent(HomepageComponent);
+		component = fixture.componentInstance;
+		fixture.detectChanges();
+	});
+
+	it("should create", () => {
+		expect(component).toBeTruthy();
+	});
 });

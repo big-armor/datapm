@@ -1,34 +1,30 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { PackageDetailComponent } from './package-detail.component';
-import {
-  ApolloTestingModule,
-  ApolloTestingController,
-} from 'apollo-angular/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { MaterialModule } from 'src/app/material.module';
+import { PackageDetailComponent } from "./package-detail.component";
+import { ApolloTestingModule, ApolloTestingController } from "apollo-angular/testing";
+import { RouterTestingModule } from "@angular/router/testing";
 
-describe('PackageDetailComponent', () => {
-  let component: PackageDetailComponent;
-  let fixture: ComponentFixture<PackageDetailComponent>;
-  let controller: ApolloTestingController;
+import { MaterialModule } from "../../material.module";
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ PackageDetailComponent ],
-      imports: [RouterTestingModule, ApolloTestingModule, MaterialModule]
-    })
-    .compileComponents();
-  }));
+describe("PackageDetailComponent", () => {
+	let component: PackageDetailComponent;
+	let fixture: ComponentFixture<PackageDetailComponent>;
+	let controller: ApolloTestingController;
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(PackageDetailComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+	beforeEach(async(() => {
+		TestBed.configureTestingModule({
+			declarations: [PackageDetailComponent],
+			imports: [RouterTestingModule, ApolloTestingModule, MaterialModule]
+		}).compileComponents();
+	}));
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+	beforeEach(() => {
+		fixture = TestBed.createComponent(PackageDetailComponent);
+		component = fixture.componentInstance;
+		fixture.detectChanges();
+	});
 
+	it("should create", () => {
+		expect(component).toBeTruthy();
+	});
 });

@@ -1,28 +1,28 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { ApolloTestingModule } from 'apollo-angular/testing';
-import { MaterialModule } from 'src/app/material.module';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ApolloTestingModule } from "apollo-angular/testing";
 
-import { LatestComponent } from './latest.component';
+import { LatestComponent } from "./latest.component";
 
-describe('LatestComponent', () => {
-  let component: LatestComponent;
-  let fixture: ComponentFixture<LatestComponent>;
+import { MaterialModule } from "../../material.module";
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ LatestComponent ],
-      imports: [ ApolloTestingModule, MaterialModule ]
-    })
-    .compileComponents();
-  }));
+describe("LatestComponent", () => {
+	let component: LatestComponent;
+	let fixture: ComponentFixture<LatestComponent>;
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(LatestComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+	beforeEach(async(() => {
+		TestBed.configureTestingModule({
+			declarations: [LatestComponent],
+			imports: [ApolloTestingModule, MaterialModule]
+		}).compileComponents();
+	}));
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+	beforeEach(() => {
+		fixture = TestBed.createComponent(LatestComponent);
+		component = fixture.componentInstance;
+		fixture.detectChanges();
+	});
+
+	it("should create", () => {
+		expect(component).toBeTruthy();
+	});
 });

@@ -363,7 +363,7 @@ export class UserRepository extends Repository<User> {
 
 			const finalUserName = value.username;
 			if (value.username) {
-				dbUser.username = value.username.trim();
+				dbUser.username = value.username.toLowerCase().trim();
 			}
 
 			if (value.emailAddress) {
@@ -408,7 +408,7 @@ export class UserRepository extends Repository<User> {
 
 			if (value.emailAddressIsPublic != null) {
 				dbUser.emailAddressIsPublic = value.emailAddressIsPublic;
-			}
+      }
 
 			dbUser.updatedAt = new Date();
 			await transaction.save(dbUser);

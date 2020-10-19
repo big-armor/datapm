@@ -1,196 +1,191 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { AuthenticationService } from '../services/authentication.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { FormGroup, FormControl } from '@angular/forms';
-import { getRegistryPort, getRegistryProtocol, getRegistryHostname } from '../helpers/RegistryAccessHelper';
-import { APIKey, Catalog, CreateAPIKeyGQL, DeleteAPIKeyGQL, MyAPIKeysGQL, MyCatalogsGQL, Scope, User } from 'src/generated/graphql';
-import { EditAccountDialogComponent } from './edit-account-dialog/edit-account-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
+import { Component, OnInit, ChangeDetectorRef } from "@angular/core";
+import { AuthenticationService } from "../services/authentication.service";
+import { ActivatedRoute, Router } from "@angular/router";
+import { FormGroup, FormControl } from "@angular/forms";
+import { getRegistryPort, getRegistryProtocol, getRegistryHostname } from "../helpers/RegistryAccessHelper";
+import {
+	APIKey,
+	Catalog,
+	CreateAPIKeyGQL,
+	DeleteAPIKeyGQL,
+	MyAPIKeysGQL,
+	MyCatalogsGQL,
+	Scope,
+	User
+} from "src/generated/graphql";
+import { EditAccountDialogComponent } from "./edit-account-dialog/edit-account-dialog.component";
+import { MatDialog } from "@angular/material/dialog";
 
 enum State {
-  INIT,
-  LOADING,
-  ERROR,
-  SUCCESS,
-  ERROR_NOT_UNIQUE
+	INIT,
+	LOADING,
+	ERROR,
+	SUCCESS,
+	ERROR_NOT_UNIQUE
 }
 @Component({
-  selector: 'app-my-account',
-  templateUrl: './my-account.component.html',
-  styleUrls: ['./my-account.component.scss']
+	selector: "app-my-account",
+	templateUrl: "./my-account.component.html",
+	styleUrls: ["./my-account.component.scss"]
 })
 export class MyAccountComponent implements OnInit {
+	State = State;
+	state = State.INIT;
 
-  State = State;
-  state = State.INIT;
+	catalogState = State.INIT;
+	apiKeysState = State.INIT;
+	createAPIKeyState = State.INIT;
+	deleteAPIKeyState = State.INIT;
 
-  catalogState = State.INIT;
-  apiKeysState = State.INIT;
-  createAPIKeyState = State.INIT;
-  deleteAPIKeyState = State.INIT;
+	currentUser: User;
 
-  currentUser:User;
+	newAPIKey: string;
 
-  newAPIKey:string;
+	public myCatalogs: Catalog[];
+	public myAPIKeys: APIKey[];
+	public selectedTab = 0;
 
-  public myCatalogs:Catalog[];
-  public myAPIKeys:APIKey[];
-  public selectedTab = 0;
+	createAPIKeyForm: FormGroup;
 
-  createAPIKeyForm:FormGroup;
+	private prefix = "me";
+	public routes = [
+		{ linkName: "details", url: this.prefix },
+		{ linkName: "packages", url: this.prefix + "/packages" },
+		{ linkName: "activity", url: this.prefix + "/activity" }
+	];
 
-  private prefix = "me";
-  public routes = [
-    {linkName:'details', url: this.prefix},
-    {linkName:'packages', url:this.prefix + '/packages'},
-    {linkName:'activity', url:this.prefix +'/activity'},
-  ]
+	constructor(
+		private authenticationService: AuthenticationService,
+		private router: Router,
+		private myCatalogsGQL: MyCatalogsGQL,
+		private createAPIKeyGQL: CreateAPIKeyGQL,
+		private myAPIKeysGQL: MyAPIKeysGQL,
+		private deleteAPIKeyGQL: DeleteAPIKeyGQL,
+		private changeDectorRef: ChangeDetectorRef,
+		private route: ActivatedRoute,
+		public dialog: MatDialog
+	) {}
 
-  constructor(
-    private authenticationService:AuthenticationService,
-    private router:Router,
-    private myCatalogsGQL:MyCatalogsGQL,
-    private createAPIKeyGQL:CreateAPIKeyGQL,
-    private myAPIKeysGQL:MyAPIKeysGQL,
-    private deleteAPIKeyGQL:DeleteAPIKeyGQL,
-    private changeDectorRef:ChangeDetectorRef,
-    private route: ActivatedRoute,
-    public dialog: MatDialog
-  ) {
-    }
+	ngOnInit(): void {
+		this.selectTab(0);
+		this.state = State.INIT;
 
-  ngOnInit(): void {
-    this.selectTab(0);
-    this.state = State.INIT;
+		this.createAPIKeyForm = new FormGroup({
+			label: new FormControl("")
+		});
 
-    this.createAPIKeyForm = new FormGroup({
-      label: new FormControl('')
-    });
+		this.authenticationService.getUserObservable().subscribe((u) => {
+			if (u == null) {
+				return;
+			}
 
-    this.authenticationService.getUserObservable().subscribe(u => {
+			u.then((user) => {
+				this.currentUser = user;
+				this.state = State.SUCCESS;
+			}).catch((error) => (this.state = State.ERROR));
+		});
 
-      if(u == null) {
-        return;
-      }
+		this.myCatalogsGQL.fetch().subscribe((response) => {
+			if (response.errors?.length > 0) {
+				this.catalogState = State.ERROR;
+				return;
+			}
 
-      u.then(user => {
-        this.currentUser = user;
-        this.state = State.SUCCESS
-      })
-      .catch(error => this.state = State.ERROR )
-    });
+			this.myCatalogs = response.data.myCatalogs;
+			this.catalogState = State.SUCCESS;
+		});
 
-    this.myCatalogsGQL.fetch().subscribe(response => {
-      if(response.errors?.length > 0) {
-        this.catalogState = State.ERROR;
-        return;
-      }
+		this.refreshAPIKeys();
+	}
 
-      this.myCatalogs = response.data.myCatalogs;
-      this.catalogState = State.SUCCESS;
+	openEditDialog() {
+		this.dialog.open(EditAccountDialogComponent);
+	}
 
-    });
+	public selectTab(index) {
+		this.router.navigate([this.routes[index].url]);
+		this.selectedTab = index;
+	}
 
-    this.refreshAPIKeys();
+	refreshAPIKeys() {
+		this.apiKeysState = State.LOADING;
 
+		this.myAPIKeysGQL.fetch({}, { fetchPolicy: "no-cache" }).subscribe((response) => {
+			if (response.errors?.length > 0) {
+				this.apiKeysState = State.ERROR;
+				return;
+			}
+			this.myAPIKeys = response.data.myAPIKeys;
+			this.apiKeysState = State.SUCCESS;
+		});
+	}
 
-  }
+	createAPIKey() {
+		this.createAPIKeyGQL
+			.mutate({
+				value: {
+					label: this.createAPIKeyForm.value.label,
+					scopes: [Scope.MANAGE_API_KEYS, Scope.MANAGE_PRIVATE_ASSETS, Scope.READ_PRIVATE_ASSETS]
+				}
+			})
+			.subscribe((response) => {
+				if (response.errors?.length > 0) {
+					if (response.errors.find((e) => e.message == "NOT_UNIQUE")) {
+						this.createAPIKeyState = State.ERROR_NOT_UNIQUE;
+						return;
+					}
 
-  openEditDialog() {
-    this.dialog.open(EditAccountDialogComponent);
-  }
+					this.createAPIKeyState = State.ERROR;
+					return;
+				}
 
-  public selectTab(index) {
-    this.router.navigate([this.routes[index].url]);
-    this.selectedTab = index;
-  }
+				const key = response.data.createAPIKey;
 
-  refreshAPIKeys() {
-    this.apiKeysState = State.LOADING;
+				this.newAPIKey = btoa(key.id + "." + key.secret);
 
-    this.myAPIKeysGQL.fetch({},{fetchPolicy: 'no-cache'}).subscribe(response => {
-      if(response.errors?.length > 0) {
-        this.apiKeysState = State.ERROR;
-        return;
-      }
-      this.myAPIKeys = response.data.myAPIKeys;
-      this.apiKeysState = State.SUCCESS;
+				this.createAPIKeyForm.get("label").setValue("");
+				this.refreshAPIKeys();
+				this.createAPIKeyState = State.SUCCESS;
+			});
+	}
 
-    });
-  }
+	deleteApiKey(id: string) {
+		this.deleteAPIKeyState = State.LOADING;
 
-  createAPIKey() {
-    this.createAPIKeyGQL.mutate({
-      value: {
-        label: this.createAPIKeyForm.value.label,
-        scopes: [Scope.MANAGE_API_KEYS,Scope.MANAGE_PRIVATE_ASSETS,Scope.READ_PRIVATE_ASSETS]
-      }
-    }).subscribe(response => {
-      if(response.errors?.length > 0) {
+		this.deleteAPIKeyGQL.mutate({ id: id }).subscribe((response) => {
+			if (response.errors?.length > 0) {
+				this.deleteAPIKeyState = State.ERROR;
+				return;
+			}
 
-        if(response.errors.find(e => e.message == "NOT_UNIQUE")) {
-          this.createAPIKeyState = State.ERROR_NOT_UNIQUE;
-          return;
-        }
+			this.createAPIKeyForm.get("label").setValue("");
+			this.refreshAPIKeys();
+			this.deleteAPIKeyState = State.SUCCESS;
+		});
+	}
 
-        this.createAPIKeyState = State.ERROR;
-        return;
-      }
+	logoutClicked() {
+		this.authenticationService.logout();
+		this.router.navigate(["/"]);
+	}
 
-      const key = response.data.createAPIKey;
+	apiKeyCommandString() {
+		const hostname = getRegistryHostname();
+		const protocol = getRegistryProtocol();
+		const port = getRegistryPort();
+		let protocolOption = "";
+		let portOption = "";
 
+		if (protocol == "https" && port != 443) {
+			portOption = "--port " + port;
+		} else if (protocol == "http" && port != 80) {
+			portOption = " --port " + port;
+		}
 
-      this.newAPIKey = btoa(key.id + "." + key.secret);
+		if (protocol == "http") {
+			protocolOption = " --protocol " + protocol;
+		}
 
-      this.createAPIKeyForm.get('label').setValue('');
-      this.refreshAPIKeys();
-      this.createAPIKeyState = State.SUCCESS;
-    })
-  }
-
-  deleteApiKey(id:string) {
-    this.deleteAPIKeyState = State.LOADING;
-
-    this.deleteAPIKeyGQL.mutate({id: id}).subscribe(response => {
-      if(response.errors?.length > 0) {
-        this.deleteAPIKeyState = State.ERROR;
-        return;
-      }
-
-      this.createAPIKeyForm.get('label').setValue('');
-      this.refreshAPIKeys();
-      this.deleteAPIKeyState = State.SUCCESS;
-    });
-  }
-
-
-  logoutClicked() {
-    this.authenticationService.logout();
-    this.router.navigate(['/']);
-  }
-
-  apiKeyCommandString() {
-
-
-
-    const hostname = getRegistryHostname();
-    const protocol = getRegistryProtocol();
-    const port =  getRegistryPort();
-    let protocolOption = "";
-    let portOption = "";
-
-
-    if(protocol == "https" && port != 443) {
-          portOption = "--port " + port;
-    } else if(protocol == "http" && port != 80) {
-          portOption = " --port " + port;
-    }
-
-    if(protocol == "http" ) {
-      protocolOption = " --protocol " + protocol;
-    }
-
-    return `datapm registry add ${hostname}` + portOption + protocolOption + ` ${this.newAPIKey}`
-  }
-
+		return `datapm registry add ${hostname}` + portOption + protocolOption + ` ${this.newAPIKey}`;
+	}
 }

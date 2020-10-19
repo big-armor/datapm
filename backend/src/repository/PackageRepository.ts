@@ -234,14 +234,12 @@ export class PackageRepository {
 			const insertedPackage = await transaction.save(packageEntity);
 
 			// add user as package manager of new package
-			await transaction
-				.getRepository(UserPackagePermission)
-				.insert({
-					packageId: insertedPackage.id,
-					userId,
-					permissions: allPermissions(),
-					createdAt: new Date()
-				});
+			await transaction.getRepository(UserPackagePermission).insert({
+				packageId: insertedPackage.id,
+				userId,
+				permissions: allPermissions(),
+				createdAt: new Date()
+			});
 
 			// requery resulting inserted person for graphql query result
 			// needed to add proper joins
