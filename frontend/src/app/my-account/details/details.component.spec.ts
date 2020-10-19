@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { MaterialModule } from "src/app/material.module";
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { EMPTY } from 'rxjs';
 
 import { DetailsComponent } from "./details.component";
 
@@ -21,10 +22,10 @@ describe("DetailsComponent", () => {
 					provide: MAT_DIALOG_DATA,
 					useValue: {}
 				},
-				{
-					provide: MatDialog,
-					useValue: {}
-				},
+				// {
+				// 	provide: MatDialog,
+				// 	useValue: {}
+				// },
 				{
 					provide: MatDialogRef,
 					useValue: {}

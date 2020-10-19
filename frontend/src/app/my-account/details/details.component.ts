@@ -85,7 +85,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
       label: new FormControl('')
     });
 
-    this.dialog.afterAllClosed.pipe(takeUntil(this.subscription)).subscribe(result => {
+    this.dialog.afterAllClosed.subscribe(result => {
       this.authenticationService.refreshUserInfo();
       this.refreshCatalogs();
     })
