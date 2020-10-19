@@ -87,7 +87,6 @@ export class MyAccountComponent implements OnInit, OnDestroy {
     this.dialog.open(EditAccountDialogComponent, dialogConfig);
 
     this.dialog.afterAllClosed.subscribe(result => {
-      console.log('my-account-refreshUserInfo')
       this.authenticationService.refreshUserInfo()
     });
   }

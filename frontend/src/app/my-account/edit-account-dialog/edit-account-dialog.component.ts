@@ -103,7 +103,7 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
       }
     }).pipe(takeUntil(this.subscription)).subscribe(response => {
       if (response.errors) {
-        return console.error(response.errors)
+        console.error(response.errors)
       }
     })
 
@@ -118,7 +118,7 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
         }
       }).pipe(takeUntil(this.subscription)).subscribe(response => {
         if (response.errors) {
-          return console.error(response.errors)
+          console.error(response.errors)
         }
       })
     }
