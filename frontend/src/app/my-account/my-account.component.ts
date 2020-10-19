@@ -5,7 +5,7 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { AuthenticationService } from "../services/authentication.service";
 import { APIKey, Catalog, User } from 'src/generated/graphql';
 import { EditAccountDialogComponent } from "./edit-account-dialog/edit-account-dialog.component";
-import { takeUntil } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 
 enum State {
@@ -86,7 +86,8 @@ export class MyAccountComponent implements OnInit, OnDestroy {
 
     this.dialog.open(EditAccountDialogComponent, dialogConfig);
 
-    this.dialog.afterAllClosed.pipe(takeUntil(this.subscription)).subscribe(result => {
+    this.dialog.afterAllClosed.subscribe(result => {
+      console.log('my-account-refreshUserInfo')
       this.authenticationService.refreshUserInfo()
     });
   }

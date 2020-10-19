@@ -174,7 +174,7 @@
         }
     }
 
-    .edit-password {
+    .edit-button {
         font-family: Roboto Mono;
         font-style: normal;
         font-weight: 400;
@@ -268,6 +268,9 @@
     .panel-div {
         width: 100%;
         box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+        table {
+            width: 100%;
+        }
         .div-answer {
             width: 100%;
             display: flex;
@@ -308,8 +311,6 @@
             }
         }
         .save-btn {
-            // position: relative;
-            // top: 10px;
             padding: 5px 20px;
             box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
             border-radius: 24px;
@@ -330,31 +331,55 @@
 }
 
 @media (max-width: 767px) {
-	.package-div {
-		margin-bottom: 0px !important;
-		.flex-row {
-			flex-direction: column !important;
-			div {
-				width: 100% !important;
-				padding-left: 0px !important;
-				padding-right: 0px !important;
-			}
-		}
-		.package-chips {
-			.mat-chip {
-				margin: 4px 4px !important;
-			}
-		}
-	}
+	.package-div, .panel-div {
+        margin-bottom: 0px !important;
+        .table-content {
+            padding-right: 24px;
+            overflow-wrap: break-word;
+            .div-answer {
+                flex-direction: column;
+            }
+            .flex-row {
+                flex-direction: column !important;
+                div {
+                    width: 100% !important;
+                    padding-left: 0px !important;
+                    padding-right: 0px !important;
+                }
+            }
+            .package-chips {
+                .mat-chip {
+                    margin: 4px 4px !important;
+                }
+            }
+        }
+    }
 }
 
 @media (max-width: 480px) {
-	.package-actions {
-		.d-flex {
-			flex-direction: column !important;
-			div {
-				padding: 4px 0px !important;
-			}
-		}
-	}
+    #detailsPage {
+        .panel-div {
+            .div-answer {
+                flex-direction: column;
+                input {
+                    width: 100%;
+                }
+                div {
+                    width: 100%;
+                    margin-top: 5px;
+                    a { 
+                        margin: 0;
+                    }
+                }
+            }
+            .package-actions {
+                .d-flex {
+                    flex-direction: column !important;
+                    div {
+                        padding: 4px 0px !important;
+                    }
+                }
+            }
+        }
+    }    
 }

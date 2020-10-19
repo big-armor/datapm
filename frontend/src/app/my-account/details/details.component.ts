@@ -18,7 +18,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { Clipboard } from '@angular/cdk/clipboard'
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 
 enum State {
   INIT,
@@ -86,6 +86,8 @@ export class DetailsComponent implements OnInit, OnDestroy {
     });
 
     this.dialog.afterAllClosed.subscribe(result => {
+      console.log('details-refreshUserInfo')
+
       this.authenticationService.refreshUserInfo();
       this.refreshCatalogs();
     })
@@ -195,5 +197,13 @@ export class DetailsComponent implements OnInit, OnDestroy {
 
   copyKeyToClipboard() {
     this.clipboard.copy(this.apiKeyCommandString())
+  }
+
+  public formatScopes(scopes: string[]): string {
+    let scopeString = ''
+    scopes.forEach((scope, index) => {
+      return scopeString += (index !== scopes.length - 1) ? (scope + ', ') : (scope)
+    })
+    return scopeString
   }
 }

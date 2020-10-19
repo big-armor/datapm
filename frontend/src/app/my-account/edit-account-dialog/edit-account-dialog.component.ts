@@ -2,7 +2,7 @@ import { Component, OnInit, Inject, ChangeDetectorRef, OnDestroy } from '@angula
 import { FormGroup, FormControl, AsyncValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 import { UpdateMeGQL, UsernameAvailableGQL, UpdateCatalogGQL, User } from '../../../generated/graphql';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 
@@ -19,7 +19,7 @@ function usernameValidator(usernameAvailableGQL: UsernameAvailableGQL, component
         });
         return;
       }
-      usernameAvailableGQL.fetch({ username: control.value }).pipe(takeUntil(this.subscription)).subscribe(result => {
+      usernameAvailableGQL.fetch({ username: control.value }).subscribe(result => {
         if (result.errors?.length > 0) {
           success({
             [result.errors[0].message]: true
@@ -103,7 +103,7 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
       }
     }).pipe(takeUntil(this.subscription)).subscribe(response => {
       if (response.errors) {
-        console.error(response.errors)
+        return console.error(response.errors)
       }
     })
 
@@ -118,10 +118,7 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
         }
       }).pipe(takeUntil(this.subscription)).subscribe(response => {
         if (response.errors) {
-          console.error(response.errors)
-        }
-        if (response.data) {
-          console.log(response.data.updateCatalog)
+          return console.error(response.errors)
         }
       })
     }

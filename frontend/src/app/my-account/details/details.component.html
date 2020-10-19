@@ -3,14 +3,14 @@
 		<div class="section-title">Actions</div>
 		<div class="d-flex flex-row bd-highlight">
 			<div class="mb-3">
-				<a class="edit-password" (click)="openPasswordDialog()">Update Password</a>
+				<a class="edit-button" (click)="openPasswordDialog()">Update Password</a>
 			</div>
 		</div>
 	</div>
 
 	<div class="package-div panel-div">
 		<div *ngIf="myAPIKeys && myAPIKeys.length > 0" class="section-title api-keys-title">My API Keys</div>
-		<table *ngIf="myAPIKeys && myAPIKeys.length > 0" mat-table [dataSource]="myAPIKeys" style="width: 100%;">
+		<table *ngIf="myAPIKeys && myAPIKeys.length > 0" mat-table [dataSource]="myAPIKeys">
 			<!-- Label column -->
 			<ng-container matColumnDef="label">
 				<th mat-header-cell *matHeaderCellDef> Label </th>
@@ -20,7 +20,7 @@
 			<!-- Key column -->
 			<ng-container matColumnDef="scopes">
 				<th mat-header-cell *matHeaderCellDef> Scopes </th>
-				<td class="table-content" mat-cell *matCellDef="let apiKey"> {{apiKey.scopes}} </td>
+				<td class="table-content" mat-cell *matCellDef="let apiKey"> {{formatScopes(apiKey.scopes)}} </td>
 			</ng-container>
 
 			<!-- Actions column -->
@@ -43,7 +43,7 @@
 					<input type="text" placeholder="API Key Label" name="label" formControlName="label" minlength="1"
 						autocomplete="off">
 					<div [class.disabled]="!createAPIKeyForm.valid">
-						<a class="edit-password ml-3" (click)="createAPIKey()">Create API Key</a>
+						<a class="edit-button" (click)="createAPIKey()">Create API Key</a>
 					</div>
 				</div>
 			</form>
