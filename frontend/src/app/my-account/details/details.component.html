@@ -17,12 +17,6 @@
 				<td class="table-content" mat-cell *matCellDef="let apiKey"> {{apiKey.label}} </td>
 			</ng-container>
 
-			<!-- Key column -->
-			<ng-container matColumnDef="scopes">
-				<th mat-header-cell *matHeaderCellDef> Scopes </th>
-				<td class="table-content" mat-cell *matCellDef="let apiKey"> {{formatScopes(apiKey.scopes)}} </td>
-			</ng-container>
-
 			<!-- Actions column -->
 			<ng-container matColumnDef="actions">
 				<th mat-header-cell *matHeaderCellDef> Actions </th>

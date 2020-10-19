@@ -46,7 +46,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
   deleteAPIKeyState = State.INIT;
   newAPIKey: string;
 
-  columnsToDisplay = ['label', 'scopes', 'actions'];
+  columnsToDisplay = ['label', 'actions'];
 
   public myCatalogs: Catalog[];
   public myAPIKeys: APIKey[];
@@ -86,7 +86,6 @@ export class DetailsComponent implements OnInit, OnDestroy {
     });
 
     this.dialog.afterAllClosed.subscribe(result => {
-      console.log('details-refreshUserInfo')
 
       this.authenticationService.refreshUserInfo();
       this.refreshCatalogs();
@@ -197,13 +196,5 @@ export class DetailsComponent implements OnInit, OnDestroy {
 
   copyKeyToClipboard() {
     this.clipboard.copy(this.apiKeyCommandString())
-  }
-
-  public formatScopes(scopes: string[]): string {
-    let scopeString = ''
-    scopes.forEach((scope, index) => {
-      return scopeString += (index !== scopes.length - 1) ? (scope + ', ') : (scope)
-    })
-    return scopeString
   }
 }
