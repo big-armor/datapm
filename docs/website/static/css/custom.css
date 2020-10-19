@@ -195,6 +195,7 @@ table td {
 }
 
 .toc .toggleNav ul li a, .onPageNav a {
+    font-size: 12px;
     color: #828282;
     font-family: 'RobotoMonoLight';
 }
