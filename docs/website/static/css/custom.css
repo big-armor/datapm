@@ -7,6 +7,19 @@
 
 /* your custom css */
 
+@media only screen and (max-width: 576px) {
+    .footer-wrapper {
+        display: block !important;
+    }
+    .first-row {
+        margin-bottom: 30px;
+        padding: 0px 0px !important;
+    }
+    .second-row {
+        padding: 0px 0px !important;
+    }
+}
+
 @media only screen and (min-device-width: 360px) and (max-device-width: 736px) {
 }
 
@@ -173,6 +186,39 @@ table td {
 .hljs-type, .hljs-string, .hljs-number, .hljs-selector-id, .hljs-selector-class, .hljs-quote, .hljs-template-tag, .hljs-deletion,
 .hljs-regexp, .hljs-symbol, .hljs-variable, .hljs-template-variable, .hljs-link, .hljs-selector-attr, .hljs-selector-pseudo {
     color: #e23326d4;
+}
+
+.footer-wrapper {
+    max-width: 850px;
+    display: flex;
+    margin: 0 auto;
+}
+
+.first-row,
+.second-row {
+    padding: 0px 30px;
+    width: 285px;
+    text-align: left;
+}
+
+.footer-title {
+    font-family: 'RobotoMonoLight';
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: -.28px;
+    font-size: 14px;
+    line-height: 18px;
+    color: #4f4f4f;
+    margin-bottom: 10px;
+}
+
+.footer-subtitle {
+    font-family: 'RobotoMonoLight';
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: -.28px;
+    font-size: 10px;
+    line-height: 13px;
 }
 
 .nav-footer {
