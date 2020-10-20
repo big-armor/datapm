@@ -134,13 +134,7 @@ export class CatalogRepository extends Repository<Catalog> {
             await grantUserCatalogPermission({
                 username,
                 catalogSlug: value.slug,
-                permissions: [
-                    Permission.MANAGE,
-                    Permission.EDIT,
-                    Permission.DELETE,
-                    Permission.VIEW,
-                    Permission.CREATE
-                ],
+                permissions: [Permission.MANAGE, Permission.EDIT, Permission.VIEW],
                 manager: transaction
             });
 
