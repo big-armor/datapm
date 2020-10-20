@@ -8,7 +8,7 @@ export GCLOUD_STORAGE_BUCKET_NAME="media"
 export GOOGLE_CLOUD_PROJECT="adsfasdf"
 export FILESYSTEM_STORAGE_DIRECTORY="local_storage"
 export MIXPANEL_TOKEN="asdfasdfasdf"
-export TYPEORM_PORT="5432"
+export TYPEORM_PORT=${TYPEORM_PORT:=5432}
 export TYPEORM_DATABASE="datapm"
 export TYPEORM_SCHEMA="public"
 export TYPEORM_USERNAME="postgres"

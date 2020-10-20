@@ -6,26 +6,25 @@ sidebar_label: Registry API
 
 DataPM registries provide an [Apollo GraphQL](https://www.apollographql.com) based GraphQL API. This API is used by the web client and DataPM Command Line Client, and you can write your own integrations using this same API.
 
-Apollo has a great ["Why GraphQL?"](https://www.apollographql.com/docs/intro/benefits/) article with an introduction to the concepts and benefits of GraphQL. 
+Apollo has a great ["Why GraphQL?"](https://www.apollographql.com/docs/intro/benefits/) article with an introduction to the concepts and benefits of GraphQL.
 
 ## API Playground
 
-You can access a live "graphql api playground" at [datapm.io/graphql](https://datapm.io/graphql) or at the "/graphql" relative url for any privately hosted registry. The playground allows you to create and test queries and mutations. 
+You can access a live "graphql api playground" at [datapm.io/graphql](https://datapm.io/graphql) or at the "/graphql" relative url for any privately hosted registry. The playground allows you to create and test queries and mutations.
 
-Use the "docs" and "schema" tabs on the right side of the playground window to access the details of every operation available in the DataPM Registry GraphQL API. 
-
+Use the "docs" and "schema" tabs on the right side of the playground window to access the details of every operation available in the DataPM Registry GraphQL API.
 
 ## API Keys and Authorization
 
-DataPM provides a simple token based API key for machine-to-machine access to the registry graphql API. 
+DataPM provides a simple token based API key for machine-to-machine access to the registry graphql API.
 
-**Note: API Keys are secrets!** Never share your API Keys. Never check API Keys into code repos, email them, or send them in non-secure chat messages. 
+**Note: API Keys are secrets!** Never share your API Keys. Never check API Keys into code repos, email them, or send them in non-secure chat messages.
 
 ### Generate an API Key
 
 1. Register as a user on the target datapm registry
-    1. You can use the public [datapm.io/sign-up](https://datapm.io/sign-up)
-    1. Or host your own private registry
+   1. You can use the public [datapm.io/sign-up](https://datapm.io/sign-up)
+   1. Or host your own private registry
 1. Log-in to your new account
 1. Click your profile icon in the upper right
 1. Click "API Keys"
@@ -35,8 +34,7 @@ DataPM provides a simple token based API key for machine-to-machine access to th
 
 ### Authenticating with an API Key request header
 
-You can submit an API key in the "Authorization" HTTP request header to authenticate with the DataPM Registry GraphQL API. You can use this same Authorization Bearer header in the "Headers" section at the bottom of the graphql playground. 
-
+You can submit an API key in the "Authorization" HTTP request header to authenticate with the DataPM Registry GraphQL API. You can use this same Authorization Bearer header in the "Headers" section at the bottom of the graphql playground.
 
 ```
 {
@@ -46,14 +44,13 @@ You can submit an API key in the "Authorization" HTTP request header to authenti
 
 ## Object Overview
 
-The [DataPM Concepts](concepts.md) page contains details about logical of a DataPM registry. The following describes the high level concepts of the registry API GraphQL object types and how they map to those concepts. 
-
+The [DataPM Concepts](concepts.md) page contains details about logical of a DataPM registry. The following describes the high level concepts of the registry API GraphQL object types and how they map to those concepts.
 
 ### Object: Catalog
 
-A catalog is, like a real world magazine catalog, published by a person or organization and contains a list of available DataPM Packages. Catalogs are uniquely identified by their "slug" or "catalogSlug" reference. 
+A catalog is, like a real world magazine catalog, published by a person or organization and contains a list of available DataPM Packages. Catalogs are uniquely identified by their "slug" or "catalogSlug" reference.
 
-Catalogs may be public or private, and may have one or more user with a Permission to access or edit them. Every user has a catalog that matches their username. 
+Catalogs may be public or private, and may have one or more user with a Permission to access or edit them. Every user has a catalog that matches their username.
 
 ```
 type Catalog {
@@ -77,11 +74,9 @@ type CatalogIdentifier {
 }
 ```
 
-
-
 #### Catalog Queries and Mutations
 
-Here are some queries and mutations of interest for catalogs. More methods exist, and you can find them in the [playground](/playground). 
+Here are some queries and mutations of interest for catalogs. More methods exist, and you can find them in the [playground](/playground).
 
 ```gql
 query myCatalogs: [Catalog]!
@@ -95,13 +90,11 @@ mutation updateCatalog(identifier: CatalogIdentifierInput!, value: UpdateCatalog
 mutation disableCatalog(identifier: CatalogIdentifierInput!): Catalog!
 ```
 
-
 ### Object: Packages
 
-A package is a single offering of one or more data sets. Each package is a part of one and only one catalog, and present in zero or more collections. Packages on a registry have versions, and each version represents a single package file versioned. 
+A package is a single offering of one or more data sets. Each package is a part of one and only one catalog, and present in zero or more collections. Packages on a registry have versions, and each version represents a single package file versioned.
 
-
-Here is the general structure of a package object. 
+Here is the general structure of a package object.
 
 ```
 type Package {
@@ -126,11 +119,9 @@ type PackageIdentifier {
 }
 ```
 
-
-
 #### Package Queries and Mutations
 
-Here are some queries and mutations of interest for packages.More methods exist, and you can find them in the [playground](/playground). 
+Here are some queries and mutations of interest for packages.More methods exist, and you can find them in the [playground](/playground).
 
 ```gql
 query package(identifier: PackageIdentifierInput!): Package
@@ -153,7 +144,7 @@ mutation removePackagePermissions(identifier: PackageIdentifierInput!, username:
 
 Collections are groupings of two or more packages for the purposes of organizing packages into logical groups. Collections are curated by one or more users, and may be private or public.
 
-Packages may be added to zero or more collections. 
+Packages may be added to zero or more collections.
 
 ```text
 type Collection {
@@ -176,11 +167,9 @@ type CollectionIdentifier {
 
 ```
 
-
 #### Collection Queries and Mutations
 
-Here are some queries and mutations of interest for collections. More methods exist, and you can find them in the [playground](/playground). 
-
+Here are some queries and mutations of interest for collections. More methods exist, and you can find them in the [playground](/playground).
 
 ```
 query collection(identifier: CollectionIdentifierInput!): Collection
@@ -195,10 +184,9 @@ disableCollection(identifier: CollectionIdentifierInput!): Collection!
 
 ```
 
-
 ### Object: User
 
-A user is a real world person account on a DataPM registry. You will only be able to access fields such as firstName, lastName, etc if the corresponding "isPublic" property is true for users other than yourself. 
+A user is a real world person account on a DataPM registry. You will only be able to access fields such as firstName, lastName, etc if the corresponding "isPublic" property is true for users other than yourself.
 
 ```text
 type User {
@@ -214,7 +202,7 @@ type User {
 }
 ```
 
-Here are some of the most used endpoints for Users. 
+Here are some of the most used endpoints for Users.
 
 ```text
 
@@ -230,16 +218,6 @@ mutation removePackagePermissions(identifier: PackageIdentifierInput!, username:
 
 ```
 
-
 ### Other Objects
 
-There are more objects that you will find defined in the [playground](/playground). 
-
-
-
-
-
-
-
-
-
+There are more objects that you will find defined in the [playground](/playground).

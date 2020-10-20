@@ -292,6 +292,12 @@ export class UserRepository extends Repository<User> {
 
 			user.isActive = true;
 
+			if (isAdmin(value) && value.isAdmin) {
+				user.isAdmin = value.isAdmin;
+			} else {
+				user.isAdmin = false;
+			}
+
 			user = await transaction.save(user);
 
 			const catalog = await transaction.getCustomRepository(CatalogRepository).createCatalog({
@@ -316,6 +322,18 @@ export class UserRepository extends Repository<User> {
 				relations,
 				includeInactive: isAdmin(value)
 			});
+		});
+	}
+
+	updateUserPassword({ username, passwordHash }: { username: string; passwordHash: string }): Promise<void> {
+		return this.manager.nestedTransaction(async (transaction) => {
+			const dbUser = await getUserByUsernameOrFail({
+				username,
+				manager: transaction
+			});
+
+			dbUser.passwordHash = passwordHash;
+			await transaction.save(dbUser);
 		});
 	}
 
@@ -345,16 +363,52 @@ export class UserRepository extends Repository<User> {
 
 			const finalUserName = value.username;
 			if (value.username) {
-				dbUser.username = value.username.trim();
+				dbUser.username = value.username.toLowerCase().trim();
 			}
 
-			if (value.email) {
-				dbUser.emailAddress = value.email.trim();
+			if (value.emailAddress) {
+				dbUser.emailAddress = value.emailAddress.trim();
 			}
 
-			if (value.password) {
-				dbUser.passwordHash = hashPassword(value.password, dbUser.passwordSalt);
+			if (value.nameIsPublic != null) {
+				dbUser.nameIsPublic = value.nameIsPublic;
 			}
+
+			if (value.twitterHandle != null) {
+				dbUser.twitterHandle = value.twitterHandle;
+			}
+
+			if (value.twitterHandleIsPublic != null) {
+				dbUser.twitterHandleIsPublic = value.twitterHandleIsPublic;
+			}
+
+			if (value.gitHubHandle != null) {
+				dbUser.gitHubHandle = value.gitHubHandle;
+			}
+
+			if (value.gitHubHandleIsPublic != null) {
+				dbUser.gitHubHandleIsPublic = value.gitHubHandleIsPublic;
+			}
+
+			if (value.location != null) {
+				dbUser.location = value.location;
+			}
+
+			if (value.locationIsPublic != null) {
+				dbUser.locationIsPublic = value.locationIsPublic;
+			}
+
+			if (value.website != null) {
+				dbUser.website = value.website;
+			}
+
+			if (value.websiteIsPublic != null) {
+				dbUser.websiteIsPublic = value.websiteIsPublic;
+			}
+
+			if (value.emailAddressIsPublic != null) {
+				dbUser.emailAddressIsPublic = value.emailAddressIsPublic;
+      }
 
 			dbUser.updatedAt = new Date();
 			await transaction.save(dbUser);

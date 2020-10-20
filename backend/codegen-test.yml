@@ -1,0 +1,21 @@
+schema:
+    - node_modules/datapm-lib/schema.gql
+    - node_modules/datapm-lib/auth-schema.gql
+    - node_modules/datapm-lib/user-schema.gql
+    - node_modules/datapm-lib/api-key-schema.gql
+documents: node_modules/datapm-lib/graphql-documents/*.graphql
+generates:
+    test/integration/registry-client.ts:
+        plugins:
+            - typescript
+            - typescript-operations
+            - typed-document-node
+        config:
+            scalars:
+                Date: Date
+                JSON: "{ [key: string]: any }"
+                Upload: Promise<FileUpload>
+            namingConvention:
+                typeNames: keep
+                enumValues: upper-case#upperCase
+            useIndexSignature: true # required for Apollo. See https://github.com/dotansimha/graphql-code-generator/issues/1133#issuecomment-456812621
