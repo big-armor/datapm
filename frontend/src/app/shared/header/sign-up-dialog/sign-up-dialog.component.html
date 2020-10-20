@@ -9,16 +9,8 @@
 			<div class="first-dialog-div">
 				<p class="dialog-subtile">sign up with email</p>
 
-				<input
-					type="text"
-					placeholder="email"
-					name="emailAddress"
-					formControlName="emailAddress"
-					autocomplete="email"
-					email
-					minlength="5"
-					class="rounded-input"
-				/>
+				<input type="text" placeholder="email" name="emailAddress" formControlName="emailAddress" autocomplete="email"
+					email minlength="5" class="rounded-input" />
 				<div class="div-with-errors">
 					<div class="alert-warn" *ngIf="signUpForm.get('emailAddress').errors?.INVALID_FORMAT">
 						Username must contain only numbers, letters, and hyphens, and may not start or end with a
@@ -34,29 +26,16 @@
 				</div>
 				<br />
 
-				<input
-					type="password"
-					placeholder="password"
-					name="password"
-					formControlName="password"
-					autocomplete="new-password"
-					minlength="8"
-					class="rounded-input"
-				/>
+				<input type="password" placeholder="password" name="password" formControlName="password"
+					autocomplete="new-password" minlength="8" class="rounded-input" />
 				<p class="hint-txt">Password must contain more than 8 characters.</p>
 			</div>
 
 			<div class="second-dialog-div">
 				<p class="dialog-subtile">new account information</p>
 
-				<input
-					type="text"
-					placeholder="username"
-					name="username"
-					formControlName="username"
-					autocomplete="username"
-					class="rounded-input"
-				/>
+				<input type="text" placeholder="username" name="username" formControlName="username" autocomplete="username"
+					class="rounded-input" />
 				<div class="div-with-errors">
 					<div class="alert-warn" *ngIf="signUpForm.get('username').errors?.INVALID_CHARACTERS">
 						Username must contain only numbers, letters, and hyphens, and may not start or end with a
