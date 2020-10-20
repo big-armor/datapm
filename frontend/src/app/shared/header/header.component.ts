@@ -34,7 +34,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 		private router: Router,
 		private route: ActivatedRoute,
 		private authenticationService: AuthenticationService
-	) {}
+	) { }
 
 	ngOnInit(): void {
 		this.authenticationService

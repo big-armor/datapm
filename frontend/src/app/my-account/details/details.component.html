@@ -1,177 +1,84 @@
 <div id="detailsPage" class="big-div-package">
-	<div class="package-div">
-		<mat-card class="example-card">
-			<div class="d-flex bd-highlight up-header mt-1 mb-3">
-				<div class="bd-highlight">Updated 5 min.</div>
-				<div class="ml-auto bd-highlight">2 downloaded</div>
+	<div class="package-div panel-div">
+		<div class="section-title">Actions</div>
+		<div class="d-flex flex-row bd-highlight">
+			<div class="mb-3">
+				<a class="edit-button" (click)="openPasswordDialog()">Update Password</a>
 			</div>
-			<mat-card-header class="card-header-mat">
-				<div mat-card-avatar class="example-header-image">
-					<img src="../../../assets/images/user-female.png" alt="User image card" class="person-card-photo" />
-					<span class="person-card-name">Tyler Williams</span>
-				</div>
-			</mat-card-header>
-
-			<mat-card-content>
-				<div class="d-flex flex-row bd-highlight mb-3">
-					<div class="bd-highlight" style="width: 50%">
-						<img mat-card-image src="../../../assets/images/galaxy.jpg" alt="Photo of a Shiba Inu" />
-					</div>
-					<div class="bd-highlight px-3 py-1" style="width: 50%">
-						<div class="content-title mb-2">nasa/light-polution</div>
-						<div class="content-description">
-							Short description preview of the product and some, lorem ipsum dolor sit amet, consectetur
-							adipiscing elit. Risus orci, sem nullam maecenas sed mauris. Sed turpis lorem vitae sit.
-							Amet, in aliquet odio id orci. Risus orci, sem nullam maecenas sed mauris. Sed turpis lorem
-							vitae sit. Amet, in aliquet odio id orci...
-						</div>
-					</div>
-				</div>
-
-				<div class="content-actions">
-					<div class="package-chips pb-2">
-						<mat-chip-list aria-label="Fish selection">
-							<mat-chip>weather</mat-chip>
-							<mat-chip>oceanic</mat-chip>
-							<mat-chip>streaming</mat-chip>
-							<mat-chip>weather</mat-chip>
-							<mat-chip>oceanic</mat-chip>
-							<mat-chip>streaming</mat-chip>
-						</mat-chip-list>
-					</div>
-					<div class="package-actions pt-2">
-						<div class="d-flex bd-highlight">
-							<div class="p-2 bd-highlight">
-								<button mat-fab class="person-menu" aria-label="Example icon button with a delete icon">
-									<mat-icon>star_border</mat-icon>
-								</button>
-								<span class="px-2 content-nr">47</span>
-							</div>
-							<div class="p-2 bd-highlight">
-								<button mat-fab class="person-menu" aria-label="Example icon button with a delete icon">
-									<mat-icon>collections</mat-icon>
-								</button>
-								<span class="px-2 content-nr">add to collection</span>
-							</div>
-						</div>
-					</div>
-				</div>
-			</mat-card-content>
-		</mat-card>
+		</div>
 	</div>
 
-	<div class="package-div">
-		<mat-card class="example-card">
-			<div class="d-flex bd-highlight up-header mt-1 mb-3">
-				<div class="bd-highlight">Updated 5 min.</div>
-				<div class="ml-auto bd-highlight">2 downloaded</div>
+	<div class="package-div panel-div">
+		<div *ngIf="myAPIKeys && myAPIKeys.length > 0" class="section-title api-keys-title">My API Keys</div>
+		<table *ngIf="myAPIKeys && myAPIKeys.length > 0" mat-table [dataSource]="myAPIKeys">
+			<!-- Label column -->
+			<ng-container matColumnDef="label">
+				<th mat-header-cell *matHeaderCellDef> Label </th>
+				<td class="table-content" mat-cell *matCellDef="let apiKey"> {{apiKey.label}} </td>
+			</ng-container>
+
+			<!-- Actions column -->
+			<ng-container matColumnDef="actions">
+				<th mat-header-cell *matHeaderCellDef> Actions </th>
+				<td mat-cell *matCellDef="let apiKey">
+					<mat-icon class="d-flex align-items-center delete-icon" (click)="deleteApiKey(apiKey.id)"> clear </mat-icon>
+				</td>
+			</ng-container>
+
+			<tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+			<tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
+		</table>
+		<div *ngIf="myAPIKeys && myAPIKeys.length === 0" class="section-title  api-keys-title">Create your first API Key
+		</div>
+
+		<div class="api-key-form">
+			<form [formGroup]="createAPIKeyForm">
+				<div class="bd-highlight div-answer">
+					<input type="text" placeholder="API Key Label" name="label" formControlName="label" minlength="1"
+						autocomplete="off">
+					<div [class.disabled]="!createAPIKeyForm.valid">
+						<a class="edit-button" (click)="createAPIKey()">Create API Key</a>
+					</div>
+				</div>
+			</form>
+			<div class="div-with-errors">
+				<div *ngIf="createAPIKeyState == State.ERROR_NOT_UNIQUE">
+					You already have a key with that label. <br>
+					Please choose a different label.
+				</div>
+				<div *ngIf="createAPIKeyState == State.ERROR_NO_LABEL">
+					A label is required.
+				</div>
+				<div *ngIf="createAPIKeyState == State.ERROR">
+					There was a problem communicating with the server. Please try again.
+				</div>
 			</div>
-			<mat-card-header class="card-header-mat">
-				<div mat-card-avatar class="example-header-image">
-					<img src="../../../assets/images/user-female.png" alt="User image card" class="person-card-photo" />
-					<span class="person-card-name">Tyler Williams</span>
+			<div *ngIf="createAPIKeyState == State.SUCCESS" class="div-with-key-command">
+				<p>
+					The command to use your new key is below:
+					<br>
+				</p>
+				<div class="command-container" (click)="copyKeyToClipboard()" matTooltip="Copy to clipboard">
+					<code>
+            {{apiKeyCommandString()}}
+          </code>
 				</div>
-			</mat-card-header>
-
-			<mat-card-content>
-				<div class="d-flex flex-row bd-highlight mb-3">
-					<div class="bd-highlight" style="width: 50%">
-						<img mat-card-image src="../../../assets/images/galaxy.jpg" alt="Photo of a Shiba Inu" />
-					</div>
-					<div class="bd-highlight px-3 py-1" style="width: 50%">
-						<div class="content-title mb-2">nasa/atmospheric-changes</div>
-						<div class="content-description">
-							Short description preview of the product and some, lorem ipsum dolor sit amet, consectetur
-							adipiscing elit. Risus orci, sem nullam maecenas sed mauris. Sed turpis lorem vitae sit.
-							Amet, in aliquet odio id orci...
-						</div>
-					</div>
-				</div>
-
-				<div class="content-actions">
-					<div class="package-chips pb-2">
-						<mat-chip-list aria-label="Fish selection">
-							<mat-chip>weather</mat-chip>
-							<mat-chip>oceanic</mat-chip>
-							<mat-chip>streaming</mat-chip>
-							<mat-chip>weather</mat-chip>
-							<mat-chip>oceanic</mat-chip>
-							<mat-chip>streaming</mat-chip>
-						</mat-chip-list>
-					</div>
-					<div class="package-actions pt-2">
-						<div class="d-flex bd-highlight">
-							<div class="p-2 bd-highlight">
-								<button mat-fab class="person-menu" aria-label="Example icon button with a delete icon">
-									<mat-icon>star_border</mat-icon>
-								</button>
-								<span class="px-2 content-nr">47</span>
-							</div>
-							<div class="p-2 bd-highlight">
-								<button mat-fab class="person-menu" aria-label="Example icon button with a delete icon">
-									<mat-icon>collections</mat-icon>
-								</button>
-								<span class="px-2 content-nr">add to collection</span>
-							</div>
-						</div>
-					</div>
-				</div>
-			</mat-card-content>
-		</mat-card>
+			</div>
+		</div>
 	</div>
 
-	<div class="package-div">
-		<mat-card class="example-card">
-			<div class="d-flex bd-highlight up-header mt-1 mb-3">
-				<div class="bd-highlight">Updated 5 min.</div>
-				<div class="ml-auto bd-highlight">2 downloaded</div>
-			</div>
-			<mat-card-header class="card-header-mat">
-				<div mat-card-avatar class="example-header-image">
-					<img src="../../../assets/images/user-female.png" alt="User image card" class="person-card-photo" />
-					<span class="person-card-name">Tyler Williams</span>
-				</div>
-			</mat-card-header>
+	<div class="package-div panel-div">
+		<div *ngIf="myCatalogs && myCatalogs.length > 0" class="section-title">My Catalogs</div>
 
-			<mat-card-content>
-				<div class="content-text">
-					<div class="content-title mb-2">noaa/weather-stations</div>
-					<div class="content-description">
-						Short description preview of the product and some, lorem ipsum dolor sit amet, consectetur
-						adipiscing elit. Risus orci, sem nullam maecenas sed mauris. Sed turpis lorem vitae sit. Amet,
-						in aliquet odio id orci...
-					</div>
-				</div>
-
-				<div class="content-actions">
-					<div class="package-chips pb-2">
-						<mat-chip-list aria-label="Fish selection">
-							<mat-chip>weather</mat-chip>
-							<mat-chip>oceanic</mat-chip>
-							<mat-chip>streaming</mat-chip>
-							<mat-chip>weather</mat-chip>
-							<mat-chip>oceanic</mat-chip>
-							<mat-chip>streaming</mat-chip>
-						</mat-chip-list>
-					</div>
-					<div class="package-actions">
-						<div class="d-flex bd-highlight">
-							<div class="p-2 bd-highlight">
-								<button mat-fab class="person-menu" aria-label="Example icon button with a delete icon">
-									<mat-icon>star_border</mat-icon>
-								</button>
-								<span class="px-2 content-nr">47</span>
-							</div>
-							<div class="p-2 bd-highlight">
-								<button mat-fab class="person-menu" aria-label="Example icon button with a delete icon">
-									<mat-icon>collections</mat-icon>
-								</button>
-								<span class="px-2 content-nr">add to collection</span>
-							</div>
-						</div>
-					</div>
-				</div>
-			</mat-card-content>
+		<mat-card *ngFor="let catalog of myCatalogs">
+			<mat-card-title>
+				<a routerLink="/{{catalog.identifier.catalogSlug}}">
+					{{catalog.displayName || catalog.identifier.catalogSlug}}
+				</a>
+			</mat-card-title>
+			<mat-card-description class="content-description">{{catalog.description}}</mat-card-description>
 		</mat-card>
+
 	</div>
+
 </div>
