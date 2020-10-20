@@ -1,10 +1,10 @@
 import graphqlFields from "graphql-fields";
 
 function isEmpty(obj: any): boolean {
-	for (var x in obj) {
-		if (obj.hasOwnProperty(x)) return false;
-	}
-	return true;
+    for (var x in obj) {
+        if (obj.hasOwnProperty(x)) return false;
+    }
+    return true;
 }
 
 /* 
@@ -33,23 +33,23 @@ function isEmpty(obj: any): boolean {
     ]
   */
 export function getRelationNames(obj: object, parentNames: string = ""): string[] {
-	let out: string[] = [];
+    let out: string[] = [];
 
-	// TODO - This is hacky
-	const skipRelations = ["identifier", "latestVersion", "packages", "creator"];
+    // TODO - This is hacky
+    const skipRelations = ["identifier", "latestVersion", "packages", "creator"];
 
-	for (let [key, val] of Object.entries(obj)) {
-		if (!isEmpty(val) && skipRelations.indexOf(key) == -1) {
-			const names = parentNames.length > 0 ? [parentNames, key].join(".") : key;
-			out = [...out, names, ...getRelationNames(val, names)];
-		}
-	}
+    for (let [key, val] of Object.entries(obj)) {
+        if (!isEmpty(val) && skipRelations.indexOf(key) == -1) {
+            const names = parentNames.length > 0 ? [parentNames, key].join(".") : key;
+            out = [...out, names, ...getRelationNames(val, names)];
+        }
+    }
 
-	return out;
+    return out;
 }
 
 export function getGraphQlRelationName(info: any): string[] {
-	const fields = graphqlFields(info);
+    const fields = graphqlFields(info);
 
-	return getRelationNames(fields);
+    return getRelationNames(fields);
 }

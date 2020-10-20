@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 const SQL = `
     ALTER TABLE "public"."user" ADD COLUMN password_hash VARCHAR(255) DEFAULT 'zx7FmJPuyN5SL' NOT NULL ;
@@ -6,12 +6,9 @@ const SQL = `
 `;
 
 export class UserPassword1598918058446 implements MigrationInterface {
-
     public async up(queryRunner: QueryRunner): Promise<void> {
         queryRunner.manager.query(SQL);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-    }
-
+    public async down(queryRunner: QueryRunner): Promise<void> {}
 }

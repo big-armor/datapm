@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 const SQL = `
     -- Create collections table
@@ -61,13 +61,9 @@ const SQL = `
 `;
 
 export class CollectionsTableCreation1600181943280 implements MigrationInterface {
-
-
     public async up(queryRunner: QueryRunner): Promise<void> {
         queryRunner.query(SQL);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-    }
-
+    public async down(queryRunner: QueryRunner): Promise<void> {}
 }

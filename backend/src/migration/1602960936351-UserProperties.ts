@@ -12,9 +12,9 @@ const sql = `
 `;
 
 export class UserProperties1602960936351 implements MigrationInterface {
-	public async up(queryRunner: QueryRunner): Promise<void> {
-		queryRunner.query(sql);
-	}
+    public async up(queryRunner: QueryRunner): Promise<void> {
+        queryRunner.query(sql);
+    }
 
-	public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {}
 }

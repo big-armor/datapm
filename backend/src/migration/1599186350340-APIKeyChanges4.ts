@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 const SQL = `
     CREATE TYPE scope AS ENUM (
@@ -11,12 +11,9 @@ const SQL = `
     ALTER TABLE "apiKey" ADD COLUMN scopes scope[];
 `;
 export class APIKeyChanges41599186350340 implements MigrationInterface {
-
     public async up(queryRunner: QueryRunner): Promise<void> {
         queryRunner.query(SQL);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-    }
-
+    public async down(queryRunner: QueryRunner): Promise<void> {}
 }

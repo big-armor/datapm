@@ -14,9 +14,9 @@ add constraint "FK_2bc1bd51e8ca9ed656bf6409e32"
 
    `;
 export class PackageVersionFKFix1602260763029 implements MigrationInterface {
-	public async up(queryRunner: QueryRunner): Promise<void> {
-		queryRunner.query(sql);
-	}
+    public async up(queryRunner: QueryRunner): Promise<void> {
+        queryRunner.query(sql);
+    }
 
-	public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {}
 }

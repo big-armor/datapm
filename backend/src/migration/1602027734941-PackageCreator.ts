@@ -18,9 +18,9 @@ ALTER TABLE ONLY public.package ADD CONSTRAINT "FK_package_creator_user" FOREIGN
 
 `;
 export class PackageCreator1602027734941 implements MigrationInterface {
-	public async up(queryRunner: QueryRunner): Promise<void> {
-		queryRunner.query(sql);
-	}
+    public async up(queryRunner: QueryRunner): Promise<void> {
+        queryRunner.query(sql);
+    }
 
-	public async down(queryRunner: QueryRunner): Promise<void> {}
+    public async down(queryRunner: QueryRunner): Promise<void> {}
 }

@@ -9,119 +9,104 @@ import fetch from "node-fetch";
 import { User } from "../entity/User";
 import { getEnvVariable } from "./getEnvVariable";
 
-
 export class InvalidAuthenticationError extends ApolloError {
-  constructor(message: string,extensions?: Record<string, any>,) {
-    super(message, 'INVALID_AUTHENTICATION',extensions);
+    constructor(message: string, extensions?: Record<string, any>) {
+        super(message, "INVALID_AUTHENTICATION", extensions);
 
-    Object.defineProperty(this, 'name', { value: 'InvalidAuthenticationError' });
-  }
+        Object.defineProperty(this, "name", { value: "InvalidAuthenticationError" });
+    }
 }
 
 export class NoAuthenticationError extends ApolloError {
-  constructor(message: string,extensions?: Record<string, any>,) {
-    super(message, 'NO_AUTHENTICATION_TOKEN',extensions);
+    constructor(message: string, extensions?: Record<string, any>) {
+        super(message, "NO_AUTHENTICATION_TOKEN", extensions);
 
-    Object.defineProperty(this, 'name', { value: 'NoAuthenticationError' });
-  }
+        Object.defineProperty(this, "name", { value: "NoAuthenticationError" });
+    }
 }
 
 const jwtOptions = {
-  audience: getEnvVariable("JWT_AUDIENCE"),
-  issuer: getEnvVariable("JWT_ISSUER"),
+    audience: getEnvVariable("JWT_AUDIENCE"),
+    issuer: getEnvVariable("JWT_ISSUER")
 };
 
-const verifyToken = (
-  token: string,
-  secretOrPublicKey: jwt.Secret,
-  options?: jwt.VerifyOptions
-) => {
-  return new Promise<DecodedJwt>((resolve, reject) => {
-    jwt.verify(token, secretOrPublicKey, options, (err, result) => {
-      if (err) 
-        reject(new InvalidAuthenticationError(err.message))
-      else
-        resolve(result as DecodedJwt);
+const verifyToken = (token: string, secretOrPublicKey: jwt.Secret, options?: jwt.VerifyOptions) => {
+    return new Promise<DecodedJwt>((resolve, reject) => {
+        jwt.verify(token, secretOrPublicKey, options, (err, result) => {
+            if (err) reject(new InvalidAuthenticationError(err.message));
+            else resolve(result as DecodedJwt);
+        });
     });
-  });
 };
 
 function getToken(req: express.Request): string {
+    if (req.cookies != null && req.cookies["token"] != null) {
+        const token = req.cookies["token"] || "";
+        return token;
+    }
 
-  if(req.cookies != null && req.cookies["token"] != null) {
-    const token = req.cookies["token"] || "";
-    return token;
-  }
+    const authHeader = req.headers.authorization || "";
 
-  const authHeader = req.headers.authorization || "";
-
-  const match = authHeader.match(/^Bearer (.*)$/);
-  if (!match || match.length < 2) {
-    throw new NoAuthenticationError(
-      `Authorization token not prepsent- ${authHeader} does not match "Bearer .*"`
-    );
-  }
-  return match[1];
+    const match = authHeader.match(/^Bearer (.*)$/);
+    if (!match || match.length < 2) {
+        throw new NoAuthenticationError(`Authorization token not prepsent- ${authHeader} does not match "Bearer .*"`);
+    }
+    return match[1];
 }
 
 export interface DecodedJwt {
-  iss: string;
-  sub: string;
-  aud: string[];
-  iat: number;
-  exp: number;
-  azp: string;
-  scope: string;
+    iss: string;
+    sub: string;
+    aud: string[];
+    iat: number;
+    exp: number;
+    azp: string;
+    scope: string;
 }
 
 export interface Jwt {
-  token: string;
-  sub: string;
-  decoded: DecodedJwt;
+    token: string;
+    sub: string;
+    decoded: DecodedJwt;
 }
 
 export async function parseJwt(req: express.Request): Promise<Jwt> {
-  // extract and parse JWT
-  const token = getToken(req);
-  const decoded: any = jwt.decode(token, { complete: true });
-  if (!decoded || !decoded.header || !decoded.header.kid) {
-    throw new AuthenticationError("invalid token");
-  }
+    // extract and parse JWT
+    const token = getToken(req);
+    const decoded: any = jwt.decode(token, { complete: true });
+    if (!decoded || !decoded.header || !decoded.header.kid) {
+        throw new AuthenticationError("invalid token");
+    }
 
-  // verify JWT is valid (signature/aud/iss/exp)
-  const verifiedJwt = await verifyToken(token, getEnvVariable("JWT_KEY"), jwtOptions);
+    // verify JWT is valid (signature/aud/iss/exp)
+    const verifiedJwt = await verifyToken(token, getEnvVariable("JWT_KEY"), jwtOptions);
 
-  return {
-    token: token,
-    sub: verifiedJwt.sub,
-    decoded: verifiedJwt,
-  };
+    return {
+        token: token,
+        sub: verifiedJwt.sub,
+        decoded: verifiedJwt
+    };
 }
 
-export function createJwt(user:User): string {
-  return jwt.sign(
-    {  },
-    getEnvVariable("JWT_KEY"),
-    { 
-      algorithm: "HS256", 
-      subject: user.id.toString(), 
-      expiresIn: "1d",
-      keyid: "JWT_KEY",
-      audience: getEnvVariable("JWT_AUDIENCE"),
-      issuer: getEnvVariable("JWT_ISSUER")
-     }
-  );
+export function createJwt(user: User): string {
+    return jwt.sign({}, getEnvVariable("JWT_KEY"), {
+        algorithm: "HS256",
+        subject: user.id.toString(),
+        expiresIn: "1d",
+        keyid: "JWT_KEY",
+        audience: getEnvVariable("JWT_AUDIENCE"),
+        issuer: getEnvVariable("JWT_ISSUER")
+    });
 }
 
 interface UserInfo {
-  sub: string;
-  given_name?: string;
-  family_name?: string;
-  nickname?: string;
-  name: string;
-  picture: string;
-  updated_at: string;
-  emailAddress: string;
-  email_verified: boolean;
+    sub: string;
+    given_name?: string;
+    family_name?: string;
+    nickname?: string;
+    name: string;
+    picture: string;
+    updated_at: string;
+    emailAddress: string;
+    email_verified: boolean;
 }
-

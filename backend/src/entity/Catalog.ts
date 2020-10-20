@@ -5,37 +5,36 @@ import { Package } from "./Package";
 import { CatalogIdentifier } from "../generated/graphql";
 
 @Entity({
-  name: "catalog",
+    name: "catalog"
 })
 @Unique(["slug"])
 export class Catalog extends BaseModel {
-  @PrimaryGeneratedColumn()
-  id: number;
+    @PrimaryGeneratedColumn()
+    id: number;
 
-  @Column({ length: 64 })
-  displayName: string;
+    @Column({ length: 64 })
+    displayName: string;
 
-  @Column({ length: 256 })
-  slug: string;
+    @Column({ length: 256 })
+    slug: string;
 
-  @Column({nullable: true})
-  website: string;
+    @Column({ nullable: true })
+    website: string;
 
-  @Column()
-  isPublic: boolean;
+    @Column()
+    isPublic: boolean;
 
-  @Column({ type: "text", nullable: true })
-  description: string | null;
+    @Column({ type: "text", nullable: true })
+    description: string | null;
 
-  @Column({nullable: false, default: true})
-  isActive: boolean;
+    @Column({ nullable: false, default: true })
+    isActive: boolean;
 
-  @OneToMany(() => UserCatalogPermission, (userCatalogPermission) => userCatalogPermission.catalog, { cascade: true })
-  userPermissions:UserCatalogPermission[]
-  
-  @OneToMany(() => Package, (packageEntity) => packageEntity.catalog, { cascade: true })
-  packages:Package[]
+    @OneToMany(() => UserCatalogPermission, (userCatalogPermission) => userCatalogPermission.catalog, { cascade: true })
+    userPermissions: UserCatalogPermission[];
 
-  identifier: CatalogIdentifier;
+    @OneToMany(() => Package, (packageEntity) => packageEntity.catalog, { cascade: true })
+    packages: Package[];
 
+    identifier: CatalogIdentifier;
 }

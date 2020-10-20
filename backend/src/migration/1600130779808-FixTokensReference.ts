@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 const SQL = `
 CREATE OR REPLACE FUNCTION updatePackageVectors()
@@ -38,15 +38,12 @@ CREATE OR REPLACE FUNCTION updateCatalogVectors()
       
       RETURN NEW;
     END' LANGUAGE 'plpgsql';
-`
+`;
 
 export class FixTokensReference1600130779808 implements MigrationInterface {
-
     public async up(queryRunner: QueryRunner): Promise<void> {
         queryRunner.query(SQL);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-    }
-
+    public async down(queryRunner: QueryRunner): Promise<void> {}
 }

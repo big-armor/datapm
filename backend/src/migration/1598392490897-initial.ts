@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 const sql = `
 --
@@ -567,16 +567,11 @@ ALTER TABLE ONLY public.user_catalog
 -- PostgreSQL database dump complete
 --
 
-`
+`;
 export class initial1598392490897 implements MigrationInterface {
-
     public async up(queryRunner: QueryRunner): Promise<void> {
         queryRunner.query(sql);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-    }
-
+    public async down(queryRunner: QueryRunner): Promise<void> {}
 }
-
-

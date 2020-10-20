@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 const SQL = `
 
@@ -11,13 +11,9 @@ const SQL = `
 
     `;
 export class LowerCaseIndexes1599852332615 implements MigrationInterface {
-
     public async up(queryRunner: QueryRunner): Promise<void> {
-
         queryRunner.query(SQL);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-    }
-
+    public async down(queryRunner: QueryRunner): Promise<void> {}
 }

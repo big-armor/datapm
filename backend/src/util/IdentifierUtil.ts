@@ -12,9 +12,8 @@ export interface Identifier {
         minorVersion: number;
         patchVersion: number;
     };
-    attributeSlug:String;
-    enumerationSlug:String;
-
+    attributeSlug: String;
+    enumerationSlug: String;
 }
 
 export function parseIdentifierString(identifier: String) {
@@ -23,46 +22,37 @@ export function parseIdentifierString(identifier: String) {
 
     returnValue.catalogSlug = identifier[0];
 
-    if(parts.length > 1)
-        returnValue.packageSlug = identifier[1];
+    if (parts.length > 1) returnValue.packageSlug = identifier[1];
 
-    if(parts.length > 2) {
-
+    if (parts.length > 2) {
         const versionParts = identifier[3].split(".");
 
         returnValue.version = {
             majorVersion: Number.parseInt(versionParts[0]),
             minorVersion: Number.parseInt(versionParts[1]),
             patchVersion: Number.parseInt(versionParts[2])
-        }
-        
+        };
     }
 
     throw new Error("Unknown identifier");
 }
 
-
 export function catalogIdentifier(catalog: Catalog): CatalogIdentifier {
-
     return {
         registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
         registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
         catalogSlug: catalog.slug
-    }
-
+    };
 }
 
-
 export function packageIdentifier(packageEntity: Package): PackageIdentifier {
-
     return {
         registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
         registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
         catalogSlug: packageEntity.catalog.slug,
         packageSlug: packageEntity.slug
-    }
+    };
 }
-
 
 export function versionIdentifier(version: Version): VersionIdentifier {
     return {
@@ -73,7 +63,5 @@ export function versionIdentifier(version: Version): VersionIdentifier {
         versionMajor: version.majorVersion,
         versionMinor: version.minorVersion,
         versionPatch: version.patchVersion
-    }
-
+    };
 }
-

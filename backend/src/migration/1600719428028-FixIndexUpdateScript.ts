@@ -1,5 +1,4 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
-
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 const SQL = `
 
@@ -43,14 +42,9 @@ BEGIN
 END' LANGUAGE 'plpgsql';
 `;
 export class FixIndexUpdateScript1600719428028 implements MigrationInterface {
-
     public async up(queryRunner: QueryRunner): Promise<void> {
-    
         queryRunner.query(SQL);
     }
-    
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-    }
-
+    public async down(queryRunner: QueryRunner): Promise<void> {}
 }

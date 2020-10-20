@@ -4,47 +4,43 @@ import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
 const client = new SecretManagerServiceClient();
 
 async function getSecret(name: string): Promise<Buffer> {
-  const projectId = process.env.GOOGLE_CLOUD_PROJECT;
-  if (!projectId) {
-    throw new Error("the environment variable GOOGLE_CLOUD_PROJECT is unset");
-  }
+    const projectId = process.env.GOOGLE_CLOUD_PROJECT;
+    if (!projectId) {
+        throw new Error("the environment variable GOOGLE_CLOUD_PROJECT is unset");
+    }
 
-  const [secret] = await client.accessSecretVersion({
-    name: `projects/${projectId}/secrets/${name}/versions/latest`,
-  });
+    const [secret] = await client.accessSecretVersion({
+        name: `projects/${projectId}/secrets/${name}/versions/latest`
+    });
 
-  if (!secret.payload) {
-    throw new Error("the secret contains no payload");
-  }
+    if (!secret.payload) {
+        throw new Error("the secret contains no payload");
+    }
 
-  if (!secret.payload.data) {
-    throw new Error("the secret contains no data");
-  }
+    if (!secret.payload.data) {
+        throw new Error("the secret contains no data");
+    }
 
-  return Buffer.from(secret.payload.data);
+    return Buffer.from(secret.payload.data);
 }
 
-export async function getSecretVariable(
-  envVariableName: string
-): Promise<void> {
-  if (process.env[envVariableName] !== undefined) {
-    // secret already specified in environment variable - all done
-    return;
-  }
+export async function getSecretVariable(envVariableName: string): Promise<void> {
+    if (process.env[envVariableName] !== undefined) {
+        // secret already specified in environment variable - all done
+        return;
+    }
 
-  // secret not specified in environment variable - retrieve from secret manager
-  try {
-    const secret = await getSecret(envVariableName);
+    // secret not specified in environment variable - retrieve from secret manager
+    try {
+        const secret = await getSecret(envVariableName);
 
-    // inject value into process environment
-    process.env[envVariableName] = secret.toString();
-    return;
-  } catch (err) {
-    console.warn(
-      `Unable to lookup ${envVariableName} from secret manager - ${err}`
-    );
-    return;
-  }
+        // inject value into process environment
+        process.env[envVariableName] = secret.toString();
+        return;
+    } catch (err) {
+        console.warn(`Unable to lookup ${envVariableName} from secret manager - ${err}`);
+        return;
+    }
 }
 
 // if running within app engine (GAE_SERVICE is set)
@@ -54,18 +50,15 @@ export async function getSecretVariable(
 // when credentials are from a json, they are cached
 // when they are from an auto-discovered service account, they are not
 export async function setAppEngineServiceAccountJson(): Promise<void> {
-  if (process.env.GAE_SERVICE === undefined) {
-    return;
-  }
+    if (process.env.GAE_SERVICE === undefined) {
+        return;
+    }
 
-  const secret = await getSecret("APP_ENGINE_SERVICE_ACCOUNT_JSON");
+    const secret = await getSecret("APP_ENGINE_SERVICE_ACCOUNT_JSON");
 
-  const jsonLocation = path.join(
-    process.cwd(),
-    "app-engine-service-account.json"
-  );
+    const jsonLocation = path.join(process.cwd(), "app-engine-service-account.json");
 
-  await fs.promises.writeFile(jsonLocation, secret);
+    await fs.promises.writeFile(jsonLocation, secret);
 
-  process.env.GOOGLE_APPLICATION_CREDENTIALS = jsonLocation;
+    process.env.GOOGLE_APPLICATION_CREDENTIALS = jsonLocation;
 }

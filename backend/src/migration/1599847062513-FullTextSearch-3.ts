@@ -1,5 +1,4 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
-
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 const SQL = `
     
@@ -51,16 +50,12 @@ const SQL = `
     DROP TRIGGER IF EXISTS updateCatalogVectors ON catalog;
     CREATE TRIGGER updateCatalogVectors BEFORE INSERT or UPDATE on catalog
     FOR EACH ROW EXECUTE PROCEDURE updateCatalogVectors();
-`
+`;
 
 export class FullTextSearch31599847062513 implements MigrationInterface {
-
     public async up(queryRunner: QueryRunner): Promise<void> {
-
         queryRunner.query(SQL);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-    }
-
+    public async down(queryRunner: QueryRunner): Promise<void> {}
 }
