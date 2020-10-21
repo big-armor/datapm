@@ -77,6 +77,7 @@ export const findPackage = async (
 ) => {
     const packageEntity = await context.connection.getCustomRepository(PackageRepository).findPackage({
         identifier,
+        includeActiveOnly: true,
         relations: getGraphQlRelationName(info)
     });
 
@@ -148,6 +149,7 @@ export const updatePackage = async (
         catalogSlug: identifier.catalogSlug,
         packageSlug: identifier.packageSlug,
         packageInput: value,
+        includeActiveOnly: true,
         relations: getGraphQlRelationName(info)
     });
 };

@@ -248,9 +248,11 @@ export const resolvers: {
                 packageSlug: packageEntity.slug
             };
 
-            const version = await context.connection
-                .getCustomRepository(VersionRepository)
-                .findLatestVersion({ identifier: identifier, relations: getGraphQlRelationName(info) });
+            const version = await context.connection.getCustomRepository(VersionRepository).findLatestVersion({
+                identifier: identifier,
+                includeActiveOnly: packageEntity.isActive,
+                relations: getGraphQlRelationName(info)
+            });
 
             if (version == undefined) return null;
 
@@ -478,7 +480,7 @@ export const resolvers: {
                 // get the latest version
                 const latestVersion = await transaction
                     .getCustomRepository(VersionRepository)
-                    .findLatestVersion({ identifier });
+                    .findLatestVersion({ identifier, includeActiveOnly: true });
 
                 if (latestVersion != null) {
                     const latestVersionSemVer = new SemVer(latestVersion.packageFile!.version);

@@ -80,7 +80,7 @@ export const addPackageToCollection = async (
     const identifier = packageIdentifier;
     const packageEntity = await context.connection
         .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier });
+        .findPackageOrFail({ identifier, includeActiveOnly: true });
 
     await context.connection.manager
         .getCustomRepository(CollectionPackageRepository)
@@ -112,7 +112,7 @@ export const removePackageFromCollection = async (
     const identifier = packageIdentifier;
     const packageEntity = await context.connection
         .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier });
+        .findPackageOrFail({ identifier, includeActiveOnly: true });
 
     await context.connection.manager
         .getCustomRepository(CollectionPackageRepository)

@@ -18,7 +18,8 @@ async function hasPermission(
 ): Promise<boolean> {
     // Check that the package exists
     const packageEntity = await context.connection.getCustomRepository(PackageRepository).findPackage({
-        identifier
+        identifier,
+        includeActiveOnly: false
     });
 
     if (packageEntity == null) throw new UserInputError("PACKAGE_NOT_FOUND");

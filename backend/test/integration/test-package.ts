@@ -6,7 +6,8 @@ import {
     PackageDocument,
     UpdateCatalogDocument,
     UpdatePackageDocument,
-    CreateVersionDocument
+    CreateVersionDocument,
+    DisablePackageDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import * as fs from "fs";
@@ -346,7 +347,44 @@ describe("Package Tests", async () => {
         ).equal(true);
     });
 
-    it("User A publish malformed version - packageSlug", async function () {
+    it("User A publish malformed package JSON", async function () {
+        let packageFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json", "utf8");
+
+        packageFileContents += "}";
+
+        let errorFound = false;
+
+        let response = await userAClient
+            .mutate({
+                mutation: CreateVersionDocument,
+                variables: {
+                    identifier: {
+                        catalogSlug: "testA-packages",
+                        packageSlug: "new-package-slug"
+                    },
+                    value: {
+                        packageFile: JSON.stringify(packageFileContents)
+                    }
+                }
+            })
+            .catch((error: ErrorResponse) => {
+                let fetchResult = error.networkError as ServerError;
+                if (
+                    fetchResult.result.errors.find(
+                        (e: { extensions: { exception: { stacktrace: string[] } } }) =>
+                            e.extensions.exception.stacktrace.find((s) =>
+                                s.startsWith("ValidationError: INVALID_PACKAGE_FILE_SCHEMA")
+                            ) != null
+                    ) != null
+                )
+                    errorFound = true;
+            })
+            .then((client) => {
+                expect(errorFound, "invalid schema error not found").equal(true);
+            });
+    });
+
+    it("User A publish invalid schema - packageSlug", async function () {
         let packageFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json", "utf8");
 
         let packageFile = JSON.parse(packageFileContents) as PackageFile;
@@ -382,5 +420,39 @@ describe("Package Tests", async () => {
             .then((client) => {
                 expect(errorFound, "invalid schema error not found").equal(true);
             });
+    });
+
+    it("User A delete package", async function () {
+        let response = await userAClient.mutate({
+            mutation: DisablePackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                }
+            }
+        });
+
+        expect(response.errors == null, "no errors").true;
+        expect(response.data!.disablePackage.identifier.packageSlug.startsWith("new-package-slug-DISABLED-")).true;
+    });
+
+    it("Anonymous User get Package", async function () {
+        let response = await anonymousClient.query({
+            query: PackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                }
+            }
+        });
+
+        console.log(JSON.stringify(response, null, 1));
+        expect(response.errors != null, "should have errors").to.equal(true);
+        expect(
+            response.errors!.find((e) => e.message == "PACKAGE_NOT_FOUND") != null,
+            "should have not package not found error"
+        ).equal(true);
     });
 });
