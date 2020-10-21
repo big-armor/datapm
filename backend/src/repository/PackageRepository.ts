@@ -266,7 +266,7 @@ export class PackageRepository {
         return this.manager.nestedTransaction(async (transaction) => {
             const ALIAS = "package";
 
-            const packageEntity = await findPackage(this.manager, catalogSlug, packageSlug, relations);
+            const packageEntity = await findPackage(transaction, catalogSlug, packageSlug, relations);
 
             if (packageEntity === null) {
                 throw new Error("Could not find package");
@@ -288,8 +288,7 @@ export class PackageRepository {
 
             if (packageInput.description) packageEntity.description = packageInput.description;
 
-            if (packageInput.isPublic?.valueOf() !== undefined)
-                packageEntity.isPublic = packageInput.isPublic?.valueOf();
+            if (packageInput.isPublic != null) packageEntity.isPublic = packageInput.isPublic;
 
             validation(packageEntity);
 

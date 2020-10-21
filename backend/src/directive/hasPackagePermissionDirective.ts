@@ -1,4 +1,10 @@
-import { SchemaDirectiveVisitor, AuthenticationError, ForbiddenError, UserInputError } from "apollo-server";
+import {
+    SchemaDirectiveVisitor,
+    AuthenticationError,
+    ForbiddenError,
+    UserInputError,
+    ApolloError
+} from "apollo-server";
 import { GraphQLObjectType, GraphQLField, defaultFieldResolver } from "graphql";
 import { Context } from "../context";
 import { Permission, PackageIdentifier } from "../generated/graphql";
@@ -17,13 +23,12 @@ async function hasPermission(
 
     if (packageEntity == null) throw new UserInputError("PACKAGE_NOT_FOUND");
 
-    if (packageEntity.isPublic) return true;
+    if (permission == Permission.VIEW && packageEntity.isPublic === true) return true;
 
     if (context.me === undefined) {
-        throw new Error(`NOT_AUTHENTICATED`);
+        throw new AuthenticationError(`NOT_AUTHENTICATED`);
     }
 
-    // TODO That the user has access to the catalog and/or package
     const packagePermissions = await context.connection
         .getCustomRepository(PackagePermissionRepository)
         .findPackagePermissions({
@@ -32,8 +37,6 @@ async function hasPermission(
         });
 
     if (packagePermissions === undefined) return false;
-
-    let found = false;
 
     for (let p of packagePermissions.permissions) {
         if (p === permission) return true;
@@ -53,15 +56,16 @@ export class HasPackagePermissionDirective extends SchemaDirectiveVisitor {
     visitFieldDefinition(field: GraphQLField<any, any>) {
         const { resolve = defaultFieldResolver } = field;
         const permission: Permission = this.args.permission;
-        field.resolve = function (source, args, context: Context, info) {
+        field.resolve = async function (source, args, context: Context, info) {
             const identifier: PackageIdentifier | undefined = args.identifier || args.packageIdentifier || undefined;
 
-            if (identifier === undefined) throw new Error(`No package identifier defined`);
+            if (identifier === undefined) throw new ApolloError(`INTERNAL_ERROR`);
 
-            if (hasPermission(permission, context, identifier)) {
+            let hasPermissionBoolean = await hasPermission(permission, context, identifier);
+            if (hasPermissionBoolean) {
                 return resolve.apply(this, [source, args, context, info]);
             } else {
-                throw new ForbiddenError(`User does not have the "${permission}" permission`);
+                throw new ForbiddenError(`NOT_AUTHORIZED`);
             }
         };
     }
