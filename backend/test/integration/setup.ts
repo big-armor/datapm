@@ -96,6 +96,11 @@ after(async function () {
     // recursively kill all child processes
     (await pids).map((p) => {
         console.log("Killing process " + p);
-        process.kill(p);
+        try {
+            process.kill(p);
+        } catch (error) {
+            console.error("Error killing process " + p);
+            console.error(error);
+        }
     });
 });
