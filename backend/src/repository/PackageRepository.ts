@@ -76,8 +76,12 @@ function validation(packageEntity: Package) {
     }
 }
 
-function setPackageDisabled(packageEntity: Package, transaction: EntityManager) {
-    transaction.getCustomRepository(VersionRepository).disableVersions(packageEntity.versions);
+async function setPackageDisabled(packageEntity: Package, transaction: EntityManager) {
+    const versions = await transaction
+        .getCustomRepository(VersionRepository)
+        .findVersions({ packageId: packageEntity.id });
+
+    transaction.getCustomRepository(VersionRepository).disableVersions(versions);
 
     packageEntity.isActive = false;
     packageEntity.slug = packageEntity.slug + "-DISABLED-" + new Date().getTime();

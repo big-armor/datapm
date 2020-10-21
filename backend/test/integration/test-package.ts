@@ -422,6 +422,203 @@ describe("Package Tests", async () => {
             });
     });
 
+    it("User A update package schema - patch - fail on version", async function () {
+        let packageFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json", "utf8");
+
+        let packageFile = JSON.parse(packageFileContents) as PackageFile;
+
+        packageFile.description = "new description";
+
+        let response = await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                },
+                value: {
+                    packageFile: JSON.stringify(packageFile)
+                }
+            }
+        });
+
+        expect(response.errors != null, "should  have errors").to.equal(true);
+        expect(
+            response.errors!.find((e) => e.extensions!.code == "HIGHER_VERSION_REQUIRED") != null,
+            "should have higher version required"
+        ).equal(true);
+    });
+
+    it("User A update package schema - patch", async function () {
+        let packageFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json", "utf8");
+
+        let packageFile = JSON.parse(packageFileContents) as PackageFile;
+
+        packageFile.description = "new description";
+        packageFile.version = "1.0.1";
+
+        let response = await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                },
+                value: {
+                    packageFile: JSON.stringify(packageFile)
+                }
+            }
+        });
+
+        expect(response.errors == null, "should not have errors").to.equal(true);
+        expect(response.data!.createVersion.identifier.catalogSlug).to.equal("testA-packages");
+        expect(response.data!.createVersion.identifier.packageSlug).to.equal("new-package-slug");
+
+        expect(response.data!.createVersion.identifier.versionMajor).equal(1);
+        expect(response.data!.createVersion.identifier.versionMinor).equal(0);
+        expect(response.data!.createVersion.identifier.versionPatch).equal(1);
+    });
+
+    it("User A update package schema - minor - fail on version number", async function () {
+        let packageFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json", "utf8");
+
+        let packageFile = JSON.parse(packageFileContents) as PackageFile;
+
+        packageFile.version = "1.0.2";
+        packageFile.schemas[0].properties!["new_column"] = {
+            title: "new_column",
+            recordCount: 1234,
+            byteCount: 5678,
+            valueTypes: {
+                string: {
+                    recordCount: 3238,
+                    valueType: "string",
+                    stringMaxLength: 17,
+                    stringMinLength: 3
+                }
+            },
+            type: ["string"]
+        };
+
+        let response = await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                },
+                value: {
+                    packageFile: JSON.stringify(packageFile)
+                }
+            }
+        });
+
+        expect(response.errors != null, "should  have errors").to.equal(true);
+        expect(
+            response.errors!.find((e) => e.extensions!.code == "HIGHER_VERSION_REQUIRED") != null,
+            "should have higher version required"
+        ).equal(true);
+    });
+
+    it("User A update package schema - minor", async function () {
+        let packageFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json", "utf8");
+
+        let packageFile = JSON.parse(packageFileContents) as PackageFile;
+
+        packageFile.version = "1.2.0";
+        packageFile.schemas[0].properties!["new_column"] = {
+            title: "new_column",
+            recordCount: 1234,
+            byteCount: 5678,
+            valueTypes: {
+                string: {
+                    recordCount: 3238,
+                    valueType: "string",
+                    stringMaxLength: 17,
+                    stringMinLength: 3
+                }
+            },
+            type: ["string"]
+        };
+
+        let response = await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                },
+                value: {
+                    packageFile: JSON.stringify(packageFile)
+                }
+            }
+        });
+
+        expect(response.errors == null, "should not have errors").to.equal(true);
+        expect(response.data!.createVersion.identifier.catalogSlug).to.equal("testA-packages");
+        expect(response.data!.createVersion.identifier.packageSlug).to.equal("new-package-slug");
+
+        expect(response.data!.createVersion.identifier.versionMajor).equal(1);
+        expect(response.data!.createVersion.identifier.versionMinor).equal(2);
+        expect(response.data!.createVersion.identifier.versionPatch).equal(0);
+    });
+
+    it("User A update package schema - major - fail high version required", async function () {
+        let packageFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json", "utf8");
+
+        let packageFile = JSON.parse(packageFileContents) as PackageFile;
+
+        packageFile.version = "1.3.0";
+
+        let response = await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                },
+                value: {
+                    packageFile: JSON.stringify(packageFile)
+                }
+            }
+        });
+
+        expect(response.errors != null, "should  have errors").to.equal(true);
+        expect(
+            response.errors!.find((e) => e.extensions!.code == "HIGHER_VERSION_REQUIRED") != null,
+            "should have higher version required"
+        ).equal(true);
+    });
+
+    it("User A update package schema - major", async function () {
+        let packageFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json", "utf8");
+
+        let packageFile = JSON.parse(packageFileContents) as PackageFile;
+
+        packageFile.version = "2.0.0";
+
+        let response = await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                },
+                value: {
+                    packageFile: JSON.stringify(packageFile)
+                }
+            }
+        });
+
+        expect(response.errors == null, "should not have errors").to.equal(true);
+        expect(response.data!.createVersion.identifier.catalogSlug).to.equal("testA-packages");
+        expect(response.data!.createVersion.identifier.packageSlug).to.equal("new-package-slug");
+
+        expect(response.data!.createVersion.identifier.versionMajor).equal(2);
+        expect(response.data!.createVersion.identifier.versionMinor).equal(0);
+        expect(response.data!.createVersion.identifier.versionPatch).equal(0);
+    });
+
     it("User A delete package", async function () {
         let response = await userAClient.mutate({
             mutation: DisablePackageDocument,
@@ -448,7 +645,6 @@ describe("Package Tests", async () => {
             }
         });
 
-        console.log(JSON.stringify(response, null, 1));
         expect(response.errors != null, "should have errors").to.equal(true);
         expect(
             response.errors!.find((e) => e.message == "PACKAGE_NOT_FOUND") != null,
