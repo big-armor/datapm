@@ -424,6 +424,7 @@ export class PackageRepository {
                     queryLike: query + "%"
                 }
             )
+            .andWhere(`"Package"."isActive" = true`)
             .limit(limit)
             .offset(offSet)
             .addRelations(ALIAS, relations)

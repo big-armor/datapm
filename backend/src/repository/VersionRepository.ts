@@ -100,6 +100,8 @@ export class VersionRepository {
     }
 
     disableVersions(versions: Version[]): void {
+        if (versions.length == 0) return;
+
         this.manager.nestedTransaction(async (transaction) => {
             await transaction
                 .createQueryBuilder()

@@ -130,7 +130,6 @@ describe("API Key Tests", async () => {
                 query: MeDocument
             })
             .catch((error: ErrorResponse) => {
-                console.log(JSON.stringify(error, null, 1));
                 let fetchResult = error.networkError as ServerError;
                 if (
                     fetchResult.result.errors.find(
