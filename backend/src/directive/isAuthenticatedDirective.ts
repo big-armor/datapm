@@ -13,7 +13,7 @@ export class IsAuthenticatedDirective extends SchemaDirectiveVisitor {
     visitFieldDefinition(field: GraphQLField<any, any>) {
         const { resolve = defaultFieldResolver } = field;
         field.resolve = function (source, args, context: Context, info) {
-            if (!context.me) throw new AuthenticationError("No active user session");
+            if (!context.me) throw new AuthenticationError("NOT_AUTHENTICATED");
 
             return resolve.apply(this, [source, args, context, info]);
         };
