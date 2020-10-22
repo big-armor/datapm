@@ -104,7 +104,7 @@ export class PackageRepository {
                 { collectionId: collectionId }
             )
             .andWhere(AUTHENTICATED_USER_OR_PUBLIC_PACKAGES_QUERY, { userId: userId, permission: Permission.VIEW })
-            .addRelations("package", relations)
+            .addRelations("Package", relations)
             .getMany();
     }
 
@@ -300,7 +300,7 @@ export class PackageRepository {
             );
 
             if (packageEntity === null) {
-                throw new Error("Could not find package");
+                throw new Error("PACKAGE_NOT_FOUND");
             }
 
             if (packageInput.newCatalogSlug) {

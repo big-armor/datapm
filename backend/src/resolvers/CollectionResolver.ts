@@ -1,4 +1,4 @@
-import { ApolloError } from "apollo-server";
+import { ApolloError, ValidationError } from "apollo-server";
 import { AuthenticatedContext } from "../context";
 import {
     CollectionIdentifierInput,
@@ -26,7 +26,7 @@ export const createCollection = async (
 
     const existingCollection = await repository.findCollectionBySlug(val.collectionSlug);
     if (existingCollection) {
-        throw new Error("Collection slug is taken");
+        throw new ValidationError("COLLECTION_SLUG_NOT_AVAILABLE");
     }
 
     const relations = getGraphQlRelationName(info);
@@ -43,10 +43,10 @@ export const updateCollection = async (
 ) => {
     const repository = context.connection.manager.getCustomRepository(CollectionRepository);
 
-    if (value.collectionSlug && identifier.collectionSlug != value.collectionSlug) {
-        const existingCollection = await repository.findCollectionBySlug(value.collectionSlug);
+    if (value.newCollectionSlug && identifier.collectionSlug != value.newCollectionSlug) {
+        const existingCollection = await repository.findCollectionBySlug(value.newCollectionSlug);
         if (existingCollection) {
-            throw new Error("Collection slug is taken");
+            throw new ValidationError("COLLECTION_SLUG_NOT_AVAILABLE");
         }
     }
 

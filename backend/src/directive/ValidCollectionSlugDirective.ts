@@ -10,7 +10,7 @@ import {
     GraphQLNonNull,
     GraphQLScalarType
 } from "graphql";
-import { Context } from "../context";
+import { AuthenticatedContext, Context } from "../context";
 import { validateCollectionSlug } from "datapm-lib";
 
 export class ValidCollectionSlugDirective extends SchemaDirectiveVisitor {

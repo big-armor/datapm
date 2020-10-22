@@ -31,7 +31,7 @@ function readLines(stream: NodeJS.ReadableStream) {
 before(async function () {
     console.log("Starting postgres temporary container");
 
-    this.timeout(50000);
+    this.timeout(60000);
     container = await new GenericContainer("postgres")
         .withEnv("POSTGRES_PASSWORD", "postgres")
         .withEnv("POSTGRES_DB", "datapm")
