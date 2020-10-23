@@ -5,23 +5,23 @@ import { MaterialModule } from "src/app/material.module";
 import { PackagesComponent } from "./packages.component";
 
 describe("PackagesComponent", () => {
-	let component: PackagesComponent;
-	let fixture: ComponentFixture<PackagesComponent>;
+    let component: PackagesComponent;
+    let fixture: ComponentFixture<PackagesComponent>;
 
-	beforeEach(async(() => {
-		TestBed.configureTestingModule({
-			declarations: [PackagesComponent],
-			imports: [MaterialModule, RouterTestingModule]
-		}).compileComponents();
-	}));
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            declarations: [PackagesComponent],
+            imports: [MaterialModule, RouterTestingModule]
+        }).compileComponents();
+    }));
 
-	beforeEach(() => {
-		fixture = TestBed.createComponent(PackagesComponent);
-		component = fixture.componentInstance;
-		fixture.detectChanges();
-	});
+    beforeEach(() => {
+        fixture = TestBed.createComponent(PackagesComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-	it("should create", () => {
-		expect(component).toBeTruthy();
-	});
+    it("should create", () => {
+        expect(component).toBeTruthy();
+    });
 });

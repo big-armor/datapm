@@ -1,97 +1,97 @@
 name: "Build & Deploy"
 
 on:
-  push:
+    push:
 
 jobs:
-  buildAndDeploy:
-    name: "Build And Deploy"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+    buildAndDeploy:
+        name: "Build And Deploy"
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
 
-      - name: Print npm verion
-        run: npm --version
+            - name: Print npm verion
+              run: npm --version
 
-      - name: Print node verion
-        run: node --version
+            - name: Print node verion
+              run: node --version
 
-      - name: Install Docker Build Dependencies
-        run: npm install gulp
+            - name: Install Docker Build Dependencies
+              run: npm install gulp
 
-      # - name: Run Prettier linter
-      #   uses: wearerequired/lint-action@v1.6.0
-      #   with:
-      #     github_token: ${{ secrets.github_token }}
-      #     prettier: true
+            # - name: Run Prettier linter
+            #   uses: wearerequired/lint-action@v1.6.0
+            #   with:
+            #     github_token: ${{ secrets.github_token }}
+            #     prettier: true
 
-      - name: Build Docker Container
-        run: npm run build
+            - name: Build Docker Container
+              run: npm run build
 
-      - name: Write Credentials file
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-        run: echo $GOOGLE_CREDENTIALS > gcloud.key
-        env:
-          PROJECT_ID: data-test-terraform
-          GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
+            - name: Write Credentials file
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: echo $GOOGLE_CREDENTIALS > gcloud.key
+              env:
+                  PROJECT_ID: data-test-terraform
+                  GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
 
-      - name: Authenticate to Google Cloud
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-        run: gcloud auth activate-service-account deployment@datapm-test-terraform.iam.gserviceaccount.com --key-file=gcloud.key
+            - name: Authenticate to Google Cloud
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: gcloud auth activate-service-account deployment@datapm-test-terraform.iam.gserviceaccount.com --key-file=gcloud.key
 
-      - name: Authorize Docker
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-        run: gcloud auth configure-docker --quiet
+            - name: Authorize Docker
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: gcloud auth configure-docker --quiet
 
-      - name: Deploy Assets
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-        run: npm run deploy
-        env:
-          PROJECT_ID: data-test-terraform
-          GOOGLE_CREDENTIALS: ~/gcloud.key
+            - name: Deploy Assets
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: npm run deploy
+              env:
+                  PROJECT_ID: data-test-terraform
+                  GOOGLE_CREDENTIALS: ~/gcloud.key
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v1
 
-      - name: Terraform Init
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-        run: terraform init
-        env:
-          PROJECT_ID: data-test-terraform
-          GOOGLE_CREDENTIALS: gcloud.key
+            - name: Terraform Init
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: terraform init
+              env:
+                  PROJECT_ID: data-test-terraform
+                  GOOGLE_CREDENTIALS: gcloud.key
 
-      - name: Terraform Format
-        run: terraform fmt -check
+            - name: Terraform Format
+              run: terraform fmt -check
 
-      - name: Terraform Plan
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-        run: terraform plan
-        env:
-          PROJECT_ID: data-test-terraform
-          GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
+            - name: Terraform Plan
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: terraform plan
+              env:
+                  PROJECT_ID: data-test-terraform
+                  GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
 
-      - name: Google Run Update
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-        run: gcloud run deploy datapm-registry --project datapm-test-terraform --image gcr.io/datapm-test-terraform/datapm-registry --region us-central1 --platform managed
-        env:
-          PROJECT_ID: data-test-terraform
-          GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
+            - name: Google Run Update
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: gcloud run deploy datapm-registry --project datapm-test-terraform --image gcr.io/datapm-test-terraform/datapm-registry --region us-central1 --platform managed
+              env:
+                  PROJECT_ID: data-test-terraform
+                  GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
 
-      - name: Google Run Update
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-        run: gcloud run services update-traffic datapm-registry --project datapm-test-terraform --region us-central1 --platform managed --to-latest
-        env:
-          PROJECT_ID: data-test-terraform
-          GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
+            - name: Google Run Update
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: gcloud run services update-traffic datapm-registry --project datapm-test-terraform --region us-central1 --platform managed --to-latest
+              env:
+                  PROJECT_ID: data-test-terraform
+                  GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
 
-      - name: Publish Apollo Graphql Update
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-        run: npx apollo service:push --graph=datapm --key=${{secrets.APOLLO_KEY}} --variant=test --localSchemaFile=backend/dist/schema.gql,backend/dist/auth-schema.gql,backend/dist/user-schema.gql,backend/dist/api-key-schema.gql
+            - name: Publish Apollo Graphql Update
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: npx apollo service:push --graph=datapm --key=${{secrets.APOLLO_KEY}} --variant=test --localSchemaFile=backend/dist/schema.gql,backend/dist/auth-schema.gql,backend/dist/user-schema.gql,backend/dist/api-key-schema.gql
 
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-        run: terraform apply -auto-approve
-        env:
-          PROJECT_ID: data-test-terraform
-          GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
+            - name: Terraform Apply
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: terraform apply -auto-approve
+              env:
+                  PROJECT_ID: data-test-terraform
+                  GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}

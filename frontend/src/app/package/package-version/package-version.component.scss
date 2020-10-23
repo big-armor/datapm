@@ -26,7 +26,7 @@
         font-size: 10px;
         line-height: 13px;
         letter-spacing: -0.28px;
-        color: #00A896;
+        color: #00a896;
     }
 
     .package-title {
@@ -36,7 +36,7 @@
         font-size: 20px;
         line-height: 26px;
         letter-spacing: -0.28px;
-        color: #4F4F4F;
+        color: #4f4f4f;
         margin-bottom: 10px;
     }
 
@@ -58,20 +58,22 @@
         font-size: 14px;
         line-height: 18px;
         letter-spacing: -0.28px;
-        color: #4F4F4F;
+        color: #4f4f4f;
         margin-bottom: 5px;
     }
 
     .div-table {
         table {
             thead {
-                box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+                box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+                    0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
                 th {
                     padding: 10px 15px;
                 }
             }
             tbody {
-                box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+                box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+                    0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
                 td {
                     padding: 15px 15px;
                 }
@@ -80,7 +82,8 @@
     }
 
     .rounded-div {
-        box-shadow: inset 0px -4px 4px rgba(255, 255, 255, 0.25), inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 4px 0px 4px rgba(183, 183, 183, 0.25), inset 0px 4px 4px rgba(183, 183, 183, 0.25);
+        box-shadow: inset 0px -4px 4px rgba(255, 255, 255, 0.25), inset -4px 0px 4px rgba(255, 255, 255, 0.25),
+            inset 4px 0px 4px rgba(183, 183, 183, 0.25), inset 0px 4px 4px rgba(183, 183, 183, 0.25);
         background-color: #fff;
         border-radius: 24px;
         padding: 8px 15px;
@@ -110,7 +113,8 @@
             width: 32px;
             height: 32px;
             background-color: #fff;
-            box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+            box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+                0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
 
             &:focus {
                 outline: #fff auto 0px !important;
@@ -136,7 +140,7 @@
     }
 }
 
-@media (max-width:992px) {
+@media (max-width: 992px) {
     .left-div {
         padding-right: 15px !important;
     }

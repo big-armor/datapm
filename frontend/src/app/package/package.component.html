@@ -1,17 +1,17 @@
-<hr style="width: 100%;" class="header-border">
+<hr style="width: 100%" class="header-border" />
 <div class="container pb-5" id="packagePage">
-  <div class="row">
-    <div class="col-md-12 no-pd-mobile">
-      <ul class="p-0" id="packageRoutes">
-        <li *ngFor="let route of routes; let i = index" class="list-names" (click)="selectTab(i)">
-              <a class="cursor-pointer" [class.active]="i == selectedTab">
-                {{route.linkName}}
-              </a>
-        </li>
-      </ul>
+    <div class="row">
+        <div class="col-md-12 no-pd-mobile">
+            <ul class="p-0" id="packageRoutes">
+                <li *ngFor="let route of routes; let i = index" class="list-names" (click)="selectTab(i)">
+                    <a class="cursor-pointer" [class.active]="i == selectedTab">
+                        {{ route.linkName }}
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-lg-12">
+            <router-outlet></router-outlet>
+        </div>
     </div>
-    <div class="col-lg-12">
-      <router-outlet></router-outlet>
-    </div>
-  </div>
 </div>

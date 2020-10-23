@@ -1,223 +1,223 @@
 .cover-image {
-	height: 240px;
-	object-fit: cover;
-	background-size: 100%;
-	background-repeat: no-repeat;
-	background-image: url("../../assets/images/cover-image.png");
+    height: 240px;
+    object-fit: cover;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-image: url("../../assets/images/cover-image.png");
 }
 
 #userProfile {
-	.top-row {
-		position: relative;
-		top: -160px;
+    .top-row {
+        position: relative;
+        top: -160px;
 
-		.profile-div {
-			box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
-				0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
-			border-radius: 4px;
-			background-color: #fff;
+        .profile-div {
+            box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+                0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+            border-radius: 4px;
+            background-color: #fff;
 
-			.user-img {
-				img {
-					width: 100px;
-					height: 100px;
-					top: -60px;
-					position: relative;
-					border-radius: 100%;
-					box-shadow: 1px 0px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(255, 255, 255, 0.25),
-						0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
-				}
-			}
+            .user-img {
+                img {
+                    width: 100px;
+                    height: 100px;
+                    top: -60px;
+                    position: relative;
+                    border-radius: 100%;
+                    box-shadow: 1px 0px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(255, 255, 255, 0.25),
+                        0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+                }
+            }
 
-			.user-fullname {
-				font-family: Roboto Mono;
-				font-style: normal;
-				font-weight: normal;
-				font-size: 20px;
-				line-height: 26px;
-				letter-spacing: -0.28px;
-				color: #333333;
-			}
+            .user-fullname {
+                font-family: Roboto Mono;
+                font-style: normal;
+                font-weight: normal;
+                font-size: 20px;
+                line-height: 26px;
+                letter-spacing: -0.28px;
+                color: #333333;
+            }
 
-			.user-name {
-				font-family: Roboto Mono;
-				font-style: normal;
-				font-weight: 300;
-				font-size: 14px;
-				line-height: 18px;
-				letter-spacing: -0.28px;
-				color: #828282;
-			}
+            .user-name {
+                font-family: Roboto Mono;
+                font-style: normal;
+                font-weight: 300;
+                font-size: 14px;
+                line-height: 18px;
+                letter-spacing: -0.28px;
+                color: #828282;
+            }
 
-			.follow-btn {
-				border-radius: 24px;
-				padding: 5px 45px;
-				cursor: pointer;
-				outline: transparent solid 0px !important;
-				box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
-					0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+            .follow-btn {
+                border-radius: 24px;
+                padding: 5px 45px;
+                cursor: pointer;
+                outline: transparent solid 0px !important;
+                box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+                    0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
 
-				span {
-					font-family: Roboto Mono;
-					font-style: normal;
-					font-weight: normal;
-					font-size: 18px;
-					line-height: 28px;
-					text-align: center;
-					letter-spacing: -0.28px;
-					color: #333333;
-				}
-			}
+                span {
+                    font-family: Roboto Mono;
+                    font-style: normal;
+                    font-weight: normal;
+                    font-size: 18px;
+                    line-height: 28px;
+                    text-align: center;
+                    letter-spacing: -0.28px;
+                    color: #333333;
+                }
+            }
 
-			.user-bio {
-				font-family: Roboto Mono;
-				font-style: normal;
-				font-weight: 300;
-				font-size: 12px;
-				line-height: 13px;
-				letter-spacing: -0.28px;
-				color: #4f4f4f;
-				max-width: 50%;
-				margin-bottom: 15px;
-			}
+            .user-bio {
+                font-family: Roboto Mono;
+                font-style: normal;
+                font-weight: 300;
+                font-size: 12px;
+                line-height: 13px;
+                letter-spacing: -0.28px;
+                color: #4f4f4f;
+                max-width: 50%;
+                margin-bottom: 15px;
+            }
 
-			.edit-profile {
-				font-family: Roboto Mono;
-				font-style: normal;
-				font-weight: 400;
-				font-size: 12px;
-				line-height: 13px;
-				letter-spacing: -0.28px;
-				color: #017fb9;
-				border: 1px solid #ddd;
-				padding: 3px 15px;
-				border-radius: 4px;
-				cursor: pointer;
-				&:hover {
-					text-decoration: none;
-				}
-			}
+            .edit-profile {
+                font-family: Roboto Mono;
+                font-style: normal;
+                font-weight: 400;
+                font-size: 12px;
+                line-height: 13px;
+                letter-spacing: -0.28px;
+                color: #017fb9;
+                border: 1px solid #ddd;
+                padding: 3px 15px;
+                border-radius: 4px;
+                cursor: pointer;
+                &:hover {
+                    text-decoration: none;
+                }
+            }
 
-			.user-following {
-				margin-top: 10px;
-				div {
-					font-family: Roboto Mono;
-					font-style: normal;
-					font-weight: normal;
-					font-size: 12px;
-					letter-spacing: -0.28px;
-					color: #4f4f4f;
+            .user-following {
+                margin-top: 10px;
+                div {
+                    font-family: Roboto Mono;
+                    font-style: normal;
+                    font-weight: normal;
+                    font-size: 12px;
+                    letter-spacing: -0.28px;
+                    color: #4f4f4f;
 
-					.material-icons {
-						font-size: 12px;
-						position: relative;
-						top: 2px;
-						margin-right: 6px;
-					}
-				}
-			}
-			#homeRoutes {
-				list-style-type: none;
-				margin-top: 30px;
-				margin-bottom: 3px;
-				display: flex;
+                    .material-icons {
+                        font-size: 12px;
+                        position: relative;
+                        top: 2px;
+                        margin-right: 6px;
+                    }
+                }
+            }
+            #homeRoutes {
+                list-style-type: none;
+                margin-top: 30px;
+                margin-bottom: 3px;
+                display: flex;
 
-				li {
-					a {
-						font-family: Roboto Mono;
-						font-style: normal;
-						font-weight: 300;
-						font-size: 14px;
-						line-height: 16px;
-						text-align: center;
-						letter-spacing: -0.28px;
-						text-transform: uppercase;
-						color: #828282;
-						cursor: pointer;
-						text-decoration: none;
-						padding: 0px 10px 4px 10px;
-						margin: 0px 40px 0px 10px;
-					}
-				}
+                li {
+                    a {
+                        font-family: Roboto Mono;
+                        font-style: normal;
+                        font-weight: 300;
+                        font-size: 14px;
+                        line-height: 16px;
+                        text-align: center;
+                        letter-spacing: -0.28px;
+                        text-transform: uppercase;
+                        color: #828282;
+                        cursor: pointer;
+                        text-decoration: none;
+                        padding: 0px 10px 4px 10px;
+                        margin: 0px 40px 0px 10px;
+                    }
+                }
 
-				.active {
-					opacity: 1;
-					color: #333333 !important;
-					border-bottom: 2px solid #333333;
-				}
-			}
-		}
-	}
-	.mat-dialog-container {
-		padding: 20px;
-	}
+                .active {
+                    opacity: 1;
+                    color: #333333 !important;
+                    border-bottom: 2px solid #333333;
+                }
+            }
+        }
+    }
+    .mat-dialog-container {
+        padding: 20px;
+    }
 }
 
 @media (max-width: 576px) {
-	.cover-image {
-		margin-top: 20px;
-		height: 100px;
-	}
-	.user-header {
-		height: unset;
-		display: contents !important;
-	}
-	#userProfile {
-		.top-row {
-			top: -30px;
-			.profile-div {
-				.user-img {
-					img {
-						top: 0px;
-						width: 60px;
-						height: 60px;
-					}
-				}
-				.follow-btn {
-					padding: 0px 40px;
-					line-height: 30px;
-					margin-bottom: 5px;
-					span {
-						font-size: 14px;
-					}
-				}
-				#homeRoutes {
-					li {
-						a {
-							font-size: 11px;
-							padding: 0px 8px 4px 8px;
-							margin: 0px 6px;
-						}
-					}
-				}
-				.user-following {
-					padding-left: 10px !important;
-					margin-top: 4px;
-					div {
-						font-size: 10px;
-					}
-				}
-				.user-bio {
-					font-size: 10px;
-					margin-bottom: 10px;
-					padding-left: 10px !important;
-				}
-				.edit-profile {
-					margin-left: 10px !important;
-				}
-			}
-		}
-	}
+    .cover-image {
+        margin-top: 20px;
+        height: 100px;
+    }
+    .user-header {
+        height: unset;
+        display: contents !important;
+    }
+    #userProfile {
+        .top-row {
+            top: -30px;
+            .profile-div {
+                .user-img {
+                    img {
+                        top: 0px;
+                        width: 60px;
+                        height: 60px;
+                    }
+                }
+                .follow-btn {
+                    padding: 0px 40px;
+                    line-height: 30px;
+                    margin-bottom: 5px;
+                    span {
+                        font-size: 14px;
+                    }
+                }
+                #homeRoutes {
+                    li {
+                        a {
+                            font-size: 11px;
+                            padding: 0px 8px 4px 8px;
+                            margin: 0px 6px;
+                        }
+                    }
+                }
+                .user-following {
+                    padding-left: 10px !important;
+                    margin-top: 4px;
+                    div {
+                        font-size: 10px;
+                    }
+                }
+                .user-bio {
+                    font-size: 10px;
+                    margin-bottom: 10px;
+                    padding-left: 10px !important;
+                }
+                .edit-profile {
+                    margin-left: 10px !important;
+                }
+            }
+        }
+    }
 }
 
 @media (max-width: 768px) {
-	#userProfile {
-		.top-row {
-			.profile-div {
-				.user-bio {
-					max-width: 100%;
-				}
-			}
-		}
-	}
+    #userProfile {
+        .top-row {
+            .profile-div {
+                .user-bio {
+                    max-width: 100%;
+                }
+            }
+        }
+    }
 }

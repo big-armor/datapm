@@ -1,8 +1,8 @@
-mutation CreateAPIKey($value:CreateAPIKeyInput!) {
-  createAPIKey(value:$value) {
-    secret
-    label
-    scopes
-    id
-  }
+mutation CreateAPIKey($value: CreateAPIKeyInput!) {
+    createAPIKey(value: $value) {
+        secret
+        label
+        scopes
+        id
+    }
 }

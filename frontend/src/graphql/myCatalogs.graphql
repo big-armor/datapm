@@ -1,13 +1,13 @@
 query MyCatalogs {
-  myCatalogs {
-    identifier {
-      registryHostname
-      registryPort
-      catalogSlug
+    myCatalogs {
+        identifier {
+            registryHostname
+            registryPort
+            catalogSlug
+        }
+        displayName
+        description
+        website
+        isPublic
     }
-    displayName
-    description
-    website
-    isPublic
-  }
 }

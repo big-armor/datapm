@@ -1,9 +1,9 @@
 query Me {
-  me {
-    emailAddress
-    firstName
-    lastName
-    username
-    nameIsPublic
-  }
+    me {
+        emailAddress
+        firstName
+        lastName
+        username
+        nameIsPublic
+    }
 }

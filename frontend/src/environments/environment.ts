@@ -3,15 +3,15 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment: {
-  production: boolean,
-  registryProtocol: "http" | "https",
-  registryHostname: string,
-  registryPort: number
+    production: boolean;
+    registryProtocol: "http" | "https";
+    registryHostname: string;
+    registryPort: number;
 } = {
-  production: false,
-  registryHostname: "localhost",
-  registryPort: 4000,
-  registryProtocol: "http"
+    production: false,
+    registryHostname: "localhost",
+    registryPort: 4000,
+    registryProtocol: "http"
 };
 
 /*

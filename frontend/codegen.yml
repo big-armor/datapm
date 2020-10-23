@@ -1,17 +1,17 @@
 overwrite: true
 schema:
-  - node_modules/datapm-lib/schema.gql
-  - node_modules/datapm-lib/auth-schema.gql
-  - node_modules/datapm-lib/user-schema.gql
-  - node_modules/datapm-lib/api-key-schema.gql
+    - node_modules/datapm-lib/schema.gql
+    - node_modules/datapm-lib/auth-schema.gql
+    - node_modules/datapm-lib/user-schema.gql
+    - node_modules/datapm-lib/api-key-schema.gql
 documents: src/graphql/*.graphql
 generates:
-  src/generated/graphql.ts:
-    plugins:
-      - "typescript"
-      - "typescript-operations"
-      - "typescript-apollo-angular"
-    config:
-      namingConvention:
-        typeNames: keep
-        enumValues: upper-case#upperCase
+    src/generated/graphql.ts:
+        plugins:
+            - "typescript"
+            - "typescript-operations"
+            - "typescript-apollo-angular"
+        config:
+            namingConvention:
+                typeNames: keep
+                enumValues: upper-case#upperCase

@@ -7,24 +7,24 @@ import { RouterTestingModule } from "@angular/router/testing";
 import { MaterialModule } from "../../material.module";
 
 describe("PackageDetailComponent", () => {
-	let component: PackageDetailComponent;
-	let fixture: ComponentFixture<PackageDetailComponent>;
-	let controller: ApolloTestingController;
+    let component: PackageDetailComponent;
+    let fixture: ComponentFixture<PackageDetailComponent>;
+    let controller: ApolloTestingController;
 
-	beforeEach(async(() => {
-		TestBed.configureTestingModule({
-			declarations: [PackageDetailComponent],
-			imports: [RouterTestingModule, ApolloTestingModule, MaterialModule]
-		}).compileComponents();
-	}));
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            declarations: [PackageDetailComponent],
+            imports: [RouterTestingModule, ApolloTestingModule, MaterialModule]
+        }).compileComponents();
+    }));
 
-	beforeEach(() => {
-		fixture = TestBed.createComponent(PackageDetailComponent);
-		component = fixture.componentInstance;
-		fixture.detectChanges();
-	});
+    beforeEach(() => {
+        fixture = TestBed.createComponent(PackageDetailComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-	it("should create", () => {
-		expect(component).toBeTruthy();
-	});
+    it("should create", () => {
+        expect(component).toBeTruthy();
+    });
 });

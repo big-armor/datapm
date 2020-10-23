@@ -10,66 +10,66 @@ import { MyAccountComponent } from "./my-account/my-account.component";
 import { SharedModule } from "./shared/shared.module";
 
 describe("AppComponent", () => {
-	beforeEach(async(() => {
-		TestBed.configureTestingModule({
-			imports: [
-				RouterTestingModule.withRoutes([{ path: "", component: AppComponent }]),
-				MaterialModule,
-				ReactiveFormsModule,
-				SharedModule
-			],
-			declarations: [AppComponent]
-		}).compileComponents();
-	}));
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            imports: [
+                RouterTestingModule.withRoutes([{ path: "", component: AppComponent }]),
+                MaterialModule,
+                ReactiveFormsModule,
+                SharedModule
+            ],
+            declarations: [AppComponent]
+        }).compileComponents();
+    }));
 
-	beforeEach(async(() => {
-		TestBed.configureTestingModule({
-			imports: [
-				RouterTestingModule.withRoutes([
-					{
-						path: "",
-						component: HomepageComponent,
-						children: [
-							{
-								path: "latest",
-								component: LatestComponent
-							}
-						]
-					},
-					{
-						path: "me",
-						component: MyAccountComponent,
-						children: [
-							{
-								path: "details",
-								redirectTo: "",
-								pathMatch: "full"
-							},
-							{
-								path: "",
-								component: DetailsComponent
-							}
-						]
-					}
-				]),
-				MaterialModule,
-				ReactiveFormsModule,
-				SharedModule
-			],
-			declarations: [AppComponent]
-		}).compileComponents();
-	}));
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            imports: [
+                RouterTestingModule.withRoutes([
+                    {
+                        path: "",
+                        component: HomepageComponent,
+                        children: [
+                            {
+                                path: "latest",
+                                component: LatestComponent
+                            }
+                        ]
+                    },
+                    {
+                        path: "me",
+                        component: MyAccountComponent,
+                        children: [
+                            {
+                                path: "details",
+                                redirectTo: "",
+                                pathMatch: "full"
+                            },
+                            {
+                                path: "",
+                                component: DetailsComponent
+                            }
+                        ]
+                    }
+                ]),
+                MaterialModule,
+                ReactiveFormsModule,
+                SharedModule
+            ],
+            declarations: [AppComponent]
+        }).compileComponents();
+    }));
 
-	it(`should have as title 'datapm-registry-frontend'`, () => {
-		const fixture = TestBed.createComponent(AppComponent);
-		const app = fixture.componentInstance;
-		expect(app.title).toEqual("datapm-registry-frontend");
-	});
+    it(`should have as title 'datapm-registry-frontend'`, () => {
+        const fixture = TestBed.createComponent(AppComponent);
+        const app = fixture.componentInstance;
+        expect(app.title).toEqual("datapm-registry-frontend");
+    });
 
-	// it('should render title', () => {
-	//   const fixture = TestBed.createComponent(AppComponent);
-	//   fixture.detectChanges();
-	//   const compiled = fixture.nativeElement;
-	//   expect(compiled.querySelector('.title').textContent).toContain('datapm');
-	// });
+    // it('should render title', () => {
+    //   const fixture = TestBed.createComponent(AppComponent);
+    //   fixture.detectChanges();
+    //   const compiled = fixture.nativeElement;
+    //   expect(compiled.querySelector('.title').textContent).toContain('datapm');
+    // });
 });

@@ -6,23 +6,23 @@ import { LatestComponent } from "./latest.component";
 import { MaterialModule } from "../../material.module";
 
 describe("LatestComponent", () => {
-	let component: LatestComponent;
-	let fixture: ComponentFixture<LatestComponent>;
+    let component: LatestComponent;
+    let fixture: ComponentFixture<LatestComponent>;
 
-	beforeEach(async(() => {
-		TestBed.configureTestingModule({
-			declarations: [LatestComponent],
-			imports: [ApolloTestingModule, MaterialModule]
-		}).compileComponents();
-	}));
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            declarations: [LatestComponent],
+            imports: [ApolloTestingModule, MaterialModule]
+        }).compileComponents();
+    }));
 
-	beforeEach(() => {
-		fixture = TestBed.createComponent(LatestComponent);
-		component = fixture.componentInstance;
-		fixture.detectChanges();
-	});
+    beforeEach(() => {
+        fixture = TestBed.createComponent(LatestComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-	it("should create", () => {
-		expect(component).toBeTruthy();
-	});
+    it("should create", () => {
+        expect(component).toBeTruthy();
+    });
 });

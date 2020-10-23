@@ -1,15 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from "@angular/core";
 
 @Component({
-  selector: 'schema',
-  templateUrl: './package-schema.component.html',
-  styleUrls: ['./package-schema.component.scss']
+    selector: "schema",
+    templateUrl: "./package-schema.component.html",
+    styleUrls: ["./package-schema.component.scss"]
 })
 export class PackageSchemaComponent implements OnInit {
+    constructor() {}
 
-  constructor() { }
-
-  ngOnInit(): void {
-  }
-
+    ngOnInit(): void {}
 }

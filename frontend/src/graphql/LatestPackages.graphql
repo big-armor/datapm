@@ -1,25 +1,25 @@
 query GetLatestPackages($offset: Int!, $limit: Int!) {
-  latestPackages(offSet: $offset, limit: $limit) {
-    packages {
-      identifier {
-        catalogSlug
-        packageSlug
-      }
-      displayName
-      description
-      description
-      latestVersion {
-        identifier {
-          versionMajor
-          versionMinor
-          versionPatch
+    latestPackages(offSet: $offset, limit: $limit) {
+        packages {
+            identifier {
+                catalogSlug
+                packageSlug
+            }
+            displayName
+            description
+            description
+            latestVersion {
+                identifier {
+                    versionMajor
+                    versionMinor
+                    versionPatch
+                }
+                createdAt
+                updatedAt
+                author {
+                    username
+                }
+            }
         }
-        createdAt
-        updatedAt
-        author {
-          username
-        }
-      }
     }
-  }
 }

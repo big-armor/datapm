@@ -1,21 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from "@angular/core";
 
 @Component({
-  selector: 'following',
-  templateUrl: './following.component.html',
-  styleUrls: ['./following.component.scss']
+    selector: "following",
+    templateUrl: "./following.component.html",
+    styleUrls: ["./following.component.scss"]
 })
 export class FollowingComponent implements OnInit {
+    public isFavorite = false;
 
-  public isFavorite = false;
+    constructor() {}
 
-  constructor() { }
+    ngOnInit(): void {}
 
-  ngOnInit(): void {
-  }
-
-  public makeFavorite(): void {
-    this.isFavorite = !this.isFavorite;
-  }
-
+    public makeFavorite(): void {
+        this.isFavorite = !this.isFavorite;
+    }
 }
