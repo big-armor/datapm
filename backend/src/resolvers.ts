@@ -32,7 +32,7 @@ import fs from "fs";
 
 import AJV from "ajv";
 import { SemVer } from "semver";
-import { ApolloError, UserInputError } from "apollo-server";
+import { ApolloError, UserInputError, ValidationError } from "apollo-server";
 
 import {
     compatibilityToString,
@@ -99,16 +99,16 @@ export const resolvers: {
             const schemaObject = JSON.parse(schema);
 
             if (!ajv.validateSchema(schemaObject)) {
-                throw new Error("AJV could not validate the schema");
+                throw new ApolloError("ERROR_READING_SCHEMA");
             }
 
             const response = ajv.validate(schemaObject, packageObject);
 
             if (!response) {
-                throw new Error("Error parsing Package File JSON: " + ajv.errors![0].message); //, "INVALID_PACKAGE_FILE", {path: ajv.errors![0].schemaPath});
+                throw new ValidationError("INVALID_PACKAGE_FILE_SCHEMA: " + JSON.stringify(ajv.errors!));
             }
 
-            return JSON.parse(value);
+            return packageObject;
         }
     }),
 
@@ -248,9 +248,11 @@ export const resolvers: {
                 packageSlug: packageEntity.slug
             };
 
-            const version = await context.connection
-                .getCustomRepository(VersionRepository)
-                .findLatestVersion({ identifier: identifier, relations: getGraphQlRelationName(info) });
+            const version = await context.connection.getCustomRepository(VersionRepository).findLatestVersion({
+                identifier: identifier,
+                includeActiveOnly: packageEntity.isActive,
+                relations: getGraphQlRelationName(info)
+            });
 
             if (version == undefined) return null;
 
@@ -478,7 +480,7 @@ export const resolvers: {
                 // get the latest version
                 const latestVersion = await transaction
                     .getCustomRepository(VersionRepository)
-                    .findLatestVersion({ identifier });
+                    .findLatestVersion({ identifier, includeActiveOnly: true });
 
                 if (latestVersion != null) {
                     const latestVersionSemVer = new SemVer(latestVersion.packageFile!.version);
@@ -489,7 +491,7 @@ export const resolvers: {
 
                     const minNextVersion = nextVersion(latestVersionSemVer, compatibility);
 
-                    const minVersionCompare = minNextVersion.compare(proposedNewVersion);
+                    const minVersionCompare = minNextVersion.compare(proposedNewVersion.version);
 
                     if (compatibility == Compability.Identical) {
                         throw new ApolloError(

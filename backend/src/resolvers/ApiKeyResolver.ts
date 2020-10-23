@@ -1,5 +1,6 @@
+import { ValidationError } from "apollo-server";
 import { AuthenticatedContext } from "../context";
-import { APIKey, APIKeyWithSecret, AUTHENTICATION_ERROR, CreateAPIKeyInput } from "../generated/graphql";
+import { APIKey, APIKeyWithSecret, AUTHENTICATION_ERROR, CreateAPIKeyInput, Scope } from "../generated/graphql";
 import { APIKeyRepository } from "../repository/APIKeyRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
@@ -15,7 +16,24 @@ export const createAPIKey = async (
     });
 
     if (!user) {
-        throw new Error(AUTHENTICATION_ERROR.USER_NOT_FOUND);
+        throw new ValidationError(AUTHENTICATION_ERROR.USER_NOT_FOUND);
+    }
+
+    if (
+        value.scopes.indexOf(Scope.MANAGE_API_KEYS) == -1 ||
+        value.scopes.indexOf(Scope.MANAGE_PRIVATE_ASSETS) == -1 ||
+        value.scopes.indexOf(Scope.READ_PRIVATE_ASSETS) == -1
+    )
+        throw new ValidationError("ALL_SCOPES_REQUIRED");
+
+    const existingAPIKeyLabel = await context.connection.manager
+        .getCustomRepository(APIKeyRepository)
+        .findByUser(context.me.id);
+
+    if (existingAPIKeyLabel != null) {
+        for (let apiKey of existingAPIKeyLabel) {
+            if (apiKey.label == value.label) throw new ValidationError("APIKEY_LABEL_NOT_AVIALABLE");
+        }
     }
 
     return context.connection.manager.getCustomRepository(APIKeyRepository).createAPIKey({

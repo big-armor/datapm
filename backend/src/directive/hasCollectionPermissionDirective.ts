@@ -1,4 +1,4 @@
-import { SchemaDirectiveVisitor, ForbiddenError } from "apollo-server";
+import { SchemaDirectiveVisitor, ForbiddenError, ApolloError } from "apollo-server";
 import { GraphQLObjectType, GraphQLField, defaultFieldResolver } from "graphql";
 import { AuthenticatedContext } from "../context";
 import { Permission } from "../generated/graphql";
@@ -25,7 +25,7 @@ export class HasCollectionPermissionDirective extends SchemaDirectiveVisitor {
                 undefined;
 
             if (!collectionSlug) {
-                throw new Error("No collection slug defined in the request");
+                throw new ApolloError("COLLECTION_SLUG_REQUIRED");
             }
 
             const collection = await context.connection
@@ -37,9 +37,7 @@ export class HasCollectionPermissionDirective extends SchemaDirectiveVisitor {
 
             const hasRequiredPermission = await hasCollectionPermissions(context, collection.id, permission);
             if (!hasRequiredPermission) {
-                throw new ForbiddenError(
-                    `User does not have the "${permission}" permission on collection "${collectionSlug}"`
-                );
+                throw new ForbiddenError(`NOT_AUTHORIZED`);
             }
 
             return resolve.apply(this, [source, args, context, info]);

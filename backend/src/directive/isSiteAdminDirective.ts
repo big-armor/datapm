@@ -13,8 +13,8 @@ export class IsAdminDirective extends SchemaDirectiveVisitor {
     visitFieldDefinition(field: GraphQLField<any, any>) {
         const { resolve = defaultFieldResolver } = field;
         field.resolve = function (source, args, context: Context, info) {
-            if (!context.me) throw new AuthenticationError("No active user session");
-            if (!context.me.isAdmin) throw new ForbiddenError("Not siteadmin");
+            if (!context.me) throw new AuthenticationError("NOT_AUTHENTICATED");
+            if (!context.me.isAdmin) throw new ForbiddenError("NOT_AUTHORIZED");
             return resolve.apply(this, [source, args, context, info]);
         };
     }
@@ -30,8 +30,8 @@ export class IsAdminDirective extends SchemaDirectiveVisitor {
         details.field.resolve = function (source, args, context: Context, info) {
             if (args[argument.name] !== undefined) {
                 // argument was specified. check for isAdmin
-                if (!context.me) throw new AuthenticationError("No active user session");
-                if (!context.me.isAdmin) throw new ForbiddenError("Not siteadmin");
+                if (!context.me) throw new AuthenticationError("NOT_AUTHENTICATED");
+                if (!context.me.isAdmin) throw new ForbiddenError("NOT_AUTHORIZED");
             }
 
             return resolve.apply(this, [source, args, context, info]);

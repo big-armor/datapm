@@ -23,8 +23,8 @@ DataPM provides a simple token based API key for machine-to-machine access to th
 ### Generate an API Key
 
 1. Register as a user on the target datapm registry
-   1. You can use the public [datapm.io/sign-up](https://datapm.io/sign-up)
-   1. Or host your own private registry
+    1. You can use the public [datapm.io/sign-up](https://datapm.io/sign-up)
+    1. Or host your own private registry
 1. Log-in to your new account
 1. Click your profile icon in the upper right
 1. Click "API Keys"
@@ -34,11 +34,11 @@ DataPM provides a simple token based API key for machine-to-machine access to th
 
 ### Authenticating with an API Key request header
 
-You can submit an API key in the "Authorization" HTTP request header to authenticate with the DataPM Registry GraphQL API. You can use this same Authorization Bearer header in the "Headers" section at the bottom of the graphql playground.
+You can submit an API key in the "X-API-Key" HTTP request header to authenticate your request with the DataPM Registry GraphQL API. You can define this "X-API-Key" header in the "Headers" section at the bottom of the graphql playground.
 
 ```
 {
-    "Authorization": "Bearer YOUR-API-TOKEN-HERE"
+    "X-API-Key": "YOUR-API-TOKEN-HERE"
 }
 ```
 

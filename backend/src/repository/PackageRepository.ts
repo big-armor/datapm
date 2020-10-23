@@ -1,4 +1,12 @@
-import { EntityRepository, EntityManager, Like, Brackets, SelectQueryBuilder } from "typeorm";
+import {
+    EntityRepository,
+    EntityManager,
+    Like,
+    Brackets,
+    SelectQueryBuilder,
+    FindOneOptions,
+    FindConditions
+} from "typeorm";
 
 import { CreatePackageInput, UpdatePackageInput, PackageIdentifierInput, Permission } from "../generated/graphql";
 import { Package } from "../entity/Package";
@@ -35,15 +43,21 @@ async function findPackage(
     manager: EntityManager,
     catalogSlug: string,
     packageSlug: string,
+    includeActiveOnly: boolean,
     relations: string[]
 ): Promise<Package | null> {
     const ALIAS = "package";
 
     const catalog = await manager.getRepository(Catalog).findOneOrFail({ where: { slug: catalogSlug } });
 
-    const packageEntity = await manager
-        .getRepository(Package)
-        .findOne({ where: { catalogId: catalog.id, slug: packageSlug, isActive: true }, relations: relations });
+    const options: FindOneOptions<Package> = {
+        where: { catalogId: catalog.id, slug: packageSlug },
+        relations: relations
+    };
+
+    if (includeActiveOnly) (options.where! as FindConditions<Package>).isActive = true;
+
+    const packageEntity = await manager.getRepository(Package).findOne(options);
 
     return packageEntity || null;
 }
@@ -62,8 +76,12 @@ function validation(packageEntity: Package) {
     }
 }
 
-function setPackageDisabled(packageEntity: Package, transaction: EntityManager) {
-    transaction.getCustomRepository(VersionRepository).disableVersions(packageEntity.versions);
+async function setPackageDisabled(packageEntity: Package, transaction: EntityManager) {
+    const versions = await transaction
+        .getCustomRepository(VersionRepository)
+        .findVersions({ packageId: packageEntity.id });
+
+    transaction.getCustomRepository(VersionRepository).disableVersions(versions);
 
     packageEntity.isActive = false;
     packageEntity.slug = packageEntity.slug + "-DISABLED-" + new Date().getTime();
@@ -86,7 +104,7 @@ export class PackageRepository {
                 { collectionId: collectionId }
             )
             .andWhere(AUTHENTICATED_USER_OR_PUBLIC_PACKAGES_QUERY, { userId: userId, permission: Permission.VIEW })
-            .addRelations("package", relations)
+            .addRelations("Package", relations)
             .getMany();
     }
 
@@ -157,15 +175,18 @@ export class PackageRepository {
 
     async findPackage({
         identifier,
+        includeActiveOnly,
         relations = []
     }: {
         identifier: PackageIdentifierInput;
+        includeActiveOnly: boolean;
         relations?: string[];
     }): Promise<Package | null> {
         const packageEntity = await findPackage(
             this.manager,
             identifier.catalogSlug,
             identifier.packageSlug,
+            includeActiveOnly,
             relations
         );
 
@@ -174,12 +195,14 @@ export class PackageRepository {
 
     async findPackageOrFail({
         identifier,
+        includeActiveOnly,
         relations = []
     }: {
         identifier: PackageIdentifierInput;
         relations?: string[];
+        includeActiveOnly: boolean;
     }): Promise<Package> {
-        const packageEntity = await this.findPackage({ identifier, relations });
+        const packageEntity = await this.findPackage({ identifier, includeActiveOnly, relations });
 
         if (packageEntity == null) throw new Error("PACKAGE_NOT_FOUND");
 
@@ -256,20 +279,28 @@ export class PackageRepository {
         catalogSlug,
         packageSlug,
         packageInput,
+        includeActiveOnly,
         relations = []
     }: {
         catalogSlug: string;
         packageSlug: string;
         packageInput: UpdatePackageInput;
+        includeActiveOnly: boolean;
         relations?: string[];
     }): Promise<Package> {
         return this.manager.nestedTransaction(async (transaction) => {
             const ALIAS = "package";
 
-            const packageEntity = await findPackage(this.manager, catalogSlug, packageSlug, relations);
+            const packageEntity = await findPackage(
+                transaction,
+                catalogSlug,
+                packageSlug,
+                includeActiveOnly,
+                relations
+            );
 
             if (packageEntity === null) {
-                throw new Error("Could not find package");
+                throw new Error("PACKAGE_NOT_FOUND");
             }
 
             if (packageInput.newCatalogSlug) {
@@ -288,8 +319,7 @@ export class PackageRepository {
 
             if (packageInput.description) packageEntity.description = packageInput.description;
 
-            if (packageInput.isPublic?.valueOf() !== undefined)
-                packageEntity.isPublic = packageInput.isPublic?.valueOf();
+            if (packageInput.isPublic != null) packageEntity.isPublic = packageInput.isPublic;
 
             validation(packageEntity);
 
@@ -319,21 +349,17 @@ export class PackageRepository {
             const catalogSlug = identifier.catalogSlug;
             const packageSlug = identifier.packageSlug;
 
-            const package_ = await transaction
-                .getRepository(Package)
-                .createQueryBuilder(ALIAS)
-                .where({ catalogSlug, packageSlug })
-                .addRelations(ALIAS, [...relations])
-                .getOne();
-            if (!package_) {
+            const packageEntity = await findPackage(transaction, catalogSlug, packageSlug, false, relations);
+
+            if (!packageEntity) {
                 throw new Error(`Could not find Package  ${catalogSlug}/${packageSlug}`);
             }
 
-            setPackageDisabled(package_, transaction);
+            setPackageDisabled(packageEntity, transaction);
 
-            await transaction.save(package_);
+            await transaction.save(packageEntity);
 
-            return package_;
+            return packageEntity;
         });
 
         return package_;
@@ -398,6 +424,7 @@ export class PackageRepository {
                     queryLike: query + "%"
                 }
             )
+            .andWhere(`"Package"."isActive" = true`)
             .limit(limit)
             .offset(offSet)
             .addRelations(ALIAS, relations)

@@ -30,8 +30,8 @@ export class CollectionRepository extends Repository<Collection> {
     ): Promise<Collection> {
         const collectionIdDb = await this.findCollectionBySlugOrFail(collectionSlug, relations);
 
-        if (collection.collectionSlug) {
-            collectionIdDb.collectionSlug = collection.collectionSlug;
+        if (collection.newCollectionSlug) {
+            collectionIdDb.collectionSlug = collection.newCollectionSlug;
         }
 
         if (collection.name) {
@@ -57,7 +57,7 @@ export class CollectionRepository extends Repository<Collection> {
 
     public async findCollectionBySlugOrFail(collectionSlug: String, relations?: string[]): Promise<Collection> {
         const collection = await this.createQueryBuilder()
-            .where('"Collection"."slug" = :slug')
+            .where('"Collection"."slug" = :slug AND "Collection"."is_active" = true')
             .setParameter("slug", collectionSlug)
             .addRelations(CollectionRepository.COLLECTION_RELATION_ALIAS, relations)
             .getOne();
@@ -71,7 +71,7 @@ export class CollectionRepository extends Repository<Collection> {
 
     public async findCollectionBySlug(collectionSlug: String, relations?: string[]): Promise<Collection | undefined> {
         return await this.createQueryBuilder()
-            .where('"Collection"."slug" = :slug')
+            .where('"Collection"."slug" = :slug AND "Collection"."is_active" = true')
             .setParameter("slug", collectionSlug)
             .addRelations(CollectionRepository.COLLECTION_RELATION_ALIAS, relations)
             .getOne();

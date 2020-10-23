@@ -33,14 +33,18 @@ export class VersionRepository {
 
     async findLatestVersion({
         identifier,
+        includeActiveOnly,
         relations = []
     }: {
         identifier: PackageIdentifierInput;
+        includeActiveOnly: boolean;
         relations?: string[];
     }): Promise<Maybe<Version>> {
         const ALIAS = "findLatestVersion";
 
-        const packageRef = await this.manager.getCustomRepository(PackageRepository).findPackageOrFail({ identifier });
+        const packageRef = await this.manager
+            .getCustomRepository(PackageRepository)
+            .findPackageOrFail({ identifier, includeActiveOnly });
 
         return this.manager
             .getRepository(Version)
@@ -96,17 +100,17 @@ export class VersionRepository {
     }
 
     disableVersions(versions: Version[]): void {
+        if (versions.length == 0) return;
+
         this.manager.nestedTransaction(async (transaction) => {
-            for await (const p of versions) {
-                await transaction
-                    .createQueryBuilder()
-                    .update(Version)
-                    .set({
-                        isActive: false
-                    })
-                    .whereInIds(versions.map((v) => v.id))
-                    .execute();
-            }
+            await transaction
+                .createQueryBuilder()
+                .update(Version)
+                .set({
+                    isActive: false
+                })
+                .whereInIds(versions.map((v) => v.id))
+                .execute();
         });
     }
 }

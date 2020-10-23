@@ -9,7 +9,7 @@ import { APIKeyRepository } from "../repository/APIKeyRepository";
 import { APIKey } from "../entity/APIKey";
 import { hashPassword } from "./PasswordUtil";
 import atob from "atob";
-import { ApolloError, UserInputError } from "apollo-server";
+import { ApolloError, AuthenticationError, UserInputError } from "apollo-server";
 
 // get Me object based on express request
 // parses JWT from Authorization header
@@ -32,7 +32,7 @@ export async function getMeRequest(req: express.Request, manager: EntityManager)
                 .findOne({ where: { id: keyId, hash: hash }, relations: ["user"] });
 
             if (apiKeyRecord == null) {
-                throw new UserInputError("API_KEY_NOT_FOUND");
+                throw new AuthenticationError("API_KEY_NOT_FOUND");
             }
 
             const user = apiKeyRecord.user;

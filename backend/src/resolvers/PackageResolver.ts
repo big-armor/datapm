@@ -1,4 +1,4 @@
-import { ApolloError, UserInputError } from "apollo-server";
+import { ApolloError, ForbiddenError, UserInputError } from "apollo-server";
 import graphqlFields from "graphql-fields";
 import { AuthenticatedContext } from "../context";
 import { Catalog } from "../entity/Catalog";
@@ -77,6 +77,7 @@ export const findPackage = async (
 ) => {
     const packageEntity = await context.connection.getCustomRepository(PackageRepository).findPackage({
         identifier,
+        includeActiveOnly: true,
         relations: getGraphQlRelationName(info)
     });
 
@@ -140,7 +141,7 @@ export const updatePackage = async (
             });
 
         if (!hasPermission) {
-            throw new Error("You do not have Edit permission for this package");
+            throw new ForbiddenError("NOT_AUTHORIZED");
         }
     }
 
@@ -148,6 +149,7 @@ export const updatePackage = async (
         catalogSlug: identifier.catalogSlug,
         packageSlug: identifier.packageSlug,
         packageInput: value,
+        includeActiveOnly: true,
         relations: getGraphQlRelationName(info)
     });
 };
