@@ -2,9 +2,17 @@ import { Component, OnInit, Inject, ChangeDetectorRef, OnDestroy } from "@angula
 import { FormGroup, FormControl, AsyncValidatorFn, AbstractControl, ValidationErrors } from "@angular/forms";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Subject } from "rxjs";
-import { take, takeUntil } from "rxjs/operators";
-import { UpdateMeGQL, UsernameAvailableGQL, UpdateCatalogGQL, User } from "../../../generated/graphql";
+import { takeUntil } from "rxjs/operators";
+import {
+    UpdateMeGQL,
+    UsernameAvailableGQL,
+    UpdateCatalogGQL,
+    User,
+    SetMyAvatarImageGQL,
+    SetMyCoverImageGQL
+} from "../../../generated/graphql";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
+import { ImageUploadService } from "../../services/image-upload.service";
 
 function usernameValidator(
     usernameAvailableGQL: UsernameAvailableGQL,
@@ -190,10 +198,10 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
     }
 
     public openAvatarUploadDialog(): void {
-      this.imageUploadService.openImageUploadDialog(this.setMyAvatarImageGQL);
+        this.imageUploadService.openImageUploadDialog(this.setMyAvatarImageGQL);
     }
 
     public openCoverUploadDialog(): void {
-      this.imageUploadService.openImageUploadDialog(this.setMyCoverImageGQL);
+        this.imageUploadService.openImageUploadDialog(this.setMyCoverImageGQL);
     }
 }

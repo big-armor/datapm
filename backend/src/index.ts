@@ -19,7 +19,7 @@ import { superCreateConnection } from "./util/databaseCreation";
 import jwt from "express-jwt";
 import { getEnvVariable } from "./util/getEnvVariable";
 import fs from "fs";
-import {ImageStorageService} from "./storage/images/image-storage-service";
+import { ImageStorageService } from "./storage/images/image-storage-service";
 
 const nodeModulesDirectory = getEnvVariable("NODE_MODULES_DIRECTORY", "node_modules");
 const dataLibPackageFile = fs.readFileSync(nodeModulesDirectory + "/datapm-lib/package.json");
@@ -71,7 +71,7 @@ async function main() {
         playground: true,
         tracing: true,
         uploads: {
-            maxFileSize: 1_000_000, // 10 MB
+            maxFileSize: 10_000_000, // 10 MB
             maxFiles: 1
         },
         engine: {
@@ -206,11 +206,13 @@ async function main() {
     const imageService = new ImageStorageService();
     app.use("/images/:id", (req, res, next) => {
         const imageEntityAndStream = imageService.readImage(req.params.id, connection);
-        imageEntityAndStream.then((img) => {
-            res.set("Content-Type", img.entity.mimeType);
-            img.stream.on("error", (e) => next("Could not read image stream"));
-            img.stream.pipe(res);
-        }).catch((error) => next("Could not fetch image"));
+        imageEntityAndStream
+            .then((img) => {
+                res.set("Content-Type", img.entity.mimeType);
+                img.stream.on("error", (e) => next("Could not read image stream"));
+                img.stream.pipe(res);
+            })
+            .catch((error) => next("Could not fetch image"));
     });
 
     // any route not yet defined goes to index.html
@@ -219,7 +221,6 @@ async function main() {
         res.setHeader("x-datapm-graphql-path", "/grahql");
         res.sendFile(path.join(__dirname, "..", "static", "index.html"));
     });
-
 
     app.listen({ port }, () => {
         console.log(`🚀 Server ready at http://localhost:${port}`);

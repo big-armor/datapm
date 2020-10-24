@@ -1,14 +1,8 @@
-import {SchemaDirectiveVisitor, ValidationError} from "apollo-server";
-import {
-    GraphQLField,
-    defaultFieldResolver,
-    GraphQLArgument,
-    GraphQLObjectType,
-    GraphQLInterfaceType
-} from "graphql";
-import {Context} from "../context";
-import {FileUpload} from "graphql-upload";
-import {IMAGE_UPLOAD_ERROR_TYPE} from "../generated/graphql";
+import { SchemaDirectiveVisitor, ValidationError } from "apollo-server";
+import { GraphQLField, defaultFieldResolver, GraphQLArgument, GraphQLObjectType, GraphQLInterfaceType } from "graphql";
+import { Context } from "../context";
+import { FileUpload } from "graphql-upload";
+import { IMAGE_UPLOAD_ERROR_TYPE } from "../generated/graphql";
 
 export class ValidateImageUploadDirective extends SchemaDirectiveVisitor {
     visitArgumentDefinition(
@@ -18,7 +12,7 @@ export class ValidateImageUploadDirective extends SchemaDirectiveVisitor {
             objectType: GraphQLObjectType | GraphQLInterfaceType;
         }
     ): GraphQLArgument | void | null {
-        const {resolve = defaultFieldResolver} = details.field;
+        const { resolve = defaultFieldResolver } = details.field;
         const self = this;
         details.field.resolve = async function (source, args, context: Context, info) {
             const imageUpload: FileUpload | undefined = args.image || args.value?.image || undefined;
@@ -43,6 +37,7 @@ export class ValidateImageUploadDirective extends SchemaDirectiveVisitor {
             case "image/jpeg":
             case "image/jpg":
             case "image/bmp":
+            case "image/png":
                 return true;
             default:
                 return false;
