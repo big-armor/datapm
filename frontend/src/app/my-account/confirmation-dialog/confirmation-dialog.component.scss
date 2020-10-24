@@ -1,36 +1,36 @@
 .mat-dialog-content {
-  max-width: 500px;
-  height: 130px;
-  font-family: Roboto Mono;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 26px;
-  letter-spacing: -0.28px;
-  color: #333333;
+    max-width: 500px;
+    height: 130px;
+    font-family: Roboto Mono;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 26px;
+    letter-spacing: -0.28px;
+    color: #333333;
 }
 
 .mat-dialog-actions {
-  padding: 0px;
-  min-height: unset;
-  .save-btn {
-    position: relative;
-    top: 10px;
-    padding: 5px 20px;
-    box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
-      0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
-    border-radius: 24px;
-    span {
-      font-family: Roboto Mono;
-      font-style: normal;
-      font-weight: 300;
-      font-size: 18px;
-      line-height: 24px;
-      display: flex;
-      align-items: center;
-      text-align: center;
-      letter-spacing: -0.28px;
-      color: #828282;
+    padding: 0px;
+    min-height: unset;
+    .save-btn {
+        position: relative;
+        top: 10px;
+        padding: 5px 20px;
+        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
+            0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
+        border-radius: 24px;
+        span {
+            font-family: Roboto Mono;
+            font-style: normal;
+            font-weight: 300;
+            font-size: 18px;
+            line-height: 24px;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            letter-spacing: -0.28px;
+            color: #828282;
+        }
     }
-  }
 }

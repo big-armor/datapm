@@ -17,89 +17,89 @@ import { PackagesComponent } from "./my-account/packages/packages.component";
 import { ActivityComponent } from "./my-account/activity/activity.component";
 
 const staticRoutes: Route[] = [
-	{
-		path: "",
-		component: HomepageComponent,
-		children: [
-			{
-				path: "",
-				redirectTo: "latest",
-				pathMatch: "full"
-			},
-			// {
-			//   path:'trending',
-			//   component: TrendingComponent
-			// },
-			{
-				path: "latest",
-				component: LatestComponent
-			}
-			// {
-			//   path:'following',
-			//   component: FollowingComponent
-			// },
-		]
-	},
-	{
-		path: "search",
-		component: SearchComponent
-	},
-	{
-		path: "me",
-		component: MyAccountComponent,
-		canActivate: [AuthGuard],
-		children: [
-			{
-				path: "details",
-				redirectTo: "",
-				pathMatch: "full"
-			},
-			{
-				path: "",
-				component: DetailsComponent
-			},
-			{
-				path: "packages",
-				component: PackagesComponent
-			},
-			{
-				path: "activity",
-				component: ActivityComponent
-			}
-		]
-	},
-	{
-		path: ":catalogSlug",
-		component: CatalogDetailsComponent
-	},
-	{
-		path: ":catalogSlug/:packageSlug",
-		component: PackageComponent,
-		children: [
-			{
-				path: "package-details",
-				redirectTo: "",
-				component: PackageDetailComponent
-			},
-			{
-				path: "",
-				component: PackageDetailComponent
-			},
-			{
-				path: "version",
-				component: PackageVersionComponent
-			},
-			{
-				path: "schema",
-				component: PackageSchemaComponent
-			}
-		]
-	}
+    {
+        path: "",
+        component: HomepageComponent,
+        children: [
+            {
+                path: "",
+                redirectTo: "latest",
+                pathMatch: "full"
+            },
+            // {
+            //   path:'trending',
+            //   component: TrendingComponent
+            // },
+            {
+                path: "latest",
+                component: LatestComponent
+            }
+            // {
+            //   path:'following',
+            //   component: FollowingComponent
+            // },
+        ]
+    },
+    {
+        path: "search",
+        component: SearchComponent
+    },
+    {
+        path: "me",
+        component: MyAccountComponent,
+        canActivate: [AuthGuard],
+        children: [
+            {
+                path: "details",
+                redirectTo: "",
+                pathMatch: "full"
+            },
+            {
+                path: "",
+                component: DetailsComponent
+            },
+            {
+                path: "packages",
+                component: PackagesComponent
+            },
+            {
+                path: "activity",
+                component: ActivityComponent
+            }
+        ]
+    },
+    {
+        path: ":catalogSlug",
+        component: CatalogDetailsComponent
+    },
+    {
+        path: ":catalogSlug/:packageSlug",
+        component: PackageComponent,
+        children: [
+            {
+                path: "package-details",
+                redirectTo: "",
+                component: PackageDetailComponent
+            },
+            {
+                path: "",
+                component: PackageDetailComponent
+            },
+            {
+                path: "version",
+                component: PackageVersionComponent
+            },
+            {
+                path: "schema",
+                component: PackageSchemaComponent
+            }
+        ]
+    }
 ];
 
 @NgModule({
-	providers: [AuthGuard],
-	imports: [RouterModule.forRoot(staticRoutes)],
-	exports: [RouterModule]
+    providers: [AuthGuard],
+    imports: [RouterModule.forRoot(staticRoutes)],
+    exports: [RouterModule]
 })
 export class AppRoutingModule {}

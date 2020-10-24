@@ -13,7 +13,8 @@
 
     .mat-card {
         margin-left: 50px;
-        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+            0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
 
         .mat-card-image {
             width: 100%;
@@ -29,7 +30,7 @@
             font-size: 12px;
             line-height: 18px;
             letter-spacing: -0.28px;
-            color: #4F4F4F;
+            color: #4f4f4f;
             max-height: 55px;
             overflow: hidden;
         }
@@ -126,10 +127,10 @@
                 font-size: 13px;
                 line-height: 16px;
                 letter-spacing: -0.28px;
-                color: #4F4F4F;
+                color: #4f4f4f;
                 margin-top: 3px;
                 a {
-                    color: #4F4F4F;
+                    color: #4f4f4f;
                 }
             }
 
@@ -155,7 +156,8 @@
             width: 26px;
             height: 26px;
             background-color: #fff;
-            box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+            box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+                0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
 
             &:focus {
                 outline: #fff auto 0px !important;
@@ -200,7 +202,8 @@
             cursor: pointer;
             margin: 0px 6px 6px 6px;
             background-color: #fff;
-            box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25), inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
+            box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25),
+                inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
         }
     }
 
@@ -214,7 +217,8 @@
 
     .div-shadow {
         padding: 16px 16px 20px 16px;
-        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+            0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
 
         .topics-title {
             font-family: Roboto Mono;
@@ -223,7 +227,7 @@
             font-size: 20px;
             line-height: 26px;
             letter-spacing: -0.28px;
-            color: #4F4F4F;
+            color: #4f4f4f;
             margin-bottom: 20px;
         }
 
@@ -240,7 +244,8 @@
                 height: 1px;
                 width: 100%;
                 background: #fff !important;
-                box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+                box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+                    0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
                 border-radius: 24px;
                 font-family: Roboto Mono;
                 font-style: normal;
@@ -255,7 +260,8 @@
         .big-chip-btn {
             width: 100%;
             border-radius: 24px;
-            box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
+            box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
+                0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
             border: none;
             font-family: Roboto Mono;
             font-weight: 300;
@@ -272,7 +278,7 @@
     display: none !important;
 }
 
-@media (max-width:767px){
+@media (max-width: 767px) {
     .following-div {
         .flex-row {
             flex-direction: column !important;

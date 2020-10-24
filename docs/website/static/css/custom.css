@@ -31,7 +31,8 @@
         top: 115px;
     }
     .navigationSlider .slidingNav ul li {
-        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
+        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
+            0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
         border-radius: 24px;
     }
     .navigationSlider .slidingNav ul li a:hover,
@@ -44,7 +45,7 @@
         color: #828282;
     }
     .navigationSlider .slidingNav ul li a {
-        font-family: 'RobotoMonoLight';
+        font-family: "RobotoMonoLight";
         font-style: normal;
         font-weight: normal;
         font-size: 16px;
@@ -68,7 +69,7 @@
     .mainContainer .wrapper .post .postHeaderTitle {
         margin-top: 15px;
     }
-    .navigationSlider .slidingNav ul{
+    .navigationSlider .slidingNav ul {
         background-color: #828282;
     }
     .navigationSlider .slidingNav ul li > a:hover,
@@ -85,24 +86,25 @@
 }
 
 @font-face {
-    font-family: 'RobotoMonoMedium';
-    src: url('../font/static/RobotoMono-Medium.ttf');
+    font-family: "RobotoMonoMedium";
+    src: url("../font/static/RobotoMono-Medium.ttf");
 }
 
 @font-face {
-    font-family: 'RobotoMonoLight';
-    src: url('../font/static/RobotoMono-Light.ttf');
+    font-family: "RobotoMonoLight";
+    src: url("../font/static/RobotoMono-Light.ttf");
 }
 
 .button {
-    box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
+    box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
+        0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
     padding: 7px 25px;
     border-radius: 24px;
     border: none;
 }
 
 .button span {
-    font-family: 'RobotoMonoLight';
+    font-family: "RobotoMonoLight";
     font-style: normal;
     font-weight: normal;
     font-size: 16px;
@@ -124,67 +126,85 @@
 h2 {
     font-size: 22px;
     font-weight: 300;
-    font-family: 'RobotoMonoMedium';
+    font-family: "RobotoMonoMedium";
 }
 
 h3 {
     font-size: 20px;
     font-weight: 300;
-    font-family: 'RobotoMonoMedium';
+    font-family: "RobotoMonoMedium";
 }
 
 h4 {
     font-size: 16px;
     font-weight: 300;
-    font-family: 'RobotoMonoMedium';
+    font-family: "RobotoMonoMedium";
 }
 
 p {
     font-size: 14px;
-    font-family: 'RobotoMonoLight';
+    font-family: "RobotoMonoLight";
 }
 
 a {
-    color: #017FB9;
+    color: #017fb9;
     font-size: 14px;
-    font-family: 'RobotoMonoMedium';
+    font-family: "RobotoMonoMedium";
 }
 
 ul li {
     font-size: 14px;
-    font-family: 'RobotoMonoLight';
+    font-family: "RobotoMonoLight";
 }
 
 ol li {
     font-size: 14px;
-    font-family: 'RobotoMonoLight';
+    font-family: "RobotoMonoLight";
 }
 
 a:hover {
-    color: #017FB9;
+    color: #017fb9;
     text-decoration: underline;
 }
 
 table th {
     font-size: 14px;
-    font-family: 'RobotoMonoMedium';
+    font-family: "RobotoMonoMedium";
 }
 
 table td {
     font-size: 14px;
-    font-family: 'RobotoMonoLight';
+    font-family: "RobotoMonoLight";
 }
 
 .function-name-prevnext {
     width: unset;
 }
 
-.hljs-keyword, .hljs-attribute, .hljs-selector-tag, .hljs-meta-keyword, .hljs-doctag, .hljs-name {
+.hljs-keyword,
+.hljs-attribute,
+.hljs-selector-tag,
+.hljs-meta-keyword,
+.hljs-doctag,
+.hljs-name {
     font-weight: 300;
 }
 
-.hljs-type, .hljs-string, .hljs-number, .hljs-selector-id, .hljs-selector-class, .hljs-quote, .hljs-template-tag, .hljs-deletion,
-.hljs-regexp, .hljs-symbol, .hljs-variable, .hljs-template-variable, .hljs-link, .hljs-selector-attr, .hljs-selector-pseudo {
+.hljs-type,
+.hljs-string,
+.hljs-number,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-quote,
+.hljs-template-tag,
+.hljs-deletion,
+.hljs-regexp,
+.hljs-symbol,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-link,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
     color: #e23326d4;
 }
 
@@ -202,10 +222,10 @@ table td {
 }
 
 .footer-title {
-    font-family: 'RobotoMonoLight';
+    font-family: "RobotoMonoLight";
     font-style: normal;
     font-weight: 400;
-    letter-spacing: -.28px;
+    letter-spacing: -0.28px;
     font-size: 14px;
     line-height: 18px;
     color: #4f4f4f;
@@ -213,16 +233,16 @@ table td {
 }
 
 .footer-subtitle {
-    font-family: 'RobotoMonoLight';
+    font-family: "RobotoMonoLight";
     font-style: normal;
     font-weight: 400;
-    letter-spacing: -.28px;
+    letter-spacing: -0.28px;
     font-size: 10px;
     line-height: 13px;
 }
 
 .nav-footer {
-    background: hsla(0,0%,94.9%,.28);
+    background: hsla(0, 0%, 94.9%, 0.28);
     padding: 25px 25px;
     width: 100%;
 }
@@ -231,38 +251,40 @@ table td {
     font-size: 14px;
     line-height: 18px;
     color: #4f4f4f;
-    font-family: 'RobotoMonoLight';
+    font-family: "RobotoMonoLight";
     font-style: normal;
-    letter-spacing: -.28px;
+    letter-spacing: -0.28px;
 }
 
 .hljs {
     background: #f0f0f08a;
 }
 
-.toc .toggleNav ul li a, .onPageNav a {
+.toc .toggleNav ul li a,
+.onPageNav a {
     font-size: 12px;
     color: #828282;
-    font-family: 'RobotoMonoLight';
+    font-family: "RobotoMonoLight";
 }
 
 .toc .toggleNav ul li a:hover,
-.onPageNav a:hover  {
-    color: #017FB9;
+.onPageNav a:hover {
+    color: #017fb9;
     text-decoration: none;
 }
 
 .toc .toggleNav ul li.navListItemActive a,
-.onPageNav .toc-headings > li > a.active, .onPageNav .toc-headings > li > a.hover {
-    color: #017FB9;
-    font-family: 'RobotoMonoMedium';
+.onPageNav .toc-headings > li > a.active,
+.onPageNav .toc-headings > li > a.hover {
+    color: #017fb9;
+    font-family: "RobotoMonoMedium";
 }
 
 .toc .toggleNav .navGroup .navGroupCategoryTitle {
-    font-family: 'RobotoMonoMedium';
+    font-family: "RobotoMonoMedium";
     font-style: normal;
     font-weight: 300;
-    letter-spacing: -.28px;
+    letter-spacing: -0.28px;
     color: #333;
 }
 
@@ -270,16 +292,17 @@ table td {
     padding: 20px 0px;
     background: #fff;
     color: #fff;
-    box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+    box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+        0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
 }
 
 .fixedHeaderContainer header .headerTitle {
-    font-family: 'RobotoMonoLight';
+    font-family: "RobotoMonoLight";
     font-style: normal;
     font-weight: 300;
     font-size: 32px;
     line-height: 42px;
-    letter-spacing: -.28px;
+    letter-spacing: -0.28px;
     color: #333;
 }
 
@@ -288,12 +311,12 @@ table td {
 }
 
 .mainContainer .wrapper .post .postHeaderTitle {
-    font-family: 'RobotoMonoMedium';
+    font-family: "RobotoMonoMedium";
     font-style: normal;
     font-weight: 300;
     line-height: 42px;
     font-size: 30px;
-    letter-spacing: -.28px;
+    letter-spacing: -0.28px;
     color: #333;
 }
 

@@ -12,7 +12,8 @@
     margin-bottom: 50px;
 
     .example-card {
-        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+            0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
         border-radius: 4px;
         height: 530px;
 
@@ -86,7 +87,7 @@
             font-size: 14px;
             line-height: 18px;
             letter-spacing: -0.28px;
-            color: #4F4F4F;
+            color: #4f4f4f;
             margin-top: 20px;
         }
 
@@ -110,7 +111,8 @@
         width: 32px;
         height: 32px;
         background-color: #fff;
-        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+            0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
 
         &:focus {
             outline: #fff auto 0px !important;
@@ -141,7 +143,8 @@
 
 .big-div-package {
     .mat-card {
-        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+            0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
 
         .mat-card-image {
             width: 100%;
@@ -157,7 +160,7 @@
             font-size: 14px;
             line-height: 18px;
             letter-spacing: -0.28px;
-            color: #4F4F4F;
+            color: #4f4f4f;
         }
 
         ::ng-deep.card-header-mat {
@@ -188,7 +191,8 @@
         cursor: pointer;
         margin: 0px 8px;
         background-color: #fff;
-        box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25), inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
+        box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25),
+            inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
     }
 }
 
@@ -200,7 +204,7 @@
     }
 }
 
-@media (max-width:767px){
+@media (max-width: 767px) {
     .div-collect {
         margin-bottom: 0px;
         .card-collections {

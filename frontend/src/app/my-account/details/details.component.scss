@@ -74,7 +74,9 @@
         }
     }
 
-    th, td, p {
+    th,
+    td,
+    p {
         font-family: Roboto Mono;
         font-style: normal;
         font-weight: normal;
@@ -82,7 +84,8 @@
         letter-spacing: -0.28px;
     }
 
-    td, p {
+    td,
+    p {
         font-size: 12px;
         color: #333333;
     }
@@ -121,7 +124,7 @@
                 font-size: 14px;
                 line-height: 18px;
                 letter-spacing: -0.28px;
-                color: #4F4F4F;
+                color: #4f4f4f;
                 margin-top: 20px;
             }
 
@@ -145,7 +148,8 @@
             width: 32px;
             height: 32px;
             background-color: #fff;
-            box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+            box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+                0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
 
             &:focus {
                 outline: #fff auto 0px !important;
@@ -181,7 +185,7 @@
         font-size: 12px;
         line-height: 13px;
         letter-spacing: -0.28px;
-        color: #017FB9;
+        color: #017fb9;
         border: 1px solid #ddd;
         padding: 3px 15px;
         border-radius: 4px;
@@ -193,7 +197,8 @@
         }
     }
     .mat-card {
-        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+            0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
 
         .mat-card-title {
             font-family: Roboto Mono;
@@ -220,7 +225,7 @@
             font-size: 14px;
             line-height: 18px;
             letter-spacing: -0.28px;
-            color: #4F4F4F;
+            color: #4f4f4f;
             max-height: 111px;
             overflow: hidden;
             padding: 8px;
@@ -253,7 +258,8 @@
             cursor: pointer;
             margin: 0px 8px;
             background-color: #fff;
-            box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25), inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
+            box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25),
+                inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
         }
     }
 
@@ -267,7 +273,8 @@
 
     .panel-div {
         width: 100%;
-        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+            0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
         table {
             width: 100%;
         }
@@ -281,7 +288,7 @@
             input {
                 height: 35px;
                 // border: none !important;
-                border: .5px solid rgb(235, 235, 235);
+                border: 0.5px solid rgb(235, 235, 235);
                 font-family: Roboto Mono;
                 font-style: normal;
                 font-weight: normal;
@@ -290,7 +297,7 @@
                 display: flex;
                 align-items: flex-end;
                 letter-spacing: -0.28px;
-                color: #017FB9;
+                color: #017fb9;
 
                 &:focus {
                     outline: transparent solid 0px;
@@ -312,7 +319,8 @@
         }
         .save-btn {
             padding: 5px 20px;
-            box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
+            box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
+                0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
             border-radius: 24px;
             span {
                 font-family: Roboto Mono;
@@ -331,7 +339,8 @@
 }
 
 @media (max-width: 767px) {
-	.package-div, .panel-div {
+    .package-div,
+    .panel-div {
         margin-bottom: 0px !important;
         .table-content {
             padding-right: 24px;
@@ -367,7 +376,7 @@
                 div {
                     width: 100%;
                     margin-top: 5px;
-                    a { 
+                    a {
                         margin: 0;
                     }
                 }
@@ -381,5 +390,5 @@
                 }
             }
         }
-    }    
+    }
 }

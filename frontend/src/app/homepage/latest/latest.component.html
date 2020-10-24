@@ -1,40 +1,53 @@
 <div class="container">
     <div class="row">
         <div class="col-lg-9 col-md-12 col-sm-12 mt-5 py-2">
-
-          <div class="row big-div-latest mb-3">
-            <div class="col-md-12 col-lg-12">
-              <h1 class="h1-title">Recent activity</h1>
-            </div>
-
-            <!-- Package without thumbnail -->
-            <div class="col-md-12 col-lg-12 pb-2 latest-div" *ngFor="let packageWithModifiedDate of packagesWithModifiedDate">
-              <mat-card class="example-card">
-                <div class="d-flex bd-highlight up-header mt-1">
-                  <div class="bd-highlight">
-                    <mat-card-header class="card-header-mat">
-                        <div mat-card-avatar class="example-header-image">
-                          <!-- TODO: Store user profile image somewhere -->
-                          <img src='../../../assets/images/user-female.png' alt="User image card" class="person-card-photo">
-                          <!-- TODO: Validate that every package should be a published latest version -->
-                          <span class="person-card-name">{{packageWithModifiedDate.package.latestVersion?.author?.username}}</span>
-                        </div>
-                      </mat-card-header>
-                  </div>
-                  <div class="ml-auto bd-highlight">{{packageWithModifiedDate.lastActivityLabel}} <br> 2 downloaded</div>
+            <div class="row big-div-latest mb-3">
+                <div class="col-md-12 col-lg-12">
+                    <h1 class="h1-title">Recent activity</h1>
                 </div>
 
-                <mat-card-content>
-                  <div class="d-flex flex-row bd-highlight content-text">
-                    <div class="bd-highlight" style="width: 100%;">
-                      <div class="content-title mb-2">{{packageWithModifiedDate.package.displayName}}</div>
-                      <div class="content-description package-height">
-                        {{packageWithModifiedDate.package.description}}
-                      </div>
-                    </div>
-                  </div>
+                <!-- Package without thumbnail -->
+                <div
+                    class="col-md-12 col-lg-12 pb-2 latest-div"
+                    *ngFor="let packageWithModifiedDate of packagesWithModifiedDate"
+                >
+                    <mat-card class="example-card">
+                        <div class="d-flex bd-highlight up-header mt-1">
+                            <div class="bd-highlight">
+                                <mat-card-header class="card-header-mat">
+                                    <div mat-card-avatar class="example-header-image">
+                                        <!-- TODO: Store user profile image somewhere -->
+                                        <img
+                                            src="../../../assets/images/user-female.png"
+                                            alt="User image card"
+                                            class="person-card-photo"
+                                        />
+                                        <!-- TODO: Validate that every package should be a published latest version -->
+                                        <span class="person-card-name">{{
+                                            packageWithModifiedDate.package.latestVersion?.author?.username
+                                        }}</span>
+                                    </div>
+                                </mat-card-header>
+                            </div>
+                            <div class="ml-auto bd-highlight">
+                                {{ packageWithModifiedDate.lastActivityLabel }} <br />
+                                2 downloaded
+                            </div>
+                        </div>
 
-                  <!-- <div class="content-actions">
+                        <mat-card-content>
+                            <div class="d-flex flex-row bd-highlight content-text">
+                                <div class="bd-highlight" style="width: 100%">
+                                    <div class="content-title mb-2">
+                                        {{ packageWithModifiedDate.package.displayName }}
+                                    </div>
+                                    <div class="content-description package-height">
+                                        {{ packageWithModifiedDate.package.description }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- <div class="content-actions">
                     <div class="latest-chips">
                       <mat-chip-list aria-label="Fish selection">
                         <mat-chip>weather</mat-chip>
@@ -61,12 +74,12 @@
                       </div>
                     </div>
                   </div> -->
-                </mat-card-content>
-              </mat-card>
-            </div>
+                        </mat-card-content>
+                    </mat-card>
+                </div>
 
-            <!-- Package with thumbnail -->
-            <!-- <div class="col-md-12 col-lg-12 pb-2 latest-div">
+                <!-- Package with thumbnail -->
+                <!-- <div class="col-md-12 col-lg-12 pb-2 latest-div">
                 <mat-card class="example-card">
                   <div class="d-flex bd-highlight up-header mt-1">
                     <div class="bd-highlight">
@@ -131,8 +144,8 @@
                 </mat-card>
             </div> -->
 
-            <!-- Collection without thumbnail -->
-            <!-- <div class="col-md-12 col-lg-12 pb-2 latest-div">
+                <!-- Collection without thumbnail -->
+                <!-- <div class="col-md-12 col-lg-12 pb-2 latest-div">
               <mat-card class="example-card">
                 <div class="d-flex bd-highlight up-header mt-1">
                   <div class="bd-highlight">
@@ -186,8 +199,8 @@
               </mat-card>
             </div> -->
 
-            <!-- Collection with thumbnail -->
-            <!-- <div class="col-md-12 col-lg-12 pb-2 latest-div">
+                <!-- Collection with thumbnail -->
+                <!-- <div class="col-md-12 col-lg-12 pb-2 latest-div">
               <mat-card class="example-card">
                 <div class="d-flex bd-highlight up-header mt-1">
                   <div class="bd-highlight">
@@ -243,7 +256,7 @@
                 </mat-card-content>
               </mat-card>
             </div> -->
-          </div>
+            </div>
         </div>
     </div>
-  </div>
+</div>

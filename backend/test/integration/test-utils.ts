@@ -60,33 +60,37 @@ export async function createUser(
 
                 let token = result.data!.createMe;
 
-                let client = new ApolloClient({
-                    cache: new InMemoryCache(),
-                    defaultOptions: {
-                        query: {
-                            errorPolicy: "all",
-                            fetchPolicy: "no-cache"
-                        },
-                        mutate: {
-                            errorPolicy: "all",
-                            fetchPolicy: "no-cache"
-                        },
-                        watchQuery: {
-                            errorPolicy: "all",
-                            fetchPolicy: "no-cache"
-                        }
-                    },
-                    link: new HttpLink({
-                        uri: "http://localhost:4000/graphql",
-                        headers: {
-                            Accept: "charset=utf-8",
-                            Authorization: "Bearer " + token
-                        },
-                        fetch
-                    })
-                });
+                let client = createTestClient({ Authorization: "Bearer " + token });
 
                 resolve(client);
             });
+    });
+}
+
+export function createTestClient(headers: any) {
+    return new ApolloClient({
+        cache: new InMemoryCache(),
+        defaultOptions: {
+            query: {
+                errorPolicy: "all",
+                fetchPolicy: "no-cache"
+            },
+            mutate: {
+                errorPolicy: "all",
+                fetchPolicy: "no-cache"
+            },
+            watchQuery: {
+                errorPolicy: "all",
+                fetchPolicy: "no-cache"
+            }
+        },
+        link: new HttpLink({
+            uri: "http://localhost:4000/graphql",
+            headers: {
+                ...headers,
+                Accept: "charset=utf-8"
+            },
+            fetch
+        })
     });
 }

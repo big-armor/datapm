@@ -1,30 +1,30 @@
 version: "3.7"
 
 volumes:
-  postgres_data_local: {}
+    postgres_data_local: {}
 
 services:
-  datapm-registry:
-    build:
-      context: ../
-      dockerfile: docker/Dockerfile
-    ports:
-      - "4000:4000"
-    env_file: 
-      - Docker-env
-  postgres:
-    image: postgres:11
-    volumes:
-      - type: volume
-        source: postgres_data_local
-        target: /var/lib/postgresql/data
-        consistency: delegated
-      - ./init-database.sh:/docker-entrypoint-initdb.d/init-database.sh
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB=datapm
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+    datapm-registry:
+        build:
+            context: ../
+            dockerfile: docker/Dockerfile
+        ports:
+            - "4000:4000"
+        env_file:
+            - Docker-env
+    postgres:
+        image: postgres:11
+        volumes:
+            - type: volume
+              source: postgres_data_local
+              target: /var/lib/postgresql/data
+              consistency: delegated
+            - ./init-database.sh:/docker-entrypoint-initdb.d/init-database.sh
+        ports:
+            - "5432:5432"
+        environment:
+            - POSTGRES_HOST=postgres
+            - POSTGRES_PORT=5432
+            - POSTGRES_DB=datapm
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres

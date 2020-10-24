@@ -1,21 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from "@angular/core";
 
 @Component({
-  selector: 'trending',
-  templateUrl: './trending.component.html',
-  styleUrls: ['./trending.component.scss']
+    selector: "trending",
+    templateUrl: "./trending.component.html",
+    styleUrls: ["./trending.component.scss"]
 })
 export class TrendingComponent implements OnInit {
+    public isFavorite = false;
 
-  public isFavorite = false;
+    constructor() {}
 
-  constructor() { }
+    ngOnInit(): void {}
 
-  ngOnInit(): void {
-  }
-
-  public makeFavorite(): void {
-    this.isFavorite = !this.isFavorite;
-  }
-
+    public makeFavorite(): void {
+        this.isFavorite = !this.isFavorite;
+    }
 }

@@ -1,13 +1,13 @@
 mutation UpdateCatalog($identifier: CatalogIdentifierInput!, $value: UpdateCatalogInput!) {
-  updateCatalog(identifier: $identifier, value: $value) {
-    identifier {
-      registryHostname
-      registryPort
-      catalogSlug
+    updateCatalog(identifier: $identifier, value: $value) {
+        identifier {
+            registryHostname
+            registryPort
+            catalogSlug
+        }
+        displayName
+        description
+        website
+        isPublic
     }
-    displayName
-    description
-    website
-    isPublic
-  }
 }

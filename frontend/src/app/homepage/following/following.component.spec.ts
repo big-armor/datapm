@@ -5,23 +5,23 @@ import { FollowingComponent } from "./following.component";
 import { MaterialModule } from "../../material.module";
 
 describe("FollowingComponent", () => {
-	let component: FollowingComponent;
-	let fixture: ComponentFixture<FollowingComponent>;
+    let component: FollowingComponent;
+    let fixture: ComponentFixture<FollowingComponent>;
 
-	beforeEach(async(() => {
-		TestBed.configureTestingModule({
-			declarations: [FollowingComponent],
-			imports: [MaterialModule]
-		}).compileComponents();
-	}));
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            declarations: [FollowingComponent],
+            imports: [MaterialModule]
+        }).compileComponents();
+    }));
 
-	beforeEach(() => {
-		fixture = TestBed.createComponent(FollowingComponent);
-		component = fixture.componentInstance;
-		fixture.detectChanges();
-	});
+    beforeEach(() => {
+        fixture = TestBed.createComponent(FollowingComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-	it("should create", () => {
-		expect(component).toBeTruthy();
-	});
+    it("should create", () => {
+        expect(component).toBeTruthy();
+    });
 });

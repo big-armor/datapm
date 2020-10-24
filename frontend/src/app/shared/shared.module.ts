@@ -9,9 +9,9 @@ import { TimeAgoPipe } from "./pipes/time-ago.pipe";
 import { ImageUploadModalComponent } from './image-upload-modal/image-upload-modal.component';
 
 @NgModule({
-	declarations: [HeaderComponent, FooterComponent, TimeAgoPipe, ImageUploadModalComponent],
-	imports: [CommonModule, MaterialModule, BrowserModule, FormsModule, ReactiveFormsModule],
-	exports: [HeaderComponent, FooterComponent, TimeAgoPipe],
-	providers: [TimeAgoPipe]
+    declarations: [HeaderComponent, FooterComponent, TimeAgoPipe, ImageUploadModalComponent],
+    imports: [CommonModule, MaterialModule, BrowserModule, FormsModule, ReactiveFormsModule],
+    exports: [HeaderComponent, FooterComponent, TimeAgoPipe],
+    providers: [TimeAgoPipe]
 })
 export class SharedModule {}

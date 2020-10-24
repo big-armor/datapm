@@ -4,7 +4,7 @@ title: Quick Start Guide
 sidebar_label: Quick Start
 ---
 
-DataPM helps you quickly publish and consume data. Let's start with some concepts. 
+DataPM helps you quickly publish and consume data. Let's start with some concepts.
 
 ## Quick Concepts
 
@@ -24,19 +24,19 @@ npm install -g datapm-client
 
 ## Search, Consume, and Publish Data Packages
 
-You can search the public [datapm.io](https://datapm.io) registry using a modern web browser. Or use the following command to search via the command line client. 
+You can search the public [datapm.io](https://datapm.io) registry using a modern web browser. Or use the following command to search via the command line client.
 
 ```text
 datapm search "example search"
 ```
 
-Then fetch a specific data package. 
+Then fetch a specific data package.
 
 ```text
 datapm fetch datapm/example
 ```
 
-Generate your own packages from a publicly available data set. 
+Generate your own packages from a publicly available data set.
 
 ```text
 datapm generate-package https://some-web-server.com/path/to/data.csv
@@ -44,7 +44,7 @@ datapm generate-package https://some-web-server.com/path/to/data.csv
 datapm publish my-package-file.datapm.json
 ```
 
-You can update the schema and statistics in the package file using the following command. 
+You can update the schema and statistics in the package file using the following command.
 
 ```text
 datapm update my-package-file.datapm.json
@@ -52,7 +52,7 @@ datapm update my-package-file.datapm.json
 datapm publish my-package-file.datapm.json
 ```
 
-And then you can re-publish the updates using the same publish command above. 
+And then you can re-publish the updates using the same publish command above.
 
 [View full command line documentation](command-line-client.md)
 

@@ -6,23 +6,23 @@ import { MaterialModule } from "src/app/material.module";
 import { LoginDialogComponent } from "./login-dialog.component";
 
 describe("LoginDialogComponent", () => {
-	let component: LoginDialogComponent;
-	let fixture: ComponentFixture<LoginDialogComponent>;
+    let component: LoginDialogComponent;
+    let fixture: ComponentFixture<LoginDialogComponent>;
 
-	beforeEach(async(() => {
-		TestBed.configureTestingModule({
-			declarations: [LoginDialogComponent],
-			imports: [MaterialModule, FormsModule, ReactiveFormsModule, RouterTestingModule]
-		}).compileComponents();
-	}));
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            declarations: [LoginDialogComponent],
+            imports: [MaterialModule, FormsModule, ReactiveFormsModule, RouterTestingModule]
+        }).compileComponents();
+    }));
 
-	beforeEach(() => {
-		fixture = TestBed.createComponent(LoginDialogComponent);
-		component = fixture.componentInstance;
-		fixture.detectChanges();
-	});
+    beforeEach(() => {
+        fixture = TestBed.createComponent(LoginDialogComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-	it("should create", () => {
-		expect(component).toBeTruthy();
-	});
+    it("should create", () => {
+        expect(component).toBeTruthy();
+    });
 });

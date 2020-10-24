@@ -1,26 +1,26 @@
-query Package($identifier:PackageIdentifierInput!) {
-  package(identifier:$identifier) {
-    creator {
-      firstName
-      lastName
-      emailAddress
+query Package($identifier: PackageIdentifierInput!) {
+    package(identifier: $identifier) {
+        creator {
+            firstName
+            lastName
+            emailAddress
+        }
+        identifier {
+            catalogSlug
+            packageSlug
+        }
+        catalog {
+            displayName
+        }
+        displayName
+        description
+        latestVersion {
+            identifier {
+                versionMajor
+                versionMinor
+                versionPatch
+            }
+            packageFile
+        }
     }
-    identifier {
-      catalogSlug
-      packageSlug
-    }
-    catalog {
-      displayName
-    }
-    displayName
-    description
-    latestVersion {
-      identifier{
-        versionMajor
-        versionMinor
-        versionPatch
-      }
-      packageFile
-    }
-  }
 }
