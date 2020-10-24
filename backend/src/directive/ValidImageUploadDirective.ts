@@ -7,8 +7,8 @@ import {
     GraphQLInterfaceType
 } from "graphql";
 import {Context} from "../context";
-import {IMAGE_UPLOAD_ERROR_TYPE} from "../generated/graphql";
 import {FileUpload} from "graphql-upload";
+import {IMAGE_UPLOAD_ERROR_TYPE} from "../generated/graphql";
 
 export class ValidateImageUploadDirective extends SchemaDirectiveVisitor {
     visitArgumentDefinition(

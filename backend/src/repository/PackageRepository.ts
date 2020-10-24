@@ -195,12 +195,12 @@ export class PackageRepository {
 
     async findPackageOrFail({
         identifier,
-        includeActiveOnly,
+        includeActiveOnly = false,
         relations = []
     }: {
         identifier: PackageIdentifierInput;
+        includeActiveOnly?: boolean;
         relations?: string[];
-        includeActiveOnly: boolean;
     }): Promise<Package> {
         const packageEntity = await this.findPackage({ identifier, includeActiveOnly, relations });
 
