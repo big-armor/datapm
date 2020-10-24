@@ -37,14 +37,15 @@ export class GoogleCloudStorage implements DPMStorage {
         this.ensureConnectionEstablished();
         const file = this.getBucketFile(namespace, itemId);
         const fileReadStream = file.createReadStream();
-        return this.streamHelper.resolveReadStream(fileReadStream);
+        this.streamHelper.registerReadStream(fileReadStream);
+        return Promise.resolve(fileReadStream);
     }
 
-    public writeItem(namespace: string, itemId: string, byteStream: Stream): Promise<void> {
+    public writeItem(namespace: string, itemId: string, byteStream: Stream, transformer?: any): Promise<void> {
         this.ensureConnectionEstablished();
         const file = this.getBucketFile(namespace, itemId);
         const writeStream = file.createWriteStream();
-        return this.streamHelper.copyToStream(byteStream, writeStream);
+        return this.streamHelper.copyToStream(byteStream, writeStream, transformer);
     }
 
     public stop(): boolean {

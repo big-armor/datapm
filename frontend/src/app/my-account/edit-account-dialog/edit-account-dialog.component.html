@@ -1,12 +1,12 @@
 <form id="editAccount">
   <div mat-dialog-content>
-    <div class="big-img-dialog text-center">
+    <div class="big-img-dialog text-center" (click)="openCoverUploadDialog()">
       <button class="add-img-btn">
         <span class="material-icons"> add_a_photo </span>
       </button>
     </div>
 
-    <div class="dialog-content-text">
+    <div class="dialog-content-text" (click)="openAvatarUploadDialog()">
       <div class="img-wrapper">
         <div class="profile-img">
           <button class="add-img-btn">

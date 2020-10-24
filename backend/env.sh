@@ -1,9 +1,12 @@
 export JWT_AUDIENCE="localhost"
 export JWT_ISSUER="localhost"
 export JWT_KEY="!!!!REPLACE_ME!!!"
+#export STORAGE_URL="file:///Users/ermal/Documents/Projects/python-tests"
+export STORAGE_URL="gs://datapm-test-bucket/testing"
 export NODE_MODULES_DIRECTORY="node_modules"
 export APOLLO_KEY="service:family-connections:asdfasdfasdfasdf"
 export APOLLO_GRAPH_VARIANT="dev"
+export GOOGLE_APPLICATION_CREDENTIALS=/Users/ermal/Documents/Projects/datapm-registry/gc.json
 export GCLOUD_STORAGE_BUCKET_NAME="media"
 export GOOGLE_CLOUD_PROJECT="adsfasdf"
 export FILESYSTEM_STORAGE_DIRECTORY="local_storage"

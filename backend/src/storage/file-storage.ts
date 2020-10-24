@@ -3,6 +3,7 @@ import * as Stream from "stream";
 import * as fs from "fs";
 import crypto from "crypto";
 import { DpmStorageStreamHolder } from "./dpm-storage-stream-holder";
+import sharp from "sharp";
 
 export class FileStorage implements DPMStorage {
     public static readonly SCHEMA_URL_PREFIX = "file";
@@ -24,15 +25,17 @@ export class FileStorage implements DPMStorage {
     public getItem(namespace: string, itemId: string): Promise<Stream> {
         const path = this.buildPath(namespace, itemId);
         const readStream = fs.createReadStream(path);
-        return this.streamHelper.resolveReadStream(readStream);
+
+        this.streamHelper.registerReadStream(readStream);
+        return Promise.resolve(readStream);
     }
 
-    public writeItem(namespace: string, itemId: string, byteStream: Stream): Promise<void> {
+    public writeItem(namespace: string, itemId: string, byteStream: Stream, transformer?: any): Promise<void> {
         const hash = this.hashItemId(itemId);
         this.createItemDirectoryIfMissing(namespace, hash);
         const path = this.buildPathWithHash(namespace, hash, itemId);
         const writeStream = fs.createWriteStream(path);
-        return this.streamHelper.copyToStream(byteStream, writeStream);
+        return this.streamHelper.copyToStream(byteStream, writeStream, transformer);
     }
 
     public stop(): boolean {
@@ -52,7 +55,7 @@ export class FileStorage implements DPMStorage {
     private createItemDirectoryIfMissing(namespace: string, hash: string): void {
         const path = `${this.SCHEMA_URL}/${namespace}/${hash}`;
         if (!fs.existsSync(path)) {
-            fs.mkdirSync(path);
+            fs.mkdirSync(path, {recursive: true});
         }
     }
 

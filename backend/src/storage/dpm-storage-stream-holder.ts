@@ -4,19 +4,12 @@ export class DpmStorageStreamHolder {
     private readonly OPEN_READ_STREAMS: Readable[] = [];
     private readonly OPEN_WRITE_STREAMS: Writable[] = [];
 
-    public resolveReadStream(stream: Readable): Promise<Stream> {
-        this.registerReadStream(stream);
-        return Promise.resolve(stream);
-    }
-
-    public copyToStream(dataStream: Stream, targetStream: Writable): Promise<void> {
+    public copyToStream(dataStream: Stream, targetStream: Writable, transformer?: any): Promise<void> {
         this.registerWriteStream(targetStream);
+        this.addPipesToDataStream(dataStream, targetStream, transformer);
+
         return new Promise<void>((resolve, reject) => {
-            dataStream.on("data", (data) => targetStream.write(data));
-            dataStream.on("end", () => {
-                targetStream.end();
-                resolve();
-            });
+            dataStream.on("end", () => resolve());
             dataStream.on("error", (error) => {
                 targetStream.destroy();
                 reject(error);
@@ -40,7 +33,15 @@ export class DpmStorageStreamHolder {
         }
     }
 
-    private registerReadStream(stream: Readable): void {
+    private addPipesToDataStream(dataStream: Stream, targetStream: Writable, transformer: any): void {
+        if (transformer) {
+            dataStream.pipe(transformer).pipe(targetStream);
+        } else {
+            dataStream.pipe(targetStream);
+        }
+    }
+
+    public registerReadStream(stream: Readable): void {
         this.registerStream(stream, this.OPEN_READ_STREAMS);
     }
 
