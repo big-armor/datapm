@@ -17,6 +17,10 @@ jobs:
             - name: Print node verion
               run: node --version
 
+            - name: Authorize Docker
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: docker login --username travisbigarmor --password $${{secrets.DOCKER_PASSWORD}}
+
             - name: Install Docker Build Dependencies
               run: npm install gulp
 
@@ -43,10 +47,6 @@ jobs:
             - name: Authorize Docker for GCR
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: gcloud auth configure-docker --quiet
-
-            - name: Authorize Docker
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-              run: docker login --username travisbigarmor --password $${{secrets.DOCKER_PASSWORD}}
 
             - name: Deploy Assets
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
