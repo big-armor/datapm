@@ -40,9 +40,13 @@ jobs:
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: gcloud auth activate-service-account deployment@datapm-test-terraform.iam.gserviceaccount.com --key-file=gcloud.key
 
-            - name: Authorize Docker
+            - name: Authorize Docker for GCR
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: gcloud auth configure-docker --quiet
+
+            - name: Authorize Docker
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: docker login --username travisbigarmor --password $${{secrets.DOCKER_PASSWORD}}
 
             - name: Deploy Assets
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
