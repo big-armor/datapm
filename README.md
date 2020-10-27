@@ -2,7 +2,7 @@ DataPM Registry Server
 
 This project contains the DataPM Registry Server, including the frontend angular project, backend apollo-graphql project, and documentation. You will find a README.md in the folder for each.
 
-## How to build
+## How to build and run locally
 
 Use npm in this top level directory to build all submodules and produce a docker image.
 
@@ -11,22 +11,28 @@ npm ci
 npm run build
 ```
 
-This produces a docker image labeled datapm-registry
+This produces a docker image labeled datapm-registry. You can then use docker-compose to run the locally built image.
+
+```
+docker-compose -f docker/docker-compose-local-build.yml up
+```
 
 ## How to run in Docker
 
-First you must build the project using the commands above. The docker build uses the artifacts from the build above to dramatically reduce the docker build time.
-
-Use the following command from the root directory of this project to use docker-compose to start a local postgres DB and DataPM Registry server.
+Use the `docker/docker-compose.yml` file to run a copy of the registry from the docker hub.
 
 ```
-npm run start
+cd docker
+docker-compose up
 ```
 
-You can run only postgres with the following command
+## How to run Postgres only
+
+You can run only Postgres with the following command from the root of this project.
 
 ```
-docker-compose -f docker/docker-compose.yml up -d postgres
+cd docker
+docker-compose up -d postgres
 ```
 
 ## License

@@ -47,12 +47,20 @@ function buildDockerImage() {
     return spawnAndLog("docker", ["build", "-t", "datapm-registry", ".", "-f", "docker/Dockerfile", "--no-cache"]);
 }
 
-function tagDockerImage() {
+function tagGCRDockerImage() {
     return spawnAndLog("docker", ["tag", "datapm-registry", "gcr.io/datapm-test-terraform/datapm-registry:latest"]);
 }
 
-function pushToGCR() {
+function pushGCRImage() {
     return spawnAndLog("docker", ["push", "gcr.io/datapm-test-terraform/datapm-registry:latest"]);
+}
+
+function tagDockerImage() {
+    return spawnAndLog("docker", ["tag", "datapm-registry", "datapm/datapm-registry:latest"]);
+}
+
+function pushDockerImage() {
+    return spawnAndLog("docker", ["push", "datapm/datapm-registry:latest"]);
 }
 
 function spawnAndLog(command, args, opts) {
@@ -82,4 +90,4 @@ exports.default = series(
     buildDockerImage
 );
 
-exports.deployDockerImage = series(tagDockerImage, pushToGCR);
+exports.deployDockerImage = series(tagGCRDockerImage, tagDockerImage, pushGCRImage, pushDockerImage);

@@ -5,7 +5,9 @@ volumes:
 
 services:
     datapm-registry:
-        image: datapm/datapm-registry
+        build:
+            context: ../
+            dockerfile: docker/Dockerfile
         ports:
             - "4000:4000"
         env_file:
