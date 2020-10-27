@@ -17,9 +17,13 @@ jobs:
             - name: Print node verion
               run: node --version
 
+            - name: Echo Docker Password to file
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: echo $${{secrets.DOCKER_PASSWORD}} > ~/docker-password
+
             - name: Authorize Docker
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-              run: docker login --username travisbigarmor --password $${{secrets.DOCKER_PASSWORD}}
+              run: cat ~/docker-password | docker login --username travisbigarmor --password-stdin
 
             - name: Install Docker Build Dependencies
               run: npm install gulp
