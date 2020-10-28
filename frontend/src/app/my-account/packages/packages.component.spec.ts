@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { RouterTestingModule } from "@angular/router/testing";
 import { MaterialModule } from "src/app/material.module";
+import { SharedModule } from "src/app/shared/shared.module";
 
 import { PackagesComponent } from "./packages.component";
 
@@ -11,7 +12,7 @@ describe("PackagesComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [PackagesComponent],
-            imports: [MaterialModule, RouterTestingModule]
+            imports: [MaterialModule, RouterTestingModule, SharedModule]
         }).compileComponents();
     }));
 

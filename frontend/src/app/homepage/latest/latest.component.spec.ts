@@ -4,6 +4,7 @@ import { ApolloTestingModule } from "apollo-angular/testing";
 import { LatestComponent } from "./latest.component";
 
 import { MaterialModule } from "../../material.module";
+import { SharedModule } from "../../shared/shared.module";
 
 describe("LatestComponent", () => {
     let component: LatestComponent;
@@ -12,7 +13,7 @@ describe("LatestComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [LatestComponent],
-            imports: [ApolloTestingModule, MaterialModule]
+            imports: [ApolloTestingModule, MaterialModule, SharedModule]
         }).compileComponents();
     }));
 
