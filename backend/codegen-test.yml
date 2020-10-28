@@ -1,12 +1,17 @@
+overwrite: true
 schema:
     - node_modules/datapm-lib/schema.gql
     - node_modules/datapm-lib/auth-schema.gql
     - node_modules/datapm-lib/user-schema.gql
     - node_modules/datapm-lib/api-key-schema.gql
+    - node_modules/datapm-lib/images-schema.gql
 documents: node_modules/datapm-lib/graphql-documents/*.graphql
 generates:
     test/integration/registry-client.ts:
         plugins:
+            - add:
+                  content:
+                      - import { FileUpload } from 'graphql-upload'
             - typescript
             - typescript-operations
             - typed-document-node
