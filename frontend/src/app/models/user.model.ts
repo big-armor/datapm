@@ -8,10 +8,10 @@ export interface User {
     website?: string;
     emailAddress?: string;
     gitHubHandle?: string;
-    nameIsPublic: boolean;
-    locationIsPublic: boolean;
-    twitterHandleIsPublic: boolean;
-    gitHubHandleIsPublic: boolean;
-    emailAddressIsPublic: boolean;
-    websiteIsPublic: boolean;
+    nameIsPublic?: boolean;
+    locationIsPublic?: boolean;
+    twitterHandleIsPublic?: boolean;
+    gitHubHandleIsPublic?: boolean;
+    emailAddressIsPublic?: boolean;
+    websiteIsPublic?: boolean;
 }

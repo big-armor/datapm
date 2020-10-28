@@ -1,4 +1,4 @@
-import { User } from "src/generated/graphql";
+import { User } from "./user.model";
 import { PackageVersion } from "./package-version.model";
 
 export interface Package {
