@@ -16,10 +16,11 @@ import { IsUserOrAdminDirective } from "./directive/isUserOrAdminDirective";
 import { ValidCatalogSlugDirective } from "./directive/ValidCatalogSlugDirective";
 import { ValidPackageSlugDirective } from "./directive/ValidPackageSlugDirective";
 import { ValidCollectionSlugDirective } from "./directive/ValidCollectionSlugDirective";
+import { ValidateImageUploadDirective } from "./directive/ValidImageUploadDirective";
 
 const NODE_MODULES_DIRECTORY = getEnvVariable("NODE_MODULES_DIRECTORY", "node_modules");
 const SCHEMAS_DIRECTORY = NODE_MODULES_DIRECTORY + "/datapm-lib/";
-const SCHEMA_FILES = ["schema.gql", "auth-schema.gql", "user-schema.gql", "api-key-schema.gql"];
+const SCHEMA_FILES = ["schema.gql", "auth-schema.gql", "user-schema.gql", "api-key-schema.gql", "images-schema.gql"];
 
 const readFile = promisify(fs.readFile);
 
@@ -41,7 +42,8 @@ export async function makeSchema() {
             validPassword: ValidPasswordDirective,
             validCatalogSlug: ValidCatalogSlugDirective,
             validPackageSlug: ValidPackageSlugDirective,
-            validCollectionSlug: ValidCollectionSlugDirective
+            validCollectionSlug: ValidCollectionSlugDirective,
+            validImageUpload: ValidateImageUploadDirective
         }
     });
 }
