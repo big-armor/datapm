@@ -49,10 +49,10 @@ export class MyAccountComponent implements OnInit, OnDestroy {
     ) {
         let prefix = "/me";
         this.routes = [
-            { linkName: "details", url: prefix },
-            { linkName: "packages", url: prefix + "/packages" },
-            { linkName: "collections", url: prefix + "/collections" },
-            { linkName: "activity", url: prefix + "/activity" }
+            { linkName: "My Account", url: prefix },
+            { linkName: "My Packages", url: prefix + "/packages" },
+            { linkName: "My Collections", url: prefix + "/collections" },
+            { linkName: "My Catalogs", url: prefix + "/catalogs"}
         ];
     }
 
