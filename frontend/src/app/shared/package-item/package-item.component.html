@@ -2,14 +2,15 @@
     <mat-card-content>
         <div class="d-flex justify-content-between mt-1 mb-2 up-header">
             <div>Updated {{ lastActivityLabel }}</div>
-            <div>2 downloaded</div>
+            <!-- <div>2 downloaded</div> -->
         </div>
         <div class="d-flex align-items-center mb-2 package-creator">
             <img src="../../../assets/images/user-female.png" alt="Creator" class="photo" />
             <span class="name">Tyler Williams</span>
         </div>
         <div class="d-flex mb-3">
-            <div class="package-image flex-1 pr-4" *ngIf="item.image">
+            <!-- To be updated later -->
+            <div class="package-image flex-1 pr-4" *ngIf="hasImage">
                 <img
                     src="https://www.publicdomainpictures.net/pictures/320000/velka/background-image.png"
                     alt="Package"
@@ -24,11 +25,11 @@
                 </div>
             </div>
         </div>
-        <div class="package-chips pb-2">
+        <!-- <div class="package-chips pb-2">
             <mat-chip-list>
                 <mat-chip *ngFor="let tag of tags">{{ tag }}</mat-chip>
             </mat-chip-list>
-        </div>
+        </div> -->
         <div class="package-actions pt-2">
             <div class="d-flex bd-highlight">
                 <div class="p-2 bd-highlight">

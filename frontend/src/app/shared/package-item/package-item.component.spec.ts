@@ -3,7 +3,7 @@ import { RouterTestingModule } from "@angular/router/testing";
 import { PackageItemComponent } from "./package-item.component";
 import { MaterialModule } from "src/app/material.module";
 
-const packageItem = {
+const packageItem: any = {
     creator: {
         username: "tylerwilliams",
         firstName: "Tyler",

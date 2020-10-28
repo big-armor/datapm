@@ -1,6 +1,4 @@
-import { Package } from "../../models/packge.model";
-
-export const packages: Package[] = [
+export const packages: any[] = [
     {
         creator: {
             username: "tylerwilliams",
