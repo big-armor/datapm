@@ -8,74 +8,10 @@
 
                 <!-- Package without thumbnail -->
                 <div
-                    class="col-md-12 col-lg-12 pb-2 latest-div"
+                    class="col-md-12 col-lg-12 pb-2 mb-4"
                     *ngFor="let packageWithModifiedDate of packagesWithModifiedDate"
                 >
-                    <mat-card class="example-card">
-                        <div class="d-flex bd-highlight up-header mt-1">
-                            <div class="bd-highlight">
-                                <mat-card-header class="card-header-mat">
-                                    <div mat-card-avatar class="example-header-image">
-                                        <!-- TODO: Store user profile image somewhere -->
-                                        <img
-                                            src="../../../assets/images/user-female.png"
-                                            alt="User image card"
-                                            class="person-card-photo"
-                                        />
-                                        <!-- TODO: Validate that every package should be a published latest version -->
-                                        <span class="person-card-name">{{
-                                            packageWithModifiedDate.package.latestVersion?.author?.username
-                                        }}</span>
-                                    </div>
-                                </mat-card-header>
-                            </div>
-                            <div class="ml-auto bd-highlight">
-                                {{ packageWithModifiedDate.lastActivityLabel }} <br />
-                                2 downloaded
-                            </div>
-                        </div>
-
-                        <mat-card-content>
-                            <div class="d-flex flex-row bd-highlight content-text">
-                                <div class="bd-highlight" style="width: 100%">
-                                    <div class="content-title mb-2">
-                                        {{ packageWithModifiedDate.package.displayName }}
-                                    </div>
-                                    <div class="content-description package-height">
-                                        {{ packageWithModifiedDate.package.description }}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- <div class="content-actions">
-                    <div class="latest-chips">
-                      <mat-chip-list aria-label="Fish selection">
-                        <mat-chip>weather</mat-chip>
-                        <mat-chip>oceanic</mat-chip>
-                        <mat-chip>streaming</mat-chip>
-                      </mat-chip-list>
-                    </div>
-                    <div class="latest-actions mt-3">
-                      <div class="d-flex bd-highlight">
-                        <div class="bd-highlight mr-2">
-                          <button mat-fab class="person-menu" [class.yellow]="isFavorite" aria-label="Example icon button with a delete icon"
-                          (click)="makeFavorite()">
-                            <mat-icon>star_border</mat-icon>
-                          </button>
-                          <span class="px-2 content-nr">47</span>
-                        </div>
-                        <div class="bd-highlight">
-                          <button mat-fab class="person-menu" [class.yellow]="isFavorite" aria-label="Example icon button with a delete icon"
-                          (click)="makeFavorite()">
-                            <mat-icon>collections</mat-icon>
-                          </button>
-                          <span class="px-2 content-nr">add to collection</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div> -->
-                        </mat-card-content>
-                    </mat-card>
+                    <app-package-item [item]="packageWithModifiedDate"></app-package-item>
                 </div>
 
                 <!-- Package with thumbnail -->

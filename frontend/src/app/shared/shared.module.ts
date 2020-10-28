@@ -6,11 +6,12 @@ import { MaterialModule } from "../material.module";
 import { BrowserModule } from "@angular/platform-browser";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { TimeAgoPipe } from "./pipes/time-ago.pipe";
+import { PackageItemComponent } from "./package-item/package-item.component";
 
 @NgModule({
-    declarations: [HeaderComponent, FooterComponent, TimeAgoPipe],
+    declarations: [HeaderComponent, FooterComponent, TimeAgoPipe, PackageItemComponent],
     imports: [CommonModule, MaterialModule, BrowserModule, FormsModule, ReactiveFormsModule],
-    exports: [HeaderComponent, FooterComponent, TimeAgoPipe],
+    exports: [HeaderComponent, FooterComponent, TimeAgoPipe, PackageItemComponent],
     providers: [TimeAgoPipe]
 })
 export class SharedModule {}

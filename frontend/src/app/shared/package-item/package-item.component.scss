@@ -1,0 +1,54 @@
+.package-item {
+    box-shadow: -4px 0 4px hsla(0, 0%, 100%, 0.25), 0 -4px 4px hsla(0, 0%, 100%, 0.25),
+        0 4px 4px hsla(0, 0%, 74.1%, 0.25), 4px 0 4px hsla(0, 0%, 74.1%, 0.25);
+}
+
+.package-item-header {
+    font-family: Roboto Mono;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 10px;
+    line-height: 13px;
+    text-align: right;
+    letter-spacing: -0.28px;
+    color: #828282;
+}
+
+.author-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    box-shadow: 0px 0px 5px 1px #666666a1;
+}
+
+.author-name {
+    font-family: Roboto Mono;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 14px;
+    letter-spacing: -0.28px;
+    color: #828282;
+    padding: 4px 10px;
+    cursor: pointer;
+}
+
+.content-title {
+    font-family: Roboto Mono;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 26px;
+    cursor: pointer;
+    letter-spacing: -0.28px;
+    color: #333333;
+}
+
+.content-description {
+    font-family: Roboto Mono;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 18px;
+    letter-spacing: -0.28px;
+    color: #4f4f4f;
+}
