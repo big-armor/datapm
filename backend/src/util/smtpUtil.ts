@@ -46,6 +46,7 @@ async function sendEmail(to: string, subject: string, bodyText: string, bodyHTML
         host: process.env["SMTP_SERVER"]!,
         port: Number.parseInt(process.env["SMTP_PORT"]!),
         secure: process.env["SMTP_SECURE"] == "true",
+        ignoreTLS: process.env["SMTP_SECURE"] != "true",
         auth: {
             user: process.env["SMTP_USER"],
             pass: process.env["SMTP_PASSWORD"]
