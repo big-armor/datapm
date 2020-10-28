@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
-import { PackageWithLastActivity } from "src/app/models/package-with-last-activity.model";
+import { Package } from "src/app/models/packge.model";
+import * as timeago from "timeago.js";
 
 @Component({
     selector: "app-package-item",
@@ -8,15 +9,19 @@ import { PackageWithLastActivity } from "src/app/models/package-with-last-activi
     styleUrls: ["./package-item.component.scss"]
 })
 export class PackageItemComponent implements OnInit {
-    @Input() item: PackageWithLastActivity;
+    @Input() item: Package;
 
     constructor(private router: Router) {}
 
     ngOnInit(): void {}
 
-    goToComponent() {
-        const { catalogSlug, packageSlug } = this.item.package.identifier;
+    goToComponent(): void {
+        const { catalogSlug, packageSlug } = this.item.identifier;
 
         this.router.navigate([catalogSlug, packageSlug]);
+    }
+
+    get lastActivityLabel(): string {
+        return timeago.format(this.item.updatedAt);
     }
 }

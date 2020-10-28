@@ -5,13 +5,13 @@
                 <!-- TODO: Store user profile image somewhere -->
                 <img src="../../../assets/images/user-female.png" alt="User image card" class="author-avatar" />
                 <!-- TODO: Validate that every package should be a published latest version -->
-                <span class="author-name">
-                    {{ item.package.latestVersion?.author?.username }}
+                <span class="category-slug">
+                    {{ item.identifier.catalogSlug }}
                 </span>
             </div>
         </mat-card-header>
         <div class="ml-auto bd-highlight">
-            <div>{{ item.lastActivityLabel }}</div>
+            <div>Updated {{ lastActivityLabel }}</div>
             <div>2 downloaded</div>
         </div>
     </div>
@@ -20,10 +20,10 @@
         <div class="d-flex flex-row bd-highlight content-text">
             <div class="bd-highlight" style="width: 100%">
                 <div class="content-title mb-2">
-                    {{ item.package.displayName }}
+                    {{ item.displayName }}
                 </div>
                 <div class="content-description package-height">
-                    {{ item.package.description }}
+                    {{ item.description }}
                 </div>
             </div>
         </div>

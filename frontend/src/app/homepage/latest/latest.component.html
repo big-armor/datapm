@@ -11,7 +11,7 @@
                     class="col-md-12 col-lg-12 pb-2 mb-4"
                     *ngFor="let packageWithModifiedDate of packagesWithModifiedDate"
                 >
-                    <app-package-item [item]="packageWithModifiedDate"></app-package-item>
+                    <app-package-item [item]="packageWithModifiedDate.package"></app-package-item>
                 </div>
 
                 <!-- Package with thumbnail -->

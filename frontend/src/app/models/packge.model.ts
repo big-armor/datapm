@@ -8,4 +8,5 @@ export interface Package {
         packageSlug: string;
     };
     latestVersion?: PackageVersion;
+    updatedAt: Date;
 }

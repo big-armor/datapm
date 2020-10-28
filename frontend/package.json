@@ -34,6 +34,7 @@
         "jwt-decode": "^2.2.0",
         "rxjs": "^6.5.5",
         "stream": "0.0.2",
+        "timeago.js": "^4.0.2",
         "tslib": "^2.0.0",
         "url-parse": "^1.4.7",
         "zone.js": "~0.10.3"
