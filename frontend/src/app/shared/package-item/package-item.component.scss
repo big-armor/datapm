@@ -1,49 +1,46 @@
 .package-item {
+    cursor: pointer;
     box-shadow: -4px 0 4px hsla(0, 0%, 100%, 0.25), 0 -4px 4px hsla(0, 0%, 100%, 0.25),
         0 4px 4px hsla(0, 0%, 74.1%, 0.25), 4px 0 4px hsla(0, 0%, 74.1%, 0.25);
 }
 
-.package-item-header {
-    font-family: Roboto Mono;
-    font-style: normal;
-    font-weight: 300;
-    font-size: 10px;
-    line-height: 13px;
-    text-align: right;
-    letter-spacing: -0.28px;
+.flex-1 {
+    flex: 1;
+}
+
+.package-image img {
+    width: 100%;
+    max-height: 150px;
+    object-fit: cover;
+}
+
+.actions button .mat-icon {
     color: #828282;
 }
 
-.author-avatar {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    box-shadow: 0px 0px 5px 1px #666666a1;
+.up-header {
+    div {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: 300;
+        font-size: 10px;
+        line-height: 13px;
+        text-align: right;
+        letter-spacing: -0.28px;
+        color: #828282;
+    }
 }
 
-.category-slug {
+.package-identifier {
     font-family: Roboto Mono;
-    font-style: normal;
-    font-weight: 300;
-    font-size: 14px;
-    letter-spacing: -0.28px;
-    color: #828282;
-    padding: 4px 10px;
-    cursor: pointer;
-}
-
-.content-title {
-    font-family: Roboto Mono;
-    font-style: normal;
     font-weight: 500;
     font-size: 20px;
     line-height: 26px;
-    cursor: pointer;
+    color: #333;
     letter-spacing: -0.28px;
-    color: #333333;
 }
 
-.content-description {
+.package-description {
     font-family: Roboto Mono;
     font-style: normal;
     font-weight: 300;
@@ -51,4 +48,83 @@
     line-height: 18px;
     letter-spacing: -0.28px;
     color: #4f4f4f;
+    max-height: 111px;
+    overflow: hidden;
+}
+
+.package-chips {
+    ::ng-deep.mat-chip {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 10px;
+        line-height: 13px;
+        letter-spacing: -0.28px;
+        color: #000000;
+        padding: 0px 9px;
+        min-height: 18px;
+        border-radius: 24px;
+        cursor: pointer;
+        margin: 0px 8px;
+        background-color: #fff;
+        box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25),
+            inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
+    }
+}
+
+.package-actions {
+    button {
+        width: 32px;
+        height: 32px;
+        background-color: #fff;
+        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+            0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+
+        &:focus {
+            outline: #fff auto 0px !important;
+        }
+
+        ::ng-deep.mat-button-wrapper {
+            padding: 0px 0;
+            line-height: 20px;
+
+            .mat-icon {
+                height: 30px;
+                color: #828282;
+
+                &:focus {
+                    outline: #fff auto 0px !important;
+                }
+            }
+        }
+    }
+
+    .content-nr {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 10px;
+        text-transform: uppercase;
+        color: #828282;
+    }
+}
+
+.package-creator {
+    .photo {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+    }
+
+    .name {
+        font-family: Roboto Mono;
+        font-style: normal;
+        letter-spacing: -0.28px;
+        font-weight: 300;
+        font-size: 14px;
+        line-height: 18px;
+        color: #828282;
+        padding: 4px 10px;
+        margin-bottom: 0 !important;
+    }
 }

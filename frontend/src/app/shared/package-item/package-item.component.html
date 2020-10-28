@@ -1,29 +1,47 @@
 <mat-card class="package-item" (click)="goToComponent()">
-    <div class="d-flex bd-highlight mt-1 package-item-header">
-        <mat-card-header>
-            <div mat-card-avatar class="d-flex">
-                <!-- TODO: Store user profile image somewhere -->
-                <img src="../../../assets/images/user-female.png" alt="User image card" class="author-avatar" />
-                <!-- TODO: Validate that every package should be a published latest version -->
-                <span class="category-slug">
-                    {{ item.identifier.catalogSlug }}
-                </span>
-            </div>
-        </mat-card-header>
-        <div class="ml-auto bd-highlight">
+    <mat-card-content>
+        <div class="d-flex justify-content-between mt-1 mb-2 up-header">
             <div>Updated {{ lastActivityLabel }}</div>
             <div>2 downloaded</div>
         </div>
-    </div>
-
-    <mat-card-content>
-        <div class="d-flex flex-row bd-highlight content-text">
-            <div class="bd-highlight" style="width: 100%">
-                <div class="content-title mb-2">
-                    {{ item.displayName }}
+        <div class="d-flex align-items-center mb-2 package-creator">
+            <img src="../../../assets/images/user-female.png" alt="Creator" class="photo" />
+            <span class="name">Tyler Williams</span>
+        </div>
+        <div class="d-flex mb-3">
+            <div class="package-image flex-1 pr-4" *ngIf="item.image">
+                <img
+                    src="https://www.publicdomainpictures.net/pictures/320000/velka/background-image.png"
+                    alt="Package"
+                />
+            </div>
+            <div class="flex-1 px-3 py-1">
+                <div class="package-identifier mb-2">
+                    {{ item.identifier.catalogSlug }} / {{ item.identifier.packageSlug }}
                 </div>
-                <div class="content-description package-height">
-                    {{ item.description }}
+                <div class="package-description">
+                    {{ truncatedDescription }}
+                </div>
+            </div>
+        </div>
+        <div class="package-chips pb-2">
+            <mat-chip-list>
+                <mat-chip *ngFor="let tag of tags">{{ tag }}</mat-chip>
+            </mat-chip-list>
+        </div>
+        <div class="package-actions pt-2">
+            <div class="d-flex bd-highlight">
+                <div class="p-2 bd-highlight">
+                    <button mat-fab>
+                        <mat-icon>star_border</mat-icon>
+                    </button>
+                    <span class="px-2 content-nr">47</span>
+                </div>
+                <div class="p-2 bd-highlight">
+                    <button mat-fab>
+                        <mat-icon>collections</mat-icon>
+                    </button>
+                    <span class="px-2 content-nr">add to collection</span>
                 </div>
             </div>
         </div>
