@@ -33,6 +33,8 @@ describe("Authentication Tests", async () => {
         let errorFound = false;
         await createUser("Password", "TooShort", "willFail", "fail@fail.com", "abcdefg")
             .catch((error: ErrorResponse) => {
+                console.log("password error");
+                console.log(JSON.stringify(error, null, 1));
                 let fetchResult = error.networkError as ServerError;
                 if (
                     fetchResult.result.errors.find(

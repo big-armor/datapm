@@ -80,4 +80,16 @@ export class User extends BaseModel {
 
     @Column({ nullable: false, name: "password_salt" })
     passwordSalt: string;
+
+    /** The secret used for verifying email addresses */
+    @Column({ nullable: true, name: "verify_email_token" })
+    verifyEmailToken?: string;
+
+    /** The date on which the verifyEmailToken was created */
+    @Column({ nullable: true, name: "verify_email_token_date" })
+    verifyEmailTokenDate: Date;
+
+    /** Whether the user has completed email verification. */
+    @Column({ nullable: false, default: false, name: "email_verified" })
+    emailVerified: boolean;
 }

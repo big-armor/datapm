@@ -25,7 +25,7 @@ export class ValidEmailDirective extends SchemaDirectiveVisitor {
         details.field.resolve = function (source, args, context: Context, info) {
             const emailAddress: string | undefined = args.emailAddress || args.value?.emailAddress || undefined;
 
-            validateEmailAddress(emailAddress);
+            verifyEmailAddress(emailAddress);
 
             return resolve.apply(this, [source, args, context, info]);
         };
@@ -37,7 +37,7 @@ export class ValidEmailDirective extends SchemaDirectiveVisitor {
         field.resolve = function (source, args, context: Context, info) {
             const emailAddress: string | undefined = args.emailAddress || args.value?.emailAddress || undefined;
 
-            validateEmailAddress(emailAddress);
+            verifyEmailAddress(emailAddress);
 
             return resolve.apply(this, [source, args, context, info]);
         };
@@ -59,7 +59,7 @@ export class ValidEmailDirective extends SchemaDirectiveVisitor {
     }
 }
 
-function validateEmailAddress(emailAddress: String | undefined) {
+function verifyEmailAddress(emailAddress: String | undefined) {
     const regex = /^(?=[A-Z0-9][A-Z0-9@._%+-]{5,253}$)[A-Z0-9._%+-]{1,64}@(?:(?=[A-Z0-9-]{1,63}\.)[A-Z0-9]+(?:-[A-Z0-9]+)*\.){1,8}[A-Z]{2,63}$/i;
 
     if (emailAddress == null) throw new ValidationError(`REQUIRED`);
@@ -87,7 +87,7 @@ class ValidatedType extends GraphQLScalarType {
             },
 
             parseValue(value) {
-                validateEmailAddress(value);
+                verifyEmailAddress(value);
 
                 return type.parseValue(value);
             },

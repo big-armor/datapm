@@ -22,6 +22,10 @@ services:
     ports:
       - "4000:4000"
     environment:
+      - REGISTRY_NAME="Private DataPM Registry"
+      - REGISTRY_URL=http://localhost:4000
+      - REGISTRY_HOSTNAME=localhost
+      - REGISTRY_PORT=4000
       - JWT_KEY=!!!!REPLACE_ME!!!
       - JWT_AUDIENCE=localhost
       - JWT_ISSUER=localhost
@@ -33,8 +37,14 @@ services:
       - TYPEORM_SCHEMA=public
       - TYPEORM_USERNAME=postgres
       - TYPEORM_PASSWORD=postgres
-      - REGISTRY_HOSTNAME=localhost
-      - REGISTRY_PORT=4000
+      - REQUIRE_EMAIL_VERIFICATION=true
+      - SMTP_SERVER=localhost
+      - SMTP_PORT=25
+      - SMTP_USER=
+      - SMTP_PASSWORD=
+      - SMTP_FROM_NAME="Localhost DataPM Registry"
+      - SMTP_FROM_ADDRESS="datapm@localhost"
+      - SMTP_SECURE=false
   postgres:
     image: postgres:11
     volumes:

@@ -1,5 +1,6 @@
-import { ApolloError, AuthenticationError } from "apollo-server";
+import { ApolloError, AuthenticationError, UserInputError, ValidationError } from "apollo-server";
 import { AuthenticatedContext } from "../context";
+import { User } from "../entity/User";
 import { AUTHENTICATION_ERROR } from "../generated/graphql";
 import { UserRepository } from "../repository/UserRepository";
 import { createJwt } from "../util/jwt";
@@ -29,4 +30,37 @@ export const login = async (
 
 export const logout = async (_0: any, {}, context: AuthenticatedContext, info: any) => {
     throw new ApolloError("Logout is not implemented on the server side. Simply discard the JWT on the client side.");
+};
+
+export const verifyEmailAddress = async (
+    _0: any,
+    { token }: { token: String },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    // Get the token
+
+    return context.connection.manager.nestedTransaction(async (manager) => {
+        let user = await manager.getCustomRepository(UserRepository).findByEmailValidationToken(token);
+
+        if (user == null) {
+            throw new UserInputError("TOKEN_NOT_VALID");
+        }
+
+        if (context.me.emailAddress != user.emailAddress) {
+            throw new UserInputError("TOKEN_DOES_NOT_MATCH");
+        }
+
+        // Verify that the token was created in the last 4 hours
+        if (new Date().getMilliseconds() - user.verifyEmailTokenDate.getMilliseconds() > 4 * 60 * 60 * 1000) {
+            // TODO Automatically send another token
+            throw new UserInputError("TOKEN_IS_TOO_OLD");
+        }
+
+        user.emailVerified = true;
+        delete user.verifyEmailToken;
+        user.verifyEmailTokenDate = new Date();
+
+        manager.save(user);
+    });
 };

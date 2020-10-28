@@ -1,7 +1,6 @@
 import querystring from "querystring";
 
 import { EntityRepository, Repository, EntityManager } from "typeorm";
-import sgMail from "@sendgrid/mail";
 import { v4 as uuidv4 } from "uuid";
 
 import { User } from "../entity/User";
@@ -60,7 +59,6 @@ async function getAPIKeyOrFail({
 export class APIKeyRepository extends Repository<APIKey> {
     constructor() {
         super();
-        sgMail.setApiKey(process.env.SENDGRID_API_KEY || "SG.DUMMY");
     }
 
     async findAllForUser({ user, relations = [] }: { user: User; relations?: string[] }) {
@@ -125,6 +123,8 @@ export class APIKeyRepository extends Repository<APIKey> {
                 scopes: scopes
             };
         });
+
+        // TODO - then send an email to the user that an API key has been created
     }
 
     async findByUser(userId: number): Promise<APIKey[]> {

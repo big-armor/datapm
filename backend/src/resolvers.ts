@@ -53,7 +53,7 @@ import {
     searchCollections,
     updateCollection
 } from "./resolvers/CollectionResolver";
-import { login, logout } from "./resolvers/AuthResolver";
+import { login, logout, verifyEmailAddress } from "./resolvers/AuthResolver";
 import { createMe, disableMe, updateMe, updateMyPassword } from "./resolvers/UserResolver";
 import { createAPIKey, deleteAPIKey } from "./resolvers/ApiKeyResolver";
 import { Collection } from "./entity/Collection";
@@ -408,7 +408,7 @@ export const resolvers: {
         // Auth
         login: login,
         logout: logout,
-
+        verifyEmailAddress: verifyEmailAddress,
         // User
         createMe: createMe,
         updateMe: updateMe,
