@@ -1,10 +1,16 @@
+import { Component } from "@angular/core";
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { MyAccountComponent } from "./my-account.component";
-import { RouterModule } from "@angular/router";
+import { RouterTestingModule } from "@angular/router/testing";
 import { ApolloTestingModule, ApolloTestingController } from "apollo-angular/testing";
 import { MaterialModule } from "../material.module";
 import { MatDialog, MatDialogConfig, MAT_DIALOG_DATA } from "@angular/material/dialog";
+
+@Component({
+    template: ""
+})
+class DummyComponent {}
 
 describe("MyAccountComponent", () => {
     let component: MyAccountComponent;
@@ -14,7 +20,11 @@ describe("MyAccountComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [MyAccountComponent],
-            imports: [RouterModule.forRoot([]), ApolloTestingModule, MaterialModule],
+            imports: [
+                RouterTestingModule.withRoutes([{ path: "me", component: DummyComponent }]),
+                ApolloTestingModule,
+                MaterialModule
+            ],
             providers: [
                 {
                     provide: MAT_DIALOG_DATA,
