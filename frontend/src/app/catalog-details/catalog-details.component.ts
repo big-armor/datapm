@@ -16,7 +16,6 @@ export class CatalogDetailsComponent implements OnInit {
     ngOnInit(): void {
         this.route.paramMap.subscribe((params) => {
             this.urlParams = params;
-
             this.getCatalogGQL
                 .watch({ identifier: { catalogSlug: this.urlParams.params.catalogSlug } })
                 .valueChanges.subscribe(({ data }) => {

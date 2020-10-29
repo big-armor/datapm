@@ -15,6 +15,7 @@ import { PackageSchemaComponent } from "./package/package-schema/package-schema.
 import { DetailsComponent } from "./my-account/details/details.component";
 import { PackagesComponent } from "./my-account/packages/packages.component";
 import { ActivityComponent } from "./my-account/activity/activity.component";
+import { CatalogsComponent } from "./my-account/catalogs/catalogs.component";
 
 const staticRoutes: Route[] = [
     {
@@ -65,6 +66,10 @@ const staticRoutes: Route[] = [
             {
                 path: "activity",
                 component: ActivityComponent
+            },
+            {
+                path: "catalogs",
+                component: CatalogsComponent
             }
         ]
     },
