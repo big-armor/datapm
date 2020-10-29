@@ -18,16 +18,18 @@ export const login = async (
         .getUserByLogin(username, getGraphQlRelationName(info));
 
     if (user == null) {
-        throw new AuthenticationError(AUTHENTICATION_ERROR.USER_NOT_FOUND);
+        throw new AuthenticationError(AUTHENTICATION_ERROR.WRONG_CREDENTIALS);
+    }
+
+    const hash = hashPassword(password, user.passwordSalt);
+    if (hash != user.passwordHash) {
+        throw new AuthenticationError(AUTHENTICATION_ERROR.WRONG_CREDENTIALS);
     }
 
     if (process.env["REQUIRE_EMAIL_VERIFICATION"] != "false" && !user.emailVerified) {
         throw new UserInputError(AUTHENTICATION_ERROR.EMAIL_ADDRESS_NOT_VERIFIED);
     }
-    const hash = hashPassword(password, user.passwordSalt);
-    if (hash != user.passwordHash) {
-        throw new AuthenticationError(AUTHENTICATION_ERROR.WRONG_CREDENTIALS);
-    }
+
     return createJwt(user);
 };
 
