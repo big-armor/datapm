@@ -26,6 +26,12 @@ This produces a docker image labeled datapm-registry. You can then use docker-co
 docker-compose -f docker/docker-compose-local-build.yml up
 ```
 
+This "local-build" of docker provides a [maildev] SMTP server - which does not forward mail! To view any email sent by the registry server, simply open the maildev web interface on port 1080.
+
+```
+http://localhost:1080
+```
+
 ## How to run Postgres and SMTP only
 
 You can run only Postgres and SMTP with the following command from the root of this project. This is useful for developers running the backend as an active service (though they should focus on an integration test work flow in the backend primarily).

@@ -27,6 +27,7 @@ services:
             - POSTGRES_USER=postgres
             - POSTGRES_PASSWORD=postgres
     smtp:
-        image: namshi/smtp:latest
+        image: maildev/maildev:latest
         ports:
             - "25:25"
+            - "1080:80"
