@@ -3,6 +3,8 @@ import {
     CreateMeDocument,
     CreateMeMutation,
     CreateMeMutationVariables,
+    LoginDocument,
+    LoginMutation,
     VerifyEmailAddressDocument,
     VerifyEmailAddressMutation
 } from "./registry-client";
@@ -42,7 +44,6 @@ export async function createUserDoNotVerifyEmail(
     password: string
 ): Promise<{
     emailVerificationToken: string;
-    client: ApolloClient<NormalizedCacheObject>;
 }> {
     return await new Promise((resolve, reject) => {
         let anonymousClient = createAnonymousClient();
@@ -78,29 +79,23 @@ export async function createUserDoNotVerifyEmail(
                     return;
                 }
 
-                console.log(JSON.stringify(result, null, 1));
+                verifyEmailPromise
+                    .catch((error) => reject(error))
+                    .then((email) => {
+                        expect(email.html).to.not.contain("{{registry_name}}");
+                        expect(email.html).to.not.contain("{{registry_url}}");
+                        expect(email.html).to.not.contain("{{token}}");
 
-                let token = result.data!.createMe;
+                        expect(email.text).to.not.contain("{{registry_name}}");
+                        expect(email.text).to.not.contain("{{registry_url}}");
+                        expect(email.text).to.not.contain("{{token}}");
 
-                let client = createTestClient({ Authorization: "Bearer " + token });
+                        const emailValidationToken = (email.text as String).match(/#token=([a-zA-z0-9-]+)/);
 
-                // Parse the email and find the verification token
-
-                verifyEmailPromise.then((email) => {
-                    expect(email.html).to.not.contain("{{registry_name}}");
-                    expect(email.html).to.not.contain("{{registry_url}}");
-                    expect(email.html).to.not.contain("{{token}}");
-
-                    expect(email.text).to.not.contain("{{registry_name}}");
-                    expect(email.text).to.not.contain("{{registry_url}}");
-                    expect(email.text).to.not.contain("{{token}}");
-
-                    const emailValidationToken = (email.text as String).match(/#token=([a-zA-z0-9-]+)/);
-
-                    resolve({ emailVerificationToken: emailValidationToken!.pop()!, client });
-                });
-
-                // read the last email off the queue
+                        resolve({
+                            emailVerificationToken: emailValidationToken!.pop()!
+                        });
+                    });
             });
     });
 }
@@ -121,12 +116,11 @@ export async function createUser(
             .then((userInfo) => {
                 let createUserResponse = userInfo as {
                     emailVerificationToken: string;
-                    client: ApolloClient<NormalizedCacheObject>;
                 };
 
                 if (createUserResponse == undefined) return;
 
-                createUserResponse.client
+                createAnonymousClient()
                     .mutate({
                         mutation: VerifyEmailAddressDocument,
                         variables: {
@@ -146,7 +140,30 @@ export async function createUser(
                                 Record<string, any>
                             >).errors == null
                         ).true;
-                        resolve(createUserResponse.client);
+
+                        createAnonymousClient()
+                            .mutate({
+                                mutation: LoginDocument,
+                                variables: {
+                                    username,
+                                    password
+                                }
+                            })
+                            .catch((error) => reject(error))
+                            .then((responseRaw) => {
+                                const response = responseRaw as FetchResult<
+                                    LoginMutation,
+                                    Record<string, any>,
+                                    Record<string, any>
+                                >;
+
+                                expect(response.errors == null).true;
+                                let authenticatedClient = createTestClient({
+                                    Authorization: "Bearer " + response.data!.login
+                                });
+
+                                resolve(authenticatedClient);
+                            });
                     });
             });
     });

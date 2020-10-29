@@ -11,9 +11,10 @@ import {
     GraphQLNonNull
 } from "graphql";
 import { Context } from "../context";
-import { INVALID_USERNAME_ERROR } from "../generated/graphql";
+import { validateUsername } from "./ValidUsernameDirective";
+import { validateEmailAddress } from "./ValidEmailDirective";
 
-export class ValidUsernameDirective extends SchemaDirectiveVisitor {
+export class ValidUsernameOrEmailAddressDirective extends SchemaDirectiveVisitor {
     visitArgumentDefinition(
         argument: GraphQLArgument,
         details: {
@@ -36,7 +37,7 @@ export class ValidUsernameDirective extends SchemaDirectiveVisitor {
         field.resolve = function (source, args, context: Context, info) {
             const username: string | undefined = args.username || args.value?.username || undefined;
 
-            validateUsername(username);
+            validateUsernameOrEmail(username);
 
             return resolve.apply(this, [source, args, context, info]);
         };
@@ -58,24 +59,9 @@ export class ValidUsernameDirective extends SchemaDirectiveVisitor {
     }
 }
 
-export function validateUsername(username: String | undefined): void {
-    const regex = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/;
-
-    if (username === undefined) {
-        throw new ValidationError(INVALID_USERNAME_ERROR.USERNAME_REQUIRED);
-    }
-
-    if (username.length == 0) {
-        throw new ValidationError(INVALID_USERNAME_ERROR.USERNAME_REQUIRED);
-    }
-
-    if (username.length > 39) {
-        throw new ValidationError(INVALID_USERNAME_ERROR.USERNAME_TOO_LONG);
-    }
-
-    if (username.toLowerCase().match(regex) == null) {
-        throw new ValidationError(INVALID_USERNAME_ERROR.INVALID_CHARACTERS);
-    }
+function validateUsernameOrEmail(value: String | undefined) {
+    if (value?.indexOf("@") != -1) validateEmailAddress(value);
+    else validateUsername(value);
 }
 
 class ValidatedType extends GraphQLScalarType {
@@ -94,7 +80,7 @@ class ValidatedType extends GraphQLScalarType {
             },
 
             parseValue(value) {
-                validateUsername(value);
+                validateUsernameOrEmail(value);
 
                 return type.parseValue(value);
             },

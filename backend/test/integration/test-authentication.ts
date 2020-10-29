@@ -92,11 +92,24 @@ describe("Authentication Tests", async () => {
         expect(userBClient).to.exist;
     });
 
-    it("Login user A", async () => {
+    it("Login user A with username", async () => {
         let result = await anonymousClient.mutate({
             mutation: LoginDocument,
             variables: {
                 username: "testA-authentication",
+                password: "passwordA!"
+            }
+        });
+
+        expect(result.errors === undefined, "no errors").equal(true);
+        expect(result.data!.login != null, "should have login key value").equal(true);
+    });
+
+    it("Login user A with email", async () => {
+        let result = await anonymousClient.mutate({
+            mutation: LoginDocument,
+            variables: {
+                username: "testA-authentication@test.datapm.io",
                 password: "passwordA!"
             }
         });
