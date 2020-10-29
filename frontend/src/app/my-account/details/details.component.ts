@@ -4,16 +4,7 @@ import { EditPasswordDialogComponent } from "../edit-password-dialog/edit-passwo
 import { AuthenticationService } from "../../services/authentication.service";
 import { getRegistryPort, getRegistryProtocol, getRegistryHostname } from "../../helpers/RegistryAccessHelper";
 
-import {
-    APIKey,
-    Catalog,
-    User,
-    CreateAPIKeyGQL,
-    MyCatalogsGQL,
-    MyAPIKeysGQL,
-    DeleteAPIKeyGQL,
-    Scope
-} from "src/generated/graphql";
+import { APIKey, User, CreateAPIKeyGQL, MyAPIKeysGQL, DeleteAPIKeyGQL, Scope } from "src/generated/graphql";
 import { FormControl, FormGroup } from "@angular/forms";
 import { MatTableDataSource } from "@angular/material/table";
 import { Clipboard } from "@angular/cdk/clipboard";
@@ -39,16 +30,13 @@ export class DetailsComponent implements OnInit, OnDestroy {
 
     currentUser: User;
     apiKeysOpenState: boolean = true;
-    catalogsOpenState: boolean = false;
     apiKeysState = State.INIT;
-    catalogState = State.INIT;
     createAPIKeyState = State.INIT;
     deleteAPIKeyState = State.INIT;
     newAPIKey: string;
 
     columnsToDisplay = ["label", "actions"];
 
-    public myCatalogs: Catalog[];
     public myAPIKeys: APIKey[];
     dataSource = new MatTableDataSource<APIKey>();
     createAPIKeyForm: FormGroup;
@@ -58,7 +46,6 @@ export class DetailsComponent implements OnInit, OnDestroy {
     constructor(
         public dialog: MatDialog,
         private authenticationService: AuthenticationService,
-        private myCatalogsGQL: MyCatalogsGQL,
         private createAPIKeyGQL: CreateAPIKeyGQL,
         private myAPIKeysGQL: MyAPIKeysGQL,
         private deleteAPIKeyGQL: DeleteAPIKeyGQL,
@@ -80,7 +67,6 @@ export class DetailsComponent implements OnInit, OnDestroy {
             });
 
         this.refreshAPIKeys();
-        this.refreshCatalogs();
 
         this.createAPIKeyForm = new FormGroup({
             label: new FormControl("")
@@ -88,7 +74,6 @@ export class DetailsComponent implements OnInit, OnDestroy {
 
         this.dialog.afterAllClosed.subscribe((result) => {
             this.authenticationService.refreshUserInfo();
-            this.refreshCatalogs();
         });
     }
 
@@ -168,20 +153,6 @@ export class DetailsComponent implements OnInit, OnDestroy {
                 }
                 this.myAPIKeys = response.data.myAPIKeys;
                 this.apiKeysState = State.SUCCESS;
-            });
-    }
-
-    refreshCatalogs() {
-        this.myCatalogsGQL
-            .fetch()
-            .pipe(takeUntil(this.subscription))
-            .subscribe((response) => {
-                if (response.errors?.length > 0) {
-                    this.catalogState = State.ERROR;
-                    return;
-                }
-                this.myCatalogs = response.data.myCatalogs;
-                this.catalogState = State.SUCCESS;
             });
     }
 
