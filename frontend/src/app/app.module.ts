@@ -5,7 +5,7 @@ import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { GraphQLModule } from "./graphql.module";
 import { HttpClientModule } from "@angular/common/http";
-import { CatalogDetailsComponent } from "./catalog-details/catalog-details.component";
+import { CatalogDetailsComponent } from "./my-account/catalog-details/catalog-details.component";
 import { ReactiveFormsModule } from "@angular/forms";
 import { MyAccountComponent } from "./my-account/my-account.component";
 import { PackageDetailComponent } from "./package/package-detail/package-detail.component";
