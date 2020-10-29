@@ -1,5 +1,6 @@
 import { NgModule } from "@angular/core";
 import { Routes, RouterModule, UrlSegment, Route } from "@angular/router";
+import { CatalogDetailsComponent } from "./catalog-details/catalog-details.component";
 import { MyAccountComponent } from "./my-account/my-account.component";
 import { AuthGuard } from "./helpers/auth-guard";
 import { PackageDetailComponent } from "./package/package-detail/package-detail.component";
@@ -14,7 +15,7 @@ import { PackageSchemaComponent } from "./package/package-schema/package-schema.
 import { DetailsComponent } from "./my-account/details/details.component";
 import { PackagesComponent } from "./my-account/packages/packages.component";
 import { ActivityComponent } from "./my-account/activity/activity.component";
-import { CatalogDetailsComponent } from "./my-account/catalog-details/catalog-details.component";
+import { CatalogsComponent } from "./my-account/catalogs/catalogs.component";
 
 const staticRoutes: Route[] = [
     {
@@ -67,8 +68,8 @@ const staticRoutes: Route[] = [
                 component: ActivityComponent
             },
             {
-                path: ":catalogSlug",
-                component: CatalogDetailsComponent
+                path: "catalogs",
+                component: CatalogsComponent
             }
         ]
     },
