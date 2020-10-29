@@ -3,7 +3,7 @@ import { GetCatalogGQL, GetCatalogQuery } from "src/generated/graphql";
 import { ActivatedRoute, Router } from "@angular/router";
 
 @Component({
-    selector: "me-catalog-details",
+    selector: "app-catalog-details",
     templateUrl: "./catalog-details.component.html",
     styleUrls: ["./catalog-details.component.scss"]
 })
