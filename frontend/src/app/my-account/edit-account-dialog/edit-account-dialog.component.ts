@@ -106,7 +106,7 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
                     // location: this.location.value,
                     // twitterHandle: this.twitterHandle.value,
                     // website: this.website.value,
-                    email: this.emailAddress.value
+                    emailAddress: this.emailAddress.value
                     // gitHubHandle: this.gitHubHandle.value,
                     // nameIsPublic: this.nameIsPublic.value
                 }
