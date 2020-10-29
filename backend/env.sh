@@ -18,10 +18,10 @@ export TYPEORM_SCHEMA="public"
 export TYPEORM_USERNAME="postgres"
 export TYPEORM_PASSWORD="postgres"
 export REQUIRE_EMAIL_VERIFICATION=${REQUIRE_EMAIL_VERIFICATION:=false}
-# export SMTP_SERVER="smtp.sendgrid.net"
-# export SMTP_PORT="465"
-# export SMTP_USER="apikey"
-# export SMTP_PASSWORD="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"
-# export SMTP_FROM_NAME="Localhost DataPM Registry"
-# export SMTP_FROM_ADDRESS="support@datapm.io"
-# export SMTP_SECURE="true"
+export SMTP_SERVER=${SMTP_SERVER:=localhost}
+export SMTP_PORT=${SMTP_PORT:=25}
+export SMTP_USER=${SMTP_USER}
+export SMTP_PASSWORD=${SMTP_PASSWORD}
+export SMTP_FROM_NAME=${SMTP_FROM_NAME:="Localhost DataPM Registry"}
+export SMTP_FROM_ADDRESS=${SMTP_FROM_ADDRESS:="test@localhost"}
+export SMTP_SECURE=${SMTP_SECURE:="false"}
