@@ -12,9 +12,7 @@
                     <a class="user-img"><img src="../../assets/images/user-female.jpg" alt="User profile image" /></a>
                 </div>
                 <div class="p-2 bd-highlight">
-                    <span class="user-fullname">
-                        {{ currentUser.firstName + " " + currentUser.lastName }} </span
-                    ><br />
+                    <span class="user-fullname"> {{ currentUser.firstName + " " + currentUser.lastName }} </span><br />
                     <span class="user-name">{{ "@" + currentUser.username }}</span>
                 </div>
             </div>
@@ -29,6 +27,18 @@
                     </li>
                 </ul>
             </div>
+        </div>
+        <div class="package-div panel-div">
+            <div *ngIf="myCatalogs && myCatalogs.length > 0" class="section-title">My Catalogs</div>
+
+            <mat-card *ngFor="let catalog of myCatalogs">
+                <mat-card-title>
+                    <a routerLink="/{{ catalog.identifier.catalogSlug }}">
+                        {{ catalog.displayName || catalog.identifier.catalogSlug }}
+                    </a>
+                </mat-card-title>
+                <mat-card-description class="content-description">{{ catalog.description }}</mat-card-description>
+            </mat-card>
         </div>
         <div class="col-lg-10 col-md-12 col-sm-12 p-0">
             <router-outlet></router-outlet>

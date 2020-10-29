@@ -3,7 +3,7 @@ import { Router } from "@angular/router";
 import { FormGroup, FormControl } from "@angular/forms";
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { AuthenticationService } from "../services/authentication.service";
-import { APIKey, Catalog, User } from "src/generated/graphql";
+import { APIKey, Catalog, User, MyCatalogsGQL } from "src/generated/graphql";
 import { EditAccountDialogComponent } from "./edit-account-dialog/edit-account-dialog.component";
 import { take, takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";
@@ -43,6 +43,7 @@ export class MyAccountComponent implements OnInit, OnDestroy {
     private subscription = new Subject();
 
     constructor(
+        private myCatalogsGQL: MyCatalogsGQL,
         private authenticationService: AuthenticationService,
         private router: Router,
         public dialog: MatDialog
@@ -52,7 +53,7 @@ export class MyAccountComponent implements OnInit, OnDestroy {
             { linkName: "My Account", url: prefix },
             { linkName: "My Packages", url: prefix + "/packages" },
             { linkName: "My Collections", url: prefix + "/collections" },
-            { linkName: "My Catalogs", url: prefix + "/catalogs"}
+            { linkName: "My Catalogs", url: prefix + "/:catalogSlug" }
         ];
     }
 
@@ -101,5 +102,19 @@ export class MyAccountComponent implements OnInit, OnDestroy {
     logoutClicked() {
         this.authenticationService.logout();
         this.router.navigate(["/"]);
+    }
+
+    refreshCatalogs() {
+        this.myCatalogsGQL
+            .fetch()
+            .pipe(takeUntil(this.subscription))
+            .subscribe((response) => {
+                if (response.errors?.length > 0) {
+                    this.catalogState = State.ERROR;
+                    return;
+                }
+                this.myCatalogs = response.data.myCatalogs;
+                this.catalogState = State.SUCCESS;
+            });
     }
 }
