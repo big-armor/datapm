@@ -3,7 +3,10 @@ import { ErrorResponse } from "apollo-link-error";
 import { Buffer } from "buffer";
 import { expect } from "chai";
 import { CreateAPIKeyDocument, DeleteAPIKeyDocument, MeDocument, Scope } from "./registry-client";
+import { mailObservable } from "./setup";
 import { createAnonymousClient, createTestClient, createUser } from "./test-utils";
+import { EMAIL_SUBJECTS } from "../../src/util/smtpUtil";
+import { describe, it } from "mocha";
 
 describe("API Key Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
@@ -52,7 +55,20 @@ describe("API Key Tests", async () => {
         expect(response.errors![0].message).equal("ALL_SCOPES_REQUIRED");
     });
 
-    it("User A create API Key - require all scopes", async function () {
+    it("User A create API Key", async function () {
+        let returnPromise = new Promise<any>((r) => {
+            let subscription = mailObservable.subscribe((email) => {
+                subscription.unsubscribe();
+
+                expect(email.html, "no tokens").not.to.contain("{{");
+                expect(email.text, "no tokens").not.to.contain("{{");
+                expect(email.subject, "email subject").to.equal(EMAIL_SUBJECTS.NEW_API_KEY);
+                expect(email.to[0].address).to.equal("testA-apiKey@test.datapm.io");
+                expect(email.to[0].name).to.equal("FirstA LastA");
+
+                r(email);
+            });
+        });
         let response = await userAClient.mutate({
             mutation: CreateAPIKeyDocument,
             variables: {
@@ -80,6 +96,8 @@ describe("API Key Tests", async () => {
         apiKeyClient = createTestClient({
             "X-API-KEY": key
         });
+
+        return returnPromise;
     });
 
     it("User A create API Key - conflicting label", async function () {
