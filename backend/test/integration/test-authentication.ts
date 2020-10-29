@@ -1,7 +1,7 @@
 import { ApolloClient, NormalizedCacheObject, ServerError } from "@apollo/client/core";
 import { ErrorResponse } from "apollo-link-error";
 import { expect } from "chai";
-import { LoginDocument, UpdateMyPasswordDocument } from "./registry-client";
+import { AUTHENTICATION_ERROR, LoginDocument, UpdateMyPasswordDocument } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 
 describe("Authentication Tests", async () => {
@@ -24,7 +24,7 @@ describe("Authentication Tests", async () => {
 
         expect(result.errors!.length > 0, "should have errors").equal(true);
         expect(
-            result.errors!.find((e) => e.message == "USER_NOT_FOUND") != null,
+            result.errors!.find((e) => e.message == AUTHENTICATION_ERROR.WRONG_CREDENTIALS) != null,
             "should have invalid login error"
         ).equal(true);
     });
@@ -156,7 +156,7 @@ describe("Authentication Tests", async () => {
 
         expect(result.errors!.length > 0, "should have errors").equal(true);
         expect(
-            result.errors!.find((e) => e.message == "WRONG_CREDENTIALS") != null,
+            result.errors!.find((e) => e.message == AUTHENTICATION_ERROR.WRONG_CREDENTIALS) != null,
             "should have invalid login error"
         ).equal(true);
     });
