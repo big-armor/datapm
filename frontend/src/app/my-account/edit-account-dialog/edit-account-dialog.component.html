@@ -1,4 +1,4 @@
-<form id="editAccount">
+<form id="editAccount" [formGroup]="form">
     <div mat-dialog-content>
         <div class="big-img-dialog text-center">
             <button class="add-img-btn">
@@ -20,20 +20,20 @@
             <div class="d-flex bd-highlight shadow-div mb-3">
                 <div class="px-4 py-2 bd-highlight div-question">first name</div>
                 <div class="bd-highlight div-answer">
-                    <input [formControl]="firstName" type="text" class="form-control" placeholder="First name" />
+                    <input formControlName="firstName" type="text" class="form-control" placeholder="First name" />
                 </div>
                 <div class="ml-auto px-4 py-2 bd-highlight slide-right">
-                    <mat-slide-toggle [formControl]="nameIsPublic" isChecked="nameIsPublic"></mat-slide-toggle>
+                    <mat-slide-toggle [checked]="nameIsPublic" (change)="toggleNameIsPublic($event)"></mat-slide-toggle>
                 </div>
             </div>
 
             <div class="d-flex bd-highlight shadow-div mb-3">
                 <div class="px-4 py-2 bd-highlight div-question">last name</div>
                 <div class="bd-highlight div-answer">
-                    <input [formControl]="lastName" type="text" class="form-control" placeholder="Last name" />
+                    <input formControlName="lastName" type="text" class="form-control" placeholder="Last name" />
                 </div>
                 <div class="ml-auto px-4 py-2 bd-highlight slide-right">
-                    <mat-slide-toggle></mat-slide-toggle>
+                    <mat-slide-toggle [checked]="nameIsPublic" (change)="toggleNameIsPublic($event)"></mat-slide-toggle>
                 </div>
             </div>
 
@@ -42,7 +42,7 @@
                 <div class="bd-highlight div-answer">
                     <input
                         (focus)="openConfirmDialog()"
-                        [formControl]="username"
+                        formControlName="username"
                         type="text"
                         class="form-control"
                         placeholder="Add your username"
@@ -61,38 +61,37 @@
                         </div>
                     </div>
                 </div>
-                <div class="ml-auto px-4 py-2 bd-highlight slide-right">
-                    <mat-slide-toggle></mat-slide-toggle>
-                </div>
             </div>
 
             <div class="d-flex bd-highlight shadow-div mb-3">
                 <div class="px-4 py-2 bd-highlight div-question">bio</div>
                 <div class="bd-highlight div-answer">
-                    <textarea class="form-control" placeholder="Add your bio"></textarea>
-                </div>
-                <div class="ml-auto px-4 py-2 bd-highlight slide-right">
-                    <mat-slide-toggle></mat-slide-toggle>
+                    <textarea formControlName="description" class="form-control" placeholder="Add your bio"></textarea>
                 </div>
             </div>
 
             <div class="d-flex bd-highlight shadow-div mb-3">
                 <div class="px-4 py-2 bd-highlight div-question">location</div>
                 <div class="bd-highlight div-answer">
-                    <input [formControl]="location" type="email" class="form-control" placeholder="Add your location" />
+                    <input
+                        formControlName="location"
+                        type="email"
+                        class="form-control"
+                        placeholder="Add your location"
+                    />
                 </div>
                 <div class="ml-auto px-4 py-2 bd-highlight slide-right">
-                    <mat-slide-toggle></mat-slide-toggle>
+                    <mat-slide-toggle formControlName="locationIsPublic"></mat-slide-toggle>
                 </div>
             </div>
 
             <div class="d-flex bd-highlight shadow-div mb-3">
                 <div class="px-4 py-2 bd-highlight div-question">website</div>
                 <div class="bd-highlight div-answer">
-                    <input [formControl]="website" type="email" class="form-control" placeholder="Add your website" />
+                    <input formControlName="website" type="email" class="form-control" placeholder="Add your website" />
                 </div>
                 <div class="ml-auto px-4 py-2 bd-highlight slide-right">
-                    <mat-slide-toggle></mat-slide-toggle>
+                    <mat-slide-toggle formControlName="websiteIsPublic"></mat-slide-toggle>
                 </div>
             </div>
 
@@ -100,18 +99,18 @@
                 <div class="px-4 py-2 bd-highlight div-question">email</div>
                 <div class="bd-highlight div-answer">
                     <input
-                        [formControl]="emailAddress"
+                        formControlName="emailAddress"
                         type="email"
                         class="form-control"
                         placeholder="Add your email"
                     />
                 </div>
                 <div class="ml-auto px-4 py-2 bd-highlight slide-right">
-                    <mat-slide-toggle></mat-slide-toggle>
+                    <mat-slide-toggle formControlName="emailAddressIsPublic"></mat-slide-toggle>
                 </div>
             </div>
 
-            <div class="d-flex bd-highlight shadow-div mb-3">
+            <!-- <div class="d-flex bd-highlight shadow-div mb-3">
                 <div class="pl-4 py-2 bd-highlight div-question">company</div>
                 <div class="bd-highlight div-answer">
                     <input type="email" class="form-control" placeholder="Add your company" />
@@ -129,7 +128,7 @@
                 <div class="ml-auto px-4 py-2 bd-highlight slide-right">
                     <mat-slide-toggle></mat-slide-toggle>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
     <div mat-dialog-actions>
@@ -138,7 +137,8 @@
             [mat-dialog-close]="true"
             (click)="submit()"
             class="ml-auto save-btn"
-            [class.disabled]="form.invalid"
+            [class.disabled]="form.invalid || form.pending"
+            [disabled]="form.invalid || form.pending"
         >
             <span>save</span>
         </button>
