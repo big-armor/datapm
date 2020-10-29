@@ -73,17 +73,4 @@
             </div>
         </div>
     </div>
-
-    <div class="package-div panel-div">
-        <div *ngIf="myCatalogs && myCatalogs.length > 0" class="section-title">My Catalogs</div>
-
-        <mat-card *ngFor="let catalog of myCatalogs">
-            <mat-card-title>
-                <a routerLink="/{{ catalog.identifier.catalogSlug }}">
-                    {{ catalog.displayName || catalog.identifier.catalogSlug }}
-                </a>
-            </mat-card-title>
-            <mat-card-description class="content-description">{{ catalog.description }}</mat-card-description>
-        </mat-card>
-    </div>
 </div>
