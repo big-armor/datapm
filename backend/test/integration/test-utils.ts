@@ -78,6 +78,8 @@ export async function createUserDoNotVerifyEmail(
                     return;
                 }
 
+                console.log(JSON.stringify(result, null, 1));
+
                 let token = result.data!.createMe;
 
                 let client = createTestClient({ Authorization: "Bearer " + token });

@@ -15,8 +15,13 @@ function copyFiles() {
         path.join(SCHEMA_DIR, "schema.gql"),
         path.join(SCHEMA_DIR, "auth-schema.gql"),
         path.join(SCHEMA_DIR, "user-schema.gql"),
-        path.join(SCHEMA_DIR, "api-key-schema.gql")
+        path.join(SCHEMA_DIR, "api-key-schema.gql"),
+        path.join(SCHEMA_DIR, "images-schema.gql")
     ]).pipe(dest(DESTINATION_DIR));
+}
+
+function copyEmailTemplates() {
+    return src(["static/email-templates/*"]).pipe(dest(path.join(DESTINATION_DIR, "static", "email-templates")));
 }
 
 function copyModules() {
@@ -29,4 +34,4 @@ function execLogCb(err, stdout, stderr) {
     return err; // makes gulp continue even if the command failed
 }
 
-exports.default = series(copyFiles, copyModules);
+exports.default = series(copyFiles, copyEmailTemplates, copyModules);
