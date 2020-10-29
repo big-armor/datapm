@@ -16,7 +16,7 @@ export const createAPIKey = async (
     });
 
     if (!user) {
-        throw new ValidationError(AUTHENTICATION_ERROR.USER_NOT_FOUND);
+        throw new ValidationError(AUTHENTICATION_ERROR.WRONG_CREDENTIALS);
     }
 
     if (
