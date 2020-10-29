@@ -41,7 +41,7 @@ export const updateMyPassword = async (
         .getUserByLogin(context.me.username, getGraphQlRelationName(info));
 
     if (user == null) {
-        throw new AuthenticationError(AUTHENTICATION_ERROR.USER_NOT_FOUND);
+        throw new AuthenticationError(AUTHENTICATION_ERROR.WRONG_CREDENTIALS);
     }
 
     const oldPasswordHash = hashPassword(value.oldPassword, user.passwordSalt);
