@@ -7,13 +7,13 @@
                 <mat-radio-group aria-label="Select an option" [(ngModel)]="selectedFilter">
                     <div class="p-2 bd-highlight">
                         <mat-radio-button [value]="Filter.PACKAGES" (change)="onPackageFilterChange()"
-                            >Packages</mat-radio-button
-                        >
+                            >Packages
+                        </mat-radio-button>
                     </div>
                     <div class="p-2 bd-highlight">
                         <mat-radio-button [value]="Filter.COLLECTIONS" (change)="onCollectionFilterChange()"
-                            >Collections</mat-radio-button
-                        >
+                            >Collections
+                        </mat-radio-button>
                     </div>
                     <!-- <div class="p-2 bd-highlight"><mat-radio-button [value]="Filter.USERS">Users</mat-radio-button></div> -->
                 </mat-radio-group>
@@ -124,97 +124,20 @@
                 </mat-list>
             </div>
             <div id="searchPackages" *ngIf="isPackageSelected">
-                <mat-list *ngIf="packageResult?.searchPackages?.packages?.length; else nothingFound">
-                    <ng-container
-                        *ngFor="
-                            let package of packageResult?.searchPackages?.packages;
-                            first as isFirst;
-                            last as isLast
-                        "
-                    >
-                        <div *ngIf="isFirst" class="search-title pl-3">
-                            Your search results for '{{ urlParams?.params?.q }}'
-                        </div>
+                <ng-container *ngIf="packageResult?.searchPackages?.packages?.length; else nothingFound">
+                    <div class="search-title pl-3">Your search results for '{{ urlParams?.params?.q }}'</div>
 
-                        <mat-list-item>
-                            <div class="d-flex bd-highlight mobile-row" style="width: 100%">
-                                <div
-                                    *ngIf="package.imageUrl"
-                                    class="d-flex bd-highlight mobile-row"
-                                    style="width: 100%"
-                                >
-                                    <img [src]="package.imageUrl" class="collection-image" alt="Image" />
-                                </div>
-                                <div class="py-2 bd-highlight">
-                                    <div class="d-flex flex-column bd-highlight pt-2">
-                                        <div class="bd-highlight user-name">
-                                            {{
-                                                (package.creator?.firstName || "") +
-                                                    " " +
-                                                    (package.creator?.lastName || "")
-                                            }}
-                                        </div>
-                                        <div class="bd-highlight user-title">
-                                            <a
-                                                [routerLink]="[
-                                                    '',
-                                                    package.identifier.catalogSlug,
-                                                    package.identifier.packageSlug
-                                                ]"
-                                                >{{ package.displayName }}</a
-                                            >
-                                        </div>
-                                        <div class="bd-highlight description-wrapper">
-                                            <span class="user-description">
-                                                {{ package.description }}
-                                            </span>
-                                        </div>
-                                        <!-- <div class="bd-highlight rounded-star-package mt-2">
-                      <button
-                      [class.yellow]="isStarClicked"
-                      mat-mini-fab
-                      aria-label="Example icon button with a home icon"
-                      (click)="clickStar()"
-                    >
-                      <mat-icon>star_border</mat-icon>
-                    </button>
-                    <span>66</span>
-                    </div> -->
-                                    </div>
-                                </div>
-                                <div class="ml-auto py-2 bd-highlight align-self-center">
-                                    <div class="d-flex flex-column bd-highlight text-right">
-                                        <div class="bd-highlight user-right-description">
-                                            {{ getPackageDateLabel(package) }}
-                                        </div>
-                                        <!-- <div class="bd-highlight user-right-description">
-                      2 downloaded
-                    </div> -->
-                                    </div>
-                                </div>
-                            </div>
-                        </mat-list-item>
+                    <app-package-item [item]="package" *ngFor="let package of packageResult?.searchPackages?.packages">
+                    </app-package-item>
 
-                        <mat-divider *ngIf="!isLast"></mat-divider>
-
-                        <ng-container
-                            *ngIf="
-                                isLast &&
-                                state !== state.LOADING &&
-                                (offset > 0 || packageResult.searchPackages.hasMore)
-                            "
+                    <div class="d-flex d-row justify-content-end">
+                        <a class="navigation-link" *ngIf="offset > 0" (click)="previous()">previous</a>
+                        <span *ngIf="offset > 0 && packageResult.searchPackages.hasMore">&nbsp;&nbsp;</span>
+                        <a class="navigation-link" *ngIf="packageResult.searchPackages.hasMore" (click)="next()"
+                            >next</a
                         >
-                            <mat-divider></mat-divider>
-                            <mat-list-item class="d-flex d-row justify-content-end">
-                                <a class="navigation-link" *ngIf="offset > 0" (click)="previous()">previous</a>
-                                <span *ngIf="offset > 0 && packageResult.searchPackages.hasMore">&nbsp;&nbsp;</span>
-                                <a class="navigation-link" *ngIf="packageResult.searchPackages.hasMore" (click)="next()"
-                                    >next</a
-                                >
-                            </mat-list-item>
-                        </ng-container>
-                    </ng-container>
-                </mat-list>
+                    </div>
+                </ng-container>
             </div>
             <!-- <div id="searchUser" *ngIf="isUserSelected">
         <mat-list>
