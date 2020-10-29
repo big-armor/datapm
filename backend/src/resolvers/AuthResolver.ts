@@ -21,6 +21,9 @@ export const login = async (
         throw new AuthenticationError(AUTHENTICATION_ERROR.USER_NOT_FOUND);
     }
 
+    if (process.env["REQUIRE_EMAIL_VERIFICATION"] != "false" && !user.emailVerified) {
+        throw new UserInputError(AUTHENTICATION_ERROR.EMAIL_ADDRESS_NOT_VERIFIED);
+    }
     const hash = hashPassword(password, user.passwordSalt);
     if (hash != user.passwordHash) {
         throw new AuthenticationError(AUTHENTICATION_ERROR.WRONG_CREDENTIALS);
@@ -45,10 +48,6 @@ export const verifyEmailAddress = async (
 
         if (user == null) {
             throw new UserInputError("TOKEN_NOT_VALID");
-        }
-
-        if (context.me.emailAddress != user.emailAddress) {
-            throw new UserInputError("TOKEN_DOES_NOT_MATCH");
         }
 
         // Verify that the token was created in the last 4 hours

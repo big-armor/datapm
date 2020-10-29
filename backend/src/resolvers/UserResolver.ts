@@ -2,7 +2,6 @@ import { AuthenticationError } from "apollo-server";
 import { AuthenticatedContext } from "../context";
 import { AUTHENTICATION_ERROR, CreateUserInput, UpdateMyPasswordInput, UpdateUserInput } from "../generated/graphql";
 import { UserRepository } from "../repository/UserRepository";
-import { createJwt } from "../util/jwt";
 import { hashPassword } from "../util/PasswordUtil";
 import { getGraphQlRelationName } from "../util/relationNames";
 
@@ -12,12 +11,10 @@ export const createMe = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const user = await context.connection.manager.getCustomRepository(UserRepository).createUser({
+    await context.connection.manager.getCustomRepository(UserRepository).createUser({
         value,
         relations: getGraphQlRelationName(info)
     });
-
-    return createJwt(user);
 };
 
 export const updateMe = async (

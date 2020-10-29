@@ -10,7 +10,8 @@ enum State {
     AWAITING_RESPONSE,
     INCORRECT_LOGIN,
     LOGGED_IN,
-    LOGIN_ERROR
+    LOGIN_ERROR,
+    LOGIN_ERROR_VALIDATE_EMAIL
 }
 
 @Component({
@@ -79,10 +80,9 @@ export class LoginDialogComponent implements OnInit, OnDestroy {
             .catch((error: any) => {
                 if (error.errors?.find((e) => (e.extensions.code == "GRAPHQL_VALIDATION_FAILED") != null)) {
                     this.state = State.INCORRECT_LOGIN;
-                }
-
-                if (error.errors?.find((e) => (e.extensions.code == "WRONG_CREDENTIALS") != null)) {
+                } else if (error.errors?.find((e) => (e.extensions.code == "WRONG_CREDENTIALS") != null)) {
                     this.state = State.INCORRECT_LOGIN;
+                } else if (error.errors?.find((e) => e.message == "LOGIN_ERROR_VALIDATE_EMAIL")) {
                 } else {
                     this.state = State.LOGIN_ERROR;
                 }

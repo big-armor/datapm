@@ -1,18 +1,16 @@
 import { ApolloClient, NormalizedCacheObject, ServerError } from "@apollo/client/core";
 import { ErrorResponse } from "apollo-link-error";
 import { expect } from "chai";
-import { VerifyEmailAddressDocument } from "./registry-client";
+import { LoginDocument, VerifyEmailAddressDocument } from "./registry-client";
 import { createAnonymousClient, createUserDoNotVerifyEmail } from "./test-utils";
 
 describe("Email Verification Tests", async () => {
     let anonymousClient: ApolloClient<NormalizedCacheObject> = createAnonymousClient();
     let userAClient: {
         emailVerificationToken: string;
-        client: ApolloClient<NormalizedCacheObject>;
     };
     let userBClient: {
         emailVerificationToken: string;
-        client: ApolloClient<NormalizedCacheObject>;
     };
 
     before(async () => {
@@ -50,20 +48,20 @@ describe("Email Verification Tests", async () => {
         expect(userBClient).to.exist;
     });
 
-    it("Validate wrong users email token", async function () {
-        let response = await userAClient.client.mutate({
-            mutation: VerifyEmailAddressDocument,
+    it("Login without validating email", async function () {
+        let response = await anonymousClient.mutate({
+            mutation: LoginDocument,
             variables: {
-                token: userBClient.emailVerificationToken
+                username: "testA-emailVerification@test.datapm.io",
+                password: "passwordA!"
             }
         });
-
         expect(response.errors != null).true;
-        expect(response.errors![0].message).equal("TOKEN_DOES_NOT_MATCH");
+        expect(response.errors![0].message).equal("EMAIL_ADDRESS_NOT_VERIFIED");
     });
 
     it("Validate correct token", async function () {
-        let response = await userAClient.client.mutate({
+        let response = await anonymousClient.mutate({
             mutation: VerifyEmailAddressDocument,
             variables: {
                 token: userAClient.emailVerificationToken
@@ -74,7 +72,7 @@ describe("Email Verification Tests", async () => {
     });
 
     it("Validate correct token again", async function () {
-        let response = await userAClient.client.mutate({
+        let response = await anonymousClient.mutate({
             mutation: VerifyEmailAddressDocument,
             variables: {
                 token: userAClient.emailVerificationToken
