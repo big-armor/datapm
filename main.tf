@@ -181,7 +181,7 @@ resource "google_cloud_run_service" "default" {
         env {
           name  = "REQUIRE_EMAIL_VERIFICATION"
           value = "true"
-        }               
+        }
       }
     }
 
