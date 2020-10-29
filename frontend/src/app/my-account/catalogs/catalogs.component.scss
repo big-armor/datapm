@@ -1,0 +1,133 @@
+#catalogsPage {
+    .catalogs-div {
+        margin-top: 30px;
+
+        .content-text {
+            margin-bottom: 15px;
+        }
+    }
+
+    .panel-div {
+        width: 100%;
+        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+            0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+        table {
+            width: 100%;
+        }
+        .div-answer {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            height: auto;
+            // justify-content: center;
+            align-items: center;
+            input {
+                height: 35px;
+                // border: none !important;
+                border: 0.5px solid rgb(235, 235, 235);
+                font-family: Roboto Mono;
+                font-style: normal;
+                font-weight: normal;
+                font-size: 14px;
+                line-height: 18px;
+                display: flex;
+                align-items: flex-end;
+                letter-spacing: -0.28px;
+                color: #017fb9;
+
+                &:focus {
+                    outline: transparent solid 0px;
+                    box-shadow: none;
+                }
+
+                &::placeholder {
+                    font-family: Roboto Mono;
+                    font-style: normal;
+                    font-weight: 300;
+                    font-size: 14px;
+                    line-height: 18px;
+                    display: flex;
+                    align-items: flex-end;
+                    letter-spacing: -0.28px;
+                    color: #828282;
+                }
+            }
+        }
+        .save-btn {
+            padding: 5px 20px;
+            box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
+                0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
+            border-radius: 24px;
+            span {
+                font-family: Roboto Mono;
+                font-style: normal;
+                font-weight: 300;
+                font-size: 18px;
+                line-height: 24px;
+                display: flex;
+                align-items: center;
+                text-align: center;
+                letter-spacing: -0.28px;
+                color: #828282;
+            }
+        }
+    }
+
+    .section-title {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 20px;
+        line-height: 26px;
+        letter-spacing: -0.28px;
+        color: #333333;
+        padding: 24px;
+    }
+
+    .mat-card {
+        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+            0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+
+        .mat-card-title {
+            font-family: Roboto Mono;
+            font-style: normal;
+            font-weight: 500;
+            font-size: 18px;
+            line-height: 18px;
+            letter-spacing: -0.28px;
+            color: #333333;
+            padding: 8px;
+        }
+
+        .mat-card-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            margin: 0px !important;
+        }
+
+        .content-description {
+            font-family: Roboto Mono;
+            font-style: normal;
+            font-weight: 300;
+            font-size: 14px;
+            line-height: 18px;
+            letter-spacing: -0.28px;
+            color: #4f4f4f;
+            max-height: 111px;
+            overflow: hidden;
+            padding: 8px;
+        }
+
+        ::ng-deep.card-header-mat {
+            .mat-card-header-text {
+                margin: 6px 0px;
+            }
+
+            .mat-card-avatar {
+                height: 35px;
+                width: unset;
+            }
+        }
+    }
+}
