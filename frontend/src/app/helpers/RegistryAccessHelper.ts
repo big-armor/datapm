@@ -7,15 +7,15 @@ export function getRegistryURL(): string {
 
     let portStr = "";
 
-    if ((protocol == "https" && port != "443") || (protocol == "http" && port != "80")) portStr = ":" + port;
+    if ((protocol == "https:" && port != "443") || (protocol == "http:" && port != "80")) portStr = ":" + port;
 
-    return getRegistryProtocol() + "://" + getRegistryHostname() + portStr;
+    return protocol + "//" + getRegistryHostname() + portStr;
 }
 
-export function getRegistryProtocol(): "https" | "http" {
+export function getRegistryProtocol(): "https:" | "http:" {
     const urlParsed = URLParse(currentLocation());
 
-    return urlParsed.protocol as "https" | "http";
+    return urlParsed.protocol as "https:" | "http:";
 }
 
 export function getRegistryHostname(): string {
