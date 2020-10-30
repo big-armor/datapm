@@ -1,7 +1,5 @@
 export REGISTRY_URL="http://localhost:4200"
 export REGISTRY_NAME="DataPM Local Development"
-export REGISTRY_HOSTNAME="localhost"
-export REGISTRY_PORT="4200"
 export JWT_AUDIENCE="localhost"
 export JWT_ISSUER="localhost"
 export JWT_KEY="!!!!REPLACE_ME!!!"

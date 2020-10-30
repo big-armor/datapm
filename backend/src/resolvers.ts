@@ -199,8 +199,7 @@ export const resolvers: {
             const catalog = parent as Catalog;
 
             return {
-                registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
-                registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
+                registryURL: getEnvVariable("REGISTRY_URL"),
                 catalogSlug: catalog.slug
             };
         },
@@ -210,8 +209,7 @@ export const resolvers: {
         identifier: async (parent: any, _1: any) => {
             const collection = parent as Collection;
             return {
-                registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
-                registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
+                registryURL: getEnvVariable("REGISTRY_URL"),
                 collectionSlug: collection.collectionSlug
             };
         },
@@ -242,8 +240,7 @@ export const resolvers: {
                 throw new ApolloError("Could not find catalog " + packageEntity.catalogId, "CATALOG_NOT_FOUND");
 
             const identifier: PackageIdentifier = {
-                registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
-                registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
+                registryURL: getEnvVariable("REGISTRY_URL"),
                 catalogSlug: catalog.slug,
                 packageSlug: packageEntity.slug
             };
@@ -276,8 +273,7 @@ export const resolvers: {
                 .findOneOrFail({ id: packageEntity.catalogId });
 
             return {
-                registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
-                registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
+                registryURL: getEnvVariable("REGISTRY_URL"),
                 catalogSlug: catalog.slug,
                 packageSlug: packageEntity.slug,
                 versionMajor: version.majorVersion,

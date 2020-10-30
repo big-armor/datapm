@@ -139,12 +139,8 @@ resource "google_cloud_run_service" "default" {
           value = google_sql_user.user.password
         }
         env {
-          name  = "REGISTRY_HOSTNAME"
-          value = "test.datapm.io"
-        }
-        env {
-          name  = "REGISTRY_PORT"
-          value = "443"
+          name  = "REGISTRY_URL"
+          value = "https://test.datapm.io"
         }
         env {
           name  = "TYPEORM_IS_DIST"
