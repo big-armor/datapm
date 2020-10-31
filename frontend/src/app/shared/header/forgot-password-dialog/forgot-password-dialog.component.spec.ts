@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
 import { ForgotPasswordDialogComponent } from "./forgot-password-dialog.component";
 
@@ -8,7 +9,8 @@ describe("ForgotPasswordDialogComponent", () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [ForgotPasswordDialogComponent]
+            declarations: [ForgotPasswordDialogComponent],
+            imports: [FormsModule, ReactiveFormsModule]
         }).compileComponents();
     }));
 
