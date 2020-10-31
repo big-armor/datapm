@@ -1,5 +1,6 @@
 import { BrowserModule } from "@angular/platform-browser";
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
+import { ToastrModule } from "ngx-toastr";
 
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
@@ -17,6 +18,7 @@ import { SharedModule } from "./shared/shared.module";
 import { TrendingComponent } from "./homepage/trending/trending.component";
 import { LoginDialogComponent } from "./shared/header/login-dialog/login-dialog.component";
 import { SignUpDialogComponent } from "./shared/header/sign-up-dialog/sign-up-dialog.component";
+import { ForgotPasswordDialogComponent } from "./shared/header/forgot-password-dialog/forgot-password-dialog.component";
 import { LatestComponent } from "./homepage/latest/latest.component";
 import { SearchComponent } from "./search/search.component";
 import { FollowingComponent } from "./homepage/following/following.component";
@@ -42,6 +44,7 @@ import { ConfirmationDialogComponent } from "./my-account/confirmation-dialog/co
         TrendingComponent,
         LoginDialogComponent,
         SignUpDialogComponent,
+        ForgotPasswordDialogComponent,
         LatestComponent,
         SearchComponent,
         FollowingComponent,
@@ -64,7 +67,8 @@ import { ConfirmationDialogComponent } from "./my-account/confirmation-dialog/co
         ReactiveFormsModule,
         FormsModule,
         SharedModule,
-        MaterialModule
+        MaterialModule,
+        ToastrModule.forRoot()
     ],
     providers: [],
     bootstrap: [AppComponent],
