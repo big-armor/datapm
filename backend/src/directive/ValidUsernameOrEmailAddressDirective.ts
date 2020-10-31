@@ -67,7 +67,7 @@ function validateUsernameOrEmail(value: String | undefined) {
 class ValidatedType extends GraphQLScalarType {
     constructor(type: GraphQLScalarType) {
         super({
-            name: `ValidatedUsername`,
+            name: `String`,
 
             // For more information about GraphQLScalar type (de)serialization,
             // see the graphql-js implementation:
