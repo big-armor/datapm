@@ -4,6 +4,7 @@ import { FormGroup, FormControl, AbstractControl, ValidationErrors } from "@angu
 
 import { User, UpdateMyPasswordGQL } from "src/generated/graphql";
 import { AuthenticationService } from "src/app/services/authentication.service";
+import { SnackBarService } from "src/app/services/snackBar.service";
 
 function newPasswordValidator() {
     return (control: AbstractControl): Promise<ValidationErrors | null> => {
@@ -59,7 +60,8 @@ export class EditPasswordDialogComponent implements OnInit {
         @Inject(MAT_DIALOG_DATA) public data: User,
         private dialog: MatDialog,
         private updateMyPasswordGQL: UpdateMyPasswordGQL,
-        private authenticationService: AuthenticationService
+        private authenticationService: AuthenticationService,
+        private snackBarService: SnackBarService
     ) {}
 
     ngOnInit(): void {
@@ -97,6 +99,7 @@ export class EditPasswordDialogComponent implements OnInit {
                     return;
                 } else {
                     this.dialog.closeAll();
+                    this.snackBarService.openSnackBar("Password updated!", "Close");
                 }
             });
     }
