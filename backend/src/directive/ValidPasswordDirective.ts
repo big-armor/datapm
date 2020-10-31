@@ -79,7 +79,7 @@ function validatePassword(password: String | undefined): void {
 class ValidatedType extends GraphQLScalarType {
     constructor(type: GraphQLScalarType) {
         super({
-            name: `ValidatedPassword`,
+            name: `String`,
 
             // For more information about GraphQLScalar type (de)serialization,
             // see the graphql-js implementation:

@@ -61,7 +61,7 @@ function validateSlug(slug: String | undefined) {
 class ValidatedType extends GraphQLScalarType {
     constructor(type: GraphQLScalarType) {
         super({
-            name: `ValidatedPackageSlug`,
+            name: `String`,
 
             // For more information about GraphQLScalar type (de)serialization,
             // see the graphql-js implementation:

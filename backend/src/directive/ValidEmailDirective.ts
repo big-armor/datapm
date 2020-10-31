@@ -74,7 +74,7 @@ export function validateEmailAddress(emailAddress: String | undefined) {
 class ValidatedType extends GraphQLScalarType {
     constructor(type: GraphQLScalarType) {
         super({
-            name: `ValidatedEmailAddress`,
+            name: `String`,
 
             // For more information about GraphQLScalar type (de)serialization,
             // see the graphql-js implementation:
