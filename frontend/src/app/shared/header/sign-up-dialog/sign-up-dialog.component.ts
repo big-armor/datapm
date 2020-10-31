@@ -1,8 +1,11 @@
 import { ChangeDetectorRef, Component, OnInit } from "@angular/core";
 import { AbstractControl, AsyncValidatorFn, FormControl, FormGroup, ValidationErrors } from "@angular/forms";
+import { ToastrService } from "ngx-toastr";
 import { Router } from "@angular/router";
+import { MatDialogRef } from "@angular/material/dialog";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { CreateMeGQL, EmailAddressAvailableGQL, UsernameAvailableGQL } from "src/generated/graphql";
+
 enum State {
     INIT,
     AWAITING_RESPONSE,
@@ -95,19 +98,15 @@ export class SignUpDialogComponent implements OnInit {
         private createMeGQL: CreateMeGQL,
         private usernameAvailableGQL: UsernameAvailableGQL,
         private emailAddressAvailableGQL: EmailAddressAvailableGQL,
-        private componentChangeDetector: ChangeDetectorRef
+        private componentChangeDetector: ChangeDetectorRef,
+        private dialogRef: MatDialogRef<SignUpDialogComponent>,
+        private toastr: ToastrService
     ) {}
 
     ngOnInit(): void {
         this.signUpForm = new FormGroup({
-            username: new FormControl("", {
-                asyncValidators: [usernameValidator(this.usernameAvailableGQL, this.componentChangeDetector)],
-                updateOn: "blur"
-            }),
-            emailAddress: new FormControl("", {
-                asyncValidators: [emailAddressValidator(this.emailAddressAvailableGQL, this.componentChangeDetector)],
-                updateOn: "blur"
-            }),
+            username: new FormControl(""),
+            emailAddress: new FormControl(""),
             password: new FormControl("")
         });
     }
@@ -123,11 +122,38 @@ export class SignUpDialogComponent implements OnInit {
             })
             .toPromise()
             .then((result) => {
-                this.state = State.SUCCESS;
-                setTimeout(() => {
-                    this.router.navigate(["/"]);
-                }, 1000);
+                if (result.errors) {
+                    const errorMsg = result.errors[0].message;
+
+                    if (errorMsg.startsWith("duplicate key value")) {
+                        this.signUpForm.get("emailAddress").setErrors({ NOT_AVAILABLE: true });
+                    } else if (errorMsg.match(/^Catalog .+ already exists$/)) {
+                        this.signUpForm.get("username").setErrors({ NOT_AVAILABLE: true });
+                    } else {
+                        this.toastr.error(errorMsg, "Error");
+                    }
+
+                    return;
+                }
+
+                this.dialogRef.close();
+                this.router.navigateByUrl("/");
+                this.toastr.success("Please check your email for next steps.", "Sign up complete!");
             })
-            .catch((error) => {});
+            .catch(() => {
+                this.toastr.error("Unknown error", "Error");
+            });
+    }
+
+    openForgotPassword() {
+        this.dialogRef.close("forgotPassword");
+    }
+
+    clearError(field: string) {
+        const control = this.signUpForm.get(field);
+        if (control.errors !== null) {
+            control.setErrors(null);
+            this.componentChangeDetector.detectChanges();
+        }
     }
 }

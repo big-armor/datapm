@@ -69,6 +69,10 @@ const staticRoutes: Route[] = [
         ]
     },
     {
+        path: "validate-email",
+        loadChildren: () => import("./verify-email/verify-email.module").then((m) => m.VerifyEmailModule)
+    },
+    {
         path: ":catalogSlug",
         component: CatalogDetailsComponent
     },
