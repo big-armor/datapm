@@ -1,7 +1,9 @@
 import { Component, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute, Router } from "@angular/router";
 import { resultKeyNameFromField } from "@apollo/client/utilities";
 import { ToastrService } from "ngx-toastr";
+import { SignUpDialogComponent } from "src/app/shared/header/sign-up-dialog/sign-up-dialog.component";
 import { VerifyEmailAddressGQL } from "src/generated/graphql";
 
 @Component({
@@ -14,7 +16,8 @@ export class VerifyEmailComponent implements OnInit {
         private verifyEmailAddressGQL: VerifyEmailAddressGQL,
         private route: ActivatedRoute,
         private router: Router,
-        private toastr: ToastrService
+        private toastr: ToastrService,
+        private dialog: MatDialog
     ) {}
 
     ngOnInit(): void {}
@@ -32,8 +35,14 @@ export class VerifyEmailComponent implements OnInit {
                     }
                     return;
                 }
-                this.toastr.success("", "Verification success!");
-                this.router.navigateByUrl("/");
+                this.toastr
+                    .success("", "Verification success!", {
+                        timeOut: 5000
+                    })
+                    .onHidden.subscribe(() => {
+                        this.router.navigateByUrl("/");
+                        this.dialog.open(SignUpDialogComponent);
+                    });
             },
             (error) => {
                 this.toastr.error(extractErrorMsg(error), "Error");
