@@ -134,7 +134,9 @@
             }
         }
     }
-
+    .mat-header-cell {
+        padding-left: 24px;
+    }
     .content-actions {
         .content-nr {
             font-family: Roboto Mono;
