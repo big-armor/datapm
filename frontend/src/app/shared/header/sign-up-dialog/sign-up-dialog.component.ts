@@ -125,9 +125,9 @@ export class SignUpDialogComponent implements OnInit {
                 if (result.errors) {
                     const errorMsg = result.errors[0].message;
 
-                    if (errorMsg.startsWith("duplicate key value")) {
+                    if (errorMsg.startsWith("EMAIL_ADDRESS_NOT_AVAILABLE")) {
                         this.signUpForm.get("emailAddress").setErrors({ NOT_AVAILABLE: true });
-                    } else if (errorMsg.match(/^Catalog .+ already exists$/)) {
+                    } else if (errorMsg.startsWith("USERNAME_NOT_AVAILABLE")) {
                         this.signUpForm.get("username").setErrors({ NOT_AVAILABLE: true });
                     } else {
                         this.toastr.error(errorMsg, "Error");
