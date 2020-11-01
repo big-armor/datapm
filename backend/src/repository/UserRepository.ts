@@ -11,6 +11,7 @@ import { CatalogRepository } from "./CatalogRepository";
 import { hashPassword } from "../util/PasswordUtil";
 import { Catalog } from "../entity/Catalog";
 import { sendVerifyEmail, smtpConfigured } from "../util/smtpUtil";
+import { ValidationError } from "apollo-server";
 // https://stackoverflow.com/a/52097700
 export function isDefined<T>(value: T | undefined | null): value is T {
     return <T>value !== undefined && <T>value !== null;
@@ -166,7 +167,6 @@ export class UserRepository extends Repository<User> {
         const ALIAS = "getByEmailAddress";
 
         const user = this.createQueryBuilder(ALIAS).where([{ emailAddress }]).getOne();
-
         return user;
     }
 
@@ -248,8 +248,6 @@ export class UserRepository extends Repository<User> {
 
         return this.manager
             .nestedTransaction(async (transaction) => {
-                // user does not exist, create it
-
                 let user = transaction.create(User);
 
                 if (value.firstName != null) user.firstName = value.firstName.trim();

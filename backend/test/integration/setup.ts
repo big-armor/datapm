@@ -30,6 +30,7 @@ before(async function () {
     // star the maildev server
     mailServer = new maildev({
         smtp: 1025,
+        web: 1081,
         ignoreTLS: true
     });
 
