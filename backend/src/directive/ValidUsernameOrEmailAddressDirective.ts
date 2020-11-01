@@ -13,6 +13,9 @@ import {
 import { Context } from "../context";
 import { validateUsername } from "./ValidUsernameDirective";
 import { validateEmailAddress } from "./ValidEmailDirective";
+import { ValidationConstraint } from "./ValidationConstraint";
+import { ValidationType } from "./ValidationType";
+import { Kind } from "graphql";
 
 export class ValidUsernameOrEmailAddressDirective extends SchemaDirectiveVisitor {
     visitArgumentDefinition(
@@ -49,45 +52,25 @@ export class ValidUsernameOrEmailAddressDirective extends SchemaDirectiveVisitor
             objectType: GraphQLInputObjectType;
         }
     ): GraphQLInputField | void | null {
-        if (field.type instanceof GraphQLNonNull && field.type.ofType instanceof GraphQLScalarType) {
-            field.type = new GraphQLNonNull(new ValidatedType(field.type.ofType));
-        } else if (field.type instanceof GraphQLScalarType) {
-            field.type = new ValidatedType(field.type);
-        } else {
-            throw new Error(`Not a scalar type: ${field.type}`);
-        }
+        field.type = ValidationType.create(field.type, new UsernameOrEmailAddressConstraint());
     }
 }
 
-function validateUsernameOrEmail(value: String | undefined) {
+export function validateUsernameOrEmail(value: String | undefined) {
     if (value?.indexOf("@") != -1) validateEmailAddress(value);
     else validateUsername(value);
 }
 
-class ValidatedType extends GraphQLScalarType {
-    constructor(type: GraphQLScalarType) {
-        super({
-            name: `ValidatedUsername`,
+class UsernameOrEmailAddressConstraint implements ValidationConstraint {
+    getName(): string {
+        return "UsernameOrEmailAddress";
+    }
 
-            // For more information about GraphQLScalar type (de)serialization,
-            // see the graphql-js implementation:
-            // https://github.com/graphql/graphql-js/blob/31ae8a8e8312/src/type/definition.js#L425-L446
+    validate(value: String) {
+        validateUsernameOrEmail(value);
+    }
 
-            serialize(value) {
-                value = type.serialize(value);
-
-                return value;
-            },
-
-            parseValue(value) {
-                validateUsernameOrEmail(value);
-
-                return type.parseValue(value);
-            },
-
-            parseLiteral(valueNode, variables) {
-                return type.parseLiteral(valueNode, variables);
-            }
-        });
+    getCompatibleScalarKinds(): string[] {
+        return [Kind.STRING];
     }
 }

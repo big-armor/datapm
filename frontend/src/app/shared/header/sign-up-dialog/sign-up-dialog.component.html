@@ -18,6 +18,7 @@
                     email
                     minlength="5"
                     class="rounded-input"
+                    (input)="clearError('emailAddress')"
                 />
                 <div class="div-with-errors">
                     <div class="alert-warn" *ngIf="signUpForm.get('emailAddress').errors?.INVALID_FORMAT">
@@ -28,8 +29,9 @@
                         Email address must be less than 100 characters long.
                     </div>
                     <div class="alert-warn" *ngIf="signUpForm.get('emailAddress').errors?.NOT_AVAILABLE">
-                        That email address already has an account. Please use the forgot password feature on the login
-                        page.
+                        <span>That email address already has an account. Please use the</span>
+                        <span class="forgot-password" (click)="openForgotPassword()">forgot password</span>
+                        <span>feature on the login page.</span>
                     </div>
                 </div>
                 <br />
@@ -56,6 +58,7 @@
                     formControlName="username"
                     autocomplete="username"
                     class="rounded-input"
+                    (input)="clearError('username')"
                 />
                 <div class="div-with-errors">
                     <div class="alert-warn" *ngIf="signUpForm.get('username').errors?.INVALID_CHARACTERS">

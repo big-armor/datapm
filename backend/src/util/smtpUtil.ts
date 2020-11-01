@@ -15,7 +15,7 @@ export async function sendAPIKeyCreatedEmail(user: User, apiKeyLabel: string) {
     emailText = replaceCommonTokens(user, emailText);
     emailText = emailText.replace(/{{api_key_label}}/g, apiKeyLabel);
 
-    emailHTML = replaceCommonTokens(user, emailText);
+    emailHTML = replaceCommonTokens(user, emailHTML);
     emailHTML = emailHTML.replace(/{{api_key_label}}/g, apiKeyLabel);
 
     sendEmail(user, EMAIL_SUBJECTS.NEW_API_KEY, emailText, emailHTML);
@@ -30,7 +30,7 @@ export async function sendVerifyEmail(user: User, token: string) {
     emailText = replaceCommonTokens(user, emailText);
     emailText = emailText.replace(/{{token}}/g, token);
 
-    emailHTML = replaceCommonTokens(user, emailText);
+    emailHTML = replaceCommonTokens(user, emailHTML);
     emailHTML = emailHTML.replace(/{{token}}/g, token);
 
     sendEmail(user, EMAIL_SUBJECTS.VERIFY_EMAIL, emailText, emailHTML);

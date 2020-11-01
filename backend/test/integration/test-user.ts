@@ -1,7 +1,7 @@
-import { ApolloClient, NormalizedCacheObject, ServerError } from "@apollo/client/core";
+import { ApolloClient, FetchResult, NormalizedCacheObject, ServerError } from "@apollo/client/core";
 import { ErrorResponse } from "apollo-link-error";
 import { expect } from "chai";
-import { MeDocument, UserDocument, UpdateMeDocument } from "./registry-client";
+import { MeDocument, UserDocument, UpdateMeDocument, LoginMutation } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 
 describe("User Tests", async () => {
@@ -15,6 +15,28 @@ describe("User Tests", async () => {
         userBClient = await createUser("FirstB", "LastB", "testB-user", "testB-user@test.datapm.io", "passwordB!");
         expect(userAClient).to.exist;
         expect(userBClient).to.exist;
+    });
+
+    it("Create an email that already exists", async function () {
+        let errorFound = false;
+        await createUser("FirstA", "LastA", "testA-user", "testA-user@test.datapm.io", "passwordA!")
+            .catch((response: FetchResult<LoginMutation, Record<string, any>, Record<string, any>>) => {
+                if (response.errors!.find((e) => e.message == "EMAIL_ADDRESS_NOT_AVAILABLE") != null) errorFound = true;
+            })
+            .then((client) => {
+                expect(errorFound, "email address not available error").equal(true);
+            });
+    });
+
+    it("Create a username that already exists", async function () {
+        let errorFound = false;
+        await createUser("FirstA", "LastA", "testA-user", "testA-user2@test.datapm.io", "passwordA!")
+            .catch((response: FetchResult<LoginMutation, Record<string, any>, Record<string, any>>) => {
+                if (response.errors!.find((e) => e.message == "USERNAME_NOT_AVAILABLE") != null) errorFound = true;
+            })
+            .then((client) => {
+                expect(errorFound, "username not available error").equal(true);
+            });
     });
 
     it("Get User A", async function () {

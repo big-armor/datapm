@@ -45,7 +45,7 @@ export async function createUserDoNotVerifyEmail(
 ): Promise<{
     emailVerificationToken: string;
 }> {
-    return await new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         let anonymousClient = createAnonymousClient();
 
         let verifyEmailPromise = new Promise<any>((r) => {
@@ -55,9 +55,8 @@ export async function createUserDoNotVerifyEmail(
             });
         });
 
-        anonymousClient
+        await anonymousClient
             .mutate<CreateMeMutation, CreateMeMutationVariables>({
-                errorPolicy: "all",
                 mutation: CreateMeDocument,
                 variables: {
                     value: {
@@ -70,15 +69,20 @@ export async function createUserDoNotVerifyEmail(
                 }
             })
             .catch((error) => {
-                //console.error(JSON.stringify(error,null,1));
                 reject(error);
             })
-            .then(async (result) => {
-                if (!result) {
-                    reject("This should never happen");
+            .then(async (responseRaw) => {
+                if (responseRaw == null) {
+                    reject();
                     return;
                 }
 
+                const response = responseRaw as FetchResult<LoginMutation, Record<string, any>, Record<string, any>>;
+
+                if (response.errors != null) {
+                    reject(response);
+                    return;
+                }
                 verifyEmailPromise
                     .catch((error) => reject(error))
                     .then((email) => {
@@ -111,7 +115,7 @@ export async function createUser(
     password: string
 ): Promise<ApolloClient<NormalizedCacheObject>> {
     return await new Promise(async (resolve, reject) => {
-        createUserDoNotVerifyEmail(firstName, lastName, username, emailAddress, password)
+        await createUserDoNotVerifyEmail(firstName, lastName, username, emailAddress, password)
             .catch((error) => {
                 reject(error);
             })
@@ -130,6 +134,9 @@ export async function createUser(
                         }
                     })
                     .catch((error) => {
+                        console.error("Error verifying email address");
+                        console.error(JSON.stringify(error, null, 1));
+
                         reject(error);
                     })
                     .then((response) => {
@@ -159,7 +166,11 @@ export async function createUser(
                                     Record<string, any>
                                 >;
 
-                                expect(response.errors == null).true;
+                                if (response.errors != null) {
+                                    reject(response);
+                                    return;
+                                }
+
                                 let authenticatedClient = createTestClient({
                                     Authorization: "Bearer " + response.data!.login
                                 });

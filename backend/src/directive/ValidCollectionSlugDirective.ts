@@ -12,6 +12,9 @@ import {
 } from "graphql";
 import { AuthenticatedContext, Context } from "../context";
 import { validateCollectionSlug } from "datapm-lib";
+import { Kind } from "graphql";
+import { ValidationConstraint } from "./ValidationConstraint";
+import { ValidationType } from "./ValidationType";
 
 export class ValidCollectionSlugDirective extends SchemaDirectiveVisitor {
     visitArgumentDefinition(
@@ -38,17 +41,11 @@ export class ValidCollectionSlugDirective extends SchemaDirectiveVisitor {
             objectType: GraphQLInputObjectType;
         }
     ): GraphQLInputField | void | null {
-        if (field.type instanceof GraphQLNonNull && field.type.ofType instanceof GraphQLScalarType) {
-            field.type = new GraphQLNonNull(new ValidatedType(field.type.ofType));
-        } else if (field.type instanceof GraphQLScalarType) {
-            field.type = new ValidatedType(field.type);
-        } else {
-            throw new Error(`Not a scalar type: ${field.type}`);
-        }
+        field.type = ValidationType.create(field.type, new CollectionSlugConstraint());
     }
 }
 
-function validateSlug(slug: String | undefined) {
+export function validateSlug(slug: String | undefined) {
     if (slug === undefined) throw new ValidationError(`COLLECTION_SLUG_REQUIRED`);
 
     if (slug.length == 0) throw new ValidationError(`COLLECTION_SLUG_REQUIRED`);
@@ -58,30 +55,16 @@ function validateSlug(slug: String | undefined) {
     if (!validateCollectionSlug(slug)) throw new ValidationError("COLLECTION_SLUG_INVALID");
 }
 
-class ValidatedType extends GraphQLScalarType {
-    constructor(type: GraphQLScalarType) {
-        super({
-            name: `ValidatedCollectionSlug`,
+class CollectionSlugConstraint implements ValidationConstraint {
+    getName(): string {
+        return "CollectionSlug";
+    }
 
-            // For more information about GraphQLScalar type (de)serialization,
-            // see the graphql-js implementation:
-            // https://github.com/graphql/graphql-js/blob/31ae8a8e8312/src/type/definition.js#L425-L446
+    validate(value: String) {
+        validateSlug(value);
+    }
 
-            serialize(value) {
-                value = type.serialize(value);
-
-                return value;
-            },
-
-            parseValue(value) {
-                validateSlug(value);
-
-                return type.parseValue(value);
-            },
-
-            parseLiteral(valueNode, variables) {
-                return type.parseLiteral(valueNode, variables);
-            }
-        });
+    getCompatibleScalarKinds(): string[] {
+        return [Kind.STRING];
     }
 }
