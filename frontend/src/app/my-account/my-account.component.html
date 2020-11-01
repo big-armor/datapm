@@ -11,16 +11,43 @@
                 <div class="p-2 bd-highlight">
                     <a class="user-img"><img src="../../assets/images/user-female.jpg" alt="User profile image" /></a>
                 </div>
-                <div *ngIf="currentUser.firstName && currentUser.lastName" class="p-2 bd-highlight">
-                    <span class="user-fullname"> {{ currentUser.firstName + " " + currentUser.lastName }} </span><br />
-                    <span class="user-name">{{ "@" + currentUser.username }}</span>
-                </div>
-                <div *ngIf="!currentUser.firstName || !currentUser.lastName" class="p-2 bd-highlight">
+                <div class="p-2 bd-highlight">
+                    <span *ngIf="currentUser.firstName && currentUser.lastName">
+                        <span class="user-fullname"> {{ currentUser.firstName + " " + currentUser.lastName }}</span>
+                        &nbsp;
+                        <span *ngIf="currentUser.nameIsPublic" class="public-text">public</span>
+                        <span *ngIf="!currentUser.nameIsPublic" class="not-public-text">not public</span><br />
+                    </span>
                     <span class="user-name-only">{{ "@" + currentUser.username }}</span>
+                    &nbsp;
+                    <span class="public-text">public</span>
                 </div>
+                <div class="p-2 bd-highlight"></div>
             </div>
-            <p class="user-bio pl-3">bio description, lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-            <a class="edit-profile ml-3" (click)="openEditDialog()">Edit profile</a>
+            <p class="user-bio pl-3">
+                {{ currentUser.description }}
+            </p>
+            <p class="pl-3">
+                <a target="_blank" href="mailto:{{ currentUser.emailAddress }}">{{ currentUser.emailAddress }}</a
+                >&nbsp;
+                <span *ngIf="currentUser.emailAddressIsPublic" class="public-text">public</span>
+                <span *ngIf="!currentUser.emailAddressIsPublic" class="not-public-text">not public</span>
+            </p>
+            <p class="pl-3" *ngIf="currentUser.twitterHandle">
+                <a target="_blank" href="https://twitter.com/{{ currentUser.twitterHandle }}"
+                    >@{{ currentUser.twitterHandle }} on Twitter</a
+                >&nbsp;
+                <span *ngIf="currentUser.twitterHandleIsPublic" class="public-text">public</span>
+                <span *ngIf="!currentUser.twitterHandleIsPublic" class="not-public-text">not public</span>
+            </p>
+            <p class="pl-3">
+                <a target="_blank" href="https://github.com/{{ currentUser.gitHubHandle }}"
+                    >@{{ currentUser.gitHubHandle }} on GitHub</a
+                >&nbsp;
+                <span *ngIf="currentUser.gitHubHandleIsPublic" class="public-text">public</span>
+                <span *ngIf="!currentUser.gitHubHandleIsPublic" class="not-public-text">not public</span>
+            </p>
+
             <div class="user-menu">
                 <ul class="p-0" id="homeRoutes">
                     <li *ngFor="let route of routes; let i = index" class="list-names" (click)="selectTab(i)">

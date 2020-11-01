@@ -3,13 +3,21 @@
         <div class="section-title">Actions</div>
         <div class="d-flex flex-row bd-highlight">
             <div class="mb-3">
-                <a class="edit-button" (click)="openPasswordDialog()">Update Password</a>
+                <a class="edit-button" (click)="openEditDialog()">Edit My Profile</a>
+                <a class="edit-button" (click)="openPasswordDialog()">Change My Password</a>
             </div>
         </div>
     </div>
 
     <div class="package-div panel-div">
         <div *ngIf="myAPIKeys && myAPIKeys.length > 0" class="section-title api-keys-title">My API Keys</div>
+        <div *ngIf="myAPIKeys && myAPIKeys.length === 0" class="section-title api-keys-title">
+            Create your first API Key
+        </div>
+        <div class="section-description">
+            API Keys are for authenticating your <a href="/docs/command-line-client/">DataPM Command Line Client</a>,
+            and custom software development projects using the <a href="/docs/registry-api/">DataPM Registry API</a>.
+        </div>
         <table *ngIf="myAPIKeys && myAPIKeys.length > 0" mat-table [dataSource]="myAPIKeys">
             <!-- Label column -->
             <ng-container matColumnDef="label">
@@ -28,9 +36,6 @@
             <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
             <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
         </table>
-        <div *ngIf="myAPIKeys && myAPIKeys.length === 0" class="section-title api-keys-title">
-            Create your first API Key
-        </div>
 
         <div class="api-key-form">
             <form [formGroup]="createAPIKeyForm">
@@ -60,7 +65,10 @@
             </div>
             <div *ngIf="createAPIKeyState == State.SUCCESS" class="div-with-key-command">
                 <p>
-                    The command to use your new key is below:
+                    Click to copy the command below. Paste it into your terminal after
+                    <a href="/docs/command-line-client/#install-the-datapm-command-line-client"
+                        >installing the command line client</a
+                    >.
                     <br />
                 </p>
                 <div class="command-container" (click)="copyKeyToClipboard()" matTooltip="Copy to clipboard">

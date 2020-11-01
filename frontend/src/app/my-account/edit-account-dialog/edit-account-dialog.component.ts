@@ -90,7 +90,9 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
             gitHubHandle: new FormControl(this.currentUser.gitHubHandle),
             locationIsPublic: new FormControl(this.currentUser.locationIsPublic),
             websiteIsPublic: new FormControl(this.currentUser.websiteIsPublic),
-            emailAddressIsPublic: new FormControl(this.currentUser.emailAddressIsPublic)
+            emailAddressIsPublic: new FormControl(this.currentUser.emailAddressIsPublic),
+            twitterHandleIsPublic: new FormControl(this.currentUser.twitterHandleIsPublic),
+            gitHubHandleIsPublic: new FormControl(this.currentUser.gitHubHandleIsPublic)
         });
 
         this.nameIsPublic = this.currentUser.nameIsPublic;

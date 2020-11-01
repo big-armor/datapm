@@ -339,6 +339,11 @@
             }
         }
     }
+
+    .section-description {
+        padding: 24px;
+        width: 66%;
+    }
 }
 
 @media (max-width: 767px) {
@@ -365,6 +370,10 @@
                 }
             }
         }
+    }
+
+    .section-description {
+        width: 100%;
     }
 }
 

@@ -161,6 +161,25 @@
     .mat-dialog-container {
         padding: 20px;
     }
+
+    .public-text {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 10px;
+        line-height: 13px;
+        letter-spacing: -0.28px;
+        color: #00a896;
+    }
+    .not-public-text {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 10px;
+        line-height: 13px;
+        letter-spacing: -0.28px;
+        color: #828282;
+    }
 }
 
 @media (max-width: 576px) {
