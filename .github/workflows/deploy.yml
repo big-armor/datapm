@@ -74,13 +74,11 @@ jobs:
             - name: Terraform Format
               run: terraform fmt -check
 
-            - name: Convert Terraform Environment Variables case
-              run: export TF_VAR_smtp_password=$TF_VAR_SMTP_PASSWORD
-
             - name: Terraform Plan
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: terraform plan
               env:
+                  TF_VAR_smtp_password: ${{secrets.TF_VAR_SMTP_PASSWORD}}
                   PROJECT_ID: data-test-terraform
                   GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
 
@@ -106,5 +104,6 @@ jobs:
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: terraform apply -auto-approve
               env:
+                  TF_VAR_smtp_password: ${{secrets.TF_VAR_SMTP_PASSWORD}}
                   PROJECT_ID: data-test-terraform
                   GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}

@@ -85,7 +85,7 @@ exports.default = series(
     buildDockerImage
 );
 
-exports.buildAndDeployParallel = series(
+exports.buildParallel = series(
     parallel(
         series(installBackendDepdendencies, buildBackend, testBackend),
         series(installFrontendDepdendencies, buildFrontend, testFrontend),
