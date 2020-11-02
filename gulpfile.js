@@ -40,7 +40,7 @@ function buildDocs() {
 }
 
 function buildDockerImage() {
-    return spawnAndLog("docs-build", "docker", [
+    return spawnAndLog("docker-build", "docker", [
         "build",
         "-t",
         "datapm-registry",
