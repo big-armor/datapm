@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { MatSnackBar, MatSnackBarRef } from "@angular/material/snack-bar";
 import { SignUpDialogComponent } from "src/app/shared/header/sign-up-dialog/sign-up-dialog.component";
 import { VerifyEmailAddressGQL } from "src/generated/graphql";
+import { LoginDialogComponent } from "src/app/shared/header/login-dialog/login-dialog.component";
 
 type VerificationState = "LOADING" | "SUCCESS" | "FAILED";
 
@@ -56,6 +57,11 @@ export class VerifyEmailComponent implements OnInit {
                 this.state = "FAILED";
             }
         );
+    }
+    loginClicked() {
+        this.dialog.open(LoginDialogComponent, {
+            disableClose: true
+        });
     }
 }
 
