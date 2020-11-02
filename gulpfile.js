@@ -1,4 +1,4 @@
-const { series, src, dest } = require("gulp");
+const { series, src, dest, parallel } = require("gulp");
 const exec = require("child_process").exec;
 const spawn = require("child_process").spawn;
 
@@ -82,6 +82,15 @@ exports.default = series(
     testFrontend,
     installDocsDepdendencies,
     buildDocs,
+    buildDockerImage
+);
+
+exports.buildAndDeployParallel = series(
+    parallel(
+        series(installBackendDepdendencies, buildBackend, testBackend),
+        series(installFrontendDepdendencies, buildFrontend, testFrontend),
+        series(installDocsDepdendencies, buildDocs)
+    ),
     buildDockerImage
 );
 
