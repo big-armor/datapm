@@ -5,12 +5,17 @@ import { MatSnackBar, MatSnackBarRef } from "@angular/material/snack-bar";
 import { SignUpDialogComponent } from "src/app/shared/header/sign-up-dialog/sign-up-dialog.component";
 import { VerifyEmailAddressGQL } from "src/generated/graphql";
 
+type VerificationState = "LOADING" | "SUCCESS" | "FAILED";
+
 @Component({
     selector: "app-verify-email",
     templateUrl: "./verify-email.component.html",
     styleUrls: ["./verify-email.component.scss"]
 })
 export class VerifyEmailComponent implements OnInit {
+    state: VerificationState = "LOADING";
+    errorMessage: string = "";
+
     constructor(
         private verifyEmailAddressGQL: VerifyEmailAddressGQL,
         private route: ActivatedRoute,
@@ -25,57 +30,30 @@ export class VerifyEmailComponent implements OnInit {
 
     validateEmail() {
         const token = this.route.snapshot.queryParamMap.get("token");
+        if (!token) {
+            this.errorMessage = "Token is invalid";
+            this.state = "FAILED";
+            return;
+        }
+
         this.verifyEmailAddressGQL.mutate({ token }).subscribe(
             (result) => {
                 if (result.errors) {
                     const errorMsg = result.errors[0].message;
-                    let snackbarRef: MatSnackBarRef<any>;
                     if (errorMsg === "TOKEN_NOT_VALID") {
-                        snackbarRef = this.snackbar.open("Token is invalid", null, {
-                            duration: 5000,
-                            panelClass: "notification-error",
-                            verticalPosition: "top",
-                            horizontalPosition: "right"
-                        });
+                        this.errorMessage = "Token is invalid";
                     } else {
-                        snackbarRef = this.snackbar.open(errorMsg, null, {
-                            duration: 5000,
-                            panelClass: "notification-error",
-                            verticalPosition: "top",
-                            horizontalPosition: "right"
-                        });
+                        this.errorMessage = errorMsg;
                     }
-                    snackbarRef.afterDismissed().subscribe(() => {
-                        this.router.navigateByUrl("/");
-                    });
+                    this.state = "FAILED";
                     return;
                 }
 
-                this.snackbar
-                    .open("Verification success!", null, {
-                        duration: 5000,
-                        panelClass: "notification-success",
-                        verticalPosition: "top",
-                        horizontalPosition: "right"
-                    })
-                    .afterDismissed()
-                    .subscribe(() => {
-                        this.router.navigateByUrl("/");
-                        this.dialog.open(SignUpDialogComponent);
-                    });
+                this.state = "SUCCESS";
             },
             (error) => {
-                this.snackbar
-                    .open(extractErrorMsg(error), null, {
-                        duration: 5000,
-                        panelClass: "notification-error",
-                        verticalPosition: "top",
-                        horizontalPosition: "right"
-                    })
-                    .afterDismissed()
-                    .subscribe(() => {
-                        this.router.navigateByUrl("/");
-                    });
+                this.errorMessage = extractErrorMsg(error);
+                this.state = "FAILED";
             }
         );
     }
