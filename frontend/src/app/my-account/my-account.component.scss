@@ -7,6 +7,17 @@
 }
 
 #userProfile {
+    .my-account-header {
+        min-height: 150px;
+    }
+    .contact-info {
+        padding: 10px;
+        color: #828282;
+
+        h3 {
+            margin-bottom: 10px;
+        }
+    }
     .top-row {
         position: relative;
         top: -160px;
@@ -87,7 +98,6 @@
                 line-height: 13px;
                 letter-spacing: -0.28px;
                 color: #4f4f4f;
-                max-width: 50%;
                 margin-bottom: 15px;
             }
 
