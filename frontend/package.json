@@ -32,7 +32,6 @@
         "crypto": "^1.0.1",
         "datapm-lib": "^0.3.20",
         "jwt-decode": "^2.2.0",
-        "ngx-toastr": "^13.1.0",
         "rxjs": "^6.5.5",
         "stream": "0.0.2",
         "timeago.js": "^4.0.2",

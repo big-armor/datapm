@@ -1,6 +1,5 @@
 import { BrowserModule } from "@angular/platform-browser";
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
-import { ToastrModule } from "ngx-toastr";
 
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
@@ -67,8 +66,7 @@ import { ConfirmationDialogComponent } from "./my-account/confirmation-dialog/co
         ReactiveFormsModule,
         FormsModule,
         SharedModule,
-        MaterialModule,
-        ToastrModule.forRoot()
+        MaterialModule
     ],
     providers: [],
     bootstrap: [AppComponent],

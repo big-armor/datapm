@@ -2,7 +2,6 @@ import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialogRef } from "@angular/material/dialog";
 import { RouterTestingModule } from "@angular/router/testing";
-import { ToastrModule } from "ngx-toastr";
 import { MaterialModule } from "src/app/material.module";
 
 import { SignUpDialogComponent } from "./sign-up-dialog.component";
@@ -14,7 +13,7 @@ describe("SignUpDialogComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [SignUpDialogComponent],
-            imports: [FormsModule, ReactiveFormsModule, RouterTestingModule, MaterialModule, ToastrModule.forRoot()],
+            imports: [FormsModule, ReactiveFormsModule, RouterTestingModule, MaterialModule],
             providers: [{ provide: MatDialogRef, useValue: {} }]
         }).compileComponents();
     }));

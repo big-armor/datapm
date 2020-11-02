@@ -18,6 +18,7 @@ import { MatListModule } from "@angular/material/list";
 import { MatDividerModule } from "@angular/material/divider";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
+import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatTableModule } from "@angular/material/table";
 import { MatTooltipModule } from "@angular/material/tooltip";
@@ -43,6 +44,7 @@ import { MatTooltipModule } from "@angular/material/tooltip";
         MatDividerModule,
         MatExpansionModule,
         MatSlideToggleModule,
+        MatSnackBarModule,
         MatProgressSpinnerModule,
         MatTableModule,
         MatTooltipModule
