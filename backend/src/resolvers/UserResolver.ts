@@ -5,8 +5,8 @@ import { UserRepository } from "../repository/UserRepository";
 import { createJwt } from "../util/jwt";
 import { hashPassword } from "../util/PasswordUtil";
 import { getGraphQlRelationName } from "../util/relationNames";
-import {ImageType} from "../storage/images/image-type";
-import {ImageStorageService} from "../storage/images/image-storage-service";
+import { ImageType } from "../storage/images/image-type";
+import { ImageStorageService } from "../storage/images/image-storage-service";
 
 export const createMe = async (
     _0: any,
@@ -62,23 +62,30 @@ export const updateMyPassword = async (
     });
 };
 
-export const setMyCoverImage = async (
-    _0: any,
-    {image}: {image: any},
-    context: AuthenticatedContext,
-    info: any) => {
+export const setMyCoverImage = async (_0: any, { image }: { image: any }, context: AuthenticatedContext, info: any) => {
     const uploadedImage = await image;
-    await ImageStorageService.INSTANCE.saveImage(context.me.id, uploadedImage, ImageType.USER_COVER_IMAGE, context);
-}
+    return await ImageStorageService.INSTANCE.saveImage(
+        context.me.id,
+        uploadedImage,
+        ImageType.USER_COVER_IMAGE,
+        context
+    );
+};
 
 export const setMyAvatarImage = async (
     _0: any,
-    {image}: {image: any},
+    { image }: { image: any },
     context: AuthenticatedContext,
-    info: any) => {
+    info: any
+) => {
     const uploadedImage = await image;
-    await ImageStorageService.INSTANCE.saveImage(context.me.id, uploadedImage, ImageType.USER_AVATAR_IMAGE, context);
-}
+    return await ImageStorageService.INSTANCE.saveImage(
+        context.me.id,
+        uploadedImage,
+        ImageType.USER_AVATAR_IMAGE,
+        context
+    );
+};
 
 export const disableMe = async (_0: any, {}, context: AuthenticatedContext, info: any) => {
     return await context.connection.manager.getCustomRepository(UserRepository).markUserActiveStatus({

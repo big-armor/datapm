@@ -8,6 +8,9 @@ documents: node_modules/datapm-lib/graphql-documents/*.graphql
 generates:
     test/integration/registry-client.ts:
         plugins:
+            - add:
+                  content:
+                      - import { FileUpload } from 'graphql-upload'
             - typescript
             - typescript-operations
             - typed-document-node

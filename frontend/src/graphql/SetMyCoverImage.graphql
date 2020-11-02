@@ -1,3 +1,0 @@
-mutation SetMyCoverImage($image: Upload!) {
-  setMyCoverImage(image: $image)
-}

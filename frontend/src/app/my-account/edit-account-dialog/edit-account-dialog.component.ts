@@ -8,8 +8,8 @@ import {
     UsernameAvailableGQL,
     UpdateCatalogGQL,
     User,
-    SetMyAvatarImageGQL,
-    SetMyCoverImageGQL
+    SetMyCoverImageGQL,
+    SetMyAvatarImageGQL
 } from "../../../generated/graphql";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
 import { ImageUploadService } from "../../services/image-upload.service";
