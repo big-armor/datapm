@@ -4,11 +4,7 @@ import { CatalogDetailsComponent } from "./catalog-details/catalog-details.compo
 import { MyAccountComponent } from "./my-account/my-account.component";
 import { AuthGuard } from "./helpers/auth-guard";
 import { PackageDetailComponent } from "./package/package-detail/package-detail.component";
-import { HomepageComponent } from "./homepage/homepage.component";
 import { SearchComponent } from "./search/search.component";
-import { TrendingComponent } from "./homepage/trending/trending.component";
-import { LatestComponent } from "./homepage/latest/latest.component";
-import { FollowingComponent } from "./homepage/following/following.component";
 import { PackageComponent } from "./package/package.component";
 import { PackageVersionComponent } from "./package/package-version/package-version.component";
 import { PackageSchemaComponent } from "./package/package-schema/package-schema.component";
@@ -20,26 +16,7 @@ import { CatalogsComponent } from "./my-account/catalogs/catalogs.component";
 const staticRoutes: Route[] = [
     {
         path: "",
-        component: HomepageComponent,
-        children: [
-            {
-                path: "",
-                redirectTo: "latest",
-                pathMatch: "full"
-            },
-            // {
-            //   path:'trending',
-            //   component: TrendingComponent
-            // },
-            {
-                path: "latest",
-                component: LatestComponent
-            }
-            // {
-            //   path:'following',
-            //   component: FollowingComponent
-            // },
-        ]
+        loadChildren: () => import("./home/home.module").then((m) => m.HomeModule)
     },
     {
         path: "search",
