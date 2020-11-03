@@ -15,7 +15,7 @@ export let mailObservable: Observable<any>;
 before(async function () {
     console.log("Starting postgres temporary container");
 
-    this.timeout(60000);
+    this.timeout(1200000);
     container = await new GenericContainer("postgres")
         .withEnv("POSTGRES_PASSWORD", "postgres")
         .withEnv("POSTGRES_DB", "datapm")
