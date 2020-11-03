@@ -33,7 +33,7 @@ button.mat-menu-item {
 
 .desktop-menu {
     max-width: 1450px;
-    margin: 0 auto;
+    margin: 0 auto 15px auto;
 }
 
 .main-menu-title {
@@ -193,9 +193,15 @@ button.mat-menu-item {
     display: none;
 }
 
+.avatar {
+    position: relative;
+    top: 5px;
+}
+
 @media (max-width: 768px) {
     .mobile-menu {
-        display: flex;
+        display: block;
+        padding-bottom: 15px;
     }
     .desktop-menu {
         display: none;

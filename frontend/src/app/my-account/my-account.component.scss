@@ -7,6 +7,17 @@
 }
 
 #userProfile {
+    .my-account-header {
+        min-height: 150px;
+    }
+    .contact-info {
+        padding: 10px;
+        color: #828282;
+
+        h3 {
+            margin-bottom: 10px;
+        }
+    }
     .top-row {
         position: relative;
         top: -160px;
@@ -87,7 +98,6 @@
                 line-height: 13px;
                 letter-spacing: -0.28px;
                 color: #4f4f4f;
-                max-width: 50%;
                 margin-bottom: 15px;
             }
 
@@ -161,11 +171,29 @@
     .mat-dialog-container {
         padding: 20px;
     }
+
+    .public-text {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 10px;
+        line-height: 13px;
+        letter-spacing: -0.28px;
+        color: #00a896;
+    }
+    .not-public-text {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 10px;
+        line-height: 13px;
+        letter-spacing: -0.28px;
+        color: #828282;
+    }
 }
 
 @media (max-width: 576px) {
     .cover-image {
-        margin-top: 20px;
         height: 100px;
     }
     .user-header {
