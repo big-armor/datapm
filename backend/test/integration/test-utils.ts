@@ -96,7 +96,7 @@ export async function createUserDoNotVerifyEmail(
                         expect(email.text).to.not.contain("{{token}}");
                         expect(email.text).to.not.contain("{{");
 
-                        const emailValidationToken = (email.text as String).match(/#token=([a-zA-z0-9-]+)/);
+                        const emailValidationToken = (email.text as String).match(/\?token=([a-zA-z0-9-]+)/);
 
                         resolve({
                             emailVerificationToken: emailValidationToken!.pop()!

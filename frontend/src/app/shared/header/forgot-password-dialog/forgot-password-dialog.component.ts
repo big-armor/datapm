@@ -8,6 +8,7 @@ import {
     Validators
 } from "@angular/forms";
 import { EmailAddressAvailableGQL } from "src/generated/graphql";
+import { emailAddressValidator } from "src/app/helpers/validators";
 
 enum State {
     INIT,
@@ -16,36 +17,6 @@ enum State {
     ERROR,
     SUCCESS,
     ERROR_AFTER_SIGNUP
-}
-
-function emailAddressValidator(
-    emailAddressAvailableGQL: EmailAddressAvailableGQL,
-    componentChangeDetector: ChangeDetectorRef
-): AsyncValidatorFn {
-    return (control: AbstractControl): Promise<ValidationErrors | null> => {
-        return new Promise<ValidationErrors | null>((success, error) => {
-            if (control.value == "" || control.value == null) {
-                return;
-            }
-            emailAddressAvailableGQL.fetch({ emailAddress: control.value }).subscribe((result) => {
-                if (result.errors?.length > 0) {
-                    success({
-                        [result.errors[0].message]: true
-                    });
-                } else {
-                    if (result.data.emailAddressAvailable) {
-                        success({
-                            NOT_AVAILABLE: true
-                        });
-                    } else {
-                        success(null);
-                    }
-                }
-                control.markAllAsTouched();
-                componentChangeDetector.detectChanges();
-            });
-        });
-    };
 }
 
 @Component({

@@ -14,7 +14,7 @@ describe("SignUpDialogComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [SignUpDialogComponent],
-            imports: [FormsModule, ReactiveFormsModule, RouterTestingModule, MaterialModule, ToastrModule.forRoot()],
+            imports: [FormsModule, ReactiveFormsModule, RouterTestingModule, MaterialModule],
             providers: [{ provide: MatDialogRef, useValue: {} }]
         }).compileComponents();
     }));

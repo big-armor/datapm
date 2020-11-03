@@ -78,6 +78,7 @@ jobs:
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: terraform plan
               env:
+                  TF_VAR_smtp_password: ${{secrets.TF_VAR_SMTP_PASSWORD}}
                   PROJECT_ID: data-test-terraform
                   GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
 
@@ -97,11 +98,12 @@ jobs:
 
             - name: Publish Apollo Graphql Update
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-              run: npx apollo service:push --graph=datapm --key=${{secrets.APOLLO_KEY}} --variant=test --localSchemaFile=backend/dist/schema.gql,backend/dist/auth-schema.gql,backend/dist/user-schema.gql,backend/dist/api-key-schema.gql
+              run: npx apollo service:push --graph=datapm --key=${{secrets.APOLLO_KEY}} --variant=test --localSchemaFile=backend/dist/schema.gql,backend/dist/auth-schema.gql,backend/dist/user-schema.gql,backend/dist/api-key-schema.gql,backend/dist/images-schema.gql
 
             - name: Terraform Apply
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: terraform apply -auto-approve
               env:
+                  TF_VAR_smtp_password: ${{secrets.TF_VAR_SMTP_PASSWORD}}
                   PROJECT_ID: data-test-terraform
                   GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}

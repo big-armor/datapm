@@ -2,7 +2,7 @@
     font-family: Roboto Mono;
     font-style: normal;
     font-weight: 400;
-    font-size: 42px;
+    font-size: 24px;
     line-height: 55px;
     text-align: center;
     margin: 10px 0 30px;
@@ -11,7 +11,7 @@
         4px 0px 4px rgba(183, 183, 183, 0.25), 0px 4px 4px rgba(183, 183, 183, 0.25);
 }
 
-.dialog-subtile {
+.dialog-subtitle {
     font-family: Roboto Mono;
     font-style: normal;
     font-weight: 300;
@@ -21,6 +21,22 @@
     padding-bottom: 5px;
     letter-spacing: -0.28px;
     color: #828282;
+    text-align: center;
+}
+
+.success-icon,
+.failed-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 60px;
+}
+
+.success-icon {
+    color: #43a047;
+}
+
+.failed-icon {
+    color: #c62828;
 }
 
 .rounded-input {

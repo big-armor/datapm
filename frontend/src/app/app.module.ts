@@ -28,6 +28,8 @@ import { PackageSchemaComponent } from "./package/package-schema/package-schema.
 import { DetailsComponent } from "./my-account/details/details.component";
 import { PackagesComponent } from "./my-account/packages/packages.component";
 import { ActivityComponent } from "./my-account/activity/activity.component";
+import { CatalogsComponent } from "./my-account/catalogs/catalogs.component";
+
 import { EditAccountDialogComponent } from "./my-account/edit-account-dialog/edit-account-dialog.component";
 import { EditPasswordDialogComponent } from "./my-account/edit-password-dialog/edit-password-dialog.component";
 import { ConfirmationDialogComponent } from "./my-account/confirmation-dialog/confirmation-dialog.component";
@@ -52,6 +54,7 @@ import { ConfirmationDialogComponent } from "./my-account/confirmation-dialog/co
         DetailsComponent,
         PackagesComponent,
         ActivityComponent,
+        CatalogsComponent,
         EditAccountDialogComponent,
         EditPasswordDialogComponent,
         ConfirmationDialogComponent

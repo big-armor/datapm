@@ -1,8 +1,9 @@
 import { Component, OnInit, Inject, ChangeDetectorRef, OnDestroy } from "@angular/core";
 import { FormGroup, FormControl, AsyncValidatorFn, AbstractControl, ValidationErrors } from "@angular/forms";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 import { Subject } from "rxjs";
-import { take, takeUntil } from "rxjs/operators";
+import { takeUntil } from "rxjs/operators";
 import { UpdateMeGQL, UsernameAvailableGQL, UpdateCatalogGQL, User } from "../../../generated/graphql";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
 
@@ -57,6 +58,8 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
 
     private subscription = new Subject();
 
+    public nameIsPublic: boolean = false;
+
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: User,
         public dialogRef: MatDialogRef<EditAccountDialogComponent>,
@@ -69,6 +72,7 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.currentUser = this.data;
+        console.log(this.data);
 
         this.form = new FormGroup({
             username: new FormControl(this.currentUser.username, {
@@ -79,12 +83,17 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
             firstName: new FormControl(this.currentUser.firstName),
             lastName: new FormControl(this.currentUser.lastName),
             location: new FormControl(this.currentUser.location),
+            description: new FormControl(this.currentUser.description),
             twitterHandle: new FormControl(this.currentUser.twitterHandle),
             website: new FormControl(this.currentUser.website),
             emailAddress: new FormControl(this.currentUser.emailAddress),
             gitHubHandle: new FormControl(this.currentUser.gitHubHandle),
-            nameIsPublic: new FormControl(this.currentUser.nameIsPublic)
+            locationIsPublic: new FormControl(this.currentUser.locationIsPublic),
+            websiteIsPublic: new FormControl(this.currentUser.websiteIsPublic),
+            emailAddressIsPublic: new FormControl(this.currentUser.emailAddressIsPublic)
         });
+
+        this.nameIsPublic = this.currentUser.nameIsPublic;
     }
 
     ngOnDestroy() {
@@ -97,18 +106,12 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
         if (this.form.invalid) {
             return;
         }
+
         this.updateMeGQL
             .mutate({
                 value: {
-                    username: this.username.value,
-                    firstName: this.firstName.value,
-                    lastName: this.lastName.value,
-                    // location: this.location.value,
-                    // twitterHandle: this.twitterHandle.value,
-                    // website: this.website.value,
-                    emailAddress: this.emailAddress.value
-                    // gitHubHandle: this.gitHubHandle.value,
-                    // nameIsPublic: this.nameIsPublic.value
+                    ...this.form.value,
+                    nameIsPublic: this.nameIsPublic
                 }
             })
             .pipe(takeUntil(this.subscription))
@@ -150,39 +153,12 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
         }
     }
 
+    toggleNameIsPublic(ev: MatSlideToggleChange) {
+        console.log("name is public", ev.checked);
+        this.nameIsPublic = ev.checked;
+    }
+
     get username() {
         return this.form.get("username")! as FormControl;
-    }
-
-    get firstName() {
-        return this.form.get("firstName")! as FormControl;
-    }
-
-    get lastName() {
-        return this.form.get("lastName")! as FormControl;
-    }
-
-    get location() {
-        return this.form.get("location")! as FormControl;
-    }
-
-    get twitterHandle() {
-        return this.form.get("twitterHandle")! as FormControl;
-    }
-
-    get website() {
-        return this.form.get("website")! as FormControl;
-    }
-
-    get emailAddress() {
-        return this.form.get("emailAddress")! as FormControl;
-    }
-
-    get gitHubHandle() {
-        return this.form.get("gitHubHandle")! as FormControl;
-    }
-
-    get nameIsPublic() {
-        return this.form.get("nameIsPublic")! as FormControl;
     }
 }
