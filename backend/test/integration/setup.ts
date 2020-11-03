@@ -5,12 +5,15 @@ import { Stream } from "stream";
 import * as readline from "readline";
 import pidtree from "pidtree";
 import { Observable } from "@apollo/client/core";
+import fs from "fs";
 const maildev = require("maildev");
 
 let container: StartedTestContainer;
 let serverProcess: execa.ExecaChildProcess;
 let mailServer: any;
 export let mailObservable: Observable<any>;
+
+const TEMP_STORAGE_URL = "~/temp/datapm-storage";
 
 before(async function () {
     console.log("Starting postgres temporary container");
@@ -56,7 +59,8 @@ before(async function () {
             SMTP_PASSWORD: "",
             SMTP_SECURE: "false",
             SMTP_FROM_ADDRESS: "test@localhost",
-            SMTP_FROM_NAME: "local-test"
+            SMTP_FROM_NAME: "local-test",
+            STORAGE_URL: TEMP_STORAGE_URL
         }
     });
 
@@ -74,6 +78,8 @@ before(async function () {
             if (line.indexOf("🚀") != -1) {
                 console.log("Server started!");
                 serverReady = true;
+
+                fs.mkdirSync(TEMP_STORAGE_URL, { recursive: true });
                 r();
             }
         });
@@ -115,5 +121,6 @@ after(async function () {
         }
     });
 
+    fs.rmdirSync(TEMP_STORAGE_URL);
     mailServer.close();
 });
