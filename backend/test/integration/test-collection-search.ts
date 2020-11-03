@@ -13,6 +13,7 @@ import {
     DisableCollectionDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
+import { describe, it } from "mocha";
 
 describe("Collection Search Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;

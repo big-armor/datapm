@@ -13,6 +13,7 @@ import { createAnonymousClient, createUser } from "./test-utils";
 import * as fs from "fs";
 import * as crypto from "crypto";
 import { PackageFile } from "datapm-lib";
+import { describe, it } from "mocha";
 
 describe("Package Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;

@@ -11,6 +11,7 @@ import {
     GetCatalogDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
+import { describe, it } from "mocha";
 
 describe("Catalog Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;

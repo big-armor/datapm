@@ -3,6 +3,7 @@ import { ErrorResponse } from "apollo-link-error";
 import { expect } from "chai";
 import { AUTHENTICATION_ERROR, LoginDocument, UpdateMyPasswordDocument } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
+import { describe, it } from "mocha";
 
 describe("Authentication Tests", async () => {
     let anonymousClient: ApolloClient<NormalizedCacheObject> = createAnonymousClient();
