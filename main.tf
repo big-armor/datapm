@@ -3,7 +3,10 @@ variable "smtp_password" {
   type        = string
 }
 
-
+variable "APOLLO_KEY" {
+  description = "Apollo GraphlQL Key"
+  type = string
+}
 
 terraform {
   backend "gcs" {
@@ -92,7 +95,7 @@ resource "google_cloud_run_service" "default" {
         }
         env {
           name  = "APOLLO_KEY"
-          value = "service:family-connections:asdfasdfasdfasdf"
+          value = var.APOLLO_KEY
         }
         env {
           name  = "APOLLO_GRAPH_VARIANT"
@@ -137,6 +140,10 @@ resource "google_cloud_run_service" "default" {
         env {
           name  = "TYPEORM_PASSWORD"
           value = google_sql_user.user.password
+        }
+        env {
+          name = "REGISTRY_NAME"
+          value = "DataPM TEST Registry"
         }
         env {
           name  = "REGISTRY_HOSTNAME"
