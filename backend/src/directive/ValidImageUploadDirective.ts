@@ -27,12 +27,12 @@ export class ValidateImageUploadDirective extends SchemaDirectiveVisitor {
             throw new ValidationError(IMAGE_UPLOAD_ERROR_TYPE.IMAGE_NOT_INITIALIZED);
         }
 
-        if (!this.isValidMimeType(image.mimetype)) {
+        if (!ValidateImageUploadDirective.isValidMimeType(image.mimetype)) {
             throw new ValidationError(IMAGE_UPLOAD_ERROR_TYPE.IMAGE_FORMAT_NOT_SUPPORTED);
         }
     }
 
-    private isValidMimeType(mimeType: string): boolean {
+    public static isValidMimeType(mimeType: string): boolean {
         switch (mimeType) {
             case "image/jpeg":
             case "image/jpg":

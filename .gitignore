@@ -10,3 +10,5 @@ terraform.tfvars*
 .DS_Store
 
 backend/test/integration/registry-client.ts
+.idea
+gc.json

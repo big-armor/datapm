@@ -37,6 +37,7 @@
         "apollo-server": "^2.11.0",
         "atob": "^2.1.2",
         "dataloader": "^2.0.0",
+        "datapm-lib": "^0.3.20",
         "express-enforces-ssl": "^1.1.0",
         "express-http-proxy": "^1.6.0",
         "express-jwt": "^6.0.0",
@@ -57,6 +58,7 @@
         "reflect-metadata": "^0.1.13",
         "semver": "^7.3.2",
         "sharp": "^0.26.2",
+        "superagent": "^6.1.0",
         "typeorm": "0.2.25",
         "uuid": "^8.2.0"
     },

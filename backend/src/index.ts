@@ -201,7 +201,7 @@ async function main() {
     registerBucketHosting(app, "/bucket", port);
 
     // set express for the Apollo GraphQL server
-    server.applyMiddleware({ app, bodyParserConfig: { limit: "1mb" } });
+    server.applyMiddleware({ app, bodyParserConfig: { limit: "20mb" } });
 
     const imageService = new ImageStorageService();
     app.use("/images/:id", (req, res, next) => {

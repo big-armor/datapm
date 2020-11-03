@@ -23,7 +23,6 @@
         "url": "https://github.com/big-armor/datapm-registry/issues"
     },
     "homepage": "https://github.com/big-armor/datapm-registry#readme",
-    "dependencies": {},
     "devDependencies": {
         "git-format-staged": "^2.1.0",
         "gulp": "^4.0.2",

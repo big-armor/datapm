@@ -16,7 +16,8 @@ import { IsUserOrAdminDirective } from "./directive/isUserOrAdminDirective";
 import { ValidCatalogSlugDirective } from "./directive/ValidCatalogSlugDirective";
 import { ValidPackageSlugDirective } from "./directive/ValidPackageSlugDirective";
 import { ValidCollectionSlugDirective } from "./directive/ValidCollectionSlugDirective";
-import {ValidateImageUploadDirective} from "./directive/ValidImageUploadDirective";
+import { ValidateImageUploadDirective } from "./directive/ValidImageUploadDirective";
+import { ValidBase64ImageUploadDirective } from "./directive/ValidBase64ImageUploadDirective";
 
 const NODE_MODULES_DIRECTORY = getEnvVariable("NODE_MODULES_DIRECTORY", "node_modules");
 const SCHEMAS_DIRECTORY = NODE_MODULES_DIRECTORY + "/datapm-lib/";
@@ -43,7 +44,8 @@ export async function makeSchema() {
             validCatalogSlug: ValidCatalogSlugDirective,
             validPackageSlug: ValidPackageSlugDirective,
             validCollectionSlug: ValidCollectionSlugDirective,
-            validImageUpload: ValidateImageUploadDirective
+            validImageUpload: ValidateImageUploadDirective,
+            validBase64Image: ValidBase64ImageUploadDirective
         }
     });
 }

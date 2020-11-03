@@ -1,6 +1,12 @@
 import { AuthenticationError } from "apollo-server";
 import { AuthenticatedContext } from "../context";
-import { AUTHENTICATION_ERROR, CreateUserInput, UpdateMyPasswordInput, UpdateUserInput } from "../generated/graphql";
+import {
+    AUTHENTICATION_ERROR,
+    Base64ImageUpload,
+    CreateUserInput,
+    UpdateMyPasswordInput,
+    UpdateUserInput
+} from "../generated/graphql";
 import { UserRepository } from "../repository/UserRepository";
 import { createJwt } from "../util/jwt";
 import { hashPassword } from "../util/PasswordUtil";
@@ -62,11 +68,15 @@ export const updateMyPassword = async (
     });
 };
 
-export const setMyCoverImage = async (_0: any, { image }: { image: any }, context: AuthenticatedContext, info: any) => {
-    const uploadedImage = await image;
-    return await ImageStorageService.INSTANCE.saveImage(
+export const setMyCoverImage = async (
+    _0: any,
+    { image }: { image: Base64ImageUpload },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    return await ImageStorageService.INSTANCE.saveImageFromBase64(
         context.me.id,
-        uploadedImage,
+        image.base64,
         ImageType.USER_COVER_IMAGE,
         context
     );
@@ -74,14 +84,13 @@ export const setMyCoverImage = async (_0: any, { image }: { image: any }, contex
 
 export const setMyAvatarImage = async (
     _0: any,
-    { image }: { image: any },
+    { image }: { image: Base64ImageUpload },
     context: AuthenticatedContext,
     info: any
 ) => {
-    const uploadedImage = await image;
-    return await ImageStorageService.INSTANCE.saveImage(
+    return await ImageStorageService.INSTANCE.saveImageFromBase64(
         context.me.id,
-        uploadedImage,
+        image.base64,
         ImageType.USER_AVATAR_IMAGE,
         context
     );

@@ -11,6 +11,10 @@ export class ImageUploadService {
         this.dialog
             .open(ImageUploadModalComponent)
             .afterClosed()
-            .subscribe((result) => mutation.mutate({ image: result }, { context: { useMultipart: true } }).subscribe());
+            .subscribe((file) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => mutation.mutate({ image: { base64: reader.result } }).subscribe();
+            });
     }
 }
