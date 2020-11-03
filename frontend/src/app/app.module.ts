@@ -1,15 +1,16 @@
 import { BrowserModule } from "@angular/platform-browser";
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
+import { HttpClientModule } from "@angular/common/http";
+import { FormsModule } from "@angular/forms";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { GraphQLModule } from "./graphql.module";
-import { HttpClientModule } from "@angular/common/http";
 import { CatalogDetailsComponent } from "./catalog-details/catalog-details.component";
 import { ReactiveFormsModule } from "@angular/forms";
 import { MyAccountComponent } from "./my-account/my-account.component";
 import { PackageDetailComponent } from "./package/package-detail/package-detail.component";
-import { FormsModule } from "@angular/forms";
 import { MaterialModule } from "./material.module";
 import { SharedModule } from "./shared/shared.module";
 import { LoginDialogComponent } from "./shared/header/login-dialog/login-dialog.component";
@@ -50,6 +51,7 @@ import { ConfirmationDialogComponent } from "./my-account/confirmation-dialog/co
     ],
     imports: [
         BrowserModule,
+        BrowserAnimationsModule,
         AppRoutingModule,
         GraphQLModule,
         HttpClientModule,

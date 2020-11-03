@@ -4,7 +4,6 @@ import { RouterModule } from "@angular/router";
 import { HeaderComponent } from "./header/header.component";
 import { FooterComponent } from "./footer/footer.component";
 import { MaterialModule } from "../material.module";
-import { BrowserModule } from "@angular/platform-browser";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { TimeAgoPipe } from "./pipes/time-ago.pipe";
 import { ImageUploadModalComponent } from "./image-upload-modal/image-upload-modal.component";
@@ -12,7 +11,7 @@ import { PackageItemComponent } from "./package-item/package-item.component";
 
 @NgModule({
     declarations: [HeaderComponent, FooterComponent, TimeAgoPipe, ImageUploadModalComponent, PackageItemComponent],
-    imports: [CommonModule, MaterialModule, BrowserModule, FormsModule, ReactiveFormsModule, RouterModule],
+    imports: [CommonModule, MaterialModule, FormsModule, ReactiveFormsModule, RouterModule],
     exports: [HeaderComponent, FooterComponent, TimeAgoPipe, PackageItemComponent],
     providers: [TimeAgoPipe]
 })
