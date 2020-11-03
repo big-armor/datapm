@@ -4,8 +4,7 @@ import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { MyAccountComponent } from "./my-account.component";
 import { RouterTestingModule } from "@angular/router/testing";
 import { ApolloTestingModule, ApolloTestingController } from "apollo-angular/testing";
-import { MaterialModule } from "../material.module";
-import { MatDialog, MatDialogConfig, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatDialogModule } from "@angular/material/dialog";
 
 @Component({
     template: ""
@@ -23,21 +22,7 @@ describe("MyAccountComponent", () => {
             imports: [
                 RouterTestingModule.withRoutes([{ path: "me", component: DummyComponent }]),
                 ApolloTestingModule,
-                MaterialModule
-            ],
-            providers: [
-                {
-                    provide: MAT_DIALOG_DATA,
-                    useValue: {}
-                },
-                {
-                    provide: MatDialog,
-                    useValue: {}
-                },
-                {
-                    provide: MatDialogConfig,
-                    useValue: {}
-                }
+                MatDialogModule
             ]
         }).compileComponents();
     }));

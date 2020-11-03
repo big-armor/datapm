@@ -1,5 +1,5 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
-
+import { NoopAnimationsModule } from "@angular/platform-browser/animations";
 import { PackageSchemaComponent } from "./package-schema.component";
 
 import { MaterialModule } from "../../material.module";
@@ -11,7 +11,7 @@ describe("PackageSchemaComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [PackageSchemaComponent],
-            imports: [MaterialModule]
+            imports: [MaterialModule, NoopAnimationsModule]
         }).compileComponents();
     }));
 
