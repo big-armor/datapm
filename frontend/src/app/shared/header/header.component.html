@@ -6,17 +6,15 @@
             </div>
             <div class="p-2 bd-highlight w-100">
                 <div class="input-group mt-1 search-box">
-                    <form [formGroup]="searchFormGroup" (ngSubmit)="search()" class="search-form">
+                    <form (ngSubmit)="search()" class="search-form">
                         <input
                             type="text"
                             name="search"
-                            formControlName="search"
                             minlength="1"
                             autocomplete="off"
                             class="form-control search-input"
                             placeholder="Search For Data"
-                            [ngModel]="searchTerm"
-                            (ngModelChange)="searchTerm = $event"
+                            [(ngModel)]="searchTerm"
                         />
                         <button class="material-icons">search</button>
                     </form>
@@ -81,8 +79,7 @@
                 class="form-control search-input"
                 (keydown.enter)="mobileSearch()"
                 placeholder="Search For Data"
-                [ngModel]="searchTerm"
-                (ngModelChange)="searchTerm = $event"
+                [(ngModel)]="searchTerm"
             />
             <button class="material-icons" (onclick)="mobileSearch()">search</button>
         </div>

@@ -35,9 +35,7 @@
                             last as isLast
                         "
                     >
-                        <div *ngIf="isFirst" class="search-title pl-3">
-                            Your search results for '{{ urlParams?.params?.q }}'
-                        </div>
+                        <div *ngIf="isFirst" class="search-title pl-3">Your search results for '{{ query }}'</div>
 
                         <mat-list-item>
                             <div class="d-flex bd-highlight mobile-row" style="width: 100%">
@@ -125,7 +123,7 @@
             </div>
             <div id="searchPackages" *ngIf="isPackageSelected">
                 <ng-container *ngIf="packageResult?.searchPackages?.packages?.length; else nothingFound">
-                    <div class="search-title pl-3">Your search results for '{{ urlParams?.params?.q }}'</div>
+                    <div class="search-title pl-3">Your search results for '{{ query }}'</div>
 
                     <app-package-item [item]="package" *ngFor="let package of packageResult?.searchPackages?.packages">
                     </app-package-item>
@@ -374,11 +372,7 @@
     <div *ngIf="state === State.SUCCESS" class="not-found">
         <p><span class="material-icons">search</span></p>
         <br />
-        <p>
-            We couldn’t find any {{ isPackageSelected ? "packages" : "collections" }} matching '{{
-                urlParams?.params?.q
-            }}'
-        </p>
+        <p>We couldn’t find any {{ isPackageSelected ? "packages" : "collections" }} matching '{{ query }}'</p>
         <p class="small-txt">Please search another name</p>
     </div>
 
