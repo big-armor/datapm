@@ -1,3 +1,4 @@
+overwrite: true
 schema:
     - node_modules/datapm-lib/schema.gql
     - node_modules/datapm-lib/auth-schema.gql

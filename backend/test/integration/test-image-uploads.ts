@@ -90,5 +90,5 @@ describe("Image Upload Tests", async () => {
             expect(uploadResult.errors[0]).to.exist;
             expect(uploadResult.errors[0].message).to.equal("IMAGE_TOO_LARGE");
         }
-    });
+    }).timeout(10000);
 });

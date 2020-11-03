@@ -5,9 +5,7 @@ volumes:
 
 services:
     datapm-registry:
-        build:
-            context: ../
-            dockerfile: docker/Dockerfile
+        image: datapm-registry
         ports:
             - "4000:4000"
         env_file:
@@ -28,3 +26,8 @@ services:
             - POSTGRES_DB=datapm
             - POSTGRES_USER=postgres
             - POSTGRES_PASSWORD=postgres
+    smtp:
+        image: maildev/maildev:latest
+        ports:
+            - "25:25"
+            - "1080:80"

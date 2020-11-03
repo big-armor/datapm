@@ -1,8 +1,10 @@
 import { ChangeDetectorRef, Component, OnInit } from "@angular/core";
-import { AbstractControl, AsyncValidatorFn, FormControl, FormGroup, ValidationErrors } from "@angular/forms";
-import { Router } from "@angular/router";
-import { AuthenticationService } from "src/app/services/authentication.service";
+import { FormControl, FormGroup } from "@angular/forms";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatDialogRef } from "@angular/material/dialog";
 import { CreateMeGQL, EmailAddressAvailableGQL, UsernameAvailableGQL } from "src/generated/graphql";
+import { usernameValidator, emailAddressValidator } from "src/app/helpers/validators";
+
 enum State {
     INIT,
     AWAITING_RESPONSE,
@@ -12,71 +14,6 @@ enum State {
     ERROR_AFTER_SIGNUP
 }
 
-function usernameValidator(
-    usernameAvailableGQL: UsernameAvailableGQL,
-    componentChangeDetector: ChangeDetectorRef
-): AsyncValidatorFn {
-    return (control: AbstractControl): Promise<ValidationErrors | null> => {
-        return new Promise<ValidationErrors | null>((success, error) => {
-            if (control.value == "" || control.value == null) {
-                success({
-                    REQUIRED: true
-                });
-                return;
-            }
-            usernameAvailableGQL.fetch({ username: control.value }).subscribe((result) => {
-                if (result.errors?.length > 0) {
-                    success({
-                        [result.errors[0].message]: true
-                    });
-                } else {
-                    if (result.data.usernameAvailable) {
-                        success(null);
-                    } else {
-                        success({
-                            NOT_AVAILABLE: true
-                        });
-                    }
-                }
-                control.markAsDirty();
-                componentChangeDetector.detectChanges();
-            });
-        });
-    };
-}
-
-function emailAddressValidator(
-    emailAddressAvailableGQL: EmailAddressAvailableGQL,
-    componentChangeDetector: ChangeDetectorRef
-): AsyncValidatorFn {
-    return (control: AbstractControl): Promise<ValidationErrors | null> => {
-        return new Promise<ValidationErrors | null>((success, error) => {
-            if (control.value == "" || control.value == null) {
-                success({
-                    REQUIRED: true
-                });
-                return;
-            }
-            emailAddressAvailableGQL.fetch({ emailAddress: control.value }).subscribe((result) => {
-                if (result.errors?.length > 0) {
-                    success({
-                        [result.errors[0].message]: true
-                    });
-                } else {
-                    if (result.data.emailAddressAvailable) {
-                        success(null);
-                    } else {
-                        success({
-                            NOT_AVAILABLE: true
-                        });
-                    }
-                }
-                control.markAllAsTouched();
-                componentChangeDetector.detectChanges();
-            });
-        });
-    };
-}
 @Component({
     selector: "app-sign-up-dialog",
     templateUrl: "./sign-up-dialog.component.html",
@@ -90,12 +27,12 @@ export class SignUpDialogComponent implements OnInit {
     signUpForm: FormGroup;
 
     constructor(
-        private router: Router,
-        private authenticationService: AuthenticationService,
         private createMeGQL: CreateMeGQL,
         private usernameAvailableGQL: UsernameAvailableGQL,
         private emailAddressAvailableGQL: EmailAddressAvailableGQL,
-        private componentChangeDetector: ChangeDetectorRef
+        private componentChangeDetector: ChangeDetectorRef,
+        private dialogRef: MatDialogRef<SignUpDialogComponent>,
+        private snackbar: MatSnackBar
     ) {}
 
     ngOnInit(): void {
@@ -105,7 +42,9 @@ export class SignUpDialogComponent implements OnInit {
                 updateOn: "blur"
             }),
             emailAddress: new FormControl("", {
-                asyncValidators: [emailAddressValidator(this.emailAddressAvailableGQL, this.componentChangeDetector)],
+                asyncValidators: [
+                    emailAddressValidator(this.emailAddressAvailableGQL, this.componentChangeDetector, true)
+                ],
                 updateOn: "blur"
             }),
             password: new FormControl("")
@@ -123,18 +62,46 @@ export class SignUpDialogComponent implements OnInit {
             })
             .toPromise()
             .then((result) => {
+                if (result.errors) {
+                    const errorMsg = result.errors[0].message;
+
+                    if (errorMsg.startsWith("EMAIL_ADDRESS_NOT_AVAILABLE")) {
+                        this.signUpForm.get("emailAddress").setErrors({ NOT_AVAILABLE: true });
+                    } else if (errorMsg.startsWith("USERNAME_NOT_AVAILABLE")) {
+                        this.signUpForm.get("username").setErrors({ NOT_AVAILABLE: true });
+                    } else {
+                        this.snackbar.open(errorMsg, null, {
+                            duration: 5000,
+                            panelClass: "notification-error",
+                            verticalPosition: "top",
+                            horizontalPosition: "right"
+                        });
+                    }
+
+                    return;
+                }
+
                 this.state = State.SUCCESS;
-                this.authenticationService
-                    .setJwt(result.data.createMe)
-                    .then((user) => {
-                        setTimeout(() => {
-                            this.router.navigate(["/"]);
-                        }, 1000);
-                    })
-                    .catch((error) => {
-                        this.state = State.ERROR_AFTER_SIGNUP;
-                    });
             })
-            .catch((error) => {});
+            .catch(() => {
+                this.snackbar.open("Unknown error", null, {
+                    duration: 5000,
+                    panelClass: "notification-error",
+                    verticalPosition: "top",
+                    horizontalPosition: "right"
+                });
+            });
+    }
+
+    openForgotPassword() {
+        this.dialogRef.close("forgotPassword");
+    }
+
+    clearError(field: string) {
+        const control = this.signUpForm.get(field);
+        if (control.errors !== null) {
+            control.setErrors(null);
+            this.componentChangeDetector.detectChanges();
+        }
     }
 }

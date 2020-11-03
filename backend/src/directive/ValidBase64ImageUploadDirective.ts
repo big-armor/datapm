@@ -44,7 +44,6 @@ export class ValidBase64ImageUploadDirective extends SchemaDirectiveVisitor {
         }
 
         const imageSizeInBytes = this.calculateLengthInBytesFromBase64(base64ImageContent);
-        console.log("imageSizeInBytes", imageSizeInBytes);
         if (imageSizeInBytes > ValidBase64ImageUploadDirective.IMAGE_SIZE_LIMIT_IN_BYTES) {
             throw new Error(IMAGE_UPLOAD_ERROR_TYPE.IMAGE_TOO_LARGE);
         }

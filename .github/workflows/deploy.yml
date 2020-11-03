@@ -30,11 +30,11 @@ jobs:
             - name: Install Docker Build Dependencies
               run: npm install gulp
 
-            # - name: Run Prettier linter
-            #   uses: wearerequired/lint-action@v1.6.0
-            #   with:
-            #     github_token: ${{ secrets.github_token }}
-            #     prettier: true
+            - name: Run Prettier linter
+              uses: wearerequired/lint-action@v1.6.0
+              with:
+                  github_token: ${{ secrets.github_token }}
+                  prettier: true
 
             - name: Build Docker Container
               run: npm run build
@@ -78,6 +78,7 @@ jobs:
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: terraform plan
               env:
+                  TF_VAR_smtp_password: ${{secrets.TF_VAR_SMTP_PASSWORD}}
                   PROJECT_ID: data-test-terraform
                   GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
 
@@ -103,5 +104,6 @@ jobs:
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: terraform apply -auto-approve
               env:
+                  TF_VAR_smtp_password: ${{secrets.TF_VAR_SMTP_PASSWORD}}
                   PROJECT_ID: data-test-terraform
                   GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}

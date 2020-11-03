@@ -1,4 +1,5 @@
 import { SchemaDirectiveVisitor, ApolloError, ValidationError } from "apollo-server";
+import { Kind } from "graphql";
 import {
     GraphQLField,
     defaultFieldResolver,
@@ -12,6 +13,8 @@ import {
 } from "graphql";
 import { Context } from "../context";
 import { INVALID_USERNAME_ERROR } from "../generated/graphql";
+import { ValidationConstraint } from "./ValidationConstraint";
+import { ValidationType } from "./ValidationType";
 
 export class ValidUsernameDirective extends SchemaDirectiveVisitor {
     visitArgumentDefinition(
@@ -48,17 +51,11 @@ export class ValidUsernameDirective extends SchemaDirectiveVisitor {
             objectType: GraphQLInputObjectType;
         }
     ): GraphQLInputField | void | null {
-        if (field.type instanceof GraphQLNonNull && field.type.ofType instanceof GraphQLScalarType) {
-            field.type = new GraphQLNonNull(new ValidatedType(field.type.ofType));
-        } else if (field.type instanceof GraphQLScalarType) {
-            field.type = new ValidatedType(field.type);
-        } else {
-            throw new Error(`Not a scalar type: ${field.type}`);
-        }
+        field.type = ValidationType.create(field.type, new UsernameConstraint());
     }
 }
 
-function validateUsername(username: String | undefined): void {
+export function validateUsername(username: String | undefined): void {
     const regex = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/;
 
     if (username === undefined) {
@@ -78,30 +75,16 @@ function validateUsername(username: String | undefined): void {
     }
 }
 
-class ValidatedType extends GraphQLScalarType {
-    constructor(type: GraphQLScalarType) {
-        super({
-            name: `ValidatedUsername`,
+class UsernameConstraint implements ValidationConstraint {
+    getName(): string {
+        return "CollectionSlug";
+    }
 
-            // For more information about GraphQLScalar type (de)serialization,
-            // see the graphql-js implementation:
-            // https://github.com/graphql/graphql-js/blob/31ae8a8e8312/src/type/definition.js#L425-L446
+    validate(value: String) {
+        validateUsername(value);
+    }
 
-            serialize(value) {
-                value = type.serialize(value);
-
-                return value;
-            },
-
-            parseValue(value) {
-                validateUsername(value);
-
-                return type.parseValue(value);
-            },
-
-            parseLiteral(valueNode, variables) {
-                return type.parseLiteral(valueNode, variables);
-            }
-        });
+    getCompatibleScalarKinds(): string[] {
+        return [Kind.STRING];
     }
 }

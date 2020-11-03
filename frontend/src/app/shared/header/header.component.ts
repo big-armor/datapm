@@ -8,6 +8,7 @@ import { Subject } from "rxjs";
 import { AuthenticationService } from "../../services/authentication.service";
 import { LoginDialogComponent } from "./login-dialog/login-dialog.component";
 import { SignUpDialogComponent } from "./sign-up-dialog/sign-up-dialog.component";
+import { ForgotPasswordDialogComponent } from "./forgot-password-dialog/forgot-password-dialog.component";
 import { User } from "src/generated/graphql";
 
 enum State {
@@ -67,8 +68,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
 
     openSignUpDialog() {
-        this.dialog.open(SignUpDialogComponent, {
+        const signupDialogRef = this.dialog.open(SignUpDialogComponent, {
             disableClose: true
+        });
+        signupDialogRef.afterClosed().subscribe((result?: string) => {
+            if (result === "forgotPassword") {
+                this.dialog.open(ForgotPasswordDialogComponent);
+            }
         });
     }
 

@@ -4,6 +4,7 @@ import { APIKey, APIKeyWithSecret, AUTHENTICATION_ERROR, CreateAPIKeyInput, Scop
 import { APIKeyRepository } from "../repository/APIKeyRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
+import { sendAPIKeyCreatedEmail } from "../util/smtpUtil";
 
 export const createAPIKey = async (
     _0: any,
@@ -16,7 +17,7 @@ export const createAPIKey = async (
     });
 
     if (!user) {
-        throw new ValidationError(AUTHENTICATION_ERROR.USER_NOT_FOUND);
+        throw new ValidationError(AUTHENTICATION_ERROR.WRONG_CREDENTIALS);
     }
 
     if (
@@ -35,6 +36,8 @@ export const createAPIKey = async (
             if (apiKey.label == value.label) throw new ValidationError("APIKEY_LABEL_NOT_AVIALABLE");
         }
     }
+
+    sendAPIKeyCreatedEmail(user, value.label);
 
     return context.connection.manager.getCustomRepository(APIKeyRepository).createAPIKey({
         user,

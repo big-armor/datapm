@@ -1,3 +1,7 @@
+export REGISTRY_URL="http://localhost:4200"
+export REGISTRY_NAME="DataPM Local Development"
+export REGISTRY_HOSTNAME="localhost"
+export REGISTRY_PORT="4200"
 export JWT_AUDIENCE="localhost"
 export JWT_ISSUER="localhost"
 export JWT_KEY="!!!!REPLACE_ME!!!"
@@ -13,9 +17,15 @@ export TYPEORM_DATABASE="datapm"
 export TYPEORM_SCHEMA="public"
 export TYPEORM_USERNAME="postgres"
 export TYPEORM_PASSWORD="postgres"
-export SENDGRID_API_KEY="asdfasdfa"
-export REGISTRY_HOSTNAME="localhost"
-export REGISTRY_PORT="4000"
+export REQUIRE_EMAIL_VERIFICATION=${REQUIRE_EMAIL_VERIFICATION:=true}
+export SMTP_SERVER=${SMTP_SERVER:=localhost}
+export SMTP_PORT=${SMTP_PORT:=25}
+export SMTP_USER=${SMTP_USER}
+export SMTP_PASSWORD=${SMTP_PASSWORD}
+export SMTP_FROM_NAME=${SMTP_FROM_NAME:="Localhost DataPM Registry"}
+export SMTP_FROM_ADDRESS=${SMTP_FROM_ADDRESS:="test@localhost"}
+export SMTP_SECURE=${SMTP_SECURE:="false"}
+export STORAGE_URL="file:///tmp" # - Temporary until defined (currently the default tmp directory of unix systems)!
 
 # Examples
 # export GOOGLE_APPLICATION_CREDENTIALS=/my-path/datapm-registry/gc.json

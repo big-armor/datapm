@@ -20,6 +20,10 @@ function copyFiles() {
     ]).pipe(dest(DESTINATION_DIR));
 }
 
+function copyEmailTemplates() {
+    return src(["static/email-templates/*"]).pipe(dest(path.join(DESTINATION_DIR, "static", "email-templates")));
+}
+
 function copyModules() {
     return exec("npx distize --no-files", execLogCb);
 }
@@ -30,4 +34,4 @@ function execLogCb(err, stdout, stderr) {
     return err; // makes gulp continue even if the command failed
 }
 
-exports.default = series(copyFiles, copyModules);
+exports.default = series(copyFiles, copyEmailTemplates, copyModules);

@@ -17,6 +17,7 @@ import { SharedModule } from "./shared/shared.module";
 import { TrendingComponent } from "./homepage/trending/trending.component";
 import { LoginDialogComponent } from "./shared/header/login-dialog/login-dialog.component";
 import { SignUpDialogComponent } from "./shared/header/sign-up-dialog/sign-up-dialog.component";
+import { ForgotPasswordDialogComponent } from "./shared/header/forgot-password-dialog/forgot-password-dialog.component";
 import { LatestComponent } from "./homepage/latest/latest.component";
 import { SearchComponent } from "./search/search.component";
 import { FollowingComponent } from "./homepage/following/following.component";
@@ -26,6 +27,8 @@ import { PackageSchemaComponent } from "./package/package-schema/package-schema.
 import { DetailsComponent } from "./my-account/details/details.component";
 import { PackagesComponent } from "./my-account/packages/packages.component";
 import { ActivityComponent } from "./my-account/activity/activity.component";
+import { CatalogsComponent } from "./my-account/catalogs/catalogs.component";
+
 import { EditAccountDialogComponent } from "./my-account/edit-account-dialog/edit-account-dialog.component";
 import { EditPasswordDialogComponent } from "./my-account/edit-password-dialog/edit-password-dialog.component";
 import { ConfirmationDialogComponent } from "./my-account/confirmation-dialog/confirmation-dialog.component";
@@ -40,6 +43,7 @@ import { ConfirmationDialogComponent } from "./my-account/confirmation-dialog/co
         TrendingComponent,
         LoginDialogComponent,
         SignUpDialogComponent,
+        ForgotPasswordDialogComponent,
         LatestComponent,
         SearchComponent,
         FollowingComponent,
@@ -49,6 +53,7 @@ import { ConfirmationDialogComponent } from "./my-account/confirmation-dialog/co
         DetailsComponent,
         PackagesComponent,
         ActivityComponent,
+        CatalogsComponent,
         EditAccountDialogComponent,
         EditPasswordDialogComponent,
         ConfirmationDialogComponent

@@ -11,27 +11,16 @@
                 <div class="p-2 bd-highlight">
                     <a class="user-img"><img src="../../assets/images/user-female.jpg" alt="User profile image" /></a>
                 </div>
-                <div class="p-2 bd-highlight">
-                    <span class="user-fullname">
-                        {{ currentUser.firstName + " " + currentUser.lastName }} </span
-                    ><br />
+                <div *ngIf="currentUser.firstName && currentUser.lastName" class="p-2 bd-highlight">
+                    <span class="user-fullname"> {{ currentUser.firstName + " " + currentUser.lastName }} </span><br />
                     <span class="user-name">{{ "@" + currentUser.username }}</span>
                 </div>
-                <div class="ml-auto p-2 bd-highlight">
-                    <button mat-button class="follow-btn">
-                        <span>follow</span>
-                    </button>
+                <div *ngIf="!currentUser.firstName || !currentUser.lastName" class="p-2 bd-highlight">
+                    <span class="user-name-only">{{ "@" + currentUser.username }}</span>
                 </div>
             </div>
             <p class="user-bio pl-3">bio description, lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
             <a class="edit-profile ml-3" (click)="openEditDialog()">Edit profile</a>
-            <div class="d-flex flex-row bd-highlight user-following pl-3">
-                <div class="py-2 bd-highlight">196 followers</div>
-                <div class="p-2 bd-highlight">·</div>
-                <div class="py-2 bd-highlight">125 following</div>
-                <div class="p-2 bd-highlight">·</div>
-                <div class="py-2 bd-highlight"><span class="material-icons">star_outline</span>27</div>
-            </div>
             <div class="user-menu">
                 <ul class="p-0" id="homeRoutes">
                     <li *ngFor="let route of routes; let i = index" class="list-names" (click)="selectTab(i)">
@@ -45,14 +34,5 @@
         <div class="col-lg-10 col-md-12 col-sm-12 p-0">
             <router-outlet></router-outlet>
         </div>
-    </div>
-    <div class="user-menu">
-        <ul class="p-0" id="homeRoutes">
-            <li *ngFor="let route of routes; let i = index" class="list-names" (click)="selectTab(i)">
-                <a class="cursor-pointer" [class.active]="i == selectedTab">
-                    {{ route.linkName }}
-                </a>
-            </li>
-        </ul>
     </div>
 </div>

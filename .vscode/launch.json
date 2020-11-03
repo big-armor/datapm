@@ -9,27 +9,7 @@
             "name": "Run npm start",
             "request": "launch",
             "type": "node-terminal",
-            "cwd": "${workspaceFolder}/backend",
-            "env": {
-                "APOLLO_KEY": "service:family-connections:asdfasdfasdfasdf",
-                "APOLLO_GRAPH_VARIANT": "dev",
-                "GCLOUD_STORAGE_BUCKET_NAME": "media",
-                "GOOGLE_CLOUD_PROJECT": "adsfasdf",
-                "FILESYSTEM_STORAGE_DIRECTORY": "local_storage",
-                "MIXPANEL_TOKEN": "asdfasdfasdf",
-                "TYPEORM_PORT": "5432",
-                "TYPEORM_DATABASE": "datapm",
-                "TYPEORM_SCHEMA": "public",
-                "TYPEORM_USERNAME": "postgres",
-                "TYPEORM_PASSWORD": "postgres",
-                "TYPEORM_CREATE_SCHEMA": "false",
-                "SENDGRID_API_KEY": "asdfasdfa",
-                "REGISTRY_HOSTNAME": "localhost",
-                "REGISTRY_PORT": "4000",
-                "JWT_KEY": "!!!!REPLACE_ME!!!",
-                "JWT_AUDIENCE": "localhost",
-                "JWT_ISSUER": "localhost"
-            }
+            "cwd": "${workspaceFolder}/backend"
         }
     ]
 }

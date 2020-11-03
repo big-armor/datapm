@@ -1,0 +1,9 @@
+A new API key has been created for your the user {{username}} on {{registry_name}} at {{registry_url}}. 
+
+If you did not create this API key, please do the following quickly. 
+
+1. Login to {{registry_url}}
+2. Delete the API Key named {{api_key_label}}
+3. Change your account password
+4. Reply to this email to report suspicious behavior
+

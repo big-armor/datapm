@@ -1,37 +1,21 @@
-import * as path from "path";
 import { GenericContainer, StartedTestContainer, Wait } from "testcontainers";
-import { expect } from "chai";
-import { ApolloClient, NormalizedCacheObject, ServerError } from "@apollo/client/core";
-import { MyCatalogsQuery, MyCatalogsDocument, LoginDocument, MyCatalogsQueryVariables } from "./registry-client";
 
 import execa from "execa";
 import { Stream } from "stream";
 import * as readline from "readline";
-import { ErrorResponse } from "apollo-link-error";
 import pidtree from "pidtree";
-import { createAnonymousClient, createUser } from "./test-utils";
+import { Observable } from "@apollo/client/core";
+const maildev = require("maildev");
 
 let container: StartedTestContainer;
 let serverProcess: execa.ExecaChildProcess;
-
-function readLines(stream: NodeJS.ReadableStream) {
-    const output = new Stream.PassThrough({ objectMode: true });
-    console.log("output created");
-    const rl = readline.createInterface({ input: stream });
-    console.log("readline created");
-    rl.on("line", (line) => {
-        output.write(line);
-    });
-    rl.on("close", () => {
-        output.push(null);
-    });
-    return output;
-}
+let mailServer: any;
+export let mailObservable: Observable<any>;
 
 before(async function () {
     console.log("Starting postgres temporary container");
 
-    this.timeout(60000);
+    this.timeout(1200000);
     container = await new GenericContainer("postgres")
         .withEnv("POSTGRES_PASSWORD", "postgres")
         .withEnv("POSTGRES_DB", "datapm")
@@ -43,9 +27,36 @@ before(async function () {
 
     console.log("Postgres started");
 
+    // star the maildev server
+    mailServer = new maildev({
+        smtp: 1025,
+        web: 1081,
+        ignoreTLS: true
+    });
+
+    let mailObserver: ZenObservable.SubscriptionObserver<any>;
+
+    mailServer.listen((err: any) => {
+        mailObservable = new Observable<any>((observer) => {
+            mailObserver = observer;
+        });
+    });
+
+    mailServer.on("new", function (email: any) {
+        mailObserver.next(email);
+    });
+
     serverProcess = execa("npm", ["run", "start-nowatch"], {
         env: {
-            TYPEORM_PORT: postgresPortNumber.toString()
+            TYPEORM_PORT: postgresPortNumber.toString(),
+            REQUIRE_EMAIL_VERIFICATION: "true",
+            SMTP_PORT: "1025",
+            SMTP_SERVER: "localhost",
+            SMTP_USER: "",
+            SMTP_PASSWORD: "",
+            SMTP_SECURE: "false",
+            SMTP_FROM_ADDRESS: "test@localhost",
+            SMTP_FROM_NAME: "local-test"
         }
     });
 
@@ -103,4 +114,6 @@ after(async function () {
             console.error(error);
         }
     });
+
+    mailServer.close();
 });

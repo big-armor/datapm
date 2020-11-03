@@ -95,7 +95,6 @@ export class SearchComponent implements OnInit, OnDestroy {
                 ({ data }) => {
                     this.state = State.SUCCESS;
                     this.packageResult = data;
-                    console.log(this.packageResult);
                 },
                 (_) => (this.state = State.ERROR)
             );

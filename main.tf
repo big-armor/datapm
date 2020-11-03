@@ -1,3 +1,10 @@
+variable "smtp_password" {
+  description = "password for the SMTP server"
+  type        = string
+}
+
+
+
 terraform {
   backend "gcs" {
     bucket = "datapm-registry-test"
@@ -132,10 +139,6 @@ resource "google_cloud_run_service" "default" {
           value = google_sql_user.user.password
         }
         env {
-          name  = "SENDGRID_API_KEY"
-          value = "asdfasdfa"
-        }
-        env {
           name  = "REGISTRY_HOSTNAME"
           value = "test.datapm.io"
         }
@@ -145,6 +148,38 @@ resource "google_cloud_run_service" "default" {
         }
         env {
           name  = "TYPEORM_IS_DIST"
+          value = "true"
+        }
+        env {
+          name  = "SMTP_SERVER"
+          value = "smtp.sendgrid.net"
+        }
+        env {
+          name  = "SMTP_PORT"
+          value = "465"
+        }
+        env {
+          name  = "SMTP_USER"
+          value = "apikey"
+        }
+        env {
+          name  = "SMTP_PASSWORD"
+          value = var.smtp_password
+        }
+        env {
+          name  = "SMTP_FROM_NAME"
+          value = "DataPM Test Registry"
+        }
+        env {
+          name  = "SMTP_FROM_ADDRESS"
+          value = "support@datapm.io"
+        }
+        env {
+          name  = "SMTP_SECURE"
+          value = "true"
+        }
+        env {
+          name  = "REQUIRE_EMAIL_VERIFICATION"
           value = "true"
         }
       }

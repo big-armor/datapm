@@ -1,4 +1,5 @@
 import { SchemaDirectiveVisitor, ApolloError, ValidationError } from "apollo-server";
+import { Kind } from "graphql";
 import {
     GraphQLField,
     defaultFieldResolver,
@@ -11,6 +12,8 @@ import {
     GraphQLScalarType
 } from "graphql";
 import { Context } from "../context";
+import { ValidationConstraint } from "./ValidationConstraint";
+import { ValidationType } from "./ValidationType";
 
 export class ValidEmailDirective extends SchemaDirectiveVisitor {
     visitArgumentDefinition(
@@ -49,17 +52,11 @@ export class ValidEmailDirective extends SchemaDirectiveVisitor {
             objectType: GraphQLInputObjectType;
         }
     ): GraphQLInputField | void | null {
-        if (field.type instanceof GraphQLNonNull && field.type.ofType instanceof GraphQLScalarType) {
-            field.type = new GraphQLNonNull(new ValidatedType(field.type.ofType));
-        } else if (field.type instanceof GraphQLScalarType) {
-            field.type = new ValidatedType(field.type);
-        } else {
-            throw new Error(`Not a scalar type: ${field.type}`);
-        }
+        field.type = ValidationType.create(field.type, new CollectionSlugConstraint());
     }
 }
 
-function validateEmailAddress(emailAddress: String | undefined) {
+export function validateEmailAddress(emailAddress: String | undefined) {
     const regex = /^(?=[A-Z0-9][A-Z0-9@._%+-]{5,253}$)[A-Z0-9._%+-]{1,64}@(?:(?=[A-Z0-9-]{1,63}\.)[A-Z0-9]+(?:-[A-Z0-9]+)*\.){1,8}[A-Z]{2,63}$/i;
 
     if (emailAddress == null) throw new ValidationError(`REQUIRED`);
@@ -71,30 +68,16 @@ function validateEmailAddress(emailAddress: String | undefined) {
     if (emailAddress.match(regex) == null) throw new ValidationError("INVALID_FORMAT");
 }
 
-class ValidatedType extends GraphQLScalarType {
-    constructor(type: GraphQLScalarType) {
-        super({
-            name: `ValidatedEmailAddress`,
+class CollectionSlugConstraint implements ValidationConstraint {
+    getName(): string {
+        return "EmailAddress";
+    }
 
-            // For more information about GraphQLScalar type (de)serialization,
-            // see the graphql-js implementation:
-            // https://github.com/graphql/graphql-js/blob/31ae8a8e8312/src/type/definition.js#L425-L446
+    validate(value: String) {
+        validateEmailAddress(value);
+    }
 
-            serialize(value) {
-                value = type.serialize(value);
-
-                return value;
-            },
-
-            parseValue(value) {
-                validateEmailAddress(value);
-
-                return type.parseValue(value);
-            },
-
-            parseLiteral(valueNode, variables) {
-                return type.parseLiteral(valueNode, variables);
-            }
-        });
+    getCompatibleScalarKinds(): string[] {
+        return [Kind.STRING];
     }
 }

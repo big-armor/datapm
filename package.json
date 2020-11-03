@@ -9,7 +9,9 @@
         "clean": "rm -rf node_modules frontend/dist frontend/node_modules backend/dist frontend/node_modules",
         "clean:node_modules": "rm -rf node_modules frontend/node_modules frontend/node_modules",
         "build": "gulp",
-        "start": "TYPEORM_IS_DIST=true docker-compose -f docker/docker-compose.yml up --build",
+        "build:parallel": "gulp buildParallel",
+        "start": "TYPEORM_IS_DIST=true docker-compose -f docker/docker-compose-local-build.yml up",
+        "start:from-docker-hub": "TYPEORM_IS_DIST=true docker-compose -f docker/docker-compose.yml up",
         "deploy": "gulp deployDockerImage",
         "test": "snyk test"
     },
