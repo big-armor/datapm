@@ -34,9 +34,16 @@ async function main() {
     // NOTE: getSecretVariable does not throw/fail. If the secret is unable
     // to be retrieved, a warning message is logged. Let the system fail
     // normally as if the variable went unset. This is because certain secrets
-    // (such as SENDGRID_API_KEY) is not required.
+    // (such as SMTP_SERVER) is not required.
     await getSecretVariable("TYPEORM_PASSWORD");
-    await getSecretVariable("SENDGRID_API_KEY");
+    await getSecretVariable("SMTP_SERVER");
+    await getSecretVariable("SMTP_PORT");
+    await getSecretVariable("SMTP_FROM_ADDRESS");
+    await getSecretVariable("SMTP_FROM_NAME");
+    await getSecretVariable("SMTP_SECURE");
+    await getSecretVariable("SMTP_USER");
+    await getSecretVariable("SMTP_PASSWORD");
+
     await setAppEngineServiceAccountJson();
 
     const connection = await superCreateConnection();

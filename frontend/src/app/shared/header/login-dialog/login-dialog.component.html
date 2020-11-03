@@ -29,6 +29,10 @@
                     <p class="forgot-pass"><a href="#">Forgot password?</a></p>
                     <br />
                     <div class="alert-div">
+                        <div class="alert-warn" *ngIf="state == State.LOGIN_ERROR_VALIDATE_EMAIL">
+                            You have not verified your email address. Check your email inbox for a "Verify Your Account"
+                            email, and click the "Verify My Email Address" button. You can then log-in.
+                        </div>
                         <div class="alert-warn" *ngIf="state == State.INCORRECT_LOGIN">
                             Your username and password were not correct.
                         </div>

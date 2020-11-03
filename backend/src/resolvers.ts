@@ -53,8 +53,15 @@ import {
     searchCollections,
     updateCollection
 } from "./resolvers/CollectionResolver";
-import { login, logout } from "./resolvers/AuthResolver";
-import { createMe, disableMe, updateMe, updateMyPassword } from "./resolvers/UserResolver";
+import { login, logout, verifyEmailAddress } from "./resolvers/AuthResolver";
+import {
+    createMe,
+    disableMe,
+    emailAddressAvailable,
+    updateMe,
+    updateMyPassword,
+    usernameAvailable
+} from "./resolvers/UserResolver";
 import { createAPIKey, deleteAPIKey } from "./resolvers/ApiKeyResolver";
 import { Collection } from "./entity/Collection";
 import {
@@ -72,6 +79,14 @@ import {
     updatePackage
 } from "./resolvers/PackageResolver";
 
+import { validatePassword } from "./directive/ValidPasswordDirective";
+import { validateSlug as validateCatalogSlug } from "./directive/ValidCatalogSlugDirective";
+import { validateUsername } from "./directive/ValidUsernameDirective";
+import { validateUsernameOrEmail } from "./directive/ValidUsernameOrEmailAddressDirective";
+import { validateSlug as validateCollectionSlug } from "./directive/ValidCollectionSlugDirective";
+import { validateSlug as validatePackageSlug } from "./directive/ValidPackageSlugDirective";
+import { validateEmailAddress } from "./directive/ValidEmailDirective";
+
 export const resolvers: {
     Query: QueryResolvers;
     Mutation: MutationResolvers;
@@ -83,6 +98,13 @@ export const resolvers: {
     Package: PackageResolvers;
     Version: VersionResolvers;
     PackageFileJSON: GraphQLScalarType;
+    Password: GraphQLScalarType;
+    CatalogSlug: GraphQLScalarType;
+    PackageSlug: GraphQLScalarType;
+    Username: GraphQLScalarType;
+    UsernameOrEmailAddress: GraphQLScalarType;
+    EmailAddress: GraphQLScalarType;
+    CollectionSlug: GraphQLScalarType;
 } = {
     PackageFileJSON: new GraphQLScalarType({
         name: "PackageFileJSON",
@@ -111,7 +133,62 @@ export const resolvers: {
             return packageObject;
         }
     }),
-
+    Password: new GraphQLScalarType({
+        name: "Password",
+        serialize: (value: any) => value,
+        parseValue: (value: any) => {
+            validatePassword(value);
+            return value;
+        }
+    }),
+    CatalogSlug: new GraphQLScalarType({
+        name: "CatalogSlug",
+        serialize: (value: any) => value,
+        parseValue: (value: any) => {
+            validateCatalogSlug(value);
+            return value;
+        }
+    }),
+    PackageSlug: new GraphQLScalarType({
+        name: "PackageSlug",
+        serialize: (value: any) => value,
+        parseValue: (value: any) => {
+            validatePackageSlug(value);
+            return value;
+        }
+    }),
+    CollectionSlug: new GraphQLScalarType({
+        name: "CollectionSlug",
+        serialize: (value: any) => value,
+        parseValue: (value: any) => {
+            validateCollectionSlug(value);
+            return value;
+        }
+    }),
+    Username: new GraphQLScalarType({
+        name: "Username",
+        serialize: (value: any) => value,
+        parseValue: (value: any) => {
+            validateUsername(value);
+            return value;
+        }
+    }),
+    EmailAddress: new GraphQLScalarType({
+        name: "EmailAddress",
+        serialize: (value: any) => value,
+        parseValue: (value: any) => {
+            validateEmailAddress(value);
+            return value;
+        }
+    }),
+    UsernameOrEmailAddress: new GraphQLScalarType({
+        name: "UsernameOrEmailAddress",
+        serialize: (value: any) => value,
+        parseValue: (value: any) => {
+            validateUsernameOrEmail(value);
+            return value;
+        }
+    }),
     Date: new GraphQLScalarType({
         name: "Date",
         serialize: (value: any) => value,
@@ -383,32 +460,16 @@ export const resolvers: {
 
         searchPackages: searchPackages,
 
-        usernameAvailable: async (_0: any, { username }, context: AuthenticatedContext) => {
-            const user = await context.connection.manager
-                .getCustomRepository(UserRepository)
-                .getUserByUsername(username);
+        usernameAvailable: usernameAvailable,
 
-            const catalog = await context.connection.manager
-                .getCustomRepository(CatalogRepository)
-                .findCatalogBySlug({ slug: username });
-
-            return user == null && catalog == null;
-        },
-
-        emailAddressAvailable: async (_0: any, { emailAddress }, context: AuthenticatedContext) => {
-            const user = await context.connection.manager
-                .getCustomRepository(UserRepository)
-                .getUserByEmail(emailAddress);
-
-            return user == null;
-        }
+        emailAddressAvailable: emailAddressAvailable
     },
 
     Mutation: {
         // Auth
         login: login,
         logout: logout,
-
+        verifyEmailAddress: verifyEmailAddress,
         // User
         createMe: createMe,
         updateMe: updateMe,

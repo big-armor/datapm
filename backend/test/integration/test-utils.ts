@@ -1,6 +1,17 @@
-import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject } from "@apollo/client/core";
-import { CreateMeDocument, CreateMeMutation, CreateMeMutationVariables } from "./registry-client";
+import { ApolloClient, FetchResult, HttpLink, InMemoryCache, NormalizedCacheObject } from "@apollo/client/core";
+import {
+    CreateMeDocument,
+    CreateMeMutation,
+    CreateMeMutationVariables,
+    LoginDocument,
+    LoginMutation,
+    VerifyEmailAddressDocument,
+    VerifyEmailAddressMutation
+} from "./registry-client";
 import fetch from "cross-fetch";
+import { mailObservable } from "./setup";
+import { expect } from "chai";
+import { execute } from "graphql";
 
 export function createAnonymousClient() {
     return new ApolloClient({
@@ -24,19 +35,28 @@ export function createAnonymousClient() {
     });
 }
 
-/** creates a new user and returns an apollo client for their session */
-export async function createUser(
+/** creates a new user, but does not verify their email */
+export async function createUserDoNotVerifyEmail(
     firstName: string,
     lastName: string,
     username: string,
     emailAddress: string,
     password: string
-): Promise<ApolloClient<NormalizedCacheObject>> {
-    return await new Promise((resolve, reject) => {
-        let client = createAnonymousClient();
-        client
+): Promise<{
+    emailVerificationToken: string;
+}> {
+    return new Promise(async (resolve, reject) => {
+        let anonymousClient = createAnonymousClient();
+
+        let verifyEmailPromise = new Promise<any>((r) => {
+            let subscription = mailObservable.subscribe((email) => {
+                subscription.unsubscribe();
+                r(email);
+            });
+        });
+
+        await anonymousClient
             .mutate<CreateMeMutation, CreateMeMutationVariables>({
-                errorPolicy: "all",
                 mutation: CreateMeDocument,
                 variables: {
                     value: {
@@ -49,20 +69,115 @@ export async function createUser(
                 }
             })
             .catch((error) => {
-                //console.error(JSON.stringify(error,null,1));
                 reject(error);
             })
-            .then((result) => {
-                if (!result) {
-                    reject("This should never happen");
+            .then(async (responseRaw) => {
+                if (responseRaw == null) {
+                    reject();
                     return;
                 }
 
-                let token = result.data!.createMe;
+                const response = responseRaw as FetchResult<LoginMutation, Record<string, any>, Record<string, any>>;
 
-                let client = createTestClient({ Authorization: "Bearer " + token });
+                if (response.errors != null) {
+                    reject(response);
+                    return;
+                }
+                verifyEmailPromise
+                    .catch((error) => reject(error))
+                    .then((email) => {
+                        expect(email.html).to.not.contain("{{registry_name}}");
+                        expect(email.html).to.not.contain("{{registry_url}}");
+                        expect(email.html).to.not.contain("{{token}}");
+                        expect(email.html).to.not.contain("{{");
 
-                resolve(client);
+                        expect(email.text).to.not.contain("{{registry_name}}");
+                        expect(email.text).to.not.contain("{{registry_url}}");
+                        expect(email.text).to.not.contain("{{token}}");
+                        expect(email.text).to.not.contain("{{");
+
+                        const emailValidationToken = (email.text as String).match(/\?token=([a-zA-z0-9-]+)/);
+
+                        resolve({
+                            emailVerificationToken: emailValidationToken!.pop()!
+                        });
+                    });
+            });
+    });
+}
+
+/** creates a new user, verifies their email address, and returns an apollo client for their session */
+export async function createUser(
+    firstName: string,
+    lastName: string,
+    username: string,
+    emailAddress: string,
+    password: string
+): Promise<ApolloClient<NormalizedCacheObject>> {
+    return await new Promise(async (resolve, reject) => {
+        await createUserDoNotVerifyEmail(firstName, lastName, username, emailAddress, password)
+            .catch((error) => {
+                reject(error);
+            })
+            .then((userInfo) => {
+                let createUserResponse = userInfo as {
+                    emailVerificationToken: string;
+                };
+
+                if (createUserResponse == undefined) return;
+
+                createAnonymousClient()
+                    .mutate({
+                        mutation: VerifyEmailAddressDocument,
+                        variables: {
+                            token: createUserResponse.emailVerificationToken
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error verifying email address");
+                        console.error(JSON.stringify(error, null, 1));
+
+                        reject(error);
+                    })
+                    .then((response) => {
+                        if (response == undefined) return;
+
+                        expect(
+                            (response as FetchResult<
+                                VerifyEmailAddressMutation,
+                                Record<string, any>,
+                                Record<string, any>
+                            >).errors == null
+                        ).true;
+
+                        createAnonymousClient()
+                            .mutate({
+                                mutation: LoginDocument,
+                                variables: {
+                                    username,
+                                    password
+                                }
+                            })
+                            .catch((error) => reject(error))
+                            .then((responseRaw) => {
+                                const response = responseRaw as FetchResult<
+                                    LoginMutation,
+                                    Record<string, any>,
+                                    Record<string, any>
+                                >;
+
+                                if (response.errors != null) {
+                                    reject(response);
+                                    return;
+                                }
+
+                                let authenticatedClient = createTestClient({
+                                    Authorization: "Bearer " + response.data!.login
+                                });
+
+                                resolve(authenticatedClient);
+                            });
+                    });
             });
     });
 }

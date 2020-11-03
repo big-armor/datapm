@@ -1,0 +1,7 @@
+Thanks for requesting access to {{registry_name}} at {{registry_url}}
+
+Click (or copy-and-paste in your browser) the link below to validate your email address.
+
+{{registry_url}}/validate-email?token={{token}}
+
+If you did not request this email, you can safely ignore it. You not receive any further communications. 

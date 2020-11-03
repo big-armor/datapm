@@ -1,0 +1,19 @@
+<div class="container p-5">
+    <div class="d-flex flex-column align-items-center" [ngSwitch]="state">
+        <div class="dialog-subtitle" *ngSwitchCase="'LOADING'">Validating email...</div>
+        <ng-container *ngSwitchCase="'SUCCESS'">
+            <mat-icon class="success-icon">verified</mat-icon>
+            <div class="dialog-title">Your Email Is Verified!</div>
+            <div class="dialog-subtitle">
+                You can <a (click)="loginClicked()" href="javascript:void(0)">log in to your account now</a>.
+            </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="'FAILED'">
+            <mat-icon class="failed-icon">warning</mat-icon>
+            <div class="dialog-title">Verification Failed!</div>
+            <div class="dialog-subtitle">
+                {{ errorMessage }}
+            </div>
+        </ng-container>
+    </div>
+</div>

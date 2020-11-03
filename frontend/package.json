@@ -30,7 +30,7 @@
         "bootstrap": "^4.5.2",
         "component": "^1.1.0",
         "crypto": "^1.0.1",
-        "datapm-lib": "^0.3.18",
+        "datapm-lib": "^0.3.20",
         "jwt-decode": "^2.2.0",
         "rxjs": "^6.5.5",
         "stream": "0.0.2",

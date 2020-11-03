@@ -1,8 +1,6 @@
 import querystring from "querystring";
 
 import { EntityRepository, Repository, EntityManager, SelectQueryBuilder } from "typeorm";
-import sgMail from "@sendgrid/mail";
-import { MailDataRequired } from "@sendgrid/helpers/classes/mail";
 import { v4 as uuid } from "uuid";
 
 import { User } from "../entity/User";
@@ -12,7 +10,8 @@ import { UserCatalogPermission } from "../entity/UserCatalogPermission";
 import { CatalogRepository } from "./CatalogRepository";
 import { hashPassword } from "../util/PasswordUtil";
 import { Catalog } from "../entity/Catalog";
-
+import { sendVerifyEmail, smtpConfigured } from "../util/smtpUtil";
+import { ValidationError } from "apollo-server";
 // https://stackoverflow.com/a/52097700
 export function isDefined<T>(value: T | undefined | null): value is T {
     return <T>value !== undefined && <T>value !== null;
@@ -129,46 +128,6 @@ function getCatalogPicture(catalogId: number) {
     return `catalog/${catalogId}/icon/${uuid()}`; // each profile picture needs its unique path to "invalidate" browser cache
 }
 
-async function sendInviteEmail(user: User, senderName: string, signUp: boolean = true) {
-    const params = {
-        client_id: process.env.AUTH0_CLIENT_ID,
-        response_type: "code",
-        redirect_uri: process.env.DEFAULT_INVITATION_REDIRECT_URL,
-        initial_screen: signUp ? "signUp" : "logIn",
-        login_hint: user.emailAddress,
-        initial_first_name: user.firstName,
-        initial_last_name: user.lastName
-    };
-
-    const link = `${process.env.JWT_ISSUER}authorize?${querystring.stringify(params)}`;
-
-    const msg: MailDataRequired = {
-        to: {
-            name: user.name,
-            email: user.emailAddress
-        },
-        from: {
-            name: "Data Beam",
-            email: "hello@datapm.com"
-        },
-        dynamicTemplateData: {
-            link,
-            receiverName: user.firstName,
-            senderName: senderName
-        },
-        // template lives within SendGrid configuration
-        // https://mc.sendgrid.com/dynamic-templates/
-        templateId: "d-af5fb8ecd1394375a971acb3e997cf6a"
-    };
-
-    try {
-        await sgMail.send(msg);
-    } catch (err) {
-        console.error(`Failed to send email - ${err.message}`);
-        throw new Error("Failed to send invitation email");
-    }
-}
-
 function addUserToMixpanel(user: User, invitedByUserEmail: string) {
     mixpanel?.people.set(user.emailAddress, {
         $first_name: user.firstName,
@@ -184,7 +143,6 @@ function addUserToMixpanel(user: User, invitedByUserEmail: string) {
 export class UserRepository extends Repository<User> {
     constructor() {
         super();
-        sgMail.setApiKey(process.env.SENDGRID_API_KEY || "SG.DUMMY");
     }
 
     getUserByUsername(username: string) {
@@ -195,11 +153,20 @@ export class UserRepository extends Repository<User> {
         return user;
     }
 
+    findByEmailValidationToken(token: String) {
+        const ALIAS = "getUsername";
+
+        const user = this.createQueryBuilder(ALIAS)
+            .where([{ verifyEmailToken: token }])
+            .getOne();
+
+        return user;
+    }
+
     getUserByEmail(emailAddress: string) {
         const ALIAS = "getByEmailAddress";
 
         const user = this.createQueryBuilder(ALIAS).where([{ emailAddress }]).getOne();
-
         return user;
     }
 
@@ -268,61 +235,74 @@ export class UserRepository extends Repository<User> {
     }
 
     createUser({ value, relations = [] }: { value: CreateUserInput; relations?: string[] }): Promise<User> {
-        return this.manager.nestedTransaction(async (transaction) => {
-            const isAdmin = (input: CreateUserInput | CreateUserInputAdmin): input is CreateUserInputAdmin => {
-                return (input as CreateUserInputAdmin) !== undefined;
-            };
+        const self: UserRepository = this;
+        const isAdmin = (input: CreateUserInput | CreateUserInputAdmin): input is CreateUserInputAdmin => {
+            return (input as CreateUserInputAdmin) !== undefined;
+        };
 
-            // user does not exist, create it
+        if (process.env["REQUIRE_EMAIL_VERIFICATION"] != "false" && !smtpConfigured()) {
+            throw new Error("REQUIRE_EMAIL_VERIFICATION_AND_SMTP_NOT_CONFIGURED");
+        }
 
-            let user = transaction.create(User);
+        let emailVerificationToken = uuid();
 
-            if (value.firstName != null) user.firstName = value.firstName.trim();
+        return this.manager
+            .nestedTransaction(async (transaction) => {
+                let user = transaction.create(User);
 
-            if (value.lastName != null) user.lastName = value.lastName.trim();
+                if (value.firstName != null) user.firstName = value.firstName.trim();
 
-            user.emailAddress = value.emailAddress.trim();
-            user.username = value.username.trim();
-            user.passwordSalt = uuid();
-            user.passwordHash = hashPassword(value.password, user.passwordSalt);
+                if (value.lastName != null) user.lastName = value.lastName.trim();
 
-            const now = new Date();
-            user.createdAt = now;
-            user.updatedAt = now;
+                user.emailAddress = value.emailAddress.trim();
+                user.username = value.username.trim();
+                user.passwordSalt = uuid();
+                user.passwordHash = hashPassword(value.password, user.passwordSalt);
 
-            user.isActive = true;
-
-            if (isAdmin(value) && value.isAdmin) {
-                user.isAdmin = value.isAdmin;
-            } else {
-                user.isAdmin = false;
-            }
-
-            user = await transaction.save(user);
-
-            const catalog = await transaction.getCustomRepository(CatalogRepository).createCatalog({
-                username: user.username,
-                value: {
-                    description: "",
-                    isPublic: false,
-                    displayName: user.username,
-                    slug: user.username,
-                    website: user.website
+                if (process.env["REQUIRE_EMAIL_VERIFICATION"] != "false") {
+                    user.verifyEmailToken = emailVerificationToken;
+                    user.verifyEmailTokenDate = new Date();
+                    user.emailVerified = false;
                 }
+
+                const now = new Date();
+                user.createdAt = now;
+                user.updatedAt = now;
+
+                user.isActive = true;
+
+                if (isAdmin(value) && value.isAdmin) {
+                    user.isAdmin = value.isAdmin;
+                } else {
+                    user.isAdmin = false;
+                }
+
+                user = await transaction.save(user);
+
+                const catalog = await transaction.getCustomRepository(CatalogRepository).createCatalog({
+                    username: user.username,
+                    value: {
+                        description: "",
+                        isPublic: false,
+                        displayName: user.username,
+                        slug: user.username,
+                        website: user.website
+                    }
+                });
+
+                return user;
+            })
+            .then(async (user: User) => {
+                if (process.env["REQUIRE_EMAIL_VERIFICATION"] != "false")
+                    await sendVerifyEmail(user, emailVerificationToken);
+
+                return getUserOrFail({
+                    username: value.username,
+                    manager: self.manager,
+                    relations,
+                    includeInactive: isAdmin(value)
+                });
             });
-
-            // send email
-            // await sendInviteEmail(user, firstName + " " + lastName);
-
-            // addUserToMixpanel(user, userEmail);
-
-            return getUserOrFail({
-                username: value.username,
-                manager: transaction,
-                relations,
-                includeInactive: isAdmin(value)
-            });
-        });
     }
 
     updateUserPassword({ username, passwordHash }: { username: string; passwordHash: string }): Promise<void> {

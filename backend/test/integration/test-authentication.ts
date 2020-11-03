@@ -1,7 +1,7 @@
 import { ApolloClient, NormalizedCacheObject, ServerError } from "@apollo/client/core";
 import { ErrorResponse } from "apollo-link-error";
 import { expect } from "chai";
-import { LoginDocument, UpdateMyPasswordDocument } from "./registry-client";
+import { AUTHENTICATION_ERROR, LoginDocument, UpdateMyPasswordDocument } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 
 describe("Authentication Tests", async () => {
@@ -24,7 +24,7 @@ describe("Authentication Tests", async () => {
 
         expect(result.errors!.length > 0, "should have errors").equal(true);
         expect(
-            result.errors!.find((e) => e.message == "USER_NOT_FOUND") != null,
+            result.errors!.find((e) => e.message == AUTHENTICATION_ERROR.WRONG_CREDENTIALS) != null,
             "should have invalid login error"
         ).equal(true);
     });
@@ -92,11 +92,24 @@ describe("Authentication Tests", async () => {
         expect(userBClient).to.exist;
     });
 
-    it("Login user A", async () => {
+    it("Login user A with username", async () => {
         let result = await anonymousClient.mutate({
             mutation: LoginDocument,
             variables: {
                 username: "testA-authentication",
+                password: "passwordA!"
+            }
+        });
+
+        expect(result.errors === undefined, "no errors").equal(true);
+        expect(result.data!.login != null, "should have login key value").equal(true);
+    });
+
+    it("Login user A with email", async () => {
+        let result = await anonymousClient.mutate({
+            mutation: LoginDocument,
+            variables: {
+                username: "testA-authentication@test.datapm.io",
                 password: "passwordA!"
             }
         });
@@ -143,7 +156,7 @@ describe("Authentication Tests", async () => {
 
         expect(result.errors!.length > 0, "should have errors").equal(true);
         expect(
-            result.errors!.find((e) => e.message == "WRONG_CREDENTIALS") != null,
+            result.errors!.find((e) => e.message == AUTHENTICATION_ERROR.WRONG_CREDENTIALS) != null,
             "should have invalid login error"
         ).equal(true);
     });

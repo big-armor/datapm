@@ -1,4 +1,5 @@
 import { SchemaDirectiveVisitor, ApolloError, ValidationError } from "apollo-server";
+import { Kind } from "graphql";
 import {
     GraphQLField,
     defaultFieldResolver,
@@ -12,6 +13,8 @@ import {
 } from "graphql";
 import { Context } from "../context";
 import { INVALID_PASSWORD_ERROR } from "../generated/graphql";
+import { ValidationConstraint } from "./ValidationConstraint";
+import { ValidationType } from "./ValidationType";
 
 export class ValidPasswordDirective extends SchemaDirectiveVisitor {
     visitArgumentDefinition(
@@ -47,17 +50,11 @@ export class ValidPasswordDirective extends SchemaDirectiveVisitor {
             objectType: GraphQLInputObjectType;
         }
     ): GraphQLInputField | void | null {
-        if (field.type instanceof GraphQLNonNull && field.type.ofType instanceof GraphQLScalarType) {
-            field.type = new GraphQLNonNull(new ValidatedType(field.type.ofType));
-        } else if (field.type instanceof GraphQLScalarType) {
-            field.type = new ValidatedType(field.type);
-        } else {
-            throw new Error(`Not a scalar type: ${field.type}`);
-        }
+        field.type = ValidationType.create(field.type, new PasswordConstraint());
     }
 }
 
-function validatePassword(password: String | undefined): void {
+export function validatePassword(password: String | undefined): void {
     const regex = /[0-9@#$%!]/;
 
     if (password === undefined || password.length == 0) {
@@ -75,31 +72,16 @@ function validatePassword(password: String | undefined): void {
         throw new ValidationError(INVALID_PASSWORD_ERROR.INVALID_CHARACTERS);
     }
 }
+export class PasswordConstraint implements ValidationConstraint {
+    getName(): string {
+        return "Password";
+    }
 
-class ValidatedType extends GraphQLScalarType {
-    constructor(type: GraphQLScalarType) {
-        super({
-            name: `ValidatedPassword`,
+    validate(value: String) {
+        validatePassword(value);
+    }
 
-            // For more information about GraphQLScalar type (de)serialization,
-            // see the graphql-js implementation:
-            // https://github.com/graphql/graphql-js/blob/31ae8a8e8312/src/type/definition.js#L425-L446
-
-            serialize(value) {
-                value = type.serialize(value);
-
-                return value;
-            },
-
-            parseValue(value) {
-                validatePassword(value);
-
-                return type.parseValue(value);
-            },
-
-            parseLiteral(valueNode, variables) {
-                return type.parseLiteral(valueNode, variables);
-            }
-        });
+    getCompatibleScalarKinds(): string[] {
+        return [Kind.STRING];
     }
 }

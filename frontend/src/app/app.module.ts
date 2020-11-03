@@ -17,6 +17,7 @@ import { SharedModule } from "./shared/shared.module";
 import { TrendingComponent } from "./homepage/trending/trending.component";
 import { LoginDialogComponent } from "./shared/header/login-dialog/login-dialog.component";
 import { SignUpDialogComponent } from "./shared/header/sign-up-dialog/sign-up-dialog.component";
+import { ForgotPasswordDialogComponent } from "./shared/header/forgot-password-dialog/forgot-password-dialog.component";
 import { LatestComponent } from "./homepage/latest/latest.component";
 import { SearchComponent } from "./search/search.component";
 import { FollowingComponent } from "./homepage/following/following.component";
@@ -42,6 +43,7 @@ import { ConfirmationDialogComponent } from "./my-account/confirmation-dialog/co
         TrendingComponent,
         LoginDialogComponent,
         SignUpDialogComponent,
+        ForgotPasswordDialogComponent,
         LatestComponent,
         SearchComponent,
         FollowingComponent,

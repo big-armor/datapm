@@ -3,14 +3,15 @@ import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms"
 import { Router, ActivatedRoute } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
 import { AuthenticationService } from "src/app/services/authentication.service";
-import { LoginGQL } from "src/generated/graphql";
+import { AUTHENTICATION_ERROR, LoginGQL } from "src/generated/graphql";
 import { Subscription } from "rxjs";
 enum State {
     LOGGED_OUT,
     AWAITING_RESPONSE,
     INCORRECT_LOGIN,
     LOGGED_IN,
-    LOGIN_ERROR
+    LOGIN_ERROR,
+    LOGIN_ERROR_VALIDATE_EMAIL
 }
 
 @Component({
@@ -77,12 +78,12 @@ export class LoginDialogComponent implements OnInit, OnDestroy {
                 this.router.navigate([returnUrl]);
             })
             .catch((error: any) => {
-                if (error.errors?.find((e) => (e.extensions.code == "GRAPHQL_VALIDATION_FAILED") != null)) {
+                if (error.errors?.find((e) => e.message == AUTHENTICATION_ERROR.WRONG_CREDENTIALS) != null) {
                     this.state = State.INCORRECT_LOGIN;
-                }
-
-                if (error.errors?.find((e) => (e.extensions.code == "WRONG_CREDENTIALS") != null)) {
-                    this.state = State.INCORRECT_LOGIN;
+                } else if (
+                    error.errors?.find((e) => e.message == AUTHENTICATION_ERROR.EMAIL_ADDRESS_NOT_VERIFIED) != null
+                ) {
+                    this.state = State.LOGIN_ERROR_VALIDATE_EMAIL;
                 } else {
                     this.state = State.LOGIN_ERROR;
                 }

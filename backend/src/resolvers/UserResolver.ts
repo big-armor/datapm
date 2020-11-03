@@ -1,10 +1,31 @@
-import { AuthenticationError } from "apollo-server";
+import { ApolloError, AuthenticationError, ValidationError } from "apollo-server";
 import { AuthenticatedContext } from "../context";
 import { AUTHENTICATION_ERROR, CreateUserInput, UpdateMyPasswordInput, UpdateUserInput } from "../generated/graphql";
+import { CatalogRepository } from "../repository/CatalogRepository";
 import { UserRepository } from "../repository/UserRepository";
-import { createJwt } from "../util/jwt";
 import { hashPassword } from "../util/PasswordUtil";
 import { getGraphQlRelationName } from "../util/relationNames";
+
+export const emailAddressAvailable = async (
+    _0: any,
+    { emailAddress }: { emailAddress: string },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const user = await context.connection.manager.getCustomRepository(UserRepository).getUserByEmail(emailAddress);
+
+    return user == null;
+};
+
+export const usernameAvailable = async (_0: any, { username }: { username: string }, context: AuthenticatedContext) => {
+    const user = await context.connection.manager.getCustomRepository(UserRepository).getUserByUsername(username);
+
+    const catalog = await context.connection.manager
+        .getCustomRepository(CatalogRepository)
+        .findCatalogBySlug({ slug: username });
+
+    return user == null && catalog == null;
+};
 
 export const createMe = async (
     _0: any,
@@ -12,12 +33,17 @@ export const createMe = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const user = await context.connection.manager.getCustomRepository(UserRepository).createUser({
+    if ((await emailAddressAvailable(_0, { emailAddress: value.emailAddress }, context, info)) == false) {
+        throw new ValidationError("EMAIL_ADDRESS_NOT_AVAILABLE");
+    }
+
+    if ((await usernameAvailable(_0, { username: value.username }, context)) == false) {
+        throw new ValidationError("USERNAME_NOT_AVAILABLE");
+    }
+    return await context.connection.manager.getCustomRepository(UserRepository).createUser({
         value,
         relations: getGraphQlRelationName(info)
     });
-
-    return createJwt(user);
 };
 
 export const updateMe = async (
@@ -44,7 +70,7 @@ export const updateMyPassword = async (
         .getUserByLogin(context.me.username, getGraphQlRelationName(info));
 
     if (user == null) {
-        throw new AuthenticationError(AUTHENTICATION_ERROR.USER_NOT_FOUND);
+        throw new AuthenticationError(AUTHENTICATION_ERROR.WRONG_CREDENTIALS);
     }
 
     const oldPasswordHash = hashPassword(value.oldPassword, user.passwordSalt);
