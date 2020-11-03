@@ -5,7 +5,7 @@ variable "smtp_password" {
 
 variable "APOLLO_KEY" {
   description = "Apollo GraphlQL Key"
-  type = string
+  type        = string
 }
 
 terraform {
@@ -142,7 +142,7 @@ resource "google_cloud_run_service" "default" {
           value = google_sql_user.user.password
         }
         env {
-          name = "REGISTRY_NAME"
+          name  = "REGISTRY_NAME"
           value = "DataPM TEST Registry"
         }
         env {
