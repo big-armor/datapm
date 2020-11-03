@@ -81,17 +81,6 @@ export class MyAccountComponent implements OnInit, OnDestroy {
         this.subscription.unsubscribe();
     }
 
-    openEditDialog() {
-        const dialogConfig = new MatDialogConfig();
-        dialogConfig.data = this.currentUser;
-
-        this.dialog.open(EditAccountDialogComponent, dialogConfig);
-
-        this.dialog.afterAllClosed.subscribe((result) => {
-            this.authenticationService.refreshUserInfo();
-        });
-    }
-
     public selectTab(index) {
         this.router.navigate([this.routes[index].url]);
         this.selectedTab = index;
