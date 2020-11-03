@@ -13,7 +13,7 @@ let serverProcess: execa.ExecaChildProcess;
 let mailServer: any;
 export let mailObservable: Observable<any>;
 
-const TEMP_STORAGE_URL = "~/temp/datapm-storage";
+const TEMP_STORAGE_URL = "file://~/temp/datapm-storage";
 
 before(async function () {
     console.log("Starting postgres temporary container");
