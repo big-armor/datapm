@@ -37,7 +37,7 @@ jobs:
             #     prettier: true
 
             - name: Build Docker Container
-              run: npm run build:parallel
+              run: npm run build
 
             - name: Write Credentials file
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
