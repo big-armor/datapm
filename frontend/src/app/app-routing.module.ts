@@ -3,7 +3,6 @@ import { RouterModule, Route } from "@angular/router";
 import { CatalogDetailsComponent } from "./catalog-details/catalog-details.component";
 import { AuthGuard } from "./helpers/auth-guard";
 import { PackageDetailComponent } from "./package/package-detail/package-detail.component";
-import { SearchComponent } from "./search/search.component";
 import { PackageComponent } from "./package/package.component";
 import { PackageVersionComponent } from "./package/package-version/package-version.component";
 import { PackageSchemaComponent } from "./package/package-schema/package-schema.component";
@@ -15,7 +14,7 @@ const staticRoutes: Route[] = [
     },
     {
         path: "search",
-        component: SearchComponent
+        loadChildren: () => import("./search/search.module").then((m) => m.SearchModule)
     },
     {
         path: "me",

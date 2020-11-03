@@ -11,7 +11,6 @@ import { CatalogDetailsComponent } from "./catalog-details/catalog-details.compo
 import { PackageDetailComponent } from "./package/package-detail/package-detail.component";
 import { MaterialModule } from "./material.module";
 import { SharedModule } from "./shared/shared.module";
-import { SearchComponent } from "./search/search.component";
 import { PackageComponent } from "./package/package.component";
 import { PackageVersionComponent } from "./package/package-version/package-version.component";
 import { PackageSchemaComponent } from "./package/package-schema/package-schema.component";
@@ -21,7 +20,6 @@ import { PackageSchemaComponent } from "./package/package-schema/package-schema.
         AppComponent,
         CatalogDetailsComponent,
         PackageDetailComponent,
-        SearchComponent,
         PackageComponent,
         PackageVersionComponent,
         PackageSchemaComponent
