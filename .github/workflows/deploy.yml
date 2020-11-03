@@ -31,7 +31,7 @@ jobs:
               run: npm install gulp
 
             - name: Run Prettier linter
-              Turnuses: wearerequired/lint-action@v1.6.0
+              uses: wearerequired/lint-action@v1.6.0
               with:
                   github_token: ${{ secrets.github_token }}
                   prettier: true
