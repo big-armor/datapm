@@ -11,16 +11,11 @@ import { MyAccountComponent } from "./my-account/my-account.component";
 import { PackageDetailComponent } from "./package/package-detail/package-detail.component";
 import { FormsModule } from "@angular/forms";
 import { MaterialModule } from "./material.module";
-import { HomepageComponent } from "./homepage/homepage.component";
-import { SharedComponent } from "./shared/shared.component";
 import { SharedModule } from "./shared/shared.module";
-import { TrendingComponent } from "./homepage/trending/trending.component";
 import { LoginDialogComponent } from "./shared/header/login-dialog/login-dialog.component";
 import { SignUpDialogComponent } from "./shared/header/sign-up-dialog/sign-up-dialog.component";
 import { ForgotPasswordDialogComponent } from "./shared/header/forgot-password-dialog/forgot-password-dialog.component";
-import { LatestComponent } from "./homepage/latest/latest.component";
 import { SearchComponent } from "./search/search.component";
-import { FollowingComponent } from "./homepage/following/following.component";
 import { PackageComponent } from "./package/package.component";
 import { PackageVersionComponent } from "./package/package-version/package-version.component";
 import { PackageSchemaComponent } from "./package/package-schema/package-schema.component";
@@ -38,15 +33,10 @@ import { ConfirmationDialogComponent } from "./my-account/confirmation-dialog/co
         CatalogDetailsComponent,
         MyAccountComponent,
         PackageDetailComponent,
-        HomepageComponent,
-        SharedComponent,
-        TrendingComponent,
         LoginDialogComponent,
         SignUpDialogComponent,
         ForgotPasswordDialogComponent,
-        LatestComponent,
         SearchComponent,
-        FollowingComponent,
         PackageComponent,
         PackageVersionComponent,
         PackageSchemaComponent,
