@@ -6,6 +6,8 @@ import request = require("superagent");
 import { SetMyAvatarImageDocument } from "./registry-client";
 
 describe("Image Upload Tests", async () => {
+    process.env.STORAGE_URL = "/tmp/datapm-storage";
+    fs.mkdirSync("/tmp/datapm-storage", { recursive: true });
     const anonymousUser = createAnonymousClient();
     let userAClient: ApolloClient<NormalizedCacheObject>;
 
@@ -91,4 +93,7 @@ describe("Image Upload Tests", async () => {
             expect(uploadResult.errors[0].message).to.equal("IMAGE_TOO_LARGE");
         }
     }).timeout(10000);
+}).afterAll(() => {
+    // Delete the temporary storage after tests have been executed
+    fs.rmdirSync("/tmp/datapm-storage");
 });
