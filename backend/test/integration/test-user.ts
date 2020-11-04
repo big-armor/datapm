@@ -1,8 +1,8 @@
 import { ApolloClient, FetchResult, NormalizedCacheObject, ServerError } from "@apollo/client/core";
-import { ErrorResponse } from "apollo-link-error";
 import { expect } from "chai";
 import { MeDocument, UserDocument, UpdateMeDocument, LoginMutation } from "./registry-client";
-import { createAnonymousClient, createUser } from "./test-utils";
+import { createUser } from "./test-utils";
+import { describe, it } from "mocha";
 
 describe("User Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;

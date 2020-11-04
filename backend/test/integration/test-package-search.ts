@@ -1,19 +1,13 @@
 import { ApolloClient, NormalizedCacheObject, ServerError } from "@apollo/client/core";
-import { ErrorResponse } from "apollo-link-error";
 import { expect } from "chai";
 import {
     CreatePackageDocument,
-    PackageDocument,
-    UpdateCatalogDocument,
     UpdatePackageDocument,
-    CreateVersionDocument,
     DisablePackageDocument,
     SearchPackagesDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
-import * as fs from "fs";
-import * as crypto from "crypto";
-import { PackageFile } from "datapm-lib";
+import { describe, it } from "mocha";
 
 describe("Package Search Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;

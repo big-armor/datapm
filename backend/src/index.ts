@@ -49,25 +49,12 @@ async function main() {
 
     const connection = await superCreateConnection();
 
-    // if the GRAPHQL_CONTEXT_USER_SUB environment variable is set, get me context
-    // from GRAPHQL_CONTEXT_USER_SUB, else, get it from the express request object
-    // GRAPHQL_CONTEXT_USER_SUB should not be set in packageion
-
-    console.log(`process.env.GRAPHQL_CONTEXT_USER_SUB set to ${process.env.GRAPHQL_CONTEXT_USER_SUB}`);
-
-    const context = process.env.GRAPHQL_CONTEXT_USER_SUB
-        ? async ({ req }: { req: express.Request }): Promise<Context> => ({
-              request: req,
-              me: await getMeSub(process.env.GRAPHQL_CONTEXT_USER_SUB!, connection.manager),
-              connection: connection,
-              dataLoaders: createDataLoaders()
-          })
-        : async ({ req }: { req: express.Request }): Promise<Context> => ({
-              request: req,
-              me: await getMeRequest(req, connection.manager),
-              connection: connection,
-              dataLoaders: createDataLoaders()
-          });
+    const context = async ({ req }: { req: express.Request }): Promise<Context> => ({
+        request: req,
+        me: await getMeRequest(req, connection.manager),
+        connection: connection,
+        dataLoaders: createDataLoaders()
+    });
 
     const schema = await makeSchema();
 

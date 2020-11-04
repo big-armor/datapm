@@ -15,6 +15,8 @@
                             autocomplete="off"
                             class="form-control search-input"
                             placeholder="Search For Data"
+                            [ngModel]="searchTerm"
+                            (ngModelChange)="searchTerm = $event"
                         />
                         <button class="material-icons">search</button>
                     </form>
@@ -30,7 +32,7 @@
             <div class="p-2 ml-4 bd-highlight main-menu-title d-flex align-items-end">
                 <a href="/docs/publish-data/">Publish</a>
             </div>
-            <div class="p-2 ml-4 bd-highlight">
+            <div class="p-2 ml-4 bd-highlight avatar">
                 <button mat-fab class="person-menu" [matMenuTriggerFor]="beforeMenu" aria-label="Person">
                     <mat-icon>person</mat-icon>
                 </button>
@@ -45,32 +47,44 @@
     </div>
 </div>
 
-<div class="row pt-3 px-3 mobile-menu">
-    <div class="col-7">
-        <h1 class="title" routerLink="/"><a (click)="goHome()">datapm</a></h1>
-    </div>
-    <div class="col-5 text-right">
-        <div class="d-flex flex-row bd-highlight d-flex justify-content-end">
-            <div class="bd-highlight mobile-collection mr-2">
-                <button mat-fab class="collection-menu" aria-label="Collections">
-                    <mat-icon>collections</mat-icon>
-                </button>
-            </div>
-            <div class="bd-highlight mobile-person">
-                <button mat-fab class="person-menu" [matMenuTriggerFor]="beforeMenu" aria-label="Person">
-                    <mat-icon>person</mat-icon>
-                </button>
-                <mat-menu #beforeMenu="matMenu" xPosition="before">
-                    <button *ngIf="currentUser" mat-menu-item (click)="goToMyDetails()">My Profile</button>
-                    <button *ngIf="!currentUser" mat-menu-item (click)="openLoginDialog()">Log In</button>
-                    <button *ngIf="!currentUser" mat-menu-item (click)="openSignUpDialog()">Sign Up</button>
-                    <button *ngIf="currentUser" mat-menu-item (click)="logout()">Log Out</button>
-                </mat-menu>
+<div class="mobile-menu">
+    <div class="row pt-3 px-3">
+        <div class="col-7">
+            <h1 class="title" routerLink="/"><a (click)="goHome()">datapm</a></h1>
+        </div>
+
+        <div class="col-5 text-right">
+            <div class="d-flex flex-row bd-highlight d-flex justify-content-end">
+                <div class="bd-highlight mobile-collection mr-2">
+                    <button mat-fab class="collection-menu" aria-label="Collections">
+                        <mat-icon>collections</mat-icon>
+                    </button>
+                </div>
+                <div class="bd-highlight mobile-person">
+                    <button mat-fab class="person-menu" [matMenuTriggerFor]="beforeMenu" aria-label="Person">
+                        <mat-icon>person</mat-icon>
+                    </button>
+                    <mat-menu #beforeMenu="matMenu" xPosition="before">
+                        <button *ngIf="currentUser" mat-menu-item (click)="goToMyDetails()">My Profile</button>
+                        <button *ngIf="!currentUser" mat-menu-item (click)="openLoginDialog()">Log In</button>
+                        <button *ngIf="!currentUser" mat-menu-item (click)="openSignUpDialog()">Sign Up</button>
+                        <button *ngIf="currentUser" mat-menu-item (click)="logout()">Log Out</button>
+                    </mat-menu>
+                </div>
             </div>
         </div>
+    </div>
+    <div class="row pt-3 px-3">
         <div class="col-12 mobile-search-box mt-3">
-            <input type="text" class="form-control search-input" placeholder="Search For Data" />
-            <button class="material-icons" (click)="goToSearch()">search</button>
+            <input
+                type="text"
+                class="form-control search-input"
+                (keydown.enter)="mobileSearch()"
+                placeholder="Search For Data"
+                [ngModel]="searchTerm"
+                (ngModelChange)="searchTerm = $event"
+            />
+            <button class="material-icons" (onclick)="mobileSearch()">search</button>
         </div>
     </div>
 </div>

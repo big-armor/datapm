@@ -10,6 +10,7 @@ import { MatTableDataSource } from "@angular/material/table";
 import { Clipboard } from "@angular/cdk/clipboard";
 import { Subject } from "rxjs";
 import { take, takeUntil } from "rxjs/operators";
+import { EditAccountDialogComponent } from "../edit-account-dialog/edit-account-dialog.component";
 
 enum State {
     INIT,
@@ -89,6 +90,17 @@ export class DetailsComponent implements OnInit, OnDestroy {
         this.dialog.open(EditPasswordDialogComponent, dialogConfig);
     }
 
+    openEditDialog() {
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.data = this.currentUser;
+
+        this.dialog.open(EditAccountDialogComponent, dialogConfig);
+
+        this.dialog.afterAllClosed.subscribe((result) => {
+            this.authenticationService.refreshUserInfo();
+        });
+    }
+
     createAPIKey() {
         if (this.createAPIKeyForm.value.label == "" || this.createAPIKeyForm.value.label == null) {
             this.createAPIKeyState = State.ERROR_NO_LABEL;
@@ -104,7 +116,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
             .pipe(takeUntil(this.subscription))
             .subscribe((response) => {
                 if (response.errors?.length > 0) {
-                    if (response.errors.find((e) => e.message == "NOT_UNIQUE")) {
+                    if (response.errors.find((e) => e.message == "APIKEY_LABEL_NOT_AVIALABLE")) {
                         this.createAPIKeyState = State.ERROR_NOT_UNIQUE;
                         return;
                     }
