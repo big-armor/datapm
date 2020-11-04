@@ -80,6 +80,11 @@ before(async function () {
             }
         });
 
+        serverProcess.stderr!.on("data", (buffer: Buffer) => {
+            const line = buffer.toString();
+            console.error(line);
+        });
+
         serverProcess.stdout!.on("error", (err: Error) => {
             console.error(JSON.stringify(err, null, 1));
         });
