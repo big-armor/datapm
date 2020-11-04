@@ -7,7 +7,6 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { GraphQLModule } from "./graphql.module";
-import { CatalogDetailsComponent } from "./catalog-details/catalog-details.component";
 import { PackageDetailComponent } from "./package/package-detail/package-detail.component";
 import { MaterialModule } from "./material.module";
 import { SharedModule } from "./shared/shared.module";
@@ -18,7 +17,6 @@ import { PackageSchemaComponent } from "./package/package-schema/package-schema.
 @NgModule({
     declarations: [
         AppComponent,
-        CatalogDetailsComponent,
         PackageDetailComponent,
         PackageComponent,
         PackageVersionComponent,

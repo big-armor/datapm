@@ -1,6 +1,5 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Route } from "@angular/router";
-import { CatalogDetailsComponent } from "./catalog-details/catalog-details.component";
 import { AuthGuard } from "./helpers/auth-guard";
 import { PackageDetailComponent } from "./package/package-detail/package-detail.component";
 import { PackageComponent } from "./package/package.component";
@@ -26,7 +25,7 @@ const staticRoutes: Route[] = [
     },
     {
         path: ":catalogSlug",
-        component: CatalogDetailsComponent
+        loadChildren: () => import("./catalog/catalog.module").then((m) => m.CatalogModule)
     },
     {
         path: ":catalogSlug/:packageSlug",
