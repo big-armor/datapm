@@ -38,7 +38,7 @@ You can run only Postgres and SMTP with the following command from the root of t
 
 ```
 cd docker
-docker-compose up -d postgres -d smtp
+docker-compose up -d postgres smtp
 ```
 
 ## License
