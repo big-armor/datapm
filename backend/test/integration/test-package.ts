@@ -7,8 +7,7 @@ import {
     UpdateCatalogDocument,
     UpdatePackageDocument,
     CreateVersionDocument,
-    DisablePackageDocument,
-    MyPackagesDocument
+    DisablePackageDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import * as fs from "fs";
@@ -40,63 +39,6 @@ describe("Package Tests", async () => {
         );
         expect(userAClient).to.exist;
         expect(userBClient).to.exist;
-    });
-
-    it("Should allow user to see own packages", async function () {
-        await userAClient.mutate({
-            mutation: CreatePackageDocument,
-            variables: {
-                value: {
-                    catalogSlug: "testA-packages",
-                    packageSlug: "food-a",
-                    displayName: "Congressional LegislatorsA",
-                    description: "Test upload of congressional legislatorsA"
-                }
-            }
-        });
-
-        await userAClient.mutate({
-            mutation: CreatePackageDocument,
-            variables: {
-                value: {
-                    catalogSlug: "testA-packages",
-                    packageSlug: "food-a2",
-                    displayName: "Congressional LegislatorsA2",
-                    description: "Test upload of congressional legislatorsA2"
-                }
-            }
-        });
-
-        await userBClient.mutate({
-            mutation: CreatePackageDocument,
-            variables: {
-                value: {
-                    catalogSlug: "testB-packages",
-                    packageSlug: "food-b",
-                    displayName: "Congressional LegislatorsB",
-                    description: "Test upload of congressional legislatorsB"
-                }
-            }
-        });
-
-        let findMyPackagesA = await userAClient.query({
-            query: MyPackagesDocument,
-            variables: {
-                offset: 0,
-                limit: 5
-            }
-        });
-
-        let findMyPackagesB = await userBClient.query({
-            query: MyPackagesDocument,
-            variables: {
-                offset: 0,
-                limit: 5
-            }
-        });
-
-        expect(findMyPackagesA.data.myPackages.count).to.equal(2);
-        expect(findMyPackagesB.data.myPackages.count).to.equal(1);
     });
 
     it("Should allow user to create a package", async function () {

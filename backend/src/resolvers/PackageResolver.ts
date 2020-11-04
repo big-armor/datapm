@@ -12,24 +12,6 @@ import { UserRepository } from "../repository/UserRepository";
 import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 
-export const myPackages = async (
-    _0: any,
-    { limit, offset }: { limit: number; offset: number },
-    context: AuthenticatedContext,
-    info: any
-) => {
-    const relations = getGraphQlRelationName(info);
-    const [searchResponse, count] = await context.connection.manager
-        .getCustomRepository(PackageRepository)
-        .myPackages(context.me, limit, offset, relations);
-
-    return {
-        hasMore: count - (offset + limit) > 0,
-        packages: searchResponse,
-        count
-    };
-};
-
 export const getLatestPackages = async (
     _0: any,
     { limit, offSet }: { limit: number; offSet: number },

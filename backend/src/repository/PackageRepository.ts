@@ -431,20 +431,6 @@ export class PackageRepository {
             .getManyAndCount();
     }
 
-    async myPackages(user: User, limit: number, offSet: number, relations?: string[]): Promise<[Package[], number]> {
-        const ALIAS = "myPackages";
-        return this.manager
-            .getRepository(Package)
-            .createQueryBuilder()
-            .where("creator_id = :userId")
-            .orderBy('"Package"."updated_at"', "DESC")
-            .limit(limit)
-            .offset(offSet)
-            .addRelations(ALIAS, relations)
-            .setParameter("userId", user.id)
-            .getManyAndCount();
-    }
-
     async getLatestPackages(
         user: User,
         limit: number,

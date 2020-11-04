@@ -76,8 +76,7 @@ import {
     removePackagePermissions,
     searchPackages,
     setPackagePermissions,
-    updatePackage,
-    myPackages
+    updatePackage
 } from "./resolvers/PackageResolver";
 
 import { validatePassword } from "./directive/ValidPasswordDirective";
@@ -417,7 +416,7 @@ export const resolvers: {
 
         package: findPackage,
         latestPackages: getLatestPackages,
-        myPackages: myPackages,
+
         collection: findCollectionBySlug,
         collections: findCollectionsForAuthenticatedUser,
         searchCollections: searchCollections,
