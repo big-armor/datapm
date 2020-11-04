@@ -87,11 +87,23 @@ export class CatalogRepository extends Repository<Catalog> {
         relations?: string[];
         includeInactive?: boolean;
     }) {
-        let query = this.manager
+        return this.manager
+            .getRepository(Catalog)
+            .findOne({ where: { slug: slug, isActive: true }, relations: relations });
+    }
+
+    async findCatalogBySlugOrFail(
+        slug: string,
+        relations?: string[]): Promise<Catalog> {
+        const catalog = this.manager
             .getRepository(Catalog)
             .findOne({ where: { slug: slug, isActive: true }, relations: relations });
 
-        return query;
+        if (catalog != null) {
+            throw new Error(`Catalog ${slug} could not be found`);
+        }
+
+        return catalog;
     }
 
     createCatalog({

@@ -25,3 +25,9 @@ export SMTP_PASSWORD=${SMTP_PASSWORD}
 export SMTP_FROM_NAME=${SMTP_FROM_NAME:="Localhost DataPM Registry"}
 export SMTP_FROM_ADDRESS=${SMTP_FROM_ADDRESS:="test@localhost"}
 export SMTP_SECURE=${SMTP_SECURE:="false"}
+export STORAGE_URL=${STORAGE_URL:="file://~/datapm-storage"}
+
+# Examples
+# export GOOGLE_APPLICATION_CREDENTIALS=/my-path/datapm-registry/gc.json
+# export STORAGE_URL="file:///Users/ermal/Documents/datapm-lib/storage" # - File storage url example
+# export STORAGE_URL="gs://datapm-test-bucket" # Google cloud storage example

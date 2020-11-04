@@ -1,6 +1,5 @@
 import { ApolloError, AuthenticationError, UserInputError, ValidationError } from "apollo-server";
 import { AuthenticatedContext } from "../context";
-import { User } from "../entity/User";
 import { AUTHENTICATION_ERROR } from "../generated/graphql";
 import { UserRepository } from "../repository/UserRepository";
 import { createJwt } from "../util/jwt";

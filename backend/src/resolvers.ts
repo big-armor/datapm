@@ -13,7 +13,8 @@ import {
     VersionResolvers,
     VersionConflict,
     PackageIdentifier,
-    CollectionResolvers
+    CollectionResolvers,
+    CatalogIdentifierInput
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
@@ -51,16 +52,19 @@ import {
     findCollectionsForAuthenticatedUser,
     removePackageFromCollection,
     searchCollections,
+    setCollectionCoverImage,
     updateCollection
 } from "./resolvers/CollectionResolver";
 import { login, logout, verifyEmailAddress } from "./resolvers/AuthResolver";
 import {
     createMe,
     disableMe,
+    setMyAvatarImage,
+    setMyCoverImage,
     emailAddressAvailable,
+    usernameAvailable,
     updateMe,
-    updateMyPassword,
-    usernameAvailable
+    updateMyPassword
 } from "./resolvers/UserResolver";
 import { createAPIKey, deleteAPIKey } from "./resolvers/ApiKeyResolver";
 import { Collection } from "./entity/Collection";
@@ -75,9 +79,12 @@ import {
     getLatestPackages,
     removePackagePermissions,
     searchPackages,
+    setPackageCoverImage,
     setPackagePermissions,
     updatePackage
 } from "./resolvers/PackageResolver";
+import { ImageStorageService } from "./storage/images/image-storage-service";
+import { ImageType } from "./storage/images/image-type";
 
 import { validatePassword } from "./directive/ValidPasswordDirective";
 import { validateSlug as validateCatalogSlug } from "./directive/ValidCatalogSlugDirective";
@@ -474,6 +481,8 @@ export const resolvers: {
         createMe: createMe,
         updateMe: updateMe,
         updateMyPassword: updateMyPassword,
+        setMyCoverImage: setMyCoverImage,
+        setMyAvatarImage: setMyAvatarImage,
         disableMe: disableMe,
 
         // API Keys
@@ -512,6 +521,24 @@ export const resolvers: {
             });
         },
 
+        setCatalogCoverImage: async (
+            _0: any,
+            { identifier, image }: { identifier: CatalogIdentifierInput; image: any },
+            context: AuthenticatedContext,
+            info: any
+        ) => {
+            const uploadedImage = await image;
+            const catalogEntity = await context.connection
+                .getCustomRepository(CatalogRepository)
+                .findCatalogBySlugOrFail(identifier.catalogSlug);
+            await ImageStorageService.INSTANCE.saveImage(
+                catalogEntity.id,
+                uploadedImage,
+                ImageType.CATALOG_COVER_IMAGE,
+                context
+            );
+        },
+
         disableCatalog: async (_0: any, { identifier }, context: AuthenticatedContext, info: any) => {
             return context.connection.manager.getCustomRepository(CatalogRepository).disableCatalog({
                 slug: identifier.catalogSlug,
@@ -521,6 +548,7 @@ export const resolvers: {
 
         createPackage: createPackage,
         updatePackage: updatePackage,
+        setPackageCoverImage: setPackageCoverImage,
         disablePackage: disablePackage,
 
         setPackagePermissions: setPackagePermissions,
@@ -528,6 +556,7 @@ export const resolvers: {
 
         createCollection: createCollection,
         updateCollection: updateCollection,
+        setCollectionCoverImage: setCollectionCoverImage,
         disableCollection: disableCollection,
         addPackageToCollection: addPackageToCollection,
         removePackageFromCollection: removePackageFromCollection,
