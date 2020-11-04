@@ -1,10 +1,12 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
-
-import { PackageDetailComponent } from "./package-detail.component";
 import { ApolloTestingModule, ApolloTestingController } from "apollo-angular/testing";
 import { RouterTestingModule } from "@angular/router/testing";
+import { ParamMap } from "@angular/router";
+import { MatButtonModule } from "@angular/material/button";
+import { MatIconModule } from "@angular/material/icon";
 
-import { MaterialModule } from "../../material.module";
+import { PackageDetailComponent } from "./package-detail.component";
+import { ActivatedRoute } from "@angular/router";
 
 describe("PackageDetailComponent", () => {
     let component: PackageDetailComponent;
@@ -14,7 +16,21 @@ describe("PackageDetailComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [PackageDetailComponent],
-            imports: [RouterTestingModule, ApolloTestingModule, MaterialModule]
+            imports: [RouterTestingModule, ApolloTestingModule, MatButtonModule, MatIconModule],
+            providers: [
+                {
+                    provide: ActivatedRoute,
+                    useValue: {
+                        snapshot: {
+                            parent: {
+                                paramMap: {
+                                    get: (name: string) => name
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
         }).compileComponents();
     }));
 

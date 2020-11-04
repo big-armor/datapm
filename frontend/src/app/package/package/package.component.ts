@@ -14,20 +14,20 @@ export class PackageComponent implements OnDestroy {
 
     private subscription = new Subject();
 
-    constructor(private router: Router, private route: ActivatedRoute) {
-        this.route.params.pipe(takeUntil(this.subscription)).subscribe((params: any) => {
-            if (params.catalogSlug && params.packageSlug) {
-                const prefix = params.catalogSlug + "/" + params.packageSlug;
+    constructor(private router: Router, private route: ActivatedRoute) {}
 
-                this.routes = [
-                    { linkName: "details", url: prefix },
-                    { linkName: "schema", url: prefix + "/schema" },
-                    { linkName: "version", url: prefix + "/version" }
-                ];
+    ngOnInit() {
+        const catalogSlug = this.route.snapshot.paramMap.get("catalogSlug");
+        const packageSlug = this.route.snapshot.paramMap.get("packageSlug");
+        const prefix = `${catalogSlug}/${packageSlug}`;
 
-                this.selectTab(0);
-            }
-        });
+        this.routes = [
+            { linkName: "details", url: prefix },
+            { linkName: "schema", url: prefix + "/schema" },
+            { linkName: "version", url: prefix + "/version" }
+        ];
+
+        this.selectTab(0);
     }
 
     ngOnDestroy(): void {

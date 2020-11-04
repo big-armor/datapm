@@ -1,8 +1,7 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { NoopAnimationsModule } from "@angular/platform-browser/animations";
+import { MatExpansionModule } from "@angular/material/expansion";
 import { PackageSchemaComponent } from "./package-schema.component";
-
-import { MaterialModule } from "../../material.module";
 
 describe("PackageSchemaComponent", () => {
     let component: PackageSchemaComponent;
@@ -11,7 +10,7 @@ describe("PackageSchemaComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [PackageSchemaComponent],
-            imports: [MaterialModule, NoopAnimationsModule]
+            imports: [MatExpansionModule, NoopAnimationsModule]
         }).compileComponents();
     }));
 

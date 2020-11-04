@@ -1,10 +1,6 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Route } from "@angular/router";
 import { AuthGuard } from "./helpers/auth-guard";
-import { PackageDetailComponent } from "./package/package-detail/package-detail.component";
-import { PackageComponent } from "./package/package.component";
-import { PackageVersionComponent } from "./package/package-version/package-version.component";
-import { PackageSchemaComponent } from "./package/package-schema/package-schema.component";
 
 const staticRoutes: Route[] = [
     {
@@ -17,7 +13,8 @@ const staticRoutes: Route[] = [
     },
     {
         path: "me",
-        loadChildren: () => import("./my-account/my-account.module").then((m) => m.MyAccountModule)
+        loadChildren: () => import("./my-account/my-account.module").then((m) => m.MyAccountModule),
+        canActivate: [AuthGuard]
     },
     {
         path: "validate-email",
@@ -29,31 +26,11 @@ const staticRoutes: Route[] = [
     },
     {
         path: ":catalogSlug/:packageSlug",
-        component: PackageComponent,
-        children: [
-            {
-                path: "package-details",
-                redirectTo: "",
-                component: PackageDetailComponent
-            },
-            {
-                path: "",
-                component: PackageDetailComponent
-            },
-            {
-                path: "version",
-                component: PackageVersionComponent
-            },
-            {
-                path: "schema",
-                component: PackageSchemaComponent
-            }
-        ]
+        loadChildren: () => import("./package/package.module").then((m) => m.PackageModule)
     }
 ];
 
 @NgModule({
-    providers: [AuthGuard],
     imports: [RouterModule.forRoot(staticRoutes)],
     exports: [RouterModule]
 })
