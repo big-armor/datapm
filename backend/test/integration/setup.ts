@@ -92,10 +92,6 @@ before(async function () {
         serverProcess.stdout!.on("close", () => {
             if (!serverReady) throw new Error("Registry server exited before becoming ready");
         });
-
-        setTimeout(function () {
-            if (!serverReady) throw new Error("Timedout waiting for registry server to start");
-        }, 30000);
     });
 });
 
