@@ -8,7 +8,6 @@ import {
     CatalogIdentifier,
     CatalogIdentifierInput
 } from "../generated/graphql";
-import { deleteNoThrow } from "../util/deleteHelpers";
 import { Catalog } from "../entity/Catalog";
 import { Package } from "../entity/Package";
 import { UserCatalogPermission } from "../entity/UserCatalogPermission";
@@ -229,14 +228,7 @@ export class CatalogRepository extends Repository<Catalog> {
             return catalog;
         });
 
-        // IN FUTURE find filesToDelete
-
-        // delete all files now that the transaction succeeded
-        for (let file of filesToDelete) {
-            if (file) {
-                await deleteNoThrow(file);
-            }
-        }
+        // TODO Delete image files, etc
 
         return catalog_;
     }

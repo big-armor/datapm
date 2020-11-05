@@ -8,6 +8,23 @@ variable "APOLLO_KEY" {
   type        = string
 }
 
+locals {
+
+  environments = {
+    default = {
+      media_bucket_name = "datapm-test-media"
+      log_bucket_name   = "datapm-test-logging"
+      log_object_prefix = "datapm-test"
+      location          = "US"
+      labels            = [{ "source" : "terraform" }]
+      registry_name     = "DataPM Test"
+    }
+  }
+
+  environmentvars = contains(keys(local.environments), terraform.workspace) ? terraform.workspace : "default"
+  workspace       = merge(local.environments["default"], local.environments[local.environmentvars])
+}
+
 terraform {
   backend "gcs" {
     bucket = "datapm-registry-test"
@@ -71,6 +88,46 @@ resource "google_project_iam_member" "cloudrun-sa-cloudsql-role" {
   role    = "roles/cloudsql.client"
   member  = "serviceAccount:${google_service_account.cloudrun-sa.email}"
 }
+
+resource "google_storage_bucket" "logging" {
+  name          = local.workspace["log_bucket_name"]
+  location      = local.workspace["location"]
+  force_destroy = false
+
+  lifecycle_rule {
+    condition {
+      age        = 365
+      with_state = "ANY"
+    }
+    action {
+      type = "Delete"
+    }
+  }
+}
+
+resource "google_storage_bucket" "media" {
+  name          = local.workspace["media_bucket_name"]
+  location      = local.workspace["location"]
+  force_destroy = false
+  project       = google_project.project.name
+
+  logging {
+    log_bucket        = local.workspace["log_bucket_name"]
+    log_object_prefix = "media"
+  }
+
+}
+
+
+resource "google_storage_bucket_acl" "media-store-acl" {
+  bucket = google_storage_bucket.media.name
+
+  role_entity = [
+    join(":", ["OWNER", google_service_account.cloudrun-sa.email]),
+    join(":", ["READER", google_service_account.cloudrun-sa.email]),
+  ]
+}
+
 
 resource "google_cloud_run_service" "default" {
   name     = "datapm-registry"
@@ -175,7 +232,7 @@ resource "google_cloud_run_service" "default" {
         }
         env {
           name  = "SMTP_FROM_NAME"
-          value = "DataPM Test Registry"
+          value = "DataPM Support"
         }
         env {
           name  = "SMTP_FROM_ADDRESS"
@@ -191,7 +248,7 @@ resource "google_cloud_run_service" "default" {
         }
         env {
           name  = "STORAGE_URL"
-          value = "file:///tmp/datapm-storage"
+          value = "gs://${local.workspace["media_bucket_name"]}"
         }
       }
     }

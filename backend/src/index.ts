@@ -8,15 +8,12 @@ import proxy from "express-http-proxy";
 import { ApolloServer } from "apollo-server-express";
 
 import { Context } from "./context";
-import { getMeRequest, getMeSub } from "./util/me";
-import { registerBucketHosting } from "./util/storage";
+import { getMeRequest } from "./util/me";
 import { makeSchema } from "./schema";
 import path from "path";
 import { getSecretVariable, setAppEngineServiceAccountJson } from "./util/secrets";
-import { createDataLoaders } from "./dataLoaders";
 import { GraphQLError } from "graphql";
 import { superCreateConnection } from "./util/databaseCreation";
-import jwt from "express-jwt";
 import { getEnvVariable } from "./util/getEnvVariable";
 import fs from "fs";
 import { ImageStorageService } from "./storage/images/image-storage-service";
@@ -52,8 +49,7 @@ async function main() {
     const context = async ({ req }: { req: express.Request }): Promise<Context> => ({
         request: req,
         me: await getMeRequest(req, connection.manager),
-        connection: connection,
-        dataLoaders: createDataLoaders()
+        connection: connection
     });
 
     const schema = await makeSchema();
@@ -190,9 +186,6 @@ async function main() {
     );
 
     app.use("/assets", express.static(path.join(__dirname, "..", "static", "assets")));
-
-    // when using FileSystemStorage for media files, sets up file hosting
-    registerBucketHosting(app, "/bucket", port);
 
     // set express for the Apollo GraphQL server
     server.applyMiddleware({ app, bodyParserConfig: { limit: "20mb" } });

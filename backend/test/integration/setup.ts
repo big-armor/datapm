@@ -80,7 +80,6 @@ before(async function () {
                 console.log("Server started!");
                 serverReady = true;
 
-                fs.mkdirSync(TEMP_STORAGE_URL, { recursive: true });
                 r();
             }
         });

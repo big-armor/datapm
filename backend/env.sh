@@ -29,5 +29,5 @@ export STORAGE_URL=${STORAGE_URL:="file://~/datapm-storage"}
 
 # Examples
 # export GOOGLE_APPLICATION_CREDENTIALS=/my-path/datapm-registry/gc.json
-# export STORAGE_URL="file:///Users/ermal/Documents/datapm-lib/storage" # - File storage url example
+# export STORAGE_URL="file:///~/datapm-storage" # - File storage url example
 # export STORAGE_URL="gs://datapm-test-bucket" # Google cloud storage example
