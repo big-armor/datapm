@@ -93,6 +93,7 @@ resource "google_storage_bucket" "logging" {
   name          = local.workspace["log_bucket_name"]
   location      = local.workspace["location"]
   force_destroy = false
+  project       = google_project.project.project_id
 
   lifecycle_rule {
     condition {
@@ -109,7 +110,7 @@ resource "google_storage_bucket" "media" {
   name          = local.workspace["media_bucket_name"]
   location      = local.workspace["location"]
   force_destroy = false
-  project       = google_project.project.name
+  project       = google_project.project.project_id
 
   logging {
     log_bucket        = local.workspace["log_bucket_name"]
