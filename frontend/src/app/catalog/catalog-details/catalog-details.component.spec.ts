@@ -1,4 +1,6 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { RouterTestingModule } from "@angular/router/testing";
+import { ApolloTestingModule } from "apollo-angular/testing";
 
 import { CatalogDetailsComponent } from "./catalog-details.component";
 
@@ -8,7 +10,8 @@ describe("CatalogDetailsComponent", () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [CatalogDetailsComponent]
+            declarations: [CatalogDetailsComponent],
+            imports: [RouterTestingModule, ApolloTestingModule]
         }).compileComponents();
     }));
 
@@ -18,8 +21,7 @@ describe("CatalogDetailsComponent", () => {
         fixture.detectChanges();
     });
 
-    /*
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });*/
+    it("should create", () => {
+        expect(component).toBeTruthy();
+    });
 });

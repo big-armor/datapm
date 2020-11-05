@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { GetLatestPackagesGQL, MeGQL, Package } from "src/generated/graphql";
+import { GetLatestPackagesGQL } from "src/generated/graphql";
 import { getTimeDifferenceLabel } from "src/app/helpers/TimeUtil";
 
 class PackageWithModifiedDate {

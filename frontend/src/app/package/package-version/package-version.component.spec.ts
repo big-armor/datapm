@@ -1,8 +1,8 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { MatButtonModule } from "@angular/material/button";
+import { MatIconModule } from "@angular/material/icon";
 
 import { PackageVersionComponent } from "./package-version.component";
-
-import { MaterialModule } from "../../material.module";
 
 describe("PackageVersionComponent", () => {
     let component: PackageVersionComponent;
@@ -11,7 +11,7 @@ describe("PackageVersionComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [PackageVersionComponent],
-            imports: [MaterialModule]
+            imports: [MatButtonModule, MatIconModule]
         }).compileComponents();
     }));
 

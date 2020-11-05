@@ -7,10 +7,9 @@
     <h3>Packages</h3>
     <ul>
         <li *ngFor="let package of getCatalogQuery.catalog.packages">
-            <a
-                routerLink="/{{ getCatalogQuery.catalog.identifier.catalogSlug }}/{{ package.identifier.packageSlug }}"
-                >{{ package.displayName || package.identifier.packageSlug }}</a
-            >
+            <a routerLink="/{{ getCatalogQuery.catalog.identifier.catalogSlug }}/{{ package.identifier.packageSlug }}">
+                {{ package.displayName || package.identifier.packageSlug }}
+            </a>
         </li>
     </ul>
 </div>

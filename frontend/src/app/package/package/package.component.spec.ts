@@ -1,6 +1,5 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { RouterTestingModule } from "@angular/router/testing";
-import { MaterialModule } from "../material.module";
 
 import { PackageComponent } from "./package.component";
 
@@ -11,7 +10,7 @@ describe("PackageComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [PackageComponent],
-            imports: [MaterialModule, RouterTestingModule]
+            imports: [RouterTestingModule]
         }).compileComponents();
     }));
 

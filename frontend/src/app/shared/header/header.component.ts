@@ -1,8 +1,7 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
-import { ActivatedRoute, DefaultUrlSerializer, NavigationEnd, Router } from "@angular/router";
-import { FormControl, FormGroup } from "@angular/forms";
+import { ActivatedRoute, ParamMap, Router } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
-import { filter, takeUntil } from "rxjs/operators";
+import { takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";
 
 import { AuthenticationService } from "../../services/authentication.service";
@@ -28,10 +27,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     currentUser: User;
     searchTerm: String;
-    searchFormGroup: FormGroup;
-    mobileSearchFormGroup: FormGroup;
     private subscription = new Subject();
-    private parameterSubject = new Subject();
 
     constructor(
         public dialog: MatDialog,
@@ -41,15 +37,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit(): void {
-        this.router.events
-            .pipe(takeUntil(this.parameterSubject))
-            .pipe(filter((event) => event instanceof NavigationEnd))
-            .subscribe((event: NavigationEnd) => {
-                const serializer = new DefaultUrlSerializer();
-                const parsedUrl = serializer.parse(event.url);
-                this.searchTerm = parsedUrl.root.children.primary.segments[0]?.parameterMap.get("q") || null;
-                console.log(`searchTerm ${this.searchTerm}`);
-            });
+        this.route.queryParamMap.pipe(takeUntil(this.subscription)).subscribe((queryParams: ParamMap) => {
+            this.searchTerm = queryParams.get("q") || null;
+        });
         this.authenticationService
             .getUserObservable()
             .pipe(takeUntil(this.subscription))
@@ -61,21 +51,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
                 u.then((user) => {
                     this.currentUser = user;
                     this.state = State.SUCCESS;
-                }).catch((error) => (this.state = State.ERROR));
+                }).catch(() => (this.state = State.ERROR));
             });
-
-        this.searchFormGroup = new FormGroup({
-            search: new FormControl("")
-        });
-
-        this.mobileSearchFormGroup = new FormGroup({
-            mobileSearch: new FormControl("")
-        });
     }
 
     ngOnDestroy(): void {
         this.subscription.unsubscribe();
-        this.parameterSubject.unsubscribe();
     }
 
     openLoginDialog() {
@@ -96,13 +77,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
 
     mobileSearch() {
-        const query = this.searchTerm;
-        this.router.navigate(["/search", { q: query }]);
+        this.router.navigate(["/search"], { queryParams: { q: this.searchTerm } });
     }
 
     search() {
-        const query = this.searchFormGroup.value.search;
-        this.router.navigate(["/search", { q: query }]);
+        this.router.navigate(["/search"], { queryParams: { q: this.searchTerm } });
     }
 
     goHome() {

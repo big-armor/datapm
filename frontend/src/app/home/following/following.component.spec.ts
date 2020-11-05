@@ -1,8 +1,11 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { FollowingComponent } from "./following.component";
+import { MatButtonModule } from "@angular/material/button";
+import { MatCardModule } from "@angular/material/card";
+import { MatChipsModule } from "@angular/material/chips";
+import { MatIconModule } from "@angular/material/icon";
 
-import { MaterialModule } from "../../material.module";
+import { FollowingComponent } from "./following.component";
 
 describe("FollowingComponent", () => {
     let component: FollowingComponent;
@@ -11,7 +14,7 @@ describe("FollowingComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [FollowingComponent],
-            imports: [MaterialModule]
+            imports: [MatButtonModule, MatCardModule, MatChipsModule, MatIconModule]
         }).compileComponents();
     }));
 
