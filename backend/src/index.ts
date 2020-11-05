@@ -17,6 +17,7 @@ import { superCreateConnection } from "./util/databaseCreation";
 import { getEnvVariable } from "./util/getEnvVariable";
 import fs from "fs";
 import { ImageStorageService } from "./storage/images/image-storage-service";
+import { ImageType } from "./storage/images/image-type";
 
 const nodeModulesDirectory = getEnvVariable("NODE_MODULES_DIRECTORY", "node_modules");
 const dataLibPackageFile = fs.readFileSync(nodeModulesDirectory + "/datapm-lib/package.json");
@@ -191,15 +192,44 @@ async function main() {
     server.applyMiddleware({ app, bodyParserConfig: { limit: "20mb" } });
 
     const imageService = new ImageStorageService();
-    app.use("/images/:id", (req, res, next) => {
-        const imageEntityAndStream = imageService.readImage(req.params.id, connection);
-        imageEntityAndStream
-            .then((img) => {
-                res.set("Content-Type", img.entity.mimeType);
-                img.stream.on("error", (e) => next("Could not read image stream"));
-                img.stream.pipe(res);
-            })
-            .catch((error) => next("Could not fetch image"));
+    app.use("/images/:username/avatar", (req, res, next) => {
+        try {
+            const imageEntityAndStream = imageService.getImageTypeForUser(
+                req.params.username,
+                ImageType.USER_AVATAR_IMAGE,
+                connection
+            );
+            imageEntityAndStream
+                .then((img) => {
+                    res.set("Content-Type", img.entity.mimeType);
+                    img.stream.on("error", (e) => next("Could not read image stream"));
+                    img.stream.pipe(res);
+                })
+                .catch((error) => next("Could not fetch image"));
+        } catch (err) {
+            res.status(404).send();
+            return;
+        }
+    });
+
+    app.use("/images/:username/cover", (req, res, next) => {
+        try {
+            const imageEntityAndStream = imageService.getImageTypeForUser(
+                req.params.username,
+                ImageType.USER_COVER_IMAGE,
+                connection
+            );
+            imageEntityAndStream
+                .then((img) => {
+                    res.set("Content-Type", img.entity.mimeType);
+                    img.stream.on("error", (e) => next("Could not read image stream"));
+                    img.stream.pipe(res);
+                })
+                .catch((error) => next("Could not fetch image"));
+        } catch (err) {
+            res.status(404).send();
+            return;
+        }
     });
 
     // any route not yet defined goes to index.html
