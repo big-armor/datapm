@@ -92,9 +92,7 @@ export class CatalogRepository extends Repository<Catalog> {
             .findOne({ where: { slug: slug, isActive: true }, relations: relations });
     }
 
-    async findCatalogBySlugOrFail(
-        slug: string,
-        relations?: string[]): Promise<Catalog> {
+    async findCatalogBySlugOrFail(slug: string, relations?: string[]): Promise<Catalog> {
         const catalog = this.manager
             .getRepository(Catalog)
             .findOne({ where: { slug: slug, isActive: true }, relations: relations });

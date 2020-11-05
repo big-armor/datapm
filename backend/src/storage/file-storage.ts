@@ -3,7 +3,6 @@ import * as Stream from "stream";
 import * as fs from "fs";
 import crypto from "crypto";
 import { DpmStorageStreamHolder } from "./dpm-storage-stream-holder";
-import sharp from "sharp";
 
 export class FileStorage implements DPMStorage {
     public static readonly SCHEMA_URL_PREFIX = "file";
@@ -17,6 +16,10 @@ export class FileStorage implements DPMStorage {
     }
 
     public start(url: string): void {
+        if (!fs.existsSync(url)) {
+            fs.mkdirSync(url, { recursive: true });
+        }
+
         if (!FileStorage.hasReadWriteAccessInDirectory(url)) {
             throw new Error("Has Read/Write access to the filesystem in directory " + url);
         }
@@ -55,7 +58,7 @@ export class FileStorage implements DPMStorage {
     private createItemDirectoryIfMissing(namespace: string, hash: string): void {
         const path = `${this.SCHEMA_URL}/${namespace}/${hash}`;
         if (!fs.existsSync(path)) {
-            fs.mkdirSync(path, {recursive: true});
+            fs.mkdirSync(path, { recursive: true });
         }
     }
 

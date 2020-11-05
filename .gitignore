@@ -12,3 +12,5 @@ terraform.tfvars*
 backend/test/integration/registry-client.ts
 .idea
 gc.json
+
+backend/tmp

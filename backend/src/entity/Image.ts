@@ -1,26 +1,20 @@
-import {
-    Entity,
-    Column,
-    PrimaryColumn,
-} from "typeorm";
-import {BaseModel} from "./BaseModel";
+import { Entity, Column, PrimaryColumn } from "typeorm";
+import { BaseModel } from "./BaseModel";
 
 @Entity("image")
 export class Image extends BaseModel {
-
     @PrimaryColumn()
     public id: string;
 
-    @Column({name: "reference_entity_id"})
+    @Column({ name: "reference_entity_id" })
     public referenceEntityId: number;
 
-    @Column({name: "user_id"})
+    @Column({ name: "user_id" })
     public userId: number;
 
-    @Column({name: "image_type"})
+    @Column({ name: "image_type" })
     public type: string;
 
-    @Column({name: "mime_type"})
+    @Column({ name: "mime_type" })
     public mimeType: string;
-
 }

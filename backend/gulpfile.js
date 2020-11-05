@@ -35,3 +35,4 @@ function execLogCb(err, stdout, stderr) {
 }
 
 exports.default = series(copyFiles, copyEmailTemplates, copyModules);
+exports.copyModules = copyModules;
