@@ -36,7 +36,6 @@ services:
       - TYPEORM_SCHEMA=public
       - TYPEORM_USERNAME=postgres
       - TYPEORM_PASSWORD=postgres
-      - REQUIRE_EMAIL_VERIFICATION=true
       - SMTP_SERVER=localhost
       - SMTP_PORT=25
       - SMTP_USER=

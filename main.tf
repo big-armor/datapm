@@ -240,10 +240,6 @@ resource "google_cloud_run_service" "default" {
           value = "true"
         }
         env {
-          name  = "REQUIRE_EMAIL_VERIFICATION"
-          value = "true"
-        }
-        env {
           name  = "STORAGE_URL"
           value = "gs://${local.workspace["media_bucket_name"]}"
         }

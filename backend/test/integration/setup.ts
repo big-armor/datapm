@@ -54,7 +54,6 @@ before(async function () {
     serverProcess = execa("npm", ["run", "start-nowatch"], {
         env: {
             TYPEORM_PORT: postgresPortNumber.toString(),
-            REQUIRE_EMAIL_VERIFICATION: "true",
             SMTP_PORT: "1025",
             SMTP_SERVER: "localhost",
             SMTP_USER: "",

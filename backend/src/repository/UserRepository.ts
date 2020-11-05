@@ -240,10 +240,6 @@ export class UserRepository extends Repository<User> {
             return (input as CreateUserInputAdmin) !== undefined;
         };
 
-        if (process.env["REQUIRE_EMAIL_VERIFICATION"] != "false" && !smtpConfigured()) {
-            throw new Error("REQUIRE_EMAIL_VERIFICATION_AND_SMTP_NOT_CONFIGURED");
-        }
-
         let emailVerificationToken = uuid();
 
         return this.manager
@@ -259,11 +255,9 @@ export class UserRepository extends Repository<User> {
                 user.passwordSalt = uuid();
                 user.passwordHash = hashPassword(value.password, user.passwordSalt);
 
-                if (process.env["REQUIRE_EMAIL_VERIFICATION"] != "false") {
-                    user.verifyEmailToken = emailVerificationToken;
-                    user.verifyEmailTokenDate = new Date();
-                    user.emailVerified = false;
-                }
+                user.verifyEmailToken = emailVerificationToken;
+                user.verifyEmailTokenDate = new Date();
+                user.emailVerified = false;
 
                 const now = new Date();
                 user.createdAt = now;
@@ -293,8 +287,7 @@ export class UserRepository extends Repository<User> {
                 return user;
             })
             .then(async (user: User) => {
-                if (process.env["REQUIRE_EMAIL_VERIFICATION"] != "false")
-                    await sendVerifyEmail(user, emailVerificationToken);
+                await sendVerifyEmail(user, emailVerificationToken);
 
                 return getUserOrFail({
                     username: value.username,

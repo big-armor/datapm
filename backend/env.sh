@@ -16,7 +16,6 @@ export TYPEORM_DATABASE="datapm"
 export TYPEORM_SCHEMA="public"
 export TYPEORM_USERNAME="postgres"
 export TYPEORM_PASSWORD="postgres"
-export REQUIRE_EMAIL_VERIFICATION=${REQUIRE_EMAIL_VERIFICATION:=true}
 export SMTP_SERVER=${SMTP_SERVER:=localhost}
 export SMTP_PORT=${SMTP_PORT:=25}
 export SMTP_USER=${SMTP_USER}

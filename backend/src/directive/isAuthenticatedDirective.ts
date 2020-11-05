@@ -15,7 +15,7 @@ export class IsAuthenticatedDirective extends SchemaDirectiveVisitor {
         field.resolve = function (source, args, context: Context, info) {
             if (!context.me) throw new AuthenticationError("NOT_AUTHENTICATED");
 
-            if (process.env["REQUIRE_EMAIL_VERIFICATION"] != "false" && !context.me.emailVerified) {
+            if (!context.me.emailVerified) {
                 throw new ValidationError("EMAIL_ADDRESS_NOT_VERIFIED");
             }
 
