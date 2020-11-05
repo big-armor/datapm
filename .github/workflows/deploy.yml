@@ -6,6 +6,7 @@ on:
 jobs:
     buildAndDeploy:
         name: "Build And Deploy"
+        timeout-minutes: 20
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
