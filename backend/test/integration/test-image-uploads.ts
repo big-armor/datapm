@@ -41,7 +41,7 @@ describe("Image Upload Tests", async () => {
     });
 
     it("Download avatar image", async function () {
-        const imageServingResult = await request.get("localhost:4000/images/first-user-username/avatar");
+        const imageServingResult = await request.get("localhost:4000/images/user/first-user-username/avatar");
         expect(imageServingResult.body).to.exist;
         expect(imageServingResult.type).to.equal("image/jpeg");
     });
@@ -65,7 +65,7 @@ describe("Image Upload Tests", async () => {
     });
 
     it("Download cover image", async function () {
-        const imageServingResult = await request.get("localhost:4000/images/first-user-username/cover");
+        const imageServingResult = await request.get("localhost:4000/images/user/first-user-username/cover");
         expect(imageServingResult.body).to.exist;
         expect(imageServingResult.type).to.equal("image/jpeg");
     });

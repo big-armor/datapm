@@ -192,7 +192,7 @@ async function main() {
     server.applyMiddleware({ app, bodyParserConfig: { limit: "20mb" } });
 
     const imageService = new ImageStorageService();
-    app.use("/images/:username/avatar", (req, res, next) => {
+    app.use("/images/user/:username/avatar", (req, res, next) => {
         try {
             const imageEntityAndStream = imageService.getImageTypeForUser(
                 req.params.username,
@@ -212,7 +212,7 @@ async function main() {
         }
     });
 
-    app.use("/images/:username/cover", (req, res, next) => {
+    app.use("/images/user/:username/cover", (req, res, next) => {
         try {
             const imageEntityAndStream = imageService.getImageTypeForUser(
                 req.params.username,
