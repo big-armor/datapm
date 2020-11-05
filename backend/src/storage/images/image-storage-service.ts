@@ -11,6 +11,12 @@ import { Connection } from "typeorm";
 import { ImageEntityAndStream } from "./image-entity-and-stream";
 import * as stream from "stream";
 import { Readable, Stream } from "stream";
+import { User } from "../../entity/User";
+import { UserRepository } from "../../repository/UserRepository";
+import { exception } from "console";
+import { read } from "fs";
+import { ValidUsernameDirective } from "../../directive/ValidUsernameDirective";
+import { validateUsername } from "../../directive/ValidUsernameDirective";
 
 export class ImageStorageService {
     public static readonly INSTANCE = new ImageStorageService();
@@ -24,7 +30,7 @@ export class ImageStorageService {
         imageType: ImageType,
         context: AuthenticatedContext
     ): Promise<Image> {
-        const existingImage = await this.findImage(itemId, imageType, context);
+        const existingImage = await this.findImage(itemId, imageType, context.connection);
         if (existingImage) {
             return this.updateImage(existingImage, image, imageType, context);
         }
@@ -39,7 +45,7 @@ export class ImageStorageService {
         context: AuthenticatedContext
     ): Promise<Image> {
         const imageStream = ImageStorageService.convertBase64ToStream(base64);
-        const existingImage = await this.findImage(itemId, imageType, context);
+        const existingImage = await this.findImage(itemId, imageType, context.connection);
         if (existingImage) {
             return this.updateImageFromStream(existingImage, imageStream, imageType, "image/jpeg", context);
         }
@@ -54,7 +60,7 @@ export class ImageStorageService {
         mimeType: string,
         context: AuthenticatedContext
     ): Promise<Image> {
-        const existingImage = await this.findImage(itemId, imageType, context);
+        const existingImage = await this.findImage(itemId, imageType, context.connection);
         if (existingImage) {
             return this.updateImageFromStream(existingImage, imageStream, imageType, mimeType, context);
         }
@@ -84,7 +90,7 @@ export class ImageStorageService {
         const formatter = ImageProcessorProvider.getImageProcessor(imageType, mimeType).getFormatter();
         await this.storageService.writeItem(ImageStorageService.NAMESPACE, fileName, imageStream, formatter);
         const imageEntity = this.buildImageEntity(fileName, itemId, context.me.id, imageType, mimeType);
-        return this.getRepository(context).save(imageEntity);
+        return this.getRepository(context.connection).save(imageEntity);
     }
 
     public async updateImage(
@@ -106,7 +112,7 @@ export class ImageStorageService {
     ): Promise<Image> {
         const formatter = ImageProcessorProvider.getImageProcessor(imageType, mimeType).getFormatter();
         await this.storageService.writeItem(ImageStorageService.NAMESPACE, imageEntity.id, imageStream, formatter);
-        return this.getRepository(context).save(imageEntity);
+        return this.getRepository(context.connection).save(imageEntity);
     }
 
     public async readImage(imageId: string, connection: Connection): Promise<ImageEntityAndStream> {
@@ -123,12 +129,8 @@ export class ImageStorageService {
         });
     }
 
-    public async findImage(
-        itemId: number,
-        imageType: ImageType,
-        context: AuthenticatedContext
-    ): Promise<Image | undefined> {
-        const repository = this.getRepository(context);
+    public async findImage(itemId: number, imageType: ImageType, connection: Connection): Promise<Image | undefined> {
+        const repository = this.getRepository(connection);
         return repository.findOneEntityReferenceIdAndType(itemId, imageType);
     }
 
@@ -161,7 +163,25 @@ export class ImageStorageService {
         return imageEntity;
     }
 
-    private getRepository(context: AuthenticatedContext): ImageRepository {
-        return context.connection.getCustomRepository(ImageRepository);
+    private getRepository(connection: Connection): ImageRepository {
+        return connection.getCustomRepository(ImageRepository);
+    }
+
+    public async getImageTypeForUser(
+        username: string,
+        imageType: ImageType,
+        connection: Connection
+    ): Promise<ImageEntityAndStream> {
+        validateUsername(username);
+
+        const user = await connection.getCustomRepository(UserRepository).getUserByUsername(username);
+
+        if (user == null) throw new Error("USER_NOT_FOUND");
+
+        const image = await this.findImage(user.id, imageType, connection);
+
+        if (image == null) throw new Error("IMAGE_NOT_FOUND");
+
+        return this.readImage(image.id, connection);
     }
 }

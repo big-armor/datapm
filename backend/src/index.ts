@@ -8,18 +8,16 @@ import proxy from "express-http-proxy";
 import { ApolloServer } from "apollo-server-express";
 
 import { Context } from "./context";
-import { getMeRequest, getMeSub } from "./util/me";
-import { registerBucketHosting } from "./util/storage";
+import { getMeRequest } from "./util/me";
 import { makeSchema } from "./schema";
 import path from "path";
 import { getSecretVariable, setAppEngineServiceAccountJson } from "./util/secrets";
-import { createDataLoaders } from "./dataLoaders";
 import { GraphQLError } from "graphql";
 import { superCreateConnection } from "./util/databaseCreation";
-import jwt from "express-jwt";
 import { getEnvVariable } from "./util/getEnvVariable";
 import fs from "fs";
 import { ImageStorageService } from "./storage/images/image-storage-service";
+import { ImageType } from "./storage/images/image-type";
 
 const nodeModulesDirectory = getEnvVariable("NODE_MODULES_DIRECTORY", "node_modules");
 const dataLibPackageFile = fs.readFileSync(nodeModulesDirectory + "/datapm-lib/package.json");
@@ -52,8 +50,7 @@ async function main() {
     const context = async ({ req }: { req: express.Request }): Promise<Context> => ({
         request: req,
         me: await getMeRequest(req, connection.manager),
-        connection: connection,
-        dataLoaders: createDataLoaders()
+        connection: connection
     });
 
     const schema = await makeSchema();
@@ -191,22 +188,48 @@ async function main() {
 
     app.use("/assets", express.static(path.join(__dirname, "..", "static", "assets")));
 
-    // when using FileSystemStorage for media files, sets up file hosting
-    registerBucketHosting(app, "/bucket", port);
-
     // set express for the Apollo GraphQL server
     server.applyMiddleware({ app, bodyParserConfig: { limit: "20mb" } });
 
     const imageService = new ImageStorageService();
-    app.use("/images/:id", (req, res, next) => {
-        const imageEntityAndStream = imageService.readImage(req.params.id, connection);
-        imageEntityAndStream
-            .then((img) => {
-                res.set("Content-Type", img.entity.mimeType);
-                img.stream.on("error", (e) => next("Could not read image stream"));
-                img.stream.pipe(res);
-            })
-            .catch((error) => next("Could not fetch image"));
+    app.use("/images/user/:username/avatar", (req, res, next) => {
+        try {
+            const imageEntityAndStream = imageService.getImageTypeForUser(
+                req.params.username,
+                ImageType.USER_AVATAR_IMAGE,
+                connection
+            );
+            imageEntityAndStream
+                .then((img) => {
+                    res.set("Content-Type", img.entity.mimeType);
+                    img.stream.on("error", (e) => next("Could not read image stream"));
+                    img.stream.pipe(res);
+                })
+                .catch((error) => next("Could not fetch image"));
+        } catch (err) {
+            res.status(404).send();
+            return;
+        }
+    });
+
+    app.use("/images/user/:username/cover", (req, res, next) => {
+        try {
+            const imageEntityAndStream = imageService.getImageTypeForUser(
+                req.params.username,
+                ImageType.USER_COVER_IMAGE,
+                connection
+            );
+            imageEntityAndStream
+                .then((img) => {
+                    res.set("Content-Type", img.entity.mimeType);
+                    img.stream.on("error", (e) => next("Could not read image stream"));
+                    img.stream.pipe(res);
+                })
+                .catch((error) => next("Could not fetch image"));
+        } catch (err) {
+            res.status(404).send();
+            return;
+        }
     });
 
     // any route not yet defined goes to index.html

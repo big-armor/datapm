@@ -7,6 +7,7 @@ import pidtree from "pidtree";
 import { Observable } from "@apollo/client/core";
 import fs from "fs";
 import { before } from "mocha";
+import { RandomUuid } from "testcontainers/dist/uuid";
 const maildev = require("maildev");
 
 let container: StartedTestContainer;
@@ -14,7 +15,7 @@ let serverProcess: execa.ExecaChildProcess;
 let mailServer: any;
 export let mailObservable: Observable<any>;
 
-const TEMP_STORAGE_URL = "file:///tmp/datapm-storage";
+const TEMP_STORAGE_URL = "file:///tmp/datapm-storage-" + new RandomUuid().nextUuid();
 
 before(async function () {
     console.log("Starting postgres temporary container");
@@ -80,7 +81,6 @@ before(async function () {
                 console.log("Server started!");
                 serverReady = true;
 
-                fs.mkdirSync(TEMP_STORAGE_URL, { recursive: true });
                 r();
             }
         });
@@ -117,7 +117,7 @@ after(async function () {
             console.error(error);
         }
     });
-
-    fs.rmdirSync(TEMP_STORAGE_URL);
     mailServer.close();
+
+    fs.rmdirSync(TEMP_STORAGE_URL.replace("file://", ""), { recursive: true });
 });

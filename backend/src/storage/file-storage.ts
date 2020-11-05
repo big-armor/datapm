@@ -25,6 +25,12 @@ export class FileStorage implements DPMStorage {
         }
     }
 
+    public deleteItem(namespace: string, itemId: string): Promise<void> {
+        const path = this.buildPath(namespace, itemId);
+        fs.unlinkSync(path);
+        return Promise.resolve();
+    }
+
     public getItem(namespace: string, itemId: string): Promise<Stream> {
         const path = this.buildPath(namespace, itemId);
         const readStream = fs.createReadStream(path);

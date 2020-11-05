@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 import * as fs from "fs";
 import request = require("superagent");
-import { SetMyAvatarImageDocument } from "./registry-client";
+import { SetMyAvatarImageDocument, SetMyCoverImageDocument } from "./registry-client";
 
 describe("Image Upload Tests", async () => {
     const anonymousUser = createAnonymousClient();
@@ -37,13 +37,37 @@ describe("Image Upload Tests", async () => {
         if (uploadResult.data) {
             expect(uploadResult.data.setMyAvatarImage).to.exist;
             expect(uploadResult.data.setMyAvatarImage.id).to.exist;
-
-            const imageServingResult = await request.get(
-                "localhost:4000/images/" + uploadResult.data.setMyAvatarImage.id
-            );
-            expect(imageServingResult.body).to.exist;
-            expect(imageServingResult.type).to.equal("image/jpeg");
         }
+    });
+
+    it("Download avatar image", async function () {
+        const imageServingResult = await request.get("localhost:4000/images/user/first-user-username/avatar");
+        expect(imageServingResult.body).to.exist;
+        expect(imageServingResult.type).to.equal("image/jpeg");
+    });
+
+    it("setMyCoverImage_WithValidImage_UploadsImageAndStoresMetadataInDbAndIsPublic", async () => {
+        const imageContent = fs.readFileSync("test/other-files/ba.jpg", "base64");
+
+        const uploadResult = await userAClient.mutate({
+            mutation: SetMyCoverImageDocument,
+            variables: {
+                image: { base64: imageContent }
+            }
+        });
+
+        expect(uploadResult).to.exist;
+        expect(uploadResult.data).to.exist;
+        if (uploadResult.data) {
+            expect(uploadResult.data.setMyCoverImage).to.exist;
+            expect(uploadResult.data.setMyCoverImage.id).to.exist;
+        }
+    });
+
+    it("Download cover image", async function () {
+        const imageServingResult = await request.get("localhost:4000/images/user/first-user-username/cover");
+        expect(imageServingResult.body).to.exist;
+        expect(imageServingResult.type).to.equal("image/jpeg");
     });
 
     it("setMyAvatarImage_WithUnsupportedImageFormat_ReturnsErrorWithInvalidFormatErrorCode", async () => {
