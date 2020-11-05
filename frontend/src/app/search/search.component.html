@@ -15,15 +15,8 @@
                             >Collections
                         </mat-radio-button>
                     </div>
-                    <!-- <div class="p-2 bd-highlight"><mat-radio-button [value]="Filter.USERS">Users</mat-radio-button></div> -->
                 </mat-radio-group>
             </div>
-            <!-- <div class="d-flex flex-column bd-highlight sorting-mat" [class.disabledDiv]="!isPackageSelected">
-          <div class="p-2 bd-highlight"><mat-checkbox class="example-margin" value="batch">batch</mat-checkbox></div>
-          <div class="p-2 bd-highlight"><mat-checkbox class="example-margin" value="streaming">streaming</mat-checkbox></div>
-          <div class="p-2 bd-highlight"><mat-checkbox class="example-margin" value="free">free</mat-checkbox></div>
-          <div class="p-2 bd-highlight"><mat-checkbox class="example-margin" value="premium">premium</mat-checkbox></div>
-        </div> -->
         </div>
         <div class="col-md-12 col-lg-9 col-sm-12">
             <div id="searchCollections" *ngIf="isCollectionSelected">
@@ -35,9 +28,7 @@
                             last as isLast
                         "
                     >
-                        <div *ngIf="isFirst" class="search-title pl-3">
-                            Your search results for '{{ urlParams?.params?.q }}'
-                        </div>
+                        <div *ngIf="isFirst" class="search-title pl-3">Your search results for '{{ query }}'</div>
 
                         <mat-list-item>
                             <div class="d-flex bd-highlight mobile-row" style="width: 100%">
@@ -66,17 +57,6 @@
                                                 {{ collection.description }}
                                             </span>
                                         </div>
-                                        <!-- <div class="bd-highlight rounded-star mt-2">
-                        <button
-                          [class.yellow]="isStarClicked"
-                          mat-mini-fab
-                          aria-label="Example icon button with a home icon"
-                          (click)="clickStar()"
-                        >
-                          <mat-icon>star_border</mat-icon>
-                        </button>
-                        <span>24</span>
-                      </div> -->
                                     </div>
                                 </div>
                                 <div class="ml-auto bd-highlight align-self-center">
@@ -125,7 +105,7 @@
             </div>
             <div id="searchPackages" *ngIf="isPackageSelected">
                 <ng-container *ngIf="packageResult?.searchPackages?.packages?.length; else nothingFound">
-                    <div class="search-title pl-3">Your search results for '{{ urlParams?.params?.q }}'</div>
+                    <div class="search-title pl-3">Your search results for '{{ query }}'</div>
 
                     <app-package-item [item]="package" *ngFor="let package of packageResult?.searchPackages?.packages">
                     </app-package-item>
@@ -139,233 +119,6 @@
                     </div>
                 </ng-container>
             </div>
-            <!-- <div id="searchUser" *ngIf="isUserSelected">
-        <mat-list>
-          <div class="search-title">
-            Your search results for <span>Bleona</span>
-          </div>
-          <mat-list-item>
-            <div class="d-flex bd-highlight" style="width: 100%">
-              <div class="py-2 bd-highlight d-flex align-items-center">
-                <img
-                  src="../../assets/images/user-female.jpg"
-                  class="user-image"
-                  alt="User image"
-                />
-              </div>
-              <div class="py-2 bd-highlight">
-                <div class="d-flex flex-column bd-highlight">
-                  <div class="bd-highlight user-name">Sarah Ray</div>
-                  <div class="bd-highlight user-location">
-                    San Francisco, CA
-                  </div>
-                </div>
-              </div>
-              <div class="ml-auto py-2 bd-highlight">
-                <a class="star-btn">
-                  <mat-icon class="material-icons star-icon"
-                    >star_rate</mat-icon
-                  >
-                  <span class="star-txt">26</span>
-                </a>
-                <span style="margin: 0px 10px; color: #bfbfbf">|</span>
-                <button mat-raised-button class="follow-btn">
-                  <mat-icon class="material-icons follow-icon">add</mat-icon>
-                  <span class="follow-txt">Follow</span>
-                </button>
-              </div>
-            </div>
-          </mat-list-item>
-          <mat-divider></mat-divider>
-          <mat-list-item>
-            <div class="d-flex bd-highlight" style="width: 100%">
-              <div class="py-2 bd-highlight d-flex align-items-center">
-                <img
-                  src="../../assets/images/user-male.jpg"
-                  class="user-image"
-                  alt="User image"
-                />
-              </div>
-              <div class="py-2 bd-highlight">
-                <div class="d-flex flex-column bd-highlight">
-                  <div class="bd-highlight user-name">John Doe</div>
-                  <div class="bd-highlight user-location">Miami</div>
-                </div>
-              </div>
-              <div class="ml-auto py-2 bd-highlight">
-                <a class="star-btn">
-                  <mat-icon class="material-icons star-icon"
-                    >star_rate</mat-icon
-                  >
-                  <span class="star-txt">54</span>
-                </a>
-                <span style="margin: 0px 10px; color: #bfbfbf">|</span>
-                <button mat-raised-button class="follow-btn">
-                  <mat-icon class="material-icons follow-icon">add</mat-icon>
-                  <span class="follow-txt">Follow</span>
-                </button>
-              </div>
-            </div>
-          </mat-list-item>
-          <mat-divider></mat-divider>
-          <mat-list-item>
-            <div class="d-flex bd-highlight" style="width: 100%">
-              <div class="py-2 bd-highlight d-flex align-items-center">
-                <img
-                  src="../../assets/images/user-male2.png"
-                  class="user-image"
-                  alt="User image"
-                />
-              </div>
-              <div class="py-2 bd-highlight">
-                <div class="d-flex flex-column bd-highlight">
-                  <div class="bd-highlight user-name">James Otto</div>
-                  <div class="bd-highlight user-location">England</div>
-                </div>
-              </div>
-              <div class="ml-auto py-2 bd-highlight">
-                <a class="star-btn">
-                  <mat-icon class="material-icons star-icon"
-                    >star_rate</mat-icon
-                  >
-                  <span class="star-txt">87</span>
-                </a>
-                <span style="margin: 0px 10px; color: #bfbfbf">|</span>
-                <button mat-raised-button class="follow-btn">
-                  <mat-icon class="material-icons follow-icon">add</mat-icon>
-                  <span class="follow-txt">Follow</span>
-                </button>
-              </div>
-            </div>
-          </mat-list-item>
-          <mat-divider></mat-divider>
-          <mat-list-item>
-            <div class="d-flex bd-highlight" style="width: 100%">
-              <div class="py-2 bd-highlight d-flex align-items-center">
-                <img
-                  src="../../assets/images/user-female.jpg"
-                  class="user-image"
-                  alt="User image"
-                />
-              </div>
-              <div class="py-2 bd-highlight">
-                <div class="d-flex flex-column bd-highlight">
-                  <div class="bd-highlight user-name">Sarah Ray</div>
-                  <div class="bd-highlight user-location">
-                    San Francisco, CA
-                  </div>
-                </div>
-              </div>
-              <div class="ml-auto py-2 bd-highlight">
-                <a class="star-btn">
-                  <mat-icon class="material-icons star-icon"
-                    >star_rate</mat-icon
-                  >
-                  <span class="star-txt">102</span>
-                </a>
-                <span style="margin: 0px 10px; color: #bfbfbf">|</span>
-                <button mat-raised-button class="follow-btn">
-                  <mat-icon class="material-icons follow-icon">add</mat-icon>
-                  <span class="follow-txt">Follow</span>
-                </button>
-              </div>
-            </div>
-          </mat-list-item>
-          <mat-divider></mat-divider>
-          <mat-list-item>
-            <div class="d-flex bd-highlight" style="width: 100%">
-              <div class="py-2 bd-highlight d-flex align-items-center">
-                <img
-                  src="../../assets/images/user-male.jpg"
-                  class="user-image"
-                  alt="User image"
-                />
-              </div>
-              <div class="py-2 bd-highlight">
-                <div class="d-flex flex-column bd-highlight">
-                  <div class="bd-highlight user-name">John Doe</div>
-                  <div class="bd-highlight user-location">Miami</div>
-                </div>
-              </div>
-              <div class="ml-auto py-2 bd-highlight">
-                <a class="star-btn">
-                  <mat-icon class="material-icons star-icon"
-                    >star_rate</mat-icon
-                  >
-                  <span class="star-txt">234</span>
-                </a>
-                <span style="margin: 0px 10px; color: #bfbfbf">|</span>
-                <button mat-raised-button class="follow-btn">
-                  <mat-icon class="material-icons follow-icon">add</mat-icon>
-                  <span class="follow-txt">Follow</span>
-                </button>
-              </div>
-            </div>
-          </mat-list-item>
-          <mat-divider></mat-divider>
-          <mat-list-item>
-            <div class="d-flex bd-highlight" style="width: 100%">
-              <div class="py-2 bd-highlight d-flex align-items-center">
-                <img
-                  src="../../assets/images/user-male2.png"
-                  class="user-image"
-                  alt="User image"
-                />
-              </div>
-              <div class="py-2 bd-highlight">
-                <div class="d-flex flex-column bd-highlight">
-                  <div class="bd-highlight user-name">James Otto</div>
-                  <div class="bd-highlight user-location">England</div>
-                </div>
-              </div>
-              <div class="ml-auto py-2 bd-highlight">
-                <a class="star-btn">
-                  <mat-icon class="material-icons star-icon"
-                    >star_rate</mat-icon
-                  >
-                  <span class="star-txt">77</span>
-                </a>
-                <span style="margin: 0px 10px; color: #bfbfbf">|</span>
-                <button mat-raised-button class="follow-btn">
-                  <mat-icon class="material-icons follow-icon">add</mat-icon>
-                  <span class="follow-txt">Follow</span>
-                </button>
-              </div>
-            </div>
-          </mat-list-item>
-          <mat-divider></mat-divider>
-          <mat-list-item>
-            <div class="d-flex bd-highlight" style="width: 100%">
-              <div class="py-2 bd-highlight d-flex align-items-center">
-                <img
-                  src="../../assets/images/user-male.jpg"
-                  class="user-image"
-                  alt="User image"
-                />
-              </div>
-              <div class="py-2 bd-highlight">
-                <div class="d-flex flex-column bd-highlight">
-                  <div class="bd-highlight user-name">John Doe</div>
-                  <div class="bd-highlight user-location">Miami</div>
-                </div>
-              </div>
-              <div class="ml-auto py-2 bd-highlight">
-                <a class="star-btn">
-                  <mat-icon class="material-icons star-icon"
-                    >star_rate</mat-icon
-                  >
-                  <span class="star-txt">12</span>
-                </a>
-                <span style="margin: 0px 10px; color: #bfbfbf">|</span>
-                <button mat-raised-button class="follow-btn">
-                  <mat-icon class="material-icons follow-icon">add</mat-icon>
-                  <span class="follow-txt">Follow</span>
-                </button>
-              </div>
-            </div>
-          </mat-list-item>
-        </mat-list>
-      </div> -->
         </div>
     </div>
 </div>
@@ -374,11 +127,7 @@
     <div *ngIf="state === State.SUCCESS" class="not-found">
         <p><span class="material-icons">search</span></p>
         <br />
-        <p>
-            We couldn’t find any {{ isPackageSelected ? "packages" : "collections" }} matching '{{
-                urlParams?.params?.q
-            }}'
-        </p>
+        <p>We couldn’t find any {{ isPackageSelected ? "packages" : "collections" }} matching '{{ query }}'</p>
         <p class="small-txt">Please search another name</p>
     </div>
 

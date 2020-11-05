@@ -1,6 +1,5 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { MatRadioModule } from "@angular/material/radio";
 import { MatIconModule } from "@angular/material/icon";
 import { MatButtonModule } from "@angular/material/button";
@@ -26,7 +25,6 @@ import { MatTooltipModule } from "@angular/material/tooltip";
     declarations: [],
     imports: [
         CommonModule,
-        BrowserAnimationsModule,
         MatRadioModule,
         MatIconModule,
         MatButtonModule,
@@ -50,7 +48,6 @@ import { MatTooltipModule } from "@angular/material/tooltip";
         MatTooltipModule
     ],
     exports: [
-        BrowserAnimationsModule,
         MatRadioModule,
         MatIconModule,
         MatButtonModule,

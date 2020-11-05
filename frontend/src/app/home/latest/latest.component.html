@@ -1,0 +1,19 @@
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9 col-md-12 col-sm-12 mt-5 py-2">
+            <div class="row big-div-latest mb-3">
+                <div class="col-md-12 col-lg-12">
+                    <h1 class="h1-title">Recent activity</h1>
+                </div>
+
+                <!-- Package without thumbnail -->
+                <div
+                    class="col-md-12 col-lg-12 pb-2 mb-4"
+                    *ngFor="let packageWithModifiedDate of packagesWithModifiedDate"
+                >
+                    <app-package-item [item]="packageWithModifiedDate.package"></app-package-item>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

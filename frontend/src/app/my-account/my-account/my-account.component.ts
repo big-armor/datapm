@@ -2,10 +2,10 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { FormGroup, FormControl } from "@angular/forms";
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
-import { AuthenticationService } from "../services/authentication.service";
+import { AuthenticationService } from "../../services/authentication.service";
 import { APIKey, Catalog, User } from "src/generated/graphql";
-import { EditAccountDialogComponent } from "./edit-account-dialog/edit-account-dialog.component";
-import { take, takeUntil } from "rxjs/operators";
+import { EditAccountDialogComponent } from "../edit-account-dialog/edit-account-dialog.component";
+import { takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";
 
 enum State {

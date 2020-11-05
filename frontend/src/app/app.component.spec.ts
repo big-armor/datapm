@@ -2,11 +2,6 @@ import { TestBed, async } from "@angular/core/testing";
 import { ReactiveFormsModule } from "@angular/forms";
 import { RouterTestingModule } from "@angular/router/testing";
 import { AppComponent } from "./app.component";
-import { HomepageComponent } from "./homepage/homepage.component";
-import { LatestComponent } from "./homepage/latest/latest.component";
-import { MaterialModule } from "./material.module";
-import { DetailsComponent } from "./my-account/details/details.component";
-import { MyAccountComponent } from "./my-account/my-account.component";
 import { SharedModule } from "./shared/shared.module";
 
 describe("AppComponent", () => {
@@ -14,7 +9,6 @@ describe("AppComponent", () => {
         TestBed.configureTestingModule({
             imports: [
                 RouterTestingModule.withRoutes([{ path: "", component: AppComponent }]),
-                MaterialModule,
                 ReactiveFormsModule,
                 SharedModule
             ],
@@ -24,38 +18,7 @@ describe("AppComponent", () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            imports: [
-                RouterTestingModule.withRoutes([
-                    {
-                        path: "",
-                        component: HomepageComponent,
-                        children: [
-                            {
-                                path: "latest",
-                                component: LatestComponent
-                            }
-                        ]
-                    },
-                    {
-                        path: "me",
-                        component: MyAccountComponent,
-                        children: [
-                            {
-                                path: "details",
-                                redirectTo: "",
-                                pathMatch: "full"
-                            },
-                            {
-                                path: "",
-                                component: DetailsComponent
-                            }
-                        ]
-                    }
-                ]),
-                MaterialModule,
-                ReactiveFormsModule,
-                SharedModule
-            ],
+            imports: [RouterTestingModule, ReactiveFormsModule, SharedModule],
             declarations: [AppComponent]
         }).compileComponents();
     }));
