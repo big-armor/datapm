@@ -56,7 +56,7 @@
                         <span *ngIf="currentUser.twitterHandleIsPublic" class="public-text">public</span>
                         <span *ngIf="!currentUser.twitterHandleIsPublic" class="not-public-text">not public</span>
                     </p>
-                    <p>
+                    <p *ngIf="currentUser.gitHubHandle">
                         <a target="_blank" href="https://github.com/{{ currentUser.gitHubHandle }}"
                             >@{{ currentUser.gitHubHandle }} on GitHub</a
                         >&nbsp;

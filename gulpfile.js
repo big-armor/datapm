@@ -40,15 +40,7 @@ function buildDocs() {
 }
 
 function buildDockerImage() {
-    return spawnAndLog("docker-build", "docker", [
-        "build",
-        "-t",
-        "datapm-registry",
-        ".",
-        "-f",
-        "docker/Dockerfile",
-        "--no-cache"
-    ]);
+    return spawnAndLog("docker-build", "docker", ["build", "-t", "datapm-registry", ".", "-f", "docker/Dockerfile"]);
 }
 
 function tagGCRDockerImage() {
@@ -107,3 +99,4 @@ exports.buildParallel = series(
 );
 
 exports.deployDockerImage = series(tagGCRDockerImage, tagDockerImage, pushGCRImage, pushDockerImage);
+exports.buildDockerImage = buildDockerImage;
