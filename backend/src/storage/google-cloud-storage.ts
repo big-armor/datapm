@@ -25,9 +25,9 @@ export class GoogleCloudStorage implements DPMStorage {
             throw new Error("Google Storage bucket name not specified");
         }
 
-        const bucketName = urlParts[2];
-        if (urlParts.length > 3) {
-            this.pathPrefix = urlParts.slice(3).join(GoogleCloudStorage.PATH_SPLITTER);
+        const bucketName = urlParts[0];
+        if (urlParts.length > 1) {
+            this.pathPrefix = urlParts.slice(1).join(GoogleCloudStorage.PATH_SPLITTER);
         }
         this.bucket = this.storage.bucket(bucketName);
         this.ensureConnectionEstablished();
