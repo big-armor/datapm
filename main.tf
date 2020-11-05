@@ -124,8 +124,7 @@ resource "google_storage_bucket_acl" "media-store-acl" {
   bucket = google_storage_bucket.media.name
 
   role_entity = [
-    join(":", ["OWNER", google_service_account.cloudrun-sa.email]),
-    join(":", ["READER", google_service_account.cloudrun-sa.email]),
+    join(":", ["OWNER", google_service_account.cloudrun-sa.email])
   ]
 }
 
