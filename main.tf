@@ -190,7 +190,7 @@ resource "google_cloud_run_service" "default" {
           value = "true"
         }
         env {
-          name = "STORAGE_URL"
+          name  = "STORAGE_URL"
           value = "file:///tmp/datapm-storage"
         }
       }
