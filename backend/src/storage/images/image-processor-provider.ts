@@ -1,13 +1,12 @@
-import {ImageType} from "./image-type";
-import {UserAvatarImageProcessor} from "./user-avatar-image-processor";
-import {ImageProcessor} from "./image-processor";
-import {UserCoverImageProcessor} from "./user-cover-image-processor";
-import {CatalogCoverImageProcessor} from "./catalog-cover-image-processor";
-import {PackageCoverImageProcessor} from "./package-cover-image-processor";
-import {CollectionCoverImageProcessor} from "./collection-cover-image-processor";
+import { ImageType } from "./image-type";
+import { UserAvatarImageProcessor } from "./user-avatar-image-processor";
+import { ImageProcessor } from "./image-processor";
+import { UserCoverImageProcessor } from "./user-cover-image-processor";
+import { CatalogCoverImageProcessor } from "./catalog-cover-image-processor";
+import { PackageCoverImageProcessor } from "./package-cover-image-processor";
+import { CollectionCoverImageProcessor } from "./collection-cover-image-processor";
 
 export class ImageProcessorProvider {
-
     public static getImageProcessor(imageType: ImageType, mimeType: string): ImageProcessor {
         switch (imageType) {
             case ImageType.USER_COVER_IMAGE:

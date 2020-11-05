@@ -189,6 +189,10 @@ resource "google_cloud_run_service" "default" {
           name  = "REQUIRE_EMAIL_VERIFICATION"
           value = "true"
         }
+        env {
+          name  = "STORAGE_URL"
+          value = "file:///tmp/datapm-storage"
+        }
       }
     }
 
