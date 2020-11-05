@@ -29,7 +29,6 @@ services:
       - JWT_KEY=!!!!REPLACE_ME!!!
       - JWT_AUDIENCE=localhost
       - JWT_ISSUER=localhost
-      - FILESYSTEM_STORAGE_DIRECTORY=local_storage
       - TYPEORM_IS_DIST=true
       - TYPEORM_PORT=5432
       - TYPEORM_HOST=postgres

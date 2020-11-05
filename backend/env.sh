@@ -10,7 +10,6 @@ export NODE_MODULES_DIRECTORY="node_modules"
 export APOLLO_GRAPH_VARIANT="dev"
 export GCLOUD_STORAGE_BUCKET_NAME="media"
 export GOOGLE_CLOUD_PROJECT="adsfasdf"
-export FILESYSTEM_STORAGE_DIRECTORY="local_storage"
 export MIXPANEL_TOKEN="asdfasdfasdf"
 export TYPEORM_PORT=${TYPEORM_PORT:=5432}
 export TYPEORM_DATABASE="datapm"

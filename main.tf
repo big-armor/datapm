@@ -168,10 +168,6 @@ resource "google_cloud_run_service" "default" {
           value = google_project.project.project_id
         }
         env {
-          name  = "FILESYSTEM_STORAGE_DIRECTORY"
-          value = "local_storage"
-        }
-        env {
           name  = "MIXPANEL_TOKEN"
           value = "asdfasdfasdf"
         }
