@@ -1,8 +1,8 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatDialogModule, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { RouterTestingModule } from "@angular/router/testing";
-import { MaterialModule } from "src/app/material.module";
 
 import { EditAccountDialogComponent } from "./edit-account-dialog.component";
 
@@ -13,7 +13,7 @@ describe("EditAccountDialogComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [EditAccountDialogComponent],
-            imports: [MaterialModule, RouterTestingModule, ReactiveFormsModule, FormsModule],
+            imports: [MatDialogModule, MatSlideToggleModule, RouterTestingModule, ReactiveFormsModule, FormsModule],
             providers: [
                 {
                     provide: MAT_DIALOG_DATA,

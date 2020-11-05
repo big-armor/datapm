@@ -1,7 +1,9 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { RouterTestingModule } from "@angular/router/testing";
-import { MaterialModule } from "src/app/material.module";
-
+import { MatButtonModule } from "@angular/material/button";
+import { MatCardModule } from "@angular/material/card";
+import { MatChipsModule } from "@angular/material/chips";
+import { MatIconModule } from "@angular/material/icon";
 import { ActivityComponent } from "./activity.component";
 
 describe("ActivityComponent", () => {
@@ -11,7 +13,7 @@ describe("ActivityComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [ActivityComponent],
-            imports: [MaterialModule, RouterTestingModule]
+            imports: [RouterTestingModule, MatButtonModule, MatCardModule, MatChipsModule, MatIconModule]
         }).compileComponents();
     }));
 

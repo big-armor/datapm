@@ -2,7 +2,6 @@ import { TestBed, async } from "@angular/core/testing";
 import { ReactiveFormsModule } from "@angular/forms";
 import { RouterTestingModule } from "@angular/router/testing";
 import { AppComponent } from "./app.component";
-import { MaterialModule } from "./material.module";
 import { SharedModule } from "./shared/shared.module";
 
 describe("AppComponent", () => {
@@ -10,7 +9,6 @@ describe("AppComponent", () => {
         TestBed.configureTestingModule({
             imports: [
                 RouterTestingModule.withRoutes([{ path: "", component: AppComponent }]),
-                MaterialModule,
                 ReactiveFormsModule,
                 SharedModule
             ],
@@ -20,7 +18,7 @@ describe("AppComponent", () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            imports: [RouterTestingModule, MaterialModule, ReactiveFormsModule, SharedModule],
+            imports: [RouterTestingModule, ReactiveFormsModule, SharedModule],
             declarations: [AppComponent]
         }).compileComponents();
     }));
