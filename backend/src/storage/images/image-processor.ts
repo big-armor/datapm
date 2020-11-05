@@ -1,8 +1,7 @@
-import {ImageType} from "./image-type";
-import sharp, {ResizeOptions, Sharp} from "sharp";
+import { ImageType } from "./image-type";
+import sharp, { ResizeOptions, Sharp } from "sharp";
 
 export abstract class ImageProcessor {
-
     private mimeType: string;
 
     public constructor(mimeType: string) {

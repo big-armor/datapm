@@ -13,8 +13,8 @@ import { CollectionRepository } from "../repository/CollectionRepository";
 import { PackageRepository } from "../repository/PackageRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { grantAllCollectionPermissionsForUser } from "./UserCollectionPermissionResolver";
-import {ImageStorageService} from "../storage/images/image-storage-service";
-import {ImageType} from "../storage/images/image-type";
+import { ImageStorageService } from "../storage/images/image-storage-service";
+import { ImageType } from "../storage/images/image-type";
 
 export const createCollection = async (
     _0: any,
@@ -56,10 +56,22 @@ export const updateCollection = async (
     return repository.updateCollection(identifier.collectionSlug, value, relations);
 };
 
-export const setCollectionCoverImage = async (_0: any, {identifier, image}: {identifier: CollectionIdentifierInput, image: any}, context: AuthenticatedContext, info: any) => {
+export const setCollectionCoverImage = async (
+    _0: any,
+    { identifier, image }: { identifier: CollectionIdentifierInput; image: any },
+    context: AuthenticatedContext,
+    info: any
+) => {
     const uploadedImage = await image;
-    const collectionEntity = await context.connection.getCustomRepository(CollectionRepository).findCollectionBySlugOrFail(identifier.collectionSlug);
-    await ImageStorageService.INSTANCE.saveImage(collectionEntity.id, uploadedImage, ImageType.COLLECTION_COVER_IMAGE, context);
+    const collectionEntity = await context.connection
+        .getCustomRepository(CollectionRepository)
+        .findCollectionBySlugOrFail(identifier.collectionSlug);
+    await ImageStorageService.INSTANCE.saveImage(
+        collectionEntity.id,
+        uploadedImage,
+        ImageType.COLLECTION_COVER_IMAGE,
+        context
+    );
 };
 
 export const disableCollection = async (

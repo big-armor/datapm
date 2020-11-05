@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 const SQL = `
     CREATE TABLE IF NOT EXISTS public."image" (
@@ -16,12 +16,9 @@ const SQL = `
 `;
 
 export class CreateImageTable1603128229212 implements MigrationInterface {
-
     public async up(queryRunner: QueryRunner): Promise<void> {
         return queryRunner.query(SQL);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-    }
-
+    public async down(queryRunner: QueryRunner): Promise<void> {}
 }

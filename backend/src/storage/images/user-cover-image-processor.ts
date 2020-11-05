@@ -1,9 +1,8 @@
-import {ImageProcessor} from "./image-processor";
-import {ImageType} from "./image-type";
-import {ResizeOptions} from "sharp";
+import { ImageProcessor } from "./image-processor";
+import { ImageType } from "./image-type";
+import { ResizeOptions } from "sharp";
 
 export class UserCoverImageProcessor extends ImageProcessor {
-
     getImageType(): ImageType {
         return ImageType.USER_COVER_IMAGE;
     }
@@ -14,5 +13,4 @@ export class UserCoverImageProcessor extends ImageProcessor {
             height: 500
         };
     }
-
 }
