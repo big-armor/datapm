@@ -31,7 +31,8 @@ export class SignUpDialogComponent implements OnInit {
         private usernameAvailableGQL: UsernameAvailableGQL,
         private emailAddressAvailableGQL: EmailAddressAvailableGQL,
         private componentChangeDetector: ChangeDetectorRef,
-        private dialogRef: MatDialogRef<SignUpDialogComponent>
+        private dialogRef: MatDialogRef<SignUpDialogComponent>,
+        private snackbar: MatSnackBar
     ) {}
 
     ngOnInit(): void {
@@ -69,12 +70,12 @@ export class SignUpDialogComponent implements OnInit {
                     } else if (errorMsg.startsWith("USERNAME_NOT_AVAILABLE")) {
                         this.signUpForm.get("username").setErrors({ NOT_AVAILABLE: true });
                     } else {
-                        /*this.snackbar.open(errorMsg, null, {
+                        this.snackbar.open(errorMsg, null, {
                             duration: 5000,
                             panelClass: "notification-error",
                             verticalPosition: "top",
                             horizontalPosition: "right"
-                        }); */
+                        });
                     }
 
                     return;
@@ -83,12 +84,12 @@ export class SignUpDialogComponent implements OnInit {
                 this.state = State.SUCCESS;
             })
             .catch(() => {
-                /*this.snackbar.open("Unknown error", null, {
+                this.snackbar.open("Unknown error", null, {
                     duration: 5000,
                     panelClass: "notification-error",
                     verticalPosition: "top",
                     horizontalPosition: "right"
-                });*/
+                });
             });
     }
 
