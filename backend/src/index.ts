@@ -19,8 +19,7 @@ import fs from "fs";
 import { ImageStorageService } from "./storage/images/image-storage-service";
 import { ImageType } from "./storage/images/image-type";
 
-const nodeModulesDirectory = getEnvVariable("NODE_MODULES_DIRECTORY", "node_modules");
-const dataLibPackageFile = fs.readFileSync(nodeModulesDirectory + "/datapm-lib/package.json");
+const dataLibPackageFile = fs.readFileSync("node_modules/datapm-lib/package.json");
 const dataLibPackageJSON = JSON.parse(dataLibPackageFile.toString());
 const REGISTRY_API_VERSION = dataLibPackageJSON.version;
 
