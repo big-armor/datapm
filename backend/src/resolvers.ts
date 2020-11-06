@@ -81,7 +81,8 @@ import {
     searchPackages,
     setPackageCoverImage,
     setPackagePermissions,
-    updatePackage
+    updatePackage,
+    myPackages
 } from "./resolvers/PackageResolver";
 import { ImageStorageService } from "./storage/images/image-storage-service";
 import { ImageType } from "./storage/images/image-type";
@@ -423,7 +424,7 @@ export const resolvers: {
 
         package: findPackage,
         latestPackages: getLatestPackages,
-
+        myPackages: myPackages,
         collection: findCollectionBySlug,
         collections: findCollectionsForAuthenticatedUser,
         searchCollections: searchCollections,
