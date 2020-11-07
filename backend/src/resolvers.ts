@@ -85,7 +85,6 @@ import {
     myPackages
 } from "./resolvers/PackageResolver";
 import { ImageStorageService } from "./storage/images/image-storage-service";
-import { ImageType } from "./storage/images/image-type";
 
 import { validatePassword } from "./directive/ValidPasswordDirective";
 import { validateSlug as validateCatalogSlug } from "./directive/ValidCatalogSlugDirective";
@@ -528,16 +527,7 @@ export const resolvers: {
             context: AuthenticatedContext,
             info: any
         ) => {
-            const uploadedImage = await image;
-            const catalogEntity = await context.connection
-                .getCustomRepository(CatalogRepository)
-                .findCatalogBySlugOrFail(identifier.catalogSlug);
-            await ImageStorageService.INSTANCE.saveImage(
-                catalogEntity.id,
-                uploadedImage,
-                ImageType.CATALOG_COVER_IMAGE,
-                context
-            );
+            await new ImageStorageService().saveCatalogCoverImage(identifier, image.base64);
         },
 
         disableCatalog: async (_0: any, { identifier }, context: AuthenticatedContext, info: any) => {

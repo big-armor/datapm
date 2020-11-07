@@ -12,7 +12,6 @@ import { UserRepository } from "../repository/UserRepository";
 import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 import { ImageStorageService } from "../storage/images/image-storage-service";
-import { ImageType } from "../storage/images/image-type";
 
 export const myPackages = async (
     _0: any,
@@ -180,16 +179,7 @@ export const setPackageCoverImage = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const uploadedImage = await image;
-    const packageEntity = await context.connection
-        .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier });
-    await ImageStorageService.INSTANCE.saveImage(
-        packageEntity.id,
-        uploadedImage,
-        ImageType.PACKAGE_COVER_IMAGE,
-        context
-    );
+    return new ImageStorageService().savePackageCoverImage(identifier, image.base64);
 };
 
 export const disablePackage = async (

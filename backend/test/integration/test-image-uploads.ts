@@ -33,11 +33,8 @@ describe("Image Upload Tests", async () => {
         });
 
         expect(uploadResult).to.exist;
+        expect(uploadResult.errors).to.not.exist;
         expect(uploadResult.data).to.exist;
-        if (uploadResult.data) {
-            expect(uploadResult.data.setMyAvatarImage).to.exist;
-            expect(uploadResult.data.setMyAvatarImage.id).to.exist;
-        }
     });
 
     it("Download avatar image", async function () {
@@ -57,11 +54,8 @@ describe("Image Upload Tests", async () => {
         });
 
         expect(uploadResult).to.exist;
+        expect(uploadResult.errors).to.not.exist;
         expect(uploadResult.data).to.exist;
-        if (uploadResult.data) {
-            expect(uploadResult.data.setMyCoverImage).to.exist;
-            expect(uploadResult.data.setMyCoverImage.id).to.exist;
-        }
     });
 
     it("Download cover image", async function () {

@@ -1,180 +1,110 @@
-import { FileUpload } from "graphql-upload";
-import { v4 as uuid } from "uuid";
-import { AuthenticatedContext } from "../../context";
-import { Image } from "../../entity/Image";
-import { ImageType } from "./image-type";
-import { ImageRepository } from "../../repository/ImageRepository";
-import { ImageProcessorProvider } from "./image-processor-provider";
-import { Connection } from "typeorm";
-import { ImageEntityAndStream } from "./image-entity-and-stream";
 import { Readable, Stream } from "stream";
-import { UserRepository } from "../../repository/UserRepository";
-import { validateUsername } from "../../directive/ValidUsernameDirective";
 import { FileStorageService, FileStorageNameSpace } from "../files/file-storage-service";
+import { ImageProcessor } from "./image-processor";
+import { UserCoverImageProcessor } from "./user-cover-image-processor";
+import { UserAvatarImageProcessor } from "./user-avatar-image-processor";
+import { CatalogCoverImageProcessor } from "./catalog-cover-image-processor";
+import { CollectionCoverImageProcessor } from "./collection-cover-image-processor";
+import { PackageCoverImageProcessor } from "./package-cover-image-processor";
+import { CatalogIdentifierInput, CollectionIdentifierInput, PackageIdentifierInput } from "../../generated/graphql";
 
 export class ImageStorageService {
-    public static readonly INSTANCE = new ImageStorageService();
-
     private readonly fileStorageService = new FileStorageService();
 
-    public async saveImage(
-        itemId: number,
-        image: FileUpload,
-        imageType: ImageType,
-        context: AuthenticatedContext
-    ): Promise<Image> {
-        const existingImage = await this.findImage(itemId, imageType, context.connection);
-        if (existingImage) {
-            return this.updateImage(existingImage, image, imageType, context);
-        }
-
-        return this.createImage(itemId, image, imageType, context);
+    public async savePackageCoverImage(identifier: PackageIdentifierInput, imageBase64: string) {
+        return this.saveImageFromBase64(
+            FileStorageNameSpace.PACKAGE_COVER_IMAGE,
+            identifier.catalogSlug + "-" + identifier.packageSlug,
+            imageBase64,
+            new PackageCoverImageProcessor("image/jpeg")
+        );
     }
 
-    public async saveImageFromBase64(
-        itemId: number,
+    public async saveCollectionCoverImage(identifier: CollectionIdentifierInput, imageBase64: string) {
+        return this.saveImageFromBase64(
+            FileStorageNameSpace.COLLECTION_COVER_IMAGE,
+            identifier.collectionSlug,
+            imageBase64,
+            new CollectionCoverImageProcessor("image/jpeg")
+        );
+    }
+
+    public async saveCatalogCoverImage(identifier: CatalogIdentifierInput, imageBase64: string) {
+        return this.saveImageFromBase64(
+            FileStorageNameSpace.CATALOG_COVER_IMAGE,
+            identifier.catalogSlug,
+            imageBase64,
+            new CatalogCoverImageProcessor("image/jpeg")
+        );
+    }
+
+    public async saveUserAvatarImage(username: string, imageBase64: string) {
+        return this.saveImageFromBase64(
+            FileStorageNameSpace.USER_AVATAR_IMAGE,
+            username,
+            imageBase64,
+            new UserAvatarImageProcessor("image/jpeg")
+        );
+    }
+
+    public async saveUserCoverImage(username: string, imageBase64: string) {
+        return this.saveImageFromBase64(
+            FileStorageNameSpace.USER_COVER_IMAGE,
+            username,
+            imageBase64,
+            new UserCoverImageProcessor("image/jpeg")
+        );
+    }
+
+    private async saveImageFromBase64(
+        namespace: FileStorageNameSpace,
+        itemId: string,
         base64: string,
-        imageType: ImageType,
-        context: AuthenticatedContext
-    ): Promise<Image> {
-        const imageStream = ImageStorageService.convertBase64ToStream(base64);
-        const existingImage = await this.findImage(itemId, imageType, context.connection);
-        if (existingImage) {
-            return this.updateImageFromStream(existingImage, imageStream, imageType, "image/jpeg", context);
-        }
-
-        return this.createImageFromStream(itemId, imageStream, imageType, "image/jpeg", context);
+        processor: ImageProcessor
+    ): Promise<void> {
+        const imageStream = this.convertBase64ToStream(base64);
+        return this.saveImageFromStream(namespace, itemId, imageStream, processor);
     }
 
-    public async saveImageFromStream(
-        itemId: number,
-        imageStream: Stream,
-        imageType: ImageType,
-        mimeType: string,
-        context: AuthenticatedContext
-    ): Promise<Image> {
-        const existingImage = await this.findImage(itemId, imageType, context.connection);
-        if (existingImage) {
-            return this.updateImageFromStream(existingImage, imageStream, imageType, mimeType, context);
-        }
-
-        return this.createImageFromStream(itemId, imageStream, imageType, mimeType, context);
+    private async saveImageFromStream(
+        namespace: FileStorageNameSpace,
+        itemId: string,
+        stream: Stream,
+        processor: ImageProcessor
+    ): Promise<void> {
+        return this.fileStorageService.writeFile(namespace, itemId, stream, processor.getFormatter());
     }
 
-    public async createImage(
-        itemId: number,
-        image: FileUpload,
-        imageType: ImageType,
-        context: AuthenticatedContext
-    ): Promise<Image> {
-        const fileName = uuid();
-        const fileStream = image.createReadStream();
-        return this.createImageFromStream(itemId, fileStream, imageType, image.mimetype, context);
+    public async readUserCoverImage(username: string): Promise<Stream> {
+        return this.readImage(FileStorageNameSpace.USER_COVER_IMAGE, username);
     }
 
-    public async createImageFromStream(
-        itemId: number,
-        imageStream: Stream,
-        imageType: ImageType,
-        mimeType: string,
-        context: AuthenticatedContext
-    ): Promise<Image> {
-        const fileName = uuid();
-        const formatter = ImageProcessorProvider.getImageProcessor(imageType, mimeType).getFormatter();
-        await this.fileStorageService.writeFile(FileStorageNameSpace.IMAGES, fileName, imageStream, formatter);
-        const imageEntity = this.buildImageEntity(fileName, itemId, context.me.id, imageType, mimeType);
-        return this.getRepository(context.connection).save(imageEntity);
+    public async readCatalogCoverImage(identifer: CatalogIdentifierInput): Promise<Stream> {
+        return this.readImage(FileStorageNameSpace.CATALOG_COVER_IMAGE, identifer.catalogSlug);
     }
 
-    public async updateImage(
-        imageEntity: Image,
-        image: FileUpload,
-        imageType: ImageType,
-        context: AuthenticatedContext
-    ): Promise<Image> {
-        const fileStream = image.createReadStream();
-        return this.updateImageFromStream(imageEntity, fileStream, imageType, image.mimetype, context);
+    public async readCollectionCoverImage(identifer: CollectionIdentifierInput): Promise<Stream> {
+        return this.readImage(FileStorageNameSpace.COLLECTION_COVER_IMAGE, identifer.collectionSlug);
     }
 
-    private async updateImageFromStream(
-        imageEntity: Image,
-        imageStream: Stream,
-        imageType: ImageType,
-        mimeType: string,
-        context: AuthenticatedContext
-    ): Promise<Image> {
-        const formatter = ImageProcessorProvider.getImageProcessor(imageType, mimeType).getFormatter();
-        await this.fileStorageService.writeFile(FileStorageNameSpace.IMAGES, imageEntity.id, imageStream, formatter);
-        return this.getRepository(context.connection).save(imageEntity);
+    public async readUserAvatarImage(username: string): Promise<Stream> {
+        return this.readImage(FileStorageNameSpace.USER_AVATAR_IMAGE, username);
     }
 
-    public async readImage(imageId: string, connection: Connection): Promise<ImageEntityAndStream> {
-        return new Promise(async (resolve, reject) => {
-            const repository = connection.getCustomRepository(ImageRepository);
-            const entity = await repository.findOne(imageId);
-            if (entity == null) {
-                reject("Could not find image");
-                return;
-            }
-
-            const stream = await this.fileStorageService.readFile(FileStorageNameSpace.IMAGES, imageId);
-            resolve({ entity, stream });
-        });
+    public async readImage(namespace: FileStorageNameSpace, imageId: string): Promise<Stream> {
+        return this.fileStorageService.readFile(namespace, imageId);
     }
 
-    public async findImage(itemId: number, imageType: ImageType, connection: Connection): Promise<Image | undefined> {
-        const repository = this.getRepository(connection);
-        return repository.findOneEntityReferenceIdAndType(itemId, imageType);
-    }
-
-    private static convertBase64ToStream(base64: string): Stream {
-        const buffer = ImageStorageService.convertBase64ToBuffer(base64);
+    private convertBase64ToStream(base64: string): Stream {
+        const buffer = this.convertBase64ToBuffer(base64);
         const bufferStream = new Readable();
         bufferStream.push(buffer);
         bufferStream.push(null);
         return bufferStream;
     }
 
-    private static convertBase64ToBuffer(base64: string): Buffer {
+    private convertBase64ToBuffer(base64: string): Buffer {
         const base64Content = base64.includes(";base64,") ? base64.split(";base64,")[1] : base64;
         return Buffer.from(base64Content, "base64");
-    }
-
-    private buildImageEntity(
-        imageId: string,
-        itemId: number,
-        userId: number,
-        imageType: ImageType,
-        mimeType: string
-    ): Image {
-        const imageEntity = new Image();
-        imageEntity.id = imageId;
-        imageEntity.referenceEntityId = itemId;
-        imageEntity.userId = userId;
-        imageEntity.type = imageType;
-        imageEntity.mimeType = mimeType;
-        return imageEntity;
-    }
-
-    private getRepository(connection: Connection): ImageRepository {
-        return connection.getCustomRepository(ImageRepository);
-    }
-
-    public async getImageTypeForUser(
-        username: string,
-        imageType: ImageType,
-        connection: Connection
-    ): Promise<ImageEntityAndStream> {
-        validateUsername(username);
-
-        const user = await connection.getCustomRepository(UserRepository).getUserByUsername(username);
-
-        if (user == null) throw new Error("USER_NOT_FOUND");
-
-        const image = await this.findImage(user.id, imageType, connection);
-
-        if (image == null) throw new Error("IMAGE_NOT_FOUND");
-
-        return this.readImage(image.id, connection);
     }
 }
