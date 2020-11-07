@@ -24,7 +24,9 @@ export class VersionRepository {
                 authorId: userId,
                 createdAt: new Date(),
                 updatedAt: new Date(value.packageFile.updatedDate),
-                packageFile: value.packageFile
+                packageFile: value.packageFile,
+                readmeFile: value.readmeFile || undefined,
+                licenseFile: value.licenseFile || undefined
             });
 
             return await transaction.save(version);

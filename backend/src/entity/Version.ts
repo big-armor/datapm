@@ -40,8 +40,14 @@ export class Version extends BaseModel {
     @Column({ nullable: false, default: true })
     isActive: boolean;
 
-    @Column({ length: 2048 })
+    @Column({ length: 250 })
     description: string;
+
+    @Column({ name: "readme_file", length: 10240 })
+    readmeFile: string;
+
+    @Column({ name: "license_file", length: 10240 })
+    licenseFile: string;
 
     @Column({ type: "jsonb", name: "packageFile" })
     packageFile: PackageFile;
