@@ -1,5 +1,3 @@
-import { DPMStorage } from "../dpm-storage";
-import { StorageProvider } from "../storage-provider";
 import { FileUpload } from "graphql-upload";
 import { v4 as uuid } from "uuid";
 import { AuthenticatedContext } from "../../context";
@@ -9,20 +7,15 @@ import { ImageRepository } from "../../repository/ImageRepository";
 import { ImageProcessorProvider } from "./image-processor-provider";
 import { Connection } from "typeorm";
 import { ImageEntityAndStream } from "./image-entity-and-stream";
-import * as stream from "stream";
 import { Readable, Stream } from "stream";
-import { User } from "../../entity/User";
 import { UserRepository } from "../../repository/UserRepository";
-import { exception } from "console";
-import { read } from "fs";
-import { ValidUsernameDirective } from "../../directive/ValidUsernameDirective";
 import { validateUsername } from "../../directive/ValidUsernameDirective";
+import { FileStorageService, FileStorageNameSpace } from "../files/file-storage-service";
 
 export class ImageStorageService {
     public static readonly INSTANCE = new ImageStorageService();
 
-    private static readonly NAMESPACE = "media";
-    private readonly storageService: DPMStorage = StorageProvider.getStorage();
+    private readonly fileStorageService = new FileStorageService();
 
     public async saveImage(
         itemId: number,
@@ -88,7 +81,7 @@ export class ImageStorageService {
     ): Promise<Image> {
         const fileName = uuid();
         const formatter = ImageProcessorProvider.getImageProcessor(imageType, mimeType).getFormatter();
-        await this.storageService.writeItem(ImageStorageService.NAMESPACE, fileName, imageStream, formatter);
+        await this.fileStorageService.writeFile(FileStorageNameSpace.IMAGES, fileName, imageStream, formatter);
         const imageEntity = this.buildImageEntity(fileName, itemId, context.me.id, imageType, mimeType);
         return this.getRepository(context.connection).save(imageEntity);
     }
@@ -111,7 +104,7 @@ export class ImageStorageService {
         context: AuthenticatedContext
     ): Promise<Image> {
         const formatter = ImageProcessorProvider.getImageProcessor(imageType, mimeType).getFormatter();
-        await this.storageService.writeItem(ImageStorageService.NAMESPACE, imageEntity.id, imageStream, formatter);
+        await this.fileStorageService.writeFile(FileStorageNameSpace.IMAGES, imageEntity.id, imageStream, formatter);
         return this.getRepository(context.connection).save(imageEntity);
     }
 
@@ -124,7 +117,7 @@ export class ImageStorageService {
                 return;
             }
 
-            const stream = await this.storageService.getItem(ImageStorageService.NAMESPACE, imageId);
+            const stream = await this.fileStorageService.readFile(FileStorageNameSpace.IMAGES, imageId);
             resolve({ entity, stream });
         });
     }
