@@ -99,7 +99,7 @@ export const setMyCoverImage = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    return new ImageStorageService().saveUserCoverImage(context.me.username, image.base64);
+    return ImageStorageService.INSTANCE.saveUserCoverImage(context.me.username, image.base64);
 };
 
 export const setMyAvatarImage = async (
@@ -108,7 +108,7 @@ export const setMyAvatarImage = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    return new ImageStorageService().saveUserAvatarImage(context.me.username, image.base64);
+    return ImageStorageService.INSTANCE.saveUserAvatarImage(context.me.username, image.base64);
 };
 
 export const disableMe = async (_0: any, {}, context: AuthenticatedContext, info: any) => {

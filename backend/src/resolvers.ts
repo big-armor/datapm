@@ -527,7 +527,7 @@ export const resolvers: {
             context: AuthenticatedContext,
             info: any
         ) => {
-            await new ImageStorageService().saveCatalogCoverImage(identifier, image.base64);
+            await ImageStorageService.INSTANCE.saveCatalogCoverImage(identifier, image.base64);
         },
 
         disableCatalog: async (_0: any, { identifier }, context: AuthenticatedContext, info: any) => {

@@ -9,7 +9,8 @@ import { PackageCoverImageProcessor } from "./package-cover-image-processor";
 import { CatalogIdentifierInput, CollectionIdentifierInput, PackageIdentifierInput } from "../../generated/graphql";
 
 export class ImageStorageService {
-    private readonly fileStorageService = new FileStorageService();
+    public static readonly INSTANCE = new ImageStorageService();
+    private readonly fileStorageService = FileStorageService.INSTANCE;
 
     public async savePackageCoverImage(identifier: PackageIdentifierInput, imageBase64: string) {
         return this.saveImageFromBase64(

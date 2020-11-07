@@ -179,7 +179,7 @@ export const setPackageCoverImage = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    return new ImageStorageService().savePackageCoverImage(identifier, image.base64);
+    return ImageStorageService.INSTANCE.savePackageCoverImage(identifier, image.base64);
 };
 
 export const disablePackage = async (

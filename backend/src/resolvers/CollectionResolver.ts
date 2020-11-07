@@ -61,7 +61,7 @@ export const setCollectionCoverImage = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    return new ImageStorageService().saveCollectionCoverImage(identifier, image.base64);
+    return ImageStorageService.INSTANCE.saveCollectionCoverImage(identifier, image.base64);
 };
 
 export const disableCollection = async (

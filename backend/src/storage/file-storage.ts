@@ -33,8 +33,10 @@ export class FileStorage implements DPMStorage {
 
     public getItem(namespace: string, itemId: string): Promise<Stream> {
         const path = this.buildPath(namespace, itemId);
-        const readStream = fs.createReadStream(path);
 
+        if (!fs.existsSync(path)) throw new Error("FILE_NOT_FOUND");
+
+        const readStream = fs.createReadStream(path);
         this.streamHelper.registerReadStream(readStream);
         return Promise.resolve(readStream);
     }

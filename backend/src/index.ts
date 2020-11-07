@@ -14,7 +14,7 @@ import path from "path";
 import { getSecretVariable, setAppEngineServiceAccountJson } from "./util/secrets";
 import { GraphQLError } from "graphql";
 import { superCreateConnection } from "./util/databaseCreation";
-import { getEnvVariable } from "./util/getEnvVariable";
+import { Readable, Stream } from "stream";
 import fs from "fs";
 import { ImageStorageService } from "./storage/images/image-storage-service";
 
@@ -189,33 +189,37 @@ async function main() {
     // set express for the Apollo GraphQL server
     server.applyMiddleware({ app, bodyParserConfig: { limit: "20mb" } });
 
-    const imageService = new ImageStorageService();
-    app.use("/images/user/:username/avatar", (req, res, next) => {
+    const respondWithImage = async function (imageStream: Stream, response: express.Response) {
+        const imageBuffer = await new Promise<Buffer>((res) => {
+            var bufs: any[] = [];
+            imageStream.on("data", function (d) {
+                bufs.push(d);
+            });
+            imageStream.on("end", function () {
+                var buf = Buffer.concat(bufs);
+                res(buf);
+            });
+        });
+
+        response.set("content-type", "image/jpeg");
+        response.set("content-length", imageBuffer.length.toString());
+
+        response.end(imageBuffer);
+    };
+
+    const imageService = ImageStorageService.INSTANCE;
+    app.use("/images/user/:username/avatar", async (req, res, next) => {
         try {
-            const stream = imageService.readUserAvatarImage(req.params.username);
-            stream
-                .then((img) => {
-                    res.set("Content-Type", "image/jpeg");
-                    img.on("error", (e) => next("Could not read image stream"));
-                    img.pipe(res);
-                })
-                .catch((error) => next("Could not fetch image"));
+            await respondWithImage(await imageService.readUserAvatarImage(req.params.username), res);
         } catch (err) {
             res.status(404).send();
             return;
         }
     });
 
-    app.use("/images/user/:username/cover", (req, res, next) => {
+    app.use("/images/user/:username/cover", async (req, res, next) => {
         try {
-            const stream = imageService.readUserCoverImage(req.params.username);
-            stream
-                .then((img) => {
-                    res.set("Content-Type", "image/jpeg");
-                    img.on("error", (e) => next("Could not read image stream"));
-                    img.pipe(res);
-                })
-                .catch((error) => next("Could not fetch image"));
+            await respondWithImage(await imageService.readUserCoverImage(req.params.username), res);
         } catch (err) {
             res.status(404).send();
             return;

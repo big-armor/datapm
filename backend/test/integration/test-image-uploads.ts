@@ -4,6 +4,8 @@ import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 import * as fs from "fs";
 import request = require("superagent");
 import { SetMyAvatarImageDocument, SetMyCoverImageDocument } from "./registry-client";
+import * as crypto from "crypto";
+import { Readable } from "stream";
 
 describe("Image Upload Tests", async () => {
     const anonymousUser = createAnonymousClient();
@@ -25,6 +27,7 @@ describe("Image Upload Tests", async () => {
     it("setMyAvatarImage_WithValidImage_UploadsImageAndStoresMetadataInDbAndIsPublic", async () => {
         const imageContent = fs.readFileSync("test/other-files/ba.jpg", "base64");
 
+        console.log("ImageContent length:" + imageContent.length);
         const uploadResult = await userAClient.mutate({
             mutation: SetMyAvatarImageDocument,
             variables: {
@@ -37,8 +40,21 @@ describe("Image Upload Tests", async () => {
         expect(uploadResult.data).to.exist;
     });
 
+    it("Avatar image not found", async function () {
+        let errorFound = false;
+        try {
+            const imageServingResult = await request.get("localhost:4000/images/user/invalid-username/avatar");
+        } catch (err) {
+            expect(err.message).to.equal("Not Found");
+            errorFound = true;
+        }
+
+        expect(errorFound).to.be.true;
+    });
+
     it("Download avatar image", async function () {
         const imageServingResult = await request.get("localhost:4000/images/user/first-user-username/avatar");
+
         expect(imageServingResult.body).to.exist;
         expect(imageServingResult.type).to.equal("image/jpeg");
     });
@@ -52,16 +68,28 @@ describe("Image Upload Tests", async () => {
                 image: { base64: imageContent }
             }
         });
-
         expect(uploadResult).to.exist;
         expect(uploadResult.errors).to.not.exist;
         expect(uploadResult.data).to.exist;
     });
 
     it("Download cover image", async function () {
-        const imageServingResult = await request.get("localhost:4000/images/user/first-user-username/cover");
+        let imageServingResult = await request.get("http://localhost:4000/images/user/first-user-username/cover");
+
         expect(imageServingResult.body).to.exist;
         expect(imageServingResult.type).to.equal("image/jpeg");
+
+        // TODO the image fetching is working, but when invoked by superagent, the server responds with 0 byte files
+        // so we can't test that the correct image is returned.
+
+        // const imageWithData = await request
+        //    .get("http://localhost:4000/images/user/first-user-username/cover")
+        //    .buffer(true)
+        //    .parse(request.parse.image);
+
+        //console.log(JSON.stringify(imageWithData.body, null, 1));
+        //let hash = crypto.createHash("sha256").update(imageWithData.body, "utf8").digest("hex");
+        // expect(hash).equal("asfdasdfasfd");
     });
 
     it("setMyAvatarImage_WithUnsupportedImageFormat_ReturnsErrorWithInvalidFormatErrorCode", async () => {
@@ -73,7 +101,6 @@ describe("Image Upload Tests", async () => {
                 image: { base64: imageContent }
             }
         });
-
         expect(uploadResult).to.exist;
         expect(uploadResult.errors).to.exist;
         expect(uploadResult.errors).length(1);

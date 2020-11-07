@@ -14,3 +14,4 @@ backend/test/integration/registry-client.ts
 gc.json
 
 backend/tmp-registry-server-storage
+backend/tmp-registry-server-storage-*
