@@ -3,24 +3,13 @@ import { StorageProvider } from "../storage-provider";
 import { Readable, Stream } from "stream";
 import fs from "fs";
 
-export enum FileStorageNameSpace {
-    README_FILE = "README_FILE",
-    LICENSE_FILE = "LICENSE_FILE",
-    PACKAGE_FILE = "PACKAGE_FILE",
-    USER_COVER_IMAGE = "USER_COVER_IMAGE",
-    USER_AVATAR_IMAGE = "USER_AVATAR_IMAGE",
-    CATALOG_COVER_IMAGE = "CATALOG_COVER_IMAGE",
-    PACKAGE_COVER_IMAGE = "PACKAGE_COVER_IMAGE",
-    COLLECTION_COVER_IMAGE = "COLLECTION_COVER_IMAGE"
-}
-
 export class FileStorageService {
     public static readonly INSTANCE = new FileStorageService();
 
     private readonly storageService: DPMStorage = StorageProvider.getStorage();
 
     public async writeFileFromBuffer(
-        namespace: FileStorageNameSpace,
+        namespace: string,
         itemId: string,
         contents: Buffer,
         transformer?: any
@@ -30,7 +19,7 @@ export class FileStorageService {
     }
 
     public async writeFileFromString(
-        namespace: FileStorageNameSpace,
+        namespace: string,
         itemId: string,
         contents: string,
         transformer?: any
@@ -39,20 +28,15 @@ export class FileStorageService {
         return this.storageService.writeItem(namespace, itemId, stream, transformer);
     }
 
-    public async writeFile(
-        namespace: FileStorageNameSpace,
-        itemId: string,
-        stream: Stream,
-        transformer?: any
-    ): Promise<void> {
+    public async writeFile(namespace: string, itemId: string, stream: Stream, transformer?: any): Promise<void> {
         return this.storageService.writeItem(namespace, itemId, stream, transformer);
     }
 
-    public async deleteFile(namespace: FileStorageNameSpace, itemId: string): Promise<void> {
+    public async deleteFile(namespace: string, itemId: string): Promise<void> {
         return this.storageService.deleteItem(namespace, itemId);
     }
 
-    public async readFile(namespace: FileStorageNameSpace, itemId: string): Promise<Stream> {
+    public async readFile(namespace: string, itemId: string): Promise<Stream> {
         return this.storageService.getItem(namespace, itemId);
     }
 

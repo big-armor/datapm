@@ -1,5 +1,5 @@
 import { Stream } from "stream";
-import { FileStorageService, FileStorageNameSpace } from "../files/file-storage-service";
+import { FileStorageService } from "../files/file-storage-service";
 import { ImageProcessor } from "./image-processor";
 import { UserCoverImageProcessor } from "./user-cover-image-processor";
 import { UserAvatarImageProcessor } from "./user-avatar-image-processor";
@@ -8,14 +8,27 @@ import { CollectionCoverImageProcessor } from "./collection-cover-image-processo
 import { PackageCoverImageProcessor } from "./package-cover-image-processor";
 import { CatalogIdentifierInput, CollectionIdentifierInput, PackageIdentifierInput } from "../../generated/graphql";
 
+enum ImageTypes {
+    PACKAGE_COVER_IMAGE = "package_cover",
+    COLLECTION_COVER_IMAGE = "collection_cover",
+    USER_AVATAR_IMAGE = "user_avatar",
+    USER_COVER_IMAGE = "user_cover",
+    CATALOG_COVER_IMAGE = "catalog_cover"
+}
+enum Prefixes {
+    USER = "user",
+    PACKAGE = "package",
+    COLLECTION = "collection",
+    CATALOG = "catalog"
+}
 export class ImageStorageService {
     public static readonly INSTANCE = new ImageStorageService();
     private readonly fileStorageService = FileStorageService.INSTANCE;
 
     public async savePackageCoverImage(identifier: PackageIdentifierInput, imageBase64: string) {
         return this.saveImageFromBase64(
-            FileStorageNameSpace.PACKAGE_COVER_IMAGE,
-            identifier.catalogSlug + "-" + identifier.packageSlug,
+            Prefixes.PACKAGE + "/" + identifier.catalogSlug + "/" + identifier.packageSlug,
+            ImageTypes.PACKAGE_COVER_IMAGE,
             imageBase64,
             new PackageCoverImageProcessor("image/jpeg")
         );
@@ -23,8 +36,8 @@ export class ImageStorageService {
 
     public async saveCollectionCoverImage(identifier: CollectionIdentifierInput, imageBase64: string) {
         return this.saveImageFromBase64(
-            FileStorageNameSpace.COLLECTION_COVER_IMAGE,
-            identifier.collectionSlug,
+            Prefixes.COLLECTION + "/" + identifier.collectionSlug,
+            ImageTypes.COLLECTION_COVER_IMAGE,
             imageBase64,
             new CollectionCoverImageProcessor("image/jpeg")
         );
@@ -32,8 +45,8 @@ export class ImageStorageService {
 
     public async saveCatalogCoverImage(identifier: CatalogIdentifierInput, imageBase64: string) {
         return this.saveImageFromBase64(
-            FileStorageNameSpace.CATALOG_COVER_IMAGE,
-            identifier.catalogSlug,
+            Prefixes.CATALOG + "/" + identifier.catalogSlug,
+            ImageTypes.CATALOG_COVER_IMAGE,
             imageBase64,
             new CatalogCoverImageProcessor("image/jpeg")
         );
@@ -41,8 +54,8 @@ export class ImageStorageService {
 
     public async saveUserAvatarImage(username: string, imageBase64: string) {
         return this.saveImageFromBase64(
-            FileStorageNameSpace.USER_AVATAR_IMAGE,
-            username,
+            Prefixes.USER + "/" + username,
+            ImageTypes.USER_AVATAR_IMAGE,
             imageBase64,
             new UserAvatarImageProcessor("image/jpeg")
         );
@@ -50,15 +63,15 @@ export class ImageStorageService {
 
     public async saveUserCoverImage(username: string, imageBase64: string) {
         return this.saveImageFromBase64(
-            FileStorageNameSpace.USER_COVER_IMAGE,
-            username,
+            Prefixes.USER + "/" + username,
+            ImageTypes.USER_COVER_IMAGE,
             imageBase64,
             new UserCoverImageProcessor("image/jpeg")
         );
     }
 
     private async saveImageFromBase64(
-        namespace: FileStorageNameSpace,
+        namespace: string,
         itemId: string,
         base64: string,
         processor: ImageProcessor
@@ -67,7 +80,7 @@ export class ImageStorageService {
     }
 
     private async saveImage(
-        namespace: FileStorageNameSpace,
+        namespace: string,
         itemId: string,
         base64: string,
         processor: ImageProcessor
@@ -77,22 +90,29 @@ export class ImageStorageService {
     }
 
     public async readUserCoverImage(username: string): Promise<Stream> {
-        return this.readImage(FileStorageNameSpace.USER_COVER_IMAGE, username);
-    }
-
-    public async readCatalogCoverImage(identifer: CatalogIdentifierInput): Promise<Stream> {
-        return this.readImage(FileStorageNameSpace.CATALOG_COVER_IMAGE, identifer.catalogSlug);
-    }
-
-    public async readCollectionCoverImage(identifer: CollectionIdentifierInput): Promise<Stream> {
-        return this.readImage(FileStorageNameSpace.COLLECTION_COVER_IMAGE, identifer.collectionSlug);
+        return this.readImage(Prefixes.USER + "/" + username, ImageTypes.USER_COVER_IMAGE);
     }
 
     public async readUserAvatarImage(username: string): Promise<Stream> {
-        return this.readImage(FileStorageNameSpace.USER_AVATAR_IMAGE, username);
+        return this.readImage(Prefixes.USER + "/" + username, ImageTypes.USER_AVATAR_IMAGE);
     }
 
-    public async readImage(namespace: FileStorageNameSpace, imageId: string): Promise<Stream> {
+    public async readCatalogCoverImage(identifer: CatalogIdentifierInput): Promise<Stream> {
+        return this.readImage(Prefixes.CATALOG + "/" + identifer.catalogSlug, ImageTypes.CATALOG_COVER_IMAGE);
+    }
+
+    public async readCollectionCoverImage(identifer: CollectionIdentifierInput): Promise<Stream> {
+        return this.readImage(Prefixes.CATALOG + "/" + identifer.collectionSlug, ImageTypes.COLLECTION_COVER_IMAGE);
+    }
+
+    public async readPackageCoverImage(identifer: PackageIdentifierInput): Promise<Stream> {
+        return this.readImage(
+            Prefixes.PACKAGE + "/" + identifer.catalogSlug + "/" + identifer.packageSlug,
+            ImageTypes.PACKAGE_COVER_IMAGE
+        );
+    }
+
+    private async readImage(namespace: string, imageId: string): Promise<Stream> {
         return this.fileStorageService.readFile(namespace, imageId);
     }
 

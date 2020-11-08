@@ -4,7 +4,7 @@ import { VersionIdentifierInput, CreateVersionInput, PackageIdentifierInput } fr
 import { PackageRepository } from "./PackageRepository";
 import { SemVer } from "semver";
 import { Maybe } from "graphql/jsutils/Maybe";
-import { FileStorageNameSpace, FileStorageService } from "../storage/files/file-storage-service";
+import { FileStorageService } from "../storage/files/file-storage-service";
 import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
 
 @EntityRepository()

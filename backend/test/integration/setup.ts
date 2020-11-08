@@ -97,7 +97,7 @@ before(async function () {
 after(async function () {
     this.timeout(30000);
 
-    //fs.rmdirSync(TEMP_STORAGE_URL.replace("file://", ""), { recursive: true });
+    fs.rmdirSync(TEMP_STORAGE_URL.replace("file://", ""), { recursive: true });
 
     if (container) await container.stop();
 
