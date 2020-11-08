@@ -2,6 +2,7 @@ version: "3.7"
 
 volumes:
     postgres_data_local: {}
+    registry_file_store: {}
 
 services:
     datapm-registry:
@@ -10,6 +11,11 @@ services:
             - "4000:4000"
         env_file:
             - Docker-env
+        volumes:
+            - type: volume
+              source: registry_file_store
+              target: /var/lib/datapm-registry/data
+              consistency: cached
     postgres:
         image: postgres:11
         volumes:
