@@ -31,7 +31,7 @@ export class FileStorage implements DPMStorage {
         return Promise.resolve();
     }
 
-    public getItem(namespace: string, itemId: string): Promise<Stream> {
+    public async getItem(namespace: string, itemId: string): Promise<Stream> {
         const path = this.buildPath(namespace, itemId);
 
         if (!fs.existsSync(path)) throw new Error("FILE_NOT_FOUND");

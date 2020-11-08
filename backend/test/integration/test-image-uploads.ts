@@ -27,7 +27,6 @@ describe("Image Upload Tests", async () => {
     it("setMyAvatarImage_WithValidImage_UploadsImageAndStoresMetadataInDbAndIsPublic", async () => {
         const imageContent = fs.readFileSync("test/other-files/ba.jpg", "base64");
 
-        console.log("ImageContent length:" + imageContent.length);
         const uploadResult = await userAClient.mutate({
             mutation: SetMyAvatarImageDocument,
             variables: {

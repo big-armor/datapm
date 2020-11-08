@@ -1,4 +1,4 @@
-import { Readable, Stream } from "stream";
+import { Stream } from "stream";
 import { FileStorageService, FileStorageNameSpace } from "../files/file-storage-service";
 import { ImageProcessor } from "./image-processor";
 import { UserCoverImageProcessor } from "./user-cover-image-processor";
@@ -63,17 +63,17 @@ export class ImageStorageService {
         base64: string,
         processor: ImageProcessor
     ): Promise<void> {
-        const imageStream = this.convertBase64ToStream(base64);
-        return this.saveImageFromStream(namespace, itemId, imageStream, processor);
+        return this.saveImage(namespace, itemId, base64, processor);
     }
 
-    private async saveImageFromStream(
+    private async saveImage(
         namespace: FileStorageNameSpace,
         itemId: string,
-        stream: Stream,
+        base64: string,
         processor: ImageProcessor
     ): Promise<void> {
-        return this.fileStorageService.writeFile(namespace, itemId, stream, processor.getFormatter());
+        const buffer = this.convertBase64ToBuffer(base64);
+        return this.fileStorageService.writeFileFromBuffer(namespace, itemId, buffer, processor.getFormatter());
     }
 
     public async readUserCoverImage(username: string): Promise<Stream> {
@@ -96,16 +96,8 @@ export class ImageStorageService {
         return this.fileStorageService.readFile(namespace, imageId);
     }
 
-    private convertBase64ToStream(base64: string): Stream {
-        const buffer = this.convertBase64ToBuffer(base64);
-        const bufferStream = new Readable();
-        bufferStream.push(buffer);
-        bufferStream.push(null);
-        return bufferStream;
-    }
-
-    private convertBase64ToBuffer(base64: string): Buffer {
-        const base64Content = base64.includes(";base64,") ? base64.split(";base64,")[1] : base64;
+    private convertBase64ToBuffer(value: string): Buffer {
+        const base64Content = value.includes(";base64,") ? value.split(";base64,")[1] : value;
         return Buffer.from(base64Content, "base64");
     }
 }

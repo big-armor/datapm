@@ -12,6 +12,7 @@ import { UserRepository } from "../repository/UserRepository";
 import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 import { ImageStorageService } from "../storage/images/image-storage-service";
+import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
 
 export const myPackages = async (
     _0: any,
@@ -188,6 +189,8 @@ export const disablePackage = async (
     context: AuthenticatedContext,
     info: any
 ) => {
+    // TODO - when we convert to deletes, actually delete the package files
+
     return context.connection.getCustomRepository(PackageRepository).disablePackage({
         identifier,
         relations: getGraphQlRelationName(info)

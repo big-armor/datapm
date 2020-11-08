@@ -93,6 +93,8 @@ import { validateUsernameOrEmail } from "./directive/ValidUsernameOrEmailAddress
 import { validateSlug as validateCollectionSlug } from "./directive/ValidCollectionSlugDirective";
 import { validateSlug as validatePackageSlug } from "./directive/ValidPackageSlugDirective";
 import { validateEmailAddress } from "./directive/ValidEmailDirective";
+import { FileStorageNameSpace, FileStorageService } from "./storage/files/file-storage-service";
+import { PackageFileStorageService } from "./storage/packages/package-file-storage-service";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -368,6 +370,85 @@ export const resolvers: {
                 versionMinor: version.minorVersion,
                 versionPatch: version.patchVersion
             };
+        },
+        packageFile: async (parent: any, _1: any, context: AuthenticatedContext) => {
+            const version = parent as Version;
+
+            const packageEntity = await context.connection
+                .getRepository(Package)
+                .findOneOrFail({ id: version.packageId });
+
+            const catalog = await context.connection
+                .getRepository(Catalog)
+                .findOneOrFail({ id: packageEntity.catalogId });
+
+            try {
+                return await PackageFileStorageService.INSTANCE.readPackageFile({
+                    catalogSlug: catalog.slug,
+                    packageSlug: packageEntity.slug,
+                    versionMajor: version.majorVersion,
+                    versionMinor: version.minorVersion,
+                    versionPatch: version.patchVersion
+                });
+            } catch (error) {
+                if (error.message == "FILE_NOT_FOUND") {
+                    console.error("A request package file was not found. This is VERY BAD!");
+                    console.error(JSON.stringify(error));
+                    return;
+                }
+
+                throw error;
+            }
+        },
+        readmeFile: async (parent: any, _1: any, context: AuthenticatedContext) => {
+            const version = parent as Version;
+            const packageEntity = await context.connection
+                .getRepository(Package)
+                .findOneOrFail({ id: version.packageId });
+
+            const catalog = await context.connection
+                .getRepository(Catalog)
+                .findOneOrFail({ id: packageEntity.catalogId });
+            try {
+                return await PackageFileStorageService.INSTANCE.readReadmeFile({
+                    catalogSlug: catalog.slug,
+                    packageSlug: packageEntity.slug,
+                    versionMajor: version.majorVersion,
+                    versionMinor: version.minorVersion,
+                    versionPatch: version.patchVersion
+                });
+            } catch (error) {
+                if (error.message == "FILE_NOT_FOUND") {
+                    return null;
+                }
+
+                throw error;
+            }
+        },
+        licenseFile: async (parent: any, _1: any, context: AuthenticatedContext) => {
+            const version = parent as Version;
+            const packageEntity = await context.connection
+                .getRepository(Package)
+                .findOneOrFail({ id: version.packageId });
+
+            const catalog = await context.connection
+                .getRepository(Catalog)
+                .findOneOrFail({ id: packageEntity.catalogId });
+            try {
+                return await PackageFileStorageService.INSTANCE.readLicenseFile({
+                    catalogSlug: catalog.slug,
+                    packageSlug: packageEntity.slug,
+                    versionMajor: version.majorVersion,
+                    versionMinor: version.minorVersion,
+                    versionPatch: version.patchVersion
+                });
+            } catch (error) {
+                if (error.message == "FILE_NOT_FOUND") {
+                    return null;
+                }
+
+                throw error;
+            }
         }
     },
 
@@ -553,6 +634,8 @@ export const resolvers: {
         removePackageFromCollection: removePackageFromCollection,
 
         createVersion: async (_0: any, { identifier, value }, context: AuthenticatedContext, info: any) => {
+            const fileStorageService = FileStorageService.INSTANCE;
+
             return await context.connection.manager.nestedTransaction(async (transaction) => {
                 const proposedNewVersion = new SemVer(value.packageFile.version);
 
@@ -564,9 +647,16 @@ export const resolvers: {
                     .findLatestVersion({ identifier, includeActiveOnly: true });
 
                 if (latestVersion != null) {
-                    const latestVersionSemVer = new SemVer(latestVersion.packageFile!.version);
+                    const packageFile = await PackageFileStorageService.INSTANCE.readPackageFile({
+                        ...identifier,
+                        versionMajor: latestVersion.majorVersion,
+                        versionMinor: latestVersion.minorVersion,
+                        versionPatch: latestVersion.patchVersion
+                    });
 
-                    const diff = comparePackages(latestVersion.packageFile, newPackageFile);
+                    const latestVersionSemVer = new SemVer(packageFile!.version);
+
+                    const diff = comparePackages(packageFile, newPackageFile);
 
                     const compatibility = diffCompatibility(diff);
 
@@ -608,6 +698,26 @@ export const resolvers: {
                 const savedVersion = await transaction
                     .getCustomRepository(VersionRepository)
                     .save(context.me.id, identifier, value);
+
+                const versionIdentifier = {
+                    ...identifier,
+                    versionMajor: proposedNewVersion.major,
+                    versionMinor: proposedNewVersion.minor,
+                    versionPatch: proposedNewVersion.patch
+                };
+
+                await transaction
+                    .getCustomRepository(PackageRepository)
+                    .updatePackageReadmeVectors(identifier, value.readmeFile);
+
+                if (value.readmeFile)
+                    await PackageFileStorageService.INSTANCE.writeReadmeFile(versionIdentifier, value.readmeFile);
+
+                if (value.licenseFile)
+                    await PackageFileStorageService.INSTANCE.writeLicenseFile(versionIdentifier, value.licenseFile);
+
+                if (value.packageFile)
+                    await PackageFileStorageService.INSTANCE.writePackageFile(versionIdentifier, value.packageFile);
 
                 const ALIAS = "findVersion";
                 const recalledVersion = await transaction
