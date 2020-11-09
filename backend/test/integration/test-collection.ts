@@ -9,7 +9,8 @@ import {
     UpdateCatalogDocument,
     CollectionDocument,
     UpdateCollectionDocument,
-    DisableCollectionDocument
+    DisableCollectionDocument,
+    MyCollectionsDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
@@ -38,6 +39,60 @@ describe("Collection Tests", async () => {
         );
         expect(userAClient).to.exist;
         expect(userBClient).to.exist;
+    });
+
+    it("Should allow user to see own collections", async function () {
+        await userAClient.mutate({
+            mutation: CreateCollectionDocument,
+            variables: {
+                value: {
+                    collectionSlug: "testA-collection",
+                    name: "test a collection",
+                    description: "Short test A"
+                }
+            }
+        });
+
+        await userBClient.mutate({
+            mutation: CreateCollectionDocument,
+            variables: {
+                value: {
+                    collectionSlug: "testB-collection-one",
+                    name: "test b collection",
+                    description: "Short test B"
+                }
+            }
+        });
+
+        await userBClient.mutate({
+            mutation: CreateCollectionDocument,
+            variables: {
+                value: {
+                    collectionSlug: "testB-collection-two",
+                    name: "test b collection",
+                    description: "Short test B"
+                }
+            }
+        });
+
+        let findMyCollectionsA = await userAClient.query({
+            query: MyCollectionsDocument,
+            variables: {
+                offSet: 0,
+                limit: 5
+            }
+        });
+
+        let findMyCollectionsB = await userBClient.query({
+            query: MyCollectionsDocument,
+            variables: {
+                offSet: 0,
+                limit: 5
+            }
+        });
+
+        expect(findMyCollectionsA.data.myCollections.count).to.equal(1);
+        expect(findMyCollectionsB.data.myCollections.count).to.equal(2);
     });
 
     it("Should allow user to create a package", async function () {
