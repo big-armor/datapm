@@ -3,8 +3,9 @@ import { expect } from "chai";
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 import * as fs from "fs";
 import request = require("superagent");
-import { SetMyAvatarImageDocument, SetMyCoverImageDocument } from "./registry-client";
+import { SetMyAvatarImageDocument, SetMyCoverImageDocument, DeleteMeDocument } from "./registry-client";
 import * as crypto from "crypto";
+import { TEMP_STORAGE_URL } from "./setup";
 import { Readable } from "stream";
 
 describe("Image Upload Tests", async () => {
@@ -70,6 +71,16 @@ describe("Image Upload Tests", async () => {
         expect(uploadResult).to.exist;
         expect(uploadResult.errors).to.not.exist;
         expect(uploadResult.data).to.exist;
+
+        expect(
+            fs.existsSync(TEMP_STORAGE_URL.replace("file://", "") + "/user/first-user-username/user_avatar"),
+            "avatar file should be present on file system"
+        ).true;
+
+        expect(
+            fs.existsSync(TEMP_STORAGE_URL.replace("file://", "") + "/user/first-user-username/user_cover"),
+            "cover file should be present on file system"
+        ).true;
     });
 
     it("Download cover image", async function () {
@@ -135,4 +146,22 @@ describe("Image Upload Tests", async () => {
             expect(uploadResult.errors[0].message).to.equal("IMAGE_TOO_LARGE");
         }
     }).timeout(10000);
+
+    it("Remove avatar and cover image file when deleting user", async function () {
+        const response = await userAClient.mutate({
+            mutation: DeleteMeDocument
+        });
+
+        expect(response.errors == null).true;
+
+        expect(
+            fs.existsSync(TEMP_STORAGE_URL.replace("file://", "") + "/user/first-user-username/user_avatar"),
+            "avatar file should be not present"
+        ).false;
+
+        expect(
+            fs.existsSync(TEMP_STORAGE_URL.replace("file://", "") + "/user/first-user-username/user_cover"),
+            "avatar file should be not present"
+        ).false;
+    });
 });

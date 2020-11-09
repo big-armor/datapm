@@ -97,7 +97,6 @@ export const findPackage = async (
 ) => {
     const packageEntity = await context.connection.getCustomRepository(PackageRepository).findPackage({
         identifier,
-        includeActiveOnly: true,
         relations: getGraphQlRelationName(info)
     });
 
@@ -169,7 +168,6 @@ export const updatePackage = async (
         catalogSlug: identifier.catalogSlug,
         packageSlug: identifier.packageSlug,
         packageInput: value,
-        includeActiveOnly: true,
         relations: getGraphQlRelationName(info)
     });
 };
@@ -183,17 +181,14 @@ export const setPackageCoverImage = async (
     return ImageStorageService.INSTANCE.savePackageCoverImage(identifier, image.base64);
 };
 
-export const disablePackage = async (
+export const deletePackage = async (
     _0: any,
     { identifier }: { identifier: PackageIdentifierInput },
     context: AuthenticatedContext,
     info: any
 ) => {
-    // TODO - when we convert to deletes, actually delete the package files
-
-    return context.connection.getCustomRepository(PackageRepository).disablePackage({
-        identifier,
-        relations: getGraphQlRelationName(info)
+    return context.connection.getCustomRepository(PackageRepository).deletePackage({
+        identifier
     });
 };
 

@@ -10,7 +10,7 @@ import {
     CollectionDocument,
     UpdateCollectionDocument,
     SearchCollectionsDocument,
-    DisableCollectionDocument
+    DeleteCollectionDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
@@ -187,7 +187,7 @@ describe("Collection Search Tests", async () => {
 
     it("Delete collection", async function () {
         let response = await userBClient.mutate({
-            mutation: DisableCollectionDocument,
+            mutation: DeleteCollectionDocument,
             variables: {
                 identifier: {
                     collectionSlug: "testB-collection-search"

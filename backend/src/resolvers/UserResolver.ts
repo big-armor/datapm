@@ -111,10 +111,8 @@ export const setMyAvatarImage = async (
     return ImageStorageService.INSTANCE.saveUserAvatarImage(context.me.username, image.base64);
 };
 
-export const disableMe = async (_0: any, {}, context: AuthenticatedContext, info: any) => {
-    return await context.connection.manager.getCustomRepository(UserRepository).markUserActiveStatus({
-        username: context.me.username,
-        active: false,
-        relations: getGraphQlRelationName(info)
+export const deleteMe = async (_0: any, {}, context: AuthenticatedContext, info: any) => {
+    return await context.connection.manager.getCustomRepository(UserRepository).deleteUser({
+        username: context.me.username
     });
 };

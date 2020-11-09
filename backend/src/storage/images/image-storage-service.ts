@@ -97,19 +97,49 @@ export class ImageStorageService {
         return this.readImage(Prefixes.USER + "/" + username, ImageTypes.USER_AVATAR_IMAGE);
     }
 
-    public async readCatalogCoverImage(identifer: CatalogIdentifierInput): Promise<Stream> {
-        return this.readImage(Prefixes.CATALOG + "/" + identifer.catalogSlug, ImageTypes.CATALOG_COVER_IMAGE);
+    public async readCatalogCoverImage(identifier: CatalogIdentifierInput): Promise<Stream> {
+        return this.readImage(Prefixes.CATALOG + "/" + identifier.catalogSlug, ImageTypes.CATALOG_COVER_IMAGE);
     }
 
-    public async readCollectionCoverImage(identifer: CollectionIdentifierInput): Promise<Stream> {
-        return this.readImage(Prefixes.CATALOG + "/" + identifer.collectionSlug, ImageTypes.COLLECTION_COVER_IMAGE);
+    public async readCollectionCoverImage(identifier: CollectionIdentifierInput): Promise<Stream> {
+        return this.readImage(Prefixes.CATALOG + "/" + identifier.collectionSlug, ImageTypes.COLLECTION_COVER_IMAGE);
     }
 
-    public async readPackageCoverImage(identifer: PackageIdentifierInput): Promise<Stream> {
+    public async readPackageCoverImage(identifier: PackageIdentifierInput): Promise<Stream> {
         return this.readImage(
-            Prefixes.PACKAGE + "/" + identifer.catalogSlug + "/" + identifer.packageSlug,
+            Prefixes.PACKAGE + "/" + identifier.catalogSlug + "/" + identifier.packageSlug,
             ImageTypes.PACKAGE_COVER_IMAGE
         );
+    }
+
+    public async deleteUserCoverImage(username: string): Promise<void> {
+        return this.deleteImage(Prefixes.USER + "/" + username, ImageTypes.USER_COVER_IMAGE);
+    }
+
+    public async deleteUserAvatarImage(username: string): Promise<void> {
+        return this.deleteImage(Prefixes.USER + "/" + username, ImageTypes.USER_AVATAR_IMAGE);
+    }
+
+    public async deleteCatalogCoverImage(identifier: CatalogIdentifierInput): Promise<void> {
+        return this.deleteImage(Prefixes.CATALOG + "/" + identifier.catalogSlug, ImageTypes.CATALOG_COVER_IMAGE);
+    }
+
+    public async deleteCollectionCoverImage(identifier: CollectionIdentifierInput): Promise<void> {
+        return this.deleteImage(
+            Prefixes.COLLECTION + "/" + identifier.collectionSlug,
+            ImageTypes.COLLECTION_COVER_IMAGE
+        );
+    }
+
+    public async deletePackageCoverImage(identifier: PackageIdentifierInput): Promise<void> {
+        return this.deleteImage(
+            Prefixes.PACKAGE + "/" + identifier.catalogSlug + "/" + identifier.packageSlug,
+            ImageTypes.PACKAGE_COVER_IMAGE
+        );
+    }
+
+    private async deleteImage(namespace: string, imageId: string): Promise<void> {
+        return this.fileStorageService.deleteFile(namespace, imageId);
     }
 
     private async readImage(namespace: string, imageId: string): Promise<Stream> {

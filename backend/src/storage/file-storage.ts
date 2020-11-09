@@ -27,14 +27,15 @@ export class FileStorage implements DPMStorage {
 
     public deleteItem(namespace: string, itemId: string): Promise<void> {
         const path = this.buildPath(namespace, itemId);
+
+        if (!fs.existsSync(path)) return Promise.resolve();
+
         fs.unlinkSync(path);
         return Promise.resolve();
     }
 
     public async getItem(namespace: string, itemId: string): Promise<Stream> {
         const path = this.buildPath(namespace, itemId);
-
-        console.debug("reading file: " + path);
 
         if (!fs.existsSync(path)) throw new Error("FILE_NOT_FOUND");
 
@@ -47,7 +48,6 @@ export class FileStorage implements DPMStorage {
         this.createItemDirectoryIfMissing(namespace);
         const path = this.buildPath(namespace, itemId);
         const writeStream = fs.createWriteStream(path);
-        console.debug("writing file: " + path);
         return this.streamHelper.copyToStream(byteStream, writeStream, transformer);
     }
 
@@ -68,7 +68,6 @@ export class FileStorage implements DPMStorage {
     private createItemDirectoryIfMissing(namespace: string): void {
         const path = `${this.SCHEMA_URL}/${namespace}`;
         if (!fs.existsSync(path)) {
-            console.debug("creating directory: " + path);
             fs.mkdirSync(path, { recursive: true });
         }
     }

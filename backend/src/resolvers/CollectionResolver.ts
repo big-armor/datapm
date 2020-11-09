@@ -64,16 +64,16 @@ export const setCollectionCoverImage = async (
     return ImageStorageService.INSTANCE.saveCollectionCoverImage(identifier, image.base64);
 };
 
-export const disableCollection = async (
+export const deleteCollection = async (
     _0: any,
     { identifier }: { identifier: CollectionIdentifierInput },
     context: AuthenticatedContext,
     info: any
 ) => {
     const relations = getGraphQlRelationName(info);
-    return context.connection.manager
+    await context.connection.manager
         .getCustomRepository(CollectionRepository)
-        .disableCollection(identifier.collectionSlug, relations);
+        .deleteCollection(identifier.collectionSlug);
 };
 
 export const addPackageToCollection = async (
@@ -90,7 +90,7 @@ export const addPackageToCollection = async (
     const identifier = packageIdentifier;
     const packageEntity = await context.connection
         .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier, includeActiveOnly: true });
+        .findPackageOrFail({ identifier });
 
     await context.connection.manager
         .getCustomRepository(CollectionPackageRepository)
@@ -122,7 +122,7 @@ export const removePackageFromCollection = async (
     const identifier = packageIdentifier;
     const packageEntity = await context.connection
         .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier, includeActiveOnly: true });
+        .findPackageOrFail({ identifier });
 
     await context.connection.manager
         .getCustomRepository(CollectionPackageRepository)

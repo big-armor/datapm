@@ -69,7 +69,7 @@ export async function getMeJwt(jwt: Jwt, manager: EntityManager): Promise<User |
             const userId = jwt.sub;
             const userRepo = manager.getRepository(User);
 
-            const user = await userRepo.findOneOrFail({ where: { id: userId, isActive: true } });
+            const user = await userRepo.findOneOrFail({ where: { id: userId } });
 
             user.lastLogin = new Date();
 

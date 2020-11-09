@@ -14,7 +14,8 @@ import {
     VersionConflict,
     PackageIdentifier,
     CollectionResolvers,
-    CatalogIdentifierInput
+    CatalogIdentifierInput,
+    VersionIdentifierInput
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
@@ -47,7 +48,7 @@ import graphqlFields from "graphql-fields";
 import {
     addPackageToCollection,
     createCollection,
-    disableCollection,
+    deleteCollection,
     findCollectionBySlug,
     findCollectionsForAuthenticatedUser,
     removePackageFromCollection,
@@ -58,7 +59,7 @@ import {
 import { login, logout, verifyEmailAddress } from "./resolvers/AuthResolver";
 import {
     createMe,
-    disableMe,
+    deleteMe,
     setMyAvatarImage,
     setMyCoverImage,
     emailAddressAvailable,
@@ -71,7 +72,7 @@ import { Collection } from "./entity/Collection";
 import {
     catalogPackagesForUser,
     createPackage,
-    disablePackage,
+    deletePackage,
     findPackage,
     findPackageCreator,
     findPackageIdentifier,
@@ -336,7 +337,6 @@ export const resolvers: {
 
             const version = await context.connection.getCustomRepository(VersionRepository).findLatestVersion({
                 identifier: identifier,
-                includeActiveOnly: packageEntity.isActive,
                 relations: getGraphQlRelationName(info)
             });
 
@@ -564,7 +564,7 @@ export const resolvers: {
         updateMyPassword: updateMyPassword,
         setMyCoverImage: setMyCoverImage,
         setMyAvatarImage: setMyAvatarImage,
-        disableMe: disableMe,
+        deleteMe: deleteMe,
 
         // API Keys
         createAPIKey: createAPIKey,
@@ -611,17 +611,21 @@ export const resolvers: {
             await ImageStorageService.INSTANCE.saveCatalogCoverImage(identifier, image.base64);
         },
 
-        disableCatalog: async (_0: any, { identifier }, context: AuthenticatedContext, info: any) => {
-            return context.connection.manager.getCustomRepository(CatalogRepository).disableCatalog({
-                slug: identifier.catalogSlug,
-                relations: getGraphQlRelationName(info)
+        deleteCatalog: async (
+            _0: any,
+            { identifier }: { identifier: CatalogIdentifierInput },
+            context: AuthenticatedContext,
+            info: any
+        ) => {
+            return context.connection.manager.getCustomRepository(CatalogRepository).deleteCatalog({
+                slug: identifier.catalogSlug
             });
         },
 
         createPackage: createPackage,
         updatePackage: updatePackage,
         setPackageCoverImage: setPackageCoverImage,
-        disablePackage: disablePackage,
+        deletePackage: deletePackage,
 
         setPackagePermissions: setPackagePermissions,
         removePackagePermissions: removePackagePermissions,
@@ -629,7 +633,7 @@ export const resolvers: {
         createCollection: createCollection,
         updateCollection: updateCollection,
         setCollectionCoverImage: setCollectionCoverImage,
-        disableCollection: disableCollection,
+        deleteCollection: deleteCollection,
         addPackageToCollection: addPackageToCollection,
         removePackageFromCollection: removePackageFromCollection,
 
@@ -644,7 +648,7 @@ export const resolvers: {
                 // get the latest version
                 const latestVersion = await transaction
                     .getCustomRepository(VersionRepository)
-                    .findLatestVersion({ identifier, includeActiveOnly: true });
+                    .findLatestVersion({ identifier });
 
                 if (latestVersion != null) {
                     const packageFile = await PackageFileStorageService.INSTANCE.readPackageFile({
@@ -734,12 +738,15 @@ export const resolvers: {
             });
         },
 
-        disableVersion: async (_0: any, { identifier }, context: AuthenticatedContext) => {
+        deleteVersion: async (
+            _0: any,
+            { identifier }: { identifier: VersionIdentifierInput },
+            context: AuthenticatedContext
+        ) => {
             await context.connection.manager.nestedTransaction(async (transaction) => {
                 const version = await transaction.getCustomRepository(VersionRepository).findOneOrFail({ identifier });
 
-                version.isActive = false;
-                transaction.save(version);
+                transaction.delete(Version, { id: version.id });
             });
         },
 

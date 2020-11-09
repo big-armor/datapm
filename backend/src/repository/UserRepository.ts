@@ -12,6 +12,8 @@ import { hashPassword } from "../util/PasswordUtil";
 import { Catalog } from "../entity/Catalog";
 import { sendVerifyEmail, smtpConfigured } from "../util/smtpUtil";
 import { ValidationError } from "apollo-server";
+import { ImageStorageService } from "../storage/images/image-storage-service";
+import { CollectionRepository } from "./CollectionRepository";
 // https://stackoverflow.com/a/52097700
 export function isDefined<T>(value: T | undefined | null): value is T {
     return <T>value !== undefined && <T>value !== null;
@@ -39,20 +41,18 @@ SelectQueryBuilder.prototype.filterUserCatalog = function (topLevelAlias: string
 async function getUser({
     username,
     manager,
-    relations = [],
-    includeInactive = false
+    relations = []
 }: {
     username: string;
     catalogId?: number;
     manager: EntityManager;
     relations?: string[];
-    includeInactive?: boolean;
 }): Promise<User | null> {
     const ALIAS = "users";
     let query = manager
         .getRepository(User)
         .createQueryBuilder(ALIAS)
-        .where(includeInactive ? { username: username } : { isActive: true, username: username })
+        .where({ username: username })
         .addRelations(ALIAS, relations);
 
     const val = await query.getOne();
@@ -84,19 +84,16 @@ async function getUserByUserName({
 async function getUserOrFail({
     username,
     manager,
-    relations = [],
-    includeInactive = false
+    relations = []
 }: {
     username: string;
     manager: EntityManager;
     relations?: string[];
-    includeInactive?: boolean;
 }): Promise<User> {
     const user = await getUser({
         username,
         manager,
-        relations,
-        includeInactive
+        relations
     });
     if (!user) throw new Error(`Failed to get user ${username}`);
     return user;
@@ -183,26 +180,16 @@ export class UserRepository extends Repository<User> {
 
     findMe({ id, relations = [] }: { id: number; relations?: string[] }) {
         return this.findOneOrFail({
-            where: { id: id, isActive: true },
+            where: { id: id },
             relations: relations
         });
     }
 
-    async findUser({
-        username,
-        relations = [],
-        includeInactive = false
-    }: {
-        username: string;
-        catalogId?: number;
-        relations?: string[];
-        includeInactive?: boolean;
-    }) {
+    async findUser({ username, relations = [] }: { username: string; catalogId?: number; relations?: string[] }) {
         return getUserOrFail({
             username: username,
             manager: this.manager,
-            relations,
-            includeInactive
+            relations
         });
     }
 
@@ -216,19 +203,9 @@ export class UserRepository extends Repository<User> {
 
     findUsers({ relations = [] }: { relations?: string[] }) {
         const ALIAS = "users";
-        return this.manager
-            .getRepository(User)
-            .createQueryBuilder(ALIAS)
-            .where({ isActive: true })
-            .addRelations(ALIAS, relations)
-            .getMany();
+        return this.manager.getRepository(User).createQueryBuilder(ALIAS).addRelations(ALIAS, relations).getMany();
     }
 
-    /**
-     * Find all users across all catalogs and irrespective of whether
-     * they are active or archived
-     * @param relations joins to follow
-     */
     findAllUsers(relations: string[] = []) {
         const ALIAS = "users";
         return this.manager.getRepository(User).createQueryBuilder(ALIAS).addRelations(ALIAS, relations).getMany();
@@ -263,8 +240,6 @@ export class UserRepository extends Repository<User> {
                 user.createdAt = now;
                 user.updatedAt = now;
 
-                user.isActive = true;
-
                 if (isAdmin(value) && value.isAdmin) {
                     user.isAdmin = value.isAdmin;
                 } else {
@@ -292,8 +267,7 @@ export class UserRepository extends Repository<User> {
                 return getUserOrFail({
                     username: value.username,
                     manager: self.manager,
-                    relations,
-                    includeInactive: isAdmin(value)
+                    relations
                 });
             });
     }
@@ -395,48 +369,38 @@ export class UserRepository extends Repository<User> {
         });
     }
 
-    markUserActiveStatus({
-        username,
-        active,
-        relations = []
-    }: {
-        username: string;
-        active: boolean;
-        relations?: string[];
-    }): Promise<User> {
-        return this.manager.nestedTransaction(async (transaction) => {
-            const user = await getUserByUsernameOrFail({
-                username: username,
-                manager: this.manager
-            });
-
-            // disable the user's catalog
-            transaction.getCustomRepository(CatalogRepository).disableCatalog({ slug: user.username });
-
-            user.isActive = active;
-
-            if (!active) {
-                user.username = user.username + "-DISABLED-" + new Date().getTime();
-                user.emailAddress = user.emailAddress + "-DISABLED-" + new Date().getTime();
-            }
-
-            await transaction.save(user);
-
-            return user;
-        });
-    }
-
-    deleteUser({ username, relations = [] }: { username: string; relations?: string[] }): Promise<User> {
-        const user = getUserByUsernameOrFail({
+    async deleteUser({ username }: { username: string }): Promise<void> {
+        const user = await getUserByUsernameOrFail({
             username: username,
-            manager: this.manager,
-            relations
+            manager: this.manager
         });
 
-        return this.manager.nestedTransaction(async (transaction) => {
+        await this.manager.getCustomRepository(CatalogRepository).deleteCatalog({ slug: username });
+
+        const collections = await this.manager.getCustomRepository(CollectionRepository).findByUser(user.id);
+
+        for (const collection of collections)
+            await this.manager.getCustomRepository(CollectionRepository).deleteCollection(collection.collectionSlug);
+
+        await this.manager.nestedTransaction(async (transaction) => {
             await transaction.delete(User, { username: (await user).username });
-            return user;
         });
+
+        try {
+            await ImageStorageService.INSTANCE.deleteUserAvatarImage(username);
+        } catch (error) {
+            if (error.message == "FILE_NOT_FOUND") return;
+
+            console.error(error.message);
+        }
+
+        try {
+            await ImageStorageService.INSTANCE.deleteUserCoverImage(username);
+        } catch (error) {
+            if (error.message == "FILE_NOT_FOUND") return;
+
+            console.error(error.message);
+        }
     }
 
     removeUserFromCatalog({

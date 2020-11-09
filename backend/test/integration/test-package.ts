@@ -7,7 +7,7 @@ import {
     UpdateCatalogDocument,
     UpdatePackageDocument,
     CreateVersionDocument,
-    DisablePackageDocument,
+    DeletePackageDocument,
     MyPackagesDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
@@ -686,7 +686,7 @@ describe("Package Tests", async () => {
 
     it("User A delete package", async function () {
         let response = await userAClient.mutate({
-            mutation: DisablePackageDocument,
+            mutation: DeletePackageDocument,
             variables: {
                 identifier: {
                     catalogSlug: "testA-packages",
@@ -694,7 +694,6 @@ describe("Package Tests", async () => {
                 }
             }
         });
-
         expect(response.errors == null, "no errors").true;
     });
 

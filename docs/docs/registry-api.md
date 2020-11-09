@@ -87,7 +87,7 @@ mutation createCatalog(value: CreateCatalogInput!): Catalog!
 
 mutation updateCatalog(identifier: CatalogIdentifierInput!, value: UpdateCatalogInput!): Catalog!
 
-mutation disableCatalog(identifier: CatalogIdentifierInput!): Catalog!
+mutation deleteCatalog(identifier: CatalogIdentifierInput!): Catalog!
 ```
 
 ### Object: Packages
@@ -132,7 +132,7 @@ mutation createPackage(value: CreatePackageInput!): Package!
 
 mutation updatePackage(identifier: PackageIdentifierInput!, value: UpdatePackageInput!): Package!
 
-mutation disablePackage(identifier: PackageIdentifierInput!): Package!
+mutation deletePackage(identifier: PackageIdentifierInput!): Package!
 
 mutation setPackagePermissions(identifier: PackageIdentifierInput!, value:SetPackagePermissionInput!): UserPackagePermissions!
 
@@ -180,7 +180,7 @@ mutation createCollection(value: CreateCollectionInput!): Collection!
 
 mutation updateCollection(identifier: CollectionIdentifierInput!, value: UpdateCollectionInput!):Collection!
 
-disableCollection(identifier: CollectionIdentifierInput!): Collection!
+mutation deleteCollection(identifier: CollectionIdentifierInput!): Collection!
 
 ```
 
