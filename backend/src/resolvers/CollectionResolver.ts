@@ -15,6 +15,7 @@ import { getGraphQlRelationName } from "../util/relationNames";
 import { grantAllCollectionPermissionsForUser } from "./UserCollectionPermissionResolver";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { ImageType } from "../storage/images/image-type";
+import { Collection } from "../entity/Collection";
 
 export const createCollection = async (
     _0: any,
@@ -54,6 +55,24 @@ export const updateCollection = async (
 
     const relations = getGraphQlRelationName(info);
     return repository.updateCollection(identifier.collectionSlug, value, relations);
+};
+
+export const myCollections = async (
+    _0: any,
+    { limit, offSet }: { limit: number; offSet: number },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const relations = getGraphQlRelationName(info);
+    const [searchResponse, count] = await context.connection.manager
+        .getCustomRepository(CollectionRepository)
+        .myCollections(context.me, limit, offSet, relations);
+
+    return {
+        hasMore: count - (offSet + limit) > 0,
+        collections: searchResponse,
+        count
+    };
 };
 
 export const setCollectionCoverImage = async (
