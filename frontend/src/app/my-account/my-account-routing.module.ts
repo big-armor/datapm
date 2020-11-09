@@ -21,7 +21,7 @@ const routes: Routes = [
                 component: PackagesComponent
             },
             {
-                path: "activity",
+                path: "collections",
                 component: ActivityComponent
             },
             {

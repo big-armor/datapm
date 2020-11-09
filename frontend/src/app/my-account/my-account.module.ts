@@ -6,7 +6,9 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
 import { MatChipsModule } from "@angular/material/chips";
 import { MatDialogModule } from "@angular/material/dialog";
+import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatIconModule } from "@angular/material/icon";
+import { MatInputModule } from "@angular/material/input";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatTableModule } from "@angular/material/table";
 
@@ -19,6 +21,7 @@ import { DetailsComponent } from "./details/details.component";
 import { EditAccountDialogComponent } from "./edit-account-dialog/edit-account-dialog.component";
 import { EditPasswordDialogComponent } from "./edit-password-dialog/edit-password-dialog.component";
 import { PackagesComponent } from "./packages/packages.component";
+import { DeleteConfirmationComponent } from "./delete-confirmation/delete-confirmation.component";
 
 @NgModule({
     declarations: [
@@ -29,7 +32,8 @@ import { PackagesComponent } from "./packages/packages.component";
         DetailsComponent,
         EditAccountDialogComponent,
         EditPasswordDialogComponent,
-        PackagesComponent
+        PackagesComponent,
+        DeleteConfirmationComponent
     ],
     imports: [
         CommonModule,
@@ -40,7 +44,9 @@ import { PackagesComponent } from "./packages/packages.component";
         MatCardModule,
         MatChipsModule,
         MatDialogModule,
+        MatFormFieldModule,
         MatIconModule,
+        MatInputModule,
         MatSlideToggleModule,
         MatTableModule
     ]
