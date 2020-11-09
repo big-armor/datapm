@@ -50,6 +50,7 @@ import {
     disableCollection,
     findCollectionBySlug,
     findCollectionsForAuthenticatedUser,
+    myCollections,
     removePackageFromCollection,
     searchCollections,
     setCollectionCoverImage,
@@ -427,6 +428,7 @@ export const resolvers: {
         myPackages: myPackages,
         collection: findCollectionBySlug,
         collections: findCollectionsForAuthenticatedUser,
+        myCollections: myCollections,
         searchCollections: searchCollections,
 
         autoComplete: async (_0: any, { startsWith }, context: AuthenticatedContext, info: any) => {
