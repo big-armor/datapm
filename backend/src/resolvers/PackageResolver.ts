@@ -12,7 +12,7 @@ import { UserRepository } from "../repository/UserRepository";
 import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 import { ImageStorageService } from "../storage/images/image-storage-service";
-import { ImageType } from "../storage/images/image-type";
+import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
 
 export const myPackages = async (
     _0: any,
@@ -180,16 +180,7 @@ export const setPackageCoverImage = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const uploadedImage = await image;
-    const packageEntity = await context.connection
-        .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier });
-    await ImageStorageService.INSTANCE.saveImage(
-        packageEntity.id,
-        uploadedImage,
-        ImageType.PACKAGE_COVER_IMAGE,
-        context
-    );
+    return ImageStorageService.INSTANCE.savePackageCoverImage(identifier, image.base64);
 };
 
 export const disablePackage = async (
@@ -198,6 +189,8 @@ export const disablePackage = async (
     context: AuthenticatedContext,
     info: any
 ) => {
+    // TODO - when we convert to deletes, actually delete the package files
+
     return context.connection.getCustomRepository(PackageRepository).disablePackage({
         identifier,
         relations: getGraphQlRelationName(info)

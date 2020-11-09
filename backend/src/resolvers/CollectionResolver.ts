@@ -14,7 +14,6 @@ import { PackageRepository } from "../repository/PackageRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { grantAllCollectionPermissionsForUser } from "./UserCollectionPermissionResolver";
 import { ImageStorageService } from "../storage/images/image-storage-service";
-import { ImageType } from "../storage/images/image-type";
 
 export const createCollection = async (
     _0: any,
@@ -62,16 +61,7 @@ export const setCollectionCoverImage = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const uploadedImage = await image;
-    const collectionEntity = await context.connection
-        .getCustomRepository(CollectionRepository)
-        .findCollectionBySlugOrFail(identifier.collectionSlug);
-    await ImageStorageService.INSTANCE.saveImage(
-        collectionEntity.id,
-        uploadedImage,
-        ImageType.COLLECTION_COVER_IMAGE,
-        context
-    );
+    return ImageStorageService.INSTANCE.saveCollectionCoverImage(identifier, image.base64);
 };
 
 export const disableCollection = async (

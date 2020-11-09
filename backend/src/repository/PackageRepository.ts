@@ -17,6 +17,7 @@ import { CatalogRepository } from "./CatalogRepository";
 import { VersionRepository } from "./VersionRepository";
 import { allPermissions } from "../util/PermissionsUtil";
 import { User } from "../entity/User";
+import { UserInputError } from "apollo-server";
 
 const PUBLIC_PACKAGES_QUERY = '("Package"."isPublic" is true)';
 const AUTHENTICATED_USER_PACKAGES_QUERY = `(("Package"."isPublic" is false and "Package"."catalog_id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId))
@@ -79,9 +80,9 @@ function validation(packageEntity: Package) {
 async function setPackageDisabled(packageEntity: Package, transaction: EntityManager) {
     const versions = await transaction
         .getCustomRepository(VersionRepository)
-        .findVersions({ packageId: packageEntity.id });
+        .findVersions({ packageId: packageEntity.id, relations: ["package", "package.catalog"] });
 
-    transaction.getCustomRepository(VersionRepository).disableVersions(versions);
+    await transaction.getCustomRepository(VersionRepository).disableVersions(versions);
 
     packageEntity.isActive = false;
     packageEntity.slug = packageEntity.slug + "-DISABLED-" + new Date().getTime();
@@ -336,6 +337,30 @@ export class PackageRepository {
         });
     }
 
+    async updatePackageReadmeVectors(identifier: PackageIdentifierInput, readmeFile: string | null | undefined) {
+        await this.manager.nestedTransaction(async (transaction) => {
+            const packageEntity = await findPackage(
+                transaction,
+                identifier.catalogSlug,
+                identifier.packageSlug,
+                false,
+                []
+            );
+
+            if (packageEntity == null) throw new UserInputError("PACKAGE_NOT_FOUND");
+
+            if (readmeFile)
+                return transaction.query('UPDATE "package" SET readme_file_vectors = to_tsvector($1) WHERE id = $2', [
+                    readmeFile,
+                    packageEntity.id
+                ]);
+            else
+                return transaction.query('UPDATE "package" SET readme_file_vectors = NULL WHERE id = $1', [
+                    packageEntity.id
+                ]);
+        });
+    }
+
     async disablePackage({
         identifier,
         relations = []
@@ -355,7 +380,7 @@ export class PackageRepository {
                 throw new Error(`Could not find Package  ${catalogSlug}/${packageSlug}`);
             }
 
-            setPackageDisabled(packageEntity, transaction);
+            await setPackageDisabled(packageEntity, transaction);
 
             await transaction.save(packageEntity);
 
@@ -375,7 +400,7 @@ export class PackageRepository {
         return this.manager.nestedTransaction(async (transaction) => {
             const returnValue: Package[] = [];
             packages.forEach(async (p) => {
-                setPackageDisabled(p, transaction);
+                await setPackageDisabled(p, transaction);
                 returnValue.push(await transaction.save(p));
             });
 
@@ -418,7 +443,7 @@ export class PackageRepository {
         const ALIAS = "search";
         return this.createQueryBuilderWithUserConditions(user)
             .andWhere(
-                `(displayName_tokens @@ to_tsquery(:query) OR description_tokens @@ to_tsquery(:query) OR slug LIKE :queryLike)`,
+                `(readme_file_vectors @@ to_tsquery(:query) OR displayName_tokens @@ to_tsquery(:query) OR description_tokens @@ to_tsquery(:query) OR slug LIKE :queryLike)`,
                 {
                     query,
                     queryLike: query + "%"

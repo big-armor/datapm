@@ -327,8 +327,9 @@ describe("Package Tests", async () => {
 
     it("User A publish first version", async function () {
         let packageFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json", "utf8");
+        let readmeFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.README.md", "utf8");
+        let licenseFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.LICENSE.md", "utf8");
 
-        let hash = crypto.createHash("sha256").update(packageFileContents, "utf8").digest("hex");
         let response = await userAClient.mutate({
             mutation: CreateVersionDocument,
             variables: {
@@ -337,7 +338,9 @@ describe("Package Tests", async () => {
                     packageSlug: "new-package-slug"
                 },
                 value: {
-                    packageFile: packageFileContents
+                    packageFile: packageFileContents,
+                    licenseFile: licenseFileContents,
+                    readmeFile: readmeFileContents
                 }
             }
         });
@@ -350,7 +353,10 @@ describe("Package Tests", async () => {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("7b099af18acd06ce94b3e13dcb1feb0a6637764b2cc4b6cac27e52f8267caf16");
+        expect(responseHash).equal("a408ed82946e088eec17f92775e67013e877a0dd0aed6d4d10ef2d1c79d14cc8");
+
+        expect(response.data!.createVersion.readmeFile!).includes("This is where a readme might go");
+        expect(response.data!.createVersion.licenseFile!).includes("This is not a real license. Just a test.");
     });
 
     it("Anonymous get package file", async function () {
@@ -380,7 +386,7 @@ describe("Package Tests", async () => {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("7b099af18acd06ce94b3e13dcb1feb0a6637764b2cc4b6cac27e52f8267caf16");
+        expect(responseHash).equal("a408ed82946e088eec17f92775e67013e877a0dd0aed6d4d10ef2d1c79d14cc8");
     });
 
     it("User A publish second version - fail no changes", async function () {
@@ -690,7 +696,6 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").true;
-        expect(response.data!.disablePackage.identifier.packageSlug.startsWith("new-package-slug-DISABLED-")).true;
     });
 
     it("Anonymous User get Package", async function () {
