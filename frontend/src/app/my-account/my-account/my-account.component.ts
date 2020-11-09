@@ -1,11 +1,10 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
-import { Router } from "@angular/router";
+import { ActivatedRoute, ParamMap, Router } from "@angular/router";
 import { FormGroup, FormControl } from "@angular/forms";
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { AuthenticationService } from "../../services/authentication.service";
 import { APIKey, Catalog, User } from "src/generated/graphql";
-import { EditAccountDialogComponent } from "../edit-account-dialog/edit-account-dialog.component";
-import { takeUntil } from "rxjs/operators";
+import { takeUntil, take } from "rxjs/operators";
 import { Subject } from "rxjs";
 
 enum State {
@@ -15,6 +14,13 @@ enum State {
     SUCCESS,
     ERROR_NOT_UNIQUE
 }
+
+const routeMap = {
+    packages: 1,
+    collections: 2,
+    catalogs: 3
+};
+
 @Component({
     selector: "app-my-account",
     templateUrl: "./my-account.component.html",
@@ -44,6 +50,7 @@ export class MyAccountComponent implements OnInit, OnDestroy {
     constructor(
         private authenticationService: AuthenticationService,
         private router: Router,
+        private route: ActivatedRoute,
         public dialog: MatDialog
     ) {
         let prefix = "/me";
@@ -53,10 +60,13 @@ export class MyAccountComponent implements OnInit, OnDestroy {
             { linkName: "My Collections", url: prefix + "/collections" },
             { linkName: "My Catalogs", url: prefix + "/catalogs" }
         ];
+
+        this.route.url.pipe(take(1)).subscribe(() => {
+            this.selectedTab = routeMap[route.snapshot.firstChild.routeConfig.path] || 0;
+        });
     }
 
     ngOnInit(): void {
-        this.selectTab(0);
         this.state = State.INIT;
 
         this.createAPIKeyForm = new FormGroup({

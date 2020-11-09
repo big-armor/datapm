@@ -45,7 +45,6 @@ export class CatalogsComponent implements OnInit {
                     return;
                 }
                 this.myCatalogs = response.data.myCatalogs;
-                console.log(this.myCatalogs);
                 this.catalogState = State.SUCCESS;
             });
     }
