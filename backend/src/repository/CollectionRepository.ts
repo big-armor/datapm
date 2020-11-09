@@ -49,6 +49,19 @@ export class CollectionRepository extends Repository<Collection> {
         return this.save(collectionIdDb);
     }
 
+    public async myCollections(
+        user: User,
+        limit: number,
+        offSet: number,
+        relations?: string[]
+    ): Promise<[Collection[], number]> {
+        return this.createQueryBuilder()
+            .where("creator_id = :userId", { userId: user.id })
+            .limit(limit)
+            .offset(offSet)
+            .getManyAndCount();
+    }
+
     public async disableCollection(collectionSlug: String, relations?: string[]): Promise<Collection> {
         const collectionIdDb = await this.findCollectionBySlugOrFail(collectionSlug, relations);
         collectionIdDb.isActive = false;
