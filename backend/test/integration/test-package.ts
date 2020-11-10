@@ -208,7 +208,7 @@ describe("Package Tests", async () => {
             variables: {
                 identifier: {
                     catalogSlug: "testA-packages",
-                    packageSlug: "congressional-legislators"
+                    packageSlug: "new-package-slug"
                 }
             }
         });

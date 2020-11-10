@@ -1,6 +1,7 @@
 import { ApolloError, ValidationError } from "apollo-server";
 import { AuthenticatedContext } from "../context";
 import {
+    Base64ImageUpload,
     CollectionIdentifierInput,
     CollectionPackage,
     CreateCollectionInput,
@@ -57,7 +58,7 @@ export const updateCollection = async (
 
 export const setCollectionCoverImage = async (
     _0: any,
-    { identifier, image }: { identifier: CollectionIdentifierInput; image: any },
+    { identifier, image }: { identifier: CollectionIdentifierInput; image: Base64ImageUpload },
     context: AuthenticatedContext,
     info: any
 ) => {

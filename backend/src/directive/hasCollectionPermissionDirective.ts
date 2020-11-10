@@ -1,7 +1,14 @@
 import { SchemaDirectiveVisitor, ForbiddenError, ApolloError } from "apollo-server";
-import { GraphQLObjectType, GraphQLField, defaultFieldResolver } from "graphql";
+import {
+    GraphQLObjectType,
+    GraphQLField,
+    defaultFieldResolver,
+    GraphQLArgument,
+    GraphQLInterfaceType,
+    EnumValueNode
+} from "graphql";
 import { AuthenticatedContext } from "../context";
-import { Permission } from "../generated/graphql";
+import { CollectionIdentifierInput, Permission } from "../generated/graphql";
 import { CollectionRepository } from "../repository/CollectionRepository";
 import { hasCollectionPermissions } from "../resolvers/UserCollectionPermissionResolver";
 
@@ -13,9 +20,29 @@ export class HasCollectionPermissionDirective extends SchemaDirectiveVisitor {
         }
     }
 
+    visitArgumentDefinition(
+        argument: GraphQLArgument,
+        details: {
+            field: GraphQLField<any, any>;
+            objectType: GraphQLObjectType | GraphQLInterfaceType;
+        }
+    ): GraphQLArgument | void | null {
+        const { resolve = defaultFieldResolver } = details.field;
+        const self = this;
+        const permission = (argument
+            .astNode!.directives!.find((d) => d.name.value == "hasCollectionPermission")!
+            .arguments!.find((a) => a.name.value == "permission")!.value as EnumValueNode).value as Permission;
+        details.field.resolve = async function (source, args, context: AuthenticatedContext, info) {
+            const identifier: CollectionIdentifierInput = args[argument.name];
+            await self.validatePermission(context, identifier, permission);
+            return resolve.apply(this, [source, args, context, info]);
+        };
+    }
+
     public visitFieldDefinition(field: GraphQLField<any, any>): void {
         const { resolve = defaultFieldResolver } = field;
         const permission: Permission = this.args.permission;
+        const self = this;
         field.resolve = async (source, args, context: AuthenticatedContext, info) => {
             const collectionSlug: string | undefined =
                 args.collectionSlug ||
@@ -28,19 +55,27 @@ export class HasCollectionPermissionDirective extends SchemaDirectiveVisitor {
                 throw new ApolloError("COLLECTION_SLUG_REQUIRED");
             }
 
-            const collection = await context.connection
-                .getCustomRepository(CollectionRepository)
-                .findCollectionBySlugOrFail(collectionSlug);
-            if (permission == Permission.VIEW && collection.isPublic) {
-                return resolve.apply(this, [source, args, context, info]);
-            }
-
-            const hasRequiredPermission = await hasCollectionPermissions(context, collection.id, permission);
-            if (!hasRequiredPermission) {
-                throw new ForbiddenError(`NOT_AUTHORIZED`);
-            }
+            await self.validatePermission(context, { collectionSlug }, permission);
 
             return resolve.apply(this, [source, args, context, info]);
         };
+    }
+
+    async validatePermission(
+        context: AuthenticatedContext,
+        identifier: CollectionIdentifierInput,
+        permission: Permission
+    ) {
+        const collection = await context.connection
+            .getCustomRepository(CollectionRepository)
+            .findCollectionBySlugOrFail(identifier.collectionSlug);
+        if (permission == Permission.VIEW && collection.isPublic) {
+            return;
+        }
+
+        const hasRequiredPermission = await hasCollectionPermissions(context, collection.id, permission);
+        if (!hasRequiredPermission) {
+            throw new ForbiddenError(`NOT_AUTHORIZED`);
+        }
     }
 }

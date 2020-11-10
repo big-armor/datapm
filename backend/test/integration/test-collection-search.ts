@@ -80,6 +80,22 @@ describe("Collection Search Tests", async () => {
         expect(response.errors == null, "no errors").true;
     });
 
+    it("User A make catalog public", async function () {
+        let response = await userAClient.mutate({
+            mutation: UpdateCatalogDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-collection-search"
+                },
+                value: {
+                    isPublic: true
+                }
+            }
+        });
+
+        expect(response.errors == null, "no errors").true;
+    });
+
     it("User B create a collection", async function () {
         let response = await userBClient.mutate({
             mutation: CreateCollectionDocument,

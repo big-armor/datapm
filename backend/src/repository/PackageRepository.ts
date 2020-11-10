@@ -334,8 +334,7 @@ export class PackageRepository {
 
         await this.manager.getCustomRepository(VersionRepository).deleteVersions(versions);
         await this.manager.nestedTransaction(async (transaction) => {
-            const ALIAS = "package";
-            transaction.delete(Package, { id: packageEntity.id });
+            await transaction.delete(Package, { id: packageEntity.id });
         });
 
         await ImageStorageService.INSTANCE.deletePackageCoverImage({
@@ -345,9 +344,14 @@ export class PackageRepository {
     }
 
     async deletePackages({ packages }: { packages: Package[] }): Promise<void> {
-        packages.forEach(async (p) => {
-            await this.deletePackage(p);
-        });
+        for (const p of packages) {
+            await this.deletePackage({
+                identifier: {
+                    catalogSlug: p.catalog.slug,
+                    packageSlug: p.slug
+                }
+            });
+        }
     }
 
     async autocomplete({

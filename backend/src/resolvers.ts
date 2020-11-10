@@ -15,7 +15,8 @@ import {
     PackageIdentifier,
     CollectionResolvers,
     CatalogIdentifierInput,
-    VersionIdentifierInput
+    VersionIdentifierInput,
+    Base64ImageUpload
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
@@ -570,10 +571,10 @@ export const resolvers: {
         createAPIKey: createAPIKey,
         deleteAPIKey: deleteAPIKey,
 
-        removeUserFromCatalog: async (_0: any, { username, catalogSlug }, context: AuthenticatedContext, info: any) => {
+        removeUserFromCatalog: async (_0: any, { username, identifier }, context: AuthenticatedContext, info: any) => {
             const catalog = await context.connection.manager
                 .getCustomRepository(CatalogRepository)
-                .findCatalogBySlug({ slug: catalogSlug });
+                .findCatalogBySlug({ slug: identifier.catalogSlug });
 
             if (catalog === undefined) {
                 throw new UserInputError("CATALOG_NOT_FOUND");
@@ -604,7 +605,7 @@ export const resolvers: {
 
         setCatalogCoverImage: async (
             _0: any,
-            { identifier, image }: { identifier: CatalogIdentifierInput; image: any },
+            { identifier, image }: { identifier: CatalogIdentifierInput; image: Base64ImageUpload },
             context: AuthenticatedContext,
             info: any
         ) => {

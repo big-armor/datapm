@@ -4,7 +4,13 @@ import { AuthenticatedContext } from "../context";
 import { Catalog } from "../entity/Catalog";
 import { Collection } from "../entity/Collection";
 import { Package } from "../entity/Package";
-import { CreatePackageInput, PackageIdentifierInput, Permission, UpdatePackageInput } from "../generated/graphql";
+import {
+    Base64ImageUpload,
+    CreatePackageInput,
+    PackageIdentifierInput,
+    Permission,
+    UpdatePackageInput
+} from "../generated/graphql";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { PackageRepository } from "../repository/PackageRepository";
@@ -174,7 +180,7 @@ export const updatePackage = async (
 
 export const setPackageCoverImage = async (
     _0: any,
-    { identifier, image }: { identifier: PackageIdentifierInput; image: any },
+    { identifier, image }: { identifier: PackageIdentifierInput; image: Base64ImageUpload },
     context: AuthenticatedContext,
     info: any
 ) => {

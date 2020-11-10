@@ -201,8 +201,9 @@ export class CatalogRepository extends Repository<Catalog> {
             .getRepository(Package)
             .createQueryBuilder(ALIAS)
             .where({ catalogId: catalog.id })
+            .addRelations(ALIAS, ["catalog"])
             .getMany();
-        // set all packages false
+
         await this.manager.getCustomRepository(PackageRepository).deletePackages({ packages: packages });
 
         await this.manager.nestedTransaction(async (transaction) => {
