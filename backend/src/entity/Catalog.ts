@@ -27,9 +27,6 @@ export class Catalog extends BaseModel {
     @Column({ type: "text", nullable: true })
     description: string | null;
 
-    @Column({ nullable: false, default: true })
-    isActive: boolean;
-
     @OneToMany(() => UserCatalogPermission, (userCatalogPermission) => userCatalogPermission.catalog, { cascade: true })
     userPermissions: UserCatalogPermission[];
 

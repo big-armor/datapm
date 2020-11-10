@@ -44,9 +44,6 @@ export class Package extends BaseModel {
     @Column({ name: "catalog_id" })
     catalogId: number;
 
-    @Column({ nullable: false, default: true })
-    isActive: boolean;
-
     @Column({ nullable: false, default: false })
     isPublic: boolean;
 

@@ -9,6 +9,7 @@ import { PackageFileStorageService } from "../storage/packages/package-file-stor
 
 @EntityRepository()
 export class VersionRepository {
+    readonly packageFileStorageService = PackageFileStorageService.INSTANCE;
     constructor(private manager: EntityManager) {}
 
     async save(userId: number, identifier: PackageIdentifierInput, value: CreateVersionInput) {
@@ -36,18 +37,14 @@ export class VersionRepository {
 
     async findLatestVersion({
         identifier,
-        includeActiveOnly,
         relations = []
     }: {
         identifier: PackageIdentifierInput;
-        includeActiveOnly: boolean;
         relations?: string[];
     }): Promise<Maybe<Version>> {
         const ALIAS = "findLatestVersion";
 
-        const packageRef = await this.manager
-            .getCustomRepository(PackageRepository)
-            .findPackageOrFail({ identifier, includeActiveOnly });
+        const packageRef = await this.manager.getCustomRepository(PackageRepository).findPackageOrFail({ identifier });
 
         return this.manager
             .getRepository(Version)
@@ -95,14 +92,14 @@ export class VersionRepository {
         const versions = await this.manager
             .getRepository(Version)
             .createQueryBuilder(ALIAS)
-            .where({ packageId, isActive: true })
+            .where({ packageId })
             .addRelations(ALIAS, relations)
             .getMany();
 
         return versions;
     }
 
-    async disableVersions(versions: Version[]) {
+    async deleteVersions(versions: Version[]): Promise<void> {
         if (versions.length == 0) return;
 
         for (const version of versions) {
@@ -114,7 +111,7 @@ export class VersionRepository {
                 versionPatch: version.patchVersion
             };
             try {
-                await PackageFileStorageService.INSTANCE.deletePackageFile(versionIdentifier);
+                await this.packageFileStorageService.deletePackageFile(versionIdentifier);
             } catch (error) {
                 if (error.message.includes("ENOENT")) return;
 
@@ -122,7 +119,7 @@ export class VersionRepository {
             }
 
             try {
-                await PackageFileStorageService.INSTANCE.deleteLicenseFile(versionIdentifier);
+                await this.packageFileStorageService.deleteLicenseFile(versionIdentifier);
             } catch (error) {
                 if (error.message.includes("ENOENT")) return;
 
@@ -130,7 +127,7 @@ export class VersionRepository {
             }
 
             try {
-                await PackageFileStorageService.INSTANCE.deleteReadmeFile(versionIdentifier);
+                await this.packageFileStorageService.deleteReadmeFile(versionIdentifier);
             } catch (error) {
                 if (error.message.includes("ENOENT")) return;
 
@@ -139,14 +136,7 @@ export class VersionRepository {
         }
 
         await this.manager.nestedTransaction(async (transaction) => {
-            await transaction
-                .createQueryBuilder()
-                .update(Version)
-                .set({
-                    isActive: false
-                })
-                .whereInIds(versions.map((v) => v.id))
-                .execute();
+            for (const version of versions) await transaction.delete(Version, { id: version.id });
         });
     }
 }

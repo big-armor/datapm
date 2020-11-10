@@ -1,6 +1,7 @@
 import { ApolloError, ValidationError } from "apollo-server";
 import { AuthenticatedContext } from "../context";
 import {
+    Base64ImageUpload,
     CollectionIdentifierInput,
     CollectionPackage,
     CreateCollectionInput,
@@ -57,23 +58,23 @@ export const updateCollection = async (
 
 export const setCollectionCoverImage = async (
     _0: any,
-    { identifier, image }: { identifier: CollectionIdentifierInput; image: any },
+    { identifier, image }: { identifier: CollectionIdentifierInput; image: Base64ImageUpload },
     context: AuthenticatedContext,
     info: any
 ) => {
     return ImageStorageService.INSTANCE.saveCollectionCoverImage(identifier, image.base64);
 };
 
-export const disableCollection = async (
+export const deleteCollection = async (
     _0: any,
     { identifier }: { identifier: CollectionIdentifierInput },
     context: AuthenticatedContext,
     info: any
 ) => {
     const relations = getGraphQlRelationName(info);
-    return context.connection.manager
+    await context.connection.manager
         .getCustomRepository(CollectionRepository)
-        .disableCollection(identifier.collectionSlug, relations);
+        .deleteCollection(identifier.collectionSlug);
 };
 
 export const addPackageToCollection = async (
@@ -90,7 +91,7 @@ export const addPackageToCollection = async (
     const identifier = packageIdentifier;
     const packageEntity = await context.connection
         .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier, includeActiveOnly: true });
+        .findPackageOrFail({ identifier });
 
     await context.connection.manager
         .getCustomRepository(CollectionPackageRepository)
@@ -122,7 +123,7 @@ export const removePackageFromCollection = async (
     const identifier = packageIdentifier;
     const packageEntity = await context.connection
         .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier, includeActiveOnly: true });
+        .findPackageOrFail({ identifier });
 
     await context.connection.manager
         .getCustomRepository(CollectionPackageRepository)

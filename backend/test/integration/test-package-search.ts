@@ -3,7 +3,7 @@ import { expect } from "chai";
 import {
     CreatePackageDocument,
     UpdatePackageDocument,
-    DisablePackageDocument,
+    DeletePackageDocument,
     SearchPackagesDocument,
     CreateVersionDocument
 } from "./registry-client";
@@ -186,7 +186,7 @@ describe("Package Search Tests", async () => {
 
     it("User A delete package", async function () {
         let response = await userAClient.mutate({
-            mutation: DisablePackageDocument,
+            mutation: DeletePackageDocument,
             variables: {
                 identifier: {
                     catalogSlug: "testA-packages-search",

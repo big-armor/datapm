@@ -8,7 +8,6 @@ import { BaseModel } from "./BaseModel";
 @Index("name")
 @Index("slug")
 @Index("isPublic")
-@Index("isActive")
 @Index("isRecommended")
 export class Collection extends BaseModel {
     @PrimaryGeneratedColumn({ name: "id", type: "integer" })
@@ -25,9 +24,6 @@ export class Collection extends BaseModel {
 
     @Column({ name: "is_public", nullable: false, default: false })
     public isPublic: boolean;
-
-    @Column({ name: "is_active", nullable: false, default: true })
-    public isActive: boolean;
 
     @Column({ name: "is_recommended", nullable: false, default: false })
     public isRecommended: boolean;

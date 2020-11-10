@@ -1,12 +1,4 @@
-import {
-    EntityRepository,
-    EntityManager,
-    Like,
-    Brackets,
-    SelectQueryBuilder,
-    FindOneOptions,
-    FindConditions
-} from "typeorm";
+import { EntityRepository, EntityManager, FindOneOptions } from "typeorm";
 
 import { CreatePackageInput, UpdatePackageInput, PackageIdentifierInput, Permission } from "../generated/graphql";
 import { Package } from "../entity/Package";
@@ -18,6 +10,7 @@ import { VersionRepository } from "./VersionRepository";
 import { allPermissions } from "../util/PermissionsUtil";
 import { User } from "../entity/User";
 import { UserInputError } from "apollo-server";
+import { ImageStorageService } from "../storage/images/image-storage-service";
 
 const PUBLIC_PACKAGES_QUERY = '("Package"."isPublic" is true)';
 const AUTHENTICATED_USER_PACKAGES_QUERY = `(("Package"."isPublic" is false and "Package"."catalog_id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId))
@@ -33,7 +26,7 @@ async function findPackageById(
     const packageEntity = await manager
         .getRepository(Package)
         .createQueryBuilder(ALIAS)
-        .where({ id: packageId, isActive: true })
+        .where({ id: packageId })
         .addRelations(ALIAS, relations)
         .getOne();
 
@@ -44,7 +37,6 @@ async function findPackage(
     manager: EntityManager,
     catalogSlug: string,
     packageSlug: string,
-    includeActiveOnly: boolean,
     relations: string[]
 ): Promise<Package | null> {
     const ALIAS = "package";
@@ -55,8 +47,6 @@ async function findPackage(
         where: { catalogId: catalog.id, slug: packageSlug },
         relations: relations
     };
-
-    if (includeActiveOnly) (options.where! as FindConditions<Package>).isActive = true;
 
     const packageEntity = await manager.getRepository(Package).findOne(options);
 
@@ -75,17 +65,6 @@ function validation(packageEntity: Package) {
     ) {
         throw new Error("You should type the name or package file number at least.");
     }
-}
-
-async function setPackageDisabled(packageEntity: Package, transaction: EntityManager) {
-    const versions = await transaction
-        .getCustomRepository(VersionRepository)
-        .findVersions({ packageId: packageEntity.id, relations: ["package", "package.catalog"] });
-
-    await transaction.getCustomRepository(VersionRepository).disableVersions(versions);
-
-    packageEntity.isActive = false;
-    packageEntity.slug = packageEntity.slug + "-DISABLED-" + new Date().getTime();
 }
 
 @EntityRepository()
@@ -176,18 +155,15 @@ export class PackageRepository {
 
     async findPackage({
         identifier,
-        includeActiveOnly,
         relations = []
     }: {
         identifier: PackageIdentifierInput;
-        includeActiveOnly: boolean;
         relations?: string[];
     }): Promise<Package | null> {
         const packageEntity = await findPackage(
             this.manager,
             identifier.catalogSlug,
             identifier.packageSlug,
-            includeActiveOnly,
             relations
         );
 
@@ -196,14 +172,12 @@ export class PackageRepository {
 
     async findPackageOrFail({
         identifier,
-        includeActiveOnly = false,
         relations = []
     }: {
         identifier: PackageIdentifierInput;
-        includeActiveOnly?: boolean;
         relations?: string[];
     }): Promise<Package> {
-        const packageEntity = await this.findPackage({ identifier, includeActiveOnly, relations });
+        const packageEntity = await this.findPackage({ identifier, relations });
 
         if (packageEntity == null) throw new Error("PACKAGE_NOT_FOUND");
 
@@ -215,7 +189,7 @@ export class PackageRepository {
         let query = this.manager
             .getRepository(Package)
             .createQueryBuilder(PRODUCTS_ALIAS)
-            .where({ catalogId: catalogId, isActive: true });
+            .where({ catalogId: catalogId });
 
         return query.getMany();
     }
@@ -251,7 +225,6 @@ export class PackageRepository {
             packageEntity.createdAt = new Date();
             packageEntity.updatedAt = new Date();
             packageEntity.creatorId = userId;
-            packageEntity.isActive = true;
 
             validation(packageEntity);
 
@@ -280,25 +253,17 @@ export class PackageRepository {
         catalogSlug,
         packageSlug,
         packageInput,
-        includeActiveOnly,
         relations = []
     }: {
         catalogSlug: string;
         packageSlug: string;
         packageInput: UpdatePackageInput;
-        includeActiveOnly: boolean;
         relations?: string[];
     }): Promise<Package> {
         return this.manager.nestedTransaction(async (transaction) => {
             const ALIAS = "package";
 
-            const packageEntity = await findPackage(
-                transaction,
-                catalogSlug,
-                packageSlug,
-                includeActiveOnly,
-                relations
-            );
+            const packageEntity = await findPackage(transaction, catalogSlug, packageSlug, relations);
 
             if (packageEntity === null) {
                 throw new Error("PACKAGE_NOT_FOUND");
@@ -339,13 +304,7 @@ export class PackageRepository {
 
     async updatePackageReadmeVectors(identifier: PackageIdentifierInput, readmeFile: string | null | undefined) {
         await this.manager.nestedTransaction(async (transaction) => {
-            const packageEntity = await findPackage(
-                transaction,
-                identifier.catalogSlug,
-                identifier.packageSlug,
-                false,
-                []
-            );
+            const packageEntity = await findPackage(transaction, identifier.catalogSlug, identifier.packageSlug, []);
 
             if (packageEntity == null) throw new UserInputError("PACKAGE_NOT_FOUND");
 
@@ -361,51 +320,38 @@ export class PackageRepository {
         });
     }
 
-    async disablePackage({
-        identifier,
-        relations = []
-    }: {
-        identifier: PackageIdentifierInput;
-        relations?: string[];
-    }): Promise<Package> {
-        const package_ = await this.manager.nestedTransaction(async (transaction) => {
-            const ALIAS = "package";
+    async deletePackage({ identifier }: { identifier: PackageIdentifierInput }): Promise<void> {
+        const catalogSlug = identifier.catalogSlug;
+        const packageSlug = identifier.packageSlug;
+        const packageEntity = await findPackage(this.manager, catalogSlug, packageSlug, ["versions", "catalog"]);
+        if (!packageEntity) {
+            throw new Error(`Could not find Package  ${catalogSlug}/${packageSlug}`);
+        }
 
-            const catalogSlug = identifier.catalogSlug;
-            const packageSlug = identifier.packageSlug;
+        const versions = await this.manager
+            .getCustomRepository(VersionRepository)
+            .findVersions({ packageId: packageEntity.id, relations: ["package", "package.catalog"] });
 
-            const packageEntity = await findPackage(transaction, catalogSlug, packageSlug, false, relations);
-
-            if (!packageEntity) {
-                throw new Error(`Could not find Package  ${catalogSlug}/${packageSlug}`);
-            }
-
-            await setPackageDisabled(packageEntity, transaction);
-
-            await transaction.save(packageEntity);
-
-            return packageEntity;
+        await this.manager.getCustomRepository(VersionRepository).deleteVersions(versions);
+        await this.manager.nestedTransaction(async (transaction) => {
+            await transaction.delete(Package, { id: packageEntity.id });
         });
 
-        return package_;
+        await ImageStorageService.INSTANCE.deletePackageCoverImage({
+            catalogSlug: packageEntity.catalog.slug,
+            packageSlug: packageEntity.slug
+        });
     }
 
-    async disablePackages({
-        packages,
-        relations = []
-    }: {
-        packages: Package[];
-        relations?: string[];
-    }): Promise<Package[]> {
-        return this.manager.nestedTransaction(async (transaction) => {
-            const returnValue: Package[] = [];
-            packages.forEach(async (p) => {
-                await setPackageDisabled(p, transaction);
-                returnValue.push(await transaction.save(p));
+    async deletePackages({ packages }: { packages: Package[] }): Promise<void> {
+        for (const p of packages) {
+            await this.deletePackage({
+                identifier: {
+                    catalogSlug: p.catalog.slug,
+                    packageSlug: p.slug
+                }
             });
-
-            return returnValue;
-        });
+        }
     }
 
     async autocomplete({
@@ -449,7 +395,6 @@ export class PackageRepository {
                     queryLike: query + "%"
                 }
             )
-            .andWhere(`"Package"."isActive" = true`)
             .limit(limit)
             .offset(offSet)
             .addRelations(ALIAS, relations)
