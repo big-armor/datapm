@@ -41,8 +41,11 @@ async function findPackage(
 ): Promise<Package | null> {
     const ALIAS = "package";
 
-    const catalog = await manager.getRepository(Catalog).findOneOrFail({ where: { slug: catalogSlug } });
+    const catalog = await manager.getRepository(Catalog).findOne({ where: { slug: catalogSlug } });
 
+    if (catalog == undefined) {
+        throw new Error("CATALOG_NOT_FOUND");
+    }
     const options: FindOneOptions<Package> = {
         where: { catalogId: catalog.id, slug: packageSlug },
         relations: relations
