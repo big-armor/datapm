@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { Catalog, MyCatalogsGQL, UpdateCatalogGQL, DisableCatalogGQL } from "src/generated/graphql";
+import { Catalog, MyCatalogsGQL, UpdateCatalogGQL, DeleteCatalogGQL } from "src/generated/graphql";
 import { Subject } from "rxjs";
 import { take, takeUntil } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
@@ -27,7 +27,7 @@ export class CatalogsComponent implements OnInit {
     constructor(
         private myCatalogsGQL: MyCatalogsGQL,
         private updateCatalogGQL: UpdateCatalogGQL,
-        private disableCatalogGQL: DisableCatalogGQL,
+        private disableCatalogGQL: DeleteCatalogGQL,
         private dialog: MatDialog
     ) {}
 

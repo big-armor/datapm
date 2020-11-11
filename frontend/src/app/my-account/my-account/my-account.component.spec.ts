@@ -5,6 +5,8 @@ import { MyAccountComponent } from "./my-account.component";
 import { RouterTestingModule } from "@angular/router/testing";
 import { ApolloTestingModule, ApolloTestingController } from "apollo-angular/testing";
 import { MatDialogModule } from "@angular/material/dialog";
+import { ActivatedRoute } from "@angular/router";
+import { Subject } from "rxjs";
 
 @Component({
     template: ""
@@ -23,6 +25,21 @@ describe("MyAccountComponent", () => {
                 RouterTestingModule.withRoutes([{ path: "me", component: DummyComponent }]),
                 ApolloTestingModule,
                 MatDialogModule
+            ],
+            providers: [
+                {
+                    provide: ActivatedRoute,
+                    useValue: {
+                        snapshot: {
+                            firstChild: {
+                                routeConfig: {
+                                    path: ""
+                                }
+                            }
+                        },
+                        url: new Subject()
+                    }
+                }
             ]
         }).compileComponents();
     }));
