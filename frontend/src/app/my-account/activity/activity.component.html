@@ -1,5 +1,36 @@
-<div id="activityPage" class="big-div-package">
-    <div class="package-div">
+<!-- <div id="activityPage" class="big-div-package">
+    <div class="package-div"> -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9 col-md-12 col-sm-12 mt-5 py-2">
+            <div class="row big-div-latest mb-3">
+                <div *ngIf="colls.length" class="col-md-12 col-lg-12">
+                    <h1 class="h1-title">Recent activity</h1>
+                </div>
+                <!-- Package without thumbnail -->
+                <div class="col-md-12 col-lg-12 pb-2 mb-4" *ngIf="colls.length">
+                    <div *ngFor="let packageWithModifiedDate of colls">
+                        <app-collection-item [item]="packageWithModifiedDate.package"></app-collection-item>
+                    </div>
+                </div>
+                <div class="col-md-12 col-lg-12 pb-2 mb-4 not-found" *ngIf="!colls.length">
+                    <p>
+                        Either no packages have been published to this registry, or you do not have access to any of the
+                        published packages
+                    </p>
+                    <a href="https://test.datapm.io/docs/publish-data/">Learn how to publish packages</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <div class="col-md-12 col-lg-12 pb-2 mb-4" *ngIf="collections.length"> -->
+<!-- <div *ngFor="let collection of collections"> -->
+<!-- <app-package-item [item]="collection.package"></app-package-item> -->
+<!-- </div> -->
+<!-- </div> -->
+<!-- asdf
         <mat-card class="example-card">
             <div class="d-flex bd-highlight up-header mt-1 mb-3">
                 <div class="bd-highlight">Updated 5 min.</div>
@@ -172,6 +203,6 @@
                     </div>
                 </div>
             </mat-card-content>
-        </mat-card>
-    </div>
-</div>
+        </mat-card> -->
+<!-- </div>
+</div> -->

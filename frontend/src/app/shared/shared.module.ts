@@ -15,6 +15,7 @@ import { FooterComponent } from "./footer/footer.component";
 import { TimeAgoPipe } from "./pipes/time-ago.pipe";
 import { ImageUploadModalComponent } from "./image-upload-modal/image-upload-modal.component";
 import { PackageItemComponent } from "./package-item/package-item.component";
+import { CollectionItemComponent } from "./collection-item/collection-item.component";
 import { ForgotPasswordDialogComponent } from "./header/forgot-password-dialog/forgot-password-dialog.component";
 import { LoginDialogComponent } from "./header/login-dialog/login-dialog.component";
 import { SignUpDialogComponent } from "./header/sign-up-dialog/sign-up-dialog.component";
@@ -26,6 +27,7 @@ import { SignUpDialogComponent } from "./header/sign-up-dialog/sign-up-dialog.co
         TimeAgoPipe,
         ImageUploadModalComponent,
         PackageItemComponent,
+        CollectionItemComponent,
         ForgotPasswordDialogComponent,
         LoginDialogComponent,
         SignUpDialogComponent
@@ -48,6 +50,7 @@ import { SignUpDialogComponent } from "./header/sign-up-dialog/sign-up-dialog.co
         FooterComponent,
         TimeAgoPipe,
         PackageItemComponent,
+        CollectionItemComponent,
         ForgotPasswordDialogComponent,
         LoginDialogComponent,
         SignUpDialogComponent

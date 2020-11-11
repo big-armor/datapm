@@ -30,6 +30,7 @@ export class LatestComponent implements OnInit {
         this.latestPackages.fetch({ offset: 0, limit: 5 }).subscribe((a) => {
             const dateNow = new Date();
             this.packagesWithModifiedDate = a.data.latestPackages.packages.map((p) => {
+                console.log("fuck: ", p);
                 const changeDates = this.getLastChangedDates(p);
                 return {
                     package: p,
