@@ -42,6 +42,24 @@ describe("Package Tests", async () => {
         expect(userBClient).to.exist;
     });
 
+    it("Should have catalog not found error", async function () {
+        let response = await userBClient.query({
+            query: PackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "invalid-catalog-name",
+                    packageSlug: "congressional-legislators"
+                }
+            }
+        });
+
+        expect(response.errors != null, "should have errors").to.equal(true);
+        expect(
+            response.errors!.find((e) => e.message == "CATALOG_NOT_FOUND") != null,
+            "should have catalog not found error"
+        ).equal(true);
+    });
+
     it("Should allow user to see own packages", async function () {
         await userAClient.mutate({
             mutation: CreatePackageDocument,
