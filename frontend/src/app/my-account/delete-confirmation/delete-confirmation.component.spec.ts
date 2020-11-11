@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { FormsModule } from "@angular/forms";
 import { NoopAnimationsModule } from "@angular/platform-browser/animations";
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MatFormFieldModule } from "@angular/material/form-field";
@@ -14,7 +15,14 @@ describe("DeleteConfirmationComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [DeleteConfirmationComponent],
-            imports: [MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule, NoopAnimationsModule],
+            imports: [
+                FormsModule,
+                MatDialogModule,
+                MatFormFieldModule,
+                MatInputModule,
+                MatButtonModule,
+                NoopAnimationsModule
+            ],
             providers: [
                 {
                     provide: MAT_DIALOG_DATA,
