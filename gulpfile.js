@@ -100,6 +100,10 @@ function spawnAndLog(prefix, command, args, opts) {
     return child;
 }
 
+function showGitDiff() {
+    return spawnAndLog("git-diff", "git", ["diff"]);
+}
+
 exports.default = series(
     installBackendDepdendencies,
     buildBackend,
@@ -122,6 +126,7 @@ exports.buildParallel = series(
 );
 
 exports.bumpAndTagAssets = series(
+    showGitDiff,
     bumpVersion,
     gitPushTag,
     tagGCRDockerImage,
