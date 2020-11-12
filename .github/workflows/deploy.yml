@@ -19,7 +19,7 @@ jobs:
               run: node --version
 
             - name: Install Docker Build Dependencies
-              run: npm install gulp
+              run: npm install -g gulp
 
             - name: Run Prettier linter
               uses: wearerequired/lint-action@v1.6.0
