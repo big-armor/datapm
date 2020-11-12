@@ -77,9 +77,7 @@ function spawnAndLog(prefix, command, args, opts) {
     return child;
 }
 
-function bumpVersion() {
-    vers;
-}
+function bumpVersion() {}
 
 exports.default = series(
     installBackendDepdendencies,
