@@ -151,5 +151,11 @@ exports.buildParallel = series(
 
 exports.bumpVersion = series(showGitDiff, bumpRootVersion, bumpLibVersion);
 exports.gitPushTag = series(gitPushTag);
-exports.deployAssets = series(libPublish, tagGCRDockerImage, tagDockerImage, pushGCRImage, pushDockerImage);
+exports.deployAssets = series(
+    //libPublish,
+    tagGCRDockerImage,
+    tagDockerImage,
+    pushGCRImage,
+    pushDockerImage
+);
 exports.buildDockerImage = buildDockerImage;

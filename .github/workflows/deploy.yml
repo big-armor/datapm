@@ -85,9 +85,14 @@ jobs:
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: npm run deploy
               env:
-                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
                   PROJECT_ID: data-test-terraform
                   GOOGLE_CREDENTIALS: ~/gcloud.key
+
+            - uses: JS-DevTools/npm-publish@v1
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              with:
+                  package: ./lib/package.json
+                  token: ${{ secrets.NPM_TOKEN }}
 
             - name: Terraform Init
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
