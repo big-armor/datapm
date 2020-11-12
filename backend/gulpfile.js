@@ -25,7 +25,11 @@ function copyEmailTemplates() {
 }
 
 function copyModules() {
-    return exec("npx distize --no-files", execLogCb);
+    return exec("npx copy-node-modules ./ dist/", execLogCb);
+}
+
+function copyDataPMLib() {
+    return exec("cp -R ../lib dist/node_modules/datapm-lib");
 }
 
 function execLogCb(err, stdout, stderr) {
@@ -34,5 +38,5 @@ function execLogCb(err, stdout, stderr) {
     return err; // makes gulp continue even if the command failed
 }
 
-exports.default = series(copyFiles, copyEmailTemplates, copyModules);
-exports.copyModules = copyModules;
+exports.default = series(copyFiles, copyEmailTemplates, copyModules, copyDataPMLib);
+exports.copyDependencies = series(copyModules, copyDataPMLib);
