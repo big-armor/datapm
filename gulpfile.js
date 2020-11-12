@@ -102,6 +102,18 @@ function gitPushTag() {
     return spawnAndLog("git-tag-push", "git", ["push", "origin", "v" + readPackageVersion()]);
 }
 
+function gitStageChanges() {
+    return spawnAndLog("git-stage", "git", ["add", "-A"]);
+}
+
+function gitCommit() {
+    return spawnAndLog("git-commit", "git", ["commit", "-m 'Commit after version bump during build [ci skip]'"]);
+}
+
+function gitCommit() {
+    return spawnAndLog("git-push", "git", ["push"]);
+}
+
 function libPublish() {
     return spawnAndLog("lib-publish", "npm", ["publish"], { cwd: "lib" });
 }
@@ -150,7 +162,7 @@ exports.buildParallel = series(
 );
 
 exports.bumpVersion = series(showGitDiff, bumpRootVersion, bumpLibVersion);
-exports.gitPushTag = series(gitPushTag);
+exports.gitPushTag = series(gitStageChanges, gitCommit, gitPush, gitPushTag);
 exports.deployAssets = series(
     //libPublish,
     tagGCRDockerImage,
