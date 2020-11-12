@@ -18,6 +18,17 @@ jobs:
             - name: Print node verion
               run: node --version
 
+            - name: Cache node_modules
+              id: cache-modules
+              uses: actions/cache@v1
+              with:
+                  path: node_modules
+                  key: ${{ matrix.node-version }}-${{ runner.OS }}-build-${{ hashFiles('package.json') }}
+
+            - name: Build
+              if: steps.cache-modules.outputs.cache-hit != 'true'
+              run: npm ci
+
             - name: Run Prettier linter
               uses: wearerequired/lint-action@v1.6.0
               with:
