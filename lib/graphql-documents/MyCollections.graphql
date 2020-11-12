@@ -1,0 +1,30 @@
+query MyCollections($offSet: Int!, $limit: Int!) {
+    myCollections(offSet: $offSet, limit: $limit) {
+        collections {
+            identifier {
+                collectionSlug
+            }
+            name
+            description
+            packages {
+                identifier {
+                    catalogSlug
+                    packageSlug
+                }
+                displayName
+                description
+                latestVersion {
+                    identifier {
+                        versionMajor
+                        versionMinor
+                        versionPatch
+                    }
+                }
+            }
+            isPublic
+            isRecommended
+        }
+        hasMore
+        count
+    }
+}
