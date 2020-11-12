@@ -25,7 +25,7 @@ jobs:
                   path: node_modules
                   key: ${{ matrix.node-version }}-${{ runner.OS }}-build-${{ hashFiles('package.json') }}
 
-            - name: Build
+            - name: Install Dependencies
               if: steps.cache-modules.outputs.cache-hit != 'true'
               run: npm ci
 
@@ -40,6 +40,9 @@ jobs:
 
             - name: Terraform Format
               run: terraform fmt -check
+
+            - name: Set Git Author
+              run: git config user.name "$${{env.GITHUB_ACTOR}}" && git config user.email "gitHubActionDeployer@no-reply"
 
             - name: Bump Version and Git Tag
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
