@@ -1,6 +1,6 @@
 {
     "name": "datapm-registry",
-    "version": "0.1.0",
+    "version": "0.6.9",
     "description": "datapm is the easiest way to discover, obtain, manage, and publish data sets. This server acts as a registry (not a repository) of catalogs of packages. Features of datapm-registry include CRUD operations on catalogs and packages, and authorization for each operation. ",
     "main": "backend/dist/index.js",
     "typings": "backend/dist/index.d.ts",
@@ -12,8 +12,11 @@
         "build:parallel": "gulp buildParallel",
         "start": "TYPEORM_IS_DIST=true docker-compose -f docker/docker-compose-local-build.yml up",
         "start:from-docker-hub": "TYPEORM_IS_DIST=true docker-compose -f docker/docker-compose.yml up",
-        "deploy": "gulp deployDockerImage",
-        "test": "snyk test"
+        "bump-version": "gulp bumpVersion",
+        "tag": "gulp gitPushTag",
+        "deploy": "gulp deployAssets",
+        "test": "mocha --slow 3000 --timeout 60000 -r ts-node/register test/**/*.ts",
+        "test:snyk": "snyk test"
     },
     "repository": {
         "type": "git",
@@ -26,11 +29,22 @@
     },
     "homepage": "https://github.com/big-armor/datapm-registry#readme",
     "devDependencies": {
+        "@types/chai": "^4.2.14",
+        "@types/mocha": "^8.0.4",
+        "chai": "^4.2.0",
         "git-format-staged": "^2.1.0",
         "gulp": "^4.0.2",
         "husky": "^4.3.0",
+        "maildev": "^1.1.0",
+        "mocha": "^8.2.1",
+        "pidtree": "^0.5.0",
         "prettier": "^2.1.2",
         "pretty-quick": "^3.1.0",
-        "snyk": "^1.413.2"
-    }
+        "snyk": "^1.413.2",
+        "testcontainers": "^6.1.1",
+        "ts-node": "^9.0.0",
+        "typescript": "^4.0.5",
+        "why-is-node-running": "^2.2.0"
+    },
+    "dependencies": {}
 }

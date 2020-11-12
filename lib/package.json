@@ -1,0 +1,46 @@
+{
+    "name": "datapm-lib",
+    "version": "0.6.9",
+    "description": "Definitions and utilities for managing datapm package files.",
+    "main": "dist/src/main.js",
+    "scripts": {
+        "prepublishOnly": "npm test",
+        "lint": "tslint -p tsconfig.json",
+        "pretty-quick": "pretty-quick --pattern \"(src|test)/**/*.ts\"",
+        "build": "tsc",
+        "test": "gqlint schema.gql && npx jest"
+    },
+    "files": [
+        "dist/**/*",
+        "graphql-documents/*",
+        "schema.gql",
+        "auth-schema.gql",
+        "images-schema.gql",
+        "user-schema.gql",
+        "api-key-schema.gql",
+        "packageFileSchema.json"
+    ],
+    "author": "Travis Collins",
+    "license": "CC-BY-NC-ND-4.0",
+    "devDependencies": {
+        "@types/json-schema": "^7.0.5",
+        "@types/semver": "^7.3.1",
+        "gqlint": "^1.8.0",
+        "husky": "^4.3.0",
+        "jest": "^26.3.0",
+        "prettier": "^2.0.5",
+        "pretty-quick": "^3.1.0",
+        "ts-jest": "^26.2.0",
+        "ts-lint": "^4.5.1",
+        "tslint-config-prettier": "^1.18.0",
+        "typescript": "^3.9.7"
+    },
+    "dependencies": {
+        "semver": "^7.3.2"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "pretty-quick --staged"
+        }
+    }
+}

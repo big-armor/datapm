@@ -8,6 +8,7 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatMenuModule } from "@angular/material/menu";
 import { MatDialogModule } from "@angular/material/dialog";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { MatStepperModule } from "@angular/material/stepper";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 
@@ -41,6 +42,7 @@ import { SignUpDialogComponent } from "./header/sign-up-dialog/sign-up-dialog.co
         MatMenuModule,
         MatDialogModule,
         MatProgressSpinnerModule,
+        MatSnackBarModule,
         MatStepperModule,
         MatSlideToggleModule,
         FormsModule,

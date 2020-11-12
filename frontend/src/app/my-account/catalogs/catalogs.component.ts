@@ -1,7 +1,9 @@
 import { Component, OnInit } from "@angular/core";
-import { Catalog, MyCatalogsGQL } from "src/generated/graphql";
+import { Catalog, MyCatalogsGQL, UpdateCatalogGQL, DeleteCatalogGQL } from "src/generated/graphql";
 import { Subject } from "rxjs";
 import { take, takeUntil } from "rxjs/operators";
+import { MatDialog } from "@angular/material/dialog";
+import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
 
 enum State {
     INIT,
@@ -20,8 +22,14 @@ export class CatalogsComponent implements OnInit {
     catalogState = State.INIT;
     public myCatalogs: Catalog[];
     private subscription = new Subject();
+    columnsToDisplay = ["name", "public", "actions"];
 
-    constructor(private myCatalogsGQL: MyCatalogsGQL) {}
+    constructor(
+        private myCatalogsGQL: MyCatalogsGQL,
+        private updateCatalogGQL: UpdateCatalogGQL,
+        private disableCatalogGQL: DeleteCatalogGQL,
+        private dialog: MatDialog
+    ) {}
 
     ngOnInit(): void {
         this.refreshCatalogs();
@@ -39,5 +47,42 @@ export class CatalogsComponent implements OnInit {
                 this.myCatalogs = response.data.myCatalogs;
                 this.catalogState = State.SUCCESS;
             });
+    }
+
+    updateCatalogVisibility(catalog: Catalog, isPublic: boolean) {
+        this.updateCatalogGQL
+            .mutate({
+                identifier: {
+                    catalogSlug: catalog.identifier.catalogSlug
+                },
+                value: {
+                    isPublic
+                }
+            })
+            .subscribe(() => {});
+    }
+
+    deleteCatalog(catalog: Catalog) {
+        const dlgRef = this.dialog.open(DeleteConfirmationComponent, {
+            data: {
+                catalogSlug: catalog.identifier.catalogSlug
+            }
+        });
+
+        dlgRef.afterClosed().subscribe((confirmed: boolean) => {
+            if (confirmed) {
+                this.disableCatalogGQL
+                    .mutate({
+                        identifier: {
+                            catalogSlug: catalog.identifier.catalogSlug
+                        }
+                    })
+                    .subscribe(() => {
+                        this.myCatalogs = this.myCatalogs.filter(
+                            (c) => c.identifier.catalogSlug !== catalog.identifier.catalogSlug
+                        );
+                    });
+            }
+        });
     }
 }

@@ -15,7 +15,7 @@ let serverProcess: execa.ExecaChildProcess;
 let mailServer: any;
 export let mailObservable: Observable<any>;
 
-const TEMP_STORAGE_URL = "file:///tmp/datapm-storage-" + new RandomUuid().nextUuid();
+export const TEMP_STORAGE_URL = "file://tmp-registry-server-storage-" + new RandomUuid().nextUuid();
 
 before(async function () {
     console.log("Starting postgres temporary container");
@@ -97,6 +97,8 @@ before(async function () {
 after(async function () {
     this.timeout(30000);
 
+    fs.rmdirSync(TEMP_STORAGE_URL.replace("file://", ""), { recursive: true });
+
     if (container) await container.stop();
 
     console.log("postgres container stopped normally");
@@ -117,6 +119,4 @@ after(async function () {
         }
     });
     mailServer.close();
-
-    fs.rmdirSync(TEMP_STORAGE_URL.replace("file://", ""), { recursive: true });
 });

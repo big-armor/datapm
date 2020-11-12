@@ -3,11 +3,26 @@ import { expect } from "chai";
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 import * as fs from "fs";
 import request = require("superagent");
-import { SetMyAvatarImageDocument, SetMyCoverImageDocument } from "./registry-client";
+import {
+    SetMyAvatarImageDocument,
+    SetMyCoverImageDocument,
+    DeleteMeDocument,
+    CreatePackageDocument,
+    SetPackageCoverImageDocument,
+    DeletePackageDocument,
+    CreateCollectionDocument,
+    SetCollectionCoverImageDocument,
+    DeleteCollectionDocument,
+    SetCatalogCoverImageDocument
+} from "./registry-client";
+import * as crypto from "crypto";
+import { TEMP_STORAGE_URL } from "./setup";
+import { Readable } from "stream";
 
 describe("Image Upload Tests", async () => {
     const anonymousUser = createAnonymousClient();
     let userAClient: ApolloClient<NormalizedCacheObject>;
+    let userBClient: ApolloClient<NormalizedCacheObject>;
 
     before(async () => {});
 
@@ -18,6 +33,13 @@ describe("Image Upload Tests", async () => {
             "first-user-username",
             "first-user@test.datapm.io",
             "passwordA!"
+        );
+        userBClient = await createUser(
+            "FirstUserName",
+            "FirstUserLastName",
+            "second-user-username",
+            "second-user@test.datapm.io",
+            "passwordB!"
         );
         expect(userAClient).to.exist;
     });
@@ -33,15 +55,30 @@ describe("Image Upload Tests", async () => {
         });
 
         expect(uploadResult).to.exist;
+        expect(uploadResult.errors).to.not.exist;
         expect(uploadResult.data).to.exist;
-        if (uploadResult.data) {
-            expect(uploadResult.data.setMyAvatarImage).to.exist;
-            expect(uploadResult.data.setMyAvatarImage.id).to.exist;
-        }
+
+        expect(
+            fs.existsSync(TEMP_STORAGE_URL.replace("file://", "") + "/user/first-user-username/user_avatar"),
+            "avatar file should be present on file system"
+        ).true;
     });
 
-    it("Download avatar image", async function () {
+    it("Avatar image not found", async function () {
+        let errorFound = false;
+        try {
+            const imageServingResult = await request.get("localhost:4000/images/user/invalid-username/avatar");
+        } catch (err) {
+            expect(err.message).to.equal("Not Found");
+            errorFound = true;
+        }
+
+        expect(errorFound).to.be.true;
+    });
+
+    it("Download user avatar image", async function () {
         const imageServingResult = await request.get("localhost:4000/images/user/first-user-username/avatar");
+
         expect(imageServingResult.body).to.exist;
         expect(imageServingResult.type).to.equal("image/jpeg");
     });
@@ -55,19 +92,33 @@ describe("Image Upload Tests", async () => {
                 image: { base64: imageContent }
             }
         });
-
         expect(uploadResult).to.exist;
+        expect(uploadResult.errors).to.not.exist;
         expect(uploadResult.data).to.exist;
-        if (uploadResult.data) {
-            expect(uploadResult.data.setMyCoverImage).to.exist;
-            expect(uploadResult.data.setMyCoverImage.id).to.exist;
-        }
+
+        expect(
+            fs.existsSync(TEMP_STORAGE_URL.replace("file://", "") + "/user/first-user-username/user_cover"),
+            "cover file should be present on file system"
+        ).true;
     });
 
-    it("Download cover image", async function () {
-        const imageServingResult = await request.get("localhost:4000/images/user/first-user-username/cover");
+    it("Download user cover image", async function () {
+        let imageServingResult = await request.get("http://localhost:4000/images/user/first-user-username/cover");
+
         expect(imageServingResult.body).to.exist;
         expect(imageServingResult.type).to.equal("image/jpeg");
+
+        // TODO the image fetching is working, but when invoked by superagent, the server responds with 0 byte files
+        // so we can't test that the correct image is returned.
+
+        // const imageWithData = await request
+        //    .get("http://localhost:4000/images/user/first-user-username/cover")
+        //    .buffer(true)
+        //    .parse(request.parse.image);
+
+        //console.log(JSON.stringify(imageWithData.body, null, 1));
+        //let hash = crypto.createHash("sha256").update(imageWithData.body, "utf8").digest("hex");
+        // expect(hash).equal("asfdasdfasfd");
     });
 
     it("setMyAvatarImage_WithUnsupportedImageFormat_ReturnsErrorWithInvalidFormatErrorCode", async () => {
@@ -79,7 +130,6 @@ describe("Image Upload Tests", async () => {
                 image: { base64: imageContent }
             }
         });
-
         expect(uploadResult).to.exist;
         expect(uploadResult.errors).to.exist;
         expect(uploadResult.errors).length(1);
@@ -115,4 +165,186 @@ describe("Image Upload Tests", async () => {
             expect(uploadResult.errors[0].message).to.equal("IMAGE_TOO_LARGE");
         }
     }).timeout(10000);
+
+    it("should allow user to create a package and set an image", async () => {
+        let response = await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "first-user-username",
+                    packageSlug: "image-test-package",
+                    displayName: "Congressional LegislatorsA2",
+                    description: "Test upload of congressional legislatorsA2"
+                }
+            }
+        });
+
+        expect(response.errors == null, "no errors").true;
+
+        const imageContent = fs.readFileSync("test/other-files/ba.jpg", "base64");
+
+        let imageResponse = await userAClient.mutate({
+            mutation: SetPackageCoverImageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "first-user-username",
+                    packageSlug: "image-test-package"
+                },
+                image: { base64: imageContent }
+            }
+        });
+
+        expect(imageResponse.errors == null).true;
+
+        expect(
+            fs.existsSync(
+                TEMP_STORAGE_URL.replace("file://", "") +
+                    "/package/first-user-username/image-test-package/package_cover"
+            ),
+            "package cover image file should be present"
+        ).true;
+    });
+
+    it("should should remove package cover image when deleted", async () => {
+        let response = await userAClient.mutate({
+            mutation: DeletePackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "first-user-username",
+                    packageSlug: "image-test-package"
+                }
+            }
+        });
+
+        expect(response.errors == null, "no errors").true;
+
+        expect(
+            fs.existsSync(
+                TEMP_STORAGE_URL.replace("file://", "") +
+                    "/package/first-user-username/image-test-package/package_cover"
+            ),
+            "package cover image file should be not present"
+        ).false;
+    });
+
+    it("should allow user to create a collection and set an image", async () => {
+        let response = await userAClient.mutate({
+            mutation: CreateCollectionDocument,
+            variables: {
+                value: {
+                    name: "Image test",
+                    collectionSlug: "image-test",
+                    description: "Test upload of congressional legislatorsA2"
+                }
+            }
+        });
+
+        expect(response.errors == null, "no errors").true;
+
+        const imageContent = fs.readFileSync("test/other-files/ba.jpg", "base64");
+
+        let imageResponse = await userAClient.mutate({
+            mutation: SetCollectionCoverImageDocument,
+            variables: {
+                identifier: {
+                    collectionSlug: "image-test"
+                },
+                image: { base64: imageContent }
+            }
+        });
+
+        expect(imageResponse.errors == null).true;
+
+        expect(
+            fs.existsSync(TEMP_STORAGE_URL.replace("file://", "") + "/collection/image-test/collection_cover"),
+            "collection cover image file should be present"
+        ).true;
+    });
+
+    it("should not allow user B to set cover image on collection", async () => {
+        const imageContent = fs.readFileSync("test/other-files/ba.jpg", "base64");
+
+        let imageResponse = await userBClient.mutate({
+            mutation: SetCollectionCoverImageDocument,
+            variables: {
+                identifier: {
+                    collectionSlug: "image-test"
+                },
+                image: { base64: imageContent }
+            }
+        });
+
+        expect(imageResponse.errors != null).true;
+        expect(
+            imageResponse.errors!.find((e) => e.message == "NOT_AUTHORIZED") != null,
+            "should have not authorized message"
+        ).equal(true);
+    });
+
+    it("should remove collection cover image when deleted", async () => {
+        let response = await userAClient.mutate({
+            mutation: DeleteCollectionDocument,
+            variables: {
+                identifier: {
+                    collectionSlug: "image-test"
+                }
+            }
+        });
+
+        expect(response.errors == null, "no errors").true;
+
+        expect(
+            fs.existsSync(TEMP_STORAGE_URL.replace("file://", "") + "/collection/image-test/collection_cover"),
+            "collection cover image file should be not present"
+        ).false;
+    });
+
+    it("should allow user to set a catalog image", async () => {
+        const imageContent = fs.readFileSync("test/other-files/ba.jpg", "base64");
+
+        let imageResponse = await userAClient.mutate({
+            mutation: SetCatalogCoverImageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "first-user-username"
+                },
+                image: { base64: imageContent }
+            }
+        });
+
+        expect(imageResponse.errors == null).true;
+
+        expect(
+            fs.existsSync(TEMP_STORAGE_URL.replace("file://", "") + "/catalog/first-user-username/catalog_cover"),
+            "catalog cover image file should be present"
+        ).true;
+    });
+
+    // TODO Test downloading package, collection, and catalog images
+    // Need to come up with a security framework for public/private listings and images
+    // Use GraphQL API instead of an express interface?
+    // Change to cookies?
+
+    it("Remove image files when deleting user", async function () {
+        const response = await userAClient.mutate({
+            mutation: DeleteMeDocument
+        });
+
+        expect(response.errors == null).true;
+
+        expect(
+            fs.existsSync(TEMP_STORAGE_URL.replace("file://", "") + "/user/first-user-username/user_avatar"),
+            "avatar file should be not present"
+        ).false;
+
+        expect(
+            fs.existsSync(TEMP_STORAGE_URL.replace("file://", "") + "/user/first-user-username/user_cover"),
+            "avatar file should be not present"
+        ).false;
+
+        expect(
+            fs.existsSync(TEMP_STORAGE_URL.replace("file://", "") + "/catalog/first-user-username/catalog_cover"),
+            "catalog cover image file should not be present"
+        ).false;
+    });
 });

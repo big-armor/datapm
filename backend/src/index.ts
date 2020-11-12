@@ -14,13 +14,11 @@ import path from "path";
 import { getSecretVariable, setAppEngineServiceAccountJson } from "./util/secrets";
 import { GraphQLError } from "graphql";
 import { superCreateConnection } from "./util/databaseCreation";
-import { getEnvVariable } from "./util/getEnvVariable";
+import { Readable, Stream } from "stream";
 import fs from "fs";
 import { ImageStorageService } from "./storage/images/image-storage-service";
-import { ImageType } from "./storage/images/image-type";
 
-const nodeModulesDirectory = getEnvVariable("NODE_MODULES_DIRECTORY", "node_modules");
-const dataLibPackageFile = fs.readFileSync(nodeModulesDirectory + "/datapm-lib/package.json");
+const dataLibPackageFile = fs.readFileSync("node_modules/datapm-lib/package.json");
 const dataLibPackageJSON = JSON.parse(dataLibPackageFile.toString());
 const REGISTRY_API_VERSION = dataLibPackageJSON.version;
 
@@ -191,41 +189,37 @@ async function main() {
     // set express for the Apollo GraphQL server
     server.applyMiddleware({ app, bodyParserConfig: { limit: "20mb" } });
 
-    const imageService = new ImageStorageService();
-    app.use("/images/user/:username/avatar", (req, res, next) => {
+    const respondWithImage = async function (imageStream: Stream, response: express.Response) {
+        const imageBuffer = await new Promise<Buffer>((res) => {
+            var bufs: any[] = [];
+            imageStream.on("data", function (d) {
+                bufs.push(d);
+            });
+            imageStream.on("end", function () {
+                var buf = Buffer.concat(bufs);
+                res(buf);
+            });
+        });
+
+        response.set("content-type", "image/jpeg");
+        response.set("content-length", imageBuffer.length.toString());
+
+        response.end(imageBuffer);
+    };
+
+    const imageService = ImageStorageService.INSTANCE;
+    app.use("/images/user/:username/avatar", async (req, res, next) => {
         try {
-            const imageEntityAndStream = imageService.getImageTypeForUser(
-                req.params.username,
-                ImageType.USER_AVATAR_IMAGE,
-                connection
-            );
-            imageEntityAndStream
-                .then((img) => {
-                    res.set("Content-Type", img.entity.mimeType);
-                    img.stream.on("error", (e) => next("Could not read image stream"));
-                    img.stream.pipe(res);
-                })
-                .catch((error) => next("Could not fetch image"));
+            await respondWithImage(await imageService.readUserAvatarImage(req.params.username), res);
         } catch (err) {
             res.status(404).send();
             return;
         }
     });
 
-    app.use("/images/user/:username/cover", (req, res, next) => {
+    app.use("/images/user/:username/cover", async (req, res, next) => {
         try {
-            const imageEntityAndStream = imageService.getImageTypeForUser(
-                req.params.username,
-                ImageType.USER_COVER_IMAGE,
-                connection
-            );
-            imageEntityAndStream
-                .then((img) => {
-                    res.set("Content-Type", img.entity.mimeType);
-                    img.stream.on("error", (e) => next("Could not read image stream"));
-                    img.stream.pipe(res);
-                })
-                .catch((error) => next("Could not fetch image"));
+            await respondWithImage(await imageService.readUserCoverImage(req.params.username), res);
         } catch (err) {
             res.status(404).send();
             return;

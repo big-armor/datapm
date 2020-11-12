@@ -116,6 +116,23 @@ async function getUserCatalogPermission({
 
 @EntityRepository(UserCatalogPermission)
 export class UserCatalogPermissionRepository extends Repository<UserCatalogPermission> {
+    findCatalogPermissions({
+        catalogId,
+        userId,
+        relations = []
+    }: {
+        catalogId: number;
+        userId: number;
+        relations?: string[];
+    }) {
+        const ALIAS = "userPackagePermission";
+        return this.manager
+            .getRepository(UserCatalogPermission)
+            .createQueryBuilder(ALIAS)
+            .addRelations(ALIAS, relations)
+            .where({ catalogId, userId })
+            .getOne();
+    }
     async findByUser({
         username,
         relations = []

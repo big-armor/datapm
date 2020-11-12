@@ -1,0 +1,34 @@
+"""
+Whether the requesting user's authentication mechanism has API key management permission
+"""
+directive @hasAPIKeyManagementPermission on ARGUMENT_DEFINITION
+
+"""
+Represents the API Key, not including the secret. API Keys are secrets that are used provided as authorization by the registry clients.
+"""
+type APIKey {
+    label: String!
+    id: String!
+    createdAt: Date
+    lastUsed: Date
+    scopes: [Scope!]!
+}
+
+"""
+This response is only sent when creating a new API key, so that the secret is shared only once
+"""
+type APIKeyWithSecret {
+    label: String!
+    id: String!
+    secret: String!
+    createdAt: Date
+    scopes: [Scope!]!
+}
+
+"""
+The information necessary to create an API Key
+"""
+input CreateAPIKeyInput {
+    label: String!
+    scopes: [Scope!]!
+}

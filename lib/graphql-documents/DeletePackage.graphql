@@ -1,0 +1,3 @@
+mutation DeletePackage($identifier: PackageIdentifierInput!) {
+    deletePackage(identifier: $identifier)
+}

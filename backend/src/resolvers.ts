@@ -14,7 +14,9 @@ import {
     VersionConflict,
     PackageIdentifier,
     CollectionResolvers,
-    CatalogIdentifierInput
+    CatalogIdentifierInput,
+    VersionIdentifierInput,
+    Base64ImageUpload
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
@@ -47,7 +49,7 @@ import graphqlFields from "graphql-fields";
 import {
     addPackageToCollection,
     createCollection,
-    disableCollection,
+    deleteCollection,
     findCollectionBySlug,
     findCollectionsForAuthenticatedUser,
     myCollections,
@@ -59,7 +61,7 @@ import {
 import { login, logout, verifyEmailAddress } from "./resolvers/AuthResolver";
 import {
     createMe,
-    disableMe,
+    deleteMe,
     setMyAvatarImage,
     setMyCoverImage,
     emailAddressAvailable,
@@ -72,7 +74,7 @@ import { Collection } from "./entity/Collection";
 import {
     catalogPackagesForUser,
     createPackage,
-    disablePackage,
+    deletePackage,
     findPackage,
     findPackageCreator,
     findPackageIdentifier,
@@ -86,7 +88,6 @@ import {
     myPackages
 } from "./resolvers/PackageResolver";
 import { ImageStorageService } from "./storage/images/image-storage-service";
-import { ImageType } from "./storage/images/image-type";
 
 import { validatePassword } from "./directive/ValidPasswordDirective";
 import { validateSlug as validateCatalogSlug } from "./directive/ValidCatalogSlugDirective";
@@ -95,6 +96,8 @@ import { validateUsernameOrEmail } from "./directive/ValidUsernameOrEmailAddress
 import { validateSlug as validateCollectionSlug } from "./directive/ValidCollectionSlugDirective";
 import { validateSlug as validatePackageSlug } from "./directive/ValidPackageSlugDirective";
 import { validateEmailAddress } from "./directive/ValidEmailDirective";
+import { FileStorageService } from "./storage/files/file-storage-service";
+import { PackageFileStorageService } from "./storage/packages/package-file-storage-service";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -336,7 +339,6 @@ export const resolvers: {
 
             const version = await context.connection.getCustomRepository(VersionRepository).findLatestVersion({
                 identifier: identifier,
-                includeActiveOnly: packageEntity.isActive,
                 relations: getGraphQlRelationName(info)
             });
 
@@ -370,6 +372,85 @@ export const resolvers: {
                 versionMinor: version.minorVersion,
                 versionPatch: version.patchVersion
             };
+        },
+        packageFile: async (parent: any, _1: any, context: AuthenticatedContext) => {
+            const version = parent as Version;
+
+            const packageEntity = await context.connection
+                .getRepository(Package)
+                .findOneOrFail({ id: version.packageId });
+
+            const catalog = await context.connection
+                .getRepository(Catalog)
+                .findOneOrFail({ id: packageEntity.catalogId });
+
+            try {
+                return await PackageFileStorageService.INSTANCE.readPackageFile({
+                    catalogSlug: catalog.slug,
+                    packageSlug: packageEntity.slug,
+                    versionMajor: version.majorVersion,
+                    versionMinor: version.minorVersion,
+                    versionPatch: version.patchVersion
+                });
+            } catch (error) {
+                if (error.message == "FILE_NOT_FOUND") {
+                    console.error("A request package file was not found. This is VERY BAD!");
+                    console.error(JSON.stringify(error));
+                    return;
+                }
+
+                throw error;
+            }
+        },
+        readmeFile: async (parent: any, _1: any, context: AuthenticatedContext) => {
+            const version = parent as Version;
+            const packageEntity = await context.connection
+                .getRepository(Package)
+                .findOneOrFail({ id: version.packageId });
+
+            const catalog = await context.connection
+                .getRepository(Catalog)
+                .findOneOrFail({ id: packageEntity.catalogId });
+            try {
+                return await PackageFileStorageService.INSTANCE.readReadmeFile({
+                    catalogSlug: catalog.slug,
+                    packageSlug: packageEntity.slug,
+                    versionMajor: version.majorVersion,
+                    versionMinor: version.minorVersion,
+                    versionPatch: version.patchVersion
+                });
+            } catch (error) {
+                if (error.message == "FILE_NOT_FOUND") {
+                    return null;
+                }
+
+                throw error;
+            }
+        },
+        licenseFile: async (parent: any, _1: any, context: AuthenticatedContext) => {
+            const version = parent as Version;
+            const packageEntity = await context.connection
+                .getRepository(Package)
+                .findOneOrFail({ id: version.packageId });
+
+            const catalog = await context.connection
+                .getRepository(Catalog)
+                .findOneOrFail({ id: packageEntity.catalogId });
+            try {
+                return await PackageFileStorageService.INSTANCE.readLicenseFile({
+                    catalogSlug: catalog.slug,
+                    packageSlug: packageEntity.slug,
+                    versionMajor: version.majorVersion,
+                    versionMinor: version.minorVersion,
+                    versionPatch: version.patchVersion
+                });
+            } catch (error) {
+                if (error.message == "FILE_NOT_FOUND") {
+                    return null;
+                }
+
+                throw error;
+            }
         }
     },
 
@@ -486,16 +567,16 @@ export const resolvers: {
         updateMyPassword: updateMyPassword,
         setMyCoverImage: setMyCoverImage,
         setMyAvatarImage: setMyAvatarImage,
-        disableMe: disableMe,
+        deleteMe: deleteMe,
 
         // API Keys
         createAPIKey: createAPIKey,
         deleteAPIKey: deleteAPIKey,
 
-        removeUserFromCatalog: async (_0: any, { username, catalogSlug }, context: AuthenticatedContext, info: any) => {
+        removeUserFromCatalog: async (_0: any, { username, identifier }, context: AuthenticatedContext, info: any) => {
             const catalog = await context.connection.manager
                 .getCustomRepository(CatalogRepository)
-                .findCatalogBySlug({ slug: catalogSlug });
+                .findCatalogBySlug({ slug: identifier.catalogSlug });
 
             if (catalog === undefined) {
                 throw new UserInputError("CATALOG_NOT_FOUND");
@@ -526,33 +607,28 @@ export const resolvers: {
 
         setCatalogCoverImage: async (
             _0: any,
-            { identifier, image }: { identifier: CatalogIdentifierInput; image: any },
+            { identifier, image }: { identifier: CatalogIdentifierInput; image: Base64ImageUpload },
             context: AuthenticatedContext,
             info: any
         ) => {
-            const uploadedImage = await image;
-            const catalogEntity = await context.connection
-                .getCustomRepository(CatalogRepository)
-                .findCatalogBySlugOrFail(identifier.catalogSlug);
-            await ImageStorageService.INSTANCE.saveImage(
-                catalogEntity.id,
-                uploadedImage,
-                ImageType.CATALOG_COVER_IMAGE,
-                context
-            );
+            await ImageStorageService.INSTANCE.saveCatalogCoverImage(identifier, image.base64);
         },
 
-        disableCatalog: async (_0: any, { identifier }, context: AuthenticatedContext, info: any) => {
-            return context.connection.manager.getCustomRepository(CatalogRepository).disableCatalog({
-                slug: identifier.catalogSlug,
-                relations: getGraphQlRelationName(info)
+        deleteCatalog: async (
+            _0: any,
+            { identifier }: { identifier: CatalogIdentifierInput },
+            context: AuthenticatedContext,
+            info: any
+        ) => {
+            return context.connection.manager.getCustomRepository(CatalogRepository).deleteCatalog({
+                slug: identifier.catalogSlug
             });
         },
 
         createPackage: createPackage,
         updatePackage: updatePackage,
         setPackageCoverImage: setPackageCoverImage,
-        disablePackage: disablePackage,
+        deletePackage: deletePackage,
 
         setPackagePermissions: setPackagePermissions,
         removePackagePermissions: removePackagePermissions,
@@ -560,11 +636,13 @@ export const resolvers: {
         createCollection: createCollection,
         updateCollection: updateCollection,
         setCollectionCoverImage: setCollectionCoverImage,
-        disableCollection: disableCollection,
+        deleteCollection: deleteCollection,
         addPackageToCollection: addPackageToCollection,
         removePackageFromCollection: removePackageFromCollection,
 
         createVersion: async (_0: any, { identifier, value }, context: AuthenticatedContext, info: any) => {
+            const fileStorageService = FileStorageService.INSTANCE;
+
             return await context.connection.manager.nestedTransaction(async (transaction) => {
                 const proposedNewVersion = new SemVer(value.packageFile.version);
 
@@ -573,12 +651,19 @@ export const resolvers: {
                 // get the latest version
                 const latestVersion = await transaction
                     .getCustomRepository(VersionRepository)
-                    .findLatestVersion({ identifier, includeActiveOnly: true });
+                    .findLatestVersion({ identifier });
 
                 if (latestVersion != null) {
-                    const latestVersionSemVer = new SemVer(latestVersion.packageFile!.version);
+                    const packageFile = await PackageFileStorageService.INSTANCE.readPackageFile({
+                        ...identifier,
+                        versionMajor: latestVersion.majorVersion,
+                        versionMinor: latestVersion.minorVersion,
+                        versionPatch: latestVersion.patchVersion
+                    });
 
-                    const diff = comparePackages(latestVersion.packageFile, newPackageFile);
+                    const latestVersionSemVer = new SemVer(packageFile!.version);
+
+                    const diff = comparePackages(packageFile, newPackageFile);
 
                     const compatibility = diffCompatibility(diff);
 
@@ -621,6 +706,26 @@ export const resolvers: {
                     .getCustomRepository(VersionRepository)
                     .save(context.me.id, identifier, value);
 
+                const versionIdentifier = {
+                    ...identifier,
+                    versionMajor: proposedNewVersion.major,
+                    versionMinor: proposedNewVersion.minor,
+                    versionPatch: proposedNewVersion.patch
+                };
+
+                await transaction
+                    .getCustomRepository(PackageRepository)
+                    .updatePackageReadmeVectors(identifier, value.readmeFile);
+
+                if (value.readmeFile)
+                    await PackageFileStorageService.INSTANCE.writeReadmeFile(versionIdentifier, value.readmeFile);
+
+                if (value.licenseFile)
+                    await PackageFileStorageService.INSTANCE.writeLicenseFile(versionIdentifier, value.licenseFile);
+
+                if (value.packageFile)
+                    await PackageFileStorageService.INSTANCE.writePackageFile(versionIdentifier, value.packageFile);
+
                 const ALIAS = "findVersion";
                 const recalledVersion = await transaction
                     .getRepository(Version)
@@ -636,12 +741,15 @@ export const resolvers: {
             });
         },
 
-        disableVersion: async (_0: any, { identifier }, context: AuthenticatedContext) => {
+        deleteVersion: async (
+            _0: any,
+            { identifier }: { identifier: VersionIdentifierInput },
+            context: AuthenticatedContext
+        ) => {
             await context.connection.manager.nestedTransaction(async (transaction) => {
                 const version = await transaction.getCustomRepository(VersionRepository).findOneOrFail({ identifier });
 
-                version.isActive = false;
-                transaction.save(version);
+                transaction.delete(Version, { id: version.id });
             });
         },
 

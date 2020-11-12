@@ -9,7 +9,7 @@ import {
     UpdateCatalogDocument,
     CollectionDocument,
     UpdateCollectionDocument,
-    DisableCollectionDocument,
+    DeleteCollectionDocument,
     MyCollectionsDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
@@ -339,7 +339,7 @@ describe("Collection Tests", async () => {
 
     it("Delete collection", async function () {
         let response = await userBClient.mutate({
-            mutation: DisableCollectionDocument,
+            mutation: DeleteCollectionDocument,
             variables: {
                 identifier: {
                     collectionSlug: "new-collection-slug"

@@ -1,4 +1,3 @@
-import { ImageType } from "./image-type";
 import sharp, { ResizeOptions, Sharp } from "sharp";
 
 export abstract class ImageProcessor {
@@ -13,7 +12,6 @@ export abstract class ImageProcessor {
         return this.getConversionFormat(resizer);
     }
 
-    public abstract getImageType(): ImageType;
     public abstract getResizeOptions(): ResizeOptions;
 
     private getConversionFormat(resizer: Sharp): Sharp {

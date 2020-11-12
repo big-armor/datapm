@@ -4,7 +4,13 @@ import { AuthenticatedContext } from "../context";
 import { Catalog } from "../entity/Catalog";
 import { Collection } from "../entity/Collection";
 import { Package } from "../entity/Package";
-import { CreatePackageInput, PackageIdentifierInput, Permission, UpdatePackageInput } from "../generated/graphql";
+import {
+    Base64ImageUpload,
+    CreatePackageInput,
+    PackageIdentifierInput,
+    Permission,
+    UpdatePackageInput
+} from "../generated/graphql";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { PackageRepository } from "../repository/PackageRepository";
@@ -12,7 +18,7 @@ import { UserRepository } from "../repository/UserRepository";
 import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 import { ImageStorageService } from "../storage/images/image-storage-service";
-import { ImageType } from "../storage/images/image-type";
+import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
 
 export const myPackages = async (
     _0: any,
@@ -97,7 +103,6 @@ export const findPackage = async (
 ) => {
     const packageEntity = await context.connection.getCustomRepository(PackageRepository).findPackage({
         identifier,
-        includeActiveOnly: true,
         relations: getGraphQlRelationName(info)
     });
 
@@ -169,38 +174,27 @@ export const updatePackage = async (
         catalogSlug: identifier.catalogSlug,
         packageSlug: identifier.packageSlug,
         packageInput: value,
-        includeActiveOnly: true,
         relations: getGraphQlRelationName(info)
     });
 };
 
 export const setPackageCoverImage = async (
     _0: any,
-    { identifier, image }: { identifier: PackageIdentifierInput; image: any },
+    { identifier, image }: { identifier: PackageIdentifierInput; image: Base64ImageUpload },
     context: AuthenticatedContext,
     info: any
 ) => {
-    const uploadedImage = await image;
-    const packageEntity = await context.connection
-        .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier });
-    await ImageStorageService.INSTANCE.saveImage(
-        packageEntity.id,
-        uploadedImage,
-        ImageType.PACKAGE_COVER_IMAGE,
-        context
-    );
+    return ImageStorageService.INSTANCE.savePackageCoverImage(identifier, image.base64);
 };
 
-export const disablePackage = async (
+export const deletePackage = async (
     _0: any,
     { identifier }: { identifier: PackageIdentifierInput },
     context: AuthenticatedContext,
     info: any
 ) => {
-    return context.connection.getCustomRepository(PackageRepository).disablePackage({
-        identifier,
-        relations: getGraphQlRelationName(info)
+    return context.connection.getCustomRepository(PackageRepository).deletePackage({
+        identifier
     });
 };
 

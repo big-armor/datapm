@@ -3,11 +3,14 @@ import { expect } from "chai";
 import {
     CreatePackageDocument,
     UpdatePackageDocument,
-    DisablePackageDocument,
-    SearchPackagesDocument
+    DeletePackageDocument,
+    SearchPackagesDocument,
+    CreateVersionDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
+import fs from "fs";
+import * as crypto from "crypto";
 
 describe("Package Search Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
@@ -57,6 +60,41 @@ describe("Package Search Tests", async () => {
         expect(response.data!.createPackage.latestVersion).to.equal(null);
     });
 
+    it("User A publish first version", async function () {
+        let packageFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json", "utf8");
+        let readmeFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.README.md", "utf8");
+        let licenseFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.LICENSE.md", "utf8");
+
+        let originalContentHash = crypto.createHash("sha256").update(packageFileContents, "utf8").digest("hex");
+        let response = await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages-search",
+                    packageSlug: "congressional-legislators"
+                },
+                value: {
+                    packageFile: packageFileContents,
+                    licenseFile: licenseFileContents,
+                    readmeFile: readmeFileContents
+                }
+            }
+        });
+
+        expect(response.errors == null, "no errors").true;
+        expect(response.data!.createVersion.author.username).equal("testA-packages-search");
+
+        const responsePackageFileContents = response.data!.createVersion.packageFile;
+
+        const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
+
+        // have to update this hash value if the package file contents change
+        expect(responseHash).equal("a408ed82946e088eec17f92775e67013e877a0dd0aed6d4d10ef2d1c79d14cc8");
+
+        expect(response.data!.createVersion.readmeFile!).includes("This is where a readme might go");
+        expect(response.data!.createVersion.licenseFile!).includes("This is not a real license. Just a test.");
+    });
+
     it("Should allow User A to search for package", async function () {
         let response = await userAClient.query({
             query: SearchPackagesDocument,
@@ -64,6 +102,25 @@ describe("Package Search Tests", async () => {
                 limit: 10,
                 offset: 0,
                 query: "congress"
+            }
+        });
+
+        expect(response.errors == null, "no errors").true;
+        expect(
+            response.data!.searchPackages.packages!.find((p) => p.identifier.catalogSlug == "testA-packages-search") !=
+                null,
+            "package returned"
+        ).true;
+        expect(response.data!.searchPackages.packages![0].displayName).to.equal("Congressional Legislators");
+    });
+
+    it("Should allow User A to search for package by README file content", async function () {
+        let response = await userAClient.query({
+            query: SearchPackagesDocument,
+            variables: {
+                limit: 10,
+                offset: 0,
+                query: "readme"
             }
         });
 
@@ -129,7 +186,7 @@ describe("Package Search Tests", async () => {
 
     it("User A delete package", async function () {
         let response = await userAClient.mutate({
-            mutation: DisablePackageDocument,
+            mutation: DeletePackageDocument,
             variables: {
                 identifier: {
                     catalogSlug: "testA-packages-search",
@@ -139,8 +196,6 @@ describe("Package Search Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").true;
-        expect(response.data!.disablePackage.identifier.packageSlug.startsWith("congressional-legislators-DISABLED-"))
-            .true;
     });
 
     it("Should not return package after delete", async function () {

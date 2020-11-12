@@ -199,6 +199,10 @@ resource "google_cloud_run_service" "default" {
           value = "DataPM TEST Registry"
         }
         env {
+          name  = "REGISTRY_URL"
+          value = "https://test.datapm.io"
+        }
+        env {
           name  = "REGISTRY_HOSTNAME"
           value = "test.datapm.io"
         }

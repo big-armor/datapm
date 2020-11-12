@@ -1,0 +1,29 @@
+mutation CreateCollection($value: CreateCollectionInput!) {
+    createCollection(value: $value) {
+        creator {
+            username
+        }
+        identifier {
+            collectionSlug
+        }
+        name
+        description
+        packages {
+            identifier {
+                catalogSlug
+                packageSlug
+            }
+            displayName
+            description
+            latestVersion {
+                identifier {
+                    versionMajor
+                    versionMinor
+                    versionPatch
+                }
+            }
+        }
+        createdAt
+        updatedAt
+    }
+}

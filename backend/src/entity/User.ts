@@ -30,9 +30,6 @@ export class User extends BaseModel {
     @Column({ length: 254, type: "varchar" })
     emailAddress: string;
 
-    @Column({ name: "is_active" })
-    isActive: boolean;
-
     @Column({ nullable: true, length: 255, type: "varchar" })
     sub: string | null;
 

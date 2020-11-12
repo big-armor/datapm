@@ -4,12 +4,17 @@ import { VersionIdentifierInput, CreateVersionInput, PackageIdentifierInput } fr
 import { PackageRepository } from "./PackageRepository";
 import { SemVer } from "semver";
 import { Maybe } from "graphql/jsutils/Maybe";
+import { FileStorageService } from "../storage/files/file-storage-service";
+import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
 
 @EntityRepository()
 export class VersionRepository {
+    readonly packageFileStorageService = PackageFileStorageService.INSTANCE;
     constructor(private manager: EntityManager) {}
 
     async save(userId: number, identifier: PackageIdentifierInput, value: CreateVersionInput) {
+        const fileStorageService: FileStorageService = FileStorageService.INSTANCE;
+
         return await this.manager.nestedTransaction(async (transaction) => {
             const packageEntity = await transaction.getCustomRepository(PackageRepository).findOrFail({ identifier });
 
@@ -23,8 +28,7 @@ export class VersionRepository {
                 description: value.packageFile.description || undefined,
                 authorId: userId,
                 createdAt: new Date(),
-                updatedAt: new Date(value.packageFile.updatedDate),
-                packageFile: value.packageFile
+                updatedAt: new Date(value.packageFile.updatedDate)
             });
 
             return await transaction.save(version);
@@ -33,18 +37,14 @@ export class VersionRepository {
 
     async findLatestVersion({
         identifier,
-        includeActiveOnly,
         relations = []
     }: {
         identifier: PackageIdentifierInput;
-        includeActiveOnly: boolean;
         relations?: string[];
     }): Promise<Maybe<Version>> {
         const ALIAS = "findLatestVersion";
 
-        const packageRef = await this.manager
-            .getCustomRepository(PackageRepository)
-            .findPackageOrFail({ identifier, includeActiveOnly });
+        const packageRef = await this.manager.getCustomRepository(PackageRepository).findPackageOrFail({ identifier });
 
         return this.manager
             .getRepository(Version)
@@ -92,25 +92,51 @@ export class VersionRepository {
         const versions = await this.manager
             .getRepository(Version)
             .createQueryBuilder(ALIAS)
-            .where({ packageId, isActive: true })
+            .where({ packageId })
             .addRelations(ALIAS, relations)
             .getMany();
 
         return versions;
     }
 
-    disableVersions(versions: Version[]): void {
+    async deleteVersions(versions: Version[]): Promise<void> {
         if (versions.length == 0) return;
 
-        this.manager.nestedTransaction(async (transaction) => {
-            await transaction
-                .createQueryBuilder()
-                .update(Version)
-                .set({
-                    isActive: false
-                })
-                .whereInIds(versions.map((v) => v.id))
-                .execute();
+        for (const version of versions) {
+            const versionIdentifier: VersionIdentifierInput = {
+                catalogSlug: version.package.catalog.slug,
+                packageSlug: version.package.slug,
+                versionMajor: version.majorVersion,
+                versionMinor: version.minorVersion,
+                versionPatch: version.patchVersion
+            };
+            try {
+                await this.packageFileStorageService.deletePackageFile(versionIdentifier);
+            } catch (error) {
+                if (error.message.includes("ENOENT")) return;
+
+                console.error(error.message);
+            }
+
+            try {
+                await this.packageFileStorageService.deleteLicenseFile(versionIdentifier);
+            } catch (error) {
+                if (error.message.includes("ENOENT")) return;
+
+                console.error(error.message);
+            }
+
+            try {
+                await this.packageFileStorageService.deleteReadmeFile(versionIdentifier);
+            } catch (error) {
+                if (error.message.includes("ENOENT")) return;
+
+                console.error(error.message);
+            }
+        }
+
+        await this.manager.nestedTransaction(async (transaction) => {
+            for (const version of versions) await transaction.delete(Version, { id: version.id });
         });
     }
 }

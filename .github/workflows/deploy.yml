@@ -12,24 +12,26 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v2
 
+            - uses: actions/setup-node@v2-beta
+              with:
+                  node-version: "12"
+
             - name: Print npm verion
               run: npm --version
 
             - name: Print node verion
               run: node --version
 
-            - name: Echo Docker Password to file
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-              run: echo $${{secrets.DOCKER_PASSWORD}} > ~/docker-password
-
-            - name: Authorize Docker
-              uses: docker/login-action@v1
+            - name: Cache node_modules
+              id: cache-modules
+              uses: actions/cache@v1
               with:
-                  username: ${{ secrets.DOCKER_USERNAME }}
-                  password: ${{ secrets.DOCKER_PASSWORD }}
+                  path: node_modules
+                  key: ${{ matrix.node-version }}-${{ runner.OS }}-build-${{ hashFiles('package.json') }}
 
-            - name: Install Docker Build Dependencies
-              run: npm install gulp
+            - name: Install Dependencies
+              if: steps.cache-modules.outputs.cache-hit != 'true'
+              run: npm ci
 
             - name: Run Prettier linter
               uses: wearerequired/lint-action@v1.6.0
@@ -37,11 +39,39 @@ jobs:
                   github_token: ${{ secrets.github_token }}
                   prettier: true
 
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v1
+
             - name: Terraform Format
               run: terraform fmt -check
 
+            - name: Set Git Author
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: git config user.name "$${{env.GITHUB_ACTOR}}" && git config user.email "gitHubActionDeployer@no-reply"
+
+            - name: Bump Version
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: npm run bump-version
+
+            - name: Echo Docker Password to file
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: echo $${{secrets.DOCKER_PASSWORD}} > ~/docker-password
+
             - name: Build Docker Container
               run: npm run build
+
+            - name: Smoke Test Docker Image
+              run: npm run test
+
+            - name: Tag
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: npm run tag
+
+            - name: Authorize Docker
+              uses: docker/login-action@v1
+              with:
+                  username: ${{ secrets.DOCKER_USERNAME }}
+                  password: ${{ secrets.DOCKER_PASSWORD }}
 
             - name: Write Credentials file
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
@@ -65,10 +95,13 @@ jobs:
                   PROJECT_ID: data-test-terraform
                   GOOGLE_CREDENTIALS: ~/gcloud.key
 
-            - name: Setup Terraform
-              uses: hashicorp/setup-terraform@v1
+            - uses: JS-DevTools/npm-publish@v1
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              with:
+                  package: ./lib/package.json
+                  token: ${{ secrets.NPM_TOKEN }}
 
-            - name: Terraform Init
+            - name: Terraform Init to
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: terraform init
               env:
@@ -110,3 +143,5 @@ jobs:
             - name: Publish Apollo Graphql Update
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: npx apollo service:push --graph=datapm --key=${{secrets.TF_VAR_APOLLO_KEY}} --variant=test --localSchemaFile=backend/dist/schema.gql,backend/dist/auth-schema.gql,backend/dist/user-schema.gql,backend/dist/api-key-schema.gql,backend/dist/images-schema.gql
+              env:
+                  INPUT_TOKEN: ${{ secrets.NPM_TOKEN }}

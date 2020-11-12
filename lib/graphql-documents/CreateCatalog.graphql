@@ -1,0 +1,11 @@
+mutation CreateCatalog($value: CreateCatalogInput!) {
+    createCatalog(value: $value) {
+        identifier {
+            catalogSlug
+        }
+        displayName
+        description
+        website
+        isPublic
+    }
+}

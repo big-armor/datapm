@@ -1,6 +1,7 @@
 import { ApolloError, ValidationError } from "apollo-server";
 import { AuthenticatedContext } from "../context";
 import {
+    Base64ImageUpload,
     CollectionIdentifierInput,
     CollectionPackage,
     CreateCollectionInput,
@@ -14,8 +15,6 @@ import { PackageRepository } from "../repository/PackageRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { grantAllCollectionPermissionsForUser } from "./UserCollectionPermissionResolver";
 import { ImageStorageService } from "../storage/images/image-storage-service";
-import { ImageType } from "../storage/images/image-type";
-import { Collection } from "../entity/Collection";
 
 export const createCollection = async (
     _0: any,
@@ -77,32 +76,23 @@ export const myCollections = async (
 
 export const setCollectionCoverImage = async (
     _0: any,
-    { identifier, image }: { identifier: CollectionIdentifierInput; image: any },
+    { identifier, image }: { identifier: CollectionIdentifierInput; image: Base64ImageUpload },
     context: AuthenticatedContext,
     info: any
 ) => {
-    const uploadedImage = await image;
-    const collectionEntity = await context.connection
-        .getCustomRepository(CollectionRepository)
-        .findCollectionBySlugOrFail(identifier.collectionSlug);
-    await ImageStorageService.INSTANCE.saveImage(
-        collectionEntity.id,
-        uploadedImage,
-        ImageType.COLLECTION_COVER_IMAGE,
-        context
-    );
+    return ImageStorageService.INSTANCE.saveCollectionCoverImage(identifier, image.base64);
 };
 
-export const disableCollection = async (
+export const deleteCollection = async (
     _0: any,
     { identifier }: { identifier: CollectionIdentifierInput },
     context: AuthenticatedContext,
     info: any
 ) => {
     const relations = getGraphQlRelationName(info);
-    return context.connection.manager
+    await context.connection.manager
         .getCustomRepository(CollectionRepository)
-        .disableCollection(identifier.collectionSlug, relations);
+        .deleteCollection(identifier.collectionSlug);
 };
 
 export const addPackageToCollection = async (
@@ -119,7 +109,7 @@ export const addPackageToCollection = async (
     const identifier = packageIdentifier;
     const packageEntity = await context.connection
         .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier, includeActiveOnly: true });
+        .findPackageOrFail({ identifier });
 
     await context.connection.manager
         .getCustomRepository(CollectionPackageRepository)
@@ -151,7 +141,7 @@ export const removePackageFromCollection = async (
     const identifier = packageIdentifier;
     const packageEntity = await context.connection
         .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier, includeActiveOnly: true });
+        .findPackageOrFail({ identifier });
 
     await context.connection.manager
         .getCustomRepository(CollectionPackageRepository)

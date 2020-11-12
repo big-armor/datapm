@@ -1,11 +1,36 @@
 <div id="catalogsPage">
     <div class="catalogs-div panel-div">
         <div *ngIf="myCatalogs && myCatalogs.length > 0" class="section-title">My Catalogs</div>
-        <mat-card *ngFor="let catalog of myCatalogs">
-            <a routerLink="/{{ catalog.identifier.catalogSlug }}">
-                {{ catalog.displayName || catalog.identifier.catalogSlug }}
-            </a>
-            <mat-card-description class="content-description">{{ catalog.description }}</mat-card-description>
-        </mat-card>
+        <table *ngIf="myCatalogs && myCatalogs.length > 0" mat-table [dataSource]="myCatalogs">
+            <!-- Label column -->
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Name</th>
+                <td class="table-content" mat-cell *matCellDef="let catalog">
+                    <a [routerLink]="['/' + catalog.identifier.catalogSlug]">{{ catalog.displayName }}</a>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="public">
+                <th mat-header-cell *matHeaderCellDef>Public</th>
+                <td class="table-content" mat-cell *matCellDef="let catalog">
+                    <mat-slide-toggle
+                        [checked]="catalog.isPublic"
+                        (change)="updateCatalogVisibility(catalog, $event.checked)"
+                    >
+                    </mat-slide-toggle>
+                </td>
+            </ng-container>
+
+            <!-- Actions column -->
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let catalog">
+                    <a class="edit-button" (click)="deleteCatalog(catalog)">Delete</a>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+            <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
+        </table>
     </div>
 </div>

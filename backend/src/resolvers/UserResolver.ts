@@ -11,7 +11,6 @@ import { CatalogRepository } from "../repository/CatalogRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { hashPassword } from "../util/PasswordUtil";
 import { getGraphQlRelationName } from "../util/relationNames";
-import { ImageType } from "../storage/images/image-type";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 
 export const emailAddressAvailable = async (
@@ -100,12 +99,7 @@ export const setMyCoverImage = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    return await ImageStorageService.INSTANCE.saveImageFromBase64(
-        context.me.id,
-        image.base64,
-        ImageType.USER_COVER_IMAGE,
-        context
-    );
+    return ImageStorageService.INSTANCE.saveUserCoverImage(context.me.username, image.base64);
 };
 
 export const setMyAvatarImage = async (
@@ -114,18 +108,11 @@ export const setMyAvatarImage = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    return await ImageStorageService.INSTANCE.saveImageFromBase64(
-        context.me.id,
-        image.base64,
-        ImageType.USER_AVATAR_IMAGE,
-        context
-    );
+    return ImageStorageService.INSTANCE.saveUserAvatarImage(context.me.username, image.base64);
 };
 
-export const disableMe = async (_0: any, {}, context: AuthenticatedContext, info: any) => {
-    return await context.connection.manager.getCustomRepository(UserRepository).markUserActiveStatus({
-        username: context.me.username,
-        active: false,
-        relations: getGraphQlRelationName(info)
+export const deleteMe = async (_0: any, {}, context: AuthenticatedContext, info: any) => {
+    return await context.connection.manager.getCustomRepository(UserRepository).deleteUser({
+        username: context.me.username
     });
 };
