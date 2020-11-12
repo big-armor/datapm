@@ -11,45 +11,46 @@ import {
 } from "../src/PackageUtil";
 import { Schema } from "../src/main";
 import { SemVer } from "semver";
-/// <reference types="jest" />
+import { expect } from "chai";
+
 describe("Checking VersionUtil", () => {
-    test("Compatibility ENUM Order", () => {
-        expect(leastCompatible(Compability.Identical, Compability.BreakingChange)).toEqual(Compability.BreakingChange);
+    it("Compatibility ENUM Order", () => {
+        expect(leastCompatible(Compability.Identical, Compability.BreakingChange)).equal(Compability.BreakingChange);
     });
 
-    test("No change test", () => {
+    it("No change test", () => {
         const oldVersion = new SemVer("1.0.3");
         const newVersion = nextVersion(oldVersion, Compability.Identical);
 
-        expect(oldVersion.version).toEqual("1.0.3");
-        expect(newVersion.version).toEqual("1.0.3");
+        expect(oldVersion.version).equal("1.0.3");
+        expect(newVersion.version).equal("1.0.3");
     });
 
-    test("Minor change test", () => {
+    it("Minor change test", () => {
         const oldVersion = new SemVer("1.0.3");
         const newVersion = nextVersion(oldVersion, Compability.MinorChange);
 
-        expect(oldVersion.version).toEqual("1.0.3");
-        expect(newVersion.version).toEqual("1.0.4");
+        expect(oldVersion.version).equal("1.0.3");
+        expect(newVersion.version).equal("1.0.4");
     });
 
-    test("Compatible change test", () => {
+    it("Compatible change test", () => {
         const oldVersion = new SemVer("1.0.3");
         const newVersion = nextVersion(oldVersion, Compability.CompatibleChange);
 
-        expect(oldVersion.version).toEqual("1.0.3");
-        expect(newVersion.version).toEqual("1.1.0");
+        expect(oldVersion.version).equal("1.0.3");
+        expect(newVersion.version).equal("1.1.0");
     });
 
-    test("Breaking change test", () => {
+    it("Breaking change test", () => {
         const oldVersion = new SemVer("1.0.3");
         const newVersion = nextVersion(oldVersion, Compability.BreakingChange);
 
-        expect(oldVersion.version).toEqual("1.0.3");
-        expect(newVersion.version).toEqual("2.0.0");
+        expect(oldVersion.version).equal("1.0.3");
+        expect(newVersion.version).equal("2.0.0");
     });
 
-    test("Simple property schema comparison", () => {
+    it("Simple property schema comparison", () => {
         const schemaA1: Schema = {
             title: "SchemaA",
             type: "string",
@@ -62,16 +63,16 @@ describe("Checking VersionUtil", () => {
             format: "date-time"
         };
 
-        expect(compareSchema(schemaA1, schemaA2).length).toEqual(0);
+        expect(compareSchema(schemaA1, schemaA2).length).equal(0);
 
         schemaA2.format = "date";
 
         const changeTitle = compareSchema(schemaA1, schemaA2);
 
-        expect(changeTitle[0].type).toEqual(DifferenceType.CHANGE_PROPERTY_FORMAT);
+        expect(changeTitle[0].type).equal(DifferenceType.CHANGE_PROPERTY_FORMAT);
     });
 
-    test("Type arrays vs singluar values", () => {
+    it("Type arrays vs singluar values", () => {
         const schemaA1: Schema = {
             title: "SchemaA",
             type: "object",
@@ -92,23 +93,23 @@ describe("Checking VersionUtil", () => {
 
         const diff = compareSchema(schemaA1, schemaA2);
 
-        expect(diff.length).toEqual(0);
+        expect(diff.length).equal(0);
 
         schemaA1.properties!["string"].type = ["string", "number"];
 
         const arrayVsNotDiff = compareSchema(schemaA1, schemaA2);
 
-        expect(arrayVsNotDiff.length).toEqual(1);
-        expect(arrayVsNotDiff[0].type).toEqual(DifferenceType.CHANGE_PROPERTY_TYPE);
+        expect(arrayVsNotDiff.length).equal(1);
+        expect(arrayVsNotDiff[0].type).equal(DifferenceType.CHANGE_PROPERTY_TYPE);
 
         schemaA2.properties!["string"].type = ["string", "number"];
 
         const equalDiff = compareSchema(schemaA1, schemaA2);
 
-        expect(equalDiff.length).toEqual(0);
+        expect(equalDiff.length).equal(0);
     });
 
-    test("Object schema comparison", () => {
+    it("Object schema comparison", () => {
         const schemaA1: Schema = {
             title: "SchemaA",
             type: "object",
@@ -129,15 +130,15 @@ describe("Checking VersionUtil", () => {
 
         const diff = compareSchema(schemaA1, schemaA2);
 
-        expect(diff.length).toEqual(0);
+        expect(diff.length).equal(0);
 
         schemaA2.properties!["boolean"] = { title: "boolean", type: "boolean" };
 
         const compatibleChange = compareSchema(schemaA1, schemaA2);
 
-        expect(compatibleChange.length).toEqual(1);
+        expect(compatibleChange.length).equal(1);
 
-        expect(compatibleChange[0].type).toEqual(DifferenceType.ADD_PROPERTY);
+        expect(compatibleChange[0].type).equal(DifferenceType.ADD_PROPERTY);
 
         schemaA1.properties!["date"] = {
             title: "date",
@@ -146,11 +147,11 @@ describe("Checking VersionUtil", () => {
         };
 
         const removePropertyDiff = compareSchema(schemaA1, schemaA2);
-        expect(removePropertyDiff.length).toEqual(2);
+        expect(removePropertyDiff.length).equal(2);
 
         const propertyRemoved = removePropertyDiff.find((d) => d.type == DifferenceType.ADD_PROPERTY);
 
-        expect(propertyRemoved != null).toEqual(true);
+        expect(propertyRemoved != null).equal(true);
 
         schemaA1.properties!["boolean"] = { title: "boolean", type: "boolean" };
         schemaA2.properties!["date"] = {
@@ -160,18 +161,20 @@ describe("Checking VersionUtil", () => {
         };
 
         const finalDiff = compareSchema(schemaA1, schemaA2);
-        expect(finalDiff).toHaveLength(0);
+        expect(finalDiff).length(0);
     });
 
-    test("Diff compatibility testing", () => {
-        expect(nextVersion(new SemVer("1.0.2"), Compability.BreakingChange)).toEqual(new SemVer("2.0.0"));
+    it("Diff compatibility testing", () => {
+        expect(nextVersion(new SemVer("1.0.2"), Compability.BreakingChange).version).equal(new SemVer("2.0.0").version);
 
-        expect(nextVersion(new SemVer("1.0.3"), Compability.CompatibleChange)).toEqual(new SemVer("1.1.0"));
+        expect(nextVersion(new SemVer("1.0.3"), Compability.CompatibleChange).version).equal(
+            new SemVer("1.1.0").version
+        );
 
-        expect(nextVersion(new SemVer("1.0.3"), Compability.MinorChange)).toEqual(new SemVer("1.0.4"));
+        expect(nextVersion(new SemVer("1.0.3"), Compability.MinorChange).version).equal(new SemVer("1.0.4").version);
     });
 
-    test("Nested Objects Comparison", () => {
+    it("Nested Objects Comparison", () => {
         const schemaA1: Schema = {
             title: "SchemaA",
             type: "object",
@@ -203,82 +206,82 @@ describe("Checking VersionUtil", () => {
         };
 
         const firstDiff = compareSchema(schemaA1, schemaA2);
-        expect(firstDiff).toHaveLength(0);
+        expect(firstDiff).length(0);
 
-        expect(diffCompatibility(firstDiff)).toEqual(Compability.Identical);
+        expect(diffCompatibility(firstDiff)).equal(Compability.Identical);
 
         schemaA2.properties!["object"].properties!["string2"] = { type: "string" };
 
         const compatibleDiff = compareSchema(schemaA1, schemaA2);
 
-        expect(compatibleDiff).toHaveLength(1);
+        expect(compatibleDiff).length(1);
 
-        expect(compatibleDiff[0].type).toEqual(DifferenceType.ADD_PROPERTY);
-        expect(compatibleDiff[0].pointer).toEqual("#/SchemaA/properties/object/properties/string2");
+        expect(compatibleDiff[0].type).equal(DifferenceType.ADD_PROPERTY);
+        expect(compatibleDiff[0].pointer).equal("#/SchemaA/properties/object/properties/string2");
 
         const compatibleComparison = diffCompatibility(compatibleDiff);
 
-        expect(compatibleComparison).toEqual(Compability.CompatibleChange);
+        expect(compatibleComparison).equal(Compability.CompatibleChange);
 
         schemaA1.properties!["object"].properties!["string3"] = { type: "string" };
 
         const breakingDiff = compareSchema(schemaA1, schemaA2);
-        expect(breakingDiff).toHaveLength(2);
+        expect(breakingDiff).length(2);
 
-        expect(breakingDiff[0].type).toEqual(DifferenceType.REMOVE_PROPERTY);
-        expect(breakingDiff[0].pointer).toEqual("#/SchemaA/properties/object");
-        expect(breakingDiff[1].type).toEqual(DifferenceType.ADD_PROPERTY);
-        expect(breakingDiff[1].pointer).toEqual("#/SchemaA/properties/object/properties/string2");
+        expect(breakingDiff[0].type).equal(DifferenceType.REMOVE_PROPERTY);
+        expect(breakingDiff[0].pointer).equal("#/SchemaA/properties/object");
+        expect(breakingDiff[1].type).equal(DifferenceType.ADD_PROPERTY);
+        expect(breakingDiff[1].pointer).equal("#/SchemaA/properties/object/properties/string2");
 
         const breakingChange = diffCompatibility(breakingDiff);
 
-        expect(breakingChange).toEqual(Compability.BreakingChange);
+        expect(breakingChange).equal(Compability.BreakingChange);
 
         schemaA1.properties!["object"].properties!["string2"] = { type: "string" };
         schemaA2.properties!["object"].properties!["string3"] = { type: "string" };
 
         const finalDiff = compareSchema(schemaA1, schemaA2);
 
-        expect(finalDiff).toHaveLength(0);
+        expect(finalDiff).length(0);
 
-        expect(diffCompatibility(finalDiff)).toEqual(Compability.Identical);
+        expect(diffCompatibility(finalDiff)).equal(Compability.Identical);
     });
 
-    test("Catalog slug validation", () => {
-        expect(validateCatalogSlug("a")).toEqual(true);
-        expect(validateCatalogSlug("0")).toEqual(true);
-        expect(validateCatalogSlug("a-b")).toEqual(true);
-        expect(validateCatalogSlug("a-b-123")).toEqual(true);
-        expect(validateCatalogSlug("a".repeat(39))).toEqual(true);
+    it("Catalog slug validation", () => {
+        expect(validateCatalogSlug("a")).equal(true);
+        expect(validateCatalogSlug("0")).equal(true);
+        expect(validateCatalogSlug("a-b")).equal(true);
+        expect(validateCatalogSlug("a-b-123")).equal(true);
+        expect(validateCatalogSlug("a".repeat(39))).equal(true);
 
-        expect(validateCatalogSlug(undefined)).toEqual(false);
-        expect(validateCatalogSlug("")).toEqual(false);
-        expect(validateCatalogSlug("a_b")).toEqual(false);
-        expect(validateCatalogSlug("a--b")).toEqual(false);
-        expect(validateCatalogSlug("a-b-")).toEqual(false);
-        expect(validateCatalogSlug("-a-b")).toEqual(false);
-        expect(validateCatalogSlug("a".repeat(40))).toEqual(false);
+        expect(validateCatalogSlug(undefined)).equal(false);
+        expect(validateCatalogSlug("")).equal(false);
+        expect(validateCatalogSlug("a_b")).equal(false);
+        expect(validateCatalogSlug("a--b")).equal(false);
+        expect(validateCatalogSlug("a-b-")).equal(false);
+        expect(validateCatalogSlug("-a-b")).equal(false);
+        expect(validateCatalogSlug("a".repeat(40))).equal(false);
     });
 
-    test("Package slug validation", () => {
-        expect(validatePackageSlug("a")).toEqual(true);
-        expect(validatePackageSlug("0")).toEqual(true);
-        expect(validatePackageSlug("a.b")).toEqual(true);
-        expect(validatePackageSlug("a--b")).toEqual(true);
-        expect(validatePackageSlug("a__b")).toEqual(true);
-        expect(validatePackageSlug("a__b----c.123")).toEqual(true);
-        expect(validatePackageSlug("a".repeat(100))).toEqual(true);
+    it("Package slug validation", () => {
+        expect(validatePackageSlug("a")).equal(true);
+        expect(validatePackageSlug("0")).equal(true);
+        expect(validatePackageSlug("a.b")).equal(true);
+        expect(validatePackageSlug("a--b")).equal(true);
+        expect(validatePackageSlug("a__b")).equal(true);
+        expect(validatePackageSlug("a__b----c.123")).equal(true);
+        expect(validatePackageSlug("a".repeat(100))).equal(true);
 
-        expect(validatePackageSlug(undefined)).toEqual(false);
-        expect(validatePackageSlug("")).toEqual(false);
-        expect(validatePackageSlug(".")).toEqual(false);
-        expect(validatePackageSlug("-")).toEqual(false);
-        expect(validatePackageSlug("_")).toEqual(false);
-        expect(validatePackageSlug("a@b")).toEqual(false);
-        expect(validatePackageSlug("a.")).toEqual(false);
-        expect(validatePackageSlug("a..b")).toEqual(false);
-        expect(validatePackageSlug("a-")).toEqual(false);
-        expect(validatePackageSlug("a_")).toEqual(false);
-        expect(validatePackageSlug("a___c")).toEqual(false);
+        expect(validatePackageSlug(undefined)).equal(false);
+        expect(validatePackageSlug("")).equal(false);
+        expect(validatePackageSlug(".")).equal(false);
+        expect(validatePackageSlug("-")).equal(false);
+        expect(validatePackageSlug("_")).equal(false);
+        expect(validatePackageSlug("a@b")).equal(false);
+        expect(validatePackageSlug("a.")).equal(false);
+        expect(validatePackageSlug("a..b")).equal(false);
+        expect(validatePackageSlug("a-")).equal(false);
+        expect(validatePackageSlug("a_")).equal(false);
+        expect(validatePackageSlug("a___c")).equal(false);
     });
 });
