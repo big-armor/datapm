@@ -123,7 +123,6 @@ exports.buildParallel = series(
 
 exports.bumpAndTagAssets = series(
     bumpVersion,
-    gitTag,
     gitPushTag,
     tagGCRDockerImage,
     tagDockerImage,
