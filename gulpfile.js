@@ -140,6 +140,7 @@ exports.default = series(
 );
 
 exports.buildParallel = series(
+    series(installLibDependencies, buildLib, testLib),
     parallel(
         series(installBackendDependencies, buildBackend, testBackend),
         series(installFrontendDependencies, buildFrontend, testFrontend),
