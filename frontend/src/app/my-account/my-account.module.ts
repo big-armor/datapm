@@ -20,6 +20,8 @@ import { EditAccountDialogComponent } from "./edit-account-dialog/edit-account-d
 import { EditPasswordDialogComponent } from "./edit-password-dialog/edit-password-dialog.component";
 import { PackagesComponent } from "./packages/packages.component";
 
+import { SharedModule } from "../shared/shared.module";
+
 @NgModule({
     declarations: [
         MyAccountComponent,
@@ -42,7 +44,8 @@ import { PackagesComponent } from "./packages/packages.component";
         MatDialogModule,
         MatIconModule,
         MatSlideToggleModule,
-        MatTableModule
+        MatTableModule,
+        SharedModule
     ]
 })
 export class MyAccountModule {}

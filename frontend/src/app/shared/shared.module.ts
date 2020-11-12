@@ -9,6 +9,7 @@ import { MatMenuModule } from "@angular/material/menu";
 import { MatDialogModule } from "@angular/material/dialog";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatStepperModule } from "@angular/material/stepper";
+import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 
 import { HeaderComponent } from "./header/header.component";
 import { FooterComponent } from "./footer/footer.component";
@@ -41,6 +42,7 @@ import { SignUpDialogComponent } from "./header/sign-up-dialog/sign-up-dialog.co
         MatDialogModule,
         MatProgressSpinnerModule,
         MatStepperModule,
+        MatSlideToggleModule,
         FormsModule,
         ReactiveFormsModule,
         RouterModule

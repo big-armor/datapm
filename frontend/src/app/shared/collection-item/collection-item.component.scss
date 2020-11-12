@@ -1,4 +1,4 @@
-.package-item {
+.collection-item {
     cursor: pointer;
     box-shadow: -4px 0 4px hsla(0, 0%, 100%, 0.25), 0 -4px 4px hsla(0, 0%, 100%, 0.25),
         0 4px 4px hsla(0, 0%, 74.1%, 0.25), 4px 0 4px hsla(0, 0%, 74.1%, 0.25);
@@ -8,7 +8,7 @@
     flex: 1;
 }
 
-.package-image img {
+.collection-image img {
     width: 100%;
     max-height: 150px;
     object-fit: cover;
@@ -31,7 +31,7 @@
     }
 }
 
-.package-identifier {
+.collection-identifier {
     font-family: Roboto Mono;
     font-weight: 500;
     font-size: 20px;
@@ -40,7 +40,7 @@
     letter-spacing: -0.28px;
 }
 
-.package-description {
+.collection-description {
     font-family: Roboto Mono;
     font-style: normal;
     font-weight: 300;
@@ -52,7 +52,7 @@
     overflow: hidden;
 }
 
-.package-chips {
+.collection-chips {
     ::ng-deep.mat-chip {
         font-family: Roboto Mono;
         font-style: normal;
@@ -72,7 +72,7 @@
     }
 }
 
-.package-actions {
+.collection-actions {
     button {
         width: 32px;
         height: 32px;
@@ -109,7 +109,7 @@
     }
 }
 
-.package-creator {
+.collection-creator {
     .photo {
         width: 30px;
         height: 30px;
@@ -126,5 +126,24 @@
         color: #828282;
         padding: 4px 10px;
         margin-bottom: 0 !important;
+    }
+}
+.collections-public {
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: 10px;
+    margin-left: 5px;
+    font-family: Roboto Mono;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 10px;
+    line-height: 13px;
+    letter-spacing: -0.28px;
+
+    .public-text {
+        color: #00a896;
+    }
+    .not-public-text {
+        color: #828282;
     }
 }

@@ -1,20 +1,45 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
-import { Collection } from "../../../generated/graphql";
+import { Collection, UpdateCollectionGQL } from "../../../generated/graphql";
 import * as timeago from "timeago.js";
+import { FormGroup, FormControl } from "@angular/forms";
+import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 
+import { takeUntil } from "rxjs/operators";
+import { Subject } from "rxjs";
+
+enum State {
+    INIT,
+    LOADING,
+    ERROR,
+    SUCCESS,
+    ERROR_NOT_UNIQUE,
+    ERROR_NO_LABEL
+}
 @Component({
     selector: "app-collection-item",
     templateUrl: "./collection-item.component.html",
     styleUrls: ["./collection-item.component.scss"]
 })
 export class CollectionItemComponent implements OnInit {
+    public isPublic: boolean = false;
+    public form: FormGroup;
+    private collection: Collection;
+    private subscription = new Subject();
     @Input() item: Collection;
     @Input() hasImage: boolean;
+    updatePublicState = State.INIT;
 
-    constructor(private router: Router) {}
+    constructor(private router: Router, private updateCollectionGQL: UpdateCollectionGQL) {}
 
-    ngOnInit(): void {}
+    ngOnInit(): void {
+        this.collection = this.item;
+
+        this.form = new FormGroup({
+            collectionIsPublic: new FormControl(this.collection.isPublic)
+        });
+        this.isPublic = this.collection.isPublic;
+    }
 
     goToComponent(): void {
         const { collectionSlug } = this.item.identifier;
@@ -34,5 +59,39 @@ export class CollectionItemComponent implements OnInit {
             return this.item.description.substr(0, 220) + "...";
         }
         return this.item.description;
+    }
+
+    toggleCollectionIsPublic(ev: MatSlideToggleChange) {
+        this.isPublic = ev.checked;
+    }
+
+    updateIsPublic() {
+        if (this.form.invalid) {
+            return;
+        }
+
+        let slug = this.item.identifier.collectionSlug;
+        let formValueIsPublic = this.form.value.collectionIsPublic;
+        this.updateCollectionGQL
+            .mutate({
+                identifier: {
+                    collectionSlug: slug
+                },
+                value: {
+                    isPublic: !formValueIsPublic
+                }
+            })
+            .pipe(takeUntil(this.subscription))
+            .subscribe((response) => {
+                if (response.errors?.length > 0) {
+                    if (response.errors.find((e) => e.message == "COLLECTION_IS_PUBLIC CANNOT BE UPDATED")) {
+                        this.updatePublicState = State.ERROR_NOT_UNIQUE;
+                        return;
+                    }
+                    this.updatePublicState = State.ERROR;
+                    return;
+                }
+                this.updatePublicState = State.SUCCESS;
+            });
     }
 }

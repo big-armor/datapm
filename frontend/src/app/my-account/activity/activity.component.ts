@@ -1,10 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { MyCollectionsGQL } from "src/generated/graphql";
-import { Subject } from "rxjs";
-import { take, takeUntil } from "rxjs/operators";
 
-class DackageWithModifiedDate {
-    package: any;
+class MyCollections {
+    allCollections: any;
 }
 
 @Component({
@@ -13,46 +11,21 @@ class DackageWithModifiedDate {
     styleUrls: ["./activity.component.scss"]
 })
 export class ActivityComponent implements OnInit {
-    // collectionState = State.INIT;
-    // private subscription = new Subject();
-    public colls: DackageWithModifiedDate[] = [];
+    public collections: MyCollections[] = [];
     constructor(private myCollections: MyCollectionsGQL) {}
 
     ngOnInit(): void {
-        this.loadLatestCollections();
+        this.loadMyCollections();
     }
 
-    private loadLatestCollections(): void {
+    private loadMyCollections(): void {
+        // Need to set a dynamic limit for future / pagination
         this.myCollections.fetch({ offSet: 0, limit: 5 }).subscribe((a) => {
-            const dateNow = new Date();
-            this.colls = a.data.myCollections.collections.map((p) => {
-                // const changeDates = this.getLastChangedDates(p);
-                console.log("P: ", p);
+            this.collections = a.data.myCollections.collections.map((p) => {
                 return {
-                    package: p
+                    allCollections: p
                 };
             });
         });
     }
-
-    // loadMyCollections() {
-    //     this.myCollections
-    //         .fetch({
-    //             limit: 10,
-    //             offSet: 0
-    //         })
-    //         .pipe(takeUntil(this.subscription))
-    //         .subscribe((response) => {
-    //             if (response.data?.myCollections.collections.length <= 0) {
-    //                 this.collectionState = State.ERROR;
-    //                 return;
-    //             }
-    //             this.coll.push(response.data.myCollections.collections);
-    //             this.coll.map((p) => {
-    //                 return {
-    //                     collections: p
-    //                 };
-    //             });
-    //         });
-    // }
 }
