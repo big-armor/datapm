@@ -1,6 +1,6 @@
 {
     "name": "datapm-lib",
-    "version": "0.6.9",
+    "version": "0.6.10",
     "description": "Definitions and utilities for managing datapm package files.",
     "main": "dist/src/main.js",
     "scripts": {
@@ -8,7 +8,7 @@
         "lint": "tslint -p tsconfig.json",
         "pretty-quick": "pretty-quick --pattern \"(src|test)/**/*.ts\"",
         "build": "tsc",
-        "test": "gqlint schema.gql && npx jest"
+        "test": "gqlint schema.gql && mocha --slow 3000 --timeout 60000 -r ts-node/register test/*.ts"
     },
     "files": [
         "dist/**/*",
@@ -23,14 +23,16 @@
     "author": "Travis Collins",
     "license": "CC-BY-NC-ND-4.0",
     "devDependencies": {
+        "@types/chai": "^4.2.14",
         "@types/json-schema": "^7.0.5",
+        "@types/mocha": "^8.0.4",
         "@types/semver": "^7.3.1",
+        "chai": "^4.2.0",
         "gqlint": "^1.8.0",
         "husky": "^4.3.0",
-        "jest": "^26.3.0",
+        "mocha": "^8.2.1",
         "prettier": "^2.0.5",
         "pretty-quick": "^3.1.0",
-        "ts-jest": "^26.2.0",
         "ts-lint": "^4.5.1",
         "tslint-config-prettier": "^1.18.0",
         "typescript": "^3.9.7"
