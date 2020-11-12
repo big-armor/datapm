@@ -125,13 +125,6 @@ exports.buildParallel = series(
     buildDockerImage
 );
 
-exports.bumpAndTagAssets = series(
-    showGitDiff,
-    bumpVersion,
-    gitPushTag,
-    tagGCRDockerImage,
-    tagDockerImage,
-    pushGCRImage,
-    pushDockerImage
-);
+exports.bumpAndGitTag = series(showGitDiff, bumpVersion, gitPushTag);
+exports.deployDockerImages = series(tagGCRDockerImage, tagDockerImage, pushGCRImage, pushDockerImage);
 exports.buildDockerImage = buildDockerImage;

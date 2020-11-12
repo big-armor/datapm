@@ -18,6 +18,10 @@ jobs:
             - name: Print node verion
               run: node --version
 
+            - name: Bump Version and Git Tag
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: npm run tag
+
             - name: Echo Docker Password to file
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: echo $${{secrets.DOCKER_PASSWORD}} > ~/docker-password
