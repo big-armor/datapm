@@ -52,7 +52,7 @@ function buildDockerImage() {
 }
 
 function bumpVersion() {
-    return spawnAndLog("bump-version", "npm", ["version", "minor"]);
+    return spawnAndLog("bump-version", "npm", ["version", "patch"]);
 }
 
 function tagGCRDockerImage() {
@@ -80,16 +80,6 @@ function tagDockerImage() {
 
 function pushDockerImage() {
     return spawnAndLog("docker-push-docker", "docker", ["push", "datapm/datapm-registry:" + readPackageVersion()]);
-}
-
-function gitTag() {
-    return spawnAndLog("git-tag", "git", [
-        "tag",
-        "-a",
-        "v" + readPackageVersion(),
-        "-m",
-        "automatic release " + readPackageVersion()
-    ]);
 }
 
 function gitPushTag() {
