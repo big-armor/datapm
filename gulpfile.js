@@ -102,6 +102,10 @@ function gitPushTag() {
     return spawnAndLog("git-tag-push", "git", ["push", "origin", "v" + readPackageVersion()]);
 }
 
+function libPublish() {
+    return spawnAndLog("lib-publish", "npm", ["publish"], { cwd: "lib" });
+}
+
 function spawnAndLog(prefix, command, args, opts) {
     const child = spawn(command, args, opts);
 
@@ -146,5 +150,5 @@ exports.buildParallel = series(
 
 exports.bumpVersion = series(showGitDiff, bumpRootVersion, bumpLibVersion);
 exports.gitPushTag = series(gitPushTag);
-exports.deployDockerImages = series(tagGCRDockerImage, tagDockerImage, pushGCRImage, pushDockerImage);
+exports.deployAssets = series(libPublish, tagGCRDockerImage, tagDockerImage, pushGCRImage, pushDockerImage);
 exports.buildDockerImage = buildDockerImage;

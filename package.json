@@ -14,7 +14,7 @@
         "start:from-docker-hub": "TYPEORM_IS_DIST=true docker-compose -f docker/docker-compose.yml up",
         "bump-version": "gulp bumpVersion",
         "tag": "gulp gitPushTag",
-        "deploy": "gulp deployDockerImages",
+        "deploy": "gulp deployAssets",
         "test": "snyk test"
     },
     "repository": {
