@@ -127,6 +127,7 @@ exports.buildParallel = series(
 
 exports.bumpAndTagAssets = series(
     showGitDiff,
+    bumpVersion,
     gitPushTag,
     tagGCRDockerImage,
     tagDockerImage,
