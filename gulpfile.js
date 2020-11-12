@@ -1,11 +1,18 @@
+const { fstat } = require("fs");
 const { series, src, dest, parallel } = require("gulp");
 const exec = require("child_process").exec;
 const spawn = require("child_process").spawn;
+const fs = require("fs");
 
 const path = require("path");
 
 const DESTINATION_DIR = path.join(__dirname, "dist");
 console.log(DESTINATION_DIR);
+
+function readPackageVersion() {
+    const packageFile = JSON.stringify(fs.readSync("package.json"));
+    return packageFile.version;
+}
 
 function installBackendDepdendencies() {
     return spawnAndLog("backend-deps", "npm", ["ci"], { cwd: "backend" });
@@ -43,24 +50,49 @@ function buildDockerImage() {
     return spawnAndLog("docker-build", "docker", ["build", "-t", "datapm-registry", ".", "-f", "docker/Dockerfile"]);
 }
 
+function bumpVersion() {
+    return spawnAndLog("bump-version", "npm", ["version", "minor"]);
+}
+
 function tagGCRDockerImage() {
     return spawnAndLog("docker-tag", "docker", [
         "tag",
         "datapm-registry",
-        "gcr.io/datapm-test-terraform/datapm-registry:latest"
+        "gcr.io/datapm-test-terraform/datapm-registry:" + readPackageVersion()
     ]);
 }
 
 function pushGCRImage() {
-    return spawnAndLog("docker-push-gcr", "docker", ["push", "gcr.io/datapm-test-terraform/datapm-registry:latest"]);
+    return spawnAndLog("docker-push-gcr", "docker", [
+        "push",
+        "gcr.io/datapm-test-terraform/datapm-registry:" + readPackageVersion()
+    ]);
 }
 
 function tagDockerImage() {
-    return spawnAndLog("docker-tag", "docker", ["tag", "datapm-registry", "datapm/datapm-registry:latest"]);
+    return spawnAndLog("docker-tag", "docker", [
+        "tag",
+        "datapm-registry",
+        "datapm/datapm-registry:" + readPackageVersion()
+    ]);
 }
 
 function pushDockerImage() {
-    return spawnAndLog("docker-push-docker", "docker", ["push", "datapm/datapm-registry:latest"]);
+    return spawnAndLog("docker-push-docker", "docker", ["push", "datapm/datapm-registry:" + readPackageVersion()]);
+}
+
+function gitTag() {
+    return spawnAndLog("git-tag", "git", [
+        "tag",
+        "-a",
+        "v" + readPackageVersion(),
+        "-m",
+        "automatic release " + readPackageVersion()
+    ]);
+}
+
+function gitPushTag() {
+    return spawnAndLog("git-tag-push", "git", ["push", "origin", "v" + readPackageVersion()]);
 }
 
 function spawnAndLog(prefix, command, args, opts) {
@@ -98,5 +130,13 @@ exports.buildParallel = series(
     buildDockerImage
 );
 
-exports.deployDockerImage = series(tagGCRDockerImage, tagDockerImage, pushGCRImage, pushDockerImage);
+exports.bumpAndTagAssets = series(
+    bumpVersion,
+    gitTag,
+    gitPushTag,
+    tagGCRDockerImage,
+    tagDockerImage,
+    pushGCRImage,
+    pushDockerImage
+);
 exports.buildDockerImage = buildDockerImage;
