@@ -94,7 +94,7 @@ jobs:
                   package: ./lib/package.json
                   token: ${{ secrets.NPM_TOKEN }}
 
-            - name: Terraform Init
+            - name: Terraform Init to
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: terraform init
               env:
@@ -136,3 +136,5 @@ jobs:
             - name: Publish Apollo Graphql Update
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: npx apollo service:push --graph=datapm --key=${{secrets.TF_VAR_APOLLO_KEY}} --variant=test --localSchemaFile=backend/dist/schema.gql,backend/dist/auth-schema.gql,backend/dist/user-schema.gql,backend/dist/api-key-schema.gql,backend/dist/images-schema.gql
+              env:
+                  INPUT_TOKEN: ${{ secrets.NPM_TOKEN }}
