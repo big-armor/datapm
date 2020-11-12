@@ -95,6 +95,7 @@
         "maildev": "^1.1.0",
         "mocha": "^8.1.3",
         "nodemon": "^2.0.4",
+        "npm-bump": "0.0.30",
         "pidtree": "^0.5.0",
         "prettier": "^2.1.2",
         "pretty-quick": "^3.0.2",
