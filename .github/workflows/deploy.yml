@@ -18,14 +18,14 @@ jobs:
             - name: Print node verion
               run: node --version
 
-            - name: Install Docker Build Dependencies
-              run: npm install -g gulp
-
             - name: Run Prettier linter
               uses: wearerequired/lint-action@v1.6.0
               with:
                   github_token: ${{ secrets.github_token }}
                   prettier: true
+
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v1
 
             - name: Terraform Format
               run: terraform fmt -check
@@ -68,9 +68,6 @@ jobs:
               env:
                   PROJECT_ID: data-test-terraform
                   GOOGLE_CREDENTIALS: ~/gcloud.key
-
-            - name: Setup Terraform
-              uses: hashicorp/setup-terraform@v1
 
             - name: Terraform Init
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
