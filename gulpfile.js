@@ -71,11 +71,19 @@ function bumpLibVersion() {
     return spawnAndLog("bump-lib-version", "npm", ["version", readPackageVersion()], { cwd: "lib" });
 }
 
-function tagGCRDockerImage() {
+function tagGCRDockerImageVersion() {
     return spawnAndLog("docker-tag", "docker", [
         "tag",
         "datapm-registry",
         "gcr.io/datapm-test-terraform/datapm-registry:" + readPackageVersion()
+    ]);
+}
+
+function tagGCRDockerImageLatest() {
+    return spawnAndLog("docker-tag", "docker", [
+        "tag",
+        "datapm-registry",
+        "gcr.io/datapm-test-terraform/datapm-registry:latest"
     ]);
 }
 
@@ -86,7 +94,11 @@ function pushGCRImage() {
     ]);
 }
 
-function tagDockerImage() {
+function tagDockerImageLatest() {
+    return spawnAndLog("docker-tag", "docker", ["tag", "datapm-registry", "datapm/datapm-registry:latest"]);
+}
+
+function tagDockerImageVersion() {
     return spawnAndLog("docker-tag", "docker", [
         "tag",
         "datapm-registry",
@@ -165,8 +177,10 @@ exports.bumpVersion = series(showGitDiff, bumpRootVersion, bumpLibVersion);
 exports.gitPushTag = series(gitStageChanges, gitCommit, gitPush, gitPushTag);
 exports.deployAssets = series(
     //libPublish,
-    tagGCRDockerImage,
-    tagDockerImage,
+    tagGCRDockerImageLatest,
+    tagGCRDockerImageVersion,
+    tagDockerImageLatest,
+    tagDockerImageVersion,
     pushGCRImage,
     pushDockerImage
 );
