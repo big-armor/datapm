@@ -47,7 +47,7 @@ jobs:
 
             - name: Bump Version
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-              run: npm run version-bump
+              run: npm run bump-version
 
             - name: Echo Docker Password to file
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
@@ -76,10 +76,6 @@ jobs:
             - name: Authorize Docker for GCR
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: gcloud auth configure-docker --quiet
-
-            - name: Bump Version
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-              run: npm run bump-version
 
             - name: Deploy Assets
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
