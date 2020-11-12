@@ -77,10 +77,6 @@ function spawnAndLog(prefix, command, args, opts) {
     return child;
 }
 
-function bumpVersion() {
-    vers;
-}
-
 exports.default = series(
     installBackendDepdendencies,
     buildBackend,
@@ -104,5 +100,3 @@ exports.buildParallel = series(
 
 exports.deployDockerImage = series(tagGCRDockerImage, tagDockerImage, pushGCRImage, pushDockerImage);
 exports.buildDockerImage = buildDockerImage;
-
-exports.bumpVersion = bumpVersion;
