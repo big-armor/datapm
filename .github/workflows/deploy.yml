@@ -42,6 +42,7 @@ jobs:
               run: terraform fmt -check
 
             - name: Set Git Author
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: git config user.name "$${{env.GITHUB_ACTOR}}" && git config user.email "gitHubActionDeployer@no-reply"
 
             - name: Bump Version and Git Tag
