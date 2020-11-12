@@ -12,7 +12,8 @@
         "build:parallel": "gulp buildParallel",
         "start": "TYPEORM_IS_DIST=true docker-compose -f docker/docker-compose-local-build.yml up",
         "start:from-docker-hub": "TYPEORM_IS_DIST=true docker-compose -f docker/docker-compose.yml up",
-        "tag": "gulp bumpAndGitTag",
+        "bump-version": "gulp bumpVersion",
+        "tag": "gulp gitPushTag",
         "deploy": "gulp deployDockerImages",
         "test": "snyk test"
     },

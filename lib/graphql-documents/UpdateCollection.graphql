@@ -1,0 +1,31 @@
+mutation UpdateCollection($identifier: CollectionIdentifierInput!, $value: UpdateCollectionInput!) {
+    updateCollection(identifier: $identifier, value: $value) {
+        identifier {
+            collectionSlug
+        }
+        name
+        description
+        packages {
+            identifier {
+                catalogSlug
+                packageSlug
+            }
+            displayName
+            description
+            latestVersion {
+                identifier {
+                    versionMajor
+                    versionMinor
+                    versionPatch
+                }
+            }
+            catalog {
+                identifier {
+                    catalogSlug
+                }
+                displayName
+                description
+            }
+        }
+    }
+}

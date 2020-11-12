@@ -1,0 +1,18 @@
+query User($username: String!) {
+    user(username: $username) {
+        emailAddress
+        firstName
+        lastName
+        username
+        nameIsPublic
+        location
+        twitterHandle
+        gitHubHandle
+        website
+        locationIsPublic
+        twitterHandleIsPublic
+        gitHubHandleIsPublic
+        emailAddressIsPublic
+        websiteIsPublic
+    }
+}

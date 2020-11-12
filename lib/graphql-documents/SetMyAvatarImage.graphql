@@ -1,0 +1,3 @@
+mutation SetMyAvatarImage($image: Base64ImageUpload!) {
+    setMyAvatarImage(image: $image)
+}

@@ -1,0 +1,3 @@
+mutation CreateMe($value: CreateUserInput!) {
+    createMe(value: $value)
+}

@@ -1,0 +1,3 @@
+mutation SetCatalogCoverImage($identifier: CatalogIdentifierInput!, $image: Base64ImageUpload!) {
+    setCatalogCoverImage(identifier: $identifier, image: $image)
+}

@@ -1,0 +1,23 @@
+mutation UpdatePackage($identifier: PackageIdentifierInput!, $value: UpdatePackageInput!) {
+    updatePackage(identifier: $identifier, value: $value) {
+        identifier {
+            catalogSlug
+            packageSlug
+        }
+        catalog {
+            displayName
+        }
+        displayName
+        description
+        latestVersion {
+            identifier {
+                versionMajor
+                versionMinor
+                versionPatch
+            }
+            packageFile
+            readmeFile
+            licenseFile
+        }
+    }
+}

@@ -15,7 +15,19 @@ function readPackageVersion() {
     return packageFile.version;
 }
 
-function installBackendDepdendencies() {
+function installLibDependencies() {
+    return spawnAndLog("lib-deps", "npm", ["ci"], { cwd: "lib" });
+}
+
+function testLib() {
+    return spawnAndLog("lib-test", "npm", ["run", "test"], { cwd: "lib" });
+}
+
+function buildLib() {
+    return spawnAndLog("lib-build", "npm", ["run", "build"], { cwd: "lib" });
+}
+
+function installBackendDependencies() {
     return spawnAndLog("backend-deps", "npm", ["ci"], { cwd: "backend" });
 }
 
@@ -27,7 +39,7 @@ function buildBackend() {
     return spawnAndLog("backend-build", "npm", ["run", "build"], { cwd: "backend" });
 }
 
-function installFrontendDepdendencies() {
+function installFrontendDependencies() {
     return spawnAndLog("frontend-deps", "npm", ["ci"], { cwd: "frontend" });
 }
 
@@ -39,7 +51,7 @@ function buildFrontend() {
     return spawnAndLog("frontend-build", "npm", ["run", "build"], { cwd: "frontend" });
 }
 
-function installDocsDepdendencies() {
+function installDocsDependencies() {
     return spawnAndLog("docs-deps", "npm", ["ci"], { cwd: "docs/website" });
 }
 
@@ -51,8 +63,12 @@ function buildDockerImage() {
     return spawnAndLog("docker-build", "docker", ["build", "-t", "datapm-registry", ".", "-f", "docker/Dockerfile"]);
 }
 
-function bumpVersion() {
+function bumpRootVersion() {
     return spawnAndLog("bump-version", "npm", ["version", "patch"]);
+}
+
+function bumpLibVersion() {
+    return spawnAndLog("bump-version", "npm", ["version", "patch", readPackageVersion()], { cwd: "lib" });
 }
 
 function tagGCRDockerImage() {
@@ -105,26 +121,30 @@ function showGitDiff() {
 }
 
 exports.default = series(
-    installBackendDepdendencies,
+    installLibDependencies,
+    buildLib,
+    testLib,
+    installBackendDependencies,
     buildBackend,
     testBackend,
-    installFrontendDepdendencies,
+    installFrontendDependencies,
     buildFrontend,
     testFrontend,
-    installDocsDepdendencies,
+    installDocsDependencies,
     buildDocs,
     buildDockerImage
 );
 
 exports.buildParallel = series(
     parallel(
-        series(installBackendDepdendencies, buildBackend, testBackend),
-        series(installFrontendDepdendencies, buildFrontend, testFrontend),
-        series(installDocsDepdendencies, buildDocs)
+        series(installBackendDependencies, buildBackend, testBackend),
+        series(installFrontendDependencies, buildFrontend, testFrontend),
+        series(installDocsDependencies, buildDocs)
     ),
     buildDockerImage
 );
 
-exports.bumpAndGitTag = series(showGitDiff, bumpVersion, gitPushTag);
+exports.bumpVersion = series(showGitDiff, bumpRootVersion, bumpLibVersion);
+exports.gitPushTag = series(gitPushTag);
 exports.deployDockerImages = series(tagGCRDockerImage, tagDockerImage, pushGCRImage, pushDockerImage);
 exports.buildDockerImage = buildDockerImage;

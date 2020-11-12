@@ -1,0 +1,26 @@
+query MyPackages($offset: Int!, $limit: Int!) {
+    myPackages(offset: $offset, limit: $limit) {
+        packages {
+            identifier {
+                registryHostname
+                registryPort
+                packageSlug
+                catalogSlug
+            }
+            displayName
+            description
+            latestVersion {
+                identifier {
+                    versionMajor
+                    versionMinor
+                    versionPatch
+                }
+                packageFile
+                readmeFile
+                licenseFile
+            }
+        }
+        hasMore
+        count
+    }
+}

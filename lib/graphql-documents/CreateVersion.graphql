@@ -1,0 +1,32 @@
+mutation CreateVersion($identifier: PackageIdentifierInput!, $value: CreateVersionInput!) {
+    createVersion(identifier: $identifier, value: $value) {
+        identifier {
+            catalogSlug
+            packageSlug
+            versionMajor
+            versionMinor
+            versionPatch
+        }
+        createdAt
+        updatedAt
+        readmeFile
+        licenseFile
+        package {
+            displayName
+            description
+            catalog {
+                displayName
+                description
+            }
+        }
+        author {
+            username
+            firstName
+            lastName
+            emailAddress
+            twitterHandle
+            gitHubHandle
+        }
+        packageFile
+    }
+}

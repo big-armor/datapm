@@ -1,0 +1,13 @@
+query MyCatalogs {
+    myCatalogs {
+        identifier {
+            registryHostname
+            registryPort
+            catalogSlug
+        }
+        displayName
+        description
+        website
+        isPublic
+    }
+}

@@ -1,0 +1,30 @@
+query GetCatalog($identifier: CatalogIdentifierInput!) {
+    catalog(identifier: $identifier) {
+        identifier {
+            catalogSlug
+        }
+        displayName
+        description
+        website
+        packages {
+            identifier {
+                catalogSlug
+                packageSlug
+            }
+            displayName
+            description
+            latestVersion {
+                identifier {
+                    catalogSlug
+                    packageSlug
+                    versionMajor
+                    versionMinor
+                    versionPatch
+                }
+                createdAt
+                updatedAt
+                packageFile
+            }
+        }
+    }
+}

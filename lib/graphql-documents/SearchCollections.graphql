@@ -1,0 +1,46 @@
+query SearchCollections($query: String!, $limit: Int!, $offset: Int!) {
+    searchCollections(query: $query, limit: $limit, offset: $offset) {
+        collections {
+            creator {
+                firstName
+                lastName
+                emailAddress
+            }
+            identifier {
+                registryHostname
+                registryPort
+                collectionSlug
+            }
+            name
+            description
+            packages {
+                creator {
+                    firstName
+                    lastName
+                    emailAddress
+                }
+                identifier {
+                    catalogSlug
+                    packageSlug
+                }
+                displayName
+                description
+                latestVersion {
+                    identifier {
+                        versionMajor
+                        versionMinor
+                        versionPatch
+                    }
+                    createdAt
+                    updatedAt
+                }
+                createdAt
+                updatedAt
+            }
+            createdAt
+            updatedAt
+        }
+        hasMore
+        count
+    }
+}

@@ -1,0 +1,3 @@
+mutation SetPackageCoverImage($identifier: PackageIdentifierInput!, $image: Base64ImageUpload!) {
+    setPackageCoverImage(identifier: $identifier, image: $image)
+}
