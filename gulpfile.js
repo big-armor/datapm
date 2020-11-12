@@ -110,7 +110,7 @@ function gitCommit() {
     return spawnAndLog("git-commit", "git", ["commit", "-m 'Commit after version bump during build [ci skip]'"]);
 }
 
-function gitCommit() {
+function gitPush() {
     return spawnAndLog("git-push", "git", ["push"]);
 }
 
