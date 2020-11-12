@@ -150,6 +150,8 @@ type Collection {
     packages: [Package!]
     createdAt: Date!
     updatedAt: Date!
+    isPublic: Boolean
+    isRecommended: Boolean
 }
 
 """
@@ -244,10 +246,19 @@ type SearchCollectionResult {
 }
 
 """
-The response for latest packages request
+The response for my packages request
 """
 type MyPackagesResult {
     packages: [Package!]
+    hasMore: Boolean!
+    count: Int!
+}
+
+"""
+The response for my packages request
+"""
+type MyCollectionsResult {
+    collections: [Collection!]
     hasMore: Boolean!
     count: Int!
 }
@@ -474,6 +485,11 @@ type Query {
     Returns all of the collections the user has permission to view
     """
     collections: [Collection!]
+
+    """
+    Returns list of authenicated users collections
+    """
+    myCollections(offSet: Int!, limit: Int!): MyCollectionsResult! @isAuthenticated
 
     """
     Returns collections whos names match the given query. This request is paginated

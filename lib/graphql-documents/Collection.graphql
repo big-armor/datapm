@@ -33,5 +33,7 @@ query Collection($identifier: CollectionIdentifierInput!) {
                 description
             }
         }
+        isPublic
+        isRecommended
     }
 }
