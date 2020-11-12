@@ -10,7 +10,7 @@ const DESTINATION_DIR = path.join(__dirname, "dist");
 console.log(DESTINATION_DIR);
 
 function readPackageVersion() {
-    const packageFile = JSON.stringify(fs.readSync("package.json"));
+    const packageFile = JSON.stringify(fs.readFileSync("package.json"));
     return packageFile.version;
 }
 
