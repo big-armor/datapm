@@ -64,11 +64,11 @@ function buildDockerImage() {
 }
 
 function bumpRootVersion() {
-    return spawnAndLog("bump-version", "npm", ["version", "patch"]);
+    return spawnAndLog("bump-root-version", "npm", ["version", "patch"]);
 }
 
 function bumpLibVersion() {
-    return spawnAndLog("bump-version", "npm", ["version", "patch", readPackageVersion()], { cwd: "lib" });
+    return spawnAndLog("bump-lib-version", "npm", ["version", readPackageVersion()], { cwd: "lib" });
 }
 
 function tagGCRDockerImage() {
