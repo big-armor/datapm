@@ -228,38 +228,6 @@ resource "google_cloud_run_service" "default" {
         }
         env {
           name  = "SMTP_FROM_NAME"
-          value = "DataPM Test Registry"
-        }
-        env {
-          name  = "SMTP_FROM_ADDRESS"
-          value = "support@datapm.io"
-        }
-        env {
-          name  = "SMTP_SECURE"
-          value = "true"
-        }
-        env {
-          name  = "REQUIRE_EMAIL_VERIFICATION"
-          value = "true"
-        }
-        env {
-          name  = "SMTP_SERVER"
-          value = "smtp.sendgrid.net"
-        }
-        env {
-          name  = "SMTP_PORT"
-          value = "465"
-        }
-        env {
-          name  = "SMTP_USER"
-          value = "apikey"
-        }
-        env {
-          name  = "SMTP_PASSWORD"
-          value = var.smtp_password
-        }
-        env {
-          name  = "SMTP_FROM_NAME"
           value = "DataPM Support"
         }
         env {
