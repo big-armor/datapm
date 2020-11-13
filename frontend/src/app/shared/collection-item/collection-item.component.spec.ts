@@ -1,44 +1,49 @@
-// import { async, ComponentFixture, TestBed } from "@angular/core/testing";
-// import { RouterTestingModule } from "@angular/router/testing";
-// import { PackageItemComponent } from "./package-item.component";
-// import { MatCardModule } from "@angular/material/card";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { RouterTestingModule } from "@angular/router/testing";
+import { CollectionItemComponent } from "./collection-item.component";
+import { MatCardModule } from "@angular/material/card";
 
-// const packageItem: any = {
-//     creator: {
-//         username: "tylerwilliams",
-//         firstName: "Tyler",
-//         lastName: "Williams"
-//     },
-//     displayName: "Weather Stations",
-//     description:
-//         "Short description preview of the product and some, lorem ipsum dolor sit amet, consectetur adipiscing elit. Risus orci, sem nullam maecenas sed mauris. Sed turpis lorem vitae sit. Amet, in aliquet odio id",
-//     identifier: {
-//         catalogSlug: "noaa",
-//         packageSlug: "weather-stations"
-//     },
-//     updatedAt: new Date(new Date().getTime() - 300000)
-// };
+const collectionItem: any = {
+    description: "test test testing a description",
+    name: "test-collections-slug",
+    identifier: {
+        collectionSlug: "test-item-collectionslug"
+    },
+    packages: [
+        {
+            description: "description-of-latest-package",
+            displayName: "displayName-of-latest-package",
+            identifier: {
+                catalogSlug: "gregoryt1",
+                packageSlug: "latestpackage22-slug"
+            }
+        }
+    ],
+    isPublic: true,
+    isRecommended: true,
+    updatedAt: new Date(new Date().getTime() - 300000)
+};
 
-// describe("PackageItemComponent", () => {
-//     let component: PackageItemComponent;
-//     let fixture: ComponentFixture<PackageItemComponent>;
+describe("CollectionItemComponent", () => {
+    let component: CollectionItemComponent;
+    let fixture: ComponentFixture<CollectionItemComponent>;
 
-//     beforeEach(async(() => {
-//         const routerSpy = jasmine.createSpyObj("Router", ["navigateByUrl"]);
-//         TestBed.configureTestingModule({
-//             declarations: [PackageItemComponent],
-//             imports: [RouterTestingModule, MatCardModule]
-//         }).compileComponents();
-//     }));
+    beforeEach(async(() => {
+        const routerSpy = jasmine.createSpyObj("Router", ["navigateByUrl"]);
+        TestBed.configureTestingModule({
+            declarations: [CollectionItemComponent],
+            imports: [RouterTestingModule, MatCardModule]
+        }).compileComponents();
+    }));
 
-//     beforeEach(() => {
-//         fixture = TestBed.createComponent(PackageItemComponent);
-//         component = fixture.componentInstance;
-//         component.item = packageItem;
-//         fixture.detectChanges();
-//     });
+    beforeEach(() => {
+        fixture = TestBed.createComponent(CollectionItemComponent);
+        component = fixture.componentInstance;
+        component.item = collectionItem;
+        fixture.detectChanges();
+    });
 
-//     it("should create", () => {
-//         expect(component).toBeTruthy();
-//     });
-// });
+    it("should create", () => {
+        expect(component).toBeTruthy();
+    });
+});
