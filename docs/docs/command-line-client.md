@@ -114,7 +114,7 @@ And then you can re-publish the updates using the same publish command above.
 By default the command line client only interacts with the the [datapm.io](https://datapm.io) registry. You can host your own private or public registries, and you will want to add those registries to your command line client.
 
 ```
-datapm registry add datapm.my-domain.com 443
+datapm registry add https://hostname.td
 ```
 
 Use the [Generate An API Key](#generate-an-api-key) section above to add a specific API for that registry.
@@ -122,7 +122,7 @@ Use the [Generate An API Key](#generate-an-api-key) section above to add a speci
 You can also remove a registry with the following command
 
 ```
-datapm registry remove datapm.my-domain.com 443
+datapm registry remove https://hostname.tld
 ```
 
 ### Manage Configuration

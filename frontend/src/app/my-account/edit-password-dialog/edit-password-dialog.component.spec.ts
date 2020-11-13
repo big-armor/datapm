@@ -5,6 +5,7 @@ import { MatDialogModule, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angu
 import { MatButtonModule } from "@angular/material/button";
 
 import { EditPasswordDialogComponent } from "./edit-password-dialog.component";
+import { MatSnackBarModule } from "@angular/material/snack-bar";
 
 describe("EditPasswordDialogComponent", () => {
     let component: EditPasswordDialogComponent;
@@ -13,7 +14,14 @@ describe("EditPasswordDialogComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [EditPasswordDialogComponent],
-            imports: [RouterTestingModule, MatButtonModule, MatDialogModule, FormsModule, ReactiveFormsModule],
+            imports: [
+                RouterTestingModule,
+                MatButtonModule,
+                MatDialogModule,
+                MatSnackBarModule,
+                FormsModule,
+                ReactiveFormsModule
+            ],
             providers: [
                 {
                     provide: MAT_DIALOG_DATA,

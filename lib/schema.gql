@@ -188,8 +188,7 @@ type Version {
 The complete identifier for a version of a package on a registry
 """
 type VersionIdentifier {
-    registryHostname: String!
-    registryPort: Int!
+    registryURL: String!
     catalogSlug: String!
     packageSlug: String!
     versionMajor: Int!
@@ -201,8 +200,7 @@ type VersionIdentifier {
 The complete identifier for a package on a registry
 """
 type PackageIdentifier {
-    registryHostname: String!
-    registryPort: Int!
+    registryURL: String!
     catalogSlug: String!
     packageSlug: String!
 }
@@ -211,8 +209,7 @@ type PackageIdentifier {
 The complete identifier for a catalog on a registry
 """
 type CatalogIdentifier {
-    registryHostname: String!
-    registryPort: Int!
+    registryURL: String!
     catalogSlug: String!
 }
 
@@ -220,8 +217,7 @@ type CatalogIdentifier {
 The complete identifier for a collections on a registry
 """
 type CollectionIdentifier {
-    registryHostname: String!
-    registryPort: Int!
+    registryURL: String!
     collectionSlug: String!
 }
 

@@ -2,19 +2,11 @@ import { JSONSchema7, JSONSchema7TypeName } from "json-schema";
 
 /** A description of where the package file should be published. */
 export interface RegistryReference {
-    /** The DNS hostname or ipv4/v6 address of the registery server. */
-    hostname: string;
-
-    /** The TCP port on which the registry is served. All datapm connections are made over HTTPS */
-    port: number;
+    /** The HTTP or HTTPS URL to reach the registry server. */
+    url: string;
 
     /** The short name (not the user friendly name) of the catalog in which to publish the package. */
     catalogSlug: string;
-
-    /** Whether the data should be published to the registry, or just the schema. This is important
-     * because some data owners want to share only the schema of the data
-     */
-    publishData: boolean;
 }
 
 export interface PackageFile {

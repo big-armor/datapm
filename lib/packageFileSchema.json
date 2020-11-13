@@ -65,8 +65,8 @@
             "description": "The registries to which this package file is published",
             "default": [
                 {
-                    "hostname": "datapm.io",
-                    "port": 443
+                    "url": "https://datapm.io",
+                    "pattern": "^https?:\\/\\/.*"
                 }
             ],
             "required": ["hostname", "port"],
@@ -77,15 +77,8 @@
                         "type": "string",
                         "pattern": "^[a-z0-9](?:[a-z0-9]|-(?=[a-z0-9])){0,38}$"
                     },
-                    "type": {
-                        "type": "string",
-                        "enum": ["local", "datapm", "DoNotPublish"]
-                    },
-                    "hostname": {
+                    "registryURL": {
                         "type": "string"
-                    },
-                    "port": {
-                        "type": "integer"
                     }
                 }
             }

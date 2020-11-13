@@ -1,8 +1,10 @@
 import { ChangeDetectorRef, Component, OnInit } from "@angular/core";
-import { FormControl, FormGroup } from "@angular/forms";
+import { AbstractControl, AsyncValidatorFn, FormControl, FormGroup, ValidationErrors } from "@angular/forms";
+import { Router } from "@angular/router";
+import { AuthenticationService } from "src/app/services/authentication.service";
+import { CreateMeGQL, EmailAddressAvailableGQL, UsernameAvailableGQL } from "src/generated/graphql";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { MatDialogRef } from "@angular/material/dialog";
-import { CreateMeGQL, EmailAddressAvailableGQL, UsernameAvailableGQL } from "src/generated/graphql";
 import { usernameValidator, emailAddressValidator } from "src/app/helpers/validators";
 
 enum State {
@@ -81,7 +83,7 @@ export class SignUpDialogComponent implements OnInit {
                     return;
                 }
 
-                this.state = State.SUCCESS;
+                this.dialogRef.close();
             })
             .catch(() => {
                 this.snackbar.open("Unknown error", null, {

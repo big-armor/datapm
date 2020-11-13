@@ -1,5 +1,12 @@
 import { ChangeDetectorRef, Component, OnInit } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import {
+    AbstractControl,
+    AsyncValidatorFn,
+    FormBuilder,
+    FormGroup,
+    ValidationErrors,
+    Validators
+} from "@angular/forms";
 import { EmailAddressAvailableGQL } from "src/generated/graphql";
 import { emailAddressValidator } from "src/app/helpers/validators";
 

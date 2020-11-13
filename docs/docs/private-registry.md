@@ -30,8 +30,6 @@ services:
     environment:
       - REGISTRY_NAME="Private DataPM Registry"
       - REGISTRY_URL=http://localhost:4000
-      - REGISTRY_HOSTNAME=localhost
-      - REGISTRY_PORT=4000
       - JWT_KEY=!!!!REPLACE_ME!!!
       - JWT_AUDIENCE=localhost
       - JWT_ISSUER=localhost

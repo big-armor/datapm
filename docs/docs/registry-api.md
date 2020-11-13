@@ -68,8 +68,7 @@ type CatalogIdentifierInput {
 }
 
 type CatalogIdentifier {
-    registryHostname: String!
-    registryPort: Int!
+    registryURL: String!
     catalogSlug: String!
 }
 ```
@@ -112,8 +111,7 @@ type PackageIdentifierInput {
 }
 
 type PackageIdentifier {
-    registryHostname: String!
-    registryPort: Int!
+    registryURL: String!
     catalogSlug: String!
     packageSlug: String!
 }
@@ -160,8 +158,7 @@ type CollectionIdentifierInput {
 }
 
 type CollectionIdentifier {
-    registryHostname: String!
-    registryPort: Int!
+    registryURL: String!
     collectionSlug: String!
 }
 

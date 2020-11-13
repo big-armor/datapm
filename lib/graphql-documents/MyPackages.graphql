@@ -2,8 +2,7 @@ query MyPackages($offset: Int!, $limit: Int!) {
     myPackages(offset: $offset, limit: $limit) {
         packages {
             identifier {
-                registryHostname
-                registryPort
+                registryURL
                 packageSlug
                 catalogSlug
             }
