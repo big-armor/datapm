@@ -1,19 +1,16 @@
 <form id="editAccount" [formGroup]="form">
     <div mat-dialog-content>
-        <div class="big-img-dialog text-center" (click)="openCoverUploadDialog()">
-            <button class="add-img-btn">
-                <span class="material-icons"> add_a_photo </span>
-            </button>
-        </div>
+        <app-cover [user]="currentUser" [height]="150" [editable]="true"></app-cover>
 
         <div class="dialog-content-text">
-            <div class="img-wrapper" (click)="openAvatarUploadDialog()">
-                <div class="profile-img">
-                    <button class="add-img-btn">
-                        <span class="material-icons"> add_a_photo </span>
-                    </button>
-                </div>
-            </div>
+            <app-avatar
+                class="user-img"
+                [user]="currentUser"
+                [size]="100"
+                [editable]="true"
+                (upload)="uploadCover($event)"
+            >
+            </app-avatar>
 
             <p class="small-paragraph">public</p>
 

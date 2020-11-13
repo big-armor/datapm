@@ -29,15 +29,8 @@
             background-color: #fff;
 
             .user-img {
-                img {
-                    width: 100px;
-                    height: 100px;
-                    top: -60px;
-                    position: relative;
-                    border-radius: 100%;
-                    box-shadow: 1px 0px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(255, 255, 255, 0.25),
-                        0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
-                }
+                margin-top: -50px;
+                display: block;
             }
 
             .user-fullname {
@@ -204,13 +197,6 @@
         .top-row {
             top: -30px;
             .profile-div {
-                .user-img {
-                    img {
-                        top: 0px;
-                        width: 60px;
-                        height: 60px;
-                    }
-                }
                 .follow-btn {
                     padding: 0px 40px;
                     line-height: 30px;

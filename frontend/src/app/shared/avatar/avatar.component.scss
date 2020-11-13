@@ -1,0 +1,47 @@
+.avatar {
+    background-color: #9e00c5;
+    background-size: contain;
+    background-position: center;
+    border-radius: 50%;
+    box-shadow: 1px 0px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(255, 255, 255, 0.25),
+        0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+    position: relative;
+    border-radius: 50%;
+    overflow: hidden;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+.add-image-btn {
+    border: none;
+    background: rgba(#000, 0.45);
+    color: white;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    outline: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    span {
+        font-size: 10px;
+        margin-bottom: -20px;
+    }
+}
+
+.letter {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.5em;
+}

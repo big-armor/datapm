@@ -8,6 +8,10 @@ import { Component, OnInit } from "@angular/core";
 export class FollowingComponent implements OnInit {
     public isFavorite = false;
 
+    user = {
+        username: "dev-tony"
+    };
+
     constructor() {}
 
     ngOnInit(): void {}

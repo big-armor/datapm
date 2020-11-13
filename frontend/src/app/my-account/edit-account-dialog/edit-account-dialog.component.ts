@@ -13,7 +13,7 @@ import {
     SetMyAvatarImageGQL
 } from "../../../generated/graphql";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
-import { ImageUploadService } from "../../services/image-upload.service";
+import { ImageService } from "../../services/image.service";
 
 function usernameValidator(
     usernameAvailableGQL: UsernameAvailableGQL,
@@ -60,7 +60,7 @@ function usernameValidator(
 })
 export class EditAccountDialogComponent implements OnInit, OnDestroy {
     public form: FormGroup;
-    private currentUser: User;
+    public currentUser: User;
     public submitDisabled: boolean = false;
     private confirmDialogOpened: boolean = false;
 
@@ -75,7 +75,7 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
         private updateMeGQL: UpdateMeGQL,
         private setMyCoverImageGQL: SetMyCoverImageGQL,
         private setMyAvatarImageGQL: SetMyAvatarImageGQL,
-        private imageUploadService: ImageUploadService,
+        private imageService: ImageService,
         private usernameAvailableGQL: UsernameAvailableGQL,
         private updateCatalogGQL: UpdateCatalogGQL,
         private componentChangeDetector: ChangeDetectorRef
@@ -169,15 +169,23 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
         this.nameIsPublic = ev.checked;
     }
 
+    uploadAvatar(data: any) {
+        this.setMyAvatarImageGQL.mutate({ image: { base64: data } }).subscribe(() => {
+            this.imageService.refreshAvatar(this.currentUser.username);
+        });
+    }
+
+    uploadCover(data: any) {
+        this.setMyCoverImageGQL.mutate({ image: { base64: data } }).subscribe(() => {
+            this.imageService.refreshCover();
+        });
+    }
+
     get username() {
         return this.form.get("username")! as FormControl;
     }
 
-    public openAvatarUploadDialog(): void {
-        this.imageUploadService.openImageUploadDialog(this.setMyAvatarImageGQL);
-    }
-
     public openCoverUploadDialog(): void {
-        this.imageUploadService.openImageUploadDialog(this.setMyCoverImageGQL);
+        // this.imageUploadService.openImageUploadDialog(this.setMyCoverImageGQL);
     }
 }

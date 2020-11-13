@@ -1,7 +1,9 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { RouterTestingModule } from "@angular/router/testing";
+import { HttpClientModule } from "@angular/common/http";
 import { PackageItemComponent } from "./package-item.component";
 import { MatCardModule } from "@angular/material/card";
+import { SharedModule } from "src/app/shared/shared.module";
 
 const packageItem: any = {
     creator: {
@@ -27,7 +29,7 @@ describe("PackageItemComponent", () => {
         const routerSpy = jasmine.createSpyObj("Router", ["navigateByUrl"]);
         TestBed.configureTestingModule({
             declarations: [PackageItemComponent],
-            imports: [RouterTestingModule, MatCardModule]
+            imports: [HttpClientModule, RouterTestingModule, MatCardModule, SharedModule]
         }).compileComponents();
     }));
 

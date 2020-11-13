@@ -219,6 +219,7 @@ async function main() {
 
     app.use("/images/user/:username/cover", async (req, res, next) => {
         try {
+            console.log("request cover image");
             await respondWithImage(await imageService.readUserCoverImage(req.params.username), res);
         } catch (err) {
             res.status(404).send();

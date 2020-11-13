@@ -5,8 +5,8 @@
             <!-- <div>2 downloaded</div> -->
         </div>
         <div class="d-flex align-items-center mb-2 package-creator">
-            <img src="../../../assets/images/user-female.png" alt="Creator" class="photo" />
-            <span class="name">Tyler Williams</span>
+            <app-avatar class="user-img" [user]="item.creator" [size]="30"> </app-avatar>
+            <span class="name">{{ item.creator | username }}</span>
         </div>
         <div class="d-flex mb-3">
             <!-- To be updated later -->
