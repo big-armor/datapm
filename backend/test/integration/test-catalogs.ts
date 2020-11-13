@@ -472,7 +472,7 @@ describe("Catalog Tests", async () => {
     });
 
     it("User A get package - check is not public", async function () {
-        let response = await userBClient.query({
+        let response = await userAClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
