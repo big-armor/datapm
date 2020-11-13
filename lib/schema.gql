@@ -127,6 +127,7 @@ type Package {
     versions: [Version]!
     createdAt: Date!
     updatedAt: Date!
+    isPublic: Boolean!
 }
 
 """

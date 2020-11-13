@@ -159,6 +159,22 @@ describe("Collection Tests", async () => {
         expect(response.errors![0].message).equal("NOT_AUTHORIZED");
     });
 
+    it("User A make catalog public", async function () {
+        let response = await userAClient.mutate({
+            mutation: UpdateCatalogDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-collection"
+                },
+                value: {
+                    isPublic: true
+                }
+            }
+        });
+
+        expect(response.errors == null, "no errors").true;
+    });
+
     it("User A make package public", async function () {
         let response = await userAClient.mutate({
             mutation: UpdatePackageDocument,

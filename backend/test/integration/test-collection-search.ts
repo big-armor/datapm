@@ -63,6 +63,22 @@ describe("Collection Search Tests", async () => {
         expect(response.data!.createPackage.latestVersion).to.equal(null);
     });
 
+    it("User A update catalog to be public", async function () {
+        let response = await userAClient.mutate({
+            mutation: UpdateCatalogDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-collection-search"
+                },
+                value: {
+                    isPublic: true
+                }
+            }
+        });
+
+        expect(response.errors == null).true;
+    });
+
     it("User A make package public", async function () {
         let response = await userAClient.mutate({
             mutation: UpdatePackageDocument,
