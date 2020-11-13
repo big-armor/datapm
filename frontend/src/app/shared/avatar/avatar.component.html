@@ -1,0 +1,8 @@
+<div class="avatar" [style.width]="size + 'px'" [style.height]="size + 'px'" [style.fontSize]="size + 'px'">
+    <img [src]="imgData" alt="avatar" *ngIf="imgData" />
+    <div class="letter" *ngIf="!imgData">{{ letter }}</div>
+    <button class="add-image-btn" (click)="uploadFile()" *ngIf="editable">
+        <mat-icon>add_a_photo</mat-icon>
+        <span class="helper-text">click to change</span>
+    </button>
+</div>

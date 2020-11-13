@@ -21,6 +21,9 @@ import { CollectionItemComponent } from "./collection-item/collection-item.compo
 import { ForgotPasswordDialogComponent } from "./header/forgot-password-dialog/forgot-password-dialog.component";
 import { LoginDialogComponent } from "./header/login-dialog/login-dialog.component";
 import { SignUpDialogComponent } from "./header/sign-up-dialog/sign-up-dialog.component";
+import { AvatarComponent } from "./avatar/avatar.component";
+import { UsernamePipe } from "./pipes/username.pipe";
+import { CoverComponent } from "./cover/cover.component";
 
 @NgModule({
     declarations: [
@@ -32,7 +35,10 @@ import { SignUpDialogComponent } from "./header/sign-up-dialog/sign-up-dialog.co
         CollectionItemComponent,
         ForgotPasswordDialogComponent,
         LoginDialogComponent,
-        SignUpDialogComponent
+        SignUpDialogComponent,
+        AvatarComponent,
+        UsernamePipe,
+        CoverComponent
     ],
     imports: [
         CommonModule,
@@ -57,7 +63,10 @@ import { SignUpDialogComponent } from "./header/sign-up-dialog/sign-up-dialog.co
         CollectionItemComponent,
         ForgotPasswordDialogComponent,
         LoginDialogComponent,
-        SignUpDialogComponent
+        SignUpDialogComponent,
+        AvatarComponent,
+        UsernamePipe,
+        CoverComponent
     ],
     providers: [TimeAgoPipe]
 })

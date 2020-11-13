@@ -7,8 +7,7 @@ query SearchCollections($query: String!, $limit: Int!, $offset: Int!) {
                 emailAddress
             }
             identifier {
-                registryHostname
-                registryPort
+                registryURL
                 collectionSlug
             }
             name

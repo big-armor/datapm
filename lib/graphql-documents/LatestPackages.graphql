@@ -20,6 +20,11 @@ query GetLatestPackages($offset: Int!, $limit: Int!) {
                     username
                 }
             }
+            creator {
+                username
+                firstName
+                lastName
+            }
         }
     }
 }

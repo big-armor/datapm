@@ -20,7 +20,7 @@ export const TEMP_STORAGE_URL = "file://tmp-registry-server-storage-" + new Rand
 before(async function () {
     console.log("Starting postgres temporary container");
 
-    this.timeout(1200000);
+    this.timeout(120000);
     container = await new GenericContainer("postgres")
         .withEnv("POSTGRES_PASSWORD", "postgres")
         .withEnv("POSTGRES_DB", "datapm")
@@ -67,6 +67,15 @@ before(async function () {
 
     serverProcess.stdout!.pipe(process.stdout);
     serverProcess.stderr!.pipe(process.stderr);
+
+    serverProcess.addListener("error", (err) => {
+        console.error("Registry server process error");
+        console.error(JSON.stringify(err));
+    });
+
+    serverProcess.addListener("exit", (code, signal) => {
+        console.log("Registry server exited with code " + code + " and signal " + signal);
+    });
 
     // Wait for the server to start
     await new Promise(async (r) => {

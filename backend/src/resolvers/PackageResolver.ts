@@ -79,8 +79,7 @@ export const findPackageIdentifier = async (parent: any, _1: any, context: Authe
     const catalog = await context.connection.getRepository(Catalog).findOneOrFail({ id: packageEntity.catalogId });
 
     return {
-        registryHostname: getEnvVariable("REGISTRY_HOSTNAME"),
-        registryPort: Number.parseInt(getEnvVariable("REGISTRY_PORT")),
+        registryURL: getEnvVariable("REGISTRY_URL"),
         catalogSlug: catalog.slug,
         packageSlug: packageEntity.slug
     };

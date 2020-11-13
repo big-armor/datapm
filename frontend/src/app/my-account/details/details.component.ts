@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { EditPasswordDialogComponent } from "../edit-password-dialog/edit-password-dialog.component";
 import { AuthenticationService } from "../../services/authentication.service";
-import { getRegistryPort, getRegistryProtocol, getRegistryHostname } from "../../helpers/RegistryAccessHelper";
+import { getRegistryURL } from "../../helpers/RegistryAccessHelper";
 
 import { APIKey, User, Catalog, CreateAPIKeyGQL, MyAPIKeysGQL, DeleteAPIKeyGQL, Scope } from "src/generated/graphql";
 import { FormControl, FormGroup } from "@angular/forms";
@@ -170,23 +170,9 @@ export class DetailsComponent implements OnInit, OnDestroy {
     }
 
     apiKeyCommandString() {
-        const hostname = getRegistryHostname();
-        const protocol = getRegistryProtocol();
-        const port = getRegistryPort();
-        let protocolOption = "";
-        let portOption = "";
+        const registryURL = getRegistryURL();
 
-        if (protocol == "https" && port != 443) {
-            portOption = "--port " + port;
-        } else if (protocol == "http" && port != 80) {
-            portOption = " --port " + port;
-        }
-
-        if (protocol == "http") {
-            protocolOption = " --protocol " + protocol;
-        }
-
-        return `datapm registry add ${hostname}` + portOption + protocolOption + ` ${this.newAPIKey}`;
+        return `datapm registry add ${registryURL} ${this.newAPIKey}`;
     }
 
     copyKeyToClipboard() {

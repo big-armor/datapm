@@ -207,10 +207,6 @@ resource "google_cloud_run_service" "default" {
           value = "test.datapm.io"
         }
         env {
-          name  = "REGISTRY_PORT"
-          value = "443"
-        }
-        env {
           name  = "TYPEORM_IS_DIST"
           value = "true"
         }

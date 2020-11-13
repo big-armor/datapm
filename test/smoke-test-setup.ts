@@ -66,7 +66,7 @@ before(async function () {
             .withEnv("REGISTRY_NAME", "client-integration-test")
             .withEnv("REGISTRY_URL", "http://localhost:4000")
             .withEnv("REGISTRY_HOSTNAME", "localhost")
-            .withEnv("REGISTRY_PORT", "4000")
+            .withEnv("PORT", "4000")
             .withEnv("JWT_AUDIENCE", "localhost")
             .withEnv("JWT_KEY", "!!!REPLACE_ME!!!")
             .withEnv("JWT_ISSUER", "localhost")
