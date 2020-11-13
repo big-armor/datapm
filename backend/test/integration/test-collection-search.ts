@@ -10,9 +10,10 @@ import {
     CollectionDocument,
     UpdateCollectionDocument,
     SearchCollectionsDocument,
-    DisableCollectionDocument
+    DeleteCollectionDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
+import { describe, it } from "mocha";
 
 describe("Collection Search Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
@@ -69,6 +70,22 @@ describe("Collection Search Tests", async () => {
                 identifier: {
                     catalogSlug: "testA-collection-search",
                     packageSlug: "congressional-legislators"
+                },
+                value: {
+                    isPublic: true
+                }
+            }
+        });
+
+        expect(response.errors == null, "no errors").true;
+    });
+
+    it("User A make catalog public", async function () {
+        let response = await userAClient.mutate({
+            mutation: UpdateCatalogDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-collection-search"
                 },
                 value: {
                     isPublic: true
@@ -186,7 +203,7 @@ describe("Collection Search Tests", async () => {
 
     it("Delete collection", async function () {
         let response = await userBClient.mutate({
-            mutation: DisableCollectionDocument,
+            mutation: DeleteCollectionDocument,
             variables: {
                 identifier: {
                     collectionSlug: "testB-collection-search"

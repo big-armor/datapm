@@ -10,6 +10,13 @@
             "request": "launch",
             "type": "node-terminal",
             "cwd": "${workspaceFolder}/backend"
+        },
+        {
+            "command": "npm run test",
+            "name": "npm run test",
+            "request": "launch",
+            "type": "node-terminal",
+            "cwd": "${workspaceFolder}/backend"
         }
     ]
 }

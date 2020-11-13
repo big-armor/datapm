@@ -1,0 +1,3 @@
+mutation DeleteCollection($identifier: CollectionIdentifierInput!) {
+    deleteCollection(identifier: $identifier)
+}

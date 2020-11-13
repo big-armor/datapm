@@ -1,12 +1,4 @@
-import {
-    EntityRepository,
-    EntityManager,
-    Like,
-    Brackets,
-    SelectQueryBuilder,
-    FindOneOptions,
-    FindConditions
-} from "typeorm";
+import { EntityRepository, EntityManager, FindOneOptions } from "typeorm";
 
 import { CreatePackageInput, UpdatePackageInput, PackageIdentifierInput, Permission } from "../generated/graphql";
 import { Package } from "../entity/Package";
@@ -17,6 +9,8 @@ import { CatalogRepository } from "./CatalogRepository";
 import { VersionRepository } from "./VersionRepository";
 import { allPermissions } from "../util/PermissionsUtil";
 import { User } from "../entity/User";
+import { UserInputError } from "apollo-server";
+import { ImageStorageService } from "../storage/images/image-storage-service";
 
 const PUBLIC_PACKAGES_QUERY = '("Package"."isPublic" is true)';
 const AUTHENTICATED_USER_PACKAGES_QUERY = `(("Package"."isPublic" is false and "Package"."catalog_id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId))
@@ -32,7 +26,7 @@ async function findPackageById(
     const packageEntity = await manager
         .getRepository(Package)
         .createQueryBuilder(ALIAS)
-        .where({ id: packageId, isActive: true })
+        .where({ id: packageId })
         .addRelations(ALIAS, relations)
         .getOne();
 
@@ -43,19 +37,19 @@ async function findPackage(
     manager: EntityManager,
     catalogSlug: string,
     packageSlug: string,
-    includeActiveOnly: boolean,
     relations: string[]
 ): Promise<Package | null> {
     const ALIAS = "package";
 
-    const catalog = await manager.getRepository(Catalog).findOneOrFail({ where: { slug: catalogSlug } });
+    const catalog = await manager.getRepository(Catalog).findOne({ where: { slug: catalogSlug } });
 
+    if (catalog == undefined) {
+        throw new Error("CATALOG_NOT_FOUND");
+    }
     const options: FindOneOptions<Package> = {
         where: { catalogId: catalog.id, slug: packageSlug },
         relations: relations
     };
-
-    if (includeActiveOnly) (options.where! as FindConditions<Package>).isActive = true;
 
     const packageEntity = await manager.getRepository(Package).findOne(options);
 
@@ -74,17 +68,6 @@ function validation(packageEntity: Package) {
     ) {
         throw new Error("You should type the name or package file number at least.");
     }
-}
-
-async function setPackageDisabled(packageEntity: Package, transaction: EntityManager) {
-    const versions = await transaction
-        .getCustomRepository(VersionRepository)
-        .findVersions({ packageId: packageEntity.id });
-
-    transaction.getCustomRepository(VersionRepository).disableVersions(versions);
-
-    packageEntity.isActive = false;
-    packageEntity.slug = packageEntity.slug + "-DISABLED-" + new Date().getTime();
 }
 
 @EntityRepository()
@@ -175,18 +158,15 @@ export class PackageRepository {
 
     async findPackage({
         identifier,
-        includeActiveOnly,
         relations = []
     }: {
         identifier: PackageIdentifierInput;
-        includeActiveOnly: boolean;
         relations?: string[];
     }): Promise<Package | null> {
         const packageEntity = await findPackage(
             this.manager,
             identifier.catalogSlug,
             identifier.packageSlug,
-            includeActiveOnly,
             relations
         );
 
@@ -195,14 +175,12 @@ export class PackageRepository {
 
     async findPackageOrFail({
         identifier,
-        includeActiveOnly,
         relations = []
     }: {
         identifier: PackageIdentifierInput;
         relations?: string[];
-        includeActiveOnly: boolean;
     }): Promise<Package> {
-        const packageEntity = await this.findPackage({ identifier, includeActiveOnly, relations });
+        const packageEntity = await this.findPackage({ identifier, relations });
 
         if (packageEntity == null) throw new Error("PACKAGE_NOT_FOUND");
 
@@ -214,7 +192,7 @@ export class PackageRepository {
         let query = this.manager
             .getRepository(Package)
             .createQueryBuilder(PRODUCTS_ALIAS)
-            .where({ catalogId: catalogId, isActive: true });
+            .where({ catalogId: catalogId });
 
         return query.getMany();
     }
@@ -250,7 +228,6 @@ export class PackageRepository {
             packageEntity.createdAt = new Date();
             packageEntity.updatedAt = new Date();
             packageEntity.creatorId = userId;
-            packageEntity.isActive = true;
 
             validation(packageEntity);
 
@@ -279,25 +256,17 @@ export class PackageRepository {
         catalogSlug,
         packageSlug,
         packageInput,
-        includeActiveOnly,
         relations = []
     }: {
         catalogSlug: string;
         packageSlug: string;
         packageInput: UpdatePackageInput;
-        includeActiveOnly: boolean;
         relations?: string[];
     }): Promise<Package> {
         return this.manager.nestedTransaction(async (transaction) => {
             const ALIAS = "package";
 
-            const packageEntity = await findPackage(
-                transaction,
-                catalogSlug,
-                packageSlug,
-                includeActiveOnly,
-                relations
-            );
+            const packageEntity = await findPackage(transaction, catalogSlug, packageSlug, relations);
 
             if (packageEntity === null) {
                 throw new Error("PACKAGE_NOT_FOUND");
@@ -336,51 +305,56 @@ export class PackageRepository {
         });
     }
 
-    async disablePackage({
-        identifier,
-        relations = []
-    }: {
-        identifier: PackageIdentifierInput;
-        relations?: string[];
-    }): Promise<Package> {
-        const package_ = await this.manager.nestedTransaction(async (transaction) => {
-            const ALIAS = "package";
+    async updatePackageReadmeVectors(identifier: PackageIdentifierInput, readmeFile: string | null | undefined) {
+        await this.manager.nestedTransaction(async (transaction) => {
+            const packageEntity = await findPackage(transaction, identifier.catalogSlug, identifier.packageSlug, []);
 
-            const catalogSlug = identifier.catalogSlug;
-            const packageSlug = identifier.packageSlug;
+            if (packageEntity == null) throw new UserInputError("PACKAGE_NOT_FOUND");
 
-            const packageEntity = await findPackage(transaction, catalogSlug, packageSlug, false, relations);
-
-            if (!packageEntity) {
-                throw new Error(`Could not find Package  ${catalogSlug}/${packageSlug}`);
-            }
-
-            setPackageDisabled(packageEntity, transaction);
-
-            await transaction.save(packageEntity);
-
-            return packageEntity;
+            if (readmeFile)
+                return transaction.query('UPDATE "package" SET readme_file_vectors = to_tsvector($1) WHERE id = $2', [
+                    readmeFile,
+                    packageEntity.id
+                ]);
+            else
+                return transaction.query('UPDATE "package" SET readme_file_vectors = NULL WHERE id = $1', [
+                    packageEntity.id
+                ]);
         });
-
-        return package_;
     }
 
-    async disablePackages({
-        packages,
-        relations = []
-    }: {
-        packages: Package[];
-        relations?: string[];
-    }): Promise<Package[]> {
-        return this.manager.nestedTransaction(async (transaction) => {
-            const returnValue: Package[] = [];
-            packages.forEach(async (p) => {
-                setPackageDisabled(p, transaction);
-                returnValue.push(await transaction.save(p));
-            });
+    async deletePackage({ identifier }: { identifier: PackageIdentifierInput }): Promise<void> {
+        const catalogSlug = identifier.catalogSlug;
+        const packageSlug = identifier.packageSlug;
+        const packageEntity = await findPackage(this.manager, catalogSlug, packageSlug, ["versions", "catalog"]);
+        if (!packageEntity) {
+            throw new Error(`Could not find Package  ${catalogSlug}/${packageSlug}`);
+        }
 
-            return returnValue;
+        const versions = await this.manager
+            .getCustomRepository(VersionRepository)
+            .findVersions({ packageId: packageEntity.id, relations: ["package", "package.catalog"] });
+
+        await this.manager.getCustomRepository(VersionRepository).deleteVersions(versions);
+        await this.manager.nestedTransaction(async (transaction) => {
+            await transaction.delete(Package, { id: packageEntity.id });
         });
+
+        await ImageStorageService.INSTANCE.deletePackageCoverImage({
+            catalogSlug: packageEntity.catalog.slug,
+            packageSlug: packageEntity.slug
+        });
+    }
+
+    async deletePackages({ packages }: { packages: Package[] }): Promise<void> {
+        for (const p of packages) {
+            await this.deletePackage({
+                identifier: {
+                    catalogSlug: p.catalog.slug,
+                    packageSlug: p.slug
+                }
+            });
+        }
     }
 
     async autocomplete({
@@ -418,16 +392,29 @@ export class PackageRepository {
         const ALIAS = "search";
         return this.createQueryBuilderWithUserConditions(user)
             .andWhere(
-                `(displayName_tokens @@ to_tsquery(:query) OR description_tokens @@ to_tsquery(:query) OR slug LIKE :queryLike)`,
+                `(readme_file_vectors @@ to_tsquery(:query) OR displayName_tokens @@ to_tsquery(:query) OR description_tokens @@ to_tsquery(:query) OR slug LIKE :queryLike)`,
                 {
                     query,
                     queryLike: query + "%"
                 }
             )
-            .andWhere(`"Package"."isActive" = true`)
             .limit(limit)
             .offset(offSet)
             .addRelations(ALIAS, relations)
+            .getManyAndCount();
+    }
+
+    async myPackages(user: User, limit: number, offSet: number, relations?: string[]): Promise<[Package[], number]> {
+        const ALIAS = "myPackages";
+        return this.manager
+            .getRepository(Package)
+            .createQueryBuilder()
+            .where("creator_id = :userId")
+            .orderBy('"Package"."updated_at"', "DESC")
+            .limit(limit)
+            .offset(offSet)
+            .addRelations(ALIAS, relations)
+            .setParameter("userId", user.id)
             .getManyAndCount();
     }
 

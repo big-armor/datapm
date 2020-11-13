@@ -1,6 +1,5 @@
 import { ApolloError, AuthenticationError, UserInputError, ValidationError } from "apollo-server";
 import { AuthenticatedContext } from "../context";
-import { User } from "../entity/User";
 import { AUTHENTICATION_ERROR } from "../generated/graphql";
 import { UserRepository } from "../repository/UserRepository";
 import { createJwt } from "../util/jwt";
@@ -26,7 +25,7 @@ export const login = async (
         throw new AuthenticationError(AUTHENTICATION_ERROR.WRONG_CREDENTIALS);
     }
 
-    if (process.env["REQUIRE_EMAIL_VERIFICATION"] != "false" && !user.emailVerified) {
+    if (!user.emailVerified) {
         throw new UserInputError(AUTHENTICATION_ERROR.EMAIL_ADDRESS_NOT_VERIFIED);
     }
 

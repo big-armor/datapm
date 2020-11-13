@@ -5,12 +5,17 @@ import { Stream } from "stream";
 import * as readline from "readline";
 import pidtree from "pidtree";
 import { Observable } from "@apollo/client/core";
+import fs from "fs";
+import { before } from "mocha";
+import { RandomUuid } from "testcontainers/dist/uuid";
 const maildev = require("maildev");
 
 let container: StartedTestContainer;
 let serverProcess: execa.ExecaChildProcess;
 let mailServer: any;
 export let mailObservable: Observable<any>;
+
+export const TEMP_STORAGE_URL = "file://tmp-registry-server-storage-" + new RandomUuid().nextUuid();
 
 before(async function () {
     console.log("Starting postgres temporary container");
@@ -49,14 +54,14 @@ before(async function () {
     serverProcess = execa("npm", ["run", "start-nowatch"], {
         env: {
             TYPEORM_PORT: postgresPortNumber.toString(),
-            REQUIRE_EMAIL_VERIFICATION: "true",
             SMTP_PORT: "1025",
             SMTP_SERVER: "localhost",
             SMTP_USER: "",
             SMTP_PASSWORD: "",
             SMTP_SECURE: "false",
             SMTP_FROM_ADDRESS: "test@localhost",
-            SMTP_FROM_NAME: "local-test"
+            SMTP_FROM_NAME: "local-test",
+            STORAGE_URL: TEMP_STORAGE_URL
         }
     });
 
@@ -83,6 +88,7 @@ before(async function () {
             if (line.indexOf("🚀") != -1) {
                 console.log("Server started!");
                 serverReady = true;
+
                 r();
             }
         });
@@ -94,15 +100,13 @@ before(async function () {
         serverProcess.stdout!.on("close", () => {
             if (!serverReady) throw new Error("Registry server exited before becoming ready");
         });
-
-        setTimeout(function () {
-            if (!serverReady) throw new Error("Timedout waiting for registry server to start");
-        }, 30000);
     });
 });
 
 after(async function () {
     this.timeout(30000);
+
+    fs.rmdirSync(TEMP_STORAGE_URL.replace("file://", ""), { recursive: true });
 
     if (container) await container.stop();
 
@@ -123,6 +127,5 @@ after(async function () {
             console.error(error);
         }
     });
-
     mailServer.close();
 });

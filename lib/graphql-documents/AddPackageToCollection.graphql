@@ -1,0 +1,29 @@
+mutation AddPackageToCollection(
+    $collectionIdentifier: CollectionIdentifierInput!
+    $packageIdentifier: PackageIdentifierInput!
+) {
+    addPackageToCollection(collectionIdentifier: $collectionIdentifier, packageIdentifier: $packageIdentifier) {
+        collection {
+            identifier {
+                collectionSlug
+            }
+            name
+            description
+        }
+        package {
+            identifier {
+                catalogSlug
+                packageSlug
+            }
+            displayName
+            description
+            latestVersion {
+                identifier {
+                    versionMajor
+                    versionMinor
+                    versionPatch
+                }
+            }
+        }
+    }
+}

@@ -1,6 +1,7 @@
 import { ApolloError, ValidationError } from "apollo-server";
 import { AuthenticatedContext } from "../context";
 import {
+    Base64ImageUpload,
     CollectionIdentifierInput,
     CollectionPackage,
     CreateCollectionInput,
@@ -13,6 +14,7 @@ import { CollectionRepository } from "../repository/CollectionRepository";
 import { PackageRepository } from "../repository/PackageRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { grantAllCollectionPermissionsForUser } from "./UserCollectionPermissionResolver";
+import { ImageStorageService } from "../storage/images/image-storage-service";
 
 export const createCollection = async (
     _0: any,
@@ -54,16 +56,25 @@ export const updateCollection = async (
     return repository.updateCollection(identifier.collectionSlug, value, relations);
 };
 
-export const disableCollection = async (
+export const setCollectionCoverImage = async (
+    _0: any,
+    { identifier, image }: { identifier: CollectionIdentifierInput; image: Base64ImageUpload },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    return ImageStorageService.INSTANCE.saveCollectionCoverImage(identifier, image.base64);
+};
+
+export const deleteCollection = async (
     _0: any,
     { identifier }: { identifier: CollectionIdentifierInput },
     context: AuthenticatedContext,
     info: any
 ) => {
     const relations = getGraphQlRelationName(info);
-    return context.connection.manager
+    await context.connection.manager
         .getCustomRepository(CollectionRepository)
-        .disableCollection(identifier.collectionSlug, relations);
+        .deleteCollection(identifier.collectionSlug);
 };
 
 export const addPackageToCollection = async (
@@ -80,7 +91,7 @@ export const addPackageToCollection = async (
     const identifier = packageIdentifier;
     const packageEntity = await context.connection
         .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier, includeActiveOnly: true });
+        .findPackageOrFail({ identifier });
 
     await context.connection.manager
         .getCustomRepository(CollectionPackageRepository)
@@ -112,7 +123,7 @@ export const removePackageFromCollection = async (
     const identifier = packageIdentifier;
     const packageEntity = await context.connection
         .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier, includeActiveOnly: true });
+        .findPackageOrFail({ identifier });
 
     await context.connection.manager
         .getCustomRepository(CollectionPackageRepository)

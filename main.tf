@@ -3,7 +3,27 @@ variable "smtp_password" {
   type        = string
 }
 
+variable "APOLLO_KEY" {
+  description = "Apollo GraphlQL Key"
+  type        = string
+}
 
+locals {
+
+  environments = {
+    default = {
+      media_bucket_name = "datapm-test-media"
+      log_bucket_name   = "datapm-test-logging"
+      log_object_prefix = "datapm-test"
+      location          = "US"
+      labels            = [{ "source" : "terraform" }]
+      registry_name     = "DataPM Test"
+    }
+  }
+
+  environmentvars = contains(keys(local.environments), terraform.workspace) ? terraform.workspace : "default"
+  workspace       = merge(local.environments["default"], local.environments[local.environmentvars])
+}
 
 terraform {
   backend "gcs" {
@@ -69,6 +89,46 @@ resource "google_project_iam_member" "cloudrun-sa-cloudsql-role" {
   member  = "serviceAccount:${google_service_account.cloudrun-sa.email}"
 }
 
+resource "google_storage_bucket" "logging" {
+  name          = local.workspace["log_bucket_name"]
+  location      = local.workspace["location"]
+  force_destroy = false
+  project       = google_project.project.project_id
+
+  lifecycle_rule {
+    condition {
+      age        = 365
+      with_state = "ANY"
+    }
+    action {
+      type = "Delete"
+    }
+  }
+}
+
+resource "google_storage_bucket" "media" {
+  name          = local.workspace["media_bucket_name"]
+  location      = local.workspace["location"]
+  force_destroy = false
+  project       = google_project.project.project_id
+
+  logging {
+    log_bucket        = local.workspace["log_bucket_name"]
+    log_object_prefix = "media"
+  }
+
+}
+
+
+resource "google_storage_bucket_acl" "media-store-acl" {
+  bucket = google_storage_bucket.media.name
+
+  role_entity = [
+    "OWNER:user-${google_service_account.cloudrun-sa.email}"
+  ]
+}
+
+
 resource "google_cloud_run_service" "default" {
   name     = "datapm-registry"
   location = "us-central1"
@@ -92,7 +152,7 @@ resource "google_cloud_run_service" "default" {
         }
         env {
           name  = "APOLLO_KEY"
-          value = "service:family-connections:asdfasdfasdfasdf"
+          value = var.APOLLO_KEY
         }
         env {
           name  = "APOLLO_GRAPH_VARIANT"
@@ -105,10 +165,6 @@ resource "google_cloud_run_service" "default" {
         env {
           name  = "GOOGLE_CLOUD_PROJECT"
           value = google_project.project.project_id
-        }
-        env {
-          name  = "FILESYSTEM_STORAGE_DIRECTORY"
-          value = "local_storage"
         }
         env {
           name  = "MIXPANEL_TOKEN"
@@ -139,8 +195,16 @@ resource "google_cloud_run_service" "default" {
           value = google_sql_user.user.password
         }
         env {
+          name  = "REGISTRY_NAME"
+          value = "DataPM TEST Registry"
+        }
+        env {
           name  = "REGISTRY_URL"
           value = "https://test.datapm.io"
+        }
+        env {
+          name  = "REGISTRY_HOSTNAME"
+          value = "test.datapm.io"
         }
         env {
           name  = "TYPEORM_IS_DIST"
@@ -196,7 +260,7 @@ resource "google_cloud_run_service" "default" {
         }
         env {
           name  = "SMTP_FROM_NAME"
-          value = "DataPM Test Registry"
+          value = "DataPM Support"
         }
         env {
           name  = "SMTP_FROM_ADDRESS"
@@ -207,8 +271,8 @@ resource "google_cloud_run_service" "default" {
           value = "true"
         }
         env {
-          name  = "REQUIRE_EMAIL_VERIFICATION"
-          value = "true"
+          name  = "STORAGE_URL"
+          value = "gs://${local.workspace["media_bucket_name"]}"
         }
       }
     }

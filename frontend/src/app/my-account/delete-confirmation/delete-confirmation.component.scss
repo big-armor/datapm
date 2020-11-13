@@ -1,0 +1,17 @@
+.catalog-slug {
+    color: #ff4081;
+}
+div[mat-dialog-title] {
+    max-width: 400px;
+    font-weight: 400;
+    font-size: 16px;
+}
+div[mat-dialog-content] {
+    font-size: 16px;
+}
+div[mat-dialog-actions] {
+    justify-content: flex-end;
+}
+mat-form-field {
+    width: 100%;
+}

@@ -37,14 +37,8 @@ export class Version extends BaseModel {
     @Column({ name: "author_id" })
     authorId: number;
 
-    @Column({ nullable: false, default: true })
-    isActive: boolean;
-
-    @Column({ length: 2048 })
+    @Column({ length: 250 })
     description: string;
-
-    @Column({ type: "jsonb", name: "packageFile" })
-    packageFile: PackageFile;
 
     identifier: VersionIdentifier;
 }

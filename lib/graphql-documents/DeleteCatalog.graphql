@@ -1,0 +1,3 @@
+mutation DeleteCatalog($identifier: CatalogIdentifierInput!) {
+    deleteCatalog(identifier: $identifier)
+}

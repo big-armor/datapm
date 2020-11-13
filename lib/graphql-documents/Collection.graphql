@@ -1,0 +1,37 @@
+query Collection($identifier: CollectionIdentifierInput!) {
+    collection(identifier: $identifier) {
+        name
+        description
+        creator {
+            username
+        }
+        identifier {
+            collectionSlug
+        }
+        packages {
+            identifier {
+                catalogSlug
+                packageSlug
+            }
+            displayName
+            description
+            latestVersion {
+                identifier {
+                    versionMajor
+                    versionMinor
+                    versionPatch
+                }
+            }
+            creator {
+                username
+            }
+            catalog {
+                identifier {
+                    catalogSlug
+                }
+                displayName
+                description
+            }
+        }
+    }
+}

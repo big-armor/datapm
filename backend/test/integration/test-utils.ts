@@ -11,7 +11,6 @@ import {
 import fetch from "cross-fetch";
 import { mailObservable } from "./setup";
 import { expect } from "chai";
-import { execute } from "graphql";
 
 export function createAnonymousClient() {
     return new ApolloClient({

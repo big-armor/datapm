@@ -8,7 +8,6 @@ import {
     CatalogIdentifier,
     CatalogIdentifierInput
 } from "../generated/graphql";
-import { deleteNoThrow } from "../util/deleteHelpers";
 import { Catalog } from "../entity/Catalog";
 import { Package } from "../entity/Package";
 import { UserCatalogPermission } from "../entity/UserCatalogPermission";
@@ -16,6 +15,8 @@ import { Permissions } from "../entity/Permissions";
 import { UserCatalogPermissionRepository, grantUserCatalogPermission } from "./CatalogPermissionRepository";
 import { PackageRepository } from "./PackageRepository";
 import { Identifier } from "../util/IdentifierUtil";
+import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
+import { ImageStorageService } from "../storage/images/image-storage-service";
 
 // https://stackoverflow.com/a/52097700
 export function isDefined<T>(value: T | undefined | null): value is T {
@@ -48,7 +49,7 @@ async function getCatalogOrFail({
     let query = manager
         .getRepository(Catalog)
         .createQueryBuilder(ALIAS)
-        .where({ slug: slug, isActive: true })
+        .where({ slug: slug })
         .addRelations(ALIAS, relations);
 
     const catalog = await query.getOne();
@@ -71,7 +72,7 @@ export class CatalogRepository extends Repository<Catalog> {
         }
     }
 
-    async findCatalog({ slug, relations = [] }: { slug: string; relations?: string[]; includeInactive?: boolean }) {
+    async findCatalog({ slug, relations = [] }: { slug: string; relations?: string[] }) {
         return getCatalogOrFail({
             slug: slug,
             manager: this.manager,
@@ -79,19 +80,18 @@ export class CatalogRepository extends Repository<Catalog> {
         });
     }
 
-    async findCatalogBySlug({
-        slug,
-        relations = []
-    }: {
-        slug: string;
-        relations?: string[];
-        includeInactive?: boolean;
-    }) {
-        let query = this.manager
-            .getRepository(Catalog)
-            .findOne({ where: { slug: slug, isActive: true }, relations: relations });
+    async findCatalogBySlug({ slug, relations = [] }: { slug: string; relations?: string[] }) {
+        return this.manager.getRepository(Catalog).findOne({ where: { slug: slug }, relations: relations });
+    }
 
-        return query;
+    async findCatalogBySlugOrFail(slug: string, relations?: string[]): Promise<Catalog> {
+        const catalog = this.manager.getRepository(Catalog).findOne({ where: { slug: slug }, relations: relations });
+
+        if (catalog != null) {
+            throw new Error(`Catalog ${slug} could not be found`);
+        }
+
+        return catalog;
     }
 
     createCatalog({
@@ -127,7 +127,6 @@ export class CatalogRepository extends Repository<Catalog> {
             catalog.createdAt = now;
             catalog.website = value.website ? value.website : "";
             catalog.updatedAt = now;
-            catalog.isActive = true;
 
             const savedCatalog = await transaction.save(catalog);
 
@@ -191,44 +190,33 @@ export class CatalogRepository extends Repository<Catalog> {
         });
     }
 
-    async disableCatalog({ slug, relations = [] }: { slug: string; relations?: string[] }): Promise<Catalog> {
-        const filesToDelete: string[] = [];
-
-        const catalog_ = await this.manager.nestedTransaction(async (transaction) => {
-            const catalog = await transaction.getRepository(Catalog).findOneOrFail({
-                where: { slug: slug },
-                relations
-            });
-
-            // find all packages that are part of this catalog
-            const ALIAS = "package";
-            const packages = await transaction
-                .getRepository(Package)
-                .createQueryBuilder(ALIAS)
-                .where({ catalogId: catalog.id })
-                .getMany();
-
-            // set all packages false
-            await transaction.getCustomRepository(PackageRepository).disablePackages({ packages: packages });
-
-            catalog.isActive = false;
-            catalog.slug = catalog.slug + "-DISABLED-" + new Date().getTime();
-
-            await transaction.save(catalog);
-
-            return catalog;
+    async deleteCatalog({ slug }: { slug: string }): Promise<void> {
+        const catalog = await this.manager.getRepository(Catalog).findOneOrFail({
+            where: { slug: slug }
         });
 
-        // IN FUTURE find filesToDelete
+        // find all packages that are part of this catalog
+        const ALIAS = "package";
+        const packages = await this.manager
+            .getRepository(Package)
+            .createQueryBuilder(ALIAS)
+            .where({ catalogId: catalog.id })
+            .addRelations(ALIAS, ["catalog"])
+            .getMany();
 
-        // delete all files now that the transaction succeeded
-        for (let file of filesToDelete) {
-            if (file) {
-                await deleteNoThrow(file);
-            }
+        await this.manager.getCustomRepository(PackageRepository).deletePackages({ packages: packages });
+
+        await this.manager.nestedTransaction(async (transaction) => {
+            await transaction.delete(Catalog, { id: catalog.id });
+        });
+
+        try {
+            await ImageStorageService.INSTANCE.deleteCatalogCoverImage({ catalogSlug: slug });
+        } catch (error) {
+            if (error.message == "FILE_NOT_FOUND") return;
+
+            console.error(error.message);
         }
-
-        return catalog_;
     }
 
     async autocomplete({

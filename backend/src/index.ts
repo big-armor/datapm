@@ -8,20 +8,17 @@ import proxy from "express-http-proxy";
 import { ApolloServer } from "apollo-server-express";
 
 import { Context } from "./context";
-import { getMeRequest, getMeSub } from "./util/me";
-import { registerBucketHosting } from "./util/storage";
+import { getMeRequest } from "./util/me";
 import { makeSchema } from "./schema";
 import path from "path";
 import { getSecretVariable, setAppEngineServiceAccountJson } from "./util/secrets";
-import { createDataLoaders } from "./dataLoaders";
 import { GraphQLError } from "graphql";
 import { superCreateConnection } from "./util/databaseCreation";
-import jwt from "express-jwt";
-import { getEnvVariable } from "./util/getEnvVariable";
+import { Readable, Stream } from "stream";
 import fs from "fs";
+import { ImageStorageService } from "./storage/images/image-storage-service";
 
-const nodeModulesDirectory = getEnvVariable("NODE_MODULES_DIRECTORY", "node_modules");
-const dataLibPackageFile = fs.readFileSync(nodeModulesDirectory + "/datapm-lib/package.json");
+const dataLibPackageFile = fs.readFileSync("node_modules/datapm-lib/package.json");
 const dataLibPackageJSON = JSON.parse(dataLibPackageFile.toString());
 const REGISTRY_API_VERSION = dataLibPackageJSON.version;
 
@@ -48,25 +45,11 @@ async function main() {
 
     const connection = await superCreateConnection();
 
-    // if the GRAPHQL_CONTEXT_USER_SUB environment variable is set, get me context
-    // from GRAPHQL_CONTEXT_USER_SUB, else, get it from the express request object
-    // GRAPHQL_CONTEXT_USER_SUB should not be set in packageion
-
-    console.log(`process.env.GRAPHQL_CONTEXT_USER_SUB set to ${process.env.GRAPHQL_CONTEXT_USER_SUB}`);
-
-    const context = process.env.GRAPHQL_CONTEXT_USER_SUB
-        ? async ({ req }: { req: express.Request }): Promise<Context> => ({
-              request: req,
-              me: await getMeSub(process.env.GRAPHQL_CONTEXT_USER_SUB!, connection.manager),
-              connection: connection,
-              dataLoaders: createDataLoaders()
-          })
-        : async ({ req }: { req: express.Request }): Promise<Context> => ({
-              request: req,
-              me: await getMeRequest(req, connection.manager),
-              connection: connection,
-              dataLoaders: createDataLoaders()
-          });
+    const context = async ({ req }: { req: express.Request }): Promise<Context> => ({
+        request: req,
+        me: await getMeRequest(req, connection.manager),
+        connection: connection
+    });
 
     const schema = await makeSchema();
 
@@ -76,6 +59,10 @@ async function main() {
         introspection: true,
         playground: true,
         tracing: true,
+        uploads: {
+            maxFileSize: 10_000_000, // 10 MB
+            maxFiles: 1
+        },
         engine: {
             sendVariableValues: { none: true },
             rewriteError: (err: GraphQLError) => {
@@ -199,11 +186,45 @@ async function main() {
 
     app.use("/assets", express.static(path.join(__dirname, "..", "static", "assets")));
 
-    // when using FileSystemStorage for media files, sets up file hosting
-    registerBucketHosting(app, "/bucket", port);
-
     // set express for the Apollo GraphQL server
-    server.applyMiddleware({ app, bodyParserConfig: { limit: "1mb" } });
+    server.applyMiddleware({ app, bodyParserConfig: { limit: "20mb" } });
+
+    const respondWithImage = async function (imageStream: Stream, response: express.Response) {
+        const imageBuffer = await new Promise<Buffer>((res) => {
+            var bufs: any[] = [];
+            imageStream.on("data", function (d) {
+                bufs.push(d);
+            });
+            imageStream.on("end", function () {
+                var buf = Buffer.concat(bufs);
+                res(buf);
+            });
+        });
+
+        response.set("content-type", "image/jpeg");
+        response.set("content-length", imageBuffer.length.toString());
+
+        response.end(imageBuffer);
+    };
+
+    const imageService = ImageStorageService.INSTANCE;
+    app.use("/images/user/:username/avatar", async (req, res, next) => {
+        try {
+            await respondWithImage(await imageService.readUserAvatarImage(req.params.username), res);
+        } catch (err) {
+            res.status(404).send();
+            return;
+        }
+    });
+
+    app.use("/images/user/:username/cover", async (req, res, next) => {
+        try {
+            await respondWithImage(await imageService.readUserCoverImage(req.params.username), res);
+        } catch (err) {
+            res.status(404).send();
+            return;
+        }
+    });
 
     // any route not yet defined goes to index.html
     app.use("*", (req, res, next) => {
@@ -216,5 +237,4 @@ async function main() {
         console.log(`🚀 Server ready at http://localhost:${port}`);
     });
 }
-
 main().catch((error) => console.log(error));

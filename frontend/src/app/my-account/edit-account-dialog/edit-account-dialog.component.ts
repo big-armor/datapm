@@ -4,8 +4,16 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dial
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
-import { UpdateMeGQL, UsernameAvailableGQL, UpdateCatalogGQL, User } from "../../../generated/graphql";
+import {
+    UpdateMeGQL,
+    UsernameAvailableGQL,
+    UpdateCatalogGQL,
+    User,
+    SetMyCoverImageGQL,
+    SetMyAvatarImageGQL
+} from "../../../generated/graphql";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
+import { ImageUploadService } from "../../services/image-upload.service";
 
 function usernameValidator(
     usernameAvailableGQL: UsernameAvailableGQL,
@@ -65,6 +73,9 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
         public dialogRef: MatDialogRef<EditAccountDialogComponent>,
         public dialog: MatDialog,
         private updateMeGQL: UpdateMeGQL,
+        private setMyCoverImageGQL: SetMyCoverImageGQL,
+        private setMyAvatarImageGQL: SetMyAvatarImageGQL,
+        private imageUploadService: ImageUploadService,
         private usernameAvailableGQL: UsernameAvailableGQL,
         private updateCatalogGQL: UpdateCatalogGQL,
         private componentChangeDetector: ChangeDetectorRef
@@ -72,7 +83,6 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.currentUser = this.data;
-        console.log(this.data);
 
         this.form = new FormGroup({
             username: new FormControl(this.currentUser.username, {
@@ -90,7 +100,9 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
             gitHubHandle: new FormControl(this.currentUser.gitHubHandle),
             locationIsPublic: new FormControl(this.currentUser.locationIsPublic),
             websiteIsPublic: new FormControl(this.currentUser.websiteIsPublic),
-            emailAddressIsPublic: new FormControl(this.currentUser.emailAddressIsPublic)
+            emailAddressIsPublic: new FormControl(this.currentUser.emailAddressIsPublic),
+            twitterHandleIsPublic: new FormControl(this.currentUser.twitterHandleIsPublic),
+            gitHubHandleIsPublic: new FormControl(this.currentUser.gitHubHandleIsPublic)
         });
 
         this.nameIsPublic = this.currentUser.nameIsPublic;
@@ -154,11 +166,18 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
     }
 
     toggleNameIsPublic(ev: MatSlideToggleChange) {
-        console.log("name is public", ev.checked);
         this.nameIsPublic = ev.checked;
     }
 
     get username() {
         return this.form.get("username")! as FormControl;
+    }
+
+    public openAvatarUploadDialog(): void {
+        this.imageUploadService.openImageUploadDialog(this.setMyAvatarImageGQL);
+    }
+
+    public openCoverUploadDialog(): void {
+        this.imageUploadService.openImageUploadDialog(this.setMyCoverImageGQL);
     }
 }

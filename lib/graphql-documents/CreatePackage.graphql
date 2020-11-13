@@ -1,0 +1,21 @@
+mutation CreatePackage($value: CreatePackageInput!) {
+    createPackage(value: $value) {
+        identifier {
+            catalogSlug
+            packageSlug
+        }
+        catalog {
+            displayName
+        }
+        displayName
+        description
+        latestVersion {
+            identifier {
+                versionMajor
+                versionMinor
+                versionPatch
+            }
+            packageFile
+        }
+    }
+}

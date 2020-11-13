@@ -1,0 +1,3 @@
+mutation SetCollectionCoverImage($identifier: CollectionIdentifierInput!, $image: Base64ImageUpload!) {
+    setCollectionCoverImage(identifier: $identifier, image: $image)
+}

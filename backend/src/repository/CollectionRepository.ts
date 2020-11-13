@@ -3,6 +3,7 @@ import { EntityRepository, Repository, SelectQueryBuilder } from "typeorm";
 import { Collection } from "../entity/Collection";
 import { User } from "../entity/User";
 import { CreateCollectionInput, UpdateCollectionInput } from "../generated/graphql";
+import { ImageStorageService } from "../storage/images/image-storage-service";
 
 @EntityRepository(Collection)
 export class CollectionRepository extends Repository<Collection> {
@@ -49,15 +50,22 @@ export class CollectionRepository extends Repository<Collection> {
         return this.save(collectionIdDb);
     }
 
-    public async disableCollection(collectionSlug: String, relations?: string[]): Promise<Collection> {
-        const collectionIdDb = await this.findCollectionBySlugOrFail(collectionSlug, relations);
-        collectionIdDb.isActive = false;
-        return this.save(collectionIdDb);
+    public async deleteCollection(collectionSlug: string): Promise<void> {
+        const collectionIdDb = await this.findCollectionBySlugOrFail(collectionSlug);
+        await this.delete({ id: collectionIdDb.id });
+
+        try {
+            await ImageStorageService.INSTANCE.deleteCollectionCoverImage({ collectionSlug });
+        } catch (error) {
+            if (error.message == "FILE_NOT_FOUND") return;
+
+            console.error(error.message);
+        }
     }
 
     public async findCollectionBySlugOrFail(collectionSlug: String, relations?: string[]): Promise<Collection> {
         const collection = await this.createQueryBuilder()
-            .where('"Collection"."slug" = :slug AND "Collection"."is_active" = true')
+            .where('"Collection"."slug" = :slug')
             .setParameter("slug", collectionSlug)
             .addRelations(CollectionRepository.COLLECTION_RELATION_ALIAS, relations)
             .getOne();
@@ -71,10 +79,18 @@ export class CollectionRepository extends Repository<Collection> {
 
     public async findCollectionBySlug(collectionSlug: String, relations?: string[]): Promise<Collection | undefined> {
         return await this.createQueryBuilder()
-            .where('"Collection"."slug" = :slug AND "Collection"."is_active" = true')
+            .where('"Collection"."slug" = :slug')
             .setParameter("slug", collectionSlug)
             .addRelations(CollectionRepository.COLLECTION_RELATION_ALIAS, relations)
             .getOne();
+    }
+
+    public async findByUser(userId: number, relations?: string[]): Promise<Collection[]> {
+        return this.createQueryBuilder()
+            .where('"Collection"."creator_id" = :userId')
+            .setParameter("userId", userId)
+            .addRelations(CollectionRepository.COLLECTION_RELATION_ALIAS, relations)
+            .getMany();
     }
 
     public async findCollectionsForAuthenticatedUser(userId: number, relations?: string[]): Promise<Collection[]> {
@@ -103,16 +119,14 @@ export class CollectionRepository extends Repository<Collection> {
     }
 
     private createQueryBuilderWithUserConditions(userId: number): SelectQueryBuilder<Collection> {
-        const publicCollectionQueryBuilder = this.createQueryBuilder().where(
-            '("Collection"."is_public" and "Collection"."is_active")'
-        );
+        const publicCollectionQueryBuilder = this.createQueryBuilder().where('("Collection"."is_public")');
         if (!userId) {
             return publicCollectionQueryBuilder;
         }
 
         return publicCollectionQueryBuilder
             .orWhere(
-                `("Collection"."is_active" AND "Collection"."id" IN (SELECT collection_id FROM collection_user WHERE user_id = :userId AND 'VIEW' = any(permissions)))`
+                `("Collection"."id" IN (SELECT collection_id FROM collection_user WHERE user_id = :userId AND 'VIEW' = any(permissions)))`
             )
             .setParameter("userId", userId);
     }

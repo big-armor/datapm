@@ -3,6 +3,7 @@
     "version": "0.0.0",
     "scripts": {
         "ng": "ng",
+        "prestart": "npm run codegen",
         "start": "ng serve --aot --proxy-config proxy.conf.json ",
         "start:test": "ng serve --aot --proxy-config proxy.test.conf.json ",
         "prebuild": "rm -rf dist; npm run codegen",
@@ -30,7 +31,8 @@
         "bootstrap": "^4.5.2",
         "component": "^1.1.0",
         "crypto": "^1.0.1",
-        "datapm-lib": "^0.3.20",
+        "datapm-lib": "file:../lib",
+        "graphql-upload": "^11.0.0",
         "jwt-decode": "^2.2.0",
         "ngx-toastr": "^13.1.0",
         "rxjs": "^6.5.5",

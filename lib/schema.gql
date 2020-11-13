@@ -1,0 +1,671 @@
+scalar Date
+scalar JSON
+scalar PackageFileJSON
+scalar Void
+scalar Long
+scalar Object
+scalar ValidationString
+scalar Upload
+
+"""
+A string that uniquely identifies a catalog - this is an intermediate type only for internal validation
+"""
+scalar CatalogSlug
+
+"""
+A string that uniquely identifies a package - this is an intermediate type only for internal validation
+"""
+scalar PackageSlug
+
+"""
+A string that uniquely identifies a collection - this is an intermediate type only for internal validation
+"""
+scalar CollectionSlug
+
+"""
+A string that uniquely identifies an email address - this is an intermediate type only for internal validation
+"""
+scalar EmailAddress
+
+"""
+A string that is a user's password - this is an intermediate type only for internal validation
+"""
+scalar Password
+
+"""
+A string that uniquely identifies a Username - this is an intermediate type only for internal validation
+"""
+scalar Username
+
+"""
+A string that uniquely identifies a Username or Email address - this is an intermediate type only for internal validation
+"""
+scalar UsernameOrEmailAddress
+
+"""
+Potential responses when creating a new version on a package
+"""
+enum VersionConflict {
+    VERSION_EXISTS
+    HIGHER_VERSION_EXISTS
+    HIGHER_VERSION_REQUIRED
+}
+
+"""
+General permission values, which are applied to users for catalogs, package, and other access
+"""
+enum Permission {
+    MANAGE
+    VIEW
+    EDIT
+    NONE
+}
+
+"""
+Scopes for an API Key
+"""
+enum Scope {
+    MANAGE_API_KEYS
+    READ_PRIVATE_ASSETS
+    MANAGE_PRIVATE_ASSETS
+}
+
+"""
+Whether the requesting user has the specified permission on the catalog
+"""
+directive @hasCatalogPermission(permission: Permission) on OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION
+
+"""
+Whether the requesting user has the specified permission on the package
+"""
+directive @hasPackagePermission(permission: Permission) on OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION
+
+"""
+Whether the requesting user has the specified permission on the collection
+"""
+directive @hasCollectionPermission(permission: Permission) on OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION
+
+"""
+Whether the catalog slug provided is valid
+"""
+directive @validCatalogSlug on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+
+"""
+Whether the catalog slug provided is valid
+"""
+directive @validPackageSlug on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+
+"""
+Whether the collection slug provided is valid
+"""
+directive @validCollectionSlug(allowNull: Boolean) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+
+"""
+A collection of packages offered by a person or an organization.
+"""
+type Catalog {
+    identifier: CatalogIdentifier!
+    displayName: String!
+    description: String
+    website: String
+    isPublic: Boolean!
+    userPermissions: [UserCatalog!]
+    packages: [Package]
+}
+
+"""
+ Represents a single offering on the registry. Packages contain one or more versions of a Package File as it is updated over time. A package may contain one or more
+data data sets, and is a member of one and only one catalog. A package may be included in zero or more collections.
+"""
+type Package {
+    creator: User!
+    identifier: PackageIdentifier!
+    catalog: Catalog!
+    displayName: String!
+    description: String
+    latestVersion: Version
+    versions: [Version]!
+    createdAt: Date!
+    updatedAt: Date!
+}
+
+"""
+Represents a user, and their permission to a catalog
+"""
+type UserCatalog {
+    user: User!
+    catalog: Catalog!
+    permissions: [Permission!]
+}
+
+"""
+ A collection is a curated list of one or more packages from across one or more catalogs on a given topic. Collections are created and maintained
+by consumer side users, and generally not the publishers
+"""
+type Collection {
+    creator: User!
+    identifier: CollectionIdentifier!
+    name: String!
+    description: String
+    packages: [Package!]
+    createdAt: Date!
+    updatedAt: Date!
+}
+
+"""
+Represents a single package's listing in a collection, and information about how it was added
+"""
+type CollectionPackage {
+    collection: Collection!
+    package: Package!
+    addedByUser: User
+}
+
+"""
+Represents a user, and their permissions on a package
+"""
+type UserPackagePermissions {
+    package: Package!
+    username: String!
+    permissions: [Permission!]!
+}
+
+"""
+A single version of a package file for a package listing on the registry
+"""
+type Version {
+    identifier: VersionIdentifier!
+    createdAt: Date!
+    updatedAt: Date!
+    package: Package!
+    author: User!
+    packageFile: PackageFileJSON
+    readmeFile: String
+    licenseFile: String
+}
+
+"""
+The complete identifier for a version of a package on a registry
+"""
+type VersionIdentifier {
+    registryURL: String!
+    catalogSlug: String!
+    packageSlug: String!
+    versionMajor: Int!
+    versionMinor: Int!
+    versionPatch: Int!
+}
+
+"""
+The complete identifier for a package on a registry
+"""
+type PackageIdentifier {
+    registryURL: String!
+    catalogSlug: String!
+    packageSlug: String!
+}
+
+"""
+The complete identifier for a catalog on a registry
+"""
+type CatalogIdentifier {
+    registryURL: String!
+    catalogSlug: String!
+}
+
+"""
+The complete identifier for a collections on a registry
+"""
+type CollectionIdentifier {
+    registryURL: String!
+    collectionSlug: String!
+}
+
+"""
+The response for a catalog search request
+"""
+type SearchCatalogsResult {
+    catalogs: [Catalog!]
+    hasMore: Boolean!
+    count: Int!
+}
+
+"""
+" The response for a collection search request
+"""
+type SearchCollectionResult {
+    collections: [Collection!]
+    hasMore: Boolean!
+    count: Int!
+}
+
+"""
+The response for latest packages request
+"""
+type MyPackagesResult {
+    packages: [Package!]
+    hasMore: Boolean!
+    count: Int!
+}
+
+"""
+The response for a package search request
+"""
+type SearchPackagesResult {
+    packages: [Package!]
+    hasMore: Boolean!
+    count: Int!
+}
+
+"""
+The response for latest packages request
+"""
+type LatestPackagesResult {
+    packages: [Package!]
+    hasMore: Boolean!
+    count: Int!
+}
+
+"""
+The response for a search term auto-complete request
+"""
+type AutoCompleteResult {
+    catalogs: [Catalog!]
+    packages: [Package!]
+}
+
+"""
+The complete identifier for a version of a package, assuming the registry is based on the HTTP request URL
+"""
+input VersionIdentifierInput {
+    catalogSlug: String! @validCatalogSlug
+    packageSlug: String! @validPackageSlug
+    versionMajor: Int!
+    versionMinor: Int!
+    versionPatch: Int!
+}
+"""
+The complete identifier for a package, assuming the registry is based on the HTTP request URL
+"""
+input PackageIdentifierInput {
+    catalogSlug: String! @validCatalogSlug
+    packageSlug: String! @validPackageSlug
+}
+
+"""
+The complete identifier for a catalog assuming the registry is based on the HTTP request URL
+"""
+input CatalogIdentifierInput {
+    catalogSlug: String! @validCatalogSlug
+}
+
+"""
+The complete identifier for a collection assuming the registry is based on the HTTP request URL
+"""
+input CollectionIdentifierInput {
+    collectionSlug: String! @validCollectionSlug
+}
+
+"""
+The properties for creating a catalog
+"""
+input CreateCatalogInput {
+    slug: String! @validCatalogSlug
+    displayName: String!
+    description: String
+    website: String
+    isPublic: Boolean!
+}
+
+"""
+The properties of a catalog that can be updated. All are optional. Only the ones specified are applied.
+"""
+input UpdateCatalogInput {
+    newSlug: String @validCatalogSlug
+    displayName: String
+    description: String
+    website: String
+    isPublic: Boolean
+}
+
+"""
+The properties for creating a package list.
+"""
+input CreatePackageInput {
+    packageSlug: String! @validPackageSlug
+    catalogSlug: String! @validCatalogSlug
+    displayName: String!
+    description: String
+}
+
+"""
+The properties for updating an existing package. All are optional. Only the ones specified are applied.
+"""
+input UpdatePackageInput {
+    newCatalogSlug: String @validCatalogSlug
+    newPackageSlug: String @validPackageSlug
+    displayName: String
+    description: String
+    isPublic: Boolean
+}
+
+"""
+The properties for updating a specific user's permissions on a package
+"""
+input SetPackagePermissionInput {
+    username: String! @validUsername
+    permissions: [Permission!]!
+}
+
+"""
+To create a new package version, submit a valid package file
+"""
+input CreateVersionInput {
+    packageFile: PackageFileJSON
+    licenseFile: String
+    readmeFile: String
+}
+
+"""
+For creating a new collection on the registry.
+"""
+input CreateCollectionInput {
+    collectionSlug: String! @validCollectionSlug(allowNull: false)
+    name: String!
+    description: String
+}
+
+"""
+For updating an existing collection. All properties are optional, and only the ones specified are applied
+"""
+input UpdateCollectionInput {
+    newCollectionSlug: String @validCollectionSlug(allowNull: true)
+    name: String
+    description: String
+    isPublic: Boolean
+}
+
+type Query {
+    """
+    Whether the specified username is available for sign up
+    """
+    usernameAvailable(username: String! @validUsername): Boolean!
+
+    """
+    Whether the specified email address is avialable for sign up
+    """
+    emailAddressAvailable(emailAddress: String! @validEmailAddress): Boolean!
+
+    """
+    Who am i
+    """
+    me: User! @isAuthenticated
+
+    """
+    A list of the requesting user's exisiting API key information
+    """
+    myAPIKeys: [APIKey!] @isAuthenticated
+
+    """
+    Returns all of the users for a given catalog
+    """
+    usersByCatalog(identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: VIEW)): [User]!
+
+    """
+    Return a user by a given username, and returns only the properties on that user the requester should be able to view
+    """
+    user(username: String! @validUsername): User!
+
+    """
+    Returns package and collections with slugs that start with the given parameter
+    """
+    autoComplete(startsWith: String!): AutoCompleteResult!
+
+    """
+    For testing whether a given catalog slug is available to be reserved
+    """
+    catalogSlugAvailable(catalogSlug: String! @validCatalogSlug): Boolean!
+
+    """
+    Returns the catalogs the requesting user either owns or has edit or manage permission to
+    """
+    myCatalogs: [Catalog]! @isAuthenticated
+
+    """
+    Returns catalogs matching the query string (which can include boolean logic combinations) with pagination
+    """
+    searchCatalogs(query: String!, offSet: Int!, limit: Int!): SearchCatalogsResult!
+
+    """
+    Returns the catalog of the given identifier. Requires permission to view the catalog
+    """
+    catalog(identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: VIEW)): Catalog!
+
+    """
+    Returns the package for the given identifier. Requires permission to view the package
+    """
+    package(identifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)): Package!
+
+    """
+    Returns list of authenicated users packages
+    """
+    myPackages(offset: Int!, limit: Int!): MyPackagesResult! @isAuthenticated
+
+    """
+    Returns packages that match the given search query (which can contain boolean search logic). This request is paginated.
+    """
+    searchPackages(query: String!, offSet: Int!, limit: Int!): SearchPackagesResult!
+
+    """
+    Returns the latest packages
+    """
+    latestPackages(offSet: Int!, limit: Int!): LatestPackagesResult!
+
+    """
+    Returns the collection specified only if the user has permission to view it
+    """
+    collection(identifier: CollectionIdentifierInput!): Collection! @hasCollectionPermission(permission: VIEW)
+
+    """
+    Returns all of the collections the user has permission to view
+    """
+    collections: [Collection!]
+
+    """
+    Returns collections whos names match the given query. This request is paginated
+    """
+    searchCollections(query: String!, offset: Int!, limit: Int!): SearchCollectionResult!
+}
+
+type Mutation {
+    """
+    Creates a new user with the given input. Returns the user's authorization token.
+    """
+    createMe(value: CreateUserInput!): Void
+
+    """
+    Updates the requesting user's information. All fields optional.
+    """
+    updateMe(value: UpdateUserInput!): User! @isAuthenticated
+
+    """
+    Updates the logged in users' password
+    """
+    updateMyPassword(value: UpdateMyPasswordInput!): Void @isAuthenticated
+
+    """
+    Updates the avatar image of the authenticated user
+    """
+    setMyCoverImage(image: Base64ImageUpload! @validBase64Image): Void @isAuthenticated
+
+    """
+    Updates the avatar image of the authenticated user
+    """
+    setMyAvatarImage(image: Base64ImageUpload! @validBase64Image): Void @isAuthenticated
+
+    """
+    Deletes the requesting user's account
+    """
+    deleteMe: Void @isAuthenticated
+
+    """
+    Using a username or email address and a password, requests authentication information for the given user
+    """
+    login(username: String! @validUsernameOrEmailAddress, password: String! @validPassword): String!
+
+    """
+    Destroys the current user's session.
+    """
+    logout: Void @isAuthenticated
+
+    """
+    Generates a new API Key for the requesting user
+    """
+    createAPIKey(value: CreateAPIKeyInput!): APIKeyWithSecret! @isAuthenticated
+
+    """
+    Deletes an existing API Key for the requesting user
+    """
+    deleteAPIKey(id: String! @hasAPIKeyManagementPermission): APIKey! @isAuthenticated
+
+    """
+    Removes a specified user from the specified catalog, and all of their permissions
+    """
+    removeUserFromCatalog(
+        username: String! @validUsername
+        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
+    ): User!
+
+    """
+    Creates a new catalog which is owned by the requesting user
+    """
+    createCatalog(value: CreateCatalogInput!): Catalog!
+
+    """
+    Updates an existing catalog.
+    """
+    updateCatalog(
+        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: EDIT)
+        value: UpdateCatalogInput!
+    ): Catalog!
+
+    """
+    Updates the cover image of the catalog
+    """
+    setCatalogCoverImage(
+        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: EDIT)
+        image: Base64ImageUpload! @validBase64Image
+    ): Void @isAuthenticated
+
+    """
+    Deletes and existing catalog. All packages in the catalog are then deleted
+    """
+    deleteCatalog(identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)): Void
+
+    """
+    Creates a new package based on the information provided, and gives the requesting user all permissions to the package
+    """
+    createPackage(value: CreatePackageInput!): Package! @hasCatalogPermission(permission: EDIT)
+
+    """
+    Updates an existing package's descriptive information. See createVersion for how to update the package data definitions
+    """
+    updatePackage(
+        identifier: PackageIdentifierInput! @hasPackagePermission(permission: EDIT)
+        value: UpdatePackageInput!
+    ): Package!
+
+    """
+    Updates the cover image of the package
+    """
+    setPackageCoverImage(
+        identifier: PackageIdentifierInput! @hasPackagePermission(permission: EDIT)
+        image: Base64ImageUpload! @validBase64Image
+    ): Void @isAuthenticated
+
+    """
+    Deletes an existing package
+    """
+    deletePackage(identifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)): Void
+
+    """
+    Creates a new collection, which is managed by the requesting user
+    """
+    createCollection(value: CreateCollectionInput!): Collection!
+
+    """
+    Updates an existing collection
+    """
+    updateCollection(
+        identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: EDIT)
+        value: UpdateCollectionInput!
+    ): Collection!
+
+    """
+    Updates the cover image of the collection
+    """
+    setCollectionCoverImage(
+        identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: EDIT)
+        image: Base64ImageUpload! @validBase64Image
+    ): Void @isAuthenticated
+
+    """
+    Deletes an existing collection.
+    """
+    deleteCollection(identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)): Void
+
+    """
+    Includes an existing package in an existing collection
+    """
+    addPackageToCollection(
+        collectionIdentifier: CollectionIdentifierInput! @hasCollectionPermission(permission: EDIT)
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+    ): CollectionPackage!
+
+    """
+    Removes an existing package from a collection
+    """
+    removePackageFromCollection(
+        collectionIdentifier: CollectionIdentifierInput! @hasCollectionPermission(permission: EDIT)
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+    ): Void
+
+    """
+    Sets the permissions for a given user
+    """
+    setPackagePermissions(
+        identifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
+        value: SetPackagePermissionInput!
+    ): UserPackagePermissions!
+
+    """
+    Removes all permissions for a user on a given package. Requires the manage package permission
+    """
+    removePackagePermissions(
+        identifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
+        username: String! @validUsername
+    ): Void
+
+    """
+    Creates a new version of the package file on a package listing. There is no update, as any update should also be published as a new version
+    """
+    createVersion(
+        identifier: PackageIdentifierInput! @hasPackagePermission(permission: EDIT)
+        value: CreateVersionInput!
+    ): Version!
+
+    """
+    Deletes a given version from a package. Use this sparingly, to allow for a viewable history of change for the package
+    """
+    deleteVersion(identifier: VersionIdentifierInput! @hasPackagePermission(permission: EDIT)): Void!
+
+    """
+    For proxying user activity tracking outside of other API requests
+    """
+    track(actions: JSON!): Int!
+
+    """
+    Given a token, validate a user's email address
+    """
+    verifyEmailAddress(token: String!): Void
+}

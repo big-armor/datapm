@@ -1,0 +1,83 @@
+<div class="container-fluid cover-image">
+    <div class="row">
+        <div class="col-md-12"></div>
+    </div>
+</div>
+
+<div class="container" id="userProfile">
+    <div class="row top-row">
+        <div *ngIf="currentUser" class="col-lg-10 col-md-12 col-sm-12 profile-div">
+            <div class="row my-account-header">
+                <div class="col-7">
+                    <div class="d-flex bd-highlight user-header" style="height: 80px">
+                        <div class="p-2 bd-highlight">
+                            <a class="user-img"
+                                ><img src="../../assets/images/user-female.jpg" alt="User profile image"
+                            /></a>
+                        </div>
+                        <div class="p-2 bd-highlight">
+                            <span *ngIf="currentUser.firstName && currentUser.lastName">
+                                <span class="user-fullname">
+                                    {{ currentUser.firstName + " " + currentUser.lastName }}</span
+                                >
+                                &nbsp;
+                                <span *ngIf="currentUser.nameIsPublic" class="public-text">public</span>
+                                <span *ngIf="!currentUser.nameIsPublic" class="not-public-text">not public</span><br />
+                            </span>
+                            <span class="user-name-only">{{ "@" + currentUser.username }}</span>
+                            &nbsp;
+                            <span class="public-text">public</span>
+                        </div>
+                        <div class="p-2 bd-highlight"></div>
+                    </div>
+                    <p class="user-bio pl-3">
+                        {{ currentUser.description }} Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                        eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
+                        nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
+                        dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur
+                        sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
+                        laborum.
+                    </p>
+                </div>
+                <div class="col-5 contact-info">
+                    <h3>Contact Info</h3>
+                    <p>
+                        <a target="_blank" href="mailto:{{ currentUser.emailAddress }}">{{
+                            currentUser.emailAddress
+                        }}</a
+                        >&nbsp;
+                        <span *ngIf="currentUser.emailAddressIsPublic" class="public-text">public</span>
+                        <span *ngIf="!currentUser.emailAddressIsPublic" class="not-public-text">not public</span>
+                    </p>
+                    <p *ngIf="currentUser.twitterHandle">
+                        <a target="_blank" href="https://twitter.com/{{ currentUser.twitterHandle }}"
+                            >@{{ currentUser.twitterHandle }} on Twitter</a
+                        >&nbsp;
+                        <span *ngIf="currentUser.twitterHandleIsPublic" class="public-text">public</span>
+                        <span *ngIf="!currentUser.twitterHandleIsPublic" class="not-public-text">not public</span>
+                    </p>
+                    <p *ngIf="currentUser.gitHubHandle">
+                        <a target="_blank" href="https://github.com/{{ currentUser.gitHubHandle }}"
+                            >@{{ currentUser.gitHubHandle }} on GitHub</a
+                        >&nbsp;
+                        <span *ngIf="currentUser.gitHubHandleIsPublic" class="public-text">public</span>
+                        <span *ngIf="!currentUser.gitHubHandleIsPublic" class="not-public-text">not public</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="user-menu">
+                <ul class="p-0" id="homeRoutes">
+                    <li *ngFor="let route of routes; let i = index" class="list-names" (click)="selectTab(i)">
+                        <a class="cursor-pointer" [class.active]="i == selectedTab">
+                            {{ route.linkName }}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-10 col-md-12 col-sm-12 p-0">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>

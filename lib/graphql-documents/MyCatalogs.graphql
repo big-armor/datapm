@@ -1,0 +1,12 @@
+query MyCatalogs {
+    myCatalogs {
+        identifier {
+            registryURL
+            catalogSlug
+        }
+        displayName
+        description
+        website
+        isPublic
+    }
+}

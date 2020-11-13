@@ -10,3 +10,8 @@ terraform.tfvars*
 .DS_Store
 
 backend/test/integration/registry-client.ts
+.idea
+gc.json
+
+backend/tmp-registry-server-storage
+backend/tmp-registry-server-storage-*

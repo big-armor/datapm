@@ -1,0 +1,11 @@
+mutation UpdateCatalog($identifier: CatalogIdentifierInput!, $value: UpdateCatalogInput!) {
+    updateCatalog(identifier: $identifier, value: $value) {
+        identifier {
+            catalogSlug
+        }
+        displayName
+        description
+        website
+        isPublic
+    }
+}

@@ -1,0 +1,11 @@
+query SearchCatalogs($query: String!, $limit: Int!, $offset: Int!) {
+    searchCatalogs(query: $query, limit: $limit, offSet: $offset) {
+        catalogs {
+            identifier {
+                catalogSlug
+            }
+            displayName
+            description
+        }
+    }
+}

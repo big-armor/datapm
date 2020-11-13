@@ -1,6 +1,5 @@
 import { Connection } from "typeorm";
 import { Request } from "express";
-import { DataLoaders } from "./dataLoaders";
 import { User } from "./entity/User";
 
 enum Scope {
@@ -13,7 +12,6 @@ enum Scope {
 export interface Context {
     connection: Connection;
     request: Request;
-    dataLoaders: DataLoaders;
     me?: User;
     scopes?: Scope[];
 }
@@ -21,7 +19,6 @@ export interface Context {
 export interface AuthenticatedContext extends Context {
     connection: Connection;
     request: Request;
-    dataLoaders: DataLoaders;
     me: User;
     scopes: [];
 }

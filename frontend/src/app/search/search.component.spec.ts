@@ -1,8 +1,10 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
-import { RouterModule } from "@angular/router";
+import { RouterTestingModule } from "@angular/router/testing";
 import { ApolloTestingModule } from "apollo-angular/testing";
+import { MatRadioModule } from "@angular/material/radio";
+import { MatListModule } from "@angular/material/list";
+import { MatDividerModule } from "@angular/material/divider";
 import { FormsModule } from "@angular/forms";
-import { MaterialModule } from "../material.module";
 import { SharedModule } from "../shared/shared.module";
 import { SearchComponent } from "./search.component";
 import { TimeAgoPipe } from "../shared/pipes/time-ago.pipe";
@@ -14,7 +16,15 @@ describe("SearchComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [SearchComponent],
-            imports: [RouterModule.forRoot([]), ApolloTestingModule, FormsModule, MaterialModule, SharedModule],
+            imports: [
+                RouterTestingModule,
+                ApolloTestingModule,
+                FormsModule,
+                SharedModule,
+                MatRadioModule,
+                MatListModule,
+                MatDividerModule
+            ],
             providers: [TimeAgoPipe]
         }).compileComponents();
     }));

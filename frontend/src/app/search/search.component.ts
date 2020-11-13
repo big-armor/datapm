@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, ParamMap } from "@angular/router";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
@@ -36,14 +36,14 @@ export class SearchComponent implements OnInit, OnDestroy {
     public isStarClicked: boolean = false;
     public selectedFilter: Filter = Filter.PACKAGES;
     public state = State.LOADING;
-    public urlParams: any;
+    public query: any;
     public limit: number = 10;
     public offset: number = 0;
+    public State = State;
 
     public packageResult: SearchPackagesQuery;
     public collectionResult: SearchCollectionsQuery;
 
-    private State = State;
     private subscription = new Subject();
 
     constructor(
@@ -54,8 +54,8 @@ export class SearchComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit(): void {
-        this.route.paramMap.pipe(takeUntil(this.subscription)).subscribe((params) => {
-            this.urlParams = params;
+        this.route.queryParamMap.pipe(takeUntil(this.subscription)).subscribe((params: ParamMap) => {
+            this.query = params.get("q") || null;
 
             this.onPackageFilterChange();
             this.onCollectionFilterChange();
@@ -86,7 +86,7 @@ export class SearchComponent implements OnInit, OnDestroy {
         this.state = State.LOADING;
         this.searchPackagesGQL
             .fetch({
-                query: this.urlParams.params.q,
+                query: this.query,
                 limit: this.limit,
                 offset: this.offset
             })
@@ -95,7 +95,6 @@ export class SearchComponent implements OnInit, OnDestroy {
                 ({ data }) => {
                     this.state = State.SUCCESS;
                     this.packageResult = data;
-                    console.log(this.packageResult);
                 },
                 (_) => (this.state = State.ERROR)
             );
@@ -105,7 +104,7 @@ export class SearchComponent implements OnInit, OnDestroy {
         this.state = State.LOADING;
         this.searchCollectionsGQL
             .fetch({
-                query: this.urlParams.params.q,
+                query: this.query,
                 limit: this.limit,
                 offset: this.offset
             })

@@ -2,7 +2,7 @@ import { ApolloClient, NormalizedCacheObject, ServerError } from "@apollo/client
 import { ErrorResponse } from "apollo-link-error";
 import { expect } from "chai";
 import {
-    DisableCatalogDocument,
+    DeleteCatalogDocument,
     UpdateCatalogDocument,
     MyCatalogsDocument,
     MyCatalogsQuery,
@@ -11,6 +11,7 @@ import {
     GetCatalogDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
+import { describe, it } from "mocha";
 
 describe("Catalog Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
@@ -366,9 +367,9 @@ describe("Catalog Tests", async () => {
         ).equal(true);
     });
 
-    it("Disable catalog", async function () {
+    it("Delete catalog", async function () {
         let response = await userAClient.mutate({
-            mutation: DisableCatalogDocument,
+            mutation: DeleteCatalogDocument,
             variables: {
                 identifier: {
                     catalogSlug: "user-a-second-catalog-v2"
@@ -379,7 +380,7 @@ describe("Catalog Tests", async () => {
         expect(response.errors == null, "no errors").to.equal(true);
     });
 
-    it("User A Get Disabled Catalog", async function () {
+    it("User A Get Deleted Catalog", async function () {
         let response = await userAClient.query({
             query: GetCatalogDocument,
             variables: {
@@ -392,7 +393,7 @@ describe("Catalog Tests", async () => {
         expect(response.errors != null, "error should be returned").to.equal(true);
         expect(
             response.errors!.find((e) => e.message == "CATALOG_NOT_FOUND") != null,
-            "should not return disabled catalog"
+            "should not return deleted catalog"
         ).equal(true);
     });
 

@@ -1,13 +1,33 @@
+const { fstat } = require("fs");
 const { series, src, dest, parallel } = require("gulp");
 const exec = require("child_process").exec;
 const spawn = require("child_process").spawn;
+const fs = require("fs");
 
 const path = require("path");
 
 const DESTINATION_DIR = path.join(__dirname, "dist");
 console.log(DESTINATION_DIR);
 
-function installBackendDepdendencies() {
+function readPackageVersion() {
+    const fileContents = fs.readFileSync("package.json");
+    const packageFile = JSON.parse(fileContents);
+    return packageFile.version;
+}
+
+function installLibDependencies() {
+    return spawnAndLog("lib-deps", "npm", ["ci"], { cwd: "lib" });
+}
+
+function testLib() {
+    return spawnAndLog("lib-test", "npm", ["run", "test"], { cwd: "lib" });
+}
+
+function buildLib() {
+    return spawnAndLog("lib-build", "npm", ["run", "build"], { cwd: "lib" });
+}
+
+function installBackendDependencies() {
     return spawnAndLog("backend-deps", "npm", ["ci"], { cwd: "backend" });
 }
 
@@ -19,7 +39,7 @@ function buildBackend() {
     return spawnAndLog("backend-build", "npm", ["run", "build"], { cwd: "backend" });
 }
 
-function installFrontendDepdendencies() {
+function installFrontendDependencies() {
     return spawnAndLog("frontend-deps", "npm", ["ci"], { cwd: "frontend" });
 }
 
@@ -31,7 +51,7 @@ function buildFrontend() {
     return spawnAndLog("frontend-build", "npm", ["run", "build"], { cwd: "frontend" });
 }
 
-function installDocsDepdendencies() {
+function installDocsDependencies() {
     return spawnAndLog("docs-deps", "npm", ["ci"], { cwd: "docs/website" });
 }
 
@@ -40,18 +60,26 @@ function buildDocs() {
 }
 
 function buildDockerImage() {
-    return spawnAndLog("docker-build", "docker", [
-        "build",
-        "-t",
+    return spawnAndLog("docker-build", "docker", ["build", "-t", "datapm-registry", ".", "-f", "docker/Dockerfile"]);
+}
+
+function bumpRootVersion() {
+    return spawnAndLog("bump-root-version", "npm", ["version", "patch"]);
+}
+
+function bumpLibVersion() {
+    return spawnAndLog("bump-lib-version", "npm", ["version", readPackageVersion()], { cwd: "lib" });
+}
+
+function tagGCRDockerImageVersion() {
+    return spawnAndLog("docker-tag", "docker", [
+        "tag",
         "datapm-registry",
-        ".",
-        "-f",
-        "docker/Dockerfile",
-        "--no-cache"
+        "gcr.io/datapm-test-terraform/datapm-registry:" + readPackageVersion()
     ]);
 }
 
-function tagGCRDockerImage() {
+function tagGCRDockerImageLatest() {
     return spawnAndLog("docker-tag", "docker", [
         "tag",
         "datapm-registry",
@@ -60,15 +88,46 @@ function tagGCRDockerImage() {
 }
 
 function pushGCRImage() {
-    return spawnAndLog("docker-push-gcr", "docker", ["push", "gcr.io/datapm-test-terraform/datapm-registry:latest"]);
+    return spawnAndLog("docker-push-gcr", "docker", [
+        "push",
+        "gcr.io/datapm-test-terraform/datapm-registry:" + readPackageVersion()
+    ]);
 }
 
-function tagDockerImage() {
+function tagDockerImageLatest() {
     return spawnAndLog("docker-tag", "docker", ["tag", "datapm-registry", "datapm/datapm-registry:latest"]);
 }
 
+function tagDockerImageVersion() {
+    return spawnAndLog("docker-tag", "docker", [
+        "tag",
+        "datapm-registry",
+        "datapm/datapm-registry:" + readPackageVersion()
+    ]);
+}
+
 function pushDockerImage() {
-    return spawnAndLog("docker-push-docker", "docker", ["push", "datapm/datapm-registry:latest"]);
+    return spawnAndLog("docker-push-docker", "docker", ["push", "datapm/datapm-registry:" + readPackageVersion()]);
+}
+
+function gitPushTag() {
+    return spawnAndLog("git-tag-push", "git", ["push", "origin", "v" + readPackageVersion()]);
+}
+
+function gitStageChanges() {
+    return spawnAndLog("git-stage", "git", ["add", "-A"]);
+}
+
+function gitCommit() {
+    return spawnAndLog("git-commit", "git", ["commit", "-m 'Commit after version bump during build [ci skip]'"]);
+}
+
+function gitPush() {
+    return spawnAndLog("git-push", "git", ["push"]);
+}
+
+function libPublish() {
+    return spawnAndLog("lib-publish", "npm", ["publish"], { cwd: "lib" });
 }
 
 function spawnAndLog(prefix, command, args, opts) {
@@ -85,25 +144,44 @@ function spawnAndLog(prefix, command, args, opts) {
     return child;
 }
 
+function showGitDiff() {
+    return spawnAndLog("git-diff", "git", ["diff"]);
+}
+
 exports.default = series(
-    installBackendDepdendencies,
+    installLibDependencies,
+    buildLib,
+    testLib,
+    installBackendDependencies,
     buildBackend,
     testBackend,
-    installFrontendDepdendencies,
+    installFrontendDependencies,
     buildFrontend,
     testFrontend,
-    installDocsDepdendencies,
+    installDocsDependencies,
     buildDocs,
     buildDockerImage
 );
 
 exports.buildParallel = series(
+    series(installLibDependencies, buildLib, testLib),
     parallel(
-        series(installBackendDepdendencies, buildBackend, testBackend),
-        series(installFrontendDepdendencies, buildFrontend, testFrontend),
-        series(installDocsDepdendencies, buildDocs)
+        series(installBackendDependencies, buildBackend, testBackend),
+        series(installFrontendDependencies, buildFrontend, testFrontend),
+        series(installDocsDependencies, buildDocs)
     ),
     buildDockerImage
 );
 
-exports.deployDockerImage = series(tagGCRDockerImage, tagDockerImage, pushGCRImage, pushDockerImage);
+exports.bumpVersion = series(showGitDiff, bumpRootVersion, bumpLibVersion);
+exports.gitPushTag = series(gitStageChanges, gitCommit, gitPush, gitPushTag);
+exports.deployAssets = series(
+    //libPublish,
+    tagGCRDockerImageLatest,
+    tagGCRDockerImageVersion,
+    tagDockerImageLatest,
+    tagDockerImageVersion,
+    pushGCRImage,
+    pushDockerImage
+);
+exports.buildDockerImage = buildDockerImage;

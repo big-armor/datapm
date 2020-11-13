@@ -1,10 +1,17 @@
-import { ApolloError, AuthenticationError, ValidationError } from "apollo-server";
+import { AuthenticationError, ValidationError } from "apollo-server";
 import { AuthenticatedContext } from "../context";
-import { AUTHENTICATION_ERROR, CreateUserInput, UpdateMyPasswordInput, UpdateUserInput } from "../generated/graphql";
+import {
+    AUTHENTICATION_ERROR,
+    Base64ImageUpload,
+    CreateUserInput,
+    UpdateMyPasswordInput,
+    UpdateUserInput
+} from "../generated/graphql";
 import { CatalogRepository } from "../repository/CatalogRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { hashPassword } from "../util/PasswordUtil";
 import { getGraphQlRelationName } from "../util/relationNames";
+import { ImageStorageService } from "../storage/images/image-storage-service";
 
 export const emailAddressAvailable = async (
     _0: any,
@@ -86,10 +93,26 @@ export const updateMyPassword = async (
     });
 };
 
-export const disableMe = async (_0: any, {}, context: AuthenticatedContext, info: any) => {
-    return await context.connection.manager.getCustomRepository(UserRepository).markUserActiveStatus({
-        username: context.me.username,
-        active: false,
-        relations: getGraphQlRelationName(info)
+export const setMyCoverImage = async (
+    _0: any,
+    { image }: { image: Base64ImageUpload },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    return ImageStorageService.INSTANCE.saveUserCoverImage(context.me.username, image.base64);
+};
+
+export const setMyAvatarImage = async (
+    _0: any,
+    { image }: { image: Base64ImageUpload },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    return ImageStorageService.INSTANCE.saveUserAvatarImage(context.me.username, image.base64);
+};
+
+export const deleteMe = async (_0: any, {}, context: AuthenticatedContext, info: any) => {
+    return await context.connection.manager.getCustomRepository(UserRepository).deleteUser({
+        username: context.me.username
     });
 };

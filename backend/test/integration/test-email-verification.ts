@@ -3,6 +3,7 @@ import { ErrorResponse } from "apollo-link-error";
 import { expect } from "chai";
 import { LoginDocument, VerifyEmailAddressDocument } from "./registry-client";
 import { createAnonymousClient, createUserDoNotVerifyEmail } from "./test-utils";
+import { describe, it } from "mocha";
 
 describe("Email Verification Tests", async () => {
     let anonymousClient: ApolloClient<NormalizedCacheObject> = createAnonymousClient();

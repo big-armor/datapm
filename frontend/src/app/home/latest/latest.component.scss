@@ -1,0 +1,29 @@
+.h1-title {
+    font-family: Roboto Mono;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 20px;
+    line-height: 26px;
+    letter-spacing: -0.28px;
+    color: #828282;
+}
+
+.not-found {
+    margin: 0 auto;
+    text-align: center;
+    padding-top: 25px;
+    font-family: Roboto Mono;
+
+    p {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 18px;
+        line-height: 28px;
+        padding: 0px 30px;
+    }
+    a {
+        font-size: 14px;
+        padding-top: 15px;
+        color: #4f4f4f;
+    }
+}

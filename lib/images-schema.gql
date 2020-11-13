@@ -1,0 +1,21 @@
+"""
+Validates the uploaded base64 image
+"""
+directive @validBase64Image on ARGUMENT_DEFINITION
+
+enum IMAGE_UPLOAD_ERROR_TYPE {
+    IMAGE_NOT_INITIALIZED
+    IMAGE_FORMAT_NOT_SUPPORTED
+    IMAGE_TOO_LARGE
+    UNKNOWN
+}
+
+input Base64ImageUpload {
+    base64: String!
+}
+
+type Image {
+    id: String
+    type: String!
+    mimeType: String!
+}

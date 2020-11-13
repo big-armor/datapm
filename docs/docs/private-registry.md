@@ -15,19 +15,25 @@ version: "3.7"
 
 volumes:
   postgres_data_local: {}
+  registry_file_store: {}
 
 services:
   datapm-registry:
     image: datapm-registry:latest
     ports:
       - "4000:4000"
+    volumes:
+      - type: volume
+        source: registry_file_store
+        target: /var/lib/datapm-registry/data
+        consistency: cached
     environment:
       - REGISTRY_NAME="Private DataPM Registry"
       - REGISTRY_URL=http://localhost:4000
       - JWT_KEY=!!!!REPLACE_ME!!!
       - JWT_AUDIENCE=localhost
       - JWT_ISSUER=localhost
-      - FILESYSTEM_STORAGE_DIRECTORY=local_storage
+      - STORAGE_URL="file:///var/lib/datapm-registry/data"
       - TYPEORM_IS_DIST=true
       - TYPEORM_PORT=5432
       - TYPEORM_HOST=postgres
@@ -35,7 +41,6 @@ services:
       - TYPEORM_SCHEMA=public
       - TYPEORM_USERNAME=postgres
       - TYPEORM_PASSWORD=postgres
-      - REQUIRE_EMAIL_VERIFICATION=true
       - SMTP_SERVER=localhost
       - SMTP_PORT=25
       - SMTP_USER=
@@ -58,6 +63,10 @@ services:
       - POSTGRES_DB=datapm
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+  smtp:
+    image: namshi/smtp:latest
+    ports:
+        - "25:25"
 
 ```
 

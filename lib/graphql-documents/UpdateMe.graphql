@@ -1,0 +1,19 @@
+mutation UpdateMe($value: UpdateUserInput!) {
+    updateMe(value: $value) {
+        emailAddress
+        firstName
+        lastName
+        username
+        description
+        location
+        twitterHandle
+        gitHubHandle
+        website
+        nameIsPublic
+        locationIsPublic
+        twitterHandleIsPublic
+        gitHubHandleIsPublic
+        emailAddressIsPublic
+        websiteIsPublic
+    }
+}

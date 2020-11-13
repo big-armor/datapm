@@ -15,7 +15,8 @@ export class ValidateImageUploadDirective extends SchemaDirectiveVisitor {
         const { resolve = defaultFieldResolver } = details.field;
         const self = this;
         details.field.resolve = async function (source, args, context: Context, info) {
-            const imageUpload: FileUpload | undefined = args.image || args.value?.image || undefined;
+            console.log("Image field name: " + details.field.name);
+            const imageUpload: FileUpload | undefined = args[details.field.name];
             const image = await imageUpload;
             self.validateImage(image);
             return resolve.apply(this, [source, args, context, info]);
@@ -27,12 +28,13 @@ export class ValidateImageUploadDirective extends SchemaDirectiveVisitor {
             throw new ValidationError(IMAGE_UPLOAD_ERROR_TYPE.IMAGE_NOT_INITIALIZED);
         }
 
-        if (!this.isValidMimeType(image.mimetype)) {
+        if (!ValidateImageUploadDirective.isValidMimeType(image.mimetype)) {
+            console.log("image mime type is " + image.mimetype);
             throw new ValidationError(IMAGE_UPLOAD_ERROR_TYPE.IMAGE_FORMAT_NOT_SUPPORTED);
         }
     }
 
-    private isValidMimeType(mimeType: string): boolean {
+    public static isValidMimeType(mimeType: string): boolean {
         switch (mimeType) {
             case "image/jpeg":
             case "image/jpg":

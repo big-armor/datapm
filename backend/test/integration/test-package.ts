@@ -7,12 +7,14 @@ import {
     UpdateCatalogDocument,
     UpdatePackageDocument,
     CreateVersionDocument,
-    DisablePackageDocument
+    DeletePackageDocument,
+    MyPackagesDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import * as fs from "fs";
 import * as crypto from "crypto";
 import { PackageFile } from "datapm-lib";
+import { describe, it } from "mocha";
 
 describe("Package Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
@@ -38,6 +40,81 @@ describe("Package Tests", async () => {
         );
         expect(userAClient).to.exist;
         expect(userBClient).to.exist;
+    });
+
+    it("Should have catalog not found error", async function () {
+        let response = await userBClient.query({
+            query: PackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "invalid-catalog-name",
+                    packageSlug: "congressional-legislators"
+                }
+            }
+        });
+
+        expect(response.errors != null, "should have errors").to.equal(true);
+        expect(
+            response.errors!.find((e) => e.message == "CATALOG_NOT_FOUND") != null,
+            "should have catalog not found error"
+        ).equal(true);
+    });
+
+    it("Should allow user to see own packages", async function () {
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "food-a",
+                    displayName: "Congressional LegislatorsA",
+                    description: "Test upload of congressional legislatorsA"
+                }
+            }
+        });
+
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "food-a2",
+                    displayName: "Congressional LegislatorsA2",
+                    description: "Test upload of congressional legislatorsA2"
+                }
+            }
+        });
+
+        await userBClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "testB-packages",
+                    packageSlug: "food-b",
+                    displayName: "Congressional LegislatorsB",
+                    description: "Test upload of congressional legislatorsB"
+                }
+            }
+        });
+
+        let findMyPackagesA = await userAClient.query({
+            query: MyPackagesDocument,
+            variables: {
+                offset: 0,
+                limit: 5
+            }
+        });
+
+        let findMyPackagesB = await userBClient.query({
+            query: MyPackagesDocument,
+            variables: {
+                offset: 0,
+                limit: 5
+            }
+        });
+
+        expect(findMyPackagesA.data.myPackages.count).to.equal(2);
+        expect(findMyPackagesB.data.myPackages.count).to.equal(1);
     });
 
     it("Should allow user to create a package", async function () {
@@ -149,7 +226,7 @@ describe("Package Tests", async () => {
             variables: {
                 identifier: {
                     catalogSlug: "testA-packages",
-                    packageSlug: "congressional-legislators"
+                    packageSlug: "new-package-slug"
                 }
             }
         });
@@ -268,8 +345,9 @@ describe("Package Tests", async () => {
 
     it("User A publish first version", async function () {
         let packageFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json", "utf8");
+        let readmeFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.README.md", "utf8");
+        let licenseFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.LICENSE.md", "utf8");
 
-        let hash = crypto.createHash("sha256").update(packageFileContents, "utf8").digest("hex");
         let response = await userAClient.mutate({
             mutation: CreateVersionDocument,
             variables: {
@@ -278,7 +356,9 @@ describe("Package Tests", async () => {
                     packageSlug: "new-package-slug"
                 },
                 value: {
-                    packageFile: packageFileContents
+                    packageFile: packageFileContents,
+                    licenseFile: licenseFileContents,
+                    readmeFile: readmeFileContents
                 }
             }
         });
@@ -291,7 +371,10 @@ describe("Package Tests", async () => {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("7b099af18acd06ce94b3e13dcb1feb0a6637764b2cc4b6cac27e52f8267caf16");
+        expect(responseHash).equal("a408ed82946e088eec17f92775e67013e877a0dd0aed6d4d10ef2d1c79d14cc8");
+
+        expect(response.data!.createVersion.readmeFile!).includes("This is where a readme might go");
+        expect(response.data!.createVersion.licenseFile!).includes("This is not a real license. Just a test.");
     });
 
     it("Anonymous get package file", async function () {
@@ -321,7 +404,7 @@ describe("Package Tests", async () => {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("7b099af18acd06ce94b3e13dcb1feb0a6637764b2cc4b6cac27e52f8267caf16");
+        expect(responseHash).equal("a408ed82946e088eec17f92775e67013e877a0dd0aed6d4d10ef2d1c79d14cc8");
     });
 
     it("User A publish second version - fail no changes", async function () {
@@ -621,7 +704,7 @@ describe("Package Tests", async () => {
 
     it("User A delete package", async function () {
         let response = await userAClient.mutate({
-            mutation: DisablePackageDocument,
+            mutation: DeletePackageDocument,
             variables: {
                 identifier: {
                     catalogSlug: "testA-packages",
@@ -629,9 +712,7 @@ describe("Package Tests", async () => {
                 }
             }
         });
-
         expect(response.errors == null, "no errors").true;
-        expect(response.data!.disablePackage.identifier.packageSlug.startsWith("new-package-slug-DISABLED-")).true;
     });
 
     it("Anonymous User get Package", async function () {

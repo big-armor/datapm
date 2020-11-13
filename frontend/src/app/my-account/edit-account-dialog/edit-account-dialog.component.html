@@ -1,13 +1,13 @@
 <form id="editAccount" [formGroup]="form">
     <div mat-dialog-content>
-        <div class="big-img-dialog text-center">
+        <div class="big-img-dialog text-center" (click)="openCoverUploadDialog()">
             <button class="add-img-btn">
                 <span class="material-icons"> add_a_photo </span>
             </button>
         </div>
 
         <div class="dialog-content-text">
-            <div class="img-wrapper">
+            <div class="img-wrapper" (click)="openAvatarUploadDialog()">
                 <div class="profile-img">
                     <button class="add-img-btn">
                         <span class="material-icons"> add_a_photo </span>
@@ -18,22 +18,17 @@
             <p class="small-paragraph">public</p>
 
             <div class="d-flex bd-highlight shadow-div mb-3">
-                <div class="px-4 py-2 bd-highlight div-question">first name</div>
+                <div class="px-4 py-2 bd-highlight div-question">email</div>
                 <div class="bd-highlight div-answer">
-                    <input formControlName="firstName" type="text" class="form-control" placeholder="First name" />
+                    <input
+                        formControlName="emailAddress"
+                        type="email"
+                        class="form-control"
+                        placeholder="Add your email"
+                    />
                 </div>
                 <div class="ml-auto px-4 py-2 bd-highlight slide-right">
-                    <mat-slide-toggle [checked]="nameIsPublic" (change)="toggleNameIsPublic($event)"></mat-slide-toggle>
-                </div>
-            </div>
-
-            <div class="d-flex bd-highlight shadow-div mb-3">
-                <div class="px-4 py-2 bd-highlight div-question">last name</div>
-                <div class="bd-highlight div-answer">
-                    <input formControlName="lastName" type="text" class="form-control" placeholder="Last name" />
-                </div>
-                <div class="ml-auto px-4 py-2 bd-highlight slide-right">
-                    <mat-slide-toggle [checked]="nameIsPublic" (change)="toggleNameIsPublic($event)"></mat-slide-toggle>
+                    <mat-slide-toggle formControlName="emailAddressIsPublic"></mat-slide-toggle>
                 </div>
             </div>
 
@@ -63,6 +58,26 @@
                 </div>
                 <div class="ml-auto px-4 py-2 bd-highlight slide-right">
                     <mat-slide-toggle [checked]="true" [disabled]="true"></mat-slide-toggle>
+                </div>
+            </div>
+
+            <div class="d-flex bd-highlight shadow-div mb-3">
+                <div class="px-4 py-2 bd-highlight div-question">first name</div>
+                <div class="bd-highlight div-answer">
+                    <input formControlName="firstName" type="text" class="form-control" placeholder="First name" />
+                </div>
+                <div class="ml-auto px-4 py-2 bd-highlight slide-right">
+                    <mat-slide-toggle [checked]="nameIsPublic" (change)="toggleNameIsPublic($event)"></mat-slide-toggle>
+                </div>
+            </div>
+
+            <div class="d-flex bd-highlight shadow-div mb-3">
+                <div class="px-4 py-2 bd-highlight div-question">last name</div>
+                <div class="bd-highlight div-answer">
+                    <input formControlName="lastName" type="text" class="form-control" placeholder="Last name" />
+                </div>
+                <div class="ml-auto px-4 py-2 bd-highlight slide-right">
+                    <mat-slide-toggle [checked]="nameIsPublic" (change)="toggleNameIsPublic($event)"></mat-slide-toggle>
                 </div>
             </div>
 
@@ -102,17 +117,32 @@
             </div>
 
             <div class="d-flex bd-highlight shadow-div mb-3">
-                <div class="px-4 py-2 bd-highlight div-question">email</div>
+                <div class="px-4 py-2 bd-highlight div-question">twitter</div>
                 <div class="bd-highlight div-answer">
                     <input
-                        formControlName="emailAddress"
+                        formControlName="twitterHandle"
                         type="email"
                         class="form-control"
-                        placeholder="Add your email"
+                        placeholder="Add your twitter handle"
                     />
                 </div>
                 <div class="ml-auto px-4 py-2 bd-highlight slide-right">
-                    <mat-slide-toggle formControlName="emailAddressIsPublic"></mat-slide-toggle>
+                    <mat-slide-toggle formControlName="twitterHandleIsPublic"></mat-slide-toggle>
+                </div>
+            </div>
+
+            <div class="d-flex bd-highlight shadow-div mb-3">
+                <div class="px-4 py-2 bd-highlight div-question">github</div>
+                <div class="bd-highlight div-answer">
+                    <input
+                        formControlName="gitHubHandle"
+                        type="email"
+                        class="form-control"
+                        placeholder="Add your twitter handle"
+                    />
+                </div>
+                <div class="ml-auto px-4 py-2 bd-highlight slide-right">
+                    <mat-slide-toggle formControlName="gitHubHandleIsPublic"></mat-slide-toggle>
                 </div>
             </div>
 

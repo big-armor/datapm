@@ -1,0 +1,19 @@
+query Me {
+    me {
+        emailAddress
+        firstName
+        lastName
+        username
+        description
+        location
+        twitterHandle
+        gitHubHandle
+        website
+        nameIsPublic
+        locationIsPublic
+        twitterHandleIsPublic
+        gitHubHandleIsPublic
+        emailAddressIsPublic
+        websiteIsPublic
+    }
+}

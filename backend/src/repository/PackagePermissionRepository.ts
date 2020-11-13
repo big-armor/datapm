@@ -70,7 +70,7 @@ export class PackagePermissionRepository {
             // ensure user exists and is part of team
             const packageEntity = await transaction
                 .getCustomRepository(PackageRepository)
-                .findPackageOrFail({ identifier, includeActiveOnly: true });
+                .findPackageOrFail({ identifier });
 
             await transaction
                 .createQueryBuilder()
@@ -110,7 +110,7 @@ export class PackagePermissionRepository {
             const user = await transaction.getCustomRepository(UserRepository).findOneOrFail({ username });
             const packageEntity = await transaction
                 .getCustomRepository(PackageRepository)
-                .findPackageOrFail({ identifier, includeActiveOnly: true });
+                .findPackageOrFail({ identifier });
 
             await transaction.delete(UserPackagePermission, { package: packageEntity, user });
         });
