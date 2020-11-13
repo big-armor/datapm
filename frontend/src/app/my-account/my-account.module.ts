@@ -24,8 +24,6 @@ import { EditPasswordDialogComponent } from "./edit-password-dialog/edit-passwor
 import { PackagesComponent } from "./packages/packages.component";
 import { DeleteConfirmationComponent } from "./delete-confirmation/delete-confirmation.component";
 
-import { SharedModule } from "../shared/shared.module";
-
 @NgModule({
     declarations: [
         MyAccountComponent,
