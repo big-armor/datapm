@@ -1,8 +1,4 @@
-<div class="container-fluid cover-image">
-    <div class="row">
-        <div class="col-md-12"></div>
-    </div>
-</div>
+<app-cover [height]="240"></app-cover>
 
 <div class="container" id="userProfile">
     <div class="row top-row">
@@ -11,15 +7,13 @@
                 <div class="col-7">
                     <div class="d-flex bd-highlight user-header" style="height: 80px">
                         <div class="p-2 bd-highlight">
-                            <a class="user-img"
-                                ><img src="../../assets/images/user-female.jpg" alt="User profile image"
-                            /></a>
+                            <app-avatar class="user-img" [user]="currentUser" [size]="100"> </app-avatar>
                         </div>
                         <div class="p-2 bd-highlight">
                             <span *ngIf="currentUser.firstName && currentUser.lastName">
                                 <span class="user-fullname">
-                                    {{ currentUser.firstName + " " + currentUser.lastName }}</span
-                                >
+                                    {{ currentUser | username }}
+                                </span>
                                 &nbsp;
                                 <span *ngIf="currentUser.nameIsPublic" class="public-text">public</span>
                                 <span *ngIf="!currentUser.nameIsPublic" class="not-public-text">not public</span><br />

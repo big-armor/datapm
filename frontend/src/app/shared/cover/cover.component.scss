@@ -1,0 +1,34 @@
+.cover {
+    position: relative;
+}
+img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.add-btn {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: none;
+    border-radius: 0;
+    border: none;
+    left: 0;
+    top: 0;
+    transition: background-color 0.5s linear;
+
+    &:hover {
+        background-color: rgba(#000, 0.45);
+    }
+
+    mat-icon {
+        font-size: 48px;
+        width: 48px;
+        height: 48px;
+        color: white;
+    }
+}

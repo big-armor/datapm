@@ -12,6 +12,7 @@ import { MatInputModule } from "@angular/material/input";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatTableModule } from "@angular/material/table";
 
+import { SharedModule } from "../shared/shared.module";
 import { MyAccountRoutingModule } from "./my-account-routing.module";
 import { MyAccountComponent } from "./my-account/my-account.component";
 import { ActivityComponent } from "./activity/activity.component";
@@ -48,7 +49,8 @@ import { DeleteConfirmationComponent } from "./delete-confirmation/delete-confir
         MatIconModule,
         MatInputModule,
         MatSlideToggleModule,
-        MatTableModule
+        MatTableModule,
+        SharedModule
     ]
 })
 export class MyAccountModule {}

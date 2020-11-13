@@ -1,8 +1,11 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { HttpClientModule } from "@angular/common/http";
 import { MatDialogModule, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { RouterTestingModule } from "@angular/router/testing";
+import { ImageService } from "src/app/services/image.service";
+import { SharedModule } from "src/app/shared/shared.module";
 
 import { EditAccountDialogComponent } from "./edit-account-dialog.component";
 
@@ -13,7 +16,15 @@ describe("EditAccountDialogComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [EditAccountDialogComponent],
-            imports: [MatDialogModule, MatSlideToggleModule, RouterTestingModule, ReactiveFormsModule, FormsModule],
+            imports: [
+                HttpClientModule,
+                MatDialogModule,
+                MatSlideToggleModule,
+                RouterTestingModule,
+                ReactiveFormsModule,
+                FormsModule,
+                SharedModule
+            ],
             providers: [
                 {
                     provide: MAT_DIALOG_DATA,
@@ -26,7 +37,8 @@ describe("EditAccountDialogComponent", () => {
                 {
                     provide: MatDialog,
                     useValue: {}
-                }
+                },
+                ImageService
             ]
         }).compileComponents();
     }));
