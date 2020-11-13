@@ -58,6 +58,7 @@ export class CollectionRepository extends Repository<Collection> {
     ): Promise<[Collection[], number]> {
         return this.createQueryBuilder()
             .where("creator_id = :userId", { userId: user.id })
+            .orderBy('"Collection"."updated_at"', "DESC")
             .limit(limit)
             .offset(offSet)
             .getManyAndCount();
