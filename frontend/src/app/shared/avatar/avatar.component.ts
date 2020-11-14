@@ -60,7 +60,8 @@ export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
             .pipe(takeUntil(this.unsubscribe$))
             .subscribe((user) => {
                 user.then((user) => {
-                    this.getImage(user.username);
+                    if (user) this.getImage(user.username);
+                    else this.userBackgroundColor = "#FFFFFF";
                 });
             });
     }
@@ -69,10 +70,14 @@ export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
         if (changes.user && changes.user.currentValue) {
             this.user = changes.user.currentValue;
 
-            this.letter = this.user.username.substr(0, 1).toUpperCase();
-            if (this.user.nameIsPublic && this.user.firstName && this.user.lastName)
+            if (this.user.username != null) {
+                this.letter = this.user.username.substr(0, 1).toUpperCase() || "";
+            }
+
+            if (this.user?.nameIsPublic && this.user?.firstName && this.user?.lastName) {
                 this.letter =
                     this.user.firstName.substr(0, 1).toUpperCase() + this.user.lastName.substr(0, 1).toUpperCase();
+            }
 
             this.getImage(this.user.username);
         }

@@ -47,7 +47,7 @@ export class CoverComponent implements OnInit {
             .pipe(takeUntil(this.unsubscribe$))
             .subscribe((user) => {
                 user.then((user) => {
-                    this.getImage(user.username);
+                    if (user) this.getImage(user.username);
                 });
             });
     }
