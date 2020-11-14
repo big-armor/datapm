@@ -6,6 +6,7 @@ import { DetailsComponent } from "./details/details.component";
 import { PackagesComponent } from "./packages/packages.component";
 import { ActivityComponent } from "./activity/activity.component";
 import { CatalogsComponent } from "./catalogs/catalogs.component";
+import { MyCollectionsComponent } from "./my-collections/my-collections.component";
 
 const routes: Routes = [
     {
@@ -22,7 +23,7 @@ const routes: Routes = [
             },
             {
                 path: "collections",
-                component: ActivityComponent
+                component: MyCollectionsComponent
             },
             {
                 path: "catalogs",

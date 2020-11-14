@@ -16,6 +16,8 @@ import { SharedModule } from "../shared/shared.module";
 import { MyAccountRoutingModule } from "./my-account-routing.module";
 import { MyAccountComponent } from "./my-account/my-account.component";
 import { ActivityComponent } from "./activity/activity.component";
+import { MyCollectionsComponent } from "./my-collections/my-collections.component";
+
 import { CatalogsComponent } from "./catalogs/catalogs.component";
 import { ConfirmationDialogComponent } from "./confirmation-dialog/confirmation-dialog.component";
 import { DetailsComponent } from "./details/details.component";
@@ -34,7 +36,8 @@ import { DeleteConfirmationComponent } from "./delete-confirmation/delete-confir
         EditAccountDialogComponent,
         EditPasswordDialogComponent,
         PackagesComponent,
-        DeleteConfirmationComponent
+        DeleteConfirmationComponent,
+        MyCollectionsComponent
     ],
     imports: [
         CommonModule,
