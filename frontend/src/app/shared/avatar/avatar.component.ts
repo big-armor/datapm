@@ -51,7 +51,7 @@ export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
 
         this.imageService.shouldRefresh.pipe(takeUntil(this.unsubscribe$)).subscribe(({ target, username }) => {
             if (target === "avatar" && this.user?.username === username) {
-                this.getImage(username);
+                setTimeout(() => this.getImage(username), 1000); // timeout is required for some weird reason
             }
         });
 
@@ -70,13 +70,13 @@ export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
         if (changes.user && changes.user.currentValue) {
             this.user = changes.user.currentValue;
 
-            if (this.user.username != null) {
-                this.letter = this.user.username.substr(0, 1).toUpperCase() || "";
-            }
-
             if (this.user?.nameIsPublic && this.user?.firstName && this.user?.lastName) {
                 this.letter =
                     this.user.firstName.substr(0, 1).toUpperCase() + this.user.lastName.substr(0, 1).toUpperCase();
+            } else if (this.user.username != null) {
+                this.letter = this.user.username.substr(0, 1).toUpperCase() || "";
+            } else {
+                this.letter = "";
             }
 
             this.getImage(this.user.username);
@@ -107,8 +107,11 @@ export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
                 this.imgData = imgData;
                 this.state = State.LOADED;
             },
-            () => {
+            (error) => {
+                console.log(JSON.stringify(error, null, 1));
                 this.imgData = null;
+                this.userBackgroundColor = this.hashStringToColor(username);
+                this.state = State.LOADED;
             }
         );
     }

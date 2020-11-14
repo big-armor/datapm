@@ -38,7 +38,7 @@ export class CoverComponent implements OnInit {
 
         this.imageService.shouldRefresh.pipe(takeUntil(this.unsubscribe$)).subscribe(({ target }) => {
             if (target === "cover") {
-                this.getImage(this.user?.username);
+                setTimeout(() => this.getImage(this.user?.username), 1000); // timeout is required for some weird reason
             }
         });
 
