@@ -2,6 +2,7 @@ import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { RouterTestingModule } from "@angular/router/testing";
 import { CollectionItemComponent } from "./collection-item.component";
 import { MatCardModule } from "@angular/material/card";
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 
 const collectionItem: any = {
     description: "test test testing a description",
@@ -32,7 +33,17 @@ describe("CollectionItemComponent", () => {
         const routerSpy = jasmine.createSpyObj("Router", ["navigateByUrl"]);
         TestBed.configureTestingModule({
             declarations: [CollectionItemComponent],
-            imports: [RouterTestingModule, MatCardModule]
+            imports: [RouterTestingModule, MatCardModule, MatDialogModule],
+            providers: [
+                {
+                    provide: MAT_DIALOG_DATA,
+                    useValue: {}
+                },
+                {
+                    provide: MatDialogRef,
+                    useValue: {}
+                }
+            ]
         }).compileComponents();
     }));
 
