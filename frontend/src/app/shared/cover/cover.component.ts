@@ -21,11 +21,7 @@ export class CoverComponent implements OnInit {
     private inputEventId: string = "";
     private unsubscribe$ = new Subject();
 
-    constructor(
-        private fileService: FileService,
-        private imageService: ImageService,
-        private authService: AuthenticationService
-    ) {
+    constructor(private fileService: FileService, private imageService: ImageService) {
         this.upload = new EventEmitter<any>();
 
         this.fileService.selectedFiles.pipe(takeUntil(this.unsubscribe$)).subscribe(({ id, files }) => {
@@ -41,15 +37,6 @@ export class CoverComponent implements OnInit {
                 setTimeout(() => this.getImage(this.user?.username), 1000); // timeout is required for some weird reason
             }
         });
-
-        this.authService
-            .getUserObservable()
-            .pipe(takeUntil(this.unsubscribe$))
-            .subscribe((user) => {
-                user.then((user) => {
-                    if (user) this.getImage(user.username);
-                });
-            });
     }
 
     ngOnInit(): void {}

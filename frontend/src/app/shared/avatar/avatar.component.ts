@@ -34,11 +34,7 @@ export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
 
     public userBackgroundColor = "#FFFFFF";
 
-    constructor(
-        private fileService: FileService,
-        private imageService: ImageService,
-        private authService: AuthenticationService
-    ) {
+    constructor(private fileService: FileService, private imageService: ImageService) {
         this.upload = new EventEmitter<any>();
 
         this.fileService.selectedFiles.pipe(takeUntil(this.unsubscribe$)).subscribe(({ id, files }) => {
@@ -54,16 +50,6 @@ export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
                 setTimeout(() => this.getImage(username), 1000); // timeout is required for some weird reason
             }
         });
-
-        this.authService
-            .getUserObservable()
-            .pipe(takeUntil(this.unsubscribe$))
-            .subscribe((user) => {
-                user.then((user) => {
-                    if (user) this.getImage(user.username);
-                    else this.userBackgroundColor = "#FFFFFF";
-                });
-            });
     }
 
     ngOnChanges(changes: SimpleChanges) {
@@ -104,7 +90,7 @@ export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
         this.imageService.getImage(url).subscribe(
             (imgData: any) => {
                 this.userBackgroundColor = this.hashStringToColor(username);
-                this.imgData = imgData;
+                //this.imgData = imgData;
                 this.state = State.LOADED;
             },
             (error) => {
