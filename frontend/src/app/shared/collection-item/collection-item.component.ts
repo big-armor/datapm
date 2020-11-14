@@ -1,11 +1,13 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
-import { Collection, UpdateCollectionGQL } from "../../../generated/graphql";
+import { Collection, UpdateCollectionGQL, DeleteCollectionGQL } from "../../../generated/graphql";
 import * as timeago from "timeago.js";
 import { FormGroup, FormControl } from "@angular/forms";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
+import { MatDialog } from "@angular/material/dialog";
 
-import { takeUntil } from "rxjs/operators";
+import { DeleteConfirmationComponent } from "../../my-account/delete-confirmation/delete-confirmation.component";
+
 import { Subject } from "rxjs";
 
 enum State {
@@ -22,19 +24,24 @@ enum State {
     styleUrls: ["./collection-item.component.scss"]
 })
 export class CollectionItemComponent implements OnInit {
-    public isPublic: boolean = false;
+    public isPublic: boolean;
     public form: FormGroup;
     private collection: Collection;
     private subscription = new Subject();
     @Input() item: Collection;
     @Input() hasImage: boolean;
     updatePublicState = State.INIT;
+    deleteCollectionState = State.INIT;
 
-    constructor(private router: Router, private updateCollectionGQL: UpdateCollectionGQL) {}
+    constructor(
+        private router: Router,
+        private updateCollectionGQL: UpdateCollectionGQL,
+        private deleteCollectionGQL: DeleteCollectionGQL,
+        private dialog: MatDialog
+    ) {}
 
     ngOnInit(): void {
         this.collection = this.item;
-
         this.form = new FormGroup({
             collectionIsPublic: new FormControl(this.collection.isPublic)
         });
@@ -72,6 +79,7 @@ export class CollectionItemComponent implements OnInit {
 
         let slug = this.item.identifier.collectionSlug;
         let formValueIsPublic = this.form.value.collectionIsPublic;
+
         this.updateCollectionGQL
             .mutate({
                 identifier: {
@@ -81,7 +89,6 @@ export class CollectionItemComponent implements OnInit {
                     isPublic: !formValueIsPublic
                 }
             })
-            .pipe(takeUntil(this.subscription))
             .subscribe((response) => {
                 if (response.errors?.length > 0) {
                     if (response.errors.find((e) => e.message == "COLLECTION_IS_PUBLIC CANNOT BE UPDATED")) {
@@ -93,5 +100,28 @@ export class CollectionItemComponent implements OnInit {
                 }
                 this.updatePublicState = State.SUCCESS;
             });
+    }
+
+    deleteCollection() {
+        const dialog = this.dialog.open(DeleteConfirmationComponent, {
+            data: {
+                collectionSlug: this.item.identifier.collectionSlug
+            }
+        });
+
+        dialog.afterClosed().subscribe((confirmed: boolean) => {
+            if (confirmed) {
+                this.deleteCollectionGQL
+                    .mutate({
+                        identifier: {
+                            collectionSlug: this.item.identifier.collectionSlug
+                        }
+                    })
+                    .subscribe(() => {
+                        location.reload();
+                        this.deleteCollectionState = State.SUCCESS;
+                    });
+            }
+        });
     }
 }

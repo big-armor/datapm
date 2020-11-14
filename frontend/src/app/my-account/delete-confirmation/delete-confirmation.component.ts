@@ -12,13 +12,16 @@ export interface DeleteConfirmationData {
 })
 export class DeleteConfirmationComponent implements OnInit {
     confirmVal: string = "";
-
+    type: string;
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: DeleteConfirmationData,
         private dialogRef: MatDialogRef<DeleteConfirmationComponent>
     ) {}
 
-    ngOnInit(): void {}
+    ngOnInit(): void {
+        if (this.data.hasOwnProperty("catalogSlug")) this.type = "catalog";
+        if (this.data.hasOwnProperty("collectionSlug")) this.type = "collection";
+    }
 
     confirm() {
         this.dialogRef.close(true);
