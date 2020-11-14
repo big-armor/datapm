@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from "@angular/core";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
+import { AuthenticationService } from "src/app/services/authentication.service";
 import { FileService } from "src/app/services/file.service";
 import { ImageService } from "src/app/services/image.service";
 import { User } from "src/generated/graphql";
@@ -20,7 +21,11 @@ export class CoverComponent implements OnInit {
     private inputEventId: string = "";
     private unsubscribe$ = new Subject();
 
-    constructor(private fileService: FileService, private imageService: ImageService) {
+    constructor(
+        private fileService: FileService,
+        private imageService: ImageService,
+        private authService: AuthenticationService
+    ) {
         this.upload = new EventEmitter<any>();
 
         this.fileService.selectedFiles.pipe(takeUntil(this.unsubscribe$)).subscribe(({ id, files }) => {
@@ -33,11 +38,18 @@ export class CoverComponent implements OnInit {
 
         this.imageService.shouldRefresh.pipe(takeUntil(this.unsubscribe$)).subscribe(({ target }) => {
             if (target === "cover") {
-                setTimeout(() => {
-                    this.getImage(this.user?.username);
-                }, 300);
+                this.getImage(this.user?.username);
             }
         });
+
+        this.authService
+            .getUserObservable()
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe((user) => {
+                user.then((user) => {
+                    this.getImage(user.username);
+                });
+            });
     }
 
     ngOnInit(): void {}
@@ -50,7 +62,7 @@ export class CoverComponent implements OnInit {
     }
 
     uploadFile() {
-        this.inputEventId = this.fileService.openFile("image/*");
+        this.inputEventId = this.fileService.openFile("image/jpeg");
     }
 
     private getImage(username?: string) {
