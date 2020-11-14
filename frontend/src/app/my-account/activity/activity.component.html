@@ -1,34 +1,177 @@
-<div id="activityPage" class="big-div-collection">
-    <div class="collection-div">
-        <div class="container">
-            <div class="col-lg-9 col-md-12 col-sm-12 mt-5">
-                <div class="row big-div-latest mb-3">
-                    <div class="section-title col-md-12 col-lg-12">
-                        <span>My Collections</span>
-                    </div>
-                    <div class="section-description col-md-12 col-lg-12">
-                        <span>
-                            These are the collections of data you have created. You may choose to share them publicly,
-                            or not.
-                        </span>
-                        <a href="/docs/concepts/collections">Learn more about collections</a>
-                    </div>
+<div id="activityPage" class="big-div-package">
+    <div class="package-div">
+        <mat-card class="example-card">
+            <div class="d-flex bd-highlight up-header mt-1 mb-3">
+                <div class="bd-highlight">Updated 5 min.</div>
+                <div class="ml-auto bd-highlight">2 downloaded</div>
+            </div>
+            <mat-card-header class="card-header-mat">
+                <div mat-card-avatar class="example-header-image">
+                    <img src="../../../assets/images/user-female.png" alt="User image card" class="person-card-photo" />
+                    <span class="person-card-name">Tyler Williams</span>
+                </div>
+            </mat-card-header>
 
-                    <!-- Package without thumbnail -->
-                    <div class="col-md-12 col-lg-12 pb-2 mb-4" *ngIf="collections.length">
-                        <div *ngFor="let collection of collections">
-                            <app-collection-item [item]="collection.allCollections"></app-collection-item>
+            <mat-card-content>
+                <div class="d-flex flex-row bd-highlight mb-3">
+                    <div class="bd-highlight" style="width: 50%">
+                        <img mat-card-image src="../../../assets/images/galaxy.jpg" alt="Photo of a Shiba Inu" />
+                    </div>
+                    <div class="bd-highlight px-3 py-1" style="width: 50%">
+                        <div class="content-title mb-2">nasa/light-polution</div>
+                        <div class="content-description">
+                            Short description preview of the product and some, lorem ipsum dolor sit amet, consectetur
+                            adipiscing elit. Risus orci, sem nullam maecenas sed mauris. Sed turpis lorem vitae sit.
+                            Amet, in aliquet odio id orci. Risus orci, sem nullam maecenas sed mauris. Sed turpis lorem
+                            vitae sit. Amet, in aliquet odio id orci...
                         </div>
                     </div>
-                    <!-- <div class="col-md-12 col-lg-12 pb-2 mb-4 not-found" *ngIf="!collections.length">
-                        <p>
-                            Either no collections have been published to this registry, or you do not have access to any of
-                            the published collections
-                        </p>
-                        <a href="/docs/publish-data/">Learn how to publish packages</a>
-                    </div> -->
                 </div>
+
+                <div class="content-actions">
+                    <div class="package-chips pb-2">
+                        <mat-chip-list aria-label="Fish selection">
+                            <mat-chip>weather</mat-chip>
+                            <mat-chip>oceanic</mat-chip>
+                            <mat-chip>streaming</mat-chip>
+                            <mat-chip>weather</mat-chip>
+                            <mat-chip>oceanic</mat-chip>
+                            <mat-chip>streaming</mat-chip>
+                        </mat-chip-list>
+                    </div>
+                    <div class="package-actions pt-2">
+                        <div class="d-flex bd-highlight">
+                            <div class="p-2 bd-highlight">
+                                <button mat-fab class="person-menu" aria-label="Example icon button with a delete icon">
+                                    <mat-icon>star_border</mat-icon>
+                                </button>
+                                <span class="px-2 content-nr">47</span>
+                            </div>
+                            <div class="p-2 bd-highlight">
+                                <button mat-fab class="person-menu" aria-label="Example icon button with a delete icon">
+                                    <mat-icon>collections</mat-icon>
+                                </button>
+                                <span class="px-2 content-nr">add to collection</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+
+    <div class="package-div">
+        <mat-card class="example-card">
+            <div class="d-flex bd-highlight up-header mt-1 mb-3">
+                <div class="bd-highlight">Updated 5 min.</div>
+                <div class="ml-auto bd-highlight">2 downloaded</div>
             </div>
-        </div>
+            <mat-card-header class="card-header-mat">
+                <div mat-card-avatar class="example-header-image">
+                    <img src="../../../assets/images/user-female.png" alt="User image card" class="person-card-photo" />
+                    <span class="person-card-name">Tyler Williams</span>
+                </div>
+            </mat-card-header>
+
+            <mat-card-content>
+                <div class="content-text">
+                    <div class="content-title mb-2">noaa/weather-stations</div>
+                    <div class="content-description">
+                        Short description preview of the product and some, lorem ipsum dolor sit amet, consectetur
+                        adipiscing elit. Risus orci, sem nullam maecenas sed mauris. Sed turpis lorem vitae sit. Amet,
+                        in aliquet odio id orci...
+                    </div>
+                </div>
+
+                <div class="content-actions">
+                    <div class="package-chips pb-2">
+                        <mat-chip-list aria-label="Fish selection">
+                            <mat-chip>weather</mat-chip>
+                            <mat-chip>oceanic</mat-chip>
+                            <mat-chip>streaming</mat-chip>
+                            <mat-chip>weather</mat-chip>
+                            <mat-chip>oceanic</mat-chip>
+                            <mat-chip>streaming</mat-chip>
+                        </mat-chip-list>
+                    </div>
+                    <div class="package-actions">
+                        <div class="d-flex bd-highlight">
+                            <div class="p-2 bd-highlight">
+                                <button mat-fab class="person-menu" aria-label="Example icon button with a delete icon">
+                                    <mat-icon>star_border</mat-icon>
+                                </button>
+                                <span class="px-2 content-nr">47</span>
+                            </div>
+                            <div class="p-2 bd-highlight">
+                                <button mat-fab class="person-menu" aria-label="Example icon button with a delete icon">
+                                    <mat-icon>collections</mat-icon>
+                                </button>
+                                <span class="px-2 content-nr">add to collection</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+
+    <div class="package-div">
+        <mat-card class="example-card">
+            <div class="d-flex bd-highlight up-header mt-1 mb-3">
+                <div class="bd-highlight">Updated 5 min.</div>
+                <div class="ml-auto bd-highlight">2 downloaded</div>
+            </div>
+            <mat-card-header class="card-header-mat">
+                <div mat-card-avatar class="example-header-image">
+                    <img src="../../../assets/images/user-female.png" alt="User image card" class="person-card-photo" />
+                    <span class="person-card-name">Tyler Williams</span>
+                </div>
+            </mat-card-header>
+
+            <mat-card-content>
+                <div class="d-flex flex-row bd-highlight mb-3">
+                    <div class="bd-highlight" style="width: 50%">
+                        <img mat-card-image src="../../../assets/images/galaxy.jpg" alt="Photo of a Shiba Inu" />
+                    </div>
+                    <div class="bd-highlight px-3 py-1" style="width: 50%">
+                        <div class="content-title mb-2">nasa/atmospheric-changes</div>
+                        <div class="content-description">
+                            Short description preview of the product and some, lorem ipsum dolor sit amet, consectetur
+                            adipiscing elit. Risus orci, sem nullam maecenas sed mauris. Sed turpis lorem vitae sit.
+                            Amet, in aliquet odio id orci...
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-actions">
+                    <div class="package-chips pb-2">
+                        <mat-chip-list aria-label="Fish selection">
+                            <mat-chip>weather</mat-chip>
+                            <mat-chip>oceanic</mat-chip>
+                            <mat-chip>streaming</mat-chip>
+                            <mat-chip>weather</mat-chip>
+                            <mat-chip>oceanic</mat-chip>
+                            <mat-chip>streaming</mat-chip>
+                        </mat-chip-list>
+                    </div>
+                    <div class="package-actions pt-2">
+                        <div class="d-flex bd-highlight">
+                            <div class="p-2 bd-highlight">
+                                <button mat-fab class="person-menu" aria-label="Example icon button with a delete icon">
+                                    <mat-icon>star_border</mat-icon>
+                                </button>
+                                <span class="px-2 content-nr">47</span>
+                            </div>
+                            <div class="p-2 bd-highlight">
+                                <button mat-fab class="person-menu" aria-label="Example icon button with a delete icon">
+                                    <mat-icon>collections</mat-icon>
+                                </button>
+                                <span class="px-2 content-nr">add to collection</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
     </div>
 </div>
