@@ -90,7 +90,7 @@ export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
         this.imageService.getImage(url).subscribe(
             (imgData: any) => {
                 this.userBackgroundColor = this.hashStringToColor(username);
-                //this.imgData = imgData;
+                this.imgData = imgData;
                 this.state = State.LOADED;
             },
             (error) => {
