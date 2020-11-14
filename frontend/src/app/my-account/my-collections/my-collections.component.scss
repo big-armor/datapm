@@ -1,0 +1,62 @@
+#myCollectionsPage {
+    .section-title {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 20px;
+        line-height: 26px;
+        letter-spacing: -0.28px;
+        color: #333333;
+        padding: 24px;
+    }
+
+    .section-description {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: 300;
+        font-size: 14px;
+        color: #333333;
+        padding-right: 24px;
+        padding-left: 24px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .collection-div {
+        margin-top: 30px;
+
+        .content-text {
+            margin-bottom: 15px;
+        }
+    }
+}
+
+@media (max-width: 767px) {
+    .collection-div {
+        margin-bottom: 0px !important;
+        .flex-row {
+            flex-direction: column !important;
+            div {
+                width: 100% !important;
+                padding-left: 0px !important;
+                padding-right: 0px !important;
+            }
+        }
+        .collection-chips {
+            .mat-chip {
+                margin: 4px 4px !important;
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .collection-actions {
+        .d-flex {
+            flex-direction: column !important;
+            div {
+                padding: 4px 0px !important;
+            }
+        }
+    }
+}
