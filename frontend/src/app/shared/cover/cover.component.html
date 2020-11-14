@@ -1,6 +1,5 @@
 <div class="cover" [style.height]="height + 'px'">
     <img [src]="imgData" alt="avatar" *ngIf="imgData" />
-    <ng-template #defaultImage> </ng-template>
     <button class="add-btn" (click)="uploadFile()" *ngIf="editable">
         <mat-icon>add_a_photo</mat-icon>
     </button>
