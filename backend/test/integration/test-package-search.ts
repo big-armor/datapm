@@ -5,7 +5,8 @@ import {
     UpdatePackageDocument,
     DeletePackageDocument,
     SearchPackagesDocument,
-    CreateVersionDocument
+    CreateVersionDocument,
+    UpdateCatalogDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
@@ -149,6 +150,22 @@ describe("Package Search Tests", async () => {
                 null,
             "package not returned"
         ).true;
+    });
+
+    it("User A update catalog to be public", async function () {
+        let response = await userAClient.mutate({
+            mutation: UpdateCatalogDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages-search"
+                },
+                value: {
+                    isPublic: true
+                }
+            }
+        });
+
+        expect(response.errors == null).true;
     });
 
     it("User A set package public", async function () {
