@@ -4,14 +4,20 @@ export class DpmStorageStreamHolder {
     private readonly OPEN_READ_STREAMS: Readable[] = [];
     private readonly OPEN_WRITE_STREAMS: Writable[] = [];
 
-    public copyToStream(dataStream: Stream, targetStream: Writable, transformer?: any): Promise<void> {
+    public copyToStream(dataStream: Readable, targetStream: Writable, transformer?: any): Promise<void> {
         this.registerWriteStream(targetStream);
         this.addPipesToDataStream(dataStream, targetStream, transformer);
 
         return new Promise<void>((resolve, reject) => {
-            dataStream.on("end", () => resolve());
+            targetStream.on("finish", async () => {
+                resolve();
+            });
             dataStream.on("error", (error) => {
                 targetStream.destroy();
+                reject(error);
+            });
+            targetStream.on("error", (error) => {
+                dataStream.destroy();
                 reject(error);
             });
         });

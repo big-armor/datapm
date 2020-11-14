@@ -3,6 +3,7 @@ import { EntityRepository, Repository, SelectQueryBuilder } from "typeorm";
 import { Collection } from "../entity/Collection";
 import { User } from "../entity/User";
 import { CreateCollectionInput, UpdateCollectionInput } from "../generated/graphql";
+import { StorageErrors } from "../storage/files/file-storage-service";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 
 @EntityRepository(Collection)
@@ -57,7 +58,7 @@ export class CollectionRepository extends Repository<Collection> {
         try {
             await ImageStorageService.INSTANCE.deleteCollectionCoverImage({ collectionSlug });
         } catch (error) {
-            if (error.message == "FILE_NOT_FOUND") return;
+            if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) return;
 
             console.error(error.message);
         }

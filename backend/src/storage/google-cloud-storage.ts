@@ -1,8 +1,9 @@
 import { DPMStorage } from "./dpm-storage";
-import { Stream } from "stream";
+import { Stream, Readable } from "stream";
 import { Bucket, File, Storage } from "@google-cloud/storage";
 import { DpmStorageStreamHolder } from "./dpm-storage-stream-holder";
 import { fileURLToPath } from "url";
+import { StorageErrors } from "./files/file-storage-service";
 
 export class GoogleCloudStorage implements DPMStorage {
     public static readonly SCHEMA_URL_PREFIX = "gs";
@@ -35,20 +36,21 @@ export class GoogleCloudStorage implements DPMStorage {
 
     public async deleteItem(namespace: string, itemId: string) {
         this.ensureConnectionEstablished();
-        await this.getBucketFile(namespace, itemId).delete();
+        const file = await this.getBucketFile(namespace, itemId);
+        await file.delete();
     }
 
-    public getItem(namespace: string, itemId: string): Promise<Stream> {
+    public async getItem(namespace: string, itemId: string): Promise<Readable> {
         this.ensureConnectionEstablished();
-        const file = this.getBucketFile(namespace, itemId);
+        const file = await this.getBucketFile(namespace, itemId);
         const fileReadStream = file.createReadStream();
         this.streamHelper.registerReadStream(fileReadStream);
         return Promise.resolve(fileReadStream);
     }
 
-    public writeItem(namespace: string, itemId: string, byteStream: Stream, transformer?: any): Promise<void> {
+    public async writeItem(namespace: string, itemId: string, byteStream: Readable, transformer?: any): Promise<void> {
         this.ensureConnectionEstablished();
-        const file = this.getBucketFile(namespace, itemId);
+        const file = await this.getBucketFile(namespace, itemId);
         const writeStream = file.createWriteStream();
         return this.streamHelper.copyToStream(byteStream, writeStream, transformer);
     }
@@ -57,9 +59,13 @@ export class GoogleCloudStorage implements DPMStorage {
         return this.streamHelper.destroyOpenStreams();
     }
 
-    private getBucketFile(namespace: string, itemId: string): File {
+    private async getBucketFile(namespace: string, itemId: string): Promise<File> {
         const filePath = this.buildPath(namespace, itemId);
-        return this.bucket.file(filePath);
+        const file = this.bucket.file(filePath);
+
+        if (!(await file.exists())) throw new Error(StorageErrors.FILE_DOES_NOT_EXIST.toString());
+
+        return file;
     }
 
     private buildPath(namespace: string, itemId: string): string {

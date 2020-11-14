@@ -47,7 +47,7 @@ export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
 
         this.imageService.shouldRefresh.pipe(takeUntil(this.unsubscribe$)).subscribe(({ target, username }) => {
             if (target === "avatar" && this.user?.username === username) {
-                setTimeout(() => this.getImage(username), 1000); // timeout is required for some weird reason
+                this.getImage(username); // timeout is required for some weird reason
             }
         });
     }

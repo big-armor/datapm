@@ -1,4 +1,4 @@
-import { Stream } from "stream";
+import { Stream, Readable } from "stream";
 import { FileStorageService } from "../files/file-storage-service";
 import { ImageProcessor } from "./image-processor";
 import { UserCoverImageProcessor } from "./user-cover-image-processor";
@@ -89,23 +89,23 @@ export class ImageStorageService {
         return this.fileStorageService.writeFileFromBuffer(namespace, itemId, buffer, processor.getFormatter());
     }
 
-    public async readUserCoverImage(username: string): Promise<Stream> {
+    public async readUserCoverImage(username: string): Promise<Readable> {
         return this.readImage(Prefixes.USER + "/" + username, ImageTypes.USER_COVER_IMAGE);
     }
 
-    public async readUserAvatarImage(username: string): Promise<Stream> {
+    public async readUserAvatarImage(username: string): Promise<Readable> {
         return this.readImage(Prefixes.USER + "/" + username, ImageTypes.USER_AVATAR_IMAGE);
     }
 
-    public async readCatalogCoverImage(identifier: CatalogIdentifierInput): Promise<Stream> {
+    public async readCatalogCoverImage(identifier: CatalogIdentifierInput): Promise<Readable> {
         return this.readImage(Prefixes.CATALOG + "/" + identifier.catalogSlug, ImageTypes.CATALOG_COVER_IMAGE);
     }
 
-    public async readCollectionCoverImage(identifier: CollectionIdentifierInput): Promise<Stream> {
+    public async readCollectionCoverImage(identifier: CollectionIdentifierInput): Promise<Readable> {
         return this.readImage(Prefixes.CATALOG + "/" + identifier.collectionSlug, ImageTypes.COLLECTION_COVER_IMAGE);
     }
 
-    public async readPackageCoverImage(identifier: PackageIdentifierInput): Promise<Stream> {
+    public async readPackageCoverImage(identifier: PackageIdentifierInput): Promise<Readable> {
         return this.readImage(
             Prefixes.PACKAGE + "/" + identifier.catalogSlug + "/" + identifier.packageSlug,
             ImageTypes.PACKAGE_COVER_IMAGE
@@ -142,7 +142,7 @@ export class ImageStorageService {
         return this.fileStorageService.deleteFile(namespace, imageId);
     }
 
-    private async readImage(namespace: string, imageId: string): Promise<Stream> {
+    private async readImage(namespace: string, imageId: string): Promise<Readable> {
         return this.fileStorageService.readFile(namespace, imageId);
     }
 

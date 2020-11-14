@@ -31,8 +31,16 @@
                 <a href="/docs/publish-data/">Publish</a>
             </div>
             <div class="p-2 ml-4 bd-highlight avatar">
-                <app-avatar [user]="currentUser" [matMenuTriggerFor]="beforeMenu"></app-avatar>
-
+                <app-avatar [user]="currentUser" [matMenuTriggerFor]="beforeMenu" *ngIf="currentUser"></app-avatar>
+                <button
+                    mat-fab
+                    class="person-menu"
+                    [matMenuTriggerFor]="beforeMenu"
+                    aria-label="Person"
+                    *ngIf="!currentUser"
+                >
+                    <mat-icon>person</mat-icon>
+                </button>
                 <mat-menu #beforeMenu="matMenu" xPosition="before">
                     <button *ngIf="currentUser" mat-menu-item (click)="goToMyDetails()">My Profile</button>
                     <button *ngIf="!currentUser" mat-menu-item (click)="openLoginDialog()">Log In</button>

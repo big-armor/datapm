@@ -17,6 +17,7 @@ import { PackageRepository } from "./PackageRepository";
 import { Identifier } from "../util/IdentifierUtil";
 import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
 import { ImageStorageService } from "../storage/images/image-storage-service";
+import { StorageErrors } from "../storage/files/file-storage-service";
 
 // https://stackoverflow.com/a/52097700
 export function isDefined<T>(value: T | undefined | null): value is T {
@@ -213,7 +214,7 @@ export class CatalogRepository extends Repository<Catalog> {
         try {
             await ImageStorageService.INSTANCE.deleteCatalogCoverImage({ catalogSlug: slug });
         } catch (error) {
-            if (error.message == "FILE_NOT_FOUND") return;
+            if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) return;
 
             console.error(error.message);
         }

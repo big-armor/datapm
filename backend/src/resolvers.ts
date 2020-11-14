@@ -95,7 +95,7 @@ import { validateUsernameOrEmail } from "./directive/ValidUsernameOrEmailAddress
 import { validateSlug as validateCollectionSlug } from "./directive/ValidCollectionSlugDirective";
 import { validateSlug as validatePackageSlug } from "./directive/ValidPackageSlugDirective";
 import { validateEmailAddress } from "./directive/ValidEmailDirective";
-import { FileStorageService } from "./storage/files/file-storage-service";
+import { FileStorageService, StorageErrors } from "./storage/files/file-storage-service";
 import { PackageFileStorageService } from "./storage/packages/package-file-storage-service";
 
 export const resolvers: {
@@ -388,7 +388,7 @@ export const resolvers: {
                     versionPatch: version.patchVersion
                 });
             } catch (error) {
-                if (error.message == "FILE_NOT_FOUND") {
+                if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) {
                     console.error("A request package file was not found. This is VERY BAD!");
                     console.error(JSON.stringify(error));
                     return;
@@ -415,7 +415,7 @@ export const resolvers: {
                     versionPatch: version.patchVersion
                 });
             } catch (error) {
-                if (error.message == "FILE_NOT_FOUND") {
+                if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) {
                     return null;
                 }
 
@@ -440,7 +440,7 @@ export const resolvers: {
                     versionPatch: version.patchVersion
                 });
             } catch (error) {
-                if (error.message == "FILE_NOT_FOUND") {
+                if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) {
                     return null;
                 }
 

@@ -74,6 +74,14 @@ describe("Image Upload Tests", async () => {
         }
 
         expect(errorFound).to.be.true;
+
+        const imageWithData = await request
+            .get("http://localhost:4000/images/user/first-user-username/avatar")
+            .buffer(true)
+            .parse(request.parse.image);
+
+        let hash = crypto.createHash("sha256").update(imageWithData.body, "utf8").digest("hex");
+        expect(hash).equal("a847c9488f535513fa06cfab75989ae767cae7381ddab701d6927e2886c1982f");
     });
 
     it("Download user avatar image", async function () {
@@ -108,17 +116,13 @@ describe("Image Upload Tests", async () => {
         expect(imageServingResult.body).to.exist;
         expect(imageServingResult.type).to.equal("image/jpeg");
 
-        // TODO the image fetching is working, but when invoked by superagent, the server responds with 0 byte files
-        // so we can't test that the correct image is returned.
+        const imageWithData = await request
+            .get("http://localhost:4000/images/user/first-user-username/cover")
+            .buffer(true)
+            .parse(request.parse.image);
 
-        // const imageWithData = await request
-        //    .get("http://localhost:4000/images/user/first-user-username/cover")
-        //    .buffer(true)
-        //    .parse(request.parse.image);
-
-        //console.log(JSON.stringify(imageWithData.body, null, 1));
-        //let hash = crypto.createHash("sha256").update(imageWithData.body, "utf8").digest("hex");
-        // expect(hash).equal("asfdasdfasfd");
+        let hash = crypto.createHash("sha256").update(imageWithData.body, "utf8").digest("hex");
+        expect(hash).equal("6df1299de51ce7178d906575a6877a3d16d9e193bf382ec9f97bdd7654a661f7");
     });
 
     it("setMyAvatarImage_WithUnsupportedImageFormat_ReturnsErrorWithInvalidFormatErrorCode", async () => {
