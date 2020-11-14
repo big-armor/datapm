@@ -156,7 +156,8 @@ export class CatalogRepository extends Repository<Catalog> {
     }): Promise<Catalog> {
         return this.manager.nestedTransaction(async (transaction) => {
             const catalog = await transaction.getRepository(Catalog).findOneOrFail({
-                where: { slug: identifier.catalogSlug }
+                where: { slug: identifier.catalogSlug },
+                relations: ["packages"]
             });
 
             if (value.newSlug) {
@@ -169,6 +170,13 @@ export class CatalogRepository extends Repository<Catalog> {
 
             if (value.isPublic != null) {
                 catalog.isPublic = value.isPublic;
+
+                if (catalog.isPublic == false) {
+                    for (const packageEntity of catalog.packages) {
+                        packageEntity.isPublic = false;
+                        transaction.save(packageEntity);
+                    }
+                }
             }
 
             if (value.description) {

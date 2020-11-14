@@ -94,6 +94,13 @@ function pushGCRImage() {
     ]);
 }
 
+function pushGCRImageLatest() {
+    return spawnAndLog("docker-push-gcr", "docker", [
+        "push",
+        "gcr.io/datapm-test-terraform/datapm-registry:latest"
+    ]);
+}
+
 function tagDockerImageLatest() {
     return spawnAndLog("docker-tag", "docker", ["tag", "datapm-registry", "datapm/datapm-registry:latest"]);
 }
@@ -108,6 +115,10 @@ function tagDockerImageVersion() {
 
 function pushDockerImage() {
     return spawnAndLog("docker-push-docker", "docker", ["push", "datapm/datapm-registry:" + readPackageVersion()]);
+}
+
+function pushDockerImageLatest() {
+    return spawnAndLog("docker-push-docker", "docker", ["push", "datapm/datapm-registry:latest"]);
 }
 
 function gitPushTag() {
@@ -182,6 +193,8 @@ exports.deployAssets = series(
     tagDockerImageLatest,
     tagDockerImageVersion,
     pushGCRImage,
-    pushDockerImage
+    pushGCRImageLatest,
+    pushDockerImage,
+    pushDockerImageLatest
 );
 exports.buildDockerImage = buildDockerImage;

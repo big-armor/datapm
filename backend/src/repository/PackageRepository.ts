@@ -61,13 +61,11 @@ function getNameLength(name: string | undefined | null) {
 }
 
 function validation(packageEntity: Package) {
-    if (
-        getNameLength(packageEntity.slug) === 0 &&
-        getNameLength(packageEntity.displayName) === 0 &&
-        getNameLength(packageEntity.description) === 0
-    ) {
-        throw new Error("You should type the name or package file number at least.");
-    }
+    if (getNameLength(packageEntity.slug) === 0) throw new Error("PACKAGE_NAME_REQUIRED");
+
+    if (getNameLength(packageEntity.displayName) === 0) throw new Error("PACKAGE_DISPLAY_NAME_REQUIRED");
+
+    if (getNameLength(packageEntity.description) === 0) throw new Error("PACKAGE_DESCRIPTION_REQUIRED");
 }
 
 @EntityRepository()
@@ -266,6 +264,10 @@ export class PackageRepository {
         return this.manager.nestedTransaction(async (transaction) => {
             const ALIAS = "package";
 
+            if (!relations.includes("catalog")) {
+                relations.push("catalog");
+            }
+
             const packageEntity = await findPackage(transaction, catalogSlug, packageSlug, relations);
 
             if (packageEntity === null) {
@@ -288,7 +290,12 @@ export class PackageRepository {
 
             if (packageInput.description) packageEntity.description = packageInput.description;
 
-            if (packageInput.isPublic != null) packageEntity.isPublic = packageInput.isPublic;
+            if (packageInput.isPublic != null) {
+                if (packageInput.isPublic == true && packageEntity.catalog.isPublic == false) {
+                    throw new Error("CATALOG_NOT_PUBLIC");
+                }
+                packageEntity.isPublic = packageInput.isPublic;
+            }
 
             validation(packageEntity);
 

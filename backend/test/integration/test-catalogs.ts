@@ -8,7 +8,10 @@ import {
     MyCatalogsQuery,
     MyCatalogsQueryVariables,
     CreateCatalogDocument,
-    GetCatalogDocument
+    GetCatalogDocument,
+    CreatePackageDocument,
+    UpdatePackageDocument,
+    PackageDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
@@ -93,7 +96,7 @@ describe("Catalog Tests", async () => {
             query: GetCatalogDocument,
             variables: {
                 identifier: {
-                    catalogSlug: "user-a-second-catalog"
+                    catalogSlug: "user-a-second-catalog-v2"
                 }
             }
         });
@@ -246,6 +249,40 @@ describe("Catalog Tests", async () => {
         expect(response.data!.catalog.website, "correct website").to.equal("https://usera.datapm.io");
     });
 
+    it("User A add package to catalog", async function () {
+        let response = await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "user-a-second-catalog",
+                    packageSlug: "us-congressional-legislators",
+                    displayName: "Congressional Legislators",
+                    description: "Test upload of congressional legislatorsA"
+                }
+            }
+        });
+
+        expect(response.errors == null).true;
+    });
+
+    it("User A set package public - should fail", async function () {
+        let response = await userAClient.mutate({
+            mutation: UpdatePackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "user-a-second-catalog",
+                    packageSlug: "us-congressional-legislators"
+                },
+                value: {
+                    isPublic: true
+                }
+            }
+        });
+
+        expect(response.errors != null).true;
+        expect(response.errors!.find((e) => e.message.includes("CATALOG_NOT_PUBLIC")) != null).true;
+    });
+
     it("User B Get User A private catalog - should fail", async function () {
         let response = await userBClient.query({
             query: GetCatalogDocument,
@@ -261,6 +298,23 @@ describe("Catalog Tests", async () => {
             response.errors!.find((e) => e.message == "NOT_AUTHORIZED") != null,
             "should have not authorized message"
         ).equal(true);
+    });
+
+    it("User A set package public", async function () {
+        let response = await userAClient.mutate({
+            mutation: UpdatePackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "user-a-second-catalog",
+                    packageSlug: "us-congressional-legislators"
+                },
+                value: {
+                    isPublic: true
+                }
+            }
+        });
+        expect(response.errors != null).true;
+        expect(response.errors!.find((e) => e.message.includes("CATALOG_NOT_PUBLIC")) != null).true;
     });
 
     it("User A update second catalog", async function () {
@@ -303,6 +357,56 @@ describe("Catalog Tests", async () => {
         expect(response.data!.catalog.displayName).to.equal("Display after update");
         expect(response.data!.catalog.identifier.catalogSlug).to.equal("user-a-second-catalog-v2");
         expect(response.data!.catalog.website).to.equal("https://second-website.co.uk");
+        expect(response.data!.catalog.packages!.length).to.equal(0);
+    });
+
+    it("User B get package should fail - package not public", async function () {
+        let response = await userBClient.query({
+            query: PackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "user-a-second-catalog-v2",
+                    packageSlug: "us-congressional-legislators"
+                }
+            }
+        });
+
+        expect(response.errors != null).true;
+        expect(
+            response.errors!.find((p) => p.message.includes("NOT_AUTHORIZED")) != null,
+            "Should return NOT_AUTHORIZED"
+        ).true;
+    });
+
+    it("User A set package public", async function () {
+        let response = await userAClient.mutate({
+            mutation: UpdatePackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "user-a-second-catalog-v2",
+                    packageSlug: "us-congressional-legislators"
+                },
+                value: {
+                    isPublic: true
+                }
+            }
+        });
+        expect(response.errors == null).true;
+    });
+
+    it("User B get package", async function () {
+        let response = await userBClient.query({
+            query: PackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "user-a-second-catalog-v2",
+                    packageSlug: "us-congressional-legislators"
+                }
+            }
+        });
+
+        expect(response.errors == null).true;
+        expect(response.data!.package.identifier.packageSlug).equals("us-congressional-legislators");
     });
 
     it("User B update User A's catalog - should fail", async function () {
@@ -365,6 +469,22 @@ describe("Catalog Tests", async () => {
             response.errors!.find((e) => e.message == "NOT_AUTHORIZED") != null,
             "should have not authorized message"
         ).equal(true);
+    });
+
+    it("User A get package - check is not public", async function () {
+        let response = await userAClient.query({
+            query: PackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "user-a-second-catalog-v2",
+                    packageSlug: "us-congressional-legislators"
+                }
+            }
+        });
+
+        expect(response.errors == null).true;
+        expect(response.data!.package.identifier.packageSlug).equals("us-congressional-legislators");
+        expect(response.data!.package.isPublic).false;
     });
 
     it("Delete catalog", async function () {

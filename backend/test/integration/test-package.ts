@@ -195,6 +195,40 @@ describe("Package Tests", async () => {
         expect(response.data!.package!.latestVersion).to.equal(null);
     });
 
+    it("User A update catalog to be public", async function () {
+        let response = await userAClient.mutate({
+            mutation: UpdateCatalogDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages"
+                },
+                value: {
+                    isPublic: true
+                }
+            }
+        });
+
+        expect(response.errors == null).true;
+    });
+
+    it("package should not be available anonymously - catalog is private", async function () {
+        let response = await anonymousClient.query({
+            query: PackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "congressional-legislators"
+                }
+            }
+        });
+
+        expect(response.errors != null, "should have errors").to.equal(true);
+        expect(
+            response.errors!.find((e) => e.message == "NOT_AUTHENTICATED") != null,
+            "should have not authenticated error"
+        ).equal(true);
+    });
+
     it("User A can update package", async function () {
         let response = await userAClient.mutate({
             mutation: UpdatePackageDocument,
@@ -218,24 +252,6 @@ describe("Package Tests", async () => {
         expect(response.data!.updatePackage.identifier.catalogSlug).to.equal("testA-packages");
         expect(response.data!.updatePackage.identifier.packageSlug).to.equal("new-package-slug");
         expect(response.data!.updatePackage.latestVersion).to.equal(null);
-    });
-
-    it("package should not be available anonymously - catalog is private", async function () {
-        let response = await anonymousClient.query({
-            query: PackageDocument,
-            variables: {
-                identifier: {
-                    catalogSlug: "testA-packages",
-                    packageSlug: "new-package-slug"
-                }
-            }
-        });
-
-        expect(response.errors != null, "should have errors").to.equal(true);
-        expect(
-            response.errors!.find((e) => e.message == "NOT_AUTHENTICATED") != null,
-            "should have not authenticated error"
-        ).equal(true);
     });
 
     it("User A set catalog public", async function () {
