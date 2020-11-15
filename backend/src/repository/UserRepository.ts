@@ -14,6 +14,7 @@ import { sendVerifyEmail, smtpConfigured } from "../util/smtpUtil";
 import { ValidationError } from "apollo-server";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { CollectionRepository } from "./CollectionRepository";
+import { StorageErrors } from "../storage/files/file-storage-service";
 // https://stackoverflow.com/a/52097700
 export function isDefined<T>(value: T | undefined | null): value is T {
     return <T>value !== undefined && <T>value !== null;
@@ -389,7 +390,7 @@ export class UserRepository extends Repository<User> {
         try {
             await ImageStorageService.INSTANCE.deleteUserAvatarImage(username);
         } catch (error) {
-            if (error.message == "FILE_NOT_FOUND") return;
+            if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) return;
 
             console.error(error.message);
         }
@@ -397,7 +398,7 @@ export class UserRepository extends Repository<User> {
         try {
             await ImageStorageService.INSTANCE.deleteUserCoverImage(username);
         } catch (error) {
-            if (error.message == "FILE_NOT_FOUND") return;
+            if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) return;
 
             console.error(error.message);
         }

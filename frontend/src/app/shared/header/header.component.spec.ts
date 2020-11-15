@@ -7,6 +7,8 @@ import { MatDialogModule } from "@angular/material/dialog";
 import { MatMenuModule } from "@angular/material/menu";
 
 import { HeaderComponent } from "./header.component";
+import { SharedModule } from "../shared.module";
+import { HttpClientModule } from "@angular/common/http";
 
 describe("HeaderComponent", () => {
     let component: HeaderComponent;
@@ -22,7 +24,9 @@ describe("HeaderComponent", () => {
                 MatButtonModule,
                 MatMenuModule,
                 MatIconModule,
-                MatDialogModule
+                MatDialogModule,
+                HttpClientModule,
+                SharedModule
             ]
         }).compileComponents();
     }));

@@ -107,7 +107,7 @@ export const setMyAvatarImage = async (
     { image }: { image: Base64ImageUpload },
     context: AuthenticatedContext,
     info: any
-) => {
+): Promise<void> => {
     return ImageStorageService.INSTANCE.saveUserAvatarImage(context.me.username, image.base64);
 };
 
