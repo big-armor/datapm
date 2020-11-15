@@ -98,7 +98,7 @@ jobs:
             - uses: JS-DevTools/npm-publish@v1
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               with:
-                  package: ./lib/package.json
+                  package: ./lib/dist/package.json
                   token: ${{ secrets.NPM_TOKEN }}
 
             - name: Terraform Init to
