@@ -5,5 +5,6 @@ npm-debug.log
  node_modules 
  frontend/node_modules 
  backend/node_modules 
+ backend/dist/node_modules
  docs/website/node_modules
 lib/node_modules

@@ -164,7 +164,7 @@ function prepareDockerBuildAssets() {
             dest(path.join(DESTINATION_DIR, "backend"))
         );
 
-        src(["lib/**"]).pipe(dest(path.join(DESTINATION_DIR, "lib")));
+        src(["lib/dist/**"]).pipe(dest(path.join(DESTINATION_DIR, "lib", "dist")));
 
         src(["backend/dist/**", "!backend/dist/node_modules/**"]).pipe(
             dest(path.join(DESTINATION_DIR, "backend", "dist"))
@@ -205,7 +205,7 @@ exports.buildParallel = series(
 exports.bumpVersion = series(showGitDiff, bumpRootVersion, bumpLibVersion);
 exports.gitPushTag = series(gitStageChanges, gitCommit, gitPush, gitPushTag);
 exports.deployAssets = series(
-    //libPublish,
+    //libPublish, // current done in the github action
     tagGCRDockerImageLatest,
     tagGCRDockerImageVersion,
     tagDockerImageLatest,

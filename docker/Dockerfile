@@ -7,8 +7,8 @@ RUN mkdir -p /usr/src/static
 
 RUN npm install -g gulp
 
-RUN mkdir -p /build/lib
-COPY lib /build/lib
+RUN mkdir -p /build/lib/dist
+COPY lib/dist /build/lib/dist
 
 RUN mkdir -p /build/backend
 COPY backend/package.json backend/package-lock.json backend/gulpfile.js /build/backend/
