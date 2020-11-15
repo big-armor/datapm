@@ -197,6 +197,7 @@ exports.default = series(
     testFrontend,
     installDocsDependencies,
     buildDocs,
+    prepareDockerBuildAssets,
     buildDockerImage
 );
 
