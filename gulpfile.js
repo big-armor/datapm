@@ -60,7 +60,14 @@ function buildDocs() {
 }
 
 function buildDockerImage() {
-    return spawnAndLog("docker-build", "docker", ["build", "-t", "datapm-registry", ".", "-f", "docker/Dockerfile"]);
+    return spawnAndLog("docker-build", "docker", [
+        "build",
+        "-t",
+        "datapm-registry",
+        "./dist",
+        "-f",
+        "docker/Dockerfile"
+    ]);
 }
 
 function bumpRootVersion() {
@@ -148,6 +155,28 @@ function showGitDiff() {
     return spawnAndLog("git-diff", "git", ["diff"]);
 }
 
+/** Tasks that must be completed before running the docker file. The docker file's build
+ * context is the "dist" directory in the root project folder.
+ */
+function prepareDockerBuildAssets() {
+    return new Promise(async (response, reject) => {
+        src(["backend/package.json", "backend/package-lock.json", "backend/gulpfile.js"]).pipe(
+            dest(path.join(DESTINATION_DIR, "backend"))
+        );
+
+        src(["lib/**"]).pipe(dest(path.join(DESTINATION_DIR, "lib")));
+
+        src(["backend/dist/**", "!backend/dist/node_modules/**"]).pipe(
+            dest(path.join(DESTINATION_DIR, "backend", "dist"))
+        );
+
+        src(["frontend/dist/**"]).pipe(dest(path.join(DESTINATION_DIR, "frontend")));
+        src(["docs/website/build/datapm/**"]).pipe(dest(path.join(DESTINATION_DIR, "docs")));
+
+        response();
+    });
+}
+
 exports.default = series(
     installLibDependencies,
     buildLib,
@@ -184,4 +213,5 @@ exports.deployAssets = series(
     pushGCRImage,
     pushDockerImage
 );
-exports.buildDockerImage = buildDockerImage;
+exports.buildDockerImage = series(prepareDockerBuildAssets, buildDockerImage);
+exports.prepareDockerBuildAssets = prepareDockerBuildAssets;
