@@ -3,6 +3,10 @@ import { StorageProvider } from "../storage-provider";
 import { Readable, Stream } from "stream";
 import fs from "fs";
 
+export enum StorageErrors {
+    FILE_DOES_NOT_EXIST = "FILE_DOES_NOT_EXIST"
+}
+
 export class FileStorageService {
     public static readonly INSTANCE = new FileStorageService();
 
@@ -28,7 +32,7 @@ export class FileStorageService {
         return this.storageService.writeItem(namespace, itemId, stream, transformer);
     }
 
-    public async writeFile(namespace: string, itemId: string, stream: Stream, transformer?: any): Promise<void> {
+    public async writeFile(namespace: string, itemId: string, stream: Readable, transformer?: any): Promise<void> {
         return this.storageService.writeItem(namespace, itemId, stream, transformer);
     }
 
@@ -36,18 +40,18 @@ export class FileStorageService {
         return this.storageService.deleteItem(namespace, itemId);
     }
 
-    public async readFile(namespace: string, itemId: string): Promise<Stream> {
+    public async readFile(namespace: string, itemId: string): Promise<Readable> {
         return this.storageService.getItem(namespace, itemId);
     }
 
-    private convertStringToStream(value: string): Stream {
+    private convertStringToStream(value: string): Readable {
         const bufferStream = new Readable();
         bufferStream.push(value);
         bufferStream.push(null);
         return bufferStream;
     }
 
-    private convertBufferToStream(value: Buffer): Stream {
+    private convertBufferToStream(value: Buffer): Readable {
         const bufferStream = new Readable();
         bufferStream.push(value);
         bufferStream.push(null);

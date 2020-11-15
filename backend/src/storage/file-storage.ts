@@ -1,8 +1,9 @@
 import { DPMStorage } from "./dpm-storage";
-import * as Stream from "stream";
+import { Stream, Readable } from "stream";
 import * as fs from "fs";
 import crypto from "crypto";
 import { DpmStorageStreamHolder } from "./dpm-storage-stream-holder";
+import { StorageErrors } from "./files/file-storage-service";
 
 export class FileStorage implements DPMStorage {
     public static readonly SCHEMA_URL_PREFIX = "file";
@@ -34,17 +35,17 @@ export class FileStorage implements DPMStorage {
         return Promise.resolve();
     }
 
-    public async getItem(namespace: string, itemId: string): Promise<Stream> {
+    public async getItem(namespace: string, itemId: string): Promise<Readable> {
         const path = this.buildPath(namespace, itemId);
 
-        if (!fs.existsSync(path)) throw new Error("FILE_NOT_FOUND");
+        if (!fs.existsSync(path)) throw new Error(StorageErrors.FILE_DOES_NOT_EXIST);
 
         const readStream = fs.createReadStream(path);
         this.streamHelper.registerReadStream(readStream);
         return Promise.resolve(readStream);
     }
 
-    public writeItem(namespace: string, itemId: string, byteStream: Stream, transformer?: any): Promise<void> {
+    public async writeItem(namespace: string, itemId: string, byteStream: Readable, transformer?: any): Promise<void> {
         this.createItemDirectoryIfMissing(namespace);
         const path = this.buildPath(namespace, itemId);
         const writeStream = fs.createWriteStream(path);

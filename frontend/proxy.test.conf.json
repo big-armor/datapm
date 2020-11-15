@@ -9,6 +9,11 @@
         "secure": false,
         "changeOrigin": true
     },
+    "/images/user": {
+        "target": "https://test.datapm.io",
+        "secure": false,
+        "changeOrigin": true
+    },
     "/graphql": {
         "target": "https://test.datapm.io",
         "secure": false,
