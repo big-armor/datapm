@@ -102,10 +102,7 @@ function pushGCRImage() {
 }
 
 function pushGCRImageLatest() {
-    return spawnAndLog("docker-push-gcr", "docker", [
-        "push",
-        "gcr.io/datapm-test-terraform/datapm-registry:latest"
-    ]);
+    return spawnAndLog("docker-push-gcr", "docker", ["push", "gcr.io/datapm-test-terraform/datapm-registry:latest"]);
 }
 
 function tagDockerImageLatest() {
