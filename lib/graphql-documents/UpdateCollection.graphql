@@ -27,5 +27,7 @@ mutation UpdateCollection($identifier: CollectionIdentifierInput!, $value: Updat
                 description
             }
         }
+        isPublic
+        isRecommended
     }
 }

@@ -1,20 +1,45 @@
-<div mat-dialog-title>
-    Are you certain you want to delete this catalog named <span class="catalog-slug">{{ data.catalogSlug }}</span
-    >? All packages in this catalog will be lost, and they can not be recovered.
-</div>
-
-<div mat-dialog-content>
-    <div>
-        Type <span class="catalog-slug">{{ data.catalogSlug }}</span> here
+<div *ngIf="type == 'catalog'">
+    <div mat-dialog-title>
+        Are you certain you want to delete this catalog named <span class="slug">{{ data.catalogSlug }}</span
+        >? All packages in this catalog will be lost, and they can not be recovered.
     </div>
-    <mat-form-field>
-        <input matInput [(ngModel)]="confirmVal" />
-    </mat-form-field>
+
+    <div mat-dialog-content>
+        <div>
+            Type <span class="slug">{{ data.catalogSlug }}</span> here
+        </div>
+        <mat-form-field>
+            <input matInput [(ngModel)]="confirmVal" />
+        </mat-form-field>
+    </div>
+
+    <div mat-dialog-actions>
+        <button mat-button mat-dialog-close>Close</button>
+        <button mat-button color="accent" (click)="confirm()" [disabled]="confirmVal !== data.catalogSlug">
+            Delete Catalog Now
+        </button>
+    </div>
 </div>
 
-<div mat-dialog-actions>
-    <button mat-button mat-dialog-close>Close</button>
-    <button mat-button color="accent" (click)="confirm()" [disabled]="confirmVal !== data.catalogSlug">
-        Delete Catalog Now
-    </button>
+<div *ngIf="type == 'collection'">
+    <div mat-dialog-title>
+        Are you certain you want to delete this collection named <span class="slug">{{ data.collectionSlug }}</span
+        >? Packages in this collection will not be deleted, and will remain otherwise available.
+    </div>
+
+    <div mat-dialog-content>
+        <div>
+            Type <span class="slug">{{ data.collectionSlug }}</span> here
+        </div>
+        <mat-form-field>
+            <input matInput [(ngModel)]="confirmVal" />
+        </mat-form-field>
+    </div>
+
+    <div mat-dialog-actions>
+        <button mat-button mat-dialog-close>Close</button>
+        <button mat-button color="accent" (click)="confirm()" [disabled]="confirmVal !== data.collectionSlug">
+            Delete Collection Now
+        </button>
+    </div>
 </div>

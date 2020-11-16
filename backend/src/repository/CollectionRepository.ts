@@ -51,6 +51,20 @@ export class CollectionRepository extends Repository<Collection> {
         return this.save(collectionIdDb);
     }
 
+    public async myCollections(
+        user: User,
+        limit: number,
+        offSet: number,
+        relations?: string[]
+    ): Promise<[Collection[], number]> {
+        return this.createQueryBuilder()
+            .where("creator_id = :userId", { userId: user.id })
+            .orderBy('"Collection"."updated_at"', "DESC")
+            .limit(limit)
+            .offset(offSet)
+            .getManyAndCount();
+    }
+
     public async deleteCollection(collectionSlug: string): Promise<void> {
         const collectionIdDb = await this.findCollectionBySlugOrFail(collectionSlug);
         await this.delete({ id: collectionIdDb.id });

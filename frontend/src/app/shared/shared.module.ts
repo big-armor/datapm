@@ -10,12 +10,14 @@ import { MatDialogModule } from "@angular/material/dialog";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { MatStepperModule } from "@angular/material/stepper";
+import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 
 import { HeaderComponent } from "./header/header.component";
 import { FooterComponent } from "./footer/footer.component";
 import { TimeAgoPipe } from "./pipes/time-ago.pipe";
 import { ImageUploadModalComponent } from "./image-upload-modal/image-upload-modal.component";
 import { PackageItemComponent } from "./package-item/package-item.component";
+import { CollectionItemComponent } from "./collection-item/collection-item.component";
 import { ForgotPasswordDialogComponent } from "./header/forgot-password-dialog/forgot-password-dialog.component";
 import { LoginDialogComponent } from "./header/login-dialog/login-dialog.component";
 import { SignUpDialogComponent } from "./header/sign-up-dialog/sign-up-dialog.component";
@@ -30,6 +32,7 @@ import { CoverComponent } from "./cover/cover.component";
         TimeAgoPipe,
         ImageUploadModalComponent,
         PackageItemComponent,
+        CollectionItemComponent,
         ForgotPasswordDialogComponent,
         LoginDialogComponent,
         SignUpDialogComponent,
@@ -47,6 +50,7 @@ import { CoverComponent } from "./cover/cover.component";
         MatProgressSpinnerModule,
         MatSnackBarModule,
         MatStepperModule,
+        MatSlideToggleModule,
         FormsModule,
         ReactiveFormsModule,
         RouterModule
@@ -56,6 +60,7 @@ import { CoverComponent } from "./cover/cover.component";
         FooterComponent,
         TimeAgoPipe,
         PackageItemComponent,
+        CollectionItemComponent,
         ForgotPasswordDialogComponent,
         LoginDialogComponent,
         SignUpDialogComponent,
