@@ -202,12 +202,13 @@ exports.default = series(
 );
 
 exports.buildParallel = series(
-    series(installLibDependencies, buildLib, testLib),
+    series(installLibDependencies, parallel(buildLib, testLib)),
     parallel(
-        series(installBackendDependencies, buildBackend, testBackend),
-        series(installFrontendDependencies, buildFrontend, testFrontend),
+        series(installBackendDependencies, parallel(buildBackend, testBackend)),
+        series(installFrontendDependencies, parallel(buildFrontend, testFrontend)),
         series(installDocsDependencies, buildDocs)
     ),
+    prepareDockerBuildAssets,
     buildDockerImage
 );
 
