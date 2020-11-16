@@ -4,7 +4,7 @@ on:
     push:
 
 jobs:
-    buildAndDeploy:
+    initialSetupsAndChecks:
         name: "Build And Deploy"
         timeout-minutes: 20
         runs-on: ubuntu-latest
@@ -22,15 +22,15 @@ jobs:
             - name: Print node verion
               run: node --version
 
-            - name: Cache node_modules
-              id: cache-modules
+            - name: Cache Root Node_modules
+              id: cache-root-node-modules
               uses: actions/cache@v1
               with:
                   path: node_modules
                   key: ${{ runner.OS }}-build-${{ hashFiles('package.json') }}
 
             - name: Install Dependencies
-              if: steps.cache-modules.outputs.cache-hit != 'true'
+              if: steps.cache-root-node-modules.outputs.cache-hit != 'true'
               run: npm ci
 
             - name: Run Prettier linter
@@ -53,19 +53,142 @@ jobs:
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: npm run bump-version
 
-            - name: Echo Docker Password to file
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-              run: echo $${{secrets.DOCKER_PASSWORD}} > ~/docker-password
+    buildLib:
+        name: "Build Lib"
+        timeout-minutes: 20
+        runs-on: ubuntu-latest
+        needs: initialSetupsAndChecks
+        steps:
+            - name: Cache Lib Node_modules
+              id: cache-lib-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: lib/node_modules
+                  key: ${{ runner.OS }}-build-${{ hashFiles('lib/package.json') }}
 
-            - name: Build Docker Container
+            - name: Install Lib Dependencies
+              id: install-lib-Dependencies
+              if: steps.cache-lib-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: lib
+
+            - name: Test Lib
+              id: test-lib-Dependencies
+              run: npm run test
+              working-directory: lib
+
+            - name: Build Lib
+              id: build-lib-Dependencies
               run: npm run build
+              working-directory: lib
+
+    buildBackend:
+        name: "Build Backend"
+        timeout-minutes: 20
+        runs-on: ubuntu-latest
+        needs: buildLib
+        steps:
+            - name: Cache Backend Node_modules
+              id: cache-backend-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: backend/node_modules
+                  key: ${{ runner.OS }}-build-${{ hashFiles('backend/package.json') }}
+
+            - name: Install Backend Dependencies
+              id: install-backend-Dependencies
+              if: steps.cache-backend-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: backend
+
+            - name: Test Backend
+              id: test-backend-Dependencies
+              run: npm run test
+              working-directory: backend
+
+            - name: Build Backend
+              id: build-backend-Dependencies
+              run: npm run build
+              working-directory: backend
+
+    buildFrontend:
+        name: "Build Frontend"
+        timeout-minutes: 20
+        runs-on: ubuntu-latest
+        needs: buildLib
+        steps:
+            - name: Cache Frontend Node_modules
+              id: cache-frontend-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: frontend/node_modules
+                  key: ${{ runner.OS }}-build-${{ hashFiles('frontend/package.json') }}
+
+            - name: Install Frontend Dependencies
+              id: install-fronend-dependencies
+              if: steps.cache-frontend-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: frontend
+
+            - name: Test Frontend
+              id: test-frontend-Dependencies
+              run: npm run test
+              working-directory: frontend
+
+            - name: Build Frontend
+              id: build-frontend-Dependencies
+              run: npm run build
+              working-directory: frontend
+
+    buildDocs:
+        name: "Build Docs"
+        timeout-minutes: 20
+        runs-on: ubuntu-latest
+        needs: initialSetupsAndChecks
+        steps:
+            - name: Cache Docs Node_modules
+              id: cache-docs-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: docs/website/node_modules
+                  key: ${{ runner.OS }}-build-${{ hashFiles('docs/website/package.json') }}
+
+            - name: Install Docs Dependencies
+              id: install-docs-dependencies
+              if: steps.cache-docs-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: docs/website
+
+            - name: Build Docs
+              id: build-docs-Dependencies
+              run: npm run build
+              working-directory: docs/website
+
+    buildDockerImage:
+        name: "Build Docker Image"
+        timeout-minutes: 20
+        runs-on: ubuntu-latest
+        needs: buildDocs,buildFrontend,buildBackend
+        steps:
+            - name: Build Docker Container
+              run: gulp buildDockerImage
 
             - name: Smoke Test Docker Image
               run: npm run test
 
+    deployDockerImage:
+        name: "Deploy Docker Image"
+        timeout-minutes: 20
+        runs-on: ubuntu-latest
+        needs: buildDocs,buildFrontend,buildBackend
+        steps:
             - name: Tag
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: npm run tag
+
+            - name: Echo Docker Password to file
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: echo $${{secrets.DOCKER_PASSWORD}} > ~/docker-password
 
             - name: Authorize Docker
               uses: docker/login-action@v1
