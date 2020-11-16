@@ -6,8 +6,7 @@
     "typings": "backend/dist/index.d.ts",
     "module": "backend/dist/index.js",
     "scripts": {
-        "clean": "rm -rf node_modules frontend/dist frontend/node_modules backend/dist frontend/node_modules",
-        "clean:node_modules": "rm -rf node_modules frontend/node_modules frontend/node_modules",
+        "clean": "rm -rf node_modules dist lib/node_modules lib/dist frontend/dist frontend/node_modules backend/dist backend/node_modules frontend/node_modules docs/website/node_modules docs/website/build",
         "build": "gulp",
         "build:parallel": "gulp buildParallel",
         "start": "TYPEORM_IS_DIST=true docker-compose -f docker/docker-compose-local-build.yml up",

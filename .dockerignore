@@ -1,10 +1,10 @@
 node_modules
 npm-debug.log
- .git
- .terraform
- node_modules 
- frontend/node_modules 
- backend/node_modules 
- backend/dist/node_modules
- docs/website/node_modules
-lib/node_modules
+.git
+.terraform
+node_modules
+frontend
+backend
+backend
+docs
+lib
