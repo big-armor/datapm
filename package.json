@@ -1,13 +1,12 @@
 {
     "name": "datapm-registry",
-    "version": "0.6.15",
+    "version": "0.6.18",
     "description": "datapm is the easiest way to discover, obtain, manage, and publish data sets. This server acts as a registry (not a repository) of catalogs of packages. Features of datapm-registry include CRUD operations on catalogs and packages, and authorization for each operation. ",
     "main": "backend/dist/index.js",
     "typings": "backend/dist/index.d.ts",
     "module": "backend/dist/index.js",
     "scripts": {
-        "clean": "rm -rf node_modules frontend/dist frontend/node_modules backend/dist frontend/node_modules",
-        "clean:node_modules": "rm -rf node_modules frontend/node_modules frontend/node_modules",
+        "clean": "rm -rf node_modules dist lib/node_modules lib/dist frontend/dist frontend/node_modules backend/dist backend/node_modules frontend/node_modules docs/website/node_modules docs/website/build",
         "build": "gulp",
         "build:parallel": "gulp buildParallel",
         "start": "TYPEORM_IS_DIST=true docker-compose -f docker/docker-compose-local-build.yml up",
