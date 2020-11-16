@@ -66,11 +66,6 @@ jobs:
               run: npm ci
               working-directory: lib
 
-            - name: Test Lib
-              id: test-lib-Dependencies
-              run: npm run test
-              working-directory: lib
-
             - name: Build Lib
               id: build-lib-Dependencies
               run: npm run build
@@ -89,11 +84,6 @@ jobs:
               run: npm ci
               working-directory: backend
 
-            - name: Test Backend
-              id: test-backend-Dependencies
-              run: npm run test
-              working-directory: backend
-
             - name: Build Backend
               id: build-backend-Dependencies
               run: npm run build
@@ -110,11 +100,6 @@ jobs:
               id: install-fronend-dependencies
               if: steps.cache-frontend-node-modules.outputs.cache-hit != 'true'
               run: npm ci
-              working-directory: frontend
-
-            - name: Test Frontend
-              id: test-frontend-Dependencies
-              run: npm run test:ci
               working-directory: frontend
 
             - name: Build Frontend

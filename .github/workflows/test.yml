@@ -1,0 +1,82 @@
+name: "Test"
+
+on:
+    push:
+
+jobs:
+    buildAndDeploy:
+        name: "Test"
+        timeout-minutes: 20
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+
+            - uses: actions/setup-node@v2-beta
+              with:
+                  node-version: "12"
+
+            - name: Print npm verion
+              run: npm --version
+
+            - name: Print node verion
+              run: node --version
+
+            - name: Cache Lib Node_modules
+              id: cache-lib-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: lib/node_modules
+                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/package.json') }}
+
+            - name: Install Lib Dependencies
+              id: install-lib-Dependencies
+              if: steps.cache-lib-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: lib
+
+            - name: Test Lib
+              id: test-lib-Dependencies
+              run: npm run test
+              working-directory: lib
+
+            - name: Build Lib
+              id: build-lib-Dependencies
+              run: npm run build
+              working-directory: lib
+
+            - name: Cache Backend Node_modules
+              id: cache-backend-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: backend/node_modules
+                  key: datampm-registry-${{ runner.OS }}-backend-${{ hashFiles('backend/package.json') }}
+
+            - name: Install Backend Dependencies
+              id: install-backend-Dependencies
+              if: steps.cache-backend-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: backend
+
+            - name: Test Backend
+              id: test-backend-Dependencies
+              run: npm run test
+              working-directory: backend
+
+            - name: Cache Frontend Node_modules
+              id: cache-frontend-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: frontend/node_modules
+                  key: datampm-registry-${{ runner.OS }}-frontend-${{ hashFiles('frontend/package.json') }}
+
+            - name: Install Frontend Dependencies
+              id: install-fronend-dependencies
+              if: steps.cache-frontend-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: frontend
+
+            - name: Test Frontend
+              id: test-frontend-Dependencies
+              run: npm run test:ci
+              working-directory: frontend
