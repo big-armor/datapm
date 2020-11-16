@@ -114,7 +114,7 @@ jobs:
 
             - name: Test Frontend
               id: test-frontend-Dependencies
-              run: npm run test
+              run: npm run test:ci
               working-directory: frontend
 
             - name: Build Frontend
