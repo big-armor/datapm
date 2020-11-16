@@ -27,7 +27,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: node_modules
-                  key: ${{ runner.OS }}-build-${{ hashFiles('package.json') }}
+                  key: datampm-registry-${{ runner.OS }}-root-${{ hashFiles('package.json') }}
 
             - name: Install Dependencies
               if: steps.cache-root-node-modules.outputs.cache-hit != 'true'
@@ -58,7 +58,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: lib/node_modules
-                  key: ${{ runner.OS }}-build-${{ hashFiles('lib/package.json') }}
+                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/package.json') }}
 
             - name: Install Lib Dependencies
               id: install-lib-Dependencies
@@ -81,7 +81,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: backend/node_modules
-                  key: ${{ runner.OS }}-build-${{ hashFiles('backend/package.json') }}
+                  key: datampm-registry-${{ runner.OS }}-backend-${{ hashFiles('backend/package.json') }}
 
             - name: Install Backend Dependencies
               id: install-backend-Dependencies
@@ -104,7 +104,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: frontend/node_modules
-                  key: ${{ runner.OS }}-build-${{ hashFiles('frontend/package.json') }}
+                  key: datampm-registry-${{ runner.OS }}-frontend-${{ hashFiles('frontend/package.json') }}
 
             - name: Install Frontend Dependencies
               id: install-fronend-dependencies
@@ -127,7 +127,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: docs/website/node_modules
-                  key: ${{ runner.OS }}-build-${{ hashFiles('docs/website/package.json') }}
+                  key: datampm-registry-${{ runner.OS }}-docs-${{ hashFiles('docs/website/package.json') }}
 
             - name: Install Docs Dependencies
               id: install-docs-dependencies
