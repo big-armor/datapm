@@ -6,16 +6,15 @@ COPY frontend/ /usr/src/static/
 COPY backend/dist/ /usr/src/app/
 COPY backend/package.json backend/package-lock.json backend/gulpfile.js /build/backend/
 
-RUN npm install -g gulp \
-    && cd /build/backend/ \
+RUN cd /build/backend/ \
     && npm ci \
-    && gulp copyDependencies \
+    && npx copy-node-modules ./ dist/ \
+    && cp -R ../lib/dist dist/node_modules/datapm-lib \
     && cp -R /build/backend/dist/node_modules /usr/src/app \
-    && rm -rf node_modules \
-    && rm -rf /usr/local/lib/node_modules \
     && rm -rf /build
 
 EXPOSE 4000
+WORKDIR /usr/src/app
 
 CMD [ "node", "index.js" ]
 
