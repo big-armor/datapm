@@ -224,5 +224,6 @@ exports.deployAssets = series(
     pushDockerImage,
     pushDockerImageLatest
 );
+
 exports.buildDockerImage = series(prepareDockerBuildAssets, buildDockerImage);
 exports.prepareDockerBuildAssets = prepareDockerBuildAssets;
