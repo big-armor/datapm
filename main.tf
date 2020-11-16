@@ -139,6 +139,10 @@ resource "google_cloud_run_service" "default" {
       containers {
         image = "gcr.io/${google_project.project.project_id}/datapm-registry"
         env {
+          name  = "NODE_ENV"
+          value = "production"
+        }
+        env {
           name  = "JWT_AUDIENCE"
           value = "test.datapm.io"
         }
