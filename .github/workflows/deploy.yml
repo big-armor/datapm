@@ -22,15 +22,15 @@ jobs:
             - name: Print node verion
               run: node --version
 
-            - name: Cache node_modules
-              id: cache-modules
+            - name: Cache Root Node_modules
+              id: cache-root-node-modules
               uses: actions/cache@v1
               with:
                   path: node_modules
-                  key: ${{ matrix.node-version }}-${{ runner.OS }}-build-${{ hashFiles('package.json') }}
+                  key: datampm-registry-${{ runner.OS }}-root-${{ hashFiles('package.json') }}
 
             - name: Install Dependencies
-              if: steps.cache-modules.outputs.cache-hit != 'true'
+              if: steps.cache-root-node-modules.outputs.cache-hit != 'true'
               run: npm ci
 
             - name: Run Prettier linter
@@ -53,12 +53,80 @@ jobs:
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: npm run bump-version
 
-            - name: Echo Docker Password to file
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-              run: echo $${{secrets.DOCKER_PASSWORD}} > ~/docker-password
+            - name: Cache Lib Node_modules
+              id: cache-lib-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: lib/node_modules
+                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/package.json') }}
+
+            - name: Install Lib Dependencies
+              id: install-lib-Dependencies
+              if: steps.cache-lib-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: lib
+
+            - name: Build Lib
+              id: build-lib-Dependencies
+              run: npm run build
+              working-directory: lib
+
+            - name: Cache Backend Node_modules
+              id: cache-backend-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: backend/node_modules
+                  key: datampm-registry-${{ runner.OS }}-backend-${{ hashFiles('backend/package.json') }}
+
+            - name: Install Backend Dependencies
+              id: install-backend-Dependencies
+              if: steps.cache-backend-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: backend
+
+            - name: Build Backend
+              id: build-backend-Dependencies
+              run: npm run build
+              working-directory: backend
+
+            - name: Cache Frontend Node_modules
+              id: cache-frontend-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: frontend/node_modules
+                  key: datampm-registry-${{ runner.OS }}-frontend-${{ hashFiles('frontend/package.json') }}
+
+            - name: Install Frontend Dependencies
+              id: install-fronend-dependencies
+              if: steps.cache-frontend-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: frontend
+
+            - name: Build Frontend
+              id: build-frontend-Dependencies
+              run: npm run build
+              working-directory: frontend
+
+            - name: Cache Docs Node_modules
+              id: cache-docs-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: docs/website/node_modules
+                  key: datampm-registry-${{ runner.OS }}-docs-${{ hashFiles('docs/website/package.json') }}
+
+            - name: Install Docs Dependencies
+              id: install-docs-dependencies
+              if: steps.cache-docs-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: docs/website
+
+            - name: Build Docs
+              id: build-docs-Dependencies
+              run: npm run build
+              working-directory: docs/website
 
             - name: Build Docker Container
-              run: npm run build
+              run: gulp buildDockerImage
 
             - name: Smoke Test Docker Image
               run: npm run test
@@ -66,6 +134,10 @@ jobs:
             - name: Tag
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: npm run tag
+
+            - name: Echo Docker Password to file
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: echo $${{secrets.DOCKER_PASSWORD}} > ~/docker-password
 
             - name: Authorize Docker
               uses: docker/login-action@v1
@@ -98,7 +170,7 @@ jobs:
             - uses: JS-DevTools/npm-publish@v1
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               with:
-                  package: ./lib/package.json
+                  package: ./lib/dist/package.json
                   token: ${{ secrets.NPM_TOKEN }}
 
             - name: Terraform Init to

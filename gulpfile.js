@@ -60,7 +60,14 @@ function buildDocs() {
 }
 
 function buildDockerImage() {
-    return spawnAndLog("docker-build", "docker", ["build", "-t", "datapm-registry", ".", "-f", "docker/Dockerfile"]);
+    return spawnAndLog("docker-build", "docker", [
+        "build",
+        "-t",
+        "datapm-registry",
+        "./dist",
+        "-f",
+        "docker/Dockerfile"
+    ]);
 }
 
 function bumpRootVersion() {
@@ -95,10 +102,7 @@ function pushGCRImage() {
 }
 
 function pushGCRImageLatest() {
-    return spawnAndLog("docker-push-gcr", "docker", [
-        "push",
-        "gcr.io/datapm-test-terraform/datapm-registry:latest"
-    ]);
+    return spawnAndLog("docker-push-gcr", "docker", ["push", "gcr.io/datapm-test-terraform/datapm-registry:latest"]);
 }
 
 function tagDockerImageLatest() {
@@ -159,6 +163,28 @@ function showGitDiff() {
     return spawnAndLog("git-diff", "git", ["diff"]);
 }
 
+/** Tasks that must be completed before running the docker file. The docker file's build
+ * context is the "dist" directory in the root project folder.
+ */
+function prepareDockerBuildAssets() {
+    return new Promise(async (response, reject) => {
+        src(["backend/package.json", "backend/package-lock.json", "backend/gulpfile.js"]).pipe(
+            dest(path.join(DESTINATION_DIR, "backend"))
+        );
+
+        src(["lib/dist/**"]).pipe(dest(path.join(DESTINATION_DIR, "lib", "dist")));
+
+        src(["backend/dist/**", "!backend/dist/node_modules/**"]).pipe(
+            dest(path.join(DESTINATION_DIR, "backend", "dist"))
+        );
+
+        src(["frontend/dist/**"]).pipe(dest(path.join(DESTINATION_DIR, "frontend")));
+        src(["docs/website/build/datapm/**"]).pipe(dest(path.join(DESTINATION_DIR, "docs")));
+
+        response();
+    });
+}
+
 exports.default = series(
     installLibDependencies,
     buildLib,
@@ -171,23 +197,25 @@ exports.default = series(
     testFrontend,
     installDocsDependencies,
     buildDocs,
+    prepareDockerBuildAssets,
     buildDockerImage
 );
 
 exports.buildParallel = series(
-    series(installLibDependencies, buildLib, testLib),
+    series(installLibDependencies, parallel(buildLib, testLib)),
     parallel(
-        series(installBackendDependencies, buildBackend, testBackend),
-        series(installFrontendDependencies, buildFrontend, testFrontend),
+        series(installBackendDependencies, parallel(buildBackend, testBackend)),
+        series(installFrontendDependencies, parallel(buildFrontend, testFrontend)),
         series(installDocsDependencies, buildDocs)
     ),
+    prepareDockerBuildAssets,
     buildDockerImage
 );
 
 exports.bumpVersion = series(showGitDiff, bumpRootVersion, bumpLibVersion);
 exports.gitPushTag = series(gitStageChanges, gitCommit, gitPush, gitPushTag);
 exports.deployAssets = series(
-    //libPublish,
+    //libPublish, // current done in the github action
     tagGCRDockerImageLatest,
     tagGCRDockerImageVersion,
     tagDockerImageLatest,
@@ -197,4 +225,6 @@ exports.deployAssets = series(
     pushDockerImage,
     pushDockerImageLatest
 );
-exports.buildDockerImage = buildDockerImage;
+
+exports.buildDockerImage = series(prepareDockerBuildAssets, buildDockerImage);
+exports.prepareDockerBuildAssets = prepareDockerBuildAssets;

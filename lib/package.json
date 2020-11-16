@@ -1,24 +1,24 @@
 {
     "name": "datapm-lib",
-    "version": "0.6.15",
+    "version": "0.6.16",
     "description": "Definitions and utilities for managing datapm package files.",
-    "main": "dist/src/main.js",
+    "main": "src/main.js",
     "scripts": {
         "prepublishOnly": "npm test",
         "lint": "tslint -p tsconfig.json",
         "pretty-quick": "pretty-quick --pattern \"(src|test)/**/*.ts\"",
+<<<<<<< HEAD
         "build": "tsc",
         "test": "npx gqlint schema.gql && mocha --slow 3000 --timeout 60000 -r ts-node/register test/*.ts"
+=======
+        "prebuild": "rm -rf dist",
+        "build": "gulp && tsc",
+        "postbuild": "npx copy-node-modules ./ dist",
+        "test": "gqlint schema.gql && mocha --slow 3000 --timeout 60000 -r ts-node/register test/*.ts"
+>>>>>>> 3db81f9c92e30742d49155b3a18cd2e60c59f884
     },
     "files": [
-        "dist/**/*",
-        "graphql-documents/*",
-        "schema.gql",
-        "auth-schema.gql",
-        "images-schema.gql",
-        "user-schema.gql",
-        "api-key-schema.gql",
-        "packageFileSchema.json"
+        "**/*"
     ],
     "author": "Travis Collins",
     "license": "CC-BY-NC-ND-4.0",
@@ -29,11 +29,13 @@
         "@types/semver": "^7.3.1",
         "chai": "^4.2.0",
         "gqlint": "^1.8.0",
+        "gulp": "^4.0.2",
         "husky": "^4.3.0",
         "mocha": "^8.2.1",
         "prettier": "^2.0.5",
         "pretty-quick": "^3.1.0",
         "ts-lint": "^4.5.1",
+        "ts-node": "^9.0.0",
         "tslint-config-prettier": "^1.18.0",
         "typescript": "^3.9.7"
     },

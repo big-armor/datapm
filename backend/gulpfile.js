@@ -29,7 +29,7 @@ function copyModules() {
 }
 
 function copyDataPMLib() {
-    return exec("cp -R ../lib dist/node_modules/datapm-lib");
+    return exec("cp -R ../lib/dist dist/node_modules/datapm-lib");
 }
 
 function execLogCb(err, stdout, stderr) {
