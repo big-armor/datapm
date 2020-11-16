@@ -4,13 +4,12 @@
     "description": "Definitions and utilities for managing datapm package files.",
     "main": "src/main.js",
     "scripts": {
-        "prepublishOnly": "npm test",
         "lint": "tslint -p tsconfig.json",
         "pretty-quick": "pretty-quick --pattern \"(src|test)/**/*.ts\"",
         "prebuild": "rm -rf dist",
         "build": "gulp && tsc",
         "postbuild": "npx copy-node-modules ./ dist",
-        "test": "npx gqlint schema.gql && mocha --slow 3000 --timeout 60000 -r ts-node/register test/*.ts"
+        "test": "gqlint schema.gql && mocha --slow 3000 --timeout 60000 -r ts-node/register test/*.ts"
     },
     "files": [
         "**/*"
