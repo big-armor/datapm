@@ -1,0 +1,20 @@
+<div class="schema" *ngFor="let schema of packageFile?.schemas">
+    <div class="schema-title">{{ schema.title }}</div>
+    <div class="schema-text">
+        {{ schema.description }}
+    </div>
+    <div class="accordions-group mt-2">
+        <mat-accordion class="schema-property" multi>
+            <mat-expansion-panel *ngFor="let property of schema | schemaProperties">
+                <mat-expansion-panel-header>
+                    <mat-panel-title> {{ property.title }} </mat-panel-title>
+                    <mat-panel-description>
+                        <span>{{ property.type[0] }}</span>
+                        <a>details</a>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                <p>I'm visible because I am open</p>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+</div>
