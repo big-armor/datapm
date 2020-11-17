@@ -199,7 +199,7 @@ export function compareSchema(priorSchema: Schema, newSchema: Schema, pointer: s
     } else if (newSchema.parser == null && priorSchema.parser != null) {
         response.push({ type: DifferenceType.CHANGE_PARSER, pointer: pointer });
     } else if (priorSchema.parser != null && newSchema.parser != null) {
-        if (priorSchema.parser.configuration != newSchema.parser.configuration) {
+        if (priorSchema.parser.mimeType != newSchema.parser.mimeType) {
             response.push({ type: DifferenceType.CHANGE_PARSER, pointer: pointer });
         } else {
             const configComparison = compareConfigObjects(

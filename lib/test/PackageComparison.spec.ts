@@ -284,4 +284,28 @@ describe("Checking VersionUtil", () => {
         expect(validatePackageSlug("a_")).equal(false);
         expect(validatePackageSlug("a___c")).equal(false);
     });
+
+    it("Compare identical", () => {
+        const schemaA1: Schema = {
+            title: "SchemaA",
+            type: "string",
+            format: "date-time",
+            parser: {
+                mimeType: "text/csv",
+                configuration: {}
+            }
+        };
+
+        const schemaA2: Schema = {
+            title: "SchemaA",
+            type: "string",
+            format: "date-time",
+            parser: {
+                mimeType: "text/csv",
+                configuration: {}
+            }
+        };
+
+        expect(compareSchema(schemaA1, schemaA2).length).equal(0);
+    });
 });
