@@ -63,11 +63,13 @@
                                 <div class="row p-2">
                                     <div class="col-lg-6 col-md-6 col-sm-4 mb-4">
                                         <p class="package-light-gray">version</p>
-                                        <p class="package-dark-gray">3.4.0</p>
+                                        <p class="package-dark-gray">
+                                            {{ package?.latestVersion.identifier | version }}
+                                        </p>
                                     </div>
                                     <div class="col-lg-6 col-md-6 col-sm-4 mb-4">
                                         <p class="package-light-gray">unpacked size</p>
-                                        <p class="package-dark-gray">24.7 kB</p>
+                                        <p class="package-dark-gray">{{ packageFile.schemas | packageSize }}</p>
                                     </div>
                                     <div class="col-lg-6 col-md-6 col-sm-6 mb-4">
                                         <p class="package-light-gray">last updated</p>

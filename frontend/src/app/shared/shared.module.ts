@@ -23,9 +23,9 @@ import { LoginDialogComponent } from "./header/login-dialog/login-dialog.compone
 import { SignUpDialogComponent } from "./header/sign-up-dialog/sign-up-dialog.component";
 import { AvatarComponent } from "./avatar/avatar.component";
 import { UsernamePipe } from "./pipes/username.pipe";
-import { SchemaPropertiesPipe } from "./pipes/schema-properties.pipe";
-import { VersionPipe } from "./pipes/version.pipe";
 import { CoverComponent } from "./cover/cover.component";
+import { PercentPipe } from "./pipes/percent.pipe";
+import { ValuesPipe } from "./pipes/values.pipe";
 
 @NgModule({
     declarations: [
@@ -40,9 +40,9 @@ import { CoverComponent } from "./cover/cover.component";
         SignUpDialogComponent,
         AvatarComponent,
         UsernamePipe,
-        SchemaPropertiesPipe,
-        VersionPipe,
-        CoverComponent
+        CoverComponent,
+        PercentPipe,
+        ValuesPipe
     ],
     imports: [
         CommonModule,
@@ -70,9 +70,9 @@ import { CoverComponent } from "./cover/cover.component";
         SignUpDialogComponent,
         AvatarComponent,
         UsernamePipe,
-        SchemaPropertiesPipe,
-        VersionPipe,
-        CoverComponent
+        CoverComponent,
+        PercentPipe,
+        ValuesPipe
     ],
     providers: [TimeAgoPipe]
 })

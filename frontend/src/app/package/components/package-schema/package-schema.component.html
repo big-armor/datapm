@@ -5,7 +5,7 @@
     </div>
     <div class="accordions-group mt-2">
         <mat-accordion class="schema-property" multi>
-            <mat-expansion-panel *ngFor="let property of schema | schemaProperties">
+            <mat-expansion-panel *ngFor="let property of schema?.properties | values">
                 <mat-expansion-panel-header>
                     <mat-panel-title> {{ property.title }} </mat-panel-title>
                     <mat-panel-description>
@@ -13,7 +13,16 @@
                         <a>details</a>
                     </mat-panel-description>
                 </mat-expansion-panel-header>
-                <p>I'm visible because I am open</p>
+                <div>
+                    <div>{{ property.description }}</div>
+                    <div
+                        class="d-flex align-items-center justify-content-between"
+                        *ngFor="let t of property.valueTypes | values"
+                    >
+                        <div>{{ t.valueType }}</div>
+                        <div>{{ t.recordCount / property.recordCount | percent }}</div>
+                    </div>
+                </div>
             </mat-expansion-panel>
         </mat-accordion>
     </div>

@@ -12,9 +12,20 @@ import { PackageComponent } from "./components/package/package.component";
 import { PackageDetailComponent } from "./components/package-detail/package-detail.component";
 import { PackageSchemaComponent } from "./components/package-schema/package-schema.component";
 import { PackageVersionComponent } from "./components/package-version/package-version.component";
+import { PackageSizePipe } from "./pipes/package-size.pipe";
+import { SchemaPropertiesPipe } from "./pipes/schema-properties.pipe";
+import { VersionPipe } from "./pipes/version.pipe";
 
 @NgModule({
-    declarations: [PackageComponent, PackageDetailComponent, PackageSchemaComponent, PackageVersionComponent],
+    declarations: [
+        PackageComponent,
+        PackageDetailComponent,
+        PackageSchemaComponent,
+        PackageVersionComponent,
+        PackageSizePipe,
+        SchemaPropertiesPipe,
+        VersionPipe
+    ],
     imports: [
         CommonModule,
         PackageRoutingModule,
