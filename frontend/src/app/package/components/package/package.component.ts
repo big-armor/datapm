@@ -32,7 +32,7 @@ export class PackageComponent implements OnDestroy {
             if (this.package && this.package.latestVersion) {
                 this.packageFile = JSON.parse(this.package.latestVersion.packageFile);
             }
-            this.title.setTitle(`${this.package.displayName} - datapm`);
+            this.title.setTitle(`${this.package?.displayName} - datapm`);
             console.log(this.package);
         });
     }

@@ -5,6 +5,8 @@ import { ActivatedRoute } from "@angular/router";
 import { Subject } from "rxjs";
 
 import { PackageVersionComponent } from "./package-version.component";
+import { VersionPipe } from "../../pipes/version.pipe";
+import { PackageSizePipe } from "../../pipes/package-size.pipe";
 import { SharedModule } from "../../../shared/shared.module";
 
 describe("PackageVersionComponent", () => {
@@ -13,7 +15,7 @@ describe("PackageVersionComponent", () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [PackageVersionComponent],
+            declarations: [PackageVersionComponent, VersionPipe, PackageSizePipe],
             imports: [MatButtonModule, MatIconModule, SharedModule],
             providers: [
                 {

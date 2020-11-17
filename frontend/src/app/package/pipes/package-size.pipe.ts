@@ -8,7 +8,7 @@ export class PackageSizePipe implements PipeTransform {
     private readonly units = ["B", "KB", "MB", "GB"];
 
     transform(value: Schema[]): unknown {
-        const totalSize = value.reduce((sum, item) => sum + item.byteCount, 0);
+        const totalSize = value?.reduce((sum, item) => sum + item.byteCount, 0) || 0;
         return this.convertSize(totalSize);
     }
 
