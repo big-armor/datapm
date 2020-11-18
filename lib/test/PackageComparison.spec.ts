@@ -332,11 +332,9 @@ describe("Checking VersionUtil", () => {
 
         expect(comparePackages(packageFileA, packageFileB).some((d) => d.type === "CHANGE_UPDATED_DATE")).equal(false);
 
-        packageFileB.updatedDate = new Date();
+        packageFileB.updatedDate = new Date(new Date().getTime() - 100);
 
         const diff = comparePackages(packageFileA, packageFileB);
-
-        console.log(JSON.stringify(diff));
 
         expect(diff.some((d) => d.type === "CHANGE_UPDATED_DATE")).equal(true);
     });
