@@ -1,6 +1,5 @@
-const { fstat } = require("fs");
+/* eslint-disable @typescript-eslint/no-var-requires */
 const { series, src, dest, parallel } = require("gulp");
-const exec = require("child_process").exec;
 const spawn = require("child_process").spawn;
 const fs = require("fs");
 
@@ -141,9 +140,9 @@ function gitPush() {
     return spawnAndLog("git-push", "git", ["push"]);
 }
 
-function libPublish() {
+/* function libPublish() {
     return spawnAndLog("lib-publish", "npm", ["publish"], { cwd: "lib" });
-}
+} */
 
 function spawnAndLog(prefix, command, args, opts) {
     const child = spawn(command, args, opts);
@@ -167,7 +166,7 @@ function showGitDiff() {
  * context is the "dist" directory in the root project folder.
  */
 function prepareDockerBuildAssets() {
-    return new Promise(async (response, reject) => {
+    return new Promise((resolve) => {
         src(["backend/package.json", "backend/package-lock.json", "backend/gulpfile.js"]).pipe(
             dest(path.join(DESTINATION_DIR, "backend"))
         );
@@ -181,7 +180,7 @@ function prepareDockerBuildAssets() {
         src(["frontend/dist/**"]).pipe(dest(path.join(DESTINATION_DIR, "frontend")));
         src(["docs/website/build/datapm/**"]).pipe(dest(path.join(DESTINATION_DIR, "docs")));
 
-        response();
+        resolve();
     });
 }
 
@@ -215,7 +214,7 @@ exports.buildParallel = series(
 exports.bumpVersion = series(showGitDiff, bumpRootVersion, bumpLibVersion);
 exports.gitPushTag = series(gitStageChanges, gitCommit, gitPush, gitPushTag);
 exports.deployAssets = series(
-    //libPublish, // current done in the github action
+    // libPublish, // current done in the github action
     tagGCRDockerImageLatest,
     tagGCRDockerImageVersion,
     tagDockerImageLatest,

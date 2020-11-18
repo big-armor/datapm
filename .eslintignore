@@ -1,0 +1,20 @@
+node_modules
+dist
+
+backend
+#backend/node_modules
+#backend/dist
+#backend/src/generated
+#backend/test/integration/registry-client.ts
+
+frontend
+#frontend/node_modules
+#frontend/dist
+#frontend/src/generated
+
+lib/node_modules
+lib/dist
+
+docs
+# docs/website/node_modules
+# docs/website/build

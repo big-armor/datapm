@@ -13,10 +13,17 @@
         },
         {
             "command": "npm run test",
-            "name": "npm run test",
+            "name": "run backend test",
             "request": "launch",
             "type": "node-terminal",
             "cwd": "${workspaceFolder}/backend"
+        },
+        {
+            "command": "npm run test",
+            "name": "run lib test",
+            "request": "launch",
+            "type": "node-terminal",
+            "cwd": "${workspaceFolder}/lib"
         }
     ]
 }

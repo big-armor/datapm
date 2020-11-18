@@ -1,4 +1,4 @@
-import { SchemaDirectiveVisitor, ApolloError, ValidationError } from "apollo-server";
+import { SchemaDirectiveVisitor, ValidationError } from "apollo-server";
 import {
     GraphQLField,
     defaultFieldResolver,
@@ -7,25 +7,22 @@ import {
     GraphQLInterfaceType,
     GraphQLInputField,
     GraphQLInputObjectType,
-    GraphQLNonNull,
-    GraphQLScalarType
+    Kind
 } from "graphql";
 import { Context } from "../context";
 import { validateCatalogSlug } from "datapm-lib";
 import { ValidationConstraint } from "./ValidationConstraint";
-import { Kind } from "graphql";
 import { ValidationType } from "./ValidationType";
 
 export class ValidCatalogSlugDirective extends SchemaDirectiveVisitor {
     visitArgumentDefinition(
-        argument: GraphQLArgument,
+        _argument: GraphQLArgument,
         details: {
             field: GraphQLField<any, any>;
             objectType: GraphQLObjectType | GraphQLInterfaceType;
         }
     ): GraphQLArgument | void | null {
         const { resolve = defaultFieldResolver } = details.field;
-        const self = this;
         details.field.resolve = function (source, args, context: Context, info) {
             const slug: string | undefined = args.catalogSlug || undefined;
 
@@ -37,7 +34,7 @@ export class ValidCatalogSlugDirective extends SchemaDirectiveVisitor {
 
     visitInputFieldDefinition(
         field: GraphQLInputField,
-        details: {
+        _details: {
             objectType: GraphQLInputObjectType;
         }
     ): GraphQLInputField | void | null {
@@ -45,7 +42,7 @@ export class ValidCatalogSlugDirective extends SchemaDirectiveVisitor {
     }
 }
 
-export function validateSlug(slug: String | undefined) {
+export function validateSlug(slug: string | undefined): void {
     if (slug === undefined) throw new ValidationError(`CATALOG_SLUG_REQUIRED`);
 
     if (slug.length == 0) throw new ValidationError(`CATALOG_SLUG_REQUIRED`);
@@ -60,7 +57,7 @@ export class CatalogSlugConstraint implements ValidationConstraint {
         return "CatalogSlug";
     }
 
-    validate(value: String) {
+    validate(value: string): void {
         validateSlug(value);
     }
 
