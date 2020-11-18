@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
-import { PackageFile, Properties, Schema } from "datapm-lib";
+import { PackageFile, Schema } from "datapm-lib";
 import { take } from "rxjs/operators";
 import { Package } from "src/generated/graphql";
 
