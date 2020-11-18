@@ -3,13 +3,12 @@ import {
     compareSchema,
     Compability,
     DifferenceType,
-    compareSchemas,
     diffCompatibility,
     nextVersion,
     validateCatalogSlug,
     validatePackageSlug
 } from "../src/PackageUtil";
-import { Schema } from "../src/main";
+import { Schema, Properties } from "../src/main";
 import { SemVer } from "semver";
 import { expect } from "chai";
 
@@ -95,14 +94,14 @@ describe("Checking VersionUtil", () => {
 
         expect(diff.length).equal(0);
 
-        schemaA1.properties!["string"].type = ["string", "number"];
+        (schemaA1.properties as Properties).string.type = ["string", "number"];
 
         const arrayVsNotDiff = compareSchema(schemaA1, schemaA2);
 
         expect(arrayVsNotDiff.length).equal(1);
         expect(arrayVsNotDiff[0].type).equal(DifferenceType.CHANGE_PROPERTY_TYPE);
 
-        schemaA2.properties!["string"].type = ["string", "number"];
+        (schemaA2.properties as Properties).string.type = ["string", "number"];
 
         const equalDiff = compareSchema(schemaA1, schemaA2);
 
@@ -132,7 +131,7 @@ describe("Checking VersionUtil", () => {
 
         expect(diff.length).equal(0);
 
-        schemaA2.properties!["boolean"] = { title: "boolean", type: "boolean" };
+        (schemaA2.properties as Properties).boolean = { title: "boolean", type: "boolean" };
 
         const compatibleChange = compareSchema(schemaA1, schemaA2);
 
@@ -140,7 +139,7 @@ describe("Checking VersionUtil", () => {
 
         expect(compatibleChange[0].type).equal(DifferenceType.ADD_PROPERTY);
 
-        schemaA1.properties!["date"] = {
+        (schemaA1.properties as Properties).date = {
             title: "date",
             type: "string",
             format: "date"
@@ -149,12 +148,12 @@ describe("Checking VersionUtil", () => {
         const removePropertyDiff = compareSchema(schemaA1, schemaA2);
         expect(removePropertyDiff.length).equal(2);
 
-        const propertyRemoved = removePropertyDiff.find((d) => d.type == DifferenceType.ADD_PROPERTY);
+        const propertyRemoved = removePropertyDiff.find((d) => d.type === DifferenceType.ADD_PROPERTY);
 
         expect(propertyRemoved != null).equal(true);
 
-        schemaA1.properties!["boolean"] = { title: "boolean", type: "boolean" };
-        schemaA2.properties!["date"] = {
+        (schemaA1.properties as Properties).boolean = { title: "boolean", type: "boolean" };
+        (schemaA2.properties as Properties).date = {
             title: "date",
             type: "string",
             format: "date"
@@ -210,7 +209,7 @@ describe("Checking VersionUtil", () => {
 
         expect(diffCompatibility(firstDiff)).equal(Compability.Identical);
 
-        schemaA2.properties!["object"].properties!["string2"] = { type: "string" };
+        ((schemaA2.properties as Properties).object.properties as Properties).string2 = { type: "string" };
 
         const compatibleDiff = compareSchema(schemaA1, schemaA2);
 
@@ -223,7 +222,7 @@ describe("Checking VersionUtil", () => {
 
         expect(compatibleComparison).equal(Compability.CompatibleChange);
 
-        schemaA1.properties!["object"].properties!["string3"] = { type: "string" };
+        ((schemaA1.properties as Properties).object.properties as Properties).string3 = { type: "string" };
 
         const breakingDiff = compareSchema(schemaA1, schemaA2);
         expect(breakingDiff).length(2);
@@ -237,8 +236,8 @@ describe("Checking VersionUtil", () => {
 
         expect(breakingChange).equal(Compability.BreakingChange);
 
-        schemaA1.properties!["object"].properties!["string2"] = { type: "string" };
-        schemaA2.properties!["object"].properties!["string3"] = { type: "string" };
+        ((schemaA1.properties as Properties).object.properties as Properties).string2 = { type: "string" };
+        ((schemaA2.properties as Properties).object.properties as Properties).string3 = { type: "string" };
 
         const finalDiff = compareSchema(schemaA1, schemaA2);
 

@@ -1,11 +1,8 @@
-const log = require("why-is-node-running");
 import { GenericContainer, Network, StartedNetwork, StartedTestContainer, Wait } from "testcontainers";
 import { exit } from "process";
-import { HostPortWaitStrategy, LogWaitStrategy } from "testcontainers/dist/wait-strategy";
+import { LogWaitStrategy } from "testcontainers/dist/wait-strategy";
 import { Readable } from "stream";
 import pidtree from "pidtree";
-let maildev = require("maildev");
-import fs from "fs";
 import { expect } from "chai";
 
 let databaseContainer: StartedTestContainer;
@@ -103,11 +100,11 @@ before(async function () {
     registryContainerReadable = await registryContainer.logs();
 
     registryContainerReadable
-        .on("data", (chunk) => {
-            //console.log(chunk);
+        .on("data", (_chunk) => {
+            // console.log(_chunk);
         })
-        .on("error", (chunk) => {
-            //console.error(chunk);
+        .on("error", (_chunk) => {
+            // console.error(_chunk);
         })
         .on("close", () => {
             console.log("DataPM registry container closed");
@@ -134,12 +131,11 @@ after(async function () {
     if (network) await network.stop();
 
     registryContainerReadable.destroy();
-    maildev = null;
 
-    let pids = pidtree(process.pid, { root: true });
+    const pids = pidtree(process.pid, { root: true });
     // recursively kill all child processes
-    (await pids).map((p) => {
-        if (p == process.pid) return;
+    (await pids).forEach((p): void => {
+        if (p === process.pid) return;
 
         console.warn("Killing process " + p + " this means there is a test leaving a process open");
         try {
@@ -155,9 +151,9 @@ after(async function () {
 });
 
 it("Should start", async function () {
-    expect(containersStarted).true;
+    expect(containersStarted).equal(true);
 });
 
-function delay(ms: number) {
+function _delay(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
