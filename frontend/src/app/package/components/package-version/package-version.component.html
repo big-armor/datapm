@@ -1,17 +1,8 @@
-<div class="version-table pb-2">
+<div class="pt-3 pb-5">
     <table style="width: 100%">
-        <thead>
-            <tr>
-                <th scope="row" class="package-light-gray">current tags</th>
-            </tr>
-            <tr>
-                <th scope="row" class="package-dark-gray">{{ package?.latestVersion.identifier | version }}</th>
-                <th scope="row" class="package-dark-gray">latest</th>
-            </tr>
-        </thead>
         <tbody>
             <tr>
-                <td class="package-light-gray">version history</td>
+                <td class="package-light-gray">schema version history</td>
             </tr>
             <tr *ngFor="let version of package?.versions">
                 <td class="package-dark-gray">{{ version.identifier | version }}</td>

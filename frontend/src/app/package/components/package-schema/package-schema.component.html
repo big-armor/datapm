@@ -9,8 +9,7 @@
                 <mat-expansion-panel-header>
                     <mat-panel-title> {{ property.title }} </mat-panel-title>
                     <mat-panel-description>
-                        <span>{{ property.type[0] }}</span>
-                        <a>details</a>
+                        <span>{{ getPropertyTypes(property) }}</span>
                     </mat-panel-description>
                 </mat-expansion-panel-header>
                 <div>

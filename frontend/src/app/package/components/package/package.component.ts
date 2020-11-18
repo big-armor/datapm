@@ -53,4 +53,10 @@ export class PackageComponent implements OnDestroy {
         document.execCommand("copy");
         document.body.removeChild(el);
     }
+
+    getRecordCount(packageFile) {
+        if (packageFile == null) return "";
+
+        return packageFile.schemas.reduce((a, b) => a + (b.recordCount || 0), 0);
+    }
 }

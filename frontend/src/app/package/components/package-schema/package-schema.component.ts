@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
-import { PackageFile } from "datapm-lib";
+import { PackageFile, Properties, Schema } from "datapm-lib";
 import { take } from "rxjs/operators";
 import { Package } from "src/generated/graphql";
 
@@ -21,5 +21,10 @@ export class PackageSchemaComponent {
                 console.log(this.packageFile);
             }
         });
+    }
+
+    getPropertyTypes(property: Schema) {
+        const keys = Object.keys(property.valueTypes);
+        return keys.join(",");
     }
 }
