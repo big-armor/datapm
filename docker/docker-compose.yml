@@ -6,7 +6,7 @@ volumes:
 
 services:
     datapm-registry:
-        image: datapm/datapm-registry
+        image: "datapm/datapm-registry:${DATAPM_VERSION}"
         ports:
             - "4000:4000"
         env_file:
