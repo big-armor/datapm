@@ -11,6 +11,9 @@ services:
             - "4000:4000"
         env_file:
             - Docker-env
+        depends_on:
+            - "postgres"
+            - "smtp"
         volumes:
             - type: volume
               source: registry_file_store
