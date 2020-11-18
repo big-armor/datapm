@@ -1,6 +1,6 @@
 import { FileStorageService } from "../files/file-storage-service";
 import { PackageIdentifierInput, VersionIdentifierInput } from "../../generated/graphql";
-import { PackageFile } from "datapm-lib";
+import { PackageFile, parsePackageFileJSON } from "datapm-lib";
 import { Readable, Stream } from "stream";
 
 enum FileType {
@@ -44,7 +44,7 @@ export class PackageFileStorageService {
 
         const stringValue = await this.streamToString(stream);
 
-        const packageFile = JSON.parse(stringValue) as PackageFile;
+        const packageFile = parsePackageFileJSON(stringValue);
         return packageFile;
     }
 

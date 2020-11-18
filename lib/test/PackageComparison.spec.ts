@@ -6,9 +6,10 @@ import {
     diffCompatibility,
     nextVersion,
     validateCatalogSlug,
-    validatePackageSlug
+    validatePackageSlug,
+    comparePackages
 } from "../src/PackageUtil";
-import { Schema, Properties } from "../src/main";
+import { Schema, Properties, PackageFile } from "../src/main";
 import { SemVer } from "semver";
 import { expect } from "chai";
 
@@ -306,5 +307,37 @@ describe("Checking VersionUtil", () => {
         };
 
         expect(compareSchema(schemaA1, schemaA2).length).equal(0);
+    });
+
+    it("Package File updated dates", function () {
+        const packageFileA: PackageFile = {
+            packageSlug: "test",
+            displayName: "test",
+            generatedBy: "test",
+            schemas: [],
+            version: "1.0.0",
+            updatedDate: new Date(),
+            description: "Back test"
+        };
+
+        const packageFileB: PackageFile = {
+            packageSlug: "test",
+            displayName: "test",
+            generatedBy: "test",
+            schemas: [],
+            version: "1.0.0",
+            updatedDate: packageFileA.updatedDate,
+            description: "Back test"
+        };
+
+        expect(comparePackages(packageFileA, packageFileB).some((d) => d.type === "CHANGE_UPDATED_DATE")).equal(false);
+
+        packageFileB.updatedDate = new Date();
+
+        const diff = comparePackages(packageFileA, packageFileB);
+
+        console.log(JSON.stringify(diff));
+
+        expect(diff.some((d) => d.type === "CHANGE_UPDATED_DATE")).equal(true);
     });
 });

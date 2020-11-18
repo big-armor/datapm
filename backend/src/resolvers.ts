@@ -43,7 +43,8 @@ import {
     diffCompatibility,
     nextVersion,
     PackageFile,
-    Compability
+    Compability,
+    parsePackageFileJSON
 } from "datapm-lib";
 import graphqlFields from "graphql-fields";
 import {
@@ -124,7 +125,9 @@ export const resolvers: {
             return JSON.stringify(value);
         },
         parseValue: (value: any) => {
-            const packageObject = JSON.parse(value);
+            const packageFileObject = parsePackageFileJSON(value);
+
+            const rawPackageFile = JSON.parse(value);
 
             const ajv = new AJV();
 
@@ -136,13 +139,13 @@ export const resolvers: {
                 throw new ApolloError("ERROR_READING_SCHEMA");
             }
 
-            const response = ajv.validate(schemaObject, packageObject);
+            const response = ajv.validate(schemaObject, rawPackageFile);
 
             if (!response) {
                 throw new ValidationError("INVALID_PACKAGE_FILE_SCHEMA: " + JSON.stringify(ajv.errors!));
             }
 
-            return packageObject;
+            return packageFileObject;
         }
     }),
     Password: new GraphQLScalarType({
