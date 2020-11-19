@@ -5,6 +5,7 @@ import { MatExpansionModule } from "@angular/material/expansion";
 import { MatIconModule } from "@angular/material/icon";
 import { MatTabsModule } from "@angular/material/tabs";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { MarkdownModule } from "ngx-markdown";
 
 import { PackageRoutingModule } from "./package-routing.module";
 import { SharedModule } from "../shared/shared.module";
@@ -35,7 +36,8 @@ import { VersionPipe } from "./pipes/version.pipe";
         MatIconModule,
         MatTabsModule,
         MatProgressSpinnerModule,
-        SharedModule
+        SharedModule,
+        MarkdownModule.forChild()
     ]
 })
 export class PackageModule {}
