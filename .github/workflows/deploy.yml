@@ -61,7 +61,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: lib/dist
-                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/**') }}
+                  key: datampm-registry-${{ runner.OS }}-lib-dist-${{ hashFiles('lib/**') }}
 
             - name: Cache Lib Node_modules
               if: steps.cache-lib-all-files.outputs.cache-hit != 'true'
@@ -69,7 +69,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: lib/node_modules
-                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/package.json') }}
+                  key: datampm-registry-${{ runner.OS }}-lib-node-modules-${{ hashFiles('lib/package.json') }}
 
             - name: Install Lib Dependencies
               id: install-lib-Dependencies
@@ -88,7 +88,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: backend/dist
-                  key: datampm-registry-${{ runner.OS }}-backend-${{ hashFiles('backend/**') }}
+                  key: datampm-registry-${{ runner.OS }}-backend-dist-${{ hashFiles('backend/**') }}
 
             - name: Cache Backend Node_modules
               id: cache-backend-node-modules
@@ -96,7 +96,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: backend/node_modules
-                  key: datampm-registry-${{ runner.OS }}-backend-${{ hashFiles('backend/package.json,') }}
+                  key: datampm-registry-${{ runner.OS }}-backend-node-modules-${{ hashFiles('backend/package.json,') }}
 
             - name: Install Backend Dependencies
               id: install-backend-Dependencies
@@ -115,7 +115,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: frontend/dist
-                  key: datampm-registry-${{ runner.OS }}-frontend-all-files-${{ hashFiles('frontend/**') }}
+                  key: datampm-registry-${{ runner.OS }}-frontend-dist-${{ hashFiles('frontend/**') }}
 
             - name: Cache Frontend Node_modules
               id: cache-frontend-node-modules
