@@ -96,6 +96,10 @@
     box-shadow: 0 6px 8px -2px rgba(189, 189, 189, 0.25);
 }
 
+.loading {
+    margin: 100px auto;
+}
+
 @media (max-width: 576px) {
     #packagePage {
         #packageRoutes {

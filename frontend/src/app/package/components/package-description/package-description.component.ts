@@ -5,11 +5,11 @@ import { Package } from "src/generated/graphql";
 import { PackageService } from "../../services/package.service";
 
 @Component({
-    selector: "version",
-    templateUrl: "./package-version.component.html",
-    styleUrls: ["./package-version.component.scss"]
+    selector: "package-description",
+    templateUrl: "./package-description.component.html",
+    styleUrls: ["./package-description.component.scss"]
 })
-export class PackageVersionComponent {
+export class PackageDescriptionComponent {
     public package: Package;
     private unsubscribe$ = new Subject();
 

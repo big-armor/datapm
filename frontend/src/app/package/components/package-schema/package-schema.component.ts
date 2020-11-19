@@ -1,8 +1,9 @@
-import { Component, OnInit } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
+import { Component } from "@angular/core";
 import { PackageFile, Schema } from "datapm-lib";
-import { take } from "rxjs/operators";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 import { Package } from "src/generated/graphql";
+import { PackageService } from "../../services/package.service";
 
 @Component({
     selector: "schema",
@@ -12,10 +13,11 @@ import { Package } from "src/generated/graphql";
 export class PackageSchemaComponent {
     public package: Package;
     public packageFile: PackageFile;
+    private unsubscribe$ = new Subject();
 
-    constructor(private route: ActivatedRoute) {
-        this.route.parent.data.pipe(take(1)).subscribe((data) => {
-            this.package = data.package;
+    constructor(private packageService: PackageService) {
+        this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe((p: Package) => {
+            this.package = p;
             if (this.package && this.package.latestVersion) {
                 this.packageFile = JSON.parse(this.package.latestVersion.packageFile);
                 console.log(this.packageFile);
@@ -26,5 +28,10 @@ export class PackageSchemaComponent {
     getPropertyTypes(property: Schema) {
         const keys = Object.keys(property.valueTypes);
         return keys.join(",");
+    }
+
+    ngOnDestroy(): void {
+        this.unsubscribe$.next();
+        this.unsubscribe$.complete();
     }
 }

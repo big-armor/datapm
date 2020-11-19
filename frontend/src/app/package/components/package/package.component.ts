@@ -3,9 +3,11 @@ import { Title } from "@angular/platform-browser";
 import { ActivatedRoute } from "@angular/router";
 import { PackageFile } from "datapm-lib";
 import { Subject } from "rxjs";
-import { take } from "rxjs/operators";
 import { packageToIdentifier } from "src/app/helpers/IdentifierHelper";
 import { Package } from "src/generated/graphql";
+import { SnackBarService } from "src/app/services/snackBar.service";
+import { PackageService } from "../../services/package.service";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
     selector: "package",
@@ -16,29 +18,38 @@ export class PackageComponent implements OnDestroy {
     public package: Package;
     public packageFile: PackageFile;
 
-    private subscription = new Subject();
+    private unsubscribe$ = new Subject();
 
     public readonly routes = [
-        { linkName: "details", url: "details" },
+        { linkName: "description", url: "description" },
         { linkName: "schema", url: "schema" },
         { linkName: "version", url: "version" }
     ];
 
-    constructor(private route: ActivatedRoute, private title: Title) {}
-
-    ngOnInit() {
-        this.route.data.pipe(take(1)).subscribe((data) => {
-            this.package = data.package;
+    constructor(
+        private route: ActivatedRoute,
+        private packageService: PackageService,
+        private title: Title,
+        private snackBarService: SnackBarService
+    ) {
+        this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe((p: Package) => {
+            this.package = p;
             if (this.package && this.package.latestVersion) {
                 this.packageFile = JSON.parse(this.package.latestVersion.packageFile);
             }
             this.title.setTitle(`${this.package?.displayName} - datapm`);
-            console.log(this.package);
         });
     }
 
+    ngOnInit() {
+        const catalogSlug = this.route.snapshot.paramMap.get("catalogSlug");
+        const packageSlug = this.route.snapshot.paramMap.get("packageSlug");
+        this.packageService.getPackage(catalogSlug, packageSlug);
+    }
+
     ngOnDestroy(): void {
-        this.subscription.unsubscribe();
+        this.unsubscribe$.next();
+        this.unsubscribe$.complete();
     }
 
     get generatedFetchCommand() {
@@ -52,6 +63,8 @@ export class PackageComponent implements OnDestroy {
         el.select();
         document.execCommand("copy");
         document.body.removeChild(el);
+
+        this.snackBarService.openSnackBar("fetch command copied to clipboard!", "");
     }
 
     getRecordCount(packageFile) {
