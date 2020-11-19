@@ -1,0 +1,28 @@
+<div class="schema" *ngFor="let schema of packageFile?.schemas">
+    <div class="schema-title">{{ schema.title }}</div>
+    <div class="schema-text">
+        {{ schema.description }}
+    </div>
+    <div class="accordions-group mt-2">
+        <mat-accordion class="schema-property" multi>
+            <mat-expansion-panel *ngFor="let property of schema?.properties | values">
+                <mat-expansion-panel-header>
+                    <mat-panel-title> {{ property.title }} </mat-panel-title>
+                    <mat-panel-description>
+                        <span>{{ getPropertyTypes(property) }}</span>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                <div>
+                    <div>{{ property.description }}</div>
+                    <div
+                        class="d-flex align-items-center justify-content-between"
+                        *ngFor="let t of property.valueTypes | values"
+                    >
+                        <div>{{ t.valueType }}</div>
+                        <div>{{ t.recordCount / property.recordCount | percent }}</div>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+</div>

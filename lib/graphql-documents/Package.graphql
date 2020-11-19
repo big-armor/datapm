@@ -1,6 +1,7 @@
 query Package($identifier: PackageIdentifierInput!) {
     package(identifier: $identifier) {
         identifier {
+            registryURL
             catalogSlug
             packageSlug
         }
@@ -17,8 +18,15 @@ query Package($identifier: PackageIdentifierInput!) {
                 versionPatch
             }
             packageFile
-            readmeFile
-            licenseFile
+            createdAt
+        }
+        versions {
+            identifier {
+                versionMajor
+                versionMinor
+                versionPatch
+            }
+            createdAt
         }
     }
 }

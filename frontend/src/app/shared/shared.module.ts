@@ -24,6 +24,8 @@ import { SignUpDialogComponent } from "./header/sign-up-dialog/sign-up-dialog.co
 import { AvatarComponent } from "./avatar/avatar.component";
 import { UsernamePipe } from "./pipes/username.pipe";
 import { CoverComponent } from "./cover/cover.component";
+import { PercentPipe } from "./pipes/percent.pipe";
+import { ValuesPipe } from "./pipes/values.pipe";
 
 @NgModule({
     declarations: [
@@ -38,7 +40,9 @@ import { CoverComponent } from "./cover/cover.component";
         SignUpDialogComponent,
         AvatarComponent,
         UsernamePipe,
-        CoverComponent
+        CoverComponent,
+        PercentPipe,
+        ValuesPipe
     ],
     imports: [
         CommonModule,
@@ -66,7 +70,9 @@ import { CoverComponent } from "./cover/cover.component";
         SignUpDialogComponent,
         AvatarComponent,
         UsernamePipe,
-        CoverComponent
+        CoverComponent,
+        PercentPipe,
+        ValuesPipe
     ],
     providers: [TimeAgoPipe]
 })
