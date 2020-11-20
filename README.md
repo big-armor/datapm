@@ -1,4 +1,4 @@
-DataPM Registry Server
+# DataPM Registry Server
 
 This project contains the DataPM Registry Server, including the frontend angular project, backend apollo-graphql project, and documentation. You will find a README.md in the folder for each.
 

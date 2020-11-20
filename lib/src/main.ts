@@ -1,5 +1,10 @@
 import { JSONSchema7, JSONSchema7TypeName } from "json-schema";
+import { DPMConfiguration } from "./PackageUtil";
 
+export enum Protocol {
+    Http = "HTTP",
+    LocalFile = "LOCAL_FILE"
+}
 /** A description of where the package file should be published. */
 export interface RegistryReference {
     /** The HTTP or HTTPS URL to reach the registry server. */
@@ -7,6 +12,74 @@ export interface RegistryReference {
 
     /** The short name (not the user friendly name) of the catalog in which to publish the package. */
     catalogSlug: string;
+}
+
+export interface ParserInfo {
+    mimeType: string;
+
+    configuration?: DPMConfiguration;
+}
+
+/** Describes where the data resides, and how to access to byte stream of the data. */
+export interface Source {
+    protocol: Protocol;
+
+    /** An object containing valid JSON properties for the purposes of accessing the data. The schema
+     * of this object is loose because it is up to the source implementation to define it's own schema
+     * configuration.
+     */
+    configuration?: DPMConfiguration;
+}
+
+export interface ValueTypeStatistics {
+    valueType: JSONSchema7TypeName | "date";
+    recordCount?: number;
+    stringMaxLength?: number;
+    stringMinLength?: number;
+    numberMaxValue?: number;
+    numberMinValue?: number;
+    dateMaxValue?: Date;
+    dateMinValue?: Date;
+    stringOptions?: { [key: string]: number };
+}
+
+// eslint-disable-next-line no-use-before-define
+export type Properties = { [key: string]: Schema };
+export type ValueTypes = { [key: string]: ValueTypeStatistics };
+
+/** The JSON Schema Draft 07 compliant schema object, extended with properties that describe
+ * how to obtain the data, and details the values of the data properties.
+ */
+export interface Schema extends JSONSchema7 {
+    /** An object describing how to access the bytestream(s) of the data */
+    source?: Source;
+
+    /** An object describing how to parse the bytestream(s) into datapm compliant records. */
+    parser?: ParserInfo;
+
+    /** The JSON Schema Draft 07 compliant property list for the object */
+    properties?: Properties;
+
+    /** The exact or approximate number of records in the data package. For streaming sets, this
+     * is the number of records per period.
+     */
+    recordCount?: number;
+
+    /** The count of records in which this schema object is not present. Note that this does obviously
+     * not apply to the root schema object.
+     */
+    recordsNotPresent?: number;
+
+    /** Whether the recordCount value is exact or approximate. */
+    recordCountApproximate?: boolean;
+
+    /** The exact or approximate number of bytes of data in the values of the data (not including format overhead) */
+    byteCount?: number;
+
+    /** Whether the byte count is exact or approximate. */
+    byteCountApproximate?: boolean;
+
+    valueTypes?: ValueTypes;
 }
 
 export interface PackageFile {
@@ -42,75 +115,6 @@ export interface PackageFile {
      * before publishing to each registry.
      */
     registries?: RegistryReference[];
-}
-
-/** The JSON Schema Draft 07 compliant schema object, extended with properties that describe
- * how to obtain the data, and details the values of the data properties.
- */
-export interface Schema extends JSONSchema7 {
-    /** An object describing how to access the bytestream(s) of the data */
-    source?: Source;
-
-    /** An object describing how to parse the bytestream(s) into datapm compliant records. */
-    parser?: ParserInfo;
-
-    /** The JSON Schema Draft 07 compliant property list for the object */
-    properties?: { [key: string]: Schema };
-
-    /** The exact or approximate number of records in the data package. For streaming sets, this
-     * is the number of records per period.
-     */
-    recordCount?: number;
-
-    /** The count of records in which this schema object is not present. Note that this does obviously
-     * not apply to the root schema object.
-     */
-    recordsNotPresent?: number;
-
-    /** Whether the recordCount value is exact or approximate. */
-    recordCountApproximate?: boolean;
-
-    /** The exact or approximate number of bytes of data in the values of the data (not including format overhead) */
-    byteCount?: number;
-
-    /** Whether the byte count is exact or approximate. */
-    byteCountApproximate?: boolean;
-
-    valueTypes?: { [key: string]: ValueTypeStatistics };
-}
-
-export interface ParserInfo {
-    mimeType: string;
-
-    configuration?: any;
-}
-
-/** Describes where the data resides, and how to access to byte stream of the data. */
-export interface Source {
-    protocol: Protocol;
-
-    /** An object containing valid JSON properties for the purposes of accessing the data. The schema
-     * of this object is loose because it is up to the source implementation to define it's own schema
-     * configuration.
-     */
-    configuration?: any;
-}
-
-export interface ValueTypeStatistics {
-    valueType: JSONSchema7TypeName | "date";
-    recordCount?: number;
-    stringMaxLength?: number;
-    stringMinLength?: number;
-    numberMaxValue?: number;
-    numberMinValue?: number;
-    dateMaxValue?: Date;
-    dateMinValue?: Date;
-    stringOptions?: { [key: string]: number };
-}
-
-export enum Protocol {
-    Http = "HTTP",
-    LocalFile = "LOCAL_FILE"
 }
 
 export * from "./PackageUtil";

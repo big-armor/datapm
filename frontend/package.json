@@ -35,7 +35,7 @@
         "datapm-lib": "file:../lib",
         "graphql-upload": "^11.0.0",
         "jwt-decode": "^2.2.0",
-        "ngx-toastr": "^13.1.0",
+        "ngx-markdown": "^10.1.1",
         "rxjs": "^6.5.5",
         "stream": "0.0.2",
         "timeago.js": "^4.0.2",

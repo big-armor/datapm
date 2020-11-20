@@ -6,11 +6,14 @@ volumes:
 
 services:
     datapm-registry:
-        image: datapm/datapm-registry
+        image: "datapm/datapm-registry:${DATAPM_VERSION}"
         ports:
             - "4000:4000"
         env_file:
             - Docker-env
+        depends_on:
+            - "postgres"
+            - "smtp"
         volumes:
             - type: volume
               source: registry_file_store

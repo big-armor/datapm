@@ -45,7 +45,7 @@ export class ValidPackageSlugDirective extends SchemaDirectiveVisitor {
     }
 }
 
-export function validateSlug(slug: String | undefined) {
+export function validateSlug(slug: string | undefined) {
     if (slug === undefined) throw new ValidationError(`PACKAGE_SLUG_REQUIRED`);
 
     if (slug.length == 0) throw new ValidationError(`PACKAGE_SLUG_REQUIRED`);
@@ -60,7 +60,7 @@ class PackageSlugConstraint implements ValidationConstraint {
         return "PackageSlug";
     }
 
-    validate(value: String) {
+    validate(value: string) {
         validateSlug(value);
     }
 

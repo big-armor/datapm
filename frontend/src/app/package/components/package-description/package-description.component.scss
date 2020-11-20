@@ -1,0 +1,28 @@
+.package-dark-gray {
+    font-family: Roboto Mono;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 18px;
+    letter-spacing: -0.28px;
+    color: #4f4f4f;
+    margin-bottom: 5px;
+}
+
+.title {
+    font-size: 20px;
+    line-height: 26px;
+    font-weight: 500;
+    letter-spacing: -0.28px;
+    color: #4f4f4f;
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+
+markdown ::ng-deep {
+    p {
+        color: #4f4f4f;
+        font-family: Roboto Mono;
+        font-weight: 300;
+    }
+}

@@ -3,6 +3,7 @@ import { NgModule } from "@angular/core";
 import { HttpClientModule } from "@angular/common/http";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { MarkdownModule } from "ngx-markdown";
 
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
@@ -19,7 +20,8 @@ import { SharedModule } from "./shared/shared.module";
         HttpClientModule,
         ReactiveFormsModule,
         FormsModule,
-        SharedModule
+        SharedModule,
+        MarkdownModule.forRoot()
     ],
     providers: [],
     bootstrap: [AppComponent],
