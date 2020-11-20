@@ -1,6 +1,27 @@
-<div class="container">
+<div class="container" *ngIf="state == State.LOADING">
     <div class="row">
-        <div class="col-lg-9 col-md-12 col-sm-12 mt-5 py-2">
+        <div class="col-12">
+            <div class="loading-spinner loading-pane">
+                <mat-spinner [diameter]="60"></mat-spinner>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container" *ngIf="state == State.ERROR">
+    <div class="row">
+        <div class="col-12 mt-5">
+            <div class="alert-warning alert">
+                There was a problem loading this page. Please refresh your browser. If that doesn't work, please contact
+                support.
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container" *ngIf="state == State.LOADED">
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1 col-md-12 col-sm-12 mt-5 py-2">
             <div class="row big-div-latest mb-3">
                 <div *ngIf="packagesWithModifiedDate.length" class="col-md-12 col-lg-12">
                     <h1 class="h1-title">Recent activity</h1>

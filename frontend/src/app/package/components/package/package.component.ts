@@ -3,18 +3,24 @@ import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
 import { PackageFile } from "datapm-lib";
 import { Subject } from "rxjs";
-import { packageToIdentifier } from "src/app/helpers/IdentifierHelper";
 import { Package } from "src/generated/graphql";
-import { SnackBarService } from "src/app/services/snackBar.service";
-import { PackageService } from "../../services/package.service";
+import { PackageService, PackageResponse } from "../../services/package.service";
 import { takeUntil } from "rxjs/operators";
 
+enum State {
+    LOADING,
+    LOADED,
+    ERROR
+}
 @Component({
     selector: "package",
     templateUrl: "./package.component.html",
     styleUrls: ["./package.component.scss"]
 })
 export class PackageComponent implements OnDestroy {
+    State = State;
+    state = State.LOADING;
+
     public package: Package;
     public packageFile: PackageFile;
 
@@ -33,19 +39,24 @@ export class PackageComponent implements OnDestroy {
         private route: ActivatedRoute,
         private packageService: PackageService,
         private title: Title,
-        private snackBarService: SnackBarService,
         private router: Router
     ) {
-        this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe((p: Package) => {
-            this.package = p;
+        this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe((p: PackageResponse) => {
+            if (!p || p.error) {
+                this.state = State.ERROR;
+                return;
+            }
+            this.package = p.package;
             if (this.package && this.package.latestVersion) {
                 this.packageFile = JSON.parse(this.package.latestVersion.packageFile);
             }
             this.title.setTitle(`${this.package?.displayName} - datapm`);
+            this.state = State.LOADED;
         });
     }
 
     ngOnInit() {
+        this.state = State.LOADING;
         this.catalogSlug = this.route.snapshot.paramMap.get("catalogSlug");
         this.packageSlug = this.route.snapshot.paramMap.get("packageSlug");
         this.packageService.getPackage(this.catalogSlug, this.packageSlug);
@@ -54,27 +65,6 @@ export class PackageComponent implements OnDestroy {
     ngOnDestroy(): void {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
-    }
-
-    get generatedFetchCommand() {
-        return this.package ? "datapm fetch " + packageToIdentifier(this.package.identifier) : "";
-    }
-
-    copyCommand() {
-        const el = document.createElement("textarea");
-        el.value = this.generatedFetchCommand;
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand("copy");
-        document.body.removeChild(el);
-
-        this.snackBarService.openSnackBar("fetch command copied to clipboard!", "");
-    }
-
-    getRecordCount(packageFile) {
-        if (packageFile == null) return "";
-
-        return packageFile.schemas.reduce((a, b) => a + (b.recordCount || 0), 0);
     }
 
     tabClick(url) {

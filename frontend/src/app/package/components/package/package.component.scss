@@ -1,4 +1,24 @@
+::ng-deep .cover {
+    height: 240px;
+}
+
+hr {
+    position: relative;
+    top: -8px;
+}
+
 #packagePage {
+    position: relative;
+    top: -180px;
+}
+
+.contentContainer {
+    border-radius: 4px;
+    box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25);
+    background-color: #fff;
+
+    padding-top: 20px;
+
     ::ng-deep #matTabs .mat-tab-header {
         border-bottom: none;
 
@@ -48,6 +68,9 @@
     margin-bottom: 0px;
     display: flex;
 
+    li:first-of-type > a {
+        margin-left: 0px;
+    }
     li {
         a {
             font-family: Roboto Mono;
@@ -101,7 +124,7 @@
 }
 
 @media (max-width: 576px) {
-    #packagePage {
+    #contentContainer {
         #packageRoutes {
             li {
                 a {
@@ -156,98 +179,56 @@
         }
     }
 }
+
+.package-details {
+    font-family: Roboto Mono;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 10px;
+    line-height: 13px;
+    letter-spacing: -0.28px;
+    color: #828282;
+}
+
+.package-privacy {
+    font-family: Roboto Mono;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 10px;
+    line-height: 13px;
+    letter-spacing: -0.28px;
+    color: #828282;
+
+    &.public {
+        color: #00a896;
+    }
+}
+
+.package-title {
+    font-family: Roboto Mono;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 26px;
+    letter-spacing: -0.28px;
+    color: #4f4f4f;
+    margin-bottom: 5px;
+}
+
+.package-identifier {
+    font-family: Roboto Mono;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 26px;
+    letter-spacing: -0.28px;
+    color: #828282;
+    margin-bottom: 10px;
+}
+
 #packageDetails {
-    padding: 40px 10px;
-
-    .right-div {
-        padding-top: 40px;
-    }
-
     .left-div {
-        padding-right: 86px;
-    }
-
-    .package-details {
-        font-family: Roboto Mono;
-        font-style: normal;
-        font-weight: normal;
-        font-size: 10px;
-        line-height: 13px;
-        letter-spacing: -0.28px;
-        color: #828282;
-    }
-
-    .package-privacy {
-        font-family: Roboto Mono;
-        font-style: normal;
-        font-weight: normal;
-        font-size: 10px;
-        line-height: 13px;
-        letter-spacing: -0.28px;
-        color: #828282;
-
-        &.public {
-            color: #00a896;
-        }
-    }
-
-    .package-title {
-        font-family: Roboto Mono;
-        font-style: normal;
-        font-weight: 500;
-        font-size: 20px;
-        line-height: 26px;
-        letter-spacing: -0.28px;
-        color: #4f4f4f;
-        margin-bottom: 5px;
-    }
-
-    .package-identifier {
-        font-family: Roboto Mono;
-        font-style: normal;
-        font-weight: 400;
-        font-size: 14px;
-        line-height: 26px;
-        letter-spacing: -0.28px;
-        color: #828282;
-        margin-bottom: 10px;
-    }
-
-    .doc-link {
-        font-weight: 300;
-        font-size: 12px;
-        line-height: 18px;
-    }
-
-    .package-light-gray {
-        font-family: Roboto Mono;
-        font-style: normal;
-        font-weight: 300;
-        font-size: 14px;
-        line-height: 18px;
-        letter-spacing: -0.28px;
-        color: #828282;
-        margin-bottom: 5px;
-    }
-
-    .rounded-div {
-        box-shadow: inset 0px -4px 4px rgba(255, 255, 255, 0.25), inset -4px 0px 4px rgba(255, 255, 255, 0.25),
-            inset 4px 0px 4px rgba(183, 183, 183, 0.25), inset 0px 4px 4px rgba(183, 183, 183, 0.25);
-        background-color: #fff;
-        border-radius: 24px;
-        padding: 8px 15px;
-        margin-bottom: 25px;
-        cursor: pointer;
-
-        .install-txt {
-            font-family: Roboto Mono;
-            font-style: normal;
-            font-weight: normal;
-            font-size: 14px;
-            line-height: 18px;
-            letter-spacing: -0.28px;
-            color: #333333;
-        }
+        padding-right: 20px;
     }
 
     .package-actions {
@@ -304,7 +285,17 @@
         }
     }
 
-    #packagePage {
+    #contentContainer {
         padding-bottom: 10px !important;
+    }
+}
+
+@media (max-width: 575px) {
+    ::ng-deep .cover {
+        height: 75px;
+    }
+    #packagePage {
+        position: relative;
+        top: 0px;
     }
 }

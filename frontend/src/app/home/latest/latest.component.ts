@@ -7,18 +7,26 @@ class PackageWithModifiedDate {
     lastActivityLabel: string;
 }
 
+enum State {
+    LOADED,
+    LOADING,
+    ERROR
+}
 @Component({
     selector: "latest",
     templateUrl: "./latest.component.html",
     styleUrls: ["./latest.component.scss"]
 })
 export class LatestComponent implements OnInit {
+    State = State;
+    state = State.LOADING;
     public isFavorite = false;
     public packagesWithModifiedDate: PackageWithModifiedDate[] = [];
 
     constructor(private latestPackages: GetLatestPackagesGQL) {}
 
     public ngOnInit(): void {
+        this.state = State.LOADING;
         this.loadLatestPackages();
     }
 
@@ -28,6 +36,11 @@ export class LatestComponent implements OnInit {
 
     private loadLatestPackages(): void {
         this.latestPackages.fetch({ offset: 0, limit: 5 }).subscribe((a) => {
+            if (a.errors) {
+                this.state = State.ERROR;
+                return;
+            }
+
             const dateNow = new Date();
             this.packagesWithModifiedDate = a.data.latestPackages.packages.map((p) => {
                 const changeDates = this.getLastChangedDates(p);
@@ -40,6 +53,7 @@ export class LatestComponent implements OnInit {
                     )
                 };
             });
+            this.state = State.LOADED;
         });
     }
 
