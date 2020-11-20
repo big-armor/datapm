@@ -15,7 +15,7 @@ export class PackageVersionComponent {
 
     constructor(private packageService: PackageService) {
         this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe((p: PackageResponse) => {
-            if (p.error) return;
+            if (p == null || p.error) return;
             this.package = p.package;
         });
     }
