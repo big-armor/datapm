@@ -52,12 +52,3 @@ TypeORM is used to interact with the database and perform migrations. See [TypeO
 
     1. `npx typeorm migration:create -n CamelCaseMigrationName`
         - This will create a Typescript file with scaffolding to write your own migration
-
-1. Run a Migration
-
-    - `RUN_MIGRATION=true npx ts-node ./node_modules/typeorm/cli.js migration:run`
-    - or `./migrate.sh`
-
-1. Revert a Migration
-
-    - `RUN_MIGRATION=true npx ts-node ./node_modules/typeorm/cli.js migration:revert`
