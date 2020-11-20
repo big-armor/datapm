@@ -73,7 +73,7 @@ jobs:
 
             - name: Install Lib Dependencies
               id: install-lib-Dependencies
-              if: steps.cache-lib-all-files.outputs.cache-hit != 'true' && steps.cache-lib-node-modules.outputs.cache-hit != 'true'
+              if: steps.cache-lib-all-files.outputs.cache-hit != 'true' || steps.cache-lib-node-modules.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: lib
 
@@ -100,7 +100,7 @@ jobs:
 
             - name: Install Backend Dependencies
               id: install-backend-Dependencies
-              if: steps.cache-backend-all-files.outputs.cache-hit != 'true' && steps.cache-backend-node-modules.outputs.cache-hit != 'true'
+              if: steps.cache-backend-all-files.outputs.cache-hit != 'true' || steps.cache-backend-node-modules.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: backend
 
@@ -127,7 +127,7 @@ jobs:
 
             - name: Install Frontend Dependencies
               id: install-fronend-dependencies
-              if: steps.cache-frontend-all-files.outputs.cache-hit != 'true' && steps.cache-frontend-node-modules.outputs.cache-hit != 'true'
+              if: steps.cache-frontend-all-files.outputs.cache-hit != 'true' || steps.cache-frontend-node-modules.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: frontend
 
