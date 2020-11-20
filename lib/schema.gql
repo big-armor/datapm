@@ -397,6 +397,11 @@ input UpdateCollectionInput {
     isPublic: Boolean
 }
 
+input RecoverMyPasswordInput {
+    emailAddress: String! @validEmailAddress
+    token: String!
+    newPassword: String! @validPassword
+}
 type Query {
     """
     Whether the specified username is available for sign up
@@ -509,6 +514,16 @@ type Mutation {
     Updates the logged in users' password
     """
     updateMyPassword(value: UpdateMyPasswordInput!): Void @isAuthenticated
+
+    """
+    Sends email to user if password is forgotten
+    """
+    forgotMyPassword(emailAddress: String! @validEmailAddress): Void
+
+    """
+    Sends email to user to update their password with token
+    """
+    recoverMyPassword(value: RecoverMyPasswordInput!): Void
 
     """
     Updates the avatar image of the authenticated user
