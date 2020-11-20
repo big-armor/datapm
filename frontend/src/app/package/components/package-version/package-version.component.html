@@ -1,0 +1,13 @@
+<div class="pt-3 pb-5">
+    <table style="width: 100%">
+        <tbody>
+            <tr>
+                <td class="package-light-gray">schema version history</td>
+            </tr>
+            <tr *ngFor="let version of package?.versions">
+                <td class="package-dark-gray">{{ version.identifier | version }}</td>
+                <td class="package-dark-gray">{{ version.createdAt | timeAgo }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

@@ -1,10 +1,11 @@
 import { NgModule } from "@angular/core";
 import { Routes, RouterModule } from "@angular/router";
 
-import { PackageComponent } from "./package/package.component";
-import { PackageDetailComponent } from "./package-detail/package-detail.component";
-import { PackageSchemaComponent } from "./package-schema/package-schema.component";
-import { PackageVersionComponent } from "./package-version/package-version.component";
+import { PackageComponent } from "./components/package/package.component";
+import { PackageDescriptionComponent } from "./components/package-description/package-description.component";
+import { PackageSchemaComponent } from "./components/package-schema/package-schema.component";
+import { PackageVersionComponent } from "./components/package-version/package-version.component";
+import { PackageResolverService } from "./services/package-resolver.service";
 
 const routes: Routes = [
     {
@@ -12,8 +13,8 @@ const routes: Routes = [
         component: PackageComponent,
         children: [
             {
-                path: "details",
-                component: PackageDetailComponent
+                path: "description",
+                component: PackageDescriptionComponent
             },
             {
                 path: "version",
@@ -25,7 +26,7 @@ const routes: Routes = [
             },
             {
                 path: "**",
-                redirectTo: "details"
+                redirectTo: "description"
             }
         ]
     }
