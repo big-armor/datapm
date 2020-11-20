@@ -37,12 +37,20 @@ export class GoogleCloudStorage implements DPMStorage {
     public async deleteItem(namespace: string, itemId: string) {
         this.ensureConnectionEstablished();
         const file = await this.getBucketFile(namespace, itemId);
+
+        const fileExists = await file.exists();
+        if (!fileExists[0]) throw new Error(StorageErrors.FILE_DOES_NOT_EXIST.toString());
+
         await file.delete();
     }
 
     public async getItem(namespace: string, itemId: string): Promise<Readable> {
         this.ensureConnectionEstablished();
         const file = await this.getBucketFile(namespace, itemId);
+
+        const fileExists = await file.exists();
+        if (!fileExists[0]) throw new Error(StorageErrors.FILE_DOES_NOT_EXIST.toString());
+
         const fileReadStream = file.createReadStream();
         this.streamHelper.registerReadStream(fileReadStream);
         return Promise.resolve(fileReadStream);
@@ -63,8 +71,6 @@ export class GoogleCloudStorage implements DPMStorage {
         const filePath = this.buildPath(namespace, itemId);
 
         const file = this.bucket.file(filePath);
-        const fileExists = await file.exists();
-        if (!fileExists[0]) throw new Error(StorageErrors.FILE_DOES_NOT_EXIST.toString());
 
         return file;
     }
