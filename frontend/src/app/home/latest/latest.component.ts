@@ -35,26 +35,31 @@ export class LatestComponent implements OnInit {
     }
 
     private loadLatestPackages(): void {
-        this.latestPackages.fetch({ offset: 0, limit: 5 }).subscribe((response) => {
-            if (response.errors) {
-                this.state = State.ERROR;
-                return;
-            }
+        this.latestPackages.fetch({ offset: 0, limit: 5 }).subscribe(
+            (response) => {
+                if (response.errors) {
+                    this.state = State.ERROR;
+                    return;
+                }
 
-            const dateNow = new Date();
-            this.packagesWithModifiedDate = response.data.latestPackages.packages.map((p) => {
-                const changeDates = this.getLastChangedDates(p);
-                return {
-                    package: p,
-                    lastActivityLabel: this.getUpdatedDateLabel(
-                        new Date(changeDates.createdAt),
-                        new Date(changeDates.updatedAt),
-                        dateNow
-                    )
-                };
-            });
-            this.state = State.LOADED;
-        });
+                const dateNow = new Date();
+                this.packagesWithModifiedDate = response.data.latestPackages.packages.map((p) => {
+                    const changeDates = this.getLastChangedDates(p);
+                    return {
+                        package: p,
+                        lastActivityLabel: this.getUpdatedDateLabel(
+                            new Date(changeDates.createdAt),
+                            new Date(changeDates.updatedAt),
+                            dateNow
+                        )
+                    };
+                });
+                this.state = State.LOADED;
+            },
+            (error) => {
+                this.state = State.ERROR;
+            }
+        );
     }
 
     private getLastChangedDates(pkg: any): { createdAt: Date; updatedAt: Date } {

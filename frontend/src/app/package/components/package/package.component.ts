@@ -41,18 +41,23 @@ export class PackageComponent implements OnDestroy {
         private title: Title,
         private router: Router
     ) {
-        this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe((p: PackageResponse) => {
-            if (!p || p.error) {
+        this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe(
+            (p: PackageResponse) => {
+                if (!p || p.error) {
+                    this.state = State.ERROR;
+                    return;
+                }
+                this.package = p.package;
+                if (this.package && this.package.latestVersion) {
+                    this.packageFile = JSON.parse(this.package.latestVersion.packageFile);
+                }
+                this.title.setTitle(`${this.package?.displayName} - datapm`);
+                this.state = State.LOADED;
+            },
+            (error) => {
                 this.state = State.ERROR;
-                return;
             }
-            this.package = p.package;
-            if (this.package && this.package.latestVersion) {
-                this.packageFile = JSON.parse(this.package.latestVersion.packageFile);
-            }
-            this.title.setTitle(`${this.package?.displayName} - datapm`);
-            this.state = State.LOADED;
-        });
+        );
     }
 
     ngOnInit() {
