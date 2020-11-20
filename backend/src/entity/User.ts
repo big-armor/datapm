@@ -89,4 +89,12 @@ export class User extends BaseModel {
     /** Whether the user has completed email verification. */
     @Column({ nullable: false, default: false, name: "email_verified" })
     emailVerified: boolean;
+
+    /** Unique token to allow for password recovery. */
+    @Column({ nullable: true, name: "password_recovery_token" })
+    passwordRecoveryToken: string;
+
+    /** The date on which the passwordRecoveryToken was created */
+    @Column({ nullable: true, name: "password_recovery_token_date" })
+    passwordRecoveryTokenDate: Date;
 }
