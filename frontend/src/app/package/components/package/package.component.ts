@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from "@angular/core";
 import { Title } from "@angular/platform-browser";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { PackageFile } from "datapm-lib";
 import { Subject } from "rxjs";
 import { packageToIdentifier } from "src/app/helpers/IdentifierHelper";
@@ -21,16 +21,20 @@ export class PackageComponent implements OnDestroy {
     private unsubscribe$ = new Subject();
 
     public readonly routes = [
-        { linkName: "description", url: "description" },
+        { linkName: "description", url: "" },
         { linkName: "schema", url: "schema" },
         { linkName: "version", url: "version" }
     ];
+
+    private catalogSlug = "";
+    private packageSlug = "";
 
     constructor(
         private route: ActivatedRoute,
         private packageService: PackageService,
         private title: Title,
-        private snackBarService: SnackBarService
+        private snackBarService: SnackBarService,
+        private router: Router
     ) {
         this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe((p: Package) => {
             this.package = p;
@@ -42,9 +46,9 @@ export class PackageComponent implements OnDestroy {
     }
 
     ngOnInit() {
-        const catalogSlug = this.route.snapshot.paramMap.get("catalogSlug");
-        const packageSlug = this.route.snapshot.paramMap.get("packageSlug");
-        this.packageService.getPackage(catalogSlug, packageSlug);
+        this.catalogSlug = this.route.snapshot.paramMap.get("catalogSlug");
+        this.packageSlug = this.route.snapshot.paramMap.get("packageSlug");
+        this.packageService.getPackage(this.catalogSlug, this.packageSlug);
     }
 
     ngOnDestroy(): void {
@@ -71,5 +75,19 @@ export class PackageComponent implements OnDestroy {
         if (packageFile == null) return "";
 
         return packageFile.schemas.reduce((a, b) => a + (b.recordCount || 0), 0);
+    }
+
+    tabClick(url) {
+        let route = this.catalogSlug + "/" + this.packageSlug + "/" + url;
+        if (url == "") route = this.catalogSlug + "/" + this.packageSlug;
+
+        this.router.navigate([route]);
+    }
+
+    isActiveTab(route) {
+        const activeRouteParts = this.router.url.split("/");
+
+        if (activeRouteParts.length == 3) return route.url == "";
+        return activeRouteParts[3] == route.url;
     }
 }

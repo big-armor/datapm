@@ -13,7 +13,7 @@ const routes: Routes = [
         component: PackageComponent,
         children: [
             {
-                path: "description",
+                path: "",
                 component: PackageDescriptionComponent
             },
             {

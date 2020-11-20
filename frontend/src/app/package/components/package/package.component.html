@@ -4,7 +4,7 @@
         <div class="col-md-12 no-pd-mobile">
             <ul class="p-0" id="packageRoutes">
                 <li *ngFor="let r of routes" class="list-names">
-                    <a class="cursor-pointer" [routerLink]="r.url" routerLinkActive="active">
+                    <a class="cursor-pointer" (click)="tabClick(r.url)" [ngClass]="{ active: isActiveTab(r) }">
                         {{ r.linkName }}
                     </a>
                 </li>
