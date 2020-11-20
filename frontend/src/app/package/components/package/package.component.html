@@ -1,108 +1,89 @@
-<hr style="width: 100%" class="header-border" />
-<div class="container pb-5" id="packagePage">
-    <div class="row" *ngIf="package">
-        <div class="col-md-12 no-pd-mobile">
-            <ul class="p-0" id="packageRoutes">
-                <li *ngFor="let r of routes" class="list-names">
-                    <a class="cursor-pointer" [routerLink]="r.url" routerLinkActive="active">
-                        {{ r.linkName }}
-                    </a>
-                </li>
-            </ul>
+<div *ngIf="state == State.LOADING">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="loading-spinner loading-pane">
+                    <mat-spinner class="" [diameter]="60"></mat-spinner>
+                </div>
+            </div>
         </div>
-        <div class="col-lg-12">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-11 col-md-12" id="packageDetails">
-                        <div class="row flex-lg-row-reverse">
-                            <div class="col-lg-5 col-md-12 col-lg-push-7 right-div">
-                                <div class="d-lg-none">
-                                    <div class="d-flex bd-highlight mb-3">
-                                        <div
-                                            class="py-2 bd-highlight package-privacy"
-                                            [class.public]="package?.isPublic"
-                                        >
-                                            {{ package?.isPublic ? "public" : "not public" }}
-                                        </div>
-                                    </div>
-                                    <div class="package-info">
-                                        <div class="package-title">{{ package?.displayName }}</div>
-                                        <div class="package-identifier">
-                                            {{ package?.identifier.catalogSlug }}/{{ package?.identifier.packageSlug }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <div class="package-light-gray">Fetch This Data</div>
-                                    <a
-                                        class="doc-link"
-                                        href="/docs/command-line-client/#install-the-datapm-command-line-client"
-                                    >
-                                        How to install datapm client
-                                    </a>
-                                </div>
-                                <div class="rounded-div" (click)="copyCommand()">
-                                    <span class="install-txt">> {{ generatedFetchCommand }}</span>
-                                </div>
+    </div>
+</div>
+<div class="container" *ngIf="state == State.ERROR">
+    <div class="row">
+        <div class="col-12 mt-5">
+            <div class="alert-warning alert">
+                There was a problem loading this page. Please refresh your browser. If that doesn't work, please contact
+                support.
+            </div>
+        </div>
+    </div>
+</div>
+<div *ngIf="state == State.LOADED">
+    <app-cover [user]="currentUser"></app-cover>
 
-                                <!-- <div class="package-actions py-2">
-                                    <div class="d-flex bd-highlight py-2">
-                                        <div class="bd-highlight mr-4 d-flex align-items-center">
-                                            <button mat-fab class="person-menu" aria-label="Example icon button with a delete icon">
-                                                <mat-icon>star_border</mat-icon>
-                                            </button>
-                                            <span class="px-2 content-nr">47</span>
-                                        </div>
-                                        <div class="bd-highlight d-flex align-items-center">
-                                            <button mat-fab class="person-menu" aria-label="Example icon button with a delete icon">
-                                                <mat-icon>collections</mat-icon>
-                                            </button>
-                                            <span class="px-2 content-nr">add to collection</span>
-                                        </div>
-                                    </div>
-                                </div> -->
+    <div class="container pl-2">
+        <div class="row" id="packagePage">
+            <div class="col-xl-10 offset-xl-1 col-12 contentContainer">
+                <div class="row" *ngIf="package">
+                    <div class="col-12 package-info">
+                        <div class="package-title">{{ package?.displayName }}</div>
+                        <div class="package-identifier">
+                            {{ package?.identifier.catalogSlug }}/{{ package?.identifier.packageSlug }}
+                        </div>
+                    </div>
 
-                                <div class="row p-2">
-                                    <div class="col-lg-6 col-md-6 col-sm-6 mb-4">
-                                        <p class="package-light-gray">version</p>
-                                        <p class="package-dark-gray">
-                                            {{ package?.latestVersion.identifier | version }}
-                                        </p>
+                    <div class="col-12 mb-3">
+                        <div class="py-2 package-privacy" [class.public]="package?.isPublic">
+                            {{ package?.isPublic ? "public" : "not public" }}
+                        </div>
+                    </div>
+                </div>
+                <div class="row d-lg-none">
+                    <div class="col-12">
+                        <app-package-info [package]="package" [packageFile]="packageFile"></app-package-info>
+                    </div>
+                </div>
+                <div class="row" *ngIf="package?.latestVersion?.identifier == null">
+                    <div class="col-12 alert alert-warning">
+                        No version of this package has been published. Therefore it is not available to fetch. Please
+                        contact the author, or check back later.
+                    </div>
+                </div>
+
+                <div class="row" *ngIf="package?.latestVersion?.identifier != null">
+                    <div class="col-md-12 no-pd-mobile">
+                        <ul class="p-0" id="packageRoutes">
+                            <li *ngFor="let r of routes" class="list-names">
+                                <a
+                                    class="cursor-pointer"
+                                    (click)="tabClick(r.url)"
+                                    [ngClass]="{ active: isActiveTab(r) }"
+                                >
+                                    {{ r.linkName }}
+                                </a>
+                            </li>
+                        </ul>
+                        <hr style="width: 100%" />
+                    </div>
+                </div>
+                <div class="row" *ngIf="package?.latestVersion?.identifier != null">
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-md-12" id="packageDetails">
+                                <div class="row flex-lg-row-reverse">
+                                    <div class="col-lg-5 col-md-12 col-lg-push-7 right-div d-none d-lg-block">
+                                        <app-package-info
+                                            [package]="package"
+                                            [packageFile]="packageFile"
+                                        ></app-package-info>
                                     </div>
-                                    <div class="col-lg-6 col-md-6 col-sm-6 mb-4">
-                                        <p class="package-light-gray">record count</p>
-                                        <p class="package-dark-gray">{{ getRecordCount(packageFile) | number }}</p>
-                                    </div>
-                                    <div class="col-lg-6 col-md-6 col-sm-6 mb-4">
-                                        <p class="package-light-gray">schema last updated</p>
-                                        <p class="package-dark-gray">
-                                            {{ package?.latestVersion?.createdAt | timeAgo }}
-                                        </p>
-                                    </div>
-                                    <div class="col-lg-6 col-md-6 col-sm-6 mb-4">
-                                        <p class="package-light-gray">unpacked size</p>
-                                        <p class="package-dark-gray">{{ packageFile?.schemas | packageSize }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-7 col-md-12 col-lg-pull-5 left-div">
-                                <div class="d-sm-none d-lg-block">
-                                    <div class="d-flex bd-highlight mb-3">
-                                        <div
-                                            class="py-2 bd-highlight package-privacy"
-                                            [class.public]="package?.isPublic"
-                                        >
-                                            {{ package?.isPublic ? "public" : "not public" }}
+                                    <div class="col-lg-7 col-md-12 col-lg-pull-5 left-div">
+                                        <div>
+                                            <router-outlet></router-outlet>
                                         </div>
                                     </div>
-                                    <div class="package-info">
-                                        <div class="package-title">{{ package?.displayName }}</div>
-                                        <div class="package-identifier">
-                                            {{ package?.identifier.catalogSlug }}/{{ package?.identifier.packageSlug }}
-                                        </div>
-                                    </div>
                                 </div>
-                                <router-outlet></router-outlet>
                             </div>
                         </div>
                     </div>
@@ -110,7 +91,4 @@
             </div>
         </div>
     </div>
-    <ng-template #loading>
-        <mat-spinner [diameter]="60"></mat-spinner>
-    </ng-template>
 </div>

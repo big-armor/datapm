@@ -20,6 +20,20 @@ body {
     font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
+.mat-spinner circle {
+    stroke: #828282 !important;
+}
+
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.loading-pane {
+    min-height: 500px;
+    padding-top: 50px;
+}
+
 .mat-menu-content:not(:empty) {
     padding-top: 0px !important;
     padding-bottom: 0px !important;
