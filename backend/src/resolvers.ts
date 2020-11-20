@@ -67,7 +67,9 @@ import {
     emailAddressAvailable,
     usernameAvailable,
     updateMe,
-    updateMyPassword
+    updateMyPassword,
+    forgotMyPassword,
+    recoverMyPassword
 } from "./resolvers/UserResolver";
 import { createAPIKey, deleteAPIKey } from "./resolvers/ApiKeyResolver";
 import { Collection } from "./entity/Collection";
@@ -561,6 +563,9 @@ export const resolvers: {
         createMe: createMe,
         updateMe: updateMe,
         updateMyPassword: updateMyPassword,
+        forgotMyPassword: forgotMyPassword,
+        recoverMyPassword: recoverMyPassword,
+
         setMyCoverImage: setMyCoverImage,
         setMyAvatarImage: setMyAvatarImage,
         deleteMe: deleteMe,
