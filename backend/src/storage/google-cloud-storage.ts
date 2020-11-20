@@ -61,9 +61,10 @@ export class GoogleCloudStorage implements DPMStorage {
 
     private async getBucketFile(namespace: string, itemId: string): Promise<File> {
         const filePath = this.buildPath(namespace, itemId);
-        const file = this.bucket.file(filePath);
 
-        if (!(await file.exists())) throw new Error(StorageErrors.FILE_DOES_NOT_EXIST.toString());
+        const file = this.bucket.file(filePath);
+        const fileExists = await file.exists();
+        if (!fileExists[0]) throw new Error(StorageErrors.FILE_DOES_NOT_EXIST.toString());
 
         return file;
     }
