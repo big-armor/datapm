@@ -20,6 +20,7 @@
         "@types/chai": "^4.2.14",
         "@types/json-schema": "^7.0.5",
         "@types/mocha": "^8.0.4",
+        "@types/node": "^12.19.0",
         "@types/semver": "^7.3.4",
         "chai": "^4.2.0",
         "gqlint": "^1.8.0",
