@@ -182,7 +182,7 @@ type Version {
     updatedAt: Date!
     package: Package!
     author: User!
-    packageFile: PackageFileJSON
+    packageFile: PackageFileJSON!
 }
 
 """

@@ -41,4 +41,6 @@ export class Version extends BaseModel {
     description: string;
 
     identifier: VersionIdentifier;
+
+    packageFile: string;
 }

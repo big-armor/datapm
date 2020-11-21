@@ -393,9 +393,7 @@ export const resolvers: {
                 });
             } catch (error) {
                 if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) {
-                    console.error("A request package file was not found. This is VERY BAD!");
-                    console.error(JSON.stringify(error));
-                    return;
+                    throw new Error("PACKAGE_FILE_NOT_FOUND");
                 }
 
                 throw error;
