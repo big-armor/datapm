@@ -104,11 +104,17 @@ export interface PackageFile {
     /** The date and time of the latest update to this package file, not the data its self. */
     updatedDate: Date;
 
-    /** A relative file reference to the location of the README.md that is published with the package file. */
+    /** A relative file reference to the location of the README.md that is published with the package file. This is generally ignored by the registry server, and only used by the client to fill the readmeMarkdown contents. */
     readmeFile?: string;
 
-    /** A relative file reference to the locaiton of the LICENSE.md file that is published iwth the package file. */
+    /** The contents of the readme file */
+    readmeMarkdown?: string;
+
+    /** A relative file reference to the locaiton of the LICENSE.md file that is published iwth the package file.  This is generally ignored by the registry server, and only used by the client to fill the licenseMarkdown contents. */
     licenseFile?: string;
+
+    /** The contents of the license file */
+    licenseMarkdown?: string;
 
     /** The list of registries, and catalogs, to which this package file should be published. This field is used by
      * the local client to determine where to publish. The client will remove private and local registry references

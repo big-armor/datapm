@@ -15,8 +15,6 @@ query MyPackages($offset: Int!, $limit: Int!) {
                     versionPatch
                 }
                 packageFile
-                readmeFile
-                licenseFile
             }
         }
         hasMore

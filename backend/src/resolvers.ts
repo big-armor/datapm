@@ -400,56 +400,6 @@ export const resolvers: {
 
                 throw error;
             }
-        },
-        readmeFile: async (parent: any, _1: any, context: AuthenticatedContext) => {
-            const version = parent as Version;
-            const packageEntity = await context.connection
-                .getRepository(Package)
-                .findOneOrFail({ id: version.packageId });
-
-            const catalog = await context.connection
-                .getRepository(Catalog)
-                .findOneOrFail({ id: packageEntity.catalogId });
-            try {
-                return await PackageFileStorageService.INSTANCE.readReadmeFile({
-                    catalogSlug: catalog.slug,
-                    packageSlug: packageEntity.slug,
-                    versionMajor: version.majorVersion,
-                    versionMinor: version.minorVersion,
-                    versionPatch: version.patchVersion
-                });
-            } catch (error) {
-                if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) {
-                    return null;
-                }
-
-                throw error;
-            }
-        },
-        licenseFile: async (parent: any, _1: any, context: AuthenticatedContext) => {
-            const version = parent as Version;
-            const packageEntity = await context.connection
-                .getRepository(Package)
-                .findOneOrFail({ id: version.packageId });
-
-            const catalog = await context.connection
-                .getRepository(Catalog)
-                .findOneOrFail({ id: packageEntity.catalogId });
-            try {
-                return await PackageFileStorageService.INSTANCE.readLicenseFile({
-                    catalogSlug: catalog.slug,
-                    packageSlug: packageEntity.slug,
-                    versionMajor: version.majorVersion,
-                    versionMinor: version.minorVersion,
-                    versionPatch: version.patchVersion
-                });
-            } catch (error) {
-                if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) {
-                    return null;
-                }
-
-                throw error;
-            }
         }
     },
 
@@ -714,13 +664,7 @@ export const resolvers: {
 
                 await transaction
                     .getCustomRepository(PackageRepository)
-                    .updatePackageReadmeVectors(identifier, value.readmeFile);
-
-                if (value.readmeFile)
-                    await PackageFileStorageService.INSTANCE.writeReadmeFile(versionIdentifier, value.readmeFile);
-
-                if (value.licenseFile)
-                    await PackageFileStorageService.INSTANCE.writeLicenseFile(versionIdentifier, value.licenseFile);
+                    .updatePackageReadmeVectors(identifier, newPackageFile.readmeMarkdown);
 
                 if (value.packageFile)
                     await PackageFileStorageService.INSTANCE.writePackageFile(versionIdentifier, value.packageFile);

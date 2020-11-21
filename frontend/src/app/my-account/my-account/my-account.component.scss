@@ -1,8 +1,5 @@
-.cover-image {
+::ng-deep .cover {
     height: 240px;
-    object-fit: cover;
-    background-size: 100%;
-    background-repeat: no-repeat;
 }
 
 #userProfile {

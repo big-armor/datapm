@@ -4,6 +4,8 @@
     "displayName": "Congressional Legislators",
     "packageSlug": "congressional-legislators",
     "version": "1.0.0",
+    "readmeFile": "congressional-legislators.README.md",
+    "licenseFile": "congressional-legislators.LICENSE.md",
     "description": "Congressional legislators as provided by the theunitedstates.io",
     "schemas": [
         {

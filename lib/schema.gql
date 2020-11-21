@@ -183,8 +183,6 @@ type Version {
     package: Package!
     author: User!
     packageFile: PackageFileJSON
-    readmeFile: String
-    licenseFile: String
 }
 
 """
@@ -374,8 +372,6 @@ To create a new package version, submit a valid package file
 """
 input CreateVersionInput {
     packageFile: PackageFileJSON
-    licenseFile: String
-    readmeFile: String
 }
 
 """

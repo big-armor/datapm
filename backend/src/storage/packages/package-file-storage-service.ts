@@ -16,26 +16,6 @@ export class PackageFileStorageService {
     public static readonly INSTANCE = new PackageFileStorageService();
     private fileStorageService = FileStorageService.INSTANCE;
 
-    public async readLicenseFile(identifier: VersionIdentifierInput): Promise<string> {
-        const stream = await this.fileStorageService.readFile(
-            this.versionIdentifierPath(identifier),
-            FileType.LICENSE_FILE
-        );
-
-        const stringValue = await this.streamToString(stream);
-        return stringValue;
-    }
-
-    public async readReadmeFile(identifier: VersionIdentifierInput): Promise<string> {
-        const stream = await this.fileStorageService.readFile(
-            this.versionIdentifierPath(identifier),
-            FileType.README_FILE
-        );
-
-        const stringValue = await this.streamToString(stream);
-        return stringValue;
-    }
-
     public async readPackageFile(identifier: VersionIdentifierInput): Promise<PackageFile> {
         const stream = await this.fileStorageService.readFile(
             this.versionIdentifierPath(identifier),
@@ -48,22 +28,6 @@ export class PackageFileStorageService {
         return packageFile;
     }
 
-    public writeReadmeFile(identifier: VersionIdentifierInput, contents: string): Promise<void> {
-        return this.fileStorageService.writeFileFromString(
-            this.versionIdentifierPath(identifier),
-            FileType.README_FILE,
-            contents
-        );
-    }
-
-    public writeLicenseFile(identifier: VersionIdentifierInput, contents: string): Promise<void> {
-        return this.fileStorageService.writeFileFromString(
-            this.versionIdentifierPath(identifier),
-            FileType.LICENSE_FILE,
-            contents
-        );
-    }
-
     public writePackageFile(identifier: VersionIdentifierInput, packageFile: PackageFile): Promise<void> {
         const valueString = JSON.stringify(packageFile);
 
@@ -72,14 +36,6 @@ export class PackageFileStorageService {
             FileType.PACKAGE_FILE,
             valueString
         );
-    }
-
-    deleteLicenseFile(identifier: VersionIdentifierInput) {
-        return this.fileStorageService.deleteFile(this.versionIdentifierPath(identifier), FileType.LICENSE_FILE);
-    }
-
-    deleteReadmeFile(identifier: VersionIdentifierInput) {
-        return this.fileStorageService.deleteFile(this.versionIdentifierPath(identifier), FileType.README_FILE);
     }
 
     deletePackageFile(identifier: VersionIdentifierInput) {

@@ -1,5 +1,7 @@
 import { SemVer } from "semver";
 import { Schema, PackageFile } from "./main";
+import fs from "fs";
+import path from "path";
 
 export type DPMRecordValue = number | string | boolean | null;
 export type DPMRecord = Record<string, DPMRecordValue>;
@@ -26,7 +28,11 @@ export enum DifferenceType {
     CHANGE_PROPERTY_DESCRIPTION = "CHANGE_PROPERTY_DESCRIPTION",
     CHANGE_GENERATED_BY = "CHANGE_GENERATED_BY",
     CHANGE_UPDATED_DATE = "CHANGE_UPDATED_DATE",
-    CHANGE_VERSION = "CHANGE_VERSION"
+    CHANGE_VERSION = "CHANGE_VERSION",
+    CHANGE_README_MARKDOWN = "CHANGE_README_MARKDOWN",
+    CHANGE_LICENSE_MARKDOWN = "CHANGE_LICENSE_MARKDOWN",
+    CHANGE_README_FILE = "CHANGE_README_FILE",
+    CHANGE_LICENSE_FILE = "CHANGE_LICENSE_FILE"
 }
 export interface Difference {
     type: DifferenceType;
@@ -62,6 +68,41 @@ export function comparePackages(packageA: PackageFile, packageB: PackageFile): D
             type: DifferenceType.CHANGE_PACKAGE_DISPLAY_NAME,
             pointer: "#"
         });
+
+    if (packageA.version !== packageB.version) {
+        response.push({
+            type: DifferenceType.CHANGE_VERSION,
+            pointer: "#"
+        });
+    }
+
+    if (packageA.readmeFile !== packageB.readmeFile) {
+        response.push({
+            type: DifferenceType.CHANGE_README_FILE,
+            pointer: "#"
+        });
+    }
+
+    if (packageA.readmeMarkdown !== packageB.readmeMarkdown) {
+        response.push({
+            type: DifferenceType.CHANGE_README_MARKDOWN,
+            pointer: "#"
+        });
+    }
+
+    if (packageA.licenseFile !== packageB.licenseFile) {
+        response.push({
+            type: DifferenceType.CHANGE_LICENSE_FILE,
+            pointer: "#"
+        });
+    }
+
+    if (packageA.licenseMarkdown !== packageB.licenseMarkdown) {
+        response.push({
+            type: DifferenceType.CHANGE_LICENSE_MARKDOWN,
+            pointer: "#"
+        });
+    }
 
     if (packageA.generatedBy !== packageB.generatedBy)
         response.push({ type: DifferenceType.CHANGE_GENERATED_BY, pointer: "#" });
@@ -257,12 +298,16 @@ export function diffCompatibility(diffs: Difference[]): Compability {
             case DifferenceType.CHANGE_PARSER:
             case DifferenceType.CHANGE_PROPERTY_DESCRIPTION:
             case DifferenceType.CHANGE_SOURCE:
+            case DifferenceType.CHANGE_README_MARKDOWN:
+            case DifferenceType.CHANGE_LICENSE_MARKDOWN:
+            case DifferenceType.CHANGE_VERSION: // this just requires that the number be at least one minor version greater, it doesn't return the actual difference
                 returnValue = Math.max(returnValue, Compability.MinorChange);
                 break;
 
-            case DifferenceType.CHANGE_VERSION:
             case DifferenceType.CHANGE_GENERATED_BY:
             case DifferenceType.CHANGE_UPDATED_DATE:
+            case DifferenceType.CHANGE_README_FILE:
+            case DifferenceType.CHANGE_LICENSE_FILE:
                 // nothing to do
                 break;
 
@@ -328,12 +373,57 @@ export function validatePackageSlug(slug: string | undefined): boolean {
     return !!slug.match(regExp);
 }
 
-export function parsePackageFileJSON(packageFileString: string): PackageFile {
-    const packageFile = JSON.parse(packageFileString, (key, value) => {
-        if (key !== "updatedDate") return value;
+export function loadPackageFileFromDisk(packageFilePath: string): PackageFile {
+    if (!fs.existsSync(packageFilePath)) throw new Error("FILE_NOT_FOUND");
 
-        return new Date(Date.parse(value));
-    }) as PackageFile;
+    let packageFileAbsolutePath;
+    if (path.isAbsolute(packageFilePath)) {
+        packageFileAbsolutePath = path.dirname(packageFilePath);
+    } else {
+        packageFileAbsolutePath = process.cwd() + path.sep + path.dirname(packageFilePath);
+    }
+
+    let packageFile;
+
+    try {
+        const packageFileContents = fs.readFileSync(packageFilePath).toString();
+        packageFile = parsePackageFileJSON(packageFileContents);
+    } catch (error) {
+        throw new Error("PACKAGE_PARSE_ERROR: " + error.message);
+    }
+
+    if (packageFile.readmeFile != null) {
+        const readmeFileAbsolutePath = packageFileAbsolutePath + path.sep + packageFile.readmeFile;
+
+        if (!fs.existsSync(readmeFileAbsolutePath)) {
+            throw new Error("README_FILE_NOT_FOUND: " + readmeFileAbsolutePath);
+        }
+
+        packageFile.readmeMarkdown = fs.readFileSync(readmeFileAbsolutePath).toString();
+    }
+
+    if (packageFile.licenseFile != null) {
+        const licenseFileAbsolutePath = packageFileAbsolutePath + path.sep + packageFile.licenseFile;
+
+        if (!fs.existsSync(licenseFileAbsolutePath)) {
+            throw new Error("LICENSE_FILE_NOT_FOUND: " + licenseFileAbsolutePath);
+        }
+
+        packageFile.licenseMarkdown = fs.readFileSync(licenseFileAbsolutePath).toString();
+    }
 
     return packageFile;
+}
+
+export function parsePackageFileJSON(packageFileString: string): PackageFile {
+    try {
+        const packageFile = JSON.parse(packageFileString, (key, value) => {
+            if (key !== "updatedDate") return value;
+
+            return new Date(Date.parse(value));
+        }) as PackageFile;
+        return packageFile;
+    } catch (error) {
+        throw new Error("ERROR_PARSING_PACKAGE_FILE: " + error.message);
+    }
 }

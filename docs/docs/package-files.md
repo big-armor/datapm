@@ -53,20 +53,22 @@ ajv validate -s  datapm-package-file-schema-v1.json -d my-package-file.datapm.js
 
 The following are the top level properties in the DataPM Package File JSON file specification.
 
-| Property     |  Type  | Required | Description                                                                                                                       |
-| :----------- | :----: | :------: | :-------------------------------------------------------------------------------------------------------------------------------- |
-| description  | String | Required | A short sentence or two about the package. Use readmeFile to reference a longer markdown based description.                       |
-| displayName  | String | Required | A short user friendly name for the package                                                                                        |
-| packageSlug  | String | Required | The unique identifier for this package. lower case letters, numbers, and hyphens only. Must not start or end in a hyphen          |
-| schemas      | Array  | Required | A set of schemas of the data that are available in the package. See Schemas section below.                                        |
-| updatedDate  | String | Required | The last updated date of the package file - not the data! In the ISO 8601 format                                                  |
-| version      | String | Required | Semantic Versioning format of major.minor.patch                                                                                   |
-| contributors | Array  | Optional | A list of contributors for this package. See Contributors below                                                                   |
-| generatedBy  | String | Optional | The name of the person or system that generated the package file.                                                                 |
-| licenseFile  | String | Optional | Relative path to the LICENSE file for this package. Defaults to package-file-name-license.md or README.md in that order.          |
-| readmeFile   | String | Optional | Relative path to the README for this package. Defaults to package-file-name.md or README.md in that order.                        |
-| registries   | Array  | Optional | See Registries properties below                                                                                                   |
-| website      | String | Optional | Website of the person or organization that maintains and/or holds the license of this data. This is for attribution purposes only |
+| Property        |  Type  | Required | Description                                                                                                                                         |
+| :-------------- | :----: | :------: | :-------------------------------------------------------------------------------------------------------------------------------------------------- |
+| description     | String | Required | A short sentence or two about the package. Use readmeFile to reference a longer markdown based description.                                         |
+| displayName     | String | Required | A short user friendly name for the package                                                                                                          |
+| packageSlug     | String | Required | The unique identifier for this package. lower case letters, numbers, and hyphens only. Must not start or end in a hyphen                            |
+| schemas         | Array  | Required | A set of schemas of the data that are available in the package. See Schemas section below.                                                          |
+| updatedDate     | String | Required | The last updated date of the package file - not the data! In the ISO 8601 format                                                                    |
+| version         | String | Required | Semantic Versioning format of major.minor.patch                                                                                                     |
+| contributors    | Array  | Optional | A list of contributors for this package. See Contributors below                                                                                     |
+| generatedBy     | String | Optional | The name of the person or system that generated the package file.                                                                                   |
+| licenseFile     | String | Optional | Relative path, from the package file, to the LICENSE.md file for this package. Defaults to package-file-name-license.md or README.md in that order. |
+| readmeFile      | String | Optional | Relative path, from the package file, to the README.md for this package. Defaults to package-file-name.md or README.md in that order.               |
+| licenseMarkdown | String | Optional | Markdown formatted content that describes the license for the schema and data referenced.                                                           |
+| readmeMarkdown  | String | Optional | Markdown formatted README content for the package.                                                                                                  |
+| registries      | Array  | Optional | See Registries properties below                                                                                                                     |
+| website         | String | Optional | Website of the person or organization that maintains and/or holds the license of this data. This is for attribution purposes only                   |
 
 ## Schemas
 
@@ -101,10 +103,10 @@ These are the properties of the parser property of the top level schema object.
 
 These are the properties for the registry objects in the top level "registries" array property.
 
-| Property |  Type   | Required | Description                                 |
-| :------- | :-----: | :------: | :------------------------------------------ |
-| hostname | String  | Required | The hostname or ip address of the registry. |
-| port     | Integer | Required | The TCP port of the registry.               |
+| Property    |  Type  | Required | Description                                                                |
+| :---------- | :----: | :------: | :------------------------------------------------------------------------- |
+| url         | String | Required | The http or https URL that uniquely identifies the datapm registry server. |
+| catalogSlug | String | Required | The unique catalogSlug to which this package is published in the registry. |
 
 ## Contributor Properties
 

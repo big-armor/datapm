@@ -13,7 +13,7 @@ import {
 import { createAnonymousClient, createUser } from "./test-utils";
 import * as fs from "fs";
 import * as crypto from "crypto";
-import { PackageFile } from "datapm-lib";
+import { PackageFile, parsePackageFileJSON, loadPackageFileFromDisk } from "datapm-lib";
 import { describe, it } from "mocha";
 
 describe("Package Tests", async () => {
@@ -360,9 +360,9 @@ describe("Package Tests", async () => {
     });
 
     it("User A publish first version", async function () {
-        let packageFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json", "utf8");
-        let readmeFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.README.md", "utf8");
-        let licenseFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.LICENSE.md", "utf8");
+        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+
+        const packageFileString = JSON.stringify(packageFileContents);
 
         let response = await userAClient.mutate({
             mutation: CreateVersionDocument,
@@ -372,9 +372,7 @@ describe("Package Tests", async () => {
                     packageSlug: "new-package-slug"
                 },
                 value: {
-                    packageFile: packageFileContents,
-                    licenseFile: licenseFileContents,
-                    readmeFile: readmeFileContents
+                    packageFile: packageFileString
                 }
             }
         });
@@ -387,10 +385,12 @@ describe("Package Tests", async () => {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("a408ed82946e088eec17f92775e67013e877a0dd0aed6d4d10ef2d1c79d14cc8");
+        expect(responseHash).equal("891a00dd3c58a9c5e6dc82c2c06711b237c97955eaa032f0f04ba67d1632660e");
 
-        expect(response.data!.createVersion.readmeFile!).includes("This is where a readme might go");
-        expect(response.data!.createVersion.licenseFile!).includes("This is not a real license. Just a test.");
+        const responsePackageFile = parsePackageFileJSON(responsePackageFileContents);
+
+        expect(responsePackageFile.readmeMarkdown).includes("This is where a readme might go");
+        expect(responsePackageFile.licenseMarkdown).includes("This is not a real license. Just a test.");
     });
 
     it("Anonymous get package file", async function () {
@@ -420,11 +420,13 @@ describe("Package Tests", async () => {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("a408ed82946e088eec17f92775e67013e877a0dd0aed6d4d10ef2d1c79d14cc8");
+        expect(responseHash).equal("891a00dd3c58a9c5e6dc82c2c06711b237c97955eaa032f0f04ba67d1632660e");
     });
 
     it("User A publish second version - fail no changes", async function () {
-        let packageFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json", "utf8");
+        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+
+        const packageFileString = JSON.stringify(packageFileContents);
 
         let response = await userAClient.mutate({
             mutation: CreateVersionDocument,
@@ -434,7 +436,7 @@ describe("Package Tests", async () => {
                     packageSlug: "new-package-slug"
                 },
                 value: {
-                    packageFile: packageFileContents
+                    packageFile: packageFileString
                 }
             }
         });
@@ -447,9 +449,10 @@ describe("Package Tests", async () => {
     });
 
     it("User A publish malformed package JSON", async function () {
-        let packageFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json", "utf8");
+        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
 
-        packageFileContents += "}";
+        let packageFileString = JSON.stringify(packageFileContents);
+        packageFileString += "}";
 
         let errorFound = false;
 
@@ -462,32 +465,33 @@ describe("Package Tests", async () => {
                         packageSlug: "new-package-slug"
                     },
                     value: {
-                        packageFile: JSON.stringify(packageFileContents)
+                        packageFile: packageFileString
                     }
                 }
             })
             .catch((error: ErrorResponse) => {
+                console.log(JSON.stringify(error, null, 1));
                 let fetchResult = error.networkError as ServerError;
                 if (
                     fetchResult.result.errors.find(
                         (e: { extensions: { exception: { stacktrace: string[] } } }) =>
                             e.extensions.exception.stacktrace.find((s) =>
-                                s.startsWith("ValidationError: INVALID_PACKAGE_FILE_SCHEMA")
+                                s.startsWith("Error: ERROR_PARSING_PACKAGE_FILE")
                             ) != null
                     ) != null
                 )
                     errorFound = true;
             })
             .then((client) => {
-                expect(errorFound, "invalid schema error not found").equal(true);
+                expect(errorFound, "invalid json format error not found").equal(true);
             });
     });
 
     it("User A publish invalid schema - packageSlug", async function () {
-        let packageFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json", "utf8");
+        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        packageFileContents.packageSlug += "-";
 
-        let packageFile = JSON.parse(packageFileContents) as PackageFile;
-        packageFile.packageSlug += "-";
+        let packageFileString = JSON.stringify(packageFileContents);
 
         let errorFound = false;
 
@@ -500,7 +504,7 @@ describe("Package Tests", async () => {
                         packageSlug: "new-package-slug"
                     },
                     value: {
-                        packageFile: JSON.stringify(packageFile)
+                        packageFile: packageFileString
                     }
                 }
             })
@@ -522,11 +526,10 @@ describe("Package Tests", async () => {
     });
 
     it("User A update package schema - patch - fail on version", async function () {
-        let packageFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json", "utf8");
+        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        packageFileContents.description = "new description";
 
-        let packageFile = JSON.parse(packageFileContents) as PackageFile;
-
-        packageFile.description = "new description";
+        let packageFileString = JSON.stringify(packageFileContents);
 
         let response = await userAClient.mutate({
             mutation: CreateVersionDocument,
@@ -536,7 +539,7 @@ describe("Package Tests", async () => {
                     packageSlug: "new-package-slug"
                 },
                 value: {
-                    packageFile: JSON.stringify(packageFile)
+                    packageFile: packageFileString
                 }
             }
         });
@@ -549,12 +552,10 @@ describe("Package Tests", async () => {
     });
 
     it("User A update package schema - patch", async function () {
-        let packageFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json", "utf8");
-
-        let packageFile = JSON.parse(packageFileContents) as PackageFile;
-
-        packageFile.description = "new description";
-        packageFile.version = "1.0.1";
+        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        packageFileContents.description = "new description";
+        packageFileContents.version = "1.0.1";
+        let packageFileString = JSON.stringify(packageFileContents);
 
         let response = await userAClient.mutate({
             mutation: CreateVersionDocument,
@@ -564,7 +565,7 @@ describe("Package Tests", async () => {
                     packageSlug: "new-package-slug"
                 },
                 value: {
-                    packageFile: JSON.stringify(packageFile)
+                    packageFile: packageFileString
                 }
             }
         });
@@ -579,12 +580,9 @@ describe("Package Tests", async () => {
     });
 
     it("User A update package schema - minor - fail on version number", async function () {
-        let packageFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json", "utf8");
-
-        let packageFile = JSON.parse(packageFileContents) as PackageFile;
-
-        packageFile.version = "1.0.2";
-        packageFile.schemas[0].properties!["new_column"] = {
+        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        packageFileContents.version = "1.0.2";
+        packageFileContents.schemas[0].properties!["new_column"] = {
             title: "new_column",
             recordCount: 1234,
             byteCount: 5678,
@@ -598,6 +596,7 @@ describe("Package Tests", async () => {
             },
             type: ["string"]
         };
+        let packageFileString = JSON.stringify(packageFileContents);
 
         let response = await userAClient.mutate({
             mutation: CreateVersionDocument,
@@ -607,7 +606,7 @@ describe("Package Tests", async () => {
                     packageSlug: "new-package-slug"
                 },
                 value: {
-                    packageFile: JSON.stringify(packageFile)
+                    packageFile: packageFileString
                 }
             }
         });
@@ -620,12 +619,9 @@ describe("Package Tests", async () => {
     });
 
     it("User A update package schema - minor", async function () {
-        let packageFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json", "utf8");
-
-        let packageFile = JSON.parse(packageFileContents) as PackageFile;
-
-        packageFile.version = "1.2.0";
-        packageFile.schemas[0].properties!["new_column"] = {
+        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        packageFileContents.version = "1.2.0";
+        packageFileContents.schemas[0].properties!["new_column"] = {
             title: "new_column",
             recordCount: 1234,
             byteCount: 5678,
@@ -639,6 +635,7 @@ describe("Package Tests", async () => {
             },
             type: ["string"]
         };
+        let packageFileString = JSON.stringify(packageFileContents);
 
         let response = await userAClient.mutate({
             mutation: CreateVersionDocument,
@@ -648,7 +645,7 @@ describe("Package Tests", async () => {
                     packageSlug: "new-package-slug"
                 },
                 value: {
-                    packageFile: JSON.stringify(packageFile)
+                    packageFile: packageFileString
                 }
             }
         });
@@ -663,11 +660,10 @@ describe("Package Tests", async () => {
     });
 
     it("User A update package schema - major - fail high version required", async function () {
-        let packageFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json", "utf8");
+        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        packageFileContents.version = "1.3.0";
 
-        let packageFile = JSON.parse(packageFileContents) as PackageFile;
-
-        packageFile.version = "1.3.0";
+        let packageFile = JSON.stringify(packageFileContents);
 
         let response = await userAClient.mutate({
             mutation: CreateVersionDocument,
@@ -677,7 +673,7 @@ describe("Package Tests", async () => {
                     packageSlug: "new-package-slug"
                 },
                 value: {
-                    packageFile: JSON.stringify(packageFile)
+                    packageFile: packageFile
                 }
             }
         });
@@ -690,11 +686,10 @@ describe("Package Tests", async () => {
     });
 
     it("User A update package schema - major", async function () {
-        let packageFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json", "utf8");
+        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        packageFileContents.version = "2.0.0";
 
-        let packageFile = JSON.parse(packageFileContents) as PackageFile;
-
-        packageFile.version = "2.0.0";
+        let packageFile = JSON.stringify(packageFileContents);
 
         let response = await userAClient.mutate({
             mutation: CreateVersionDocument,
@@ -704,7 +699,7 @@ describe("Package Tests", async () => {
                     packageSlug: "new-package-slug"
                 },
                 value: {
-                    packageFile: JSON.stringify(packageFile)
+                    packageFile: packageFile
                 }
             }
         });

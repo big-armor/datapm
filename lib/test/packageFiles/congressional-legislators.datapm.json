@@ -3,6 +3,8 @@
     "updatedDate": "2020-10-01T13:54:29.442Z",
     "displayName": "Congressional Legislators",
     "packageSlug": "congressional-legislators",
+    "readmeFile": "congressional-legislators.README.md",
+    "licenseFile": "congressional-legislators.LICENSE.md",
     "version": "1.0.0",
     "description": "Congressional legislators as provided by the theunitedstates.io",
     "schemas": [
