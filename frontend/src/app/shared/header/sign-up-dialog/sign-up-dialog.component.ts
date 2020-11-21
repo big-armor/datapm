@@ -83,7 +83,7 @@ export class SignUpDialogComponent implements OnInit {
                     return;
                 }
 
-                this.dialogRef.close();
+                this.state = State.SUCCESS;
             })
             .catch(() => {
                 this.snackbar.open("Unknown error", null, {
