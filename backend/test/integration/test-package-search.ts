@@ -67,9 +67,6 @@ describe("Package Search Tests", async () => {
 
         const packageFileString = JSON.stringify(packageFileContents);
 
-        console.log("readme file contents");
-        console.log(packageFileContents.readmeMarkdown);
-
         let response = await userAClient.mutate({
             mutation: CreateVersionDocument,
             variables: {
@@ -87,8 +84,6 @@ describe("Package Search Tests", async () => {
         expect(response.data!.createVersion.author.username).equal("testA-packages-search");
 
         const responsePackageFileContents = response.data!.createVersion.packageFile;
-
-        console.log(JSON.stringify(response));
 
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
