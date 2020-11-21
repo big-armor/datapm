@@ -385,7 +385,7 @@ describe("Package Tests", async () => {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("891a00dd3c58a9c5e6dc82c2c06711b237c97955eaa032f0f04ba67d1632660e");
+        expect(responseHash).equal("277a1c1995ea6adbcd229621daf11c7cb4f90580c4871d2da7ab8e5c80a92987");
 
         const responsePackageFile = parsePackageFileJSON(responsePackageFileContents);
 
@@ -420,7 +420,7 @@ describe("Package Tests", async () => {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("891a00dd3c58a9c5e6dc82c2c06711b237c97955eaa032f0f04ba67d1632660e");
+        expect(responseHash).equal("277a1c1995ea6adbcd229621daf11c7cb4f90580c4871d2da7ab8e5c80a92987");
     });
 
     it("User A publish second version - fail no changes", async function () {
@@ -470,7 +470,6 @@ describe("Package Tests", async () => {
                 }
             })
             .catch((error: ErrorResponse) => {
-                console.log(JSON.stringify(error, null, 1));
                 let fetchResult = error.networkError as ServerError;
                 if (
                     fetchResult.result.errors.find(
