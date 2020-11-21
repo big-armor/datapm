@@ -1,0 +1,46 @@
+.doc-link {
+    font-weight: 300;
+    font-size: 12px;
+    line-height: 18px;
+}
+
+.package-light-gray {
+    font-family: Roboto Mono;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 12px;
+    line-height: 18px;
+    letter-spacing: -0.28px;
+    color: #828282;
+    margin-bottom: 5px;
+}
+
+.rounded-div {
+    box-shadow: inset 0px -4px 4px rgba(255, 255, 255, 0.25), inset -4px 0px 4px rgba(255, 255, 255, 0.25),
+        inset 4px 0px 4px rgba(183, 183, 183, 0.25), inset 0px 4px 4px rgba(183, 183, 183, 0.25);
+    background-color: #fff;
+    border-radius: 24px;
+    padding: 8px 15px;
+    color: black;
+    cursor: pointer;
+
+    overflow: scroll;
+    white-space: nowrap;
+
+    &:hover {
+        background-color: #eee;
+    }
+    &:active {
+        background-color: #ddd;
+    }
+
+    .install-txt {
+        font-family: Roboto Mono;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 18px;
+        letter-spacing: -0.28px;
+        color: #333333;
+    }
+}

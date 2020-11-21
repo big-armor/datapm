@@ -17,6 +17,7 @@ import { PackageVersionComponent } from "./components/package-version/package-ve
 import { PackageSizePipe } from "./pipes/package-size.pipe";
 import { SchemaPropertiesPipe } from "./pipes/schema-properties.pipe";
 import { VersionPipe } from "./pipes/version.pipe";
+import { PackageInfoComponent } from "./components/package-info/package-info.component";
 
 @NgModule({
     declarations: [
@@ -26,7 +27,8 @@ import { VersionPipe } from "./pipes/version.pipe";
         PackageVersionComponent,
         PackageSizePipe,
         SchemaPropertiesPipe,
-        VersionPipe
+        VersionPipe,
+        PackageInfoComponent
     ],
     imports: [
         CommonModule,

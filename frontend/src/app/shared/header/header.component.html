@@ -1,52 +1,51 @@
-<div class="row pt-3 px-3 desktop-menu">
-    <div class="col-md-8 col-sm-12">
-        <div class="d-flex flex-row bd-highlight">
-            <div class="p-2 bd-highlight align-self-center">
-                <h1 class="title mr-4 mb-0"><a (click)="goHome()">datapm</a></h1>
-            </div>
-            <div class="p-2 bd-highlight w-100">
-                <div class="input-group mt-1 search-box">
-                    <form (ngSubmit)="search()" class="search-form">
-                        <input
-                            type="text"
-                            name="search"
-                            minlength="1"
-                            autocomplete="off"
-                            class="form-control search-input"
-                            placeholder="Search For Data"
-                            [(ngModel)]="searchTerm"
-                        />
-                        <button class="material-icons">search</button>
-                    </form>
+<div class="container pl-0">
+    <div class="row pl-0 pt-3 pr-3 pb-3 desktop-menu">
+        <div class="pl-0 col-md-10 col-sm-12">
+            <div class="d-flex flex-row bd-highlight">
+                <div class="pr-2 pt-2 pb-2 bd-highlight align-self-center">
+                    <h1 class="title mr-4 mb-0"><a (click)="goHome()">datapm</a></h1>
+                </div>
+                <div class="p-2 bd-highlight w-100">
+                    <div class="input-group mt-1 search-box">
+                        <form (ngSubmit)="search()" class="search-form">
+                            <input
+                                type="text"
+                                name="search"
+                                minlength="1"
+                                autocomplete="off"
+                                class="form-control search-input"
+                                placeholder="Search For Data"
+                                [(ngModel)]="searchTerm"
+                            />
+                            <button class="material-icons">search</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-4 col-sm-12">
-        <div class="d-flex flex-row bd-highlight justify-content-end">
-            <div class="p-2 ml-4 bd-highlight main-menu-title d-flex align-items-end">
-                <a href="/collections">Collections</a>
-            </div>
-            <div class="p-2 ml-4 bd-highlight main-menu-title d-flex align-items-end">
-                <a href="/docs/publish-data/">Publish</a>
-            </div>
-            <div class="p-2 ml-4 bd-highlight avatar">
-                <app-avatar [user]="currentUser" [matMenuTriggerFor]="beforeMenu" *ngIf="currentUser"></app-avatar>
-                <button
-                    mat-fab
-                    class="person-menu"
-                    [matMenuTriggerFor]="beforeMenu"
-                    aria-label="Person"
-                    *ngIf="!currentUser"
-                >
-                    <mat-icon>person</mat-icon>
-                </button>
-                <mat-menu #beforeMenu="matMenu" xPosition="before">
-                    <button *ngIf="currentUser" mat-menu-item (click)="goToMyDetails()">My Profile</button>
-                    <button *ngIf="!currentUser" mat-menu-item (click)="openLoginDialog()">Log In</button>
-                    <button *ngIf="!currentUser" mat-menu-item (click)="openSignUpDialog()">Sign Up</button>
-                    <button *ngIf="currentUser" mat-menu-item (click)="logout()">Log Out</button>
-                </mat-menu>
+        <div class="col-md-2 col-sm-12">
+            <div class="d-flex flex-row bd-highlight justify-content-end">
+                <div class="ml-4 pr-1 bd-highlight main-menu-title d-flex align-items-end">
+                    <a href="/docs/publish-data/">Publish</a>
+                </div>
+                <div class="ml-4 bd-highlight avatar">
+                    <app-avatar [user]="currentUser" [matMenuTriggerFor]="beforeMenu" *ngIf="currentUser"></app-avatar>
+                    <button
+                        mat-fab
+                        class="person-menu"
+                        [matMenuTriggerFor]="beforeMenu"
+                        aria-label="Person"
+                        *ngIf="!currentUser"
+                    >
+                        <mat-icon>person</mat-icon>
+                    </button>
+                    <mat-menu #beforeMenu="matMenu" xPosition="before">
+                        <button *ngIf="currentUser" mat-menu-item (click)="goToMyDetails()">My Profile</button>
+                        <button *ngIf="!currentUser" mat-menu-item (click)="openLoginDialog()">Log In</button>
+                        <button *ngIf="!currentUser" mat-menu-item (click)="openSignUpDialog()">Sign Up</button>
+                        <button *ngIf="currentUser" mat-menu-item (click)="logout()">Log Out</button>
+                    </mat-menu>
+                </div>
             </div>
         </div>
     </div>
@@ -60,11 +59,6 @@
 
         <div class="col-5 text-right">
             <div class="d-flex flex-row bd-highlight d-flex justify-content-end">
-                <div class="bd-highlight mobile-collection mr-2">
-                    <button mat-fab class="collection-menu" aria-label="Collections">
-                        <mat-icon>collections</mat-icon>
-                    </button>
-                </div>
                 <div class="bd-highlight mobile-person">
                     <app-avatar [user]="currentUser" [matMenuTriggerFor]="beforeMenu"></app-avatar>
                     <mat-menu #beforeMenu="matMenu" xPosition="before">
