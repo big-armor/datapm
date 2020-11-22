@@ -2,7 +2,6 @@
     {{ package?.description }}
 </div>
 <div *ngIf="packageFile?.readmeMarkdown">
-    <div class="title">Readme</div>
     <markdown [data]="packageFile?.readmeMarkdown"></markdown>
 </div>
 <div *ngIf="packageFile?.licenseMarkdown">
