@@ -8,12 +8,16 @@ schema:
 documents:
     - src/graphql/*.graphql
     - node_modules/datapm-lib/graphql-documents/*.graphql
+config:
+    scalars:
+        Date: Date
 generates:
     src/generated/graphql.ts:
         plugins:
             - "typescript"
             - "typescript-operations"
             - "typescript-apollo-angular"
+            - "typescript-typedefs.js"
         config:
             namingConvention:
                 typeNames: keep

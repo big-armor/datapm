@@ -99,11 +99,12 @@ import { validateSlug as validatePackageSlug } from "./directive/ValidPackageSlu
 import { validateEmailAddress } from "./directive/ValidEmailDirective";
 import { FileStorageService, StorageErrors } from "./storage/files/file-storage-service";
 import { PackageFileStorageService } from "./storage/packages/package-file-storage-service";
+import { DateResolver } from "./resolvers/DateResolver";
 
 export const resolvers: {
     Query: QueryResolvers;
     Mutation: MutationResolvers;
-    Date: GraphQLScalarType;
+    Date: DateResolver;
     User: UserResolvers;
     UserCatalog: UserCatalogResolvers;
     Catalog: CatalogResolvers;

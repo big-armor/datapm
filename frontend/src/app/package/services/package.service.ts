@@ -1,10 +1,11 @@
 import { Injectable } from "@angular/core";
+import { ApolloQueryResult } from "@apollo/client/core";
 import { BehaviorSubject } from "rxjs";
 import { take } from "rxjs/operators";
-import { Package, PackageGQL } from "src/generated/graphql";
+import { Package, PackageGQL, PackageQuery } from "src/generated/graphql";
 export interface PackageResponse {
     package: Package | null;
-    error: Error | null;
+    response?: ApolloQueryResult<PackageQuery> | null;
 }
 @Injectable({
     providedIn: "root"
@@ -17,16 +18,16 @@ export class PackageService {
             .fetch({ identifier: { catalogSlug, packageSlug } })
             .pipe(take(1))
             .subscribe(
-                ({ data }) => {
-                    if (data == null)
+                (response) => {
+                    if (response.data == null)
                         this.package.next({
                             package: null,
-                            error: { name: "unknown error", message: "network level error" }
+                            response: response
                         });
                     else
                         this.package.next({
-                            package: data.package as Package,
-                            error: null
+                            package: response.data.package as Package,
+                            response: response
                         });
                 },
                 (error) => {
@@ -34,7 +35,7 @@ export class PackageService {
 
                     this.package.next({
                         package: null,
-                        error
+                        response: null
                     });
                 }
             );

@@ -19,6 +19,15 @@
         </div>
     </div>
 </div>
+
+<div class="container" *ngIf="state == State.ERROR_NOT_AUTHENTICATED">
+    <div class="row text-center">
+        <div class="col-12 mt-5">
+            You must <a href="javascript:void(0);" (click)="loginClicked()">login to view this package</a>.
+        </div>
+    </div>
+</div>
+
 <div *ngIf="state == State.LOADED">
     <app-cover [user]="currentUser"></app-cover>
 

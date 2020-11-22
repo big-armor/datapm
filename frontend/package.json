@@ -15,6 +15,11 @@
         "e2e": "ng e2e",
         "codegen": "graphql-codegen --config codegen.yml"
     },
+    "browser": {
+        "fs": false,
+        "path": false,
+        "os": false
+    },
     "private": true,
     "dependencies": {
         "@angular/animations": "~10.0.11",
@@ -29,10 +34,12 @@
         "@angular/router": "~10.0.11",
         "@apollo/client": "^3.0.0",
         "apollo-angular": "^2.0.3",
+        "apollo-link-scalars": "^2.0.2",
+        "apollo-link-schema": "^1.2.5",
         "bootstrap": "^4.5.2",
         "component": "^1.1.0",
         "crypto": "^1.0.1",
-        "datapm-lib": "file:../lib",
+        "datapm-lib": "file:../lib/dist",
         "graphql-upload": "^11.0.0",
         "jwt-decode": "^2.2.0",
         "ngx-markdown": "^10.1.1",

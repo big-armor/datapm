@@ -17,7 +17,7 @@ export class PackageSchemaComponent {
 
     constructor(private packageService: PackageService) {
         this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe((p: PackageResponse) => {
-            if (p == null || p.error) return;
+            if (p == null || p.package == null) return;
             this.package = p.package;
             if (this.package && this.package.latestVersion) {
                 this.packageFile = JSON.parse(this.package.latestVersion.packageFile);

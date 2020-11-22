@@ -6,7 +6,7 @@ import { distanceInWordsToNow } from "date-fns";
     name: "timeAgo"
 })
 export class TimeAgoPipe implements PipeTransform {
-    transform(value: string, ..._args: any[]): string {
+    transform(value: Date, ..._args: any[]): string {
         return distanceInWordsToNow(value, { addSuffix: true, includeSeconds: false });
     }
 }

@@ -418,7 +418,7 @@ export function loadPackageFileFromDisk(packageFilePath: string): PackageFile {
 export function parsePackageFileJSON(packageFileString: string): PackageFile {
     try {
         const packageFile = JSON.parse(packageFileString, (key, value) => {
-            if (key !== "updatedDate") return value;
+            if (key !== "updatedDate" && key !== "createdAt" && key !== "updatedAt") return value;
 
             return new Date(Date.parse(value));
         }) as PackageFile;

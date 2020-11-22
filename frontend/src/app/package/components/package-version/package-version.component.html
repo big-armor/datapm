@@ -4,7 +4,7 @@
             <tr>
                 <td class="package-light-gray">schema version history</td>
             </tr>
-            <tr *ngFor="let version of package?.versions">
+            <tr *ngFor="let version of versions">
                 <td class="package-dark-gray">{{ version.identifier | version }}</td>
                 <td class="package-dark-gray">{{ version.createdAt | timeAgo }}</td>
             </tr>
