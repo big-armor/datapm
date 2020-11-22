@@ -167,10 +167,10 @@ export class UserRepository extends Repository<User> {
         return user;
     }
 
-    async getUserByEmail(emailAddress: string) {
+    getUserByEmail(emailAddress: string) {
         const ALIAS = "getByEmailAddress";
 
-        const user = await this.createQueryBuilder(ALIAS).where([{ emailAddress }]).getOne();
+        const user = this.createQueryBuilder(ALIAS).where([{ emailAddress }]).getOne();
         return user;
     }
 
