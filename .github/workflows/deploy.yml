@@ -56,57 +56,84 @@ jobs:
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: npm run bump-version
 
+            - name: Cache Lib Dist
+              id: cache-lib-all-files
+              uses: actions/cache@v1
+              with:
+                  path: lib/dist
+                  key: datampm-registry-${{ runner.OS }}-lib-dist-${{ hashFiles('lib/**') }}
+
             - name: Cache Lib Node_modules
+              if: steps.cache-lib-all-files.outputs.cache-hit != 'true'
               id: cache-lib-node-modules
               uses: actions/cache@v1
               with:
                   path: lib/node_modules
-                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/package.json') }}
+                  key: datampm-registry-${{ runner.OS }}-lib-node-modules-${{ hashFiles('lib/package.json') }}
 
             - name: Install Lib Dependencies
               id: install-lib-Dependencies
-              if: steps.cache-lib-node-modules.outputs.cache-hit != 'true'
+              if: steps.cache-lib-all-files.outputs.cache-hit != 'true' && steps.cache-lib-node-modules.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: lib
 
             - name: Build Lib
               id: build-lib-Dependencies
+              if: steps.cache-lib-all-files.outputs.cache-hit != 'true'
               run: npm run build
               working-directory: lib
 
+            - name: Cache Backend Dist
+              id: cache-backend-all-files
+              uses: actions/cache@v1
+              with:
+                  path: backend/dist
+                  key: datampm-registry-${{ runner.OS }}-backend-dist-${{ hashFiles('backend/**') }}
+
             - name: Cache Backend Node_modules
               id: cache-backend-node-modules
+              if: steps.cache-backend-all-files.outputs.cache-hit != 'true'
               uses: actions/cache@v1
               with:
                   path: backend/node_modules
-                  key: datampm-registry-${{ runner.OS }}-backend-${{ hashFiles('backend/package.json') }}
+                  key: datampm-registry-${{ runner.OS }}-backend-node-modules-${{ hashFiles('backend/package.json,') }}
 
             - name: Install Backend Dependencies
               id: install-backend-Dependencies
-              if: steps.cache-backend-node-modules.outputs.cache-hit != 'true'
+              if: steps.cache-backend-all-files.outputs.cache-hit != 'true' && steps.cache-backend-node-modules.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: backend
 
             - name: Build Backend
               id: build-backend-Dependencies
+              if: steps.cache-backend-all-files.outputs.cache-hit != 'true'
               run: npm run build
               working-directory: backend
 
+            - name: Cache Frontend Dist
+              id: cache-frontend-all-files
+              uses: actions/cache@v1
+              with:
+                  path: frontend/dist
+                  key: datampm-registry-${{ runner.OS }}-frontend-dist-${{ hashFiles('frontend/**') }}
+
             - name: Cache Frontend Node_modules
               id: cache-frontend-node-modules
+              if: steps.cache-frontend-all-files.outputs.cache-hit != 'true'
               uses: actions/cache@v1
               with:
                   path: frontend/node_modules
-                  key: datampm-registry-${{ runner.OS }}-frontend-${{ hashFiles('frontend/package.json') }}
+                  key: datampm-registry-${{ runner.OS }}-frontend-node-modules-${{ hashFiles('frontend/package.json') }}
 
             - name: Install Frontend Dependencies
               id: install-fronend-dependencies
-              if: steps.cache-frontend-node-modules.outputs.cache-hit != 'true'
+              if: steps.cache-frontend-all-files.outputs.cache-hit != 'true' && steps.cache-frontend-node-modules.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: frontend
 
             - name: Build Frontend
               id: build-frontend-Dependencies
+              if: steps.cache-frontend-all-files.outputs.cache-hit != 'true'
               run: npm run build
               working-directory: frontend
 

@@ -3,7 +3,7 @@ import { PackageFile, Schema } from "datapm-lib";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { Package } from "src/generated/graphql";
-import { PackageService } from "../../services/package.service";
+import { PackageService, PackageResponse } from "../../services/package.service";
 
 @Component({
     selector: "schema",
@@ -16,8 +16,9 @@ export class PackageSchemaComponent {
     private unsubscribe$ = new Subject();
 
     constructor(private packageService: PackageService) {
-        this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe((p: Package) => {
-            this.package = p;
+        this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe((p: PackageResponse) => {
+            if (p == null || p.error) return;
+            this.package = p.package;
             if (this.package && this.package.latestVersion) {
                 this.packageFile = JSON.parse(this.package.latestVersion.packageFile);
                 console.log(this.packageFile);

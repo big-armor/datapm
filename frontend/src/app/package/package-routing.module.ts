@@ -13,8 +13,9 @@ const routes: Routes = [
         component: PackageComponent,
         children: [
             {
-                path: "description",
-                component: PackageDescriptionComponent
+                path: "",
+                component: PackageDescriptionComponent,
+                pathMatch: "full"
             },
             {
                 path: "version",

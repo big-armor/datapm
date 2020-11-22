@@ -1,11 +1,11 @@
 <div class="package-dark-gray">
     {{ package?.description }}
 </div>
-<div *ngIf="package?.latestVersion.readmeFile">
+<div *ngIf="package?.latestVersion?.readmeFile">
     <div class="title">Readme</div>
-    <markdown [data]="package?.latestVersion.readmeFile"></markdown>
+    <markdown [data]="package?.latestVersion?.readmeFile"></markdown>
 </div>
-<div *ngIf="package?.latestVersion.licenseFile">
+<div *ngIf="package?.latestVersion?.licenseFile">
     <div class="title">License</div>
-    <markdown [data]="package?.latestVersion.licenseFile"></markdown>
+    <markdown [data]="package?.latestVersion?.licenseFile"></markdown>
 </div>

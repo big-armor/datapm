@@ -20,10 +20,10 @@ npm ci
 npm run build
 ```
 
-This produces a docker image labeled datapm-registry. You can then use docker-compose to run the locally built image.
+This produces a docker image labeled datapm-registry. You can then use the following command to run the locally built image and all of it's supporting services.
 
 ```
-docker-compose -f docker/docker-compose-local-build.yml up
+npm run start
 ```
 
 This "local-build" of docker provides a [maildev] SMTP server - which does not forward mail! To view any email sent by the registry server, simply open the maildev web interface on port 1080.

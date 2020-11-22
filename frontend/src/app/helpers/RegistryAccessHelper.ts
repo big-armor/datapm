@@ -7,7 +7,11 @@ export function getRegistryURL(): string {
 
     let portStr = "";
 
-    if ((protocol == "https:" && port != "443") || (protocol == "http:" && port != "80")) portStr = ":" + port;
+    if (
+        (protocol == "https:" && !(port == "443" || port == "")) ||
+        (protocol == "http:" && !(port == "80" || port == ""))
+    )
+        portStr = ":" + port;
 
     return protocol + "//" + getRegistryHostname() + portStr;
 }
