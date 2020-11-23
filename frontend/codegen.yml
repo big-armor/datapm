@@ -11,6 +11,7 @@ documents:
 config:
     scalars:
         Date: Date
+        Void: void
 generates:
     src/generated/graphql.ts:
         plugins:
