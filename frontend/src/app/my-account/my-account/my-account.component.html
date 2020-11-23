@@ -1,8 +1,8 @@
-<app-cover [height]="240" [user]="currentUser"></app-cover>
+<app-cover [username]="currentUser.username"></app-cover>
 
 <div class="container" id="userProfile">
     <div class="row top-row">
-        <div *ngIf="currentUser" class="col-lg-10 col-md-12 col-sm-12 profile-div">
+        <div *ngIf="currentUser" class="col-lg-10 offset-lg-1 col-md-12 col-sm-12 profile-div">
             <div class="row my-account-header">
                 <div class="col-7">
                     <div class="d-flex bd-highlight user-header" style="height: 80px">
@@ -25,12 +25,7 @@
                         <div class="p-2 bd-highlight"></div>
                     </div>
                     <p class="user-bio pl-3">
-                        {{ currentUser.description }} Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                        eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-                        nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
-                        dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur
-                        sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
-                        laborum.
+                        {{ currentUser.description }}
                     </p>
                 </div>
                 <div class="col-5 contact-info">
@@ -70,7 +65,7 @@
                 </ul>
             </div>
         </div>
-        <div class="col-lg-10 col-md-12 col-sm-12 p-0">
+        <div class="col-lg-10 offset-lg-1 col-md-12 col-sm-12 p-0">
             <router-outlet></router-outlet>
         </div>
     </div>

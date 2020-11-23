@@ -358,6 +358,10 @@ export class UserRepository extends Repository<User> {
                 dbUser.emailAddressIsPublic = value.emailAddressIsPublic;
             }
 
+            if (value.description != null) {
+                dbUser.description = value.description;
+            }
+
             dbUser.updatedAt = new Date();
             await transaction.save(dbUser);
 

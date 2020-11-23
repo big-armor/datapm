@@ -12,7 +12,8 @@ import { User } from "src/generated/graphql";
     styleUrls: ["./cover.component.scss"]
 })
 export class CoverComponent implements OnInit {
-    @Input() user: User;
+    @Input() username: string;
+    @Input() catalogSlug: string;
     @Input() height: number = 40;
     @Input() editable: boolean = false;
     @Output() upload: EventEmitter<any>;
@@ -34,7 +35,7 @@ export class CoverComponent implements OnInit {
 
         this.imageService.shouldRefresh.pipe(takeUntil(this.unsubscribe$)).subscribe(({ target }) => {
             if (target === "cover") {
-                this.getImage(this.user?.username);
+                this.getImage(this.username);
             }
         });
     }
@@ -42,9 +43,8 @@ export class CoverComponent implements OnInit {
     ngOnInit(): void {}
 
     ngOnChanges(changes: SimpleChanges) {
-        if (changes.user && changes.user.currentValue) {
-            this.user = changes.user.currentValue;
-            this.getImage(this.user.username);
+        if (changes.username && changes.username.currentValue) {
+            this.getImage(this.username);
         }
     }
 
@@ -57,7 +57,13 @@ export class CoverComponent implements OnInit {
             return;
         }
 
-        const url = `/images/user/${username}/cover`;
+        let url;
+        if (this.username) {
+            url = `/images/user/${username}/cover`;
+        } else if (this.catalogSlug) {
+            url = `/images/catalog/${username}/cover`;
+        }
+
         this.imageService.getImage(url).subscribe(
             (imgData: any) => {
                 this.imgData = imgData;

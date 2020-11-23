@@ -2,6 +2,17 @@
     height: 240px;
 }
 
+::ng-deep .avatar {
+    display: inline-block;
+}
+
+.identifier {
+    position: relative;
+    top: -10px;
+    display: inline-block;
+    margin-left: 10px;
+}
+
 hr {
     position: relative;
     top: -8px;
@@ -228,7 +239,7 @@ hr {
 
 #packageDetails {
     .left-div {
-        padding-right: 20px;
+        padding-right: 30px;
     }
 
     .package-actions {

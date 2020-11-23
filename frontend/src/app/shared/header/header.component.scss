@@ -197,9 +197,14 @@ button.mat-menu-item {
     display: none;
 }
 
+.header-right {
+    position: relative;
+    top: 6px;
+}
+
 .avatar {
     position: relative;
-    top: 5px;
+    top: 10px;
 }
 
 @media (max-width: 768px) {
