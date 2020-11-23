@@ -96,7 +96,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: backend/node_modules
-                  key: datampm-registry-${{ runner.OS }}-backend-node-modules-${{ hashFiles('backend/package.json,') }}
+                  key: datampm-registry-${{ runner.OS }}-backend-node-modules-${{ hashFiles('backend/package.json') }}
 
             - name: Install Backend Dependencies
               id: install-backend-Dependencies
