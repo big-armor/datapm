@@ -48,7 +48,8 @@ export const createMe = async (
     if ((await usernameAvailable(_0, { username: value.username }, context)) == false) {
         throw new ValidationError("USERNAME_NOT_AVAILABLE");
     }
-    return await context.connection.manager.getCustomRepository(UserRepository).createUser({
+
+    await context.connection.manager.getCustomRepository(UserRepository).createUser({
         value,
         relations: getGraphQlRelationName(info)
     });
