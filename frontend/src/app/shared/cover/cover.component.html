@@ -1,4 +1,4 @@
-<div class="cover">
+<div *ngIf="imgData || editable" class="cover">
     <img [src]="imgData" alt="avatar" *ngIf="imgData" />
     <button class="add-btn" (click)="uploadFile()" *ngIf="editable">
         <mat-icon>add_a_photo</mat-icon>

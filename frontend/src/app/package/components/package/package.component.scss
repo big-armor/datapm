@@ -1,5 +1,5 @@
 ::ng-deep .cover {
-    height: 240px;
+    height: 150px;
 }
 
 ::ng-deep .avatar {
@@ -18,17 +18,16 @@ hr {
     top: -8px;
 }
 
-#packagePage {
-    position: relative;
-    top: -180px;
-}
-
 .contentContainer {
+    overflow: hidden;
     border-radius: 4px;
-    box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25);
+
     background-color: #fff;
 
-    padding-top: 20px;
+    ::ng-deep .cover img {
+        border-bottom-left-radius: 4px;
+        border-bottom-right-radius: 4px;
+    }
 
     ::ng-deep #matTabs .mat-tab-header {
         border-bottom: none;
@@ -167,9 +166,7 @@ hr {
     ::ng-deep #matTabs .mat-tab-header-pagination-controls-enabled .mat-tab-header-pagination {
         display: none;
     }
-    .no-pd-mobile {
-        padding: 0px !important;
-    }
+
     .header-border {
         top: 1.6rem;
         height: 9px;

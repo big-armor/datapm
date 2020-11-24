@@ -25,6 +25,7 @@ import { EditAccountDialogComponent } from "./edit-account-dialog/edit-account-d
 import { EditPasswordDialogComponent } from "./edit-password-dialog/edit-password-dialog.component";
 import { PackagesComponent } from "./packages/packages.component";
 import { DeleteConfirmationComponent } from "./delete-confirmation/delete-confirmation.component";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 
 @NgModule({
     declarations: [
@@ -52,6 +53,7 @@ import { DeleteConfirmationComponent } from "./delete-confirmation/delete-confir
         MatIconModule,
         MatInputModule,
         MatSlideToggleModule,
+        MatProgressSpinnerModule,
         MatTableModule,
         SharedModule
     ]

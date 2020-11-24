@@ -41,6 +41,7 @@ button.mat-menu-item {
 }
 
 .main-menu-title {
+    padding-bottom: 7px;
     a {
         font-family: Roboto Mono;
         font-style: normal;
@@ -200,6 +201,7 @@ button.mat-menu-item {
 .header-right {
     position: relative;
     top: 6px;
+    padding-right: 0px;
 }
 
 .avatar {

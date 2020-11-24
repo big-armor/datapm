@@ -1,10 +1,23 @@
-::ng-deep .cover {
-    height: 240px;
-}
-
 #userProfile {
+    ::ng-deep app-cover {
+        width: 100%;
+    }
+
+    ::ng-deep .cover {
+        height: 150px;
+
+        img {
+            border-radius: 4px;
+        }
+    }
+
     .my-account-header {
         min-height: 150px;
+    }
+
+    .social-link {
+        display: inline-block;
+        margin-right: 1em;
     }
     .contact-info {
         padding: 10px;
@@ -15,13 +28,10 @@
         }
     }
     .top-row {
-        position: relative;
-        top: -160px;
-
         .profile-div {
-            box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
-                0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
             border-radius: 4px;
+            padding-bottom: 1px;
+            border-bottom: 1px solid #ddd;
             background-color: #fff;
 
             .user-img {
@@ -80,12 +90,7 @@
             }
 
             .user-bio {
-                font-family: Roboto Mono;
-                font-style: normal;
-                font-weight: 300;
-                font-size: 12px;
-                line-height: 13px;
-                letter-spacing: -0.28px;
+                margin-top: 15px;
                 color: #4f4f4f;
                 margin-bottom: 15px;
             }
@@ -185,11 +190,17 @@
     .cover-image {
         height: 100px;
     }
+
     .user-header {
         height: unset;
         display: contents !important;
     }
     #userProfile {
+        ::ng-deep .cover {
+            img {
+                border-radius: 0px;
+            }
+        }
         .top-row {
             top: -30px;
             .profile-div {
@@ -218,9 +229,7 @@
                     }
                 }
                 .user-bio {
-                    font-size: 10px;
                     margin-bottom: 10px;
-                    padding-left: 10px !important;
                 }
                 .edit-profile {
                     margin-left: 10px !important;

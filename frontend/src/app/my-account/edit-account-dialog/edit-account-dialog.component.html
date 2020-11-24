@@ -1,11 +1,6 @@
 <form id="editAccount" [formGroup]="form">
     <div mat-dialog-content>
-        <app-cover
-            [username]="currentUser.username"
-            [height]="150"
-            [editable]="true"
-            (upload)="uploadCover($event)"
-        ></app-cover>
+        <app-cover [username]="currentUser.username" [editable]="true" (upload)="uploadCover($event)"></app-cover>
 
         <div class="dialog-content-text">
             <app-avatar

@@ -29,78 +29,78 @@
 </div>
 
 <div *ngIf="state == State.LOADED">
-    <app-cover [user]="currentUser"></app-cover>
-
     <div class="container pl-2">
         <div class="row" id="packagePage">
-            <div class="col-xl-10 offset-xl-1 col-12 contentContainer">
-                <div class="row" *ngIf="package">
-                    <div class="col-12 package-info">
-                        <div class="package-title">{{ package?.displayName }}</div>
-                        <div class="package-identifier">
-                            <app-avatar class="user-img" *ngIf="catalogUser" [user]="catalogUser" [size]="32">
-                            </app-avatar>
-                            <div class="identifier">
-                                <a [routerLink]="['/' + package?.identifier.catalogSlug]">{{
-                                    package?.identifier.catalogSlug
-                                }}</a
-                                >/{{ package?.identifier.packageSlug }}
+            <div class="col-xl-12 col-12 contentContainer pl-0 pr-0">
+                <app-cover class="cover-image" [packageSlug]="package?.identifier.packageSlug"></app-cover>
+
+                <div class="p-2">
+                    <div class="row" *ngIf="package">
+                        <div class="col-12 package-info">
+                            <!-- <div class="package-title">{{ package?.displayName }}</div> -->
+                            <div class="package-identifier">
+                                <app-avatar class="user-img" *ngIf="catalogUser" [user]="catalogUser" [size]="32">
+                                </app-avatar>
+                                <div class="identifier">
+                                    <a [routerLink]="['/' + package?.identifier.catalogSlug]">{{
+                                        package?.identifier.catalogSlug
+                                    }}</a
+                                    >/{{ package?.identifier.packageSlug }}
+                                    &nbsp;&nbsp;
+                                    <span
+                                        class="py-2 package-privacy"
+                                        *ngIf="this.currentUser?.username == this.catalogUser?.username"
+                                        [class.public]="package?.isPublic"
+                                    >
+                                        {{ package?.isPublic ? "public" : "not public" }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    <div class="col-12 mb-3">
-                        <div
-                            class="py-2 package-privacy"
-                            *ngIf="this.currentUser?.username == this.catalogUser?.username"
-                            [class.public]="package?.isPublic"
-                        >
-                            {{ package?.isPublic ? "public" : "not public" }}
+                    <div class="row d-lg-none">
+                        <div class="col-12">
+                            <app-package-info [package]="package" [packageFile]="packageFile"></app-package-info>
                         </div>
                     </div>
-                </div>
-                <div class="row d-lg-none">
-                    <div class="col-12">
-                        <app-package-info [package]="package" [packageFile]="packageFile"></app-package-info>
+                    <div class="row" *ngIf="package?.latestVersion?.identifier == null">
+                        <div class="col-12 alert alert-warning">
+                            No version of this package has been published. Therefore it is not available to fetch.
+                            Please contact the author, or check back later.
+                        </div>
                     </div>
-                </div>
-                <div class="row" *ngIf="package?.latestVersion?.identifier == null">
-                    <div class="col-12 alert alert-warning">
-                        No version of this package has been published. Therefore it is not available to fetch. Please
-                        contact the author, or check back later.
-                    </div>
-                </div>
 
-                <div class="row" *ngIf="package?.latestVersion?.identifier != null">
-                    <div class="col-md-12 no-pd-mobile">
-                        <ul class="p-0" id="packageRoutes">
-                            <li *ngFor="let r of routes" class="list-names">
-                                <a
-                                    class="cursor-pointer"
-                                    (click)="tabClick(r.url)"
-                                    [ngClass]="{ active: isActiveTab(r) }"
-                                >
-                                    {{ r.linkName }}
-                                </a>
-                            </li>
-                        </ul>
-                        <hr style="width: 100%" />
+                    <div class="row" *ngIf="package?.latestVersion?.identifier != null">
+                        <div class="col-md-12">
+                            <ul class="p-0" id="packageRoutes">
+                                <li *ngFor="let r of routes" class="list-names">
+                                    <a
+                                        class="cursor-pointer"
+                                        (click)="tabClick(r.url)"
+                                        [ngClass]="{ active: isActiveTab(r) }"
+                                    >
+                                        {{ r.linkName }}
+                                    </a>
+                                </li>
+                            </ul>
+                            <hr style="width: 100%" />
+                        </div>
                     </div>
-                </div>
-                <div class="row" *ngIf="package?.latestVersion?.identifier != null">
-                    <div class="col-lg-12">
-                        <div class="row">
-                            <div class="col-md-12" id="packageDetails">
-                                <div class="row flex-lg-row-reverse">
-                                    <div class="col-lg-5 col-md-12 col-lg-push-7 right-div d-none d-lg-block">
-                                        <app-package-info
-                                            [package]="package"
-                                            [packageFile]="packageFile"
-                                        ></app-package-info>
-                                    </div>
-                                    <div class="col-lg-7 col-md-12 col-lg-pull-5 left-div">
-                                        <div>
-                                            <router-outlet></router-outlet>
+                    <div class="row" *ngIf="package?.latestVersion?.identifier != null">
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-md-12" id="packageDetails">
+                                    <div class="row flex-lg-row-reverse">
+                                        <div class="col-lg-5 col-md-12 col-lg-push-7 right-div d-none d-lg-block">
+                                            <app-package-info
+                                                [package]="package"
+                                                [packageFile]="packageFile"
+                                            ></app-package-info>
+                                        </div>
+                                        <div class="col-lg-7 col-md-12 col-lg-pull-5 left-div">
+                                            <div>
+                                                <router-outlet></router-outlet>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

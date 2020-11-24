@@ -11,6 +11,7 @@ import { Clipboard } from "@angular/cdk/clipboard";
 import { Subject } from "rxjs";
 import { take, takeUntil } from "rxjs/operators";
 import { EditAccountDialogComponent } from "../edit-account-dialog/edit-account-dialog.component";
+import { SnackBarService } from "src/app/services/snackBar.service";
 
 enum State {
     INIT,
@@ -20,6 +21,7 @@ enum State {
     ERROR_NOT_UNIQUE,
     ERROR_NO_LABEL
 }
+
 @Component({
     selector: "me-details",
     templateUrl: "./details.component.html",
@@ -30,8 +32,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
     state = State.INIT;
 
     currentUser: User;
-    apiKeysOpenState: boolean = true;
-    apiKeysState = State.INIT;
+    public apiKeysState = State.INIT;
     createAPIKeyState = State.INIT;
     deleteAPIKeyState = State.INIT;
     newAPIKey: string;
@@ -51,7 +52,8 @@ export class DetailsComponent implements OnInit, OnDestroy {
         private createAPIKeyGQL: CreateAPIKeyGQL,
         private myAPIKeysGQL: MyAPIKeysGQL,
         private deleteAPIKeyGQL: DeleteAPIKeyGQL,
-        private clipboard: Clipboard
+        private clipboard: Clipboard,
+        private snackBarService: SnackBarService
     ) {}
 
     ngOnInit(): void {
@@ -106,6 +108,8 @@ export class DetailsComponent implements OnInit, OnDestroy {
             this.createAPIKeyState = State.ERROR_NO_LABEL;
             return;
         }
+        this.createAPIKeyState = State.LOADING;
+
         this.createAPIKeyGQL
             .mutate({
                 value: {
@@ -137,6 +141,13 @@ export class DetailsComponent implements OnInit, OnDestroy {
 
     deleteApiKey(id: string) {
         this.deleteAPIKeyState = State.LOADING;
+        this.apiKeysState = State.LOADING;
+
+        this.myAPIKeys = this.myAPIKeys.filter((k) => k.id != id);
+
+        const deletedKey = this.myAPIKeys.find((k) => k.id == id);
+
+        const startingArray = this.myAPIKeys;
 
         this.deleteAPIKeyGQL
             .mutate({ id: id })
@@ -144,6 +155,8 @@ export class DetailsComponent implements OnInit, OnDestroy {
             .subscribe((response) => {
                 if (response.errors?.length > 0) {
                     this.deleteAPIKeyState = State.ERROR;
+
+                    if (startingArray == this.myAPIKeys) this.myAPIKeys.push(deletedKey);
                     return;
                 }
 
@@ -177,5 +190,6 @@ export class DetailsComponent implements OnInit, OnDestroy {
 
     copyKeyToClipboard() {
         this.clipboard.copy(this.apiKeyCommandString());
+        this.snackBarService.openSnackBar("Copied to clipboard! Paste the command into your terminal.", "");
     }
 }

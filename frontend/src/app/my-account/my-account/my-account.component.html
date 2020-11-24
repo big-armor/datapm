@@ -1,11 +1,11 @@
-<app-cover [username]="currentUser?.username"></app-cover>
-
 <div class="container" id="userProfile">
     <div class="row top-row">
-        <div *ngIf="currentUser" class="col-lg-10 offset-lg-1 col-md-12 col-sm-12 profile-div">
+        <div *ngIf="currentUser" class="col-12 profile-div">
             <div class="row my-account-header">
-                <div class="col-7">
-                    <div class="d-flex bd-highlight user-header" style="height: 80px">
+                <app-cover [username]="currentUser?.username"></app-cover>
+
+                <div class="col-lg-8 col-xs-12">
+                    <div class="d-flex bd-highlight user-header">
                         <div class="p-2 bd-highlight">
                             <app-avatar class="user-img" [user]="currentUser" [size]="100"> </app-avatar>
                         </div>
@@ -18,41 +18,64 @@
                                 <span *ngIf="currentUser.nameIsPublic" class="public-text">public</span>
                                 <span *ngIf="!currentUser.nameIsPublic" class="not-public-text">not public</span><br />
                             </span>
-                            <span class="user-name-only">{{ "@" + currentUser.username }}</span>
-                            &nbsp;
-                            <span class="public-text">public</span>
+
+                            <div class="user-name-only">
+                                {{ "@" + currentUser.username }} <span class="public-text">public</span>
+                            </div>
+
+                            <div class="pb-1">
+                                <span class="social-link">
+                                    <a target="_blank" href="{{ currentUser.website }}">{{ currentUser.website }}</a
+                                    >&nbsp;
+                                    <span *ngIf="currentUser.websiteIsPublic" class="public-text">public</span>
+                                    <span *ngIf="!currentUser.websiteIsPublic" class="not-public-text">not public</span>
+                                </span>
+                            </div>
+
+                            <span class="social-link">
+                                <a target="_blank" href="mailto:{{ currentUser.emailAddress }}"
+                                    ><img src="/assets/images/envelope.png" width="24" alt="email" /></a
+                                >&nbsp;
+                                <span *ngIf="currentUser.emailAddressIsPublic" class="public-text">public</span>
+                                <span *ngIf="!currentUser.emailAddressIsPublic" class="not-public-text"
+                                    >not public</span
+                                >
+                            </span>
+
+                            <span class="social-link" *ngIf="currentUser.twitterHandle">
+                                <a target="_blank" href="https://twitter.com/{{ currentUser.twitterHandle }}"
+                                    ><img
+                                        src="/assets/images/twitter.png"
+                                        style="opacity: 0.8"
+                                        width="24"
+                                        alt="twitter"
+                                /></a>
+                                <span *ngIf="currentUser.twitterHandleIsPublic" class="public-text">public</span>
+                                <span *ngIf="!currentUser.twitterHandleIsPublic" class="not-public-text"
+                                    >not public</span
+                                >
+                            </span>
+                            <span class="social-link" *ngIf="currentUser.gitHubHandle">
+                                <a target="_blank" href="https://github.com/{{ currentUser.gitHubHandle }}"
+                                    ><img
+                                        src="/assets/images/github.png"
+                                        style="opacity: 0.8"
+                                        width="24"
+                                        alt="twitter" /></a
+                                >&nbsp;
+                                <span *ngIf="currentUser.gitHubHandleIsPublic" class="public-text">public</span>
+                                <span *ngIf="!currentUser.gitHubHandleIsPublic" class="not-public-text"
+                                    >not public</span
+                                >
+                            </span>
+                            <p class="user-bio">
+                                {{ currentUser.description }}
+                            </p>
                         </div>
                         <div class="p-2 bd-highlight"></div>
                     </div>
-                    <p class="user-bio pl-3">
-                        {{ currentUser.description }}
-                    </p>
                 </div>
-                <div class="col-5 contact-info">
-                    <h3>Contact Info</h3>
-                    <p>
-                        <a target="_blank" href="mailto:{{ currentUser.emailAddress }}">{{
-                            currentUser.emailAddress
-                        }}</a
-                        >&nbsp;
-                        <span *ngIf="currentUser.emailAddressIsPublic" class="public-text">public</span>
-                        <span *ngIf="!currentUser.emailAddressIsPublic" class="not-public-text">not public</span>
-                    </p>
-                    <p *ngIf="currentUser.twitterHandle">
-                        <a target="_blank" href="https://twitter.com/{{ currentUser.twitterHandle }}"
-                            >@{{ currentUser.twitterHandle }} on Twitter</a
-                        >&nbsp;
-                        <span *ngIf="currentUser.twitterHandleIsPublic" class="public-text">public</span>
-                        <span *ngIf="!currentUser.twitterHandleIsPublic" class="not-public-text">not public</span>
-                    </p>
-                    <p *ngIf="currentUser.gitHubHandle">
-                        <a target="_blank" href="https://github.com/{{ currentUser.gitHubHandle }}"
-                            >@{{ currentUser.gitHubHandle }} on GitHub</a
-                        >&nbsp;
-                        <span *ngIf="currentUser.gitHubHandleIsPublic" class="public-text">public</span>
-                        <span *ngIf="!currentUser.gitHubHandleIsPublic" class="not-public-text">not public</span>
-                    </p>
-                </div>
+                <div class="col-lg-4 col-xs-12 contact-info"><!-- future follow button--></div>
             </div>
 
             <div class="user-menu">
@@ -65,7 +88,7 @@
                 </ul>
             </div>
         </div>
-        <div class="col-lg-10 offset-lg-1 col-md-12 col-sm-12 p-0">
+        <div class="col-12 p-0">
             <router-outlet></router-outlet>
         </div>
     </div>
