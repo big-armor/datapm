@@ -4,14 +4,20 @@ import { EntityRepository, Repository, EntityManager, SelectQueryBuilder } from 
 import { v4 as uuid } from "uuid";
 
 import { User } from "../entity/User";
-import { CreateUserInputAdmin, Permission, UpdateUserInput, CreateUserInput } from "../generated/graphql";
+import {
+    CreateUserInputAdmin,
+    Permission,
+    UpdateUserInput,
+    CreateUserInput,
+    RecoverMyPasswordInput
+} from "../generated/graphql";
 import { mixpanel } from "../util/mixpanel";
 import { UserCatalogPermission } from "../entity/UserCatalogPermission";
 import { CatalogRepository } from "./CatalogRepository";
 import { hashPassword } from "../util/PasswordUtil";
 import { Catalog } from "../entity/Catalog";
-import { sendVerifyEmail, smtpConfigured } from "../util/smtpUtil";
-import { ValidationError } from "apollo-server";
+import { sendVerifyEmail, sendForgotPasswordEmail, smtpConfigured } from "../util/smtpUtil";
+import { ValidationError, UserInputError } from "apollo-server";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { CollectionRepository } from "./CollectionRepository";
 import { StorageErrors } from "../storage/files/file-storage-service";
@@ -202,6 +208,13 @@ export class UserRepository extends Repository<User> {
         });
     }
 
+    async findUserByRecoveryPasswordToken(token: String) {
+        const ALIAS = "getUserByRecoveryPasswordToken";
+        const user = await this.createQueryBuilder(ALIAS).where({ passwordRecoveryToken: token }).getOne();
+
+        return user;
+    }
+
     findUsers({ relations = [] }: { relations?: string[] }) {
         const ALIAS = "users";
         return this.manager.getRepository(User).createQueryBuilder(ALIAS).addRelations(ALIAS, relations).getMany();
@@ -281,6 +294,48 @@ export class UserRepository extends Repository<User> {
             });
 
             dbUser.passwordHash = passwordHash;
+            await transaction.save(dbUser);
+        });
+    }
+
+    forgotMyPassword({ user }: { user: User }): Promise<void> {
+        return this.manager
+            .nestedTransaction(async (transaction) => {
+                const dbUser = await getUserByUsernameOrFail({
+                    username: user.username,
+                    manager: transaction
+                });
+
+                dbUser.passwordRecoveryToken = uuid();
+                dbUser.passwordRecoveryTokenDate = new Date();
+
+                await transaction.save(dbUser);
+                return dbUser;
+            })
+            .then(async (user: User) => {
+                await sendForgotPasswordEmail(user, user.passwordRecoveryToken);
+            });
+    }
+
+    recoverMyPassword({ value }: { value: RecoverMyPasswordInput }): Promise<void> {
+        return this.manager.nestedTransaction(async (transaction) => {
+            const dbUser = await this.findUserByRecoveryPasswordToken(value.token);
+
+            // // return error if current user token is not the same as input token
+            if (dbUser?.passwordRecoveryToken != value.token) throw new UserInputError("TOKEN_NOT_VALID");
+
+            // return error if token is more than 4 hours expired
+            if (dbUser.passwordRecoveryToken && dbUser.passwordRecoveryTokenDate) {
+                const moreThanFourHours =
+                    new Date().getMilliseconds() - dbUser.passwordRecoveryTokenDate.getMilliseconds() >
+                    4 * 60 * 60 * 1000;
+
+                if (moreThanFourHours) throw new UserInputError("TOKEN_NO_LONGER_VALID");
+            }
+
+            const newPasswordHash = hashPassword(value.newPassword, dbUser.passwordSalt);
+            dbUser.passwordHash = newPasswordHash;
+
             await transaction.save(dbUser);
         });
     }

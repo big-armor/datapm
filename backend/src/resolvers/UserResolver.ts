@@ -1,9 +1,10 @@
-import { AuthenticationError, ValidationError } from "apollo-server";
+import { AuthenticationError, ValidationError, UserInputError } from "apollo-server";
 import { AuthenticatedContext } from "../context";
 import {
     AUTHENTICATION_ERROR,
     Base64ImageUpload,
     CreateUserInput,
+    RecoverMyPasswordInput,
     UpdateMyPasswordInput,
     UpdateUserInput
 } from "../generated/graphql";
@@ -47,7 +48,7 @@ export const createMe = async (
     if ((await usernameAvailable(_0, { username: value.username }, context)) == false) {
         throw new ValidationError("USERNAME_NOT_AVAILABLE");
     }
-    return await context.connection.manager.getCustomRepository(UserRepository).createUser({
+    await context.connection.manager.getCustomRepository(UserRepository).createUser({
         value,
         relations: getGraphQlRelationName(info)
     });
@@ -63,6 +64,33 @@ export const updateMe = async (
         username: context.me.username,
         value,
         relations: getGraphQlRelationName(info)
+    });
+};
+
+export const forgotMyPassword = async (
+    _0: any,
+    { emailAddress }: { emailAddress: string },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const user = await context.connection.manager.getCustomRepository(UserRepository).getUserByLogin(emailAddress);
+
+    // return a "fake" successful resolve if user not found
+    if (user == null) return Promise.resolve();
+
+    return await context.connection.manager.getCustomRepository(UserRepository).forgotMyPassword({
+        user
+    });
+};
+
+export const recoverMyPassword = async (
+    _0: any,
+    { value }: { value: RecoverMyPasswordInput },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    await context.connection.manager.getCustomRepository(UserRepository).recoverMyPassword({
+        value
     });
 };
 

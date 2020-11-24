@@ -5,7 +5,8 @@ import { Address } from "nodemailer/lib/mailer";
 
 export enum EMAIL_SUBJECTS {
     NEW_API_KEY = "⚠ New API Key Created",
-    VERIFY_EMAIL = "✓ Verify Your New Account"
+    VERIFY_EMAIL = "✓ Verify Your New Account",
+    FORGOT_PASSWORD = "⚠ Recover Your Account"
 }
 
 export async function sendAPIKeyCreatedEmail(user: User, apiKeyLabel: string) {
@@ -21,9 +22,19 @@ export async function sendAPIKeyCreatedEmail(user: User, apiKeyLabel: string) {
     sendEmail(user, EMAIL_SUBJECTS.NEW_API_KEY, emailText, emailHTML);
 }
 
-export async function sendVerifyEmail(user: User, token: string) {
-    // read the text
+export async function sendForgotPasswordEmail(user: User, token: string) {
+    let emailText = fs.readFileSync("./static/email-templates/forgot-password.txt", "utf8");
+    let emailHTML = fs.readFileSync("./static/email-templates/forgot-password.html", "utf8");
+    emailText = replaceCommonTokens(user, emailText);
+    emailText = emailText.replace(/{{token}}/g, token);
 
+    emailHTML = replaceCommonTokens(user, emailHTML);
+    emailHTML = emailHTML.replace(/{{token}}/g, token);
+
+    sendEmail(user, EMAIL_SUBJECTS.FORGOT_PASSWORD, emailText, emailHTML);
+}
+
+export async function sendVerifyEmail(user: User, token: string) {
     let emailText = fs.readFileSync("./static/email-templates/validate-email-address.txt", "utf8");
     let emailHTML = fs.readFileSync("./static/email-templates/validate-email-address.html", "utf8");
 
