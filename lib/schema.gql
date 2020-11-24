@@ -397,11 +397,14 @@ input UpdateCollectionInput {
     isPublic: Boolean
 }
 
+"""
+For sending a token response to recover and update users password
+"""
 input RecoverMyPasswordInput {
-    emailAddress: String! @validEmailAddress
     token: String!
     newPassword: String! @validPassword
 }
+
 type Query {
     """
     Whether the specified username is available for sign up
