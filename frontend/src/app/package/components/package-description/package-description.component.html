@@ -1,4 +1,5 @@
 <div class="package-dark-gray" *ngIf="packageFile?.readmeMarkdown == null">
+    <div class="title">{{ packageFile?.displayName }}</div>
     {{ package?.description }}
 </div>
 <div *ngIf="packageFile?.readmeMarkdown">
