@@ -74,7 +74,7 @@ export class PackageComponent implements OnDestroy {
                     .toPromise()
                     .then((value) => {
                         if (value.data == null) {
-                            console.log(JSON.stringify(value));
+                            console.error(JSON.stringify(value));
                             return;
                         }
 
@@ -83,7 +83,10 @@ export class PackageComponent implements OnDestroy {
             },
             (error) => {
                 if (error.message.includes("NOT_AUTHENTICATED")) this.state = State.ERROR_NOT_AUTHENTICATED;
-                else this.state = State.ERROR;
+                else {
+                    this.state = State.ERROR;
+                    console.error(error);
+                }
             }
         );
     }
