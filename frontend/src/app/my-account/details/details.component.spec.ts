@@ -7,6 +7,7 @@ import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from "@angular/materia
 import { MatTableModule } from "@angular/material/table";
 
 import { DetailsComponent } from "./details.component";
+import { MatSnackBarModule } from "@angular/material/snack-bar";
 
 describe("DetailsComponent", () => {
     let component: DetailsComponent;
@@ -22,6 +23,7 @@ describe("DetailsComponent", () => {
                 ApolloTestingModule,
                 RouterTestingModule,
                 FormsModule,
+                MatSnackBarModule,
                 ReactiveFormsModule
             ],
             providers: [
