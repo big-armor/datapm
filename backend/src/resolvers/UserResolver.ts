@@ -48,7 +48,6 @@ export const createMe = async (
     if ((await usernameAvailable(_0, { username: value.username }, context)) == false) {
         throw new ValidationError("USERNAME_NOT_AVAILABLE");
     }
-
     await context.connection.manager.getCustomRepository(UserRepository).createUser({
         value,
         relations: getGraphQlRelationName(info)
@@ -74,7 +73,7 @@ export const forgotMyPassword = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const user = await context.connection.manager.getCustomRepository(UserRepository).getUserByEmail(emailAddress);
+    const user = await context.connection.manager.getCustomRepository(UserRepository).getUserByLogin(emailAddress);
 
     // return a "fake" successful resolve if user not found
     if (user == null) return Promise.resolve();
@@ -90,14 +89,7 @@ export const recoverMyPassword = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const user = await context.connection.manager
-        .getCustomRepository(UserRepository)
-        .getUserByEmail(value.emailAddress);
-
-    if (user == null) throw new UserInputError("USER_NOT_FOUND");
-
-    return await context.connection.manager.getCustomRepository(UserRepository).recoverMyPassword({
-        user: user,
+    await context.connection.manager.getCustomRepository(UserRepository).recoverMyPassword({
         value
     });
 };

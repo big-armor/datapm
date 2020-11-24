@@ -208,6 +208,13 @@ export class UserRepository extends Repository<User> {
         });
     }
 
+    async findUserByRecoveryPasswordToken(token: String) {
+        const ALIAS = "getUserByRecoveryPasswordToken";
+        const user = await this.createQueryBuilder(ALIAS).where({ passwordRecoveryToken: token }).getOne();
+
+        return user;
+    }
+
     findUsers({ relations = [] }: { relations?: string[] }) {
         const ALIAS = "users";
         return this.manager.getRepository(User).createQueryBuilder(ALIAS).addRelations(ALIAS, relations).getMany();
@@ -291,7 +298,7 @@ export class UserRepository extends Repository<User> {
         });
     }
 
-    forgotMyPassword({ user }: { user: User }): Promise<User> {
+    forgotMyPassword({ user }: { user: User }): Promise<void> {
         return this.manager
             .nestedTransaction(async (transaction) => {
                 const dbUser = await getUserByUsernameOrFail({
@@ -307,45 +314,30 @@ export class UserRepository extends Repository<User> {
             })
             .then(async (user: User) => {
                 await sendForgotPasswordEmail(user, user.passwordRecoveryToken);
-                return getUserOrFail({
-                    username: user.username,
-                    manager: this.manager
-                });
             });
     }
 
-    recoverMyPassword({ user, value }: { user: User; value: RecoverMyPasswordInput }): Promise<User> {
-        return this.manager
-            .nestedTransaction(async (transaction) => {
-                const dbUser = await getUserByUsernameOrFail({
-                    username: user.username,
-                    manager: transaction
-                });
+    recoverMyPassword({ value }: { value: RecoverMyPasswordInput }): Promise<void> {
+        return this.manager.nestedTransaction(async (transaction) => {
+            const dbUser = await this.findUserByRecoveryPasswordToken(value.token);
 
-                // return error if current user token is not the same as input token
-                if (dbUser.passwordRecoveryToken != value.token) throw new UserInputError("TOKEN_NOT_VALID");
+            // // return error if current user token is not the same as input token
+            if (dbUser?.passwordRecoveryToken != value.token) throw new UserInputError("TOKEN_NOT_VALID");
 
-                // return error if token is more than 4 hours expired
-                if (dbUser.passwordRecoveryToken && dbUser.passwordRecoveryTokenDate) {
-                    const moreThanFourHours =
-                        new Date().getMilliseconds() - dbUser.passwordRecoveryTokenDate.getMilliseconds() >
-                        4 * 60 * 60 * 1000;
+            // return error if token is more than 4 hours expired
+            if (dbUser.passwordRecoveryToken && dbUser.passwordRecoveryTokenDate) {
+                const moreThanFourHours =
+                    new Date().getMilliseconds() - dbUser.passwordRecoveryTokenDate.getMilliseconds() >
+                    4 * 60 * 60 * 1000;
 
-                    if (moreThanFourHours) throw new UserInputError("TOKEN_NOT_VALID");
-                }
+                if (moreThanFourHours) throw new UserInputError("TOKEN_NO_LONGER_VALID");
+            }
 
-                const newPasswordHash = hashPassword(value.newPassword, dbUser.passwordSalt);
-                dbUser.passwordHash = newPasswordHash;
+            const newPasswordHash = hashPassword(value.newPassword, dbUser.passwordSalt);
+            dbUser.passwordHash = newPasswordHash;
 
-                await transaction.save(dbUser);
-                return dbUser;
-            })
-            .then(async (user: User) => {
-                return getUserOrFail({
-                    username: user.username,
-                    manager: this.manager
-                });
-            });
+            await transaction.save(dbUser);
+        });
     }
 
     updateUser({
