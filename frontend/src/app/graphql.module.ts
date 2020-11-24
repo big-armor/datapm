@@ -91,7 +91,6 @@ export function provideApollo(httpLink: HttpLink) {
             schema,
             typesMap
         }),
-        ,
         basic,
         auth,
         httpLink.create({ uri }),
