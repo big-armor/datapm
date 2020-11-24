@@ -226,6 +226,49 @@ async function main() {
         }
     });
 
+    app.use("/images/package/:catalogSlug/:packageSlug/cover", async (req, res, next) => {
+        try {
+            await respondWithImage(
+                await imageService.readPackageCoverImage({
+                    catalogSlug: req.params.catalogSlug,
+                    packageSlug: req.params.packageSlug
+                }),
+                res
+            );
+        } catch (err) {
+            res.status(404).send();
+            return;
+        }
+    });
+
+    app.use("/images/catalog/:catalogSlug/cover", async (req, res, next) => {
+        try {
+            await respondWithImage(
+                await imageService.readCatalogCoverImage({
+                    catalogSlug: req.params.catalogSlug
+                }),
+                res
+            );
+        } catch (err) {
+            res.status(404).send();
+            return;
+        }
+    });
+
+    app.use("/images/collection/:collectionSlug/cover", async (req, res, next) => {
+        try {
+            await respondWithImage(
+                await imageService.readCollectionCoverImage({
+                    collectionSlug: req.params.collectionSlug
+                }),
+                res
+            );
+        } catch (err) {
+            res.status(404).send();
+            return;
+        }
+    });
+
     // any route not yet defined goes to index.html
     app.use("*", (req, res, next) => {
         res.setHeader("x-datapm-version", REGISTRY_API_VERSION);

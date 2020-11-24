@@ -64,10 +64,10 @@ export class CoverComponent implements OnInit {
         let url;
         if (this.username) {
             url = `/images/user/${this.username}/cover`;
+        } else if (this.packageSlug && this.catalogSlug) {
+            url = `/images/package/${this.catalogSlug}/${this.packageSlug}/cover`;
         } else if (this.catalogSlug) {
             url = `/images/catalog/${this.catalogSlug}/cover`;
-        } else if (this.packageSlug) {
-            url = `/images/package/${this.packageSlug}/cover`;
         } else if (this.collectionSlug) {
             url = `/images/collection/${this.collectionSlug}/cover`;
         } else {

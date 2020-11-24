@@ -32,7 +32,11 @@
     <div class="container pl-2">
         <div class="row" id="packagePage">
             <div class="col-xl-12 col-12 contentContainer pl-0 pr-0">
-                <app-cover class="cover-image" [packageSlug]="package?.identifier.packageSlug"></app-cover>
+                <app-cover
+                    class="cover-image"
+                    [catalogSlug]="package?.identifier.catalogSlug"
+                    [packageSlug]="package?.identifier.packageSlug"
+                ></app-cover>
 
                 <div class="p-2">
                     <div class="row" *ngIf="package">
