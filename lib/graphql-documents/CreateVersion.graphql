@@ -9,8 +9,6 @@ mutation CreateVersion($identifier: PackageIdentifierInput!, $value: CreateVersi
         }
         createdAt
         updatedAt
-        readmeFile
-        licenseFile
         package {
             displayName
             description

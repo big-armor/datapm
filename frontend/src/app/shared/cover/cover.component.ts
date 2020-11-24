@@ -12,7 +12,10 @@ import { User } from "src/generated/graphql";
     styleUrls: ["./cover.component.scss"]
 })
 export class CoverComponent implements OnInit {
-    @Input() user: User;
+    @Input() username: string;
+    @Input() catalogSlug: string;
+    @Input() collectionSlug: string;
+    @Input() packageSlug: string;
     @Input() height: number = 40;
     @Input() editable: boolean = false;
     @Output() upload: EventEmitter<any>;
@@ -34,7 +37,7 @@ export class CoverComponent implements OnInit {
 
         this.imageService.shouldRefresh.pipe(takeUntil(this.unsubscribe$)).subscribe(({ target }) => {
             if (target === "cover") {
-                this.getImage(this.user?.username);
+                this.getImage();
             }
         });
     }
@@ -42,9 +45,14 @@ export class CoverComponent implements OnInit {
     ngOnInit(): void {}
 
     ngOnChanges(changes: SimpleChanges) {
-        if (changes.user && changes.user.currentValue) {
-            this.user = changes.user.currentValue;
-            this.getImage(this.user.username);
+        if (changes.username && changes.username.currentValue) {
+            this.getImage();
+        } else if (changes.packageSlug && changes.packageSlug.currentValue) {
+            this.getImage();
+        } else if (changes.catalogSlug && changes.catalogSlug.currentValue) {
+            this.getImage();
+        } else if (changes.collectionSlug && changes.collectionSlug.currentValue) {
+            this.getImage();
         }
     }
 
@@ -52,12 +60,20 @@ export class CoverComponent implements OnInit {
         this.inputEventId = this.fileService.openFile("image/jpeg");
     }
 
-    private getImage(username?: string) {
-        if (!username) {
+    private getImage() {
+        let url;
+        if (this.username) {
+            url = `/images/user/${this.username}/cover`;
+        } else if (this.catalogSlug) {
+            url = `/images/catalog/${this.catalogSlug}/cover`;
+        } else if (this.packageSlug) {
+            url = `/images/package/${this.packageSlug}/cover`;
+        } else if (this.collectionSlug) {
+            url = `/images/collection/${this.collectionSlug}/cover`;
+        } else {
             return;
         }
 
-        const url = `/images/user/${username}/cover`;
         this.imageService.getImage(url).subscribe(
             (imgData: any) => {
                 this.imgData = imgData;

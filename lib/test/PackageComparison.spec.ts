@@ -338,4 +338,112 @@ describe("Checking VersionUtil", () => {
 
         expect(diff.some((d) => d.type === "CHANGE_UPDATED_DATE")).equal(true);
     });
+
+    it("Package File updated versions", function () {
+        const packageFileA: PackageFile = {
+            packageSlug: "test",
+            displayName: "test",
+            generatedBy: "test",
+            schemas: [],
+            version: "1.0.0",
+            updatedDate: new Date(),
+            description: "Back test"
+        };
+
+        const packageFileB: PackageFile = {
+            packageSlug: "test",
+            displayName: "test",
+            generatedBy: "test",
+            schemas: [],
+            version: "1.0.0",
+            updatedDate: packageFileA.updatedDate,
+            description: "Back test"
+        };
+
+        expect(comparePackages(packageFileA, packageFileB).some((d) => d.type === "CHANGE_VERSION")).equal(false);
+
+        packageFileB.version = "1.0.1";
+
+        const diff = comparePackages(packageFileA, packageFileB);
+
+        expect(diff.some((d) => d.type === "CHANGE_VERSION")).equal(true);
+    });
+
+    it("Package File updated readme", function () {
+        const packageFileA: PackageFile = {
+            packageSlug: "test",
+            displayName: "test",
+            generatedBy: "test",
+            schemas: [],
+            version: "1.0.0",
+            updatedDate: new Date(),
+            description: "Back test",
+            readmeMarkdown: "Some readme content"
+        };
+
+        const packageFileB: PackageFile = {
+            packageSlug: "test",
+            displayName: "test",
+            generatedBy: "test",
+            schemas: [],
+            version: "1.0.0",
+            updatedDate: packageFileA.updatedDate,
+            description: "Back test",
+            readmeMarkdown: packageFileA.readmeMarkdown
+        };
+
+        expect(
+            comparePackages(packageFileA, packageFileB).some((d) => d.type === DifferenceType.CHANGE_README_MARKDOWN)
+        ).equal(false);
+
+        packageFileB.readmeFile = "some-new-file.README.md";
+        expect(
+            comparePackages(packageFileA, packageFileB).some((d) => d.type === DifferenceType.CHANGE_README_FILE)
+        ).equal(true);
+
+        packageFileB.readmeMarkdown = "other content";
+
+        const diff = comparePackages(packageFileA, packageFileB);
+
+        expect(diff.some((d) => d.type === DifferenceType.CHANGE_README_MARKDOWN)).equal(true);
+    });
+
+    it("Package File updated license", function () {
+        const packageFileA: PackageFile = {
+            packageSlug: "test",
+            displayName: "test",
+            generatedBy: "test",
+            schemas: [],
+            version: "1.0.0",
+            updatedDate: new Date(),
+            description: "Back test",
+            licenseMarkdown: "Some content"
+        };
+
+        const packageFileB: PackageFile = {
+            packageSlug: "test",
+            displayName: "test",
+            generatedBy: "test",
+            schemas: [],
+            version: "1.0.0",
+            updatedDate: packageFileA.updatedDate,
+            description: "Back test",
+            licenseMarkdown: packageFileA.licenseMarkdown
+        };
+
+        expect(
+            comparePackages(packageFileA, packageFileB).some((d) => d.type === DifferenceType.CHANGE_LICENSE_MARKDOWN)
+        ).equal(false);
+
+        packageFileB.licenseFile = "some-new-file.LICENSE.md";
+        expect(
+            comparePackages(packageFileA, packageFileB).some((d) => d.type === DifferenceType.CHANGE_LICENSE_FILE)
+        ).equal(true);
+
+        packageFileB.licenseMarkdown = "other content";
+
+        const diff = comparePackages(packageFileA, packageFileB);
+
+        expect(diff.some((d) => d.type === DifferenceType.CHANGE_LICENSE_MARKDOWN)).equal(true);
+    });
 });

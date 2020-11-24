@@ -181,6 +181,11 @@
         }
     }
 
+    .loading-spinner {
+        display: inline-block;
+        position: relative;
+        top: 2px;
+    }
     .edit-button {
         font-family: Roboto Mono;
         font-style: normal;
@@ -200,9 +205,6 @@
         }
     }
     .mat-card {
-        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
-            0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
-
         .mat-card-title {
             font-family: Roboto Mono;
             font-style: normal;
@@ -276,8 +278,7 @@
 
     .panel-div {
         width: 100%;
-        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
-            0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+
         table {
             width: 100%;
         }
@@ -292,15 +293,10 @@
                 height: 35px;
                 // border: none !important;
                 border: 0.5px solid rgb(235, 235, 235);
-                font-family: Roboto Mono;
-                font-style: normal;
-                font-weight: normal;
-                font-size: 14px;
                 line-height: 18px;
                 display: flex;
                 align-items: flex-end;
                 letter-spacing: -0.28px;
-                color: #017fb9;
 
                 &:focus {
                     outline: transparent solid 0px;
@@ -372,8 +368,10 @@
         }
     }
 
-    .section-description {
-        width: 100%;
+    #detailsPage {
+        .section-description {
+            width: 100%;
+        }
     }
 }
 

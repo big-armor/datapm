@@ -4,9 +4,12 @@ import { Apollo, APOLLO_OPTIONS } from "apollo-angular";
 import { HttpLink } from "apollo-angular/http";
 import { InMemoryCache, ApolloLink } from "@apollo/client/core";
 import { setContext } from "@apollo/client/link/context";
-import { getTokenDesc } from "graphql/language/lexer";
+import { withScalars } from "apollo-link-scalars";
 import { onError } from "@apollo/client/link/error";
 import JwtDecode from "jwt-decode";
+import { typeDefs } from "../generated/graphql";
+import { GraphQLScalarType, GraphQLSchema, Kind } from "graphql";
+import { makeExecutableSchema } from "@graphql-tools/schema";
 const uri = "/graphql";
 
 export function provideApollo(httpLink: HttpLink) {
@@ -53,7 +56,46 @@ export function provideApollo(httpLink: HttpLink) {
         if (networkError) console.log(`[Network error]: ${networkError}`);
     });
 
-    const link = ApolloLink.from([basic, auth, httpLink.create({ uri }), errorLink]);
+    const typesMap = {
+        Date: {
+            serialize: (date: Date) => date.toString(),
+            parseValue: (raw: string | null): Date | null => {
+                return raw ? new Date(Date.parse(raw)) : null;
+            }
+        }
+    };
+
+    const resolvers = {
+        // example of scalar type, which will parse the string into a custom class CustomDate which receives a Date object
+        Date: new GraphQLScalarType({
+            name: "Date",
+            serialize: (parsed: Date | null) => parsed && parsed.toISOString(),
+            parseValue: (raw: any) => raw && new Date(Date.parse(raw))
+            /*parseLiteral(ast) {
+                if (ast.kind === Kind.STRING || ast.kind === Kind.INT) {
+                    return new new Date(Date.parse(ast.value))();
+                }
+                return null;
+            }*/
+        })
+    };
+
+    // GraphQL Schema, required to use the link
+    const schema = makeExecutableSchema({
+        typeDefs,
+        resolvers
+    });
+
+    const link = ApolloLink.from([
+        withScalars({
+            schema,
+            typesMap
+        }),
+        basic,
+        auth,
+        httpLink.create({ uri }),
+        errorLink
+    ]);
     const cache = new InMemoryCache();
 
     return {

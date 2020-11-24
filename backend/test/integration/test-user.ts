@@ -293,6 +293,19 @@ describe("User Tests", async () => {
         expect(response.data!.updateMe.location).to.equal("testLocationA");
     });
 
+    it("Set User A description", async function () {
+        let response = await userAClient.mutate({
+            mutation: UpdateMeDocument,
+            variables: {
+                value: {
+                    description: "This is my new description"
+                }
+            }
+        });
+
+        expect(response.data!.updateMe.description).to.equal("This is my new description");
+    });
+
     it("User B Access User A Location - Not Public", async function () {
         let response = await userBClient.query({
             query: UserDocument,

@@ -101,11 +101,12 @@ import { validateSlug as validatePackageSlug } from "./directive/ValidPackageSlu
 import { validateEmailAddress } from "./directive/ValidEmailDirective";
 import { FileStorageService, StorageErrors } from "./storage/files/file-storage-service";
 import { PackageFileStorageService } from "./storage/packages/package-file-storage-service";
+import { DateResolver } from "./resolvers/DateResolver";
 
 export const resolvers: {
     Query: QueryResolvers;
     Mutation: MutationResolvers;
-    Date: GraphQLScalarType;
+    Date: DateResolver;
     User: UserResolvers;
     UserCatalog: UserCatalogResolvers;
     Catalog: CatalogResolvers;
@@ -395,59 +396,7 @@ export const resolvers: {
                 });
             } catch (error) {
                 if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) {
-                    console.error("A request package file was not found. This is VERY BAD!");
-                    console.error(JSON.stringify(error));
-                    return;
-                }
-
-                throw error;
-            }
-        },
-        readmeFile: async (parent: any, _1: any, context: AuthenticatedContext) => {
-            const version = parent as Version;
-            const packageEntity = await context.connection
-                .getRepository(Package)
-                .findOneOrFail({ id: version.packageId });
-
-            const catalog = await context.connection
-                .getRepository(Catalog)
-                .findOneOrFail({ id: packageEntity.catalogId });
-            try {
-                return await PackageFileStorageService.INSTANCE.readReadmeFile({
-                    catalogSlug: catalog.slug,
-                    packageSlug: packageEntity.slug,
-                    versionMajor: version.majorVersion,
-                    versionMinor: version.minorVersion,
-                    versionPatch: version.patchVersion
-                });
-            } catch (error) {
-                if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) {
-                    return null;
-                }
-
-                throw error;
-            }
-        },
-        licenseFile: async (parent: any, _1: any, context: AuthenticatedContext) => {
-            const version = parent as Version;
-            const packageEntity = await context.connection
-                .getRepository(Package)
-                .findOneOrFail({ id: version.packageId });
-
-            const catalog = await context.connection
-                .getRepository(Catalog)
-                .findOneOrFail({ id: packageEntity.catalogId });
-            try {
-                return await PackageFileStorageService.INSTANCE.readLicenseFile({
-                    catalogSlug: catalog.slug,
-                    packageSlug: packageEntity.slug,
-                    versionMajor: version.majorVersion,
-                    versionMinor: version.minorVersion,
-                    versionPatch: version.patchVersion
-                });
-            } catch (error) {
-                if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) {
-                    return null;
+                    throw new Error("PACKAGE_FILE_NOT_FOUND");
                 }
 
                 throw error;
@@ -719,13 +668,7 @@ export const resolvers: {
 
                 await transaction
                     .getCustomRepository(PackageRepository)
-                    .updatePackageReadmeVectors(identifier, value.readmeFile);
-
-                if (value.readmeFile)
-                    await PackageFileStorageService.INSTANCE.writeReadmeFile(versionIdentifier, value.readmeFile);
-
-                if (value.licenseFile)
-                    await PackageFileStorageService.INSTANCE.writeLicenseFile(versionIdentifier, value.licenseFile);
+                    .updatePackageReadmeVectors(identifier, newPackageFile.readmeMarkdown);
 
                 if (value.packageFile)
                     await PackageFileStorageService.INSTANCE.writePackageFile(versionIdentifier, value.packageFile);

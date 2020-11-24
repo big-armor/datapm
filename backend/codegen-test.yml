@@ -18,6 +18,7 @@ generates:
         config:
             scalars:
                 Date: Date
+                Void: void
                 JSON: "{ [key: string]: any }"
                 Upload: Promise<FileUpload>
             namingConvention:

@@ -3,14 +3,18 @@ import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
 import { PackageFile } from "datapm-lib";
 import { Subject } from "rxjs";
-import { Package } from "src/generated/graphql";
+import { Package, User, UserGQL } from "src/generated/graphql";
 import { PackageService, PackageResponse } from "../../services/package.service";
 import { takeUntil } from "rxjs/operators";
+import { MatDialog } from "@angular/material/dialog";
+import { LoginDialogComponent } from "src/app/shared/header/login-dialog/login-dialog.component";
+import { AuthenticationService } from "src/app/services/authentication.service";
 
 enum State {
     LOADING,
     LOADED,
-    ERROR
+    ERROR,
+    ERROR_NOT_AUTHENTICATED
 }
 @Component({
     selector: "package",
@@ -35,16 +39,26 @@ export class PackageComponent implements OnDestroy {
     private catalogSlug = "";
     private packageSlug = "";
 
+    public catalogUser: User;
+    public currentUser: User;
+
     constructor(
         private route: ActivatedRoute,
         private packageService: PackageService,
+        public dialog: MatDialog,
         private title: Title,
-        private router: Router
+        private router: Router,
+        private userGql: UserGQL,
+        private authenticationService: AuthenticationService
     ) {
         this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe(
             (p: PackageResponse) => {
-                if (!p || p.error) {
-                    this.state = State.ERROR;
+                if (p == null) return;
+
+                if (p.package == null) {
+                    if (p.response.errors.some((e) => e.message.includes("NOT_AUTHENTICATED")))
+                        this.state = State.ERROR_NOT_AUTHENTICATED;
+                    else this.state = State.ERROR;
                     return;
                 }
                 this.package = p.package;
@@ -53,9 +67,26 @@ export class PackageComponent implements OnDestroy {
                 }
                 this.title.setTitle(`${this.package?.displayName} - datapm`);
                 this.state = State.LOADED;
+                this.userGql
+                    .fetch({
+                        username: this.package.identifier.catalogSlug
+                    })
+                    .toPromise()
+                    .then((value) => {
+                        if (value.data == null) {
+                            console.error(JSON.stringify(value));
+                            return;
+                        }
+
+                        this.catalogUser = value.data.user;
+                    });
             },
             (error) => {
-                this.state = State.ERROR;
+                if (error.message.includes("NOT_AUTHENTICATED")) this.state = State.ERROR_NOT_AUTHENTICATED;
+                else {
+                    this.state = State.ERROR;
+                    console.error(error);
+                }
             }
         );
     }
@@ -65,6 +96,13 @@ export class PackageComponent implements OnDestroy {
         this.catalogSlug = this.route.snapshot.paramMap.get("catalogSlug");
         this.packageSlug = this.route.snapshot.paramMap.get("packageSlug");
         this.packageService.getPackage(this.catalogSlug, this.packageSlug);
+
+        this.authenticationService
+            .getUserObservable()
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe(async (response) => {
+                this.currentUser = await response;
+            });
     }
 
     ngOnDestroy(): void {
@@ -84,5 +122,11 @@ export class PackageComponent implements OnDestroy {
 
         if (activeRouteParts.length == 3) return route.url == "";
         return activeRouteParts[3] == route.url;
+    }
+
+    loginClicked() {
+        this.dialog.open(LoginDialogComponent, {
+            disableClose: true
+        });
     }
 }

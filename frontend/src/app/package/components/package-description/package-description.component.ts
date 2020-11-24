@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { PackageFile } from "datapm-lib";
+import { PackageFile, parsePackageFileJSON } from "datapm-lib";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { Package } from "src/generated/graphql";
@@ -17,9 +17,10 @@ export class PackageDescriptionComponent {
 
     constructor(private packageService: PackageService) {
         this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe((p: PackageResponse) => {
-            if (p == null || p.error) return;
+            if (p == null || p.package == null) return;
 
             this.package = p.package;
+            this.packageFile = parsePackageFileJSON(p.package.latestVersion.packageFile);
         });
     }
 

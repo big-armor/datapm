@@ -1,11 +1,27 @@
+"""
+ISO 8601 serialized Date strings
+"""
 scalar Date
+
+"""
+Generic object JSON serialized strings
+"""
 scalar JSON
+
+"""
+Package files are JSON serialized and validated using JSONSchema
+"""
 scalar PackageFileJSON
+
+"""
+A no-return value, mapped to void in typescript
+"""
 scalar Void
-scalar Long
-scalar Object
+
+"""
+ValidationString is used at runtime by the validate***Directive classes to allow apollo a intermediate type for conversions
+"""
 scalar ValidationString
-scalar Upload
 
 """
 A string that uniquely identifies a catalog - this is an intermediate type only for internal validation
@@ -182,9 +198,7 @@ type Version {
     updatedAt: Date!
     package: Package!
     author: User!
-    packageFile: PackageFileJSON
-    readmeFile: String
-    licenseFile: String
+    packageFile: PackageFileJSON!
 }
 
 """
@@ -374,8 +388,6 @@ To create a new package version, submit a valid package file
 """
 input CreateVersionInput {
     packageFile: PackageFileJSON
-    licenseFile: String
-    readmeFile: String
 }
 
 """

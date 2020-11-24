@@ -18,8 +18,6 @@ query Package($identifier: PackageIdentifierInput!) {
                 versionPatch
             }
             packageFile
-            readmeFile
-            licenseFile
             createdAt
         }
         versions {

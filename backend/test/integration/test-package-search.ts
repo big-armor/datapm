@@ -12,6 +12,7 @@ import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
 import fs from "fs";
 import * as crypto from "crypto";
+import { loadPackageFileFromDisk, parsePackageFileJSON } from "datapm-lib";
 
 describe("Package Search Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
@@ -62,11 +63,10 @@ describe("Package Search Tests", async () => {
     });
 
     it("User A publish first version", async function () {
-        let packageFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json", "utf8");
-        let readmeFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.README.md", "utf8");
-        let licenseFileContents = fs.readFileSync("test/packageFiles/congressional-legislators.LICENSE.md", "utf8");
+        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
 
-        let originalContentHash = crypto.createHash("sha256").update(packageFileContents, "utf8").digest("hex");
+        const packageFileString = JSON.stringify(packageFileContents);
+
         let response = await userAClient.mutate({
             mutation: CreateVersionDocument,
             variables: {
@@ -75,9 +75,7 @@ describe("Package Search Tests", async () => {
                     packageSlug: "congressional-legislators"
                 },
                 value: {
-                    packageFile: packageFileContents,
-                    licenseFile: licenseFileContents,
-                    readmeFile: readmeFileContents
+                    packageFile: packageFileString
                 }
             }
         });
@@ -90,10 +88,12 @@ describe("Package Search Tests", async () => {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("a408ed82946e088eec17f92775e67013e877a0dd0aed6d4d10ef2d1c79d14cc8");
+        expect(responseHash).equal("277a1c1995ea6adbcd229621daf11c7cb4f90580c4871d2da7ab8e5c80a92987");
 
-        expect(response.data!.createVersion.readmeFile!).includes("This is where a readme might go");
-        expect(response.data!.createVersion.licenseFile!).includes("This is not a real license. Just a test.");
+        const packageFile = parsePackageFileJSON(responsePackageFileContents);
+
+        expect(packageFile.readmeMarkdown).includes("This is where a readme might go");
+        expect(packageFile.licenseMarkdown).includes("This is not a real license. Just a test.");
     });
 
     it("Should allow User A to search for package", async function () {

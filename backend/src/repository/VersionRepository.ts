@@ -117,22 +117,6 @@ export class VersionRepository {
 
                 console.error(error.message);
             }
-
-            try {
-                await this.packageFileStorageService.deleteLicenseFile(versionIdentifier);
-            } catch (error) {
-                if (error.message.includes("ENOENT")) return;
-
-                console.error(error.message);
-            }
-
-            try {
-                await this.packageFileStorageService.deleteReadmeFile(versionIdentifier);
-            } catch (error) {
-                if (error.message.includes("ENOENT")) return;
-
-                console.error(error.message);
-            }
         }
 
         await this.manager.nestedTransaction(async (transaction) => {

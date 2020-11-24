@@ -16,8 +16,6 @@ mutation UpdatePackage($identifier: PackageIdentifierInput!, $value: UpdatePacka
                 versionPatch
             }
             packageFile
-            readmeFile
-            licenseFile
         }
     }
 }

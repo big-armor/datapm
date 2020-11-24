@@ -36,6 +36,9 @@
             <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
             <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
         </table>
+        <span *ngIf="apiKeysState == State.LOADING" class="loading-spinner pl-4 pt-1">
+            <mat-spinner diameter="25"></mat-spinner>
+        </span>
 
         <div class="api-key-form">
             <form [formGroup]="createAPIKeyForm">
@@ -48,8 +51,14 @@
                         minlength="1"
                         autocomplete="off"
                     />
+
                     <div [class.disabled]="!createAPIKeyForm.valid">
-                        <a class="edit-button" (click)="createAPIKey()">Create API Key</a>
+                        <a class="edit-button" (click)="createAPIKey()">
+                            <span *ngIf="createAPIKeyState != State.LOADING" class="btn-text">Create API Key</span>
+                            <span *ngIf="createAPIKeyState == State.LOADING" class="loading-spinner">
+                                <mat-spinner diameter="15"></mat-spinner>
+                            </span>
+                        </a>
                     </div>
                 </div>
             </form>

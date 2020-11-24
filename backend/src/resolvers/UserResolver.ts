@@ -52,6 +52,8 @@ export const createMe = async (
         value,
         relations: getGraphQlRelationName(info)
     });
+
+    return;
 };
 
 export const updateMe = async (

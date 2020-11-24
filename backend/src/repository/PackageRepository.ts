@@ -312,15 +312,17 @@ export class PackageRepository {
         });
     }
 
-    async updatePackageReadmeVectors(identifier: PackageIdentifierInput, readmeFile: string | null | undefined) {
+    async updatePackageReadmeVectors(identifier: PackageIdentifierInput, readmeMarkdown: string | null | undefined) {
         await this.manager.nestedTransaction(async (transaction) => {
             const packageEntity = await findPackage(transaction, identifier.catalogSlug, identifier.packageSlug, []);
 
             if (packageEntity == null) throw new UserInputError("PACKAGE_NOT_FOUND");
 
-            if (readmeFile)
+            // TODO strip markdown characters before creating vectors?
+
+            if (readmeMarkdown)
                 return transaction.query('UPDATE "package" SET readme_file_vectors = to_tsvector($1) WHERE id = $2', [
-                    readmeFile,
+                    readmeMarkdown,
                     packageEntity.id
                 ]);
             else
