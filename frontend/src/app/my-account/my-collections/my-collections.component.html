@@ -3,7 +3,7 @@
         <div class="section-title col-md-12 col-lg-12">
             <span>My Collections</span>
         </div>
-        <ng-container *ngIf="!loading && collections.length === 0">
+        <ng-container *ngIf="!state !== State.LOADING && collections.length === 0">
             <div class="section-description col-md-12 col-lg-12">
                 <span>
                     These are the collections of data you have created. You may choose to share them publicly, or not.
@@ -16,7 +16,11 @@
         </ng-container>
 
         <!-- Package without thumbnail -->
-        <table *ngIf="!loading && collections && collections.length > 0" mat-table [dataSource]="collections">
+        <table
+            *ngIf="!state !== State.LOADING && collections && collections.length > 0"
+            mat-table
+            [dataSource]="collections"
+        >
             <!-- Label column -->
             <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef>Name</th>
@@ -48,7 +52,7 @@
             <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
         </table>
 
-        <div class="loading-container" *ngIf="loading">
+        <div class="loading-container" *ngIf="state === State.LOADING">
             <mat-spinner [diameter]="40"></mat-spinner>
         </div>
     </div>

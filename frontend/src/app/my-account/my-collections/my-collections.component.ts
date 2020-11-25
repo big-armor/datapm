@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
+import { STATUS_CODES } from "http";
 import {
     Collection,
     CreateCollectionGQL,
@@ -11,6 +12,13 @@ import { CreateCollectionComponent } from "../create-collection/create-collectio
 import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
 import { FewPackagesAlertComponent } from "../few-packages-alert/few-packages-alert.component";
 
+enum State {
+    INIT,
+    LOADING,
+    ERROR,
+    SUCCESS
+}
+
 @Component({
     selector: "my-collections",
     templateUrl: "./my-collections.component.html",
@@ -19,7 +27,8 @@ import { FewPackagesAlertComponent } from "../few-packages-alert/few-packages-al
 export class MyCollectionsComponent implements OnInit {
     public collections: Collection[] = [];
     columnsToDisplay = ["name", "public", "actions"];
-    loading = false;
+    State = State;
+    state = State.INIT;
 
     constructor(
         private myCollections: MyCollectionsGQL,
@@ -53,11 +62,16 @@ export class MyCollectionsComponent implements OnInit {
 
     private loadMyCollections(): void {
         // Need to set a dynamic limit for future / pagination
-        this.loading = true;
-        this.myCollections.fetch({ offSet: 0, limit: 5 }).subscribe((a) => {
-            this.collections = a.data.myCollections.collections as Collection[];
-            this.loading = false;
-        });
+        this.state = State.LOADING;
+        this.myCollections.fetch({ offSet: 0, limit: 5 }).subscribe(
+            (a) => {
+                this.collections = a.data.myCollections.collections as Collection[];
+                this.state = State.SUCCESS;
+            },
+            () => {
+                this.state = State.ERROR;
+            }
+        );
     }
 
     updateCollectionVisibility(collection: Collection, checked: boolean): void {
