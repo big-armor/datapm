@@ -21,13 +21,12 @@ export class PackageSchemaComponent {
             this.package = p.package;
             if (this.package && this.package.latestVersion) {
                 this.packageFile = JSON.parse(this.package.latestVersion.packageFile);
-                console.log(this.packageFile);
             }
         });
     }
 
     getPropertyTypes(property: Schema) {
-        const keys = Object.keys(property.valueTypes);
+        const keys = Object.keys(property.valueTypes).sort();
         return keys.join(",");
     }
 

@@ -14,7 +14,8 @@ enum State {
     LOADING,
     LOADED,
     ERROR,
-    ERROR_NOT_AUTHENTICATED
+    ERROR_NOT_AUTHENTICATED,
+    ERROR_NOT_AUTHORIZED
 }
 @Component({
     selector: "package",
@@ -58,6 +59,8 @@ export class PackageComponent implements OnDestroy {
                 if (p.package == null) {
                     if (p.response.errors.some((e) => e.message.includes("NOT_AUTHENTICATED")))
                         this.state = State.ERROR_NOT_AUTHENTICATED;
+                    else if (p.response.errors.some((e) => e.message.includes("NOT_AUTHORIZED")))
+                        this.state = State.ERROR_NOT_AUTHORIZED;
                     else this.state = State.ERROR;
                     return;
                 }

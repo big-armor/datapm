@@ -23,7 +23,7 @@
                                 {{ "@" + currentUser.username }} <span class="public-text">public</span>
                             </div>
 
-                            <div class="pb-1">
+                            <div *ngIf="currentUser.website" class="pb-1">
                                 <span class="social-link">
                                     <a target="_blank" href="{{ currentUser.website }}">{{ currentUser.website }}</a
                                     >&nbsp;

@@ -5,7 +5,7 @@
     </div>
     <div class="accordions-group mt-2">
         <mat-accordion class="schema-property" multi>
-            <mat-expansion-panel *ngFor="let property of schema?.properties | values">
+            <mat-expansion-panel *ngFor="let property of schema?.properties | values | sortBy: 'asc':'title'">
                 <mat-expansion-panel-header>
                     <mat-panel-title> {{ property.title }} </mat-panel-title>
                     <mat-panel-description>
