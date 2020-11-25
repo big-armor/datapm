@@ -27,6 +27,7 @@ import { CoverComponent } from "./cover/cover.component";
 import { PercentPipe } from "./pipes/percent.pipe";
 import { ValuesPipe } from "./pipes/values.pipe";
 import { SortByPipe } from "./pipes/sort.pipe";
+import { ButtonComponent } from "./button/button.component";
 
 @NgModule({
     declarations: [
@@ -44,7 +45,8 @@ import { SortByPipe } from "./pipes/sort.pipe";
         CoverComponent,
         PercentPipe,
         ValuesPipe,
-        SortByPipe
+        SortByPipe,
+        ButtonComponent
     ],
     imports: [
         CommonModule,
@@ -75,7 +77,8 @@ import { SortByPipe } from "./pipes/sort.pipe";
         CoverComponent,
         PercentPipe,
         ValuesPipe,
-        SortByPipe
+        SortByPipe,
+        ButtonComponent
     ],
     providers: [TimeAgoPipe]
 })
