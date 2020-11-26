@@ -15,7 +15,7 @@ export class PasswordRecoveryComponent implements OnInit {
         validators: [Validators.required, Validators.minLength(8)],
         updateOn: "blur"
     });
-    state: PageState = "SUCCESS";
+    state: PageState = "INIT";
     error: string = "";
 
     constructor(private recoverPasswordGQL: RecoverMyPasswordGQL, private route: ActivatedRoute) {}
