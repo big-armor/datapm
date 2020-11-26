@@ -17,8 +17,8 @@ const staticRoutes: Route[] = [
         canActivate: [AuthGuard]
     },
     {
-        path: "validate-email",
-        loadChildren: () => import("./verify-email/verify-email.module").then((m) => m.VerifyEmailModule)
+        path: "",
+        loadChildren: () => import("./auth-callbacks/auth-callbacks.module").then((m) => m.AuthCallbacksModule)
     },
     {
         path: ":catalogSlug",

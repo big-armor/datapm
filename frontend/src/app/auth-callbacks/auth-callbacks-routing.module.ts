@@ -4,7 +4,7 @@ import { VerifyEmailComponent } from "./verify-email/verify-email.component";
 
 const routes: Routes = [
     {
-        path: "",
+        path: "validate-email",
         component: VerifyEmailComponent
     }
 ];
@@ -13,4 +13,4 @@ const routes: Routes = [
     imports: [RouterModule.forChild(routes)],
     exports: [RouterModule]
 })
-export class VerifyEmailRoutingModule {}
+export class AuthCallbacksRoutingModule {}
