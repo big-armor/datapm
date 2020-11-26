@@ -8,15 +8,7 @@
                 <div class="p-2 bd-highlight w-100">
                     <div class="input-group mt-1 search-box">
                         <form (ngSubmit)="search()" class="search-form">
-                            <input
-                                type="text"
-                                name="search"
-                                minlength="1"
-                                autocomplete="off"
-                                class="form-control search-input"
-                                placeholder="Search For Data"
-                                [(ngModel)]="searchTerm"
-                            />
+                            <app-input placeholder="Search For Data"></app-input>
                             <button class="material-icons">search</button>
                         </form>
                     </div>

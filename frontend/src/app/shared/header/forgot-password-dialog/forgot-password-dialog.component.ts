@@ -1,14 +1,9 @@
 import { ChangeDetectorRef, Component, OnInit } from "@angular/core";
-import {
-    AbstractControl,
-    AsyncValidatorFn,
-    FormBuilder,
-    FormGroup,
-    ValidationErrors,
-    Validators
-} from "@angular/forms";
-import { EmailAddressAvailableGQL } from "src/generated/graphql";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { EmailAddressAvailableGQL, ForgotMyPasswordGQL } from "src/generated/graphql";
 import { emailAddressValidator } from "src/app/helpers/validators";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { LoginDialogComponent } from "../login-dialog/login-dialog.component";
 
 enum State {
     INIT,
@@ -28,13 +23,17 @@ export class ForgotPasswordDialogComponent implements OnInit {
     State = State;
 
     state = State.INIT;
+    error: string = "";
 
     form: FormGroup;
 
     constructor(
         formBuilder: FormBuilder,
         emailAddressAvailableGQL: EmailAddressAvailableGQL,
-        componentChangeDetector: ChangeDetectorRef
+        componentChangeDetector: ChangeDetectorRef,
+        private forgotMyPasswordGQL: ForgotMyPasswordGQL,
+        private dialog: MatDialog,
+        private dialogRef: MatDialogRef<ForgotPasswordDialogComponent>
     ) {
         this.form = formBuilder.group({
             emailAddress: [
@@ -42,7 +41,7 @@ export class ForgotPasswordDialogComponent implements OnInit {
                 {
                     validators: [Validators.required, Validators.email],
                     asyncValidators: [emailAddressValidator(emailAddressAvailableGQL, componentChangeDetector)],
-                    updateOnBlur: "blur"
+                    updateOn: "blur"
                 }
             ]
         });
@@ -50,5 +49,31 @@ export class ForgotPasswordDialogComponent implements OnInit {
 
     ngOnInit(): void {}
 
-    formSubmit() {}
+    formSubmit() {
+        if (!this.form.valid) {
+            return;
+        }
+
+        this.forgotMyPasswordGQL
+            .mutate({
+                emailAddress: this.form.value.emailAddress
+            })
+            .subscribe(
+                () => {
+                    this.state = State.SUCCESS;
+                },
+                (err) => {
+                    this.state = State.ERROR_AFTER_SIGNUP;
+                    this.error = err.message || "Unknown error occured";
+                }
+            );
+    }
+
+    backToLogin(ev: any) {
+        ev.preventDefault();
+        this.dialogRef.close();
+        this.dialogRef.afterClosed().subscribe(() => {
+            this.dialog.open(LoginDialogComponent);
+        });
+    }
 }

@@ -28,6 +28,8 @@ import { PercentPipe } from "./pipes/percent.pipe";
 import { ValuesPipe } from "./pipes/values.pipe";
 import { SortByPipe } from "./pipes/sort.pipe";
 import { ButtonComponent } from "./button/button.component";
+import { InputComponent } from "./input/input.component";
+import { InputErrorPipe } from "./pipes/input-error.pipe";
 
 @NgModule({
     declarations: [
@@ -46,7 +48,9 @@ import { ButtonComponent } from "./button/button.component";
         PercentPipe,
         ValuesPipe,
         SortByPipe,
-        ButtonComponent
+        ButtonComponent,
+        InputComponent,
+        InputErrorPipe
     ],
     imports: [
         CommonModule,
@@ -78,7 +82,9 @@ import { ButtonComponent } from "./button/button.component";
         PercentPipe,
         ValuesPipe,
         SortByPipe,
-        ButtonComponent
+        ButtonComponent,
+        InputComponent,
+        InputErrorPipe
     ],
     providers: [TimeAgoPipe]
 })
