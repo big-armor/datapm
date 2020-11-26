@@ -1,13 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { STATUS_CODES } from "http";
-import {
-    Collection,
-    CreateCollectionGQL,
-    DeleteCollectionGQL,
-    MyCollectionsGQL,
-    UpdateCollectionGQL
-} from "src/generated/graphql";
+import { Collection, DeleteCollectionGQL, MyCollectionsGQL, UpdateCollectionGQL } from "src/generated/graphql";
 import { CreateCollectionComponent } from "../create-collection/create-collection.component";
 import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
 import { FewPackagesAlertComponent } from "../few-packages-alert/few-packages-alert.component";
@@ -32,7 +25,6 @@ export class MyCollectionsComponent implements OnInit {
 
     constructor(
         private myCollections: MyCollectionsGQL,
-        private createCollectionGQL: CreateCollectionGQL,
         private updateCollectionGQL: UpdateCollectionGQL,
         private deleteCollectionGQL: DeleteCollectionGQL,
         private dialog: MatDialog
@@ -46,17 +38,8 @@ export class MyCollectionsComponent implements OnInit {
         this.dialog
             .open(CreateCollectionComponent)
             .afterClosed()
-            .subscribe((data: any) => {
-                this.createCollectionGQL
-                    .mutate({
-                        value: {
-                            name: data.name,
-                            collectionSlug: data.name.toLowerCase()
-                        }
-                    })
-                    .subscribe(() => {
-                        this.loadMyCollections();
-                    });
+            .subscribe(() => {
+                this.loadMyCollections();
             });
     }
 
@@ -113,20 +96,33 @@ export class MyCollectionsComponent implements OnInit {
             .afterClosed()
             .subscribe((confirmed: boolean) => {
                 if (confirmed) {
+                    this.state = State.LOADING;
+                    const prevCollections = this.collections;
+                    this.collections = this.collections.filter(
+                        (c) => c.identifier.collectionSlug !== collection.identifier.collectionSlug
+                    );
                     this.deleteCollectionGQL
                         .mutate({
                             identifier: {
                                 collectionSlug: collection.identifier.collectionSlug
                             }
                         })
-                        .subscribe(() => {
-                            this.collections = this.collections.filter(
-                                (c) => c.identifier.collectionSlug !== collection.identifier.collectionSlug
-                            );
-                        });
+                        .subscribe(
+                            (response) => {
+                                if (response.errors?.length > 0) {
+                                    this.state = State.ERROR;
+                                    this.collections = prevCollections;
+                                    return;
+                                }
+
+                                this.state = State.SUCCESS;
+                            },
+                            () => {
+                                this.state = State.ERROR;
+                                this.collections = prevCollections;
+                            }
+                        );
                 }
             });
     }
-
-    private showTooFewPackagesModal() {}
 }

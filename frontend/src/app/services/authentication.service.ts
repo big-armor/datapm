@@ -61,7 +61,7 @@ export class AuthenticationService {
                 .toPromise()
                 .then((response) => {
                     if (response.errors) {
-                        console.log(response);
+                        console.error(response);
                         reject(response);
                         return;
                     }
