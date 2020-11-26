@@ -15,8 +15,14 @@ export class InputErrorPipe implements PipeTransform {
         return formControl.statusChanges.pipe(
             map(() => {
                 if (formControl.dirty && formControl.errors) {
+                    console.log(formControl.errors);
                     if (formControl.errors.required) {
                         return messages?.required || "Required field";
+                    } else if (formControl.errors.minlength) {
+                        return (
+                            messages?.minlength ||
+                            `Must have more than ${formControl.errors.minlength.requiredLength} characters`
+                        );
                     } else if (formControl.errors.email) {
                         return messages?.email || "Invalid format";
                     } else if (formControl.errors.NOT_AVAILABLE) {

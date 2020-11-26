@@ -21,8 +21,6 @@ export class VerifyEmailComponent implements OnInit {
     constructor(
         private verifyEmailAddressGQL: VerifyEmailAddressGQL,
         private route: ActivatedRoute,
-        private router: Router,
-        private snackbar: MatSnackBar,
         private dialog: MatDialog
     ) {}
 
