@@ -1,8 +1,10 @@
 import { Component, OnInit } from "@angular/core";
 import { FormControl, Validators } from "@angular/forms";
+import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute } from "@angular/router";
 
 import { PageState } from "src/app/models/page-state";
+import { LoginDialogComponent } from "src/app/shared/header/login-dialog/login-dialog.component";
 import { RecoverMyPasswordGQL } from "src/generated/graphql";
 
 @Component({
@@ -15,10 +17,14 @@ export class PasswordRecoveryComponent implements OnInit {
         validators: [Validators.required, Validators.minLength(8)],
         updateOn: "blur"
     });
-    state: PageState = "INIT";
+    state: PageState = "SUCCESS";
     error: string = "";
 
-    constructor(private recoverPasswordGQL: RecoverMyPasswordGQL, private route: ActivatedRoute) {}
+    constructor(
+        private recoverPasswordGQL: RecoverMyPasswordGQL,
+        private route: ActivatedRoute,
+        private dialog: MatDialog
+    ) {}
 
     ngOnInit(): void {}
 
@@ -46,5 +52,9 @@ export class PasswordRecoveryComponent implements OnInit {
                     this.state = "ERROR";
                 }
             );
+    }
+
+    login() {
+        this.dialog.open(LoginDialogComponent);
     }
 }
