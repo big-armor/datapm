@@ -5,6 +5,7 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
 import { MatChipsModule } from "@angular/material/chips";
 import { MatIconModule } from "@angular/material/icon";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MyCollectionsComponent } from "./my-collections.component";
 import { SharedModule } from "../../shared/shared.module";
 
@@ -22,6 +23,7 @@ describe("MyCollectionsComponent", () => {
                 MatCardModule,
                 MatChipsModule,
                 MatIconModule,
+                MatProgressSpinnerModule,
                 SharedModule
             ]
         }).compileComponents();

@@ -1,5 +1,6 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { ApolloTestingModule } from "apollo-angular/testing";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 
 import { LatestComponent } from "./latest.component";
 
@@ -12,7 +13,7 @@ describe("LatestComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [LatestComponent],
-            imports: [ApolloTestingModule, SharedModule]
+            imports: [ApolloTestingModule, MatProgressSpinnerModule, SharedModule]
         }).compileComponents();
     }));
 

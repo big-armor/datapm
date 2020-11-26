@@ -77,7 +77,6 @@ export class CoverComponent implements OnInit {
         this.imageService.getImage(url).subscribe(
             (imgData: any) => {
                 this.imgData = imgData;
-                console.log(this.imgData);
             },
             () => {
                 this.imgData = null;

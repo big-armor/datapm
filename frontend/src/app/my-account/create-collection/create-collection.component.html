@@ -1,0 +1,20 @@
+<form id="createCollection" [formGroup]="form">
+    <div mat-dialog-title>Create collection</div>
+    <div mat-dialog-content>
+        <div class="d-flex bd-highlight shadow-div mb-3">
+            <div class="px-4 py-2 bd-highlight div-question">Collection Name</div>
+            <div class="bd-highlight div-answer">
+                <input formControlName="name" class="form-control" placeholder="My collection" />
+            </div>
+        </div>
+        <div class="text-danger pl-4" *ngIf="state === 'ERROR'">
+            {{ error }}
+        </div>
+    </div>
+    <div mat-dialog-actions>
+        <button mat-button (click)="submit()" class="ml-auto save-btn" [class.disabled]="form.invalid">
+            <span *ngIf="state !== 'LOADING'">create</span>
+            <mat-spinner [diameter]="24" *ngIf="state === 'LOADING'"></mat-spinner>
+        </button>
+    </div>
+</form>

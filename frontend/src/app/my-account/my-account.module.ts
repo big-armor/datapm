@@ -9,6 +9,7 @@ import { MatDialogModule } from "@angular/material/dialog";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatTableModule } from "@angular/material/table";
 
@@ -25,7 +26,8 @@ import { EditAccountDialogComponent } from "./edit-account-dialog/edit-account-d
 import { EditPasswordDialogComponent } from "./edit-password-dialog/edit-password-dialog.component";
 import { PackagesComponent } from "./packages/packages.component";
 import { DeleteConfirmationComponent } from "./delete-confirmation/delete-confirmation.component";
-import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { CreateCollectionComponent } from "./create-collection/create-collection.component";
+import { FewPackagesAlertComponent } from "./few-packages-alert/few-packages-alert.component";
 
 @NgModule({
     declarations: [
@@ -38,7 +40,9 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
         EditPasswordDialogComponent,
         PackagesComponent,
         DeleteConfirmationComponent,
-        MyCollectionsComponent
+        MyCollectionsComponent,
+        CreateCollectionComponent,
+        FewPackagesAlertComponent
     ],
     imports: [
         CommonModule,
@@ -52,6 +56,7 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
         MatFormFieldModule,
         MatIconModule,
         MatInputModule,
+        MatProgressSpinnerModule,
         MatSlideToggleModule,
         MatProgressSpinnerModule,
         MatTableModule,
