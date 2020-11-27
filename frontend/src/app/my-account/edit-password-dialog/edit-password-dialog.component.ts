@@ -5,36 +5,7 @@ import { FormGroup, FormControl, AbstractControl, ValidationErrors } from "@angu
 import { User, UpdateMyPasswordGQL } from "src/generated/graphql";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { SnackBarService } from "src/app/services/snackBar.service";
-
-function newPasswordValidator() {
-    return (control: AbstractControl): Promise<ValidationErrors | null> => {
-        return new Promise<ValidationErrors | null>((success, error) => {
-            const regex = /[0-9@#$%!]/;
-
-            if (control.value == "" || control.value == null) {
-                success({
-                    REQUIRED: true
-                });
-                return;
-            }
-            if (control.value.length > 99) {
-                success({
-                    PASSWORD_TOO_LONG: true
-                });
-            }
-            if (control.value.length < 8) {
-                success({
-                    PASSWORD_TOO_SHORT: true
-                });
-            }
-            if (control.value.length < 16 && control.value.match(regex) == null) {
-                success({
-                    INVALID_CHARACTERS: true
-                });
-            }
-        });
-    };
-}
+import { newPasswordValidator } from "src/app/helpers/validators";
 
 enum State {
     INIT,
