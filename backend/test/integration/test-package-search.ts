@@ -67,19 +67,26 @@ describe("Package Search Tests", async () => {
 
         const packageFileString = JSON.stringify(packageFileContents);
 
-        let response = await userAClient.mutate({
-            mutation: CreateVersionDocument,
-            variables: {
-                identifier: {
-                    catalogSlug: "testA-packages-search",
-                    packageSlug: "congressional-legislators"
-                },
-                value: {
-                    packageFile: packageFileString
+        let response;
+        try {
+            response = await userAClient.mutate({
+                mutation: CreateVersionDocument,
+                variables: {
+                    identifier: {
+                        catalogSlug: "testA-packages-search",
+                        packageSlug: "congressional-legislators"
+                    },
+                    value: {
+                        packageFile: packageFileString
+                    }
                 }
-            }
-        });
+            });
+        } catch (error) {
+            console.error(JSON.stringify(error, null, 1));
+            return;
+        }
 
+        console.log(JSON.stringify(response, null, 1));
         expect(response.errors == null, "no errors").true;
         expect(response.data!.createVersion.author.username).equal("testA-packages-search");
 

@@ -132,7 +132,9 @@ export const resolvers: {
 
             const rawPackageFile = JSON.parse(value);
 
-            const ajv = new AJV();
+            const ajv = new AJV({
+                format: false // https://www.npmjs.com/package/ajv#redos-attack
+            });
 
             const schema = fs.readFileSync("node_modules/datapm-lib/packageFileSchema.json", "utf8");
 

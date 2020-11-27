@@ -46,15 +46,32 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-6 mb-4">
-                <p class="package-light-gray">schema last updated</p>
+            <div class="col-6 mb-2">
+                <p class="package-light-gray">info last updated</p>
                 <p class="package-dark-gray">
                     {{ package?.latestVersion?.createdAt | timeAgo }}
                 </p>
             </div>
-            <div class="col-6 mb-4">
+            <div class="col-6 mb-2">
                 <p class="package-light-gray">unpacked size</p>
                 <p class="package-dark-gray">{{ packageFile?.schemas | packageSize }}</p>
+            </div>
+        </div>
+
+        <div class="row" *ngIf="packageFile?.website">
+            <div class="col-12 mb-2">
+                <p class="package-light-gray">website</p>
+                <p class="package-dark-gray text-overflow-elipses">
+                    <a target="_blank" href="{{ packageFile?.website }}">{{ packageFile?.website }}</a>
+                </p>
+            </div>
+        </div>
+        <div class="row" *ngIf="packageFile?.contactEmail">
+            <div class="col-12 mb-4">
+                <p class="package-light-gray">contact</p>
+                <p class="package-dark-gray text-overflow-elipses">
+                    <a href="mailto:{{ packageFile?.contactEmail }}">{{ packageFile?.contactEmail }}</a>
+                </p>
             </div>
         </div>
     </div>

@@ -15,7 +15,8 @@ enum State {
     LOADED,
     ERROR,
     ERROR_NOT_AUTHENTICATED,
-    ERROR_NOT_AUTHORIZED
+    ERROR_NOT_AUTHORIZED,
+    ERROR_NOT_FOUND
 }
 @Component({
     selector: "package",
@@ -56,12 +57,19 @@ export class PackageComponent implements OnDestroy {
             (p: PackageResponse) => {
                 if (p == null) return;
 
-                if (p.package == null) {
+                if (p.package == null && p.response != null) {
                     if (p.response.errors.some((e) => e.message.includes("NOT_AUTHENTICATED")))
                         this.state = State.ERROR_NOT_AUTHENTICATED;
                     else if (p.response.errors.some((e) => e.message.includes("NOT_AUTHORIZED")))
                         this.state = State.ERROR_NOT_AUTHORIZED;
+                    else if (p.response.errors.some((e) => e.message.includes("CATALOG_NOT_FOUND")))
+                        this.state = State.ERROR_NOT_FOUND;
+                    else if (p.response.errors.some((e) => e.message.includes("PACKAGE_NOT_FOUND")))
+                        this.state = State.ERROR_NOT_FOUND;
                     else this.state = State.ERROR;
+                    return;
+                } else if (p.package == null && p.response == null) {
+                    this.state = State.ERROR;
                     return;
                 }
                 this.package = p.package;
@@ -131,5 +139,10 @@ export class PackageComponent implements OnDestroy {
         this.dialog.open(LoginDialogComponent, {
             disableClose: true
         });
+    }
+
+    getPackageIdentifierFromURL() {
+        const activeRouteParts = this.router.url.split("/");
+        return activeRouteParts[1] + "/" + activeRouteParts[2];
     }
 }
