@@ -4,6 +4,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute } from "@angular/router";
 
 import { PageState } from "src/app/models/page-state";
+import { newPasswordValidator } from "src/app/helpers/validators";
 import { LoginDialogComponent } from "src/app/shared/header/login-dialog/login-dialog.component";
 import { RecoverMyPasswordGQL } from "src/generated/graphql";
 
@@ -14,10 +15,9 @@ import { RecoverMyPasswordGQL } from "src/generated/graphql";
 })
 export class PasswordRecoveryComponent implements OnInit {
     password = new FormControl("", {
-        validators: [Validators.required, Validators.minLength(8)],
-        updateOn: "blur"
+        asyncValidators: [newPasswordValidator()]
     });
-    state: PageState = "SUCCESS";
+    state: PageState = "INIT";
     error: string = "";
 
     constructor(
