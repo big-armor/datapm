@@ -14,7 +14,7 @@
         "bump-version": "gulp bumpVersion",
         "tag": "gulp gitPushTag",
         "deploy": "gulp deployAssets",
-        "lint": "eslint --fix .",
+        "lint": "eslint --fix . && prettier -w .",
         "test": "mocha --slow 3000 --timeout 60000 -r ts-node/register test/**/*.ts",
         "test:snyk": "snyk test"
     },
