@@ -23,6 +23,10 @@
 <div class="container" *ngIf="state == State.ERROR_NOT_AUTHENTICATED">
     <div class="row text-center">
         <div class="col-12 mt-5">
+            <div class="package-title">
+                {{ getPackageIdentifierFromURL() }}
+            </div>
+            <br />
             You must <a href="javascript:void(0);" (click)="loginClicked()">login to view this package</a>.
         </div>
     </div>
@@ -30,7 +34,25 @@
 
 <div class="container" *ngIf="state == State.ERROR_NOT_AUTHORIZED">
     <div class="row text-center">
-        <div class="col-12 mt-5">You do not have permission to view this package. Please contact the author.</div>
+        <div class="col-12 mt-5">
+            <div class="package-title">
+                {{ getPackageIdentifierFromURL() }}
+            </div>
+            <br />
+            You do not have permission to view this package. Please contact the author.
+        </div>
+    </div>
+</div>
+
+<div class="container" *ngIf="state == State.ERROR_NOT_FOUND">
+    <div class="row text-center">
+        <div class="col-12 mt-5">
+            <div class="package-title">
+                {{ getPackageIdentifierFromURL() }}
+            </div>
+            <br />
+            The package was not found. Use the search bar above to find additional data.
+        </div>
     </div>
 </div>
 

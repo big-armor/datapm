@@ -32,7 +32,9 @@ export enum DifferenceType {
     CHANGE_README_MARKDOWN = "CHANGE_README_MARKDOWN",
     CHANGE_LICENSE_MARKDOWN = "CHANGE_LICENSE_MARKDOWN",
     CHANGE_README_FILE = "CHANGE_README_FILE",
-    CHANGE_LICENSE_FILE = "CHANGE_LICENSE_FILE"
+    CHANGE_LICENSE_FILE = "CHANGE_LICENSE_FILE",
+    CHANGE_WEBSITE = "CHANGE_WEBSITE",
+    CHANGE_CONTACT_EMAIL = "CHAGNE_CONTACT_EMAIL"
 }
 export interface Difference {
     type: DifferenceType;
@@ -79,6 +81,20 @@ export function comparePackages(packageA: PackageFile, packageB: PackageFile): D
     if (packageA.readmeFile !== packageB.readmeFile) {
         response.push({
             type: DifferenceType.CHANGE_README_FILE,
+            pointer: "#"
+        });
+    }
+
+    if (packageA.website !== packageB.website) {
+        response.push({
+            type: DifferenceType.CHANGE_WEBSITE,
+            pointer: "#"
+        });
+    }
+
+    if (packageA.contactEmail !== packageB.contactEmail) {
+        response.push({
+            type: DifferenceType.CHANGE_CONTACT_EMAIL,
             pointer: "#"
         });
     }
@@ -300,6 +316,8 @@ export function diffCompatibility(diffs: Difference[]): Compability {
             case DifferenceType.CHANGE_SOURCE:
             case DifferenceType.CHANGE_README_MARKDOWN:
             case DifferenceType.CHANGE_LICENSE_MARKDOWN:
+            case DifferenceType.CHANGE_WEBSITE:
+            case DifferenceType.CHANGE_CONTACT_EMAIL:
             case DifferenceType.CHANGE_VERSION: // this just requires that the number be at least one minor version greater, it doesn't return the actual difference
                 returnValue = Math.max(returnValue, Compability.MinorChange);
                 break;
