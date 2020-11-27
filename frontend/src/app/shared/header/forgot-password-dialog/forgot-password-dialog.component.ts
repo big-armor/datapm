@@ -21,7 +21,7 @@ enum State {
 export class ForgotPasswordDialogComponent implements OnInit {
     State = State;
 
-    state = State.SUCCESS;
+    state = State.INIT;
     error: string = "";
 
     form: FormGroup;
@@ -36,8 +36,7 @@ export class ForgotPasswordDialogComponent implements OnInit {
             emailAddress: [
                 "",
                 {
-                    validators: [Validators.required, Validators.email],
-                    updateOn: "blur"
+                    validators: [Validators.required, Validators.email]
                 }
             ]
         });
