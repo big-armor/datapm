@@ -1,7 +1,6 @@
-import { ChangeDetectorRef, Component, OnInit } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { EmailAddressAvailableGQL, ForgotMyPasswordGQL } from "src/generated/graphql";
-import { emailAddressValidator } from "src/app/helpers/validators";
+import { ForgotMyPasswordGQL } from "src/generated/graphql";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { LoginDialogComponent } from "../login-dialog/login-dialog.component";
 
@@ -22,15 +21,13 @@ enum State {
 export class ForgotPasswordDialogComponent implements OnInit {
     State = State;
 
-    state = State.INIT;
+    state = State.SUCCESS;
     error: string = "";
 
     form: FormGroup;
 
     constructor(
         formBuilder: FormBuilder,
-        emailAddressAvailableGQL: EmailAddressAvailableGQL,
-        componentChangeDetector: ChangeDetectorRef,
         private forgotMyPasswordGQL: ForgotMyPasswordGQL,
         private dialog: MatDialog,
         private dialogRef: MatDialogRef<ForgotPasswordDialogComponent>
@@ -40,7 +37,6 @@ export class ForgotPasswordDialogComponent implements OnInit {
                 "",
                 {
                     validators: [Validators.required, Validators.email],
-                    asyncValidators: [emailAddressValidator(emailAddressAvailableGQL, componentChangeDetector)],
                     updateOn: "blur"
                 }
             ]
