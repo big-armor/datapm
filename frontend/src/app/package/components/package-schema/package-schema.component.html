@@ -3,6 +3,11 @@
     <div class="schema-text">
         {{ schema.description }}
     </div>
+    <div class="schema-samples" *ngIf="schema.sampleRecords?.length > 0">
+        <a href="javascript:void(0)" (click)="showSamplesFullscreen(schema)"
+            >preview {{ schema.sampleRecords.length }} sample records</a
+        >
+    </div>
     <div class="accordions-group mt-2">
         <mat-accordion class="schema-property" multi>
             <mat-expansion-panel *ngFor="let property of schema?.properties | values | sortBy: 'asc':'title'">

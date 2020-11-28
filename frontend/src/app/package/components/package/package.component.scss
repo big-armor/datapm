@@ -8,9 +8,15 @@
 
 .identifier {
     position: relative;
-    top: -10px;
-    display: inline-block;
-    margin-left: 10px;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+
+    .identifier-text {
+        position: relative;
+        top: -6px;
+        left: 10px;
+    }
 }
 
 hr {
@@ -206,6 +212,9 @@ hr {
     line-height: 13px;
     letter-spacing: -0.28px;
     color: #828282;
+
+    margin-bottom: 10px;
+    display: block;
 
     &.public {
         color: #00a896;

@@ -1,0 +1,9 @@
+<table mat-table [dataSource]="schemaSampleValues(schema)">
+    <ng-container [matColumnDef]="column" *ngFor="let column of schemaColumns(schema)">
+        <th mat-header-cell *matHeaderCellDef>{{ column }}</th>
+        <td mat-cell *matCellDef="let element">{{ element[column] }}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="schemaColumns(schema); sticky: true"></tr>
+    <tr mat-row *matRowDef="let row; columns: schemaColumns(schema)"></tr>
+</table>

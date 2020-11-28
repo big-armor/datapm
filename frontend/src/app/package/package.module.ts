@@ -18,13 +18,20 @@ import { PackageSizePipe } from "./pipes/package-size.pipe";
 import { SchemaPropertiesPipe } from "./pipes/schema-properties.pipe";
 import { VersionPipe } from "./pipes/version.pipe";
 import { PackageInfoComponent } from "./components/package-info/package-info.component";
+import { MatTableModule } from "@angular/material/table";
+import { PackageSamplesComponent } from "./components/package-samples/package-samples.component";
+import { SamplesComponent } from "./components/package-samples/samples.component";
+import { SamplesFullScreenDialog } from "./components/package-samples/samples-fullscreen-dialog.component";
 
 @NgModule({
     declarations: [
         PackageComponent,
         PackageDescriptionComponent,
         PackageSchemaComponent,
+        PackageSamplesComponent,
         PackageVersionComponent,
+        SamplesComponent,
+        SamplesFullScreenDialog,
         PackageSizePipe,
         SchemaPropertiesPipe,
         VersionPipe,
@@ -37,6 +44,7 @@ import { PackageInfoComponent } from "./components/package-info/package-info.com
         MatExpansionModule,
         MatIconModule,
         MatTabsModule,
+        MatTableModule,
         MatProgressSpinnerModule,
         SharedModule,
         MarkdownModule.forChild()
