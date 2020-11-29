@@ -3,23 +3,12 @@ import { MatDialog } from "@angular/material/dialog";
 import { PackageFile, Schema } from "datapm-lib";
 import { TableVirtualScrollDataSource } from "ng-table-virtual-scroll";
 
-enum State {
-    LOGGED_OUT,
-    AWAITING_RESPONSE,
-    INCORRECT_LOGIN,
-    LOGGED_IN,
-    LOGIN_ERROR,
-    LOGIN_ERROR_VALIDATE_EMAIL
-}
-
 @Component({
     selector: "app-schema-samples",
     templateUrl: "./samples.component.html",
     styleUrls: ["./samples.component.scss"]
 })
 export class SamplesComponent implements OnInit, OnDestroy {
-    State = State;
-
     @Input() public schema: Schema;
 
     public columns: string[];
@@ -32,7 +21,7 @@ export class SamplesComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.dataSource = new TableVirtualScrollDataSource(this.schemaSampleValues(this.schema));
-        this.columns = this.schemaColumns(this.schema);
+        this.columns = Object.keys(this.schema.properties);
     }
 
     ngOnDestroy() {}
@@ -43,6 +32,7 @@ export class SamplesComponent implements OnInit, OnDestroy {
 
     schemaSampleValues(schema: Schema) {
         if (schema == null) return [];
+
         return schema.sampleRecords?.map<{ [key: string]: string }>((r) => {
             const returnValue: { [key: string]: string } = {};
 

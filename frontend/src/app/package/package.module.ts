@@ -22,7 +22,7 @@ import { MatTableModule } from "@angular/material/table";
 import { PackageSamplesComponent } from "./components/package-samples/package-samples.component";
 import { SamplesComponent } from "./components/package-samples/samples.component";
 import { SamplesFullScreenDialog } from "./components/package-samples/samples-fullscreen-dialog.component";
-import { CdkVirtualScrollViewport, ScrollingModule } from "@angular/cdk/scrolling";
+import { ScrollingModule } from "@angular/cdk/scrolling";
 import { TableVirtualScrollModule } from "ng-table-virtual-scroll";
 
 @NgModule({
