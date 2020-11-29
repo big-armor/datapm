@@ -1,3 +1,6 @@
+.table-wrapper {
+    height: 100%;
+}
 table {
     display: inline-block;
     width: 100%;
@@ -27,10 +30,6 @@ table {
 
 .mat-row:nth-child(odd) {
     background-color: #eee;
-}
-
-.table-wrapper {
-    height: 400px;
 }
 
 .mat-cell {
