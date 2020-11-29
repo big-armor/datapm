@@ -22,6 +22,8 @@ import { MatTableModule } from "@angular/material/table";
 import { PackageSamplesComponent } from "./components/package-samples/package-samples.component";
 import { SamplesComponent } from "./components/package-samples/samples.component";
 import { SamplesFullScreenDialog } from "./components/package-samples/samples-fullscreen-dialog.component";
+import { CdkVirtualScrollViewport, ScrollingModule } from "@angular/cdk/scrolling";
+import { TableVirtualScrollModule } from "ng-table-virtual-scroll";
 
 @NgModule({
     declarations: [
@@ -47,6 +49,8 @@ import { SamplesFullScreenDialog } from "./components/package-samples/samples-fu
         MatTableModule,
         MatProgressSpinnerModule,
         SharedModule,
+        ScrollingModule,
+        TableVirtualScrollModule,
         MarkdownModule.forChild()
     ]
 })

@@ -1,6 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { PackageFile, Schema } from "datapm-lib";
+import { TableVirtualScrollDataSource } from "ng-table-virtual-scroll";
 
 enum State {
     LOGGED_OUT,
@@ -21,9 +22,18 @@ export class SamplesComponent implements OnInit, OnDestroy {
 
     @Input() public schema: Schema;
 
+    public columns: string[];
+
+    dataSource: TableVirtualScrollDataSource<{
+        [key: string]: string;
+    }>;
+
     constructor(private dialog: MatDialog) {}
 
-    ngOnInit() {}
+    ngOnInit() {
+        this.dataSource = new TableVirtualScrollDataSource(this.schemaSampleValues(this.schema));
+        this.columns = this.schemaColumns(this.schema);
+    }
 
     ngOnDestroy() {}
 
