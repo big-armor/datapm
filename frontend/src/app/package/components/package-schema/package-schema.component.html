@@ -4,9 +4,7 @@
         {{ schema.description }}
     </div>
     <div class="schema-samples" *ngIf="schema.sampleRecords?.length > 0">
-        <a href="javascript:void(0)" (click)="showSamplesFullscreen(schema)"
-            >preview {{ schema.sampleRecords.length }} sample records</a
-        >
+        {{ schema.recordCount | number }} records containing {{ schemaPropertiesLength(schema) | number }} properties
     </div>
     <div class="accordions-group mt-2">
         <mat-accordion class="schema-property" multi>
@@ -21,10 +19,78 @@
                     <div>{{ property.description }}</div>
                     <div
                         class="d-flex align-items-center justify-content-between"
-                        *ngFor="let t of property.valueTypes | values"
+                        *ngFor="let type of property.valueTypes | values"
+                        [ngSwitch]="type.valueType"
                     >
-                        <div>{{ t.valueType }}</div>
-                        <div>{{ t.recordCount / property.recordCount | percent }}</div>
+                        <div *ngSwitchCase="'number'">
+                            <div>
+                                {{ type.valueType }}
+                                <ul>
+                                    <li>
+                                        present in {{ type.recordCount | number }} ({{
+                                            type.recordCount / schema.recordCount | percent
+                                        }}) records
+                                    </li>
+                                    <li>max value: {{ type.numberMaxValue | number }}</li>
+                                    <li>min value: {{ type.numberMinValue | number }}</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div *ngSwitchCase="'boolean'">
+                            <div>
+                                {{ type.valueType }}
+                                <ul>
+                                    <li>
+                                        present in {{ type.recordCount | number }} ({{
+                                            type.recordCount / schema.recordCount | percent
+                                        }}) records
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div *ngSwitchCase="'null'">
+                            <div>
+                                {{ type.valueType }}
+                                <ul>
+                                    <li>
+                                        present in {{ type.recordCount | number }} ({{
+                                            type.recordCount / schema.recordCount | percent
+                                        }}) records
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div *ngSwitchCase="'string'">
+                            <div>
+                                {{ type.valueType }}
+                                <ul>
+                                    <li>
+                                        present in {{ type.recordCount | number }} ({{
+                                            type.recordCount / schema.recordCount | percent
+                                        }}) records
+                                    </li>
+                                    <li>max length: {{ type.stringMaxLength | number }}</li>
+                                    <li>min length: {{ type.stringMinLength | number }}</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div *ngSwitchCase="'date'">
+                            <div>
+                                {{ type.valueType }}
+                                <ul>
+                                    <li>
+                                        present in {{ type.recordCount | number }} ({{
+                                            type.recordCount / schema.recordCount | percent
+                                        }}) records
+                                    </li>
+                                    <li>max date: {{ type.dateMaxValue | number }}</li>
+                                    <li>min date: {{ type.dateMinValue | number }}</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </mat-expansion-panel>

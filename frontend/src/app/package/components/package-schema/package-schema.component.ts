@@ -37,6 +37,10 @@ export class PackageSchemaComponent {
         this.unsubscribe$.complete();
     }
 
+    schemaPropertiesLength(schema: Schema) {
+        return Object.keys(schema.properties).length;
+    }
+
     showSamplesFullscreen(schema: Schema) {
         this.dialog.open(SamplesFullScreenDialog, {
             width: "95vw",
