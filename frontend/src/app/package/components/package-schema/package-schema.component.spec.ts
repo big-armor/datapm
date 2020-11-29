@@ -4,6 +4,7 @@ import { MatExpansionModule } from "@angular/material/expansion";
 import { PackageSchemaComponent } from "./package-schema.component";
 import { ActivatedRoute } from "@angular/router";
 import { Subject } from "rxjs";
+import { MatDialogModule } from "@angular/material/dialog";
 
 describe("PackageSchemaComponent", () => {
     let component: PackageSchemaComponent;
@@ -12,7 +13,7 @@ describe("PackageSchemaComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [PackageSchemaComponent],
-            imports: [MatExpansionModule, NoopAnimationsModule],
+            imports: [MatExpansionModule, NoopAnimationsModule, MatDialogModule],
             providers: [
                 {
                     provide: ActivatedRoute,
