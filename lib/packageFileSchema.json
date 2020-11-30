@@ -210,6 +210,16 @@
                                 "description": "Whether the provided byte count is approximate or exact.",
                                 "default": false
                             },
+                            "samples": {
+                                "$id": "#/sampleRecords",
+                                "type": "array",
+                                "title": "Samples",
+                                "description": "A randomly selected set of sample reference records",
+                                "default": [],
+                                "items": {
+                                    "type": "object"
+                                }
+                            },
                             "source": {
                                 "$id": "#/schemas/source",
                                 "type": "object",

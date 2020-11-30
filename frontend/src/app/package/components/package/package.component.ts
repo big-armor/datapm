@@ -34,8 +34,9 @@ export class PackageComponent implements OnDestroy {
 
     public readonly routes = [
         { linkName: "description", url: "" },
+        { linkName: "preview", url: "preview" },
         { linkName: "schema", url: "schema" },
-        { linkName: "version", url: "version" }
+        { linkName: "history", url: "history" }
     ];
 
     private catalogSlug = "";

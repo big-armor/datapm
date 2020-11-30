@@ -67,6 +67,7 @@ The following are the top level properties in the DataPM Package File JSON file 
 | licenseFile     | String | Optional | Relative path, from the package file, to the LICENSE.md file for this package. Defaults to package-file-name-license.md or README.md in that order. |
 | readmeFile      | String | Optional | Relative path, from the package file, to the README.md for this package. Defaults to package-file-name.md or README.md in that order.               |
 | licenseMarkdown | String | Optional | Markdown formatted content that describes the license for the schema and data referenced.                                                           |
+| sampleRecords   | Array  | Optional | Extracted sample records for preview purposes.                                                                                                      |
 | readmeMarkdown  | String | Optional | Markdown formatted README content for the package.                                                                                                  |
 | registries      | Array  | Optional | See Registries properties below                                                                                                                     |
 | website         | String | Optional | Website of the person or organization that maintains and/or holds the license of this data. This is for attribution purposes only                   |

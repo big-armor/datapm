@@ -1,0 +1,37 @@
+.table-wrapper {
+    height: 100%;
+    border-radius: 4px;
+}
+
+table {
+    width: 100%;
+}
+
+.mat-table {
+    overflow: scroll;
+    border-left: 1px solid #ddd;
+}
+
+.mat-header-cell {
+    padding: 8px 8px 8px 8px;
+    border-right: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+}
+.mat-cell {
+    padding: 8px 8px 8px 8px;
+    border-right: 1px solid #ddd;
+    max-height: 75px;
+    height: 75px;
+}
+
+.mat-row:nth-child(even) {
+    background-color: white;
+}
+
+.mat-row:nth-child(odd) {
+    background-color: #eee;
+}
+
+.mat-cell {
+    height: 75px;
+}

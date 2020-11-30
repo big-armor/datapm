@@ -1,0 +1,32 @@
+<div [ngSwitch]="state">
+    <ng-container *ngSwitchCase="'ERROR'">
+        There was a problem loading this page. Please try again, checkback later, or contact support.
+    </ng-container>
+</div>
+<div [ngSwitch]="state">
+    <ng-container *ngSwitchCase="'NO_SAMPLES'">
+        This package contains no samples. Use the client to fetch data for samples.
+    </ng-container>
+</div>
+<div [ngSwitch]="state">
+    <ng-container *ngSwitchCase="'LOADED'">
+        <div *ngFor="let schema of packageFile?.schemas">
+            <div class="samples">
+                <div>
+                    <div class="title d-flex">{{ schema.title }}</div>
+                    <div class="d-flex">
+                        <div class="subtitle justify-content-start">
+                            {{ schema.sampleRecords?.length }} sample records
+                        </div>
+
+                        <div class="ml-auto justify-content-end full-screen-link">
+                            <a (click)="showSchemaFullScreen(schema)">view full screen</a>
+                        </div>
+                    </div>
+                </div>
+
+                <app-schema-samples [schema]="schema"></app-schema-samples>
+            </div>
+        </div>
+    </ng-container>
+</div>

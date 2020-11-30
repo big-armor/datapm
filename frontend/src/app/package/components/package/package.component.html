@@ -70,21 +70,23 @@
                     <div class="row" *ngIf="package">
                         <div class="col-12 package-info">
                             <!-- <div class="package-title">{{ package?.displayName }}</div> -->
+                            <span
+                                class="py-2 package-privacy"
+                                *ngIf="this.currentUser && this.currentUser?.username == this.catalogUser?.username"
+                                [class.public]="package?.isPublic"
+                            >
+                                {{ package?.isPublic ? "public" : "not public" }}
+                            </span>
                             <div class="package-identifier">
-                                <app-avatar class="user-img" *ngIf="catalogUser" [user]="catalogUser" [size]="32">
-                                </app-avatar>
                                 <div class="identifier">
-                                    <a [routerLink]="['/' + package?.identifier.catalogSlug]">{{
-                                        package?.identifier.catalogSlug
-                                    }}</a
-                                    >/{{ package?.identifier.packageSlug }}
-                                    <span
-                                        class="py-2 package-privacy"
-                                        *ngIf="this.currentUser?.username == this.catalogUser?.username"
-                                        [class.public]="package?.isPublic"
-                                    >
-                                        {{ package?.isPublic ? "public" : "not public" }}
-                                    </span>
+                                    <app-avatar class="user-img" *ngIf="catalogUser" [user]="catalogUser" [size]="32">
+                                    </app-avatar>
+                                    <div class="identifier-text text-overflow-elipses">
+                                        <a [routerLink]="['/' + package?.identifier.catalogSlug]">{{
+                                            package?.identifier.catalogSlug
+                                        }}</a
+                                        >/{{ package?.identifier.packageSlug }}
+                                    </div>
                                 </div>
                             </div>
                         </div>

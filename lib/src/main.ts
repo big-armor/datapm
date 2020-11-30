@@ -80,7 +80,11 @@ export interface Schema extends JSONSchema7 {
     /** Whether the byte count is exact or approximate. */
     byteCountApproximate?: boolean;
 
+    /** A object which has keys that the property type (string, array, date, boolean, object, etc). The values of this object describe the property type. */
     valueTypes?: ValueTypes;
+
+    /** A  selected set of sample records that are representative of the schema */
+    sampleRecords?: { [key: string]: unknown }[];
 }
 
 export interface PackageFile {
