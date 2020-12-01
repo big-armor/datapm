@@ -1,6 +1,7 @@
 import { Component, Inject } from "@angular/core";
 import { MatDialog, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { Schema } from "datapm-lib";
+import { PackageFile, Schema } from "datapm-lib";
+import { Package } from "src/generated/graphql";
 
 @Component({
     selector: "samples-fullscreen-dialog",
@@ -9,8 +10,15 @@ import { Schema } from "datapm-lib";
 })
 export class SamplesFullScreenDialog {
     public schema: Schema;
-    constructor(@Inject(MAT_DIALOG_DATA) public data: { schema: Schema }, private dialog: MatDialog) {
+    public packageFile: PackageFile;
+    public package: Package;
+    constructor(
+        @Inject(MAT_DIALOG_DATA) public data: { schema: Schema; packageFile: PackageFile; package: Package },
+        private dialog: MatDialog
+    ) {
         this.schema = data.schema;
+        this.packageFile = data.packageFile;
+        this.package = data.package;
     }
     close() {
         this.dialog.closeAll();
