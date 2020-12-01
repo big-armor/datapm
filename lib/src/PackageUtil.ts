@@ -3,7 +3,15 @@ import { Schema, PackageFile } from "./main";
 import fs from "fs";
 import path from "path";
 
-export type DPMRecordValue = number | string | boolean | null;
+export type DPMRecordValue =
+    | number
+    | string
+    | boolean
+    | Date
+    | bigint
+    | { [key: string]: unknown }
+    | Array<DPMRecordValue>
+    | null;
 export type DPMRecord = Record<string, DPMRecordValue>;
 export type DPMConfiguration = Record<string, number | string | boolean | null>;
 
