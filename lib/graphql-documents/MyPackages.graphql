@@ -3,9 +3,13 @@ query MyPackages($offset: Int!, $limit: Int!) {
         packages {
             identifier {
                 registryURL
-                packageSlug
                 catalogSlug
+                packageSlug
             }
+            catalog {
+                displayName
+            }
+            isPublic
             displayName
             description
             latestVersion {
@@ -14,9 +18,23 @@ query MyPackages($offset: Int!, $limit: Int!) {
                     versionMinor
                     versionPatch
                 }
-                packageFile
+                createdAt
+            }
+            creator {
+                username
+                firstName
+                lastName
+            }
+            versions {
+                identifier {
+                    versionMajor
+                    versionMinor
+                    versionPatch
+                }
+                createdAt
             }
         }
+
         hasMore
         count
     }

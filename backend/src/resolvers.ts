@@ -352,6 +352,22 @@ export const resolvers: {
             return version;
         },
 
+        catalog: async (parent: any, _1: any, context: AuthenticatedContext, info: any): Promise<Catalog> => {
+            const catalog = await context.connection.getCustomRepository(CatalogRepository).findOne(parent.catalogId, {
+                relations: getRelationNames(graphqlFields(info))
+            });
+
+            if (!catalog) throw new Error("CATALOG_NOT_FOUND");
+            return catalog;
+        },
+        versions: async (parent: any, _1: any, context: AuthenticatedContext, info: any): Promise<Version[]> => {
+            const versions = await context.connection
+                .getCustomRepository(VersionRepository)
+                .findVersions({ packageId: parent.id, relations: getRelationNames(graphqlFields(info)) });
+
+            return versions;
+        },
+
         identifier: findPackageIdentifier,
         creator: findPackageCreator
     },
@@ -377,7 +393,7 @@ export const resolvers: {
                 versionPatch: version.patchVersion
             };
         },
-        packageFile: async (parent: any, _1: any, context: AuthenticatedContext) => {
+        packageFile: async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
             const version = parent as Version;
 
             const packageEntity = await context.connection
