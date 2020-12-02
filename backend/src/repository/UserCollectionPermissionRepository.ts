@@ -1,7 +1,12 @@
 import { EntityRepository, Repository } from "typeorm";
+import { ForbiddenError } from "apollo-server";
 
-import { Permission } from "../generated/graphql";
+import { Permission, CollectionIdentifierInput, SetUserCollectionPermissionInput } from "../generated/graphql";
 import { UserCollectionPermission } from "../entity/UserCollectionPermission";
+import { User } from "../entity/User";
+
+import { UserRepository } from "./UserRepository";
+import { CollectionRepository } from "./CollectionRepository";
 
 @EntityRepository(UserCollectionPermission)
 export class UserCollectionPermissionRepository extends Repository<UserCollectionPermission> {
@@ -39,5 +44,93 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
         collectionId: number
     ): Promise<UserCollectionPermission | undefined> {
         return this.createQueryBuilder().where({ userId: userId, collectionId: collectionId }).getOne();
+    }
+
+    public async setUserCollectionPermission({
+        identifier,
+        value,
+        relations
+    }: {
+        identifier: CollectionIdentifierInput;
+        value: SetUserCollectionPermissionInput;
+        relations?: string[];
+    }): Promise<void> {
+        await this.manager.nestedTransaction(async (transaction) => {
+            const user = await transaction.getCustomRepository(UserRepository).getUserByUsername(value.username);
+
+            if (!user) {
+                throw new Error(`User ${value.username} not found`);
+            }
+
+            const collectionEntity = await transaction
+                .getCustomRepository(CollectionRepository)
+                .findCollectionBySlugOrFail(identifier.collectionSlug);
+
+            const permissions = await this.findByUserAndCollectionId(user.id, collectionEntity.id);
+
+            // If User does not exist in UserCollectionTable, it creates new record
+            if (permissions == undefined) {
+                try {
+                    await transaction
+                        .createQueryBuilder()
+                        .insert()
+                        .into(UserCollectionPermission)
+                        .values({
+                            collectionId: collectionEntity.id,
+                            userId: user.id,
+                            permissions: value.permissions
+                        })
+                        .execute();
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+
+            // Updates permissions if user exists already in UserCollectiontable
+            if (permissions != undefined && value.permissions.length) {
+                try {
+                    await transaction
+                        .createQueryBuilder()
+                        .update(UserCollectionPermission)
+                        .set({ permissions: value.permissions })
+                        .where({ collectionId: collectionEntity.id, userId: user.id })
+                        .execute();
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+        });
+    }
+
+    public async myCollectionPermission(user: User, identifier: CollectionIdentifierInput): Promise<Permission> {
+        // return this.createQueryBuilder().where({}).getOne();
+        return await this.manager.nestedTransaction(async (transaction) => {
+            const collectionEntity = await transaction
+                .getCustomRepository(CollectionRepository)
+                .findCollectionBySlugOrFail(identifier.collectionSlug);
+
+            if (collectionEntity.creatorId == user.id) return Permission.MANAGE;
+            if (collectionEntity.isPublic) return Permission.VIEW;
+            throw new ForbiddenError("NOT_AUTHORIZED");
+        });
+    }
+
+    deleteUserCollectionPermissions({
+        identifier,
+        username
+    }: {
+        identifier: CollectionIdentifierInput;
+        username: string;
+        relations?: string[];
+    }): void {
+        this.manager.nestedTransaction(async (transaction) => {
+            const user = await transaction.getCustomRepository(UserRepository).findOneOrFail({ username });
+
+            const collectionEntity = await transaction
+                .getCustomRepository(CollectionRepository)
+                .findCollectionBySlugOrFail(identifier.collectionSlug);
+
+            await transaction.delete(UserCollectionPermission, { collectionId: collectionEntity.id });
+        });
     }
 }
