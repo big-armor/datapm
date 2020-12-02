@@ -3,11 +3,13 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { NoopAnimationsModule } from "@angular/platform-browser/animations";
 import { RouterTestingModule } from "@angular/router/testing";
 import { MatButtonModule } from "@angular/material/button";
-import { MatDialogModule } from "@angular/material/dialog";
+import { MatDialogModule, MatDialogRef } from "@angular/material/dialog";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatStepperModule } from "@angular/material/stepper";
 
 import { LoginDialogComponent } from "./login-dialog.component";
+import { InputComponent } from "../../input/input.component";
+import { InputErrorPipe } from "../../pipes/input-error.pipe";
 
 describe("LoginDialogComponent", () => {
     let component: LoginDialogComponent;
@@ -15,7 +17,7 @@ describe("LoginDialogComponent", () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [LoginDialogComponent],
+            declarations: [LoginDialogComponent, InputErrorPipe, InputComponent],
             imports: [
                 FormsModule,
                 ReactiveFormsModule,
@@ -25,6 +27,12 @@ describe("LoginDialogComponent", () => {
                 MatDialogModule,
                 MatStepperModule,
                 MatProgressSpinnerModule
+            ],
+            providers: [
+                {
+                    provide: MatDialogRef,
+                    useValue: {}
+                }
             ]
         }).compileComponents();
     }));

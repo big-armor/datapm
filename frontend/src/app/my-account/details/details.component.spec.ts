@@ -5,6 +5,7 @@ import { RouterModule } from "@angular/router";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MatTableModule } from "@angular/material/table";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 
 import { DetailsComponent } from "./details.component";
 import { MatSnackBarModule } from "@angular/material/snack-bar";
@@ -24,6 +25,7 @@ describe("DetailsComponent", () => {
                 RouterTestingModule,
                 FormsModule,
                 MatSnackBarModule,
+                MatProgressSpinnerModule,
                 ReactiveFormsModule
             ],
             providers: [
