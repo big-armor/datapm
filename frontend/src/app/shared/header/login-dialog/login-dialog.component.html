@@ -8,25 +8,19 @@
         <mat-step>
             <div mat-dialog-content>
                 <form [formGroup]="loginForm" (ngSubmit)="formSubmit()">
-                    <input
-                        cdkFocusInitial
-                        type="text"
+                    <app-input
                         placeholder="username or email address"
-                        name="username"
-                        formControlName="username"
-                        autocomplete="username"
-                        class="light-inputs"
-                    />
+                        [group]="loginForm"
+                        controlName="username"
+                        [error]="loginForm | inputError: 'username' | async"
+                    >
+                    </app-input>
                     <br />
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        name="password"
-                        formControlName="password"
-                        autocomplete="current-password"
-                        class="light-inputs"
-                    />
-                    <p class="forgot-pass"><a href="#">Forgot password?</a></p>
+                    <app-input inputType="password" placeholder="password" [group]="loginForm" controlName="password">
+                    </app-input>
+                    <p class="forgot-pass">
+                        <a href="#" (click)="openForgotPasswordDialog($event)">Forgot password?</a>
+                    </p>
                     <br />
                     <div class="alert-div">
                         <div class="alert-warn" *ngIf="state == State.LOGIN_ERROR_VALIDATE_EMAIL">

@@ -1,0 +1,10 @@
+<input
+    [type]="inputType"
+    autocomplete="off"
+    [placeholder]="placeholder"
+    [formControl]="formControl"
+    (change)="handleInputChange($event)"
+    (keyup)="handleKeyUp($event)"
+    cdkFocusInitial
+/>
+<div class="text-danger mt-1 ml-2" *ngIf="error">{{ error }}</div>

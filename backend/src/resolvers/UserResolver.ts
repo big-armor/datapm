@@ -13,6 +13,7 @@ import { UserRepository } from "../repository/UserRepository";
 import { hashPassword } from "../util/PasswordUtil";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { ImageStorageService } from "../storage/images/image-storage-service";
+import { connect } from "superagent";
 
 export const emailAddressAvailable = async (
     _0: any,
@@ -129,7 +130,7 @@ export const setMyCoverImage = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    return ImageStorageService.INSTANCE.saveUserCoverImage(context.me.username, image.base64);
+    return ImageStorageService.INSTANCE.saveUserCoverImage(context.me.id, image.base64);
 };
 
 export const setMyAvatarImage = async (
@@ -138,7 +139,7 @@ export const setMyAvatarImage = async (
     context: AuthenticatedContext,
     info: any
 ): Promise<void> => {
-    return ImageStorageService.INSTANCE.saveUserAvatarImage(context.me.username, image.base64);
+    return ImageStorageService.INSTANCE.saveUserAvatarImage(context.me.id, image.base64);
 };
 
 export const deleteMe = async (_0: any, {}, context: AuthenticatedContext, info: any) => {

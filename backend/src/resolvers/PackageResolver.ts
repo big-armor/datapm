@@ -183,7 +183,10 @@ export const setPackageCoverImage = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    return ImageStorageService.INSTANCE.savePackageCoverImage(identifier, image.base64);
+    const packageEntity = await context.connection
+        .getCustomRepository(PackageRepository)
+        .findPackageOrFail({ identifier });
+    return ImageStorageService.INSTANCE.savePackageCoverImage(packageEntity.id, image.base64);
 };
 
 export const deletePackage = async (

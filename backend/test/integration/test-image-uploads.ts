@@ -13,11 +13,10 @@ import {
     CreateCollectionDocument,
     SetCollectionCoverImageDocument,
     DeleteCollectionDocument,
-    SetCatalogCoverImageDocument
+    SetCatalogCoverImageDocument,
+    UpdateMeDocument
 } from "./registry-client";
 import * as crypto from "crypto";
-import { TEMP_STORAGE_URL } from "./setup";
-import { Readable } from "stream";
 
 describe("Image Upload Tests", async () => {
     const anonymousUser = createAnonymousClient();
@@ -58,10 +57,9 @@ describe("Image Upload Tests", async () => {
         expect(uploadResult.errors).to.not.exist;
         expect(uploadResult.data).to.exist;
 
-        expect(
-            fs.existsSync(TEMP_STORAGE_URL.replace("file://", "") + "/user/first-user-username/user_avatar"),
-            "avatar file should be present on file system"
-        ).true;
+        const imageServingResult = await request.get("localhost:4000/images/user/first-user-username/avatar");
+
+        expect(imageServingResult.status).equal(200);
     });
 
     it("Avatar image not found", async function () {
@@ -104,10 +102,9 @@ describe("Image Upload Tests", async () => {
         expect(uploadResult.errors).to.not.exist;
         expect(uploadResult.data).to.exist;
 
-        expect(
-            fs.existsSync(TEMP_STORAGE_URL.replace("file://", "") + "/user/first-user-username/user_cover"),
-            "cover file should be present on file system"
-        ).true;
+        const imageServingResult = await request.get("localhost:4000/images/user/first-user-username/cover");
+
+        expect(imageServingResult.status).equal(200);
     });
 
     it("Download user cover image", async function () {
@@ -200,13 +197,11 @@ describe("Image Upload Tests", async () => {
 
         expect(imageResponse.errors == null).true;
 
-        expect(
-            fs.existsSync(
-                TEMP_STORAGE_URL.replace("file://", "") +
-                    "/package/first-user-username/image-test-package/package_cover"
-            ),
-            "package cover image file should be present"
-        ).true;
+        const imageServingResult = await request.get(
+            "localhost:4000/images/package/first-user-username/image-test-package/avatar"
+        );
+
+        expect(imageServingResult.status).equal(200);
     });
 
     it("should should remove package cover image when deleted", async () => {
@@ -222,13 +217,16 @@ describe("Image Upload Tests", async () => {
 
         expect(response.errors == null, "no errors").true;
 
-        expect(
-            fs.existsSync(
-                TEMP_STORAGE_URL.replace("file://", "") +
-                    "/package/first-user-username/image-test-package/package_cover"
-            ),
-            "package cover image file should be not present"
-        ).false;
+        let errorFound = false;
+        try {
+            const imageServingResult = await request.get(
+                "localhost:4000/images/package/first-user-username/image-test-package/cover"
+            );
+        } catch (error) {
+            if (error.message == "Not Found") errorFound = true;
+        }
+
+        expect(errorFound).equal(true);
     });
 
     it("should allow user to create a collection and set an image", async () => {
@@ -259,10 +257,14 @@ describe("Image Upload Tests", async () => {
 
         expect(imageResponse.errors == null).true;
 
-        expect(
-            fs.existsSync(TEMP_STORAGE_URL.replace("file://", "") + "/collection/image-test/collection_cover"),
-            "collection cover image file should be present"
-        ).true;
+        let errorFound = false;
+        try {
+            const imageServingResult = await request.get("localhost:4000/images/collection/image-test/cover");
+        } catch (error) {
+            if (error.message == "Not Found") errorFound = true;
+        }
+
+        expect(errorFound).equal(true);
     });
 
     it("should not allow user B to set cover image on collection", async () => {
@@ -278,11 +280,7 @@ describe("Image Upload Tests", async () => {
             }
         });
 
-        expect(imageResponse.errors != null).true;
-        expect(
-            imageResponse.errors!.find((e) => e.message == "NOT_AUTHORIZED") != null,
-            "should have not authorized message"
-        ).equal(true);
+        expect(imageResponse.errors!.find((e) => e.message.includes("NOT_AUTHORIZED")) != null).equal(true);
     });
 
     it("should remove collection cover image when deleted", async () => {
@@ -297,10 +295,14 @@ describe("Image Upload Tests", async () => {
 
         expect(response.errors == null, "no errors").true;
 
-        expect(
-            fs.existsSync(TEMP_STORAGE_URL.replace("file://", "") + "/collection/image-test/collection_cover"),
-            "collection cover image file should be not present"
-        ).false;
+        let errorFound = false;
+        try {
+            const imageServingResult = await request.get("localhost:4000/images/collection/image-test/cover");
+        } catch (error) {
+            if (error.message == "Not Found") errorFound = true;
+        }
+
+        expect(errorFound).equal(true);
     });
 
     it("should allow user to set a catalog image", async () => {
@@ -318,10 +320,40 @@ describe("Image Upload Tests", async () => {
 
         expect(imageResponse.errors == null).true;
 
-        expect(
-            fs.existsSync(TEMP_STORAGE_URL.replace("file://", "") + "/catalog/first-user-username/catalog_cover"),
-            "catalog cover image file should be present"
-        ).true;
+        const imageServingResult = await request.get("localhost:4000/images/catalog/first-user-username/cover");
+
+        expect(imageServingResult.status).equal(200);
+    });
+
+    it("should allow accessing the catalog cover after renaming the user", async () => {
+        const imageContent = fs.readFileSync("test/other-files/ba.jpg", "base64");
+
+        let imageResponse = await userAClient.mutate({
+            mutation: UpdateMeDocument,
+            variables: {
+                value: {
+                    username: "new-image-username"
+                }
+            }
+        });
+
+        expect(imageResponse.errors == null).true;
+
+        const imageServingResult = await request.get("localhost:4000/images/catalog/new-image-username/cover");
+
+        expect(imageServingResult.status).equal(200);
+    });
+
+    it("should find user cover after renaming the user", async () => {
+        const userCoverResult = await request.get("localhost:4000/images/user/new-image-username/cover");
+
+        expect(userCoverResult.status).equal(200);
+    });
+
+    it("should find user avatar after renaming the user", async () => {
+        const userAvatarResult = await request.get("localhost:4000/images/user/new-image-username/avatar");
+
+        expect(userAvatarResult.status).equal(200);
     });
 
     // TODO Test downloading package, collection, and catalog images
@@ -334,21 +366,7 @@ describe("Image Upload Tests", async () => {
             mutation: DeleteMeDocument
         });
 
+        console.log(JSON.stringify(response, null, 1));
         expect(response.errors == null).true;
-
-        expect(
-            fs.existsSync(TEMP_STORAGE_URL.replace("file://", "") + "/user/first-user-username/user_avatar"),
-            "avatar file should be not present"
-        ).false;
-
-        expect(
-            fs.existsSync(TEMP_STORAGE_URL.replace("file://", "") + "/user/first-user-username/user_cover"),
-            "avatar file should be not present"
-        ).false;
-
-        expect(
-            fs.existsSync(TEMP_STORAGE_URL.replace("file://", "") + "/catalog/first-user-username/catalog_cover"),
-            "catalog cover image file should not be present"
-        ).false;
     });
 });

@@ -86,7 +86,6 @@ describe("Package Search Tests", async () => {
             return;
         }
 
-        console.log(JSON.stringify(response, null, 1));
         expect(response.errors == null, "no errors").true;
         expect(response.data!.createVersion.author.username).equal("testA-packages-search");
 

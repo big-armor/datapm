@@ -111,7 +111,7 @@ export class VersionRepository {
                 versionPatch: version.patchVersion
             };
             try {
-                await this.packageFileStorageService.deletePackageFile(versionIdentifier);
+                await this.packageFileStorageService.deletePackageFile(version.package.id, versionIdentifier);
             } catch (error) {
                 if (error.message.includes("ENOENT")) return;
 
