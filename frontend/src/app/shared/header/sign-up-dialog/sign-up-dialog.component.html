@@ -22,8 +22,7 @@
                 />
                 <div class="div-with-errors">
                     <div class="alert-warn" *ngIf="signUpForm.get('emailAddress').errors?.INVALID_FORMAT">
-                        Username must contain only numbers, letters, and hyphens, and may not start or end with a
-                        hyphen.
+                        Not a valid email address.
                     </div>
                     <div class="alert-warn" *ngIf="signUpForm.get('emailAddress').errors?.TOO_LONG">
                         Email address must be less than 100 characters long.
