@@ -70,7 +70,7 @@ export class CollectionRepository extends Repository<Collection> {
         await this.delete({ id: collectionIdDb.id });
 
         try {
-            await ImageStorageService.INSTANCE.deleteCollectionCoverImage({ collectionSlug });
+            await ImageStorageService.INSTANCE.deleteCollectionCoverImage(collectionIdDb.id);
         } catch (error) {
             if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) return;
 

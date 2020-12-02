@@ -344,7 +344,7 @@ export class PackageRepository {
         const packageSlug = identifier.packageSlug;
         const packageEntity = await findPackage(this.manager, catalogSlug, packageSlug, ["versions", "catalog"]);
         if (!packageEntity) {
-            throw new Error(`Could not find Package  ${catalogSlug}/${packageSlug}`);
+            throw new Error(`PACKAGE_NOT_FOUND  ${catalogSlug}/${packageSlug}`);
         }
 
         const versions = await this.manager
@@ -356,10 +356,7 @@ export class PackageRepository {
             await transaction.delete(Package, { id: packageEntity.id });
         });
 
-        await ImageStorageService.INSTANCE.deletePackageCoverImage({
-            catalogSlug: packageEntity.catalog.slug,
-            packageSlug: packageEntity.slug
-        });
+        await ImageStorageService.INSTANCE.deletePackageCoverImage(packageEntity.id);
     }
 
     async deletePackages({ packages }: { packages: Package[] }): Promise<void> {

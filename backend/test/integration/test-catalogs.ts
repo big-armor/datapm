@@ -12,7 +12,8 @@ import {
     CreatePackageDocument,
     UpdatePackageDocument,
     PackageDocument,
-    CreateVersionDocument
+    CreateVersionDocument,
+    UpdateMeDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
@@ -539,6 +540,44 @@ describe("Catalog Tests", async () => {
             response.errors!.find((e) => e.message == "CATALOG_NOT_FOUND") != null,
             "should not return deleted catalog"
         ).equal(true);
+    });
+
+    it("should update catalog slug after changing a user's username", async () => {
+        let response = await userAClient.mutate({
+            mutation: UpdateMeDocument,
+            variables: {
+                value: {
+                    username: "my-new-username-test-catalog"
+                }
+            }
+        });
+
+        expect(response.errors == null).equal(true);
+
+        let catalogRequest = await userAClient.query({
+            query: GetCatalogDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "my-new-username-test-catalog"
+                }
+            }
+        });
+
+        expect(catalogRequest.errors == null).equal(true);
+        expect(catalogRequest.data.catalog.identifier.catalogSlug).equal("my-new-username-test-catalog");
+    });
+
+    it("old catalog should not be available", async () => {
+        let catalogRequest = await userAClient.query({
+            query: GetCatalogDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-catalog"
+                }
+            }
+        });
+
+        expect(catalogRequest.errors!.find((e) => e.message.includes("CATALOG_NOT_FOUND")) != null).equal(true);
     });
 
     // TODO Test package and catalog association, and permissions of packages in private catalogs

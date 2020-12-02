@@ -582,7 +582,10 @@ export const resolvers: {
             context: AuthenticatedContext,
             info: any
         ) => {
-            await ImageStorageService.INSTANCE.saveCatalogCoverImage(identifier, image.base64);
+            const catalog = await context.connection.manager
+                .getCustomRepository(CatalogRepository)
+                .findCatalogBySlugOrFail(identifier.catalogSlug);
+            await ImageStorageService.INSTANCE.saveCatalogCoverImage(catalog.id, image.base64);
         },
 
         deleteCatalog: async (

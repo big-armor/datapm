@@ -17,6 +17,10 @@ import { superCreateConnection } from "./util/databaseCreation";
 import { Readable, Stream } from "stream";
 import fs from "fs";
 import { ImageStorageService } from "./storage/images/image-storage-service";
+import { UserRepository } from "./repository/UserRepository";
+import { PackageRepository } from "./repository/PackageRepository";
+import { CatalogRepository } from "./repository/CatalogRepository";
+import { CollectionRepository } from "./repository/CollectionRepository";
 
 const dataLibPackageFile = fs.readFileSync("node_modules/datapm-lib/package.json");
 const dataLibPackageJSON = JSON.parse(dataLibPackageFile.toString());
@@ -208,9 +212,14 @@ async function main() {
     };
 
     const imageService = ImageStorageService.INSTANCE;
+
     app.use("/images/user/:username/avatar", async (req, res, next) => {
         try {
-            await respondWithImage(await imageService.readUserAvatarImage(req.params.username), res);
+            const contextObject = context({ req });
+            const user = await (await contextObject).connection
+                .getCustomRepository(UserRepository)
+                .findUserByUserName({ username: req.params.username });
+            await respondWithImage(await imageService.readUserAvatarImage(user.id), res);
         } catch (err) {
             res.status(404).send();
             return;
@@ -219,7 +228,11 @@ async function main() {
 
     app.use("/images/user/:username/cover", async (req, res, next) => {
         try {
-            await respondWithImage(await imageService.readUserCoverImage(req.params.username), res);
+            const contextObject = context({ req });
+            const user = await (await contextObject).connection
+                .getCustomRepository(UserRepository)
+                .findUserByUserName({ username: req.params.username });
+            await respondWithImage(await imageService.readUserCoverImage(user.id), res);
         } catch (err) {
             res.status(404).send();
             return;
@@ -228,13 +241,13 @@ async function main() {
 
     app.use("/images/package/:catalogSlug/:packageSlug/cover", async (req, res, next) => {
         try {
-            await respondWithImage(
-                await imageService.readPackageCoverImage({
-                    catalogSlug: req.params.catalogSlug,
-                    packageSlug: req.params.packageSlug
-                }),
-                res
-            );
+            const contextObject = context({ req });
+            const user = await (await contextObject).connection
+                .getCustomRepository(PackageRepository)
+                .findPackageOrFail({
+                    identifier: { catalogSlug: req.params.catalogSlug, packageSlug: req.params.packageSlug }
+                });
+            await respondWithImage(await imageService.readPackageCoverImage(user.id), res);
         } catch (err) {
             res.status(404).send();
             return;
@@ -243,12 +256,11 @@ async function main() {
 
     app.use("/images/catalog/:catalogSlug/cover", async (req, res, next) => {
         try {
-            await respondWithImage(
-                await imageService.readCatalogCoverImage({
-                    catalogSlug: req.params.catalogSlug
-                }),
-                res
-            );
+            const contextObject = context({ req });
+            const user = await (await contextObject).connection
+                .getCustomRepository(CatalogRepository)
+                .findCatalogBySlugOrFail(req.params.catalogSlug);
+            await respondWithImage(await imageService.readCatalogCoverImage(user.id), res);
         } catch (err) {
             res.status(404).send();
             return;
@@ -257,12 +269,11 @@ async function main() {
 
     app.use("/images/collection/:collectionSlug/cover", async (req, res, next) => {
         try {
-            await respondWithImage(
-                await imageService.readCollectionCoverImage({
-                    collectionSlug: req.params.collectionSlug
-                }),
-                res
-            );
+            const contextObject = context({ req });
+            const collection = await (await contextObject).connection
+                .getCustomRepository(CollectionRepository)
+                .findCollectionBySlugOrFail(req.params.collectionSlug);
+            await respondWithImage(await imageService.readCollectionCoverImage(collection.id), res);
         } catch (err) {
             res.status(404).send();
             return;
