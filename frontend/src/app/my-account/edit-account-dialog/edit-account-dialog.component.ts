@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject, ChangeDetectorRef, OnDestroy } from "@angular/core";
-import { FormGroup, FormControl, AsyncValidatorFn, AbstractControl, ValidationErrors } from "@angular/forms";
+import { FormGroup, FormControl } from "@angular/forms";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 import { Subject } from "rxjs";
@@ -14,44 +14,7 @@ import {
 } from "../../../generated/graphql";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
 import { ImageService } from "../../services/image.service";
-
-function usernameValidator(
-    usernameAvailableGQL: UsernameAvailableGQL,
-    componentChangeDetector: ChangeDetectorRef,
-    currentUsername: string
-): AsyncValidatorFn {
-    return (control: AbstractControl): Promise<ValidationErrors | null> => {
-        return new Promise<ValidationErrors | null>((success, error) => {
-            if (control.value == currentUsername) {
-                success(null);
-                return;
-            }
-            if (control.value == "" || control.value == null) {
-                success({
-                    REQUIRED: true
-                });
-                return;
-            }
-            usernameAvailableGQL.fetch({ username: control.value }).subscribe((result) => {
-                if (result.errors?.length > 0) {
-                    success({
-                        [result.errors[0].message]: true
-                    });
-                } else {
-                    if (result.data.usernameAvailable) {
-                        success(null);
-                    } else {
-                        success({
-                            NOT_AVAILABLE: true
-                        });
-                    }
-                }
-                control.markAsDirty();
-                componentChangeDetector.detectChanges();
-            });
-        });
-    };
-}
+import { usernameValidator } from "src/app/helpers/validators";
 
 @Component({
     selector: "app-edit-account-dialog",

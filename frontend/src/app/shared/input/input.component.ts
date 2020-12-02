@@ -20,12 +20,14 @@ export class InputComponent implements OnInit, OnChanges {
     @Input() autoFocus: boolean = false;
     @Output() inputChange: EventEmitter<string>;
     @Output() keyEnter: EventEmitter<void>;
+    @Output() focus: EventEmitter<any>;
 
     formControl: FormControl;
 
     constructor() {
         this.inputChange = new EventEmitter<string>();
         this.keyEnter = new EventEmitter<void>();
+        this.focus = new EventEmitter<any>();
         this.formControl = new FormControl();
     }
 

@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
+import { EditCollectionComponent } from "src/app/shared/edit-collection/edit-collection.component";
 import { Collection, DeleteCollectionGQL, MyCollectionsGQL, UpdateCollectionGQL } from "src/generated/graphql";
 import { CreateCollectionComponent } from "../create-collection/create-collection.component";
 import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
@@ -83,6 +84,21 @@ export class MyCollectionsComponent implements OnInit {
                         ? newCollection
                         : collection
                 );
+            });
+    }
+
+    editCollection(collection: Collection): void {
+        this.dialog
+            .open(EditCollectionComponent, {
+                data: collection
+            })
+            .afterClosed()
+            .subscribe((newCollection: Collection) => {
+                if (newCollection) {
+                    this.collections = this.collections.map((c) =>
+                        c.identifier.collectionSlug === collection.identifier.collectionSlug ? newCollection : c
+                    );
+                }
             });
     }
 

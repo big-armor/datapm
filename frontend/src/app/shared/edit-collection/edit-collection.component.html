@@ -1,0 +1,41 @@
+<form [formGroup]="form">
+    <div mat-dialog-content>
+        <app-cover
+            [collectionSlug]="data.identifier.collectionSlug"
+            [editable]="true"
+            (upload)="uploadCover($event)"
+        ></app-cover>
+        <div class="d-flex bd-highlight form-field my-3">
+            <div class="px-4 py-2 bd-highlight label">Make this collection public</div>
+            <div class="ml-auto px-4 py-2 bd-highlight slide-right">
+                <mat-slide-toggle class="app-slide-toggle" formControlName="isPublic"></mat-slide-toggle>
+            </div>
+        </div>
+        <div class="d-flex bd-highlight form-field my-3">
+            <div class="px-4 py-2 bd-highlight label">Name</div>
+            <app-input
+                [group]="form"
+                controlName="name"
+                placeholder="Name"
+                [autoFocus]="true"
+                [error]="form | inputError: 'name':errorMsg['name'] | async"
+            ></app-input>
+        </div>
+        <div class="d-flex bd-highlight form-field my-3">
+            <div class="px-4 py-2 bd-highlight label">Collection slug</div>
+            <app-input
+                [group]="form"
+                controlName="newCollectionSlug"
+                placeholder="Collection slug"
+                (focus)="openConfirmDialog()"
+                [error]="form | inputError: 'newCollectionSlug':errorMsg['newCollectionSlug'] | async"
+            ></app-input>
+        </div>
+        <div class="text-danger mt-3" *ngIf="state === 'ERROR'">Error occured while updating collection.</div>
+    </div>
+    <div mat-dialog-actions>
+        <app-button type="raised" [loading]="state === 'LOADING'" [disabled]="form.invalid" (buttonClick)="save()">
+            Save
+        </app-button>
+    </div>
+</form>

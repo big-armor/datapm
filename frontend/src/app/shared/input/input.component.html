@@ -1,10 +1,24 @@
 <input
+    class="app-input-round"
     [type]="inputType"
     autocomplete="off"
     [placeholder]="placeholder"
     [formControl]="formControl"
     (change)="handleInputChange($event)"
     (keyup)="handleKeyUp($event)"
+    (focus)="focus.emit($event)"
     cdkFocusInitial
+    *ngIf="autoFocus"
+/>
+<input
+    class="app-input-round"
+    [type]="inputType"
+    autocomplete="off"
+    [placeholder]="placeholder"
+    [formControl]="formControl"
+    (change)="handleInputChange($event)"
+    (keyup)="handleKeyUp($event)"
+    (focus)="focus.emit($event)"
+    *ngIf="!autoFocus"
 />
 <div class="text-danger mt-1 ml-2" *ngIf="error">{{ error }}</div>

@@ -51,6 +51,7 @@
                 <ng-container matColumnDef="actions">
                     <th mat-header-cell *matHeaderCellDef>Actions</th>
                     <td mat-cell *matCellDef="let collection">
+                        <app-button (click)="editCollection(collection)">Edit</app-button>
                         <app-button (click)="deleteCollection(collection)">Delete</app-button>
                     </td>
                 </ng-container>
