@@ -405,7 +405,7 @@ export const resolvers: {
                 .findOneOrFail({ id: packageEntity.catalogId });
 
             try {
-                return await PackageFileStorageService.INSTANCE.readPackageFile({
+                return await PackageFileStorageService.INSTANCE.readPackageFile(packageEntity.id, {
                     catalogSlug: catalog.slug,
                     packageSlug: packageEntity.slug,
                     versionMajor: version.majorVersion,
@@ -622,15 +622,18 @@ export const resolvers: {
                 // get the latest version
                 const latestVersion = await transaction
                     .getCustomRepository(VersionRepository)
-                    .findLatestVersion({ identifier });
+                    .findLatestVersion({ identifier, relations: ["package"] });
 
                 if (latestVersion != null) {
-                    const packageFile = await PackageFileStorageService.INSTANCE.readPackageFile({
-                        ...identifier,
-                        versionMajor: latestVersion.majorVersion,
-                        versionMinor: latestVersion.minorVersion,
-                        versionPatch: latestVersion.patchVersion
-                    });
+                    const packageFile = await PackageFileStorageService.INSTANCE.readPackageFile(
+                        latestVersion.package.id,
+                        {
+                            ...identifier,
+                            versionMajor: latestVersion.majorVersion,
+                            versionMinor: latestVersion.minorVersion,
+                            versionPatch: latestVersion.patchVersion
+                        }
+                    );
 
                     const latestVersionSemVer = new SemVer(packageFile!.version);
 
@@ -684,12 +687,20 @@ export const resolvers: {
                     versionPatch: proposedNewVersion.patch
                 };
 
+                const packageEntity = await transaction
+                    .getCustomRepository(PackageRepository)
+                    .findOrFail({ identifier });
+
                 await transaction
                     .getCustomRepository(PackageRepository)
                     .updatePackageReadmeVectors(identifier, newPackageFile.readmeMarkdown);
 
                 if (value.packageFile)
-                    await PackageFileStorageService.INSTANCE.writePackageFile(versionIdentifier, value.packageFile);
+                    await PackageFileStorageService.INSTANCE.writePackageFile(
+                        packageEntity.id,
+                        versionIdentifier,
+                        value.packageFile
+                    );
 
                 const ALIAS = "findVersion";
                 const recalledVersion = await transaction

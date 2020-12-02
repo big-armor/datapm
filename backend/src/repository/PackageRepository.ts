@@ -102,7 +102,7 @@ export class PackageRepository {
         return this.manager
             .getRepository(Package)
             .createQueryBuilder()
-            .where(AUTHENTICATED_USER_PACKAGES_QUERY, { userId: userId, permission: permission });
+            .where(AUTHENTICATED_USER_OR_PUBLIC_PACKAGES_QUERY, { userId: userId, permission: permission });
     }
 
     async findOrFail({
@@ -268,6 +268,10 @@ export class PackageRepository {
                 relations.push("catalog");
             }
 
+            if (!relations.includes("versions")) {
+                relations.push("versions");
+            }
+
             const packageEntity = await findPackage(transaction, catalogSlug, packageSlug, relations);
 
             if (packageEntity === null) {
@@ -293,6 +297,9 @@ export class PackageRepository {
             if (packageInput.isPublic != null) {
                 if (packageInput.isPublic == true && packageEntity.catalog.isPublic == false) {
                     throw new Error("CATALOG_NOT_PUBLIC");
+                }
+                if (packageEntity.versions == null || packageEntity.versions.length == 0) {
+                    throw new Error("PACKAGE_HAS_NO_VERSIONS");
                 }
                 packageEntity.isPublic = packageInput.isPublic;
             }
