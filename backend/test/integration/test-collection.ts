@@ -10,7 +10,8 @@ import {
     CollectionDocument,
     UpdateCollectionDocument,
     DeleteCollectionDocument,
-    MyCollectionsDocument
+    MyCollectionsDocument,
+    CollectionPackagesDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
@@ -334,6 +335,106 @@ describe("Collection Tests", async () => {
         expect(response.data!.collection.name).equal("new name");
         expect(response.data!.collection.packages!.length == 1).true;
         expect(response.data!.collection.identifier.collectionSlug).equal("new-collection-slug");
+    });
+
+    it("Adding at least three unique packages to a collection", async function () {
+        await userAClient.mutate({
+            mutation: CreateCollectionDocument,
+            variables: {
+                value: {
+                    collectionSlug: "testS-collection",
+                    name: "testing collectionPackages",
+                    description: "collection-packages yay"
+                }
+            }
+        });
+
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "testA-collection",
+                    packageSlug: "congressional-legislators2",
+                    displayName: "Congressional Legislators2",
+                    description: "Test upload of congressional legislators2"
+                }
+            }
+        });
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "testA-collection",
+                    packageSlug: "congressional-legislators3",
+                    displayName: "Congressional Legislators3",
+                    description: "Test upload of congressional legislators3"
+                }
+            }
+        });
+
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "testA-collection",
+                    packageSlug: "congressional-legislators4",
+                    displayName: "Congressional Legislators4",
+                    description: "Test upload of congressional legislators4"
+                }
+            }
+        });
+
+        await userAClient.mutate({
+            mutation: AddPackageToCollectionDocument,
+            variables: {
+                collectionIdentifier: {
+                    collectionSlug: "testS-collection"
+                },
+                packageIdentifier: {
+                    catalogSlug: "testA-collection",
+                    packageSlug: "congressional-legislators2"
+                }
+            }
+        });
+
+        await userAClient.mutate({
+            mutation: AddPackageToCollectionDocument,
+            variables: {
+                collectionIdentifier: {
+                    collectionSlug: "testS-collection"
+                },
+                packageIdentifier: {
+                    catalogSlug: "testA-collection",
+                    packageSlug: "congressional-legislators3"
+                }
+            }
+        });
+
+        await userAClient.mutate({
+            mutation: AddPackageToCollectionDocument,
+            variables: {
+                collectionIdentifier: {
+                    collectionSlug: "testS-collection"
+                },
+                packageIdentifier: {
+                    catalogSlug: "testA-collection",
+                    packageSlug: "congressional-legislators4"
+                }
+            }
+        });
+
+        const response = await userAClient.query({
+            query: CollectionPackagesDocument,
+            variables: {
+                identifier: {
+                    collectionSlug: "testS-collection"
+                },
+                limit: 10,
+                offset: 0
+            }
+        });
+        expect(response.errors == null).true;
+        expect(response.data?.collectionPackages.length).to.equal(3);
     });
 
     it("Anonymous get collection", async function () {
