@@ -41,4 +41,19 @@ export class CollectionPackageRepository extends Repository<CollectionPackage> {
 
         return value;
     }
+
+    public async collectionPackages(
+        collectionId: number,
+        limit: number,
+        offset: number,
+        relations?: string[]
+    ): Promise<CollectionPackage[]> {
+        return this.createQueryBuilder(CollectionPackageRepository.TABLE_RELATIONS_ALIAS)
+            .where({ collectionId: collectionId })
+            .orderBy('"CollectionPackage"."created_at"', "DESC")
+            .addRelations(CollectionPackageRepository.TABLE_RELATIONS_ALIAS, relations)
+            .limit(limit)
+            .offset(offset)
+            .getMany();
+    }
 }

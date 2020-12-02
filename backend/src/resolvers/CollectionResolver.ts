@@ -74,6 +74,21 @@ export const myCollections = async (
     };
 };
 
+export const collectionPackages = async (
+    _0: any,
+    { identifier, limit, offset }: { identifier: CollectionIdentifierInput; limit: number; offset: number },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const repository = context.connection.manager.getCustomRepository(CollectionRepository);
+    const collectionEntity = await repository.findCollectionBySlugOrFail(identifier.collectionSlug);
+    const relations = getGraphQlRelationName(info);
+
+    return await context.connection.manager
+        .getCustomRepository(CollectionPackageRepository)
+        .collectionPackages(collectionEntity.id, limit, offset, relations);
+};
+
 export const setCollectionCoverImage = async (
     _0: any,
     { identifier, image }: { identifier: CollectionIdentifierInput; image: Base64ImageUpload },
