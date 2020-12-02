@@ -384,6 +384,14 @@ input SetPackagePermissionInput {
 }
 
 """
+The properties for setting a specific user's permissions on a collection
+"""
+input SetUserCollectionPermissionInput {
+    username: String! @validUsername
+    permissions: [Permission!]!
+}
+
+"""
 To create a new package version, submit a valid package file
 """
 input CreateVersionInput {
@@ -509,9 +517,23 @@ type Query {
     myCollections(offSet: Int!, limit: Int!): MyCollectionsResult! @isAuthenticated
 
     """
+    Returns permission of users collection
+    """
+    myCollectionPermission(identifier: CollectionIdentifierInput!): Permission!
+
+    """
     Returns collections whos names match the given query. This request is paginated
     """
     searchCollections(query: String!, offset: Int!, limit: Int!): SearchCollectionResult!
+
+    """
+    Returns collections equal to collectionSlug, gives all packages associated with collectionSlug
+    """
+    collectionPackages(
+        identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: VIEW)
+        offset: Int!
+        limit: Int!
+    ): [CollectionPackage!]!
 }
 
 type Mutation {
@@ -675,6 +697,22 @@ type Mutation {
     removePackageFromCollection(
         collectionIdentifier: CollectionIdentifierInput! @hasCollectionPermission(permission: EDIT)
         packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+    ): Void
+
+    """
+    Sets the permissions for a given user collection
+    """
+    setUserCollectionPermission(
+        identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
+        value: SetUserCollectionPermissionInput!
+    ): Void
+
+    """
+    Removes all permissions for a user on a given collection. Requires the manage package permission
+    """
+    deleteUserCollectionPermissions(
+        identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
+        username: String! @validUsername
     ): Void
 
     """
