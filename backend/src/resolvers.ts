@@ -57,8 +57,14 @@ import {
     removePackageFromCollection,
     searchCollections,
     setCollectionCoverImage,
-    updateCollection
+    updateCollection,
+    collectionPackages
 } from "./resolvers/CollectionResolver";
+import {
+    setUserCollectionPermission,
+    myCollectionPermission,
+    deleteUserCollectionPermissions
+} from "./resolvers/UserCollectionPermissionResolver";
 import { login, logout, verifyEmailAddress } from "./resolvers/AuthResolver";
 import {
     createMe,
@@ -461,6 +467,8 @@ export const resolvers: {
         collections: findCollectionsForAuthenticatedUser,
         myCollections: myCollections,
         searchCollections: searchCollections,
+        collectionPackages: collectionPackages,
+        myCollectionPermission: myCollectionPermission,
 
         autoComplete: async (_0: any, { startsWith }, context: AuthenticatedContext, info: any) => {
             const catalogs = context.connection.manager.getCustomRepository(CatalogRepository).autocomplete({
@@ -592,6 +600,8 @@ export const resolvers: {
         deleteCollection: deleteCollection,
         addPackageToCollection: addPackageToCollection,
         removePackageFromCollection: removePackageFromCollection,
+        setUserCollectionPermission: setUserCollectionPermission,
+        deleteUserCollectionPermissions: deleteUserCollectionPermissions,
 
         createVersion: async (_0: any, { identifier, value }, context: AuthenticatedContext, info: any) => {
             const fileStorageService = FileStorageService.INSTANCE;
