@@ -21,6 +21,7 @@ export class InputComponent implements OnInit, OnChanges {
     @Output() inputChange: EventEmitter<string>;
     @Output() keyEnter: EventEmitter<void>;
     @Output() focus: EventEmitter<any>;
+    @Output() blur: EventEmitter<any>;
 
     formControl: FormControl;
 
@@ -28,6 +29,7 @@ export class InputComponent implements OnInit, OnChanges {
         this.inputChange = new EventEmitter<string>();
         this.keyEnter = new EventEmitter<void>();
         this.focus = new EventEmitter<any>();
+        this.blur = new EventEmitter<any>();
         this.formControl = new FormControl();
     }
 

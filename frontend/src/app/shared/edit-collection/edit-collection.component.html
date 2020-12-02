@@ -27,7 +27,7 @@
                 [group]="form"
                 controlName="newCollectionSlug"
                 placeholder="Collection slug"
-                (focus)="openConfirmDialog()"
+                (blur)="openConfirmDialog()"
                 [error]="form | inputError: 'newCollectionSlug':errorMsg['newCollectionSlug'] | async"
             ></app-input>
         </div>
