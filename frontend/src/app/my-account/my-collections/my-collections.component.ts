@@ -46,7 +46,7 @@ export class MyCollectionsComponent implements OnInit {
     private loadMyCollections(): void {
         // Need to set a dynamic limit for future / pagination
         this.state = State.LOADING;
-        this.myCollections.fetch({ offSet: 0, limit: 5 }).subscribe(
+        this.myCollections.fetch({ offSet: 0, limit: 100 }).subscribe(
             (a) => {
                 this.collections = a.data.myCollections.collections as Collection[];
                 this.state = State.SUCCESS;

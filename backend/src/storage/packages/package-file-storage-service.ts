@@ -16,9 +16,9 @@ export class PackageFileStorageService {
     public static readonly INSTANCE = new PackageFileStorageService();
     private fileStorageService = FileStorageService.INSTANCE;
 
-    public async readPackageFile(identifier: VersionIdentifierInput): Promise<PackageFile> {
+    public async readPackageFile(packageId: number, identifier: VersionIdentifierInput): Promise<PackageFile> {
         const stream = await this.fileStorageService.readFile(
-            this.versionIdentifierPath(identifier),
+            this.versionIdentifierPath(packageId, identifier),
             FileType.PACKAGE_FILE
         );
 
@@ -28,18 +28,25 @@ export class PackageFileStorageService {
         return packageFile;
     }
 
-    public writePackageFile(identifier: VersionIdentifierInput, packageFile: PackageFile): Promise<void> {
+    public writePackageFile(
+        packageId: number,
+        identifier: VersionIdentifierInput,
+        packageFile: PackageFile
+    ): Promise<void> {
         const valueString = JSON.stringify(packageFile);
 
         return this.fileStorageService.writeFileFromString(
-            this.versionIdentifierPath(identifier),
+            this.versionIdentifierPath(packageId, identifier),
             FileType.PACKAGE_FILE,
             valueString
         );
     }
 
-    deletePackageFile(identifier: VersionIdentifierInput) {
-        return this.fileStorageService.deleteFile(this.versionIdentifierPath(identifier), FileType.PACKAGE_FILE);
+    deletePackageFile(packageId: number, identifier: VersionIdentifierInput) {
+        return this.fileStorageService.deleteFile(
+            this.versionIdentifierPath(packageId, identifier),
+            FileType.PACKAGE_FILE
+        );
     }
 
     private async streamToString(stream: Stream): Promise<string> {
@@ -55,13 +62,11 @@ export class PackageFileStorageService {
         });
     }
 
-    private versionIdentifierPath(identifier: VersionIdentifierInput): string {
+    private versionIdentifierPath(packageId: number, identifier: VersionIdentifierInput): string {
         return (
             Prefixes.PACKAGE +
             "/" +
-            identifier.catalogSlug +
-            "/" +
-            identifier.packageSlug +
+            packageId +
             "/" +
             identifier.versionMajor +
             "." +

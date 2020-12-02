@@ -86,10 +86,12 @@ export class CatalogRepository extends Repository<Catalog> {
     }
 
     async findCatalogBySlugOrFail(slug: string, relations?: string[]): Promise<Catalog> {
-        const catalog = this.manager.getRepository(Catalog).findOne({ where: { slug: slug }, relations: relations });
+        const catalog = await this.manager
+            .getRepository(Catalog)
+            .findOne({ where: { slug: slug }, relations: relations });
 
-        if (catalog != null) {
-            throw new Error(`Catalog ${slug} could not be found`);
+        if (catalog == null) {
+            throw new Error(`CATALOG_NOT_FOUND ${slug}`);
         }
 
         return catalog;
@@ -106,7 +108,7 @@ export class CatalogRepository extends Repository<Catalog> {
     }): Promise<Catalog> {
         return this.manager.nestedTransaction(async (transaction) => {
             if (value.slug.trim() === "") {
-                throw new Error("Slug must not be empty or whitespace.");
+                throw new Error("CATALOG_SLUG_REQUIRED");
             }
 
             const existingCatalogs = await transaction.find(Catalog, {
@@ -116,7 +118,7 @@ export class CatalogRepository extends Repository<Catalog> {
             });
 
             if (existingCatalogs.length > 0) {
-                throw new Error(`Catalog "${value.slug}" already exists`);
+                throw new Error(`CATALOG_SLUG_NOT_AVAILABLE ${value.slug}`);
             }
 
             const now = new Date();
@@ -220,7 +222,7 @@ export class CatalogRepository extends Repository<Catalog> {
         });
 
         try {
-            await ImageStorageService.INSTANCE.deleteCatalogCoverImage({ catalogSlug: slug });
+            await ImageStorageService.INSTANCE.deleteCatalogCoverImage(catalog.id);
         } catch (error) {
             if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) return;
 

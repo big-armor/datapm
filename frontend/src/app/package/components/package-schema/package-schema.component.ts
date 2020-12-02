@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { PackageFile, Schema } from "datapm-lib";
+import { PackageFile, Schema, ValueTypes, ValueTypeStatistics } from "datapm-lib";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { Package } from "src/generated/graphql";
@@ -51,5 +51,16 @@ export class PackageSchemaComponent {
                 schema
             }
         });
+    }
+
+    stringOptions(valueTypes: ValueTypeStatistics): { name: string; value: number }[] {
+        return Object.keys(valueTypes)
+            .map((v) => {
+                return {
+                    name: v,
+                    value: valueTypes[v]
+                };
+            })
+            .sort((a, b) => a.name.localeCompare(b.name));
     }
 }

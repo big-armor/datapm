@@ -1,9 +1,10 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { Catalog, MyCatalogsGQL, UpdateCatalogGQL, DeleteCatalogGQL } from "src/generated/graphql";
 import { Subject } from "rxjs";
 import { take, takeUntil } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
 import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
+import { AuthenticationService } from "src/app/services/authentication.service";
 
 enum State {
     INIT,
@@ -19,15 +20,19 @@ enum State {
     styleUrls: ["./catalogs.component.scss"]
 })
 export class CatalogsComponent implements OnInit {
+    State = State;
     catalogState = State.INIT;
     public myCatalogs: Catalog[];
     private subscription = new Subject();
     columnsToDisplay = ["name", "public", "actions"];
 
+    @ViewChild("deleteMyUsercatalog") deleteMyUsercatalog: TemplateRef<any>;
+
     constructor(
         private myCatalogsGQL: MyCatalogsGQL,
         private updateCatalogGQL: UpdateCatalogGQL,
         private disableCatalogGQL: DeleteCatalogGQL,
+        private authenticationService: AuthenticationService,
         private dialog: MatDialog
     ) {}
 
@@ -36,6 +41,7 @@ export class CatalogsComponent implements OnInit {
     }
 
     refreshCatalogs() {
+        this.catalogState = State.LOADING;
         this.myCatalogsGQL
             .fetch()
             .pipe(takeUntil(this.subscription))
@@ -63,6 +69,10 @@ export class CatalogsComponent implements OnInit {
     }
 
     deleteCatalog(catalog: Catalog) {
+        if (catalog.identifier.catalogSlug == this.authenticationService.currentUser.username) {
+            this.dialog.open(this.deleteMyUsercatalog);
+            return;
+        }
         const dlgRef = this.dialog.open(DeleteConfirmationComponent, {
             data: {
                 catalogSlug: catalog.identifier.catalogSlug
