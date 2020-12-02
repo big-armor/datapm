@@ -10,7 +10,7 @@ Apollo has a great ["Why GraphQL?"](https://www.apollographql.com/docs/intro/ben
 
 ## API Playground
 
-You can access a live "graphql api playground" at [datapm.io/graphql](https://datapm.io/graphql) or at the "/graphql" relative url for any privately hosted registry. The playground allows you to create and test queries and mutations.
+You can access a live "graphql api playground" at [/graphql](/graphql) on this site. The playground allows you to create and test queries and mutations.
 
 Use the "docs" and "schema" tabs on the right side of the playground window to access the details of every operation available in the DataPM Registry GraphQL API.
 

@@ -79,6 +79,22 @@
             "title": "LICENSE.md contents",
             "description": "Markdown formated content describing the license for the schema and data in the package."
         },
+        "website": {
+            "$id": "#/website",
+            "type": "string",
+            "format": "iri",
+            "maxLength": 1024,
+            "title": "Website",
+            "description": "The URL of the information/marketing website related to this package."
+        },
+        "contactEmail": {
+            "$id": "#/contactEmail",
+            "type": "string",
+            "format": "idn-email",
+            "maxLength": 1024,
+            "title": "Contact Email",
+            "description": "An email address for contacting the author."
+        },
         "registries": {
             "$id": "#/registries",
             "type": "array",
@@ -193,6 +209,16 @@
                                 "title": "Byte Count Approximate",
                                 "description": "Whether the provided byte count is approximate or exact.",
                                 "default": false
+                            },
+                            "samples": {
+                                "$id": "#/sampleRecords",
+                                "type": "array",
+                                "title": "Samples",
+                                "description": "A randomly selected set of sample reference records",
+                                "default": [],
+                                "items": {
+                                    "type": "object"
+                                }
                             },
                             "source": {
                                 "$id": "#/schemas/source",

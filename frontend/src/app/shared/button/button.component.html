@@ -1,0 +1,9 @@
+<a class="link-button" (click)="handleClick()" [class.disabled]="disabled" *ngIf="type === 'link'">
+    <ng-container *ngTemplateOutlet="content"></ng-container>
+</a>
+<button class="raised-button" (click)="handleClick()" [disabled]="disabled" *ngIf="type === 'raised'">
+    <ng-container *ngTemplateOutlet="content"></ng-container>
+</button>
+<ng-template #content>
+    <ng-content></ng-content>
+</ng-template>

@@ -1,7 +1,9 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ReactiveFormsModule } from "@angular/forms";
 import { RouterTestingModule } from "@angular/router/testing";
 import { CollectionItemComponent } from "./collection-item.component";
 import { MatCardModule } from "@angular/material/card";
+import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 
 const collectionItem: any = {
@@ -33,7 +35,7 @@ describe("CollectionItemComponent", () => {
         const routerSpy = jasmine.createSpyObj("Router", ["navigateByUrl"]);
         TestBed.configureTestingModule({
             declarations: [CollectionItemComponent],
-            imports: [RouterTestingModule, MatCardModule, MatDialogModule],
+            imports: [RouterTestingModule, MatCardModule, MatDialogModule, ReactiveFormsModule, MatSlideToggleModule],
             providers: [
                 {
                     provide: MAT_DIALOG_DATA,

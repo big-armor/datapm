@@ -1,34 +1,56 @@
-<div id="myCollectionsPage" class="big-div-collection">
-    <div class="collection-div">
-        <div class="container">
-            <div class="col-lg-9 col-md-12 col-sm-12 mt-5">
-                <div class="row big-div-latest mb-3">
-                    <div class="section-title col-md-12 col-lg-12">
-                        <span>My Collections</span>
-                    </div>
-                    <div class="section-description col-md-12 col-lg-12">
-                        <span>
-                            These are the collections of data you have created. You may choose to share them publicly,
-                            or not.
-                        </span>
-                        <a href="/docs/concepts/collections">Learn more about collections</a>
-                    </div>
-
-                    <!-- Package without thumbnail -->
-                    <div class="col-md-12 col-lg-12 pb-2 mb-4" *ngIf="collections.length">
-                        <div *ngFor="let collection of collections">
-                            <app-collection-item [item]="collection.allCollections"></app-collection-item>
-                        </div>
-                    </div>
-                    <!-- <div class="col-md-12 col-lg-12 pb-2 mb-4 not-found" *ngIf="!collections.length">
-                        <p>
-                            Either no collections have been published to this registry, or you do not have access to any of
-                            the published collections
-                        </p>
-                        <a href="/docs/publish-data/">Learn how to publish packages</a>
-                    </div> -->
-                </div>
+<div id="myCollections" class="big-div-collection mt-5">
+    <div class="row mb-3 ml-0 mr-0">
+        <div class="section-title col-md-12 col-lg-12">
+            <span class="mr-2">My Collections</span>
+            <app-button (click)="openCreateDialog()">Create A Collection</app-button>
+        </div>
+        <ng-container *ngIf="state !== State.LOADING && collections.length === 0">
+            <div class="section-description col-md-12 col-lg-12">
+                <span>
+                    These are the collections of data you have created. You may choose to share them publicly, or not.
+                </span>
+                <a href="/docs/concepts/collections">Learn more about collections</a>
             </div>
+            <div class="col-md-12 col-lg-12 text-center pt-4 pb-5">
+                <app-button (click)="openCreateDialog()">Create A Collection</app-button>
+            </div>
+        </ng-container>
+
+        <!-- Package without thumbnail -->
+        <table *ngIf="collections && collections.length > 0" mat-table [dataSource]="collections">
+            <!-- Label column -->
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Name</th>
+                <td class="table-content" mat-cell *matCellDef="let collection">
+                    <a [routerLink]="['/' + collection.identifier.collectionSlug]">{{ collection.name }}</a>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="public">
+                <th mat-header-cell *matHeaderCellDef>Public</th>
+                <td class="table-content" mat-cell *matCellDef="let collection">
+                    <mat-slide-toggle
+                        [(ngModel)]="collection.isPublic"
+                        (change)="updateCollectionVisibility(collection, $event.checked)"
+                    >
+                    </mat-slide-toggle>
+                </td>
+            </ng-container>
+
+            <!-- Actions column -->
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let collection">
+                    <app-button (click)="deleteCollection(collection)">Delete</app-button>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+            <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
+        </table>
+
+        <div class="loading-container" *ngIf="state === State.LOADING">
+            <mat-spinner [diameter]="40"></mat-spinner>
         </div>
     </div>
 </div>

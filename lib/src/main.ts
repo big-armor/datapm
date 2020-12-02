@@ -17,6 +17,7 @@ export interface RegistryReference {
 export interface ParserInfo {
     mimeType: string;
 
+    /** An object that holds keys and values used by the Parser implementation to complete runtime tasks. The keys and values are provided by the user when they complete the parameter prompts.  */
     configuration?: DPMConfiguration;
 }
 
@@ -79,7 +80,11 @@ export interface Schema extends JSONSchema7 {
     /** Whether the byte count is exact or approximate. */
     byteCountApproximate?: boolean;
 
+    /** A object which has keys that the property type (string, array, date, boolean, object, etc). The values of this object describe the property type. */
     valueTypes?: ValueTypes;
+
+    /** A  selected set of sample records that are representative of the schema */
+    sampleRecords?: { [key: string]: unknown }[];
 }
 
 export interface PackageFile {
@@ -115,6 +120,12 @@ export interface PackageFile {
 
     /** The contents of the license file */
     licenseMarkdown?: string;
+
+    /** The information or marketing URL of the website for the publisher of the package. */
+    website?: string;
+
+    /** The contact email address for the publisher */
+    contactEmail?: string;
 
     /** The list of registries, and catalogs, to which this package file should be published. This field is used by
      * the local client to determine where to publish. The client will remove private and local registry references

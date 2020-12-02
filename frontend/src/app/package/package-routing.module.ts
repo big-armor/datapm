@@ -5,7 +5,7 @@ import { PackageComponent } from "./components/package/package.component";
 import { PackageDescriptionComponent } from "./components/package-description/package-description.component";
 import { PackageSchemaComponent } from "./components/package-schema/package-schema.component";
 import { PackageVersionComponent } from "./components/package-version/package-version.component";
-import { PackageResolverService } from "./services/package-resolver.service";
+import { PackageSamplesComponent } from "./components/package-samples/package-samples.component";
 
 const routes: Routes = [
     {
@@ -18,12 +18,16 @@ const routes: Routes = [
                 pathMatch: "full"
             },
             {
-                path: "version",
+                path: "history",
                 component: PackageVersionComponent
             },
             {
                 path: "schema",
                 component: PackageSchemaComponent
+            },
+            {
+                path: "preview",
+                component: PackageSamplesComponent
             },
             {
                 path: "**",

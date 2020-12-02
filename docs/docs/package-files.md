@@ -57,6 +57,7 @@ The following are the top level properties in the DataPM Package File JSON file 
 | :-------------- | :----: | :------: | :-------------------------------------------------------------------------------------------------------------------------------------------------- |
 | description     | String | Required | A short sentence or two about the package. Use readmeFile to reference a longer markdown based description.                                         |
 | displayName     | String | Required | A short user friendly name for the package                                                                                                          |
+| contactEmail    | String | Optional | The publishers email address                                                                                                                        |
 | packageSlug     | String | Required | The unique identifier for this package. lower case letters, numbers, and hyphens only. Must not start or end in a hyphen                            |
 | schemas         | Array  | Required | A set of schemas of the data that are available in the package. See Schemas section below.                                                          |
 | updatedDate     | String | Required | The last updated date of the package file - not the data! In the ISO 8601 format                                                                    |
@@ -66,6 +67,7 @@ The following are the top level properties in the DataPM Package File JSON file 
 | licenseFile     | String | Optional | Relative path, from the package file, to the LICENSE.md file for this package. Defaults to package-file-name-license.md or README.md in that order. |
 | readmeFile      | String | Optional | Relative path, from the package file, to the README.md for this package. Defaults to package-file-name.md or README.md in that order.               |
 | licenseMarkdown | String | Optional | Markdown formatted content that describes the license for the schema and data referenced.                                                           |
+| sampleRecords   | Array  | Optional | Extracted sample records for preview purposes.                                                                                                      |
 | readmeMarkdown  | String | Optional | Markdown formatted README content for the package.                                                                                                  |
 | registries      | Array  | Optional | See Registries properties below                                                                                                                     |
 | website         | String | Optional | Website of the person or organization that maintains and/or holds the license of this data. This is for attribution purposes only                   |

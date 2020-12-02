@@ -88,7 +88,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: backend/dist
-                  key: datampm-registry-${{ runner.OS }}-backend-dist-${{ hashFiles('backend/**') }}
+                  key: datampm-registry-${{ runner.OS }}-backend-dist-${{ hashFiles('backend/**', 'lib/**') }}
 
             - name: Cache Backend Node_modules
               id: cache-backend-node-modules
@@ -115,7 +115,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: frontend/dist
-                  key: datampm-registry-${{ runner.OS }}-frontend-dist-${{ hashFiles('frontend/**') }}
+                  key: datampm-registry-${{ runner.OS }}-frontend-dist-${{ hashFiles('frontend/**', 'lib/**') }}
 
             - name: Cache Frontend Node_modules
               id: cache-frontend-node-modules

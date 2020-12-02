@@ -1,9 +1,11 @@
 import { Component } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { PackageFile, Schema } from "datapm-lib";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { Package } from "src/generated/graphql";
 import { PackageService, PackageResponse } from "../../services/package.service";
+import { SamplesFullScreenDialog } from "../package-samples/samples-fullscreen-dialog.component";
 
 @Component({
     selector: "schema",
@@ -15,24 +17,39 @@ export class PackageSchemaComponent {
     public packageFile: PackageFile;
     private unsubscribe$ = new Subject();
 
-    constructor(private packageService: PackageService) {
+    constructor(private packageService: PackageService, private dialog: MatDialog) {
         this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe((p: PackageResponse) => {
             if (p == null || p.package == null) return;
             this.package = p.package;
             if (this.package && this.package.latestVersion) {
                 this.packageFile = JSON.parse(this.package.latestVersion.packageFile);
-                console.log(this.packageFile);
             }
         });
     }
 
     getPropertyTypes(property: Schema) {
-        const keys = Object.keys(property.valueTypes);
+        const keys = Object.keys(property.valueTypes).sort();
         return keys.join(",");
     }
 
     ngOnDestroy(): void {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
+    }
+
+    schemaPropertiesLength(schema: Schema) {
+        return Object.keys(schema.properties).length;
+    }
+
+    showSamplesFullscreen(schema: Schema) {
+        this.dialog.open(SamplesFullScreenDialog, {
+            width: "95vw",
+            height: "95vh",
+            maxWidth: "95vw",
+            maxHeight: "95vh",
+            data: {
+                schema
+            }
+        });
     }
 }

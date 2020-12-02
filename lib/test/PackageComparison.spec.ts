@@ -446,4 +446,76 @@ describe("Checking VersionUtil", () => {
 
         expect(diff.some((d) => d.type === DifferenceType.CHANGE_LICENSE_MARKDOWN)).equal(true);
     });
+
+    it("Package File updated contact email", function () {
+        const packageFileA: PackageFile = {
+            packageSlug: "test",
+            displayName: "test",
+            generatedBy: "test",
+            schemas: [],
+            version: "1.0.0",
+            updatedDate: new Date(),
+            description: "Back test",
+            readmeMarkdown: "Some readme content",
+            contactEmail: "test@test.com"
+        };
+
+        const packageFileB: PackageFile = {
+            packageSlug: "test",
+            displayName: "test",
+            generatedBy: "test",
+            schemas: [],
+            version: "1.0.0",
+            updatedDate: packageFileA.updatedDate,
+            description: "Back test",
+            readmeMarkdown: packageFileA.readmeMarkdown,
+            contactEmail: packageFileA.contactEmail
+        };
+
+        expect(
+            comparePackages(packageFileA, packageFileB).some((d) => d.type === DifferenceType.CHANGE_CONTACT_EMAIL)
+        ).equal(false);
+
+        packageFileB.contactEmail = "testb@test.com";
+        expect(
+            comparePackages(packageFileA, packageFileB).some((d) => d.type === DifferenceType.CHANGE_CONTACT_EMAIL)
+        ).equal(true);
+    });
+
+    it("Package File updated website", function () {
+        const packageFileA: PackageFile = {
+            packageSlug: "test",
+            displayName: "test",
+            generatedBy: "test",
+            schemas: [],
+            version: "1.0.0",
+            updatedDate: new Date(),
+            description: "Back test",
+            readmeMarkdown: "Some readme content",
+            contactEmail: "test@test.com",
+            website: "https://dreamingwell.com"
+        };
+
+        const packageFileB: PackageFile = {
+            packageSlug: "test",
+            displayName: "test",
+            generatedBy: "test",
+            schemas: [],
+            version: "1.0.0",
+            updatedDate: packageFileA.updatedDate,
+            description: "Back test",
+            readmeMarkdown: packageFileA.readmeMarkdown,
+            contactEmail: packageFileA.contactEmail,
+            website: packageFileA.website
+        };
+
+        expect(comparePackages(packageFileA, packageFileB).some((d) => d.type === DifferenceType.CHANGE_WEBSITE)).equal(
+            false
+        );
+
+        packageFileB.website = "https://datapm.io";
+        expect(comparePackages(packageFileA, packageFileB).some((d) => d.type === DifferenceType.CHANGE_WEBSITE)).equal(
+            true
+        );
+    });
 });

@@ -8,15 +8,7 @@
                 <div class="p-2 bd-highlight w-100">
                     <div class="input-group mt-1 search-box">
                         <form (ngSubmit)="search()" class="search-form">
-                            <input
-                                type="text"
-                                name="search"
-                                minlength="1"
-                                autocomplete="off"
-                                class="form-control search-input"
-                                placeholder="Search For Data"
-                                [(ngModel)]="searchTerm"
-                            />
+                            <app-input placeholder="Search For Data"></app-input>
                             <button class="material-icons">search</button>
                         </form>
                     </div>
@@ -60,7 +52,16 @@
         <div class="col-5 text-right">
             <div class="d-flex flex-row bd-highlight d-flex justify-content-end">
                 <div class="bd-highlight mobile-person">
-                    <app-avatar [user]="currentUser" [matMenuTriggerFor]="beforeMenu"></app-avatar>
+                    <app-avatar [user]="currentUser" [matMenuTriggerFor]="beforeMenu" *ngIf="currentUser"></app-avatar>
+                    <button
+                        mat-fab
+                        class="person-menu"
+                        [matMenuTriggerFor]="beforeMenu"
+                        aria-label="Person"
+                        *ngIf="!currentUser"
+                    >
+                        <mat-icon>person</mat-icon>
+                    </button>
                     <mat-menu #beforeMenu="matMenu" xPosition="before">
                         <button *ngIf="currentUser" mat-menu-item (click)="goToMyDetails()">My Profile</button>
                         <button *ngIf="!currentUser" mat-menu-item (click)="openLoginDialog()">Log In</button>

@@ -23,13 +23,41 @@
 <div class="container" *ngIf="state == State.ERROR_NOT_AUTHENTICATED">
     <div class="row text-center">
         <div class="col-12 mt-5">
+            <div class="package-title">
+                {{ getPackageIdentifierFromURL() }}
+            </div>
+            <br />
             You must <a href="javascript:void(0);" (click)="loginClicked()">login to view this package</a>.
         </div>
     </div>
 </div>
 
+<div class="container" *ngIf="state == State.ERROR_NOT_AUTHORIZED">
+    <div class="row text-center">
+        <div class="col-12 mt-5">
+            <div class="package-title">
+                {{ getPackageIdentifierFromURL() }}
+            </div>
+            <br />
+            You do not have permission to view this package. Please contact the author.
+        </div>
+    </div>
+</div>
+
+<div class="container" *ngIf="state == State.ERROR_NOT_FOUND">
+    <div class="row text-center">
+        <div class="col-12 mt-5">
+            <div class="package-title">
+                {{ getPackageIdentifierFromURL() }}
+            </div>
+            <br />
+            The package was not found. Use the search bar above to find additional data.
+        </div>
+    </div>
+</div>
+
 <div *ngIf="state == State.LOADED">
-    <div class="container pl-2">
+    <div class="container">
         <div class="row" id="packagePage">
             <div class="col-xl-12 col-12 contentContainer pl-0 pr-0">
                 <app-cover
@@ -42,22 +70,23 @@
                     <div class="row" *ngIf="package">
                         <div class="col-12 package-info">
                             <!-- <div class="package-title">{{ package?.displayName }}</div> -->
+                            <span
+                                class="py-2 package-privacy"
+                                *ngIf="this.currentUser && this.currentUser?.username == this.catalogUser?.username"
+                                [class.public]="package?.isPublic"
+                            >
+                                {{ package?.isPublic ? "public" : "not public" }}
+                            </span>
                             <div class="package-identifier">
-                                <app-avatar class="user-img" *ngIf="catalogUser" [user]="catalogUser" [size]="32">
-                                </app-avatar>
                                 <div class="identifier">
-                                    <a [routerLink]="['/' + package?.identifier.catalogSlug]">{{
-                                        package?.identifier.catalogSlug
-                                    }}</a
-                                    >/{{ package?.identifier.packageSlug }}
-                                    &nbsp;&nbsp;
-                                    <span
-                                        class="py-2 package-privacy"
-                                        *ngIf="this.currentUser?.username == this.catalogUser?.username"
-                                        [class.public]="package?.isPublic"
-                                    >
-                                        {{ package?.isPublic ? "public" : "not public" }}
-                                    </span>
+                                    <app-avatar class="user-img" *ngIf="catalogUser" [user]="catalogUser" [size]="32">
+                                    </app-avatar>
+                                    <div class="identifier-text text-overflow-elipses">
+                                        <a [routerLink]="['/' + package?.identifier.catalogSlug]">{{
+                                            package?.identifier.catalogSlug
+                                        }}</a
+                                        >/{{ package?.identifier.packageSlug }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
