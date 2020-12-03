@@ -6,8 +6,7 @@ import {
     CreateCatalogInput,
     Permission,
     CatalogIdentifier,
-    CatalogIdentifierInput,
-    CatalogPackage
+    CatalogIdentifierInput
 } from "../generated/graphql";
 import { Catalog } from "../entity/Catalog";
 import { Package } from "../entity/Package";

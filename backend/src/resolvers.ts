@@ -465,17 +465,6 @@ export const resolvers: {
             return permissions.filter((p) => p.catalog != null).map((p) => p.catalog);
         },
 
-        myCatalogPermission: async (
-            _0: any,
-            { identifier }: { identifier: CatalogIdentifierInput },
-            context: AuthenticatedContext,
-            info: any
-        ) => {
-            return await context.connection
-                .getCustomRepository(UserCatalogPermissionRepository)
-                .myCatalogPermission(context.me, identifier);
-        },
-
         myAPIKeys: async (_0: any, {}, context: AuthenticatedContext) => {
             const apiKeys = await context.connection.manager
                 .getCustomRepository(APIKeyRepository)

@@ -198,8 +198,7 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
             const catalogEntity = await transaction
                 .getCustomRepository(CatalogRepository)
                 .findCatalogBySlugOrFail(identifier.catalogSlug);
-            console.log(catalogEntity);
-            debugger;
+
             const permissions = await this.findByUserAndCatalogId(user.id, catalogEntity.id);
 
             // If User does not exist in UserCatalogTable, it creates new record
@@ -233,19 +232,6 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
                     console.log(e);
                 }
             }
-        });
-    }
-
-    public async myCatalogPermission(user: User, identifier: CatalogIdentifierInput): Promise<Permission[]> {
-        // return this.createQueryBuilder().where({}).getOne();
-        return await this.manager.nestedTransaction(async (transaction) => {
-            const catalogEntity = await transaction
-                .getCustomRepository(CatalogRepository)
-                .findCatalogBySlugOrFail(identifier.catalogSlug);
-
-            if (catalogEntity.slug == user.username) return [Permission.MANAGE, Permission.EDIT, Permission.VIEW];
-            if (catalogEntity.isPublic) return [Permission.VIEW];
-            throw new ForbiddenError("NOT_AUTHORIZED");
         });
     }
 }

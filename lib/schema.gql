@@ -488,11 +488,6 @@ type Query {
     ): [Package!]!
 
     """
-    Returns list of authenicated users permissions on catalogs
-    """
-    myCatalogPermission(identifier: CatalogIdentifierInput!): [Permission!]!
-
-    """
     Returns the package for the given identifier. Requires permission to view the package
     """
     package(identifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)): Package!

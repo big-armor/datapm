@@ -1,3 +1,0 @@
-query MyCatalogPermission($identifier: CatalogIdentifierInput!) {
-    myCatalogPermission(identifier: $identifier)
-}
