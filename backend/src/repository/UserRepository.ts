@@ -364,9 +364,17 @@ export class UserRepository extends Repository<User> {
                 dbUser.lastName = value.lastName.trim();
             }
 
-            const finalUserName = value.username;
             if (value.username) {
-                dbUser.username = value.username.toLowerCase().trim();
+                const finalUserName = value.username.toLowerCase().trim();
+                const oldUserName = dbUser.username;
+
+                const catalog = await transaction
+                    .getCustomRepository(CatalogRepository)
+                    .findCatalogBySlugOrFail(oldUserName);
+                catalog.slug = finalUserName;
+                await transaction.save(catalog);
+
+                dbUser.username = finalUserName;
             }
 
             if (value.emailAddress) {
@@ -447,7 +455,7 @@ export class UserRepository extends Repository<User> {
         });
 
         try {
-            await ImageStorageService.INSTANCE.deleteUserAvatarImage(username);
+            await ImageStorageService.INSTANCE.deleteUserAvatarImage(user.id);
         } catch (error) {
             if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) return;
 
@@ -455,7 +463,7 @@ export class UserRepository extends Repository<User> {
         }
 
         try {
-            await ImageStorageService.INSTANCE.deleteUserCoverImage(username);
+            await ImageStorageService.INSTANCE.deleteUserCoverImage(user.id);
         } catch (error) {
             if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) return;
 

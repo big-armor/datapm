@@ -58,7 +58,9 @@ export class PackageSamplesComponent {
             maxWidth: "95vw",
             maxHeight: "95vh",
             data: {
-                schema
+                schema,
+                packageFile: this.packageFile,
+                package: this.package
             }
         });
     }

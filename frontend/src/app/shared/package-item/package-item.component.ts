@@ -18,6 +18,7 @@ export class PackageItemComponent implements OnInit {
 
     goToComponent(): void {
         const { catalogSlug, packageSlug } = this.item.identifier;
+        window.scrollTo(0, 0);
 
         this.router.navigate([catalogSlug, packageSlug]);
     }

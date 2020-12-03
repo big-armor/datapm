@@ -353,6 +353,22 @@ export const resolvers: {
             return version;
         },
 
+        catalog: async (parent: any, _1: any, context: AuthenticatedContext, info: any): Promise<Catalog> => {
+            const catalog = await context.connection.getCustomRepository(CatalogRepository).findOne(parent.catalogId, {
+                relations: getRelationNames(graphqlFields(info))
+            });
+
+            if (!catalog) throw new Error("CATALOG_NOT_FOUND");
+            return catalog;
+        },
+        versions: async (parent: any, _1: any, context: AuthenticatedContext, info: any): Promise<Version[]> => {
+            const versions = await context.connection
+                .getCustomRepository(VersionRepository)
+                .findVersions({ packageId: parent.id, relations: getRelationNames(graphqlFields(info)) });
+
+            return versions;
+        },
+
         identifier: findPackageIdentifier,
         creator: findPackageCreator
     },
@@ -378,7 +394,7 @@ export const resolvers: {
                 versionPatch: version.patchVersion
             };
         },
-        packageFile: async (parent: any, _1: any, context: AuthenticatedContext) => {
+        packageFile: async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
             const version = parent as Version;
 
             const packageEntity = await context.connection
@@ -390,7 +406,7 @@ export const resolvers: {
                 .findOneOrFail({ id: packageEntity.catalogId });
 
             try {
-                return await PackageFileStorageService.INSTANCE.readPackageFile({
+                return await PackageFileStorageService.INSTANCE.readPackageFile(packageEntity.id, {
                     catalogSlug: catalog.slug,
                     packageSlug: packageEntity.slug,
                     versionMajor: version.majorVersion,
@@ -576,7 +592,10 @@ export const resolvers: {
             context: AuthenticatedContext,
             info: any
         ) => {
-            await ImageStorageService.INSTANCE.saveCatalogCoverImage(identifier, image.base64);
+            const catalog = await context.connection.manager
+                .getCustomRepository(CatalogRepository)
+                .findCatalogBySlugOrFail(identifier.catalogSlug);
+            await ImageStorageService.INSTANCE.saveCatalogCoverImage(catalog.id, image.base64);
         },
 
         setUserCatalogPermission: async (
@@ -629,15 +648,18 @@ export const resolvers: {
                 // get the latest version
                 const latestVersion = await transaction
                     .getCustomRepository(VersionRepository)
-                    .findLatestVersion({ identifier });
+                    .findLatestVersion({ identifier, relations: ["package"] });
 
                 if (latestVersion != null) {
-                    const packageFile = await PackageFileStorageService.INSTANCE.readPackageFile({
-                        ...identifier,
-                        versionMajor: latestVersion.majorVersion,
-                        versionMinor: latestVersion.minorVersion,
-                        versionPatch: latestVersion.patchVersion
-                    });
+                    const packageFile = await PackageFileStorageService.INSTANCE.readPackageFile(
+                        latestVersion.package.id,
+                        {
+                            ...identifier,
+                            versionMajor: latestVersion.majorVersion,
+                            versionMinor: latestVersion.minorVersion,
+                            versionPatch: latestVersion.patchVersion
+                        }
+                    );
 
                     const latestVersionSemVer = new SemVer(packageFile!.version);
 
@@ -691,12 +713,20 @@ export const resolvers: {
                     versionPatch: proposedNewVersion.patch
                 };
 
+                const packageEntity = await transaction
+                    .getCustomRepository(PackageRepository)
+                    .findOrFail({ identifier });
+
                 await transaction
                     .getCustomRepository(PackageRepository)
                     .updatePackageReadmeVectors(identifier, newPackageFile.readmeMarkdown);
 
                 if (value.packageFile)
-                    await PackageFileStorageService.INSTANCE.writePackageFile(versionIdentifier, value.packageFile);
+                    await PackageFileStorageService.INSTANCE.writePackageFile(
+                        packageEntity.id,
+                        versionIdentifier,
+                        value.packageFile
+                    );
 
                 const ALIAS = "findVersion";
                 const recalledVersion = await transaction
