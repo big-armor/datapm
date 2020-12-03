@@ -462,34 +462,4 @@ export class UserRepository extends Repository<User> {
             console.error(error.message);
         }
     }
-
-    removeUserFromCatalog({
-        username,
-        catalog,
-        relations = []
-    }: {
-        username: string;
-        catalog: Catalog;
-        relations?: string[];
-    }): Promise<User> {
-        return this.manager.nestedTransaction(async (transaction) => {
-            const user = await getUserByUsernameOrFail({
-                username: username,
-                manager: transaction
-            });
-
-            // remove user from catalog, remove all user settings
-            await transaction.delete(UserCatalogPermission, { userId: user.id, catalogId: catalog.id });
-
-            user.updatedAt = new Date();
-            await transaction.save(user);
-
-            // return result with requested relations
-            return getUserByUsernameOrFail({
-                username: username,
-                manager: transaction,
-                relations
-            });
-        });
-    }
 }

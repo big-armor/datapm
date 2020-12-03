@@ -6,7 +6,8 @@ import {
     CreateCatalogInput,
     Permission,
     CatalogIdentifier,
-    CatalogIdentifierInput
+    CatalogIdentifierInput,
+    CatalogPackage
 } from "../generated/graphql";
 import { Catalog } from "../entity/Catalog";
 import { Package } from "../entity/Package";
@@ -197,6 +198,26 @@ export class CatalogRepository extends Repository<Catalog> {
                 relations
             });
         });
+    }
+
+    public async catalogPackages(
+        catalogId: number,
+        limit: number,
+        offset: number,
+        relations?: string[]
+    ): Promise<Package[]> {
+        const ALIAS = "package";
+        const packages = await this.manager
+            .getRepository(Package)
+            .createQueryBuilder(ALIAS)
+            .where({ catalogId: catalogId })
+            .orderBy('"package"."updated_at"', "DESC")
+            .addRelations(ALIAS, ["catalog"])
+            .limit(limit)
+            .offset(offset)
+            .getMany();
+
+        return packages;
     }
 
     async deleteCatalog({ slug }: { slug: string }): Promise<void> {

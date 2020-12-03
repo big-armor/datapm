@@ -15,6 +15,7 @@ import {
     PackageIdentifier,
     CollectionResolvers,
     CatalogIdentifierInput,
+    SetUserCatalogPermissionInput,
     VersionIdentifierInput,
     Base64ImageUpload
 } from "./generated/graphql";
@@ -448,6 +449,17 @@ export const resolvers: {
             return permissions.filter((p) => p.catalog != null).map((p) => p.catalog);
         },
 
+        myCatalogPermission: async (
+            _0: any,
+            { identifier }: { identifier: CatalogIdentifierInput },
+            context: AuthenticatedContext,
+            info: any
+        ) => {
+            return await context.connection
+                .getCustomRepository(UserCatalogPermissionRepository)
+                .myCatalogPermission(context.me, identifier);
+        },
+
         myAPIKeys: async (_0: any, {}, context: AuthenticatedContext) => {
             const apiKeys = await context.connection.manager
                 .getCustomRepository(APIKeyRepository)
@@ -501,6 +513,20 @@ export const resolvers: {
             };
         },
 
+        catalogPackages: async (
+            _0: any,
+            { identifier, limit, offset }: { identifier: CatalogIdentifierInput; limit: number; offset: number },
+            context: AuthenticatedContext,
+            info: any
+        ) => {
+            const repository = context.connection.manager.getCustomRepository(CatalogRepository);
+            const catalogEntity = await repository.findCatalogBySlugOrFail(identifier.catalogSlug);
+            const relations = getGraphQlRelationName(info);
+            return await context.connection.manager
+                .getCustomRepository(CatalogRepository)
+                .catalogPackages(catalogEntity.id, limit, offset, relations);
+        },
+
         searchPackages: searchPackages,
 
         usernameAvailable: usernameAvailable,
@@ -528,22 +554,6 @@ export const resolvers: {
         createAPIKey: createAPIKey,
         deleteAPIKey: deleteAPIKey,
 
-        removeUserFromCatalog: async (_0: any, { username, identifier }, context: AuthenticatedContext, info: any) => {
-            const catalog = await context.connection.manager
-                .getCustomRepository(CatalogRepository)
-                .findCatalogBySlug({ slug: identifier.catalogSlug });
-
-            if (catalog === undefined) {
-                throw new UserInputError("CATALOG_NOT_FOUND");
-            }
-
-            return context.connection.manager.getCustomRepository(UserRepository).removeUserFromCatalog({
-                username: username,
-                catalog: catalog,
-                relations: getGraphQlRelationName(info)
-            });
-        },
-
         createCatalog: async (_0: any, { value }, context: AuthenticatedContext, info: any) => {
             return context.connection.manager.getCustomRepository(CatalogRepository).createCatalog({
                 username: context.me?.username,
@@ -567,6 +577,19 @@ export const resolvers: {
             info: any
         ) => {
             await ImageStorageService.INSTANCE.saveCatalogCoverImage(identifier, image.base64);
+        },
+
+        setUserCatalogPermission: async (
+            _0: any,
+            { identifier, value }: { identifier: CatalogIdentifierInput; value: SetUserCatalogPermissionInput },
+            context: AuthenticatedContext,
+            info: any
+        ) => {
+            await context.connection.getCustomRepository(UserCatalogPermissionRepository).setUserCatalogPermission({
+                identifier,
+                value,
+                relations: getGraphQlRelationName(info)
+            });
         },
 
         deleteCatalog: async (

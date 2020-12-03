@@ -11,7 +11,8 @@ import {
     GetCatalogDocument,
     CreatePackageDocument,
     UpdatePackageDocument,
-    PackageDocument
+    PackageDocument,
+    CatalogPackagesDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
@@ -515,6 +516,71 @@ describe("Catalog Tests", async () => {
             response.errors!.find((e) => e.message == "CATALOG_NOT_FOUND") != null,
             "should not return deleted catalog"
         ).equal(true);
+    });
+
+    it("CatalogPackages returned in DESC order, with view permissions", async function () {
+        await userAClient.mutate({
+            mutation: CreateCatalogDocument,
+            variables: {
+                value: {
+                    slug: "user-a-second-catalog-v3",
+                    displayName: "User AAA",
+                    description: "This is an integration test User A second catalog",
+                    website: "https://usera.datapm.io",
+                    isPublic: false
+                }
+            }
+        });
+
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "user-a-second-catalog-v3",
+                    packageSlug: "us-congressional-legislators-4",
+                    displayName: "Congressional Legislator3s",
+                    description: "Test upload of congressional legislatorsA"
+                }
+            }
+        });
+
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "user-a-second-catalog-v3",
+                    packageSlug: "us-congressional-legislators-5",
+                    displayName: "Congressional Legislator4s",
+                    description: "Test upload of congressional legislatorsA"
+                }
+            }
+        });
+
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "user-a-second-catalog-v3",
+                    packageSlug: "us-congressional-legislators-3",
+                    displayName: "Congressional Legislator5s",
+                    description: "Test upload of congressional legislatorsA"
+                }
+            }
+        });
+
+        let response = await userAClient.query({
+            query: CatalogPackagesDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "user-a-second-catalog-v3"
+                },
+                offset: 0,
+                limit: 3
+            }
+        });
+
+        expect(response.errors == null).true;
+        expect(response.data?.catalogPackages.length).to.equal(3);
     });
 
     // TODO Test package and catalog association, and permissions of packages in private catalogs

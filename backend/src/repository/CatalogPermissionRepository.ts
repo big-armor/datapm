@@ -1,12 +1,12 @@
 import { EntityRepository, Repository, EntityManager } from "typeorm";
 
 import { User } from "../entity/User";
-import { Permission } from "../generated/graphql";
+import { Permission, CatalogIdentifierInput, SetUserCatalogPermissionInput } from "../generated/graphql";
 import { Catalog } from "../entity/Catalog";
 import { UserCatalogPermission } from "../entity/UserCatalogPermission";
 import { UserRepository } from "./UserRepository";
 import { CatalogRepository } from "./CatalogRepository";
-import { UserInputError } from "apollo-server";
+import { UserInputError, ForbiddenError } from "apollo-server";
 
 async function getUserCatalogPermissionOrFail({
     userId,
@@ -174,5 +174,78 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
         });
 
         return userCatalogPermission.permissions.indexOf(permission) != -1;
+    }
+
+    public async findByUserAndCatalogId(userId: number, catalogId: number): Promise<UserCatalogPermission | undefined> {
+        return this.createQueryBuilder().where({ userId: userId, catalogId: catalogId }).getOne();
+    }
+
+    public async setUserCatalogPermission({
+        identifier,
+        value,
+        relations
+    }: {
+        identifier: CatalogIdentifierInput;
+        value: SetUserCatalogPermissionInput;
+        relations?: string[];
+    }): Promise<void> {
+        await this.manager.nestedTransaction(async (transaction) => {
+            const user = await transaction.getCustomRepository(UserRepository).getUserByUsername(value.username);
+
+            if (!user) {
+                throw new Error(`User ${value.username} not found`);
+            }
+            const catalogEntity = await transaction
+                .getCustomRepository(CatalogRepository)
+                .findCatalogBySlugOrFail(identifier.catalogSlug);
+            console.log(catalogEntity);
+            debugger;
+            const permissions = await this.findByUserAndCatalogId(user.id, catalogEntity.id);
+
+            // If User does not exist in UserCatalogTable, it creates new record
+            if (permissions == undefined) {
+                try {
+                    await transaction
+                        .createQueryBuilder()
+                        .insert()
+                        .into(UserCatalogPermission)
+                        .values({
+                            catalogId: catalogEntity.id,
+                            userId: user.id,
+                            permissions: value.permission
+                        })
+                        .execute();
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+
+            // Updates permissions if user exists already in UserCatalogTable
+            if (permissions != undefined && value.permission.length) {
+                try {
+                    await transaction
+                        .createQueryBuilder()
+                        .update(UserCatalogPermission)
+                        .set({ permissions: value.permission })
+                        .where({ catalogId: catalogEntity.id, userId: user.id })
+                        .execute();
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+        });
+    }
+
+    public async myCatalogPermission(user: User, identifier: CatalogIdentifierInput): Promise<Permission[]> {
+        // return this.createQueryBuilder().where({}).getOne();
+        return await this.manager.nestedTransaction(async (transaction) => {
+            const catalogEntity = await transaction
+                .getCustomRepository(CatalogRepository)
+                .findCatalogBySlugOrFail(identifier.catalogSlug);
+
+            if (catalogEntity.slug == user.username) return [Permission.MANAGE, Permission.EDIT, Permission.VIEW];
+            if (catalogEntity.isPublic) return [Permission.VIEW];
+            throw new ForbiddenError("NOT_AUTHORIZED");
+        });
     }
 }
