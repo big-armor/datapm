@@ -19,10 +19,11 @@ const errorKeys = [
     "REQUIRED",
     "minlength",
     "email",
-    "NOT_AVAILABLE",
     "PASSWORD_TOO_SHORT",
     "PASSWORD_TOO_LONG",
-    "INVALID_CHARACTERS"
+    "INVALID_CHARACTERS",
+    "USERNAME_TOO_LONG",
+    "NOT_AVAILABLE"
 ];
 
 @Pipe({

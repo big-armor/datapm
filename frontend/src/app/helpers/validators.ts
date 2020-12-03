@@ -4,10 +4,15 @@ import { AbstractControl, AsyncValidatorFn, ValidationErrors } from "@angular/fo
 
 export function usernameValidator(
     usernameAvailableGQL: UsernameAvailableGQL,
-    componentChangeDetector: ChangeDetectorRef
+    componentChangeDetector: ChangeDetectorRef,
+    currentUsername: string
 ): AsyncValidatorFn {
     return (control: AbstractControl): Promise<ValidationErrors | null> => {
         return new Promise<ValidationErrors | null>((success, error) => {
+            if (control.value == currentUsername) {
+                success(null);
+                return;
+            }
             if (control.value == "" || control.value == null) {
                 success({
                     REQUIRED: true
@@ -98,6 +103,33 @@ export function newPasswordValidator() {
                     INVALID_CHARACTERS: true
                 });
             }
+        });
+    };
+}
+
+export function slugValidator() {
+    return (control: AbstractControl): Promise<ValidationErrors | null> => {
+        return new Promise<ValidationErrors | null>((success, error) => {
+            const regex = /^[a-zA-Z0-9]([a-zA-Z0-9\-]*[a-zA-Z0-9])?$/;
+
+            if (control.value == "" || control.value == null) {
+                success({
+                    REQUIRED: true
+                });
+                return;
+            }
+            if (control.value.length > 40) {
+                success({
+                    SLUG_TOO_LONG: true
+                });
+            }
+            if (!regex.test(control.value)) {
+                success({
+                    INVALID_CHARACTERS: true
+                });
+            }
+
+            success(null);
         });
     };
 }

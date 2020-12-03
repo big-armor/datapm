@@ -9,7 +9,7 @@
                 others. <a target="_blank" href="/docs/concepts/collections">Learn more about collections</a>
             </div>
             <div class="col-md-12 col-lg-12 text-center pt-4 pb-5">
-                <app-button (click)="openCreateDialog()">Create A Collection</app-button>
+                <app-button class="create-button" (click)="openCreateDialog()">Create A Collection</app-button>
             </div>
         </ng-container>
 
@@ -18,7 +18,7 @@
                 <span class="pr-2">My Collections</span>
             </div>
 
-            <div class="pl-4 pr-4">
+            <div class="pl-4 pr-4 mb-4">
                 <p>
                     Collections are groupings of data packages that you can use to organize your interests, and share
                     with others.
@@ -51,6 +51,7 @@
                 <ng-container matColumnDef="actions">
                     <th mat-header-cell *matHeaderCellDef>Actions</th>
                     <td mat-cell *matCellDef="let collection">
+                        <app-button (click)="editCollection(collection)">Edit</app-button>
                         <app-button (click)="deleteCollection(collection)">Delete</app-button>
                     </td>
                 </ng-container>

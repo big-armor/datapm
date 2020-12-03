@@ -1,7 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit } from "@angular/core";
-import { AbstractControl, AsyncValidatorFn, FormControl, FormGroup, ValidationErrors } from "@angular/forms";
-import { Router } from "@angular/router";
-import { AuthenticationService } from "src/app/services/authentication.service";
+import { FormControl, FormGroup } from "@angular/forms";
 import { CreateMeGQL, EmailAddressAvailableGQL, UsernameAvailableGQL } from "src/generated/graphql";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { MatDialogRef } from "@angular/material/dialog";
@@ -40,7 +38,7 @@ export class SignUpDialogComponent implements OnInit {
     ngOnInit(): void {
         this.signUpForm = new FormGroup({
             username: new FormControl("", {
-                asyncValidators: [usernameValidator(this.usernameAvailableGQL, this.componentChangeDetector)],
+                asyncValidators: [usernameValidator(this.usernameAvailableGQL, this.componentChangeDetector, "")],
                 updateOn: "blur"
             }),
             emailAddress: new FormControl("", {

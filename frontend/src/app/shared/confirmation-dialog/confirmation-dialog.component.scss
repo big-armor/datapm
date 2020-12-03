@@ -1,0 +1,15 @@
+.mat-dialog-content {
+    max-width: 500px;
+    font-family: Roboto Mono;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 26px;
+    letter-spacing: -0.28px;
+    color: #333333;
+}
+
+app-button ::ng-deep .raised-button {
+    margin-top: 0;
+    margin-bottom: 16px;
+}
