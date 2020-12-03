@@ -22,16 +22,6 @@
         margin-right: 10px;
     }
 
-    ::ng-deep.mat-checked {
-        .mat-slide-toggle-bar {
-            background-color: #00a896;
-        }
-
-        .mat-slide-toggle-thumb {
-            background-color: #fff;
-        }
-    }
-
     .loading-container {
         display: flex;
         justify-content: center;

@@ -7,6 +7,7 @@ query MyPackages($offset: Int!, $limit: Int!) {
                 packageSlug
             }
             catalog {
+                myPermissions
                 displayName
             }
             isPublic

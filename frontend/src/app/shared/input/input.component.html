@@ -9,7 +9,7 @@
     (focus)="focus.emit($event)"
     (blur)="blur.emit($event)"
     cdkFocusInitial
-    *ngIf="autoFocus"
+    *ngIf="autoFocus && !multiline"
 />
 <input
     class="app-input-round"
@@ -21,6 +21,29 @@
     (keyup)="handleKeyUp($event)"
     (focus)="focus.emit($event)"
     (blur)="blur.emit($event)"
-    *ngIf="!autoFocus"
+    *ngIf="!autoFocus && !multiline"
 />
+<textarea
+    class="app-input-round"
+    autocomplete="off"
+    [placeholder]="placeholder"
+    [formControl]="formControl"
+    (change)="handleInputChange($event)"
+    (keyup)="handleKeyUp($event)"
+    (focus)="focus.emit($event)"
+    (blur)="blur.emit($event)"
+    cdkFocusInitial
+    *ngIf="autoFocus && multiline"
+></textarea>
+<textarea
+    class="app-input-round"
+    autocomplete="off"
+    [placeholder]="placeholder"
+    [formControl]="formControl"
+    (change)="handleInputChange($event)"
+    (keyup)="handleKeyUp($event)"
+    (focus)="focus.emit($event)"
+    (blur)="blur.emit($event)"
+    *ngIf="!autoFocus && multiline"
+></textarea>
 <div class="text-danger mt-1 ml-2" *ngIf="error">{{ error }}</div>
