@@ -12,7 +12,7 @@ import {
     CreatePackageDocument,
     UpdatePackageDocument,
     PackageDocument,
-    CatalogPackagesDocument
+    CatalogPackagesDocument,
     CreateVersionDocument,
     UpdateMeDocument
 } from "./registry-client";
@@ -543,7 +543,44 @@ describe("Catalog Tests", async () => {
         ).equal(true);
     });
 
-<<<<<<< HEAD
+    it("should update catalog slug after changing a user's username", async () => {
+        let response = await userAClient.mutate({
+            mutation: UpdateMeDocument,
+            variables: {
+                value: {
+                    username: "my-new-username-test-catalog"
+                }
+            }
+        });
+
+        expect(response.errors == null).equal(true);
+
+        let catalogRequest = await userAClient.query({
+            query: GetCatalogDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "my-new-username-test-catalog"
+                }
+            }
+        });
+
+        expect(catalogRequest.errors == null).equal(true);
+        expect(catalogRequest.data.catalog.identifier.catalogSlug).equal("my-new-username-test-catalog");
+    });
+
+    it("old catalog should not be available", async () => {
+        let catalogRequest = await userAClient.query({
+            query: GetCatalogDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-catalog"
+                }
+            }
+        });
+
+        expect(catalogRequest.errors!.find((e) => e.message.includes("CATALOG_NOT_FOUND")) != null).equal(true);
+    });
+
     it("CatalogPackages returned in DESC order, with view permissions", async function () {
         await userAClient.mutate({
             mutation: CreateCatalogDocument,
@@ -554,19 +591,10 @@ describe("Catalog Tests", async () => {
                     description: "This is an integration test User A second catalog",
                     website: "https://usera.datapm.io",
                     isPublic: false
-=======
-    it("should update catalog slug after changing a user's username", async () => {
-        let response = await userAClient.mutate({
-            mutation: UpdateMeDocument,
-            variables: {
-                value: {
-                    username: "my-new-username-test-catalog"
->>>>>>> master
                 }
             }
         });
 
-<<<<<<< HEAD
         await userAClient.mutate({
             mutation: CreatePackageDocument,
             variables: {
@@ -587,20 +615,10 @@ describe("Catalog Tests", async () => {
                     packageSlug: "us-congressional-legislators-5",
                     displayName: "Congressional Legislator4s",
                     description: "Test upload of congressional legislatorsA"
-=======
-        expect(response.errors == null).equal(true);
-
-        let catalogRequest = await userAClient.query({
-            query: GetCatalogDocument,
-            variables: {
-                identifier: {
-                    catalogSlug: "my-new-username-test-catalog"
->>>>>>> master
                 }
             }
         });
 
-<<<<<<< HEAD
         await userAClient.mutate({
             mutation: CreatePackageDocument,
             variables: {
@@ -626,24 +644,6 @@ describe("Catalog Tests", async () => {
 
         expect(response.errors == null).true;
         expect(response.data?.catalogPackages.length).to.equal(3);
-=======
-        expect(catalogRequest.errors == null).equal(true);
-        expect(catalogRequest.data.catalog.identifier.catalogSlug).equal("my-new-username-test-catalog");
     });
-
-    it("old catalog should not be available", async () => {
-        let catalogRequest = await userAClient.query({
-            query: GetCatalogDocument,
-            variables: {
-                identifier: {
-                    catalogSlug: "testA-catalog"
-                }
-            }
-        });
-
-        expect(catalogRequest.errors!.find((e) => e.message.includes("CATALOG_NOT_FOUND")) != null).equal(true);
->>>>>>> master
-    });
-
     // TODO Test package and catalog association, and permissions of packages in private catalogs
 });
