@@ -1,7 +1,18 @@
 <div id="catalogsPage">
     <div class="catalogs-div panel-div">
-        <div *ngIf="myCatalogs && myCatalogs.length > 0" class="section-title">My Catalogs</div>
-        <table *ngIf="myCatalogs && myCatalogs.length > 0" mat-table [dataSource]="myCatalogs">
+        <div *ngIf="catalogState !== State.LOADING && myCatalogs && myCatalogs.length > 0" class="section-title">
+            My Catalogs
+        </div>
+        <p class="pl-4 pr-4">
+            Catalogs are lists of data packages offered by individuals or organizations. All packages belong to one and
+            only one catalog.
+        </p>
+
+        <table
+            *ngIf="catalogState === State.SUCCESS && myCatalogs && myCatalogs.length > 0"
+            mat-table
+            [dataSource]="myCatalogs"
+        >
             <!-- Label column -->
             <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef>Name</th>
@@ -32,5 +43,18 @@
             <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
             <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
         </table>
+        <div class="loading-container" *ngIf="catalogState === State.LOADING">
+            <mat-spinner [diameter]="40"></mat-spinner>
+        </div>
     </div>
 </div>
+
+<ng-template #deleteMyUsercatalog>
+    <h2 matDialogTitle>Cannot delete your user catalog</h2>
+    <mat-dialog-content>
+        <p>You can not delete the catalog that's the same as your username.</p>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+        <button mat-button matDialogClose class="edit-button">Close</button>
+    </mat-dialog-actions>
+</ng-template>

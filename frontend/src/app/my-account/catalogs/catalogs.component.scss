@@ -53,4 +53,11 @@
             background-color: rgba(240, 240, 240, 0.783);
         }
     }
+
+    .loading-container {
+        display: flex;
+        justify-content: center;
+        padding: 20px 0 40px;
+        width: 100%;
+    }
 }

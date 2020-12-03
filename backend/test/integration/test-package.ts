@@ -8,7 +8,8 @@ import {
     UpdatePackageDocument,
     CreateVersionDocument,
     DeletePackageDocument,
-    MyPackagesDocument
+    MyPackagesDocument,
+    GetLatestPackagesDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import * as fs from "fs";
@@ -229,6 +230,72 @@ describe("Package Tests", async () => {
         ).equal(true);
     });
 
+    it("Should not be in latest list - because it is not public", async function () {
+        let response = await anonymousClient.query({
+            query: GetLatestPackagesDocument,
+            variables: {
+                limit: 10,
+                offset: 0
+            }
+        });
+
+        expect(response.errors == null, "no errors").equal(true);
+        expect(
+            response.data!.latestPackages.packages!.find((p) => p.identifier.packageSlug == "new-package-slug")
+        ).to.equal(undefined);
+    });
+
+    it("User A can not update package", async function () {
+        let response = await userAClient.mutate({
+            mutation: UpdatePackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "congressional-legislators"
+                },
+                value: {
+                    isPublic: true
+                }
+            }
+        });
+        expect(response.errors != null, "has errors").equal(true);
+        expect(response.errors!.find((e) => e.message.includes("PACKAGE_HAS_NO_VERSIONS"))).to.not.equal(undefined);
+    });
+
+    it("User A publish first version", async function () {
+        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+
+        const packageFileString = JSON.stringify(packageFileContents);
+
+        let response = await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "congressional-legislators"
+                },
+                value: {
+                    packageFile: packageFileString
+                }
+            }
+        });
+
+        expect(response.errors == null, "no errors").true;
+        expect(response.data!.createVersion.author.username).equal("testA-packages");
+
+        const responsePackageFileContents = response.data!.createVersion.packageFile;
+
+        const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
+
+        // have to update this hash value if the package file contents change
+        expect(responseHash).equal("277a1c1995ea6adbcd229621daf11c7cb4f90580c4871d2da7ab8e5c80a92987");
+
+        const responsePackageFile = parsePackageFileJSON(responsePackageFileContents);
+
+        expect(responsePackageFile.readmeMarkdown).includes("This is where a readme might go");
+        expect(responsePackageFile.licenseMarkdown).includes("This is not a real license. Just a test.");
+    });
+
     it("User A can update package", async function () {
         let response = await userAClient.mutate({
             mutation: UpdatePackageDocument,
@@ -251,7 +318,13 @@ describe("Package Tests", async () => {
         expect(response.data!.updatePackage.displayName).to.equal("New displayName");
         expect(response.data!.updatePackage.identifier.catalogSlug).to.equal("testA-packages");
         expect(response.data!.updatePackage.identifier.packageSlug).to.equal("new-package-slug");
-        expect(response.data!.updatePackage.latestVersion).to.equal(null);
+        expect(response.data!.updatePackage.latestVersion).to.not.equal(null);
+
+        const identifier = response.data!.updatePackage.latestVersion!.identifier;
+
+        expect(identifier.versionMajor).to.equal(1);
+        expect(identifier.versionMinor).to.equal(0);
+        expect(identifier.versionPatch).to.equal(0);
     });
 
     it("User A set catalog public", async function () {
@@ -288,7 +361,13 @@ describe("Package Tests", async () => {
         expect(response.data!.package.displayName).to.equal("New displayName");
         expect(response.data!.package.identifier.catalogSlug).to.equal("testA-packages");
         expect(response.data!.package.identifier.packageSlug).to.equal("new-package-slug");
-        expect(response.data!.package.latestVersion).to.equal(null);
+        expect(response.data!.package.latestVersion).to.not.equal(null);
+
+        const identifier = response.data!.package.latestVersion!.identifier;
+
+        expect(identifier.versionMajor).to.equal(1);
+        expect(identifier.versionMinor).to.equal(0);
+        expect(identifier.versionPatch).to.equal(0);
     });
 
     it("user B can access package", async function () {
@@ -308,7 +387,11 @@ describe("Package Tests", async () => {
         expect(response.data!.package.displayName).to.equal("New displayName");
         expect(response.data!.package.identifier.catalogSlug).to.equal("testA-packages");
         expect(response.data!.package.identifier.packageSlug).to.equal("new-package-slug");
-        expect(response.data!.package.latestVersion).to.equal(null);
+        const identifier = response.data!.package.latestVersion!.identifier;
+
+        expect(identifier.versionMajor).to.equal(1);
+        expect(identifier.versionMinor).to.equal(0);
+        expect(identifier.versionPatch).to.equal(0);
     });
 
     it("User b can not update package", async function () {
@@ -359,38 +442,34 @@ describe("Package Tests", async () => {
         ).equal(true);
     });
 
-    it("User A publish first version", async function () {
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
-
-        const packageFileString = JSON.stringify(packageFileContents);
-
-        let response = await userAClient.mutate({
-            mutation: CreateVersionDocument,
+    it("Should be in latest list - anonymous user", async function () {
+        let response = await anonymousClient.query({
+            query: GetLatestPackagesDocument,
             variables: {
-                identifier: {
-                    catalogSlug: "testA-packages",
-                    packageSlug: "new-package-slug"
-                },
-                value: {
-                    packageFile: packageFileString
-                }
+                limit: 10,
+                offset: 0
             }
         });
 
-        expect(response.errors == null, "no errors").true;
-        expect(response.data!.createVersion.author.username).equal("testA-packages");
+        expect(response.errors == null, "no errors").equal(true);
+        expect(
+            response.data!.latestPackages.packages!.find((p) => p.identifier.packageSlug == "new-package-slug")
+        ).to.not.equal(undefined);
+    });
 
-        const responsePackageFileContents = response.data!.createVersion.packageFile;
+    it("Should be in latest list - creator", async function () {
+        let response = await userAClient.query({
+            query: GetLatestPackagesDocument,
+            variables: {
+                limit: 10,
+                offset: 0
+            }
+        });
 
-        const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
-
-        // have to update this hash value if the package file contents change
-        expect(responseHash).equal("277a1c1995ea6adbcd229621daf11c7cb4f90580c4871d2da7ab8e5c80a92987");
-
-        const responsePackageFile = parsePackageFileJSON(responsePackageFileContents);
-
-        expect(responsePackageFile.readmeMarkdown).includes("This is where a readme might go");
-        expect(responsePackageFile.licenseMarkdown).includes("This is not a real license. Just a test.");
+        expect(response.errors == null, "no errors").equal(true);
+        expect(
+            response.data!.latestPackages.packages!.find((p) => p.identifier.packageSlug == "new-package-slug")
+        ).to.not.equal(undefined);
     });
 
     it("Anonymous get package file", async function () {

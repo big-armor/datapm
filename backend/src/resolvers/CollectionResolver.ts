@@ -95,7 +95,10 @@ export const setCollectionCoverImage = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    return ImageStorageService.INSTANCE.saveCollectionCoverImage(identifier, image.base64);
+    const collection = await context.connection
+        .getCustomRepository(CollectionRepository)
+        .findCollectionBySlugOrFail(identifier.collectionSlug);
+    return ImageStorageService.INSTANCE.saveCollectionCoverImage(collection.id, image.base64);
 };
 
 export const deleteCollection = async (

@@ -4,6 +4,7 @@ import { HttpClientModule } from "@angular/common/http";
 import { SharedModule } from "src/app/shared/shared.module";
 
 import { PackagesComponent } from "./packages.component";
+import { ApolloTestingModule } from "apollo-angular/testing";
 
 describe("PackagesComponent", () => {
     let component: PackagesComponent;
@@ -12,7 +13,7 @@ describe("PackagesComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [PackagesComponent],
-            imports: [HttpClientModule, RouterTestingModule, SharedModule]
+            imports: [HttpClientModule, RouterTestingModule, ApolloTestingModule, SharedModule]
         }).compileComponents();
     }));
 

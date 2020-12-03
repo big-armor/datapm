@@ -11,10 +11,12 @@ import {
     UpdateCollectionDocument,
     DeleteCollectionDocument,
     MyCollectionsDocument,
-    CollectionPackagesDocument
+    CollectionPackagesDocument,
+    CreateVersionDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
+import { loadPackageFileFromDisk } from "datapm-lib";
 
 describe("Collection Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
@@ -224,6 +226,27 @@ describe("Collection Tests", async () => {
                 },
                 value: {
                     isPublic: true
+                }
+            }
+        });
+
+        expect(response.errors == null, "no errors").true;
+    });
+
+    it("User A publish first version", async function () {
+        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+
+        const packageFileString = JSON.stringify(packageFileContents);
+
+        let response = await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-collection",
+                    packageSlug: "congressional-legislators"
+                },
+                value: {
+                    packageFile: packageFileString
                 }
             }
         });

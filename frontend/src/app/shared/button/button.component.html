@@ -5,5 +5,6 @@
     <ng-container *ngTemplateOutlet="content"></ng-container>
 </button>
 <ng-template #content>
-    <ng-content></ng-content>
+    <ng-content *ngIf="!loading"></ng-content>
+    <mat-spinner [diameter]="16" *ngIf="loading"></mat-spinner>
 </ng-template>

@@ -67,12 +67,21 @@
                                 {{ type.valueType }}
                                 <ul>
                                     <li>
-                                        present in {{ type.recordCount | number }} ({{
+                                        present in {{ type.recordCount | number }} records ({{
                                             type.recordCount / schema.recordCount | percent
-                                        }}) records
+                                        }}
+                                        of total)
                                     </li>
-                                    <li>max length: {{ type.stringMaxLength | number }}</li>
-                                    <li>min length: {{ type.stringMinLength | number }}</li>
+                                    <li>max length: {{ type.stringMaxLength | number }} characters</li>
+                                    <li>min length: {{ type.stringMinLength | number }} characters</li>
+                                    <li *ngIf="type.stringOptions">
+                                        enumerated values:
+                                        <ul>
+                                            <li *ngFor="let value of stringOptions(type.stringOptions)">
+                                                {{ value.name }}: {{ value.value }} record
+                                            </li>
+                                        </ul>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
