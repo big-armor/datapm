@@ -5,6 +5,7 @@ mutation CreatePackage($value: CreatePackageInput!) {
             packageSlug
         }
         catalog {
+            myPermissions
             displayName
         }
         displayName

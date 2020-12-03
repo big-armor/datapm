@@ -125,7 +125,11 @@ type Catalog {
     description: String
     website: String
     isPublic: Boolean!
-    userPermissions: [UserCatalog!]
+
+    """
+    The permissions of the requesting user to the catalog
+    """
+    myPermissions: [Permission!]
     packages: [Package]
 }
 

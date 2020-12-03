@@ -13,7 +13,8 @@ import {
     UpdatePackageDocument,
     PackageDocument,
     CreateVersionDocument,
-    UpdateMeDocument
+    UpdateMeDocument,
+    Permission
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
@@ -63,6 +64,7 @@ describe("Catalog Tests", async () => {
 
                     expect(catalogs[0]!.identifier.catalogSlug == "testA-catalog");
                     expect(catalogs[0]!.isPublic).equal(false);
+                    expect(catalogs[0]!.myPermissions!.length).equal(3);
                 } else {
                     expect(true, "value to exist").equal(false);
                 }
@@ -88,6 +90,7 @@ describe("Catalog Tests", async () => {
 
                     expect(catalogs[0]!.identifier.catalogSlug == "testB-catalog");
                     expect(catalogs[0]!.isPublic).equal(false);
+                    expect(catalogs[0]!.myPermissions!.length).equal(3);
                 } else {
                     expect(true, "value to exist").equal(false);
                 }
@@ -230,6 +233,7 @@ describe("Catalog Tests", async () => {
         expect(response.data!.createCatalog.displayName, "correct displayName").to.equal("User A Second Catalog");
         expect(response.data!.createCatalog.website, "correct website").to.equal("https://usera.datapm.io");
         expect(response.data!.createCatalog.isPublic, "not public").to.equal(false);
+        expect(response.data!.createCatalog.myPermissions!.length).to.equal(3);
     });
 
     it("User A Get Second Catalog", async function () {
@@ -250,6 +254,7 @@ describe("Catalog Tests", async () => {
         expect(response.data!.catalog.identifier.catalogSlug, "correct slug").to.equal("user-a-second-catalog");
         expect(response.data!.catalog.displayName, "correct displayName").to.equal("User A Second Catalog");
         expect(response.data!.catalog.website, "correct website").to.equal("https://usera.datapm.io");
+        expect(response.data!.catalog.myPermissions!.length).to.equal(3);
     });
 
     it("User A add package to catalog", async function () {
@@ -361,6 +366,7 @@ describe("Catalog Tests", async () => {
         expect(response.data!.catalog.identifier.catalogSlug).to.equal("user-a-second-catalog-v2");
         expect(response.data!.catalog.website).to.equal("https://second-website.co.uk");
         expect(response.data!.catalog.packages!.length).to.equal(0);
+        expect(response.data!.catalog.myPermissions![0]).to.equal(Permission.VIEW);
     });
 
     it("User B get package should fail - package not public", async function () {

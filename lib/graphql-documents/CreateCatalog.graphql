@@ -3,6 +3,7 @@ mutation CreateCatalog($value: CreateCatalogInput!) {
         identifier {
             catalogSlug
         }
+        myPermissions
         displayName
         description
         website
