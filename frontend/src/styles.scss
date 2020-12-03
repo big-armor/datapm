@@ -81,6 +81,29 @@ body {
     color: white;
 }
 
+.submit-btn {
+    background-color: inherit;
+    transition: background-color ease 0.5s;
+
+    &:hover {
+        background-color: #f9f9f9;
+        transition: background-color ease 0.5s;
+    }
+
+    &:focus {
+        background-color: #ddd;
+    }
+
+    .disabled {
+        background-color: #ddd;
+        pointer-events: none;
+        opacity: 0.6;
+        .btn-text {
+            color: #82828273;
+        }
+    }
+}
+
 .text-overflow-elipses {
     white-space: nowrap;
     overflow: hidden;
@@ -113,9 +136,14 @@ body {
     height: 44px;
     border: none;
     outline: none;
+    background-color: #f9f9f9;
     box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25),
         inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
-
+    transition: background-color ease 0.5s;
+    &:hover {
+        background-color: white;
+        transition: background-color ease 0.5s;
+    }
     &::placeholder {
         font-family: Roboto Mono;
         font-style: normal;

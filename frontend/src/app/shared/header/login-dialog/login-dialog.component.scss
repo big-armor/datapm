@@ -127,19 +127,6 @@
             text-align: center;
             color: #828282;
         }
-
-        &:hover {
-            background-color: #dddddd9c;
-        }
-    }
-
-    .disabled {
-        background-color: #cccccc85;
-        pointer-events: none;
-        opacity: 0.6;
-        .btn-text {
-            color: #82828273;
-        }
     }
 
     .back-btn {
