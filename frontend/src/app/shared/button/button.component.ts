@@ -10,6 +10,7 @@ export type ButtonType = "raised" | "link";
 export class ButtonComponent implements OnInit {
     @Input() type: ButtonType = "link";
     @Input() disabled: boolean = false;
+    @Input() loading: boolean = false;
     @Output() buttonClick = new EventEmitter();
 
     constructor() {}

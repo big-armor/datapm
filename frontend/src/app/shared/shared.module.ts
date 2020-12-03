@@ -30,6 +30,8 @@ import { SortByPipe } from "./pipes/sort.pipe";
 import { ButtonComponent } from "./button/button.component";
 import { InputComponent } from "./input/input.component";
 import { InputErrorPipe } from "./pipes/input-error.pipe";
+import { EditCollectionComponent } from "./edit-collection/edit-collection.component";
+import { ConfirmationDialogComponent } from "./confirmation-dialog/confirmation-dialog.component";
 
 @NgModule({
     declarations: [
@@ -50,7 +52,9 @@ import { InputErrorPipe } from "./pipes/input-error.pipe";
         SortByPipe,
         ButtonComponent,
         InputComponent,
-        InputErrorPipe
+        InputErrorPipe,
+        EditCollectionComponent,
+        ConfirmationDialogComponent
     ],
     imports: [
         CommonModule,
@@ -84,7 +88,9 @@ import { InputErrorPipe } from "./pipes/input-error.pipe";
         SortByPipe,
         ButtonComponent,
         InputComponent,
-        InputErrorPipe
+        InputErrorPipe,
+        EditCollectionComponent,
+        ConfirmationDialogComponent
     ],
     providers: [TimeAgoPipe]
 })

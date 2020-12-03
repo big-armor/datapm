@@ -42,6 +42,17 @@
         padding: 20px 0 40px;
         width: 100%;
     }
+
+    .mat-column-actions app-button {
+        display: inline-block;
+        width: 80px;
+        margin-right: 10px;
+    }
+
+    .create-button {
+        width: 180px;
+        display: inline-block;
+    }
 }
 
 @media (max-width: 767px) {
