@@ -58,8 +58,15 @@ button.mat-menu-item {
 .mat-fab.person-menu {
     width: 40px;
     height: 40px;
-    box-shadow: 0px 1px 7px 4px rgb(90 88 88 / 25%);
-    background: white;
+    box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
+        0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
+    background: inherit;
+    transition: background-color ease 0.5s;
+
+    &:hover {
+        background-color: #f9f9f9;
+        transition: background-color ease 0.5s;
+    }
 
     &:focus {
         outline: transparent solid 0px !important;
@@ -163,8 +170,8 @@ button.mat-menu-item {
     .mat-fab.person-menu {
         width: 30px;
         height: 30px;
-        box-shadow: 0px 1px 7px 4px rgb(90 88 88 / 15%);
-
+        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
+            0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
         ::ng-deep .mat-button-wrapper {
             .mat-icon {
                 font-size: 26px !important;

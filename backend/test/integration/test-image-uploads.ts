@@ -366,7 +366,6 @@ describe("Image Upload Tests", async () => {
             mutation: DeleteMeDocument
         });
 
-        console.log(JSON.stringify(response, null, 1));
         expect(response.errors == null).true;
     });
 });

@@ -30,6 +30,21 @@ body {
     align-items: center;
     justify-content: center;
 }
+
+.mat-table,
+.cdk-overlay-pane,
+.mat-expansion-panel,
+.mat-stepper-horizontal,
+.mat-card {
+    background-color: inherit;
+}
+.mat-dialog-container {
+    background-color: #f2f2f2;
+}
+.mat-header-row {
+    background-color: white;
+}
+
 .loading-pane {
     min-height: 500px;
     padding-top: 50px;
