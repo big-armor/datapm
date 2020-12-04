@@ -1,22 +1,10 @@
 query CollectionPackages($identifier: CollectionIdentifierInput!, $offset: Int!, $limit: Int!) {
     collectionPackages(identifier: $identifier, offset: $offset, limit: $limit) {
-        collection {
-            name
-            description
-            createdAt
-            updatedAt
-            isPublic
-            isRecommended
-        }
-        package {
+        packages {
             displayName
             description
             createdAt
             updatedAt
-            isPublic
-        }
-        addedByUser {
-            username
         }
     }
 }

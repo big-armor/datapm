@@ -1,6 +1,7 @@
 import { DeleteResult, EntityRepository, Repository } from "typeorm";
 
 import { CollectionPackage } from "../entity/CollectionPackage";
+import { Collection } from "../entity/Collection";
 
 @EntityRepository(CollectionPackage)
 export class CollectionPackageRepository extends Repository<CollectionPackage> {
@@ -47,11 +48,14 @@ export class CollectionPackageRepository extends Repository<CollectionPackage> {
         limit: number,
         offset: number,
         relations?: string[]
-    ): Promise<CollectionPackage[]> {
-        return this.createQueryBuilder(CollectionPackageRepository.TABLE_RELATIONS_ALIAS)
-            .where({ collectionId: collectionId })
-            .orderBy('"CollectionPackage"."created_at"', "DESC")
-            .addRelations(CollectionPackageRepository.TABLE_RELATIONS_ALIAS, relations)
+    ): Promise<Collection[]> {
+        const ALIAS = "collection";
+        return await this.manager
+            .getRepository(Collection)
+            .createQueryBuilder(ALIAS)
+            .where({ id: collectionId })
+            .orderBy('"collection"."created_at"', "DESC")
+            .addRelations(ALIAS, relations)
             .limit(limit)
             .offset(offset)
             .getMany();

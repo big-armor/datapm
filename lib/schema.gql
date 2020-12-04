@@ -533,7 +533,7 @@ type Query {
         identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: VIEW)
         offset: Int!
         limit: Int!
-    ): [CollectionPackage!]!
+    ): [Collection!]!
 }
 
 type Mutation {

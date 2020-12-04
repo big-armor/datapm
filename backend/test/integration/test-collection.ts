@@ -456,8 +456,9 @@ describe("Collection Tests", async () => {
                 offset: 0
             }
         });
+
         expect(response.errors == null).true;
-        expect(response.data?.collectionPackages.length).to.equal(3);
+        expect(response.data?.collectionPackages![0].packages?.length).to.equal(3);
     });
 
     it("Anonymous get collection", async function () {
