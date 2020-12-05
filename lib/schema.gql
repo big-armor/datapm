@@ -125,7 +125,11 @@ type Catalog {
     description: String
     website: String
     isPublic: Boolean!
-    userPermissions: [UserCatalog!]
+
+    """
+    The permissions of the requesting user to the catalog
+    """
+    myPermissions: [Permission!]
     packages: [Package]
 }
 
@@ -354,6 +358,11 @@ input UpdateCatalogInput {
     isPublic: Boolean
 }
 
+input SetUserCatalogPermissionInput {
+    username: String! @validUsername
+    permission: [Permission!]!
+}
+
 """
 The properties for creating a package list.
 """
@@ -482,6 +491,15 @@ type Query {
     catalog(identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: VIEW)): Catalog!
 
     """
+    Returns the packages of the given identifier. Requires permission to view the catalog packages
+    """
+    catalogPackages(
+        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: VIEW)
+        offset: Int!
+        limit: Int!
+    ): [Package!]!
+
+    """
     Returns the package for the given identifier. Requires permission to view the package
     """
     package(identifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)): Package!
@@ -598,14 +616,6 @@ type Mutation {
     deleteAPIKey(id: String! @hasAPIKeyManagementPermission): APIKey! @isAuthenticated
 
     """
-    Removes a specified user from the specified catalog, and all of their permissions
-    """
-    removeUserFromCatalog(
-        username: String! @validUsername
-        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
-    ): User!
-
-    """
     Creates a new catalog which is owned by the requesting user
     """
     createCatalog(value: CreateCatalogInput!): Catalog!
@@ -625,6 +635,14 @@ type Mutation {
         identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: EDIT)
         image: Base64ImageUpload! @validBase64Image
     ): Void @isAuthenticated
+
+    """
+    Updates the catalog permissions of a user
+    """
+    setUserCatalogPermission(
+        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
+        value: SetUserCatalogPermissionInput!
+    ): Void
 
     """
     Deletes and existing catalog. All packages in the catalog are then deleted

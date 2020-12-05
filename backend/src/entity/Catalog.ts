@@ -2,7 +2,8 @@ import { Entity, Column, PrimaryGeneratedColumn, Unique, OneToMany } from "typeo
 import { BaseModel } from "./BaseModel";
 import { UserCatalogPermission } from "./UserCatalogPermission";
 import { Package } from "./Package";
-import { CatalogIdentifier } from "../generated/graphql";
+import { CatalogIdentifier, Permission } from "../generated/graphql";
+import { Permissions } from "./Permissions";
 
 @Entity({
     name: "catalog"
@@ -33,5 +34,8 @@ export class Catalog extends BaseModel {
     @OneToMany(() => Package, (packageEntity) => packageEntity.catalog, { cascade: true })
     packages: Package[];
 
+    // These are dummy values so that response objects will have the right values
+    // need to write converters for Entity -> GraphQL object
     identifier: CatalogIdentifier;
+    myPermissions: Permission[];
 }

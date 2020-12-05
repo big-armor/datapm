@@ -4,6 +4,7 @@ import { ApolloTestingModule } from "apollo-angular/testing";
 import { RouterModule } from "@angular/router";
 import { MatCardModule } from "@angular/material/card";
 import { MatDialogModule } from "@angular/material/dialog";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
 import { CatalogsComponent } from "./catalogs.component";
@@ -22,7 +23,8 @@ describe("CatalogsComponent", () => {
                 ApolloTestingModule,
                 RouterTestingModule,
                 FormsModule,
-                ReactiveFormsModule
+                ReactiveFormsModule,
+                MatProgressSpinnerModule
             ]
         }).compileComponents();
     }));

@@ -12,8 +12,10 @@ import {
     CreatePackageDocument,
     UpdatePackageDocument,
     PackageDocument,
+    CatalogPackagesDocument,
     CreateVersionDocument,
-    UpdateMeDocument
+    UpdateMeDocument,
+    Permission
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
@@ -63,6 +65,7 @@ describe("Catalog Tests", async () => {
 
                     expect(catalogs[0]!.identifier.catalogSlug == "testA-catalog");
                     expect(catalogs[0]!.isPublic).equal(false);
+                    expect(catalogs[0]!.myPermissions!.length).equal(3);
                 } else {
                     expect(true, "value to exist").equal(false);
                 }
@@ -88,6 +91,7 @@ describe("Catalog Tests", async () => {
 
                     expect(catalogs[0]!.identifier.catalogSlug == "testB-catalog");
                     expect(catalogs[0]!.isPublic).equal(false);
+                    expect(catalogs[0]!.myPermissions!.length).equal(3);
                 } else {
                     expect(true, "value to exist").equal(false);
                 }
@@ -230,6 +234,7 @@ describe("Catalog Tests", async () => {
         expect(response.data!.createCatalog.displayName, "correct displayName").to.equal("User A Second Catalog");
         expect(response.data!.createCatalog.website, "correct website").to.equal("https://usera.datapm.io");
         expect(response.data!.createCatalog.isPublic, "not public").to.equal(false);
+        expect(response.data!.createCatalog.myPermissions!.length).to.equal(3);
     });
 
     it("User A Get Second Catalog", async function () {
@@ -250,6 +255,7 @@ describe("Catalog Tests", async () => {
         expect(response.data!.catalog.identifier.catalogSlug, "correct slug").to.equal("user-a-second-catalog");
         expect(response.data!.catalog.displayName, "correct displayName").to.equal("User A Second Catalog");
         expect(response.data!.catalog.website, "correct website").to.equal("https://usera.datapm.io");
+        expect(response.data!.catalog.myPermissions!.length).to.equal(3);
     });
 
     it("User A add package to catalog", async function () {
@@ -361,6 +367,7 @@ describe("Catalog Tests", async () => {
         expect(response.data!.catalog.identifier.catalogSlug).to.equal("user-a-second-catalog-v2");
         expect(response.data!.catalog.website).to.equal("https://second-website.co.uk");
         expect(response.data!.catalog.packages!.length).to.equal(0);
+        expect(response.data!.catalog.myPermissions![0]).to.equal(Permission.VIEW);
     });
 
     it("User B get package should fail - package not public", async function () {
@@ -580,5 +587,69 @@ describe("Catalog Tests", async () => {
         expect(catalogRequest.errors!.find((e) => e.message.includes("CATALOG_NOT_FOUND")) != null).equal(true);
     });
 
+    it("CatalogPackages returned in DESC order, with view permissions", async function () {
+        await userAClient.mutate({
+            mutation: CreateCatalogDocument,
+            variables: {
+                value: {
+                    slug: "user-a-second-catalog-v3",
+                    displayName: "User AAA",
+                    description: "This is an integration test User A second catalog",
+                    website: "https://usera.datapm.io",
+                    isPublic: false
+                }
+            }
+        });
+
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "user-a-second-catalog-v3",
+                    packageSlug: "us-congressional-legislators-4",
+                    displayName: "Congressional Legislator3s",
+                    description: "Test upload of congressional legislatorsA"
+                }
+            }
+        });
+
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "user-a-second-catalog-v3",
+                    packageSlug: "us-congressional-legislators-5",
+                    displayName: "Congressional Legislator4s",
+                    description: "Test upload of congressional legislatorsA"
+                }
+            }
+        });
+
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "user-a-second-catalog-v3",
+                    packageSlug: "us-congressional-legislators-3",
+                    displayName: "Congressional Legislator5s",
+                    description: "Test upload of congressional legislatorsA"
+                }
+            }
+        });
+
+        let response = await userAClient.query({
+            query: CatalogPackagesDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "user-a-second-catalog-v3"
+                },
+                offset: 0,
+                limit: 3
+            }
+        });
+
+        expect(response.errors == null).true;
+        expect(response.data?.catalogPackages.length).to.equal(3);
+    });
     // TODO Test package and catalog association, and permissions of packages in private catalogs
 });

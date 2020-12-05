@@ -1,0 +1,3 @@
+mutation SetUserCatalogPermission($identifier: CatalogIdentifierInput!, $value: SetUserCatalogPermissionInput!) {
+    setUserCatalogPermission(identifier: $identifier, value: $value)
+}

@@ -209,8 +209,6 @@ query login(username: String!, password: String!): String!
 
 query usersByCatalog(identifier: CatalogIdentifierInput!): [User]!
 
-mutation removeUserFromCatalog(username: String!, catalogSlug: String!): User!
-
 mutation removePackagePermissions(identifier: PackageIdentifierInput!, username: String!): Void
 
 ```

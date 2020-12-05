@@ -29,6 +29,7 @@ query Collection($identifier: CollectionIdentifierInput!) {
                 identifier {
                     catalogSlug
                 }
+                myPermissions
                 displayName
                 description
             }

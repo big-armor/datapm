@@ -5,6 +5,7 @@ import { take, takeUntil } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
 import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
 import { AuthenticationService } from "src/app/services/authentication.service";
+import { EditCatalogComponent } from "src/app/shared/edit-catalog/edit-catalog.component";
 
 enum State {
     INIT,
@@ -94,5 +95,20 @@ export class CatalogsComponent implements OnInit {
                     });
             }
         });
+    }
+
+    editCatalog(catalog: Catalog) {
+        this.dialog
+            .open(EditCatalogComponent, {
+                data: catalog
+            })
+            .afterClosed()
+            .subscribe((newCatalog: Catalog) => {
+                if (newCatalog) {
+                    this.myCatalogs = this.myCatalogs.map((c) =>
+                        c.identifier.catalogSlug === catalog.identifier.catalogSlug ? newCatalog : c
+                    );
+                }
+            });
     }
 }
