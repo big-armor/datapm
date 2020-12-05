@@ -2,6 +2,7 @@ import { SemVer } from "semver";
 import { Schema, PackageFile } from "./main";
 import fs from "fs";
 import path from "path";
+import AJV from "ajv";
 
 export type DPMRecordValue =
     | number
@@ -442,14 +443,51 @@ export function loadPackageFileFromDisk(packageFilePath: string): PackageFile {
 }
 
 export function parsePackageFileJSON(packageFileString: string): PackageFile {
+    let packageFile;
+
     try {
-        const packageFile = JSON.parse(packageFileString, (key, value) => {
+        const rawPackageFile = JSON.parse(packageFileString);
+
+        validatePackageFile(rawPackageFile);
+
+        packageFile = JSON.parse(packageFileString, (key, value) => {
             if (key !== "updatedDate" && key !== "createdAt" && key !== "updatedAt") return value;
 
             return new Date(Date.parse(value));
         }) as PackageFile;
-        return packageFile;
     } catch (error) {
         throw new Error("ERROR_PARSING_PACKAGE_FILE: " + error.message);
+    }
+
+    return packageFile;
+}
+
+export function validatePackageFile(packageFile: unknown): void {
+    const ajv = new AJV({
+        format: false // https://www.npmjs.com/package/ajv#redos-attack
+    });
+
+    let schema: string;
+
+    try {
+        schema = fs.readFileSync("node_modules/datapm-lib/packageFileSchema.json", "utf8");
+    } catch (error) {
+        if (error.message.includes("ENOENT")) {
+            schema = fs.readFileSync("packageFileSchema.json", "utf8");
+        } else {
+            throw error;
+        }
+    }
+
+    const schemaObject = JSON.parse(schema);
+
+    if (!ajv.validateSchema(schemaObject)) {
+        throw new Error("ERROR_READING_SCHEMA");
+    }
+
+    const response = ajv.validate(schemaObject, packageFile);
+
+    if (!response) {
+        throw new Error("INVALID_PACKAGE_FILE_SCHEMA: " + JSON.stringify(ajv.errors));
     }
 }

@@ -130,26 +130,6 @@ export const resolvers: {
         parseValue: (value: any) => {
             const packageFileObject = parsePackageFileJSON(value);
 
-            const rawPackageFile = JSON.parse(value);
-
-            const ajv = new AJV({
-                format: false // https://www.npmjs.com/package/ajv#redos-attack
-            });
-
-            const schema = fs.readFileSync("node_modules/datapm-lib/packageFileSchema.json", "utf8");
-
-            const schemaObject = JSON.parse(schema);
-
-            if (!ajv.validateSchema(schemaObject)) {
-                throw new ApolloError("ERROR_READING_SCHEMA");
-            }
-
-            const response = ajv.validate(schemaObject, rawPackageFile);
-
-            if (!response) {
-                throw new ValidationError("INVALID_PACKAGE_FILE_SCHEMA: " + JSON.stringify(ajv.errors!));
-            }
-
             return packageFileObject;
         }
     }),

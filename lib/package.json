@@ -35,6 +35,7 @@
     },
     "dependencies": {
         "@types/semver": "^7.3.4",
+        "ajv": "^6.12.6",
         "semver": "^7.3.2"
     },
     "husky": {
