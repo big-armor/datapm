@@ -23,9 +23,7 @@
     box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
         0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
     border-radius: 24px;
-    min-width: 200px;
     height: 36px;
-    margin: 30px 0 15px;
     border: none;
     background: #fff;
     font-family: Roboto Mono;
@@ -35,6 +33,7 @@
     align-items: center;
     text-align: center;
     color: #828282;
+    padding: 0 1.5em;
 
     &:hover {
         background-color: #dddddd9c;
@@ -45,4 +44,7 @@
         pointer-events: none;
         opacity: 0.6;
     }
+}
+mat-spinner {
+    margin: auto;
 }
