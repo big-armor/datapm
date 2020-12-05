@@ -192,46 +192,60 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
         await this.manager.nestedTransaction(async (transaction) => {
             const user = await transaction.getCustomRepository(UserRepository).getUserByUsername(value.username);
 
-            if (!user) {
-                throw new Error(`User ${value.username} not found`);
-            }
+            if (!user) throw new Error(`User ${value.username} not found`);
+
             const catalogEntity = await transaction
                 .getCustomRepository(CatalogRepository)
                 .findCatalogBySlugOrFail(identifier.catalogSlug);
 
             const permissions = await this.findByUserAndCatalogId(user.id, catalogEntity.id);
 
-            // If User does not exist in UserCatalogTable, it creates new record
-            if (permissions == undefined) {
-                try {
-                    await transaction
-                        .createQueryBuilder()
-                        .insert()
-                        .into(UserCatalogPermission)
-                        .values({
-                            catalogId: catalogEntity.id,
-                            userId: user.id,
-                            permissions: value.permission
-                        })
-                        .execute();
-                } catch (e) {
-                    console.log(e);
+            // If permission input is not empty
+            if (value.permission!.length > 0) {
+                // If user does not exist in catalog permissions, it creates new record
+                if (permissions == undefined) {
+                    try {
+                        const catalogPermissionEntry = transaction.create(UserCatalogPermission);
+                        catalogPermissionEntry.userId = user.id;
+                        catalogPermissionEntry.catalogId = catalogEntity.id;
+                        catalogPermissionEntry.permissions = value.permission;
+                        return await transaction.save(catalogPermissionEntry);
+                    } catch (e) {
+                        console.log(e);
+                    }
                 }
-            }
 
-            // Updates permissions if user exists already in UserCatalogTable
-            if (permissions != undefined && value.permission.length) {
-                try {
-                    await transaction
-                        .createQueryBuilder()
-                        .update(UserCatalogPermission)
-                        .set({ permissions: value.permission })
-                        .where({ catalogId: catalogEntity.id, userId: user.id })
-                        .execute();
-                } catch (e) {
-                    console.log(e);
+                // If user does exists in catalog permissions, it updates the record found
+                else {
+                    try {
+                        return await transaction
+                            .createQueryBuilder()
+                            .update(UserCatalogPermission)
+                            .set({ permissions: value.permission })
+                            .where({ catalogId: catalogEntity.id, userId: user.id })
+                            .execute();
+                    } catch (e) {
+                        console.log(e);
+                    }
                 }
             }
+            // If the permissions input is empty, it will delete the row in catalog permissions
+            else {
+                // If the permissions row exists in the table delete it
+                if (permissions != undefined) {
+                    try {
+                        return await transaction
+                            .createQueryBuilder()
+                            .delete()
+                            .from(UserCatalogPermission)
+                            .where({ catalogId: catalogEntity.id, userId: user.id })
+                            .execute();
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+            }
+            return;
         });
     }
 }

@@ -81,38 +81,13 @@ describe("Catalog Permissions", async () => {
     });
 
     it("attempting to grant permissions to a user that does not exist", async function () {
-        await userAClient.mutate({
-            mutation: CreateCatalogDocument,
-            variables: {
-                value: {
-                    slug: "user-a-catalog-v2",
-                    displayName: "User A Catalog v2",
-                    description: "This is an integration test User A v2",
-                    website: "https://usera.datapm.io",
-                    isPublic: false
-                }
-            }
-        });
-
-        await userAClient.mutate({
-            mutation: CreatePackageDocument,
-            variables: {
-                value: {
-                    catalogSlug: "user-a-catalog-v2",
-                    packageSlug: "congressional-legislators2",
-                    displayName: "Congressional Legislators2",
-                    description: "Test upload of congressional legislators2"
-                }
-            }
-        });
-
         const newPermissions = [Permission.VIEW];
 
         let response = await userAClient.mutate({
             mutation: SetUserCatalogPermissionDocument,
             variables: {
                 identifier: {
-                    catalogSlug: "user-a-catalog-v2"
+                    catalogSlug: "user-a-catalog-v1"
                 },
                 value: {
                     username: "my-test-user202",
@@ -125,35 +100,13 @@ describe("Catalog Permissions", async () => {
     });
 
     it("successfully setting permissions for authorized use case", async function () {
-        await userAClient.mutate({
-            mutation: CreateCatalogDocument,
-            variables: {
-                value: {
-                    slug: "user-a-catalog-v3",
-                    displayName: "User A catalog v3",
-                    description: "This is an integration test User A v3",
-                    website: "https://usera.datapm.io",
-                    isPublic: false
-                }
-            }
-        });
-        await userAClient.mutate({
-            mutation: CreatePackageDocument,
-            variables: {
-                value: {
-                    catalogSlug: "my-test-user200",
-                    packageSlug: "congressional-legislators3",
-                    displayName: "Congressional Legislators3",
-                    description: "Test upload of congressional legislators3"
-                }
-            }
-        });
-        const newPermissions = [Permission.VIEW];
+        let newPermissions: Permission[] = [Permission.VIEW, Permission.EDIT];
+
         let response = await userAClient.mutate({
             mutation: SetUserCatalogPermissionDocument,
             variables: {
                 identifier: {
-                    catalogSlug: "user-a-catalog-v3"
+                    catalogSlug: "user-a-catalog-v1"
                 },
                 value: {
                     username: "my-test-user201",
@@ -166,36 +119,13 @@ describe("Catalog Permissions", async () => {
     });
 
     it("updating user permissions by changing the permissions list", async function () {
-        await userAClient.mutate({
-            mutation: CreateCatalogDocument,
-            variables: {
-                value: {
-                    slug: "user-a-catalog-v4",
-                    displayName: "User A catalog v4",
-                    description: "This is an integration test User A v4",
-                    website: "https://usera.datapm.io",
-                    isPublic: false
-                }
-            }
-        });
-        await userAClient.mutate({
-            mutation: CreatePackageDocument,
-            variables: {
-                value: {
-                    catalogSlug: "my-test-user200",
-                    packageSlug: "congressional-legislators4",
-                    displayName: "Congressional Legislators4",
-                    description: "Test upload of congressional legislators2"
-                }
-            }
-        });
-        const newPermissions = [Permission.VIEW, Permission.NONE];
+        const newPermissions = [Permission.VIEW, Permission.EDIT];
 
         let response = await userAClient.mutate({
             mutation: SetUserCatalogPermissionDocument,
             variables: {
                 identifier: {
-                    catalogSlug: "user-a-catalog-v4"
+                    catalogSlug: "user-a-catalog-v1"
                 },
                 value: {
                     username: "my-test-user200",
@@ -212,9 +142,9 @@ describe("Catalog Permissions", async () => {
             mutation: CreateCatalogDocument,
             variables: {
                 value: {
-                    slug: "user-a-catalog-v5",
-                    displayName: "User A catalog v5",
-                    description: "This is an integration test User A v5",
+                    slug: "user-a-catalog-v2",
+                    displayName: "User A catalog v2",
+                    description: "This is an integration test User A v2",
                     website: "https://usera.datapm.io",
                     isPublic: false
                 }
@@ -225,9 +155,9 @@ describe("Catalog Permissions", async () => {
             mutation: CreatePackageDocument,
             variables: {
                 value: {
-                    catalogSlug: "user-a-catalog-v5",
-                    packageSlug: "congressional-legislators5",
-                    displayName: "Congressional Legislators5",
+                    catalogSlug: "user-a-catalog-v2",
+                    packageSlug: "congressional-legislators2",
+                    displayName: "Congressional Legislators2",
                     description: "Test upload of congressional legislators"
                 }
             }
@@ -237,18 +167,18 @@ describe("Catalog Permissions", async () => {
             query: GetCatalogDocument,
             variables: {
                 identifier: {
-                    catalogSlug: "user-a-catalog-v5"
+                    catalogSlug: "user-a-catalog-v2"
                 }
             }
         });
 
-        const newPermissions = [Permission.VIEW];
+        const newPermissions: Permission[] = [Permission.VIEW];
 
         await userAClient.mutate({
             mutation: SetUserCatalogPermissionDocument,
             variables: {
                 identifier: {
-                    catalogSlug: "user-a-catalog-v5"
+                    catalogSlug: "user-a-catalog-v2"
                 },
                 value: {
                     username: "my-test-user201",
@@ -261,14 +191,46 @@ describe("Catalog Permissions", async () => {
             query: GetCatalogDocument,
             variables: {
                 identifier: {
-                    catalogSlug: "user-a-catalog-v5"
+                    catalogSlug: "user-a-catalog-v2"
                 }
             }
         });
 
         expect(beforeGrantedViewOnUserB.errors![0].message).to.equal("NOT_AUTHORIZED");
         expect(beforeGrantedViewOnUserB.data).to.equal(null);
-        expect(afterGrantedViewOnUserB.data?.catalog.displayName).to.equal("User A catalog v5");
-        expect(afterGrantedViewOnUserB.data?.catalog.description).to.equal("This is an integration test User A v5");
+        expect(afterGrantedViewOnUserB.data?.catalog.displayName).to.equal("User A catalog v2");
+        expect(afterGrantedViewOnUserB.data?.catalog.description).to.equal("This is an integration test User A v2");
+    });
+
+    it("inserting empty permissions array and deleting if empty", async function () {
+        await userAClient.mutate({
+            mutation: CreateCatalogDocument,
+            variables: {
+                value: {
+                    slug: "user-a-catalog-v3",
+                    displayName: "User A catalog v3",
+                    description: "This is an integration test User A v3",
+                    website: "https://usera.datapm.io",
+                    isPublic: false
+                }
+            }
+        });
+
+        let newPermissions: Permission[] = [];
+
+        let response = await userAClient.mutate({
+            mutation: SetUserCatalogPermissionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "user-a-catalog-v3"
+                },
+                value: {
+                    username: "my-test-user200",
+                    permission: newPermissions
+                }
+            }
+        });
+
+        expect(response.errors! == null).true;
     });
 });
