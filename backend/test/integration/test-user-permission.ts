@@ -4,9 +4,8 @@ import {
     CreateCollectionDocument,
     CreatePackageDocument,
     Permission,
-    SetUserCollectionPermissionDocument,
+    SetUserCollectionPermissionsDocument,
     DeleteUserCollectionPermissionsDocument,
-    MyCollectionPermissionDocument,
     CollectionDocument
 } from "./registry-client";
 import { createUser } from "./test-utils";
@@ -53,7 +52,7 @@ describe("User Permissions", async () => {
         const newPermissions = [Permission.VIEW];
 
         let response = await userBClient.mutate({
-            mutation: SetUserCollectionPermissionDocument,
+            mutation: SetUserCollectionPermissionsDocument,
             variables: {
                 identifier: {
                     collectionSlug: "testA-collection"
@@ -95,7 +94,7 @@ describe("User Permissions", async () => {
         const newPermissions = [Permission.VIEW];
 
         let response = await userAClient.mutate({
-            mutation: SetUserCollectionPermissionDocument,
+            mutation: SetUserCollectionPermissionsDocument,
             variables: {
                 identifier: {
                     collectionSlug: "testB-collection"
@@ -107,7 +106,7 @@ describe("User Permissions", async () => {
             }
         });
 
-        expect(response.errors![0].message).to.equal("User my-test-user102 not found");
+        expect(response.errors![0].message).to.equal("USER_NOT_FOUND - my-test-user102");
     });
 
     it("successfully setting permissions for authorized use case", async function () {
@@ -134,7 +133,7 @@ describe("User Permissions", async () => {
         });
         const newPermissions = [Permission.VIEW];
         let response = await userAClient.mutate({
-            mutation: SetUserCollectionPermissionDocument,
+            mutation: SetUserCollectionPermissionsDocument,
             variables: {
                 identifier: {
                     collectionSlug: "testC-collection"
@@ -174,7 +173,7 @@ describe("User Permissions", async () => {
         const newPermissions = [Permission.VIEW, Permission.NONE];
 
         let response = await userAClient.mutate({
-            mutation: SetUserCollectionPermissionDocument,
+            mutation: SetUserCollectionPermissionsDocument,
             variables: {
                 identifier: {
                     collectionSlug: "testE-collection"
@@ -225,7 +224,7 @@ describe("User Permissions", async () => {
         const newPermissions = [Permission.VIEW];
 
         await userAClient.mutate({
-            mutation: SetUserCollectionPermissionDocument,
+            mutation: SetUserCollectionPermissionsDocument,
             variables: {
                 identifier: {
                     collectionSlug: "testF-collection"
@@ -252,41 +251,5 @@ describe("User Permissions", async () => {
         expect(afterGrantedViewOnUserB.data?.collection.description).to.equal(
             "UserB Will Find This After Granted View Permissions"
         );
-    });
-
-    it("user is the creator of the collection, return Manage", async function () {
-        const response = await userAClient.query({
-            query: MyCollectionPermissionDocument,
-            variables: {
-                identifier: {
-                    collectionSlug: "testF-collection"
-                }
-            }
-        });
-        expect(response.data?.myCollectionPermission).to.equal("MANAGE");
-    });
-
-    it("collection that a user does not have access to NOT_AUTHORIZED", async function () {
-        await userBClient.mutate({
-            mutation: CreateCollectionDocument,
-            variables: {
-                value: {
-                    collectionSlug: "testG-collection",
-                    name: "testing collectionPackages6",
-                    description: "UserA is not authorized to view this collection"
-                }
-            }
-        });
-
-        let response = await userAClient.query({
-            query: MyCollectionPermissionDocument,
-            variables: {
-                identifier: {
-                    collectionSlug: "testG-collection"
-                }
-            }
-        });
-
-        expect(response.errors![0].message).to.equal("NOT_AUTHORIZED");
     });
 });
