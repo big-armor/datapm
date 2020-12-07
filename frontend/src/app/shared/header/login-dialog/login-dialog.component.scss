@@ -1,14 +1,6 @@
 ::ng-deep.dialog-wrapper {
     padding: 20px 30px;
 
-    .mat-stepper-label-position-bottom .mat-horizontal-stepper-header-container {
-        display: none;
-    }
-
-    .mat-horizontal-content-container {
-        padding: 0px;
-    }
-
     .dialog-close-wrapper {
         display: flex;
         position: relative;
@@ -62,98 +54,15 @@
         margin-top: 20px;
     }
 
-    ::ng-deep .light-inputs {
-        min-width: 348px;
-        max-width: 380px;
-        border: none;
-        border-radius: 24px;
-        padding: 10px 20px;
-        -webkit-appearance: none !important;
-        box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25),
-            inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
-        height: 49px;
-        margin-top: 20px;
-        font-family: Roboto Mono;
-        font-style: normal;
-        font-weight: 300;
-        font-size: 14px;
-        line-height: 18px;
-        letter-spacing: -0.28px;
-        outline: solid transparent 0px;
-
-        &::placeholder {
-            color: #bdbdbd;
-            font-family: Roboto Mono;
-            font-style: normal;
-            font-weight: 300;
-            font-size: 14px;
-            line-height: 18px;
-            letter-spacing: -0.28px;
-        }
-    }
-
     .forgot-pass {
         margin-top: 15px;
         a {
-            font-family: Roboto Mono;
-            font-style: normal;
-            font-weight: 400;
             font-size: 12px;
-            line-height: 18px;
-            padding-left: 15px;
-            padding-top: 4px;
-            margin-bottom: 0px;
-            letter-spacing: -0.3px;
-            color: #3a80ca;
         }
     }
 
-    .submit-btn {
-        outline: #fff solid 0px;
-        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
-            0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
-        border-radius: 24px;
+    .app-raised-button {
         min-width: 200px;
-        height: 36px;
-        margin: 30px 0 15px;
-        border: none;
-
-        .btn-text {
-            font-family: Roboto Mono;
-            font-style: normal;
-            font-weight: 300;
-            font-size: 18px;
-            align-items: center;
-            text-align: center;
-            color: #828282;
-        }
-    }
-
-    .back-btn {
-        outline: #fff solid 0px;
-        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
-            0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
-        border-radius: 24px;
-        min-width: 200px;
-        height: 36px;
-        margin-top: 15px;
-        margin-bottom: 15px;
-        border: none;
-        background: #fff;
-
-        &:hover {
-            background-color: #dddddd9c;
-        }
-
-        .btn-text {
-            font-family: Roboto Mono;
-            font-style: normal;
-            font-weight: 300;
-            font-size: 18px;
-            align-items: center;
-            text-align: center;
-            color: #828282;
-        }
     }
 
     .alert-div {
@@ -177,99 +86,20 @@
         4px 0px 4px rgba(51, 51, 51, 0.25), 0px 4px 4px rgba(51, 51, 51, 0.25);
 
     #logIn {
-        .button-wrapper {
-            button {
-                outline: #fff solid 0px;
-                box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
-                    0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
-                border-radius: 24px;
-                min-width: 200px;
-                height: 36px;
-                margin-top: 15px;
-
-                .flex-row {
-                    line-height: 27px;
-
-                    .btn-text {
-                        font-family: Roboto Mono;
-                        font-style: normal;
-                        font-weight: 300;
-                        font-size: 18px;
-                        align-items: center;
-                        text-align: center;
-                        color: #828282;
-                    }
-
-                    .btn-image {
-                        margin-right: 30px;
-                    }
-                }
-            }
-        }
-        .mat-dialog-actions {
-            display: block;
-            margin-bottom: 10px;
-            margin-top: 30px;
-
-            .btn-text {
-                font-family: Roboto Mono;
-                font-style: normal;
-                font-weight: 300;
-                font-size: 17px;
-                align-items: center;
-                text-align: center;
-                color: #828282;
-            }
-        }
         .mat-spinner {
             stroke: #828282;
         }
-
-        .mat-dialog-actions.less-pd {
-            margin-top: 0px;
-        }
+    }
+    .mat-dialog-actions {
+        display: block;
+        margin-bottom: 10px;
+        margin-top: 30px;
     }
 }
 
 @media (max-width: 576px) {
     #logIn {
         padding: 0px;
-        .light-inputs {
-            min-width: 228px;
-            max-width: 280px;
-            height: 38px;
-            font-size: 13px;
-            &::placeholder {
-                font-size: 12px;
-            }
-        }
-        app-input {
-            min-width: inherit;
-        }
-        .submit-btn {
-            height: 30px;
-            margin: 15px 0 15px;
-            .btn-text {
-                font-size: 14px;
-            }
-        }
-        .back-btn {
-            height: 30px;
-            .btn-text {
-                font-size: 14px;
-            }
-        }
-        .button-wrapper {
-            button {
-                min-width: 180px;
-                height: unset;
-                .flex-row {
-                    .btn-text {
-                        font-size: 15px;
-                    }
-                }
-            }
-        }
         .dialog-description {
             font-size: 12px;
             text-align: center;
@@ -293,9 +123,8 @@
                 font-size: 12px;
             }
         }
-        .forgot-pass {
-            font-size: 10px;
-            padding-left: 10px;
+        app-input {
+            min-width: 208px;
         }
     }
 }

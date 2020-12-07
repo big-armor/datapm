@@ -153,3 +153,57 @@ body {
         color: #bdbdbd;
     }
 }
+
+.app-raised-button {
+    outline: #fff solid 0px;
+    box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
+        0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
+    border-radius: 24px;
+    height: 36px;
+    border: none;
+    background: #fff;
+    font-family: Roboto Mono;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 18px;
+    align-items: center;
+    text-align: center;
+    color: #828282;
+    padding: 0 1.5em;
+
+    &:hover {
+        background-color: #dddddd9c;
+    }
+
+    &:disabled {
+        background-color: #cccccc85;
+        pointer-events: none;
+        opacity: 0.6;
+    }
+}
+
+.app-fab-button.app-fab-button {
+    width: 40px;
+    height: 40px;
+    box-shadow: 0px 1px 7px 4px rgb(90 88 88 / 25%);
+    background: white;
+
+    &:focus {
+        outline: transparent solid 0px !important;
+    }
+
+    .mat-button-wrapper {
+        padding: 0 !important;
+
+        .mat-icon {
+            color: #828282;
+            font-size: 26px;
+            width: unset;
+            height: 32px;
+
+            &:focus {
+                outline: transparent solid 0px !important;
+            }
+        }
+    }
+}

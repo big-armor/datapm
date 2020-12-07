@@ -1,10 +1,17 @@
 .search-form {
     display: flex;
     width: 100%;
+    max-width: 699px;
+    position: relative;
 
     app-input {
-        max-width: 699px;
         width: 100%;
+    }
+
+    button {
+        position: absolute;
+        top: 2px;
+        right: 8px;
     }
 }
 
@@ -55,119 +62,22 @@ button.mat-menu-item {
     }
 }
 
-.mat-fab.person-menu {
-    width: 40px;
-    height: 40px;
-    box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
-        0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
-    background: inherit;
-    transition: background-color ease 0.5s;
-
-    &:hover {
-        background-color: #f9f9f9;
-        transition: background-color ease 0.5s;
-    }
-
-    &:focus {
-        outline: transparent solid 0px !important;
-    }
-
-    ::ng-deep .mat-button-wrapper {
-        padding: 0 !important;
-
-        .mat-icon {
-            color: #828282;
-            font-size: 26px;
-            width: unset;
-            height: 32px;
-
-            &:focus {
-                outline: transparent solid 0px !important;
-            }
-        }
-    }
-}
-
-.search-box {
-    input {
-        border-top-right-radius: 24px;
-        border-bottom-right-radius: 24px;
-        border-radius: 24px;
-        padding: 10px 23px;
-        height: 44px;
-        border: none;
-        box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25),
-            inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
-
-        &::placeholder {
-            font-family: Roboto Mono;
-            font-style: normal;
-            font-weight: 300;
-            font-size: 14px;
-            letter-spacing: -0.28px;
-            color: #bdbdbd;
-        }
-    }
-
-    button {
-        border: none;
-        background: none;
-        position: relative;
-        right: 50px;
-        z-index: 999;
-        color: #828282;
-
-        &:active {
-            color: #828282;
-        }
-
-        &:focus {
-            outline: auto transparent 0px !important;
-        }
-    }
-}
-
 .mobile-search-box {
     display: flex;
 
-    input {
-        border-top-right-radius: 24px;
-        border-bottom-right-radius: 24px;
-        max-width: 100%;
-        border-radius: 24px;
-        padding: 10px 23px;
-        height: 36px;
-        border: none;
-        box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25),
-            inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
-
-        &::placeholder {
-            font-family: Roboto Mono;
-            font-style: normal;
-            font-weight: 300;
-            font-size: 12px;
-            letter-spacing: -0.28px;
-            color: #bdbdbd;
-        }
+    app-input {
+        width: 100%;
     }
 
     button {
-        border: none;
-        background: none;
         position: absolute;
-        right: 18px;
-        z-index: 999;
-        color: #828282;
-        top: 6px;
-
-        &:active {
-            color: #828282;
-        }
+        right: 24px;
+        top: 2px;
     }
 }
 
 .mobile-person {
-    .mat-fab.person-menu {
+    .app-fab-button {
         width: 30px;
         height: 30px;
         box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),

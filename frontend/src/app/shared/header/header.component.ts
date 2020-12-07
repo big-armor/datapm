@@ -1,14 +1,16 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
 import { ActivatedRoute, ParamMap, Router } from "@angular/router";
-import { MatDialog } from "@angular/material/dialog";
+import { FormControl } from "@angular/forms";
 import { takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";
 
 import { AuthenticationService } from "../../services/authentication.service";
+import { DialogService } from "../../services/dialog.service";
+import { User } from "src/generated/graphql";
+import { MatDialog } from "@angular/material/dialog";
 import { LoginDialogComponent } from "./login-dialog/login-dialog.component";
 import { SignUpDialogComponent } from "./sign-up-dialog/sign-up-dialog.component";
 import { ForgotPasswordDialogComponent } from "./forgot-password-dialog/forgot-password-dialog.component";
-import { User } from "src/generated/graphql";
 
 enum State {
     INIT,
@@ -26,19 +28,22 @@ export class HeaderComponent implements OnInit, OnDestroy {
     state = State.INIT;
 
     currentUser: User;
-    searchTerm: String;
+    searchControl: FormControl;
     private subscription = new Subject();
 
     constructor(
-        public dialog: MatDialog,
+        private matDialog: MatDialog,
+        private dialog: DialogService,
         private router: Router,
         private route: ActivatedRoute,
         private authenticationService: AuthenticationService
-    ) {}
+    ) {
+        this.searchControl = new FormControl("");
+    }
 
     ngOnInit(): void {
         this.route.queryParamMap.pipe(takeUntil(this.subscription)).subscribe((queryParams: ParamMap) => {
-            this.searchTerm = queryParams.get("q") || null;
+            this.searchControl.setValue(queryParams.get("q") || "");
         });
         this.authenticationService
             .getUserObservable()
@@ -53,6 +58,35 @@ export class HeaderComponent implements OnInit, OnDestroy {
                     this.state = State.SUCCESS;
                 }).catch(() => (this.state = State.ERROR));
             });
+        this.dialog.actions.pipe(takeUntil(this.subscription)).subscribe((action: string) => {
+            switch (action) {
+                case "login":
+                    this.matDialog.open(LoginDialogComponent, {
+                        disableClose: true
+                    });
+                    break;
+                case "forgotPassword":
+                    this.matDialog.open(ForgotPasswordDialogComponent, {
+                        disableClose: true
+                    });
+                    break;
+                case "signup":
+                    const signupDialogRef = this.matDialog.open(SignUpDialogComponent, {
+                        disableClose: true
+                    });
+                    signupDialogRef.afterClosed().subscribe((result?: string) => {
+                        if (result === "forgotPassword") {
+                            this.dialog.openForgotPasswordDialog();
+                        }
+                    });
+                    break;
+                case "closeAll":
+                    this.matDialog.closeAll();
+                    break;
+                default:
+                    break;
+            }
+        });
     }
 
     ngOnDestroy(): void {
@@ -60,28 +94,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
 
     openLoginDialog() {
-        this.dialog.open(LoginDialogComponent, {
-            disableClose: true
-        });
+        this.dialog.openLoginDialog();
     }
 
     openSignUpDialog() {
-        const signupDialogRef = this.dialog.open(SignUpDialogComponent, {
-            disableClose: true
-        });
-        signupDialogRef.afterClosed().subscribe((result?: string) => {
-            if (result === "forgotPassword") {
-                this.dialog.open(ForgotPasswordDialogComponent);
-            }
-        });
-    }
-
-    mobileSearch() {
-        this.router.navigate(["/search"], { queryParams: { q: this.searchTerm } });
+        this.dialog.openSignupDialog();
     }
 
     search() {
-        this.router.navigate(["/search"], { queryParams: { q: this.searchTerm } });
+        console.log(this.searchControl.value);
+        this.router.navigate(["/search"], { queryParams: { q: this.searchControl.value } });
     }
 
     goHome() {

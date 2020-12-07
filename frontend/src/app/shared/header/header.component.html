@@ -8,8 +8,14 @@
                 <div class="p-2 bd-highlight w-100">
                     <div class="input-group mt-1 search-box">
                         <form (ngSubmit)="search()" class="search-form">
-                            <app-input placeholder="Search For Data"></app-input>
-                            <button class="material-icons">search</button>
+                            <app-input
+                                placeholder="Search For Data"
+                                [control]="searchControl"
+                                (keyEnter)="search()"
+                            ></app-input>
+                            <button mat-icon-button>
+                                <mat-icon>search</mat-icon>
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -24,7 +30,7 @@
                     <app-avatar [user]="currentUser" [matMenuTriggerFor]="beforeMenu" *ngIf="currentUser"></app-avatar>
                     <button
                         mat-fab
-                        class="person-menu"
+                        class="app-fab-button"
                         [matMenuTriggerFor]="beforeMenu"
                         aria-label="Person"
                         *ngIf="!currentUser"
@@ -55,7 +61,7 @@
                     <app-avatar [user]="currentUser" [matMenuTriggerFor]="beforeMenu" *ngIf="currentUser"></app-avatar>
                     <button
                         mat-fab
-                        class="person-menu"
+                        class="app-fab-button"
                         [matMenuTriggerFor]="beforeMenu"
                         aria-label="Person"
                         *ngIf="!currentUser"
@@ -74,14 +80,10 @@
     </div>
     <div class="row pt-3 px-3">
         <div class="col-12 mobile-search-box mt-3">
-            <input
-                type="text"
-                class="form-control search-input"
-                (keydown.enter)="mobileSearch()"
-                placeholder="Search For Data"
-                [(ngModel)]="searchTerm"
-            />
-            <button class="material-icons" (onclick)="mobileSearch()">search</button>
+            <app-input placeholder="Search For Data" [control]="searchControl" (keyEnter)="search()"></app-input>
+            <button mat-icon-button (onclick)="search()">
+                <mat-icon>search</mat-icon>
+            </button>
         </div>
     </div>
 </div>

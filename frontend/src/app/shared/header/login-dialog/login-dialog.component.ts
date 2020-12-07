@@ -1,11 +1,12 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Router, ActivatedRoute } from "@angular/router";
-import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { MatDialogRef } from "@angular/material/dialog";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { AUTHENTICATION_ERROR } from "src/generated/graphql";
 import { Subscription } from "rxjs";
-import { ForgotPasswordDialogComponent } from "../forgot-password-dialog/forgot-password-dialog.component";
+import { DialogService } from "src/app/services/dialog.service";
+
 enum State {
     LOGGED_OUT,
     AWAITING_RESPONSE,
@@ -35,7 +36,7 @@ export class LoginDialogComponent implements OnInit, OnDestroy {
         private authenticationService: AuthenticationService,
         private route: ActivatedRoute,
         private router: Router,
-        private dialog: MatDialog,
+        private dialog: DialogService,
         private dialogRef: MatDialogRef<LoginDialogComponent>
     ) {}
 
@@ -95,7 +96,7 @@ export class LoginDialogComponent implements OnInit, OnDestroy {
         ev.preventDefault();
         this.dialogRef.close();
         this.dialogRef.afterClosed().subscribe(() => {
-            this.dialog.open(ForgotPasswordDialogComponent);
+            this.dialog.openForgotPasswordDialog();
         });
     }
 }
