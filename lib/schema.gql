@@ -148,6 +148,7 @@ type Package {
     createdAt: Date!
     updatedAt: Date!
     isPublic: Boolean!
+    myPermissions: [Permission!]
 }
 
 """
@@ -173,6 +174,7 @@ type Collection {
     updatedAt: Date!
     isPublic: Boolean
     isRecommended: Boolean
+    myPermissions: [Permission!]
 }
 
 """
@@ -395,7 +397,7 @@ input SetPackagePermissionInput {
 """
 The properties for setting a specific user's permissions on a collection
 """
-input SetUserCollectionPermissionInput {
+input SetUserCollectionPermissionsInput {
     username: String! @validUsername
     permissions: [Permission!]!
 }
@@ -535,11 +537,6 @@ type Query {
     myCollections(offSet: Int!, limit: Int!): MyCollectionsResult! @isAuthenticated
 
     """
-    Returns permission of users collection
-    """
-    myCollectionPermission(identifier: CollectionIdentifierInput!): Permission!
-
-    """
     Returns collections whos names match the given query. This request is paginated
     """
     searchCollections(query: String!, offset: Int!, limit: Int!): SearchCollectionResult!
@@ -551,7 +548,7 @@ type Query {
         identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: VIEW)
         offset: Int!
         limit: Int!
-    ): [Collection!]!
+    ): [Package!]!
 }
 
 type Mutation {
@@ -720,9 +717,9 @@ type Mutation {
     """
     Sets the permissions for a given user collection
     """
-    setUserCollectionPermission(
+    setUserCollectionPermissions(
         identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
-        value: SetUserCollectionPermissionInput!
+        value: SetUserCollectionPermissionsInput!
     ): Void
 
     """

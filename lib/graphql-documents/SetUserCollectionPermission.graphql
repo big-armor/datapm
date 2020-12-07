@@ -1,6 +1,0 @@
-mutation SetUserCollectionPermission(
-    $identifier: CollectionIdentifierInput!
-    $value: SetUserCollectionPermissionInput!
-) {
-    setUserCollectionPermission(identifier: $identifier, value: $value)
-}

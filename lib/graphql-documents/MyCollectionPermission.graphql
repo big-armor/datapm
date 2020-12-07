@@ -1,3 +1,0 @@
-query MyCollectionPermission($identifier: CollectionIdentifierInput!) {
-    myCollectionPermission(identifier: $identifier)
-}
