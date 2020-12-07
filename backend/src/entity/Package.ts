@@ -3,7 +3,7 @@ import { Entity, Column, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColum
 import { BaseModel } from "./BaseModel";
 import { Catalog } from "./Catalog";
 import { Version } from "./Version";
-import { PackageIdentifier } from "../generated/graphql";
+import { PackageIdentifier, Permission } from "../generated/graphql";
 import { User } from "./User";
 
 @Entity({
@@ -62,4 +62,8 @@ export class Package extends BaseModel {
     latestVersion: Version;
 
     identifier: PackageIdentifier;
+
+    // These are dummy values so that response objects will have the right values
+    // need to write converters for Entity -> GraphQL object
+    myPermissions: Permission[];
 }

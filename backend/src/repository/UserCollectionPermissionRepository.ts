@@ -1,7 +1,7 @@
 import { EntityRepository, Repository } from "typeorm";
 import { ForbiddenError } from "apollo-server";
 
-import { Permission, CollectionIdentifierInput, SetUserCollectionPermissionInput } from "../generated/graphql";
+import { Permission, CollectionIdentifierInput, SetUserCollectionPermissionsInput } from "../generated/graphql";
 import { UserCollectionPermission } from "../entity/UserCollectionPermission";
 import { User } from "../entity/User";
 
@@ -10,6 +10,23 @@ import { CollectionRepository } from "./CollectionRepository";
 
 @EntityRepository(UserCollectionPermission)
 export class UserCollectionPermissionRepository extends Repository<UserCollectionPermission> {
+    findCollectionPermissions({
+        collectionId,
+        userId,
+        relations = []
+    }: {
+        collectionId: number;
+        userId: number;
+        relations?: string[];
+    }) {
+        const ALIAS = "userCollectionPermission";
+        return this.manager
+            .getRepository(UserCollectionPermission)
+            .createQueryBuilder(ALIAS)
+            .addRelations(ALIAS, relations)
+            .where({ collectionId, userId })
+            .getOne();
+    }
     public async grantAllPermissionsForUser(userId: number, collectionId: number): Promise<UserCollectionPermission> {
         return this.setPermissionsForUser(userId, collectionId, [Permission.VIEW, Permission.EDIT, Permission.MANAGE]);
     }
@@ -46,20 +63,20 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
         return this.createQueryBuilder().where({ userId: userId, collectionId: collectionId }).getOne();
     }
 
-    public async setUserCollectionPermission({
+    public async setUserCollectionPermissions({
         identifier,
         value,
         relations
     }: {
         identifier: CollectionIdentifierInput;
-        value: SetUserCollectionPermissionInput;
+        value: SetUserCollectionPermissionsInput;
         relations?: string[];
     }): Promise<void> {
         await this.manager.nestedTransaction(async (transaction) => {
             const user = await transaction.getCustomRepository(UserRepository).getUserByUsername(value.username);
 
             if (!user) {
-                throw new Error(`User ${value.username} not found`);
+                throw new Error(`USER_NOT_FOUND - ${value.username}`);
             }
 
             const collectionEntity = await transaction
@@ -99,19 +116,6 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
                     console.log(e);
                 }
             }
-        });
-    }
-
-    public async myCollectionPermission(user: User, identifier: CollectionIdentifierInput): Promise<Permission> {
-        // return this.createQueryBuilder().where({}).getOne();
-        return await this.manager.nestedTransaction(async (transaction) => {
-            const collectionEntity = await transaction
-                .getCustomRepository(CollectionRepository)
-                .findCollectionBySlugOrFail(identifier.collectionSlug);
-
-            if (collectionEntity.creatorId == user.id) return Permission.MANAGE;
-            if (collectionEntity.isPublic) return Permission.VIEW;
-            throw new ForbiddenError("NOT_AUTHORIZED");
         });
     }
 
