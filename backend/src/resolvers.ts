@@ -128,9 +128,13 @@ export const resolvers: {
             return JSON.stringify(value);
         },
         parseValue: (value: any) => {
-            const packageFileObject = parsePackageFileJSON(value);
+            try {
+                const packageFileObject = parsePackageFileJSON(value);
 
-            return packageFileObject;
+                return packageFileObject;
+            } catch (error) {
+                throw new ValidationError(error.message);
+            }
         }
     }),
     Password: new GraphQLScalarType({

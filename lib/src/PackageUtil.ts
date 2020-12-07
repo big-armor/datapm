@@ -443,21 +443,20 @@ export function loadPackageFileFromDisk(packageFilePath: string): PackageFile {
 }
 
 export function parsePackageFileJSON(packageFileString: string): PackageFile {
-    let packageFile;
-
+    let rawPackageFile;
     try {
-        const rawPackageFile = JSON.parse(packageFileString);
-
-        validatePackageFile(rawPackageFile);
-
-        packageFile = JSON.parse(packageFileString, (key, value) => {
-            if (key !== "updatedDate" && key !== "createdAt" && key !== "updatedAt") return value;
-
-            return new Date(Date.parse(value));
-        }) as PackageFile;
+        rawPackageFile = JSON.parse(packageFileString);
     } catch (error) {
-        throw new Error("ERROR_PARSING_PACKAGE_FILE: " + error.message);
+        throw new Error("ERROR_PARSING_PACAKGE_FILE: " + error.message);
     }
+
+    validatePackageFile(rawPackageFile);
+
+    const packageFile = JSON.parse(packageFileString, (key, value) => {
+        if (key !== "updatedDate" && key !== "createdAt" && key !== "updatedAt") return value;
+
+        return new Date(Date.parse(value));
+    }) as PackageFile;
 
     return packageFile;
 }
@@ -479,7 +478,12 @@ export function validatePackageFile(packageFile: unknown): void {
         }
     }
 
-    const schemaObject = JSON.parse(schema);
+    let schemaObject;
+    try {
+        schemaObject = JSON.parse(schema);
+    } catch (error) {
+        throw new Error("ERROR_PARSING_PACAKGE_FILE: " + error.message);
+    }
 
     if (!ajv.validateSchema(schemaObject)) {
         throw new Error("ERROR_READING_SCHEMA");
