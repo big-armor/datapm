@@ -63,8 +63,7 @@ import {
     collectionPackages
 } from "./resolvers/CollectionResolver";
 import {
-    setUserCollectionPermission,
-    myCollectionPermission,
+    setUserCollectionPermissions,
     deleteUserCollectionPermissions
 } from "./resolvers/UserCollectionPermissionResolver";
 import { login, logout, verifyEmailAddress } from "./resolvers/AuthResolver";
@@ -521,7 +520,6 @@ export const resolvers: {
         myCollections: myCollections,
         searchCollections: searchCollections,
         collectionPackages: collectionPackages,
-        myCollectionPermission: myCollectionPermission,
 
         autoComplete: async (_0: any, { startsWith }, context: AuthenticatedContext, info: any) => {
             const catalogs = context.connection.manager.getCustomRepository(CatalogRepository).autocomplete({
@@ -667,7 +665,7 @@ export const resolvers: {
         deleteCollection: deleteCollection,
         addPackageToCollection: addPackageToCollection,
         removePackageFromCollection: removePackageFromCollection,
-        setUserCollectionPermission: setUserCollectionPermission,
+        setUserCollectionPermissions: setUserCollectionPermissions,
         deleteUserCollectionPermissions: deleteUserCollectionPermissions,
 
         createVersion: async (_0: any, { identifier, value }, context: AuthenticatedContext, info: any) => {
