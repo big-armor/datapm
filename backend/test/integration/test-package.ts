@@ -554,7 +554,7 @@ describe("Package Tests", async () => {
                 if (
                     fetchResult.result.errors.find((e: { extensions: { exception: { stacktrace: string[] } } }) => {
                         return (
-                            e.extensions.exception.stacktrace.find((s) => s.includes("ERROR_PARSING_PACAKGE_FILE")) !=
+                            e.extensions.exception.stacktrace.find((s) => s.includes("ERROR_PARSING_PACKAGE_FILE")) !=
                             null
                         );
                     }) != null
