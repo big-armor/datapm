@@ -447,7 +447,7 @@ export function parsePackageFileJSON(packageFileString: string): PackageFile {
     try {
         rawPackageFile = JSON.parse(packageFileString);
     } catch (error) {
-        throw new Error("ERROR_PARSING_PACAKGE_FILE: " + error.message);
+        throw new Error("ERROR_PARSING_PACKAGE_FILE: " + error.message);
     }
 
     validatePackageFile(rawPackageFile);
@@ -482,7 +482,7 @@ export function validatePackageFile(packageFile: unknown): void {
     try {
         schemaObject = JSON.parse(schema);
     } catch (error) {
-        throw new Error("ERROR_PARSING_PACAKGE_FILE: " + error.message);
+        throw new Error("ERROR_PARSING_PACKAGE_FILE: " + error.message);
     }
 
     if (!ajv.validateSchema(schemaObject)) {
