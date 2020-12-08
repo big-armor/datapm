@@ -1,0 +1,30 @@
+query CollectionPackages($identifier: CollectionIdentifierInput!, $offset: Int!, $limit: Int!) {
+    collectionPackages(identifier: $identifier, offset: $offset, limit: $limit) {
+        identifier {
+            catalogSlug
+            packageSlug
+        }
+        catalog {
+            displayName
+            isPublic
+            myPermissions
+        }
+        latestVersion {
+            createdAt
+            updatedAt
+            identifier {
+                versionMajor
+                versionMinor
+                versionPatch
+            }
+        }
+        creator {
+            username
+            firstName
+            lastName
+            nameIsPublic
+        }
+        isPublic
+        myPermissions
+    }
+}

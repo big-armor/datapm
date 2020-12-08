@@ -5,6 +5,7 @@ import { SharedModule } from "src/app/shared/shared.module";
 
 import { PackagesComponent } from "./packages.component";
 import { ApolloTestingModule } from "apollo-angular/testing";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 
 describe("PackagesComponent", () => {
     let component: PackagesComponent;
@@ -13,7 +14,13 @@ describe("PackagesComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [PackagesComponent],
-            imports: [HttpClientModule, RouterTestingModule, ApolloTestingModule, SharedModule]
+            imports: [
+                HttpClientModule,
+                RouterTestingModule,
+                ApolloTestingModule,
+                SharedModule,
+                MatProgressSpinnerModule
+            ]
         }).compileComponents();
     }));
 

@@ -1,6 +1,7 @@
 import { AuthenticatedContext } from "../context";
-import { Permission } from "../generated/graphql";
+import { Permission, CollectionIdentifierInput, SetUserCollectionPermissionsInput } from "../generated/graphql";
 import { UserCollectionPermissionRepository } from "../repository/UserCollectionPermissionRepository";
+import { getGraphQlRelationName } from "../util/relationNames";
 
 export const hasCollectionPermissions = async (
     context: AuthenticatedContext,
@@ -26,4 +27,28 @@ export const setPermissionsForUser = async (
     return context.connection
         .getCustomRepository(UserCollectionPermissionRepository)
         .setPermissionsForUser(context.me.id, collectionId, permissions);
+};
+
+export const setUserCollectionPermissions = async (
+    _0: any,
+    { identifier, value }: { identifier: CollectionIdentifierInput; value: SetUserCollectionPermissionsInput },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    await context.connection.getCustomRepository(UserCollectionPermissionRepository).setUserCollectionPermissions({
+        identifier,
+        value,
+        relations: getGraphQlRelationName(info)
+    });
+};
+
+export const deleteUserCollectionPermissions = async (
+    _0: any,
+    { identifier, username }: { identifier: CollectionIdentifierInput; username: string },
+    context: AuthenticatedContext
+) => {
+    await context.connection.getCustomRepository(UserCollectionPermissionRepository).deleteUserCollectionPermissions({
+        identifier,
+        username
+    });
 };

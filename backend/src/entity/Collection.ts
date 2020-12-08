@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryColumn, Index, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
-import { CollectionIdentifier } from "../generated/graphql";
+import { CollectionIdentifier, Permission } from "../generated/graphql";
 import { User } from "./User";
 
 import { BaseModel } from "./BaseModel";
@@ -36,4 +36,7 @@ export class Collection extends BaseModel {
     public creatorId: number;
 
     public identifier: CollectionIdentifier;
+    // These are dummy values so that response objects will have the right values
+    // need to write converters for Entity -> GraphQL object
+    myPermissions: Permission[];
 }

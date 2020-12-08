@@ -125,7 +125,11 @@ type Catalog {
     description: String
     website: String
     isPublic: Boolean!
-    userPermissions: [UserCatalog!]
+
+    """
+    The permissions of the requesting user to the catalog
+    """
+    myPermissions: [Permission!]
     packages: [Package]
 }
 
@@ -144,6 +148,7 @@ type Package {
     createdAt: Date!
     updatedAt: Date!
     isPublic: Boolean!
+    myPermissions: [Permission!]
 }
 
 """
@@ -169,6 +174,7 @@ type Collection {
     updatedAt: Date!
     isPublic: Boolean
     isRecommended: Boolean
+    myPermissions: [Permission!]
 }
 
 """
@@ -354,6 +360,11 @@ input UpdateCatalogInput {
     isPublic: Boolean
 }
 
+input SetUserCatalogPermissionInput {
+    username: String! @validUsername
+    permission: [Permission!]!
+}
+
 """
 The properties for creating a package list.
 """
@@ -379,6 +390,14 @@ input UpdatePackageInput {
 The properties for updating a specific user's permissions on a package
 """
 input SetPackagePermissionInput {
+    username: String! @validUsername
+    permissions: [Permission!]!
+}
+
+"""
+The properties for setting a specific user's permissions on a collection
+"""
+input SetUserCollectionPermissionsInput {
     username: String! @validUsername
     permissions: [Permission!]!
 }
@@ -474,6 +493,15 @@ type Query {
     catalog(identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: VIEW)): Catalog!
 
     """
+    Returns the packages of the given identifier. Requires permission to view the catalog packages
+    """
+    catalogPackages(
+        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: VIEW)
+        offset: Int!
+        limit: Int!
+    ): [Package!]!
+
+    """
     Returns the package for the given identifier. Requires permission to view the package
     """
     package(identifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)): Package!
@@ -512,6 +540,15 @@ type Query {
     Returns collections whos names match the given query. This request is paginated
     """
     searchCollections(query: String!, offset: Int!, limit: Int!): SearchCollectionResult!
+
+    """
+    Returns collections equal to collectionSlug, gives all packages associated with collectionSlug
+    """
+    collectionPackages(
+        identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: VIEW)
+        offset: Int!
+        limit: Int!
+    ): [Package!]!
 }
 
 type Mutation {
@@ -576,14 +613,6 @@ type Mutation {
     deleteAPIKey(id: String! @hasAPIKeyManagementPermission): APIKey! @isAuthenticated
 
     """
-    Removes a specified user from the specified catalog, and all of their permissions
-    """
-    removeUserFromCatalog(
-        username: String! @validUsername
-        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
-    ): User!
-
-    """
     Creates a new catalog which is owned by the requesting user
     """
     createCatalog(value: CreateCatalogInput!): Catalog!
@@ -603,6 +632,14 @@ type Mutation {
         identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: EDIT)
         image: Base64ImageUpload! @validBase64Image
     ): Void @isAuthenticated
+
+    """
+    Updates the catalog permissions of a user
+    """
+    setUserCatalogPermission(
+        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
+        value: SetUserCatalogPermissionInput!
+    ): Void
 
     """
     Deletes and existing catalog. All packages in the catalog are then deleted
@@ -675,6 +712,22 @@ type Mutation {
     removePackageFromCollection(
         collectionIdentifier: CollectionIdentifierInput! @hasCollectionPermission(permission: EDIT)
         packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+    ): Void
+
+    """
+    Sets the permissions for a given user collection
+    """
+    setUserCollectionPermissions(
+        identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
+        value: SetUserCollectionPermissionsInput!
+    ): Void
+
+    """
+    Removes all permissions for a user on a given collection. Requires the manage package permission
+    """
+    deleteUserCollectionPermissions(
+        identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
+        username: String! @validUsername
     ): Void
 
     """

@@ -20,6 +20,7 @@ mutation UpdateCollection($identifier: CollectionIdentifierInput!, $value: Updat
                 }
             }
             catalog {
+                myPermissions
                 identifier {
                     catalogSlug
                 }

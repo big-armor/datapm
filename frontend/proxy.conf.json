@@ -19,6 +19,21 @@
         "secure": false,
         "changeOrigin": true
     },
+    "/images/catalog": {
+        "target": "http://localhost:4000",
+        "secure": false,
+        "changeOrigin": true
+    },
+    "/images/collection": {
+        "target": "http://localhost:4000",
+        "secure": false,
+        "changeOrigin": true
+    },
+    "/images/package": {
+        "target": "http://localhost:4000",
+        "secure": false,
+        "changeOrigin": true
+    },
     "/__debug__": {
         "target": "http://localhost:4000",
         "secure": false,

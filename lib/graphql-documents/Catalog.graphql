@@ -6,6 +6,7 @@ query GetCatalog($identifier: CatalogIdentifierInput!) {
         displayName
         description
         website
+        myPermissions
         packages {
             identifier {
                 catalogSlug

@@ -16,6 +16,7 @@ export class InputComponent implements OnInit, OnChanges {
     @Input() controlName: string;
     @Input() placeholder: string = "";
     @Input() inputType: string = "text";
+    @Input() multiline: boolean = false;
     @Input() error: string = "";
     @Input() autoFocus: boolean = false;
     @Output() inputChange: EventEmitter<string>;

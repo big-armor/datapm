@@ -1,0 +1,8 @@
+query CatalogPackages($identifier: CatalogIdentifierInput!, $offset: Int!, $limit: Int!) {
+    catalogPackages(identifier: $identifier, offset: $offset, limit: $limit) {
+        displayName
+        description
+        createdAt
+        updatedAt
+    }
+}

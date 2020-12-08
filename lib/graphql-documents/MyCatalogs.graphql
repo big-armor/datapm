@@ -8,5 +8,6 @@ query MyCatalogs {
         description
         website
         isPublic
+        myPermissions
     }
 }
