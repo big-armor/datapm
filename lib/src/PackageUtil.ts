@@ -3,6 +3,7 @@ import { Schema, PackageFile } from "./main";
 import fs from "fs";
 import path from "path";
 import AJV from "ajv";
+import fetch from "cross-fetch";
 
 export type DPMRecordValue =
     | number
@@ -461,20 +462,31 @@ export function parsePackageFileJSON(packageFileString: string): PackageFile {
     return packageFile;
 }
 
-export function validatePackageFile(packageFile: unknown): void {
+export async function validatePackageFile(packageFile: unknown): Promise<void> {
     const ajv = new AJV({
         format: false // https://www.npmjs.com/package/ajv#redos-attack
     });
 
     let packageSchemaFile: string;
-    try {
-        const pathToDataPmLib = require.resolve("datapm-lib").replace(path.sep + "src" + path.sep + "main.js", "");
-        packageSchemaFile = fs.readFileSync(path.join(pathToDataPmLib, "packageFileSchema.json"), "utf8");
-    } catch (error) {
+
+    if (typeof window === undefined) {
         try {
-            packageSchemaFile = fs.readFileSync("packageFileSchema.json", "utf8");
+            const pathToDataPmLib = require.resolve("datapm-lib").replace(path.sep + "src" + path.sep + "main.js", "");
+            packageSchemaFile = fs.readFileSync(path.join(pathToDataPmLib, "packageFileSchema.json"), "utf8");
         } catch (error) {
-            packageSchemaFile = fs.readFileSync(path.join("..", "lib", "packageFileSchema.json"), "utf8");
+            try {
+                packageSchemaFile = fs.readFileSync("packageFileSchema.json", "utf8");
+            } catch (error) {
+                packageSchemaFile = fs.readFileSync(path.join("..", "lib", "packageFileSchema.json"), "utf8");
+            }
+        }
+    } else {
+        const response = await fetch("/docs/datapm-package-file-schema-v1.json");
+
+        if (response.status > 199 && response.status < 300) {
+            packageSchemaFile = await response.text();
+        } else {
+            throw new Error("Error finding package file " + response.status);
         }
     }
 

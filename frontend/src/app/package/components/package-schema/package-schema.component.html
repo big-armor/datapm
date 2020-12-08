@@ -78,7 +78,7 @@
                                         enumerated values:
                                         <ul>
                                             <li *ngFor="let value of stringOptions(type.stringOptions)">
-                                                {{ value.name }}: {{ value.value }} record
+                                                {{ value.name }}: {{ value.value | number }} record
                                             </li>
                                         </ul>
                                     </li>
