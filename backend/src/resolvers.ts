@@ -15,8 +15,10 @@ import {
     PackageIdentifier,
     CollectionResolvers,
     CatalogIdentifierInput,
+    SetUserCatalogPermissionInput,
     VersionIdentifierInput,
-    Base64ImageUpload
+    Base64ImageUpload,
+    Permission
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
@@ -57,8 +59,13 @@ import {
     removePackageFromCollection,
     searchCollections,
     setCollectionCoverImage,
-    updateCollection
+    updateCollection,
+    collectionPackages
 } from "./resolvers/CollectionResolver";
+import {
+    setUserCollectionPermissions,
+    deleteUserCollectionPermissions
+} from "./resolvers/UserCollectionPermissionResolver";
 import { login, logout, verifyEmailAddress } from "./resolvers/AuthResolver";
 import {
     createMe,
@@ -102,6 +109,8 @@ import { validateEmailAddress } from "./directive/ValidEmailDirective";
 import { FileStorageService, StorageErrors } from "./storage/files/file-storage-service";
 import { PackageFileStorageService } from "./storage/packages/package-file-storage-service";
 import { DateResolver } from "./resolvers/DateResolver";
+import { Permissions } from "./entity/Permissions";
+import { exit } from "process";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -284,7 +293,38 @@ export const resolvers: {
                 catalogSlug: catalog.slug
             };
         },
-        packages: catalogPackagesForUser
+        packages: catalogPackagesForUser,
+        myPermissions: async (parent: any, _1: any, context: Context) => {
+            const catalog = parent as Catalog;
+
+            if (context.me == null) {
+                if (catalog.isPublic) return [Permission.VIEW];
+
+                console.error(
+                    "Anonymous user request just resolved permissions for a non-public catalog!!! THIS IS BAD!!!"
+                );
+                exit(1); // Shut down the server so the admin knows something very bad happened
+            }
+
+            const userPermission = await context.connection
+                .getCustomRepository(UserCatalogPermissionRepository)
+                .findCatalogPermissions({
+                    catalogId: catalog.id,
+                    userId: context.me.id
+                });
+
+            if (userPermission == null) {
+                if (catalog.isPublic) return [Permission.VIEW];
+                console.error(
+                    "User " +
+                        context.me.username +
+                        " request just resolved permissions for a non-public catalog to which they have no permissions!!! THIS IS BAD!!!"
+                );
+                exit(1); // Shut down the server so the admin knows something very bad happened
+            }
+
+            return userPermission.permissions;
+        }
     },
     Collection: {
         identifier: async (parent: any, _1: any) => {
@@ -463,6 +503,7 @@ export const resolvers: {
         collections: findCollectionsForAuthenticatedUser,
         myCollections: myCollections,
         searchCollections: searchCollections,
+        collectionPackages: collectionPackages,
 
         autoComplete: async (_0: any, { startsWith }, context: AuthenticatedContext, info: any) => {
             const catalogs = context.connection.manager.getCustomRepository(CatalogRepository).autocomplete({
@@ -501,6 +542,20 @@ export const resolvers: {
             };
         },
 
+        catalogPackages: async (
+            _0: any,
+            { identifier, limit, offset }: { identifier: CatalogIdentifierInput; limit: number; offset: number },
+            context: AuthenticatedContext,
+            info: any
+        ) => {
+            const repository = context.connection.manager.getCustomRepository(CatalogRepository);
+            const catalogEntity = await repository.findCatalogBySlugOrFail(identifier.catalogSlug);
+            const relations = getGraphQlRelationName(info);
+            return await context.connection.manager
+                .getCustomRepository(CatalogRepository)
+                .catalogPackages(catalogEntity.id, limit, offset, relations);
+        },
+
         searchPackages: searchPackages,
 
         usernameAvailable: usernameAvailable,
@@ -527,22 +582,6 @@ export const resolvers: {
         // API Keys
         createAPIKey: createAPIKey,
         deleteAPIKey: deleteAPIKey,
-
-        removeUserFromCatalog: async (_0: any, { username, identifier }, context: AuthenticatedContext, info: any) => {
-            const catalog = await context.connection.manager
-                .getCustomRepository(CatalogRepository)
-                .findCatalogBySlug({ slug: identifier.catalogSlug });
-
-            if (catalog === undefined) {
-                throw new UserInputError("CATALOG_NOT_FOUND");
-            }
-
-            return context.connection.manager.getCustomRepository(UserRepository).removeUserFromCatalog({
-                username: username,
-                catalog: catalog,
-                relations: getGraphQlRelationName(info)
-            });
-        },
 
         createCatalog: async (_0: any, { value }, context: AuthenticatedContext, info: any) => {
             return context.connection.manager.getCustomRepository(CatalogRepository).createCatalog({
@@ -572,6 +611,19 @@ export const resolvers: {
             await ImageStorageService.INSTANCE.saveCatalogCoverImage(catalog.id, image.base64);
         },
 
+        setUserCatalogPermission: async (
+            _0: any,
+            { identifier, value }: { identifier: CatalogIdentifierInput; value: SetUserCatalogPermissionInput },
+            context: AuthenticatedContext,
+            info: any
+        ) => {
+            await context.connection.getCustomRepository(UserCatalogPermissionRepository).setUserCatalogPermission({
+                identifier,
+                value,
+                relations: getGraphQlRelationName(info)
+            });
+        },
+
         deleteCatalog: async (
             _0: any,
             { identifier }: { identifier: CatalogIdentifierInput },
@@ -597,6 +649,8 @@ export const resolvers: {
         deleteCollection: deleteCollection,
         addPackageToCollection: addPackageToCollection,
         removePackageFromCollection: removePackageFromCollection,
+        setUserCollectionPermissions: setUserCollectionPermissions,
+        deleteUserCollectionPermissions: deleteUserCollectionPermissions,
 
         createVersion: async (_0: any, { identifier, value }, context: AuthenticatedContext, info: any) => {
             const fileStorageService = FileStorageService.INSTANCE;

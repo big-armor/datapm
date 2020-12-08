@@ -5,6 +5,7 @@ mutation UpdatePackage($identifier: PackageIdentifierInput!, $value: UpdatePacka
             packageSlug
         }
         catalog {
+            myPermissions
             displayName
         }
         displayName
