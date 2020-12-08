@@ -612,15 +612,20 @@ export const resolvers: {
                     .findLatestVersion({ identifier, relations: ["package"] });
 
                 if (latestVersion != null) {
-                    const packageFile = await PackageFileStorageService.INSTANCE.readPackageFile(
-                        latestVersion.package.id,
-                        {
-                            ...identifier,
-                            versionMajor: latestVersion.majorVersion,
-                            versionMinor: latestVersion.minorVersion,
-                            versionPatch: latestVersion.patchVersion
-                        }
-                    );
+                    let packageFile;
+                    try {
+                        packageFile = await PackageFileStorageService.INSTANCE.readPackageFile(
+                            latestVersion.package.id,
+                            {
+                                ...identifier,
+                                versionMajor: latestVersion.majorVersion,
+                                versionMinor: latestVersion.minorVersion,
+                                versionPatch: latestVersion.patchVersion
+                            }
+                        );
+                    } catch (error) {
+                        throw new ApolloError("INTERNAL_SERVER_ERROR");
+                    }
 
                     const latestVersionSemVer = new SemVer(packageFile!.version);
 
