@@ -85,37 +85,51 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
 
             const permissions = await this.findByUserAndCollectionId(user.id, collectionEntity.id);
 
-            // If User does not exist in UserCollectionTable, it creates new record
-            if (permissions == undefined) {
-                try {
-                    await transaction
-                        .createQueryBuilder()
-                        .insert()
-                        .into(UserCollectionPermission)
-                        .values({
-                            collectionId: collectionEntity.id,
-                            userId: user.id,
-                            permissions: value.permissions
-                        })
-                        .execute();
-                } catch (e) {
-                    console.log(e);
+            // If permission input is not empty
+            if (value.permissions!.length > 0) {
+                // If user does not exist in collection permissions, it creates new record
+                if (permissions == undefined) {
+                    try {
+                        const collectionPermissionEntry = transaction.create(UserCollectionPermission);
+                        collectionPermissionEntry.userId = user.id;
+                        collectionPermissionEntry.collectionId = collectionEntity.id;
+                        collectionPermissionEntry.permissions = value.permissions;
+                        return await transaction.save(collectionPermissionEntry);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+                // If user does exists in collection permissions, it updates the record found
+                else {
+                    try {
+                        return await transaction
+                            .createQueryBuilder()
+                            .update(UserCollectionPermission)
+                            .set({ permissions: value.permissions })
+                            .where({ collectionId: collectionEntity.id, userId: user.id })
+                            .execute();
+                    } catch (e) {
+                        console.log(e);
+                    }
                 }
             }
-
-            // Updates permissions if user exists already in UserCollectiontable
-            if (permissions != undefined && value.permissions.length) {
-                try {
-                    await transaction
-                        .createQueryBuilder()
-                        .update(UserCollectionPermission)
-                        .set({ permissions: value.permissions })
-                        .where({ collectionId: collectionEntity.id, userId: user.id })
-                        .execute();
-                } catch (e) {
-                    console.log(e);
+            // If the permissions input is empty, it will delete the row in collection permissions
+            else {
+                // If the permissions row exists in the table delete it
+                if (permissions != undefined) {
+                    try {
+                        return await transaction
+                            .createQueryBuilder()
+                            .delete()
+                            .from(UserCollectionPermission)
+                            .where({ collectionId: collectionEntity.id, userId: user.id })
+                            .execute();
+                    } catch (e) {
+                        console.log(e);
+                    }
                 }
             }
+            return;
         });
     }
 
