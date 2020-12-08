@@ -17,7 +17,7 @@ export class PasswordRecoveryComponent implements OnInit {
     password = new FormControl("", {
         asyncValidators: [newPasswordValidator()]
     });
-    state: PageState = "INIT";
+    state: PageState = "SUCCESS";
     error: string = "";
 
     constructor(

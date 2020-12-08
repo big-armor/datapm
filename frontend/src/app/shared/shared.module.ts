@@ -27,7 +27,6 @@ import { CoverComponent } from "./cover/cover.component";
 import { PercentPipe } from "./pipes/percent.pipe";
 import { ValuesPipe } from "./pipes/values.pipe";
 import { SortByPipe } from "./pipes/sort.pipe";
-import { ButtonComponent } from "./button/button.component";
 import { InputComponent } from "./input/input.component";
 import { InputErrorPipe } from "./pipes/input-error.pipe";
 import { EditCollectionComponent } from "./edit-collection/edit-collection.component";
@@ -51,7 +50,6 @@ import { EditCatalogComponent } from "./edit-catalog/edit-catalog.component";
         PercentPipe,
         ValuesPipe,
         SortByPipe,
-        ButtonComponent,
         InputComponent,
         InputErrorPipe,
         EditCollectionComponent,
@@ -88,7 +86,6 @@ import { EditCatalogComponent } from "./edit-catalog/edit-catalog.component";
         PercentPipe,
         ValuesPipe,
         SortByPipe,
-        ButtonComponent,
         InputComponent,
         InputErrorPipe,
         EditCollectionComponent,
