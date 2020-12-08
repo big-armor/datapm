@@ -37,7 +37,16 @@ export class FileStorageService {
     }
 
     public async deleteFile(namespace: string, itemId: string): Promise<void> {
-        return this.storageService.deleteItem(namespace, itemId);
+        try {
+            return this.storageService.deleteItem(namespace, itemId);
+        } catch (error) {
+            if (error.message.includes("FILE_DOES_NOT_EXIST")) {
+                console.warn("Tried deleting a file that does not exist" + namespace + " " + imageId);
+                return;
+            }
+
+            throw error;
+        }
     }
 
     public async readFile(namespace: string, itemId: string): Promise<Readable> {
