@@ -51,6 +51,13 @@ export class SamplesComponent implements OnInit, OnDestroy {
                     returnValue[key] = (value as number).toString();
                     continue;
                 }
+
+                if (typeof value === "boolean") {
+                    returnValue[key] = value ? "True" : "False";
+                    continue;
+                }
+
+                returnValue[key] = value.toString !== undefined ? value.toString() : "";
             }
 
             return returnValue;

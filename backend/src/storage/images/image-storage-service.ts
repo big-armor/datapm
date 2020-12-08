@@ -130,7 +130,8 @@ export class ImageStorageService {
     }
 
     private async deleteImage(namespace: string, imageId: string): Promise<void> {
-        return this.fileStorageService.deleteFile(namespace, imageId);
+        if (this.fileStorageService.fileExists(namespace, imageId))
+            return this.fileStorageService.deleteFile(namespace, imageId);
     }
 
     private async readImage(namespace: string, imageId: string): Promise<Readable> {

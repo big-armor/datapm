@@ -36,6 +36,10 @@ export class FileStorageService {
         return this.storageService.writeItem(namespace, itemId, stream, transformer);
     }
 
+    public async fileExists(namespace: string, itemId: string): Promise<boolean> {
+        return this.storageService.itemExists(namespace, itemId);
+    }
+
     public async deleteFile(namespace: string, itemId: string): Promise<void> {
         try {
             return this.storageService.deleteItem(namespace, itemId);

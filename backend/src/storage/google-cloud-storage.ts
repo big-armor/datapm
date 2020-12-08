@@ -44,6 +44,13 @@ export class GoogleCloudStorage implements DPMStorage {
         await file.delete();
     }
 
+    public async itemExists(namespace: string, itemId: string): Promise<boolean> {
+        this.ensureConnectionEstablished();
+        const file = await this.getBucketFile(namespace, itemId);
+
+        return (await file.exists())[0];
+    }
+
     public async getItem(namespace: string, itemId: string): Promise<Readable> {
         this.ensureConnectionEstablished();
         const file = await this.getBucketFile(namespace, itemId);
