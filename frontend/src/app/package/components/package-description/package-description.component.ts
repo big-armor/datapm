@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { PackageFile, parsePackageFileJSON, validatePackageFile } from "datapm-lib";
+import { PackageFile, parsePackageFileJSON, validatePackageFile, validatePackageFileInBrowser } from "datapm-lib";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { Package } from "src/generated/graphql";
