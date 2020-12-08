@@ -146,11 +146,11 @@ export const addPackageToCollection = async (
         .getCustomRepository(PackageRepository)
         .findPackageOrFail({ identifier });
 
-    // const hasVersions = await context.connection.manager
-    //     .getCustomRepository(VersionRepository)
-    //     .findVersions({ packageId: packageEntity.id });
+    const hasVersions = await context.connection.manager
+        .getCustomRepository(VersionRepository)
+        .findVersions({ packageId: packageEntity.id });
 
-    // if (!hasVersions) throw new ApolloError("PACKAGE_HAS_NO_VERSIONS");
+    if (!hasVersions.length) throw new UserInputError("PACKAGE_HAS_NO_VERSIONS");
 
     await context.connection.manager
         .getCustomRepository(CollectionPackageRepository)
