@@ -11,7 +11,7 @@ import {
 import { createUser } from "./test-utils";
 import { describe, it } from "mocha";
 
-describe("User Permissions", async () => {
+describe("Collection Permissions", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
 
@@ -30,7 +30,7 @@ describe("User Permissions", async () => {
             mutation: CreateCollectionDocument,
             variables: {
                 value: {
-                    collectionSlug: "testA-collection",
+                    collectionSlug: "testA-collection-permissions",
                     name: "testing collectionPackages1",
                     description: "asdfsdfsdf"
                 }
@@ -55,7 +55,7 @@ describe("User Permissions", async () => {
             mutation: SetUserCollectionPermissionsDocument,
             variables: {
                 identifier: {
-                    collectionSlug: "testA-collection"
+                    collectionSlug: "testA-collection-permissions"
                 },
                 value: {
                     username: "my-test-user100",
@@ -68,36 +68,13 @@ describe("User Permissions", async () => {
     });
 
     it("attempting to grant permissions to a user that does not exist", async function () {
-        await userAClient.mutate({
-            mutation: CreateCollectionDocument,
-            variables: {
-                value: {
-                    collectionSlug: "testB-collection",
-                    name: "testing collectionPackages2",
-                    description: "asdfsdfsdf"
-                }
-            }
-        });
-
-        await userAClient.mutate({
-            mutation: CreatePackageDocument,
-            variables: {
-                value: {
-                    catalogSlug: "my-test-user100",
-                    packageSlug: "congressional-legislators2",
-                    displayName: "Congressional Legislators2",
-                    description: "Test upload of congressional legislators2"
-                }
-            }
-        });
-
         const newPermissions = [Permission.VIEW];
 
         let response = await userAClient.mutate({
             mutation: SetUserCollectionPermissionsDocument,
             variables: {
                 identifier: {
-                    collectionSlug: "testB-collection"
+                    collectionSlug: "testA-collection-permissions"
                 },
                 value: {
                     username: "my-test-user102",
@@ -110,33 +87,12 @@ describe("User Permissions", async () => {
     });
 
     it("successfully setting permissions for authorized use case", async function () {
-        await userAClient.mutate({
-            mutation: CreateCollectionDocument,
-            variables: {
-                value: {
-                    collectionSlug: "testC-collection",
-                    name: "testing collectionPackages2",
-                    description: "asdfsdfsdf"
-                }
-            }
-        });
-        await userAClient.mutate({
-            mutation: CreatePackageDocument,
-            variables: {
-                value: {
-                    catalogSlug: "my-test-user100",
-                    packageSlug: "congressional-legislators3",
-                    displayName: "Congressional Legislators3",
-                    description: "Test upload of congressional legislators3"
-                }
-            }
-        });
         const newPermissions = [Permission.VIEW];
         let response = await userAClient.mutate({
             mutation: SetUserCollectionPermissionsDocument,
             variables: {
                 identifier: {
-                    collectionSlug: "testC-collection"
+                    collectionSlug: "testA-collection-permissions"
                 },
                 value: {
                     username: "my-test-user101",
@@ -149,37 +105,16 @@ describe("User Permissions", async () => {
     });
 
     it("updating user permissions by changing the permissions list", async function () {
-        await userAClient.mutate({
-            mutation: CreateCollectionDocument,
-            variables: {
-                value: {
-                    collectionSlug: "testE-collection",
-                    name: "testing collectionPackages4",
-                    description: "asdfsdfsdf"
-                }
-            }
-        });
-        await userAClient.mutate({
-            mutation: CreatePackageDocument,
-            variables: {
-                value: {
-                    catalogSlug: "my-test-user100",
-                    packageSlug: "congressional-legislators4",
-                    displayName: "Congressional Legislators4",
-                    description: "Test upload of congressional legislators2"
-                }
-            }
-        });
-        const newPermissions = [Permission.VIEW, Permission.NONE];
+        const newPermissions = [Permission.VIEW, Permission.EDIT];
 
         let response = await userAClient.mutate({
             mutation: SetUserCollectionPermissionsDocument,
             variables: {
                 identifier: {
-                    collectionSlug: "testE-collection"
+                    collectionSlug: "testA-collection-permissions"
                 },
                 value: {
-                    username: "my-test-user100",
+                    username: "my-test-user101",
                     permissions: newPermissions
                 }
             }

@@ -96,7 +96,7 @@ describe("Catalog Permissions", async () => {
             }
         });
 
-        expect(response.errors![0].message).to.equal("User my-test-user202 not found");
+        expect(response.errors![0].message).to.equal("USER_NOT_FOUND - my-test-user202");
     });
 
     it("successfully setting permissions for authorized use case", async function () {

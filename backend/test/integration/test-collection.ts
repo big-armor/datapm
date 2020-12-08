@@ -361,25 +361,16 @@ describe("Collection Tests", async () => {
     });
 
     it("Adding at least three unique packages to a collection", async function () {
-        await userAClient.mutate({
-            mutation: CreateCollectionDocument,
-            variables: {
-                value: {
-                    collectionSlug: "testS-collection",
-                    name: "testing collectionPackages",
-                    description: "collection-packages yay"
-                }
-            }
-        });
-
+        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileString = JSON.stringify(packageFileContents);
         await userAClient.mutate({
             mutation: CreatePackageDocument,
             variables: {
                 value: {
                     catalogSlug: "testA-collection",
-                    packageSlug: "congressional-legislators2",
-                    displayName: "Congressional Legislators2",
-                    description: "Test upload of congressional legislators2"
+                    packageSlug: "congressional-legislators-1",
+                    displayName: "Congressional Legislators-1",
+                    description: "Test upload of congressional legislators"
                 }
             }
         });
@@ -388,86 +379,114 @@ describe("Collection Tests", async () => {
             variables: {
                 value: {
                     catalogSlug: "testA-collection",
-                    packageSlug: "congressional-legislators3",
-                    displayName: "Congressional Legislators3",
-                    description: "Test upload of congressional legislators3"
+                    packageSlug: "congressional-legislators-2",
+                    displayName: "Congressional Legislators-2",
+                    description: "Test upload of congressional legislators"
                 }
             }
         });
-
         await userAClient.mutate({
-            mutation: CreatePackageDocument,
+            mutation: CreateVersionDocument,
             variables: {
+                identifier: {
+                    catalogSlug: "testA-collection",
+                    packageSlug: "congressional-legislators-1"
+                },
                 value: {
-                    catalogSlug: "testA-collection",
-                    packageSlug: "congressional-legislators4",
-                    displayName: "Congressional Legislators4",
-                    description: "Test upload of congressional legislators4"
+                    packageFile: packageFileString
                 }
             }
         });
-
-        let one = await userAClient.mutate({
+        await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-collection",
+                    packageSlug: "congressional-legislators-2"
+                },
+                value: {
+                    packageFile: packageFileString
+                }
+            }
+        });
+        await userAClient.mutate({
             mutation: AddPackageToCollectionDocument,
             variables: {
                 collectionIdentifier: {
-                    collectionSlug: "testS-collection"
+                    collectionSlug: "testA-collection"
                 },
                 packageIdentifier: {
                     catalogSlug: "testA-collection",
-                    packageSlug: "congressional-legislators2"
+                    packageSlug: "congressional-legislators"
                 }
             }
         });
-
-        // console.log("one: ", one.data?.addPackageToCollection?.package);
-
-        let two = await userAClient.mutate({
+        await userAClient.mutate({
             mutation: AddPackageToCollectionDocument,
             variables: {
                 collectionIdentifier: {
-                    collectionSlug: "testS-collection"
+                    collectionSlug: "testA-collection"
                 },
                 packageIdentifier: {
                     catalogSlug: "testA-collection",
-                    packageSlug: "congressional-legislators3"
+                    packageSlug: "congressional-legislators-1"
                 }
             }
         });
-
-        // console.log("two: ", two.data?.addPackageToCollection?.package);
-
-        let three = await userAClient.mutate({
+        await userAClient.mutate({
             mutation: AddPackageToCollectionDocument,
             variables: {
                 collectionIdentifier: {
-                    collectionSlug: "testS-collection"
+                    collectionSlug: "testA-collection"
                 },
                 packageIdentifier: {
                     catalogSlug: "testA-collection",
-                    packageSlug: "congressional-legislators4"
+                    packageSlug: "congressional-legislators-2"
                 }
             }
         });
-
-        // console.log("there: ", three.data?.addPackageToCollection?.package);
-        // debugger;
-
         const response = await userAClient.query({
             query: CollectionPackagesDocument,
             variables: {
                 identifier: {
-                    collectionSlug: "testS-collection"
+                    collectionSlug: "testA-collection"
                 },
                 limit: 10,
                 offset: 0
             }
         });
+        expect(response.errors == null).true;
+        expect(response.data?.collectionPackages?.length).to.equal(3);
+    });
 
-        // console.log(response.data?.collectionPackages);
+    it("Package returns error if Version does not exist", async function () {
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "testA-collection",
+                    packageSlug: "congressional-legislators-4",
+                    displayName: "Congressional Legislators-4",
+                    description: "Test upload of congressional legislators"
+                }
+            }
+        });
 
-        // expect(response.errors == null).true;
-        // expect(response.data?.collectionPackages?.length).to.equal(3);
+        let response = await userAClient.mutate({
+            mutation: AddPackageToCollectionDocument,
+            variables: {
+                collectionIdentifier: {
+                    collectionSlug: "testA-collection"
+                },
+                packageIdentifier: {
+                    catalogSlug: "testA-collection",
+                    packageSlug: "congressional-legislators-4"
+                }
+            }
+        });
+
+        expect(response.errors != null).true;
+        expect(response.errors![0].message).to.equal("PACKAGE_HAS_NO_VERSIONS");
     });
 
     it("Anonymous get collection", async function () {
