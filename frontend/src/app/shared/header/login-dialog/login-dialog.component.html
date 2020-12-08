@@ -4,47 +4,43 @@
     </div>
     <h1 mat-dialog-title class="dialog-title">datapm</h1>
     <p class="dialog-description">Welcome back!</p>
-    <mat-horizontal-stepper labelPosition="bottom" #stepper>
-        <mat-step>
-            <div mat-dialog-content>
-                <form [formGroup]="loginForm" (ngSubmit)="formSubmit()">
-                    <app-input
-                        placeholder="username or email address"
-                        [group]="loginForm"
-                        controlName="username"
-                        [error]="loginForm | inputError: 'username' | async"
-                    >
-                    </app-input>
-                    <br />
-                    <app-input inputType="password" placeholder="password" [group]="loginForm" controlName="password">
-                    </app-input>
-                    <p class="forgot-pass">
-                        <a href="#" (click)="openForgotPasswordDialog($event)">Forgot password?</a>
-                    </p>
-                    <br />
-                    <div class="alert-div">
-                        <div class="alert-warn" *ngIf="state == State.LOGIN_ERROR_VALIDATE_EMAIL">
-                            You have not verified your email address. Check your email inbox for a "Verify Your Account"
-                            email, and click the "Verify My Email Address" button. You can then log-in.
-                        </div>
-                        <div class="alert-warn" *ngIf="state == State.INCORRECT_LOGIN">
-                            Your username and password were not correct.
-                        </div>
-                        <div class="alert-warn" *ngIf="state == State.LOGIN_ERROR">
-                            There was a problem communicating with the server. Please try again, or contact support.
-                        </div>
-                    </div>
-                    <div class="content-btn text-center">
-                        <button type="submit" [class.disabled]="!loginForm.valid" class="submit-btn">
-                            <span *ngIf="state != State.AWAITING_RESPONSE" class="btn-text">Login</span>
-                            <span *ngIf="state == State.AWAITING_RESPONSE" class="loading-spinner">
-                                <mat-spinner diameter="25"></mat-spinner>
-                            </span>
-                        </button>
-                        <br />
-                    </div>
-                </form>
+    <div mat-dialog-content>
+        <form [formGroup]="loginForm" (ngSubmit)="formSubmit()">
+            <app-input
+                placeholder="username or email address"
+                [group]="loginForm"
+                controlName="username"
+                [error]="loginForm | inputError: 'username' | async"
+            >
+            </app-input>
+            <br />
+            <app-input inputType="password" placeholder="password" [group]="loginForm" controlName="password">
+            </app-input>
+            <p class="forgot-pass mt-3 ml-3">
+                <a href="#" (click)="openForgotPasswordDialog($event)">Forgot password?</a>
+            </p>
+            <br />
+            <div class="alert-div">
+                <div class="alert-warn" *ngIf="state == State.LOGIN_ERROR_VALIDATE_EMAIL">
+                    You have not verified your email address. Check your email inbox for a "Verify Your Account" email,
+                    and click the "Verify My Email Address" button. You can then log-in.
+                </div>
+                <div class="alert-warn" *ngIf="state == State.INCORRECT_LOGIN">
+                    Your username and password were not correct.
+                </div>
+                <div class="alert-warn" *ngIf="state == State.LOGIN_ERROR">
+                    There was a problem communicating with the server. Please try again, or contact support.
+                </div>
             </div>
-        </mat-step>
-    </mat-horizontal-stepper>
+            <div class="content-btn text-center">
+                <button type="submit" class="app-raised-button mb-1 mt-4" [disabled]="!loginForm.valid">
+                    <span *ngIf="state != State.AWAITING_RESPONSE" class="btn-text">Login</span>
+                    <span *ngIf="state == State.AWAITING_RESPONSE" class="loading-spinner">
+                        <mat-spinner diameter="25"></mat-spinner>
+                    </span>
+                </button>
+                <br />
+            </div>
+        </form>
+    </div>
 </div>

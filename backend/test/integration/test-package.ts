@@ -550,13 +550,14 @@ describe("Package Tests", async () => {
             })
             .catch((error: ErrorResponse) => {
                 let fetchResult = error.networkError as ServerError;
+
                 if (
-                    fetchResult.result.errors.find(
-                        (e: { extensions: { exception: { stacktrace: string[] } } }) =>
-                            e.extensions.exception.stacktrace.find((s) =>
-                                s.startsWith("Error: ERROR_PARSING_PACKAGE_FILE")
-                            ) != null
-                    ) != null
+                    fetchResult.result.errors.find((e: { extensions: { exception: { stacktrace: string[] } } }) => {
+                        return (
+                            e.extensions.exception.stacktrace.find((s) => s.includes("ERROR_PARSING_PACKAGE_FILE")) !=
+                            null
+                        );
+                    }) != null
                 )
                     errorFound = true;
             })
@@ -589,12 +590,12 @@ describe("Package Tests", async () => {
             .catch((error: ErrorResponse) => {
                 let fetchResult = error.networkError as ServerError;
                 if (
-                    fetchResult.result.errors.find(
-                        (e: { extensions: { exception: { stacktrace: string[] } } }) =>
-                            e.extensions.exception.stacktrace.find((s) =>
-                                s.startsWith("ValidationError: INVALID_PACKAGE_FILE_SCHEMA")
-                            ) != null
-                    ) != null
+                    fetchResult.result.errors.find((e: { extensions: { exception: { stacktrace: string[] } } }) => {
+                        return (
+                            e.extensions.exception.stacktrace.find((s) => s.includes("INVALID_PACKAGE_FILE_SCHEMA")) !=
+                            null
+                        );
+                    }) != null
                 )
                     errorFound = true;
             })

@@ -2,6 +2,7 @@ import { SemVer } from "semver";
 import { Schema, PackageFile } from "./main";
 import fs from "fs";
 import path from "path";
+import AJV from "ajv";
 
 export type DPMRecordValue =
     | number
@@ -442,14 +443,55 @@ export function loadPackageFileFromDisk(packageFilePath: string): PackageFile {
 }
 
 export function parsePackageFileJSON(packageFileString: string): PackageFile {
+    let rawPackageFile;
     try {
-        const packageFile = JSON.parse(packageFileString, (key, value) => {
-            if (key !== "updatedDate" && key !== "createdAt" && key !== "updatedAt") return value;
-
-            return new Date(Date.parse(value));
-        }) as PackageFile;
-        return packageFile;
+        rawPackageFile = JSON.parse(packageFileString);
     } catch (error) {
         throw new Error("ERROR_PARSING_PACKAGE_FILE: " + error.message);
+    }
+
+    validatePackageFile(rawPackageFile);
+
+    const packageFile = JSON.parse(packageFileString, (key, value) => {
+        if (key !== "updatedDate" && key !== "createdAt" && key !== "updatedAt") return value;
+
+        return new Date(Date.parse(value));
+    }) as PackageFile;
+
+    return packageFile;
+}
+
+export function validatePackageFile(packageFile: unknown): void {
+    const ajv = new AJV({
+        format: false // https://www.npmjs.com/package/ajv#redos-attack
+    });
+
+    let packageSchemaFile: string;
+    try {
+        const pathToDataPmLib = require.resolve("datapm-lib").replace(path.sep + "src" + path.sep + "main.js", "");
+        packageSchemaFile = fs.readFileSync(path.join(pathToDataPmLib, "packageFileSchema.json"), "utf8");
+    } catch (error) {
+        try {
+            packageSchemaFile = fs.readFileSync("packageFileSchema.json", "utf8");
+        } catch (error) {
+            packageSchemaFile = fs.readFileSync(path.join("..", "lib", "packageFileSchema.json"), "utf8");
+        }
+    }
+
+    let schemaObject;
+    try {
+        schemaObject = JSON.parse(packageSchemaFile);
+    } catch (error) {
+        throw new Error("ERROR_PARSING_PACKAGE_FILE: " + error.message);
+    }
+
+    if (!ajv.validateSchema(schemaObject)) {
+        throw new Error("ERROR_READING_SCHEMA");
+    }
+
+    const response = ajv.validate(schemaObject, packageFile);
+
+    if (!response) {
+        throw new Error("INVALID_PACKAGE_FILE_SCHEMA: " + JSON.stringify(ajv.errors));
     }
 }
