@@ -41,7 +41,7 @@ export class FileStorageService {
             return this.storageService.deleteItem(namespace, itemId);
         } catch (error) {
             if (error.message.includes("FILE_DOES_NOT_EXIST")) {
-                console.warn("Tried deleting a file that does not exist" + namespace + " " + imageId);
+                console.warn("Tried deleting a file that does not exist" + namespace + "/" + itemId);
                 return;
             }
 
