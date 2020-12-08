@@ -468,7 +468,7 @@ export function validatePackageFile(packageFile: unknown): void {
 
     let packageSchemaFile: string;
     try {
-        const pathToDataPmLib = require.resolve("datapm-lib");
+        const pathToDataPmLib = require.resolve("datapm-lib").replace(path.sep + "src" + path.sep + "main.js", "");
         packageSchemaFile = fs.readFileSync(path.join(pathToDataPmLib, "packageFileSchema.json"), "utf8");
     } catch (error) {
         try {
