@@ -46,7 +46,8 @@ import {
     nextVersion,
     PackageFile,
     Compability,
-    parsePackageFileJSON
+    parsePackageFileJSON,
+    validatePackageFile
 } from "datapm-lib";
 import graphqlFields from "graphql-fields";
 import {
@@ -137,13 +138,10 @@ export const resolvers: {
             return JSON.stringify(value);
         },
         parseValue: (value: any) => {
-            try {
-                const packageFileObject = parsePackageFileJSON(value);
+            validatePackageFile(value);
+            const packageFileObject = parsePackageFileJSON(value);
 
-                return packageFileObject;
-            } catch (error) {
-                throw new ValidationError(error.message);
-            }
+            return packageFileObject;
         }
     }),
     Password: new GraphQLScalarType({

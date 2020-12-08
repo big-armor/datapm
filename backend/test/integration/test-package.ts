@@ -550,7 +550,7 @@ describe("Package Tests", async () => {
             })
             .catch((error: ErrorResponse) => {
                 let fetchResult = error.networkError as ServerError;
-
+                console.log(JSON.stringify(fetchResult, null, 1));
                 if (
                     fetchResult.result.errors.find((e: { extensions: { exception: { stacktrace: string[] } } }) => {
                         return (

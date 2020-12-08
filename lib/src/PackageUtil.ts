@@ -413,8 +413,11 @@ export function loadPackageFileFromDisk(packageFilePath: string): PackageFile {
 
     let packageFile;
 
+    const packageFileContents = fs.readFileSync(packageFilePath).toString();
+
+    validatePackageFile(packageFileContents);
+
     try {
-        const packageFileContents = fs.readFileSync(packageFilePath).toString();
         packageFile = parsePackageFileJSON(packageFileContents);
     } catch (error) {
         throw new Error("PACKAGE_PARSE_ERROR: " + error.message);
@@ -444,49 +447,81 @@ export function loadPackageFileFromDisk(packageFilePath: string): PackageFile {
 }
 
 export function parsePackageFileJSON(packageFileString: string): PackageFile {
-    let rawPackageFile;
     try {
-        rawPackageFile = JSON.parse(packageFileString);
+        const packageFile = JSON.parse(packageFileString, (key, value) => {
+            if (key !== "updatedDate" && key !== "createdAt" && key !== "updatedAt") return value;
+
+            return new Date(Date.parse(value));
+        }) as PackageFile;
+        return packageFile;
     } catch (error) {
-        throw new Error("ERROR_PARSING_PACKAGE_FILE: " + error.message);
+        throw new Error("ERROR_PARSING_PACKAGE_FILE - " + error.message);
     }
-
-    validatePackageFile(rawPackageFile);
-
-    const packageFile = JSON.parse(packageFileString, (key, value) => {
-        if (key !== "updatedDate" && key !== "createdAt" && key !== "updatedAt") return value;
-
-        return new Date(Date.parse(value));
-    }) as PackageFile;
-
-    return packageFile;
 }
 
-export async function validatePackageFile(packageFile: unknown): Promise<void> {
+export async function validatePackageFileInBrowser(packageFile: string): Promise<void> {
     const ajv = new AJV({
         format: false // https://www.npmjs.com/package/ajv#redos-attack
     });
 
     let packageSchemaFile: string;
 
-    if (typeof window === undefined) {
-        try {
-            const pathToDataPmLib = require.resolve("datapm-lib").replace(path.sep + "src" + path.sep + "main.js", "");
-            packageSchemaFile = fs.readFileSync(path.join(pathToDataPmLib, "packageFileSchema.json"), "utf8");
-        } catch (error) {
-            try {
-                packageSchemaFile = fs.readFileSync("packageFileSchema.json", "utf8");
-            } catch (error) {
-                packageSchemaFile = fs.readFileSync(path.join("..", "lib", "packageFileSchema.json"), "utf8");
-            }
-        }
-    } else {
-        const response = await fetch("/docs/datapm-package-file-schema-v1.json");
+    const response = await fetch("/docs/datapm-package-file-schema-v1.json");
 
-        if (response.status > 199 && response.status < 300) {
-            packageSchemaFile = await response.text();
-        } else {
-            throw new Error("Error finding package file " + response.status);
+    if (response.status > 199 && response.status < 300) {
+        packageSchemaFile = await response.text();
+    } else {
+        throw new Error("ERROR_FINDING_PACKAGE_SCHEMA_FILE " + response.status);
+    }
+
+    let schemaObject;
+    try {
+        schemaObject = JSON.parse(packageSchemaFile);
+    } catch (error) {
+        throw new Error("ERROR_PARSING_PACKAGE_SCHEMA_FILE: " + error.message);
+    }
+
+    if (!ajv.validateSchema(schemaObject)) {
+        throw new Error("ERROR_READING_SCHEMA");
+    }
+
+    let packageFileObject;
+    try {
+        packageFileObject = JSON.parse(packageFile);
+    } catch (error) {
+        throw new Error("ERROR_PARSING_PACKAGE_FILE - " + error.message);
+    }
+
+    const ajvResponse = ajv.validate(schemaObject, packageFileObject);
+
+    if (!ajvResponse) {
+        throw new Error("INVALID_PACKAGE_FILE_SCHEMA: " + JSON.stringify(ajv.errors));
+    }
+}
+
+export function validatePackageFile(packageFile: string): void {
+    let packageFileObject;
+
+    try {
+        packageFileObject = JSON.parse(packageFile);
+    } catch (error) {
+        throw new Error("ERROR_PARSING_PACKAGE_FILE - " + error.message);
+    }
+
+    const ajv = new AJV({
+        format: false // https://www.npmjs.com/package/ajv#redos-attack
+    });
+
+    let packageSchemaFile: string;
+
+    try {
+        const pathToDataPmLib = require.resolve("datapm-lib").replace(path.sep + "src" + path.sep + "main.js", "");
+        packageSchemaFile = fs.readFileSync(path.join(pathToDataPmLib, "packageFileSchema.json"), "utf8");
+    } catch (error) {
+        try {
+            packageSchemaFile = fs.readFileSync("packageFileSchema.json", "utf8");
+        } catch (error) {
+            packageSchemaFile = fs.readFileSync(path.join("..", "lib", "packageFileSchema.json"), "utf8");
         }
     }
 
@@ -494,14 +529,14 @@ export async function validatePackageFile(packageFile: unknown): Promise<void> {
     try {
         schemaObject = JSON.parse(packageSchemaFile);
     } catch (error) {
-        throw new Error("ERROR_PARSING_PACKAGE_FILE: " + error.message);
+        throw new Error("ERROR_PARSING_PACKAGE_SCHEMA_FILE: " + error.message);
     }
 
     if (!ajv.validateSchema(schemaObject)) {
         throw new Error("ERROR_READING_SCHEMA");
     }
 
-    const response = ajv.validate(schemaObject, packageFile);
+    const response = ajv.validate(schemaObject, packageFileObject);
 
     if (!response) {
         throw new Error("INVALID_PACKAGE_FILE_SCHEMA: " + JSON.stringify(ajv.errors));

@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { PackageFile, parsePackageFileJSON } from "datapm-lib";
+import { PackageFile, parsePackageFileJSON, validatePackageFile } from "datapm-lib";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { Package } from "src/generated/graphql";
@@ -20,6 +20,8 @@ export class PackageDescriptionComponent {
             if (p == null || p.package == null) return;
 
             this.package = p.package;
+
+            validatePackageFileInBrowser(p.package.latestVersion.packageFile);
             this.packageFile = parsePackageFileJSON(p.package.latestVersion.packageFile);
         });
     }
