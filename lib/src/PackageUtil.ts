@@ -469,7 +469,7 @@ export function validatePackageFile(packageFile: unknown): void {
     let schema: string;
 
     try {
-        schema = fs.readFileSync("node_modules/datapm-lib/packageFileSchema.json", "utf8");
+        schema = fs.readFileSync(path.join(__dirname, "node_modules", "datapm-lib", "packageFileSchema.json"), "utf8");
     } catch (error) {
         if (error.message.includes("ENOENT")) {
             schema = fs.readFileSync("packageFileSchema.json", "utf8");
