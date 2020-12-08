@@ -466,21 +466,21 @@ export function validatePackageFile(packageFile: unknown): void {
         format: false // https://www.npmjs.com/package/ajv#redos-attack
     });
 
-    let schema: string;
-
+    let packageSchemaFile: string;
     try {
-        schema = fs.readFileSync(path.join(__dirname, "node_modules", "datapm-lib", "packageFileSchema.json"), "utf8");
+        const pathToDataPmLib = require.resolve("datapm-lib");
+        packageSchemaFile = fs.readFileSync(path.join(pathToDataPmLib, "packageFileSchema.json"), "utf8");
     } catch (error) {
-        if (error.message.includes("ENOENT")) {
-            schema = fs.readFileSync("packageFileSchema.json", "utf8");
-        } else {
-            throw error;
+        try {
+            packageSchemaFile = fs.readFileSync("packageFileSchema.json", "utf8");
+        } catch (error) {
+            packageSchemaFile = fs.readFileSync(path.join("..", "lib", "packageFileSchema.json"), "utf8");
         }
     }
 
     let schemaObject;
     try {
-        schemaObject = JSON.parse(schema);
+        schemaObject = JSON.parse(packageSchemaFile);
     } catch (error) {
         throw new Error("ERROR_PARSING_PACKAGE_FILE: " + error.message);
     }
