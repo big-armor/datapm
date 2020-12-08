@@ -2,6 +2,13 @@
     cursor: pointer;
     box-shadow: -4px 0 4px hsla(0, 0%, 100%, 0.25), 0 -4px 4px hsla(0, 0%, 100%, 0.25),
         0 4px 4px hsla(0, 0%, 74.1%, 0.25), 4px 0 4px hsla(0, 0%, 74.1%, 0.25);
+
+    background-color: #f9f9f9;
+    &:hover {
+        background-color: white;
+        transition: background-color 0.5s ease;
+    }
+    transition: background-color 0.5s ease;
 }
 
 .flex-1 {

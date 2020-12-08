@@ -59,7 +59,6 @@
     app-input {
         display: block;
         min-width: 348px;
-        max-width: 380px;
         margin-top: 20px;
     }
 
@@ -69,7 +68,6 @@
         border: none;
         border-radius: 24px;
         padding: 10px 20px;
-        background-color: #fff;
         -webkit-appearance: none !important;
         box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25),
             inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
@@ -119,7 +117,6 @@
         height: 36px;
         margin: 30px 0 15px;
         border: none;
-        background: #fff;
 
         .btn-text {
             font-family: Roboto Mono;
@@ -129,19 +126,6 @@
             align-items: center;
             text-align: center;
             color: #828282;
-        }
-
-        &:hover {
-            background-color: #dddddd9c;
-        }
-    }
-
-    .disabled {
-        background-color: #cccccc85;
-        pointer-events: none;
-        opacity: 0.6;
-        .btn-text {
-            color: #82828273;
         }
     }
 
@@ -258,6 +242,9 @@
             &::placeholder {
                 font-size: 12px;
             }
+        }
+        app-input {
+            min-width: inherit;
         }
         .submit-btn {
             height: 30px;
