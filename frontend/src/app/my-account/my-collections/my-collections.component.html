@@ -18,6 +18,13 @@
                 <span class="pr-2">My Collections</span>
             </div>
 
+            <div class="pl-4 pr-4 mb-4">
+                <p>
+                    Collections are groupings of data packages that you can use to organize your interests, and share
+                    with others. <a target="_blank" href="/docs/concepts/collections">Learn more about collections</a>
+                </p>
+            </div>
+
             <!-- Package without thumbnail -->
             <table *ngIf="collections && collections.length > 0" mat-table [dataSource]="collections">
                 <!-- Label column -->
