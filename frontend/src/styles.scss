@@ -155,9 +155,9 @@ body {
 }
 
 .app-raised-button {
-    outline: #fff solid 0px;
+    outline: none !important;
     box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
-        0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
+        0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25) !important;
     border-radius: 24px;
     height: 36px;
     border: none;
@@ -172,7 +172,10 @@ body {
     padding: 0 1.5em;
 
     &:hover {
-        background-color: #dddddd9c;
+        background-color: #f9f9f9;
+    }
+    &:active {
+        box-shadow: none !important;
     }
 
     &:disabled {
@@ -185,11 +188,10 @@ body {
 .app-fab-button.app-fab-button {
     width: 40px;
     height: 40px;
-    box-shadow: 0px 1px 7px 4px rgb(90 88 88 / 25%);
     background: white;
 
     &:focus {
-        outline: transparent solid 0px !important;
+        outline: none !important;
     }
 
     .mat-button-wrapper {
