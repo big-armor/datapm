@@ -225,7 +225,17 @@ export class UserRepository extends Repository<User> {
         return this.manager.getRepository(User).createQueryBuilder(ALIAS).addRelations(ALIAS, relations).getMany();
     }
 
-    async search({ value, relations = [] }: { value: string; relations?: string[] }): Promise<[User[], number]> {
+    async search({
+        value,
+        limit,
+        offSet,
+        relations = []
+    }: {
+        value: string;
+        limit: number;
+        offSet: number;
+        relations?: string[];
+    }): Promise<[User[], number]> {
         const ALIAS = "search";
         return await this.manager
             .getRepository(User)
@@ -239,6 +249,8 @@ export class UserRepository extends Repository<User> {
                 }
             )
             .addRelations(ALIAS, relations)
+            .limit(limit)
+            .offset(offSet)
             .getManyAndCount();
     }
 

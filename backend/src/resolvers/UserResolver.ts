@@ -14,12 +14,18 @@ import { hashPassword } from "../util/PasswordUtil";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 
-export const searchUsers = async (_0: any, { value }: { value: string }, context: AuthenticatedContext, info: any) => {
+export const searchUsers = async (
+    _0: any,
+    { value, limit, offSet }: { value: string; limit: number; offSet: number },
+    context: AuthenticatedContext,
+    info: any
+) => {
     const [searchResponse, count] = await context.connection.manager
         .getCustomRepository(UserRepository)
-        .search({ value });
+        .search({ value, limit, offSet });
 
     return {
+        hasMore: count - (offSet + limit) > 0,
         users: searchResponse,
         count
     };

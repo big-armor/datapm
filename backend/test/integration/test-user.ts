@@ -120,32 +120,40 @@ describe("User Tests", async () => {
         expect(userA.user.lastName).equal("LastA");
     });
 
-    it("Search Users By Username, Email, Firstname", async function () {
+    it("Search Users By Username, Email, Firstname, Lastname", async function () {
         let firstName = await userAClient.query({
             query: SearchUsersDocument,
             variables: {
-                value: "Fir"
+                value: "Fir",
+                limit: 5,
+                offset: 0
             }
         });
 
         let lastName = await userAClient.query({
             query: SearchUsersDocument,
             variables: {
-                value: "Las"
+                value: "Las",
+                limit: 5,
+                offset: 0
             }
         });
 
         let email = await userAClient.query({
             query: SearchUsersDocument,
             variables: {
-                value: "testA-user@te"
+                value: "testA-user@te",
+                limit: 5,
+                offset: 0
             }
         });
 
         let username = await userAClient.query({
             query: SearchUsersDocument,
             variables: {
-                value: "testA-"
+                value: "testA-",
+                limit: 5,
+                offset: 0
             }
         });
 
