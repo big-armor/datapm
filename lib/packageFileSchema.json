@@ -196,11 +196,11 @@
                                 "description": "Whether a record count is exact or approximate",
                                 "default": false
                             },
-                            "recordUnit": {
-                                "$id": "#/schemas/statistics/recordUnit",
+                            "unit": {
+                                "$id": "#/schemas/statistics/unit",
                                 "type": "string",
-                                "title": "Record Unit",
-                                "description": "What each record in the data represents. Example: Country, Person, Location and Time, etc",
+                                "title": "Unit",
+                                "description": "What schema or a property in the data represents. Example: Country, Person, Location and Time, etc",
                                 "maxLength": 128
                             },
 

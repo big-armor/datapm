@@ -4,7 +4,7 @@
         {{ schema.description }}
     </div>
     <div class="schema-samples" *ngIf="schema.sampleRecords?.length > 0">
-        {{ schema.recordCount | number }} {{ schema.recordUnit || "" }} records<br />
+        {{ schema.recordCount | number }} {{ schema.unit || "" }} records<br />
         {{ schemaPropertiesLength(schema) | number }} properties
     </div>
     <div class="accordions-group mt-2">
