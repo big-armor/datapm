@@ -31,7 +31,9 @@
                 <ng-container matColumnDef="name">
                     <th mat-header-cell *matHeaderCellDef>Name</th>
                     <td class="table-content" mat-cell *matCellDef="let collection">
-                        <a [routerLink]="['/' + collection.identifier.collectionSlug]">{{ collection.name }}</a>
+                        <a [routerLink]="['/collections/' + collection.identifier.collectionSlug]">{{
+                            collection.name
+                        }}</a>
                     </td>
                 </ng-container>
 

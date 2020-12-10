@@ -12,6 +12,11 @@ const staticRoutes: Route[] = [
         loadChildren: () => import("./search/search.module").then((m) => m.SearchModule)
     },
     {
+        path: "collections/:collectionSlug",
+        loadChildren: () =>
+            import("./collection-details/collection-details.module").then((m) => m.CollectionDetailsModule)
+    },
+    {
         path: "me",
         loadChildren: () => import("./my-account/my-account.module").then((m) => m.MyAccountModule),
         canActivate: [AuthGuard]

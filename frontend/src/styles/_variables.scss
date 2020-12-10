@@ -1,0 +1,32 @@
+$cover-height: 224px;
+$page-header-height: 136px;
+
+$white: #fff;
+$gray-1: #333;
+$gray-2: #4f4f4f;
+$gray-3: #828282;
+$gray-4: #bdbdbd;
+$gray-5: #e0e0e0;
+$gray-6: #f2f2f2;
+$custom-gray-1: #aeaeae;
+$color-1: #00a896;
+$color-2: rgba($color-1, 0.8);
+$color-3: rgba($color-1, 0.6);
+$color-4: rgba($color-1, 0.4);
+$color-5: rgba($color-1, 0.2);
+$color-6: rgba($color-1, 0.1);
+$color-info: #017fb9;
+$color-success: #2eb244;
+$color-warning: #efd54b;
+$color-danger: #e23326;
+
+$outer-shadow-1: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+    0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+$outer-shadow-2: -4px 0px 4px rgba(130, 130, 130, 0.25), 0px -4px 4px rgba(130, 130, 130, 0.25),
+    4px 0px 4px rgba(51, 51, 51, 0.25), 0px 4px 4px rgba(51, 51, 51, 0.25);
+$outer-shadow-3: 0px 4px 4px rgba(183, 183, 183, 0.25);
+
+$inner-shadow-1: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25),
+    inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
+$inner-shadow-2: inset -4px 0px 4px rgba(130, 130, 130, 0.25), inset 0px -4px 4px rgba(130, 130, 130, 0.25),
+    inset 4px 0px 4px rgba(51, 51, 51, 0.25), inset 0px 4px 4px rgba(51, 51, 51, 0.25);

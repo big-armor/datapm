@@ -1,20 +1,18 @@
 /* You can add global styles to this file, and also import other style files */
 @import "~bootstrap/dist/css/bootstrap.min.css";
+@import "./variables.scss";
+@import "./typography";
 
 html,
 body {
     height: 100%;
     overflow-x: hidden;
-    background-color: #f2f2f2;
+    background-color: $gray-6;
 }
 
 a {
-    font-family: Roboto Mono;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 13px;
-    letter-spacing: -0.28px;
-    color: #017fb9;
+    @include text("small");
+    color: $color-info;
 }
 body {
     margin: 0;
@@ -22,7 +20,7 @@ body {
 }
 
 .mat-spinner circle {
-    stroke: #828282 !important;
+    stroke: $gray-3 !important;
 }
 
 .loading-spinner {
@@ -39,10 +37,10 @@ body {
     background-color: inherit;
 }
 .mat-dialog-container {
-    background-color: #f2f2f2;
+    background-color: $gray-6;
 }
 .mat-header-row {
-    background-color: white;
+    background-color: $white;
 }
 
 .loading-pane {
@@ -58,13 +56,8 @@ body {
 .mat-menu-content {
     button.mat-menu-item {
         border-bottom: 1px solid rgb(0 0 0 / 5%) !important;
-        font-family: Roboto Mono;
-        font-style: normal;
-        font-weight: normal;
-        font-size: 14px;
-        line-height: 18px;
-        letter-spacing: -0.28px;
-        color: #4f4f4f;
+        @include text("body");
+        color: $gray-2;
         &:last-child {
             border-bottom: none !important;
         }
@@ -72,13 +65,13 @@ body {
 }
 
 .notification-error {
-    background-color: #b0003a;
-    color: white;
+    background-color: $color-danger;
+    color: $white;
 }
 
 .notification-success {
-    background-color: #388e3c;
-    color: white;
+    background-color: $color-success;
+    color: $white;
 }
 
 .submit-btn {
@@ -86,20 +79,20 @@ body {
     transition: background-color ease 0.5s;
 
     &:hover {
-        background-color: #f9f9f9;
+        background-color: $gray-6;
         transition: background-color ease 0.5s;
     }
 
     &:focus {
-        background-color: #ddd;
+        background-color: $gray-5;
     }
 
     .disabled {
-        background-color: #ddd;
+        background-color: $gray-4;
         pointer-events: none;
         opacity: 0.6;
         .btn-text {
-            color: #82828273;
+            color: $gray-3;
         }
     }
 }
@@ -122,10 +115,10 @@ body {
 .app-slide-toggle.mat-checked {
     .mat-slide-toggle-bar,
     .mat-ripple-element {
-        background-color: #00a896;
+        background-color: $color-1;
     }
     .mat-slide-toggle-thumb {
-        background-color: #fff;
+        background-color: $white;
     }
 }
 
@@ -136,47 +129,41 @@ body {
     height: 44px;
     border: none;
     outline: none;
-    background-color: #f9f9f9;
-    box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25),
-        inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
+    background-color: $gray-6;
+    box-shadow: $inner-shadow-1;
     transition: background-color ease 0.5s;
     &:hover {
-        background-color: white;
+        background-color: $white;
         transition: background-color ease 0.5s;
     }
     &::placeholder {
-        font-family: Roboto Mono;
-        font-style: normal;
-        font-weight: 300;
-        font-size: 14px;
-        letter-spacing: -0.28px;
-        color: #bdbdbd;
+        @include text("body");
+        color: $gray-4;
     }
 }
 
 .app-raised-button {
-    outline: #fff solid 0px;
-    box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
-        0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
+    outline: none;
+    box-shadow: $outer-shadow-1;
     border-radius: 24px;
     height: 36px;
     border: none;
-    background: #fff;
+    background: $white;
     font-family: Roboto Mono;
     font-style: normal;
     font-weight: 300;
     font-size: 18px;
     align-items: center;
     text-align: center;
-    color: #828282;
+    color: $gray-3;
     padding: 0 1.5em;
 
     &:hover {
-        background-color: #dddddd9c;
+        background-color: $gray-5;
     }
 
     &:disabled {
-        background-color: #cccccc85;
+        background-color: $gray-4;
         pointer-events: none;
         opacity: 0.6;
     }
@@ -186,7 +173,7 @@ body {
     width: 40px;
     height: 40px;
     box-shadow: 0px 1px 7px 4px rgb(90 88 88 / 25%);
-    background: white;
+    background: $white;
 
     &:focus {
         outline: transparent solid 0px !important;
@@ -196,7 +183,7 @@ body {
         padding: 0 !important;
 
         .mat-icon {
-            color: #828282;
+            color: $gray-3;
             font-size: 26px;
             width: unset;
             height: 32px;
@@ -230,4 +217,20 @@ body {
         text-decoration: none;
         background-color: rgba(240, 240, 240, 0.783);
     }
+}
+
+.dpm-page-loading {
+    min-height: 240px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dpm-no-data {
+    @include text("body");
+    color: $gray-2;
+    min-height: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
