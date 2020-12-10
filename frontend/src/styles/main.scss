@@ -231,6 +231,7 @@ body {
     color: $gray-2;
     min-height: 240px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
 }

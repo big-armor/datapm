@@ -16,6 +16,7 @@
             </app-package-item>
             <div class="dpm-no-data" *ngIf="!collection.packages?.length">
                 <p>There are no packages available.</p>
+                <a class="app-outlined-button mt-3">Create collection</a>
             </div>
         </div>
         <div class="dpm-page-loading" *ngIf="state === 'LOADING'">

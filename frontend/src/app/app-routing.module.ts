@@ -12,7 +12,7 @@ const staticRoutes: Route[] = [
         loadChildren: () => import("./search/search.module").then((m) => m.SearchModule)
     },
     {
-        path: "collections/:collectionSlug",
+        path: "collection/:collectionSlug",
         loadChildren: () =>
             import("./collection-details/collection-details.module").then((m) => m.CollectionDetailsModule)
     },

@@ -1,9 +1,11 @@
-::ng-deep .cover {
-    height: 150px;
-}
+:host {
+    ::ng-deep .cover {
+        height: 150px;
+    }
 
-::ng-deep .avatar {
-    display: inline-block;
+    ::ng-deep .avatar {
+        display: inline-block;
+    }
 }
 
 .identifier {
@@ -307,7 +309,7 @@ hr {
 }
 
 @media (max-width: 575px) {
-    ::ng-deep .cover {
+    :host ::ng-deep .cover {
         height: 75px;
     }
     #packagePage {
