@@ -1,6 +1,6 @@
 import { ApolloClient, FetchResult, NormalizedCacheObject, ServerError } from "@apollo/client/core";
 import { expect } from "chai";
-import { MeDocument, UserDocument, UpdateMeDocument, LoginMutation } from "./registry-client";
+import { MeDocument, UserDocument, UpdateMeDocument, LoginMutation, SearchUsersDocument } from "./registry-client";
 import { createUser } from "./test-utils";
 import { describe, it } from "mocha";
 
@@ -118,6 +118,41 @@ describe("User Tests", async () => {
         expect(userA.user.nameIsPublic).to.equal(true);
         expect(userA.user.firstName).equal("FirstA");
         expect(userA.user.lastName).equal("LastA");
+    });
+
+    it("Search Users By Username, Email, Firstname", async function () {
+        let firstName = await userAClient.query({
+            query: SearchUsersDocument,
+            variables: {
+                value: "Fir"
+            }
+        });
+
+        let lastName = await userAClient.query({
+            query: SearchUsersDocument,
+            variables: {
+                value: "Las"
+            }
+        });
+
+        let email = await userAClient.query({
+            query: SearchUsersDocument,
+            variables: {
+                value: "testA-user@te"
+            }
+        });
+
+        let username = await userAClient.query({
+            query: SearchUsersDocument,
+            variables: {
+                value: "testA-"
+            }
+        });
+
+        expect(firstName.data?.searchUsers["users"][0]?.firstName).to.equal("FirstA");
+        expect(lastName.data?.searchUsers["users"][0]?.lastName).to.equal("LastA");
+        expect(email.data?.searchUsers["users"][0]?.emailAddress).to.equal("testA-user@test.datapm.io");
+        expect(username.data?.searchUsers["users"][0]?.username).to.equal("testA-user");
     });
 
     it("Set User A twitterHandle", async function () {
