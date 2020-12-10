@@ -1,0 +1,13 @@
+query SearchUsers($value: String!, $limit: Int!, $offset: Int!) {
+    searchUsers(value: $value, limit: $limit, offSet: $offset) {
+        users {
+            username
+            firstName
+            lastName
+            emailAddress
+            nameIsPublic
+        }
+        hasMore
+        count
+    }
+}
