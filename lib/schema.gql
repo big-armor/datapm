@@ -299,6 +299,14 @@ type LatestPackagesResult {
 }
 
 """
+The response for searching users
+"""
+type SearchUsersResult {
+    users: [User]!
+    count: Int!
+}
+
+"""
 The response for a search term auto-complete request
 """
 type AutoCompleteResult {
@@ -515,6 +523,11 @@ type Query {
     Returns packages that match the given search query (which can contain boolean search logic). This request is paginated.
     """
     searchPackages(query: String!, offSet: Int!, limit: Int!): SearchPackagesResult!
+
+    """
+    Returns users that match the given search query
+    """
+    searchUsers(value: String!): SearchUsersResult!
 
     """
     Returns the latest packages

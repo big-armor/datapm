@@ -1,0 +1,11 @@
+query SearchUsers($value: String!) {
+    searchUsers(value: $value) {
+        users {
+            username
+            firstName
+            lastName
+            emailAddress
+            nameIsPublic
+        }
+    }
+}
