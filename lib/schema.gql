@@ -303,6 +303,7 @@ The response for searching users
 """
 type SearchUsersResult {
     users: [User]!
+    hasMore: Boolean!
     count: Int!
 }
 
@@ -527,7 +528,7 @@ type Query {
     """
     Returns users that match the given search query
     """
-    searchUsers(value: String!): SearchUsersResult!
+    searchUsers(value: String!, limit: Int!, offSet: Int!): SearchUsersResult!
 
     """
     Returns the latest packages

@@ -1,5 +1,5 @@
-query SearchUsers($value: String!) {
-    searchUsers(value: $value) {
+query SearchUsers($value: String!, $limit: Int!, $offset: Int!) {
+    searchUsers(value: $value, limit: $limit, offSet: $offset) {
         users {
             username
             firstName
@@ -7,5 +7,7 @@ query SearchUsers($value: String!) {
             emailAddress
             nameIsPublic
         }
+        hasMore
+        count
     }
 }
