@@ -78,7 +78,8 @@ import {
     updateMe,
     updateMyPassword,
     forgotMyPassword,
-    recoverMyPassword
+    recoverMyPassword,
+    searchUsers
 } from "./resolvers/UserResolver";
 import { createAPIKey, deleteAPIKey } from "./resolvers/ApiKeyResolver";
 import { Collection } from "./entity/Collection";
@@ -516,9 +517,16 @@ export const resolvers: {
                 relations: getRelationNames(graphqlFields(info).packages)
             });
 
+            const users = context.connection.manager.getCustomRepository(PackageRepository).autocomplete({
+                user: context.me,
+                startsWith,
+                relations: getRelationNames(graphqlFields(info).users)
+            });
+
             return {
                 catalogs: await catalogs,
-                packages: await packages
+                packages: await packages,
+                users: await users
             };
         },
 
@@ -558,7 +566,9 @@ export const resolvers: {
 
         usernameAvailable: usernameAvailable,
 
-        emailAddressAvailable: emailAddressAvailable
+        emailAddressAvailable: emailAddressAvailable,
+
+        searchUsers: searchUsers
     },
 
     Mutation: {

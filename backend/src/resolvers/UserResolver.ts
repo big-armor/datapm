@@ -1,4 +1,4 @@
-import { AuthenticationError, ValidationError, UserInputError } from "apollo-server";
+import { AuthenticationError, ValidationError } from "apollo-server";
 import { AuthenticatedContext } from "../context";
 import {
     AUTHENTICATION_ERROR,
@@ -13,7 +13,17 @@ import { UserRepository } from "../repository/UserRepository";
 import { hashPassword } from "../util/PasswordUtil";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { ImageStorageService } from "../storage/images/image-storage-service";
-import { connect } from "superagent";
+
+export const searchUsers = async (_0: any, { value }: { value: string }, context: AuthenticatedContext, info: any) => {
+    const [searchResponse, count] = await context.connection.manager
+        .getCustomRepository(UserRepository)
+        .search({ value });
+
+    return {
+        users: searchResponse,
+        count
+    };
+};
 
 export const emailAddressAvailable = async (
     _0: any,

@@ -225,6 +225,23 @@ export class UserRepository extends Repository<User> {
         return this.manager.getRepository(User).createQueryBuilder(ALIAS).addRelations(ALIAS, relations).getMany();
     }
 
+    async search({ value, relations = [] }: { value: string; relations?: string[] }): Promise<[User[], number]> {
+        const ALIAS = "search";
+        return await this.manager
+            .getRepository(User)
+            .createQueryBuilder()
+            .where('("User"."nameIsPublic")')
+            .andWhere(
+                `(User.username LIKE :valueLike OR User.emailAddress LIKE :valueLike OR User.firstName LIKE :valueLike OR User.lastName LIKE :valueLike)`,
+                {
+                    value,
+                    valueLike: value + "%"
+                }
+            )
+            .addRelations(ALIAS, relations)
+            .getManyAndCount();
+    }
+
     createUser({ value, relations = [] }: { value: CreateUserInput; relations?: string[] }): Promise<User> {
         const self: UserRepository = this;
         const isAdmin = (input: CreateUserInput | CreateUserInputAdmin): input is CreateUserInputAdmin => {
