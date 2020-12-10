@@ -189,24 +189,6 @@
         position: relative;
         top: 2px;
     }
-    .edit-button {
-        font-family: Roboto Mono;
-        font-style: normal;
-        font-weight: 400;
-        font-size: 12px;
-        line-height: 13px;
-        letter-spacing: -0.28px;
-        color: #017fb9;
-        border: 1px solid #ddd;
-        padding: 3px 15px;
-        border-radius: 4px;
-        margin: 24px;
-        cursor: pointer;
-        &:hover {
-            text-decoration: none;
-            background-color: rgba(240, 240, 240, 0.783);
-        }
-    }
     .mat-card {
         .mat-card-title {
             font-family: Roboto Mono;

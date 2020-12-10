@@ -3,8 +3,8 @@ import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { ReactiveFormsModule } from "@angular/forms";
 import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MatIconModule } from "@angular/material/icon";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
-import { ButtonComponent } from "../button/button.component";
 import { CoverComponent } from "../cover/cover.component";
 import { InputComponent } from "../input/input.component";
 import { InputErrorPipe } from "../pipes/input-error.pipe";
@@ -17,8 +17,15 @@ describe("EditCatalogComponent", () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [EditCatalogComponent, CoverComponent, InputComponent, ButtonComponent, InputErrorPipe],
-            imports: [ReactiveFormsModule, HttpClientModule, MatDialogModule, MatSlideToggleModule, MatIconModule],
+            declarations: [EditCatalogComponent, CoverComponent, InputComponent, InputErrorPipe],
+            imports: [
+                ReactiveFormsModule,
+                HttpClientModule,
+                MatDialogModule,
+                MatProgressSpinnerModule,
+                MatSlideToggleModule,
+                MatIconModule
+            ],
             providers: [
                 {
                     provide: MAT_DIALOG_DATA,

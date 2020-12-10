@@ -20,6 +20,7 @@ describe("CatalogsComponent", () => {
                 RouterModule.forRoot([]),
                 MatCardModule,
                 MatDialogModule,
+                MatProgressSpinnerModule,
                 ApolloTestingModule,
                 RouterTestingModule,
                 FormsModule,
