@@ -196,6 +196,14 @@
                                 "description": "Whether a record count is exact or approximate",
                                 "default": false
                             },
+                            "recordUnit": {
+                                "$id": "#/schemas/statistics/recordUnit",
+                                "type": "string",
+                                "title": "Record Unit",
+                                "description": "What each record in the data represents. Example: Country, Person, Location and Time, etc",
+                                "maxLength": 128
+                            },
+
                             "byteCount": {
                                 "$id": "#/schemas/statistics/byteCount",
                                 "type": "integer",

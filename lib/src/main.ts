@@ -61,6 +61,9 @@ export interface Schema extends JSONSchema7 {
     /** The JSON Schema Draft 07 compliant property list for the object */
     properties?: Properties;
 
+    /** What each record in the data represents. Example: Person, Date and Location, Point In Time */
+    recordUnit?: string;
+
     /** The exact or approximate number of records in the data package. For streaming sets, this
      * is the number of records per period.
      */

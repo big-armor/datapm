@@ -85,6 +85,7 @@ These are the properties for the "schemas" top level array property. These schem
 | byteCountApproximate   | Boolean | Optional | Whether the provided byte count is approximate (true) or exact (false). Default is false (exact).                                      |
 | recordCount            | Integer | Optional | The exact or estimated number of records in the data set.                                                                              |
 | recordCountApproximate | Boolean | Optional | Whether the recordCount property value is exact (false) or approximate (true). Defaults false (exact).                                 |
+| recordUnit             | String  | Optional | The noun(s) describing what each record represents. Example: Person, Location and Time, Point In Time, etc.                            |
 
 ## Schema Properties
 
