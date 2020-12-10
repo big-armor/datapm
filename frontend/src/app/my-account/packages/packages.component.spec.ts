@@ -1,11 +1,11 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { RouterTestingModule } from "@angular/router/testing";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { HttpClientModule } from "@angular/common/http";
 import { SharedModule } from "src/app/shared/shared.module";
 
 import { PackagesComponent } from "./packages.component";
 import { ApolloTestingModule } from "apollo-angular/testing";
-import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 
 describe("PackagesComponent", () => {
     let component: PackagesComponent;

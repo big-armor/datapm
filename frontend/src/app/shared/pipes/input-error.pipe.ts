@@ -30,28 +30,32 @@ const errorKeys = [
     name: "inputError"
 })
 export class InputErrorPipe implements PipeTransform {
-    transform(control: AbstractControl, controlName?: string, messages?: any): any {
-        let formControl = control as AbstractControl;
-        if (controlName) {
-            formControl = control.get(controlName);
-        }
+    private formControl: AbstractControl;
+    private messages: any;
 
-        return formControl.statusChanges.pipe(
-            map(() => {
-                if (formControl.dirty && formControl.errors) {
-                    for (let i = 0; i < errorKeys.length; i++) {
-                        const key = errorKeys[i];
-                        if (formControl.errors[key]) {
-                            return (
-                                (messages && messages[key]) ||
-                                (defaultMessages[key] && defaultMessages[key](formControl.errors[key])) ||
-                                ""
-                            );
-                        }
-                    }
+    transform(control: AbstractControl, controlName?: string, messages?: any): any {
+        this.formControl = control as AbstractControl;
+        if (controlName) {
+            this.formControl = control.get(controlName);
+        }
+        this.messages = messages;
+
+        return this.formControl.statusChanges.pipe(map(() => this.checkError()));
+    }
+
+    private checkError() {
+        if (this.formControl && this.formControl.dirty && this.formControl.errors) {
+            for (let i = 0; i < errorKeys.length; i++) {
+                const key = errorKeys[i];
+                if (this.formControl.errors[key]) {
+                    return (
+                        (this.messages && this.messages[key]) ||
+                        (defaultMessages[key] && defaultMessages[key](this.formControl.errors[key])) ||
+                        ""
+                    );
                 }
-                return "";
-            })
-        );
+            }
+        }
+        return "";
     }
 }

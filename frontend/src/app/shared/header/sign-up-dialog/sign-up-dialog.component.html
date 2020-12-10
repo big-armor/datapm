@@ -6,71 +6,34 @@
 
     <div *ngIf="state != State.SUCCESS">
         <form [formGroup]="signUpForm" (ngSubmit)="formSubmit()">
-            <div class="first-dialog-div">
+            <div class="pb-5">
                 <p class="dialog-subtile">sign up with email</p>
 
-                <input
-                    type="text"
-                    placeholder="email"
-                    name="emailAddress"
-                    formControlName="emailAddress"
-                    autocomplete="email"
-                    email
-                    minlength="5"
-                    class="rounded-input"
-                    (input)="clearError('emailAddress')"
-                />
-                <div class="div-with-errors">
-                    <div class="alert-warn" *ngIf="signUpForm.get('emailAddress').errors?.INVALID_FORMAT">
-                        Not a valid email address.
-                    </div>
-                    <div class="alert-warn" *ngIf="signUpForm.get('emailAddress').errors?.TOO_LONG">
-                        Email address must be less than 100 characters long.
-                    </div>
-                    <div class="alert-warn" *ngIf="signUpForm.get('emailAddress').errors?.NOT_AVAILABLE">
-                        <span>That email address already has an account. Please use the</span>
-                        <span class="forgot-password" (click)="openForgotPassword()">forgot password</span>
-                        <span>feature on the login page.</span>
-                    </div>
-                </div>
+                <app-input
+                    placeholder="Email"
+                    [group]="signUpForm"
+                    controlName="emailAddress"
+                    inputType="email"
+                    [error]="signUpForm | inputError: 'emailAddress':errorMessages['emailAddress'] | async"
+                ></app-input>
                 <br />
 
-                <input
-                    type="password"
-                    placeholder="password"
-                    name="password"
-                    formControlName="password"
-                    autocomplete="new-password"
-                    minlength="8"
-                    class="rounded-input"
-                />
-                <p class="hint-txt">Password must contain more than 8 characters.</p>
-            </div>
+                <app-input
+                    placeholder="Password"
+                    [group]="signUpForm"
+                    controlName="password"
+                    inputType="password"
+                    [error]="signUpForm | inputError: 'password' | async"
+                ></app-input>
 
-            <div class="second-dialog-div">
-                <p class="dialog-subtile">new account information</p>
-
-                <input
-                    type="text"
-                    placeholder="username"
-                    name="username"
-                    formControlName="username"
-                    autocomplete="username"
-                    class="rounded-input"
-                    (input)="clearError('username')"
-                />
-                <div class="div-with-errors">
-                    <div class="alert-warn" *ngIf="signUpForm.get('username').errors?.INVALID_CHARACTERS">
-                        Username must contain only numbers, letters, and hyphens, and may not start or end with a
-                        hyphen.
-                    </div>
-                    <div class="alert-warn" *ngIf="signUpForm.get('username').errors?.TOO_LONG">
-                        Username must be less than 40 characters long.
-                    </div>
-                    <div class="alert-warn" *ngIf="signUpForm.get('username').errors?.NOT_AVAILABLE">
-                        That username is not available. Try a different username.
-                    </div>
-                </div>
+                <p class="dialog-subtile mt-3">new account information</p>
+                <app-input
+                    placeholder="Username"
+                    [group]="signUpForm"
+                    controlName="username"
+                    inputType="text"
+                    [error]="signUpForm | inputError: 'username':errorMessages['username'] | async"
+                ></app-input>
             </div>
 
             <div class="div-with-errors">
@@ -83,8 +46,8 @@
                 </div>
             </div>
 
-            <div class="button-dialog-div text-center">
-                <button type="submit" [class.disabled]="!signUpForm.valid">
+            <div class="text-center">
+                <button type="submit" class="app-raised-button">
                     <span class="btn-text">sign up</span>
                 </button>
             </div>
@@ -94,7 +57,7 @@
     <div class="div-with-errors" *ngIf="state == State.SUCCESS">
         <div style="margin: 35px 0px">Please check your email for next steps.</div>
         <div class="text-center">
-            <button mat-dialog-close class="close-btn">
+            <button mat-dialog-close class="app-raised-button">
                 <span class="close-text">Back to browse</span>
             </button>
         </div>

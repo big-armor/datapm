@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit } from "@angular/core";
-import { FormControl, FormGroup } from "@angular/forms";
+import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { CreateMeGQL, EmailAddressAvailableGQL, UsernameAvailableGQL } from "src/generated/graphql";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { MatDialogRef } from "@angular/material/dialog";
@@ -26,6 +26,21 @@ export class SignUpDialogComponent implements OnInit {
 
     signUpForm: FormGroup;
 
+    errorMessages = {
+        emailAddress: {
+            INVALID_FORMAT: "Not a valid email address.",
+            TOO_LONG: "Email address must be less than 100 characters long.",
+            NOT_AVAILABLE:
+                "That email address already has an account. Please use the forgot password feature on the login page."
+        },
+        username: {
+            INVALID_CHARACTERS:
+                "Username must contain only numbers, letters, and hyphens, and may not start or end with a hyphen.",
+            TOO_LONG: "Username must be less than 40 characters long.",
+            NOT_AVAILABLE: "That username is not available. Try a different username."
+        }
+    };
+
     constructor(
         private createMeGQL: CreateMeGQL,
         private usernameAvailableGQL: UsernameAvailableGQL,
@@ -47,11 +62,20 @@ export class SignUpDialogComponent implements OnInit {
                 ],
                 updateOn: "blur"
             }),
-            password: new FormControl("")
+            password: new FormControl("", {
+                validators: [Validators.required]
+            })
         });
     }
 
     formSubmit() {
+        this.signUpForm.markAllAsTouched();
+        console.log("submit");
+        console.log(this.signUpForm);
+        if (this.signUpForm.invalid) {
+            return;
+        }
+
         this.createMeGQL
             .mutate({
                 value: {

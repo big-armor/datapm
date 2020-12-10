@@ -7,6 +7,8 @@ import { MatDialogModule } from "@angular/material/dialog";
 import { MatSnackBarModule } from "@angular/material/snack-bar";
 
 import { SignUpDialogComponent } from "./sign-up-dialog.component";
+import { InputErrorPipe } from "../../pipes/input-error.pipe";
+import { InputComponent } from "../../input/input.component";
 
 describe("SignUpDialogComponent", () => {
     let component: SignUpDialogComponent;
@@ -14,7 +16,7 @@ describe("SignUpDialogComponent", () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [SignUpDialogComponent],
+            declarations: [SignUpDialogComponent, InputErrorPipe, InputComponent],
             imports: [
                 FormsModule,
                 ReactiveFormsModule,
