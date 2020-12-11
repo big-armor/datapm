@@ -44,7 +44,7 @@
         <div class="text-danger mt-3" *ngIf="state === 'ERROR'">Error occured while updating catalog.</div>
     </div>
     <div mat-dialog-actions>
-        <button class="app-raised-button" [disabled]="form.invalid" (click)="(save)">
+        <button class="app-raised-button" [disabled]="form.invalid" (click)="save()">
             <span *ngIf="state !== 'LOADING'">Save</span>
             <mat-spinner [diameter]="16" *ngIf="state === 'LOADING'">Save</mat-spinner>
         </button>
