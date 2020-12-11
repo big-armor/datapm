@@ -1,13 +1,14 @@
-<div *ngIf="getCatalogQuery">
-    <b>{{ getCatalogQuery.catalog.displayName }}</b>
-    <div *ngIf="getCatalogQuery.catalog.identifier.catalogSlug != getCatalogQuery.catalog.displayName">
-        {{ getCatalogQuery.catalog.identifier.catalogSlug }}
+<div *ngIf="catalog">
+    <b>{{ catalog.displayName }}</b>
+    <div *ngIf="catalog.identifier.catalogSlug != catalog.displayName">
+        {{ catalog.identifier.catalogSlug }}
     </div>
-    <p>{{ getCatalogQuery.catalog.description }}</p>
+    <a class="app-outlined-button ml-3" *ngIf="canEdit" (click)="editCatalog()">Edit</a>
+    <p>{{ catalog.description }}</p>
     <h3>Packages</h3>
     <ul>
-        <li *ngFor="let package of getCatalogQuery.catalog.packages">
-            <a routerLink="/{{ getCatalogQuery.catalog.identifier.catalogSlug }}/{{ package.identifier.packageSlug }}">
+        <li *ngFor="let package of catalog.packages">
+            <a routerLink="/{{ catalog.identifier.catalogSlug }}/{{ package.identifier.packageSlug }}">
                 {{ package.displayName || package.identifier.packageSlug }}
             </a>
         </li>
