@@ -128,13 +128,15 @@ body {
     height: 44px;
     border: none;
     outline: none;
-    background-color: $gray-6;
+    background-color: $gray-7;
     box-shadow: $inner-shadow-1;
     transition: background-color ease 0.5s;
+
     &:hover {
         background-color: $white;
         transition: background-color ease 0.5s;
     }
+
     &::placeholder {
         @include text("body");
         color: $gray-4;
@@ -147,7 +149,6 @@ body {
     border-radius: 24px;
     height: 36px;
     border: none;
-    background: $white;
     font-family: Roboto Mono;
     font-style: normal;
     font-weight: 300;
@@ -157,8 +158,11 @@ body {
     color: $gray-3;
     padding: 0 1.5em;
 
+    transition: background-color ease 0.5s;
+
     &:hover {
-        background-color: $gray-5;
+        background-color: $gray-6;
+        transition: background-color ease 0.5s;
     }
 
     &:active {
@@ -172,10 +176,15 @@ body {
     }
 }
 
+.raised {
+    box-shadow: $outer-shadow-1 !important;
+}
+
 .app-fab-button.app-fab-button {
     width: 40px;
     height: 40px;
     background: $white;
+    box-shadow: $outer-shadow-1 !important;
 
     &:focus {
         outline: none !important;
