@@ -1,0 +1,26 @@
+<div class="collection-details">
+    <app-cover [collectionSlug]="collectionSlug" defaultCover="/assets/images/cover-image.png"></app-cover>
+    <div class="container">
+        <div class="collection-header px-4 py-3">
+            <h1 class="dpm-text-title mb-1">{{ collection?.name }}</h1>
+            <h3 class="dpm-text-body mb-1 collection-slug">{{ collectionSlug }}</h3>
+            <p class="dpm-text-small collection-description">
+                {{ collection?.description }}
+            </p>
+        </div>
+        <mat-tab-group class="collection-tabs px-3">
+            <mat-tab label="Pacages"></mat-tab>
+        </mat-tab-group>
+        <div *ngIf="state === 'SUCCESS'">
+            <app-package-item [item]="package" [hasImage]="true" *ngFor="let package of collection.packages">
+            </app-package-item>
+            <div class="dpm-no-data" *ngIf="!collection.packages?.length">
+                <p>There are no packages available.</p>
+                <a class="app-outlined-button mt-3">Create collection</a>
+            </div>
+        </div>
+        <div class="dpm-page-loading" *ngIf="state === 'LOADING'">
+            <mat-spinner></mat-spinner>
+        </div>
+    </div>
+</div>

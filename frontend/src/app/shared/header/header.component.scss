@@ -1,3 +1,6 @@
+@import "../../../styles/mixins";
+@import "../../../styles/variables";
+
 .search-form {
     display: flex;
     width: 100%;
@@ -19,21 +22,11 @@ app-avatar {
     cursor: pointer;
 }
 
-h1.title {
-    font-family: Roboto Mono;
-    font-style: normal;
-    font-weight: 300;
-    font-size: 32px;
-    line-height: 42px;
-    letter-spacing: -0.28px;
-    color: #333333;
+a.dpm-text-logo {
+    color: $gray-1;
     cursor: pointer;
-
-    a {
-        cursor: pointer;
-        &:hover {
-            text-decoration: none;
-        }
+    &:hover {
+        text-decoration: none;
     }
 }
 
