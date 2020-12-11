@@ -16,6 +16,7 @@ export class CoverComponent implements OnInit {
     @Input() catalogSlug: string;
     @Input() collectionSlug: string;
     @Input() packageSlug: string;
+    @Input() defaultCover: string;
     @Input() height: number = 40;
     @Input() editable: boolean = false;
     @Output() upload: EventEmitter<any>;
@@ -79,7 +80,7 @@ export class CoverComponent implements OnInit {
                 this.imgData = imgData;
             },
             () => {
-                this.imgData = null;
+                this.imgData = this.defaultCover;
             }
         );
     }

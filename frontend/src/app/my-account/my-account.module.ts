@@ -26,7 +26,6 @@ import { EditAccountDialogComponent } from "./edit-account-dialog/edit-account-d
 import { EditPasswordDialogComponent } from "./edit-password-dialog/edit-password-dialog.component";
 import { PackagesComponent } from "./packages/packages.component";
 import { DeleteConfirmationComponent } from "./delete-confirmation/delete-confirmation.component";
-import { CreateCollectionComponent } from "./create-collection/create-collection.component";
 import { FewPackagesAlertComponent } from "./few-packages-alert/few-packages-alert.component";
 
 @NgModule({
@@ -41,7 +40,6 @@ import { FewPackagesAlertComponent } from "./few-packages-alert/few-packages-ale
         PackagesComponent,
         DeleteConfirmationComponent,
         MyCollectionsComponent,
-        CreateCollectionComponent,
         FewPackagesAlertComponent
     ],
     imports: [

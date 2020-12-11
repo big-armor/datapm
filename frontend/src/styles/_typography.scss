@@ -1,0 +1,35 @@
+@import "./variables";
+@import "./mixins";
+
+.mat-typography {
+    .dpm-text-hero {
+        @include text("hero");
+    }
+
+    .dpm-text-head {
+        @include text("head");
+    }
+
+    .dpm-text-title {
+        @include text("title");
+    }
+
+    .dpm-text-label,
+    .dpm-text-body {
+        @include text("body");
+    }
+
+    .dpm-text-footer,
+    .dpm-text-small {
+        @include text("small");
+    }
+
+    .dpm-text-button-label {
+        @extend .dpm-text-footer;
+        font-weight: 700;
+    }
+
+    .dpm-text-logo {
+        @include logoText;
+    }
+}

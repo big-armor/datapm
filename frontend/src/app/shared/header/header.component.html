@@ -3,7 +3,7 @@
         <div class="pl-0 col-md-10 col-sm-12">
             <div class="d-flex flex-row bd-highlight">
                 <div class="pr-2 pt-2 pb-2 bd-highlight align-self-center">
-                    <h1 class="title mr-4 mb-0"><a (click)="goHome()">datapm</a></h1>
+                    <h1 class="mr-4 mb-0"><a class="dpm-text-logo" (click)="goHome()">datapm</a></h1>
                 </div>
                 <div class="p-2 bd-highlight w-100">
                     <div class="input-group mt-1 search-box">
@@ -30,7 +30,7 @@
                     <app-avatar [user]="currentUser" [matMenuTriggerFor]="beforeMenu" *ngIf="currentUser"></app-avatar>
                     <button
                         mat-fab
-                        class="app-fab-button"
+                        class="app-fab-button app-raised-button"
                         [matMenuTriggerFor]="beforeMenu"
                         aria-label="Person"
                         *ngIf="!currentUser"
@@ -61,7 +61,7 @@
                     <app-avatar [user]="currentUser" [matMenuTriggerFor]="beforeMenu" *ngIf="currentUser"></app-avatar>
                     <button
                         mat-fab
-                        class="app-fab-button"
+                        class="app-fab-button app-raised-button"
                         [matMenuTriggerFor]="beforeMenu"
                         aria-label="Person"
                         *ngIf="!currentUser"
