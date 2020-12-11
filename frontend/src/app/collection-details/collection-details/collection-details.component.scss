@@ -5,17 +5,9 @@
     color: $gray-1;
 }
 
-app-cover {
-    display: block;
-    height: $cover-height;
-    min-height: 100px;
-    overflow: hidden;
-    position: relative;
-    z-index: 0;
-}
-
-.container {
-    z-index: 1;
+app-cover ::ng-deep img {
+    height: 150px;
+    border-radius: 4px;
 }
 
 .collection-header {
@@ -23,18 +15,13 @@ app-cover {
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     height: $page-header-height;
-    margin-top: -$page-header-height;
-    background-color: $gray-6;
-    position: relative;
-    z-index: 1;
+    background-color: $custom-gray-2;
 }
 
 .collection-tabs {
-    background-color: $gray-6;
+    background-color: $custom-gray-2;
     box-shadow: $outer-shadow-1;
     display: block;
-    position: relative;
-    z-index: 2;
 
     ::ng-deep {
         .mat-tab-header {

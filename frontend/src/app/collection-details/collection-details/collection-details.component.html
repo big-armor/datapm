@@ -1,7 +1,7 @@
 <div class="collection-details">
-    <app-cover [collectionSlug]="collectionSlug" defaultCover="/assets/images/cover-image.png"></app-cover>
     <div class="container">
-        <div class="collection-header px-4 py-3">
+        <app-cover [collectionSlug]="collectionSlug"></app-cover>
+        <div class="collection-header px-4 py-3 mt-4">
             <h1 class="dpm-text-title mb-1">{{ collection?.name }}</h1>
             <h3 class="dpm-text-body mb-1 collection-slug">{{ collectionSlug }}</h3>
             <p class="dpm-text-small collection-description">
