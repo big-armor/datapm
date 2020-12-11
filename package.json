@@ -1,6 +1,6 @@
 {
     "name": "datapm-registry",
-    "version": "0.6.60",
+    "version": "0.6.64",
     "description": "datapm is the easiest way to discover, obtain, manage, and publish data sets. This server acts as a registry (not a repository) of catalogs of packages. Features of datapm-registry include CRUD operations on catalogs and packages, and authorization for each operation. ",
     "main": "backend/dist/index.js",
     "typings": "backend/dist/index.d.ts",
@@ -14,7 +14,8 @@
         "bump-version": "gulp bumpVersion",
         "tag": "gulp gitPushTag",
         "deploy": "gulp deployAssets",
-        "lint": "eslint --fix . && prettier -w .",
+        "lint": "eslint . && prettier -c  --loglevel=warn .",
+        "lint:fix": "eslint --fix . && prettier -w .",
         "test": "mocha --slow 3000 --timeout 60000 -r ts-node/register test/**/*.ts",
         "test:snyk": "snyk test"
     },

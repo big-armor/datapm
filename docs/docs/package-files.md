@@ -76,15 +76,16 @@ The following are the top level properties in the DataPM Package File JSON file 
 
 These are the properties for the "schemas" top level array property. These schemas are validated both by the [JSON Schema Draft 07 specification](https://json-schema.org/specification-links.html#draft-7), and the DataPM Package file specification. This document contains only the properties listed in the DataPM specification - as they are generally more restrictive than the [JSON Schema Draft 07 specification](https://json-schema.org/specification-links.html#draft-7).
 
-| Property               |  Type   | Required | Description                                                                                                                            |
-| :--------------------- | :-----: | :------: | :------------------------------------------------------------------------------------------------------------------------------------- |
-| parser                 | Object  | Required | A configuration object describing the parser required for the data. See Parser section below                                           |
-| properties             | Object  | Required | See Schema Properties table below                                                                                                      |
-| source                 | Object  | Required | See Source properties below                                                                                                            |
-| byteCount              | Integer | Optional | The exact or approximate number of bytes in the raw dataset. This should include only the 'values' and not the format, schema, or keys |
-| byteCountApproximate   | Boolean | Optional | Whether the provided byte count is approximate (true) or exact (false). Default is false (exact).                                      |
-| recordCount            | Integer | Optional | The exact or estimated number of records in the data set.                                                                              |
-| recordCountApproximate | Boolean | Optional | Whether the recordCount property value is exact (false) or approximate (true). Defaults false (exact).                                 |
+| Property               |  Type   | Required | Description                                                                                                                                                              |
+| :--------------------- | :-----: | :------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| parser                 | Object  | Required | A configuration object describing the parser required for the data. See Parser section below                                                                             |
+| properties             | Object  | Required | See Schema Properties table below                                                                                                                                        |
+| source                 | Object  | Required | See Source properties below                                                                                                                                              |
+| byteCount              | Integer | Optional | The exact or approximate number of bytes in the raw dataset. This should include only the 'values' and not the format, schema, or keys                                   |
+| byteCountApproximate   | Boolean | Optional | Whether the provided byte count is approximate (true) or exact (false). Default is false (exact).                                                                        |
+| recordCount            | Integer | Optional | The exact or estimated number of records in the data set.                                                                                                                |
+| recordCountApproximate | Boolean | Optional | Whether the recordCount property value is exact (false) or approximate (true). Defaults false (exact).                                                                   |
+| unit                   | String  | Optional | The noun(s) describing what each record represents. Example for Objects: Person, Location and Time, Point In Time, etc. Example for values: Meters, Degrees Celsius, etc |
 
 ## Schema Properties
 
