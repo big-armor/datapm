@@ -5,7 +5,7 @@ import { MatDialogModule } from "@angular/material/dialog";
 
 import { CatalogDetailsComponent } from "./catalog-details.component";
 
-fdescribe("CatalogDetailsComponent", () => {
+describe("CatalogDetailsComponent", () => {
     let component: CatalogDetailsComponent;
     let fixture: ComponentFixture<CatalogDetailsComponent>;
 
