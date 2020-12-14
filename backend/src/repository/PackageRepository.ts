@@ -381,7 +381,12 @@ export class PackageRepository {
     }): Promise<Package[]> {
         const ALIAS = "autoCompletePackage";
 
-        const entities = this.createQueryBuilderWithUserConditions(user)
+        // const byDisplayName = 'LOWER("Package"."displayName") LIKE \'' + startsWith.toLowerCase() + "%'";
+        // const bySlug = ' OR LOWER("Package"."slug") LIKE \'' + startsWith.toLowerCase() + "%'";
+        // const byDescVector = ' OR LOWER("Package"."description_tokens") LIKE \'' + startsWith.toLowerCase() + "%'";
+        // const byReadmeVector = ' OR LOWER("Package"."readme_file_vectors") LIKE \'' + startsWith.toLowerCase() + "%'";
+
+        const entities = await this.createQueryBuilderWithUserConditions(user)
             .andWhere('LOWER("Package"."displayName") LIKE \'' + startsWith.toLowerCase() + "%'")
             .addRelations(ALIAS, relations)
             .getMany();

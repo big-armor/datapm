@@ -115,6 +115,32 @@ export class CollectionRepository extends Repository<Collection> {
             .getMany();
     }
 
+    async autocomplete({
+        user,
+        startsWith,
+        relations = []
+    }: {
+        user: User;
+        startsWith: string;
+        relations?: string[];
+    }): Promise<Collection[]> {
+        const ALIAS = "autoCompleteCollection";
+
+        const byDisplayName = 'LOWER("Collection"."name") ILIKE :valueLike';
+        const bySlug = ' OR LOWER("Collection"."slug") ILIKE :valueLike';
+        // const byDescVector = ' OR LOWER("Collection"."description_tokens") LIKE \'' + startsWith.toLowerCase() + "%'";
+        // const byReadmeVector = ' OR LOWER("Collection"."readme_file_vectors") LIKE \'' + startsWith.toLowerCase() + "%'";
+
+        const entities = this.createQueryBuilderWithUserConditions(user.id)
+            .andWhere(byDisplayName + bySlug, {
+                valueLike: startsWith.toLowerCase() + "%"
+            })
+            .addRelations(ALIAS, relations)
+            .getMany();
+
+        return entities;
+    }
+
     public async search(
         userId: number,
         query: string,

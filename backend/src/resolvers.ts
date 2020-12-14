@@ -113,6 +113,7 @@ import { PackageFileStorageService } from "./storage/packages/package-file-stora
 import { DateResolver } from "./resolvers/DateResolver";
 import { Permissions } from "./entity/Permissions";
 import { exit } from "process";
+import { CollectionRepository } from "./repository/CollectionRepository";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -505,27 +506,34 @@ export const resolvers: {
         collectionPackages: collectionPackages,
 
         autoComplete: async (_0: any, { startsWith }, context: AuthenticatedContext, info: any) => {
-            const catalogs = context.connection.manager.getCustomRepository(CatalogRepository).autocomplete({
-                user: context.me,
-                startsWith,
-                relations: getRelationNames(graphqlFields(info).catalogs)
-            });
-
             const packages = context.connection.manager.getCustomRepository(PackageRepository).autocomplete({
                 user: context.me,
                 startsWith,
                 relations: getRelationNames(graphqlFields(info).packages)
             });
 
-            const users = context.connection.manager.getCustomRepository(PackageRepository).autocomplete({
+            const collections = context.connection.manager.getCustomRepository(CollectionRepository).autocomplete({
+                user: context.me,
+                startsWith,
+                relations: getRelationNames(graphqlFields(info).collections)
+            });
+
+            const users = context.connection.manager.getCustomRepository(UserRepository).autocomplete({
                 user: context.me,
                 startsWith,
                 relations: getRelationNames(graphqlFields(info).users)
             });
 
+            const catalogs = context.connection.manager.getCustomRepository(CatalogRepository).autocomplete({
+                user: context.me,
+                startsWith,
+                relations: getRelationNames(graphqlFields(info).catalogs)
+            });
+
             return {
                 catalogs: await catalogs,
                 packages: await packages,
+                collections: await collections,
                 users: await users
             };
         },
