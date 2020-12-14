@@ -472,6 +472,11 @@ type Query {
     usersByCatalog(identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: VIEW)): [User]!
 
     """
+    Returns all of the users for a given collection
+    """
+    usersByCollection(identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: VIEW)): [User]!
+
+    """
     Return a user by a given username, and returns only the properties on that user the requester should be able to view
     """
     user(username: String! @validUsername): User!

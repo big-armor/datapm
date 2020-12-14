@@ -1,0 +1,6 @@
+mutation RemovePackageFromCollection(
+    $collectionIdentifier: CollectionIdentifierInput!
+    $packageIdentifier: PackageIdentifierInput!
+) {
+    removePackageFromCollection(collectionIdentifier: $collectionIdentifier, packageIdentifier: $packageIdentifier)
+}
