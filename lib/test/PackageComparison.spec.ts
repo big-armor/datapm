@@ -290,8 +290,9 @@ describe("Checking VersionUtil", () => {
             title: "SchemaA",
             type: "string",
             format: "date-time",
-            parser: {
-                mimeType: "text/csv",
+            source: {
+                type: "test",
+                uri: "http://datapm.io/test",
                 configuration: {}
             }
         };
@@ -300,13 +301,19 @@ describe("Checking VersionUtil", () => {
             title: "SchemaA",
             type: "string",
             format: "date-time",
-            parser: {
-                mimeType: "text/csv",
+            source: {
+                type: "test",
+                uri: "http://datapm.io/test",
                 configuration: {}
             }
         };
 
         expect(compareSchema(schemaA1, schemaA2).length).equal(0);
+
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        schemaA2.source!.uri = "https://somethingelse.datapm.io";
+
+        expect(compareSchema(schemaA1, schemaA2).length).equal(1);
     });
 
     it("Package File updated dates", function () {
