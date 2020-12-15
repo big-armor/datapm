@@ -155,33 +155,6 @@
                                     ]
                                 }
                             },
-                            "parser": {
-                                "$id": "#/schemas/parser",
-                                "type": "object",
-                                "title": "Parser",
-                                "description": "A description of the parser needed for the stream.",
-                                "default": {},
-                                "required": ["mimeType"],
-                                "properties": {
-                                    "mimeType": {
-                                        "$id": "#/schemas/parser/mimeType",
-                                        "type": "string",
-                                        "maxLength": 128,
-                                        "title": "Parser Mime Type",
-                                        "description": "The mime type of the file, which identifies the parser needed.",
-                                        "default": ""
-                                    },
-                                    "configuration": {
-                                        "$id": "#/schemas/parser/configuration",
-                                        "type": "object",
-                                        "tile": "Parser Configuration",
-                                        "description": "The parser configuration. The properties of which is specific to the parser",
-                                        "properties": {},
-                                        "additionalProperties": true
-                                    }
-                                },
-                                "additionalProperties": true
-                            },
                             "recordCount": {
                                 "$id": "#/schemas/statistics/recordCount",
                                 "type": "integer",
@@ -234,21 +207,29 @@
                                 "title": "Data Source",
                                 "description": "A description of how the data is sourceed",
                                 "default": {},
-                                "required": ["protocol"],
+                                "required": ["type"],
                                 "properties": {
-                                    "protocol": {
-                                        "$id": "#/schemas/source/protocol",
+                                    "type": {
+                                        "$id": "#/schemas/source/type",
                                         "type": "string",
                                         "maxLength": 128,
-                                        "title": "Source Protocol",
-                                        "description": "The protocol that is used to source the data. This defines the transport method.",
+                                        "title": "Source Type",
+                                        "description": "The unique identifier for the source implementation.",
+                                        "default": ""
+                                    },
+                                    "uri": {
+                                        "$id": "#/schemas/source/uri",
+                                        "type": "string",
+                                        "maxLength": 128,
+                                        "title": "Source URI",
+                                        "description": "Used by the source implementation to pull the data.",
                                         "default": ""
                                     },
                                     "configuration": {
                                         "$id": "#/schemas/source/configuration",
                                         "type": "object",
                                         "title": "Source Configuration",
-                                        "description": "The configuration used by the transport implementation to aquire the data stream.",
+                                        "description": "The configuration used by the source implementation to aquire and interpret the record stream.",
                                         "default": {},
                                         "required": [],
                                         "properties": {},
