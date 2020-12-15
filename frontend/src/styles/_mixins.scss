@@ -1,0 +1,33 @@
+@use 'sass:map';
+
+$font-sizes: (
+    "hero": 32px,
+    "head": 28px,
+    "title": 20px,
+    "body": 14px,
+    "small": 10px
+);
+$line-heights: (
+    "hero": 42px,
+    "head": 37px,
+    "title": 26px,
+    "body": 18px,
+    "small": 13px
+);
+
+@mixin text($key) {
+    font-family: Roboto Mono;
+    font-size: map.get($font-sizes, $key);
+    font-style: normal;
+    font-weight: 400;
+    line-height: map.get($line-heights, $key);
+    letter-spacing: -0.28px;
+}
+
+@mixin logoText {
+    font-family: Roboto Mono;
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 46px;
+}

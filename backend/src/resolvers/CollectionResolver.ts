@@ -23,6 +23,23 @@ import { ImageStorageService } from "../storage/images/image-storage-service";
 import { Collection } from "../entity/Collection";
 import { exit } from "process";
 
+export const usersByCollection = async (
+    _0: any,
+    { identifier }: { identifier: CollectionIdentifierInput },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const relations = getGraphQlRelationName(info);
+
+    const collectionEntity = await context.connection.manager
+        .getCustomRepository(CollectionRepository)
+        .findCollectionBySlugOrFail(identifier.collectionSlug);
+
+    return context.connection.manager
+        .getCustomRepository(UserCollectionPermissionRepository)
+        .usersByCollection(collectionEntity.id, relations);
+};
+
 export const createCollection = async (
     _0: any,
     { value }: { value: CreateCollectionInput },

@@ -36,5 +36,6 @@ query Collection($identifier: CollectionIdentifierInput!) {
         }
         isPublic
         isRecommended
+        myPermissions
     }
 }

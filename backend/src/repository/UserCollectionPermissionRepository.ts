@@ -63,6 +63,18 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
         return this.createQueryBuilder().where({ userId: userId, collectionId: collectionId }).getOne();
     }
 
+    public async usersByCollection(collectionId: number, relations?: string[]): Promise<User[]> {
+        const ALIAS = "userCollectionPermission";
+        return await this.manager
+            .getRepository(User)
+            .createQueryBuilder()
+            .where('("User"."id" IN (SELECT user_id FROM collection_user WHERE collection_id = :collectionId))', {
+                collectionId: collectionId
+            })
+            .addRelations(ALIAS, relations)
+            .getMany();
+    }
+
     public async setUserCollectionPermissions({
         identifier,
         value,

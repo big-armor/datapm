@@ -1,0 +1,8 @@
+query UsersByCollection($identifier: CollectionIdentifierInput!) {
+    usersByCollection(identifier: $identifier) {
+        username
+        firstName
+        lastName
+        nameIsPublic
+    }
+}

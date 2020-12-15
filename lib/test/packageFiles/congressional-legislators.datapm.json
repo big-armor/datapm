@@ -705,15 +705,11 @@
             "recordCount": 537,
             "byteCount": 182453,
             "type": "object",
-            "parser": {
-                "mimeType": "text/csv"
-            },
             "title": "legislators-current.csv",
             "source": {
-                "protocol": "HTTP",
-                "configuration": {
-                    "url": "https://theunitedstates.io/congress-legislators/legislators-current.csv"
-                }
+                "type": "http",
+                "uri": "https://theunitedstates.io/congress-legislators/legislators-current.csv",
+                "configuration": {}
             }
         }
     ]

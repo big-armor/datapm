@@ -61,7 +61,8 @@ import {
     searchCollections,
     setCollectionCoverImage,
     updateCollection,
-    collectionPackages
+    collectionPackages,
+    usersByCollection
 } from "./resolvers/CollectionResolver";
 import {
     setUserCollectionPermissions,
@@ -504,6 +505,7 @@ export const resolvers: {
         myCollections: myCollections,
         searchCollections: searchCollections,
         collectionPackages: collectionPackages,
+        usersByCollection: usersByCollection,
 
         autoComplete: async (_0: any, { startsWith }, context: AuthenticatedContext, info: any) => {
             const users = context.connection.manager.getCustomRepository(UserRepository).autocomplete({

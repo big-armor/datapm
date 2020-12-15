@@ -32,6 +32,7 @@ import { InputErrorPipe } from "./pipes/input-error.pipe";
 import { EditCollectionComponent } from "./edit-collection/edit-collection.component";
 import { ConfirmationDialogComponent } from "./confirmation-dialog/confirmation-dialog.component";
 import { EditCatalogComponent } from "./edit-catalog/edit-catalog.component";
+import { CreateCollectionComponent } from "./create-collection/create-collection.component";
 
 @NgModule({
     declarations: [
@@ -54,7 +55,8 @@ import { EditCatalogComponent } from "./edit-catalog/edit-catalog.component";
         InputErrorPipe,
         EditCollectionComponent,
         ConfirmationDialogComponent,
-        EditCatalogComponent
+        EditCatalogComponent,
+        CreateCollectionComponent
     ],
     imports: [
         CommonModule,
@@ -90,7 +92,8 @@ import { EditCatalogComponent } from "./edit-catalog/edit-catalog.component";
         InputErrorPipe,
         EditCollectionComponent,
         ConfirmationDialogComponent,
-        EditCatalogComponent
+        EditCatalogComponent,
+        CreateCollectionComponent
     ],
     providers: [TimeAgoPipe]
 })

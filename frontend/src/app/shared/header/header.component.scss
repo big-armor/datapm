@@ -1,3 +1,6 @@
+@import "../../../styles/mixins";
+@import "../../../styles/variables";
+
 .search-form {
     display: flex;
     width: 100%;
@@ -19,21 +22,11 @@ app-avatar {
     cursor: pointer;
 }
 
-h1.title {
-    font-family: Roboto Mono;
-    font-style: normal;
-    font-weight: 300;
-    font-size: 32px;
-    line-height: 42px;
-    letter-spacing: -0.28px;
-    color: #333333;
+a.dpm-text-logo {
+    color: $gray-1;
     cursor: pointer;
-
-    a {
-        cursor: pointer;
-        &:hover {
-            text-decoration: none;
-        }
+    &:hover {
+        text-decoration: none;
     }
 }
 
@@ -80,8 +73,7 @@ button.mat-menu-item {
     .app-fab-button {
         width: 30px;
         height: 30px;
-        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
-            0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
+
         ::ng-deep .mat-button-wrapper {
             .mat-icon {
                 font-size: 26px !important;
