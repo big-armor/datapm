@@ -262,7 +262,9 @@ export class CatalogRepository extends Repository<Catalog> {
         const ALIAS = "autoCompleteCatalog";
 
         const entities = this.createQueryBuilderWithUserConditions(user)
-            .andWhere('(LOWER("Catalog"."displayName") LIKE \'' + startsWith.toLowerCase() + "%')")
+            .andWhere(`(LOWER("Catalog"."slug") LIKE :valueLike OR LOWER("Catalog"."displayName") LIKE :valueLike)`, {
+                valueLike: startsWith.toLowerCase() + "%"
+            })
             .addRelations(ALIAS, relations)
             .getMany();
 

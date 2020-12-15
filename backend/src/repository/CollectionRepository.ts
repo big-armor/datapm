@@ -126,13 +126,8 @@ export class CollectionRepository extends Repository<Collection> {
     }): Promise<Collection[]> {
         const ALIAS = "autoCompleteCollection";
 
-        const byDisplayName = 'LOWER("Collection"."name") ILIKE :valueLike';
-        const bySlug = ' OR LOWER("Collection"."slug") ILIKE :valueLike';
-        // const byDescVector = ' OR LOWER("Collection"."description_tokens") LIKE \'' + startsWith.toLowerCase() + "%'";
-        // const byReadmeVector = ' OR LOWER("Collection"."readme_file_vectors") LIKE \'' + startsWith.toLowerCase() + "%'";
-
         const entities = this.createQueryBuilderWithUserConditions(user.id)
-            .andWhere(byDisplayName + bySlug, {
+            .andWhere(`(LOWER("Collection"."slug") LIKE :valueLike OR LOWER("Collection"."name") LIKE :valueLike)`, {
                 valueLike: startsWith.toLowerCase() + "%"
             })
             .addRelations(ALIAS, relations)

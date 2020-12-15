@@ -506,18 +506,6 @@ export const resolvers: {
         collectionPackages: collectionPackages,
 
         autoComplete: async (_0: any, { startsWith }, context: AuthenticatedContext, info: any) => {
-            const packages = context.connection.manager.getCustomRepository(PackageRepository).autocomplete({
-                user: context.me,
-                startsWith,
-                relations: getRelationNames(graphqlFields(info).packages)
-            });
-
-            const collections = context.connection.manager.getCustomRepository(CollectionRepository).autocomplete({
-                user: context.me,
-                startsWith,
-                relations: getRelationNames(graphqlFields(info).collections)
-            });
-
             const users = context.connection.manager.getCustomRepository(UserRepository).autocomplete({
                 user: context.me,
                 startsWith,
@@ -530,11 +518,23 @@ export const resolvers: {
                 relations: getRelationNames(graphqlFields(info).catalogs)
             });
 
+            const packages = context.connection.manager.getCustomRepository(PackageRepository).autocomplete({
+                user: context.me,
+                startsWith,
+                relations: getRelationNames(graphqlFields(info).packages)
+            });
+
+            const collections = context.connection.manager.getCustomRepository(CollectionRepository).autocomplete({
+                user: context.me,
+                startsWith,
+                relations: getRelationNames(graphqlFields(info).collections)
+            });
+
             return {
+                users: await users,
                 catalogs: await catalogs,
                 packages: await packages,
-                collections: await collections,
-                users: await users
+                collections: await collections
             };
         },
 
