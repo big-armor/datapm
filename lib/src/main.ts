@@ -1,10 +1,6 @@
 import { JSONSchema7, JSONSchema7TypeName } from "json-schema";
 import { DPMConfiguration } from "./PackageUtil";
 
-export enum Protocol {
-    Http = "HTTP",
-    LocalFile = "LOCAL_FILE"
-}
 /** A description of where the package file should be published. */
 export interface RegistryReference {
     /** The HTTP or HTTPS URL to reach the registry server. */
@@ -14,16 +10,13 @@ export interface RegistryReference {
     catalogSlug: string;
 }
 
-export interface ParserInfo {
-    mimeType: string;
-
-    /** An object that holds keys and values used by the Parser implementation to complete runtime tasks. The keys and values are provided by the user when they complete the parameter prompts.  */
-    configuration?: DPMConfiguration;
-}
-
 /** Describes where the data resides, and how to access to byte stream of the data. */
 export interface Source {
-    protocol: Protocol;
+    /** The universally unique identifier for the sourceInterface implementation */
+    type: string;
+
+    /** The URI used for accessing the data */
+    uri: string;
 
     /** An object containing valid JSON properties for the purposes of accessing the data. The schema
      * of this object is loose because it is up to the source implementation to define it's own schema
@@ -52,11 +45,8 @@ export type ValueTypes = { [key: string]: ValueTypeStatistics };
  * how to obtain the data, and details the values of the data properties.
  */
 export interface Schema extends JSONSchema7 {
-    /** An object describing how to access the bytestream(s) of the data */
+    /** An object describing how to access the record stream of the data */
     source?: Source;
-
-    /** An object describing how to parse the bytestream(s) into datapm compliant records. */
-    parser?: ParserInfo;
 
     /** The JSON Schema Draft 07 compliant property list for the object */
     properties?: Properties;

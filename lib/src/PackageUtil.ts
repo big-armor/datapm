@@ -30,7 +30,6 @@ export enum DifferenceType {
     CHANGE_PACKAGE_DISPLAY_NAME = "CHANGE_PACKAGE_DISPLAY_NAME",
     CHANGE_PACKAGE_DESCRIPTION = "CHANGE_PACKAGE_DESCRIPTION",
     CHANGE_SOURCE = "CHANGE_SOURCE",
-    CHANGE_PARSER = "CHANGE_PARSER",
     ADD_PROPERTY = "ADD_PROPERTY",
     REMOVE_PROPERTY = "REMOVE_PROPERTY",
     CHANGE_PROPERTY_TYPE = "CHANGE_PROPERTY_TYPE",
@@ -241,7 +240,9 @@ export function compareSchema(priorSchema: Schema, newSchema: Schema, pointer = 
     } else if (newSchema.source == null && priorSchema.source != null) {
         response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
     } else if (priorSchema.source != null && newSchema.source != null) {
-        if (priorSchema.source.protocol !== newSchema.source.protocol) {
+        if (priorSchema.source.type !== newSchema.source.type) {
+            response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
+        } else if (priorSchema.source.uri !== newSchema.source.uri) {
             response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
         } else {
             const configComparison = compareConfigObjects(
@@ -250,23 +251,6 @@ export function compareSchema(priorSchema: Schema, newSchema: Schema, pointer = 
             );
 
             if (!configComparison) response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
-        }
-    }
-
-    if (priorSchema.parser == null && newSchema.parser != null) {
-        response.push({ type: DifferenceType.CHANGE_PARSER, pointer: pointer });
-    } else if (newSchema.parser == null && priorSchema.parser != null) {
-        response.push({ type: DifferenceType.CHANGE_PARSER, pointer: pointer });
-    } else if (priorSchema.parser != null && newSchema.parser != null) {
-        if (priorSchema.parser.mimeType !== newSchema.parser.mimeType) {
-            response.push({ type: DifferenceType.CHANGE_PARSER, pointer: pointer });
-        } else {
-            const configComparison = compareConfigObjects(
-                priorSchema.parser.configuration,
-                newSchema.parser.configuration
-            );
-
-            if (!configComparison) response.push({ type: DifferenceType.CHANGE_PARSER, pointer: pointer });
         }
     }
 
@@ -321,7 +305,6 @@ export function diffCompatibility(diffs: Difference[]): Compability {
 
             case DifferenceType.CHANGE_PACKAGE_DESCRIPTION:
             case DifferenceType.CHANGE_PACKAGE_DISPLAY_NAME:
-            case DifferenceType.CHANGE_PARSER:
             case DifferenceType.CHANGE_PROPERTY_DESCRIPTION:
             case DifferenceType.CHANGE_SOURCE:
             case DifferenceType.CHANGE_README_MARKDOWN:
@@ -519,9 +502,16 @@ export function validatePackageFile(packageFile: string): void {
         packageSchemaFile = fs.readFileSync(path.join(pathToDataPmLib, "packageFileSchema.json"), "utf8");
     } catch (error) {
         try {
-            packageSchemaFile = fs.readFileSync("packageFileSchema.json", "utf8");
+            packageSchemaFile = fs.readFileSync(
+                "node_modules" + path.sep + "datapm-lib" + path.sep + "packageFileSchema.json",
+                "utf8"
+            );
         } catch (error) {
-            packageSchemaFile = fs.readFileSync(path.join("..", "lib", "packageFileSchema.json"), "utf8");
+            try {
+                packageSchemaFile = fs.readFileSync("packageFileSchema.json", "utf8");
+            } catch (error) {
+                packageSchemaFile = fs.readFileSync(path.join("..", "lib", "packageFileSchema.json"), "utf8");
+            }
         }
     }
 

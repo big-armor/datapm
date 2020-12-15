@@ -93,14 +93,15 @@ Please refer to the [Understanding JSON Schema website](https://json-schema.org/
 
 The DataPM specification only additionally requires that the "type" field is specified.
 
-## Parser
+## Source Properties
 
 These are the properties of the parser property of the top level schema object.
 
-| Property      |  Type  | Required | Description                                                                                         |
-| :------------ | :----: | :------: | :-------------------------------------------------------------------------------------------------- |
-| mimeType      | String | Required | The mimeType of the data stream which identifies the parser implementation needed to parse the data |
-| configuration | Object | Optional | A plain JSON object with properties as defined by the parser implementation.                        |
+| Property      |  Type  | Required | Description                                                                  |
+| :------------ | :----: | :------: | :--------------------------------------------------------------------------- |
+| type          | String | Required | The unique identifier for the source implementation.                         |
+| uri           | String | Optional | The URI for accessing the data                                               |
+| configuration | Object | Optional | A plain JSON object with properties as defined by the source implementation. |
 
 ## Registries
 
