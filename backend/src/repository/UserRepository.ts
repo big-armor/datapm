@@ -236,16 +236,15 @@ export class UserRepository extends Repository<User> {
     }): Promise<User[]> {
         const ALIAS = "autoCompleteUser";
 
-        const entities = this.manager
+        const entities = await this.manager
             .getRepository(User)
             .createQueryBuilder()
-            .where(`("User"."nameIsPublic" is true or "User"."emailAddressIsPublic" is true)`)
-            .andWhere(
-                `(LOWER("User"."first_name") LIKE :valueLike OR LOWER("User"."last_name") LIKE :valueLike OR LOWER("User"."username") LIKE :valueLike OR LOWER("User"."emailAddress") LIKE :valueLike)`,
-                {
-                    valueLike: startsWith.toLowerCase() + "%"
-                }
+            .where(`(LOWER("User"."username") LIKE :valueLike)`)
+            .orWhere(`("User"."emailAddressIsPublic" is true AND (LOWER("User"."emailAddress") LIKE :valueLike))`)
+            .orWhere(
+                `("User"."nameIsPublic" is true AND (LOWER("User"."first_name") LIKE :valueLike OR LOWER("User"."last_name") LIKE :valueLike))`
             )
+            .setParameter("valueLike", startsWith.toLowerCase() + "%")
             .addRelations(ALIAS, relations)
             .getMany();
 
