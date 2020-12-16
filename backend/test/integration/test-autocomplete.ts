@@ -5,8 +5,6 @@ import {
     CreateCollectionDocument,
     CreatePackageDocument,
     UpdateMeDocument,
-    MeDocument,
-    UpdatePackageDocument,
     CreateCatalogDocument
 } from "./registry-client";
 import { createUser } from "./test-utils";
@@ -44,7 +42,7 @@ describe("Autocomplete tests", async () => {
             variables: {
                 value: {
                     collectionSlug: "collection-auto-complete-test-v1",
-                    name: "Collection Auto Complete Test v1",
+                    name: "Collection Auto Complete Test v1 For Training",
                     description: "This is a test collection for auto-complete test purposes"
                 }
             }
@@ -54,8 +52,8 @@ describe("Autocomplete tests", async () => {
             mutation: CreateCatalogDocument,
             variables: {
                 value: {
-                    slug: "catalog-auto-complete-v1",
-                    displayName: "Catalog Auto Complete Test v1",
+                    slug: "catalog-auto-complete-test-v1",
+                    displayName: "Catalog Auto Complete Test v1 For Exercise",
                     description: "This is a test catalog for auto-complete test purposes",
                     website: "https://autocomplete.datapm.io",
                     isPublic: false
@@ -68,8 +66,8 @@ describe("Autocomplete tests", async () => {
             variables: {
                 value: {
                     catalogSlug: "userA-auto-complete-test",
-                    packageSlug: "package-auto-complete-v1",
-                    displayName: "Package Auto Complete Test v1",
+                    packageSlug: "package-auto-complete-test-v1",
+                    displayName: "Package Auto Complete Test v1 For Lucid",
                     description: "This is a test package for auto-complete test purposes"
                 }
             }
@@ -89,7 +87,9 @@ describe("Autocomplete tests", async () => {
         });
 
         expect(response.data?.autoComplete?.packages?.length).to.equal(1);
-        expect(response.data?.autoComplete?.packages![0].identifier.packageSlug).to.equal("package-auto-complete-v1");
+        expect(response.data?.autoComplete?.packages![0].identifier.packageSlug).to.equal(
+            "package-auto-complete-test-v1"
+        );
     });
 
     it("Should return packages display name", async function () {
@@ -101,7 +101,9 @@ describe("Autocomplete tests", async () => {
         });
 
         expect(response.data?.autoComplete?.packages?.length).to.equal(1);
-        expect(response.data?.autoComplete?.packages![0].displayName).to.equal("Package Auto Complete Test v1");
+        expect(response.data?.autoComplete?.packages![0].displayName).to.equal(
+            "Package Auto Complete Test v1 For Lucid"
+        );
     });
 
     it("Should return catalogs by slug", async function () {
@@ -113,7 +115,9 @@ describe("Autocomplete tests", async () => {
         });
 
         expect(response.data?.autoComplete?.catalogs?.length).to.equal(1);
-        expect(response.data?.autoComplete?.catalogs![0].identifier.catalogSlug).to.equal("catalog-auto-complete-v1");
+        expect(response.data?.autoComplete?.catalogs![0].identifier.catalogSlug).to.equal(
+            "catalog-auto-complete-test-v1"
+        );
     });
 
     it("Should return catalogs display name", async function () {
@@ -125,7 +129,9 @@ describe("Autocomplete tests", async () => {
         });
 
         expect(response.data?.autoComplete?.catalogs?.length).to.equal(1);
-        expect(response.data?.autoComplete?.catalogs![0].displayName).to.equal("Catalog Auto Complete Test v1");
+        expect(response.data?.autoComplete?.catalogs![0].displayName).to.equal(
+            "Catalog Auto Complete Test v1 For Exercise"
+        );
     });
 
     it("Should return collections by slug", async function () {
@@ -151,7 +157,9 @@ describe("Autocomplete tests", async () => {
         });
 
         expect(response.data?.autoComplete?.collections?.length).to.equal(1);
-        expect(response.data?.autoComplete?.collections![0].name).to.equal("Collection Auto Complete Test v1");
+        expect(response.data?.autoComplete?.collections![0].name).to.equal(
+            "Collection Auto Complete Test v1 For Training"
+        );
     });
 
     it("Should return users by username", async function () {
@@ -196,6 +204,15 @@ describe("Autocomplete tests", async () => {
     });
 
     it("Should return users by email address", async function () {
+        let setEmailPublic = await userAClient.mutate({
+            mutation: UpdateMeDocument,
+            variables: {
+                value: {
+                    emailAddressIsPublic: true
+                }
+            }
+        });
+
         let response = await userAClient.query({
             query: AutoCompleteDocument,
             variables: {
@@ -228,18 +245,11 @@ describe("Autocomplete tests", async () => {
     });
 
     it("Should return users only if emailAddressIsPublic", async function () {
-        let before = await userAClient.query({
-            query: AutoCompleteDocument,
-            variables: {
-                startsWith: "Aemail"
-            }
-        });
-
-        let setEmailPublic = await userAClient.mutate({
+        let setEmailNotPublic = await userAClient.mutate({
             mutation: UpdateMeDocument,
             variables: {
                 value: {
-                    emailAddressIsPublic: true
+                    emailAddressIsPublic: false
                 }
             }
         });
@@ -251,19 +261,48 @@ describe("Autocomplete tests", async () => {
             }
         });
 
-        expect(before.data?.autoComplete?.users?.length).to.equal(0);
-        expect(after.data?.autoComplete?.users?.length).to.equal(1);
+        expect(after.data?.autoComplete?.users?.length).to.equal(0);
     });
 
-    it("Should return packages by description vectors", async function () {});
+    it("Should return collections name tokens", async function () {
+        let response = await userAClient.query({
+            query: AutoCompleteDocument,
+            variables: {
+                startsWith: "Training"
+            }
+        });
 
-    it("Should return packages readme vectors", async function () {});
+        expect(response.data?.autoComplete?.collections?.length).to.equal(1);
+        expect(response.data?.autoComplete?.collections![0].identifier.collectionSlug).to.equal(
+            "collection-auto-complete-test-v1"
+        );
+    });
 
-    it("Should return collections description vectors", async function () {});
+    it("Should return catalogs displayName tokens", async function () {
+        let response = await userAClient.query({
+            query: AutoCompleteDocument,
+            variables: {
+                startsWith: "Exercise"
+            }
+        });
 
-    it("Should return collections name tokens", async function () {});
+        expect(response.data?.autoComplete?.catalogs?.length).to.equal(1);
+        expect(response.data?.autoComplete?.catalogs![0].identifier.catalogSlug).to.equal(
+            "catalog-auto-complete-test-v1"
+        );
+    });
 
-    it("Should return catalogs displayName tokens", async function () {});
+    it("Should return packages displayNames tokens", async function () {
+        let response = await userAClient.query({
+            query: AutoCompleteDocument,
+            variables: {
+                startsWith: "Lucid"
+            }
+        });
 
-    it("Should return collections description_tokens tokens", async function () {});
+        expect(response.data?.autoComplete?.packages?.length).to.equal(1);
+        expect(response.data?.autoComplete?.packages![0].identifier.packageSlug).to.equal(
+            "package-auto-complete-test-v1"
+        );
+    });
 });
