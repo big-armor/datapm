@@ -62,7 +62,8 @@ import {
     setCollectionCoverImage,
     updateCollection,
     collectionPackages,
-    usersByCollection
+    usersByCollection,
+    myPermissions
 } from "./resolvers/CollectionResolver";
 import {
     setUserCollectionPermissions,
@@ -335,6 +336,7 @@ export const resolvers: {
             };
         },
         packages: findPackagesForCollection,
+        myPermissions: myPermissions,
         creator: async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
             const collection = parent as Collection;
 
