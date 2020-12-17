@@ -33,6 +33,7 @@ import { EditCollectionComponent } from "./edit-collection/edit-collection.compo
 import { ConfirmationDialogComponent } from "./confirmation-dialog/confirmation-dialog.component";
 import { EditCatalogComponent } from "./edit-catalog/edit-catalog.component";
 import { CreateCollectionComponent } from "./create-collection/create-collection.component";
+import { UserDetailsHeaderComponent } from "./user-details-header/user-details-header.component";
 
 @NgModule({
     declarations: [
@@ -56,7 +57,8 @@ import { CreateCollectionComponent } from "./create-collection/create-collection
         EditCollectionComponent,
         ConfirmationDialogComponent,
         EditCatalogComponent,
-        CreateCollectionComponent
+        CreateCollectionComponent,
+        UserDetailsHeaderComponent
     ],
     imports: [
         CommonModule,
@@ -93,7 +95,8 @@ import { CreateCollectionComponent } from "./create-collection/create-collection
         EditCollectionComponent,
         ConfirmationDialogComponent,
         EditCatalogComponent,
-        CreateCollectionComponent
+        CreateCollectionComponent,
+        UserDetailsHeaderComponent
     ],
     providers: [TimeAgoPipe]
 })
