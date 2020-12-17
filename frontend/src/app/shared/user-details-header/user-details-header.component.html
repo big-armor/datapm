@@ -1,0 +1,64 @@
+<app-cover [username]="user?.username"></app-cover>
+<div class="row" *ngIf="user">
+    <div class="col-lg-8 col-xs-12">
+        <div class="d-flex user-header">
+            <div class="p-2">
+                <app-avatar class="user-img" [user]="user" [size]="64"></app-avatar>
+            </div>
+            <div class="p-2">
+                <span *ngIf="user.firstName && user.lastName">
+                    <span class="dpm-text-title">
+                        {{ user | username }}
+                    </span>
+                    &nbsp;
+                    <span *ngIf="user.nameIsPublic" class="public-text">public</span>
+                    <span *ngIf="!user.nameIsPublic" class="not-public-text">not public</span><br />
+                </span>
+
+                <div class="username dpm-text-body my-2">
+                    {{ "@" + user.username }} <span class="public-text">public</span>
+                </div>
+
+                <div *ngIf="user.website" class="pb-1">
+                    <span class="social-link">
+                        <a target="_blank" href="{{ user.website }}">{{ user.website }}</a>
+                        &nbsp;
+                        <span *ngIf="user.websiteIsPublic" class="public-text">public</span>
+                        <span *ngIf="!user.websiteIsPublic" class="not-public-text">not public</span>
+                    </span>
+                </div>
+
+                <span class="social-link">
+                    <a target="_blank" href="mailto:{{ user.emailAddress }}">
+                        <img src="/assets/images/envelope.png" width="24" alt="email" />
+                    </a>
+                    &nbsp;
+                    <span *ngIf="user.emailAddressIsPublic" class="public-text">public</span>
+                    <span *ngIf="!user.emailAddressIsPublic" class="not-public-text">not public</span>
+                </span>
+
+                <span class="social-link" *ngIf="user.twitterHandle">
+                    <a target="_blank" href="https://twitter.com/{{ user.twitterHandle }}">
+                        <img src="/assets/images/twitter.png" style="opacity: 0.8;" width="24" alt="twitter" />
+                    </a>
+                    &nbsp;
+                    <span *ngIf="user.twitterHandleIsPublic" class="public-text">public</span>
+                    <span *ngIf="!user.twitterHandleIsPublic" class="not-public-text">not public</span>
+                </span>
+                <span class="social-link" *ngIf="user.gitHubHandle">
+                    <a target="_blank" href="https://github.com/{{ user.gitHubHandle }}">
+                        <img src="/assets/images/github.png" style="opacity: 0.8;" width="24" alt="twitter" />
+                    </a>
+                    &nbsp;
+                    <span *ngIf="user.gitHubHandleIsPublic" class="public-text">public</span>
+                    <span *ngIf="!user.gitHubHandleIsPublic" class="not-public-text">not public</span>
+                </span>
+                <p class="user-bio">
+                    {{ user.description }}
+                </p>
+            </div>
+            <div class="p-2"></div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-xs-12 contact-info"><!-- future follow button--></div>
+</div>
