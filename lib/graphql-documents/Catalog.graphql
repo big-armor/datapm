@@ -26,6 +26,9 @@ query GetCatalog($identifier: CatalogIdentifierInput!) {
                 updatedAt
                 packageFile
             }
+            creator {
+                username
+            }
         }
     }
 }
