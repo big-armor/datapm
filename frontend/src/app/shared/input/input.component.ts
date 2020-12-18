@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
 import { FormControl, FormGroup } from "@angular/forms";
 
+type InputComponentStyle = "round" | "flat";
+
 @Component({
     selector: "app-input",
     templateUrl: "./input.component.html",
@@ -18,6 +20,7 @@ export class InputComponent implements OnInit, OnChanges {
     @Input() inputType: string = "text";
     @Input() multiline: boolean = false;
     @Input() error: string = "";
+    @Input() inputStyle: InputComponentStyle = "round";
     @Input() autoFocus: boolean = false;
     @Output() inputChange: EventEmitter<string>;
     @Output() keyEnter: EventEmitter<void>;
