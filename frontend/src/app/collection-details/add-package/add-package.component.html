@@ -1,0 +1,25 @@
+<form [formGroup]="form" (submit)="submit($event)">
+    <div class="dpm-text-title" mat-dialog-title>Add Package</div>
+    <div mat-dialog-content class="py-4">
+        <div class="d-flex input-row">
+            <div class="input-label">Package Slug</div>
+            <div class="input-control">
+                <app-input
+                    placeholder="catalog-slug/package-slug"
+                    [group]="form"
+                    controlName="packageSlug"
+                    inputStyle="flat"
+                    [error]="form | inputError: 'packageSlug' | async"
+                ></app-input>
+            </div>
+        </div>
+        <div class="text-danger mt-3" *ngIf="state === 'ERROR'">
+            Error occured while adding a package to the collection
+        </div>
+    </div>
+    <div mat-dialog-actions class="d-flex justify-content-end">
+        <button type="submit" class="ml-auto app-raised-button" [disabled]="form.invalid">
+            <span>Add</span>
+        </button>
+    </div>
+</form>

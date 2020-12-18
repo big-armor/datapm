@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, Output, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { Package } from "src/generated/graphql";
 import * as timeago from "timeago.js";
@@ -11,6 +11,9 @@ import * as timeago from "timeago.js";
 export class PackageItemComponent implements OnInit {
     @Input() item: Package;
     @Input() hasImage: boolean;
+    @Input() ctaText: string = "";
+    @Input() showCta: boolean = false;
+    @Output() action = new EventEmitter();
 
     constructor(private router: Router) {}
 
@@ -21,6 +24,11 @@ export class PackageItemComponent implements OnInit {
         window.scrollTo(0, 0);
 
         this.router.navigate([catalogSlug, packageSlug]);
+    }
+
+    handleAction(ev): void {
+        ev.stopPropagation();
+        this.action.emit();
     }
 
     get lastActivityLabel(): string {
