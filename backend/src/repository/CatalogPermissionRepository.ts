@@ -1,7 +1,12 @@
 import { EntityRepository, Repository, EntityManager } from "typeorm";
 
 import { User } from "../entity/User";
-import { Permission, CatalogIdentifierInput, SetUserCatalogPermissionInput } from "../generated/graphql";
+import {
+    Permission,
+    CatalogIdentifierInput,
+    SetUserCatalogPermissionInput,
+    UserCatalogPermissions
+} from "../generated/graphql";
 import { Catalog } from "../entity/Catalog";
 import { UserCatalogPermission } from "../entity/UserCatalogPermission";
 import { UserRepository } from "./UserRepository";
@@ -133,6 +138,7 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
             .where({ catalogId, userId })
             .getOne();
     }
+
     async findByUser({
         username,
         relations = []
@@ -178,6 +184,17 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
 
     public async findByUserAndCatalogId(userId: number, catalogId: number): Promise<UserCatalogPermission | undefined> {
         return this.createQueryBuilder().where({ userId: userId, catalogId: catalogId }).getOne();
+    }
+
+    public async usersByCatalog(catalogEntity: Catalog, relations?: string[]): Promise<UserCatalogPermissions[]> {
+        const ALIAS = "userCatalogPermission";
+
+        return await this.manager
+            .getRepository(UserCatalogPermission)
+            .createQueryBuilder(ALIAS)
+            .addRelations(ALIAS, relations)
+            .where({ catalogId: catalogEntity.id })
+            .getMany();
     }
 
     public async setUserCatalogPermission({

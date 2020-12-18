@@ -35,9 +35,9 @@ export const usersByCollection = async (
         .getCustomRepository(CollectionRepository)
         .findCollectionBySlugOrFail(identifier.collectionSlug);
 
-    return context.connection.manager
+    return await context.connection.manager
         .getCustomRepository(UserCollectionPermissionRepository)
-        .usersByCollection(collectionEntity.id, relations);
+        .usersByCollection(collectionEntity, relations);
 };
 
 export const createCollection = async (
