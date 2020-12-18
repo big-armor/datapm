@@ -14,7 +14,6 @@ export async function superCreateConnection(): Promise<Connection> {
 
     try {
         connection = await createConnection(ormOpts);
-        console.log("Found: " + ormOpts.database!);
         return connection;
     } catch (error) {
         console.log("Database creation error : " + JSON.stringify(error));
