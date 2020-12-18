@@ -3,7 +3,7 @@ import { HttpClientModule } from "@angular/common/http";
 import { SharedModule } from "../../shared/shared.module";
 import { UserDetailsHeaderComponent } from "./user-details-header.component";
 
-fdescribe("UserDetailsHeaderComponent", () => {
+describe("UserDetailsHeaderComponent", () => {
     let component: UserDetailsHeaderComponent;
     let fixture: ComponentFixture<UserDetailsHeaderComponent>;
 
