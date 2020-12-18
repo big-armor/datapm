@@ -1,5 +1,5 @@
-query UsersByCollection($identifier: CollectionIdentifierInput!) {
-    usersByCollection(identifier: $identifier) {
+query UsersByCatalog($identifier: CatalogIdentifierInput!) {
+    usersByCatalog(identifier: $identifier) {
         user {
             username
             firstName
