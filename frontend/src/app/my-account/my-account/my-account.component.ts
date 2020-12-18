@@ -88,7 +88,8 @@ export class MyAccountComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.subscription.unsubscribe();
+        this.subscription.next();
+        this.subscription.complete();
     }
 
     public selectTab(index) {

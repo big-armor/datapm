@@ -26,7 +26,7 @@ const staticRoutes: Route[] = [
         loadChildren: () => import("./auth-callbacks/auth-callbacks.module").then((m) => m.AuthCallbacksModule)
     },
     {
-        path: ":catalogSlug",
+        path: "",
         loadChildren: () => import("./catalog/catalog.module").then((m) => m.CatalogModule)
     },
     {
