@@ -121,7 +121,7 @@ body {
     }
 }
 
-.app-input-round {
+.dpm-input-round {
     border-radius: 24px;
     padding: 10px 23px;
     width: 100%;
@@ -130,6 +130,27 @@ body {
     outline: none;
     background-color: $gray-7;
     box-shadow: $inner-shadow-1;
+    transition: background-color ease 0.5s;
+
+    &:hover {
+        background-color: $white;
+        transition: background-color ease 0.5s;
+    }
+
+    &::placeholder {
+        @include text("body");
+        color: $gray-4;
+    }
+}
+
+.dpm-input-flat {
+    border-radius: 4px;
+    padding: 10px 16px;
+    width: 100%;
+    height: 44px;
+    border: none;
+    outline: none;
+    background-color: $gray-7;
     transition: background-color ease 0.5s;
 
     &:hover {

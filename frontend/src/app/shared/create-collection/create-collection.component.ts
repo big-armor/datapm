@@ -39,7 +39,7 @@ export class CreateCollectionComponent implements OnInit {
             .mutate({
                 value: {
                     name,
-                    collectionSlug: name.toLowerCase()
+                    collectionSlug: name.toLowerCase().replace(/\s+/g, "-")
                 }
             })
             .subscribe(
