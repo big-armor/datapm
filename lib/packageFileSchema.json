@@ -220,7 +220,7 @@
                                     "uri": {
                                         "$id": "#/schemas/source/uri",
                                         "type": "string",
-                                        "maxLength": 128,
+                                        "maxLength": 2048,
                                         "title": "Source URI",
                                         "description": "Used by the source implementation to pull the data.",
                                         "default": ""
