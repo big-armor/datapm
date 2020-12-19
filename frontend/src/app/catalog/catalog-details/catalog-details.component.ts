@@ -1,8 +1,9 @@
 import { Component, OnInit } from "@angular/core";
-import { Catalog, GetCatalogGQL, GetCatalogQuery, Permission } from "src/generated/graphql";
+import { Catalog, GetCatalogGQL } from "src/generated/graphql";
 import { ActivatedRoute } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
 import { EditCatalogComponent } from "src/app/shared/edit-catalog/edit-catalog.component";
+import { PageState } from "src/app/models/page-state";
 
 @Component({
     selector: "app-catalog-details",
@@ -10,16 +11,19 @@ import { EditCatalogComponent } from "src/app/shared/edit-catalog/edit-catalog.c
     styleUrls: ["./catalog-details.component.scss"]
 })
 export class CatalogDetailsComponent implements OnInit {
-    catalog: Catalog;
-    canEdit: boolean;
+    public catalogSlug = "";
+    public catalog: Catalog;
+    public state: PageState = "INIT";
 
     constructor(private getCatalogGQL: GetCatalogGQL, private dialog: MatDialog, private route: ActivatedRoute) {}
 
     ngOnInit(): void {
-        const catalogSlug = this.route.snapshot.paramMap.get("catalogSlug");
-        this.getCatalogGQL.fetch({ identifier: { catalogSlug } }).subscribe(({ data }) => {
+        this.catalogSlug = this.route.snapshot.paramMap.get("catalogSlug");
+        this.state = "LOADING";
+        this.getCatalogGQL.fetch({ identifier: { catalogSlug: this.catalogSlug } }).subscribe(({ data }) => {
             this.catalog = data.catalog as Catalog;
-            this.canEdit = this.catalog?.myPermissions?.includes(Permission.EDIT);
+            this.state = "SUCCESS";
+            console.log(this.catalog);
         });
     }
 
