@@ -327,7 +327,7 @@ describe("Checking VersionUtil", () => {
 
         const diffs2 = compareSchema(schemaA1, schemaA2);
 
-        expect(diffs2[0].type).equal(DifferenceType.CHANGE_SOURCE);
+        expect(diffs2[0].type).equal(DifferenceType.CHANGE_SOURCE_UPDATE_HASH);
     });
 
     it("Package File updated dates", function () {
