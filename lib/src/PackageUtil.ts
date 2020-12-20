@@ -30,6 +30,7 @@ export enum DifferenceType {
     CHANGE_PACKAGE_DISPLAY_NAME = "CHANGE_PACKAGE_DISPLAY_NAME",
     CHANGE_PACKAGE_DESCRIPTION = "CHANGE_PACKAGE_DESCRIPTION",
     CHANGE_SOURCE = "CHANGE_SOURCE",
+    CHANGE_SOURCE_UPDATE_HASH = "CHANGE_SOURCE_UPDATE_HASH",
     ADD_PROPERTY = "ADD_PROPERTY",
     REMOVE_PROPERTY = "REMOVE_PROPERTY",
     CHANGE_PROPERTY_TYPE = "CHANGE_PROPERTY_TYPE",
@@ -244,8 +245,6 @@ export function compareSchema(priorSchema: Schema, newSchema: Schema, pointer = 
             response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
         } else if (priorSchema.source.uri !== newSchema.source.uri) {
             response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
-        } else if (priorSchema.source.lastUpdateHash !== newSchema.source.lastUpdateHash) {
-            response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
         } else {
             const configComparison = compareConfigObjects(
                 priorSchema.source.configuration,
@@ -253,6 +252,13 @@ export function compareSchema(priorSchema: Schema, newSchema: Schema, pointer = 
             );
 
             if (!configComparison) response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
+        }
+
+        if (
+            priorSchema.source.lastUpdateHash !== newSchema.source.lastUpdateHash &&
+            priorSchema.source.lastUpdateHash != null
+        ) {
+            response.push({ type: DifferenceType.CHANGE_SOURCE_UPDATE_HASH, pointer: pointer });
         }
     }
 
@@ -317,6 +323,7 @@ export function diffCompatibility(diffs: Difference[]): Compability {
                 returnValue = Math.max(returnValue, Compability.MinorChange);
                 break;
 
+            case DifferenceType.CHANGE_SOURCE_UPDATE_HASH:
             case DifferenceType.CHANGE_GENERATED_BY:
             case DifferenceType.CHANGE_UPDATED_DATE:
             case DifferenceType.CHANGE_README_FILE:
