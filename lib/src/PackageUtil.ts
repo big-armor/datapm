@@ -244,6 +244,8 @@ export function compareSchema(priorSchema: Schema, newSchema: Schema, pointer = 
             response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
         } else if (priorSchema.source.uri !== newSchema.source.uri) {
             response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
+        } else if (priorSchema.source.lastUpdateHash !== newSchema.source.lastUpdateHash) {
+            response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
         } else {
             const configComparison = compareConfigObjects(
                 priorSchema.source.configuration,

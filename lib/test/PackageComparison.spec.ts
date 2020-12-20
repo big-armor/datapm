@@ -293,7 +293,8 @@ describe("Checking VersionUtil", () => {
             source: {
                 type: "test",
                 uri: "http://datapm.io/test",
-                configuration: {}
+                configuration: {},
+                lastUpdateHash: "abc123"
             }
         };
 
@@ -304,16 +305,29 @@ describe("Checking VersionUtil", () => {
             source: {
                 type: "test",
                 uri: "http://datapm.io/test",
-                configuration: {}
+                configuration: {},
+                lastUpdateHash: "abc123"
             }
         };
 
+        if (schemaA2.source == null) {
+            throw new Error("source should not be null");
+        }
+
         expect(compareSchema(schemaA1, schemaA2).length).equal(0);
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        schemaA2.source!.uri = "https://somethingelse.datapm.io";
+        schemaA2.source.uri = "https://somethingelse.datapm.io";
 
-        expect(compareSchema(schemaA1, schemaA2).length).equal(1);
+        const diffs = compareSchema(schemaA1, schemaA2);
+
+        expect(diffs[0].type).equal(DifferenceType.CHANGE_SOURCE);
+
+        schemaA2.source.uri = "http://datapm.io/test";
+        schemaA2.source.lastUpdateHash = "test1234";
+
+        const diffs2 = compareSchema(schemaA1, schemaA2);
+
+        expect(diffs2[0].type).equal(DifferenceType.CHANGE_SOURCE);
     });
 
     it("Package File updated dates", function () {
