@@ -27,7 +27,7 @@ export interface Source {
     /** The last update hash provided by the source after generating the file package file. This is used
      * to determine if there are new updates available from a source when updating a package file.
      */
-    lastUpdateHash: string;
+    lastUpdateHash?: string;
 }
 
 export interface ValueTypeStatistics {
