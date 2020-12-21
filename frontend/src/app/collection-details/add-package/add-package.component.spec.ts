@@ -1,5 +1,8 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ReactiveFormsModule } from "@angular/forms";
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 
+import { SharedModule } from "../../shared/shared.module";
 import { AddPackageComponent } from "./add-package.component";
 
 describe("AddPackageComponent", () => {
@@ -8,7 +11,19 @@ describe("AddPackageComponent", () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [AddPackageComponent]
+            declarations: [AddPackageComponent],
+            imports: [ReactiveFormsModule, MatDialogModule, SharedModule],
+            providers: [
+                {
+                    provide: MatDialogRef,
+                    useValue: {}
+                },
+                {
+                    // I was expecting this will pass the desired value
+                    provide: MAT_DIALOG_DATA,
+                    useValue: {}
+                }
+            ]
         }).compileComponents();
     }));
 
