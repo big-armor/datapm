@@ -51,17 +51,9 @@ export class MyAccountComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.authenticationService
-            .getUserObservable()
-            .pipe(takeUntil(this.subscription))
-            .subscribe((u) => {
-                if (u == null) {
-                    return;
-                }
-                u.then((user) => {
-                    this.currentUser = user;
-                });
-            });
+        this.authenticationService.currentUser.pipe(takeUntil(this.subscription)).subscribe((user: User) => {
+            this.currentUser = user;
+        });
     }
 
     ngOnDestroy() {

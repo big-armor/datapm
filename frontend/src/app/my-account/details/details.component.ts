@@ -57,18 +57,12 @@ export class DetailsComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit(): void {
-        this.authenticationService
-            .getUserObservable()
-            .pipe(takeUntil(this.subscription))
-            .subscribe((u) => {
-                if (u == null) {
-                    return;
-                }
-                u.then((user) => {
-                    this.currentUser = user;
-                    this.state = State.SUCCESS;
-                }).catch((error) => (this.state = State.ERROR));
-            });
+        this.authenticationService.currentUser.pipe(takeUntil(this.subscription)).subscribe((user: User) => {
+            this.currentUser = user;
+            if (user) {
+                this.state = State.SUCCESS;
+            }
+        });
 
         this.refreshAPIKeys();
 

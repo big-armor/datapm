@@ -70,7 +70,7 @@ export class CatalogsComponent implements OnInit {
     }
 
     deleteCatalog(catalog: Catalog) {
-        if (catalog.identifier.catalogSlug == this.authenticationService.currentUser.username) {
+        if (catalog.identifier.catalogSlug == this.authenticationService.currentUser.value?.username) {
             this.dialog.open(this.deleteMyUsercatalog);
             return;
         }

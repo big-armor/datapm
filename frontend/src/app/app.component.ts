@@ -23,34 +23,13 @@ export class AppComponent implements OnInit, OnDestroy {
     constructor(private authenticationService: AuthenticationService, public router: Router) {}
 
     ngOnInit() {
-        let currentPromise: Promise<User>;
-
         this.searchFormGroup = new FormGroup({
             search: new FormControl("")
         });
 
-        this.authenticationService
-            .getUserObservable()
-            .pipe(takeUntil(this.subscription))
-            .subscribe((userPromise) => {
-                currentPromise = userPromise;
-
-                if (userPromise == null) {
-                    this.currentUser = null;
-                    return;
-                }
-
-                userPromise
-                    .then((user) => {
-                        // Race condition consideration
-                        if (currentPromise != userPromise) return;
-
-                        this.currentUser = user;
-                    })
-                    .catch((error) => {
-                        // nothing to do
-                    });
-            });
+        this.authenticationService.currentUser.pipe(takeUntil(this.subscription)).subscribe((user: User) => {
+            this.currentUser = user;
+        });
     }
 
     ngOnDestroy() {

@@ -23,7 +23,7 @@ export class CatalogComponent implements OnInit {
     ngOnInit(): void {
         this.route.paramMap.pipe(takeUntil(this.subscription)).subscribe((paramMap: ParamMap) => {
             const catalogSlug = paramMap.get("catalogSlug");
-            const username = this.authenticationService.currentUser?.username;
+            const username = this.authenticationService.currentUser.value?.username;
             if (username && catalogSlug === username) {
                 this.router.navigate(["/user", catalogSlug]);
             }
