@@ -29,13 +29,17 @@ const staticRoutes: Route[] = [
         path: "",
         loadChildren: () => import("./auth-callbacks/auth-callbacks.module").then((m) => m.AuthCallbacksModule)
     },
-    {
-        path: "",
-        loadChildren: () => import("./catalog/catalog.module").then((m) => m.CatalogModule)
-    },
+    // {
+    //     path: "",
+    //     loadChildren: () => import("./catalog/catalog.module").then((m) => m.CatalogModule)
+    // },
     {
         path: ":catalogSlug/:packageSlug",
         loadChildren: () => import("./package/package.module").then((m) => m.PackageModule)
+    },
+    {
+        path: "**",
+        redirectTo: ""
     }
 ];
 
