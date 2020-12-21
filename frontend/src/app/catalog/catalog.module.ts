@@ -5,12 +5,10 @@ import { MatTabsModule } from "@angular/material/tabs";
 import { SharedModule } from "../shared/shared.module";
 
 import { CatalogRoutingModule } from "./catalog-routing.module";
-import { CatalogDetailsComponent } from "./catalog-details/catalog-details.component";
-import { UserDetailsComponent } from "./user-details/user-details.component";
 import { CatalogComponent } from "./catalog/catalog.component";
 
 @NgModule({
-    declarations: [CatalogDetailsComponent, UserDetailsComponent, CatalogComponent],
+    declarations: [CatalogComponent],
     imports: [CommonModule, CatalogRoutingModule, MatProgressSpinnerModule, MatTabsModule, SharedModule]
 })
 export class CatalogModule {}

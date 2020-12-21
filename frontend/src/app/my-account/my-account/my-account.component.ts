@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, Input, OnDestroy, OnInit, SimpleChanges } from "@angular/core";
 import { ActivatedRoute, ParamMap, Router } from "@angular/router";
 import { FormGroup, FormControl } from "@angular/forms";
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -27,23 +27,12 @@ const routeMap = {
     styleUrls: ["./my-account.component.scss"]
 })
 export class MyAccountComponent implements OnInit, OnDestroy {
-    State = State;
-    state = State.INIT;
-
-    catalogState = State.INIT;
-    apiKeysState = State.INIT;
-    createAPIKeyState = State.INIT;
-    deleteAPIKeyState = State.INIT;
+    @Input() user: User;
 
     currentUser: User;
-    newAPIKey: string;
 
-    public myCatalogs: Catalog[];
-    public myAPIKeys: APIKey[];
     public routes = [];
     public selectedTab = 0;
-
-    createAPIKeyForm: FormGroup;
 
     private subscription = new Subject();
 
@@ -67,12 +56,6 @@ export class MyAccountComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.state = State.INIT;
-
-        this.createAPIKeyForm = new FormGroup({
-            label: new FormControl("")
-        });
-
         this.authenticationService
             .getUserObservable()
             .pipe(takeUntil(this.subscription))
@@ -82,8 +65,7 @@ export class MyAccountComponent implements OnInit, OnDestroy {
                 }
                 u.then((user) => {
                     this.currentUser = user;
-                    this.state = State.SUCCESS;
-                }).catch((error) => (this.state = State.ERROR));
+                });
             });
     }
 
