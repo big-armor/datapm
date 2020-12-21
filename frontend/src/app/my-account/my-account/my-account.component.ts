@@ -7,19 +7,10 @@ import { APIKey, Catalog, User } from "src/generated/graphql";
 import { takeUntil, take } from "rxjs/operators";
 import { Subject } from "rxjs";
 
-enum State {
-    INIT,
-    LOADING,
-    ERROR,
-    SUCCESS,
-    ERROR_NOT_UNIQUE
+interface Tab {
+    name: string;
+    value: string;
 }
-
-const routeMap = {
-    packages: 1,
-    collections: 2,
-    catalogs: 3
-};
 
 @Component({
     selector: "app-my-account",
@@ -31,8 +22,8 @@ export class MyAccountComponent implements OnInit, OnDestroy {
 
     currentUser: User;
 
-    public routes = [];
-    public selectedTab = 0;
+    public tabs: Tab[] = [];
+    public selectedTab: string = "";
 
     private subscription = new Subject();
 
@@ -42,16 +33,20 @@ export class MyAccountComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         public dialog: MatDialog
     ) {
-        let prefix = "/me";
-        this.routes = [
-            { linkName: "My Account", url: prefix },
-            { linkName: "My Packages", url: prefix + "/packages" },
-            { linkName: "My Collections", url: prefix + "/collections" },
-            { linkName: "My Catalogs", url: prefix + "/catalogs" }
+        this.tabs = [
+            { name: "My Account", value: "" },
+            { name: "My Packages", value: "packages" },
+            { name: "My Collections", value: "collections" },
+            { name: "My Catalogs", value: "catalogs" }
         ];
 
-        this.route.url.pipe(take(1)).subscribe(() => {
-            this.selectedTab = routeMap[route.snapshot.firstChild.routeConfig.path] || 0;
+        this.route.fragment.pipe(takeUntil(this.subscription)).subscribe((fragment: string) => {
+            const index = this.tabs.findIndex((tab) => tab.value === fragment);
+            if (index < 0) {
+                this.selectTab(this.tabs[0].value);
+            } else {
+                this.selectedTab = fragment;
+            }
         });
     }
 
@@ -74,9 +69,11 @@ export class MyAccountComponent implements OnInit, OnDestroy {
         this.subscription.complete();
     }
 
-    public selectTab(index) {
-        this.router.navigate([this.routes[index].url]);
-        this.selectedTab = index;
+    public selectTab(tab: string) {
+        this.router.navigate(["."], {
+            relativeTo: this.route,
+            fragment: tab
+        });
     }
 
     logoutClicked() {

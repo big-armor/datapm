@@ -24,11 +24,10 @@ export class CatalogComponent implements OnInit {
         this.route.paramMap.pipe(takeUntil(this.subscription)).subscribe((paramMap: ParamMap) => {
             const catalogSlug = paramMap.get("catalogSlug");
             const username = this.authenticationService.currentUser?.username;
-
             if (username && catalogSlug === username) {
-                this.router.navigate(["/user", catalogSlug], { skipLocationChange: true });
+                this.router.navigate(["/user", catalogSlug]);
             } else {
-                this.router.navigate(["/catalog", catalogSlug], { skipLocationChange: true });
+                this.router.navigate(["/catalog", catalogSlug]);
             }
         });
     }

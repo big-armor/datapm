@@ -4,15 +4,18 @@
             <app-user-details-header [user]="currentUser"></app-user-details-header>
 
             <ul class="p-0 tabs">
-                <li *ngFor="let route of routes; let i = index" class="list-names" (click)="selectTab(i)">
-                    <a class="cursor-pointer" [class.active]="i == selectedTab">
-                        {{ route.linkName }}
+                <li *ngFor="let tab of tabs; let i = index" class="list-names" (click)="selectTab(tab.value)">
+                    <a class="cursor-pointer" [class.active]="tab.value == selectedTab">
+                        {{ tab.name }}
                     </a>
                 </li>
             </ul>
         </div>
-        <div class="p-0">
-            <router-outlet></router-outlet>
+        <div class="p-0" [ngSwitch]="selectedTab">
+            <me-packages *ngSwitchCase="'packages'"></me-packages>
+            <my-collections *ngSwitchCase="'collections'"></my-collections>
+            <me-catalogs *ngSwitchCase="'catalogs'"></me-catalogs>
+            <me-details *ngSwitchDefault></me-details>
         </div>
     </div>
 </div>
