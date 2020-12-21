@@ -21,10 +21,6 @@ const staticRoutes: Route[] = [
         loadChildren: () => import("./my-account/my-account.module").then((m) => m.MyAccountModule)
     },
     {
-        path: "catalog/:catalogSlug",
-        loadChildren: () => import("./catalog-details/catalog-details.module").then((m) => m.CatalogDetailsModule)
-    },
-    {
         path: "me",
         loadChildren: () => import("./my-account/my-account.module").then((m) => m.MyAccountModule),
         canActivate: [AuthGuard]
