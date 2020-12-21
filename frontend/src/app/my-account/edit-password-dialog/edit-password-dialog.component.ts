@@ -1,9 +1,8 @@
-import { Component, OnInit, Inject, ChangeDetectorRef } from "@angular/core";
+import { Component, OnInit, Inject } from "@angular/core";
 import { MatDialog, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { FormGroup, FormControl, AbstractControl, ValidationErrors } from "@angular/forms";
+import { FormGroup, FormControl } from "@angular/forms";
 
 import { User, UpdateMyPasswordGQL } from "src/generated/graphql";
-import { AuthenticationService } from "src/app/services/authentication.service";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import { newPasswordValidator } from "src/app/helpers/validators";
 
@@ -31,7 +30,6 @@ export class EditPasswordDialogComponent implements OnInit {
         @Inject(MAT_DIALOG_DATA) public data: User,
         private dialog: MatDialog,
         private updateMyPasswordGQL: UpdateMyPasswordGQL,
-        private authenticationService: AuthenticationService,
         private snackBarService: SnackBarService
     ) {}
 

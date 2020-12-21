@@ -1,5 +1,5 @@
 <input
-    class="app-input-round"
+    [ngClass]="'dpm-input-' + inputStyle"
     [type]="inputType"
     autocomplete="off"
     [placeholder]="placeholder"
@@ -12,7 +12,7 @@
     *ngIf="autoFocus && !multiline"
 />
 <input
-    class="app-input-round"
+    [ngClass]="'dpm-input-' + inputStyle"
     [type]="inputType"
     autocomplete="off"
     [placeholder]="placeholder"
@@ -24,7 +24,7 @@
     *ngIf="!autoFocus && !multiline"
 />
 <textarea
-    class="app-input-round"
+    [ngClass]="'dpm-input-' + inputStyle"
     autocomplete="off"
     [placeholder]="placeholder"
     [formControl]="formControl"
@@ -36,7 +36,7 @@
     *ngIf="autoFocus && multiline"
 ></textarea>
 <textarea
-    class="app-input-round"
+    [ngClass]="'dpm-input-' + inputStyle"
     autocomplete="off"
     [placeholder]="placeholder"
     [formControl]="formControl"
