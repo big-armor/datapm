@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { Catalog, GetCatalogGQL } from "src/generated/graphql";
+import { Catalog, GetCatalogGQL, Package, Permission } from "src/generated/graphql";
 import { ActivatedRoute } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
 import { EditCatalogComponent } from "src/app/shared/edit-catalog/edit-catalog.component";
@@ -14,6 +14,7 @@ export class CatalogDetailsComponent implements OnInit {
     public catalogSlug = "";
     public catalog: Catalog;
     public state: PageState = "INIT";
+    public currentTab = 0;
 
     constructor(private getCatalogGQL: GetCatalogGQL, private dialog: MatDialog, private route: ActivatedRoute) {}
 
@@ -38,5 +39,29 @@ export class CatalogDetailsComponent implements OnInit {
                     this.catalog = newCatalog;
                 }
             });
+    }
+
+    removePackage(p: Package) {
+        // this.removePackageFromCollectionGQL
+        //     .mutate({
+        //         collectionIdentifier: {
+        //             collectionSlug: this.collectionSlug
+        //         },
+        //         packageIdentifier: {
+        //             catalogSlug: p.identifier.catalogSlug,
+        //             packageSlug: p.identifier.packageSlug
+        //         }
+        //     })
+        //     .subscribe(() => {
+        //         this.getCollectionDetails();
+        //     });
+    }
+
+    public get canManage() {
+        return this.catalog && this.catalog.myPermissions?.includes(Permission.MANAGE);
+    }
+
+    public get canEdit() {
+        return this.catalog && this.catalog.myPermissions?.includes(Permission.EDIT);
     }
 }

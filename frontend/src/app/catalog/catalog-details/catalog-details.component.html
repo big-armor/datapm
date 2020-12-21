@@ -7,17 +7,27 @@
             {{ catalog?.description }}
         </p>
     </div>
-    <mat-tab-group class="catalog-tabs px-3">
+    <mat-tab-group [(selectedIndex)]="currentTab" class="catalog-tabs px-3">
         <mat-tab label="Packages"></mat-tab>
+        <mat-tab label="Permissions" *ngIf="canManage"></mat-tab>
     </mat-tab-group>
-    <div *ngIf="state === 'SUCCESS'">
-        <app-package-item [item]="package" [hasImage]="true" *ngFor="let package of catalog?.packages">
+    <div *ngIf="state === 'SUCCESS' && currentTab === 0">
+        <app-package-item
+            [item]="package"
+            [hasImage]="true"
+            ctaText="Remove From Catalog"
+            [showCta]="canEdit"
+            (action)="removePackage(package)"
+            *ngFor="let package of catalog?.packages"
+        >
         </app-package-item>
         <div class="dpm-no-data" *ngIf="!catalog?.packages?.length">
             <p>There are no packages available.</p>
             <a class="app-outlined-button mt-3 px-3">Add package</a>
         </div>
     </div>
+    <!-- <app-catalog-permissions *ngIf="state === 'SUCCESS' && currentTab === 1"></app-catalog-permissions> -->
+    <div *ngIf="state === 'SUCCESS' && currentTab === 1">Users with permissions</div>
     <div class="dpm-page-loading" *ngIf="state === 'LOADING'">
         <mat-spinner></mat-spinner>
     </div>
