@@ -566,6 +566,23 @@ export const resolvers: {
                 .catalogPackages(catalogEntity.id, limit, offset, relations);
         },
 
+        usersByCatalog: async (
+            _0: any,
+            { identifier }: { identifier: CatalogIdentifierInput },
+            context: AuthenticatedContext,
+            info: any
+        ) => {
+            const relations = getGraphQlRelationName(info);
+
+            const catalogEntity = await context.connection.manager
+                .getCustomRepository(CatalogRepository)
+                .findCatalogBySlugOrFail(identifier.catalogSlug);
+
+            return await context.connection.manager
+                .getCustomRepository(UserCatalogPermissionRepository)
+                .usersByCatalog(catalogEntity, relations);
+        },
+
         searchPackages: searchPackages,
 
         usernameAvailable: usernameAvailable,

@@ -1,6 +1,8 @@
-import { Entity, Column, PrimaryColumn, Index } from "typeorm";
+import { Entity, Column, PrimaryColumn, Index, JoinColumn, ManyToOne } from "typeorm";
 import { BaseModel } from "./BaseModel";
 import { Permission } from "../generated/graphql";
+import { Collection } from "./Collection";
+import { User } from "./User";
 
 @Entity({
     name: "collection_user"
@@ -16,4 +18,12 @@ export class UserCollectionPermission extends BaseModel {
 
     @Column("enum", { array: true, name: "permissions", enum: Permission, nullable: false })
     public permissions: Permission[];
+
+    @ManyToOne(() => Collection)
+    @JoinColumn({ name: "collection_id" })
+    collection: Collection;
+
+    @ManyToOne(() => User)
+    @JoinColumn({ name: "user_id" })
+    user: User;
 }
