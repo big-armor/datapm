@@ -97,11 +97,12 @@ The DataPM specification only additionally requires that the "type" field is spe
 
 These are the properties of the parser property of the top level schema object.
 
-| Property      |  Type  | Required | Description                                                                  |
-| :------------ | :----: | :------: | :--------------------------------------------------------------------------- |
-| type          | String | Required | The unique identifier for the source implementation.                         |
-| uri           | String | Optional | The URI for accessing the data                                               |
-| configuration | Object | Optional | A plain JSON object with properties as defined by the source implementation. |
+| Property       |  Type  | Required | Description                                                                   |
+| :------------- | :----: | :------: | :---------------------------------------------------------------------------- |
+| type           | String | Required | The unique identifier for the source implementation.                          |
+| configuration  | Object | Optional | A plain JSON object with properties as defined by the source implementation.  |
+| lastUpdateHash | String | Optional | The last update hash provided by the source when generating the package file. |
+| uri            | String | Optional | The URI for accessing the data                                                |
 
 ## Registries
 
