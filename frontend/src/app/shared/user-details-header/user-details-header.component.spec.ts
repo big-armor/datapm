@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { HttpClientModule } from "@angular/common/http";
-import { SharedModule } from "../../shared/shared.module";
 import { UserDetailsHeaderComponent } from "./user-details-header.component";
+import { CoverComponent } from "../cover/cover.component";
 
 describe("UserDetailsHeaderComponent", () => {
     let component: UserDetailsHeaderComponent;
@@ -9,8 +9,8 @@ describe("UserDetailsHeaderComponent", () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [UserDetailsHeaderComponent],
-            imports: [HttpClientModule, SharedModule]
+            declarations: [UserDetailsHeaderComponent, CoverComponent],
+            imports: [HttpClientModule]
         }).compileComponents();
     }));
 

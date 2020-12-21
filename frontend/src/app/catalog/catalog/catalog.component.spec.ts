@@ -5,7 +5,6 @@ import { MatDialogModule } from "@angular/material/dialog";
 
 import { CatalogComponent } from "./catalog.component";
 import { CatalogDetailsComponent } from "../catalog-details/catalog-details.component";
-import { UserDetailsComponent } from "../user-details/user-details.component";
 
 describe("CatalogComponent", () => {
     let component: CatalogComponent;
@@ -13,7 +12,7 @@ describe("CatalogComponent", () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [CatalogComponent, CatalogDetailsComponent, UserDetailsComponent],
+            declarations: [CatalogComponent, CatalogDetailsComponent],
             imports: [RouterTestingModule, MatDialogModule, ApolloTestingModule]
         }).compileComponents();
     }));
