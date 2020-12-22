@@ -1,4 +1,6 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { MatSlideToggleModule } from "@angular/material/slide-toggle";
+import { MatTableModule } from "@angular/material/table";
 
 import { CollectionPermissionsComponent } from "./collection-permissions.component";
 
@@ -8,7 +10,8 @@ describe("CollectionPermissionsComponent", () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [CollectionPermissionsComponent]
+            declarations: [CollectionPermissionsComponent],
+            imports: [MatSlideToggleModule, MatTableModule]
         }).compileComponents();
     }));
 

@@ -1,14 +1,17 @@
 import { Component } from "@angular/core";
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { HttpClientModule } from "@angular/common/http";
+import { ReactiveFormsModule } from "@angular/forms";
 
 import { MyAccountComponent } from "./my-account.component";
 import { RouterTestingModule } from "@angular/router/testing";
 import { ApolloTestingModule } from "apollo-angular/testing";
 import { MatDialogModule } from "@angular/material/dialog";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { ActivatedRoute } from "@angular/router";
 import { Subject } from "rxjs";
 import { SharedModule } from "../../shared/shared.module";
+import { DetailsComponent } from "../details/details.component";
 
 @Component({
     template: ""
@@ -21,12 +24,14 @@ describe("MyAccountComponent", () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [MyAccountComponent],
+            declarations: [MyAccountComponent, DetailsComponent],
             imports: [
                 HttpClientModule,
                 RouterTestingModule.withRoutes([{ path: "me", component: DummyComponent }]),
                 ApolloTestingModule,
+                ReactiveFormsModule,
                 MatDialogModule,
+                MatProgressSpinnerModule,
                 SharedModule
             ],
             providers: [
@@ -40,7 +45,7 @@ describe("MyAccountComponent", () => {
                                 }
                             }
                         },
-                        url: new Subject()
+                        fragment: new Subject()
                     }
                 }
             ]
