@@ -227,3 +227,21 @@ export const removePackagePermissions = async (
         username
     });
 };
+
+export const userPackages = async (
+    _0: any,
+    { username, limit, offSet }: { username: string; limit: number; offSet: number },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const relations = getGraphQlRelationName(info);
+    const [searchResponse, count] = await context.connection.manager
+        .getCustomRepository(PackageRepository)
+        .userPackages({ user: context.me, username, offSet, limit, relations });
+
+    return {
+        hasMore: count - (offSet + limit) > 0,
+        packages: searchResponse,
+        count
+    };
+};

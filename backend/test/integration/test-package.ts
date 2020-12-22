@@ -9,7 +9,8 @@ import {
     CreateVersionDocument,
     DeletePackageDocument,
     MyPackagesDocument,
-    GetLatestPackagesDocument
+    GetLatestPackagesDocument,
+    UserPackagesDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import * as fs from "fs";
@@ -176,6 +177,22 @@ describe("Package Tests", async () => {
         ).equal(true);
     });
 
+    it("User A package list should not available to user B", async function () {
+        let response = await userBClient.query({
+            query: UserPackagesDocument,
+            variables: {
+                username: "testA-packages",
+                offSet: 0,
+                limit: 100
+            }
+        });
+
+        expect(response.errors == null, "should not have errors").to.equal(true);
+        expect(response.data.userPackages.hasMore).to.equal(false);
+        expect(response.data.userPackages.count).to.equal(0);
+        expect(response.data.userPackages.packages?.length).to.equal(0);
+    });
+
     it("User A can get package", async function () {
         let response = await userAClient.query({
             query: PackageDocument,
@@ -212,7 +229,23 @@ describe("Package Tests", async () => {
         expect(response.errors == null).true;
     });
 
-    it("package should not be available anonymously - catalog is private", async function () {
+    it("User A package list should not available to user B", async function () {
+        let response = await userBClient.query({
+            query: UserPackagesDocument,
+            variables: {
+                username: "testA-packages",
+                offSet: 0,
+                limit: 100
+            }
+        });
+
+        expect(response.errors == null, "should not have errors").to.equal(true);
+        expect(response.data.userPackages.hasMore).to.equal(false);
+        expect(response.data.userPackages.count).to.equal(0);
+        expect(response.data.userPackages.packages?.length).to.equal(0);
+    });
+
+    it("package should not be available anonymously - package is private", async function () {
         let response = await anonymousClient.query({
             query: PackageDocument,
             variables: {
@@ -245,7 +278,7 @@ describe("Package Tests", async () => {
         ).to.equal(undefined);
     });
 
-    it("User A can not update package", async function () {
+    it("User A can not set package public - no versions", async function () {
         let response = await userAClient.mutate({
             mutation: UpdatePackageDocument,
             variables: {
@@ -327,23 +360,6 @@ describe("Package Tests", async () => {
         expect(identifier.versionPatch).to.equal(0);
     });
 
-    it("User A set catalog public", async function () {
-        let response = await userAClient.mutate({
-            mutation: UpdateCatalogDocument,
-            variables: {
-                identifier: {
-                    catalogSlug: "testA-packages"
-                },
-                value: {
-                    isPublic: true
-                }
-            }
-        });
-
-        expect(response.errors == null, "should not have errors").to.equal(true);
-        expect(response.data!.updateCatalog.isPublic).equal(true);
-    });
-
     it("Anonymous user can access package", async function () {
         let response = await anonymousClient.query({
             query: PackageDocument,
@@ -392,6 +408,22 @@ describe("Package Tests", async () => {
         expect(identifier.versionMajor).to.equal(1);
         expect(identifier.versionMinor).to.equal(0);
         expect(identifier.versionPatch).to.equal(0);
+    });
+
+    it("User A package list should be available to user B", async function () {
+        let response = await userBClient.query({
+            query: UserPackagesDocument,
+            variables: {
+                username: "testA-packages",
+                offSet: 0,
+                limit: 100
+            }
+        });
+
+        expect(response.errors == null, "should not have errors").to.equal(true);
+        expect(response.data.userPackages.hasMore).to.equal(false);
+        expect(response.data.userPackages.count).to.equal(1);
+        expect(response.data.userPackages.packages?.length).to.equal(1);
     });
 
     it("User b can not update package", async function () {
