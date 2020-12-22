@@ -1,16 +1,11 @@
-import { Component, Input, OnDestroy, OnInit, SimpleChanges } from "@angular/core";
-import { ActivatedRoute, ParamMap, Router } from "@angular/router";
-import { FormGroup, FormControl } from "@angular/forms";
-import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { Component, Input, OnDestroy, OnInit } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
+import { MatDialog } from "@angular/material/dialog";
 import { AuthenticationService } from "../../services/authentication.service";
-import { APIKey, Catalog, User } from "src/generated/graphql";
-import { takeUntil, take } from "rxjs/operators";
+import { TabModel } from "../../models/tab.model";
+import { User } from "src/generated/graphql";
+import { takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";
-
-interface Tab {
-    name: string;
-    value: string;
-}
 
 @Component({
     selector: "app-my-account",
@@ -22,7 +17,7 @@ export class MyAccountComponent implements OnInit, OnDestroy {
 
     currentUser: User;
 
-    public tabs: Tab[] = [];
+    public tabs: TabModel[] = [];
     public selectedTab: string = "";
 
     private subscription = new Subject();
