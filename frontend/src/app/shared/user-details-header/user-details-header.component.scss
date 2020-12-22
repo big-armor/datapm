@@ -40,3 +40,9 @@
     @include text("small");
     color: $gray-3;
 }
+.not-current-user {
+    .public-text,
+    .not-public-text {
+        display: none;
+    }
+}

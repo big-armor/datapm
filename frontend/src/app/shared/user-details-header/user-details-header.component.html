@@ -5,8 +5,8 @@
             <div class="p-2">
                 <app-avatar class="user-img" [user]="user" [size]="64"></app-avatar>
             </div>
-            <div class="p-2">
-                <span *ngIf="user.firstName && user.lastName">
+            <div class="p-2" [class.not-current-user]="!isCurrentUser">
+                <span *ngIf="user.firstName && user.lastName && (user.nameIsPublic || isCurrentUser)">
                     <span class="dpm-text-title">
                         {{ user | username }}
                     </span>
@@ -19,7 +19,7 @@
                     {{ "@" + user.username }} <span class="public-text">public</span>
                 </div>
 
-                <div *ngIf="user.website" class="pb-1">
+                <div *ngIf="user.website && (user.websiteIsPublic || isCurrentUser)" class="pb-1">
                     <span class="social-link">
                         <a target="_blank" href="{{ user.website }}">{{ user.website }}</a>
                         &nbsp;
@@ -28,7 +28,7 @@
                     </span>
                 </div>
 
-                <span class="social-link">
+                <span class="social-link" *ngIf="user.emailAddressIsPublic || isCurrentUser">
                     <a target="_blank" href="mailto:{{ user.emailAddress }}">
                         <img src="/assets/images/envelope.png" width="24" alt="email" />
                     </a>
@@ -37,7 +37,7 @@
                     <span *ngIf="!user.emailAddressIsPublic" class="not-public-text">not public</span>
                 </span>
 
-                <span class="social-link" *ngIf="user.twitterHandle">
+                <span class="social-link" *ngIf="user.twitterHandle && (user.twitterHandleIsPublic || isCurrentUser)">
                     <a target="_blank" href="https://twitter.com/{{ user.twitterHandle }}">
                         <img src="/assets/images/twitter.png" style="opacity: 0.8;" width="24" alt="twitter" />
                     </a>
@@ -45,7 +45,7 @@
                     <span *ngIf="user.twitterHandleIsPublic" class="public-text">public</span>
                     <span *ngIf="!user.twitterHandleIsPublic" class="not-public-text">not public</span>
                 </span>
-                <span class="social-link" *ngIf="user.gitHubHandle">
+                <span class="social-link" *ngIf="user.gitHubHandle && (user.gitHubHandleIsPublic || isCurrentUser)">
                     <a target="_blank" href="https://github.com/{{ user.gitHubHandle }}">
                         <img src="/assets/images/github.png" style="opacity: 0.8;" width="24" alt="twitter" />
                     </a>
