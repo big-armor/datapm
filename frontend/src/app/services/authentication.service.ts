@@ -20,7 +20,7 @@ export class AuthenticationService {
         const jwt = localStorage.getItem("jwt");
 
         if (!jwt) {
-            return;
+            return of(null);
         }
 
         // TODO Determine if the jwt is expired
