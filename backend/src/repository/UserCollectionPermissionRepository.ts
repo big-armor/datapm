@@ -1,9 +1,15 @@
 import { EntityRepository, Repository } from "typeorm";
 import { ForbiddenError } from "apollo-server";
 
-import { Permission, CollectionIdentifierInput, SetUserCollectionPermissionsInput } from "../generated/graphql";
+import {
+    Permission,
+    CollectionIdentifierInput,
+    SetUserCollectionPermissionsInput,
+    UserCollectionPermissions
+} from "../generated/graphql";
 import { UserCollectionPermission } from "../entity/UserCollectionPermission";
 import { User } from "../entity/User";
+import { Collection } from "../entity/Collection";
 
 import { UserRepository } from "./UserRepository";
 import { CollectionRepository } from "./CollectionRepository";
@@ -27,6 +33,7 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
             .where({ collectionId, userId })
             .getOne();
     }
+
     public async grantAllPermissionsForUser(userId: number, collectionId: number): Promise<UserCollectionPermission> {
         return this.setPermissionsForUser(userId, collectionId, [Permission.VIEW, Permission.EDIT, Permission.MANAGE]);
     }
@@ -63,15 +70,17 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
         return this.createQueryBuilder().where({ userId: userId, collectionId: collectionId }).getOne();
     }
 
-    public async usersByCollection(collectionId: number, relations?: string[]): Promise<User[]> {
+    public async usersByCollection(
+        collectionEntity: Collection,
+        relations?: string[]
+    ): Promise<UserCollectionPermissions[]> {
         const ALIAS = "userCollectionPermission";
+
         return await this.manager
-            .getRepository(User)
-            .createQueryBuilder()
-            .where('("User"."id" IN (SELECT user_id FROM collection_user WHERE collection_id = :collectionId))', {
-                collectionId: collectionId
-            })
+            .getRepository(UserCollectionPermission)
+            .createQueryBuilder(ALIAS)
             .addRelations(ALIAS, relations)
+            .where({ collectionId: collectionEntity.id })
             .getMany();
     }
 

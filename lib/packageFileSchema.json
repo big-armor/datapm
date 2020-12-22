@@ -220,9 +220,17 @@
                                     "uri": {
                                         "$id": "#/schemas/source/uri",
                                         "type": "string",
-                                        "maxLength": 128,
+                                        "maxLength": 2048,
                                         "title": "Source URI",
                                         "description": "Used by the source implementation to pull the data.",
+                                        "default": ""
+                                    },
+                                    "lastUpdateHash": {
+                                        "$id": "#/schemas/source/lastUpdateHash",
+                                        "type": "string",
+                                        "maxLength": 2048,
+                                        "title": "Last Source Update Hash",
+                                        "description": "The update hash reported by the source after generating this package file.",
                                         "default": ""
                                     },
                                     "configuration": {

@@ -21,6 +21,7 @@ import { UserRepository } from "./repository/UserRepository";
 import { PackageRepository } from "./repository/PackageRepository";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { CollectionRepository } from "./repository/CollectionRepository";
+console.log("DataPM Registry Server Starting...");
 
 const dataLibPackageFile = fs.readFileSync("node_modules/datapm-lib/package.json");
 const dataLibPackageJSON = JSON.parse(dataLibPackageFile.toString());

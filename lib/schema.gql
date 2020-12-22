@@ -196,6 +196,22 @@ type UserPackagePermissions {
 }
 
 """
+Represents users, and their permissions on a collection
+"""
+type UserCollectionPermissions {
+    user: User!
+    permissions: [Permission!]!
+}
+
+"""
+Represents users, and their permissions on a catalog
+"""
+type UserCatalogPermissions {
+    user: User!
+    permissions: [Permission!]!
+}
+
+"""
 A single version of a package file for a package listing on the registry
 """
 type Version {
@@ -471,12 +487,16 @@ type Query {
     """
     Returns all of the users for a given catalog
     """
-    usersByCatalog(identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)): [User]!
+    usersByCatalog(
+        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
+    ): [UserCatalogPermissions]!
 
     """
     Returns all of the users for a given collection
     """
-    usersByCollection(identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)): [User]!
+    usersByCollection(
+        identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
+    ): [UserCollectionPermissions]!
 
     """
     Return a user by a given username, and returns only the properties on that user the requester should be able to view
