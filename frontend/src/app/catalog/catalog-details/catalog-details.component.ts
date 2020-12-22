@@ -22,6 +22,7 @@ export class CatalogDetailsComponent implements OnInit {
         this.catalogSlug = this.route.snapshot.paramMap.get("catalogSlug");
         this.state = "LOADING";
         this.getCatalogGQL.fetch({ identifier: { catalogSlug: this.catalogSlug } }).subscribe(({ data }) => {
+            if (!data) return;
             this.catalog = data.catalog as Catalog;
             this.state = "SUCCESS";
             console.log(this.catalog);

@@ -26,8 +26,6 @@ export class CatalogComponent implements OnInit {
             const username = this.authenticationService.currentUser?.username;
             if (username && catalogSlug === username) {
                 this.router.navigate(["/user", catalogSlug]);
-            } else {
-                this.router.navigate(["/catalog", catalogSlug]);
             }
         });
     }
