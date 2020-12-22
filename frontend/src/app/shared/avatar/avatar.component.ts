@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from "@angular/core";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
-import { AuthenticationService } from "src/app/services/authentication.service";
 
 import { FileService } from "src/app/services/file.service";
 import { ImageService } from "src/app/services/image.service";
