@@ -2,6 +2,7 @@ import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { RouterTestingModule } from "@angular/router/testing";
 import { ApolloTestingModule } from "apollo-angular/testing";
 import { MatDialogModule } from "@angular/material/dialog";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 
 import { CatalogComponent } from "./catalog.component";
 import { CatalogDetailsComponent } from "../catalog-details/catalog-details.component";
@@ -13,7 +14,7 @@ describe("CatalogComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [CatalogComponent, CatalogDetailsComponent],
-            imports: [RouterTestingModule, MatDialogModule, ApolloTestingModule]
+            imports: [RouterTestingModule, MatDialogModule, MatProgressSpinnerModule, ApolloTestingModule]
         }).compileComponents();
     }));
 
