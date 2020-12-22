@@ -1,22 +1,25 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, of } from "rxjs";
+import { BehaviorSubject, of, throwError } from "rxjs";
 
 import { User, LoginGQL, MeGQL } from "../../generated/graphql";
-import { tap, switchMap } from "rxjs/operators";
+import { tap, switchMap, catchError } from "rxjs/operators";
 
 @Injectable({ providedIn: "root" })
 export class AuthenticationService {
     public currentUser: BehaviorSubject<User>;
+    public isLoggedIn: BehaviorSubject<boolean>;
 
     constructor(private loginGQL: LoginGQL, private meGQL: MeGQL) {
         this.currentUser = new BehaviorSubject(null);
-        this.refreshUserInfo();
+        const jwt = localStorage.getItem("jwt");
+        this.isLoggedIn = new BehaviorSubject(!!jwt);
+        this.refreshUserInfo().subscribe(() => {});
     }
 
     refreshUserInfo() {
         const jwt = localStorage.getItem("jwt");
 
-        if (jwt == null) {
+        if (!jwt) {
             return;
         }
 
@@ -28,7 +31,12 @@ export class AuthenticationService {
             tap(({ data }) => {
                 if (data) {
                     this.currentUser.next(data.me);
+                    this.isLoggedIn.next(true);
                 }
+            }),
+            catchError((err) => {
+                this.logout();
+                return throwError(err);
             })
         );
     }
@@ -50,5 +58,6 @@ export class AuthenticationService {
         // remove user from local storage to log user out
         localStorage.removeItem("jwt");
         this.currentUser.next(null);
+        this.isLoggedIn.next(false);
     }
 }
