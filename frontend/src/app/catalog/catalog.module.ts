@@ -7,9 +7,10 @@ import { SharedModule } from "../shared/shared.module";
 import { CatalogRoutingModule } from "./catalog-routing.module";
 import { CatalogDetailsComponent } from "./catalog-details/catalog-details.component";
 import { CatalogComponent } from "./catalog/catalog.component";
+import { UserDetailsComponent } from "./user-details/user-details.component";
 
 @NgModule({
-    declarations: [CatalogComponent, CatalogDetailsComponent],
+    declarations: [CatalogComponent, CatalogDetailsComponent, UserDetailsComponent],
     imports: [CommonModule, CatalogRoutingModule, MatProgressSpinnerModule, MatTabsModule, SharedModule]
 })
 export class CatalogModule {}

@@ -6,13 +6,7 @@ import { CatalogComponent } from "./catalog/catalog.component";
 const routes: Routes = [
     {
         path: ":catalogSlug",
-        component: CatalogComponent,
-        children: [
-            {
-                path: "",
-                component: CatalogDetailsComponent
-            }
-        ]
+        component: CatalogComponent
     }
 ];
 
