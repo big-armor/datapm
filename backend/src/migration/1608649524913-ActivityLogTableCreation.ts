@@ -17,7 +17,7 @@ ALTER TYPE public."activity_log_event_type_enum" OWNER TO postgres;
 CREATE TABLE public."activity_log" (
     id integer NOT NULL,
     user_id integer,
-    event_type public."activity_log_event_type_enum NOT NULL",
+    event_type public."activity_log_event_type_enum" NOT NULL,
     target_package_id integer,
     target_package_version_id integer,
     target_catalog_id integer,

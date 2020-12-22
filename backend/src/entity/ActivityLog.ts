@@ -19,7 +19,7 @@ export class ActivityLog {
     @JoinColumn({ name: "user" })
     public user: User;
 
-    @Column({ name: "event_type" })
+    @Column({ name: "event_type", nullable: false })
     public eventType: ActivityLogEventType;
 
     @Column({ name: "target_package_id" })
