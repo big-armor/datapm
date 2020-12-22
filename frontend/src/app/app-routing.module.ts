@@ -38,8 +38,8 @@ const staticRoutes: Route[] = [
         loadChildren: () => import("./package/package.module").then((m) => m.PackageModule)
     },
     {
-        path: "**",
-        redirectTo: ""
+        path: "login",
+        loadChildren: () => import("./login-container/login-container.module").then((m) => m.LoginContainerModule)
     }
 ];
 
