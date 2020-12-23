@@ -5,6 +5,7 @@ import { User } from "../entity/User";
 import { CreateCollectionInput, UpdateCollectionInput } from "../generated/graphql";
 import { StorageErrors } from "../storage/files/file-storage-service";
 import { ImageStorageService } from "../storage/images/image-storage-service";
+import { UserRepository } from "./UserRepository";
 
 @EntityRepository(Collection)
 export class CollectionRepository extends Repository<Collection> {
@@ -63,6 +64,34 @@ export class CollectionRepository extends Repository<Collection> {
             .limit(limit)
             .offset(offSet)
             .getManyAndCount();
+    }
+
+    async userCollections({
+        user,
+        username,
+        offSet,
+        limit,
+        relations = []
+    }: {
+        user?: User;
+        username: string;
+        offSet: number;
+        limit: number;
+        relations?: string[];
+    }): Promise<[Collection[], number]> {
+        const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
+
+        const response = await this.createQueryBuilderWithUserConditions(user?.id)
+            .andWhere(
+                `("Collection".id IN (SELECT collection_id FROM collection_user WHERE user_id = :targetUserId AND 'MANAGE' = ANY( permissions) ))`
+            )
+            .setParameter("targetUserId", targetUser.id)
+            .offset(offSet)
+            .limit(limit)
+            .addRelations("Collection", relations)
+            .getManyAndCount();
+
+        return response;
     }
 
     public async deleteCollection(collectionSlug: string): Promise<void> {
@@ -133,7 +162,7 @@ export class CollectionRepository extends Repository<Collection> {
         );
     }
 
-    private createQueryBuilderWithUserConditions(userId: number): SelectQueryBuilder<Collection> {
+    private createQueryBuilderWithUserConditions(userId?: number): SelectQueryBuilder<Collection> {
         const publicCollectionQueryBuilder = this.createQueryBuilder().where('("Collection"."is_public")');
         if (!userId) {
             return publicCollectionQueryBuilder;

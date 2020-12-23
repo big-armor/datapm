@@ -11,6 +11,7 @@ import { allPermissions } from "../util/PermissionsUtil";
 import { User } from "../entity/User";
 import { UserInputError } from "apollo-server";
 import { ImageStorageService } from "../storage/images/image-storage-service";
+import { UserRepository } from "./UserRepository";
 
 const PUBLIC_PACKAGES_QUERY = '("Package"."isPublic" is true)';
 const AUTHENTICATED_USER_PACKAGES_QUERY = `(("Package"."isPublic" is false and "Package"."catalog_id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId))
@@ -70,6 +71,33 @@ function validation(packageEntity: Package) {
 
 @EntityRepository()
 export class PackageRepository {
+    async userPackages({
+        user,
+        username,
+        offSet,
+        limit,
+        relations = []
+    }: {
+        user: User;
+        username: string;
+        offSet: number;
+        limit: number;
+        relations?: string[];
+    }): Promise<[Package[], number]> {
+        const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
+
+        const response = await this.createQueryBuilderWithUserConditions(user, Permission.VIEW)
+            .andWhere(
+                `("Package"."id" IN (SELECT package_id FROM user_package_permission WHERE user_id = :targetUserId AND 'MANAGE' = ANY(user_package_permission.permission) ))`
+            )
+            .setParameter("targetUserId", targetUser.id)
+            .offset(offSet)
+            .limit(limit)
+            .addRelations("Package", relations)
+            .getManyAndCount();
+
+        return response;
+    }
     constructor(private manager: EntityManager) {}
 
     public async findPackagesForCollection(

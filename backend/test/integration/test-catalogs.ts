@@ -15,7 +15,8 @@ import {
     CatalogPackagesDocument,
     CreateVersionDocument,
     UpdateMeDocument,
-    Permission
+    Permission,
+    UserCatalogsDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
@@ -24,6 +25,7 @@ import { loadPackageFileFromDisk } from "datapm-lib";
 describe("Catalog Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
+    let anonymousClient: ApolloClient<NormalizedCacheObject>;
 
     before(async () => {});
 
@@ -42,6 +44,8 @@ describe("Catalog Tests", async () => {
             "testB-catalog@test.datapm.io",
             "passwordB!"
         );
+        anonymousClient = createAnonymousClient();
+
         expect(userAClient).to.exist;
         expect(userBClient).to.exist;
     });
@@ -309,6 +313,22 @@ describe("Catalog Tests", async () => {
         ).equal(true);
     });
 
+    it("User B List User A catalogs - should be empty", async function () {
+        let response = await userBClient.query({
+            query: UserCatalogsDocument,
+            variables: {
+                username: "testA-catalog",
+                offSet: 0,
+                limit: 10
+            }
+        });
+
+        expect(response.errors == null, "no errors").to.equal(true);
+        expect(response.data.userCatalogs.hasMore).to.equal(false);
+        expect(response.data.userCatalogs.count).to.equal(0);
+        expect(response.data.userCatalogs.catalogs?.length).to.equal(0);
+    });
+
     it("User A set package public", async function () {
         let response = await userAClient.mutate({
             mutation: UpdatePackageDocument,
@@ -368,6 +388,38 @@ describe("Catalog Tests", async () => {
         expect(response.data!.catalog.website).to.equal("https://second-website.co.uk");
         expect(response.data!.catalog.packages!.length).to.equal(0);
         expect(response.data!.catalog.myPermissions![0]).to.equal(Permission.VIEW);
+    });
+
+    it("User B List User A catalogs - should return catalog", async function () {
+        let response = await userBClient.query({
+            query: UserCatalogsDocument,
+            variables: {
+                username: "testA-catalog",
+                offSet: 0,
+                limit: 10
+            }
+        });
+
+        expect(response.errors == null, "no errors").to.equal(true);
+        expect(response.data.userCatalogs.hasMore).to.equal(false);
+        expect(response.data.userCatalogs.count).to.equal(1);
+        expect(response.data.userCatalogs.catalogs?.length).to.equal(1);
+    });
+
+    it("Anonymous User List User A catalogs - should return catalog", async function () {
+        let response = await anonymousClient.query({
+            query: UserCatalogsDocument,
+            variables: {
+                username: "testA-catalog",
+                offSet: 0,
+                limit: 10
+            }
+        });
+
+        expect(response.errors == null, "no errors").to.equal(true);
+        expect(response.data.userCatalogs.hasMore).to.equal(false);
+        expect(response.data.userCatalogs.count).to.equal(1);
+        expect(response.data.userCatalogs.catalogs?.length).to.equal(1);
     });
 
     it("User B get package should fail - package not public", async function () {
