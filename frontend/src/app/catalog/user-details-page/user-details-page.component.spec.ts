@@ -4,21 +4,21 @@ import { RouterTestingModule } from "@angular/router/testing";
 import { ApolloTestingModule } from "apollo-angular/testing";
 
 import { SharedModule } from "../../shared/shared.module";
-import { UserDetailsComponent } from "./user-details.component";
+import { UserDetailsPageComponent } from "./user-details-page.component";
 
-describe("UserDetailsComponent", () => {
-    let component: UserDetailsComponent;
-    let fixture: ComponentFixture<UserDetailsComponent>;
+describe("UserDetailsPageComponent", () => {
+    let component: UserDetailsPageComponent;
+    let fixture: ComponentFixture<UserDetailsPageComponent>;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [UserDetailsComponent],
+            declarations: [UserDetailsPageComponent],
             imports: [HttpClientModule, RouterTestingModule, ApolloTestingModule, SharedModule]
         }).compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(UserDetailsComponent);
+        fixture = TestBed.createComponent(UserDetailsPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

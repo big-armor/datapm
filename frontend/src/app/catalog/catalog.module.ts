@@ -10,7 +10,7 @@ import { SharedModule } from "../shared/shared.module";
 import { CatalogRoutingModule } from "./catalog-routing.module";
 import { CatalogDetailsComponent } from "./catalog-details/catalog-details.component";
 import { CatalogComponent } from "./catalog/catalog.component";
-import { UserDetailsComponent } from "./user-details/user-details.component";
+import { UserDetailsPageComponent } from "./user-details-page/user-details-page.component";
 import { AddUserComponent } from "./add-user/add-user.component";
 import { CatalogPermissionsComponent } from "./catalog-permissions/catalog-permissions.component";
 
@@ -18,7 +18,7 @@ import { CatalogPermissionsComponent } from "./catalog-permissions/catalog-permi
     declarations: [
         CatalogComponent,
         CatalogDetailsComponent,
-        UserDetailsComponent,
+        UserDetailsPageComponent,
         AddUserComponent,
         CatalogPermissionsComponent
     ],

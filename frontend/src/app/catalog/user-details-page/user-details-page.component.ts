@@ -4,28 +4,47 @@ import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { PageState } from "src/app/models/page-state";
 import { TabModel } from "src/app/models/tab.model";
+import { AuthenticationService } from "src/app/services/authentication.service";
 import { User, UserGQL } from "src/generated/graphql";
 
 @Component({
-    selector: "app-user-details",
-    templateUrl: "./user-details.component.html",
-    styleUrls: ["./user-details.component.scss"]
+    selector: "app-user-details-page",
+    templateUrl: "./user-details-page.component.html",
+    styleUrls: ["./user-details-page.component.scss"]
 })
-export class UserDetailsComponent implements OnInit {
+export class UserDetailsPageComponent implements OnInit {
     public user: User;
     public username: string;
     public state: PageState = "INIT";
     public tabs: TabModel[] = [];
     public selectedTab: string = "packages";
+    public isCurrentUser: boolean = false;
 
     private subscription = new Subject();
 
-    constructor(private userGQL: UserGQL, private route: ActivatedRoute, private router: Router) {
-        this.tabs = [
-            { name: "Packages", value: "packages" },
-            { name: "Collections", value: "collections" },
-            { name: "Catalogs", value: "catalogs" }
-        ];
+    constructor(
+        private userGQL: UserGQL,
+        private route: ActivatedRoute,
+        private router: Router,
+        private authSvc: AuthenticationService
+    ) {
+        this.username = this.route.snapshot.paramMap.get("catalogSlug");
+
+        if (this.username === this.authSvc.currentUser.value?.username) {
+            this.isCurrentUser = true;
+            this.tabs = [
+                { name: "My Account", value: "" },
+                { name: "My Packages", value: "packages" },
+                { name: "My Collections", value: "collections" },
+                { name: "My Catalogs", value: "catalogs" }
+            ];
+        } else {
+            this.tabs = [
+                { name: "Packages", value: "packages" },
+                { name: "Collections", value: "collections" },
+                { name: "Catalogs", value: "catalogs" }
+            ];
+        }
 
         this.route.fragment.pipe(takeUntil(this.subscription)).subscribe((fragment: string) => {
             const index = this.tabs.findIndex((tab) => tab.value === fragment);
@@ -38,7 +57,6 @@ export class UserDetailsComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.username = this.route.snapshot.paramMap.get("catalogSlug");
         this.userGQL
             .fetch({
                 username: this.username
