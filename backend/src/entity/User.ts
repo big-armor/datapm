@@ -91,8 +91,8 @@ export class User extends BaseModel {
     emailVerified: boolean;
 
     /** Unique token to allow for password recovery. */
-    @Column({ nullable: true, name: "password_recovery_token" })
-    passwordRecoveryToken: string;
+    @Column({ nullable: true, name: "password_recovery_token", type: "varchar" })
+    passwordRecoveryToken: string | null;
 
     /** The date on which the passwordRecoveryToken was created */
     @Column({ nullable: true, name: "password_recovery_token_date" })

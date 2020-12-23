@@ -63,7 +63,8 @@ import {
     updateCollection,
     collectionPackages,
     usersByCollection,
-    myPermissions
+    myPermissions,
+    userCollections
 } from "./resolvers/CollectionResolver";
 import {
     setUserCollectionPermissions,
@@ -99,7 +100,8 @@ import {
     setPackageCoverImage,
     setPackagePermissions,
     updatePackage,
-    myPackages
+    myPackages,
+    userPackages
 } from "./resolvers/PackageResolver";
 import { ImageStorageService } from "./storage/images/image-storage-service";
 
@@ -116,6 +118,7 @@ import { DateResolver } from "./resolvers/DateResolver";
 import { Permissions } from "./entity/Permissions";
 import { exit } from "process";
 import { CollectionRepository } from "./repository/CollectionRepository";
+import { userCatalogs } from "./resolvers/CatalogResolver";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -508,7 +511,9 @@ export const resolvers: {
         searchCollections: searchCollections,
         collectionPackages: collectionPackages,
         usersByCollection: usersByCollection,
-
+        userCatalogs: userCatalogs,
+        userCollections: userCollections,
+        userPackages: userPackages,
         autoComplete: async (_0: any, { startsWith }, context: AuthenticatedContext, info: any) => {
             const users = context.connection.manager.getCustomRepository(UserRepository).autocomplete({
                 user: context.me,

@@ -6,7 +6,8 @@ import {
     CreateCatalogInput,
     Permission,
     CatalogIdentifier,
-    CatalogIdentifierInput
+    CatalogIdentifierInput,
+    CatalogsResult
 } from "../generated/graphql";
 import { Catalog } from "../entity/Catalog";
 import { Package } from "../entity/Package";
@@ -18,6 +19,7 @@ import { Identifier } from "../util/IdentifierUtil";
 import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { StorageErrors } from "../storage/files/file-storage-service";
+import { UserRepository } from "./UserRepository";
 
 // https://stackoverflow.com/a/52097700
 export function isDefined<T>(value: T | undefined | null): value is T {
@@ -273,6 +275,33 @@ export class CatalogRepository extends Repository<Catalog> {
             .getMany();
 
         return entities;
+    }
+
+    async userCatalogs({
+        user,
+        username,
+        offSet,
+        limit,
+        relations = []
+    }: {
+        user: User;
+        username: string;
+        offSet: number;
+        limit: number;
+        relations?: string[];
+    }): Promise<[Catalog[], number]> {
+        const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
+        const response = await this.createQueryBuilderWithUserConditions(user)
+            .andWhere(
+                `("Catalog"."id" IN (SELECT "catalog_id" FROM "user_catalog" uc WHERE "uc"."user_id" = :targetUserId AND 'MANAGE' = ANY( "uc"."permission") ))`
+            )
+            .setParameter("targetUserId", targetUser.id)
+            .offset(offSet)
+            .limit(limit)
+            .addRelations("Catalog", relations)
+            .getManyAndCount();
+
+        return response;
     }
 
     async search({
