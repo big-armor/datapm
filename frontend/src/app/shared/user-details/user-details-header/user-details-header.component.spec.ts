@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { HttpClientModule } from "@angular/common/http";
 import { UserDetailsHeaderComponent } from "./user-details-header.component";
-import { CoverComponent } from "../cover/cover.component";
+import { CoverComponent } from "../../cover/cover.component";
 
 describe("UserDetailsHeaderComponent", () => {
     let component: UserDetailsHeaderComponent;

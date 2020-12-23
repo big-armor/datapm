@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { RouterTestingModule } from "@angular/router/testing";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { HttpClientModule } from "@angular/common/http";
-import { SharedModule } from "src/app/shared/shared.module";
+import { PackageItemComponent } from "../../package-item/package-item.component";
 
 import { PackagesComponent } from "./packages.component";
 import { ApolloTestingModule } from "apollo-angular/testing";
@@ -13,14 +13,8 @@ describe("PackagesComponent", () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [PackagesComponent],
-            imports: [
-                HttpClientModule,
-                RouterTestingModule,
-                ApolloTestingModule,
-                SharedModule,
-                MatProgressSpinnerModule
-            ]
+            declarations: [PackagesComponent, PackageItemComponent],
+            imports: [HttpClientModule, RouterTestingModule, ApolloTestingModule, MatProgressSpinnerModule]
         }).compileComponents();
     }));
 

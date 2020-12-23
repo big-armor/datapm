@@ -11,6 +11,7 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { MatStepperModule } from "@angular/material/stepper";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
+import { MatTableModule } from "@angular/material/table";
 
 import { HeaderComponent } from "./header/header.component";
 import { FooterComponent } from "./footer/footer.component";
@@ -33,7 +34,12 @@ import { EditCollectionComponent } from "./edit-collection/edit-collection.compo
 import { ConfirmationDialogComponent } from "./confirmation-dialog/confirmation-dialog.component";
 import { EditCatalogComponent } from "./edit-catalog/edit-catalog.component";
 import { CreateCollectionComponent } from "./create-collection/create-collection.component";
-import { UserDetailsHeaderComponent } from "./user-details-header/user-details-header.component";
+import { UserDetailsHeaderComponent } from "./user-details/user-details-header/user-details-header.component";
+import { CatalogsComponent } from "./user-details/catalogs/catalogs.component";
+import { DeleteConfirmationComponent } from "./user-details/delete-confirmation/delete-confirmation.component";
+import { FewPackagesAlertComponent } from "./user-details/few-packages-alert/few-packages-alert.component";
+import { MyCollectionsComponent } from "./user-details/my-collections/my-collections.component";
+import { PackagesComponent } from "./user-details/packages/packages.component";
 
 @NgModule({
     declarations: [
@@ -58,7 +64,12 @@ import { UserDetailsHeaderComponent } from "./user-details-header/user-details-h
         ConfirmationDialogComponent,
         EditCatalogComponent,
         CreateCollectionComponent,
-        UserDetailsHeaderComponent
+        UserDetailsHeaderComponent,
+        CatalogsComponent,
+        DeleteConfirmationComponent,
+        FewPackagesAlertComponent,
+        MyCollectionsComponent,
+        PackagesComponent
     ],
     imports: [
         CommonModule,
@@ -71,6 +82,7 @@ import { UserDetailsHeaderComponent } from "./user-details-header/user-details-h
         MatSnackBarModule,
         MatStepperModule,
         MatSlideToggleModule,
+        MatTableModule,
         FormsModule,
         ReactiveFormsModule,
         RouterModule
@@ -96,7 +108,12 @@ import { UserDetailsHeaderComponent } from "./user-details-header/user-details-h
         ConfirmationDialogComponent,
         EditCatalogComponent,
         CreateCollectionComponent,
-        UserDetailsHeaderComponent
+        UserDetailsHeaderComponent,
+        CatalogsComponent,
+        DeleteConfirmationComponent,
+        FewPackagesAlertComponent,
+        MyCollectionsComponent,
+        PackagesComponent
     ],
     providers: [TimeAgoPipe]
 })

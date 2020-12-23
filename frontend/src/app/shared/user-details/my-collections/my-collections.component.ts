@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { CreateCollectionComponent } from "src/app/shared/create-collection/create-collection.component";
-import { EditCollectionComponent } from "src/app/shared/edit-collection/edit-collection.component";
+import { CreateCollectionComponent } from "../../create-collection/create-collection.component";
+import { EditCollectionComponent } from "../../edit-collection/edit-collection.component";
 import { Collection, DeleteCollectionGQL, MyCollectionsGQL, UpdateCollectionGQL } from "src/generated/graphql";
 import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
 import { FewPackagesAlertComponent } from "../few-packages-alert/few-packages-alert.component";

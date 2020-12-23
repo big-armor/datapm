@@ -5,7 +5,7 @@ import { take, takeUntil } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
 import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
 import { AuthenticationService } from "src/app/services/authentication.service";
-import { EditCatalogComponent } from "src/app/shared/edit-catalog/edit-catalog.component";
+import { EditCatalogComponent } from "../../edit-catalog/edit-catalog.component";
 
 enum State {
     INIT,
