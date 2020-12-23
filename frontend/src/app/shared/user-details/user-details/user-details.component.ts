@@ -23,11 +23,11 @@ enum State {
 }
 
 @Component({
-    selector: "me-details",
+    selector: "app-user-details",
     templateUrl: "./user-details.component.html",
     styleUrls: ["./user-details.component.scss"]
 })
-export class DetailsComponent implements OnInit, OnDestroy {
+export class UserDetailsComponent implements OnInit, OnDestroy {
     State = State;
     state = State.INIT;
 

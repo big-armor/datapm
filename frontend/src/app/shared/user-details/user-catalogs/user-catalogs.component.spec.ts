@@ -9,15 +9,15 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatTableModule } from "@angular/material/table";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
-import { CatalogsComponent } from "./catalogs.component";
+import { UserCatalogsComponent } from "./user-catalogs.component";
 
-describe("CatalogsComponent", () => {
-    let component: CatalogsComponent;
-    let fixture: ComponentFixture<CatalogsComponent>;
+describe("UserCatalogsComponent", () => {
+    let component: UserCatalogsComponent;
+    let fixture: ComponentFixture<UserCatalogsComponent>;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [CatalogsComponent],
+            declarations: [UserCatalogsComponent],
             imports: [
                 RouterModule.forRoot([]),
                 MatCardModule,
@@ -35,7 +35,7 @@ describe("CatalogsComponent", () => {
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(CatalogsComponent);
+        fixture = TestBed.createComponent(UserCatalogsComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

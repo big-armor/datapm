@@ -10,11 +10,11 @@ enum State {
     ERROR
 }
 @Component({
-    selector: "me-packages",
-    templateUrl: "./packages.component.html",
-    styleUrls: ["./packages.component.scss"]
+    selector: "app-user-packages",
+    templateUrl: "./user-packages.component.html",
+    styleUrls: ["./user-packages.component.scss"]
 })
-export class PackagesComponent implements OnInit {
+export class UserPackagesComponent implements OnInit {
     State = State;
     state = State.INIT;
     public myPackages: Package[];

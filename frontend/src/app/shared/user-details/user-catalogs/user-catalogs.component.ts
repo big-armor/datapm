@@ -16,11 +16,11 @@ enum State {
     ERROR_NO_LABEL
 }
 @Component({
-    selector: "me-catalogs",
-    templateUrl: "./catalogs.component.html",
-    styleUrls: ["./catalogs.component.scss"]
+    selector: "app-user-catalogs",
+    templateUrl: "./user-catalogs.component.html",
+    styleUrls: ["./user-catalogs.component.scss"]
 })
-export class CatalogsComponent implements OnInit {
+export class UserCatalogsComponent implements OnInit {
     @Input() isCurrentUser: boolean;
 
     State = State;

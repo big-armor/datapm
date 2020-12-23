@@ -14,11 +14,11 @@ enum State {
 }
 
 @Component({
-    selector: "my-collections",
-    templateUrl: "./my-collections.component.html",
-    styleUrls: ["./my-collections.component.scss"]
+    selector: "app-user-collections",
+    templateUrl: "./user-collections.component.html",
+    styleUrls: ["./user-collections.component.scss"]
 })
-export class MyCollectionsComponent implements OnInit {
+export class UserCollectionsComponent implements OnInit {
     public collections: Collection[] = [];
     columnsToDisplay = ["name", "public", "actions"];
     State = State;

@@ -8,8 +8,8 @@
         </li>
     </ul>
     <div class="p-0" [ngSwitch]="selectedTab">
-        <my-collections *ngSwitchCase="'collections'"></my-collections>
-        <me-catalogs *ngSwitchCase="'catalogs'"></me-catalogs>
-        <me-packages *ngSwitchCase="'packages'"></me-packages>
+        <app-user-collections *ngSwitchCase="'collections'"></app-user-collections>
+        <app-user-catalogs *ngSwitchCase="'catalogs'"></app-user-catalogs>
+        <app-user-packages *ngSwitchCase="'packages'"></app-user-packages>
     </div>
 </div>

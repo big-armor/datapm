@@ -7,16 +7,16 @@ import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from "@angular/materia
 import { MatTableModule } from "@angular/material/table";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 
-import { DetailsComponent } from "./user-details.component";
+import { UserDetailsComponent } from "./user-details.component";
 import { MatSnackBarModule } from "@angular/material/snack-bar";
 
-describe("DetailsComponent", () => {
-    let component: DetailsComponent;
-    let fixture: ComponentFixture<DetailsComponent>;
+describe("UserDetailsComponent", () => {
+    let component: UserDetailsComponent;
+    let fixture: ComponentFixture<UserDetailsComponent>;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [DetailsComponent],
+            declarations: [UserDetailsComponent],
             imports: [
                 RouterModule.forRoot([]),
                 MatDialogModule,
@@ -46,7 +46,7 @@ describe("DetailsComponent", () => {
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(DetailsComponent);
+        fixture = TestBed.createComponent(UserDetailsComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

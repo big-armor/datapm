@@ -8,15 +8,15 @@ import { MatDialogModule } from "@angular/material/dialog";
 import { MatIconModule } from "@angular/material/icon";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
-import { MyCollectionsComponent } from "./my-collections.component";
+import { UserCollectionsComponent } from "./user-collections.component";
 
-describe("MyCollectionsComponent", () => {
-    let component: MyCollectionsComponent;
-    let fixture: ComponentFixture<MyCollectionsComponent>;
+describe("UserCollectionsComponent", () => {
+    let component: UserCollectionsComponent;
+    let fixture: ComponentFixture<UserCollectionsComponent>;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [MyCollectionsComponent],
+            declarations: [UserCollectionsComponent],
             imports: [
                 ApolloTestingModule,
                 RouterTestingModule,
@@ -32,7 +32,7 @@ describe("MyCollectionsComponent", () => {
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(MyCollectionsComponent);
+        fixture = TestBed.createComponent(UserCollectionsComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

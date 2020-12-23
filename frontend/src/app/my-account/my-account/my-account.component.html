@@ -12,10 +12,10 @@
             </ul>
         </div>
         <div class="p-0" [ngSwitch]="selectedTab">
-            <me-packages *ngSwitchCase="'packages'"></me-packages>
-            <my-collections *ngSwitchCase="'collections'"></my-collections>
-            <me-catalogs *ngSwitchCase="'catalogs'"></me-catalogs>
-            <me-details *ngSwitchDefault></me-details>
+            <app-user-packages *ngSwitchCase="'packages'"></app-user-packages>
+            <app-user-collections *ngSwitchCase="'collections'"></app-user-collections>
+            <app-user-catalogs *ngSwitchCase="'catalogs'"></app-user-catalogs>
+            <app-user-details *ngSwitchDefault></app-user-details>
         </div>
     </div>
 </div>

@@ -35,14 +35,14 @@ import { ConfirmationDialogComponent } from "./confirmation-dialog/confirmation-
 import { EditCatalogComponent } from "./edit-catalog/edit-catalog.component";
 import { CreateCollectionComponent } from "./create-collection/create-collection.component";
 import { UserDetailsHeaderComponent } from "./user-details/user-details-header/user-details-header.component";
-import { CatalogsComponent } from "./user-details/catalogs/catalogs.component";
+import { UserCatalogsComponent } from "./user-details/user-catalogs/user-catalogs.component";
 import { DeleteConfirmationComponent } from "./user-details/delete-confirmation/delete-confirmation.component";
 import { FewPackagesAlertComponent } from "./user-details/few-packages-alert/few-packages-alert.component";
-import { MyCollectionsComponent } from "./user-details/my-collections/my-collections.component";
-import { PackagesComponent } from "./user-details/packages/packages.component";
+import { UserCollectionsComponent } from "./user-details/user-collections/user-collections.component";
+import { UserPackagesComponent } from "./user-details/user-packages/user-packages.component";
 import { EditAccountDialogComponent } from "./user-details/edit-account-dialog/edit-account-dialog.component";
 import { EditPasswordDialogComponent } from "./user-details/edit-password-dialog/edit-password-dialog.component";
-import { DetailsComponent } from "./user-details/user-details/user-details.component";
+import { UserDetailsComponent } from "./user-details/user-details/user-details.component";
 
 @NgModule({
     declarations: [
@@ -68,14 +68,14 @@ import { DetailsComponent } from "./user-details/user-details/user-details.compo
         EditCatalogComponent,
         CreateCollectionComponent,
         UserDetailsHeaderComponent,
-        CatalogsComponent,
+        UserCatalogsComponent,
         DeleteConfirmationComponent,
         FewPackagesAlertComponent,
-        MyCollectionsComponent,
-        PackagesComponent,
+        UserCollectionsComponent,
+        UserPackagesComponent,
         EditAccountDialogComponent,
         EditPasswordDialogComponent,
-        DetailsComponent
+        UserDetailsComponent
     ],
     imports: [
         CommonModule,
@@ -115,14 +115,14 @@ import { DetailsComponent } from "./user-details/user-details/user-details.compo
         EditCatalogComponent,
         CreateCollectionComponent,
         UserDetailsHeaderComponent,
-        CatalogsComponent,
+        UserCatalogsComponent,
         DeleteConfirmationComponent,
         FewPackagesAlertComponent,
-        MyCollectionsComponent,
-        PackagesComponent,
+        UserCollectionsComponent,
+        UserPackagesComponent,
         EditAccountDialogComponent,
         EditPasswordDialogComponent,
-        DetailsComponent
+        UserDetailsComponent
     ],
     providers: [TimeAgoPipe]
 })
