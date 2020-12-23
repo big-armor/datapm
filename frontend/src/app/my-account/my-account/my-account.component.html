@@ -27,11 +27,7 @@
                 [username]="currentUser?.username"
                 *ngSwitchCase="'catalogs'"
             ></app-user-catalogs>
-            <app-user-details
-                [isCurrentUser]="true"
-                [username]="currentUser?.username"
-                *ngSwitchDefault
-            ></app-user-details>
+            <app-user-details *ngSwitchDefault></app-user-details>
         </div>
     </div>
 </div>
