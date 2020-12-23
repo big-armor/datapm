@@ -1,0 +1,25 @@
+<form [formGroup]="form" (submit)="submit($event)">
+    <div class="dpm-text-title" mat-dialog-title>Add User</div>
+    <div mat-dialog-content class="py-4">
+        <div class="d-flex input-row">
+            <div class="input-label">Username</div>
+            <div class="input-control">
+                <app-input
+                    placeholder="username"
+                    [group]="form"
+                    controlName="username"
+                    inputStyle="flat"
+                    [error]="form | inputError: 'username' | async"
+                ></app-input>
+            </div>
+        </div>
+        <div class="text-danger mt-3" *ngIf="state === 'ERROR'">
+            Error occured while adding a user permission to the catalog
+        </div>
+    </div>
+    <div mat-dialog-actions class="d-flex justify-content-end">
+        <button type="submit" class="ml-auto app-raised-button" [disabled]="form.invalid">
+            <span>Add</span>
+        </button>
+    </div>
+</form>

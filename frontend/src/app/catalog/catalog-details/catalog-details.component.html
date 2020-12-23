@@ -26,8 +26,10 @@
             <a class="app-outlined-button mt-3 px-3">Add package</a>
         </div>
     </div>
-    <!-- <app-catalog-permissions *ngIf="state === 'SUCCESS' && currentTab === 1"></app-catalog-permissions> -->
-    <div *ngIf="state === 'SUCCESS' && currentTab === 1">Users with permissions</div>
+    <app-catalog-permissions
+        [catalog]="catalog"
+        *ngIf="state === 'SUCCESS' && currentTab === 1"
+    ></app-catalog-permissions>
     <div class="dpm-page-loading" *ngIf="state === 'LOADING'">
         <mat-spinner [diameter]="32"></mat-spinner>
     </div>
