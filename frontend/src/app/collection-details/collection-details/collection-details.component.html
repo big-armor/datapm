@@ -27,7 +27,10 @@
                 <a class="app-outlined-button mt-3" (click)="addPackage()">Add a package</a>
             </div>
         </div>
-        <app-collection-permissions *ngIf="state === 'SUCCESS' && currentTab === 1"></app-collection-permissions>
+        <app-collection-permissions
+            [collection]="collection"
+            *ngIf="state === 'SUCCESS' && currentTab === 1"
+        ></app-collection-permissions>
         <div *ngIf="state === 'NOT_AUTHORIZED'">
             <div class="dpm-no-data">
                 <p>You do not have permission to view this collection.</p>

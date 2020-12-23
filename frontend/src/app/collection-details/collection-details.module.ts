@@ -12,10 +12,11 @@ import { SharedModule } from "../shared/shared.module";
 import { CollectionDetailsRoutingModule } from "./collection-details-routing.module";
 import { CollectionDetailsComponent } from "./collection-details/collection-details.component";
 import { AddPackageComponent } from "./add-package/add-package.component";
+import { AddUserComponent } from "./add-user/add-user.component";
 import { CollectionPermissionsComponent } from "./collection-permissions/collection-permissions.component";
 
 @NgModule({
-    declarations: [CollectionDetailsComponent, AddPackageComponent, CollectionPermissionsComponent],
+    declarations: [CollectionDetailsComponent, AddPackageComponent, AddUserComponent, CollectionPermissionsComponent],
     imports: [
         CommonModule,
         ReactiveFormsModule,
