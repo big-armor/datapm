@@ -109,8 +109,8 @@ export const findPackage = async (
     if (packageEntity == null) throw new UserInputError("PACKAGE_NOT_FOUND");
 
     try {
-        await context.connection.getRepository(ActivityLog).save({
-            userId: context.me.id,
+        await context.connection.getRepository(ActivityLog).create({
+            userId: context?.me?.id,
             eventType: ActivityLogEventType.PackageViewed,
             targetPackageId: packageEntity?.id
         });
@@ -149,8 +149,8 @@ export const createPackage = async (
             relations: getGraphQlRelationName(info)
         });
 
-        await context.connection.getRepository(ActivityLog).save({
-            userId: context.me.id,
+        await context.connection.getRepository(ActivityLog).create({
+            userId: context?.me?.id,
             eventType: ActivityLogEventType.PackageCreated,
             targetPackageId: packageEntity?.id
         });

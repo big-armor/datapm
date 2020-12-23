@@ -185,8 +185,8 @@ export const addPackageToCollection = async (
         throw new ApolloError("Not able to find the CollectionPackage entry after entry. This should never happen!");
 
     try {
-        await context.connection.getRepository(ActivityLog).save({
-            userId: context.me.id,
+        await context.connection.getRepository(ActivityLog).create({
+            userId: context?.me?.id,
             eventType: ActivityLogEventType.CollectionPackageAdded,
             targetCollectionId: value?.collectionId
         });
@@ -216,8 +216,8 @@ export const removePackageFromCollection = async (
         .removePackageToCollection(collectionEntity.id, packageEntity.id);
 
     try {
-        await context.connection.getRepository(ActivityLog).save({
-            userId: context.me.id,
+        await context.connection.getRepository(ActivityLog).create({
+            userId: context?.me?.id,
             eventType: ActivityLogEventType.CollectionPackageRemoved,
             targetCollectionId: collectionEntity?.id
         });

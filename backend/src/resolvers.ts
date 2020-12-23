@@ -754,26 +754,26 @@ export const resolvers: {
 
                     try {
                         if (proposedNewVersion.major !== latestVersionSemVer.major) {
-                            await transaction.getRepository(ActivityLog).save({
-                                userId: context.me.id,
+                            await transaction.getRepository(ActivityLog).create({
+                                userId: context?.me?.id,
                                 eventType: ActivityLogEventType.PackageMajorChange,
-                                targetPackageId: latestVersion.packageId
+                                targetPackageId: latestVersion?.packageId
                             });
                         }
 
                         if (proposedNewVersion.minor !== latestVersionSemVer.minor) {
-                            await transaction.getRepository(ActivityLog).save({
-                                userId: context.me.id,
+                            await transaction.getRepository(ActivityLog).create({
+                                userId: context?.me?.id,
                                 eventType: ActivityLogEventType.PackageMinorChange,
-                                targetPackageId: latestVersion.packageId
+                                targetPackageId: latestVersion?.packageId
                             });
                         }
 
                         if (proposedNewVersion.patch !== latestVersionSemVer.patch) {
-                            await transaction.getRepository(ActivityLog).save({
-                                userId: context.me.id,
+                            await transaction.getRepository(ActivityLog).create({
+                                userId: context?.me?.id,
                                 eventType: ActivityLogEventType.PackagePatchChanged,
-                                targetPackageId: latestVersion.packageId
+                                targetPackageId: latestVersion?.packageId
                             });
                         }
                     } catch (e) {}

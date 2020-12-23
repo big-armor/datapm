@@ -368,8 +368,8 @@ export class PackageRepository {
         await ImageStorageService.INSTANCE.deletePackageCoverImage(packageEntity.id);
 
         try {
-            await this.manager.getRepository(ActivityLog).save({
-                userId: context?.me.id,
+            await this.manager.getRepository(ActivityLog).create({
+                userId: context?.me?.id,
                 eventType: ActivityLogEventType.PackageViewed,
                 targetPackageId: packageEntity?.id
             });
