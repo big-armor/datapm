@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { EditPasswordDialogComponent } from "../edit-password-dialog/edit-password-dialog.component";
-import { AuthenticationService } from "../../services/authentication.service";
-import { getRegistryURL } from "../../helpers/RegistryAccessHelper";
+import { AuthenticationService } from "../../../services/authentication.service";
+import { getRegistryURL } from "../../../helpers/RegistryAccessHelper";
 
 import { APIKey, User, Catalog, CreateAPIKeyGQL, MyAPIKeysGQL, DeleteAPIKeyGQL, Scope } from "src/generated/graphql";
 import { FormControl, FormGroup } from "@angular/forms";
@@ -24,8 +24,8 @@ enum State {
 
 @Component({
     selector: "me-details",
-    templateUrl: "./details.component.html",
-    styleUrls: ["./details.component.scss"]
+    templateUrl: "./user-details.component.html",
+    styleUrls: ["./user-details.component.scss"]
 })
 export class DetailsComponent implements OnInit, OnDestroy {
     State = State;

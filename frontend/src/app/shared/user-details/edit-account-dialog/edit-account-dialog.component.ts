@@ -11,9 +11,9 @@ import {
     User,
     SetMyCoverImageGQL,
     SetMyAvatarImageGQL
-} from "../../../generated/graphql";
-import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
-import { ImageService } from "../../services/image.service";
+} from "../../../../generated/graphql";
+import { ConfirmationDialogComponent } from "../../confirmation-dialog/confirmation-dialog.component";
+import { ImageService } from "../../../services/image.service";
 import { usernameValidator } from "src/app/helpers/validators";
 
 @Component({
@@ -123,7 +123,10 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
 
     openConfirmDialog() {
         if (this.confirmDialogOpened === false) {
-            this.dialog.open(ConfirmationDialogComponent);
+            this.dialog.open(ConfirmationDialogComponent, {
+                data:
+                    "Changing your username will change your catalog name and potentially break links you have to packages outside of datapm."
+            });
             this.confirmDialogOpened = true;
         }
     }

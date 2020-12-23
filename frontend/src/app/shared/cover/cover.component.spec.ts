@@ -1,6 +1,7 @@
 import { HttpClientModule } from "@angular/common/http";
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { ImageService } from "src/app/services/image.service";
+import { MatIconModule } from "@angular/material/icon";
 
 import { CoverComponent } from "./cover.component";
 
@@ -11,7 +12,7 @@ describe("CoverComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [CoverComponent],
-            imports: [HttpClientModule],
+            imports: [HttpClientModule, MatIconModule],
             providers: [ImageService]
         }).compileComponents();
     }));

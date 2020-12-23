@@ -40,6 +40,9 @@ import { DeleteConfirmationComponent } from "./user-details/delete-confirmation/
 import { FewPackagesAlertComponent } from "./user-details/few-packages-alert/few-packages-alert.component";
 import { MyCollectionsComponent } from "./user-details/my-collections/my-collections.component";
 import { PackagesComponent } from "./user-details/packages/packages.component";
+import { EditAccountDialogComponent } from "./user-details/edit-account-dialog/edit-account-dialog.component";
+import { EditPasswordDialogComponent } from "./user-details/edit-password-dialog/edit-password-dialog.component";
+import { DetailsComponent } from "./user-details/user-details/user-details.component";
 
 @NgModule({
     declarations: [
@@ -69,7 +72,10 @@ import { PackagesComponent } from "./user-details/packages/packages.component";
         DeleteConfirmationComponent,
         FewPackagesAlertComponent,
         MyCollectionsComponent,
-        PackagesComponent
+        PackagesComponent,
+        EditAccountDialogComponent,
+        EditPasswordDialogComponent,
+        DetailsComponent
     ],
     imports: [
         CommonModule,
@@ -113,7 +119,10 @@ import { PackagesComponent } from "./user-details/packages/packages.component";
         DeleteConfirmationComponent,
         FewPackagesAlertComponent,
         MyCollectionsComponent,
-        PackagesComponent
+        PackagesComponent,
+        EditAccountDialogComponent,
+        EditPasswordDialogComponent,
+        DetailsComponent
     ],
     providers: [TimeAgoPipe]
 })
