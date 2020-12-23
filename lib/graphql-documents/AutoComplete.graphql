@@ -13,5 +13,15 @@ query AutoComplete($startsWith: String!) {
             }
             displayName
         }
+        collections {
+            identifier {
+                collectionSlug
+            }
+            name
+        }
+        users {
+            username
+            emailAddress
+        }
     }
 }

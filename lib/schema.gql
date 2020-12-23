@@ -338,6 +338,8 @@ The response for a search term auto-complete request
 type AutoCompleteResult {
     catalogs: [Catalog!]
     packages: [Package!]
+    collections: [Collection!]
+    users: [User!]
 }
 
 """

@@ -118,6 +118,7 @@ import { DateResolver } from "./resolvers/DateResolver";
 import { Permissions } from "./entity/Permissions";
 import { exit } from "process";
 import { userCatalogs } from "./resolvers/CatalogResolver";
+import { CollectionRepository } from "./repository/CollectionRepository";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -514,6 +515,12 @@ export const resolvers: {
         userCollections: userCollections,
         userPackages: userPackages,
         autoComplete: async (_0: any, { startsWith }, context: AuthenticatedContext, info: any) => {
+            const users = context.connection.manager.getCustomRepository(UserRepository).autocomplete({
+                user: context.me,
+                startsWith,
+                relations: getRelationNames(graphqlFields(info).users)
+            });
+
             const catalogs = context.connection.manager.getCustomRepository(CatalogRepository).autocomplete({
                 user: context.me,
                 startsWith,
@@ -526,16 +533,17 @@ export const resolvers: {
                 relations: getRelationNames(graphqlFields(info).packages)
             });
 
-            const users = context.connection.manager.getCustomRepository(PackageRepository).autocomplete({
+            const collections = context.connection.manager.getCustomRepository(CollectionRepository).autocomplete({
                 user: context.me,
                 startsWith,
-                relations: getRelationNames(graphqlFields(info).users)
+                relations: getRelationNames(graphqlFields(info).collections)
             });
 
             return {
+                users: await users,
                 catalogs: await catalogs,
                 packages: await packages,
-                users: await users
+                collections: await collections
             };
         },
 
