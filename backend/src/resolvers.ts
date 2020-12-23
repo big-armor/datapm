@@ -85,6 +85,8 @@ import {
 } from "./resolvers/UserResolver";
 import { createAPIKey, deleteAPIKey } from "./resolvers/ApiKeyResolver";
 import { Collection } from "./entity/Collection";
+import { ActivityLog } from "./entity/ActivityLog";
+import { ActivityLogEventType } from "./entity/ActivityLogEventType";
 import {
     catalogPackagesForUser,
     createPackage,
@@ -749,6 +751,32 @@ export const resolvers: {
                             { existingVersion: latestVersionSemVer.version, minNextVersion: minNextVersion.version }
                         );
                     }
+
+                    try {
+                        if (proposedNewVersion.major !== latestVersionSemVer.major) {
+                            await transaction.getRepository(ActivityLog).save({
+                                userId: context.me.id,
+                                eventType: ActivityLogEventType.PackageMajorChange,
+                                targetPackageId: latestVersion.packageId
+                            });
+                        }
+
+                        if (proposedNewVersion.minor !== latestVersionSemVer.minor) {
+                            await transaction.getRepository(ActivityLog).save({
+                                userId: context.me.id,
+                                eventType: ActivityLogEventType.PackageMinorChange,
+                                targetPackageId: latestVersion.packageId
+                            });
+                        }
+
+                        if (proposedNewVersion.patch !== latestVersionSemVer.patch) {
+                            await transaction.getRepository(ActivityLog).save({
+                                userId: context.me.id,
+                                eventType: ActivityLogEventType.PackagePatchChanged,
+                                targetPackageId: latestVersion.packageId
+                            });
+                        }
+                    } catch (e) {}
                 }
 
                 const savedVersion = await transaction

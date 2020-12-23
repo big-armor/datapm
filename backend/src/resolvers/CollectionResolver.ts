@@ -21,6 +21,8 @@ import { getGraphQlRelationName } from "../util/relationNames";
 import { grantAllCollectionPermissionsForUser } from "./UserCollectionPermissionResolver";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { Collection } from "../entity/Collection";
+import { ActivityLog } from "../entity/ActivityLog";
+import { ActivityLogEventType } from "../entity/ActivityLogEventType";
 import { exit } from "process";
 
 export const usersByCollection = async (
@@ -182,6 +184,14 @@ export const addPackageToCollection = async (
     if (value == undefined)
         throw new ApolloError("Not able to find the CollectionPackage entry after entry. This should never happen!");
 
+    try {
+        await context.connection.getRepository(ActivityLog).save({
+            userId: context.me.id,
+            eventType: ActivityLogEventType.CollectionPackageAdded,
+            targetCollectionId: value?.collectionId
+        });
+    } catch (e) {}
+
     return value;
 };
 
@@ -204,6 +214,14 @@ export const removePackageFromCollection = async (
     await context.connection.manager
         .getCustomRepository(CollectionPackageRepository)
         .removePackageToCollection(collectionEntity.id, packageEntity.id);
+
+    try {
+        await context.connection.getRepository(ActivityLog).save({
+            userId: context.me.id,
+            eventType: ActivityLogEventType.CollectionPackageRemoved,
+            targetCollectionId: collectionEntity?.id
+        });
+    } catch (e) {}
 };
 
 export const findCollectionsForAuthenticatedUser = async (_0: any, {}, context: AuthenticatedContext, info: any) => {

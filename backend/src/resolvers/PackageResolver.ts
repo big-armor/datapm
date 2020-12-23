@@ -4,6 +4,8 @@ import { AuthenticatedContext } from "../context";
 import { Catalog } from "../entity/Catalog";
 import { Collection } from "../entity/Collection";
 import { Package } from "../entity/Package";
+import { ActivityLog } from "../entity/ActivityLog";
+import { ActivityLogEventType } from "../entity/ActivityLogEventType";
 import {
     Base64ImageUpload,
     CreatePackageInput,
@@ -18,7 +20,6 @@ import { UserRepository } from "../repository/UserRepository";
 import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 import { ImageStorageService } from "../storage/images/image-storage-service";
-import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
 
 export const myPackages = async (
     _0: any,
@@ -107,6 +108,14 @@ export const findPackage = async (
 
     if (packageEntity == null) throw new UserInputError("PACKAGE_NOT_FOUND");
 
+    try {
+        await context.connection.getRepository(ActivityLog).save({
+            userId: context.me.id,
+            eventType: ActivityLogEventType.PackageViewed,
+            targetPackageId: packageEntity?.id
+        });
+    } catch (e) {}
+
     return packageEntity;
 };
 
@@ -134,11 +143,19 @@ export const createPackage = async (
     info: any
 ) => {
     try {
-        return await context.connection.getCustomRepository(PackageRepository).createPackage({
+        const packageEntity = await context.connection.getCustomRepository(PackageRepository).createPackage({
             userId: context.me?.id,
             packageInput: value,
             relations: getGraphQlRelationName(info)
         });
+
+        await context.connection.getRepository(ActivityLog).save({
+            userId: context.me.id,
+            eventType: ActivityLogEventType.PackageCreated,
+            targetPackageId: packageEntity?.id
+        });
+
+        return packageEntity;
     } catch (error) {
         if (error.message == "CATALOG_NOT_FOUND") {
             throw new UserInputError("CATALOG_NOT_FOUND");
@@ -196,7 +213,8 @@ export const deletePackage = async (
     info: any
 ) => {
     return context.connection.getCustomRepository(PackageRepository).deletePackage({
-        identifier
+        identifier,
+        context
     });
 };
 

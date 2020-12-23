@@ -1,10 +1,13 @@
 import { EntityRepository, EntityManager, FindOneOptions } from "typeorm";
 
 import { CreatePackageInput, UpdatePackageInput, PackageIdentifierInput, Permission } from "../generated/graphql";
+import { AuthenticatedContext } from "../context";
 import { Package } from "../entity/Package";
 
 import { UserPackagePermission } from "../entity/UserPackagePermission";
 import { Catalog } from "../entity/Catalog";
+import { ActivityLog } from "../entity/ActivityLog";
+import { ActivityLogEventType } from "../entity/ActivityLogEventType";
 import { CatalogRepository } from "./CatalogRepository";
 import { VersionRepository } from "./VersionRepository";
 import { allPermissions } from "../util/PermissionsUtil";
@@ -339,7 +342,13 @@ export class PackageRepository {
         });
     }
 
-    async deletePackage({ identifier }: { identifier: PackageIdentifierInput }): Promise<void> {
+    async deletePackage({
+        identifier,
+        context
+    }: {
+        identifier: PackageIdentifierInput;
+        context?: AuthenticatedContext;
+    }): Promise<void> {
         const catalogSlug = identifier.catalogSlug;
         const packageSlug = identifier.packageSlug;
         const packageEntity = await findPackage(this.manager, catalogSlug, packageSlug, ["versions", "catalog"]);
@@ -357,6 +366,14 @@ export class PackageRepository {
         });
 
         await ImageStorageService.INSTANCE.deletePackageCoverImage(packageEntity.id);
+
+        try {
+            await this.manager.getRepository(ActivityLog).save({
+                userId: context?.me.id,
+                eventType: ActivityLogEventType.PackageViewed,
+                targetPackageId: packageEntity?.id
+            });
+        } catch (e) {}
     }
 
     async deletePackages({ packages }: { packages: Package[] }): Promise<void> {
