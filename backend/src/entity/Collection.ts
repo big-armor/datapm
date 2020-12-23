@@ -38,5 +38,5 @@ export class Collection extends BaseModel {
     public identifier: CollectionIdentifier;
     // These are dummy values so that response objects will have the right values
     // need to write converters for Entity -> GraphQL object
-    myPermissions: Permission[];
+    public myPermissions: Permission[];
 }

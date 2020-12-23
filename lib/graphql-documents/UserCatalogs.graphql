@@ -1,0 +1,17 @@
+query UserCatalogs($username: String!, $offSet: Int!, $limit: Int!) {
+    userCatalogs(username: $username, offSet: $offSet, limit: $limit) {
+        catalogs {
+            identifier {
+                registryURL
+                catalogSlug
+            }
+            displayName
+            description
+            website
+            isPublic
+            myPermissions
+        }
+        hasMore
+        count
+    }
+}

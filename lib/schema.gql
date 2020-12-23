@@ -196,6 +196,22 @@ type UserPackagePermissions {
 }
 
 """
+Represents users, and their permissions on a collection
+"""
+type UserCollectionPermissions {
+    user: User!
+    permissions: [Permission!]!
+}
+
+"""
+Represents users, and their permissions on a catalog
+"""
+type UserCatalogPermissions {
+    user: User!
+    permissions: [Permission!]!
+}
+
+"""
 A single version of a package file for a package listing on the registry
 """
 type Version {
@@ -263,18 +279,27 @@ type SearchCollectionResult {
 }
 
 """
-The response for my packages request
+The response for packages list request
 """
-type MyPackagesResult {
+type PackagesResult {
     packages: [Package!]
     hasMore: Boolean!
     count: Int!
 }
 
 """
-The response for my packages request
+The response for a catalog list request
 """
-type MyCollectionsResult {
+type CatalogsResult {
+    catalogs: [Catalog!]
+    hasMore: Boolean!
+    count: Int!
+}
+
+"""
+The response for collections list request
+"""
+type CollectionsResult {
     collections: [Collection!]
     hasMore: Boolean!
     count: Int!
@@ -471,12 +496,16 @@ type Query {
     """
     Returns all of the users for a given catalog
     """
-    usersByCatalog(identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)): [User]!
+    usersByCatalog(
+        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
+    ): [UserCatalogPermissions]!
 
     """
     Returns all of the users for a given collection
     """
-    usersByCollection(identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)): [User]!
+    usersByCollection(
+        identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
+    ): [UserCollectionPermissions]!
 
     """
     Return a user by a given username, and returns only the properties on that user the requester should be able to view
@@ -525,7 +554,7 @@ type Query {
     """
     Returns list of authenicated users packages
     """
-    myPackages(offset: Int!, limit: Int!): MyPackagesResult! @isAuthenticated
+    myPackages(offset: Int!, limit: Int!): PackagesResult! @isAuthenticated
 
     """
     Returns packages that match the given search query (which can contain boolean search logic). This request is paginated.
@@ -555,7 +584,22 @@ type Query {
     """
     Returns list of authenicated users collections
     """
-    myCollections(offSet: Int!, limit: Int!): MyCollectionsResult! @isAuthenticated
+    myCollections(offSet: Int!, limit: Int!): CollectionsResult! @isAuthenticated
+
+    """
+    Returns list of collections for the given user
+    """
+    userCollections(username: String! @validUsername, offSet: Int!, limit: Int!): CollectionsResult!
+
+    """
+    Returns list of catalogs for the given user
+    """
+    userCatalogs(username: String! @validUsername, offSet: Int!, limit: Int!): CatalogsResult!
+
+    """
+    Returns list of catalogs for the given user
+    """
+    userPackages(username: String! @validUsername, offSet: Int!, limit: Int!): PackagesResult!
 
     """
     Returns collections whos names match the given query. This request is paginated

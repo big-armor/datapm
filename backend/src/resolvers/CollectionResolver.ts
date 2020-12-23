@@ -35,9 +35,9 @@ export const usersByCollection = async (
         .getCustomRepository(CollectionRepository)
         .findCollectionBySlugOrFail(identifier.collectionSlug);
 
-    return context.connection.manager
+    return await context.connection.manager
         .getCustomRepository(UserCollectionPermissionRepository)
-        .usersByCollection(collectionEntity.id, relations);
+        .usersByCollection(collectionEntity, relations);
 };
 
 export const createCollection = async (
@@ -238,6 +238,24 @@ export const searchCollections = async (
 
     return {
         hasMore: count - (offset + limit) > 0,
+        collections: searchResponse,
+        count
+    };
+};
+
+export const userCollections = async (
+    _0: any,
+    { username, limit, offSet }: { username: string; limit: number; offSet: number },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const relations = getGraphQlRelationName(info);
+    const [searchResponse, count] = await context.connection.manager
+        .getCustomRepository(CollectionRepository)
+        .userCollections({ user: context.me, username, offSet: offSet, limit, relations });
+
+    return {
+        hasMore: count - (offSet + limit) > 0,
         collections: searchResponse,
         count
     };

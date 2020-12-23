@@ -62,7 +62,9 @@ import {
     setCollectionCoverImage,
     updateCollection,
     collectionPackages,
-    usersByCollection
+    usersByCollection,
+    myPermissions,
+    userCollections
 } from "./resolvers/CollectionResolver";
 import {
     setUserCollectionPermissions,
@@ -98,7 +100,8 @@ import {
     setPackageCoverImage,
     setPackagePermissions,
     updatePackage,
-    myPackages
+    myPackages,
+    userPackages
 } from "./resolvers/PackageResolver";
 import { ImageStorageService } from "./storage/images/image-storage-service";
 
@@ -115,6 +118,7 @@ import { DateResolver } from "./resolvers/DateResolver";
 import { Permissions } from "./entity/Permissions";
 import { exit } from "process";
 import { CollectionRepository } from "./repository/CollectionRepository";
+import { userCatalogs } from "./resolvers/CatalogResolver";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -336,6 +340,7 @@ export const resolvers: {
             };
         },
         packages: findPackagesForCollection,
+        myPermissions: myPermissions,
         creator: async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
             const collection = parent as Collection;
 
@@ -506,7 +511,9 @@ export const resolvers: {
         searchCollections: searchCollections,
         collectionPackages: collectionPackages,
         usersByCollection: usersByCollection,
-
+        userCatalogs: userCatalogs,
+        userCollections: userCollections,
+        userPackages: userPackages,
         autoComplete: async (_0: any, { startsWith }, context: AuthenticatedContext, info: any) => {
             const users = context.connection.manager.getCustomRepository(UserRepository).autocomplete({
                 user: context.me,
@@ -570,6 +577,23 @@ export const resolvers: {
             return await context.connection.manager
                 .getCustomRepository(CatalogRepository)
                 .catalogPackages(catalogEntity.id, limit, offset, relations);
+        },
+
+        usersByCatalog: async (
+            _0: any,
+            { identifier }: { identifier: CatalogIdentifierInput },
+            context: AuthenticatedContext,
+            info: any
+        ) => {
+            const relations = getGraphQlRelationName(info);
+
+            const catalogEntity = await context.connection.manager
+                .getCustomRepository(CatalogRepository)
+                .findCatalogBySlugOrFail(identifier.catalogSlug);
+
+            return await context.connection.manager
+                .getCustomRepository(UserCatalogPermissionRepository)
+                .usersByCatalog(catalogEntity, relations);
         },
 
         searchPackages: searchPackages,
