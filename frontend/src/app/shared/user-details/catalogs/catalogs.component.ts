@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef, ViewChild } from "@angular/core";
+import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { Catalog, MyCatalogsGQL, UpdateCatalogGQL, DeleteCatalogGQL } from "src/generated/graphql";
 import { Subject } from "rxjs";
 import { take, takeUntil } from "rxjs/operators";
@@ -21,6 +21,8 @@ enum State {
     styleUrls: ["./catalogs.component.scss"]
 })
 export class CatalogsComponent implements OnInit {
+    @Input() isCurrentUser: boolean;
+
     State = State;
     catalogState = State.INIT;
     public myCatalogs: Catalog[];

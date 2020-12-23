@@ -16,13 +16,13 @@ export class UserDetailsComponent implements OnInit {
     public username: string;
     public state: PageState = "INIT";
     public tabs: TabModel[] = [];
-    public selectedTab: string = "";
+    public selectedTab: string = "packages";
 
     private subscription = new Subject();
 
     constructor(private userGQL: UserGQL, private route: ActivatedRoute, private router: Router) {
         this.tabs = [
-            { name: "Packages", value: "" },
+            { name: "Packages", value: "packages" },
             { name: "Collections", value: "collections" },
             { name: "Catalogs", value: "catalogs" }
         ];

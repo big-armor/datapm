@@ -9,7 +9,9 @@
 </div>
 
 <div *ngIf="state == State.SUCCESS" id="packagesPage" class="big-div-package">
-    <div class="section-title">My Packages</div>
+    <div class="section-title">
+        {{ isCurrentUser ? "My Packages" : "Packages" }}
+    </div>
     <p class="pl-4 pr-4">
         A package is a single offering of one or more data sets. You can publish packages to this registry, and consume
         packages that you discover on this registry.

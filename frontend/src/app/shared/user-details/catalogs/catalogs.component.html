@@ -1,6 +1,8 @@
 <div id="catalogsPage">
     <div class="catalogs-div panel-div">
-        <div *ngIf="catalogState !== State.LOADING" class="section-title">My Catalogs</div>
+        <div *ngIf="catalogState !== State.LOADING" class="section-title">
+            {{ isCurrentUser ? "My Catalogs" : "Catalogs" }}
+        </div>
         <p class="pl-4 pr-4" *ngIf="catalogState !== State.LOADING">
             Catalogs are lists of data packages offered by individuals or organizations. All packages belong to one and
             only one catalog.

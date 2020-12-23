@@ -7,4 +7,9 @@
             </a>
         </li>
     </ul>
+    <div class="p-0" [ngSwitch]="selectedTab">
+        <my-collections *ngSwitchCase="'collections'"></my-collections>
+        <me-catalogs *ngSwitchCase="'catalogs'"></me-catalogs>
+        <me-packages *ngSwitchCase="'packages'"></me-packages>
+    </div>
 </div>
