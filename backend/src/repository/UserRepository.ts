@@ -342,7 +342,7 @@ export class UserRepository extends Repository<User> {
                 return dbUser;
             })
             .then(async (user: User) => {
-                await sendForgotPasswordEmail(user, user.passwordRecoveryToken);
+                await sendForgotPasswordEmail(user, user.passwordRecoveryToken as string);
             });
     }
 
@@ -364,6 +364,7 @@ export class UserRepository extends Repository<User> {
 
             const newPasswordHash = hashPassword(value.newPassword, dbUser.passwordSalt);
             dbUser.passwordHash = newPasswordHash;
+            dbUser.passwordRecoveryToken = null;
 
             await transaction.save(dbUser);
         });

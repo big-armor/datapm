@@ -218,4 +218,62 @@ describe("Forgot Password Tests", async () => {
         expect(loginWithNewPassword.errors![0].message).equal("WRONG_CREDENTIALS");
         return await verifyEmailPromise;
     });
+
+    it("Should validate that the token is no longer useable after a successful reset", async function () {
+        const verifyEmailPromise = new Promise<any>((r) => {
+            let subscription = mailObservable.subscribe((email) => {
+                subscription.unsubscribe();
+                r(email);
+            });
+        });
+        await userAClient.mutate({
+            mutation: ForgotMyPasswordDocument,
+            variables: {
+                emailAddress: "forgotpasswordA-user@test.datapm.io"
+            }
+        });
+        const token = await verifyEmailPromise.then((email) => {
+            let token;
+            const emailForgotToken = (email.text as String).match(/\?token=([a-zA-z0-9-]+)/);
+            if (emailForgotToken) token = emailForgotToken[1];
+            return token;
+        });
+
+        const passwordResetResponse = await userAClient.mutate({
+            mutation: RecoverMyPasswordDocument,
+            variables: {
+                value: {
+                    token: token,
+                    newPassword: "greenAndOrange!"
+                }
+            }
+        });
+
+        expect(passwordResetResponse.errors == null, "no errors").to.equal(true);
+
+        const secondPasswordResetResponse = await userAClient.mutate({
+            mutation: RecoverMyPasswordDocument,
+            variables: {
+                value: {
+                    token: token,
+                    newPassword: "greenAndOrange2!"
+                }
+            }
+        });
+
+        expect(secondPasswordResetResponse.errors != null, "has errors").to.equal(true);
+        expect(secondPasswordResetResponse.errors![0].message).to.equal("TOKEN_NOT_VALID");
+
+        let loginWithNewPassword = await userAClient.mutate({
+            mutation: LoginDocument,
+            variables: {
+                username: "forgotpassword-user",
+                password: "greenAndOrange!"
+            }
+        });
+        await verifyEmailPromise;
+        expect(loginWithNewPassword.errors == null).true;
+        expect(loginWithNewPassword.data?.login).to.exist;
+        return await verifyEmailPromise;
+    });
 });
