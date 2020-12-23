@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { CreateCollectionComponent } from "../../create-collection/create-collection.component";
 import { EditCollectionComponent } from "../../edit-collection/edit-collection.component";
@@ -19,6 +19,9 @@ enum State {
     styleUrls: ["./user-collections.component.scss"]
 })
 export class UserCollectionsComponent implements OnInit {
+    @Input() username: string;
+    @Input() isCurrentUser: boolean;
+
     public collections: Collection[] = [];
     columnsToDisplay = ["name", "public", "actions"];
     State = State;
@@ -33,6 +36,9 @@ export class UserCollectionsComponent implements OnInit {
 
     ngOnInit(): void {
         this.loadMyCollections();
+        if (!this.isCurrentUser) {
+            this.columnsToDisplay = ["name"];
+        }
     }
 
     openCreateDialog() {

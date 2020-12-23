@@ -21,6 +21,7 @@ enum State {
     styleUrls: ["./user-catalogs.component.scss"]
 })
 export class UserCatalogsComponent implements OnInit {
+    @Input() username: string;
     @Input() isCurrentUser: boolean;
 
     State = State;
@@ -41,6 +42,9 @@ export class UserCatalogsComponent implements OnInit {
 
     ngOnInit(): void {
         this.refreshCatalogs();
+        if (!this.isCurrentUser) {
+            this.columnsToDisplay = ["name"];
+        }
     }
 
     refreshCatalogs() {

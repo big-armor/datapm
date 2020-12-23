@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, Input, OnDestroy, OnInit } from "@angular/core";
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { EditPasswordDialogComponent } from "../edit-password-dialog/edit-password-dialog.component";
 import { AuthenticationService } from "../../../services/authentication.service";

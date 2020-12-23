@@ -12,10 +12,26 @@
             </ul>
         </div>
         <div class="p-0" [ngSwitch]="selectedTab">
-            <app-user-packages *ngSwitchCase="'packages'"></app-user-packages>
-            <app-user-collections *ngSwitchCase="'collections'"></app-user-collections>
-            <app-user-catalogs *ngSwitchCase="'catalogs'"></app-user-catalogs>
-            <app-user-details *ngSwitchDefault></app-user-details>
+            <app-user-packages
+                [isCurrentUser]="true"
+                [username]="currentUser?.username"
+                *ngSwitchCase="'packages'"
+            ></app-user-packages>
+            <app-user-collections
+                [isCurrentUser]="true"
+                [username]="currentUser?.username"
+                *ngSwitchCase="'collections'"
+            ></app-user-collections>
+            <app-user-catalogs
+                [isCurrentUser]="true"
+                [username]="currentUser?.username"
+                *ngSwitchCase="'catalogs'"
+            ></app-user-catalogs>
+            <app-user-details
+                [isCurrentUser]="true"
+                [username]="currentUser?.username"
+                *ngSwitchDefault
+            ></app-user-details>
         </div>
     </div>
 </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { MyPackagesGQL, Package } from "src/generated/graphql";
@@ -15,6 +15,9 @@ enum State {
     styleUrls: ["./user-packages.component.scss"]
 })
 export class UserPackagesComponent implements OnInit {
+    @Input() username: string;
+    @Input() isCurrentUser: boolean;
+
     State = State;
     state = State.INIT;
     public myPackages: Package[];

@@ -8,9 +8,21 @@
         </li>
     </ul>
     <div class="p-0" [ngSwitch]="selectedTab">
-        <app-user-collections *ngSwitchCase="'collections'"></app-user-collections>
-        <app-user-catalogs *ngSwitchCase="'catalogs'"></app-user-catalogs>
-        <app-user-packages *ngSwitchCase="'packages'"></app-user-packages>
+        <app-user-collections
+            [isCurrentUser]="isCurrentUser"
+            [username]="username"
+            *ngSwitchCase="'collections'"
+        ></app-user-collections>
+        <app-user-catalogs
+            [isCurrentUser]="isCurrentUser"
+            [username]="username"
+            *ngSwitchCase="'catalogs'"
+        ></app-user-catalogs>
+        <app-user-packages
+            [isCurrentUser]="isCurrentUser"
+            [username]="username"
+            *ngSwitchCase="'packages'"
+        ></app-user-packages>
         <app-user-details *ngSwitchDefault></app-user-details>
     </div>
 </div>
