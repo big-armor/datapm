@@ -86,7 +86,7 @@ export class PackageRepository {
     }): Promise<[Package[], number]> {
         const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
 
-        const response = await this.createQueryBuilderWithUserConditionsByUserId(user.id, Permission.VIEW)
+        const response = await this.createQueryBuilderWithUserConditions(user, Permission.VIEW)
             .andWhere(
                 `("Package"."id" IN (SELECT package_id FROM user_package_permission WHERE user_id = :targetUserId AND 'MANAGE' = ANY(user_package_permission.permission) ))`
             )

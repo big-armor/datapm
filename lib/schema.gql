@@ -587,17 +587,17 @@ type Query {
     """
     Returns list of collections for the given user
     """
-    userCollections(username: String! @validUsername, offSet: Int!, limit: Int!): CollectionsResult! @isAuthenticated
+    userCollections(username: String! @validUsername, offSet: Int!, limit: Int!): CollectionsResult!
 
     """
     Returns list of catalogs for the given user
     """
-    userCatalogs(username: String! @validUsername, offSet: Int!, limit: Int!): CatalogsResult! @isAuthenticated
+    userCatalogs(username: String! @validUsername, offSet: Int!, limit: Int!): CatalogsResult!
 
     """
     Returns list of catalogs for the given user
     """
-    userPackages(username: String! @validUsername, offSet: Int!, limit: Int!): PackagesResult! @isAuthenticated
+    userPackages(username: String! @validUsername, offSet: Int!, limit: Int!): PackagesResult!
 
     """
     Returns collections whos names match the given query. This request is paginated

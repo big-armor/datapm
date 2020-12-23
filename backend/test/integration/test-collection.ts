@@ -12,7 +12,8 @@ import {
     DeleteCollectionDocument,
     MyCollectionsDocument,
     CollectionPackagesDocument,
-    CreateVersionDocument
+    CreateVersionDocument,
+    UserCollectionsDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
@@ -321,6 +322,22 @@ describe("Collection Tests", async () => {
         expect(response.errors![0].message).equal("NOT_AUTHORIZED");
     });
 
+    it("User A list user B collections - not present", async function () {
+        let response = await userAClient.query({
+            query: UserCollectionsDocument,
+            variables: {
+                username: "testB-collection",
+                offSet: 0,
+                limit: 10
+            }
+        });
+
+        expect(response.errors == null, "has no errors").true;
+        expect(response.data.userCollections.hasMore).equal(false);
+        expect(response.data.userCollections.count).equal(0);
+        expect(response.data.userCollections.collections?.length).equal(0);
+    });
+
     it("User B set collection public", async function () {
         let response = await userBClient.mutate({
             mutation: UpdateCollectionDocument,
@@ -358,6 +375,22 @@ describe("Collection Tests", async () => {
         expect(response.data!.collection.name).equal("new name");
         expect(response.data!.collection.packages!.length == 1).true;
         expect(response.data!.collection.identifier.collectionSlug).equal("new-collection-slug");
+    });
+
+    it("User A list user B collections - present", async function () {
+        let response = await userAClient.query({
+            query: UserCollectionsDocument,
+            variables: {
+                username: "testB-collection",
+                offSet: 0,
+                limit: 10
+            }
+        });
+
+        expect(response.errors == null, "has no errors").true;
+        expect(response.data.userCollections.hasMore).equal(false);
+        expect(response.data.userCollections.count).equal(1);
+        expect(response.data.userCollections.collections?.length).equal(1);
     });
 
     it("Adding at least three unique packages to a collection", async function () {
@@ -504,6 +537,22 @@ describe("Collection Tests", async () => {
         expect(response.data!.collection.name).equal("new name");
         expect(response.data!.collection.packages!.length == 1).true;
         expect(response.data!.collection.identifier.collectionSlug).equal("new-collection-slug");
+    });
+
+    it("Anonymous list user B collections - present", async function () {
+        let response = await anonymousUser.query({
+            query: UserCollectionsDocument,
+            variables: {
+                username: "testB-collection",
+                offSet: 0,
+                limit: 10
+            }
+        });
+
+        expect(response.errors == null, "has no errors").true;
+        expect(response.data.userCollections.hasMore).equal(false);
+        expect(response.data.userCollections.count).equal(1);
+        expect(response.data.userCollections.collections?.length).equal(1);
     });
 
     it("Delete collection", async function () {

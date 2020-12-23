@@ -73,7 +73,7 @@ export class CollectionRepository extends Repository<Collection> {
         limit,
         relations = []
     }: {
-        user: User;
+        user?: User;
         username: string;
         offSet: number;
         limit: number;
@@ -81,9 +81,9 @@ export class CollectionRepository extends Repository<Collection> {
     }): Promise<[Collection[], number]> {
         const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
 
-        const response = await this.createQueryBuilderWithUserConditions(user.id)
+        const response = await this.createQueryBuilderWithUserConditions(user?.id)
             .andWhere(
-                `(collection.id IN (SELECT collection_id FROM collection_user WHERE user_id = :targetUserId AND 'MANAGE' = ANY( permissions) ))`
+                `("Collection".id IN (SELECT collection_id FROM collection_user WHERE user_id = :targetUserId AND 'MANAGE' = ANY( permissions) ))`
             )
             .setParameter("targetUserId", targetUser.id)
             .offset(offSet)
@@ -162,7 +162,7 @@ export class CollectionRepository extends Repository<Collection> {
         );
     }
 
-    private createQueryBuilderWithUserConditions(userId: number): SelectQueryBuilder<Collection> {
+    private createQueryBuilderWithUserConditions(userId?: number): SelectQueryBuilder<Collection> {
         const publicCollectionQueryBuilder = this.createQueryBuilder().where('("Collection"."is_public")');
         if (!userId) {
             return publicCollectionQueryBuilder;

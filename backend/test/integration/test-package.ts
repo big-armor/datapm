@@ -489,6 +489,22 @@ describe("Package Tests", async () => {
         ).to.not.equal(undefined);
     });
 
+    it("Anonymous user list should be available to user B", async function () {
+        let response = await anonymousClient.query({
+            query: UserPackagesDocument,
+            variables: {
+                username: "testA-packages",
+                offSet: 0,
+                limit: 100
+            }
+        });
+
+        expect(response.errors == null, "should not have errors").to.equal(true);
+        expect(response.data.userPackages.hasMore).to.equal(false);
+        expect(response.data.userPackages.count).to.equal(1);
+        expect(response.data.userPackages.packages?.length).to.equal(1);
+    });
+
     it("Should be in latest list - creator", async function () {
         let response = await userAClient.query({
             query: GetLatestPackagesDocument,
