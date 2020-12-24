@@ -2,7 +2,13 @@ import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { CreateCollectionComponent } from "../../create-collection/create-collection.component";
 import { EditCollectionComponent } from "../../edit-collection/edit-collection.component";
-import { Collection, DeleteCollectionGQL, MyCollectionsGQL, UpdateCollectionGQL } from "src/generated/graphql";
+import {
+    Collection,
+    DeleteCollectionGQL,
+    MyCollectionsGQL,
+    UpdateCollectionGQL,
+    UserCollectionsGQL
+} from "src/generated/graphql";
 import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
 import { FewPackagesAlertComponent } from "../few-packages-alert/few-packages-alert.component";
 
@@ -28,7 +34,7 @@ export class UserCollectionsComponent implements OnInit {
     state = State.INIT;
 
     constructor(
-        private myCollections: MyCollectionsGQL,
+        private userCollections: UserCollectionsGQL,
         private updateCollectionGQL: UpdateCollectionGQL,
         private deleteCollectionGQL: DeleteCollectionGQL,
         private dialog: MatDialog
@@ -53,9 +59,9 @@ export class UserCollectionsComponent implements OnInit {
     private loadMyCollections(): void {
         // Need to set a dynamic limit for future / pagination
         this.state = State.LOADING;
-        this.myCollections.fetch({ offSet: 0, limit: 100 }).subscribe(
+        this.userCollections.fetch({ username: this.username, offSet: 0, limit: 100 }).subscribe(
             (a) => {
-                this.collections = a.data.myCollections.collections as Collection[];
+                this.collections = a.data.userCollections.collections as Collection[];
                 this.state = State.SUCCESS;
             },
             () => {

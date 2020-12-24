@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
-import { MyPackagesGQL, Package } from "src/generated/graphql";
+import { MyPackagesGQL, Package, UserPackagesGQL } from "src/generated/graphql";
 
 enum State {
     INIT,
@@ -20,9 +20,10 @@ export class UserPackagesComponent implements OnInit {
 
     State = State;
     state = State.INIT;
-    public myPackages: Package[];
+    public packages: Package[];
     private subscription = new Subject();
-    constructor(private myPackagesGQL: MyPackagesGQL) {}
+
+    constructor(private userPackages: UserPackagesGQL) {}
 
     ngOnInit(): void {
         this.refreshPackages();
@@ -30,15 +31,15 @@ export class UserPackagesComponent implements OnInit {
 
     refreshPackages() {
         this.state = State.LOADING;
-        this.myPackagesGQL
-            .fetch({ offset: 0, limit: 1000 })
+        this.userPackages
+            .fetch({ username: this.username, offSet: 0, limit: 1000 })
             .pipe(takeUntil(this.subscription))
             .subscribe((response) => {
                 if (response.errors?.length > 0) {
                     this.state = State.ERROR;
                     return;
                 }
-                this.myPackages = response.data.myPackages.packages as Package[];
+                this.packages = response.data.userPackages.packages as Package[];
                 this.state = State.SUCCESS;
             });
     }

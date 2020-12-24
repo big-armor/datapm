@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { Catalog, MyCatalogsGQL, UpdateCatalogGQL, DeleteCatalogGQL } from "src/generated/graphql";
+import { Catalog, MyCatalogsGQL, UpdateCatalogGQL, DeleteCatalogGQL, UserCatalogsGQL } from "src/generated/graphql";
 import { Subject } from "rxjs";
 import { take, takeUntil } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
@@ -33,7 +33,7 @@ export class UserCatalogsComponent implements OnInit {
     @ViewChild("deleteMyUsercatalog") deleteMyUsercatalog: TemplateRef<any>;
 
     constructor(
-        private myCatalogsGQL: MyCatalogsGQL,
+        private userCatalogs: UserCatalogsGQL,
         private updateCatalogGQL: UpdateCatalogGQL,
         private disableCatalogGQL: DeleteCatalogGQL,
         private authenticationService: AuthenticationService,
@@ -49,15 +49,15 @@ export class UserCatalogsComponent implements OnInit {
 
     refreshCatalogs() {
         this.catalogState = State.LOADING;
-        this.myCatalogsGQL
-            .fetch()
+        this.userCatalogs
+            .fetch({ username: this.username, offSet: 0, limit: 1000 })
             .pipe(takeUntil(this.subscription))
             .subscribe((response) => {
                 if (response.errors?.length > 0) {
                     this.catalogState = State.ERROR;
                     return;
                 }
-                this.myCatalogs = response.data.myCatalogs;
+                this.myCatalogs = response.data.userCatalogs.catalogs as Catalog[];
                 this.catalogState = State.SUCCESS;
             });
     }
