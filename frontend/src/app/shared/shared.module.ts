@@ -43,6 +43,7 @@ import { UserPackagesComponent } from "./user-details/user-packages/user-package
 import { EditAccountDialogComponent } from "./user-details/edit-account-dialog/edit-account-dialog.component";
 import { EditPasswordDialogComponent } from "./user-details/edit-password-dialog/edit-password-dialog.component";
 import { UserDetailsComponent } from "./user-details/user-details/user-details.component";
+import { SimpleCreateComponent } from "./user-details/simple-create/simple-create.component";
 
 @NgModule({
     declarations: [
@@ -75,7 +76,8 @@ import { UserDetailsComponent } from "./user-details/user-details/user-details.c
         UserPackagesComponent,
         EditAccountDialogComponent,
         EditPasswordDialogComponent,
-        UserDetailsComponent
+        UserDetailsComponent,
+        SimpleCreateComponent
     ],
     imports: [
         CommonModule,

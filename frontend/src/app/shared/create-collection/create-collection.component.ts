@@ -1,6 +1,6 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Inject, OnInit } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { MatDialogRef } from "@angular/material/dialog";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { CreateCollectionGQL } from "src/generated/graphql";
 
 type State = "INIT" | "LOADING" | "SUCCESS" | "ERROR";
@@ -17,10 +17,11 @@ export class CreateCollectionComponent implements OnInit {
 
     constructor(
         private dialogRef: MatDialogRef<CreateCollectionComponent>,
-        private createCollectionGQL: CreateCollectionGQL
+        private createCollectionGQL: CreateCollectionGQL,
+        @Inject(MAT_DIALOG_DATA) private data: { input: string }
     ) {
         this.form = new FormGroup({
-            name: new FormControl("", {
+            name: new FormControl(data?.input, {
                 validators: [Validators.required]
             })
         });

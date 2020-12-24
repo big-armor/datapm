@@ -65,6 +65,15 @@
             </table>
         </div>
 
+        <div class="mt-3">
+            <app-simple-create
+                inputPlaceholder="Collection Name"
+                createLabel="Create a collection"
+                [errorMessages]="inputErrors"
+                (submit)="createCollection($event)"
+            ></app-simple-create>
+        </div>
+
         <div class="loading-container" *ngIf="state === State.LOADING">
             <mat-spinner [diameter]="40"></mat-spinner>
         </div>

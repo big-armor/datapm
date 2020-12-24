@@ -1,0 +1,14 @@
+<form [formGroup]="form">
+    <div class="d-flex align-items-start">
+        <app-input inputStyle="flat" [group]="form" controlName="input" [placeholder]="inputPlaceholder"></app-input>
+        <a class="app-outlined-button ml-3 mt-2" (click)="submitForm()">{{ createLabel }}</a>
+    </div>
+    <div class="mt-1 text-danger" *ngIf="errorMessages[error]; else formError">
+        {{ errorMessages[error] }}
+    </div>
+    <ng-template #formError>
+        <div class="mt-1 text-danger">
+            {{ form | inputError: "input":errorMessages | async }}
+        </div>
+    </ng-template>
+</form>

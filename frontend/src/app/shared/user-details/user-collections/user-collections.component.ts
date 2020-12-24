@@ -32,6 +32,9 @@ export class UserCollectionsComponent implements OnInit {
     columnsToDisplay = ["name", "public", "actions"];
     State = State;
     state = State.INIT;
+    inputErrors = {
+        required: "Collection name is required"
+    };
 
     constructor(
         private userCollections: UserCollectionsGQL,
@@ -50,6 +53,17 @@ export class UserCollectionsComponent implements OnInit {
     openCreateDialog() {
         this.dialog
             .open(CreateCollectionComponent)
+            .afterClosed()
+            .subscribe(() => {
+                this.loadMyCollections();
+            });
+    }
+
+    createCollection(formValue) {
+        this.dialog
+            .open(CreateCollectionComponent, {
+                data: formValue
+            })
             .afterClosed()
             .subscribe(() => {
                 this.loadMyCollections();
