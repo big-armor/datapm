@@ -24,11 +24,18 @@ export class SimpleCreateComponent implements OnInit {
         this.form.valueChanges.subscribe(() => {
             this.inputChanged = true;
         });
+
+        this.form.statusChanges.subscribe(() => {
+            console.log("Form status changes");
+        });
     }
 
     ngOnInit(): void {}
 
     submitForm() {
+        this.form.markAllAsTouched();
+        this.form.patchValue(this.form.value);
+
         if (this.form.invalid) {
             return;
         }

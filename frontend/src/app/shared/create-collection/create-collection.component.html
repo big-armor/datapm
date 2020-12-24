@@ -4,7 +4,13 @@
         <div class="d-flex bd-highlight shadow-div mb-3">
             <div class="px-4 py-2 bd-highlight div-question">Collection Name</div>
             <div class="bd-highlight div-answer">
-                <input formControlName="name" class="form-control" placeholder="Collection Name" />
+                <input formControlName="name" class="form-control" placeholder="Collection Name*" />
+            </div>
+        </div>
+        <div class="d-flex bd-highlight shadow-div mb-3">
+            <div class="px-4 py-2 bd-highlight div-question">Description</div>
+            <div class="bd-highlight div-answer">
+                <textarea formControlName="description" class="form-control" placeholder="Description"></textarea>
             </div>
         </div>
         <div class="text-danger pl-4" *ngIf="state === 'ERROR'">

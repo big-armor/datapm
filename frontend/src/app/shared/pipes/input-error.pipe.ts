@@ -1,6 +1,7 @@
 import { Pipe, PipeTransform } from "@angular/core";
 import { AbstractControl } from "@angular/forms";
-import { map, startWith } from "rxjs/operators";
+import { merge } from "rxjs";
+import { map } from "rxjs/operators";
 
 const defaultMessages = {
     required: (errors: any) => "Required field",
@@ -42,11 +43,16 @@ export class InputErrorPipe implements PipeTransform {
         }
         this.messages = messages;
 
-        return this.formControl.statusChanges.pipe(map(() => this.checkError()));
+        let statusChanges = this.formControl.statusChanges;
+        if (controlName) {
+            statusChanges = merge(statusChanges, control.statusChanges);
+        }
+
+        return statusChanges.pipe(map(() => this.checkError()));
     }
 
     private checkError() {
-        if (this.formControl && this.formControl.dirty && this.formControl.errors) {
+        if (this.formControl && this.formControl.touched && this.formControl.errors) {
             for (let i = 0; i < errorKeys.length; i++) {
                 const key = errorKeys[i];
                 if (this.formControl.errors[key]) {

@@ -23,7 +23,8 @@ export class CreateCollectionComponent implements OnInit {
         this.form = new FormGroup({
             name: new FormControl(data?.input, {
                 validators: [Validators.required]
-            })
+            }),
+            description: new FormControl("")
         });
     }
 
@@ -34,13 +35,13 @@ export class CreateCollectionComponent implements OnInit {
             return;
         }
 
-        const name = this.form.value.name;
         this.state = "LOADING";
+        const collectionSlug = this.form.value.name.toLowerCase().replace(/\s+/g, "-");
         this.createCollectionGQL
             .mutate({
                 value: {
-                    name,
-                    collectionSlug: name.toLowerCase().replace(/\s+/g, "-")
+                    ...this.form.value,
+                    collectionSlug
                 }
             })
             .subscribe(
@@ -48,7 +49,7 @@ export class CreateCollectionComponent implements OnInit {
                     if (response.errors) {
                         const error = response.errors.find((e) => e.message === "COLLECTION_SLUG_NOT_AVAILABLE");
                         if (error) {
-                            this.error = `Collection slug '${name.toLowerCase()}' already exists. Please change name to fix the issue`;
+                            this.error = `Collection slug '${collectionSlug}' already exists. Please change name to fix the issue`;
                         } else {
                             this.error = "Unknown error occured";
                         }
