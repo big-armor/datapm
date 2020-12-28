@@ -34,6 +34,7 @@ import { EditCollectionComponent } from "./edit-collection/edit-collection.compo
 import { ConfirmationDialogComponent } from "./confirmation-dialog/confirmation-dialog.component";
 import { EditCatalogComponent } from "./edit-catalog/edit-catalog.component";
 import { CreateCollectionComponent } from "./create-collection/create-collection.component";
+import { CreateCatalogComponent } from "./create-catalog/create-catalog.component";
 import { UserDetailsHeaderComponent } from "./user-details/user-details-header/user-details-header.component";
 import { UserCatalogsComponent } from "./user-details/user-catalogs/user-catalogs.component";
 import { DeleteConfirmationComponent } from "./user-details/delete-confirmation/delete-confirmation.component";
@@ -68,6 +69,7 @@ import { SimpleCreateComponent } from "./user-details/simple-create/simple-creat
         ConfirmationDialogComponent,
         EditCatalogComponent,
         CreateCollectionComponent,
+        CreateCatalogComponent,
         UserDetailsHeaderComponent,
         UserCatalogsComponent,
         DeleteConfirmationComponent,

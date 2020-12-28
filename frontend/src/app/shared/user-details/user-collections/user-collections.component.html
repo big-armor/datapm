@@ -65,7 +65,7 @@
             </table>
         </div>
 
-        <div class="mt-3">
+        <div class="mt-3" *ngIf="state !== State.LOADING">
             <app-simple-create
                 inputPlaceholder="Collection Name"
                 createLabel="Create a collection"

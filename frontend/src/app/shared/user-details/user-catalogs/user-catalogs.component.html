@@ -53,6 +53,15 @@
         <div class="loading-container" *ngIf="catalogState === State.LOADING">
             <mat-spinner [diameter]="40"></mat-spinner>
         </div>
+
+        <div class="mt-3" *ngIf="catalogState !== State.LOADING">
+            <app-simple-create
+                inputPlaceholder="Catalog Name"
+                createLabel="Create a catalog"
+                [errorMessages]="inputErrors"
+                (submit)="createCatalog($event)"
+            ></app-simple-create>
+        </div>
     </div>
 </div>
 

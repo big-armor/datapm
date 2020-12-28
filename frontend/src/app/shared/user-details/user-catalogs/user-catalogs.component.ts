@@ -1,11 +1,12 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { Catalog, MyCatalogsGQL, UpdateCatalogGQL, DeleteCatalogGQL, UserCatalogsGQL } from "src/generated/graphql";
+import { Catalog, UpdateCatalogGQL, DeleteCatalogGQL, UserCatalogsGQL } from "src/generated/graphql";
 import { Subject } from "rxjs";
-import { take, takeUntil } from "rxjs/operators";
+import { takeUntil } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
 import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { EditCatalogComponent } from "../../edit-catalog/edit-catalog.component";
+import { CreateCatalogComponent } from "../../create-catalog/create-catalog.component";
 
 enum State {
     INIT,
@@ -29,6 +30,9 @@ export class UserCatalogsComponent implements OnInit {
     public myCatalogs: Catalog[];
     private subscription = new Subject();
     columnsToDisplay = ["name", "public", "actions"];
+    inputErrors = {
+        required: "Catalog name is required"
+    };
 
     @ViewChild("deleteMyUsercatalog") deleteMyUsercatalog: TemplateRef<any>;
 
@@ -73,6 +77,17 @@ export class UserCatalogsComponent implements OnInit {
                 }
             })
             .subscribe(() => {});
+    }
+
+    createCatalog(formValue) {
+        this.dialog
+            .open(CreateCatalogComponent, {
+                data: formValue
+            })
+            .afterClosed()
+            .subscribe(() => {
+                this.refreshCatalogs();
+            });
     }
 
     deleteCatalog(catalog: Catalog) {
