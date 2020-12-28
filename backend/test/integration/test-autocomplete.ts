@@ -299,48 +299,6 @@ describe("Autocomplete tests", async () => {
         expect(after.data?.autoComplete?.users?.length).to.equal(0);
     });
 
-    it("Should return collections name tokens", async function () {
-        let response = await userAClient.query({
-            query: AutoCompleteDocument,
-            variables: {
-                startsWith: "Training"
-            }
-        });
-
-        expect(response.data?.autoComplete?.collections?.length).to.equal(1);
-        expect(response.data?.autoComplete?.collections![0].identifier.collectionSlug).to.equal(
-            "collection-auto-complete-test-v1"
-        );
-    });
-
-    it("Should return catalogs displayName tokens", async function () {
-        let response = await userAClient.query({
-            query: AutoCompleteDocument,
-            variables: {
-                startsWith: "Exercise"
-            }
-        });
-
-        expect(response.data?.autoComplete?.catalogs?.length).to.equal(1);
-        expect(response.data?.autoComplete?.catalogs![0].identifier.catalogSlug).to.equal(
-            "catalog-auto-complete-test-v1"
-        );
-    });
-
-    it("Should return packages displayNames tokens", async function () {
-        let response = await userAClient.query({
-            query: AutoCompleteDocument,
-            variables: {
-                startsWith: "Lucid"
-            }
-        });
-
-        expect(response.data?.autoComplete?.packages?.length).to.equal(1);
-        expect(response.data?.autoComplete?.packages![0].identifier.packageSlug).to.equal(
-            "package-auto-complete-test-v1"
-        );
-    });
-
     it("Should return empty for User B not public", async function () {
         let catalogToNotPublic = await userAClient.mutate({
             mutation: UpdateCatalogDocument,
