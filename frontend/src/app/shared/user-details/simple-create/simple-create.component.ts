@@ -9,8 +9,8 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
 export class SimpleCreateComponent implements OnInit {
     @Input() createLabel = "Create";
     @Input() inputPlaceholder = "";
-    @Input() errorMessages: any;
-    @Input() error: string;
+    @Input() errorMessages: any = {};
+    @Input() error: string = "";
     @Output() submit = new EventEmitter();
 
     form: FormGroup;
@@ -23,10 +23,6 @@ export class SimpleCreateComponent implements OnInit {
 
         this.form.valueChanges.subscribe(() => {
             this.inputChanged = true;
-        });
-
-        this.form.statusChanges.subscribe(() => {
-            console.log("Form status changes");
         });
     }
 

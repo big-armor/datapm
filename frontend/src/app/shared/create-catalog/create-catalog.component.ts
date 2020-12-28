@@ -18,7 +18,7 @@ export class CreateCatalogComponent implements OnInit {
     constructor(
         private dialogRef: MatDialogRef<CreateCatalogComponent>,
         private createCatalog: CreateCatalogGQL,
-        @Inject(MAT_DIALOG_DATA) private data: { input: string }
+        @Inject(MAT_DIALOG_DATA) data: { input: string }
     ) {
         this.form = new FormGroup({
             displayName: new FormControl(data?.input, {

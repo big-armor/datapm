@@ -18,7 +18,7 @@ export class CreateCollectionComponent implements OnInit {
     constructor(
         private dialogRef: MatDialogRef<CreateCollectionComponent>,
         private createCollectionGQL: CreateCollectionGQL,
-        @Inject(MAT_DIALOG_DATA) private data: { input: string }
+        @Inject(MAT_DIALOG_DATA) data: { input: string }
     ) {
         this.form = new FormGroup({
             name: new FormControl(data?.input, {
