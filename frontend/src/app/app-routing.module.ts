@@ -17,11 +17,6 @@ const staticRoutes: Route[] = [
             import("./collection-details/collection-details.module").then((m) => m.CollectionDetailsModule)
     },
     {
-        path: "me",
-        loadChildren: () => import("./my-account/my-account.module").then((m) => m.MyAccountModule),
-        canActivate: [AuthGuard]
-    },
-    {
         path: "",
         loadChildren: () => import("./auth-callbacks/auth-callbacks.module").then((m) => m.AuthCallbacksModule)
     },
