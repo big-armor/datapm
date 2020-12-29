@@ -11,7 +11,6 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { ActivatedRoute } from "@angular/router";
 import { Subject } from "rxjs";
 import { SharedModule } from "../../shared/shared.module";
-import { DetailsComponent } from "../details/details.component";
 
 @Component({
     template: ""
@@ -24,7 +23,7 @@ describe("MyAccountComponent", () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [MyAccountComponent, DetailsComponent],
+            declarations: [MyAccountComponent],
             imports: [
                 HttpClientModule,
                 RouterTestingModule.withRoutes([{ path: "me", component: DummyComponent }]),
