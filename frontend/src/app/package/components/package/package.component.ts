@@ -86,7 +86,6 @@ export class PackageComponent implements OnDestroy {
                     .toPromise()
                     .then((value) => {
                         if (value.data == null) {
-                            console.error(JSON.stringify(value));
                             return;
                         }
 
@@ -97,7 +96,6 @@ export class PackageComponent implements OnDestroy {
                 if (error.message.includes("NOT_AUTHENTICATED")) this.state = State.ERROR_NOT_AUTHENTICATED;
                 else {
                     this.state = State.ERROR;
-                    console.error(error);
                 }
             }
         );
@@ -109,12 +107,9 @@ export class PackageComponent implements OnDestroy {
         this.packageSlug = this.route.snapshot.paramMap.get("packageSlug");
         this.packageService.getPackage(this.catalogSlug, this.packageSlug);
 
-        this.authenticationService
-            .getUserObservable()
-            .pipe(takeUntil(this.unsubscribe$))
-            .subscribe(async (response) => {
-                this.currentUser = await response;
-            });
+        this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
+            this.currentUser = user;
+        });
     }
 
     ngOnDestroy(): void {

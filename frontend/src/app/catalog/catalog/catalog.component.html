@@ -1,0 +1,7 @@
+<div class="page-content" *ngIf="state !== 'LOADING'; else loading">
+    <app-catalog-details *ngIf="!isPersonal"></app-catalog-details>
+    <app-user-details-page *ngIf="isPersonal"></app-user-details-page>
+</div>
+<ng-template #loading>
+    <mat-spinner [diameter]="32"></mat-spinner>
+</ng-template>

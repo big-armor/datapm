@@ -1,0 +1,28 @@
+<div class="container">
+    <app-user-details-header [user]="user"></app-user-details-header>
+    <ul class="p-0 tabs">
+        <li *ngFor="let tab of tabs; let i = index" class="list-names" (click)="selectTab(tab.value)">
+            <a class="cursor-pointer" [class.active]="tab.value == selectedTab">
+                {{ tab.name }}
+            </a>
+        </li>
+    </ul>
+    <div class="p-0" [ngSwitch]="selectedTab">
+        <app-user-collections
+            [isCurrentUser]="isCurrentUser"
+            [username]="username"
+            *ngSwitchCase="'collections'"
+        ></app-user-collections>
+        <app-user-catalogs
+            [isCurrentUser]="isCurrentUser"
+            [username]="username"
+            *ngSwitchCase="'catalogs'"
+        ></app-user-catalogs>
+        <app-user-packages
+            [isCurrentUser]="isCurrentUser"
+            [username]="username"
+            *ngSwitchCase="'packages'"
+        ></app-user-packages>
+        <app-user-details *ngSwitchDefault></app-user-details>
+    </div>
+</div>

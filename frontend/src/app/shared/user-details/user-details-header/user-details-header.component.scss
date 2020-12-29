@@ -1,0 +1,48 @@
+@import "../../../../styles/variables";
+@import "../../../../styles/mixins";
+
+:host {
+    display: block;
+    min-height: 150px;
+}
+::ng-deep .cover {
+    height: 150px;
+
+    img {
+        border-radius: 4px;
+    }
+}
+.user-img {
+    margin-top: -32px;
+    display: block;
+}
+.username {
+    color: $gray-3;
+    font-weight: 300;
+}
+.social-link {
+    display: inline-block;
+    margin-right: 1em;
+}
+.contact-info {
+    padding: 10px;
+    color: $gray-3;
+
+    h3 {
+        margin-bottom: 10px;
+    }
+}
+.public-text {
+    @include text("small");
+    color: $color-1;
+}
+.not-public-text {
+    @include text("small");
+    color: $gray-3;
+}
+.not-current-user {
+    .public-text,
+    .not-public-text {
+        display: none;
+    }
+}

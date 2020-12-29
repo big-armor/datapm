@@ -23,8 +23,8 @@
     padding: 8px 15px;
     color: black;
     cursor: pointer;
-
-    overflow: scroll;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
 
     &:hover {
