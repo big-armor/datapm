@@ -6,10 +6,14 @@ sidebar_label: Command Line Client
 
 DataPM's mission is to make the world's data more accessible. This command line client helps you...
 
--   [Search for and discover new data](#search-registries)
--   [Aquire new data easily](#consume-data)
--   [Publish your data for private or public consumption](#publish-data)
--   [Manage your own DataPM private registry](#add-registries)
+-   [Install the DataPM Command Line Client](#install-the-datapm-command-line-client)
+-   [View Help Options](#view-help-options)
+-   [Generate An API Key](#generate-an-api-key)
+-   [Search Registries](#search-registries)
+-   [Consume Data](#consume-data)
+-   [Publish Data](#publish-data)
+-   [Add Registries](#add-registries)
+-   [Manage Configuration](#manage-configuration)
 
 The DataPM client is easily installed, and almost every task is a self explanatory single command execution. The DataPM client features an easy to use prompts system, and always gives you easy to copy next steps after each command.
 
@@ -115,7 +119,7 @@ And then you can re-publish the updates using the same publish command above.
 
 By default the command line client only interacts with the the [datapm.io](https://datapm.io) registry. You can host your own private or public registries, and you will want to add those registries to your command line client.
 
-```
+```text
 datapm registry add https://hostname.td
 ```
 
@@ -123,7 +127,7 @@ Use the [Generate An API Key](#generate-an-api-key) section above to add a speci
 
 You can also remove a registry with the following command
 
-```
+```text
 datapm registry remove https://hostname.tld
 ```
 
@@ -131,7 +135,7 @@ datapm registry remove https://hostname.tld
 
 You can view and remove the local configuration using the following commands.
 
-```
+```text
 datapm configuration show
 
 datapm configuration reset

@@ -39,8 +39,6 @@ body {
         box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
             0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
         border-radius: 24px;
-        /* background: linear-gradient(145deg, #f2f2f2, #ffffff);
-        box-shadow: 1px 1px 4px #616161, -1px -1px 6px #ffffff; */
     }
     .navigationSlider .slidingNav ul li a:hover,
     .navigationSlider .slidingNav ul li a:active,
@@ -103,30 +101,31 @@ body {
 }
 
 .button {
-    box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
-        0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
-    padding: 7px 25px;
-    border-radius: 24px;
-    border: none;
+    font-family: "RobotoMonoMedium";
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: -0.28px;
+    color: #017fb9;
+    border: 1px solid #ddd;
+    padding: 3px 15px;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 .button span {
-    font-family: "RobotoMonoLight";
+    font-family: "RobotoMonoMedium";
     font-style: normal;
-    font-weight: normal;
-    font-size: 16px;
-    line-height: 20px;
     align-items: center;
     text-align: center;
-    letter-spacing: -0.28px;
-    color: #828282;
+    color: #017fb9;
     text-transform: none;
 }
 
 .button:hover {
-    background-color: #ffffff8a;
+    background-color: rgba(240, 240, 240, 0.783);
     text-decoration: none;
-    border-radius: 24px;
     color: #333;
 }
 
@@ -182,6 +181,14 @@ table th {
 table td {
     font-size: 14px;
     font-family: "RobotoMonoLight";
+}
+
+table tr:nth-child(odd) {
+    background: #fff;
+}
+
+table tr:nth-child(even) {
+    background: #ffffff8a;
 }
 
 .function-name-prevnext {
@@ -264,7 +271,7 @@ table td {
 }
 
 .hljs {
-    background: #f0f0f08a;
+    background: #ffffff8a;
 }
 
 .toc .toggleNav ul li a,
