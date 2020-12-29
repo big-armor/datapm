@@ -264,13 +264,10 @@ export class CatalogRepository extends Repository<Catalog> {
         const ALIAS = "autoCompleteCatalog";
 
         const entities = await this.createQueryBuilderWithUserConditions(user)
-            .andWhere(
-                `(displayName_tokens @@ websearch_to_tsquery(:startsWith) OR LOWER("Catalog"."slug") LIKE :valueLike OR LOWER("Catalog"."displayName") LIKE :valueLike)`,
-                {
-                    startsWith,
-                    valueLike: startsWith.toLowerCase() + "%"
-                }
-            )
+            .andWhere(`(LOWER("Catalog"."slug") LIKE :valueLike OR LOWER("Catalog"."displayName") LIKE :valueLike)`, {
+                startsWith,
+                valueLike: startsWith.toLowerCase() + "%"
+            })
             .addRelations(ALIAS, relations)
             .getMany();
 
@@ -321,9 +318,10 @@ export class CatalogRepository extends Repository<Catalog> {
 
         const count = this.createQueryBuilderWithUserConditions(user)
             .andWhere(
-                `(displayName_tokens @@ websearch_to_tsquery(:query) OR description_tokens @@ websearch_to_tsquery(:query))`,
+                `(displayName_tokens @@ websearch_to_tsquery(:query) OR description_tokens @@ websearch_to_tsquery(:query) OR slug LIKE :queryLike))`,
                 {
-                    query
+                    query,
+                    queryLike: query + "%"
                 }
             )
             .limit(limit)

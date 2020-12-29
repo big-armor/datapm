@@ -5,6 +5,7 @@ query AutoComplete($startsWith: String!) {
                 catalogSlug
             }
             displayName
+            description
         }
         packages {
             identifier {
@@ -12,12 +13,21 @@ query AutoComplete($startsWith: String!) {
                 packageSlug
             }
             displayName
+            description
+            latestVersion {
+                identifier {
+                    versionMajor
+                    versionMinor
+                    versionPatch
+                }
+            }
         }
         collections {
             identifier {
                 collectionSlug
             }
             name
+            description
         }
         users {
             username

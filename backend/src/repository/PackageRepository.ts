@@ -410,13 +410,10 @@ export class PackageRepository {
         const ALIAS = "autoCompletePackage";
 
         const entities = await this.createQueryBuilderWithUserConditions(user)
-            .andWhere(
-                `(displayName_tokens @@ websearch_to_tsquery(:startsWith) OR LOWER("Package"."slug") LIKE :valueLike OR LOWER("Package"."displayName") LIKE :valueLike)`,
-                {
-                    startsWith,
-                    valueLike: startsWith.toLowerCase() + "%"
-                }
-            )
+            .andWhere(`(LOWER("Package"."slug") LIKE :valueLike OR LOWER("Package"."displayName") LIKE :valueLike)`, {
+                startsWith,
+                valueLike: startsWith.toLowerCase() + "%"
+            })
             .addRelations(ALIAS, relations)
             .getMany();
 

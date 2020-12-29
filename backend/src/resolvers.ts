@@ -117,8 +117,8 @@ import { PackageFileStorageService } from "./storage/packages/package-file-stora
 import { DateResolver } from "./resolvers/DateResolver";
 import { Permissions } from "./entity/Permissions";
 import { exit } from "process";
-import { userCatalogs } from "./resolvers/CatalogResolver";
 import { CollectionRepository } from "./repository/CollectionRepository";
+import { userCatalogs } from "./resolvers/CatalogResolver";
 
 export const resolvers: {
     Query: QueryResolvers;

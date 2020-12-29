@@ -5,14 +5,23 @@ import {
     CreateCollectionDocument,
     CreatePackageDocument,
     UpdateMeDocument,
-    CreateCatalogDocument
+    CreateCatalogDocument,
+    UpdatePackageDocument,
+    UpdateCatalogDocument,
+    CreateVersionDocument,
+    UpdateCollectionDocument,
+    DeletePackageDocument,
+    DeleteCatalogDocument,
+    DeleteCollectionDocument
 } from "./registry-client";
 import { createUser } from "./test-utils";
 import { describe, it } from "mocha";
+import { loadPackageFileFromDisk } from "datapm-lib";
 
 describe("Autocomplete tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
+    let userCClient: ApolloClient<NormalizedCacheObject>;
 
     before(async () => {});
 
@@ -24,6 +33,7 @@ describe("Autocomplete tests", async () => {
             "Aemailautocomplete@test.datapm.io",
             "autoPassword1!"
         );
+
         userBClient = await createUser(
             "BAuta",
             "BCompletely",
@@ -32,11 +42,23 @@ describe("Autocomplete tests", async () => {
             "autoPassward2!"
         );
 
+        userCClient = await createUser(
+            "CAuta",
+            "CCompletely",
+            "userC-auto-complete-test",
+            "Cemailautocomplete@test.datapm.io",
+            "autoPassward3!"
+        );
+
         expect(userAClient).to.exist;
         expect(userBClient).to.exist;
+        expect(userCClient).to.exist;
     });
 
     it("Creates inital packages and collections for search queries", async function () {
+        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileString = JSON.stringify(packageFileContents);
+
         let createCollection = await userAClient.mutate({
             mutation: CreateCollectionDocument,
             variables: {
@@ -56,7 +78,7 @@ describe("Autocomplete tests", async () => {
                     displayName: "Catalog Auto Complete Test v1 For Exercise",
                     description: "This is a test catalog for auto-complete test purposes",
                     website: "https://autocomplete.datapm.io",
-                    isPublic: false
+                    isPublic: true
                 }
             }
         });
@@ -65,10 +87,23 @@ describe("Autocomplete tests", async () => {
             mutation: CreatePackageDocument,
             variables: {
                 value: {
-                    catalogSlug: "userA-auto-complete-test",
+                    catalogSlug: "catalog-auto-complete-test-v1",
                     packageSlug: "package-auto-complete-test-v1",
                     displayName: "Package Auto Complete Test v1 For Lucid",
                     description: "This is a test package for auto-complete test purposes"
+                }
+            }
+        });
+
+        let addVersionToPackage = await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "catalog-auto-complete-test-v1",
+                    packageSlug: "package-auto-complete-test-v1"
+                },
+                value: {
+                    packageFile: packageFileString
                 }
             }
         });
@@ -264,45 +299,157 @@ describe("Autocomplete tests", async () => {
         expect(after.data?.autoComplete?.users?.length).to.equal(0);
     });
 
-    it("Should return collections name tokens", async function () {
-        let response = await userAClient.query({
-            query: AutoCompleteDocument,
+    it("Should return empty for User B not public", async function () {
+        let catalogToNotPublic = await userAClient.mutate({
+            mutation: UpdateCatalogDocument,
             variables: {
-                startsWith: "Training"
+                identifier: {
+                    catalogSlug: "catalog-auto-complete-test-v1"
+                },
+                value: {
+                    isPublic: false
+                }
             }
         });
 
-        expect(response.data?.autoComplete?.collections?.length).to.equal(1);
-        expect(response.data?.autoComplete?.collections![0].identifier.collectionSlug).to.equal(
-            "collection-auto-complete-test-v1"
-        );
+        let packages = await userBClient.query({
+            query: AutoCompleteDocument,
+            variables: {
+                startsWith: "package-auto-co"
+            }
+        });
+        let collections = await userBClient.query({
+            query: AutoCompleteDocument,
+            variables: {
+                startsWith: "collection-auto-compl"
+            }
+        });
+        let catalogs = await userBClient.query({
+            query: AutoCompleteDocument,
+            variables: {
+                startsWith: "catalog-auto-compl"
+            }
+        });
+
+        expect(packages.data?.autoComplete?.packages?.length).to.equal(0);
+        expect(collections.data?.autoComplete?.collections?.length).to.equal(0);
+        expect(catalogs.data?.autoComplete?.catalogs?.length).to.equal(0);
     });
 
-    it("Should return catalogs displayName tokens", async function () {
-        let response = await userAClient.query({
-            query: AutoCompleteDocument,
+    it("Should return nodes for User C setting to public", async function () {
+        let collectionToPublic = await userAClient.mutate({
+            mutation: UpdateCollectionDocument,
             variables: {
-                startsWith: "Exercise"
+                identifier: {
+                    collectionSlug: "collection-auto-complete-test-v1"
+                },
+                value: {
+                    isPublic: true
+                }
             }
         });
 
-        expect(response.data?.autoComplete?.catalogs?.length).to.equal(1);
-        expect(response.data?.autoComplete?.catalogs![0].identifier.catalogSlug).to.equal(
-            "catalog-auto-complete-test-v1"
-        );
+        let catalogToPublic = await userAClient.mutate({
+            mutation: UpdateCatalogDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "catalog-auto-complete-test-v1"
+                },
+                value: {
+                    isPublic: true
+                }
+            }
+        });
+
+        let packageToPublic = await userAClient.mutate({
+            mutation: UpdatePackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "catalog-auto-complete-test-v1",
+                    packageSlug: "package-auto-complete-test-v1"
+                },
+                value: {
+                    isPublic: true
+                }
+            }
+        });
+
+        let packages = await userCClient.query({
+            query: AutoCompleteDocument,
+            variables: {
+                startsWith: "package-auto-com"
+            }
+        });
+
+        let collections = await userCClient.query({
+            query: AutoCompleteDocument,
+            variables: {
+                startsWith: "collection-auto-compl"
+            }
+        });
+
+        let catalogs = await userCClient.query({
+            query: AutoCompleteDocument,
+            variables: {
+                startsWith: "catalog-auto-comple"
+            }
+        });
+
+        expect(packages.data?.autoComplete?.packages?.length).to.equal(1);
+        expect(collections.data?.autoComplete?.collections?.length).to.equal(1);
+        expect(catalogs.data?.autoComplete?.catalogs?.length).to.equal(1);
     });
 
-    it("Should return packages displayNames tokens", async function () {
-        let response = await userAClient.query({
+    it("Test i18n strings", async function () {
+        let strangeChars = await userAClient.query({
             query: AutoCompleteDocument,
             variables: {
-                startsWith: "Lucid"
+                startsWith: "שלום ירושלים"
             }
         });
 
-        expect(response.data?.autoComplete?.packages?.length).to.equal(1);
-        expect(response.data?.autoComplete?.packages![0].identifier.packageSlug).to.equal(
-            "package-auto-complete-test-v1"
-        );
+        let nonEnglish = await userAClient.query({
+            query: AutoCompleteDocument,
+            variables: {
+                startsWith: "hayır ve göster"
+            }
+        });
+
+        expect(strangeChars.errors! == null).to.equal(true);
+        expect(nonEnglish.errors! == null).to.equal(true);
+    });
+
+    it("Deletes Collection, Package, Catalog", async function () {
+        let deleteCollection = await userAClient.mutate({
+            mutation: DeleteCollectionDocument,
+            variables: {
+                identifier: {
+                    collectionSlug: "collection-auto-complete-test-v1"
+                }
+            }
+        });
+
+        let deletePackage = await userAClient.mutate({
+            mutation: DeletePackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "catalog-auto-complete-test-v1",
+                    packageSlug: "package-auto-complete-test-v1"
+                }
+            }
+        });
+
+        let deleteCatalog = await userAClient.mutate({
+            mutation: DeleteCatalogDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "catalog-auto-complete-test-v1"
+                }
+            }
+        });
+
+        expect(deleteCollection.errors! == null).to.equal(true);
+        expect(deletePackage.errors! == null).to.equal(true);
+        expect(deleteCatalog.errors! == null).to.equal(true);
     });
 });
