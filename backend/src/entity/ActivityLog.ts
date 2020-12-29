@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseModel } from "./BaseModel";
 import { User } from "./User";
 import { Package } from "./Package";
 import { Version } from "../generated/graphql";
@@ -8,47 +9,44 @@ import { ActivityLogEventType } from "./ActivityLogEventType";
 
 @Entity({ name: "activity_log" })
 @Index("event_type")
-export class ActivityLog {
+export class ActivityLog extends BaseModel {
     @PrimaryGeneratedColumn({ name: "id", type: "integer" })
     public id: number;
 
-    @Column({ name: "user" })
-    public userId: number;
+    @Column({ name: "user_id", nullable: true })
+    public userId?: number;
 
     @ManyToOne(() => User)
     @JoinColumn({ name: "user" })
-    public user: User;
+    public user: User | null;
 
     @Column({ name: "event_type", nullable: false })
     public eventType: ActivityLogEventType;
 
-    @Column({ name: "target_package_id" })
-    public targetPackageId: number;
+    @Column({ name: "target_package_id", nullable: true })
+    public targetPackageId?: number;
 
     @ManyToOne(() => Package)
     @JoinColumn({ name: "target_package_id" })
-    public targetPackage: Package;
+    public targetPackage: Package | null;
 
-    @Column({ name: "target_package_version_id" })
-    public targetPackageVersionId: number;
+    @Column({ name: "target_package_version_id", nullable: true })
+    public targetPackageVersionId?: number;
 
     @JoinColumn({ name: "target_package_version_id" })
-    targetPackageVersion: Version;
+    targetPackageVersion: Version | null;
 
-    @Column({ name: "target_catalog_id" })
-    public targetCatalogId: number;
+    @Column({ name: "target_catalog_id", nullable: true })
+    public targetCatalogId?: number;
 
     @ManyToOne(() => Catalog)
     @JoinColumn({ name: "target_catalog_id" })
-    public targetCatalog: Catalog;
+    public targetCatalog: Catalog | null;
 
-    @Column({ name: "target_collection_id" })
-    public targetCollectionId: number;
+    @Column({ name: "target_collection_id", nullable: true })
+    public targetCollectionId?: number;
 
     @ManyToOne(() => Collection)
     @JoinColumn({ name: "target_collection_id" })
-    public targetCollection: Collection;
-
-    @CreateDateColumn({ name: "created_at", default: () => "CURRENT_TIMESTAMP" })
-    createdAt: Date;
+    public targetCollection: Collection | null;
 }
