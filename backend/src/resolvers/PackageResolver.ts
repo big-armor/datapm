@@ -6,6 +6,7 @@ import { Collection } from "../entity/Collection";
 import { Package } from "../entity/Package";
 import { ActivityLog } from "../entity/ActivityLog";
 import { ActivityLogEventType } from "../entity/ActivityLogEventType";
+import { ActivityLogRepository } from "../repository/ActivityLogRepository";
 import {
     Base64ImageUpload,
     CreatePackageInput,
@@ -109,11 +110,12 @@ export const findPackage = async (
     if (packageEntity == null) throw new UserInputError("PACKAGE_NOT_FOUND");
 
     try {
-        await context.connection.getRepository(ActivityLog).create({
-            userId: context?.me?.id,
-            eventType: ActivityLogEventType.PackageViewed,
-            targetPackageId: packageEntity?.id
-        });
+        let log = new ActivityLog();
+        log.userId = context?.me?.id;
+        log.eventType = ActivityLogEventType.PackageViewed;
+        log.targetCollectionId = packageEntity?.id;
+
+        await context.connection.getCustomRepository(ActivityLogRepository).create(log);
     } catch (e) {}
 
     return packageEntity;

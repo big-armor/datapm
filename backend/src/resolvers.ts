@@ -87,6 +87,7 @@ import { createAPIKey, deleteAPIKey } from "./resolvers/ApiKeyResolver";
 import { Collection } from "./entity/Collection";
 import { ActivityLog } from "./entity/ActivityLog";
 import { ActivityLogEventType } from "./entity/ActivityLogEventType";
+import { ActivityLogRepository } from "./repository/ActivityLogRepository";
 import {
     catalogPackagesForUser,
     createPackage,
@@ -753,28 +754,19 @@ export const resolvers: {
                     }
 
                     try {
+                        let log = new ActivityLog();
+                        log.userId = context?.me?.id;
+                        log.targetPackageId = latestVersion?.packageId;
+
                         if (proposedNewVersion.major !== latestVersionSemVer.major) {
-                            await transaction.getRepository(ActivityLog).create({
-                                userId: context?.me?.id,
-                                eventType: ActivityLogEventType.PackageMajorChange,
-                                targetPackageId: latestVersion?.packageId
-                            });
-                        }
-
-                        if (proposedNewVersion.minor !== latestVersionSemVer.minor) {
-                            await transaction.getRepository(ActivityLog).create({
-                                userId: context?.me?.id,
-                                eventType: ActivityLogEventType.PackageMinorChange,
-                                targetPackageId: latestVersion?.packageId
-                            });
-                        }
-
-                        if (proposedNewVersion.patch !== latestVersionSemVer.patch) {
-                            await transaction.getRepository(ActivityLog).create({
-                                userId: context?.me?.id,
-                                eventType: ActivityLogEventType.PackagePatchChanged,
-                                targetPackageId: latestVersion?.packageId
-                            });
+                            log.eventType = ActivityLogEventType.PackageMajorChange;
+                            await transaction.getCustomRepository(ActivityLogRepository).create(log);
+                        } else if (proposedNewVersion.minor !== latestVersionSemVer.minor) {
+                            log.eventType = ActivityLogEventType.PackageMinorChange;
+                            await transaction.getCustomRepository(ActivityLogRepository).create(log);
+                        } else if (proposedNewVersion.patch !== latestVersionSemVer.patch) {
+                            log.eventType = ActivityLogEventType.PackagePatchChanged;
+                            await transaction.getCustomRepository(ActivityLogRepository).create(log);
                         }
                     } catch (e) {}
                 }

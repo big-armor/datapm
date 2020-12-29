@@ -8,6 +8,7 @@ import { UserPackagePermission } from "../entity/UserPackagePermission";
 import { Catalog } from "../entity/Catalog";
 import { ActivityLog } from "../entity/ActivityLog";
 import { ActivityLogEventType } from "../entity/ActivityLogEventType";
+import { ActivityLogRepository } from "./ActivityLogRepository";
 import { CatalogRepository } from "./CatalogRepository";
 import { VersionRepository } from "./VersionRepository";
 import { allPermissions } from "../util/PermissionsUtil";
@@ -361,19 +362,21 @@ export class PackageRepository {
             .findVersions({ packageId: packageEntity.id, relations: ["package", "package.catalog"] });
 
         await this.manager.getCustomRepository(VersionRepository).deleteVersions(versions);
+
+        try {
+            let log = new ActivityLog();
+            log.userId = context?.me?.id;
+            log.eventType = ActivityLogEventType.PackageDeleted;
+            log.targetPackageId = packageEntity?.id;
+
+            await this.manager.getCustomRepository(ActivityLogRepository).create(log);
+        } catch (e) {}
+
         await this.manager.nestedTransaction(async (transaction) => {
             await transaction.delete(Package, { id: packageEntity.id });
         });
 
         await ImageStorageService.INSTANCE.deletePackageCoverImage(packageEntity.id);
-
-        try {
-            await this.manager.getRepository(ActivityLog).create({
-                userId: context?.me?.id,
-                eventType: ActivityLogEventType.PackageViewed,
-                targetPackageId: packageEntity?.id
-            });
-        } catch (e) {}
     }
 
     async deletePackages({ packages }: { packages: Package[] }): Promise<void> {

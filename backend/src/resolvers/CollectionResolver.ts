@@ -23,6 +23,7 @@ import { ImageStorageService } from "../storage/images/image-storage-service";
 import { Collection } from "../entity/Collection";
 import { ActivityLog } from "../entity/ActivityLog";
 import { ActivityLogEventType } from "../entity/ActivityLogEventType";
+import { ActivityLogRepository } from "../repository/ActivityLogRepository";
 import { exit } from "process";
 
 export const usersByCollection = async (
@@ -185,11 +186,12 @@ export const addPackageToCollection = async (
         throw new ApolloError("Not able to find the CollectionPackage entry after entry. This should never happen!");
 
     try {
-        await context.connection.getRepository(ActivityLog).create({
-            userId: context?.me?.id,
-            eventType: ActivityLogEventType.CollectionPackageAdded,
-            targetCollectionId: value?.collectionId
-        });
+        let log = new ActivityLog();
+        log.userId = context?.me?.id;
+        log.eventType = ActivityLogEventType.CollectionPackageAdded;
+        log.targetCollectionId = value?.collectionId;
+
+        await context.connection.getCustomRepository(ActivityLogRepository).create(log);
     } catch (e) {}
 
     return value;
@@ -216,11 +218,12 @@ export const removePackageFromCollection = async (
         .removePackageToCollection(collectionEntity.id, packageEntity.id);
 
     try {
-        await context.connection.getRepository(ActivityLog).create({
-            userId: context?.me?.id,
-            eventType: ActivityLogEventType.CollectionPackageRemoved,
-            targetCollectionId: collectionEntity?.id
-        });
+        let log = new ActivityLog();
+        log.userId = context?.me?.id;
+        log.eventType = ActivityLogEventType.CollectionPackageRemoved;
+        log.targetCollectionId = collectionEntity?.id;
+
+        await context.connection.getCustomRepository(ActivityLogRepository).create(log);
     } catch (e) {}
 };
 
