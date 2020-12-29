@@ -7,8 +7,9 @@
             <p class="dpm-text-small collection-description">
                 {{ collection?.description }}
             </p>
+            <a class="app-outlined-button edit-button" (click)="editCollection()" *ngIf="canEdit">Edit collection</a>
         </div>
-        <mat-tab-group [(selectedIndex)]="currentTab" class="collection-tabs px-3">
+        <mat-tab-group [(selectedIndex)]="currentTab" disableRipple class="collection-tabs px-3">
             <mat-tab label="Pacages"></mat-tab>
             <mat-tab label="Permissions" *ngIf="canManage"></mat-tab>
         </mat-tab-group>
@@ -24,7 +25,7 @@
             </app-package-item>
             <div class="dpm-no-data" *ngIf="!collection.packages?.length">
                 <p>There are no packages available.</p>
-                <a class="app-outlined-button mt-3" (click)="addPackage()">Add a package</a>
+                <a class="app-outlined-button mt-3" (click)="addPackage()" *ngIf="canEdit">Add a package</a>
             </div>
         </div>
         <app-collection-permissions

@@ -33,12 +33,12 @@ export class CatalogComponent implements OnInit {
                     username: catalogSlug
                 })
                 .subscribe(({ data, errors }) => {
-                    if (errors) {
-                        this.state = "ERROR";
-                        return;
+                    if (data?.user) {
+                        this.isPersonal = true;
+                    } else {
+                        this.isPersonal = false;
                     }
 
-                    this.isPersonal = true;
                     this.state = "SUCCESS";
                 });
         });

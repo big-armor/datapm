@@ -11,16 +11,18 @@ app-cover ::ng-deep img {
 }
 
 .collection-header {
-    box-shadow: $outer-shadow-3;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
     height: $page-header-height;
-    background-color: $custom-gray-2;
+    position: relative;
+}
+
+.edit-button {
+    position: absolute;
+    top: 16px;
+    right: 20px;
 }
 
 .collection-tabs {
-    background-color: $custom-gray-2;
-    box-shadow: $outer-shadow-1;
+    border-bottom: 1px solid $gray-5;
     display: block;
 
     ::ng-deep {
