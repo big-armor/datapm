@@ -1,8 +1,8 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { HttpClientModule } from "@angular/common/http";
+import { MatIconModule } from "@angular/material/icon";
 import { ImageService } from "src/app/services/image.service";
 import { AvatarComponent } from "./avatar.component";
-import { User } from "src/generated/graphql";
 
 describe("AvatarComponent", () => {
     let component: AvatarComponent;
@@ -11,7 +11,7 @@ describe("AvatarComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [AvatarComponent],
-            imports: [HttpClientModule],
+            imports: [HttpClientModule, MatIconModule],
             providers: [ImageService]
         }).compileComponents();
 

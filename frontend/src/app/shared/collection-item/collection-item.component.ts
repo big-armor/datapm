@@ -6,7 +6,7 @@ import { FormGroup, FormControl } from "@angular/forms";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 import { MatDialog } from "@angular/material/dialog";
 
-import { DeleteConfirmationComponent } from "../../my-account/delete-confirmation/delete-confirmation.component";
+import { DeleteConfirmationComponent } from "../user-details/delete-confirmation/delete-confirmation.component";
 
 import { Subject } from "rxjs";
 

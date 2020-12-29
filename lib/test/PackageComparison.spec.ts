@@ -146,10 +146,10 @@ describe("Checking VersionUtil", () => {
             format: "date"
         };
 
-        const removePropertyDiff = compareSchema(schemaA1, schemaA2);
-        expect(removePropertyDiff.length).equal(2);
+        const addPropertyDiff = compareSchema(schemaA1, schemaA2);
+        expect(addPropertyDiff.length).equal(2);
 
-        const propertyRemoved = removePropertyDiff.find((d) => d.type === DifferenceType.ADD_PROPERTY);
+        const propertyRemoved = addPropertyDiff.find((d) => d.type === DifferenceType.ADD_PROPERTY);
 
         expect(propertyRemoved != null).equal(true);
 

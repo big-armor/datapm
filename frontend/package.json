@@ -37,7 +37,6 @@
         "apollo-link-scalars": "^2.0.2",
         "apollo-link-schema": "^1.2.5",
         "bootstrap": "^4.5.2",
-        "component": "^1.1.0",
         "crypto": "^1.0.1",
         "datapm-lib": "file:../lib/dist",
         "graphql-upload": "^11.0.0",

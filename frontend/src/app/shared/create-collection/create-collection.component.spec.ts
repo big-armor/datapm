@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { ReactiveFormsModule } from "@angular/forms";
-import { MatDialogModule, MatDialogRef } from "@angular/material/dialog";
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 
 import { CreateCollectionComponent } from "./create-collection.component";
@@ -16,6 +16,10 @@ describe("CreateCollectionComponent", () => {
             providers: [
                 {
                     provide: MatDialogRef,
+                    useValue: {}
+                },
+                {
+                    provide: MAT_DIALOG_DATA,
                     useValue: {}
                 }
             ]

@@ -17,7 +17,7 @@ export class PasswordRecoveryComponent implements OnInit {
     password = new FormControl("", {
         asyncValidators: [newPasswordValidator()]
     });
-    state: PageState = "SUCCESS";
+    passwordResetState: PageState = "INIT";
     error: string = "";
 
     constructor(
@@ -40,16 +40,18 @@ export class PasswordRecoveryComponent implements OnInit {
             .subscribe(
                 (response) => {
                     if (response.errors) {
-                        this.error = "Error occured. Password reset failed!";
-                        this.state = "ERROR";
+                        this.error =
+                            "An error occured. Please try to login and use the 'forgot password' link again. Or contact support.";
+                        this.passwordResetState = "ERROR";
                         return;
                     }
 
-                    this.state = "SUCCESS";
+                    this.passwordResetState = "SUCCESS";
                 },
                 () => {
-                    this.error = "Error occured. Password reset failed!";
-                    this.state = "ERROR";
+                    this.error =
+                        "An error occured. Please try to login and use the 'forgot password' link again. Or contact support.";
+                    this.passwordResetState = "ERROR";
                 }
             );
     }

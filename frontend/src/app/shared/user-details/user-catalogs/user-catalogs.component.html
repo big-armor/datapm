@@ -1,0 +1,76 @@
+<div id="catalogsPage">
+    <div class="catalogs-div panel-div">
+        <ng-container *ngIf="catalogState !== State.LOADING">
+            <div class="section-title">
+                {{ isCurrentUser ? "My Catalogs" : "Catalogs" }}
+            </div>
+            <p class="pl-4 pr-4">
+                Catalogs are lists of data packages offered by individuals or organizations. All packages belong to one
+                and only one catalog.
+            </p>
+            <div class="col-md-12 col-lg-12 text-center pt-4 pb-5" *ngIf="myCatalogs.length === 0">
+                <a class="app-outlined-button create-button" (click)="openCreateDialog()">Create A Collection</a>
+            </div>
+        </ng-container>
+
+        <table
+            *ngIf="catalogState === State.SUCCESS && myCatalogs && myCatalogs.length > 0"
+            mat-table
+            [dataSource]="myCatalogs"
+        >
+            <!-- Label column -->
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Name</th>
+                <td class="table-content" mat-cell *matCellDef="let catalog">
+                    <a [routerLink]="['/' + catalog.identifier.catalogSlug]">{{ catalog.displayName }}</a>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="public">
+                <th mat-header-cell *matHeaderCellDef>Public</th>
+                <td class="table-content" mat-cell *matCellDef="let catalog">
+                    <mat-slide-toggle
+                        class="app-slide-toggle"
+                        [checked]="catalog.isPublic"
+                        (change)="updateCatalogVisibility(catalog, $event.checked)"
+                    >
+                    </mat-slide-toggle>
+                </td>
+            </ng-container>
+
+            <!-- Actions column -->
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let catalog">
+                    <a class="app-outlined-button mr-3" (click)="editCatalog(catalog)">Edit</a>
+                    <a class="app-outlined-button" (click)="deleteCatalog(catalog)">Delete</a>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+            <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
+        </table>
+        <div class="loading-container" *ngIf="catalogState === State.LOADING">
+            <mat-spinner [diameter]="40"></mat-spinner>
+        </div>
+
+        <div class="mt-3" *ngIf="catalogState !== State.LOADING">
+            <app-simple-create
+                inputPlaceholder="Catalog Name"
+                createLabel="Create a catalog"
+                [errorMessages]="inputErrors"
+                (submit)="createCatalog($event)"
+            ></app-simple-create>
+        </div>
+    </div>
+</div>
+
+<ng-template #deleteMyUsercatalog>
+    <h2 matDialogTitle>Cannot delete your user catalog</h2>
+    <mat-dialog-content>
+        <p>You can not delete the catalog that's the same as your username.</p>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+        <button mat-button matDialogClose>Close</button>
+    </mat-dialog-actions>
+</ng-template>
