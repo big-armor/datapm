@@ -360,6 +360,23 @@ describe("Collection Tests", async () => {
         expect(response.data!.updateCollection.identifier.collectionSlug).equal("new-collection-slug");
     });
 
+    it("User A set collection public", async function () {
+        let response = await userAClient.mutate({
+            mutation: UpdateCollectionDocument,
+            variables: {
+                identifier: {
+                    collectionSlug: "testA-collection"
+                },
+                value: {
+                    isPublic: true
+                }
+            }
+        });
+        expect(response.errors == null, "no errors").true;
+        expect(response.data!.updateCollection.identifier.collectionSlug).equal("testA-collection");
+        expect(response.data!.updateCollection.isPublic).equal(true);
+    });
+
     it("User A get collection", async function () {
         let response = await userAClient.query({
             query: CollectionDocument,
@@ -391,6 +408,7 @@ describe("Collection Tests", async () => {
         expect(response.data.userCollections.hasMore).equal(false);
         expect(response.data.userCollections.count).equal(1);
         expect(response.data.userCollections.collections?.length).equal(1);
+        expect(response.data.userCollections.collections![0].identifier.collectionSlug).equal("new-collection-slug");
     });
 
     it("Adding at least three unique packages to a collection", async function () {

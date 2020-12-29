@@ -163,14 +163,15 @@ export class CollectionRepository extends Repository<Collection> {
     }
 
     private createQueryBuilderWithUserConditions(userId?: number): SelectQueryBuilder<Collection> {
-        const publicCollectionQueryBuilder = this.createQueryBuilder().where('("Collection"."is_public")');
+        const queryBuilder = this.createQueryBuilder();
+
         if (!userId) {
-            return publicCollectionQueryBuilder;
+            return queryBuilder.where('("Collection"."is_public")');
         }
 
-        return publicCollectionQueryBuilder
-            .orWhere(
-                `("Collection"."id" IN (SELECT collection_id FROM collection_user WHERE user_id = :userId AND 'VIEW' = any(permissions)))`
+        return queryBuilder
+            .where(
+                `(("Collection"."is_public") OR ("Collection"."id" IN (SELECT collection_id FROM collection_user WHERE user_id = :userId AND 'VIEW' = any(permissions))))`
             )
             .setParameter("userId", userId);
     }
