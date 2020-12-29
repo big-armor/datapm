@@ -91,6 +91,11 @@ body {
 }
 
 @font-face {
+    font-family: Roboto Mono;
+    src: url("../font/static/RobotoMono-Regular.ttf");
+}
+
+@font-face {
     font-family: "RobotoMonoMedium";
     src: url("../font/static/RobotoMono-Medium.ttf");
 }
@@ -306,18 +311,16 @@ table tr:nth-child(even) {
     padding: 20px 0px;
     background-color: #f2f2f2;
     background: #f2f2f2;
-    /* color: #f2f2f2; */
     box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
         0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
 }
 
 .fixedHeaderContainer header .headerTitle {
-    font-family: "RobotoMonoLight";
+    font-family: Roboto Mono;
     font-style: normal;
-    font-weight: 300;
+    font-weight: 400;
     font-size: 32px;
-    line-height: 42px;
-    letter-spacing: -0.28px;
+    line-height: 46px;
     color: #333;
 }
 
