@@ -75,7 +75,7 @@ export class LoginDialogComponent implements OnInit, OnDestroy {
                 }
 
                 this.state = State.LOGGED_IN;
-                const returnUrl = this.route.queryParams["returnUrl"] || "/me";
+                const returnUrl = this.route.queryParams["returnUrl"] || "/" + this.loginForm.value.username;
                 this.dialog.closeAll();
                 this.router.navigate([returnUrl]);
             },
