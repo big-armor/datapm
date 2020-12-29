@@ -11,8 +11,16 @@
                             <app-input
                                 placeholder="Search For Data"
                                 [control]="searchControl"
+                                matInput
+                                [matAutocomplete]="auto"
                                 (keyEnter)="search()"
                             ></app-input>
+                            <mat-autocomplete #auto="matAutocomplete">
+                                <mat-option *ngFor="let option of options" [value]="option.package">
+                                    <span>{{ option.package }}</span> |
+                                    <span>{{ option.collection }}</span>
+                                </mat-option>
+                            </mat-autocomplete>
                             <button mat-icon-button>
                                 <mat-icon>search</mat-icon>
                             </button>
