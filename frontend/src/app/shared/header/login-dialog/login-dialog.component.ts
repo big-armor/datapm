@@ -31,6 +31,7 @@ export class LoginDialogComponent implements OnInit, OnDestroy {
         username: new FormControl("", Validators.required),
         password: new FormControl("", Validators.required)
     });
+    fragment: string;
 
     constructor(
         private authenticationService: AuthenticationService,
@@ -52,6 +53,7 @@ export class LoginDialogComponent implements OnInit, OnDestroy {
                 this.state = State.LOGGED_IN;
             }
         });
+        this.fragment = this.route.snapshot.fragment || null;
     }
 
     ngOnDestroy(): void {
@@ -77,7 +79,7 @@ export class LoginDialogComponent implements OnInit, OnDestroy {
                 this.state = State.LOGGED_IN;
                 const returnUrl = this.route.queryParams["returnUrl"] || "/" + this.loginForm.value.username;
                 this.dialog.closeAll();
-                this.router.navigate([returnUrl]);
+                this.router.navigate([returnUrl], { fragment: this.fragment });
             },
             () => {
                 this.state = State.LOGIN_ERROR;
