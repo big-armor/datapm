@@ -48,13 +48,13 @@ export class PackagePermissionRepository {
     }
 
     public async usersByPackage(packageEntity: Package, relations?: string[]): Promise<UserPackagePermission[]> {
-        const ALIAS = "userCollectionPermission";
+        const ALIAS = "userPackagePermission";
 
         return await this.manager
             .getRepository(UserPackagePermission)
             .createQueryBuilder(ALIAS)
             .addRelations(ALIAS, relations)
-            .where({ collectionId: packageEntity.id })
+            .where({ packageId: packageEntity.id })
             .getMany();
     }
 
