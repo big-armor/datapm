@@ -5,6 +5,7 @@ import { ActivatedRoute, ParamMap } from "@angular/router";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { PageState } from "src/app/models/page-state";
+import { EditCollectionComponent } from "src/app/shared/edit-collection/edit-collection.component";
 import {
     Collection,
     CollectionGQL,
@@ -32,7 +33,6 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
     constructor(
         private route: ActivatedRoute,
         private collectionGQL: CollectionGQL,
-        private updateCollectionGQL: UpdateCollectionGQL,
         private removePackageFromCollectionGQL: RemovePackageFromCollectionGQL,
         private dialog: MatDialog
     ) {
@@ -98,6 +98,17 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
             })
             .subscribe(() => {
                 this.getCollectionDetails();
+            });
+    }
+
+    editCollection(): void {
+        this.dialog
+            .open(EditCollectionComponent, {
+                data: this.collection
+            })
+            .afterClosed()
+            .subscribe((newCollection: Collection) => {
+                this.collection = newCollection;
             });
     }
 

@@ -148,7 +148,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
 
     goToMyDetails() {
-        this.router.navigate(["/me"]);
+        this.router.navigate([this.currentUser?.username]);
     }
 
     logout() {

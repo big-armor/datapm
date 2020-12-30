@@ -1,35 +1,38 @@
 <div class="catalog-details container">
-    <app-cover [catalogSlug]="catalogSlug"></app-cover>
-    <div class="catalog-header px-4 py-3 mt-4">
-        <h1 class="dpm-text-title mb-1">{{ catalog?.displayName }}</h1>
-        <h3 class="dpm-text-body mb-1 catalog-slug">{{ catalogSlug }}</h3>
-        <p class="dpm-text-small catalog-description">
-            {{ catalog?.description }}
-        </p>
-    </div>
-    <mat-tab-group [(selectedIndex)]="currentTab" class="catalog-tabs px-3">
-        <mat-tab label="Packages"></mat-tab>
-        <mat-tab label="Permissions" *ngIf="canManage"></mat-tab>
-    </mat-tab-group>
-    <div *ngIf="state === 'SUCCESS' && currentTab === 0">
-        <app-package-item
-            [item]="package"
-            [hasImage]="true"
-            ctaText="Remove From Catalog"
-            [showCta]="canEdit"
-            (action)="removePackage(package)"
-            *ngFor="let package of catalog?.packages"
-        >
-        </app-package-item>
-        <div class="dpm-no-data" *ngIf="!catalog?.packages?.length">
-            <p>There are no packages available.</p>
-            <a class="app-outlined-button mt-3 px-3">Add package</a>
+    <ng-container *ngIf="state === 'SUCCESS'">
+        <app-cover [catalogSlug]="catalogSlug"></app-cover>
+        <div class="catalog-header px-4 py-3 mt-4">
+            <h1 class="dpm-text-title mb-1">{{ catalog?.displayName }}</h1>
+            <h3 class="dpm-text-body mb-1 catalog-slug">{{ catalogSlug }}</h3>
+            <p class="dpm-text-small catalog-description">
+                {{ catalog?.description }}
+            </p>
         </div>
+        <mat-tab-group [(selectedIndex)]="currentTab" disableRipple class="catalog-tabs px-3">
+            <mat-tab label="Packages"></mat-tab>
+            <mat-tab label="Permissions" *ngIf="canManage"></mat-tab>
+        </mat-tab-group>
+        <div *ngIf="currentTab === 0">
+            <app-package-item
+                [item]="package"
+                [hasImage]="true"
+                ctaText="Remove From Catalog"
+                [showCta]="canEdit"
+                (action)="removePackage(package)"
+                *ngFor="let package of catalog?.packages"
+            >
+            </app-package-item>
+            <div class="dpm-no-data" *ngIf="!catalog?.packages?.length">
+                <p>There are no packages available.</p>
+                <a class="app-outlined-button mt-3 px-3">Add package</a>
+            </div>
+        </div>
+        <app-catalog-permissions [catalog]="catalog" *ngIf="currentTab === 1"></app-catalog-permissions>
+    </ng-container>
+    <div class="dpm-no-data" *ngIf="state === 'CATALOG_NOT_FOUND'">The catalog does not exist.</div>
+    <div class="dpm-no-data" *ngIf="state === 'ERROR'">
+        An error ocurred while getting catalog details. Please try again later.
     </div>
-    <app-catalog-permissions
-        [catalog]="catalog"
-        *ngIf="state === 'SUCCESS' && currentTab === 1"
-    ></app-catalog-permissions>
     <div class="dpm-page-loading" *ngIf="state === 'LOADING'">
         <mat-spinner [diameter]="32"></mat-spinner>
     </div>

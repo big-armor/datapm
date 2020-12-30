@@ -54,13 +54,8 @@
             <mat-spinner [diameter]="40"></mat-spinner>
         </div>
 
-        <div class="mt-3" *ngIf="catalogState !== State.LOADING">
-            <app-simple-create
-                inputPlaceholder="Catalog Name"
-                createLabel="Create a catalog"
-                [errorMessages]="inputErrors"
-                (submit)="createCatalog($event)"
-            ></app-simple-create>
+        <div class="mt-3" *ngIf="catalogState !== State.LOADING && isCurrentUser">
+            <a class="app-outlined-button" (click)="createCatalog()">Create a collection</a>
         </div>
     </div>
 </div>

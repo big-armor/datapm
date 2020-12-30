@@ -85,8 +85,10 @@ export class UserCatalogsComponent implements OnInit {
                 data: formValue
             })
             .afterClosed()
-            .subscribe(() => {
-                this.refreshCatalogs();
+            .subscribe((data) => {
+                if (data) {
+                    this.refreshCatalogs();
+                }
             });
     }
 
