@@ -20,6 +20,23 @@ import { getGraphQlRelationName, getRelationNames } from "../util/relationNames"
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
 
+export const usersByPackage = async (
+    _0: any,
+    { identifier }: { identifier: PackageIdentifierInput },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const relations = getGraphQlRelationName(info);
+
+    const packageEntity = await context.connection.manager
+        .getCustomRepository(PackageRepository)
+        .findPackageOrFail({ identifier, relations });
+
+    return await context.connection.manager
+        .getCustomRepository(PackagePermissionRepository)
+        .usersByPackage(packageEntity, relations);
+};
+
 export const myPackages = async (
     _0: any,
     { limit, offset }: { limit: number; offset: number },

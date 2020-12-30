@@ -4,6 +4,7 @@ import { UserPackagePermission } from "../entity/UserPackagePermission";
 import { UserRepository } from "./UserRepository";
 import { Permission, PackageIdentifier, PackageIdentifierInput } from "../generated/graphql";
 import { PackageRepository } from "./PackageRepository";
+import { Package } from "../entity/Package";
 
 async function getPackagePermissions({
     manager,
@@ -46,6 +47,17 @@ export class PackagePermissionRepository {
         });
     }
 
+    public async usersByPackage(packageEntity: Package, relations?: string[]): Promise<UserPackagePermission[]> {
+        const ALIAS = "userCollectionPermission";
+
+        return await this.manager
+            .getRepository(UserPackagePermission)
+            .createQueryBuilder(ALIAS)
+            .addRelations(ALIAS, relations)
+            .where({ collectionId: packageEntity.id })
+            .getMany();
+    }
+
     setPackagePermissions({
         identifier,
         username,
@@ -56,7 +68,7 @@ export class PackagePermissionRepository {
         username: string;
         permissions: Permission[];
         relations?: string[];
-    }): Promise<UserPackagePermission> {
+    }): Promise<void> {
         return this.manager.nestedTransaction(async (transaction) => {
             // ensure user exists and is part of team
             const user = await transaction.getCustomRepository(UserRepository).findUser({ username });
@@ -93,8 +105,6 @@ export class PackagePermissionRepository {
 
             if (packagePermission === undefined)
                 throw new Error(`Package not found after updating permissions. This should never happen!`);
-
-            return packagePermission;
         });
     }
 
