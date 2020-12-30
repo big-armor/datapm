@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject, of, throwError } from "rxjs";
 
 import { User, LoginGQL, MeGQL } from "../../generated/graphql";
-import { tap, switchMap, catchError } from "rxjs/operators";
+import { catchError, switchMap, tap } from "rxjs/operators";
 
 @Injectable({ providedIn: "root" })
 export class AuthenticationService {
@@ -13,10 +13,34 @@ export class AuthenticationService {
         this.currentUser = new BehaviorSubject(null);
         const jwt = localStorage.getItem("jwt");
         this.isLoggedIn = new BehaviorSubject(!!jwt);
-        this.refreshUserInfo().subscribe(() => {});
+        this.refreshUserInfo();
     }
 
     refreshUserInfo() {
+        this.getUserInfo().subscribe(() => {});
+    }
+
+    login(username: string, password: string) {
+        return this.loginGQL.mutate({ username, password }).pipe(
+            switchMap(({ data, errors }) => {
+                if (data) {
+                    localStorage.setItem("jwt", data.login);
+                    return this.getUserInfo();
+                }
+
+                return of({ errors });
+            })
+        );
+    }
+
+    logout() {
+        // remove user from local storage to log user out
+        localStorage.removeItem("jwt");
+        this.currentUser.next(null);
+        this.isLoggedIn.next(false);
+    }
+
+    private getUserInfo() {
         const jwt = localStorage.getItem("jwt");
 
         if (!jwt) {
@@ -39,25 +63,5 @@ export class AuthenticationService {
                 return throwError(err);
             })
         );
-    }
-
-    login(username: string, password: string) {
-        return this.loginGQL.mutate({ username, password }).pipe(
-            switchMap(({ data, errors }) => {
-                if (data) {
-                    localStorage.setItem("jwt", data.login);
-                    return this.refreshUserInfo();
-                }
-
-                return of({ errors });
-            })
-        );
-    }
-
-    logout() {
-        // remove user from local storage to log user out
-        localStorage.removeItem("jwt");
-        this.currentUser.next(null);
-        this.isLoggedIn.next(false);
     }
 }

@@ -13,7 +13,7 @@ import { PageState } from "src/app/models/page-state";
 export class CatalogDetailsComponent implements OnInit {
     public catalogSlug = "";
     public catalog: Catalog;
-    public state: PageState = "INIT";
+    public state: PageState | "CATALOG_NOT_FOUND" = "INIT";
     public currentTab = 0;
 
     constructor(private getCatalogGQL: GetCatalogGQL, private dialog: MatDialog, private route: ActivatedRoute) {}
@@ -21,8 +21,16 @@ export class CatalogDetailsComponent implements OnInit {
     ngOnInit(): void {
         this.catalogSlug = this.route.snapshot.paramMap.get("catalogSlug");
         this.state = "LOADING";
-        this.getCatalogGQL.fetch({ identifier: { catalogSlug: this.catalogSlug } }).subscribe(({ data }) => {
-            if (!data) return;
+        this.getCatalogGQL.fetch({ identifier: { catalogSlug: this.catalogSlug } }).subscribe(({ data, errors }) => {
+            if (errors) {
+                if (errors[0].message === "CATALOG_NOT_FOUND") {
+                    this.state = "CATALOG_NOT_FOUND";
+                } else {
+                    this.state = "ERROR";
+                }
+                return;
+            }
+
             this.catalog = data.catalog as Catalog;
             this.state = "SUCCESS";
             console.log(this.catalog);

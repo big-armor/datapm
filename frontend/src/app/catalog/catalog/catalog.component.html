@@ -1,7 +1,8 @@
-<div class="page-content" *ngIf="state !== 'LOADING'; else loading">
+<div class="page-content" *ngIf="state === 'SUCCESS'">
     <app-catalog-details *ngIf="!isPersonal"></app-catalog-details>
     <app-user-details-page *ngIf="isPersonal"></app-user-details-page>
 </div>
-<ng-template #loading>
+<div class="dpm-no-data" *ngIf="state === 'ERROR'">Error occured while getting catalog details.</div>
+<ng-template *ngIf="state === 'LOADING'">
     <mat-spinner [diameter]="32"></mat-spinner>
 </ng-template>

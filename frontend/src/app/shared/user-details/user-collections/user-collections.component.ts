@@ -65,8 +65,10 @@ export class UserCollectionsComponent implements OnInit {
                 data: formValue
             })
             .afterClosed()
-            .subscribe(() => {
-                this.loadMyCollections();
+            .subscribe((data) => {
+                if (data) {
+                    this.loadMyCollections();
+                }
             });
     }
 
