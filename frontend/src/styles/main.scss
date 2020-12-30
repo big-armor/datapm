@@ -279,3 +279,12 @@ body {
     color: #333333;
     padding: 24px;
 }
+
+.public-text {
+    @include text("small");
+    color: $color-1;
+}
+.not-public-text {
+    @include text("small");
+    color: $gray-3;
+}

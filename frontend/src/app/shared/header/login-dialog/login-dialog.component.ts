@@ -64,11 +64,13 @@ export class LoginDialogComponent implements OnInit, OnDestroy {
         this.state = State.AWAITING_RESPONSE;
 
         this.authenticationService.login(this.loginForm.value.username, this.loginForm.value.password).subscribe(
-            ({ errors }) => {
-                if (errors) {
-                    if (errors.find((e) => e.message === AUTHENTICATION_ERROR.WRONG_CREDENTIALS)) {
+            (value: { errors; data: { me: { username: string } } }) => {
+                if (value.errors) {
+                    if (value.errors.find((e) => e.message === AUTHENTICATION_ERROR.WRONG_CREDENTIALS)) {
                         this.state = State.INCORRECT_LOGIN;
-                    } else if (errors.find((e) => e.message === AUTHENTICATION_ERROR.EMAIL_ADDRESS_NOT_VERIFIED)) {
+                    } else if (
+                        value.errors.find((e) => e.message === AUTHENTICATION_ERROR.EMAIL_ADDRESS_NOT_VERIFIED)
+                    ) {
                         this.state = State.LOGIN_ERROR_VALIDATE_EMAIL;
                     } else {
                         this.state = State.LOGIN_ERROR;
@@ -77,7 +79,7 @@ export class LoginDialogComponent implements OnInit, OnDestroy {
                 }
 
                 this.state = State.LOGGED_IN;
-                const returnUrl = this.route.queryParams["returnUrl"] || "/" + this.loginForm.value.username;
+                const returnUrl = this.route.queryParams["returnUrl"] || "/" + value.data.me.username;
                 this.dialog.closeAll();
                 this.router.navigate([returnUrl], { fragment: this.fragment });
             },
