@@ -121,10 +121,10 @@ A collection of packages offered by a person or an organization.
 """
 type Catalog {
     identifier: CatalogIdentifier!
-    displayName: String!
+    displayName: String
     description: String
     website: String
-    isPublic: Boolean!
+    isPublic: Boolean
 
     """
     The permissions of the requesting user to the catalog
@@ -138,16 +138,16 @@ type Catalog {
 data data sets, and is a member of one and only one catalog. A package may be included in zero or more collections.
 """
 type Package {
-    creator: User!
+    creator: User
     identifier: PackageIdentifier!
-    catalog: Catalog!
+    catalog: Catalog
     displayName: String!
     description: String
     latestVersion: Version
-    versions: [Version]!
-    createdAt: Date!
-    updatedAt: Date!
-    isPublic: Boolean!
+    versions: [Version]
+    createdAt: Date
+    updatedAt: Date
+    isPublic: Boolean
     myPermissions: [Permission!]
 }
 
@@ -165,13 +165,13 @@ type UserCatalog {
 by consumer side users, and generally not the publishers
 """
 type Collection {
-    creator: User!
+    creator: User
     identifier: CollectionIdentifier!
     name: String!
     description: String
     packages: [Package!]
-    createdAt: Date!
-    updatedAt: Date!
+    createdAt: Date
+    updatedAt: Date
     isPublic: Boolean
     isRecommended: Boolean
     myPermissions: [Permission!]
@@ -216,23 +216,23 @@ A single version of a package file for a package listing on the registry
 """
 type Version {
     identifier: VersionIdentifier!
-    createdAt: Date!
-    updatedAt: Date!
-    package: Package!
-    author: User!
-    packageFile: PackageFileJSON!
+    createdAt: Date
+    updatedAt: Date
+    package: Package
+    author: User
+    packageFile: PackageFileJSON
 }
 
 """
 The complete identifier for a version of a package on a registry
 """
 type VersionIdentifier {
-    registryURL: String!
-    catalogSlug: String!
-    packageSlug: String!
-    versionMajor: Int!
-    versionMinor: Int!
-    versionPatch: Int!
+    registryURL: String
+    catalogSlug: String
+    packageSlug: String
+    versionMajor: Int
+    versionMinor: Int
+    versionPatch: Int
 }
 
 """
@@ -248,16 +248,16 @@ type PackageIdentifier {
 The complete identifier for a catalog on a registry
 """
 type CatalogIdentifier {
-    registryURL: String!
-    catalogSlug: String!
+    registryURL: String
+    catalogSlug: String
 }
 
 """
 The complete identifier for a collections on a registry
 """
 type CollectionIdentifier {
-    registryURL: String!
-    collectionSlug: String!
+    registryURL: String
+    collectionSlug: String
 }
 
 """

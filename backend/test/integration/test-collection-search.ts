@@ -57,7 +57,7 @@ describe("Collection Search Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.createPackage.catalog.displayName).to.equal("testA-collection-search");
+        expect(response.data!.createPackage.catalog?.displayName).to.equal("testA-collection-search");
         expect(response.data!.createPackage.description).to.equal("Test upload of congressional legislators");
         expect(response.data!.createPackage.displayName).to.equal("Congressional Legislators");
         expect(response.data!.createPackage.identifier.catalogSlug).to.equal("testA-collection-search");
@@ -148,7 +148,7 @@ describe("Collection Search Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").true;
-        expect(response.data!.createCollection.creator.username).equal("testB-collection-search");
+        expect(response.data!.createCollection.creator?.username).equal("testB-collection-search");
         expect(response.data!.createCollection.identifier.collectionSlug).equal("testB-collection-search");
         expect(response.data!.createCollection.name).equal("Congressional Data Sets");
         expect(response.data!.createCollection.description).equal("Short test for congressional data sets");
@@ -217,7 +217,7 @@ describe("Collection Search Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").true;
-        expect(response.data!.collection.creator.username).equal("testB-collection-search");
+        expect(response.data!.collection.creator?.username).equal("testB-collection-search");
         expect(response.data!.collection.identifier.collectionSlug).equal("testB-collection-search");
         expect(response.data!.collection.name).equal("Congressional Data Sets");
         expect(response.data!.collection.description).equal("Short test for congressional data sets");

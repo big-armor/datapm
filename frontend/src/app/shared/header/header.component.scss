@@ -132,3 +132,17 @@ button.mat-menu-item {
         margin-bottom: 0px;
     }
 }
+
+.autocomplete-title {
+    line-height: normal;
+}
+
+.autocomplete-description {
+    line-height: normal;
+    font-size: 0.75em;
+    color: $gray-3;
+}
+
+.mat-option {
+    border-bottom: 1px solid $gray-6;
+}

@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
 import { ActivatedRoute, ParamMap, Router } from "@angular/router";
 import { FormControl } from "@angular/forms";
-import { takeUntil, startWith, map, filter } from "rxjs/operators";
+import { takeUntil, startWith, map, filter, debounceTime, switchMap } from "rxjs/operators";
 import { Subject, Observable, BehaviorSubject } from "rxjs";
 
 import { AuthenticationService } from "../../services/authentication.service";
@@ -50,17 +50,17 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        // this.options = [
-        //     { package: "bryan", collection: "test" },
-        //     { package: "bryan2", collection: "test2" }
-        // ];
-        // this.options = this.searchControl.valueChanges.subscribe(
-        //     // startWith(""),
-        //     value => {
-
-        //         value.map((val) => (val.length >= 1 ? this.autoCompleteFilter(val) : []))
-        //     }
-        // );
+        this.searchControl.valueChanges
+            .pipe(
+                debounceTime(500),
+                switchMap((value) => {
+                    if (value.length < 3) return [];
+                    return this.autocomplete.fetch({ startsWith: value });
+                })
+            )
+            .subscribe((result) => {
+                this.autoCompleteResult = result.data.autoComplete;
+            });
 
         this.route.queryParamMap.pipe(takeUntil(this.subscription)).subscribe((queryParams: ParamMap) => {
             this.searchControl.setValue(queryParams.get("q") || "");
@@ -122,26 +122,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
 
     search() {
-        console.log(this.searchControl.value);
         this.router.navigate(["/search"], { queryParams: { q: this.searchControl.value } });
     }
-
-    // autoCompleteFilter(val: string) {
-    //     return this.options.pipe(
-    //         map((item) => {
-    //             item.filter((again) => {
-    //                 again.collection.toLocaleLowerCase().indexOf(val.toLocaleLowerCase()) === 0 ||
-    //                     again.package.toLocaleLowerCase().indexOf(val.toLocaleLowerCase()) === 0;
-    //             });
-    //         })
-    //     );
-    // }
-    // autoCompleteFilter(val: string) {
-    //     return this.options.filter((option) => {
-    //         option.collection.toLocaleLowerCase().indexOf(val.toLocaleLowerCase()) === 0 ||
-    //             option.package.toLocaleLowerCase().indexOf(val.toLocaleLowerCase()) === 0;
-    //     });
-    // }
 
     goHome() {
         this.router.navigate(["/"]);
@@ -155,5 +137,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.authenticationService.logout();
         setTimeout(() => (this.currentUser = null), 500);
         this.router.navigate(["/"]);
+    }
+
+    autoCompleteOptionSelected(event) {
+        this.router.navigate(["/" + event.option.value]);
+        this.searchControl.setValue("");
+        this.autoCompleteResult = null;
     }
 }
