@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from "@angular/core";
+import { Component, OnDestroy, TemplateRef, ViewChild } from "@angular/core";
 import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
 import { PackageFile } from "datapm-lib";
@@ -24,6 +24,8 @@ enum State {
     styleUrls: ["./package.component.scss"]
 })
 export class PackageComponent implements OnDestroy {
+    @ViewChild("derivedFrom") derivedFromDialogTemplate: TemplateRef<any>;
+
     State = State;
     state = State.LOADING;
 
@@ -76,6 +78,8 @@ export class PackageComponent implements OnDestroy {
                 this.package = p.package;
                 if (this.package && this.package.latestVersion) {
                     this.packageFile = JSON.parse(this.package.latestVersion.packageFile);
+                } else {
+                    this.packageFile = null;
                 }
                 this.title.setTitle(`${this.package?.displayName} - datapm`);
                 this.state = State.LOADED;
@@ -140,5 +144,15 @@ export class PackageComponent implements OnDestroy {
     getPackageIdentifierFromURL() {
         const activeRouteParts = this.router.url.split("/");
         return activeRouteParts[1] + "/" + activeRouteParts[2];
+    }
+
+    openDerivedFromModal(packageFile: PackageFile) {
+        this.dialog.open(this.derivedFromDialogTemplate, {
+            data: packageFile
+        });
+    }
+    derivedFromCount(packageFile: PackageFile) {
+        if (packageFile == null) return 0;
+        return packageFile.schemas.reduce((count, schema) => count + (schema.derivedFrom.length || 0), 0);
     }
 }

@@ -149,11 +149,11 @@ async function main() {
     );
 
     app.use("/docs/schema.gql", function (req, res, next) {
-        res.sendFile(path.join(__dirname, "node_modules/datapm-lib/schema.gql"));
+        res.sendFile(path.join(process.cwd(), "node_modules/datapm-lib/schema.gql"));
     });
 
     app.use("/docs/datapm-package-file-schema-v1.json", function (req, res, next) {
-        res.sendFile(path.join(__dirname, "node_modules/datapm-lib/packageFileSchema.json"));
+        res.sendFile(path.join(process.cwd(), "node_modules/datapm-lib/packageFileSchema.json"));
     });
 
     app.use("/robots.txt", function (req, res, next) {

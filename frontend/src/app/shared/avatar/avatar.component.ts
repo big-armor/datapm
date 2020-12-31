@@ -93,7 +93,6 @@ export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
                 this.state = State.LOADED;
             },
             (error) => {
-                console.log(JSON.stringify(error, null, 1));
                 this.imgData = null;
                 this.userBackgroundColor = this.hashStringToColor(username);
                 this.state = State.LOADED;
