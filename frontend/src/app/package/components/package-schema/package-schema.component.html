@@ -7,6 +7,14 @@
         {{ schema.recordCount | number }} {{ schema.unit || "" }} records<br />
         {{ schemaPropertiesLength(schema) | number }} properties
     </div>
+    <div *ngIf="schema.derivedFrom?.length > 0">
+        Derived from
+        <span *ngFor="let derivedFrom of schema?.derivedFrom; let i = index">
+            <span *ngIf="i > 0"> & </span>
+
+            <a href="{{ derivedFrom.url }}" target="_blank">{{ derivedFrom.displayName }}</a>
+        </span>
+    </div>
     <div class="accordions-group mt-2">
         <mat-accordion class="schema-property" multi>
             <mat-expansion-panel *ngFor="let property of schema?.properties | values | sortBy: 'asc':'title'">
@@ -79,7 +87,10 @@
                                         enumerated values:
                                         <ul>
                                             <li *ngFor="let value of stringOptions(type.stringOptions)">
-                                                {{ value.name }}: {{ value.value | number }} record
+                                                {{ value.name }}: {{ value.value | number }} record<span
+                                                    *ngIf="value.value > 1"
+                                                    >s</span
+                                                >
                                             </li>
                                         </ul>
                                     </li>
