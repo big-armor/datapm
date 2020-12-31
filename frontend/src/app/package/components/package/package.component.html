@@ -79,7 +79,7 @@
                             </span>
                             <div class="package-identifier">
                                 <div class="identifier">
-                                    <app-avatar class="user-img" *ngIf="catalogUser" [user]="catalogUser" [size]="32">
+                                    <app-avatar class="user-img" *ngIf="catalogUser" [user]="catalogUser" [size]="40">
                                     </app-avatar>
                                     <div class="identifier-text text-overflow-elipses">
                                         <a [routerLink]="['/' + package?.identifier.catalogSlug]">{{
@@ -88,10 +88,10 @@
                                         >&nbsp;/&nbsp;{{ package?.identifier.packageSlug }}
                                     </div>
                                 </div>
-                                <div class="derivedFromSubtitle" *ngIf="true">
+                                <div class="derivedFromSubtitle" *ngIf="derivedFromCount(packageFile) > 0">
                                     Derived from
                                     <span>
-                                        <a href="javascript:void(0)" (click)="showDerivedFrom(packageFile)"
+                                        <a href="javascript:void(0)" (click)="openDerivedFromModal(packageFile)"
                                             >{{ derivedFromCount(packageFile) }} upstream data sets</a
                                         >
                                     </span>
@@ -155,7 +155,7 @@
 </div>
 
 <ng-template #derivedFrom let-package>
-    <h2 mat-dialog-title>{{ package.displayName }} Provenance</h2>
+    <h2 mat-dialog-title>Provenance for {{ package.displayName }}</h2>
     <mat-dialog-content>
         <div *ngFor="let schema of package.schemas">
             <h3>{{ schema.title }}</h3>

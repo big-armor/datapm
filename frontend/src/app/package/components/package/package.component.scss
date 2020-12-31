@@ -13,6 +13,7 @@
     display: flex;
     justify-content: left;
     align-items: center;
+    font-size: 1.5em;
 
     .identifier-text {
         position: relative;
@@ -294,6 +295,9 @@ hr {
     .left-div {
         padding-right: 15px !important;
     }
+    .identifier {
+        font-size: 1.25em;
+    }
 }
 
 @media (max-width: 768px) {
@@ -306,6 +310,9 @@ hr {
     #contentContainer {
         padding-bottom: 10px !important;
     }
+    .identifier {
+        font-size: 1.25em;
+    }
 }
 
 @media (max-width: 575px) {
@@ -316,6 +323,9 @@ hr {
         position: relative;
         top: 0px;
     }
+    .identifier {
+        font-size: 1em;
+    }
 }
 
 .mat-dialog-actions {
@@ -323,8 +333,8 @@ hr {
 }
 
 .derivedFromSubtitle {
-    top: -20px;
+    top: -15px;
     position: relative;
     font-size: 0.8em;
-    left: 40px;
+    left: 50px;
 }

@@ -78,6 +78,8 @@ export class PackageComponent implements OnDestroy {
                 this.package = p.package;
                 if (this.package && this.package.latestVersion) {
                     this.packageFile = JSON.parse(this.package.latestVersion.packageFile);
+                } else {
+                    this.packageFile = null;
                 }
                 this.title.setTitle(`${this.package?.displayName} - datapm`);
                 this.state = State.LOADED;
@@ -144,12 +146,13 @@ export class PackageComponent implements OnDestroy {
         return activeRouteParts[1] + "/" + activeRouteParts[2];
     }
 
-    showDerivedFrom(schema: Package) {
+    openDerivedFromModal(packageFile: PackageFile) {
         this.dialog.open(this.derivedFromDialogTemplate, {
-            data: schema
+            data: packageFile
         });
     }
     derivedFromCount(packageFile: PackageFile) {
-        return packageFile.schemas.reduce((count, schema) => schema.derivedFrom.length || 0, 0);
+        if (packageFile == null) return 0;
+        return packageFile.schemas.reduce((count, schema) => count + (schema.derivedFrom.length || 0), 0);
     }
 }
