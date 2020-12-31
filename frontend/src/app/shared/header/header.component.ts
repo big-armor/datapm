@@ -59,7 +59,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
                 })
             )
             .subscribe((result) => {
-                this.autoCompleteResult = result.data.autoComplete;
+                if (result.errors != null) this.autoCompleteResult = null;
+                else this.autoCompleteResult = result.data.autoComplete;
             });
 
         this.route.queryParamMap.pipe(takeUntil(this.subscription)).subscribe((queryParams: ParamMap) => {

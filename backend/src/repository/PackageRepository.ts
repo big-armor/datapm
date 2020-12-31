@@ -412,7 +412,7 @@ export class PackageRepository {
         const entities = await this.createQueryBuilderWithUserConditions(user)
             .andWhere(`(LOWER("Package"."slug") LIKE :valueLike OR LOWER("Package"."displayName") LIKE :valueLike)`, {
                 startsWith,
-                valueLike: startsWith.toLowerCase() + "%"
+                valueLike: "%" + startsWith.toLowerCase() + "%"
             })
             .addRelations(ALIAS, relations)
             .getMany();
