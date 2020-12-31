@@ -118,7 +118,7 @@ export class PackageRepository {
     }
 
     /** Use this function to create a user scoped query that returns only packages that should be visible to that user */
-    public createQueryBuilderWithUserConditions(user: User, permission: Permission = Permission.VIEW) {
+    public createQueryBuilderWithUserConditions(user: User | null, permission: Permission = Permission.VIEW) {
         if (user != null) {
             return this.createQueryBuilderWithUserConditionsByUserId(user.id, permission);
         }
@@ -403,13 +403,13 @@ export class PackageRepository {
         startsWith,
         relations = []
     }: {
-        user: User;
+        user: User | undefined;
         startsWith: string;
         relations?: string[];
     }): Promise<Package[]> {
         const ALIAS = "autoCompletePackage";
 
-        const entities = await this.createQueryBuilderWithUserConditions(user)
+        const entities = await this.createQueryBuilderWithUserConditions(user || null)
             .andWhere(`(LOWER("Package"."slug") LIKE :valueLike OR LOWER("Package"."displayName") LIKE :valueLike)`, {
                 startsWith,
                 valueLike: "%" + startsWith.toLowerCase() + "%"

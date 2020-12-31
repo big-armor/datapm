@@ -149,13 +149,13 @@ export class CollectionRepository extends Repository<Collection> {
         startsWith,
         relations = []
     }: {
-        user: User;
+        user: User | undefined;
         startsWith: string;
         relations?: string[];
     }): Promise<Collection[]> {
         const ALIAS = "autoCompleteCollection";
 
-        const entities = await this.createQueryBuilderWithUserConditions(user.id)
+        const entities = await this.createQueryBuilderWithUserConditions(user?.id)
             .andWhere(`(LOWER("Collection"."slug") LIKE :queryLike OR LOWER("Collection"."name") LIKE :queryLike)`, {
                 startsWith,
                 queryLike: startsWith.toLowerCase() + "%"

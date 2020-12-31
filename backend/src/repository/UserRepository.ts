@@ -230,7 +230,7 @@ export class UserRepository extends Repository<User> {
         startsWith,
         relations = []
     }: {
-        user: User;
+        user: User | undefined;
         startsWith: string;
         relations?: string[];
     }): Promise<User[]> {
