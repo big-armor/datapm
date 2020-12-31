@@ -88,6 +88,14 @@
                                         >&nbsp;/&nbsp;{{ package?.identifier.packageSlug }}
                                     </div>
                                 </div>
+                                <div class="derivedFromSubtitle" *ngIf="true">
+                                    Derived from
+                                    <span>
+                                        <a href="javascript:void(0)" (click)="showDerivedFrom(packageFile)"
+                                            >{{ derivedFromCount(packageFile) }} upstream data sets</a
+                                        >
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -145,3 +153,24 @@
         </div>
     </div>
 </div>
+
+<ng-template #derivedFrom let-package>
+    <h2 mat-dialog-title>{{ package.displayName }} Provenance</h2>
+    <mat-dialog-content>
+        <div *ngFor="let schema of package.schemas">
+            <h3>{{ schema.title }}</h3>
+            {{ schema.derivedFromDescription }}
+            <br /><br />
+            <h3>Derived From</h3>
+            <ul>
+                <li *ngFor="let derivedFrom of schema.derivedFrom">
+                    <a href="{{ derivedFrom.url }}" target="_blank">{{ derivedFrom.displayName }}</a>
+                </li>
+            </ul>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
+        <button mat-button [mat-dialog-close]="true">Close</button>
+    </mat-dialog-actions>
+</ng-template>

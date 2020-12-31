@@ -13,7 +13,6 @@ import { SamplesFullScreenDialog } from "../package-samples/samples-fullscreen-d
     styleUrls: ["./package-schema.component.scss"]
 })
 export class PackageSchemaComponent {
-    @ViewChild("derivedFrom") derivedFromDialogTemplate: TemplateRef<any>;
     public package: Package;
     public packageFile: PackageFile;
     private unsubscribe$ = new Subject();
@@ -63,11 +62,5 @@ export class PackageSchemaComponent {
                 };
             })
             .sort((a, b) => a.name.localeCompare(b.name));
-    }
-
-    showDerivedFrom(schema: Schema) {
-        this.dialog.open(this.derivedFromDialogTemplate, {
-            data: schema
-        });
     }
 }

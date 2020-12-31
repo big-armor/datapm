@@ -4,21 +4,14 @@
         <div class="schema-text">
             {{ schema.description }}
         </div>
-        <div class="schema-samples" *ngIf="schema.sampleRecords?.length > 0">
-            {{ schema.recordCount | number }} {{ schema.unit || "" }} records<br />
-        </div>
-        <div *ngIf="schema.derivedFrom?.length > 0">
-            <div class="provenanceTitle">Provenance</div>
-            Derived from
 
-            <span>
-                <a href="javascript:void(0)" (click)="showDerivedFrom(schema)"
-                    >{{ schema?.derivedFrom.length }} upstream data sets</a
-                >
-            </span>
+        <div class="schema-stats">
+            <div class="schema-samples" *ngIf="schema.sampleRecords?.length > 0">
+                {{ schema.recordCount | number }} {{ schema.unit || "" }} records<br />
+            </div>
+            <div>{{ schemaPropertiesLength(schema) | number }} Properties</div>
         </div>
 
-        <div class="provenanceTitle">{{ schemaPropertiesLength(schema) | number }} Properties</div>
         <div class="accordions-group mt-2">
             <mat-accordion class="schema-property" multi>
                 <mat-expansion-panel *ngFor="let property of schema?.properties | values | sortBy: 'asc':'title'">
@@ -123,22 +116,3 @@
         </div>
     </div>
 </div>
-
-<ng-template #derivedFrom let-schema>
-    <h2 mat-dialog-title>{{ schema.title }} Provenance</h2>
-    <mat-dialog-content>
-        {{ schema.derivedFromDescription }}
-        <br /><br />
-
-        <h3>Upstream Data</h3>
-        <ul>
-            <li *ngFor="let derivedFrom of schema.derivedFrom">
-                <a href="{{ derivedFrom.url }}" target="_blank">{{ derivedFrom.displayName }}</a>
-            </li>
-        </ul>
-    </mat-dialog-content>
-    <mat-dialog-actions>
-        <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
-        <button mat-button [mat-dialog-close]="true">Close</button>
-    </mat-dialog-actions>
-</ng-template>

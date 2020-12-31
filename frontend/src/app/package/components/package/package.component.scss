@@ -317,3 +317,14 @@ hr {
         top: 0px;
     }
 }
+
+.mat-dialog-actions {
+    justify-content: flex-end;
+}
+
+.derivedFromSubtitle {
+    top: -20px;
+    position: relative;
+    font-size: 0.8em;
+    left: 40px;
+}

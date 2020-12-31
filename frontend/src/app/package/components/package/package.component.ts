@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from "@angular/core";
+import { Component, OnDestroy, TemplateRef, ViewChild } from "@angular/core";
 import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
 import { PackageFile } from "datapm-lib";
@@ -24,6 +24,8 @@ enum State {
     styleUrls: ["./package.component.scss"]
 })
 export class PackageComponent implements OnDestroy {
+    @ViewChild("derivedFrom") derivedFromDialogTemplate: TemplateRef<any>;
+
     State = State;
     state = State.LOADING;
 
@@ -140,5 +142,14 @@ export class PackageComponent implements OnDestroy {
     getPackageIdentifierFromURL() {
         const activeRouteParts = this.router.url.split("/");
         return activeRouteParts[1] + "/" + activeRouteParts[2];
+    }
+
+    showDerivedFrom(schema: Package) {
+        this.dialog.open(this.derivedFromDialogTemplate, {
+            data: schema
+        });
+    }
+    derivedFromCount(packageFile: PackageFile) {
+        return packageFile.schemas.reduce((count, schema) => schema.derivedFrom.length || 0, 0);
     }
 }
