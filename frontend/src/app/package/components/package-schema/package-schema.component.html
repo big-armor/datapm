@@ -1,120 +1,144 @@
 <div class="schema" *ngFor="let schema of packageFile?.schemas">
-    <div class="schema-title">{{ schema.title }}</div>
-    <div class="schema-text">
-        {{ schema.description }}
-    </div>
-    <div class="schema-samples" *ngIf="schema.sampleRecords?.length > 0">
-        {{ schema.recordCount | number }} {{ schema.unit || "" }} records<br />
-        {{ schemaPropertiesLength(schema) | number }} properties
-    </div>
-    <div *ngIf="schema.derivedFrom?.length > 0">
-        Derived from
-        <span *ngFor="let derivedFrom of schema?.derivedFrom; let i = index">
-            <span *ngIf="i > 0"> & </span>
+    <div class="mat-headline">{{ schema.title }}</div>
+    <div class="schema-content">
+        <div class="schema-text">
+            {{ schema.description }}
+        </div>
+        <div class="schema-samples" *ngIf="schema.sampleRecords?.length > 0">
+            {{ schema.recordCount | number }} {{ schema.unit || "" }} records<br />
+        </div>
+        <div *ngIf="schema.derivedFrom?.length > 0">
+            <div class="provenanceTitle">Provenance</div>
+            Derived from
 
-            <a href="{{ derivedFrom.url }}" target="_blank">{{ derivedFrom.displayName }}</a>
-        </span>
-    </div>
-    <div class="accordions-group mt-2">
-        <mat-accordion class="schema-property" multi>
-            <mat-expansion-panel *ngFor="let property of schema?.properties | values | sortBy: 'asc':'title'">
-                <mat-expansion-panel-header>
-                    <mat-panel-title> {{ property.title }} </mat-panel-title>
-                    <mat-panel-description>
-                        <span>{{ getPropertyTypes(property) }}</span>
-                    </mat-panel-description>
-                </mat-expansion-panel-header>
-                <div>
-                    <div>{{ property.description }}</div>
-                    <div
-                        class="d-flex align-items-center justify-content-between"
-                        *ngFor="let type of property.valueTypes | values"
-                        [ngSwitch]="type.valueType"
-                    >
-                        <div *ngSwitchCase="'number'">
-                            <div>
-                                {{ type.valueType }}
-                                <ul>
-                                    <li>
-                                        present in {{ type.recordCount | number }} ({{
-                                            type.recordCount / schema.recordCount | percent
-                                        }}) records
-                                    </li>
-                                    <li>max value: {{ type.numberMaxValue | number }}</li>
-                                    <li>min value: {{ type.numberMinValue | number }}</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div *ngSwitchCase="'boolean'">
-                            <div>
-                                {{ type.valueType }}
-                                <ul>
-                                    <li>
-                                        present in {{ type.recordCount | number }} ({{
-                                            type.recordCount / schema.recordCount | percent
-                                        }}) records
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
+            <span>
+                <a href="javascript:void(0)" (click)="showDerivedFrom(schema)"
+                    >{{ schema?.derivedFrom.length }} upstream data sets</a
+                >
+            </span>
+        </div>
 
-                        <div *ngSwitchCase="'null'">
-                            <div>
-                                {{ type.valueType }}
-                                <ul>
-                                    <li>
-                                        present in {{ type.recordCount | number }} ({{
-                                            type.recordCount / schema.recordCount | percent
-                                        }}) records
-                                    </li>
-                                </ul>
+        <div class="provenanceTitle">{{ schemaPropertiesLength(schema) | number }} Properties</div>
+        <div class="accordions-group mt-2">
+            <mat-accordion class="schema-property" multi>
+                <mat-expansion-panel *ngFor="let property of schema?.properties | values | sortBy: 'asc':'title'">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title> {{ property.title }} </mat-panel-title>
+                        <mat-panel-description>
+                            <span>{{ getPropertyTypes(property) }}</span>
+                        </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <div>
+                        <div>{{ property.description }}</div>
+                        <div
+                            class="d-flex align-items-center justify-content-between"
+                            *ngFor="let type of property.valueTypes | values"
+                            [ngSwitch]="type.valueType"
+                        >
+                            <div *ngSwitchCase="'number'">
+                                <div>
+                                    {{ type.valueType }}
+                                    <ul>
+                                        <li>
+                                            present in {{ type.recordCount | number }} ({{
+                                                type.recordCount / schema.recordCount | percent
+                                            }}) records
+                                        </li>
+                                        <li>max value: {{ type.numberMaxValue | number }}</li>
+                                        <li>min value: {{ type.numberMinValue | number }}</li>
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
-
-                        <div *ngSwitchCase="'string'">
-                            <div>
-                                {{ type.valueType }}
-                                <ul>
-                                    <li>
-                                        present in {{ type.recordCount | number }} records ({{
-                                            type.recordCount / schema.recordCount | percent
-                                        }}
-                                        of total)
-                                    </li>
-                                    <li>max length: {{ type.stringMaxLength | number }} characters</li>
-                                    <li>min length: {{ type.stringMinLength | number }} characters</li>
-                                    <li *ngIf="type.stringOptions">
-                                        enumerated values:
-                                        <ul>
-                                            <li *ngFor="let value of stringOptions(type.stringOptions)">
-                                                {{ value.name }}: {{ value.value | number }} record<span
-                                                    *ngIf="value.value > 1"
-                                                    >s</span
-                                                >
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </ul>
+                            <div *ngSwitchCase="'boolean'">
+                                <div>
+                                    {{ type.valueType }}
+                                    <ul>
+                                        <li>
+                                            present in {{ type.recordCount | number }} ({{
+                                                type.recordCount / schema.recordCount | percent
+                                            }}) records
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
 
-                        <div *ngSwitchCase="'date'">
-                            <div>
-                                {{ type.valueType }}
-                                <ul>
-                                    <li>
-                                        present in {{ type.recordCount | number }} ({{
-                                            type.recordCount / schema.recordCount | percent
-                                        }}) records
-                                    </li>
-                                    <li>max date: {{ type.dateMaxValue | date }}</li>
-                                    <li>min date: {{ type.dateMinValue | date }}</li>
-                                </ul>
+                            <div *ngSwitchCase="'null'">
+                                <div>
+                                    {{ type.valueType }}
+                                    <ul>
+                                        <li>
+                                            present in {{ type.recordCount | number }} ({{
+                                                type.recordCount / schema.recordCount | percent
+                                            }}) records
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div *ngSwitchCase="'string'">
+                                <div>
+                                    {{ type.valueType }}
+                                    <ul>
+                                        <li>
+                                            present in {{ type.recordCount | number }} records ({{
+                                                type.recordCount / schema.recordCount | percent
+                                            }}
+                                            of total)
+                                        </li>
+                                        <li>max length: {{ type.stringMaxLength | number }} characters</li>
+                                        <li>min length: {{ type.stringMinLength | number }} characters</li>
+                                        <li *ngIf="type.stringOptions">
+                                            enumerated values:
+                                            <ul>
+                                                <li *ngFor="let value of stringOptions(type.stringOptions)">
+                                                    {{ value.name }}: {{ value.value | number }} record<span
+                                                        *ngIf="value.value > 1"
+                                                        >s</span
+                                                    >
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div *ngSwitchCase="'date'">
+                                <div>
+                                    {{ type.valueType }}
+                                    <ul>
+                                        <li>
+                                            present in {{ type.recordCount | number }} ({{
+                                                type.recordCount / schema.recordCount | percent
+                                            }}) records
+                                        </li>
+                                        <li>max date: {{ type.dateMaxValue | date }}</li>
+                                        <li>min date: {{ type.dateMinValue | date }}</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </mat-expansion-panel>
-        </mat-accordion>
+                </mat-expansion-panel>
+            </mat-accordion>
+        </div>
     </div>
 </div>
+
+<ng-template #derivedFrom let-schema>
+    <h2 mat-dialog-title>{{ schema.title }} Provenance</h2>
+    <mat-dialog-content>
+        {{ schema.derivedFromDescription }}
+        <br /><br />
+
+        <h3>Upstream Data</h3>
+        <ul>
+            <li *ngFor="let derivedFrom of schema.derivedFrom">
+                <a href="{{ derivedFrom.url }}" target="_blank">{{ derivedFrom.displayName }}</a>
+            </li>
+        </ul>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
+        <button mat-button [mat-dialog-close]="true">Close</button>
+    </mat-dialog-actions>
+</ng-template>

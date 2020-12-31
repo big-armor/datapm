@@ -24,6 +24,7 @@ import { SamplesComponent } from "./components/package-samples/samples.component
 import { SamplesFullScreenDialog } from "./components/package-samples/samples-fullscreen-dialog.component";
 import { ScrollingModule } from "@angular/cdk/scrolling";
 import { TableVirtualScrollModule } from "ng-table-virtual-scroll";
+import { MatDialogModule } from "@angular/material/dialog";
 
 @NgModule({
     declarations: [
@@ -46,6 +47,7 @@ import { TableVirtualScrollModule } from "ng-table-virtual-scroll";
         MatExpansionModule,
         MatIconModule,
         MatTabsModule,
+        MatDialogModule,
         MatTableModule,
         MatProgressSpinnerModule,
         SharedModule,
