@@ -102,7 +102,7 @@ async function getUserOrFail({
         manager,
         relations
     });
-    if (!user) throw new Error(`Failed to get user ${username}`);
+    if (!user) throw new Error(`USER_NOT_FOUND - ${username}`);
     return user;
 }
 
@@ -120,7 +120,7 @@ async function getUserByUsernameOrFail({
         manager,
         relations
     });
-    if (!user) throw new Error(`Failed to get user ${username}`);
+    if (!user) throw new Error(`USER_NOT_FOUND - ${username}`);
     return user;
 }
 
