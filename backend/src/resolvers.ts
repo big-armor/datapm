@@ -102,7 +102,8 @@ import {
     setPackagePermissions,
     updatePackage,
     myPackages,
-    userPackages
+    userPackages,
+    usersByPackage
 } from "./resolvers/PackageResolver";
 import { ImageStorageService } from "./storage/images/image-storage-service";
 
@@ -545,6 +546,7 @@ export const resolvers: {
         searchCollections: searchCollections,
         collectionPackages: collectionPackages,
         usersByCollection: usersByCollection,
+        usersByPackage: usersByPackage,
         userCatalogs: userCatalogs,
         userCollections: userCollections,
         userPackages: userPackages,

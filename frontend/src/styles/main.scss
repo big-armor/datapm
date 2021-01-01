@@ -285,3 +285,11 @@ body {
     margin: 0px 10px;
     margin-top: 2px;
 }
+.public-text {
+    @include text("small");
+    color: $color-1;
+}
+.not-public-text {
+    @include text("small");
+    color: $gray-3;
+}

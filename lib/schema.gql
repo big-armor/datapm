@@ -196,6 +196,14 @@ type UserPackagePermissions {
 }
 
 """
+Represents a user, and their permissions on a package
+"""
+type UserPackagePermission {
+    user: User!
+    permissions: [Permission!]!
+}
+
+"""
 Represents users, and their permissions on a collection
 """
 type UserCollectionPermissions {
@@ -496,6 +504,13 @@ type Query {
     """
     Returns all of the users for a given catalog
     """
+    usersByPackage(
+        identifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
+    ): [UserPackagePermission]!
+
+    """
+    Returns all of the users for a given catalog
+    """
     usersByCatalog(
         identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
     ): [UserCatalogPermissions]!
@@ -597,7 +612,7 @@ type Query {
     userCatalogs(username: String! @validUsername, offSet: Int!, limit: Int!): CatalogsResult!
 
     """
-    Returns list of catalogs for the given user
+    Returns list of packages for the given user
     """
     userPackages(username: String! @validUsername, offSet: Int!, limit: Int!): PackagesResult!
 
@@ -801,7 +816,7 @@ type Mutation {
     setPackagePermissions(
         identifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
         value: SetPackagePermissionInput!
-    ): UserPackagePermissions!
+    ): Void
 
     """
     Removes all permissions for a user on a given package. Requires the manage package permission

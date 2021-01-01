@@ -1,0 +1,11 @@
+query UsersByPackage($identifier: PackageIdentifierInput!) {
+    usersByPackage(identifier: $identifier) {
+        user {
+            username
+            firstName
+            lastName
+            nameIsPublic
+        }
+        permissions
+    }
+}

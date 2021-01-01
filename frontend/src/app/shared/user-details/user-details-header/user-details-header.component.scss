@@ -32,14 +32,7 @@
         margin-bottom: 10px;
     }
 }
-.public-text {
-    @include text("small");
-    color: $color-1;
-}
-.not-public-text {
-    @include text("small");
-    color: $gray-3;
-}
+
 .not-current-user {
     .public-text,
     .not-public-text {

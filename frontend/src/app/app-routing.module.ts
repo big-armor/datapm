@@ -1,6 +1,5 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Route } from "@angular/router";
-import { AuthGuard } from "./helpers/auth-guard";
 
 const staticRoutes: Route[] = [
     {

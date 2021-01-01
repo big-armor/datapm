@@ -1,0 +1,3 @@
+mutation SetPackagePermissions($identifier: PackageIdentifierInput!, $value: SetPackagePermissionInput!) {
+    setPackagePermissions(identifier: $identifier, value: $value)
+}
