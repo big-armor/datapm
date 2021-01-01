@@ -19,7 +19,7 @@
                                 class="search-autocomplete"
                                 (optionSelected)="autoCompleteOptionSelected($event)"
                             >
-                                <mat-option *ngIf="!autoCompleteResult && searchControl.value.length > 0"
+                                <mat-option *ngIf="!autoCompleteResult && searchControl.value.length > 1"
                                     >Loading...</mat-option
                                 >
                                 <ng-container *ngIf="autoCompleteResult">

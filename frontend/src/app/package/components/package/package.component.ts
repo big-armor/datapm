@@ -1,11 +1,11 @@
 import { Component, OnDestroy, TemplateRef, ViewChild } from "@angular/core";
 import { Title } from "@angular/platform-browser";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { PackageFile } from "datapm-lib";
 import { Subject } from "rxjs";
 import { Package, User, UserGQL } from "src/generated/graphql";
 import { PackageService, PackageResponse } from "../../services/package.service";
-import { takeUntil } from "rxjs/operators";
+import { filter, takeUntil } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
 import { LoginDialogComponent } from "src/app/shared/header/login-dialog/login-dialog.component";
 import { AuthenticationService } from "src/app/services/authentication.service";
@@ -107,13 +107,23 @@ export class PackageComponent implements OnDestroy {
 
     ngOnInit() {
         this.state = State.LOADING;
-        this.catalogSlug = this.route.snapshot.paramMap.get("catalogSlug");
-        this.packageSlug = this.route.snapshot.paramMap.get("packageSlug");
-        this.packageService.getPackage(this.catalogSlug, this.packageSlug);
+
+        this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((event: NavigationEnd) => {
+            this.updateFromUrl();
+        });
+
+        this.updateFromUrl();
 
         this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
             this.currentUser = user;
         });
+    }
+
+    updateFromUrl() {
+        this.catalogSlug = this.route.snapshot.paramMap.get("catalogSlug");
+        this.packageSlug = this.route.snapshot.paramMap.get("packageSlug");
+
+        this.packageService.getPackage(this.catalogSlug, this.packageSlug);
     }
 
     ngOnDestroy(): void {

@@ -409,11 +409,20 @@ export class PackageRepository {
     }): Promise<Package[]> {
         const ALIAS = "autoCompletePackage";
 
+        const queryArray = startsWith
+            .trim()
+            .toLowerCase()
+            .split(/\s+/)
+            .map((s) => `%${s}%`);
+
         const entities = await this.createQueryBuilderWithUserConditions(user || null)
-            .andWhere(`(LOWER("Package"."slug") LIKE :valueLike OR LOWER("Package"."displayName") LIKE :valueLike)`, {
-                startsWith,
-                valueLike: "%" + startsWith.toLowerCase() + "%"
-            })
+            .andWhere(
+                `(LOWER("Package"."slug") LIKE :startsWith OR LOWER("Package"."displayName") like all (array[:...queryArray]))`,
+                {
+                    startsWith: startsWith.trim().toLowerCase() + "%",
+                    queryArray: queryArray
+                }
+            )
             .addRelations(ALIAS, relations)
             .getMany();
 

@@ -54,7 +54,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
             .pipe(
                 debounceTime(500),
                 switchMap((value) => {
-                    if (value.length < 3) return [];
+                    if (value.length < 2) {
+                        this.autoCompleteResult = null;
+                        return [];
+                    }
                     return this.autocomplete.fetch({ startsWith: value });
                 })
             )
