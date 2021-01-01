@@ -113,7 +113,7 @@ describe("Collection Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.createPackage.catalog.displayName).to.equal("testA-collection");
+        expect(response.data!.createPackage.catalog?.displayName).to.equal("testA-collection");
         expect(response.data!.createPackage.description).to.equal("Test upload of congressional legislators");
         expect(response.data!.createPackage.displayName).to.equal("Congressional Legislators");
         expect(response.data!.createPackage.identifier.catalogSlug).to.equal("testA-collection");
@@ -178,7 +178,7 @@ describe("Collection Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").true;
-        expect(response.data!.createCollection.creator.username).equal("testB-collection");
+        expect(response.data!.createCollection.creator?.username).equal("testB-collection");
         expect(response.data!.createCollection.identifier.collectionSlug).equal("testB-collection");
         expect(response.data!.createCollection.name).equal("test b collection");
         expect(response.data!.createCollection.description).equal("Short test");

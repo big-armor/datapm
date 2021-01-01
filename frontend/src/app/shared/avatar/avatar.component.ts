@@ -55,7 +55,7 @@ export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
         if (changes.user && changes.user.currentValue) {
             this.user = changes.user.currentValue;
 
-            if (this.user?.nameIsPublic && this.user?.firstName && this.user?.lastName) {
+            if (this.user?.firstName && this.user?.lastName) {
                 this.letter =
                     this.user.firstName.substr(0, 1).toUpperCase() + this.user.lastName.substr(0, 1).toUpperCase();
             } else if (this.user.username != null) {

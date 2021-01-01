@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
 import { FormControl, FormGroup } from "@angular/forms";
+import { MatAutocomplete } from "@angular/material/autocomplete";
 
 type InputComponentStyle = "round" | "flat";
 
@@ -22,6 +23,7 @@ export class InputComponent implements OnInit, OnChanges {
     @Input() error: string = "";
     @Input() inputStyle: InputComponentStyle = "round";
     @Input() autoFocus: boolean = false;
+    @Input() matAutocomplete: MatAutocomplete;
     @Output() inputChange: EventEmitter<string>;
     @Output() keyEnter: EventEmitter<void>;
     @Output() focus: EventEmitter<any>;

@@ -2,16 +2,40 @@ query AutoComplete($startsWith: String!) {
     autoComplete(startsWith: $startsWith) {
         catalogs {
             identifier {
+                registryURL
                 catalogSlug
             }
             displayName
+            description
+            isPublic
         }
         packages {
+            updatedAt
             identifier {
+                registryURL
                 catalogSlug
                 packageSlug
             }
             displayName
+            description
+            latestVersion {
+                identifier {
+                    versionMajor
+                    versionMinor
+                    versionPatch
+                }
+            }
+        }
+        collections {
+            identifier {
+                collectionSlug
+            }
+            name
+            description
+        }
+        users {
+            username
+            emailAddress
         }
     }
 }

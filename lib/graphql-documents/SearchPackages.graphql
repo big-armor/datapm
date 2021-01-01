@@ -4,7 +4,7 @@ query SearchPackages($query: String!, $limit: Int!, $offset: Int!) {
             creator {
                 firstName
                 lastName
-                emailAddress
+                username
             }
             identifier {
                 catalogSlug

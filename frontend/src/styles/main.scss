@@ -43,7 +43,7 @@ body {
 }
 
 .loading-pane {
-    min-height: 500px;
+    min-height: 250px;
     padding-top: 50px;
 }
 
@@ -280,6 +280,11 @@ body {
     padding: 24px;
 }
 
+.search-autocomplete {
+    border-radius: 4px;
+    margin: 0px 10px;
+    margin-top: 2px;
+}
 .public-text {
     @include text("small");
     color: $color-1;

@@ -2,6 +2,7 @@ import { NgModule } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
+import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
 import { MatIconModule } from "@angular/material/icon";
@@ -83,6 +84,7 @@ import { SimpleCreateComponent } from "./user-details/simple-create/simple-creat
     ],
     imports: [
         CommonModule,
+        MatAutocompleteModule,
         MatButtonModule,
         MatCardModule,
         MatIconModule,

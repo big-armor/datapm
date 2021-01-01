@@ -22,3 +22,7 @@ export interface AuthenticatedContext extends Context {
     me: User;
     scopes: [];
 }
+
+export interface AutoCompleteContext extends Context {
+    query: string;
+}

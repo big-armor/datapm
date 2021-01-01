@@ -118,7 +118,7 @@ export class PackageRepository {
     }
 
     /** Use this function to create a user scoped query that returns only packages that should be visible to that user */
-    public createQueryBuilderWithUserConditions(user: User, permission: Permission = Permission.VIEW) {
+    public createQueryBuilderWithUserConditions(user: User | null, permission: Permission = Permission.VIEW) {
         if (user != null) {
             return this.createQueryBuilderWithUserConditionsByUserId(user.id, permission);
         }
@@ -403,14 +403,26 @@ export class PackageRepository {
         startsWith,
         relations = []
     }: {
-        user: User;
+        user: User | undefined;
         startsWith: string;
         relations?: string[];
     }): Promise<Package[]> {
         const ALIAS = "autoCompletePackage";
 
-        const entities = this.createQueryBuilderWithUserConditions(user)
-            .andWhere('LOWER("Package"."displayName") LIKE \'' + startsWith.toLowerCase() + "%'")
+        const queryArray = startsWith
+            .trim()
+            .toLowerCase()
+            .split(/\s+/)
+            .map((s) => `%${s}%`);
+
+        const entities = await this.createQueryBuilderWithUserConditions(user || null)
+            .andWhere(
+                `(LOWER("Package"."slug") LIKE :startsWith OR LOWER("Package"."displayName") like all (array[:...queryArray]))`,
+                {
+                    startsWith: startsWith.trim().toLowerCase() + "%",
+                    queryArray: queryArray
+                }
+            )
             .addRelations(ALIAS, relations)
             .getMany();
 
@@ -433,10 +445,10 @@ export class PackageRepository {
         const ALIAS = "search";
         return this.createQueryBuilderWithUserConditions(user)
             .andWhere(
-                `(readme_file_vectors @@ to_tsquery(:query) OR displayName_tokens @@ to_tsquery(:query) OR description_tokens @@ to_tsquery(:query) OR slug LIKE :queryLike)`,
+                `(readme_file_vectors @@ websearch_to_tsquery(:query) OR displayName_tokens @@ websearch_to_tsquery(:query) OR description_tokens @@ websearch_to_tsquery(:query) OR "Package"."slug" LIKE :queryLike OR "Package"."displayName" LIKE :queryLike)`,
                 {
                     query,
-                    queryLike: query + "%"
+                    queryLike: "%" + query + "%"
                 }
             )
             .limit(limit)
