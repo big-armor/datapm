@@ -445,7 +445,7 @@ export class PackageRepository {
         const ALIAS = "search";
         return this.createQueryBuilderWithUserConditions(user)
             .andWhere(
-                `(readme_file_vectors @@ websearch_to_tsquery(:query) OR displayName_tokens @@ websearch_to_tsquery(:query) OR description_tokens @@ websearch_to_tsquery(:query) OR slug LIKE :queryLike OR displayName LIKE :queryLike)`,
+                `(readme_file_vectors @@ websearch_to_tsquery(:query) OR displayName_tokens @@ websearch_to_tsquery(:query) OR description_tokens @@ websearch_to_tsquery(:query) OR "Package"."slug" LIKE :queryLike OR "Package"."displayName" LIKE :queryLike)`,
                 {
                     query,
                     queryLike: "%" + query + "%"
