@@ -610,7 +610,7 @@ type Query {
     userCatalogs(username: String! @validUsername, offSet: Int!, limit: Int!): CatalogsResult!
 
     """
-    Returns list of catalogs for the given user
+    Returns list of packages for the given user
     """
     userPackages(username: String! @validUsername, offSet: Int!, limit: Int!): PackagesResult!
 
