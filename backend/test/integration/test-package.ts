@@ -133,7 +133,7 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.createPackage.catalog.displayName).to.equal("testA-packages");
+        expect(response.data!.createPackage.catalog?.displayName).to.equal("testA-packages");
         expect(response.data!.createPackage.description).to.equal("Test upload of congressional legislators");
         expect(response.data!.createPackage.displayName).to.equal("Congressional Legislators");
         expect(response.data!.createPackage.identifier.catalogSlug).to.equal("testA-packages");
@@ -205,7 +205,7 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").equal(true);
-        expect(response.data!.package!.catalog.displayName).to.equal("testA-packages");
+        expect(response.data!.package!.catalog?.displayName).to.equal("testA-packages");
         expect(response.data!.package!.description).to.equal("Test upload of congressional legislators");
         expect(response.data!.package!.displayName).to.equal("Congressional Legislators");
         expect(response.data!.package!.identifier.catalogSlug).to.equal("testA-packages");
@@ -314,7 +314,7 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").true;
-        expect(response.data!.createVersion.author.username).equal("testA-packages");
+        expect(response.data!.createVersion.author?.username).equal("testA-packages");
 
         const responsePackageFileContents = response.data!.createVersion.packageFile;
 
@@ -346,7 +346,7 @@ describe("Package Tests", async () => {
             }
         });
         expect(response.errors == null, "no errors").equal(true);
-        expect(response.data!.updatePackage.catalog.displayName).to.equal("testA-packages");
+        expect(response.data!.updatePackage.catalog?.displayName).to.equal("testA-packages");
         expect(response.data!.updatePackage.description).to.equal("New description");
         expect(response.data!.updatePackage.displayName).to.equal("New displayName");
         expect(response.data!.updatePackage.identifier.catalogSlug).to.equal("testA-packages");
@@ -372,7 +372,7 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").equal(true);
-        expect(response.data!.package.catalog.displayName).to.equal("testA-packages");
+        expect(response.data!.package.catalog?.displayName).to.equal("testA-packages");
         expect(response.data!.package.description).to.equal("New description");
         expect(response.data!.package.displayName).to.equal("New displayName");
         expect(response.data!.package.identifier.catalogSlug).to.equal("testA-packages");
@@ -398,7 +398,7 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").equal(true);
-        expect(response.data!.package.catalog.displayName).to.equal("testA-packages");
+        expect(response.data!.package.catalog?.displayName).to.equal("testA-packages");
         expect(response.data!.package.description).to.equal("New description");
         expect(response.data!.package.displayName).to.equal("New displayName");
         expect(response.data!.package.identifier.catalogSlug).to.equal("testA-packages");
@@ -532,7 +532,7 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").true;
-        expect(response.data!.package.catalog.displayName).to.equal("testA-packages");
+        expect(response.data!.package.catalog?.displayName).to.equal("testA-packages");
         expect(response.data!.package.description).to.equal("New description");
         expect(response.data!.package.displayName).to.equal("New displayName");
         expect(response.data!.package.identifier.catalogSlug).to.equal("testA-packages");

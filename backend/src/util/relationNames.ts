@@ -33,6 +33,7 @@ function isEmpty(obj: any): boolean {
     ]
   */
 export function getRelationNames(obj: object, parentNames: string = ""): string[] {
+    if (obj == null) return [];
     let out: string[] = [];
 
     // TODO - This is hacky

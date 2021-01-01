@@ -1,7 +1,7 @@
 import "./util/prototypeExtensions";
 import { GraphQLScalarType } from "graphql";
 import { UserRepository } from "./repository/UserRepository";
-import { AuthenticatedContext, Context } from "./context";
+import { AuthenticatedContext, AutoCompleteContext, Context } from "./context";
 import { PackageRepository } from "./repository/PackageRepository";
 import {
     MutationResolvers,
@@ -18,7 +18,8 @@ import {
     SetUserCatalogPermissionInput,
     VersionIdentifierInput,
     Base64ImageUpload,
-    Permission
+    Permission,
+    AutoCompleteResultResolvers
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
@@ -118,6 +119,7 @@ import { PackageFileStorageService } from "./storage/packages/package-file-stora
 import { DateResolver } from "./resolvers/DateResolver";
 import { Permissions } from "./entity/Permissions";
 import { exit } from "process";
+import { CollectionRepository } from "./repository/CollectionRepository";
 import { userCatalogs } from "./resolvers/CatalogResolver";
 
 export const resolvers: {
@@ -138,7 +140,40 @@ export const resolvers: {
     UsernameOrEmailAddress: GraphQLScalarType;
     EmailAddress: GraphQLScalarType;
     CollectionSlug: GraphQLScalarType;
+    AutoCompleteResult: AutoCompleteResultResolvers;
 } = {
+    AutoCompleteResult: {
+        packages: async (parent: any, args: any, context: AutoCompleteContext, info: any) => {
+            return await context.connection.manager.getCustomRepository(PackageRepository).autocomplete({
+                user: context.me,
+                startsWith: context.query,
+                relations: getRelationNames(graphqlFields(info))
+            });
+        },
+        users: async (parent: any, args: any, context: AutoCompleteContext, info: any) => {
+            return await context.connection.manager.getCustomRepository(UserRepository).autocomplete({
+                user: context.me,
+                startsWith: context.query,
+                relations: getRelationNames(graphqlFields(info))
+            });
+        },
+
+        catalogs: async (parent: any, args: any, context: AutoCompleteContext, info: any) => {
+            return await context.connection.manager.getCustomRepository(CatalogRepository).autocomplete({
+                user: context.me,
+                startsWith: context.query,
+                relations: getRelationNames(graphqlFields(info))
+            });
+        },
+
+        collections: (parent: any, args: any, context: AutoCompleteContext, info: any) => {
+            return context.connection.manager.getCustomRepository(CollectionRepository).autocomplete({
+                user: context.me,
+                startsWith: context.query,
+                relations: getRelationNames(graphqlFields(info))
+            });
+        }
+    },
     PackageFileJSON: new GraphQLScalarType({
         name: "PackageFileJSON",
         serialize: (value: any) => {
@@ -515,29 +550,13 @@ export const resolvers: {
         userCatalogs: userCatalogs,
         userCollections: userCollections,
         userPackages: userPackages,
-        autoComplete: async (_0: any, { startsWith }, context: AuthenticatedContext, info: any) => {
-            const catalogs = context.connection.manager.getCustomRepository(CatalogRepository).autocomplete({
-                user: context.me,
-                startsWith,
-                relations: getRelationNames(graphqlFields(info).catalogs)
-            });
-
-            const packages = context.connection.manager.getCustomRepository(PackageRepository).autocomplete({
-                user: context.me,
-                startsWith,
-                relations: getRelationNames(graphqlFields(info).packages)
-            });
-
-            const users = context.connection.manager.getCustomRepository(PackageRepository).autocomplete({
-                user: context.me,
-                startsWith,
-                relations: getRelationNames(graphqlFields(info).users)
-            });
-
+        autoComplete: async (_0: any, { startsWith }, context: AutoCompleteContext, info: any) => {
+            context.query = startsWith;
             return {
-                catalogs: await catalogs,
-                packages: await packages,
-                users: await users
+                catalogs: [],
+                users: [],
+                collections: [],
+                packages: []
             };
         },
 

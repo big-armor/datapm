@@ -14,12 +14,12 @@ type User {
     website: String
     emailAddress: String
     gitHubHandle: String
-    nameIsPublic: Boolean!
-    locationIsPublic: Boolean!
-    twitterHandleIsPublic: Boolean!
-    gitHubHandleIsPublic: Boolean!
-    emailAddressIsPublic: Boolean!
-    websiteIsPublic: Boolean!
+    nameIsPublic: Boolean
+    locationIsPublic: Boolean
+    twitterHandleIsPublic: Boolean
+    gitHubHandleIsPublic: Boolean
+    emailAddressIsPublic: Boolean
+    websiteIsPublic: Boolean
 }
 
 """

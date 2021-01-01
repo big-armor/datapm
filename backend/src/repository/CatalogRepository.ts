@@ -63,7 +63,7 @@ async function getCatalogOrFail({
 @EntityRepository(Catalog)
 export class CatalogRepository extends Repository<Catalog> {
     /** Use this function to create a user scoped query that returns only catalogs that should be visible to that user */
-    createQueryBuilderWithUserConditions(user: User) {
+    createQueryBuilderWithUserConditions(user: User | null) {
         if (user == null) {
             return this.manager.getRepository(Catalog).createQueryBuilder().where(`("Catalog"."isPublic" is true)`);
         } else {
@@ -257,14 +257,17 @@ export class CatalogRepository extends Repository<Catalog> {
         startsWith,
         relations = []
     }: {
-        user: User;
+        user: User | undefined;
         startsWith: string;
         relations?: string[];
     }): Promise<Catalog[]> {
         const ALIAS = "autoCompleteCatalog";
 
-        const entities = this.createQueryBuilderWithUserConditions(user)
-            .andWhere('(LOWER("Catalog"."displayName") LIKE \'' + startsWith.toLowerCase() + "%')")
+        const entities = await this.createQueryBuilderWithUserConditions(user || null)
+            .andWhere(`(LOWER("Catalog"."slug") LIKE :valueLike OR LOWER("Catalog"."displayName") LIKE :valueLike)`, {
+                startsWith,
+                valueLike: startsWith.toLowerCase() + "%"
+            })
             .addRelations(ALIAS, relations)
             .getMany();
 
@@ -314,9 +317,13 @@ export class CatalogRepository extends Repository<Catalog> {
         const ALIAS = "search";
 
         const count = this.createQueryBuilderWithUserConditions(user)
-            .andWhere(`(displayName_tokens @@ to_tsquery(:query) OR description_tokens @@ to_tsquery(:query))`, {
-                query
-            })
+            .andWhere(
+                `(displayName_tokens @@ websearch_to_tsquery(:query) OR description_tokens @@ websearch_to_tsquery(:query) OR slug LIKE :queryLike))`,
+                {
+                    query,
+                    queryLike: query + "%"
+                }
+            )
             .limit(limit)
             .offset(offSet)
             .addRelations(ALIAS, relations)

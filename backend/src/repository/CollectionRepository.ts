@@ -144,6 +144,28 @@ export class CollectionRepository extends Repository<Collection> {
             .getMany();
     }
 
+    async autocomplete({
+        user,
+        startsWith,
+        relations = []
+    }: {
+        user: User | undefined;
+        startsWith: string;
+        relations?: string[];
+    }): Promise<Collection[]> {
+        const ALIAS = "autoCompleteCollection";
+
+        const entities = await this.createQueryBuilderWithUserConditions(user?.id)
+            .andWhere(`(LOWER("Collection"."slug") LIKE :queryLike OR LOWER("Collection"."name") LIKE :queryLike)`, {
+                startsWith,
+                queryLike: startsWith.toLowerCase() + "%"
+            })
+            .addRelations(ALIAS, relations)
+            .getMany();
+
+        return entities;
+    }
+
     public async search(
         userId: number,
         query: string,
@@ -153,7 +175,9 @@ export class CollectionRepository extends Repository<Collection> {
     ): Promise<[Collection[], number]> {
         return (
             this.createQueryBuilderWithUserConditions(userId)
-                .andWhere("(name_tokens @@ to_tsquery(:query) OR description_tokens @@ to_tsquery(:query))")
+                .andWhere(
+                    "(name_tokens @@ websearch_to_tsquery(:query) OR description_tokens @@ websearch_to_tsquery(:query))"
+                )
                 .setParameter("query", query)
                 .limit(limit)
                 .offset(offSet)
