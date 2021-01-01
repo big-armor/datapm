@@ -106,8 +106,6 @@ export class PackageComponent implements OnDestroy {
     }
 
     ngOnInit() {
-        this.state = State.LOADING;
-
         this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((event: NavigationEnd) => {
             this.updateFromUrl();
         });
@@ -120,10 +118,16 @@ export class PackageComponent implements OnDestroy {
     }
 
     updateFromUrl() {
-        this.catalogSlug = this.route.snapshot.paramMap.get("catalogSlug");
-        this.packageSlug = this.route.snapshot.paramMap.get("packageSlug");
+        const newCatalog = this.route.snapshot.paramMap.get("catalogSlug");
+        const newPackage = this.route.snapshot.paramMap.get("packageSlug");
 
-        this.packageService.getPackage(this.catalogSlug, this.packageSlug);
+        if (this.catalogSlug != newCatalog || this.packageSlug != newPackage) {
+            this.state = State.LOADING;
+            this.catalogSlug = newCatalog;
+            this.packageSlug = newPackage;
+
+            this.packageService.getPackage(this.catalogSlug, this.packageSlug);
+        }
     }
 
     ngOnDestroy(): void {
