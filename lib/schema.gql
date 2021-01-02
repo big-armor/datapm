@@ -406,7 +406,16 @@ input UpdateCatalogInput {
 
 input SetUserCatalogPermissionInput {
     username: String! @validUsername
+
+    """
+    The users permissions for the catalog itself
+    """
     permission: [Permission!]!
+
+    """
+    The users permissions for all packages in the catalog
+    """
+    packagePermission: [Permission!]!
 }
 
 """

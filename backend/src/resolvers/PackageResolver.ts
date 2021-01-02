@@ -1,6 +1,6 @@
 import { ApolloError, ForbiddenError, UserInputError } from "apollo-server";
 import graphqlFields from "graphql-fields";
-import { AuthenticatedContext } from "../context";
+import { AuthenticatedContext, Context } from "../context";
 import { Catalog } from "../entity/Catalog";
 import { Collection } from "../entity/Collection";
 import { Package } from "../entity/Package";
@@ -73,7 +73,7 @@ export const getLatestPackages = async (
     };
 };
 
-export const catalogPackagesForUser = async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+export const catalogPackagesForUser = async (parent: any, _1: any, context: Context, info: any) => {
     const catalog = parent as Catalog;
 
     return await context.connection.getCustomRepository(PackageRepository).catalogPackagesForUser({
@@ -229,8 +229,7 @@ export const setPackagePermissions = async (
     return context.connection.getCustomRepository(PackagePermissionRepository).setPackagePermissions({
         identifier,
         username,
-        permissions,
-        relations: getGraphQlRelationName(info)
+        permissions
     });
 };
 

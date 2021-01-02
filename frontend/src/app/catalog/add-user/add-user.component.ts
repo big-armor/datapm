@@ -40,6 +40,7 @@ export class AddUserComponent implements OnInit {
                 },
                 value: {
                     permission: [Permission.VIEW],
+                    packagePermission: [],
                     username: this.form.value.username
                 }
             })
