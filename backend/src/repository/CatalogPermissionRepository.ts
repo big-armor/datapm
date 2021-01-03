@@ -226,6 +226,7 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
                         catalogPermissionEntry.userId = user.id;
                         catalogPermissionEntry.catalogId = catalogEntity.id;
                         catalogPermissionEntry.permissions = value.permission;
+                        catalogPermissionEntry.packagePermission = value.packagePermission;
                         return await transaction.save(catalogPermissionEntry);
                     } catch (e) {
                         console.log(e);
@@ -238,7 +239,7 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
                         return await transaction
                             .createQueryBuilder()
                             .update(UserCatalogPermission)
-                            .set({ permissions: value.permission })
+                            .set({ permissions: value.permission, packagePermission: value.packagePermission })
                             .where({ catalogId: catalogEntity.id, userId: user.id })
                             .execute();
                     } catch (e) {

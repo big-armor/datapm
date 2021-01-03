@@ -14,8 +14,12 @@ import { ImageStorageService } from "../storage/images/image-storage-service";
 import { UserRepository } from "./UserRepository";
 
 const PUBLIC_PACKAGES_QUERY = '("Package"."isPublic" is true)';
-const AUTHENTICATED_USER_PACKAGES_QUERY = `(("Package"."isPublic" is false and "Package"."catalog_id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId))
-          or ("Package"."isPublic" is false and "Package".id in (select up.package_id from user_package_permission up where up.user_id = :userId and :permission = ANY(up.permission))))`;
+const AUTHENTICATED_USER_PACKAGES_QUERY = `
+    (
+        ("Package"."isPublic" is false and "Package"."catalog_id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId and :permission = ANY(uc.package_permission))) 
+        or 
+        ("Package"."isPublic" is false and "Package".id in (select up.package_id from user_package_permission up where up.user_id = :userId and :permission = ANY(up.permission)))
+    )`;
 const AUTHENTICATED_USER_OR_PUBLIC_PACKAGES_QUERY = `(${PUBLIC_PACKAGES_QUERY} or ${AUTHENTICATED_USER_PACKAGES_QUERY})`;
 
 async function findPackageById(
@@ -118,7 +122,7 @@ export class PackageRepository {
     }
 
     /** Use this function to create a user scoped query that returns only packages that should be visible to that user */
-    public createQueryBuilderWithUserConditions(user: User | null, permission: Permission = Permission.VIEW) {
+    public createQueryBuilderWithUserConditions(user: User | undefined, permission: Permission = Permission.VIEW) {
         if (user != null) {
             return this.createQueryBuilderWithUserConditionsByUserId(user.id, permission);
         }
@@ -155,12 +159,12 @@ export class PackageRepository {
         relations = []
     }: {
         catalogId: number;
-        user: User;
+        user?: User;
         relations?: string[];
     }): Promise<Package[]> {
         const ALIAS = "packagesForUser";
 
-        const packages = this.createQueryBuilderWithUserConditions(user)
+        const packages = await this.createQueryBuilderWithUserConditions(user)
             .andWhere(`"Package"."catalog_id" = :catalogId `, { catalogId: catalogId })
             .addRelations(ALIAS, relations)
             .getMany();
@@ -415,7 +419,7 @@ export class PackageRepository {
             .split(/\s+/)
             .map((s) => `%${s}%`);
 
-        const entities = await this.createQueryBuilderWithUserConditions(user || null)
+        const entities = await this.createQueryBuilderWithUserConditions(user)
             .andWhere(
                 `(LOWER("Package"."slug") LIKE :startsWith OR LOWER("Package"."displayName") like all (array[:...queryArray]))`,
                 {

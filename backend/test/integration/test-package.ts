@@ -10,7 +10,10 @@ import {
     DeletePackageDocument,
     MyPackagesDocument,
     GetLatestPackagesDocument,
-    UserPackagesDocument
+    UserPackagesDocument,
+    Permission,
+    SetPackagePermissionsDocument,
+    RemovePackagePermissionsDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import * as fs from "fs";
@@ -489,7 +492,7 @@ describe("Package Tests", async () => {
         ).to.not.equal(undefined);
     });
 
-    it("Anonymous user list should be available to user B", async function () {
+    it("User A packages list should be available to anonymous user", async function () {
         let response = await anonymousClient.query({
             query: UserPackagesDocument,
             variables: {
@@ -838,6 +841,113 @@ describe("Package Tests", async () => {
         expect(response.data!.createVersion.identifier.versionMajor).equal(2);
         expect(response.data!.createVersion.identifier.versionMinor).equal(0);
         expect(response.data!.createVersion.identifier.versionPatch).equal(0);
+    });
+
+    it("User A find myPermissions on package", async function () {
+        let response = await userAClient.query({
+            query: PackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                }
+            }
+        });
+
+        expect(response.errors! == null).true;
+
+        expect(response.data.package.myPermissions!.indexOf(Permission.MANAGE) !== -1).equal(true);
+        expect(response.data.package.myPermissions!.indexOf(Permission.VIEW) !== -1).equal(true);
+        expect(response.data.package.myPermissions!.indexOf(Permission.EDIT) !== -1).equal(true);
+    });
+
+    it("User B find myPermissions on package - view only", async function () {
+        let response = await userBClient.query({
+            query: PackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                }
+            }
+        });
+
+        expect(response.errors! == null).true;
+
+        expect(response.data.package.myPermissions!.indexOf(Permission.MANAGE) === -1).equal(true);
+        expect(response.data.package.myPermissions!.indexOf(Permission.VIEW) !== -1).equal(true);
+        expect(response.data.package.myPermissions!.indexOf(Permission.EDIT) === -1).equal(true);
+    });
+
+    it("User A give User B permission to package", async function () {
+        const newPermissions = [Permission.VIEW, Permission.EDIT, Permission.MANAGE];
+
+        let response = await userAClient.mutate({
+            mutation: SetPackagePermissionsDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                },
+                value: {
+                    username: "testB-packages",
+                    permissions: newPermissions
+                }
+            }
+        });
+
+        expect(response.errors! == null).true;
+    });
+
+    it("User B find myPermissions on package - all", async function () {
+        let response = await userBClient.query({
+            query: PackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                }
+            }
+        });
+
+        expect(response.errors! == null).true;
+
+        expect(response.data.package.myPermissions!.indexOf(Permission.MANAGE) !== -1).equal(true);
+        expect(response.data.package.myPermissions!.indexOf(Permission.VIEW) !== -1).equal(true);
+        expect(response.data.package.myPermissions!.indexOf(Permission.EDIT) !== -1).equal(true);
+    });
+
+    it("Remove User B permissions on package", async function () {
+        let response = await userAClient.mutate({
+            mutation: RemovePackagePermissionsDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                },
+                username: "testB-packages"
+            }
+        });
+
+        expect(response.errors! == null).true;
+    });
+
+    it("User B find myPermissions on package - view only after permissions removed", async function () {
+        let response = await userBClient.query({
+            query: PackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                }
+            }
+        });
+
+        expect(response.errors! == null).true;
+
+        expect(response.data.package.myPermissions!.indexOf(Permission.MANAGE) === -1).equal(true);
+        expect(response.data.package.myPermissions!.indexOf(Permission.VIEW) !== -1).equal(true);
+        expect(response.data.package.myPermissions!.indexOf(Permission.EDIT) === -1).equal(true);
     });
 
     it("User A delete package", async function () {

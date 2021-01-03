@@ -72,7 +72,8 @@ describe("Catalog Permissions", async () => {
                 },
                 value: {
                     username: "my-test-user200",
-                    permission: newPermissions
+                    permission: newPermissions,
+                    packagePermission: []
                 }
             }
         });
@@ -91,7 +92,8 @@ describe("Catalog Permissions", async () => {
                 },
                 value: {
                     username: "my-test-user202",
-                    permission: newPermissions
+                    permission: newPermissions,
+                    packagePermission: []
                 }
             }
         });
@@ -110,7 +112,8 @@ describe("Catalog Permissions", async () => {
                 },
                 value: {
                     username: "my-test-user201",
-                    permission: newPermissions
+                    permission: newPermissions,
+                    packagePermission: []
                 }
             }
         });
@@ -129,7 +132,8 @@ describe("Catalog Permissions", async () => {
                 },
                 value: {
                     username: "my-test-user200",
-                    permission: newPermissions
+                    permission: newPermissions,
+                    packagePermission: []
                 }
             }
         });
@@ -182,7 +186,8 @@ describe("Catalog Permissions", async () => {
                 },
                 value: {
                     username: "my-test-user201",
-                    permission: newPermissions
+                    permission: newPermissions,
+                    packagePermission: []
                 }
             }
         });
@@ -226,7 +231,8 @@ describe("Catalog Permissions", async () => {
                 },
                 value: {
                     username: "my-test-user200",
-                    permission: newPermissions
+                    permission: newPermissions,
+                    packagePermission: []
                 }
             }
         });

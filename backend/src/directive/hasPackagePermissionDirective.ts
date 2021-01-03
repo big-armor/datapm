@@ -18,6 +18,49 @@ import { Permission, PackageIdentifier, PackageIdentifierInput } from "../genera
 import { PackageRepository } from "../repository/PackageRepository";
 import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
+import { User } from "../entity/User";
+
+export async function resolvePackagePermissions(
+    context: Context,
+    identifier: PackageIdentifierInput,
+    user?: User
+): Promise<Permission[]> {
+    const permissions: Permission[] = [];
+
+    const packageEntity = await context.connection
+        .getCustomRepository(PackageRepository)
+        .findPackageOrFail({ identifier });
+
+    if (packageEntity.isPublic) permissions.push(Permission.VIEW);
+
+    if (user == null) return permissions;
+
+    const userPermission = await context.connection
+        .getCustomRepository(PackagePermissionRepository)
+        .findPackagePermissions({
+            packageId: packageEntity.id,
+            userId: user.id
+        });
+
+    if (userPermission != null)
+        userPermission.permissions.forEach((p) => {
+            if (!permissions.includes(p)) permissions.push(p);
+        });
+
+    const catalogPermissions = await context.connection
+        .getCustomRepository(UserCatalogPermissionRepository)
+        .findCatalogPermissions({
+            catalogId: packageEntity.catalogId,
+            userId: user!.id
+        });
+
+    if (catalogPermissions != null)
+        catalogPermissions.packagePermission.forEach((p) => {
+            if (!permissions.includes(p)) permissions.push(p);
+        });
+
+    return permissions;
+}
 
 async function hasPermission(
     permission: Permission,
@@ -25,52 +68,11 @@ async function hasPermission(
     identifier: PackageIdentifierInput
 ): Promise<void> {
     // Check that the package exists
-    const packageEntity = await context.connection.getCustomRepository(PackageRepository).findPackage({
-        identifier,
-        relations: ["catalog"]
-    });
+    const permissions = await resolvePackagePermissions(context, identifier, context.me);
 
-    if (packageEntity == null) throw new UserInputError("PACKAGE_NOT_FOUND");
+    if (permissions.includes(permission)) return;
 
-    if (permission == Permission.VIEW && packageEntity.isPublic === true && packageEntity.catalog.isPublic === true)
-        return;
-
-    if (context.me === undefined) {
-        throw new AuthenticationError(`NOT_AUTHENTICATED`);
-    }
-
-    const packagePermissions = await context.connection
-        .getCustomRepository(PackagePermissionRepository)
-        .findPackagePermissions({
-            packageId: packageEntity.id,
-            userId: context.me?.id
-        });
-
-    if (packagePermissions === undefined) throw new ForbiddenError(`NOT_AUTHORIZED`);
-
-    let foundPackagePermission = false;
-
-    for (let p of packagePermissions.permissions) {
-        if (p === permission) {
-            foundPackagePermission = true;
-            continue;
-        }
-    }
-
-    if (!foundPackagePermission) throw new ForbiddenError(`NOT_AUTHORIZED`);
-
-    const catalogPermissions = await context.connection
-        .getCustomRepository(UserCatalogPermissionRepository)
-        .findCatalogPermissions({
-            catalogId: packageEntity.catalogId,
-            userId: context.me?.id
-        });
-
-    if (catalogPermissions === undefined) throw new ForbiddenError(`NOT_AUTHORIZED`);
-
-    for (let c of catalogPermissions.permissions) {
-        if (c === Permission.VIEW) return;
-    }
+    if (context.me == null) throw new AuthenticationError(`NOT_AUTHENTICATED`);
 
     throw new ForbiddenError(`NOT_AUTHORIZED`);
 }

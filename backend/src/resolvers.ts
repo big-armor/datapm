@@ -29,6 +29,7 @@ import { APIKeyRepository } from "./repository/APIKeyRepository";
 import { User } from "./entity/User";
 import { UserCatalogPermission } from "./entity/UserCatalogPermission";
 import { UserCatalogPermissionRepository } from "./repository/CatalogPermissionRepository";
+import { PackagePermissionRepository } from "./repository/PackagePermissionRepository";
 import { isAuthenticatedContext } from "./util/contextHelpers";
 import { Version } from "./entity/Version";
 import { Package } from "./entity/Package";
@@ -121,6 +122,9 @@ import { Permissions } from "./entity/Permissions";
 import { exit } from "process";
 import { CollectionRepository } from "./repository/CollectionRepository";
 import { userCatalogs } from "./resolvers/CatalogResolver";
+import { UserPackagePermission } from "./entity/UserPackagePermission";
+import { resolvePackagePermissions } from "./directive/hasPackagePermissionDirective";
+import { resolveCatalogPermissions } from "./directive/hasCatalogPermissionDirective";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -337,33 +341,7 @@ export const resolvers: {
         myPermissions: async (parent: any, _1: any, context: Context) => {
             const catalog = parent as Catalog;
 
-            if (context.me == null) {
-                if (catalog.isPublic) return [Permission.VIEW];
-
-                console.error(
-                    "Anonymous user request just resolved permissions for a non-public catalog!!! THIS IS BAD!!!"
-                );
-                exit(1); // Shut down the server so the admin knows something very bad happened
-            }
-
-            const userPermission = await context.connection
-                .getCustomRepository(UserCatalogPermissionRepository)
-                .findCatalogPermissions({
-                    catalogId: catalog.id,
-                    userId: context.me.id
-                });
-
-            if (userPermission == null) {
-                if (catalog.isPublic) return [Permission.VIEW];
-                console.error(
-                    "User " +
-                        context.me.username +
-                        " request just resolved permissions for a non-public catalog to which they have no permissions!!! THIS IS BAD!!!"
-                );
-                exit(1); // Shut down the server so the admin knows something very bad happened
-            }
-
-            return userPermission.permissions;
+            return resolveCatalogPermissions(context, { catalogSlug: catalog.slug }, context.me);
         }
     },
     Collection: {
@@ -434,7 +412,23 @@ export const resolvers: {
         },
 
         identifier: findPackageIdentifier,
-        creator: findPackageCreator
+        creator: findPackageCreator,
+        myPermissions: async (parent: any, _0: any, context: AuthenticatedContext) => {
+            const packageEntity = parent as Package;
+
+            const catalog = await context.connection.getRepository(Catalog).findOne(packageEntity.catalogId);
+
+            if (catalog == null) throw new Error("CATALOG_NOT_FOUND - " + packageEntity.catalogId);
+
+            return resolvePackagePermissions(
+                context,
+                {
+                    catalogSlug: catalog?.slug,
+                    packageSlug: packageEntity.slug
+                },
+                context.me
+            );
+        }
     },
 
     Version: {

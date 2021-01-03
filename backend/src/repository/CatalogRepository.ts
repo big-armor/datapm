@@ -1,25 +1,15 @@
 import { EntityRepository, Repository, EntityManager, SelectQueryBuilder, Like } from "typeorm";
 
 import { User } from "../entity/User";
-import {
-    UpdateCatalogInput,
-    CreateCatalogInput,
-    Permission,
-    CatalogIdentifier,
-    CatalogIdentifierInput,
-    CatalogsResult
-} from "../generated/graphql";
+import { UpdateCatalogInput, CreateCatalogInput, Permission, CatalogIdentifierInput } from "../generated/graphql";
 import { Catalog } from "../entity/Catalog";
 import { Package } from "../entity/Package";
-import { UserCatalogPermission } from "../entity/UserCatalogPermission";
-import { Permissions } from "../entity/Permissions";
-import { UserCatalogPermissionRepository, grantUserCatalogPermission } from "./CatalogPermissionRepository";
+import { grantUserCatalogPermission } from "./CatalogPermissionRepository";
 import { PackageRepository } from "./PackageRepository";
-import { Identifier } from "../util/IdentifierUtil";
-import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { StorageErrors } from "../storage/files/file-storage-service";
 import { UserRepository } from "./UserRepository";
+import { View } from "typeorm/schema-builder/view/View";
 
 // https://stackoverflow.com/a/52097700
 export function isDefined<T>(value: T | undefined | null): value is T {
@@ -63,14 +53,18 @@ async function getCatalogOrFail({
 @EntityRepository(Catalog)
 export class CatalogRepository extends Repository<Catalog> {
     /** Use this function to create a user scoped query that returns only catalogs that should be visible to that user */
-    createQueryBuilderWithUserConditions(user: User | null) {
+    createQueryBuilderWithUserConditions(user: User | null, permission: Permission) {
         if (user == null) {
             return this.manager.getRepository(Catalog).createQueryBuilder().where(`("Catalog"."isPublic" is true)`);
         } else {
             return this.manager.getRepository(Catalog).createQueryBuilder().where(
-                `("Catalog"."isPublic" is true 
-        or ("Catalog"."isPublic" is false and "Catalog"."id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId)))`,
-                { userId: user.id }
+                `
+                (
+                    "Catalog"."isPublic" is true 
+                    or 
+                    ("Catalog"."isPublic" is false and "Catalog"."id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId and :permission = ANY(uc.permission)))
+                )`,
+                { userId: user.id, permission }
             );
         }
     }
@@ -263,7 +257,7 @@ export class CatalogRepository extends Repository<Catalog> {
     }): Promise<Catalog[]> {
         const ALIAS = "autoCompleteCatalog";
 
-        const entities = await this.createQueryBuilderWithUserConditions(user || null)
+        const entities = await this.createQueryBuilderWithUserConditions(user || null, Permission.VIEW)
             .andWhere(`(LOWER("Catalog"."slug") LIKE :valueLike OR LOWER("Catalog"."displayName") LIKE :valueLike)`, {
                 startsWith,
                 valueLike: startsWith.toLowerCase() + "%"
@@ -288,7 +282,7 @@ export class CatalogRepository extends Repository<Catalog> {
         relations?: string[];
     }): Promise<[Catalog[], number]> {
         const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
-        const response = await this.createQueryBuilderWithUserConditions(user)
+        const response = await this.createQueryBuilderWithUserConditions(user, Permission.VIEW)
             .andWhere(
                 `("Catalog"."id" IN (SELECT "catalog_id" FROM "user_catalog" uc WHERE "uc"."user_id" = :targetUserId AND 'MANAGE' = ANY( "uc"."permission") ))`
             )
@@ -316,7 +310,7 @@ export class CatalogRepository extends Repository<Catalog> {
     }): Promise<[Catalog[], number]> {
         const ALIAS = "search";
 
-        const count = this.createQueryBuilderWithUserConditions(user)
+        const count = this.createQueryBuilderWithUserConditions(user, Permission.VIEW)
             .andWhere(
                 `(displayName_tokens @@ websearch_to_tsquery(:query) OR description_tokens @@ websearch_to_tsquery(:query) OR slug LIKE :queryLike))`,
                 {

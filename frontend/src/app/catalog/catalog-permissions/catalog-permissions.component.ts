@@ -108,7 +108,8 @@ export class CatalogPermissionsComponent implements OnInit {
                 },
                 value: {
                     username,
-                    permission: permissions
+                    permission: permissions,
+                    packagePermission: []
                 }
             })
             .subscribe(() => {

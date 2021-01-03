@@ -73,7 +73,7 @@ export class PackagePermissionRepository {
             // ensure user exists and is part of team
             const user = await transaction.getCustomRepository(UserRepository).findUser({ username });
             if (!user) {
-                throw new Error(`User ${username} not found`);
+                throw new Error(`USER_NOT_FOUND - ${username}`);
             }
 
             const catalogSlug = identifier.catalogSlug;
@@ -94,17 +94,6 @@ export class PackagePermissionRepository {
                     permissions: permissions
                 })
                 .execute();
-
-            // return all case roles associated with this caseId with relations
-            const packagePermission = await getPackagePermissions({
-                manager: transaction,
-                packageId: packageEntity.id,
-                userId: user.id,
-                relations
-            });
-
-            if (packagePermission === undefined)
-                throw new Error(`Package not found after updating permissions. This should never happen!`);
         });
     }
 
