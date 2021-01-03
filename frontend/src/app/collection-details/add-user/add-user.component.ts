@@ -4,6 +4,10 @@ import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { PageState } from "src/app/models/page-state";
 import { Permission, SetUserCollectionPermissionsGQL } from "src/generated/graphql";
 
+enum ErrorType {
+    USER_NOT_FOUND = "USER_NOT_FOUND",
+    CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS = "CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS"
+}
 @Component({
     selector: "app-add-user",
     templateUrl: "./add-user.component.html",
@@ -12,6 +16,7 @@ import { Permission, SetUserCollectionPermissionsGQL } from "src/generated/graph
 export class AddUserComponent implements OnInit {
     public form: FormGroup;
     public state: PageState = "INIT";
+    public error: ErrorType = null;
 
     constructor(
         private setUserCollectionPermissionsGQL: SetUserCollectionPermissionsGQL,
@@ -44,7 +49,16 @@ export class AddUserComponent implements OnInit {
                 }
             })
             .subscribe(
-                ({ data }) => {
+                ({ errors, data }) => {
+                    if (errors) {
+                        this.state = "ERROR";
+
+                        if (errors[0].message.includes("USER_NOT_FOUND")) this.error = ErrorType.USER_NOT_FOUND;
+                        else if (errors[0].message.includes("CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS"))
+                            this.error = ErrorType.CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS;
+                        else this.error = null;
+                        return;
+                    }
                     this.dialogRef.close("SUCCESS");
                 },
                 () => {

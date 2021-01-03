@@ -86,6 +86,26 @@ describe("Collection Permissions", async () => {
         expect(response.errors![0].message).to.equal("USER_NOT_FOUND - my-test-user102");
     });
 
+    it("Can not set permissions for creator", async function () {
+        const newPermissions = [Permission.VIEW];
+        let response = await userAClient.mutate({
+            mutation: SetUserCollectionPermissionsDocument,
+            variables: {
+                identifier: {
+                    collectionSlug: "testA-collection-permissions"
+                },
+                value: {
+                    username: "my-test-user100",
+                    permissions: newPermissions
+                }
+            }
+        });
+
+        expect(response.errors! !== null).equal(true);
+        expect(response.errors!.find((e) => e.message.includes("CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS"))).is.not
+            .null;
+    });
+
     it("successfully setting permissions for authorized use case", async function () {
         const newPermissions = [Permission.VIEW];
         let response = await userAClient.mutate({

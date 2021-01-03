@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute, Router, NavigationExtras } from "@angular/router";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { PageState } from "src/app/models/page-state";
@@ -17,7 +17,7 @@ export class UserDetailsPageComponent implements OnInit {
     public username: string;
     public state: PageState = "INIT";
     public tabs: TabModel[] = [];
-    public selectedTab: string = "packages";
+    public selectedTab: string = "";
     public isCurrentUser: boolean = false;
 
     private subscription = new Subject();
@@ -47,11 +47,11 @@ export class UserDetailsPageComponent implements OnInit {
         }
 
         this.route.fragment.pipe(takeUntil(this.subscription)).subscribe((fragment: string) => {
-            const index = this.tabs.findIndex((tab) => tab.value === fragment);
+            const index = this.tabs.findIndex((tab) => tab.value === (fragment || ""));
             if (index < 0) {
                 this.selectTab(this.tabs[0].value);
             } else {
-                this.selectedTab = fragment;
+                this.selectedTab = fragment || "";
             }
         });
     }
@@ -78,9 +78,12 @@ export class UserDetailsPageComponent implements OnInit {
     }
 
     public selectTab(tab: string) {
-        this.router.navigate(["."], {
-            relativeTo: this.route,
-            fragment: tab
-        });
+        const extras: NavigationExtras = {
+            relativeTo: this.route
+        };
+
+        if (tab !== "") extras.fragment = tab;
+
+        this.router.navigate(["."], extras);
     }
 }

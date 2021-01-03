@@ -14,7 +14,17 @@
             </div>
         </div>
         <div class="text-danger mt-3" *ngIf="state === 'ERROR'">
-            Error occured while adding a user permission to the collection
+            <ng-container [ngSwitch]="error">
+                <ng-container *ngSwitchCase="'CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS'">
+                    You can not change the permissions of the collection owner.
+                </ng-container>
+                <ng-container *ngSwitchCase="'USER_NOT_FOUND'">
+                    There is no user with that username on this registry.
+                </ng-container>
+                <ng-container *ngSwitchDefault>
+                    Error occured while adding a user permission to the collection
+                </ng-container>
+            </ng-container>
         </div>
     </div>
     <div mat-dialog-actions class="d-flex justify-content-end">

@@ -1,23 +1,6 @@
 <div class="collection-details">
     <div class="container">
-        <app-cover [collectionSlug]="collectionSlug"></app-cover>
-        <div class="collection-header px-4 py-3 mt-4">
-            <div class="collections-public">
-                <span *ngIf="collection?.isPublic" class="public-text">public</span>
-                <span *ngIf="!collection?.isPublic" class="not-public-text">not public</span>
-            </div>
-            <h1 class="dpm-text-title mb-1">{{ collection?.name }}</h1>
-            <h3 class="dpm-text-body mb-1 collection-slug">{{ collectionSlug }}</h3>
-            <p class="dpm-text-small collection-description">
-                {{ collection?.description }}
-            </p>
-            <a class="app-outlined-button edit-button" (click)="editCollection()" *ngIf="canEdit">Edit collection</a>
-        </div>
-        <mat-tab-group [(selectedIndex)]="currentTab" disableRipple class="collection-tabs px-3">
-            <mat-tab label="Pacages"></mat-tab>
-            <mat-tab label="Permissions" *ngIf="canManage"></mat-tab>
-        </mat-tab-group>
-        <div *ngIf="state === 'SUCCESS' && currentTab === 0">
+        <div *ngIf="state === 'SUCCESS'">
             <app-cover [collectionSlug]="collectionSlug"></app-cover>
             <div class="collection-header px-4 py-3 mt-4">
                 <div *ngIf="collection" class="collections-public">
@@ -34,24 +17,27 @@
                 <mat-tab label="Packages"></mat-tab>
                 <mat-tab label="Permissions" *ngIf="canManage"></mat-tab>
             </mat-tab-group>
-            <app-package-item
-                [item]="package"
-                [hasImage]="true"
-                ctaText="Remove From Collection"
-                [showCta]="canEdit"
-                (action)="removePackage(package)"
-                *ngFor="let package of collection.packages"
-            >
-            </app-package-item>
-            <div class="dpm-no-data" *ngIf="!collection.packages?.length">
-                <p>There are no packages available.</p>
-                <a class="app-outlined-button mt-3" (click)="addPackage()" *ngIf="canEdit">Add a package</a>
+            <div *ngIf="currentTab === 0">
+                <app-package-item
+                    [item]="package"
+                    [hasImage]="true"
+                    ctaText="Remove From Collection"
+                    [showCta]="canEdit"
+                    (action)="removePackage(package)"
+                    *ngFor="let package of collection.packages"
+                >
+                </app-package-item>
+                <div class="dpm-no-data" *ngIf="!collection.packages?.length">
+                    <p>
+                        This collection either contains no packages, or you do not have permission to view the packages
+                        it contains.
+                    </p>
+                    <a class="app-outlined-button mt-3" (click)="addPackage()" *ngIf="canEdit">Add a package</a>
+                </div>
             </div>
+            <app-collection-permissions [collection]="collection" *ngIf="currentTab === 1"></app-collection-permissions>
         </div>
-        <app-collection-permissions
-            [collection]="collection"
-            *ngIf="state === 'SUCCESS' && currentTab === 1"
-        ></app-collection-permissions>
+
         <div *ngIf="state === 'NOT_AUTHORIZED'">
             <div class="dpm-no-data">
                 <p>You do not have permission to view this collection.</p>
