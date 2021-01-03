@@ -58,7 +58,7 @@ describe("Collection Permissions", async () => {
                     collectionSlug: "testA-collection-permissions"
                 },
                 value: {
-                    username: "my-test-user100",
+                    usernameOrEmailAddress: "my-test-user100",
                     permissions: newPermissions
                 }
             }
@@ -77,7 +77,7 @@ describe("Collection Permissions", async () => {
                     collectionSlug: "testA-collection-permissions"
                 },
                 value: {
-                    username: "my-test-user102",
+                    usernameOrEmailAddress: "my-test-user102",
                     permissions: newPermissions
                 }
             }
@@ -95,7 +95,7 @@ describe("Collection Permissions", async () => {
                     collectionSlug: "testA-collection-permissions"
                 },
                 value: {
-                    username: "my-test-user100",
+                    usernameOrEmailAddress: "my-test-user100",
                     permissions: newPermissions
                 }
             }
@@ -115,7 +115,7 @@ describe("Collection Permissions", async () => {
                     collectionSlug: "testA-collection-permissions"
                 },
                 value: {
-                    username: "my-test-user101",
+                    usernameOrEmailAddress: "my-test-user101",
                     permissions: newPermissions
                 }
             }
@@ -134,7 +134,7 @@ describe("Collection Permissions", async () => {
                     collectionSlug: "testA-collection-permissions"
                 },
                 value: {
-                    username: "my-test-user101",
+                    usernameOrEmailAddress: "my-test-user101",
                     permissions: newPermissions
                 }
             }
@@ -185,7 +185,7 @@ describe("Collection Permissions", async () => {
                     collectionSlug: "testF-collection"
                 },
                 value: {
-                    username: "my-test-user101",
+                    usernameOrEmailAddress: "my-test-user101",
                     permissions: newPermissions
                 }
             }

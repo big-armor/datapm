@@ -1,5 +1,6 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { ReactiveFormsModule } from "@angular/forms";
+import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 
 import { SharedModule } from "../../shared/shared.module";
@@ -12,7 +13,7 @@ describe("AddPackageComponent", () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             declarations: [AddUserComponent],
-            imports: [ReactiveFormsModule, MatDialogModule, SharedModule],
+            imports: [ReactiveFormsModule, MatDialogModule, SharedModule, MatAutocompleteModule],
             providers: [
                 {
                     provide: MatDialogRef,

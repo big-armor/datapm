@@ -94,10 +94,12 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
         relations?: string[];
     }): Promise<void> {
         await this.manager.nestedTransaction(async (transaction) => {
-            const user = await transaction.getCustomRepository(UserRepository).getUserByUsername(value.username);
+            const user = await transaction
+                .getCustomRepository(UserRepository)
+                .getUserByUsername(value.usernameOrEmailAddress);
 
             if (!user) {
-                throw new Error(`USER_NOT_FOUND - ${value.username}`);
+                throw new Error(`USER_NOT_FOUND - ${value.usernameOrEmailAddress}`);
             }
 
             const collectionEntity = await transaction

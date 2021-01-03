@@ -105,7 +105,7 @@ export class CollectionPermissionsComponent implements OnInit {
                     collectionSlug: this.collection?.identifier.collectionSlug
                 },
                 value: {
-                    username,
+                    usernameOrEmailAddress: username,
                     permissions
                 }
             })
