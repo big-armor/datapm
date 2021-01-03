@@ -9,6 +9,15 @@ import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { GraphQLModule } from "./graphql.module";
 import { SharedModule } from "./shared/shared.module";
+import { MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions } from "@angular/material/core";
+
+const globalRippleConfig: RippleGlobalOptions = {
+    disabled: true,
+    animation: {
+        enterDuration: 300,
+        exitDuration: 0
+    }
+};
 
 @NgModule({
     declarations: [AppComponent],
@@ -23,7 +32,7 @@ import { SharedModule } from "./shared/shared.module";
         SharedModule,
         MarkdownModule.forRoot()
     ],
-    providers: [],
+    providers: [{ provide: MAT_RIPPLE_GLOBAL_OPTIONS, useValue: globalRippleConfig }],
     bootstrap: [AppComponent],
     entryComponents: [],
     schemas: []

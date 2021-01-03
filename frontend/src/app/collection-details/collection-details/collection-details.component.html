@@ -28,7 +28,10 @@
                 >
                 </app-package-item>
                 <div class="dpm-no-data" *ngIf="!collection.packages?.length">
-                    <p>There are no packages available.</p>
+                    <p>
+                        This collection either contains no packages, or you do not have permission to view the packages
+                        it contains.
+                    </p>
                     <a class="app-outlined-button mt-3" (click)="addPackage()" *ngIf="canEdit">Add a package</a>
                 </div>
             </div>

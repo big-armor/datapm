@@ -104,6 +104,8 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
                 .getCustomRepository(CollectionRepository)
                 .findCollectionBySlugOrFail(identifier.collectionSlug);
 
+            if (user.id == collectionEntity.creatorId) throw new Error(`CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS`);
+
             const permissions = await this.findByUserAndCollectionId(user.id, collectionEntity.id);
 
             // If permission input is not empty
