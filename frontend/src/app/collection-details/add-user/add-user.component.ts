@@ -6,7 +6,7 @@ import { PageState } from "src/app/models/page-state";
 import {
     AutoCompleteGQL,
     AutoCompleteResult,
-    AutoCompleteUsersGQL,
+    AutoCompleteUserGQL,
     Permission,
     SetUserCollectionPermissionsGQL
 } from "src/generated/graphql";
@@ -31,7 +31,7 @@ export class AddUserComponent implements OnInit {
         private setUserCollectionPermissionsGQL: SetUserCollectionPermissionsGQL,
         private dialogRef: MatDialogRef<AddUserComponent>,
         @Inject(MAT_DIALOG_DATA) private collectionSlug: string,
-        private autocompleteUsers: AutoCompleteUsersGQL
+        private autocompleteUsers: AutoCompleteUserGQL
     ) {}
 
     ngOnInit(): void {
@@ -92,6 +92,4 @@ export class AddUserComponent implements OnInit {
                 }
             );
     }
-
-    autoCompleteOptionSelected(event: Event) {}
 }

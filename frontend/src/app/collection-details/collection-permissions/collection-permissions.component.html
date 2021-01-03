@@ -18,7 +18,7 @@
 <table mat-table [dataSource]="users" *ngIf="users.length > 0">
     <!-- Label column -->
     <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <th mat-header-cell *matHeaderCellDef>User</th>
         <td class="table-content" mat-cell *matCellDef="let user">
             <a>{{ user.name }}</a>
         </td>
