@@ -18,7 +18,6 @@ import {
 import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
 import { loadPackageFileFromDisk } from "datapm-lib";
-import { ServerError } from "@apollo/client/core";
 
 describe("Collection Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
