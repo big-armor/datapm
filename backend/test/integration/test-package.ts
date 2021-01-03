@@ -13,7 +13,8 @@ import {
     UserPackagesDocument,
     Permission,
     SetPackagePermissionsDocument,
-    RemovePackagePermissionsDocument
+    RemovePackagePermissionsDocument,
+    UsersByPackageDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import * as fs from "fs";
@@ -917,6 +918,22 @@ describe("Package Tests", async () => {
         expect(response.data.package.myPermissions!.indexOf(Permission.EDIT) !== -1).equal(true);
     });
 
+    it("User A should be able to list users with access to package", async function () {
+        let response = await userAClient.query({
+            query: UsersByPackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                }
+            }
+        });
+
+        expect(response.errors! == null).true;
+
+        expect(response.data.usersByPackage!.length).equal(2);
+    });
+
     it("Remove User B permissions on package", async function () {
         let response = await userAClient.mutate({
             mutation: RemovePackagePermissionsDocument,
@@ -930,6 +947,38 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors! == null).true;
+    });
+
+    it("User A should be able to list users with access to package - after removing user B", async function () {
+        let response = await userAClient.query({
+            query: UsersByPackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                }
+            }
+        });
+
+        expect(response.errors! == null).true;
+
+        expect(response.data.usersByPackage!.length).equal(1);
+    });
+
+    it("User B should not be able to list users with access to package - not a manager", async function () {
+        let response = await userBClient.query({
+            query: UsersByPackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                }
+            }
+        });
+
+        expect(response.errors! !== null).true;
+
+        expect(response.errors!.find((e) => e.message.includes("NOT_AUTHORIZED"))).is.not.null;
     });
 
     it("User B find myPermissions on package - view only after permissions removed", async function () {
