@@ -1,8 +1,15 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { FormGroup, FormControl, Validators } from "@angular/forms";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { debounceTime, switchMap } from "rxjs/operators";
 import { PageState } from "src/app/models/page-state";
-import { Permission, SetUserCollectionPermissionsGQL } from "src/generated/graphql";
+import {
+    AutoCompleteGQL,
+    AutoCompleteResult,
+    AutoCompleteUsersGQL,
+    Permission,
+    SetUserCollectionPermissionsGQL
+} from "src/generated/graphql";
 
 enum ErrorType {
     USER_NOT_FOUND = "USER_NOT_FOUND",
@@ -17,17 +24,36 @@ export class AddUserComponent implements OnInit {
     public form: FormGroup;
     public state: PageState = "INIT";
     public error: ErrorType = null;
+    public usernameControl: FormControl = new FormControl("", [Validators.required]);
+    autoCompleteResult: AutoCompleteResult;
 
     constructor(
         private setUserCollectionPermissionsGQL: SetUserCollectionPermissionsGQL,
         private dialogRef: MatDialogRef<AddUserComponent>,
-        @Inject(MAT_DIALOG_DATA) private collectionSlug: string
+        @Inject(MAT_DIALOG_DATA) private collectionSlug: string,
+        private autocompleteUsers: AutoCompleteUsersGQL
     ) {}
 
     ngOnInit(): void {
         this.form = new FormGroup({
-            username: new FormControl("", [Validators.required])
+            username: this.usernameControl
         });
+
+        this.usernameControl.valueChanges
+            .pipe(
+                debounceTime(500),
+                switchMap((value) => {
+                    if (value.length < 2) {
+                        this.autoCompleteResult = null;
+                        return [];
+                    }
+                    return this.autocompleteUsers.fetch({ startsWith: value });
+                })
+            )
+            .subscribe((result) => {
+                if (result.errors != null) this.autoCompleteResult = null;
+                else this.autoCompleteResult = result.data.autoComplete;
+            });
     }
 
     submit(ev) {
@@ -45,7 +71,7 @@ export class AddUserComponent implements OnInit {
                 },
                 value: {
                     permissions: [Permission.VIEW],
-                    username: this.form.value.username
+                    usernameOrEmailAddress: this.form.value.username
                 }
             })
             .subscribe(
@@ -66,4 +92,6 @@ export class AddUserComponent implements OnInit {
                 }
             );
     }
+
+    autoCompleteOptionSelected(event: Event) {}
 }

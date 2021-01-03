@@ -157,6 +157,18 @@ export class UserRepository extends Repository<User> {
         return user;
     }
 
+    getUserByUsernameOrEmailAddress(username: string) {
+        const ALIAS = "getUsername";
+
+        const user = this.createQueryBuilder(ALIAS)
+            .where([{ username }])
+            .orWhere("(emailAddress = :username AND isPublic IS TRUE)")
+            .setParameter("username", username)
+            .getOne();
+
+        return user;
+    }
+
     findByEmailValidationToken(token: String) {
         const ALIAS = "getUsername";
 

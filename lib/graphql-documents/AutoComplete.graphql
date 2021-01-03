@@ -39,3 +39,14 @@ query AutoComplete($startsWith: String!) {
         }
     }
 }
+
+query AutoCompleteUsers($startsWith: String!) {
+    autoComplete(startsWith: $startsWith) {
+        users {
+            username
+            emailAddress
+            firstName
+            lastName
+        }
+    }
+}

@@ -451,7 +451,7 @@ input SetPackagePermissionInput {
 The properties for setting a specific user's permissions on a collection
 """
 input SetUserCollectionPermissionsInput {
-    username: String! @validUsername
+    usernameOrEmailAddress: String! @validUsernameOrEmailAddress
     permissions: [Permission!]!
 }
 
