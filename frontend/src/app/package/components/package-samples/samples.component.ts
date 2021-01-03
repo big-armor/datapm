@@ -33,8 +33,10 @@ export class SamplesComponent implements OnInit, OnDestroy {
     schemaSampleValues(schema: Schema) {
         if (schema == null) return [];
 
+        let index = 0;
         return schema.sampleRecords?.map<{ [key: string]: string }>((r) => {
             const returnValue: { [key: string]: string } = {};
+            returnValue._oddEven = index++ % 2 == 0 ? "odd" : "even";
 
             for (const key of Object.keys(schema.properties)) {
                 const value = r[key];
@@ -44,7 +46,11 @@ export class SamplesComponent implements OnInit, OnDestroy {
                 }
 
                 if (typeof value === "string") {
-                    returnValue[key] = value;
+                    let shortValue = value;
+
+                    if (value.length > 100) shortValue = value.substr(0, 97) + "...";
+
+                    returnValue[key] = shortValue;
                     continue;
                 }
                 if (typeof value === "number") {
