@@ -881,6 +881,26 @@ describe("Package Tests", async () => {
     });
 
     it("User A give User B permission to package", async function () {
+        const newPermissions = [Permission.VIEW, Permission.EDIT];
+
+        let response = await userAClient.mutate({
+            mutation: SetPackagePermissionsDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                },
+                value: {
+                    username: "testB-packages",
+                    permissions: newPermissions
+                }
+            }
+        });
+
+        expect(response.errors! == null).true;
+    });
+
+    it("User A update User B permission to package", async function () {
         const newPermissions = [Permission.VIEW, Permission.EDIT, Permission.MANAGE];
 
         let response = await userAClient.mutate({
