@@ -7,7 +7,7 @@ import { AutoCompleteResult, AutoCompleteUsersGQL, Permission, SetPackagePermiss
 
 enum ErrorType {
     USER_NOT_FOUND = "USER_NOT_FOUND",
-    CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS = "CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS"
+    CANNOT_SET_PACKAGE_CREATOR_PERMISSIONS = "CANNOT_SET_PACKAGE_CREATOR_PERMISSIONS"
 }
 @Component({
     selector: "app-add-user",
@@ -72,8 +72,8 @@ export class AddUserComponent implements OnInit {
                         this.state = "ERROR";
 
                         if (errors[0].message.includes("USER_NOT_FOUND")) this.error = ErrorType.USER_NOT_FOUND;
-                        else if (errors[0].message.includes("CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS"))
-                            this.error = ErrorType.CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS;
+                        else if (errors[0].message.includes("CANNOT_SET_PACKAGE_CREATOR_PERMISSIONS"))
+                            this.error = ErrorType.CANNOT_SET_PACKAGE_CREATOR_PERMISSIONS;
                         else this.error = null;
                         return;
                     }

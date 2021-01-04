@@ -1,10 +1,19 @@
 import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
+import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { AuthenticationService } from "src/app/services/authentication.service";
-import { Package, Permission, SetPackagePermissionsGQL, User, UsersByPackageGQL } from "src/generated/graphql";
+import {
+    Package,
+    Permission,
+    RemovePackagePermissionsGQL,
+    SetPackagePermissionsGQL,
+    UpdatePackageGQL,
+    User,
+    UsersByPackageGQL
+} from "src/generated/graphql";
 import { PackageResponse, PackageService } from "../../services/package.service";
 import { AddUserComponent } from "../add-user/add-user.component";
 
@@ -22,8 +31,10 @@ export class PackagePermissionComponent implements OnInit {
     constructor(
         private dialog: MatDialog,
         private usersByPackage: UsersByPackageGQL,
+        private updatePackage: UpdatePackageGQL,
         private packageService: PackageService,
         private authSvc: AuthenticationService,
+        private removeUserPackagePermission: RemovePackagePermissionsGQL,
         private setPackagePermissions: SetPackagePermissionsGQL,
         private router: Router,
         private route: ActivatedRoute
@@ -84,7 +95,17 @@ export class PackagePermissionComponent implements OnInit {
     }
 
     public removeUser(username: string) {
-        this.setUserPermission(username, []);
+        this.removeUserPackagePermission
+            .mutate({
+                identifier: {
+                    catalogSlug: this.package.identifier.catalogSlug,
+                    packageSlug: this.package.identifier.packageSlug
+                },
+                username
+            })
+            .subscribe(() => {
+                this.getUserList();
+            });
     }
 
     public get canManage() {
@@ -130,5 +151,21 @@ export class PackagePermissionComponent implements OnInit {
     private getUserName(user: User) {
         const fullname = `${user.firstName || ""} ${user.lastName || ""}`.trim();
         return fullname ? `${fullname} (${user.username})` : user.username;
+    }
+
+    public updatePublic(ev: MatSlideToggleChange) {
+        this.updatePackage
+            .mutate({
+                identifier: {
+                    catalogSlug: this.package.identifier.catalogSlug,
+                    packageSlug: this.package.identifier.packageSlug
+                },
+                value: {
+                    isPublic: ev.checked
+                }
+            })
+            .subscribe(({ errors, data }) => {
+                this.package.isPublic = ev.checked;
+            });
     }
 }

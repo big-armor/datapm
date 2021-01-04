@@ -1,7 +1,24 @@
-<table mat-table [dataSource]="users">
+<div class="d-flex align-items-center justify-content-between mt-5 mb-3">
+    <div class="d-flex align-items-center public-toggle">
+        <div class="px-4 py-2 label">Make this package public</div>
+        <div class="ml-auto px-4 py-2 slide-right">
+            <mat-slide-toggle
+                class="app-slide-toggle"
+                [checked]="package?.isPublic"
+                (change)="updatePublic($event)"
+            ></mat-slide-toggle>
+        </div>
+    </div>
+
+    <div>
+        <button class="app-outlined-button" (click)="addUser()" *ngIf="users.length > 0">Add User</button>
+    </div>
+</div>
+
+<table mat-table [dataSource]="users" *ngIf="users?.length > 0">
     <!-- Label column -->
     <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <th mat-header-cell *matHeaderCellDef>User</th>
         <td class="table-content" mat-cell *matCellDef="let user">
             <a>{{ user.name }}</a>
         </td>
@@ -32,6 +49,6 @@
 </table>
 
 <div class="dpm-no-data" *ngIf="!users?.length">
-    <p>There are no users who have permissions to this package.</p>
+    <p>There are no other users who have permissions to this package.</p>
     <a class="app-outlined-button mt-3" (click)="addUser()">Add a user</a>
 </div>

@@ -29,6 +29,7 @@ import { TableVirtualScrollModule } from "ng-table-virtual-scroll";
 import { MatDialogModule } from "@angular/material/dialog";
 import { PackagePermissionComponent } from "./components/package-permission/package-permission.component";
 import { AddUserComponent } from "./components/add-user/add-user.component";
+import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 
 @NgModule({
     declarations: [
@@ -55,6 +56,7 @@ import { AddUserComponent } from "./components/add-user/add-user.component";
         MatIconModule,
         MatTabsModule,
         MatDialogModule,
+        MatSlideToggleModule,
         MatTableModule,
         MatAutocompleteModule,
         MatProgressSpinnerModule,

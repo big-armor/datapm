@@ -900,6 +900,27 @@ describe("Package Tests", async () => {
         expect(response.errors! == null).true;
     });
 
+    it("User A set own permissions should fail", async function () {
+        const newPermissions = [Permission.VIEW];
+
+        let response = await userAClient.mutate({
+            mutation: SetPackagePermissionsDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                },
+                value: {
+                    username: "testA-packages",
+                    permissions: newPermissions
+                }
+            }
+        });
+
+        expect(response.errors! !== null).true;
+        expect(response.errors!.find((e) => e.message.includes("CANNOT_SET_PACKAGE_CREATOR_PERMISSIONS"))).is.not.null;
+    });
+
     it("User B find myPermissions on package - all", async function () {
         let response = await userBClient.query({
             query: PackageDocument,

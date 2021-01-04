@@ -35,10 +35,10 @@ export class PackageComponent implements OnDestroy {
     private unsubscribe$ = new Subject();
 
     public routes = [
-        { linkName: "description", url: "" },
-        { linkName: "preview", url: "preview" },
-        { linkName: "schema", url: "schema" },
-        { linkName: "history", url: "history" }
+        { linkName: "description", url: "", showDetails: true },
+        { linkName: "preview", url: "preview", showDetails: true },
+        { linkName: "schema", url: "schema", showDetails: true },
+        { linkName: "history", url: "history", showDetails: true }
     ];
 
     private catalogSlug = "";
@@ -96,21 +96,14 @@ export class PackageComponent implements OnDestroy {
                         this.catalogUser = value.data.user;
                     });
 
+                this.routes = [
+                    { linkName: "description", url: "", showDetails: true },
+                    { linkName: "preview", url: "preview", showDetails: true },
+                    { linkName: "schema", url: "schema", showDetails: true },
+                    { linkName: "history", url: "history", showDetails: true }
+                ];
                 if (this.package?.myPermissions.includes(Permission.MANAGE)) {
-                    this.routes = [
-                        { linkName: "description", url: "" },
-                        { linkName: "preview", url: "preview" },
-                        { linkName: "schema", url: "schema" },
-                        { linkName: "history", url: "history" },
-                        { linkName: "permission", url: "permission" }
-                    ];
-                } else {
-                    this.routes = [
-                        { linkName: "description", url: "" },
-                        { linkName: "preview", url: "preview" },
-                        { linkName: "schema", url: "schema" },
-                        { linkName: "history", url: "history" }
-                    ];
+                    this.routes.push({ linkName: "permission", url: "permission", showDetails: false });
                 }
             },
             (error) => {
@@ -164,6 +157,12 @@ export class PackageComponent implements OnDestroy {
 
         if (activeRouteParts.length == 3) return route.url == "";
         return activeRouteParts[3] == route.url;
+    }
+
+    getActiveTab() {
+        const activeRouteParts = this.router.url.split("/");
+
+        return this.routes.find((r) => r.url == activeRouteParts[3]);
     }
 
     loginClicked() {

@@ -31,8 +31,8 @@
         </div>
         <div class="text-danger mt-3" *ngIf="state === 'ERROR'">
             <ng-container [ngSwitch]="error">
-                <ng-container *ngSwitchCase="'CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS'">
-                    You can not change the permissions of the collection owner.
+                <ng-container *ngSwitchCase="'CANNOT_SET_PACKAGE_CREATOR_PERMISSIONS'">
+                    You can not change the permissions of the package owner.
                 </ng-container>
                 <ng-container *ngSwitchCase="'USER_NOT_FOUND'">
                     There is no user with that username on this registry.

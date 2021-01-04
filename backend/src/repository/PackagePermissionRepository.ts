@@ -84,6 +84,8 @@ export class PackagePermissionRepository {
                 .getCustomRepository(PackageRepository)
                 .findPackageOrFail({ identifier });
 
+            if (packageEntity.creatorId == user.id) throw new Error(`CANNOT_SET_PACKAGE_CREATOR_PERMISSIONS`);
+
             await transaction
                 .createQueryBuilder()
                 .insert()
