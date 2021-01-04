@@ -132,7 +132,7 @@ mutation updatePackage(identifier: PackageIdentifierInput!, value: UpdatePackage
 
 mutation deletePackage(identifier: PackageIdentifierInput!): Package!
 
-mutation setPackagePermissions(identifier: PackageIdentifierInput!, value:SetPackagePermissionInput!): UserPackagePermissions!
+mutation setPackagePermissions(identifier: PackageIdentifierInput!, value:SetPackagePermissionInput!): [UserPackagePermission!]
 
 mutation removePackagePermissions(identifier: PackageIdentifierInput!, username: String!): Void
 

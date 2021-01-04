@@ -190,16 +190,7 @@ type CollectionPackage {
 Represents a user, and their permissions on a package
 """
 type UserPackagePermissions {
-    package: Package!
-    username: String!
-    permissions: [Permission!]!
-}
-
-"""
-Represents a user, and their permissions on a package
-"""
-type UserPackagePermission {
-    user: User!
+    user: User
     permissions: [Permission!]!
 }
 
@@ -515,7 +506,7 @@ type Query {
     """
     usersByPackage(
         identifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
-    ): [UserPackagePermission]!
+    ): [UserPackagePermissions]!
 
     """
     Returns all of the users for a given catalog

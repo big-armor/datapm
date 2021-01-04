@@ -30,7 +30,7 @@ export const usersByPackage = async (
 
     const packageEntity = await context.connection.manager
         .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier, relations });
+        .findPackageOrFail({ identifier });
 
     return await context.connection.manager
         .getCustomRepository(PackagePermissionRepository)

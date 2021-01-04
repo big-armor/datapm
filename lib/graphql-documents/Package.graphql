@@ -13,6 +13,7 @@ query Package($identifier: PackageIdentifierInput!) {
         myPermissions
         displayName
         description
+        myPermissions
         latestVersion {
             identifier {
                 versionMajor

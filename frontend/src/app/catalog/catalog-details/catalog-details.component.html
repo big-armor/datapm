@@ -23,13 +23,20 @@
             >
             </app-package-item>
             <div class="dpm-no-data" *ngIf="!catalog?.packages?.length">
-                <p>There are no packages available.</p>
-                <a class="app-outlined-button mt-3 px-3">Add package</a>
+                <p>
+                    This catalog contains no packages, or you do not have permission to view the packages it does
+                    contain.
+                </p>
+                <a class="app-outlined-button mt-3 px-3" *ngIf="catalog.myPermissions.includes('EDIT')">Add package</a>
             </div>
         </div>
         <app-catalog-permissions [catalog]="catalog" *ngIf="currentTab === 1"></app-catalog-permissions>
     </ng-container>
     <div class="dpm-no-data" *ngIf="state === 'CATALOG_NOT_FOUND'">The catalog does not exist.</div>
+    <div class="dpm-no-data" *ngIf="state === 'NOT_AUTHENTICATED'">
+        <p>You must login to view this catalog.</p>
+        <a class="app-outlined-button mt-3 px-3" (click)="loginClicked()">Login</a>
+    </div>
     <div class="dpm-no-data" *ngIf="state === 'ERROR'">
         An error ocurred while getting catalog details. Please try again later.
     </div>

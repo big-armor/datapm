@@ -33,7 +33,7 @@ export class CatalogComponent implements OnInit {
                     username: catalogSlug
                 })
                 .subscribe(({ data, errors }) => {
-                    if (errors && errors[0].message?.includes("Failed to get user")) {
+                    if (errors && errors[0].message?.includes("USER_NOT_FOUND")) {
                         this.isPersonal = false;
                         this.state = "SUCCESS";
                     } else if (data?.user) {

@@ -132,13 +132,22 @@
                             <div class="row">
                                 <div class="col-md-12" id="packageDetails">
                                     <div class="row flex-lg-row-reverse">
-                                        <div class="col-lg-5 col-md-12 col-lg-push-7 right-div d-none d-lg-block">
+                                        <div
+                                            class="col-lg-5 col-md-12 col-lg-push-7 right-div d-none d-lg-block"
+                                            *ngIf="getActiveTab()?.showDetails"
+                                        >
                                             <app-package-info
                                                 [package]="package"
                                                 [packageFile]="packageFile"
                                             ></app-package-info>
                                         </div>
-                                        <div class="col-lg-7 col-md-12 col-lg-pull-5 left-div">
+                                        <div
+                                            [ngClass]="{
+                                                'col-lg-7 col-md-12 col-lg-pull-5 left-div': getActiveTab()
+                                                    ?.showDetails,
+                                                'col-12': !getActiveTab()?.showDetails
+                                            }"
+                                        >
                                             <div>
                                                 <router-outlet></router-outlet>
                                             </div>
