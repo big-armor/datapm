@@ -58,7 +58,7 @@ export class PackagePermissionRepository {
             .getMany();
     }
 
-    setPackagePermissions({
+    async setPackagePermissions({
         identifier,
         username,
         permissions,
@@ -69,7 +69,7 @@ export class PackagePermissionRepository {
         permissions: Permission[];
         relations?: string[];
     }): Promise<void> {
-        return this.manager.nestedTransaction(async (transaction) => {
+        await this.manager.nestedTransaction(async (transaction) => {
             // ensure user exists and is part of team
             const user = await transaction.getCustomRepository(UserRepository).findUser({ username });
             if (!user) {
@@ -84,16 +84,58 @@ export class PackagePermissionRepository {
                 .getCustomRepository(PackageRepository)
                 .findPackageOrFail({ identifier });
 
-            await transaction
-                .createQueryBuilder()
-                .insert()
-                .into(UserPackagePermission)
-                .values({
-                    packageId: packageEntity.id,
-                    userId: user.id,
-                    permissions: permissions
-                })
-                .execute();
+            if (packageEntity.creatorId == user.id) throw new Error(`CANNOT_SET_PACKAGE_CREATOR_PERMISSIONS`);
+
+            const packagePermissions = await this.findPackagePermissions({
+                packageId: packageEntity.id,
+                userId: user.id
+            });
+
+            // If permission input is not empty
+            if (permissions.length > 0) {
+                // If user does not exist in collection permissions, it creates new record
+                if (packagePermissions == undefined) {
+                    try {
+                        const collectionPermissionEntry = transaction.create(UserPackagePermission);
+                        collectionPermissionEntry.userId = user.id;
+                        collectionPermissionEntry.packageId = packageEntity.id;
+                        collectionPermissionEntry.permissions = permissions;
+                        return await transaction.save(collectionPermissionEntry);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+                // If user does exists in package permissions, it updates the record found
+                else {
+                    try {
+                        return await transaction
+                            .createQueryBuilder()
+                            .update(UserPackagePermission)
+                            .set({ permissions: permissions })
+                            .where({ packageId: packageEntity.id, userId: user.id })
+                            .execute();
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+            }
+            // If the permissions input is empty, it will delete the row in package permissions
+            else {
+                // If the permissions row exists in the table delete it
+                if (packagePermissions != undefined) {
+                    try {
+                        return await transaction
+                            .createQueryBuilder()
+                            .delete()
+                            .from(UserPackagePermission)
+                            .where({ packageId: packageEntity.id, userId: user.id })
+                            .execute();
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+            }
+            return;
         });
     }
 

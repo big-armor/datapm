@@ -3,7 +3,7 @@ import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { PackageFile } from "datapm-lib";
 import { Subject } from "rxjs";
-import { Package, User, UserGQL } from "src/generated/graphql";
+import { Package, Permission, User, UserGQL } from "src/generated/graphql";
 import { PackageService, PackageResponse } from "../../services/package.service";
 import { filter, takeUntil } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
@@ -34,11 +34,11 @@ export class PackageComponent implements OnDestroy {
 
     private unsubscribe$ = new Subject();
 
-    public readonly routes = [
-        { linkName: "description", url: "" },
-        { linkName: "preview", url: "preview" },
-        { linkName: "schema", url: "schema" },
-        { linkName: "history", url: "history" }
+    public routes = [
+        { linkName: "description", url: "", showDetails: true },
+        { linkName: "preview", url: "preview", showDetails: true },
+        { linkName: "schema", url: "schema", showDetails: true },
+        { linkName: "history", url: "history", showDetails: true }
     ];
 
     private catalogSlug = "";
@@ -95,6 +95,16 @@ export class PackageComponent implements OnDestroy {
 
                         this.catalogUser = value.data.user;
                     });
+
+                this.routes = [
+                    { linkName: "description", url: "", showDetails: true },
+                    { linkName: "preview", url: "preview", showDetails: true },
+                    { linkName: "schema", url: "schema", showDetails: true },
+                    { linkName: "history", url: "history", showDetails: true }
+                ];
+                if (this.package?.myPermissions.includes(Permission.MANAGE)) {
+                    this.routes.push({ linkName: "permission", url: "permission", showDetails: false });
+                }
             },
             (error) => {
                 if (error.message.includes("NOT_AUTHENTICATED")) this.state = State.ERROR_NOT_AUTHENTICATED;
@@ -147,6 +157,12 @@ export class PackageComponent implements OnDestroy {
 
         if (activeRouteParts.length == 3) return route.url == "";
         return activeRouteParts[3] == route.url;
+    }
+
+    getActiveTab() {
+        const activeRouteParts = this.router.url.split("/");
+
+        return this.routes.find((r) => r.url == activeRouteParts[3]);
     }
 
     loginClicked() {
