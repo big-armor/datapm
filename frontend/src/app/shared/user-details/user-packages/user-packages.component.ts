@@ -21,7 +21,6 @@ export class UserPackagesComponent implements OnInit {
     State = State;
     state = State.INIT;
     public packages: Package[];
-    private subscription = new Subject();
 
     constructor(private userPackages: UserPackagesGQL) {}
 
@@ -31,16 +30,13 @@ export class UserPackagesComponent implements OnInit {
 
     refreshPackages() {
         this.state = State.LOADING;
-        this.userPackages
-            .fetch({ username: this.username, offSet: 0, limit: 1000 })
-            .pipe(takeUntil(this.subscription))
-            .subscribe((response) => {
-                if (response.errors?.length > 0) {
-                    this.state = State.ERROR;
-                    return;
-                }
-                this.packages = response.data.userPackages.packages as Package[];
-                this.state = State.SUCCESS;
-            });
+        this.userPackages.fetch({ username: this.username, offSet: 0, limit: 1000 }).subscribe((response) => {
+            if (response.errors?.length > 0) {
+                this.state = State.ERROR;
+                return;
+            }
+            this.packages = response.data.userPackages.packages as Package[];
+            this.state = State.SUCCESS;
+        });
     }
 }

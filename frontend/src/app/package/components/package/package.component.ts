@@ -3,7 +3,7 @@ import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { PackageFile } from "datapm-lib";
 import { Subject } from "rxjs";
-import { Package, User, UserGQL } from "src/generated/graphql";
+import { Package, Permission, User, UserGQL } from "src/generated/graphql";
 import { PackageService, PackageResponse } from "../../services/package.service";
 import { filter, takeUntil } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
@@ -34,7 +34,7 @@ export class PackageComponent implements OnDestroy {
 
     private unsubscribe$ = new Subject();
 
-    public readonly routes = [
+    public routes = [
         { linkName: "description", url: "" },
         { linkName: "preview", url: "preview" },
         { linkName: "schema", url: "schema" },
@@ -95,6 +95,23 @@ export class PackageComponent implements OnDestroy {
 
                         this.catalogUser = value.data.user;
                     });
+
+                if (this.package?.myPermissions.includes(Permission.MANAGE)) {
+                    this.routes = [
+                        { linkName: "description", url: "" },
+                        { linkName: "preview", url: "preview" },
+                        { linkName: "schema", url: "schema" },
+                        { linkName: "history", url: "history" },
+                        { linkName: "permission", url: "permission" }
+                    ];
+                } else {
+                    this.routes = [
+                        { linkName: "description", url: "" },
+                        { linkName: "preview", url: "preview" },
+                        { linkName: "schema", url: "schema" },
+                        { linkName: "history", url: "history" }
+                    ];
+                }
             },
             (error) => {
                 if (error.message.includes("NOT_AUTHENTICATED")) this.state = State.ERROR_NOT_AUTHENTICATED;

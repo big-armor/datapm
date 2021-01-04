@@ -6,6 +6,7 @@ import { PackageDescriptionComponent } from "./components/package-description/pa
 import { PackageSchemaComponent } from "./components/package-schema/package-schema.component";
 import { PackageVersionComponent } from "./components/package-version/package-version.component";
 import { PackageSamplesComponent } from "./components/package-samples/package-samples.component";
+import { PackagePermissionComponent } from "./components/package-permission/package-permission.component";
 
 const routes: Routes = [
     {
@@ -28,6 +29,10 @@ const routes: Routes = [
             {
                 path: "preview",
                 component: PackageSamplesComponent
+            },
+            {
+                path: "permission",
+                component: PackagePermissionComponent
             },
             {
                 path: "**",
