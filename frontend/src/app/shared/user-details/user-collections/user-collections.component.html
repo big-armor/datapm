@@ -27,6 +27,10 @@
                 </p>
             </div>
 
+            <div class="col-12 mt-3" *ngIf="state !== State.LOADING && isCurrentUser">
+                <a class="app-outlined-button" (click)="createCollection()">Create a collection</a>
+            </div>
+
             <!-- Package without thumbnail -->
             <table *ngIf="collections && collections.length > 0" mat-table [dataSource]="collections">
                 <!-- Label column -->
@@ -63,10 +67,6 @@
                 <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
                 <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
             </table>
-        </div>
-
-        <div class="mt-3" *ngIf="state !== State.LOADING && isCurrentUser">
-            <a class="app-outlined-button" (click)="createCollection()">Create a collection</a>
         </div>
 
         <div class="loading-container" *ngIf="state === State.LOADING">

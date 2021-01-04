@@ -47,11 +47,10 @@ export class CreateCollectionComponent implements OnInit {
             .subscribe(
                 (response) => {
                     if (response.errors) {
-                        const error = response.errors.find((e) => e.message === "COLLECTION_SLUG_NOT_AVAILABLE");
-                        if (error) {
+                        if (response.errors.find((e) => e.message.includes("COLLECTION_SLUG_NOT_AVAILABLE"))) {
                             this.error = `Collection slug '${collectionSlug}' already exists. Please change name to fix the issue`;
                         } else {
-                            this.error = "Unknown error occured";
+                            this.error = "Unknown error occured - " + response.errors[0].message;
                         }
                         this.state = "ERROR";
                         return;
@@ -59,9 +58,17 @@ export class CreateCollectionComponent implements OnInit {
 
                     this.dialogRef.close(this.form.value);
                 },
-                () => {
+                (response) => {
                     this.state = "ERROR";
-                    this.error = "Unknown error occured";
+
+                    if (response.networkError?.error.errors) {
+                        if (
+                            response.networkError?.error.errors.find((e) =>
+                                e.extensions?.exception?.stacktrace[0].includes("COLLECTION_SLUG_INVALID")
+                            )
+                        )
+                            this.error = "Only characters a-z, A-Z, 0-9, and - are supported for collection names";
+                    } else this.error = "Unknown error occured. Please try again or contact support";
                 }
             );
     }

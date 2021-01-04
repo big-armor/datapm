@@ -23,7 +23,7 @@ export class CatalogDetailsComponent implements OnInit {
         this.state = "LOADING";
         this.getCatalogGQL.fetch({ identifier: { catalogSlug: this.catalogSlug } }).subscribe(({ data, errors }) => {
             if (errors) {
-                if (errors[0].message === "CATALOG_NOT_FOUND") {
+                if (errors.find((e) => e.message.includes("CATALOG_NOT_FOUND"))) {
                     this.state = "CATALOG_NOT_FOUND";
                 } else {
                     this.state = "ERROR";
