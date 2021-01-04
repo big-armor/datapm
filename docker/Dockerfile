@@ -16,5 +16,5 @@ RUN cd /build/backend/ \
 EXPOSE 4000
 WORKDIR /usr/src/app
 
-CMD [ "node", "index.js" ]
+CMD [ "node", "index2.js" ]
 
