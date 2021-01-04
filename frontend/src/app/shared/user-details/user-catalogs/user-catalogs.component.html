@@ -8,8 +8,9 @@
                 Catalogs are lists of data packages offered by individuals or organizations. All packages belong to one
                 and only one catalog.
             </p>
-            <div class="col-md-12 col-lg-12 text-center pt-4 pb-5" *ngIf="myCatalogs.length === 0">
-                <a class="app-outlined-button create-button" (click)="openCreateDialog()">Create A Catalog</a>
+
+            <div class="col-12 mt-3" *ngIf="catalogState !== State.LOADING && isCurrentUser">
+                <a class="app-outlined-button" (click)="createCatalog()">Create a catalog</a>
             </div>
         </ng-container>
 
@@ -52,10 +53,6 @@
         </table>
         <div class="loading-container" *ngIf="catalogState === State.LOADING">
             <mat-spinner [diameter]="40"></mat-spinner>
-        </div>
-
-        <div class="mt-3" *ngIf="catalogState !== State.LOADING && isCurrentUser">
-            <a class="app-outlined-button" (click)="createCatalog()">Create a collection</a>
         </div>
     </div>
 </div>

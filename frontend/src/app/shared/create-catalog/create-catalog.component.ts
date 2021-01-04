@@ -49,11 +49,11 @@ export class CreateCatalogComponent implements OnInit {
             .subscribe(
                 (response) => {
                     if (response.errors) {
-                        const error = response.errors.find((e) => e.message === "COLLECTION_SLUG_NOT_AVAILABLE");
+                        const error = response.errors.find((e) => e.message.includes("CATALOG_SLUG_NOT_AVAILABLE"));
                         if (error) {
                             this.error = `Catalog slug '${catalogSlug}' already exists. Please change name to fix the issue`;
                         } else {
-                            this.error = "Unknown error occured";
+                            this.error = "Unknown error occured. Please try again or contact support.";
                         }
                         this.state = "ERROR";
                         return;
