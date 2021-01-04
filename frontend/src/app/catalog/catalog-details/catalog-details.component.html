@@ -1,6 +1,11 @@
 <div class="catalog-details container">
     <ng-container *ngIf="state === 'SUCCESS'">
         <app-cover [catalogSlug]="catalogSlug"></app-cover>
+
+        <div *ngIf="catalog" class="collections-public">
+            <span *ngIf="catalog?.isPublic" class="public-text">public</span>
+            <span *ngIf="!catalog?.isPublic" class="not-public-text">not public</span>
+        </div>
         <div class="catalog-header px-4 py-3 mt-4">
             <h1 class="dpm-text-title mb-1">{{ catalog?.displayName }}</h1>
             <h3 class="dpm-text-body mb-1 catalog-slug">{{ catalogSlug }}</h3>

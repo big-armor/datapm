@@ -1,4 +1,12 @@
-<div class="d-flex align-items-center justify-content-between mt-5 mb-3">
+<div class="container mt-5">
+    <h2>Public Access</h2>
+    <p>
+        Enabling public access allows all users, including anonymous users, to view the name, description, and packages
+        in this collection. Users must have access to each individual package to view them.
+    </p>
+</div>
+
+<div class="d-flex align-items-center justify-content-between mb-3">
     <div class="d-flex align-items-center public-toggle">
         <div class="px-4 py-2 label">Make this collection public</div>
         <div class="ml-auto px-4 py-2 slide-right">
@@ -9,12 +17,15 @@
             ></mat-slide-toggle>
         </div>
     </div>
-    <div>
-        <button class="app-outlined-button" (click)="addUser()" *ngIf="users.length > 0">Add User</button>
-    </div>
 </div>
 
-<!-- Package without thumbnail -->
+<div class="container mt-5" *ngIf="users?.length">
+    <h2>Users With Access</h2>
+    <p>The following users have permission to access this package.</p>
+    <button class="app-outlined-button" (click)="addUser()" *ngIf="users.length > 0">Add User</button>
+</div>
+
+<!-- Package without thupmbnail -->
 <table mat-table [dataSource]="users" *ngIf="users.length > 0">
     <!-- Label column -->
     <ng-container matColumnDef="name">

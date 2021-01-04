@@ -18,14 +18,11 @@
                 <mat-tab label="Permissions" *ngIf="canManage"></mat-tab>
             </mat-tab-group>
             <div *ngIf="currentTab === 0">
-                <div class="mt-4 d-flex justify-content-end">
-                    <button
-                        class="app-outlined-button"
-                        (click)="addPackage()"
-                        *ngIf="collection.packages?.length > 0 && canEdit"
-                    >
-                        Add Package
-                    </button>
+                <div class="mt-4" *ngIf="collection.packages?.length > 0">
+                    <p>The following packages are included in this collection.</p>
+                    <div class="mt-4 mb-4">
+                        <button class="app-outlined-button" (click)="addPackage()" *ngIf="canEdit">Add Package</button>
+                    </div>
                 </div>
                 <app-package-item
                     [item]="package"

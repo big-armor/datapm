@@ -5,12 +5,12 @@
                 {{ isCurrentUser ? "My Catalogs" : "Catalogs" }}
             </div>
             <p class="pl-4 pr-4">
-                Catalogs are lists of data packages offered by individuals or organizations. All packages belong to one
+                Catalogs are represent offerings from a single individual or organizations. All packages belong to one
                 and only one catalog.
             </p>
 
             <div class="col-12 mt-3" *ngIf="catalogState !== State.LOADING && isCurrentUser">
-                <a class="app-outlined-button" (click)="createCatalog()">Create a catalog</a>
+                <a class="app-outlined-button" (click)="createCatalog()">Create A Catalog</a>
             </div>
         </ng-container>
 

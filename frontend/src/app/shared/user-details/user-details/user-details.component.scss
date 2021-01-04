@@ -101,10 +101,13 @@
     .command-container {
         padding: 8px;
         border-radius: 4px;
-        background-color: rgba(240, 240, 240, 0.783);
+        background-color: #fff;
         &:hover {
             cursor: pointer;
             background-color: #ddd;
+        }
+        &:active {
+            background-color: #ccc;
         }
     }
 

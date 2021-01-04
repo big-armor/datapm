@@ -3,7 +3,7 @@ import { FormGroup, FormControl, Validators } from "@angular/forms";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { debounceTime, switchMap } from "rxjs/operators";
 import { PageState } from "src/app/models/page-state";
-import { AutoCompleteResult, AutoCompleteUsersGQL, Permission, SetPackagePermissionsGQL } from "src/generated/graphql";
+import { AutoCompleteResult, AutoCompleteUserGQL, Permission, SetPackagePermissionsGQL } from "src/generated/graphql";
 
 enum ErrorType {
     USER_NOT_FOUND = "USER_NOT_FOUND",
@@ -25,7 +25,7 @@ export class AddUserComponent implements OnInit {
         private setPackagePermissions: SetPackagePermissionsGQL,
         private dialogRef: MatDialogRef<AddUserComponent>,
         @Inject(MAT_DIALOG_DATA) private data: any,
-        private autocompleteUsers: AutoCompleteUsersGQL
+        private autocompleteUsers: AutoCompleteUserGQL
     ) {}
 
     ngOnInit(): void {

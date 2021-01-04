@@ -1,4 +1,12 @@
-<div class="d-flex align-items-center justify-content-between mt-5 mb-3">
+<div class="container mt-4">
+    <h1>Public Access</h1>
+    <p>
+        Enabling public access allows all users, including anonymous users that can access this registry, access to view
+        and fetch this package.
+    </p>
+</div>
+
+<div class="d-flex align-items-center justify-content-between mb-3">
     <div class="d-flex align-items-center public-toggle">
         <div class="px-4 py-2 label">Make this package public</div>
         <div class="ml-auto px-4 py-2 slide-right">
@@ -9,10 +17,11 @@
             ></mat-slide-toggle>
         </div>
     </div>
-
-    <div>
-        <button class="app-outlined-button" (click)="addUser()" *ngIf="users.length > 0">Add User</button>
-    </div>
+</div>
+<div class="container mt-5" *ngIf="users?.length">
+    <h1>Users With Access</h1>
+    <p>The following users have permission to access this package.</p>
+    <button class="app-outlined-button" (click)="addUser()" *ngIf="users.length > 0">Add User</button>
 </div>
 
 <table mat-table [dataSource]="users" *ngIf="users?.length > 0">
@@ -28,7 +37,6 @@
         <th mat-header-cell *matHeaderCellDef>Permission</th>
         <td class="table-content" mat-cell *matCellDef="let user">
             <select [value]="user.permission" (change)="updatePermission(user.username, $event.target.value)">
-                <option>None</option>
                 <option value="VIEW">View</option>
                 <option value="EDIT">Edit</option>
                 <option value="MANAGE">Manage</option>
