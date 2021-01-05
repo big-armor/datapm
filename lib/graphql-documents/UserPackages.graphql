@@ -1,6 +1,7 @@
 query UserPackages($username: String!, $offSet: Int!, $limit: Int!) {
     userPackages(username: $username, offSet: $offSet, limit: $limit) {
         packages {
+            myPermissions
             identifier {
                 registryURL
                 catalogSlug

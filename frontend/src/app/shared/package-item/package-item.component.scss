@@ -1,3 +1,5 @@
+@import "../../../styles/variables";
+
 .package-item {
     cursor: pointer;
     box-shadow: -4px 0 4px hsla(0, 0%, 100%, 0.25), 0 -4px 4px hsla(0, 0%, 100%, 0.25),
@@ -40,10 +42,9 @@
 
 .package-identifier {
     font-family: Roboto Mono;
-    font-weight: 500;
-    font-size: 20px;
+    font-size: 16px;
     line-height: 26px;
-    color: #333;
+    color: $color-info;
     letter-spacing: -0.28px;
     margin-bottom: 0px !important;
     margin-left: 10px;
@@ -118,22 +119,23 @@
     }
 }
 
-.package-creator {
-    .name {
-        font-family: Roboto Mono;
-        font-style: normal;
-        letter-spacing: -0.28px;
-        font-weight: 300;
-        font-size: 14px;
-        line-height: 18px;
-        color: #828282;
-        padding: 4px 10px;
-        margin-bottom: 0 !important;
-    }
-}
-
 .ctaButton {
     position: absolute;
     top: 20px;
     right: 16px;
+}
+
+@media (max-width: 992px) {
+    .package-identifier {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 768px) {
+}
+
+@media (max-width: 575px) {
+    .package-identifier {
+        font-size: 12px;
+    }
 }

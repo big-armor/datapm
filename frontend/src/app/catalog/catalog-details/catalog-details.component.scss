@@ -11,21 +11,14 @@ app-cover ::ng-deep img {
 }
 
 .catalog-header {
-    box-shadow: $outer-shadow-3;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-    height: $page-header-height;
-    background-color: $custom-gray-2;
 }
 
 .catalog-tabs {
-    background-color: $custom-gray-2;
-    box-shadow: $outer-shadow-1;
     display: block;
 
     ::ng-deep {
         .mat-tab-header {
-            border-bottom: none;
+            border-bottom: 1px solid $gray-5;
         }
         .mat-tab-label {
             min-width: 0px;

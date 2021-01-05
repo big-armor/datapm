@@ -31,7 +31,7 @@ const routes: Routes = [
                 component: PackageSamplesComponent
             },
             {
-                path: "permission",
+                path: "manage",
                 component: PackagePermissionComponent
             },
             {

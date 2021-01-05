@@ -9,12 +9,34 @@
                     [group]="form"
                     controlName="username"
                     inputStyle="flat"
+                    [matAutocomplete]="auto"
                     [error]="form | inputError: 'username' | async"
                 ></app-input>
+                <mat-autocomplete #auto="matAutocomplete" class="search-autocomplete">
+                    <mat-option *ngIf="!autoCompleteResult && usernameControl.value.length > 1">Loading...</mat-option>
+                    <ng-container *ngIf="autoCompleteResult">
+                        <mat-option *ngFor="let option of autoCompleteResult.users" [value]="option.username">
+                            <div class="autocomplete-title">{{ option.username }}</div>
+                            <div *ngIf="option.emailAddress != null" class="autocomplete-description">
+                                {{ option.emailAddress }}
+                            </div>
+                        </mat-option>
+                    </ng-container>
+                </mat-autocomplete>
             </div>
         </div>
         <div class="text-danger mt-3" *ngIf="state === 'ERROR'">
-            Error occured while adding a user permission to the catalog
+            <ng-container [ngSwitch]="error">
+                <ng-container *ngSwitchCase="'CANNOT_SET_CATALOG_CREATOR_PERMISSIONS'">
+                    You can not change the permissions of the collection owner.
+                </ng-container>
+                <ng-container *ngSwitchCase="'USER_NOT_FOUND'">
+                    There is no user with that username on this registry.
+                </ng-container>
+                <ng-container *ngSwitchDefault>
+                    Error occured while adding a user permission to the collection
+                </ng-container>
+            </ng-container>
         </div>
     </div>
     <div mat-dialog-actions class="d-flex justify-content-end">

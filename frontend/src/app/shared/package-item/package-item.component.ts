@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
-import { Package } from "src/generated/graphql";
+import { AuthenticationService } from "src/app/services/authentication.service";
+import { Package, User } from "src/generated/graphql";
 import * as timeago from "timeago.js";
 
 @Component({
@@ -15,9 +16,15 @@ export class PackageItemComponent implements OnInit {
     @Input() showCta: boolean = false;
     @Output() action = new EventEmitter();
 
-    constructor(private router: Router) {}
+    public currentUser: User;
 
-    ngOnInit(): void {}
+    constructor(private router: Router, private authenicationService: AuthenticationService) {}
+
+    ngOnInit(): void {
+        this.authenicationService.currentUser.subscribe((user) => {
+            this.currentUser = user;
+        });
+    }
 
     goToComponent(): void {
         const { catalogSlug, packageSlug } = this.item.identifier;

@@ -73,7 +73,8 @@
                             <span
                                 class="py-2 package-privacy"
                                 *ngIf="this.currentUser && this.currentUser?.username == this.catalogUser?.username"
-                                [class.public]="package?.isPublic"
+                                [class.public-text]="package?.isPublic"
+                                [class.not-public-text]="!package?.isPublic"
                             >
                                 {{ package?.isPublic ? "public" : "not public" }}
                             </span>
@@ -85,7 +86,7 @@
                                         <a [routerLink]="['/' + package?.identifier.catalogSlug]">{{
                                             package?.identifier.catalogSlug
                                         }}</a
-                                        >&nbsp;/&nbsp;{{ package?.identifier.packageSlug }}
+                                        >/{{ package?.identifier.packageSlug }}
                                     </div>
                                 </div>
                                 <div class="derivedFromSubtitle" *ngIf="derivedFromCount(packageFile) > 0">

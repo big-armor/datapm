@@ -13,6 +13,7 @@ import { CatalogComponent } from "./catalog/catalog.component";
 import { UserDetailsPageComponent } from "./user-details-page/user-details-page.component";
 import { AddUserComponent } from "./add-user/add-user.component";
 import { CatalogPermissionsComponent } from "./catalog-permissions/catalog-permissions.component";
+import { MatAutocompleteModule } from "@angular/material/autocomplete";
 
 @NgModule({
     declarations: [
@@ -27,6 +28,7 @@ import { CatalogPermissionsComponent } from "./catalog-permissions/catalog-permi
         ReactiveFormsModule,
         CatalogRoutingModule,
         MatProgressSpinnerModule,
+        MatAutocompleteModule,
         MatSlideToggleModule,
         MatTableModule,
         MatTabsModule,

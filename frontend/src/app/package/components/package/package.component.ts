@@ -103,7 +103,7 @@ export class PackageComponent implements OnDestroy {
                     { linkName: "history", url: "history", showDetails: true }
                 ];
                 if (this.package?.myPermissions.includes(Permission.MANAGE)) {
-                    this.routes.push({ linkName: "permission", url: "permission", showDetails: false });
+                    this.routes.push({ linkName: "manage", url: "manage", showDetails: false });
                 }
             },
             (error) => {
