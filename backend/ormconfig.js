@@ -20,7 +20,7 @@ module.exports = {
     subscribers: [`${PATH_PREFIX}subscriber/**/*.${FILE_EXTENSION}`],
     migrationsRun: true,
     migrationsTableName: "typeorm_migrations",
-    migrationsTransactionMode: "each",
+    migrationsTransactionMode: "all",
     cli: {
         entitiesDir: `${PATH_PREFIX}entity`,
         migrationsDir: `${PATH_PREFIX}migration`,
