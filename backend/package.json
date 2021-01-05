@@ -9,7 +9,7 @@
         "build": "tsc",
         "postbuild": "gulp",
         "prestart": "npm run codegen",
-        "start": ". ./env.sh && nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts",
+        "start": "TS_NODE_FILES=true . ./env.sh && nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts",
         "start-nowatch": ". ./env.sh && ts-node src/index.ts",
         "start:server": ". ./env.sh && cd dist && TYPEORM_IS_DIST=true  node index.js",
         "pretest": "npm run codegen",
