@@ -13,7 +13,7 @@
                 {{ catalog?.description }}
             </p>
         </div>
-        <mat-tab-group [(selectedIndex)]="currentTab" disableRipple class="catalog-tabs px-3">
+        <mat-tab-group [(selectedIndex)]="currentTab" disableRipple class="catalog-tabs">
             <mat-tab label="Packages"></mat-tab>
             <mat-tab label="Manage" *ngIf="canManage"></mat-tab>
         </mat-tab-group>
@@ -32,7 +32,9 @@
                     This catalog contains no packages, or you do not have permission to view the packages it does
                     contain.
                 </p>
-                <a class="app-outlined-button mt-3 px-3" *ngIf="catalog.myPermissions.includes('EDIT')">Add package</a>
+                <a href="/docs/publish-data/" target="_blank" *ngIf="catalog.myPermissions.includes('EDIT')"
+                    >Learn how to publish</a
+                >
             </div>
         </div>
         <app-catalog-permissions [catalog]="catalog" *ngIf="currentTab === 1"></app-catalog-permissions>

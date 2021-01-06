@@ -79,7 +79,6 @@
 
     td,
     p {
-        font-size: 12px;
         color: #333333;
     }
 
@@ -94,7 +93,6 @@
             font-size: 10px;
             margin-top: 5px;
             color: #f44336;
-            line-height: 12px;
         }
     }
 
@@ -129,9 +127,7 @@
             }
         }
     }
-    .mat-header-cell {
-        padding-left: 24px;
-    }
+
     .content-actions {
         .content-nr {
             font-family: Roboto Mono;

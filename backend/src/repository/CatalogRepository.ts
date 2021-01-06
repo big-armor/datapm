@@ -94,11 +94,11 @@ export class CatalogRepository extends Repository<Catalog> {
     }
 
     createCatalog({
-        username,
+        userId,
         value,
         relations = []
     }: {
-        username: string;
+        userId: number;
         value: CreateCatalogInput;
         relations?: string[];
     }): Promise<Catalog> {
@@ -126,11 +126,12 @@ export class CatalogRepository extends Repository<Catalog> {
             catalog.createdAt = now;
             catalog.website = value.website ? value.website : "";
             catalog.updatedAt = now;
+            catalog.creatorId = userId;
 
             const savedCatalog = await transaction.save(catalog);
 
             await grantUserCatalogPermission({
-                username,
+                userId,
                 catalogSlug: value.slug,
                 permissions: [Permission.MANAGE, Permission.EDIT, Permission.VIEW],
                 manager: transaction
@@ -283,9 +284,7 @@ export class CatalogRepository extends Repository<Catalog> {
     }): Promise<[Catalog[], number]> {
         const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
         const response = await this.createQueryBuilderWithUserConditions(user, Permission.VIEW)
-            .andWhere(
-                `("Catalog"."id" IN (SELECT "catalog_id" FROM "user_catalog" uc WHERE "uc"."user_id" = :targetUserId AND 'MANAGE' = ANY( "uc"."permission") ))`
-            )
+            .andWhere(`("Catalog"."creator_id" = :targetUserId)`)
             .setParameter("targetUserId", targetUser.id)
             .offset(offSet)
             .limit(limit)

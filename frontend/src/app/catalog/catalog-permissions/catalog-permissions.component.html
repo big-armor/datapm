@@ -1,4 +1,8 @@
 <div class="container mt-5">
+    <a class="app-outlined-button mr-3" (click)="editCatalog()">Edit Catalog Details</a>
+</div>
+
+<div class="container mt-5">
     <h2>Public Access</h2>
     <p>
         Enabling public access allows all users, including anonymous users, to view these catalog details. Users must
@@ -32,7 +36,7 @@
     <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>Name</th>
         <td class="table-content" mat-cell *matCellDef="let user">
-            <a>{{ user.name }}</a>
+            <a href="/{{ user.username }}">{{ user.name }}</a>
         </td>
     </ng-container>
 

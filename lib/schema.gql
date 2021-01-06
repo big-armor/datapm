@@ -124,6 +124,7 @@ type Catalog {
     displayName: String
     description: String
     website: String
+    creator: User
     isPublic: Boolean
 
     """

@@ -40,13 +40,13 @@ async function getUserCatalogPermissionOrFail({
 }
 
 export async function grantUserCatalogPermission({
-    username,
+    userId,
     catalogSlug,
     permissions,
     manager,
     relations = []
 }: {
-    username: string;
+    userId: number;
     catalogSlug: string;
     permissions: Permission[];
     manager: EntityManager;
@@ -54,7 +54,8 @@ export async function grantUserCatalogPermission({
 }): Promise<UserCatalogPermission | null> {
     const userCatalogPermission = await manager.nestedTransaction(async (transaction) => {
         // find the user
-        const user = await transaction.getCustomRepository(UserRepository).findUserByUserName({ username });
+        const user = await transaction.getCustomRepository(UserRepository).findOne({ id: userId });
+        if (user == null) throw new Error("USER_NOT_FOUND");
 
         // find the catalog
         const catalog = await transaction

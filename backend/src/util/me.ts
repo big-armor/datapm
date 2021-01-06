@@ -35,6 +35,9 @@ export async function getMeRequest(req: express.Request, manager: EntityManager)
                 throw new AuthenticationError("API_KEY_NOT_FOUND");
             }
 
+            apiKeyRecord.lastUsed = new Date();
+            transaction.save(apiKeyRecord);
+
             const user = apiKeyRecord.user;
 
             return user;

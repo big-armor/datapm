@@ -342,6 +342,13 @@ export const resolvers: {
             const catalog = parent as Catalog;
 
             return resolveCatalogPermissions(context, { catalogSlug: catalog.slug }, context.me);
+        },
+        creator: async (parent: any, _1: any, context: Context, info: any) => {
+            const catalog = parent as Catalog;
+
+            return await context.connection
+                .getCustomRepository(UserRepository)
+                .findOneOrFail({ where: { id: catalog.creatorId }, relations: getGraphQlRelationName(info) });
         }
     },
     Collection: {
@@ -634,7 +641,7 @@ export const resolvers: {
 
         createCatalog: async (_0: any, { value }, context: AuthenticatedContext, info: any) => {
             return context.connection.manager.getCustomRepository(CatalogRepository).createCatalog({
-                username: context.me?.username,
+                userId: context.me?.id,
                 value,
                 relations: getGraphQlRelationName(info)
             });

@@ -12,6 +12,7 @@ import { Subject } from "rxjs";
 import { take, takeUntil } from "rxjs/operators";
 import { EditAccountDialogComponent } from "../edit-account-dialog/edit-account-dialog.component";
 import { SnackBarService } from "src/app/services/snackBar.service";
+import * as timeago from "timeago.js";
 
 enum State {
     INIT,
@@ -37,7 +38,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     deleteAPIKeyState = State.INIT;
     newAPIKey: string;
 
-    columnsToDisplay = ["label", "actions"];
+    columnsToDisplay = ["label", "created", "lastUsed", "actions"];
 
     public myCatalogs: Catalog[];
     public myAPIKeys: APIKey[];
@@ -185,5 +186,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     copyKeyToClipboard() {
         this.clipboard.copy(this.apiKeyCommandString());
         this.snackBarService.openSnackBar("Copied to clipboard! Paste the command into your terminal.", "");
+    }
+    getMoment(date: Date) {
+        return timeago.format(date);
     }
 }

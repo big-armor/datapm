@@ -91,9 +91,7 @@ export class PackageRepository {
         const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
 
         const response = await this.createQueryBuilderWithUserConditions(user, Permission.VIEW)
-            .andWhere(
-                `("Package"."id" IN (SELECT package_id FROM user_package_permission WHERE user_id = :targetUserId AND 'MANAGE' = ANY(user_package_permission.permission) ))`
-            )
+            .andWhere(`("Package"."creator_id" = :targetUserId )`)
             .setParameter("targetUserId", targetUser.id)
             .offset(offSet)
             .limit(limit)

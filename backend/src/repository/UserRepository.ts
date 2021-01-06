@@ -330,7 +330,7 @@ export class UserRepository extends Repository<User> {
                 user = await transaction.save(user);
 
                 const catalog = await transaction.getCustomRepository(CatalogRepository).createCatalog({
-                    username: user.username,
+                    userId: user.id,
                     value: {
                         description: "",
                         isPublic: false,

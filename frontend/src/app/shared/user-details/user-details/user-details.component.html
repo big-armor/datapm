@@ -19,13 +19,22 @@
             and custom software development projects using the <a href="/docs/registry-api/">DataPM Registry API</a>.
         </div>
         <table *ngIf="myAPIKeys && myAPIKeys.length > 0" mat-table [dataSource]="myAPIKeys">
-            <!-- Label column -->
             <ng-container matColumnDef="label">
                 <th mat-header-cell *matHeaderCellDef>Label</th>
                 <td class="table-content" mat-cell *matCellDef="let apiKey">{{ apiKey.label }}</td>
             </ng-container>
-
-            <!-- Actions column -->
+            <ng-container matColumnDef="created">
+                <th mat-header-cell *matHeaderCellDef>Created</th>
+                <td mat-cell *matCellDef="let apiKey">
+                    {{ getMoment(apiKey.createdAt) }}
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="lastUsed">
+                <th mat-header-cell *matHeaderCellDef>Last Used</th>
+                <td mat-cell *matCellDef="let apiKey">
+                    {{ getMoment(apiKey.lastUsed) }}
+                </td>
+            </ng-container>
             <ng-container matColumnDef="actions">
                 <th mat-header-cell *matHeaderCellDef>Actions</th>
                 <td mat-cell *matCellDef="let apiKey">

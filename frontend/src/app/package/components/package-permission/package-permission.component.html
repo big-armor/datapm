@@ -1,9 +1,6 @@
 <div class="container mt-4">
     <h1>Public Access</h1>
-    <p>
-        Enabling public access allows all users, including anonymous users that can access this registry, access to view
-        and fetch this package.
-    </p>
+    <p>Enabling public access allows all users, including anonymous users, access to view and fetch this package.</p>
 </div>
 
 <div class="d-flex align-items-center justify-content-between mb-3">
@@ -29,7 +26,7 @@
     <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>User</th>
         <td class="table-content" mat-cell *matCellDef="let user">
-            <a>{{ user.name }}</a>
+            <a href="/{{ user.username }}">{{ user.name }}</a>
         </td>
     </ng-container>
 

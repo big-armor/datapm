@@ -2,6 +2,7 @@ import { Component, Input, OnInit, SimpleChanges } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 import { AuthenticationService } from "src/app/services/authentication.service";
+import { EditCatalogComponent } from "src/app/shared/edit-catalog/edit-catalog.component";
 import {
     Catalog,
     Permission,
@@ -139,5 +140,16 @@ export class CatalogPermissionsComponent implements OnInit {
     private getUserName(user: User) {
         const fullname = `${user.firstName || ""} ${user.lastName || ""}`.trim();
         return fullname ? `${fullname} (${user.username})` : user.username;
+    }
+
+    public editCatalog() {
+        this.dialog
+            .open(EditCatalogComponent, {
+                data: this.catalog
+            })
+            .afterClosed()
+            .subscribe((newCatalog: Catalog) => {
+                this.getUserList();
+            });
     }
 }
