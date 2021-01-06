@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 const sql = `
-    ALTER TABLE catalog ADD COLUMN creator_id BIGINT;
+    ALTER TABLE catalog ADD COLUMN IF NOT EXISTS creator_id BIGINT;
 `;
 export class CatalogCreator1609902949161 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
