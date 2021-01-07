@@ -31,7 +31,13 @@
     <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>User</th>
         <td class="table-content" mat-cell *matCellDef="let user">
-            <a>{{ user.name }}</a>
+            <div style="display: flex; justify-content: start; align-content: center">
+                <a class="ml-2" [routerLink]="'/' + user.username"
+                    ><app-avatar [user]="user" [size]="24"></app-avatar
+                ></a>
+
+                <a class="ml-2" [routerLink]="'/' + user.username">{{ user.name }}</a>
+            </div>
         </td>
     </ng-container>
 
