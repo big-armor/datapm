@@ -62,7 +62,12 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
                 }
             })
             .subscribe(
-                ({ data }) => {
+                ({ errors, data }) => {
+                    if (errors) {
+                        if (errors.find((e) => e.message.includes("NOT_AUTHORIZED"))) this.state = "NOT_AUTHORIZED";
+                        else this.state = "ERROR";
+                        return;
+                    }
                     this.collection = data.collection as Collection;
                     console.log(this.collection);
                     this.state = "SUCCESS";
