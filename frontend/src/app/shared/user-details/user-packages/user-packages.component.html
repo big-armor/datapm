@@ -12,9 +12,15 @@
     <div class="section-title">
         {{ isCurrentUser ? "My Packages" : "Packages" }}
     </div>
-    <p class="pl-4 pr-4">
+    <p *ngIf="isCurrentUser" class="pl-4 pr-4">
         A package is a single offering of one or more data sets. You can publish packages to this registry, and consume
         packages that you discover on this registry.
+    </p>
+
+    <p *ngIf="!isCurrentUser && packages.length > 0" class="pl-4 pr-4">Packages of data published by {{ username }}.</p>
+    <p *ngIf="!isCurrentUser && packages.length == 0" class="pl-4 pr-4">
+        Either {{ username }} has not published a package, or you do not have permission to any of the packages they
+        have published.
     </p>
 
     <app-package-item [item]="package" *ngFor="let package of packages"></app-package-item>

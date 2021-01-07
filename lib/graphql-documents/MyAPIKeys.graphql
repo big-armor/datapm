@@ -3,5 +3,7 @@ query MyAPIKeys {
         id
         label
         scopes
+        createdAt
+        lastUsed
     }
 }

@@ -5,8 +5,11 @@
                 {{ isCurrentUser ? "My Catalogs" : "Catalogs" }}
             </div>
             <p class="pl-4 pr-4">
-                Catalogs are represent offerings from a single individual or organizations. All packages belong to one
-                and only one catalog.
+                <span *ngIf="isCurrentUser"
+                    >Catalogs represent a single individual or organization. All data packages belong to one and only
+                    one catalog.</span
+                >
+                <span *ngIf="!isCurrentUser && myCatalogs.length > 0">Catalogs created by {{ username }} </span>
             </p>
 
             <div class="col-12 mt-3" *ngIf="catalogState !== State.LOADING && isCurrentUser">

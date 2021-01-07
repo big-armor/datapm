@@ -40,7 +40,7 @@ export class UserDetailsPageComponent implements OnInit {
             ];
         } else {
             this.tabs = [
-                { name: "Packages", value: "packages" },
+                { name: "Packages", value: "" },
                 { name: "Collections", value: "collections" },
                 { name: "Catalogs", value: "catalogs" }
             ];

@@ -26,7 +26,7 @@
     <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>User</th>
         <td class="table-content" mat-cell *matCellDef="let user">
-            <a href="/{{ user.username }}">{{ user.name }}</a>
+            <a [routerLink]="'/' + user.username">{{ user.name }}</a>
         </td>
     </ng-container>
 
