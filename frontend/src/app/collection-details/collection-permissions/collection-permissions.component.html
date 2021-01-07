@@ -39,7 +39,6 @@
         <th mat-header-cell *matHeaderCellDef>Permission</th>
         <td class="table-content" mat-cell *matCellDef="let user">
             <select [value]="user.permission" (change)="updatePermission(user.username, $event.target.value)">
-                <option>None</option>
                 <option value="VIEW">View</option>
                 <option value="EDIT">Edit</option>
                 <option value="MANAGE">Manage</option>
