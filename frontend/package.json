@@ -50,7 +50,6 @@
         "zone.js": "~0.10.3"
     },
     "devDependencies": {
-        "datapm-lib": "^0.6.x",
         "@angular-devkit/build-angular": "~0.1000.7",
         "@angular/cli": "~10.0.7",
         "@angular/compiler-cli": "~10.0.11",
