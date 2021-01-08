@@ -13,7 +13,7 @@
         "test:ci": "npm run codegen && ng test --watch false  --browsers=ChromeHeadless",
         "lint": "ng lint",
         "e2e": "ng e2e",
-        "codegen": "node_modules/@graphql-codegen/cli/bin.js --config codegen.yml"
+        "codegen": "graphql-codegen --config codegen.yml"
     },
     "browser": {
         "fs": false,

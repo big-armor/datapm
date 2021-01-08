@@ -14,7 +14,7 @@
         "start:server": ". ./env.sh && cd dist && TYPEORM_IS_DIST=true  node index.js",
         "pretest": "npm run codegen",
         "test": "mocha -r ts-node/register --slow 2000 test/integration/*.ts src/**/*.spec.ts",
-        "codegen": "node_modules/@graphql-codegen/cli/bin.js --config codegen.yml && node_modules/@graphql-codegen/cli/bin.js --config codegen-test.yml"
+        "codegen": "graphql-codegen --config codegen.yml && graphql-codegen --config codegen-test.yml"
     },
     "repository": {
         "type": "git",
