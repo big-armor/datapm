@@ -1,7 +1,9 @@
 import { Component, Input, OnInit, SimpleChanges } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
+import { Router } from "@angular/router";
 import { AuthenticationService } from "src/app/services/authentication.service";
+import { DeleteCatalogComponent } from "src/app/shared/delete-catalog/delete-catalog.component";
 import { EditCatalogComponent } from "src/app/shared/edit-catalog/edit-catalog.component";
 import {
     Catalog,
@@ -27,6 +29,8 @@ export class CatalogPermissionsComponent implements OnInit {
 
     constructor(
         private dialog: MatDialog,
+        private authenticationService: AuthenticationService,
+        private router: Router,
         private usersByCatalogGQL: UsersByCatalogGQL,
         private updateCatalogGQL: UpdateCatalogGQL,
         private setUserCatalogPermissionGQL: SetUserCatalogPermissionGQL,
@@ -56,13 +60,11 @@ export class CatalogPermissionsComponent implements OnInit {
             })
             .valueChanges.subscribe(({ data }) => {
                 const currentUsername = this.authSvc.currentUser.value?.username;
-                this.users = data.usersByCatalog
-                    .filter((item) => !currentUsername || item.user.username !== currentUsername)
-                    .map((item) => ({
-                        username: item.user.username,
-                        name: this.getUserName(item.user as User),
-                        permission: this.findHighestPermission(item.permissions)
-                    }));
+                this.users = data.usersByCatalog.map((item) => ({
+                    username: item.user.username,
+                    name: this.getUserName(item.user as User),
+                    permission: this.findHighestPermission(item.permissions)
+                }));
             });
     }
 
@@ -151,5 +153,18 @@ export class CatalogPermissionsComponent implements OnInit {
             .subscribe((newCatalog: Catalog) => {
                 this.getUserList();
             });
+    }
+
+    public deleteCatalog() {
+        const dlgRef = this.dialog.open(DeleteCatalogComponent, {
+            data: {
+                catalogSlug: this.catalog.identifier.catalogSlug
+            }
+        });
+
+        dlgRef.afterClosed().subscribe((confirmed: boolean) => {
+            if (confirmed)
+                this.router.navigate(["/" + this.authenticationService.currentUser.getValue().username + "#catalogs"]);
+        });
     }
 }

@@ -162,7 +162,7 @@ export class PackageComponent implements OnDestroy {
     getActiveTab() {
         const activeRouteParts = this.router.url.split("/");
 
-        return this.routes.find((r) => r.url == activeRouteParts[3]);
+        return this.routes.find((r) => r.url == (activeRouteParts[3] || ""));
     }
 
     loginClicked() {

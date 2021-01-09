@@ -1,7 +1,9 @@
 import { Component, Input, OnInit, SimpleChanges } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
+import { Router } from "@angular/router";
 import { AuthenticationService } from "src/app/services/authentication.service";
+import { DeleteCollectionComponent } from "src/app/shared/delete-collection/delete-collection.component";
 import { EditCollectionComponent } from "src/app/shared/edit-collection/edit-collection.component";
 import {
     Collection,
@@ -29,6 +31,8 @@ export class CollectionPermissionsComponent implements OnInit {
         private usersByCollection: UsersByCollectionGQL,
         private updateCollectionGQL: UpdateCollectionGQL,
         private setUserCollectionPermissionsGQL: SetUserCollectionPermissionsGQL,
+        private authenticationService: AuthenticationService,
+        private router: Router,
         private authSvc: AuthenticationService
     ) {}
 
@@ -54,13 +58,11 @@ export class CollectionPermissionsComponent implements OnInit {
             })
             .valueChanges.subscribe(({ data }) => {
                 const currentUsername = this.authSvc.currentUser.value?.username;
-                this.users = data.usersByCollection
-                    .filter((item) => !currentUsername || item.user.username !== currentUsername)
-                    .map((item) => ({
-                        username: item.user.username,
-                        name: this.getUserName(item.user as User),
-                        permission: this.findHighestPermission(item.permissions)
-                    }));
+                this.users = data.usersByCollection.map((item) => ({
+                    username: item.user.username,
+                    name: this.getUserName(item.user as User),
+                    permission: this.findHighestPermission(item.permissions)
+                }));
             });
     }
 
@@ -146,5 +148,20 @@ export class CollectionPermissionsComponent implements OnInit {
     private getUserName(user: User) {
         const fullname = `${user.firstName || ""} ${user.lastName || ""}`.trim();
         return fullname ? `${fullname} (${user.username})` : user.username;
+    }
+
+    public deleteCollection() {
+        const dlgRef = this.dialog.open(DeleteCollectionComponent, {
+            data: {
+                collectionSlug: this.collection.identifier.collectionSlug
+            }
+        });
+
+        dlgRef.afterClosed().subscribe((confirmed: boolean) => {
+            if (confirmed)
+                this.router.navigate(["/" + this.authenticationService.currentUser.getValue().username], {
+                    fragment: "collections"
+                });
+        });
     }
 }
