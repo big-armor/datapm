@@ -257,14 +257,8 @@ describe("Image Upload Tests", async () => {
 
         expect(imageResponse.errors == null).true;
 
-        let errorFound = false;
-        try {
-            const imageServingResult = await request.get("localhost:4000/images/collection/image-test/cover");
-        } catch (error) {
-            if (error.message == "Not Found") errorFound = true;
-        }
-
-        expect(errorFound).equal(true);
+        const imageServingResult = await request.get("localhost:4000/images/collection/image-test/cover");
+        expect(imageServingResult.status).equal(200);
     });
 
     it("should not allow user B to set cover image on collection", async () => {
