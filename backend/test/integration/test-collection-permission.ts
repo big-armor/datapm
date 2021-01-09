@@ -125,7 +125,7 @@ describe("Collection Permissions", async () => {
     });
 
     it("updating user permissions by changing the permissions list", async function () {
-        const newPermissions = [Permission.VIEW, Permission.EDIT];
+        const newPermissions = [Permission.VIEW, Permission.EDIT, Permission.MANAGE];
 
         let response = await userAClient.mutate({
             mutation: SetUserCollectionPermissionsDocument,
@@ -141,6 +141,21 @@ describe("Collection Permissions", async () => {
         });
 
         expect(response.errors! == null).true;
+    });
+
+    it("Should not allow other user to remove creator permissions", async function () {
+        let response = await userAClient.mutate({
+            mutation: DeleteUserCollectionPermissionsDocument,
+            variables: {
+                identifier: {
+                    collectionSlug: "testA-collection-permissions"
+                },
+                username: "my-test-user100"
+            }
+        });
+
+        expect(response.errors !== null).true;
+        expect(response.errors!.find((e) => e.message.includes("CANNOT_REMOVE_CREATOR_PERMISSIONS"))).not.null;
     });
 
     it("Validate that the target user has the permission granted to view a collection that they did not previously", async function () {

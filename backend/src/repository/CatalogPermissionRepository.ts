@@ -216,6 +216,10 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
                 .getCustomRepository(CatalogRepository)
                 .findCatalogBySlugOrFail(identifier.catalogSlug);
 
+            if (catalogEntity.creatorId == user.id) {
+                throw new Error("CANNOT_CHANGE_CATALOG_CREATOR_PERMISSIONS");
+            }
+
             const permissions = await this.findByUserAndCatalogId(user.id, catalogEntity.id);
 
             // If permission input is not empty
@@ -265,6 +269,29 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
                 }
             }
             return;
+        });
+    }
+
+    deleteUserCatalogPermissions({
+        identifier,
+        username
+    }: {
+        identifier: CatalogIdentifierInput;
+        username: string;
+        relations?: string[];
+    }): Promise<void> {
+        return this.manager.nestedTransaction(async (transaction) => {
+            const user = await transaction.getCustomRepository(UserRepository).findOneOrFail({ username });
+
+            const catalogEntity = await transaction
+                .getCustomRepository(CatalogRepository)
+                .findCatalogBySlugOrFail(identifier.catalogSlug);
+
+            if (catalogEntity.creatorId == user.id) {
+                throw new Error("CANNOT_REMOVE_CREATOR_PERMISSIONS");
+            }
+
+            await transaction.delete(UserCatalogPermission, { catalogId: catalogEntity.id });
         });
     }
 }

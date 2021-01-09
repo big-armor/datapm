@@ -131,7 +131,7 @@ describe("Catalog Permissions", async () => {
                     catalogSlug: "user-a-catalog-v1"
                 },
                 value: {
-                    username: "my-test-user200",
+                    username: "my-test-user201",
                     permission: newPermissions,
                     packagePermission: []
                 }
@@ -230,7 +230,7 @@ describe("Catalog Permissions", async () => {
                     catalogSlug: "user-a-catalog-v3"
                 },
                 value: {
-                    username: "my-test-user200",
+                    username: "my-test-user201",
                     permission: newPermissions,
                     packagePermission: []
                 }

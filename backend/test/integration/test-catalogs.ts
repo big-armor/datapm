@@ -18,7 +18,8 @@ import {
     Permission,
     UserCatalogsDocument,
     SetUserCatalogPermissionDocument,
-    SetPackagePermissionsDocument
+    SetPackagePermissionsDocument,
+    DeleteUserCatalogPermissionsDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
@@ -638,6 +639,21 @@ describe("Catalog Tests", async () => {
 
         expect(response.errors == null, "no errors").to.equal(true);
         expect(response.data!.catalog.packages!.length).to.equal(1);
+    });
+
+    it("User B can't delete permissions of creator User A", async function () {
+        let response = await userAClient.mutate({
+            mutation: DeleteUserCatalogPermissionsDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "user-a-second-catalog-v2"
+                },
+                username: "testA-catalog"
+            }
+        });
+
+        expect(response.errors! !== null).true;
+        expect(response.errors!.find((e) => e.message.includes("CANNOT_REMOVE_CREATOR_PERMISSIONS"))).not.null;
     });
 
     it("User A remove catalog package permissions for User B", async function () {
