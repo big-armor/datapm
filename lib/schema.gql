@@ -804,10 +804,18 @@ type Mutation {
     ): Void
 
     """
-    Removes all permissions for a user on a given collection. Requires the manage package permission
+    Removes all permissions for a user on a given collection. Requires the manage collection permission
     """
     deleteUserCollectionPermissions(
         identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
+        username: String! @validUsername
+    ): Void
+
+    """
+    Removes all permissions for a user on a given catalog. Requires the manage catalog permission
+    """
+    deleteUserCatalogPermissions(
+        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
         username: String! @validUsername
     ): Void
 

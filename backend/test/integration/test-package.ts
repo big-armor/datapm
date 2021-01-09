@@ -975,6 +975,22 @@ describe("Package Tests", async () => {
         expect(response.data.usersByPackage!.length).equal(2);
     });
 
+    it("User B can't delete permissions of creator User A", async function () {
+        let response = await userAClient.mutate({
+            mutation: RemovePackagePermissionsDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                },
+                username: "testA-packages"
+            }
+        });
+
+        expect(response.errors! !== null).true;
+        expect(response.errors!.find((e) => e.message.includes("CANNOT_REMOVE_CREATOR_PERMISSIONS"))).not.null;
+    });
+
     it("Remove User B permissions on package", async function () {
         let response = await userAClient.mutate({
             mutation: RemovePackagePermissionsDocument,

@@ -118,7 +118,7 @@ after(async function () {
     let pids = pidtree(serverProcess.pid, { root: true });
 
     // recursively kill all child processes
-    (await pids).map((p) => {
+    (await pids).forEach((p) => {
         console.log("Killing process " + p);
         try {
             process.kill(p);

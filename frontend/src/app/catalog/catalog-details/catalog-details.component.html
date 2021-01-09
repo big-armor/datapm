@@ -7,7 +7,7 @@
             <span *ngIf="!catalog?.isPublic" class="not-public-text">not public</span>
         </div>
         <div class="catalog-header">
-            <h1 class="dpm-text-title mb-1">Catalog: {{ catalog?.displayName }}</h1>
+            <h1 class="dpm-text-title mb-1">{{ catalog?.displayName }}</h1>
             <h3 class="dpm-text-body mb-1 catalog-slug">{{ catalogSlug }}</h3>
             <p class="dpm-text-small catalog-description">
                 {{ catalog?.description }}

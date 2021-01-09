@@ -165,13 +165,17 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
         identifier: CollectionIdentifierInput;
         username: string;
         relations?: string[];
-    }): void {
-        this.manager.nestedTransaction(async (transaction) => {
+    }): Promise<void> {
+        return this.manager.nestedTransaction(async (transaction) => {
             const user = await transaction.getCustomRepository(UserRepository).findOneOrFail({ username });
 
             const collectionEntity = await transaction
                 .getCustomRepository(CollectionRepository)
                 .findCollectionBySlugOrFail(identifier.collectionSlug);
+
+            if (collectionEntity.creatorId == user.id) {
+                throw new Error("CANNOT_REMOVE_CREATOR_PERMISSIONS");
+            }
 
             await transaction.delete(UserCollectionPermission, { collectionId: collectionEntity.id });
         });

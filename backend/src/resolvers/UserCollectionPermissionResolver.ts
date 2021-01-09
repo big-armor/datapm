@@ -60,7 +60,7 @@ export const deleteUserCollectionPermissions = async (
     { identifier, username }: { identifier: CollectionIdentifierInput; username: string },
     context: AuthenticatedContext
 ) => {
-    await context.connection.getCustomRepository(UserCollectionPermissionRepository).deleteUserCollectionPermissions({
+    return context.connection.getCustomRepository(UserCollectionPermissionRepository).deleteUserCollectionPermissions({
         identifier,
         username
     });

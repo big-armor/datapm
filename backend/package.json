@@ -27,6 +27,7 @@
     },
     "homepage": "https://github.com/big-armor/datapm-registry#readme",
     "dependencies": {
+        "datapm-lib": "file:../lib/dist",
         "@google-cloud/secret-manager": "^3.1.0",
         "@google-cloud/storage": "^5.1.1",
         "@types/nodemailer": "^6.4.0",
@@ -35,7 +36,6 @@
         "apollo-server": "^2.11.0",
         "atob": "^2.1.2",
         "dataloader": "^2.0.0",
-        "datapm-lib": "file:../lib/dist",
         "express-enforces-ssl": "^1.1.0",
         "express-http-proxy": "^1.6.0",
         "express-jwt": "^6.0.0",

@@ -16,7 +16,7 @@ import {
 } from "src/generated/graphql";
 import { AddPackageComponent } from "../add-package/add-package.component";
 
-type CollectionDetailsPageState = PageState | "NOT_AUTHORIZED";
+type CollectionDetailsPageState = PageState | "NOT_AUTHORIZED" | "NOT_FOUND";
 
 @Component({
     selector: "app-collection-details",
@@ -65,6 +65,7 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
                 ({ errors, data }) => {
                     if (errors) {
                         if (errors.find((e) => e.message.includes("NOT_AUTHORIZED"))) this.state = "NOT_AUTHORIZED";
+                        if (errors.find((e) => e.message.includes("COLLECTION_NOT_FOUND"))) this.state = "NOT_FOUND";
                         else this.state = "ERROR";
                         return;
                     }

@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { AuthenticationService } from "src/app/services/authentication.service";
+import { SnackBarService } from "src/app/services/snackBar.service";
 import {
     Package,
     Permission,
@@ -37,6 +38,7 @@ export class PackagePermissionComponent implements OnInit {
         private removeUserPackagePermission: RemovePackagePermissionsGQL,
         private setPackagePermissions: SetPackagePermissionsGQL,
         private router: Router,
+        private snackBarService: SnackBarService,
         private route: ActivatedRoute
     ) {}
 
@@ -65,13 +67,11 @@ export class PackagePermissionComponent implements OnInit {
             })
             .subscribe(({ data }) => {
                 const currentUsername = this.authSvc.currentUser.value?.username;
-                this.users = data.usersByPackage
-                    .filter((item) => !currentUsername || item.user.username !== currentUsername)
-                    .map((item) => ({
-                        username: item.user.username,
-                        name: this.getUserName(item.user as User),
-                        permission: this.findHighestPermission(item.permissions)
-                    }));
+                this.users = data.usersByPackage.map((item) => ({
+                    username: item.user.username,
+                    name: this.getUserName(item.user as User),
+                    permission: this.findHighestPermission(item.permissions)
+                }));
             });
     }
 
@@ -103,7 +103,12 @@ export class PackagePermissionComponent implements OnInit {
                 },
                 username
             })
-            .subscribe(() => {
+            .subscribe(({ errors }) => {
+                if (errors) {
+                    if (errors.find((e) => e.message.includes("CANNOT_REMOVE_CREATOR_PERMISSIONS")))
+                        this.snackBarService.openSnackBar("Can not change the package creator permissions.", "Ok");
+                    else this.snackBarService.openSnackBar("There was a problem. Try again later.", "Ok");
+                }
                 this.getUserList();
             });
     }
@@ -124,10 +129,13 @@ export class PackagePermissionComponent implements OnInit {
                     permissions
                 }
             })
-            .subscribe(() => {
-                if (!permissions.length) {
-                    this.getUserList();
+            .subscribe(({ errors }) => {
+                if (errors) {
+                    if (errors.find((e) => e.message.includes("CANNOT_SET_PACKAGE_CREATOR_PERMISSIONS")))
+                        this.snackBarService.openSnackBar("Can not change the package creator permissions.", "Ok");
+                    else this.snackBarService.openSnackBar("There was a problem. Try again later.", "Ok");
                 }
+                this.getUserList();
             });
     }
 

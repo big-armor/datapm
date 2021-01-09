@@ -56,7 +56,7 @@ export class CreateCollectionComponent implements OnInit {
                         return;
                     }
 
-                    this.dialogRef.close(this.form.value);
+                    this.dialogRef.close(collectionSlug);
                 },
                 (response) => {
                     this.state = "ERROR";

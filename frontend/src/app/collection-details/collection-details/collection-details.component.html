@@ -50,6 +50,11 @@
             </div>
         </div>
 
+        <div *ngIf="state === 'NOT_FOUND'">
+            <div class="dpm-no-data">
+                <p>The requested collection was not found.</p>
+            </div>
+        </div>
         <div class="dpm-page-loading" *ngIf="state === 'LOADING'">
             <mat-spinner></mat-spinner>
         </div>

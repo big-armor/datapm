@@ -9,8 +9,9 @@ import {
     UpdateCollectionGQL,
     UserCollectionsGQL
 } from "src/generated/graphql";
-import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
+import { DeleteCollectionComponent } from "../../delete-collection/delete-collection.component";
 import { FewPackagesAlertComponent } from "../few-packages-alert/few-packages-alert.component";
+import { Router } from "@angular/router";
 
 enum State {
     INIT,
@@ -40,7 +41,8 @@ export class UserCollectionsComponent implements OnInit {
         private userCollections: UserCollectionsGQL,
         private updateCollectionGQL: UpdateCollectionGQL,
         private deleteCollectionGQL: DeleteCollectionGQL,
-        private dialog: MatDialog
+        private dialog: MatDialog,
+        private router: Router
     ) {}
 
     ngOnInit(): void {
@@ -50,24 +52,15 @@ export class UserCollectionsComponent implements OnInit {
         }
     }
 
-    openCreateDialog() {
-        this.dialog
-            .open(CreateCollectionComponent)
-            .afterClosed()
-            .subscribe(() => {
-                this.loadMyCollections();
-            });
-    }
-
     createCollection(formValue) {
         this.dialog
             .open(CreateCollectionComponent, {
                 data: formValue
             })
             .afterClosed()
-            .subscribe((data) => {
-                if (data) {
-                    this.loadMyCollections();
+            .subscribe((collectionSlug) => {
+                if (collectionSlug) {
+                    this.router.navigate(["/collection/" + collectionSlug]);
                 }
             });
     }
@@ -132,41 +125,14 @@ export class UserCollectionsComponent implements OnInit {
 
     deleteCollection(collection: Collection): void {
         this.dialog
-            .open(DeleteConfirmationComponent, {
+            .open(DeleteCollectionComponent, {
                 data: {
                     collectionSlug: collection.identifier.collectionSlug
                 }
             })
             .afterClosed()
             .subscribe((confirmed: boolean) => {
-                if (confirmed) {
-                    this.state = State.LOADING;
-                    const prevCollections = this.collections;
-                    this.collections = this.collections.filter(
-                        (c) => c.identifier.collectionSlug !== collection.identifier.collectionSlug
-                    );
-                    this.deleteCollectionGQL
-                        .mutate({
-                            identifier: {
-                                collectionSlug: collection.identifier.collectionSlug
-                            }
-                        })
-                        .subscribe(
-                            (response) => {
-                                if (response.errors?.length > 0) {
-                                    this.state = State.ERROR;
-                                    this.collections = prevCollections;
-                                    return;
-                                }
-
-                                this.state = State.SUCCESS;
-                            },
-                            () => {
-                                this.state = State.ERROR;
-                                this.collections = prevCollections;
-                            }
-                        );
-                }
+                this.loadMyCollections();
             });
     }
 }

@@ -72,6 +72,7 @@ import {
     setUserCollectionPermissions,
     deleteUserCollectionPermissions
 } from "./resolvers/UserCollectionPermissionResolver";
+import { deleteUserCatalogPermissions } from "./resolvers/UserCatalogPermissionResolver";
 import { login, logout, verifyEmailAddress } from "./resolvers/AuthResolver";
 import {
     createMe,
@@ -178,6 +179,7 @@ export const resolvers: {
             });
         }
     },
+
     PackageFileJSON: new GraphQLScalarType({
         name: "PackageFileJSON",
         serialize: (value: any) => {
@@ -707,6 +709,7 @@ export const resolvers: {
         removePackageFromCollection: removePackageFromCollection,
         setUserCollectionPermissions: setUserCollectionPermissions,
         deleteUserCollectionPermissions: deleteUserCollectionPermissions,
+        deleteUserCatalogPermissions: deleteUserCatalogPermissions,
 
         createVersion: async (_0: any, { identifier, value }, context: AuthenticatedContext, info: any) => {
             const fileStorageService = FileStorageService.INSTANCE;

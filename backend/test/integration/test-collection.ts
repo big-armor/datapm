@@ -13,7 +13,8 @@ import {
     MyCollectionsDocument,
     CollectionPackagesDocument,
     CreateVersionDocument,
-    UserCollectionsDocument
+    UserCollectionsDocument,
+    DeleteUserCollectionPermissionsDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
