@@ -65,13 +65,11 @@ export class PackagePermissionComponent implements OnInit {
             })
             .subscribe(({ data }) => {
                 const currentUsername = this.authSvc.currentUser.value?.username;
-                this.users = data.usersByPackage
-                    .filter((item) => !currentUsername || item.user.username !== currentUsername)
-                    .map((item) => ({
-                        username: item.user.username,
-                        name: this.getUserName(item.user as User),
-                        permission: this.findHighestPermission(item.permissions)
-                    }));
+                this.users = data.usersByPackage.map((item) => ({
+                    username: item.user.username,
+                    name: this.getUserName(item.user as User),
+                    permission: this.findHighestPermission(item.permissions)
+                }));
             });
     }
 
