@@ -1,7 +1,7 @@
 {
     "name": "datapm-lib",
-    "version": "0.6.104",
-    "description": "Definitions and utilities for managing datapm package files. ",
+    "version": "0.6.105",
+    "description": "Definitions and utilities for managing datapm package files.",
     "main": "src/main.js",
     "scripts": {
         "lint": "tslint -p tsconfig.json",
