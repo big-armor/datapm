@@ -3,6 +3,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 import { Router } from "@angular/router";
 import { AuthenticationService } from "src/app/services/authentication.service";
+import { SnackBarService } from "src/app/services/snackBar.service";
 import { DeleteCollectionComponent } from "src/app/shared/delete-collection/delete-collection.component";
 import { EditCollectionComponent } from "src/app/shared/edit-collection/edit-collection.component";
 import {
@@ -33,6 +34,7 @@ export class CollectionPermissionsComponent implements OnInit {
         private setUserCollectionPermissionsGQL: SetUserCollectionPermissionsGQL,
         private authenticationService: AuthenticationService,
         private router: Router,
+        private snackBarService: SnackBarService,
         private authSvc: AuthenticationService
     ) {}
 
@@ -121,10 +123,13 @@ export class CollectionPermissionsComponent implements OnInit {
                     permissions
                 }
             })
-            .subscribe(() => {
-                if (!permissions.length) {
-                    this.getUserList();
+            .subscribe(({ errors }) => {
+                if (errors) {
+                    if (errors.find((e) => e.message.includes("CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS")))
+                        this.snackBarService.openSnackBar("Can not change the catalog creator permissions.", "Ok");
+                    else this.snackBarService.openSnackBar("There was a problem. Try again later.", "Ok");
                 }
+                this.getUserList();
             });
     }
 

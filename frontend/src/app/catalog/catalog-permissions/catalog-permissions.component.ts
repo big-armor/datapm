@@ -3,10 +3,12 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 import { Router } from "@angular/router";
 import { AuthenticationService } from "src/app/services/authentication.service";
+import { SnackBarService } from "src/app/services/snackBar.service";
 import { DeleteCatalogComponent } from "src/app/shared/delete-catalog/delete-catalog.component";
 import { EditCatalogComponent } from "src/app/shared/edit-catalog/edit-catalog.component";
 import {
     Catalog,
+    DeleteUserCatalogPermissionsGQL,
     Permission,
     SetUserCatalogPermissionGQL,
     UpdateCatalogGQL,
@@ -34,6 +36,8 @@ export class CatalogPermissionsComponent implements OnInit {
         private usersByCatalogGQL: UsersByCatalogGQL,
         private updateCatalogGQL: UpdateCatalogGQL,
         private setUserCatalogPermissionGQL: SetUserCatalogPermissionGQL,
+        private deleteUserCatalogPermissionGQL: DeleteUserCatalogPermissionsGQL,
+        private snackBarService: SnackBarService,
         private authSvc: AuthenticationService
     ) {}
 
@@ -100,7 +104,20 @@ export class CatalogPermissionsComponent implements OnInit {
     }
 
     public removeUser(username: string) {
-        this.setUserPermission(username, []);
+        this.deleteUserCatalogPermissionGQL
+            .mutate({
+                identifier: {
+                    catalogSlug: this.catalog?.identifier.catalogSlug
+                },
+                username
+            })
+            .subscribe(({ errors }) => {
+                if (errors) {
+                    if (errors.find((e) => e.message.includes("CANNOT_REMOVE_CREATOR_PERMISSIONS")))
+                        this.snackBarService.openSnackBar("Can not remove the catalog creator.", "Ok");
+                    else this.snackBarService.openSnackBar("There was a problem. Try again later.", "Ok");
+                }
+            });
     }
 
     private setUserPermission(username: string, permissions: Permission[]) {
@@ -115,10 +132,13 @@ export class CatalogPermissionsComponent implements OnInit {
                     packagePermission: []
                 }
             })
-            .subscribe(() => {
-                if (!permissions.length) {
-                    this.getUserList();
+            .subscribe(({ errors }) => {
+                if (errors) {
+                    if (errors.find((e) => e.message.includes("CANNOT_CHANGE_CATALOG_CREATOR_PERMISSIONS")))
+                        this.snackBarService.openSnackBar("Can not change the catalog creator permissions.", "Ok");
+                    else this.snackBarService.openSnackBar("There was a problem. Try again later.", "Ok");
                 }
+                this.getUserList();
             });
     }
 
