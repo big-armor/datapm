@@ -2,6 +2,7 @@ import { Component, Input, OnInit, SimpleChanges } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 import { AuthenticationService } from "src/app/services/authentication.service";
+import { EditCollectionComponent } from "src/app/shared/edit-collection/edit-collection.component";
 import {
     Collection,
     Permission,
@@ -76,6 +77,15 @@ export class CollectionPermissionsComponent implements OnInit {
             .subscribe(({ data }) => {
                 this.collection = data.updateCollection as Collection;
             });
+    }
+
+    public editCollection() {
+        this.dialog
+            .open(EditCollectionComponent, {
+                data: this.collection
+            })
+            .afterClosed()
+            .subscribe((newCollection: Collection) => {});
     }
 
     public addUser() {
