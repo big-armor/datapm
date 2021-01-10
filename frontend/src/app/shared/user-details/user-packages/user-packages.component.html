@@ -23,5 +23,11 @@
         have published.
     </p>
 
-    <app-package-item [item]="package" *ngFor="let package of packages"></app-package-item>
+    <app-package-item
+        [item]="package"
+        showCta="true"
+        ctaText="Add To Collection"
+        (action)="addToCollection(package)"
+        *ngFor="let package of packages"
+    ></app-package-item>
 </div>

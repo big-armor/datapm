@@ -10,6 +10,12 @@ query AutoComplete($startsWith: String!) {
             isPublic
         }
         packages {
+            creator {
+                username
+                firstName
+                lastName
+                nameIsPublic
+            }
             updatedAt
             identifier {
                 registryURL
@@ -59,6 +65,12 @@ query AutoCompletePackage($startsWith: String!) {
                 registryURL
                 catalogSlug
                 packageSlug
+            }
+            creator {
+                username
+                firstName
+                lastName
+                nameIsPublic
             }
             displayName
             description

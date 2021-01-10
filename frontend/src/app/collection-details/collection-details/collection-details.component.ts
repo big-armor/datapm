@@ -81,7 +81,12 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
 
     public addPackage() {
         const dialogRef = this.dialog.open(AddPackageComponent, {
-            data: this.collectionSlug
+            data: {
+                collectionIdentifier: {
+                    collectionSlug: this.collectionSlug
+                }
+            },
+            width: "600px"
         });
 
         dialogRef.afterClosed().subscribe((result) => {

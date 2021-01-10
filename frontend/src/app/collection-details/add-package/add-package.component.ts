@@ -3,11 +3,29 @@ import { FormGroup, FormControl, Validators } from "@angular/forms";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { debounceTime, switchMap } from "rxjs/operators";
 import { PageState } from "src/app/models/page-state";
-import { AddPackageToCollectionGQL, AutoCompletePackageGQL, AutoCompleteResult } from "src/generated/graphql";
+import { AuthenticationService } from "src/app/services/authentication.service";
+import { SnackBarService } from "src/app/services/snackBar.service";
+import {
+    AddPackageToCollectionGQL,
+    AutoCompletePackageGQL,
+    AutoCompleteResult,
+    Collection,
+    CollectionIdentifier,
+    CollectionIdentifierInput,
+    MyCollectionsGQL,
+    PackageIdentifierInput,
+    UserCollectionsGQL
+} from "src/generated/graphql";
 
 enum ErrorType {
     PACKAGE_NOT_FOUND = "PACKAGE_NOT_FOUND",
-    CATALOG_NOT_FOUND = "CATALOG_NOT_FOUND"
+    CATALOG_NOT_FOUND = "CATALOG_NOT_FOUND",
+    COLLECTION_NOT_FOUND = "COLLECTION_NOT_FOUND"
+}
+
+class AddPackageToCollectionData {
+    collectionIdentifier: CollectionIdentifierInput;
+    packageIdentifier: PackageIdentifierInput;
 }
 
 @Component({
@@ -19,11 +37,15 @@ export class AddPackageComponent implements OnInit {
     public form: FormGroup;
     public state: PageState = "INIT";
     public error: ErrorType = null;
+    public collections: Collection[];
+    public selectedCollectionSlug: string;
 
     public packageNameControl: FormControl = new FormControl("", [
         Validators.required,
         Validators.pattern(/^[a-zA-Z]([a-zA-Z0-9\-]*[a-zA-Z0-9])?\/[a-zA-Z]([a-zA-Z0-9\-]*[a-zA-Z0-9])?$/)
     ]);
+
+    public collectionNameControl: FormControl = new FormControl(".*", [Validators.required]);
 
     autoCompleteResult: AutoCompleteResult;
 
@@ -31,13 +53,34 @@ export class AddPackageComponent implements OnInit {
         private addPackageToCollectionGQL: AddPackageToCollectionGQL,
         private dialogRef: MatDialogRef<AddPackageComponent>,
         private autoCompletePackages: AutoCompletePackageGQL,
-        @Inject(MAT_DIALOG_DATA) private collectionSlug: string
+        private userCollectionsGQL: UserCollectionsGQL,
+        private authenticationService: AuthenticationService,
+        private snackBar: SnackBarService,
+        @Inject(MAT_DIALOG_DATA) private data: AddPackageToCollectionData
     ) {}
 
     ngOnInit(): void {
         this.form = new FormGroup({
-            packageSlug: this.packageNameControl
+            packageSlug: this.packageNameControl,
+            collectionSlug: this.collectionNameControl
         });
+
+        if (this.data.collectionIdentifier) this.selectedCollectionSlug = this.data.collectionIdentifier.collectionSlug;
+
+        this.userCollectionsGQL
+            .fetch({
+                limit: 9999,
+                offSet: 0,
+                username: this.authenticationService.currentUser.getValue().username
+            })
+            .subscribe(({ errors, data }) => {
+                if (errors) {
+                    console.log(errors);
+                    return;
+                }
+
+                this.collections = data.userCollections.collections;
+            });
 
         this.packageNameControl.valueChanges
             .pipe(
@@ -69,7 +112,7 @@ export class AddPackageComponent implements OnInit {
         this.addPackageToCollectionGQL
             .mutate({
                 collectionIdentifier: {
-                    collectionSlug: this.collectionSlug
+                    collectionSlug: this.selectedCollectionSlug
                 },
                 packageIdentifier: {
                     catalogSlug,
@@ -84,11 +127,14 @@ export class AddPackageComponent implements OnInit {
                         if (errors[0].message.includes("PACKAGE_NOT_FOUND")) this.error = ErrorType.PACKAGE_NOT_FOUND;
                         else if (errors[0].message.includes("CATALOG_NOT_FOUND"))
                             this.error = ErrorType.CATALOG_NOT_FOUND;
+                        else if (errors[0].message.includes("COLLECTION_NOT_FOUND"))
+                            this.error = ErrorType.COLLECTION_NOT_FOUND;
                         else this.error = null;
 
                         return;
                     }
                     this.dialogRef.close(data.addPackageToCollection);
+                    this.snackBar.openSnackBar("Package added to collection " + this.selectedCollectionSlug, "ok");
                 },
                 () => {
                     this.state = "ERROR";

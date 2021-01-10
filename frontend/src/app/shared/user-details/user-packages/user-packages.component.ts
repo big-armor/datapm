@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { MyPackagesGQL, Package, UserPackagesGQL } from "src/generated/graphql";
@@ -22,7 +23,7 @@ export class UserPackagesComponent implements OnInit {
     state = State.INIT;
     public packages: Package[];
 
-    constructor(private userPackages: UserPackagesGQL) {}
+    constructor(private userPackages: UserPackagesGQL, private dialog: MatDialog) {}
 
     ngOnInit(): void {
         this.refreshPackages();
