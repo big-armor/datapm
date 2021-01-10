@@ -49,6 +49,7 @@ import { UserDetailsComponent } from "./user-details/user-details/user-details.c
 import { SimpleCreateComponent } from "./user-details/simple-create/simple-create.component";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
+import { DeletePackageComponent } from "./delete-package/delete-package.component";
 
 @NgModule({
     declarations: [
@@ -84,7 +85,8 @@ import { MatInputModule } from "@angular/material/input";
         EditAccountDialogComponent,
         EditPasswordDialogComponent,
         UserDetailsComponent,
-        SimpleCreateComponent
+        SimpleCreateComponent,
+        DeletePackageComponent
     ],
     imports: [
         CommonModule,
