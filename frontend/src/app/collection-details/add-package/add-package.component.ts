@@ -39,6 +39,7 @@ export class AddPackageComponent implements OnInit {
     public error: ErrorType = null;
     public collections: Collection[];
     public selectedCollectionSlug: string;
+    public packageKeyDownHasHappened = false;
 
     public packageNameControl: FormControl = new FormControl("", [
         Validators.required,
@@ -66,6 +67,11 @@ export class AddPackageComponent implements OnInit {
         });
 
         if (this.data.collectionIdentifier) this.selectedCollectionSlug = this.data.collectionIdentifier.collectionSlug;
+
+        if (this.data.packageIdentifier)
+            this.packageNameControl.setValue(
+                this.data.packageIdentifier.catalogSlug + "/" + this.data.packageIdentifier.packageSlug
+            );
 
         this.userCollectionsGQL
             .fetch({
@@ -97,6 +103,10 @@ export class AddPackageComponent implements OnInit {
                 if (result.errors != null) this.autoCompleteResult = null;
                 else this.autoCompleteResult = result.data.autoComplete;
             });
+    }
+
+    packageInputKeyDown() {
+        this.packageKeyDownHasHappened = true;
     }
 
     submit(ev) {

@@ -50,6 +50,7 @@ import { SimpleCreateComponent } from "./user-details/simple-create/simple-creat
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { DeletePackageComponent } from "./delete-package/delete-package.component";
+import { MatSelect, MatSelectModule } from "@angular/material/select";
 
 @NgModule({
     declarations: [
@@ -101,6 +102,7 @@ import { DeletePackageComponent } from "./delete-package/delete-package.componen
         MatProgressSpinnerModule,
         MatSnackBarModule,
         MatStepperModule,
+        MatSelectModule,
         MatSlideToggleModule,
         MatTableModule,
         FormsModule,

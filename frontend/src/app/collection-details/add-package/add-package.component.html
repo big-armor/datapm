@@ -12,10 +12,13 @@
                     controlName="packageSlug"
                     inputStyle="flat"
                     [matAutocomplete]="auto"
+                    (keydown)="packageInputKeyDown()"
                     [error]="form | inputError: 'packageSlug' | async"
                 ></app-input>
                 <mat-autocomplete #auto="matAutocomplete" class="search-autocomplete">
-                    <mat-option *ngIf="!autoCompleteResult && packageNameControl.value.length > 1">
+                    <mat-option
+                        *ngIf="packageKeyDownHasHappened && !autoCompleteResult && packageNameControl.value.length > 1"
+                    >
                         <mat-spinner [diameter]="30" class="ml-3"></mat-spinner>
                     </mat-option>
                     <ng-container *ngIf="autoCompleteResult">
@@ -46,7 +49,11 @@
             <div class="input-control">
                 <mat-label class="d-block mb-2">Collection</mat-label>
 
-                <mat-select controlName="collectionSlug" [(value)]="selectedCollectionSlug">
+                <mat-select
+                    controlName="collectionSlug"
+                    [(value)]="selectedCollectionSlug"
+                    placeholder="Select a Collection"
+                >
                     <mat-option *ngFor="let collection of collections" [value]="collection.identifier.collectionSlug">
                         {{ collection.name }}
                     </mat-option>

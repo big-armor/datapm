@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
+import { AddPackageComponent } from "src/app/collection-details/add-package/add-package.component";
 import { MyPackagesGQL, Package, UserPackagesGQL } from "src/generated/graphql";
 
 enum State {
@@ -38,6 +39,14 @@ export class UserPackagesComponent implements OnInit {
             }
             this.packages = response.data.userPackages.packages as Package[];
             this.state = State.SUCCESS;
+        });
+    }
+    addToCollection(packageObject: Package) {
+        const dialogRef = this.dialog.open(AddPackageComponent, {
+            data: {
+                packageIdentifier: packageObject.identifier
+            },
+            width: "600px"
         });
     }
 }
