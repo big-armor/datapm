@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { Catalog, DeletePackageGQL, GetCatalogGQL, Package, Permission } from "src/generated/graphql";
+import { Catalog, GetCatalogGQL, Package, Permission } from "src/generated/graphql";
 import { ActivatedRoute, Router } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
 import { EditCatalogComponent } from "src/app/shared/edit-catalog/edit-catalog.component";
@@ -20,7 +20,6 @@ export class CatalogDetailsComponent implements OnInit {
 
     constructor(
         private getCatalogGQL: GetCatalogGQL,
-        private deletePackageGQL: DeletePackageGQL,
         private dialog: MatDialog,
         private router: Router,
         private route: ActivatedRoute,
