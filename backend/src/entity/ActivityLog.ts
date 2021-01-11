@@ -2,22 +2,22 @@ import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } 
 import { BaseModel } from "./BaseModel";
 import { User } from "./User";
 import { Package } from "./Package";
-import { Version } from "../generated/graphql";
+import { Version } from "./Version";
 import { Catalog } from "./Catalog";
 import { Collection } from "./Collection";
 import { ActivityLogEventType } from "./ActivityLogEventType";
 
 @Entity({ name: "activity_log" })
-@Index("event_type")
+@Index(["userId", "eventType"])
 export class ActivityLog extends BaseModel {
-    @PrimaryGeneratedColumn({ name: "id", type: "integer" })
+    @PrimaryGeneratedColumn()
     public id: number;
 
     @Column({ name: "user_id", nullable: true })
     public userId?: number;
 
-    @ManyToOne(() => User)
-    @JoinColumn({ name: "user" })
+    @ManyToOne(() => User, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "user_id" })
     public user: User | null;
 
     @Column({ name: "event_type", nullable: false })
@@ -26,27 +26,28 @@ export class ActivityLog extends BaseModel {
     @Column({ name: "target_package_id", nullable: true })
     public targetPackageId?: number;
 
-    @ManyToOne(() => Package)
+    @ManyToOne(() => Package, { onDelete: "CASCADE" })
     @JoinColumn({ name: "target_package_id" })
     public targetPackage: Package | null;
 
     @Column({ name: "target_package_version_id", nullable: true })
     public targetPackageVersionId?: number;
 
+    @ManyToOne(() => Version, { onDelete: "CASCADE" })
     @JoinColumn({ name: "target_package_version_id" })
-    targetPackageVersion: Version | null;
+    public targetPackageVersion: Version | null;
 
     @Column({ name: "target_catalog_id", nullable: true })
     public targetCatalogId?: number;
 
-    @ManyToOne(() => Catalog)
+    @ManyToOne(() => Catalog, { onDelete: "CASCADE" })
     @JoinColumn({ name: "target_catalog_id" })
     public targetCatalog: Catalog | null;
 
     @Column({ name: "target_collection_id", nullable: true })
     public targetCollectionId?: number;
 
-    @ManyToOne(() => Collection)
+    @ManyToOne(() => Collection, { onDelete: "CASCADE" })
     @JoinColumn({ name: "target_collection_id" })
     public targetCollection: Collection | null;
 }
