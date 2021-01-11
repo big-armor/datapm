@@ -116,8 +116,13 @@ import { validateEmailAddress } from "./directive/ValidEmailDirective";
 import { FileStorageService, StorageErrors } from "./storage/files/file-storage-service";
 import { PackageFileStorageService } from "./storage/packages/package-file-storage-service";
 import { DateResolver } from "./resolvers/DateResolver";
-import { Permissions } from "./entity/Permissions";
 import { exit } from "process";
+import {
+    myActivity,
+    catalogActivities,
+    collectionActivities,
+    packageActivities
+} from "./resolvers/ActivityLogResolver";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -592,7 +597,15 @@ export const resolvers: {
 
         emailAddressAvailable: emailAddressAvailable,
 
-        searchUsers: searchUsers
+        searchUsers: searchUsers,
+
+        myActivity: myActivity,
+
+        collectionActivities: collectionActivities,
+
+        packageActivities: packageActivities,
+
+        catalogActivities: catalogActivities
     },
 
     Mutation: {
@@ -759,13 +772,13 @@ export const resolvers: {
                         log.targetPackageId = latestVersion?.packageId;
 
                         if (proposedNewVersion.major !== latestVersionSemVer.major) {
-                            log.eventType = ActivityLogEventType.PackageMajorChange;
+                            log.eventType = ActivityLogEventType.PACKAGE_MAJOR_CHANGE;
                             await transaction.getCustomRepository(ActivityLogRepository).create(log);
                         } else if (proposedNewVersion.minor !== latestVersionSemVer.minor) {
-                            log.eventType = ActivityLogEventType.PackageMinorChange;
+                            log.eventType = ActivityLogEventType.PACKAGE_MINOR_CHANGE;
                             await transaction.getCustomRepository(ActivityLogRepository).create(log);
                         } else if (proposedNewVersion.patch !== latestVersionSemVer.patch) {
-                            log.eventType = ActivityLogEventType.PackagePatchChanged;
+                            log.eventType = ActivityLogEventType.PACKAGE_PATCH_CHANGE;
                             await transaction.getCustomRepository(ActivityLogRepository).create(log);
                         }
                     } catch (e) {}
