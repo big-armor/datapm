@@ -54,3 +54,19 @@ export function packageSlugValid(
 
     return true;
 }
+
+export function collectionSlugValid(
+    slug: string | undefined
+): "COLLECTION_SLUG_REQUIRED" | "COLLECTION_SLUG_TOO_LONG" | "COLLECTION_SLUG_INVALID" | true {
+    if (slug === undefined) return `COLLECTION_SLUG_REQUIRED`;
+
+    if (slug.length === 0) return `COLLECTION_SLUG_REQUIRED`;
+
+    if (slug.length > 100) return `COLLECTION_SLUG_TOO_LONG`;
+
+    const regExp = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
+
+    if (!slug.match(regExp)) return `COLLECTION_SLUG_INVALID`;
+
+    return true;
+}

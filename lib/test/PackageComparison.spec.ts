@@ -7,7 +7,7 @@ import {
     nextVersion,
     comparePackages
 } from "../src/PackageUtil";
-import { Schema, Properties, PackageFile, catalogSlugValid, packageSlugValid } from "../src/main";
+import { Schema, Properties, PackageFile, catalogSlugValid, packageSlugValid, collectionSlugValid } from "../src/main";
 import { SemVer } from "semver";
 import { expect } from "chai";
 
@@ -280,6 +280,27 @@ describe("Checking VersionUtil", () => {
         expect(packageSlugValid("a-")).equal("PACKAGE_SLUG_INVALID");
         expect(packageSlugValid("a_")).equal("PACKAGE_SLUG_INVALID");
         expect(packageSlugValid("a___c")).equal("PACKAGE_SLUG_INVALID");
+    });
+
+    it("Collection slug validation", () => {
+        expect(collectionSlugValid("a")).equal(true);
+        expect(collectionSlugValid("a--b")).equal("COLLECTION_SLUG_INVALID");
+        expect(collectionSlugValid("a__b")).equal("COLLECTION_SLUG_INVALID");
+        expect(collectionSlugValid("a__b----c.123")).equal("COLLECTION_SLUG_INVALID");
+        expect(collectionSlugValid("a".repeat(101))).equal("COLLECTION_SLUG_TOO_LONG");
+        expect(collectionSlugValid(undefined)).equal("COLLECTION_SLUG_REQUIRED");
+        expect(collectionSlugValid("a.b")).equal("COLLECTION_SLUG_INVALID");
+        expect(collectionSlugValid("")).equal("COLLECTION_SLUG_REQUIRED");
+        expect(collectionSlugValid("0")).equal(true);
+        expect(collectionSlugValid(".")).equal("COLLECTION_SLUG_INVALID");
+        expect(collectionSlugValid("-")).equal("COLLECTION_SLUG_INVALID");
+        expect(collectionSlugValid("_")).equal("COLLECTION_SLUG_INVALID");
+        expect(collectionSlugValid("a@b")).equal("COLLECTION_SLUG_INVALID");
+        expect(collectionSlugValid("a.")).equal("COLLECTION_SLUG_INVALID");
+        expect(collectionSlugValid("a..b")).equal("COLLECTION_SLUG_INVALID");
+        expect(collectionSlugValid("a-")).equal("COLLECTION_SLUG_INVALID");
+        expect(collectionSlugValid("a_")).equal("COLLECTION_SLUG_INVALID");
+        expect(collectionSlugValid("a___c")).equal("COLLECTION_SLUG_INVALID");
     });
 
     it("Compare identical", () => {
