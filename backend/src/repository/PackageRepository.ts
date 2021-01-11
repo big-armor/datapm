@@ -366,7 +366,7 @@ export class PackageRepository {
         try {
             let log = new ActivityLog();
             log.userId = context?.me?.id;
-            log.eventType = ActivityLogEventType.PackageDeleted;
+            log.eventType = ActivityLogEventType.PACKAGE_DELETED;
             log.targetPackageId = packageEntity?.id;
 
             await this.manager.getCustomRepository(ActivityLogRepository).create(log);

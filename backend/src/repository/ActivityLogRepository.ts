@@ -7,15 +7,13 @@ export class ActivityLogRepository {
     constructor(private manager: EntityManager) {}
 
     async create(activityLog: ActivityLog): Promise<void> {
-        let log: ActivityLog;
         return this.manager.nestedTransaction(async (transaction) => {
-            if (activityLog.eventType !== ActivityLogEventType.PackageDeleted) {
-                log = await transaction.create(ActivityLog, activityLog);
-            } else {
-                console.log(JSON.stringify(log));
+            const entity = transaction.create(ActivityLog, activityLog);
+            if (activityLog.eventType !== ActivityLogEventType.PACKAGE_DELETED) {
+                await transaction.save(entity);
             }
 
-            Promise.resolve();
+            console.log(JSON.stringify(entity));
         });
     }
 }
