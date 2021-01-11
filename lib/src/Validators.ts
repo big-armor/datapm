@@ -70,3 +70,26 @@ export function collectionSlugValid(
 
     return true;
 }
+
+export function passwordValid(
+    password: string | undefined
+): "PASSWORD_REQUIRED" | "PASSWORD_TOO_LONG" | "INVALID_CHARACTERS" | "PASSWORD_TOO_SHORT" | true {
+    const regex = /[0-9@#$%!]/;
+
+    if (password === undefined || password.length === 0) {
+        return "PASSWORD_REQUIRED";
+    }
+    if (password.length > 99) {
+        return "PASSWORD_TOO_LONG";
+    }
+
+    if (password.length < 8) {
+        return "PASSWORD_TOO_SHORT";
+    }
+
+    if (password.length < 16 && password.match(regex) == null) {
+        return "INVALID_CHARACTERS";
+    }
+
+    return true;
+}

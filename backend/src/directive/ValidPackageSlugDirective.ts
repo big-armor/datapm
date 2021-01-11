@@ -1,4 +1,4 @@
-import { SchemaDirectiveVisitor, ApolloError, ValidationError } from "apollo-server";
+import { SchemaDirectiveVisitor, ValidationError } from "apollo-server";
 import {
     GraphQLField,
     defaultFieldResolver,
@@ -6,9 +6,7 @@ import {
     GraphQLObjectType,
     GraphQLInterfaceType,
     GraphQLInputField,
-    GraphQLInputObjectType,
-    GraphQLNonNull,
-    GraphQLScalarType
+    GraphQLInputObjectType
 } from "graphql";
 import { Context } from "../context";
 import { packageSlugValid } from "datapm-lib";
