@@ -1,0 +1,15 @@
+.page-container {
+    text-align: center;
+
+    .button-container {
+        width: 300px !important;
+
+        button {
+            width: 100%;
+        }
+
+        .delete-permanently-button {
+            background: #ce5959; // make this a variable
+        }
+    }
+}

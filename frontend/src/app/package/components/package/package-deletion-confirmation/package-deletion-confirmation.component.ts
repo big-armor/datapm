@@ -30,6 +30,10 @@ export class PackageDeletionConfirmationComponent implements OnInit {
         this.startCountdown();
     }
 
+    public cancel(): void {
+        this.router.navigate([this.catalogSlug, this.packageSlug]);
+    }
+
     public deletePackage(): void {
         this.deletePackageGQL
             .mutate({
