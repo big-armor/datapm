@@ -13,6 +13,7 @@
     display: flex;
     justify-content: left;
     align-items: center;
+    font-size: 1.25em;
 
     .identifier-text {
         position: relative;
@@ -136,7 +137,7 @@ hr {
 }
 
 .loading {
-    margin: 100px auto;
+    margin: 25px auto 100px;
 }
 
 @media (max-width: 576px) {
@@ -205,20 +206,8 @@ hr {
 }
 
 .package-privacy {
-    font-family: Roboto Mono;
-    font-style: normal;
-    font-weight: normal;
-    font-size: 10px;
-    line-height: 13px;
-    letter-spacing: -0.28px;
-    color: #828282;
-
     margin-bottom: 10px;
     display: block;
-
-    &.public {
-        color: #00a896;
-    }
 }
 
 .package-title {
@@ -294,6 +283,9 @@ hr {
     .left-div {
         padding-right: 15px !important;
     }
+    .identifier {
+        font-size: 1.1em;
+    }
 }
 
 @media (max-width: 768px) {
@@ -306,6 +298,9 @@ hr {
     #contentContainer {
         padding-bottom: 10px !important;
     }
+    .identifier {
+        font-size: 1.25em;
+    }
 }
 
 @media (max-width: 575px) {
@@ -316,4 +311,18 @@ hr {
         position: relative;
         top: 0px;
     }
+    .identifier {
+        font-size: 1em;
+    }
+}
+
+.mat-dialog-actions {
+    justify-content: flex-end;
+}
+
+.derivedFromSubtitle {
+    top: -15px;
+    position: relative;
+    font-size: 0.8em;
+    left: 50px;
 }

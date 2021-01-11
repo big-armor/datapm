@@ -1,6 +1,7 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, Output, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
-import { Package } from "src/generated/graphql";
+import { AuthenticationService } from "src/app/services/authentication.service";
+import { Package, User } from "src/generated/graphql";
 import * as timeago from "timeago.js";
 
 @Component({
@@ -11,16 +12,30 @@ import * as timeago from "timeago.js";
 export class PackageItemComponent implements OnInit {
     @Input() item: Package;
     @Input() hasImage: boolean;
+    @Input() ctaText: string = "";
+    @Input() showCta: boolean = false;
+    @Output() action = new EventEmitter();
 
-    constructor(private router: Router) {}
+    public currentUser: User;
 
-    ngOnInit(): void {}
+    constructor(private router: Router, private authenicationService: AuthenticationService) {}
+
+    ngOnInit(): void {
+        this.authenicationService.currentUser.subscribe((user) => {
+            this.currentUser = user;
+        });
+    }
 
     goToComponent(): void {
         const { catalogSlug, packageSlug } = this.item.identifier;
-        window.scrollTo(0, 0);
+        setTimeout(() => (document.body.scrollTop = 0), 100);
 
         this.router.navigate([catalogSlug, packageSlug]);
+    }
+
+    handleAction(ev): void {
+        ev.stopPropagation();
+        this.action.emit();
     }
 
     get lastActivityLabel(): string {

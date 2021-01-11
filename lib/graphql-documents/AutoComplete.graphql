@@ -2,16 +2,99 @@ query AutoComplete($startsWith: String!) {
     autoComplete(startsWith: $startsWith) {
         catalogs {
             identifier {
+                registryURL
                 catalogSlug
             }
             displayName
+            description
+            isPublic
         }
         packages {
+            updatedAt
             identifier {
+                registryURL
                 catalogSlug
                 packageSlug
             }
             displayName
+            description
+            latestVersion {
+                identifier {
+                    versionMajor
+                    versionMinor
+                    versionPatch
+                }
+            }
+        }
+        collections {
+            identifier {
+                collectionSlug
+            }
+            name
+            description
+        }
+        users {
+            username
+            emailAddress
+        }
+    }
+}
+
+query AutoCompleteUser($startsWith: String!) {
+    autoComplete(startsWith: $startsWith) {
+        users {
+            username
+            emailAddress
+            firstName
+            lastName
+        }
+    }
+}
+
+query AutoCompletePackage($startsWith: String!) {
+    autoComplete(startsWith: $startsWith) {
+        packages {
+            updatedAt
+            identifier {
+                registryURL
+                catalogSlug
+                packageSlug
+            }
+            displayName
+            description
+            latestVersion {
+                identifier {
+                    versionMajor
+                    versionMinor
+                    versionPatch
+                }
+            }
+        }
+    }
+}
+
+query AutoCompleteCollection($startsWith: String!) {
+    autoComplete(startsWith: $startsWith) {
+        collections {
+            identifier {
+                collectionSlug
+            }
+            name
+            description
+        }
+    }
+}
+
+query AutoCompleteCatalog($startsWith: String!) {
+    autoComplete(startsWith: $startsWith) {
+        catalogs {
+            identifier {
+                registryURL
+                catalogSlug
+            }
+            displayName
+            description
+            isPublic
         }
     }
 }

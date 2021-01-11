@@ -19,6 +19,9 @@ mutation UpdateCollection($identifier: CollectionIdentifierInput!, $value: Updat
                     versionPatch
                 }
             }
+            creator {
+                username
+            }
             catalog {
                 myPermissions
                 identifier {

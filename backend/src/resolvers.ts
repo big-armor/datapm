@@ -1,7 +1,7 @@
 import "./util/prototypeExtensions";
 import { GraphQLScalarType } from "graphql";
 import { UserRepository } from "./repository/UserRepository";
-import { AuthenticatedContext, Context } from "./context";
+import { AuthenticatedContext, AutoCompleteContext, Context } from "./context";
 import { PackageRepository } from "./repository/PackageRepository";
 import {
     MutationResolvers,
@@ -18,7 +18,8 @@ import {
     SetUserCatalogPermissionInput,
     VersionIdentifierInput,
     Base64ImageUpload,
-    Permission
+    Permission,
+    AutoCompleteResultResolvers
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
@@ -28,6 +29,7 @@ import { APIKeyRepository } from "./repository/APIKeyRepository";
 import { User } from "./entity/User";
 import { UserCatalogPermission } from "./entity/UserCatalogPermission";
 import { UserCatalogPermissionRepository } from "./repository/CatalogPermissionRepository";
+import { PackagePermissionRepository } from "./repository/PackagePermissionRepository";
 import { isAuthenticatedContext } from "./util/contextHelpers";
 import { Version } from "./entity/Version";
 import { Package } from "./entity/Package";
@@ -63,12 +65,14 @@ import {
     updateCollection,
     collectionPackages,
     usersByCollection,
-    myPermissions
+    myPermissions,
+    userCollections
 } from "./resolvers/CollectionResolver";
 import {
     setUserCollectionPermissions,
     deleteUserCollectionPermissions
 } from "./resolvers/UserCollectionPermissionResolver";
+import { deleteUserCatalogPermissions } from "./resolvers/UserCatalogPermissionResolver";
 import { login, logout, verifyEmailAddress } from "./resolvers/AuthResolver";
 import {
     createMe,
@@ -102,7 +106,9 @@ import {
     setPackageCoverImage,
     setPackagePermissions,
     updatePackage,
-    myPackages
+    myPackages,
+    userPackages,
+    usersByPackage
 } from "./resolvers/PackageResolver";
 import { ImageStorageService } from "./storage/images/image-storage-service";
 
@@ -123,6 +129,11 @@ import {
     collectionActivities,
     packageActivities
 } from "./resolvers/ActivityLogResolver";
+import { CollectionRepository } from "./repository/CollectionRepository";
+import { userCatalogs } from "./resolvers/CatalogResolver";
+import { UserPackagePermission } from "./entity/UserPackagePermission";
+import { resolvePackagePermissions } from "./directive/hasPackagePermissionDirective";
+import { resolveCatalogPermissions } from "./directive/hasCatalogPermissionDirective";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -142,7 +153,41 @@ export const resolvers: {
     UsernameOrEmailAddress: GraphQLScalarType;
     EmailAddress: GraphQLScalarType;
     CollectionSlug: GraphQLScalarType;
+    AutoCompleteResult: AutoCompleteResultResolvers;
 } = {
+    AutoCompleteResult: {
+        packages: async (parent: any, args: any, context: AutoCompleteContext, info: any) => {
+            return await context.connection.manager.getCustomRepository(PackageRepository).autocomplete({
+                user: context.me,
+                startsWith: context.query,
+                relations: getRelationNames(graphqlFields(info))
+            });
+        },
+        users: async (parent: any, args: any, context: AutoCompleteContext, info: any) => {
+            return await context.connection.manager.getCustomRepository(UserRepository).autocomplete({
+                user: context.me,
+                startsWith: context.query,
+                relations: getRelationNames(graphqlFields(info))
+            });
+        },
+
+        catalogs: async (parent: any, args: any, context: AutoCompleteContext, info: any) => {
+            return await context.connection.manager.getCustomRepository(CatalogRepository).autocomplete({
+                user: context.me,
+                startsWith: context.query,
+                relations: getRelationNames(graphqlFields(info))
+            });
+        },
+
+        collections: (parent: any, args: any, context: AutoCompleteContext, info: any) => {
+            return context.connection.manager.getCustomRepository(CollectionRepository).autocomplete({
+                user: context.me,
+                startsWith: context.query,
+                relations: getRelationNames(graphqlFields(info))
+            });
+        }
+    },
+
     PackageFileJSON: new GraphQLScalarType({
         name: "PackageFileJSON",
         serialize: (value: any) => {
@@ -306,33 +351,14 @@ export const resolvers: {
         myPermissions: async (parent: any, _1: any, context: Context) => {
             const catalog = parent as Catalog;
 
-            if (context.me == null) {
-                if (catalog.isPublic) return [Permission.VIEW];
+            return resolveCatalogPermissions(context, { catalogSlug: catalog.slug }, context.me);
+        },
+        creator: async (parent: any, _1: any, context: Context, info: any) => {
+            const catalog = parent as Catalog;
 
-                console.error(
-                    "Anonymous user request just resolved permissions for a non-public catalog!!! THIS IS BAD!!!"
-                );
-                exit(1); // Shut down the server so the admin knows something very bad happened
-            }
-
-            const userPermission = await context.connection
-                .getCustomRepository(UserCatalogPermissionRepository)
-                .findCatalogPermissions({
-                    catalogId: catalog.id,
-                    userId: context.me.id
-                });
-
-            if (userPermission == null) {
-                if (catalog.isPublic) return [Permission.VIEW];
-                console.error(
-                    "User " +
-                        context.me.username +
-                        " request just resolved permissions for a non-public catalog to which they have no permissions!!! THIS IS BAD!!!"
-                );
-                exit(1); // Shut down the server so the admin knows something very bad happened
-            }
-
-            return userPermission.permissions;
+            return await context.connection
+                .getCustomRepository(UserRepository)
+                .findOneOrFail({ where: { id: catalog.creatorId }, relations: getGraphQlRelationName(info) });
         }
     },
     Collection: {
@@ -403,7 +429,23 @@ export const resolvers: {
         },
 
         identifier: findPackageIdentifier,
-        creator: findPackageCreator
+        creator: findPackageCreator,
+        myPermissions: async (parent: any, _0: any, context: AuthenticatedContext) => {
+            const packageEntity = parent as Package;
+
+            const catalog = await context.connection.getRepository(Catalog).findOne(packageEntity.catalogId);
+
+            if (catalog == null) throw new Error("CATALOG_NOT_FOUND - " + packageEntity.catalogId);
+
+            return resolvePackagePermissions(
+                context,
+                {
+                    catalogSlug: catalog?.slug,
+                    packageSlug: packageEntity.slug
+                },
+                context.me
+            );
+        }
     },
 
     Version: {
@@ -515,30 +557,17 @@ export const resolvers: {
         searchCollections: searchCollections,
         collectionPackages: collectionPackages,
         usersByCollection: usersByCollection,
-
-        autoComplete: async (_0: any, { startsWith }, context: AuthenticatedContext, info: any) => {
-            const catalogs = context.connection.manager.getCustomRepository(CatalogRepository).autocomplete({
-                user: context.me,
-                startsWith,
-                relations: getRelationNames(graphqlFields(info).catalogs)
-            });
-
-            const packages = context.connection.manager.getCustomRepository(PackageRepository).autocomplete({
-                user: context.me,
-                startsWith,
-                relations: getRelationNames(graphqlFields(info).packages)
-            });
-
-            const users = context.connection.manager.getCustomRepository(PackageRepository).autocomplete({
-                user: context.me,
-                startsWith,
-                relations: getRelationNames(graphqlFields(info).users)
-            });
-
+        usersByPackage: usersByPackage,
+        userCatalogs: userCatalogs,
+        userCollections: userCollections,
+        userPackages: userPackages,
+        autoComplete: async (_0: any, { startsWith }, context: AutoCompleteContext, info: any) => {
+            context.query = startsWith;
             return {
-                catalogs: await catalogs,
-                packages: await packages,
-                users: await users
+                catalogs: [],
+                users: [],
+                collections: [],
+                packages: []
             };
         },
 
@@ -630,7 +659,7 @@ export const resolvers: {
 
         createCatalog: async (_0: any, { value }, context: AuthenticatedContext, info: any) => {
             return context.connection.manager.getCustomRepository(CatalogRepository).createCatalog({
-                username: context.me?.username,
+                userId: context.me?.id,
                 value,
                 relations: getGraphQlRelationName(info)
             });
@@ -696,6 +725,7 @@ export const resolvers: {
         removePackageFromCollection: removePackageFromCollection,
         setUserCollectionPermissions: setUserCollectionPermissions,
         deleteUserCollectionPermissions: deleteUserCollectionPermissions,
+        deleteUserCatalogPermissions: deleteUserCatalogPermissions,
 
         createVersion: async (_0: any, { identifier, value }, context: AuthenticatedContext, info: any) => {
             const fileStorageService = FileStorageService.INSTANCE;

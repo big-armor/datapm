@@ -58,7 +58,7 @@ describe("Collection Permissions", async () => {
                     collectionSlug: "testA-collection-permissions"
                 },
                 value: {
-                    username: "my-test-user100",
+                    usernameOrEmailAddress: "my-test-user100",
                     permissions: newPermissions
                 }
             }
@@ -77,13 +77,33 @@ describe("Collection Permissions", async () => {
                     collectionSlug: "testA-collection-permissions"
                 },
                 value: {
-                    username: "my-test-user102",
+                    usernameOrEmailAddress: "my-test-user102",
                     permissions: newPermissions
                 }
             }
         });
 
         expect(response.errors![0].message).to.equal("USER_NOT_FOUND - my-test-user102");
+    });
+
+    it("Can not set permissions for creator", async function () {
+        const newPermissions = [Permission.VIEW];
+        let response = await userAClient.mutate({
+            mutation: SetUserCollectionPermissionsDocument,
+            variables: {
+                identifier: {
+                    collectionSlug: "testA-collection-permissions"
+                },
+                value: {
+                    usernameOrEmailAddress: "my-test-user100",
+                    permissions: newPermissions
+                }
+            }
+        });
+
+        expect(response.errors! !== null).equal(true);
+        expect(response.errors!.find((e) => e.message.includes("CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS"))).is.not
+            .null;
     });
 
     it("successfully setting permissions for authorized use case", async function () {
@@ -95,7 +115,7 @@ describe("Collection Permissions", async () => {
                     collectionSlug: "testA-collection-permissions"
                 },
                 value: {
-                    username: "my-test-user101",
+                    usernameOrEmailAddress: "my-test-user101",
                     permissions: newPermissions
                 }
             }
@@ -105,7 +125,7 @@ describe("Collection Permissions", async () => {
     });
 
     it("updating user permissions by changing the permissions list", async function () {
-        const newPermissions = [Permission.VIEW, Permission.EDIT];
+        const newPermissions = [Permission.VIEW, Permission.EDIT, Permission.MANAGE];
 
         let response = await userAClient.mutate({
             mutation: SetUserCollectionPermissionsDocument,
@@ -114,13 +134,28 @@ describe("Collection Permissions", async () => {
                     collectionSlug: "testA-collection-permissions"
                 },
                 value: {
-                    username: "my-test-user101",
+                    usernameOrEmailAddress: "my-test-user101",
                     permissions: newPermissions
                 }
             }
         });
 
         expect(response.errors! == null).true;
+    });
+
+    it("Should not allow other user to remove creator permissions", async function () {
+        let response = await userAClient.mutate({
+            mutation: DeleteUserCollectionPermissionsDocument,
+            variables: {
+                identifier: {
+                    collectionSlug: "testA-collection-permissions"
+                },
+                username: "my-test-user100"
+            }
+        });
+
+        expect(response.errors !== null).true;
+        expect(response.errors!.find((e) => e.message.includes("CANNOT_REMOVE_CREATOR_PERMISSIONS"))).not.null;
     });
 
     it("Validate that the target user has the permission granted to view a collection that they did not previously", async function () {
@@ -165,7 +200,7 @@ describe("Collection Permissions", async () => {
                     collectionSlug: "testF-collection"
                 },
                 value: {
-                    username: "my-test-user101",
+                    usernameOrEmailAddress: "my-test-user101",
                     permissions: newPermissions
                 }
             }

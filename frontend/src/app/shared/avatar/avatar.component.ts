@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from "@angular/core";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
-import { AuthenticationService } from "src/app/services/authentication.service";
 
 import { FileService } from "src/app/services/file.service";
 import { ImageService } from "src/app/services/image.service";
@@ -56,7 +55,7 @@ export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
         if (changes.user && changes.user.currentValue) {
             this.user = changes.user.currentValue;
 
-            if (this.user?.nameIsPublic && this.user?.firstName && this.user?.lastName) {
+            if (this.user?.firstName && this.user?.lastName) {
                 this.letter =
                     this.user.firstName.substr(0, 1).toUpperCase() + this.user.lastName.substr(0, 1).toUpperCase();
             } else if (this.user.username != null) {
@@ -94,7 +93,6 @@ export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
                 this.state = State.LOADED;
             },
             (error) => {
-                console.log(JSON.stringify(error, null, 1));
                 this.imgData = null;
                 this.userBackgroundColor = this.hashStringToColor(username);
                 this.state = State.LOADED;

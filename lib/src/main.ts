@@ -46,6 +46,25 @@ export interface ValueTypeStatistics {
 export type Properties = { [key: string]: Schema };
 export type ValueTypes = { [key: string]: ValueTypeStatistics };
 
+export interface SchemaIdentifier {
+    registryUrl: string;
+    catalogSlug: string;
+    packageSlug: string;
+    version: string;
+    schemaTitle: string;
+}
+
+export interface DerivedFrom {
+    /** User friendly name for the upstream data */
+    displayName: string;
+
+    /** A website or direct link for the upstream data. Url or schemaIdentifier must be defined */
+    url?: string;
+
+    /** The identifier for the specific version of the datapm package version and schema title. Url or schemaIdentifier must be defined.  */
+    schemaIdentifier?: SchemaIdentifier;
+}
+
 /** The JSON Schema Draft 07 compliant schema object, extended with properties that describe
  * how to obtain the data, and details the values of the data properties.
  */
@@ -83,6 +102,12 @@ export interface Schema extends JSONSchema7 {
 
     /** A  selected set of sample records that are representative of the schema */
     sampleRecords?: { [key: string]: unknown }[];
+
+    /** A description or specific SQL used to generate the data in this schema from an upstream set of data in the 'derivedFrom' property. */
+    derivedFromDescription?: string;
+
+    /** A list of references to upstream data from which this schema was derived. This is also called "Provenance" */
+    derivedFrom?: DerivedFrom[];
 }
 
 export interface PackageFile {

@@ -14,5 +14,6 @@ query User($username: String!) {
         gitHubHandleIsPublic
         emailAddressIsPublic
         websiteIsPublic
+        description
     }
 }

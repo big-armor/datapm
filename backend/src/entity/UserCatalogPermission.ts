@@ -28,4 +28,7 @@ export class UserCatalogPermission extends BaseModel {
 
     @Column("enum", { array: true, name: "permission", enum: Permission })
     permissions: Permission[];
+
+    @Column("enum", { array: true, name: "package_permission", enum: Permission })
+    packagePermission: Permission[];
 }

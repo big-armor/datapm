@@ -8,10 +8,35 @@ import {
     EnumValueNode
 } from "graphql";
 import { Context } from "../context";
+import { User } from "../entity/User";
 import { CatalogIdentifierInput, Permission } from "../generated/graphql";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { CatalogRepository } from "../repository/CatalogRepository";
 
+export async function resolveCatalogPermissions(context: Context, identifier: CatalogIdentifierInput, user?: User) {
+    const catalog = await context.connection
+        .getCustomRepository(CatalogRepository)
+        .findCatalogBySlugOrFail(identifier.catalogSlug);
+
+    const permissions: Permission[] = [];
+
+    if (catalog.isPublic) permissions.push(Permission.VIEW);
+
+    if (user == null) return permissions;
+
+    const userPermission = await context.connection
+        .getCustomRepository(UserCatalogPermissionRepository)
+        .findCatalogPermissions({
+            catalogId: catalog.id,
+            userId: user.id
+        });
+
+    userPermission?.permissions.forEach((p) => {
+        if (!permissions.includes(p)) permissions.push(p);
+    });
+
+    return permissions;
+}
 export class HasCatalogPermissionDirective extends SchemaDirectiveVisitor {
     visitObject(object: GraphQLObjectType) {
         const fields = object.getFields();
@@ -59,29 +84,12 @@ export class HasCatalogPermissionDirective extends SchemaDirectiveVisitor {
     }
 
     async validatePermission(context: Context, catalogSlug: string, permission: Permission) {
-        // Check that the requested catalog exists
-        const catalog = await context.connection
-            .getCustomRepository(CatalogRepository)
-            .findCatalogBySlug({ slug: catalogSlug });
+        const permissions = await resolveCatalogPermissions(context, { catalogSlug }, context.me);
 
-        if (catalog == null) {
-            throw new UserInputError("CATALOG_NOT_FOUND");
-        }
+        if (permissions.includes(permission)) return;
 
-        if (permission == Permission.VIEW && catalog.isPublic) {
-            return;
-        }
+        if (context.me == null) throw new AuthenticationError(`NOT_AUTHENTICATED`);
 
-        if (!context.me) throw new AuthenticationError("NOT_AUTHENTICATED");
-
-        const catalogPermission = await context.connection
-            .getCustomRepository(UserCatalogPermissionRepository)
-            .findOne({
-                catalogId: catalog.id,
-                userId: context.me.id
-            });
-
-        if (catalogPermission == null || catalogPermission?.permissions.indexOf(permission) === -1)
-            throw new ForbiddenError("NOT_AUTHORIZED");
+        throw new ForbiddenError("NOT_AUTHORIZED");
     }
 }

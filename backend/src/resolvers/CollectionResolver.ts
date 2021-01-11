@@ -264,6 +264,24 @@ export const searchCollections = async (
     };
 };
 
+export const userCollections = async (
+    _0: any,
+    { username, limit, offSet }: { username: string; limit: number; offSet: number },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const relations = getGraphQlRelationName(info);
+    const [searchResponse, count] = await context.connection.manager
+        .getCustomRepository(CollectionRepository)
+        .userCollections({ user: context.me, username, offSet: offSet, limit, relations });
+
+    return {
+        hasMore: count - (offSet + limit) > 0,
+        collections: searchResponse,
+        count
+    };
+};
+
 export const myPermissions = async (parent: any, _0: any, context: AuthenticatedContext) => {
     const collection = parent as Collection;
 

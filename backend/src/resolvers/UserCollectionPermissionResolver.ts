@@ -1,5 +1,6 @@
 import { AuthenticatedContext } from "../context";
 import { Permission, CollectionIdentifierInput, SetUserCollectionPermissionsInput } from "../generated/graphql";
+import { CollectionRepository } from "../repository/CollectionRepository";
 import { UserCollectionPermissionRepository } from "../repository/UserCollectionPermissionRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
 
@@ -8,6 +9,18 @@ export const hasCollectionPermissions = async (
     collectionId: number,
     permission: Permission
 ) => {
+    if (permission == Permission.VIEW) {
+        const collection = await context.connection
+            .getCustomRepository(CollectionRepository)
+            .findOne({ id: collectionId });
+
+        if (collection?.isPublic) return true;
+    }
+
+    if (context.me == null) {
+        return false;
+    }
+
     return context.connection
         .getCustomRepository(UserCollectionPermissionRepository)
         .hasPermission(context.me.id, collectionId, permission);
@@ -47,7 +60,7 @@ export const deleteUserCollectionPermissions = async (
     { identifier, username }: { identifier: CollectionIdentifierInput; username: string },
     context: AuthenticatedContext
 ) => {
-    await context.connection.getCustomRepository(UserCollectionPermissionRepository).deleteUserCollectionPermissions({
+    return context.connection.getCustomRepository(UserCollectionPermissionRepository).deleteUserCollectionPermissions({
         identifier,
         username
     });

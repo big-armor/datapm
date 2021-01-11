@@ -1,16 +1,53 @@
-<div *ngIf="catalog">
-    <b>{{ catalog.displayName }}</b>
-    <div *ngIf="catalog.identifier.catalogSlug != catalog.displayName">
-        {{ catalog.identifier.catalogSlug }}
+<div class="catalog-details container">
+    <ng-container *ngIf="state === 'SUCCESS'">
+        <app-cover [catalogSlug]="catalogSlug"></app-cover>
+
+        <div *ngIf="catalog" class="collections-public mb-3">
+            <span *ngIf="catalog?.isPublic" class="public-text">public</span>
+            <span *ngIf="!catalog?.isPublic" class="not-public-text">not public</span>
+        </div>
+        <div class="catalog-header">
+            <h1 class="dpm-text-title mb-1">{{ catalog?.displayName }}</h1>
+            <h3 class="dpm-text-body mb-1 catalog-slug">{{ catalogSlug }}</h3>
+            <p class="dpm-text-small catalog-description">
+                {{ catalog?.description }}
+            </p>
+        </div>
+        <mat-tab-group [(selectedIndex)]="currentTab" disableRipple class="catalog-tabs">
+            <mat-tab label="Packages"></mat-tab>
+            <mat-tab label="Manage" *ngIf="canManage"></mat-tab>
+        </mat-tab-group>
+        <div *ngIf="currentTab === 0">
+            <app-package-item
+                [item]="package"
+                [hasImage]="true"
+                ctaText="Remove From Catalog"
+                [showCta]="canEdit"
+                (action)="removePackage(package)"
+                *ngFor="let package of catalog?.packages"
+            >
+            </app-package-item>
+            <div class="dpm-no-data" *ngIf="!catalog?.packages?.length">
+                <p>
+                    This catalog contains no packages, or you do not have permission to view the packages it does
+                    contain.
+                </p>
+                <a href="/docs/publish-data/" target="_blank" *ngIf="catalog.myPermissions.includes('EDIT')"
+                    >Learn how to publish</a
+                >
+            </div>
+        </div>
+        <app-catalog-permissions [catalog]="catalog" *ngIf="currentTab === 1"></app-catalog-permissions>
+    </ng-container>
+    <div class="dpm-no-data" *ngIf="state === 'CATALOG_NOT_FOUND'">The catalog does not exist.</div>
+    <div class="dpm-no-data" *ngIf="state === 'NOT_AUTHENTICATED'">
+        <p>You must login to view this catalog.</p>
+        <a class="app-outlined-button mt-3 px-3" (click)="loginClicked()">Login</a>
     </div>
-    <a class="app-outlined-button ml-3" *ngIf="canEdit" (click)="editCatalog()">Edit</a>
-    <p>{{ catalog.description }}</p>
-    <h3>Packages</h3>
-    <ul>
-        <li *ngFor="let package of catalog.packages">
-            <a routerLink="/{{ catalog.identifier.catalogSlug }}/{{ package.identifier.packageSlug }}">
-                {{ package.displayName || package.identifier.packageSlug }}
-            </a>
-        </li>
-    </ul>
+    <div class="dpm-no-data" *ngIf="state === 'ERROR'">
+        An error ocurred while getting catalog details. Please try again later.
+    </div>
+    <div class="dpm-page-loading" *ngIf="state === 'LOADING'">
+        <mat-spinner [diameter]="32"></mat-spinner>
+    </div>
 </div>

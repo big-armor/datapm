@@ -1,30 +1,29 @@
 <mat-card class="package-item my-3" (click)="goToComponent()">
     <mat-card-content>
-        <div class="d-flex justify-content-between mt-1 mb-2 up-header">
-            <div>Updated {{ lastActivityLabel }}</div>
-            <!-- <div>2 downloaded</div> -->
+        <div
+            class="mb-2 package-privacy"
+            *ngIf="this.item?.myPermissions?.includes('MANAGE')"
+            [class.public-text]="item?.isPublic"
+            [class.not-public-text]="!item?.isPublic"
+        >
+            {{ item?.isPublic ? "public" : "not public" }}
         </div>
-        <div class="d-flex align-items-center mb-2 package-creator">
-            <app-avatar class="user-img" [user]="item.creator" [size]="30"> </app-avatar>
-            <span class="name">{{ item.creator | username }}</span>
-        </div>
-        <div class="d-flex mb-3">
-            <!-- To be updated later -->
-            <div class="package-image flex-1 pr-4" *ngIf="hasImage">
-                <img
-                    src="https://www.publicdomainpictures.net/pictures/320000/velka/background-image.png"
-                    alt="Package"
-                />
+        <div class="d-flex">
+            <div class="d-flex align-items-start mb-2">
+                <app-avatar class="align-top user-img" [user]="item.creator" [size]="40"> </app-avatar>
             </div>
-            <div class="flex-1 px-3 py-1">
-                <div class="package-identifier mb-2">
-                    {{ item.identifier.catalogSlug }} / {{ item.identifier.packageSlug }}
+            <div class="mb-3">
+                <div class="package-identifier mb-2 ml-2">
+                    {{ item.identifier.catalogSlug }}/{{ item.identifier.packageSlug }}
                 </div>
-                <div class="package-description">
-                    {{ truncatedDescription }}
+                <div class="flex-1 ml-2">
+                    <div class="package-description">
+                        {{ truncatedDescription }}
+                    </div>
                 </div>
             </div>
         </div>
+
         <!-- <div class="package-chips pb-2">
             <mat-chip-list>
                 <mat-chip *ngFor="let tag of tags">{{ tag }}</mat-chip>
@@ -46,5 +45,6 @@
                 </div> -->
             </div>
         </div>
+        <a class="app-outlined-button ctaButton" *ngIf="showCta" (click)="handleAction($event)">{{ ctaText }}</a>
     </mat-card-content>
 </mat-card>

@@ -40,13 +40,13 @@ async function getUserCatalogPermissionOrFail({
 }
 
 export async function grantUserCatalogPermission({
-    username,
+    userId,
     catalogSlug,
     permissions,
     manager,
     relations = []
 }: {
-    username: string;
+    userId: number;
     catalogSlug: string;
     permissions: Permission[];
     manager: EntityManager;
@@ -54,7 +54,8 @@ export async function grantUserCatalogPermission({
 }): Promise<UserCatalogPermission | null> {
     const userCatalogPermission = await manager.nestedTransaction(async (transaction) => {
         // find the user
-        const user = await transaction.getCustomRepository(UserRepository).findUserByUserName({ username });
+        const user = await transaction.getCustomRepository(UserRepository).findOne({ id: userId });
+        if (user == null) throw new Error("USER_NOT_FOUND");
 
         // find the catalog
         const catalog = await transaction
@@ -215,6 +216,10 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
                 .getCustomRepository(CatalogRepository)
                 .findCatalogBySlugOrFail(identifier.catalogSlug);
 
+            if (catalogEntity.creatorId == user.id) {
+                throw new Error("CANNOT_CHANGE_CATALOG_CREATOR_PERMISSIONS");
+            }
+
             const permissions = await this.findByUserAndCatalogId(user.id, catalogEntity.id);
 
             // If permission input is not empty
@@ -226,6 +231,7 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
                         catalogPermissionEntry.userId = user.id;
                         catalogPermissionEntry.catalogId = catalogEntity.id;
                         catalogPermissionEntry.permissions = value.permission;
+                        catalogPermissionEntry.packagePermission = value.packagePermission;
                         return await transaction.save(catalogPermissionEntry);
                     } catch (e) {
                         console.log(e);
@@ -238,7 +244,7 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
                         return await transaction
                             .createQueryBuilder()
                             .update(UserCatalogPermission)
-                            .set({ permissions: value.permission })
+                            .set({ permissions: value.permission, packagePermission: value.packagePermission })
                             .where({ catalogId: catalogEntity.id, userId: user.id })
                             .execute();
                     } catch (e) {
@@ -263,6 +269,29 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
                 }
             }
             return;
+        });
+    }
+
+    deleteUserCatalogPermissions({
+        identifier,
+        username
+    }: {
+        identifier: CatalogIdentifierInput;
+        username: string;
+        relations?: string[];
+    }): Promise<void> {
+        return this.manager.nestedTransaction(async (transaction) => {
+            const user = await transaction.getCustomRepository(UserRepository).findOneOrFail({ username });
+
+            const catalogEntity = await transaction
+                .getCustomRepository(CatalogRepository)
+                .findCatalogBySlugOrFail(identifier.catalogSlug);
+
+            if (catalogEntity.creatorId == user.id) {
+                throw new Error("CANNOT_REMOVE_CREATOR_PERMISSIONS");
+            }
+
+            await transaction.delete(UserCatalogPermission, { catalogId: catalogEntity.id });
         });
     }
 }

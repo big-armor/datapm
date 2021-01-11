@@ -8,6 +8,7 @@ const SCHEMA_DIR = path.join(__dirname, "node_modules", "datapm-lib");
 function copyFiles() {
     return src([
         "ormconfig.js",
+        "startServer.sh",
         "package.json",
         "static/robots.txt",
         "static/robots-production.txt",

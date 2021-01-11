@@ -54,7 +54,7 @@ describe("Package Search Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.createPackage.catalog.displayName).to.equal("testA-packages-search");
+        expect(response.data!.createPackage.catalog?.displayName).to.equal("testA-packages-search");
         expect(response.data!.createPackage.description).to.equal("Test upload of congressional legislators");
         expect(response.data!.createPackage.displayName).to.equal("Congressional Legislators");
         expect(response.data!.createPackage.identifier.catalogSlug).to.equal("testA-packages-search");
@@ -87,7 +87,7 @@ describe("Package Search Tests", async () => {
         }
 
         expect(response.errors == null, "no errors").true;
-        expect(response.data!.createVersion.author.username).equal("testA-packages-search");
+        expect(response.data!.createVersion.author?.username).equal("testA-packages-search");
 
         const responsePackageFileContents = response.data!.createVersion.packageFile;
 

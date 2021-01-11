@@ -1,12 +1,12 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
 import { ActivatedRoute, ParamMap, Router } from "@angular/router";
 import { FormControl } from "@angular/forms";
-import { takeUntil } from "rxjs/operators";
-import { Subject } from "rxjs";
+import { takeUntil, startWith, map, filter, debounceTime, switchMap } from "rxjs/operators";
+import { Subject, Observable, BehaviorSubject } from "rxjs";
 
 import { AuthenticationService } from "../../services/authentication.service";
 import { DialogService } from "../../services/dialog.service";
-import { User } from "src/generated/graphql";
+import { AutoCompleteGQL, AutoCompleteResult, User } from "src/generated/graphql";
 import { MatDialog } from "@angular/material/dialog";
 import { LoginDialogComponent } from "./login-dialog/login-dialog.component";
 import { SignUpDialogComponent } from "./sign-up-dialog/sign-up-dialog.component";
@@ -18,6 +18,11 @@ enum State {
     ERROR,
     SUCCESS,
     ERROR_NOT_UNIQUE
+}
+
+interface Option {
+    package?: string;
+    collection?: string;
 }
 @Component({
     selector: "sd-header",
@@ -31,33 +36,45 @@ export class HeaderComponent implements OnInit, OnDestroy {
     searchControl: FormControl;
     private subscription = new Subject();
 
+    autoCompleteResult: AutoCompleteResult;
+
     constructor(
         private matDialog: MatDialog,
         private dialog: DialogService,
         private router: Router,
         private route: ActivatedRoute,
-        private authenticationService: AuthenticationService
+        private authenticationService: AuthenticationService,
+        private autocomplete: AutoCompleteGQL
     ) {
         this.searchControl = new FormControl("");
     }
 
     ngOnInit(): void {
+        this.searchControl.valueChanges
+            .pipe(
+                debounceTime(500),
+                switchMap((value) => {
+                    if (value.length < 2) {
+                        this.autoCompleteResult = null;
+                        return [];
+                    }
+                    return this.autocomplete.fetch({ startsWith: value });
+                })
+            )
+            .subscribe((result) => {
+                if (result.errors != null) this.autoCompleteResult = null;
+                else this.autoCompleteResult = result.data.autoComplete;
+            });
+
         this.route.queryParamMap.pipe(takeUntil(this.subscription)).subscribe((queryParams: ParamMap) => {
             this.searchControl.setValue(queryParams.get("q") || "");
         });
-        this.authenticationService
-            .getUserObservable()
-            .pipe(takeUntil(this.subscription))
-            .subscribe((u) => {
-                if (u == null) {
-                    return;
-                }
-
-                u.then((user) => {
-                    this.currentUser = user;
-                    this.state = State.SUCCESS;
-                }).catch(() => (this.state = State.ERROR));
-            });
+        this.authenticationService.currentUser.pipe(takeUntil(this.subscription)).subscribe((user: User) => {
+            this.currentUser = user;
+            if (user) {
+                this.state = State.SUCCESS;
+            }
+        });
         this.dialog.actions.pipe(takeUntil(this.subscription)).subscribe((action: string) => {
             switch (action) {
                 case "login":
@@ -89,6 +106,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
         });
     }
 
+    autoComplete(val: string) {
+        this.autocomplete.fetch({ startsWith: val }).subscribe(({ data }) => {
+            if (!data) return;
+            this.autoCompleteResult = data.autoComplete;
+        });
+    }
+
     ngOnDestroy(): void {
         this.subscription.unsubscribe();
     }
@@ -102,7 +126,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
 
     search() {
-        console.log(this.searchControl.value);
         this.router.navigate(["/search"], { queryParams: { q: this.searchControl.value } });
     }
 
@@ -111,12 +134,18 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
 
     goToMyDetails() {
-        this.router.navigate(["/me"]);
+        this.router.navigate([this.currentUser?.username]);
     }
 
     logout() {
         this.authenticationService.logout();
         setTimeout(() => (this.currentUser = null), 500);
         this.router.navigate(["/"]);
+    }
+
+    autoCompleteOptionSelected(event) {
+        this.router.navigate(["/" + event.option.value]);
+        this.searchControl.setValue("");
+        this.autoCompleteResult = null;
     }
 }

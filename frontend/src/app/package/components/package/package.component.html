@@ -73,20 +73,29 @@
                             <span
                                 class="py-2 package-privacy"
                                 *ngIf="this.currentUser && this.currentUser?.username == this.catalogUser?.username"
-                                [class.public]="package?.isPublic"
+                                [class.public-text]="package?.isPublic"
+                                [class.not-public-text]="!package?.isPublic"
                             >
                                 {{ package?.isPublic ? "public" : "not public" }}
                             </span>
                             <div class="package-identifier">
                                 <div class="identifier">
-                                    <app-avatar class="user-img" *ngIf="catalogUser" [user]="catalogUser" [size]="32">
+                                    <app-avatar class="user-img" *ngIf="catalogUser" [user]="catalogUser" [size]="40">
                                     </app-avatar>
                                     <div class="identifier-text text-overflow-elipses">
                                         <a [routerLink]="['/' + package?.identifier.catalogSlug]">{{
                                             package?.identifier.catalogSlug
                                         }}</a
-                                        >&nbsp;/&nbsp;{{ package?.identifier.packageSlug }}
+                                        >/{{ package?.identifier.packageSlug }}
                                     </div>
+                                </div>
+                                <div class="derivedFromSubtitle" *ngIf="derivedFromCount(packageFile) > 0">
+                                    Derived from
+                                    <span>
+                                        <a href="javascript:void(0)" (click)="openDerivedFromModal(packageFile)"
+                                            >{{ derivedFromCount(packageFile) }} upstream data sets</a
+                                        >
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -124,13 +133,22 @@
                             <div class="row">
                                 <div class="col-md-12" id="packageDetails">
                                     <div class="row flex-lg-row-reverse">
-                                        <div class="col-lg-5 col-md-12 col-lg-push-7 right-div d-none d-lg-block">
+                                        <div
+                                            class="col-lg-5 col-md-12 col-lg-push-7 right-div d-none d-lg-block"
+                                            *ngIf="getActiveTab()?.showDetails"
+                                        >
                                             <app-package-info
                                                 [package]="package"
                                                 [packageFile]="packageFile"
                                             ></app-package-info>
                                         </div>
-                                        <div class="col-lg-7 col-md-12 col-lg-pull-5 left-div">
+                                        <div
+                                            [ngClass]="{
+                                                'col-lg-7 col-md-12 col-lg-pull-5 left-div': getActiveTab()
+                                                    ?.showDetails,
+                                                'col-12': !getActiveTab()?.showDetails
+                                            }"
+                                        >
                                             <div>
                                                 <router-outlet></router-outlet>
                                             </div>
@@ -145,3 +163,24 @@
         </div>
     </div>
 </div>
+
+<ng-template #derivedFrom let-package>
+    <h2 mat-dialog-title>Provenance for {{ package.displayName }}</h2>
+    <mat-dialog-content>
+        <div *ngFor="let schema of package.schemas">
+            <h3>{{ schema.title }}</h3>
+            {{ schema.derivedFromDescription }}
+            <br /><br />
+            <h3>Derived From</h3>
+            <ul>
+                <li *ngFor="let derivedFrom of schema.derivedFrom">
+                    <a href="{{ derivedFrom.url }}" target="_blank">{{ derivedFrom.displayName }}</a>
+                </li>
+            </ul>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
+        <button mat-button [mat-dialog-close]="true">Close</button>
+    </mat-dialog-actions>
+</ng-template>

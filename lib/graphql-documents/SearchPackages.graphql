@@ -1,10 +1,12 @@
 query SearchPackages($query: String!, $limit: Int!, $offset: Int!) {
     searchPackages(query: $query, limit: $limit, offSet: $offset) {
         packages {
+            isPublic
+            myPermissions
             creator {
                 firstName
                 lastName
-                emailAddress
+                username
             }
             identifier {
                 catalogSlug

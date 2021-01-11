@@ -155,22 +155,98 @@
                                     ]
                                 }
                             },
+                            "derivedFrom": {
+                                "$id": "#/schemas/derivedFrom",
+                                "type": "array",
+                                "description": "An array of identifiers (URIs, files, or package identifers, that the schema is derived from",
+                                "title": "Derived From",
+                                "default": [],
+                                "items": {
+                                    "type": "object",
+                                    "required": ["displayName"],
+                                    "oneOf": [{ "required": ["packageIdentifier"] }, { "required": ["url"] }],
+                                    "properties": {
+                                        "displayName": {
+                                            "type": "string",
+                                            "maxLength": 128
+                                        },
+                                        "schemaIdentifier": {
+                                            "type": "object",
+                                            "required": ["registryUrl", "catalogSlug", "packageSlug", "version"],
+                                            "description": "Optionally, The identifier for the upstream schema.",
+                                            "properties": {
+                                                "registryUrl": {
+                                                    "$id": "#/schemas/derivedFrom/packageIdentifier/registryUrl",
+                                                    "type": "string",
+                                                    "maxLength": 512,
+                                                    "description": "The base URL of the registry. Example https://datapm.company.net"
+                                                },
+                                                "catalogSlug": {
+                                                    "$id": "#/schemas/derivedFrom/packageIdentifier/catalogSlug",
+                                                    "type": "string",
+                                                    "maxLength": 38,
+                                                    "pattern": "^[a-z0-9](?:[a-z0-9]|-(?=[a-z0-9])){0,38}$"
+                                                },
+                                                "packageSlug": {
+                                                    "$id": "#/schemas/derivedFrom/packageIdentifier/packageSlug",
+                                                    "type": "string",
+                                                    "maxLength": 100,
+                                                    "title": "Short Name",
+                                                    "description": "The name used to reference this package for API and developer purposes. This field is restricted to characters A-z,0-9,_,-,@",
+                                                    "default": "",
+                                                    "pattern": "^[a-z0-9]+(?:(?:(?:[._]|__|[-]*)[a-z0-9]+)+)?$"
+                                                },
+                                                "version": {
+                                                    "$id": "#/schemas/derivedFrom/packageIdentifier/version",
+                                                    "type": "string",
+                                                    "maxLength": 128,
+                                                    "title": "Version",
+                                                    "description": "In the semantic versioning format of major.minor.patch",
+                                                    "default": "1.0.0",
+                                                    "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+                                                },
+                                                "schemaTitle": {
+                                                    "$id": "#/schemas/derivedFrom/packageIdentifier/schemaTitle",
+                                                    "type": "string",
+                                                    "maxLength": 512,
+                                                    "title": "Schema Title",
+                                                    "description": "The title of the schema in the upstream package file"
+                                                }
+                                            }
+                                        },
+                                        "url": {
+                                            "$id": "#/schemas/derivedFrom/url",
+                                            "type": "string",
+                                            "format": "url",
+                                            "maxLength": 2048,
+                                            "description": "Alternatively to the packageIdentifier, a URL of the upstream data set or website about it"
+                                        }
+                                    }
+                                }
+                            },
+                            "derivedFromDescription": {
+                                "$id": "#/schemas/derivedFromDescription",
+                                "type": "string",
+                                "maxLength": 2048,
+                                "title": "Derived From Description",
+                                "description": "A short description, script, or SQL that describes how this schema was derived from the references in the 'derivedFrom' property."
+                            },
                             "recordCount": {
-                                "$id": "#/schemas/statistics/recordCount",
+                                "$id": "#/schemas/recordCount",
                                 "type": "integer",
                                 "title": "Record Count",
                                 "description": "The exact or estamated number of records in the data set.",
                                 "default": 0
                             },
                             "recordCountApproximate": {
-                                "$id": "#/schemas/statistics/recordCountApproximate",
+                                "$id": "#/schemas/recordCountApproximate",
                                 "type": "boolean",
                                 "title": "Record Count Approximate",
                                 "description": "Whether a record count is exact or approximate",
                                 "default": false
                             },
                             "unit": {
-                                "$id": "#/schemas/statistics/unit",
+                                "$id": "#/schemas/unit",
                                 "type": "string",
                                 "title": "Unit",
                                 "description": "What schema or a property in the data represents. Example: Country, Person, Location and Time, etc",
@@ -178,14 +254,14 @@
                             },
 
                             "byteCount": {
-                                "$id": "#/schemas/statistics/byteCount",
+                                "$id": "#/schemas/byteCount",
                                 "type": "integer",
                                 "title": "Byte Count",
                                 "description": "The exact or approximate number of bytes in the raw dataset. This should include only the 'values' and not the format, schema, or keys",
                                 "default": 0
                             },
                             "byteCountApproximate": {
-                                "$id": "#/schemas/statistics/byteCountApproximate",
+                                "$id": "#/schemas/byteCountApproximate",
                                 "type": "boolean",
                                 "title": "Byte Count Approximate",
                                 "description": "Whether the provided byte count is approximate or exact.",

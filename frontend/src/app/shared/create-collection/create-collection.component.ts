@@ -1,6 +1,6 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Inject, OnInit } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { MatDialogRef } from "@angular/material/dialog";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { CreateCollectionGQL } from "src/generated/graphql";
 
 type State = "INIT" | "LOADING" | "SUCCESS" | "ERROR";
@@ -17,12 +17,14 @@ export class CreateCollectionComponent implements OnInit {
 
     constructor(
         private dialogRef: MatDialogRef<CreateCollectionComponent>,
-        private createCollectionGQL: CreateCollectionGQL
+        private createCollectionGQL: CreateCollectionGQL,
+        @Inject(MAT_DIALOG_DATA) data: { input: string }
     ) {
         this.form = new FormGroup({
-            name: new FormControl("", {
+            name: new FormControl(data?.input, {
                 validators: [Validators.required]
-            })
+            }),
+            description: new FormControl("")
         });
     }
 
@@ -33,33 +35,40 @@ export class CreateCollectionComponent implements OnInit {
             return;
         }
 
-        const name = this.form.value.name;
         this.state = "LOADING";
+        const collectionSlug = this.form.value.name.toLowerCase().replace(/\s+/g, "-");
         this.createCollectionGQL
             .mutate({
                 value: {
-                    name,
-                    collectionSlug: name.toLowerCase()
+                    ...this.form.value,
+                    collectionSlug
                 }
             })
             .subscribe(
                 (response) => {
                     if (response.errors) {
-                        const error = response.errors.find((e) => e.message === "COLLECTION_SLUG_NOT_AVAILABLE");
-                        if (error) {
-                            this.error = `Collection slug '${name.toLowerCase()}' already exists. Please change name to fix the issue`;
+                        if (response.errors.find((e) => e.message.includes("COLLECTION_SLUG_NOT_AVAILABLE"))) {
+                            this.error = `Collection slug '${collectionSlug}' already exists. Please change name to fix the issue`;
                         } else {
-                            this.error = "Unknown error occured";
+                            this.error = "Unknown error occured - " + response.errors[0].message;
                         }
                         this.state = "ERROR";
                         return;
                     }
 
-                    this.dialogRef.close(this.form.value);
+                    this.dialogRef.close(collectionSlug);
                 },
-                () => {
+                (response) => {
                     this.state = "ERROR";
-                    this.error = "Unknown error occured";
+
+                    if (response.networkError?.error.errors) {
+                        if (
+                            response.networkError?.error.errors.find((e) =>
+                                e.extensions?.exception?.stacktrace[0].includes("COLLECTION_SLUG_INVALID")
+                            )
+                        )
+                            this.error = "Only characters a-z, A-Z, 0-9, and - are supported for collection names";
+                    } else this.error = "Unknown error occured. Please try again or contact support";
                 }
             );
     }

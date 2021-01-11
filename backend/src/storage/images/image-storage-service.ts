@@ -101,8 +101,8 @@ export class ImageStorageService {
         return this.readImage(Prefixes.CATALOG + "/" + catalogId, ImageTypes.CATALOG_COVER_IMAGE);
     }
 
-    public async readCollectionCoverImage(catalogId: number): Promise<Readable> {
-        return this.readImage(Prefixes.CATALOG + "/" + catalogId, ImageTypes.COLLECTION_COVER_IMAGE);
+    public async readCollectionCoverImage(collectionId: number): Promise<Readable> {
+        return this.readImage(Prefixes.COLLECTION + "/" + collectionId, ImageTypes.COLLECTION_COVER_IMAGE);
     }
 
     public async readPackageCoverImage(packageId: number): Promise<Readable> {

@@ -15,10 +15,15 @@ import { allPermissions } from "../util/PermissionsUtil";
 import { User } from "../entity/User";
 import { UserInputError } from "apollo-server";
 import { ImageStorageService } from "../storage/images/image-storage-service";
+import { UserRepository } from "./UserRepository";
 
 const PUBLIC_PACKAGES_QUERY = '("Package"."isPublic" is true)';
-const AUTHENTICATED_USER_PACKAGES_QUERY = `(("Package"."isPublic" is false and "Package"."catalog_id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId))
-          or ("Package"."isPublic" is false and "Package".id in (select up.package_id from user_package_permission up where up.user_id = :userId and :permission = ANY(up.permission))))`;
+const AUTHENTICATED_USER_PACKAGES_QUERY = `
+    (
+        ("Package"."isPublic" is false and "Package"."catalog_id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId and :permission = ANY(uc.package_permission))) 
+        or 
+        ("Package"."isPublic" is false and "Package".id in (select up.package_id from user_package_permission up where up.user_id = :userId and :permission = ANY(up.permission)))
+    )`;
 const AUTHENTICATED_USER_OR_PUBLIC_PACKAGES_QUERY = `(${PUBLIC_PACKAGES_QUERY} or ${AUTHENTICATED_USER_PACKAGES_QUERY})`;
 
 async function findPackageById(
@@ -74,6 +79,31 @@ function validation(packageEntity: Package) {
 
 @EntityRepository()
 export class PackageRepository {
+    async userPackages({
+        user,
+        username,
+        offSet,
+        limit,
+        relations = []
+    }: {
+        user: User;
+        username: string;
+        offSet: number;
+        limit: number;
+        relations?: string[];
+    }): Promise<[Package[], number]> {
+        const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
+
+        const response = await this.createQueryBuilderWithUserConditions(user, Permission.VIEW)
+            .andWhere(`("Package"."creator_id" = :targetUserId )`)
+            .setParameter("targetUserId", targetUser.id)
+            .offset(offSet)
+            .limit(limit)
+            .addRelations("Package", relations)
+            .getManyAndCount();
+
+        return response;
+    }
     constructor(private manager: EntityManager) {}
 
     public async findPackagesForCollection(
@@ -94,7 +124,7 @@ export class PackageRepository {
     }
 
     /** Use this function to create a user scoped query that returns only packages that should be visible to that user */
-    public createQueryBuilderWithUserConditions(user: User, permission: Permission = Permission.VIEW) {
+    public createQueryBuilderWithUserConditions(user: User | undefined, permission: Permission = Permission.VIEW) {
         if (user != null) {
             return this.createQueryBuilderWithUserConditionsByUserId(user.id, permission);
         }
@@ -131,12 +161,12 @@ export class PackageRepository {
         relations = []
     }: {
         catalogId: number;
-        user: User;
+        user?: User;
         relations?: string[];
     }): Promise<Package[]> {
         const ALIAS = "packagesForUser";
 
-        const packages = this.createQueryBuilderWithUserConditions(user)
+        const packages = await this.createQueryBuilderWithUserConditions(user)
             .andWhere(`"Package"."catalog_id" = :catalogId `, { catalogId: catalogId })
             .addRelations(ALIAS, relations)
             .getMany();
@@ -395,14 +425,26 @@ export class PackageRepository {
         startsWith,
         relations = []
     }: {
-        user: User;
+        user: User | undefined;
         startsWith: string;
         relations?: string[];
     }): Promise<Package[]> {
         const ALIAS = "autoCompletePackage";
 
-        const entities = this.createQueryBuilderWithUserConditions(user)
-            .andWhere('LOWER("Package"."displayName") LIKE \'' + startsWith.toLowerCase() + "%'")
+        const queryArray = startsWith
+            .trim()
+            .toLowerCase()
+            .split(/\s+/)
+            .map((s) => `%${s}%`);
+
+        const entities = await this.createQueryBuilderWithUserConditions(user)
+            .andWhere(
+                `(LOWER("Package"."slug") LIKE :startsWith OR LOWER("Package"."displayName") like all (array[:...queryArray]))`,
+                {
+                    startsWith: startsWith.trim().toLowerCase() + "%",
+                    queryArray: queryArray
+                }
+            )
             .addRelations(ALIAS, relations)
             .getMany();
 
@@ -425,10 +467,10 @@ export class PackageRepository {
         const ALIAS = "search";
         return this.createQueryBuilderWithUserConditions(user)
             .andWhere(
-                `(readme_file_vectors @@ to_tsquery(:query) OR displayName_tokens @@ to_tsquery(:query) OR description_tokens @@ to_tsquery(:query) OR slug LIKE :queryLike)`,
+                `(readme_file_vectors @@ websearch_to_tsquery(:query) OR displayName_tokens @@ websearch_to_tsquery(:query) OR description_tokens @@ websearch_to_tsquery(:query) OR "Package"."slug" LIKE :queryLike OR "Package"."displayName" LIKE :queryLike)`,
                 {
                     query,
-                    queryLike: query + "%"
+                    queryLike: "%" + query + "%"
                 }
             )
             .limit(limit)

@@ -2,6 +2,7 @@ import { NgModule } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
+import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
 import { MatIconModule } from "@angular/material/icon";
@@ -11,6 +12,7 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { MatStepperModule } from "@angular/material/stepper";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
+import { MatTableModule } from "@angular/material/table";
 
 import { HeaderComponent } from "./header/header.component";
 import { FooterComponent } from "./footer/footer.component";
@@ -33,6 +35,20 @@ import { EditCollectionComponent } from "./edit-collection/edit-collection.compo
 import { ConfirmationDialogComponent } from "./confirmation-dialog/confirmation-dialog.component";
 import { EditCatalogComponent } from "./edit-catalog/edit-catalog.component";
 import { CreateCollectionComponent } from "./create-collection/create-collection.component";
+import { CreateCatalogComponent } from "./create-catalog/create-catalog.component";
+import { UserDetailsHeaderComponent } from "./user-details/user-details-header/user-details-header.component";
+import { UserCatalogsComponent } from "./user-details/user-catalogs/user-catalogs.component";
+import { DeleteCollectionComponent } from "./delete-collection/delete-collection.component";
+import { DeleteCatalogComponent } from "./delete-catalog/delete-catalog.component";
+import { FewPackagesAlertComponent } from "./user-details/few-packages-alert/few-packages-alert.component";
+import { UserCollectionsComponent } from "./user-details/user-collections/user-collections.component";
+import { UserPackagesComponent } from "./user-details/user-packages/user-packages.component";
+import { EditAccountDialogComponent } from "./user-details/edit-account-dialog/edit-account-dialog.component";
+import { EditPasswordDialogComponent } from "./user-details/edit-password-dialog/edit-password-dialog.component";
+import { UserDetailsComponent } from "./user-details/user-details/user-details.component";
+import { SimpleCreateComponent } from "./user-details/simple-create/simple-create.component";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatInputModule } from "@angular/material/input";
 
 @NgModule({
     declarations: [
@@ -56,19 +72,35 @@ import { CreateCollectionComponent } from "./create-collection/create-collection
         EditCollectionComponent,
         ConfirmationDialogComponent,
         EditCatalogComponent,
-        CreateCollectionComponent
+        CreateCollectionComponent,
+        CreateCatalogComponent,
+        UserDetailsHeaderComponent,
+        UserCatalogsComponent,
+        DeleteCatalogComponent,
+        DeleteCollectionComponent,
+        FewPackagesAlertComponent,
+        UserCollectionsComponent,
+        UserPackagesComponent,
+        EditAccountDialogComponent,
+        EditPasswordDialogComponent,
+        UserDetailsComponent,
+        SimpleCreateComponent
     ],
     imports: [
         CommonModule,
+        MatAutocompleteModule,
         MatButtonModule,
         MatCardModule,
         MatIconModule,
         MatMenuModule,
         MatDialogModule,
+        MatFormFieldModule,
+        MatInputModule,
         MatProgressSpinnerModule,
         MatSnackBarModule,
         MatStepperModule,
         MatSlideToggleModule,
+        MatTableModule,
         FormsModule,
         ReactiveFormsModule,
         RouterModule
@@ -93,7 +125,17 @@ import { CreateCollectionComponent } from "./create-collection/create-collection
         EditCollectionComponent,
         ConfirmationDialogComponent,
         EditCatalogComponent,
-        CreateCollectionComponent
+        CreateCollectionComponent,
+        UserDetailsHeaderComponent,
+        UserCatalogsComponent,
+        DeleteCatalogComponent,
+        DeleteCollectionComponent,
+        FewPackagesAlertComponent,
+        UserCollectionsComponent,
+        UserPackagesComponent,
+        EditAccountDialogComponent,
+        EditPasswordDialogComponent,
+        UserDetailsComponent
     ],
     providers: [TimeAgoPipe]
 })

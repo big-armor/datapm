@@ -94,15 +94,19 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
         relations?: string[];
     }): Promise<void> {
         await this.manager.nestedTransaction(async (transaction) => {
-            const user = await transaction.getCustomRepository(UserRepository).getUserByUsername(value.username);
+            const user = await transaction
+                .getCustomRepository(UserRepository)
+                .getUserByUsername(value.usernameOrEmailAddress);
 
             if (!user) {
-                throw new Error(`USER_NOT_FOUND - ${value.username}`);
+                throw new Error(`USER_NOT_FOUND - ${value.usernameOrEmailAddress}`);
             }
 
             const collectionEntity = await transaction
                 .getCustomRepository(CollectionRepository)
                 .findCollectionBySlugOrFail(identifier.collectionSlug);
+
+            if (user.id == collectionEntity.creatorId) throw new Error(`CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS`);
 
             const permissions = await this.findByUserAndCollectionId(user.id, collectionEntity.id);
 
@@ -161,13 +165,17 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
         identifier: CollectionIdentifierInput;
         username: string;
         relations?: string[];
-    }): void {
-        this.manager.nestedTransaction(async (transaction) => {
+    }): Promise<void> {
+        return this.manager.nestedTransaction(async (transaction) => {
             const user = await transaction.getCustomRepository(UserRepository).findOneOrFail({ username });
 
             const collectionEntity = await transaction
                 .getCustomRepository(CollectionRepository)
                 .findCollectionBySlugOrFail(identifier.collectionSlug);
+
+            if (collectionEntity.creatorId == user.id) {
+                throw new Error("CANNOT_REMOVE_CREATOR_PERMISSIONS");
+            }
 
             await transaction.delete(UserCollectionPermission, { collectionId: collectionEntity.id });
         });

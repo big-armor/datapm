@@ -1,93 +1,67 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, of, throwError } from "rxjs";
 
 import { User, LoginGQL, MeGQL } from "../../generated/graphql";
-import Maybe from "graphql/tsutils/Maybe";
+import { catchError, switchMap, tap } from "rxjs/operators";
 
 @Injectable({ providedIn: "root" })
 export class AuthenticationService {
-    private currentUserSubject: BehaviorSubject<Promise<Maybe<User>>>;
-    private _currentUser: User;
-    private _currentUserPromise: Promise<User>;
+    public currentUser: BehaviorSubject<User>;
+    public isLoggedIn: BehaviorSubject<boolean>;
 
     constructor(private loginGQL: LoginGQL, private meGQL: MeGQL) {
-        this.currentUserSubject = new BehaviorSubject(this.refreshUserInfo());
+        this.currentUser = new BehaviorSubject(null);
+        const jwt = localStorage.getItem("jwt");
+        this.isLoggedIn = new BehaviorSubject(!!jwt);
+        this.refreshUserInfo();
     }
 
-    public get currentUser(): Maybe<User> {
-        return this._currentUser;
+    refreshUserInfo() {
+        this.getUserInfo().subscribe(() => {});
     }
 
-    public get currentUserPromise(): Promise<Maybe<User>> {
-        return this._currentUserPromise;
-    }
-
-    public getUserObservable() {
-        return this.currentUserSubject.asObservable();
-    }
-
-    refreshUserInfo(): Promise<Maybe<User>> {
-        this._currentUserPromise = new Promise((result, reject) => {
-            const jwt = localStorage.getItem("jwt");
-
-            if (jwt == null) {
-                result(null);
-                return;
-            }
-
-            // TODO Determine if the jwt is expired
-
-            // TODO - implement refresh tokens
-
-            this.meGQL.fetch().subscribe((observer) => {
-                if (observer.errors?.length > 0) {
-                    reject(observer.error);
-                } else {
-                    const me = observer.data.me;
-                    this._currentUser = me;
-                    this.currentUserSubject.next(Promise.resolve(me));
-                    result(me);
+    login(username: string, password: string) {
+        return this.loginGQL.mutate({ username, password }).pipe(
+            switchMap(({ data, errors }) => {
+                if (data) {
+                    localStorage.setItem("jwt", data.login);
+                    return this.getUserInfo();
                 }
-            });
-        });
 
-        return this._currentUserPromise;
-    }
-
-    login(username: string, password: string): Promise<Maybe<User>> {
-        return new Promise((result, reject) => {
-            this.loginGQL
-                .mutate({ username, password })
-                .toPromise()
-                .then((response) => {
-                    if (response.errors) {
-                        console.error(response);
-                        reject(response);
-                        return;
-                    }
-
-                    const jwt = response.data.login;
-                    localStorage.setItem("jwt", jwt);
-
-                    this.refreshUserInfo().then((user) => {
-                        result(user);
-                    });
-                })
-                .catch((error) => {
-                    console.error(error);
-                    reject(error);
-                });
-        });
+                return of({ errors });
+            })
+        );
     }
 
     logout() {
         // remove user from local storage to log user out
         localStorage.removeItem("jwt");
-        this.currentUserSubject.next(null);
+        this.currentUser.next(null);
+        this.isLoggedIn.next(false);
     }
 
-    setJwt(login: string): Promise<User | null> {
-        localStorage.setItem("jwt", login);
-        return this.refreshUserInfo();
+    private getUserInfo() {
+        const jwt = localStorage.getItem("jwt");
+
+        if (!jwt) {
+            return of(null);
+        }
+
+        // TODO Determine if the jwt is expired
+
+        // TODO - implement refresh tokens
+
+        return this.meGQL.fetch().pipe(
+            tap(({ data }) => {
+                if (data) {
+                    this.currentUser.next(data.me);
+                    this.isLoggedIn.next(true);
+                }
+            }),
+            catchError((err) => {
+                this.logout();
+                return throwError(err);
+            })
+        );
     }
 }

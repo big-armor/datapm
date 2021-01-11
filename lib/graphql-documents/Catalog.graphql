@@ -7,6 +7,7 @@ query GetCatalog($identifier: CatalogIdentifierInput!) {
         description
         website
         myPermissions
+        isPublic
         packages {
             identifier {
                 catalogSlug
@@ -25,6 +26,9 @@ query GetCatalog($identifier: CatalogIdentifierInput!) {
                 createdAt
                 updatedAt
                 packageFile
+            }
+            creator {
+                username
             }
         }
     }

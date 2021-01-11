@@ -1,5 +1,5 @@
 <input
-    class="app-input-round"
+    [ngClass]="'dpm-input-' + inputStyle"
     [type]="inputType"
     autocomplete="off"
     [placeholder]="placeholder"
@@ -9,10 +9,10 @@
     (focus)="focus.emit($event)"
     (blur)="blur.emit($event)"
     cdkFocusInitial
-    *ngIf="autoFocus && !multiline"
+    *ngIf="autoFocus && !multiline && !matAutocomplete"
 />
 <input
-    class="app-input-round"
+    [ngClass]="'dpm-input-' + inputStyle"
     [type]="inputType"
     autocomplete="off"
     [placeholder]="placeholder"
@@ -21,10 +21,22 @@
     (keyup)="handleKeyUp($event)"
     (focus)="focus.emit($event)"
     (blur)="blur.emit($event)"
-    *ngIf="!autoFocus && !multiline"
+    *ngIf="!autoFocus && !multiline && !matAutocomplete"
+/>
+<input
+    [ngClass]="'dpm-input-' + inputStyle"
+    [type]="inputType"
+    [matAutocomplete]="matAutocomplete"
+    [placeholder]="placeholder"
+    [formControl]="formControl"
+    (change)="handleInputChange($event)"
+    (keyup)="handleKeyUp($event)"
+    (focus)="focus.emit($event)"
+    (blur)="blur.emit($event)"
+    *ngIf="matAutocomplete"
 />
 <textarea
-    class="app-input-round"
+    [ngClass]="'dpm-input-' + inputStyle"
     autocomplete="off"
     [placeholder]="placeholder"
     [formControl]="formControl"
@@ -33,10 +45,10 @@
     (focus)="focus.emit($event)"
     (blur)="blur.emit($event)"
     cdkFocusInitial
-    *ngIf="autoFocus && multiline"
+    *ngIf="autoFocus && multiline && !matAutocomplete"
 ></textarea>
 <textarea
-    class="app-input-round"
+    [ngClass]="'dpm-input-' + inputStyle"
     autocomplete="off"
     [placeholder]="placeholder"
     [formControl]="formControl"
@@ -44,6 +56,6 @@
     (keyup)="handleKeyUp($event)"
     (focus)="focus.emit($event)"
     (blur)="blur.emit($event)"
-    *ngIf="!autoFocus && multiline"
+    *ngIf="!autoFocus && multiline && !matAutocomplete"
 ></textarea>
 <div class="text-danger mt-1 ml-2" *ngIf="error">{{ error }}</div>

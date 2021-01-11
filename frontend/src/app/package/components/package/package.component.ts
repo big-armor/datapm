@@ -1,11 +1,11 @@
-import { Component, OnDestroy } from "@angular/core";
+import { Component, OnDestroy, TemplateRef, ViewChild } from "@angular/core";
 import { Title } from "@angular/platform-browser";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { PackageFile } from "datapm-lib";
 import { Subject } from "rxjs";
-import { Package, User, UserGQL } from "src/generated/graphql";
+import { Package, Permission, User, UserGQL } from "src/generated/graphql";
 import { PackageService, PackageResponse } from "../../services/package.service";
-import { takeUntil } from "rxjs/operators";
+import { filter, takeUntil } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
 import { LoginDialogComponent } from "src/app/shared/header/login-dialog/login-dialog.component";
 import { AuthenticationService } from "src/app/services/authentication.service";
@@ -24,6 +24,8 @@ enum State {
     styleUrls: ["./package.component.scss"]
 })
 export class PackageComponent implements OnDestroy {
+    @ViewChild("derivedFrom") derivedFromDialogTemplate: TemplateRef<any>;
+
     State = State;
     state = State.LOADING;
 
@@ -32,11 +34,11 @@ export class PackageComponent implements OnDestroy {
 
     private unsubscribe$ = new Subject();
 
-    public readonly routes = [
-        { linkName: "description", url: "" },
-        { linkName: "preview", url: "preview" },
-        { linkName: "schema", url: "schema" },
-        { linkName: "history", url: "history" }
+    public routes = [
+        { linkName: "description", url: "", showDetails: true },
+        { linkName: "preview", url: "preview", showDetails: true },
+        { linkName: "schema", url: "schema", showDetails: true },
+        { linkName: "history", url: "history", showDetails: true }
     ];
 
     private catalogSlug = "";
@@ -76,6 +78,8 @@ export class PackageComponent implements OnDestroy {
                 this.package = p.package;
                 if (this.package && this.package.latestVersion) {
                     this.packageFile = JSON.parse(this.package.latestVersion.packageFile);
+                } else {
+                    this.packageFile = null;
                 }
                 this.title.setTitle(`${this.package?.displayName} - datapm`);
                 this.state = State.LOADED;
@@ -86,35 +90,54 @@ export class PackageComponent implements OnDestroy {
                     .toPromise()
                     .then((value) => {
                         if (value.data == null) {
-                            console.error(JSON.stringify(value));
                             return;
                         }
 
                         this.catalogUser = value.data.user;
                     });
+
+                this.routes = [
+                    { linkName: "description", url: "", showDetails: true },
+                    { linkName: "preview", url: "preview", showDetails: true },
+                    { linkName: "schema", url: "schema", showDetails: true },
+                    { linkName: "history", url: "history", showDetails: true }
+                ];
+                if (this.package?.myPermissions.includes(Permission.MANAGE)) {
+                    this.routes.push({ linkName: "manage", url: "manage", showDetails: false });
+                }
             },
             (error) => {
                 if (error.message.includes("NOT_AUTHENTICATED")) this.state = State.ERROR_NOT_AUTHENTICATED;
                 else {
                     this.state = State.ERROR;
-                    console.error(error);
                 }
             }
         );
     }
 
     ngOnInit() {
-        this.state = State.LOADING;
-        this.catalogSlug = this.route.snapshot.paramMap.get("catalogSlug");
-        this.packageSlug = this.route.snapshot.paramMap.get("packageSlug");
-        this.packageService.getPackage(this.catalogSlug, this.packageSlug);
+        this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((event: NavigationEnd) => {
+            this.updateFromUrl();
+        });
 
-        this.authenticationService
-            .getUserObservable()
-            .pipe(takeUntil(this.unsubscribe$))
-            .subscribe(async (response) => {
-                this.currentUser = await response;
-            });
+        this.updateFromUrl();
+
+        this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
+            this.currentUser = user;
+        });
+    }
+
+    updateFromUrl() {
+        const newCatalog = this.route.snapshot.paramMap.get("catalogSlug");
+        const newPackage = this.route.snapshot.paramMap.get("packageSlug");
+
+        if (this.catalogSlug != newCatalog || this.packageSlug != newPackage) {
+            this.state = State.LOADING;
+            this.catalogSlug = newCatalog;
+            this.packageSlug = newPackage;
+
+            this.packageService.getPackage(this.catalogSlug, this.packageSlug);
+        }
     }
 
     ngOnDestroy(): void {
@@ -136,6 +159,12 @@ export class PackageComponent implements OnDestroy {
         return activeRouteParts[3] == route.url;
     }
 
+    getActiveTab() {
+        const activeRouteParts = this.router.url.split("/");
+
+        return this.routes.find((r) => r.url == (activeRouteParts[3] || ""));
+    }
+
     loginClicked() {
         this.dialog.open(LoginDialogComponent, {
             disableClose: true
@@ -145,5 +174,15 @@ export class PackageComponent implements OnDestroy {
     getPackageIdentifierFromURL() {
         const activeRouteParts = this.router.url.split("/");
         return activeRouteParts[1] + "/" + activeRouteParts[2];
+    }
+
+    openDerivedFromModal(packageFile: PackageFile) {
+        this.dialog.open(this.derivedFromDialogTemplate, {
+            data: packageFile
+        });
+    }
+    derivedFromCount(packageFile: PackageFile) {
+        if (packageFile == null) return 0;
+        return packageFile.schemas.reduce((count, schema) => count + (schema.derivedFrom?.length || 0), 0);
     }
 }

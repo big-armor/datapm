@@ -10,8 +10,10 @@ query Package($identifier: PackageIdentifierInput!) {
             myPermissions
         }
         isPublic
+        myPermissions
         displayName
         description
+        myPermissions
         latestVersion {
             identifier {
                 versionMajor

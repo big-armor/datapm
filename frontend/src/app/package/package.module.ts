@@ -1,9 +1,11 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { ReactiveFormsModule } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatIconModule } from "@angular/material/icon";
 import { MatTabsModule } from "@angular/material/tabs";
+import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MarkdownModule } from "ngx-markdown";
 
@@ -24,6 +26,10 @@ import { SamplesComponent } from "./components/package-samples/samples.component
 import { SamplesFullScreenDialog } from "./components/package-samples/samples-fullscreen-dialog.component";
 import { ScrollingModule } from "@angular/cdk/scrolling";
 import { TableVirtualScrollModule } from "ng-table-virtual-scroll";
+import { MatDialogModule } from "@angular/material/dialog";
+import { PackagePermissionComponent } from "./components/package-permission/package-permission.component";
+import { AddUserComponent } from "./components/add-user/add-user.component";
+import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 
 @NgModule({
     declarations: [
@@ -37,16 +43,22 @@ import { TableVirtualScrollModule } from "ng-table-virtual-scroll";
         PackageSizePipe,
         SchemaPropertiesPipe,
         VersionPipe,
-        PackageInfoComponent
+        PackageInfoComponent,
+        PackagePermissionComponent,
+        AddUserComponent
     ],
     imports: [
         CommonModule,
+        ReactiveFormsModule,
         PackageRoutingModule,
         MatButtonModule,
         MatExpansionModule,
         MatIconModule,
         MatTabsModule,
+        MatDialogModule,
+        MatSlideToggleModule,
         MatTableModule,
+        MatAutocompleteModule,
         MatProgressSpinnerModule,
         SharedModule,
         ScrollingModule,

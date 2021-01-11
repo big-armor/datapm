@@ -9,7 +9,12 @@ import {
     CreateVersionDocument,
     DeletePackageDocument,
     MyPackagesDocument,
-    GetLatestPackagesDocument
+    GetLatestPackagesDocument,
+    UserPackagesDocument,
+    Permission,
+    SetPackagePermissionsDocument,
+    RemovePackagePermissionsDocument,
+    UsersByPackageDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import * as fs from "fs";
@@ -132,7 +137,7 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.createPackage.catalog.displayName).to.equal("testA-packages");
+        expect(response.data!.createPackage.catalog?.displayName).to.equal("testA-packages");
         expect(response.data!.createPackage.description).to.equal("Test upload of congressional legislators");
         expect(response.data!.createPackage.displayName).to.equal("Congressional Legislators");
         expect(response.data!.createPackage.identifier.catalogSlug).to.equal("testA-packages");
@@ -176,6 +181,22 @@ describe("Package Tests", async () => {
         ).equal(true);
     });
 
+    it("User A package list should not available to user B", async function () {
+        let response = await userBClient.query({
+            query: UserPackagesDocument,
+            variables: {
+                username: "testA-packages",
+                offSet: 0,
+                limit: 100
+            }
+        });
+
+        expect(response.errors == null, "should not have errors").to.equal(true);
+        expect(response.data.userPackages.hasMore).to.equal(false);
+        expect(response.data.userPackages.count).to.equal(0);
+        expect(response.data.userPackages.packages?.length).to.equal(0);
+    });
+
     it("User A can get package", async function () {
         let response = await userAClient.query({
             query: PackageDocument,
@@ -188,7 +209,7 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").equal(true);
-        expect(response.data!.package!.catalog.displayName).to.equal("testA-packages");
+        expect(response.data!.package!.catalog?.displayName).to.equal("testA-packages");
         expect(response.data!.package!.description).to.equal("Test upload of congressional legislators");
         expect(response.data!.package!.displayName).to.equal("Congressional Legislators");
         expect(response.data!.package!.identifier.catalogSlug).to.equal("testA-packages");
@@ -212,7 +233,23 @@ describe("Package Tests", async () => {
         expect(response.errors == null).true;
     });
 
-    it("package should not be available anonymously - catalog is private", async function () {
+    it("User A package list should not available to user B", async function () {
+        let response = await userBClient.query({
+            query: UserPackagesDocument,
+            variables: {
+                username: "testA-packages",
+                offSet: 0,
+                limit: 100
+            }
+        });
+
+        expect(response.errors == null, "should not have errors").to.equal(true);
+        expect(response.data.userPackages.hasMore).to.equal(false);
+        expect(response.data.userPackages.count).to.equal(0);
+        expect(response.data.userPackages.packages?.length).to.equal(0);
+    });
+
+    it("package should not be available anonymously - package is private", async function () {
         let response = await anonymousClient.query({
             query: PackageDocument,
             variables: {
@@ -245,7 +282,7 @@ describe("Package Tests", async () => {
         ).to.equal(undefined);
     });
 
-    it("User A can not update package", async function () {
+    it("User A can not set package public - no versions", async function () {
         let response = await userAClient.mutate({
             mutation: UpdatePackageDocument,
             variables: {
@@ -281,7 +318,7 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").true;
-        expect(response.data!.createVersion.author.username).equal("testA-packages");
+        expect(response.data!.createVersion.author?.username).equal("testA-packages");
 
         const responsePackageFileContents = response.data!.createVersion.packageFile;
 
@@ -313,7 +350,7 @@ describe("Package Tests", async () => {
             }
         });
         expect(response.errors == null, "no errors").equal(true);
-        expect(response.data!.updatePackage.catalog.displayName).to.equal("testA-packages");
+        expect(response.data!.updatePackage.catalog?.displayName).to.equal("testA-packages");
         expect(response.data!.updatePackage.description).to.equal("New description");
         expect(response.data!.updatePackage.displayName).to.equal("New displayName");
         expect(response.data!.updatePackage.identifier.catalogSlug).to.equal("testA-packages");
@@ -325,23 +362,6 @@ describe("Package Tests", async () => {
         expect(identifier.versionMajor).to.equal(1);
         expect(identifier.versionMinor).to.equal(0);
         expect(identifier.versionPatch).to.equal(0);
-    });
-
-    it("User A set catalog public", async function () {
-        let response = await userAClient.mutate({
-            mutation: UpdateCatalogDocument,
-            variables: {
-                identifier: {
-                    catalogSlug: "testA-packages"
-                },
-                value: {
-                    isPublic: true
-                }
-            }
-        });
-
-        expect(response.errors == null, "should not have errors").to.equal(true);
-        expect(response.data!.updateCatalog.isPublic).equal(true);
     });
 
     it("Anonymous user can access package", async function () {
@@ -356,7 +376,7 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").equal(true);
-        expect(response.data!.package.catalog.displayName).to.equal("testA-packages");
+        expect(response.data!.package.catalog?.displayName).to.equal("testA-packages");
         expect(response.data!.package.description).to.equal("New description");
         expect(response.data!.package.displayName).to.equal("New displayName");
         expect(response.data!.package.identifier.catalogSlug).to.equal("testA-packages");
@@ -382,7 +402,7 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").equal(true);
-        expect(response.data!.package.catalog.displayName).to.equal("testA-packages");
+        expect(response.data!.package.catalog?.displayName).to.equal("testA-packages");
         expect(response.data!.package.description).to.equal("New description");
         expect(response.data!.package.displayName).to.equal("New displayName");
         expect(response.data!.package.identifier.catalogSlug).to.equal("testA-packages");
@@ -392,6 +412,22 @@ describe("Package Tests", async () => {
         expect(identifier.versionMajor).to.equal(1);
         expect(identifier.versionMinor).to.equal(0);
         expect(identifier.versionPatch).to.equal(0);
+    });
+
+    it("User A package list should be available to user B", async function () {
+        let response = await userBClient.query({
+            query: UserPackagesDocument,
+            variables: {
+                username: "testA-packages",
+                offSet: 0,
+                limit: 100
+            }
+        });
+
+        expect(response.errors == null, "should not have errors").to.equal(true);
+        expect(response.data.userPackages.hasMore).to.equal(false);
+        expect(response.data.userPackages.count).to.equal(1);
+        expect(response.data.userPackages.packages?.length).to.equal(1);
     });
 
     it("User b can not update package", async function () {
@@ -457,6 +493,22 @@ describe("Package Tests", async () => {
         ).to.not.equal(undefined);
     });
 
+    it("User A packages list should be available to anonymous user", async function () {
+        let response = await anonymousClient.query({
+            query: UserPackagesDocument,
+            variables: {
+                username: "testA-packages",
+                offSet: 0,
+                limit: 100
+            }
+        });
+
+        expect(response.errors == null, "should not have errors").to.equal(true);
+        expect(response.data.userPackages.hasMore).to.equal(false);
+        expect(response.data.userPackages.count).to.equal(1);
+        expect(response.data.userPackages.packages?.length).to.equal(1);
+    });
+
     it("Should be in latest list - creator", async function () {
         let response = await userAClient.query({
             query: GetLatestPackagesDocument,
@@ -484,7 +536,7 @@ describe("Package Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").true;
-        expect(response.data!.package.catalog.displayName).to.equal("testA-packages");
+        expect(response.data!.package.catalog?.displayName).to.equal("testA-packages");
         expect(response.data!.package.description).to.equal("New description");
         expect(response.data!.package.displayName).to.equal("New displayName");
         expect(response.data!.package.identifier.catalogSlug).to.equal("testA-packages");
@@ -790,6 +842,218 @@ describe("Package Tests", async () => {
         expect(response.data!.createVersion.identifier.versionMajor).equal(2);
         expect(response.data!.createVersion.identifier.versionMinor).equal(0);
         expect(response.data!.createVersion.identifier.versionPatch).equal(0);
+    });
+
+    it("User A find myPermissions on package", async function () {
+        let response = await userAClient.query({
+            query: PackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                }
+            }
+        });
+
+        expect(response.errors! == null).true;
+
+        expect(response.data.package.myPermissions!.indexOf(Permission.MANAGE) !== -1).equal(true);
+        expect(response.data.package.myPermissions!.indexOf(Permission.VIEW) !== -1).equal(true);
+        expect(response.data.package.myPermissions!.indexOf(Permission.EDIT) !== -1).equal(true);
+    });
+
+    it("User B find myPermissions on package - view only", async function () {
+        let response = await userBClient.query({
+            query: PackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                }
+            }
+        });
+
+        expect(response.errors! == null).true;
+
+        expect(response.data.package.myPermissions!.indexOf(Permission.MANAGE) === -1).equal(true);
+        expect(response.data.package.myPermissions!.indexOf(Permission.VIEW) !== -1).equal(true);
+        expect(response.data.package.myPermissions!.indexOf(Permission.EDIT) === -1).equal(true);
+    });
+
+    it("User A give User B permission to package", async function () {
+        const newPermissions = [Permission.VIEW, Permission.EDIT];
+
+        let response = await userAClient.mutate({
+            mutation: SetPackagePermissionsDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                },
+                value: {
+                    username: "testB-packages",
+                    permissions: newPermissions
+                }
+            }
+        });
+
+        expect(response.errors! == null).true;
+    });
+
+    it("User A update User B permission to package", async function () {
+        const newPermissions = [Permission.VIEW, Permission.EDIT, Permission.MANAGE];
+
+        let response = await userAClient.mutate({
+            mutation: SetPackagePermissionsDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                },
+                value: {
+                    username: "testB-packages",
+                    permissions: newPermissions
+                }
+            }
+        });
+
+        expect(response.errors! == null).true;
+    });
+
+    it("User A set own permissions should fail", async function () {
+        const newPermissions = [Permission.VIEW];
+
+        let response = await userAClient.mutate({
+            mutation: SetPackagePermissionsDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                },
+                value: {
+                    username: "testA-packages",
+                    permissions: newPermissions
+                }
+            }
+        });
+
+        expect(response.errors! !== null).true;
+        expect(response.errors!.find((e) => e.message.includes("CANNOT_SET_PACKAGE_CREATOR_PERMISSIONS"))).is.not.null;
+    });
+
+    it("User B find myPermissions on package - all", async function () {
+        let response = await userBClient.query({
+            query: PackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                }
+            }
+        });
+
+        expect(response.errors! == null).true;
+
+        expect(response.data.package.myPermissions!.indexOf(Permission.MANAGE) !== -1).equal(true);
+        expect(response.data.package.myPermissions!.indexOf(Permission.VIEW) !== -1).equal(true);
+        expect(response.data.package.myPermissions!.indexOf(Permission.EDIT) !== -1).equal(true);
+    });
+
+    it("User A should be able to list users with access to package", async function () {
+        let response = await userAClient.query({
+            query: UsersByPackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                }
+            }
+        });
+
+        expect(response.errors! == null).true;
+
+        expect(response.data.usersByPackage!.length).equal(2);
+    });
+
+    it("User B can't delete permissions of creator User A", async function () {
+        let response = await userAClient.mutate({
+            mutation: RemovePackagePermissionsDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                },
+                username: "testA-packages"
+            }
+        });
+
+        expect(response.errors! !== null).true;
+        expect(response.errors!.find((e) => e.message.includes("CANNOT_REMOVE_CREATOR_PERMISSIONS"))).not.null;
+    });
+
+    it("Remove User B permissions on package", async function () {
+        let response = await userAClient.mutate({
+            mutation: RemovePackagePermissionsDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                },
+                username: "testB-packages"
+            }
+        });
+
+        expect(response.errors! == null).true;
+    });
+
+    it("User A should be able to list users with access to package - after removing user B", async function () {
+        let response = await userAClient.query({
+            query: UsersByPackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                }
+            }
+        });
+
+        expect(response.errors! == null).true;
+
+        expect(response.data.usersByPackage!.length).equal(1);
+    });
+
+    it("User B should not be able to list users with access to package - not a manager", async function () {
+        let response = await userBClient.query({
+            query: UsersByPackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                }
+            }
+        });
+
+        expect(response.errors! !== null).true;
+
+        expect(response.errors!.find((e) => e.message.includes("NOT_AUTHORIZED"))).is.not.null;
+    });
+
+    it("User B find myPermissions on package - view only after permissions removed", async function () {
+        let response = await userBClient.query({
+            query: PackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "new-package-slug"
+                }
+            }
+        });
+
+        expect(response.errors! == null).true;
+
+        expect(response.data.package.myPermissions!.indexOf(Permission.MANAGE) === -1).equal(true);
+        expect(response.data.package.myPermissions!.indexOf(Permission.VIEW) !== -1).equal(true);
+        expect(response.data.package.myPermissions!.indexOf(Permission.EDIT) === -1).equal(true);
     });
 
     it("User A delete package", async function () {

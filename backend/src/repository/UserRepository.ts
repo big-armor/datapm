@@ -102,7 +102,7 @@ async function getUserOrFail({
         manager,
         relations
     });
-    if (!user) throw new Error(`Failed to get user ${username}`);
+    if (!user) throw new Error(`USER_NOT_FOUND - ${username}`);
     return user;
 }
 
@@ -120,7 +120,7 @@ async function getUserByUsernameOrFail({
         manager,
         relations
     });
-    if (!user) throw new Error(`Failed to get user ${username}`);
+    if (!user) throw new Error(`USER_NOT_FOUND - ${username}`);
     return user;
 }
 
@@ -153,6 +153,18 @@ export class UserRepository extends Repository<User> {
         const ALIAS = "getUsername";
 
         const user = this.createQueryBuilder(ALIAS).where([{ username }]).getOne();
+
+        return user;
+    }
+
+    getUserByUsernameOrEmailAddress(username: string) {
+        const ALIAS = "getUsername";
+
+        const user = this.createQueryBuilder(ALIAS)
+            .where([{ username }])
+            .orWhere("(emailAddress = :username AND isPublic IS TRUE)")
+            .setParameter("username", username)
+            .getOne();
 
         return user;
     }
@@ -225,6 +237,32 @@ export class UserRepository extends Repository<User> {
         return this.manager.getRepository(User).createQueryBuilder(ALIAS).addRelations(ALIAS, relations).getMany();
     }
 
+    async autocomplete({
+        user,
+        startsWith,
+        relations = []
+    }: {
+        user: User | undefined;
+        startsWith: string;
+        relations?: string[];
+    }): Promise<User[]> {
+        const ALIAS = "autoCompleteUser";
+
+        const entities = await this.manager
+            .getRepository(User)
+            .createQueryBuilder()
+            .where(`(LOWER("User"."username") LIKE :valueLike)`)
+            .orWhere(`("User"."emailAddressIsPublic" is true AND (LOWER("User"."emailAddress") LIKE :valueLike))`)
+            .orWhere(
+                `("User"."nameIsPublic" is true AND (LOWER("User"."first_name") LIKE :valueLike OR LOWER("User"."last_name") LIKE :valueLike))`
+            )
+            .setParameter("valueLike", startsWith.toLowerCase() + "%")
+            .addRelations(ALIAS, relations)
+            .getMany();
+
+        return entities;
+    }
+
     async search({
         value,
         limit,
@@ -292,7 +330,7 @@ export class UserRepository extends Repository<User> {
                 user = await transaction.save(user);
 
                 const catalog = await transaction.getCustomRepository(CatalogRepository).createCatalog({
-                    username: user.username,
+                    userId: user.id,
                     value: {
                         description: "",
                         isPublic: false,
@@ -342,7 +380,7 @@ export class UserRepository extends Repository<User> {
                 return dbUser;
             })
             .then(async (user: User) => {
-                await sendForgotPasswordEmail(user, user.passwordRecoveryToken);
+                await sendForgotPasswordEmail(user, user.passwordRecoveryToken as string);
             });
     }
 
@@ -364,6 +402,7 @@ export class UserRepository extends Repository<User> {
 
             const newPasswordHash = hashPassword(value.newPassword, dbUser.passwordSalt);
             dbUser.passwordHash = newPasswordHash;
+            dbUser.passwordRecoveryToken = null;
 
             await transaction.save(dbUser);
         });

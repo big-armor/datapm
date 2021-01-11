@@ -1,6 +1,7 @@
 query MyPackages($offset: Int!, $limit: Int!) {
     myPackages(offset: $offset, limit: $limit) {
         packages {
+            myPermissions
             identifier {
                 registryURL
                 catalogSlug

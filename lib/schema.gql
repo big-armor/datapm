@@ -135,10 +135,11 @@ A collection of packages offered by a person or an organization.
 """
 type Catalog {
     identifier: CatalogIdentifier!
-    displayName: String!
+    displayName: String
     description: String
     website: String
-    isPublic: Boolean!
+    creator: User
+    isPublic: Boolean
 
     """
     The permissions of the requesting user to the catalog
@@ -152,16 +153,16 @@ type Catalog {
 data data sets, and is a member of one and only one catalog. A package may be included in zero or more collections.
 """
 type Package {
-    creator: User!
+    creator: User
     identifier: PackageIdentifier!
-    catalog: Catalog!
+    catalog: Catalog
     displayName: String!
     description: String
     latestVersion: Version
-    versions: [Version]!
-    createdAt: Date!
-    updatedAt: Date!
-    isPublic: Boolean!
+    versions: [Version]
+    createdAt: Date
+    updatedAt: Date
+    isPublic: Boolean
     myPermissions: [Permission!]
 }
 
@@ -179,13 +180,13 @@ type UserCatalog {
 by consumer side users, and generally not the publishers
 """
 type Collection {
-    creator: User!
+    creator: User
     identifier: CollectionIdentifier!
     name: String!
     description: String
     packages: [Package!]
-    createdAt: Date!
-    updatedAt: Date!
+    createdAt: Date
+    updatedAt: Date
     isPublic: Boolean
     isRecommended: Boolean
     myPermissions: [Permission!]
@@ -204,8 +205,7 @@ type CollectionPackage {
 Represents a user, and their permissions on a package
 """
 type UserPackagePermissions {
-    package: Package!
-    username: String!
+    user: User
     permissions: [Permission!]!
 }
 
@@ -230,23 +230,23 @@ A single version of a package file for a package listing on the registry
 """
 type Version {
     identifier: VersionIdentifier!
-    createdAt: Date!
-    updatedAt: Date!
-    package: Package!
-    author: User!
-    packageFile: PackageFileJSON!
+    createdAt: Date
+    updatedAt: Date
+    package: Package
+    author: User
+    packageFile: PackageFileJSON
 }
 
 """
 The complete identifier for a version of a package on a registry
 """
 type VersionIdentifier {
-    registryURL: String!
-    catalogSlug: String!
-    packageSlug: String!
-    versionMajor: Int!
-    versionMinor: Int!
-    versionPatch: Int!
+    registryURL: String
+    catalogSlug: String
+    packageSlug: String
+    versionMajor: Int
+    versionMinor: Int
+    versionPatch: Int
 }
 
 """
@@ -262,16 +262,16 @@ type PackageIdentifier {
 The complete identifier for a catalog on a registry
 """
 type CatalogIdentifier {
-    registryURL: String!
-    catalogSlug: String!
+    registryURL: String
+    catalogSlug: String
 }
 
 """
 The complete identifier for a collections on a registry
 """
 type CollectionIdentifier {
-    registryURL: String!
-    collectionSlug: String!
+    registryURL: String
+    collectionSlug: String
 }
 
 """
@@ -313,18 +313,27 @@ type SearchCollectionResult {
 }
 
 """
-The response for my packages request
+The response for packages list request
 """
-type MyPackagesResult {
+type PackagesResult {
     packages: [Package!]
     hasMore: Boolean!
     count: Int!
 }
 
 """
-The response for my packages request
+The response for a catalog list request
 """
-type MyCollectionsResult {
+type CatalogsResult {
+    catalogs: [Catalog!]
+    hasMore: Boolean!
+    count: Int!
+}
+
+"""
+The response for collections list request
+"""
+type CollectionsResult {
     collections: [Collection!]
     hasMore: Boolean!
     count: Int!
@@ -363,6 +372,8 @@ The response for a search term auto-complete request
 type AutoCompleteResult {
     catalogs: [Catalog!]
     packages: [Package!]
+    collections: [Collection!]
+    users: [User!]
 }
 
 """
@@ -430,7 +441,16 @@ input UpdateCatalogInput {
 
 input SetUserCatalogPermissionInput {
     username: String! @validUsername
+
+    """
+    The users permissions for the catalog itself
+    """
     permission: [Permission!]!
+
+    """
+    The users permissions for all packages in the catalog
+    """
+    packagePermission: [Permission!]!
 }
 
 """
@@ -466,7 +486,7 @@ input SetPackagePermissionInput {
 The properties for setting a specific user's permissions on a collection
 """
 input SetUserCollectionPermissionsInput {
-    username: String! @validUsername
+    usernameOrEmailAddress: String! @validUsernameOrEmailAddress
     permissions: [Permission!]!
 }
 
@@ -536,6 +556,13 @@ type Query {
     """
     Returns all of the users for a given catalog
     """
+    usersByPackage(
+        identifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
+    ): [UserPackagePermissions]!
+
+    """
+    Returns all of the users for a given catalog
+    """
     usersByCatalog(
         identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
     ): [UserCatalogPermissions]!
@@ -594,7 +621,7 @@ type Query {
     """
     Returns list of authenicated users packages
     """
-    myPackages(offset: Int!, limit: Int!): MyPackagesResult! @isAuthenticated
+    myPackages(offset: Int!, limit: Int!): PackagesResult! @isAuthenticated
 
     """
     Returns packages that match the given search query (which can contain boolean search logic). This request is paginated.
@@ -624,7 +651,22 @@ type Query {
     """
     Returns list of authenicated users collections
     """
-    myCollections(offSet: Int!, limit: Int!): MyCollectionsResult! @isAuthenticated
+    myCollections(offSet: Int!, limit: Int!): CollectionsResult! @isAuthenticated
+
+    """
+    Returns list of collections for the given user
+    """
+    userCollections(username: String! @validUsername, offSet: Int!, limit: Int!): CollectionsResult!
+
+    """
+    Returns list of catalogs for the given user
+    """
+    userCatalogs(username: String! @validUsername, offSet: Int!, limit: Int!): CatalogsResult!
+
+    """
+    Returns list of packages for the given user
+    """
+    userPackages(username: String! @validUsername, offSet: Int!, limit: Int!): PackagesResult!
 
     """
     Returns collections whos names match the given query. This request is paginated
@@ -833,10 +875,18 @@ type Mutation {
     ): Void
 
     """
-    Removes all permissions for a user on a given collection. Requires the manage package permission
+    Removes all permissions for a user on a given collection. Requires the manage collection permission
     """
     deleteUserCollectionPermissions(
         identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
+        username: String! @validUsername
+    ): Void
+
+    """
+    Removes all permissions for a user on a given catalog. Requires the manage catalog permission
+    """
+    deleteUserCatalogPermissions(
+        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
         username: String! @validUsername
     ): Void
 
@@ -846,7 +896,7 @@ type Mutation {
     setPackagePermissions(
         identifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
         value: SetPackagePermissionInput!
-    ): UserPackagePermissions!
+    ): Void
 
     """
     Removes all permissions for a user on a given package. Requires the manage package permission

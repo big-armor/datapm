@@ -76,16 +76,18 @@ The following are the top level properties in the DataPM Package File JSON file 
 
 These are the properties for the "schemas" top level array property. These schemas are validated both by the [JSON Schema Draft 07 specification](https://json-schema.org/specification-links.html#draft-7), and the DataPM Package file specification. This document contains only the properties listed in the DataPM specification - as they are generally more restrictive than the [JSON Schema Draft 07 specification](https://json-schema.org/specification-links.html#draft-7).
 
-| Property               |  Type   | Required | Description                                                                                                                                                              |
-| :--------------------- | :-----: | :------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| parser                 | Object  | Required | A configuration object describing the parser required for the data. See Parser section below                                                                             |
-| properties             | Object  | Required | See Schema Properties table below                                                                                                                                        |
-| source                 | Object  | Required | See Source properties below                                                                                                                                              |
-| byteCount              | Integer | Optional | The exact or approximate number of bytes in the raw dataset. This should include only the 'values' and not the format, schema, or keys                                   |
-| byteCountApproximate   | Boolean | Optional | Whether the provided byte count is approximate (true) or exact (false). Default is false (exact).                                                                        |
-| recordCount            | Integer | Optional | The exact or estimated number of records in the data set.                                                                                                                |
-| recordCountApproximate | Boolean | Optional | Whether the recordCount property value is exact (false) or approximate (true). Defaults false (exact).                                                                   |
-| unit                   | String  | Optional | The noun(s) describing what each record represents. Example for Objects: Person, Location and Time, Point In Time, etc. Example for values: Meters, Degrees Celsius, etc |
+| Property               |   Type   | Required | Description                                                                                                                                                              |
+| :--------------------- | :------: | :------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| parser                 |  Object  | Required | A configuration object describing the parser required for the data. See Parser section below                                                                             |
+| properties             |  Object  | Required | See Schema Properties table below                                                                                                                                        |
+| source                 |  Object  | Required | See Source properties below                                                                                                                                              |
+| byteCount              | Integer  | Optional | The exact or approximate number of bytes in the raw dataset. This should include only the 'values' and not the format, schema, or keys                                   |
+| byteCountApproximate   | Boolean  | Optional | Whether the provided byte count is approximate (true) or exact (false). Default is false (exact).                                                                        |
+| derivedFrom            | Object[] | Optional | See 'Derived From' properties                                                                                                                                            |
+| derivedFromDescription |  String  | Optional | A description, such as a SQL statement, or a human description of what actions were taken to derive the data in this schema.                                             |
+| recordCount            | Integer  | Optional | The exact or estimated number of records in the data set.                                                                                                                |
+| recordCountApproximate | Boolean  | Optional | Whether the recordCount property value is exact (false) or approximate (true). Defaults false (exact).                                                                   |
+| unit                   |  String  | Optional | The noun(s) describing what each record represents. Example for Objects: Person, Location and Time, Point In Time, etc. Example for values: Meters, Degrees Celsius, etc |
 
 ## Schema Properties
 
@@ -112,6 +114,28 @@ These are the properties for the registry objects in the top level "registries" 
 | :---------- | :----: | :------: | :------------------------------------------------------------------------- |
 | url         | String | Required | The http or https URL that uniquely identifies the datapm registry server. |
 | catalogSlug | String | Required | The unique catalogSlug to which this package is published in the registry. |
+
+## Derived From Properties
+
+These are the properties of the 'derivedFrom' object in the schema properties.
+
+| Property         |  Type  | Required | Description                                                                                                                       |
+| :--------------- | :----: | :------: | :-------------------------------------------------------------------------------------------------------------------------------- |
+| displayName      | String | Required | The user friendly name for the upstream data.                                                                                     |
+| schemaIdentifier | Object | EitherOr | See 'Upstream Schema Version Identifier' properties. Must specify either packageIdentifier or url.                                |
+| url              | String | EitherOr | The URL either of the upstream data or the website that describes the upstream data.Must specify either packageIdentifier or url. |
+
+## Upstream Schema Version Identifier Properties
+
+Identifies a single package and version. Used in the 'Derived From' property to identify an upstream data package
+
+| Property    |  Type  | Required | Description                                                                                |
+| :---------- | :----: | :------: | :----------------------------------------------------------------------------------------- |
+| registryURL | String | Required | The base URL of the upstream registry that contains the catalog and package.               |
+| catalogSlug | String | Required | The unique catalog slug for the upstream package                                           |
+| packageSlug | String | Required | The unique package slug for the upstream package.                                          |
+| version     | String | Required | The semantic version formatted version string for the upstream package.                    |
+| schemaTitle | String | Required | The upstream schema 'title' property, found in the upstream package file schema definition |
 
 ## Contributor Properties
 

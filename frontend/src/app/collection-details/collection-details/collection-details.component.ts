@@ -1,10 +1,22 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
+import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 import { ActivatedRoute, ParamMap } from "@angular/router";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { PageState } from "src/app/models/page-state";
-import { Collection, CollectionGQL } from "src/generated/graphql";
-import { mockPackages } from "./mock-data";
+import { EditCollectionComponent } from "src/app/shared/edit-collection/edit-collection.component";
+import {
+    Collection,
+    CollectionGQL,
+    Package,
+    Permission,
+    RemovePackageFromCollectionGQL,
+    UpdateCollectionGQL
+} from "src/generated/graphql";
+import { AddPackageComponent } from "../add-package/add-package.component";
+
+type CollectionDetailsPageState = PageState | "NOT_AUTHORIZED" | "NOT_FOUND";
 
 @Component({
     selector: "app-collection-details",
@@ -14,10 +26,16 @@ import { mockPackages } from "./mock-data";
 export class CollectionDetailsComponent implements OnInit, OnDestroy {
     public collectionSlug: string = "";
     public collection: Collection;
-    public state: PageState = "INIT";
+    public state: CollectionDetailsPageState = "INIT";
+    public currentTab = 0;
     private unsubscribe$: Subject<any> = new Subject();
 
-    constructor(private route: ActivatedRoute, private collectionGQL: CollectionGQL) {
+    constructor(
+        private route: ActivatedRoute,
+        private collectionGQL: CollectionGQL,
+        private removePackageFromCollectionGQL: RemovePackageFromCollectionGQL,
+        private dialog: MatDialog
+    ) {
         this.route.paramMap.pipe(takeUntil(this.unsubscribe$)).subscribe((paramMap: ParamMap) => {
             this.collectionSlug = paramMap.get("collectionSlug") || "";
             this.getCollectionDetails();
@@ -44,14 +62,67 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
                 }
             })
             .subscribe(
-                ({ data }) => {
+                ({ errors, data }) => {
+                    if (errors) {
+                        if (errors.find((e) => e.message.includes("NOT_AUTHORIZED"))) this.state = "NOT_AUTHORIZED";
+                        if (errors.find((e) => e.message.includes("COLLECTION_NOT_FOUND"))) this.state = "NOT_FOUND";
+                        else this.state = "ERROR";
+                        return;
+                    }
                     this.collection = data.collection as Collection;
-                    this.collection.packages = mockPackages as any; // To be removed later
+                    console.log(this.collection);
                     this.state = "SUCCESS";
                 },
                 () => {
                     this.state = "ERROR";
                 }
             );
+    }
+
+    public addPackage() {
+        const dialogRef = this.dialog.open(AddPackageComponent, {
+            data: this.collectionSlug
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.getCollectionDetails();
+            }
+        });
+    }
+
+    public removePackage(p: Package) {
+        this.removePackageFromCollectionGQL
+            .mutate({
+                collectionIdentifier: {
+                    collectionSlug: this.collectionSlug
+                },
+                packageIdentifier: {
+                    catalogSlug: p.identifier.catalogSlug,
+                    packageSlug: p.identifier.packageSlug
+                }
+            })
+            .subscribe(() => {
+                this.getCollectionDetails();
+            });
+    }
+
+    editCollection(): void {
+        this.dialog
+            .open(EditCollectionComponent, {
+                data: this.collection
+            })
+            .afterClosed()
+            .subscribe((newCollection: Collection) => {
+                this.collection = newCollection;
+            });
+    }
+
+    public get canManage() {
+        return this.collection && this.collection.myPermissions?.includes(Permission.MANAGE);
+    }
+
+    public get canEdit() {
+        return this.collection && this.collection.myPermissions?.includes(Permission.EDIT);
     }
 }

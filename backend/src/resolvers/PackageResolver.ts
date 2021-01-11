@@ -1,6 +1,6 @@
 import { ApolloError, ForbiddenError, UserInputError } from "apollo-server";
 import graphqlFields from "graphql-fields";
-import { AuthenticatedContext } from "../context";
+import { AuthenticatedContext, Context } from "../context";
 import { Catalog } from "../entity/Catalog";
 import { Collection } from "../entity/Collection";
 import { Package } from "../entity/Package";
@@ -21,6 +21,23 @@ import { UserRepository } from "../repository/UserRepository";
 import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 import { ImageStorageService } from "../storage/images/image-storage-service";
+
+export const usersByPackage = async (
+    _0: any,
+    { identifier }: { identifier: PackageIdentifierInput },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const relations = getGraphQlRelationName(info);
+
+    const packageEntity = await context.connection.manager
+        .getCustomRepository(PackageRepository)
+        .findPackageOrFail({ identifier });
+
+    return await context.connection.manager
+        .getCustomRepository(PackagePermissionRepository)
+        .usersByPackage(packageEntity, relations);
+};
 
 export const myPackages = async (
     _0: any,
@@ -58,7 +75,7 @@ export const getLatestPackages = async (
     };
 };
 
-export const catalogPackagesForUser = async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+export const catalogPackagesForUser = async (parent: any, _1: any, context: Context, info: any) => {
     const catalog = parent as Catalog;
 
     return await context.connection.getCustomRepository(PackageRepository).catalogPackagesForUser({
@@ -233,8 +250,7 @@ export const setPackagePermissions = async (
     return context.connection.getCustomRepository(PackagePermissionRepository).setPackagePermissions({
         identifier,
         username,
-        permissions,
-        relations: getGraphQlRelationName(info)
+        permissions
     });
 };
 
@@ -243,8 +259,26 @@ export const removePackagePermissions = async (
     { identifier, username }: { identifier: PackageIdentifierInput; username: string },
     context: AuthenticatedContext
 ) => {
-    context.connection.getCustomRepository(PackagePermissionRepository).removePackagePermission({
+    return context.connection.getCustomRepository(PackagePermissionRepository).removePackagePermission({
         identifier,
         username
     });
+};
+
+export const userPackages = async (
+    _0: any,
+    { username, limit, offSet }: { username: string; limit: number; offSet: number },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const relations = getGraphQlRelationName(info);
+    const [searchResponse, count] = await context.connection.manager
+        .getCustomRepository(PackageRepository)
+        .userPackages({ user: context.me, username, offSet, limit, relations });
+
+    return {
+        hasMore: count - (offSet + limit) > 0,
+        packages: searchResponse,
+        count
+    };
 };

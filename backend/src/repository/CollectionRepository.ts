@@ -5,6 +5,7 @@ import { User } from "../entity/User";
 import { CreateCollectionInput, UpdateCollectionInput } from "../generated/graphql";
 import { StorageErrors } from "../storage/files/file-storage-service";
 import { ImageStorageService } from "../storage/images/image-storage-service";
+import { UserRepository } from "./UserRepository";
 
 @EntityRepository(Collection)
 export class CollectionRepository extends Repository<Collection> {
@@ -65,6 +66,34 @@ export class CollectionRepository extends Repository<Collection> {
             .getManyAndCount();
     }
 
+    async userCollections({
+        user,
+        username,
+        offSet,
+        limit,
+        relations = []
+    }: {
+        user?: User;
+        username: string;
+        offSet: number;
+        limit: number;
+        relations?: string[];
+    }): Promise<[Collection[], number]> {
+        const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
+
+        const response = await this.createQueryBuilderWithUserConditions(user?.id)
+            .andWhere(
+                `("Collection".id IN (SELECT collection_id FROM collection_user WHERE user_id = :targetUserId AND 'MANAGE' = ANY( permissions) ))`
+            )
+            .setParameter("targetUserId", targetUser.id)
+            .offset(offSet)
+            .limit(limit)
+            .addRelations("Collection", relations)
+            .getManyAndCount();
+
+        return response;
+    }
+
     public async deleteCollection(collectionSlug: string): Promise<void> {
         const collectionIdDb = await this.findCollectionBySlugOrFail(collectionSlug);
         await this.delete({ id: collectionIdDb.id });
@@ -115,6 +144,28 @@ export class CollectionRepository extends Repository<Collection> {
             .getMany();
     }
 
+    async autocomplete({
+        user,
+        startsWith,
+        relations = []
+    }: {
+        user: User | undefined;
+        startsWith: string;
+        relations?: string[];
+    }): Promise<Collection[]> {
+        const ALIAS = "autoCompleteCollection";
+
+        const entities = await this.createQueryBuilderWithUserConditions(user?.id)
+            .andWhere(`(LOWER("Collection"."slug") LIKE :queryLike OR LOWER("Collection"."name") LIKE :queryLike)`, {
+                startsWith,
+                queryLike: startsWith.toLowerCase() + "%"
+            })
+            .addRelations(ALIAS, relations)
+            .getMany();
+
+        return entities;
+    }
+
     public async search(
         userId: number,
         query: string,
@@ -124,7 +175,9 @@ export class CollectionRepository extends Repository<Collection> {
     ): Promise<[Collection[], number]> {
         return (
             this.createQueryBuilderWithUserConditions(userId)
-                .andWhere("(name_tokens @@ to_tsquery(:query) OR description_tokens @@ to_tsquery(:query))")
+                .andWhere(
+                    "(name_tokens @@ websearch_to_tsquery(:query) OR description_tokens @@ websearch_to_tsquery(:query))"
+                )
                 .setParameter("query", query)
                 .limit(limit)
                 .offset(offSet)
@@ -133,15 +186,16 @@ export class CollectionRepository extends Repository<Collection> {
         );
     }
 
-    private createQueryBuilderWithUserConditions(userId: number): SelectQueryBuilder<Collection> {
-        const publicCollectionQueryBuilder = this.createQueryBuilder().where('("Collection"."is_public")');
+    private createQueryBuilderWithUserConditions(userId?: number): SelectQueryBuilder<Collection> {
+        const queryBuilder = this.createQueryBuilder();
+
         if (!userId) {
-            return publicCollectionQueryBuilder;
+            return queryBuilder.where('("Collection"."is_public")');
         }
 
-        return publicCollectionQueryBuilder
-            .orWhere(
-                `("Collection"."id" IN (SELECT collection_id FROM collection_user WHERE user_id = :userId AND 'VIEW' = any(permissions)))`
+        return queryBuilder
+            .where(
+                `(("Collection"."is_public") OR ("Collection"."id" IN (SELECT collection_id FROM collection_user WHERE user_id = :userId AND 'VIEW' = any(permissions))))`
             )
             .setParameter("userId", userId);
     }
