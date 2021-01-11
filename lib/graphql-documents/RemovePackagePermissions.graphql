@@ -1,0 +1,3 @@
+mutation RemovePackagePermissions($username: String!, $identifier: PackageIdentifierInput!) {
+    removePackagePermissions(username: $username, identifier: $identifier)
+}

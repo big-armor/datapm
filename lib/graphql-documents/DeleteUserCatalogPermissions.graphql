@@ -1,0 +1,3 @@
+mutation DeleteUserCatalogPermissions($username: String!, $identifier: CatalogIdentifierInput!) {
+    deleteUserCatalogPermissions(username: $username, identifier: $identifier)
+}

@@ -1,0 +1,15 @@
+query UserCollections($username: String!, $offSet: Int!, $limit: Int!) {
+    userCollections(username: $username, offSet: $offSet, limit: $limit) {
+        collections {
+            identifier {
+                collectionSlug
+            }
+            name
+            description
+            myPermissions
+            isPublic
+        }
+        hasMore
+        count
+    }
+}

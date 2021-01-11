@@ -1,0 +1,65 @@
+<div class="container mt-4">
+    <h1>Public Access</h1>
+    <p>Enabling public access allows all users, including anonymous users, access to view and fetch this package.</p>
+</div>
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div class="d-flex align-items-center public-toggle">
+        <div class="px-4 py-2 label">Make this package public</div>
+        <div class="ml-auto px-4 py-2 slide-right">
+            <mat-slide-toggle
+                class="app-slide-toggle"
+                [checked]="package?.isPublic"
+                (change)="updatePublic($event)"
+            ></mat-slide-toggle>
+        </div>
+    </div>
+</div>
+<div class="container mt-5" *ngIf="users?.length">
+    <h1>Users With Access</h1>
+    <p>The following users have permission to access this package.</p>
+    <button class="app-outlined-button" (click)="addUser()" *ngIf="users.length > 0">Add User</button>
+</div>
+
+<table mat-table [dataSource]="users" *ngIf="users?.length > 0">
+    <!-- Label column -->
+    <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>User</th>
+        <td class="table-content" mat-cell *matCellDef="let user">
+            <div style="display: flex; justify-content: start; align-content: center">
+                <a class="ml-2" [routerLink]="'/' + user.username"
+                    ><app-avatar [user]="user" [size]="24"></app-avatar
+                ></a>
+
+                <a class="ml-2" [routerLink]="'/' + user.username">{{ user.name }}</a>
+            </div>
+        </td>
+    </ng-container>
+
+    <ng-container matColumnDef="permission">
+        <th mat-header-cell *matHeaderCellDef>Permission</th>
+        <td class="table-content" mat-cell *matCellDef="let user">
+            <select [value]="user.permission" (change)="updatePermission(user.username, $event.target.value)">
+                <option value="VIEW">View</option>
+                <option value="EDIT">Edit</option>
+                <option value="MANAGE">Manage</option>
+            </select>
+        </td>
+    </ng-container>
+
+    <!-- Actions column -->
+    <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let user">
+            <a class="app-outlined-button mr-3" (click)="removeUser(user.username)">Remove</a>
+        </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+    <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
+</table>
+
+<div class="dpm-no-data" *ngIf="!users?.length">
+    <p>There are no other users who have permissions to this package.</p>
+    <a class="app-outlined-button mt-3" (click)="addUser()">Add a user</a>
+</div>

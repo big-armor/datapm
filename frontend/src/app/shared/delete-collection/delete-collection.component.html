@@ -1,0 +1,23 @@
+<div mat-dialog-title>
+    <h1>Delete Collection</h1>
+    <p>
+        Packages in this collection are not affected by this action. Deleting the collection is permanent and can not be
+        undone.
+    </p>
+</div>
+
+<div mat-dialog-content>
+    <div>
+        Type <span class="slug">{{ data.collectionSlug }}</span> here
+    </div>
+    <mat-form-field>
+        <input matInput [(ngModel)]="confirmVal" autocomplete="off" />
+    </mat-form-field>
+</div>
+
+<div mat-dialog-actions class="d-flex justify-content-between">
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-button color="accent" (click)="confirm()" [disabled]="confirmVal !== data.collectionSlug">
+        Delete Collection Now
+    </button>
+</div>

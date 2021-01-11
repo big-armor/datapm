@@ -1,0 +1,42 @@
+query UserPackages($username: String!, $offSet: Int!, $limit: Int!) {
+    userPackages(username: $username, offSet: $offSet, limit: $limit) {
+        packages {
+            myPermissions
+            identifier {
+                registryURL
+                catalogSlug
+                packageSlug
+            }
+            catalog {
+                myPermissions
+                displayName
+            }
+            isPublic
+            displayName
+            description
+            latestVersion {
+                identifier {
+                    versionMajor
+                    versionMinor
+                    versionPatch
+                }
+                createdAt
+            }
+            creator {
+                username
+                firstName
+                lastName
+            }
+            versions {
+                identifier {
+                    versionMajor
+                    versionMinor
+                    versionPatch
+                }
+                createdAt
+            }
+        }
+        hasMore
+        count
+    }
+}
