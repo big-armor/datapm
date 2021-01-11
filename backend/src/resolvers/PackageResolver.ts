@@ -112,7 +112,7 @@ export const findPackage = async (
     try {
         let log = new ActivityLog();
         log.userId = context?.me?.id;
-        log.eventType = ActivityLogEventType.PackageViewed;
+        log.eventType = ActivityLogEventType.PACKAGE_VIEWED;
         log.targetCollectionId = packageEntity?.id;
 
         await context.connection.getCustomRepository(ActivityLogRepository).create(log);
@@ -151,11 +151,12 @@ export const createPackage = async (
             relations: getGraphQlRelationName(info)
         });
 
-        await context.connection.getRepository(ActivityLog).create({
-            userId: context?.me?.id,
-            eventType: ActivityLogEventType.PackageCreated,
-            targetPackageId: packageEntity?.id
-        });
+        let log = new ActivityLog();
+        log.userId = context?.me?.id;
+        log.eventType = ActivityLogEventType.PACKAGE_CREATED;
+        log.targetPackageId = packageEntity?.id;
+
+        await context.connection.getCustomRepository(ActivityLogRepository).create(log);
 
         return packageEntity;
     } catch (error) {

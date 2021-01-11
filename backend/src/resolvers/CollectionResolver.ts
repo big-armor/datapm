@@ -188,7 +188,7 @@ export const addPackageToCollection = async (
     try {
         let log = new ActivityLog();
         log.userId = context?.me?.id;
-        log.eventType = ActivityLogEventType.CollectionPackageAdded;
+        log.eventType = ActivityLogEventType.COLLECTION_PACKAGE_ADDED;
         log.targetCollectionId = value?.collectionId;
 
         await context.connection.getCustomRepository(ActivityLogRepository).create(log);
@@ -220,7 +220,7 @@ export const removePackageFromCollection = async (
     try {
         let log = new ActivityLog();
         log.userId = context?.me?.id;
-        log.eventType = ActivityLogEventType.CollectionPackageRemoved;
+        log.eventType = ActivityLogEventType.COLLECTION_PACKAGE_REMOVED;
         log.targetCollectionId = collectionEntity?.id;
 
         await context.connection.getCustomRepository(ActivityLogRepository).create(log);
