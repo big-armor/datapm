@@ -72,7 +72,7 @@
                             <!-- <div class="package-title">{{ package?.displayName }}</div> -->
                             <span
                                 class="py-2 package-privacy"
-                                *ngIf="this.currentUser && this.currentUser?.username == this.catalogUser?.username"
+                                *ngIf="package.myPermissions.includes('MANAGE')"
                                 [class.public-text]="package?.isPublic"
                                 [class.not-public-text]="!package?.isPublic"
                             >
