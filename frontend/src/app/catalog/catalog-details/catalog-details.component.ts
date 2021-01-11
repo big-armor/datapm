@@ -1,10 +1,11 @@
 import { Component, OnInit } from "@angular/core";
-import { Catalog, GetCatalogGQL, Package, Permission } from "src/generated/graphql";
-import { ActivatedRoute } from "@angular/router";
+import { Catalog, DeletePackageGQL, GetCatalogGQL, Package, Permission } from "src/generated/graphql";
+import { ActivatedRoute, Router } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
 import { EditCatalogComponent } from "src/app/shared/edit-catalog/edit-catalog.component";
 import { PageState } from "src/app/models/page-state";
 import { DialogService } from "../../services/dialog.service";
+import { DeletePackageComponent } from "../../shared/delete-package/delete-package.component";
 
 @Component({
     selector: "app-catalog-details",
@@ -19,12 +20,14 @@ export class CatalogDetailsComponent implements OnInit {
 
     constructor(
         private getCatalogGQL: GetCatalogGQL,
+        private deletePackageGQL: DeletePackageGQL,
         private dialog: MatDialog,
+        private router: Router,
         private route: ActivatedRoute,
         private dialogService: DialogService
     ) {}
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.catalogSlug = this.route.snapshot.paramMap.get("catalogSlug");
         this.state = "LOADING";
         this.getCatalogGQL.fetch({ identifier: { catalogSlug: this.catalogSlug } }).subscribe(({ data, errors }) => {
@@ -41,11 +44,10 @@ export class CatalogDetailsComponent implements OnInit {
 
             this.catalog = data.catalog as Catalog;
             this.state = "SUCCESS";
-            console.log(this.catalog);
         });
     }
 
-    editCatalog() {
+    public editCatalog(): void {
         this.dialog
             .open(EditCatalogComponent, {
                 data: this.catalog
@@ -58,31 +60,37 @@ export class CatalogDetailsComponent implements OnInit {
             });
     }
 
-    loginClicked() {
+    public loginClicked(): void {
         this.dialogService.openLoginDialog();
     }
 
-    removePackage(p: Package) {
-        // this.removePackageFromCollectionGQL
-        //     .mutate({
-        //         collectionIdentifier: {
-        //             collectionSlug: this.collectionSlug
-        //         },
-        //         packageIdentifier: {
-        //             catalogSlug: p.identifier.catalogSlug,
-        //             packageSlug: p.identifier.packageSlug
-        //         }
-        //     })
-        //     .subscribe(() => {
-        //         this.getCollectionDetails();
-        //     });
+    public deletePackage(packageToDelete: Package): void {
+        const dialogConfig = {
+            data: {
+                catalogSlug: packageToDelete.identifier.catalogSlug,
+                packageSlug: packageToDelete.identifier.packageSlug,
+                dontDeleteInstantly: true
+            }
+        };
+        const dialogReference = this.dialog.open(DeletePackageComponent, dialogConfig);
+
+        dialogReference.afterClosed().subscribe((confirmed: boolean) => {
+            if (confirmed) {
+                const deletionRoutePathFragments = [
+                    packageToDelete.identifier.catalogSlug,
+                    packageToDelete.identifier.packageSlug,
+                    "delete-confirmation"
+                ];
+                this.router.navigate(deletionRoutePathFragments);
+            }
+        });
     }
 
-    public get canManage() {
+    public get canManage(): boolean {
         return this.catalog && this.catalog.myPermissions?.includes(Permission.MANAGE);
     }
 
-    public get canEdit() {
+    public get canEdit(): boolean {
         return this.catalog && this.catalog.myPermissions?.includes(Permission.EDIT);
     }
 }

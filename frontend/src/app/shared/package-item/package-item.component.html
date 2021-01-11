@@ -36,15 +36,17 @@
                         <mat-icon>star_border</mat-icon>
                     </button>
                     <span class="px-2 content-nr">47</span>
-                </div> 
+                </div>
                  <div class="p-2 bd-highlight">
                     <button mat-fab>
                         <mat-icon>collections</mat-icon>
                     </button>
                     <span class="px-2 content-nr">add to collection</span>
-                </div> 
+                </div>
             </div>
         </div>-->
-        <a class="app-outlined-button ctaButton" *ngIf="showCta" (click)="handleAction($event)">{{ ctaText }}</a>
+        <a class="app-outlined-button ctaButton" *ngIf="shouldShowActionButton" (click)="handleAction($event)">{{
+            actionButtonText
+        }}</a>
     </mat-card-content>
 </mat-card>

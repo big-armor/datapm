@@ -1,0 +1,11 @@
+<div class="container">
+    ARE YOU SURE SURE YOU WANT TO DELETE PACKAGE {{ packageSlug }}?
+
+    <div *ngIf="!isCountdownOver">
+        {{ currentCountdownValue }}
+    </div>
+
+    <div *ngIf="isCountdownOver">
+        <button class="app-outlined-button" (click)="deletePackage()">Yes, delete it!</button>
+    </div>
+</div>
