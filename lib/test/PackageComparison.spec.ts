@@ -5,11 +5,9 @@ import {
     DifferenceType,
     diffCompatibility,
     nextVersion,
-    validateCatalogSlug,
-    validatePackageSlug,
     comparePackages
 } from "../src/PackageUtil";
-import { Schema, Properties, PackageFile } from "../src/main";
+import { Schema, Properties, PackageFile, catalogSlugValid, packageSlugValid } from "../src/main";
 import { SemVer } from "semver";
 import { expect } from "chai";
 
@@ -248,41 +246,40 @@ describe("Checking VersionUtil", () => {
     });
 
     it("Catalog slug validation", () => {
-        expect(validateCatalogSlug("a")).equal(true);
-        expect(validateCatalogSlug("0")).equal(true);
-        expect(validateCatalogSlug("a-b")).equal(true);
-        expect(validateCatalogSlug("a-b-123")).equal(true);
-        expect(validateCatalogSlug("a".repeat(39))).equal(true);
+        expect(catalogSlugValid("a")).equal(true);
+        expect(catalogSlugValid("0")).equal(true);
+        expect(catalogSlugValid("a-b")).equal(true);
+        expect(catalogSlugValid("a-b-123")).equal(true);
+        expect(catalogSlugValid("a".repeat(39))).equal("CATALOG_SLUG_TOO_LONG");
 
-        expect(validateCatalogSlug(undefined)).equal(false);
-        expect(validateCatalogSlug("")).equal(false);
-        expect(validateCatalogSlug("a_b")).equal(false);
-        expect(validateCatalogSlug("a--b")).equal(false);
-        expect(validateCatalogSlug("a-b-")).equal(false);
-        expect(validateCatalogSlug("-a-b")).equal(false);
-        expect(validateCatalogSlug("a".repeat(40))).equal(false);
+        expect(catalogSlugValid(undefined)).equal("CATALOG_SLUG_REQUIRED");
+        expect(catalogSlugValid("")).equal("CATALOG_SLUG_REQUIRED");
+        expect(catalogSlugValid("a_b")).equal("CATALOG_SLUG_INVALID");
+        expect(catalogSlugValid("a--b")).equal("CATALOG_SLUG_INVALID");
+        expect(catalogSlugValid("a-b-")).equal("CATALOG_SLUG_INVALID");
+        expect(catalogSlugValid("-a-b")).equal("CATALOG_SLUG_INVALID");
     });
 
     it("Package slug validation", () => {
-        expect(validatePackageSlug("a")).equal(true);
-        expect(validatePackageSlug("0")).equal(true);
-        expect(validatePackageSlug("a.b")).equal(true);
-        expect(validatePackageSlug("a--b")).equal(true);
-        expect(validatePackageSlug("a__b")).equal(true);
-        expect(validatePackageSlug("a__b----c.123")).equal(true);
-        expect(validatePackageSlug("a".repeat(100))).equal(true);
+        expect(packageSlugValid("a")).equal(true);
+        expect(packageSlugValid("0")).equal(true);
+        expect(packageSlugValid("a.b")).equal(true);
+        expect(packageSlugValid("a--b")).equal(true);
+        expect(packageSlugValid("a__b")).equal(true);
+        expect(packageSlugValid("a__b----c.123")).equal(true);
+        expect(packageSlugValid("a".repeat(100))).equal("PACKAGE_SLUG_TOO_LONG");
 
-        expect(validatePackageSlug(undefined)).equal(false);
-        expect(validatePackageSlug("")).equal(false);
-        expect(validatePackageSlug(".")).equal(false);
-        expect(validatePackageSlug("-")).equal(false);
-        expect(validatePackageSlug("_")).equal(false);
-        expect(validatePackageSlug("a@b")).equal(false);
-        expect(validatePackageSlug("a.")).equal(false);
-        expect(validatePackageSlug("a..b")).equal(false);
-        expect(validatePackageSlug("a-")).equal(false);
-        expect(validatePackageSlug("a_")).equal(false);
-        expect(validatePackageSlug("a___c")).equal(false);
+        expect(packageSlugValid(undefined)).equal("PACKAGE_SLUG_REQUIRED");
+        expect(packageSlugValid("")).equal("PACKAGE_SLUG_REQUIRED");
+        expect(packageSlugValid(".")).equal("PACKAGE_SLUG_INVALID");
+        expect(packageSlugValid("-")).equal("PACKAGE_SLUG_INVALID");
+        expect(packageSlugValid("_")).equal("PACKAGE_SLUG_INVALID");
+        expect(packageSlugValid("a@b")).equal("PACKAGE_SLUG_INVALID");
+        expect(packageSlugValid("a.")).equal("PACKAGE_SLUG_INVALID");
+        expect(packageSlugValid("a..b")).equal("PACKAGE_SLUG_INVALID");
+        expect(packageSlugValid("a-")).equal("PACKAGE_SLUG_INVALID");
+        expect(packageSlugValid("a_")).equal("PACKAGE_SLUG_INVALID");
+        expect(packageSlugValid("a___c")).equal("PACKAGE_SLUG_INVALID");
     });
 
     it("Compare identical", () => {

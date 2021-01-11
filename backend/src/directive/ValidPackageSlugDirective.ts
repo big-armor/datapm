@@ -11,7 +11,7 @@ import {
     GraphQLScalarType
 } from "graphql";
 import { Context } from "../context";
-import { validatePackageSlug } from "datapm-lib";
+import { packageSlugValid } from "datapm-lib";
 import { ValidationConstraint } from "./ValidationConstraint";
 import { Kind } from "graphql";
 import { ValidationType } from "./ValidationType";
@@ -29,7 +29,7 @@ export class ValidPackageSlugDirective extends SchemaDirectiveVisitor {
         details.field.resolve = function (source, args, context: Context, info) {
             const slug: string | undefined = args.packageSlug || undefined;
 
-            validateSlug(slug);
+            validatePackageSlug(slug);
 
             return resolve.apply(this, [source, args, context, info]);
         };
@@ -45,14 +45,14 @@ export class ValidPackageSlugDirective extends SchemaDirectiveVisitor {
     }
 }
 
-export function validateSlug(slug: string | undefined) {
-    if (slug === undefined) throw new ValidationError(`PACKAGE_SLUG_REQUIRED`);
+export function validatePackageSlug(slug: string | undefined) {
+    const validPackageSlug = packageSlugValid(slug);
 
-    if (slug.length == 0) throw new ValidationError(`PACKAGE_SLUG_REQUIRED`);
+    if (validPackageSlug === "PACKAGE_SLUG_REQUIRED") throw new ValidationError(`PACKAGE_SLUG_REQUIRED`);
 
-    if (slug.length > 100) throw new ValidationError(`PACKAGE_SLUG_TOO_LONG`);
+    if (validPackageSlug === "PACKAGE_SLUG_TOO_LONG") throw new ValidationError(`PACKAGE_SLUG_REQUIRED`);
 
-    if (!validatePackageSlug(slug)) throw new ValidationError("PACKAGE_SLUG_INVALID");
+    if (validPackageSlug === "PACKAGE_SLUG_INVALID") throw new ValidationError(`PACKAGE_SLUG_INVALID`);
 }
 
 class PackageSlugConstraint implements ValidationConstraint {
@@ -61,7 +61,7 @@ class PackageSlugConstraint implements ValidationConstraint {
     }
 
     validate(value: string) {
-        validateSlug(value);
+        validatePackageSlug(value);
     }
 
     getCompatibleScalarKinds(): string[] {

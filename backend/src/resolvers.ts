@@ -110,11 +110,11 @@ import {
 import { ImageStorageService } from "./storage/images/image-storage-service";
 
 import { validatePassword } from "./directive/ValidPasswordDirective";
-import { validateSlug as validateCatalogSlug } from "./directive/ValidCatalogSlugDirective";
+import { validateCatalogSlug } from "./directive/ValidCatalogSlugDirective";
 import { validateUsername } from "./directive/ValidUsernameDirective";
 import { validateUsernameOrEmail } from "./directive/ValidUsernameOrEmailAddressDirective";
 import { validateSlug as validateCollectionSlug } from "./directive/ValidCollectionSlugDirective";
-import { validateSlug as validatePackageSlug } from "./directive/ValidPackageSlugDirective";
+import { validatePackageSlug } from "./directive/ValidPackageSlugDirective";
 import { validateEmailAddress } from "./directive/ValidEmailDirective";
 import { FileStorageService, StorageErrors } from "./storage/files/file-storage-service";
 import { PackageFileStorageService } from "./storage/packages/package-file-storage-service";
