@@ -1,60 +1,7 @@
 import { ApolloClient, gql, NormalizedCacheObject } from "@apollo/client/core";
 import { createAnonymousClient, createUser } from "./test-utils";
-import { CreatePackageDocument, MeDocument } from "./registry-client";
+import { CreatePackageDocument, MeDocument, MyActivityDocument, ActivityLogEventType } from "./registry-client";
 import { expect } from "chai";
-
-const QUERY_MY_ACTIVITY = gql`
-    query myActivity($filter: ActivityLogFilterInput!) {
-        myActivity(filter: $filter) {
-            logs {
-                id
-                userId
-                user {
-                    emailAddress
-                    username
-                    firstName
-                    lastName
-                }
-                targetPackageId
-                targetPackage {
-                    creator {
-                        username
-                        emailAddress
-                    }
-                }
-                targetPackageVersionId
-                targetPackageVersion {
-                    identifier {
-                        versionMajor
-                        versionMinor
-                        versionPatch
-                    }
-                }
-                targetCollectionId
-                targetCollection {
-                    identifier {
-                        registryURL
-                        collectionSlug
-                    }
-                    name
-                }
-                targetCatalogId
-                targetCatalog {
-                    identifier {
-                        registryURL
-                        catalogSlug
-                    }
-                    displayName
-                }
-                eventType
-                createdAt
-                updatedAt
-            }
-            count
-            hasMore
-        }
-    }
-`;
 
 describe("Activity Log Tests", async () => {
     let userOne: any;
@@ -105,24 +52,24 @@ describe("Activity Log Tests", async () => {
 
     it("Should allow user to get own activity", async function () {
         const response = await userOneClient.query({
-            query: QUERY_MY_ACTIVITY,
-            variables: { filter: { eventType: "PACKAGE_CREATED", limit: 100, offset: 0 } }
+            query: MyActivityDocument,
+            variables: { filter: { eventType: [ActivityLogEventType.PACKAGE_CREATED], limit: 100, offset: 0 } }
         });
 
         expect(response.data).to.exist;
         expect(response.data.myActivity).to.exist;
         expect(response.data.myActivity.logs.length).to.equal(1);
-        expect(response.data.myActivity.logs[0].user.username).to.equal(userOne.username);
+        expect(response.data.myActivity.logs[0]?.user?.username).to.equal(userOne.username);
     });
 
     it("Should return no activity", async function () {
         const response = await userTwoClient.query({
-            query: QUERY_MY_ACTIVITY,
-            variables: { filter: { eventType: "PACKAGE_CREATED", limit: 100, offset: 0 } }
+            query: MyActivityDocument,
+            variables: { filter: { eventType: [ActivityLogEventType.PACKAGE_CREATED], limit: 100, offset: 0 } }
         });
 
         expect(response.data).to.exist;
         expect(response.data.myActivity).to.exist;
-        expect(response.data.myActivity.logs.length).to.equal(0);
+        expect(response.data.myActivity.logs?.length).to.equal(0);
     });
 });
