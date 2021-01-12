@@ -49,6 +49,8 @@ import { UserDetailsComponent } from "./user-details/user-details/user-details.c
 import { SimpleCreateComponent } from "./user-details/simple-create/simple-create.component";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
+import { DeletePackageComponent } from "./delete-package/delete-package.component";
+import { MatSelect, MatSelectModule } from "@angular/material/select";
 
 @NgModule({
     declarations: [
@@ -84,7 +86,8 @@ import { MatInputModule } from "@angular/material/input";
         EditAccountDialogComponent,
         EditPasswordDialogComponent,
         UserDetailsComponent,
-        SimpleCreateComponent
+        SimpleCreateComponent,
+        DeletePackageComponent
     ],
     imports: [
         CommonModule,
@@ -99,6 +102,7 @@ import { MatInputModule } from "@angular/material/input";
         MatProgressSpinnerModule,
         MatSnackBarModule,
         MatStepperModule,
+        MatSelectModule,
         MatSlideToggleModule,
         MatTableModule,
         FormsModule,

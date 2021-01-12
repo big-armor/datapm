@@ -6,6 +6,7 @@ import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { SnackBarService } from "src/app/services/snackBar.service";
+import { DeletePackageComponent } from "src/app/shared/delete-package/delete-package.component";
 import {
     Package,
     Permission,
@@ -39,7 +40,9 @@ export class PackagePermissionComponent implements OnInit {
         private setPackagePermissions: SetPackagePermissionsGQL,
         private router: Router,
         private snackBarService: SnackBarService,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private snackBar: SnackBarService,
+        private authenticationService: AuthenticationService
     ) {}
 
     ngOnInit(): void {
@@ -175,5 +178,21 @@ export class PackagePermissionComponent implements OnInit {
             .subscribe(({ errors, data }) => {
                 this.package.isPublic = ev.checked;
             });
+    }
+
+    public deletePackage() {
+        const dlgRef = this.dialog.open(DeletePackageComponent, {
+            data: {
+                catalogSlug: this.package.identifier.catalogSlug,
+                packageSlug: this.package.identifier.packageSlug
+            }
+        });
+
+        dlgRef.afterClosed().subscribe((confirmed: boolean) => {
+            if (confirmed)
+                this.router.navigate(["/" + this.authenticationService.currentUser.getValue().username], {
+                    fragment: "packages"
+                });
+        });
     }
 }

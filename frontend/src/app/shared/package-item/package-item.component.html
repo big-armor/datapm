@@ -9,10 +9,10 @@
             {{ item?.isPublic ? "public" : "not public" }}
         </div>
         <div class="d-flex">
-            <div class="d-flex align-items-start mb-2">
+            <div class="d-flex align-items-start">
                 <app-avatar class="align-top user-img" [user]="item.creator" [size]="40"> </app-avatar>
             </div>
-            <div class="mb-3">
+            <div class="">
                 <div class="package-identifier mb-2 ml-2">
                     {{ item.identifier.catalogSlug }}/{{ item.identifier.packageSlug }}
                 </div>
@@ -29,22 +29,22 @@
                 <mat-chip *ngFor="let tag of tags">{{ tag }}</mat-chip>
             </mat-chip-list>
         </div> -->
-        <div class="package-actions pt-2">
+        <!--<div class="package-actions pt-2">
             <div class="d-flex bd-highlight">
-                <!-- <div class="p-2 bd-highlight">
+                 <div class="p-2 bd-highlight">
                     <button mat-fab>
                         <mat-icon>star_border</mat-icon>
                     </button>
                     <span class="px-2 content-nr">47</span>
-                </div> -->
-                <!-- <div class="p-2 bd-highlight">
+                </div> 
+                 <div class="p-2 bd-highlight">
                     <button mat-fab>
                         <mat-icon>collections</mat-icon>
                     </button>
                     <span class="px-2 content-nr">add to collection</span>
-                </div> -->
+                </div> 
             </div>
-        </div>
+        </div>-->
         <a class="app-outlined-button ctaButton" *ngIf="showCta" (click)="handleAction($event)">{{ ctaText }}</a>
     </mat-card-content>
 </mat-card>

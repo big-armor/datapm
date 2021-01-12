@@ -19,7 +19,8 @@ import {
     VersionIdentifierInput,
     Base64ImageUpload,
     Permission,
-    AutoCompleteResultResolvers
+    AutoCompleteResultResolvers,
+    RegistryStatus
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
@@ -113,11 +114,11 @@ import {
 import { ImageStorageService } from "./storage/images/image-storage-service";
 
 import { validatePassword } from "./directive/ValidPasswordDirective";
-import { validateSlug as validateCatalogSlug } from "./directive/ValidCatalogSlugDirective";
+import { validateCatalogSlug } from "./directive/ValidCatalogSlugDirective";
 import { validateUsername } from "./directive/ValidUsernameDirective";
 import { validateUsernameOrEmail } from "./directive/ValidUsernameOrEmailAddressDirective";
 import { validateSlug as validateCollectionSlug } from "./directive/ValidCollectionSlugDirective";
-import { validateSlug as validatePackageSlug } from "./directive/ValidPackageSlugDirective";
+import { validatePackageSlug } from "./directive/ValidPackageSlugDirective";
 import { validateEmailAddress } from "./directive/ValidEmailDirective";
 import { FileStorageService, StorageErrors } from "./storage/files/file-storage-service";
 import { PackageFileStorageService } from "./storage/packages/package-file-storage-service";
@@ -499,6 +500,9 @@ export const resolvers: {
     },
 
     Query: {
+        registryStatus: (_0: any, _1: any, context: AuthenticatedContext, info: any) => {
+            return RegistryStatus.SERVING_REQUESTS;
+        },
         me: async (_0: any, _1: any, context: AuthenticatedContext, info: any) => {
             const user = await context.connection.getCustomRepository(UserRepository).findUserByUserName({
                 username: context.me.username,

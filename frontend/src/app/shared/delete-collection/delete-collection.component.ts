@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { SnackBarService } from "src/app/services/snackBar.service";
 import { DeleteCollectionGQL } from "src/generated/graphql";
 
 export interface DeleteConfirmationData {
@@ -16,7 +17,8 @@ export class DeleteCollectionComponent implements OnInit {
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: DeleteConfirmationData,
         private dialogRef: MatDialogRef<DeleteCollectionComponent>,
-        private deleteCollectionGQL: DeleteCollectionGQL
+        private deleteCollectionGQL: DeleteCollectionGQL,
+        private snackBar: SnackBarService
     ) {}
 
     ngOnInit(): void {}
@@ -32,6 +34,7 @@ export class DeleteCollectionComponent implements OnInit {
                 if (!response.errors) this.dialogRef.close(true);
                 else {
                     console.error(response);
+                    this.snackBar.openSnackBar("There was an error.", "ok");
                 }
             });
     }

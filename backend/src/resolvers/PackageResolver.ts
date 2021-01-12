@@ -39,6 +39,23 @@ export const usersByPackage = async (
         .usersByPackage(packageEntity, relations);
 };
 
+export const usersByPackage = async (
+    _0: any,
+    { identifier }: { identifier: PackageIdentifierInput },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const relations = getGraphQlRelationName(info);
+
+    const packageEntity = await context.connection.manager
+        .getCustomRepository(PackageRepository)
+        .findPackageOrFail({ identifier });
+
+    return await context.connection.manager
+        .getCustomRepository(PackagePermissionRepository)
+        .usersByPackage(packageEntity, relations);
+};
+
 export const myPackages = async (
     _0: any,
     { limit, offset }: { limit: number; offset: number },

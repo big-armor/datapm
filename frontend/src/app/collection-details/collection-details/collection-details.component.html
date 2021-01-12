@@ -3,7 +3,7 @@
         <div *ngIf="state === 'SUCCESS'">
             <app-cover [collectionSlug]="collectionSlug"></app-cover>
             <div class="collection-header px-4 py-3 mt-4">
-                <div *ngIf="collection" class="collections-public">
+                <div *ngIf="collection.myPermissions.includes('MANAGE')" class="collections-public">
                     <span *ngIf="collection?.isPublic" class="public-text">public</span>
                     <span *ngIf="!collection?.isPublic" class="not-public-text">not public</span>
                 </div>
