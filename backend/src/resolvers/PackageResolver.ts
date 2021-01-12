@@ -130,7 +130,7 @@ export const findPackage = async (
         let log = new ActivityLog();
         log.userId = context?.me?.id;
         log.eventType = ActivityLogEventType.PACKAGE_VIEWED;
-        log.targetCollectionId = packageEntity?.id;
+        log.targetPackageId = packageEntity?.id;
 
         await context.connection.getCustomRepository(ActivityLogRepository).create(log);
     } catch (e) {}
