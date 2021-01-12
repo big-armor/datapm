@@ -1,15 +1,88 @@
+@import "./src/styles/variables.scss";
+
 .page-container {
     text-align: center;
+    padding: 80px 0;
+
+    h2 {
+        font-size: 32px;
+    }
+
+    .page-content {
+        margin: 45px 0;
+
+        p {
+            font-size: 16px;
+        }
+    }
+
+    .counter {
+        margin: 40px auto;
+        font-size: 30px;
+        color: $color-danger;
+        position: relative;
+        width: 50px;
+        height: 50px;
+        padding: 15px 10px;
+
+        box-shadow: 0 0 0 0 rgba(0, 0, 0, 1);
+        transform: scale(1);
+        animation: pulse 1s infinite;
+    }
 
     .button-container {
-        width: 300px !important;
+        margin: 0 auto;
 
         button {
-            width: 100%;
+            width: 300px;
+            display: inline-block;
+            padding: 15px 20px;
+            margin-right: 10px;
+            transition: 0.3s all ease-in-out;
         }
 
         .delete-permanently-button {
-            background: #ce5959; // make this a variable
+            background: $color-danger;
+            color: white !important;
+
+            &:disabled {
+                background: $gray-4;
+                cursor: not-allowed;
+            }
+
+            &:hover {
+                background: white !important;
+                color: $color-danger !important;
+                border: 1px solid $color-danger;
+            }
+        }
+
+        .cancel-button {
+            background: $gray-5;
+            color: black;
+
+            &:hover {
+                background: white !important;
+                color: $color-danger !important;
+                border: 1px solid $color-danger;
+            }
+        }
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+        }
+
+        70% {
+            transform: scale(1);
+            box-shadow: 0 0 0 10px rgba(255, 0, 0, 0);
+        }
+
+        100% {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
         }
     }
 }
