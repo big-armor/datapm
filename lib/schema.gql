@@ -59,6 +59,13 @@ A string that uniquely identifies a Username or Email address - this is an inter
 scalar UsernameOrEmailAddress
 
 """
+Server status states
+"""
+enum RegistryStatus {
+    SERVING_REQUESTS
+}
+
+"""
 Potential responses when creating a new version on a package
 """
 enum VersionConflict {
@@ -630,6 +637,11 @@ type Query {
         offset: Int!
         limit: Int!
     ): [Package!]!
+
+    """
+    For validating that the server is up, and requesting it's status
+    """
+    registryStatus: RegistryStatus
 }
 
 type Mutation {

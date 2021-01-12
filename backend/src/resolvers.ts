@@ -19,7 +19,8 @@ import {
     VersionIdentifierInput,
     Base64ImageUpload,
     Permission,
-    AutoCompleteResultResolvers
+    AutoCompleteResultResolvers,
+    RegistryStatus
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
@@ -491,6 +492,9 @@ export const resolvers: {
     },
 
     Query: {
+        registryStatus: (_0: any, _1: any, context: AuthenticatedContext, info: any) => {
+            return RegistryStatus.SERVING_REQUESTS;
+        },
         me: async (_0: any, _1: any, context: AuthenticatedContext, info: any) => {
             const user = await context.connection.getCustomRepository(UserRepository).findUserByUserName({
                 username: context.me.username,
