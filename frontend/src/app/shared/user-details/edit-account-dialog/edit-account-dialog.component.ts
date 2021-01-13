@@ -135,7 +135,7 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
         this.nameIsPublic = ev.checked;
     }
 
-    uploadAvatar(data: any) {
+    public uploadAvatar(data: any): void {
         this.setMyAvatarImageGQL.mutate({ image: { base64: data } }).subscribe(() => {
             this.imageService.refreshAvatar(this.currentUser.username);
         });

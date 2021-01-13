@@ -37,7 +37,7 @@ export class CoverComponent implements OnInit {
 
         this.imageService.shouldRefresh.pipe(takeUntil(this.unsubscribe$)).subscribe(({ target }) => {
             if (target === "cover") {
-                this.getImage();
+                this.fetchImage(true);
             }
         });
     }
@@ -46,13 +46,13 @@ export class CoverComponent implements OnInit {
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes.username && changes.username.currentValue) {
-            this.getImage();
+            this.fetchImage();
         } else if (changes.packageSlug && changes.packageSlug.currentValue) {
-            this.getImage();
+            this.fetchImage();
         } else if (changes.catalogSlug && changes.catalogSlug.currentValue) {
-            this.getImage();
+            this.fetchImage();
         } else if (changes.collectionSlug && changes.collectionSlug.currentValue) {
-            this.getImage();
+            this.fetchImage();
         }
     }
 
@@ -60,27 +60,23 @@ export class CoverComponent implements OnInit {
         this.inputEventId = this.fileService.openFile("image/jpeg");
     }
 
-    private getImage() {
-        let url;
+    private fetchImage(reload?: boolean): void {
+        let imageObservable;
         if (this.username) {
-            url = `/images/user/${this.username}/cover`;
+            imageObservable = this.imageService.getUserCover(this.username, reload);
         } else if (this.packageSlug && this.catalogSlug) {
-            url = `/images/package/${this.catalogSlug}/${this.packageSlug}/cover`;
+            imageObservable = this.imageService.getPackageCover(this.catalogSlug, this.packageSlug, reload);
         } else if (this.catalogSlug) {
-            url = `/images/catalog/${this.catalogSlug}/cover`;
+            imageObservable = this.imageService.getCatalogCover(this.catalogSlug, reload);
         } else if (this.collectionSlug) {
-            url = `/images/collection/${this.collectionSlug}/cover`;
+            imageObservable = this.imageService.getCollectionCover(this.collectionSlug, reload);
         } else {
             return;
         }
 
-        this.imageService.getImage(url).subscribe(
-            (imgData: any) => {
-                this.imgData = imgData;
-            },
-            () => {
-                this.imgData = this.defaultCover;
-            }
+        imageObservable.subscribe(
+            (imgData: any) => (this.imgData = imgData),
+            () => (this.imgData = this.defaultCover)
         );
     }
 }
