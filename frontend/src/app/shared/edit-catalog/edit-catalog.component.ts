@@ -12,7 +12,7 @@ import { ImageService } from "../../services/image.service";
     templateUrl: "./edit-catalog.component.html",
     styleUrls: ["./edit-catalog.component.scss"]
 })
-export class EditCatalogComponent implements OnInit {
+export class EditCatalogComponent {
     form: FormGroup;
     public readonly errorMsg = {
         displayName: {
