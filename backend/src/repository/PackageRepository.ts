@@ -6,8 +6,6 @@ import { Package } from "../entity/Package";
 
 import { UserPackagePermission } from "../entity/UserPackagePermission";
 import { Catalog } from "../entity/Catalog";
-import { ActivityLogEventType } from "../entity/ActivityLogEventType";
-import { createActivityLog } from "./ActivityLogRepository";
 import { CatalogRepository } from "./CatalogRepository";
 import { VersionRepository } from "./VersionRepository";
 import { allPermissions } from "../util/PermissionsUtil";
@@ -392,12 +390,6 @@ export class PackageRepository {
             .findVersions({ packageId: packageEntity.id, relations: ["package", "package.catalog"] });
 
         await this.manager.getCustomRepository(VersionRepository).deleteVersions(versions);
-
-        await createActivityLog(this.manager, {
-            userId: context!.me!.id,
-            eventType: ActivityLogEventType.PACKAGE_DELETED,
-            targetPackageId: packageEntity?.id
-        });
 
         await this.manager.nestedTransaction(async (transaction) => {
             await transaction.delete(Package, { id: packageEntity.id });

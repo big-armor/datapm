@@ -729,6 +729,7 @@ describe("Catalog Tests", async () => {
             }
         });
 
+        console.log(JSON.stringify(response, null, 1));
         expect(response.errors != null, "error should be returned").to.equal(true);
         expect(
             response.errors!.find((e) => e.message.startsWith("CATALOG_NOT_FOUND")) != null,
