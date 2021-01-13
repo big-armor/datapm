@@ -135,15 +135,15 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
         this.nameIsPublic = ev.checked;
     }
 
-    uploadAvatar(data: any) {
+    public uploadAvatar(data: any): void {
         this.setMyAvatarImageGQL.mutate({ image: { base64: data } }).subscribe(() => {
-            this.imageService.refreshAvatar(this.currentUser.username);
+            this.imageService.loadUserAvatar(this.currentUser.username, true);
         });
     }
 
     uploadCover(data: any) {
         this.setMyCoverImageGQL.mutate({ image: { base64: data } }).subscribe(() => {
-            this.imageService.refreshCover();
+            this.imageService.loadUserCover(this.currentUser.username, true);
         });
     }
 
