@@ -174,7 +174,7 @@ export class CatalogRepository extends Repository<Catalog> {
                 if (catalog.isPublic == false) {
                     for (const packageEntity of catalog.packages) {
                         packageEntity.isPublic = false;
-                        transaction.save(packageEntity);
+                        await transaction.save(packageEntity);
                     }
                 }
             }

@@ -1,6 +1,10 @@
 import { Connection, EntityManager, EntityRepository } from "typeorm";
 import { ActivityLog } from "../entity/ActivityLog";
 import { ActivityLogChangeType, ActivityLogEventType } from "../entity/ActivityLogEventType";
+import { Catalog } from "../entity/Catalog";
+import { Collection } from "../entity/Collection";
+import { Package } from "../entity/Package";
+import { Version } from "../entity/Version";
 
 export interface ActivityLogTemp {
     userId: number;
@@ -19,10 +23,45 @@ export async function createActivityLog(connection: EntityManager | Connection, 
     activityLog.userId = activityLogTemp.userId;
     activityLog.eventType = activityLogTemp.eventType;
     activityLog.changeType = activityLogTemp.changeType;
-    activityLog.targetPackageId = activityLogTemp.targetPackageId;
-    activityLog.targetPackageVersionId = activityLogTemp.targetPackageVersionId;
-    activityLog.targetCatalogId = activityLogTemp.targetCatalogId;
-    activityLog.targetCollectionId = activityLogTemp.targetCollectionId;
+
+    if (activityLogTemp.targetPackageId) {
+        activityLog.targetPackageId = activityLogTemp.targetPackageId;
+
+        const packageEntity = await connection
+            .getRepository(Package)
+            .findOneOrFail({ id: activityLogTemp.targetPackageId }, { relations: ["catalog"] });
+
+        activityLog.targetPackageIdentifier = packageEntity.catalog.slug + "/" + packageEntity.slug;
+    }
+
+    if (activityLogTemp.targetPackageVersionId) {
+        activityLog.targetPackageVersionId = activityLogTemp.targetPackageVersionId;
+
+        const version = await connection
+            .getRepository(Version)
+            .findOneOrFail({ id: activityLogTemp.targetPackageVersionId });
+
+        activityLog.targetVersionNumber = `${version?.majorVersion}.${version?.minorVersion}.${version?.patchVersion}`;
+    }
+
+    if (activityLogTemp.targetCatalogId) {
+        activityLog.targetCatalogId = activityLogTemp.targetCatalogId;
+
+        const catalog = await connection.getRepository(Catalog).findOneOrFail({ id: activityLogTemp.targetCatalogId });
+
+        activityLog.targetCatalogSlug = catalog.slug;
+    }
+
+    if (activityLogTemp.targetCollectionId) {
+        activityLog.targetCollectionId = activityLogTemp.targetCollectionId;
+
+        const collection = await connection
+            .getRepository(Collection)
+            .findOneOrFail({ id: activityLogTemp.targetCollectionId });
+
+        activityLog.targetCollectionSlug = collection.collectionSlug;
+    }
+
     activityLog.propertiesEdited = activityLogTemp.propertiesEdited;
 
     await connection.getCustomRepository(ActivityLogRepository).create(activityLog);
@@ -44,7 +83,7 @@ export class ActivityLogRepository {
                 await transaction.save(entity);
             }
 
-            console.log(JSON.stringify(entity));
+            console.log(JSON.stringify(activityLog));
         });
     }
 }

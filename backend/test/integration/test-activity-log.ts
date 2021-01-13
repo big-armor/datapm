@@ -56,21 +56,25 @@ describe("Activity Log Tests", async () => {
             variables: { filter: { eventType: [ActivityLogEventType.PACKAGE_CREATED], limit: 100, offset: 0 } }
         });
 
+        console.log(JSON.stringify(response, null, 1));
+
         expect(response.data).to.exist;
         expect(response.data.myActivity).to.exist;
         expect(response.data.myActivity.logs.length).to.equal(2);
         expect(response.data.myActivity.logs[1]?.user?.username).to.equal(userOne.username);
     });
 
-    it("Should return no activity", async function () {
+    it("Should return create package", async function () {
         const response = await userTwoClient.query({
             query: MyActivityDocument,
             variables: { filter: { eventType: [ActivityLogEventType.PACKAGE_CREATED], limit: 100, offset: 0 } }
         });
 
+        console.log(JSON.stringify(response, null, 1));
+
         expect(response.data).to.exist;
         expect(response.data.myActivity).to.exist;
         expect(response.data.myActivity.logs?.length).to.equal(1);
-        expect(response.data.myActivity.logs[0]?.user?.username).to.equal(userOne.username);
+        expect(response.data.myActivity.logs[0]?.user?.username).to.equal(userTwo.username);
     });
 });

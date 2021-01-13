@@ -94,7 +94,7 @@ export const updateMe = async (
             propertiesEdited: Object.keys(value)
         });
 
-        return await context.connection.manager.getCustomRepository(UserRepository).updateUser({
+        return await transaction.getCustomRepository(UserRepository).updateUser({
             username: context.me.username,
             value,
             relations: getGraphQlRelationName(info)

@@ -127,7 +127,7 @@ export const findPackage = async (
         });
 
         packageEntity.viewCount++;
-        transaction.save(packageEntity);
+        await transaction.save(packageEntity);
 
         if (context.me) {
             await createActivityLog(transaction, {
@@ -156,7 +156,7 @@ export const packageFetched = async (
         const versionEntity = await transaction.getCustomRepository(VersionRepository).findOneOrFail({ identifier });
 
         packageEntity.fetchCount++;
-        transaction.save(packageEntity);
+        await transaction.save(packageEntity);
 
         await createActivityLog(transaction, {
             userId: context!.me!.id,

@@ -429,6 +429,8 @@ describe("Autocomplete tests", async () => {
             }
         });
 
+        console.log(JSON.stringify(deleteCollection, null, 1));
+
         let deletePackage = await userAClient.mutate({
             mutation: DeletePackageDocument,
             variables: {
@@ -439,6 +441,8 @@ describe("Autocomplete tests", async () => {
             }
         });
 
+        console.log(JSON.stringify(deletePackage, null, 1));
+
         let deleteCatalog = await userAClient.mutate({
             mutation: DeleteCatalogDocument,
             variables: {
@@ -447,6 +451,7 @@ describe("Autocomplete tests", async () => {
                 }
             }
         });
+        console.log(JSON.stringify(deleteCatalog, null, 1));
 
         expect(deleteCollection.errors! == null).to.equal(true);
         expect(deletePackage.errors! == null).to.equal(true);

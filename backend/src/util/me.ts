@@ -36,7 +36,7 @@ export async function getMeRequest(req: express.Request, manager: EntityManager)
             }
 
             apiKeyRecord.lastUsed = new Date();
-            transaction.save(apiKeyRecord);
+            await transaction.save(apiKeyRecord);
 
             const user = apiKeyRecord.user;
 

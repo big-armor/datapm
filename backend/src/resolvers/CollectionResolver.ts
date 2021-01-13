@@ -185,13 +185,13 @@ export const deleteCollection = async (
             .getCustomRepository(CollectionRepository)
             .findCollectionBySlugOrFail(identifier.collectionSlug);
 
-        await transaction.getCustomRepository(CollectionRepository).deleteCollection(identifier.collectionSlug);
-
         await createActivityLog(transaction, {
             userId: context.me.id,
             eventType: ActivityLogEventType.COLLECTION_DELETED,
             targetCollectionId: collection.id
         });
+
+        await transaction.getCustomRepository(CollectionRepository).deleteCollection(identifier.collectionSlug);
     });
 };
 
@@ -234,7 +234,7 @@ export const addPackageToCollection = async (
         userId: context.me.id,
         eventType: ActivityLogEventType.COLLECTION_PACKAGE_ADDED,
         targetCollectionId: value?.collectionId,
-        targetPackageVersionId: packageEntity.id
+        targetPackageId: packageEntity.id
     });
 
     return value;

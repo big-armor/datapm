@@ -56,4 +56,11 @@ export class ActivityLog extends BaseModel {
 
     @Column({ name: "properties_edited", array: true, type: "text" })
     public propertiesEdited?: string[];
+
+    // The following are not persisted to the database
+    // but are used during logging to the console.
+    public targetPackageIdentifier?: string;
+    public targetVersionNumber?: string;
+    public targetCatalogSlug?: string;
+    public targetCollectionSlug?: string;
 }

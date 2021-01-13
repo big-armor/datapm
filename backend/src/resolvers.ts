@@ -18,6 +18,7 @@ import {
     SetUserCatalogPermissionInput,
     VersionIdentifierInput,
     Base64ImageUpload,
+    Permission,
     AutoCompleteResultResolvers,
     RegistryStatus
 } from "./generated/graphql";
@@ -89,8 +90,6 @@ import {
 } from "./resolvers/UserResolver";
 import { createAPIKey, deleteAPIKey } from "./resolvers/ApiKeyResolver";
 import { Collection } from "./entity/Collection";
-import { ActivityLogChangeType, ActivityLogEventType } from "./entity/ActivityLogEventType";
-import { createActivityLog } from "./repository/ActivityLogRepository";
 import {
     catalogPackagesForUser,
     createPackage,
@@ -121,18 +120,14 @@ import { validateEmailAddress } from "./directive/ValidEmailDirective";
 import { FileStorageService, StorageErrors } from "./storage/files/file-storage-service";
 import { PackageFileStorageService } from "./storage/packages/package-file-storage-service";
 import { DateResolver } from "./resolvers/DateResolver";
+import { Permissions } from "./entity/Permissions";
 import { exit } from "process";
-import {
-    myActivity,
-    catalogActivities,
-    collectionActivities,
-    packageActivities
-} from "./resolvers/ActivityLogResolver";
 import { CollectionRepository } from "./repository/CollectionRepository";
 import { userCatalogs } from "./resolvers/CatalogResolver";
 import { UserPackagePermission } from "./entity/UserPackagePermission";
 import { resolvePackagePermissions } from "./directive/hasPackagePermissionDirective";
 import { resolveCatalogPermissions } from "./directive/hasCatalogPermissionDirective";
+import { myActivity } from "./resolvers/ActivityLogResolver";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -629,14 +624,7 @@ export const resolvers: {
         emailAddressAvailable: emailAddressAvailable,
 
         searchUsers: searchUsers,
-
-        myActivity: myActivity,
-
-        collectionActivities: collectionActivities,
-
-        packageActivities: packageActivities,
-
-        catalogActivities: catalogActivities
+        myActivity: myActivity
     },
 
     Mutation: {
@@ -660,49 +648,18 @@ export const resolvers: {
         deleteAPIKey: deleteAPIKey,
 
         createCatalog: async (_0: any, { value }, context: AuthenticatedContext, info: any) => {
-            return context.connection.transaction(async (transaction) => {
-                const catalog = await transaction.getCustomRepository(CatalogRepository).createCatalog({
-                    userId: context.me?.id,
-                    value,
-                    relations: getGraphQlRelationName(info)
-                });
-                await createActivityLog(transaction, {
-                    userId: context.me.id,
-                    eventType: ActivityLogEventType.CATALOG_CREATED,
-                    targetCatalogId: catalog?.id
-                });
-
-                return catalog;
+            return context.connection.manager.getCustomRepository(CatalogRepository).createCatalog({
+                userId: context.me?.id,
+                value,
+                relations: getGraphQlRelationName(info)
             });
         },
 
         updateCatalog: async (_0: any, { identifier, value }, context: AuthenticatedContext, info: any) => {
-            return context.connection.transaction(async (transaction) => {
-                const catalog = await context.connection.manager.getCustomRepository(CatalogRepository).updateCatalog({
-                    identifier,
-                    value,
-                    relations: getGraphQlRelationName(info)
-                });
-
-                if (value.isPublic !== undefined) {
-                    await createActivityLog(transaction, {
-                        userId: context.me.id,
-                        eventType: ActivityLogEventType.CATALOG_PUBLIC_CHANGED,
-                        targetCatalogId: catalog.id,
-                        changeType: value.isPublic
-                            ? ActivityLogChangeType.PUBLIC_ENABLED
-                            : ActivityLogChangeType.PUBLIC_DISABLED
-                    });
-                }
-
-                await createActivityLog(transaction, {
-                    userId: context.me.id,
-                    eventType: ActivityLogEventType.CATALOG_EDIT,
-                    targetCatalogId: catalog.id,
-                    propertiesEdited: Object.keys(value).map((k) => (k == "newSlug" ? "slug" : ""))
-                });
-
-                return catalog;
+            return context.connection.manager.getCustomRepository(CatalogRepository).updateCatalog({
+                identifier,
+                value,
+                relations: getGraphQlRelationName(info)
             });
         },
 
@@ -737,20 +694,8 @@ export const resolvers: {
             context: AuthenticatedContext,
             info: any
         ) => {
-            context.connection.transaction(async (transaction) => {
-                const catalog = await transaction
-                    .getCustomRepository(CatalogRepository)
-                    .findCatalogBySlugOrFail(identifier.catalogSlug);
-
-                await createActivityLog(transaction, {
-                    userId: context.me.id,
-                    eventType: ActivityLogEventType.CATALOG_CREATED,
-                    targetCatalogId: catalog?.id
-                });
-
-                return transaction.getCustomRepository(CatalogRepository).deleteCatalog({
-                    slug: identifier.catalogSlug
-                });
+            return context.connection.manager.getCustomRepository(CatalogRepository).deleteCatalog({
+                slug: identifier.catalogSlug
             });
         },
 
@@ -784,13 +729,6 @@ export const resolvers: {
                 const latestVersion = await transaction
                     .getCustomRepository(VersionRepository)
                     .findLatestVersion({ identifier, relations: ["package"] });
-
-                const savedVersion = await transaction
-                    .getCustomRepository(VersionRepository)
-                    .save(context.me.id, identifier, value);
-
-                let eventType: ActivityLogEventType = ActivityLogEventType.VERSION_CREATED;
-                let changeType: ActivityLogChangeType = ActivityLogChangeType.VERSION_FIRST_VERSION;
 
                 if (latestVersion != null) {
                     let packageFile;
@@ -847,23 +785,11 @@ export const resolvers: {
                             { existingVersion: latestVersionSemVer.version, minNextVersion: minNextVersion.version }
                         );
                     }
-
-                    if (proposedNewVersion.major !== latestVersionSemVer.major) {
-                        changeType = ActivityLogChangeType.VERSION_MAJOR_CHANGE;
-                    } else if (proposedNewVersion.minor !== latestVersionSemVer.minor) {
-                        changeType = ActivityLogChangeType.VERSION_MINOR_CHANGE;
-                    } else if (proposedNewVersion.patch !== latestVersionSemVer.patch) {
-                        changeType = ActivityLogChangeType.VERSION_PATCH_CHANGE;
-                    }
                 }
 
-                await createActivityLog(context.connection, {
-                    userId: context!.me!.id,
-                    eventType,
-                    changeType,
-                    targetPackageId: savedVersion.packageId,
-                    targetPackageVersionId: savedVersion.id
-                });
+                const savedVersion = await transaction
+                    .getCustomRepository(VersionRepository)
+                    .save(context.me.id, identifier, value);
 
                 const versionIdentifier = {
                     ...identifier,
@@ -910,14 +836,7 @@ export const resolvers: {
             await context.connection.manager.nestedTransaction(async (transaction) => {
                 const version = await transaction.getCustomRepository(VersionRepository).findOneOrFail({ identifier });
 
-                await createActivityLog(transaction, {
-                    userId: context.me.id,
-                    eventType: ActivityLogEventType.VERSION_DELETED,
-                    targetPackageId: version.packageId,
-                    targetPackageVersionId: version.id
-                });
-
-                await transaction.delete(Version, { id: version.id });
+                transaction.delete(Version, { id: version.id });
             });
         },
 
