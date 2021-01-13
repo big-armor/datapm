@@ -1,17 +1,17 @@
+@import '../../../../styles/variables';
+
 #editAccount {
     position: relative;
-    top: -24px;
     min-width: 700px;
-    ::ng-deep .cover {
-        height: 150px;
-    }
+    top: -24px;
+
     ::ng-deep.mat-checked {
         .mat-slide-toggle-bar {
-            background-color: #00a896;
+            background-color: $color-1;
         }
 
         .mat-slide-toggle-thumb {
-            background-color: #fff;
+            background-color: $white;
         }
     }
 
@@ -20,241 +20,158 @@
         padding-right: 0px !important;
         padding-bottom: 0px !important;
         max-height: calc(100vh - 130px);
+
+        .dialog-content-text {
+            position: relative;
+
+            .user-img {
+                display: block;
+                margin-left: 30px;
+                width: 100px;
+                height: 55px;
+                transform: translateY(-45px);
+            }
+
+            .small-paragraph {
+                margin-bottom: 3px;
+                font-family: $family-roboto-mono;
+                font-style: $style-normal;
+                font-weight: $weight-400;
+                font-size: $xsmall-font;
+                line-height: 13px;
+                text-align: right;
+                letter-spacing: -0.28px;
+                padding-right: 24px;
+                color: $gray-4;
+            }
+
+            .shadow-div {
+                .div-question {
+                    font-family: $family-roboto-mono;
+                    font-style: $style-normal;
+                    font-weight: $weight-400;
+                    font-size: $text-font;
+                    line-height: 18px;
+                    letter-spacing: -0.28px;
+                    color: $gray-2;
+                    width: 165px;
+                }
+
+                .div-answer {
+                    width: 100%;
+                    textarea {
+                        width: 100%;
+                        border-radius: 6px;
+                        padding: 10px 15px;
+                        border: none !important;
+                        font-family: $family-roboto-mono;
+                        font-style: $style-normal;
+                        font-weight: $weight-400;
+                        font-size: $text-font;
+                        display: flex;
+                        align-items: flex-end;
+                        letter-spacing: -0.28px;
+                        color: $color-info;
+
+                        &:focus {
+                            outline: transparent solid 0px;
+                            box-shadow: none;
+                        }
+
+                        &::placeholder {
+                            font-family: $family-roboto-mono;
+                            font-style: $style-normal;
+                            font-weight: $weight-300;
+                            font-size: $text-font;
+                            line-height: 18px;
+                            display: flex;
+                            align-items: flex-end;
+                            letter-spacing: -0.28px;
+                            color: $gray-4;
+                        }
+                    }
+
+                    input {
+                        height: 35px;
+                        width: 100%;
+                        border-radius: 6px;
+                        padding: 0px 15px;
+                        border: none !important;
+                        font-family: $family-roboto-mono;
+                        font-style: $style-normal;
+                        font-weight: $weight-400;
+                        font-size: $text-font;
+                        line-height: 18px;
+                        display: flex;
+                        align-items: flex-end;
+                        letter-spacing: -0.28px;
+                        color: $color-info;
+
+                        &:focus {
+                            outline: transparent solid 0px;
+                            box-shadow: none;
+                        }
+
+                        &::placeholder {
+                            font-family: $family-roboto-mono;
+                            font-style: $style-normal;
+                            font-weight: $weight-300;
+                            font-size: $text-font;
+                            line-height: 18px;
+                            display: flex;
+                            align-items: flex-end;
+                            letter-spacing: -0.28px;
+                            color: $gray-4;
+                        }
+                    }
+                }
+
+                .div-with-errors {
+                    max-width: 346px;
+                    font-family: $family-roboto-mono;
+                    font-style: $style-normal;
+                    font-weight: $weight-400;
+                    padding-left: 10px;
+                    font-size: $xsmall-font;
+                    color: $color-danger;
+                    line-height: 12px;
+                }
+            }
+        }
     }
 
     .mat-dialog-actions {
         padding: 0px;
         min-height: unset;
+
         .save-btn {
             position: relative;
             top: 10px;
             padding: 5px 20px;
-            box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
-                0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
+            box-shadow: $outer-shadow-1;
             border-radius: 24px;
+
             span {
-                font-family: Roboto Mono;
-                font-style: normal;
-                font-weight: 300;
-                font-size: 18px;
+                font-family: $family-roboto-mono;
+                font-style: $style-normal;
+                font-weight: $weight-300;
+                font-size: ($default-font + 2);
                 line-height: 24px;
                 display: flex;
                 align-items: center;
                 text-align: center;
                 letter-spacing: -0.28px;
-                color: #828282;
+                color: $gray-3;
             }
         }
     }
 
-    .dialog-content-text {
-        position: relative;
-
-        .user-img {
-            display: block;
-            margin-left: 30px;
-            width: 100px;
-            height: 55px;
-            transform: translateY(-45px);
-        }
-
-        .small-paragraph {
-            margin-bottom: 3px;
-            font-family: Roboto Mono;
-            font-style: normal;
-            font-weight: normal;
-            font-size: 10px;
-            line-height: 13px;
-            text-align: right;
-            letter-spacing: -0.28px;
-            padding-right: 24px;
-            color: #bdbdbd;
-        }
-
-        .shadow-div {
-            .div-question {
-                font-family: Roboto Mono;
-                font-style: normal;
-                font-weight: normal;
-                font-size: 14px;
-                line-height: 18px;
-                letter-spacing: -0.28px;
-                color: #4f4f4f;
-                width: 165px;
-            }
-
-            .div-answer {
-                width: 100%;
-                textarea {
-                    border: none !important;
-                    font-family: Roboto Mono;
-                    font-style: normal;
-                    font-weight: normal;
-                    font-size: 14px;
-                    display: flex;
-                    align-items: flex-end;
-                    letter-spacing: -0.28px;
-                    color: #017fb9;
-
-                    &:focus {
-                        outline: transparent solid 0px;
-                        box-shadow: none;
-                    }
-
-                    &::placeholder {
-                        font-family: Roboto Mono;
-                        font-style: normal;
-                        font-weight: 300;
-                        font-size: 14px;
-                        line-height: 18px;
-                        display: flex;
-                        align-items: flex-end;
-                        letter-spacing: -0.28px;
-                        color: #828282;
-                    }
-                }
-                input {
-                    height: 35px;
-                    border: none !important;
-                    font-family: Roboto Mono;
-                    font-style: normal;
-                    font-weight: normal;
-                    font-size: 14px;
-                    line-height: 18px;
-                    display: flex;
-                    align-items: flex-end;
-                    letter-spacing: -0.28px;
-                    color: #017fb9;
-
-                    &:focus {
-                        outline: transparent solid 0px;
-                        box-shadow: none;
-                    }
-
-                    &::placeholder {
-                        font-family: Roboto Mono;
-                        font-style: normal;
-                        font-weight: 300;
-                        font-size: 14px;
-                        line-height: 18px;
-                        display: flex;
-                        align-items: flex-end;
-                        letter-spacing: -0.28px;
-                        color: #828282;
-                    }
-                }
-            }
-            .div-with-errors {
-                max-width: 346px;
-                font-family: Roboto Mono;
-                font-style: normal;
-                font-weight: 400;
-                padding-left: 10px;
-                font-size: 10px;
-                color: #f44336;
-                line-height: 12px;
-            }
-        }
-    }
     .disabled {
-        background-color: #cccccc85;
+        background-color: $gray-color-8;
         pointer-events: none;
         opacity: 0.6;
         .btn-text {
-            color: #82828273;
-        }
-    }
-}
-
-@media (max-width: 992px) {
-    #editAccount {
-        min-width: 400px;
-    }
-}
-
-@media (max-width: 576px) {
-    #editAccount {
-        min-width: 300px;
-        .dialog-content-text {
-            .shadow-div {
-                .div-question {
-                    width: 70px;
-                    font-size: 11px;
-                    padding-left: 5px !important;
-                    padding-right: 0px !important;
-                }
-                .div-answer {
-                    input {
-                        height: 35px;
-                        font-size: 11px;
-                        &::placeholder {
-                            font-size: 11px;
-                        }
-                    }
-                    textarea {
-                        height: 45px;
-                        font-size: 9px;
-                        &::placeholder {
-                            font-size: 9px;
-                        }
-                    }
-                }
-                .slide-right {
-                    padding-right: 10px !important;
-                    padding-left: 0px !important;
-                }
-            }
-            .img-wrapper {
-                width: 75px;
-                height: 75px;
-                margin-left: 16px;
-            }
-            .small-paragraph {
-                font-size: 9px;
-                padding-right: 6px;
-            }
-        }
-        .mat-dialog-actions {
-            .save-btn {
-                position: relative;
-                top: 10px;
-                padding: 0px 16px;
-                span {
-                    font-size: 14px;
-                }
-            }
-        }
-    }
-}
-
-@media (max-width: 480px) {
-    #editAccount {
-        min-width: 210px;
-        .dialog-content-text {
-            .shadow-div {
-                .div-question {
-                    width: 58px;
-                    font-size: 10px;
-                    padding-left: 5px !important;
-                    padding-right: 0px !important;
-                }
-                .div-answer {
-                    input {
-                        height: 35px;
-                        font-size: 9px;
-                        &::placeholder {
-                            font-size: 9px;
-                        }
-                    }
-                    textarea {
-                        height: 45px;
-                        font-size: 9px;
-                        &::placeholder {
-                            font-size: 9px;
-                        }
-                    }
-                }
-            }
+            color: $gray-color-3;
         }
     }
 }

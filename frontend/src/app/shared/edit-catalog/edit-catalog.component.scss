@@ -1,67 +1,51 @@
-app-cover {
-    display: block;
-    height: 150px;
+@import '../../../styles/variables';
 
-    ::ng-deep > div {
-        height: 100%;
-    }
-}
-.mat-dialog-content {
-    max-height: calc(100vh - 130px);
-    padding-left: 0px !important;
-    padding-right: 0px !important;
-    padding-bottom: 0px !important;
-}
-form {
+#editCatalog {
     min-width: 700px;
     position: relative;
     top: -24px;
-}
-.form-field {
-    padding-right: 10px;
 
-    .label {
-        font-family: Roboto Mono;
-        font-style: normal;
-        font-weight: normal;
-        font-size: 14px;
-        line-height: 18px;
-        letter-spacing: -0.28px;
-        color: #4f4f4f;
-        width: 275px;
+    .mat-dialog-actions {
+        display: flex;
+        justify-content: flex-end;
     }
 
-    app-input {
-        width: 100%;
+    .mat-dialog-content {
+        max-height: calc(100vh - 130px);
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+        padding-bottom: 0px !important;
 
-        ::ng-deep {
-            input,
-            textarea {
-                border: none !important;
-                font-family: Roboto Mono;
-                font-style: normal;
-                font-weight: normal;
-                font-size: 14px;
+        app-cover {
+            display: block;
+            height: 150px;
+
+            ::ng-deep > div {
+                height: 100%;
+            }
+        }
+
+        .form-field {
+            padding-right: 10px;
+
+            .label {
+                font-family: $family-roboto-mono;
+                font-style: $style-normal;
+                font-weight: $weight-400;
+                font-size: $text-font;
                 line-height: 18px;
-                display: flex;
-                align-items: flex-end;
                 letter-spacing: -0.28px;
-                color: #017fb9;
-                box-shadow: none;
-                padding-left: 0.5rem;
+                color: $gray-2;
+                width: 275px;
             }
-            textarea {
-                min-height: 62px;
-            }
-            .text-danger {
-                font-size: 10px;
-                line-height: 12px;
+
+            app-input {
+                width: 100%;
+
+                ::ng-deep .dpm-input-round {
+                    color: $color-info;
+                }
             }
         }
     }
-}
-
-.mat-dialog-actions {
-    display: flex;
-    justify-content: flex-end;
 }

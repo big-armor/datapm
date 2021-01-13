@@ -1,16 +1,23 @@
-.input-row {
-    margin-left: -24px;
-    margin-right: -24px;
-    padding-left: 24px;
-    padding-right: 24px;
-}
-.input-label {
-    width: 150px;
-    padding-top: 12px;
-}
-.input-control {
-    width: 300px;
-}
-.app-raised-button {
-    background-color: #fff;
+@import '../../../../styles/variables';
+
+#addUser {
+    .input-label {
+        width: 150px;
+        padding-top: 12px;
+    }
+
+    .app-raised-button {
+        background-color: $white;
+    }
+
+    .input-row {
+        margin-left: -24px;
+        margin-right: -24px;
+        padding-left: 24px;
+        padding-right: 24px;
+
+        .input-control {
+            width: 300px;
+        }
+    }
 }

@@ -35,10 +35,10 @@
                 </div>
 
                 <!-- Package without thumbnail -->
-                <table *ngIf="collections && collections.length > 0" mat-table [dataSource]="collections">
+                <table *ngIf="collections && collections.length > 0" mat-table [dataSource]="collections" aria-describedby="collectionsTable">
                     <!-- Label column -->
                     <ng-container matColumnDef="name">
-                        <th mat-header-cell *matHeaderCellDef>Name</th>
+                        <th scope="col" mat-header-cell *matHeaderCellDef>Name</th>
                         <td class="table-content" mat-cell *matCellDef="let collection">
                             <a [routerLink]="['/collection/' + collection.identifier.collectionSlug]">{{
                                 collection.name
@@ -47,7 +47,7 @@
                     </ng-container>
 
                     <ng-container matColumnDef="public">
-                        <th mat-header-cell *matHeaderCellDef>Public</th>
+                        <th scope="col" mat-header-cell *matHeaderCellDef>Public</th>
                         <td class="table-content" mat-cell *matCellDef="let collection">
                             <mat-slide-toggle
                                 class="app-slide-toggle"
@@ -60,7 +60,7 @@
 
                     <!-- Actions column -->
                     <ng-container matColumnDef="actions">
-                        <th mat-header-cell *matHeaderCellDef>Actions</th>
+                        <th scope="col" mat-header-cell *matHeaderCellDef>Actions</th>
                         <td mat-cell *matCellDef="let collection">
                             <a class="app-outlined-button mr-3" (click)="editCollection(collection)">Edit</a>
                             <a class="app-outlined-button" (click)="deleteCollection(collection)">Delete</a>

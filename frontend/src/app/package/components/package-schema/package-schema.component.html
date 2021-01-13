@@ -1,5 +1,5 @@
-<div class="schema" *ngFor="let schema of packageFile?.schemas">
-    <div class="mat-headline">{{ schema.title }}</div>
+<div class="schema" id="schema" *ngFor="let schema of packageFile?.schemas">
+    <div class="schema-title">{{ schema.title }}</div>
     <div class="schema-content">
         <div class="schema-text">
             {{ schema.description }}

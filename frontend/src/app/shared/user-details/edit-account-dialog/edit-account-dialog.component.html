@@ -20,7 +20,7 @@
                     <input
                         formControlName="emailAddress"
                         type="email"
-                        class="form-control"
+                        class=""
                         placeholder="Add your email"
                     />
                 </div>
@@ -36,7 +36,7 @@
                         (focus)="openConfirmDialog()"
                         formControlName="username"
                         type="text"
-                        class="form-control"
+                        class=""
                         placeholder="Add your username"
                     />
                     <div class="div-with-errors">
@@ -61,7 +61,7 @@
             <div class="d-flex bd-highlight shadow-div mb-3">
                 <div class="px-4 py-2 bd-highlight div-question">first name</div>
                 <div class="bd-highlight div-answer">
-                    <input formControlName="firstName" type="text" class="form-control" placeholder="First name" />
+                    <input formControlName="firstName" type="text" class="" placeholder="First name" />
                 </div>
                 <div class="ml-auto px-4 py-2 bd-highlight slide-right">
                     <mat-slide-toggle [checked]="nameIsPublic" (change)="toggleNameIsPublic($event)"></mat-slide-toggle>
@@ -71,7 +71,7 @@
             <div class="d-flex bd-highlight shadow-div mb-3">
                 <div class="px-4 py-2 bd-highlight div-question">last name</div>
                 <div class="bd-highlight div-answer">
-                    <input formControlName="lastName" type="text" class="form-control" placeholder="Last name" />
+                    <input formControlName="lastName" type="text" class="" placeholder="Last name" />
                 </div>
                 <div class="ml-auto px-4 py-2 bd-highlight slide-right">
                     <mat-slide-toggle [checked]="nameIsPublic" (change)="toggleNameIsPublic($event)"></mat-slide-toggle>
@@ -81,7 +81,7 @@
             <div class="d-flex bd-highlight shadow-div mb-3">
                 <div class="px-4 py-2 bd-highlight div-question">bio</div>
                 <div class="bd-highlight div-answer">
-                    <textarea formControlName="description" class="form-control" placeholder="Add your bio"></textarea>
+                    <textarea formControlName="description" class="" placeholder="Add your bio"></textarea>
                 </div>
                 <div class="ml-auto px-4 py-2 bd-highlight slide-right">
                     <mat-slide-toggle [checked]="true" [disabled]="true"></mat-slide-toggle>
@@ -94,7 +94,7 @@
                     <input
                         formControlName="location"
                         type="email"
-                        class="form-control"
+                        class=""
                         placeholder="Add your location"
                     />
                 </div>
@@ -106,7 +106,7 @@
             <div class="d-flex bd-highlight shadow-div mb-3">
                 <div class="px-4 py-2 bd-highlight div-question">website</div>
                 <div class="bd-highlight div-answer">
-                    <input formControlName="website" type="email" class="form-control" placeholder="Add your website" />
+                    <input formControlName="website" type="email" class="" placeholder="Add your website" />
                 </div>
                 <div class="ml-auto px-4 py-2 bd-highlight slide-right">
                     <mat-slide-toggle formControlName="websiteIsPublic"></mat-slide-toggle>
@@ -119,7 +119,7 @@
                     <input
                         formControlName="twitterHandle"
                         type="email"
-                        class="form-control"
+                        class=""
                         placeholder="Add your twitter handle"
                     />
                 </div>
@@ -134,7 +134,7 @@
                     <input
                         formControlName="gitHubHandle"
                         type="email"
-                        class="form-control"
+                        class=""
                         placeholder="Add your twitter handle"
                     />
                 </div>
@@ -142,26 +142,6 @@
                     <mat-slide-toggle formControlName="gitHubHandleIsPublic"></mat-slide-toggle>
                 </div>
             </div>
-
-            <!-- <div class="d-flex bd-highlight shadow-div mb-3">
-                <div class="pl-4 py-2 bd-highlight div-question">company</div>
-                <div class="bd-highlight div-answer">
-                    <input type="email" class="form-control" placeholder="Add your company" />
-                </div>
-                <div class="ml-auto px-4 py-2 bd-highlight slide-right">
-                    <mat-slide-toggle></mat-slide-toggle>
-                </div>
-            </div>
-
-            <div class="d-flex bd-highlight shadow-div">
-                <div class="pl-4 py-2 bd-highlight div-question">title</div>
-                <div class="bd-highlight div-answer">
-                    <input type="email" class="form-control" placeholder="Add your title" />
-                </div>
-                <div class="ml-auto px-4 py-2 bd-highlight slide-right">
-                    <mat-slide-toggle></mat-slide-toggle>
-                </div>
-            </div> -->
         </div>
     </div>
     <div mat-dialog-actions>
