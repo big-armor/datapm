@@ -5,7 +5,7 @@ import { Package } from "./Package";
 import { Version } from "./Version";
 import { Catalog } from "./Catalog";
 import { Collection } from "./Collection";
-import { ActivityLogEventType } from "./ActivityLogEventType";
+import { ActivityLogChangeType, ActivityLogEventType } from "./ActivityLogEventType";
 
 @Entity({ name: "activity_log" })
 @Index(["userId", "eventType"])
@@ -22,6 +22,9 @@ export class ActivityLog extends BaseModel {
 
     @Column({ name: "event_type", nullable: false })
     public eventType: ActivityLogEventType;
+
+    @Column({ name: "change_type", nullable: false })
+    public changeType?: ActivityLogChangeType;
 
     @Column({ name: "target_package_id", nullable: true })
     public targetPackageId?: number;
@@ -50,4 +53,7 @@ export class ActivityLog extends BaseModel {
     @ManyToOne(() => Collection, { onDelete: "CASCADE" })
     @JoinColumn({ name: "target_collection_id" })
     public targetCollection: Collection | null;
+
+    @Column({ name: "properties_edited", array: true, type: "text" })
+    public propertiesEdited?: string[];
 }

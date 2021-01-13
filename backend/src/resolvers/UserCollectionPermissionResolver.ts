@@ -3,6 +3,7 @@ import { Permission, CollectionIdentifierInput, SetUserCollectionPermissionsInpu
 import { CollectionRepository } from "../repository/CollectionRepository";
 import { UserCollectionPermissionRepository } from "../repository/UserCollectionPermissionRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
+import { EntityManager } from "typeorm";
 
 export const hasCollectionPermissions = async (
     context: AuthenticatedContext,
@@ -26,10 +27,14 @@ export const hasCollectionPermissions = async (
         .hasPermission(context.me.id, collectionId, permission);
 };
 
-export const grantAllCollectionPermissionsForUser = async (context: AuthenticatedContext, collectionId: number) => {
-    return context.connection
+export const grantAllCollectionPermissionsForUser = async (
+    transaction: EntityManager,
+    userId: number,
+    collectionId: number
+) => {
+    return transaction
         .getCustomRepository(UserCollectionPermissionRepository)
-        .grantAllPermissionsForUser(context.me.id, collectionId);
+        .grantAllPermissionsForUser(userId, collectionId);
 };
 
 export const setPermissionsForUser = async (

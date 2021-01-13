@@ -13,6 +13,8 @@ import { UserRepository } from "../repository/UserRepository";
 import { hashPassword } from "../util/PasswordUtil";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { ImageStorageService } from "../storage/images/image-storage-service";
+import { createActivityLog } from "../repository/ActivityLogRepository";
+import { ActivityLogEventType } from "../entity/ActivityLogEventType";
 
 export const searchUsers = async (
     _0: any,
@@ -65,12 +67,18 @@ export const createMe = async (
     if ((await usernameAvailable(_0, { username: value.username }, context)) == false) {
         throw new ValidationError("USERNAME_NOT_AVAILABLE");
     }
-    await context.connection.manager.getCustomRepository(UserRepository).createUser({
-        value,
-        relations: getGraphQlRelationName(info)
-    });
 
-    return;
+    await context.connection.transaction(async (transaction) => {
+        const user = await transaction.getCustomRepository(UserRepository).createUser({
+            value,
+            relations: getGraphQlRelationName(info)
+        });
+
+        await createActivityLog(transaction, {
+            userId: user.id,
+            eventType: ActivityLogEventType.USER_CREATED
+        });
+    });
 };
 
 export const updateMe = async (
@@ -79,10 +87,18 @@ export const updateMe = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    return await context.connection.manager.getCustomRepository(UserRepository).updateUser({
-        username: context.me.username,
-        value,
-        relations: getGraphQlRelationName(info)
+    return context.connection.transaction(async (transaction) => {
+        await createActivityLog(transaction, {
+            userId: context.me.id,
+            eventType: ActivityLogEventType.USER_EDIT,
+            propertiesEdited: Object.keys(value)
+        });
+
+        return await context.connection.manager.getCustomRepository(UserRepository).updateUser({
+            username: context.me.username,
+            value,
+            relations: getGraphQlRelationName(info)
+        });
     });
 };
 
@@ -159,7 +175,18 @@ export const setMyAvatarImage = async (
 };
 
 export const deleteMe = async (_0: any, {}, context: AuthenticatedContext, info: any) => {
-    return await context.connection.manager.getCustomRepository(UserRepository).deleteUser({
-        username: context.me.username
+    context.connection.transaction(async (transaction) => {
+        const user = await transaction
+            .getCustomRepository(UserRepository)
+            .findUserByUserName({ username: context.me.username });
+
+        await createActivityLog(transaction, {
+            userId: user.id,
+            eventType: ActivityLogEventType.USER_DELETED
+        });
+
+        return await transaction.getCustomRepository(UserRepository).deleteUser({
+            username: context.me.username
+        });
     });
 };

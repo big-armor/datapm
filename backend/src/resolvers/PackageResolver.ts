@@ -4,15 +4,15 @@ import { AuthenticatedContext, Context } from "../context";
 import { Catalog } from "../entity/Catalog";
 import { Collection } from "../entity/Collection";
 import { Package } from "../entity/Package";
-import { ActivityLog } from "../entity/ActivityLog";
-import { ActivityLogEventType } from "../entity/ActivityLogEventType";
-import { ActivityLogRepository } from "../repository/ActivityLogRepository";
+import { ActivityLogChangeType, ActivityLogEventType } from "../entity/ActivityLogEventType";
+import { createActivityLog } from "../repository/ActivityLogRepository";
 import {
     Base64ImageUpload,
     CreatePackageInput,
     PackageIdentifierInput,
     Permission,
-    UpdatePackageInput
+    UpdatePackageInput,
+    VersionIdentifierInput
 } from "../generated/graphql";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
@@ -21,6 +21,7 @@ import { UserRepository } from "../repository/UserRepository";
 import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 import { ImageStorageService } from "../storage/images/image-storage-service";
+import { VersionRepository } from "../repository/VersionRepository";
 
 export const usersByPackage = async (
     _0: any,
@@ -116,26 +117,56 @@ export const findPackageCreator = async (parent: any, _1: any, context: Authenti
 export const findPackage = async (
     _0: any,
     { identifier }: { identifier: PackageIdentifierInput },
+    context: Context,
+    info: any
+) => {
+    return context.connection.transaction(async (transaction) => {
+        const packageEntity = await transaction.getCustomRepository(PackageRepository).findPackageOrFail({
+            identifier,
+            relations: getGraphQlRelationName(info)
+        });
+
+        packageEntity.viewCount++;
+        transaction.save(packageEntity);
+
+        if (context.me) {
+            await createActivityLog(transaction, {
+                userId: context.me?.id,
+                eventType: ActivityLogEventType.PACKAGE_VIEWED,
+                targetPackageId: packageEntity.id
+            });
+        }
+
+        return packageEntity;
+    });
+};
+
+export const packageFetched = async (
+    _0: any,
+    { identifier }: { identifier: VersionIdentifierInput },
     context: AuthenticatedContext,
     info: any
 ) => {
-    const packageEntity = await context.connection.getCustomRepository(PackageRepository).findPackage({
-        identifier,
-        relations: getGraphQlRelationName(info)
+    return await context.connection.transaction(async (transaction) => {
+        const packageEntity = await transaction.getCustomRepository(PackageRepository).findPackageOrFail({
+            identifier,
+            relations: getGraphQlRelationName(info)
+        });
+
+        const versionEntity = await transaction.getCustomRepository(VersionRepository).findOneOrFail({ identifier });
+
+        packageEntity.fetchCount++;
+        transaction.save(packageEntity);
+
+        await createActivityLog(transaction, {
+            userId: context!.me!.id,
+            eventType: ActivityLogEventType.PACKAGE_FETCHED,
+            targetPackageId: packageEntity.id,
+            targetPackageVersionId: versionEntity.id
+        });
+
+        return packageEntity;
     });
-
-    if (packageEntity == null) throw new UserInputError("PACKAGE_NOT_FOUND");
-
-    try {
-        let log = new ActivityLog();
-        log.userId = context?.me?.id;
-        log.eventType = ActivityLogEventType.PACKAGE_VIEWED;
-        log.targetPackageId = packageEntity?.id;
-
-        await context.connection.getCustomRepository(ActivityLogRepository).create(log);
-    } catch (e) {}
-
-    return packageEntity;
 };
 
 export const searchPackages = async (
@@ -161,28 +192,29 @@ export const createPackage = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    try {
-        const packageEntity = await context.connection.getCustomRepository(PackageRepository).createPackage({
-            userId: context.me?.id,
-            packageInput: value,
-            relations: getGraphQlRelationName(info)
-        });
+    return await context.connection.transaction(async (transaction) => {
+        try {
+            const packageEntity = await transaction.getCustomRepository(PackageRepository).createPackage({
+                userId: context.me?.id,
+                packageInput: value,
+                relations: getGraphQlRelationName(info)
+            });
 
-        let log = new ActivityLog();
-        log.userId = context?.me?.id;
-        log.eventType = ActivityLogEventType.PACKAGE_CREATED;
-        log.targetPackageId = packageEntity?.id;
+            await createActivityLog(transaction, {
+                userId: context!.me!.id,
+                eventType: ActivityLogEventType.PACKAGE_CREATED,
+                targetPackageId: packageEntity?.id
+            });
 
-        await context.connection.getCustomRepository(ActivityLogRepository).create(log);
+            return packageEntity;
+        } catch (error) {
+            if (error.message == "CATALOG_NOT_FOUND") {
+                throw new UserInputError("CATALOG_NOT_FOUND");
+            }
 
-        return packageEntity;
-    } catch (error) {
-        if (error.message == "CATALOG_NOT_FOUND") {
-            throw new UserInputError("CATALOG_NOT_FOUND");
+            throw new ApolloError("UNKNOWN_ERROR");
         }
-
-        throw new ApolloError("UNKNOWN_ERROR");
-    }
+    });
 };
 
 export const updatePackage = async (
@@ -206,11 +238,37 @@ export const updatePackage = async (
         }
     }
 
-    return context.connection.getCustomRepository(PackageRepository).updatePackage({
-        catalogSlug: identifier.catalogSlug,
-        packageSlug: identifier.packageSlug,
-        packageInput: value,
-        relations: getGraphQlRelationName(info)
+    return await context.connection.transaction(async (transaction) => {
+        const packageEntity = await transaction
+            .getCustomRepository(PackageRepository)
+            .findPackageOrFail({ identifier });
+
+        if (value.isPublic !== undefined) {
+            await createActivityLog(transaction, {
+                userId: context.me.id,
+                eventType: ActivityLogEventType.PACKAGE_PUBLIC_CHANGED,
+                targetPackageId: packageEntity.id,
+                changeType: value.isPublic
+                    ? ActivityLogChangeType.PUBLIC_ENABLED
+                    : ActivityLogChangeType.PUBLIC_DISABLED
+            });
+        }
+
+        await createActivityLog(transaction, {
+            userId: context.me.id,
+            eventType: ActivityLogEventType.PACKAGE_EDIT,
+            targetPackageId: packageEntity.id,
+            propertiesEdited: Object.keys(value)
+                .map((k) => (k == "newPackageSlug" ? "slug" : k))
+                .map((k) => (k == "newCatalogSlug" ? "catalogSlug" : k))
+        });
+
+        return transaction.getCustomRepository(PackageRepository).updatePackage({
+            catalogSlug: identifier.catalogSlug,
+            packageSlug: identifier.packageSlug,
+            packageInput: value,
+            relations: getGraphQlRelationName(info)
+        });
     });
 };
 
@@ -232,9 +290,21 @@ export const deletePackage = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    return context.connection.getCustomRepository(PackageRepository).deletePackage({
-        identifier,
-        context
+    return context.connection.transaction(async (transaction) => {
+        const packageEntity = await transaction.getCustomRepository(PackageRepository).findPackageOrFail({
+            identifier
+        });
+
+        await createActivityLog(transaction, {
+            userId: context.me!.id,
+            eventType: ActivityLogEventType.PACKAGE_DELETED,
+            targetPackageId: packageEntity.id
+        });
+
+        return transaction.getCustomRepository(PackageRepository).deletePackage({
+            identifier,
+            context
+        });
     });
 };
 

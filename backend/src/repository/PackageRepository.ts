@@ -6,9 +6,8 @@ import { Package } from "../entity/Package";
 
 import { UserPackagePermission } from "../entity/UserPackagePermission";
 import { Catalog } from "../entity/Catalog";
-import { ActivityLog } from "../entity/ActivityLog";
 import { ActivityLogEventType } from "../entity/ActivityLogEventType";
-import { ActivityLogRepository } from "./ActivityLogRepository";
+import { createActivityLog } from "./ActivityLogRepository";
 import { CatalogRepository } from "./CatalogRepository";
 import { VersionRepository } from "./VersionRepository";
 import { allPermissions } from "../util/PermissionsUtil";
@@ -214,7 +213,8 @@ export class PackageRepository {
     }): Promise<Package> {
         const packageEntity = await this.findPackage({ identifier, relations });
 
-        if (packageEntity == null) throw new Error("PACKAGE_NOT_FOUND");
+        if (packageEntity == null)
+            throw new Error("PACKAGE_NOT_FOUND - " + identifier.catalogSlug + "/" + identifier.packageSlug);
 
         return packageEntity;
     }
@@ -393,14 +393,11 @@ export class PackageRepository {
 
         await this.manager.getCustomRepository(VersionRepository).deleteVersions(versions);
 
-        try {
-            let log = new ActivityLog();
-            log.userId = context?.me?.id;
-            log.eventType = ActivityLogEventType.PACKAGE_DELETED;
-            log.targetPackageId = packageEntity?.id;
-
-            await this.manager.getCustomRepository(ActivityLogRepository).create(log);
-        } catch (e) {}
+        await createActivityLog(this.manager, {
+            userId: context!.me!.id,
+            eventType: ActivityLogEventType.PACKAGE_DELETED,
+            targetPackageId: packageEntity?.id
+        });
 
         await this.manager.nestedTransaction(async (transaction) => {
             await transaction.delete(Package, { id: packageEntity.id });

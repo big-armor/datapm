@@ -87,12 +87,9 @@ export const packageActivities = async (
             {
                 eventType: In([
                     ActivityLogEventType.PACKAGE_CREATED,
-                    ActivityLogEventType.PACKAGE_DELETED,
-                    ActivityLogEventType.PACKAGE_FETCHED,
-                    ActivityLogEventType.PACKAGE_MAJOR_CHANGE,
-                    ActivityLogEventType.PACKAGE_MINOR_CHANGE,
-                    ActivityLogEventType.PACKAGE_PATCH_CHANGE,
-                    ActivityLogEventType.PACKAGE_VIEWED
+                    ActivityLogEventType.PACKAGE_EDIT,
+                    ActivityLogEventType.VERSION_CREATED,
+                    ActivityLogEventType.VERSION_DELETED
                 ])
             },
             {

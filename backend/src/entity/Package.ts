@@ -58,6 +58,12 @@ export class Package extends BaseModel {
     @Column({ name: "creator_id", nullable: false })
     public creatorId: number;
 
+    @Column({ name: "fetch_count", nullable: false })
+    public fetchCount: number;
+
+    @Column({ name: "view_count", nullable: false })
+    public viewCount: number;
+
     /** These are dummy values that are filled in by graphql responses */
     latestVersion: Version;
 

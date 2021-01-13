@@ -58,8 +58,8 @@ describe("Activity Log Tests", async () => {
 
         expect(response.data).to.exist;
         expect(response.data.myActivity).to.exist;
-        expect(response.data.myActivity.logs.length).to.equal(1);
-        expect(response.data.myActivity.logs[0]?.user?.username).to.equal(userOne.username);
+        expect(response.data.myActivity.logs.length).to.equal(2);
+        expect(response.data.myActivity.logs[1]?.user?.username).to.equal(userOne.username);
     });
 
     it("Should return no activity", async function () {
@@ -70,6 +70,7 @@ describe("Activity Log Tests", async () => {
 
         expect(response.data).to.exist;
         expect(response.data.myActivity).to.exist;
-        expect(response.data.myActivity.logs?.length).to.equal(0);
+        expect(response.data.myActivity.logs?.length).to.equal(1);
+        expect(response.data.myActivity.logs[0]?.user?.username).to.equal(userOne.username);
     });
 });

@@ -21,10 +21,10 @@ import { getGraphQlRelationName } from "../util/relationNames";
 import { grantAllCollectionPermissionsForUser } from "./UserCollectionPermissionResolver";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { Collection } from "../entity/Collection";
-import { ActivityLog } from "../entity/ActivityLog";
-import { ActivityLogEventType } from "../entity/ActivityLogEventType";
-import { ActivityLogRepository } from "../repository/ActivityLogRepository";
+import { ActivityLogChangeType, ActivityLogEventType } from "../entity/ActivityLogEventType";
+import { createActivityLog } from "../repository/ActivityLogRepository";
 import { exit } from "process";
+import { trace } from "superagent";
 
 export const usersByCollection = async (
     _0: any,
@@ -58,10 +58,22 @@ export const createCollection = async (
         throw new ValidationError("COLLECTION_SLUG_NOT_AVAILABLE");
     }
 
-    const relations = getGraphQlRelationName(info);
-    const createdCollection = await repository.createCollection(context.me, value, relations);
-    await grantAllCollectionPermissionsForUser(context, createdCollection.id);
-    return createdCollection;
+    return context.connection.transaction(async (transaction) => {
+        const relations = getGraphQlRelationName(info);
+
+        const createdCollection = await transaction
+            .getCustomRepository(CollectionRepository)
+            .createCollection(context.me, value, relations);
+        await grantAllCollectionPermissionsForUser(transaction, context.me.id, createdCollection.id);
+
+        await createActivityLog(transaction, {
+            userId: context.me.id,
+            eventType: ActivityLogEventType.COLLECTION_CREATED,
+            targetCollectionId: createdCollection.id
+        });
+
+        return createdCollection;
+    });
 };
 
 export const updateCollection = async (
@@ -70,17 +82,39 @@ export const updateCollection = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const repository = context.connection.manager.getCustomRepository(CollectionRepository);
+    return context.connection.transaction(async (transaction) => {
+        const repository = transaction.getCustomRepository(CollectionRepository);
 
-    if (value.newCollectionSlug && identifier.collectionSlug != value.newCollectionSlug) {
-        const existingCollection = await repository.findCollectionBySlug(value.newCollectionSlug);
-        if (existingCollection) {
-            throw new ValidationError("COLLECTION_SLUG_NOT_AVAILABLE");
+        const collection = await repository.findCollectionBySlugOrFail(identifier.collectionSlug);
+
+        if (value.newCollectionSlug && identifier.collectionSlug != value.newCollectionSlug) {
+            const existingCollection = await repository.findCollectionBySlug(value.newCollectionSlug);
+            if (existingCollection) {
+                throw new ValidationError("COLLECTION_SLUG_NOT_AVAILABLE");
+            }
         }
-    }
 
-    const relations = getGraphQlRelationName(info);
-    return repository.updateCollection(identifier.collectionSlug, value, relations);
+        if (value.isPublic !== undefined) {
+            await createActivityLog(transaction, {
+                userId: context.me.id,
+                eventType: ActivityLogEventType.COLLECTION_PUBLIC_CHANGED,
+                targetCollectionId: collection?.id,
+                changeType: value.isPublic
+                    ? ActivityLogChangeType.PUBLIC_ENABLED
+                    : ActivityLogChangeType.PUBLIC_DISABLED
+            });
+        }
+
+        await createActivityLog(transaction, {
+            userId: context.me.id,
+            eventType: ActivityLogEventType.COLLECTION_EDIT,
+            targetCollectionId: collection?.id,
+            propertiesEdited: Object.keys(value).map((k) => (k === "newCollectionSlug" ? "slug" : k))
+        });
+
+        const relations = getGraphQlRelationName(info);
+        return repository.updateCollection(identifier.collectionSlug, value, relations);
+    });
 };
 
 export const myCollections = async (
@@ -144,10 +178,21 @@ export const deleteCollection = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const relations = getGraphQlRelationName(info);
-    await context.connection.manager
-        .getCustomRepository(CollectionRepository)
-        .deleteCollection(identifier.collectionSlug);
+    return context.connection.transaction(async (transaction) => {
+        const relations = getGraphQlRelationName(info);
+
+        const collection = await transaction
+            .getCustomRepository(CollectionRepository)
+            .findCollectionBySlugOrFail(identifier.collectionSlug);
+
+        await transaction.getCustomRepository(CollectionRepository).deleteCollection(identifier.collectionSlug);
+
+        await createActivityLog(transaction, {
+            userId: context.me.id,
+            eventType: ActivityLogEventType.COLLECTION_DELETED,
+            targetCollectionId: collection.id
+        });
+    });
 };
 
 export const addPackageToCollection = async (
@@ -185,14 +230,12 @@ export const addPackageToCollection = async (
     if (value == undefined)
         throw new ApolloError("Not able to find the CollectionPackage entry after entry. This should never happen!");
 
-    try {
-        let log = new ActivityLog();
-        log.userId = context?.me?.id;
-        log.eventType = ActivityLogEventType.COLLECTION_PACKAGE_ADDED;
-        log.targetCollectionId = value?.collectionId;
-
-        await context.connection.getCustomRepository(ActivityLogRepository).create(log);
-    } catch (e) {}
+    await createActivityLog(context.connection, {
+        userId: context.me.id,
+        eventType: ActivityLogEventType.COLLECTION_PACKAGE_ADDED,
+        targetCollectionId: value?.collectionId,
+        targetPackageVersionId: packageEntity.id
+    });
 
     return value;
 };
@@ -217,14 +260,12 @@ export const removePackageFromCollection = async (
         .getCustomRepository(CollectionPackageRepository)
         .removePackageToCollection(collectionEntity.id, packageEntity.id);
 
-    try {
-        let log = new ActivityLog();
-        log.userId = context?.me?.id;
-        log.eventType = ActivityLogEventType.COLLECTION_PACKAGE_REMOVED;
-        log.targetCollectionId = collectionEntity?.id;
-
-        await context.connection.getCustomRepository(ActivityLogRepository).create(log);
-    } catch (e) {}
+    await createActivityLog(context.connection, {
+        userId: context.me.id,
+        eventType: ActivityLogEventType.COLLECTION_PACKAGE_REMOVED,
+        targetCollectionId: collectionEntity.id,
+        targetPackageId: packageEntity.id
+    });
 };
 
 export const findCollectionsForAuthenticatedUser = async (_0: any, {}, context: AuthenticatedContext, info: any) => {
