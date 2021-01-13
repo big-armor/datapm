@@ -1,74 +1,62 @@
 import { Injectable } from "@angular/core";
 import { DomSanitizer, SafeUrl } from "@angular/platform-browser";
 import { HttpClient } from "@angular/common/http";
-import { Observable, of, Subject } from "rxjs";
-import { map } from "rxjs/operators";
-
-export interface ImageRefreshTarget {
-    target: string;
-    [key: string]: string;
-}
+import { BehaviorSubject, Subject } from "rxjs";
 
 @Injectable({
     providedIn: "root"
 })
 export class ImageService {
-    public shouldRefresh = new Subject<ImageRefreshTarget>();
-    private imageDataByUrl = new Map<string, Observable<SafeUrl>>();
+    private imageDataSubjectByUrl = new Map<string, BehaviorSubject<SafeUrl>>();
 
     constructor(private http: HttpClient, private sanitizer: DomSanitizer) {}
 
-    public refreshAvatar(username: string): void {
-        this.shouldRefresh.next({
-            target: "avatar",
-            username
-        });
-    }
-
-    public refreshCover(): void {
-        this.shouldRefresh.next({
-            target: "cover"
-        });
-    }
-
-    public getUserAvatar(username: string, reload?: boolean): Observable<SafeUrl> {
+    public loadUserAvatar(username: string, reload?: boolean): Subject<SafeUrl> {
         const url = this.buildUserAvatarUrl(username);
-        return this.getImage(url, reload);
+        return this.loadImage(url, reload);
     }
 
-    public getUserCover(username: string, reload?: boolean): Observable<SafeUrl> {
+    public loadUserCover(username: string, reload?: boolean): Subject<SafeUrl> {
         const url = this.buildUserCoverUrl(username);
-        return this.getImage(url, reload);
+        return this.loadImage(url, reload);
     }
 
-    public getPackageCover(catalogSlug: string, packageSlug: string, reload?: boolean): Observable<SafeUrl> {
+    public loadPackageCover(catalogSlug: string, packageSlug: string, reload?: boolean): Subject<SafeUrl> {
         const url = this.buildPackageCoverUrl(catalogSlug, packageSlug);
-        return this.getImage(url, reload);
+        return this.loadImage(url, reload);
     }
 
-    public getCatalogCover(catalogSlug: string, reload?: boolean): Observable<SafeUrl> {
+    public loadCatalogCover(catalogSlug: string, reload?: boolean): Subject<SafeUrl> {
         const url = this.buildCatalogCoverUrl(catalogSlug);
-        return this.getImage(url, reload);
+        return this.loadImage(url, reload);
     }
 
-    public getCollectionCover(catalogSlug: string, reload?: boolean): Observable<SafeUrl> {
+    public loadCollectionCover(catalogSlug: string, reload?: boolean): Subject<SafeUrl> {
         const url = this.buildCollectionCoverUrl(catalogSlug);
-        return this.getImage(url, reload);
+        return this.loadImage(url, reload);
     }
 
-    public getImage(url: string, reload?: boolean): Observable<SafeUrl> {
-        if (!reload && this.imageDataByUrl.has(url)) {
-            return this.imageDataByUrl.get(url);
+    public loadImage(url: string, reload?: boolean): Subject<SafeUrl> {
+        const isImageCached = this.imageDataSubjectByUrl.has(url);
+        if (!reload && isImageCached) {
+            return this.imageDataSubjectByUrl.get(url);
         }
 
-        return this.http.get(url, { responseType: "blob" }).pipe(
-            map((res: Blob) => {
-                const imageObjectURL = URL.createObjectURL(res);
-                const safeImageObjectURL = this.sanitizer.bypassSecurityTrustUrl(imageObjectURL);
-                this.imageDataByUrl.set(url, of(safeImageObjectURL));
-                return safeImageObjectURL;
-            })
-        );
+        let imageSubject;
+        if (isImageCached) {
+            imageSubject = this.imageDataSubjectByUrl.get(url);
+        } else {
+            imageSubject = new BehaviorSubject(null);
+            this.imageDataSubjectByUrl.set(url, imageSubject);
+        }
+
+        this.http.get(url, { responseType: "blob" }).subscribe((res: Blob) => {
+            const imageObjectURL = URL.createObjectURL(res);
+            const safeImageObjectURL = this.sanitizer.bypassSecurityTrustUrl(imageObjectURL);
+            imageSubject.next(safeImageObjectURL);
+        });
+
+        return imageSubject;
     }
 
     private buildUserAvatarUrl(username: string): string {

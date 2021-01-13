@@ -16,7 +16,7 @@ enum State {
     templateUrl: "./avatar.component.html",
     styleUrls: ["./avatar.component.scss"]
 })
-export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
+export class AvatarComponent implements OnChanges, OnDestroy {
     @Input() user: User;
     @Input() size: number = 40;
     @Input() editable: boolean = false;
@@ -29,6 +29,7 @@ export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
     public imgData = "";
     public letter = "";
     private inputEventId: string = "";
+
     private unsubscribe$ = new Subject();
 
     public userBackgroundColor = "#FFFFFF";
@@ -41,12 +42,6 @@ export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
                 const reader = new FileReader();
                 reader.onload = () => this.upload.emit(reader.result);
                 reader.readAsDataURL(files[0]);
-            }
-        });
-
-        this.imageService.shouldRefresh.pipe(takeUntil(this.unsubscribe$)).subscribe(({ target, username }) => {
-            if (target === "avatar" && this.user?.username === username) {
-                this.getImage(username, true); // timeout is required for some weird reason
             }
         });
     }
@@ -68,8 +63,6 @@ export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
         }
     }
 
-    ngOnInit(): void {}
-
     ngOnDestroy() {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
@@ -79,23 +72,19 @@ export class AvatarComponent implements OnInit, OnChanges, OnDestroy {
         this.inputEventId = this.fileService.openFile("image/jpeg");
     }
 
-    private getImage(username?: string, reload?: boolean): void {
+    private getImage(username?: string): void {
         if (!username) {
             return;
         }
         this.userBackgroundColor = "#FFFF";
-        this.imageService.getUserAvatar(username, reload).subscribe(
-            (imgData: any) => {
+        this.imageService
+            .loadUserAvatar(username)
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe((imgData: any) => {
                 this.userBackgroundColor = this.hashStringToColor(username);
                 this.imgData = imgData;
                 this.state = State.LOADED;
-            },
-            (error) => {
-                this.imgData = null;
-                this.userBackgroundColor = this.hashStringToColor(username);
-                this.state = State.LOADED;
-            }
-        );
+            });
     }
 
     private djb2(str) {

@@ -34,12 +34,6 @@ export class CoverComponent implements OnInit {
                 reader.readAsDataURL(files[0]);
             }
         });
-
-        this.imageService.shouldRefresh.pipe(takeUntil(this.unsubscribe$)).subscribe(({ target }) => {
-            if (target === "cover") {
-                this.fetchImage(true);
-            }
-        });
     }
 
     ngOnInit(): void {}
@@ -63,13 +57,13 @@ export class CoverComponent implements OnInit {
     private fetchImage(reload?: boolean): void {
         let imageObservable;
         if (this.username) {
-            imageObservable = this.imageService.getUserCover(this.username, reload);
+            imageObservable = this.imageService.loadUserCover(this.username, reload);
         } else if (this.packageSlug && this.catalogSlug) {
-            imageObservable = this.imageService.getPackageCover(this.catalogSlug, this.packageSlug, reload);
+            imageObservable = this.imageService.loadPackageCover(this.catalogSlug, this.packageSlug, reload);
         } else if (this.catalogSlug) {
-            imageObservable = this.imageService.getCatalogCover(this.catalogSlug, reload);
+            imageObservable = this.imageService.loadCatalogCover(this.catalogSlug, reload);
         } else if (this.collectionSlug) {
-            imageObservable = this.imageService.getCollectionCover(this.collectionSlug, reload);
+            imageObservable = this.imageService.loadCollectionCover(this.collectionSlug, reload);
         } else {
             return;
         }
