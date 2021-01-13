@@ -10,7 +10,7 @@ import {
     Kind
 } from "graphql";
 import { Context } from "../context";
-import { validateCatalogSlug } from "datapm-lib";
+import { catalogSlugValid } from "datapm-lib";
 import { ValidationConstraint } from "./ValidationConstraint";
 import { ValidationType } from "./ValidationType";
 
@@ -26,7 +26,7 @@ export class ValidCatalogSlugDirective extends SchemaDirectiveVisitor {
         details.field.resolve = function (source, args, context: Context, info) {
             const slug: string | undefined = args.catalogSlug || undefined;
 
-            validateSlug(slug);
+            validateCatalogSlug(slug);
 
             return resolve.apply(this, [source, args, context, info]);
         };
@@ -42,14 +42,14 @@ export class ValidCatalogSlugDirective extends SchemaDirectiveVisitor {
     }
 }
 
-export function validateSlug(slug: string | undefined): void {
-    if (slug === undefined) throw new ValidationError(`CATALOG_SLUG_REQUIRED`);
+export function validateCatalogSlug(slug: string | undefined): void {
+    const validCatalogSlug = catalogSlugValid(slug);
 
-    if (slug.length == 0) throw new ValidationError(`CATALOG_SLUG_REQUIRED`);
+    if (validCatalogSlug === "CATALOG_SLUG_REQUIRED") throw new ValidationError(`CATALOG_SLUG_REQUIRED`);
 
-    if (slug.length > 38) throw new ValidationError(`CATALOG_SLUG_TOO_LONG`);
+    if (validCatalogSlug === "CATALOG_SLUG_TOO_LONG") throw new ValidationError(`CATALOG_SLUG_TOO_LONG`);
 
-    if (!validateCatalogSlug(slug)) throw new ValidationError("CATALOG_SLUG_INVALID");
+    if (validCatalogSlug === "CATALOG_SLUG_INVALID") throw new ValidationError("CATALOG_SLUG_INVALID");
 }
 
 export class CatalogSlugConstraint implements ValidationConstraint {
@@ -58,7 +58,7 @@ export class CatalogSlugConstraint implements ValidationConstraint {
     }
 
     validate(value: string): void {
-        validateSlug(value);
+        validateCatalogSlug(value);
     }
 
     getCompatibleScalarKinds(): string[] {

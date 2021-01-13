@@ -1,9 +1,9 @@
-<hr style="width: 100%" class="header-border" />
+<hr style="width: 100%;" class="header-border" />
 
 <div class="container padding-desktop">
     <div class="row">
         <div class="col-md-12 col-lg-3 col-sm-12">
-            <div class="d-flex flex-column bd-highlight sorting-mat">
+            <div class="d-flex flex-column sorting-mat">
                 <mat-radio-group aria-label="Select an option" [(ngModel)]="selectedFilter">
                     <div class="p-2 bd-highlight">
                         <mat-radio-button [value]="Filter.PACKAGES" (change)="onPackageFilterChange()"
@@ -31,7 +31,7 @@
                         <div *ngIf="isFirst" class="search-title pl-3">Your search results for '{{ query }}'</div>
 
                         <mat-list-item>
-                            <div class="d-flex bd-highlight mobile-row" style="width: 100%">
+                            <div class="d-flex bd-highlight mobile-row" style="width: 100%;">
                                 <div class="py-2 bd-highlight d-flex align-items-center">
                                     <img
                                         *ngIf="collection.imageUrl"

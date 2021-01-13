@@ -8,6 +8,9 @@ import { Observable } from "@apollo/client/core";
 import fs from "fs";
 import { before } from "mocha";
 import { RandomUuid } from "testcontainers/dist/uuid";
+import { createTestClient } from "./test-utils";
+import { RegistryStatus, RegistryStatusDocument } from "./registry-client";
+import { expect } from "chai";
 const maildev = require("maildev");
 
 let container: StartedTestContainer;
@@ -100,6 +103,17 @@ before(async function () {
         serverProcess.stdout!.on("close", () => {
             if (!serverReady) throw new Error("Registry server exited before becoming ready");
         });
+    });
+});
+
+describe("Server should start", async function () {
+    it("Should return running status", async function () {
+        const client = createTestClient({});
+        const response = await client.query({
+            query: RegistryStatusDocument
+        });
+
+        expect(response.errors == null).equal(true);
     });
 });
 

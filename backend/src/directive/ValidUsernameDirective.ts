@@ -7,14 +7,13 @@ import {
     GraphQLObjectType,
     GraphQLInterfaceType,
     GraphQLInputField,
-    GraphQLInputObjectType,
-    GraphQLScalarType,
-    GraphQLNonNull
+    GraphQLInputObjectType
 } from "graphql";
 import { Context } from "../context";
 import { INVALID_USERNAME_ERROR } from "../generated/graphql";
 import { ValidationConstraint } from "./ValidationConstraint";
 import { ValidationType } from "./ValidationType";
+import { usernameValid } from "datapm-lib";
 
 export class ValidUsernameDirective extends SchemaDirectiveVisitor {
     visitArgumentDefinition(
@@ -55,22 +54,18 @@ export class ValidUsernameDirective extends SchemaDirectiveVisitor {
     }
 }
 
-export function validateUsername(username: String | undefined): void {
-    const regex = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/;
+export function validateUsername(username: string | undefined): void {
+    const validUsername = usernameValid(username);
 
-    if (username === undefined) {
+    if (validUsername == "USERNAME_REQUIRED") {
         throw new ValidationError(INVALID_USERNAME_ERROR.USERNAME_REQUIRED);
     }
 
-    if (username.length == 0) {
-        throw new ValidationError(INVALID_USERNAME_ERROR.USERNAME_REQUIRED);
-    }
-
-    if (username.length > 39) {
+    if (validUsername == "USERNAME_TOO_LONG") {
         throw new ValidationError(INVALID_USERNAME_ERROR.USERNAME_TOO_LONG);
     }
 
-    if (username.toLowerCase().match(regex) == null) {
+    if (validUsername == "INVALID_CHARACTERS") {
         throw new ValidationError(INVALID_USERNAME_ERROR.INVALID_CHARACTERS);
     }
 }
@@ -80,7 +75,7 @@ class UsernameConstraint implements ValidationConstraint {
         return "CollectionSlug";
     }
 
-    validate(value: String) {
+    validate(value: string) {
         validateUsername(value);
     }
 

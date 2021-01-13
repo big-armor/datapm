@@ -2,140 +2,56 @@
 
 .package-item {
     cursor: pointer;
-    box-shadow: -4px 0 4px hsla(0, 0%, 100%, 0.25), 0 -4px 4px hsla(0, 0%, 100%, 0.25),
-        0 4px 4px hsla(0, 0%, 74.1%, 0.25), 4px 0 4px hsla(0, 0%, 74.1%, 0.25);
+    box-shadow: $outer-shadow-1;
+    background-color: $gray-7;
+    transition: background-color 0.5s ease;
 
-    background-color: #f9f9f9;
     &:hover {
-        background-color: white;
+        background-color: $white;
         transition: background-color 0.5s ease;
     }
-    transition: background-color 0.5s ease;
-}
 
-.flex-1 {
-    flex: 1;
-}
-
-.package-image img {
-    width: 100%;
-    max-height: 150px;
-    object-fit: cover;
-}
-
-.actions button .mat-icon {
-    color: #828282;
-}
-
-.up-header {
-    div {
-        font-family: Roboto Mono;
-        font-style: normal;
-        font-weight: 300;
-        font-size: 10px;
-        line-height: 13px;
-        text-align: right;
+    .package-identifier {
+        font-family: $family-roboto-mono;
+        font-size: $default-font;
+        line-height: 26px;
+        color: $color-info;
         letter-spacing: -0.28px;
-        color: #828282;
+        margin-bottom: 0px !important;
+        margin-left: 10px;
     }
-}
 
-.package-identifier {
-    font-family: Roboto Mono;
-    font-size: 16px;
-    line-height: 26px;
-    color: $color-info;
-    letter-spacing: -0.28px;
-    margin-bottom: 0px !important;
-    margin-left: 10px;
-}
-
-.package-description {
-    font-family: Roboto Mono;
-    font-style: normal;
-    font-weight: 300;
-    font-size: 14px;
-    line-height: 18px;
-    letter-spacing: -0.28px;
-    color: #4f4f4f;
-    max-height: 111px;
-    overflow: hidden;
-}
-
-.package-chips {
-    ::ng-deep.mat-chip {
-        font-family: Roboto Mono;
-        font-style: normal;
-        font-weight: normal;
-        font-size: 10px;
-        line-height: 13px;
+    .package-description {
+        font-family: $family-roboto-mono;
+        font-style: $style-normal;
+        font-weight: $weight-300;
+        font-size: $text-font;
+        line-height: 18px;
         letter-spacing: -0.28px;
-        color: #000000;
-        padding: 0px 9px;
-        min-height: 18px;
-        border-radius: 24px;
-        cursor: pointer;
-        margin: 0px 8px;
-        background-color: #fff;
-        box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25),
-            inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
-    }
-}
-
-.package-actions {
-    button {
-        width: 32px;
-        height: 32px;
-        background-color: #fff;
-        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
-            0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
-
-        &:focus {
-            outline: #fff auto 0px !important;
-        }
-
-        ::ng-deep.mat-button-wrapper {
-            padding: 0px 0;
-            line-height: 20px;
-
-            .mat-icon {
-                height: 30px;
-                color: #828282;
-
-                &:focus {
-                    outline: #fff auto 0px !important;
-                }
-            }
-        }
+        color: $gray-2;
+        max-height: 111px;
+        overflow: hidden;
     }
 
-    .content-nr {
-        font-family: Roboto Mono;
-        font-style: normal;
-        font-weight: 500;
-        font-size: 10px;
-        text-transform: uppercase;
-        color: #828282;
+    .ctaButton {
+        position: absolute;
+        top: 20px;
+        right: 16px;
     }
-}
-
-.ctaButton {
-    position: absolute;
-    top: 20px;
-    right: 16px;
 }
 
 @media (max-width: 992px) {
-    .package-identifier {
-        font-size: 14px;
+    .package-item {
+        .package-identifier {
+            font-size: $text-font;
+        }
     }
 }
 
-@media (max-width: 768px) {
-}
-
 @media (max-width: 575px) {
-    .package-identifier {
-        font-size: 12px;
+    .package-item {
+        .package-identifier {
+            font-size: $small-font;
+        }
     }
 }

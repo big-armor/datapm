@@ -1,5 +1,5 @@
-<app-cover [username]="user?.username"></app-cover>
-<div class="row" *ngIf="user">
+<app-cover [username]="user?.username" id="profileCover"></app-cover>
+<div class="row" *ngIf="user" id="detailsHeader">
     <div class="col-lg-8 col-xs-12">
         <div class="d-flex user-header">
             <div class="p-2">
@@ -39,7 +39,7 @@
 
                 <span class="social-link" *ngIf="user.twitterHandle && (user.twitterHandleIsPublic || isCurrentUser)">
                     <a target="_blank" href="https://twitter.com/{{ user.twitterHandle }}">
-                        <img src="/assets/images/twitter.png" style="opacity: 0.8" width="24" alt="twitter" />
+                        <img src="/assets/images/twitter.png" style="opacity: 0.8;" width="24" alt="twitter" />
                     </a>
                     &nbsp;
                     <span *ngIf="user.twitterHandleIsPublic" class="public-text">public</span>
@@ -47,7 +47,7 @@
                 </span>
                 <span class="social-link" *ngIf="user.gitHubHandle && (user.gitHubHandleIsPublic || isCurrentUser)">
                     <a target="_blank" href="https://github.com/{{ user.gitHubHandle }}">
-                        <img src="/assets/images/github.png" style="opacity: 0.8" width="24" alt="twitter" />
+                        <img src="/assets/images/github.png" style="opacity: 0.8;" width="24" alt="twitter" />
                     </a>
                     &nbsp;
                     <span *ngIf="user.gitHubHandleIsPublic" class="public-text">public</span>

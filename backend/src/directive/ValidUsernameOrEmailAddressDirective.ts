@@ -56,7 +56,7 @@ export class ValidUsernameOrEmailAddressDirective extends SchemaDirectiveVisitor
     }
 }
 
-export function validateUsernameOrEmail(value: String | undefined) {
+export function validateUsernameOrEmail(value: string | undefined) {
     if (value?.indexOf("@") != -1) validateEmailAddress(value);
     else validateUsername(value);
 }
@@ -66,7 +66,7 @@ class UsernameOrEmailAddressConstraint implements ValidationConstraint {
         return "UsernameOrEmailAddress";
     }
 
-    validate(value: String) {
+    validate(value: string) {
         validateUsernameOrEmail(value);
     }
 

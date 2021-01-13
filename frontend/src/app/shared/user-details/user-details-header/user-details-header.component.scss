@@ -1,44 +1,46 @@
 @import "../../../../styles/variables";
 @import "../../../../styles/mixins";
 
-:host {
-    display: block;
-}
-::ng-deep .cover {
-    height: 150px;
+#detailsHeader {
+    .user-header {
+        .user-img {
+            margin-top: -32px;
+            display: block;
+        }
 
-    img {
-        border-radius: 4px;
-    }
-}
-.user-img {
-    margin-top: -32px;
-    display: block;
-}
-.username {
-    color: $gray-3;
-    font-weight: 300;
-}
-.social-link {
-    display: inline-block;
-    margin-right: 1em;
-}
-.contact-info {
-    padding: 10px;
-    color: $gray-3;
+        .username {
+            color: $gray-3;
+            font-weight: 300;
+        }
 
-    h3 {
-        margin-bottom: 10px;
-    }
-}
+        .social-link {
+            display: inline-block;
+            margin-right: 1em;
+        }
 
-.not-current-user {
-    .public-text,
-    .not-public-text {
-        display: none;
+        :host {
+            display: block;
+        }
+
+        .user-bio {
+            margin-top: 1em;
+        }
+
+        .not-current-user {
+            .public-text,
+            .not-public-text {
+                display: none;
+            }
+        }
     }
 }
 
-.user-bio {
-    margin-top: 1em;
+#profileCover {
+    ::ng-deep .cover {
+        height: 150px;
+
+        img {
+            border-radius: 4px;
+        }
+    }
 }
