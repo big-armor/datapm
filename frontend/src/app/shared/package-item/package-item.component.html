@@ -23,6 +23,8 @@
                 </div>
             </div>
         </div>
-        <a class="app-outlined-button ctaButton" *ngIf="showCta" (click)="handleAction($event)">{{ ctaText }}</a>
+        <a class="app-outlined-button ctaButton" *ngIf="shouldShowActionButton" (click)="handleAction($event)">{{
+            actionButtonText
+        }}</a>
     </mat-card-content>
 </mat-card>

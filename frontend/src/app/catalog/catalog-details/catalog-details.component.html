@@ -21,9 +21,9 @@
             <app-package-item
                 [item]="package"
                 [hasImage]="true"
-                ctaText="Remove From Catalog"
-                [showCta]="canEdit"
-                (action)="removePackage(package)"
+                actionButtonText="Delete Package"
+                [shouldShowActionButton]="canEdit"
+                (action)="deletePackage(package)"
                 *ngFor="let package of catalog?.packages"
             >
             </app-package-item>

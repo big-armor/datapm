@@ -30,6 +30,7 @@ import { MatDialogModule } from "@angular/material/dialog";
 import { PackagePermissionComponent } from "./components/package-permission/package-permission.component";
 import { AddUserComponent } from "./components/add-user/add-user.component";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
+import { PackageDeletionConfirmationComponent } from "./components/package/package-deletion-confirmation/package-deletion-confirmation.component";
 
 @NgModule({
     declarations: [
@@ -45,7 +46,8 @@ import { MatSlideToggleModule } from "@angular/material/slide-toggle";
         VersionPipe,
         PackageInfoComponent,
         PackagePermissionComponent,
-        AddUserComponent
+        AddUserComponent,
+        PackageDeletionConfirmationComponent
     ],
     imports: [
         CommonModule,

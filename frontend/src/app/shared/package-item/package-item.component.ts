@@ -10,45 +10,54 @@ import * as timeago from "timeago.js";
     styleUrls: ["./package-item.component.scss"]
 })
 export class PackageItemComponent implements OnInit {
-    @Input() item: Package;
-    @Input() hasImage: boolean;
-    @Input() ctaText: string = "";
-    @Input() showCta: boolean = false;
-    @Output() action = new EventEmitter();
+    private readonly DESCRIPTION_CHARACTER_COUNT_LIMIT = 220;
+
+    @Input()
+    public item: Package;
+
+    @Input()
+    public hasImage: boolean;
+
+    @Input()
+    public actionButtonText: string = "";
+
+    @Input()
+    public shouldShowActionButton: boolean = false;
+
+    @Output()
+    public action = new EventEmitter();
 
     public currentUser: User;
 
-    constructor(private router: Router, private authenicationService: AuthenticationService) {}
+    constructor(private router: Router, private authenticationService: AuthenticationService) {}
 
-    ngOnInit(): void {
-        this.authenicationService.currentUser.subscribe((user) => {
-            this.currentUser = user;
-        });
+    public ngOnInit(): void {
+        this.authenticationService.currentUser.subscribe((user) => (this.currentUser = user));
     }
 
-    goToComponent(): void {
+    public goToComponent(): void {
         const { catalogSlug, packageSlug } = this.item.identifier;
         setTimeout(() => (document.body.scrollTop = 0), 100);
 
         this.router.navigate([catalogSlug, packageSlug]);
     }
 
-    handleAction(ev): void {
+    public handleAction(ev): void {
         ev.stopPropagation();
         this.action.emit();
     }
 
-    get lastActivityLabel(): string {
+    public get lastActivityLabel(): string {
         return timeago.format(this.item.updatedAt);
     }
 
-    get truncatedDescription(): string {
+    public get truncatedDescription(): string {
         if (!this.item.description) {
             return "";
         }
 
-        if (this.item.description.length > 220) {
-            return this.item.description.substr(0, 220) + "...";
+        if (this.item.description.length > this.DESCRIPTION_CHARACTER_COUNT_LIMIT) {
+            return this.item.description.substr(0, this.DESCRIPTION_CHARACTER_COUNT_LIMIT) + "...";
         }
         return this.item.description;
     }
