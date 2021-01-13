@@ -15,6 +15,7 @@ import { AddPackageComponent } from "./add-package/add-package.component";
 import { AddUserComponent } from "./add-user/add-user.component";
 import { CollectionPermissionsComponent } from "./collection-permissions/collection-permissions.component";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
+import { MatSelectModule } from "@angular/material/select";
 
 @NgModule({
     declarations: [CollectionDetailsComponent, AddPackageComponent, AddUserComponent, CollectionPermissionsComponent],
@@ -26,6 +27,7 @@ import { MatAutocompleteModule } from "@angular/material/autocomplete";
         MatProgressSpinnerModule,
         MatAutocompleteModule,
         MatTabsModule,
+        MatSelectModule,
         MatTableModule,
         MatSlideToggleModule,
         MatButtonModule

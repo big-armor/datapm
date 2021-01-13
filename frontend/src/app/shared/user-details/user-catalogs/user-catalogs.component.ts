@@ -3,10 +3,10 @@ import { Catalog, UpdateCatalogGQL, DeleteCatalogGQL, UserCatalogsGQL } from "sr
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
-import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { EditCatalogComponent } from "../../edit-catalog/edit-catalog.component";
 import { CreateCatalogComponent } from "../../create-catalog/create-catalog.component";
+import { DeleteCatalogComponent } from "../../delete-catalog/delete-catalog.component";
 
 enum State {
     INIT,
@@ -39,7 +39,7 @@ export class UserCatalogsComponent implements OnInit {
     constructor(
         private userCatalogs: UserCatalogsGQL,
         private updateCatalogGQL: UpdateCatalogGQL,
-        private disableCatalogGQL: DeleteCatalogGQL,
+        private deleteCatalogGQL: DeleteCatalogGQL,
         private authenticationService: AuthenticationService,
         private dialog: MatDialog
     ) {}
@@ -97,26 +97,14 @@ export class UserCatalogsComponent implements OnInit {
             this.dialog.open(this.deleteMyUsercatalog);
             return;
         }
-        const dlgRef = this.dialog.open(DeleteConfirmationComponent, {
+        const dlgRef = this.dialog.open(DeleteCatalogComponent, {
             data: {
                 catalogSlug: catalog.identifier.catalogSlug
             }
         });
 
         dlgRef.afterClosed().subscribe((confirmed: boolean) => {
-            if (confirmed) {
-                this.disableCatalogGQL
-                    .mutate({
-                        identifier: {
-                            catalogSlug: catalog.identifier.catalogSlug
-                        }
-                    })
-                    .subscribe(() => {
-                        this.myCatalogs = this.myCatalogs.filter(
-                            (c) => c.identifier.catalogSlug !== catalog.identifier.catalogSlug
-                        );
-                    });
-            }
+            this.refreshCatalogs();
         });
     }
 

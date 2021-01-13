@@ -188,7 +188,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         this.snackBarService.openSnackBar("Copied to clipboard! Paste the command into your terminal.", "");
     }
     getMoment(date: Date) {
-        if (date == null) return "";
+        if (date == null) return "Never";
 
         return timeago.format(date);
     }

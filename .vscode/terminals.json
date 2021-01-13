@@ -1,0 +1,21 @@
+{
+    "autorun": true,
+    "terminals": [
+        {
+            "name": "docker",
+            "cwd": "docker"
+        },
+        {
+            "name": "backend",
+            "cwd": "backend"
+        },
+        {
+            "name": "frontend",
+            "cwd": "frontend"
+        },
+        {
+            "name": "lib",
+            "cwd": "lib"
+        }
+    ]
+}

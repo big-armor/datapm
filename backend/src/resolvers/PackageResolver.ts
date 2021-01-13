@@ -238,7 +238,7 @@ export const removePackagePermissions = async (
     { identifier, username }: { identifier: PackageIdentifierInput; username: string },
     context: AuthenticatedContext
 ) => {
-    context.connection.getCustomRepository(PackagePermissionRepository).removePackagePermission({
+    return context.connection.getCustomRepository(PackagePermissionRepository).removePackagePermission({
         identifier,
         username
     });

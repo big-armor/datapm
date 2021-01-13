@@ -9,6 +9,7 @@ import { filter, takeUntil } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
 import { LoginDialogComponent } from "src/app/shared/header/login-dialog/login-dialog.component";
 import { AuthenticationService } from "src/app/services/authentication.service";
+import { AddPackageComponent } from "src/app/collection-details/add-package/add-package.component";
 
 enum State {
     LOADING,
@@ -188,5 +189,14 @@ export class PackageComponent implements OnDestroy {
     derivedFromCount(packageFile: PackageFile) {
         if (packageFile == null) return 0;
         return packageFile.schemas.reduce((count, schema) => count + (schema.derivedFrom?.length || 0), 0);
+    }
+
+    addToCollection(packageObject: Package) {
+        const dialogRef = this.dialog.open(AddPackageComponent, {
+            data: {
+                packageIdentifier: this.package.identifier
+            },
+            width: "600px"
+        });
     }
 }

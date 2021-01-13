@@ -21,6 +21,7 @@ export SMTP_FROM_NAME=${SMTP_FROM_NAME:="Localhost DataPM Registry"}
 export SMTP_FROM_ADDRESS=${SMTP_FROM_ADDRESS:="test@localhost"}
 export SMTP_SECURE=${SMTP_SECURE:="false"}
 export STORAGE_URL=${STORAGE_URL:="file://tmp-registry-server-storage"}
+export DATAPM_VERSION=${DATAPM_VERSION:=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[", ]//g')}
 
 # Examples
 # export GOOGLE_APPLICATION_CREDENTIALS=/my-path/datapm-registry/gc.json

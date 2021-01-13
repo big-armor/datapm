@@ -8,14 +8,24 @@
 }
 
 .input-label {
-    width: 150px;
+    width: 100%;
     padding-top: 12px;
 }
 
 .input-control {
-    width: 300px;
+    width: 100%;
 }
 
 .app-raised-button {
     background-color: $white;
+}
+
+.mat-option {
+    height: 75px;
+    padding: 5px 5px;
+    line-height: 75px;
+    ::ng-deep.avatar {
+        line-height: 20px;
+        margin-right: 10px;
+    }
 }

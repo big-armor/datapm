@@ -38,7 +38,8 @@ import { CreateCollectionComponent } from "./create-collection/create-collection
 import { CreateCatalogComponent } from "./create-catalog/create-catalog.component";
 import { UserDetailsHeaderComponent } from "./user-details/user-details-header/user-details-header.component";
 import { UserCatalogsComponent } from "./user-details/user-catalogs/user-catalogs.component";
-import { DeleteConfirmationComponent } from "./user-details/delete-confirmation/delete-confirmation.component";
+import { DeleteCollectionComponent } from "./delete-collection/delete-collection.component";
+import { DeleteCatalogComponent } from "./delete-catalog/delete-catalog.component";
 import { FewPackagesAlertComponent } from "./user-details/few-packages-alert/few-packages-alert.component";
 import { UserCollectionsComponent } from "./user-details/user-collections/user-collections.component";
 import { UserPackagesComponent } from "./user-details/user-packages/user-packages.component";
@@ -46,6 +47,10 @@ import { EditAccountDialogComponent } from "./user-details/edit-account-dialog/e
 import { EditPasswordDialogComponent } from "./user-details/edit-password-dialog/edit-password-dialog.component";
 import { UserDetailsComponent } from "./user-details/user-details/user-details.component";
 import { SimpleCreateComponent } from "./user-details/simple-create/simple-create.component";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatInputModule } from "@angular/material/input";
+import { DeletePackageComponent } from "./delete-package/delete-package.component";
+import { MatSelect, MatSelectModule } from "@angular/material/select";
 
 @NgModule({
     declarations: [
@@ -73,14 +78,16 @@ import { SimpleCreateComponent } from "./user-details/simple-create/simple-creat
         CreateCatalogComponent,
         UserDetailsHeaderComponent,
         UserCatalogsComponent,
-        DeleteConfirmationComponent,
+        DeleteCatalogComponent,
+        DeleteCollectionComponent,
         FewPackagesAlertComponent,
         UserCollectionsComponent,
         UserPackagesComponent,
         EditAccountDialogComponent,
         EditPasswordDialogComponent,
         UserDetailsComponent,
-        SimpleCreateComponent
+        SimpleCreateComponent,
+        DeletePackageComponent
     ],
     imports: [
         CommonModule,
@@ -90,9 +97,12 @@ import { SimpleCreateComponent } from "./user-details/simple-create/simple-creat
         MatIconModule,
         MatMenuModule,
         MatDialogModule,
+        MatFormFieldModule,
+        MatInputModule,
         MatProgressSpinnerModule,
         MatSnackBarModule,
         MatStepperModule,
+        MatSelectModule,
         MatSlideToggleModule,
         MatTableModule,
         FormsModule,
@@ -122,7 +132,8 @@ import { SimpleCreateComponent } from "./user-details/simple-create/simple-creat
         CreateCollectionComponent,
         UserDetailsHeaderComponent,
         UserCatalogsComponent,
-        DeleteConfirmationComponent,
+        DeleteCatalogComponent,
+        DeleteCollectionComponent,
         FewPackagesAlertComponent,
         UserCollectionsComponent,
         UserPackagesComponent,

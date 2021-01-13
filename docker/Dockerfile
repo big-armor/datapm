@@ -17,4 +17,3 @@ EXPOSE 4000
 WORKDIR /usr/src/app
 
 CMD [ "sh", "/usr/src/app/startServer.sh" ]
-

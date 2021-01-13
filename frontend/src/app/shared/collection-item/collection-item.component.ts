@@ -6,7 +6,7 @@ import { FormGroup, FormControl } from "@angular/forms";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 import { MatDialog } from "@angular/material/dialog";
 
-import { DeleteConfirmationComponent } from "../user-details/delete-confirmation/delete-confirmation.component";
+import { DeleteCollectionComponent } from "../delete-collection/delete-collection.component";
 
 import { Subject } from "rxjs";
 
@@ -103,7 +103,7 @@ export class CollectionItemComponent implements OnInit {
     }
 
     deleteCollection() {
-        const dialog = this.dialog.open(DeleteConfirmationComponent, {
+        const dialog = this.dialog.open(DeleteCollectionComponent, {
             data: {
                 collectionSlug: this.item.identifier.collectionSlug
             }

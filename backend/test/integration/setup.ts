@@ -8,6 +8,9 @@ import { Observable } from "@apollo/client/core";
 import fs from "fs";
 import { before } from "mocha";
 import { RandomUuid } from "testcontainers/dist/uuid";
+import { createTestClient } from "./test-utils";
+import { RegistryStatus, RegistryStatusDocument } from "./registry-client";
+import { expect } from "chai";
 const maildev = require("maildev");
 
 let container: StartedTestContainer;
@@ -103,6 +106,17 @@ before(async function () {
     });
 });
 
+describe("Server should start", async function () {
+    it("Should return running status", async function () {
+        const client = createTestClient({});
+        const response = await client.query({
+            query: RegistryStatusDocument
+        });
+
+        expect(response.errors == null).equal(true);
+    });
+});
+
 after(async function () {
     this.timeout(30000);
 
@@ -118,7 +132,7 @@ after(async function () {
     let pids = pidtree(serverProcess.pid, { root: true });
 
     // recursively kill all child processes
-    (await pids).map((p) => {
+    (await pids).forEach((p) => {
         console.log("Killing process " + p);
         try {
             process.kill(p);

@@ -6,15 +6,15 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { MatButtonModule } from "@angular/material/button";
 
-import { DeleteConfirmationComponent } from "./delete-confirmation.component";
+import { DeletePackageComponent } from "./delete-package.component";
 
-describe("DeleteConfirmationComponent", () => {
-    let component: DeleteConfirmationComponent;
-    let fixture: ComponentFixture<DeleteConfirmationComponent>;
+describe("DeletePackageComponent", () => {
+    let component: DeletePackageComponent;
+    let fixture: ComponentFixture<DeletePackageComponent>;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [DeleteConfirmationComponent],
+            declarations: [DeletePackageComponent],
             imports: [
                 FormsModule,
                 MatDialogModule,
@@ -37,7 +37,7 @@ describe("DeleteConfirmationComponent", () => {
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(DeleteConfirmationComponent);
+        fixture = TestBed.createComponent(DeletePackageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
