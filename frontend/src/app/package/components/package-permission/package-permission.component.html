@@ -14,6 +14,11 @@
         <div class="ml-auto px-4 py-2 slide-right">
             <mat-slide-toggle
                 class="app-slide-toggle"
+                matTooltip="Can't edit visibility of a package inside a private catalog"
+                matTooltipPosition="above"
+                [matTooltipDisabled]="canEditVisibility"
+                aria-label="Edit package visibility"
+                [disabled]="!canEditVisibility"
                 [checked]="package?.isPublic"
                 (change)="updatePublic($event)"
             ></mat-slide-toggle>
@@ -31,7 +36,7 @@
     <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>User</th>
         <td class="table-content" mat-cell *matCellDef="let user">
-            <div style="display: flex; justify-content: start; align-content: center">
+            <div style="display: flex; justify-content: start; align-content: center;">
                 <a class="ml-2" [routerLink]="'/' + user.username"
                     ><app-avatar [user]="user" [size]="24"></app-avatar
                 ></a>

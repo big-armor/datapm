@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
 import { EditCatalogComponent } from "src/app/shared/edit-catalog/edit-catalog.component";
 import { PageState } from "src/app/models/page-state";
-import { DialogService } from "../../services/dialog.service";
+import { DialogService } from "../../services/dialog/dialog.service";
 import { DeletePackageComponent } from "../../shared/delete-package/delete-package.component";
 
 @Component({

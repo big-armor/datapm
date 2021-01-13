@@ -7,6 +7,8 @@ import { AuthenticationService } from "src/app/services/authentication.service";
 import { EditCatalogComponent } from "../../edit-catalog/edit-catalog.component";
 import { CreateCatalogComponent } from "../../create-catalog/create-catalog.component";
 import { DeleteCatalogComponent } from "../../delete-catalog/delete-catalog.component";
+import { DialogService } from "../../../services/dialog/dialog.service";
+import { MatSlideToggle, MatSlideToggleChange } from "@angular/material/slide-toggle";
 
 enum State {
     INIT,
@@ -41,7 +43,8 @@ export class UserCatalogsComponent implements OnInit {
         private updateCatalogGQL: UpdateCatalogGQL,
         private deleteCatalogGQL: DeleteCatalogGQL,
         private authenticationService: AuthenticationService,
-        private dialog: MatDialog
+        private dialog: MatDialog,
+        private dialogService: DialogService
     ) {}
 
     ngOnInit(): void {
@@ -64,19 +67,6 @@ export class UserCatalogsComponent implements OnInit {
                 this.myCatalogs = response.data.userCatalogs.catalogs as Catalog[];
                 this.catalogState = State.SUCCESS;
             });
-    }
-
-    updateCatalogVisibility(catalog: Catalog, isPublic: boolean) {
-        this.updateCatalogGQL
-            .mutate({
-                identifier: {
-                    catalogSlug: catalog.identifier.catalogSlug
-                },
-                value: {
-                    isPublic
-                }
-            })
-            .subscribe(() => {});
     }
 
     createCatalog(formValue) {
@@ -121,5 +111,36 @@ export class UserCatalogsComponent implements OnInit {
                     );
                 }
             });
+    }
+
+    public updateCatalogVisibility(catalog: Catalog, changeEvent: MatSlideToggleChange): void {
+        if (!changeEvent.checked) {
+            this.openPackagePrivateVisibilityChangeDialog(catalog, changeEvent.source);
+        } else {
+            this.executeUpdateOnCatalogVisibility(catalog, true);
+        }
+    }
+
+    private openPackagePrivateVisibilityChangeDialog(catalog: Catalog, toggle: MatSlideToggle): void {
+        this.dialogService.openCatalogVisibilityChangeConfirmationDialog().subscribe((confirmed) => {
+            if (confirmed) {
+                this.executeUpdateOnCatalogVisibility(catalog, false);
+            } else {
+                toggle.writeValue(true);
+            }
+        });
+    }
+
+    private executeUpdateOnCatalogVisibility(catalog: Catalog, isPublic: boolean): void {
+        this.updateCatalogGQL
+            .mutate({
+                identifier: {
+                    catalogSlug: catalog.identifier.catalogSlug
+                },
+                value: {
+                    isPublic
+                }
+            })
+            .subscribe(() => (catalog.isPublic = isPublic));
     }
 }

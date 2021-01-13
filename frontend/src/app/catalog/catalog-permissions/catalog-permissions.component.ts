@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, SimpleChanges } from "@angular/core";
+import { Component, Input, OnChanges, SimpleChanges } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 import { Router } from "@angular/router";
@@ -17,77 +17,49 @@ import {
 } from "src/generated/graphql";
 
 import { AddUserComponent } from "../add-user/add-user.component";
+import { DialogService } from "../../services/dialog/dialog.service";
 
 @Component({
     selector: "app-catalog-permissions",
     templateUrl: "./catalog-permissions.component.html",
     styleUrls: ["./catalog-permissions.component.scss"]
 })
-export class CatalogPermissionsComponent implements OnInit {
+export class CatalogPermissionsComponent implements OnChanges {
     @Input() catalog: Catalog;
 
+    public isCatalogPublic: boolean;
     public columnsToDisplay = ["name", "permission", "actions"];
     public users: any[] = [];
 
     constructor(
         private dialog: MatDialog,
+        private dialogService: DialogService,
         private authenticationService: AuthenticationService,
         private router: Router,
         private usersByCatalogGQL: UsersByCatalogGQL,
         private updateCatalogGQL: UpdateCatalogGQL,
         private setUserCatalogPermissionGQL: SetUserCatalogPermissionGQL,
         private deleteUserCatalogPermissionGQL: DeleteUserCatalogPermissionsGQL,
-        private snackBarService: SnackBarService,
-        private authSvc: AuthenticationService
+        private snackBarService: SnackBarService
     ) {}
 
-    ngOnInit(): void {}
-
-    ngOnChanges(changes: SimpleChanges) {
+    public ngOnChanges(changes: SimpleChanges): void {
         if (changes.catalog && changes.catalog.currentValue) {
-            this.catalog = changes.catalog.currentValue;
-            console.log(changes.catalog.currentValue);
+            this.setCatalogVariables(changes.catalog.currentValue);
             this.getUserList();
         }
     }
 
-    private getUserList() {
-        if (!this.catalog) {
-            return;
+    public updatePublic(ev: MatSlideToggleChange): void {
+        this.isCatalogPublic = ev.checked;
+        if (!ev.checked) {
+            this.openPackagePrivateVisibilityChangeDialog();
+        } else {
+            this.updateCatalogVisibility(true);
         }
-
-        this.usersByCatalogGQL
-            .watch({
-                identifier: {
-                    catalogSlug: this.catalog.identifier.catalogSlug
-                }
-            })
-            .valueChanges.subscribe(({ data }) => {
-                const currentUsername = this.authSvc.currentUser.value?.username;
-                this.users = data.usersByCatalog.map((item) => ({
-                    username: item.user.username,
-                    name: this.getUserName(item.user as User),
-                    permission: this.findHighestPermission(item.permissions)
-                }));
-            });
     }
 
-    public updatePublic(ev: MatSlideToggleChange) {
-        this.updateCatalogGQL
-            .mutate({
-                identifier: {
-                    catalogSlug: this.catalog.identifier.catalogSlug
-                },
-                value: {
-                    isPublic: ev.checked
-                }
-            })
-            .subscribe(({ data }) => {
-                this.catalog = data.updateCatalog as Catalog;
-            });
-    }
-
-    public addUser() {
+    public addUser(): void {
         const dialogRef = this.dialog.open(AddUserComponent, {
             data: this.catalog?.identifier.catalogSlug
         });
@@ -99,11 +71,11 @@ export class CatalogPermissionsComponent implements OnInit {
         });
     }
 
-    public updatePermission(username: string, permission: Permission) {
+    public updatePermission(username: string, permission: Permission): void {
         this.setUserPermission(username, this.getPermissionArrayFrom(permission));
     }
 
-    public removeUser(username: string) {
+    public removeUser(username: string): void {
         this.deleteUserCatalogPermissionGQL
             .mutate({
                 identifier: {
@@ -120,7 +92,51 @@ export class CatalogPermissionsComponent implements OnInit {
             });
     }
 
-    private setUserPermission(username: string, permissions: Permission[]) {
+    public editCatalog(): void {
+        this.dialog
+            .open(EditCatalogComponent, {
+                data: this.catalog
+            })
+            .afterClosed()
+            .subscribe((newCatalog: Catalog) => {
+                this.getUserList();
+            });
+    }
+
+    public deleteCatalog(): void {
+        const dlgRef = this.dialog.open(DeleteCatalogComponent, {
+            data: {
+                catalogSlug: this.catalog.identifier.catalogSlug
+            }
+        });
+
+        dlgRef.afterClosed().subscribe((confirmed: boolean) => {
+            if (confirmed)
+                this.router.navigate(["/" + this.authenticationService.currentUser.getValue().username + "#catalogs"]);
+        });
+    }
+
+    private getUserList(): void {
+        if (!this.catalog) {
+            return;
+        }
+
+        this.usersByCatalogGQL
+            .watch({
+                identifier: {
+                    catalogSlug: this.catalog.identifier.catalogSlug
+                }
+            })
+            .valueChanges.subscribe(({ data }) => {
+                this.users = data.usersByCatalog.map((item) => ({
+                    username: item.user.username,
+                    name: this.getUserName(item.user as User),
+                    permission: this.findHighestPermission(item.permissions)
+                }));
+            });
+    }
+
+    private setUserPermission(username: string, permissions: Permission[]): void {
         this.setUserCatalogPermissionGQL
             .mutate({
                 identifier: {
@@ -142,49 +158,54 @@ export class CatalogPermissionsComponent implements OnInit {
             });
     }
 
-    private findHighestPermission(userPermssions: Permission[]) {
+    private findHighestPermission(userPermissions: Permission[]): Permission {
         const permissions = [Permission.MANAGE, Permission.EDIT, Permission.VIEW];
-        for (let i = 0; i < permissions.length; i++) {
-            if (userPermssions.includes(permissions[i])) {
-                return permissions[i];
+
+        for (const permission of permissions) {
+            if (userPermissions.includes(permission)) {
+                return permission;
             }
         }
 
         return Permission.NONE;
     }
 
-    private getPermissionArrayFrom(permission: Permission) {
+    private getPermissionArrayFrom(permission: Permission): Permission[] {
         const permissions = [Permission.VIEW, Permission.EDIT, Permission.MANAGE];
         const index = permissions.findIndex((p) => p === permission);
         return permissions.slice(0, index + 1);
     }
 
-    private getUserName(user: User) {
-        const fullname = `${user.firstName || ""} ${user.lastName || ""}`.trim();
-        return fullname ? `${fullname} (${user.username})` : user.username;
+    private getUserName(user: User): string {
+        const fullName = `${user.firstName || ""} ${user.lastName || ""}`.trim();
+        return fullName ? `${fullName} (${user.username})` : user.username;
     }
 
-    public editCatalog() {
-        this.dialog
-            .open(EditCatalogComponent, {
-                data: this.catalog
-            })
-            .afterClosed()
-            .subscribe((newCatalog: Catalog) => {
-                this.getUserList();
-            });
-    }
-
-    public deleteCatalog() {
-        const dlgRef = this.dialog.open(DeleteCatalogComponent, {
-            data: {
-                catalogSlug: this.catalog.identifier.catalogSlug
+    private openPackagePrivateVisibilityChangeDialog(): void {
+        this.dialogService.openCatalogVisibilityChangeConfirmationDialog().subscribe((confirmed) => {
+            if (confirmed) {
+                this.updateCatalogVisibility(false);
+            } else {
+                this.isCatalogPublic = true;
             }
         });
+    }
 
-        dlgRef.afterClosed().subscribe((confirmed: boolean) => {
-            if (confirmed)
-                this.router.navigate(["/" + this.authenticationService.currentUser.getValue().username + "#catalogs"]);
-        });
+    private updateCatalogVisibility(isPublic: boolean): void {
+        this.updateCatalogGQL
+            .mutate({
+                identifier: {
+                    catalogSlug: this.catalog.identifier.catalogSlug
+                },
+                value: {
+                    isPublic
+                }
+            })
+            .subscribe(({ data }) => this.setCatalogVariables(data.updateCatalog as Catalog));
+    }
+
+    private setCatalogVariables(catalog: Catalog): void {
+        this.catalog = catalog;
+        this.isCatalogPublic = catalog.isPublic;
     }
 }

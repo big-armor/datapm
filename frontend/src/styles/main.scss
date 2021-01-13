@@ -312,3 +312,9 @@ mat-select {
 .mat-option {
     border-bottom: 1px solid $gray-6;
 }
+
+.mat-dialog-without-padding {
+    .mat-dialog-container {
+        padding: 0;
+    }
+}
