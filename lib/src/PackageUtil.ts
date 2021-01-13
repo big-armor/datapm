@@ -375,24 +375,6 @@ export function compatibilityToString(compatibility: Compability): string {
     }
 }
 
-/** Validate catalog slug */
-export function validateCatalogSlug(slug: string | undefined): boolean {
-    const regExp = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
-
-    if (slug === undefined) return false;
-
-    return !!slug.match(regExp);
-}
-
-/** Validate package slug */
-export function validatePackageSlug(slug: string | undefined): boolean {
-    const regExp = /^[a-z0-9]+(?:(?:(?:[._]|__|[-]*)[a-z0-9]+)+)?$/;
-
-    if (slug === undefined) return false;
-
-    return !!slug.match(regExp);
-}
-
 export function loadPackageFileFromDisk(packageFilePath: string): PackageFile {
     if (!fs.existsSync(packageFilePath)) throw new Error("FILE_NOT_FOUND");
 

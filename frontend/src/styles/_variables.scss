@@ -1,6 +1,7 @@
 $cover-height: 150px;
 $page-header-height: 136px;
 
+$black: #000;
 $white: #fff;
 $gray-1: #333;
 $gray-2: #4f4f4f;
@@ -9,6 +10,12 @@ $gray-4: #bdbdbd;
 $gray-5: #e0e0e0;
 $gray-6: #f2f2f2;
 $gray-7: #f9f9f9;
+$gray-8: #ccc;
+$gray-9: #ddd;
+$gray-10: #eee;
+
+$gray-color-8: rgba($gray-8, 0.85);
+$gray-color-3: rgba($gray-3, 0.73);
 
 $custom-gray-1: #aeaeae;
 $custom-gray-2: #f9f9f9;
@@ -34,3 +41,35 @@ $inner-shadow-1: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4p
     inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
 $inner-shadow-2: inset -4px 0px 4px rgba(130, 130, 130, 0.25), inset 0px -4px 4px rgba(130, 130, 130, 0.25),
     inset 4px 0px 4px rgba(51, 51, 51, 0.25), inset 0px 4px 4px rgba(51, 51, 51, 0.25);
+
+$text-shadow: 0px -4px 4px rgba(255, 255, 255, 0.25), -4px 0px 4px rgba(255, 255, 255, 0.25),
+    4px 0px 4px rgba(183, 183, 183, 0.25), 0px 4px 4px rgba(183, 183, 183, 0.25);
+
+$radio-outer-shadow: inset -2px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -2px 4px rgba(255, 255, 255, 0.25),
+    inset 0px 2px 4px rgba(189, 189, 189, 0.25), inset 2px 0px 4px rgba(189, 189, 189, 0.25);
+
+$family-roboto: Roboto, "Helvetica Neue", sans-serif;
+$family-roboto-mono: Roboto Mono;
+
+$weight-100: 100;
+$weight-200: ($weight-100 + 100);
+$weight-300: ($weight-100 + 200);
+$weight-400: ($weight-100 + 300);
+$weight-500: ($weight-100 + 400);
+$weight-600: ($weight-100 + 500);
+$weight-700: ($weight-100 + 600);
+$weight-800: ($weight-100 + 700);
+$weight-900: ($weight-100 + 800);
+
+$style-normal: normal;
+$style-italic: italic;
+$style-unset: unset;
+
+$xsmall-font: 10px;
+$small-font: 12px;
+$text-font: 14px;
+$default-font: 16px;
+$title-font: 20px;
+$logo-font: 31px;
+$dialog-font: 42px;
+$icon-font: 60px;

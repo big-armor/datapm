@@ -137,7 +137,7 @@
                                     </a>
                                 </li>
                             </ul>
-                            <hr style="width: 100%" />
+                            <hr style="width: 100%;" />
                         </div>
                     </div>
                     <div class="row" *ngIf="package?.latestVersion?.identifier != null">
@@ -146,7 +146,7 @@
                                 <div class="col-md-12" id="packageDetails">
                                     <div class="row flex-lg-row-reverse">
                                         <div
-                                            class="col-lg-5 col-md-12 col-lg-push-7 right-div d-none d-lg-block"
+                                            class="col-lg-5 col-md-12 col-lg-push-7 right-div d-lg-block"
                                             *ngIf="getActiveTab()?.showDetails"
                                         >
                                             <app-package-info

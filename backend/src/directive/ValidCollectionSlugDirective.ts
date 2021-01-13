@@ -11,7 +11,7 @@ import {
     GraphQLScalarType
 } from "graphql";
 import { AuthenticatedContext, Context } from "../context";
-import { validateCollectionSlug } from "datapm-lib";
+import { collectionSlugValid } from "datapm-lib";
 import { Kind } from "graphql";
 import { ValidationConstraint } from "./ValidationConstraint";
 import { ValidationType } from "./ValidationType";
@@ -46,13 +46,13 @@ export class ValidCollectionSlugDirective extends SchemaDirectiveVisitor {
 }
 
 export function validateSlug(slug: string | undefined) {
-    if (slug === undefined) throw new ValidationError(`COLLECTION_SLUG_REQUIRED`);
+    const validCollection = collectionSlugValid(slug);
 
-    if (slug.length == 0) throw new ValidationError(`COLLECTION_SLUG_REQUIRED`);
+    if (validCollection === "COLLECTION_SLUG_REQUIRED") throw new ValidationError(`COLLECTION_SLUG_REQUIRED`);
 
-    if (slug.length > 100) throw new ValidationError(`COLLECTION_SLUG_TOO_LONG`);
+    if (validCollection == "COLLECTION_SLUG_TOO_LONG") throw new ValidationError(`COLLECTION_SLUG_TOO_LONG`);
 
-    if (!validateCollectionSlug(slug)) throw new ValidationError("COLLECTION_SLUG_INVALID");
+    if (validCollection == "COLLECTION_SLUG_INVALID") throw new ValidationError("COLLECTION_SLUG_INVALID");
 }
 
 class CollectionSlugConstraint implements ValidationConstraint {

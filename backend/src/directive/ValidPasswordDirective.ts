@@ -15,6 +15,7 @@ import { Context } from "../context";
 import { INVALID_PASSWORD_ERROR } from "../generated/graphql";
 import { ValidationConstraint } from "./ValidationConstraint";
 import { ValidationType } from "./ValidationType";
+import { passwordValid } from "datapm-lib";
 
 export class ValidPasswordDirective extends SchemaDirectiveVisitor {
     visitArgumentDefinition(
@@ -54,21 +55,21 @@ export class ValidPasswordDirective extends SchemaDirectiveVisitor {
     }
 }
 
-export function validatePassword(password: String | undefined): void {
-    const regex = /[0-9@#$%!]/;
+export function validatePassword(password: string | undefined): void {
+    const passwordValidResponse = passwordValid(password);
 
-    if (password === undefined || password.length == 0) {
+    if (passwordValidResponse === "PASSWORD_REQUIRED") {
         throw new ValidationError(INVALID_PASSWORD_ERROR.PASSWORD_REQUIRED);
     }
-    if (password.length > 99) {
+    if (passwordValidResponse === "PASSWORD_TOO_LONG") {
         throw new ValidationError(INVALID_PASSWORD_ERROR.PASSWORD_TOO_LONG);
     }
 
-    if (password.length < 8) {
+    if (passwordValidResponse === "PASSWORD_TOO_SHORT") {
         throw new ValidationError(INVALID_PASSWORD_ERROR.PASSWORD_TOO_SHORT);
     }
 
-    if (password.length < 16 && password.match(regex) == null) {
+    if (passwordValidResponse === "INVALID_CHARACTERS") {
         throw new ValidationError(INVALID_PASSWORD_ERROR.INVALID_CHARACTERS);
     }
 }
@@ -77,7 +78,7 @@ export class PasswordConstraint implements ValidationConstraint {
         return "Password";
     }
 
-    validate(value: String) {
+    validate(value: string) {
         validatePassword(value);
     }
 

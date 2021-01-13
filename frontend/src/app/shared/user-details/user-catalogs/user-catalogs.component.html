@@ -18,20 +18,21 @@
         </ng-container>
 
         <table
+            aria-describedby="catalogTable"
             *ngIf="catalogState === State.SUCCESS && myCatalogs && myCatalogs.length > 0"
             mat-table
             [dataSource]="myCatalogs"
         >
             <!-- Label column -->
             <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef>Name</th>
+                <th scope="col" mat-header-cell *matHeaderCellDef>Name</th>
                 <td class="table-content" mat-cell *matCellDef="let catalog">
                     <a [routerLink]="['/' + catalog.identifier.catalogSlug]">{{ catalog.displayName }}</a>
                 </td>
             </ng-container>
 
             <ng-container matColumnDef="public">
-                <th mat-header-cell *matHeaderCellDef>Public</th>
+                <th scope="col" mat-header-cell *matHeaderCellDef>Public</th>
                 <td class="table-content" mat-cell *matCellDef="let catalog">
                     <mat-slide-toggle
                         class="app-slide-toggle"
@@ -44,7 +45,7 @@
 
             <!-- Actions column -->
             <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <th scope="col" mat-header-cell *matHeaderCellDef>Actions</th>
                 <td mat-cell *matCellDef="let catalog">
                     <a class="app-outlined-button mr-3" (click)="editCatalog(catalog)">Edit</a>
                     <a class="app-outlined-button" (click)="deleteCatalog(catalog)">Delete</a>
