@@ -7,7 +7,7 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
 import { MatIconModule } from "@angular/material/icon";
 import { MatMenuModule } from "@angular/material/menu";
-import { MatDialogModule } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialogModule } from "@angular/material/dialog";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { MatStepperModule } from "@angular/material/stepper";
@@ -50,7 +50,8 @@ import { SimpleCreateComponent } from "./user-details/simple-create/simple-creat
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { DeletePackageComponent } from "./delete-package/delete-package.component";
-import { MatSelect, MatSelectModule } from "@angular/material/select";
+import { MatSelectModule } from "@angular/material/select";
+import { FancyConfirmationDialogComponent } from "./dialogs/fancy-confirmation-dialog/fancy-confirmation-dialog.component";
 
 @NgModule({
     declarations: [
@@ -87,7 +88,8 @@ import { MatSelect, MatSelectModule } from "@angular/material/select";
         EditPasswordDialogComponent,
         UserDetailsComponent,
         SimpleCreateComponent,
-        DeletePackageComponent
+        DeletePackageComponent,
+        FancyConfirmationDialogComponent
     ],
     imports: [
         CommonModule,
@@ -139,8 +141,9 @@ import { MatSelect, MatSelectModule } from "@angular/material/select";
         UserPackagesComponent,
         EditAccountDialogComponent,
         EditPasswordDialogComponent,
-        UserDetailsComponent
+        UserDetailsComponent,
+        FancyConfirmationDialogComponent
     ],
-    providers: [TimeAgoPipe]
+    providers: [TimeAgoPipe, { provide: MAT_DIALOG_DATA, useValue: {} }]
 })
 export class SharedModule {}

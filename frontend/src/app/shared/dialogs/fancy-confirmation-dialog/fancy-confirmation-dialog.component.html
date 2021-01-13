@@ -1,0 +1,17 @@
+<div class="fixActionRow">
+    <h1 mat-dialog-title>{{ title }}</h1>
+    <mat-dialog-content>
+        <div class="description" *ngIf="warning">
+            <h4>{{ warning }}</h4>
+        </div>
+        <div class="content">
+            <p [innerHTML]="content"></p>
+        </div>
+    </mat-dialog-content>
+
+    <div class="spacer"></div>
+    <mat-dialog-actions>
+        <button mat-button (click)="confirm()" class="mat-flat-button confirm-button">Confirm</button>
+        <button mat-button (click)="close()" class="mat-flat-button cancel-button">Cancel</button>
+    </mat-dialog-actions>
+</div>

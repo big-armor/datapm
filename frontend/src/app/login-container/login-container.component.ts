@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 // import { MatDialogRef } from "@angular/material/dialog";
-import { DialogService } from "../services/dialog.service";
+import { DialogService } from "../services/dialog/dialog.service";
 // import { LoginDialogComponent } from "../shared/header/login-dialog/login-dialog.component";
 
 @Component({

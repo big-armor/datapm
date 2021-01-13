@@ -31,6 +31,7 @@ import { PackagePermissionComponent } from "./components/package-permission/pack
 import { AddUserComponent } from "./components/add-user/add-user.component";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { PackageDeletionConfirmationComponent } from "./components/package/package-deletion-confirmation/package-deletion-confirmation.component";
+import { MatTooltipModule } from "@angular/material/tooltip";
 
 @NgModule({
     declarations: [
@@ -65,7 +66,8 @@ import { PackageDeletionConfirmationComponent } from "./components/package/packa
         SharedModule,
         ScrollingModule,
         TableVirtualScrollModule,
-        MarkdownModule.forChild()
+        MarkdownModule.forChild(),
+        MatTooltipModule
     ]
 })
 export class PackageModule {}
