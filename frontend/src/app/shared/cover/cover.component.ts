@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from "@angular/core";
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { FileService } from "src/app/services/file.service";
@@ -10,7 +10,7 @@ import { User } from "src/generated/graphql";
     templateUrl: "./cover.component.html",
     styleUrls: ["./cover.component.scss"]
 })
-export class CoverComponent implements OnInit {
+export class CoverComponent implements OnChanges {
     @Input() username: string;
     @Input() catalogSlug: string;
     @Input() collectionSlug: string;
@@ -36,9 +36,7 @@ export class CoverComponent implements OnInit {
         });
     }
 
-    ngOnInit(): void {}
-
-    ngOnChanges(changes: SimpleChanges) {
+    public ngOnChanges(changes: SimpleChanges): void {
         if (changes.username && changes.username.currentValue) {
             this.fetchImage();
         } else if (changes.packageSlug && changes.packageSlug.currentValue) {
@@ -50,7 +48,7 @@ export class CoverComponent implements OnInit {
         }
     }
 
-    uploadFile() {
+    public uploadFile(): void {
         this.inputEventId = this.fileService.openFile("image/jpeg");
     }
 
@@ -68,9 +66,12 @@ export class CoverComponent implements OnInit {
             return;
         }
 
-        imageObservable.subscribe(
-            (imgData: any) => (this.imgData = imgData),
-            () => (this.imgData = this.defaultCover)
-        );
+        imageObservable.pipe(takeUntil(this.unsubscribe$)).subscribe((imgData: any) => {
+            if (imgData) {
+                this.imgData = imgData;
+            } else {
+                this.imgData = this.defaultCover;
+            }
+        });
     }
 }
