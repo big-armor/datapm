@@ -18,25 +18,25 @@
             API Keys are for authenticating your <a href="/docs/command-line-client/">DataPM Command Line Client</a>,
             and custom software development projects using the <a href="/docs/registry-api/">DataPM Registry API</a>.
         </div>
-        <table *ngIf="myAPIKeys && myAPIKeys.length > 0" mat-table [dataSource]="myAPIKeys">
+        <table *ngIf="myAPIKeys && myAPIKeys.length > 0" mat-table [dataSource]="myAPIKeys" aria-describedby="apiTable">
             <ng-container matColumnDef="label">
-                <th mat-header-cell *matHeaderCellDef>Label</th>
+                <th scope="col" mat-header-cell *matHeaderCellDef>Label</th>
                 <td class="table-content" mat-cell *matCellDef="let apiKey">{{ apiKey.label }}</td>
             </ng-container>
             <ng-container matColumnDef="created">
-                <th mat-header-cell *matHeaderCellDef>Created</th>
+                <th scope="col" mat-header-cell *matHeaderCellDef>Created</th>
                 <td mat-cell *matCellDef="let apiKey">
                     {{ getMoment(apiKey.createdAt) }}
                 </td>
             </ng-container>
             <ng-container matColumnDef="lastUsed">
-                <th mat-header-cell *matHeaderCellDef>Last Used</th>
+                <th scope="col" mat-header-cell *matHeaderCellDef>Last Used</th>
                 <td mat-cell *matCellDef="let apiKey">
                     {{ getMoment(apiKey.lastUsed) }}
                 </td>
             </ng-container>
             <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <th scope="col" mat-header-cell *matHeaderCellDef>Actions</th>
                 <td mat-cell *matCellDef="let apiKey">
                     <a class="app-outlined-button" (click)="deleteApiKey(apiKey.id)"> delete </a>
                 </td>

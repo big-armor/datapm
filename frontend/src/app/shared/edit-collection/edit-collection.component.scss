@@ -1,63 +1,70 @@
-app-cover {
-    display: block;
-    height: 150px;
+@import "../../../styles/variables";
 
-    ::ng-deep > div {
-        height: 100%;
-    }
-}
-.mat-dialog-content {
-    max-height: calc(100vh - 130px);
-    padding-left: 0px !important;
-    padding-right: 0px !important;
-    padding-bottom: 0px !important;
-}
-form {
+#editCollection {
     min-width: 700px;
     position: relative;
     top: -24px;
-}
-.app-raised-button {
-    width: 100px;
-}
-.form-field {
-    box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
-        0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
-    .label {
-        font-family: Roboto Mono;
-        font-style: normal;
-        font-weight: normal;
-        font-size: 14px;
-        line-height: 18px;
-        letter-spacing: -0.28px;
-        color: #4f4f4f;
-        width: 275px;
+
+    .app-raised-button {
+        width: 100px;
     }
 
-    app-input ::ng-deep {
-        input {
-            height: 35px;
-            border: none !important;
-            font-family: Roboto Mono;
-            font-style: normal;
-            font-weight: normal;
-            font-size: 14px;
-            line-height: 18px;
-            display: flex;
-            align-items: flex-end;
-            letter-spacing: -0.28px;
-            color: #017fb9;
-            box-shadow: none;
-            padding-left: 0.5rem;
+    .mat-dialog-actions {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .mat-dialog-content {
+        max-height: calc(100vh - 130px);
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+        padding-bottom: 0px !important;
+
+        app-cover {
+            display: block;
+            height: 150px;
+
+            ::ng-deep > div {
+                height: 100%;
+            }
         }
-        .text-danger {
-            font-size: 10px;
-            line-height: 12px;
+
+        .form-field {
+            box-shadow: $outer-shadow-1;
+
+            .label {
+                font-family: $family-roboto-mono;
+                font-style: $style-normal;
+                font-weight: $weight-400;
+                font-size: $text-font;
+                line-height: 18px;
+                letter-spacing: -0.28px;
+                color: $gray-2;
+                width: 275px;
+            }
+
+            app-input {
+                input {
+                    height: 35px;
+                    border: none !important;
+                    font-family: $family-roboto-mono;
+                    font-style: $style-normal;
+                    font-weight: $weight-400;
+                    font-size: $text-font;
+                    line-height: 18px;
+                    display: flex;
+                    align-items: flex-end;
+                    letter-spacing: -0.28px;
+                    color: $color-info;
+                    box-shadow: none;
+                    padding-left: 0.5rem;
+                }
+
+                .text-danger {
+                    font-size: $xsmall-font;
+                    line-height: 12px;
+                }
+            }
         }
     }
-}
-
-.mat-dialog-actions {
-    display: flex;
-    justify-content: flex-end;
 }

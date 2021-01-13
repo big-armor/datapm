@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container" id="userDetails">
     <app-user-details-header [user]="user"></app-user-details-header>
     <ul class="p-0 tabs">
         <li *ngFor="let tab of tabs; let i = index" class="list-names" (click)="selectTab(tab.value)">

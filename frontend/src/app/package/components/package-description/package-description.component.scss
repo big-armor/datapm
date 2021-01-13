@@ -1,27 +1,30 @@
+@import "../../../../styles/variables";
+
 .package-dark-gray {
-    font-family: Roboto Mono;
-    font-style: normal;
-    font-weight: 300;
-    font-size: 14px;
+    font-family: $family-roboto-mono;
+    font-style: $style-normal;
+    font-weight: $weight-300;
+    font-size: $text-font;
     line-height: 18px;
     letter-spacing: -0.28px;
-    color: #4f4f4f;
+    color: $gray-2;
     margin-bottom: 5px;
 }
 
 .title {
-    font-size: 20px;
+    font-size: $title-font;
     line-height: 26px;
-    font-weight: 500;
+    font-weight: $weight-300;
     letter-spacing: -0.28px;
-    color: #4f4f4f;
+    color: $gray-2;
     margin-bottom: 10px;
 }
 
 markdown ::ng-deep {
     p {
-        color: #4f4f4f;
-        font-family: Roboto Mono;
-        font-weight: 300;
+        color: $gray-2;
+        font-family: $family-roboto-mono;
+        font-style: $style-normal;
+        font-weight: $weight-300;
     }
 }

@@ -2,7 +2,7 @@
     <div class="dialog-close-wrapper">
         <button mat-button mat-dialog-close class="dialog-close">close</button>
     </div>
-    <h1 class="dialog-title">datapm</h1>
+    <h1 class="dialog-title pb-2">datapm</h1>
 
     <div *ngIf="state != State.SUCCESS">
         <form [formGroup]="signUpForm" (ngSubmit)="formSubmit()">
