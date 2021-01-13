@@ -35,7 +35,12 @@
                 </div>
 
                 <!-- Package without thumbnail -->
-                <table *ngIf="collections && collections.length > 0" mat-table [dataSource]="collections" aria-describedby="collectionsTable">
+                <table
+                    *ngIf="collections && collections.length > 0"
+                    mat-table
+                    [dataSource]="collections"
+                    aria-describedby="collectionsTable"
+                >
                     <!-- Label column -->
                     <ng-container matColumnDef="name">
                         <th scope="col" mat-header-cell *matHeaderCellDef>Name</th>

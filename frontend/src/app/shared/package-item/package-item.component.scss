@@ -3,11 +3,11 @@
 .package-item {
     cursor: pointer;
     box-shadow: $outer-shadow-1;
-    background-color:$gray-7;
+    background-color: $gray-7;
     transition: background-color 0.5s ease;
 
     &:hover {
-        background-color:$white;
+        background-color: $white;
         transition: background-color 0.5s ease;
     }
 

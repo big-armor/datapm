@@ -17,7 +17,8 @@
             </div>
         </ng-container>
 
-        <table aria-describedby="catalogTable"
+        <table
+            aria-describedby="catalogTable"
             *ngIf="catalogState === State.SUCCESS && myCatalogs && myCatalogs.length > 0"
             mat-table
             [dataSource]="myCatalogs"

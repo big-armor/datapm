@@ -1,4 +1,4 @@
-@import '../../../styles/variables';
+@import "../../../styles/variables";
 
 #createCollection {
     position: relative;
@@ -43,7 +43,7 @@
                 font-family: $family-roboto-mono;
                 font-style: $style-normal;
                 font-weight: $weight-300;
-                font-size:  ($default-font + 2);
+                font-size: ($default-font + 2);
                 line-height: 24px;
                 display: flex;
                 align-items: center;

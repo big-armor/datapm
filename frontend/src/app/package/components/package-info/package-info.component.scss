@@ -1,4 +1,4 @@
-@import '../../../../styles/variables';
+@import "../../../../styles/variables";
 
 #packageInfo {
     .doc-link {
@@ -50,6 +50,6 @@
 
 @media (max-width: 768px) {
     .d-md-block {
-        display: none!important;
+        display: none !important;
     }
 }
