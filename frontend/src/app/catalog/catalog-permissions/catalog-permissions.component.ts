@@ -52,11 +52,7 @@ export class CatalogPermissionsComponent implements OnChanges {
 
     public updatePublic(ev: MatSlideToggleChange): void {
         this.isCatalogPublic = ev.checked;
-        if (!ev.checked) {
-            this.openPackagePrivateVisibilityChangeDialog();
-        } else {
-            this.updateCatalogVisibility(true);
-        }
+        this.openPackageVisibilityChangeDialog(ev.checked);
     }
 
     public addUser(): void {
@@ -181,12 +177,12 @@ export class CatalogPermissionsComponent implements OnChanges {
         return fullName ? `${fullName} (${user.username})` : user.username;
     }
 
-    private openPackagePrivateVisibilityChangeDialog(): void {
-        this.dialogService.openCatalogVisibilityChangeConfirmationDialog().subscribe((confirmed) => {
+    private openPackageVisibilityChangeDialog(isPublic: boolean): void {
+        this.dialogService.openCatalogVisibilityChangeConfirmationDialog(isPublic).subscribe((confirmed) => {
             if (confirmed) {
-                this.updateCatalogVisibility(false);
+                this.updateCatalogVisibility(isPublic);
             } else {
-                this.isCatalogPublic = true;
+                this.isCatalogPublic = !isPublic;
             }
         });
     }

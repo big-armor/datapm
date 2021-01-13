@@ -19,6 +19,7 @@ import {
 import { PackageResponse, PackageService } from "../../services/package.service";
 import { AddUserComponent } from "../add-user/add-user.component";
 import { ConfirmationDialogService } from "../../../services/dialog/confirmation-dialog.service";
+import { DialogService } from "../../../services/dialog/dialog.service";
 
 @Component({
     selector: "app-package-permission",
@@ -44,7 +45,7 @@ export class PackagePermissionComponent implements OnInit {
         private route: ActivatedRoute,
         private snackBar: SnackBarService,
         private authenticationService: AuthenticationService,
-        private confirmationDialogService: ConfirmationDialogService
+        private dialogService: DialogService
     ) {}
 
     public ngOnInit(): void {
@@ -100,12 +101,12 @@ export class PackagePermissionComponent implements OnInit {
         return this.package?.myPermissions.includes(Permission.MANAGE);
     }
 
-    public updatePublic(ev: MatSlideToggleChange): void {
+    public updatePublic(changeEvent: MatSlideToggleChange): void {
         if (!this.canEditVisibility) {
             return;
         }
 
-        this.updatePackageVisibility(ev.checked);
+        this.updatePackageVisibility(changeEvent);
     }
 
     public get canEditVisibility(): boolean {
@@ -199,17 +200,26 @@ export class PackagePermissionComponent implements OnInit {
         return fullName ? `${fullName} (${user.username})` : user.username;
     }
 
-    private updatePackageVisibility(isPublic: boolean): void {
-        this.updatePackage
-            .mutate({
-                identifier: {
-                    catalogSlug: this.package.identifier.catalogSlug,
-                    packageSlug: this.package.identifier.packageSlug
-                },
-                value: {
-                    isPublic
+    private updatePackageVisibility(changeEvent: MatSlideToggleChange): void {
+        this.dialogService
+            .openPackageVisibilityChangeConfirmationDialog(changeEvent.checked)
+            .subscribe((confirmation) => {
+                if (!confirmation) {
+                    changeEvent.source.writeValue(!changeEvent.checked);
+                    return;
                 }
-            })
-            .subscribe(({ errors, data }) => (this.package.isPublic = isPublic));
+
+                this.updatePackage
+                    .mutate({
+                        identifier: {
+                            catalogSlug: this.package.identifier.catalogSlug,
+                            packageSlug: this.package.identifier.packageSlug
+                        },
+                        value: {
+                            isPublic: changeEvent.checked
+                        }
+                    })
+                    .subscribe(({ errors, data }) => (this.package.isPublic = changeEvent.checked));
+            });
     }
 }

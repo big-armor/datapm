@@ -114,19 +114,11 @@ export class UserCatalogsComponent implements OnInit {
     }
 
     public updateCatalogVisibility(catalog: Catalog, changeEvent: MatSlideToggleChange): void {
-        if (!changeEvent.checked) {
-            this.openPackagePrivateVisibilityChangeDialog(catalog, changeEvent.source);
-        } else {
-            this.executeUpdateOnCatalogVisibility(catalog, true);
-        }
-    }
-
-    private openPackagePrivateVisibilityChangeDialog(catalog: Catalog, toggle: MatSlideToggle): void {
-        this.dialogService.openCatalogVisibilityChangeConfirmationDialog().subscribe((confirmed) => {
+        this.dialogService.openCatalogVisibilityChangeConfirmationDialog(changeEvent.checked).subscribe((confirmed) => {
             if (confirmed) {
-                this.executeUpdateOnCatalogVisibility(catalog, false);
+                this.executeUpdateOnCatalogVisibility(catalog, changeEvent.checked);
             } else {
-                toggle.writeValue(true);
+                changeEvent.source.writeValue(!changeEvent.checked);
             }
         });
     }
