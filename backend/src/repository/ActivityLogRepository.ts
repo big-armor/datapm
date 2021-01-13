@@ -4,6 +4,7 @@ import { ActivityLogChangeType, ActivityLogEventType } from "../entity/ActivityL
 import { Catalog } from "../entity/Catalog";
 import { Collection } from "../entity/Collection";
 import { Package } from "../entity/Package";
+import { User } from "../entity/User";
 import { Version } from "../entity/Version";
 
 export interface ActivityLogTemp {
@@ -20,9 +21,16 @@ export interface ActivityLogTemp {
 /** Creates a new ActivityLog entry in the database, and logs it */
 export async function createActivityLog(connection: EntityManager | Connection, activityLogTemp: ActivityLogTemp) {
     const activityLog = new ActivityLog();
-    activityLog.userId = activityLogTemp.userId;
     activityLog.eventType = activityLogTemp.eventType;
     activityLog.changeType = activityLogTemp.changeType;
+
+    if (activityLogTemp.userId) {
+        activityLog.userId = activityLogTemp.userId;
+
+        const user = await connection.getRepository(User).findOneOrFail({ id: activityLogTemp.userId });
+
+        activityLog.username = user.username;
+    }
 
     if (activityLogTemp.targetPackageId) {
         activityLog.targetPackageId = activityLogTemp.targetPackageId;

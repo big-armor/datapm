@@ -63,4 +63,6 @@ export class ActivityLog extends BaseModel {
     public targetVersionNumber?: string;
     public targetCatalogSlug?: string;
     public targetCollectionSlug?: string;
+    public username?: string;
+    public targetUsername?: string;
 }
