@@ -13,6 +13,8 @@ $gray-7: #f9f9f9;
 $gray-8: #ccc;
 $gray-9: #ddd;
 $gray-10: #eee;
+$gray-11: #f3f3f3;
+$gray-12: #ededed;
 
 $gray-color-8: rgba($gray-8, 0.85);
 $gray-color-3: rgba($gray-3, 0.73);
@@ -47,6 +49,9 @@ $text-shadow: 0px -4px 4px rgba(255, 255, 255, 0.25), -4px 0px 4px rgba(255, 255
 
 $radio-outer-shadow: inset -2px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -2px 4px rgba(255, 255, 255, 0.25),
     inset 0px 2px 4px rgba(189, 189, 189, 0.25), inset 2px 0px 4px rgba(189, 189, 189, 0.25);
+
+$footer-shadow: 4px 0px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(255, 255, 255, 0.25),
+    0px -4px 4px rgba(189, 189, 189, 0.25), -4px 0px 4px rgba(189, 189, 189, 0.25);
 
 $family-roboto: Roboto, "Helvetica Neue", sans-serif;
 $family-roboto-mono: Roboto Mono;

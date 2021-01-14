@@ -14,6 +14,7 @@
                     [group]="signUpForm"
                     controlName="emailAddress"
                     inputType="email"
+                    class="rounded-input"
                     [error]="signUpForm | inputError: 'emailAddress':errorMessages['emailAddress'] | async"
                 ></app-input>
                 <br />
@@ -23,6 +24,7 @@
                     [group]="signUpForm"
                     controlName="password"
                     inputType="password"
+                    class="rounded-input"
                     [error]="signUpForm | inputError: 'password' | async"
                 ></app-input>
 
@@ -32,6 +34,7 @@
                     [group]="signUpForm"
                     controlName="username"
                     inputType="text"
+                    class="rounded-input"
                     [error]="signUpForm | inputError: 'username':errorMessages['username'] | async"
                 ></app-input>
             </div>

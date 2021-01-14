@@ -11,6 +11,7 @@
                             <app-input
                                 placeholder="Search For Data"
                                 [control]="searchControl"
+                                class="rounded-input"
                                 matInput
                                 [matAutocomplete]="auto"
                             ></app-input>
@@ -122,9 +123,10 @@
             </div>
         </div>
     </div>
-    <div class="row pt-3 px-3">
+    <div class="row px-3">
         <div class="col-12 mobile-search-box mt-3">
             <app-input
+                class="rounded-input"
                 placeholder="Search For Data"
                 [control]="searchControl"
                 [matAutocomplete]="autoCompleteMobile"

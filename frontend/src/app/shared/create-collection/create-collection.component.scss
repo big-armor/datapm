@@ -4,25 +4,13 @@
     position: relative;
     min-width: 500px;
 
-    .mat-dialog-title {
-        font-family: $family-roboto-mono;
-        font-style: $style-normal;
-        font-weight: $weight-300;
-    }
-
-    .mat-dialog-content {
-        padding-left: 0px !important;
-        padding-right: 0px !important;
-        padding-bottom: 0px !important;
-        max-height: calc(100vh - 130px);
-    }
-
     .div-with-errors {
         max-width: 346px;
         font-family: $family-roboto-mono;
         font-style: $style-normal;
         font-weight: $weight-400;
-        padding-left: 10px;
+        padding-left: 2px;
+        padding-top: 3px;
         font-size: $xsmall-font;
         color: $color-danger;
         line-height: 12px;
@@ -31,115 +19,17 @@
     .mat-dialog-actions {
         padding: 0px;
         margin: 0;
-
-        .save-btn {
-            position: relative;
-            top: 10px;
-            padding: 5px 20px;
-            box-shadow: $outer-shadow-1;
-            border-radius: 24px;
-
-            span {
-                font-family: $family-roboto-mono;
-                font-style: $style-normal;
-                font-weight: $weight-300;
-                font-size: ($default-font + 2);
-                line-height: 24px;
-                display: flex;
-                align-items: center;
-                text-align: center;
-                letter-spacing: -0.28px;
-                color: $gray-3;
-            }
-        }
-    }
-
-    .shadow-div {
-        box-shadow: $outer-shadow-1;
-
-        .div-question {
-            font-family: $family-roboto-mono;
-            font-style: $style-normal;
-            font-weight: $weight-400;
-            font-size: $text-font;
-            line-height: 18px;
-            letter-spacing: -0.28px;
-            color: $gray-2;
-            width: 245px;
-        }
-
-        .div-answer {
-            width: 100%;
-
-            textarea {
-                border: none !important;
-                font-family: $family-roboto-mono;
-                font-style: $style-normal;
-                font-weight: $weight-400;
-                font-size: $text-font;
-                display: flex;
-                align-items: flex-end;
-                letter-spacing: -0.28px;
-                color: $color-info;
-
-                &:focus {
-                    outline: transparent solid 0px;
-                    box-shadow: none;
-                }
-
-                &::placeholder {
-                    font-family: $family-roboto-mono;
-                    font-style: $style-normal;
-                    font-weight: $weight-400;
-                    font-size: $text-font;
-                    line-height: 18px;
-                    display: flex;
-                    align-items: flex-end;
-                    letter-spacing: -0.28px;
-                    color: $gray-3;
-                }
-            }
-
-            input {
-                height: 35px;
-                border: none !important;
-                font-family: $family-roboto-mono;
-                font-style: $style-normal;
-                font-weight: $weight-400;
-                font-size: $text-font;
-                line-height: 18px;
-                display: flex;
-                align-items: flex-end;
-                letter-spacing: -0.28px;
-                color: $color-info;
-
-                &:focus {
-                    outline: transparent solid 0px;
-                    box-shadow: none;
-                }
-
-                &::placeholder {
-                    font-family: $family-roboto-mono;
-                    font-style: $style-normal;
-                    font-weight: $weight-300;
-                    font-size: $text-font;
-                    line-height: 18px;
-                    display: flex;
-                    align-items: flex-end;
-                    letter-spacing: -0.28px;
-                    color: $gray-3;
-                }
-            }
-        }
     }
 }
 
-.disabled {
-    background-color: $gray-color-8;
-    pointer-events: none;
-    opacity: 0.6;
+@media (max-width: 768px) {
+    #createCollection {
+        min-width: 400px;
+    }
+}
 
-    .btn-text {
-        color: $gray-color-3;
+@media (max-width: 576px) {
+    #createCollection {
+        min-width: 260px;
     }
 }

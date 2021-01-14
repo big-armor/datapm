@@ -2,8 +2,8 @@
 
 #editAccount {
     position: relative;
-    min-width: 700px;
-    top: -24px;
+    min-width: 800px;
+    top: -14px;
 
     ::ng-deep.mat-checked {
         .mat-slide-toggle-bar {
@@ -16,11 +16,7 @@
     }
 
     .mat-dialog-content {
-        padding-left: 0px !important;
-        padding-right: 0px !important;
-        padding-bottom: 0px !important;
-        max-height: calc(100vh - 130px);
-
+        border-top: none;
         .dialog-content-text {
             position: relative;
 
@@ -44,134 +40,34 @@
                 padding-right: 24px;
                 color: $gray-4;
             }
-
-            .shadow-div {
-                .div-question {
-                    font-family: $family-roboto-mono;
-                    font-style: $style-normal;
-                    font-weight: $weight-400;
-                    font-size: $text-font;
-                    line-height: 18px;
-                    letter-spacing: -0.28px;
-                    color: $gray-2;
-                    width: 165px;
-                }
-
-                .div-answer {
-                    width: 100%;
-                    textarea {
-                        width: 100%;
-                        border-radius: 6px;
-                        padding: 10px 15px;
-                        border: none !important;
-                        font-family: $family-roboto-mono;
-                        font-style: $style-normal;
-                        font-weight: $weight-400;
-                        font-size: $text-font;
-                        display: flex;
-                        align-items: flex-end;
-                        letter-spacing: -0.28px;
-                        color: $color-info;
-
-                        &:focus {
-                            outline: transparent solid 0px;
-                            box-shadow: none;
-                        }
-
-                        &::placeholder {
-                            font-family: $family-roboto-mono;
-                            font-style: $style-normal;
-                            font-weight: $weight-300;
-                            font-size: $text-font;
-                            line-height: 18px;
-                            display: flex;
-                            align-items: flex-end;
-                            letter-spacing: -0.28px;
-                            color: $gray-4;
-                        }
-                    }
-
-                    input {
-                        height: 35px;
-                        width: 100%;
-                        border-radius: 6px;
-                        padding: 0px 15px;
-                        border: none !important;
-                        font-family: $family-roboto-mono;
-                        font-style: $style-normal;
-                        font-weight: $weight-400;
-                        font-size: $text-font;
-                        line-height: 18px;
-                        display: flex;
-                        align-items: flex-end;
-                        letter-spacing: -0.28px;
-                        color: $color-info;
-
-                        &:focus {
-                            outline: transparent solid 0px;
-                            box-shadow: none;
-                        }
-
-                        &::placeholder {
-                            font-family: $family-roboto-mono;
-                            font-style: $style-normal;
-                            font-weight: $weight-300;
-                            font-size: $text-font;
-                            line-height: 18px;
-                            display: flex;
-                            align-items: flex-end;
-                            letter-spacing: -0.28px;
-                            color: $gray-4;
-                        }
-                    }
-                }
-
-                .div-with-errors {
-                    max-width: 346px;
-                    font-family: $family-roboto-mono;
-                    font-style: $style-normal;
-                    font-weight: $weight-400;
-                    padding-left: 10px;
-                    font-size: $xsmall-font;
-                    color: $color-danger;
-                    line-height: 12px;
-                }
-            }
         }
     }
 
     .mat-dialog-actions {
-        padding: 0px;
         min-height: unset;
-
-        .save-btn {
-            position: relative;
-            top: 10px;
-            padding: 5px 20px;
-            box-shadow: $outer-shadow-1;
-            border-radius: 24px;
-
-            span {
-                font-family: $family-roboto-mono;
-                font-style: $style-normal;
-                font-weight: $weight-300;
-                font-size: ($default-font + 2);
-                line-height: 24px;
-                display: flex;
-                align-items: center;
-                text-align: center;
-                letter-spacing: -0.28px;
-                color: $gray-3;
-            }
-        }
     }
+}
 
-    .disabled {
-        background-color: $gray-color-8;
-        pointer-events: none;
-        opacity: 0.6;
-        .btn-text {
-            color: $gray-color-3;
-        }
+@media (max-width: 1076px) {
+    #editAccount {
+        min-width: 600px;
+    }
+}
+
+@media (max-width: 992px) {
+    #editAccount {
+        min-width: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+    .div-question {
+        padding-left: 0px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    #editAccount {
+        min-width: 200px;
     }
 }
