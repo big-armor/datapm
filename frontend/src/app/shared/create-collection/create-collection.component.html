@@ -1,30 +1,35 @@
 <div class="container">
     <div class="row">
-            <form id="createCollection" [formGroup]="form">
-                <div mat-dialog-title id="contentTitle">Create collection</div>
-                <div mat-dialog-content id="contentBorder">
-                    <div class="d-flex bd-highlight shadow-div my-3">
-                        <div class="pr-3 py-2 bd-highlight div-question">Collection Name*</div>
-                        <div class="bd-highlight div-answer">
-                            <input formControlName="name" class="flat-input" placeholder="Collection Name" />
-                        </div>
-                    </div>
-                    <div class="d-flex bd-highlight shadow-div mb-3">
-                        <div class="pr-4 py-2 bd-highlight div-question">Description</div>
-                        <div class="bd-highlight div-answer">
-                            <textarea formControlName="description" rows="5" class="flat-input" placeholder="Description"></textarea>
-                        </div>
-                    </div>
-                    <div class="text-danger pl-4" *ngIf="state === 'ERROR'">
-                        {{ error }}
+        <form id="createCollection" [formGroup]="form">
+            <div mat-dialog-title id="contentTitle">Create collection</div>
+            <div mat-dialog-content id="contentBorder">
+                <div class="d-flex bd-highlight shadow-div my-3">
+                    <div class="pr-3 py-2 bd-highlight div-question">Collection Name*</div>
+                    <div class="bd-highlight div-answer">
+                        <input formControlName="name" class="flat-input" placeholder="Collection Name" />
                     </div>
                 </div>
-                <div mat-dialog-actions>
-                    <button mat-button (click)="submit()" class="ml-auto save-btn" [class.disabled]="form.invalid">
-                        <span *ngIf="state !== 'LOADING'">create</span>
-                        <mat-spinner [diameter]="24" *ngIf="state === 'LOADING'"></mat-spinner>
-                    </button>
+                <div class="d-flex bd-highlight shadow-div mb-3">
+                    <div class="pr-4 py-2 bd-highlight div-question">Description</div>
+                    <div class="bd-highlight div-answer">
+                        <textarea
+                            formControlName="description"
+                            rows="5"
+                            class="flat-input"
+                            placeholder="Description"
+                        ></textarea>
+                    </div>
                 </div>
-            </form>
+                <div class="text-danger pl-4" *ngIf="state === 'ERROR'">
+                    {{ error }}
+                </div>
+            </div>
+            <div mat-dialog-actions>
+                <button mat-button (click)="submit()" class="ml-auto save-btn" [class.disabled]="form.invalid">
+                    <span *ngIf="state !== 'LOADING'">create</span>
+                    <mat-spinner [diameter]="24" *ngIf="state === 'LOADING'"></mat-spinner>
+                </button>
+            </div>
+        </form>
     </div>
 </div>

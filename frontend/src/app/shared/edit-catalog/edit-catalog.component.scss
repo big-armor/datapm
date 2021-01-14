@@ -26,9 +26,8 @@
     }
 }
 
-
 @media (max-width: 768px) {
-    #editCatalog{
+    #editCatalog {
         min-width: 400px;
         .mat-dialog-content {
             app-cover {

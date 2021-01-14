@@ -15,26 +15,26 @@
             <div class="pr-3 py-2 bd-highlight div-question">Name</div>
             <div class="bd-highlight div-answer">
                 <app-input
-                [group]="form"
-                controlName="name"
-                placeholder="Name"
-                [autoFocus]="true"
-                class="flat-input-parent"
-                [error]="form | inputError: 'name':errorMsg['name'] | async"
-            ></app-input>
+                    [group]="form"
+                    controlName="name"
+                    placeholder="Name"
+                    [autoFocus]="true"
+                    class="flat-input-parent"
+                    [error]="form | inputError: 'name':errorMsg['name'] | async"
+                ></app-input>
             </div>
         </div>
         <div class="d-flex bd-highlight shadow-div mb-3">
             <div class="pr-3 py-2 bd-highlight div-question">Collection slug</div>
             <div class="bd-highlight div-answer">
                 <app-input
-                [group]="form"
-                controlName="newCollectionSlug"
-                placeholder="Collection slug"
-                (blur)="openConfirmDialog()"
-                class="flat-input-parent"
-                [error]="form | inputError: 'newCollectionSlug':errorMsg['newCollectionSlug'] | async"
-            ></app-input>
+                    [group]="form"
+                    controlName="newCollectionSlug"
+                    placeholder="Collection slug"
+                    (blur)="openConfirmDialog()"
+                    class="flat-input-parent"
+                    [error]="form | inputError: 'newCollectionSlug':errorMsg['newCollectionSlug'] | async"
+                ></app-input>
             </div>
         </div>
         <div class="text-danger mt-3" *ngIf="state === 'ERROR'">Error occured while updating collection.</div>
