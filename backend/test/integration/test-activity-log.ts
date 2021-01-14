@@ -56,8 +56,6 @@ describe("Activity Log Tests", async () => {
             variables: { filter: { eventType: [ActivityLogEventType.PACKAGE_CREATED], limit: 100, offset: 0 } }
         });
 
-        console.log(JSON.stringify(response, null, 1));
-
         expect(response.data).to.exist;
         expect(response.data.myActivity).to.exist;
         expect(response.data.myActivity.logs.length).to.equal(2);
@@ -69,8 +67,6 @@ describe("Activity Log Tests", async () => {
             query: MyActivityDocument,
             variables: { filter: { eventType: [ActivityLogEventType.PACKAGE_CREATED], limit: 100, offset: 0 } }
         });
-
-        console.log(JSON.stringify(response, null, 1));
 
         expect(response.data).to.exist;
         expect(response.data.myActivity).to.exist;

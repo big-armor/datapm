@@ -91,7 +91,13 @@ export class ActivityLogRepository {
                 await transaction.save(entity);
             }
 
-            console.log(JSON.stringify(activityLog));
+            console.debug(
+                JSON.stringify({
+                    _type: "ActivityLog",
+                    date: new Date().toISOString(),
+                    ...activityLog
+                })
+            );
         });
     }
 }
