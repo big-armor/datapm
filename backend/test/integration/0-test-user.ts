@@ -61,7 +61,6 @@ describe("User Tests", async () => {
         expect(userA.me.twitterHandle, "twitterHandle should be null").equal(null);
         expect(userA.me.gitHubHandle, "gitHubHandle should be null").equal(null);
         expect(userA.me.website, "website should be null").equal(null);
-        expect(userA.me.isAdmin, "admin should be true").equal(true);
     });
 
     it("First created user in registry is an admin", async function () {
