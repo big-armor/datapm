@@ -151,9 +151,7 @@ export class UserRepository extends Repository<User> {
     }
 
     public isAtLeastOneUserRegistered(): Promise<number> {
-        return this.query(
-            "SELECT CASE WHEN EXISTS" + '(SELECT 1 FROM "user" WHERE id IS NOT NULL)' + " THEN 1" + " ELSE 0 END"
-        );
+        return this.query('SELECT CASE WHEN EXISTS (SELECT 1 FROM "user" WHERE id IS NOT NULL) THEN 1 ELSE 0 END');
     }
 
     getUserByUsername(username: string) {
