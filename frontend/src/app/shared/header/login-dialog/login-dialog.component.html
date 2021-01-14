@@ -9,12 +9,13 @@
             <app-input
                 placeholder="username or email address"
                 [group]="loginForm"
+                class="rounded-input"
                 controlName="username"
                 [error]="loginForm | inputError: 'username' | async"
             >
             </app-input>
             <br />
-            <app-input inputType="password" placeholder="password" [group]="loginForm" controlName="password">
+            <app-input inputType="password" placeholder="password" [group]="loginForm" controlName="password" class="rounded-input">
             </app-input>
             <p class="forgot-pass mt-3 ml-3">
                 <a href="#" (click)="openForgotPasswordDialog($event)">Forgot password?</a>

@@ -4,131 +4,20 @@
     position: relative;
     min-width: 500px;
 
-    .mat-dialog-title {
-        font-family: $family-roboto-mono;
-        font-style: $style-normal;
-        font-weight: $weight-400;
-    }
-
     .mat-dialog-actions {
         padding: 0px;
         margin: 0;
-
-        .save-btn {
-            position: relative;
-            top: 10px;
-            padding: 5px 20px;
-            box-shadow: $outer-shadow-1;
-            border-radius: 24px;
-
-            span {
-                font-family: $family-roboto-mono;
-                font-style: $style-normal;
-                font-weight: $weight-300;
-                font-size: ($title-font -2);
-                line-height: 24px;
-                display: flex;
-                align-items: center;
-                text-align: center;
-                letter-spacing: -0.28px;
-                color: $gray-3;
-            }
-        }
-    }
-
-    .mat-dialog-content {
-        padding-left: 0px !important;
-        padding-right: 0px !important;
-        padding-bottom: 0px !important;
-        max-height: calc(100vh - 130px);
-
-        .shadow-div {
-            box-shadow: $outer-shadow-1;
-
-            .div-question {
-                font-family: $family-roboto-mono;
-                font-style: $style-normal;
-                font-weight: $weight-400;
-                font-size: $text-font;
-                line-height: 18px;
-                letter-spacing: -0.28px;
-                color: $gray-2;
-                width: 245px;
-            }
-
-            .div-answer {
-                width: 100%;
-
-                textarea {
-                    border: none !important;
-                    font-family: $family-roboto-mono;
-                    font-style: $style-normal;
-                    font-weight: $weight-400;
-                    font-size: $text-font;
-                    display: flex;
-                    align-items: flex-end;
-                    letter-spacing: -0.28px;
-                    color: $color-info;
-
-                    &:focus {
-                        outline: transparent solid 0px;
-                        box-shadow: none;
-                    }
-
-                    &::placeholder {
-                        font-family: $family-roboto-mono;
-                        font-style: $style-normal;
-                        font-weight: $weight-300;
-                        font-size: $text-font;
-                        line-height: 18px;
-                        display: flex;
-                        align-items: flex-end;
-                        letter-spacing: -0.28px;
-                        color: $gray-3;
-                    }
-                }
-
-                input {
-                    height: 35px;
-                    border: none !important;
-                    font-family: $family-roboto-mono;
-                    font-style: $style-normal;
-                    font-weight: $weight-400;
-                    font-size: $text-font;
-                    line-height: 18px;
-                    display: flex;
-                    align-items: flex-end;
-                    letter-spacing: -0.28px;
-                    color: #017fb9;
-
-                    &:focus {
-                        outline: transparent solid 0px;
-                        box-shadow: none;
-                    }
-
-                    &::placeholder {
-                        font-family: $family-roboto-mono;
-                        font-style: $style-normal;
-                        font-weight: $weight-300;
-                        font-size: $text-font;
-                        line-height: 18px;
-                        display: flex;
-                        align-items: flex-end;
-                        letter-spacing: -0.28px;
-                        color: $gray-3;
-                    }
-                }
-            }
-        }
     }
 }
 
-.disabled {
-    background-color: $gray-color-8;
-    pointer-events: none;
-    opacity: 0.6;
+@media (max-width: 768px) {
+    #createCatalog {
+        min-width: 400px;
+    }
+}
 
-    .btn-text {
-        color: $gray-color-3;
+@media (max-width: 576px) {
+    #createCatalog {
+        min-width: 260px;
     }
 }

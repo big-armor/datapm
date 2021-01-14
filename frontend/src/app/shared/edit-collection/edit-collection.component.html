@@ -1,40 +1,46 @@
 <form [formGroup]="form" id="editCollection">
-    <div mat-dialog-content>
+    <div mat-dialog-content id="contentBorder">
         <app-cover
             [collectionSlug]="data.identifier.collectionSlug"
             [editable]="true"
             (upload)="uploadCover($event)"
         ></app-cover>
-        <div class="d-flex bd-highlight form-field my-3">
-            <div class="px-4 py-2 bd-highlight label">Make this collection public</div>
-            <div class="ml-auto px-4 py-2 bd-highlight slide-right">
+        <div class="d-flex bd-highlight mt-3 mb-1">
+            <div class="pr-3 py-2 bd-highlight div-question long-txt">Make this collection public</div>
+            <div class="ml-auto py-2 bd-highlight slide-right">
                 <mat-slide-toggle class="app-slide-toggle" formControlName="isPublic"></mat-slide-toggle>
             </div>
         </div>
-        <div class="d-flex bd-highlight form-field my-3">
-            <div class="px-4 py-2 bd-highlight label">Name</div>
-            <app-input
+        <div class="d-flex bd-highlight shadow-div mb-3">
+            <div class="pr-3 py-2 bd-highlight div-question">Name</div>
+            <div class="bd-highlight div-answer">
+                <app-input
                 [group]="form"
                 controlName="name"
                 placeholder="Name"
                 [autoFocus]="true"
+                class="flat-input-parent"
                 [error]="form | inputError: 'name':errorMsg['name'] | async"
             ></app-input>
+            </div>
         </div>
-        <div class="d-flex bd-highlight form-field my-3">
-            <div class="px-4 py-2 bd-highlight label">Collection slug</div>
-            <app-input
+        <div class="d-flex bd-highlight shadow-div mb-3">
+            <div class="pr-3 py-2 bd-highlight div-question">Collection slug</div>
+            <div class="bd-highlight div-answer">
+                <app-input
                 [group]="form"
                 controlName="newCollectionSlug"
                 placeholder="Collection slug"
                 (blur)="openConfirmDialog()"
+                class="flat-input-parent"
                 [error]="form | inputError: 'newCollectionSlug':errorMsg['newCollectionSlug'] | async"
             ></app-input>
+            </div>
         </div>
         <div class="text-danger mt-3" *ngIf="state === 'ERROR'">Error occured while updating collection.</div>
     </div>
     <div mat-dialog-actions>
-        <button class="app-raised-button" [disabled]="form.invalid" (click)="save()">
+        <button mat-button class="ml-auto save-btn" [disabled]="form.invalid" (click)="save()">
             <span *ngIf="state !== 'LOADING'">Save</span>
             <mat-spinner [diameter]="16" class="mx-auto" *ngIf="state === 'LOADING'"></mat-spinner>
         </button>
