@@ -164,8 +164,6 @@ export const packageFetched = async (
             targetPackageId: packageEntity.id,
             targetPackageVersionId: versionEntity.id
         });
-
-        return packageEntity;
     });
 };
 
@@ -243,6 +241,15 @@ export const updatePackage = async (
             .getCustomRepository(PackageRepository)
             .findPackageOrFail({ identifier });
 
+        await createActivityLog(transaction, {
+            userId: context.me.id,
+            eventType: ActivityLogEventType.PACKAGE_EDIT,
+            targetPackageId: packageEntity.id,
+            propertiesEdited: Object.keys(value)
+                .map((k) => (k == "newPackageSlug" ? "slug" : k))
+                .map((k) => (k == "newCatalogSlug" ? "catalogSlug" : k))
+        });
+
         if (value.isPublic !== undefined) {
             await createActivityLog(transaction, {
                 userId: context.me.id,
@@ -253,15 +260,6 @@ export const updatePackage = async (
                     : ActivityLogChangeType.PUBLIC_DISABLED
             });
         }
-
-        await createActivityLog(transaction, {
-            userId: context.me.id,
-            eventType: ActivityLogEventType.PACKAGE_EDIT,
-            targetPackageId: packageEntity.id,
-            propertiesEdited: Object.keys(value)
-                .map((k) => (k == "newPackageSlug" ? "slug" : k))
-                .map((k) => (k == "newCatalogSlug" ? "catalogSlug" : k))
-        });
 
         return transaction.getCustomRepository(PackageRepository).updatePackage({
             catalogSlug: identifier.catalogSlug,

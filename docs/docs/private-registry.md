@@ -28,6 +28,7 @@ services:
         target: /var/lib/datapm-registry/data
         consistency: cached
     environment:
+      - ACTIVITY_LOG=true
       - REGISTRY_NAME="Private DataPM Registry"
       - REGISTRY_URL=http://localhost:4000
       - JWT_KEY=!!!!REPLACE_ME!!!

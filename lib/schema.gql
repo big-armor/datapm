@@ -318,18 +318,13 @@ type CollectionIdentifier {
 Represents a logged user activity
 """
 type ActivityLog {
-    id: Int!
-    userId: Int
     user: User
-    targetPackageId: Int
     targetPackage: Package
-    targetPackageVersionId: Int
     targetPackageVersion: Version
-    targetCollectionId: Int
     targetCollection: Collection
-    targetCatalogId: Int
     targetCatalog: Catalog
     eventType: ActivityLogEventType!
+    changeType: ActivityLogChangeType
     createdAt: Date!
     updatedAt: Date!
 }
@@ -739,7 +734,7 @@ type Query {
     Activity for a given package
     """
     packageActivities(
-        identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
+        identifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
         filter: ActivityLogFilterInput!
     ): ActivityLogResult! @isAuthenticated
 
@@ -747,7 +742,7 @@ type Query {
     Activity for a given catalog
     """
     catalogActivities(
-        identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
+        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
         filter: ActivityLogFilterInput!
     ): ActivityLogResult! @isAuthenticated
 
@@ -881,7 +876,7 @@ type Mutation {
     """
     Called by a client to indicate a package has been fetched
     """
-    packageFetched(identifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)): Void
+    packageFetched(identifier: VersionIdentifierInput! @hasPackagePermission(permission: VIEW)): Void
 
     """
     Creates a new collection, which is managed by the requesting user

@@ -1,15 +1,13 @@
 import { GenericContainer, StartedTestContainer, Wait } from "testcontainers";
 
 import execa from "execa";
-import { Stream } from "stream";
-import * as readline from "readline";
 import pidtree from "pidtree";
 import { Observable } from "@apollo/client/core";
 import fs from "fs";
 import { before } from "mocha";
 import { RandomUuid } from "testcontainers/dist/uuid";
 import { createTestClient } from "./test-utils";
-import { RegistryStatus, RegistryStatusDocument } from "./registry-client";
+import { RegistryStatusDocument } from "./registry-client";
 import { expect } from "chai";
 const maildev = require("maildev");
 
@@ -64,7 +62,8 @@ before(async function () {
             SMTP_SECURE: "false",
             SMTP_FROM_ADDRESS: "test@localhost",
             SMTP_FROM_NAME: "local-test",
-            STORAGE_URL: TEMP_STORAGE_URL
+            STORAGE_URL: TEMP_STORAGE_URL,
+            ACTIVITY_LOG: "false"
         }
     });
 

@@ -8,8 +8,10 @@ import {
     ActivityLogEventType,
     ActivityLogFilterInput,
     ActivityLogResult,
-    CollectionIdentifierInput
+    CollectionIdentifierInput,
+    PackageIdentifierInput
 } from "../generated/graphql";
+import { PackageRepository } from "../repository/PackageRepository";
 
 export const myActivity = async (
     _0: any,
@@ -20,10 +22,15 @@ export const myActivity = async (
     const ALIAS = "myActivities";
     const { eventType, limit, offset } = filter;
 
-    const [logs, count] = await context.connection
+    let builder = context.connection
         .getRepository(ActivityLog)
         .createQueryBuilder(ALIAS)
-        .where({ userId: context?.me?.id }, { eventType })
+        .where({ userId: context?.me?.id });
+
+    if (eventType != null && eventType?.length > 0) {
+        builder = builder.andWhere('"myActivities"."event_type" IN (:...types)', { types: eventType });
+    }
+    const [logs, count] = await builder
         .addRelations(ALIAS, getRelationNames(graphqlFields(info).logs))
         .skip(offset)
         .take(limit)
@@ -73,29 +80,28 @@ export const collectionActivities = async (
 
 export const packageActivities = async (
     _0: any,
-    { identifier, filter }: { identifier: CollectionIdentifierInput; filter: ActivityLogFilterInput },
+    { identifier, filter }: { identifier: PackageIdentifierInput; filter: ActivityLogFilterInput },
     context: AuthenticatedContext,
     info: any
 ): Promise<ActivityLogResult> => {
     const ALIAS = "packageActivities";
     const { limit, offset } = filter;
 
-    const [logs, count] = await context.connection
-        .getRepository(ActivityLog)
-        .createQueryBuilder()
-        .where([
-            {
-                eventType: In([
-                    ActivityLogEventType.PACKAGE_CREATED,
-                    ActivityLogEventType.PACKAGE_EDIT,
-                    ActivityLogEventType.VERSION_CREATED,
-                    ActivityLogEventType.VERSION_DELETED
-                ])
-            },
-            {
-                targetPackage: { collectionIdentifier: identifier }
-            }
-        ])
+    const packageEntity = await context.connection
+        .getCustomRepository(PackageRepository)
+        .findPackageOrFail({ identifier });
+
+    let builder = context.connection.getRepository(ActivityLog).createQueryBuilder(ALIAS).where({
+        targetPackageId: packageEntity.id
+    });
+
+    if (filter.eventType) {
+        builder = builder.andWhere('"packageActivities"."event_type" IN (:...eventTypes)', {
+            eventTypes: filter.eventType
+        });
+    }
+
+    const [logs, count] = await builder
         .addRelations(ALIAS, getRelationNames(graphqlFields(info).logs))
         .skip(offset)
         .take(limit)

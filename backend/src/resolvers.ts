@@ -20,7 +20,9 @@ import {
     Base64ImageUpload,
     Permission,
     AutoCompleteResultResolvers,
-    RegistryStatus
+    RegistryStatus,
+    ActivityLogChangeType,
+    ActivityLogEventType
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
@@ -106,7 +108,8 @@ import {
     updatePackage,
     myPackages,
     userPackages,
-    usersByPackage
+    usersByPackage,
+    packageFetched
 } from "./resolvers/PackageResolver";
 import { ImageStorageService } from "./storage/images/image-storage-service";
 
@@ -127,7 +130,8 @@ import { userCatalogs } from "./resolvers/CatalogResolver";
 import { UserPackagePermission } from "./entity/UserPackagePermission";
 import { resolvePackagePermissions } from "./directive/hasPackagePermissionDirective";
 import { resolveCatalogPermissions } from "./directive/hasCatalogPermissionDirective";
-import { myActivity } from "./resolvers/ActivityLogResolver";
+import { myActivity, packageActivities } from "./resolvers/ActivityLogResolver";
+import { createActivityLog } from "./repository/ActivityLogRepository";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -624,7 +628,8 @@ export const resolvers: {
         emailAddressAvailable: emailAddressAvailable,
 
         searchUsers: searchUsers,
-        myActivity: myActivity
+        myActivity: myActivity,
+        packageActivities: packageActivities
     },
 
     Mutation: {
@@ -656,10 +661,32 @@ export const resolvers: {
         },
 
         updateCatalog: async (_0: any, { identifier, value }, context: AuthenticatedContext, info: any) => {
-            return context.connection.manager.getCustomRepository(CatalogRepository).updateCatalog({
-                identifier,
-                value,
-                relations: getGraphQlRelationName(info)
+            return context.connection.transaction(async (transaction) => {
+                const catalog = await transaction.getCustomRepository(CatalogRepository).updateCatalog({
+                    identifier,
+                    value,
+                    relations: getGraphQlRelationName(info)
+                });
+
+                await createActivityLog(transaction, {
+                    userId: context.me.id,
+                    eventType: ActivityLogEventType.CATALOG_EDIT,
+                    targetCatalogId: catalog.id,
+                    propertiesEdited: Object.keys(value).map((k) => (k == "newSlug" ? "slug" : k))
+                });
+
+                if (value.isPublic !== undefined) {
+                    await createActivityLog(transaction, {
+                        userId: context.me.id,
+                        eventType: ActivityLogEventType.CATALOG_PUBLIC_CHANGED,
+                        targetCatalogId: catalog.id,
+                        changeType: value.isPublic
+                            ? ActivityLogChangeType.PUBLIC_ENABLED
+                            : ActivityLogChangeType.PUBLIC_DISABLED
+                    });
+                }
+
+                return catalog;
             });
         },
 
@@ -703,6 +730,7 @@ export const resolvers: {
         updatePackage: updatePackage,
         setPackageCoverImage: setPackageCoverImage,
         deletePackage: deletePackage,
+        packageFetched: packageFetched,
 
         setPackagePermissions: setPackagePermissions,
         removePackagePermissions: removePackagePermissions,
@@ -729,6 +757,8 @@ export const resolvers: {
                 const latestVersion = await transaction
                     .getCustomRepository(VersionRepository)
                     .findLatestVersion({ identifier, relations: ["package"] });
+
+                let changeType = ActivityLogChangeType.VERSION_FIRST_VERSION;
 
                 if (latestVersion != null) {
                     let packageFile;
@@ -767,8 +797,7 @@ export const resolvers: {
                             VersionConflict.VERSION_EXISTS,
                             { existingVersion: latestVersionSemVer.version }
                         );
-                    }
-                    if (minVersionCompare == 1) {
+                    } else if (minVersionCompare == 1) {
                         throw new ApolloError(
                             identifier.catalogSlug +
                                 "/" +
@@ -784,6 +813,12 @@ export const resolvers: {
                             VersionConflict.HIGHER_VERSION_REQUIRED,
                             { existingVersion: latestVersionSemVer.version, minNextVersion: minNextVersion.version }
                         );
+                    } else if (compatibility == Compability.MinorChange) {
+                        changeType = ActivityLogChangeType.VERSION_PATCH_CHANGE;
+                    } else if (compatibility == Compability.CompatibleChange) {
+                        changeType = ActivityLogChangeType.VERSION_MINOR_CHANGE;
+                    } else if (compatibility == Compability.BreakingChange) {
+                        changeType = ActivityLogChangeType.VERSION_MAJOR_CHANGE;
                     }
                 }
 
@@ -824,6 +859,13 @@ export const resolvers: {
                 if (recalledVersion === undefined)
                     throw new Error("Could not find the version after saving. This should never happen!");
 
+                await createActivityLog(transaction, {
+                    userId: context.me.id,
+                    eventType: ActivityLogEventType.VERSION_CREATED,
+                    changeType,
+                    targetPackageVersionId: savedVersion?.id,
+                    targetPackageId: packageEntity.id
+                });
                 return recalledVersion;
             });
         },

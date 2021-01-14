@@ -91,13 +91,14 @@ export class ActivityLogRepository {
                 await transaction.save(entity);
             }
 
-            console.debug(
-                JSON.stringify({
-                    _type: "ActivityLog",
-                    date: new Date().toISOString(),
-                    ...activityLog
-                })
-            );
+            if (process.env.ACTIVITY_LOG === "true")
+                console.info(
+                    JSON.stringify({
+                        _type: "ActivityLog",
+                        date: new Date().toISOString(),
+                        ...activityLog
+                    })
+                );
         });
     }
 }

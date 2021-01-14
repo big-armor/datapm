@@ -1,5 +1,5 @@
-query MyActivity($filter: ActivityLogFilterInput!) {
-    myActivity(filter: $filter) {
+query PackageActivities($identifier: PackageIdentifierInput!, $filter: ActivityLogFilterInput!) {
+    packageActivities(identifier: $identifier, filter: $filter) {
         logs {
             user {
                 emailAddress
