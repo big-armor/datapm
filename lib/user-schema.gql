@@ -20,6 +20,7 @@ type User {
     gitHubHandleIsPublic: Boolean
     emailAddressIsPublic: Boolean
     websiteIsPublic: Boolean
+    isAdmin: Boolean
 }
 
 """

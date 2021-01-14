@@ -13,6 +13,7 @@ import { UserRepository } from "../repository/UserRepository";
 import { hashPassword } from "../util/PasswordUtil";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { ImageStorageService } from "../storage/images/image-storage-service";
+import { FirstUserStatusHolder } from "./FirstUserStatusHolder";
 
 export const searchUsers = async (
     _0: any,
@@ -59,18 +60,38 @@ export const createMe = async (
     info: any
 ) => {
     if ((await emailAddressAvailable(_0, { emailAddress: value.emailAddress }, context, info)) == false) {
+        FirstUserStatusHolder.IS_FIRST_USER_CREATED = true;
         throw new ValidationError("EMAIL_ADDRESS_NOT_AVAILABLE");
     }
 
     if ((await usernameAvailable(_0, { username: value.username }, context)) == false) {
+        FirstUserStatusHolder.IS_FIRST_USER_CREATED = true;
         throw new ValidationError("USERNAME_NOT_AVAILABLE");
     }
-    await context.connection.manager.getCustomRepository(UserRepository).createUser({
+
+    const repository = context.connection.manager.getCustomRepository(UserRepository);
+    if (!FirstUserStatusHolder.IS_FIRST_USER_CREATED) {
+        FirstUserStatusHolder.IS_FIRST_USER_CREATED = (await repository.isAtLeastOneUserRegistered()) === 1;
+    }
+
+    await repository.createUser({
         value,
         relations: getGraphQlRelationName(info)
     });
 
     return;
+};
+
+export const setAsAdmin = async (
+    _0: any,
+    { username, isAdmin }: { username: string; isAdmin: boolean },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    return await context.connection.manager.getCustomRepository(UserRepository).updateUserAdminStatus({
+        username,
+        isAdmin
+    });
 };
 
 export const updateMe = async (
