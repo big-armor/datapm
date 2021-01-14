@@ -5,13 +5,14 @@ import { slugValidator } from "src/app/helpers/validators";
 import { PageState } from "src/app/models/page-state";
 import { Catalog, SetCatalogCoverImageGQL, UpdateCatalogGQL } from "src/generated/graphql";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
+import { ImageService } from "../../services/image.service";
 
 @Component({
     selector: "app-edit-catalog",
     templateUrl: "./edit-catalog.component.html",
     styleUrls: ["./edit-catalog.component.scss"]
 })
-export class EditCatalogComponent implements OnInit {
+export class EditCatalogComponent {
     form: FormGroup;
     public readonly errorMsg = {
         displayName: {
@@ -33,7 +34,8 @@ export class EditCatalogComponent implements OnInit {
         private setCatalogCoverImage: SetCatalogCoverImageGQL,
         private updateCatalog: UpdateCatalogGQL,
         private dialogRef: MatDialogRef<EditCatalogComponent>,
-        private dialog: MatDialog
+        private dialog: MatDialog,
+        private imageService: ImageService
     ) {
         this.form = new FormGroup({
             isPublic: new FormControl(data.isPublic),
@@ -47,9 +49,7 @@ export class EditCatalogComponent implements OnInit {
         });
     }
 
-    ngOnInit(): void {}
-
-    uploadCover(data: any) {
+    public uploadCover(data: any): void {
         this.setCatalogCoverImage
             .mutate({
                 image: { base64: data },
@@ -57,10 +57,10 @@ export class EditCatalogComponent implements OnInit {
                     catalogSlug: this.data.identifier.catalogSlug
                 }
             })
-            .subscribe(() => {});
+            .subscribe(() => this.imageService.loadCatalogCover(this.data.identifier.catalogSlug, true));
     }
 
-    save() {
+    public save(): void {
         if (!this.form.valid) {
             return;
         }
@@ -84,7 +84,7 @@ export class EditCatalogComponent implements OnInit {
             );
     }
 
-    openConfirmDialog() {
+    public openConfirmDialog(): void {
         if (this.confirmDialogOpened === false) {
             this.dialog.open(ConfirmationDialogComponent, {
                 data: "Changing the slug will break links you have to packages outside of datapm."

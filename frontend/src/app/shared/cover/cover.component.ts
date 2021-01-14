@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from "@angular/core";
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { FileService } from "src/app/services/file.service";
@@ -10,7 +10,7 @@ import { User } from "src/generated/graphql";
     templateUrl: "./cover.component.html",
     styleUrls: ["./cover.component.scss"]
 })
-export class CoverComponent implements OnInit {
+export class CoverComponent implements OnChanges {
     @Input() username: string;
     @Input() catalogSlug: string;
     @Input() collectionSlug: string;
@@ -34,53 +34,44 @@ export class CoverComponent implements OnInit {
                 reader.readAsDataURL(files[0]);
             }
         });
-
-        this.imageService.shouldRefresh.pipe(takeUntil(this.unsubscribe$)).subscribe(({ target }) => {
-            if (target === "cover") {
-                this.getImage();
-            }
-        });
     }
 
-    ngOnInit(): void {}
-
-    ngOnChanges(changes: SimpleChanges) {
+    public ngOnChanges(changes: SimpleChanges): void {
         if (changes.username && changes.username.currentValue) {
-            this.getImage();
+            this.fetchImage();
         } else if (changes.packageSlug && changes.packageSlug.currentValue) {
-            this.getImage();
+            this.fetchImage();
         } else if (changes.catalogSlug && changes.catalogSlug.currentValue) {
-            this.getImage();
+            this.fetchImage();
         } else if (changes.collectionSlug && changes.collectionSlug.currentValue) {
-            this.getImage();
+            this.fetchImage();
         }
     }
 
-    uploadFile() {
+    public uploadFile(): void {
         this.inputEventId = this.fileService.openFile("image/jpeg");
     }
 
-    private getImage() {
-        let url;
+    private fetchImage(reload?: boolean): void {
+        let imageObservable;
         if (this.username) {
-            url = `/images/user/${this.username}/cover`;
+            imageObservable = this.imageService.loadUserCover(this.username, reload);
         } else if (this.packageSlug && this.catalogSlug) {
-            url = `/images/package/${this.catalogSlug}/${this.packageSlug}/cover`;
+            imageObservable = this.imageService.loadPackageCover(this.catalogSlug, this.packageSlug, reload);
         } else if (this.catalogSlug) {
-            url = `/images/catalog/${this.catalogSlug}/cover`;
+            imageObservable = this.imageService.loadCatalogCover(this.catalogSlug, reload);
         } else if (this.collectionSlug) {
-            url = `/images/collection/${this.collectionSlug}/cover`;
+            imageObservable = this.imageService.loadCollectionCover(this.collectionSlug, reload);
         } else {
             return;
         }
 
-        this.imageService.getImage(url).subscribe(
-            (imgData: any) => {
+        imageObservable.pipe(takeUntil(this.unsubscribe$)).subscribe((imgData: any) => {
+            if (imgData) {
                 this.imgData = imgData;
-            },
-            () => {
+            } else {
                 this.imgData = this.defaultCover;
             }
-        );
+        });
     }
 }

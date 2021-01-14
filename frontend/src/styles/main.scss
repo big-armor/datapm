@@ -582,3 +582,9 @@ button:focus {
         margin: 3px;
     }
 }
+
+.mat-dialog-without-padding {
+    .mat-dialog-container {
+        padding: 0;
+    }
+}

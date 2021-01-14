@@ -7,6 +7,7 @@ import { PackageSchemaComponent } from "./components/package-schema/package-sche
 import { PackageVersionComponent } from "./components/package-version/package-version.component";
 import { PackageSamplesComponent } from "./components/package-samples/package-samples.component";
 import { PackagePermissionComponent } from "./components/package-permission/package-permission.component";
+import { PackageDeletionConfirmationComponent } from "./components/package/package-deletion-confirmation/package-deletion-confirmation.component";
 
 const routes: Routes = [
     {
@@ -39,6 +40,10 @@ const routes: Routes = [
                 redirectTo: "description"
             }
         ]
+    },
+    {
+        path: "delete-confirmation",
+        component: PackageDeletionConfirmationComponent
     }
 ];
 

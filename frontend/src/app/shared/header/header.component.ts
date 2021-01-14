@@ -5,7 +5,7 @@ import { takeUntil, startWith, map, filter, debounceTime, switchMap } from "rxjs
 import { Subject, Observable, BehaviorSubject } from "rxjs";
 
 import { AuthenticationService } from "../../services/authentication.service";
-import { DialogService } from "../../services/dialog.service";
+import { DialogService } from "../../services/dialog/dialog.service";
 import { AutoCompleteGQL, AutoCompleteResult, User } from "src/generated/graphql";
 import { MatDialog } from "@angular/material/dialog";
 import { LoginDialogComponent } from "./login-dialog/login-dialog.component";

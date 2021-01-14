@@ -44,7 +44,7 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
         private componentChangeDetector: ChangeDetectorRef
     ) {}
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.currentUser = this.data;
 
         this.form = new FormGroup({
@@ -71,11 +71,11 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
         this.nameIsPublic = this.currentUser.nameIsPublic;
     }
 
-    ngOnDestroy() {
+    public ngOnDestroy(): void {
         this.subscription.unsubscribe();
     }
 
-    submit() {
+    public submit(): void {
         this.form.markAllAsTouched();
         this.form.markAsDirty();
         if (this.form.invalid) {
@@ -117,11 +117,11 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
         this.closeDialog();
     }
 
-    closeDialog() {
+    public closeDialog(): void {
         this.dialogRef.close();
     }
 
-    openConfirmDialog() {
+    public openConfirmDialog(): void {
         if (this.confirmDialogOpened === false) {
             this.dialog.open(ConfirmationDialogComponent, {
                 data:
@@ -131,27 +131,23 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
         }
     }
 
-    toggleNameIsPublic(ev: MatSlideToggleChange) {
+    public toggleNameIsPublic(ev: MatSlideToggleChange): void {
         this.nameIsPublic = ev.checked;
     }
 
-    uploadAvatar(data: any) {
-        this.setMyAvatarImageGQL.mutate({ image: { base64: data } }).subscribe(() => {
-            this.imageService.refreshAvatar(this.currentUser.username);
-        });
+    public uploadAvatar(data: any): void {
+        this.setMyAvatarImageGQL
+            .mutate({ image: { base64: data } })
+            .subscribe(() => this.imageService.loadUserAvatar(this.currentUser.username, true));
     }
 
-    uploadCover(data: any) {
-        this.setMyCoverImageGQL.mutate({ image: { base64: data } }).subscribe(() => {
-            this.imageService.refreshCover();
-        });
+    public uploadCover(data: any): void {
+        this.setMyCoverImageGQL
+            .mutate({ image: { base64: data } })
+            .subscribe(() => this.imageService.loadUserCover(this.currentUser.username, true));
     }
 
-    get username() {
+    public get username(): FormControl {
         return this.form.get("username")! as FormControl;
-    }
-
-    public openCoverUploadDialog(): void {
-        // this.imageUploadService.openImageUploadDialog(this.setMyCoverImageGQL);
     }
 }

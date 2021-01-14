@@ -18,6 +18,8 @@ import {
 } from "src/generated/graphql";
 import { PackageResponse, PackageService } from "../../services/package.service";
 import { AddUserComponent } from "../add-user/add-user.component";
+import { ConfirmationDialogService } from "../../../services/dialog/confirmation-dialog.service";
+import { DialogService } from "../../../services/dialog/dialog.service";
 
 @Component({
     selector: "app-package-permission",
@@ -42,10 +44,11 @@ export class PackagePermissionComponent implements OnInit {
         private snackBarService: SnackBarService,
         private route: ActivatedRoute,
         private snackBar: SnackBarService,
-        private authenticationService: AuthenticationService
+        private authenticationService: AuthenticationService,
+        private dialogService: DialogService
     ) {}
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe((p: PackageResponse) => {
             this.package = p?.package;
             if (this.canManage) {
@@ -56,7 +59,81 @@ export class PackagePermissionComponent implements OnInit {
         });
     }
 
-    private getUserList() {
+    public addUser(): void {
+        const dialogRef = this.dialog.open(AddUserComponent, {
+            data: {
+                catalogSlug: this.package.identifier.catalogSlug,
+                packageSlug: this.package.identifier.packageSlug
+            }
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.getUserList();
+            }
+        });
+    }
+
+    public updatePermission(username: string, permission: Permission): void {
+        this.setUserPermission(username, this.getPermissionArrayFrom(permission));
+    }
+
+    public removeUser(username: string): void {
+        this.removeUserPackagePermission
+            .mutate({
+                identifier: {
+                    catalogSlug: this.package.identifier.catalogSlug,
+                    packageSlug: this.package.identifier.packageSlug
+                },
+                username
+            })
+            .subscribe(({ errors }) => {
+                if (errors) {
+                    if (errors.find((e) => e.message.includes("CANNOT_REMOVE_CREATOR_PERMISSIONS")))
+                        this.snackBarService.openSnackBar("Can not change the package creator permissions.", "Ok");
+                    else this.snackBarService.openSnackBar("There was a problem. Try again later.", "Ok");
+                }
+                this.getUserList();
+            });
+    }
+
+    public get canManage(): boolean {
+        return this.package?.myPermissions.includes(Permission.MANAGE);
+    }
+
+    public updatePublic(changeEvent: MatSlideToggleChange): void {
+        if (!this.canEditVisibility) {
+            return;
+        }
+
+        this.updatePackageVisibility(changeEvent);
+    }
+
+    public get canEditVisibility(): boolean {
+        if (!this.package || !this.package.catalog) {
+            return false;
+        }
+
+        return this.package.catalog.isPublic;
+    }
+
+    public deletePackage(): void {
+        const dlgRef = this.dialog.open(DeletePackageComponent, {
+            data: {
+                catalogSlug: this.package.identifier.catalogSlug,
+                packageSlug: this.package.identifier.packageSlug
+            }
+        });
+
+        dlgRef.afterClosed().subscribe((confirmed: boolean) => {
+            if (confirmed)
+                this.router.navigate(["/" + this.authenticationService.currentUser.getValue().username], {
+                    fragment: "packages"
+                });
+        });
+    }
+
+    private getUserList(): void {
         if (!this.package) {
             return;
         }
@@ -78,49 +155,7 @@ export class PackagePermissionComponent implements OnInit {
             });
     }
 
-    public addUser() {
-        const dialogRef = this.dialog.open(AddUserComponent, {
-            data: {
-                catalogSlug: this.package.identifier.catalogSlug,
-                packageSlug: this.package.identifier.packageSlug
-            }
-        });
-
-        dialogRef.afterClosed().subscribe((result) => {
-            if (result) {
-                this.getUserList();
-            }
-        });
-    }
-
-    public updatePermission(username: string, permission: Permission) {
-        this.setUserPermission(username, this.getPermissionArrayFrom(permission));
-    }
-
-    public removeUser(username: string) {
-        this.removeUserPackagePermission
-            .mutate({
-                identifier: {
-                    catalogSlug: this.package.identifier.catalogSlug,
-                    packageSlug: this.package.identifier.packageSlug
-                },
-                username
-            })
-            .subscribe(({ errors }) => {
-                if (errors) {
-                    if (errors.find((e) => e.message.includes("CANNOT_REMOVE_CREATOR_PERMISSIONS")))
-                        this.snackBarService.openSnackBar("Can not change the package creator permissions.", "Ok");
-                    else this.snackBarService.openSnackBar("There was a problem. Try again later.", "Ok");
-                }
-                this.getUserList();
-            });
-    }
-
-    public get canManage() {
-        return this.package?.myPermissions.includes(Permission.MANAGE);
-    }
-
-    private setUserPermission(username: string, permissions: Permission[]) {
+    private setUserPermission(username: string, permissions: Permission[]): void {
         this.setPackagePermissions
             .mutate({
                 identifier: {
@@ -142,57 +177,49 @@ export class PackagePermissionComponent implements OnInit {
             });
     }
 
-    private findHighestPermission(userPermssions: Permission[]) {
+    private findHighestPermission(userPermissions: Permission[]): Permission {
         const permissions = [Permission.MANAGE, Permission.EDIT, Permission.VIEW];
-        for (let i = 0; i < permissions.length; i++) {
-            if (userPermssions.includes(permissions[i])) {
-                return permissions[i];
+
+        for (const permission of permissions) {
+            if (userPermissions.includes(permission)) {
+                return permission;
             }
         }
 
         return Permission.NONE;
     }
 
-    private getPermissionArrayFrom(permission: Permission) {
+    private getPermissionArrayFrom(permission: Permission): Permission[] {
         const permissions = [Permission.VIEW, Permission.EDIT, Permission.MANAGE];
         const index = permissions.findIndex((p) => p === permission);
         return permissions.slice(0, index + 1);
     }
 
-    private getUserName(user: User) {
-        const fullname = `${user.firstName || ""} ${user.lastName || ""}`.trim();
-        return fullname ? `${fullname} (${user.username})` : user.username;
+    private getUserName(user: User): string {
+        const fullName = `${user.firstName || ""} ${user.lastName || ""}`.trim();
+        return fullName ? `${fullName} (${user.username})` : user.username;
     }
 
-    public updatePublic(ev: MatSlideToggleChange) {
-        this.updatePackage
-            .mutate({
-                identifier: {
-                    catalogSlug: this.package.identifier.catalogSlug,
-                    packageSlug: this.package.identifier.packageSlug
-                },
-                value: {
-                    isPublic: ev.checked
+    private updatePackageVisibility(changeEvent: MatSlideToggleChange): void {
+        this.dialogService
+            .openPackageVisibilityChangeConfirmationDialog(changeEvent.checked)
+            .subscribe((confirmation) => {
+                if (!confirmation) {
+                    changeEvent.source.writeValue(!changeEvent.checked);
+                    return;
                 }
-            })
-            .subscribe(({ errors, data }) => {
-                this.package.isPublic = ev.checked;
+
+                this.updatePackage
+                    .mutate({
+                        identifier: {
+                            catalogSlug: this.package.identifier.catalogSlug,
+                            packageSlug: this.package.identifier.packageSlug
+                        },
+                        value: {
+                            isPublic: changeEvent.checked
+                        }
+                    })
+                    .subscribe(({ errors, data }) => (this.package.isPublic = changeEvent.checked));
             });
-    }
-
-    public deletePackage() {
-        const dlgRef = this.dialog.open(DeletePackageComponent, {
-            data: {
-                catalogSlug: this.package.identifier.catalogSlug,
-                packageSlug: this.package.identifier.packageSlug
-            }
-        });
-
-        dlgRef.afterClosed().subscribe((confirmed: boolean) => {
-            if (confirmed)
-                this.router.navigate(["/" + this.authenticationService.currentUser.getValue().username], {
-                    fragment: "packages"
-                });
-        });
     }
 }

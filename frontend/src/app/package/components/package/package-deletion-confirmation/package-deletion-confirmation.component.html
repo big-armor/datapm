@@ -1,0 +1,26 @@
+<div class="container page-container justify-content-between col-md-6">
+    <h2>Are you absolutely sure?</h2>
+
+    <div class="page-content">
+        <p>This action <b>cannot</b> be undone.</p>
+        <p>
+            This will permanently delete the <b>{{ catalogSlug }}/{{ packageSlug }}</b> package along with every
+            configuration of it.
+        </p>
+    </div>
+
+    <div *ngIf="!isCountdownOver" class="counter">
+        {{ currentCountdownValue }}
+    </div>
+
+    <div class="col-xl-12 align-self-center button-container">
+        <button
+            [disabled]="!isCountdownOver"
+            class="app-outlined-button delete-permanently-button"
+            (click)="deletePackage()"
+        >
+            Delete Permanently
+        </button>
+        <button class="app-outlined-button cancel-button" (click)="cancel()">Cancel</button>
+    </div>
+</div>

@@ -6,6 +6,7 @@ import { DeleteCollectionGQL, DeletePackageGQL } from "src/generated/graphql";
 export interface DeletePackageData {
     catalogSlug: string;
     packageSlug: string;
+    dontDeleteInstantly?: boolean;
 }
 
 @Component({
@@ -13,8 +14,9 @@ export interface DeletePackageData {
     templateUrl: "./delete-package.component.html",
     styleUrls: ["./delete-package.component.scss"]
 })
-export class DeletePackageComponent implements OnInit {
-    confirmVal: string = "";
+export class DeletePackageComponent {
+    public confirmVal: string = "";
+
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: DeletePackageData,
         private dialogRef: MatDialogRef<DeletePackageComponent>,
@@ -22,9 +24,12 @@ export class DeletePackageComponent implements OnInit {
         private snackBar: SnackBarService
     ) {}
 
-    ngOnInit(): void {}
+    public confirm(): void {
+        if (this.data.dontDeleteInstantly) {
+            this.dialogRef.close(true);
+            return;
+        }
 
-    confirm() {
         this.deletePackageGQL
             .mutate({
                 identifier: {
@@ -33,9 +38,9 @@ export class DeletePackageComponent implements OnInit {
                 }
             })
             .subscribe((response) => {
-                if (!response.errors) this.dialogRef.close(true);
-                else {
-                    console.error(response);
+                if (!response.errors) {
+                    this.dialogRef.close(true);
+                } else {
                     this.snackBar.openSnackBar("There was an error. Please try again later", "ok");
                 }
             });
