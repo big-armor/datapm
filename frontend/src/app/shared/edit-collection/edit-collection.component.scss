@@ -1,63 +1,52 @@
-app-cover {
-    display: block;
-    height: 150px;
+@import "../../../styles/variables";
 
-    ::ng-deep > div {
-        height: 100%;
-    }
-}
-.mat-dialog-content {
-    max-height: calc(100vh - 130px);
-    padding-left: 0px !important;
-    padding-right: 0px !important;
-    padding-bottom: 0px !important;
-}
-form {
-    min-width: 700px;
+#editCollection {
+    min-width: 600px;
     position: relative;
-    top: -24px;
-}
-.app-raised-button {
-    width: 100px;
-}
-.form-field {
-    box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
-        0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
-    .label {
-        font-family: Roboto Mono;
-        font-style: normal;
-        font-weight: normal;
-        font-size: 14px;
-        line-height: 18px;
-        letter-spacing: -0.28px;
-        color: #4f4f4f;
-        width: 275px;
-    }
+    top: -14px;
 
-    app-input ::ng-deep {
-        input {
-            height: 35px;
-            border: none !important;
-            font-family: Roboto Mono;
-            font-style: normal;
-            font-weight: normal;
-            font-size: 14px;
-            line-height: 18px;
-            display: flex;
-            align-items: flex-end;
-            letter-spacing: -0.28px;
-            color: #017fb9;
-            box-shadow: none;
-            padding-left: 0.5rem;
-        }
-        .text-danger {
-            font-size: 10px;
-            line-height: 12px;
+    .mat-dialog-content {
+        border-top: none !important;
+
+        app-cover {
+            display: block;
+            height: 150px;
+
+            ::ng-deep > div {
+                height: 100%;
+
+                img {
+                    min-width: 100%;
+                    width: unset;
+                    height: 100%;
+                    object-fit: cover;
+                }
+            }
         }
     }
 }
 
-.mat-dialog-actions {
-    display: flex;
-    justify-content: flex-end;
+@media (max-width: 768px) {
+    #editCollection {
+        min-width: 400px;
+        .mat-dialog-content {
+            app-cover {
+                ::ng-deep > div {
+                    img {
+                        width: 100%;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    #editCollection {
+        min-width: 260px;
+        top: -8px;
+        button.save-btn {
+            top: 0px !important;
+        }
+    }
 }

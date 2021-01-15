@@ -1,51 +1,60 @@
-<form [formGroup]="form">
-    <div mat-dialog-content>
+<form [formGroup]="form" id="editCatalog">
+    <div mat-dialog-content id="contentBorder">
         <app-cover
             [catalogSlug]="data.identifier.catalogSlug"
             [editable]="true"
             (upload)="uploadCover($event)"
         ></app-cover>
-        <div class="d-flex bd-highlight form-field my-3">
-            <div class="px-4 py-2 bd-highlight label">Make this catalog public</div>
-            <div class="ml-auto px-4 py-2 bd-highlight slide-right">
+        <div class="d-flex bd-highlight mt-3 mb-1">
+            <div class="pr-3 py-2 bd-highlight div-question long-txt">Make this catalog public</div>
+            <div class="ml-auto py-2 bd-highlight slide-right">
                 <mat-slide-toggle class="app-slide-toggle" formControlName="isPublic"></mat-slide-toggle>
             </div>
         </div>
-        <div class="d-flex bd-highlight form-field my-3">
-            <div class="px-4 py-2 bd-highlight label">Name</div>
-            <app-input
-                [group]="form"
-                controlName="displayName"
-                placeholder="Name"
-                [autoFocus]="true"
-                [error]="form | inputError: 'displayName':errorMsg['displayName'] | async"
-            ></app-input>
+        <div class="d-flex bd-highlight shadow-div mb-3">
+            <div class="pr-3 py-2 bd-highlight div-question">Name</div>
+            <div class="bd-highlight div-answer">
+                <app-input
+                    class="flat-input-parent"
+                    [group]="form"
+                    controlName="displayName"
+                    placeholder="Name"
+                    [autoFocus]="true"
+                    [error]="form | inputError: 'displayName':errorMsg['displayName'] | async"
+                ></app-input>
+            </div>
         </div>
-        <div class="d-flex bd-highlight form-field my-3">
-            <div class="px-4 py-2 bd-highlight label">Catalog slug</div>
-            <app-input
-                [group]="form"
-                controlName="newSlug"
-                placeholder="Catalog slug"
-                (blur)="openConfirmDialog()"
-                [error]="form | inputError: 'newSlug':errorMsg['newSlug'] | async"
-            ></app-input>
+        <div class="d-flex bd-highlight shadow-div mb-3">
+            <div class="pr-3 py-2 bd-highlight div-question">Catalog slug</div>
+            <div class="bd-highlight div-answer">
+                <app-input
+                    class="flat-input-parent"
+                    [group]="form"
+                    controlName="newSlug"
+                    placeholder="Catalog slug"
+                    (blur)="openConfirmDialog()"
+                    [error]="form | inputError: 'newSlug':errorMsg['newSlug'] | async"
+                ></app-input>
+            </div>
         </div>
-        <div class="d-flex bd-highlight form-field my-3">
-            <div class="px-4 py-2 bd-highlight label">Description</div>
-            <app-input
-                [group]="form"
-                controlName="description"
-                placeholder="Description"
-                [autoFocus]="true"
-                [multiline]="true"
-            ></app-input>
+        <div class="d-flex bd-highlight shadow-div mb-3">
+            <div class="pr-3 py-2 bd-highlight div-question">Description</div>
+            <div class="bd-highlight div-answer">
+                <app-input
+                    class="flat-input-parent"
+                    [group]="form"
+                    controlName="description"
+                    placeholder="Description"
+                    [autoFocus]="true"
+                    [multiline]="true"
+                ></app-input>
+            </div>
         </div>
         <div class="text-danger mt-3" *ngIf="state === 'ERROR'">Error occured while updating catalog.</div>
     </div>
     <div mat-dialog-actions>
-        <button class="app-raised-button" [disabled]="form.invalid" (click)="save()">
-            <span *ngIf="state !== 'LOADING'">Save</span>
+        <button mat-button class="ml-auto save-btn" [disabled]="form.invalid" (click)="save()">
+            <span *ngIf="state !== 'LOADING'">save</span>
             <mat-spinner [diameter]="16" *ngIf="state === 'LOADING'">Save</mat-spinner>
         </button>
     </div>

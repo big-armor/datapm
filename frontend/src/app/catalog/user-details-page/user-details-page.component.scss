@@ -1,35 +1,39 @@
-.tabs {
-    list-style-type: none;
-    margin-top: 30px;
-    margin-bottom: 3px;
-    display: flex;
+@import "../../../styles/variables";
 
-    li {
-        a {
-            font-family: Roboto Mono;
-            font-style: normal;
-            font-weight: 300;
-            font-size: 14px;
-            line-height: 16px;
-            text-align: center;
-            letter-spacing: -0.28px;
-            text-transform: uppercase;
-            color: #828282;
-            cursor: pointer;
-            text-decoration: none;
-            padding: 0px 10px 7px 10px;
-            margin: 0px 40px 0px 10px;
+#userDetails {
+    hr {
+        position: relative;
+        top: -8px;
+    }
+
+    .tabs {
+        list-style-type: none;
+        margin-top: 30px;
+        margin-bottom: 3px;
+        display: flex;
+
+        li {
+            a {
+                font-family: $family-roboto-mono;
+                font-style: $style-normal;
+                font-weight: $weight-300;
+                font-size: $text-font;
+                line-height: 16px;
+                text-align: center;
+                letter-spacing: -0.28px;
+                text-transform: uppercase;
+                color: $gray-3;
+                cursor: pointer;
+                text-decoration: none;
+                padding: 0px 10px 7px 10px;
+                margin: 0px 40px 0px 10px;
+            }
+        }
+
+        .active {
+            opacity: 1;
+            color: $gray-1 !important;
+            border-bottom: 2px solid $gray-1;
         }
     }
-
-    .active {
-        opacity: 1;
-        color: #333333 !important;
-        border-bottom: 2px solid #333333;
-    }
-}
-
-hr {
-    position: relative;
-    top: -8px;
 }

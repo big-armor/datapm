@@ -5,7 +5,7 @@ import { MatDialogRef } from "@angular/material/dialog";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { AUTHENTICATION_ERROR, User } from "src/generated/graphql";
 import { Subscription } from "rxjs";
-import { DialogService } from "src/app/services/dialog.service";
+import { DialogService } from "src/app/services/dialog/dialog.service";
 
 enum State {
     LOGGED_OUT,

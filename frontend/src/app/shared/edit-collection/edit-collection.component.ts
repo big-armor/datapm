@@ -5,13 +5,14 @@ import { slugValidator } from "src/app/helpers/validators";
 import { PageState } from "src/app/models/page-state";
 import { Collection, SetCollectionCoverImageGQL, UpdateCollectionGQL } from "src/generated/graphql";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
+import { ImageService } from "../../services/image.service";
 
 @Component({
     selector: "app-edit-collection",
     templateUrl: "./edit-collection.component.html",
     styleUrls: ["./edit-collection.component.scss"]
 })
-export class EditCollectionComponent implements OnInit {
+export class EditCollectionComponent {
     public readonly errorMsg = {
         name: {
             required: "Collection name is required"
@@ -33,7 +34,8 @@ export class EditCollectionComponent implements OnInit {
         private dialog: MatDialog,
         private dialogRef: MatDialogRef<EditCollectionComponent>,
         private setCollectionCoverImage: SetCollectionCoverImageGQL,
-        private updateCollection: UpdateCollectionGQL
+        private updateCollection: UpdateCollectionGQL,
+        private imageService: ImageService
     ) {
         this.form = new FormGroup({
             isPublic: new FormControl(data.isPublic),
@@ -46,9 +48,7 @@ export class EditCollectionComponent implements OnInit {
         });
     }
 
-    ngOnInit(): void {}
-
-    uploadCover(data: any) {
+    public uploadCover(data: any): void {
         this.setCollectionCoverImage
             .mutate({
                 image: { base64: data },
@@ -56,10 +56,10 @@ export class EditCollectionComponent implements OnInit {
                     collectionSlug: this.data.identifier.collectionSlug
                 }
             })
-            .subscribe(() => {});
+            .subscribe(() => this.imageService.loadCollectionCover(this.data.identifier.collectionSlug, true));
     }
 
-    save() {
+    public save(): void {
         if (!this.form.valid) {
             return;
         }
@@ -83,7 +83,7 @@ export class EditCollectionComponent implements OnInit {
             );
     }
 
-    openConfirmDialog() {
+    public openConfirmDialog(): void {
         if (this.confirmDialogOpened === false) {
             this.dialog.open(ConfirmationDialogComponent, {
                 data: "Changing the slug will break links you have to packages outside of datapm."

@@ -14,6 +14,11 @@
         <div class="ml-auto px-4 py-2 slide-right">
             <mat-slide-toggle
                 class="app-slide-toggle"
+                matTooltip="Can't edit visibility of a package inside a private catalog"
+                matTooltipPosition="above"
+                [matTooltipDisabled]="canEditVisibility"
+                aria-label="Edit package visibility"
+                [disabled]="!canEditVisibility"
                 [checked]="package?.isPublic"
                 (change)="updatePublic($event)"
             ></mat-slide-toggle>

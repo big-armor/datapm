@@ -7,7 +7,7 @@ html,
 body {
     height: 100%;
     overflow-x: hidden;
-    background-color: $gray-6;
+    background-color: $gray-11;
 }
 
 a {
@@ -15,7 +15,7 @@ a {
 }
 body {
     margin: 0;
-    font-family: Roboto, "Helvetica Neue", sans-serif;
+    font-family: $family-roboto !important;
 }
 
 .mat-spinner circle {
@@ -35,9 +35,11 @@ body {
 .mat-card {
     background-color: inherit;
 }
+
 .mat-dialog-container {
-    background-color: $gray-6;
+    background-color: $gray-11;
 }
+
 .mat-header-row {
     background-color: $white;
 }
@@ -121,25 +123,34 @@ body {
     }
 }
 
-.dpm-input-round {
-    border-radius: 24px;
-    padding: 10px 23px;
-    width: 100%;
-    height: 44px;
-    border: none;
-    outline: none;
-    background-color: $gray-7;
-    box-shadow: $inner-shadow-1;
-    transition: background-color ease 0.5s;
-
-    &:hover {
-        background-color: $white;
+.rounded-input {
+    .dpm-input-round {
+        border-radius: 24px;
+        padding: 10px 23px;
+        width: 100%;
+        height: 44px;
+        border: none;
+        outline: none;
+        background-color: $gray-7;
+        box-shadow: $inner-shadow-1;
         transition: background-color ease 0.5s;
-    }
 
-    &::placeholder {
-        @include text("body");
-        color: $gray-4;
+        &:hover {
+            background-color: $white;
+            transition: background-color ease 0.5s;
+        }
+
+        &::placeholder {
+            font-family: $family-roboto-mono;
+            font-style: $style-normal;
+            font-weight: $weight-300;
+            font-size: ($text-font);
+            line-height: 18px;
+            display: flex;
+            align-items: flex-end;
+            letter-spacing: -0.28px;
+            color: $gray-4;
+        }
     }
 }
 
@@ -175,10 +186,10 @@ mat-select {
     border-radius: 24px;
     height: 36px;
     border: none;
-    font-family: Roboto Mono;
-    font-style: normal;
-    font-weight: 300;
-    font-size: 18px;
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-weight: $weight-300;
+    font-size: ($title-font - 2);
     align-items: center;
     text-align: center;
     color: $gray-3;
@@ -222,7 +233,7 @@ mat-select {
 
         .mat-icon {
             color: $gray-3;
-            font-size: 26px;
+            font-size: ($title-font + 6);
             width: unset;
             height: 32px;
 
@@ -234,14 +245,14 @@ mat-select {
 }
 
 .app-outlined-button {
-    font-family: Roboto Mono;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 12px;
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-weight: $weight-400;
+    font-size: $small-font;
     line-height: 13px;
     letter-spacing: -0.28px;
-    color: #017fb9;
-    border: 1px solid #ddd;
+    color: $color-info;
+    border: 1px solid $gray-9;
     padding: 3px 15px;
     border-radius: 4px;
     cursor: pointer;
@@ -275,13 +286,13 @@ mat-select {
 }
 
 .section-title {
-    font-family: Roboto Mono;
-    font-style: normal;
-    font-weight: 500;
-    font-size: 20px;
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-weight: $weight-500;
+    font-size: $title-font;
     line-height: 26px;
     letter-spacing: -0.28px;
-    color: #333333;
+    color: $gray-1;
     padding: 24px;
 }
 
@@ -305,10 +316,275 @@ mat-select {
 
 .autocomplete-description {
     line-height: normal;
-    font-size: 0.75em;
+    font-size: $text-font;
     color: $gray-3;
 }
 
 .mat-option {
     border-bottom: 1px solid $gray-6;
+}
+
+.header-border {
+    border-bottom: none;
+    position: relative;
+    top: 0.5rem;
+    height: 14px;
+    border: 0;
+    margin: 6px 0px;
+    box-shadow: 0px 0 0px rgb(255 255 255), 0 0px 0px rgb(255 255 255 / 25%), 0 4px 4px rgb(191 187 187 / 25%),
+        4px 0 4px rgb(247 247 247 / 25%);
+}
+
+.d-none {
+    display: none !important;
+}
+
+div {
+    .dialog-close-wrapper {
+        display: flex;
+        position: relative;
+        bottom: 30px;
+        left: 40px;
+        margin-bottom: -26px;
+        justify-content: flex-end;
+
+        .dialog-close {
+            padding: 4px 8px;
+            font-family: $family-roboto-mono;
+            font-style: $style-normal;
+            font-weight: $weight-300;
+            font-size: $text-font;
+            text-align: center;
+            line-height: 18px;
+            letter-spacing: -0.28px;
+            color: $gray-3;
+            outline: transparent solid 0px;
+        }
+    }
+
+    .dialog-title {
+        font-family: $family-roboto-mono;
+        font-style: $style-normal;
+        font-weight: $weight-400;
+        font-size: $dialog-font;
+        line-height: 55px;
+        text-align: center;
+        margin: 20px 0 10px;
+        color: $gray-1;
+        text-shadow: $text-shadow;
+    }
+}
+
+textarea.flat-input,
+.flat-input-parent textarea {
+    height: 75px !important;
+    padding: 8px 15px !important;
+}
+
+.flat-input,
+.flat-input-parent input,
+.flat-input-parent textarea {
+    height: 35px;
+    width: 100%;
+    border-radius: 6px;
+    padding: 0px 15px;
+    border: none !important;
+    font-family: $family-roboto-mono;
+    font-style: $style-normal;
+    font-weight: $weight-400;
+    font-size: $text-font;
+    line-height: 18px;
+    display: flex;
+    align-items: flex-end;
+    letter-spacing: -0.28px;
+    color: $color-info;
+
+    &:focus {
+        outline: transparent solid 0px;
+        box-shadow: none;
+    }
+
+    &::placeholder {
+        font-family: $family-roboto-mono;
+        font-style: $style-normal;
+        font-weight: $weight-300;
+        font-size: ($text-font - 1);
+        line-height: 18px;
+        display: flex;
+        align-items: flex-end;
+        letter-spacing: -0.28px;
+        color: $gray-4;
+    }
+}
+
+button.save-btn {
+    position: relative;
+    top: 10px;
+    padding: 4px 24px;
+    box-shadow: $outer-shadow-1;
+    border-radius: 24px;
+
+    span {
+        font-family: $family-roboto-mono;
+        font-style: $style-normal;
+        font-weight: $weight-300;
+        font-size: $default-font;
+        line-height: 24px;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        letter-spacing: -0.28px;
+        color: $gray-3;
+    }
+}
+
+button:focus {
+    outline: transparent solid 0px;
+    box-shadow: none;
+}
+
+.disabled {
+    background-color: $gray-color-8;
+    pointer-events: none;
+    opacity: 0.6;
+
+    .btn-text {
+        color: $gray-color-3;
+    }
+}
+.mat-button.mat-primary[disabled],
+.mat-button.mat-accent[disabled],
+.mat-button.mat-warn[disabled],
+.mat-button[disabled][disabled],
+.mat-icon-button.mat-primary[disabled],
+.mat-icon-button.mat-accent[disabled],
+.mat-icon-button.mat-warn[disabled],
+.mat-icon-button[disabled][disabled],
+.mat-stroked-button.mat-primary[disabled],
+.mat-stroked-button.mat-accent[disabled],
+.mat-stroked-button.mat-warn[disabled],
+.mat-stroked-button[disabled][disabled] {
+    background-color: $gray-color-8;
+    pointer-events: none;
+    opacity: 0.6;
+
+    span {
+        color: $gray-color-3;
+    }
+}
+
+#contentTitle {
+    font-family: $family-roboto-mono;
+    font-style: $style-normal;
+    font-weight: $weight-400;
+}
+
+#contentBorder {
+    width: 100%;
+    margin: 0 auto;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+    max-height: calc(100vh - 130px);
+    padding: 10px 0px 5px 0px;
+    border-top: 1px solid #ddddddad;
+    border-bottom: 1px solid #dddddd7a;
+}
+
+.div-question {
+    font-family: $family-roboto-mono;
+    font-style: $style-normal;
+    font-weight: $weight-400;
+    font-size: $text-font;
+    line-height: 18px;
+    letter-spacing: -0.28px;
+    color: $gray-2;
+    width: 230px;
+}
+
+.div-answer {
+    width: 100%;
+}
+
+.l-15 {
+    left: 15px;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.long-txt {
+    width: 300px;
+}
+
+.text-danger {
+    margin-top: 0px !important;
+    font-size: 12px;
+    color: $color-danger !important;
+}
+
+@media (max-width: 768px) {
+    .shadow-div {
+        display: block !important;
+    }
+    .div-question {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    #contentTitle {
+        font-size: $default-font;
+    }
+    .div-question {
+        font-size: $small-font;
+    }
+    .div-answer {
+        font-size: $small-font;
+    }
+    #contentBorder {
+        padding: 0px;
+    }
+    button.save-btn span {
+        font-size: $text-font;
+    }
+    .flat-input,
+    .flat-input-parent input,
+    .flat-input-parent textarea {
+        font-size: $small-font;
+
+        &::placeholder {
+            font-size: $small-font;
+        }
+    }
+    div {
+        .dialog-description {
+            font-size: $small-font;
+            text-align: center;
+            margin-bottom: 0px;
+        }
+        .dialog-close-wrapper {
+            bottom: 19px;
+            left: 22px;
+            .dialog-close {
+                font-size: $small-font;
+            }
+        }
+        .dialog-title {
+            font-size: ($logo-font + 3);
+            line-height: 40px;
+            margin: 15px 0 5px;
+        }
+    }
+    .header-border {
+        top: 0.83rem;
+        height: 9px;
+        margin: 3px;
+    }
+}
+
+.mat-dialog-without-padding {
+    .mat-dialog-container {
+        padding: 0;
+    }
 }

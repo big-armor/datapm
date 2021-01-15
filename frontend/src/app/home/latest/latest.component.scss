@@ -1,28 +1,26 @@
+@import "../../../styles/variables";
+
 .h1-title {
-    font-family: Roboto Mono;
-    font-style: normal;
-    font-weight: 300;
-    font-size: 20px;
+    font-family: $family-roboto-mono;
+    font-style: $style-normal;
+    font-weight: $weight-300;
+    font-size: $title-font;
     line-height: 26px;
     letter-spacing: -0.28px;
-    color: #828282;
+    color: $gray-3;
 }
 
 .not-found {
     margin: 0 auto;
     text-align: center;
     padding-top: 25px;
-    font-family: Roboto Mono;
+    font-family: $family-roboto-mono;
 
     p {
-        font-style: normal;
-        font-weight: normal;
-        font-size: 18px;
+        font-style: $style-normal;
+        font-weight: $weight-400;
+        font-size: ($title-font - 2);
         line-height: 28px;
         text-align: left;
     }
-}
-
-.container {
-    min-height: 500px;
 }

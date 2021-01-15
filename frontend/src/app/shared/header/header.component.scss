@@ -1,37 +1,80 @@
 @import "../../../styles/mixins";
 @import "../../../styles/variables";
 
-.search-form {
-    display: flex;
-    width: 100%;
-    position: relative;
+.desktop-menu {
+    max-width: 1450px;
+    margin: 0 auto 15px auto;
 
-    app-input {
+    .main-menu-title {
+        a {
+            font-family: $family-roboto-mono;
+            font-style: $style-normal;
+            font-weight: $weight-300;
+            font-size: $default-font;
+            line-height: 21px;
+            text-align: center;
+            cursor: pointer;
+            letter-spacing: -0.28px;
+            color: $gray-3;
+        }
+    }
+
+    .search-form {
+        display: flex;
         width: 100%;
-    }
+        position: relative;
 
-    button {
-        position: absolute;
-        top: 2px;
-        right: 8px;
-    }
-}
+        app-input {
+            width: 100%;
+        }
 
-app-avatar {
-    cursor: pointer;
-}
-
-.mat-option {
-    height: 75px;
-    padding: 5px 5px;
-    line-height: 75px;
-    ::ng-deep.avatar {
-        line-height: 20px;
-        margin-right: 10px;
+        button {
+            position: absolute;
+            top: 2px;
+            right: 8px;
+        }
     }
 }
 
-a.dpm-text-logo {
+.mobile-menu {
+    display: none;
+
+    .mobile-search-box {
+        display: flex;
+
+        app-input {
+            width: 100%;
+        }
+
+        button {
+            position: absolute;
+            right: 24px;
+            top: 2px;
+        }
+    }
+
+    .mobile-person {
+        .app-fab-button {
+            width: 30px;
+            height: 30px;
+
+            ::ng-deep .mat-button-wrapper {
+                .mat-icon {
+                    font-size: ($default-font + 10) !important;
+                    height: 36px;
+                }
+            }
+        }
+    }
+
+    .header-right {
+        position: relative;
+        top: 6px;
+        padding-right: 0px;
+    }
+}
+
+.dpm-text-logo {
     color: $gray-1;
     cursor: pointer;
     &:hover {
@@ -45,86 +88,13 @@ button.mat-menu-item {
     }
 }
 
-.desktop-menu {
-    max-width: 1450px;
-    margin: 0 auto 15px auto;
-}
-
-.main-menu-title {
-    a {
-        font-family: Roboto Mono;
-        font-style: normal;
-        font-weight: 300;
-        font-size: 16px;
-        line-height: 21px;
-        text-align: center;
-        cursor: pointer;
-        letter-spacing: -0.28px;
-        color: #828282;
-    }
-}
-
-.mobile-search-box {
-    display: flex;
-
-    app-input {
-        width: 100%;
-    }
-
-    button {
-        position: absolute;
-        right: 24px;
-        top: 2px;
-    }
-}
-
-.mobile-person {
-    .app-fab-button {
-        width: 30px;
-        height: 30px;
-
-        ::ng-deep .mat-button-wrapper {
-            .mat-icon {
-                font-size: 26px !important;
-                height: 36px;
-            }
-        }
-    }
-}
-
-.mobile-collection {
-    .mat-fab.collection-menu {
-        width: 30px;
-        height: 30px;
-        background: #fff;
-        box-shadow: 0px 1px 7px 4px rgb(90 88 88 / 15%);
-
-        ::ng-deep .mat-button-wrapper {
-            padding: 0 !important;
-
-            .mat-icon {
-                font-size: 20px !important;
-                height: 30px;
-                color: #828282;
-                width: unset;
-            }
-        }
-    }
-}
-
-.mobile-menu {
-    display: none;
-}
-
-.header-right {
-    position: relative;
-    top: 6px;
-    padding-right: 0px;
-}
-
 .avatar {
     position: relative;
     top: 10px;
+}
+
+app-avatar {
+    cursor: pointer;
 }
 
 @media (max-width: 768px) {
@@ -135,8 +105,11 @@ button.mat-menu-item {
     .desktop-menu {
         display: none;
     }
-    h1.title {
-        font-size: 28px;
+    h1 {
+        margin-bottom: 0px;
+    }
+    .dpm-text-logo {
+        font-size: ($title-font + 8);
         line-height: 31px;
         margin-bottom: 0px;
     }

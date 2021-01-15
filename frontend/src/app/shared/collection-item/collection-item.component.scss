@@ -1,167 +1,93 @@
+@import "../../../styles/variables";
+
 .collection-item {
     cursor: pointer;
-    box-shadow: -4px 0 4px hsla(0, 0%, 100%, 0.25), 0 -4px 4px hsla(0, 0%, 100%, 0.25),
-        0 4px 4px hsla(0, 0%, 74.1%, 0.25), 4px 0 4px hsla(0, 0%, 74.1%, 0.25);
-}
+    box-shadow: $outer-shadow-1;
 
-.flex-1 {
-    flex: 1;
-}
-
-.collection-image img {
-    width: 100%;
-    max-height: 150px;
-    object-fit: cover;
-}
-
-.actions button .mat-icon {
-    color: #828282;
-}
-
-.up-header {
-    div {
-        font-family: Roboto Mono;
-        font-style: normal;
-        font-weight: 300;
-        font-size: 10px;
-        line-height: 13px;
-        text-align: right;
+    .collection-identifier {
+        font-family: $family-roboto-mono;
+        font-weight: $weight-500;
+        font-size: ($title-font + 2);
+        line-height: 26px;
+        color: $gray-1;
         letter-spacing: -0.28px;
-        color: #828282;
     }
-}
 
-.collection-identifier {
-    font-family: Roboto Mono;
-    font-weight: 500;
-    font-size: 20px;
-    line-height: 26px;
-    color: #333;
-    letter-spacing: -0.28px;
-}
-
-.collection-description {
-    font-family: Roboto Mono;
-    font-style: normal;
-    font-weight: 300;
-    font-size: 14px;
-    line-height: 18px;
-    letter-spacing: -0.28px;
-    color: #4f4f4f;
-    max-height: 111px;
-    overflow: hidden;
-}
-
-.collection-chips {
-    ::ng-deep.mat-chip {
-        font-family: Roboto Mono;
-        font-style: normal;
-        font-weight: normal;
-        font-size: 10px;
-        line-height: 13px;
+    .collection-description {
+        font-family: $family-roboto-mono;
+        font-style: $style-normal;
+        font-weight: $weight-300;
+        font-size: $text-font;
+        line-height: 18px;
         letter-spacing: -0.28px;
-        color: #000000;
-        padding: 0px 9px;
-        min-height: 18px;
-        border-radius: 24px;
-        cursor: pointer;
-        margin: 0px 8px;
-        background-color: #fff;
-        box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25),
-            inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
+        color: $gray-2;
+        max-height: 111px;
+        overflow: hidden;
     }
-}
 
-.collection-actions {
-    button {
-        width: 32px;
-        height: 32px;
-        background-color: #fff;
-        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
-            0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+    .collection-image {
+        width: 100%;
+        max-height: 150px;
+        object-fit: cover;
+    }
 
-        &:focus {
-            outline: #fff auto 0px !important;
-        }
+    .collection-creator {
+        .collections-public {
+            display: inline-block;
+            vertical-align: middle;
+            margin-bottom: 10px;
+            margin-left: 5px;
+            font-family: $family-roboto-mono;
+            font-style: $style-normal;
+            font-weight: $weight-400;
+            font-size: $xsmall-font;
+            line-height: 13px;
+            letter-spacing: -0.28px;
 
-        ::ng-deep.mat-button-wrapper {
-            padding: 0px 0;
-            line-height: 20px;
-
-            .mat-icon {
-                height: 30px;
-                color: #828282;
-
-                &:focus {
-                    outline: #fff auto 0px !important;
-                }
+            .public-text {
+                color: $color-1;
+            }
+            .not-public-text {
+                color: $gray-3;
             }
         }
+
+        .name {
+            font-family: $family-roboto-mono;
+            font-style: $style-normal;
+            letter-spacing: -0.28px;
+            font-weight: $weight-300;
+            font-size: $text-font;
+            line-height: 18px;
+            color: $gray-3;
+            padding: 4px 10px;
+            margin-bottom: 0 !important;
+        }
+
+        .photo {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
     }
 
-    .content-nr {
-        font-family: Roboto Mono;
-        font-style: normal;
-        font-weight: 500;
-        font-size: 10px;
-        text-transform: uppercase;
-        color: #828282;
-    }
-}
-
-.collection-creator {
-    .photo {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-    }
-
-    .name {
-        font-family: Roboto Mono;
-        font-style: normal;
-        letter-spacing: -0.28px;
-        font-weight: 300;
-        font-size: 14px;
-        line-height: 18px;
-        color: #828282;
-        padding: 4px 10px;
-        margin-bottom: 0 !important;
-    }
-}
-.collections-public {
-    display: inline-block;
-    vertical-align: middle;
-    margin-bottom: 10px;
-    margin-left: 5px;
-    font-family: Roboto Mono;
-    font-style: normal;
-    font-weight: normal;
-    font-size: 10px;
-    line-height: 13px;
-    letter-spacing: -0.28px;
-
-    .public-text {
-        color: #00a896;
-    }
-    .not-public-text {
-        color: #828282;
-    }
-}
-
-.edit-button {
-    font-family: Roboto Mono;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 13px;
-    letter-spacing: -0.28px;
-    color: #017fb9;
-    border: 1px solid #ddd;
-    padding: 3px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    &:hover {
-        text-decoration: none;
-        background-color: rgba(240, 240, 240, 0.783);
+    .collection-actions {
+        .edit-button {
+            font-family: $family-roboto-mono;
+            font-style: $style-normal;
+            font-weight: $weight-400;
+            font-size: $small-font;
+            line-height: 13px;
+            letter-spacing: -0.28px;
+            color: $color-info;
+            border: 1px solid $gray-9;
+            padding: 3px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            &:hover {
+                text-decoration: none;
+                background-color: $gray-9;
+            }
+        }
     }
 }

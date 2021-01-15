@@ -1,36 +1,4 @@
-.example-radio-group {
-    display: flex;
-    flex-direction: column;
-    margin: 15px 0;
-}
-
-.example-radio-button {
-    margin: 5px;
-}
-
-.example-large-box {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 16px;
-    padding: 16px;
-    border-radius: 8px;
-}
-
-.example-large-box {
-    height: 300px;
-    width: 300px;
-}
-
-.header-border {
-    border-bottom: none;
-    position: relative;
-    top: 2rem;
-    height: 14px;
-    border: 0;
-    margin: 6px 0px;
-    border-bottom: 1px solid #ddd;
-}
+@import "../../../styles/variables";
 
 #homeRoutes {
     list-style-type: none;
@@ -39,24 +7,26 @@
 
     li {
         a {
-            font-family: Roboto Mono;
-            font-style: normal;
-            font-weight: 300;
-            font-size: 16px;
+            font-family: $family-roboto-mono;
+            font-style: $style-normal;
+            font-weight: $weight-300;
+            font-size: $default-font;
             line-height: 21px;
             text-align: center;
             letter-spacing: -0.28px;
-            color: #828282;
+            color: $gray-3;
             text-decoration: none;
             padding: 0px 10px 4px 10px;
             margin: 0px 10px;
+            position: relative;
+            bottom: 25px;
         }
     }
 
     .active {
         opacity: 1;
-        color: #333333 !important;
-        border-bottom: 2px solid #333333;
+        color: $gray-1 !important;
+        border-bottom: 2px solid $gray-1;
     }
 }
 
@@ -64,7 +34,7 @@
     #homeRoutes {
         li {
             a {
-                font-size: 13px;
+                font-size: ($text-font - 1);
                 padding: 0px 8px 4px 8px;
                 margin: 0px 6px;
             }
@@ -72,12 +42,6 @@
     }
     .no-pd-mobile {
         padding: 0px !important;
-    }
-    .header-border {
-        top: 1.68rem;
-        height: 9px;
-        border: 0;
-        margin: 3px;
     }
 }
 
