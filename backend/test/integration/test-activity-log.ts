@@ -12,7 +12,11 @@ import {
     CreateCollectionDocument,
     AddPackageToCollectionDocument,
     PackageFetchedDocument,
-    PackageActivitiesDocument
+    PackageActivitiesDocument,
+    PackageDocument,
+    CatalogActivitiesDocument,
+    CollectionActivitiesDocument,
+    RemovePackageFromCollectionDocument
 } from "./registry-client";
 import { expect } from "chai";
 import { loadPackageFileFromDisk } from "datapm-lib";
@@ -63,7 +67,20 @@ describe("Activity Log Tests", async () => {
         });
     });
 
-    it("Should allow user to get own activity", async function () {
+    it("Should show USER_CREATED", async function () {
+        const response = await userOneClient.query({
+            query: MyActivityDocument,
+            variables: { filter: { eventType: [ActivityLogEventType.USER_CREATED], limit: 100, offset: 0 } }
+        });
+
+        expect(response.data).to.exist;
+        expect(response.data.myActivity).to.exist;
+        expect(response.data.myActivity.logs.length).to.equal(1);
+        expect(response.data.myActivity.logs[0]?.user?.username).to.equal(userOne.username);
+        expect(response.data.myActivity.logs[0]?.eventType).to.equal(ActivityLogEventType.USER_CREATED);
+    });
+
+    it("Should show PACKAGE_CREATED", async function () {
         const response = await userOneClient.query({
             query: MyActivityDocument,
             variables: { filter: { eventType: [ActivityLogEventType.PACKAGE_CREATED], limit: 100, offset: 0 } }
@@ -287,6 +304,103 @@ describe("Activity Log Tests", async () => {
         expect(activityLogResponse.data.myActivity.logs[0]?.targetPackage!.identifier.packageSlug).to.equal(
             "congressional-legislators"
         );
+
+        const userOneActivityResponse = await userOneClient.query({
+            query: PackageActivitiesDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testOne-packages",
+                    packageSlug: "congressional-legislators"
+                },
+                filter: {
+                    eventType: [ActivityLogEventType.COLLECTION_PACKAGE_ADDED],
+                    limit: 100,
+                    offset: 0
+                }
+            }
+        });
+
+        expect(response.data).to.exist;
+        expect(userOneActivityResponse.data.packageActivities).to.exist;
+        expect(userOneActivityResponse.data.packageActivities.logs.length).to.equal(1);
+        expect(userOneActivityResponse.data.packageActivities.logs[0]?.eventType).to.equal(
+            ActivityLogEventType.COLLECTION_PACKAGE_ADDED
+        );
+        expect(userOneActivityResponse.data.packageActivities.logs[0]?.user?.username).to.equal(userTwo.username);
+        expect(
+            userOneActivityResponse.data.packageActivities.logs[0]?.targetCollection!.identifier.collectionSlug
+        ).to.equal("private");
+        expect(userOneActivityResponse.data.packageActivities.logs[0]?.targetCollection!.name).to.equal("private");
+        expect(userOneActivityResponse.data.packageActivities.logs[0]?.targetPackage!.identifier.catalogSlug).to.equal(
+            "testOne-packages"
+        );
+        expect(userOneActivityResponse.data.packageActivities.logs[0]?.targetPackage!.identifier.packageSlug).to.equal(
+            "congressional-legislators"
+        );
+    });
+
+    it("Should show PACKAGE_VIEWED for package owner and viewer", async function () {
+        let response = await userTwoClient.mutate({
+            mutation: PackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testOne-packages",
+                    packageSlug: "congressional-legislators"
+                }
+            }
+        });
+
+        expect(response.errors == null, "no errors").true;
+        expect(response.data).to.exist;
+
+        const activityLogResponse = await userTwoClient.query({
+            query: MyActivityDocument,
+            variables: {
+                filter: {
+                    eventType: [ActivityLogEventType.PACKAGE_VIEWED],
+                    limit: 100,
+                    offset: 0
+                }
+            }
+        });
+
+        expect(activityLogResponse.data.myActivity).to.exist;
+        expect(activityLogResponse.data.myActivity.logs.length).to.equal(1);
+        expect(activityLogResponse.data.myActivity.logs[0]?.eventType).to.equal(ActivityLogEventType.PACKAGE_VIEWED);
+        expect(activityLogResponse.data.myActivity.logs[0]?.user?.username).to.equal(userTwo.username);
+        expect(activityLogResponse.data.myActivity.logs[0]?.targetPackage!.identifier.catalogSlug).to.equal(
+            "testOne-packages"
+        );
+        expect(activityLogResponse.data.myActivity.logs[0]?.targetPackage!.identifier.packageSlug).to.equal(
+            "congressional-legislators"
+        );
+
+        const userOneActivity = await userOneClient.query({
+            query: PackageActivitiesDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testOne-packages",
+                    packageSlug: "congressional-legislators"
+                },
+                filter: {
+                    eventType: [ActivityLogEventType.PACKAGE_VIEWED],
+                    limit: 100,
+                    offset: 0
+                }
+            }
+        });
+
+        expect(response.data).to.exist;
+        expect(userOneActivity.data.packageActivities).to.exist;
+        expect(userOneActivity.data.packageActivities.logs.length).to.equal(1);
+        expect(userOneActivity.data.packageActivities.logs[0]?.eventType).to.equal(ActivityLogEventType.PACKAGE_VIEWED);
+        expect(userOneActivity.data.packageActivities.logs[0]?.user?.username).to.equal(userTwo.username);
+        expect(userOneActivity.data.packageActivities.logs[0]?.targetPackage!.identifier.catalogSlug).to.equal(
+            "testOne-packages"
+        );
+        expect(userOneActivity.data.packageActivities.logs[0]?.targetPackage!.identifier.packageSlug).to.equal(
+            "congressional-legislators"
+        );
     });
 
     it("Should show PACKAGE_FETCHED", async function () {
@@ -343,8 +457,6 @@ describe("Activity Log Tests", async () => {
             }
         });
 
-        console.log(JSON.stringify(userOneActivity, null, 1));
-
         expect(response.data).to.exist;
         expect(userOneActivity.data.packageActivities).to.exist;
         expect(userOneActivity.data.packageActivities.logs.length).to.equal(1);
@@ -356,6 +468,51 @@ describe("Activity Log Tests", async () => {
             "testOne-packages"
         );
         expect(userOneActivity.data.packageActivities.logs[0]?.targetPackage!.identifier.packageSlug).to.equal(
+            "congressional-legislators"
+        );
+    });
+
+    it("Should show COLLECTION_REMOVE_PACKAGE", async function () {
+        let response = await userTwoClient.mutate({
+            mutation: RemovePackageFromCollectionDocument,
+            variables: {
+                collectionIdentifier: {
+                    collectionSlug: "activityLog"
+                },
+                packageIdentifier: {
+                    catalogSlug: "testOne-packages",
+                    packageSlug: "congressional-legislators"
+                }
+            }
+        });
+
+        expect(response.errors == null, "no errors").true;
+
+        const activityLogResponse = await userTwoClient.query({
+            query: MyActivityDocument,
+            variables: {
+                filter: {
+                    eventType: [ActivityLogEventType.COLLECTION_PACKAGE_REMOVED],
+                    limit: 100,
+                    offset: 0
+                }
+            }
+        });
+
+        expect(response.data).to.exist;
+        expect(activityLogResponse.data.myActivity).to.exist;
+        expect(activityLogResponse.data.myActivity.logs.length).to.equal(1);
+        expect(activityLogResponse.data.myActivity.logs[0]?.eventType).to.equal(
+            ActivityLogEventType.COLLECTION_PACKAGE_REMOVED
+        );
+        expect(activityLogResponse.data.myActivity.logs[0]?.user?.username).to.equal(userTwo.username);
+        expect(activityLogResponse.data.myActivity.logs[0]?.targetCollection!.identifier.collectionSlug).to.equal(
+            "activityLog"
+        );
+        expect(activityLogResponse.data.myActivity.logs[0]?.targetPackage!.identifier.catalogSlug).to.equal(
+            "testOne-packages"
+        );
+        expect(activityLogResponse.data.myActivity.logs[0]?.targetPackage!.identifier.packageSlug).to.equal(
             "congressional-legislators"
         );
     });

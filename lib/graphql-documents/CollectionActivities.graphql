@@ -1,0 +1,47 @@
+query CollectionActivities($identifier: CollectionIdentifierInput!, $filter: ActivityLogFilterInput!) {
+    collectionActivities(identifier: $identifier, filter: $filter) {
+        logs {
+            user {
+                emailAddress
+                username
+                firstName
+                lastName
+            }
+            targetPackage {
+                creator {
+                    username
+                    emailAddress
+                }
+                identifier {
+                    catalogSlug
+                    packageSlug
+                }
+            }
+            targetPackageVersion {
+                identifier {
+                    versionMajor
+                    versionMinor
+                    versionPatch
+                }
+            }
+            targetCollection {
+                identifier {
+                    collectionSlug
+                }
+                name
+            }
+            targetCatalog {
+                identifier {
+                    catalogSlug
+                }
+                displayName
+            }
+            eventType
+            changeType
+            createdAt
+            updatedAt
+        }
+        count
+        hasMore
+    }
+}

@@ -1,15 +1,11 @@
-import { AuthenticatedContext } from "../context";
+import { AuthenticatedContext, Context } from "../context";
 import { Permission, CollectionIdentifierInput, SetUserCollectionPermissionsInput } from "../generated/graphql";
 import { CollectionRepository } from "../repository/CollectionRepository";
 import { UserCollectionPermissionRepository } from "../repository/UserCollectionPermissionRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { EntityManager } from "typeorm";
 
-export const hasCollectionPermissions = async (
-    context: AuthenticatedContext,
-    collectionId: number,
-    permission: Permission
-) => {
+export const hasCollectionPermissions = async (context: Context, collectionId: number, permission: Permission) => {
     if (permission == Permission.VIEW) {
         const collection = await context.connection
             .getCustomRepository(CollectionRepository)

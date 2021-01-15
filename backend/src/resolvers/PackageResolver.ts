@@ -22,6 +22,7 @@ import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { VersionRepository } from "../repository/VersionRepository";
+import { hasCollectionPermissions } from "./UserCollectionPermissionResolver";
 
 export const usersByPackage = async (
     _0: any,
@@ -88,6 +89,10 @@ export const catalogPackagesForUser = async (parent: any, _1: any, context: Cont
 
 export const findPackagesForCollection = async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
     const collection = parent as Collection;
+
+    if (!(await hasCollectionPermissions(context, collection.id, Permission.VIEW))) {
+        return [];
+    }
 
     return await context.connection
         .getCustomRepository(PackageRepository)

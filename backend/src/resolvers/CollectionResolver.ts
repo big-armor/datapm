@@ -1,5 +1,5 @@
 import { ApolloError, ValidationError, UserInputError } from "apollo-server";
-import { AuthenticatedContext } from "../context";
+import { AuthenticatedContext, Context } from "../context";
 import {
     Base64ImageUpload,
     CollectionIdentifierInput,
@@ -18,13 +18,16 @@ import { VersionRepository } from "../repository/VersionRepository";
 
 import { UserCollectionPermissionRepository } from "../repository/UserCollectionPermissionRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
-import { grantAllCollectionPermissionsForUser } from "./UserCollectionPermissionResolver";
+import { grantAllCollectionPermissionsForUser, hasCollectionPermissions } from "./UserCollectionPermissionResolver";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { Collection } from "../entity/Collection";
 import { ActivityLogChangeType, ActivityLogEventType } from "../entity/ActivityLogEventType";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 import { exit } from "process";
-import { trace } from "superagent";
+import { connect, trace } from "superagent";
+import { Connection, EntityManager } from "typeorm";
+import { User } from "../entity/User";
+import { getEnvVariable } from "../util/getEnvVariable";
 
 export const usersByCollection = async (
     _0: any,
@@ -324,31 +327,77 @@ export const userCollections = async (
 };
 
 export const myPermissions = async (parent: any, _0: any, context: AuthenticatedContext) => {
+    return userCollectionPermissions(context.connection, context.me.username, {
+        collectionSlug: (parent as Collection).identifier.collectionSlug!
+    });
+};
+
+export const collectionIdentifier = async (parent: any, _1: any, context: Context) => {
     const collection = parent as Collection;
 
-    if (context.me == null) {
-        if (collection.isPublic) return [Permission.VIEW];
-
-        console.error("Anonymous user request just resolved permissions for a non-public collection!!! THIS IS BAD!!!");
-        exit(1); // Shut down the server so the admin knows something very bad happened
+    if (!(await hasCollectionPermissions(context, collection.id, Permission.VIEW))) {
+        return {
+            registryURL: getEnvVariable("REGISTRY_URL"),
+            collectionSlug: "private"
+        };
     }
 
-    const userPermission = await context.connection
+    return {
+        registryURL: getEnvVariable("REGISTRY_URL"),
+        collectionSlug: collection.collectionSlug
+    };
+};
+
+export const collectionCreator = async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+    const collection = parent as Collection;
+
+    if (!(await hasCollectionPermissions(context, collection.id, Permission.VIEW))) {
+        return null;
+    }
+
+    return await context.connection
+        .getCustomRepository(UserRepository)
+        .findOneOrFail({ where: { id: collection.creatorId }, relations: getGraphQlRelationName(info) });
+};
+
+export const collectionName = async (parent: any, _1: any, context: Context) => {
+    const collection = parent as Collection;
+
+    if (!(await hasCollectionPermissions(context, collection.id, Permission.VIEW))) {
+        return "private";
+    }
+
+    if (collection.name != null) return collection.name;
+
+    const collectionEntity = await context.connection
+        .getCustomRepository(CollectionRepository)
+        .findCollectionBySlugOrFail(collection.collectionSlug);
+
+    return collectionEntity.name;
+};
+
+export const userCollectionPermissions = async (
+    connection: Connection | EntityManager,
+    username: string,
+    identifier: CollectionIdentifierInput
+): Promise<Permission[]> => {
+    const collection = await connection
+        .getCustomRepository(CollectionRepository)
+        .findCollectionBySlugOrFail(identifier.collectionSlug);
+
+    if (username == null) {
+        if (collection.isPublic) return [Permission.VIEW];
+        else return [];
+    }
+
+    const user = await connection.getCustomRepository(UserRepository).findUserByUserName({ username });
+
+    const userPermission = await connection
         .getCustomRepository(UserCollectionPermissionRepository)
         .findCollectionPermissions({
             collectionId: collection.id,
-            userId: context.me.id
+            userId: user.id
         });
 
-    if (userPermission == null) {
-        if (collection.isPublic) return [Permission.VIEW];
-        console.error(
-            "User " +
-                context.me.username +
-                " request just resolved permissions for a non-public collection to which they have no permissions!!! THIS IS BAD!!!"
-        );
-        exit(1); // Shut down the server so the admin knows something very bad happened
-    }
-
-    return userPermission.permissions;
+    return userPermission?.permissions || [];
 };

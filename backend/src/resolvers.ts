@@ -69,11 +69,15 @@ import {
     collectionPackages,
     usersByCollection,
     myPermissions,
-    userCollections
+    userCollections,
+    collectionIdentifier,
+    collectionName,
+    collectionCreator
 } from "./resolvers/CollectionResolver";
 import {
     setUserCollectionPermissions,
-    deleteUserCollectionPermissions
+    deleteUserCollectionPermissions,
+    hasCollectionPermissions
 } from "./resolvers/UserCollectionPermissionResolver";
 import { deleteUserCatalogPermissions } from "./resolvers/UserCatalogPermissionResolver";
 import { login, logout, verifyEmailAddress } from "./resolvers/AuthResolver";
@@ -360,22 +364,11 @@ export const resolvers: {
         }
     },
     Collection: {
-        identifier: async (parent: any, _1: any) => {
-            const collection = parent as Collection;
-            return {
-                registryURL: getEnvVariable("REGISTRY_URL"),
-                collectionSlug: collection.collectionSlug
-            };
-        },
+        name: collectionName,
+        identifier: collectionIdentifier,
         packages: findPackagesForCollection,
         myPermissions: myPermissions,
-        creator: async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
-            const collection = parent as Collection;
-
-            return await context.connection
-                .getCustomRepository(UserRepository)
-                .findOneOrFail({ where: { id: collection.creatorId }, relations: getGraphQlRelationName(info) });
-        }
+        creator: collectionCreator
     },
 
     Package: {
