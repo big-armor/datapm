@@ -23,6 +23,7 @@ import { getGraphQlRelationName, getRelationNames } from "../util/relationNames"
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { VersionRepository } from "../repository/VersionRepository";
 import { hasCollectionPermissions } from "./UserCollectionPermissionResolver";
+import { hasCatalogPermissions } from "./UserCatalogPermissionResolver";
 
 export const usersByPackage = async (
     _0: any,
@@ -75,16 +76,6 @@ export const getLatestPackages = async (
         packages: searchResponse,
         count
     };
-};
-
-export const catalogPackagesForUser = async (parent: any, _1: any, context: Context, info: any) => {
-    const catalog = parent as Catalog;
-
-    return await context.connection.getCustomRepository(PackageRepository).catalogPackagesForUser({
-        catalogId: catalog.id,
-        user: context.me,
-        relations: getGraphQlRelationName(info)
-    });
 };
 
 export const findPackagesForCollection = async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {

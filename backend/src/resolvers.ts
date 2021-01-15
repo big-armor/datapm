@@ -79,7 +79,7 @@ import {
     deleteUserCollectionPermissions,
     hasCollectionPermissions
 } from "./resolvers/UserCollectionPermissionResolver";
-import { deleteUserCatalogPermissions } from "./resolvers/UserCatalogPermissionResolver";
+import { deleteUserCatalogPermissions, hasCatalogPermissions } from "./resolvers/UserCatalogPermissionResolver";
 import { login, logout, verifyEmailAddress } from "./resolvers/AuthResolver";
 import {
     createMe,
@@ -97,7 +97,6 @@ import {
 import { createAPIKey, deleteAPIKey } from "./resolvers/ApiKeyResolver";
 import { Collection } from "./entity/Collection";
 import {
-    catalogPackagesForUser,
     createPackage,
     deletePackage,
     findPackage,
@@ -130,7 +129,16 @@ import { DateResolver } from "./resolvers/DateResolver";
 import { Permissions } from "./entity/Permissions";
 import { exit } from "process";
 import { CollectionRepository } from "./repository/CollectionRepository";
-import { userCatalogs } from "./resolvers/CatalogResolver";
+import {
+    catalogCreator,
+    catalogDescription,
+    catalogDisplayName,
+    catalogIdentifier,
+    catalogPackagesForUser,
+    catalogWebsite,
+    myCatalogPermissions,
+    userCatalogs
+} from "./resolvers/CatalogResolver";
 import { UserPackagePermission } from "./entity/UserPackagePermission";
 import { resolvePackagePermissions } from "./directive/hasPackagePermissionDirective";
 import { resolveCatalogPermissions } from "./directive/hasCatalogPermissionDirective";
@@ -341,27 +349,13 @@ export const resolvers: {
         }
     },
     Catalog: {
-        identifier: async (parent: any, _1: any) => {
-            const catalog = parent as Catalog;
-
-            return {
-                registryURL: getEnvVariable("REGISTRY_URL"),
-                catalogSlug: catalog.slug
-            };
-        },
+        identifier: catalogIdentifier,
         packages: catalogPackagesForUser,
-        myPermissions: async (parent: any, _1: any, context: Context) => {
-            const catalog = parent as Catalog;
-
-            return resolveCatalogPermissions(context, { catalogSlug: catalog.slug }, context.me);
-        },
-        creator: async (parent: any, _1: any, context: Context, info: any) => {
-            const catalog = parent as Catalog;
-
-            return await context.connection
-                .getCustomRepository(UserRepository)
-                .findOneOrFail({ where: { id: catalog.creatorId }, relations: getGraphQlRelationName(info) });
-        }
+        myPermissions: myCatalogPermissions,
+        creator: catalogCreator,
+        description: catalogDescription,
+        displayName: catalogDisplayName,
+        website: catalogWebsite
     },
     Collection: {
         name: collectionName,

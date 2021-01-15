@@ -122,6 +122,15 @@ async function getUserCatalogPermission({
 
 @EntityRepository(UserCatalogPermission)
 export class UserCatalogPermissionRepository extends Repository<UserCatalogPermission> {
+    public async hasPermission(userId: number, catalogId: number, permission: Permission): Promise<boolean> {
+        const permissionsEntity = await this.findCatalogPermissions({ catalogId, userId });
+        if (!permissionsEntity) {
+            return false;
+        }
+
+        return permissionsEntity.permissions.some((p) => p === permission);
+    }
+
     findCatalogPermissions({
         catalogId,
         userId,
