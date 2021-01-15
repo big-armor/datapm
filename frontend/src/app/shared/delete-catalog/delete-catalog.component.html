@@ -1,20 +1,27 @@
-<div mat-dialog-title>
-    <h1>Delete Catalog</h1>
-    <p>All packages in this catalog will be lost. This action is permanent and can not be undone.</p>
-</div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12" id="deleteCatalog">
+            <div mat-dialog-title id="contentTitle">Delete Catalog</div>
+            <div mat-dialog-content id="contentBorder">
+                <div class="w-100">
+                    <p>All packages in this catalog will be lost. This action is permanent and can not be undone.</p>
+                </div>
 
-<div mat-dialog-content>
-    <div>
-        Type <span class="slug">{{ data.catalogSlug }}</span> here
+                <div>
+                    Type <span class="slug">{{ data.catalogSlug }}</span> here
+                </div>
+
+                <div class="oneline-input py-3">
+                    <input matInput [(ngModel)]="confirmVal" autocomplete="off" />
+                </div>
+            </div>
+
+            <div mat-dialog-actions class="d-flex justify-content-between pb-3 pt-2">
+                <button mat-button mat-dialog-close>Cancel</button>
+                <button mat-button class="btn-delete" (click)="confirm()" [disabled]="confirmVal !== data.catalogSlug">
+                    Delete
+                </button>
+            </div>
+        </div>
     </div>
-    <mat-form-field>
-        <input matInput [(ngModel)]="confirmVal" autocomplete="off" />
-    </mat-form-field>
-</div>
-
-<div mat-dialog-actions class="d-flex justify-content-between">
-    <button mat-button mat-dialog-close>Close</button>
-    <button mat-button color="accent" (click)="confirm()" [disabled]="confirmVal !== data.catalogSlug">
-        Delete Catalog Now
-    </button>
 </div>
