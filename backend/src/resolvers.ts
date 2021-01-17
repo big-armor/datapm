@@ -86,7 +86,8 @@ import {
     updateMyPassword,
     forgotMyPassword,
     recoverMyPassword,
-    searchUsers
+    searchUsers,
+    setAsAdmin
 } from "./resolvers/UserResolver";
 import { createAPIKey, deleteAPIKey } from "./resolvers/ApiKeyResolver";
 import { Collection } from "./entity/Collection";
@@ -633,6 +634,7 @@ export const resolvers: {
         // User
         createMe: createMe,
         updateMe: updateMe,
+        setAsAdmin: setAsAdmin,
         updateMyPassword: updateMyPassword,
         forgotMyPassword: forgotMyPassword,
         recoverMyPassword: recoverMyPassword,

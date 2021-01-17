@@ -21,6 +21,7 @@ import { ValidationError, UserInputError } from "apollo-server";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { CollectionRepository } from "./CollectionRepository";
 import { StorageErrors } from "../storage/files/file-storage-service";
+import { FirstUserStatusHolder } from "../resolvers/FirstUserStatusHolder";
 // https://stackoverflow.com/a/52097700
 export function isDefined<T>(value: T | undefined | null): value is T {
     return <T>value !== undefined && <T>value !== null;
@@ -147,6 +148,10 @@ function addUserToMixpanel(user: User, invitedByUserEmail: string) {
 export class UserRepository extends Repository<User> {
     constructor() {
         super();
+    }
+
+    public isAtLeastOneUserRegistered(): Promise<number> {
+        return this.query('SELECT CASE WHEN EXISTS (SELECT 1 FROM "user" WHERE id IS NOT NULL) THEN 1 ELSE 0 END');
     }
 
     getUserByUsername(username: string) {
@@ -298,7 +303,7 @@ export class UserRepository extends Repository<User> {
             return (input as CreateUserInputAdmin) !== undefined;
         };
 
-        let emailVerificationToken = uuid();
+        const emailVerificationToken = uuid();
 
         return this.manager
             .nestedTransaction(async (transaction) => {
@@ -321,15 +326,17 @@ export class UserRepository extends Repository<User> {
                 user.createdAt = now;
                 user.updatedAt = now;
 
-                if (isAdmin(value) && value.isAdmin) {
+                if (!FirstUserStatusHolder.IS_FIRST_USER_CREATED) {
+                    user.isAdmin = true;
+                    FirstUserStatusHolder.IS_FIRST_USER_CREATED = true;
+                } else if (isAdmin(value) && value.isAdmin) {
                     user.isAdmin = value.isAdmin;
                 } else {
                     user.isAdmin = false;
                 }
 
                 user = await transaction.save(user);
-
-                const catalog = await transaction.getCustomRepository(CatalogRepository).createCatalog({
+                await transaction.getCustomRepository(CatalogRepository).createCatalog({
                     userId: user.id,
                     value: {
                         description: "",
@@ -404,6 +411,18 @@ export class UserRepository extends Repository<User> {
             dbUser.passwordHash = newPasswordHash;
             dbUser.passwordRecoveryToken = null;
 
+            await transaction.save(dbUser);
+        });
+    }
+
+    public updateUserAdminStatus({ username, isAdmin }: { username: string; isAdmin: boolean }): Promise<void> {
+        return this.manager.nestedTransaction(async (transaction) => {
+            const dbUser = await getUserByUsernameOrFail({
+                username,
+                manager: transaction
+            });
+
+            dbUser.isAdmin = isAdmin;
             await transaction.save(dbUser);
         });
     }

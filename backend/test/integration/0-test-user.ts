@@ -1,6 +1,13 @@
 import { ApolloClient, FetchResult, NormalizedCacheObject, ServerError } from "@apollo/client/core";
 import { expect } from "chai";
-import { MeDocument, UserDocument, UpdateMeDocument, LoginMutation, SearchUsersDocument } from "./registry-client";
+import {
+    MeDocument,
+    UserDocument,
+    UpdateMeDocument,
+    LoginMutation,
+    SearchUsersDocument,
+    SetAsAdminDocument
+} from "./registry-client";
 import { createUser } from "./test-utils";
 import { describe, it } from "mocha";
 
@@ -56,6 +63,14 @@ describe("User Tests", async () => {
         expect(userA.me.website, "website should be null").equal(null);
     });
 
+    it("First created user in registry is an admin", async function () {
+        let response = await userAClient.query({
+            query: MeDocument
+        });
+
+        expect(response.data.me.isAdmin, "First user of the registry should be an admin").equal(true);
+    });
+
     it("Get User B", async function () {
         let response = await userBClient.query({
             query: MeDocument
@@ -71,6 +86,14 @@ describe("User Tests", async () => {
         expect(userB.me.twitterHandle).equal(null);
         expect(userB.me.gitHubHandle).equal(null);
         expect(userB.me.website).equal(null);
+    });
+
+    it("Second created user in registry is not an admin", async function () {
+        let response = await userBClient.query({
+            query: MeDocument
+        });
+
+        expect(response.data.me.isAdmin, "Second user of the registry should not be an admin").equal(false);
     });
 
     it("User B Get User A", async function () {
@@ -161,6 +184,56 @@ describe("User Tests", async () => {
         expect(lastName.data?.searchUsers["users"][0]?.lastName).to.equal("LastA");
         expect(email.data?.searchUsers["users"][0]?.emailAddress).to.equal("testA-user@test.datapm.io");
         expect(username.data?.searchUsers["users"][0]?.username).to.equal("testA-user");
+    });
+
+    it("Make a user an admin", async function () {
+        await userAClient.mutate({
+            mutation: SetAsAdminDocument,
+            variables: {
+                username: "testB-user",
+                isAdmin: true
+            }
+        });
+
+        let userBResponse = await userBClient.query({
+            query: MeDocument
+        });
+
+        expect(userBResponse.data?.me.isAdmin).to.equal(true);
+    });
+
+    it("Remove admin status from a user", async function () {
+        await userAClient.mutate({
+            mutation: SetAsAdminDocument,
+            variables: {
+                username: "testB-user",
+                isAdmin: false
+            }
+        });
+
+        let userBResponse = await userBClient.query({
+            query: MeDocument
+        });
+
+        expect(userBResponse.data?.me.isAdmin).to.equal(false);
+    });
+
+    it("Non admin user should not be able to set admin status of any user", async function () {
+        const adminStatusChangeResponse = await userBClient.mutate({
+            mutation: SetAsAdminDocument,
+            variables: {
+                username: "testA-user",
+                isAdmin: false
+            }
+        });
+
+        const userAProfileResponse = await userAClient.query({
+            query: MeDocument
+        });
+
+        const responseErrors = adminStatusChangeResponse.errors ? adminStatusChangeResponse.errors : [];
+        expect(responseErrors[0].message).to.equal("NOT_AUTHORIZED");
+        expect(userAProfileResponse.data?.me.isAdmin).to.equal(true);
     });
 
     it("Set User A twitterHandle", async function () {
