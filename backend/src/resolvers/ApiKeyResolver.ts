@@ -57,3 +57,9 @@ export const deleteAPIKey = async (
         .getCustomRepository(APIKeyRepository)
         .deleteAPIKey({ id, relations: getGraphQlRelationName(info) });
 };
+
+export const myAPIKeys = async (_0: any, {}, context: AuthenticatedContext) => {
+    const apiKeys = await context.connection.manager.getCustomRepository(APIKeyRepository).findByUser(context.me?.id);
+
+    return apiKeys;
+};

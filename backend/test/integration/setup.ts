@@ -67,7 +67,12 @@ before(async function () {
         }
     });
 
-    serverProcess.stdout!.pipe(process.stdout);
+    serverProcess.stdout!.addListener("data", (chunk: Buffer) => {
+        const line = chunk.toString();
+        if (line.startsWith("{")) return;
+        console.log(line);
+    });
+
     serverProcess.stderr!.pipe(process.stderr);
 
     serverProcess.addListener("error", (err) => {

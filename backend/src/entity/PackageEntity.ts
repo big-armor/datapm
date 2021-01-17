@@ -1,16 +1,16 @@
 import { Entity, Column, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
 
-import { BaseModel } from "./BaseModel";
-import { Catalog } from "./Catalog";
-import { Version } from "./Version";
-import { PackageIdentifier, Permission } from "../generated/graphql";
-import { User } from "./User";
+import { EntityBaseModel } from "./EntityBaseModel";
+import { CatalogEntity } from "./CatalogEntity";
+import { VersionEntity } from "./VersionEntity";
+import { UserEntity } from "./UserEntity";
+import { PackageIdentifier } from "../generated/graphql";
 
 @Entity({
     name: "package"
 })
 @Unique(["slug", "catalogId"])
-export class Package extends BaseModel {
+export class PackageEntity extends EntityBaseModel {
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -37,9 +37,9 @@ export class Package extends BaseModel {
     })
     description: string | null;
 
-    @ManyToOne(() => Catalog)
+    @ManyToOne(() => CatalogEntity, { eager: true })
     @JoinColumn({ name: "catalog_id" })
-    catalog: Catalog;
+    catalog: CatalogEntity;
 
     @Column({ name: "catalog_id" })
     catalogId: number;
@@ -47,13 +47,13 @@ export class Package extends BaseModel {
     @Column({ nullable: false, default: false })
     isPublic: boolean;
 
-    @OneToMany(() => Version, (version) => version.package, {})
+    @OneToMany(() => VersionEntity, (version) => version.package, {})
     @JoinColumn({ name: "catalog_id" })
-    versions: Version[];
+    versions: VersionEntity[];
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => UserEntity)
     @JoinColumn({ name: "creator_id" })
-    creator: User;
+    creator: UserEntity;
 
     @Column({ name: "creator_id", nullable: false })
     public creatorId: number;
@@ -63,13 +63,4 @@ export class Package extends BaseModel {
 
     @Column({ name: "view_count", nullable: false })
     public viewCount: number;
-
-    /** These are dummy values that are filled in by graphql responses */
-    latestVersion: Version;
-
-    identifier: PackageIdentifier;
-
-    // These are dummy values so that response objects will have the right values
-    // need to write converters for Entity -> GraphQL object
-    myPermissions: Permission[];
 }

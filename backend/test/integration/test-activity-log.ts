@@ -54,7 +54,7 @@ describe("Activity Log Tests", async () => {
         userOne = userOneResponse.data!.me;
         userTwo = userTwoResponse.data!.me;
 
-        await userOneClient.mutate({
+        const createPackageResponse = await userOneClient.mutate({
             mutation: CreatePackageDocument,
             variables: {
                 value: {
@@ -65,6 +65,8 @@ describe("Activity Log Tests", async () => {
                 }
             }
         });
+
+        expect(createPackageResponse.errors == null).to.equal(true);
     });
 
     it("Should show USER_CREATED", async function () {

@@ -194,7 +194,7 @@ type Package {
     creator: User
     identifier: PackageIdentifier!
     catalog: Catalog
-    displayName: String!
+    displayName: String
     description: String
     latestVersion: Version
     versions: [Version]
@@ -207,22 +207,13 @@ type Package {
 }
 
 """
-Represents a user, and their permission to a catalog
-"""
-type UserCatalog {
-    user: User!
-    catalog: Catalog!
-    permissions: [Permission!]
-}
-
-"""
  A collection is a curated list of one or more packages from across one or more catalogs on a given topic. Collections are created and maintained
 by consumer side users, and generally not the publishers
 """
 type Collection {
     creator: User
     identifier: CollectionIdentifier!
-    name: String!
+    name: String
     description: String
     packages: [Package!]
     createdAt: Date
@@ -282,11 +273,11 @@ The complete identifier for a version of a package on a registry
 """
 type VersionIdentifier {
     registryURL: String
-    catalogSlug: String
-    packageSlug: String
-    versionMajor: Int
-    versionMinor: Int
-    versionPatch: Int
+    catalogSlug: String!
+    packageSlug: String!
+    versionMajor: Int!
+    versionMinor: Int!
+    versionPatch: Int!
 }
 
 """
@@ -303,7 +294,7 @@ The complete identifier for a catalog on a registry
 """
 type CatalogIdentifier {
     registryURL: String
-    catalogSlug: String
+    catalogSlug: String!
 }
 
 """
@@ -311,7 +302,7 @@ The complete identifier for a collections on a registry
 """
 type CollectionIdentifier {
     registryURL: String
-    collectionSlug: String
+    collectionSlug: String!
 }
 
 """

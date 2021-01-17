@@ -1,24 +1,24 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { BaseModel } from "./BaseModel";
-import { User } from "./User";
-import { Package } from "./Package";
-import { Version } from "./Version";
-import { Catalog } from "./Catalog";
-import { Collection } from "./Collection";
+import { EntityBaseModel } from "./EntityBaseModel";
+import { UserEntity } from "./UserEntity";
+import { PackageEntity } from "./PackageEntity";
+import { VersionEntity } from "./VersionEntity";
+import { CatalogEntity } from "./CatalogEntity";
+import { CollectionEntity } from "./CollectionEntity";
 import { ActivityLogChangeType, ActivityLogEventType } from "./ActivityLogEventType";
 
 @Entity({ name: "activity_log" })
 @Index(["userId", "eventType"])
-export class ActivityLog extends BaseModel {
+export class ActivityLogEntity extends EntityBaseModel {
     @PrimaryGeneratedColumn()
     public id: number;
 
     @Column({ name: "user_id", nullable: true })
     public userId?: number;
 
-    @ManyToOne(() => User, { onDelete: "CASCADE" })
+    @ManyToOne(() => UserEntity, { onDelete: "CASCADE", eager: true })
     @JoinColumn({ name: "user_id" })
-    public user: User | null;
+    public user: UserEntity | null;
 
     @Column({ name: "event_type", nullable: false })
     public eventType: ActivityLogEventType;
@@ -29,30 +29,30 @@ export class ActivityLog extends BaseModel {
     @Column({ name: "target_package_id", nullable: true })
     public targetPackageId?: number;
 
-    @ManyToOne(() => Package, { onDelete: "CASCADE" })
+    @ManyToOne(() => PackageEntity, { onDelete: "CASCADE", eager: true })
     @JoinColumn({ name: "target_package_id" })
-    public targetPackage: Package | null;
+    public targetPackage: PackageEntity | null;
 
     @Column({ name: "target_package_version_id", nullable: true })
     public targetPackageVersionId?: number;
 
-    @ManyToOne(() => Version, { onDelete: "CASCADE" })
+    @ManyToOne(() => VersionEntity, { onDelete: "CASCADE", eager: true })
     @JoinColumn({ name: "target_package_version_id" })
-    public targetPackageVersion: Version | null;
+    public targetPackageVersion: VersionEntity | null;
 
     @Column({ name: "target_catalog_id", nullable: true })
     public targetCatalogId?: number;
 
-    @ManyToOne(() => Catalog, { onDelete: "CASCADE" })
+    @ManyToOne(() => CatalogEntity, { onDelete: "CASCADE", eager: true })
     @JoinColumn({ name: "target_catalog_id" })
-    public targetCatalog: Catalog | null;
+    public targetCatalog: CatalogEntity | null;
 
     @Column({ name: "target_collection_id", nullable: true })
     public targetCollectionId?: number;
 
-    @ManyToOne(() => Collection, { onDelete: "CASCADE" })
+    @ManyToOne(() => CollectionEntity, { onDelete: "CASCADE", eager: true })
     @JoinColumn({ name: "target_collection_id" })
-    public targetCollection: Collection | null;
+    public targetCollection: CollectionEntity | null;
 
     @Column({ name: "properties_edited", array: true, type: "text" })
     public propertiesEdited?: string[];

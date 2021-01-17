@@ -1,5 +1,5 @@
 import { EntityRepository, EntityManager } from "typeorm";
-import { Version } from "../entity/Version";
+import { VersionEntity } from "../entity/VersionEntity";
 import { VersionIdentifierInput, CreateVersionInput, PackageIdentifierInput } from "../generated/graphql";
 import { PackageRepository } from "./PackageRepository";
 import { SemVer } from "semver";
@@ -20,7 +20,7 @@ export class VersionRepository {
 
             let semVer = new SemVer(value.packageFile.version);
 
-            let version = transaction.getRepository(Version).create({
+            let version = transaction.getRepository(VersionEntity).create({
                 packageId: packageEntity.id,
                 majorVersion: semVer.major,
                 minorVersion: semVer.minor,
@@ -41,13 +41,13 @@ export class VersionRepository {
     }: {
         identifier: PackageIdentifierInput;
         relations?: string[];
-    }): Promise<Maybe<Version>> {
+    }): Promise<Maybe<VersionEntity>> {
         const ALIAS = "findLatestVersion";
 
         const packageRef = await this.manager.getCustomRepository(PackageRepository).findPackageOrFail({ identifier });
 
         return this.manager
-            .getRepository(Version)
+            .getRepository(VersionEntity)
             .createQueryBuilder(ALIAS)
             .where({ packageId: packageRef.id })
             .orderBy({
@@ -65,10 +65,10 @@ export class VersionRepository {
     }: {
         identifier: VersionIdentifierInput;
         relations?: string[];
-    }): Promise<Version> {
+    }): Promise<VersionEntity> {
         let packageEntity = await this.manager.getCustomRepository(PackageRepository).findOrFail({ identifier });
 
-        let version = await this.manager.getRepository(Version).findOneOrFail({
+        let version = await this.manager.getRepository(VersionEntity).findOneOrFail({
             where: {
                 packageId: packageEntity.id,
                 majorVersion: identifier.versionMajor,
@@ -87,10 +87,16 @@ export class VersionRepository {
         return version;
     }
 
-    async findVersions({ packageId, relations = [] }: { packageId: number; relations?: string[] }): Promise<Version[]> {
+    async findVersions({
+        packageId,
+        relations = []
+    }: {
+        packageId: number;
+        relations?: string[];
+    }): Promise<VersionEntity[]> {
         const ALIAS = "versionsByPackageId";
         const versions = await this.manager
-            .getRepository(Version)
+            .getRepository(VersionEntity)
             .createQueryBuilder(ALIAS)
             .where({ packageId })
             .addRelations(ALIAS, relations)
@@ -99,7 +105,7 @@ export class VersionRepository {
         return versions;
     }
 
-    async deleteVersions(versions: Version[]): Promise<void> {
+    async deleteVersions(versions: VersionEntity[]): Promise<void> {
         if (versions.length == 0) return;
 
         for (const version of versions) {
@@ -120,7 +126,7 @@ export class VersionRepository {
         }
 
         await this.manager.nestedTransaction(async (transaction) => {
-            for (const version of versions) await transaction.delete(Version, { id: version.id });
+            for (const version of versions) await transaction.delete(VersionEntity, { id: version.id });
         });
     }
 }

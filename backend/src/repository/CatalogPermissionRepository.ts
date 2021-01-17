@@ -1,14 +1,14 @@
 import { EntityRepository, Repository, EntityManager } from "typeorm";
 
-import { User } from "../entity/User";
+import { UserEntity } from "../entity/UserEntity";
 import {
     Permission,
     CatalogIdentifierInput,
     SetUserCatalogPermissionInput,
     UserCatalogPermissions
 } from "../generated/graphql";
-import { Catalog } from "../entity/Catalog";
-import { UserCatalogPermission } from "../entity/UserCatalogPermission";
+import { CatalogEntity } from "../entity/CatalogEntity";
+import { UserCatalogPermissionEntity } from "../entity/UserCatalogPermissionEntity";
 import { UserRepository } from "./UserRepository";
 import { CatalogRepository } from "./CatalogRepository";
 import { UserInputError, ForbiddenError } from "apollo-server";
@@ -25,11 +25,11 @@ async function getUserCatalogPermissionOrFail({
     permission: Permission;
     manager: EntityManager;
     relations?: string[];
-}): Promise<UserCatalogPermission> {
+}): Promise<UserCatalogPermissionEntity> {
     const ALIAS = "catalog";
 
     let query = manager
-        .getRepository(UserCatalogPermission)
+        .getRepository(UserCatalogPermissionEntity)
         .createQueryBuilder(ALIAS)
         .where({ userId: userId, catalogId: catalogId, permission: permission })
         .addRelations(ALIAS, relations);
@@ -51,7 +51,7 @@ export async function grantUserCatalogPermission({
     permissions: Permission[];
     manager: EntityManager;
     relations?: string[];
-}): Promise<UserCatalogPermission | null> {
+}): Promise<UserCatalogPermissionEntity | null> {
     const userCatalogPermission = await manager.nestedTransaction(async (transaction) => {
         // find the user
         const user = await transaction.getCustomRepository(UserRepository).findOne({ id: userId });
@@ -75,7 +75,7 @@ export async function grantUserCatalogPermission({
 
         if (returnValue) return returnValue;
 
-        const entry = transaction.getRepository(UserCatalogPermission).create();
+        const entry = transaction.getRepository(UserCatalogPermissionEntity).create();
         entry.userId = user.id;
         entry.catalogId = catalog.id;
         entry.permissions = permissions;
@@ -107,11 +107,11 @@ async function getUserCatalogPermission({
     catalogId: number;
     manager: EntityManager;
     relations?: string[];
-}): Promise<UserCatalogPermission | null> {
+}): Promise<UserCatalogPermissionEntity | null> {
     const ALIAS = "catalog";
 
     let query = manager
-        .getRepository(UserCatalogPermission)
+        .getRepository(UserCatalogPermissionEntity)
         .createQueryBuilder(ALIAS)
         .where({ userId: userId, catalogId: catalogId })
         .addRelations(ALIAS, relations);
@@ -120,8 +120,8 @@ async function getUserCatalogPermission({
     return catalog || null;
 }
 
-@EntityRepository(UserCatalogPermission)
-export class UserCatalogPermissionRepository extends Repository<UserCatalogPermission> {
+@EntityRepository(UserCatalogPermissionEntity)
+export class UserCatalogPermissionRepository extends Repository<UserCatalogPermissionEntity> {
     public async hasPermission(userId: number, catalogId: number, permission: Permission): Promise<boolean> {
         const permissionsEntity = await this.findCatalogPermissions({ catalogId, userId });
         if (!permissionsEntity) {
@@ -142,7 +142,7 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
     }) {
         const ALIAS = "userPackagePermission";
         return this.manager
-            .getRepository(UserCatalogPermission)
+            .getRepository(UserCatalogPermissionEntity)
             .createQueryBuilder(ALIAS)
             .addRelations(ALIAS, relations)
             .where({ catalogId, userId })
@@ -155,12 +155,12 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
     }: {
         username: string;
         relations?: string[];
-    }): Promise<UserCatalogPermission[]> {
-        const user = await this.manager.getRepository(User).findOneOrFail({ username: username });
+    }): Promise<UserCatalogPermissionEntity[]> {
+        const user = await this.manager.getRepository(UserEntity).findOneOrFail({ username: username });
 
         const ALIAS = "UserCatalogPermission";
         return this.manager
-            .getRepository(UserCatalogPermission)
+            .getRepository(UserCatalogPermissionEntity)
             .createQueryBuilder(ALIAS)
             .where({ userId: user.id })
             .addRelations(ALIAS, relations)
@@ -176,15 +176,15 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
         catalogSlug: string;
         permission: Permission;
     }): Promise<boolean> {
-        const catalog = await this.manager.getRepository(Catalog).findOneOrFail({
+        const catalog = await this.manager.getRepository(CatalogEntity).findOneOrFail({
             slug: catalogSlug
         });
 
-        const user = await this.manager.getRepository(User).findOneOrFail({
+        const user = await this.manager.getRepository(UserEntity).findOneOrFail({
             username
         });
 
-        const userCatalogPermission = await this.manager.getRepository(UserCatalogPermission).findOneOrFail({
+        const userCatalogPermission = await this.manager.getRepository(UserCatalogPermissionEntity).findOneOrFail({
             userId: user.id,
             catalogId: catalog.id
         });
@@ -192,15 +192,18 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
         return userCatalogPermission.permissions.indexOf(permission) != -1;
     }
 
-    public async findByUserAndCatalogId(userId: number, catalogId: number): Promise<UserCatalogPermission | undefined> {
+    public async findByUserAndCatalogId(
+        userId: number,
+        catalogId: number
+    ): Promise<UserCatalogPermissionEntity | undefined> {
         return this.createQueryBuilder().where({ userId: userId, catalogId: catalogId }).getOne();
     }
 
-    public async usersByCatalog(catalogEntity: Catalog, relations?: string[]): Promise<UserCatalogPermissions[]> {
+    public async usersByCatalog(catalogEntity: CatalogEntity, relations?: string[]): Promise<UserCatalogPermissions[]> {
         const ALIAS = "userCatalogPermission";
 
         return await this.manager
-            .getRepository(UserCatalogPermission)
+            .getRepository(UserCatalogPermissionEntity)
             .createQueryBuilder(ALIAS)
             .addRelations(ALIAS, relations)
             .where({ catalogId: catalogEntity.id })
@@ -236,7 +239,7 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
                 // If user does not exist in catalog permissions, it creates new record
                 if (permissions == undefined) {
                     try {
-                        const catalogPermissionEntry = transaction.create(UserCatalogPermission);
+                        const catalogPermissionEntry = transaction.create(UserCatalogPermissionEntity);
                         catalogPermissionEntry.userId = user.id;
                         catalogPermissionEntry.catalogId = catalogEntity.id;
                         catalogPermissionEntry.permissions = value.permission;
@@ -252,7 +255,7 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
                     try {
                         return await transaction
                             .createQueryBuilder()
-                            .update(UserCatalogPermission)
+                            .update(UserCatalogPermissionEntity)
                             .set({ permissions: value.permission, packagePermission: value.packagePermission })
                             .where({ catalogId: catalogEntity.id, userId: user.id })
                             .execute();
@@ -269,7 +272,7 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
                         return await transaction
                             .createQueryBuilder()
                             .delete()
-                            .from(UserCatalogPermission)
+                            .from(UserCatalogPermissionEntity)
                             .where({ catalogId: catalogEntity.id, userId: user.id })
                             .execute();
                     } catch (e) {
@@ -300,7 +303,7 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
                 throw new Error("CANNOT_REMOVE_CREATOR_PERMISSIONS");
             }
 
-            await transaction.delete(UserCatalogPermission, { catalogId: catalogEntity.id });
+            await transaction.delete(UserCatalogPermissionEntity, { catalogId: catalogEntity.id });
         });
     }
 }

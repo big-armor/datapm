@@ -1,6 +1,6 @@
 import { Connection } from "typeorm";
 import { Request } from "express";
-import { User } from "./entity/User";
+import { UserEntity } from "./entity/UserEntity";
 
 enum Scope {
     // Need to determine what these should be
@@ -12,14 +12,14 @@ enum Scope {
 export interface Context {
     connection: Connection;
     request: Request;
-    me?: User;
+    me?: UserEntity;
     scopes?: Scope[];
 }
 
 export interface AuthenticatedContext extends Context {
     connection: Connection;
     request: Request;
-    me: User;
+    me: UserEntity;
     scopes: [];
 }
 

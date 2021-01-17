@@ -1,10 +1,11 @@
-import { In } from "typeorm";
+import { Connection, EntityManager, In } from "typeorm";
 import graphqlFields from "graphql-fields";
 
 import { AuthenticatedContext } from "../context";
-import { ActivityLog } from "../entity/ActivityLog";
+import { ActivityLogEntity } from "../entity/ActivityLogEntity";
 import { getRelationNames } from "../util/relationNames";
 import {
+    ActivityLog,
     ActivityLogEventType,
     ActivityLogFilterInput,
     ActivityLogResult,
@@ -12,6 +13,81 @@ import {
     PackageIdentifierInput
 } from "../generated/graphql";
 import { PackageRepository } from "../repository/PackageRepository";
+import { UserEntity } from "../entity/UserEntity";
+import { catalogEntityToGraphQL } from "./CatalogResolver";
+import { CatalogEntity } from "../entity/CatalogEntity";
+import { collectionEntityToGraphQL } from "./CollectionResolver";
+import { CollectionEntity } from "../entity/CollectionEntity";
+import { packageEntityToGraphqlObject } from "./PackageResolver";
+import { PackageEntity } from "../entity/PackageEntity";
+import { versionEntityToGraphqlObject } from "./VersionResolver";
+import { VersionEntity } from "../entity/VersionEntity";
+
+export const activtyLogEntityToGraphQL = async function (
+    connection: Connection | EntityManager,
+    activityLogEntity: ActivityLogEntity
+): Promise<ActivityLog> {
+    const activityLog: ActivityLog = {
+        eventType: activityLogEntity.eventType,
+        changeType: activityLogEntity.changeType,
+        createdAt: activityLogEntity.createdAt,
+        updatedAt: activityLogEntity.updatedAt
+    };
+
+    if (activityLogEntity.userId) {
+        if (activityLogEntity.user) activityLog.user = activityLogEntity.user;
+        else {
+            activityLog.user = await connection.getRepository(UserEntity).findOneOrFail(activityLogEntity.userId);
+        }
+    }
+
+    if (activityLogEntity.targetCatalogId) {
+        if (activityLogEntity.targetCatalog)
+            activityLog.targetCatalog = catalogEntityToGraphQL(activityLogEntity.targetCatalog);
+        else {
+            activityLog.targetCatalog = catalogEntityToGraphQL(
+                await connection.getRepository(CatalogEntity).findOneOrFail(activityLogEntity.targetCatalogId)
+            );
+        }
+    }
+
+    if (activityLogEntity.targetCollectionId) {
+        if (activityLogEntity.targetCollection)
+            activityLog.targetCollection = collectionEntityToGraphQL(activityLogEntity.targetCollection);
+        else {
+            activityLog.targetCollection = collectionEntityToGraphQL(
+                await connection.getRepository(CollectionEntity).findOneOrFail(activityLogEntity.targetCollectionId)
+            );
+        }
+    }
+
+    if (activityLogEntity.targetPackageId) {
+        if (activityLogEntity.targetPackage)
+            activityLog.targetPackage = await packageEntityToGraphqlObject(connection, activityLogEntity.targetPackage);
+        else {
+            activityLog.targetPackage = await packageEntityToGraphqlObject(
+                connection,
+                await connection.getRepository(PackageEntity).findOneOrFail(activityLogEntity.targetPackageId)
+            );
+        }
+    }
+
+    if (activityLogEntity.targetPackageVersionId) {
+        if (activityLogEntity.targetPackageVersion)
+            activityLog.targetPackageVersion = await versionEntityToGraphqlObject(
+                connection,
+                activityLogEntity.targetPackageVersion
+            );
+        else {
+            activityLog.targetPackageVersion = await versionEntityToGraphqlObject(
+                connection,
+                await connection.getRepository(VersionEntity).findOneOrFail(activityLogEntity.targetPackageVersionId)
+            );
+        }
+    }
+
+    return activityLog;
+};
 
 export const myActivity = async (
     _0: any,
@@ -23,7 +99,7 @@ export const myActivity = async (
     const { eventType, limit, offset } = filter;
 
     let builder = context.connection
-        .getRepository(ActivityLog)
+        .getRepository(ActivityLogEntity)
         .createQueryBuilder(ALIAS)
         .where({ userId: context?.me?.id });
 
@@ -36,8 +112,10 @@ export const myActivity = async (
         .take(limit)
         .getManyAndCount();
 
+    const logObjects = await Promise.all(logs.map((l) => activtyLogEntityToGraphQL(context.connection, l)));
+
     return {
-        logs,
+        logs: logObjects,
         count,
         hasMore: count - (limit + offset) > 0
     };
@@ -53,7 +131,7 @@ export const collectionActivities = async (
     const { limit, offset } = filter;
 
     const [logs, count] = await context.connection
-        .getRepository(ActivityLog)
+        .getRepository(ActivityLogEntity)
         .createQueryBuilder(ALIAS)
         .where([
             {
@@ -71,8 +149,10 @@ export const collectionActivities = async (
         .take(limit)
         .getManyAndCount();
 
+    const logObjects = await Promise.all(logs.map((l) => activtyLogEntityToGraphQL(context.connection, l)));
+
     return {
-        logs,
+        logs: logObjects,
         count: count,
         hasMore: count - (limit + offset) > 0
     };
@@ -91,7 +171,7 @@ export const packageActivities = async (
         .getCustomRepository(PackageRepository)
         .findPackageOrFail({ identifier });
 
-    let builder = context.connection.getRepository(ActivityLog).createQueryBuilder(ALIAS).where({
+    let builder = context.connection.getRepository(ActivityLogEntity).createQueryBuilder(ALIAS).where({
         targetPackageId: packageEntity.id
     });
 
@@ -107,8 +187,10 @@ export const packageActivities = async (
         .take(limit)
         .getManyAndCount();
 
+    const logObjects = await Promise.all(logs.map((l) => activtyLogEntityToGraphQL(context.connection, l)));
+
     return {
-        logs,
+        logs: logObjects,
         count: count,
         hasMore: count - (limit + offset) > 0
     };

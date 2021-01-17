@@ -3,9 +3,9 @@ import querystring from "querystring";
 import { EntityRepository, Repository, EntityManager } from "typeorm";
 import { v4 as uuidv4 } from "uuid";
 
-import { User } from "../entity/User";
+import { UserEntity } from "../entity/UserEntity";
 
-import { APIKey } from "../entity/APIKey";
+import { APIKeyEntity } from "../entity/APIKeyEntity";
 import { hashPassword } from "../util/PasswordUtil";
 import { APIKeyWithSecret, Scope } from "../generated/graphql";
 import { ValidationError } from "apollo-server";
@@ -24,10 +24,10 @@ async function getAPIKey({
     catalogId?: number;
     manager: EntityManager;
     relations?: string[];
-}): Promise<APIKey | null> {
+}): Promise<APIKeyEntity | null> {
     const ALIAS = "users";
     let query = manager
-        .getRepository(APIKey)
+        .getRepository(APIKeyEntity)
         .createQueryBuilder(ALIAS)
         .where({ id: id })
         .addRelations(ALIAS, relations);
@@ -45,7 +45,7 @@ async function getAPIKeyOrFail({
     id: string;
     manager: EntityManager;
     relations?: string[];
-}): Promise<APIKey> {
+}): Promise<APIKeyEntity> {
     const apiKey = await getAPIKey({
         id,
         manager,
@@ -55,18 +55,18 @@ async function getAPIKeyOrFail({
     return apiKey;
 }
 
-@EntityRepository(User)
-export class APIKeyRepository extends Repository<APIKey> {
+@EntityRepository(UserEntity)
+export class APIKeyRepository extends Repository<APIKeyEntity> {
     constructor() {
         super();
     }
 
-    async findAllForUser({ user, relations = [] }: { user: User; relations?: string[] }) {
+    async findAllForUser({ user, relations = [] }: { user: UserEntity; relations?: string[] }) {
         const ALIAS = "users";
         const keys = await this.manager
-            .getRepository(APIKey)
+            .getRepository(APIKeyEntity)
             .createQueryBuilder(ALIAS)
-            .where({ user: User })
+            .where({ user: UserEntity })
             .addRelations(ALIAS, relations)
             .getMany();
 
@@ -80,14 +80,14 @@ export class APIKeyRepository extends Repository<APIKey> {
         scopes,
         relations = []
     }: {
-        user: User;
+        user: UserEntity;
         label: string;
         scopes: Scope[];
         relations?: string[];
     }): Promise<APIKeyWithSecret> {
         return this.manager.nestedTransaction(async (transaction) => {
             const existingKey = await transaction
-                .getRepository(APIKey)
+                .getRepository(APIKeyEntity)
                 .createQueryBuilder()
                 .where({ userId: user.id, label: label })
                 .getOne();
@@ -100,7 +100,7 @@ export class APIKeyRepository extends Repository<APIKey> {
 
             const secret = uuidv4();
 
-            const apiKey = transaction.create(APIKey);
+            const apiKey = transaction.create(APIKeyEntity);
             apiKey.user = user;
             apiKey.label = label;
             apiKey.id = uuidv4();
@@ -127,15 +127,15 @@ export class APIKeyRepository extends Repository<APIKey> {
         // TODO - then send an email to the user that an API key has been created
     }
 
-    async findByUser(userId: number): Promise<APIKey[]> {
+    async findByUser(userId: number): Promise<APIKeyEntity[]> {
         return await this.manager
-            .getRepository(APIKey)
+            .getRepository(APIKeyEntity)
             .createQueryBuilder("findUsersAPIKeys")
             .where({ userId })
             .getMany();
     }
 
-    deleteAPIKey({ id, relations = [] }: { id: string; relations?: string[] }): Promise<APIKey> {
+    deleteAPIKey({ id, relations = [] }: { id: string; relations?: string[] }): Promise<APIKeyEntity> {
         return this.manager.nestedTransaction(async (transaction) => {
             const apiKey = getAPIKeyOrFail({
                 id,
@@ -143,7 +143,7 @@ export class APIKeyRepository extends Repository<APIKey> {
                 relations
             });
 
-            await transaction.delete(APIKey, { id: (await apiKey).id });
+            await transaction.delete(APIKeyEntity, { id: (await apiKey).id });
             delete (await apiKey).hash; // never return the hash
             return apiKey;
         });

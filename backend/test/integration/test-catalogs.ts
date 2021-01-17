@@ -835,6 +835,7 @@ describe("Catalog Tests", async () => {
             }
         });
 
+        console.log(JSON.stringify(response, null, 1));
         expect(response.errors == null).true;
         expect(response.data?.catalogPackages.length).to.equal(3);
     });

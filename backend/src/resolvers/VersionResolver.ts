@@ -1,0 +1,310 @@
+import { SemVer } from "semver";
+import {
+    compatibilityToString,
+    comparePackages,
+    diffCompatibility,
+    nextVersion,
+    PackageFile,
+    Compability
+} from "datapm-lib";
+import { VersionRepository } from "./../repository/VersionRepository";
+import { PackageFileStorageService } from "./../storage/packages/package-file-storage-service";
+import { AuthenticatedContext } from "./../context";
+import {
+    ActivityLogChangeType,
+    ActivityLogEventType,
+    CreateVersionInput,
+    Package,
+    PackageIdentifierInput,
+    Permission,
+    User,
+    Version,
+    VersionConflict,
+    VersionIdentifier,
+    VersionIdentifierInput
+} from "../generated/graphql";
+import { ApolloError } from "apollo-server";
+import { PackageRepository } from "../repository/PackageRepository";
+import { getGraphQlRelationName } from "./../util/relationNames";
+import { VersionEntity } from "../entity/VersionEntity";
+import { createActivityLog } from "./../repository/ActivityLogRepository";
+import { Connection, EntityManager } from "typeorm";
+import { PackageEntity } from "../entity/PackageEntity";
+import { CatalogEntity } from "../entity/CatalogEntity";
+import { catalogEntityToGraphQL } from "./CatalogResolver";
+import { StorageErrors } from "../storage/files/file-storage-service";
+import { hasPackagePermissions } from "./UserPackagePermissionResolver";
+import { packageEntityToGraphqlObject } from "./PackageResolver";
+
+export const versionEntityToGraphqlObject = async (
+    context: EntityManager | Connection,
+    versionEntity: VersionEntity
+): Promise<Version> => {
+    let packageSlug: string;
+    let catalogSlug: string;
+    const packageEntity = await context
+        .getRepository(PackageEntity)
+        .findOneOrFail({ where: { id: versionEntity.packageId } });
+    packageSlug = packageEntity.slug;
+
+    if (versionEntity.package?.catalog != null) {
+        catalogSlug = versionEntity.package.catalog.slug;
+    } else if (packageEntity.catalog != null) {
+        catalogSlug = packageEntity.catalog.slug;
+    } else {
+        const catalogEntity = await context.getRepository(CatalogEntity).findOneOrFail({ id: packageEntity.id });
+        catalogSlug = catalogEntity.slug;
+    }
+
+    const packageEntityLoaded = await context
+        .getRepository(PackageEntity)
+        .findOneOrFail({ where: { id: packageEntity.id } });
+
+    return {
+        identifier: {
+            registryURL: process.env["REGISTRY_URL"]!,
+            catalogSlug: catalogSlug,
+            packageSlug: packageSlug,
+            versionMajor: versionEntity.majorVersion,
+            versionMinor: versionEntity.minorVersion,
+            versionPatch: versionEntity.patchVersion
+        }
+    };
+};
+
+export const createVersion = async (
+    _0: any,
+    { identifier, value }: { identifier: PackageIdentifierInput; value: CreateVersionInput },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const fileStorageService = PackageFileStorageService.INSTANCE;
+
+    return await context.connection.manager.nestedTransaction(async (transaction) => {
+        const proposedNewVersion = new SemVer(value.packageFile.version);
+
+        const newPackageFile = value.packageFile as PackageFile;
+
+        // get the latest version
+        const latestVersion = await transaction
+            .getCustomRepository(VersionRepository)
+            .findLatestVersion({ identifier, relations: ["package"] });
+
+        let changeType = ActivityLogChangeType.VERSION_FIRST_VERSION;
+
+        if (latestVersion != null) {
+            let packageFile;
+            try {
+                packageFile = await PackageFileStorageService.INSTANCE.readPackageFile(latestVersion.package.id, {
+                    ...identifier,
+                    versionMajor: latestVersion.majorVersion,
+                    versionMinor: latestVersion.minorVersion,
+                    versionPatch: latestVersion.patchVersion
+                });
+            } catch (error) {
+                throw new ApolloError("INTERNAL_SERVER_ERROR");
+            }
+
+            const latestVersionSemVer = new SemVer(packageFile!.version);
+
+            const diff = comparePackages(packageFile, newPackageFile);
+
+            const compatibility = diffCompatibility(diff);
+
+            const minNextVersion = nextVersion(latestVersionSemVer, compatibility);
+
+            const minVersionCompare = minNextVersion.compare(proposedNewVersion.version);
+
+            if (compatibility == Compability.Identical) {
+                throw new ApolloError(
+                    identifier.catalogSlug +
+                        "/" +
+                        identifier.packageSlug +
+                        "/" +
+                        latestVersionSemVer.version +
+                        " already exists, and the submission is identical to it",
+                    VersionConflict.VERSION_EXISTS,
+                    { existingVersion: latestVersionSemVer.version }
+                );
+            } else if (minVersionCompare == 1) {
+                throw new ApolloError(
+                    identifier.catalogSlug +
+                        "/" +
+                        identifier.packageSlug +
+                        " has current version " +
+                        latestVersionSemVer.version +
+                        ", and this new version has " +
+                        compatibilityToString(compatibility) +
+                        " changes - requiring a minimum version number of " +
+                        minNextVersion.version +
+                        ", but you submitted version number " +
+                        proposedNewVersion.version,
+                    VersionConflict.HIGHER_VERSION_REQUIRED,
+                    { existingVersion: latestVersionSemVer.version, minNextVersion: minNextVersion.version }
+                );
+            } else if (compatibility == Compability.MinorChange) {
+                changeType = ActivityLogChangeType.VERSION_PATCH_CHANGE;
+            } else if (compatibility == Compability.CompatibleChange) {
+                changeType = ActivityLogChangeType.VERSION_MINOR_CHANGE;
+            } else if (compatibility == Compability.BreakingChange) {
+                changeType = ActivityLogChangeType.VERSION_MAJOR_CHANGE;
+            }
+        }
+
+        const savedVersion = await transaction
+            .getCustomRepository(VersionRepository)
+            .save(context.me.id, identifier, value);
+
+        const versionIdentifier = {
+            ...identifier,
+            versionMajor: proposedNewVersion.major,
+            versionMinor: proposedNewVersion.minor,
+            versionPatch: proposedNewVersion.patch
+        };
+
+        const packageEntity = await transaction.getCustomRepository(PackageRepository).findOrFail({ identifier });
+
+        await transaction
+            .getCustomRepository(PackageRepository)
+            .updatePackageReadmeVectors(identifier, newPackageFile.readmeMarkdown);
+
+        if (value.packageFile)
+            await PackageFileStorageService.INSTANCE.writePackageFile(
+                packageEntity.id,
+                versionIdentifier,
+                value.packageFile
+            );
+
+        const ALIAS = "findVersion";
+        const recalledVersion = await transaction
+            .getRepository(VersionEntity)
+            .createQueryBuilder(ALIAS)
+            .addRelations(ALIAS, getGraphQlRelationName(info))
+            .where({ id: savedVersion.id })
+            .getOne();
+
+        if (recalledVersion === undefined)
+            throw new Error("Could not find the version after saving. This should never happen!");
+
+        await createActivityLog(transaction, {
+            userId: context.me.id,
+            eventType: ActivityLogEventType.VERSION_CREATED,
+            changeType,
+            targetPackageVersionId: savedVersion?.id,
+            targetPackageId: packageEntity.id
+        });
+        return versionEntityToGraphqlObject(transaction, recalledVersion);
+    });
+};
+
+export const deleteVersion = async (
+    _0: any,
+    { identifier }: { identifier: VersionIdentifierInput },
+    context: AuthenticatedContext
+) => {
+    await context.connection.manager.nestedTransaction(async (transaction) => {
+        const version = await transaction.getCustomRepository(VersionRepository).findOneOrFail({ identifier });
+
+        transaction.delete(VersionEntity, { id: version.id });
+    });
+};
+
+export const versionPackageFile = async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+    const version = await context.connection
+        .getCustomRepository(VersionRepository)
+        .findOneOrFail({ identifier: parent.identifier });
+
+    const packageEntity = await context.connection
+        .getRepository(PackageEntity)
+        .findOneOrFail({ id: version.packageId });
+
+    const catalog = await context.connection
+        .getRepository(CatalogEntity)
+        .findOneOrFail({ id: packageEntity.catalogId });
+
+    try {
+        return await PackageFileStorageService.INSTANCE.readPackageFile(packageEntity.id, {
+            catalogSlug: catalog.slug,
+            packageSlug: packageEntity.slug,
+            versionMajor: version.majorVersion,
+            versionMinor: version.minorVersion,
+            versionPatch: version.patchVersion
+        });
+    } catch (error) {
+        if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) {
+            throw new Error("PACKAGE_FILE_NOT_FOUND");
+        }
+
+        throw error;
+    }
+};
+
+export const versionAuthor = async (
+    parent: Version,
+    _1: any,
+    context: AuthenticatedContext,
+    info: any
+): Promise<User | null> => {
+    const version = await context.connection
+        .getCustomRepository(VersionRepository)
+        .findOneOrFail({ identifier: parent.identifier, relations: ["author"] });
+
+    if (!(await hasPackagePermissions(context, version.packageId, Permission.VIEW))) {
+        return null;
+    }
+    return version.author;
+};
+
+export const versionIdentifier = (
+    parent: Version,
+    _1: any,
+    context: AuthenticatedContext,
+    info: any
+): VersionIdentifier => {
+    return parent.identifier;
+};
+
+export const versionCreatedAt = async (
+    parent: Version,
+    _1: any,
+    context: AuthenticatedContext,
+    info: any
+): Promise<Date | null> => {
+    const version = await context.connection
+        .getCustomRepository(VersionRepository)
+        .findOneOrFail({ identifier: parent.identifier });
+
+    if (!(await hasPackagePermissions(context, version.packageId, Permission.VIEW))) {
+        return null;
+    }
+    return version.createdAt;
+};
+
+export const versionUpdatedAt = async (
+    parent: Version,
+    _1: any,
+    context: AuthenticatedContext,
+    info: any
+): Promise<Date | null> => {
+    const version = await context.connection
+        .getCustomRepository(VersionRepository)
+        .findOneOrFail({ identifier: parent.identifier });
+
+    if (!(await hasPackagePermissions(context, version.packageId, Permission.VIEW))) {
+        return null;
+    }
+    return version.updatedAt;
+};
+
+export const versionPackage = async (
+    parent: Version,
+    _1: any,
+    context: AuthenticatedContext,
+    info: any
+): Promise<Package | null> => {
+    const version = await context.connection
+        .getCustomRepository(VersionRepository)
+        .findOneOrFail({ identifier: parent.identifier });
+
+    return packageEntityToGraphqlObject(context.connection, version.package);
+};

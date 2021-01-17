@@ -1,11 +1,11 @@
 import { Connection, EntityManager, EntityRepository } from "typeorm";
-import { ActivityLog } from "../entity/ActivityLog";
+import { ActivityLogEntity } from "../entity/ActivityLogEntity";
 import { ActivityLogChangeType, ActivityLogEventType } from "../entity/ActivityLogEventType";
-import { Catalog } from "../entity/Catalog";
-import { Collection } from "../entity/Collection";
-import { Package } from "../entity/Package";
-import { User } from "../entity/User";
-import { Version } from "../entity/Version";
+import { CatalogEntity } from "../entity/CatalogEntity";
+import { CollectionEntity } from "../entity/CollectionEntity";
+import { PackageEntity } from "../entity/PackageEntity";
+import { UserEntity } from "../entity/UserEntity";
+import { VersionEntity } from "../entity/VersionEntity";
 
 export interface ActivityLogTemp {
     userId: number;
@@ -20,67 +20,63 @@ export interface ActivityLogTemp {
 
 /** Creates a new ActivityLog entry in the database, and logs it */
 export async function createActivityLog(connection: EntityManager | Connection, activityLogTemp: ActivityLogTemp) {
-    const activityLog = new ActivityLog();
+    const activityLog = new ActivityLogEntity();
     activityLog.eventType = activityLogTemp.eventType;
     activityLog.changeType = activityLogTemp.changeType;
+    activityLog.userId = activityLogTemp.userId;
+    activityLog.targetPackageId = activityLogTemp.targetPackageId;
+    activityLog.targetPackageVersionId = activityLogTemp.targetPackageVersionId;
+    activityLog.targetCatalogId = activityLogTemp.targetCatalogId;
+    activityLog.targetCollectionId = activityLogTemp.targetCollectionId;
+    activityLog.propertiesEdited = activityLogTemp.propertiesEdited;
 
     if (activityLogTemp.userId) {
-        activityLog.userId = activityLogTemp.userId;
-
-        const user = await connection.getRepository(User).findOneOrFail({ id: activityLogTemp.userId });
+        const user = await connection.getRepository(UserEntity).findOneOrFail({ id: activityLogTemp.userId });
 
         activityLog.username = user.username;
     }
 
     if (activityLogTemp.targetPackageId) {
-        activityLog.targetPackageId = activityLogTemp.targetPackageId;
-
         const packageEntity = await connection
-            .getRepository(Package)
+            .getRepository(PackageEntity)
             .findOneOrFail({ id: activityLogTemp.targetPackageId }, { relations: ["catalog"] });
 
         activityLog.targetPackageIdentifier = packageEntity.catalog.slug + "/" + packageEntity.slug;
     }
 
     if (activityLogTemp.targetPackageVersionId) {
-        activityLog.targetPackageVersionId = activityLogTemp.targetPackageVersionId;
-
         const version = await connection
-            .getRepository(Version)
+            .getRepository(VersionEntity)
             .findOneOrFail({ id: activityLogTemp.targetPackageVersionId });
 
         activityLog.targetVersionNumber = `${version?.majorVersion}.${version?.minorVersion}.${version?.patchVersion}`;
     }
 
     if (activityLogTemp.targetCatalogId) {
-        activityLog.targetCatalogId = activityLogTemp.targetCatalogId;
-
-        const catalog = await connection.getRepository(Catalog).findOneOrFail({ id: activityLogTemp.targetCatalogId });
+        const catalog = await connection
+            .getRepository(CatalogEntity)
+            .findOneOrFail({ id: activityLogTemp.targetCatalogId });
 
         activityLog.targetCatalogSlug = catalog.slug;
     }
 
     if (activityLogTemp.targetCollectionId) {
-        activityLog.targetCollectionId = activityLogTemp.targetCollectionId;
-
         const collection = await connection
-            .getRepository(Collection)
+            .getRepository(CollectionEntity)
             .findOneOrFail({ id: activityLogTemp.targetCollectionId });
 
         activityLog.targetCollectionSlug = collection.collectionSlug;
     }
 
-    activityLog.propertiesEdited = activityLogTemp.propertiesEdited;
-
     await connection.getCustomRepository(ActivityLogRepository).create(activityLog);
 }
-@EntityRepository(ActivityLog)
+@EntityRepository(ActivityLogEntity)
 export class ActivityLogRepository {
     constructor(private manager: EntityManager) {}
 
-    async create(activityLog: ActivityLog): Promise<void> {
+    async create(activityLog: ActivityLogEntity): Promise<void> {
         return this.manager.nestedTransaction(async (transaction) => {
-            const entity = transaction.create(ActivityLog, activityLog);
+            const entity = transaction.create(ActivityLogEntity, activityLog);
             if (
                 activityLog.eventType !== ActivityLogEventType.PACKAGE_DELETED &&
                 activityLog.eventType !== ActivityLogEventType.VERSION_DELETED &&
