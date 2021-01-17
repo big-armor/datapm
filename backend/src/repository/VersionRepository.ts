@@ -80,7 +80,7 @@ export class VersionRepository {
 
         if (!version) {
             throw new Error(
-                `Version ${identifier.versionMajor}.${identifier.versionMinor}.${identifier.versionPatch} for package ${packageEntity.id} not found`
+                `VERSION_NOT_FOUND ${identifier.versionMajor}.${identifier.versionMinor}.${identifier.versionPatch} for package ${packageEntity.id}`
             );
         }
 

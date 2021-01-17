@@ -1,11 +1,11 @@
 import { Connection, EntityManager, EntityRepository } from "typeorm";
 import { ActivityLogEntity } from "../entity/ActivityLogEntity";
-import { ActivityLogChangeType, ActivityLogEventType } from "../entity/ActivityLogEventType";
 import { CatalogEntity } from "../entity/CatalogEntity";
 import { CollectionEntity } from "../entity/CollectionEntity";
 import { PackageEntity } from "../entity/PackageEntity";
 import { UserEntity } from "../entity/UserEntity";
 import { VersionEntity } from "../entity/VersionEntity";
+import { ActivityLogChangeType, ActivityLogEventType } from "../generated/graphql";
 
 export interface ActivityLogTemp {
     userId: number;

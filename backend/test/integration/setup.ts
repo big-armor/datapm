@@ -18,6 +18,11 @@ export let mailObservable: Observable<any>;
 
 export const TEMP_STORAGE_URL = "file://tmp-registry-server-storage-" + new RandomUuid().nextUuid();
 
+// These hold the standard out log lines from the datapm server
+export let serverLogLines: string[] = [];
+export let serverErrorLogLines: string[] = [];
+const MAX_SERVER_LOG_LINES = 25;
+
 before(async function () {
     console.log("Starting postgres temporary container");
 
@@ -69,11 +74,25 @@ before(async function () {
 
     serverProcess.stdout!.addListener("data", (chunk: Buffer) => {
         const line = chunk.toString();
+
+        serverLogLines.push(line);
+
+        if (serverLogLines.length > MAX_SERVER_LOG_LINES) serverLogLines.shift();
+
         if (line.startsWith("{")) return;
         console.log(line);
     });
 
-    serverProcess.stderr!.pipe(process.stderr);
+    serverProcess.stderr!.addListener("data", (chunk: Buffer) => {
+        const line = chunk.toString();
+
+        serverErrorLogLines.push(line);
+
+        if (serverErrorLogLines.length > MAX_SERVER_LOG_LINES) serverErrorLogLines.shift();
+
+        if (line.startsWith("{")) return;
+        console.error(line);
+    });
 
     serverProcess.addListener("error", (err) => {
         console.error("Registry server process error");

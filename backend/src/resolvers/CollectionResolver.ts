@@ -9,7 +9,8 @@ import {
     UpdateCollectionInput,
     Permission,
     Collection,
-    Package
+    ActivityLogEventType,
+    ActivityLogChangeType
 } from "../generated/graphql";
 import { CollectionPackageRepository } from "../repository/CollectionPackageRepository";
 import { CollectionRepository } from "../repository/CollectionRepository";
@@ -22,7 +23,6 @@ import { getGraphQlRelationName } from "../util/relationNames";
 import { grantAllCollectionPermissionsForUser, hasCollectionPermissions } from "./UserCollectionPermissionResolver";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { CollectionEntity } from "../entity/CollectionEntity";
-import { ActivityLogChangeType, ActivityLogEventType } from "../entity/ActivityLogEventType";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 import { Connection, EntityManager } from "typeorm";
 import { getEnvVariable } from "../util/getEnvVariable";

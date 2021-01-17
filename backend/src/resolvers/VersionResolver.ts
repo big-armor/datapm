@@ -201,11 +201,18 @@ export const deleteVersion = async (
     _0: any,
     { identifier }: { identifier: VersionIdentifierInput },
     context: AuthenticatedContext
-) => {
-    await context.connection.manager.nestedTransaction(async (transaction) => {
+): Promise<void> => {
+    return await context.connection.transaction(async (transaction) => {
         const version = await transaction.getCustomRepository(VersionRepository).findOneOrFail({ identifier });
 
-        transaction.delete(VersionEntity, { id: version.id });
+        await createActivityLog(transaction, {
+            userId: context.me.id,
+            eventType: ActivityLogEventType.VERSION_DELETED,
+            targetPackageVersionId: version.id,
+            targetPackageId: version.packageId
+        });
+
+        await transaction.delete(VersionEntity, { id: version.id });
     });
 };
 

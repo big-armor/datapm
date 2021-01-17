@@ -31,7 +31,8 @@ export const activtyLogEntityToGraphQL = async function (
         eventType: activityLogEntity.eventType,
         changeType: activityLogEntity.changeType,
         createdAt: activityLogEntity.createdAt,
-        updatedAt: activityLogEntity.updatedAt
+        updatedAt: activityLogEntity.updatedAt,
+        propertiesEdited: activityLogEntity.propertiesEdited
     };
 
     if (activityLogEntity.userId) {

@@ -119,8 +119,6 @@ import { validateUsernameOrEmail } from "./directive/ValidUsernameOrEmailAddress
 import { validateSlug as validateCollectionSlug } from "./directive/ValidCollectionSlugDirective";
 import { validatePackageSlug } from "./directive/ValidPackageSlugDirective";
 import { validateEmailAddress } from "./directive/ValidEmailDirective";
-import { StorageErrors } from "./storage/files/file-storage-service";
-import { PackageFileStorageService } from "./storage/packages/package-file-storage-service";
 import { DateResolver } from "./resolvers/DateResolver";
 import { CollectionRepository } from "./repository/CollectionRepository";
 import {

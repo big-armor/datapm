@@ -1,0 +1,3 @@
+mutation DeleteVersion($identifier: VersionIdentifierInput!) {
+    deleteVersion(identifier: $identifier)
+}

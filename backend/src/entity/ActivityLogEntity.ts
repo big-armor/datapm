@@ -5,7 +5,7 @@ import { PackageEntity } from "./PackageEntity";
 import { VersionEntity } from "./VersionEntity";
 import { CatalogEntity } from "./CatalogEntity";
 import { CollectionEntity } from "./CollectionEntity";
-import { ActivityLogChangeType, ActivityLogEventType } from "./ActivityLogEventType";
+import { ActivityLogChangeType, ActivityLogEventType } from "../generated/graphql";
 
 @Entity({ name: "activity_log" })
 @Index(["userId", "eventType"])

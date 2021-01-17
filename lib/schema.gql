@@ -318,6 +318,7 @@ type ActivityLog {
     changeType: ActivityLogChangeType
     createdAt: Date!
     updatedAt: Date!
+    propertiesEdited: [String!]
 }
 
 """
@@ -962,7 +963,7 @@ type Mutation {
     """
     Deletes a given version from a package. Use this sparingly, to allow for a viewable history of change for the package
     """
-    deleteVersion(identifier: VersionIdentifierInput! @hasPackagePermission(permission: EDIT)): Void!
+    deleteVersion(identifier: VersionIdentifierInput! @hasPackagePermission(permission: EDIT)): Void
 
     """
     For proxying user activity tracking outside of other API requests

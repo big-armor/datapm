@@ -1,9 +1,7 @@
 import { ApolloError, ForbiddenError, UserInputError } from "apollo-server";
 import graphqlFields from "graphql-fields";
 import { AuthenticatedContext, Context } from "../context";
-import { CollectionEntity } from "../entity/CollectionEntity";
 import { PackageEntity } from "../entity/PackageEntity";
-import { ActivityLogChangeType, ActivityLogEventType } from "../entity/ActivityLogEventType";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 import {
     Base64ImageUpload,
@@ -17,7 +15,9 @@ import {
     Permission,
     UpdatePackageInput,
     Version,
-    VersionIdentifierInput
+    VersionIdentifierInput,
+    ActivityLogEventType,
+    ActivityLogChangeType
 } from "../generated/graphql";
 import { CatalogEntity } from "../entity/CatalogEntity";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";

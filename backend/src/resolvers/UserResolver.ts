@@ -6,7 +6,8 @@ import {
     CreateUserInput,
     RecoverMyPasswordInput,
     UpdateMyPasswordInput,
-    UpdateUserInput
+    UpdateUserInput,
+    ActivityLogEventType
 } from "../generated/graphql";
 import { CatalogRepository } from "../repository/CatalogRepository";
 import { UserRepository } from "../repository/UserRepository";
@@ -14,7 +15,6 @@ import { hashPassword } from "../util/PasswordUtil";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { createActivityLog } from "../repository/ActivityLogRepository";
-import { ActivityLogEventType } from "../entity/ActivityLogEventType";
 
 export const searchUsers = async (
     _0: any,

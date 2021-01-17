@@ -177,6 +177,12 @@ export const createCatalog = async (
         relations: getGraphQlRelationName(info)
     });
 
+    await createActivityLog(context.connection, {
+        userId: context.me.id,
+        eventType: ActivityLogEventType.CATALOG_CREATED,
+        targetCatalogId: catalogEntity.id
+    });
+
     return catalogEntityToGraphQL(catalogEntity);
 };
 
@@ -246,7 +252,17 @@ export const deleteCatalog = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    return context.connection.manager.getCustomRepository(CatalogRepository).deleteCatalog({
+    const catalog = await context.connection.manager
+        .getCustomRepository(CatalogRepository)
+        .findCatalogBySlugOrFail(identifier.catalogSlug);
+
+    await createActivityLog(context.connection, {
+        userId: context.me.id,
+        eventType: ActivityLogEventType.CATALOG_DELETED,
+        targetCatalogId: catalog.id
+    });
+
+    await context.connection.manager.getCustomRepository(CatalogRepository).deleteCatalog({
         slug: identifier.catalogSlug
     });
 };
