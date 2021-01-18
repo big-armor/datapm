@@ -70,6 +70,8 @@ describe("Autocomplete tests", async () => {
             }
         });
 
+        expect(createCollection.errors == null).equal(true);
+
         let createCatalog = await userAClient.mutate({
             mutation: CreateCatalogDocument,
             variables: {
@@ -83,6 +85,8 @@ describe("Autocomplete tests", async () => {
             }
         });
 
+        expect(createCatalog.errors == null).equal(true);
+
         let createPackage = await userAClient.mutate({
             mutation: CreatePackageDocument,
             variables: {
@@ -94,6 +98,8 @@ describe("Autocomplete tests", async () => {
                 }
             }
         });
+
+        expect(createPackage.errors == null).equal(true);
 
         let addVersionToPackage = await userAClient.mutate({
             mutation: CreateVersionDocument,
@@ -108,9 +114,7 @@ describe("Autocomplete tests", async () => {
             }
         });
 
-        expect(createCollection.errors! == null);
-        expect(createCatalog.errors! == null);
-        expect(createPackage.errors! == null);
+        expect(addVersionToPackage.errors == null).equal(true);
     });
 
     it("Should return packages by slug", async function () {

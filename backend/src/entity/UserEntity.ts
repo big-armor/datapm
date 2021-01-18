@@ -1,13 +1,13 @@
 import { Entity, Column, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
-import { BaseModel } from "./BaseModel";
-import { UserCatalogPermission } from "./UserCatalogPermission";
+import { EntityBaseModel } from "./EntityBaseModel";
+import { UserCatalogPermissionEntity } from "./UserCatalogPermissionEntity";
 
 @Entity({
     name: "user"
 })
 @Unique(["emailAddress"])
 @Unique(["sub"])
-export class User extends BaseModel {
+export class UserEntity extends EntityBaseModel {
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -27,7 +27,7 @@ export class User extends BaseModel {
         return `${this.firstName || ""} ${this.lastName || ""}`.trim();
     }
 
-    @Column({ length: 254, type: "varchar" })
+    @Column({ length: 254, type: "varchar", name: "emailAddress" })
     emailAddress: string;
 
     @Column({ nullable: true, length: 255, type: "varchar" })
@@ -36,8 +36,10 @@ export class User extends BaseModel {
     @Column({ length: 39, type: "varchar" })
     username: string;
 
-    @OneToMany(() => UserCatalogPermission, (userCatalogPermission) => userCatalogPermission.user, { cascade: true })
-    catalogPermissions: UserCatalogPermission[];
+    @OneToMany(() => UserCatalogPermissionEntity, (userCatalogPermission) => userCatalogPermission.user, {
+        cascade: true
+    })
+    catalogPermissions: UserCatalogPermissionEntity[];
 
     @Column({ nullable: true })
     twitterHandle?: string;

@@ -18,12 +18,12 @@ import { Permission, PackageIdentifier, PackageIdentifierInput } from "../genera
 import { PackageRepository } from "../repository/PackageRepository";
 import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
-import { User } from "../entity/User";
+import { UserEntity } from "../entity/UserEntity";
 
 export async function resolvePackagePermissions(
     context: Context,
     identifier: PackageIdentifierInput,
-    user?: User
+    user?: UserEntity
 ): Promise<Permission[]> {
     const permissions: Permission[] = [];
 

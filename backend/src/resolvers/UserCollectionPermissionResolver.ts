@@ -1,19 +1,14 @@
-import { AuthenticatedContext } from "../context";
+import { AuthenticatedContext, Context } from "../context";
 import { Permission, CollectionIdentifierInput, SetUserCollectionPermissionsInput } from "../generated/graphql";
-import { CollectionRepository } from "../repository/CollectionRepository";
 import { UserCollectionPermissionRepository } from "../repository/UserCollectionPermissionRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
+import { EntityManager } from "typeorm";
+import { CollectionEntity } from "../entity/CollectionEntity";
 
-export const hasCollectionPermissions = async (
-    context: AuthenticatedContext,
-    collectionId: number,
-    permission: Permission
-) => {
+export const hasCollectionPermissions = async (context: Context, collectionId: number, permission: Permission) => {
+    const collection = await context.connection.getRepository(CollectionEntity).findOneOrFail(collectionId);
+
     if (permission == Permission.VIEW) {
-        const collection = await context.connection
-            .getCustomRepository(CollectionRepository)
-            .findOne({ id: collectionId });
-
         if (collection?.isPublic) return true;
     }
 
@@ -23,13 +18,17 @@ export const hasCollectionPermissions = async (
 
     return context.connection
         .getCustomRepository(UserCollectionPermissionRepository)
-        .hasPermission(context.me.id, collectionId, permission);
+        .hasPermission(context.me.id, collection.id, permission);
 };
 
-export const grantAllCollectionPermissionsForUser = async (context: AuthenticatedContext, collectionId: number) => {
-    return context.connection
+export const grantAllCollectionPermissionsForUser = async (
+    transaction: EntityManager,
+    userId: number,
+    collectionId: number
+) => {
+    return transaction
         .getCustomRepository(UserCollectionPermissionRepository)
-        .grantAllPermissionsForUser(context.me.id, collectionId);
+        .grantAllPermissionsForUser(userId, collectionId);
 };
 
 export const setPermissionsForUser = async (

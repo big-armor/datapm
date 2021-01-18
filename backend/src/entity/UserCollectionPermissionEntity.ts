@@ -1,15 +1,15 @@
 import { Entity, Column, PrimaryColumn, Index, JoinColumn, ManyToOne } from "typeorm";
-import { BaseModel } from "./BaseModel";
+import { EntityBaseModel } from "./EntityBaseModel";
 import { Permission } from "../generated/graphql";
-import { Collection } from "./Collection";
-import { User } from "./User";
+import { CollectionEntity } from "./CollectionEntity";
+import { UserEntity } from "./UserEntity";
 
 @Entity({
     name: "collection_user"
 })
 @Index("userId")
 @Index(["userId", "collectionId"], { unique: true })
-export class UserCollectionPermission extends BaseModel {
+export class UserCollectionPermissionEntity extends EntityBaseModel {
     @PrimaryColumn({ name: "user_id", nullable: false })
     public userId: number;
 
@@ -19,11 +19,11 @@ export class UserCollectionPermission extends BaseModel {
     @Column("enum", { array: true, name: "permissions", enum: Permission, nullable: false })
     public permissions: Permission[];
 
-    @ManyToOne(() => Collection)
+    @ManyToOne(() => CollectionEntity)
     @JoinColumn({ name: "collection_id" })
-    collection: Collection;
+    collection: CollectionEntity;
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => UserEntity)
     @JoinColumn({ name: "user_id" })
-    user: User;
+    user: UserEntity;
 }

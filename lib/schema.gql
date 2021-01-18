@@ -92,6 +92,51 @@ enum Scope {
     READ_PRIVATE_ASSETS
     MANAGE_PRIVATE_ASSETS
 }
+"""
+Activity Log Event types
+"""
+enum ActivityLogEventType {
+    PACKAGE_CREATED
+    PACKAGE_DELETED
+    PACKAGE_VIEWED
+    PACKAGE_FETCHED
+    PACKAGE_PUBLIC_CHANGED
+    PACKAGE_EDIT
+
+    VERSION_CREATED
+    VERSION_DELETED
+
+    COLLECTION_CREATED
+    COLLECTION_DELETED
+    COLLECTION_EDIT
+    COLLECTION_PACKAGE_ADDED
+    COLLECTION_PACKAGE_REMOVED
+    COLLECTION_PUBLIC_CHANGED
+
+    CATALOG_CREATED
+    CATALOG_DELETED
+    CATALOG_PUBLIC_CHANGED
+    CATALOG_EDIT
+
+    USER_CREATED
+    USER_DELETED
+    USER_EDIT
+}
+
+enum ActivityLogChangeType {
+    VERSION_FIRST_VERSION
+    VERSION_PATCH_CHANGE
+    VERSION_MINOR_CHANGE
+    VERSION_MAJOR_CHANGE
+
+    PUBLIC_ENABLED
+    PUBLIC_DISABLED
+
+    COVER_IMAGE_UPDATED
+    COVER_IMAGE_REMOVED
+    AVATAR_IMAGE_UPDATED
+    AVATAR_IMAGE_REMOVED
+}
 
 """
 Whether the requesting user has the specified permission on the catalog
@@ -149,7 +194,7 @@ type Package {
     creator: User
     identifier: PackageIdentifier!
     catalog: Catalog
-    displayName: String!
+    displayName: String
     description: String
     latestVersion: Version
     versions: [Version]
@@ -157,15 +202,8 @@ type Package {
     updatedAt: Date
     isPublic: Boolean
     myPermissions: [Permission!]
-}
-
-"""
-Represents a user, and their permission to a catalog
-"""
-type UserCatalog {
-    user: User!
-    catalog: Catalog!
-    permissions: [Permission!]
+    fetchedCount: Int
+    viewedCount: Int
 }
 
 """
@@ -175,7 +213,7 @@ by consumer side users, and generally not the publishers
 type Collection {
     creator: User
     identifier: CollectionIdentifier!
-    name: String!
+    name: String
     description: String
     packages: [Package!]
     createdAt: Date
@@ -235,11 +273,11 @@ The complete identifier for a version of a package on a registry
 """
 type VersionIdentifier {
     registryURL: String
-    catalogSlug: String
-    packageSlug: String
-    versionMajor: Int
-    versionMinor: Int
-    versionPatch: Int
+    catalogSlug: String!
+    packageSlug: String!
+    versionMajor: Int!
+    versionMinor: Int!
+    versionPatch: Int!
 }
 
 """
@@ -256,7 +294,7 @@ The complete identifier for a catalog on a registry
 """
 type CatalogIdentifier {
     registryURL: String
-    catalogSlug: String
+    catalogSlug: String!
 }
 
 """
@@ -264,7 +302,23 @@ The complete identifier for a collections on a registry
 """
 type CollectionIdentifier {
     registryURL: String
-    collectionSlug: String
+    collectionSlug: String!
+}
+
+"""
+Represents a logged user activity
+"""
+type ActivityLog {
+    user: User
+    targetPackage: Package
+    targetPackageVersion: Version
+    targetCollection: Collection
+    targetCatalog: Catalog
+    eventType: ActivityLogEventType!
+    changeType: ActivityLogChangeType
+    createdAt: Date!
+    updatedAt: Date!
+    propertiesEdited: [String!]
 }
 
 """
@@ -347,6 +401,15 @@ type AutoCompleteResult {
     packages: [Package!]
     collections: [Collection!]
     users: [User!]
+}
+
+"""
+The response for a search term auto-complete request
+"""
+type ActivityLogResult {
+    logs: [ActivityLog!]!
+    hasMore: Boolean!
+    count: Int!
 }
 
 """
@@ -486,6 +549,14 @@ For sending a token response to recover and update users password
 input RecoverMyPasswordInput {
     token: String!
     newPassword: String! @validPassword
+}
+"""
+For filtering Activity Logs by event type
+"""
+input ActivityLogFilterInput {
+    eventType: [ActivityLogEventType]
+    limit: Int!
+    offset: Int!
 }
 
 type Query {
@@ -639,6 +710,35 @@ type Query {
     ): [Package!]!
 
     """
+    Returns activity for the requesting user
+    """
+    myActivity(filter: ActivityLogFilterInput!): ActivityLogResult! @isAuthenticated
+
+    """
+    Activity for a given collection
+    """
+    collectionActivities(
+        identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
+        filter: ActivityLogFilterInput!
+    ): ActivityLogResult! @isAuthenticated
+
+    """
+    Activity for a given package
+    """
+    packageActivities(
+        identifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
+        filter: ActivityLogFilterInput!
+    ): ActivityLogResult! @isAuthenticated
+
+    """
+    Activity for a given catalog
+    """
+    catalogActivities(
+        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
+        filter: ActivityLogFilterInput!
+    ): ActivityLogResult! @isAuthenticated
+
+    """
     For validating that the server is up, and requesting it's status
     """
     registryStatus: RegistryStatus
@@ -771,6 +871,11 @@ type Mutation {
     deletePackage(identifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)): Void
 
     """
+    Called by a client to indicate a package has been fetched
+    """
+    packageFetched(identifier: VersionIdentifierInput! @hasPackagePermission(permission: VIEW)): Void
+
+    """
     Creates a new collection, which is managed by the requesting user
     """
     createCollection(value: CreateCollectionInput!): Collection!
@@ -863,7 +968,7 @@ type Mutation {
     """
     Deletes a given version from a package. Use this sparingly, to allow for a viewable history of change for the package
     """
-    deleteVersion(identifier: VersionIdentifierInput! @hasPackagePermission(permission: EDIT)): Void!
+    deleteVersion(identifier: VersionIdentifierInput! @hasPackagePermission(permission: EDIT)): Void
 
     """
     For proxying user activity tracking outside of other API requests

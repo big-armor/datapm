@@ -1082,7 +1082,7 @@ describe("Package Tests", async () => {
 
         expect(response.errors != null, "should have errors").to.equal(true);
         expect(
-            response.errors!.find((e) => e.message == "PACKAGE_NOT_FOUND") != null,
+            response.errors!.find((e) => e.message.includes("PACKAGE_NOT_FOUND")) != null,
             "should have not package not found error"
         ).equal(true);
     });

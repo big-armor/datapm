@@ -1,0 +1,3 @@
+mutation PackageFetched($identifier: VersionIdentifierInput!) {
+    packageFetched(identifier: $identifier)
+}

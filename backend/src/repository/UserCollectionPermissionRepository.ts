@@ -7,15 +7,15 @@ import {
     SetUserCollectionPermissionsInput,
     UserCollectionPermissions
 } from "../generated/graphql";
-import { UserCollectionPermission } from "../entity/UserCollectionPermission";
-import { User } from "../entity/User";
-import { Collection } from "../entity/Collection";
+import { UserCollectionPermissionEntity } from "../entity/UserCollectionPermissionEntity";
+import { UserEntity } from "../entity/UserEntity";
+import { CollectionEntity } from "../entity/CollectionEntity";
 
 import { UserRepository } from "./UserRepository";
 import { CollectionRepository } from "./CollectionRepository";
 
-@EntityRepository(UserCollectionPermission)
-export class UserCollectionPermissionRepository extends Repository<UserCollectionPermission> {
+@EntityRepository(UserCollectionPermissionEntity)
+export class UserCollectionPermissionRepository extends Repository<UserCollectionPermissionEntity> {
     findCollectionPermissions({
         collectionId,
         userId,
@@ -27,14 +27,17 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
     }) {
         const ALIAS = "userCollectionPermission";
         return this.manager
-            .getRepository(UserCollectionPermission)
+            .getRepository(UserCollectionPermissionEntity)
             .createQueryBuilder(ALIAS)
             .addRelations(ALIAS, relations)
             .where({ collectionId, userId })
             .getOne();
     }
 
-    public async grantAllPermissionsForUser(userId: number, collectionId: number): Promise<UserCollectionPermission> {
+    public async grantAllPermissionsForUser(
+        userId: number,
+        collectionId: number
+    ): Promise<UserCollectionPermissionEntity> {
         return this.setPermissionsForUser(userId, collectionId, [Permission.VIEW, Permission.EDIT, Permission.MANAGE]);
     }
 
@@ -42,8 +45,8 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
         userId: number,
         collectionId: number,
         permissions: Permission[]
-    ): Promise<UserCollectionPermission> {
-        const permissionEntity = new UserCollectionPermission();
+    ): Promise<UserCollectionPermissionEntity> {
+        const permissionEntity = new UserCollectionPermissionEntity();
         permissionEntity.collectionId = collectionId;
         permissionEntity.userId = userId;
         permissionEntity.permissions = permissions;
@@ -59,25 +62,25 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
         return permissionsEntity.permissions.some((p) => p === permission);
     }
 
-    public async findByUserId(userId: number): Promise<UserCollectionPermission[]> {
+    public async findByUserId(userId: number): Promise<UserCollectionPermissionEntity[]> {
         return this.createQueryBuilder().where({ userId: userId }).getMany();
     }
 
     public async findByUserAndCollectionId(
         userId: number,
         collectionId: number
-    ): Promise<UserCollectionPermission | undefined> {
+    ): Promise<UserCollectionPermissionEntity | undefined> {
         return this.createQueryBuilder().where({ userId: userId, collectionId: collectionId }).getOne();
     }
 
     public async usersByCollection(
-        collectionEntity: Collection,
+        collectionEntity: CollectionEntity,
         relations?: string[]
     ): Promise<UserCollectionPermissions[]> {
         const ALIAS = "userCollectionPermission";
 
         return await this.manager
-            .getRepository(UserCollectionPermission)
+            .getRepository(UserCollectionPermissionEntity)
             .createQueryBuilder(ALIAS)
             .addRelations(ALIAS, relations)
             .where({ collectionId: collectionEntity.id })
@@ -115,7 +118,7 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
                 // If user does not exist in collection permissions, it creates new record
                 if (permissions == undefined) {
                     try {
-                        const collectionPermissionEntry = transaction.create(UserCollectionPermission);
+                        const collectionPermissionEntry = transaction.create(UserCollectionPermissionEntity);
                         collectionPermissionEntry.userId = user.id;
                         collectionPermissionEntry.collectionId = collectionEntity.id;
                         collectionPermissionEntry.permissions = value.permissions;
@@ -129,7 +132,7 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
                     try {
                         return await transaction
                             .createQueryBuilder()
-                            .update(UserCollectionPermission)
+                            .update(UserCollectionPermissionEntity)
                             .set({ permissions: value.permissions })
                             .where({ collectionId: collectionEntity.id, userId: user.id })
                             .execute();
@@ -146,7 +149,7 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
                         return await transaction
                             .createQueryBuilder()
                             .delete()
-                            .from(UserCollectionPermission)
+                            .from(UserCollectionPermissionEntity)
                             .where({ collectionId: collectionEntity.id, userId: user.id })
                             .execute();
                     } catch (e) {
@@ -177,7 +180,7 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
                 throw new Error("CANNOT_REMOVE_CREATOR_PERMISSIONS");
             }
 
-            await transaction.delete(UserCollectionPermission, { collectionId: collectionEntity.id });
+            await transaction.delete(UserCollectionPermissionEntity, { collectionId: collectionEntity.id });
         });
     }
 }

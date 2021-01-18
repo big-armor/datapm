@@ -1,4 +1,4 @@
-import { User } from "../entity/User";
+import { UserEntity } from "../entity/UserEntity";
 import { createTransport } from "nodemailer";
 import * as fs from "fs";
 import { Address } from "nodemailer/lib/mailer";
@@ -9,7 +9,7 @@ export enum EMAIL_SUBJECTS {
     FORGOT_PASSWORD = "⚠ Recover Your Account"
 }
 
-export async function sendAPIKeyCreatedEmail(user: User, apiKeyLabel: string) {
+export async function sendAPIKeyCreatedEmail(user: UserEntity, apiKeyLabel: string) {
     let emailText = fs.readFileSync("./static/email-templates/api-key-created.txt", "utf8");
     let emailHTML = fs.readFileSync("./static/email-templates/api-key-created.html", "utf8");
 
@@ -22,7 +22,7 @@ export async function sendAPIKeyCreatedEmail(user: User, apiKeyLabel: string) {
     sendEmail(user, EMAIL_SUBJECTS.NEW_API_KEY, emailText, emailHTML);
 }
 
-export async function sendForgotPasswordEmail(user: User, token: string) {
+export async function sendForgotPasswordEmail(user: UserEntity, token: string) {
     let emailText = fs.readFileSync("./static/email-templates/forgot-password.txt", "utf8");
     let emailHTML = fs.readFileSync("./static/email-templates/forgot-password.html", "utf8");
     emailText = replaceCommonTokens(user, emailText);
@@ -34,7 +34,7 @@ export async function sendForgotPasswordEmail(user: User, token: string) {
     sendEmail(user, EMAIL_SUBJECTS.FORGOT_PASSWORD, emailText, emailHTML);
 }
 
-export async function sendVerifyEmail(user: User, token: string) {
+export async function sendVerifyEmail(user: UserEntity, token: string) {
     let emailText = fs.readFileSync("./static/email-templates/validate-email-address.txt", "utf8");
     let emailHTML = fs.readFileSync("./static/email-templates/validate-email-address.html", "utf8");
 
@@ -66,7 +66,7 @@ export function smtpConfigured(): boolean {
     return true;
 }
 
-async function sendEmail(user: User, subject: string, bodyText: string, bodyHTML: string) {
+async function sendEmail(user: UserEntity, subject: string, bodyText: string, bodyHTML: string) {
     if (!smtpConfigured) throw new Error("SMTP_NOT_CONFIGURED");
 
     // create reusable transporter object using the default SMTP transport
@@ -102,7 +102,7 @@ async function sendEmail(user: User, subject: string, bodyText: string, bodyHTML
         });
 }
 
-function replaceCommonTokens(user: User, content: string): string {
+function replaceCommonTokens(user: UserEntity, content: string): string {
     let returnValue = content.replace(/{{registry_name}}/g, process.env["REGISTRY_NAME"]!);
     returnValue = returnValue.replace(/{{registry_url}}/g, process.env["REGISTRY_URL"]!);
     returnValue = returnValue.replace(/{{username}}/g, user.username);

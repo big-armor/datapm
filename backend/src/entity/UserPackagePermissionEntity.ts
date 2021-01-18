@@ -1,30 +1,30 @@
 import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne, Unique } from "typeorm";
-import { User } from "./User";
-import { Package } from "./Package";
+import { UserEntity } from "./UserEntity";
+import { PackageEntity } from "./PackageEntity";
 import { Permission } from "../generated/graphql";
-import { BaseModel } from "./BaseModel";
+import { EntityBaseModel } from "./EntityBaseModel";
 
 @Entity({
     name: "user_package_permission"
 })
 @Unique(["userId", "packageId"])
-export class UserPackagePermission extends BaseModel {
+export class UserPackagePermissionEntity extends EntityBaseModel {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column({ name: "user_id" })
     userId: number;
 
-    @ManyToOne(() => User, { onDelete: "CASCADE" })
+    @ManyToOne(() => UserEntity, { onDelete: "CASCADE" })
     @JoinColumn({ name: "user_id" })
-    user: User;
+    user: UserEntity;
 
     @Column({ name: "package_id" })
     packageId: number;
 
-    @ManyToOne(() => Package, { onDelete: "CASCADE" })
+    @ManyToOne(() => PackageEntity, { onDelete: "CASCADE" })
     @JoinColumn({ name: "package_id" })
-    package: Package;
+    package: PackageEntity;
 
     @Column("enum", { array: true, name: "permission", enum: Permission })
     permissions: Permission[];

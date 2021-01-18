@@ -1,13 +1,13 @@
 import { Entity, Column, PrimaryGeneratedColumn, Unique, ManyToOne, JoinColumn } from "typeorm";
-import { BaseModel } from "./BaseModel";
-import { User } from "./User";
+import { EntityBaseModel } from "./EntityBaseModel";
+import { UserEntity } from "./UserEntity";
 import { Scope } from "../generated/graphql";
 
 @Entity({
     name: "apiKey"
 })
 @Unique(["id"])
-export class APIKey extends BaseModel {
+export class APIKeyEntity extends EntityBaseModel {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
@@ -23,9 +23,9 @@ export class APIKey extends BaseModel {
     @Column({ name: "user_id" })
     userId: number;
 
-    @ManyToOne(() => User, { onDelete: "CASCADE" })
+    @ManyToOne(() => UserEntity, { onDelete: "CASCADE" })
     @JoinColumn({ name: "user_id" })
-    user: User;
+    user: UserEntity;
 
     @Column("enum", { array: true, name: "scopes", enum: Scope })
     scopes: Scope[];
