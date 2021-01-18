@@ -306,6 +306,10 @@ resource "google_sql_database_instance" "instance" {
       start_time                     = "01:00"
       point_in_time_recovery_enabled = true
     }
+
+    ip_configuration {
+      require_ssl = true
+    }
   }
 
   lifecycle {
