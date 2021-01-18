@@ -14,7 +14,7 @@ import { ConfirmationDialogService } from "../../../services/dialog/confirmation
 })
 export class UsersComponent implements AfterViewInit, OnDestroy {
     public readonly DISPLAYED_COLUMNS: string[] = ["username", "firstName", "lastName", "emailAddress", "actions"];
-    public readonly USERS_PER_PAGE = 5;
+    public readonly USERS_PER_PAGE = 25;
 
     public readonly dataSource = new MatTableDataSource<User>();
     private readonly destroyed = new Subject();

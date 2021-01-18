@@ -501,7 +501,7 @@ export const resolvers: {
     },
 
     Mutation: {
-        // AuthSearchUsersAsAdmin
+        // Auth
         login: login,
         logout: logout,
         verifyEmailAddress: verifyEmailAddress,
