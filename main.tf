@@ -302,8 +302,9 @@ resource "google_sql_database_instance" "instance" {
   settings {
     tier = "db-f1-micro"
     backup_configuration {
-      enabled    = true
-      start_time = "01:00"
+      enabled                        = true
+      start_time                     = "01:00"
+      point_in_time_recovery_enabled = true
     }
   }
 
