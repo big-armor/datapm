@@ -93,7 +93,7 @@ export const createMe = async (
 
     const repository = context.connection.manager.getCustomRepository(UserRepository);
     if (!FirstUserStatusHolder.IS_FIRST_USER_CREATED) {
-        FirstUserStatusHolder.IS_FIRST_USER_CREATED = (await repository.isAtLeastOneUserRegistered()) === 1;
+        FirstUserStatusHolder.IS_FIRST_USER_CREATED = await repository.isAtLeastOneUserRegistered();
     }
 
     await context.connection.transaction(async (transaction) => {

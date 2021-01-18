@@ -150,8 +150,8 @@ export class UserRepository extends Repository<UserEntity> {
         super();
     }
 
-    public isAtLeastOneUserRegistered(): Promise<number> {
-        return this.query('SELECT CASE WHEN EXISTS (SELECT 1 FROM "user" WHERE id IS NOT NULL) THEN 1 ELSE 0 END');
+    public async isAtLeastOneUserRegistered(): Promise<boolean> {
+        return (await this.createQueryBuilder().getOne()) != null;
     }
 
     getUserByUsername(username: string) {
