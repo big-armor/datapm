@@ -7,6 +7,7 @@ import { LatestComponent } from "./latest/latest.component";
 import { TrendingComponent } from "./trending/trending.component";
 import { AdminDashboardComponent } from "./admin-dashboard/admin-dashboard.component";
 import { UsersComponent } from "./admin-dashboard/users/users.component";
+import { AuthGuard } from "../helpers/auth-guard";
 
 const routes: Routes = [
     {
@@ -35,6 +36,7 @@ const routes: Routes = [
     {
         path: "admin",
         component: AdminDashboardComponent,
+        canActivate: [AuthGuard],
         children: [
             {
                 path: "",
