@@ -1,25 +1,25 @@
 import { Entity, Column, PrimaryColumn, Index, Unique, ManyToOne, JoinColumn } from "typeorm";
-import { BaseModel } from "./BaseModel";
-import { Collection } from "./Collection";
-import { Package } from "./Package";
-import { User } from "./User";
+import { EntityBaseModel } from "./EntityBaseModel";
+import { CollectionEntity } from "./CollectionEntity";
+import { PackageEntity } from "./PackageEntity";
+import { UserEntity } from "./UserEntity";
 
 @Entity({
     name: "collection_package"
 })
 @Index("collectionId")
 @Unique(["collectionId", "packageId"])
-export class CollectionPackage extends BaseModel {
-    @ManyToOne(() => Collection)
+export class CollectionPackageEntity extends EntityBaseModel {
+    @ManyToOne(() => CollectionEntity)
     @JoinColumn({ name: "collection_id" })
-    collection: Collection;
+    collection: CollectionEntity;
 
     @PrimaryColumn({ name: "collection_id", nullable: false })
     public collectionId: number;
 
-    @ManyToOne(() => Package)
+    @ManyToOne(() => PackageEntity)
     @JoinColumn({ name: "package_id" })
-    package: Package;
+    package: PackageEntity;
 
     @PrimaryColumn({ name: "package_id", nullable: false })
     public packageId: number;
@@ -27,7 +27,7 @@ export class CollectionPackage extends BaseModel {
     @Column({ name: "added_by", nullable: false })
     public addedBy: number;
 
-    @ManyToOne((type) => User)
+    @ManyToOne((type) => UserEntity)
     @JoinColumn({ name: "added_by" })
-    public addedByUser: User;
+    public addedByUser: UserEntity;
 }

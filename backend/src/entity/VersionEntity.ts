@@ -1,15 +1,14 @@
 import { Entity, Column, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
-import { BaseModel } from "./BaseModel";
-import { Package } from "./Package";
+import { EntityBaseModel } from "./EntityBaseModel";
+import { PackageEntity } from "./PackageEntity";
 import { VersionIdentifier } from "../generated/graphql";
-import { PackageFile } from "datapm-lib";
-import { User } from "./User";
+import { UserEntity } from "./UserEntity";
 
 @Entity({
     name: "version"
 })
 @Unique(["packageId", "majorVersion", "minorVersion", "patchVersion"])
-export class Version extends BaseModel {
+export class VersionEntity extends EntityBaseModel {
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -23,13 +22,13 @@ export class Version extends BaseModel {
     patchVersion: number;
 
     // Eager loading for upstream access in the get identifier method
-    @ManyToOne(() => Package)
+    @ManyToOne(() => PackageEntity, { eager: true })
     @JoinColumn({ name: "package_id" })
-    package: Package;
+    package: PackageEntity;
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => UserEntity)
     @JoinColumn({ name: "author_id" })
-    author: User;
+    author: UserEntity;
 
     @Column({ name: "package_id" })
     packageId: number;
@@ -39,8 +38,4 @@ export class Version extends BaseModel {
 
     @Column({ length: 250 })
     description: string;
-
-    identifier: VersionIdentifier;
-
-    packageFile: string;
 }

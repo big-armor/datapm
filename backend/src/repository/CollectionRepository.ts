@@ -1,22 +1,22 @@
 import { UserInputError } from "apollo-server";
 import { EntityRepository, Repository, SelectQueryBuilder } from "typeorm";
-import { Collection } from "../entity/Collection";
-import { User } from "../entity/User";
+import { CollectionEntity } from "../entity/CollectionEntity";
+import { UserEntity } from "../entity/UserEntity";
 import { CreateCollectionInput, UpdateCollectionInput } from "../generated/graphql";
 import { StorageErrors } from "../storage/files/file-storage-service";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { UserRepository } from "./UserRepository";
 
-@EntityRepository(Collection)
-export class CollectionRepository extends Repository<Collection> {
-    private static readonly COLLECTION_RELATION_ALIAS = "Collection";
+@EntityRepository(CollectionEntity)
+export class CollectionRepository extends Repository<CollectionEntity> {
+    private static readonly COLLECTION_RELATION_ALIAS = "CollectionEntity";
 
     public async createCollection(
-        creator: User,
+        creator: UserEntity,
         collection: CreateCollectionInput,
         relations?: string[]
-    ): Promise<Collection> {
-        const entity = new Collection();
+    ): Promise<CollectionEntity> {
+        const entity = new CollectionEntity();
         entity.creatorId = creator.id;
         entity.name = collection.name;
         entity.collectionSlug = collection.collectionSlug;
@@ -30,7 +30,7 @@ export class CollectionRepository extends Repository<Collection> {
         collectionSlug: String,
         collection: UpdateCollectionInput,
         relations?: string[]
-    ): Promise<Collection> {
+    ): Promise<CollectionEntity> {
         const collectionIdDb = await this.findCollectionBySlugOrFail(collectionSlug, relations);
 
         if (collection.newCollectionSlug) {
@@ -53,14 +53,14 @@ export class CollectionRepository extends Repository<Collection> {
     }
 
     public async myCollections(
-        user: User,
+        user: UserEntity,
         limit: number,
         offSet: number,
         relations?: string[]
-    ): Promise<[Collection[], number]> {
+    ): Promise<[CollectionEntity[], number]> {
         return this.createQueryBuilder()
             .where("creator_id = :userId", { userId: user.id })
-            .orderBy('"Collection"."updated_at"', "DESC")
+            .orderBy('"CollectionEntity"."updated_at"', "DESC")
             .limit(limit)
             .offset(offSet)
             .getManyAndCount();
@@ -73,22 +73,22 @@ export class CollectionRepository extends Repository<Collection> {
         limit,
         relations = []
     }: {
-        user?: User;
+        user?: UserEntity;
         username: string;
         offSet: number;
         limit: number;
         relations?: string[];
-    }): Promise<[Collection[], number]> {
+    }): Promise<[CollectionEntity[], number]> {
         const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
 
         const response = await this.createQueryBuilderWithUserConditions(user?.id)
             .andWhere(
-                `("Collection".id IN (SELECT collection_id FROM collection_user WHERE user_id = :targetUserId AND 'MANAGE' = ANY( permissions) ))`
+                `("CollectionEntity".id IN (SELECT collection_id FROM collection_user WHERE user_id = :targetUserId AND 'MANAGE' = ANY( permissions) ))`
             )
             .setParameter("targetUserId", targetUser.id)
             .offset(offSet)
             .limit(limit)
-            .addRelations("Collection", relations)
+            .addRelations("CollectionEntity", relations)
             .getManyAndCount();
 
         return response;
@@ -107,9 +107,9 @@ export class CollectionRepository extends Repository<Collection> {
         }
     }
 
-    public async findCollectionBySlugOrFail(collectionSlug: String, relations?: string[]): Promise<Collection> {
+    public async findCollectionBySlugOrFail(collectionSlug: String, relations?: string[]): Promise<CollectionEntity> {
         const collection = await this.createQueryBuilder()
-            .where('"Collection"."slug" = :slug')
+            .where('"CollectionEntity"."slug" = :slug')
             .setParameter("slug", collectionSlug)
             .addRelations(CollectionRepository.COLLECTION_RELATION_ALIAS, relations)
             .getOne();
@@ -121,23 +121,29 @@ export class CollectionRepository extends Repository<Collection> {
         return collection;
     }
 
-    public async findCollectionBySlug(collectionSlug: String, relations?: string[]): Promise<Collection | undefined> {
+    public async findCollectionBySlug(
+        collectionSlug: String,
+        relations?: string[]
+    ): Promise<CollectionEntity | undefined> {
         return await this.createQueryBuilder()
-            .where('"Collection"."slug" = :slug')
+            .where('"CollectionEntity"."slug" = :slug')
             .setParameter("slug", collectionSlug)
             .addRelations(CollectionRepository.COLLECTION_RELATION_ALIAS, relations)
             .getOne();
     }
 
-    public async findByUser(userId: number, relations?: string[]): Promise<Collection[]> {
+    public async findByUser(userId: number, relations?: string[]): Promise<CollectionEntity[]> {
         return this.createQueryBuilder()
-            .where('"Collection"."creator_id" = :userId')
+            .where('"CollectionEntity"."creator_id" = :userId')
             .setParameter("userId", userId)
             .addRelations(CollectionRepository.COLLECTION_RELATION_ALIAS, relations)
             .getMany();
     }
 
-    public async findCollectionsForAuthenticatedUser(userId: number, relations?: string[]): Promise<Collection[]> {
+    public async findCollectionsForAuthenticatedUser(
+        userId: number,
+        relations?: string[]
+    ): Promise<CollectionEntity[]> {
         return this.createQueryBuilderWithUserConditions(userId)
             .setParameter("userId", userId)
             .addRelations(CollectionRepository.COLLECTION_RELATION_ALIAS, relations)
@@ -149,17 +155,20 @@ export class CollectionRepository extends Repository<Collection> {
         startsWith,
         relations = []
     }: {
-        user: User | undefined;
+        user: UserEntity | undefined;
         startsWith: string;
         relations?: string[];
-    }): Promise<Collection[]> {
+    }): Promise<CollectionEntity[]> {
         const ALIAS = "autoCompleteCollection";
 
         const entities = await this.createQueryBuilderWithUserConditions(user?.id)
-            .andWhere(`(LOWER("Collection"."slug") LIKE :queryLike OR LOWER("Collection"."name") LIKE :queryLike)`, {
-                startsWith,
-                queryLike: startsWith.toLowerCase() + "%"
-            })
+            .andWhere(
+                `(LOWER("CollectionEntity"."slug") LIKE :queryLike OR LOWER("CollectionEntity"."name") LIKE :queryLike)`,
+                {
+                    startsWith,
+                    queryLike: startsWith.toLowerCase() + "%"
+                }
+            )
             .addRelations(ALIAS, relations)
             .getMany();
 
@@ -172,7 +181,7 @@ export class CollectionRepository extends Repository<Collection> {
         limit: number,
         offSet: number,
         relations?: string[]
-    ): Promise<[Collection[], number]> {
+    ): Promise<[CollectionEntity[], number]> {
         return (
             this.createQueryBuilderWithUserConditions(userId)
                 .andWhere(
@@ -186,16 +195,16 @@ export class CollectionRepository extends Repository<Collection> {
         );
     }
 
-    private createQueryBuilderWithUserConditions(userId?: number): SelectQueryBuilder<Collection> {
+    private createQueryBuilderWithUserConditions(userId?: number): SelectQueryBuilder<CollectionEntity> {
         const queryBuilder = this.createQueryBuilder();
 
         if (!userId) {
-            return queryBuilder.where('("Collection"."is_public")');
+            return queryBuilder.where('("CollectionEntity"."is_public")');
         }
 
         return queryBuilder
             .where(
-                `(("Collection"."is_public") OR ("Collection"."id" IN (SELECT collection_id FROM collection_user WHERE user_id = :userId AND 'VIEW' = any(permissions))))`
+                `(("CollectionEntity"."is_public") OR ("CollectionEntity"."id" IN (SELECT collection_id FROM collection_user WHERE user_id = :userId AND 'VIEW' = any(permissions))))`
             )
             .setParameter("userId", userId);
     }

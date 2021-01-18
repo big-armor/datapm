@@ -1,9 +1,9 @@
 import { EntityRepository, Repository, EntityManager, SelectQueryBuilder, Like } from "typeorm";
 
-import { User } from "../entity/User";
+import { UserEntity } from "../entity/UserEntity";
 import { UpdateCatalogInput, CreateCatalogInput, Permission, CatalogIdentifierInput } from "../generated/graphql";
-import { Catalog } from "../entity/Catalog";
-import { Package } from "../entity/Package";
+import { CatalogEntity } from "../entity/CatalogEntity";
+import { PackageEntity } from "../entity/PackageEntity";
 import { grantUserCatalogPermission } from "./CatalogPermissionRepository";
 import { PackageRepository } from "./PackageRepository";
 import { ImageStorageService } from "../storage/images/image-storage-service";
@@ -36,11 +36,11 @@ async function getCatalogOrFail({
     slug: string;
     manager: EntityManager;
     relations?: string[];
-}): Promise<Catalog> {
-    const ALIAS = "catalog";
+}): Promise<CatalogEntity> {
+    const ALIAS = "catalogentity";
 
     let query = manager
-        .getRepository(Catalog)
+        .getRepository(CatalogEntity)
         .createQueryBuilder(ALIAS)
         .where({ slug: slug })
         .addRelations(ALIAS, relations);
@@ -50,19 +50,22 @@ async function getCatalogOrFail({
     return catalog;
 }
 
-@EntityRepository(Catalog)
-export class CatalogRepository extends Repository<Catalog> {
+@EntityRepository(CatalogEntity)
+export class CatalogRepository extends Repository<CatalogEntity> {
     /** Use this function to create a user scoped query that returns only catalogs that should be visible to that user */
-    createQueryBuilderWithUserConditions(user: User | null, permission: Permission) {
+    createQueryBuilderWithUserConditions(user: UserEntity | null, permission: Permission) {
         if (user == null) {
-            return this.manager.getRepository(Catalog).createQueryBuilder().where(`("Catalog"."isPublic" is true)`);
+            return this.manager
+                .getRepository(CatalogEntity)
+                .createQueryBuilder()
+                .where(`("CatalogEntity"."isPublic" is true)`);
         } else {
-            return this.manager.getRepository(Catalog).createQueryBuilder().where(
+            return this.manager.getRepository(CatalogEntity).createQueryBuilder().where(
                 `
                 (
-                    "Catalog"."isPublic" is true 
+                    "CatalogEntity"."isPublic" is true 
                     or 
-                    ("Catalog"."isPublic" is false and "Catalog"."id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId and :permission = ANY(uc.permission)))
+                    ("CatalogEntity"."isPublic" is false and "CatalogEntity"."id" in (select uc.catalog_id from user_catalog uc where uc.user_id = :userId and :permission = ANY(uc.permission)))
                 )`,
                 { userId: user.id, permission }
             );
@@ -78,12 +81,12 @@ export class CatalogRepository extends Repository<Catalog> {
     }
 
     async findCatalogBySlug({ slug, relations = [] }: { slug: string; relations?: string[] }) {
-        return this.manager.getRepository(Catalog).findOne({ where: { slug: slug }, relations: relations });
+        return this.manager.getRepository(CatalogEntity).findOne({ where: { slug: slug }, relations: relations });
     }
 
-    async findCatalogBySlugOrFail(slug: string, relations?: string[]): Promise<Catalog> {
+    async findCatalogBySlugOrFail(slug: string, relations?: string[]): Promise<CatalogEntity> {
         const catalog = await this.manager
-            .getRepository(Catalog)
+            .getRepository(CatalogEntity)
             .findOne({ where: { slug: slug }, relations: relations });
 
         if (catalog == null) {
@@ -101,13 +104,13 @@ export class CatalogRepository extends Repository<Catalog> {
         userId: number;
         value: CreateCatalogInput;
         relations?: string[];
-    }): Promise<Catalog> {
+    }): Promise<CatalogEntity> {
         return this.manager.nestedTransaction(async (transaction) => {
             if (value.slug.trim() === "") {
                 throw new Error("CATALOG_SLUG_REQUIRED");
             }
 
-            const existingCatalogs = await transaction.find(Catalog, {
+            const existingCatalogs = await transaction.find(CatalogEntity, {
                 where: {
                     slug: value.slug
                 }
@@ -118,7 +121,7 @@ export class CatalogRepository extends Repository<Catalog> {
             }
 
             const now = new Date();
-            const catalog = transaction.create(Catalog);
+            const catalog = transaction.create(CatalogEntity);
             catalog.slug = value.slug;
             catalog.displayName = value.displayName;
             catalog.description = value.description || null;
@@ -153,9 +156,9 @@ export class CatalogRepository extends Repository<Catalog> {
         identifier: CatalogIdentifierInput;
         value: UpdateCatalogInput;
         relations?: string[];
-    }): Promise<Catalog> {
+    }): Promise<CatalogEntity> {
         return this.manager.nestedTransaction(async (transaction) => {
-            const catalog = await transaction.getRepository(Catalog).findOneOrFail({
+            const catalog = await transaction.getRepository(CatalogEntity).findOneOrFail({
                 where: { slug: identifier.catalogSlug },
                 relations: ["packages"]
             });
@@ -174,7 +177,7 @@ export class CatalogRepository extends Repository<Catalog> {
                 if (catalog.isPublic == false) {
                     for (const packageEntity of catalog.packages) {
                         packageEntity.isPublic = false;
-                        transaction.save(packageEntity);
+                        await transaction.save(packageEntity);
                     }
                 }
             }
@@ -203,10 +206,10 @@ export class CatalogRepository extends Repository<Catalog> {
         limit: number,
         offset: number,
         relations?: string[]
-    ): Promise<Package[]> {
+    ): Promise<PackageEntity[]> {
         const ALIAS = "package";
         const packages = await this.manager
-            .getRepository(Package)
+            .getRepository(PackageEntity)
             .createQueryBuilder(ALIAS)
             .where({ catalogId: catalogId })
             .orderBy('"package"."updated_at"', "DESC")
@@ -219,14 +222,14 @@ export class CatalogRepository extends Repository<Catalog> {
     }
 
     async deleteCatalog({ slug }: { slug: string }): Promise<void> {
-        const catalog = await this.manager.getRepository(Catalog).findOneOrFail({
+        const catalog = await this.manager.getRepository(CatalogEntity).findOneOrFail({
             where: { slug: slug }
         });
 
         // find all packages that are part of this catalog
         const ALIAS = "package";
         const packages = await this.manager
-            .getRepository(Package)
+            .getRepository(PackageEntity)
             .createQueryBuilder(ALIAS)
             .where({ catalogId: catalog.id })
             .addRelations(ALIAS, ["catalog"])
@@ -235,7 +238,7 @@ export class CatalogRepository extends Repository<Catalog> {
         await this.manager.getCustomRepository(PackageRepository).deletePackages({ packages: packages });
 
         await this.manager.nestedTransaction(async (transaction) => {
-            await transaction.delete(Catalog, { id: catalog.id });
+            await transaction.delete(CatalogEntity, { id: catalog.id });
         });
 
         try {
@@ -252,17 +255,20 @@ export class CatalogRepository extends Repository<Catalog> {
         startsWith,
         relations = []
     }: {
-        user: User | undefined;
+        user: UserEntity | undefined;
         startsWith: string;
         relations?: string[];
-    }): Promise<Catalog[]> {
+    }): Promise<CatalogEntity[]> {
         const ALIAS = "autoCompleteCatalog";
 
         const entities = await this.createQueryBuilderWithUserConditions(user || null, Permission.VIEW)
-            .andWhere(`(LOWER("Catalog"."slug") LIKE :valueLike OR LOWER("Catalog"."displayName") LIKE :valueLike)`, {
-                startsWith,
-                valueLike: startsWith.toLowerCase() + "%"
-            })
+            .andWhere(
+                `(LOWER("CatalogEntity"."slug") LIKE :valueLike OR LOWER("CatalogEntity"."displayName") LIKE :valueLike)`,
+                {
+                    startsWith,
+                    valueLike: startsWith.toLowerCase() + "%"
+                }
+            )
             .addRelations(ALIAS, relations)
             .getMany();
 
@@ -276,19 +282,19 @@ export class CatalogRepository extends Repository<Catalog> {
         limit,
         relations = []
     }: {
-        user: User;
+        user: UserEntity;
         username: string;
         offSet: number;
         limit: number;
         relations?: string[];
-    }): Promise<[Catalog[], number]> {
+    }): Promise<[CatalogEntity[], number]> {
         const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
         const response = await this.createQueryBuilderWithUserConditions(user, Permission.VIEW)
-            .andWhere(`("Catalog"."creator_id" = :targetUserId)`)
+            .andWhere(`("CatalogEntity"."creator_id" = :targetUserId)`)
             .setParameter("targetUserId", targetUser.id)
             .offset(offSet)
             .limit(limit)
-            .addRelations("Catalog", relations)
+            .addRelations("CatalogEntity", relations)
             .getManyAndCount();
 
         return response;
@@ -301,12 +307,12 @@ export class CatalogRepository extends Repository<Catalog> {
         offSet,
         relations = []
     }: {
-        user: User;
+        user: UserEntity;
         query: string;
         limit: number;
         offSet: number;
         relations?: string[];
-    }): Promise<[Catalog[], number]> {
+    }): Promise<[CatalogEntity[], number]> {
         const ALIAS = "search";
 
         const count = this.createQueryBuilderWithUserConditions(user, Permission.VIEW)

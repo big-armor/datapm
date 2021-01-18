@@ -26,6 +26,8 @@ query AutoComplete($startsWith: String!) {
             description
             latestVersion {
                 identifier {
+                    catalogSlug
+                    packageSlug
                     versionMajor
                     versionMinor
                     versionPatch
@@ -76,6 +78,8 @@ query AutoCompletePackage($startsWith: String!) {
             description
             latestVersion {
                 identifier {
+                    catalogSlug
+                    packageSlug
                     versionMajor
                     versionMinor
                     versionPatch

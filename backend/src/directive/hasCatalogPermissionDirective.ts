@@ -8,12 +8,16 @@ import {
     EnumValueNode
 } from "graphql";
 import { Context } from "../context";
-import { User } from "../entity/User";
+import { UserEntity } from "../entity/UserEntity";
 import { CatalogIdentifierInput, Permission } from "../generated/graphql";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { CatalogRepository } from "../repository/CatalogRepository";
 
-export async function resolveCatalogPermissions(context: Context, identifier: CatalogIdentifierInput, user?: User) {
+export async function resolveCatalogPermissions(
+    context: Context,
+    identifier: CatalogIdentifierInput,
+    user?: UserEntity
+) {
     const catalog = await context.connection
         .getCustomRepository(CatalogRepository)
         .findCatalogBySlugOrFail(identifier.catalogSlug);

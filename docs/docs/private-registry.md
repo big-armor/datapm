@@ -28,6 +28,7 @@ services:
         target: /var/lib/datapm-registry/data
         consistency: cached
     environment:
+      - ACTIVITY_LOG=true
       - REGISTRY_NAME="Private DataPM Registry"
       - REGISTRY_URL=http://localhost:4000
       - JWT_KEY=!!!!REPLACE_ME!!!
@@ -96,6 +97,10 @@ DataPM Registry server scales both horizontally and vertically with-in reason. Y
 
 -   Terminate SSL
 -   No session or connection affinity
+
+## Activity Logs
+
+This server outputs logs via standard out (stdout) and standard error (stderr). Your infrastructure should capture and maintain these logs for as long as your retention policies require. The standard out logs contain activity logs that describe the major actions taken by users. Activity logs are output as JSON lines, and have the property "\_type" set as "ActivityLog". Activity logs can be used to meet your organizations data governance and compliance requirements.
 
 ## Maintaining The Registry
 

@@ -1,20 +1,17 @@
 import express from "express";
 import { EntityManager } from "typeorm";
 
-import { Jwt, parseJwt as ensureUserExistsOrCreate, parseJwt } from "./jwt";
-import { User } from "../entity/User";
-import { Catalog } from "../entity/Catalog";
-import { UserRepository } from "../repository/UserRepository";
-import { APIKeyRepository } from "../repository/APIKeyRepository";
-import { APIKey } from "../entity/APIKey";
+import { Jwt, parseJwt } from "./jwt";
+import { UserEntity } from "../entity/UserEntity";
+import { APIKeyEntity } from "../entity/APIKeyEntity";
 import { hashPassword } from "./PasswordUtil";
 import atob from "atob";
-import { ApolloError, AuthenticationError, UserInputError } from "apollo-server";
+import { AuthenticationError } from "apollo-server";
 
 // get Me object based on express request
 // parses JWT from Authorization header
 // used for packageion
-export async function getMeRequest(req: express.Request, manager: EntityManager): Promise<User | undefined> {
+export async function getMeRequest(req: express.Request, manager: EntityManager): Promise<UserEntity | undefined> {
     let user;
 
     if (req.header("X-API-Key") != null) {
@@ -28,7 +25,7 @@ export async function getMeRequest(req: express.Request, manager: EntityManager)
             const hash = hashPassword(secret, keyId);
 
             const apiKeyRecord = await transaction
-                .getRepository(APIKey)
+                .getRepository(APIKeyEntity)
                 .findOne({ where: { id: keyId, hash: hash }, relations: ["user"] });
 
             if (apiKeyRecord == null) {
@@ -36,14 +33,14 @@ export async function getMeRequest(req: express.Request, manager: EntityManager)
             }
 
             apiKeyRecord.lastUsed = new Date();
-            transaction.save(apiKeyRecord);
+            await transaction.save(apiKeyRecord);
 
             const user = apiKeyRecord.user;
 
             return user;
         });
     } else if (req.header("Authorization") != null) {
-        return new Promise<User | undefined>(async (success, error) => {
+        return new Promise<UserEntity | undefined>(async (success, error) => {
             try {
                 success(getMeJwt(await parseJwt(req), manager));
             } catch (err) {
@@ -66,11 +63,11 @@ export async function getMeSub(sub: string, manager: EntityManager) {
 
 // takes a Jwt and retrieves the corresponding user from the database
 // also retrieves permissions for that user
-export async function getMeJwt(jwt: Jwt, manager: EntityManager): Promise<User | undefined> {
+export async function getMeJwt(jwt: Jwt, manager: EntityManager): Promise<UserEntity | undefined> {
     try {
         return await manager.nestedTransaction(async (transaction) => {
             const userId = jwt.sub;
-            const userRepo = manager.getRepository(User);
+            const userRepo = manager.getRepository(UserEntity);
 
             const user = await userRepo.findOneOrFail({ where: { id: userId } });
 

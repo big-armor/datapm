@@ -1,10 +1,10 @@
 import { EntityRepository, EntityManager } from "typeorm";
 
-import { UserPackagePermission } from "../entity/UserPackagePermission";
+import { UserPackagePermissionEntity } from "../entity/UserPackagePermissionEntity";
 import { UserRepository } from "./UserRepository";
 import { Permission, PackageIdentifier, PackageIdentifierInput } from "../generated/graphql";
 import { PackageRepository } from "./PackageRepository";
-import { Package } from "../entity/Package";
+import { PackageEntity } from "../entity/PackageEntity";
 
 async function getPackagePermissions({
     manager,
@@ -16,10 +16,10 @@ async function getPackagePermissions({
     packageId: number;
     userId: number;
     relations?: string[];
-}): Promise<UserPackagePermission | undefined> {
+}): Promise<UserPackagePermissionEntity | undefined> {
     const ALIAS = "userPackagePermission";
     return manager
-        .getRepository(UserPackagePermission)
+        .getRepository(UserPackagePermissionEntity)
         .createQueryBuilder(ALIAS)
         .addRelations(ALIAS, relations)
         .where({ packageId, userId })
@@ -30,6 +30,15 @@ async function getPackagePermissions({
 export class PackagePermissionRepository {
     constructor(private manager: EntityManager) {}
 
+    public async hasPermission(userId: number, packageId: number, permission: Permission): Promise<boolean> {
+        const permissionsEntity = await this.findPackagePermissions({ packageId, userId });
+        if (!permissionsEntity) {
+            return false;
+        }
+
+        return permissionsEntity.permissions.some((p) => p === permission);
+    }
+
     findPackagePermissions({
         packageId,
         userId,
@@ -38,7 +47,7 @@ export class PackagePermissionRepository {
         packageId: number;
         userId: number;
         relations?: string[];
-    }): Promise<UserPackagePermission | undefined> {
+    }): Promise<UserPackagePermissionEntity | undefined> {
         return getPackagePermissions({
             manager: this.manager,
             packageId,
@@ -47,11 +56,14 @@ export class PackagePermissionRepository {
         });
     }
 
-    public async usersByPackage(packageEntity: Package, relations?: string[]): Promise<UserPackagePermission[]> {
+    public async usersByPackage(
+        packageEntity: PackageEntity,
+        relations?: string[]
+    ): Promise<UserPackagePermissionEntity[]> {
         const ALIAS = "userPackagePermission";
 
         return await this.manager
-            .getRepository(UserPackagePermission)
+            .getRepository(UserPackagePermissionEntity)
             .createQueryBuilder(ALIAS)
             .addRelations(ALIAS, relations)
             .where({ packageId: packageEntity.id })
@@ -96,7 +108,7 @@ export class PackagePermissionRepository {
                 // If user does not exist in collection permissions, it creates new record
                 if (packagePermissions == undefined) {
                     try {
-                        const collectionPermissionEntry = transaction.create(UserPackagePermission);
+                        const collectionPermissionEntry = transaction.create(UserPackagePermissionEntity);
                         collectionPermissionEntry.userId = user.id;
                         collectionPermissionEntry.packageId = packageEntity.id;
                         collectionPermissionEntry.permissions = permissions;
@@ -110,7 +122,7 @@ export class PackagePermissionRepository {
                     try {
                         return await transaction
                             .createQueryBuilder()
-                            .update(UserPackagePermission)
+                            .update(UserPackagePermissionEntity)
                             .set({ permissions: permissions })
                             .where({ packageId: packageEntity.id, userId: user.id })
                             .execute();
@@ -127,7 +139,7 @@ export class PackagePermissionRepository {
                         return await transaction
                             .createQueryBuilder()
                             .delete()
-                            .from(UserPackagePermission)
+                            .from(UserPackagePermissionEntity)
                             .where({ packageId: packageEntity.id, userId: user.id })
                             .execute();
                     } catch (e) {
@@ -156,7 +168,7 @@ export class PackagePermissionRepository {
             if (packageEntity.creatorId == user.id) {
                 throw new Error("CANNOT_REMOVE_CREATOR_PERMISSIONS");
             }
-            await transaction.delete(UserPackagePermission, { package: packageEntity, user });
+            await transaction.delete(UserPackagePermissionEntity, { package: packageEntity, user });
         });
     }
 }

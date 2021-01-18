@@ -3,7 +3,7 @@ import querystring from "querystring";
 import { EntityRepository, Repository, EntityManager, SelectQueryBuilder } from "typeorm";
 import { v4 as uuid } from "uuid";
 
-import { User } from "../entity/User";
+import { UserEntity } from "../entity/UserEntity";
 import {
     CreateUserInputAdmin,
     Permission,
@@ -12,10 +12,10 @@ import {
     RecoverMyPasswordInput
 } from "../generated/graphql";
 import { mixpanel } from "../util/mixpanel";
-import { UserCatalogPermission } from "../entity/UserCatalogPermission";
+import { UserCatalogPermissionEntity } from "../entity/UserCatalogPermissionEntity";
 import { CatalogRepository } from "./CatalogRepository";
 import { hashPassword } from "../util/PasswordUtil";
-import { Catalog } from "../entity/Catalog";
+import { CatalogEntity } from "../entity/CatalogEntity";
 import { sendVerifyEmail, sendForgotPasswordEmail, smtpConfigured } from "../util/smtpUtil";
 import { ValidationError, UserInputError } from "apollo-server";
 import { ImageStorageService } from "../storage/images/image-storage-service";
@@ -55,10 +55,10 @@ async function getUser({
     catalogId?: number;
     manager: EntityManager;
     relations?: string[];
-}): Promise<User | null> {
+}): Promise<UserEntity | null> {
     const ALIAS = "users";
     let query = manager
-        .getRepository(User)
+        .getRepository(UserEntity)
         .createQueryBuilder(ALIAS)
         .where({ username: username })
         .addRelations(ALIAS, relations);
@@ -76,10 +76,10 @@ async function getUserByUserName({
     username: string;
     manager: EntityManager;
     relations?: string[];
-}): Promise<User | null> {
+}): Promise<UserEntity | null> {
     const ALIAS = "users";
     let query = manager
-        .getRepository(User)
+        .getRepository(UserEntity)
         .createQueryBuilder(ALIAS)
         .where({ username: username })
         .addRelations(ALIAS, relations);
@@ -97,7 +97,7 @@ async function getUserOrFail({
     username: string;
     manager: EntityManager;
     relations?: string[];
-}): Promise<User> {
+}): Promise<UserEntity> {
     const user = await getUser({
         username,
         manager,
@@ -115,7 +115,7 @@ async function getUserByUsernameOrFail({
     username: string;
     manager: EntityManager;
     relations?: string[];
-}): Promise<User> {
+}): Promise<UserEntity> {
     const user = await getUserByUserName({
         username,
         manager,
@@ -133,7 +133,7 @@ function getCatalogPicture(catalogId: number) {
     return `catalog/${catalogId}/icon/${uuid()}`; // each profile picture needs its unique path to "invalidate" browser cache
 }
 
-function addUserToMixpanel(user: User, invitedByUserEmail: string) {
+function addUserToMixpanel(user: UserEntity, invitedByUserEmail: string) {
     mixpanel?.people.set(user.emailAddress, {
         $first_name: user.firstName,
         $last_name: user.firstName,
@@ -144,8 +144,8 @@ function addUserToMixpanel(user: User, invitedByUserEmail: string) {
     });
 }
 
-@EntityRepository(User)
-export class UserRepository extends Repository<User> {
+@EntityRepository(UserEntity)
+export class UserRepository extends Repository<UserEntity> {
     constructor() {
         super();
     }
@@ -234,12 +234,20 @@ export class UserRepository extends Repository<User> {
 
     findUsers({ relations = [] }: { relations?: string[] }) {
         const ALIAS = "users";
-        return this.manager.getRepository(User).createQueryBuilder(ALIAS).addRelations(ALIAS, relations).getMany();
+        return this.manager
+            .getRepository(UserEntity)
+            .createQueryBuilder(ALIAS)
+            .addRelations(ALIAS, relations)
+            .getMany();
     }
 
     findAllUsers(relations: string[] = []) {
         const ALIAS = "users";
-        return this.manager.getRepository(User).createQueryBuilder(ALIAS).addRelations(ALIAS, relations).getMany();
+        return this.manager
+            .getRepository(UserEntity)
+            .createQueryBuilder(ALIAS)
+            .addRelations(ALIAS, relations)
+            .getMany();
     }
 
     async autocomplete({
@@ -247,19 +255,21 @@ export class UserRepository extends Repository<User> {
         startsWith,
         relations = []
     }: {
-        user: User | undefined;
+        user: UserEntity | undefined;
         startsWith: string;
         relations?: string[];
-    }): Promise<User[]> {
+    }): Promise<UserEntity[]> {
         const ALIAS = "autoCompleteUser";
 
         const entities = await this.manager
-            .getRepository(User)
+            .getRepository(UserEntity)
             .createQueryBuilder()
-            .where(`(LOWER("User"."username") LIKE :valueLike)`)
-            .orWhere(`("User"."emailAddressIsPublic" is true AND (LOWER("User"."emailAddress") LIKE :valueLike))`)
+            .where(`(LOWER("UserEntity"."username") LIKE :valueLike)`)
             .orWhere(
-                `("User"."nameIsPublic" is true AND (LOWER("User"."first_name") LIKE :valueLike OR LOWER("User"."last_name") LIKE :valueLike))`
+                `("UserEntity"."emailAddressIsPublic" is true AND (LOWER("UserEntity"."emailAddress") LIKE :valueLike))`
+            )
+            .orWhere(
+                `("UserEntity"."nameIsPublic" is true AND (LOWER("UserEntity"."first_name") LIKE :valueLike OR LOWER("UserEntity"."last_name") LIKE :valueLike))`
             )
             .setParameter("valueLike", startsWith.toLowerCase() + "%")
             .addRelations(ALIAS, relations)
@@ -278,14 +288,14 @@ export class UserRepository extends Repository<User> {
         limit: number;
         offSet: number;
         relations?: string[];
-    }): Promise<[User[], number]> {
+    }): Promise<[UserEntity[], number]> {
         const ALIAS = "search";
         return await this.manager
-            .getRepository(User)
+            .getRepository(UserEntity)
             .createQueryBuilder()
-            .where('("User"."nameIsPublic")')
+            .where('("UserEntity"."nameIsPublic")')
             .andWhere(
-                `(User.username LIKE :valueLike OR User.emailAddress LIKE :valueLike OR User.firstName LIKE :valueLike OR User.lastName LIKE :valueLike)`,
+                `("UserEntity"."username" LIKE :valueLike OR "UserEntity"."emailAddress" LIKE :valueLike OR "UserEntity"."first_name" LIKE :valueLike OR "UserEntity"."last_name" LIKE :valueLike)`,
                 {
                     value,
                     valueLike: value + "%"
@@ -307,13 +317,13 @@ export class UserRepository extends Repository<User> {
         limit: number;
         offSet: number;
         relations?: string[];
-    }): Promise<[User[], number]> {
+    }): Promise<[UserEntity[], number]> {
         const ALIAS = "searchWithNoRestrictions";
         return await this.manager
-            .getRepository(User)
+            .getRepository(UserEntity)
             .createQueryBuilder()
             .where(
-                `(User.username LIKE :valueLike OR User.emailAddress LIKE :valueLike OR User.firstName LIKE :valueLike OR User.lastName LIKE :valueLike)`,
+                `(UserEntity.username LIKE :valueLike OR UserEntity.emailAddress LIKE :valueLike OR UserEntity.firstName LIKE :valueLike OR UserEntity.lastName LIKE :valueLike)`,
                 {
                     value,
                     valueLike: value + "%"
@@ -325,7 +335,7 @@ export class UserRepository extends Repository<User> {
             .getManyAndCount();
     }
 
-    createUser({ value, relations = [] }: { value: CreateUserInput; relations?: string[] }): Promise<User> {
+    createUser({ value, relations = [] }: { value: CreateUserInput; relations?: string[] }): Promise<UserEntity> {
         const self: UserRepository = this;
         const isAdmin = (input: CreateUserInput | CreateUserInputAdmin): input is CreateUserInputAdmin => {
             return (input as CreateUserInputAdmin) !== undefined;
@@ -335,7 +345,7 @@ export class UserRepository extends Repository<User> {
 
         return this.manager
             .nestedTransaction(async (transaction) => {
-                let user = transaction.create(User);
+                let user = transaction.create(UserEntity);
 
                 if (value.firstName != null) user.firstName = value.firstName.trim();
 
@@ -377,7 +387,7 @@ export class UserRepository extends Repository<User> {
 
                 return user;
             })
-            .then(async (user: User) => {
+            .then(async (user: UserEntity) => {
                 await sendVerifyEmail(user, emailVerificationToken);
 
                 return getUserOrFail({
@@ -400,7 +410,7 @@ export class UserRepository extends Repository<User> {
         });
     }
 
-    forgotMyPassword({ user }: { user: User }): Promise<void> {
+    forgotMyPassword({ user }: { user: UserEntity }): Promise<void> {
         return this.manager
             .nestedTransaction(async (transaction) => {
                 const dbUser = await getUserByUsernameOrFail({
@@ -414,7 +424,7 @@ export class UserRepository extends Repository<User> {
                 await transaction.save(dbUser);
                 return dbUser;
             })
-            .then(async (user: User) => {
+            .then(async (user: UserEntity) => {
                 await sendForgotPasswordEmail(user, user.passwordRecoveryToken as string);
             });
     }
@@ -463,7 +473,7 @@ export class UserRepository extends Repository<User> {
         username: string;
         value: UpdateUserInput;
         relations?: string[];
-    }): Promise<User> {
+    }): Promise<UserEntity> {
         return this.manager.nestedTransaction(async (transaction) => {
             const dbUser = await getUserByUsernameOrFail({
                 username,
@@ -566,7 +576,7 @@ export class UserRepository extends Repository<User> {
             await this.manager.getCustomRepository(CollectionRepository).deleteCollection(collection.collectionSlug);
 
         await this.manager.nestedTransaction(async (transaction) => {
-            await transaction.delete(User, { username: (await user).username });
+            await transaction.delete(UserEntity, { username: (await user).username });
         });
 
         try {

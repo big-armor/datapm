@@ -1,15 +1,15 @@
 import { Entity, Column, PrimaryColumn, Index, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
 import { CollectionIdentifier, Permission } from "../generated/graphql";
-import { User } from "./User";
+import { UserEntity } from "./UserEntity";
 
-import { BaseModel } from "./BaseModel";
+import { EntityBaseModel } from "./EntityBaseModel";
 
-@Entity()
+@Entity("collection")
 @Index("name")
 @Index("slug")
 @Index("isPublic")
 @Index("isRecommended")
-export class Collection extends BaseModel {
+export class CollectionEntity extends EntityBaseModel {
     @PrimaryGeneratedColumn({ name: "id", type: "integer" })
     public id: number;
 
@@ -28,15 +28,10 @@ export class Collection extends BaseModel {
     @Column({ name: "is_recommended", nullable: false, default: false })
     public isRecommended: boolean;
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => UserEntity)
     @JoinColumn({ name: "creator_id" })
-    creator: User;
+    creator: UserEntity;
 
     @Column({ name: "creator_id", nullable: false })
     public creatorId: number;
-
-    public identifier: CollectionIdentifier;
-    // These are dummy values so that response objects will have the right values
-    // need to write converters for Entity -> GraphQL object
-    public myPermissions: Permission[];
 }

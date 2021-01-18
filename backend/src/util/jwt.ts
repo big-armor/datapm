@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 import express from "express";
 import fetch from "node-fetch";
 
-import { User } from "../entity/User";
+import { UserEntity } from "../entity/UserEntity";
 import { getEnvVariable } from "./getEnvVariable";
 
 export class InvalidAuthenticationError extends ApolloError {
@@ -88,7 +88,7 @@ export async function parseJwt(req: express.Request): Promise<Jwt> {
     };
 }
 
-export function createJwt(user: User): string {
+export function createJwt(user: UserEntity): string {
     return jwt.sign({}, getEnvVariable("JWT_KEY"), {
         algorithm: "HS256",
         subject: user.id.toString(),

@@ -41,6 +41,7 @@ export class UserPackagesComponent implements OnInit {
             this.state = State.SUCCESS;
         });
     }
+
     addToCollection(packageObject: Package) {
         const dialogRef = this.dialog.open(AddPackageComponent, {
             data: {

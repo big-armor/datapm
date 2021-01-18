@@ -1,0 +1,48 @@
+query MyActivity($filter: ActivityLogFilterInput!) {
+    myActivity(filter: $filter) {
+        logs {
+            user {
+                emailAddress
+                username
+                firstName
+                lastName
+            }
+            targetPackage {
+                creator {
+                    username
+                    emailAddress
+                }
+                identifier {
+                    catalogSlug
+                    packageSlug
+                }
+            }
+            targetPackageVersion {
+                identifier {
+                    versionMajor
+                    versionMinor
+                    versionPatch
+                }
+            }
+            targetCollection {
+                identifier {
+                    collectionSlug
+                }
+                name
+            }
+            targetCatalog {
+                identifier {
+                    catalogSlug
+                }
+                displayName
+            }
+            propertiesEdited
+            eventType
+            changeType
+            createdAt
+            updatedAt
+        }
+        count
+        hasMore
+    }
+}

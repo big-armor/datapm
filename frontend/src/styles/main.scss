@@ -423,10 +423,11 @@ textarea.flat-input,
 
 button.save-btn {
     position: relative;
-    top: 10px;
+    top: 4px;
     padding: 4px 24px;
     box-shadow: $outer-shadow-1;
     border-radius: 24px;
+    border-color: transparent;
 
     span {
         font-family: $family-roboto-mono;
@@ -447,7 +448,8 @@ button:focus {
     box-shadow: none;
 }
 
-.disabled {
+.disabled,
+button:disabled {
     background-color: $gray-color-8;
     pointer-events: none;
     opacity: 0.6;
@@ -456,6 +458,7 @@ button:focus {
         color: $gray-color-3;
     }
 }
+
 .mat-button.mat-primary[disabled],
 .mat-button.mat-accent[disabled],
 .mat-button.mat-warn[disabled],
@@ -481,6 +484,7 @@ button:focus {
     font-family: $family-roboto-mono;
     font-style: $style-normal;
     font-weight: $weight-400;
+    font-size: $title-font;
 }
 
 #contentBorder {
@@ -517,6 +521,10 @@ button:focus {
     flex: 1;
 }
 
+.mb-12 {
+    margin-bottom: -12px !important;
+}
+
 .long-txt {
     width: 300px;
 }
@@ -527,16 +535,37 @@ button:focus {
     color: $color-danger !important;
 }
 
+#addUser {
+    position: relative;
+    min-width: 500px;
+}
+
+.mat-dialog-without-padding {
+    .mat-dialog-container {
+        padding: 0;
+    }
+}
+
 @media (max-width: 768px) {
+    #contentBorder {
+        padding: 0px;
+        overflow: hidden;
+    }
     .shadow-div {
         display: block !important;
     }
     .div-question {
         width: 100%;
     }
+    #addUser {
+        min-width: 400px;
+    }
 }
 
 @media (max-width: 576px) {
+    #addUser {
+        min-width: 260px;
+    }
     #contentTitle {
         font-size: $default-font;
     }
@@ -584,11 +613,5 @@ button:focus {
         top: 0.83rem;
         height: 9px;
         margin: 3px;
-    }
-}
-
-.mat-dialog-without-padding {
-    .mat-dialog-container {
-        padding: 0;
     }
 }

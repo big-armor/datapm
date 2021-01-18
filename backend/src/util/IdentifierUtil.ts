@@ -1,6 +1,6 @@
-import { Catalog } from "../entity/Catalog";
-import { Package } from "../entity/Package";
-import { Version } from "../entity/Version";
+import { CatalogEntity } from "../entity/CatalogEntity";
+import { PackageEntity } from "../entity/PackageEntity";
+import { VersionEntity } from "../entity/VersionEntity";
 import { CatalogIdentifier, PackageIdentifier, VersionIdentifier } from "../generated/graphql";
 import { getEnvVariable } from "./getEnvVariable";
 
@@ -37,14 +37,14 @@ export function parseIdentifierString(identifier: String) {
     throw new Error("Unknown identifier");
 }
 
-export function catalogIdentifier(catalog: Catalog): CatalogIdentifier {
+export function catalogIdentifier(catalog: CatalogEntity): CatalogIdentifier {
     return {
         registryURL: getEnvVariable("REGISTRY_URL"),
         catalogSlug: catalog.slug
     };
 }
 
-export function packageIdentifier(packageEntity: Package): PackageIdentifier {
+export function packageIdentifier(packageEntity: PackageEntity): PackageIdentifier {
     return {
         registryURL: getEnvVariable("REGISTRY_URL"),
         catalogSlug: packageEntity.catalog.slug,
@@ -52,7 +52,7 @@ export function packageIdentifier(packageEntity: Package): PackageIdentifier {
     };
 }
 
-export function versionIdentifier(version: Version): VersionIdentifier {
+export function versionIdentifier(version: VersionEntity): VersionIdentifier {
     return {
         registryURL: getEnvVariable("REGISTRY_URL"),
         catalogSlug: version.package.catalog.slug,

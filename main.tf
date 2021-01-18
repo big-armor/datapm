@@ -246,6 +246,10 @@ resource "google_cloud_run_service" "default" {
           name  = "STORAGE_URL"
           value = "gs://${local.workspace["media_bucket_name"]}"
         }
+        env {
+          name  = "ACTIVITY_LOG"
+          value = "true"
+        }
       }
     }
 
