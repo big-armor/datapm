@@ -308,7 +308,7 @@ resource "google_sql_database_instance" "instance" {
     }
 
     ip_configuration {
-      require_ssl = true
+      require_ssl = false
     }
   }
 
