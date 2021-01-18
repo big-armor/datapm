@@ -1,5 +1,8 @@
+@import "../../../../styles/variables";
+
 .table-wrapper {
     height: 100%;
+    top: 10px;
     border-radius: 4px;
 }
 
@@ -9,23 +12,24 @@ table {
 
 .mat-table {
     overflow: scroll;
-    border-left: 1px solid #ddd;
+    border-left: 1px solid $gray-9;
 }
 
 .mat-header-cell {
     padding: 8px 8px 8px 8px;
-    border-right: 1px solid #ddd;
-    border-top: 1px solid #ddd;
+    border-right: 1px solid $gray-9;
+    border-top: 1px solid $gray-9;
 }
+
 .mat-cell {
     padding: 8px 8px 8px 8px;
-    border-right: 1px solid #ddd;
+    border-right: 1px solid $gray-9;
     max-height: 75px;
     height: 75px;
 }
 
 .oddRow {
-    background-color: white;
+    background-color: $white;
 }
 
 .mat-cell {

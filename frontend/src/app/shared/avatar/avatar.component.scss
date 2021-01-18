@@ -1,3 +1,5 @@
+@import "../../../styles/variables";
+
 .avatar {
     background-size: contain;
     background-position: center;
@@ -43,4 +45,17 @@
     justify-content: center;
     color: white;
     font-size: 0.5em;
+}
+
+@media (max-width: 576px) {
+    .add-image-btn {
+        mat-icon {
+            height: ($title-font - 2);
+            font-size: ($title-font - 2);
+        }
+        span {
+            font-size: 8px;
+            margin-bottom: -8px;
+        }
+    }
 }
