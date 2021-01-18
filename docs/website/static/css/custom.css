@@ -144,7 +144,7 @@ body {
 }
 
 .button:hover {
-    background-color:#fff;
+    background-color: #fff;
     text-decoration: none;
     color: #333;
 }
@@ -279,7 +279,8 @@ table tr:nth-child(even) {
     background: #ededed !important;
     padding: 40px 15px;
     width: 100%;
-    box-shadow: 4px 0 4px hsla(0,0%,100%,.25), 0 4px 4px hsla(0,0%,100%,.25), 0 -4px 4px hsla(0,0%,74.1%,.25), -4px 0 4px hsla(0,0%,74.1%,.25);
+    box-shadow: 4px 0 4px hsla(0, 0%, 100%, 0.25), 0 4px 4px hsla(0, 0%, 100%, 0.25),
+        0 -4px 4px hsla(0, 0%, 74.1%, 0.25), -4px 0 4px hsla(0, 0%, 74.1%, 0.25);
     background: hsla(0, 0%, 94.9%, 0.28);
 }
 
