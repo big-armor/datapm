@@ -96,7 +96,7 @@ describe("Activity Log Tests", async () => {
         expect(response.data.myActivity.logs[0]?.user?.username).to.equal(userOne.username);
         expect(response.data.myActivity.logs[0]?.eventType).to.equal(ActivityLogEventType.USER_CREATED);
 
-        const line = serverLogLines.find((l) =>
+        const line = serverLogLines.find((l: any) =>
             findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
                 return (
                     activityLogLine.eventType == ActivityLogEventType.USER_CREATED &&
