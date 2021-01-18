@@ -92,7 +92,7 @@ before(async function () {
                 console.log("Server started!");
                 serverReady = true;
 
-                r();
+                r(null);
             }
         });
 

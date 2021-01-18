@@ -297,6 +297,34 @@ export class UserRepository extends Repository<User> {
             .getManyAndCount();
     }
 
+    async searchWithNoRestrictions({
+        value,
+        limit,
+        offSet,
+        relations = []
+    }: {
+        value: string;
+        limit: number;
+        offSet: number;
+        relations?: string[];
+    }): Promise<[User[], number]> {
+        const ALIAS = "searchWithNoRestrictions";
+        return await this.manager
+            .getRepository(User)
+            .createQueryBuilder()
+            .where(
+                `(User.username LIKE :valueLike OR User.emailAddress LIKE :valueLike OR User.firstName LIKE :valueLike OR User.lastName LIKE :valueLike)`,
+                {
+                    value,
+                    valueLike: value + "%"
+                }
+            )
+            .addRelations(ALIAS, relations)
+            .limit(limit)
+            .offset(offSet)
+            .getManyAndCount();
+    }
+
     createUser({ value, relations = [] }: { value: CreateUserInput; relations?: string[] }): Promise<User> {
         const self: UserRepository = this;
         const isAdmin = (input: CreateUserInput | CreateUserInputAdmin): input is CreateUserInputAdmin => {

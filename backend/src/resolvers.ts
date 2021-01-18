@@ -30,15 +30,12 @@ import { APIKeyRepository } from "./repository/APIKeyRepository";
 import { User } from "./entity/User";
 import { UserCatalogPermission } from "./entity/UserCatalogPermission";
 import { UserCatalogPermissionRepository } from "./repository/CatalogPermissionRepository";
-import { PackagePermissionRepository } from "./repository/PackagePermissionRepository";
-import { isAuthenticatedContext } from "./util/contextHelpers";
+import { isUserWithUsernameOrAdmin } from "./util/contextHelpers";
 import { Version } from "./entity/Version";
 import { Package } from "./entity/Package";
 import { VersionRepository } from "./repository/VersionRepository";
 import { getEnvVariable } from "./util/getEnvVariable";
-import fs from "fs";
 
-import AJV from "ajv";
 import { SemVer } from "semver";
 import { ApolloError, UserInputError, ValidationError } from "apollo-server";
 
@@ -87,7 +84,8 @@ import {
     forgotMyPassword,
     recoverMyPassword,
     searchUsers,
-    setAsAdmin
+    setAsAdmin,
+    searchUsersAsAdmin
 } from "./resolvers/UserResolver";
 import { createAPIKey, deleteAPIKey } from "./resolvers/ApiKeyResolver";
 import { Collection } from "./entity/Collection";
@@ -270,8 +268,9 @@ export const resolvers: {
 
             if (user.nameIsPublic) return user.firstName || null;
 
-            if (isAuthenticatedContext(context) && context.me?.username === user.username)
+            if (isUserWithUsernameOrAdmin(context, user.username)) {
                 return user.firstName || null;
+            }
 
             return null;
         },
@@ -280,7 +279,9 @@ export const resolvers: {
 
             if (user.nameIsPublic) return user.lastName || null;
 
-            if (isAuthenticatedContext(context) && context.me?.username === user.username) return user.lastName || null;
+            if (isUserWithUsernameOrAdmin(context, user.username)) {
+                return user.lastName || null;
+            }
 
             return null;
         },
@@ -289,7 +290,9 @@ export const resolvers: {
 
             if (user.emailAddressIsPublic) return user.emailAddress;
 
-            if (isAuthenticatedContext(context) && context.me?.username === user.username) return user.emailAddress;
+            if (isUserWithUsernameOrAdmin(context, user.username)) {
+                return user.emailAddress;
+            }
 
             return null;
         },
@@ -298,8 +301,9 @@ export const resolvers: {
 
             if (user.twitterHandleIsPublic) return user.twitterHandle || null;
 
-            if (isAuthenticatedContext(context) && context.me?.username === user.username)
+            if (isUserWithUsernameOrAdmin(context, user.username)) {
                 return user.twitterHandle || null;
+            }
 
             return null;
         },
@@ -308,8 +312,9 @@ export const resolvers: {
 
             if (user.gitHubHandleIsPublic) return user.gitHubHandle || null;
 
-            if (isAuthenticatedContext(context) && context.me?.username === user.username)
+            if (isUserWithUsernameOrAdmin(context, user.username)) {
                 return user.gitHubHandle || null;
+            }
 
             return null;
         },
@@ -318,7 +323,9 @@ export const resolvers: {
 
             if (user.websiteIsPublic) return user.website || null;
 
-            if (isAuthenticatedContext(context) && context.me?.username === user.username) return user.website || null;
+            if (isUserWithUsernameOrAdmin(context, user.username)) {
+                return user.website || null;
+            }
 
             return null;
         },
@@ -327,7 +334,9 @@ export const resolvers: {
 
             if (user.locationIsPublic) return user.location || null;
 
-            if (isAuthenticatedContext(context) && context.me?.username === user.username) return user.location || null;
+            if (isUserWithUsernameOrAdmin(context, user.username)) {
+                return user.location || null;
+            }
 
             return null;
         }
@@ -623,7 +632,9 @@ export const resolvers: {
 
         emailAddressAvailable: emailAddressAvailable,
 
-        searchUsers: searchUsers
+        searchUsers: searchUsers,
+
+        searchUsersAsAdmin: searchUsersAsAdmin
     },
 
     Mutation: {

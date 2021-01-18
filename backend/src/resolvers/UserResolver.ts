@@ -15,18 +15,38 @@ import { getGraphQlRelationName } from "../util/relationNames";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { FirstUserStatusHolder } from "./FirstUserStatusHolder";
 
+const USER_SEARCH_RESULT_LIMIT = 100;
 export const searchUsers = async (
     _0: any,
     { value, limit, offSet }: { value: string; limit: number; offSet: number },
     context: AuthenticatedContext,
     info: any
 ) => {
+    const clampedLimit = Math.min(limit, USER_SEARCH_RESULT_LIMIT);
     const [searchResponse, count] = await context.connection.manager
         .getCustomRepository(UserRepository)
-        .search({ value, limit, offSet });
+        .search({ value, limit: clampedLimit, offSet });
 
     return {
-        hasMore: count - (offSet + limit) > 0,
+        hasMore: count - (offSet + clampedLimit) > 0,
+        users: searchResponse,
+        count
+    };
+};
+
+export const searchUsersAsAdmin = async (
+    _0: any,
+    { value, limit, offSet }: { value: string; limit: number; offSet: number },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const clampedLimit = Math.min(limit, USER_SEARCH_RESULT_LIMIT);
+    const [searchResponse, count] = await context.connection.manager
+        .getCustomRepository(UserRepository)
+        .searchWithNoRestrictions({ value, limit: clampedLimit, offSet });
+
+    return {
+        hasMore: count - (offSet + clampedLimit) > 0,
         users: searchResponse,
         count
     };

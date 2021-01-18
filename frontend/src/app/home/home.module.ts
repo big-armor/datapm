@@ -12,9 +12,24 @@ import { HomepageComponent } from "./homepage/homepage.component";
 import { FollowingComponent } from "./following/following.component";
 import { LatestComponent } from "./latest/latest.component";
 import { TrendingComponent } from "./trending/trending.component";
+import { AdminDashboardComponent } from "./admin-dashboard/admin-dashboard.component";
+import { UsersComponent } from "./admin-dashboard/users/users.component";
+import { MatTableModule } from "@angular/material/table";
+import { MatPaginatorModule } from "@angular/material/paginator";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatInputModule } from "@angular/material/input";
+import { FormsModule } from "@angular/forms";
 
 @NgModule({
-    declarations: [FollowingComponent, HomepageComponent, LatestComponent, TrendingComponent],
+    declarations: [
+        FollowingComponent,
+        HomepageComponent,
+        LatestComponent,
+        TrendingComponent,
+        AdminDashboardComponent,
+        UsersComponent
+    ],
     imports: [
         CommonModule,
         HomeRoutingModule,
@@ -22,7 +37,13 @@ import { TrendingComponent } from "./trending/trending.component";
         MatCardModule,
         MatChipsModule,
         MatIconModule,
-        SharedModule
+        SharedModule,
+        MatTableModule,
+        MatPaginatorModule,
+        MatProgressSpinnerModule,
+        MatFormFieldModule,
+        MatInputModule,
+        FormsModule
     ]
 })
 export class HomeModule {}

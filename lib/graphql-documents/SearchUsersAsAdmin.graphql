@@ -1,0 +1,12 @@
+query SearchUsersAsAdmin($value: String!, $limit: Int!, $offset: Int!) {
+    searchUsersAsAdmin(value: $value, limit: $limit, offSet: $offset) {
+        users {
+            username
+            firstName
+            lastName
+            emailAddress
+        }
+        hasMore
+        count
+    }
+}

@@ -5,6 +5,8 @@ import { FollowingComponent } from "./following/following.component";
 import { HomepageComponent } from "./homepage/homepage.component";
 import { LatestComponent } from "./latest/latest.component";
 import { TrendingComponent } from "./trending/trending.component";
+import { AdminDashboardComponent } from "./admin-dashboard/admin-dashboard.component";
+import { UsersComponent } from "./admin-dashboard/users/users.component";
 
 const routes: Routes = [
     {
@@ -27,6 +29,21 @@ const routes: Routes = [
             {
                 path: "following",
                 component: FollowingComponent
+            }
+        ]
+    },
+    {
+        path: "admin",
+        component: AdminDashboardComponent,
+        children: [
+            {
+                path: "",
+                pathMatch: "full",
+                redirectTo: "users"
+            },
+            {
+                path: "users",
+                component: UsersComponent
             }
         ]
     }

@@ -590,6 +590,11 @@ type Query {
     searchUsers(value: String!, limit: Int!, offSet: Int!): SearchUsersResult!
 
     """
+    Returns users that match the given search query with no restrictions
+    """
+    searchUsersAsAdmin(value: String!, limit: Int!, offSet: Int!): SearchUsersResult! @isAdmin
+
+    """
     Returns the latest packages
     """
     latestPackages(offSet: Int!, limit: Int!): LatestPackagesResult!

@@ -49,7 +49,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.searchControl = new FormControl("");
     }
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.searchControl.valueChanges
             .pipe(
                 debounceTime(500),
@@ -106,44 +106,48 @@ export class HeaderComponent implements OnInit, OnDestroy {
         });
     }
 
-    autoComplete(val: string) {
+    public autoComplete(val: string): void {
         this.autocomplete.fetch({ startsWith: val }).subscribe(({ data }) => {
             if (!data) return;
             this.autoCompleteResult = data.autoComplete;
         });
     }
 
-    ngOnDestroy(): void {
+    public ngOnDestroy(): void {
         this.subscription.unsubscribe();
     }
 
-    openLoginDialog() {
+    public openLoginDialog(): void {
         this.dialog.openLoginDialog();
     }
 
-    openSignUpDialog() {
+    public openSignUpDialog(): void {
         this.dialog.openSignupDialog();
     }
 
-    search() {
+    public search(): void {
         this.router.navigate(["/search"], { queryParams: { q: this.searchControl.value } });
     }
 
-    goHome() {
+    public goHome(): void {
         this.router.navigate(["/"]);
     }
 
-    goToMyDetails() {
+    public goToAdminDashboard(): void {
+        this.router.navigate(["admin"]);
+    }
+
+    public goToMyDetails(): void {
         this.router.navigate([this.currentUser?.username]);
     }
 
-    logout() {
+    public logout(): void {
         this.authenticationService.logout();
         setTimeout(() => (this.currentUser = null), 500);
         this.router.navigate(["/"]);
     }
 
-    autoCompleteOptionSelected(event) {
+    public autoCompleteOptionSelected(event): void {
         this.router.navigate(["/" + event.option.value]);
         this.searchControl.setValue("");
         this.autoCompleteResult = null;
