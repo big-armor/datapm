@@ -796,6 +796,11 @@ type Mutation {
     deleteMe: Void @isAuthenticated
 
     """
+    Deletes a user's account
+    """
+    deleteUser(username: String!): Void @isAdmin
+
+    """
     Using a username or email address and a password, requests authentication information for the given user
     """
     login(username: String! @validUsernameOrEmailAddress, password: String! @validPassword): String!

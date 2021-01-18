@@ -330,6 +330,7 @@ export class UserRepository extends Repository<UserEntity> {
                 }
             )
             .addRelations(ALIAS, relations)
+            .orderBy("id")
             .limit(limit)
             .offset(offSet)
             .getManyAndCount();
@@ -562,13 +563,8 @@ export class UserRepository extends Repository<UserEntity> {
         });
     }
 
-    async deleteUser({ username }: { username: string }): Promise<void> {
-        const user = await getUserByUsernameOrFail({
-            username: username,
-            manager: this.manager
-        });
-
-        await this.manager.getCustomRepository(CatalogRepository).deleteCatalog({ slug: username });
+    async deleteUser(user: UserEntity): Promise<void> {
+        await this.manager.getCustomRepository(CatalogRepository).deleteCatalog({ slug: user.username });
 
         const collections = await this.manager.getCustomRepository(CollectionRepository).findByUser(user.id);
 

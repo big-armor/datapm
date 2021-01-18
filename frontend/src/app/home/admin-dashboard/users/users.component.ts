@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, ViewChild } from "@angular/core";
 import { MatPaginator, PageEvent } from "@angular/material/paginator";
 import { MatTableDataSource } from "@angular/material/table";
-import { SearchUsersAsAdminGQL, User } from "../../../../generated/graphql";
+import { DeleteUserGQL, SearchUsersAsAdminGQL, User } from "../../../../generated/graphql";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import Timeout = NodeJS.Timeout;
@@ -33,7 +33,7 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
 
     constructor(
         private searchUsersGQL: SearchUsersAsAdminGQL,
-        // private deleteUserGQL: DeleteUserGQL,
+        private deleteUserGQL: DeleteUserGQL,
         private changeDetectorRef: ChangeDetectorRef,
         private confirmationDialogService: ConfirmationDialogService
     ) {}
@@ -74,7 +74,7 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
         };
         this.confirmationDialogService.openFancyConfirmationDialog(dialogConfig).subscribe((confirmation) => {
             if (confirmation) {
-                console.log("omgj", confirmation);
+                this.deleteUserGQL.mutate({ username: user.username }).subscribe(() => this.loadSearchedUsers());
             }
         });
     }

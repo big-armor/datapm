@@ -215,18 +215,28 @@ export const setMyAvatarImage = async (
 };
 
 export const deleteMe = async (_0: any, {}, context: AuthenticatedContext, info: any) => {
-    context.connection.transaction(async (transaction) => {
-        const user = await transaction
-            .getCustomRepository(UserRepository)
-            .findUserByUserName({ username: context.me.username });
+    return await deleteUserAndLogAction(context.me.username, context);
+};
+
+export const deleteUser = async (
+    _0: any,
+    { username }: { username: string },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    return await deleteUserAndLogAction(username, context);
+};
+
+const deleteUserAndLogAction = async (username: string, context: AuthenticatedContext) => {
+    await context.connection.transaction(async (transaction) => {
+        const userRepository = transaction.getCustomRepository(UserRepository);
+        const user = await transaction.getCustomRepository(UserRepository).findUserByUserName({ username });
 
         await createActivityLog(transaction, {
             userId: user.id,
             eventType: ActivityLogEventType.USER_DELETED
         });
 
-        return await transaction.getCustomRepository(UserRepository).deleteUser({
-            username: context.me.username
-        });
+        return await userRepository.deleteUser(user);
     });
 };

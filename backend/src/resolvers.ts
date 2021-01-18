@@ -20,7 +20,7 @@ import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { UserCatalogPermissionRepository } from "./repository/CatalogPermissionRepository";
-import { isAuthenticatedContext, isUserWithUsernameOrAdmin } from "./util/contextHelpers";
+import { isAuthenticatedAsAdmin, isUserWithUsernameOrAdmin } from "./util/contextHelpers";
 import { UserInputError } from "apollo-server";
 import { parsePackageFileJSON, validatePackageFile } from "datapm-lib";
 import graphqlFields from "graphql-fields";
@@ -61,8 +61,7 @@ import {
 } from "./resolvers/VersionResolver";
 import {
     setUserCollectionPermissions,
-    deleteUserCollectionPermissions,
-    hasCollectionPermissions
+    deleteUserCollectionPermissions
 } from "./resolvers/UserCollectionPermissionResolver";
 import { deleteUserCatalogPermissions, hasCatalogPermissions } from "./resolvers/UserCatalogPermissionResolver";
 import { login, logout, verifyEmailAddress } from "./resolvers/AuthResolver";
@@ -79,7 +78,8 @@ import {
     recoverMyPassword,
     searchUsers,
     setAsAdmin,
-    searchUsersAsAdmin
+    searchUsersAsAdmin,
+    deleteUser
 } from "./resolvers/UserResolver";
 import { createAPIKey, deleteAPIKey, myAPIKeys } from "./resolvers/ApiKeyResolver";
 import {
@@ -516,6 +516,7 @@ export const resolvers: {
         setMyCoverImage: setMyCoverImage,
         setMyAvatarImage: setMyAvatarImage,
         deleteMe: deleteMe,
+        deleteUser: deleteUser,
 
         // API Keys
         createAPIKey: createAPIKey,
