@@ -17,6 +17,16 @@
 
     .mat-dialog-content {
         border-top: none;
+
+        app-cover {
+            img {
+                min-width: 100%;
+                width: unset;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+
         .dialog-content-text {
             position: relative;
 
@@ -61,13 +71,40 @@
 }
 
 @media (max-width: 768px) {
-    .div-question {
-        padding-left: 0px !important;
+    #editAccount {
+        .div-question {
+            padding-left: 0px !important;
+        }
+        .slide-right {
+            padding-right: 0px !important;
+            padding-bottom: 0px !important;
+            position: absolute;
+            float: right;
+            right: 0px;
+        }
+        .mat-dialog-content {
+            .dialog-content-text {
+                .small-paragraph {
+                    padding-right: 0px;
+                }
+            }
+        }
     }
 }
 
 @media (max-width: 576px) {
     #editAccount {
         min-width: 200px;
+        .mat-dialog-content {
+            .dialog-content-text {
+                .user-img {
+                    height: 20px;
+                    ::ng-deep.avatar {
+                        width: 70px !important;
+                        height: 70px !important;
+                    }
+                }
+            }
+        }
     }
 }

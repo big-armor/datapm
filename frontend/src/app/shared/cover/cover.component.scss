@@ -1,13 +1,18 @@
+@import "../../../styles/variables";
+
 .cover {
     height: 150px;
     position: relative;
     background-color: #ddd;
 }
+
 img {
     min-width: 100%;
+    width: unset;
     height: 100%;
     object-fit: cover;
 }
+
 .add-btn {
     position: absolute;
     width: 100%;
@@ -32,5 +37,19 @@ img {
         width: 48px;
         height: 48px;
         color: white;
+    }
+}
+
+@media (max-width: 576px) {
+    img {
+        width: 100%;
+    }
+    .add-btn {
+        mat-icon {
+            font-size: 35px;
+            width: 35px;
+            height: 35px;
+            color: $white;
+        }
     }
 }

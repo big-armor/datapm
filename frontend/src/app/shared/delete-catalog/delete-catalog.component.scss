@@ -1,28 +1,60 @@
 @import "../../../styles/variables";
 
-.slug {
-    color: $color-danger;
+#deleteCatalog {
+    width: 500px;
+    position: relative;
+
+    p {
+        font-size: $text-font;
+        margin-bottom: 0px;
+        color: $gray-1;
+    }
+
+    .slug {
+        color: $color-danger;
+    }
+
+    button {
+        font-weight: $weight-400;
+        border-radius: 24px;
+    }
+
+    .btn-delete {
+        color: $color-danger;
+        position: relative;
+        top: 4px;
+        padding: 0px 15px;
+        box-shadow: $outer-shadow-1;
+        border-color: transparent;
+        font-family: $family-roboto-mono;
+        font-style: $style-normal;
+        font-size: $text-font;
+        line-height: 33px;
+    }
+
+    .oneline-input {
+        ::ng-deep input.mat-input-element {
+            width: unset;
+            border: none;
+            border-bottom: 2px solid $color-danger;
+            background: transparent;
+            outline: transparent solid 1px;
+        }
+    }
 }
 
-div[mat-dialog-title] {
-    max-width: 400px;
-    font-weight: $weight-400;
-    font-size: $default-font;
+@media (max-width: 768px) {
+    #deleteCatalog {
+        min-width: 400px;
+        .w-100 {
+            margin-top: 15px;
+        }
+    }
 }
 
-div[mat-dialog-content] {
-    font-size: $default-font;
-}
-
-div[mat-dialog-actions] {
-    justify-content: flex-end;
-}
-
-mat-form-field {
-    width: 100%;
-}
-
-input {
-    width: 100%;
-    margin-top: 1em;
+@media (max-width: 576px) {
+    #deleteCatalog {
+        min-width: 260px;
+        top: -2px;
+    }
 }
