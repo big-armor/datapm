@@ -36,6 +36,7 @@ import { Connection, EntityManager } from "typeorm";
 import { versionEntityToGraphqlObject } from "./VersionResolver";
 import { catalogEntityToGraphQL } from "./CatalogResolver";
 import { CollectionRepository } from "../repository/CollectionRepository";
+import { VersionEntity } from "../entity/VersionEntity";
 
 export const packageEntityToGraphqlObject = async (
     context: EntityManager | Connection,
@@ -117,10 +118,14 @@ export const getLatestPackages = async (
     };
 };
 
-export const packageVersions = async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+export const packageVersions = async (parent: Package, _1: any, context: AuthenticatedContext, info: any) => {
+    const packageEntity = await context.connection
+        .getCustomRepository(PackageRepository)
+        .findPackageOrFail({ identifier: parent.identifier });
+
     const versions = await context.connection
         .getCustomRepository(VersionRepository)
-        .findVersions({ packageId: parent.id, relations: getRelationNames(graphqlFields(info)) });
+        .findVersions({ packageId: packageEntity.id, relations: getRelationNames(graphqlFields(info)) });
 
     return versions.map(async (v) => await versionEntityToGraphqlObject(context.connection, v));
 };
