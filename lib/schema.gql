@@ -756,6 +756,11 @@ type Mutation {
     updateMe(value: UpdateUserInput!): User! @isAuthenticated
 
     """
+    Updates the user's admin status.
+    """
+    setAsAdmin(username: String! @validUsernameOrEmailAddress, isAdmin: Boolean!): Void @isAdmin
+
+    """
     Updates the logged in users' password
     """
     updateMyPassword(value: UpdateMyPasswordInput!): Void @isAuthenticated

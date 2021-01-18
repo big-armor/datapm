@@ -15,5 +15,6 @@ query Me {
         gitHubHandleIsPublic
         emailAddressIsPublic
         websiteIsPublic
+        isAdmin
     }
 }

@@ -10,7 +10,7 @@ export class IsAdminDirective extends SchemaDirectiveVisitor {
         }
     }
 
-    visitFieldDefinition(field: GraphQLField<any, any>) {
+    public visitFieldDefinition(field: GraphQLField<any, any>): void {
         const { resolve = defaultFieldResolver } = field;
         field.resolve = function (source, args, context: Context, info) {
             if (!context.me) throw new AuthenticationError("NOT_AUTHENTICATED");
@@ -19,7 +19,7 @@ export class IsAdminDirective extends SchemaDirectiveVisitor {
         };
     }
 
-    visitArgumentDefinition(
+    public visitArgumentDefinition(
         argument: GraphQLArgument,
         details: {
             field: GraphQLField<any, any>;
