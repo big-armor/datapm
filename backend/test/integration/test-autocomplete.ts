@@ -70,8 +70,6 @@ describe("Autocomplete tests", async () => {
             }
         });
 
-        console.log(JSON.stringify(createCollection, null, 1));
-
         expect(createCollection.errors == null).equal(true);
 
         let createCatalog = await userAClient.mutate({

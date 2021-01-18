@@ -1,5 +1,5 @@
-import { ApolloClient, gql, NormalizedCacheObject } from "@apollo/client/core";
-import { createAnonymousClient, createUser } from "./test-utils";
+import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
+import { createUser } from "./test-utils";
 import {
     CreatePackageDocument,
     MeDocument,
@@ -243,8 +243,6 @@ describe("Activity Log Tests", async () => {
                 );
             })
         );
-
-        console.log(line);
 
         expect(line).to.be.not.undefined;
     });
@@ -834,7 +832,6 @@ describe("Activity Log Tests", async () => {
 
         const line = serverLogLines.find((l) =>
             findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
-                console.log(l);
                 return (
                     activityLogLine.eventType == ActivityLogEventType.VERSION_DELETED &&
                     activityLogLine.username == userOne.username &&

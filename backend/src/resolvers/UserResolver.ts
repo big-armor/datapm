@@ -76,11 +76,6 @@ export const createMe = async (
         FirstUserStatusHolder.IS_FIRST_USER_CREATED = (await repository.isAtLeastOneUserRegistered()) === 1;
     }
 
-    await repository.createUser({
-        value,
-        relations: getGraphQlRelationName(info)
-    });
-
     await context.connection.transaction(async (transaction) => {
         const user = await transaction.getCustomRepository(UserRepository).createUser({
             value,
