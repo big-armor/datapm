@@ -43,6 +43,7 @@ body {
         box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
             0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
         border-radius: 24px;
+        background: #f9f9f9;
     }
     .navigationSlider .slidingNav ul li a:hover,
     .navigationSlider .slidingNav ul li a:active,
@@ -52,6 +53,9 @@ body {
         text-decoration: none;
         border-radius: 24px;
         color: #828282;
+    }
+    .navigationSlider .slidingNav ul li:hover {
+        background-color: #fff;
     }
     .navigationSlider .slidingNav ul li a {
         font-family: "RobotoMonoLight";
@@ -117,13 +121,14 @@ body {
 
 .button {
     font-family: "RobotoMonoMedium";
+    background: #ffffff6e;
     font-style: normal;
     font-weight: 400;
     font-size: 13px;
     line-height: 20px;
     letter-spacing: -0.28px;
     color: #017fb9;
-    border: 1px solid #ddd;
+    border: 1px solid #dddddd99;
     padding: 5px 20px;
     border-radius: 4px;
     cursor: pointer;
@@ -139,7 +144,7 @@ body {
 }
 
 .button:hover {
-    background-color: rgba(240, 240, 240, 0.783);
+    background-color:#fff;
     text-decoration: none;
     color: #333;
 }
