@@ -167,7 +167,7 @@ export class UserRepository extends Repository<UserEntity> {
 
         const user = this.createQueryBuilder(ALIAS)
             .where([{ username }])
-            .orWhere("(emailAddress = :username AND isPublic IS TRUE)")
+            .orWhere("(emailAddress = :username)")
             .setParameter("username", username)
             .getOne();
 
@@ -305,6 +305,24 @@ export class UserRepository extends Repository<UserEntity> {
             .limit(limit)
             .offset(offSet)
             .getManyAndCount();
+    }
+
+    createInviteUser(emailAddress: string): Promise<UserEntity> {
+        return this.manager.nestedTransaction(async (transaction) => {
+            let user = transaction.create(UserEntity);
+            user.emailAddress = emailAddress.trim();
+            user.verifyEmailToken = uuid();
+            user.verifyEmailTokenDate = new Date();
+            user.passwordSalt = uuid();
+            user.emailVerified = false;
+
+            const now = new Date();
+            user.createdAt = now;
+            user.updatedAt = now;
+            user.isAdmin = false;
+
+            return transaction.save(user);
+        });
     }
 
     createUser({ value, relations = [] }: { value: CreateUserInput; relations?: string[] }): Promise<UserEntity> {

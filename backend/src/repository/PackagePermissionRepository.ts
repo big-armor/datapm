@@ -5,6 +5,7 @@ import { UserRepository } from "./UserRepository";
 import { Permission, PackageIdentifier, PackageIdentifierInput } from "../generated/graphql";
 import { PackageRepository } from "./PackageRepository";
 import { PackageEntity } from "../entity/PackageEntity";
+import { UserEntity } from "../entity/UserEntity";
 
 async function getPackagePermissions({
     manager,
@@ -72,21 +73,18 @@ export class PackagePermissionRepository {
 
     async setPackagePermissions({
         identifier,
-        username,
+        userId,
         permissions,
         relations = []
     }: {
         identifier: PackageIdentifierInput;
-        username: string;
+        userId: number;
         permissions: Permission[];
         relations?: string[];
     }): Promise<void> {
         await this.manager.nestedTransaction(async (transaction) => {
             // ensure user exists and is part of team
-            const user = await transaction.getCustomRepository(UserRepository).findUser({ username });
-            if (!user) {
-                throw new Error(`USER_NOT_FOUND - ${username}`);
-            }
+            const user = await transaction.getRepository(UserEntity).findOneOrFail(userId);
 
             const catalogSlug = identifier.catalogSlug;
             const packageSlug = identifier.packageSlug;

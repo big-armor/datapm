@@ -23,6 +23,11 @@ export class UserEntity extends EntityBaseModel {
     @Column({ length: 150, name: "last_name", type: "varchar", nullable: true })
     lastName?: string;
 
+    get displayName(): string {
+        if (this.nameIsPublic) return this.name;
+        else return this.username;
+    }
+
     get name(): string {
         return `${this.firstName || ""} ${this.lastName || ""}`.trim();
     }

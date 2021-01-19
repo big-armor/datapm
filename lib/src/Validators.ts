@@ -93,3 +93,19 @@ export function passwordValid(
 
     return true;
 }
+
+export function emailAddressValid(
+    emailAddress: string | undefined
+): boolean | "REQUIRED" | "TOO_LONG" | "INVALID_FORMAT" {
+    const regex = /^(?=[A-Z0-9][A-Z0-9@._%+-]{5,253}$)[A-Z0-9._%+-]{1,64}@(?:(?=[A-Z0-9-]{1,63}\.)[A-Z0-9]+(?:-[A-Z0-9]+)*\.){1,8}[A-Z]{2,63}$/i;
+
+    if (emailAddress == null) return `REQUIRED`;
+
+    if (emailAddress.trim().length === 0) return `REQUIRED`;
+
+    if (emailAddress.length > 254) return `TOO_LONG`;
+
+    if (emailAddress.match(regex) == null) return "INVALID_FORMAT";
+
+    return true;
+}

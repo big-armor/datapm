@@ -467,7 +467,7 @@ input UpdateCatalogInput {
 }
 
 input SetUserCatalogPermissionInput {
-    username: String! @validUsername
+    usernameOrEmailAddress: String! @validUsernameOrEmailAddress
 
     """
     The users permissions for the catalog itself
@@ -505,7 +505,7 @@ input UpdatePackageInput {
 The properties for updating a specific user's permissions on a package
 """
 input SetPackagePermissionInput {
-    username: String! @validUsername
+    usernameOrEmailAddress: String! @validUsernameOrEmailAddress
     permissions: [Permission!]!
 }
 
@@ -979,4 +979,9 @@ type Mutation {
     Given a token, validate a user's email address
     """
     verifyEmailAddress(token: String!): Void
+
+    """
+    Accept invite emails to finish creating user
+    """
+    acceptInvite(token: String!, username: String! @validUsername, password: String! @validPassword): Void
 }

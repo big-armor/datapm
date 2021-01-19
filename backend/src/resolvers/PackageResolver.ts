@@ -37,6 +37,8 @@ import { versionEntityToGraphqlObject } from "./VersionResolver";
 import { catalogEntityToGraphQL } from "./CatalogResolver";
 import { CollectionRepository } from "../repository/CollectionRepository";
 import { VersionEntity } from "../entity/VersionEntity";
+import { emailAddressValid } from "datapm-lib";
+import { sendInviteUser } from "../util/smtpUtil";
 
 export const packageEntityToGraphqlObject = async (
     context: EntityManager | Connection,
@@ -448,14 +450,41 @@ export const setPackagePermissions = async (
     _0: any,
     {
         identifier,
-        value: { username, permissions }
-    }: { identifier: PackageIdentifierInput; value: { username: string; permissions: Permission[] } },
+        value: { usernameOrEmailAddress, permissions }
+    }: { identifier: PackageIdentifierInput; value: { usernameOrEmailAddress: string; permissions: Permission[] } },
     context: AuthenticatedContext,
     info: any
 ) => {
-    return context.connection.getCustomRepository(PackagePermissionRepository).setPackagePermissions({
+    const user = await context.connection
+        .getCustomRepository(UserRepository)
+        .getUserByUsernameOrEmailAddress(usernameOrEmailAddress);
+
+    const packageEntity = await context.connection.getCustomRepository(PackageRepository).findPackage({ identifier });
+
+    if (packageEntity == null)
+        throw new Error("PACKAGE_NOT_FOUND - " + identifier.catalogSlug + "/" + identifier.packageSlug);
+
+    let userId = null;
+
+    if (user == null) {
+        if (emailAddressValid(usernameOrEmailAddress)) {
+            const inviteUser = await context.connection
+                .getCustomRepository(UserRepository)
+                .createInviteUser(usernameOrEmailAddress);
+
+            await sendInviteUser(inviteUser, context.me.displayName, packageEntity.displayName);
+
+            userId = inviteUser.id;
+        } else {
+            throw Error("USER_NOT_FOUND - " + usernameOrEmailAddress);
+        }
+    } else {
+        userId = user.id;
+    }
+
+    await context.connection.getCustomRepository(PackagePermissionRepository).setPackagePermissions({
         identifier,
-        username,
+        userId,
         permissions
     });
 };

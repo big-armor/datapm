@@ -1,5 +1,5 @@
-import { AuthenticationError, ValidationError } from "apollo-server";
-import { AuthenticatedContext } from "../context";
+import { AuthenticationError, UserInputError, ValidationError } from "apollo-server";
+import { AuthenticatedContext, Context } from "../context";
 import {
     AUTHENTICATION_ERROR,
     Base64ImageUpload,
@@ -45,7 +45,7 @@ export const emailAddressAvailable = async (
     return user == null;
 };
 
-export const usernameAvailable = async (_0: any, { username }: { username: string }, context: AuthenticatedContext) => {
+export const usernameAvailable = async (_0: any, { username }: { username: string }, context: Context) => {
     const user = await context.connection.manager.getCustomRepository(UserRepository).getUserByUsername(username);
 
     const catalog = await context.connection.manager
@@ -208,5 +208,33 @@ export const deleteMe = async (_0: any, {}, context: AuthenticatedContext, info:
         return await transaction.getCustomRepository(UserRepository).deleteUser({
             username: context.me.username
         });
+    });
+};
+
+export const acceptInvite = async (
+    _0: any,
+    { username, token, password }: { username: string; token: string; password: string },
+    context: Context,
+    info: any
+): Promise<void> => {
+    return context.connection.transaction(async (transaction) => {
+        if ((await usernameAvailable(_0, { username: username }, context)) == false) {
+            throw new ValidationError("USERNAME_NOT_AVAILABLE");
+        }
+
+        const user = await transaction.getCustomRepository(UserRepository).findByEmailValidationToken(token);
+
+        if (user == null) {
+            throw new UserInputError("TOKEN_NOT_VALID");
+        }
+
+        if (user.username != null) {
+            throw new UserInputError("USER_ALREADY_REGISTERED");
+        }
+
+        user.passwordHash = hashPassword(password, user.passwordSalt);
+        user.username = username;
+
+        await transaction.save(user);
     });
 };

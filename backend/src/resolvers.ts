@@ -61,8 +61,7 @@ import {
 } from "./resolvers/VersionResolver";
 import {
     setUserCollectionPermissions,
-    deleteUserCollectionPermissions,
-    hasCollectionPermissions
+    deleteUserCollectionPermissions
 } from "./resolvers/UserCollectionPermissionResolver";
 import { deleteUserCatalogPermissions, hasCatalogPermissions } from "./resolvers/UserCatalogPermissionResolver";
 import { login, logout, verifyEmailAddress } from "./resolvers/AuthResolver";
@@ -78,7 +77,8 @@ import {
     forgotMyPassword,
     recoverMyPassword,
     searchUsers,
-    setAsAdmin
+    setAsAdmin,
+    acceptInvite
 } from "./resolvers/UserResolver";
 import { createAPIKey, deleteAPIKey, myAPIKeys } from "./resolvers/ApiKeyResolver";
 import {
@@ -554,6 +554,8 @@ export const resolvers: {
         createVersion: createVersion,
 
         deleteVersion: deleteVersion,
+
+        acceptInvite: acceptInvite,
 
         track: (_, { actions }, context: Context) => mixpanel.track(actions, context.request)
     }

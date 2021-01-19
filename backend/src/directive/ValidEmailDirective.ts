@@ -7,13 +7,13 @@ import {
     GraphQLInputObjectType,
     GraphQLArgument,
     GraphQLObjectType,
-    GraphQLInterfaceType,
-    GraphQLNonNull,
-    GraphQLScalarType
+    GraphQLInterfaceType
 } from "graphql";
 import { Context } from "../context";
 import { ValidationConstraint } from "./ValidationConstraint";
 import { ValidationType } from "./ValidationType";
+import { emailAddressValid } from "datapm-lib";
+import { INVALID_EMAIL_ADDRESS_ERROR } from "../generated/graphql";
 
 export class ValidEmailDirective extends SchemaDirectiveVisitor {
     visitArgumentDefinition(
@@ -56,16 +56,20 @@ export class ValidEmailDirective extends SchemaDirectiveVisitor {
     }
 }
 
-export function validateEmailAddress(emailAddress: String | undefined) {
-    const regex = /^(?=[A-Z0-9][A-Z0-9@._%+-]{5,253}$)[A-Z0-9._%+-]{1,64}@(?:(?=[A-Z0-9-]{1,63}\.)[A-Z0-9]+(?:-[A-Z0-9]+)*\.){1,8}[A-Z]{2,63}$/i;
+export function validateEmailAddress(emailAddress: string | undefined) {
+    const validEmailAddress = emailAddressValid(emailAddress);
 
-    if (emailAddress == null) throw new ValidationError(`REQUIRED`);
+    if (validEmailAddress == "REQUIRED") {
+        throw new ValidationError(INVALID_EMAIL_ADDRESS_ERROR.REQUIRED);
+    }
 
-    if (emailAddress.length == 0) throw new ValidationError(`REQUIRED`);
+    if (validEmailAddress == "TOO_LONG") {
+        throw new ValidationError(INVALID_EMAIL_ADDRESS_ERROR.TOO_LONG);
+    }
 
-    if (emailAddress.length > 254) throw new ValidationError(`TOO_LONG`);
-
-    if (emailAddress.match(regex) == null) throw new ValidationError("INVALID_FORMAT");
+    if (validEmailAddress == "INVALID_FORMAT") {
+        throw new ValidationError(INVALID_EMAIL_ADDRESS_ERROR.INVALID_FORMAT);
+    }
 }
 
 class CollectionSlugConstraint implements ValidationConstraint {

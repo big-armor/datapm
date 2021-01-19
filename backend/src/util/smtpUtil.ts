@@ -6,7 +6,8 @@ import { Address } from "nodemailer/lib/mailer";
 export enum EMAIL_SUBJECTS {
     NEW_API_KEY = "⚠ New API Key Created",
     VERIFY_EMAIL = "✓ Verify Your New Account",
-    FORGOT_PASSWORD = "⚠ Recover Your Account"
+    FORGOT_PASSWORD = "⚠ Recover Your Account",
+    INVITE_USER = "🚀 Data Invite"
 }
 
 export async function sendAPIKeyCreatedEmail(user: UserEntity, apiKeyLabel: string) {
@@ -32,6 +33,23 @@ export async function sendForgotPasswordEmail(user: UserEntity, token: string) {
     emailHTML = emailHTML.replace(/{{token}}/g, token);
 
     sendEmail(user, EMAIL_SUBJECTS.FORGOT_PASSWORD, emailText, emailHTML);
+}
+
+export async function sendInviteUser(user: UserEntity, inviterName: string, dataName: string) {
+    let emailText = fs.readFileSync("./static/email-templates/user-invite.txt", "utf8");
+    let emailHTML = fs.readFileSync("./static/email-templates/user-invite.html", "utf8");
+
+    emailText = replaceCommonTokens(user, emailText);
+    emailText = emailText.replace(/{{token}}/g, user.verifyEmailToken!);
+    emailText = emailText.replace(/{{data_name}}/g, dataName);
+    emailText = emailText.replace(/{{inviter_name}}/g, inviterName);
+
+    emailHTML = replaceCommonTokens(user, emailHTML);
+    emailHTML = emailHTML.replace(/{{token}}/g, user.verifyEmailToken!);
+    emailHTML = emailHTML.replace(/{{data_name}}/g, dataName);
+    emailHTML = emailHTML.replace(/{{inviter_name}}/g, inviterName);
+
+    sendEmail(user, EMAIL_SUBJECTS.INVITE_USER, emailText, emailHTML);
 }
 
 export async function sendVerifyEmail(user: UserEntity, token: string) {
