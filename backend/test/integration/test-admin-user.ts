@@ -1,14 +1,9 @@
-import { ApolloClient, FetchResult, NormalizedCacheObject, ServerError } from "@apollo/client/core";
 import { expect } from "chai";
 import {
-    MeDocument,
     UserDocument,
-    UpdateMeDocument,
-    LoginMutation,
     SearchUsersDocument,
-    SetAsAdminDocument,
-    DeleteUserDocument,
-    SearchUsersAsAdminDocument
+    AdminDeleteUserDocument,
+    AdminSearchUsersDocument
 } from "./registry-client";
 import { createUser } from "./test-utils";
 import { describe, it } from "mocha";
@@ -17,7 +12,7 @@ import { AdminHolder } from "./admin-holder";
 describe("User Tests", async () => {
     before(async () => {});
 
-    it("Non admin can't search for users without restrictions", async function () {
+    it("Non admin can't search for users without restrictions", async () => {
         const nonAdminUser = await createUser(
             "NonAdmin",
             "NonAdmin",
@@ -26,7 +21,7 @@ describe("User Tests", async () => {
             "passwordA!"
         );
         const userSearchQuery = await nonAdminUser.query({
-            query: SearchUsersAsAdminDocument,
+            query: AdminSearchUsersDocument,
             variables: {
                 limit: 1,
                 offset: 0,
@@ -37,7 +32,7 @@ describe("User Tests", async () => {
         expect(userSearchQuery.errors?.some((error) => error.message.includes("NOT_AUTHORIZED"))).to.be.true;
     });
 
-    it("Non admin can't delete users", async function () {
+    it("Non admin can't delete users", async () => {
         await createUser(
             "UserToTryToDelete",
             "UserToTryToDelete",
@@ -53,7 +48,7 @@ describe("User Tests", async () => {
             "passwordA!"
         );
         const userDeletion = await nonAdminUser.mutate({
-            mutation: DeleteUserDocument,
+            mutation: AdminDeleteUserDocument,
             variables: {
                 username: "UserToTryToDelete"
             }
@@ -62,10 +57,10 @@ describe("User Tests", async () => {
         expect(userDeletion.errors?.some((error) => error.message.includes("NOT_AUTHORIZED"))).to.be.true;
     });
 
-    it("Admin can delete users", async function () {
+    it("Admin can delete users", async () => {
         await createUser("UserToDelete", "UserToDelete", "UserToDelete", "UserToDelete@test.datapm.io", "passwordB!");
         await AdminHolder.adminClient.mutate({
-            mutation: DeleteUserDocument,
+            mutation: AdminDeleteUserDocument,
             variables: {
                 username: "UserToDelete"
             }
@@ -81,7 +76,7 @@ describe("User Tests", async () => {
         expect(deletedUserResponse.errors?.some((error) => error.message.includes("USER_NOT_FOUND"))).to.be.true;
     });
 
-    it("Admin can see private user data in admin search query", async function () {
+    it("Admin can see private user data in admin search query", async () => {
         await createUser(
             "UserAFirstName",
             "UserALastName",
@@ -90,7 +85,7 @@ describe("User Tests", async () => {
             "passwordB!"
         );
         const usersSearchResults = await AdminHolder.adminClient.query({
-            query: SearchUsersAsAdminDocument,
+            query: AdminSearchUsersDocument,
             variables: {
                 limit: 1,
                 offset: 0,
@@ -98,11 +93,11 @@ describe("User Tests", async () => {
             }
         });
 
-        const firstUser = usersSearchResults.data.searchUsersAsAdmin.users[0];
+        const firstUser = usersSearchResults.data.adminSearchUsers.users[0];
         expect(firstUser?.firstName).to.equal("UserAFirstName");
     });
 
-    it("Admin can't see private user data in non-admin search query", async function () {
+    it("Admin can't see private user data in non-admin search query", async () => {
         await createUser(
             "UserBFirstName",
             "UserBLastName",
