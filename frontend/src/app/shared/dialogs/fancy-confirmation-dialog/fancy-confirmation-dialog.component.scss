@@ -50,6 +50,16 @@
     }
 
     .confirm-button {
+        border: 1px solid $color-danger;
+        background: $color-danger;
+
+        &:hover {
+            background: $white;
+            color: $color-danger-lighter;
+        }
+    }
+
+    .cancel-button {
         border: 1px solid $gray-3;
         background: $white;
         color: $gray-3;
@@ -57,15 +67,6 @@
         &:hover {
             background: $gray-3;
             color: $white;
-        }
-    }
-
-    .cancel-button {
-        border: 1px solid $color-danger;
-        background: $color-danger;
-        &:hover {
-            background: $white;
-            color: $color-danger-lighter;
         }
     }
 }
@@ -78,4 +79,14 @@
 
 .spacer {
     flex-grow: 1;
+}
+
+.one-line-input {
+    ::ng-deep input.mat-input-element {
+        width: unset;
+        border: none;
+        border-bottom: 2px solid $color-danger;
+        background: transparent;
+        outline: transparent solid 1px;
+    }
 }

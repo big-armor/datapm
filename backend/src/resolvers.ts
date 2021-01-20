@@ -20,7 +20,7 @@ import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { UserCatalogPermissionRepository } from "./repository/CatalogPermissionRepository";
-import { isAuthenticatedAsAdmin, isUserWithUsernameOrAdmin } from "./util/contextHelpers";
+import { isRequestingUserOrAdmin } from "./util/contextHelpers";
 import { UserInputError } from "apollo-server";
 import { parsePackageFileJSON, validatePackageFile } from "datapm-lib";
 import graphqlFields from "graphql-fields";
@@ -78,8 +78,8 @@ import {
     recoverMyPassword,
     searchUsers,
     setAsAdmin,
-    searchUsersAsAdmin,
-    deleteUser
+    adminSearchUsers,
+    adminDeleteUser
 } from "./resolvers/UserResolver";
 import { createAPIKey, deleteAPIKey, myAPIKeys } from "./resolvers/ApiKeyResolver";
 import {
@@ -285,7 +285,7 @@ export const resolvers: {
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
 
-            if (isUserWithUsernameOrAdmin(context, user.username) || user.nameIsPublic) {
+            if (isRequestingUserOrAdmin(context, user.username) || user.nameIsPublic) {
                 return user.firstName || null;
             }
 
@@ -296,7 +296,7 @@ export const resolvers: {
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
 
-            if (isUserWithUsernameOrAdmin(context, user.username) || user.nameIsPublic) {
+            if (isRequestingUserOrAdmin(context, user.username) || user.nameIsPublic) {
                 return user.lastName || null;
             }
 
@@ -307,7 +307,7 @@ export const resolvers: {
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
 
-            if (isUserWithUsernameOrAdmin(context, user.username) || user.emailAddressIsPublic) {
+            if (isRequestingUserOrAdmin(context, user.username) || user.emailAddressIsPublic) {
                 return user.emailAddress;
             }
 
@@ -318,7 +318,7 @@ export const resolvers: {
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
 
-            if (isUserWithUsernameOrAdmin(context, user.username) || user.twitterHandleIsPublic) {
+            if (isRequestingUserOrAdmin(context, user.username) || user.twitterHandleIsPublic) {
                 return user.twitterHandle || null;
             }
 
@@ -329,7 +329,7 @@ export const resolvers: {
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
 
-            if (isUserWithUsernameOrAdmin(context, user.username) || user.gitHubHandleIsPublic) {
+            if (isRequestingUserOrAdmin(context, user.username) || user.gitHubHandleIsPublic) {
                 return user.gitHubHandle || null;
             }
 
@@ -340,7 +340,7 @@ export const resolvers: {
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
 
-            if (isUserWithUsernameOrAdmin(context, user.username) || user.websiteIsPublic) {
+            if (isRequestingUserOrAdmin(context, user.username) || user.websiteIsPublic) {
                 return user.website || null;
             }
 
@@ -351,7 +351,7 @@ export const resolvers: {
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
 
-            if (isUserWithUsernameOrAdmin(context, user.username) || user.locationIsPublic) {
+            if (isRequestingUserOrAdmin(context, user.username) || user.locationIsPublic) {
                 return user.location || null;
             }
 
@@ -495,7 +495,7 @@ export const resolvers: {
         usernameAvailable: usernameAvailable,
         emailAddressAvailable: emailAddressAvailable,
         searchUsers: searchUsers,
-        searchUsersAsAdmin: searchUsersAsAdmin,
+        adminSearchUsers: adminSearchUsers,
         myActivity: myActivity,
         packageActivities: packageActivities
     },
@@ -516,7 +516,7 @@ export const resolvers: {
         setMyCoverImage: setMyCoverImage,
         setMyAvatarImage: setMyAvatarImage,
         deleteMe: deleteMe,
-        deleteUser: deleteUser,
+        adminDeleteUser: adminDeleteUser,
 
         // API Keys
         createAPIKey: createAPIKey,

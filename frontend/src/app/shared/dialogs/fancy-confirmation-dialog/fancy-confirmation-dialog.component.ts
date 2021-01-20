@@ -16,6 +16,10 @@ export class FancyConfirmationDialogComponent {
     public confirmButtonText: string = "Confirm";
     public cancelButtonText: string = "Cancel";
 
+    public showConfirmationInputField: boolean = false;
+    public confirmationInputFieldRequiredValue: string = "I confirm";
+    public confirmationInputFieldValue: string = "";
+
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: DialogData,
         public dialogRef: MatDialogRef<FancyConfirmationDialogComponent>
@@ -23,9 +27,17 @@ export class FancyConfirmationDialogComponent {
         this.title = this.getOrDefault(data.title, this.title);
         this.warning = this.getOrDefault(data.warning, this.warning);
         this.content = this.getOrDefault(data.content, this.content);
+
         this.confirmButtonText = this.getOrDefault(data.confirmButtonText, this.confirmButtonText);
         this.cancelButtonText = this.getOrDefault(data.cancelButtonText, this.cancelButtonText);
+
         this.textOrientation = this.getOrDefault(data.textOrientation, this.textOrientation);
+
+        this.showConfirmationInputField = data.showConfirmationInputField;
+        this.confirmationInputFieldRequiredValue = this.getOrDefault(
+            data.confirmationInputFieldRequiredValue,
+            this.confirmationInputFieldRequiredValue
+        );
     }
 
     public confirm(): void {
@@ -34,6 +46,18 @@ export class FancyConfirmationDialogComponent {
 
     public close(): void {
         this.dialogRef.close(false);
+    }
+
+    public get shouldDisableConfirmButton(): boolean {
+        return !this.shouldEnableConfirmButton;
+    }
+
+    public get shouldEnableConfirmButton(): boolean {
+        if (!this.showConfirmationInputField) {
+            return true;
+        }
+
+        return this.confirmationInputFieldValue === this.confirmationInputFieldRequiredValue;
     }
 
     private getOrDefault(value: string, defaultValue: string): string {

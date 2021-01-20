@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, ViewChild } from "@angular/core";
-import { MatPaginator, PageEvent } from "@angular/material/paginator";
+import { MatPaginator } from "@angular/material/paginator";
 import { MatTableDataSource } from "@angular/material/table";
-import { DeleteUserGQL, SearchUsersAsAdminGQL, User } from "../../../../generated/graphql";
+import { AdminDeleteUserGQL, AdminSearchUsersGQL, User } from "../../../../generated/graphql";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import Timeout = NodeJS.Timeout;
@@ -14,7 +14,7 @@ import { ConfirmationDialogService } from "../../../services/dialog/confirmation
 })
 export class UsersComponent implements AfterViewInit, OnDestroy {
     public readonly DISPLAYED_COLUMNS: string[] = ["username", "firstName", "lastName", "emailAddress", "actions"];
-    public readonly USERS_PER_PAGE = 25;
+    public readonly USERS_PER_PAGE = 20;
 
     public readonly dataSource = new MatTableDataSource<User>();
     private readonly destroyed = new Subject();
@@ -32,8 +32,8 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
     private searchTimeout: Timeout;
 
     constructor(
-        private searchUsersGQL: SearchUsersAsAdminGQL,
-        private deleteUserGQL: DeleteUserGQL,
+        private searchUsersGQL: AdminSearchUsersGQL,
+        private deleteUserGQL: AdminDeleteUserGQL,
         private changeDetectorRef: ChangeDetectorRef,
         private confirmationDialogService: ConfirmationDialogService
     ) {}
@@ -69,7 +69,10 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
         const dialogConfig = {
             data: {
                 title: "Confirm user deletion",
-                content: dialogContent
+                content: dialogContent,
+                showConfirmationInputField: true,
+                confirmationInputFieldText: `Type ${user.username} here`,
+                confirmationInputFieldRequiredValue: user.username
             }
         };
         this.confirmationDialogService.openFancyConfirmationDialog(dialogConfig).subscribe((confirmation) => {
@@ -98,7 +101,7 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
             .fetch({ value: this.searchValue, offset: this.loadedUsers.length, limit: this.USERS_PER_PAGE })
             .subscribe(
                 (users) => {
-                    const response = users.data?.searchUsersAsAdmin;
+                    const response = users.data?.adminSearchUsers;
                     if (response) {
                         this.loadUsersToTheTable(response.users as User[], response.count);
                     } else {

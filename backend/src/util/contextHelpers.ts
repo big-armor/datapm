@@ -1,6 +1,6 @@
 import { Context } from "../context";
 
-export function isUserWithUsernameOrAdmin(context: Context, username: string): boolean {
+export function isRequestingUserOrAdmin(context: Context, username: string): boolean {
     if (context.me == null) {
         return false;
     }

@@ -36,7 +36,7 @@ export const searchUsers = async (
     };
 };
 
-export const searchUsersAsAdmin = async (
+export const adminSearchUsers = async (
     _0: any,
     { value, limit, offSet }: { value: string; limit: number; offSet: number },
     context: AuthenticatedContext,
@@ -218,7 +218,7 @@ export const deleteMe = async (_0: any, {}, context: AuthenticatedContext, info:
     return await deleteUserAndLogAction(context.me.username, context);
 };
 
-export const deleteUser = async (
+export const adminDeleteUser = async (
     _0: any,
     { username }: { username: string },
     context: AuthenticatedContext,
@@ -233,7 +233,8 @@ const deleteUserAndLogAction = async (username: string, context: AuthenticatedCo
         const user = await transaction.getCustomRepository(UserRepository).findUserByUserName({ username });
 
         await createActivityLog(transaction, {
-            userId: user.id,
+            userId: context.me.id,
+            targetUserId: user.id,
             eventType: ActivityLogEventType.USER_DELETED
         });
 

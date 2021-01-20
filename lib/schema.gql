@@ -663,7 +663,7 @@ type Query {
     """
     Returns users that match the given search query with no restrictions
     """
-    searchUsersAsAdmin(value: String!, limit: Int!, offSet: Int!): SearchUsersResult! @isAdmin
+    adminSearchUsers(value: String!, limit: Int!, offSet: Int!): SearchUsersResult! @isAdmin
 
     """
     Returns the latest packages
@@ -798,7 +798,7 @@ type Mutation {
     """
     Deletes a user's account
     """
-    deleteUser(username: String!): Void @isAdmin
+    adminDeleteUser(username: String!): Void @isAdmin
 
     """
     Using a username or email address and a password, requests authentication information for the given user

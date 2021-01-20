@@ -1,5 +1,5 @@
-query SearchUsersAsAdmin($value: String!, $limit: Int!, $offset: Int!) {
-    searchUsersAsAdmin(value: $value, limit: $limit, offSet: $offset) {
+query AdminSearchUsers($value: String!, $limit: Int!, $offset: Int!) {
+    adminSearchUsers(value: $value, limit: $limit, offSet: $offset) {
         users {
             username
             firstName

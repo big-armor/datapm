@@ -15,6 +15,7 @@ export interface ActivityLogTemp {
     targetPackageVersionId?: number;
     targetCatalogId?: number;
     targetCollectionId?: number;
+    targetUserId?: number;
     propertiesEdited?: string[];
 }
 
