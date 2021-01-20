@@ -6,9 +6,7 @@ import {
     GraphQLObjectType,
     GraphQLInterfaceType,
     GraphQLInputField,
-    GraphQLInputObjectType,
-    GraphQLScalarType,
-    GraphQLNonNull
+    GraphQLInputObjectType
 } from "graphql";
 import { Context } from "../context";
 import { validateUsername } from "./ValidUsernameDirective";
@@ -28,7 +26,8 @@ export class ValidUsernameOrEmailAddressDirective extends SchemaDirectiveVisitor
         const { resolve = defaultFieldResolver } = details.field;
         const self = this;
         details.field.resolve = function (source, args, context: Context, info) {
-            const username: string | undefined = args.username || args.value?.username || undefined;
+            const username: string | undefined =
+                args.username || args.value?.username || args.value?.usernameOrEmailAddress || undefined;
             validateUsername(username);
             return resolve.apply(this, [source, args, context, info]);
         };
@@ -38,7 +37,8 @@ export class ValidUsernameOrEmailAddressDirective extends SchemaDirectiveVisitor
         const { resolve = defaultFieldResolver } = field;
         const self = this;
         field.resolve = function (source, args, context: Context, info) {
-            const username: string | undefined = args.username || args.value?.username || undefined;
+            const username: string | undefined =
+                args.username || args.value?.username || args.value?.usernameOrEmailAddress || undefined;
 
             validateUsernameOrEmail(username);
 

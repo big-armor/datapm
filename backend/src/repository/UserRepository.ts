@@ -167,7 +167,7 @@ export class UserRepository extends Repository<UserEntity> {
 
         const user = this.createQueryBuilder(ALIAS)
             .where([{ username }])
-            .orWhere("(emailAddress = :username)")
+            .orWhere('("getUsername"."emailAddress" = :username)')
             .setParameter("username", username)
             .getOne();
 

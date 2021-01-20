@@ -228,12 +228,11 @@ export const acceptInvite = async (
             throw new UserInputError("TOKEN_NOT_VALID");
         }
 
-        if (user.username != null) {
-            throw new UserInputError("USER_ALREADY_REGISTERED");
-        }
-
         user.passwordHash = hashPassword(password, user.passwordSalt);
         user.username = username;
+        user.emailVerified = true;
+        delete user.verifyEmailToken;
+        user.verifyEmailTokenDate = new Date();
 
         await transaction.save(user);
     });

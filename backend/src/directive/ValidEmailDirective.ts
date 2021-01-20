@@ -60,15 +60,15 @@ export function validateEmailAddress(emailAddress: string | undefined) {
     const validEmailAddress = emailAddressValid(emailAddress);
 
     if (validEmailAddress == "REQUIRED") {
-        throw new ValidationError(INVALID_EMAIL_ADDRESS_ERROR.REQUIRED);
+        throw new Error(INVALID_EMAIL_ADDRESS_ERROR.REQUIRED);
     }
 
     if (validEmailAddress == "TOO_LONG") {
-        throw new ValidationError(INVALID_EMAIL_ADDRESS_ERROR.TOO_LONG);
+        throw new Error(INVALID_EMAIL_ADDRESS_ERROR.TOO_LONG);
     }
 
-    if (validEmailAddress == "INVALID_FORMAT") {
-        throw new ValidationError(INVALID_EMAIL_ADDRESS_ERROR.INVALID_FORMAT);
+    if (validEmailAddress == "INVALID_EMAIL_ADDRESS_FORMAT") {
+        throw new Error(INVALID_EMAIL_ADDRESS_ERROR.INVALID_EMAIL_ADDRESS_FORMAT);
     }
 }
 
@@ -77,7 +77,7 @@ class CollectionSlugConstraint implements ValidationConstraint {
         return "EmailAddress";
     }
 
-    validate(value: String) {
+    validate(value: string) {
         validateEmailAddress(value);
     }
 

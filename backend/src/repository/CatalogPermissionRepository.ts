@@ -220,9 +220,11 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
         relations?: string[];
     }): Promise<void> {
         await this.manager.nestedTransaction(async (transaction) => {
-            const user = await transaction.getCustomRepository(UserRepository).getUserByUsername(value.username);
+            const user = await transaction
+                .getCustomRepository(UserRepository)
+                .getUserByUsernameOrEmailAddress(value.usernameOrEmailAddress);
 
-            if (!user) throw new Error(`USER_NOT_FOUND - ${value.username}`);
+            if (!user) throw new Error(`USER_NOT_FOUND - ${value.usernameOrEmailAddress}`);
 
             const catalogEntity = await transaction
                 .getCustomRepository(CatalogRepository)
