@@ -5,7 +5,6 @@ export interface DialogData {
     content: string;
     warning?: string;
     showConfirmationInputField?: boolean;
-    confirmationInputFieldText?: string;
     confirmationInputFieldRequiredValue?: string;
     confirmButtonText?: string;
     cancelButtonText?: string;

@@ -40,6 +40,12 @@ body {
     background-color: inherit;
 }
 
+.cdk-global-scrollblock {
+    position: static !important;
+    width: initial !important;
+    overflow-y: inherit !important;
+}
+
 .mat-dialog-container {
     background-color: $gray-11;
 }

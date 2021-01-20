@@ -17,7 +17,7 @@ export class FancyConfirmationDialogComponent {
     public cancelButtonText: string = "Cancel";
 
     public showConfirmationInputField: boolean = false;
-    public confirmationInputFieldRequiredValue: string = "I confirm";
+    public confirmationInputFieldRequiredValue: string = "";
     public confirmationInputFieldValue: string = "";
 
     constructor(

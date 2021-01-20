@@ -71,7 +71,6 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
                 title: "Confirm user deletion",
                 content: dialogContent,
                 showConfirmationInputField: true,
-                confirmationInputFieldText: `Type ${user.username} here`,
                 confirmationInputFieldRequiredValue: user.username
             }
         };
