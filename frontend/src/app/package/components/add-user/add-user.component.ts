@@ -1,9 +1,12 @@
-import { Component, Inject, OnInit } from "@angular/core";
+import { Component, ElementRef, Inject, OnInit, ViewChild } from "@angular/core";
 import { FormGroup, FormControl, Validators } from "@angular/forms";
+import { MatChipInputEvent } from "@angular/material/chips";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { debounceTime, switchMap } from "rxjs/operators";
 import { PageState } from "src/app/models/page-state";
 import { AutoCompleteResult, AutoCompleteUserGQL, Permission, SetPackagePermissionsGQL } from "src/generated/graphql";
+import { COMMA, ENTER } from "@angular/cdk/keycodes";
+import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 
 enum ErrorType {
     USER_NOT_FOUND = "USER_NOT_FOUND",
@@ -20,6 +23,11 @@ export class AddUserComponent implements OnInit {
     public error: ErrorType = null;
     public usernameControl: FormControl = new FormControl("", [Validators.required]);
     autoCompleteResult: AutoCompleteResult;
+    readonly separatorKeysCodes: number[] = [ENTER, COMMA];
+
+    public usernames: string[] = [];
+
+    @ViewChild("usernameInput") fruitInput: ElementRef<HTMLInputElement>;
 
     constructor(
         private setPackagePermissions: SetPackagePermissionsGQL,
@@ -37,7 +45,7 @@ export class AddUserComponent implements OnInit {
             .pipe(
                 debounceTime(500),
                 switchMap((value) => {
-                    if (value.length < 2) {
+                    if (value == null || value.length < 2) {
                         this.autoCompleteResult = null;
                         return [];
                     }
@@ -88,5 +96,32 @@ export class AddUserComponent implements OnInit {
             );
     }
 
-    autoCompleteOptionSelected(event: Event) {}
+    selected(event: MatAutocompleteSelectedEvent): void {
+        this.usernames.push(event.option.viewValue);
+        this.fruitInput.nativeElement.value = "";
+        this.usernameControl.setValue(null);
+    }
+
+    removeFromSelection(usernameOrEmailAddress: string) {
+        const index = this.usernames.indexOf(usernameOrEmailAddress);
+
+        if (index >= 0) {
+            this.usernames.splice(index, 1);
+        }
+    }
+
+    add(event: MatChipInputEvent): void {
+        const input = event.input;
+        const value = event.value;
+
+        // Add our fruit
+        if ((value || "").trim()) {
+            this.usernames.push(value.trim());
+        }
+
+        // Reset the input value
+        if (input) {
+            input.value = "";
+        }
+    }
 }

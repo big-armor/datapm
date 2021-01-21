@@ -1,50 +1,73 @@
 <form [formGroup]="form" (submit)="submit($event)" id="addUser">
     <div mat-dialog-title id="contentTitle">Add User</div>
     <div mat-dialog-content id="contentBorder">
-        <div class="d-flex flex-row bd-highlight py-4 shadow-div">
+        <div class="bd-highlight py-4 shadow-div">
             <div class="bd-highlight w-100">
-                <div class="div-answer">
-                    <app-input
-                        class="flat-input-parent"
-                        placeholder="username or email address"
-                        [group]="form"
-                        [control]="usernameControl"
-                        controlName="username"
-                        inputStyle="flat"
-                        [matAutocomplete]="auto"
-                        [error]="form | inputError: 'username' | async"
-                    ></app-input>
-                    <mat-autocomplete
-                        #auto="matAutocomplete"
-                        class="search-autocomplete"
-                        (optionSelected)="autoCompleteOptionSelected($event)"
-                    >
-                        <mat-option *ngIf="!autoCompleteResult && usernameControl.value.length > 1"
-                            >Loading...</mat-option
+                <mat-form-field class="w-100">
+                    <mat-label>Usernames or Email Addresses</mat-label>
+                    <mat-chip-list #chipList aria-label="Fruit selection">
+                        <mat-chip
+                            *ngFor="let user of usernames"
+                            [selectable]="false"
+                            [removable]="true"
+                            (removed)="removeFromSelection(user)"
                         >
-                        <ng-container *ngIf="autoCompleteResult">
-                            <mat-option *ngFor="let option of autoCompleteResult.users" [value]="option.username">
-                                <div class="autocomplete-title">{{ option.username }}</div>
-                                <div *ngIf="option.emailAddress != null" class="autocomplete-description">
-                                    {{ option.emailAddress }}
-                                </div>
-                            </mat-option>
+                            {{ user }}
+                            <mat-icon matChipRemove>remove</mat-icon>
+                        </mat-chip>
+
+                        <input
+                            matInput
+                            #usernameInput
+                            class="flat-input-parent"
+                            controlName="username"
+                            inputStyle="flat"
+                            [formControl]="usernameControl"
+                            [matAutocomplete]="auto"
+                            [matChipInputFor]="chipList"
+                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                            (matChipInputTokenEnd)="add($event)"
+                        />
+
+                        <mat-autocomplete
+                            #auto="matAutocomplete"
+                            class="search-autocomplete"
+                            (optionSelected)="selected($event)"
+                        >
+                            <mat-option *ngIf="!autoCompleteResult && usernameControl.value.length > 1"
+                                >Loading...</mat-option
+                            >
+                            <ng-container *ngIf="autoCompleteResult">
+                                <mat-option *ngFor="let option of autoCompleteResult.users" [value]="option.username">
+                                    <div class="autocomplete-title">{{ option.username }}</div>
+                                    <div *ngIf="option.emailAddress != null" class="autocomplete-description">
+                                        {{ option.emailAddress }}
+                                    </div>
+                                </mat-option>
+                            </ng-container>
+                        </mat-autocomplete>
+                    </mat-chip-list>
+                </mat-form-field>
+
+                <div class="text-danger mt-3" *ngIf="state === 'ERROR'">
+                    <ng-container [ngSwitch]="error">
+                        <ng-container *ngSwitchCase="'CANNOT_SET_PACKAGE_CREATOR_PERMISSIONS'">
+                            You can not change the permissions of the package owner.
                         </ng-container>
-                    </mat-autocomplete>
-                    <div class="text-danger mt-3" *ngIf="state === 'ERROR'">
-                        <ng-container [ngSwitch]="error">
-                            <ng-container *ngSwitchCase="'CANNOT_SET_PACKAGE_CREATOR_PERMISSIONS'">
-                                You can not change the permissions of the package owner.
-                            </ng-container>
-                            <ng-container *ngSwitchCase="'USER_NOT_FOUND'">
-                                There is no user with that username on this registry.
-                            </ng-container>
-                            <ng-container *ngSwitchDefault>
-                                Error occured while adding a user permission to the collection
-                            </ng-container>
+                        <ng-container *ngSwitchCase="'USER_NOT_FOUND'">
+                            There is no user with that username on this registry.
                         </ng-container>
-                    </div>
+                        <ng-container *ngSwitchDefault>
+                            Error occured while adding a user permission to the collection
+                        </ng-container>
+                    </ng-container>
                 </div>
+            </div>
+            <div>
+                <mat-form-field class="w-100">
+                    <mat-label>Message</mat-label>
+                    <textarea matInput></textarea>
+                </mat-form-field>
             </div>
         </div>
     </div>

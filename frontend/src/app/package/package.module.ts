@@ -32,6 +32,8 @@ import { AddUserComponent } from "./components/add-user/add-user.component";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { PackageDeletionConfirmationComponent } from "./components/package/package-deletion-confirmation/package-deletion-confirmation.component";
 import { MatTooltipModule } from "@angular/material/tooltip";
+import { MatChipsModule } from "@angular/material/chips";
+import { MatInputModule } from "@angular/material/input";
 
 @NgModule({
     declarations: [
@@ -58,6 +60,8 @@ import { MatTooltipModule } from "@angular/material/tooltip";
         MatExpansionModule,
         MatIconModule,
         MatTabsModule,
+        MatChipsModule,
+        MatInputModule,
         MatDialogModule,
         MatSlideToggleModule,
         MatTableModule,
