@@ -1,5 +1,5 @@
 <cdk-virtual-scroll-viewport tvsItemSize="75" class="table-wrapper mat-elevation-z2">
-    <table mat-table [dataSource]="dataSource">
+    <table mat-table [dataSource]="dataSource" id="sampleTable">
         <tr mat-header-row *matHeaderRowDef="columns; sticky: true"></tr>
         <tr stye="background-color: red" mat-row *matRowDef="let row; columns: columns"></tr>
         <ng-container [matColumnDef]="column" *ngFor="let column of columns">

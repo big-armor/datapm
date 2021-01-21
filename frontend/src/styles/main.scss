@@ -248,12 +248,12 @@ mat-select {
     font-family: $family-roboto;
     font-style: $style-normal;
     font-weight: $weight-400;
-    font-size: $small-font;
+    font-size: ($text-font - 1);
+    background: $white-1;
     line-height: 13px;
-    letter-spacing: -0.28px;
     color: $color-info;
     border: 1px solid $gray-9;
-    padding: 3px 15px;
+    padding: 6px 15px;
     border-radius: 4px;
     cursor: pointer;
 
@@ -263,8 +263,24 @@ mat-select {
     }
 
     &:hover {
+        color: $color-info;
         text-decoration: none;
-        background-color: rgba(240, 240, 240, 0.783);
+        background-color: $white;
+    }
+
+    .delete-txt {
+        color: $color-danger-dark;
+    }
+}
+
+.create-div {
+    color: $color-1;
+    padding: 8px 15px;
+
+    &:hover {
+        color: $color-1;
+        text-decoration: none;
+        background-color: $white;
     }
 }
 
@@ -286,14 +302,14 @@ mat-select {
 }
 
 .section-title {
-    font-family: $family-roboto;
+    font-family: $family-roboto-mono;
     font-style: $style-normal;
-    font-weight: $weight-500;
+    font-weight: $weight-400;
     font-size: $title-font;
     line-height: 26px;
     letter-spacing: -0.28px;
     color: $gray-1;
-    padding: 24px;
+    padding: 0px 24px 14px 0px;
 }
 
 .search-autocomplete {

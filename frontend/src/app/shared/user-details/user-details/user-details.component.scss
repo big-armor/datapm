@@ -5,6 +5,11 @@
         background-color: inherit;
     }
 
+    tr.mat-header-row {
+        height: 40px;
+        background-color: #ededed;
+    }
+
     .no-keys-div {
         font-family: $family-roboto-mono;
         font-style: $style-normal;
@@ -17,20 +22,17 @@
         padding-bottom: 0;
     }
 
-    .api-keys-title {
-        padding-bottom: 0;
-    }
-
     .api-key-form {
-        padding: 24px;
+        padding: 0px 24px 24px 0px;
 
         .div-with-errors {
             max-width: 346px;
-            font-family: $family-roboto-mono;
+            font-family: $family-roboto;
             font-style: $style-normal;
             font-weight: $weight-400;
             padding-left: 2px;
             font-size: $xsmall-font;
+            line-height: 12px;
             margin-top: 5px;
             color: $color-danger;
         }
@@ -58,7 +60,7 @@
     }
 
     .section-description {
-        padding: 24px;
+        padding: 0px 24px 30px 0px;
         width: 66%;
     }
 
@@ -66,11 +68,17 @@
         width: 100%;
 
         th {
-            font-family: $family-roboto-mono;
+            font-family: $family-roboto;
+            font-size: $text-font;
+            font-weight: $weight-500;
+            color: $gray-1;
         }
 
         td {
             font-family: $family-roboto;
+            color: $gray-2;
+            font-size: $text-font;
+            font-weight: $weight-400;
         }
     }
 
@@ -86,10 +94,13 @@
             align-items: center;
 
             input {
-                height: 35px;
                 border: 0.5px solid $gray-5;
-                line-height: 18px;
+                line-height: 23px;
+                height: 33px;
+                margin-top: 1px;
                 display: flex;
+                width: 230px;
+                font-size: $text-font;
                 align-items: flex-end;
                 letter-spacing: -0.28px;
 
@@ -99,15 +110,14 @@
                 }
 
                 &::placeholder {
-                    font-family: $family-roboto-mono;
+                    font-family: $family-roboto;
                     font-style: $style-normal;
-                    font-weight: $weight-500;
+                    font-weight: $weight-300;
                     font-size: $text-font;
-                    line-height: 18px;
                     display: flex;
                     align-items: flex-end;
                     letter-spacing: -0.28px;
-                    color: $gray-3;
+                    color: $gray-4;
                 }
             }
         }
