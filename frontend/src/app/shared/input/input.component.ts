@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 import { FormControl, FormGroup } from "@angular/forms";
 import { MatAutocomplete } from "@angular/material/autocomplete";
 
-type InputComponentStyle = "round" | "flat";
+type InputComponentStyle = "square" | "flat";
 
 @Component({
     selector: "app-input",
@@ -21,7 +21,7 @@ export class InputComponent implements OnInit, OnChanges {
     @Input() inputType: string = "text";
     @Input() multiline: boolean = false;
     @Input() error: string = "";
-    @Input() inputStyle: InputComponentStyle = "round";
+    @Input() inputStyle: InputComponentStyle = "square";
     @Input() autoFocus: boolean = false;
     @Input() matAutocomplete: MatAutocomplete;
     @Output() inputChange: EventEmitter<string>;
@@ -45,6 +45,8 @@ export class InputComponent implements OnInit, OnChanges {
         if (changes.group?.currentValue && changes.controlName?.currentValue) {
             this.formControl = changes.group.currentValue.get(changes.controlName.currentValue);
         }
+
+        console.log("erroriii", this.error);
     }
 
     handleInputChange(ev: any) {
