@@ -124,15 +124,15 @@ body {
 }
 
 .rounded-input {
-    .dpm-input-round {
-        border-radius: 24px;
-        padding: 10px 23px;
+    .dpm-input-square {
+        border-radius: 6px;
+        padding: 10px 15px;
         width: 100%;
         height: 44px;
-        border: none;
+        font-size: $text-font;
+        border: 1px solid $gray-5;
         outline: none;
         background-color: $gray-7;
-        box-shadow: $inner-shadow-1;
         transition: background-color ease 0.5s;
 
         &:hover {
@@ -144,12 +144,20 @@ body {
             font-family: $family-roboto-mono;
             font-style: $style-normal;
             font-weight: $weight-300;
-            font-size: ($text-font);
+            font-size: ($small-font + 1);
             line-height: 18px;
             display: flex;
             align-items: flex-end;
             letter-spacing: -0.28px;
             color: $gray-4;
+        }
+    }
+}
+
+.rounded-input.search-input {
+    .dpm-input-square {
+        &::placeholder {
+            font-size: ($small-font + 2);
         }
     }
 }
@@ -182,24 +190,22 @@ mat-select {
 
 .app-raised-button {
     outline: none !important;
-    box-shadow: $outer-shadow-1;
-    border-radius: 24px;
-    height: 36px;
+    border-radius: 6px;
     border: none;
     font-family: $family-roboto;
     font-style: $style-normal;
-    font-weight: $weight-300;
-    font-size: ($title-font - 2);
+    font-weight: $weight-400;
+    font-size: $default-font;
     align-items: center;
     text-align: center;
-    color: $gray-3;
-    background-color: $gray-6;
-    padding: 0 1.5em;
-
+    padding: 8px 15px;
+    color: #fff;
+    background-color: $color-info;
     transition: background-color ease 0.5s;
 
     &:hover {
-        background-color: $gray-6;
+        color: $color-info;
+        background-color: $color-info-lighter;
         transition: background-color ease 0.5s;
     }
 
@@ -542,8 +548,9 @@ button:disabled {
 }
 
 .text-danger {
-    margin-top: 0px !important;
+    margin-top: 3px !important;
     font-size: 12px;
+    line-height: 15px;
     color: $color-danger !important;
 }
 
@@ -555,6 +562,15 @@ button:disabled {
 .mat-dialog-without-padding {
     .mat-dialog-container {
         padding: 0;
+    }
+}
+
+.dialog-wrapper-account {
+    padding: 20px 30px;
+    app-input {
+        display: block;
+        min-width: 348px;
+        margin-top: 20px;
     }
 }
 
@@ -602,11 +618,34 @@ button:disabled {
             font-size: $small-font;
         }
     }
+    .text-danger {
+        font-size: $xsmall-font;
+        max-width: 240px !important;
+    }
+    .rounded-input {
+        .dpm-input-square {
+            height: 38px;
+            &::placeholder {
+                font-size: $small-font !important;
+            }
+        }
+    }
+    .app-raised-button {
+        margin-top: 0px !important;
+        font-size: $text-font;
+        width: 100%;
+    }
+    .dialog-wrapper-account {
+        padding: 0px;
+        min-width: 236px;
+        app-input {
+            min-width: 208px;
+        }
+    }
     div {
         .dialog-description {
-            font-size: $small-font;
-            text-align: center;
-            margin-bottom: 0px;
+            font-size: $small-font !important;
+            margin-bottom: 0px !important;
         }
         .dialog-close-wrapper {
             bottom: 19px;
@@ -616,7 +655,7 @@ button:disabled {
             }
         }
         .dialog-title {
-            font-size: ($logo-font + 3);
+            font-size: ($logo-font);
             line-height: 40px;
             margin: 15px 0 5px;
         }

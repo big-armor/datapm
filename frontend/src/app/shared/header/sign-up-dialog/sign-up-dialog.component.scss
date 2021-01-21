@@ -1,18 +1,14 @@
 @import "../../../../styles/variables";
 
-.dialog-wrapper-signup {
-    padding: 20px 30px;
-
+.dialog-wrapper-account {
     .dialog-subtile {
         font-family: $family-roboto-mono;
         font-style: $style-normal;
-        font-weight: $weight-300;
+        font-weight: $weight-400;
         font-size: ($small-font + 1);
-        line-height: 18px;
-        padding-left: 10px;
-        padding-bottom: 5px;
+        line-height: 12px;
         letter-spacing: -0.28px;
-        color: $gray-3;
+        color: $gray-2;
     }
 
     .div-with-errors {
@@ -21,9 +17,8 @@
         font-style: $style-normal;
         font-weight: $weight-400;
         padding-left: 10px;
-        font-size: $xsmall-font;
-        margin-top: 5px;
-        color: $color-danger;
+        font-size: $small-font;
+        color: $gray-1;
         line-height: 12px;
 
         .alert-info {
@@ -33,35 +28,20 @@
         }
     }
 
-    .app-raised-button {
-        min-width: 200px;
+    ::ng-deep.text-danger {
+        max-width: 336px !important;
     }
 
-    app-input {
-        display: block;
-        min-width: 348px;
-        max-width: 380px;
-
-        ::ng-deep.text-danger {
-            font-size: ($small-font - 1);
-            max-width: 324px;
-            line-height: 13px;
-        }
+    .app-raised-button {
+        min-width: 200px;
     }
 }
 
 @media (max-width: 576px) {
-    .dialog-wrapper-signup {
-        padding: 0px;
+    .dialog-wrapper-account {
         .dialog-subtile {
-            margin-bottom: 0px;
-            padding-top: 18px;
-        }
-        app-input {
-            min-width: 208px;
-            ::ng-deep.text-danger {
-                font-size: $xsmall-font;
-            }
+            margin-bottom: 7px;
+            padding-top: 0px;
         }
     }
 }

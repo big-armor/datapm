@@ -1,4 +1,4 @@
-<div class="dialog-wrapper" id="logIn">
+<div class="dialog-wrapper-account" id="logIn">
     <div class="dialog-close-wrapper">
         <button mat-button mat-dialog-close class="dialog-close">close</button>
     </div>
@@ -7,23 +7,23 @@
     <div mat-dialog-content>
         <form [formGroup]="loginForm" (ngSubmit)="formSubmit()">
             <app-input
-                placeholder="username or email address"
+                placeholder="Username or email address"
                 [group]="loginForm"
                 class="rounded-input"
                 controlName="username"
                 [error]="loginForm | inputError: 'username' | async"
             >
             </app-input>
-            <br />
             <app-input
                 inputType="password"
-                placeholder="password"
+                placeholder="Password"
                 [group]="loginForm"
                 controlName="password"
                 class="rounded-input"
+                [error]="loginForm | inputError: 'password' | async"
             >
             </app-input>
-            <p class="forgot-pass mt-3 ml-3">
+            <p class="forgot-pass text-left">
                 <a href="#" (click)="openForgotPasswordDialog($event)">Forgot password?</a>
             </p>
             <br />
