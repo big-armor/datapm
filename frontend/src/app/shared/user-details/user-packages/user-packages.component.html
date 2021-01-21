@@ -8,26 +8,34 @@
     </div>
 </div>
 
-<div *ngIf="state == State.SUCCESS" id="packagesPage" class="big-div-package">
-    <div class="section-title">
-        {{ isCurrentUser ? "My Packages" : "Packages" }}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div *ngIf="state == State.SUCCESS" id="packagesPage" class="big-div-package">
+                <div class="section-title">
+                    {{ isCurrentUser ? "My Packages" : "Packages" }}
+                </div>
+                <p *ngIf="isCurrentUser" class="section-description">
+                    A package is a single offering of one or more data sets. You can publish packages to this registry,
+                    and consume packages that you discover on this registry.
+                </p>
+
+                <p *ngIf="!isCurrentUser && packages.length > 0" class="section-description">
+                    Packages of data published by {{ username }}.
+                </p>
+                <p *ngIf="!isCurrentUser && packages.length == 0" class="section-description">
+                    Either {{ username }} has not published a package, or you do not have permission to any of the
+                    packages they have published.
+                </p>
+
+                <app-package-item
+                    [item]="package"
+                    shouldShowActionButton="true"
+                    actionButtonText="Add To Collection"
+                    (action)="addToCollection(package)"
+                    *ngFor="let package of packages"
+                ></app-package-item>
+            </div>
+        </div>
     </div>
-    <p *ngIf="isCurrentUser" class="pl-4 pr-4">
-        A package is a single offering of one or more data sets. You can publish packages to this registry, and consume
-        packages that you discover on this registry.
-    </p>
-
-    <p *ngIf="!isCurrentUser && packages.length > 0" class="pl-4 pr-4">Packages of data published by {{ username }}.</p>
-    <p *ngIf="!isCurrentUser && packages.length == 0" class="pl-4 pr-4">
-        Either {{ username }} has not published a package, or you do not have permission to any of the packages they
-        have published.
-    </p>
-
-    <app-package-item
-        [item]="package"
-        shouldShowActionButton="true"
-        actionButtonText="Add To Collection"
-        (action)="addToCollection(package)"
-        *ngFor="let package of packages"
-    ></app-package-item>
 </div>

@@ -1,18 +1,18 @@
 <mat-card class="package-item my-3" (click)="goToComponent()">
     <mat-card-content>
-        <div
-            class="mb-2 package-privacy"
-            *ngIf="this.item?.myPermissions?.includes('MANAGE')"
-            [class.public-text]="item?.isPublic"
-            [class.not-public-text]="!item?.isPublic"
-        >
-            {{ item?.isPublic ? "public" : "not public" }}
-        </div>
         <div class="d-flex">
-            <div class="d-flex align-items-start">
+            <div class="d-flex align-items-start img-cover">
                 <app-avatar class="align-top user-img" [user]="item.creator" [size]="40"> </app-avatar>
             </div>
             <div class="mb-2">
+                <div
+                    class="ml-2 package-privacy"
+                    *ngIf="this.item?.myPermissions?.includes('MANAGE')"
+                    [class.public-text]="item?.isPublic"
+                    [class.not-public-text]="!item?.isPublic"
+                >
+                    {{ item?.isPublic ? "public" : "not public" }}
+                </div>
                 <div class="package-identifier mb-2 ml-2">
                     {{ item.identifier.catalogSlug }}/{{ item.identifier.packageSlug }}
                 </div>

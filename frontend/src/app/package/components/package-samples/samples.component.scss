@@ -6,8 +6,11 @@
     border-radius: 4px;
 }
 
-table {
+#sampleTable {
     width: 100%;
+    tbody {
+        overflow-y: scroll;
+    }
 }
 
 .mat-table {

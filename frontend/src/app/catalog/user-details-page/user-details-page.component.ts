@@ -34,9 +34,9 @@ export class UserDetailsPageComponent implements OnInit {
             this.isCurrentUser = true;
             this.tabs = [
                 { name: "My Account", value: "" },
-                { name: "My Packages", value: "packages" },
-                { name: "My Collections", value: "collections" },
-                { name: "My Catalogs", value: "catalogs" }
+                { name: "Packages", value: "packages" },
+                { name: "Collections", value: "collections" },
+                { name: "Catalogs", value: "catalogs" }
             ];
         } else {
             this.tabs = [
