@@ -154,12 +154,16 @@ describe("Inviting USers", function () {
     it("Should send invite email", async function () {
         let userCEmail: any = null;
         let userDEmail: any = null;
+        let userBEmail: any = null;
         let verifyEmailPromise = new Promise<void>((r) => {
             let subscription = mailObservable.subscribe((email) => {
-                if (email.to[0].address === "test-invite-package-c@test.datapm.io") userCEmail = email;
-                if (email.to[0].address === "test-invite-package-d@test.datapm.io") userDEmail = email;
+                console.log(email.to[0].address);
 
-                if (userCEmail && userDEmail) {
+                if (email.to[0].address === "testB-invite-users@test.datapm.io") userBEmail = email;
+                else if (email.to[0].address === "test-invite-package-c@test.datapm.io") userCEmail = email;
+                else if (email.to[0].address === "test-invite-package-d@test.datapm.io") userDEmail = email;
+
+                if (userBEmail && userCEmail && userDEmail) {
                     subscription.unsubscribe();
                     r();
                 }
@@ -194,6 +198,10 @@ describe("Inviting USers", function () {
         expect(response.errors == null).equal(true);
 
         await verifyEmailPromise.then(() => {
+            expect(userBEmail.html).to.not.contain("{{");
+            expect(userBEmail.html).to.contain("Here is my message!@#$%^&*()-=+");
+            expect(userBEmail.html).to.contain("/testA-invite-users/legislators-test");
+
             expect(userCEmail.html).to.not.contain("{{");
             emailVerificationToken = (userCEmail.text as String).match(/\?token=([a-zA-z0-9-]+)/)!.pop()!;
             expect(emailVerificationToken != null).equal(true);

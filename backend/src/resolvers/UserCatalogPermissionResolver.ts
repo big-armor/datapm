@@ -2,13 +2,13 @@ import { ValidationError } from "apollo-server";
 import { emailAddressValid } from "datapm-lib";
 import { AuthenticatedContext, Context } from "../context";
 import { UserEntity } from "../entity/UserEntity";
-import { CatalogIdentifierInput, Permission, SetUserCatalogPermissionInput } from "../generated/graphql";
+import { CatalogIdentifierInput, Permission, SetUserCatalogPermissionInput, UserStatus } from "../generated/graphql";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { CatalogRepository } from "../repository/CatalogRepository";
 import { CollectionRepository } from "../repository/CollectionRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { asyncForEach } from "../util/AsyncForEach";
-import { sendInviteUser, validateMessageContents } from "../util/smtpUtil";
+import { sendInviteUser, sendShareNotification, validateMessageContents } from "../util/smtpUtil";
 
 export const hasCatalogPermissions = async (context: Context, catalogId: number, permission: Permission) => {
     if (permission == Permission.VIEW) {
@@ -54,39 +54,54 @@ export const setUserCatalogPermission = async (
         .findCatalogBySlugOrFail(identifier.catalogSlug);
 
     const inviteUsers: UserEntity[] = [];
+    const existingUsers: UserEntity[] = [];
 
-    await context.connection
-        .transaction(async (transaction) => {
-            await asyncForEach(value, async (userCatalogPermission) => {
-                let userId = null;
-                const user = await transaction
-                    .getCustomRepository(UserRepository)
-                    .getUserByUsernameOrEmailAddress(userCatalogPermission.usernameOrEmailAddress);
+    await context.connection.transaction(async (transaction) => {
+        await asyncForEach(value, async (userCatalogPermission) => {
+            let userId = null;
+            const user = await transaction
+                .getCustomRepository(UserRepository)
+                .getUserByUsernameOrEmailAddress(userCatalogPermission.usernameOrEmailAddress);
 
-                if (user == null) {
-                    if (emailAddressValid(userCatalogPermission.usernameOrEmailAddress) === true) {
-                        const inviteUser = await context.connection
-                            .getCustomRepository(UserRepository)
-                            .createInviteUser(userCatalogPermission.usernameOrEmailAddress);
+            if (user == null) {
+                if (emailAddressValid(userCatalogPermission.usernameOrEmailAddress) === true) {
+                    const inviteUser = await context.connection
+                        .getCustomRepository(UserRepository)
+                        .createInviteUser(userCatalogPermission.usernameOrEmailAddress);
 
-                        userId = inviteUser.id;
-                        inviteUsers.push(inviteUser);
-                    } else {
-                        throw new ValidationError("USER_NOT_FOUND - " + userCatalogPermission.usernameOrEmailAddress);
-                    }
+                    userId = inviteUser.id;
+                    inviteUsers.push(inviteUser);
                 } else {
-                    userId = user.id;
+                    throw new ValidationError("USER_NOT_FOUND - " + userCatalogPermission.usernameOrEmailAddress);
                 }
+            } else {
+                userId = user.id;
 
-                await transaction.getCustomRepository(UserCatalogPermissionRepository).setUserCatalogPermission({
-                    identifier,
-                    value: userCatalogPermission
-                });
-            });
-        })
-        .then(async () => {
-            await asyncForEach(inviteUsers, async (user) => {
-                await sendInviteUser(user, context.me.displayName, catalogEntity.displayName, message);
+                if (user.status == UserStatus.PENDING_SIGN_UP) {
+                    inviteUsers.push(user);
+                } else {
+                    existingUsers.push(user);
+                }
+            }
+
+            await transaction.getCustomRepository(UserCatalogPermissionRepository).setUserCatalogPermission({
+                identifier,
+                value: userCatalogPermission
             });
         });
+    });
+
+    await asyncForEach(inviteUsers, async (user) => {
+        await sendShareNotification(
+            user,
+            context.me.displayName,
+            catalogEntity.displayName,
+            "/" + catalogEntity.slug,
+            message
+        );
+    });
+
+    await asyncForEach(inviteUsers, async (user) => {
+        await sendInviteUser(user, context.me.displayName, catalogEntity.displayName, message);
+    });
 };

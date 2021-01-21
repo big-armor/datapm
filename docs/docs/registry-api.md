@@ -195,7 +195,8 @@ type User {
     website: String
     emailAddress: String
     gitHubHandle: String
-    nameIsPublic: Boolean!
+    nameIsPublic: Boolean
+    status: UserStatus
 }
 ```
 

@@ -7,7 +7,8 @@ import {
     RecoverMyPasswordInput,
     UpdateMyPasswordInput,
     UpdateUserInput,
-    ActivityLogEventType
+    ActivityLogEventType,
+    UserStatus
 } from "../generated/graphql";
 import { CatalogRepository } from "../repository/CatalogRepository";
 import { UserRepository } from "../repository/UserRepository";
@@ -233,6 +234,7 @@ export const acceptInvite = async (
         user.emailVerified = true;
         delete user.verifyEmailToken;
         user.verifyEmailTokenDate = new Date();
+        user.status = UserStatus.ACTIVE;
 
         await transaction.save(user);
     });

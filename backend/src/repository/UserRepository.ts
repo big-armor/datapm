@@ -9,7 +9,8 @@ import {
     Permission,
     UpdateUserInput,
     CreateUserInput,
-    RecoverMyPasswordInput
+    RecoverMyPasswordInput,
+    UserStatus
 } from "../generated/graphql";
 import { mixpanel } from "../util/mixpanel";
 import { UserCatalogPermissionEntity } from "../entity/UserCatalogPermissionEntity";
@@ -321,6 +322,8 @@ export class UserRepository extends Repository<UserEntity> {
             user.updatedAt = now;
             user.isAdmin = false;
 
+            user.status = UserStatus.PENDING_SIGN_UP;
+
             return transaction.save(user);
         });
     }
@@ -353,6 +356,8 @@ export class UserRepository extends Repository<UserEntity> {
                 const now = new Date();
                 user.createdAt = now;
                 user.updatedAt = now;
+
+                user.status = UserStatus.ACTIVE;
 
                 if (!FirstUserStatusHolder.IS_FIRST_USER_CREATED) {
                     user.isAdmin = true;
