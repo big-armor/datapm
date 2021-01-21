@@ -36,7 +36,10 @@ export class ForgotPasswordDialogComponent implements OnInit {
             emailAddress: [
                 "",
                 {
-                    validators: [Validators.required, Validators.email]
+                    validators: [
+                        Validators.required,
+                        Validators.pattern("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$")
+                    ]
                 }
             ]
         });

@@ -29,16 +29,21 @@ body {
 }
 
 @media only screen and (min-width: 1024px) {
+    .separateOnPageNav .docsNavContainer {
+        flex: 0 0 170px;
+    }
     .navPusher {
         padding-top: 75px;
     }
     .onPageNav {
         top: 115px;
+        flex: 0 0 190px;
     }
     .navigationSlider .slidingNav ul li {
         box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
             0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
         border-radius: 24px;
+        background: #f9f9f9;
     }
     .navigationSlider .slidingNav ul li a:hover,
     .navigationSlider .slidingNav ul li a:active,
@@ -49,11 +54,14 @@ body {
         border-radius: 24px;
         color: #828282;
     }
+    .navigationSlider .slidingNav ul li:hover {
+        background-color: #fff;
+    }
     .navigationSlider .slidingNav ul li a {
         font-family: "RobotoMonoLight";
         font-style: normal;
         font-weight: normal;
-        font-size: 16px;
+        font-size: 15px;
         line-height: 20px;
         align-items: center;
         text-align: center;
@@ -105,16 +113,23 @@ body {
     src: url("../font/static/RobotoMono-Light.ttf");
 }
 
+.wrapper {
+    margin: 0px auto;
+    max-width: 1180px !important;
+    padding: 0 20px;
+}
+
 .button {
     font-family: "RobotoMonoMedium";
+    background: #ffffff6e;
     font-style: normal;
     font-weight: 400;
-    font-size: 16px;
+    font-size: 13px;
     line-height: 20px;
     letter-spacing: -0.28px;
     color: #017fb9;
-    border: 1px solid #ddd;
-    padding: 3px 15px;
+    border: 1px solid #dddddd99;
+    padding: 5px 20px;
     border-radius: 4px;
     cursor: pointer;
 }
@@ -129,7 +144,7 @@ body {
 }
 
 .button:hover {
-    background-color: rgba(240, 240, 240, 0.783);
+    background-color: #fff;
     text-decoration: none;
     color: #333;
 }
@@ -261,9 +276,12 @@ table tr:nth-child(even) {
 }
 
 .nav-footer {
-    background: hsla(0, 0%, 94.9%, 0.28);
-    padding: 25px 25px;
+    background: #ededed !important;
+    padding: 40px 15px;
     width: 100%;
+    box-shadow: 4px 0 4px hsla(0, 0%, 100%, 0.25), 0 4px 4px hsla(0, 0%, 100%, 0.25),
+        0 -4px 4px hsla(0, 0%, 74.1%, 0.25), -4px 0 4px hsla(0, 0%, 74.1%, 0.25);
+    background: hsla(0, 0%, 94.9%, 0.28);
 }
 
 .nav-footer .copyright {
@@ -295,6 +313,7 @@ table tr:nth-child(even) {
 .toc .toggleNav ul li.navListItemActive a,
 .onPageNav .toc-headings > li > a.active,
 .onPageNav .toc-headings > li > a.hover {
+    font-weight: 400;
     color: #017fb9;
     font-family: "RobotoMonoMedium";
 }
@@ -308,7 +327,7 @@ table tr:nth-child(even) {
 }
 
 .fixedHeaderContainer {
-    padding: 20px 0px;
+    padding: 25px 0px;
     background-color: #f2f2f2;
     background: #f2f2f2;
     box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),

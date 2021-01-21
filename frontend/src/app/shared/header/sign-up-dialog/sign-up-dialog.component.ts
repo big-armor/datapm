@@ -26,7 +26,7 @@ export class SignUpDialogComponent implements OnInit {
 
     signUpForm: FormGroup;
 
-    errorMessages = {
+    public errorMessages = {
         emailAddress: {
             INVALID_EMAIL_ADDRESS_FORMAT: "Not a valid email address.",
             TOO_LONG: "Email address must be less than 100 characters long.",
