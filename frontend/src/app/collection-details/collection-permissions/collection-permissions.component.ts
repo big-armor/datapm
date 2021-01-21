@@ -118,10 +118,13 @@ export class CollectionPermissionsComponent implements OnInit {
                 identifier: {
                     collectionSlug: this.collection?.identifier.collectionSlug
                 },
-                value: {
-                    usernameOrEmailAddress: username,
-                    permissions
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: username,
+                        permissions
+                    }
+                ],
+                message: ""
             })
             .subscribe(({ errors }) => {
                 if (errors) {

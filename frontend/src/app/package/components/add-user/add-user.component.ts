@@ -61,10 +61,13 @@ export class AddUserComponent implements OnInit {
         this.setPackagePermissions
             .mutate({
                 identifier: this.data,
-                value: {
-                    permissions: [Permission.VIEW],
-                    username: this.form.value.username
-                }
+                value: [
+                    {
+                        permissions: [Permission.VIEW],
+                        usernameOrEmailAddress: this.form.value.username
+                    }
+                ],
+                message: ""
             })
             .subscribe(
                 ({ errors, data }) => {

@@ -138,11 +138,14 @@ export class CatalogPermissionsComponent implements OnChanges {
                 identifier: {
                     catalogSlug: this.catalog?.identifier.catalogSlug
                 },
-                value: {
-                    username,
-                    permission: permissions,
-                    packagePermission: []
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: username,
+                        permission: permissions,
+                        packagePermission: []
+                    }
+                ],
+                message: ""
             })
             .subscribe(({ errors }) => {
                 if (errors) {

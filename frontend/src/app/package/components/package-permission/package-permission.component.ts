@@ -162,10 +162,13 @@ export class PackagePermissionComponent implements OnInit {
                     catalogSlug: this.package.identifier.catalogSlug,
                     packageSlug: this.package.identifier.packageSlug
                 },
-                value: {
-                    username,
-                    permissions
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: username,
+                        permissions
+                    }
+                ],
+                message: ""
             })
             .subscribe(({ errors }) => {
                 if (errors) {

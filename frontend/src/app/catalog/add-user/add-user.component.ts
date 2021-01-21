@@ -69,11 +69,14 @@ export class AddUserComponent implements OnInit {
                 identifier: {
                     catalogSlug: this.catalogSlug
                 },
-                value: {
-                    permission: [Permission.VIEW],
-                    packagePermission: [],
-                    username: this.form.value.username
-                }
+                value: [
+                    {
+                        permission: [Permission.VIEW],
+                        packagePermission: [],
+                        usernameOrEmailAddress: this.form.value.username
+                    }
+                ],
+                message: ""
             })
             .subscribe(
                 ({ errors, data }) => {
