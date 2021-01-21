@@ -152,10 +152,17 @@ describe("Inviting USers", function () {
     });
 
     it("Should send invite email", async function () {
-        let verifyEmailPromise = new Promise<any>((r) => {
+        let userCEmail: any = null;
+        let userDEmail: any = null;
+        let verifyEmailPromise = new Promise<void>((r) => {
             let subscription = mailObservable.subscribe((email) => {
-                subscription.unsubscribe();
-                r(email);
+                if (email.to[0].address === "test-invite-package-c@test.datapm.io") userCEmail = email;
+                if (email.to[0].address === "test-invite-package-d@test.datapm.io") userDEmail = email;
+
+                if (userCEmail && userDEmail) {
+                    subscription.unsubscribe();
+                    r();
+                }
             });
         });
 
@@ -170,6 +177,14 @@ describe("Inviting USers", function () {
                     {
                         permissions: [Permission.VIEW],
                         usernameOrEmailAddress: "test-invite-package-c@test.datapm.io"
+                    },
+                    {
+                        permissions: [Permission.VIEW],
+                        usernameOrEmailAddress: "test-invite-package-d@test.datapm.io"
+                    },
+                    {
+                        permissions: [Permission.VIEW],
+                        usernameOrEmailAddress: "testB-invite-users"
                     }
                 ],
                 message: "Here is my message!@#$%^&*()-=+"
@@ -178,11 +193,16 @@ describe("Inviting USers", function () {
 
         expect(response.errors == null).equal(true);
 
-        await verifyEmailPromise.then((email) => {
-            expect(email.html).to.not.contain("{{");
-            emailVerificationToken = (email.text as String).match(/\?token=([a-zA-z0-9-]+)/)!.pop()!;
+        await verifyEmailPromise.then(() => {
+            expect(userCEmail.html).to.not.contain("{{");
+            emailVerificationToken = (userCEmail.text as String).match(/\?token=([a-zA-z0-9-]+)/)!.pop()!;
             expect(emailVerificationToken != null).equal(true);
-            expect(email.html).to.contain("Here is my message!@#$%^&*()-=+");
+            expect(userCEmail.html).to.contain("Here is my message!@#$%^&*()-=+");
+
+            expect(userDEmail.html).to.not.contain("{{");
+            let emailDVerificationToken = (userDEmail.text as String).match(/\?token=([a-zA-z0-9-]+)/)!.pop()!;
+            expect(emailDVerificationToken != null).equal(true);
+            expect(userDEmail.html).to.contain("Here is my message!@#$%^&*()-=+");
         });
     });
 
@@ -252,6 +272,21 @@ describe("Inviting USers", function () {
 
     it("Should return VIEW permission on package", async function () {
         const response = await invitedUserClient.query({
+            query: PackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-invite-users",
+                    packageSlug: "legislators-test"
+                }
+            }
+        });
+
+        expect(response.errors == null).equal(true);
+        expect(response.data.package.myPermissions).includes("VIEW");
+    });
+
+    it("Should return VIEW permission on existing user", async function () {
+        const response = await userBClient.query({
             query: PackageDocument,
             variables: {
                 identifier: {
