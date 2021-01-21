@@ -63,7 +63,11 @@ import {
     setUserCollectionPermissions,
     deleteUserCollectionPermissions
 } from "./resolvers/UserCollectionPermissionResolver";
-import { deleteUserCatalogPermissions, hasCatalogPermissions } from "./resolvers/UserCatalogPermissionResolver";
+import {
+    deleteUserCatalogPermissions,
+    hasCatalogPermissions,
+    setUserCatalogPermission
+} from "./resolvers/UserCatalogPermissionResolver";
 import { login, logout, verifyEmailAddress } from "./resolvers/AuthResolver";
 import {
     createMe,
@@ -137,7 +141,6 @@ import {
     myCatalogs,
     searchCatalogs,
     setCatalogCoverImage,
-    setUserCatalogPermission,
     updateCatalog,
     userCatalogs
 } from "./resolvers/CatalogResolver";
@@ -506,6 +509,7 @@ export const resolvers: {
         login: login,
         logout: logout,
         verifyEmailAddress: verifyEmailAddress,
+
         // User
         createMe: createMe,
         updateMe: updateMe,
@@ -513,25 +517,23 @@ export const resolvers: {
         updateMyPassword: updateMyPassword,
         forgotMyPassword: forgotMyPassword,
         recoverMyPassword: recoverMyPassword,
-
         setMyCoverImage: setMyCoverImage,
         setMyAvatarImage: setMyAvatarImage,
         deleteMe: deleteMe,
+        acceptInvite: acceptInvite,
 
         // API Keys
         createAPIKey: createAPIKey,
         deleteAPIKey: deleteAPIKey,
 
+        // Catalog
         createCatalog: createCatalog,
-
         updateCatalog: updateCatalog,
-
         setCatalogCoverImage: setCatalogCoverImage,
-
         setUserCatalogPermission: setUserCatalogPermission,
-
         deleteCatalog: deleteCatalog,
 
+        // Package
         createPackage: createPackage,
         updatePackage: updatePackage,
         setPackageCoverImage: setPackageCoverImage,
@@ -541,6 +543,7 @@ export const resolvers: {
         setPackagePermissions: setPackagePermissions,
         removePackagePermissions: removePackagePermissions,
 
+        // Collection
         createCollection: createCollection,
         updateCollection: updateCollection,
         setCollectionCoverImage: setCollectionCoverImage,
@@ -551,11 +554,9 @@ export const resolvers: {
         deleteUserCollectionPermissions: deleteUserCollectionPermissions,
         deleteUserCatalogPermissions: deleteUserCatalogPermissions,
 
+        // Version
         createVersion: createVersion,
-
         deleteVersion: deleteVersion,
-
-        acceptInvite: acceptInvite,
 
         track: (_, { actions }, context: Context) => mixpanel.track(actions, context.request)
     }

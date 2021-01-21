@@ -836,7 +836,8 @@ type Mutation {
     """
     setUserCatalogPermission(
         identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
-        value: SetUserCatalogPermissionInput!
+        value: [SetUserCatalogPermissionInput!]!
+        message: String!
     ): Void
 
     """
@@ -922,7 +923,8 @@ type Mutation {
     """
     setUserCollectionPermissions(
         identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
-        value: SetUserCollectionPermissionsInput!
+        value: [SetUserCollectionPermissionsInput!]!
+        message: String!
     ): Void
 
     """
@@ -942,11 +944,12 @@ type Mutation {
     ): Void
 
     """
-    Sets the permissions for a given user
+    Sets the permissions for a given set of users
     """
     setPackagePermissions(
         identifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
-        value: SetPackagePermissionInput!
+        value: [SetPackagePermissionInput!]!
+        message: String!
     ): Void
 
     """

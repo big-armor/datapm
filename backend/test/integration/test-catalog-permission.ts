@@ -71,7 +71,7 @@ describe("Catalog Permissions", async () => {
                     catalogSlug: "user-a-catalog-v1"
                 },
                 value: {
-                    username: "my-test-user200",
+                    usernameOrEmailAddress: "my-test-user200",
                     permission: newPermissions,
                     packagePermission: []
                 }
@@ -91,7 +91,7 @@ describe("Catalog Permissions", async () => {
                     catalogSlug: "user-a-catalog-v1"
                 },
                 value: {
-                    username: "my-test-user202",
+                    usernameOrEmailAddress: "my-test-user202",
                     permission: newPermissions,
                     packagePermission: []
                 }
@@ -111,7 +111,7 @@ describe("Catalog Permissions", async () => {
                     catalogSlug: "user-a-catalog-v1"
                 },
                 value: {
-                    username: "my-test-user201",
+                    usernameOrEmailAddress: "my-test-user201",
                     permission: newPermissions,
                     packagePermission: []
                 }
@@ -131,7 +131,7 @@ describe("Catalog Permissions", async () => {
                     catalogSlug: "user-a-catalog-v1"
                 },
                 value: {
-                    username: "my-test-user201",
+                    usernameOrEmailAddress: "my-test-user201",
                     permission: newPermissions,
                     packagePermission: []
                 }
@@ -185,7 +185,7 @@ describe("Catalog Permissions", async () => {
                     catalogSlug: "user-a-catalog-v2"
                 },
                 value: {
-                    username: "my-test-user201",
+                    usernameOrEmailAddress: "my-test-user201",
                     permission: newPermissions,
                     packagePermission: []
                 }
@@ -230,7 +230,7 @@ describe("Catalog Permissions", async () => {
                     catalogSlug: "user-a-catalog-v3"
                 },
                 value: {
-                    username: "my-test-user201",
+                    usernameOrEmailAddress: "my-test-user201",
                     permission: newPermissions,
                     packagePermission: []
                 }

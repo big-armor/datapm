@@ -115,6 +115,7 @@ describe("Authentication Tests", async () => {
             }
         });
 
+        console.log(JSON.stringify(result, null, 1));
         expect(result.errors === undefined, "no errors").equal(true);
         expect(result.data!.login != null, "should have login key value").equal(true);
     });

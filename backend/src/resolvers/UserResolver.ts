@@ -218,14 +218,14 @@ export const acceptInvite = async (
     info: any
 ): Promise<void> => {
     return context.connection.transaction(async (transaction) => {
-        if ((await usernameAvailable(_0, { username: username }, context)) == false) {
-            throw new ValidationError("USERNAME_NOT_AVAILABLE");
-        }
-
         const user = await transaction.getCustomRepository(UserRepository).findByEmailValidationToken(token);
 
         if (user == null) {
             throw new UserInputError("TOKEN_NOT_VALID");
+        }
+
+        if ((await usernameAvailable(_0, { username: username }, context)) == false) {
+            throw new ValidationError("USERNAME_NOT_AVAILABLE");
         }
 
         user.passwordHash = hashPassword(password, user.passwordSalt);

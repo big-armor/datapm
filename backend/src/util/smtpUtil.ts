@@ -35,19 +35,39 @@ export async function sendForgotPasswordEmail(user: UserEntity, token: string) {
     sendEmail(user, EMAIL_SUBJECTS.FORGOT_PASSWORD, emailText, emailHTML);
 }
 
-export async function sendInviteUser(user: UserEntity, inviterName: string, dataName: string) {
+export function validateMessageContents(message: string) {
+    if (message.match(/([a-zA-Z0-9._+-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gim) != null)
+        throw new Error("MESSAGE_CANNOT_CONTAIN_EMAIL_ADDRESS");
+
+    if (
+        message.match(
+            /(?:(?:https?|ftp|file):\/\/)(?:\([-a-zA-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-a-zA-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-a-zA-Z0-9+&@#\/%=~_|$?!:,.]*\)|[a-zA-Z0-9+&@#\/%=~_|$])/gm
+        ) != null
+    )
+        throw new Error("MESSAGE_CANNOT_CONTAIN_URL");
+
+    if (message.match(/<[^>]*>/gi) != null) throw new Error("MESSAGE_CANNOT_CONTAIN_HTML_TAGS");
+}
+
+export async function sendInviteUser(user: UserEntity, inviterName: string, dataName: string, message: string) {
     let emailText = fs.readFileSync("./static/email-templates/user-invite.txt", "utf8");
     let emailHTML = fs.readFileSync("./static/email-templates/user-invite.html", "utf8");
+
+    validateMessageContents(message);
 
     emailText = replaceCommonTokens(user, emailText);
     emailText = emailText.replace(/{{token}}/g, user.verifyEmailToken!);
     emailText = emailText.replace(/{{data_name}}/g, dataName);
     emailText = emailText.replace(/{{inviter_name}}/g, inviterName);
 
+    if (message) emailText = emailText.replace(/{{message}}/g, message);
+
     emailHTML = replaceCommonTokens(user, emailHTML);
     emailHTML = emailHTML.replace(/{{token}}/g, user.verifyEmailToken!);
     emailHTML = emailHTML.replace(/{{data_name}}/g, dataName);
     emailHTML = emailHTML.replace(/{{inviter_name}}/g, inviterName);
+
+    if (message) emailHTML = emailHTML.replace(/{{message}}/g, message);
 
     sendEmail(user, EMAIL_SUBJECTS.INVITE_USER, emailText, emailHTML);
 }

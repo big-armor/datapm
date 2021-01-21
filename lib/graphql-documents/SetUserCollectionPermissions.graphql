@@ -1,6 +1,7 @@
 mutation SetUserCollectionPermissions(
     $identifier: CollectionIdentifierInput!
-    $value: SetUserCollectionPermissionsInput!
+    $value: [SetUserCollectionPermissionsInput!]!
+    $message: String!
 ) {
-    setUserCollectionPermissions(identifier: $identifier, value: $value)
+    setUserCollectionPermissions(identifier: $identifier, value: $value, message: $message)
 }

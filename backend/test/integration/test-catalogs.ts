@@ -584,7 +584,7 @@ describe("Catalog Tests", async () => {
                 value: {
                     permission: [Permission.VIEW, Permission.EDIT, Permission.MANAGE],
                     packagePermission: [],
-                    username: "testB-catalog"
+                    usernameOrEmailAddress: "testB-catalog"
                 }
             }
         });
@@ -619,7 +619,7 @@ describe("Catalog Tests", async () => {
                 value: {
                     permission: [Permission.VIEW, Permission.EDIT, Permission.MANAGE],
                     packagePermission: [Permission.VIEW],
-                    username: "testB-catalog"
+                    usernameOrEmailAddress: "testB-catalog"
                 }
             }
         });
@@ -666,7 +666,7 @@ describe("Catalog Tests", async () => {
                 value: {
                     permission: [Permission.VIEW],
                     packagePermission: [],
-                    username: "testB-catalog"
+                    usernameOrEmailAddress: "testB-catalog"
                 }
             }
         });
@@ -683,7 +683,7 @@ describe("Catalog Tests", async () => {
                     packageSlug: "us-congressional-legislators"
                 },
                 value: {
-                    username: "testB-catalog",
+                    usernameOrEmailAddress: "testB-catalog",
                     permissions: [Permission.VIEW]
                 }
             }

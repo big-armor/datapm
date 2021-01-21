@@ -1,5 +1,6 @@
 {{inviter_name}} has invited you to collaborate on {{data_name}} data at {{registry_name}}. 
 
+{{message}}
 Use the link below to get started. 
 
 {{registry_url}}/accept-invite?token={{token}}

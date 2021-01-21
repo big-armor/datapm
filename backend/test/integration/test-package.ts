@@ -893,7 +893,7 @@ describe("Package Tests", async () => {
                     packageSlug: "new-package-slug"
                 },
                 value: {
-                    username: "testB-packages",
+                    usernameOrEmailAddress: "testB-packages",
                     permissions: newPermissions
                 }
             }
@@ -913,7 +913,7 @@ describe("Package Tests", async () => {
                     packageSlug: "new-package-slug"
                 },
                 value: {
-                    username: "testB-packages",
+                    usernameOrEmailAddress: "testB-packages",
                     permissions: newPermissions
                 }
             }
@@ -933,7 +933,7 @@ describe("Package Tests", async () => {
                     packageSlug: "new-package-slug"
                 },
                 value: {
-                    username: "testA-packages",
+                    usernameOrEmailAddress: "testA-packages",
                     permissions: newPermissions
                 }
             }

@@ -4,6 +4,7 @@ import {
     AcceptInviteDocument,
     CreatePackageDocument,
     LoginDocument,
+    MeDocument,
     PackageDocument,
     Permission,
     SetPackagePermissionsDocument
@@ -52,7 +53,7 @@ describe("Inviting USers", function () {
         expect(response.errors == null).equal(true);
     });
 
-    it("Should not accept invalid invite", async function () {
+    it("Should not accept invalid email format", async function () {
         let errorFound = false;
         try {
             await userAClient.mutate({
@@ -62,15 +63,16 @@ describe("Inviting USers", function () {
                         catalogSlug: "testA-invite-users",
                         packageSlug: "legislators-test"
                     },
-                    value: {
-                        permissions: [Permission.VIEW],
-                        usernameOrEmailAddress: "not-valid@email"
-                    }
+                    value: [
+                        {
+                            permissions: [Permission.VIEW],
+                            usernameOrEmailAddress: "not-valid@email"
+                        }
+                    ],
+                    message: "This is my message. don't wear it out!"
                 }
             });
         } catch (error) {
-            console.log(JSON.stringify(error, null, 1));
-
             if (
                 error.networkError.result.errors.find(
                     (e: { extensions: { exception: { stacktrace: string[] } } }) =>
@@ -82,6 +84,71 @@ describe("Inviting USers", function () {
         }
 
         expect(errorFound).equal(true);
+    });
+
+    it("Should not allow email address in message", async function () {
+        const response = await userAClient.mutate({
+            mutation: SetPackagePermissionsDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-invite-users",
+                    packageSlug: "legislators-test"
+                },
+                value: [
+                    {
+                        permissions: [Permission.VIEW],
+                        usernameOrEmailAddress: "test-invite-package-c@test.datapm.io"
+                    }
+                ],
+                message: "This is test@test.com testing"
+            }
+        });
+
+        expect(response.errors!.find((e) => e.message.includes("MESSAGE_CANNOT_CONTAIN_EMAIL_ADDRESS"))).not.equal(
+            null
+        );
+    });
+
+    it("Should not allow URL in message", async function () {
+        const response = await userAClient.mutate({
+            mutation: SetPackagePermissionsDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-invite-users",
+                    packageSlug: "legislators-test"
+                },
+                value: [
+                    {
+                        permissions: [Permission.VIEW],
+                        usernameOrEmailAddress: "test-invite-package-c@test.datapm.io"
+                    }
+                ],
+                message: "This is http://datapm.io testing"
+            }
+        });
+
+        expect(response.errors!.find((e) => e.message.includes("MESSAGE_CANNOT_CONTAIN_URL"))).not.equal(null);
+    });
+
+    it("Should not allow HTML tag in message", async function () {
+        const response = await userAClient.mutate({
+            mutation: SetPackagePermissionsDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-invite-users",
+                    packageSlug: "legislators-test"
+                },
+                value: [
+                    {
+                        permissions: [Permission.VIEW],
+                        usernameOrEmailAddress: "test-invite-package-c@test.datapm.io"
+                    }
+                ],
+                message: "This is <script src='test'/>testing"
+            }
+        });
+
+        expect(response.errors!.find((e) => e.message.includes("MESSAGE_CANNOT_CONTAIN_HTML_TAGS"))).not.equal(null);
     });
 
     it("Should send invite email", async function () {
@@ -99,23 +166,27 @@ describe("Inviting USers", function () {
                     catalogSlug: "testA-invite-users",
                     packageSlug: "legislators-test"
                 },
-                value: {
-                    permissions: [Permission.VIEW],
-                    usernameOrEmailAddress: "test-invite-package-c@test.datapm.io"
-                }
+                value: [
+                    {
+                        permissions: [Permission.VIEW],
+                        usernameOrEmailAddress: "test-invite-package-c@test.datapm.io"
+                    }
+                ],
+                message: "Here is my message!@#$%^&*()-=+"
             }
         });
 
         expect(response.errors == null).equal(true);
 
-        verifyEmailPromise.then((email) => {
+        await verifyEmailPromise.then((email) => {
             expect(email.html).to.not.contain("{{");
             emailVerificationToken = (email.text as String).match(/\?token=([a-zA-z0-9-]+)/)!.pop()!;
             expect(emailVerificationToken != null).equal(true);
+            expect(email.html).to.contain("Here is my message!@#$%^&*()-=+");
         });
     });
 
-    it("Should not allow unavailable username", async function () {
+    it("Should not allow inivted user to claim an unavailable username", async function () {
         const response = await anonymousClient.mutate({
             mutation: AcceptInviteDocument,
             variables: {
@@ -170,6 +241,13 @@ describe("Inviting USers", function () {
         invitedUserClient = createTestClient({
             Authorization: "Bearer " + response.data!.login
         });
+
+        const whoAmIResponse = await invitedUserClient.query({
+            query: MeDocument
+        });
+
+        expect(whoAmIResponse.errors == null).equal(true);
+        expect(whoAmIResponse.data.me.username).equal("new-invited-user-1");
     });
 
     it("Should return VIEW permission on package", async function () {
@@ -184,5 +262,19 @@ describe("Inviting USers", function () {
         });
 
         expect(response.errors == null).equal(true);
+        expect(response.data.package.myPermissions).includes("VIEW");
+    });
+
+    it("Should return TOKEN_NOT_VALID after it has already been used", async function () {
+        const response = await anonymousClient.mutate({
+            mutation: AcceptInviteDocument,
+            variables: {
+                password: "password!",
+                token: emailVerificationToken,
+                username: "new-invited-user-1"
+            }
+        });
+
+        expect(response.errors!.find((e) => e.message.includes("TOKEN_NOT_VALID"))).not.equal(null);
     });
 });

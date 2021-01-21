@@ -17,7 +17,8 @@ import {
     Version,
     VersionIdentifierInput,
     ActivityLogEventType,
-    ActivityLogChangeType
+    ActivityLogChangeType,
+    SetPackagePermissionInput
 } from "../generated/graphql";
 import { CatalogEntity } from "../entity/CatalogEntity";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
@@ -38,7 +39,9 @@ import { catalogEntityToGraphQL } from "./CatalogResolver";
 import { CollectionRepository } from "../repository/CollectionRepository";
 import { VersionEntity } from "../entity/VersionEntity";
 import { emailAddressValid } from "datapm-lib";
-import { sendInviteUser } from "../util/smtpUtil";
+import { sendInviteUser, validateMessageContents } from "../util/smtpUtil";
+import { UserEntity } from "../entity/UserEntity";
+import { asyncForEach } from "../util/AsyncForEach";
 
 export const packageEntityToGraphqlObject = async (
     context: EntityManager | Connection,
@@ -450,43 +453,60 @@ export const setPackagePermissions = async (
     _0: any,
     {
         identifier,
-        value: { usernameOrEmailAddress, permissions }
-    }: { identifier: PackageIdentifierInput; value: { usernameOrEmailAddress: string; permissions: Permission[] } },
+        value,
+        message
+    }: {
+        identifier: PackageIdentifierInput;
+        value: SetPackagePermissionInput[];
+        message: string;
+    },
     context: AuthenticatedContext,
     info: any
 ) => {
-    const user = await context.connection
-        .getCustomRepository(UserRepository)
-        .getUserByUsernameOrEmailAddress(usernameOrEmailAddress);
+    validateMessageContents(message);
 
     const packageEntity = await context.connection.getCustomRepository(PackageRepository).findPackage({ identifier });
 
     if (packageEntity == null)
         throw new Error("PACKAGE_NOT_FOUND - " + identifier.catalogSlug + "/" + identifier.packageSlug);
 
-    let userId = null;
+    const inviteUsers: UserEntity[] = [];
 
-    if (user == null) {
-        if (emailAddressValid(usernameOrEmailAddress)) {
-            const inviteUser = await context.connection
-                .getCustomRepository(UserRepository)
-                .createInviteUser(usernameOrEmailAddress);
+    await context.connection
+        .transaction(async (transaction) => {
+            await asyncForEach(value, async (userPackagePermission) => {
+                let userId = null;
+                const user = await transaction
+                    .getCustomRepository(UserRepository)
+                    .getUserByUsernameOrEmailAddress(userPackagePermission.usernameOrEmailAddress);
 
-            await sendInviteUser(inviteUser, context.me.displayName, packageEntity.displayName);
+                if (user == null) {
+                    if (emailAddressValid(userPackagePermission.usernameOrEmailAddress)) {
+                        const inviteUser = await context.connection
+                            .getCustomRepository(UserRepository)
+                            .createInviteUser(userPackagePermission.usernameOrEmailAddress);
 
-            userId = inviteUser.id;
-        } else {
-            throw Error("USER_NOT_FOUND - " + usernameOrEmailAddress);
-        }
-    } else {
-        userId = user.id;
-    }
+                        userId = inviteUser.id;
+                        inviteUsers.push(inviteUser);
+                    } else {
+                        throw Error("USER_NOT_FOUND - " + userPackagePermission.usernameOrEmailAddress);
+                    }
+                } else {
+                    userId = user.id;
+                }
 
-    await context.connection.getCustomRepository(PackagePermissionRepository).setPackagePermissions({
-        identifier,
-        userId,
-        permissions
-    });
+                await transaction.getCustomRepository(PackagePermissionRepository).setPackagePermissions({
+                    identifier,
+                    userId,
+                    permissions: userPackagePermission.permissions
+                });
+            });
+        })
+        .then(async () => {
+            await asyncForEach(inviteUsers, async (user) => {
+                await sendInviteUser(user, context.me.displayName, packageEntity.displayName, message);
+            });
+        });
 };
 
 export const removePackagePermissions = async (

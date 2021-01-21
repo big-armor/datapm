@@ -1,4 +1,4 @@
-import { SchemaDirectiveVisitor, ApolloError, ValidationError } from "apollo-server";
+import { SchemaDirectiveVisitor } from "apollo-server";
 import {
     GraphQLField,
     defaultFieldResolver,
@@ -28,7 +28,7 @@ export class ValidUsernameOrEmailAddressDirective extends SchemaDirectiveVisitor
         details.field.resolve = function (source, args, context: Context, info) {
             const username: string | undefined =
                 args.username || args.value?.username || args.value?.usernameOrEmailAddress || undefined;
-            validateUsername(username);
+            validateUsernameOrEmail(username);
             return resolve.apply(this, [source, args, context, info]);
         };
     }
