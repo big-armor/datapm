@@ -1,16 +1,32 @@
+@import "../../../../styles/variables";
+
 #myCollections {
     margin-top: 30px;
 
     table {
         width: 100%;
+        th {
+            font-family: $family-roboto;
+            font-size: $text-font;
+            font-weight: $weight-500;
+            color: $gray-1;
+        }
     }
 
     .mat-header-row {
-        background-color: inherit;
+        height: 40px;
+        background-color: #ededed;
     }
 
     .mat-column-name {
-        width: 40%;
+        width: 30%;
+
+        a {
+            font-family: $family-roboto;
+            color: $gray-2;
+            font-size: $text-font;
+            font-weight: $weight-400;
+        }
     }
 
     .mat-column-actions app-button {
