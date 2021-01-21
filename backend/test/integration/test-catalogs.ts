@@ -581,11 +581,14 @@ describe("Catalog Tests", async () => {
                 identifier: {
                     catalogSlug: "user-a-second-catalog-v2"
                 },
-                value: {
-                    permission: [Permission.VIEW, Permission.EDIT, Permission.MANAGE],
-                    packagePermission: [],
-                    usernameOrEmailAddress: "testB-catalog"
-                }
+                value: [
+                    {
+                        permission: [Permission.VIEW, Permission.EDIT, Permission.MANAGE],
+                        packagePermission: [],
+                        usernameOrEmailAddress: "testB-catalog"
+                    }
+                ],
+                message: "Testing testing test"
             }
         });
 
@@ -616,11 +619,14 @@ describe("Catalog Tests", async () => {
                 identifier: {
                     catalogSlug: "user-a-second-catalog-v2"
                 },
-                value: {
-                    permission: [Permission.VIEW, Permission.EDIT, Permission.MANAGE],
-                    packagePermission: [Permission.VIEW],
-                    usernameOrEmailAddress: "testB-catalog"
-                }
+                value: [
+                    {
+                        permission: [Permission.VIEW, Permission.EDIT, Permission.MANAGE],
+                        packagePermission: [Permission.VIEW],
+                        usernameOrEmailAddress: "testB-catalog"
+                    }
+                ],
+                message: "Testing test"
             }
         });
 
@@ -663,11 +669,14 @@ describe("Catalog Tests", async () => {
                 identifier: {
                     catalogSlug: "user-a-second-catalog-v2"
                 },
-                value: {
-                    permission: [Permission.VIEW],
-                    packagePermission: [],
-                    usernameOrEmailAddress: "testB-catalog"
-                }
+                value: [
+                    {
+                        permission: [Permission.VIEW],
+                        packagePermission: [],
+                        usernameOrEmailAddress: "testB-catalog"
+                    }
+                ],
+                message: "Testing"
             }
         });
 
@@ -682,10 +691,13 @@ describe("Catalog Tests", async () => {
                     catalogSlug: "user-a-second-catalog-v2",
                     packageSlug: "us-congressional-legislators"
                 },
-                value: {
-                    usernameOrEmailAddress: "testB-catalog",
-                    permissions: [Permission.VIEW]
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: "testB-catalog",
+                        permissions: [Permission.VIEW]
+                    }
+                ],
+                message: "Testing test"
             }
         });
 

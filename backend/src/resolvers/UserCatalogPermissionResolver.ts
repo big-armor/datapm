@@ -1,3 +1,4 @@
+import { ValidationError } from "apollo-server";
 import { emailAddressValid } from "datapm-lib";
 import { AuthenticatedContext, Context } from "../context";
 import { UserEntity } from "../entity/UserEntity";
@@ -63,7 +64,7 @@ export const setUserCatalogPermission = async (
                     .getUserByUsernameOrEmailAddress(userCatalogPermission.usernameOrEmailAddress);
 
                 if (user == null) {
-                    if (emailAddressValid(userCatalogPermission.usernameOrEmailAddress)) {
+                    if (emailAddressValid(userCatalogPermission.usernameOrEmailAddress) === true) {
                         const inviteUser = await context.connection
                             .getCustomRepository(UserRepository)
                             .createInviteUser(userCatalogPermission.usernameOrEmailAddress);
@@ -71,7 +72,7 @@ export const setUserCatalogPermission = async (
                         userId = inviteUser.id;
                         inviteUsers.push(inviteUser);
                     } else {
-                        throw Error("USER_NOT_FOUND - " + userCatalogPermission.usernameOrEmailAddress);
+                        throw new ValidationError("USER_NOT_FOUND - " + userCatalogPermission.usernameOrEmailAddress);
                     }
                 } else {
                     userId = user.id;

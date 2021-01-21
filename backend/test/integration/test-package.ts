@@ -892,10 +892,13 @@ describe("Package Tests", async () => {
                     catalogSlug: "testA-packages",
                     packageSlug: "new-package-slug"
                 },
-                value: {
-                    usernameOrEmailAddress: "testB-packages",
-                    permissions: newPermissions
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: "testB-packages",
+                        permissions: newPermissions
+                    }
+                ],
+                message: "Testing test"
             }
         });
 
@@ -912,10 +915,13 @@ describe("Package Tests", async () => {
                     catalogSlug: "testA-packages",
                     packageSlug: "new-package-slug"
                 },
-                value: {
-                    usernameOrEmailAddress: "testB-packages",
-                    permissions: newPermissions
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: "testB-packages",
+                        permissions: newPermissions
+                    }
+                ],
+                message: "Testing test"
             }
         });
 
@@ -932,10 +938,13 @@ describe("Package Tests", async () => {
                     catalogSlug: "testA-packages",
                     packageSlug: "new-package-slug"
                 },
-                value: {
-                    usernameOrEmailAddress: "testA-packages",
-                    permissions: newPermissions
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: "testA-packages",
+                        permissions: newPermissions
+                    }
+                ],
+                message: "Testing testing"
             }
         });
 

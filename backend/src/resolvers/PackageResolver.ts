@@ -17,8 +17,7 @@ import {
     Version,
     VersionIdentifierInput,
     ActivityLogEventType,
-    ActivityLogChangeType,
-    SetPackagePermissionInput
+    ActivityLogChangeType
 } from "../generated/graphql";
 import { CatalogEntity } from "../entity/CatalogEntity";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
@@ -37,11 +36,6 @@ import { Connection, EntityManager } from "typeorm";
 import { versionEntityToGraphqlObject } from "./VersionResolver";
 import { catalogEntityToGraphQL } from "./CatalogResolver";
 import { CollectionRepository } from "../repository/CollectionRepository";
-import { VersionEntity } from "../entity/VersionEntity";
-import { emailAddressValid } from "datapm-lib";
-import { sendInviteUser, validateMessageContents } from "../util/smtpUtil";
-import { UserEntity } from "../entity/UserEntity";
-import { asyncForEach } from "../util/AsyncForEach";
 
 export const packageEntityToGraphqlObject = async (
     context: EntityManager | Connection,
@@ -446,77 +440,6 @@ export const deletePackage = async (
             identifier,
             context
         });
-    });
-};
-
-export const setPackagePermissions = async (
-    _0: any,
-    {
-        identifier,
-        value,
-        message
-    }: {
-        identifier: PackageIdentifierInput;
-        value: SetPackagePermissionInput[];
-        message: string;
-    },
-    context: AuthenticatedContext,
-    info: any
-) => {
-    validateMessageContents(message);
-
-    const packageEntity = await context.connection.getCustomRepository(PackageRepository).findPackage({ identifier });
-
-    if (packageEntity == null)
-        throw new Error("PACKAGE_NOT_FOUND - " + identifier.catalogSlug + "/" + identifier.packageSlug);
-
-    const inviteUsers: UserEntity[] = [];
-
-    await context.connection
-        .transaction(async (transaction) => {
-            await asyncForEach(value, async (userPackagePermission) => {
-                let userId = null;
-                const user = await transaction
-                    .getCustomRepository(UserRepository)
-                    .getUserByUsernameOrEmailAddress(userPackagePermission.usernameOrEmailAddress);
-
-                if (user == null) {
-                    if (emailAddressValid(userPackagePermission.usernameOrEmailAddress)) {
-                        const inviteUser = await context.connection
-                            .getCustomRepository(UserRepository)
-                            .createInviteUser(userPackagePermission.usernameOrEmailAddress);
-
-                        userId = inviteUser.id;
-                        inviteUsers.push(inviteUser);
-                    } else {
-                        throw Error("USER_NOT_FOUND - " + userPackagePermission.usernameOrEmailAddress);
-                    }
-                } else {
-                    userId = user.id;
-                }
-
-                await transaction.getCustomRepository(PackagePermissionRepository).setPackagePermissions({
-                    identifier,
-                    userId,
-                    permissions: userPackagePermission.permissions
-                });
-            });
-        })
-        .then(async () => {
-            await asyncForEach(inviteUsers, async (user) => {
-                await sendInviteUser(user, context.me.displayName, packageEntity.displayName, message);
-            });
-        });
-};
-
-export const removePackagePermissions = async (
-    _0: any,
-    { identifier, username }: { identifier: PackageIdentifierInput; username: string },
-    context: AuthenticatedContext
-) => {
-    return context.connection.getCustomRepository(PackagePermissionRepository).removePackagePermission({
-        identifier,
-        username
     });
 };
 

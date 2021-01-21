@@ -10,6 +10,7 @@ import { emailAddressValid } from "datapm-lib";
 import { sendInviteUser, validateMessageContents } from "../util/smtpUtil";
 import { CollectionRepository } from "../repository/CollectionRepository";
 import { asyncForEach } from "../util/AsyncForEach";
+import { ValidationError } from "apollo-server";
 
 export const hasCollectionPermissions = async (context: Context, collectionId: number, permission: Permission) => {
     const collection = await context.connection.getRepository(CollectionEntity).findOneOrFail(collectionId);
@@ -65,40 +66,38 @@ export const setUserCollectionPermissions = async (
 
     const inviteUsers: UserEntity[] = [];
 
-    await context.connection
-        .transaction(async (transaction) => {
-            await asyncForEach(value, async (userCollectionPermission) => {
-                let userId = null;
-                const user = await transaction
-                    .getCustomRepository(UserRepository)
-                    .getUserByUsernameOrEmailAddress(userCollectionPermission.usernameOrEmailAddress);
+    await context.connection.transaction(async (transaction) => {
+        await asyncForEach(value, async (userCollectionPermission) => {
+            let userId = null;
+            const user = await transaction
+                .getCustomRepository(UserRepository)
+                .getUserByUsernameOrEmailAddress(userCollectionPermission.usernameOrEmailAddress);
 
-                if (user == null) {
-                    if (emailAddressValid(userCollectionPermission.usernameOrEmailAddress)) {
-                        const inviteUser = await context.connection
-                            .getCustomRepository(UserRepository)
-                            .createInviteUser(userCollectionPermission.usernameOrEmailAddress);
+            if (user == null) {
+                if (emailAddressValid(userCollectionPermission.usernameOrEmailAddress) === true) {
+                    const inviteUser = await context.connection
+                        .getCustomRepository(UserRepository)
+                        .createInviteUser(userCollectionPermission.usernameOrEmailAddress);
 
-                        userId = inviteUser.id;
-                        inviteUsers.push(inviteUser);
-                    } else {
-                        throw Error("USER_NOT_FOUND - " + userCollectionPermission.usernameOrEmailAddress);
-                    }
+                    userId = inviteUser.id;
+                    inviteUsers.push(inviteUser);
                 } else {
-                    userId = user.id;
+                    throw new ValidationError("USER_NOT_FOUND - " + userCollectionPermission.usernameOrEmailAddress);
                 }
+            } else {
+                userId = user.id;
+            }
 
-                await transaction.getCustomRepository(UserCollectionPermissionRepository).setUserCollectionPermissions({
-                    identifier,
-                    value: userCollectionPermission
-                });
-            });
-        })
-        .then(async () => {
-            await asyncForEach(inviteUsers, async (user) => {
-                await sendInviteUser(user, context.me.displayName, collectionEntity.name, message);
+            await transaction.getCustomRepository(UserCollectionPermissionRepository).setUserCollectionPermissions({
+                identifier,
+                value: userCollectionPermission
             });
         });
+    });
+
+    await asyncForEach(inviteUsers, async (user) => {
+        await sendInviteUser(user, context.me.displayName, collectionEntity.name, message);
+    });
 };
 
 export const deleteUserCollectionPermissions = async (

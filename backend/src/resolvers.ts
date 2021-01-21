@@ -93,10 +93,8 @@ import {
     findPackageIdentifier,
     findPackagesForCollection,
     getLatestPackages,
-    removePackagePermissions,
     searchPackages,
     setPackageCoverImage,
-    setPackagePermissions,
     updatePackage,
     myPackages,
     userPackages,
@@ -146,6 +144,7 @@ import {
 } from "./resolvers/CatalogResolver";
 
 import { myActivity, packageActivities } from "./resolvers/ActivityLogResolver";
+import { removePackagePermissions, setPackagePermissions } from "./resolvers/UserPackagePermissionResolver";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -530,8 +529,11 @@ export const resolvers: {
         createCatalog: createCatalog,
         updateCatalog: updateCatalog,
         setCatalogCoverImage: setCatalogCoverImage,
-        setUserCatalogPermission: setUserCatalogPermission,
         deleteCatalog: deleteCatalog,
+
+        // Catalog Permissions
+        setUserCatalogPermission: setUserCatalogPermission,
+        deleteUserCatalogPermissions: deleteUserCatalogPermissions,
 
         // Package
         createPackage: createPackage,
@@ -540,6 +542,7 @@ export const resolvers: {
         deletePackage: deletePackage,
         packageFetched: packageFetched,
 
+        // Package Permissions
         setPackagePermissions: setPackagePermissions,
         removePackagePermissions: removePackagePermissions,
 
@@ -550,9 +553,10 @@ export const resolvers: {
         deleteCollection: deleteCollection,
         addPackageToCollection: addPackageToCollection,
         removePackageFromCollection: removePackageFromCollection,
+
+        // Collection Permissions
         setUserCollectionPermissions: setUserCollectionPermissions,
         deleteUserCollectionPermissions: deleteUserCollectionPermissions,
-        deleteUserCatalogPermissions: deleteUserCatalogPermissions,
 
         // Version
         createVersion: createVersion,
