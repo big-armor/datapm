@@ -58,6 +58,12 @@ A string that uniquely identifies a Username or Email address - this is an inter
 """
 scalar UsernameOrEmailAddress
 
+enum UserStatus {
+    PENDING_SIGN_UP
+    ACTIVE
+    SUSPENDED
+}
+
 """
 Server status states
 """

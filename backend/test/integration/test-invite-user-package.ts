@@ -12,7 +12,7 @@ import {
 import { mailObservable } from "./setup";
 import { createAnonymousClient, createTestClient, createUser } from "./test-utils";
 
-describe("Inviting USers", function () {
+describe("Inviting Users", function () {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
     let invitedUserClient: ApolloClient<NormalizedCacheObject>;
@@ -151,15 +151,38 @@ describe("Inviting USers", function () {
         expect(response.errors!.find((e) => e.message.includes("MESSAGE_CANNOT_CONTAIN_HTML_TAGS"))).not.equal(null);
     });
 
+    it("Should not allow messages longer than 250 characters", async function () {
+        const response = await userAClient.mutate({
+            mutation: SetPackagePermissionsDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-invite-users",
+                    packageSlug: "legislators-test"
+                },
+                value: [
+                    {
+                        permissions: [Permission.VIEW],
+                        usernameOrEmailAddress: "test-invite-package-c@test.datapm.io"
+                    }
+                ],
+                message: "T".repeat(251)
+            }
+        });
+
+        expect(response.errors!.find((e) => e.message.includes("MESSAGE_TOO_LONG"))).not.equal(null);
+    });
+
     it("Should send invite email", async function () {
         let userCEmail: any = null;
         let userDEmail: any = null;
+        let userBEmail: any = null;
         let verifyEmailPromise = new Promise<void>((r) => {
             let subscription = mailObservable.subscribe((email) => {
-                if (email.to[0].address === "test-invite-package-c@test.datapm.io") userCEmail = email;
-                if (email.to[0].address === "test-invite-package-d@test.datapm.io") userDEmail = email;
+                if (email.to[0].address === "testB-invite-users@test.datapm.io") userBEmail = email;
+                else if (email.to[0].address === "test-invite-package-c@test.datapm.io") userCEmail = email;
+                else if (email.to[0].address === "test-invite-package-d@test.datapm.io") userDEmail = email;
 
-                if (userCEmail && userDEmail) {
+                if (userBEmail && userCEmail && userDEmail) {
                     subscription.unsubscribe();
                     r();
                 }
@@ -194,6 +217,10 @@ describe("Inviting USers", function () {
         expect(response.errors == null).equal(true);
 
         await verifyEmailPromise.then(() => {
+            expect(userBEmail.html).to.not.contain("{{");
+            expect(userBEmail.html).to.contain("Here is my message!@#$%^&*()-=+");
+            expect(userBEmail.html).to.contain("/testA-invite-users/legislators-test");
+
             expect(userCEmail.html).to.not.contain("{{");
             emailVerificationToken = (userCEmail.text as String).match(/\?token=([a-zA-z0-9-]+)/)!.pop()!;
             expect(emailVerificationToken != null).equal(true);

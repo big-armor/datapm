@@ -63,11 +63,7 @@ import {
     setUserCollectionPermissions,
     deleteUserCollectionPermissions
 } from "./resolvers/UserCollectionPermissionResolver";
-import {
-    deleteUserCatalogPermissions,
-    hasCatalogPermissions,
-    setUserCatalogPermission
-} from "./resolvers/UserCatalogPermissionResolver";
+import { deleteUserCatalogPermissions, setUserCatalogPermission } from "./resolvers/UserCatalogPermissionResolver";
 import { login, logout, verifyEmailAddress } from "./resolvers/AuthResolver";
 import {
     createMe,
@@ -293,7 +289,7 @@ export const resolvers: {
 
             return null;
         },
-        lastName: async (parent: any, _1: any, context: AuthenticatedContext) => {
+        lastName: async (parent: User, _1: any, context: Context) => {
             const user = await context.connection
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
@@ -304,7 +300,7 @@ export const resolvers: {
 
             return null;
         },
-        emailAddress: async (parent: any, _1: any, context: AuthenticatedContext) => {
+        emailAddress: async (parent: User, _1: any, context: Context) => {
             const user = await context.connection
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
@@ -315,7 +311,7 @@ export const resolvers: {
 
             return null;
         },
-        twitterHandle: async (parent: any, _1: any, context: AuthenticatedContext) => {
+        twitterHandle: async (parent: User, _1: any, context: Context) => {
             const user = await context.connection
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
@@ -327,7 +323,7 @@ export const resolvers: {
 
             return null;
         },
-        gitHubHandle: async (parent: any, _1: any, context: AuthenticatedContext) => {
+        gitHubHandle: async (parent: User, _1: any, context: Context) => {
             const user = await context.connection
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
@@ -339,7 +335,7 @@ export const resolvers: {
 
             return null;
         },
-        website: async (parent: any, _1: any, context: AuthenticatedContext) => {
+        website: async (parent: User, _1: any, context: Context) => {
             const user = await context.connection
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
@@ -350,7 +346,7 @@ export const resolvers: {
 
             return null;
         },
-        location: async (parent: any, _1: any, context: AuthenticatedContext) => {
+        location: async (parent: User, _1: any, context: Context) => {
             const user = await context.connection
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
@@ -360,6 +356,13 @@ export const resolvers: {
             if (isAuthenticatedContext(context) && context.me?.username === user.username) return user.location || null;
 
             return null;
+        },
+        status: async (parent: User, _1: any, context: Context) => {
+            const user = await context.connection
+                .getCustomRepository(UserRepository)
+                .findUserByUserName({ username: parent.username });
+
+            return user.status;
         }
     },
     Catalog: {

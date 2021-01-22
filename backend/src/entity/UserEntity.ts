@@ -1,7 +1,7 @@
 import { Entity, Column, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { EntityBaseModel } from "./EntityBaseModel";
 import { UserCatalogPermissionEntity } from "./UserCatalogPermissionEntity";
-
+import { UserStatus } from "../generated/graphql";
 @Entity({
     name: "user"
 })
@@ -104,4 +104,7 @@ export class UserEntity extends EntityBaseModel {
     /** The date on which the passwordRecoveryToken was created */
     @Column({ nullable: true, name: "password_recovery_token_date" })
     passwordRecoveryTokenDate: Date;
+
+    @Column("enum", { array: false, name: "status", enum: UserStatus })
+    status: UserStatus;
 }

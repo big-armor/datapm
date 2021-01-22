@@ -7,7 +7,8 @@ import {
     RecoverMyPasswordInput,
     UpdateMyPasswordInput,
     UpdateUserInput,
-    ActivityLogEventType
+    ActivityLogEventType,
+    UserStatus
 } from "../generated/graphql";
 import { CatalogRepository } from "../repository/CatalogRepository";
 import { UserRepository } from "../repository/UserRepository";
@@ -16,6 +17,7 @@ import { getGraphQlRelationName } from "../util/relationNames";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 import { FirstUserStatusHolder } from "./FirstUserStatusHolder";
+import { UserEntity } from "../entity/UserEntity";
 
 export const searchUsers = async (
     _0: any,
@@ -41,6 +43,8 @@ export const emailAddressAvailable = async (
     info: any
 ) => {
     const user = await context.connection.manager.getCustomRepository(UserRepository).getUserByEmail(emailAddress);
+
+    if (user != null && user.status == UserStatus.PENDING_SIGN_UP) return true;
 
     return user == null;
 };
@@ -77,13 +81,24 @@ export const createMe = async (
     }
 
     await context.connection.transaction(async (transaction) => {
-        const user = await transaction.getCustomRepository(UserRepository).createUser({
+        const existingUser = await transaction.getCustomRepository(UserRepository).getUserByEmail(value.emailAddress);
+
+        let user = null;
+
+        if (existingUser != null) {
+            user = existingUser;
+        } else {
+            user = transaction.create(UserEntity);
+        }
+
+        const createdUser = await transaction.getCustomRepository(UserRepository).completeCreatedUser({
+            user,
             value,
             relations: getGraphQlRelationName(info)
         });
 
         await createActivityLog(transaction, {
-            userId: user.id,
+            userId: createdUser.id,
             eventType: ActivityLogEventType.USER_CREATED
         });
     });
@@ -228,11 +243,16 @@ export const acceptInvite = async (
             throw new ValidationError("USERNAME_NOT_AVAILABLE");
         }
 
-        user.passwordHash = hashPassword(password, user.passwordSalt);
-        user.username = username;
         user.emailVerified = true;
-        delete user.verifyEmailToken;
-        user.verifyEmailTokenDate = new Date();
+
+        await transaction.getCustomRepository(UserRepository).completeCreatedUser({
+            user,
+            value: {
+                emailAddress: user.emailAddress,
+                password,
+                username
+            }
+        });
 
         await transaction.save(user);
     });

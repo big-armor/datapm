@@ -1,5 +1,10 @@
 import { AuthenticatedContext, Context } from "../context";
-import { Permission, CollectionIdentifierInput, SetUserCollectionPermissionsInput } from "../generated/graphql";
+import {
+    Permission,
+    CollectionIdentifierInput,
+    SetUserCollectionPermissionsInput,
+    UserStatus
+} from "../generated/graphql";
 import { UserCollectionPermissionRepository } from "../repository/UserCollectionPermissionRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { EntityManager } from "typeorm";
@@ -7,7 +12,7 @@ import { CollectionEntity } from "../entity/CollectionEntity";
 import { UserEntity } from "../entity/UserEntity";
 import { UserRepository } from "../repository/UserRepository";
 import { emailAddressValid } from "datapm-lib";
-import { sendInviteUser, validateMessageContents } from "../util/smtpUtil";
+import { sendInviteUser, sendShareNotification, validateMessageContents } from "../util/smtpUtil";
 import { CollectionRepository } from "../repository/CollectionRepository";
 import { asyncForEach } from "../util/AsyncForEach";
 import { ValidationError } from "apollo-server";
@@ -65,6 +70,7 @@ export const setUserCollectionPermissions = async (
         .findCollectionBySlugOrFail(identifier.collectionSlug);
 
     const inviteUsers: UserEntity[] = [];
+    const existingUsers: UserEntity[] = [];
 
     await context.connection.transaction(async (transaction) => {
         await asyncForEach(value, async (userCollectionPermission) => {
@@ -86,6 +92,12 @@ export const setUserCollectionPermissions = async (
                 }
             } else {
                 userId = user.id;
+
+                if (user.status == UserStatus.PENDING_SIGN_UP) {
+                    inviteUsers.push(user);
+                } else {
+                    existingUsers.push(user);
+                }
             }
 
             await transaction.getCustomRepository(UserCollectionPermissionRepository).setUserCollectionPermissions({
@@ -95,6 +107,15 @@ export const setUserCollectionPermissions = async (
         });
     });
 
+    await asyncForEach(inviteUsers, async (user) => {
+        await sendShareNotification(
+            user,
+            context.me.displayName,
+            collectionEntity.name,
+            "/collection/" + collectionEntity.collectionSlug,
+            message
+        );
+    });
     await asyncForEach(inviteUsers, async (user) => {
         await sendInviteUser(user, context.me.displayName, collectionEntity.name, message);
     });
