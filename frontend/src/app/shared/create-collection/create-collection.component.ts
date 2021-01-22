@@ -46,17 +46,24 @@ export class CreateCollectionComponent implements OnInit {
             })
             .subscribe(
                 (response) => {
-                    if (response.errors) {
-                        if (response.errors.find((e) => e.message.includes("COLLECTION_SLUG_NOT_AVAILABLE"))) {
-                            this.error = `Collection slug '${collectionSlug}' already exists. Please change name to fix the issue`;
-                        } else {
-                            this.error = "Unknown error occured - " + response.errors[0].message;
-                        }
-                        this.state = "ERROR";
+                    if (!response.errors) {
+                        this.dialogRef.close(this.form.value);
                         return;
                     }
 
-                    this.dialogRef.close(collectionSlug);
+                    for (const error of response.errors) {
+                        if (error.message.includes("COLLECTION_SLUG_NOT_AVAILABLE")) {
+                            this.error = `Catalog slug '${collectionSlug}' already exists. Please change name to fix the issue`;
+                        } else if (error.message.includes("RESERVED_KEYWORD")) {
+                            this.error = "The name you entered is a restricted keyword in the system";
+                        }
+                    }
+
+                    if (!this.error) {
+                        this.error = "Unknown error occurred. Please try again or contact support.";
+                    }
+
+                    this.state = "ERROR";
                 },
                 (response) => {
                     this.state = "ERROR";
