@@ -13,7 +13,8 @@ const defaultMessages = {
     PASSWORD_TOO_SHORT: (errors: any) => "Password is too short",
     PASSWORD_TOO_LONG: (errors: any) => "Password is too long",
     INVALID_CHARACTERS: (errors: any) =>
-        "Passwords less than 16 characters must include one number or a special character (@ # $ % !)"
+        "Passwords less than 16 characters must include one number or a special character (@ # $ % !)",
+    RESERVED_KEYWORD: (errors: any) => "You've used a reserved keyword"
 };
 
 const errorKeys = [
@@ -26,7 +27,8 @@ const errorKeys = [
     "PASSWORD_TOO_LONG",
     "INVALID_CHARACTERS",
     "USERNAME_TOO_LONG",
-    "NOT_AVAILABLE"
+    "NOT_AVAILABLE",
+    "RESERVED_KEYWORD"
 ];
 
 @Pipe({

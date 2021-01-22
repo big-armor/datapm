@@ -152,13 +152,13 @@ export class CatalogRepository extends Repository<CatalogEntity> {
         relations?: string[];
     }): Promise<CatalogEntity> {
         return this.manager.nestedTransaction(async (transaction) => {
-            ReservedKeywordsService.validateReservedKeyword(value.newSlug);
             const catalog = await transaction.getRepository(CatalogEntity).findOneOrFail({
                 where: { slug: identifier.catalogSlug },
                 relations: ["packages"]
             });
 
             if (value.newSlug) {
+                ReservedKeywordsService.validateReservedKeyword(value.newSlug);
                 catalog.slug = value.newSlug;
             }
 

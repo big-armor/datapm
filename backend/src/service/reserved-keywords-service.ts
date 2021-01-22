@@ -21,7 +21,7 @@ export class ReservedKeywordsService {
 
     public static validateReservedKeyword(keyword: string): void {
         if (this.isReservedKeyword(keyword)) {
-            throw new Error("RESERVED_KEYWORD " + keyword);
+            throw new Error("RESERVED_KEYWORD");
         }
     }
 
