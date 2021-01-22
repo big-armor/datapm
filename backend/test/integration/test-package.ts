@@ -215,6 +215,7 @@ describe("Package Tests", async () => {
         expect(response.data!.package!.identifier.catalogSlug).to.equal("testA-packages");
         expect(response.data!.package!.identifier.packageSlug).to.equal("congressional-legislators");
         expect(response.data!.package!.latestVersion).to.equal(null);
+        expect(response.data!.package!.versions?.length).equal(0);
     });
 
     it("User A update catalog to be public", async function () {
@@ -382,6 +383,7 @@ describe("Package Tests", async () => {
         expect(response.data!.package.identifier.catalogSlug).to.equal("testA-packages");
         expect(response.data!.package.identifier.packageSlug).to.equal("new-package-slug");
         expect(response.data!.package.latestVersion).to.not.equal(null);
+        expect(response.data!.package.versions?.length).equal(1);
 
         const identifier = response.data!.package.latestVersion!.identifier;
 
