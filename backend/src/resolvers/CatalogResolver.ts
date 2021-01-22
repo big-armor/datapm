@@ -24,6 +24,7 @@ import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 import { packageEntityToGraphqlObject } from "./PackageResolver";
 import { hasCatalogPermissions } from "./UserCatalogPermissionResolver";
+import { ReservedKeywordsService } from "../service/reserved-keywords-service";
 
 export const catalogEntityToGraphQL = (catalogEntity: CatalogEntity): Catalog => {
     return {
