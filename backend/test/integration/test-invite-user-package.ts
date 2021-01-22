@@ -151,6 +151,27 @@ describe("Inviting Users", function () {
         expect(response.errors!.find((e) => e.message.includes("MESSAGE_CANNOT_CONTAIN_HTML_TAGS"))).not.equal(null);
     });
 
+    it("Should not allow messages longer than 250 characters", async function () {
+        const response = await userAClient.mutate({
+            mutation: SetPackagePermissionsDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-invite-users",
+                    packageSlug: "legislators-test"
+                },
+                value: [
+                    {
+                        permissions: [Permission.VIEW],
+                        usernameOrEmailAddress: "test-invite-package-c@test.datapm.io"
+                    }
+                ],
+                message: "T".repeat(251)
+            }
+        });
+
+        expect(response.errors!.find((e) => e.message.includes("MESSAGE_TOO_LONG"))).not.equal(null);
+    });
+
     it("Should send invite email", async function () {
         let userCEmail: any = null;
         let userDEmail: any = null;

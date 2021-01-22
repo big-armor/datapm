@@ -36,6 +36,8 @@ export async function sendForgotPasswordEmail(user: UserEntity, token: string) {
 }
 
 export function validateMessageContents(message: string) {
+    if (message.length > 250) throw new Error("MESSAGE_TOO_LONG");
+
     if (message.match(/([a-zA-Z0-9._+-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gim) != null)
         throw new Error("MESSAGE_CANNOT_CONTAIN_EMAIL_ADDRESS");
 
