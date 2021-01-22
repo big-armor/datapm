@@ -13,6 +13,8 @@ import { UserEntity } from "../entity/UserEntity";
 import { UserInputError } from "apollo-server";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { UserRepository } from "./UserRepository";
+import { ActivityLogRepository } from "./ActivityLogRepository";
+import { ActivityLogEntity } from "../entity/ActivityLogEntity";
 
 const PUBLIC_PACKAGES_QUERY = '("PackageEntity"."isPublic" is true)';
 const AUTHENTICATED_USER_PACKAGES_QUERY = `
@@ -471,6 +473,27 @@ export class PackageRepository {
             .getManyAndCount();
     }
 
+    async myRecentlyViewedPackages(
+        user: UserEntity,
+        limit: number,
+        offSet: number,
+        relations?: string[]
+    ): Promise<[PackageEntity[], number]> {
+        const ALIAS = "recentlyViewedPackages";
+        const [activityLogs, count] = await this.manager
+            .getRepository(ActivityLogEntity)
+            .createQueryBuilder("ActivityLog")
+            .where("ActivityLog.user_id = :userId AND ActivityLog.eventType = 'PACKAGE_VIEWED'")
+            .orderBy('"ActivityLog"."created_at"', "DESC")
+            .limit(limit)
+            .offset(offSet)
+            .addRelations(ALIAS, relations)
+            .setParameter("userId", user.id)
+            .addRelations("Package", "targetPackage")
+            .getManyAndCount();
+
+        return [activityLogs.map((a) => a.targetPackage!), count];
+    }
     async myPackages(
         user: UserEntity,
         limit: number,

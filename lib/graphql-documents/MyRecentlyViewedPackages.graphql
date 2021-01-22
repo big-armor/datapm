@@ -1,0 +1,36 @@
+query MyRecentlyViewedPackages($offset: Int!, $limit: Int!) {
+    myRecentlyViewedPackages(offSet: $offset, limit: $limit) {
+        packages {
+            identifier {
+                catalogSlug
+                packageSlug
+            }
+            catalog {
+                myPermissions
+            }
+            myPermissions
+            isPublic
+            displayName
+            description
+            description
+            latestVersion {
+                identifier {
+                    versionMajor
+                    versionMinor
+                    versionPatch
+                }
+                createdAt
+                updatedAt
+                author {
+                    username
+                }
+            }
+            creator {
+                username
+                firstName
+                lastName
+                nameIsPublic
+            }
+        }
+    }
+}

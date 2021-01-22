@@ -82,6 +82,24 @@ export const usersByPackage = async (
         .usersByPackage(packageEntity, relations);
 };
 
+export const myRecentlyViewedPackages = async (
+    _0: any,
+    { limit, offSet }: { limit: number; offSet: number },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const relations = getGraphQlRelationName(info);
+    const [searchResponse, count] = await context.connection.manager
+        .getCustomRepository(PackageRepository)
+        .myRecentlyViewedPackages(context.me, limit, offSet, relations);
+
+    return {
+        hasMore: count - (offSet + limit) > 0,
+        packages: await Promise.all(searchResponse.map((p) => packageEntityToGraphqlObject(context.connection, p))),
+        count
+    };
+};
+
 export const myPackages = async (
     _0: any,
     { limit, offset }: { limit: number; offset: number },
