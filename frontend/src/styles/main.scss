@@ -574,6 +574,43 @@ button:disabled {
     }
 }
 
+#homeRoutes {
+    list-style-type: none;
+    margin-bottom: 0px;
+    display: flex;
+
+    li {
+        a {
+            font-family: $family-roboto;
+            font-style: $style-normal;
+            font-weight: $weight-300;
+            font-size: $default-font;
+            letter-spacing: 0.6px;
+            line-height: 24px;
+            text-align: center;
+            color: $gray-3;
+            text-decoration: none;
+            padding: 0px 10px 4px 10px;
+            margin: 0px 10px;
+            position: relative;
+            cursor: pointer;
+            bottom: 25px;
+        }
+
+        &:first-child {
+            a {
+                margin-left: 0px;
+            }
+        }
+    }
+
+    .active {
+        opacity: 1;
+        color: $gray-1 !important;
+        border-bottom: 2px solid $gray-1;
+    }
+}
+
 @media (max-width: 768px) {
     #contentBorder {
         padding: 0px;
@@ -642,6 +679,9 @@ button:disabled {
             min-width: 208px;
         }
     }
+    .app-outlined-button {
+        padding: 6px 10px;
+    }
     div {
         .dialog-description {
             font-size: $small-font !important;
@@ -664,5 +704,15 @@ button:disabled {
         top: 0.83rem;
         height: 9px;
         margin: 3px;
+    }
+    #homeRoutes {
+        li {
+            a {
+                font-size: $text-font;
+                padding: 0px 4px 4px 4px;
+                margin: 0px 2px;
+                bottom: 16px;
+            }
+        }
     }
 }

@@ -22,8 +22,11 @@
         font-family: $family-roboto;
         font-style: $style-normal;
         font-weight: $weight-300;
-        font-size: ($text-font - 1);
-        color: $gray-1;
+        font-size: $small-font;
+        letter-spacing: 0.7px;
+        line-height: 14px;
+        margin-top: 2px;
+        color: $gray-3;
         max-height: 111px;
         overflow: hidden;
     }
