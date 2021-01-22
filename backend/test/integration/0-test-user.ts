@@ -1,4 +1,4 @@
-import { ApolloClient, FetchResult, NormalizedCacheObject, ServerError } from "@apollo/client/core";
+import { ApolloClient, FetchResult, NormalizedCacheObject } from "@apollo/client/core";
 import { expect } from "chai";
 import {
     MeDocument,

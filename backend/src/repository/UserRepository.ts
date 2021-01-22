@@ -328,7 +328,15 @@ export class UserRepository extends Repository<UserEntity> {
         });
     }
 
-    createUser({ value, relations = [] }: { value: CreateUserInput; relations?: string[] }): Promise<UserEntity> {
+    completeCreatedUser({
+        user,
+        value,
+        relations = []
+    }: {
+        user: UserEntity;
+        value: CreateUserInput;
+        relations?: string[];
+    }): Promise<UserEntity> {
         const self: UserRepository = this;
         const isAdmin = (input: CreateUserInput | CreateUserInputAdmin): input is CreateUserInputAdmin => {
             return (input as CreateUserInputAdmin) !== undefined;
@@ -338,8 +346,6 @@ export class UserRepository extends Repository<UserEntity> {
 
         return this.manager
             .nestedTransaction(async (transaction) => {
-                let user = transaction.create(UserEntity);
-
                 if (value.firstName != null) user.firstName = value.firstName.trim();
 
                 if (value.lastName != null) user.lastName = value.lastName.trim();
@@ -351,7 +357,8 @@ export class UserRepository extends Repository<UserEntity> {
 
                 user.verifyEmailToken = emailVerificationToken;
                 user.verifyEmailTokenDate = new Date();
-                user.emailVerified = false;
+
+                if (user.emailVerified == null) user.emailVerified = false;
 
                 const now = new Date();
                 user.createdAt = now;
@@ -383,7 +390,7 @@ export class UserRepository extends Repository<UserEntity> {
                 return user;
             })
             .then(async (user: UserEntity) => {
-                await sendVerifyEmail(user, emailVerificationToken);
+                if (!user.emailVerified) await sendVerifyEmail(user, emailVerificationToken);
 
                 return getUserOrFail({
                     username: value.username,

@@ -12,7 +12,7 @@ import {
 import { mailObservable } from "./setup";
 import { createAnonymousClient, createTestClient, createUser } from "./test-utils";
 
-describe("Inviting USers", function () {
+describe("Inviting Users", function () {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
     let invitedUserClient: ApolloClient<NormalizedCacheObject>;
@@ -157,8 +157,6 @@ describe("Inviting USers", function () {
         let userBEmail: any = null;
         let verifyEmailPromise = new Promise<void>((r) => {
             let subscription = mailObservable.subscribe((email) => {
-                console.log(email.to[0].address);
-
                 if (email.to[0].address === "testB-invite-users@test.datapm.io") userBEmail = email;
                 else if (email.to[0].address === "test-invite-package-c@test.datapm.io") userCEmail = email;
                 else if (email.to[0].address === "test-invite-package-d@test.datapm.io") userDEmail = email;

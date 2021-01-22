@@ -63,11 +63,7 @@ import {
     setUserCollectionPermissions,
     deleteUserCollectionPermissions
 } from "./resolvers/UserCollectionPermissionResolver";
-import {
-    deleteUserCatalogPermissions,
-    hasCatalogPermissions,
-    setUserCatalogPermission
-} from "./resolvers/UserCatalogPermissionResolver";
+import { deleteUserCatalogPermissions, setUserCatalogPermission } from "./resolvers/UserCatalogPermissionResolver";
 import { login, logout, verifyEmailAddress } from "./resolvers/AuthResolver";
 import {
     createMe,
