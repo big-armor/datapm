@@ -14,7 +14,7 @@ const defaultMessages = {
     PASSWORD_TOO_LONG: (errors: any) => "Password is too long",
     INVALID_CHARACTERS: (errors: any) =>
         "Passwords less than 16 characters must include one number or a special character (@ # $ % !)",
-    RESERVED_KEYWORD: (errors: any) => "You've used a reserved keyword"
+    RESERVED_KEYWORD: (errors: any) => "This is a reserved keyword. Please choose a different word"
 };
 
 const errorKeys = [

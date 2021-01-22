@@ -55,7 +55,7 @@ export class CreateCollectionComponent implements OnInit {
                         if (error.message.includes("COLLECTION_SLUG_NOT_AVAILABLE")) {
                             this.error = `Catalog slug '${collectionSlug}' already exists. Please change name to fix the issue`;
                         } else if (error.message.includes("RESERVED_KEYWORD")) {
-                            this.error = "The name you entered is a restricted keyword in the system";
+                            this.error = "The name you entered is a restricted keyword. Please choose another name";
                         }
                     }
 

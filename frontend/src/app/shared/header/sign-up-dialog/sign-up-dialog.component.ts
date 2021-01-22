@@ -38,7 +38,7 @@ export class SignUpDialogComponent implements OnInit {
                 "Username must contain only numbers, letters, and hyphens, and may not start or end with a hyphen.",
             TOO_LONG: "Username must be less than 40 characters long.",
             NOT_AVAILABLE: "That username is not available. Try a different username.",
-            RESERVED_KEYWORD: "The username you used is a restricted keyword in the system"
+            RESERVED_KEYWORD: "The username you used is a restricted keyword. Please choose another name"
         }
     };
 
