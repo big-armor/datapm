@@ -26,8 +26,8 @@ describe("Recently Viewed", async () => {
         userTwoClient = await createUser(
             "FirstTwo",
             "LastTwo",
-            "testTwo-packages",
-            "testTwo-packages@test.datapm.io",
+            "testTwo-recently-viewed",
+            "testTwo-recently-viewed@test.datapm.io",
             "passwordTwo!"
         );
 
@@ -94,7 +94,6 @@ describe("Recently Viewed", async () => {
             }
         });
 
-        console.log(JSON.stringify(response, null, 1));
         expect(response.errors == null).to.equal(true);
         expect(response.data.myRecentlyViewedPackages.logs?.length == 1).to.equal(true);
         expect(
