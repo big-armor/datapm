@@ -658,7 +658,7 @@ type Query {
     """
     Returns a list of packages the requesting user has recently viewed
     """
-    myRecentlyViewedPackages(offSet: Int!, limit: Int!): PackagesResult! @isAuthenticated
+    myRecentlyViewedPackages(offSet: Int!, limit: Int!): ActivityLogResult! @isAuthenticated
 
     """
     Returns users that match the given search query

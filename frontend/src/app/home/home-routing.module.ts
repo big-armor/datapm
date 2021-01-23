@@ -5,6 +5,7 @@ import { FollowingComponent } from "./following/following.component";
 import { HomepageComponent } from "./homepage/homepage.component";
 import { LatestComponent } from "./latest/latest.component";
 import { TrendingComponent } from "./trending/trending.component";
+import { RecentlyViewedComponent } from "./recently-viewed/recently-viewed.component";
 
 const routes: Routes = [
     {
@@ -13,12 +14,11 @@ const routes: Routes = [
         children: [
             {
                 path: "",
-                pathMatch: "full",
-                redirectTo: "latest"
+                component: LatestComponent
             },
             {
-                path: "latest",
-                component: LatestComponent
+                path: "viewed",
+                component: RecentlyViewedComponent
             },
             {
                 path: "trending",

@@ -473,27 +473,6 @@ export class PackageRepository {
             .getManyAndCount();
     }
 
-    async myRecentlyViewedPackages(
-        user: UserEntity,
-        limit: number,
-        offSet: number,
-        relations?: string[]
-    ): Promise<[PackageEntity[], number]> {
-        const ALIAS = "recentlyViewedPackages";
-        const [activityLogs, count] = await this.manager
-            .getRepository(ActivityLogEntity)
-            .createQueryBuilder("ActivityLog")
-            .where("ActivityLog.user_id = :userId AND ActivityLog.eventType = 'PACKAGE_VIEWED'")
-            .orderBy('"ActivityLog"."created_at"', "DESC")
-            .limit(limit)
-            .offset(offSet)
-            .addRelations(ALIAS, relations)
-            .setParameter("userId", user.id)
-            .addRelations("Package", "targetPackage")
-            .getManyAndCount();
-
-        return [activityLogs.map((a) => a.targetPackage!), count];
-    }
     async myPackages(
         user: UserEntity,
         limit: number,

@@ -2,7 +2,7 @@ import { ApolloError, ForbiddenError, UserInputError } from "apollo-server";
 import graphqlFields from "graphql-fields";
 import { AuthenticatedContext, Context } from "../context";
 import { PackageEntity } from "../entity/PackageEntity";
-import { createActivityLog } from "../repository/ActivityLogRepository";
+import { ActivityLogRepository, createActivityLog } from "../repository/ActivityLogRepository";
 import {
     Base64ImageUpload,
     Catalog,
@@ -17,7 +17,8 @@ import {
     Version,
     VersionIdentifierInput,
     ActivityLogEventType,
-    ActivityLogChangeType
+    ActivityLogChangeType,
+    ActivityLogResult
 } from "../generated/graphql";
 import { CatalogEntity } from "../entity/CatalogEntity";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
@@ -37,6 +38,7 @@ import { versionEntityToGraphqlObject } from "./VersionResolver";
 import { catalogEntityToGraphQL } from "./CatalogResolver";
 import { CollectionRepository } from "../repository/CollectionRepository";
 import { VersionEntity } from "../entity/VersionEntity";
+import { activtyLogEntityToGraphQL } from "./ActivityLogResolver";
 
 export const packageEntityToGraphqlObject = async (
     context: EntityManager | Connection,
@@ -87,15 +89,15 @@ export const myRecentlyViewedPackages = async (
     { limit, offSet }: { limit: number; offSet: number },
     context: AuthenticatedContext,
     info: any
-) => {
+): Promise<ActivityLogResult> => {
     const relations = getGraphQlRelationName(info);
     const [searchResponse, count] = await context.connection.manager
-        .getCustomRepository(PackageRepository)
+        .getCustomRepository(ActivityLogRepository)
         .myRecentlyViewedPackages(context.me, limit, offSet, relations);
 
     return {
         hasMore: count - (offSet + limit) > 0,
-        packages: await Promise.all(searchResponse.map((p) => packageEntityToGraphqlObject(context.connection, p))),
+        logs: await Promise.all(searchResponse.map((p) => activtyLogEntityToGraphQL(context.connection, p))),
         count
     };
 };

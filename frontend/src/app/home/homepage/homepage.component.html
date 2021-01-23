@@ -3,11 +3,17 @@
     <div class="row">
         <div class="col-md-12">
             <ul class="p-0" id="homeRoutes">
-                <li *ngFor="let route of routes" class="list-names">
-                    <a [routerLink]="route.url" routerLinkActive="active">
-                        {{ route.linkName }}
-                    </a>
-                </li>
+                <span *ngFor="let route of routes">
+                    <li *ngIf="!route.authRequired || currentUser != null" class="list-names">
+                        <a
+                            [routerLink]="route.url"
+                            routerLinkActive="active"
+                            [routerLinkActiveOptions]="{ exact: true }"
+                        >
+                            {{ route.linkName }}
+                        </a>
+                    </li>
+                </span>
             </ul>
         </div>
     </div>
