@@ -196,21 +196,20 @@ async function main() {
     // set express for the Apollo GraphQL server
     server.applyMiddleware({ app, bodyParserConfig: { limit: "20mb" } });
 
-    const respondWithImage = async function (imageStream: Readable, response: express.Response) {
+    const respondWithImage = async (imageStream: Readable, response: express.Response) => {
         const imageBuffer = await new Promise<Buffer>((res) => {
-            var bufs: any[] = [];
-            imageStream.on("data", function (d) {
-                bufs.push(d);
+            const bufferedData: any[] = [];
+            imageStream.on("data", (d) => {
+                bufferedData.push(d);
             });
-            imageStream.on("end", function () {
-                var buf = Buffer.concat(bufs);
-                res(buf);
+            imageStream.on("end", () => {
+                const buffer = Buffer.concat(bufferedData);
+                res(buffer);
             });
         });
 
         response.set("content-type", "image/jpeg");
         response.set("content-length", imageBuffer.length.toString());
-
         response.end(imageBuffer);
     };
 
@@ -251,6 +250,19 @@ async function main() {
                     identifier: { catalogSlug: req.params.catalogSlug, packageSlug: req.params.packageSlug }
                 });
             await respondWithImage(await imageService.readPackageCoverImage(user.id), res);
+        } catch (err) {
+            res.status(404).send();
+            return;
+        }
+    });
+
+    app.use("/images/catalog/:catalogSlug/avatar", async (req, res, next) => {
+        try {
+            const contextObject = context({ req });
+            const user = await (await contextObject).connection
+                .getCustomRepository(CatalogRepository)
+                .findCatalogBySlugOrFail(req.params.catalogSlug);
+            await respondWithImage(await imageService.readCatalogAvatarImage(user.id), res);
         } catch (err) {
             res.status(404).send();
             return;

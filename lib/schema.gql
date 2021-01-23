@@ -836,6 +836,20 @@ type Mutation {
     """
     Updates the cover image of the catalog
     """
+    setCatalogAvatarImage(
+        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: EDIT)
+        image: Base64ImageUpload! @validBase64Image
+    ): Void @isAuthenticated
+
+    """
+    Updates the cover image of the catalog
+    """
+    deleteCatalogAvatarImage(identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: EDIT)): Void
+        @isAuthenticated
+
+    """
+    Updates the cover image of the catalog
+    """
     setCatalogCoverImage(
         identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: EDIT)
         image: Base64ImageUpload! @validBase64Image
