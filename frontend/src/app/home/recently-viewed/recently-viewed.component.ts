@@ -20,40 +20,43 @@ enum State {
 export class RecentlyViewedComponent implements OnInit {
     State = State;
     state = State.LOADING;
-    public isFavorite = false;
-    public packagesWithModifiedDate: PackageWithModifiedDate[] = [];
+    public offSet = 0;
+    public hasMore = false;
+    public packages: PackageWithModifiedDate[] = [];
 
     constructor(private recentlyViewedPackagesQuery: MyRecentlyViewedPackagesGQL) {}
 
     public ngOnInit(): void {
         this.state = State.LOADING;
-        this.loadLatestPackages();
+        this.packages = [];
+        this.loadPackages();
     }
 
-    public makeFavorite(): void {
-        this.isFavorite = !this.isFavorite;
-    }
-
-    private loadLatestPackages(): void {
-        this.recentlyViewedPackagesQuery.fetch({ offset: 0, limit: 25 }).subscribe(
+    private loadPackages(): void {
+        this.recentlyViewedPackagesQuery.fetch({ offset: this.offSet, limit: 25 }).subscribe(
             (response) => {
                 if (response.errors) {
                     this.state = State.ERROR;
                     return;
                 }
 
+                this.hasMore = response.data.myRecentlyViewedPackages.hasMore;
                 const dateNow = new Date();
-                this.packagesWithModifiedDate = response.data.myRecentlyViewedPackages.logs.map((l) => {
-                    const changeDates = this.getLastChangedDates(l.targetPackage);
-                    return {
-                        package: l.targetPackage,
-                        lastActivityLabel: this.getUpdatedDateLabel(
-                            new Date(changeDates.createdAt),
-                            new Date(changeDates.updatedAt),
-                            dateNow
-                        )
-                    };
-                });
+                const receivedPackages: PackageWithModifiedDate[] = response.data.myRecentlyViewedPackages.logs.map(
+                    (l) => {
+                        const changeDates = this.getLastChangedDates(l.targetPackage);
+                        return {
+                            package: l.targetPackage,
+                            lastActivityLabel: this.getUpdatedDateLabel(
+                                new Date(changeDates.createdAt),
+                                new Date(changeDates.updatedAt),
+                                dateNow
+                            )
+                        };
+                    }
+                );
+                this.packages = this.packages.concat(receivedPackages);
+
                 this.state = State.LOADED;
             },
             (error) => {
@@ -86,5 +89,10 @@ export class RecentlyViewedComponent implements OnInit {
 
         const differenceLabel = getTimeDifferenceLabel(updatedAtDate, dateNow);
         return actionLabel + differenceLabel;
+    }
+
+    public loadMore() {
+        this.offSet += 25;
+        this.loadPackages();
     }
 }

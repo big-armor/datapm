@@ -1,5 +1,7 @@
 query MyRecentlyViewedPackages($offset: Int!, $limit: Int!) {
     myRecentlyViewedPackages(offSet: $offset, limit: $limit) {
+        hasMore
+        count
         logs {
             targetPackage {
                 identifier {
