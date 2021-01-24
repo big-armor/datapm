@@ -1,3 +1,5 @@
+@import "../../../../styles/variables";
+
 #catalogsPage {
     .catalogs-div {
         width: 100%;
@@ -5,6 +7,23 @@
 
         table {
             width: 100%;
+            th {
+                font-family: $family-roboto;
+                font-size: $text-font;
+                font-weight: $weight-500;
+                color: $gray-1;
+            }
+
+            .mat-column-name {
+                width: 30%;
+
+                a {
+                    font-family: $family-roboto;
+                    color: $gray-2;
+                    font-size: $text-font;
+                    font-weight: $weight-400;
+                }
+            }
         }
 
         .loading-container {
@@ -15,7 +34,8 @@
         }
 
         .mat-header-row {
-            background-color: inherit;
+            height: 40px;
+            background-color: #ededed;
         }
     }
 }

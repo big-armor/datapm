@@ -9,9 +9,9 @@
                     <div class="input-group mt-1 search-box">
                         <form (ngSubmit)="search()" class="search-form">
                             <app-input
-                                placeholder="Search For Data"
+                                placeholder="Search For Data..."
                                 [control]="searchControl"
-                                class="rounded-input"
+                                class="rounded-input search-input"
                                 matInput
                                 [matAutocomplete]="auto"
                             ></app-input>
@@ -75,7 +75,7 @@
                     ></app-avatar>
                     <button
                         mat-fab
-                        class="app-fab-button app-raised-button"
+                        class="app-fab-button"
                         [matMenuTriggerFor]="beforeMenu"
                         aria-label="Person"
                         *ngIf="!currentUser"
@@ -107,7 +107,7 @@
                     <app-avatar [user]="currentUser" [matMenuTriggerFor]="beforeMenu" *ngIf="currentUser"></app-avatar>
                     <button
                         mat-fab
-                        class="app-fab-button app-raised-button"
+                        class="app-fab-button"
                         [matMenuTriggerFor]="beforeMenu"
                         aria-label="Person"
                         *ngIf="!currentUser"

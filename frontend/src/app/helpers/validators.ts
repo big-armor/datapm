@@ -9,17 +9,18 @@ export function usernameValidator(
 ): AsyncValidatorFn {
     return (control: AbstractControl): Promise<ValidationErrors | null> => {
         return new Promise<ValidationErrors | null>((success, error) => {
-            if (control.value == currentUsername) {
-                success(null);
-                return;
-            }
             if (control.value == "" || control.value == null) {
                 success({
                     REQUIRED: true
                 });
                 return;
             }
+            if (control.value == currentUsername) {
+                success(null);
+                return;
+            }
             usernameAvailableGQL.fetch({ username: control.value }).subscribe((result) => {
+                console.log("mali", result.errors);
                 if (result.errors?.length > 0) {
                     success({
                         [result.errors[0].message]: true
