@@ -22,17 +22,11 @@ import { ImageStorageService } from "../storage/images/image-storage-service";
 import { CollectionRepository } from "./CollectionRepository";
 import { StorageErrors } from "../storage/files/file-storage-service";
 import { FirstUserStatusHolder } from "../resolvers/FirstUserStatusHolder";
+import { ReservedKeywordsService } from "../service/reserved-keywords-service";
 // https://stackoverflow.com/a/52097700
 export function isDefined<T>(value: T | undefined | null): value is T {
     return <T>value !== undefined && <T>value !== null;
 }
-
-export interface UserCatalogInput {
-    catalogId: number;
-    permission: Permission[];
-}
-
-const SELECTED_WORKPAD_REGEX = /^selected_workpad_id_person_(\d+)$/;
 
 declare module "typeorm" {
     interface SelectQueryBuilder<Entity> {
@@ -158,18 +152,6 @@ export class UserRepository extends Repository<UserEntity> {
         const ALIAS = "getUsername";
 
         const user = this.createQueryBuilder(ALIAS).where([{ username }]).getOne();
-
-        return user;
-    }
-
-    getUserByUsernameOrEmailAddress(username: string) {
-        const ALIAS = "getUsername";
-
-        const user = this.createQueryBuilder(ALIAS)
-            .where([{ username }])
-            .orWhere("(emailAddress = :username AND isPublic IS TRUE)")
-            .setParameter("username", username)
-            .getOne();
 
         return user;
     }
@@ -342,8 +324,8 @@ export class UserRepository extends Repository<UserEntity> {
             return (input as CreateUserInputAdmin) !== undefined;
         };
 
+        ReservedKeywordsService.validateReservedKeyword(value.username);
         const emailVerificationToken = uuid();
-
         return this.manager
             .nestedTransaction(async (transaction) => {
                 let user = transaction.create(UserEntity);
@@ -475,6 +457,9 @@ export class UserRepository extends Repository<UserEntity> {
         value: UpdateUserInput;
         relations?: string[];
     }): Promise<UserEntity> {
+        if (value.username) {
+            ReservedKeywordsService.validateReservedKeyword(value.username);
+        }
         return this.manager.nestedTransaction(async (transaction) => {
             const dbUser = await getUserByUsernameOrFail({
                 username,
