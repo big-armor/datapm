@@ -17,10 +17,20 @@ enum State {
     styleUrls: ["./avatar.component.scss"]
 })
 export class AvatarComponent implements OnChanges, OnDestroy {
-    @Input() user: User;
-    @Input() size: number = 40;
-    @Input() editable: boolean = false;
-    @Output() upload: EventEmitter<any>;
+    @Input()
+    public user: User;
+
+    @Input()
+    public size: number = 40;
+
+    @Input()
+    public editable: boolean = false;
+
+    @Input()
+    public circled: boolean = true;
+
+    @Output()
+    public upload: EventEmitter<any>;
 
     State = State;
 

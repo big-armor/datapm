@@ -1,4 +1,10 @@
-<div class="avatar raised" [style.width]="size + 'px'" [style.height]="size + 'px'" [style.fontSize]="size + 'px'">
+<div
+    class="avatar raised"
+    [class.avatar-circle]="circled"
+    [style.width]="size + 'px'"
+    [style.height]="size + 'px'"
+    [style.fontSize]="size + 'px'"
+>
     <span *ngIf="state != State.LOADED"></span>
     <span *ngIf="state == State.LOADED">
         <img [src]="imgData" alt="avatar" *ngIf="imgData" />
