@@ -554,7 +554,7 @@ export class UserRepository extends Repository<UserEntity> {
         try {
             await ImageStorageService.INSTANCE.deleteUserAvatarImage(user.id);
         } catch (error) {
-            if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) return;
+            if (error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST)) return;
 
             console.error(error.message);
         }
@@ -562,7 +562,7 @@ export class UserRepository extends Repository<UserEntity> {
         try {
             await ImageStorageService.INSTANCE.deleteUserCoverImage(user.id);
         } catch (error) {
-            if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) return;
+            if (error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST)) return;
 
             console.error(error.message);
         }
