@@ -301,6 +301,15 @@ resource "google_sql_database_instance" "instance" {
   database_version = "POSTGRES_12"
   settings {
     tier = "db-f1-micro"
+    backup_configuration {
+      enabled                        = true
+      start_time                     = "01:00"
+      point_in_time_recovery_enabled = true
+    }
+
+    ip_configuration {
+      require_ssl = false
+    }
   }
 
   lifecycle {
