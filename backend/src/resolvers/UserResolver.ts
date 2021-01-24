@@ -16,6 +16,7 @@ import { getGraphQlRelationName } from "../util/relationNames";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 import { FirstUserStatusHolder } from "./FirstUserStatusHolder";
+import { ReservedKeywordsService } from "../service/reserved-keywords-service";
 
 const USER_SEARCH_RESULT_LIMIT = 100;
 export const searchUsers = async (
@@ -66,6 +67,7 @@ export const emailAddressAvailable = async (
 };
 
 export const usernameAvailable = async (_0: any, { username }: { username: string }, context: AuthenticatedContext) => {
+    ReservedKeywordsService.validateReservedKeyword(username);
     const user = await context.connection.manager.getCustomRepository(UserRepository).getUserByUsername(username);
 
     const catalog = await context.connection.manager

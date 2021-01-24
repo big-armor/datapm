@@ -27,6 +27,7 @@ import { createActivityLog } from "../repository/ActivityLogRepository";
 import { Connection, EntityManager } from "typeorm";
 import { getEnvVariable } from "../util/getEnvVariable";
 import { packageEntityToGraphqlObject } from "./PackageResolver";
+import { ReservedKeywordsService } from "../service/reserved-keywords-service";
 
 export const collectionEntityToGraphQL = (collectionEntity: CollectionEntity): Collection => {
     return {
@@ -59,6 +60,7 @@ export const createCollection = async (
     context: AuthenticatedContext,
     info: any
 ) => {
+    ReservedKeywordsService.validateReservedKeyword(value.collectionSlug);
     const repository = context.connection.manager.getCustomRepository(CollectionRepository);
 
     const existingCollection = await repository.findCollectionBySlug(value.collectionSlug);
@@ -97,6 +99,7 @@ export const updateCollection = async (
         const collection = await repository.findCollectionBySlugOrFail(identifier.collectionSlug);
 
         if (value.newCollectionSlug && identifier.collectionSlug != value.newCollectionSlug) {
+            ReservedKeywordsService.validateReservedKeyword(value.newCollectionSlug);
             const existingCollection = await repository.findCollectionBySlug(value.newCollectionSlug);
             if (existingCollection) {
                 throw new ValidationError("COLLECTION_SLUG_NOT_AVAILABLE");
