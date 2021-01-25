@@ -132,6 +132,8 @@ body {
         font-size: $text-font;
         border: 1px solid $gray-5;
         outline: none;
+        letter-spacing: 1px;
+        font-family: $family-roboto;
         background-color: $gray-7;
         transition: background-color ease 0.5s;
 
@@ -320,7 +322,6 @@ mat-select {
 
 .search-autocomplete {
     border-radius: 4px;
-    margin: 0px 10px;
     margin-top: 2px;
 }
 .public-text {
@@ -332,14 +333,22 @@ mat-select {
     color: $gray-3;
 }
 
+.autocomplete-contents {
+    padding-left: 15px;
+}
+
 .autocomplete-title {
-    line-height: normal;
+    line-height: 24px;
+    font-family: $family-roboto;
+    letter-spacing: 0.7px;
+    font-size: $text-font;
 }
 
 .autocomplete-description {
-    line-height: normal;
-    font-size: $text-font;
+    line-height: 12px;
+    font-size: $small-font;
     color: $gray-3;
+    font-weight: $weight-300;
 }
 
 .mat-option {
