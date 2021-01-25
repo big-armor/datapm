@@ -647,7 +647,7 @@ type Query {
     package(identifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)): Package!
 
     """
-    Returns list of authenicated users packages
+    Returns list of the requesting users packages
     """
     myPackages(offset: Int!, limit: Int!): PackagesResult! @isAuthenticated
 
@@ -655,6 +655,11 @@ type Query {
     Returns packages that match the given search query (which can contain boolean search logic). This request is paginated.
     """
     searchPackages(query: String!, offSet: Int!, limit: Int!): SearchPackagesResult!
+
+    """
+    Returns a list of packages the requesting user has recently viewed
+    """
+    myRecentlyViewedPackages(offSet: Int!, limit: Int!): ActivityLogResult! @isAuthenticated
 
     """
     Returns users that match the given search query

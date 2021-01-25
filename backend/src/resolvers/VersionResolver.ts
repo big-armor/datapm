@@ -238,7 +238,7 @@ export const versionPackageFile = async (parent: any, _1: any, context: Authenti
             versionPatch: version.patchVersion
         });
     } catch (error) {
-        if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) {
+        if (error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST.toString())) {
             throw new Error("PACKAGE_FILE_NOT_FOUND");
         }
 

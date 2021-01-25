@@ -105,7 +105,7 @@ export class CollectionRepository extends Repository<CollectionEntity> {
         try {
             await ImageStorageService.INSTANCE.deleteCollectionCoverImage(collectionIdDb.id);
         } catch (error) {
-            if (error.message !== StorageErrors.FILE_DOES_NOT_EXIST) {
+            if (!error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST)) {
                 console.error(error.message);
             }
         }

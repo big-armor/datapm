@@ -12,14 +12,15 @@ import { HomepageComponent } from "./homepage/homepage.component";
 import { FollowingComponent } from "./following/following.component";
 import { LatestComponent } from "./latest/latest.component";
 import { TrendingComponent } from "./trending/trending.component";
+import { RecentlyViewedComponent } from "./recently-viewed/recently-viewed.component";
 import { AdminDashboardComponent } from "./admin-dashboard/admin-dashboard.component";
 import { UsersComponent } from "./admin-dashboard/users/users.component";
 import { MatTableModule } from "@angular/material/table";
 import { MatPaginatorModule } from "@angular/material/paginator";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatInputModule } from "@angular/material/input";
 import { FormsModule } from "@angular/forms";
+import { MatInputModule } from "@angular/material/input";
 
 @NgModule({
     declarations: [
@@ -28,7 +29,8 @@ import { FormsModule } from "@angular/forms";
         LatestComponent,
         TrendingComponent,
         AdminDashboardComponent,
-        UsersComponent
+        UsersComponent,
+        RecentlyViewedComponent
     ],
     imports: [
         CommonModule,

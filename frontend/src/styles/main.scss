@@ -134,15 +134,17 @@ body {
 }
 
 .rounded-input {
-    .dpm-input-round {
-        border-radius: 24px;
-        padding: 10px 23px;
+    .dpm-input-square {
+        border-radius: 6px;
+        padding: 10px 15px;
         width: 100%;
         height: 44px;
-        border: none;
+        font-size: $text-font;
+        border: 1px solid $gray-5;
         outline: none;
+        letter-spacing: 1px;
+        font-family: $family-roboto;
         background-color: $gray-7;
-        box-shadow: $inner-shadow-1;
         transition: background-color ease 0.5s;
 
         &:hover {
@@ -154,12 +156,20 @@ body {
             font-family: $family-roboto-mono;
             font-style: $style-normal;
             font-weight: $weight-300;
-            font-size: ($text-font);
+            font-size: ($small-font + 1);
             line-height: 18px;
             display: flex;
             align-items: flex-end;
             letter-spacing: -0.28px;
             color: $gray-4;
+        }
+    }
+}
+
+.rounded-input.search-input {
+    .dpm-input-square {
+        &::placeholder {
+            font-size: ($small-font + 2);
         }
     }
 }
@@ -192,24 +202,22 @@ mat-select {
 
 .app-raised-button {
     outline: none !important;
-    box-shadow: $outer-shadow-1;
-    border-radius: 24px;
-    height: 36px;
+    border-radius: 6px;
     border: none;
     font-family: $family-roboto;
     font-style: $style-normal;
-    font-weight: $weight-300;
-    font-size: ($title-font - 2);
+    font-weight: $weight-400;
+    font-size: $default-font;
     align-items: center;
     text-align: center;
-    color: $gray-3;
-    background-color: $gray-6;
-    padding: 0 1.5em;
-
+    padding: 8px 15px;
+    color: #fff;
+    background-color: $color-info;
     transition: background-color ease 0.5s;
 
     &:hover {
-        background-color: $gray-6;
+        color: $color-info;
+        background-color: $color-info-lighter;
         transition: background-color ease 0.5s;
     }
 
@@ -258,12 +266,12 @@ mat-select {
     font-family: $family-roboto;
     font-style: $style-normal;
     font-weight: $weight-400;
-    font-size: $small-font;
+    font-size: ($text-font - 1);
+    background: $white-1;
     line-height: 13px;
-    letter-spacing: -0.28px;
     color: $color-info;
     border: 1px solid $gray-9;
-    padding: 3px 15px;
+    padding: 6px 15px;
     border-radius: 4px;
     cursor: pointer;
 
@@ -273,8 +281,24 @@ mat-select {
     }
 
     &:hover {
+        color: $color-info;
         text-decoration: none;
-        background-color: rgba(240, 240, 240, 0.783);
+        background-color: $white;
+    }
+
+    .delete-txt {
+        color: $color-danger-dark;
+    }
+}
+
+.create-div {
+    color: $color-1;
+    padding: 8px 15px;
+
+    &:hover {
+        color: $color-1;
+        text-decoration: none;
+        background-color: $white;
     }
 }
 
@@ -296,19 +320,18 @@ mat-select {
 }
 
 .section-title {
-    font-family: $family-roboto;
+    font-family: $family-roboto-mono;
     font-style: $style-normal;
-    font-weight: $weight-500;
+    font-weight: $weight-400;
     font-size: $title-font;
     line-height: 26px;
     letter-spacing: -0.28px;
     color: $gray-1;
-    padding: 24px;
+    padding: 0px 24px 14px 0px;
 }
 
 .search-autocomplete {
     border-radius: 4px;
-    margin: 0px 10px;
     margin-top: 2px;
 }
 .public-text {
@@ -320,14 +343,22 @@ mat-select {
     color: $gray-3;
 }
 
+.autocomplete-contents {
+    padding-left: 15px;
+}
+
 .autocomplete-title {
-    line-height: normal;
+    line-height: 24px;
+    font-family: $family-roboto;
+    letter-spacing: 0.7px;
+    font-size: $text-font;
 }
 
 .autocomplete-description {
-    line-height: normal;
-    font-size: $text-font;
+    line-height: 12px;
+    font-size: $small-font;
     color: $gray-3;
+    font-weight: $weight-300;
 }
 
 .mat-option {
@@ -536,8 +567,9 @@ button:disabled {
 }
 
 .text-danger {
-    margin-top: 0px !important;
+    margin-top: 3px !important;
     font-size: 12px;
+    line-height: 15px;
     color: $color-danger !important;
 }
 
@@ -549,6 +581,52 @@ button:disabled {
 .mat-dialog-without-padding {
     .mat-dialog-container {
         padding: 0;
+    }
+}
+
+.dialog-wrapper-account {
+    padding: 20px 30px;
+    app-input {
+        display: block;
+        min-width: 348px;
+        margin-top: 20px;
+    }
+}
+
+#homeRoutes {
+    list-style-type: none;
+    margin-bottom: 0px;
+    display: flex;
+
+    li {
+        a {
+            font-family: $family-roboto;
+            font-style: $style-normal;
+            font-weight: $weight-300;
+            font-size: $default-font;
+            letter-spacing: 0.6px;
+            line-height: 24px;
+            text-align: center;
+            color: $gray-3;
+            text-decoration: none;
+            padding: 0px 10px 4px 10px;
+            margin: 0px 10px;
+            position: relative;
+            cursor: pointer;
+            bottom: 25px;
+        }
+
+        &:first-child {
+            a {
+                margin-left: 0px;
+            }
+        }
+    }
+
+    .active {
+        opacity: 1;
+        color: $gray-1 !important;
+        border-bottom: 2px solid $gray-1;
     }
 }
 
@@ -596,11 +674,37 @@ button:disabled {
             font-size: $small-font;
         }
     }
+    .text-danger {
+        font-size: $xsmall-font;
+        max-width: 240px !important;
+    }
+    .rounded-input {
+        .dpm-input-square {
+            height: 38px;
+            &::placeholder {
+                font-size: $small-font !important;
+            }
+        }
+    }
+    .app-raised-button {
+        margin-top: 0px !important;
+        font-size: $text-font;
+        width: 100%;
+    }
+    .dialog-wrapper-account {
+        padding: 0px;
+        min-width: 236px;
+        app-input {
+            min-width: 208px;
+        }
+    }
+    .app-outlined-button {
+        padding: 6px 10px;
+    }
     div {
         .dialog-description {
-            font-size: $small-font;
-            text-align: center;
-            margin-bottom: 0px;
+            font-size: $small-font !important;
+            margin-bottom: 0px !important;
         }
         .dialog-close-wrapper {
             bottom: 19px;
@@ -610,7 +714,7 @@ button:disabled {
             }
         }
         .dialog-title {
-            font-size: ($logo-font + 3);
+            font-size: ($logo-font);
             line-height: 40px;
             margin: 15px 0 5px;
         }
@@ -619,5 +723,15 @@ button:disabled {
         top: 0.83rem;
         height: 9px;
         margin: 3px;
+    }
+    #homeRoutes {
+        li {
+            a {
+                font-size: $text-font;
+                padding: 0px 4px 4px 4px;
+                margin: 0px 2px;
+                bottom: 16px;
+            }
+        }
     }
 }

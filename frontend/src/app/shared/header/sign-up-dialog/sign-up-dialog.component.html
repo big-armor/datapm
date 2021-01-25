@@ -1,10 +1,10 @@
-<div class="dialog-wrapper-signup" id="signUp">
+<div class="dialog-wrapper-account" id="signUp">
     <div class="dialog-close-wrapper">
         <button mat-button mat-dialog-close class="dialog-close">close</button>
     </div>
     <h1 class="dialog-title pb-2">datapm</h1>
 
-    <div *ngIf="state != State.SUCCESS">
+    <div *ngIf="state != State.SUCCESS" class="mt-4">
         <form [formGroup]="signUpForm" (ngSubmit)="formSubmit()">
             <div class="pb-5">
                 <p class="dialog-subtile">sign up with email</p>
@@ -14,25 +14,29 @@
                     [group]="signUpForm"
                     controlName="emailAddress"
                     inputType="email"
+                    autocomplete="rutjfkde"
                     class="rounded-input"
                     [error]="signUpForm | inputError: 'emailAddress':errorMessages['emailAddress'] | async"
                 ></app-input>
-                <br />
 
                 <app-input
                     placeholder="Password"
                     [group]="signUpForm"
                     controlName="password"
+                    autocomplete="rutjfkde"
                     inputType="password"
                     class="rounded-input"
                     [error]="signUpForm | inputError: 'password' | async"
                 ></app-input>
+
+                <br />
 
                 <p class="dialog-subtile mt-3">new account information</p>
                 <app-input
                     placeholder="Username"
                     [group]="signUpForm"
                     controlName="username"
+                    autocomplete="rutjfkde"
                     inputType="text"
                     class="rounded-input"
                     [error]="signUpForm | inputError: 'username':errorMessages['username'] | async"
@@ -50,19 +54,17 @@
             </div>
 
             <div class="text-center">
-                <button type="submit" class="app-raised-button">
-                    <span class="btn-text">sign up</span>
+                <button type="submit" class="app-raised-button" [disabled]="!signUpForm.valid">
+                    <span class="btn-text">Sign Up</span>
                 </button>
             </div>
         </form>
     </div>
 
     <div class="div-with-errors" *ngIf="state == State.SUCCESS">
-        <div style="margin: 35px 0px">Please check your email for next steps.</div>
+        <div style="margin: 25px 0px 35px 0px">Please check your email for next steps.</div>
         <div class="text-center">
-            <button mat-dialog-close class="app-raised-button">
-                <span class="close-text">Back to browse</span>
-            </button>
+            <button mat-dialog-close class="app-raised-button py-2">Back to browse</button>
         </div>
     </div>
 </div>

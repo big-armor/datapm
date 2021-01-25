@@ -11,10 +11,9 @@
             font-style: $style-normal;
             font-weight: $weight-300;
             font-size: $default-font;
-            line-height: 21px;
+            line-height: 14px;
             text-align: center;
             cursor: pointer;
-            letter-spacing: -0.28px;
             color: $gray-3;
         }
     }
@@ -48,8 +47,7 @@
 
         button {
             position: absolute;
-            right: 24px;
-            top: 2px;
+            right: 16px;
         }
     }
 
@@ -90,11 +88,20 @@ button.mat-menu-item {
 
 .avatar {
     position: relative;
-    top: 10px;
+    top: 13px;
 }
 
 app-avatar {
     cursor: pointer;
+}
+
+@media (max-width: 992px) {
+    .main-menu-title {
+        padding-left: 0px !important;
+    }
+    .avatar {
+        margin-left: 10px !important;
+    }
 }
 
 @media (max-width: 768px) {

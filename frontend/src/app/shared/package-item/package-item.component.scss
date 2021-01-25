@@ -13,30 +13,33 @@
 
     .package-identifier {
         font-family: $family-roboto-mono;
-        font-size: $default-font;
-        line-height: 26px;
+        font-size: ($default-font - 1);
         color: $color-info;
-        letter-spacing: -0.28px;
         margin-bottom: 0px !important;
-        margin-left: 10px;
     }
 
     .package-description {
-        font-family: $family-roboto-mono;
+        font-family: $family-roboto;
         font-style: $style-normal;
         font-weight: $weight-300;
-        font-size: $text-font;
-        line-height: 18px;
-        letter-spacing: -0.28px;
-        color: $gray-2;
+        font-size: $small-font;
+        letter-spacing: 0.7px;
+        line-height: 14px;
+        margin-top: 2px;
+        color: $gray-3;
         max-height: 111px;
         overflow: hidden;
     }
 
     .ctaButton {
         position: absolute;
-        top: 20px;
-        right: 16px;
+        top: 12px;
+        right: 12px;
+    }
+
+    .img-cover {
+        margin-top: 6px;
+        margin-right: 6px;
     }
 }
 

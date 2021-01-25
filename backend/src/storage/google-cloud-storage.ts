@@ -39,7 +39,8 @@ export class GoogleCloudStorage implements DPMStorage {
         const file = await this.getBucketFile(namespace, itemId);
 
         const fileExists = await file.exists();
-        if (!fileExists[0]) throw new Error(StorageErrors.FILE_DOES_NOT_EXIST.toString());
+        if (!fileExists[0])
+            throw new Error(StorageErrors.FILE_DOES_NOT_EXIST.toString() + " - " + this.buildPath(namespace, itemId));
 
         await file.delete();
     }
@@ -56,7 +57,8 @@ export class GoogleCloudStorage implements DPMStorage {
         const file = await this.getBucketFile(namespace, itemId);
 
         const fileExists = await file.exists();
-        if (!fileExists[0]) throw new Error(StorageErrors.FILE_DOES_NOT_EXIST.toString());
+        if (!fileExists[0])
+            throw new Error(StorageErrors.FILE_DOES_NOT_EXIST.toString() + " - " + this.buildPath(namespace, itemId));
 
         const fileReadStream = file.createReadStream();
         this.streamHelper.registerReadStream(fileReadStream);

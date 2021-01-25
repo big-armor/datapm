@@ -1,8 +1,6 @@
 @import "../../../../styles/variables";
 
-.dialog-wrapper {
-    padding: 20px 30px;
-
+.dialog-wrapper-account {
     .dialog-description {
         font-family: $family-roboto-mono;
         font-style: $style-normal;
@@ -29,16 +27,14 @@
         line-height: 14px;
     }
 
-    app-input {
-        display: block;
-        min-width: 348px;
-        margin-top: 20px;
-    }
-
     .forgot-pass {
-        margin-top: 15px;
+        margin-top: 10px;
         a {
-            font-size: $small-font;
+            font-size: $text-font;
+            color: $color-info;
+            :hover {
+                color: $color-info;
+            }
         }
     }
 
@@ -52,16 +48,17 @@
 }
 
 @media (max-width: 576px) {
-    .dialog-wrapper {
-        padding: 0px;
+    .dialog-wrapper-account {
         .mat-dialog-actions {
             margin-top: 15px;
             .btn-text {
                 font-size: $small-font;
             }
         }
-        app-input {
-            min-width: 208px;
+        .forgot-pass {
+            a {
+                font-size: $small-font;
+            }
         }
     }
 }
