@@ -5,6 +5,17 @@
             [editable]="true"
             (upload)="uploadCover($event)"
         ></app-cover>
+
+        <app-avatar
+            class="catalog-avatar"
+            [catalog]="data"
+            [circled]="false"
+            [size]="100"
+            [editable]="true"
+            (upload)="uploadAvatar($event)"
+        >
+        </app-avatar>
+
         <div class="d-flex bd-highlight mt-3 mb-1">
             <div class="pr-3 py-2 bd-highlight div-question long-txt">Make this catalog public</div>
             <div class="ml-auto py-2 bd-highlight slide-right">

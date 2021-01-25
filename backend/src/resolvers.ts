@@ -135,9 +135,11 @@ import {
     catalogWebsite,
     createCatalog,
     deleteCatalog,
+    deleteCatalogAvatarImage,
     myCatalogPermissions,
     myCatalogs,
     searchCatalogs,
+    setCatalogAvatarImage,
     setCatalogCoverImage,
     setUserCatalogPermission,
     updateCatalog,
@@ -529,6 +531,8 @@ export const resolvers: {
         updateCatalog: updateCatalog,
 
         setCatalogCoverImage: setCatalogCoverImage,
+        setCatalogAvatarImage: setCatalogAvatarImage,
+        deleteCatalogAvatarImage: deleteCatalogAvatarImage,
 
         setUserCatalogPermission: setUserCatalogPermission,
 

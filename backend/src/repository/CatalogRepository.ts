@@ -9,7 +9,6 @@ import { PackageRepository } from "./PackageRepository";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { StorageErrors } from "../storage/files/file-storage-service";
 import { UserRepository } from "./UserRepository";
-import { View } from "typeorm/schema-builder/view/View";
 import { ReservedKeywordsService } from "../service/reserved-keywords-service";
 
 // https://stackoverflow.com/a/52097700
@@ -236,13 +235,8 @@ export class CatalogRepository extends Repository<CatalogEntity> {
             await transaction.delete(CatalogEntity, { id: catalog.id });
         });
 
-        try {
-            await ImageStorageService.INSTANCE.deleteCatalogCoverImage(catalog.id);
-        } catch (error) {
-            if (error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST)) return;
-
-            console.error(error.message);
-        }
+        await this.deleteCatalogAvatarImage(catalog.id);
+        await this.deleteCatalogCoverImage(catalog.id);
     }
 
     async autocomplete({
@@ -324,5 +318,27 @@ export class CatalogRepository extends Repository<CatalogEntity> {
             .getManyAndCount();
 
         return count;
+    }
+
+    private async deleteCatalogAvatarImage(catalogId: number): Promise<void> {
+        try {
+            return ImageStorageService.INSTANCE.deleteCatalogAvatarImage(catalogId);
+        } catch (error) {
+            if (!error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST)) {
+                console.error(error.message);
+            }
+            return Promise.resolve();
+        }
+    }
+
+    private async deleteCatalogCoverImage(catalogId: number): Promise<void> {
+        try {
+            return await ImageStorageService.INSTANCE.deleteCatalogCoverImage(catalogId);
+        } catch (error) {
+            if (!error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST)) {
+                console.error(error.message);
+            }
+            return Promise.resolve();
+        }
     }
 }

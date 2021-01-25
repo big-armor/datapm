@@ -1,7 +1,8 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { CreateCollectionGQL } from "src/generated/graphql";
+import { CreateCollectionGQL, SetCollectionCoverImageGQL } from "src/generated/graphql";
+import { Observable, of } from "rxjs";
 
 type State = "INIT" | "LOADING" | "SUCCESS" | "ERROR";
 
@@ -10,27 +11,29 @@ type State = "INIT" | "LOADING" | "SUCCESS" | "ERROR";
     templateUrl: "./create-collection.component.html",
     styleUrls: ["./create-collection.component.scss"]
 })
-export class CreateCollectionComponent implements OnInit {
+export class CreateCollectionComponent {
     public form: FormGroup;
-    state: State = "INIT";
-    error = "";
+    public state: State = "INIT";
+    public error = "";
+
+    public coverImgData: string;
 
     constructor(
         private dialogRef: MatDialogRef<CreateCollectionComponent>,
         private createCollectionGQL: CreateCollectionGQL,
+        private setCollectionCoverImageGQL: SetCollectionCoverImageGQL,
         @Inject(MAT_DIALOG_DATA) data: { input: string }
     ) {
         this.form = new FormGroup({
             name: new FormControl(data?.input, {
                 validators: [Validators.required]
             }),
-            description: new FormControl("")
+            description: new FormControl(""),
+            isPublic: new FormControl(false)
         });
     }
 
-    ngOnInit(): void {}
-
-    submit() {
+    public submit(): void {
         if (this.state === "LOADING") {
             return;
         }
@@ -47,7 +50,7 @@ export class CreateCollectionComponent implements OnInit {
             .subscribe(
                 (response) => {
                     if (!response.errors) {
-                        this.dialogRef.close(this.form.value);
+                        this.uploadCover(collectionSlug).subscribe(() => this.dialogRef.close(this.form.value));
                         return;
                     }
 
@@ -78,5 +81,24 @@ export class CreateCollectionComponent implements OnInit {
                     } else this.error = "Unknown error occured. Please try again or contact support";
                 }
             );
+    }
+
+    public addCoverImage(imgData: any): void {
+        this.coverImgData = imgData;
+    }
+
+    private uploadCover(collectionSlug: string): Observable<any> {
+        if (!this.coverImgData) {
+            return of(null);
+        }
+
+        return this.setCollectionCoverImageGQL.mutate({
+            identifier: {
+                collectionSlug
+            },
+            image: {
+                base64: this.coverImgData
+            }
+        });
     }
 }

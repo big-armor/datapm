@@ -3,6 +3,15 @@
 #createCatalog {
     position: relative;
     min-width: 500px;
+
+    .catalog-avatar {
+        display: block;
+        margin-left: 30px;
+        margin-bottom: 20px;
+        width: 100px;
+        height: 55px;
+        transform: translateY(-45px);
+    }
 }
 
 @media (max-width: 768px) {

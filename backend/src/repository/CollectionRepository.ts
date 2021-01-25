@@ -23,6 +23,7 @@ export class CollectionRepository extends Repository<CollectionEntity> {
         entity.name = collection.name;
         entity.collectionSlug = collection.collectionSlug;
         entity.description = collection.description;
+        entity.isPublic = collection.isPublic != null && collection.isPublic;
 
         await this.save(entity);
         return this.findCollectionBySlugOrFail(collection.collectionSlug, relations);
@@ -104,9 +105,9 @@ export class CollectionRepository extends Repository<CollectionEntity> {
         try {
             await ImageStorageService.INSTANCE.deleteCollectionCoverImage(collectionIdDb.id);
         } catch (error) {
-            if (error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST)) return;
-
-            console.error(error.message);
+            if (!error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST)) {
+                console.error(error.message);
+            }
         }
     }
 
