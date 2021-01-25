@@ -110,7 +110,8 @@ import {
     packageCreatedAt,
     packageUpdatedAt,
     packageViewedCount,
-    packageIsPublic
+    packageIsPublic,
+    myRecentlyViewedPackages
 } from "./resolvers/PackageResolver";
 
 import { validatePassword } from "./directive/ValidPasswordDirective";
@@ -452,6 +453,7 @@ export const resolvers: {
         package: findPackage,
         latestPackages: getLatestPackages,
         myPackages: myPackages,
+        myRecentlyViewedPackages: myRecentlyViewedPackages,
         collection: findCollectionBySlug,
         collections: findCollectionsForAuthenticatedUser,
         myCollections: myCollections,

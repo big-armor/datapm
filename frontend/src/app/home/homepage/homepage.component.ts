@@ -1,4 +1,8 @@
 import { Component, OnInit } from "@angular/core";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
+import { AuthenticationService } from "src/app/services/authentication.service";
+import { User } from "src/generated/graphql";
 
 @Component({
     selector: "home",
@@ -6,14 +10,21 @@ import { Component, OnInit } from "@angular/core";
     styleUrls: ["./homepage.component.scss"]
 })
 export class HomepageComponent implements OnInit {
+    private unsubscribe$ = new Subject();
+    public currentUser: User;
+
     public routes = [
         // {linkName:'trending',url:'/trending'},
-        { linkName: "latest", url: "" }
-        // {linkName:'following',url:'/following'},
+        { linkName: "latest", url: "", authRequired: false },
+        { linkName: "recently viewed", url: "/viewed", authRequired: true }
         // {linkName:'premium',url:'/premium'},
     ];
 
-    constructor() {}
+    constructor(private authenticationService: AuthenticationService) {}
 
-    ngOnInit(): void {}
+    ngOnInit(): void {
+        this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
+            this.currentUser = user;
+        });
+    }
 }
