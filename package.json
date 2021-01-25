@@ -1,6 +1,6 @@
 {
     "name": "datapm-registry",
-    "version": "0.6.137",
+    "version": "0.6.138",
     "description": "datapm is the easiest way to discover, obtain, manage, and publish data sets. This server acts as a registry (not a repository) of catalogs of packages. Features of datapm-registry include CRUD operations on catalogs and packages, and authorization for each operation. ",
     "main": "backend/dist/index.js",
     "typings": "backend/dist/index.d.ts",
