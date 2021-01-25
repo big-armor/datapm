@@ -1,5 +1,4 @@
-<hr style="width: 100%" class="header-border" />
-<div class="py-5">
+<div>
     <div *ngIf="state == State.LOADING">
         <div class="container">
             <div class="row">
@@ -59,7 +58,7 @@
     </div>
 
     <div *ngIf="state == State.LOADED">
-        <div class="container">
+        <div class="container-fluid">
             <div class="row" id="packagePage">
                 <div class="col-xl-12 col-12 contentContainer pl-0 pr-0">
                     <app-cover
@@ -69,102 +68,119 @@
                     ></app-cover>
 
                     <div class="p-2">
-                        <div class="row" *ngIf="package">
-                            <div class="col-12 package-info">
-                                <!-- <div class="package-title">{{ package?.displayName }}</div> -->
-                                <span
-                                    class="py-2 package-privacy"
-                                    *ngIf="package.myPermissions.includes('MANAGE')"
-                                    [class.public-text]="package?.isPublic"
-                                    [class.not-public-text]="!package?.isPublic"
-                                >
-                                    {{ package?.isPublic ? "public" : "not public" }}
-                                </span>
-                                <div class="d-flex">
-                                    <div class="package-identifier w-100">
-                                        <div class="identifier">
-                                            <app-avatar
-                                                class="user-img"
-                                                *ngIf="catalogUser"
-                                                [user]="catalogUser"
-                                                [size]="40"
-                                            >
-                                            </app-avatar>
-                                            <div class="identifier-text text-overflow-elipses">
-                                                <a [routerLink]="['/' + package?.identifier.catalogSlug]">{{
-                                                    package?.identifier.catalogSlug
-                                                }}</a
-                                                >/{{ package?.identifier.packageSlug }}
+                        <div class="container mb-4">
+                            <div class="row" *ngIf="package">
+                                <div class="col-12 package-info">
+                                    <!-- <div class="package-title">{{ package?.displayName }}</div> -->
+
+                                    <div class="d-flex">
+                                        <div class="package-identifier w-100">
+                                            <div class="identifier">
+                                                <app-avatar
+                                                    class="pr-3 user-img"
+                                                    *ngIf="catalogUser"
+                                                    [user]="catalogUser"
+                                                    [size]="40"
+                                                >
+                                                </app-avatar>
+                                                <div class="d-flex flex-column bd-highlight">
+                                                    <div class="bd-highlight">
+                                                        <span
+                                                            class="pt-2 package-privacy"
+                                                            *ngIf="package.myPermissions.includes('MANAGE')"
+                                                            [class.public-text]="package?.isPublic"
+                                                            [class.not-public-text]="!package?.isPublic"
+                                                        >
+                                                            {{ package?.isPublic ? "public" : "not public" }}
+                                                        </span>
+                                                    </div>
+                                                    <div class="bd-highlight">
+                                                        <a [routerLink]="['/' + package?.identifier.catalogSlug]">{{
+                                                            package?.identifier.catalogSlug
+                                                        }}</a
+                                                        >/{{ package?.identifier.packageSlug }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="derivedFromSubtitle" *ngIf="derivedFromCount(packageFile) > 0">
+                                                Derived from
+                                                <span>
+                                                    <a
+                                                        href="javascript:void(0)"
+                                                        (click)="openDerivedFromModal(packageFile)"
+                                                        >{{ derivedFromCount(packageFile) }} upstream data sets</a
+                                                    >
+                                                </span>
                                             </div>
                                         </div>
-                                        <div class="derivedFromSubtitle" *ngIf="derivedFromCount(packageFile) > 0">
-                                            Derived from
-                                            <span>
-                                                <a href="javascript:void(0)" (click)="openDerivedFromModal(packageFile)"
-                                                    >{{ derivedFromCount(packageFile) }} upstream data sets</a
-                                                >
-                                            </span>
+                                        <div *ngIf="currentUser" class="d-flex align-items-end">
+                                            <a class="app-outlined-button ctaButton" (click)="addToCollection($event)"
+                                                >Add&nbsp;To&nbsp;Collection</a
+                                            >
                                         </div>
-                                    </div>
-                                    <div class="mt-2" *ngIf="currentUser">
-                                        <a class="app-outlined-button ctaButton" (click)="addToCollection($event)"
-                                            >Add&nbsp;To&nbsp;Collection</a
-                                        >
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row d-lg-none">
-                            <div class="col-12">
-                                <app-package-info [package]="package" [packageFile]="packageFile"></app-package-info>
+                            <div class="row d-lg-none mt-3">
+                                <div class="col-12">
+                                    <app-package-info
+                                        [package]="package"
+                                        [packageFile]="packageFile"
+                                    ></app-package-info>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row" *ngIf="package?.latestVersion?.identifier == null">
-                            <div class="col-12 alert alert-warning">
-                                No version of this package has been published. Therefore it is not available to fetch.
-                                Please contact the author, or check back later.
+                            <div class="row" *ngIf="package?.latestVersion?.identifier == null">
+                                <div class="col-12 alert alert-warning">
+                                    No version of this package has been published. Therefore it is not available to
+                                    fetch. Please contact the author, or check back later.
+                                </div>
                             </div>
                         </div>
 
                         <div class="row" *ngIf="package?.latestVersion?.identifier != null">
                             <div class="col-md-12">
-                                <ul class="p-0" id="packageRoutes">
-                                    <li *ngFor="let r of routes" class="list-names">
-                                        <a
-                                            class="cursor-pointer"
-                                            (click)="tabClick(r.url)"
-                                            [ngClass]="{ active: isActiveTab(r) }"
-                                        >
-                                            {{ r.linkName }}
-                                        </a>
-                                    </li>
-                                </ul>
-                                <hr style="width: 100%" />
+                                <hr style="width: 100%" class="header-border" />
+                                <div class="container">
+                                    <ul class="p-0" id="homeRoutes">
+                                        <li *ngFor="let r of routes" class="list-names">
+                                            <a
+                                                class="cursor-pointer"
+                                                (click)="tabClick(r.url)"
+                                                [ngClass]="{ active: isActiveTab(r) }"
+                                            >
+                                                {{ r.linkName }}
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                        <div class="row" *ngIf="package?.latestVersion?.identifier != null">
-                            <div class="col-lg-12">
-                                <div class="row">
-                                    <div class="col-md-12" id="packageDetails">
-                                        <div class="row flex-lg-row-reverse">
-                                            <div
-                                                class="col-lg-5 col-md-12 col-lg-push-7 right-div d-lg-block d-sm-none"
-                                                *ngIf="getActiveTab()?.showDetails"
-                                            >
-                                                <app-package-info
-                                                    [package]="package"
-                                                    [packageFile]="packageFile"
-                                                ></app-package-info>
-                                            </div>
-                                            <div
-                                                [ngClass]="{
-                                                    'col-lg-7 col-md-12 col-lg-pull-5 left-div': getActiveTab()
-                                                        ?.showDetails,
-                                                    'col-12': !getActiveTab()?.showDetails
-                                                }"
-                                            >
-                                                <div>
-                                                    <router-outlet></router-outlet>
+
+                        <div class="container mt-5">
+                            <div class="row" *ngIf="package?.latestVersion?.identifier != null">
+                                <div class="col-lg-12">
+                                    <div class="row">
+                                        <div class="col-md-12" id="packageDetails">
+                                            <div class="row flex-lg-row-reverse">
+                                                <div
+                                                    class="col-lg-5 col-md-12 col-lg-push-7 right-div d-lg-block d-sm-none"
+                                                    *ngIf="getActiveTab()?.showDetails"
+                                                >
+                                                    <app-package-info
+                                                        [package]="package"
+                                                        [packageFile]="packageFile"
+                                                    ></app-package-info>
+                                                </div>
+                                                <div
+                                                    [ngClass]="{
+                                                        'col-lg-7 col-md-12 col-lg-pull-5 left-div': getActiveTab()
+                                                            ?.showDetails,
+                                                        'col-12': !getActiveTab()?.showDetails
+                                                    }"
+                                                >
+                                                    <div>
+                                                        <router-outlet></router-outlet>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
