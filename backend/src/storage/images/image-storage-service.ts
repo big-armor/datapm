@@ -6,7 +6,7 @@ import { UserAvatarImageProcessor } from "./user-avatar-image-processor";
 import { CatalogCoverImageProcessor } from "./catalog-cover-image-processor";
 import { CollectionCoverImageProcessor } from "./collection-cover-image-processor";
 import { PackageCoverImageProcessor } from "./package-cover-image-processor";
-import { CatalogIdentifierInput, CollectionIdentifierInput, PackageIdentifierInput } from "../../generated/graphql";
+import { CatalogAvatarImageProcessor } from "./catalog-avatar-image-processor";
 
 enum ImageTypes {
     PACKAGE_COVER_IMAGE = "package_cover",
@@ -49,7 +49,7 @@ export class ImageStorageService {
             Prefixes.CATALOG + "/" + catalogId,
             ImageTypes.CATALOG_AVATAR,
             imageBase64,
-            new CatalogCoverImageProcessor("image/jpeg")
+            new CatalogAvatarImageProcessor("image/jpeg")
         );
     }
 

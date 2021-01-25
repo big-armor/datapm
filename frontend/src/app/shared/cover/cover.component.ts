@@ -11,18 +11,33 @@ import { User } from "src/generated/graphql";
     styleUrls: ["./cover.component.scss"]
 })
 export class CoverComponent implements OnChanges {
-    @Input() username: string;
-    @Input() catalogSlug: string;
-    @Input() collectionSlug: string;
-    @Input() packageSlug: string;
-    @Input() defaultCover: string;
-    @Input() height: number = 40;
-    @Input() editable: boolean = false;
-    @Output() upload: EventEmitter<any>;
+    @Input()
+    public username: string;
 
-    public imgData = "";
+    @Input()
+    public catalogSlug: string;
+
+    @Input()
+    public collectionSlug: string;
+
+    @Input()
+    public packageSlug: string;
+
+    @Input()
+    public defaultCover: string;
+
+    @Input()
+    public height: number = 40;
+
+    @Input()
+    public editable: boolean = false;
+
+    @Output()
+    public upload: EventEmitter<any>;
+
+    public selectedImageData;
     private inputEventId: string = "";
-    private unsubscribe$ = new Subject();
+    private readonly unsubscribe$ = new Subject();
 
     constructor(private fileService: FileService, private imageService: ImageService) {
         this.upload = new EventEmitter<any>();
@@ -32,6 +47,7 @@ export class CoverComponent implements OnChanges {
                 const reader = new FileReader();
                 reader.onload = () => this.upload.emit(reader.result);
                 reader.readAsDataURL(files[0]);
+                this.selectedImageData = this.imageService.convertBlobToSafeImageObjectUrl(files[0]);
             }
         });
     }
@@ -68,9 +84,9 @@ export class CoverComponent implements OnChanges {
 
         imageObservable.pipe(takeUntil(this.unsubscribe$)).subscribe((imgData: any) => {
             if (imgData) {
-                this.imgData = imgData;
+                this.selectedImageData = imgData;
             } else {
-                this.imgData = this.defaultCover;
+                this.selectedImageData = this.defaultCover;
             }
         });
     }

@@ -7,8 +7,8 @@
 >
     <span *ngIf="state != State.LOADED"></span>
     <span *ngIf="state == State.LOADED">
-        <img [src]="imgData" alt="avatar" *ngIf="imgData" />
-        <div class="letter" *ngIf="!imgData" [style.background]="userBackgroundColor">{{ letter }}</div>
+        <img [src]="selectedImageData" alt="avatar" *ngIf="selectedImageData" />
+        <div class="letter" *ngIf="!selectedImageData" [style.background]="backgroundColor">{{ letter }}</div>
         <button class="add-image-btn" (click)="uploadFile()" *ngIf="editable">
             <mat-icon>add_a_photo</mat-icon>
             <span class="helper-text">click to change</span>

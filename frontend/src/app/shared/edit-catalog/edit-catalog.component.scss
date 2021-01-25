@@ -8,6 +8,14 @@
     .mat-dialog-content {
         border-top: none !important;
 
+        .catalog-avatar {
+            display: block;
+            margin-left: 30px;
+            width: 100px;
+            height: 55px;
+            transform: translateY(-45px);
+        }
+
         app-cover {
             display: block;
             height: 150px;

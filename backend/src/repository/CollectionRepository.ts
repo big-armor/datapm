@@ -23,6 +23,7 @@ export class CollectionRepository extends Repository<CollectionEntity> {
         entity.name = collection.name;
         entity.collectionSlug = collection.collectionSlug;
         entity.description = collection.description;
+        entity.isPublic = collection.isPublic != null && collection.isPublic;
 
         await this.save(entity);
         return this.findCollectionBySlugOrFail(collection.collectionSlug, relations);
