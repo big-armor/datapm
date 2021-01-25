@@ -18,6 +18,10 @@ body {
     font-family: $family-roboto !important;
 }
 
+.cursor-pointer {
+    cursor: pointer;
+}
+
 .mat-spinner circle {
     stroke: $gray-3 !important;
 }
@@ -34,6 +38,12 @@ body {
 .mat-stepper-horizontal,
 .mat-card {
     background-color: inherit;
+}
+
+.cdk-global-scrollblock {
+    position: static !important;
+    width: initial !important;
+    overflow-y: inherit !important;
 }
 
 .mat-dialog-container {

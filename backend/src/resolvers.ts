@@ -20,7 +20,7 @@ import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { UserCatalogPermissionRepository } from "./repository/CatalogPermissionRepository";
-import { isAuthenticatedContext } from "./util/contextHelpers";
+import { isRequestingUserOrAdmin } from "./util/contextHelpers";
 import { UserInputError } from "apollo-server";
 import { parsePackageFileJSON, validatePackageFile } from "datapm-lib";
 import graphqlFields from "graphql-fields";
@@ -61,8 +61,7 @@ import {
 } from "./resolvers/VersionResolver";
 import {
     setUserCollectionPermissions,
-    deleteUserCollectionPermissions,
-    hasCollectionPermissions
+    deleteUserCollectionPermissions
 } from "./resolvers/UserCollectionPermissionResolver";
 import { deleteUserCatalogPermissions, hasCatalogPermissions } from "./resolvers/UserCatalogPermissionResolver";
 import { login, logout, verifyEmailAddress } from "./resolvers/AuthResolver";
@@ -78,7 +77,9 @@ import {
     forgotMyPassword,
     recoverMyPassword,
     searchUsers,
-    setAsAdmin
+    setAsAdmin,
+    adminSearchUsers,
+    adminDeleteUser
 } from "./resolvers/UserResolver";
 import { createAPIKey, deleteAPIKey, myAPIKeys } from "./resolvers/ApiKeyResolver";
 import {
@@ -134,9 +135,11 @@ import {
     catalogWebsite,
     createCatalog,
     deleteCatalog,
+    deleteCatalogAvatarImage,
     myCatalogPermissions,
     myCatalogs,
     searchCatalogs,
+    setCatalogAvatarImage,
     setCatalogCoverImage,
     setUserCatalogPermission,
     updateCatalog,
@@ -285,10 +288,9 @@ export const resolvers: {
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
 
-            if (user.nameIsPublic) return user.firstName || null;
-
-            if (isAuthenticatedContext(context) && context.me?.username === user.username)
+            if (isRequestingUserOrAdmin(context, user.username) || user.nameIsPublic) {
                 return user.firstName || null;
+            }
 
             return null;
         },
@@ -297,9 +299,9 @@ export const resolvers: {
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
 
-            if (user.nameIsPublic) return user.lastName || null;
-
-            if (isAuthenticatedContext(context) && context.me?.username === user.username) return user.lastName || null;
+            if (isRequestingUserOrAdmin(context, user.username) || user.nameIsPublic) {
+                return user.lastName || null;
+            }
 
             return null;
         },
@@ -308,9 +310,9 @@ export const resolvers: {
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
 
-            if (user.emailAddressIsPublic) return user.emailAddress;
-
-            if (isAuthenticatedContext(context) && context.me?.username === user.username) return user.emailAddress;
+            if (isRequestingUserOrAdmin(context, user.username) || user.emailAddressIsPublic) {
+                return user.emailAddress;
+            }
 
             return null;
         },
@@ -319,10 +321,9 @@ export const resolvers: {
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
 
-            if (user.twitterHandleIsPublic) return user.twitterHandle || null;
-
-            if (isAuthenticatedContext(context) && context.me?.username === user.username)
+            if (isRequestingUserOrAdmin(context, user.username) || user.twitterHandleIsPublic) {
                 return user.twitterHandle || null;
+            }
 
             return null;
         },
@@ -331,10 +332,9 @@ export const resolvers: {
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
 
-            if (user.gitHubHandleIsPublic) return user.gitHubHandle || null;
-
-            if (isAuthenticatedContext(context) && context.me?.username === user.username)
+            if (isRequestingUserOrAdmin(context, user.username) || user.gitHubHandleIsPublic) {
                 return user.gitHubHandle || null;
+            }
 
             return null;
         },
@@ -343,9 +343,9 @@ export const resolvers: {
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
 
-            if (user.websiteIsPublic) return user.website || null;
-
-            if (isAuthenticatedContext(context) && context.me?.username === user.username) return user.website || null;
+            if (isRequestingUserOrAdmin(context, user.username) || user.websiteIsPublic) {
+                return user.website || null;
+            }
 
             return null;
         },
@@ -354,9 +354,9 @@ export const resolvers: {
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
 
-            if (user.locationIsPublic) return user.location || null;
-
-            if (isAuthenticatedContext(context) && context.me?.username === user.username) return user.location || null;
+            if (isRequestingUserOrAdmin(context, user.username) || user.locationIsPublic) {
+                return user.location || null;
+            }
 
             return null;
         }
@@ -499,6 +499,7 @@ export const resolvers: {
         usernameAvailable: usernameAvailable,
         emailAddressAvailable: emailAddressAvailable,
         searchUsers: searchUsers,
+        adminSearchUsers: adminSearchUsers,
         myActivity: myActivity,
         packageActivities: packageActivities
     },
@@ -519,6 +520,7 @@ export const resolvers: {
         setMyCoverImage: setMyCoverImage,
         setMyAvatarImage: setMyAvatarImage,
         deleteMe: deleteMe,
+        adminDeleteUser: adminDeleteUser,
 
         // API Keys
         createAPIKey: createAPIKey,
@@ -529,6 +531,8 @@ export const resolvers: {
         updateCatalog: updateCatalog,
 
         setCatalogCoverImage: setCatalogCoverImage,
+        setCatalogAvatarImage: setCatalogAvatarImage,
+        deleteCatalogAvatarImage: deleteCatalogAvatarImage,
 
         setUserCatalogPermission: setUserCatalogPermission,
 

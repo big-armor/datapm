@@ -13,9 +13,25 @@ import { FollowingComponent } from "./following/following.component";
 import { LatestComponent } from "./latest/latest.component";
 import { TrendingComponent } from "./trending/trending.component";
 import { RecentlyViewedComponent } from "./recently-viewed/recently-viewed.component";
+import { AdminDashboardComponent } from "./admin-dashboard/admin-dashboard.component";
+import { UsersComponent } from "./admin-dashboard/users/users.component";
+import { MatTableModule } from "@angular/material/table";
+import { MatPaginatorModule } from "@angular/material/paginator";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { FormsModule } from "@angular/forms";
+import { MatInputModule } from "@angular/material/input";
 
 @NgModule({
-    declarations: [FollowingComponent, HomepageComponent, LatestComponent, TrendingComponent, RecentlyViewedComponent],
+    declarations: [
+        FollowingComponent,
+        HomepageComponent,
+        LatestComponent,
+        TrendingComponent,
+        AdminDashboardComponent,
+        UsersComponent,
+        RecentlyViewedComponent
+    ],
     imports: [
         CommonModule,
         HomeRoutingModule,
@@ -23,7 +39,13 @@ import { RecentlyViewedComponent } from "./recently-viewed/recently-viewed.compo
         MatCardModule,
         MatChipsModule,
         MatIconModule,
-        SharedModule
+        SharedModule,
+        MatTableModule,
+        MatPaginatorModule,
+        MatProgressSpinnerModule,
+        MatFormFieldModule,
+        MatInputModule,
+        FormsModule
     ]
 })
 export class HomeModule {}

@@ -6,6 +6,7 @@ import { CreateCollectionInput, UpdateCollectionInput } from "../generated/graph
 import { StorageErrors } from "../storage/files/file-storage-service";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { UserRepository } from "./UserRepository";
+import { ReservedKeywordsService } from "../service/reserved-keywords-service";
 
 @EntityRepository(CollectionEntity)
 export class CollectionRepository extends Repository<CollectionEntity> {
@@ -16,11 +17,13 @@ export class CollectionRepository extends Repository<CollectionEntity> {
         collection: CreateCollectionInput,
         relations?: string[]
     ): Promise<CollectionEntity> {
+        ReservedKeywordsService.validateReservedKeyword(collection.collectionSlug);
         const entity = new CollectionEntity();
         entity.creatorId = creator.id;
         entity.name = collection.name;
         entity.collectionSlug = collection.collectionSlug;
         entity.description = collection.description;
+        entity.isPublic = collection.isPublic != null && collection.isPublic;
 
         await this.save(entity);
         return this.findCollectionBySlugOrFail(collection.collectionSlug, relations);
@@ -34,6 +37,7 @@ export class CollectionRepository extends Repository<CollectionEntity> {
         const collectionIdDb = await this.findCollectionBySlugOrFail(collectionSlug, relations);
 
         if (collection.newCollectionSlug) {
+            ReservedKeywordsService.validateReservedKeyword(collection.newCollectionSlug);
             collectionIdDb.collectionSlug = collection.newCollectionSlug;
         }
 
@@ -101,9 +105,9 @@ export class CollectionRepository extends Repository<CollectionEntity> {
         try {
             await ImageStorageService.INSTANCE.deleteCollectionCoverImage(collectionIdDb.id);
         } catch (error) {
-            if (error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST)) return;
-
-            console.error(error.message);
+            if (!error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST)) {
+                console.error(error.message);
+            }
         }
     }
 

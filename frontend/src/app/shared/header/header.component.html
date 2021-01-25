@@ -83,6 +83,7 @@
                         <mat-icon>person</mat-icon>
                     </button>
                     <mat-menu #beforeMenu="matMenu" xPosition="before">
+                        <button *ngIf="currentUser?.isAdmin" mat-menu-item (click)="goToAdminDashboard()">Admin</button>
                         <button *ngIf="currentUser" mat-menu-item (click)="goToMyDetails()">My Profile</button>
                         <button *ngIf="!currentUser" mat-menu-item (click)="openLoginDialog()">Log In</button>
                         <button *ngIf="!currentUser" mat-menu-item (click)="openSignUpDialog()">Sign Up</button>

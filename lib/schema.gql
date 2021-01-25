@@ -531,6 +531,7 @@ input CreateCollectionInput {
     collectionSlug: String! @validCollectionSlug(allowNull: false)
     name: String!
     description: String
+    isPublic: Boolean
 }
 
 """
@@ -666,6 +667,11 @@ type Query {
     searchUsers(value: String!, limit: Int!, offSet: Int!): SearchUsersResult!
 
     """
+    Returns users that match the given search query with no restrictions
+    """
+    adminSearchUsers(value: String!, limit: Int!, offSet: Int!): SearchUsersResult! @isAdmin
+
+    """
     Returns the latest packages
     """
     latestPackages(offSet: Int!, limit: Int!): LatestPackagesResult!
@@ -796,6 +802,11 @@ type Mutation {
     deleteMe: Void @isAuthenticated
 
     """
+    Deletes a user's account
+    """
+    adminDeleteUser(username: String!): Void @isAdmin
+
+    """
     Using a username or email address and a password, requests authentication information for the given user
     """
     login(username: String! @validUsernameOrEmailAddress, password: String! @validPassword): String!
@@ -827,6 +838,20 @@ type Mutation {
         identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: EDIT)
         value: UpdateCatalogInput!
     ): Catalog!
+
+    """
+    Updates the cover image of the catalog
+    """
+    setCatalogAvatarImage(
+        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: EDIT)
+        image: Base64ImageUpload! @validBase64Image
+    ): Void @isAuthenticated
+
+    """
+    Updates the cover image of the catalog
+    """
+    deleteCatalogAvatarImage(identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: EDIT)): Void
+        @isAuthenticated
 
     """
     Updates the cover image of the catalog

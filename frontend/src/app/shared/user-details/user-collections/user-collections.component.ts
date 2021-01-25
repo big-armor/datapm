@@ -58,9 +58,9 @@ export class UserCollectionsComponent implements OnInit {
                 data: formValue
             })
             .afterClosed()
-            .subscribe((collectionSlug) => {
-                if (collectionSlug) {
-                    this.router.navigate(["/collection/" + collectionSlug]);
+            .subscribe((collection) => {
+                if (collection) {
+                    this.router.navigate(["/collection/" + collection.name]);
                 }
             });
     }

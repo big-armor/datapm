@@ -3,11 +3,10 @@
 .avatar {
     background-size: contain;
     background-position: center;
-    border-radius: 50%;
+
     box-shadow: 1px 0px 4px rgba(255, 255, 255, 0.25), 0px 4px 4px rgba(255, 255, 255, 0.25),
         0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
     position: relative;
-    border-radius: 50%;
     overflow: hidden;
 
     img {
@@ -16,6 +15,11 @@
         object-fit: cover;
     }
 }
+
+.avatar-circle {
+    border-radius: 50%;
+}
+
 .add-image-btn {
     border: none;
     background: rgba(#000, 0.45);
