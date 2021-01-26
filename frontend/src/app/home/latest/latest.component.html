@@ -1,4 +1,4 @@
-<div class="container" *ngIf="state == State.LOADING">
+<!-- <div class="container" *ngIf="state == State.LOADING">
     <div class="row">
         <div class="col-12">
             <div class="loading-spinner loading-pane">
@@ -6,9 +6,9 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
-<div class="container" *ngIf="state == State.ERROR">
+<!-- <div class="container" *ngIf="state == State.ERROR">
     <div class="row">
         <div class="col-12 mt-5">
             <div class="alert-warning alert">
@@ -17,35 +17,33 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
-<div *ngIf="state == State.LOADED">
+<div>
     <div class="container">
         <div class="row">
             <div class="col-lg-10 offset-lg-1 col-md-12 col-sm-12 mt-5 py-2">
                 <div class="row big-div-latest mb-3">
-                    <div *ngIf="packages.length" class="col-md-12 col-lg-12">
+                    <div class="col-md-12 col-lg-12">
                         <h1 class="h1-title">Recently updated</h1>
                     </div>
 
                     <!-- Package without thumbnail -->
-                    <div class="col-md-12 col-lg-12 pb-2 mb-4" *ngIf="packages.length">
+                    <div class="col-md-12 col-lg-12 pb-2 mb-4">
                         <app-package-and-collection
-                            [packages]="packages"
-                            [collections]="[]"
                             [packagesLimit]="LIMIT_PER_LOAD"
-                            [hasMorePackages]="hasMorePackages"
-                            (loadPackages)="loadPackages($event)"
+                            [packagesQuery]="packagesQuery"
+                            (onLoadPackagesClick)="updatePackageFetchingQuery($event)"
                         >
                         </app-package-and-collection>
                     </div>
-                    <div class="col-md-12 col-lg-12 pb-2 mb-4 not-found" *ngIf="!packages.length">
+                    <!-- <div class="col-md-12 col-lg-12 pb-2 mb-4 not-found" *ngIf="!packages.length">
                         <p>
                             Either no packages have been published to this registry, or you do not have access to any of
                             the published packages
                         </p>
                         <a href="/docs/publish-data/" class="pt-3">Learn how to publish packages</a>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>

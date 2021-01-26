@@ -1,18 +1,19 @@
-import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
 import { Collection, Package } from "src/generated/graphql";
 import { LimitAndOffset } from "./limit-and-offset";
-
+import { PackagesResponse } from "./packages-response";
+import { Observable } from "rxjs";
 @Component({
     selector: "app-package-and-collection",
     templateUrl: "./package-and-collection.component.html",
     styleUrls: ["./package-and-collection.component.scss"]
 })
-export class PackageAndCollectionComponent {
-    @Input()
-    public collections: Collection[];
+export class PackageAndCollectionComponent implements OnInit, OnChanges {
+    public collections: Collection[] = [];
+    public packages: Package[] = [];
 
     @Input()
-    public packages: Package[];
+    public packagesQuery: Observable<PackagesResponse>;
 
     @Input()
     public title: string;
@@ -39,20 +40,39 @@ export class PackageAndCollectionComponent {
     public hasMorePackages: boolean = false;
 
     @Output()
-    public loadCollections = new EventEmitter<LimitAndOffset>();
+    public onLoadCollectionsClick = new EventEmitter<LimitAndOffset>();
 
     @Output()
-    public loadPackages = new EventEmitter<LimitAndOffset>();
+    public onLoadPackagesClick = new EventEmitter<LimitAndOffset>();
 
-    public loadMoreCollections(): void {
-        this.loadCollections.emit({
+    public ngOnInit(): void {
+        this.requestMorePackages();
+    }
+
+    public ngOnChanges(changes: SimpleChanges): void {
+        console.log("changes mali", changes);
+        // debugger
+        if (changes.packagesQuery && changes.packagesQuery.currentValue) {
+            this.loadMorePackages();
+        }
+    }
+
+    private loadMorePackages(): void {
+        this.packagesQuery.subscribe((response) => {
+            this.packages = this.packages.concat(response.packages);
+            this.hasMorePackages = response.hasMore;
+        });
+    }
+
+    public requestMoreCollections(): void {
+        this.onLoadCollectionsClick.emit({
             limit: this.collectionsLimit,
             offset: this.collections.length
         });
     }
 
-    public loadMorePackages(): void {
-        this.loadPackages.emit({
+    public requestMorePackages(): void {
+        this.onLoadPackagesClick.emit({
             limit: this.packagesLimit,
             offset: this.packages.length
         });

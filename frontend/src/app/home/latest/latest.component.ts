@@ -1,12 +1,10 @@
-import { Component, OnInit } from "@angular/core";
+import { ChangeDetectorRef, Component, OnInit } from "@angular/core";
 import { GetLatestPackagesGQL, Package } from "src/generated/graphql";
 import { LimitAndOffset } from "src/app/shared/package-and-collection/limit-and-offset";
-
-enum State {
-    LOADED,
-    LOADING,
-    ERROR
-}
+import { PackageResponse } from "src/app/package/services/package.service";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
+import { PackagesResponse } from "src/app/shared/package-and-collection/packages-response";
 @Component({
     selector: "latest",
     templateUrl: "./latest.component.html",
@@ -15,34 +13,35 @@ enum State {
 export class LatestComponent implements OnInit {
     public readonly LIMIT_PER_LOAD = 1;
 
-    public State = State;
-    public state = State.LOADING;
-    public packages: Package[] = [];
+    public packagesQuery: Observable<PackagesResponse>;
 
-    public hasMorePackages = false;
-
-    constructor(private latestPackages: GetLatestPackagesGQL) {}
+    constructor(private latestPackages: GetLatestPackagesGQL, private cdr: ChangeDetectorRef) {}
 
     public ngOnInit(): void {
-        this.state = State.LOADING;
-        this.loadPackages({ limit: this.LIMIT_PER_LOAD, offset: 0 });
+        this.cdr.detectChanges();
     }
 
-    public loadPackages(limitAndOffset: LimitAndOffset): void {
-        this.latestPackages.fetch(limitAndOffset).subscribe(
-            (response) => {
-                if (response.errors) {
-                    this.state = State.ERROR;
-                    return;
-                }
+    public updatePackageFetchingQuery(limitAndOffset: LimitAndOffset): void {
+        this.packagesQuery = this.latestPackages.fetch(limitAndOffset).pipe(
+            map(
+                (response) => {
+                    if (response.errors) {
+                        return {
+                            errors: response.errors.map((e) => e.message)
+                        };
+                    }
 
-                this.packages = this.packages.concat(response.data.latestPackages.packages as Package[]);
-                this.hasMorePackages = response.data.latestPackages.hasMore;
-                this.state = State.LOADED;
-            },
-            (error) => {
-                this.state = State.ERROR;
-            }
+                    return {
+                        packages: response.data.latestPackages.packages as Package[],
+                        hasMore: response.data.latestPackages.hasMore
+                    };
+                },
+                (error) => {
+                    return {
+                        errors: [error]
+                    };
+                }
+            )
         );
     }
 }

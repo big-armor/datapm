@@ -5,7 +5,7 @@
         </div>
 
         <div *ngIf="collections.length && hasMoreCollections">
-            <a class="app-outlined-button ctaButton" (click)="loadMoreCollections()">Load&nbsp;More</a>
+            <a class="app-outlined-button ctaButton" (click)="requestMoreCollections()">Load&nbsp;More</a>
         </div>
     </div>
 </div>
@@ -16,7 +16,7 @@
         </div>
 
         <div *ngIf="packages.length && hasMorePackages">
-            <a class="app-outlined-button ctaButton" (click)="loadMorePackages()">Load&nbsp;More</a>
+            <a class="app-outlined-button ctaButton" (click)="requestMorePackages()">Load&nbsp;More</a>
         </div>
     </div>
 </div>
