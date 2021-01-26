@@ -1,63 +1,60 @@
 <app-cover [username]="user?.username" id="profileCover"></app-cover>
 <div class="row" *ngIf="user" id="detailsHeader">
-    <div class="col-lg-8 col-xs-12">
+    <div class="col-lg-9 col-xs-12">
         <div class="d-flex user-header">
             <div class="p-2">
-                <app-avatar class="user-img" [user]="user" [size]="64"></app-avatar>
+                <app-avatar class="user-img" [user]="user" [size]="74"></app-avatar>
             </div>
-            <div class="p-2" [class.not-current-user]="!isCurrentUser">
+            <div class="p-2 align-self-center" [class.not-current-user]="!isCurrentUser">
                 <span *ngIf="user.firstName && user.lastName && (user.nameIsPublic || isCurrentUser)">
-                    <span class="dpm-text-title">
-                        {{ user | username }}
-                    </span>
-                    &nbsp;
-                    <span *ngIf="user.nameIsPublic" class="public-text">public</span>
-                    <span *ngIf="!user.nameIsPublic" class="not-public-text">not public</span><br />
+                    <span class="dpm-text-middle">{{ user | username }}</span>
+                    <span *ngIf="user.nameIsPublic" class="public-text">(public)</span>
+                    <span *ngIf="!user.nameIsPublic" class="not-public-text">(not public)</span><br />
                 </span>
 
                 <div class="username dpm-text-body my-2">
-                    {{ "@" + user.username }} <span class="public-text">public</span>
+                    {{ "@" + user.username }}<span class="public-text">(public)</span>
                 </div>
+            </div>
+        </div>
+        <div class="px-3">
+            <div *ngIf="user.website && (user.websiteIsPublic || isCurrentUser)" class="pb-1">
+                <span class="social-link">
+                    <a target="_blank" href="{{ user.website }}">{{ user.website }}</a>
+                    <span *ngIf="user.websiteIsPublic" class="public-text">(public)</span>
+                    <span *ngIf="!user.websiteIsPublic" class="not-public-text">(not public)</span>
+                </span>
+            </div>
 
-                <div *ngIf="user.website && (user.websiteIsPublic || isCurrentUser)" class="pb-1">
-                    <span class="social-link">
-                        <a target="_blank" href="{{ user.website }}">{{ user.website }}</a>
-                        &nbsp;
-                        <span *ngIf="user.websiteIsPublic" class="public-text">public</span>
-                        <span *ngIf="!user.websiteIsPublic" class="not-public-text">not public</span>
-                    </span>
-                </div>
-
+            <div class="py-1">
                 <span class="social-link" *ngIf="user.emailAddressIsPublic || isCurrentUser">
-                    <a target="_blank" href="mailto:{{ user.emailAddress }}">
+                    <a target="_blank" href="mailto:{{ user.emailAddress }}" class="social-img">
                         <img src="/assets/images/envelope.png" width="24" alt="email" />
                     </a>
-                    &nbsp;
-                    <span *ngIf="user.emailAddressIsPublic" class="public-text">public</span>
-                    <span *ngIf="!user.emailAddressIsPublic" class="not-public-text">not public</span>
+                    <span *ngIf="user.emailAddressIsPublic" class="public-text">(public)</span>
+                    <span *ngIf="!user.emailAddressIsPublic" class="not-public-text">(not public)</span>
                 </span>
 
                 <span class="social-link" *ngIf="user.twitterHandle && (user.twitterHandleIsPublic || isCurrentUser)">
-                    <a target="_blank" href="https://twitter.com/{{ user.twitterHandle }}">
+                    <a target="_blank" href="https://twitter.com/{{ user.twitterHandle }}" class="social-img">
                         <img src="/assets/images/twitter.png" style="opacity: 0.8" width="24" alt="twitter" />
                     </a>
-                    &nbsp;
-                    <span *ngIf="user.twitterHandleIsPublic" class="public-text">public</span>
-                    <span *ngIf="!user.twitterHandleIsPublic" class="not-public-text">not public</span>
+                    <span *ngIf="user.twitterHandleIsPublic" class="public-text">(public)</span>
+                    <span *ngIf="!user.twitterHandleIsPublic" class="not-public-text">(not public)</span>
                 </span>
+
                 <span class="social-link" *ngIf="user.gitHubHandle && (user.gitHubHandleIsPublic || isCurrentUser)">
-                    <a target="_blank" href="https://github.com/{{ user.gitHubHandle }}">
+                    <a target="_blank" href="https://github.com/{{ user.gitHubHandle }}" class="social-img">
                         <img src="/assets/images/github.png" style="opacity: 0.8" width="24" alt="twitter" />
                     </a>
-                    &nbsp;
-                    <span *ngIf="user.gitHubHandleIsPublic" class="public-text">public</span>
-                    <span *ngIf="!user.gitHubHandleIsPublic" class="not-public-text">not public</span>
+                    <span *ngIf="user.gitHubHandleIsPublic" class="public-text">(public)</span>
+                    <span *ngIf="!user.gitHubHandleIsPublic" class="not-public-text">(not public)</span>
                 </span>
-                <p class="user-bio">
-                    {{ user.description }}
-                </p>
             </div>
-            <div class="p-2"></div>
+
+            <p class="user-bio">
+                {{ user.description }}
+            </p>
         </div>
     </div>
     <div class="col-lg-4 col-xs-12 contact-info"><!-- future follow button--></div>

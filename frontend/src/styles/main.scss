@@ -323,13 +323,17 @@ mat-select {
     margin: 0px 10px;
     margin-top: 2px;
 }
+
 .public-text {
     @include text("small");
     color: $color-1;
+    margin-left: 6px;
 }
+
 .not-public-text {
     @include text("small");
     color: $gray-3;
+    margin-left: 6px;
 }
 
 .autocomplete-title {
@@ -574,6 +578,36 @@ button:disabled {
     }
 }
 
+#homeRoutes {
+    list-style-type: none;
+    margin-bottom: 0px;
+    display: flex;
+
+    li {
+        a {
+            font-family: $family-roboto-mono;
+            font-style: $style-normal;
+            font-weight: $weight-300;
+            font-size: $default-font;
+            line-height: 24px;
+            text-align: center;
+            letter-spacing: -0.28px;
+            color: $gray-3;
+            text-decoration: none;
+            padding: 0px 10px 4px 10px;
+            margin: 0px 10px;
+            position: relative;
+            bottom: 25px;
+        }
+    }
+
+    .active {
+        opacity: 1;
+        color: $gray-1 !important;
+        border-bottom: 2px solid $gray-1;
+    }
+}
+
 @media (max-width: 768px) {
     #contentBorder {
         padding: 0px;
@@ -664,5 +698,27 @@ button:disabled {
         top: 0.83rem;
         height: 9px;
         margin: 3px;
+    }
+    #homeRoutes {
+        li {
+            a {
+                font-size: ($text-font - 1);
+                padding: 0px 8px 4px 8px;
+                margin: 0px 6px;
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    #homeRoutes {
+        li {
+            &:first-child {
+                a {
+                    margin-left: 0px !important;
+                    padding-left: 0px;
+                }
+            }
+        }
     }
 }

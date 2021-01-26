@@ -14,6 +14,10 @@
         @include text("title");
     }
 
+    .dpm-text-middle {
+        @include text("middle");
+    }
+
     .dpm-text-label,
     .dpm-text-body {
         @include text("body");

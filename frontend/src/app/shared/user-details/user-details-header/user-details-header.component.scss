@@ -1,29 +1,40 @@
 @import "../../../../styles/variables";
 @import "../../../../styles/mixins";
+@import "../../../../styles/variables";
 
 #detailsHeader {
+    .social-link {
+        display: inline-block;
+        margin-right: 20px;
+    }
+
+    .user-bio {
+        font-family: $family-roboto;
+        letter-spacing: 0.4px;
+        font-style: $style-normal;
+        font-weight: $weight-300;
+        margin-top: 4px;
+        font-size: 13px;
+        color: $black;
+        overflow: hidden;
+    }
+
     .user-header {
+        margin-top: -20px;
+
         .user-img {
-            margin-top: -32px;
             display: block;
         }
 
         .username {
             color: $gray-3;
             font-weight: 300;
-        }
-
-        .social-link {
-            display: inline-block;
-            margin-right: 1em;
+            margin-top: 0px !important;
+            margin-bottom: 0px !important;
         }
 
         :host {
             display: block;
-        }
-
-        .user-bio {
-            margin-top: 1em;
         }
 
         .not-current-user {
