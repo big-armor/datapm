@@ -1,0 +1,25 @@
+<div *ngIf="!loadingCollections; else collectionsLoadingTemplate">
+    <div *ngIf="collections">
+        <div *ngFor="let collection of collections">
+            {{ collection.name }}
+        </div>
+
+        <div *ngIf="collections.length && hasMoreCollections">
+            <a class="app-outlined-button ctaButton" (click)="loadMoreCollections()">Load&nbsp;More</a>
+        </div>
+    </div>
+</div>
+<div *ngIf="!loadingPackages; else packagesLoadingTemplate">
+    <div *ngIf="packages">
+        <div *ngFor="let package of packages">
+            <app-package-item [item]="package"></app-package-item>
+        </div>
+
+        <div *ngIf="packages.length && hasMorePackages">
+            <a class="app-outlined-button ctaButton" (click)="loadMorePackages()">Load&nbsp;More</a>
+        </div>
+    </div>
+</div>
+
+<ng-template #collectionsLoadingTemplate> Loading collections... </ng-template>
+<ng-template #packagesLoadingTemplate> Loading packages... </ng-template>

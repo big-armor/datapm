@@ -1,11 +1,6 @@
 import { Component, OnInit } from "@angular/core";
-import { GetLatestPackagesGQL } from "src/generated/graphql";
-import { getTimeDifferenceLabel } from "src/app/helpers/TimeUtil";
-
-class PackageWithModifiedDate {
-    package: any;
-    lastActivityLabel: string;
-}
+import { GetLatestPackagesGQL, Package } from "src/generated/graphql";
+import { LimitAndOffset } from "src/app/shared/package-and-collection/limit-and-offset";
 
 enum State {
     LOADED,
@@ -18,73 +13,36 @@ enum State {
     styleUrls: ["./latest.component.scss"]
 })
 export class LatestComponent implements OnInit {
-    State = State;
-    state = State.LOADING;
-    public isFavorite = false;
-    public packagesWithModifiedDate: PackageWithModifiedDate[] = [];
+    public readonly LIMIT_PER_LOAD = 1;
+
+    public State = State;
+    public state = State.LOADING;
+    public packages: Package[] = [];
+
+    public hasMorePackages = false;
 
     constructor(private latestPackages: GetLatestPackagesGQL) {}
 
     public ngOnInit(): void {
         this.state = State.LOADING;
-        this.loadLatestPackages();
+        this.loadPackages({ limit: this.LIMIT_PER_LOAD, offset: 0 });
     }
 
-    public makeFavorite(): void {
-        this.isFavorite = !this.isFavorite;
-    }
-
-    private loadLatestPackages(): void {
-        this.latestPackages.fetch({ offset: 0, limit: 5 }).subscribe(
+    public loadPackages(limitAndOffset: LimitAndOffset): void {
+        this.latestPackages.fetch(limitAndOffset).subscribe(
             (response) => {
                 if (response.errors) {
                     this.state = State.ERROR;
                     return;
                 }
 
-                const dateNow = new Date();
-                this.packagesWithModifiedDate = response.data.latestPackages.packages.map((p) => {
-                    const changeDates = this.getLastChangedDates(p);
-                    return {
-                        package: p,
-                        lastActivityLabel: this.getUpdatedDateLabel(
-                            new Date(changeDates.createdAt),
-                            new Date(changeDates.updatedAt),
-                            dateNow
-                        )
-                    };
-                });
+                this.packages = this.packages.concat(response.data.latestPackages.packages as Package[]);
+                this.hasMorePackages = response.data.latestPackages.hasMore;
                 this.state = State.LOADED;
             },
             (error) => {
                 this.state = State.ERROR;
             }
         );
-    }
-
-    private getLastChangedDates(pkg: any): { createdAt: Date; updatedAt: Date } {
-        if (pkg.latestVersion != null) {
-            return {
-                createdAt: pkg.latestVersion.createdAt,
-                updatedAt: pkg.latestVersion.updatedAt
-            };
-        } else {
-            return {
-                createdAt: pkg.createdAt,
-                updatedAt: pkg.updatedAt
-            };
-        }
-    }
-
-    private getUpdatedDateLabel(createdAtDate: Date, updatedAtDate: Date, dateNow: Date): string {
-        let actionLabel;
-        if (createdAtDate.getTime() == updatedAtDate.getTime()) {
-            actionLabel = "Created ";
-        } else {
-            actionLabel = "Updated ";
-        }
-
-        const differenceLabel = getTimeDifferenceLabel(updatedAtDate, dateNow);
-        return actionLabel + differenceLabel;
     }
 }

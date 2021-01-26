@@ -52,6 +52,7 @@ import { MatInputModule } from "@angular/material/input";
 import { DeletePackageComponent } from "./delete-package/delete-package.component";
 import { MatSelectModule } from "@angular/material/select";
 import { FancyConfirmationDialogComponent } from "./dialogs/fancy-confirmation-dialog/fancy-confirmation-dialog.component";
+import { PackageAndCollectionComponent } from "./package-and-collection/package-and-collection.component";
 
 @NgModule({
     declarations: [
@@ -89,7 +90,8 @@ import { FancyConfirmationDialogComponent } from "./dialogs/fancy-confirmation-d
         UserDetailsComponent,
         SimpleCreateComponent,
         DeletePackageComponent,
-        FancyConfirmationDialogComponent
+        FancyConfirmationDialogComponent,
+        PackageAndCollectionComponent
     ],
     imports: [
         CommonModule,
@@ -142,7 +144,8 @@ import { FancyConfirmationDialogComponent } from "./dialogs/fancy-confirmation-d
         EditAccountDialogComponent,
         EditPasswordDialogComponent,
         UserDetailsComponent,
-        FancyConfirmationDialogComponent
+        FancyConfirmationDialogComponent,
+        PackageAndCollectionComponent
     ],
     providers: [TimeAgoPipe, { provide: MAT_DIALOG_DATA, useValue: {} }]
 })
