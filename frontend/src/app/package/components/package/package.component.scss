@@ -7,22 +7,18 @@
 }
 
 .identifier {
-    font-family: $family-roboto-mono;
+    font-family: $family-roboto;
     position: relative;
     display: flex;
+    color: $gray-2;
     justify-content: left;
     align-items: center;
-    font-size: ($title-font - 2);
-
-    .identifier-text {
-        position: relative;
-        top: -6px;
-        left: 10px;
-    }
+    font-weight: $weight-400;
+    font-size: $title-font;
+    letter-spacing: 0.18px;
 }
 
 .package-privacy {
-    margin-bottom: 10px;
     display: block;
 }
 
@@ -38,18 +34,17 @@
 }
 
 .package-identifier {
-    font-family: $family-roboto-mono;
+    font-family: $family-roboto;
     font-style: $style-normal;
     font-weight: $weight-400;
     font-size: $text-font;
     line-height: 26px;
     letter-spacing: -0.28px;
     color: $gray-3;
-    margin-bottom: 10px;
 }
 
 #packageDetails {
-    min-height: 500px;
+    min-height: 450px;
 
     .left-div {
         padding-right: 30px;
@@ -74,52 +69,6 @@
     ::ng-deep .cover img {
         border-bottom-left-radius: 4px;
         border-bottom-right-radius: 4px;
-    }
-
-    #packageRoutes {
-        list-style-type: none;
-        margin-bottom: 0px;
-        display: flex;
-
-        li:first-of-type > a {
-            margin-left: 0px;
-        }
-
-        li {
-            a {
-                font-family: $family-roboto-mono;
-                font-style: $style-normal;
-                font-weight: $weight-300;
-                font-size: $default-font;
-                line-height: 21px;
-                text-align: center;
-                letter-spacing: -0.28px;
-                color: $gray-3;
-                text-decoration: none;
-                padding: 0px 10px 7px 10px;
-                margin: 0px 10px;
-                cursor: pointer;
-            }
-        }
-
-        .active {
-            opacity: 1;
-            color: $gray-1 !important;
-            border-bottom: 2px solid $gray-1;
-        }
-    }
-}
-
-@media (max-width: 480px) {
-    #packageRoutes {
-        li {
-            &:first-child {
-                a {
-                    margin-left: 0px !important;
-                    padding-left: 0px;
-                }
-            }
-        }
     }
 }
 
@@ -148,17 +97,6 @@
 }
 
 @media (max-width: 575px) {
-    .contentContainer {
-        #packageRoutes {
-            li {
-                a {
-                    font-size: ($text-font - 1);
-                    padding: 0px 8px 4px 8px;
-                    margin: 0px 6px;
-                }
-            }
-        }
-    }
     #packagePage {
         position: relative;
         top: 0px;

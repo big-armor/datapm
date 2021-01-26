@@ -1,6 +1,14 @@
 <div class="container">
     <div class="row">
         <form id="createCollection" [formGroup]="form">
+            <app-cover [editable]="true" (upload)="addCoverImage($event)"></app-cover>
+
+            <div class="d-flex bd-highlight mt-3 mb-1">
+                <div class="pr-3 py-2 bd-highlight div-question long-txt">Make this collection public</div>
+                <div class="ml-auto py-2 bd-highlight slide-right">
+                    <mat-slide-toggle class="app-slide-toggle" formControlName="isPublic"></mat-slide-toggle>
+                </div>
+            </div>
             <div mat-dialog-title id="contentTitle">Create collection</div>
             <div mat-dialog-content id="contentBorder">
                 <div class="d-flex bd-highlight shadow-div my-3">

@@ -26,6 +26,11 @@ export class ImageService {
         return this.loadImage(url, reload);
     }
 
+    public loadCatalogAvatar(catalogSlug: string, reload?: boolean): Subject<SafeUrl> {
+        const url = this.buildCatalogAvatarUrl(catalogSlug);
+        return this.loadImage(url, reload);
+    }
+
     public loadCatalogCover(catalogSlug: string, reload?: boolean): Subject<SafeUrl> {
         const url = this.buildCatalogCoverUrl(catalogSlug);
         return this.loadImage(url, reload);
@@ -51,12 +56,16 @@ export class ImageService {
         }
 
         this.http.get(url, { responseType: "blob" }).subscribe((res: Blob) => {
-            const imageObjectURL = URL.createObjectURL(res);
-            const safeImageObjectURL = this.sanitizer.bypassSecurityTrustUrl(imageObjectURL);
+            const safeImageObjectURL = this.convertBlobToSafeImageObjectUrl(res);
             imageSubject.next(safeImageObjectURL);
         });
 
         return imageSubject;
+    }
+
+    public convertBlobToSafeImageObjectUrl(blob: Blob): SafeUrl {
+        const imageObjectURL = URL.createObjectURL(blob);
+        return this.sanitizer.bypassSecurityTrustUrl(imageObjectURL);
     }
 
     private buildUserAvatarUrl(username: string): string {
@@ -69,6 +78,10 @@ export class ImageService {
 
     private buildPackageCoverUrl(catalogSlug: string, packageSlug: string): string {
         return `/images/package/${catalogSlug}/${packageSlug}/cover`;
+    }
+
+    private buildCatalogAvatarUrl(catalogSlug: string): string {
+        return `/images/catalog/${catalogSlug}/avatar`;
     }
 
     private buildCatalogCoverUrl(catalogSlug: string): string {

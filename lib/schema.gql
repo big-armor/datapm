@@ -531,6 +531,7 @@ input CreateCollectionInput {
     collectionSlug: String! @validCollectionSlug(allowNull: false)
     name: String!
     description: String
+    isPublic: Boolean
 }
 
 """
@@ -646,7 +647,7 @@ type Query {
     package(identifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)): Package!
 
     """
-    Returns list of authenicated users packages
+    Returns list of the requesting users packages
     """
     myPackages(offset: Int!, limit: Int!): PackagesResult! @isAuthenticated
 
@@ -656,9 +657,19 @@ type Query {
     searchPackages(query: String!, offSet: Int!, limit: Int!): SearchPackagesResult!
 
     """
+    Returns a list of packages the requesting user has recently viewed
+    """
+    myRecentlyViewedPackages(offSet: Int!, limit: Int!): ActivityLogResult! @isAuthenticated
+
+    """
     Returns users that match the given search query
     """
     searchUsers(value: String!, limit: Int!, offSet: Int!): SearchUsersResult!
+
+    """
+    Returns users that match the given search query with no restrictions
+    """
+    adminSearchUsers(value: String!, limit: Int!, offSet: Int!): SearchUsersResult! @isAdmin
 
     """
     Returns the latest packages
@@ -791,6 +802,11 @@ type Mutation {
     deleteMe: Void @isAuthenticated
 
     """
+    Deletes a user's account
+    """
+    adminDeleteUser(username: String!): Void @isAdmin
+
+    """
     Using a username or email address and a password, requests authentication information for the given user
     """
     login(username: String! @validUsernameOrEmailAddress, password: String! @validPassword): String!
@@ -822,6 +838,20 @@ type Mutation {
         identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: EDIT)
         value: UpdateCatalogInput!
     ): Catalog!
+
+    """
+    Updates the cover image of the catalog
+    """
+    setCatalogAvatarImage(
+        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: EDIT)
+        image: Base64ImageUpload! @validBase64Image
+    ): Void @isAuthenticated
+
+    """
+    Updates the cover image of the catalog
+    """
+    deleteCatalogAvatarImage(identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: EDIT)): Void
+        @isAuthenticated
 
     """
     Updates the cover image of the catalog

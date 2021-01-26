@@ -20,8 +20,6 @@ export class FileService {
         input.style.opacity = "0";
         input.style["pointer-events"] = "none";
         this.input = input;
-
-        this.input = input;
     }
 
     openFile(accept: string = "*", multiple?: boolean) {
