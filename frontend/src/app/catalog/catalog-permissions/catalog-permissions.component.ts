@@ -8,7 +8,7 @@ import { DeleteCatalogComponent } from "src/app/shared/delete-catalog/delete-cat
 import { EditCatalogComponent } from "src/app/shared/edit-catalog/edit-catalog.component";
 import {
     Catalog,
-    // DeleteUserCatalogPermissionsGQL,
+    DeleteUserCatalogPermissionsGQL,
     Permission,
     SetUserCatalogPermissionGQL,
     UpdateCatalogGQL,
@@ -39,7 +39,7 @@ export class CatalogPermissionsComponent implements OnChanges {
         private usersByCatalogGQL: UsersByCatalogGQL,
         private updateCatalogGQL: UpdateCatalogGQL,
         private setUserCatalogPermissionGQL: SetUserCatalogPermissionGQL,
-        // private deleteUserCatalogPermissionGQL: DeleteUserCatalogPermissionsGQL,
+        private deleteUserCatalogPermissionGQL: DeleteUserCatalogPermissionsGQL,
         private snackBarService: SnackBarService
     ) {}
 
@@ -71,22 +71,22 @@ export class CatalogPermissionsComponent implements OnChanges {
         this.setUserPermission(username, this.getPermissionArrayFrom(permission));
     }
 
-    // public removeUser(username: string): void {
-    //     this.deleteUserCatalogPermissionGQL
-    //         .mutate({
-    //             identifier: {
-    //                 catalogSlug: this.catalog?.identifier.catalogSlug
-    //             },
-    //             username
-    //         })
-    //         .subscribe(({ errors }) => {
-    //             if (errors) {
-    //                 if (errors.find((e) => e.message.includes("CANNOT_REMOVE_CREATOR_PERMISSIONS")))
-    //                     this.snackBarService.openSnackBar("Can not remove the catalog creator.", "Ok");
-    //                 else this.snackBarService.openSnackBar("There was a problem. Try again later.", "Ok");
-    //             }
-    //         });
-    // }
+    public removeUser(username: string): void {
+        this.deleteUserCatalogPermissionGQL
+            .mutate({
+                identifier: {
+                    catalogSlug: this.catalog?.identifier.catalogSlug
+                },
+                username
+            })
+            .subscribe(({ errors }) => {
+                if (errors) {
+                    if (errors.find((e) => e.message.includes("CANNOT_REMOVE_CREATOR_PERMISSIONS")))
+                        this.snackBarService.openSnackBar("Can not remove the catalog creator.", "Ok");
+                    else this.snackBarService.openSnackBar("There was a problem. Try again later.", "Ok");
+                }
+            });
+    }
 
     public editCatalog(): void {
         this.dialog
