@@ -29,10 +29,12 @@
                         <div *ngIf="collections.length > 0">
                             <div class="pr-4 mb-4">
                                 <p>
-                                    <span *ngIf="isCurrentUser">
+                                    <span *ngIf="isCurrentUser" class="section-description">
                                         Create collections to organize and share data sets you discover.
                                     </span>
-                                    <span *ngIf="!isCurrentUser"> Collections of data created by {{ username }}. </span>
+                                    <span *ngIf="!isCurrentUser" class="section-description">
+                                        Collections of data created by {{ username }}.
+                                    </span>
                                     <a target="_blank" href="/docs/concepts/collections"
                                         >Learn more about collections</a
                                     >

@@ -1,14 +1,14 @@
-<form [formGroup]="form" (submit)="submit($event)">
-    <div class="dpm-text-title" mat-dialog-title>Add Package To Collection</div>
-    <p class="mt-3">Select the package and collection below.</p>
-    <div mat-dialog-content class="py-4">
-        <div class="d-flex input-row">
-            <div class="input-control">
-                <mat-label class="d-block mb-2">Package</mat-label>
-
+<form [formGroup]="form" (submit)="submit($event)" id="addPackage">
+    <div mat-dialog-title id="contentTitle" class="mb-4">Add Package To Collection</div>
+    <div mat-dialog-content class="py-3" id="contentBorder">
+        <p class="mt-0 mb-4 add-package-text">Select the package and collection below.</p>
+        <div class="d-flex bd-highlight shadow-div my-3">
+            <div class="bd-highlight div-question py-2">Package</div>
+            <div class="bd-highlight div-answer">
                 <app-input
                     placeholder="catalog/package"
                     [group]="form"
+                    class="flat-input px-0"
                     controlName="packageSlug"
                     inputStyle="flat"
                     [matAutocomplete]="auto"
@@ -45,16 +45,21 @@
                 </mat-autocomplete>
             </div>
         </div>
-        <div class="d-flex input-row mt-3">
-            <div class="input-control">
-                <mat-label class="d-block mb-2">Collection</mat-label>
-
+        <div class="d-flex bd-highlight shadow-div mb-3">
+            <div class="bd-highlight div-question my-2">
+                <span class="mt-2">Collection</span>
+            </div>
+            <div class="bd-highlight div-answer">
                 <mat-select
                     controlName="collectionSlug"
                     [(value)]="selectedCollectionSlug"
                     placeholder="Select a Collection"
                 >
-                    <mat-option *ngFor="let collection of collections" [value]="collection.identifier.collectionSlug">
+                    <mat-option
+                        *ngFor="let collection of collections"
+                        [value]="collection.identifier.collectionSlug"
+                        class="flat-input"
+                    >
                         {{ collection.name }}
                     </mat-option>
                 </mat-select>
@@ -79,8 +84,8 @@
         </div>
     </div>
     <div mat-dialog-actions class="d-flex justify-content-end">
-        <button type="submit" class="ml-auto app-raised-button" [disabled]="form.invalid">
-            <span>Add</span>
+        <button type="submit" class="mt-2 save-btn" [disabled]="form.invalid">
+            <span>add</span>
         </button>
     </div>
 </form>
