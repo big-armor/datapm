@@ -3,9 +3,7 @@
     <div mat-dialog-content class="py-3" id="contentBorder">
         <p class="mt-0 mb-4 add-package-text">Select the package and collection below.</p>
         <div class="d-flex bd-highlight shadow-div my-3">
-            <div class="bd-highlight div-question py-2">
-                Package
-            </div>
+            <div class="bd-highlight div-question py-2">Package</div>
             <div class="bd-highlight div-answer">
                 <app-input
                     placeholder="Catalog/package"
@@ -57,7 +55,11 @@
                     [(value)]="selectedCollectionSlug"
                     placeholder="Select a Collection"
                 >
-                    <mat-option *ngFor="let collection of collections" [value]="collection.identifier.collectionSlug" class="flat-input">
+                    <mat-option
+                        *ngFor="let collection of collections"
+                        [value]="collection.identifier.collectionSlug"
+                        class="flat-input"
+                    >
                         {{ collection.name }}
                     </mat-option>
                 </mat-select>
@@ -81,7 +83,7 @@
             </ng-container>
         </div>
     </div>
-    <div  mat-dialog-actions class="d-flex justify-content-end">
+    <div mat-dialog-actions class="d-flex justify-content-end">
         <button type="submit" class="mt-2 save-btn" [disabled]="form.invalid">
             <span>add</span>
         </button>

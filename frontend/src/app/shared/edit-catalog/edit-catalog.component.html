@@ -1,12 +1,7 @@
 <form [formGroup]="form" id="editCatalog">
-
     <div mat-dialog-title id="contentTitle">Edit catalog</div>
 
-    <app-cover
-        [catalogSlug]="data.identifier.catalogSlug"
-        [editable]="true"
-        (upload)="uploadCover($event)"
-    ></app-cover>
+    <app-cover [catalogSlug]="data.identifier.catalogSlug" [editable]="true" (upload)="uploadCover($event)"></app-cover>
 
     <app-avatar
         class="catalog-avatar"
@@ -19,51 +14,51 @@
     </app-avatar>
 
     <div mat-dialog-content id="contentBorder">
-            <div class="d-flex bd-highlight mb-1">
-                <div class="pr-3 py-2 bd-highlight div-question long-txt">Make this catalog public</div>
-                <div class="ml-auto py-2 bd-highlight slide-right">
-                    <mat-slide-toggle class="app-slide-toggle" formControlName="isPublic"></mat-slide-toggle>
-                </div>
+        <div class="d-flex bd-highlight mb-1">
+            <div class="pr-3 py-2 bd-highlight div-question long-txt">Make this catalog public</div>
+            <div class="ml-auto py-2 bd-highlight slide-right">
+                <mat-slide-toggle class="app-slide-toggle" formControlName="isPublic"></mat-slide-toggle>
             </div>
-            <div class="d-flex bd-highlight shadow-div mb-3">
-                <div class="pr-3 py-2 bd-highlight div-question">Name</div>
-                <div class="bd-highlight div-answer">
-                    <app-input
-                        class="flat-input-parent"
-                        [group]="form"
-                        controlName="displayName"
-                        placeholder="Name"
-                        [autoFocus]="true"
-                        [error]="form | inputError: 'displayName':errorMsg['displayName'] | async"
-                    ></app-input>
-                </div>
+        </div>
+        <div class="d-flex bd-highlight shadow-div mb-3">
+            <div class="pr-3 py-2 bd-highlight div-question">Name</div>
+            <div class="bd-highlight div-answer">
+                <app-input
+                    class="flat-input-parent"
+                    [group]="form"
+                    controlName="displayName"
+                    placeholder="Name"
+                    [autoFocus]="true"
+                    [error]="form | inputError: 'displayName':errorMsg['displayName'] | async"
+                ></app-input>
             </div>
-            <div class="d-flex bd-highlight shadow-div mb-3">
-                <div class="pr-3 py-2 bd-highlight div-question">Catalog slug</div>
-                <div class="bd-highlight div-answer">
-                    <app-input
-                        class="flat-input-parent"
-                        [group]="form"
-                        controlName="newSlug"
-                        placeholder="Catalog slug"
-                        (blur)="openConfirmDialog()"
-                        [error]="form | inputError: 'newSlug':errorMsg['newSlug'] | async"
-                    ></app-input>
-                </div>
+        </div>
+        <div class="d-flex bd-highlight shadow-div mb-3">
+            <div class="pr-3 py-2 bd-highlight div-question">Catalog slug</div>
+            <div class="bd-highlight div-answer">
+                <app-input
+                    class="flat-input-parent"
+                    [group]="form"
+                    controlName="newSlug"
+                    placeholder="Catalog slug"
+                    (blur)="openConfirmDialog()"
+                    [error]="form | inputError: 'newSlug':errorMsg['newSlug'] | async"
+                ></app-input>
             </div>
-            <div class="d-flex bd-highlight shadow-div mb-3">
-                <div class="pr-3 py-2 bd-highlight div-question">Description</div>
-                <div class="bd-highlight div-answer">
-                    <app-input
-                        class="flat-input-parent"
-                        [group]="form"
-                        controlName="description"
-                        placeholder="Description"
-                        [autoFocus]="true"
-                        [multiline]="true"
-                    ></app-input>
-                </div>
+        </div>
+        <div class="d-flex bd-highlight shadow-div mb-3">
+            <div class="pr-3 py-2 bd-highlight div-question">Description</div>
+            <div class="bd-highlight div-answer">
+                <app-input
+                    class="flat-input-parent"
+                    [group]="form"
+                    controlName="description"
+                    placeholder="Description"
+                    [autoFocus]="true"
+                    [multiline]="true"
+                ></app-input>
             </div>
+        </div>
         <div class="text-danger mt-3" *ngIf="state === 'ERROR'">Error occured while updating catalog.</div>
     </div>
     <div mat-dialog-actions class="mb-12">
