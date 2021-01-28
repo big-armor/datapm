@@ -1,5 +1,17 @@
 @import "../../../styles/variables";
 
+#addPackage {
+    .flat-input {
+        display: inline;
+    }
+
+    .add-package-text {
+        font-family: $family-roboto;
+        letter-spacing: 0.7px;
+        font-weight: $weight-400;
+    }
+}
+
 .input-row {
     margin-left: -24px;
     margin-right: -24px;
@@ -22,10 +34,19 @@
 
 .mat-option {
     height: 75px;
-    padding: 5px 5px;
+    padding: 5px 10px;
     line-height: 75px;
     ::ng-deep.avatar {
         line-height: 20px;
         margin-right: 10px;
+    }
+}
+
+@media (max-width: 576px) {
+    #addPackage {
+        .add-package-text {
+            font-size: 12px;
+            margin-bottom: 0px !important;
+        }
     }
 }

@@ -8,11 +8,11 @@
                             {{ isCurrentUser ? "My Catalogs" : "Catalogs" }}
                         </div>
                         <p class="pr-4">
-                            <span *ngIf="isCurrentUser"
+                            <span *ngIf="isCurrentUser" class="section-description"
                                 >Catalogs represent a single individual or organization. All data packages belong to one
                                 and only one catalog.</span
                             >
-                            <span *ngIf="!isCurrentUser && myCatalogs.length > 0"
+                            <span *ngIf="!isCurrentUser && myCatalogs.length > 0" class="section-description"
                                 >Catalogs created by {{ username }}
                             </span>
                         </p>

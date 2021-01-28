@@ -9,13 +9,13 @@
     }
 
     .user-bio {
+        color: $gray-2;
         font-family: $family-roboto;
-        letter-spacing: 0.4px;
+        letter-spacing: 0.7px;
         font-style: $style-normal;
-        font-weight: $weight-300;
+        font-weight: $weight-400;
         margin-top: 4px;
-        font-size: 13px;
-        color: $black;
+        font-size: ($text-font - 1);
         overflow: hidden;
     }
 
@@ -52,6 +52,17 @@
 
         img {
             border-radius: 4px;
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    #detailsHeader {
+        .user-bio {
+            font-size: ($text-font - 2);
+        }
+        .user-header {
+            margin-top: -16px;
         }
     }
 }

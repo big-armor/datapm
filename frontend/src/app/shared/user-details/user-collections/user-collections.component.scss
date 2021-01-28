@@ -19,7 +19,7 @@
     }
 
     .mat-column-name {
-        width: 30%;
+        width: 40%;
 
         a {
             font-family: $family-roboto;
@@ -27,6 +27,18 @@
             font-size: $text-font;
             font-weight: $weight-400;
         }
+    }
+
+    th.mat-header-cell:first-of-type,
+    td.mat-cell:first-of-type,
+    td.mat-footer-cell:first-of-type {
+        padding-right: 6px;
+    }
+
+    th.mat-header-cell:last-of-type,
+    td.mat-cell:last-of-type,
+    td.mat-footer-cell:last-of-type {
+        padding-right: 0px;
     }
 
     .mat-column-actions app-button {
@@ -68,6 +80,14 @@
                 margin: 4px 4px !important;
             }
         }
+    }
+}
+
+@media (max-width: 576px) {
+    th.mat-header-cell:first-of-type,
+    td.mat-cell:first-of-type,
+    td.mat-footer-cell:first-of-type {
+        padding-left: 5px;
     }
 }
 

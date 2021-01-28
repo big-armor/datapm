@@ -55,6 +55,18 @@
 @media (max-width: 576px) {
     #deleteCatalog {
         min-width: 260px;
-        top: -2px;
+        .mat-dialog-actions {
+            min-height: 40px;
+            .btn-delete {
+                font-size: $small-font;
+                line-height: 26px;
+                top: 0px;
+            }
+            .btn-close {
+                font-size: ($small-font + 1);
+                line-height: 26px;
+            }
+
+        }
     }
 }

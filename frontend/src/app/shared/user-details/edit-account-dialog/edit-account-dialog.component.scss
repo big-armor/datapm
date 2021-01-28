@@ -3,7 +3,6 @@
 #editAccount {
     position: relative;
     min-width: 800px;
-    top: -14px;
 
     ::ng-deep.mat-checked {
         .mat-slide-toggle-bar {
@@ -29,32 +28,28 @@
 
         .dialog-content-text {
             position: relative;
-
-            .user-img {
-                display: block;
-                margin-left: 30px;
-                width: 100px;
-                height: 55px;
-                transform: translateY(-45px);
-            }
-
-            .small-paragraph {
-                margin-bottom: 3px;
-                font-family: $family-roboto-mono;
-                font-style: $style-normal;
-                font-weight: $weight-400;
-                font-size: $xsmall-font;
-                line-height: 13px;
-                text-align: right;
-                letter-spacing: -0.28px;
-                padding-right: 24px;
-                color: $gray-4;
-            }
         }
     }
 
-    .mat-dialog-actions {
-        min-height: unset;
+    .user-img {
+        display: block;
+        margin-left: 30px;
+        width: 100px;
+        height: 55px;
+        transform: translateY(-45px);
+    }
+
+    .small-paragraph {
+        margin-bottom: 3px;
+        font-family: $family-roboto-mono;
+        font-style: $style-normal;
+        font-weight: $weight-400;
+        font-size: $xsmall-font;
+        line-height: 13px;
+        text-align: right;
+        letter-spacing: -0.28px;
+        padding-right: 24px;
+        color: $gray-4;
     }
 }
 
@@ -82,12 +77,8 @@
             float: right;
             right: 0px;
         }
-        .mat-dialog-content {
-            .dialog-content-text {
-                .small-paragraph {
-                    padding-right: 0px;
-                }
-            }
+        .small-paragraph {
+            padding-right: 0px;
         }
     }
 }
@@ -95,15 +86,12 @@
 @media (max-width: 576px) {
     #editAccount {
         min-width: 200px;
-        .mat-dialog-content {
-            .dialog-content-text {
-                .user-img {
-                    height: 20px;
-                    ::ng-deep.avatar {
-                        width: 70px !important;
-                        height: 70px !important;
-                    }
-                }
+        .user-img {
+            height: 20px;
+            margin-left: 10px;
+            ::ng-deep.avatar {
+                width: 70px !important;
+                height: 70px !important;
             }
         }
     }
