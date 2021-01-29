@@ -32,6 +32,10 @@ export interface Source {
 
 export interface ValueTypeStatistics {
     valueType: JSONSchema7TypeName | "date";
+
+    /** The number of records on which this property was observed. If schema recordCountApproximate property is true,
+     * then not all records were inspected, and therefore this does not represent the exact number of records
+     * on which this value type is present */
     recordCount?: number;
     stringMaxLength?: number;
     stringMinLength?: number;
@@ -65,6 +69,12 @@ export interface DerivedFrom {
     schemaIdentifier?: SchemaIdentifier;
 }
 
+export enum CountPrecision {
+    EXACT = "EXACT",
+    APPROXIMATE = "APPROXIMATE",
+    GREATER_THAN = "GREATER_THAN"
+}
+
 /** The JSON Schema Draft 07 compliant schema object, extended with properties that describe
  * how to obtain the data, and details the values of the data properties.
  */
@@ -78,7 +88,10 @@ export interface Schema extends JSONSchema7 {
     /** What the schema or a property in the data represents. Example for objects: Person, Date and Location, Point In Time. Examples for values: Meters, Degrees Celsius */
     unit?: string;
 
-    /** The exact or approximate number of records in the data package. For streaming sets, this
+    /** The number of records that were inspected during generation of this package file */
+    recordsInspectedCount?: number;
+
+    /** The exact or approximate number of records in the schema. For streaming sets, this
      * is the number of records per period.
      */
     recordCount?: number;
@@ -88,14 +101,14 @@ export interface Schema extends JSONSchema7 {
      */
     recordsNotPresent?: number;
 
-    /** Whether the recordCount value is exact or approximate. */
-    recordCountApproximate?: boolean;
+    /** How to consider the recordCount value - as one of exact, approximate, or greater than. */
+    recordCountPrecision?: CountPrecision;
 
     /** The exact or approximate number of bytes of data in the values of the data (not including format overhead) */
     byteCount?: number;
 
     /** Whether the byte count is exact or approximate. */
-    byteCountApproximate?: boolean;
+    byteCountPrecision?: CountPrecision;
 
     /** A object which has keys that the property type (string, array, date, boolean, object, etc). The values of this object describe the property type. */
     valueTypes?: ValueTypes;

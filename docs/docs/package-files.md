@@ -85,8 +85,9 @@ These are the properties for the "schemas" top level array property. These schem
 | byteCountApproximate   | Boolean  | Optional | Whether the provided byte count is approximate (true) or exact (false). Default is false (exact).                                                                        |
 | derivedFrom            | Object[] | Optional | See 'Derived From' properties                                                                                                                                            |
 | derivedFromDescription |  String  | Optional | A description, such as a SQL statement, or a human description of what actions were taken to derive the data in this schema.                                             |
-| recordCount            | Integer  | Optional | The exact or estimated number of records in the data set.                                                                                                                |
-| recordCountApproximate | Boolean  | Optional | Whether the recordCount property value is exact (false) or approximate (true). Defaults false (exact).                                                                   |
+| recordsInspectedCount  | Integer  | Optional | The number of records inspected (not just counted) during generating this package.                                                                                       |
+| recordCount            | Integer  | Optional | The exact or estimated number of records in the data set. See recordCountPrecision                                                                                       |
+| recordCountPrecision   |  String  | Optional | Defines how to consider recordCount value. Either "EXACT", "APPROXIMATE", OR "GREATER_THAN".                                                                             |
 | unit                   |  String  | Optional | The noun(s) describing what each record represents. Example for Objects: Person, Location and Time, Point In Time, etc. Example for values: Meters, Degrees Celsius, etc |
 
 ## Schema Properties

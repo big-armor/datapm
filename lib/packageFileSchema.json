@@ -238,12 +238,12 @@
                                 "description": "The exact or estamated number of records in the data set.",
                                 "default": 0
                             },
-                            "recordCountApproximate": {
-                                "$id": "#/schemas/recordCountApproximate",
-                                "type": "boolean",
-                                "title": "Record Count Approximate",
-                                "description": "Whether a record count is exact or approximate",
-                                "default": false
+                            "recordCountPrecision": {
+                                "$id": "#/schemas/recordCountPrecision",
+                                "type": "string",
+                                "title": "Record Count Approximation Method",
+                                "description": "How to consider the recordCount value",
+                                "enum": ["EXACT", "APPROXIMATE", "GREATER_THAN"]
                             },
                             "unit": {
                                 "$id": "#/schemas/unit",
@@ -252,7 +252,6 @@
                                 "description": "What schema or a property in the data represents. Example: Country, Person, Location and Time, etc",
                                 "maxLength": 128
                             },
-
                             "byteCount": {
                                 "$id": "#/schemas/byteCount",
                                 "type": "integer",
@@ -260,12 +259,12 @@
                                 "description": "The exact or approximate number of bytes in the raw dataset. This should include only the 'values' and not the format, schema, or keys",
                                 "default": 0
                             },
-                            "byteCountApproximate": {
-                                "$id": "#/schemas/byteCountApproximate",
-                                "type": "boolean",
-                                "title": "Byte Count Approximate",
-                                "description": "Whether the provided byte count is approximate or exact.",
-                                "default": false
+                            "byteCountPrecision": {
+                                "$id": "#/schemas/byteCountPrecision",
+                                "type": "string",
+                                "title": "Byte Count Approximation Method",
+                                "description": "How to consider the byteCount value.",
+                                "enum": ["EXACT", "APPROXIMATE", "GREATER_THAN"]
                             },
                             "samples": {
                                 "$id": "#/sampleRecords",
