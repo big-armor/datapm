@@ -50,7 +50,9 @@ export class CreateCollectionComponent {
             .subscribe(
                 (response) => {
                     if (!response.errors) {
-                        this.uploadCover(collectionSlug).subscribe(() => this.dialogRef.close(this.form.value));
+                        this.uploadCover(collectionSlug).subscribe(() =>
+                            this.dialogRef.close(response.data.createCollection)
+                        );
                         return;
                     }
 

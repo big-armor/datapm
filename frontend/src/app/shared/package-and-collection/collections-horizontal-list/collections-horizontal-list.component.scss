@@ -1,0 +1,10 @@
+.collections-container {
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.collection-item {
+    display: inline-block;
+    cursor: pointer;
+    margin-right: 10px;
+}

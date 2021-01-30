@@ -27,6 +27,22 @@ describe("User Tests", async () => {
         expect(userBClient).to.exist;
     });
 
+    it("The first created user is an admin and the second one isn't", async function () {
+        let firstUserResponse = await userAClient.query({
+            query: MeDocument
+        });
+
+        let userA = firstUserResponse.data;
+        expect(userA.me.isAdmin).is.true;
+
+        let secondUserResponse = await userBClient.query({
+            query: MeDocument
+        });
+
+        let userB = secondUserResponse.data;
+        expect(userB.me.isAdmin).is.false;
+    });
+
     it("Create an email that already exists", async function () {
         let errorFound = false;
         await createUser("FirstA", "LastA", "testA-user", "testA-user@test.datapm.io", "passwordA!")

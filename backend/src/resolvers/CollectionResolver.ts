@@ -10,7 +10,8 @@ import {
     Permission,
     Collection,
     ActivityLogEventType,
-    ActivityLogChangeType
+    ActivityLogChangeType,
+    ActivityLogResult
 } from "../generated/graphql";
 import { CollectionPackageRepository } from "../repository/CollectionPackageRepository";
 import { CollectionRepository } from "../repository/CollectionRepository";
@@ -23,11 +24,12 @@ import { getGraphQlRelationName } from "../util/relationNames";
 import { grantAllCollectionPermissionsForUser, hasCollectionPermissions } from "./UserCollectionPermissionResolver";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { CollectionEntity } from "../entity/CollectionEntity";
-import { createActivityLog } from "../repository/ActivityLogRepository";
+import { ActivityLogRepository, createActivityLog } from "../repository/ActivityLogRepository";
 import { Connection, EntityManager } from "typeorm";
 import { getEnvVariable } from "../util/getEnvVariable";
 import { packageEntityToGraphqlObject } from "./PackageResolver";
 import { ReservedKeywordsService } from "../service/reserved-keywords-service";
+import { activtyLogEntityToGraphQL } from "./ActivityLogResolver";
 
 export const collectionEntityToGraphQL = (collectionEntity: CollectionEntity): Collection => {
     return {
@@ -312,16 +314,27 @@ export const findCollectionBySlug = async (
     context: AuthenticatedContext,
     info: any
 ): Promise<Collection> => {
-    const relations = getGraphQlRelationName(info);
-    const collectionEntity = await context.connection.manager
-        .getCustomRepository(CollectionRepository)
-        .findCollectionBySlugOrFail(identifier.collectionSlug, relations);
-    return {
-        identifier: {
-            collectionSlug: collectionEntity.collectionSlug,
-            registryURL: process.env["REGISTRY_URL"]
+    return context.connection.transaction(async (transaction) => {
+        const relations = getGraphQlRelationName(info);
+        const collectionEntity = await context.connection.manager
+            .getCustomRepository(CollectionRepository)
+            .findCollectionBySlugOrFail(identifier.collectionSlug, relations);
+
+        if (context.me) {
+            await createActivityLog(transaction, {
+                userId: context.me?.id,
+                eventType: ActivityLogEventType.COLLECTION_VIEWED,
+                targetCollectionId: collectionEntity.id
+            });
         }
-    };
+
+        return {
+            identifier: {
+                collectionSlug: collectionEntity.collectionSlug,
+                registryURL: process.env["REGISTRY_URL"]
+            }
+        };
+    });
 };
 
 export const searchCollections = async (
@@ -500,4 +513,40 @@ export const userCollectionPermissions = async (
         });
 
     return userPermission?.permissions || [];
+};
+
+export const getLatestCollections = async (
+    _0: any,
+    { limit, offset }: { limit: number; offset: number },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const relations = getGraphQlRelationName(info);
+    const [collections, count] = await context.connection.manager
+        .getCustomRepository(CollectionRepository)
+        .getLatestCollections(context.me?.id, limit, offset, relations);
+
+    return {
+        hasMore: count - (offset + limit) > 0,
+        collections: collections.map((c) => collectionEntityToGraphQL(c)),
+        count
+    };
+};
+
+export const getMyRecentlyViewedPackages = async (
+    _0: any,
+    { limit, offset }: { limit: number; offset: number },
+    context: AuthenticatedContext,
+    info: any
+): Promise<ActivityLogResult> => {
+    const relations = getGraphQlRelationName(info);
+    const [searchResponse, count] = await context.connection.manager
+        .getCustomRepository(ActivityLogRepository)
+        .myRecentlyViewedCollections(context.me, limit, offset, relations);
+
+    return {
+        hasMore: count - (offset + limit) > 0,
+        logs: await Promise.all(searchResponse.map((c) => activtyLogEntityToGraphQL(context.connection, c))),
+        count
+    };
 };

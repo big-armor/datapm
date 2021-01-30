@@ -1,30 +1,12 @@
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from "@angular/core";
 import { ActivatedRoute, ParamMap } from "@angular/router";
-import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
+import { Subject, Observable } from "rxjs";
+import { map, takeUntil } from "rxjs/operators";
 
-import { TimeAgoPipe } from "../shared/pipes/time-ago.pipe";
-
-import {
-    SearchPackagesGQL,
-    SearchCollectionsGQL,
-    SearchPackagesQuery,
-    SearchCollectionsQuery,
-    Package,
-    Collection
-} from "src/generated/graphql";
-
-enum State {
-    LOADING,
-    SUCCESS,
-    ERROR
-}
-
-enum Filter {
-    COLLECTIONS,
-    PACKAGES,
-    USERS
-}
+import { SearchPackagesGQL, SearchCollectionsGQL, Package, Collection } from "src/generated/graphql";
+import { CollectionsResponse } from "../shared/package-and-collection/collections-response";
+import { PackagesResponse } from "../shared/package-and-collection/packages-response";
+import { SearchParameters } from "../shared/package-and-collection/search-parameters";
 
 @Component({
     selector: "search",
@@ -32,134 +14,112 @@ enum Filter {
     styleUrls: ["./search.component.scss"]
 })
 export class SearchComponent implements OnInit, OnDestroy {
-    public Filter = Filter;
-    public isStarClicked: boolean = false;
-    public selectedFilter: Filter = Filter.PACKAGES;
-    public state = State.LOADING;
     public query: any;
-    public limit: number = 10;
-    public offset: number = 0;
-    public State = State;
 
-    public packageResult: SearchPackagesQuery;
-    public collectionResult: SearchCollectionsQuery;
+    public collectionsParameters: SearchParameters;
+    public packagesParameters: SearchParameters;
 
-    private subscription = new Subject();
+    public collectionsQuery: Observable<CollectionsResponse>;
+    public packagesQuery: Observable<PackagesResponse>;
+
+    private readonly subscription = new Subject();
 
     constructor(
         private route: ActivatedRoute,
         private searchPackagesGQL: SearchPackagesGQL,
         private searchCollectionsGQL: SearchCollectionsGQL,
-        private timeAgoPipe: TimeAgoPipe
+        private cdr: ChangeDetectorRef
     ) {}
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.route.queryParamMap.pipe(takeUntil(this.subscription)).subscribe((params: ParamMap) => {
-            this.query = params.get("q") || null;
+            const newQuery = params.get("q") || "";
+            console.log(this.query, newQuery);
+            if (newQuery == this.query) {
+                return;
+            }
 
-            this.onPackageFilterChange();
-            this.onCollectionFilterChange();
+            this.query = newQuery;
+            if (this.packagesParameters && this.collectionsParameters) {
+                this.packagesParameters = { query: this.query, offset: 0, limit: this.packagesParameters.limit };
+                this.collectionsParameters = { query: this.query, offset: 0, limit: this.collectionsParameters.limit };
+
+                this.updatePackageFetchingQueryValue(this.packagesParameters, true);
+                this.updateCollectionsFetchingQueryValue(this.collectionsParameters, true);
+            }
         });
+        this.cdr.detectChanges();
     }
 
-    ngOnDestroy() {
+    public ngOnDestroy(): void {
         this.subscription.unsubscribe();
     }
 
-    public get isPackageSelected() {
-        return this.selectedFilter == Filter.PACKAGES;
+    public updatePackageFetchingQuery(searchQuery: SearchParameters): void {
+        this.updatePackageFetchingQueryValue(searchQuery, false);
     }
 
-    public get isUserSelected() {
-        return this.selectedFilter == Filter.USERS;
-    }
+    public updatePackageFetchingQueryValue(searchQuery: SearchParameters, resetCollection: boolean): void {
+        this.packagesParameters = this.updateParametersQuery(searchQuery);
+        this.packagesQuery = this.searchPackagesGQL.fetch(this.packagesParameters).pipe(
+            map(
+                (response) => {
+                    if (response.errors) {
+                        return {
+                            errors: response.errors.map((e) => e.message)
+                        };
+                    }
 
-    public get isCollectionSelected() {
-        return this.selectedFilter == Filter.COLLECTIONS;
-    }
-
-    public clickStar(): void {
-        this.isStarClicked = !this.isStarClicked;
-    }
-
-    public onPackageFilterChange(): void {
-        this.state = State.LOADING;
-        this.searchPackagesGQL
-            .fetch({
-                query: this.query,
-                limit: this.limit,
-                offset: this.offset
-            })
-            .pipe(takeUntil(this.subscription))
-            .subscribe(
-                ({ data }) => {
-                    this.state = State.SUCCESS;
-                    this.packageResult = data;
+                    return {
+                        packages: response.data.searchPackages.packages as Package[],
+                        hasMore: response.data.searchPackages.hasMore,
+                        shouldResetCollection: resetCollection
+                    };
                 },
-                (_) => (this.state = State.ERROR)
-            );
+                (error) => {
+                    return {
+                        errors: [error]
+                    };
+                }
+            )
+        );
     }
 
-    public onCollectionFilterChange(): void {
-        this.state = State.LOADING;
-        this.searchCollectionsGQL
-            .fetch({
-                query: this.query,
-                limit: this.limit,
-                offset: this.offset
-            })
-            .pipe(takeUntil(this.subscription))
-            .subscribe(
-                ({ data }) => {
-                    this.state = State.SUCCESS;
-                    this.collectionResult = data;
+    public updateCollectionsFetchingQuery(searchQuery: SearchParameters): void {
+        this.updateCollectionsFetchingQueryValue(searchQuery, false);
+    }
+
+    public updateCollectionsFetchingQueryValue(searchQuery: SearchParameters, resetCollection: boolean): void {
+        this.collectionsParameters = this.updateParametersQuery(searchQuery);
+        this.collectionsQuery = this.searchCollectionsGQL.fetch(this.collectionsParameters).pipe(
+            map(
+                (response) => {
+                    if (response.errors) {
+                        return {
+                            errors: response.errors.map((e) => e.message)
+                        };
+                    }
+
+                    return {
+                        collections: response.data.searchCollections.collections as Collection[],
+                        hasMore: response.data.searchCollections.hasMore,
+                        shouldResetCollection: resetCollection
+                    };
                 },
-                (_) => (this.state = State.ERROR)
-            );
+                (error) => {
+                    return {
+                        errors: [error]
+                    };
+                }
+            )
+        );
     }
 
-    public getPackageDateLabel(pkg: Package) {
-        let label;
-
-        if (pkg.latestVersion?.createdAt && pkg.latestVersion?.updatedAt) {
-            label =
-                pkg.latestVersion.createdAt === pkg.latestVersion.updatedAt
-                    ? `Created ${this.timeAgoPipe.transform(pkg.latestVersion.createdAt)}`
-                    : `Updated ${this.timeAgoPipe.transform(pkg.latestVersion.updatedAt)}`;
-
-            return label;
+    private updateParametersQuery(searchQuery: SearchParameters): SearchParameters {
+        if (!searchQuery.query) {
+            searchQuery.query = this.query;
         }
 
-        return pkg.createdAt === pkg.updatedAt
-            ? `Created ${this.timeAgoPipe.transform(pkg.createdAt)}`
-            : `Updated ${this.timeAgoPipe.transform(pkg.updatedAt)}`;
-    }
-
-    public getCollectionDateLabel(collection: Collection) {
-        let label;
-
-        if (collection.packages?.length) {
-            collection.packages.forEach((pkg) => (label = this.getPackageDateLabel(pkg)));
-
-            return label;
-        }
-
-        return collection.createdAt === collection.updatedAt
-            ? `Created ${this.timeAgoPipe.transform(collection.createdAt)}`
-            : `Updated ${this.timeAgoPipe.transform(collection.updatedAt)}`;
-    }
-
-    public previous(): void {
-        this.offset = this.offset - 10;
-
-        if (this.selectedFilter === Filter.PACKAGES) this.onPackageFilterChange();
-        if (this.selectedFilter == Filter.COLLECTIONS) this.onCollectionFilterChange();
-    }
-
-    public next(): void {
-        this.offset = this.offset + 10;
-
-        if (this.selectedFilter === Filter.PACKAGES) this.onPackageFilterChange();
-        if (this.selectedFilter == Filter.COLLECTIONS) this.onCollectionFilterChange();
+        return searchQuery;
     }
 }

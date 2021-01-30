@@ -199,6 +199,21 @@ export class CollectionRepository extends Repository<CollectionEntity> {
         );
     }
 
+    async getLatestCollections(
+        userId: number,
+        limit: number,
+        offSet: number,
+        relations?: string[]
+    ): Promise<[CollectionEntity[], number]> {
+        const ALIAS = "latestCollections";
+        return this.createQueryBuilderWithUserConditions(userId)
+            .orderBy('"CollectionEntity"."created_at"', "DESC")
+            .limit(limit)
+            .offset(offSet)
+            .addRelations(ALIAS, relations)
+            .getManyAndCount();
+    }
+
     private createQueryBuilderWithUserConditions(userId?: number): SelectQueryBuilder<CollectionEntity> {
         const queryBuilder = this.createQueryBuilder();
 

@@ -1,0 +1,32 @@
+query MyRecentlyViewedCollections($offset: Int!, $limit: Int!) {
+    myRecentlyViewedCollections(offset: $offset, limit: $limit) {
+        logs {
+            targetCollection {
+                identifier {
+                    collectionSlug
+                }
+                name
+                description
+                packages {
+                    identifier {
+                        catalogSlug
+                        packageSlug
+                    }
+                    displayName
+                    description
+                    latestVersion {
+                        identifier {
+                            versionMajor
+                            versionMinor
+                            versionPatch
+                        }
+                    }
+                }
+                isPublic
+                isRecommended
+            }
+        }
+        hasMore
+        count
+    }
+}

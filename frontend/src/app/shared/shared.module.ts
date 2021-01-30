@@ -53,6 +53,7 @@ import { DeletePackageComponent } from "./delete-package/delete-package.componen
 import { MatSelectModule } from "@angular/material/select";
 import { FancyConfirmationDialogComponent } from "./dialogs/fancy-confirmation-dialog/fancy-confirmation-dialog.component";
 import { PackageAndCollectionComponent } from "./package-and-collection/package-and-collection.component";
+import { CollectionsHorizontalListComponent } from "./package-and-collection/collections-horizontal-list/collections-horizontal-list.component";
 
 @NgModule({
     declarations: [
@@ -91,7 +92,8 @@ import { PackageAndCollectionComponent } from "./package-and-collection/package-
         SimpleCreateComponent,
         DeletePackageComponent,
         FancyConfirmationDialogComponent,
-        PackageAndCollectionComponent
+        PackageAndCollectionComponent,
+        CollectionsHorizontalListComponent
     ],
     imports: [
         CommonModule,

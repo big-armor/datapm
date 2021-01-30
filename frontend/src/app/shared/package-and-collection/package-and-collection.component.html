@@ -1,25 +1,44 @@
+<div class="col-md-12 col-lg-12">
+    <h1 class="title">{{ title }}</h1>
+</div>
+
 <div *ngIf="!loadingCollections; else collectionsLoadingTemplate">
-    <div *ngIf="collections">
-        <div *ngFor="let collection of collections">
-            {{ collection.name }}
-        </div>
-
-        <div *ngIf="collections.length && hasMoreCollections">
-            <a class="app-outlined-button ctaButton" (click)="requestMoreCollections()">Load&nbsp;More</a>
-        </div>
-    </div>
-</div>
-<div *ngIf="!loadingPackages; else packagesLoadingTemplate">
-    <div *ngIf="packages">
-        <div *ngFor="let package of packages">
-            <app-package-item [item]="package"></app-package-item>
-        </div>
-
-        <div *ngIf="packages.length && hasMorePackages">
-            <a class="app-outlined-button ctaButton" (click)="requestMorePackages()">Load&nbsp;More</a>
-        </div>
+    <div *ngIf="collections.length">
+        <h3 class="section-title">Collections</h3>
+        <app-collections-horizontal-list [collections]="collections"></app-collections-horizontal-list>
     </div>
 </div>
 
-<ng-template #collectionsLoadingTemplate> Loading collections... </ng-template>
-<ng-template #packagesLoadingTemplate> Loading packages... </ng-template>
+<div *ngIf="packages.length">
+    <h3 class="section-title">Packages</h3>
+    <div *ngFor="let package of packages">
+        <app-package-item [item]="package"></app-package-item>
+    </div>
+
+    <a
+        *ngIf="hasMorePackages"
+        class="app-outlined-button ctaButton"
+        [class.disabled]="loadingPackages"
+        (click)="requestMorePackages()"
+    >
+        Load More
+    </a>
+</div>
+
+<div class="loading-spinner" *ngIf="loadingPackages">
+    <mat-spinner [diameter]="60"></mat-spinner>
+</div>
+
+<ng-template #emptyStateTemplate><ng-content select="[packagesEmptyState]"></ng-content></ng-template>
+
+<div *ngIf="!loadingPackages && !packages.length && !hasPackageErrors">
+    <ng-container *ngTemplateOutlet="emptyStateTemplate"></ng-container>
+</div>
+
+<ng-template #errorStateTemplate><ng-content select="[packagesErrorState]"></ng-content></ng-template>
+
+<div *ngIf="!loadingPackages && !packages.length && hasPackageErrors">
+    <ng-container *ngTemplateOutlet="errorStateTemplate"></ng-container>
+</div>
+
+<ng-template #collectionsLoadingTemplate> <mat-spinner [diameter]="60"></mat-spinner> </ng-template>

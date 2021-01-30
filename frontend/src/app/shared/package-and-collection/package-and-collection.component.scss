@@ -1,0 +1,44 @@
+@import "../../../styles/variables";
+
+.title {
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-weight: $weight-300;
+    font-size: $title-font;
+    line-height: 26px;
+    letter-spacing: 0.28px;
+    color: $gray-2;
+}
+
+.section-title {
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-weight: $weight-300;
+    font-size: $default-font;
+    line-height: 26px;
+    letter-spacing: 0.28px;
+    color: $gray-2;
+}
+
+.empty-state-label {
+    margin: 0 auto;
+    text-align: center;
+    padding-top: 25px;
+    font-family: $family-roboto-mono;
+
+    p {
+        font-style: $style-normal;
+        font-weight: $weight-400;
+        font-size: ($title-font - 2);
+        line-height: 28px;
+        text-align: left;
+    }
+}
+
+.packages-error-label {
+    font-style: $style-normal;
+    font-weight: $weight-400;
+    font-size: $text-font;
+    line-height: 28px;
+    text-align: left;
+}

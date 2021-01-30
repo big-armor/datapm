@@ -1,0 +1,30 @@
+query GetLatestCollections($offset: Int!, $limit: Int!) {
+    latestCollections(offset: $offset, limit: $limit) {
+        collections {
+            identifier {
+                collectionSlug
+            }
+            name
+            description
+            packages {
+                identifier {
+                    catalogSlug
+                    packageSlug
+                }
+                displayName
+                description
+                latestVersion {
+                    identifier {
+                        versionMajor
+                        versionMinor
+                        versionPatch
+                    }
+                }
+            }
+            isPublic
+            isRecommended
+        }
+        hasMore
+        count
+    }
+}
