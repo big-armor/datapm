@@ -1,13 +1,13 @@
 @import "../../../styles/variables";
 
 .h1-title {
-    font-family: $family-roboto-mono;
+    font-family: $family-roboto;
     font-style: $style-normal;
     font-weight: $weight-300;
     font-size: $title-font;
     line-height: 26px;
-    letter-spacing: -0.28px;
-    color: $gray-3;
+    letter-spacing: 0.28px;
+    color: $gray-2;
 }
 
 .not-found {

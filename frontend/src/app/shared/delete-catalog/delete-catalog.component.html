@@ -16,8 +16,8 @@
                 </div>
             </div>
 
-            <div mat-dialog-actions class="d-flex justify-content-between pb-3 pt-2">
-                <button mat-button mat-dialog-close>Cancel</button>
+            <div mat-dialog-actions class="d-flex justify-content-between mb-12">
+                <button mat-button mat-dialog-close class="btn-close">Cancel</button>
                 <button mat-button class="btn-delete" (click)="confirm()" [disabled]="confirmVal !== data.catalogSlug">
                     Delete
                 </button>

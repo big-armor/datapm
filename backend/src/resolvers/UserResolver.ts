@@ -18,19 +18,40 @@ import { ImageStorageService } from "../storage/images/image-storage-service";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 import { FirstUserStatusHolder } from "./FirstUserStatusHolder";
 import { UserEntity } from "../entity/UserEntity";
+import { ReservedKeywordsService } from "../service/reserved-keywords-service";
 
+const USER_SEARCH_RESULT_LIMIT = 100;
 export const searchUsers = async (
     _0: any,
     { value, limit, offSet }: { value: string; limit: number; offSet: number },
     context: AuthenticatedContext,
     info: any
 ) => {
+    const clampedLimit = Math.min(limit, USER_SEARCH_RESULT_LIMIT);
     const [searchResponse, count] = await context.connection.manager
         .getCustomRepository(UserRepository)
-        .search({ value, limit, offSet });
+        .search({ value, limit: clampedLimit, offSet });
 
     return {
-        hasMore: count - (offSet + limit) > 0,
+        hasMore: count - (offSet + clampedLimit) > 0,
+        users: searchResponse,
+        count
+    };
+};
+
+export const adminSearchUsers = async (
+    _0: any,
+    { value, limit, offSet }: { value: string; limit: number; offSet: number },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const clampedLimit = Math.min(limit, USER_SEARCH_RESULT_LIMIT);
+    const [searchResponse, count] = await context.connection.manager
+        .getCustomRepository(UserRepository)
+        .searchWithNoRestrictions({ value, limit: clampedLimit, offSet });
+
+    return {
+        hasMore: count - (offSet + clampedLimit) > 0,
         users: searchResponse,
         count
     };
@@ -50,6 +71,7 @@ export const emailAddressAvailable = async (
 };
 
 export const usernameAvailable = async (_0: any, { username }: { username: string }, context: Context) => {
+    ReservedKeywordsService.validateReservedKeyword(username);
     const user = await context.connection.manager.getCustomRepository(UserRepository).getUserByUsername(username);
 
     const catalog = await context.connection.manager
@@ -77,7 +99,7 @@ export const createMe = async (
 
     const repository = context.connection.manager.getCustomRepository(UserRepository);
     if (!FirstUserStatusHolder.IS_FIRST_USER_CREATED) {
-        FirstUserStatusHolder.IS_FIRST_USER_CREATED = (await repository.isAtLeastOneUserRegistered()) === 1;
+        FirstUserStatusHolder.IS_FIRST_USER_CREATED = await repository.isAtLeastOneUserRegistered();
     }
 
     await context.connection.transaction(async (transaction) => {
@@ -210,19 +232,30 @@ export const setMyAvatarImage = async (
 };
 
 export const deleteMe = async (_0: any, {}, context: AuthenticatedContext, info: any) => {
-    context.connection.transaction(async (transaction) => {
-        const user = await transaction
-            .getCustomRepository(UserRepository)
-            .findUserByUserName({ username: context.me.username });
+    return await deleteUserAndLogAction(context.me.username, context);
+};
+
+export const adminDeleteUser = async (
+    _0: any,
+    { username }: { username: string },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    return await deleteUserAndLogAction(username, context);
+};
+
+const deleteUserAndLogAction = async (username: string, context: AuthenticatedContext) => {
+    await context.connection.transaction(async (transaction) => {
+        const userRepository = transaction.getCustomRepository(UserRepository);
+        const user = await transaction.getCustomRepository(UserRepository).findUserByUserName({ username });
 
         await createActivityLog(transaction, {
-            userId: user.id,
+            userId: context.me.id,
+            targetUserId: user.id,
             eventType: ActivityLogEventType.USER_DELETED
         });
 
-        return await transaction.getCustomRepository(UserRepository).deleteUser({
-            username: context.me.username
-        });
+        return await userRepository.deleteUser(user);
     });
 };
 

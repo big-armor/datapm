@@ -1,0 +1,3 @@
+mutation SetCatalogAvatarImage($identifier: CatalogIdentifierInput!, $image: Base64ImageUpload!) {
+    setCatalogAvatarImage(identifier: $identifier, image: $image)
+}

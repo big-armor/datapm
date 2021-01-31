@@ -23,17 +23,11 @@ import { ImageStorageService } from "../storage/images/image-storage-service";
 import { CollectionRepository } from "./CollectionRepository";
 import { StorageErrors } from "../storage/files/file-storage-service";
 import { FirstUserStatusHolder } from "../resolvers/FirstUserStatusHolder";
+import { ReservedKeywordsService } from "../service/reserved-keywords-service";
 // https://stackoverflow.com/a/52097700
 export function isDefined<T>(value: T | undefined | null): value is T {
     return <T>value !== undefined && <T>value !== null;
 }
-
-export interface UserCatalogInput {
-    catalogId: number;
-    permission: Permission[];
-}
-
-const SELECTED_WORKPAD_REGEX = /^selected_workpad_id_person_(\d+)$/;
 
 declare module "typeorm" {
     interface SelectQueryBuilder<Entity> {
@@ -151,8 +145,8 @@ export class UserRepository extends Repository<UserEntity> {
         super();
     }
 
-    public isAtLeastOneUserRegistered(): Promise<number> {
-        return this.query('SELECT CASE WHEN EXISTS (SELECT 1 FROM "user" WHERE id IS NOT NULL) THEN 1 ELSE 0 END');
+    public async isAtLeastOneUserRegistered(): Promise<boolean> {
+        return (await this.createQueryBuilder().getOne()) != null;
     }
 
     getUserByUsername(username: string) {
@@ -308,6 +302,35 @@ export class UserRepository extends Repository<UserEntity> {
             .getManyAndCount();
     }
 
+    async searchWithNoRestrictions({
+        value,
+        limit,
+        offSet,
+        relations = []
+    }: {
+        value: string;
+        limit: number;
+        offSet: number;
+        relations?: string[];
+    }): Promise<[UserEntity[], number]> {
+        const ALIAS = "searchWithNoRestrictions";
+        return await this.manager
+            .getRepository(UserEntity)
+            .createQueryBuilder()
+            .where(
+                `(UserEntity.username LIKE :valueLike OR UserEntity.emailAddress LIKE :valueLike OR UserEntity.firstName LIKE :valueLike OR UserEntity.lastName LIKE :valueLike)`,
+                {
+                    value,
+                    valueLike: value + "%"
+                }
+            )
+            .addRelations(ALIAS, relations)
+            .orderBy("id")
+            .limit(limit)
+            .offset(offSet)
+            .getManyAndCount();
+    }
+
     createInviteUser(emailAddress: string): Promise<UserEntity> {
         return this.manager.nestedTransaction(async (transaction) => {
             let user = transaction.create(UserEntity);
@@ -342,8 +365,8 @@ export class UserRepository extends Repository<UserEntity> {
             return (input as CreateUserInputAdmin) !== undefined;
         };
 
+        ReservedKeywordsService.validateReservedKeyword(value.username);
         const emailVerificationToken = uuid();
-
         return this.manager
             .nestedTransaction(async (transaction) => {
                 if (value.firstName != null) user.firstName = value.firstName.trim();
@@ -476,6 +499,9 @@ export class UserRepository extends Repository<UserEntity> {
         value: UpdateUserInput;
         relations?: string[];
     }): Promise<UserEntity> {
+        if (value.username) {
+            ReservedKeywordsService.validateReservedKeyword(value.username);
+        }
         return this.manager.nestedTransaction(async (transaction) => {
             const dbUser = await getUserByUsernameOrFail({
                 username,
@@ -564,13 +590,8 @@ export class UserRepository extends Repository<UserEntity> {
         });
     }
 
-    async deleteUser({ username }: { username: string }): Promise<void> {
-        const user = await getUserByUsernameOrFail({
-            username: username,
-            manager: this.manager
-        });
-
-        await this.manager.getCustomRepository(CatalogRepository).deleteCatalog({ slug: username });
+    async deleteUser(user: UserEntity): Promise<void> {
+        await this.manager.getCustomRepository(CatalogRepository).deleteCatalog({ slug: user.username });
 
         const collections = await this.manager.getCustomRepository(CollectionRepository).findByUser(user.id);
 
@@ -584,7 +605,7 @@ export class UserRepository extends Repository<UserEntity> {
         try {
             await ImageStorageService.INSTANCE.deleteUserAvatarImage(user.id);
         } catch (error) {
-            if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) return;
+            if (error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST)) return;
 
             console.error(error.message);
         }
@@ -592,7 +613,7 @@ export class UserRepository extends Repository<UserEntity> {
         try {
             await ImageStorageService.INSTANCE.deleteUserCoverImage(user.id);
         } catch (error) {
-            if (error.message == StorageErrors.FILE_DOES_NOT_EXIST) return;
+            if (error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST)) return;
 
             console.error(error.message);
         }

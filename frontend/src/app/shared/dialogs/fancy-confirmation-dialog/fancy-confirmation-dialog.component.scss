@@ -3,6 +3,7 @@
 .mat-dialog-title {
     padding: 20px 20px 0;
 }
+
 .description {
     padding: 20px 0;
     background: $white;
@@ -50,22 +51,31 @@
     }
 
     .confirm-button {
+        border: 1px solid $color-danger;
+        background: $white;
+        color: $gray-3;
+        font-family: $family-roboto;
+        font-size: $text-font;
+        font-weight: $weight-400;
+
+        &:hover {
+            border: 1px solid $color-danger;
+            background: $white;
+            color: $gray-3;
+            font-family: $family-roboto;
+            font-size: $text-font;
+        }
+    }
+
+    .cancel-button {
         border: 1px solid $gray-3;
         background: $white;
         color: $gray-3;
 
         &:hover {
-            background: $gray-3;
-            color: $white;
-        }
-    }
-
-    .cancel-button {
-        border: 1px solid $color-danger;
-        background: $color-danger;
-        &:hover {
+            border: 1px solid $gray-3;
             background: $white;
-            color: $color-danger-lighter;
+            color: $gray-3;
         }
     }
 }
@@ -78,4 +88,14 @@
 
 .spacer {
     flex-grow: 1;
+}
+
+.one-line-input {
+    ::ng-deep input.mat-input-element {
+        width: unset;
+        border: none;
+        border-bottom: 2px solid $color-danger;
+        background: transparent;
+        outline: transparent solid 1px;
+    }
 }

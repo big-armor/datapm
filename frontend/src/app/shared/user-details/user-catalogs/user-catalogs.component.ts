@@ -47,14 +47,14 @@ export class UserCatalogsComponent implements OnInit {
         private dialogService: DialogService
     ) {}
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.refreshCatalogs();
         if (!this.isCurrentUser) {
             this.columnsToDisplay = ["name"];
         }
     }
 
-    refreshCatalogs() {
+    public refreshCatalogs(): void {
         this.catalogState = State.LOADING;
         this.userCatalogs
             .fetch({ username: this.username, offSet: 0, limit: 1000 })
@@ -69,7 +69,7 @@ export class UserCatalogsComponent implements OnInit {
             });
     }
 
-    createCatalog(formValue) {
+    public createCatalog(formValue): void {
         this.dialog
             .open(CreateCatalogComponent, {
                 data: formValue
@@ -82,7 +82,11 @@ export class UserCatalogsComponent implements OnInit {
             });
     }
 
-    deleteCatalog(catalog: Catalog) {
+    public deleteCatalog(catalog: Catalog): void {
+        if (!this.canModifyCatalog(catalog.identifier.catalogSlug)) {
+            return;
+        }
+
         if (catalog.identifier.catalogSlug == this.authenticationService.currentUser.value?.username) {
             this.dialog.open(this.deleteMyUsercatalog);
             return;
@@ -94,11 +98,17 @@ export class UserCatalogsComponent implements OnInit {
         });
 
         dlgRef.afterClosed().subscribe((confirmed: boolean) => {
-            this.refreshCatalogs();
+            if (confirmed) {
+                this.refreshCatalogs();
+            }
         });
     }
 
-    editCatalog(catalog: Catalog) {
+    public editCatalog(catalog: Catalog): void {
+        if (!this.canModifyCatalog(catalog.identifier.catalogSlug)) {
+            return;
+        }
+
         this.dialog
             .open(EditCatalogComponent, {
                 data: catalog
@@ -111,6 +121,10 @@ export class UserCatalogsComponent implements OnInit {
                     );
                 }
             });
+    }
+
+    public canModifyCatalog(catalogSlug: string): boolean {
+        return catalogSlug && catalogSlug !== this.username;
     }
 
     public updateCatalogVisibility(catalog: Catalog, changeEvent: MatSlideToggleChange): void {

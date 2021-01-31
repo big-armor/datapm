@@ -10,6 +10,7 @@ import {
 } from "./registry-client";
 import { createUser } from "./test-utils";
 import { describe, it } from "mocha";
+import { AdminHolder } from "./admin-holder";
 
 describe("User Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
@@ -19,6 +20,8 @@ describe("User Tests", async () => {
 
     it("Create users A & B", async function () {
         userAClient = await createUser("FirstA", "LastA", "testA-user", "testA-user@test.datapm.io", "passwordA!");
+        AdminHolder.adminClient = userAClient;
+
         userBClient = await createUser("FirstB", "LastB", "testB-user", "testB-user@test.datapm.io", "passwordB!");
         expect(userAClient).to.exist;
         expect(userBClient).to.exist;

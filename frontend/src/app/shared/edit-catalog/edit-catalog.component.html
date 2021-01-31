@@ -1,11 +1,20 @@
 <form [formGroup]="form" id="editCatalog">
+    <div mat-dialog-title id="contentTitle">Edit catalog</div>
+
+    <app-cover [catalogSlug]="data.identifier.catalogSlug" [editable]="true" (upload)="uploadCover($event)"></app-cover>
+
+    <app-avatar
+        class="catalog-avatar"
+        [catalog]="data"
+        [circled]="false"
+        [size]="100"
+        [editable]="true"
+        (upload)="uploadAvatar($event)"
+    >
+    </app-avatar>
+
     <div mat-dialog-content id="contentBorder">
-        <app-cover
-            [catalogSlug]="data.identifier.catalogSlug"
-            [editable]="true"
-            (upload)="uploadCover($event)"
-        ></app-cover>
-        <div class="d-flex bd-highlight mt-3 mb-1">
+        <div class="d-flex bd-highlight mb-1">
             <div class="pr-3 py-2 bd-highlight div-question long-txt">Make this catalog public</div>
             <div class="ml-auto py-2 bd-highlight slide-right">
                 <mat-slide-toggle class="app-slide-toggle" formControlName="isPublic"></mat-slide-toggle>
@@ -52,7 +61,7 @@
         </div>
         <div class="text-danger mt-3" *ngIf="state === 'ERROR'">Error occured while updating catalog.</div>
     </div>
-    <div mat-dialog-actions>
+    <div mat-dialog-actions class="mb-12">
         <button mat-button class="ml-auto save-btn" [disabled]="form.invalid" (click)="save()">
             <span *ngIf="state !== 'LOADING'">save</span>
             <mat-spinner [diameter]="16" *ngIf="state === 'LOADING'">Save</mat-spinner>
