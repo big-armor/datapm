@@ -1,0 +1,4 @@
+Hello, {{username}},
+
+Your account in {{registry_url}} at {{registry_name}} has been suspended with the following message:
+{{message}}

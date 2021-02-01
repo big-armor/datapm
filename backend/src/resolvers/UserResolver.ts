@@ -11,7 +11,7 @@ import {
     UserStatus
 } from "../generated/graphql";
 import { CatalogRepository } from "../repository/CatalogRepository";
-import { UserRepository } from "../repository/UserRepository";
+import { getUserByUsernameOrFail, UserRepository } from "../repository/UserRepository";
 import { hashPassword } from "../util/PasswordUtil";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { ImageStorageService } from "../storage/images/image-storage-service";
@@ -19,6 +19,7 @@ import { createActivityLog } from "../repository/ActivityLogRepository";
 import { FirstUserStatusHolder } from "./FirstUserStatusHolder";
 import { UserEntity } from "../entity/UserEntity";
 import { ReservedKeywordsService } from "../service/reserved-keywords-service";
+import { sendUserSuspendedEmail } from "../util/smtpUtil";
 
 const USER_SEARCH_RESULT_LIMIT = 100;
 export const searchUsers = async (
@@ -55,6 +56,33 @@ export const adminSearchUsers = async (
         users: searchResponse,
         count
     };
+};
+
+export const adminSetUserStatus = async (
+    _0: any,
+    { username, status, message }: { username: string; status: UserStatus; message?: string | undefined | null },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    return context.connection.transaction(async (transaction) => {
+        const targetUser = await getUserByUsernameOrFail({
+            username,
+            manager: transaction
+        });
+
+        if (UserStatus.SUSPENDED == status) {
+            sendUserSuspendedEmail(targetUser, message || "");
+        }
+
+        await createActivityLog(transaction, {
+            userId: context.me.id,
+            targetUserId: targetUser.id,
+            eventType: ActivityLogEventType.USER_STATUS_CHANGED
+        });
+
+        const repository = context.connection.manager.getCustomRepository(UserRepository);
+        return repository.updateUserStatus(username, status);
+    });
 };
 
 export const emailAddressAvailable = async (

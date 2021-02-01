@@ -1,11 +1,12 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, ViewChild } from "@angular/core";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatTableDataSource } from "@angular/material/table";
-import { AdminDeleteUserGQL, AdminSearchUsersGQL, User } from "../../../../generated/graphql";
+import { AdminSetUserStatusGQL, AdminDeleteUserGQL, AdminSearchUsersGQL, User } from "../../../../generated/graphql";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import Timeout = NodeJS.Timeout;
 import { ConfirmationDialogService } from "../../../services/dialog/confirmation-dialog.service";
+import { UserStatusChangeDialogResponse } from "src/app/services/dialog/user-status-change-dialog-response";
 
 @Component({
     selector: "app-users",
@@ -33,6 +34,7 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
 
     constructor(
         private searchUsersGQL: AdminSearchUsersGQL,
+        private changeUserStatusGQL: AdminSetUserStatusGQL,
         private deleteUserGQL: AdminDeleteUserGQL,
         private changeDetectorRef: ChangeDetectorRef,
         private confirmationDialogService: ConfirmationDialogService
@@ -79,6 +81,18 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
                 this.deleteUserGQL.mutate({ username: user.username }).subscribe(() => this.loadSearchedUsers());
             }
         });
+    }
+
+    public openUserStatusChangeConfirmationDialog(user: User): void {
+        this.confirmationDialogService
+            .openUserStatusChangeConfirmationDialog({ data: user })
+            .subscribe((response: UserStatusChangeDialogResponse) => {
+                if (response) {
+                    this.changeUserStatusGQL
+                        .mutate({ username: user.username, status: response.status, message: response.message })
+                        .subscribe(() => this.loadSearchedUsers());
+                }
+            });
     }
 
     private subscribeToPageChangeEvent(): void {

@@ -45,7 +45,9 @@
             <ng-container matColumnDef="actions">
                 <th mat-header-cell *matHeaderCellDef>Actions</th>
                 <td mat-cell *matCellDef="let element">
-                    <button (click)="openDeleteUserConfirmationDialog(element)" mat-button color="warn">Delete</button>
+                    <button (click)="openUserStatusChangeConfirmationDialog(element)" mat-button color="warn">
+                        Delete
+                    </button>
                 </td>
             </ng-container>
 

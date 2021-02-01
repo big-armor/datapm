@@ -127,6 +127,7 @@ enum ActivityLogEventType {
     USER_CREATED
     USER_DELETED
     USER_EDIT
+    USER_STATUS_CHANGED
 }
 
 enum ActivityLogChangeType {
@@ -776,6 +777,11 @@ type Mutation {
     Updates the user's admin status.
     """
     setAsAdmin(username: String! @validUsernameOrEmailAddress, isAdmin: Boolean!): Void @isAdmin
+
+    """
+    Updates the user's status and sends a notification email to them
+    """
+    adminSetUserStatus(username: String! @validUsername, status: UserStatus!, message: String): Void @isAdmin
 
     """
     Updates the logged in users' password

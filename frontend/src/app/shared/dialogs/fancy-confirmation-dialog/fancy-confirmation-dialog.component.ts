@@ -1,6 +1,6 @@
 import { Component, Inject } from "@angular/core";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
-import { DialogData } from "../../../services/dialog/dialog-data";
+import { ConfirmationDialogData } from "../../../services/dialog/confirmation-dialog-data";
 
 @Component({
     selector: "app-fancy-confirmation-dialog",
@@ -21,7 +21,7 @@ export class FancyConfirmationDialogComponent {
     public confirmationInputFieldValue: string = "";
 
     constructor(
-        @Inject(MAT_DIALOG_DATA) public data: DialogData,
+        @Inject(MAT_DIALOG_DATA) public data: ConfirmationDialogData,
         public dialogRef: MatDialogRef<FancyConfirmationDialogComponent>
     ) {
         this.title = this.getOrDefault(data.title, this.title);
