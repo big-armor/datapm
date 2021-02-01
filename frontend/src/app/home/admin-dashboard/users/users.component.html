@@ -46,8 +46,9 @@
                 <th mat-header-cell *matHeaderCellDef>Actions</th>
                 <td mat-cell *matCellDef="let element">
                     <button (click)="openUserStatusChangeConfirmationDialog(element)" mat-button color="warn">
-                        Delete
+                        Change status
                     </button>
+                    <button (click)="openDeleteUserConfirmationDialog(element)" mat-button color="warn">Delete</button>
                 </td>
             </ng-container>
 

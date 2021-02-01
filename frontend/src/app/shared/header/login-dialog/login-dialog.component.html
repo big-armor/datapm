@@ -35,6 +35,9 @@
                 <div class="alert-warn" *ngIf="state == State.INCORRECT_LOGIN">
                     Your username and password were not correct.
                 </div>
+                <div class="alert-warn" *ngIf="state == State.LOGIN_ERROR_ACCOUNT_SUSPENDED">
+                    Your account has been suspended.
+                </div>
                 <div class="alert-warn" *ngIf="state == State.LOGIN_ERROR">
                     There was a problem communicating with the server. Please try again, or contact support.
                 </div>
