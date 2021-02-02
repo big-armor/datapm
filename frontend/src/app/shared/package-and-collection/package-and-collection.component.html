@@ -1,16 +1,16 @@
-<div class="col-md-12 col-lg-12">
+<div class="p-0 col-md-12 col-lg-12">
     <h1 class="title">{{ title }}</h1>
 </div>
 
 <div *ngIf="!loadingCollections; else collectionsLoadingTemplate">
     <div *ngIf="collections.length">
-        <h3 class="section-title">Collections</h3>
+        <h3 class="sub-title">Collections</h3>
         <app-collections-horizontal-list [collections]="collections"></app-collections-horizontal-list>
     </div>
 </div>
 
 <div *ngIf="packages.length">
-    <h3 class="section-title">Packages</h3>
+    <h3 class="sub-title">Packages</h3>
     <div *ngFor="let package of packages">
         <app-package-item [item]="package"></app-package-item>
     </div>
