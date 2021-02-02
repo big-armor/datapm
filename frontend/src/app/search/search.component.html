@@ -6,7 +6,8 @@
             <div class="row big-div-latest mb-3">
                 <div class="col-md-12 col-lg-12 pb-2 mb-4">
                     <app-package-and-collection
-                        [title]="'Search results'"
+                        [title]="'Search Results'"
+                        [subtitlesPrefix]="'Matching'"
                         [packagesQuery]="packagesQuery"
                         [collectionsQuery]="collectionsQuery"
                         (onLoadPackagesClick)="updatePackageFetchingQuery($event)"

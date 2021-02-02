@@ -147,6 +147,9 @@ export class ActivityLogRepository {
                     user_id: user.id
                 }
             )
+            .andWhere(
+                'EXISTS (SELECT 1 FROM collection_package WHERE collection_id = "ActivityLog".target_collection_id)'
+            )
             .orderBy('"ActivityLog"."created_at"', "DESC")
             .limit(limit)
             .offset(offSet)

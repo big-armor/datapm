@@ -14,7 +14,8 @@ import {
     CollectionPackagesDocument,
     CreateVersionDocument,
     UserCollectionsDocument,
-    DeleteUserCollectionPermissionsDocument
+    DeleteUserCollectionPermissionsDocument,
+    RemovePackageFromCollectionDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
@@ -287,6 +288,73 @@ describe("Collection Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").true;
+    });
+
+    it("Adding a package to a collection changes its update date", async function () {
+        await userAClient.mutate({
+            mutation: CreateCollectionDocument,
+            variables: {
+                value: {
+                    collectionSlug: "test-update-collection",
+                    name: "test-update-collection",
+                    description: "test-update-collection"
+                }
+            }
+        });
+
+        const collectionBeforeUpdate = await userAClient.query({
+            query: CollectionDocument,
+            variables: {
+                identifier: {
+                    collectionSlug: "test-update-collection"
+                }
+            }
+        });
+        const oldUpdatedDate = collectionBeforeUpdate.data.collection.updatedAt;
+
+        let response = await userAClient.mutate({
+            mutation: AddPackageToCollectionDocument,
+            variables: {
+                collectionIdentifier: {
+                    collectionSlug: "test-update-collection"
+                },
+                packageIdentifier: {
+                    catalogSlug: "testA-collection",
+                    packageSlug: "congressional-legislators"
+                }
+            }
+        });
+
+        console.log("response", response);
+
+        const collectionAfterUpdate = await userAClient.query({
+            query: CollectionDocument,
+            variables: {
+                identifier: {
+                    collectionSlug: "test-update-collection"
+                }
+            }
+        });
+        const newUpdatedDate = collectionAfterUpdate.data.collection.updatedAt;
+        console.log(oldUpdatedDate, newUpdatedDate);
+
+        expect(response.errors != undefined).false;
+        expect(oldUpdatedDate != undefined).true;
+        expect(newUpdatedDate != undefined).true;
+        expect(newUpdatedDate != oldUpdatedDate).true;
+
+        await userAClient.mutate({
+            mutation: RemovePackageFromCollectionDocument,
+            variables: {
+                collectionIdentifier: {
+                    collectionSlug: "test-update-collection"
+                },
+                packageIdentifier: {
+                    catalogSlug: "testA-collection",
+                    packageSlug: "congressional-legislators"
+                }
+            }
+        });
     });
 
     it("User B add package to collection", async function () {

@@ -25,7 +25,7 @@ export class PackageAndCollectionComponent implements OnInit, OnChanges {
     public title: string;
 
     @Input()
-    public subTitle: string;
+    public subtitlesPrefix: string;
 
     @Input()
     public collectionsLimit: number = 30;
@@ -49,6 +49,10 @@ export class PackageAndCollectionComponent implements OnInit, OnChanges {
     public hasPackageErrors: boolean = false;
 
     public ngOnInit(): void {
+        if (!this.subtitlesPrefix) {
+            this.subtitlesPrefix = this.title;
+        }
+
         this.requestMorePackages();
         this.requestMoreCollections();
     }

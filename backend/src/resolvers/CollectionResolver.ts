@@ -248,6 +248,9 @@ export const addPackageToCollection = async (
     if (value == undefined)
         throw new ApolloError("Not able to find the CollectionPackage entry after entry. This should never happen!");
 
+    collectionEntity.updatedAt = new Date();
+    await repository.save(collectionEntity);
+
     await createActivityLog(context.connection, {
         userId: context.me.id,
         eventType: ActivityLogEventType.COLLECTION_PACKAGE_ADDED,
