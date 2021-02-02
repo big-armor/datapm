@@ -1,7 +1,6 @@
-import { DialogData } from "./dialog-data";
 import { DialogSize } from "./dialog-size";
 
 export interface DialogConfig {
-    data: DialogData;
+    data: any;
     size?: DialogSize;
 }

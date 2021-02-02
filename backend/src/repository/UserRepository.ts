@@ -102,7 +102,7 @@ async function getUserOrFail({
     return user;
 }
 
-async function getUserByUsernameOrFail({
+export async function getUserByUsernameOrFail({
     username,
     manager,
     relations = []
@@ -486,6 +486,18 @@ export class UserRepository extends Repository<UserEntity> {
             });
 
             dbUser.isAdmin = isAdmin;
+            await transaction.save(dbUser);
+        });
+    }
+
+    public updateUserStatus(username: string, status: UserStatus): Promise<void> {
+        return this.manager.nestedTransaction(async (transaction) => {
+            const dbUser = await getUserByUsernameOrFail({
+                username,
+                manager: transaction
+            });
+
+            dbUser.status = status;
             await transaction.save(dbUser);
         });
     }

@@ -1,6 +1,6 @@
 import { DialogTextOrientation } from "./dialog-text-orientation";
 
-export interface DialogData {
+export interface ConfirmationDialogData {
     title: string;
     content: string;
     warning?: string;
