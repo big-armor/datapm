@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "http://datapm.io/docs/package-file-schema-v1.json",
+    "$id": "https://datapm.io/docs/package-file-schema-v0.2.0.json",
     "type": "object",
     "title": "DataPM Package File",
     "description": "The root definition file for version 1 of the datapm package file system.",
@@ -121,14 +121,6 @@
                     }
                 }
             }
-        },
-        "description": {
-            "$id": "#/description",
-            "type": "string",
-            "maxLength": 256,
-            "title": "Package Description",
-            "description": "A short description of the package contents that is shown in package listings. Use the readmeFile or readmeMark down for long form content.",
-            "default": ""
         },
         "schemas": {
             "$id": "#/schemas",
