@@ -1,7 +1,3 @@
-<div class="p-0 col-md-12 col-lg-12">
-    <h1 class="title">{{ title }}</h1>
-</div>
-
 <div *ngIf="!loadingCollections; else collectionsLoadingTemplate">
     <div *ngIf="collections.length">
         <h3 class="sub-title">{{ subtitlesPrefix }} Collections</h3>
