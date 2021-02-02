@@ -1,9 +1,8 @@
 @import "../../../styles/variables";
 
 #editCollection {
-    min-width: 600px;
+    min-width: 500px;
     position: relative;
-    top: -14px;
 
     .mat-dialog-content {
         border-top: none !important;
@@ -44,7 +43,6 @@
 @media (max-width: 576px) {
     #editCollection {
         min-width: 260px;
-        top: -8px;
         button.save-btn {
             top: 0px !important;
         }

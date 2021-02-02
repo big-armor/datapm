@@ -18,6 +18,10 @@ body {
     font-family: $family-roboto !important;
 }
 
+.cursor-pointer {
+    cursor: pointer;
+}
+
 .mat-spinner circle {
     stroke: $gray-3 !important;
 }
@@ -36,12 +40,69 @@ body {
     background-color: inherit;
 }
 
-.mat-dialog-container {
-    background-color: $gray-11;
+table.gray-table {
+    width: 100%;
+    border: 1px solid #d9d9d9;
+
+    .mat-column-name {
+        width: 35%;
+    }
+
+    tr.mat-row,
+    tr.mat-footer-row {
+        height: 42px;
+        cursor: pointer;
+    }
+
+    .mat-header-row {
+        height: 40px !important;
+        background-color: #ededed;
+    }
+
+    th {
+        font-family: $family-roboto;
+        font-size: $text-font;
+        font-weight: $weight-500;
+        letter-spacing: 0.4px;
+        color: $gray-1;
+    }
+
+    td {
+        font-family: $family-roboto;
+        letter-spacing: 0.4px;
+        color: $gray-2;
+        font-size: $text-font;
+        font-weight: $weight-400;
+    }
 }
 
-.mat-header-row {
-    background-color: $white;
+.gray-paginator {
+    height: 58px !important;
+    background-color: #ededed;
+    border: 1px solid #d9d9d9;
+    border-top: 0px;
+    font-weight: $weight-400;
+    color: $gray-1;
+
+    .mat-paginator-icon {
+        width: 22px;
+    }
+
+    .mat-icon-button {
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+    }
+}
+
+.cdk-global-scrollblock {
+    position: static !important;
+    width: initial !important;
+    overflow-y: inherit !important;
+}
+
+.mat-dialog-container {
+    background-color: $gray-11;
 }
 
 .loading-pane {
@@ -129,9 +190,12 @@ body {
         padding: 10px 15px;
         width: 100%;
         height: 44px;
+        box-shadow: none;
         font-size: $text-font;
         border: 1px solid $gray-5;
         outline: none;
+        letter-spacing: 1px;
+        font-family: $family-roboto;
         background-color: $gray-7;
         transition: background-color ease 0.5s;
 
@@ -165,6 +229,15 @@ body {
 mat-select {
     background-color: $gray-7;
     padding: 10px 16px;
+    letter-spacing: 0.7px;
+    font-family: $family-roboto;
+
+    &::placeholder {
+        font-family: $family-roboto;
+        letter-spacing: 0.7px;
+        font-weight: $weight-300 !important;
+        font-size: $text-font;
+    }
 }
 
 .dpm-input-flat {
@@ -174,7 +247,9 @@ mat-select {
     height: 44px;
     border: none;
     outline: none;
+    letter-spacing: 0.7px;
     background-color: $gray-7;
+    font-family: $family-roboto;
     transition: background-color ease 0.5s;
 
     &:hover {
@@ -183,8 +258,10 @@ mat-select {
     }
 
     &::placeholder {
-        @include text("body");
-        color: $gray-4;
+        font-family: $family-roboto;
+        letter-spacing: 0.7px;
+        font-weight: $weight-300;
+        font-size: $text-font;
     }
 }
 
@@ -308,38 +385,49 @@ mat-select {
 }
 
 .section-title {
-    font-family: $family-roboto-mono;
+    font-family: $family-roboto;
     font-style: $style-normal;
     font-weight: $weight-400;
     font-size: $title-font;
     line-height: 26px;
-    letter-spacing: -0.28px;
+    letter-spacing: 0.7px;
     color: $gray-1;
     padding: 0px 24px 14px 0px;
 }
 
 .search-autocomplete {
     border-radius: 4px;
-    margin: 0px 10px;
     margin-top: 2px;
 }
+
 .public-text {
     @include text("small");
     color: $color-1;
+    margin-left: 6px;
 }
+
 .not-public-text {
     @include text("small");
     color: $gray-3;
+    margin-left: 6px;
+}
+
+.autocomplete-contents {
+    padding-left: 15px;
 }
 
 .autocomplete-title {
-    line-height: normal;
+    line-height: 24px;
+    font-family: $family-roboto;
+    letter-spacing: 0.7px;
+    font-size: $text-font;
 }
 
 .autocomplete-description {
-    line-height: normal;
-    font-size: $text-font;
+    line-height: 12px;
+    font-size: $small-font;
     color: $gray-3;
+    font-weight: $weight-300;
 }
 
 .mat-option {
@@ -411,15 +499,15 @@ textarea.flat-input,
     border-radius: 6px;
     padding: 0px 15px;
     border: none !important;
-    font-family: $family-roboto-mono;
+    font-family: $family-roboto;
     font-style: $style-normal;
     font-weight: $weight-400;
     font-size: $text-font;
     line-height: 18px;
     display: flex;
     align-items: flex-end;
-    letter-spacing: -0.28px;
-    color: $color-info;
+    letter-spacing: 0.7px;
+    color: $gray-1;
 
     &:focus {
         outline: transparent solid 0px;
@@ -427,16 +515,28 @@ textarea.flat-input,
     }
 
     &::placeholder {
-        font-family: $family-roboto-mono;
+        font-family: $family-roboto;
         font-style: $style-normal;
         font-weight: $weight-300;
         font-size: ($text-font - 1);
         line-height: 18px;
         display: flex;
         align-items: flex-end;
-        letter-spacing: -0.28px;
+        letter-spacing: 0.7px;
         color: $gray-4;
     }
+}
+
+.section-description {
+    padding: 0px 0px 15px 0px;
+    font-family: $family-roboto;
+    font-size: ($text-font - 1);
+    font-style: $style-normal;
+    letter-spacing: 0.7px;
+    color: $gray-1;
+    margin-top: 4px !important;
+    width: 66%;
+    overflow: hidden;
 }
 
 button.save-btn {
@@ -448,7 +548,7 @@ button.save-btn {
     border-color: transparent;
 
     span {
-        font-family: $family-roboto-mono;
+        font-family: $family-roboto;
         font-style: $style-normal;
         font-weight: $weight-300;
         font-size: $default-font;
@@ -456,7 +556,7 @@ button.save-btn {
         display: flex;
         align-items: center;
         text-align: center;
-        letter-spacing: -0.28px;
+        letter-spacing: 0.7px;
         color: $gray-3;
     }
 }
@@ -499,8 +599,10 @@ button:disabled {
 }
 
 #contentTitle {
-    font-family: $family-roboto-mono;
+    font-family: $family-roboto;
     font-style: $style-normal;
+    letter-spacing: 0.7px;
+    line-height: 20px;
     font-weight: $weight-400;
     font-size: $title-font;
 }
@@ -508,6 +610,7 @@ button:disabled {
 #contentBorder {
     width: 100%;
     margin: 0 auto;
+    overflow-x: hidden;
     padding-left: 0px !important;
     padding-right: 0px !important;
     max-height: calc(100vh - 130px);
@@ -517,12 +620,12 @@ button:disabled {
 }
 
 .div-question {
-    font-family: $family-roboto-mono;
+    font-family: $family-roboto;
     font-style: $style-normal;
     font-weight: $weight-400;
     font-size: $text-font;
     line-height: 18px;
-    letter-spacing: -0.28px;
+    letter-spacing: 0.7px;
     color: $gray-2;
     width: 230px;
 }
@@ -574,13 +677,106 @@ button:disabled {
     }
 }
 
+.search-user {
+    width: 200px;
+    margin-bottom: 10px;
+
+    .mat-form-field-infix {
+        font-family: $family-roboto;
+        font-style: $style-normal;
+        font-weight: $weight-400;
+        font-size: ($default-font - 1);
+    }
+
+    .mat-form-field-label {
+        font-family: $family-roboto;
+        font-style: $style-normal;
+        font-weight: $weight-400;
+        font-size: $text-font;
+        letter-spacing: 0.4px;
+        color: rgb(0 0 0 / 35%);
+    }
+
+    .mat-form-field-ripple {
+        background-color: $color-info !important;
+    }
+}
+
+.mat-focused .mat-form-field-label {
+    color: $color-info !important;
+}
+
+.slug {
+    color: $color-danger;
+}
+
+#deleteCollection,
+#deleteCatalog,
+#deletePackage,
+#deleteUser {
+    .btn-delete {
+        color: $color-danger;
+        position: relative;
+        top: 4px;
+        padding: 0px 15px;
+        font-weight: $weight-400;
+        border-radius: 6px;
+        box-shadow: $outer-shadow-1;
+        border-color: transparent;
+        font-family: $family-roboto-mono;
+        font-style: $style-normal;
+        font-size: $text-font;
+        line-height: 33px;
+    }
+}
+
+#homeRoutes {
+    list-style-type: none;
+    margin-bottom: 0px;
+    display: flex;
+
+    li {
+        a {
+            font-family: $family-roboto;
+            font-style: $style-normal;
+            font-weight: $weight-300;
+            font-size: ($default-font - 1);
+            letter-spacing: 0.6px;
+            line-height: 24px;
+            text-align: center;
+            color: $gray-3;
+            text-decoration: none;
+            padding: 0px 10px 4px 10px;
+            margin: 0px 10px;
+            position: relative;
+            cursor: pointer;
+            bottom: 25px;
+        }
+
+        &:first-child {
+            a {
+                margin-left: 0px;
+            }
+        }
+    }
+
+    .active {
+        opacity: 1;
+        color: $gray-1 !important;
+        border-bottom: 2px solid $gray-1;
+    }
+}
+
 @media (max-width: 768px) {
     #contentBorder {
-        padding: 0px;
-        overflow: hidden;
+        padding: 10px 0px 0px;
+        max-height: 300px;
+        overflow-y: scroll;
+        overflow-x: hidden;
     }
     .shadow-div {
-        display: block !important;
+        display: grid !important;
+        margin-top: 0px !important;
     }
     .div-question {
         width: 100%;
@@ -588,14 +784,41 @@ button:disabled {
     #addUser {
         min-width: 400px;
     }
+    .section-description {
+        width: 100%;
+    }
+    .gray-responsive {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
 }
 
 @media (max-width: 576px) {
+    #deleteCollection,
+    #deleteCatalog,
+    #deletePackage,
+    #deleteUser {
+        .btn-delete {
+            font-size: $small-font;
+            line-height: 26px;
+            top: 0px;
+        }
+        .btn-close {
+            font-size: ($small-font + 1);
+            line-height: 26px;
+        }
+        .mat-dialog-actions {
+            min-height: 40px;
+        }
+    }
     #addUser {
         min-width: 260px;
     }
     #contentTitle {
         font-size: $default-font;
+        margin-bottom: 10px !important;
     }
     .div-question {
         font-size: $small-font;
@@ -603,11 +826,24 @@ button:disabled {
     .div-answer {
         font-size: $small-font;
     }
-    #contentBorder {
-        padding: 0px;
+    button.save-btn {
+        padding: 2px 24px;
+        top: 0px;
+        span {
+            font-size: $text-font;
+        }
     }
-    button.save-btn span {
-        font-size: $text-font;
+    table.gray-table {
+        .mat-column-name {
+            width: 44%;
+        }
+        th {
+            font-size: ($text-font - 1);
+        }
+
+        td {
+            font-size: ($text-font - 1);
+        }
     }
     .flat-input,
     .flat-input-parent input,
@@ -642,13 +878,22 @@ button:disabled {
             min-width: 208px;
         }
     }
+    .app-outlined-button {
+        padding: 6px 6px;
+        font-size: $small-font;
+    }
+    .dpm-input-flat {
+        &::placeholder {
+            font-size: $small-font;
+        }
+    }
     div {
         .dialog-description {
             font-size: $small-font !important;
             margin-bottom: 0px !important;
         }
         .dialog-close-wrapper {
-            bottom: 19px;
+            bottom: 10px;
             left: 22px;
             .dialog-close {
                 font-size: $small-font;
@@ -664,5 +909,18 @@ button:disabled {
         top: 0.83rem;
         height: 9px;
         margin: 3px;
+    }
+    .mat-dialog-container {
+        padding: 12px 15px 15px 15px !important;
+    }
+    #homeRoutes {
+        li {
+            a {
+                font-size: $text-font;
+                padding: 0px 4px 4px 4px;
+                margin: 0px 2px;
+                bottom: 16px;
+            }
+        }
     }
 }

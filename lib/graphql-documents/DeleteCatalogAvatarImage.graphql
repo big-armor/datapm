@@ -1,0 +1,3 @@
+mutation DeleteCatalogAvatarImage($identifier: CatalogIdentifierInput!) {
+    deleteCatalogAvatarImage(identifier: $identifier)
+}

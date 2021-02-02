@@ -5,12 +5,12 @@
         <div class="col-md-12 col-lg-3 col-sm-12">
             <div class="d-flex flex-column sorting-mat">
                 <mat-radio-group aria-label="Select an option" [(ngModel)]="selectedFilter">
-                    <div class="p-2 bd-highlight">
+                    <div class="py-2 pr-2 bd-highlight">
                         <mat-radio-button [value]="Filter.PACKAGES" (change)="onPackageFilterChange()"
                             >Packages
                         </mat-radio-button>
                     </div>
-                    <div class="p-2 bd-highlight">
+                    <div class="py-2 bd-highlight">
                         <mat-radio-button [value]="Filter.COLLECTIONS" (change)="onCollectionFilterChange()"
                             >Collections
                         </mat-radio-button>
@@ -105,7 +105,7 @@
             </div>
             <div id="searchPackages" *ngIf="isPackageSelected">
                 <ng-container *ngIf="packageResult?.searchPackages?.packages?.length; else nothingFound">
-                    <div class="search-title pl-3">Your search results for '{{ query }}'</div>
+                    <div class="search-title">Your search results for '{{ query }}'</div>
 
                     <app-package-item [item]="package" *ngFor="let package of packageResult?.searchPackages?.packages">
                     </app-package-item>

@@ -26,9 +26,7 @@ export class ConfirmationDialogService {
         const dimensions = DialogDimensionsCalculator.calculate(dialogSize);
         return {
             data,
-            width: dimensions.x + "px",
-            height: dimensions.y + "px",
-            panelClass: "mat-dialog-without-padding"
+            width: dimensions.x + "px"
         };
     }
 }

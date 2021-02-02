@@ -24,6 +24,7 @@ import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 import { packageEntityToGraphqlObject } from "./PackageResolver";
 import { hasCatalogPermissions } from "./UserCatalogPermissionResolver";
+import { ReservedKeywordsService } from "../service/reserved-keywords-service";
 
 export const catalogEntityToGraphQL = (catalogEntity: CatalogEntity): Catalog => {
     return {
@@ -219,6 +220,34 @@ export const updateCatalog = async (
 
         return catalogEntityToGraphQL(catalog);
     });
+};
+
+export const setCatalogAvatarImage = async (
+    _0: any,
+    { identifier, image }: { identifier: CatalogIdentifierInput; image: Base64ImageUpload },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    if (identifier.catalogSlug === context.me.username) {
+        throw new Error("AVATAR_NOT_ALLOWED_ON_USER_CATALOGS");
+    }
+
+    const catalog = await context.connection.manager
+        .getCustomRepository(CatalogRepository)
+        .findCatalogBySlugOrFail(identifier.catalogSlug);
+    await ImageStorageService.INSTANCE.saveCatalogAvatarImage(catalog.id, image.base64);
+};
+
+export const deleteCatalogAvatarImage = async (
+    _0: any,
+    { identifier }: { identifier: CatalogIdentifierInput },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const catalog = await context.connection.manager
+        .getCustomRepository(CatalogRepository)
+        .findCatalogBySlugOrFail(identifier.catalogSlug);
+    await ImageStorageService.INSTANCE.deleteCatalogAvatarImage(catalog.id);
 };
 
 export const setCatalogCoverImage = async (

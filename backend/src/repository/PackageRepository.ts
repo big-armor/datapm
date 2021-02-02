@@ -13,6 +13,8 @@ import { UserEntity } from "../entity/UserEntity";
 import { UserInputError } from "apollo-server";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { UserRepository } from "./UserRepository";
+import { ActivityLogRepository } from "./ActivityLogRepository";
+import { ActivityLogEntity } from "../entity/ActivityLogEntity";
 
 const PUBLIC_PACKAGES_QUERY = '("PackageEntity"."isPublic" is true)';
 const AUTHENTICATED_USER_PACKAGES_QUERY = `

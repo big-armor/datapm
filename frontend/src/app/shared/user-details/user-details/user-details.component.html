@@ -78,6 +78,7 @@
                     <table
                         *ngIf="myAPIKeys && myAPIKeys.length > 0"
                         mat-table
+                        class="gray-table"
                         [dataSource]="myAPIKeys"
                         aria-describedby="apiTable"
                     >

@@ -1,5 +1,15 @@
 <form id="createCatalog" [formGroup]="form">
     <div mat-dialog-title id="contentTitle">Create Catalog</div>
+    <app-cover [editable]="true" (upload)="addCoverImage($event)"></app-cover>
+
+    <app-avatar
+        class="catalog-avatar"
+        [circled]="false"
+        [size]="100"
+        [editable]="true"
+        (upload)="addAvatarImage($event)"
+    >
+    </app-avatar>
     <div mat-dialog-content id="contentBorder">
         <div class="d-flex bd-highlight shadow-div my-3">
             <div class="pr-3 py-2 bd-highlight div-question">Catalog Name*</div>

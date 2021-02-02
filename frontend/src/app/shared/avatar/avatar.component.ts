@@ -4,7 +4,7 @@ import { takeUntil } from "rxjs/operators";
 
 import { FileService } from "src/app/services/file.service";
 import { ImageService } from "src/app/services/image.service";
-import { User } from "src/generated/graphql";
+import { Catalog, User } from "src/generated/graphql";
 
 enum State {
     LOADING,
@@ -17,22 +17,35 @@ enum State {
     styleUrls: ["./avatar.component.scss"]
 })
 export class AvatarComponent implements OnChanges, OnDestroy {
-    @Input() user: User;
-    @Input() size: number = 40;
-    @Input() editable: boolean = false;
-    @Output() upload: EventEmitter<any>;
+    @Input()
+    public user: User;
 
-    State = State;
+    @Input()
+    public catalog: Catalog;
+
+    @Input()
+    public size: number = 40;
+
+    @Input()
+    public editable: boolean = false;
+
+    @Input()
+    public circled: boolean = true;
+
+    @Output()
+    public upload: EventEmitter<any>;
+
+    public State = State;
 
     public state = State.LOADING;
 
-    public imgData = "";
+    public selectedImageData;
     public letter = "";
+
+    public backgroundColor = "#FFFFFF";
+
     private inputEventId: string = "";
-
-    private unsubscribe$ = new Subject();
-
-    public userBackgroundColor = "#FFFFFF";
+    private readonly unsubscribe$ = new Subject();
 
     constructor(private fileService: FileService, private imageService: ImageService) {
         this.upload = new EventEmitter<any>();
@@ -42,11 +55,12 @@ export class AvatarComponent implements OnChanges, OnDestroy {
                 const reader = new FileReader();
                 reader.onload = () => this.upload.emit(reader.result);
                 reader.readAsDataURL(files[0]);
+                this.selectedImageData = this.imageService.convertBlobToSafeImageObjectUrl(files[0]);
             }
         });
     }
 
-    ngOnChanges(changes: SimpleChanges) {
+    public ngOnChanges(changes: SimpleChanges): void {
         if (changes.user && changes.user.currentValue) {
             this.user = changes.user.currentValue;
 
@@ -59,47 +73,66 @@ export class AvatarComponent implements OnChanges, OnDestroy {
                 this.letter = "";
             }
 
-            this.getImage(this.user.username);
+            this.getUserAvatarImage(this.user.username);
+        } else if (changes.catalog && changes.catalog.currentValue) {
+            this.catalog = changes.catalog.currentValue;
+            this.letter = this.catalog.displayName.substr(0, 1).toUpperCase();
+            this.getCatalogAvatarImage(this.catalog.identifier.catalogSlug);
+        } else {
+            this.state = State.LOADED;
         }
     }
 
-    ngOnDestroy() {
+    public ngOnDestroy(): void {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
     }
 
-    uploadFile() {
+    public uploadFile(): void {
         this.inputEventId = this.fileService.openFile("image/jpeg");
     }
 
-    private getImage(username?: string): void {
+    private getUserAvatarImage(username?: string): void {
         if (!username) {
             return;
         }
-        this.userBackgroundColor = "#FFFF";
+        this.backgroundColor = "#FFFF";
         this.imageService
             .loadUserAvatar(username)
             .pipe(takeUntil(this.unsubscribe$))
-            .subscribe((imgData: any) => {
-                this.userBackgroundColor = this.hashStringToColor(username);
-                this.imgData = imgData;
-                this.state = State.LOADED;
-            });
+            .subscribe((imgData: any) => this.loadImageData(imgData, username));
     }
 
-    private djb2(str) {
-        var hash = 5381;
-        for (var i = 0; i < str.length; i++) {
-            hash = (hash << 5) + hash + str.charCodeAt(i); /* hash * 33 + c */
+    private getCatalogAvatarImage(catalogSlug?: string): void {
+        if (!catalogSlug) {
+            return;
+        }
+        this.backgroundColor = "#FFFF";
+        this.imageService
+            .loadCatalogAvatar(catalogSlug)
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe((imgData: any) => this.loadImageData(imgData, catalogSlug));
+    }
+
+    private loadImageData(imageData: any, stringValue: string): void {
+        this.backgroundColor = this.hashStringToColor(stringValue);
+        this.selectedImageData = imageData;
+        this.state = State.LOADED;
+    }
+
+    private djb2(str): number {
+        let hash = 5381;
+        for (let i = 0; i < str.length; i++) {
+            hash = (hash << 5) + hash + str.charCodeAt(i);
         }
         return hash;
     }
 
-    private hashStringToColor(str) {
-        var hash = this.djb2(str);
-        var r = (hash & 0x990000) >> 16;
-        var g = (hash & 0x009900) >> 8;
-        var b = hash & 0x000099;
+    private hashStringToColor(str): string {
+        const hash = this.djb2(str);
+        const r = (hash & 0x990000) >> 16;
+        const g = (hash & 0x009900) >> 8;
+        const b = hash & 0x000099;
         return (
             "#" +
             ("0" + r.toString(16)).substr(-2) +

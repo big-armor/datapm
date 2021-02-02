@@ -3,7 +3,7 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { slugValidator } from "src/app/helpers/validators";
 import { PageState } from "src/app/models/page-state";
-import { Catalog, SetCatalogCoverImageGQL, UpdateCatalogGQL } from "src/generated/graphql";
+import { Catalog, SetCatalogAvatarImageGQL, SetCatalogCoverImageGQL, UpdateCatalogGQL } from "src/generated/graphql";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
 import { ImageService } from "../../services/image.service";
 
@@ -31,6 +31,7 @@ export class EditCatalogComponent {
 
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: Catalog,
+        private setCatalogAvatarImageGQL: SetCatalogAvatarImageGQL,
         private setCatalogCoverImage: SetCatalogCoverImageGQL,
         private updateCatalog: UpdateCatalogGQL,
         private dialogRef: MatDialogRef<EditCatalogComponent>,
@@ -49,12 +50,27 @@ export class EditCatalogComponent {
         });
     }
 
+    public uploadAvatar(data: any): void {
+        this.setCatalogAvatarImageGQL
+            .mutate({
+                identifier: {
+                    catalogSlug: this.data.identifier.catalogSlug
+                },
+                image: {
+                    base64: data
+                }
+            })
+            .subscribe(() => this.imageService.loadCatalogAvatar(this.data.identifier.catalogSlug, true));
+    }
+
     public uploadCover(data: any): void {
         this.setCatalogCoverImage
             .mutate({
-                image: { base64: data },
                 identifier: {
                     catalogSlug: this.data.identifier.catalogSlug
+                },
+                image: {
+                    base64: data
                 }
             })
             .subscribe(() => this.imageService.loadCatalogCover(this.data.identifier.catalogSlug, true));

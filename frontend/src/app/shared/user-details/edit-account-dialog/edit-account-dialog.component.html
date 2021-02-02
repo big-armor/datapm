@@ -1,19 +1,12 @@
 <form id="editAccount" [formGroup]="form">
+    <app-cover [username]="currentUser.username" [editable]="true" (upload)="uploadCover($event)"></app-cover>
+
+    <app-avatar class="user-img" [user]="currentUser" [size]="100" [editable]="true" (upload)="uploadAvatar($event)">
+    </app-avatar>
+    <p class="small-paragraph">public</p>
+
     <div mat-dialog-content id="contentBorder">
-        <app-cover [username]="currentUser.username" [editable]="true" (upload)="uploadCover($event)"></app-cover>
-
         <div class="dialog-content-text">
-            <app-avatar
-                class="user-img"
-                [user]="currentUser"
-                [size]="100"
-                [editable]="true"
-                (upload)="uploadAvatar($event)"
-            >
-            </app-avatar>
-
-            <p class="small-paragraph">public</p>
-
             <div class="d-flex bd-highlight shadow-div mb-3">
                 <div class="px-4 py-2 bd-highlight div-question">email</div>
                 <div class="bd-highlight div-answer">
@@ -141,7 +134,7 @@
             </div>
         </div>
     </div>
-    <div mat-dialog-actions>
+    <div mat-dialog-actions class="mb-12">
         <button
             mat-button
             [mat-dialog-close]="true"

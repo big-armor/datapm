@@ -1,15 +1,6 @@
 @import "../../../../styles/variables";
 
 #detailsPage {
-    .mat-header-row {
-        background-color: inherit;
-    }
-
-    tr.mat-header-row {
-        height: 40px;
-        background-color: #ededed;
-    }
-
     .no-keys-div {
         font-family: $family-roboto-mono;
         font-style: $style-normal;
@@ -59,32 +50,9 @@
         top: 2px;
     }
 
-    .section-description {
-        padding: 0px 24px 30px 0px;
-        width: 66%;
-    }
-
-    table {
-        width: 100%;
-
-        th {
-            font-family: $family-roboto;
-            font-size: $text-font;
-            font-weight: $weight-500;
-            color: $gray-1;
-        }
-
-        td {
-            font-family: $family-roboto;
-            color: $gray-2;
-            font-size: $text-font;
-            font-weight: $weight-400;
-        }
-    }
-
     .panel-div {
         width: 100%;
-        margin-top: 30px;
+        margin-top: 20px;
 
         .div-answer {
             width: 100%;
@@ -94,12 +62,12 @@
             align-items: center;
 
             input {
-                border: 0.5px solid $gray-5;
+                border: 1px solid $gray-5;
                 line-height: 23px;
                 height: 33px;
-                margin-top: 1px;
                 display: flex;
                 width: 230px;
+                box-shadow: none;
                 font-size: $text-font;
                 align-items: flex-end;
                 letter-spacing: -0.28px;
@@ -124,19 +92,11 @@
     }
 }
 
-@media (max-width: 767px) {
-    #detailsPage {
-        .section-description {
-            width: 100%;
-        }
-    }
-}
-
 @media (max-width: 480px) {
     .div-answer {
         flex-direction: column;
         input {
-            width: 100%;
+            width: 190px !important;
         }
     }
 }
