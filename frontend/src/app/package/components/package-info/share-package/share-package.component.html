@@ -1,16 +1,20 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12 p-0" id="sharePackage">
-            <div mat-dialog-title id="contentTitle">Share Package</div>
+            <div mat-dialog-title id="contentTitle">Share {{ userPackage.displayName }}</div>
             <div mat-dialog-content id="contentBorder">
                 <div class="row py-3">
                     <div class="col-md-12">
-                        <div class="d-flex bd-highlight mb-3">
+                        <div
+                            class="d-flex bd-highlight mb-3 copy-wrapper"
+                            (click)="copyPackagelink()"
+                            style="cursor: pointer;"
+                        >
                             <div class="bd-highlight copy-input">
                                 <span>{{ packageUrl() }}</span>
                             </div>
                             <div class="ml-auto bd-highlight">
-                                <button (click)="copyPackagelink()" class="copy-btn">
+                                <button class="copy-btn">
                                     <a><em class="far fa-copy"></em></a>
                                 </button>
                             </div>
@@ -54,15 +58,7 @@
             </div>
 
             <div mat-dialog-actions class="d-flex justify-content-end pb-3 pt-2">
-                <button mat-button mat-dialog-close>Cancel</button>
-                <!-- <button
-                    mat-button
-                    class="btn-delete"
-                    (click)="confirm()"
-                    [disabled]="confirmVal !== data.catalogSlug + '/' + data.packageSlug"
-                >
-                    Delete
-                </button> -->
+                <button mat-button mat-dialog-close>Close</button>
             </div>
         </div>
     </div>

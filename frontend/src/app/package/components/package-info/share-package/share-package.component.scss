@@ -64,35 +64,4 @@
             text-decoration: none;
         }
     }
-
-    .copy-input {
-        border: 1px solid rgb(0 0 0 / 20%);
-        padding: 5px 10px;
-        background: $white;
-        width: 100%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        letter-spacing: 0.8px;
-        font-size: $small-font;
-        font-family: $family-roboto;
-        border-top-left-radius: 6px;
-        border-bottom-left-radius: 6px;
-    }
-
-    .copy-btn {
-        background: #7d7d7de8;
-        border: none;
-        padding: 6px 15px;
-        border-top-right-radius: 6px;
-        border-bottom-right-radius: 6px;
-
-        &:hover {
-            background-color: #7d7d7dc9;
-        }
-
-        a {
-            font-size: $text-font;
-        }
-    }
 }
