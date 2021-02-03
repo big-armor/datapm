@@ -336,7 +336,6 @@ describe("Collection Tests", async () => {
             }
         });
         const newUpdatedDate = collectionAfterUpdate.data.collection.updatedAt;
-        console.log(oldUpdatedDate, newUpdatedDate);
 
         expect(response.errors != undefined).false;
         expect(oldUpdatedDate != undefined).true;
