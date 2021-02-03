@@ -626,6 +626,11 @@ button:disabled {
     }
 }
 
+.disabled-tooltip {
+    min-width: 270px;
+    font-size: 10px;
+}
+
 #homeRoutes {
     list-style-type: none;
     margin-bottom: 0px;

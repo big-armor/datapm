@@ -32,6 +32,7 @@ import { AddUserComponent } from "./components/add-user/add-user.component";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { PackageDeletionConfirmationComponent } from "./components/package/package-deletion-confirmation/package-deletion-confirmation.component";
 import { MatTooltipModule } from "@angular/material/tooltip";
+import { SharePackageComponent } from "./components/package-info/share-package/share-package.component";
 
 @NgModule({
     declarations: [
@@ -48,7 +49,8 @@ import { MatTooltipModule } from "@angular/material/tooltip";
         PackageInfoComponent,
         PackagePermissionComponent,
         AddUserComponent,
-        PackageDeletionConfirmationComponent
+        PackageDeletionConfirmationComponent,
+        SharePackageComponent
     ],
     imports: [
         CommonModule,

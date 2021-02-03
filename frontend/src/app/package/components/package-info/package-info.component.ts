@@ -1,8 +1,11 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { PackageFile } from "datapm-lib";
 import { packageToIdentifier } from "src/app/helpers/IdentifierHelper";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import { Package } from "src/generated/graphql";
+import { AddUserComponent } from "../add-user/add-user.component";
+import { SharePackageComponent } from "./share-package/share-package.component";
 
 @Component({
     selector: "app-package-info",
@@ -13,7 +16,7 @@ export class PackageInfoComponent implements OnInit {
     @Input() public package: Package;
     @Input() public packageFile: PackageFile;
 
-    constructor(private snackBarService: SnackBarService) {}
+    constructor(private snackBarService: SnackBarService, private dialog: MatDialog) {}
 
     ngOnInit(): void {}
     getRecordCount(packageFile) {
@@ -34,5 +37,34 @@ export class PackageInfoComponent implements OnInit {
         document.body.removeChild(el);
 
         this.snackBarService.openSnackBar("fetch command copied to clipboard!", "");
+    }
+
+    public sharePackage() {
+        if (this.package.isPublic) {
+            const dialogRef = this.dialog.open(SharePackageComponent, {
+                data: this.package,
+                width: "450px"
+            });
+        } else {
+            const dialogRef = this.dialog.open(AddUserComponent, {
+                data: {
+                    catalogSlug: this.package.identifier.catalogSlug,
+                    packageSlug: this.package.identifier.packageSlug
+                }
+            });
+        }
+    }
+
+    public canManage() {
+        const isPublic = this.package.myPermissions.filter((permission) => permission === "MANAGE").length > 0;
+        return isPublic;
+    }
+
+    public canShare() {
+        if (this.package.isPublic || this.canManage()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

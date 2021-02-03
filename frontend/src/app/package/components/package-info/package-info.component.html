@@ -1,5 +1,31 @@
 <div id="packageInfo">
     <div *ngIf="package?.latestVersion?.identifier != null">
+        <div class="row pb-3 pt-1 mb-4 share-data">
+            <div class="col-12 justify-content-end" style="display: flex">
+                <div class="px-1 d-flex flex-column bd-highlight">
+                    <button class="app-outlined-button"><a>Download</a></button>
+                </div>
+                <div
+                    class="px-1 d-flex flex-column bd-highlight share-btn"
+                    [matTooltip]="'You do not have the Manage permission for this package'"
+                    matTooltipClass="disabled-tooltip"
+                    [matTooltipDisabled]="canShare()"
+                >
+                    <button
+                        mat-raised-button
+                        style="pointer-events: all !important"
+                        class="app-outlined-button"
+                        (click)="sharePackage()"
+                        [disabled]="!canShare()"
+                    >
+                        <a>Share</a>
+                    </button>
+                </div>
+                <div class="px-1 d-flex flex-column bd-highlight">
+                    <button class="app-outlined-button"><a>Add To Collection</a></button>
+                </div>
+            </div>
+        </div>
         <div class="d-md-block pb-3">
             <div class="d-flex justify-content-between">
                 <div class="package-light-gray">click to copy fetch command</div>

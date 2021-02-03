@@ -1,0 +1,69 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 p-0" id="sharePackage">
+            <div mat-dialog-title id="contentTitle">Share Package</div>
+            <div mat-dialog-content id="contentBorder">
+                <div class="row py-3">
+                    <div class="col-md-12">
+                        <div class="d-flex bd-highlight mb-3">
+                            <div class="bd-highlight copy-input">
+                                <span>{{ packageUrl() }}</span>
+                            </div>
+                            <div class="ml-auto bd-highlight">
+                                <button (click)="copyPackagelink()" class="copy-btn">
+                                    <a><em class="far fa-copy"></em></a>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="social-btn twitter-share-button">
+                            <a [href]="twitterLink()" target="_blank">
+                                <span class="social-square"><em class="fab fa-twitter"></em></span>
+                                <span>Share on Twitter</span>
+                            </a>
+                        </button>
+                        <br />
+                        <button
+                            class="social-btn fb-share-button"
+                            data-href="https://developers.facebook.com/docs/plugins/"
+                        >
+                            <a target="_blank" [href]="facebookLink()" class="fb-xfbml-parse-ignore">
+                                <span class="social-square"><em class="fab fa-facebook-f"></em></span>
+                                <span>Share on Facebook</span>
+                            </a>
+                        </button>
+                    </div>
+
+                    <div class="col-md-6">
+                        <button class="social-btn email-share-button">
+                            <a [href]="emailLink()">
+                                <span class="social-square"><em class="far fa-envelope"></em></span>
+                                <span>Email</span>
+                            </a>
+                        </button>
+                        <br />
+                        <button class="social-btn reddit-share-button">
+                            <a target="_blank" [href]="redditLink()" class="fb-xfbml-parse-ignore">
+                                <span class="social-square"><em class="fab fa-reddit-alien"></em></span>
+                                <span>Share on Reddit</span>
+                            </a>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div mat-dialog-actions class="d-flex justify-content-end pb-3 pt-2">
+                <button mat-button mat-dialog-close>Cancel</button>
+                <!-- <button
+                    mat-button
+                    class="btn-delete"
+                    (click)="confirm()"
+                    [disabled]="confirmVal !== data.catalogSlug + '/' + data.packageSlug"
+                >
+                    Delete
+                </button> -->
+            </div>
+        </div>
+    </div>
+</div>
