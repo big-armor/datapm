@@ -350,6 +350,7 @@ describe("Checking VersionUtil", () => {
 
     it("Package File updated dates", function () {
         const packageFileA: PackageFile = {
+            ...new PackageFile(),
             packageSlug: "test",
             displayName: "test",
             generatedBy: "test",
@@ -360,6 +361,7 @@ describe("Checking VersionUtil", () => {
         };
 
         const packageFileB: PackageFile = {
+            ...new PackageFile(),
             packageSlug: "test",
             displayName: "test",
             generatedBy: "test",
@@ -380,6 +382,7 @@ describe("Checking VersionUtil", () => {
 
     it("Package File updated versions", function () {
         const packageFileA: PackageFile = {
+            ...new PackageFile(),
             packageSlug: "test",
             displayName: "test",
             generatedBy: "test",
@@ -390,6 +393,7 @@ describe("Checking VersionUtil", () => {
         };
 
         const packageFileB: PackageFile = {
+            ...new PackageFile(),
             packageSlug: "test",
             displayName: "test",
             generatedBy: "test",
@@ -410,6 +414,7 @@ describe("Checking VersionUtil", () => {
 
     it("Package File updated readme", function () {
         const packageFileA: PackageFile = {
+            ...new PackageFile(),
             packageSlug: "test",
             displayName: "test",
             generatedBy: "test",
@@ -421,6 +426,7 @@ describe("Checking VersionUtil", () => {
         };
 
         const packageFileB: PackageFile = {
+            ...new PackageFile(),
             packageSlug: "test",
             displayName: "test",
             generatedBy: "test",
@@ -449,6 +455,7 @@ describe("Checking VersionUtil", () => {
 
     it("Package File updated license", function () {
         const packageFileA: PackageFile = {
+            ...new PackageFile(),
             packageSlug: "test",
             displayName: "test",
             generatedBy: "test",
@@ -460,6 +467,7 @@ describe("Checking VersionUtil", () => {
         };
 
         const packageFileB: PackageFile = {
+            ...new PackageFile(),
             packageSlug: "test",
             displayName: "test",
             generatedBy: "test",
@@ -488,6 +496,7 @@ describe("Checking VersionUtil", () => {
 
     it("Package File updated contact email", function () {
         const packageFileA: PackageFile = {
+            ...new PackageFile(),
             packageSlug: "test",
             displayName: "test",
             generatedBy: "test",
@@ -500,6 +509,7 @@ describe("Checking VersionUtil", () => {
         };
 
         const packageFileB: PackageFile = {
+            ...new PackageFile(),
             packageSlug: "test",
             displayName: "test",
             generatedBy: "test",
@@ -523,6 +533,7 @@ describe("Checking VersionUtil", () => {
 
     it("Package File updated website", function () {
         const packageFileA: PackageFile = {
+            ...new PackageFile(),
             packageSlug: "test",
             displayName: "test",
             generatedBy: "test",
@@ -536,6 +547,7 @@ describe("Checking VersionUtil", () => {
         };
 
         const packageFileB: PackageFile = {
+            ...new PackageFile(),
             packageSlug: "test",
             displayName: "test",
             generatedBy: "test",

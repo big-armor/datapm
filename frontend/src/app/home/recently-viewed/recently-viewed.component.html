@@ -1,49 +1,29 @@
-<div class="container" *ngIf="state == State.LOADING">
+<div class="container">
     <div class="row">
-        <div class="col-12">
-            <div class="loading-spinner loading-pane">
-                <mat-spinner [diameter]="60"></mat-spinner>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container" *ngIf="state == State.ERROR">
-    <div class="row">
-        <div class="col-12 mt-5">
-            <div class="alert-warning alert">
-                There was a problem loading this page. Please refresh your browser. If that doesn't work, please contact
-                support.
-            </div>
-        </div>
-    </div>
-</div>
-
-<div *ngIf="state == State.LOADED">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-10 offset-lg-1 col-md-12 col-sm-12 mt-5 py-2">
-                <div class="row big-div-latest mb-3">
-                    <div *ngIf="packages.length" class="col-md-12 col-lg-12">
-                        <h1 class="h1-title">Recently viewed</h1>
-                    </div>
-
-                    <!-- Package without thumbnail -->
-                    <div class="col-md-12 col-lg-12 pb-2 mb-4" *ngIf="packages.length">
-                        <div *ngFor="let packages of packages">
-                            <app-package-item [item]="packages.package"></app-package-item>
+        <div class="col-lg-10 offset-lg-1 col-md-12 col-sm-12 mt-5 py-2">
+            <div class="row big-div-latest mb-3">
+                <div class="col-md-12 col-lg-12 pb-2 mb-4">
+                    <app-package-and-collection
+                        [title]="'Recently Viewed'"
+                        [packagesQuery]="packagesQuery"
+                        [collectionsQuery]="collectionsQuery"
+                        (onLoadPackagesClick)="updatePackageFetchingQuery($event)"
+                        (onLoadCollectionsClick)="updateCollectionsFetchingQuery($event)"
+                    >
+                        <div packagesEmptyState>
+                            <p>
+                                You have not recently viewed any packages. Try the
+                                <a [routerLink]="['/']">latest updates</a> page
+                            </p>
                         </div>
-                    </div>
 
-                    <div *ngIf="packages.length && hasMore">
-                        <a class="app-outlined-button ctaButton" (click)="loadMore($event)">Load&nbsp;More</a>
-                    </div>
-                    <div class="col-md-12 col-lg-12 pb-2 mb-4 not-found" *ngIf="!packages.length">
-                        <p>
-                            You have not recently viewed any packages. Try the
-                            <a [routerLink]="['/']">latest updates</a> page
-                        </p>
-                    </div>
+                        <div packagesErrorState>
+                            <p>
+                                Could not load the recently updated packages. Reload the page and if the issue persists
+                                please contact support.
+                            </p>
+                        </div>
+                    </app-package-and-collection>
                 </div>
             </div>
         </div>
