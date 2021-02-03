@@ -326,7 +326,7 @@ describe("Package Tests", async () => {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("bbb6be9a7860fa3b2d42a0b708764bff8f97134cb2e7f90d37a0934190efdd40");
+        expect(responseHash).equal("a889aa0f559a2677e6db69f0c966f2c0be66025a0b52e4fd9d1aa62e9be8ccd0");
 
         const responsePackageFile = parsePackageFileJSON(responsePackageFileContents);
 
@@ -553,7 +553,7 @@ describe("Package Tests", async () => {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("bbb6be9a7860fa3b2d42a0b708764bff8f97134cb2e7f90d37a0934190efdd40");
+        expect(responseHash).equal("a889aa0f559a2677e6db69f0c966f2c0be66025a0b52e4fd9d1aa62e9be8ccd0");
     });
 
     it("User A publish second version - fail no changes", async function () {
@@ -643,6 +643,7 @@ describe("Package Tests", async () => {
             })
             .catch((error: ErrorResponse) => {
                 let fetchResult = error.networkError as ServerError;
+                console.log(JSON.stringify(error, null, 1));
                 if (
                     fetchResult.result.errors.find((e: { extensions: { exception: { stacktrace: string[] } } }) => {
                         return (
@@ -653,7 +654,7 @@ describe("Package Tests", async () => {
                 )
                     errorFound = true;
             })
-            .then((client) => {
+            .then((response) => {
                 expect(errorFound, "invalid schema error not found").equal(true);
             });
     });
