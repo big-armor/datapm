@@ -1,139 +1,36 @@
 <hr style="width: 100%" class="header-border" />
 
-<div class="container padding-desktop">
+<div class="container">
     <div class="row">
-        <div class="col-md-12 col-lg-3 col-sm-12">
-            <div class="d-flex flex-column sorting-mat">
-                <mat-radio-group aria-label="Select an option" [(ngModel)]="selectedFilter">
-                    <div class="py-2 pr-2 bd-highlight">
-                        <mat-radio-button [value]="Filter.PACKAGES" (change)="onPackageFilterChange()"
-                            >Packages
-                        </mat-radio-button>
-                    </div>
-                    <div class="py-2 bd-highlight">
-                        <mat-radio-button [value]="Filter.COLLECTIONS" (change)="onCollectionFilterChange()"
-                            >Collections
-                        </mat-radio-button>
-                    </div>
-                </mat-radio-group>
-            </div>
-        </div>
-        <div class="col-md-12 col-lg-9 col-sm-12">
-            <div id="searchCollections" *ngIf="isCollectionSelected">
-                <mat-list *ngIf="collectionResult?.searchCollections?.collections?.length; else nothingFound">
-                    <ng-container
-                        *ngFor="
-                            let collection of collectionResult?.searchCollections?.collections;
-                            first as isFirst;
-                            last as isLast
-                        "
+        <div class="col-lg-10 offset-lg-1 col-md-12 col-sm-12 mt-5 py-2">
+            <div class="row big-div-latest mb-3">
+                <div class="col-md-12 col-lg-12 pb-2 mb-4">
+                    <app-package-and-collection
+                        [title]="'Search Results'"
+                        [subtitlesPrefix]="'Matching'"
+                        [packagesQuery]="packagesQuery"
+                        [collectionsQuery]="collectionsQuery"
+                        (onLoadPackagesClick)="updatePackageFetchingQuery($event)"
+                        (onLoadCollectionsClick)="updateCollectionsFetchingQuery($event)"
                     >
-                        <div *ngIf="isFirst" class="search-title pl-3">Your search results for '{{ query }}'</div>
+                        <div packagesEmptyState>
+                            <p><span class="material-icons">search</span></p>
+                            <br />
+                            <p>We couldn’t find any packages matching '{{ query }}'</p>
+                            <p class="small-txt">Please search another name</p>
+                        </div>
 
-                        <mat-list-item>
-                            <div class="d-flex bd-highlight mobile-row" style="width: 100%">
-                                <div class="py-2 bd-highlight d-flex align-items-center">
-                                    <img
-                                        *ngIf="collection.imageUrl"
-                                        [src]="collection.imageUrl"
-                                        class="collection-image"
-                                        alt="User image"
-                                    />
-                                </div>
-                                <div class="py-2 bd-highlight">
-                                    <div class="d-flex flex-column bd-highlight pt-2">
-                                        <div class="bd-highlight user-name">
-                                            {{
-                                                (collection.creator?.firstName || "") +
-                                                    " " +
-                                                    (collection.creator?.lastName || "")
-                                            }}
-                                        </div>
-                                        <div class="bd-highlight user-title">
-                                            <a href="#">{{ collection.name }}</a>
-                                        </div>
-                                        <div class="bd-highlight description-wrapper">
-                                            <span class="user-description">
-                                                {{ collection.description }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="ml-auto bd-highlight align-self-center">
-                                    <div class="d-flex flex-column bd-highlight text-right">
-                                        <div class="bd-highlight user-description">
-                                            {{ getCollectionDateLabel(collection) }}
-                                        </div>
-                                        <div *ngIf="collection.packages?.length" class="bd-highlight user-description">
-                                            {{
-                                                collection.packages?.length > 1
-                                                    ? collection.packages?.length + " packages"
-                                                    : collection.packages?.length + " package"
-                                            }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </mat-list-item>
-
-                        <mat-divider *ngIf="!isLast"></mat-divider>
-
-                        <ng-container
-                            *ngIf="
-                                isLast &&
-                                state !== state.LOADING &&
-                                (offset > 0 || collectionResult.searchCollections.hasMore)
-                            "
-                        >
-                            <mat-divider></mat-divider>
-                            <mat-list-item class="d-flex d-row justify-content-end">
-                                <a class="navigation-link" *ngIf="offset > 0" (click)="previous()">previous</a>
-                                <span
-                                    *ngIf="offset > 0 && collectionResult.searchCollections.hasMore"
-                                    class="mr-2"
-                                ></span>
-                                <a
-                                    class="navigation-link"
-                                    *ngIf="collectionResult.searchCollections.hasMore"
-                                    (click)="next()"
-                                    >next</a
-                                >
-                            </mat-list-item>
-                        </ng-container>
-                    </ng-container>
-                </mat-list>
-            </div>
-            <div id="searchPackages" *ngIf="isPackageSelected">
-                <ng-container *ngIf="packageResult?.searchPackages?.packages?.length; else nothingFound">
-                    <div class="search-title">Your search results for '{{ query }}'</div>
-
-                    <app-package-item [item]="package" *ngFor="let package of packageResult?.searchPackages?.packages">
-                    </app-package-item>
-
-                    <div class="d-flex d-row justify-content-end">
-                        <a class="navigation-link" *ngIf="offset > 0" (click)="previous()">previous</a>
-                        <span *ngIf="offset > 0 && packageResult.searchPackages.hasMore">&nbsp;&nbsp;</span>
-                        <a class="navigation-link" *ngIf="packageResult.searchPackages.hasMore" (click)="next()"
-                            >next</a
-                        >
-                    </div>
-                </ng-container>
+                        <div packagesErrorState>
+                            <p><span class="material-icons">error</span></p>
+                            <br />
+                            <p>
+                                Could not search packages. Reload the page and if the issue persists please contact
+                                support.
+                            </p>
+                        </div>
+                    </app-package-and-collection>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-<ng-template #nothingFound>
-    <div *ngIf="state === State.SUCCESS" class="not-found">
-        <p><span class="material-icons">search</span></p>
-        <br />
-        <p>We couldn’t find any {{ isPackageSelected ? "packages" : "collections" }} matching '{{ query }}'</p>
-        <p class="small-txt">Please search another name</p>
-    </div>
-
-    <div *ngIf="state === State.ERROR" class="not-found">
-        <p><span class="material-icons">error</span></p>
-        <br />
-        <p>Something went wrong</p>
-    </div>
-</ng-template>
