@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { PackageFile } from "datapm-lib";
+import { AddPackageComponent } from "src/app/collection-details/add-package/add-package.component";
 import { packageToIdentifier } from "src/app/helpers/IdentifierHelper";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import { Package } from "src/generated/graphql";
@@ -66,5 +67,14 @@ export class PackageInfoComponent implements OnInit {
         } else {
             return false;
         }
+    }
+
+    addToCollection(packageObject: Package) {
+        const dialogRef = this.dialog.open(AddPackageComponent, {
+            data: {
+                packageIdentifier: this.package.identifier
+            },
+            width: "600px"
+        });
     }
 }
