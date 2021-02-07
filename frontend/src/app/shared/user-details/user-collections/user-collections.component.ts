@@ -2,13 +2,7 @@ import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { CreateCollectionComponent } from "../../create-collection/create-collection.component";
 import { EditCollectionComponent } from "../../edit-collection/edit-collection.component";
-import {
-    Collection,
-    DeleteCollectionGQL,
-    MyCollectionsGQL,
-    UpdateCollectionGQL,
-    UserCollectionsGQL
-} from "src/generated/graphql";
+import { Collection, UpdateCollectionGQL, UserCollectionsGQL } from "src/generated/graphql";
 import { DeleteCollectionComponent } from "../../delete-collection/delete-collection.component";
 import { FewPackagesAlertComponent } from "../few-packages-alert/few-packages-alert.component";
 import { Router } from "@angular/router";
@@ -40,7 +34,6 @@ export class UserCollectionsComponent implements OnInit {
     constructor(
         private userCollections: UserCollectionsGQL,
         private updateCollectionGQL: UpdateCollectionGQL,
-        private deleteCollectionGQL: DeleteCollectionGQL,
         private dialog: MatDialog,
         private router: Router
     ) {}
@@ -60,7 +53,7 @@ export class UserCollectionsComponent implements OnInit {
             .afterClosed()
             .subscribe((collection) => {
                 if (collection) {
-                    this.router.navigate(["/collection/" + collection.name]);
+                    this.router.navigate(["/collection/" + collection.identifier.collectionSlug]);
                 }
             });
     }

@@ -26,6 +26,7 @@
                         aria-describedby="catalogTable"
                         *ngIf="catalogState === State.SUCCESS && myCatalogs && myCatalogs.length > 0"
                         mat-table
+                        class="gray-table"
                         [dataSource]="myCatalogs"
                     >
                         <!-- Label column -->

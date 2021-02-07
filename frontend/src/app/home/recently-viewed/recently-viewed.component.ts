@@ -1,98 +1,81 @@
-import { Component, OnInit } from "@angular/core";
-import { GetLatestPackagesGQL, MyRecentlyViewedPackagesGQL } from "src/generated/graphql";
-import { getTimeDifferenceLabel } from "src/app/helpers/TimeUtil";
-
-class PackageWithModifiedDate {
-    package: any;
-    lastActivityLabel: string;
-}
-
-enum State {
-    LOADED,
-    LOADING,
-    ERROR
-}
+import { ChangeDetectorRef, Component, OnInit } from "@angular/core";
+import {
+    Collection,
+    MyRecentlyViewedCollectionsGQL,
+    MyRecentlyViewedPackagesGQL,
+    Package
+} from "src/generated/graphql";
+import { PackagesResponse } from "src/app/shared/package-and-collection/packages-response";
+import { LimitAndOffset } from "src/app/shared/package-and-collection/limit-and-offset";
+import { map } from "rxjs/operators";
+import { Observable } from "rxjs";
+import { CollectionsResponse } from "src/app/shared/package-and-collection/collections-response";
 @Component({
     selector: "recently-viewed",
     templateUrl: "./recently-viewed.component.html",
     styleUrls: ["./recently-viewed.component.scss"]
 })
 export class RecentlyViewedComponent implements OnInit {
-    State = State;
-    state = State.LOADING;
-    public offSet = 0;
-    public hasMore = false;
-    public packages: PackageWithModifiedDate[] = [];
+    public collectionsQuery: Observable<CollectionsResponse>;
+    public packagesQuery: Observable<PackagesResponse>;
 
-    constructor(private recentlyViewedPackagesQuery: MyRecentlyViewedPackagesGQL) {}
+    constructor(
+        private recentlyViewedCollectionsQuery: MyRecentlyViewedCollectionsGQL,
+        private recentlyViewedPackagesQuery: MyRecentlyViewedPackagesGQL,
+        private cdr: ChangeDetectorRef
+    ) {}
 
     public ngOnInit(): void {
-        this.state = State.LOADING;
-        this.packages = [];
-        this.loadPackages();
+        this.cdr.detectChanges();
     }
 
-    private loadPackages(): void {
-        this.recentlyViewedPackagesQuery.fetch({ offset: this.offSet, limit: 25 }).subscribe(
-            (response) => {
-                if (response.errors) {
-                    this.state = State.ERROR;
-                    return;
-                }
-
-                this.hasMore = response.data.myRecentlyViewedPackages.hasMore;
-                const dateNow = new Date();
-                const receivedPackages: PackageWithModifiedDate[] = response.data.myRecentlyViewedPackages.logs.map(
-                    (l) => {
-                        const changeDates = this.getLastChangedDates(l.targetPackage);
+    public updatePackageFetchingQuery(limitAndOffset: LimitAndOffset): void {
+        this.packagesQuery = this.recentlyViewedPackagesQuery.fetch(limitAndOffset).pipe(
+            map(
+                (response) => {
+                    if (response.errors) {
                         return {
-                            package: l.targetPackage,
-                            lastActivityLabel: this.getUpdatedDateLabel(
-                                new Date(changeDates.createdAt),
-                                new Date(changeDates.updatedAt),
-                                dateNow
-                            )
+                            errors: response.errors.map((e) => e.message)
                         };
                     }
-                );
-                this.packages = this.packages.concat(receivedPackages);
 
-                this.state = State.LOADED;
-            },
-            (error) => {
-                this.state = State.ERROR;
-            }
+                    return {
+                        packages: response.data.myRecentlyViewedPackages.logs.map((l) => l.targetPackage) as Package[],
+                        hasMore: response.data.myRecentlyViewedPackages.hasMore
+                    };
+                },
+                (error) => {
+                    return {
+                        errors: [error]
+                    };
+                }
+            )
         );
     }
 
-    private getLastChangedDates(pkg: any): { createdAt: Date; updatedAt: Date } {
-        if (pkg.latestVersion != null) {
-            return {
-                createdAt: pkg.latestVersion.createdAt,
-                updatedAt: pkg.latestVersion.updatedAt
-            };
-        } else {
-            return {
-                createdAt: pkg.createdAt,
-                updatedAt: pkg.updatedAt
-            };
-        }
-    }
+    public updateCollectionsFetchingQuery(limitAndOffset: LimitAndOffset): void {
+        this.collectionsQuery = this.recentlyViewedCollectionsQuery.fetch(limitAndOffset).pipe(
+            map(
+                (response) => {
+                    if (response.errors) {
+                        return {
+                            errors: response.errors.map((e) => e.message)
+                        };
+                    }
 
-    private getUpdatedDateLabel(createdAtDate: Date, updatedAtDate: Date, dateNow: Date): string {
-        let actionLabel;
-        if (createdAtDate.getTime() == updatedAtDate.getTime()) {
-            actionLabel = "Created ";
-        } else {
-            actionLabel = "Updated ";
-        }
-
-        const differenceLabel = getTimeDifferenceLabel(updatedAtDate, dateNow);
-        return actionLabel + differenceLabel;
-    }
-
-    public loadMore() {
-        this.offSet += 25;
-        this.loadPackages();
+                    return {
+                        collections: response.data.myRecentlyViewedCollections.logs.map(
+                            (l) => l.targetCollection
+                        ) as Collection[],
+                        hasMore: response.data.myRecentlyViewedCollections.hasMore
+                    };
+                },
+                (error) => {
+                    return {
+                        errors: [error]
+                    };
+                }
+            )
+        );
     }
 }

@@ -125,4 +125,36 @@ export class ActivityLogRepository {
 
         return [activityLogEntities, count];
     }
+
+    async myRecentlyViewedCollections(
+        user: UserEntity,
+        limit: number,
+        offSet: number,
+        relations?: string[]
+    ): Promise<[ActivityLogEntity[], number]> {
+        if (relations == null) relations = [];
+
+        if (!relations?.includes("targetCollection")) {
+            relations.push("targetCollection");
+        }
+
+        const [activityLogEntities, count] = await this.manager
+            .getRepository(ActivityLogEntity)
+            .createQueryBuilder("ActivityLog")
+            .where(
+                '"ActivityLog"."id" IN ( WITH summary AS ( SELECT "ActivityLog".id as id, "ActivityLog"."created_at" as "created_at",  ROW_NUMBER() OVER(PARTITION BY "ActivityLog".target_collection_id  ORDER BY "ActivityLog".created_at DESC) AS rk FROM "public"."activity_log" "ActivityLog" where "ActivityLog".event_type  = \'COLLECTION_VIEWED\' and "ActivityLog".user_id  = :user_id ORDER BY "ActivityLog".created_at DESC LIMIT 1000 ) SELECT s.id FROM summary s WHERE s.rk = 1 order by s.created_at desc )',
+                {
+                    user_id: user.id
+                }
+            )
+            .andWhere(
+                'EXISTS (SELECT 1 FROM collection_package WHERE collection_id = "ActivityLog".target_collection_id)'
+            )
+            .orderBy('"ActivityLog"."created_at"', "DESC")
+            .limit(limit)
+            .offset(offSet)
+            .getManyAndCount();
+
+        return [activityLogEntities, count];
+    }
 }

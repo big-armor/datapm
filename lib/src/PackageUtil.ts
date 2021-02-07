@@ -1,5 +1,5 @@
 import { SemVer } from "semver";
-import { Schema, PackageFile } from "./main";
+import { Schema, PackageFile, CountPrecision, PackageFileV010 } from "./main";
 import fs from "fs";
 import path from "path";
 import AJV from "ajv";
@@ -422,15 +422,36 @@ export function loadPackageFileFromDisk(packageFilePath: string): PackageFile {
 
 export function parsePackageFileJSON(packageFileString: string): PackageFile {
     try {
-        const packageFile = JSON.parse(packageFileString, (key, value) => {
+        let packageFile = JSON.parse(packageFileString, (key, value) => {
             if (key !== "updatedDate" && key !== "createdAt" && key !== "updatedAt") return value;
 
             return new Date(Date.parse(value));
-        }) as PackageFile;
+        });
+
+        packageFile = upgradePackageFile(packageFile);
+
         return packageFile;
     } catch (error) {
         throw new Error("ERROR_PARSING_PACKAGE_FILE - " + error.message);
     }
+}
+
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
+export function upgradePackageFile(packageFileObject: any): PackageFile {
+    if (packageFileObject.$schema == null) {
+        packageFileObject.$schema = "https://datapm.io/docs/package-file-schema-v0.2.0.json";
+
+        const oldPackageFile = packageFileObject as PackageFileV010;
+
+        for (const schema of oldPackageFile.schemas) {
+            (schema as Schema).recordsInspectedCount = schema.recordCount;
+            (schema as Schema).recordCountPrecision =
+                schema.recordCountApproximate === true ? CountPrecision.APPROXIMATE : CountPrecision.EXACT;
+            delete schema.recordCountApproximate;
+        }
+    }
+
+    return packageFileObject as PackageFile;
 }
 
 export async function validatePackageFileInBrowser(packageFile: string): Promise<void> {
@@ -440,7 +461,16 @@ export async function validatePackageFileInBrowser(packageFile: string): Promise
 
     let packageSchemaFile: string;
 
-    const response = await fetch("/docs/datapm-package-file-schema-v1.json");
+    let packageFileObject;
+    try {
+        packageFileObject = JSON.parse(packageFile);
+    } catch (error) {
+        throw new Error("ERROR_PARSING_PACKAGE_FILE - " + error.message);
+    }
+
+    const schemaVersion = getSchemaVersionFromPackageFile(packageFileObject);
+
+    const response = await fetch("/docs/datapm-package-file-schema-v" + schemaVersion + ".json");
 
     if (response.status > 199 && response.status < 300) {
         packageSchemaFile = await response.text();
@@ -459,18 +489,28 @@ export async function validatePackageFileInBrowser(packageFile: string): Promise
         throw new Error("ERROR_READING_SCHEMA");
     }
 
-    let packageFileObject;
-    try {
-        packageFileObject = JSON.parse(packageFile);
-    } catch (error) {
-        throw new Error("ERROR_PARSING_PACKAGE_FILE - " + error.message);
-    }
-
     const ajvResponse = ajv.validate(schemaObject, packageFileObject);
 
     if (!ajvResponse) {
         throw new Error("INVALID_PACKAGE_FILE_SCHEMA: " + JSON.stringify(ajv.errors));
     }
+}
+
+/** Given a raw package file JSON object, return the version of the package file schema from the $schema value. This handles
+ * legacy values.
+ */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,@typescript-eslint/no-explicit-any
+export function getSchemaVersionFromPackageFile(packageFileObject: any): string {
+    let packageFileSchemaUrl = packageFileObject.$schema as string;
+
+    if (packageFileSchemaUrl == null)
+        packageFileSchemaUrl = "https://datapm.io/docs/datapm-package-file-schema-v0.1.0.json";
+
+    const schemaVersion = packageFileSchemaUrl.match(/package-file-schema-v(.*)\.json/i);
+
+    if (schemaVersion == null) throw new Error("ERROR_SCHEMA_VERSION_NOT_RECOGNIZED - " + packageFileSchemaUrl);
+
+    return schemaVersion[1];
 }
 
 export function validatePackageFile(packageFile: string): void {
@@ -488,20 +528,28 @@ export function validatePackageFile(packageFile: string): void {
 
     let packageSchemaFile: string;
 
+    const schemaVersion = getSchemaVersionFromPackageFile(packageFileObject);
+
     try {
         const pathToDataPmLib = require.resolve("datapm-lib").replace(path.sep + "src" + path.sep + "main.js", "");
-        packageSchemaFile = fs.readFileSync(path.join(pathToDataPmLib, "packageFileSchema.json"), "utf8");
+        packageSchemaFile = fs.readFileSync(
+            path.join(pathToDataPmLib, "packageFileSchema-v" + schemaVersion + ".json"),
+            "utf8"
+        );
     } catch (error) {
         try {
             packageSchemaFile = fs.readFileSync(
-                "node_modules" + path.sep + "datapm-lib" + path.sep + "packageFileSchema.json",
+                "node_modules" + path.sep + "datapm-lib" + path.sep + "packageFileSchema-v" + schemaVersion + ".json",
                 "utf8"
             );
         } catch (error) {
             try {
-                packageSchemaFile = fs.readFileSync("packageFileSchema.json", "utf8");
+                packageSchemaFile = fs.readFileSync("packageFileSchema-v" + schemaVersion + ".json", "utf8");
             } catch (error) {
-                packageSchemaFile = fs.readFileSync(path.join("..", "lib", "packageFileSchema.json"), "utf8");
+                packageSchemaFile = fs.readFileSync(
+                    path.join("..", "lib", "packageFileSchema-v" + schemaVersion + ".json"),
+                    "utf8"
+                );
             }
         }
     }

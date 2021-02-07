@@ -1,15 +1,6 @@
 @import "../../../../styles/variables";
 
 #detailsPage {
-    .mat-header-row {
-        background-color: inherit;
-    }
-
-    tr.mat-header-row {
-        height: 40px;
-        background-color: #ededed;
-    }
-
     .no-keys-div {
         font-family: $family-roboto-mono;
         font-style: $style-normal;
@@ -57,24 +48,6 @@
         display: inline-block;
         position: relative;
         top: 2px;
-    }
-
-    table {
-        width: 100%;
-
-        th {
-            font-family: $family-roboto;
-            font-size: $text-font;
-            font-weight: $weight-500;
-            color: $gray-1;
-        }
-
-        td {
-            font-family: $family-roboto;
-            color: $gray-2;
-            font-size: $text-font;
-            font-weight: $weight-400;
-        }
     }
 
     .panel-div {

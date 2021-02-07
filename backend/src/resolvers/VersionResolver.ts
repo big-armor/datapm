@@ -5,7 +5,8 @@ import {
     diffCompatibility,
     nextVersion,
     PackageFile,
-    Compability
+    Compability,
+    upgradePackageFile
 } from "datapm-lib";
 import { VersionRepository } from "./../repository/VersionRepository";
 import { PackageFileStorageService } from "./../storage/packages/package-file-storage-service";
@@ -83,7 +84,9 @@ export const createVersion = async (
     return await context.connection.manager.nestedTransaction(async (transaction) => {
         const proposedNewVersion = new SemVer(value.packageFile.version);
 
-        const newPackageFile = value.packageFile as PackageFile;
+        const rawPackageFile = value.packageFile as PackageFile;
+
+        const newPackageFile = upgradePackageFile(rawPackageFile);
 
         // get the latest version
         const latestVersion = await transaction

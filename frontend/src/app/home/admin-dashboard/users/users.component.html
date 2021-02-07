@@ -1,63 +1,77 @@
-<div class="container">
-    <div>
-        <mat-form-field class="example-form-field">
-            <mat-label>Search for Users</mat-label>
-            <input matInput type="text" [(ngModel)]="searchValue" (ngModelChange)="searchUsers()" />
-            <button
-                mat-button
-                *ngIf="searchValue"
-                matSuffix
-                mat-icon-button
-                aria-label="Clear"
-                (click)="clearUserSearch()"
+<div class="container my-3">
+    <div class="row">
+        <div class="col-md-12">
+            <mat-form-field class="example-form-field search-user">
+                <mat-label>Search for Users</mat-label>
+                <input matInput type="text" [(ngModel)]="searchValue" (ngModelChange)="searchUsers()" />
+                <button
+                    mat-button
+                    *ngIf="searchValue"
+                    matSuffix
+                    mat-icon-button
+                    aria-label="Clear"
+                    (click)="clearUserSearch()"
+                >
+                    <mat-icon>close</mat-icon>
+                </button>
+            </mat-form-field>
+        </div>
+
+        <div class="col-md-12">
+            <table
+                mat-table
+                [dataSource]="dataSource"
+                *ngIf="!loading; else loadingSpinner"
+                class="gray-table gray-responsive"
             >
-                <mat-icon>close</mat-icon>
-            </button>
-        </mat-form-field>
-    </div>
+                <ng-container matColumnDef="username">
+                    <th mat-header-cell *matHeaderCellDef scope="col">Username</th>
+                    <td
+                        class="cursor-pointer"
+                        [routerLink]="['/' + element.username]"
+                        mat-cell
+                        *matCellDef="let element"
+                    >
+                        {{ element.username }}
+                    </td>
+                </ng-container>
 
-    <div class="mat-elevation-z8">
-        <table mat-table [dataSource]="dataSource" *ngIf="!loading; else loadingSpinner">
-            <ng-container matColumnDef="username">
-                <th mat-header-cell *matHeaderCellDef>Username</th>
-                <td class="cursor-pointer" [routerLink]="['/' + element.username]" mat-cell *matCellDef="let element">
-                    {{ element.username }}
-                </td>
-            </ng-container>
+                <ng-container matColumnDef="firstName">
+                    <th mat-header-cell *matHeaderCellDef scope="col">First Name</th>
+                    <td mat-cell *matCellDef="let element">{{ element.firstName }}</td>
+                </ng-container>
 
-            <ng-container matColumnDef="firstName">
-                <th mat-header-cell *matHeaderCellDef>First Name</th>
-                <td mat-cell *matCellDef="let element">{{ element.firstName }}</td>
-            </ng-container>
+                <ng-container matColumnDef="lastName">
+                    <th mat-header-cell *matHeaderCellDef scope="col">Last Name</th>
+                    <td mat-cell *matCellDef="let element">{{ element.lastName }}</td>
+                </ng-container>
 
-            <ng-container matColumnDef="lastName">
-                <th mat-header-cell *matHeaderCellDef>Last Name</th>
-                <td mat-cell *matCellDef="let element">{{ element.lastName }}</td>
-            </ng-container>
+                <ng-container matColumnDef="emailAddress">
+                    <th mat-header-cell *matHeaderCellDef scope="col">Email Address</th>
+                    <td mat-cell *matCellDef="let element">
+                        <a href="mailto: + {{ element.emailAddress }}">{{ element.emailAddress }}</a>
+                    </td>
+                </ng-container>
 
-            <ng-container matColumnDef="emailAddress">
-                <th mat-header-cell *matHeaderCellDef>Email Address</th>
-                <td mat-cell *matCellDef="let element">
-                    <a href="mailto: + {{ element.emailAddress }}">{{ element.emailAddress }}</a>
-                </td>
-            </ng-container>
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef scope="col">Actions</th>
+                    <td mat-cell *matCellDef="let element">
+                        <button (click)="openDeleteUserConfirmationDialog(element)" class="app-outlined-button">
+                            <span class="delete-txt">Delete</span>
+                        </button>
+                    </td>
+                </ng-container>
 
-            <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef>Actions</th>
-                <td mat-cell *matCellDef="let element">
-                    <button (click)="openDeleteUserConfirmationDialog(element)" mat-button color="warn">Delete</button>
-                </td>
-            </ng-container>
+                <tr mat-header-row *matHeaderRowDef="DISPLAYED_COLUMNS"></tr>
+                <tr mat-row *matRowDef="let row; columns: DISPLAYED_COLUMNS"></tr>
+            </table>
+            <ng-template #loadingSpinner>
+                <div class="d-flex justify-content-center">
+                    <mat-spinner class="spinner"></mat-spinner>
+                </div>
+            </ng-template>
 
-            <tr mat-header-row *matHeaderRowDef="DISPLAYED_COLUMNS"></tr>
-            <tr mat-row *matRowDef="let row; columns: DISPLAYED_COLUMNS"></tr>
-        </table>
-        <ng-template #loadingSpinner>
-            <div class="d-flex justify-content-center">
-                <mat-spinner class="spinner"></mat-spinner>
-            </div>
-        </ng-template>
-
-        <mat-paginator [pageSize]="USERS_PER_PAGE" [disabled]="loading"></mat-paginator>
+            <mat-paginator [pageSize]="USERS_PER_PAGE" [disabled]="loading" class="gray-paginator"></mat-paginator>
+        </div>
     </div>
 </div>

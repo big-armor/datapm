@@ -108,6 +108,7 @@ enum ActivityLogEventType {
 
     COLLECTION_CREATED
     COLLECTION_DELETED
+    COLLECTION_VIEWED
     COLLECTION_EDIT
     COLLECTION_PACKAGE_ADDED
     COLLECTION_PACKAGE_REMOVED
@@ -707,9 +708,19 @@ type Query {
     userPackages(username: String! @validUsername, offSet: Int!, limit: Int!): PackagesResult!
 
     """
-    Returns collections whos names match the given query. This request is paginated
+    Returns collections whose names match the given query. This request is paginated
     """
     searchCollections(query: String!, offset: Int!, limit: Int!): SearchCollectionResult!
+
+    """
+    Returns the latest collections. This request is paginated
+    """
+    latestCollections(offset: Int!, limit: Int!): CollectionsResult!
+
+    """
+    Returns a list of collections the requesting user has recently viewed
+    """
+    myRecentlyViewedCollections(offset: Int!, limit: Int!): ActivityLogResult! @isAuthenticated
 
     """
     Returns collections equal to collectionSlug, gives all packages associated with collectionSlug
