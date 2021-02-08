@@ -1,0 +1,13 @@
+#addUser {
+    .text-danger {
+        width: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    #addUser {
+        .text-danger {
+            width: 100%;
+        }
+    }
+}

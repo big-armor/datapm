@@ -1,0 +1,67 @@
+@import "../../../../../styles/variables";
+
+#sharePackage {
+    .email-share-button {
+        background-color: $email-color;
+
+        &:hover {
+            background-color: $email-hover-color;
+        }
+    }
+
+    .reddit-share-button {
+        background-color: $reddit-color;
+
+        &:hover {
+            background-color: $reddit-hover-color;
+        }
+    }
+
+    .fb-share-button {
+        background-color: $fb-color;
+
+        &:hover {
+            background-color: $fb-hover-color;
+        }
+
+        .social-square {
+            padding: 9px 14px;
+        }
+    }
+
+    .twitter-share-button {
+        background-color: $twitter-color;
+
+        &:hover {
+            background-color: $twitter-hover-color;
+        }
+    }
+
+    .social-btn {
+        border-radius: 6px;
+        text-align: left;
+        width: 100%;
+        border: none;
+        margin-bottom: 14px;
+        padding: 6px 12px 6px 0px;
+    }
+
+    .social-square {
+        background: $black-1;
+        padding: 9px 11px;
+        margin-right: 8px;
+        border-radius: 6px;
+    }
+
+    a {
+        color: $white;
+        font-weight: $weight-300;
+        letter-spacing: 0.8px;
+        font-size: $small-font;
+        font-family: $family-roboto;
+
+        &:hover {
+            text-decoration: none;
+        }
+    }
+}

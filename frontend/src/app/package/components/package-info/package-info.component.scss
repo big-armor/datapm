@@ -1,6 +1,19 @@
 @import "../../../../styles/variables";
 
 #packageInfo {
+    .share-data {
+        border-bottom: 1px solid #bdbdbd54;
+    }
+
+    .share-btn {
+        ::ng-deep .mat-raised-button {
+            box-shadow: none;
+            line-height: 13px;
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+        }
+    }
+
     .doc-link {
         font-weight: $weight-300;
         font-size: $small-font;

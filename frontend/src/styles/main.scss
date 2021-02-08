@@ -602,9 +602,12 @@ button:disabled {
     font-family: $family-roboto;
     font-style: $style-normal;
     letter-spacing: 0.7px;
-    line-height: 20px;
+    line-height: 21px;
     font-weight: $weight-400;
     font-size: $title-font;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 #contentBorder {
@@ -677,14 +680,19 @@ button:disabled {
     }
 }
 
+.disabled-tooltip {
+    min-width: 270px;
+    font-size: 10px;
+}
+
 .search-user {
     width: 200px;
     margin-bottom: 10px;
 
     .mat-form-field-infix {
         font-family: $family-roboto;
-        font-style: $style-normal;
         font-weight: $weight-400;
+        font-style: $style-normal;
         font-size: ($default-font - 1);
     }
 
@@ -727,6 +735,41 @@ button:disabled {
         font-style: $style-normal;
         font-size: $text-font;
         line-height: 33px;
+    }
+}
+
+.copy-wrapper {
+    &:hover {
+        border-radius: 6px;
+        opacity: 0.9;
+    }
+
+    .copy-input {
+        border: 1px solid rgb(0 0 0 / 20%);
+        padding: 5px 10px;
+        background: $white;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        letter-spacing: 0.8px;
+        font-size: $small-font;
+        font-family: $family-roboto;
+        border-top-left-radius: 6px;
+        border-bottom-left-radius: 6px;
+    }
+
+    .copy-btn {
+        background: #7d7d7de8;
+        border: none;
+        padding: 6px 15px;
+        border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px;
+
+        a {
+            font-size: $text-font !important;
+            color: $white !important;
+        }
     }
 }
 
