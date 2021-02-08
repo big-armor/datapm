@@ -18,8 +18,8 @@ import {
 } from "src/generated/graphql";
 import { PackageResponse, PackageService } from "../../services/package.service";
 import { AddUserComponent } from "../add-user/add-user.component";
-import { ConfirmationDialogService } from "../../../services/dialog/confirmation-dialog.service";
 import { DialogService } from "../../../services/dialog/dialog.service";
+import { getEffectivePermissions } from "../../../services/permissions.service";
 
 @Component({
     selector: "app-package-permission",
@@ -61,10 +61,7 @@ export class PackagePermissionComponent implements OnInit {
 
     public addUser(): void {
         const dialogRef = this.dialog.open(AddUserComponent, {
-            data: {
-                catalogSlug: this.package.identifier.catalogSlug,
-                packageSlug: this.package.identifier.packageSlug
-            }
+            data: this.package
         });
 
         dialogRef.afterClosed().subscribe((result) => {
@@ -75,7 +72,7 @@ export class PackagePermissionComponent implements OnInit {
     }
 
     public updatePermission(username: string, permission: Permission): void {
-        this.setUserPermission(username, this.getPermissionArrayFrom(permission));
+        this.setUserPermission(username, getEffectivePermissions(permission));
     }
 
     public removeUser(username: string): void {
@@ -190,12 +187,6 @@ export class PackagePermissionComponent implements OnInit {
         }
 
         return Permission.NONE;
-    }
-
-    private getPermissionArrayFrom(permission: Permission): Permission[] {
-        const permissions = [Permission.VIEW, Permission.EDIT, Permission.MANAGE];
-        const index = permissions.findIndex((p) => p === permission);
-        return permissions.slice(0, index + 1);
     }
 
     private getUserName(user: User): string {

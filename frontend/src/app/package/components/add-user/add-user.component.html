@@ -1,5 +1,5 @@
 <form [formGroup]="form" (submit)="submit($event)" id="addUser">
-    <div mat-dialog-title id="contentTitle">Add User</div>
+    <div mat-dialog-title id="contentTitle">Share {{ userPackage.displayName }}</div>
     <div mat-dialog-content id="contentBorder">
         <div class="bd-highlight py-4 shadow-div">
             <div class="bd-highlight w-100">
@@ -7,12 +7,21 @@
                     <mat-label>Usernames or Email Addresses</mat-label>
                     <mat-chip-list #chipList aria-label="Fruit selection">
                         <mat-chip
-                            *ngFor="let user of usernames"
+                            *ngFor="let userChip of usersChips"
                             [selectable]="false"
                             [removable]="true"
-                            (removed)="removeFromSelection(user)"
+                            (removed)="removeFromSelection(userChip)"
                         >
-                            {{ user }}
+                            <ng-container [ngSwitch]="userChip.state">
+                                <ng-container *ngSwitchCase="ChipState.SUCCESS"
+                                    ><mat-icon>check_circle</mat-icon></ng-container
+                                >
+                                <ng-container *ngSwitchCase="ChipState.WARNING"
+                                    ><mat-icon>warning_amber</mat-icon></ng-container
+                                >
+                                <ng-container *ngSwitchCase="ChipState.ERROR"> <mat-icon>error</mat-icon></ng-container>
+                            </ng-container>
+                            {{ userChip.usernameOrEmailAddress }}
                             <mat-icon matChipRemove>remove</mat-icon>
                         </mat-chip>
 
@@ -22,10 +31,11 @@
                             class="flat-input-parent"
                             controlName="username"
                             inputStyle="flat"
+                            [disabled]="validatingUsername"
                             [formControl]="usernameControl"
                             [matAutocomplete]="auto"
                             [matChipInputFor]="chipList"
-                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                            [matChipInputSeparatorKeyCodes]="CHIP_SEPARATOR_KEY_CODES"
                             (matChipInputTokenEnd)="add($event)"
                         />
 
@@ -34,16 +44,21 @@
                             class="search-autocomplete"
                             (optionSelected)="selected($event)"
                         >
-                            <mat-option *ngIf="!autoCompleteResult && usernameControl.value.length > 1"
-                                >Loading...</mat-option
-                            >
-                            <ng-container *ngIf="autoCompleteResult">
-                                <mat-option *ngFor="let option of autoCompleteResult.users" [value]="option.username">
-                                    <div class="autocomplete-title">{{ option.username }}</div>
-                                    <div *ngIf="option.emailAddress != null" class="autocomplete-description">
-                                        {{ option.emailAddress }}
-                                    </div>
-                                </mat-option>
+                            <ng-container *ngIf="!skipAutoCompleteSearch && !validatingUsername">
+                                <mat-option *ngIf="!autoCompleteResult && usernameControl.value?.length > 1"
+                                    >Loading...</mat-option
+                                >
+                                <ng-container *ngIf="autoCompleteResult">
+                                    <mat-option
+                                        *ngFor="let option of autoCompleteResult.users"
+                                        [value]="option.username"
+                                    >
+                                        <div class="autocomplete-title">{{ option.username }}</div>
+                                        <div *ngIf="option.emailAddress != null" class="autocomplete-description">
+                                            {{ option.emailAddress }}
+                                        </div>
+                                    </mat-option>
+                                </ng-container>
                             </ng-container>
                         </mat-autocomplete>
                     </mat-chip-list>
@@ -57,6 +72,9 @@
                         <ng-container *ngSwitchCase="'USER_NOT_FOUND'">
                             There is no user with that username on this registry.
                         </ng-container>
+                        <ng-container *ngSwitchCase="'INVALID_EMAIL_ADDRESS'">
+                            Invalid email address used as an input.
+                        </ng-container>
                         <ng-container *ngSwitchDefault>
                             Error occured while adding a user permission to the collection
                         </ng-container>
@@ -66,13 +84,20 @@
             <div>
                 <mat-form-field class="w-100">
                     <mat-label>Message</mat-label>
-                    <textarea matInput></textarea>
+                    <textarea [formControl]="messageControl" matInput></textarea>
                 </mat-form-field>
+            </div>
+            <div>
+                <select (change)="updateSelectedPermission($event.target.value)">
+                    <option value="VIEW">View</option>
+                    <option value="EDIT">Edit</option>
+                    <option value="MANAGE">Manage</option>
+                </select>
             </div>
         </div>
     </div>
     <div mat-dialog-actions class="text-right pb-3">
-        <button mat-button type="submit" class="ml-auto save-btn" [disabled]="form.invalid">
+        <button mat-button type="submit" class="ml-auto save-btn" [disabled]="form.invalid || validatingUsername">
             <span>add</span>
         </button>
     </div>
