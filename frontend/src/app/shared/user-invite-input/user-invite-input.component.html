@@ -1,1 +1,51 @@
-<p>user-invite-input works!</p>
+<mat-form-field class="w-100">
+    <mat-label>Usernames or Email Addresses</mat-label>
+    <mat-chip-list #chipList aria-label="Fruit selection">
+        <mat-chip
+            *ngFor="let userChip of usersChips"
+            [selectable]="false"
+            [removable]="true"
+            (removed)="removeFromSelection(userChip)"
+        >
+            <ng-container [ngSwitch]="userChip.state">
+                <ng-container *ngSwitchCase="ChipState.SUCCESS"><mat-icon>check_circle</mat-icon></ng-container>
+                <ng-container *ngSwitchCase="ChipState.WARNING"><mat-icon>warning_amber</mat-icon></ng-container>
+                <ng-container *ngSwitchCase="ChipState.ERROR"> <mat-icon>error</mat-icon></ng-container>
+            </ng-container>
+            {{ userChip.usernameOrEmailAddress }}
+            <mat-icon matChipRemove>remove</mat-icon>
+        </mat-chip>
+
+        <input
+            matInput
+            #usernameInput
+            class="flat-input-parent"
+            controlName="username"
+            inputStyle="flat"
+            [disabled]="validatingUsername"
+            [formControl]="usernameControl"
+            [matAutocomplete]="auto"
+            [matChipInputFor]="chipList"
+            [matChipInputSeparatorKeyCodes]="CHIP_SEPARATOR_KEY_CODES"
+            (matChipInputTokenEnd)="add($event)"
+        />
+
+        <mat-autocomplete
+            #auto="matAutocomplete"
+            class="search-autocomplete"
+            (optionSelected)="selectFromAutocompleteDropdown($event)"
+        >
+            <ng-container *ngIf="!skipAutoCompleteSearch && !validatingUsername">
+                <mat-option *ngIf="!autoCompleteResult && usernameControl.value?.length > 1">Loading...</mat-option>
+                <ng-container *ngIf="autoCompleteResult">
+                    <mat-option *ngFor="let option of autoCompleteResult.users" [value]="option.username">
+                        <div class="autocomplete-title">{{ option.username }}</div>
+                        <div *ngIf="option.emailAddress != null" class="autocomplete-description">
+                            {{ option.emailAddress }}
+                        </div>
+                    </mat-option>
+                </ng-container>
+            </ng-container>
+        </mat-autocomplete>
+    </mat-chip-list>
+</mat-form-field>

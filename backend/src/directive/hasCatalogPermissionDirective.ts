@@ -89,6 +89,7 @@ export class HasCatalogPermissionDirective extends SchemaDirectiveVisitor {
 
     async validatePermission(context: Context, catalogSlug: string, permission: Permission) {
         const permissions = await resolveCatalogPermissions(context, { catalogSlug }, context.me);
+        console.log("woow", permissions);
 
         if (permissions.includes(permission)) return;
 

@@ -1,18 +1,15 @@
 import { Component, Inject, OnInit } from "@angular/core";
-import { FormGroup, FormControl, Validators } from "@angular/forms";
+import { FormGroup, FormControl } from "@angular/forms";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { debounceTime, switchMap } from "rxjs/operators";
 import { PageState } from "src/app/models/page-state";
-import {
-    AutoCompleteResult,
-    AutoCompleteUserGQL,
-    Permission,
-    SetUserCatalogPermissionGQL
-} from "src/generated/graphql";
+import { getEffectivePermissions } from "src/app/services/permissions.service";
+import { ChipData } from "src/app/shared/user-invite-input/chip-data";
+import { ChipState } from "src/app/shared/user-invite-input/chip-state";
+import { Catalog, Permission, SetUserCatalogPermissionGQL, SetUserCatalogPermissionInput } from "src/generated/graphql";
 
 enum ErrorType {
     USER_NOT_FOUND = "USER_NOT_FOUND",
-    CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS = "CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS"
+    CANNOT_SET_CATALOG_CREATOR_PERMISSIONS = "CANNOT_SET_CATALOG_CREATOR_PERMISSIONS"
 }
 @Component({
     selector: "app-add-user",
@@ -22,78 +19,112 @@ enum ErrorType {
 export class AddUserComponent implements OnInit {
     public form: FormGroup;
     public state: PageState = "INIT";
-    public usernameControl: FormControl = new FormControl("", [Validators.required]);
-    autoCompleteResult: AutoCompleteResult;
-    public error: string;
+    public error: ErrorType | string = null;
+
+    public usernameControl: FormControl = new FormControl("");
+    public messageControl: FormControl = new FormControl("");
+
+    public permission: Permission;
+    public packagesPermission: Permission;
+
+    public usersChips: ChipData[] = [];
+    public loading: boolean;
+
+    public hasErrors = false;
+
+    private effectivePermissions: Permission[];
+    private packagesEffectivePermissions: Permission[];
 
     constructor(
+        @Inject(MAT_DIALOG_DATA) public catalog: Catalog,
         private setUserCatalogPermissionGQL: SetUserCatalogPermissionGQL,
-        private dialogRef: MatDialogRef<AddUserComponent>,
-        private autocompleteUsers: AutoCompleteUserGQL,
-
-        @Inject(MAT_DIALOG_DATA) private catalogSlug: string
-    ) {}
-
-    ngOnInit(): void {
-        this.form = new FormGroup({
-            username: this.usernameControl
-        });
-
-        this.usernameControl.valueChanges
-            .pipe(
-                debounceTime(500),
-                switchMap((value) => {
-                    if (value.length < 2) {
-                        this.autoCompleteResult = null;
-                        return [];
-                    }
-                    return this.autocompleteUsers.fetch({ startsWith: value });
-                })
-            )
-            .subscribe((result) => {
-                if (result.errors != null) this.autoCompleteResult = null;
-                else this.autoCompleteResult = result.data.autoComplete;
-            });
+        private dialogRef: MatDialogRef<AddUserComponent>
+    ) {
+        this.updateSelectedPermission(Permission.VIEW);
+        this.updatePackagesPermissions(Permission.VIEW);
     }
 
-    submit(ev) {
-        ev.preventDefault();
+    public ngOnInit(): void {
+        this.form = new FormGroup({
+            username: this.usernameControl,
+            message: this.messageControl
+        });
+    }
 
-        if (!this.form.valid) {
+    public submit(event: any): void {
+        event.preventDefault();
+
+        if (this.hasErrors) {
             return;
         }
 
         this.state = "LOADING";
+        this.loading = true;
         this.setUserCatalogPermissionGQL
             .mutate({
                 identifier: {
-                    catalogSlug: this.catalogSlug
+                    catalogSlug: this.catalog.identifier.catalogSlug
                 },
-                value: [
-                    {
-                        permission: [Permission.VIEW],
-                        packagePermission: [],
-                        usernameOrEmailAddress: this.form.value.username
-                    }
-                ],
-                message: ""
+                value: this.buildPermissionsArray(),
+                message: this.messageControl.value
             })
             .subscribe(
-                ({ errors, data }) => {
+                ({ errors }) => {
                     if (errors) {
                         this.state = "ERROR";
 
-                        if (errors[0].message.includes("USER_NOT_FOUND")) this.error = ErrorType.USER_NOT_FOUND;
-                        else if (errors[0].message.includes("CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS"))
-                            this.error = ErrorType.CANNOT_SET_COLLECTION_CREATOR_PERMISSIONS;
-                        else this.error = null;
+                        const firstErrorMessage = errors[0].message;
+                        if (firstErrorMessage.includes("USER_NOT_FOUND")) {
+                            this.error = ErrorType.USER_NOT_FOUND;
+                        } else if (firstErrorMessage.includes("CANNOT_SET_CATALOG_CREATOR_PERMISSIONS")) {
+                            this.error = ErrorType.CANNOT_SET_CATALOG_CREATOR_PERMISSIONS;
+                        } else {
+                            this.error = firstErrorMessage;
+                        }
+
+                        this.loading = false;
                         return;
                     }
+                    this.loading = false;
                     this.dialogRef.close("SUCCESS");
                 },
                 () => {
                     this.state = "ERROR";
+                    this.loading = false;
                 }
             );
+    }
+
+    public updateSelectedPermission(permission: Permission): void {
+        this.permission = permission;
+        this.effectivePermissions = getEffectivePermissions(permission);
+    }
+
+    public updatePackagesPermissions(permission: Permission): void {
+        this.packagesPermission = permission;
+        this.packagesEffectivePermissions = getEffectivePermissions(permission);
+    }
+
+    public onUserInputChange(value: ChipData[]): void {
+        this.usersChips = value;
+        this.hasErrors = this.hasErrorsInAddedUsers();
+    }
+
+    public onLoadingStatusChange(value: boolean): void {
+        this.loading = value;
+    }
+
+    private hasErrorsInAddedUsers(): boolean {
+        return this.usersChips.some((c) => ChipState.ERROR === c.state);
+    }
+
+    private buildPermissionsArray(): SetUserCatalogPermissionInput[] {
+        return this.usersChips.map((c) => {
+            return {
+                usernameOrEmailAddress: c.usernameOrEmailAddress,
+                permission: this.effectivePermissions,
+                packagePermission: this.packagesEffectivePermissions
+            };
+        });
     }
 }

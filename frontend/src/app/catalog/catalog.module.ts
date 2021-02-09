@@ -14,6 +14,8 @@ import { UserDetailsPageComponent } from "./user-details-page/user-details-page.
 import { AddUserComponent } from "./add-user/add-user.component";
 import { CatalogPermissionsComponent } from "./catalog-permissions/catalog-permissions.component";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatInputModule } from "@angular/material/input";
 
 @NgModule({
     declarations: [
@@ -32,6 +34,8 @@ import { MatAutocompleteModule } from "@angular/material/autocomplete";
         MatSlideToggleModule,
         MatTableModule,
         MatTabsModule,
+        MatInputModule,
+        MatFormFieldModule,
         SharedModule
     ]
 })

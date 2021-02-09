@@ -57,6 +57,7 @@ export class ValidEmailDirective extends SchemaDirectiveVisitor {
 }
 
 export function validateEmailAddress(emailAddress: string | undefined) {
+    console.log("emailAddress", emailAddress);
     const validEmailAddress = emailAddressValid(emailAddress);
 
     if (validEmailAddress == "REQUIRED") {

@@ -283,6 +283,13 @@ export const resolvers: {
         parseValue: (value: any) => new Date(value)
     }),
     User: {
+        username: async (parent: User, _1: any, context: Context) => {
+            if (!parent.username) {
+                return parent.emailAddress as string;
+            }
+
+            return parent.username;
+        },
         firstName: async (parent: User, _1: any, context: Context) => {
             const user = await context.connection
                 .getCustomRepository(UserRepository)

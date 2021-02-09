@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, SimpleChanges } from "@angular/core";
+import { Component, Input, OnChanges, SimpleChanges } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 import { Router } from "@angular/router";
@@ -21,7 +21,7 @@ import { AddUserComponent } from "../add-user/add-user.component";
     templateUrl: "./collection-permissions.component.html",
     styleUrls: ["./collection-permissions.component.scss"]
 })
-export class CollectionPermissionsComponent implements OnInit {
+export class CollectionPermissionsComponent implements OnChanges {
     @Input() collection: Collection;
 
     public columnsToDisplay = ["name", "permission", "actions"];
@@ -38,8 +38,6 @@ export class CollectionPermissionsComponent implements OnInit {
         private authSvc: AuthenticationService
     ) {}
 
-    ngOnInit(): void {}
-
     ngOnChanges(changes: SimpleChanges) {
         if (changes.collection && changes.collection.currentValue) {
             this.collection = changes.collection.currentValue;
@@ -53,13 +51,12 @@ export class CollectionPermissionsComponent implements OnInit {
         }
 
         this.usersByCollection
-            .watch({
+            .fetch({
                 identifier: {
                     collectionSlug: this.collection.identifier.collectionSlug
                 }
             })
-            .valueChanges.subscribe(({ data }) => {
-                const currentUsername = this.authSvc.currentUser.value?.username;
+            .subscribe(({ data }) => {
                 this.users = data.usersByCollection.map((item) => ({
                     username: item.user.username,
                     name: this.getUserName(item.user as User),
@@ -94,7 +91,7 @@ export class CollectionPermissionsComponent implements OnInit {
 
     public addUser() {
         const dialogRef = this.dialog.open(AddUserComponent, {
-            data: this.collection?.identifier.collectionSlug
+            data: this.collection
         });
 
         dialogRef.afterClosed().subscribe((result) => {

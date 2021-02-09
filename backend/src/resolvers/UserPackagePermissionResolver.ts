@@ -45,18 +45,30 @@ export const setPackagePermissions = async (
         .getCustomRepository(PackageRepository)
         .findPackage({ identifier, relations: ["catalog"] });
 
-    if (packageEntity == null)
+    if (packageEntity == null) {
         throw new Error("PACKAGE_NOT_FOUND - " + identifier.catalogSlug + "/" + identifier.packageSlug);
+    }
 
     const inviteUsers: UserEntity[] = [];
     const existingUsers: UserEntity[] = [];
 
     await context.connection.transaction(async (transaction) => {
         await asyncForEach(value, async (userPackagePermission) => {
-            let userId = null;
-            const user = await transaction
+            let user = await transaction
                 .getCustomRepository(UserRepository)
                 .getUserByUsernameOrEmailAddress(userPackagePermission.usernameOrEmailAddress);
+
+            const packagePermissionRepository = transaction.getCustomRepository(PackagePermissionRepository);
+            if (userPackagePermission.permissions.length === 0) {
+                if (!user) {
+                    return;
+                }
+
+                return await packagePermissionRepository.removePackagePermissionForUser({
+                    identifier,
+                    user
+                });
+            }
 
             if (user == null) {
                 if (emailAddressValid(userPackagePermission.usernameOrEmailAddress) === true) {
@@ -64,14 +76,12 @@ export const setPackagePermissions = async (
                         .getCustomRepository(UserRepository)
                         .createInviteUser(userPackagePermission.usernameOrEmailAddress);
 
-                    userId = inviteUser.id;
+                    user = inviteUser;
                     inviteUsers.push(inviteUser);
                 } else {
                     throw new ValidationError("USER_NOT_FOUND - " + userPackagePermission.usernameOrEmailAddress);
                 }
             } else {
-                userId = user.id;
-
                 if (user.status == UserStatus.PENDING_SIGN_UP) {
                     inviteUsers.push(user);
                 } else {
@@ -79,13 +89,14 @@ export const setPackagePermissions = async (
                 }
             }
 
-            await transaction.getCustomRepository(PackagePermissionRepository).setPackagePermissions({
+            await packagePermissionRepository.setPackagePermissions({
                 identifier,
-                userId,
+                userId: user.id,
                 permissions: userPackagePermission.permissions
             });
         });
     });
+
     await asyncForEach(existingUsers, async (user) => {
         await sendShareNotification(
             user,
@@ -103,11 +114,11 @@ export const setPackagePermissions = async (
 
 export const removePackagePermissions = async (
     _0: any,
-    { identifier, username }: { identifier: PackageIdentifierInput; username: string },
+    { identifier, usernameOrEmailAddress }: { identifier: PackageIdentifierInput; usernameOrEmailAddress: string },
     context: AuthenticatedContext
 ) => {
     return context.connection.getCustomRepository(PackagePermissionRepository).removePackagePermission({
         identifier,
-        username
+        usernameOrEmailAddress
     });
 };

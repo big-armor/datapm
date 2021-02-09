@@ -1,24 +1,20 @@
-import querystring from "querystring";
-
 import { EntityRepository, Repository, EntityManager, SelectQueryBuilder } from "typeorm";
 import { v4 as uuid } from "uuid";
 
 import { UserEntity } from "../entity/UserEntity";
 import {
     CreateUserInputAdmin,
-    Permission,
     UpdateUserInput,
     CreateUserInput,
     RecoverMyPasswordInput,
-    UserStatus
+    UserStatus,
+    User
 } from "../generated/graphql";
 import { mixpanel } from "../util/mixpanel";
-import { UserCatalogPermissionEntity } from "../entity/UserCatalogPermissionEntity";
 import { CatalogRepository } from "./CatalogRepository";
 import { hashPassword } from "../util/PasswordUtil";
-import { CatalogEntity } from "../entity/CatalogEntity";
-import { sendVerifyEmail, sendForgotPasswordEmail, smtpConfigured } from "../util/smtpUtil";
-import { ValidationError, UserInputError } from "apollo-server";
+import { sendVerifyEmail, sendForgotPasswordEmail } from "../util/smtpUtil";
+import { UserInputError } from "apollo-server";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { CollectionRepository } from "./CollectionRepository";
 import { StorageErrors } from "../storage/files/file-storage-service";

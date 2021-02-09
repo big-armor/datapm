@@ -37,7 +37,6 @@ import { Connection, EntityManager } from "typeorm";
 import { versionEntityToGraphqlObject } from "./VersionResolver";
 import { catalogEntityToGraphQL } from "./CatalogResolver";
 import { CollectionRepository } from "../repository/CollectionRepository";
-import { VersionEntity } from "../entity/VersionEntity";
 import { activtyLogEntityToGraphQL } from "./ActivityLogResolver";
 
 export const packageEntityToGraphqlObject = async (

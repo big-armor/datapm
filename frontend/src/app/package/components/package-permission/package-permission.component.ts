@@ -28,22 +28,21 @@ import { getEffectivePermissions } from "../../../services/permissions.service";
 })
 export class PackagePermissionComponent implements OnInit {
     public package: Package;
-    private unsubscribe$ = new Subject();
     public columnsToDisplay = ["name", "permission", "actions"];
     public users: any[] = [];
+
+    private unsubscribe$ = new Subject();
 
     constructor(
         private dialog: MatDialog,
         private usersByPackage: UsersByPackageGQL,
         private updatePackage: UpdatePackageGQL,
         private packageService: PackageService,
-        private authSvc: AuthenticationService,
         private removeUserPackagePermission: RemovePackagePermissionsGQL,
         private setPackagePermissions: SetPackagePermissionsGQL,
         private router: Router,
         private snackBarService: SnackBarService,
         private route: ActivatedRoute,
-        private snackBar: SnackBarService,
         private authenticationService: AuthenticationService,
         private dialogService: DialogService
     ) {}
@@ -75,14 +74,14 @@ export class PackagePermissionComponent implements OnInit {
         this.setUserPermission(username, getEffectivePermissions(permission));
     }
 
-    public removeUser(username: string): void {
+    public removeUser(usernameOrEmailAddress: string): void {
         this.removeUserPackagePermission
             .mutate({
                 identifier: {
                     catalogSlug: this.package.identifier.catalogSlug,
                     packageSlug: this.package.identifier.packageSlug
                 },
-                username
+                usernameOrEmailAddress
             })
             .subscribe(({ errors }) => {
                 if (errors) {
@@ -143,7 +142,6 @@ export class PackagePermissionComponent implements OnInit {
                 }
             })
             .subscribe(({ data }) => {
-                const currentUsername = this.authSvc.currentUser.value?.username;
                 this.users = data.usersByPackage.map((item) => ({
                     username: item.user.username,
                     name: this.getUserName(item.user as User),
