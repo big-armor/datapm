@@ -24,7 +24,6 @@ export class ValidEmailDirective extends SchemaDirectiveVisitor {
         }
     ): GraphQLArgument | void | null {
         const { resolve = defaultFieldResolver } = details.field;
-        const self = this;
         details.field.resolve = function (source, args, context: Context, info) {
             const emailAddress: string | undefined = args.emailAddress || args.value?.emailAddress || undefined;
 
@@ -36,7 +35,6 @@ export class ValidEmailDirective extends SchemaDirectiveVisitor {
 
     visitFieldDefinition(field: GraphQLField<any, any>) {
         const { resolve = defaultFieldResolver } = field;
-        const self = this;
         field.resolve = function (source, args, context: Context, info) {
             const emailAddress: string | undefined = args.emailAddress || args.value?.emailAddress || undefined;
 
@@ -57,7 +55,6 @@ export class ValidEmailDirective extends SchemaDirectiveVisitor {
 }
 
 export function validateEmailAddress(emailAddress: string | undefined) {
-    console.log("emailAddress", emailAddress);
     const validEmailAddress = emailAddressValid(emailAddress);
 
     if (validEmailAddress == "REQUIRED") {
