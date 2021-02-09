@@ -1,0 +1,56 @@
+<div class="container">
+    <div class="col-md-2">
+        <div *ngIf="!acceptedInvitation">
+            <form [formGroup]="acceptInviteForm" (ngSubmit)="submit()">
+                <app-input
+                    placeholder="Username or email address"
+                    [group]="acceptInviteForm"
+                    class="rounded-input"
+                    controlName="username"
+                    [error]="acceptInviteForm | inputError: 'username' | async"
+                >
+                </app-input>
+                <app-input
+                    inputType="password"
+                    placeholder="Password"
+                    [group]="acceptInviteForm"
+                    controlName="password"
+                    class="rounded-input"
+                    [error]="acceptInviteForm | inputError: 'password' | async"
+                >
+                </app-input>
+                <app-input
+                    inputType="password"
+                    placeholder="Confirm Password"
+                    [group]="acceptInviteForm"
+                    controlName="confirmPassword"
+                    class="rounded-input"
+                    [error]="acceptInviteForm | inputError: 'confirmPassword' | async"
+                >
+                </app-input>
+                <br />
+                <div class="alert-div">
+                    <div class="alert-warn" *ngIf="errorMessage">
+                        {{ errorMessage }}
+                    </div>
+                    <div class="content-btn text-center">
+                        <button type="submit" class="app-raised-button mb-1 mt-4" [disabled]="loading">
+                            <span *ngIf="!loading" class="btn-text">Activate</span>
+                            <span *ngIf="loading" class="loading-spinner">
+                                <mat-spinner diameter="25"></mat-spinner>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+                <br />
+            </form>
+        </div>
+        <div *ngIf="acceptedInvitation">
+            <mat-icon class="success-icon">verified</mat-icon>
+            <div class="dialog-title">You've successfully created your account!</div>
+            <div class="dialog-subtitle">
+                You can <a (click)="openLoginDialog()" href="javascript:void(0)">log in to your account now</a>.
+            </div>
+        </div>
+    </div>
+</div>
