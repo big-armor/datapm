@@ -165,7 +165,7 @@ describe("Collection Permissions", async () => {
                 identifier: {
                     collectionSlug: "testA-collection-permissions"
                 },
-                username: "my-test-user100"
+                usernameOrEmailAddress: "my-test-user100"
             }
         });
 
