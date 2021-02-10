@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { FormBuilder } from "@angular/forms";
 import { MatStepper } from "@angular/material/stepper";
 import { combineLatest } from "rxjs";
 import { getRegistryURL } from "src/app/helpers/RegistryAccessHelper";
@@ -13,11 +13,6 @@ import { MyAPIKeysGQL } from "src/generated/graphql";
     styleUrls: ["./client-wizard.component.scss"]
 })
 export class ClientWizardComponent implements OnInit {
-    firstFormGroup: FormGroup;
-    secondFormGroup: FormGroup;
-    thirdFormGroup: FormGroup;
-    fourthFormGroup: FormGroup;
-
     public currentIndex: number = 0;
 
     username: string;
@@ -28,7 +23,6 @@ export class ClientWizardComponent implements OnInit {
     loading = false;
 
     constructor(
-        private _formBuilder: FormBuilder,
         public myAPIKeysGQL: MyAPIKeysGQL,
         public authenticationService: AuthenticationService,
         public pacakgeService: PackageService
@@ -37,19 +31,6 @@ export class ClientWizardComponent implements OnInit {
     @ViewChild("stepper") private myStepper: MatStepper;
 
     ngOnInit() {
-        this.firstFormGroup = this._formBuilder.group({
-            firstCtrl: ["", Validators.required]
-        });
-        this.secondFormGroup = this._formBuilder.group({
-            secondCtrl: ["", Validators.required]
-        });
-        this.thirdFormGroup = this._formBuilder.group({
-            firstCtrl: ["", Validators.required]
-        });
-        this.fourthFormGroup = this._formBuilder.group({
-            secondCtrl: ["", Validators.required]
-        });
-
         this.registryUrl = getRegistryURL();
 
         this.loading = true;

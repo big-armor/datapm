@@ -1,7 +1,7 @@
 <div id="packageInfo">
     <div *ngIf="package?.latestVersion?.identifier != null">
         <div class="row pb-3 pt-1 mb-4 share-data">
-            <div class="col-12 justify-content-end" style="display: flex;">
+            <div class="col-12 justify-content-end" style="display: flex">
                 <div class="px-1 d-flex flex-column bd-highlight">
                     <button class="app-outlined-button" (click)="downloadPackage()">
                         <a>Download</a>
@@ -15,7 +15,7 @@
                 >
                     <button
                         mat-raised-button
-                        style="pointer-events: all !important;"
+                        style="pointer-events: all !important"
                         class="app-outlined-button"
                         (click)="sharePackage()"
                         [disabled]="!canShare()"
@@ -34,7 +34,7 @@
             <div class="d-flex justify-content-between">
                 <div class="package-light-gray">click to copy fetch command</div>
             </div>
-            <div class="d-flex bd-highlight copy-wrapper" (click)="copyCommand()" style="cursor: pointer;">
+            <div class="d-flex bd-highlight copy-wrapper" (click)="copyCommand()" style="cursor: pointer">
                 <div class="bd-highlight copy-input">
                     <span>{{ generatedFetchCommand }}</span>
                 </div>

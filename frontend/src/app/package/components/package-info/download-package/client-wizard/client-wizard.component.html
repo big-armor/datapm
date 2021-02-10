@@ -9,7 +9,7 @@
                                 class="progress-bar"
                                 role="progressbar"
                                 (click)="move(0)"
-                                style="width: 25%; background-color: #828282a8;"
+                                style="width: 25%; background-color: #828282a8"
                                 [class.active-bar]="currentIndex == undefined || currentIndex == 0"
                                 aria-valuenow="25"
                                 aria-valuemin="0"
@@ -21,7 +21,7 @@
                                 class="progress-bar"
                                 role="progressbar"
                                 (click)="move(1)"
-                                style="width: 25%; background-color: #828282a8;"
+                                style="width: 25%; background-color: #828282a8"
                                 [class.active-bar]="currentIndex == 1"
                                 aria-valuenow="50"
                                 aria-valuemin="0"
@@ -33,7 +33,7 @@
                                 class="progress-bar"
                                 role="progressbar"
                                 (click)="move(2)"
-                                style="width: 25%; background-color: #828282a8;"
+                                style="width: 25%; background-color: #828282a8"
                                 [class.active-bar]="currentIndex == 2"
                                 aria-valuenow="75"
                                 aria-valuemin="0"
@@ -45,7 +45,7 @@
                                 class="progress-bar"
                                 role="progressbar"
                                 (click)="move(3)"
-                                style="width: 25%; background-color: #828282a8;"
+                                style="width: 25%; background-color: #828282a8"
                                 [class.active-bar]="currentIndex == 3"
                                 aria-valuenow="100"
                                 aria-valuemin="0"
@@ -55,72 +55,64 @@
                             </div>
                         </div>
                         <mat-horizontal-stepper labelPosition="bottom" #stepper>
-                            <mat-step [stepControl]="firstFormGroup">
-                                <form [formGroup]="firstFormGroup">
-                                    <div class="mat-content">
-                                        <p class="stepper-title">Install NodeJS</p>
-                                        <div class="stepper-content">
-                                            <p>
-                                                Use the instructions in the link below to install NodeJS.
-                                                <a>https://nodejs.org/en/</a>
-                                            </p>
-                                            <p>Verify that you have installed Node 12 or greater.</p>
-                                        </div>
-                                        <div class="white-div">
-                                            <p>node -v</p>
-                                            <p>npm -v</p>
-                                        </div>
+                            <mat-step>
+                                <div class="mat-content">
+                                    <p class="stepper-title">Install NodeJS</p>
+                                    <div class="stepper-content">
+                                        <p>
+                                            Use the instructions in the link below to install NodeJS.
+                                            <a>https://nodejs.org/en/</a>
+                                        </p>
+                                        <p>Verify that you have installed Node 12 or greater.</p>
                                     </div>
-                                </form>
+                                    <div class="white-div">
+                                        <p>node -v</p>
+                                        <p>npm -v</p>
+                                    </div>
+                                </div>
                             </mat-step>
-                            <mat-step [stepControl]="secondFormGroup" optional>
-                                <form [formGroup]="secondFormGroup">
-                                    <ng-template matStepLabel>Done</ng-template>
-                                    <div class="mat-content">
-                                        <p class="stepper-title">Install DataPM Client</p>
-                                        <div class="stepper-content">
-                                            <p>Install the datapm client</p>
-                                        </div>
-                                        <div class="white-div">
-                                            <p>npm install -g datapm-client</p>
-                                        </div>
-                                        <div class="stepper-content mt-2">
-                                            <p>Verify that the datapm client is installed</p>
-                                        </div>
-                                        <div class="white-div">
-                                            <p>datapm --version</p>
-                                        </div>
+                            <mat-step optional>
+                                <ng-template matStepLabel>Done</ng-template>
+                                <div class="mat-content">
+                                    <p class="stepper-title">Install DataPM Client</p>
+                                    <div class="stepper-content">
+                                        <p>Install the datapm client</p>
                                     </div>
-                                </form>
+                                    <div class="white-div">
+                                        <p>npm install -g datapm-client</p>
+                                    </div>
+                                    <div class="stepper-content mt-2">
+                                        <p>Verify that the datapm client is installed</p>
+                                    </div>
+                                    <div class="white-div">
+                                        <p>datapm --version</p>
+                                    </div>
+                                </div>
                             </mat-step>
-                            <mat-step [stepControl]="thirdFormGroup">
-                                <form [formGroup]="thirdFormGroup">
-                                    <div class="mat-content">
-                                        <p class="stepper-title">Login to Registry</p>
-                                        <div class="stepper-content">
-                                            <p>Use the this command to login to your registry account.</p>
-                                        </div>
-                                        <div class="white-div">
-                                            <p>datapm registry login {{ registryUrl }} {{ username }}</p>
-                                        </div>
+                            <mat-step>
+                                <div class="mat-content">
+                                    <p class="stepper-title">Login to Registry</p>
+                                    <div class="stepper-content">
+                                        <p>Use the this command to login to your registry account.</p>
                                     </div>
-                                </form>
+                                    <div class="white-div">
+                                        <p>datapm registry login {{ registryUrl }} {{ username }}</p>
+                                    </div>
+                                </div>
                             </mat-step>
-                            <mat-step [stepControl]="fourthFormGroup" optional>
-                                <form [formGroup]="fourthFormGroup">
-                                    <div class="mat-content">
-                                        <p class="stepper-title">Fetch Data</p>
-                                        <div class="stepper-content">
-                                            <p>Use this command to fetch the data package</p>
-                                        </div>
-                                        <div class="white-div">
-                                            <p>datapm fetch {{ packageUrl }}</p>
-                                        </div>
-                                        <div *ngIf="hasApiKeys" class="stepper-content mt-2">
-                                            <a (click)="move(0)">How to install datapm client</a>
-                                        </div>
+                            <mat-step optional>
+                                <div class="mat-content">
+                                    <p class="stepper-title">Fetch Data</p>
+                                    <div class="stepper-content">
+                                        <p>Use this command to fetch the data package</p>
                                     </div>
-                                </form>
+                                    <div class="white-div">
+                                        <p>datapm fetch {{ packageUrl }}</p>
+                                    </div>
+                                    <div *ngIf="hasApiKeys" class="stepper-content mt-2">
+                                        <a (click)="move(0)">How to install datapm client</a>
+                                    </div>
+                                </div>
                             </mat-step>
                         </mat-horizontal-stepper>
                     </div>
