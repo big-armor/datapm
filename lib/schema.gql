@@ -816,7 +816,7 @@ type Mutation {
     """
     Deletes a user's account
     """
-    adminDeleteUser(username: String!): Void @isAdmin
+    adminDeleteUser(usernameOrEmailAddress: String! @validUsernameOrEmailAddress): Void @isAdmin
 
     """
     Using a username or email address and a password, requests authentication information for the given user

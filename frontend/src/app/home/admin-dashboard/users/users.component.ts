@@ -85,7 +85,8 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
         };
         this.confirmationDialogService.openFancyConfirmationDialog(dialogConfig).subscribe((confirmation) => {
             if (confirmation) {
-                this.deleteUserGQL.mutate({ username: user.username }).subscribe(() => this.loadSearchedUsers());
+                const usernameOrEmailAddress = user.emailAddress ? user.emailAddress : user.username;
+                this.deleteUserGQL.mutate({ usernameOrEmailAddress }).subscribe(() => this.loadSearchedUsers());
             }
         });
     }
