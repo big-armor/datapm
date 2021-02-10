@@ -1,0 +1,135 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 p-0" id="downloadPackage">
+            <div mat-dialog-title id="contentTitle">Download {{ userPackage.displayName }}</div>
+            <div mat-dialog-content id="contentBorder">
+                <div class="row m-0">
+                    <mat-horizontal-stepper labelPosition="bottom" #stepper>
+                        <mat-step>
+                            <div class="mat-content">
+                                <div class="first-format" *ngIf="showRawFileButton">
+                                    <div class="stepper-content">Download the original raw file</div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <button class="download-btn w-100" (click)="move(1)">
+                                                <a
+                                                    ><img
+                                                        src="../../../../../assets/images/raw_logo.png"
+                                                        alt="csv img"
+                                                        style="width: 16px; height: 16px;"
+                                                /></a>
+                                                Download raw file
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="second-format">
+                                    <div class="stepper-content">No-code ETL Options</div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-2">
+                                            <button class="download-btn w-100" (click)="openClientWizard()">
+                                                <a
+                                                    ><img
+                                                        src="../../../../../assets/images/Postgresql_logo.svg"
+                                                        alt="postres img"
+                                                        style="width: 16px; height: 16px;"
+                                                /></a>
+                                                Postgres
+                                            </button>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <button class="download-btn w-100" (click)="openClientWizard()">
+                                                <a
+                                                    ><img
+                                                        src="../../../../../assets/images/mysql_logo.png"
+                                                        alt="myslq img"
+                                                        style="width: 16px; height: 16px;"
+                                                /></a>
+                                                MySQL
+                                            </button>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <button class="download-btn w-100" (click)="openClientWizard()">
+                                                <a
+                                                    ><img
+                                                        src="../../../../../assets/images/mongodb_logo1.png"
+                                                        alt="mongodb img"
+                                                        style="width: 16px; height: 16px;"
+                                                /></a>
+                                                MongoDB
+                                            </button>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <button class="download-btn w-100" (click)="openClientWizard()">
+                                                <a
+                                                    ><img
+                                                        src="../../../../../assets/images/bigquery_logo.svg"
+                                                        alt="bigquery img"
+                                                        style="width: 16px; height: 16px;"
+                                                /></a>
+                                                Big Query
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-2">
+                                            <button class="download-btn w-100" (click)="openClientWizard()">
+                                                <a
+                                                    ><img
+                                                        src="../../../../../assets/images/csv_logo.png"
+                                                        alt="csv img"
+                                                        style="width: 16px; height: 16px;"
+                                                /></a>
+                                                CSV
+                                            </button>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <button class="download-btn w-100" (click)="openClientWizard()">
+                                                <a
+                                                    ><img
+                                                        src="../../../../../assets/images/json_logo.png"
+                                                        alt="json img"
+                                                        style="width: 16px; height: 16px;"
+                                                /></a>
+                                                JSON
+                                            </button>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <button class="download-btn w-100" (click)="openClientWizard()">
+                                                <a
+                                                    ><img
+                                                        src="../../../../../assets/images/terminal_logo.jpg"
+                                                        alt="csv img"
+                                                        style="width: 16px; height: 16px;"
+                                                /></a>
+                                                Pipe to Standard Out
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-step>
+                        <mat-step optional>
+                            <div class="mat-content">
+                                <div class="stepper-content">
+                                    <span>Schemas</span>
+                                    <div class="white-div">
+                                        <a *ngFor="let schema of schemas" [href]="schema.source.uri" target="_blank">
+                                            {{ schema.$id }}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-step>
+                    </mat-horizontal-stepper>
+                </div>
+            </div>
+
+            <div mat-dialog-actions class="d-flex justify-content-end pt-1">
+                <button mat-button (click)="move(0)" *ngIf="currentIndex == 1">Back</button>
+                <button mat-button mat-dialog-close>Close</button>
+            </div>
+        </div>
+    </div>
+</div>

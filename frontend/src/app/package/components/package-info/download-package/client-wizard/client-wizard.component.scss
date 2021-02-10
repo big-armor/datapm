@@ -1,0 +1,93 @@
+@import "../../../../../../styles/variables";
+
+#clientWizard {
+    .stepper-title {
+        font-family: $family-roboto;
+        font-weight: $weight-500;
+        margin-top: 10px;
+        font-size: 18px;
+    }
+
+    .mat-content {
+        height: 190px;
+        display: block;
+    }
+
+    .stepper-content {
+        p {
+            margin-bottom: 0px !important;
+            font-family: $family-roboto;
+            font-style: $style-normal;
+            font-weight: $weight-300;
+            font-size: ($text-font - 1);
+            line-height: 18px;
+            letter-spacing: 0.4px;
+            color: $gray-3;
+        }
+
+        a {
+            color: $color-info;
+            line-height: 24px;
+            font-size: ($text-font - 1);
+            cursor: pointer;
+            font-weight: $weight-400;
+        }
+    }
+
+    .white-div {
+        background-color: $white;
+        margin-top: 10px;
+        border-radius: 6px;
+        padding: 10px 15px;
+
+        p {
+            color: $gray-1;
+            margin-bottom: 0px !important;
+        }
+    }
+
+    ::ng-deep.progress {
+        font-size: $xsmall-font;
+        font-weight: $weight-300;
+
+        .active-bar {
+            background-color: #017fb9 !important;
+        }
+
+        .inactive-bar {
+            background-color: #82828280 !important;
+        }
+
+        .progress-bar {
+            cursor: pointer;
+            border-right: 1px solid rgb(255 255 255 / 25%) !important;
+        }
+    }
+
+    ::ng-deep .mat-horizontal-stepper-header-container {
+        display: none;
+    }
+
+    ::ng-deep.mat-horizontal-content-container {
+        padding: 0px;
+    }
+
+    #contentBorder {
+        border: 0px;
+        padding: 0px;
+    }
+
+    .stepper-actions {
+        text-align: right;
+        padding: 0px;
+        min-height: 46px;
+        margin-bottom: 0px !important;
+        border-top: 1px solid #e5e5e5;
+    }
+}
+
+::ng-deep .my-custom-dialog {
+    .mat-dialog-container {
+        padding: 25px 25px 3px 25px !important;
+    }
+}

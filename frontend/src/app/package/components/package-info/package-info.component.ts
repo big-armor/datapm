@@ -9,6 +9,7 @@ import { AuthenticationService } from "src/app/services/authentication.service";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import { Package, User } from "src/generated/graphql";
 import { AddUserComponent } from "../add-user/add-user.component";
+import { DownloadPackageComponent } from "./download-package/download-package.component";
 import { SharePackageComponent } from "./share-package/share-package.component";
 
 @Component({
@@ -68,6 +69,13 @@ export class PackageInfoComponent implements OnInit {
                 }
             });
         }
+    }
+
+    public downloadPackage() {
+        const dialogRef = this.dialog.open(DownloadPackageComponent, {
+            data: this.package,
+            width: "420px"
+        });
     }
 
     public canManage() {

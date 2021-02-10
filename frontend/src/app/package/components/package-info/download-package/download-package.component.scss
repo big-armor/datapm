@@ -1,0 +1,101 @@
+@import "../../../../../styles/variables";
+
+#downloadPackage {
+    #contentBorder {
+        padding: 0px;
+    }
+
+    .stepper-content {
+        margin-bottom: 6px !important;
+        font-family: $family-roboto;
+        font-style: $style-normal;
+        font-weight: $weight-300;
+        font-size: ($text-font - 1);
+        line-height: 18px;
+        letter-spacing: 0.4px;
+        color: $gray-3;
+    }
+
+    .white-div {
+        background-color: $white;
+        margin-top: 10px;
+        border-radius: 6px;
+        padding: 10px 15px;
+
+        a {
+            color: $color-info;
+            line-height: 24px;
+            font-size: ($text-font - 1);
+            cursor: pointer;
+            font-weight: $weight-400;
+        }
+    }
+
+    p {
+        font-family: $family-roboto;
+        font-weight: $weight-500;
+        font-size: $text-font;
+    }
+
+    .download-btn {
+        border-radius: 6px;
+        text-align: left;
+        width: 100%;
+        border: none;
+        padding: 5px 12px 5px 0px;
+        background: #fff;
+        color: $gray-1;
+        border: 1px solid #33333326;
+        font-weight: $weight-300;
+        letter-spacing: 0.8px;
+        font-size: ($small-font - 1);
+        font-family: $family-roboto;
+
+        a {
+            padding: 10px 7px;
+            margin-right: 7px;
+            border-right: 1px solid #ddd;
+        }
+
+        &:hover {
+            text-decoration: none;
+        }
+    }
+
+    .mat-content {
+        height: 280px;
+        display: block;
+        padding-top: 10px;
+    }
+
+    .first-format {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .form-check {
+        label {
+            margin-bottom: 0px !important;
+            font-family: $family-roboto;
+            font-style: $style-normal;
+            font-weight: $weight-300;
+            font-size: ($text-font - 2);
+            line-height: 18px;
+            letter-spacing: 0.4px;
+            color: $gray-2;
+        }
+    }
+
+    ::ng-deep .mat-horizontal-stepper-header-container {
+        display: none;
+    }
+
+    ::ng-deep .mat-horizontal-content-container {
+        padding: 0px;
+    }
+
+    .next-btn {
+        border: none;
+        background: transparent;
+    }
+}

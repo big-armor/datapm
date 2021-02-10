@@ -16,6 +16,7 @@ import { AddUserComponent } from "./add-user/add-user.component";
 import { CollectionPermissionsComponent } from "./collection-permissions/collection-permissions.component";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatSelectModule } from "@angular/material/select";
+import { MatStepperModule } from "@angular/material/stepper";
 
 @NgModule({
     declarations: [CollectionDetailsComponent, AddPackageComponent, AddUserComponent, CollectionPermissionsComponent],
@@ -30,7 +31,8 @@ import { MatSelectModule } from "@angular/material/select";
         MatSelectModule,
         MatTableModule,
         MatSlideToggleModule,
-        MatButtonModule
+        MatButtonModule,
+        MatStepperModule
     ]
 })
 export class CollectionDetailsModule {}

@@ -33,6 +33,9 @@ import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { PackageDeletionConfirmationComponent } from "./components/package/package-deletion-confirmation/package-deletion-confirmation.component";
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { SharePackageComponent } from "./components/package-info/share-package/share-package.component";
+import { DownloadPackageComponent } from "./components/package-info/download-package/download-package.component";
+import { ClientWizardComponent } from "./components/package-info/download-package/client-wizard/client-wizard.component";
+import { MatStepperModule } from "@angular/material/stepper";
 
 @NgModule({
     declarations: [
@@ -50,7 +53,9 @@ import { SharePackageComponent } from "./components/package-info/share-package/s
         PackagePermissionComponent,
         AddUserComponent,
         PackageDeletionConfirmationComponent,
-        SharePackageComponent
+        SharePackageComponent,
+        DownloadPackageComponent,
+        ClientWizardComponent
     ],
     imports: [
         CommonModule,
@@ -67,6 +72,7 @@ import { SharePackageComponent } from "./components/package-info/share-package/s
         MatProgressSpinnerModule,
         SharedModule,
         ScrollingModule,
+        MatStepperModule,
         TableVirtualScrollModule,
         MarkdownModule.forChild(),
         MatTooltipModule
