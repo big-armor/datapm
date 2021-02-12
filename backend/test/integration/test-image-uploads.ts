@@ -14,7 +14,10 @@ import {
     SetCollectionCoverImageDocument,
     DeleteCollectionDocument,
     SetCatalogCoverImageDocument,
-    UpdateMeDocument
+    UpdateMeDocument,
+    SetCatalogAvatarImageDocument,
+    CreateCatalogDocument,
+    DeleteCatalogAvatarImageDocument
 } from "./registry-client";
 import * as crypto from "crypto";
 
@@ -277,7 +280,7 @@ describe("Image Upload Tests", async () => {
         expect(imageResponse.errors!.find((e) => e.message.includes("NOT_AUTHORIZED")) != null).equal(true);
     });
 
-    it("should remove collection cover image when deleted", async () => {
+    it("should remove collection cover and avatar image when deleted", async () => {
         let response = await userAClient.mutate({
             mutation: DeleteCollectionDocument,
             variables: {
@@ -289,17 +292,29 @@ describe("Image Upload Tests", async () => {
 
         expect(response.errors == null, "no errors").true;
 
-        let errorFound = false;
+        let avatarImageErrorFound = false;
+        let coverImageErrorFound = false;
+
         try {
-            const imageServingResult = await request.get("localhost:4000/images/collection/image-test/cover");
+            await request.get("localhost:4000/images/collection/image-test/cover");
         } catch (error) {
-            if (error.message == "Not Found") errorFound = true;
+            if (error.message === "Not Found") {
+                avatarImageErrorFound = true;
+            }
+        }
+        try {
+            await request.get("localhost:4000/images/collection/image-test/cover");
+        } catch (error) {
+            if (error.message === "Not Found") {
+                coverImageErrorFound = true;
+            }
         }
 
-        expect(errorFound).equal(true);
+        expect(avatarImageErrorFound).equal(true);
+        expect(coverImageErrorFound).equal(true);
     });
 
-    it("should allow user to set a catalog image", async () => {
+    it("should allow user to set a catalog cover image", async () => {
         const imageContent = fs.readFileSync("test/other-files/ba.jpg", "base64");
 
         let imageResponse = await userAClient.mutate({
@@ -319,10 +334,119 @@ describe("Image Upload Tests", async () => {
         expect(imageServingResult.status).equal(200);
     });
 
-    it("should allow accessing the catalog cover after renaming the user", async () => {
+    it("should allow user to set a catalog avatar image", async () => {
+        const imageContent = fs.readFileSync("test/other-files/ba.jpg", "base64");
+        await userAClient.mutate({
+            mutation: CreateCatalogDocument,
+            variables: {
+                value: {
+                    slug: "user-image-catalog",
+                    displayName: "User A Catalog v1",
+                    description: "This is an integration test User A v1 Catalog",
+                    website: "https://usera.datapm.io",
+                    isPublic: false
+                }
+            }
+        });
+
+        const imageResponse = await userAClient.mutate({
+            mutation: SetCatalogAvatarImageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "user-image-catalog"
+                },
+                image: { base64: imageContent }
+            }
+        });
+
+        expect(imageResponse.errors == null).true;
+
+        const imageServingResult = await request.get("localhost:4000/images/catalog/user-image-catalog/avatar");
+
+        expect(imageServingResult.status).equal(200);
+    });
+
+    it("should allow user to delete a catalog avatar image", async () => {
+        const imageContent = fs.readFileSync("test/other-files/ba.jpg", "base64");
+        await userAClient.mutate({
+            mutation: CreateCatalogDocument,
+            variables: {
+                value: {
+                    slug: "user-image-catalog-2",
+                    displayName: "User A Catalog",
+                    description: "This is an integration test User A v1 Catalog",
+                    website: "https://usera.datapm.io",
+                    isPublic: false
+                }
+            }
+        });
+
+        const setImageResponse = await userAClient.mutate({
+            mutation: SetCatalogAvatarImageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "user-image-catalog-2"
+                },
+                image: { base64: imageContent }
+            }
+        });
+
+        expect(setImageResponse.errors == null).true;
+
+        const deleteImageResponse = await userAClient.mutate({
+            mutation: DeleteCatalogAvatarImageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "user-image-catalog-2"
+                }
+            }
+        });
+
+        expect(deleteImageResponse.errors == null).true;
+
+        let imageNotFound = false;
+        try {
+            await request.get("localhost:4000/images/catalog/user-image-catalog-2/avatar");
+        } catch (error) {
+            if (error.message === "Not Found") {
+                imageNotFound = true;
+            }
+        }
+
+        expect(imageNotFound).equal(true);
+    });
+
+    it("should not allow user to set a user catalog avatar", async () => {
         const imageContent = fs.readFileSync("test/other-files/ba.jpg", "base64");
 
-        let imageResponse = await userAClient.mutate({
+        const imageResponse = await userAClient.mutate({
+            mutation: SetCatalogAvatarImageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "first-user-username"
+                },
+                image: { base64: imageContent }
+            }
+        });
+
+        expect(imageResponse.errors?.some((e) => e.message === "AVATAR_NOT_ALLOWED_ON_USER_CATALOGS"));
+    });
+
+    it("should not allow user to delete a user catalog avatar", async () => {
+        const imageResponse = await userAClient.mutate({
+            mutation: DeleteCatalogAvatarImageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "first-user-username"
+                }
+            }
+        });
+
+        expect(imageResponse.errors?.some((e) => e.message === "AVATAR_NOT_ALLOWED_ON_USER_CATALOGS"));
+    });
+
+    it("should allow accessing the catalog cover after renaming the user", async () => {
+        const imageResponse = await userAClient.mutate({
             mutation: UpdateMeDocument,
             variables: {
                 value: {

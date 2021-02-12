@@ -33,16 +33,16 @@ export class UserDetailsPageComponent implements OnInit {
         if (this.username === this.authSvc.currentUser.value?.username) {
             this.isCurrentUser = true;
             this.tabs = [
-                { name: "My Account", value: "" },
-                { name: "Packages", value: "packages" },
-                { name: "Collections", value: "collections" },
-                { name: "Catalogs", value: "catalogs" }
+                { name: "my account", value: "" },
+                { name: "packages", value: "packages" },
+                { name: "collections", value: "collections" },
+                { name: "catalogs", value: "catalogs" }
             ];
         } else {
             this.tabs = [
-                { name: "Packages", value: "" },
-                { name: "Collections", value: "collections" },
-                { name: "Catalogs", value: "catalogs" }
+                { name: "packages", value: "" },
+                { name: "collections", value: "collections" },
+                { name: "catalogs", value: "catalogs" }
             ];
         }
 

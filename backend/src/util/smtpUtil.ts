@@ -7,7 +7,8 @@ export enum EMAIL_SUBJECTS {
     NEW_API_KEY = "⚠ New API Key Created",
     VERIFY_EMAIL = "✓ Verify Your New Account",
     FORGOT_PASSWORD = "⚠ Recover Your Account",
-    INVITE_USER = "🚀 Data Invite"
+    INVITE_USER = "🚀 Data Invite",
+    USER_SUSPENDED = "Your account has been suspended"
 }
 
 export async function sendAPIKeyCreatedEmail(user: UserEntity, apiKeyLabel: string) {
@@ -21,6 +22,19 @@ export async function sendAPIKeyCreatedEmail(user: UserEntity, apiKeyLabel: stri
     emailHTML = emailHTML.replace(/{{api_key_label}}/g, apiKeyLabel);
 
     sendEmail(user, EMAIL_SUBJECTS.NEW_API_KEY, emailText, emailHTML);
+}
+
+export async function sendUserSuspendedEmail(user: UserEntity, message: string) {
+    let emailText = fs.readFileSync("./static/email-templates/user-suspended.txt", "utf8");
+    let emailHTML = fs.readFileSync("./static/email-templates/user-suspended.html", "utf8");
+
+    emailText = replaceCommonTokens(user, emailText);
+    emailText = emailText.replace(/{{message}}/g, message);
+
+    emailHTML = replaceCommonTokens(user, emailHTML);
+    emailHTML = emailHTML.replace(/{{message}}/g, message);
+
+    sendEmail(user, EMAIL_SUBJECTS.USER_SUSPENDED, emailText, emailHTML);
 }
 
 export async function sendForgotPasswordEmail(user: UserEntity, token: string) {

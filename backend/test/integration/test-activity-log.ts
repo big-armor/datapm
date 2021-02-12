@@ -96,7 +96,7 @@ describe("Activity Log Tests", async () => {
         expect(response.data.myActivity.logs[0]?.user?.username).to.equal(userOne.username);
         expect(response.data.myActivity.logs[0]?.eventType).to.equal(ActivityLogEventType.USER_CREATED);
 
-        const line = serverLogLines.find((l) =>
+        const line = serverLogLines.find((l: any) =>
             findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
                 return (
                     activityLogLine.eventType == ActivityLogEventType.USER_CREATED &&
@@ -137,7 +137,7 @@ describe("Activity Log Tests", async () => {
         );
 
         expect(
-            serverLogLines.find((l) =>
+            serverLogLines.find((l: any) =>
                 findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
                     return (
                         activityLogLine.eventType == ActivityLogEventType.PACKAGE_CREATED &&
@@ -178,7 +178,7 @@ describe("Activity Log Tests", async () => {
         );
 
         expect(
-            serverLogLines.find((l) =>
+            serverLogLines.find((l: any) =>
                 findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
                     return (
                         activityLogLine.eventType == ActivityLogEventType.CATALOG_CREATED &&
@@ -233,7 +233,7 @@ describe("Activity Log Tests", async () => {
         expect(version.identifier.versionMinor).to.equal(0);
         expect(version.identifier.versionPatch).to.equal(0);
 
-        const line = serverLogLines.find((l) =>
+        const line = serverLogLines.find((l: any) =>
             findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
                 return (
                     activityLogLine.eventType == ActivityLogEventType.VERSION_CREATED &&
@@ -286,7 +286,7 @@ describe("Activity Log Tests", async () => {
         );
         expect(activityLogResponse.data.myActivity.logs[1]?.changeType).to.equal(ActivityLogChangeType.PUBLIC_ENABLED);
 
-        const line = serverLogLines.find((l) =>
+        const line = serverLogLines.find((l: any) =>
             findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
                 return (
                     activityLogLine.eventType == ActivityLogEventType.CATALOG_EDIT &&
@@ -298,7 +298,7 @@ describe("Activity Log Tests", async () => {
 
         expect(line).to.be.not.undefined;
 
-        const catalogPublicChangedLine = serverLogLines.find((l) =>
+        const catalogPublicChangedLine = serverLogLines.find((l: any) =>
             findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
                 return (
                     activityLogLine.eventType == ActivityLogEventType.CATALOG_PUBLIC_CHANGED &&
@@ -354,7 +354,7 @@ describe("Activity Log Tests", async () => {
         );
         expect(activityLogResponse.data.myActivity.logs[1]?.changeType).to.equal(ActivityLogChangeType.PUBLIC_ENABLED);
 
-        const line = serverLogLines.find((l) =>
+        const line = serverLogLines.find((l: any) =>
             findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
                 return (
                     activityLogLine.eventType == ActivityLogEventType.PACKAGE_EDIT &&
@@ -366,7 +366,7 @@ describe("Activity Log Tests", async () => {
 
         expect(line).to.be.not.undefined;
 
-        const publicChangedLine = serverLogLines.find((l) =>
+        const publicChangedLine = serverLogLines.find((l: any) =>
             findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
                 return (
                     activityLogLine.eventType == ActivityLogEventType.PACKAGE_PUBLIC_CHANGED &&
@@ -415,7 +415,7 @@ describe("Activity Log Tests", async () => {
             "activityLog"
         );
 
-        const line = serverLogLines.find((l) =>
+        const line = serverLogLines.find((l: any) =>
             findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
                 return (
                     activityLogLine.eventType == ActivityLogEventType.COLLECTION_CREATED &&
@@ -472,7 +472,7 @@ describe("Activity Log Tests", async () => {
             "congressional-legislators"
         );
 
-        const line = serverLogLines.find((l) =>
+        const line = serverLogLines.find((l: any) =>
             findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
                 return (
                     activityLogLine.eventType == ActivityLogEventType.COLLECTION_PACKAGE_ADDED &&
@@ -555,7 +555,7 @@ describe("Activity Log Tests", async () => {
             "congressional-legislators"
         );
 
-        const line = serverLogLines.find((l) =>
+        const line = serverLogLines.find((l: any) =>
             findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
                 return (
                     activityLogLine.eventType == ActivityLogEventType.PACKAGE_VIEWED &&
@@ -634,7 +634,7 @@ describe("Activity Log Tests", async () => {
             "congressional-legislators"
         );
 
-        const line = serverLogLines.find((l) =>
+        const line = serverLogLines.find((l: any) =>
             findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
                 return (
                     activityLogLine.eventType == ActivityLogEventType.PACKAGE_FETCHED &&
@@ -720,7 +720,7 @@ describe("Activity Log Tests", async () => {
             "congressional-legislators"
         );
 
-        const line = serverLogLines.find((l) =>
+        const line = serverLogLines.find((l: any) =>
             findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
                 return (
                     activityLogLine.eventType == ActivityLogEventType.COLLECTION_PACKAGE_REMOVED &&
@@ -772,7 +772,7 @@ describe("Activity Log Tests", async () => {
         expect(activityLogResponse.data.myActivity.logs[0]?.propertiesEdited).to.contain("isPublic");
         expect(activityLogResponse.data.myActivity.logs[0]?.propertiesEdited).to.contain("description");
 
-        const line = serverLogLines.find((l) =>
+        const line = serverLogLines.find((l: any) =>
             findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
                 return (
                     activityLogLine.eventType == ActivityLogEventType.COLLECTION_EDIT &&
@@ -799,7 +799,7 @@ describe("Activity Log Tests", async () => {
 
         expect(response.errors == null, "no errors").true;
 
-        const line = serverLogLines.find((l) =>
+        const line = serverLogLines.find((l: any) =>
             findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
                 return (
                     activityLogLine.eventType == ActivityLogEventType.COLLECTION_DELETED &&
@@ -830,7 +830,7 @@ describe("Activity Log Tests", async () => {
 
         await new Promise((resolve) => setTimeout(() => resolve(null), 500)); // pause for console log to catch up
 
-        const line = serverLogLines.find((l) =>
+        const line = serverLogLines.find((l: any) =>
             findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
                 return (
                     activityLogLine.eventType == ActivityLogEventType.VERSION_DELETED &&
@@ -859,7 +859,7 @@ describe("Activity Log Tests", async () => {
 
         await new Promise((resolve) => setTimeout(() => resolve(null), 500)); // pause for console log to catch up
 
-        const line = serverLogLines.find((l) =>
+        const line = serverLogLines.find((l: any) =>
             findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
                 return (
                     activityLogLine.eventType == ActivityLogEventType.PACKAGE_DELETED &&
@@ -885,7 +885,7 @@ describe("Activity Log Tests", async () => {
         expect(deleteCatalogResponse.errors == null).to.equal(true);
 
         expect(
-            serverLogLines.find((l) =>
+            serverLogLines.find((l: any) =>
                 findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
                     return (
                         activityLogLine.eventType == ActivityLogEventType.CATALOG_DELETED &&

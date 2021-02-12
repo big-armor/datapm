@@ -1,4 +1,4 @@
-import { SchemaDirectiveVisitor, ApolloError, ValidationError } from "apollo-server";
+import { SchemaDirectiveVisitor, ValidationError } from "apollo-server";
 import { Kind } from "graphql";
 import {
     GraphQLField,
@@ -7,9 +7,7 @@ import {
     GraphQLInputObjectType,
     GraphQLArgument,
     GraphQLInterfaceType,
-    GraphQLObjectType,
-    GraphQLNonNull,
-    GraphQLScalarType
+    GraphQLObjectType
 } from "graphql";
 import { Context } from "../context";
 import { INVALID_PASSWORD_ERROR } from "../generated/graphql";
@@ -26,7 +24,6 @@ export class ValidPasswordDirective extends SchemaDirectiveVisitor {
         }
     ): GraphQLArgument | void | null {
         const { resolve = defaultFieldResolver } = details.field;
-        const self = this;
         details.field.resolve = function (source, args, context: Context, info) {
             const password: string | undefined = args.password || args.value.password || undefined;
             validatePassword(password);

@@ -2,16 +2,20 @@
     <ng-container *ngIf="state === 'SUCCESS'">
         <app-cover [catalogSlug]="catalogSlug"></app-cover>
 
-        <div *ngIf="catalog" class="collections-public mb-3">
-            <span *ngIf="catalog?.isPublic" class="public-text">public</span>
-            <span *ngIf="!catalog?.isPublic" class="not-public-text">not public</span>
-        </div>
-        <div class="catalog-header">
-            <h1 class="dpm-text-title mb-1">{{ catalog?.displayName }}</h1>
-            <h3 class="dpm-text-body mb-1 catalog-slug">{{ catalogSlug }}</h3>
-            <p class="dpm-text-small catalog-description">
-                {{ catalog?.description }}
-            </p>
+        <div class="p-2">
+            <app-avatar class="catalog-avatar" [catalog]="catalog" [circled]="false" [size]="100"> </app-avatar>
+
+            <div *ngIf="catalog" class="collections-public mb-3">
+                <span *ngIf="catalog?.isPublic" class="public-text">public</span>
+                <span *ngIf="!catalog?.isPublic" class="not-public-text">not public</span>
+            </div>
+            <div class="catalog-header">
+                <h1 class="dpm-text-title mb-1">{{ catalog?.displayName }}</h1>
+                <h3 class="dpm-text-body mb-1 catalog-slug">{{ catalogSlug }}</h3>
+                <p class="dpm-text-small catalog-description">
+                    {{ catalog?.description }}
+                </p>
+            </div>
         </div>
         <mat-tab-group [(selectedIndex)]="currentTab" disableRipple class="catalog-tabs">
             <mat-tab label="Packages"></mat-tab>

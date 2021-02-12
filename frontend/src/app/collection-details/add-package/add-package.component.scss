@@ -1,31 +1,32 @@
 @import "../../../styles/variables";
 
-.input-row {
-    margin-left: -24px;
-    margin-right: -24px;
-    padding-left: 24px;
-    padding-right: 24px;
+#addPackage {
+    .flat-input {
+        display: inline;
+    }
+
+    .add-package-text {
+        font-family: $family-roboto;
+        letter-spacing: 0.7px;
+        font-weight: $weight-400;
+    }
+
+    .mat-option {
+        height: 75px;
+        padding: 5px 10px;
+        line-height: 75px;
+        ::ng-deep.avatar {
+            line-height: 20px;
+            margin-right: 10px;
+        }
+    }
 }
 
-.input-label {
-    width: 100%;
-    padding-top: 12px;
-}
-
-.input-control {
-    width: 100%;
-}
-
-.app-raised-button {
-    background-color: $white;
-}
-
-.mat-option {
-    height: 75px;
-    padding: 5px 5px;
-    line-height: 75px;
-    ::ng-deep.avatar {
-        line-height: 20px;
-        margin-right: 10px;
+@media (max-width: 576px) {
+    #addPackage {
+        .add-package-text {
+            font-size: 12px;
+            margin-bottom: 0px !important;
+        }
     }
 }

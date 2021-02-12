@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from "@angular/core";
 import { FormControl, FormGroup } from "@angular/forms";
 import { MatAutocomplete } from "@angular/material/autocomplete";
 
@@ -9,7 +9,7 @@ type InputComponentStyle = "square" | "flat";
     templateUrl: "./input.component.html",
     styleUrls: ["./input.component.scss"]
 })
-export class InputComponent implements OnInit, OnChanges {
+export class InputComponent implements OnChanges {
     @Input() set control(c: FormControl) {
         if (c) {
             this.formControl = c;
@@ -20,6 +20,7 @@ export class InputComponent implements OnInit, OnChanges {
     @Input() placeholder: string = "";
     @Input() inputType: string = "text";
     @Input() multiline: boolean = false;
+    @Input() disabled: boolean = false;
     @Input() error: string = "";
     @Input() inputStyle: InputComponentStyle = "square";
     @Input() autoFocus: boolean = false;
@@ -39,14 +40,10 @@ export class InputComponent implements OnInit, OnChanges {
         this.formControl = new FormControl();
     }
 
-    ngOnInit(): void {}
-
     ngOnChanges(changes: SimpleChanges) {
         if (changes.group?.currentValue && changes.controlName?.currentValue) {
             this.formControl = changes.group.currentValue.get(changes.controlName.currentValue);
         }
-
-        console.log("erroriii", this.error);
     }
 
     handleInputChange(ev: any) {

@@ -20,7 +20,7 @@ import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { UserCatalogPermissionRepository } from "./repository/CatalogPermissionRepository";
-import { isAuthenticatedContext } from "./util/contextHelpers";
+import { isRequestingUserOrAdmin } from "./util/contextHelpers";
 import { UserInputError } from "apollo-server";
 import { parsePackageFileJSON, validatePackageFile } from "datapm-lib";
 import graphqlFields from "graphql-fields";
@@ -78,7 +78,10 @@ import {
     recoverMyPassword,
     searchUsers,
     setAsAdmin,
-    acceptInvite
+    acceptInvite,
+    adminSearchUsers,
+    adminDeleteUser,
+    adminSetUserStatus
 } from "./resolvers/UserResolver";
 import { createAPIKey, deleteAPIKey, myAPIKeys } from "./resolvers/ApiKeyResolver";
 import {
@@ -108,7 +111,8 @@ import {
     packageCreatedAt,
     packageUpdatedAt,
     packageViewedCount,
-    packageIsPublic
+    packageIsPublic,
+    myRecentlyViewedPackages
 } from "./resolvers/PackageResolver";
 
 import { validatePassword } from "./directive/ValidPasswordDirective";
@@ -131,9 +135,11 @@ import {
     catalogWebsite,
     createCatalog,
     deleteCatalog,
+    deleteCatalogAvatarImage,
     myCatalogPermissions,
     myCatalogs,
     searchCatalogs,
+    setCatalogAvatarImage,
     setCatalogCoverImage,
     updateCatalog,
     userCatalogs
@@ -277,15 +283,21 @@ export const resolvers: {
         parseValue: (value: any) => new Date(value)
     }),
     User: {
+        username: async (parent: User, _1: any, context: Context) => {
+            if (!parent.username) {
+                return parent.emailAddress as string;
+            }
+
+            return parent.username;
+        },
         firstName: async (parent: User, _1: any, context: Context) => {
             const user = await context.connection
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
 
-            if (user.nameIsPublic) return user.firstName || null;
-
-            if (isAuthenticatedContext(context) && context.me?.username === user.username)
+            if (isRequestingUserOrAdmin(context, user.username) || user.nameIsPublic) {
                 return user.firstName || null;
+            }
 
             return null;
         },
@@ -294,9 +306,9 @@ export const resolvers: {
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
 
-            if (user.nameIsPublic) return user.lastName || null;
-
-            if (isAuthenticatedContext(context) && context.me?.username === user.username) return user.lastName || null;
+            if (isRequestingUserOrAdmin(context, user.username) || user.nameIsPublic) {
+                return user.lastName || null;
+            }
 
             return null;
         },
@@ -305,9 +317,9 @@ export const resolvers: {
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
 
-            if (user.emailAddressIsPublic) return user.emailAddress;
-
-            if (isAuthenticatedContext(context) && context.me?.username === user.username) return user.emailAddress;
+            if (isRequestingUserOrAdmin(context, user.username) || user.emailAddressIsPublic) {
+                return user.emailAddress;
+            }
 
             return null;
         },
@@ -316,10 +328,9 @@ export const resolvers: {
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
 
-            if (user.twitterHandleIsPublic) return user.twitterHandle || null;
-
-            if (isAuthenticatedContext(context) && context.me?.username === user.username)
+            if (isRequestingUserOrAdmin(context, user.username) || user.twitterHandleIsPublic) {
                 return user.twitterHandle || null;
+            }
 
             return null;
         },
@@ -328,10 +339,9 @@ export const resolvers: {
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
 
-            if (user.gitHubHandleIsPublic) return user.gitHubHandle || null;
-
-            if (isAuthenticatedContext(context) && context.me?.username === user.username)
+            if (isRequestingUserOrAdmin(context, user.username) || user.gitHubHandleIsPublic) {
                 return user.gitHubHandle || null;
+            }
 
             return null;
         },
@@ -340,9 +350,9 @@ export const resolvers: {
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
 
-            if (user.websiteIsPublic) return user.website || null;
-
-            if (isAuthenticatedContext(context) && context.me?.username === user.username) return user.website || null;
+            if (isRequestingUserOrAdmin(context, user.username) || user.websiteIsPublic) {
+                return user.website || null;
+            }
 
             return null;
         },
@@ -351,9 +361,9 @@ export const resolvers: {
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
 
-            if (user.locationIsPublic) return user.location || null;
-
-            if (isAuthenticatedContext(context) && context.me?.username === user.username) return user.location || null;
+            if (isRequestingUserOrAdmin(context, user.username) || user.locationIsPublic) {
+                return user.location || null;
+            }
 
             return null;
         },
@@ -457,6 +467,7 @@ export const resolvers: {
         package: findPackage,
         latestPackages: getLatestPackages,
         myPackages: myPackages,
+        myRecentlyViewedPackages: myRecentlyViewedPackages,
         collection: findCollectionBySlug,
         collections: findCollectionsForAuthenticatedUser,
         myCollections: myCollections,
@@ -502,6 +513,7 @@ export const resolvers: {
         usernameAvailable: usernameAvailable,
         emailAddressAvailable: emailAddressAvailable,
         searchUsers: searchUsers,
+        adminSearchUsers: adminSearchUsers,
         myActivity: myActivity,
         packageActivities: packageActivities
     },
@@ -516,6 +528,7 @@ export const resolvers: {
         createMe: createMe,
         updateMe: updateMe,
         setAsAdmin: setAsAdmin,
+        adminSetUserStatus: adminSetUserStatus,
         updateMyPassword: updateMyPassword,
         forgotMyPassword: forgotMyPassword,
         recoverMyPassword: recoverMyPassword,
@@ -523,6 +536,7 @@ export const resolvers: {
         setMyAvatarImage: setMyAvatarImage,
         deleteMe: deleteMe,
         acceptInvite: acceptInvite,
+        adminDeleteUser: adminDeleteUser,
 
         // API Keys
         createAPIKey: createAPIKey,
@@ -533,6 +547,8 @@ export const resolvers: {
         updateCatalog: updateCatalog,
         setCatalogCoverImage: setCatalogCoverImage,
         deleteCatalog: deleteCatalog,
+        setCatalogAvatarImage: setCatalogAvatarImage,
+        deleteCatalogAvatarImage: deleteCatalogAvatarImage,
 
         // Catalog Permissions
         setUserCatalogPermission: setUserCatalogPermission,

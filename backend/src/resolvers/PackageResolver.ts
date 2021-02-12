@@ -2,7 +2,7 @@ import { ApolloError, ForbiddenError, UserInputError } from "apollo-server";
 import graphqlFields from "graphql-fields";
 import { AuthenticatedContext, Context } from "../context";
 import { PackageEntity } from "../entity/PackageEntity";
-import { createActivityLog } from "../repository/ActivityLogRepository";
+import { ActivityLogRepository, createActivityLog } from "../repository/ActivityLogRepository";
 import {
     Base64ImageUpload,
     Catalog,
@@ -17,7 +17,8 @@ import {
     Version,
     VersionIdentifierInput,
     ActivityLogEventType,
-    ActivityLogChangeType
+    ActivityLogChangeType,
+    ActivityLogResult
 } from "../generated/graphql";
 import { CatalogEntity } from "../entity/CatalogEntity";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
@@ -36,6 +37,7 @@ import { Connection, EntityManager } from "typeorm";
 import { versionEntityToGraphqlObject } from "./VersionResolver";
 import { catalogEntityToGraphQL } from "./CatalogResolver";
 import { CollectionRepository } from "../repository/CollectionRepository";
+import { activtyLogEntityToGraphQL } from "./ActivityLogResolver";
 
 export const packageEntityToGraphqlObject = async (
     context: EntityManager | Connection,
@@ -79,6 +81,24 @@ export const usersByPackage = async (
     return await context.connection.manager
         .getCustomRepository(PackagePermissionRepository)
         .usersByPackage(packageEntity, relations);
+};
+
+export const myRecentlyViewedPackages = async (
+    _0: any,
+    { limit, offSet }: { limit: number; offSet: number },
+    context: AuthenticatedContext,
+    info: any
+): Promise<ActivityLogResult> => {
+    const relations = getGraphQlRelationName(info);
+    const [searchResponse, count] = await context.connection.manager
+        .getCustomRepository(ActivityLogRepository)
+        .myRecentlyViewedPackages(context.me, limit, offSet, relations);
+
+    return {
+        hasMore: count - (offSet + limit) > 0,
+        logs: await Promise.all(searchResponse.map((p) => activtyLogEntityToGraphQL(context.connection, p))),
+        count
+    };
 };
 
 export const myPackages = async (

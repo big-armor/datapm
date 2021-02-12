@@ -1,6 +1,7 @@
 import { SchemaDirectiveVisitor, AuthenticationError, ValidationError } from "apollo-server";
 import { GraphQLObjectType, GraphQLField, defaultFieldResolver } from "graphql";
 import { Context } from "../context";
+import { AUTHENTICATION_ERROR, UserStatus } from "../generated/graphql";
 
 export class IsAuthenticatedDirective extends SchemaDirectiveVisitor {
     visitObject(object: GraphQLObjectType) {
@@ -17,6 +18,10 @@ export class IsAuthenticatedDirective extends SchemaDirectiveVisitor {
 
             if (!context.me.emailVerified) {
                 throw new ValidationError("EMAIL_ADDRESS_NOT_VERIFIED");
+            }
+
+            if (UserStatus.SUSPENDED == context.me.status) {
+                throw new ValidationError(AUTHENTICATION_ERROR.ACCOUNT_SUSPENDED);
             }
 
             return resolve.apply(this, [source, args, context, info]);

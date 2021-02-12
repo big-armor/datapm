@@ -8,6 +8,7 @@
     (keyup)="handleKeyUp($event)"
     (focus)="focus.emit($event)"
     (blur)="blur.emit($event)"
+    [disabled]="disabled"
     cdkFocusInitial
     *ngIf="autoFocus && !multiline && !matAutocomplete"
 />
@@ -21,6 +22,7 @@
     (keyup)="handleKeyUp($event)"
     (focus)="focus.emit($event)"
     (blur)="blur.emit($event)"
+    [disabled]="disabled"
     *ngIf="!autoFocus && !multiline && !matAutocomplete"
 />
 <input
@@ -33,6 +35,7 @@
     (keyup)="handleKeyUp($event)"
     (focus)="focus.emit($event)"
     (blur)="blur.emit($event)"
+    [disabled]="disabled"
     *ngIf="matAutocomplete"
 />
 <textarea
@@ -44,6 +47,7 @@
     (keyup)="handleKeyUp($event)"
     (focus)="focus.emit($event)"
     (blur)="blur.emit($event)"
+    [disabled]="disabled"
     cdkFocusInitial
     *ngIf="autoFocus && multiline && !matAutocomplete"
 ></textarea>
@@ -56,6 +60,7 @@
     (keyup)="handleKeyUp($event)"
     (focus)="focus.emit($event)"
     (blur)="blur.emit($event)"
+    [disabled]="disabled"
     *ngIf="!autoFocus && multiline && !matAutocomplete"
 ></textarea>
 <div class="text-danger mt-1 ml-1" *ngIf="error">{{ error }}</div>

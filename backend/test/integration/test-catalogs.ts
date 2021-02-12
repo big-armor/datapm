@@ -654,7 +654,7 @@ describe("Catalog Tests", async () => {
                 identifier: {
                     catalogSlug: "user-a-second-catalog-v2"
                 },
-                username: "testA-catalog"
+                usernameOrEmailAddress: "testA-catalog"
             }
         });
 

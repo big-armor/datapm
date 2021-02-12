@@ -7,7 +7,6 @@ import { IsAuthenticatedDirective } from "./directive/isAuthenticatedDirective";
 import { HasCatalogPermissionDirective } from "./directive/hasCatalogPermissionDirective";
 import { HasPackagePermissionDirective } from "./directive/hasPackagePermissionDirective";
 import { IsAdminDirective } from "./directive/isSiteAdminDirective";
-import { getEnvVariable } from "./util/getEnvVariable";
 import { ValidEmailDirective } from "./directive/ValidEmailDirective";
 import { ValidUsernameDirective } from "./directive/ValidUsernameDirective";
 import { ValidPasswordDirective } from "./directive/ValidPasswordDirective";

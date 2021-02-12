@@ -15,7 +15,9 @@ const defaultMessages = {
     INVALID_CHARACTERS: (errors: any) =>
         "Passwords less than 16 characters must include one number or a special character (@ # $ % !)",
     INVALID_FORMAT: (errors: any) => "Invalid format",
-    TOO_LONG: (errors: any) => "Too long"
+    TOO_LONG: (errors: any) => "Too long",
+    RESERVED_KEYWORD: (errors: any) => "This is a reserved keyword. Please choose a different word",
+    PASSWORDS_DONT_MATCH: (errors: any) => "The entered passwords must match."
 };
 
 const errorKeys = [
@@ -30,7 +32,9 @@ const errorKeys = [
     "USERNAME_TOO_LONG",
     "NOT_AVAILABLE",
     "INVALID_FORMAT",
-    "TOO_LONG"
+    "TOO_LONG",
+    "RESERVED_KEYWORD",
+    "PASSWORDS_DONT_MATCH"
 ];
 
 @Pipe({
@@ -59,8 +63,6 @@ export class InputErrorPipe implements PipeTransform {
         if (this.formControl && this.formControl.touched && this.formControl.errors) {
             for (let i = 0; i < errorKeys.length; i++) {
                 const key = errorKeys[i];
-                console.log("this.formControl.errors", this.formControl.errors);
-                console.log("this.formControl.errors[key]", this.formControl.errors[key]);
                 if (this.formControl.errors[key]) {
                     return (
                         (this.messages && this.messages[key]) ||

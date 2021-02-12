@@ -95,6 +95,15 @@ app-avatar {
     cursor: pointer;
 }
 
+@media (max-width: 992px) {
+    .main-menu-title {
+        padding-left: 0px !important;
+    }
+    .avatar {
+        margin-left: 10px !important;
+    }
+}
+
 @media (max-width: 768px) {
     .mobile-menu {
         display: block;

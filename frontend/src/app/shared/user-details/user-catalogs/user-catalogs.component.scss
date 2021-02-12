@@ -15,11 +15,10 @@
             }
 
             .mat-column-name {
-                width: 30%;
+                width: 40%;
 
                 a {
                     font-family: $family-roboto;
-                    color: $gray-2;
                     font-size: $text-font;
                     font-weight: $weight-400;
                 }
@@ -37,5 +36,25 @@
             height: 40px;
             background-color: #ededed;
         }
+
+        th.mat-header-cell:first-of-type,
+        td.mat-cell:first-of-type,
+        td.mat-footer-cell:first-of-type {
+            padding-right: 6px;
+        }
+
+        th.mat-header-cell:last-of-type,
+        td.mat-cell:last-of-type,
+        td.mat-footer-cell:last-of-type {
+            padding: 0px 5px;
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    th.mat-header-cell:first-of-type,
+    td.mat-cell:first-of-type,
+    td.mat-footer-cell:first-of-type {
+        padding-left: 5px;
     }
 }

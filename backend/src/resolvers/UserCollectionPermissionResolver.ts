@@ -74,10 +74,21 @@ export const setUserCollectionPermissions = async (
 
     await context.connection.transaction(async (transaction) => {
         await asyncForEach(value, async (userCollectionPermission) => {
-            let userId = null;
-            const user = await transaction
+            let user = await transaction
                 .getCustomRepository(UserRepository)
                 .getUserByUsernameOrEmailAddress(userCollectionPermission.usernameOrEmailAddress);
+
+            const collectionPermissionRepository = transaction.getCustomRepository(UserCollectionPermissionRepository);
+            if (userCollectionPermission.permissions.length === 0) {
+                if (!user) {
+                    return;
+                }
+
+                return await collectionPermissionRepository.deleteUserCollectionPermissionsForUser({
+                    identifier,
+                    user
+                });
+            }
 
             if (user == null) {
                 if (emailAddressValid(userCollectionPermission.usernameOrEmailAddress) === true) {
@@ -85,14 +96,11 @@ export const setUserCollectionPermissions = async (
                         .getCustomRepository(UserRepository)
                         .createInviteUser(userCollectionPermission.usernameOrEmailAddress);
 
-                    userId = inviteUser.id;
                     inviteUsers.push(inviteUser);
                 } else {
                     throw new ValidationError("USER_NOT_FOUND - " + userCollectionPermission.usernameOrEmailAddress);
                 }
             } else {
-                userId = user.id;
-
                 if (user.status == UserStatus.PENDING_SIGN_UP) {
                     inviteUsers.push(user);
                 } else {
@@ -123,11 +131,11 @@ export const setUserCollectionPermissions = async (
 
 export const deleteUserCollectionPermissions = async (
     _0: any,
-    { identifier, username }: { identifier: CollectionIdentifierInput; username: string },
+    { identifier, usernameOrEmailAddress }: { identifier: CollectionIdentifierInput; usernameOrEmailAddress: string },
     context: AuthenticatedContext
 ) => {
     return context.connection.getCustomRepository(UserCollectionPermissionRepository).deleteUserCollectionPermissions({
         identifier,
-        username
+        usernameOrEmailAddress
     });
 };

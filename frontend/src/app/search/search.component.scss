@@ -5,22 +5,32 @@
 }
 
 ::ng-deep .sorting-mat {
-    border: 1px solid transparent;
-    padding: 15px;
-    box-shadow: $outer-shadow-1;
+    padding: 15px 30px;
+    cursor: pointer;
     border-radius: 4px;
     margin-bottom: 20px;
+    background-color: $gray-7;
+    box-shadow: $outer-shadow-1;
+    border: 1px solid transparent;
+    transition: background-color 0.5s ease;
+
+    &:hover {
+        background-color: $white;
+        transition: background-color 0.5s ease;
+    }
 
     .bd-highlight {
         .mat-radio-label-content {
             margin-bottom: 0px;
-            font-family: $family-roboto-mono;
+            font-family: $family-roboto;
             font-style: $style-normal;
             font-weight: $weight-400;
-            font-size: $text-font;
-            line-height: 18px;
+            font-size: ($default-font - 1);
+            line-height: 17px;
             text-align: center;
             color: $gray-1;
+            letter-spacing: 0.7px;
+            padding-left: 10px;
         }
 
         .mat-radio-outer-circle {
@@ -31,7 +41,7 @@
 
         .mat-radio-checked {
             .mat-radio-inner-circle {
-                background-color: rgb(0 0 0 / 37%);
+                background-color: $gray-3;
             }
         }
     }
@@ -44,22 +54,26 @@
 
     p {
         margin: 0 auto;
-        font-family: $family-roboto-mono;
+        font-family: $family-roboto;
         font-style: $style-normal;
         font-weight: $weight-400;
         font-size: ($default-font + 2);
+        letter-spacing: 0.8px;
         line-height: 28px;
         text-align: center;
         padding: 0px 30px;
+        color: $gray-1;
 
         span {
-            font-size: 40px;
+            font-size: 36px;
         }
     }
 
     .small-txt {
+        color: $gray-2;
         font-size: 14px;
         padding-top: 15px;
+        font-weight: $weight-300;
     }
 }
 
@@ -136,12 +150,13 @@
 
 #searchPackages {
     .search-title {
-        font-family: $family-roboto-mono;
+        font-family: $family-roboto;
         font-style: $style-normal;
         font-weight: $weight-400;
         font-size: $default-font;
         color: $gray-2;
-        padding-bottom: 20px;
+        padding-bottom: 10px;
+        letter-spacing: 1.6px;
     }
 
     .mat-list-item {
@@ -201,7 +216,6 @@
             .search-title {
                 font-size: $text-font;
                 text-align: left;
-                padding-left: 15px;
                 padding-bottom: 10px;
             }
             .mat-list-item {
@@ -254,9 +268,14 @@
         }
     }
     ::ng-deep .sorting-mat {
-        padding: 10px;
+        padding: 10px 0px;
         box-shadow: none;
+        margin-bottom: 10px;
         flex-direction: row !important;
+        background-color: transparent;
+        &:hover {
+            background-color: transparent;
+        }
         .mat-radio-group {
             display: flex;
             .mat-radio-label {
@@ -277,15 +296,29 @@
     }
 }
 
-@media (max-width: 480px) {
-    ::ng-deep .sorting-mat {
-        .mat-radio-group {
-            .mat-radio-label {
-                .mat-radio-label-content {
-                    font-size: $xsmall-font;
-                }
+@media (max-width: 576px) {
+    .padding-desktop {
+        padding: 10px 15px !important;
+    }
+    .search-title {
+        margin-top: 10px;
+    }
+    .not-found {
+        p {
+            font-size: $text-font;
+            span {
+                font-size: 26px;
             }
         }
+        .small-txt {
+            padding-top: 5px;
+            font-size: $xsmall-font;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    ::ng-deep .sorting-mat {
         .mat-checkbox {
             .mat-checkbox-layout {
                 font-size: ($xsmall-font - 1);

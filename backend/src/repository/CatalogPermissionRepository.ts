@@ -224,7 +224,9 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
                 .getCustomRepository(UserRepository)
                 .getUserByUsernameOrEmailAddress(value.usernameOrEmailAddress);
 
-            if (!user) throw new Error(`USER_NOT_FOUND - ${value.usernameOrEmailAddress}`);
+            if (!user) {
+                throw new Error(`USER_NOT_FOUND - ${value.usernameOrEmailAddress}`);
+            }
 
             const catalogEntity = await transaction
                 .getCustomRepository(CatalogRepository)
@@ -286,17 +288,35 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
         });
     }
 
-    deleteUserCatalogPermissions({
+    public deleteUserCatalogPermissions({
         identifier,
-        username
+        usernameOrEmailAddress
     }: {
         identifier: CatalogIdentifierInput;
-        username: string;
+        usernameOrEmailAddress: string;
         relations?: string[];
     }): Promise<void> {
         return this.manager.nestedTransaction(async (transaction) => {
-            const user = await transaction.getCustomRepository(UserRepository).findOneOrFail({ username });
+            const user = await transaction
+                .getCustomRepository(UserRepository)
+                .getUserByUsernameOrEmailAddress(usernameOrEmailAddress);
+            if (!user) {
+                throw new Error("USER_NOT_FOUND-" + usernameOrEmailAddress);
+            }
 
+            await this.deleteUserCatalogPermissionsForUser({ identifier, user });
+        });
+    }
+
+    public deleteUserCatalogPermissionsForUser({
+        identifier,
+        user
+    }: {
+        identifier: CatalogIdentifierInput;
+        user: UserEntity;
+        relations?: string[];
+    }): Promise<void> {
+        return this.manager.nestedTransaction(async (transaction) => {
             const catalogEntity = await transaction
                 .getCustomRepository(CatalogRepository)
                 .findCatalogBySlugOrFail(identifier.catalogSlug);
@@ -305,7 +325,7 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
                 throw new Error("CANNOT_REMOVE_CREATOR_PERMISSIONS");
             }
 
-            await transaction.delete(UserCatalogPermissionEntity, { catalogId: catalogEntity.id });
+            await transaction.delete(UserCatalogPermissionEntity, { catalogId: catalogEntity.id, userId: user.id });
         });
     }
 }

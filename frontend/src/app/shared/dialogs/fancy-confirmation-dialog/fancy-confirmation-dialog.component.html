@@ -6,12 +6,29 @@
         </div>
         <div class="content">
             <p [innerHTML]="content"></p>
+
+            <div *ngIf="showConfirmationInputField">
+                <div>
+                    Type <span class="slug">{{ confirmationInputFieldRequiredValue }}</span> here
+                </div>
+
+                <div class="one-line-input py-3">
+                    <input matInput [(ngModel)]="confirmationInputFieldValue" autocomplete="off" />
+                </div>
+            </div>
         </div>
     </mat-dialog-content>
 
     <div class="spacer"></div>
     <mat-dialog-actions>
-        <button mat-button (click)="confirm()" class="mat-flat-button confirm-button">Confirm</button>
+        <button
+            mat-button
+            [disabled]="shouldDisableConfirmButton"
+            (click)="confirm()"
+            class="mat-flat-button confirm-button"
+        >
+            Confirm
+        </button>
         <button mat-button (click)="close()" class="mat-flat-button cancel-button">Cancel</button>
     </mat-dialog-actions>
 </div>

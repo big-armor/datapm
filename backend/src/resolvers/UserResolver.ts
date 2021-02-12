@@ -11,29 +11,78 @@ import {
     UserStatus
 } from "../generated/graphql";
 import { CatalogRepository } from "../repository/CatalogRepository";
-import { UserRepository } from "../repository/UserRepository";
+import { getUserByUsernameOrFail, UserRepository } from "../repository/UserRepository";
 import { hashPassword } from "../util/PasswordUtil";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 import { FirstUserStatusHolder } from "./FirstUserStatusHolder";
 import { UserEntity } from "../entity/UserEntity";
+import { ReservedKeywordsService } from "../service/reserved-keywords-service";
+import { sendUserSuspendedEmail } from "../util/smtpUtil";
 
+const USER_SEARCH_RESULT_LIMIT = 100;
 export const searchUsers = async (
     _0: any,
     { value, limit, offSet }: { value: string; limit: number; offSet: number },
     context: AuthenticatedContext,
     info: any
 ) => {
+    const clampedLimit = Math.min(limit, USER_SEARCH_RESULT_LIMIT);
     const [searchResponse, count] = await context.connection.manager
         .getCustomRepository(UserRepository)
-        .search({ value, limit, offSet });
+        .search({ value, limit: clampedLimit, offSet });
 
     return {
-        hasMore: count - (offSet + limit) > 0,
+        hasMore: count - (offSet + clampedLimit) > 0,
         users: searchResponse,
         count
     };
+};
+
+export const adminSearchUsers = async (
+    _0: any,
+    { value, limit, offSet }: { value: string; limit: number; offSet: number },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const clampedLimit = Math.min(limit, USER_SEARCH_RESULT_LIMIT);
+    const [searchResponse, count] = await context.connection.manager
+        .getCustomRepository(UserRepository)
+        .searchWithNoRestrictions({ value, limit: clampedLimit, offSet });
+
+    return {
+        hasMore: count - (offSet + clampedLimit) > 0,
+        users: searchResponse,
+        count
+    };
+};
+
+export const adminSetUserStatus = async (
+    _0: any,
+    { username, status, message }: { username: string; status: UserStatus; message?: string | undefined | null },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    return context.connection.transaction(async (transaction) => {
+        const targetUser = await getUserByUsernameOrFail({
+            username,
+            manager: transaction
+        });
+
+        if (UserStatus.SUSPENDED == status) {
+            sendUserSuspendedEmail(targetUser, message || "");
+        }
+
+        await createActivityLog(transaction, {
+            userId: context.me.id,
+            targetUserId: targetUser.id,
+            eventType: ActivityLogEventType.USER_STATUS_CHANGED
+        });
+
+        const repository = context.connection.manager.getCustomRepository(UserRepository);
+        return repository.updateUserStatus(username, status);
+    });
 };
 
 export const emailAddressAvailable = async (
@@ -50,6 +99,7 @@ export const emailAddressAvailable = async (
 };
 
 export const usernameAvailable = async (_0: any, { username }: { username: string }, context: Context) => {
+    ReservedKeywordsService.validateReservedKeyword(username);
     const user = await context.connection.manager.getCustomRepository(UserRepository).getUserByUsername(username);
 
     const catalog = await context.connection.manager
@@ -73,11 +123,6 @@ export const createMe = async (
     if ((await usernameAvailable(_0, { username: value.username }, context)) == false) {
         FirstUserStatusHolder.IS_FIRST_USER_CREATED = true;
         throw new ValidationError("USERNAME_NOT_AVAILABLE");
-    }
-
-    const repository = context.connection.manager.getCustomRepository(UserRepository);
-    if (!FirstUserStatusHolder.IS_FIRST_USER_CREATED) {
-        FirstUserStatusHolder.IS_FIRST_USER_CREATED = (await repository.isAtLeastOneUserRegistered()) === 1;
     }
 
     await context.connection.transaction(async (transaction) => {
@@ -210,19 +255,35 @@ export const setMyAvatarImage = async (
 };
 
 export const deleteMe = async (_0: any, {}, context: AuthenticatedContext, info: any) => {
-    context.connection.transaction(async (transaction) => {
+    return await deleteUserAndLogAction(context.me.username, context);
+};
+
+export const adminDeleteUser = async (
+    _0: any,
+    { usernameOrEmailAddress }: { usernameOrEmailAddress: string },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    return await deleteUserAndLogAction(usernameOrEmailAddress, context);
+};
+
+const deleteUserAndLogAction = async (usernameOrEmailAddress: string, context: AuthenticatedContext) => {
+    await context.connection.transaction(async (transaction) => {
+        const userRepository = transaction.getCustomRepository(UserRepository);
         const user = await transaction
             .getCustomRepository(UserRepository)
-            .findUserByUserName({ username: context.me.username });
+            .getUserByUsernameOrEmailAddress(usernameOrEmailAddress);
+        if (!user) {
+            throw new Error("USER_NOT_FOUND-" + usernameOrEmailAddress);
+        }
 
         await createActivityLog(transaction, {
-            userId: user.id,
+            userId: context.me.id,
+            targetUserId: user.id,
             eventType: ActivityLogEventType.USER_DELETED
         });
 
-        return await transaction.getCustomRepository(UserRepository).deleteUser({
-            username: context.me.username
-        });
+        return await userRepository.deleteUser(user);
     });
 };
 

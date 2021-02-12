@@ -1,0 +1,3 @@
+mutation AdminSetUserStatus($username: String!, $status: UserStatus!, $message: String) {
+    adminSetUserStatus(username: $username, status: $status, message: $message)
+}

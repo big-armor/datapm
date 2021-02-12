@@ -1,21 +1,21 @@
-<div class="container-fluid" id="userDetails">
+<div class="container-fluid px-0" id="userDetails">
     <div class="row">
         <div class="container">
             <app-user-details-header [user]="user"></app-user-details-header>
         </div>
     </div>
-    <div class="row">
+    <div class="row mt-3">
+        <hr style="width: 100%" class="header-border" />
         <div class="container">
-            <ul class="p-0 tabs">
+            <ul class="px-3" id="homeRoutes">
                 <li *ngFor="let tab of tabs; let i = index" class="list-names" (click)="selectTab(tab.value)">
-                    <a class="cursor-pointer" [class.active]="tab.value == selectedTab">
+                    <a [class.active]="tab.value == selectedTab">
                         {{ tab.name }}
                     </a>
                 </li>
             </ul>
         </div>
     </div>
-    <hr class="header-border" />
 
     <div class="row">
         <div class="container">

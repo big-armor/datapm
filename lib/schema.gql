@@ -127,6 +127,7 @@ enum ActivityLogEventType {
     USER_CREATED
     USER_DELETED
     USER_EDIT
+    USER_STATUS_CHANGED
 }
 
 enum ActivityLogChangeType {
@@ -537,6 +538,7 @@ input CreateCollectionInput {
     collectionSlug: String! @validCollectionSlug(allowNull: false)
     name: String!
     description: String
+    isPublic: Boolean
 }
 
 """
@@ -652,7 +654,7 @@ type Query {
     package(identifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)): Package!
 
     """
-    Returns list of authenicated users packages
+    Returns list of the requesting users packages
     """
     myPackages(offset: Int!, limit: Int!): PackagesResult! @isAuthenticated
 
@@ -662,9 +664,19 @@ type Query {
     searchPackages(query: String!, offSet: Int!, limit: Int!): SearchPackagesResult!
 
     """
+    Returns a list of packages the requesting user has recently viewed
+    """
+    myRecentlyViewedPackages(offSet: Int!, limit: Int!): ActivityLogResult! @isAuthenticated
+
+    """
     Returns users that match the given search query
     """
     searchUsers(value: String!, limit: Int!, offSet: Int!): SearchUsersResult!
+
+    """
+    Returns users that match the given search query with no restrictions
+    """
+    adminSearchUsers(value: String!, limit: Int!, offSet: Int!): SearchUsersResult! @isAdmin
 
     """
     Returns the latest packages
@@ -767,6 +779,11 @@ type Mutation {
     setAsAdmin(username: String! @validUsernameOrEmailAddress, isAdmin: Boolean!): Void @isAdmin
 
     """
+    Updates the user's status and sends a notification email to them
+    """
+    adminSetUserStatus(username: String! @validUsername, status: UserStatus!, message: String): Void @isAdmin
+
+    """
     Updates the logged in users' password
     """
     updateMyPassword(value: UpdateMyPasswordInput!): Void @isAuthenticated
@@ -795,6 +812,11 @@ type Mutation {
     Deletes the requesting user's account
     """
     deleteMe: Void @isAuthenticated
+
+    """
+    Deletes a user's account
+    """
+    adminDeleteUser(usernameOrEmailAddress: String! @validUsernameOrEmailAddress): Void @isAdmin
 
     """
     Using a username or email address and a password, requests authentication information for the given user
@@ -828,6 +850,20 @@ type Mutation {
         identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: EDIT)
         value: UpdateCatalogInput!
     ): Catalog!
+
+    """
+    Updates the cover image of the catalog
+    """
+    setCatalogAvatarImage(
+        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: EDIT)
+        image: Base64ImageUpload! @validBase64Image
+    ): Void @isAuthenticated
+
+    """
+    Updates the cover image of the catalog
+    """
+    deleteCatalogAvatarImage(identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: EDIT)): Void
+        @isAuthenticated
 
     """
     Updates the cover image of the catalog
@@ -938,7 +974,7 @@ type Mutation {
     """
     deleteUserCollectionPermissions(
         identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
-        username: String! @validUsername
+        usernameOrEmailAddress: String! @validUsernameOrEmailAddress
     ): Void
 
     """
@@ -946,7 +982,7 @@ type Mutation {
     """
     deleteUserCatalogPermissions(
         identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
-        username: String! @validUsername
+        usernameOrEmailAddress: String! @validUsernameOrEmailAddress
     ): Void
 
     """
@@ -963,7 +999,7 @@ type Mutation {
     """
     removePackagePermissions(
         identifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
-        username: String! @validUsername
+        usernameOrEmailAddress: String! @validUsernameOrEmailAddress
     ): Void
 
     """
