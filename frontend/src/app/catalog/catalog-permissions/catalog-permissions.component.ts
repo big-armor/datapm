@@ -57,6 +57,7 @@ export class CatalogPermissionsComponent implements OnChanges {
 
     public addUser(): void {
         const dialogRef = this.dialog.open(AddUserComponent, {
+            width: "550px",
             data: this.catalog
         });
 

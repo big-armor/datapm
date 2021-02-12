@@ -37,6 +37,7 @@ export class AddUserComponent implements OnInit {
     public hasErrors = false;
 
     private effectivePermissions: Permission[];
+    modeSelect: string;
 
     constructor(
         private setUserCollectionPermissionsGQL: SetUserCollectionPermissionsGQL,
@@ -47,6 +48,8 @@ export class AddUserComponent implements OnInit {
     }
 
     public ngOnInit(): void {
+        this.modeSelect = "VIEW";
+
         this.form = new FormGroup({
             username: this.usernameControl,
             message: this.messageControl

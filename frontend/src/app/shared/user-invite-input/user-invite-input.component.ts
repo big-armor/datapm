@@ -6,7 +6,8 @@ import {
     Input,
     OnInit,
     Output,
-    ViewChild
+    ViewChild,
+    ViewEncapsulation
 } from "@angular/core";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { MatChipInputEvent } from "@angular/material/chips";
@@ -48,6 +49,7 @@ export class UserInviteInputComponent implements OnInit {
 
     public validatingUsername = false;
     public skipAutoCompleteSearch = false;
+    encapsulation: ViewEncapsulation.None;
 
     @ViewChild("usernameInput")
     private fruitInput: ElementRef<HTMLInputElement>;

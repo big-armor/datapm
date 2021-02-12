@@ -91,6 +91,7 @@ export class CollectionPermissionsComponent implements OnChanges {
 
     public addUser() {
         const dialogRef = this.dialog.open(AddUserComponent, {
+            width: "550px",
             data: this.collection
         });
 

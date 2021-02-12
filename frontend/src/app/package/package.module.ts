@@ -34,6 +34,7 @@ import { PackageDeletionConfirmationComponent } from "./components/package/packa
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { MatChipsModule } from "@angular/material/chips";
 import { MatInputModule } from "@angular/material/input";
+import { MatSelectModule } from "@angular/material/select";
 
 @NgModule({
     declarations: [
@@ -68,6 +69,7 @@ import { MatInputModule } from "@angular/material/input";
         MatAutocompleteModule,
         MatProgressSpinnerModule,
         SharedModule,
+        MatSelectModule,
         ScrollingModule,
         TableVirtualScrollModule,
         MarkdownModule.forChild(),

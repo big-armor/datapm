@@ -34,6 +34,7 @@ export class AddUserComponent implements OnInit {
 
     private effectivePermissions: Permission[];
     private packagesEffectivePermissions: Permission[];
+    modeSelect: string;
 
     constructor(
         @Inject(MAT_DIALOG_DATA) public catalog: Catalog,
@@ -45,6 +46,8 @@ export class AddUserComponent implements OnInit {
     }
 
     public ngOnInit(): void {
+        this.modeSelect = "VIEW";
+
         this.form = new FormGroup({
             username: this.usernameControl,
             message: this.messageControl

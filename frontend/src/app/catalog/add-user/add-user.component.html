@@ -1,34 +1,38 @@
 <form [formGroup]="form" (submit)="submit($event)" id="addUser">
     <div mat-dialog-title id="contentTitle" class="pb-3">Share {{ catalog.displayName }}</div>
     <div mat-dialog-content id="contentBorder">
-        <div class="d-flex flex-row bd-highlight py-4 shadow-div">
+        <div class="d-flex flex-row bd-highlight pt-2 shadow-div">
             <app-user-invite-input
                 [usernameControl]="usernameControl"
                 (userInputChange)="onUserInputChange($event)"
                 (loadingStateChange)="onLoadingStatusChange($event)"
             >
             </app-user-invite-input>
-            <div>
-                <mat-form-field class="w-100">
-                    <mat-label>Message</mat-label>
-                    <textarea [formControl]="messageControl" matInput></textarea>
+            <div class="textarea-input">
+                <label class="div-question pl-1">Message</label>
+                <mat-form-field class="w-100" appearance="outline">
+                    <textarea [formControl]="messageControl" matInput placeholder="Write message" rows="4"></textarea>
                 </mat-form-field>
             </div>
-            <div>
-                <p>Catalog permissions</p>
-                <select (change)="updateSelectedPermission($event.target.value)">
-                    <option value="VIEW">View</option>
-                    <option value="EDIT">Edit</option>
-                    <option value="MANAGE">Manage</option>
-                </select>
+            <div class="permission-div w-50">
+                <label class="div-question pl-1">Catalog permissions</label>
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-select (change)="updateSelectedPermission($event.target.value)" [(value)]="modeSelect">
+                        <mat-option value="VIEW">View </mat-option>
+                        <mat-option value="EDIT">Edit </mat-option>
+                        <mat-option value="MANAGE">Manage </mat-option>
+                    </mat-select>
+                </mat-form-field>
             </div>
-            <div>
-                <p>Catalog packages permissions</p>
-                <select (change)="updatePackagesPermissions($event.target.value)">
-                    <option value="VIEW">View</option>
-                    <option value="EDIT">Edit</option>
-                    <option value="MANAGE">Manage</option>
-                </select>
+            <div class="permission-div w-50">
+                <label class="div-question pl-1">Catalog packages permissions</label>
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-select (change)="updatePackagesPermissions($event.target.value)" [(value)]="modeSelect">
+                        <mat-option value="VIEW">View </mat-option>
+                        <mat-option value="EDIT">Edit </mat-option>
+                        <mat-option value="MANAGE">Manage </mat-option>
+                    </mat-select>
+                </mat-form-field>
             </div>
             <div class="bd-highlight w-100">
                 <div class="text-danger mt-3" *ngIf="state === 'ERROR'">
@@ -62,7 +66,7 @@
             </div>
         </div>
     </div>
-    <div mat-dialog-actions class="text-right pt-3">
+    <div mat-dialog-actions class="mat-dialog-actions text-right pb-3">
         <button mat-button type="submit" class="ml-auto save-btn" [disabled]="loading || hasErrors">
             <span>add</span>
         </button>

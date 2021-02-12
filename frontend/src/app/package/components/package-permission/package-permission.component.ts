@@ -60,6 +60,7 @@ export class PackagePermissionComponent implements OnInit {
 
     public addUser(): void {
         const dialogRef = this.dialog.open(AddUserComponent, {
+            width: "550px",
             data: this.package
         });
 

@@ -1,5 +1,6 @@
-<mat-form-field class="w-100">
-    <mat-label>Usernames or Email Addresses</mat-label>
+<label class="div-question pl-1"> Usernames or Email Addresses </label>
+
+<mat-form-field class="w-100" id="inviteInput" appearance="outline">
     <mat-chip-list #chipList aria-label="Fruit selection">
         <mat-chip
             *ngFor="let userChip of usersChips"
@@ -24,6 +25,7 @@
             inputStyle="flat"
             [disabled]="validatingUsername"
             [formControl]="usernameControl"
+            placeholder="Usernames or Email Addresses"
             [matAutocomplete]="auto"
             [matChipInputFor]="chipList"
             [matChipInputSeparatorKeyCodes]="CHIP_SEPARATOR_KEY_CODES"
