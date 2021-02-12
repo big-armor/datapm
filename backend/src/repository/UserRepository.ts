@@ -386,10 +386,11 @@ export class UserRepository extends Repository<UserEntity> {
                 user.status = UserStatus.ACTIVE;
 
                 if (!FirstUserStatusHolder.IS_FIRST_USER_CREATED) {
+                    FirstUserStatusHolder.IS_FIRST_USER_CREATED = await this.isAtLeastOneUserRegistered();
+                }
+
+                if (!FirstUserStatusHolder.IS_FIRST_USER_CREATED || (isAdmin(value) && value.isAdmin)) {
                     user.isAdmin = true;
-                    FirstUserStatusHolder.IS_FIRST_USER_CREATED = true;
-                } else if (isAdmin(value) && value.isAdmin) {
-                    user.isAdmin = value.isAdmin;
                 } else {
                     user.isAdmin = false;
                 }
@@ -599,22 +600,29 @@ export class UserRepository extends Repository<UserEntity> {
     }
 
     async deleteUser(user: UserEntity): Promise<void> {
-        await this.manager.getCustomRepository(CatalogRepository).deleteCatalog({ slug: user.username });
+        // If user doesn't have a username it means that they have not yet signed up and don't have any catalogs/collections/images
+        if (!user.username) {
+            await this.manager.nestedTransaction(async (transaction) => {
+                await transaction.delete(UserEntity, { id: user.id });
+            });
+            return;
+        }
 
+        await this.manager.getCustomRepository(CatalogRepository).deleteCatalog({ slug: user.username });
         const collections = await this.manager.getCustomRepository(CollectionRepository).findByUser(user.id);
 
-        for (const collection of collections)
+        for (const collection of collections) {
             await this.manager.getCustomRepository(CollectionRepository).deleteCollection(collection.collectionSlug);
+        }
 
         await this.manager.nestedTransaction(async (transaction) => {
-            await transaction.delete(UserEntity, { username: (await user).username });
+            await transaction.delete(UserEntity, { id: user.id });
         });
 
         try {
             await ImageStorageService.INSTANCE.deleteUserAvatarImage(user.id);
         } catch (error) {
             if (error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST)) return;
-
             console.error(error.message);
         }
 
@@ -622,7 +630,6 @@ export class UserRepository extends Repository<UserEntity> {
             await ImageStorageService.INSTANCE.deleteUserCoverImage(user.id);
         } catch (error) {
             if (error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST)) return;
-
             console.error(error.message);
         }
     }

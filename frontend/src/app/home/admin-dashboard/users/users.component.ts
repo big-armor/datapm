@@ -14,7 +14,14 @@ import { UserStatusChangeDialogResponse } from "src/app/services/dialog/user-sta
     styleUrls: ["./users.component.scss"]
 })
 export class UsersComponent implements AfterViewInit, OnDestroy {
-    public readonly DISPLAYED_COLUMNS: string[] = ["username", "firstName", "lastName", "emailAddress", "actions"];
+    public readonly DISPLAYED_COLUMNS: string[] = [
+        "username",
+        "firstName",
+        "lastName",
+        "emailAddress",
+        "isAdmin",
+        "actions"
+    ];
     public readonly USERS_PER_PAGE = 20;
 
     public readonly dataSource = new MatTableDataSource<User>();
@@ -78,7 +85,8 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
         };
         this.confirmationDialogService.openFancyConfirmationDialog(dialogConfig).subscribe((confirmation) => {
             if (confirmation) {
-                this.deleteUserGQL.mutate({ username: user.username }).subscribe(() => this.loadSearchedUsers());
+                const usernameOrEmailAddress = user.emailAddress ? user.emailAddress : user.username;
+                this.deleteUserGQL.mutate({ usernameOrEmailAddress }).subscribe(() => this.loadSearchedUsers());
             }
         });
     }

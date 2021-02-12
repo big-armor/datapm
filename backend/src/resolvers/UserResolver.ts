@@ -125,11 +125,6 @@ export const createMe = async (
         throw new ValidationError("USERNAME_NOT_AVAILABLE");
     }
 
-    const repository = context.connection.manager.getCustomRepository(UserRepository);
-    if (!FirstUserStatusHolder.IS_FIRST_USER_CREATED) {
-        FirstUserStatusHolder.IS_FIRST_USER_CREATED = await repository.isAtLeastOneUserRegistered();
-    }
-
     await context.connection.transaction(async (transaction) => {
         const existingUser = await transaction.getCustomRepository(UserRepository).getUserByEmail(value.emailAddress);
 
@@ -265,17 +260,22 @@ export const deleteMe = async (_0: any, {}, context: AuthenticatedContext, info:
 
 export const adminDeleteUser = async (
     _0: any,
-    { username }: { username: string },
+    { usernameOrEmailAddress }: { usernameOrEmailAddress: string },
     context: AuthenticatedContext,
     info: any
 ) => {
-    return await deleteUserAndLogAction(username, context);
+    return await deleteUserAndLogAction(usernameOrEmailAddress, context);
 };
 
-const deleteUserAndLogAction = async (username: string, context: AuthenticatedContext) => {
+const deleteUserAndLogAction = async (usernameOrEmailAddress: string, context: AuthenticatedContext) => {
     await context.connection.transaction(async (transaction) => {
         const userRepository = transaction.getCustomRepository(UserRepository);
-        const user = await transaction.getCustomRepository(UserRepository).findUserByUserName({ username });
+        const user = await transaction
+            .getCustomRepository(UserRepository)
+            .getUserByUsernameOrEmailAddress(usernameOrEmailAddress);
+        if (!user) {
+            throw new Error("USER_NOT_FOUND-" + usernameOrEmailAddress);
+        }
 
         await createActivityLog(transaction, {
             userId: context.me.id,
