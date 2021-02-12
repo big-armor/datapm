@@ -43,7 +43,9 @@
         </div>
         <app-catalog-permissions [catalog]="catalog" *ngIf="currentTab === 1"></app-catalog-permissions>
     </ng-container>
-    <div class="dpm-no-data" *ngIf="state === 'CATALOG_NOT_FOUND'">The catalog does not exist.</div>
+    <div class="dpm-no-data" *ngIf="state === 'CATALOG_NOT_FOUND'">
+        The catalog '{{ catalogSlug }}' does not exist. <br /><br /><a [routerLink]="'/'">Back to home page</a>
+    </div>
     <div class="dpm-no-data" *ngIf="state === 'NOT_AUTHENTICATED'">
         <p>You must login to view this catalog.</p>
         <a class="app-outlined-button mt-3 px-3" (click)="loginClicked()">Login</a>

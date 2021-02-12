@@ -176,6 +176,16 @@ export class PackageComponent implements OnDestroy {
         });
     }
 
+    getCatalogSlugFromURL() {
+        const activeRouteParts = this.router.url.split("/");
+        return activeRouteParts[1];
+    }
+
+    getPackageSlugFromURL() {
+        const activeRouteParts = this.router.url.split("/");
+        return activeRouteParts[2];
+    }
+
     getPackageIdentifierFromURL() {
         const activeRouteParts = this.router.url.split("/");
         return activeRouteParts[1] + "/" + activeRouteParts[2];

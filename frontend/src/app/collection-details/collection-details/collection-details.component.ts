@@ -79,6 +79,10 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
             );
     }
 
+    public collectionEdited(collection: Collection) {
+        this.getCollectionDetails();
+    }
+
     public addPackage() {
         const dialogRef = this.dialog.open(AddPackageComponent, {
             data: {

@@ -5,7 +5,7 @@
 </div>
 
 <div class="container mt-5">
-    <h2>Public Access</h2>
+    <h1>Public Access</h1>
     <p>
         Enabling public access allows all users, including anonymous users, to view these catalog details. Users must
         have access to each individual package to view them. Packages in this catalog can not be set public until this
@@ -15,13 +15,14 @@
 
 <div class="d-flex align-items-center justify-content-between mb-3">
     <div class="d-flex align-items-center public-toggle">
-        <div class="px-4 py-2 label">Make this catalog public</div>
         <div class="ml-auto px-4 py-2 slide-right">
             <mat-slide-toggle
                 class="app-slide-toggle"
                 [checked]="isCatalogPublic"
                 (change)="updatePublic($event)"
             ></mat-slide-toggle>
+            <span *ngIf="isCatalogPublic" class="public-text">public</span>
+            <span *ngIf="!isCatalogPublic" class="not-public-text">not public</span>
         </div>
     </div>
 </div>

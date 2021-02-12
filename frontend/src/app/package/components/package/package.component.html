@@ -49,10 +49,11 @@
         <div class="row text-center">
             <div class="col-12 mt-5">
                 <div class="package-title">
-                    {{ getPackageIdentifierFromURL() }}
+                    <a [routerLink]="'/' + getCatalogSlugFromURL()"> {{ getCatalogSlugFromURL() }}</a
+                    >/{{ getPackageSlugFromURL() }}
                 </div>
                 <br />
-                The package was not found. Use the search bar above to find additional data. 123
+                The package was not found. Use the search bar above to find additional data.
             </div>
         </div>
     </div>

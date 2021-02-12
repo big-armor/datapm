@@ -29,6 +29,8 @@ export class EditCollectionComponent {
     confirmDialogOpened: boolean = false;
     state: PageState = "INIT";
 
+    public isPublicControl = new FormControl(false);
+
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: Collection,
         private dialog: MatDialog,
@@ -38,7 +40,7 @@ export class EditCollectionComponent {
         private imageService: ImageService
     ) {
         this.form = new FormGroup({
-            isPublic: new FormControl(data.isPublic),
+            isPublic: this.isPublicControl,
             name: new FormControl(data.name, {
                 validators: [Validators.required]
             }),
@@ -46,6 +48,8 @@ export class EditCollectionComponent {
                 asyncValidators: [slugValidator()]
             })
         });
+
+        this.isPublicControl.setValue(this.data.isPublic);
     }
 
     public uploadCover(data: any): void {

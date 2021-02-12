@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, SimpleChanges } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 import { Router } from "@angular/router";
@@ -23,6 +23,7 @@ import { AddUserComponent } from "../add-user/add-user.component";
 })
 export class CollectionPermissionsComponent implements OnInit {
     @Input() collection: Collection;
+    @Output() collectionEdited: EventEmitter<Collection> = new EventEmitter();
 
     public columnsToDisplay = ["name", "permission", "actions"];
     public users: any[] = [];
@@ -79,7 +80,7 @@ export class CollectionPermissionsComponent implements OnInit {
                 }
             })
             .subscribe(({ data }) => {
-                this.collection = data.updateCollection as Collection;
+                this.collection.isPublic = (data.updateCollection as Collection).isPublic;
             });
     }
 
@@ -89,7 +90,10 @@ export class CollectionPermissionsComponent implements OnInit {
                 data: this.collection
             })
             .afterClosed()
-            .subscribe((newCollection: Collection) => {});
+            .subscribe((collection: Collection) => {
+                this.collection = collection;
+                this.collectionEdited.emit(collection);
+            });
     }
 
     public addUser() {

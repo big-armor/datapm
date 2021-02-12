@@ -1,16 +1,19 @@
 <div class="container mt-5">
-    <h2>Manage Package</h2>
+    <h1>Manage Package</h1>
+    <p>
+        Use the <a href="/docs/publish-data/#update-the-package-file">datapm update command</a> to update this package.
+    </p>
+
     <button class="app-outlined-button" (click)="deletePackage()">Delete This Package</button>
 </div>
 
-<div class="container mt-4">
+<div class="container mt-5">
     <h1>Public Access</h1>
     <p>Enabling public access allows all users, including anonymous users, access to view and fetch this package.</p>
 </div>
 
-<div class="d-flex align-items-center justify-content-between mb-3">
+<div class="d-flex align-items-center justify-content-between mb-3 mt-1">
     <div class="d-flex align-items-center public-toggle">
-        <div class="px-4 py-2 label">Make this package public</div>
         <div class="ml-auto px-4 py-2 slide-right">
             <mat-slide-toggle
                 class="app-slide-toggle"
@@ -22,6 +25,8 @@
                 [checked]="package?.isPublic"
                 (change)="updatePublic($event)"
             ></mat-slide-toggle>
+            <span *ngIf="package.isPublic" class="public-text">public</span>
+            <span *ngIf="!package.isPublic" class="not-public-text">not public</span>
         </div>
     </div>
 </div>
