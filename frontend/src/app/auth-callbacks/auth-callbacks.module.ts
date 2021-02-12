@@ -1,7 +1,7 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { MatDialogModule } from "@angular/material/dialog";
+import { MatDialogModule, MatDialogRef } from "@angular/material/dialog";
 import { MatIconModule } from "@angular/material/icon";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 
@@ -22,6 +22,12 @@ import { AcceptInviteComponent } from "./accept-invite/accept-invite.component";
         MatIconModule,
         MatProgressSpinnerModule,
         SharedModule
+    ],
+    providers: [
+        {
+            provide: MatDialogRef,
+            useValue: {}
+        }
     ]
 })
 export class AuthCallbacksModule {}

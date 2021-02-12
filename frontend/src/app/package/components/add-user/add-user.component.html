@@ -16,8 +16,12 @@
             </div>
             <div class="permission-div w-50">
                 <label class="div-question pl-1">Package permissions</label>
-                <mat-form-field appearance="fill" class="w-100">
-                    <mat-select (change)="updateSelectedPermission($event.target.value)" [(value)]="modeSelect">
+                <mat-form-field
+                    appearance="fill"
+                    class="w-100"
+                    (selectionChange)="updateSelectedPermission($event.target.value)"
+                >
+                    <mat-select [(value)]="modeSelect">
                         <mat-option value="VIEW" selected>View </mat-option>
                         <mat-option value="EDIT">Edit </mat-option>
                         <mat-option value="MANAGE">Manage </mat-option>

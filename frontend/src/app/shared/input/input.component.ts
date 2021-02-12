@@ -20,6 +20,7 @@ export class InputComponent implements OnChanges {
     @Input() placeholder: string = "";
     @Input() inputType: string = "text";
     @Input() multiline: boolean = false;
+    @Input() disabled: boolean = false;
     @Input() error: string = "";
     @Input() inputStyle: InputComponentStyle = "square";
     @Input() autoFocus: boolean = false;

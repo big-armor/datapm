@@ -1,10 +1,12 @@
 import { Component, OnInit } from "@angular/core";
 import { AbstractControl, FormControl, FormGroup, ValidationErrors, Validators } from "@angular/forms";
-import { MatDialog } from "@angular/material/dialog";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { ActivatedRoute, Router } from "@angular/router";
+import { GraphQLError } from "graphql";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { LoginDialogComponent } from "src/app/shared/header/login-dialog/login-dialog.component";
-import { AcceptInviteGQL } from "src/generated/graphql";
+import { AcceptInviteGQL, AUTHENTICATION_ERROR } from "src/generated/graphql";
+import { DialogService } from "src/app/services/dialog/dialog.service";
 
 let componentInstance;
 @Component({
@@ -15,20 +17,22 @@ let componentInstance;
 export class AcceptInviteComponent implements OnInit {
     public errorMessage: string;
 
-    public acceptedInvitation = false;
     public loading = false;
 
-    public usernameControl = new FormControl("", { validators: [Validators.required], updateOn: "blur" });
-    public passwordControl = new FormControl("", { validators: [Validators.required], updateOn: "blur" });
-    public confirmPasswordControl = new FormControl("", {
-        validators: [Validators.required, this.validatePasswordConfirm],
+    public showForgotPasswordButton = false;
+
+    public usernameControl = new FormControl("", {
+        validators: [Validators.required],
+        updateOn: "blur"
+    });
+    public passwordControl = new FormControl("", {
+        validators: [Validators.required],
         updateOn: "blur"
     });
 
     public acceptInviteForm = new FormGroup({
         username: this.usernameControl,
-        password: this.passwordControl,
-        confirmPassword: this.confirmPasswordControl
+        password: this.passwordControl
     });
 
     public token: string;
@@ -38,9 +42,23 @@ export class AcceptInviteComponent implements OnInit {
         private router: Router,
         private dialog: MatDialog,
         private authenticationService: AuthenticationService,
-        private acceptInvite: AcceptInviteGQL
+        private acceptInvite: AcceptInviteGQL,
+        private matDialog: MatDialog,
+        private dialogService: DialogService,
+        private dialogRef: MatDialogRef<LoginDialogComponent>
     ) {
         componentInstance = this;
+    }
+
+    public openLogin() {
+        this.matDialog.open(LoginDialogComponent, {
+            disableClose: true
+        });
+    }
+
+    public openForgotPasswordDialog(ev: any) {
+        ev.preventDefault();
+        this.dialogService.openForgotPasswordDialog();
     }
 
     public ngOnInit(): void {
@@ -62,6 +80,7 @@ export class AcceptInviteComponent implements OnInit {
         }
 
         this.loading = true;
+        this.showForgotPasswordButton = false;
         this.acceptInvite
             .mutate({
                 username: this.usernameControl.value,
@@ -71,14 +90,19 @@ export class AcceptInviteComponent implements OnInit {
             .subscribe(
                 ({ errors }) => {
                     if (errors && errors.length) {
+                        if (errors[0].message === "TOKEN_NOT_VALID") {
+                            this.attemptLoginAfterInvalidToken(errors);
+                            return;
+                        }
+
                         this.errorMessage = this.getErrorMessageFromCode(errors[0].message);
                         this.loading = false;
                         return;
                     }
 
                     this.errorMessage = null;
-                    this.loading = false;
-                    this.acceptedInvitation = true;
+
+                    this.loginAfterSuccessfulAcceptInvite();
                 },
                 (error) => {
                     this.errorMessage = this.getErrorMessageFromCode(error);
@@ -87,47 +111,68 @@ export class AcceptInviteComponent implements OnInit {
             );
     }
 
+    public loginAfterSuccessfulAcceptInvite() {
+        this.authenticationService.login(this.usernameControl.value, this.passwordControl.value).subscribe(
+            (value: { errors; data: { me: { username: string } } }) => {
+                if (value.errors) {
+                    this.errorMessage = value.errors[0].message;
+                    this.loading = false;
+                    return;
+                }
+
+                this.loading = false;
+                const returnUrl = this.route.queryParams["returnUrl"] || "/" + value.data.me.username;
+                this.dialog.closeAll();
+                this.router.navigate([returnUrl]);
+            },
+            (error) => {
+                this.loading = false;
+                this.errorMessage = error.message;
+                this.loading = false;
+            }
+        );
+    }
+
+    public attemptLoginAfterInvalidToken(originalError: readonly GraphQLError[]) {
+        this.authenticationService.login(this.usernameControl.value, this.passwordControl.value).subscribe(
+            (value: { errors; data: { me: { username: string } } }) => {
+                if (value.errors) {
+                    if (value.errors.find((e) => e.message === AUTHENTICATION_ERROR.WRONG_CREDENTIALS)) {
+                        this.loading = false;
+                        this.errorMessage =
+                            "This invite token has already been claimed. And the username and password you entered are not correct.";
+                        this.showForgotPasswordButton = true;
+                    } else if (
+                        value.errors.find((e) => e.message === AUTHENTICATION_ERROR.EMAIL_ADDRESS_NOT_VERIFIED)
+                    ) {
+                        this.loading = false;
+                        this.errorMessage =
+                            "Check your inbox for a validation email, and click the link in that email.";
+                    } else if (value.errors.find((e) => e.message === AUTHENTICATION_ERROR.ACCOUNT_SUSPENDED)) {
+                        this.loading = false;
+                        this.errorMessage = "Your account has been suspended";
+                    } else {
+                        this.loading = false;
+                        this.errorMessage = originalError[0].message;
+                    }
+                    return;
+                }
+
+                const returnUrl = this.route.queryParams["returnUrl"] || "/" + value.data.me.username;
+                this.dialog.closeAll();
+                this.router.navigate([returnUrl]);
+            },
+            () => {
+                this.loading = false;
+                this.errorMessage = originalError[0].message;
+            }
+        );
+    }
+
     public openLoginDialog() {
         this.dialog.open(LoginDialogComponent, {
             disableClose: true
         });
-    }
-
-    public validatePassword(control: AbstractControl): ValidationErrors | null {
-        if (!componentInstance) {
-            return null;
-        }
-
-        return componentInstance.validatePasswordControl(control, "confirmPassword");
-    }
-
-    public validatePasswordConfirm(control: AbstractControl): ValidationErrors | null {
-        if (!componentInstance) {
-            return null;
-        }
-
-        return componentInstance.validatePasswordControl(control, "password");
-    }
-
-    public validatePasswordControl(control: AbstractControl, otherFormName: string): ValidationErrors | null {
-        if (!control.value) {
-            return {
-                required: "You need to confirm your password"
-            };
-        }
-
-        const otherControl = componentInstance.acceptInviteForm.controls[otherFormName];
-        if (otherControl.value && control.value != otherControl.value) {
-            return {
-                PASSWORDS_DONT_MATCH: "The entered password and password confirmation must be the same"
-            };
-        }
-
-        if (otherControl.errors) {
-            otherControl.setErrors(null);
-        }
-
-        return null;
     }
 
     private getErrorMessageFromCode(errorCode: string): string {
@@ -135,7 +180,7 @@ export class AcceptInviteComponent implements OnInit {
             case "TOKEN_NOT_VALID":
                 return "Token not valid.";
             case "USERNAME_NOT_AVAILABLE":
-                return "Username is not available.";
+                return "Username " + this.usernameControl.value + " is not available.";
             case "USERNAME_REQUIRED":
                 return "Username is required.";
             case "PASSWORD_REQUIRED":
@@ -147,7 +192,7 @@ export class AcceptInviteComponent implements OnInit {
             case "PASSWORD_TOO_SHORT":
                 return "Password is too short.";
             case "INVALID_CHARACTERS":
-                return "Invalid characters not allowed.";
+                return "Username or password contains invalid characters";
             default:
                 return "Something went wrong accepting your invitation.";
         }
