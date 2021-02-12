@@ -25,16 +25,17 @@ markdown ::ng-deep {
         font-family: $family-roboto;
         font-style: $style-normal;
         font-weight: $weight-300;
-        font-size: ($text-font - 1);
+        font-size: $small-font;
         line-height: 18px;
         letter-spacing: 0.7px;
         color: $gray-3;
-        margin-bottom: 30px;
+        margin-bottom: 5px;
     }
 
     h1 {
         color: $gray-1;
-        letter-spacing: -0.7px;
-        font-family: $family-roboto-mono;
+        letter-spacing: 0.6px;
+        margin-bottom: 0px;
+        font-size: ($title-font + 2);
     }
 }

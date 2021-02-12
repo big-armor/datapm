@@ -6,10 +6,10 @@
         </div>
 
         <div class="schema-stats">
-            <div class="schema-samples" *ngIf="schema.sampleRecords?.length > 0">
+            <div class="schema-samples package-light-gray mb-0" *ngIf="schema.sampleRecords?.length > 0">
                 {{ schema.recordCount | number }} {{ schema.unit || "" }} records<br />
             </div>
-            <div>{{ schemaPropertiesLength(schema) | number }} Properties</div>
+            <div class="package-light-gray mb-0">{{ schemaPropertiesLength(schema) | number }} Properties</div>
         </div>
 
         <div class="accordions-group mt-2">

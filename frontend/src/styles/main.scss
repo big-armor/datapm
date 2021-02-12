@@ -773,6 +773,17 @@ button:disabled {
     }
 }
 
+.package-light-gray {
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-weight: $weight-300;
+    font-size: $small-font;
+    line-height: 18px;
+    letter-spacing: 0.7px;
+    color: $gray-3;
+    margin-bottom: 5px;
+}
+
 #homeRoutes {
     list-style-type: none;
     margin-bottom: 0px;
