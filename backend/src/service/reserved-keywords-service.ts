@@ -13,7 +13,8 @@ export class ReservedKeywordsService {
         "ME",
         "DOCS",
         "IMAGES",
-        "GRAPHQL"
+        "GRAPHQL",
+        "ACCEPT-INVITE"
     ];
 
     public static validateReservedKeyword(keyword: string): void {

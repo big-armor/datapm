@@ -1,0 +1,29 @@
+@import "../../../styles/variables";
+
+.accept-wrapper {
+    margin: 0 auto;
+    padding: 30px 50px 15px 50px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-top: 50px;
+}
+
+.alert-warn {
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-weight: $weight-400;
+    font-size: $small-font;
+    line-height: 18px;
+    letter-spacing: 0.7px;
+    color: $gray-2;
+    margin-top: 4px;
+}
+
+.app-outlined-button {
+    font-size: 14px;
+    padding: 10px 25px;
+}
+
+label {
+    margin-bottom: 4px;
+}

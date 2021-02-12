@@ -1,0 +1,67 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 accept-wrapper">
+            <div *ngIf="!acceptedInvitation">
+                <form [formGroup]="acceptInviteForm" (ngSubmit)="submit()">
+                    <div class="mt-3">
+                        <label class="div-question pl-1">Username</label>
+                        <app-input
+                            placeholder="Username"
+                            [group]="acceptInviteForm"
+                            class="rounded-input mb-3"
+                            controlName="username"
+                            [error]="acceptInviteForm | inputError: 'username' | async"
+                        >
+                        </app-input>
+                    </div>
+                    <div class="mt-3">
+                        <label class="div-question pl-1">Password</label>
+                        <app-input
+                            inputType="password"
+                            placeholder="Password"
+                            [group]="acceptInviteForm"
+                            controlName="password"
+                            class="rounded-input mb-3"
+                            [error]="acceptInviteForm | inputError: 'password' | async"
+                        >
+                        </app-input>
+                    </div>
+                    <div class="mt-3">
+                        <label class="div-question pl-1">Confirm Passwords</label>
+                        <app-input
+                            inputType="password"
+                            placeholder="Confirm Password"
+                            [group]="acceptInviteForm"
+                            controlName="confirmPassword"
+                            class="rounded-input mb-3"
+                            [error]="acceptInviteForm | inputError: 'confirmPassword' | async"
+                        >
+                        </app-input>
+                    </div>
+                    <div class="alert-div">
+                        <div class="alert-warn" *ngIf="errorMessage">
+                            {{ errorMessage }}
+                        </div>
+                        <br />
+                        <div class="content-btn text-center mt-2">
+                            <button type="submit" class="app-outlined-button" [disabled]="loading">
+                                <span *ngIf="!loading" class="btn-text">Activate</span>
+                                <span *ngIf="loading" class="loading-spinner">
+                                    <mat-spinner diameter="25"></mat-spinner>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                    <br />
+                </form>
+            </div>
+            <div *ngIf="acceptedInvitation">
+                <mat-icon class="success-icon">verified</mat-icon>
+                <div class="dialog-title">You've successfully created your account!</div>
+                <div class="dialog-subtitle">
+                    You can <a (click)="openLoginDialog()" href="javascript:void(0)">log in to your account now</a>.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

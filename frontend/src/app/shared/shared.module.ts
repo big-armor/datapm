@@ -53,6 +53,8 @@ import { DeletePackageComponent } from "./delete-package/delete-package.componen
 import { MatSelectModule } from "@angular/material/select";
 import { FancyConfirmationDialogComponent } from "./dialogs/fancy-confirmation-dialog/fancy-confirmation-dialog.component";
 import { UserStatusChangeConfirmationDialogComponent } from "./dialogs/user-status-change-confirmation-dialog/user-status-change-confirmation-dialog.component";
+import { UserInviteInputComponent } from "./user-invite-input/user-invite-input.component";
+import { MatChipsModule } from "@angular/material/chips";
 
 @NgModule({
     declarations: [
@@ -91,7 +93,8 @@ import { UserStatusChangeConfirmationDialogComponent } from "./dialogs/user-stat
         SimpleCreateComponent,
         DeletePackageComponent,
         FancyConfirmationDialogComponent,
-        UserStatusChangeConfirmationDialogComponent
+        UserStatusChangeConfirmationDialogComponent,
+        UserInviteInputComponent
     ],
     imports: [
         CommonModule,
@@ -109,6 +112,7 @@ import { UserStatusChangeConfirmationDialogComponent } from "./dialogs/user-stat
         MatSelectModule,
         MatSlideToggleModule,
         MatTableModule,
+        MatChipsModule,
         FormsModule,
         ReactiveFormsModule,
         RouterModule
@@ -144,7 +148,8 @@ import { UserStatusChangeConfirmationDialogComponent } from "./dialogs/user-stat
         EditAccountDialogComponent,
         EditPasswordDialogComponent,
         UserDetailsComponent,
-        FancyConfirmationDialogComponent
+        FancyConfirmationDialogComponent,
+        UserInviteInputComponent
     ],
     providers: [TimeAgoPipe, { provide: MAT_DIALOG_DATA, useValue: {} }]
 })

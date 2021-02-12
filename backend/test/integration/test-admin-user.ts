@@ -109,7 +109,7 @@ describe("Admin Tests", async () => {
         const userDeletion = await nonAdminUser.mutate({
             mutation: AdminDeleteUserDocument,
             variables: {
-                username: "UserToTryToDelete"
+                usernameOrEmailAddress: "UserToTryToDelete"
             }
         });
 
@@ -121,7 +121,7 @@ describe("Admin Tests", async () => {
         await AdminHolder.adminClient.mutate({
             mutation: AdminDeleteUserDocument,
             variables: {
-                username: "UserToDelete"
+                usernameOrEmailAddress: "UserToDelete"
             }
         });
 

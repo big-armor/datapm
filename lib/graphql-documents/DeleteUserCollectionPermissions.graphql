@@ -1,3 +1,3 @@
-mutation DeleteUserCollectionPermissions($identifier: CollectionIdentifierInput!, $username: String!) {
-    deleteUserCollectionPermissions(identifier: $identifier, username: $username)
+mutation DeleteUserCollectionPermissions($identifier: CollectionIdentifierInput!, $usernameOrEmailAddress: String!) {
+    deleteUserCollectionPermissions(identifier: $identifier, usernameOrEmailAddress: $usernameOrEmailAddress)
 }

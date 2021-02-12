@@ -27,7 +27,11 @@ export class ValidUsernameOrEmailAddressDirective extends SchemaDirectiveVisitor
         const self = this;
         details.field.resolve = function (source, args, context: Context, info) {
             const username: string | undefined =
-                args.username || args.value?.username || args.value?.usernameOrEmailAddress || undefined;
+                args.username ||
+                args.usernameOrEmailAddress ||
+                args.value?.username ||
+                args.value?.usernameOrEmailAddress ||
+                undefined;
             validateUsernameOrEmail(username);
             return resolve.apply(this, [source, args, context, info]);
         };
@@ -38,7 +42,11 @@ export class ValidUsernameOrEmailAddressDirective extends SchemaDirectiveVisitor
         const self = this;
         field.resolve = function (source, args, context: Context, info) {
             const username: string | undefined =
-                args.username || args.value?.username || args.value?.usernameOrEmailAddress || undefined;
+                args.username ||
+                args.usernameOrEmailAddress ||
+                args.value?.username ||
+                args.value?.usernameOrEmailAddress ||
+                undefined;
 
             validateUsernameOrEmail(username);
 
@@ -57,8 +65,11 @@ export class ValidUsernameOrEmailAddressDirective extends SchemaDirectiveVisitor
 }
 
 export function validateUsernameOrEmail(value: string | undefined) {
-    if (value?.indexOf("@") != -1) validateEmailAddress(value);
-    else validateUsername(value);
+    if (value?.indexOf("@") != -1) {
+        validateEmailAddress(value);
+    } else {
+        validateUsername(value);
+    }
 }
 
 class UsernameOrEmailAddressConstraint implements ValidationConstraint {

@@ -6,6 +6,7 @@ query AdminSearchUsers($value: String!, $limit: Int!, $offset: Int!) {
             lastName
             emailAddress
             status
+            isAdmin
         }
         hasMore
         count

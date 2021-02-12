@@ -5,7 +5,6 @@ import { UserEntity } from "../entity/UserEntity";
 import { CatalogIdentifierInput, Permission, SetUserCatalogPermissionInput, UserStatus } from "../generated/graphql";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { CatalogRepository } from "../repository/CatalogRepository";
-import { CollectionRepository } from "../repository/CollectionRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { asyncForEach } from "../util/AsyncForEach";
 import { sendInviteUser, sendShareNotification, validateMessageContents } from "../util/smtpUtil";
@@ -26,24 +25,17 @@ export const hasCatalogPermissions = async (context: Context, catalogId: number,
         .hasPermission(context.me.id, catalogId, permission);
 };
 
-export const deleteUserCatalogPermissions = async (
-    _0: any,
-    { identifier, username }: { identifier: CatalogIdentifierInput; username: string },
-    context: AuthenticatedContext
-) => {
-    return context.connection.getCustomRepository(UserCatalogPermissionRepository).deleteUserCatalogPermissions({
-        identifier,
-        username
-    });
-};
-
 export const setUserCatalogPermission = async (
     _0: any,
     {
         identifier,
         value,
         message
-    }: { identifier: CatalogIdentifierInput; value: SetUserCatalogPermissionInput[]; message: string },
+    }: {
+        identifier: CatalogIdentifierInput;
+        value: SetUserCatalogPermissionInput[];
+        message: string;
+    },
     context: AuthenticatedContext,
     info: any
 ) => {
@@ -58,10 +50,21 @@ export const setUserCatalogPermission = async (
 
     await context.connection.transaction(async (transaction) => {
         await asyncForEach(value, async (userCatalogPermission) => {
-            let userId = null;
-            const user = await transaction
+            let user = await transaction
                 .getCustomRepository(UserRepository)
                 .getUserByUsernameOrEmailAddress(userCatalogPermission.usernameOrEmailAddress);
+
+            const catalogPermissionRepository = transaction.getCustomRepository(UserCatalogPermissionRepository);
+            if (userCatalogPermission.permission.length === 0) {
+                if (!user) {
+                    return;
+                }
+
+                return await catalogPermissionRepository.deleteUserCatalogPermissionsForUser({
+                    identifier,
+                    user
+                });
+            }
 
             if (user == null) {
                 if (emailAddressValid(userCatalogPermission.usernameOrEmailAddress) === true) {
@@ -69,14 +72,11 @@ export const setUserCatalogPermission = async (
                         .getCustomRepository(UserRepository)
                         .createInviteUser(userCatalogPermission.usernameOrEmailAddress);
 
-                    userId = inviteUser.id;
                     inviteUsers.push(inviteUser);
                 } else {
                     throw new ValidationError("USER_NOT_FOUND - " + userCatalogPermission.usernameOrEmailAddress);
                 }
             } else {
-                userId = user.id;
-
                 if (user.status == UserStatus.PENDING_SIGN_UP) {
                     inviteUsers.push(user);
                 } else {
@@ -103,5 +103,16 @@ export const setUserCatalogPermission = async (
 
     await asyncForEach(inviteUsers, async (user) => {
         await sendInviteUser(user, context.me.displayName, catalogEntity.displayName, message);
+    });
+};
+
+export const deleteUserCatalogPermissions = async (
+    _0: any,
+    { identifier, usernameOrEmailAddress }: { identifier: CatalogIdentifierInput; usernameOrEmailAddress: string },
+    context: AuthenticatedContext
+) => {
+    return context.connection.getCustomRepository(UserCatalogPermissionRepository).deleteUserCatalogPermissions({
+        identifier,
+        usernameOrEmailAddress
     });
 };

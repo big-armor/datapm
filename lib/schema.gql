@@ -816,7 +816,7 @@ type Mutation {
     """
     Deletes a user's account
     """
-    adminDeleteUser(username: String!): Void @isAdmin
+    adminDeleteUser(usernameOrEmailAddress: String! @validUsernameOrEmailAddress): Void @isAdmin
 
     """
     Using a username or email address and a password, requests authentication information for the given user
@@ -974,7 +974,7 @@ type Mutation {
     """
     deleteUserCollectionPermissions(
         identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
-        username: String! @validUsername
+        usernameOrEmailAddress: String! @validUsernameOrEmailAddress
     ): Void
 
     """
@@ -982,7 +982,7 @@ type Mutation {
     """
     deleteUserCatalogPermissions(
         identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
-        username: String! @validUsername
+        usernameOrEmailAddress: String! @validUsernameOrEmailAddress
     ): Void
 
     """
@@ -999,7 +999,7 @@ type Mutation {
     """
     removePackagePermissions(
         identifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
-        username: String! @validUsername
+        usernameOrEmailAddress: String! @validUsernameOrEmailAddress
     ): Void
 
     """
