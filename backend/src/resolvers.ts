@@ -47,7 +47,9 @@ import {
     collectionIsPublic,
     collectionIsRecommended,
     collectionCreatedAt,
-    collectionUpdatedAt
+    collectionUpdatedAt,
+    getLatestCollections,
+    getMyRecentlyViewedPackages
 } from "./resolvers/CollectionResolver";
 import {
     createVersion,
@@ -472,6 +474,8 @@ export const resolvers: {
         collections: findCollectionsForAuthenticatedUser,
         myCollections: myCollections,
         searchCollections: searchCollections,
+        latestCollections: getLatestCollections,
+        myRecentlyViewedCollections: getMyRecentlyViewedPackages,
         collectionPackages: collectionPackages,
         usersByCollection: usersByCollection,
         usersByPackage: usersByPackage,

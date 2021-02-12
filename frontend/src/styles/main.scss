@@ -40,6 +40,61 @@ body {
     background-color: inherit;
 }
 
+table.gray-table {
+    width: 100%;
+    border: 1px solid #d9d9d9;
+
+    .mat-column-name {
+        width: 35%;
+    }
+
+    tr.mat-row,
+    tr.mat-footer-row {
+        height: 42px;
+        cursor: pointer;
+    }
+
+    .mat-header-row {
+        height: 40px !important;
+        background-color: #ededed;
+    }
+
+    th {
+        font-family: $family-roboto;
+        font-size: $text-font;
+        font-weight: $weight-500;
+        letter-spacing: 0.4px;
+        color: $gray-1;
+    }
+
+    td {
+        font-family: $family-roboto;
+        letter-spacing: 0.4px;
+        color: $gray-2;
+        font-size: $text-font;
+        font-weight: $weight-400;
+    }
+}
+
+.gray-paginator {
+    height: 58px !important;
+    background-color: #ededed;
+    border: 1px solid #d9d9d9;
+    border-top: 0px;
+    font-weight: $weight-400;
+    color: $gray-1;
+
+    .mat-paginator-icon {
+        width: 22px;
+    }
+
+    .mat-icon-button {
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+    }
+}
+
 .cdk-global-scrollblock {
     position: static !important;
     width: initial !important;
@@ -48,10 +103,6 @@ body {
 
 .mat-dialog-container {
     background-color: $gray-11;
-}
-
-.mat-header-row {
-    background-color: $white;
 }
 
 .loading-pane {
@@ -551,9 +602,12 @@ button:disabled {
     font-family: $family-roboto;
     font-style: $style-normal;
     letter-spacing: 0.7px;
-    line-height: 20px;
+    line-height: 21px;
     font-weight: $weight-400;
     font-size: $title-font;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 #contentBorder {
@@ -626,6 +680,99 @@ button:disabled {
     }
 }
 
+.disabled-tooltip {
+    min-width: 270px;
+    font-size: 10px;
+}
+
+.search-user {
+    width: 200px;
+    margin-bottom: 10px;
+
+    .mat-form-field-infix {
+        font-family: $family-roboto;
+        font-weight: $weight-400;
+        font-style: $style-normal;
+        font-size: ($default-font - 1);
+    }
+
+    .mat-form-field-label {
+        font-family: $family-roboto;
+        font-style: $style-normal;
+        font-weight: $weight-400;
+        font-size: $text-font;
+        letter-spacing: 0.4px;
+        color: rgb(0 0 0 / 35%);
+    }
+
+    .mat-form-field-ripple {
+        background-color: $color-info !important;
+    }
+}
+
+.mat-focused .mat-form-field-label {
+    color: $color-info !important;
+}
+
+.slug {
+    color: $color-danger;
+}
+
+#deleteCollection,
+#deleteCatalog,
+#deletePackage,
+#deleteUser {
+    .btn-delete {
+        color: $color-danger;
+        position: relative;
+        top: 4px;
+        padding: 0px 15px;
+        font-weight: $weight-400;
+        border-radius: 6px;
+        box-shadow: $outer-shadow-1;
+        border-color: transparent;
+        font-family: $family-roboto-mono;
+        font-style: $style-normal;
+        font-size: $text-font;
+        line-height: 33px;
+    }
+}
+
+.copy-wrapper {
+    &:hover {
+        border-radius: 6px;
+        opacity: 0.9;
+    }
+
+    .copy-input {
+        border: 1px solid rgb(0 0 0 / 20%);
+        padding: 5px 10px;
+        background: $white;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        letter-spacing: 0.8px;
+        font-size: $small-font;
+        font-family: $family-roboto;
+        border-top-left-radius: 6px;
+        border-bottom-left-radius: 6px;
+    }
+
+    .copy-btn {
+        background: #7d7d7de8;
+        border: none;
+        padding: 6px 15px;
+        border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px;
+
+        a {
+            font-size: $text-font !important;
+            color: $white !important;
+        }
+    }
+}
+
 #homeRoutes {
     list-style-type: none;
     margin-bottom: 0px;
@@ -683,9 +830,32 @@ button:disabled {
     .section-description {
         width: 100%;
     }
+    .gray-responsive {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
 }
 
 @media (max-width: 576px) {
+    #deleteCollection,
+    #deleteCatalog,
+    #deletePackage,
+    #deleteUser {
+        .btn-delete {
+            font-size: $small-font;
+            line-height: 26px;
+            top: 0px;
+        }
+        .btn-close {
+            font-size: ($small-font + 1);
+            line-height: 26px;
+        }
+        .mat-dialog-actions {
+            min-height: 40px;
+        }
+    }
     #addUser {
         min-width: 260px;
     }
@@ -704,6 +874,18 @@ button:disabled {
         top: 0px;
         span {
             font-size: $text-font;
+        }
+    }
+    table.gray-table {
+        .mat-column-name {
+            width: 44%;
+        }
+        th {
+            font-size: ($text-font - 1);
+        }
+
+        td {
+            font-size: ($text-font - 1);
         }
     }
     .flat-input,

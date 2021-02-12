@@ -51,6 +51,39 @@
     }
 }
 
+.share-data {
+    button {
+        border-radius: 26px;
+        width: 58px;
+        height: 52px;
+        line-height: 15px;
+        padding: 2px;
+        border: none;
+        background-color: transparent;
+
+        &:hover {
+            background-color: #e8e8e8;
+        }
+
+        .bd-text {
+            font-size: 11px;
+            font-family: Roboto, "Helvetica Neue", sans-serif;
+            font-style: normal;
+            font-weight: 300;
+            letter-spacing: -0.28px;
+            color: $gray-2;
+        }
+
+        p {
+            margin-bottom: 0px;
+            a {
+                color: $gray-2;
+                font-size: 18px;
+            }
+        }
+    }
+}
+
 .derivedFromSubtitle {
     top: -15px;
     position: relative;

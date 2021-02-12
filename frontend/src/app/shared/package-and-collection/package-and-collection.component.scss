@@ -1,6 +1,6 @@
 @import "../../../styles/variables";
 
-.h1-title {
+.title {
     font-family: $family-roboto;
     font-style: $style-normal;
     font-weight: $weight-300;
@@ -10,7 +10,18 @@
     color: $gray-2;
 }
 
-.not-found {
+.sub-title {
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-weight: $weight-300;
+    font-size: $default-font;
+    margin-bottom: 0px;
+    line-height: 26px;
+    letter-spacing: 0.28px;
+    color: $gray-2;
+}
+
+.empty-state-label {
     margin: 0 auto;
     text-align: center;
     padding-top: 25px;
@@ -23,4 +34,12 @@
         line-height: 28px;
         text-align: left;
     }
+}
+
+.packages-error-label {
+    font-style: $style-normal;
+    font-weight: $weight-400;
+    font-size: $text-font;
+    line-height: 28px;
+    text-align: left;
 }

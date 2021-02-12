@@ -155,7 +155,26 @@ async function main() {
 
     app.use("/docs/datapm-package-file-schema-v1.json", function (req, res, next) {
         res.set("content-type", "application/json");
-        res.send(fs.readFileSync("node_modules/datapm-lib/packageFileSchema.json"));
+        res.send(fs.readFileSync("node_modules/datapm-lib/packageFileSchema-v0.1.0.json"));
+    });
+
+    app.use("/docs/datapm-package-file-schema-current.json", function (req, res, next) {
+        res.set("content-type", "application/json");
+
+        const files = fs.readdirSync("node_modules/datapm-lib/");
+        const packageFiles = files.filter((f) => f.startsWith("packageFileSchema-")).sort();
+
+        res.send(fs.readFileSync("node_modules/datapm-lib/" + packageFiles[packageFiles.length - 1]));
+    });
+
+    app.use("/docs/datapm-package-file-schema-*", function (req, res, next) {
+        const version = req.url.match(/^\/docs\/datapm-package-file-schema-v(.*)\.json$/i);
+        if (version == null) {
+            res.sendStatus(404);
+            return;
+        }
+
+        res.send(fs.readFileSync("node_modules/datapm-lib/packageFileSchema-v" + version[1] + ".json"));
     });
 
     app.use("/robots.txt", function (req, res, next) {

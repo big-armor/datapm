@@ -55,6 +55,8 @@ import { FancyConfirmationDialogComponent } from "./dialogs/fancy-confirmation-d
 import { UserStatusChangeConfirmationDialogComponent } from "./dialogs/user-status-change-confirmation-dialog/user-status-change-confirmation-dialog.component";
 import { UserInviteInputComponent } from "./user-invite-input/user-invite-input.component";
 import { MatChipsModule } from "@angular/material/chips";
+import { PackageAndCollectionComponent } from "./package-and-collection/package-and-collection.component";
+import { CollectionsHorizontalListComponent } from "./package-and-collection/collections-horizontal-list/collections-horizontal-list.component";
 
 @NgModule({
     declarations: [
@@ -94,7 +96,9 @@ import { MatChipsModule } from "@angular/material/chips";
         DeletePackageComponent,
         FancyConfirmationDialogComponent,
         UserStatusChangeConfirmationDialogComponent,
-        UserInviteInputComponent
+        UserInviteInputComponent,
+        PackageAndCollectionComponent,
+        CollectionsHorizontalListComponent
     ],
     imports: [
         CommonModule,
@@ -149,7 +153,8 @@ import { MatChipsModule } from "@angular/material/chips";
         EditPasswordDialogComponent,
         UserDetailsComponent,
         FancyConfirmationDialogComponent,
-        UserInviteInputComponent
+        UserInviteInputComponent,
+        PackageAndCollectionComponent
     ],
     providers: [TimeAgoPipe, { provide: MAT_DIALOG_DATA, useValue: {} }]
 })

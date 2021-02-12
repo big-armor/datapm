@@ -78,5 +78,16 @@
 @media (max-width: 576px) {
     .w-50 {
         width: 100% !important;
+#addUser {
+    .text-danger {
+        width: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    #addUser {
+        .text-danger {
+            width: 100%;
+        }
     }
 }

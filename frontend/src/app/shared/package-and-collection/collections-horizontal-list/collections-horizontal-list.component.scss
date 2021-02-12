@@ -1,0 +1,29 @@
+@import "../../../../styles/variables";
+
+.collections-container {
+    overflow-x: scroll;
+    white-space: nowrap;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    padding: 20px 10px;
+    background-color: #e9e8e86b;
+}
+
+.collection-item {
+    display: inline-block;
+    cursor: pointer;
+    margin-right: 10px;
+    border: 1px solid #3333330d;
+    background-color: #f9f9f9;
+    padding: 10px 10px;
+    border-radius: 6px;
+    font-family: $family-roboto;
+    font-weight: $weight-400;
+    letter-spacing: 0.6px;
+    font-size: $small-font;
+    color: $gray-1;
+
+    &:hover {
+        background-color: $white;
+    }
+}

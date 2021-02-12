@@ -1,4 +1,4 @@
-import { loadPackageFileFromDisk, parsePackageFileJSON } from "../src/main";
+import { loadPackageFileFromDisk, parsePackageFileJSON, validatePackageFile } from "../src/main";
 import { expect } from "chai";
 import fs from "fs";
 
@@ -16,5 +16,21 @@ describe("Checking VersionUtil", () => {
 
         expect(packageFile.readmeMarkdown).contains("This is where a readme might go.");
         expect(packageFile.licenseMarkdown).contains("This is not a real license. Just a test.");
+    });
+
+    it("Should throw invalid package file error", function () {
+        const packageFile = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        packageFile.packageSlug += "-";
+
+        const invalidPackageFileString = JSON.stringify(packageFile);
+
+        let errorFound = false;
+        try {
+            validatePackageFile(invalidPackageFileString);
+        } catch (error) {
+            errorFound = true;
+        }
+
+        expect(errorFound).equal(true);
     });
 });

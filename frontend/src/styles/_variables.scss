@@ -4,6 +4,7 @@ $page-header-height: 136px;
 $black: #000;
 $white: #fff;
 $white-1: #ffffffb3;
+$black-1: rgba($black, 0.08);
 $gray-1: #333;
 $gray-2: #4f4f4f;
 $gray-3: #828282;
@@ -16,6 +17,18 @@ $gray-9: #ddd;
 $gray-10: #eee;
 $gray-11: #f3f3f3;
 $gray-12: #ededed;
+
+$fb-color: #3e68c0;
+$fb-hover-color: rgba($fb-color, 0.9);
+
+$reddit-color: #ff4500;
+$reddit-hover-color: rgba($reddit-color, 0.9);
+
+$email-color: #7d7d7d;
+$email-hover-color: rgba($email-color, 0.9);
+
+$twitter-color: #1b95e0;
+$twitter-hover-color: rgba($twitter-color, 0.9);
 
 $gray-color-8: rgba($gray-8, 0.85);
 $gray-color-3: rgba($gray-3, 0.73);

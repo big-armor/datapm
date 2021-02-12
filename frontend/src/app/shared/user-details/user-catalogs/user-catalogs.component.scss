@@ -5,48 +5,11 @@
         width: 100%;
         margin-top: 30px;
 
-        table {
-            width: 100%;
-            th {
-                font-family: $family-roboto;
-                font-size: $text-font;
-                font-weight: $weight-500;
-                color: $gray-1;
-            }
-
-            .mat-column-name {
-                width: 40%;
-
-                a {
-                    font-family: $family-roboto;
-                    font-size: $text-font;
-                    font-weight: $weight-400;
-                }
-            }
-        }
-
         .loading-container {
             display: flex;
             justify-content: center;
             padding: 20px 0 40px;
             width: 100%;
-        }
-
-        .mat-header-row {
-            height: 40px;
-            background-color: #ededed;
-        }
-
-        th.mat-header-cell:first-of-type,
-        td.mat-cell:first-of-type,
-        td.mat-footer-cell:first-of-type {
-            padding-right: 6px;
-        }
-
-        th.mat-header-cell:last-of-type,
-        td.mat-cell:last-of-type,
-        td.mat-footer-cell:last-of-type {
-            padding: 0px 5px;
         }
     }
 }
@@ -55,6 +18,12 @@
     th.mat-header-cell:first-of-type,
     td.mat-cell:first-of-type,
     td.mat-footer-cell:first-of-type {
-        padding-left: 5px;
+        padding-left: 6px;
+    }
+
+    th.mat-header-cell:last-of-type,
+    td.mat-cell:last-of-type,
+    td.mat-footer-cell:last-of-type {
+        padding: 0px 10px;
     }
 }

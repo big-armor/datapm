@@ -35,6 +35,7 @@ import { MatTooltipModule } from "@angular/material/tooltip";
 import { MatChipsModule } from "@angular/material/chips";
 import { MatInputModule } from "@angular/material/input";
 import { MatSelectModule } from "@angular/material/select";
+import { SharePackageComponent } from "./components/package-info/share-package/share-package.component";
 
 @NgModule({
     declarations: [
@@ -51,7 +52,8 @@ import { MatSelectModule } from "@angular/material/select";
         PackageInfoComponent,
         PackagePermissionComponent,
         AddUserComponent,
-        PackageDeletionConfirmationComponent
+        PackageDeletionConfirmationComponent,
+        SharePackageComponent
     ],
     imports: [
         CommonModule,

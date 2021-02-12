@@ -190,13 +190,4 @@ export class PackageComponent implements OnDestroy {
         if (packageFile == null) return 0;
         return packageFile.schemas.reduce((count, schema) => count + (schema.derivedFrom?.length || 0), 0);
     }
-
-    addToCollection(packageObject: Package) {
-        const dialogRef = this.dialog.open(AddPackageComponent, {
-            data: {
-                packageIdentifier: this.package.identifier
-            },
-            width: "600px"
-        });
-    }
 }
