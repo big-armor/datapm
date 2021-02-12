@@ -25,8 +25,8 @@
                 [checked]="package?.isPublic"
                 (change)="updatePublic($event)"
             ></mat-slide-toggle>
-            <span *ngIf="package.isPublic" class="public-text">public</span>
-            <span *ngIf="!package.isPublic" class="not-public-text">not public</span>
+            <span *ngIf="package?.isPublic" class="public-text">public</span>
+            <span *ngIf="!package?.isPublic" class="not-public-text">not public</span>
         </div>
     </div>
 </div>
