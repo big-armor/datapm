@@ -27,8 +27,8 @@ DataPM provides a simple token based API key for machine-to-machine access to th
     1. Or host your own private registry
 1. Log-in to your new account
 1. Click your profile icon in the upper right
-1. Click "API Keys"
-1. Click "Create API Key"
+1. Click "My Profile"
+1. Near the bottom, enter a new label and click "Create New API Key"
 1. (Optional) Copy the example registry config and API Key command
 1. (Optional) Paste that command into your terminal to ensure you have command line access to the registry
 
