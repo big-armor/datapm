@@ -98,7 +98,7 @@ _Important Note:_ Right now, DataPM only supports publishing data schemas. So yo
 Use the command line client to create a data package file based on any publicly available data set.
 
 ```text
-datapm generate-package https://some-web-server.com/path/to/data.csv
+datapm package https://some-web-server.com/path/to/data.csv
 ```
 
 Follow the prompts to complete the package file. Then use the following command to publish the package.
