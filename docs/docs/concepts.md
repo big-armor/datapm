@@ -6,7 +6,7 @@ title: Concepts
 DataPM stands for Data Package Manager, and consists of three major components.
 
 -   [Package Files](package-files.md)
--   [Registry](registry.md)
+-   [Registry](registry-api.md)
 -   Clients: [Command Line](command-line-client.md) & Web Interface
 
 The registry holds packages, and the client performs actions such as searching for package and using the information in the packages to fetch data.
