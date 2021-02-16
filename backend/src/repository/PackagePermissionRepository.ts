@@ -5,6 +5,7 @@ import { UserRepository } from "./UserRepository";
 import { Permission, PackageIdentifier, PackageIdentifierInput } from "../generated/graphql";
 import { PackageRepository } from "./PackageRepository";
 import { PackageEntity } from "../entity/PackageEntity";
+import { UserEntity } from "../entity/UserEntity";
 
 async function getPackagePermissions({
     manager,
@@ -39,7 +40,7 @@ export class PackagePermissionRepository {
         return permissionsEntity.permissions.some((p) => p === permission);
     }
 
-    findPackagePermissions({
+    public findPackagePermissions({
         packageId,
         userId,
         relations = []
@@ -70,97 +71,90 @@ export class PackagePermissionRepository {
             .getMany();
     }
 
-    async setPackagePermissions({
+    public async setPackagePermissions({
         identifier,
-        username,
+        userId,
         permissions,
         relations = []
     }: {
         identifier: PackageIdentifierInput;
-        username: string;
+        userId: number;
         permissions: Permission[];
         relations?: string[];
     }): Promise<void> {
         await this.manager.nestedTransaction(async (transaction) => {
-            // ensure user exists and is part of team
-            const user = await transaction.getCustomRepository(UserRepository).findUser({ username });
-            if (!user) {
-                throw new Error(`USER_NOT_FOUND - ${username}`);
-            }
-
-            const catalogSlug = identifier.catalogSlug;
-            const packageSlug = identifier.packageSlug;
-
-            // ensure user exists and is part of team
+            const user = await transaction.getRepository(UserEntity).findOneOrFail(userId);
             const packageEntity = await transaction
                 .getCustomRepository(PackageRepository)
                 .findPackageOrFail({ identifier });
 
-            if (packageEntity.creatorId == user.id) throw new Error(`CANNOT_SET_PACKAGE_CREATOR_PERMISSIONS`);
+            if (packageEntity.creatorId == user.id) {
+                throw new Error("CANNOT_SET_PACKAGE_CREATOR_PERMISSIONS");
+            }
 
             const packagePermissions = await this.findPackagePermissions({
                 packageId: packageEntity.id,
                 userId: user.id
             });
 
-            // If permission input is not empty
-            if (permissions.length > 0) {
-                // If user does not exist in collection permissions, it creates new record
-                if (packagePermissions == undefined) {
-                    try {
-                        const collectionPermissionEntry = transaction.create(UserPackagePermissionEntity);
-                        collectionPermissionEntry.userId = user.id;
-                        collectionPermissionEntry.packageId = packageEntity.id;
-                        collectionPermissionEntry.permissions = permissions;
-                        return await transaction.save(collectionPermissionEntry);
-                    } catch (e) {
-                        console.log(e);
-                    }
-                }
-                // If user does exists in package permissions, it updates the record found
-                else {
-                    try {
-                        return await transaction
-                            .createQueryBuilder()
-                            .update(UserPackagePermissionEntity)
-                            .set({ permissions: permissions })
-                            .where({ packageId: packageEntity.id, userId: user.id })
-                            .execute();
-                    } catch (e) {
-                        console.log(e);
-                    }
+            // If user does not exist in collection permissions, it creates new record
+            if (packagePermissions == undefined) {
+                try {
+                    const collectionPermissionEntry = transaction.create(UserPackagePermissionEntity);
+                    collectionPermissionEntry.userId = user.id;
+                    collectionPermissionEntry.packageId = packageEntity.id;
+                    collectionPermissionEntry.permissions = permissions;
+                    return await transaction.save(collectionPermissionEntry);
+                } catch (e) {
+                    console.log(e);
                 }
             }
-            // If the permissions input is empty, it will delete the row in package permissions
+            // If user does exists in package permissions, it updates the record found
             else {
-                // If the permissions row exists in the table delete it
-                if (packagePermissions != undefined) {
-                    try {
-                        return await transaction
-                            .createQueryBuilder()
-                            .delete()
-                            .from(UserPackagePermissionEntity)
-                            .where({ packageId: packageEntity.id, userId: user.id })
-                            .execute();
-                    } catch (e) {
-                        console.log(e);
-                    }
+                try {
+                    return await transaction
+                        .createQueryBuilder()
+                        .update(UserPackagePermissionEntity)
+                        .set({ permissions: permissions })
+                        .where({ packageId: packageEntity.id, userId: user.id })
+                        .execute();
+                } catch (e) {
+                    console.log(e);
                 }
             }
             return;
         });
     }
 
-    removePackagePermission({
+    public removePackagePermission({
         identifier,
-        username
+        usernameOrEmailAddress
     }: {
         identifier: PackageIdentifierInput;
-        username: string;
+        usernameOrEmailAddress: string;
         relations?: string[];
     }): Promise<void> {
         return this.manager.nestedTransaction(async (transaction) => {
-            const user = await transaction.getCustomRepository(UserRepository).findOneOrFail({ username });
+            const user = await transaction
+                .getCustomRepository(UserRepository)
+                .getUserByUsernameOrEmailAddress(usernameOrEmailAddress);
+            if (!user) {
+                throw new Error("USER_NOT_FOUND-" + usernameOrEmailAddress);
+            }
+
+            await this.removePackagePermissionForUser({ identifier, user });
+        });
+    }
+
+    public removePackagePermissionForUser({
+        identifier,
+        user
+    }: {
+        identifier: PackageIdentifierInput;
+        user: UserEntity;
+        relations?: string[];
+    }): Promise<void> {
+        return this.manager.nestedTransaction(async (transaction) => {
             const packageEntity = await transaction
                 .getCustomRepository(PackageRepository)
                 .findPackageOrFail({ identifier });

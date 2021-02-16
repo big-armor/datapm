@@ -1,0 +1,7 @@
+{{ inviter_name }} has shared {{ data_name }} with you.
+
+{{ message }}
+
+Click or copy and paste the url below to access this data.
+
+{{ url }}

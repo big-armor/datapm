@@ -37,7 +37,6 @@ import { Connection, EntityManager } from "typeorm";
 import { versionEntityToGraphqlObject } from "./VersionResolver";
 import { catalogEntityToGraphQL } from "./CatalogResolver";
 import { CollectionRepository } from "../repository/CollectionRepository";
-import { VersionEntity } from "../entity/VersionEntity";
 import { activtyLogEntityToGraphQL } from "./ActivityLogResolver";
 
 export const packageEntityToGraphqlObject = async (
@@ -461,33 +460,6 @@ export const deletePackage = async (
             identifier,
             context
         });
-    });
-};
-
-export const setPackagePermissions = async (
-    _0: any,
-    {
-        identifier,
-        value: { username, permissions }
-    }: { identifier: PackageIdentifierInput; value: { username: string; permissions: Permission[] } },
-    context: AuthenticatedContext,
-    info: any
-) => {
-    return context.connection.getCustomRepository(PackagePermissionRepository).setPackagePermissions({
-        identifier,
-        username,
-        permissions
-    });
-};
-
-export const removePackagePermissions = async (
-    _0: any,
-    { identifier, username }: { identifier: PackageIdentifierInput; username: string },
-    context: AuthenticatedContext
-) => {
-    return context.connection.getCustomRepository(PackagePermissionRepository).removePackagePermission({
-        identifier,
-        username
     });
 };
 

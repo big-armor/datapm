@@ -17,9 +17,8 @@ import {
     UsersByPackageDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
-import * as fs from "fs";
 import * as crypto from "crypto";
-import { PackageFile, parsePackageFileJSON, loadPackageFileFromDisk } from "datapm-lib";
+import { parsePackageFileJSON, loadPackageFileFromDisk } from "datapm-lib";
 import { describe, it } from "mocha";
 
 describe("Package Tests", async () => {
@@ -893,10 +892,13 @@ describe("Package Tests", async () => {
                     catalogSlug: "testA-packages",
                     packageSlug: "new-package-slug"
                 },
-                value: {
-                    username: "testB-packages",
-                    permissions: newPermissions
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: "testB-packages",
+                        permissions: newPermissions
+                    }
+                ],
+                message: "Testing test"
             }
         });
 
@@ -913,10 +915,13 @@ describe("Package Tests", async () => {
                     catalogSlug: "testA-packages",
                     packageSlug: "new-package-slug"
                 },
-                value: {
-                    username: "testB-packages",
-                    permissions: newPermissions
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: "testB-packages",
+                        permissions: newPermissions
+                    }
+                ],
+                message: "Testing test"
             }
         });
 
@@ -933,10 +938,13 @@ describe("Package Tests", async () => {
                     catalogSlug: "testA-packages",
                     packageSlug: "new-package-slug"
                 },
-                value: {
-                    username: "testA-packages",
-                    permissions: newPermissions
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: "testA-packages",
+                        permissions: newPermissions
+                    }
+                ],
+                message: "Testing testing"
             }
         });
 
@@ -986,7 +994,7 @@ describe("Package Tests", async () => {
                     catalogSlug: "testA-packages",
                     packageSlug: "new-package-slug"
                 },
-                username: "testA-packages"
+                usernameOrEmailAddress: "testA-packages"
             }
         });
 
@@ -1002,7 +1010,7 @@ describe("Package Tests", async () => {
                     catalogSlug: "testA-packages",
                     packageSlug: "new-package-slug"
                 },
-                username: "testB-packages"
+                usernameOrEmailAddress: "testB-packages"
             }
         });
 

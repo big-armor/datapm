@@ -99,7 +99,7 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
         await this.manager.nestedTransaction(async (transaction) => {
             const user = await transaction
                 .getCustomRepository(UserRepository)
-                .getUserByUsername(value.usernameOrEmailAddress);
+                .getUserByUsernameOrEmailAddress(value.usernameOrEmailAddress);
 
             if (!user) {
                 throw new Error(`USER_NOT_FOUND - ${value.usernameOrEmailAddress}`);
@@ -163,15 +163,33 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
 
     deleteUserCollectionPermissions({
         identifier,
-        username
+        usernameOrEmailAddress
     }: {
         identifier: CollectionIdentifierInput;
-        username: string;
+        usernameOrEmailAddress: string;
         relations?: string[];
     }): Promise<void> {
         return this.manager.nestedTransaction(async (transaction) => {
-            const user = await transaction.getCustomRepository(UserRepository).findOneOrFail({ username });
+            const user = await transaction
+                .getCustomRepository(UserRepository)
+                .getUserByUsernameOrEmailAddress(usernameOrEmailAddress);
+            if (!user) {
+                throw new Error("USER_NOT_FOUND-" + usernameOrEmailAddress);
+            }
 
+            await this.deleteUserCollectionPermissionsForUser({ identifier, user });
+        });
+    }
+
+    deleteUserCollectionPermissionsForUser({
+        identifier,
+        user
+    }: {
+        identifier: CollectionIdentifierInput;
+        user: UserEntity;
+        relations?: string[];
+    }): Promise<void> {
+        return this.manager.nestedTransaction(async (transaction) => {
             const collectionEntity = await transaction
                 .getCustomRepository(CollectionRepository)
                 .findCollectionBySlugOrFail(identifier.collectionSlug);
@@ -180,7 +198,10 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
                 throw new Error("CANNOT_REMOVE_CREATOR_PERMISSIONS");
             }
 
-            await transaction.delete(UserCollectionPermissionEntity, { collectionId: collectionEntity.id });
+            await transaction.delete(UserCollectionPermissionEntity, {
+                collectionId: collectionEntity.id,
+                userId: user.id
+            });
         });
     }
 }

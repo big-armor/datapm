@@ -28,7 +28,7 @@ export class SignUpDialogComponent implements OnInit {
 
     public errorMessages = {
         emailAddress: {
-            INVALID_FORMAT: "Not a valid email address.",
+            INVALID_EMAIL_ADDRESS_FORMAT: "Not a valid email address.",
             TOO_LONG: "Email address must be less than 100 characters long.",
             NOT_AVAILABLE:
                 "That email address already has an account. Please use the forgot password feature on the login page."
