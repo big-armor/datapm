@@ -7,14 +7,14 @@
                     <mat-horizontal-stepper labelPosition="bottom" #stepper>
                         <mat-step>
                             <div class="mat-content">
-                                <div class="first-format" *ngIf="showRawFileButton">
+                                <div class="format-category" *ngIf="showRawFileButton">
                                     <div class="stepper-content">Download the original raw file</div>
                                     <div class="row">
                                         <div class="col-md-6">
                                             <button class="download-btn w-100" (click)="move(1)">
                                                 <a
                                                     ><img
-                                                        src="../../../../../assets/images/raw_logo.png"
+                                                        src="../../../../../assets/images/sources/raw_file.png"
                                                         alt="csv img"
                                                         style="width: 16px; height: 16px"
                                                 /></a>
@@ -24,86 +24,52 @@
                                     </div>
                                 </div>
 
-                                <div class="second-format">
-                                    <div class="stepper-content">No-code ETL Options</div>
+                                <div class="format-category">
+                                    <div class="stepper-content">Database Options</div>
                                     <div class="row">
-                                        <div class="col-md-6 mb-2">
+                                        <div class="col-md-6 mb-2" *ngFor="let source of databaseSources">
                                             <button class="download-btn w-100" (click)="openClientWizard()">
                                                 <a
                                                     ><img
-                                                        src="../../../../../assets/images/Postgresql_logo.svg"
-                                                        alt="postres img"
+                                                        src="../../../../../assets/images/sources/{{ source.slug }}.svg"
+                                                        alt="{{ source.slug }} img"
                                                         style="width: 16px; height: 16px"
                                                 /></a>
-                                                Postgres
-                                            </button>
-                                        </div>
-                                        <div class="col-md-6 mb-2">
-                                            <button class="download-btn w-100" (click)="openClientWizard()">
-                                                <a
-                                                    ><img
-                                                        src="../../../../../assets/images/mysql_logo.png"
-                                                        alt="myslq img"
-                                                        style="width: 16px; height: 16px"
-                                                /></a>
-                                                MySQL
-                                            </button>
-                                        </div>
-                                        <div class="col-md-6 mb-2">
-                                            <button class="download-btn w-100" (click)="openClientWizard()">
-                                                <a
-                                                    ><img
-                                                        src="../../../../../assets/images/mongodb_logo1.png"
-                                                        alt="mongodb img"
-                                                        style="width: 16px; height: 16px"
-                                                /></a>
-                                                MongoDB
-                                            </button>
-                                        </div>
-                                        <div class="col-md-6 mb-2">
-                                            <button class="download-btn w-100" (click)="openClientWizard()">
-                                                <a
-                                                    ><img
-                                                        src="../../../../../assets/images/bigquery_logo.svg"
-                                                        alt="bigquery img"
-                                                        style="width: 16px; height: 16px"
-                                                /></a>
-                                                Big Query
+                                                {{ source.name }}
                                             </button>
                                         </div>
                                     </div>
+                                </div>
+
+                                <div class="format-category">
+                                    <div class="stepper-content">File Repository Options</div>
                                     <div class="row">
-                                        <div class="col-md-6 mb-2">
+                                        <div class="col-md-6 mb-2" *ngFor="let source of fileRepositorySources">
                                             <button class="download-btn w-100" (click)="openClientWizard()">
                                                 <a
                                                     ><img
-                                                        src="../../../../../assets/images/csv_logo.png"
-                                                        alt="csv img"
+                                                        src="../../../../../assets/images/sources/{{ source.slug }}.svg"
+                                                        alt="{{ source.slug }} img"
                                                         style="width: 16px; height: 16px"
                                                 /></a>
-                                                CSV
+                                                {{ source.name }}
                                             </button>
                                         </div>
-                                        <div class="col-md-6 mb-2">
+                                    </div>
+                                </div>
+
+                                <div class="format-category">
+                                    <div class="stepper-content">File Format Options</div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-2" *ngFor="let source of fileSources">
                                             <button class="download-btn w-100" (click)="openClientWizard()">
                                                 <a
                                                     ><img
-                                                        src="../../../../../assets/images/json_logo.png"
-                                                        alt="json img"
+                                                        src="../../../../../assets/images/sources/{{ source.slug }}.svg"
+                                                        alt="{{ source.slug }} img"
                                                         style="width: 16px; height: 16px"
                                                 /></a>
-                                                JSON
-                                            </button>
-                                        </div>
-                                        <div class="col-md-6 mb-2">
-                                            <button class="download-btn w-100" (click)="openClientWizard()">
-                                                <a
-                                                    ><img
-                                                        src="../../../../../assets/images/terminal_logo.jpg"
-                                                        alt="csv img"
-                                                        style="width: 16px; height: 16px"
-                                                /></a>
-                                                Pipe to Standard Out
+                                                {{ source.name }}
                                             </button>
                                         </div>
                                     </div>
