@@ -60,6 +60,7 @@ export class CollectionPermissionsComponent implements OnChanges {
                 this.users = data.usersByCollection.map((item) => ({
                     username: item.user.username,
                     name: this.getUserName(item.user as User),
+                    pendingInvitationAcceptance: item.user.username.includes("@"),
                     permission: this.findHighestPermission(item.permissions)
                 }));
             });

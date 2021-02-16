@@ -76,13 +76,22 @@ export class UserInviteInputComponent implements OnInit {
                     return this.autocompleteUsers.fetch({ startsWith: value });
                 })
             )
-            .subscribe((result) => {
+            .subscribe((result: any) => {
                 if (result.errors != null) {
                     this.autoCompleteResult = null;
                 } else {
                     this.autoCompleteResult = result.data.autoComplete;
                 }
             });
+    }
+
+    public addFromInputControlValue(): void {
+        const value = this.usernameControl.value;
+        if (value && value.trim().length) {
+            this.addChip(value);
+            this.fruitInput.nativeElement.value = "";
+            this.usernameControl.setValue(null);
+        }
     }
 
     public selectFromAutocompleteDropdown(event: MatAutocompleteSelectedEvent): void {
@@ -94,15 +103,7 @@ export class UserInviteInputComponent implements OnInit {
 
     public add(event: MatChipInputEvent): void {
         const value = event.value;
-
-        this.skipAutoCompleteSearch = true;
-        const isEmail = value.includes(this.EMAIL_DETECTION_CHARACTER);
-        if (isEmail) {
-            this.validateEmailAndAddToTheList(value);
-        } else {
-            this.validateUsernameAndAddToTheList(value);
-        }
-        this.changeDetectorRef.detectChanges();
+        this.addChip(value);
     }
 
     public removeFromSelection(chip: ChipData): void {
@@ -112,6 +113,17 @@ export class UserInviteInputComponent implements OnInit {
             this.usersChips.splice(index, 1);
             this.emitUserInputChangeEvent();
         }
+    }
+
+    private addChip(value: string): void {
+        this.skipAutoCompleteSearch = true;
+        const isEmail = value.includes(this.EMAIL_DETECTION_CHARACTER);
+        if (isEmail) {
+            this.validateEmailAndAddToTheList(value);
+        } else {
+            this.validateUsernameAndAddToTheList(value);
+        }
+        this.changeDetectorRef.detectChanges();
     }
 
     private validateEmailAndAddToTheList(value: string): void {

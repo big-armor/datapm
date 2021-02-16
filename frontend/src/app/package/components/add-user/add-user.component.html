@@ -3,6 +3,7 @@
     <div mat-dialog-content id="contentBorder">
         <div class="bd-highlight py-4 shadow-div">
             <app-user-invite-input
+                #userInviteInput
                 [usernameControl]="usernameControl"
                 (userInputChange)="onUserInputChange($event)"
                 (loadingStateChange)="onLoadingStatusChange($event)"
@@ -16,12 +17,8 @@
             </div>
             <div class="permission-div w-50">
                 <label class="div-question pl-1">Package permissions</label>
-                <mat-form-field
-                    appearance="fill"
-                    class="w-100"
-                    (selectionChange)="updateSelectedPermission($event.target.value)"
-                >
-                    <mat-select [(value)]="modeSelect">
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-select [value]="permission" (selectionChange)="updateSelectedPermission($event.value)">
                         <mat-option value="VIEW" selected>View </mat-option>
                         <mat-option value="EDIT">Edit </mat-option>
                         <mat-option value="MANAGE">Manage </mat-option>

@@ -146,6 +146,7 @@ export class PackagePermissionComponent implements OnInit {
                 this.users = data.usersByPackage.map((item) => ({
                     username: item.user.username,
                     name: this.getUserName(item.user as User),
+                    pendingInvitationAcceptance: item.user.username.includes("@"),
                     permission: this.findHighestPermission(item.permissions)
                 }));
             });

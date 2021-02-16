@@ -1,10 +1,11 @@
-import { Component, Inject, OnInit } from "@angular/core";
+import { Component, Inject, OnInit, ViewChild } from "@angular/core";
 import { FormGroup, FormControl } from "@angular/forms";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { PageState } from "src/app/models/page-state";
 import { getEffectivePermissions } from "src/app/services/permissions.service";
 import { ChipData } from "src/app/shared/user-invite-input/chip-data";
 import { ChipState } from "src/app/shared/user-invite-input/chip-state";
+import { UserInviteInputComponent } from "src/app/shared/user-invite-input/user-invite-input.component";
 import {
     Collection,
     Permission,
@@ -22,6 +23,9 @@ enum ErrorType {
     styleUrls: ["./add-user.component.scss"]
 })
 export class AddUserComponent implements OnInit {
+    @ViewChild("userInviteInput")
+    public userInviteInput: UserInviteInputComponent;
+
     public form: FormGroup;
     public state: PageState = "INIT";
     public error: ErrorType | string = null;
@@ -37,7 +41,6 @@ export class AddUserComponent implements OnInit {
     public hasErrors = false;
 
     private effectivePermissions: Permission[];
-    modeSelect: string;
 
     constructor(
         private setUserCollectionPermissionsGQL: SetUserCollectionPermissionsGQL,
@@ -48,8 +51,6 @@ export class AddUserComponent implements OnInit {
     }
 
     public ngOnInit(): void {
-        this.modeSelect = "VIEW";
-
         this.form = new FormGroup({
             username: this.usernameControl,
             message: this.messageControl
@@ -58,11 +59,28 @@ export class AddUserComponent implements OnInit {
 
     public submit(event: any): void {
         event.preventDefault();
+        this.userInviteInput.addFromInputControlValue();
 
-        if (this.hasErrors) {
-            return;
+        if (!this.hasErrors) {
+            this.submitForm();
         }
+    }
 
+    public updateSelectedPermission(permission: Permission): void {
+        this.permission = permission;
+        this.effectivePermissions = getEffectivePermissions(permission);
+    }
+
+    public onUserInputChange(value: ChipData[]): void {
+        this.usersChips = value;
+        this.hasErrors = this.hasErrorsInAddedUsers();
+    }
+
+    public onLoadingStatusChange(value: boolean): void {
+        this.loading = value;
+    }
+
+    private submitForm(): void {
         this.state = "LOADING";
         this.setUserCollectionPermissionsGQL
             .mutate({
@@ -97,20 +115,6 @@ export class AddUserComponent implements OnInit {
                     this.loading = false;
                 }
             );
-    }
-
-    public updateSelectedPermission(permission: Permission): void {
-        this.permission = permission;
-        this.effectivePermissions = getEffectivePermissions(permission);
-    }
-
-    public onUserInputChange(value: ChipData[]): void {
-        this.usersChips = value;
-        this.hasErrors = this.hasErrorsInAddedUsers();
-    }
-
-    public onLoadingStatusChange(value: boolean): void {
-        this.loading = value;
     }
 
     private hasErrorsInAddedUsers(): boolean {

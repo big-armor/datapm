@@ -3,6 +3,7 @@
     <div mat-dialog-content id="contentBorder">
         <div class="d-flex flex-row bd-highlight pt-2 shadow-div">
             <app-user-invite-input
+                #userInviteInput
                 [usernameControl]="usernameControl"
                 (userInputChange)="onUserInputChange($event)"
                 (loadingStateChange)="onLoadingStatusChange($event)"
@@ -17,7 +18,7 @@
             <div class="permission-div w-50">
                 <label class="div-question pl-1">Catalog permissions</label>
                 <mat-form-field appearance="fill" class="w-100">
-                    <mat-select (change)="updateSelectedPermission($event.target.value)" [(value)]="modeSelect">
+                    <mat-select (selectionChange)="updateSelectedPermission($event.value)" [value]="permission">
                         <mat-option value="VIEW">View </mat-option>
                         <mat-option value="EDIT">Edit </mat-option>
                         <mat-option value="MANAGE">Manage </mat-option>
@@ -27,7 +28,10 @@
             <div class="permission-div w-50">
                 <label class="div-question pl-1">Catalog packages permissions</label>
                 <mat-form-field appearance="fill" class="w-100">
-                    <mat-select (change)="updatePackagesPermissions($event.target.value)" [(value)]="modeSelect">
+                    <mat-select
+                        (selectionChange)="updatePackagesPermissions($event.value)"
+                        [value]="packagesPermission"
+                    >
                         <mat-option value="VIEW">View </mat-option>
                         <mat-option value="EDIT">Edit </mat-option>
                         <mat-option value="MANAGE">Manage </mat-option>
