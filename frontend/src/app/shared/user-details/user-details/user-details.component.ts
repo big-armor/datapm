@@ -4,7 +4,7 @@ import { EditPasswordDialogComponent } from "../edit-password-dialog/edit-passwo
 import { AuthenticationService } from "../../../services/authentication.service";
 import { getRegistryURL } from "../../../helpers/RegistryAccessHelper";
 
-import { APIKey, User, Catalog, CreateAPIKeyGQL, MyAPIKeysGQL, DeleteAPIKeyGQL, Scope } from "src/generated/graphql";
+import { APIKey, User, Catalog, CreateAPIKeyGQL, DeleteAPIKeyGQL, Scope } from "src/generated/graphql";
 import { FormControl, FormGroup } from "@angular/forms";
 import { MatTableDataSource } from "@angular/material/table";
 import { Clipboard } from "@angular/cdk/clipboard";
@@ -130,7 +130,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
                 this.newAPIKey = btoa(key.id + "." + key.secret);
 
                 this.createAPIKeyForm.get("label").setValue("");
-                this.refreshAPIKeys();
+                this.refreshAPIKeys(true);
                 this.createAPIKeyState = State.SUCCESS;
             });
     }
@@ -157,16 +157,16 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
                 }
 
                 this.createAPIKeyForm.get("label").setValue("");
-                this.refreshAPIKeys();
+                this.refreshAPIKeys(true);
                 this.deleteAPIKeyState = State.SUCCESS;
             });
     }
 
-    refreshAPIKeys() {
+    refreshAPIKeys(forceReload?: boolean) {
         this.apiKeysState = State.LOADING;
 
         this.apiKeysService
-            .getMyApiKeys()
+            .getMyApiKeys(forceReload)
             .pipe(takeUntil(this.subscription))
             .subscribe(
                 (apiKeys) => {
