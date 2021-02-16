@@ -13,6 +13,7 @@ import { take, takeUntil } from "rxjs/operators";
 import { EditAccountDialogComponent } from "../edit-account-dialog/edit-account-dialog.component";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import * as timeago from "timeago.js";
+import { ApiKeyService } from "src/app/services/api-key.service";
 
 enum State {
     INIT,
@@ -51,7 +52,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         public dialog: MatDialog,
         private authenticationService: AuthenticationService,
         private createAPIKeyGQL: CreateAPIKeyGQL,
-        private myAPIKeysGQL: MyAPIKeysGQL,
+        private apiKeysService: ApiKeyService,
         private deleteAPIKeyGQL: DeleteAPIKeyGQL,
         private clipboard: Clipboard,
         private snackBarService: SnackBarService
@@ -164,17 +165,16 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     refreshAPIKeys() {
         this.apiKeysState = State.LOADING;
 
-        this.myAPIKeysGQL
-            .fetch({}, { fetchPolicy: "no-cache" })
+        this.apiKeysService
+            .getMyApiKeys()
             .pipe(takeUntil(this.subscription))
-            .subscribe((response) => {
-                if (response.errors?.length > 0) {
-                    this.apiKeysState = State.ERROR;
-                    return;
-                }
-                this.myAPIKeys = response.data.myAPIKeys;
-                this.apiKeysState = State.SUCCESS;
-            });
+            .subscribe(
+                (apiKeys) => {
+                    this.myAPIKeys = apiKeys;
+                    this.apiKeysState = State.SUCCESS;
+                },
+                () => (this.apiKeysState = State.ERROR)
+            );
     }
 
     apiKeyCommandString() {

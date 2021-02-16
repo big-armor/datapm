@@ -1,0 +1,35 @@
+{
+    "version": "0.0.1",
+    "sources": [
+        {
+            "name": "PostgreSQL",
+            "slug": "postgresql",
+            "category": "DATABASE"
+        },
+        {
+            "name": "MySQL",
+            "slug": "mysql",
+            "category": "DATABASE"
+        },
+        {
+            "name": "MariaDB",
+            "slug": "mariadb",
+            "category": "DATABASE"
+        },
+        {
+            "name": "Google Big Query",
+            "slug": "big-query",
+            "category": "DATABASE"
+        },
+        {
+            "name": "CSV",
+            "slug": "csv",
+            "category": "FILE"
+        },
+        {
+            "name": "XML",
+            "slug": "xml",
+            "category": "FILE"
+        }
+    ]
+}

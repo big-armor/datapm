@@ -1,13 +1,14 @@
 import { Inject, ViewChild } from "@angular/core";
 import { Component, OnInit } from "@angular/core";
-import { FormGroup } from "@angular/forms";
 import { MatDialog, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MatStepper } from "@angular/material/stepper";
 import { PackageFile, Schema } from "datapm-lib";
-import { Source } from "graphql";
+import { SourceCategory } from "datapm-lib/src/capabilities/SourceCategory";
+import { SourceDescription } from "datapm-lib/src/capabilities/SourceDescription";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { PackageResponse, PackageService } from "src/app/package/services/package.service";
+import { CapabilitiesServiceImpl } from "src/app/services/capabilities-impl.service";
 import { Package } from "src/generated/graphql";
 import { ClientWizardComponent } from "./client-wizard/client-wizard.component";
 
@@ -29,13 +30,19 @@ export class DownloadPackageComponent implements OnInit {
 
     unsubscribe$ = new Subject();
 
+    public sources: SourceDescription[] = [];
+    public databaseSources: SourceDescription[] = [];
+    public fileSources: SourceDescription[] = [];
+
     constructor(
         private dialog: MatDialog,
         private packageService: PackageService,
+        private capabilitiesService: CapabilitiesServiceImpl,
         @Inject(MAT_DIALOG_DATA) public userPackage: Package
     ) {}
 
     ngOnInit(): void {
+        this.loadSources();
         this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe((p: PackageResponse) => {
             if (p == null || p.package == null) return;
             this.package = p.package;
@@ -59,5 +66,11 @@ export class DownloadPackageComponent implements OnInit {
             width: "550px",
             panelClass: "my-custom-dialog"
         });
+    }
+
+    private loadSources(): void {
+        this.sources = this.capabilitiesService.getSourceDescriptions();
+        this.fileSources = this.sources.filter((s) => SourceCategory.FILE == s.category);
+        this.databaseSources = this.sources.filter((s) => SourceCategory.DATABASE == s.category);
     }
 }
