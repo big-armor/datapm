@@ -6,7 +6,7 @@ title: Concepts
 DataPM stands for Data Package Manager, and consists of three major components.
 
 -   [Package Files](package-files.md)
--   [Registry](registry.md)
+-   [Registry](registry-api.md)
 -   Clients: [Command Line](command-line-client.md) & Web Interface
 
 The registry holds packages, and the client performs actions such as searching for package and using the information in the packages to fetch data.
@@ -60,7 +60,7 @@ DataPM package files are written in JSON format, and have their own JSON Schema'
 
 ### How are package files generated?
 
-The DataPM Command Line Client's "generate-package" command automatically generates package files from common file formats, databases, and other repositories. The client will prompt you with simple questions about the discovered contents, and then write the final package file to your local disk.
+The DataPM Command Line Client's "package" command automatically creates package files from common file formats, databases, and other repositories. The client will prompt you with simple questions about the discovered contents, and then write the final package file to your local disk.
 
 ### Do I have to have a package file to get data?
 

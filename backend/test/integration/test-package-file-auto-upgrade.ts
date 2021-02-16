@@ -89,7 +89,7 @@ describe("Upgrading package files automatically", function () {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("ddc043917db1b4c6c971ae1feaab4da53a802b36adb88c6280a9da7cc606ef84");
+        expect(responseHash).equal("59749da9a9c40425a461acd629329dd6d6370f484de0379d84373510848239d7");
 
         const packageFile = parsePackageFileJSON(responsePackageFileContents);
 

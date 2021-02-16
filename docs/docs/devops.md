@@ -27,10 +27,10 @@ After you run the above command and complete all of the prompts, the datapm clie
 
 ## Continuous Data Publishing
 
-DataPM can be integrated into or become your complete data publishing work flow. Simply generate a package file with the following command one time.
+DataPM can be integrated into or become your complete data publishing work flow. Simply create a package file with the following command one time.
 
 ```text
-datapm generate-package <url-or-path-to-data>
+datapm package [url-or-path-to-data]
 ```
 
 After answering the prompts, the client will produce a package file that can be checked into your code repository.
@@ -38,11 +38,11 @@ After answering the prompts, the client will produce a package file that can be 
 When you update the data schema, or publish new batch data sets, run the following command to automatically update the package file.
 
 ```text
-datapm update <path-to-package-file>
+datapm update [path-to-package-file]
 ```
 
 And then use the following command to publish the package file.
 
 ```text
-datapm publish <path-to-package-file>
+datapm publish [path-to-package-file]
 ```

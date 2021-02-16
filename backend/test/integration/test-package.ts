@@ -326,7 +326,7 @@ describe("Package Tests", async () => {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("a889aa0f559a2677e6db69f0c966f2c0be66025a0b52e4fd9d1aa62e9be8ccd0");
+        expect(responseHash).equal("435b885cb99b979f33c8ff1ee008ee79c67c0f6041bfdca46f6a0d9759839223");
 
         const responsePackageFile = parsePackageFileJSON(responsePackageFileContents);
 
@@ -553,7 +553,7 @@ describe("Package Tests", async () => {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("a889aa0f559a2677e6db69f0c966f2c0be66025a0b52e4fd9d1aa62e9be8ccd0");
+        expect(responseHash).equal("435b885cb99b979f33c8ff1ee008ee79c67c0f6041bfdca46f6a0d9759839223");
     });
 
     it("User A publish second version - fail no changes", async function () {
