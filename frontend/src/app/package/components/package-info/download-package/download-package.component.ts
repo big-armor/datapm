@@ -32,6 +32,7 @@ export class DownloadPackageComponent implements OnInit {
 
     public sources: SourceDescription[] = [];
     public databaseSources: SourceDescription[] = [];
+    public fileRepositorySources: SourceDescription[] = [];
     public fileSources: SourceDescription[] = [];
 
     constructor(
@@ -71,6 +72,7 @@ export class DownloadPackageComponent implements OnInit {
     private loadSources(): void {
         this.sources = this.capabilitiesService.getSourceDescriptions();
         this.fileSources = this.sources.filter((s) => SourceCategory.FILE == s.category);
+        this.fileRepositorySources = this.sources.filter((s) => SourceCategory.FILE_REPOSITORY == s.category);
         this.databaseSources = this.sources.filter((s) => SourceCategory.DATABASE == s.category);
     }
 }

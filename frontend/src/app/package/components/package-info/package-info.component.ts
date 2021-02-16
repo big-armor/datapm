@@ -74,7 +74,7 @@ export class PackageInfoComponent implements OnInit {
     public downloadPackage() {
         const dialogRef = this.dialog.open(DownloadPackageComponent, {
             data: this.package,
-            width: "420px"
+            width: "430px"
         });
     }
 
