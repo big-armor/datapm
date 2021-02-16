@@ -16,13 +16,12 @@ DataPM supports reading and writing records for the following databases.
 
 | Name              |    Read Data    |    Write Data    |
 | :---------------- | :-------------: | :--------------: |
-| PostgreSQL        |      Read       |      Write       |
-| MySQL             |      Read       |      Write       |
-| MariaDB           | Read (untested) | Write (untested) |
-| Oracle            |    (future)     |     (future)     |
 | Google Big Query  |    (future)     |      Write       |
+| PostgreSQL        |      Read       |      Write       |
+| MariaDB           | Read (untested) | Write (untested) |
+| MySQL             |      Read       |      Write       |
+| MongoDB           |    (future)     |      Write       |
 | Oracle            |    (future)     |     (future)     |
-| AWS DynamoDB      |    (future)     |     (future)     |
 | GCP Cloud Spanner |    (future)     |     (future)     |
 | Snowflake         |    (future)     |     (future)     |
 
@@ -30,16 +29,17 @@ DataPM supports reading and writing records for the following databases.
 
 DataPM supports reading and writing files of specific formats (below) to the following file repositories.
 
-| Name                 | Read Data |          Write Data          |
-| :------------------- | :-------: | :--------------------------: |
-| Local File System    |   Read    |            Write             |
-| HTTP                 |   Read    | (future POST/PUT operations) |
-| SFTP                 | (future)  |           (future)           |
-| FTP                  | (future)  |           (future)           |
-| Azure Blob Storage   | (future)  |           (future)           |
-| AWS S3               | (future)  |           (future)           |
-| Google Cloud Storage | (future)  |           (future)           |
-| Azure Blob Storage   | (future)  |           (future)           |
+| Name                           | Read Data |          Write Data          |
+| :----------------------------- | :-------: | :--------------------------: |
+| Standard Out/In (stdout/stdin) |   Read    |            Write             |
+| Local File System              |   Read    |            Write             |
+| HTTP                           |   Read    | (future POST/PUT operations) |
+| SFTP                           | (future)  |           (future)           |
+| FTP                            | (future)  |           (future)           |
+| Azure Blob Storage             | (future)  |           (future)           |
+| AWS S3                         | (future)  |           (future)           |
+| Google Cloud Storage           | (future)  |           (future)           |
+| Azure Blob Storage             | (future)  |           (future)           |
 
 ## File Formats
 
