@@ -63,16 +63,6 @@ export class AvatarComponent implements OnChanges, OnDestroy {
     public ngOnChanges(changes: SimpleChanges): void {
         if (changes.user && changes.user.currentValue) {
             this.user = changes.user.currentValue;
-
-            if (this.user?.firstName && this.user?.lastName) {
-                this.letter =
-                    this.user.firstName.substr(0, 1).toUpperCase() + this.user.lastName.substr(0, 1).toUpperCase();
-            } else if (this.user.username != null) {
-                this.letter = this.user.username.substr(0, 1).toUpperCase() || "";
-            } else {
-                this.letter = "";
-            }
-
             this.getUserAvatarImage(this.user.username);
         } else if (changes.catalog && changes.catalog.currentValue) {
             this.catalog = changes.catalog.currentValue;
@@ -96,26 +86,48 @@ export class AvatarComponent implements OnChanges, OnDestroy {
         if (!username) {
             return;
         }
-        this.backgroundColor = "#FFFF";
+
         this.imageService
             .loadUserAvatar(username)
             .pipe(takeUntil(this.unsubscribe$))
-            .subscribe((imgData: any) => this.loadImageData(imgData, username));
+            .subscribe((imgData: any) => {
+                if (imgData) {
+                    this.loadImageData(imgData);
+                    return;
+                }
+
+                if (this.user?.firstName && this.user?.lastName) {
+                    this.letter =
+                        this.user.firstName.substr(0, 1).toUpperCase() + this.user.lastName.substr(0, 1).toUpperCase();
+                } else if (this.user.username != null) {
+                    this.letter = this.user.username.substr(0, 1).toUpperCase() || "";
+                } else {
+                    this.letter = "";
+                }
+                this.backgroundColor = this.hashStringToColor(username);
+                this.state = State.LOADED;
+            });
     }
 
     private getCatalogAvatarImage(catalogSlug?: string): void {
         if (!catalogSlug) {
             return;
         }
-        this.backgroundColor = "#FFFF";
+
         this.imageService
             .loadCatalogAvatar(catalogSlug)
             .pipe(takeUntil(this.unsubscribe$))
-            .subscribe((imgData: any) => this.loadImageData(imgData, catalogSlug));
+            .subscribe((imgData: any) => {
+                if (imgData) {
+                    this.loadImageData(imgData);
+                } else {
+                    this.backgroundColor = this.hashStringToColor(catalogSlug);
+                    this.state = State.LOADED;
+                }
+            });
     }
 
-    private loadImageData(imageData: any, stringValue: string): void {
-        this.backgroundColor = this.hashStringToColor(stringValue);
+    private loadImageData(imageData: any): void {
         this.selectedImageData = imageData;
         this.state = State.LOADED;
     }
