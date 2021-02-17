@@ -37,6 +37,7 @@
                                                 type.recordCount / schema.recordCount | percent
                                             }}) {{ schema.unit }} records
                                         </li>
+                                        <li>unit: {{ property.unit }}</li>
                                         <li>max value: {{ type.numberMaxValue | number }}</li>
                                         <li>min value: {{ type.numberMinValue | number }}</li>
                                     </ul>
@@ -49,7 +50,7 @@
                                         <li>
                                             present in {{ type.recordCount | number }} ({{
                                                 type.recordCount / schema.recordCount | percent
-                                            }}) {{ schema.unit }} records
+                                            }}) records
                                         </li>
                                     </ul>
                                 </div>
@@ -62,7 +63,7 @@
                                         <li>
                                             present in {{ type.recordCount | number }} ({{
                                                 type.recordCount / schema.recordCount | percent
-                                            }}) {{ schema.unit }} records
+                                            }}) records
                                         </li>
                                     </ul>
                                 </div>
@@ -73,7 +74,7 @@
                                     {{ type.valueType }}
                                     <ul>
                                         <li>
-                                            present in {{ type.recordCount | number }} {{ schema.unit }} records ({{
+                                            present in {{ type.recordCount | number }} records ({{
                                                 type.recordCount / schema.recordCount | percent
                                             }}
                                             of total)
