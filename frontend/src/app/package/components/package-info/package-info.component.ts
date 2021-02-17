@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnChanges, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { PackageFile } from "datapm-lib";
 import { Subject } from "rxjs";
@@ -9,6 +9,7 @@ import { AuthenticationService } from "src/app/services/authentication.service";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import { Package, User } from "src/generated/graphql";
 import { AddUserComponent } from "../add-user/add-user.component";
+import { DownloadPackageComponent } from "./download-package/download-package.component";
 import { SharePackageComponent } from "./share-package/share-package.component";
 
 @Component({
@@ -16,11 +17,13 @@ import { SharePackageComponent } from "./share-package/share-package.component";
     templateUrl: "./package-info.component.html",
     styleUrls: ["./package-info.component.scss"]
 })
-export class PackageInfoComponent implements OnInit {
+export class PackageInfoComponent implements OnInit, OnChanges {
     @Input() public package: Package;
     @Input() public packageFile: PackageFile;
 
     public currentUser: User;
+    public packageUnit: string;
+
     private unsubscribe$ = new Subject();
 
     constructor(
@@ -29,21 +32,39 @@ export class PackageInfoComponent implements OnInit {
         private authenticationService: AuthenticationService
     ) {}
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
             this.currentUser = user;
         });
     }
-    getRecordCount(packageFile) {
-        if (packageFile == null) return "";
+
+    public ngOnChanges(): void {
+        this.packageUnit = this.parsePackageUnit();
+    }
+
+    public getRecordCount(packageFile): string {
+        if (packageFile == null) {
+            return "";
+        }
 
         return packageFile.schemas.reduce((a, b) => a + (b.recordCount || 0), 0);
     }
 
-    get generatedFetchCommand() {
+    public get generatedFetchCommand() {
         return this.package ? "datapm fetch " + packageToIdentifier(this.package.identifier) : "";
     }
-    copyCommand() {
+
+    public parsePackageUnit(): string {
+        if (!this.packageFile || !this.packageFile.schemas.length) {
+            return null;
+        }
+
+        let unit = this.packageFile.schemas[0].unit;
+        const hasMultipleUnits = this.packageFile.schemas.find((schema) => schema.unit && schema.unit != unit);
+        return hasMultipleUnits ? null : unit;
+    }
+
+    public copyCommand() {
         const el = document.createElement("textarea");
         el.value = this.generatedFetchCommand;
         document.body.appendChild(el);
@@ -68,6 +89,13 @@ export class PackageInfoComponent implements OnInit {
                 }
             });
         }
+    }
+
+    public downloadPackage() {
+        const dialogRef = this.dialog.open(DownloadPackageComponent, {
+            data: this.package,
+            width: "430px"
+        });
     }
 
     public canManage() {

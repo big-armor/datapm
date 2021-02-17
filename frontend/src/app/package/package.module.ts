@@ -36,6 +36,9 @@ import { MatChipsModule } from "@angular/material/chips";
 import { MatInputModule } from "@angular/material/input";
 import { MatSelectModule } from "@angular/material/select";
 import { SharePackageComponent } from "./components/package-info/share-package/share-package.component";
+import { DownloadPackageComponent } from "./components/package-info/download-package/download-package.component";
+import { ClientWizardComponent } from "./components/package-info/download-package/client-wizard/client-wizard.component";
+import { MatStepperModule } from "@angular/material/stepper";
 
 @NgModule({
     declarations: [
@@ -53,7 +56,9 @@ import { SharePackageComponent } from "./components/package-info/share-package/s
         PackagePermissionComponent,
         AddUserComponent,
         PackageDeletionConfirmationComponent,
-        SharePackageComponent
+        SharePackageComponent,
+        DownloadPackageComponent,
+        ClientWizardComponent
     ],
     imports: [
         CommonModule,
@@ -73,6 +78,7 @@ import { SharePackageComponent } from "./components/package-info/share-package/s
         SharedModule,
         MatSelectModule,
         ScrollingModule,
+        MatStepperModule,
         TableVirtualScrollModule,
         MarkdownModule.forChild(),
         MatTooltipModule
