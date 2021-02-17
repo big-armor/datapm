@@ -35,6 +35,9 @@
     font-size: $small-font;
     letter-spacing: 0.4px;
     color: $gray-2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .oddRow {
@@ -43,6 +46,7 @@
 
 tr.mat-header-row {
     height: 40px !important;
+    background-color: $gray-4;
 }
 
 ::ng-deep .my-second-custom-dialog {
