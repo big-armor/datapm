@@ -17,9 +17,8 @@ import {
     UsersByPackageDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
-import * as fs from "fs";
 import * as crypto from "crypto";
-import { PackageFile, parsePackageFileJSON, loadPackageFileFromDisk } from "datapm-lib";
+import { parsePackageFileJSON, loadPackageFileFromDisk } from "datapm-lib";
 import { describe, it } from "mocha";
 
 describe("Package Tests", async () => {
@@ -326,7 +325,7 @@ describe("Package Tests", async () => {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("a889aa0f559a2677e6db69f0c966f2c0be66025a0b52e4fd9d1aa62e9be8ccd0");
+        expect(responseHash).equal("435b885cb99b979f33c8ff1ee008ee79c67c0f6041bfdca46f6a0d9759839223");
 
         const responsePackageFile = parsePackageFileJSON(responsePackageFileContents);
 
@@ -553,7 +552,7 @@ describe("Package Tests", async () => {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("a889aa0f559a2677e6db69f0c966f2c0be66025a0b52e4fd9d1aa62e9be8ccd0");
+        expect(responseHash).equal("435b885cb99b979f33c8ff1ee008ee79c67c0f6041bfdca46f6a0d9759839223");
     });
 
     it("User A publish second version - fail no changes", async function () {
@@ -893,10 +892,13 @@ describe("Package Tests", async () => {
                     catalogSlug: "testA-packages",
                     packageSlug: "new-package-slug"
                 },
-                value: {
-                    username: "testB-packages",
-                    permissions: newPermissions
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: "testB-packages",
+                        permissions: newPermissions
+                    }
+                ],
+                message: "Testing test"
             }
         });
 
@@ -913,10 +915,13 @@ describe("Package Tests", async () => {
                     catalogSlug: "testA-packages",
                     packageSlug: "new-package-slug"
                 },
-                value: {
-                    username: "testB-packages",
-                    permissions: newPermissions
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: "testB-packages",
+                        permissions: newPermissions
+                    }
+                ],
+                message: "Testing test"
             }
         });
 
@@ -933,10 +938,13 @@ describe("Package Tests", async () => {
                     catalogSlug: "testA-packages",
                     packageSlug: "new-package-slug"
                 },
-                value: {
-                    username: "testA-packages",
-                    permissions: newPermissions
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: "testA-packages",
+                        permissions: newPermissions
+                    }
+                ],
+                message: "Testing testing"
             }
         });
 
@@ -986,7 +994,7 @@ describe("Package Tests", async () => {
                     catalogSlug: "testA-packages",
                     packageSlug: "new-package-slug"
                 },
-                username: "testA-packages"
+                usernameOrEmailAddress: "testA-packages"
             }
         });
 
@@ -1002,7 +1010,7 @@ describe("Package Tests", async () => {
                     catalogSlug: "testA-packages",
                     packageSlug: "new-package-slug"
                 },
-                username: "testB-packages"
+                usernameOrEmailAddress: "testB-packages"
             }
         });
 

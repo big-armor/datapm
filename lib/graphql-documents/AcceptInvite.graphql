@@ -1,0 +1,3 @@
+mutation AcceptInvite($token: String!, $username: String!, $password: String!) {
+    acceptInvite(token: $token, username: $username, password: $password)
+}

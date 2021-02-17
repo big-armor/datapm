@@ -65,7 +65,7 @@ import {
     setUserCollectionPermissions,
     deleteUserCollectionPermissions
 } from "./resolvers/UserCollectionPermissionResolver";
-import { deleteUserCatalogPermissions, hasCatalogPermissions } from "./resolvers/UserCatalogPermissionResolver";
+import { deleteUserCatalogPermissions, setUserCatalogPermission } from "./resolvers/UserCatalogPermissionResolver";
 import { login, logout, verifyEmailAddress } from "./resolvers/AuthResolver";
 import {
     createMe,
@@ -80,8 +80,10 @@ import {
     recoverMyPassword,
     searchUsers,
     setAsAdmin,
+    acceptInvite,
     adminSearchUsers,
-    adminDeleteUser
+    adminDeleteUser,
+    adminSetUserStatus
 } from "./resolvers/UserResolver";
 import { createAPIKey, deleteAPIKey, myAPIKeys } from "./resolvers/ApiKeyResolver";
 import {
@@ -92,10 +94,8 @@ import {
     findPackageIdentifier,
     findPackagesForCollection,
     getLatestPackages,
-    removePackagePermissions,
     searchPackages,
     setPackageCoverImage,
-    setPackagePermissions,
     updatePackage,
     myPackages,
     userPackages,
@@ -143,12 +143,12 @@ import {
     searchCatalogs,
     setCatalogAvatarImage,
     setCatalogCoverImage,
-    setUserCatalogPermission,
     updateCatalog,
     userCatalogs
 } from "./resolvers/CatalogResolver";
 
 import { myActivity, packageActivities } from "./resolvers/ActivityLogResolver";
+import { removePackagePermissions, setPackagePermissions } from "./resolvers/UserPackagePermissionResolver";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -285,6 +285,13 @@ export const resolvers: {
         parseValue: (value: any) => new Date(value)
     }),
     User: {
+        username: async (parent: User, _1: any, context: Context) => {
+            if (!parent.username) {
+                return parent.emailAddress as string;
+            }
+
+            return parent.username;
+        },
         firstName: async (parent: User, _1: any, context: Context) => {
             const user = await context.connection
                 .getCustomRepository(UserRepository)
@@ -296,7 +303,7 @@ export const resolvers: {
 
             return null;
         },
-        lastName: async (parent: any, _1: any, context: AuthenticatedContext) => {
+        lastName: async (parent: User, _1: any, context: Context) => {
             const user = await context.connection
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
@@ -307,7 +314,7 @@ export const resolvers: {
 
             return null;
         },
-        emailAddress: async (parent: any, _1: any, context: AuthenticatedContext) => {
+        emailAddress: async (parent: User, _1: any, context: Context) => {
             const user = await context.connection
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
@@ -318,7 +325,7 @@ export const resolvers: {
 
             return null;
         },
-        twitterHandle: async (parent: any, _1: any, context: AuthenticatedContext) => {
+        twitterHandle: async (parent: User, _1: any, context: Context) => {
             const user = await context.connection
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
@@ -329,7 +336,7 @@ export const resolvers: {
 
             return null;
         },
-        gitHubHandle: async (parent: any, _1: any, context: AuthenticatedContext) => {
+        gitHubHandle: async (parent: User, _1: any, context: Context) => {
             const user = await context.connection
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
@@ -340,7 +347,7 @@ export const resolvers: {
 
             return null;
         },
-        website: async (parent: any, _1: any, context: AuthenticatedContext) => {
+        website: async (parent: User, _1: any, context: Context) => {
             const user = await context.connection
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
@@ -351,7 +358,7 @@ export const resolvers: {
 
             return null;
         },
-        location: async (parent: any, _1: any, context: AuthenticatedContext) => {
+        location: async (parent: User, _1: any, context: Context) => {
             const user = await context.connection
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: parent.username });
@@ -361,6 +368,13 @@ export const resolvers: {
             }
 
             return null;
+        },
+        status: async (parent: User, _1: any, context: Context) => {
+            const user = await context.connection
+                .getCustomRepository(UserRepository)
+                .findUserByUserName({ username: parent.username });
+
+            return user.status;
         }
     },
     Catalog: {
@@ -513,56 +527,62 @@ export const resolvers: {
         login: login,
         logout: logout,
         verifyEmailAddress: verifyEmailAddress,
+
         // User
         createMe: createMe,
         updateMe: updateMe,
         setAsAdmin: setAsAdmin,
+        adminSetUserStatus: adminSetUserStatus,
         updateMyPassword: updateMyPassword,
         forgotMyPassword: forgotMyPassword,
         recoverMyPassword: recoverMyPassword,
-
         setMyCoverImage: setMyCoverImage,
         setMyAvatarImage: setMyAvatarImage,
         deleteMe: deleteMe,
+        acceptInvite: acceptInvite,
         adminDeleteUser: adminDeleteUser,
 
         // API Keys
         createAPIKey: createAPIKey,
         deleteAPIKey: deleteAPIKey,
 
+        // Catalog
         createCatalog: createCatalog,
-
         updateCatalog: updateCatalog,
-
         setCatalogCoverImage: setCatalogCoverImage,
+        deleteCatalog: deleteCatalog,
         setCatalogAvatarImage: setCatalogAvatarImage,
         deleteCatalogAvatarImage: deleteCatalogAvatarImage,
 
+        // Catalog Permissions
         setUserCatalogPermission: setUserCatalogPermission,
+        deleteUserCatalogPermissions: deleteUserCatalogPermissions,
 
-        deleteCatalog: deleteCatalog,
-
+        // Package
         createPackage: createPackage,
         updatePackage: updatePackage,
         setPackageCoverImage: setPackageCoverImage,
         deletePackage: deletePackage,
         packageFetched: packageFetched,
 
+        // Package Permissions
         setPackagePermissions: setPackagePermissions,
         removePackagePermissions: removePackagePermissions,
 
+        // Collection
         createCollection: createCollection,
         updateCollection: updateCollection,
         setCollectionCoverImage: setCollectionCoverImage,
         deleteCollection: deleteCollection,
         addPackageToCollection: addPackageToCollection,
         removePackageFromCollection: removePackageFromCollection,
+
+        // Collection Permissions
         setUserCollectionPermissions: setUserCollectionPermissions,
         deleteUserCollectionPermissions: deleteUserCollectionPermissions,
-        deleteUserCatalogPermissions: deleteUserCatalogPermissions,
 
+        // Version
         createVersion: createVersion,
-
         deleteVersion: deleteVersion,
 
         track: (_, { actions }, context: Context) => mixpanel.track(actions, context.request)

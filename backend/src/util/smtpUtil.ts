@@ -6,7 +6,9 @@ import { Address } from "nodemailer/lib/mailer";
 export enum EMAIL_SUBJECTS {
     NEW_API_KEY = "⚠ New API Key Created",
     VERIFY_EMAIL = "✓ Verify Your New Account",
-    FORGOT_PASSWORD = "⚠ Recover Your Account"
+    FORGOT_PASSWORD = "⚠ Recover Your Account",
+    INVITE_USER = "🚀 Data Invite",
+    USER_SUSPENDED = "Your account has been suspended"
 }
 
 export async function sendAPIKeyCreatedEmail(user: UserEntity, apiKeyLabel: string) {
@@ -22,6 +24,19 @@ export async function sendAPIKeyCreatedEmail(user: UserEntity, apiKeyLabel: stri
     sendEmail(user, EMAIL_SUBJECTS.NEW_API_KEY, emailText, emailHTML);
 }
 
+export async function sendUserSuspendedEmail(user: UserEntity, message: string) {
+    let emailText = fs.readFileSync("./static/email-templates/user-suspended.txt", "utf8");
+    let emailHTML = fs.readFileSync("./static/email-templates/user-suspended.html", "utf8");
+
+    emailText = replaceCommonTokens(user, emailText);
+    emailText = emailText.replace(/{{message}}/g, message);
+
+    emailHTML = replaceCommonTokens(user, emailHTML);
+    emailHTML = emailHTML.replace(/{{message}}/g, message);
+
+    sendEmail(user, EMAIL_SUBJECTS.USER_SUSPENDED, emailText, emailHTML);
+}
+
 export async function sendForgotPasswordEmail(user: UserEntity, token: string) {
     let emailText = fs.readFileSync("./static/email-templates/forgot-password.txt", "utf8");
     let emailHTML = fs.readFileSync("./static/email-templates/forgot-password.html", "utf8");
@@ -32,6 +47,74 @@ export async function sendForgotPasswordEmail(user: UserEntity, token: string) {
     emailHTML = emailHTML.replace(/{{token}}/g, token);
 
     sendEmail(user, EMAIL_SUBJECTS.FORGOT_PASSWORD, emailText, emailHTML);
+}
+
+export function validateMessageContents(message: string) {
+    if (message.length > 250) throw new Error("MESSAGE_TOO_LONG");
+
+    if (message.match(/([a-zA-Z0-9._+-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gim) != null)
+        throw new Error("MESSAGE_CANNOT_CONTAIN_EMAIL_ADDRESS");
+
+    if (
+        message.match(
+            /(?:(?:https?|ftp|file):\/\/)(?:\([-a-zA-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-a-zA-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-a-zA-Z0-9+&@#\/%=~_|$?!:,.]*\)|[a-zA-Z0-9+&@#\/%=~_|$])/gm
+        ) != null
+    )
+        throw new Error("MESSAGE_CANNOT_CONTAIN_URL");
+
+    if (message.match(/<[^>]*>/gi) != null) throw new Error("MESSAGE_CANNOT_CONTAIN_HTML_TAGS");
+}
+
+export async function sendShareNotification(
+    user: UserEntity,
+    inviterName: string,
+    dataName: string,
+    relativeUrl: string,
+    message: string
+) {
+    let emailText = fs.readFileSync("./static/email-templates/share-notification.txt", "utf8");
+    let emailHTML = fs.readFileSync("./static/email-templates/share-notification.html", "utf8");
+
+    validateMessageContents(message);
+
+    emailText = replaceCommonTokens(user, emailText);
+    emailText = emailText.replace(/{{url}}/g, process.env["REGISTRY_URL"] + relativeUrl);
+    emailText = emailText.replace(/{{data_name}}/g, dataName);
+    emailText = emailText.replace(/{{inviter_name}}/g, inviterName);
+
+    emailText = emailText.replace(/{{message}}/g, message);
+
+    emailHTML = replaceCommonTokens(user, emailHTML);
+    emailHTML = emailHTML.replace(/{{url}}/g, process.env["REGISTRY_URL"] + relativeUrl);
+    emailHTML = emailHTML.replace(/{{data_name}}/g, dataName);
+    emailHTML = emailHTML.replace(/{{inviter_name}}/g, inviterName);
+
+    emailHTML = emailHTML.replace(/{{message}}/g, message);
+
+    sendEmail(user, EMAIL_SUBJECTS.INVITE_USER, emailText, emailHTML);
+}
+
+export async function sendInviteUser(user: UserEntity, inviterName: string, dataName: string, message: string) {
+    let emailText = fs.readFileSync("./static/email-templates/user-invite.txt", "utf8");
+    let emailHTML = fs.readFileSync("./static/email-templates/user-invite.html", "utf8");
+
+    validateMessageContents(message);
+
+    emailText = replaceCommonTokens(user, emailText);
+    emailText = emailText.replace(/{{token}}/g, user.verifyEmailToken!);
+    emailText = emailText.replace(/{{data_name}}/g, dataName);
+    emailText = emailText.replace(/{{inviter_name}}/g, inviterName);
+
+    emailText = emailText.replace(/{{message}}/g, message);
+
+    emailHTML = replaceCommonTokens(user, emailHTML);
+    emailHTML = emailHTML.replace(/{{token}}/g, user.verifyEmailToken!);
+    emailHTML = emailHTML.replace(/{{data_name}}/g, dataName);
+    emailHTML = emailHTML.replace(/{{inviter_name}}/g, inviterName);
+
+    emailHTML = emailHTML.replace(/{{message}}/g, message);
+
+    sendEmail(user, EMAIL_SUBJECTS.INVITE_USER, emailText, emailHTML);
 }
 
 export async function sendVerifyEmail(user: UserEntity, token: string) {

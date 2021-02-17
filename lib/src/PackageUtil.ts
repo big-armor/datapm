@@ -15,7 +15,7 @@ export type DPMRecordValue =
     | Array<DPMRecordValue>
     | null;
 export type DPMRecord = Record<string, DPMRecordValue>;
-export type DPMConfiguration = Record<string, number | string | boolean | null>;
+export type DPMConfiguration = Record<string, number | string | boolean | { [key: string]: unknown } | null>;
 
 export enum Compability {
     Identical = 0,
@@ -286,7 +286,7 @@ export function compareConfigObjects(
         if (typeof priorValue !== typeof newValue) return false;
 
         if (typeof priorValue === "object" && typeof newValue === "object") {
-            if (!compareConfigObjects(priorValue, newValue)) return false;
+            if (!compareConfigObjects(priorValue as DPMConfiguration, newValue as DPMConfiguration)) return false;
         } else if (priorValue !== newValue) return false;
     }
 

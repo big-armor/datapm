@@ -13,7 +13,8 @@ enum State {
     INCORRECT_LOGIN,
     LOGGED_IN,
     LOGIN_ERROR,
-    LOGIN_ERROR_VALIDATE_EMAIL
+    LOGIN_ERROR_VALIDATE_EMAIL,
+    LOGIN_ERROR_ACCOUNT_SUSPENDED
 }
 
 @Component({
@@ -72,6 +73,8 @@ export class LoginDialogComponent implements OnInit, OnDestroy {
                         value.errors.find((e) => e.message === AUTHENTICATION_ERROR.EMAIL_ADDRESS_NOT_VERIFIED)
                     ) {
                         this.state = State.LOGIN_ERROR_VALIDATE_EMAIL;
+                    } else if (value.errors.find((e) => e.message === AUTHENTICATION_ERROR.ACCOUNT_SUSPENDED)) {
+                        this.state = State.LOGIN_ERROR_ACCOUNT_SUSPENDED;
                     } else {
                         this.state = State.LOGIN_ERROR;
                     }

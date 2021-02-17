@@ -1,0 +1,104 @@
+@import "./src/styles/variables.scss";
+
+.mat-dialog-title {
+    padding: 20px 20px 0;
+}
+
+#username-label {
+    color: $color-danger;
+}
+
+.description {
+    padding: 20px 0;
+    background: $white;
+    border-radius: 4px;
+    position: relative;
+    h4 {
+        font-size: 14px;
+        margin: 0px 20px;
+    }
+
+    &:before {
+        content: "";
+        position: absolute;
+        width: 114%;
+        height: 1px;
+        background: $gray-3;
+        top: 0px;
+        left: -24px;
+    }
+
+    &:after {
+        content: "";
+        position: absolute;
+        width: 114%;
+        height: 1px;
+        background: $gray-4;
+        bottom: 0px;
+        left: -24px;
+    }
+}
+
+.content {
+    padding: 20px;
+    text-align: justify;
+}
+
+.mat-dialog-actions {
+    padding: 20px;
+    button {
+        margin: 0 auto;
+        outline: unset;
+        transition: 0.3s all ease-in-out;
+        color: $white;
+        padding: 0px 55px;
+    }
+
+    .confirm-button {
+        border: 1px solid $color-danger;
+        background: $white;
+        color: $gray-3;
+        font-family: $family-roboto;
+        font-size: $text-font;
+        font-weight: $weight-400;
+
+        &:hover {
+            border: 1px solid $color-danger;
+            background: $white;
+            color: $gray-3;
+            font-family: $family-roboto;
+            font-size: $text-font;
+        }
+    }
+
+    .cancel-button {
+        border: 1px solid $gray-3;
+        background: $white;
+        color: $gray-3;
+
+        &:hover {
+            border: 1px solid $gray-3;
+            background: $white;
+            color: $gray-3;
+        }
+    }
+}
+
+.fixActionRow {
+    height: 95%;
+    display: flex;
+    flex-direction: column;
+}
+
+.spacer {
+    flex-grow: 1;
+}
+
+.one-line-input {
+    ::ng-deep input.mat-input-element {
+        border: none;
+        border-bottom: 2px solid $color-danger;
+        background: transparent;
+        outline: transparent solid 1px;
+    }
+}

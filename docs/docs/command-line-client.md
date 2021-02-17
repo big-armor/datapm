@@ -8,7 +8,7 @@ DataPM's mission is to make the world's data more accessible. This command line 
 
 -   [Install the DataPM Command Line Client](#install-the-datapm-command-line-client)
 -   [View Help Options](#view-help-options)
--   [Generate An API Key](#generate-an-api-key)
+-   [Authenticate The Client](#authenticate-the-client)
 -   [Search Registries](#search-registries)
 -   [Consume Data](#consume-data)
 -   [Publish Data](#publish-data)
@@ -53,15 +53,25 @@ datapm --help
 datapm publish --help
 ```
 
-## Generate An API Key
+## Authenticate The Client
 
 To publish packages or perform any authenticated tasks, you'll need to add an API key to your command line client. Here are the instructions to generate an API Key.
+
+#### Either Login with Command Line Client
+
+Use the following command to login directly from the command line client.
+
+```
+datapm registry login
+```
+
+#### OR Create API Key Via Web Browser
 
 1. Using a web browser, [visit the registry](/)
 1. Log in or sign up as a new user
 1. Click your profile icon in the upper right
-1. Click "API Keys"
-1. Click "Create New API Key"
+1. Click "My Profiles"
+1. Near the bottom, enter a new label and click "Create New API Key"
 1. Copy the command provided
 1. Paste the command into your terminal
 
@@ -98,7 +108,7 @@ _Important Note:_ Right now, DataPM only supports publishing data schemas. So yo
 Use the command line client to create a data package file based on any publicly available data set.
 
 ```text
-datapm generate-package https://some-web-server.com/path/to/data.csv
+datapm package https://some-web-server.com/path/to/data.csv
 ```
 
 Follow the prompts to complete the package file. Then use the following command to publish the package.

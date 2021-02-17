@@ -26,6 +26,9 @@ export class ActivityLogEntity extends EntityBaseModel {
     @Column({ name: "change_type", nullable: false })
     public changeType?: ActivityLogChangeType;
 
+    @Column({ name: "target_user_id", nullable: true })
+    public targetUserId?: number;
+
     @Column({ name: "target_package_id", nullable: true })
     public targetPackageId?: number;
 
