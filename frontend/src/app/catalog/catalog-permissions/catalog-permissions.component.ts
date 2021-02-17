@@ -57,7 +57,8 @@ export class CatalogPermissionsComponent implements OnChanges {
 
     public addUser(): void {
         const dialogRef = this.dialog.open(AddUserComponent, {
-            data: this.catalog?.identifier.catalogSlug
+            width: "550px",
+            data: this.catalog
         });
 
         dialogRef.afterClosed().subscribe((result) => {
@@ -77,7 +78,7 @@ export class CatalogPermissionsComponent implements OnChanges {
                 identifier: {
                     catalogSlug: this.catalog?.identifier.catalogSlug
                 },
-                username
+                usernameOrEmailAddress: username
             })
             .subscribe(({ errors }) => {
                 if (errors) {
@@ -85,6 +86,7 @@ export class CatalogPermissionsComponent implements OnChanges {
                         this.snackBarService.openSnackBar("Can not remove the catalog creator.", "Ok");
                     else this.snackBarService.openSnackBar("There was a problem. Try again later.", "Ok");
                 }
+                this.getUserList();
             });
     }
 
@@ -118,15 +120,16 @@ export class CatalogPermissionsComponent implements OnChanges {
         }
 
         this.usersByCatalogGQL
-            .watch({
+            .fetch({
                 identifier: {
                     catalogSlug: this.catalog.identifier.catalogSlug
                 }
             })
-            .valueChanges.subscribe(({ data }) => {
+            .subscribe(({ data }) => {
                 this.users = data.usersByCatalog.map((item) => ({
                     username: item.user.username,
                     name: this.getUserName(item.user as User),
+                    pendingInvitationAcceptance: item.user.username.includes("@"),
                     permission: this.findHighestPermission(item.permissions)
                 }));
             });
@@ -138,11 +141,14 @@ export class CatalogPermissionsComponent implements OnChanges {
                 identifier: {
                     catalogSlug: this.catalog?.identifier.catalogSlug
                 },
-                value: {
-                    username,
-                    permission: permissions,
-                    packagePermission: []
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: username,
+                        permission: permissions,
+                        packagePermission: []
+                    }
+                ],
+                message: ""
             })
             .subscribe(({ errors }) => {
                 if (errors) {

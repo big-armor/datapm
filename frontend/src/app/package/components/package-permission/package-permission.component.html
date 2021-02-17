@@ -1,5 +1,5 @@
 <div class="container mt-5">
-    <h2>Manage Package</h2>
+    <h1>Manage Package</h1>
     <button class="app-outlined-button" (click)="deletePackage()">Delete This Package</button>
 </div>
 
@@ -42,6 +42,7 @@
                 ></a>
 
                 <a class="ml-2" [routerLink]="'/' + user.username">{{ user.name }}</a>
+                <span *ngIf="user.pendingInvitationAcceptance"> &nbsp;(pending invite acceptance)</span>
             </div>
         </td>
     </ng-container>

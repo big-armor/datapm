@@ -3,14 +3,24 @@ import {
     UserDocument,
     SearchUsersDocument,
     AdminDeleteUserDocument,
-    AdminSearchUsersDocument
+    AdminSearchUsersDocument,
+    AdminSetUserStatusDocument,
+    UserStatus,
+    LoginDocument,
+    AUTHENTICATION_ERROR,
+    MeDocument
 } from "./registry-client";
-import { createUser } from "./test-utils";
+import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
 import { AdminHolder } from "./admin-holder";
+import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 
-describe("User Tests", async () => {
+describe("Admin Tests", async () => {
+    let anonymousClient: ApolloClient<NormalizedCacheObject> = createAnonymousClient();
+    let nonAdminUserClient: ApolloClient<NormalizedCacheObject>;
+
     before(async () => {});
+    beforeEach((done) => setTimeout(done, 100));
 
     it("Non admin can't search for users without restrictions", async () => {
         const nonAdminUser = await createUser(
@@ -32,14 +42,62 @@ describe("User Tests", async () => {
         expect(userSearchQuery.errors?.some((error) => error.message.includes("NOT_AUTHORIZED"))).to.be.true;
     });
 
-    it("Non admin can't delete users", async () => {
-        await createUser(
-            "UserToTryToDelete",
-            "UserToTryToDelete",
-            "UserToTryToDelete",
-            "UserToTryToDelete@test.datapm.io",
-            "passwordB!"
+    it("Non admin can't suspend users", async () => {
+        nonAdminUserClient = await createUser(
+            "NonAdminSuspender",
+            "NonAdminSuspender",
+            "NonAdminSuspender",
+            "NonAdminSuspender@test.datapm.io",
+            "passwordA!"
         );
+        const userStatusChangeResult = await nonAdminUserClient.mutate({
+            mutation: AdminSetUserStatusDocument,
+            variables: {
+                username: "NonAdmin",
+                status: UserStatus.SUSPENDED,
+                message: "You've been a bad user"
+            }
+        });
+
+        expect(userStatusChangeResult.errors?.some((error) => error.message.includes("NOT_AUTHORIZED"))).to.be.true;
+    });
+
+    it("Admin can suspend users", async () => {
+        const userStatusChangeResult = await AdminHolder.adminClient.mutate({
+            mutation: AdminSetUserStatusDocument,
+            variables: {
+                username: "NonAdminSuspender",
+                status: UserStatus.SUSPENDED,
+                message: "You've been a bad user"
+            }
+        });
+
+        expect(userStatusChangeResult.errors).to.be.undefined;
+    });
+
+    it("Suspended user can't do queries that require valid authentication", async () => {
+        const meResponse = await nonAdminUserClient.query({
+            query: MeDocument
+        });
+
+        expect(meResponse.errors?.some((error) => error.message.includes(AUTHENTICATION_ERROR.ACCOUNT_SUSPENDED))).to.be
+            .true;
+    });
+
+    it("Suspended user can't login", async () => {
+        const loginResponse = await anonymousClient.mutate({
+            mutation: LoginDocument,
+            variables: {
+                username: "NonAdminSuspender",
+                password: "passwordA!"
+            }
+        });
+
+        expect(loginResponse.errors?.some((error) => error.message.includes(AUTHENTICATION_ERROR.ACCOUNT_SUSPENDED))).to
+            .be.true;
+    });
+
+    it("Non admin can't delete users", async () => {
         const nonAdminUser = await createUser(
             "NonAdmin2",
             "NonAdmin2",
@@ -47,10 +105,11 @@ describe("User Tests", async () => {
             "NonAdmin2@test.datapm.io",
             "passwordA!"
         );
+
         const userDeletion = await nonAdminUser.mutate({
             mutation: AdminDeleteUserDocument,
             variables: {
-                username: "UserToTryToDelete"
+                usernameOrEmailAddress: "UserToTryToDelete"
             }
         });
 
@@ -62,7 +121,7 @@ describe("User Tests", async () => {
         await AdminHolder.adminClient.mutate({
             mutation: AdminDeleteUserDocument,
             variables: {
-                username: "UserToDelete"
+                usernameOrEmailAddress: "UserToDelete"
             }
         });
 

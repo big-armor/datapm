@@ -262,19 +262,6 @@ export const setCatalogCoverImage = async (
     await ImageStorageService.INSTANCE.saveCatalogCoverImage(catalog.id, image.base64);
 };
 
-export const setUserCatalogPermission = async (
-    _0: any,
-    { identifier, value }: { identifier: CatalogIdentifierInput; value: SetUserCatalogPermissionInput },
-    context: AuthenticatedContext,
-    info: any
-) => {
-    await context.connection.getCustomRepository(UserCatalogPermissionRepository).setUserCatalogPermission({
-        identifier,
-        value,
-        relations: getGraphQlRelationName(info)
-    });
-};
-
 export const deleteCatalog = async (
     _0: any,
     { identifier }: { identifier: CatalogIdentifierInput },
