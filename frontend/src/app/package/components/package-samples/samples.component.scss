@@ -2,12 +2,11 @@
 
 .table-wrapper {
     height: 100%;
-    top: 10px;
-    border-radius: 4px;
 }
 
 #sampleTable {
     width: 100%;
+
     tbody {
         overflow-y: scroll;
     }
@@ -22,19 +21,45 @@
     padding: 8px 8px 8px 8px;
     border-right: 1px solid $gray-9;
     border-top: 1px solid $gray-9;
+    max-height: 40px;
+    height: 40px;
 }
 
 .mat-cell {
     padding: 8px 8px 8px 8px;
     border-right: 1px solid $gray-9;
-    max-height: 75px;
-    height: 75px;
+    max-height: 40px;
+    height: 40px;
+    font-family: $family-roboto;
+    font-weight: $weight-400;
+    font-size: $small-font;
+    letter-spacing: 0.4px;
+    color: $gray-2;
 }
 
 .oddRow {
     background-color: $white;
 }
 
-.mat-cell {
-    height: 75px;
+tr.mat-header-row {
+    height: 40px !important;
+}
+
+::ng-deep .my-second-custom-dialog {
+    .mat-dialog-container {
+        padding: 40px 25px 30px 25px !important;
+        .mat-table thead {
+            opacity: 1;
+            color: $white;
+            background-color: $gray-3;
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    ::ng-deep .my-second-custom-dialog {
+        .mat-dialog-container {
+            padding: 25px 25px 3px 25px !important;
+        }
+    }
 }

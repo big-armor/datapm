@@ -14,6 +14,7 @@ import { UserDetailsPageComponent } from "./user-details-page/user-details-page.
 import { AddUserComponent } from "./add-user/add-user.component";
 import { CatalogPermissionsComponent } from "./catalog-permissions/catalog-permissions.component";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
+import { MatSelectModule } from "@angular/material/select";
 
 @NgModule({
     declarations: [
@@ -30,6 +31,7 @@ import { MatAutocompleteModule } from "@angular/material/autocomplete";
         MatProgressSpinnerModule,
         MatAutocompleteModule,
         MatSlideToggleModule,
+        MatSelectModule,
         MatTableModule,
         MatTabsModule,
         SharedModule

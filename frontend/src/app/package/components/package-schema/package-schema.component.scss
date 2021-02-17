@@ -1,16 +1,6 @@
 @import "../../../../styles/variables";
 
 #schema {
-    .schema-title {
-        font-family: $family-roboto;
-        font-style: $style-normal;
-        font-size: ($title-font + 4);
-        font-weight: $weight-400;
-        margin-bottom: 15px;
-        color: $gray-1;
-        letter-spacing: 0.6px;
-    }
-
     .schema-text {
         font-family: $family-roboto;
         font-style: $style-normal;

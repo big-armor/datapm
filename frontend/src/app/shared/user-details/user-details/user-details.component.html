@@ -1,9 +1,9 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <div id="detailsPage" class="big-div-package">
+            <div id="detailsPage" class="big-div-package pl-2">
                 <div class="package-div panel-div">
-                    <div class="section-title">Actions</div>
+                    <div class="package-details-title">Actions</div>
                     <div class="d-flex flex-row bd-highlight">
                         <div class="mb-3">
                             <a class="app-outlined-button mr-3" (click)="openEditDialog()">Edit My Profile</a>
@@ -13,11 +13,11 @@
                 </div>
 
                 <div class="package-div panel-div">
-                    <div *ngIf="myAPIKeys && myAPIKeys.length > 0" class="section-title">My API Keys</div>
-                    <div *ngIf="myAPIKeys && myAPIKeys.length === 0" class="section-title api-keys-title">
+                    <div *ngIf="myAPIKeys && myAPIKeys.length > 0" class="package-details-title">My API Keys</div>
+                    <div *ngIf="myAPIKeys && myAPIKeys.length === 0" class="package-details-title api-keys-title">
                         Create your first API Key
                     </div>
-                    <div class="section-description">
+                    <div class="package-dark-gray">
                         API Keys are for authenticating your
                         <a href="/docs/command-line-client/">DataPM Command Line Client</a>, and custom software
                         development projects using the <a href="/docs/registry-api/">DataPM Registry API</a>.

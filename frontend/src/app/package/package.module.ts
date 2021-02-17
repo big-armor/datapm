@@ -36,6 +36,7 @@ import { SharePackageComponent } from "./components/package-info/share-package/s
 import { DownloadPackageComponent } from "./components/package-info/download-package/download-package.component";
 import { ClientWizardComponent } from "./components/package-info/download-package/client-wizard/client-wizard.component";
 import { MatStepperModule } from "@angular/material/stepper";
+import { MatSelectModule } from "@angular/material/select";
 
 @NgModule({
     declarations: [
@@ -72,6 +73,7 @@ import { MatStepperModule } from "@angular/material/stepper";
         MatProgressSpinnerModule,
         SharedModule,
         ScrollingModule,
+        MatSelectModule,
         MatStepperModule,
         TableVirtualScrollModule,
         MarkdownModule.forChild(),

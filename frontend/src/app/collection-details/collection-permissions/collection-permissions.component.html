@@ -1,76 +1,81 @@
-<div class="container mt-5">
-    <h2>Manage Collection</h2>
-    <button class="app-outlined-button mr-2" (click)="editCollection()">Edit Collection Details</button>
-    <button class="app-outlined-button" (click)="deleteCollection()">Delete This Collection</button>
-</div>
+<div class="container mt-4 pt-2">
+    <div class="mb-4 pb-3">
+        <div class="package-details-title">Public Access</div>
+        <p class="package-dark-gray">
+            Enabling public access allows all users, including anonymous users, to view the name, description, and
+            packages in this collection. Users must have access to each individual package to view them.
+        </p>
 
-<div class="container mt-5">
-    <h2>Public Access</h2>
-    <p>
-        Enabling public access allows all users, including anonymous users, to view the name, description, and packages
-        in this collection. Users must have access to each individual package to view them.
-    </p>
-</div>
-
-<div class="d-flex align-items-center justify-content-between mb-3">
-    <div class="d-flex align-items-center public-toggle">
-        <div class="px-4 py-2 label">Make this collection public</div>
-        <div class="ml-auto px-4 py-2 slide-right">
-            <mat-slide-toggle
-                class="app-slide-toggle"
-                [checked]="collection?.isPublic"
-                (change)="updatePublic($event)"
-            ></mat-slide-toggle>
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center public-toggle">
+                <div class="package-dark-gray">Make this collection public</div>
+                <div class="ml-auto px-2 pb-1 slide-right">
+                    <mat-slide-toggle
+                        class="app-slide-toggle"
+                        [checked]="collection?.isPublic"
+                        (change)="updatePublic($event)"
+                    ></mat-slide-toggle>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="container mt-5" *ngIf="users?.length">
-    <h2>Users With Access</h2>
-    <p>The following users have individual permission this collection.</p>
-    <button class="app-outlined-button" (click)="addUser()" *ngIf="users.length > 0">Add User</button>
-</div>
+    <div class="package-details-title">Manage Collection</div>
+    <button class="app-outlined-button mr-2" (click)="editCollection()">Edit Collection Details</button>
+    <button class="app-outlined-button" (click)="deleteCollection()">Delete This Collection</button>
 
-<!-- Package without thupmbnail -->
-<table mat-table [dataSource]="users" *ngIf="users.length > 0">
-    <!-- Label column -->
-    <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>User</th>
-        <td class="table-content" mat-cell *matCellDef="let user">
-            <div style="display: flex; justify-content: start; align-content: center">
-                <a class="ml-2" [routerLink]="'/' + user.username"
-                    ><app-avatar [user]="user" [size]="24"></app-avatar
-                ></a>
+    <div class="mt-4 py-3" *ngIf="users?.length">
+        <div class="package-details-title">Users With Access</div>
+        <p class="package-dark-gray">The following users have individual permission this collection.</p>
+        <button class="app-outlined-button" (click)="addUser()" *ngIf="users.length > 0">Add User</button>
+    </div>
 
-                <a class="ml-2" [routerLink]="'/' + user.username">{{ user.name }}</a>
-            </div>
-        </td>
-    </ng-container>
+    <!-- Package without thupmbnail -->
+    <table mat-table [dataSource]="users" *ngIf="users.length > 0" class="gray-table">
+        <!-- Label column -->
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef scope="col">User</th>
+            <td class="table-content" mat-cell *matCellDef="let user">
+                <div style="display: flex; justify-content: start; align-content: center">
+                    <a class="ml-2" [routerLink]="'/' + user.username"
+                        ><app-avatar [user]="user" [size]="24"></app-avatar
+                    ></a>
 
-    <ng-container matColumnDef="permission">
-        <th mat-header-cell *matHeaderCellDef>Permission</th>
-        <td class="table-content" mat-cell *matCellDef="let user">
-            <select [value]="user.permission" (change)="updatePermission(user.username, $event.target.value)">
-                <option value="VIEW">View</option>
-                <option value="EDIT">Edit</option>
-                <option value="MANAGE">Manage</option>
-            </select>
-        </td>
-    </ng-container>
+                    <a class="ml-2" [routerLink]="'/' + user.username">{{ user.name }}</a>
+                </div>
+            </td>
+        </ng-container>
 
-    <!-- Actions column -->
-    <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef>Actions</th>
-        <td mat-cell *matCellDef="let user">
-            <a class="app-outlined-button mr-3" (click)="removeUser(user.username)">Remove</a>
-        </td>
-    </ng-container>
+        <ng-container matColumnDef="permission">
+            <th mat-header-cell *matHeaderCellDef scope="col">Permission</th>
+            <td class="table-content" mat-cell *matCellDef="let user">
+                <mat-form-field appearance="fill" class="permission-div">
+                    <mat-select
+                        [value]="user.permission"
+                        (selectionChange)="updatePermission(user.username, $event.target.value)"
+                    >
+                        <mat-option value="VIEW">View </mat-option>
+                        <mat-option value="EDIT">Edit </mat-option>
+                        <mat-option value="MANAGE">Manage </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </td>
+        </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-    <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
-</table>
+        <!-- Actions column -->
+        <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef scope="col">Actions</th>
+            <td mat-cell *matCellDef="let user">
+                <a class="app-outlined-button mr-3" (click)="removeUser(user.username)">Remove</a>
+            </td>
+        </ng-container>
 
-<div class="dpm-no-data" *ngIf="!users.length">
-    <p>There are no users who have permissions to this collection.</p>
-    <a class="app-outlined-button mt-3" (click)="addUser()">Add a user</a>
+        <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
+    </table>
+
+    <div class="dpm-no-data" *ngIf="!users.length">
+        <p>There are no users who have permissions to this collection.</p>
+        <a class="app-outlined-button mt-3" (click)="addUser()">Add a user</a>
+    </div>
 </div>
