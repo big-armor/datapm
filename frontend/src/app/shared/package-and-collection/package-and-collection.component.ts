@@ -48,6 +48,9 @@ export class PackageAndCollectionComponent implements OnInit, OnChanges {
     public hasCollectionsErrors: boolean = false;
     public hasPackageErrors: boolean = false;
 
+    public loadedCollectionsInitially: boolean = false;
+    public loadedPackagesInitially: boolean = false;
+
     public ngOnInit(): void {
         if (!this.subtitlesPrefix) {
             this.subtitlesPrefix = this.title;
@@ -69,30 +72,44 @@ export class PackageAndCollectionComponent implements OnInit, OnChanges {
 
     private loadMoreCollections(): void {
         this.loadingCollections = true;
-        this.collectionsQuery.pipe(finalize(() => (this.loadingCollections = false))).subscribe((response) => {
-            if (response.collections) {
-                this.collections = response.shouldResetCollection
-                    ? response.collections
-                    : this.collections.concat(response.collections);
-                this.hasMoreCollections = response.hasMore;
-            }
+        this.collectionsQuery
+            .pipe(
+                finalize(() => {
+                    this.loadingCollections = false;
+                    this.loadedCollectionsInitially = true;
+                })
+            )
+            .subscribe((response) => {
+                if (response.collections) {
+                    this.collections = response.shouldResetCollection
+                        ? response.collections
+                        : this.collections.concat(response.collections);
+                    this.hasMoreCollections = response.hasMore;
+                }
 
-            this.hasCollectionsErrors = response.errors != null;
-        });
+                this.hasCollectionsErrors = response.errors != null;
+            });
     }
 
     private loadMorePackages(): void {
         this.loadingPackages = true;
-        this.packagesQuery.pipe(finalize(() => (this.loadingPackages = false))).subscribe((response) => {
-            if (response.packages) {
-                this.packages = response.shouldResetCollection
-                    ? response.packages
-                    : this.packages.concat(response.packages);
-                this.hasMorePackages = response.hasMore;
-            }
+        this.packagesQuery
+            .pipe(
+                finalize(() => {
+                    this.loadingPackages = false;
+                    this.loadedPackagesInitially = true;
+                })
+            )
+            .subscribe((response) => {
+                if (response.packages) {
+                    this.packages = response.shouldResetCollection
+                        ? response.packages
+                        : this.packages.concat(response.packages);
+                    this.hasMorePackages = response.hasMore;
+                }
 
-            this.hasPackageErrors = response.errors != null;
-        });
+                this.hasPackageErrors = response.errors != null;
+            });
     }
 
     public requestMoreCollections(): void {
