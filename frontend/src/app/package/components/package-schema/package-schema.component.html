@@ -37,7 +37,7 @@
                                                 type.recordCount / schema.recordCount | percent
                                             }}) {{ schema.unit }} records
                                         </li>
-                                        <li>unit: {{ property.unit }}</li>
+                                        <li *ngIf="property.unit">unit: {{ property.unit }}</li>
                                         <li>max value: {{ type.numberMaxValue | number }}</li>
                                         <li>min value: {{ type.numberMinValue | number }}</li>
                                     </ul>
