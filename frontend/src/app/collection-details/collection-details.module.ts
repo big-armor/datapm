@@ -16,6 +16,7 @@ import { AddUserComponent } from "./add-user/add-user.component";
 import { CollectionPermissionsComponent } from "./collection-permissions/collection-permissions.component";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatSelectModule } from "@angular/material/select";
+import { MatStepperModule } from "@angular/material/stepper";
 import { MatInputModule } from "@angular/material/input";
 import { MatFormFieldModule } from "@angular/material/form-field";
 
@@ -33,6 +34,7 @@ import { MatFormFieldModule } from "@angular/material/form-field";
         MatTableModule,
         MatSlideToggleModule,
         MatButtonModule,
+        MatStepperModule,
         MatInputModule,
         MatFormFieldModule
     ]

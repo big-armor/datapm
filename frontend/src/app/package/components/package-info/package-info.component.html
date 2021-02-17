@@ -3,7 +3,9 @@
         <div class="row pb-3 pt-1 mb-4 share-data">
             <div class="col-12 justify-content-end" style="display: flex">
                 <div class="px-1 d-flex flex-column bd-highlight">
-                    <button class="app-outlined-button"><a>Download</a></button>
+                    <button class="app-outlined-button" (click)="downloadPackage()">
+                        <a>Download</a>
+                    </button>
                 </div>
                 <div
                     class="px-1 d-flex flex-column bd-highlight share-btn"
@@ -60,7 +62,7 @@
             </div>
             <div class="col-6">
                 <p class="package-light-gray">record count</p>
-                <p class="package-dark-gray">{{ getRecordCount(packageFile) | number }}</p>
+                <p class="package-dark-gray">{{ getRecordCount(packageFile) | number }} {{ packageUnit }} records</p>
             </div>
         </div>
         <div class="row">
