@@ -21,6 +21,7 @@ type User {
     emailAddressIsPublic: Boolean
     websiteIsPublic: Boolean
     isAdmin: Boolean
+    status: UserStatus
 }
 
 """

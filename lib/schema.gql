@@ -58,6 +58,12 @@ A string that uniquely identifies a Username or Email address - this is an inter
 """
 scalar UsernameOrEmailAddress
 
+enum UserStatus {
+    PENDING_SIGN_UP
+    ACTIVE
+    SUSPENDED
+}
+
 """
 Server status states
 """
@@ -122,6 +128,7 @@ enum ActivityLogEventType {
     USER_CREATED
     USER_DELETED
     USER_EDIT
+    USER_STATUS_CHANGED
 }
 
 enum ActivityLogChangeType {
@@ -468,7 +475,7 @@ input UpdateCatalogInput {
 }
 
 input SetUserCatalogPermissionInput {
-    username: String! @validUsername
+    usernameOrEmailAddress: String! @validUsernameOrEmailAddress
 
     """
     The users permissions for the catalog itself
@@ -506,7 +513,7 @@ input UpdatePackageInput {
 The properties for updating a specific user's permissions on a package
 """
 input SetPackagePermissionInput {
-    username: String! @validUsername
+    usernameOrEmailAddress: String! @validUsernameOrEmailAddress
     permissions: [Permission!]!
 }
 
@@ -783,6 +790,11 @@ type Mutation {
     setAsAdmin(username: String! @validUsernameOrEmailAddress, isAdmin: Boolean!): Void @isAdmin
 
     """
+    Updates the user's status and sends a notification email to them
+    """
+    adminSetUserStatus(username: String! @validUsername, status: UserStatus!, message: String): Void @isAdmin
+
+    """
     Updates the logged in users' password
     """
     updateMyPassword(value: UpdateMyPasswordInput!): Void @isAuthenticated
@@ -815,7 +827,7 @@ type Mutation {
     """
     Deletes a user's account
     """
-    adminDeleteUser(username: String!): Void @isAdmin
+    adminDeleteUser(usernameOrEmailAddress: String! @validUsernameOrEmailAddress): Void @isAdmin
 
     """
     Using a username or email address and a password, requests authentication information for the given user
@@ -877,7 +889,8 @@ type Mutation {
     """
     setUserCatalogPermission(
         identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
-        value: SetUserCatalogPermissionInput!
+        value: [SetUserCatalogPermissionInput!]!
+        message: String!
     ): Void
 
     """
@@ -963,7 +976,8 @@ type Mutation {
     """
     setUserCollectionPermissions(
         identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
-        value: SetUserCollectionPermissionsInput!
+        value: [SetUserCollectionPermissionsInput!]!
+        message: String!
     ): Void
 
     """
@@ -971,7 +985,7 @@ type Mutation {
     """
     deleteUserCollectionPermissions(
         identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
-        username: String! @validUsername
+        usernameOrEmailAddress: String! @validUsernameOrEmailAddress
     ): Void
 
     """
@@ -979,15 +993,16 @@ type Mutation {
     """
     deleteUserCatalogPermissions(
         identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
-        username: String! @validUsername
+        usernameOrEmailAddress: String! @validUsernameOrEmailAddress
     ): Void
 
     """
-    Sets the permissions for a given user
+    Sets the permissions for a given set of users
     """
     setPackagePermissions(
         identifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
-        value: SetPackagePermissionInput!
+        value: [SetPackagePermissionInput!]!
+        message: String!
     ): Void
 
     """
@@ -995,7 +1010,7 @@ type Mutation {
     """
     removePackagePermissions(
         identifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
-        username: String! @validUsername
+        usernameOrEmailAddress: String! @validUsernameOrEmailAddress
     ): Void
 
     """
@@ -1020,4 +1035,9 @@ type Mutation {
     Given a token, validate a user's email address
     """
     verifyEmailAddress(token: String!): Void
+
+    """
+    Accept invite emails to finish creating user
+    """
+    acceptInvite(token: String!, username: String! @validUsername, password: String! @validPassword): Void
 }

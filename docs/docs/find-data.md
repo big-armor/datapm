@@ -4,7 +4,7 @@ title: DataPM Use Case: Find Data
 sidebar_label: Find Data
 ---
 
-DataPM is the easiest way to discover new data. And all DataPM listings include the properties, value types, and value statistics of that data. When you've found data of interest, DataPM will help you deliver that data to the location and in the format that works best for you!
+DataPM is the easiest way to discover new data. All DataPM listings include the properties, value types, and value statistics of that data. When you've found data of interest, DataPM will help you deliver that data to the location and in the format that works best for you!
 
 ## Discover Data
 

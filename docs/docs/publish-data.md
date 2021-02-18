@@ -33,7 +33,7 @@ To generate your first package file, install the [command line client](command-l
 Use the following command to create a package file for the following CSV file
 
 ```text
-datapm generate-package https://datapm.io/docs/test-data/state-codes.csv
+datapm package https://datapm.io/docs/test-data/state-codes.csv
 ```
 
 You will be prompted to provide human descriptions, and to view a summary of the data contents. After you complete these prompts, your DataPM package file will be written to your local disk.

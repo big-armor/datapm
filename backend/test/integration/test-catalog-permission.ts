@@ -70,11 +70,14 @@ describe("Catalog Permissions", async () => {
                 identifier: {
                     catalogSlug: "user-a-catalog-v1"
                 },
-                value: {
-                    username: "my-test-user200",
-                    permission: newPermissions,
-                    packagePermission: []
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: "my-test-user200",
+                        permission: newPermissions,
+                        packagePermission: []
+                    }
+                ],
+                message: "Test message"
             }
         });
 
@@ -90,11 +93,14 @@ describe("Catalog Permissions", async () => {
                 identifier: {
                     catalogSlug: "user-a-catalog-v1"
                 },
-                value: {
-                    username: "my-test-user202",
-                    permission: newPermissions,
-                    packagePermission: []
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: "my-test-user202",
+                        permission: newPermissions,
+                        packagePermission: []
+                    }
+                ],
+                message: "Test message"
             }
         });
 
@@ -110,11 +116,14 @@ describe("Catalog Permissions", async () => {
                 identifier: {
                     catalogSlug: "user-a-catalog-v1"
                 },
-                value: {
-                    username: "my-test-user201",
-                    permission: newPermissions,
-                    packagePermission: []
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: "my-test-user201",
+                        permission: newPermissions,
+                        packagePermission: []
+                    }
+                ],
+                message: "Test"
             }
         });
 
@@ -130,11 +139,14 @@ describe("Catalog Permissions", async () => {
                 identifier: {
                     catalogSlug: "user-a-catalog-v1"
                 },
-                value: {
-                    username: "my-test-user201",
-                    permission: newPermissions,
-                    packagePermission: []
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: "my-test-user201",
+                        permission: newPermissions,
+                        packagePermission: []
+                    }
+                ],
+                message: "Test message"
             }
         });
 
@@ -184,11 +196,14 @@ describe("Catalog Permissions", async () => {
                 identifier: {
                     catalogSlug: "user-a-catalog-v2"
                 },
-                value: {
-                    username: "my-test-user201",
-                    permission: newPermissions,
-                    packagePermission: []
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: "my-test-user201",
+                        permission: newPermissions,
+                        packagePermission: []
+                    }
+                ],
+                message: "Test message"
             }
         });
 
@@ -229,11 +244,14 @@ describe("Catalog Permissions", async () => {
                 identifier: {
                     catalogSlug: "user-a-catalog-v3"
                 },
-                value: {
-                    username: "my-test-user201",
-                    permission: newPermissions,
-                    packagePermission: []
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: "my-test-user201",
+                        permission: newPermissions,
+                        packagePermission: []
+                    }
+                ],
+                message: "Testing messages"
             }
         });
 

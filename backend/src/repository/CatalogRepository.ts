@@ -1,4 +1,4 @@
-import { EntityRepository, Repository, EntityManager, SelectQueryBuilder, Like } from "typeorm";
+import { EntityRepository, Repository, EntityManager, SelectQueryBuilder } from "typeorm";
 
 import { UserEntity } from "../entity/UserEntity";
 import { UpdateCatalogInput, CreateCatalogInput, Permission, CatalogIdentifierInput } from "../generated/graphql";

@@ -1,15 +1,15 @@
 <div class="schema" id="schema" *ngFor="let schema of packageFile?.schemas">
-    <div class="schema-title">{{ schema.title }}</div>
+    <div class="package-details-title">{{ schema.title }}</div>
     <div class="schema-content">
         <div class="schema-text">
             {{ schema.description }}
         </div>
 
         <div class="schema-stats">
-            <div class="schema-samples" *ngIf="schema.sampleRecords?.length > 0">
+            <div class="schema-samples package-light-gray mb-0" *ngIf="schema.sampleRecords?.length > 0">
                 {{ schema.recordCount | number }} {{ schema.unit || "" }} records<br />
             </div>
-            <div>{{ schemaPropertiesLength(schema) | number }} Properties</div>
+            <div class="package-light-gray mb-0">{{ schemaPropertiesLength(schema) | number }} Properties</div>
         </div>
 
         <div class="accordions-group mt-2">
@@ -35,8 +35,9 @@
                                         <li>
                                             present in {{ type.recordCount | number }} ({{
                                                 type.recordCount / schema.recordCount | percent
-                                            }}) records
+                                            }}) {{ schema.unit }} records
                                         </li>
+                                        <li *ngIf="property.unit">unit: {{ property.unit }}</li>
                                         <li>max value: {{ type.numberMaxValue | number }}</li>
                                         <li>min value: {{ type.numberMinValue | number }}</li>
                                     </ul>

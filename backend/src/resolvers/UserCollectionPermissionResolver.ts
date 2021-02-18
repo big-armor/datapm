@@ -1,9 +1,21 @@
 import { AuthenticatedContext, Context } from "../context";
-import { Permission, CollectionIdentifierInput, SetUserCollectionPermissionsInput } from "../generated/graphql";
+import {
+    Permission,
+    CollectionIdentifierInput,
+    SetUserCollectionPermissionsInput,
+    UserStatus
+} from "../generated/graphql";
 import { UserCollectionPermissionRepository } from "../repository/UserCollectionPermissionRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { EntityManager } from "typeorm";
 import { CollectionEntity } from "../entity/CollectionEntity";
+import { UserEntity } from "../entity/UserEntity";
+import { UserRepository } from "../repository/UserRepository";
+import { emailAddressValid } from "datapm-lib";
+import { sendInviteUser, sendShareNotification, validateMessageContents } from "../util/smtpUtil";
+import { CollectionRepository } from "../repository/CollectionRepository";
+import { asyncForEach } from "../util/AsyncForEach";
+import { ValidationError } from "apollo-server";
 
 export const hasCollectionPermissions = async (context: Context, collectionId: number, permission: Permission) => {
     const collection = await context.connection.getRepository(CollectionEntity).findOneOrFail(collectionId);
@@ -43,24 +55,87 @@ export const setPermissionsForUser = async (
 
 export const setUserCollectionPermissions = async (
     _0: any,
-    { identifier, value }: { identifier: CollectionIdentifierInput; value: SetUserCollectionPermissionsInput },
+    {
+        identifier,
+        value,
+        message
+    }: { identifier: CollectionIdentifierInput; value: SetUserCollectionPermissionsInput[]; message: string },
     context: AuthenticatedContext,
     info: any
 ) => {
-    await context.connection.getCustomRepository(UserCollectionPermissionRepository).setUserCollectionPermissions({
-        identifier,
-        value,
-        relations: getGraphQlRelationName(info)
+    validateMessageContents(message);
+
+    const collectionEntity = await context.connection
+        .getCustomRepository(CollectionRepository)
+        .findCollectionBySlugOrFail(identifier.collectionSlug);
+
+    const inviteUsers: UserEntity[] = [];
+    const existingUsers: UserEntity[] = [];
+
+    await context.connection.transaction(async (transaction) => {
+        await asyncForEach(value, async (userCollectionPermission) => {
+            let user = await transaction
+                .getCustomRepository(UserRepository)
+                .getUserByUsernameOrEmailAddress(userCollectionPermission.usernameOrEmailAddress);
+
+            const collectionPermissionRepository = transaction.getCustomRepository(UserCollectionPermissionRepository);
+            if (userCollectionPermission.permissions.length === 0) {
+                if (!user) {
+                    return;
+                }
+
+                return await collectionPermissionRepository.deleteUserCollectionPermissionsForUser({
+                    identifier,
+                    user
+                });
+            }
+
+            if (user == null) {
+                if (emailAddressValid(userCollectionPermission.usernameOrEmailAddress) === true) {
+                    const inviteUser = await context.connection
+                        .getCustomRepository(UserRepository)
+                        .createInviteUser(userCollectionPermission.usernameOrEmailAddress);
+
+                    inviteUsers.push(inviteUser);
+                } else {
+                    throw new ValidationError("USER_NOT_FOUND - " + userCollectionPermission.usernameOrEmailAddress);
+                }
+            } else {
+                if (user.status == UserStatus.PENDING_SIGN_UP) {
+                    inviteUsers.push(user);
+                } else {
+                    existingUsers.push(user);
+                }
+            }
+
+            await transaction.getCustomRepository(UserCollectionPermissionRepository).setUserCollectionPermissions({
+                identifier,
+                value: userCollectionPermission
+            });
+        });
+    });
+
+    await asyncForEach(inviteUsers, async (user) => {
+        await sendShareNotification(
+            user,
+            context.me.displayName,
+            collectionEntity.name,
+            "/collection/" + collectionEntity.collectionSlug,
+            message
+        );
+    });
+    await asyncForEach(inviteUsers, async (user) => {
+        await sendInviteUser(user, context.me.displayName, collectionEntity.name, message);
     });
 };
 
 export const deleteUserCollectionPermissions = async (
     _0: any,
-    { identifier, username }: { identifier: CollectionIdentifierInput; username: string },
+    { identifier, usernameOrEmailAddress }: { identifier: CollectionIdentifierInput; usernameOrEmailAddress: string },
     context: AuthenticatedContext
 ) => {
     return context.connection.getCustomRepository(UserCollectionPermissionRepository).deleteUserCollectionPermissions({
         identifier,
-        username
+        usernameOrEmailAddress
     });
 };

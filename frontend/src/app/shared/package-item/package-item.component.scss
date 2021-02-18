@@ -18,32 +18,30 @@
         margin-bottom: 0px !important;
     }
 
-    .package-description {
-        font-family: $family-roboto;
-        font-style: $style-normal;
-        font-weight: $weight-300;
-        font-size: $small-font;
-        letter-spacing: 0.7px;
-        line-height: 14px;
-        margin-top: 2px;
-        color: $gray-3;
-        max-height: 111px;
-        overflow: hidden;
-    }
-
-    .ctaButton {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-    }
-
     .img-cover {
         margin-top: 6px;
         margin-right: 6px;
     }
+
+    .package-wrapper {
+        max-width: 850px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .package-wrapper {
+        max-width: 650px !important;
+    }
 }
 
 @media (max-width: 992px) {
+    #packageItem {
+        display: block !important;
+    }
+    .package-btn {
+        padding-left: 47px;
+        padding-top: 7px;
+    }
     .package-item {
         .package-identifier {
             font-size: $text-font;
@@ -60,12 +58,6 @@
         .img-cover {
             margin-top: 0px;
             margin-right: 0px;
-        }
-        .ctaButton {
-            top: 6px;
-            right: 6px;
-            font-size: ($small-font - 1);
-            padding: 4px 4px;
         }
     }
 }

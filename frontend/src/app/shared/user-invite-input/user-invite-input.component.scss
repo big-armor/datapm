@@ -1,0 +1,61 @@
+@import "../../../styles/variables";
+
+#inviteInput {
+    ::ng-deep .mat-form-field-infix {
+        border-top: none;
+        font-family: Roboto, Helvetica Neue, sans-serif;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 18px;
+        padding: 0.5em 0;
+    }
+
+    input {
+        height: 30px;
+
+        &::placeholder {
+            font-size: 13px;
+            font-family: Roboto, Helvetica Neue, sans-serif;
+            letter-spacing: 0.5px;
+            font-weight: 300;
+            color: $gray-4;
+        }
+    }
+
+    ::ng-deep .mat-form-field-flex {
+        background-color: #f9f9f9;
+        border-radius: 6px;
+    }
+
+    ::ng-deep .mat-chip {
+        font-family: Roboto, Helvetica Neue, sans-serif;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 18px;
+        letter-spacing: 0.5px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+        padding-right: 4px;
+        padding-left: 4px;
+    }
+
+    ::ng-deep .mat-icon {
+        height: 20px;
+        font-size: 20px;
+        width: 22px;
+        color: $color-info;
+    }
+
+    ::ng-deep .mat-chip-remove {
+        color: $gray-1;
+        margin-left: 2px;
+    }
+
+    ::ng-deep .mat-form-field-outline {
+        color: transparent !important;
+        height: 0px !important;
+        border: 0;
+    }
+}

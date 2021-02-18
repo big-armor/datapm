@@ -72,7 +72,7 @@ export function validateUsername(username: string | undefined): void {
 
 class UsernameConstraint implements ValidationConstraint {
     getName(): string {
-        return "CollectionSlug";
+        return "Username";
     }
 
     validate(value: string) {

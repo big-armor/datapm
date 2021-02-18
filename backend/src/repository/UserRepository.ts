@@ -1,23 +1,20 @@
-import querystring from "querystring";
-
 import { EntityRepository, Repository, EntityManager, SelectQueryBuilder } from "typeorm";
 import { v4 as uuid } from "uuid";
 
 import { UserEntity } from "../entity/UserEntity";
 import {
     CreateUserInputAdmin,
-    Permission,
     UpdateUserInput,
     CreateUserInput,
-    RecoverMyPasswordInput
+    RecoverMyPasswordInput,
+    UserStatus,
+    User
 } from "../generated/graphql";
 import { mixpanel } from "../util/mixpanel";
-import { UserCatalogPermissionEntity } from "../entity/UserCatalogPermissionEntity";
 import { CatalogRepository } from "./CatalogRepository";
 import { hashPassword } from "../util/PasswordUtil";
-import { CatalogEntity } from "../entity/CatalogEntity";
-import { sendVerifyEmail, sendForgotPasswordEmail, smtpConfigured } from "../util/smtpUtil";
-import { ValidationError, UserInputError } from "apollo-server";
+import { sendVerifyEmail, sendForgotPasswordEmail } from "../util/smtpUtil";
+import { UserInputError } from "apollo-server";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { CollectionRepository } from "./CollectionRepository";
 import { StorageErrors } from "../storage/files/file-storage-service";
@@ -101,7 +98,7 @@ async function getUserOrFail({
     return user;
 }
 
-async function getUserByUsernameOrFail({
+export async function getUserByUsernameOrFail({
     username,
     manager,
     relations = []
@@ -152,6 +149,18 @@ export class UserRepository extends Repository<UserEntity> {
         const ALIAS = "getUsername";
 
         const user = this.createQueryBuilder(ALIAS).where([{ username }]).getOne();
+
+        return user;
+    }
+
+    getUserByUsernameOrEmailAddress(username: string) {
+        const ALIAS = "getUsername";
+
+        const user = this.createQueryBuilder(ALIAS)
+            .where([{ username }])
+            .orWhere('("getUsername"."emailAddress" = :username)')
+            .setParameter("username", username)
+            .getOne();
 
         return user;
     }
@@ -318,7 +327,35 @@ export class UserRepository extends Repository<UserEntity> {
             .getManyAndCount();
     }
 
-    createUser({ value, relations = [] }: { value: CreateUserInput; relations?: string[] }): Promise<UserEntity> {
+    createInviteUser(emailAddress: string): Promise<UserEntity> {
+        return this.manager.nestedTransaction(async (transaction) => {
+            let user = transaction.create(UserEntity);
+            user.emailAddress = emailAddress.trim();
+            user.verifyEmailToken = uuid();
+            user.verifyEmailTokenDate = new Date();
+            user.passwordSalt = uuid();
+            user.emailVerified = false;
+
+            const now = new Date();
+            user.createdAt = now;
+            user.updatedAt = now;
+            user.isAdmin = false;
+
+            user.status = UserStatus.PENDING_SIGN_UP;
+
+            return transaction.save(user);
+        });
+    }
+
+    completeCreatedUser({
+        user,
+        value,
+        relations = []
+    }: {
+        user: UserEntity;
+        value: CreateUserInput;
+        relations?: string[];
+    }): Promise<UserEntity> {
         const self: UserRepository = this;
         const isAdmin = (input: CreateUserInput | CreateUserInputAdmin): input is CreateUserInputAdmin => {
             return (input as CreateUserInputAdmin) !== undefined;
@@ -328,8 +365,6 @@ export class UserRepository extends Repository<UserEntity> {
         const emailVerificationToken = uuid();
         return this.manager
             .nestedTransaction(async (transaction) => {
-                let user = transaction.create(UserEntity);
-
                 if (value.firstName != null) user.firstName = value.firstName.trim();
 
                 if (value.lastName != null) user.lastName = value.lastName.trim();
@@ -341,17 +376,21 @@ export class UserRepository extends Repository<UserEntity> {
 
                 user.verifyEmailToken = emailVerificationToken;
                 user.verifyEmailTokenDate = new Date();
-                user.emailVerified = false;
+
+                if (user.emailVerified == null) user.emailVerified = false;
 
                 const now = new Date();
                 user.createdAt = now;
                 user.updatedAt = now;
 
+                user.status = UserStatus.ACTIVE;
+
                 if (!FirstUserStatusHolder.IS_FIRST_USER_CREATED) {
+                    FirstUserStatusHolder.IS_FIRST_USER_CREATED = await this.isAtLeastOneUserRegistered();
+                }
+
+                if (!FirstUserStatusHolder.IS_FIRST_USER_CREATED || (isAdmin(value) && value.isAdmin)) {
                     user.isAdmin = true;
-                    FirstUserStatusHolder.IS_FIRST_USER_CREATED = true;
-                } else if (isAdmin(value) && value.isAdmin) {
-                    user.isAdmin = value.isAdmin;
                 } else {
                     user.isAdmin = false;
                 }
@@ -371,7 +410,7 @@ export class UserRepository extends Repository<UserEntity> {
                 return user;
             })
             .then(async (user: UserEntity) => {
-                await sendVerifyEmail(user, emailVerificationToken);
+                if (!user.emailVerified) await sendVerifyEmail(user, emailVerificationToken);
 
                 return getUserOrFail({
                     username: value.username,
@@ -444,6 +483,18 @@ export class UserRepository extends Repository<UserEntity> {
             });
 
             dbUser.isAdmin = isAdmin;
+            await transaction.save(dbUser);
+        });
+    }
+
+    public updateUserStatus(username: string, status: UserStatus): Promise<void> {
+        return this.manager.nestedTransaction(async (transaction) => {
+            const dbUser = await getUserByUsernameOrFail({
+                username,
+                manager: transaction
+            });
+
+            dbUser.status = status;
             await transaction.save(dbUser);
         });
     }
@@ -549,22 +600,29 @@ export class UserRepository extends Repository<UserEntity> {
     }
 
     async deleteUser(user: UserEntity): Promise<void> {
-        await this.manager.getCustomRepository(CatalogRepository).deleteCatalog({ slug: user.username });
+        // If user doesn't have a username it means that they have not yet signed up and don't have any catalogs/collections/images
+        if (!user.username) {
+            await this.manager.nestedTransaction(async (transaction) => {
+                await transaction.delete(UserEntity, { id: user.id });
+            });
+            return;
+        }
 
+        await this.manager.getCustomRepository(CatalogRepository).deleteCatalog({ slug: user.username });
         const collections = await this.manager.getCustomRepository(CollectionRepository).findByUser(user.id);
 
-        for (const collection of collections)
+        for (const collection of collections) {
             await this.manager.getCustomRepository(CollectionRepository).deleteCollection(collection.collectionSlug);
+        }
 
         await this.manager.nestedTransaction(async (transaction) => {
-            await transaction.delete(UserEntity, { username: (await user).username });
+            await transaction.delete(UserEntity, { id: user.id });
         });
 
         try {
             await ImageStorageService.INSTANCE.deleteUserAvatarImage(user.id);
         } catch (error) {
             if (error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST)) return;
-
             console.error(error.message);
         }
 
@@ -572,7 +630,6 @@ export class UserRepository extends Repository<UserEntity> {
             await ImageStorageService.INSTANCE.deleteUserCoverImage(user.id);
         } catch (error) {
             if (error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST)) return;
-
             console.error(error.message);
         }
     }

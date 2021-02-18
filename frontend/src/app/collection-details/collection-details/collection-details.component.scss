@@ -9,10 +9,11 @@
         border-radius: 4px;
     }
 
-    .collection-header {
-        height: $page-header-height;
-        position: relative;
+    ::ng-deep .cover {
+        margin-bottom: 15px;
+    }
 
+    .collection-header {
         .collection-slug {
             color: $custom-gray-1;
         }
@@ -30,17 +31,48 @@
             .mat-tab-header {
                 border-bottom: none;
             }
+
             .mat-tab-label {
                 min-width: 0px;
                 height: 32px;
                 padding: 0;
-                margin: 0 24px;
-                font-size: $small-font;
-                text-transform: uppercase;
+                margin: 0 0px 0 0;
+                font-family: $family-roboto;
+                font-style: $style-normal;
+                font-weight: $weight-300;
+                font-size: ($default-font - 1);
+                line-height: 24px;
+                text-align: center;
+                color: $gray-2;
+                text-decoration: none;
+                text-transform: lowercase;
+
+                .mat-tab-label-content {
+                    padding: 0px 12px;
+                }
             }
+
+            .mat-tab-label-active {
+                opacity: 1;
+                color: #333 !important;
+                // border-bottom: 2px solid #333;
+            }
+
             .mat-ink-bar {
+                width: 85px !important;
                 background-color: $gray-1;
             }
         }
+    }
+}
+
+.box-shadow {
+    height: 18px;
+    box-shadow: 0 6px 6px -4px #3333331f;
+}
+
+@media (max-width: 576px) {
+    .collection-details {
+        padding: 0px !important;
     }
 }

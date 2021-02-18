@@ -1,5 +1,5 @@
-import { AuthenticationError, ValidationError } from "apollo-server";
-import { AuthenticatedContext } from "../context";
+import { AuthenticationError, UserInputError, ValidationError } from "apollo-server";
+import { AuthenticatedContext, Context } from "../context";
 import {
     AUTHENTICATION_ERROR,
     Base64ImageUpload,
@@ -7,16 +7,19 @@ import {
     RecoverMyPasswordInput,
     UpdateMyPasswordInput,
     UpdateUserInput,
-    ActivityLogEventType
+    ActivityLogEventType,
+    UserStatus
 } from "../generated/graphql";
 import { CatalogRepository } from "../repository/CatalogRepository";
-import { UserRepository } from "../repository/UserRepository";
+import { getUserByUsernameOrFail, UserRepository } from "../repository/UserRepository";
 import { hashPassword } from "../util/PasswordUtil";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 import { FirstUserStatusHolder } from "./FirstUserStatusHolder";
+import { UserEntity } from "../entity/UserEntity";
 import { ReservedKeywordsService } from "../service/reserved-keywords-service";
+import { sendUserSuspendedEmail } from "../util/smtpUtil";
 
 const USER_SEARCH_RESULT_LIMIT = 100;
 export const searchUsers = async (
@@ -55,6 +58,33 @@ export const adminSearchUsers = async (
     };
 };
 
+export const adminSetUserStatus = async (
+    _0: any,
+    { username, status, message }: { username: string; status: UserStatus; message?: string | undefined | null },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    return context.connection.transaction(async (transaction) => {
+        const targetUser = await getUserByUsernameOrFail({
+            username,
+            manager: transaction
+        });
+
+        if (UserStatus.SUSPENDED == status) {
+            sendUserSuspendedEmail(targetUser, message || "");
+        }
+
+        await createActivityLog(transaction, {
+            userId: context.me.id,
+            targetUserId: targetUser.id,
+            eventType: ActivityLogEventType.USER_STATUS_CHANGED
+        });
+
+        const repository = context.connection.manager.getCustomRepository(UserRepository);
+        return repository.updateUserStatus(username, status);
+    });
+};
+
 export const emailAddressAvailable = async (
     _0: any,
     { emailAddress }: { emailAddress: string },
@@ -63,10 +93,12 @@ export const emailAddressAvailable = async (
 ) => {
     const user = await context.connection.manager.getCustomRepository(UserRepository).getUserByEmail(emailAddress);
 
+    if (user != null && user.status == UserStatus.PENDING_SIGN_UP) return true;
+
     return user == null;
 };
 
-export const usernameAvailable = async (_0: any, { username }: { username: string }, context: AuthenticatedContext) => {
+export const usernameAvailable = async (_0: any, { username }: { username: string }, context: Context) => {
     ReservedKeywordsService.validateReservedKeyword(username);
     const user = await context.connection.manager.getCustomRepository(UserRepository).getUserByUsername(username);
 
@@ -93,19 +125,25 @@ export const createMe = async (
         throw new ValidationError("USERNAME_NOT_AVAILABLE");
     }
 
-    const repository = context.connection.manager.getCustomRepository(UserRepository);
-    if (!FirstUserStatusHolder.IS_FIRST_USER_CREATED) {
-        FirstUserStatusHolder.IS_FIRST_USER_CREATED = await repository.isAtLeastOneUserRegistered();
-    }
-
     await context.connection.transaction(async (transaction) => {
-        const user = await transaction.getCustomRepository(UserRepository).createUser({
+        const existingUser = await transaction.getCustomRepository(UserRepository).getUserByEmail(value.emailAddress);
+
+        let user = null;
+
+        if (existingUser != null) {
+            user = existingUser;
+        } else {
+            user = transaction.create(UserEntity);
+        }
+
+        const createdUser = await transaction.getCustomRepository(UserRepository).completeCreatedUser({
+            user,
             value,
             relations: getGraphQlRelationName(info)
         });
 
         await createActivityLog(transaction, {
-            userId: user.id,
+            userId: createdUser.id,
             eventType: ActivityLogEventType.USER_CREATED
         });
     });
@@ -222,17 +260,22 @@ export const deleteMe = async (_0: any, {}, context: AuthenticatedContext, info:
 
 export const adminDeleteUser = async (
     _0: any,
-    { username }: { username: string },
+    { usernameOrEmailAddress }: { usernameOrEmailAddress: string },
     context: AuthenticatedContext,
     info: any
 ) => {
-    return await deleteUserAndLogAction(username, context);
+    return await deleteUserAndLogAction(usernameOrEmailAddress, context);
 };
 
-const deleteUserAndLogAction = async (username: string, context: AuthenticatedContext) => {
+const deleteUserAndLogAction = async (usernameOrEmailAddress: string, context: AuthenticatedContext) => {
     await context.connection.transaction(async (transaction) => {
         const userRepository = transaction.getCustomRepository(UserRepository);
-        const user = await transaction.getCustomRepository(UserRepository).findUserByUserName({ username });
+        const user = await transaction
+            .getCustomRepository(UserRepository)
+            .getUserByUsernameOrEmailAddress(usernameOrEmailAddress);
+        if (!user) {
+            throw new Error("USER_NOT_FOUND-" + usernameOrEmailAddress);
+        }
 
         await createActivityLog(transaction, {
             userId: context.me.id,
@@ -241,5 +284,37 @@ const deleteUserAndLogAction = async (username: string, context: AuthenticatedCo
         });
 
         return await userRepository.deleteUser(user);
+    });
+};
+
+export const acceptInvite = async (
+    _0: any,
+    { username, token, password }: { username: string; token: string; password: string },
+    context: Context,
+    info: any
+): Promise<void> => {
+    return context.connection.transaction(async (transaction) => {
+        const user = await transaction.getCustomRepository(UserRepository).findByEmailValidationToken(token);
+
+        if (user == null) {
+            throw new UserInputError("TOKEN_NOT_VALID");
+        }
+
+        if ((await usernameAvailable(_0, { username: username }, context)) == false) {
+            throw new ValidationError("USERNAME_NOT_AVAILABLE");
+        }
+
+        user.emailVerified = true;
+
+        await transaction.getCustomRepository(UserRepository).completeCreatedUser({
+            user,
+            value: {
+                emailAddress: user.emailAddress,
+                password,
+                username
+            }
+        });
+
+        await transaction.save(user);
     });
 };

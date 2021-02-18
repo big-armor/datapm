@@ -52,6 +52,9 @@ import { MatInputModule } from "@angular/material/input";
 import { DeletePackageComponent } from "./delete-package/delete-package.component";
 import { MatSelectModule } from "@angular/material/select";
 import { FancyConfirmationDialogComponent } from "./dialogs/fancy-confirmation-dialog/fancy-confirmation-dialog.component";
+import { UserStatusChangeConfirmationDialogComponent } from "./dialogs/user-status-change-confirmation-dialog/user-status-change-confirmation-dialog.component";
+import { UserInviteInputComponent } from "./user-invite-input/user-invite-input.component";
+import { MatChipsModule } from "@angular/material/chips";
 import { PackageAndCollectionComponent } from "./package-and-collection/package-and-collection.component";
 import { CollectionsHorizontalListComponent } from "./package-and-collection/collections-horizontal-list/collections-horizontal-list.component";
 
@@ -92,6 +95,8 @@ import { CollectionsHorizontalListComponent } from "./package-and-collection/col
         SimpleCreateComponent,
         DeletePackageComponent,
         FancyConfirmationDialogComponent,
+        UserStatusChangeConfirmationDialogComponent,
+        UserInviteInputComponent,
         PackageAndCollectionComponent,
         CollectionsHorizontalListComponent
     ],
@@ -111,6 +116,7 @@ import { CollectionsHorizontalListComponent } from "./package-and-collection/col
         MatSelectModule,
         MatSlideToggleModule,
         MatTableModule,
+        MatChipsModule,
         FormsModule,
         ReactiveFormsModule,
         RouterModule
@@ -147,6 +153,7 @@ import { CollectionsHorizontalListComponent } from "./package-and-collection/col
         EditPasswordDialogComponent,
         UserDetailsComponent,
         FancyConfirmationDialogComponent,
+        UserInviteInputComponent,
         PackageAndCollectionComponent
     ],
     providers: [TimeAgoPipe, { provide: MAT_DIALOG_DATA, useValue: {} }]

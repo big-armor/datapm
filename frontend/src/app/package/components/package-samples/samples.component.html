@@ -2,8 +2,11 @@
     <table mat-table [dataSource]="dataSource" id="sampleTable">
         <tr mat-header-row *matHeaderRowDef="columns; sticky: true"></tr>
         <tr stye="background-color: red" mat-row *matRowDef="let row; columns: columns"></tr>
-        <ng-container [matColumnDef]="column" *ngFor="let column of columns">
-            <th mat-header-cell *matHeaderCellDef>{{ column }}</th>
+        <ng-container [matColumnDef]="column" *ngFor="let column of columns; let i = index">
+            <th mat-header-cell scope="col" *matHeaderCellDef>
+                {{ column }}
+                {{ columnsUnits[i] }}
+            </th>
             <td [ngClass]="{ oddRow: element._oddEven == 'odd' }" mat-cell *matCellDef="let element">
                 {{ element[column] }}
             </td>

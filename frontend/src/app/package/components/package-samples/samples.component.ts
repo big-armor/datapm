@@ -1,6 +1,6 @@
-import { Component, Input, OnDestroy, OnInit } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { PackageFile, Schema } from "datapm-lib";
+import { Schema } from "datapm-lib";
 import { TableVirtualScrollDataSource } from "ng-table-virtual-scroll";
 
 @Component({
@@ -8,10 +8,11 @@ import { TableVirtualScrollDataSource } from "ng-table-virtual-scroll";
     templateUrl: "./samples.component.html",
     styleUrls: ["./samples.component.scss"]
 })
-export class SamplesComponent implements OnInit, OnDestroy {
+export class SamplesComponent implements OnInit {
     @Input() public schema: Schema;
 
     public columns: string[];
+    public columnsUnits: string[] = [];
 
     dataSource: TableVirtualScrollDataSource<{
         [key: string]: string;
@@ -19,18 +20,27 @@ export class SamplesComponent implements OnInit, OnDestroy {
 
     constructor(private dialog: MatDialog) {}
 
-    ngOnInit() {
-        this.dataSource = new TableVirtualScrollDataSource(this.schemaSampleValues(this.schema));
-        this.columns = Object.keys(this.schema.properties);
+    public ngOnInit(): void {
+        this.dataSource = new TableVirtualScrollDataSource(this.buildSchemaSampleValues(this.schema));
+        this.columns = this.buildSchemaColumns(this.schema);
+        this.columnsUnits = this.buildSchemaColumnsUnits(this.schema);
     }
 
-    ngOnDestroy() {}
-
-    schemaColumns(schema: Schema) {
+    private buildSchemaColumns(schema: Schema) {
         return Object.keys(schema.properties);
     }
 
-    schemaSampleValues(schema: Schema) {
+    private buildSchemaColumnsUnits(schema: Schema) {
+        return Object.values(schema.properties).map((value) => {
+            if (typeof value.type == "number" || (value.type.length && value.type[0] == "number")) {
+                return `(${value.unit})`;
+            }
+
+            return null;
+        });
+    }
+
+    private buildSchemaSampleValues(schema: Schema) {
         if (schema == null) return [];
 
         let index = 0;

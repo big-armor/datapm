@@ -53,10 +53,11 @@ export class PackageSamplesComponent {
 
     showSchemaFullScreen(schema: Schema) {
         this.dialog.open(SamplesFullScreenDialog, {
-            width: "95vw",
-            height: "95vh",
-            maxWidth: "95vw",
-            maxHeight: "95vh",
+            width: "100%",
+            height: "80%",
+            panelClass: "my-second-custom-dialog",
+            // maxWidth: "95vw",
+            // maxHeight: "600px",
             data: {
                 schema,
                 packageFile: this.packageFile,

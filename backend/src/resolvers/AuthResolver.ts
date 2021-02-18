@@ -1,6 +1,6 @@
 import { ApolloError, AuthenticationError, UserInputError, ValidationError } from "apollo-server";
 import { AuthenticatedContext } from "../context";
-import { AUTHENTICATION_ERROR } from "../generated/graphql";
+import { AUTHENTICATION_ERROR, UserStatus } from "../generated/graphql";
 import { UserRepository } from "../repository/UserRepository";
 import { createJwt } from "../util/jwt";
 import { hashPassword } from "../util/PasswordUtil";
@@ -27,6 +27,10 @@ export const login = async (
 
     if (!user.emailVerified) {
         throw new UserInputError(AUTHENTICATION_ERROR.EMAIL_ADDRESS_NOT_VERIFIED);
+    }
+
+    if (UserStatus.SUSPENDED == user.status) {
+        throw new UserInputError(AUTHENTICATION_ERROR.ACCOUNT_SUSPENDED);
     }
 
     return createJwt(user);

@@ -57,10 +57,13 @@ describe("Collection Permissions", async () => {
                 identifier: {
                     collectionSlug: "testA-collection-permissions"
                 },
-                value: {
-                    usernameOrEmailAddress: "my-test-user100",
-                    permissions: newPermissions
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: "my-test-user100",
+                        permissions: newPermissions
+                    }
+                ],
+                message: "Test"
             }
         });
 
@@ -76,10 +79,13 @@ describe("Collection Permissions", async () => {
                 identifier: {
                     collectionSlug: "testA-collection-permissions"
                 },
-                value: {
-                    usernameOrEmailAddress: "my-test-user102",
-                    permissions: newPermissions
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: "my-test-user102",
+                        permissions: newPermissions
+                    }
+                ],
+                message: "Testing"
             }
         });
 
@@ -94,10 +100,13 @@ describe("Collection Permissions", async () => {
                 identifier: {
                     collectionSlug: "testA-collection-permissions"
                 },
-                value: {
-                    usernameOrEmailAddress: "my-test-user100",
-                    permissions: newPermissions
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: "my-test-user100",
+                        permissions: newPermissions
+                    }
+                ],
+                message: "testing"
             }
         });
 
@@ -114,17 +123,20 @@ describe("Collection Permissions", async () => {
                 identifier: {
                     collectionSlug: "testA-collection-permissions"
                 },
-                value: {
-                    usernameOrEmailAddress: "my-test-user101",
-                    permissions: newPermissions
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: "my-test-user101",
+                        permissions: newPermissions
+                    }
+                ],
+                message: "Testing message"
             }
         });
 
         expect(response.errors! == null).true;
     });
 
-    it("updating user permissions by changing the permissions list", async function () {
+    it("update collection user permissions by changing the permissions list", async function () {
         const newPermissions = [Permission.VIEW, Permission.EDIT, Permission.MANAGE];
 
         let response = await userAClient.mutate({
@@ -133,10 +145,13 @@ describe("Collection Permissions", async () => {
                 identifier: {
                     collectionSlug: "testA-collection-permissions"
                 },
-                value: {
-                    usernameOrEmailAddress: "my-test-user101",
-                    permissions: newPermissions
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: "my-test-user101",
+                        permissions: newPermissions
+                    }
+                ],
+                message: "Testing test"
             }
         });
 
@@ -150,7 +165,7 @@ describe("Collection Permissions", async () => {
                 identifier: {
                     collectionSlug: "testA-collection-permissions"
                 },
-                username: "my-test-user100"
+                usernameOrEmailAddress: "my-test-user100"
             }
         });
 
@@ -199,10 +214,13 @@ describe("Collection Permissions", async () => {
                 identifier: {
                     collectionSlug: "testF-collection"
                 },
-                value: {
-                    usernameOrEmailAddress: "my-test-user101",
-                    permissions: newPermissions
-                }
+                value: [
+                    {
+                        usernameOrEmailAddress: "my-test-user101",
+                        permissions: newPermissions
+                    }
+                ],
+                message: "Testing testing"
             }
         });
 

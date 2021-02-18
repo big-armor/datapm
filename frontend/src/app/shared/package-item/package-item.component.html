@@ -1,30 +1,41 @@
-<mat-card class="package-item my-3" (click)="goToComponent()">
-    <mat-card-content>
-        <div class="d-flex">
-            <div class="d-flex align-items-start img-cover">
-                <app-avatar class="align-top user-img" [user]="item.creator" [size]="40"> </app-avatar>
-            </div>
-            <div class="text-left">
-                <div
-                    class="ml-2 package-privacy"
-                    *ngIf="this.item?.myPermissions?.includes('MANAGE')"
-                    [class.public-text]="item?.isPublic"
-                    [class.not-public-text]="!item?.isPublic"
-                >
-                    {{ item?.isPublic ? "public" : "not public" }}
-                </div>
-                <div class="package-identifier mb-2 ml-2">
-                    {{ item.identifier.catalogSlug }}/{{ item.identifier.packageSlug }}
-                </div>
-                <div class="flex-1 ml-2">
-                    <div class="package-description">
-                        {{ truncatedDescription }}
+<div class="container">
+    <mat-card class="package-item my-3" (click)="goToComponent()">
+        <mat-card-content>
+            <div class="d-flex bd-highlight" id="packageItem">
+                <div class="bd-highlight">
+                    <div class="d-flex package-wrapper">
+                        <div class="d-flex align-items-start img-cover">
+                            <app-avatar class="align-top user-img" [user]="item.creator" [size]="40"> </app-avatar>
+                        </div>
+                        <div class="text-left">
+                            <div
+                                class="ml-2 package-privacy"
+                                *ngIf="this.item?.myPermissions?.includes('MANAGE')"
+                                [class.public-text]="item?.isPublic"
+                                [class.not-public-text]="!item?.isPublic"
+                            >
+                                {{ item?.isPublic ? "public" : "not public" }}
+                            </div>
+                            <div class="package-identifier mb-2 ml-2">
+                                {{ item.identifier.catalogSlug }}/{{ item.identifier.packageSlug }}
+                            </div>
+                            <div class="flex-1 ml-2">
+                                <div class="package-light-gray">
+                                    {{ truncatedDescription }}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <div class="ml-auto bd-highlight align-self-center package-btn">
+                    <a
+                        class="app-outlined-button ctaButton"
+                        *ngIf="shouldShowActionButton"
+                        (click)="handleAction($event)"
+                        >{{ actionButtonText }}</a
+                    >
+                </div>
             </div>
-        </div>
-        <a class="app-outlined-button ctaButton" *ngIf="shouldShowActionButton" (click)="handleAction($event)">{{
-            actionButtonText
-        }}</a>
-    </mat-card-content>
-</mat-card>
+        </mat-card-content>
+    </mat-card>
+</div>

@@ -4,7 +4,7 @@ import { EditPasswordDialogComponent } from "../edit-password-dialog/edit-passwo
 import { AuthenticationService } from "../../../services/authentication.service";
 import { getRegistryURL } from "../../../helpers/RegistryAccessHelper";
 
-import { APIKey, User, Catalog, CreateAPIKeyGQL, MyAPIKeysGQL, DeleteAPIKeyGQL, Scope } from "src/generated/graphql";
+import { APIKey, User, Catalog, CreateAPIKeyGQL, DeleteAPIKeyGQL, Scope } from "src/generated/graphql";
 import { FormControl, FormGroup } from "@angular/forms";
 import { MatTableDataSource } from "@angular/material/table";
 import { Clipboard } from "@angular/cdk/clipboard";
@@ -13,6 +13,7 @@ import { take, takeUntil } from "rxjs/operators";
 import { EditAccountDialogComponent } from "../edit-account-dialog/edit-account-dialog.component";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import * as timeago from "timeago.js";
+import { ApiKeyService } from "src/app/services/api-key.service";
 
 enum State {
     INIT,
@@ -51,7 +52,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         public dialog: MatDialog,
         private authenticationService: AuthenticationService,
         private createAPIKeyGQL: CreateAPIKeyGQL,
-        private myAPIKeysGQL: MyAPIKeysGQL,
+        private apiKeysService: ApiKeyService,
         private deleteAPIKeyGQL: DeleteAPIKeyGQL,
         private clipboard: Clipboard,
         private snackBarService: SnackBarService
@@ -129,7 +130,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
                 this.newAPIKey = btoa(key.id + "." + key.secret);
 
                 this.createAPIKeyForm.get("label").setValue("");
-                this.refreshAPIKeys();
+                this.refreshAPIKeys(true);
                 this.createAPIKeyState = State.SUCCESS;
             });
     }
@@ -156,25 +157,24 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
                 }
 
                 this.createAPIKeyForm.get("label").setValue("");
-                this.refreshAPIKeys();
+                this.refreshAPIKeys(true);
                 this.deleteAPIKeyState = State.SUCCESS;
             });
     }
 
-    refreshAPIKeys() {
+    refreshAPIKeys(forceReload?: boolean) {
         this.apiKeysState = State.LOADING;
 
-        this.myAPIKeysGQL
-            .fetch({}, { fetchPolicy: "no-cache" })
+        this.apiKeysService
+            .getMyApiKeys(forceReload)
             .pipe(takeUntil(this.subscription))
-            .subscribe((response) => {
-                if (response.errors?.length > 0) {
-                    this.apiKeysState = State.ERROR;
-                    return;
-                }
-                this.myAPIKeys = response.data.myAPIKeys;
-                this.apiKeysState = State.SUCCESS;
-            });
+            .subscribe(
+                (apiKeys) => {
+                    this.myAPIKeys = apiKeys;
+                    this.apiKeysState = State.SUCCESS;
+                },
+                () => (this.apiKeysState = State.ERROR)
+            );
     }
 
     apiKeyCommandString() {

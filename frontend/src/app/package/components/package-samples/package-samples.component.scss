@@ -11,12 +11,7 @@
     margin-bottom: 10px;
 }
 
-.full-screen-link {
-    font-family: $family-roboto-mono;
-    font-style: $style-normal;
-    font-weight: $weight-400;
-    line-height: 13px;
-    letter-spacing: -0.28px;
-    color: $color-info;
+a {
+    color: $color-info !important;
     cursor: pointer;
 }

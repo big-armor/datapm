@@ -1,0 +1,67 @@
+<div class="container">
+    <div class="row">
+        <div class="col-12"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 accept-wrapper">
+            <h1>Welcome!</h1>
+            <p>
+                Use the form below to create your new account. If you already have an account,
+                <a href="javascript:void(0)" (click)="openLogin()">click here to login</a>.
+            </p>
+            <form [formGroup]="acceptInviteForm" (ngSubmit)="submit()">
+                <div class="mt-3">
+                    <label class="div-question pl-1">New Username</label>
+                    <app-input
+                        placeholder="Username"
+                        [group]="acceptInviteForm"
+                        class="rounded-input mb-3"
+                        controlName="username"
+                        [error]="acceptInviteForm | inputError: 'username' | async"
+                    >
+                    </app-input>
+                </div>
+                <div class="mt-3">
+                    <label class="div-question pl-1">Password</label>
+                    <app-input
+                        inputType="password"
+                        placeholder="Password"
+                        [group]="acceptInviteForm"
+                        controlName="password"
+                        class="rounded-input mb-3"
+                        [error]="acceptInviteForm | inputError: 'password' | async"
+                    >
+                    </app-input>
+                </div>
+                <div class="alert-div">
+                    <div class="content-btn text-center mt-4">
+                        <button type="submit" class="app-outlined-button" [disabled]="loading">
+                            <span *ngIf="!loading" class="btn-text">Accept Invite</span>
+                            <span *ngIf="loading" class="loading-spinner">
+                                <mat-spinner diameter="25"></mat-spinner>
+                            </span>
+                        </button>
+                    </div>
+                    <br />
+                    <div class="alert alert-warning" *ngIf="errorMessage">
+                        {{ errorMessage }}
+                    </div>
+                    <div class="content-btn text-center mt-4" *ngIf="showForgotPasswordButton">
+                        <button
+                            type="submit"
+                            class="app-outlined-button"
+                            (click)="openForgotPasswordDialog($event)"
+                            [disabled]="loading"
+                        >
+                            <span *ngIf="!loading" class="btn-text">Forgot Password</span>
+                            <span *ngIf="loading" class="loading-spinner">
+                                <mat-spinner diameter="25"></mat-spinner>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+                <br />
+            </form>
+        </div>
+    </div>
+</div>

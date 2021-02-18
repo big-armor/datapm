@@ -1,4 +1,4 @@
-import { SchemaDirectiveVisitor, ApolloError, ValidationError } from "apollo-server";
+import { SchemaDirectiveVisitor } from "apollo-server";
 import {
     GraphQLField,
     defaultFieldResolver,
@@ -6,9 +6,7 @@ import {
     GraphQLObjectType,
     GraphQLInterfaceType,
     GraphQLInputField,
-    GraphQLInputObjectType,
-    GraphQLScalarType,
-    GraphQLNonNull
+    GraphQLInputObjectType
 } from "graphql";
 import { Context } from "../context";
 import { validateUsername } from "./ValidUsernameDirective";
@@ -28,8 +26,13 @@ export class ValidUsernameOrEmailAddressDirective extends SchemaDirectiveVisitor
         const { resolve = defaultFieldResolver } = details.field;
         const self = this;
         details.field.resolve = function (source, args, context: Context, info) {
-            const username: string | undefined = args.username || args.value?.username || undefined;
-            validateUsername(username);
+            const username: string | undefined =
+                args.username ||
+                args.usernameOrEmailAddress ||
+                args.value?.username ||
+                args.value?.usernameOrEmailAddress ||
+                undefined;
+            validateUsernameOrEmail(username);
             return resolve.apply(this, [source, args, context, info]);
         };
     }
@@ -38,7 +41,12 @@ export class ValidUsernameOrEmailAddressDirective extends SchemaDirectiveVisitor
         const { resolve = defaultFieldResolver } = field;
         const self = this;
         field.resolve = function (source, args, context: Context, info) {
-            const username: string | undefined = args.username || args.value?.username || undefined;
+            const username: string | undefined =
+                args.username ||
+                args.usernameOrEmailAddress ||
+                args.value?.username ||
+                args.value?.usernameOrEmailAddress ||
+                undefined;
 
             validateUsernameOrEmail(username);
 
@@ -57,8 +65,11 @@ export class ValidUsernameOrEmailAddressDirective extends SchemaDirectiveVisitor
 }
 
 export function validateUsernameOrEmail(value: string | undefined) {
-    if (value?.indexOf("@") != -1) validateEmailAddress(value);
-    else validateUsername(value);
+    if (value?.indexOf("@") != -1) {
+        validateEmailAddress(value);
+    } else {
+        validateUsername(value);
+    }
 }
 
 class UsernameOrEmailAddressConstraint implements ValidationConstraint {

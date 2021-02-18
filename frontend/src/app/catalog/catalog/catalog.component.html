@@ -1,4 +1,5 @@
 <div class="page-content" *ngIf="state === 'SUCCESS'">
+    <div class="box-shadow" *ngIf="!isPersonal"></div>
     <app-catalog-details *ngIf="!isPersonal"></app-catalog-details>
     <app-user-details-page *ngIf="isPersonal"></app-user-details-page>
 </div>

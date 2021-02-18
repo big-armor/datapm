@@ -1,5 +1,5 @@
 {
-    "generatedBy": "`datapm generate-package` command. Visit datapm.io to learn about the open source tools and to discover other data packages",
+    "generatedBy": "`datapm package` command. Visit datapm.io to learn about the open source tools and to discover other data packages",
     "updatedDate": "2020-10-01T15:41:58.061Z",
     "displayName": "Country Year GDP",
     "packageSlug": "country-year-gdp",
