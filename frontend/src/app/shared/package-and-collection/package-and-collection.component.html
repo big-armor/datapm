@@ -1,13 +1,13 @@
 <ng-container *ngIf="loadedCollectionsInitially && loadedPackagesInitially; else pageLoader">
     <div>
         <div *ngIf="collections.length">
-            <h3 class="sub-title">{{ subtitlesPrefix }} Collections</h3>
+            <!-- <h3 class="sub-title">{{ subtitlesPrefix }} Collections</h3> -->
             <app-collections-horizontal-list [collections]="collections"></app-collections-horizontal-list>
         </div>
     </div>
 
     <div *ngIf="packages.length">
-        <h3 class="sub-title">{{ subtitlesPrefix }} Packages</h3>
+        <!-- <h3 class="sub-title">{{ subtitlesPrefix }} Packages</h3> -->
         <div *ngFor="let package of packages">
             <app-package-item [item]="package"></app-package-item>
         </div>

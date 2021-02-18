@@ -4,7 +4,7 @@
             <div class="d-flex align-items-start img-cover">
                 <app-avatar class="align-top user-img" [user]="item.creator" [size]="40"> </app-avatar>
             </div>
-            <div>
+            <div class="text-left">
                 <div
                     class="ml-2 package-privacy"
                     *ngIf="this.item?.myPermissions?.includes('MANAGE')"

@@ -42,6 +42,10 @@
         min-width: 200px;
     }
 
+    ::ng-deep .mat-spinner circle {
+        stroke: $white !important;
+    }
+
     .mat-spinner {
         stroke: $gray-3;
     }

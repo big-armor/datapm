@@ -281,8 +281,7 @@ mat-select {
     transition: background-color ease 0.5s;
 
     &:hover {
-        color: $color-info;
-        background-color: $color-info-lighter;
+        background-color: #017fb9c7;
         transition: background-color ease 0.5s;
     }
 

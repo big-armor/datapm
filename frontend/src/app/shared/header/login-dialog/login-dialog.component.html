@@ -12,6 +12,7 @@
                 class="rounded-input"
                 controlName="username"
                 [error]="loginForm | inputError: 'username' | async"
+                cdkFocusInitial
             >
             </app-input>
             <app-input
@@ -43,7 +44,7 @@
                 <button type="submit" class="app-raised-button mb-1 mt-4" [disabled]="!loginForm.valid">
                     <span *ngIf="state != State.AWAITING_RESPONSE" class="btn-text">Login</span>
                     <span *ngIf="state == State.AWAITING_RESPONSE" class="loading-spinner">
-                        <mat-spinner diameter="25"></mat-spinner>
+                        <mat-spinner diameter="20"></mat-spinner>
                     </span>
                 </button>
                 <br />
