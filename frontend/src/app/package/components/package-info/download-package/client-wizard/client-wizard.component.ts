@@ -1,11 +1,10 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
-import { FormBuilder } from "@angular/forms";
 import { MatStepper } from "@angular/material/stepper";
 import { combineLatest } from "rxjs";
 import { getRegistryURL } from "src/app/helpers/RegistryAccessHelper";
 import { PackageService } from "src/app/package/services/package.service";
 import { AuthenticationService } from "src/app/services/authentication.service";
-import { MyAPIKeysGQL } from "src/generated/graphql";
+import { ApiKeyService } from "src/app/services/api-key.service";
 
 @Component({
     selector: "app-client-wizard",
@@ -23,7 +22,7 @@ export class ClientWizardComponent implements OnInit {
     loading = false;
 
     constructor(
-        public myAPIKeysGQL: MyAPIKeysGQL,
+        public apiKeysService: ApiKeyService,
         public authenticationService: AuthenticationService,
         public pacakgeService: PackageService
     ) {}
@@ -34,10 +33,7 @@ export class ClientWizardComponent implements OnInit {
         this.registryUrl = getRegistryURL();
 
         this.loading = true;
-        combineLatest([
-            this.myAPIKeysGQL.fetch({}, { fetchPolicy: "no-cache" }),
-            this.pacakgeService.package
-        ]).subscribe(([keysResponse, pkg]) => {
+        combineLatest([this.apiKeysService.getMyApiKeys(), this.pacakgeService.package]).subscribe(([apiKeys, pkg]) => {
             this.packageUrl = this.packageUrl =
                 this.registryUrl + "/" + pkg.package.identifier.catalogSlug + "/" + pkg.package.identifier.packageSlug;
 
@@ -48,17 +44,17 @@ export class ClientWizardComponent implements OnInit {
                 this.username = "username";
             }
 
-            this.hasApiKeys = keysResponse.data?.myAPIKeys?.length > 0;
-            if (this.hasApiKeys) {
-                this.move(3);
-            }
+            this.hasApiKeys = apiKeys?.length > 0;
             this.loading = false;
+            if (this.hasApiKeys) {
+                setTimeout(() => this.move(3), 200);
+            }
         });
     }
 
-    move(index: number) {
-        this.myStepper.selectedIndex = index;
+    public move(index: number) {
         this.currentIndex = index;
+        this.myStepper.selectedIndex = index;
     }
 
     public next() {

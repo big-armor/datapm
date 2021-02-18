@@ -15,6 +15,11 @@
                             <span *ngIf="!isCurrentUser && myCatalogs.length > 0" class="package-dark-gray pl-3"
                                 >Catalogs created by {{ username }}
                             </span>
+
+                            <span *ngIf="!isCurrentUser && myCatalogs.length == 0" class="section-description">
+                                Either {{ username }} has not created any catalogs, or you do not have permission to
+                                view any of the catalogs they have created.
+                            </span>
                         </p>
 
                         <div class="ml-3 mb-4" *ngIf="catalogState !== State.LOADING && isCurrentUser">
