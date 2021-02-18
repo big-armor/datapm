@@ -19,10 +19,14 @@
 
 .mat-header-cell {
     padding: 8px 8px 8px 8px;
-    border-right: 1px solid $gray-9;
+    border-right: 1px solid $gray-4;
     border-top: 1px solid $gray-9;
     max-height: 40px;
     height: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    background: #e4e4e4;
 }
 
 .mat-cell {
@@ -46,7 +50,7 @@
 
 tr.mat-header-row {
     height: 40px !important;
-    background-color: $gray-4;
+    background-color: #e4e4e4;
 }
 
 ::ng-deep .my-second-custom-dialog {
@@ -55,7 +59,7 @@ tr.mat-header-row {
         .mat-table thead {
             opacity: 1;
             color: $white;
-            background-color: $gray-3;
+            background-color: #e4e4e4;
         }
     }
 }

@@ -3,9 +3,8 @@
         <tr mat-header-row *matHeaderRowDef="columns; sticky: true"></tr>
         <tr stye="background-color: red" mat-row *matRowDef="let row; columns: columns"></tr>
         <ng-container [matColumnDef]="column" *ngFor="let column of columns; let i = index">
-            <th mat-header-cell *matHeaderCellDef>
+            <th mat-header-cell scope="col" *matHeaderCellDef>
                 {{ column }}
-                <br />
                 {{ columnsUnits[i] }}
             </th>
             <td [ngClass]="{ oddRow: element._oddEven == 'odd' }" mat-cell *matCellDef="let element">
