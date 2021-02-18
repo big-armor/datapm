@@ -1,45 +1,44 @@
-<div class="container mt-5">
-    <h1>Manage Package</h1>
-    <button class="app-outlined-button" (click)="deletePackage()">Delete This Package</button>
-</div>
+<div class="container p-0 mb-3" id="packagePermission">
+    <div class="package-details-title">Public Access</div>
+    <p class="package-dark-gray">
+        Enabling public access allows all users, including anonymous users, access to view and fetch this package.
+    </p>
 
-<div class="container mt-4">
-    <h1>Public Access</h1>
-    <p>Enabling public access allows all users, including anonymous users, access to view and fetch this package.</p>
-</div>
-
-<div class="d-flex align-items-center justify-content-between mb-3">
-    <div class="d-flex align-items-center public-toggle">
-        <div class="px-4 py-2 label">Make this package public</div>
-        <div class="ml-auto px-4 py-2 slide-right">
-            <mat-slide-toggle
-                class="app-slide-toggle"
-                matTooltip="Can't edit visibility of a package inside a private catalog"
-                matTooltipPosition="above"
-                [matTooltipDisabled]="canEditVisibility"
-                aria-label="Edit package visibility"
-                [disabled]="!canEditVisibility"
-                [checked]="package?.isPublic"
-                (change)="updatePublic($event)"
-            ></mat-slide-toggle>
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <div class="d-flex align-items-center public-toggle">
+            <div class="pr-2 package-dark-gray" style="margin-bottom: 0px !important">Make this package public</div>
+            <div class="ml-auto px-3 py-1 slide-right">
+                <mat-slide-toggle
+                    class="app-slide-toggle"
+                    matTooltip="Can't edit visibility of a package inside a private catalog"
+                    matTooltipPosition="above"
+                    [matTooltipDisabled]="canEditVisibility"
+                    aria-label="Edit package visibility"
+                    [disabled]="!canEditVisibility"
+                    [checked]="package?.isPublic"
+                    (change)="updatePublic($event)"
+                ></mat-slide-toggle>
+            </div>
         </div>
     </div>
-</div>
-<div class="container mt-5" *ngIf="users?.length">
-    <h1>Users With Access</h1>
-    <p>The following users have permission to access this package.</p>
-    <button class="app-outlined-button" (click)="addUser()" *ngIf="users.length > 0">Add User</button>
+
+    <div class="package-details-title mt-4 pt-3">Manage Package</div>
+    <button class="app-outlined-button" (click)="deletePackage()">Delete This Package</button>
+
+    <div *ngIf="users?.length">
+        <div class="package-details-title mt-4 pt-3">Users With Access</div>
+        <p class="package-dark-gray">The following users have permission to access this package.</p>
+        <button class="app-outlined-button mt-2" (click)="addUser()" *ngIf="users.length > 0">Add User</button>
+    </div>
 </div>
 
-<table mat-table [dataSource]="users" *ngIf="users?.length > 0">
+<table mat-table [dataSource]="users" *ngIf="users?.length > 0" class="gray-table">
     <!-- Label column -->
     <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>User</th>
+        <th mat-header-cell *matHeaderCellDef scope="col">User</th>
         <td class="table-content" mat-cell *matCellDef="let user">
             <div style="display: flex; justify-content: start; align-content: center">
-                <a class="ml-2" [routerLink]="'/' + user.username"
-                    ><app-avatar [user]="user" [size]="24"></app-avatar
-                ></a>
+                <a [routerLink]="'/' + user.username"><app-avatar [user]="user" [size]="24"></app-avatar></a>
 
                 <a class="ml-2" [routerLink]="'/' + user.username">{{ user.name }}</a>
                 <span *ngIf="user.pendingInvitationAcceptance"> &nbsp;(pending invite acceptance)</span>
@@ -48,21 +47,26 @@
     </ng-container>
 
     <ng-container matColumnDef="permission">
-        <th mat-header-cell *matHeaderCellDef>Permission</th>
+        <th mat-header-cell *matHeaderCellDef scope="col">Permission</th>
         <td class="table-content" mat-cell *matCellDef="let user">
-            <select [value]="user.permission" (change)="updatePermission(user.username, $event.target.value)">
-                <option value="VIEW">View</option>
-                <option value="EDIT">Edit</option>
-                <option value="MANAGE">Manage</option>
-            </select>
+            <mat-form-field appearance="fill" class="permission-div">
+                <mat-select
+                    [value]="user.permission"
+                    (selectionChange)="updatePermission(user.username, $event.target.value)"
+                >
+                    <mat-option value="VIEW">View </mat-option>
+                    <mat-option value="EDIT">Edit </mat-option>
+                    <mat-option value="MANAGE">Manage </mat-option>
+                </mat-select>
+            </mat-form-field>
         </td>
     </ng-container>
 
     <!-- Actions column -->
     <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <th mat-header-cell *matHeaderCellDef scope="col">Actions</th>
         <td mat-cell *matCellDef="let user">
-            <a class="app-outlined-button mr-3" (click)="removeUser(user.username)">Remove</a>
+            <a class="app-outlined-button" (click)="removeUser(user.username)">Remove</a>
         </td>
     </ng-container>
 

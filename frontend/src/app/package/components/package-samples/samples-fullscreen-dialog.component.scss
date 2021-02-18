@@ -3,29 +3,17 @@
 .dialog-wrapper {
     width: 100%;
     height: 100%;
-    padding-bottom: 10px;
 }
 
 .dialog-close-wrapper {
     left: 0px !important;
-    bottom: 20px !important;
-
-    .dialog-close {
-        padding: 4px 8px;
-        font-family: $family-roboto-mono;
-        font-style: $style-normal;
-        font-weight: $weight-300;
-        font-size: $text-font;
-        text-align: center;
-        line-height: 18px;
-        letter-spacing: -0.28px;
-        color: $gray-3;
-        outline: transparent solid 0px;
-    }
 }
 
 @media (max-width: 576px) {
     .dialog-close-wrapper {
         font-size: $small-font;
+    }
+    .dialog-close {
+        bottom: 10px;
     }
 }

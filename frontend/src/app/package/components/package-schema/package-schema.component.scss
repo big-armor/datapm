@@ -1,24 +1,13 @@
 @import "../../../../styles/variables";
 
 #schema {
-    .schema-stats {
-        margin-left: 10px;
-    }
-
-    .schema-title {
-        font-family: $family-roboto;
-        font-style: $style-normal;
-        font-size: ($title-font + 4);
-        margin-bottom: 25px;
-    }
-
     .schema-text {
-        font-family: $family-roboto-mono;
+        font-family: $family-roboto;
         font-style: $style-normal;
         font-weight: $weight-300;
         font-size: $xsmall-font;
         line-height: 13px;
-        letter-spacing: -0.28px;
+        letter-spacing: 0.6px;
         color: $gray-2;
     }
 
@@ -27,22 +16,24 @@
             box-shadow: none;
 
             .mat-expanded {
-                height: 48px;
+                height: 46px;
             }
 
             .mat-expansion-panel-header {
                 padding: 4px 8px;
                 border-radius: 4px;
+                margin-bottom: 2px;
+                border: 1px solid #33333314;
 
                 .mat-expansion-panel-header-title {
                     flex-basis: 0;
-                    font-family: $family-roboto-mono;
+                    font-family: $family-roboto;
                     font-style: $style-normal;
                     font-weight: $weight-400;
-                    font-size: $text-font;
+                    font-size: $small-font;
                     line-height: 18px;
                     flex-grow: 100;
-                    letter-spacing: -0.28px;
+                    letter-spacing: 0.6px;
                     color: $gray-2;
                 }
             }
@@ -54,18 +45,18 @@
 
                 span {
                     flex-basis: 0;
-                    font-family: $family-roboto-mono;
+                    font-family: $family-roboto;
                     font-style: $style-normal;
                     font-weight: $weight-400;
-                    font-size: $text-font;
+                    font-size: $small-font;
                     line-height: 18px;
-                    letter-spacing: -0.28px;
+                    letter-spacing: 0.6px;
                     color: $gray-2;
                     padding-right: 10px;
                 }
 
                 a {
-                    font-family: $family-roboto-mono;
+                    font-family: $family-roboto;
                     font-style: $style-normal;
                     font-weight: $weight-400;
                     font-size: $text-font;
@@ -73,7 +64,7 @@
                     display: flex;
                     align-items: center;
                     text-align: right;
-                    letter-spacing: -0.28px;
+                    letter-spacing: 0.6px;
                     color: $gray-3;
                     padding-right: 6px;
                     border-bottom: 1px solid $gray-9;
@@ -86,6 +77,8 @@
 
                     .mat-expansion-panel-body {
                         padding: 16px 22px 16px 22px;
+                        font-weight: $weight-400;
+                        font-size: $small-font;
                     }
                 }
 

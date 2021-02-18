@@ -1,5 +1,5 @@
 <app-cover [username]="user?.username" id="profileCover"></app-cover>
-<div class="row" *ngIf="user" id="detailsHeader">
+<div class="row pl-2" *ngIf="user" id="detailsHeader">
     <div class="col-lg-9 col-xs-12">
         <div class="d-flex user-header">
             <div class="p-2">
@@ -7,7 +7,7 @@
             </div>
             <div class="p-2 align-self-center" [class.not-current-user]="!isCurrentUser">
                 <span *ngIf="user.firstName && user.lastName && (user.nameIsPublic || isCurrentUser)">
-                    <span class="dpm-text-middle">{{ user | username }}</span>
+                    <span class="package-details-title">{{ user | username }}</span>
                     <span *ngIf="user.nameIsPublic" class="public-text">(public)</span>
                     <span *ngIf="!user.nameIsPublic" class="not-public-text">(not public)</span><br />
                 </span>
@@ -52,7 +52,7 @@
                 </span>
             </div>
 
-            <p class="user-bio">
+            <p class="package-dark-gray">
                 {{ user.description }}
             </p>
         </div>

@@ -33,6 +33,7 @@ import { MatSelectModule } from "@angular/material/select";
         MatProgressSpinnerModule,
         MatAutocompleteModule,
         MatSlideToggleModule,
+        MatSelectModule,
         MatTableModule,
         MatSelectModule,
         MatTabsModule,

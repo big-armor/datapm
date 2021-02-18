@@ -1,13 +1,40 @@
-.public-toggle {
-    max-width: 400px;
+@import "../../../styles/variables";
+
+table.gray-table {
+    .mat-column-permission {
+        width: 30%;
+    }
 }
 
-.mat-table {
-    width: 100%;
+.permission-div {
+    ::ng-deep mat-select {
+        border: 1px solid #dddddd;
+        border-radius: 6px;
+        padding: 6px 10px;
+    }
 }
 
-select {
-    background-color: transparent;
-    border: none;
-    outline: none;
+@media (max-width: 768px) {
+    th.mat-header-cell:first-of-type,
+    td.mat-cell:first-of-type,
+    td.mat-footer-cell:first-of-type {
+        padding-left: 10px;
+        width: 50%;
+        line-height: 13px;
+    }
+    th.mat-header-cell:last-of-type,
+    td.mat-cell:last-of-type,
+    td.mat-footer-cell:last-of-type {
+        padding-right: 4px;
+    }
+    .permission-div {
+        ::ng-deep .mat-form-field-infix {
+            width: 100px;
+        }
+    }
+    .mat-column-permission {
+        .mat-form-field {
+            margin-right: 10px;
+        }
+    }
 }

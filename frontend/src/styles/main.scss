@@ -382,17 +382,14 @@ mat-select {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-}
 
-.section-title {
-    font-family: $family-roboto;
-    font-style: $style-normal;
-    font-weight: $weight-400;
-    font-size: $title-font;
-    line-height: 26px;
-    letter-spacing: 0.7px;
-    color: $gray-1;
-    padding: 0px 24px 14px 0px;
+    p {
+        text-align: center;
+    }
+
+    a {
+        font-size: ($text-font - 1);
+    }
 }
 
 .search-autocomplete {
@@ -403,13 +400,13 @@ mat-select {
 .public-text {
     @include text("small");
     color: $color-1;
-    margin-left: 6px;
+    margin-left: 0px;
 }
 
 .not-public-text {
     @include text("small");
     color: $gray-3;
-    margin-left: 6px;
+    margin-left: 0px;
 }
 
 .autocomplete-contents {
@@ -525,18 +522,6 @@ textarea.flat-input,
         letter-spacing: 0.7px;
         color: $gray-4;
     }
-}
-
-.section-description {
-    padding: 0px 0px 15px 0px;
-    font-family: $family-roboto;
-    font-size: ($text-font - 1);
-    font-style: $style-normal;
-    letter-spacing: 0.7px;
-    color: $gray-1;
-    margin-top: 4px !important;
-    width: 66%;
-    overflow: hidden;
 }
 
 button.save-btn {
@@ -773,6 +758,77 @@ button:disabled {
     }
 }
 
+.permission-div {
+    mat-select {
+        font-family: $family-roboto;
+        font-style: $style-normal;
+        font-weight: $weight-400;
+        font-size: $text-font;
+        letter-spacing: unset;
+        color: $gray-2;
+        padding: 10px;
+    }
+
+    .mat-form-field-underline {
+        display: none;
+        &::before {
+            height: 0px;
+        }
+    }
+
+    .mat-select-arrow-wrapper {
+        position: relative;
+        top: 7px;
+    }
+
+    .mat-form-field-wrapper {
+        padding: 10px 0px !important;
+    }
+
+    .mat-form-field-flex {
+        padding: 0px !important;
+    }
+
+    .mat-form-field-infix {
+        border-top: 0px;
+        padding: 0px;
+    }
+}
+
+.mat-primary .mat-option.mat-selected:not(.mat-option-disabled) {
+    color: $color-info;
+}
+
+.package-light-gray {
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-weight: $weight-300;
+    font-size: $small-font;
+    letter-spacing: 0.4px;
+    color: $gray-3;
+    margin-bottom: 0px !important;
+}
+
+.package-dark-gray {
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-weight: $weight-400;
+    font-size: ($text-font - 1);
+    letter-spacing: 0.4px;
+    color: $gray-2;
+    margin-bottom: 5px !important;
+}
+
+.package-details-title {
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-size: $title-font;
+    font-weight: $weight-400;
+    margin-bottom: 15px;
+    color: $gray-1;
+    letter-spacing: 0.6px;
+}
+
 #homeRoutes {
     list-style-type: none;
     margin-bottom: 0px;
@@ -811,6 +867,11 @@ button:disabled {
 }
 
 @media (max-width: 768px) {
+    .permission-div {
+        mat-select {
+            font-size: $small-font;
+        }
+    }
     #contentBorder {
         padding: 10px 0px 0px;
         max-height: 300px;
@@ -826,9 +887,6 @@ button:disabled {
     }
     #addUser {
         min-width: 400px;
-    }
-    .section-description {
-        width: 100%;
     }
     .gray-responsive {
         display: block;
@@ -878,14 +936,14 @@ button:disabled {
     }
     table.gray-table {
         .mat-column-name {
-            width: 44%;
+            width: 44% !important;
         }
         th {
-            font-size: ($text-font - 1);
+            font-size: $small-font;
         }
 
         td {
-            font-size: ($text-font - 1);
+            font-size: $small-font;
         }
     }
     .flat-input,

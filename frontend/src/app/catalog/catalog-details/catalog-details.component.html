@@ -1,26 +1,31 @@
-<div class="catalog-details container">
+<div class="catalog-details container pt-4">
     <ng-container *ngIf="state === 'SUCCESS'">
         <app-cover [catalogSlug]="catalogSlug"></app-cover>
-
-        <div class="p-2">
-            <app-avatar class="catalog-avatar" [catalog]="catalog" [circled]="false" [size]="100"> </app-avatar>
-
-            <div *ngIf="catalog" class="collections-public mb-3">
-                <span *ngIf="catalog?.isPublic" class="public-text">public</span>
-                <span *ngIf="!catalog?.isPublic" class="not-public-text">not public</span>
+        <div class="d-flex flex-row bd-highlight">
+            <div class="pl-3 bd-highlight">
+                <app-avatar class="catalog-avatar" [catalog]="catalog" [circled]="false" [size]="80"> </app-avatar>
             </div>
-            <div class="catalog-header">
-                <h1 class="dpm-text-title mb-1">{{ catalog?.displayName }}</h1>
-                <h3 class="dpm-text-body mb-1 catalog-slug">{{ catalogSlug }}</h3>
-                <p class="dpm-text-small catalog-description">
-                    {{ catalog?.description }}
-                </p>
+            <div class="px-2 bd-highlight d-flex align-items-end">
+                <div class="catalog-header">
+                    <div class="package-details-title mb-0">{{ catalog?.displayName }}</div>
+                    <div class="package-light-gray mb-1">{{ catalogSlug }}</div>
+                    <p class="package-dark-gray" style="margin-bottom: 0px !important; line-height: 11px">
+                        {{ catalog?.description }}
+                    </p>
+                </div>
             </div>
         </div>
-        <mat-tab-group [(selectedIndex)]="currentTab" disableRipple class="catalog-tabs">
+
+        <div *ngIf="catalog" class="collections-public pl-3">
+            <span *ngIf="catalog?.isPublic" class="public-text">public</span>
+            <span *ngIf="!catalog?.isPublic" class="not-public-text">not public</span>
+        </div>
+
+        <mat-tab-group [(selectedIndex)]="currentTab" disableRipple class="catalog-tabs mt-4">
             <mat-tab label="Packages"></mat-tab>
             <mat-tab label="Manage" *ngIf="canManage"></mat-tab>
         </mat-tab-group>
+
         <div *ngIf="currentTab === 0">
             <app-package-item
                 [item]="package"
@@ -32,7 +37,7 @@
             >
             </app-package-item>
             <div class="dpm-no-data" *ngIf="!catalog?.packages?.length">
-                <p>
+                <p class="package-dark-gray">
                     This catalog contains no packages, or you do not have permission to view the packages it does
                     contain.
                 </p>
@@ -43,13 +48,16 @@
         </div>
         <app-catalog-permissions [catalog]="catalog" *ngIf="currentTab === 1"></app-catalog-permissions>
     </ng-container>
-    <div class="dpm-no-data" *ngIf="state === 'CATALOG_NOT_FOUND'">The catalog does not exist.</div>
+
+    <div class="dpm-no-data" *ngIf="state === 'CATALOG_NOT_FOUND'">
+        <p class="package-dark-gray">The catalog does not exist.</p>
+    </div>
     <div class="dpm-no-data" *ngIf="state === 'NOT_AUTHENTICATED'">
-        <p>You must login to view this catalog.</p>
+        <p class="package-dark-gray">You must login to view this catalog.</p>
         <a class="app-outlined-button mt-3 px-3" (click)="loginClicked()">Login</a>
     </div>
     <div class="dpm-no-data" *ngIf="state === 'ERROR'">
-        An error ocurred while getting catalog details. Please try again later.
+        <p class="package-dark-gray">An error ocurred while getting catalog details. Please try again later.</p>
     </div>
     <div class="dpm-page-loading" *ngIf="state === 'LOADING'">
         <mat-spinner [diameter]="32"></mat-spinner>

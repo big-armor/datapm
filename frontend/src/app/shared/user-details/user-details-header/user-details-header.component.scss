@@ -8,15 +8,8 @@
         margin-right: 20px;
     }
 
-    .user-bio {
-        color: $gray-2;
-        font-family: $family-roboto;
-        letter-spacing: 0.7px;
-        font-style: $style-normal;
-        font-weight: $weight-400;
-        margin-top: 4px;
-        font-size: ($text-font - 1);
-        overflow: hidden;
+    .public-text {
+        margin-left: 6px;
     }
 
     .user-header {
@@ -58,9 +51,6 @@
 
 @media (max-width: 576px) {
     #detailsHeader {
-        .user-bio {
-            font-size: ($text-font - 2);
-        }
         .user-header {
             margin-top: -16px;
         }

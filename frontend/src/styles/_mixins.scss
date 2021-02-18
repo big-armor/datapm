@@ -17,16 +17,16 @@ $line-heights: (
 );
 
 @mixin text($key) {
-    font-family: Roboto Mono;
+    font-family: Roboto;
     font-size: map.get($font-sizes, $key);
     font-style: normal;
     font-weight: 400;
     line-height: map.get($line-heights, $key);
-    letter-spacing: -0.28px;
+    letter-spacing: 0.4px;
 }
 
 @mixin logoText {
-    font-family: Roboto Mono;
+    font-family: Roboto;
     font-size: 32px;
     font-style: normal;
     font-weight: 400;
