@@ -8,7 +8,7 @@ import {
     comparePackages
 } from "../src/PackageUtil";
 import { Schema, Properties, PackageFile, catalogSlugValid, packageSlugValid, collectionSlugValid } from "../src/main";
-import { SemVer } from "semver";
+import { diff, SemVer } from "semver";
 import { expect } from "chai";
 
 describe("Checking VersionUtil", () => {
@@ -310,7 +310,7 @@ describe("Checking VersionUtil", () => {
             format: "date-time",
             source: {
                 type: "test",
-                uri: "http://datapm.io/test",
+                uris: ["http://datapm.io/test"],
                 configuration: {},
                 lastUpdateHash: "abc123"
             }
@@ -322,7 +322,7 @@ describe("Checking VersionUtil", () => {
             format: "date-time",
             source: {
                 type: "test",
-                uri: "http://datapm.io/test",
+                uris: ["http://datapm.io/test"],
                 configuration: {},
                 lastUpdateHash: "abc123"
             }
@@ -332,15 +332,19 @@ describe("Checking VersionUtil", () => {
             throw new Error("source should not be null");
         }
 
-        expect(compareSchema(schemaA1, schemaA2).length).equal(0);
+        let diffs = compareSchema(schemaA1, schemaA2);
 
-        schemaA2.source.uri = "https://somethingelse.datapm.io";
+        console.log(JSON.stringify(diffs, null, 1));
 
-        const diffs = compareSchema(schemaA1, schemaA2);
+        expect(diffs.length).equal(0);
+
+        schemaA2.source.uris = ["https://somethingelse.datapm.io"];
+
+        diffs = compareSchema(schemaA1, schemaA2);
 
         expect(diffs[0].type).equal(DifferenceType.CHANGE_SOURCE);
 
-        schemaA2.source.uri = "http://datapm.io/test";
+        schemaA2.source.uris = ["http://datapm.io/test"];
         schemaA2.source.lastUpdateHash = "test1234";
 
         const diffs2 = compareSchema(schemaA1, schemaA2);

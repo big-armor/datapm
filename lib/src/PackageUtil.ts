@@ -243,7 +243,7 @@ export function compareSchema(priorSchema: Schema, newSchema: Schema, pointer = 
     } else if (priorSchema.source != null && newSchema.source != null) {
         if (priorSchema.source.type !== newSchema.source.type) {
             response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
-        } else if (priorSchema.source.uri !== newSchema.source.uri) {
+        } else if (!sourceURIsEquivalent(priorSchema.source.uris, newSchema.source.uris)) {
             response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
         } else {
             const configComparison = compareConfigObjects(
@@ -263,6 +263,18 @@ export function compareSchema(priorSchema: Schema, newSchema: Schema, pointer = 
     }
 
     return response;
+}
+/** returns false if they are different */
+export function sourceURIsEquivalent(urisA: string[], urisB: string[]): boolean {
+    for (const a of urisA) {
+        if (!urisB.includes(a)) return false;
+    }
+
+    for (const b of urisB) {
+        if (!urisA.includes(b)) return false;
+    }
+
+    return true;
 }
 
 /** Retuns whether the two objects are identical or not */
@@ -448,6 +460,21 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
             (schema as Schema).recordCountPrecision =
                 schema.recordCountApproximate === true ? CountPrecision.APPROXIMATE : CountPrecision.EXACT;
             delete schema.recordCountApproximate;
+        }
+    }
+
+    if (packageFileObject.$schema === "https://datapm.io/docs/package-file-schema-v0.2.0.json") {
+        packageFileObject.$schema = "https://datapm.io/docs/package-file-schema-v0.3.0.json";
+
+        const oldPackageFile = packageFileObject as PackageFileV010;
+
+        for (const schema of oldPackageFile.schemas) {
+            if (schema && schema.source) {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                (schema as Schema).source!.uris = [schema.source.uri];
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                delete (schema.source as any).uri;
+            }
         }
     }
 

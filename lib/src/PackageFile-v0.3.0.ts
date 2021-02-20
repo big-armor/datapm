@@ -2,7 +2,7 @@ import { JSONSchema7, JSONSchema7TypeName } from "json-schema";
 import { DPMConfiguration } from "./main";
 
 /** A description of where the package file should be published. */
-export interface RegistryReferenceV020 {
+export interface RegistryReference {
     /** The HTTP or HTTPS URL to reach the registry server. */
     url: string;
 
@@ -11,12 +11,12 @@ export interface RegistryReferenceV020 {
 }
 
 /** Describes where the data resides, and how to access to byte stream of the data. */
-export interface SourceV020 {
+export interface Source {
     /** The universally unique identifier for the sourceInterface implementation */
     type: string;
 
     /** The URI used for accessing the data */
-    uri: string;
+    uris: string[];
 
     /** An object containing valid JSON properties for the purposes of accessing the data. The schema
      * of this object is loose because it is up to the source implementation to define it's own schema
@@ -30,7 +30,7 @@ export interface SourceV020 {
     lastUpdateHash?: string;
 }
 
-export interface ValueTypeStatisticsV020 {
+export interface ValueTypeStatistics {
     valueType: JSONSchema7TypeName | "date";
 
     /** The number of records on which this property was observed. If schema recordCountApproximate property is true,
@@ -47,10 +47,10 @@ export interface ValueTypeStatisticsV020 {
 }
 
 // eslint-disable-next-line no-use-before-define
-export type PropertiesV020 = { [key: string]: SchemaV020 };
-export type ValueTypesV020 = { [key: string]: ValueTypeStatisticsV020 };
+export type Properties = { [key: string]: Schema };
+export type ValueTypes = { [key: string]: ValueTypeStatistics };
 
-export interface SchemaIdentifierV020 {
+export interface SchemaIdentifier {
     registryUrl: string;
     catalogSlug: string;
     packageSlug: string;
@@ -58,7 +58,7 @@ export interface SchemaIdentifierV020 {
     schemaTitle: string;
 }
 
-export interface DerivedFromV020 {
+export interface DerivedFrom {
     /** User friendly name for the upstream data */
     displayName: string;
 
@@ -66,10 +66,10 @@ export interface DerivedFromV020 {
     url?: string;
 
     /** The identifier for the specific version of the datapm package version and schema title. Url or schemaIdentifier must be defined.  */
-    schemaIdentifier?: SchemaIdentifierV020;
+    schemaIdentifier?: SchemaIdentifier;
 }
 
-export enum CountPrecisionV020 {
+export enum CountPrecision {
     EXACT = "EXACT",
     APPROXIMATE = "APPROXIMATE",
     GREATER_THAN = "GREATER_THAN"
@@ -78,12 +78,12 @@ export enum CountPrecisionV020 {
 /** The JSON Schema Draft 07 compliant schema object, extended with properties that describe
  * how to obtain the data, and details the values of the data properties.
  */
-export interface SchemaV020 extends JSONSchema7 {
+export interface Schema extends JSONSchema7 {
     /** An object describing how to access the record stream of the data */
-    source?: SourceV020;
+    source?: Source;
 
     /** The JSON Schema Draft 07 compliant property list for the object */
-    properties?: PropertiesV020;
+    properties?: Properties;
 
     /** What the schema or a property in the data represents. Example for objects: Person, Date and Location, Point In Time. Examples for values: Meters, Degrees Celsius */
     unit?: string;
@@ -102,16 +102,16 @@ export interface SchemaV020 extends JSONSchema7 {
     recordsNotPresent?: number;
 
     /** How to consider the recordCount value - as one of exact, approximate, or greater than. */
-    recordCountPrecision?: CountPrecisionV020;
+    recordCountPrecision?: CountPrecision;
 
     /** The exact or approximate number of bytes of data in the values of the data (not including format overhead) */
     byteCount?: number;
 
     /** Whether the byte count is exact or approximate. */
-    byteCountPrecision?: CountPrecisionV020;
+    byteCountPrecision?: CountPrecision;
 
     /** A object which has keys that the property type (string, array, date, boolean, object, etc). The values of this object describe the property type. */
-    valueTypes?: ValueTypesV020;
+    valueTypes?: ValueTypes;
 
     /** A  selected set of sample records that are representative of the schema */
     sampleRecords?: { [key: string]: unknown }[];
@@ -120,10 +120,10 @@ export interface SchemaV020 extends JSONSchema7 {
     derivedFromDescription?: string;
 
     /** A list of references to upstream data from which this schema was derived. This is also called "Provenance" */
-    derivedFrom?: DerivedFromV020[];
+    derivedFrom?: DerivedFrom[];
 }
 
-export class PackageFileV020 {
+export class PackageFile {
     /** The URL of the JSON schema file to validate this file. */
     $schema = "https://datapm.io/docs/package-file-schema-v0.2.0.json";
 
@@ -137,7 +137,7 @@ export class PackageFileV020 {
     description: string;
 
     /** The json-schema.org Draft 7 compliant schemas, extended to support the features of datapm. */
-    schemas: SchemaV020[];
+    schemas: Schema[];
 
     /** The semver compatible version number. */
     version: string;
@@ -170,5 +170,5 @@ export class PackageFileV020 {
      * the local client to determine where to publish. The client will remove private and local registry references
      * before publishing to each registry.
      */
-    registries?: RegistryReferenceV020[];
+    registries?: RegistryReference[];
 }
