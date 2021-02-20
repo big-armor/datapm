@@ -7,8 +7,18 @@ import {
     nextVersion,
     comparePackages
 } from "../src/PackageUtil";
-import { Schema, Properties, PackageFile, catalogSlugValid, packageSlugValid, collectionSlugValid } from "../src/main";
-import { diff, SemVer } from "semver";
+import {
+    Schema,
+    Properties,
+    PackageFile,
+    catalogSlugValid,
+    packageSlugValid,
+    collectionSlugValid,
+    Source,
+    compareSource,
+    compareSources
+} from "../src/main";
+import { SemVer } from "semver";
 import { expect } from "chai";
 
 describe("Checking VersionUtil", () => {
@@ -303,53 +313,92 @@ describe("Checking VersionUtil", () => {
         expect(collectionSlugValid("a___c")).equal("COLLECTION_SLUG_INVALID");
     });
 
-    it("Compare identical", () => {
+    it("Compare identical schemas", () => {
         const schemaA1: Schema = {
             title: "SchemaA",
             type: "string",
-            format: "date-time",
-            source: {
-                type: "test",
-                uris: ["http://datapm.io/test"],
-                configuration: {},
-                lastUpdateHash: "abc123"
-            }
+            format: "date-time"
         };
 
         const schemaA2: Schema = {
             title: "SchemaA",
             type: "string",
-            format: "date-time",
-            source: {
-                type: "test",
-                uris: ["http://datapm.io/test"],
-                configuration: {},
-                lastUpdateHash: "abc123"
-            }
+            format: "date-time"
         };
 
-        if (schemaA2.source == null) {
-            throw new Error("source should not be null");
-        }
-
-        let diffs = compareSchema(schemaA1, schemaA2);
+        const diffs = compareSchema(schemaA1, schemaA2);
 
         console.log(JSON.stringify(diffs, null, 1));
 
         expect(diffs.length).equal(0);
+    });
 
-        schemaA2.source.uris = ["https://somethingelse.datapm.io"];
+    it("Compare source objects", () => {
+        const sourceA: Source = {
+            type: "test",
+            uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+            configuration: {},
+            lastUpdateHash: "abc123",
+            schemaTitles: ["A"]
+        };
 
-        diffs = compareSchema(schemaA1, schemaA2);
+        const sourceB: Source = {
+            type: "test",
+            uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+            configuration: {},
+            lastUpdateHash: "abc123",
+            schemaTitles: ["A"]
+        };
 
-        expect(diffs[0].type).equal(DifferenceType.CHANGE_SOURCE);
+        const diffs = compareSource(sourceA, sourceB);
 
-        schemaA2.source.uris = ["http://datapm.io/test"];
-        schemaA2.source.lastUpdateHash = "test1234";
+        expect(diffs.length).equals(0);
 
-        const diffs2 = compareSchema(schemaA1, schemaA2);
+        sourceA.lastUpdateHash = "test";
+
+        const diffs2 = compareSource(sourceA, sourceB);
 
         expect(diffs2[0].type).equal(DifferenceType.CHANGE_SOURCE_UPDATE_HASH);
+
+        sourceA.lastUpdateHash = sourceB.lastUpdateHash;
+
+        sourceA.uris = ["http://datapm.io.test"];
+
+        const diffs3 = compareSource(sourceA, sourceB);
+
+        expect(diffs3[0].type).equal(DifferenceType.CHANGE_SOURCE);
+    });
+
+    it("Compare source arrays", () => {
+        const sourceA: Source[] = [
+            {
+                type: "test",
+                uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+                configuration: {},
+                lastUpdateHash: "abc123",
+                schemaTitles: ["A"]
+            }
+        ];
+
+        const sourceB: Source[] = [
+            {
+                type: "test",
+                uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+                configuration: {},
+                lastUpdateHash: "abc123",
+                schemaTitles: ["A"]
+            }
+        ];
+
+        const diffs = compareSources(sourceA, sourceB);
+
+        expect(diffs.length).equals(0);
+
+        sourceA[0].uris = ["test"];
+
+        const diffs2 = compareSources(sourceA, sourceB);
+
+        expect(diffs2[0].type).equal(DifferenceType.CHANGE_SOURCE);
     });
 
     it("Package File updated dates", function () {
@@ -361,7 +410,8 @@ describe("Checking VersionUtil", () => {
             schemas: [],
             version: "1.0.0",
             updatedDate: new Date(),
-            description: "Back test"
+            description: "Back test",
+            sources: []
         };
 
         const packageFileB: PackageFile = {
@@ -372,7 +422,8 @@ describe("Checking VersionUtil", () => {
             schemas: [],
             version: "1.0.0",
             updatedDate: packageFileA.updatedDate,
-            description: "Back test"
+            description: "Back test",
+            sources: []
         };
 
         expect(comparePackages(packageFileA, packageFileB).some((d) => d.type === "CHANGE_UPDATED_DATE")).equal(false);
@@ -391,6 +442,7 @@ describe("Checking VersionUtil", () => {
             displayName: "test",
             generatedBy: "test",
             schemas: [],
+            sources: [],
             version: "1.0.0",
             updatedDate: new Date(),
             description: "Back test"
@@ -402,6 +454,7 @@ describe("Checking VersionUtil", () => {
             displayName: "test",
             generatedBy: "test",
             schemas: [],
+            sources: [],
             version: "1.0.0",
             updatedDate: packageFileA.updatedDate,
             description: "Back test"
@@ -423,6 +476,8 @@ describe("Checking VersionUtil", () => {
             displayName: "test",
             generatedBy: "test",
             schemas: [],
+            sources: [],
+
             version: "1.0.0",
             updatedDate: new Date(),
             description: "Back test",
@@ -435,6 +490,8 @@ describe("Checking VersionUtil", () => {
             displayName: "test",
             generatedBy: "test",
             schemas: [],
+            sources: [],
+
             version: "1.0.0",
             updatedDate: packageFileA.updatedDate,
             description: "Back test",
@@ -464,6 +521,8 @@ describe("Checking VersionUtil", () => {
             displayName: "test",
             generatedBy: "test",
             schemas: [],
+            sources: [],
+
             version: "1.0.0",
             updatedDate: new Date(),
             description: "Back test",
@@ -476,6 +535,7 @@ describe("Checking VersionUtil", () => {
             displayName: "test",
             generatedBy: "test",
             schemas: [],
+            sources: [],
             version: "1.0.0",
             updatedDate: packageFileA.updatedDate,
             description: "Back test",
@@ -505,6 +565,8 @@ describe("Checking VersionUtil", () => {
             displayName: "test",
             generatedBy: "test",
             schemas: [],
+            sources: [],
+
             version: "1.0.0",
             updatedDate: new Date(),
             description: "Back test",
@@ -518,6 +580,8 @@ describe("Checking VersionUtil", () => {
             displayName: "test",
             generatedBy: "test",
             schemas: [],
+            sources: [],
+
             version: "1.0.0",
             updatedDate: packageFileA.updatedDate,
             description: "Back test",
@@ -542,6 +606,8 @@ describe("Checking VersionUtil", () => {
             displayName: "test",
             generatedBy: "test",
             schemas: [],
+            sources: [],
+
             version: "1.0.0",
             updatedDate: new Date(),
             description: "Back test",
@@ -556,6 +622,8 @@ describe("Checking VersionUtil", () => {
             displayName: "test",
             generatedBy: "test",
             schemas: [],
+            sources: [],
+
             version: "1.0.0",
             updatedDate: packageFileA.updatedDate,
             description: "Back test",

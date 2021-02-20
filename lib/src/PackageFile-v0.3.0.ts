@@ -18,6 +18,9 @@ export interface Source {
     /** The URI used for accessing the data */
     uris: string[];
 
+    /** The titles of schemas present in this source. One source produces one or more schemas of data. A schema may be present in more than one source. */
+    schemaTitles: string[];
+
     /** An object containing valid JSON properties for the purposes of accessing the data. The schema
      * of this object is loose because it is up to the source implementation to define it's own schema
      * configuration.
@@ -79,9 +82,6 @@ export enum CountPrecision {
  * how to obtain the data, and details the values of the data properties.
  */
 export interface Schema extends JSONSchema7 {
-    /** An object describing how to access the record stream of the data */
-    source?: Source;
-
     /** The JSON Schema Draft 07 compliant property list for the object */
     properties?: Properties;
 
@@ -135,6 +135,9 @@ export class PackageFile {
 
     /** The long form, markdown format, description of the contents of this package. Focus on the origin, purpose, use, and features. Not the schema. */
     description: string;
+
+    /** An object describing how to access the record stream of the data */
+    sources: Source[];
 
     /** The json-schema.org Draft 7 compliant schemas, extended to support the features of datapm. */
     schemas: Schema[];

@@ -4,6 +4,8 @@ import fs from "fs";
 import path from "path";
 import AJV from "ajv";
 import fetch from "cross-fetch";
+import { Source } from "./PackageFile-v0.3.0";
+import { PackageFileV020 } from "./PackageFile-v0.2.0";
 
 export type DPMRecordValue =
     | number
@@ -138,6 +140,8 @@ export function comparePackages(packageA: PackageFile, packageB: PackageFile): D
 
     response = response.concat(compareSchemas(packageA.schemas, packageB.schemas));
 
+    response = response.concat(compareSources(packageA.sources, packageB.sources));
+
     return response;
 }
 
@@ -162,6 +166,58 @@ export function compareSchemas(priorSchemas: Schema[], newSchemas: Schema[]): Di
                 type: DifferenceType.REMOVE_SCHEMA,
                 pointer: ""
             });
+    }
+
+    return response;
+}
+
+/** Given two sets of schemas, compares forward compatibility only */
+export function compareSources(priorSources: Source[], newSources: Source[]): Difference[] {
+    let response: Difference[] = [];
+    for (const sourceA of priorSources) {
+        let found = false;
+
+        for (const sourceB of newSources) {
+            if (!sourceURIsEquivalent(sourceA.uris, sourceB.uris)) continue;
+
+            found = true;
+
+            // Math.min not a typo - looking for "most compatibile schema comparison",
+            // because we're not defining which prior and new schema must be compared
+            response = response.concat(compareSource(sourceA, sourceB, "#"));
+        }
+
+        if (!found)
+            response.push({
+                type: DifferenceType.CHANGE_SOURCE,
+                pointer: ""
+            });
+    }
+
+    return response;
+}
+
+export function compareSource(sourceA: Source, sourceB: Source, pointer = "#"): Difference[] {
+    const response: Difference[] = [];
+
+    if (sourceA == null && sourceB != null) {
+        response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
+    } else if (sourceB == null && sourceA != null) {
+        response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
+    } else if (sourceA != null && sourceB != null) {
+        if (sourceA.type !== sourceB.type) {
+            response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
+        } else if (!sourceURIsEquivalent(sourceA.uris, sourceB.uris)) {
+            response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
+        } else {
+            const configComparison = compareConfigObjects(sourceA.configuration, sourceB.configuration);
+
+            if (!configComparison) response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
+        }
+
+        if (sourceA.lastUpdateHash !== sourceB.lastUpdateHash && sourceA.lastUpdateHash != null) {
+            response.push({ type: DifferenceType.CHANGE_SOURCE_UPDATE_HASH, pointer: pointer });
+        }
     }
 
     return response;
@@ -233,32 +289,6 @@ export function compareSchema(priorSchema: Schema, newSchema: Schema, pointer = 
                     pointer: propertyPointer
                 });
             }
-        }
-    }
-
-    if (priorSchema.source == null && newSchema.source != null) {
-        response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
-    } else if (newSchema.source == null && priorSchema.source != null) {
-        response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
-    } else if (priorSchema.source != null && newSchema.source != null) {
-        if (priorSchema.source.type !== newSchema.source.type) {
-            response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
-        } else if (!sourceURIsEquivalent(priorSchema.source.uris, newSchema.source.uris)) {
-            response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
-        } else {
-            const configComparison = compareConfigObjects(
-                priorSchema.source.configuration,
-                newSchema.source.configuration
-            );
-
-            if (!configComparison) response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
-        }
-
-        if (
-            priorSchema.source.lastUpdateHash !== newSchema.source.lastUpdateHash &&
-            priorSchema.source.lastUpdateHash != null
-        ) {
-            response.push({ type: DifferenceType.CHANGE_SOURCE_UPDATE_HASH, pointer: pointer });
         }
     }
 
@@ -466,14 +496,23 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
     if (packageFileObject.$schema === "https://datapm.io/docs/package-file-schema-v0.2.0.json") {
         packageFileObject.$schema = "https://datapm.io/docs/package-file-schema-v0.3.0.json";
 
-        const oldPackageFile = packageFileObject as PackageFileV010;
+        const oldPackageFile = packageFileObject as PackageFileV020;
+        const newPackagefile = packageFileObject as PackageFile;
 
         for (const schema of oldPackageFile.schemas) {
             if (schema && schema.source) {
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                (schema as Schema).source!.uris = [schema.source.uri];
+                newPackagefile.sources = [
+                    {
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        schemaTitles: [schema.title!],
+                        type: schema.source?.type,
+                        uris: [schema.source?.uri],
+                        configuration: schema.source?.configuration,
+                        lastUpdateHash: schema.source?.lastUpdateHash
+                    }
+                ];
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                delete (schema.source as any).uri;
+                delete schema.source;
             }
         }
     }

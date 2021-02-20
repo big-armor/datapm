@@ -18,6 +18,15 @@ describe("Checking VersionUtil", () => {
         expect(packageFile.licenseMarkdown).contains("This is not a real license. Just a test.");
     });
 
+    it("Should have v0.3.0 sources array separate from schemas", function () {
+        const packageFile = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        expect(packageFile.sources.length).equal(1);
+        expect(packageFile.sources[0].uris.length).equal(1);
+        expect(packageFile.sources[0].uris[0]).equal(
+            "https://theunitedstates.io/congress-legislators/legislators-current.csv"
+        );
+    });
+
     it("Should throw invalid package file error", function () {
         const packageFile = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         packageFile.packageSlug += "-";
