@@ -339,7 +339,10 @@ describe("Checking VersionUtil", () => {
             uris: ["http://datapm.io/test", "http://datapm.io/test2"],
             configuration: {},
             lastUpdateHash: "abc123",
-            schemaTitles: ["A"]
+            schemaTitles: ["A"],
+            streamStats: {
+                inspectedCount: 0
+            }
         };
 
         const sourceB: Source = {
@@ -347,7 +350,10 @@ describe("Checking VersionUtil", () => {
             uris: ["http://datapm.io/test", "http://datapm.io/test2"],
             configuration: {},
             lastUpdateHash: "abc123",
-            schemaTitles: ["A"]
+            schemaTitles: ["A"],
+            streamStats: {
+                inspectedCount: 0
+            }
         };
 
         const diffs = compareSource(sourceA, sourceB);
@@ -376,7 +382,10 @@ describe("Checking VersionUtil", () => {
                 uris: ["http://datapm.io/test", "http://datapm.io/test2"],
                 configuration: {},
                 lastUpdateHash: "abc123",
-                schemaTitles: ["A"]
+                schemaTitles: ["A"],
+                streamStats: {
+                    inspectedCount: 0
+                }
             }
         ];
 
@@ -386,7 +395,10 @@ describe("Checking VersionUtil", () => {
                 uris: ["http://datapm.io/test", "http://datapm.io/test2"],
                 configuration: {},
                 lastUpdateHash: "abc123",
-                schemaTitles: ["A"]
+                schemaTitles: ["A"],
+                streamStats: {
+                    inspectedCount: 0
+                }
             }
         ];
 
@@ -399,6 +411,40 @@ describe("Checking VersionUtil", () => {
         const diffs2 = compareSources(sourceA, sourceB);
 
         expect(diffs2[0].type).equal(DifferenceType.CHANGE_SOURCE);
+    });
+
+    it("Stream status change detection", () => {
+        const sourceA: Source[] = [
+            {
+                type: "test",
+                uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+                configuration: {},
+                lastUpdateHash: "abc123",
+                schemaTitles: ["A"],
+                streamStats: {
+                    inspectedCount: 0
+                }
+            }
+        ];
+
+        const sourceB: Source[] = [
+            {
+                type: "test",
+                uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+                configuration: {},
+                lastUpdateHash: "abc123",
+                schemaTitles: ["A"],
+                streamStats: {
+                    inspectedCount: 1
+                }
+            }
+        ];
+
+        const diffs = compareSources(sourceA, sourceB);
+
+        expect(diffs.length).equals(1);
+
+        expect(diffs[0].type).equal(DifferenceType.CHANGE_SOURCE_STATS);
     });
 
     it("Package File updated dates", function () {

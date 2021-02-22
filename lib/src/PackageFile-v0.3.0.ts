@@ -1,6 +1,29 @@
 import { JSONSchema7, JSONSchema7TypeName } from "json-schema";
 import { DPMConfiguration } from "./main";
 
+export enum CountPrecision {
+    EXACT = "EXACT",
+    APPROXIMATE = "APPROXIMATE",
+    GREATER_THAN = "GREATER_THAN"
+}
+export interface StreamStats {
+    /** The number of bytes observed in the stream. See byteCountPrecision
+     * for whether this is an exact, estimated, or "greater than" number.
+     */
+    byteCount?: number;
+
+    byteCountPrecision?: CountPrecision;
+
+    /** The number of records deeply inspected during the stream */
+    inspectedCount: number;
+
+    /** The number of records in the stream. See recordCountPrecision for whether
+     * this is an exact, estimated, or "greater than" number.
+     */
+    recordCount?: number;
+    recordCountPrecision?: CountPrecision;
+}
+
 /** A description of where the package file should be published. */
 export interface RegistryReference {
     /** The HTTP or HTTPS URL to reach the registry server. */
@@ -31,6 +54,9 @@ export interface Source {
      * to determine if there are new updates available from a source when updating a package file.
      */
     lastUpdateHash?: string;
+
+    /** The number of records last observed */
+    streamStats: StreamStats;
 }
 
 export interface ValueTypeStatistics {
@@ -70,12 +96,6 @@ export interface DerivedFrom {
 
     /** The identifier for the specific version of the datapm package version and schema title. Url or schemaIdentifier must be defined.  */
     schemaIdentifier?: SchemaIdentifier;
-}
-
-export enum CountPrecision {
-    EXACT = "EXACT",
-    APPROXIMATE = "APPROXIMATE",
-    GREATER_THAN = "GREATER_THAN"
 }
 
 /** The JSON Schema Draft 07 compliant schema object, extended with properties that describe

@@ -32,6 +32,7 @@ export enum DifferenceType {
     CHANGE_PACKAGE_DISPLAY_NAME = "CHANGE_PACKAGE_DISPLAY_NAME",
     CHANGE_PACKAGE_DESCRIPTION = "CHANGE_PACKAGE_DESCRIPTION",
     CHANGE_SOURCE = "CHANGE_SOURCE",
+    CHANGE_SOURCE_STATS = "CHANGE_SOURCE_STATS",
     CHANGE_SOURCE_UPDATE_HASH = "CHANGE_SOURCE_UPDATE_HASH",
     ADD_PROPERTY = "ADD_PROPERTY",
     REMOVE_PROPERTY = "REMOVE_PROPERTY",
@@ -199,6 +200,16 @@ export function compareSources(priorSources: Source[], newSources: Source[]): Di
 
 export function compareSource(sourceA: Source, sourceB: Source, pointer = "#"): Difference[] {
     const response: Difference[] = [];
+
+    if (sourceA.streamStats.inspectedCount !== sourceB.streamStats.inspectedCount) {
+        response.push({ type: DifferenceType.CHANGE_SOURCE_STATS, pointer });
+    } else if (sourceA.streamStats.inspectedCount !== sourceB.streamStats.inspectedCount) {
+        response.push({ type: DifferenceType.CHANGE_SOURCE_STATS, pointer });
+    } else if (sourceA.streamStats.inspectedCount !== sourceB.streamStats.inspectedCount) {
+        response.push({ type: DifferenceType.CHANGE_SOURCE_STATS, pointer });
+    } else if (sourceA.streamStats.inspectedCount !== sourceB.streamStats.inspectedCount) {
+        response.push({ type: DifferenceType.CHANGE_SOURCE_STATS, pointer });
+    }
 
     if (sourceA == null && sourceB != null) {
         response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
@@ -508,7 +519,14 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
                         type: schema.source?.type,
                         uris: [schema.source?.uri],
                         configuration: schema.source?.configuration,
-                        lastUpdateHash: schema.source?.lastUpdateHash
+                        lastUpdateHash: schema.source?.lastUpdateHash,
+                        streamStats: {
+                            inspectedCount: schema.recordsInspectedCount || 0,
+                            byteCount: schema.byteCount,
+                            byteCountPrecision: (schema.byteCountPrecision as unknown) as CountPrecision,
+                            recordCount: schema.recordCount,
+                            recordCountPrecision: (schema.recordCountPrecision as unknown) as CountPrecision
+                        }
                     }
                 ];
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
