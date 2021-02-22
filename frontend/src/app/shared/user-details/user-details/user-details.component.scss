@@ -1,6 +1,9 @@
 @import "../../../../styles/variables";
 
 #detailsPage {
+    min-height: 350px;
+    margin-top: 30px;
+
     .no-keys-div {
         font-family: $family-roboto-mono;
         font-style: $style-normal;

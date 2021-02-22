@@ -23,6 +23,7 @@
                 [dataSource]="dataSource"
                 *ngIf="!loading; else loadingSpinner"
                 class="gray-table gray-responsive"
+                aria-describedby="userAdmin"
             >
                 <ng-container matColumnDef="username">
                     <th mat-header-cell *matHeaderCellDef scope="col">Username</th>
@@ -77,7 +78,7 @@
             </table>
             <ng-template #loadingSpinner>
                 <div class="d-flex justify-content-center">
-                    <mat-spinner class="spinner"></mat-spinner>
+                    <mat-spinner class="spinner" diameter="40"></mat-spinner>
                 </div>
             </ng-template>
 

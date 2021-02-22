@@ -46,7 +46,8 @@ export class EditCollectionComponent {
             }),
             newCollectionSlug: new FormControl(data.identifier.collectionSlug, {
                 asyncValidators: [slugValidator()]
-            })
+            }),
+            description: new FormControl(data.description)
         });
 
         this.isPublicControl.setValue(this.data.isPublic);

@@ -17,7 +17,9 @@
                                     to view of any of the collections they have created.
                                 </span>
 
-                                <a target="_blank" href="/docs/concepts/collections">Learn more about collections</a>
+                                <a target="_blank" href="/docs/concepts/collections">
+                                    <span class="pl-1" style="font-size: 13px">Learn more about collections.</span>
+                                </a>
                             </div>
                             <div class="col-md-12 col-lg-12 my-3" *ngIf="isCurrentUser">
                                 <a class="app-outlined-button" (click)="createCollection()">Create A Collection</a>
@@ -33,9 +35,9 @@
                                     <span *ngIf="!isCurrentUser" class="package-dark-gray pl-3">
                                         Collections of data created by {{ username }}.
                                     </span>
-                                    <a target="_blank" href="/docs/concepts/collections"
-                                        >Learn more about collections</a
-                                    >
+                                    <a target="_blank" href="/docs/concepts/collections">
+                                        <span class="pl-1" style="font-size: 13px"> Learn more about collections.</span>
+                                    </a>
                                 </p>
                             </div>
 
