@@ -216,6 +216,12 @@
                                     }
                                 }
                             },
+                            "hidden": {
+                                "$id": "#/schemas/hidden",
+                                "type": "boolean",
+                                "title": "Hidden",
+                                "description": "Whether this schema should be used by the consumer by default."
+                            },
                             "derivedFromDescription": {
                                 "$id": "#/schemas/derivedFromDescription",
                                 "type": "string",

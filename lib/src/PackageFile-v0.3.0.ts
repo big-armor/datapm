@@ -105,6 +105,9 @@ export interface Schema extends JSONSchema7 {
     /** The JSON Schema Draft 07 compliant property list for the object */
     properties?: Properties;
 
+    /** Whether the consumer should by default include this schema/property in the regular output */
+    hidden?: boolean;
+
     /** What the schema or a property in the data represents. Example for objects: Person, Date and Location, Point In Time. Examples for values: Meters, Degrees Celsius */
     unit?: string;
 
@@ -123,12 +126,6 @@ export interface Schema extends JSONSchema7 {
 
     /** How to consider the recordCount value - as one of exact, approximate, or greater than. */
     recordCountPrecision?: CountPrecision;
-
-    /** The exact or approximate number of bytes of data in the values of the data (not including format overhead) */
-    byteCount?: number;
-
-    /** Whether the byte count is exact or approximate. */
-    byteCountPrecision?: CountPrecision;
 
     /** A object which has keys that the property type (string, array, date, boolean, object, etc). The values of this object describe the property type. */
     valueTypes?: ValueTypes;

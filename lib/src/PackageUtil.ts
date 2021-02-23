@@ -28,6 +28,7 @@ export enum Compability {
 
 export enum DifferenceType {
     REMOVE_SCHEMA = "REMOVE_SCHEMA",
+    REMOVE_HIDDEN_SCHEMA = "REMOVE_HIDDEN_SCHEMA",
     ADD_SCHEMA = "ADD_SCHEMA",
     CHANGE_PACKAGE_DISPLAY_NAME = "CHANGE_PACKAGE_DISPLAY_NAME",
     CHANGE_PACKAGE_DESCRIPTION = "CHANGE_PACKAGE_DESCRIPTION",
@@ -36,6 +37,7 @@ export enum DifferenceType {
     CHANGE_SOURCE_UPDATE_HASH = "CHANGE_SOURCE_UPDATE_HASH",
     ADD_PROPERTY = "ADD_PROPERTY",
     REMOVE_PROPERTY = "REMOVE_PROPERTY",
+    REMOVE_HIDDEN_PROPERTY = "REMOVE_HIDDEN_PROPERTY",
     CHANGE_PROPERTY_TYPE = "CHANGE_PROPERTY_TYPE",
     CHANGE_PROPERTY_FORMAT = "CHANGE_PROPERTY_FORMAT",
     CHANGE_PROPERTY_DESCRIPTION = "CHANGE_PROPERTY_DESCRIPTION",
@@ -162,11 +164,19 @@ export function compareSchemas(priorSchemas: Schema[], newSchemas: Schema[]): Di
             response = response.concat(compareSchema(schemaA, schemaB, "#"));
         }
 
-        if (!found)
-            response.push({
-                type: DifferenceType.REMOVE_SCHEMA,
-                pointer: ""
-            });
+        if (!found) {
+            if (schemaA.hidden === true) {
+                response.push({
+                    type: DifferenceType.REMOVE_HIDDEN_SCHEMA,
+                    pointer: ""
+                });
+            } else {
+                response.push({
+                    type: DifferenceType.REMOVE_SCHEMA,
+                    pointer: ""
+                });
+            }
+        }
     }
 
     return response;
@@ -377,10 +387,13 @@ export function diffCompatibility(diffs: Difference[]): Compability {
                 break;
 
             case DifferenceType.CHANGE_SOURCE_UPDATE_HASH:
+            case DifferenceType.CHANGE_SOURCE_STATS:
             case DifferenceType.CHANGE_GENERATED_BY:
             case DifferenceType.CHANGE_UPDATED_DATE:
             case DifferenceType.CHANGE_README_FILE:
             case DifferenceType.CHANGE_LICENSE_FILE:
+            case DifferenceType.REMOVE_HIDDEN_PROPERTY:
+            case DifferenceType.REMOVE_HIDDEN_SCHEMA:
                 // nothing to do
                 break;
 

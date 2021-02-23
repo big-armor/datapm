@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { Schema } from "datapm-lib";
+import { CountPrecision, PackageFile, Schema } from "datapm-lib";
 
 @Pipe({
     name: "packageSize"
@@ -7,9 +7,31 @@ import { Schema } from "datapm-lib";
 export class PackageSizePipe implements PipeTransform {
     private readonly units = ["B", "KB", "MB", "GB"];
 
-    transform(value: Schema[]): unknown {
-        const totalSize = value?.reduce((sum, item) => sum + item.byteCount, 0) || 0;
-        return this.convertSize(totalSize);
+    transform(value: PackageFile): unknown {
+        const totalSize = value.sources.reduce((sum, item) => sum + item.streamStats.byteCount, 0) || 0;
+        const bytes = this.convertSize(totalSize);
+
+        let highestPrecision = CountPrecision.EXACT;
+
+        for (const source of value.sources) {
+            if (source.streamStats.byteCountPrecision == CountPrecision.GREATER_THAN)
+                highestPrecision = CountPrecision.GREATER_THAN;
+            else if (
+                highestPrecision != CountPrecision.GREATER_THAN &&
+                source.streamStats.byteCountPrecision == CountPrecision.APPROXIMATE
+            )
+                highestPrecision = CountPrecision.APPROXIMATE;
+        }
+
+        let prefix = "";
+
+        if (highestPrecision == CountPrecision.GREATER_THAN) {
+            prefix = ">";
+        } else if (highestPrecision == CountPrecision.APPROXIMATE) {
+            prefix = "~";
+        }
+
+        return prefix + bytes;
     }
 
     private convertSize(bytes: number) {

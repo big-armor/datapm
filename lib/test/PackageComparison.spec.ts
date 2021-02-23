@@ -687,4 +687,10 @@ describe("Checking VersionUtil", () => {
             true
         );
     });
+
+    // TODO Add test for removing a schema
+
+    // TODO Add test for removing a hidden schema
+
+    // TODO Add test for removing a hidden property
 });
