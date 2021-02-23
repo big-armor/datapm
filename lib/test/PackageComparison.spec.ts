@@ -335,70 +335,98 @@ describe("Checking VersionUtil", () => {
 
     it("Compare source objects", () => {
         const sourceA: Source = {
+            slug: "datapm",
             type: "test",
             uris: ["http://datapm.io/test", "http://datapm.io/test2"],
             configuration: {},
-            lastUpdateHash: "abc123",
-            schemaTitles: ["A"],
-            streamStats: {
-                inspectedCount: 0
-            }
+            streamSets: [
+                {
+                    configuration: {},
+                    slug: "streamA",
+                    lastUpdateHash: "abc123",
+                    schemaTitles: ["A"],
+                    streamStats: {
+                        inspectedCount: 0
+                    }
+                }
+            ]
         };
 
         const sourceB: Source = {
+            slug: "datapm",
             type: "test",
             uris: ["http://datapm.io/test", "http://datapm.io/test2"],
             configuration: {},
-            lastUpdateHash: "abc123",
-            schemaTitles: ["A"],
-            streamStats: {
-                inspectedCount: 0
-            }
+            streamSets: [
+                {
+                    configuration: {},
+                    slug: "streamA",
+                    lastUpdateHash: "abc123",
+                    schemaTitles: ["A"],
+                    streamStats: {
+                        inspectedCount: 0
+                    }
+                }
+            ]
         };
 
         const diffs = compareSource(sourceA, sourceB);
 
         expect(diffs.length).equals(0);
 
-        sourceA.lastUpdateHash = "test";
+        sourceA.streamSets[0].lastUpdateHash = "test";
 
         const diffs2 = compareSource(sourceA, sourceB);
 
-        expect(diffs2[0].type).equal(DifferenceType.CHANGE_SOURCE_UPDATE_HASH);
+        expect(diffs2[0].type).equal(DifferenceType.CHANGE_STREAM_UPDATE_HASH);
 
-        sourceA.lastUpdateHash = sourceB.lastUpdateHash;
+        sourceA.streamSets[0].lastUpdateHash = sourceB.streamSets[0].lastUpdateHash;
 
         sourceA.uris = ["http://datapm.io.test"];
 
         const diffs3 = compareSource(sourceA, sourceB);
 
-        expect(diffs3[0].type).equal(DifferenceType.CHANGE_SOURCE);
+        expect(diffs3[0].type).equal(DifferenceType.CHANGE_SOURCE_URIS);
     });
 
     it("Compare source arrays", () => {
         const sourceA: Source[] = [
             {
+                slug: "datapm",
                 type: "test",
                 uris: ["http://datapm.io/test", "http://datapm.io/test2"],
                 configuration: {},
-                lastUpdateHash: "abc123",
-                schemaTitles: ["A"],
-                streamStats: {
-                    inspectedCount: 0
-                }
+                streamSets: [
+                    {
+                        configuration: {},
+                        slug: "streamA",
+                        lastUpdateHash: "abc123",
+                        schemaTitles: ["A"],
+                        streamStats: {
+                            inspectedCount: 0
+                        }
+                    }
+                ]
             }
         ];
 
         const sourceB: Source[] = [
             {
+                slug: "datapm",
                 type: "test",
                 uris: ["http://datapm.io/test", "http://datapm.io/test2"],
                 configuration: {},
-                lastUpdateHash: "abc123",
-                schemaTitles: ["A"],
-                streamStats: {
-                    inspectedCount: 0
-                }
+                streamSets: [
+                    {
+                        configuration: {},
+                        slug: "streamA",
+                        lastUpdateHash: "abc123",
+                        schemaTitles: ["A"],
+                        streamStats: {
+                            inspectedCount: 0
+                        }
+                    }
+                ]
             }
         ];
 
@@ -410,33 +438,94 @@ describe("Checking VersionUtil", () => {
 
         const diffs2 = compareSources(sourceA, sourceB);
 
-        expect(diffs2[0].type).equal(DifferenceType.CHANGE_SOURCE);
+        expect(diffs2[0].type).equal(DifferenceType.CHANGE_SOURCE_URIS);
     });
 
-    it("Stream status change detection", () => {
+    it("Detected removed sources", () => {
         const sourceA: Source[] = [
             {
+                slug: "datapm",
                 type: "test",
                 uris: ["http://datapm.io/test", "http://datapm.io/test2"],
                 configuration: {},
-                lastUpdateHash: "abc123",
-                schemaTitles: ["A"],
-                streamStats: {
-                    inspectedCount: 0
-                }
+                streamSets: [
+                    {
+                        configuration: {},
+                        slug: "streamA",
+                        lastUpdateHash: "abc123",
+                        schemaTitles: ["A"],
+                        streamStats: {
+                            inspectedCount: 0
+                        }
+                    }
+                ]
             }
         ];
 
         const sourceB: Source[] = [
             {
+                slug: "datapm2",
                 type: "test",
                 uris: ["http://datapm.io/test", "http://datapm.io/test2"],
                 configuration: {},
-                lastUpdateHash: "abc123",
-                schemaTitles: ["A"],
-                streamStats: {
-                    inspectedCount: 1
-                }
+                streamSets: [
+                    {
+                        configuration: {},
+                        slug: "streamA",
+                        lastUpdateHash: "abc123",
+                        schemaTitles: ["A"],
+                        streamStats: {
+                            inspectedCount: 0
+                        }
+                    }
+                ]
+            }
+        ];
+
+        const diffs = compareSources(sourceA, sourceB);
+
+        expect(diffs.length).equals(1);
+        expect(diffs[0].type).equals(DifferenceType.REMOVE_SOURCE);
+    });
+
+    it("Stream status change detection", () => {
+        const sourceA: Source[] = [
+            {
+                slug: "datapm",
+                type: "test",
+                uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+                configuration: {},
+                streamSets: [
+                    {
+                        slug: "test",
+                        configuration: {},
+                        lastUpdateHash: "abc123",
+                        schemaTitles: ["A"],
+                        streamStats: {
+                            inspectedCount: 0
+                        }
+                    }
+                ]
+            }
+        ];
+
+        const sourceB: Source[] = [
+            {
+                slug: "datapm",
+                type: "test",
+                uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+                configuration: {},
+                streamSets: [
+                    {
+                        slug: "test",
+                        configuration: {},
+                        lastUpdateHash: "abc123",
+                        schemaTitles: ["A"],
+                        streamStats: {
+                            inspectedCount: 1
+                        }
+                    }
+                ]
             }
         ];
 
@@ -444,7 +533,15 @@ describe("Checking VersionUtil", () => {
 
         expect(diffs.length).equals(1);
 
-        expect(diffs[0].type).equal(DifferenceType.CHANGE_SOURCE_STATS);
+        expect(diffs[0].type).equal(DifferenceType.CHANGE_STREAM_STATS);
+
+        sourceB[0].streamSets[0].slug += "!";
+
+        const diffs2 = compareSources(sourceA, sourceB);
+
+        expect(diffs2.length).equals(1);
+
+        expect(diffs2[0].type).equal(DifferenceType.REMOVE_STREAM_SET);
     });
 
     it("Package File updated dates", function () {

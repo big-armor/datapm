@@ -4,7 +4,7 @@ import fs from "fs";
 import path from "path";
 import AJV from "ajv";
 import fetch from "cross-fetch";
-import { Source } from "./PackageFile-v0.3.0";
+import { Source, StreamSet } from "./PackageFile-v0.3.0";
 import { PackageFileV020 } from "./PackageFile-v0.2.0";
 
 export type DPMRecordValue =
@@ -30,11 +30,13 @@ export enum DifferenceType {
     REMOVE_SCHEMA = "REMOVE_SCHEMA",
     REMOVE_HIDDEN_SCHEMA = "REMOVE_HIDDEN_SCHEMA",
     ADD_SCHEMA = "ADD_SCHEMA",
+    REMOVE_SOURCE = "REMOVE_SOURCE",
     CHANGE_PACKAGE_DISPLAY_NAME = "CHANGE_PACKAGE_DISPLAY_NAME",
     CHANGE_PACKAGE_DESCRIPTION = "CHANGE_PACKAGE_DESCRIPTION",
     CHANGE_SOURCE = "CHANGE_SOURCE",
-    CHANGE_SOURCE_STATS = "CHANGE_SOURCE_STATS",
-    CHANGE_SOURCE_UPDATE_HASH = "CHANGE_SOURCE_UPDATE_HASH",
+    CHANGE_SOURCE_URIS = "CHANGE_SOURCE_URIS",
+    CHANGE_STREAM_STATS = "CHANGE_SOURCE_STATS",
+    CHANGE_STREAM_UPDATE_HASH = "CHANGE_SOURCE_UPDATE_HASH",
     ADD_PROPERTY = "ADD_PROPERTY",
     REMOVE_PROPERTY = "REMOVE_PROPERTY",
     REMOVE_HIDDEN_PROPERTY = "REMOVE_HIDDEN_PROPERTY",
@@ -49,7 +51,8 @@ export enum DifferenceType {
     CHANGE_README_FILE = "CHANGE_README_FILE",
     CHANGE_LICENSE_FILE = "CHANGE_LICENSE_FILE",
     CHANGE_WEBSITE = "CHANGE_WEBSITE",
-    CHANGE_CONTACT_EMAIL = "CHANGE_CONTACT_EMAIL"
+    CHANGE_CONTACT_EMAIL = "CHANGE_CONTACT_EMAIL",
+    REMOVE_STREAM_SET = "REMOVE_STREAM_SET"
 }
 export interface Difference {
     type: DifferenceType;
@@ -189,7 +192,7 @@ export function compareSources(priorSources: Source[], newSources: Source[]): Di
         let found = false;
 
         for (const sourceB of newSources) {
-            if (!sourceURIsEquivalent(sourceA.uris, sourceB.uris)) continue;
+            if (sourceA.slug !== sourceB.slug) continue;
 
             found = true;
 
@@ -200,7 +203,7 @@ export function compareSources(priorSources: Source[], newSources: Source[]): Di
 
         if (!found)
             response.push({
-                type: DifferenceType.CHANGE_SOURCE,
+                type: DifferenceType.REMOVE_SOURCE,
                 pointer: ""
             });
     }
@@ -208,37 +211,58 @@ export function compareSources(priorSources: Source[], newSources: Source[]): Di
     return response;
 }
 
-export function compareSource(sourceA: Source, sourceB: Source, pointer = "#"): Difference[] {
+export function compareStream(priorStreamSet: StreamSet, newStreamSet: StreamSet, pointer = "#"): Difference[] {
     const response: Difference[] = [];
 
-    if (sourceA.streamStats.inspectedCount !== sourceB.streamStats.inspectedCount) {
-        response.push({ type: DifferenceType.CHANGE_SOURCE_STATS, pointer });
-    } else if (sourceA.streamStats.inspectedCount !== sourceB.streamStats.inspectedCount) {
-        response.push({ type: DifferenceType.CHANGE_SOURCE_STATS, pointer });
-    } else if (sourceA.streamStats.inspectedCount !== sourceB.streamStats.inspectedCount) {
-        response.push({ type: DifferenceType.CHANGE_SOURCE_STATS, pointer });
-    } else if (sourceA.streamStats.inspectedCount !== sourceB.streamStats.inspectedCount) {
-        response.push({ type: DifferenceType.CHANGE_SOURCE_STATS, pointer });
+    if (priorStreamSet.streamStats.inspectedCount !== newStreamSet.streamStats.inspectedCount) {
+        response.push({ type: DifferenceType.CHANGE_STREAM_STATS, pointer });
+    } else if (priorStreamSet.streamStats.inspectedCount !== newStreamSet.streamStats.inspectedCount) {
+        response.push({ type: DifferenceType.CHANGE_STREAM_STATS, pointer });
+    } else if (priorStreamSet.streamStats.inspectedCount !== newStreamSet.streamStats.inspectedCount) {
+        response.push({ type: DifferenceType.CHANGE_STREAM_STATS, pointer });
+    } else if (priorStreamSet.streamStats.inspectedCount !== newStreamSet.streamStats.inspectedCount) {
+        response.push({ type: DifferenceType.CHANGE_STREAM_STATS, pointer });
     }
 
-    if (sourceA == null && sourceB != null) {
+    if (priorStreamSet.lastUpdateHash !== newStreamSet.lastUpdateHash && priorStreamSet.lastUpdateHash != null) {
+        response.push({ type: DifferenceType.CHANGE_STREAM_UPDATE_HASH, pointer: pointer });
+    }
+
+    return response;
+}
+
+export function compareSource(priorSource: Source, newSource: Source, pointer = "#"): Difference[] {
+    let response: Difference[] = [];
+
+    if (!sourceURIsEquivalent(priorSource.uris, newSource.uris)) {
+        response.push({ type: DifferenceType.CHANGE_SOURCE_URIS, pointer });
+    }
+
+    if (priorSource == null && newSource != null) {
         response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
-    } else if (sourceB == null && sourceA != null) {
+    } else if (newSource == null && priorSource != null) {
         response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
-    } else if (sourceA != null && sourceB != null) {
-        if (sourceA.type !== sourceB.type) {
+    } else if (priorSource != null && newSource != null) {
+        if (priorSource.type !== newSource.type) {
             response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
-        } else if (!sourceURIsEquivalent(sourceA.uris, sourceB.uris)) {
+        } else if (!sourceURIsEquivalent(priorSource.uris, newSource.uris)) {
             response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
         } else {
-            const configComparison = compareConfigObjects(sourceA.configuration, sourceB.configuration);
+            const configComparison = compareConfigObjects(priorSource.configuration, newSource.configuration);
 
             if (!configComparison) response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
         }
+    }
 
-        if (sourceA.lastUpdateHash !== sourceB.lastUpdateHash && sourceA.lastUpdateHash != null) {
-            response.push({ type: DifferenceType.CHANGE_SOURCE_UPDATE_HASH, pointer: pointer });
+    for (const priorStreamSet of priorSource.streamSets) {
+        const newStreamSet = newSource.streamSets.find((ssB) => ssB.slug === priorStreamSet.slug);
+
+        if (!newStreamSet) {
+            response.push({ type: DifferenceType.REMOVE_STREAM_SET, pointer });
+            continue;
         }
+
+        response = response.concat(compareStream(priorStreamSet, newStreamSet, pointer));
     }
 
     return response;
@@ -386,8 +410,8 @@ export function diffCompatibility(diffs: Difference[]): Compability {
                 returnValue = Math.max(returnValue, Compability.MinorChange);
                 break;
 
-            case DifferenceType.CHANGE_SOURCE_UPDATE_HASH:
-            case DifferenceType.CHANGE_SOURCE_STATS:
+            case DifferenceType.CHANGE_STREAM_UPDATE_HASH:
+            case DifferenceType.CHANGE_STREAM_STATS:
             case DifferenceType.CHANGE_GENERATED_BY:
             case DifferenceType.CHANGE_UPDATED_DATE:
             case DifferenceType.CHANGE_README_FILE:
@@ -527,19 +551,27 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
             if (schema && schema.source) {
                 newPackagefile.sources = [
                     {
+                        slug: schema.source?.uri,
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                        schemaTitles: [schema.title!],
                         type: schema.source?.type,
                         uris: [schema.source?.uri],
                         configuration: schema.source?.configuration,
-                        lastUpdateHash: schema.source?.lastUpdateHash,
-                        streamStats: {
-                            inspectedCount: schema.recordsInspectedCount || 0,
-                            byteCount: schema.byteCount,
-                            byteCountPrecision: (schema.byteCountPrecision as unknown) as CountPrecision,
-                            recordCount: schema.recordCount,
-                            recordCountPrecision: (schema.recordCountPrecision as unknown) as CountPrecision
-                        }
+                        streamSets: [
+                            {
+                                slug: schema.source?.uri,
+                                configuration: {},
+                                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                                schemaTitles: [schema.title!],
+                                lastUpdateHash: schema.source?.lastUpdateHash,
+                                streamStats: {
+                                    inspectedCount: schema.recordsInspectedCount || 0,
+                                    byteCount: schema.byteCount,
+                                    byteCountPrecision: (schema.byteCountPrecision as unknown) as CountPrecision,
+                                    recordCount: schema.recordCount,
+                                    recordCountPrecision: (schema.recordCountPrecision as unknown) as CountPrecision
+                                }
+                            }
+                        ]
                     }
                 ];
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any

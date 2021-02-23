@@ -33,22 +33,19 @@ export interface RegistryReference {
     catalogSlug: string;
 }
 
-/** Describes where the data resides, and how to access to byte stream of the data. */
-export interface Source {
-    /** The universally unique identifier for the sourceInterface implementation */
-    type: string;
+/** Represents a single logical unit of streaming data from a source. For example
+ * a file system/SFTP/NFS select of *.xml from a particular directory would be one stream set. Each table in a database would
+ * be another stream set.
+ */
+export interface StreamSet {
+    /** The unique identifier for the stream set in a single source */
+    slug: string;
 
-    /** The URI used for accessing the data */
-    uris: string[];
+    /** Configuration necessary to access the stream set from the source */
+    configuration: DPMConfiguration;
 
     /** The titles of schemas present in this source. One source produces one or more schemas of data. A schema may be present in more than one source. */
     schemaTitles: string[];
-
-    /** An object containing valid JSON properties for the purposes of accessing the data. The schema
-     * of this object is loose because it is up to the source implementation to define it's own schema
-     * configuration.
-     */
-    configuration?: DPMConfiguration;
 
     /** The last update hash provided by the source after generating the file package file. This is used
      * to determine if there are new updates available from a source when updating a package file.
@@ -57,6 +54,28 @@ export interface Source {
 
     /** The number of records last observed */
     streamStats: StreamStats;
+}
+
+/** Describes where the data resides, and how to access one or more logical sets of streams. For example, how to
+ * access a database, and which tables are each an individual stream set.
+ */
+export interface Source {
+    /** The universally unique identifier for the sourceInterface implementation */
+    type: string;
+
+    /** The unique identifier for this source in the package */
+    slug: string;
+
+    /** The URI used for accessing the data */
+    uris: string[];
+
+    /** An object containing valid JSON properties for the purposes of accessing the source. The schema
+     * of this object is loose because it is up to the source implementation to define it's own schema
+     * configuration. This is used in combination with the StreamSet.configuration to access an individual stream
+     */
+    configuration?: DPMConfiguration;
+
+    streamSets: StreamSet[];
 }
 
 export interface ValueTypeStatistics {
