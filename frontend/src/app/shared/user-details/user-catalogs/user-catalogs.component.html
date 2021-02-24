@@ -7,18 +7,21 @@
                         <div class="package-details-title pl-3">
                             {{ isCurrentUser ? "My Catalogs" : "Catalogs" }}
                         </div>
-                        <p class="pr-4">
-                            <span *ngIf="isCurrentUser" class="package-dark-gray pl-3"
+                        <p class="col-lg-8">
+                            <span *ngIf="isCurrentUser" class="package-dark-gray"
                                 >Catalogs represent a single individual or organization. All data packages belong to one
                                 and only one catalog.</span
                             >
-                            <span *ngIf="!isCurrentUser && myCatalogs.length > 0" class="package-dark-gray pl-3"
-                                >Catalogs created by {{ username }}
+                            <span *ngIf="!isCurrentUser && myCatalogs.length > 0" class="package-dark-gray"
+                                >Catalogs created by <span style="font-weight: 500">{{ username }}</span>
                             </span>
 
-                            <span *ngIf="!isCurrentUser && myCatalogs.length == 0" class="section-description">
-                                Either {{ username }} has not created any catalogs, or you do not have permission to
-                                view any of the catalogs they have created.
+                            <span *ngIf="!isCurrentUser && myCatalogs.length == 0" class="package-dark-gray">
+                                Either <span style="font-weight: 500">{{ username }}</span> has not created any
+                                catalogs, or you do not have permission to view any of the catalogs they have created.
+                                <a target="_blank" href="/docs/catalogs">
+                                    <span style="font-size: 13px"> Learn more about catalogs.</span>
+                                </a>
                             </span>
                         </p>
 
@@ -67,13 +70,19 @@
                                         (click)="editCatalog(catalog)"
                                         >Edit</a
                                     >
-                                    <a
-                                        class="app-outlined-button"
-                                        [class.disabled]="!canModifyCatalog(catalog.identifier.catalogSlug)"
-                                        (click)="deleteCatalog(catalog)"
+                                    <button
+                                        [matTooltip]="message.value"
+                                        [matTooltipPosition]="'above'"
+                                        [matTooltipDisabled]="canModifyCatalog(catalog.identifier.catalogSlug)"
                                     >
-                                        <span class="delete-txt">Delete</span>
-                                    </a>
+                                        <a
+                                            class="app-outlined-button"
+                                            [class.disabled]="!canModifyCatalog(catalog.identifier.catalogSlug)"
+                                            (click)="deleteCatalog(catalog)"
+                                        >
+                                            <span class="delete-txt">Delete</span>
+                                        </a>
+                                    </button>
                                 </td>
                             </ng-container>
 

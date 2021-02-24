@@ -56,16 +56,19 @@
 
                 <ng-container matColumnDef="isAdmin">
                     <th mat-header-cell *matHeaderCellDef>Admin</th>
-                    <td mat-cell *matCellDef="let element">
-                        <mat-icon *ngIf="element.isAdmin">check_circle_outline</mat-icon>
+                    <td mat-cell *matCellDef="let element" class="pl-2">
+                        <mat-icon *ngIf="element.isAdmin" style="font-size: 20px">check_circle_outline</mat-icon>
                     </td>
                 </ng-container>
 
                 <ng-container matColumnDef="actions">
                     <th mat-header-cell *matHeaderCellDef scope="col">Actions</th>
                     <td mat-cell *matCellDef="let element">
-                        <button (click)="openUserStatusChangeConfirmationDialog(element)" color="app-outlined-button">
-                            Change status
+                        <button
+                            (click)="openUserStatusChangeConfirmationDialog(element)"
+                            class="app-outlined-button mr-3"
+                        >
+                            <span class="info-txt">Change status</span>
                         </button>
                         <button (click)="openDeleteUserConfirmationDialog(element)" class="app-outlined-button">
                             <span class="delete-txt">Delete</span>

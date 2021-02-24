@@ -7,6 +7,7 @@ import { takeUntil } from "rxjs/operators";
 import Timeout = NodeJS.Timeout;
 import { ConfirmationDialogService } from "../../../services/dialog/confirmation-dialog.service";
 import { UserStatusChangeDialogResponse } from "src/app/services/dialog/user-status-change-dialog-response";
+import { DialogSize } from "src/app/services/dialog/dialog-size";
 
 @Component({
     selector: "app-users",
@@ -22,7 +23,7 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
         "isAdmin",
         "actions"
     ];
-    public readonly USERS_PER_PAGE = 20;
+    public readonly USERS_PER_PAGE = 10;
 
     public readonly dataSource = new MatTableDataSource<User>();
     private readonly destroyed = new Subject();
@@ -93,7 +94,7 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
 
     public openUserStatusChangeConfirmationDialog(user: User): void {
         this.confirmationDialogService
-            .openUserStatusChangeConfirmationDialog({ data: user })
+            .openUserStatusChangeConfirmationDialog({ data: user, size: DialogSize.MEDIUM })
             .subscribe((response: UserStatusChangeDialogResponse) => {
                 if (response) {
                     this.changeUserStatusGQL

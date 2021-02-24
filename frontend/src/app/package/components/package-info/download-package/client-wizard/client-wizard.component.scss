@@ -9,8 +9,16 @@
     }
 
     .mat-content {
-        height: 190px;
+        height: 210px;
         display: block;
+    }
+
+    a {
+        color: $color-info;
+        line-height: 24px;
+        font-size: ($text-font - 1);
+        cursor: pointer;
+        font-weight: $weight-400;
     }
 
     .stepper-content {
@@ -23,26 +31,6 @@
             line-height: 18px;
             letter-spacing: 0.4px;
             color: $gray-3;
-        }
-
-        a {
-            color: $color-info;
-            line-height: 24px;
-            font-size: ($text-font - 1);
-            cursor: pointer;
-            font-weight: $weight-400;
-        }
-    }
-
-    .white-div {
-        background-color: $white;
-        margin-top: 10px;
-        border-radius: 6px;
-        padding: 10px 15px;
-
-        p {
-            color: $gray-1;
-            margin-bottom: 0px !important;
         }
     }
 

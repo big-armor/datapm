@@ -51,6 +51,14 @@
     }
 }
 
+.copy-link {
+    color: $gray-3;
+    cursor: pointer;
+    bottom: 1px;
+    position: relative;
+    font-size: $default-font;
+}
+
 .share-data {
     button {
         border-radius: 26px;

@@ -57,6 +57,7 @@ import { UserInviteInputComponent } from "./user-invite-input/user-invite-input.
 import { MatChipsModule } from "@angular/material/chips";
 import { PackageAndCollectionComponent } from "./package-and-collection/package-and-collection.component";
 import { CollectionsHorizontalListComponent } from "./package-and-collection/collections-horizontal-list/collections-horizontal-list.component";
+import { MatTooltipModule } from "@angular/material/tooltip";
 
 @NgModule({
     declarations: [
@@ -117,6 +118,7 @@ import { CollectionsHorizontalListComponent } from "./package-and-collection/col
         MatSlideToggleModule,
         MatTableModule,
         MatChipsModule,
+        MatTooltipModule,
         FormsModule,
         ReactiveFormsModule,
         RouterModule

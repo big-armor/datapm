@@ -60,7 +60,7 @@
             <div mat-dialog-actions class="mb-12">
                 <button mat-button class="ml-auto save-btn" [disabled]="form.invalid" (click)="save()">
                     <span *ngIf="state !== 'LOADING'">Save</span>
-                    <mat-spinner [diameter]="16" class="mx-auto" *ngIf="state === 'LOADING'"></mat-spinner>
+                    <mat-spinner [diameter]="20" class="mx-auto" *ngIf="state === 'LOADING'"></mat-spinner>
                 </button>
             </div>
         </form>

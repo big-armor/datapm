@@ -7,6 +7,8 @@ export interface DeleteConfirmationData {
     collectionSlug: string;
 }
 
+type State = "INIT" | "LOADING" | "SUCCESS" | "ERROR";
+
 @Component({
     selector: "app-delete-collection",
     templateUrl: "./delete-collection.component.html",
@@ -14,6 +16,7 @@ export interface DeleteConfirmationData {
 })
 export class DeleteCollectionComponent implements OnInit {
     confirmVal: string = "";
+    public state: State = "INIT";
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: DeleteConfirmationData,
         private dialogRef: MatDialogRef<DeleteCollectionComponent>,
@@ -24,6 +27,11 @@ export class DeleteCollectionComponent implements OnInit {
     ngOnInit(): void {}
 
     confirm() {
+        if (this.state === "LOADING") {
+            return;
+        }
+
+        this.state = "LOADING";
         this.deleteCollectionGQL
             .mutate({
                 identifier: {

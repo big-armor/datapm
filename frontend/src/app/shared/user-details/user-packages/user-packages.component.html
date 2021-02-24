@@ -10,23 +10,29 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-lg-12">
             <div *ngIf="state == State.SUCCESS" id="packagesPage" class="big-div-package">
-                <div class="package-details-title pl-3">
-                    {{ isCurrentUser ? "My Packages" : "Packages" }}
-                </div>
-                <p *ngIf="isCurrentUser" class="package-dark-gray pl-3">
-                    A package is a single offering of one or more data sets. You can publish packages to this registry,
-                    and consume packages that you discover on this registry.
-                </p>
+                <div class="col-lg-9">
+                    <div class="package-details-title">
+                        {{ isCurrentUser ? "My Packages" : "Packages" }}
+                    </div>
 
-                <p *ngIf="!isCurrentUser && packages.length > 0" class="package-dark-gray pl-3">
-                    Packages of data published by {{ username }}.
-                </p>
-                <p *ngIf="!isCurrentUser && packages.length == 0" class="package-dark-gray pl-3">
-                    Either {{ username }} has not published a package, or you do not have permission to any of the
-                    packages they have published.
-                </p>
+                    <span *ngIf="isCurrentUser" class="package-dark-gray">
+                        You have no published packages on this registry.
+                        <a href="/docs/publish-data" target="_blank">
+                            <span style="font-size: 13px">Learn how to publish a package.</span>
+                        </a>
+                    </span>
+
+                    <p *ngIf="!isCurrentUser && packages.length > 0" class="package-dark-gray">
+                        Packages of data published by <span style="font-weight: 500">{{ username }}</span
+                        >.
+                    </p>
+                    <p *ngIf="!isCurrentUser && packages.length == 0" class="package-dark-gray">
+                        Either <span style="font-weight: 500">{{ username }}</span> has not published a package, or you
+                        do not have permission to any of the packages they have published.
+                    </p>
+                </div>
 
                 <app-package-item
                     [item]="package"

@@ -77,13 +77,15 @@
                                     <div class="d-flex">
                                         <div class="package-identifier w-100">
                                             <div class="identifier">
-                                                <app-avatar
-                                                    class="pr-3 user-img"
+                                                <a
+                                                    class="mr-3"
+                                                    [routerLink]="['/' + package?.identifier.catalogSlug]"
+                                                    style="width: 40px; height: 40px; border-radius: 50%"
                                                     *ngIf="catalogUser"
-                                                    [user]="catalogUser"
-                                                    [size]="40"
                                                 >
-                                                </app-avatar>
+                                                    <app-avatar class="user-img" [user]="catalogUser" [size]="40">
+                                                    </app-avatar>
+                                                </a>
                                                 <div class="d-flex flex-column bd-highlight">
                                                     <div class="bd-highlight">
                                                         <span
@@ -100,6 +102,9 @@
                                                             package?.identifier.catalogSlug
                                                         }}</a
                                                         >/{{ package?.identifier.packageSlug }}
+                                                        <a class="copy-link" (click)="copyCommand()">
+                                                            <em class="far fa-copy"></em>
+                                                        </a>
                                                     </div>
                                                 </div>
                                             </div>

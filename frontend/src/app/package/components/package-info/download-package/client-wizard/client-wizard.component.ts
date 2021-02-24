@@ -5,6 +5,8 @@ import { getRegistryURL } from "src/app/helpers/RegistryAccessHelper";
 import { PackageService } from "src/app/package/services/package.service";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { ApiKeyService } from "src/app/services/api-key.service";
+import { SnackBarService } from "src/app/services/snackBar.service";
+import { Clipboard } from "@angular/cdk/clipboard";
 
 @Component({
     selector: "app-client-wizard",
@@ -24,7 +26,9 @@ export class ClientWizardComponent implements OnInit {
     constructor(
         public apiKeysService: ApiKeyService,
         public authenticationService: AuthenticationService,
-        public pacakgeService: PackageService
+        public pacakgeService: PackageService,
+        private snackBarService: SnackBarService,
+        private clipboard: Clipboard
     ) {}
 
     @ViewChild("stepper") private myStepper: MatStepper;
@@ -63,5 +67,34 @@ export class ClientWizardComponent implements OnInit {
 
     public previous() {
         this.move(this.currentIndex - 1);
+    }
+
+    copyNodeVersionCmd() {
+        this.copyToClipboard("node -v");
+    }
+
+    copyNpmVersionCmd() {
+        this.copyToClipboard("npm -v");
+    }
+
+    copyNpmInstall() {
+        this.copyToClipboard("npm install -g datapm-client");
+    }
+
+    copyDataVersion() {
+        this.copyToClipboard("datapm --version");
+    }
+
+    copyRegistryLogin() {
+        this.copyToClipboard("datapm registry login" + this.registryUrl + " " + this.username);
+    }
+
+    copyDataFetch() {
+        this.copyToClipboard("datapm fetch " + this.packageUrl);
+    }
+
+    copyToClipboard(text) {
+        this.clipboard.copy(text);
+        this.snackBarService.openSnackBar("copied to clipboard!", "");
     }
 }

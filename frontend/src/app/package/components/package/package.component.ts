@@ -10,6 +10,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { LoginDialogComponent } from "src/app/shared/header/login-dialog/login-dialog.component";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { AddPackageComponent } from "src/app/collection-details/add-package/add-package.component";
+import { SnackBarService } from "src/app/services/snackBar.service";
 
 enum State {
     LOADING,
@@ -50,6 +51,7 @@ export class PackageComponent implements OnDestroy {
 
     constructor(
         private route: ActivatedRoute,
+        private snackBarService: SnackBarService,
         private packageService: PackageService,
         public dialog: MatDialog,
         private title: Title,
@@ -196,8 +198,20 @@ export class PackageComponent implements OnDestroy {
             data: packageFile
         });
     }
+
     derivedFromCount(packageFile: PackageFile) {
         if (packageFile == null) return 0;
         return packageFile.schemas.reduce((count, schema) => count + (schema.derivedFrom?.length || 0), 0);
+    }
+
+    public copyCommand() {
+        const el = document.createElement("textarea");
+        el.value = this.package.identifier.catalogSlug + "/" + this.package.identifier.packageSlug;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand("copy");
+        document.body.removeChild(el);
+
+        this.snackBarService.openSnackBar("package slug copied to clipboard!", "");
     }
 }

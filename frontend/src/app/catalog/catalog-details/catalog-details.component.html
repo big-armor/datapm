@@ -21,7 +21,12 @@
             <span *ngIf="!catalog?.isPublic" class="not-public-text">not public</span>
         </div>
 
-        <mat-tab-group [(selectedIndex)]="currentTab" disableRipple class="catalog-tabs mt-4">
+        <mat-tab-group
+            [(selectedIndex)]="currentTab"
+            (selectedTabChange)="updateTabParam()"
+            disableRipple
+            class="catalog-tabs mt-4"
+        >
             <mat-tab label="Packages"></mat-tab>
             <mat-tab label="Manage" *ngIf="canManage"></mat-tab>
         </mat-tab-group>

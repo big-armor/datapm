@@ -1,11 +1,13 @@
 import { Component, OnInit } from "@angular/core";
 import { Catalog, GetCatalogGQL, Package, Permission } from "src/generated/graphql";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute, NavigationExtras, Router } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
 import { EditCatalogComponent } from "src/app/shared/edit-catalog/edit-catalog.component";
 import { PageState } from "src/app/models/page-state";
 import { DialogService } from "../../services/dialog/dialog.service";
 import { DeletePackageComponent } from "../../shared/delete-package/delete-package.component";
+import { takeUntil } from "rxjs/operators";
+import { Subject } from "rxjs";
 
 @Component({
     selector: "app-catalog-details",
@@ -17,6 +19,8 @@ export class CatalogDetailsComponent implements OnInit {
     public catalog: Catalog;
     public state: PageState | "CATALOG_NOT_FOUND" | "NOT_AUTHENTICATED" = "INIT";
     public currentTab = 0;
+    private unsubscribe$: Subject<any> = new Subject();
+    private tabs = ["", "manage"];
 
     constructor(
         private getCatalogGQL: GetCatalogGQL,
@@ -24,7 +28,30 @@ export class CatalogDetailsComponent implements OnInit {
         private router: Router,
         private route: ActivatedRoute,
         private dialogService: DialogService
-    ) {}
+    ) {
+        this.route.fragment.pipe(takeUntil(this.unsubscribe$)).subscribe((fragment: string) => {
+            const index = this.tabs.findIndex((tab) => tab === fragment);
+            if (index < 0) {
+                this.currentTab = 0;
+                this.updateTabParam();
+            } else {
+                this.updateTabParam();
+            }
+        });
+    }
+
+    public updateTabParam() {
+        const tab = this.tabs[this.currentTab];
+        const extras: NavigationExtras = {
+            relativeTo: this.route
+        };
+
+        if (tab !== "") {
+            extras.fragment = tab;
+        }
+
+        this.router.navigate(["."], extras);
+    }
 
     public ngOnInit(): void {
         this.catalogSlug = this.route.snapshot.paramMap.get("catalogSlug");

@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
-import { ActivatedRoute, ParamMap } from "@angular/router";
+import { ActivatedRoute, NavigationExtras, ParamMap, Router } from "@angular/router";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { PageState } from "src/app/models/page-state";
@@ -30,8 +30,11 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
     public currentTab = 0;
     private unsubscribe$: Subject<any> = new Subject();
 
+    private tabs = ["", "Manage"];
+
     constructor(
         private route: ActivatedRoute,
+        private router: Router,
         private collectionGQL: CollectionGQL,
         private removePackageFromCollectionGQL: RemovePackageFromCollectionGQL,
         private dialog: MatDialog
@@ -40,6 +43,16 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
             this.collectionSlug = paramMap.get("collectionSlug") || "";
             this.getCollectionDetails();
         });
+
+        this.route.fragment.pipe(takeUntil(this.unsubscribe$)).subscribe((fragment: string) => {
+            const index = this.tabs.findIndex((tab) => tab === fragment);
+            if (index < 0) {
+                this.currentTab = 0;
+                this.updateTabParam();
+            } else {
+                this.updateTabParam();
+            }
+        });
     }
 
     ngOnInit(): void {}
@@ -47,6 +60,19 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
     ngOnDestroy() {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
+    }
+
+    public updateTabParam() {
+        const tab = this.tabs[this.currentTab];
+        const extras: NavigationExtras = {
+            relativeTo: this.route
+        };
+
+        if (tab !== "") {
+            extras.fragment = tab;
+        }
+
+        this.router.navigate(["."], extras);
     }
 
     private getCollectionDetails() {
