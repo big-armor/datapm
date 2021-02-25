@@ -18,7 +18,7 @@
     </div>
 
     <div class="row">
-        <div class="container">
+        <div class="container fixed-height">
             <div class="p-0" *ngIf="isCurrentUser" [ngSwitch]="selectedTab">
                 <app-user-collections
                     [isCurrentUser]="isCurrentUser"

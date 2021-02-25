@@ -23,12 +23,12 @@
 }
 
 .package-title {
-    font-family: $family-roboto-mono;
+    font-family: $family-roboto;
     font-style: $style-normal;
-    font-weight: $weight-500;
+    font-weight: $weight-400;
     font-size: $title-font;
     line-height: 26px;
-    letter-spacing: -0.28px;
+    letter-spacing: 0.4px;
     color: $gray-2;
     margin-bottom: 5px;
 }

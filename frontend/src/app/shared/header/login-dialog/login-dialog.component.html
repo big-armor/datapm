@@ -24,10 +24,7 @@
                 [error]="loginForm | inputError: 'password' | async"
             >
             </app-input>
-            <p class="forgot-pass text-left">
-                <a href="#" (click)="openForgotPasswordDialog($event)">Forgot password?</a>
-            </p>
-            <br />
+
             <div class="alert-div">
                 <div class="alert-warn" *ngIf="state == State.LOGIN_ERROR_VALIDATE_EMAIL">
                     You have not verified your email address. Check your email inbox for a "Verify Your Account" email,
@@ -43,6 +40,12 @@
                     There was a problem communicating with the server. Please try again, or contact support.
                 </div>
             </div>
+
+            <p class="forgot-pass text-left">
+                <a href="#" (click)="openForgotPasswordDialog($event)">Forgot password?</a>
+            </p>
+            <br />
+
             <div class="content-btn text-center">
                 <button type="submit" class="app-raised-button mb-1 mt-4" [disabled]="!loginForm.valid">
                     <span *ngIf="state != State.AWAITING_RESPONSE" class="btn-text">Login</span>

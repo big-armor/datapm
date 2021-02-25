@@ -1,17 +1,7 @@
-<div class="container">
-    <div class="row" *ngIf="state == State.LOADING">
-        <div class="col-12">
-            <div class="loading-container">
-                <mat-spinner [diameter]="40"></mat-spinner>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container">
+<div class="container" id="packagesPage" class="big-div-package">
     <div class="row">
         <div class="col-lg-12">
-            <div *ngIf="state == State.SUCCESS" id="packagesPage" class="big-div-package">
+            <div *ngIf="state == State.SUCCESS">
                 <div class="col-lg-9">
                     <div class="package-details-title">
                         {{ isCurrentUser ? "My Packages" : "Packages" }}
@@ -41,6 +31,13 @@
                     (action)="addToCollection(package)"
                     *ngFor="let package of packages"
                 ></app-package-item>
+            </div>
+        </div>
+    </div>
+    <div class="row" *ngIf="state == State.LOADING">
+        <div class="col-12">
+            <div class="loading-container">
+                <mat-spinner [diameter]="40"></mat-spinner>
             </div>
         </div>
     </div>

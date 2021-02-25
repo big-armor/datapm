@@ -12,7 +12,7 @@
     </div>
     <div class="container" *ngIf="state == State.ERROR">
         <div class="row">
-            <div class="col-12 mt-5">
+            <div class="col-12 mt-5 pt-3">
                 <div class="alert-warning alert">
                     There was a problem loading this page. Please refresh your browser. If that doesn't work, please
                     contact support.
@@ -23,37 +23,42 @@
 
     <div class="container" *ngIf="state == State.ERROR_NOT_AUTHENTICATED">
         <div class="row text-center">
-            <div class="col-12 mt-5">
+            <div class="col-12 mt-5 pt-3">
                 <div class="package-title">
-                    {{ getPackageIdentifierFromURL() }}
+                    <a [routerLink]="'/' + getCatalogSlugFromURL()"> {{ getCatalogSlugFromURL() }}</a
+                    >/{{ getPackageSlugFromURL() }}
                 </div>
-                <br />
-                You must <a href="javascript:void(0);" (click)="loginClicked()">login to view this package</a>.
+                <p class="package-dark-gray mt-3">
+                    You must <a href="javascript:void(0);" (click)="loginClicked()">login to view this package</a>.
+                </p>
             </div>
         </div>
     </div>
 
     <div class="container" *ngIf="state == State.ERROR_NOT_AUTHORIZED">
         <div class="row text-center">
-            <div class="col-12 mt-5">
+            <div class="col-12 mt-5 pt-3">
                 <div class="package-title">
-                    {{ getPackageIdentifierFromURL() }}
+                    <a [routerLink]="'/' + getCatalogSlugFromURL()"> {{ getCatalogSlugFromURL() }}</a
+                    >/{{ getPackageSlugFromURL() }}
                 </div>
-                <br />
-                You do not have permission to view this package. Please contact the author.
+                <p class="package-dark-gray mt-3">
+                    You do not have permission to view this package. Please contact the author.
+                </p>
             </div>
         </div>
     </div>
 
     <div class="container" *ngIf="state == State.ERROR_NOT_FOUND">
         <div class="row text-center">
-            <div class="col-12 mt-5">
+            <div class="col-12 mt-5 pt-3">
                 <div class="package-title">
                     <a [routerLink]="'/' + getCatalogSlugFromURL()"> {{ getCatalogSlugFromURL() }}</a
                     >/{{ getPackageSlugFromURL() }}
                 </div>
-                <br />
-                The package was not found. Use the search bar above to find additional data.
+                <p class="package-dark-gray mt-3">
+                    The package was not found. Use the search bar above to find additional data.
+                </p>
             </div>
         </div>
     </div>
@@ -78,7 +83,6 @@
                                         <div class="package-identifier w-100">
                                             <div class="identifier">
                                                 <a
-                                                    class="mr-3"
                                                     [routerLink]="['/' + package?.identifier.catalogSlug]"
                                                     style="width: 40px; height: 40px; border-radius: 50%"
                                                     *ngIf="catalogUser"
@@ -86,7 +90,7 @@
                                                     <app-avatar class="user-img" [user]="catalogUser" [size]="40">
                                                     </app-avatar>
                                                 </a>
-                                                <div class="d-flex flex-column bd-highlight">
+                                                <div class="d-flex flex-column bd-highlight ml-2">
                                                     <div class="bd-highlight">
                                                         <span
                                                             class="pt-2 package-privacy"
