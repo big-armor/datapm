@@ -39,6 +39,7 @@ import { DownloadPackageComponent } from "./components/package-info/download-pac
 import { ClientWizardComponent } from "./components/package-info/download-package/client-wizard/client-wizard.component";
 import { MatStepperModule } from "@angular/material/stepper";
 import { MatSelectModule } from "@angular/material/select";
+import { PackageIssuesComponent } from "./components/package-issues/package-issues.component";
 
 @NgModule({
     declarations: [
@@ -58,7 +59,8 @@ import { MatSelectModule } from "@angular/material/select";
         PackageDeletionConfirmationComponent,
         SharePackageComponent,
         DownloadPackageComponent,
-        ClientWizardComponent
+        ClientWizardComponent,
+        PackageIssuesComponent
     ],
     imports: [
         CommonModule,

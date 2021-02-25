@@ -1,0 +1,13 @@
+mutation CreatePackageIssue($packageIdentifier: PackageIdentifierInput!, $issue: CreatePackageIssueInput!) {
+    createPackageIssue(packageIdentifier: $packageIdentifier, issue: $issue) {
+        issueId
+        subject
+        content
+        status
+        creator {
+            username
+        }
+        createdAt
+        updatedAt
+    }
+}

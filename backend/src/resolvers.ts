@@ -149,6 +149,8 @@ import {
 
 import { myActivity, packageActivities } from "./resolvers/ActivityLogResolver";
 import { removePackagePermissions, setPackagePermissions } from "./resolvers/UserPackagePermissionResolver";
+import { createPackageIssue } from "./resolvers/PackageIssueResolver";
+import { createPackageIssueComment } from "./resolvers/PackageIssueCommentResolver";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -415,7 +417,6 @@ export const resolvers: {
         viewedCount: packageViewedCount,
         isPublic: packageIsPublic
     },
-
     Version: {
         identifier: versionIdentifier,
         packageFile: versionPackageFile,
@@ -564,6 +565,9 @@ export const resolvers: {
         setPackageCoverImage: setPackageCoverImage,
         deletePackage: deletePackage,
         packageFetched: packageFetched,
+
+        createPackageIssue: createPackageIssue,
+        createPackageIssueComment: createPackageIssueComment,
 
         // Package Permissions
         setPackagePermissions: setPackagePermissions,

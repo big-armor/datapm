@@ -147,6 +147,14 @@ enum ActivityLogChangeType {
 }
 
 """
+The package issue status
+"""
+enum PackageIssueStatus {
+    OPEN
+    CLOSED
+}
+
+"""
 Whether the requesting user has the specified permission on the catalog
 """
 directive @hasCatalogPermission(permission: Permission) on OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION
@@ -175,6 +183,11 @@ directive @validPackageSlug on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 Whether the collection slug provided is valid
 """
 directive @validCollectionSlug(allowNull: Boolean) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+
+"""
+Whether the markdown provided is valid
+"""
+directive @validMarkdown(maxLength: Int) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 
 """
 A collection of packages offered by a person or an organization.
@@ -212,6 +225,28 @@ type Package {
     myPermissions: [Permission!]
     fetchedCount: Int
     viewedCount: Int
+}
+
+"""
+A package issue represents an issue raised for a topic related to the package.
+"""
+type PackageIssue {
+    issueId: Int!
+    subject: String!
+    content: String!
+    creator: User
+    status: PackageIssueStatus!
+    createdAt: Date!
+    updatedAt: Date
+}
+
+type PackageIssueComment {
+    commentId: Int!
+    content: String!
+    issue: PackageIssue
+    creator: User
+    createdAt: Date!
+    updatedAt: Date
 }
 
 """
@@ -430,12 +465,36 @@ input VersionIdentifierInput {
     versionMinor: Int!
     versionPatch: Int!
 }
+
 """
 The complete identifier for a package, assuming the registry is based on the HTTP request URL
 """
 input PackageIdentifierInput {
     catalogSlug: String! @validCatalogSlug
     packageSlug: String! @validPackageSlug
+}
+
+"""
+The complete identifier for a package issue
+"""
+input PackageIssueIdentifierInput {
+    package: PackageIdentifierInput!
+    issueId: Int!
+}
+
+"""
+The package issue creation input
+"""
+input CreatePackageIssueInput {
+    subject: String!
+    content: String! @validMarkdown(maxLength: 50000)
+}
+
+"""
+The input to create a package issue comment
+"""
+input CreatePackageIssueCommentInput {
+    content: String! @validMarkdown(maxLength: 50000)
 }
 
 """
@@ -928,6 +987,19 @@ type Mutation {
     Called by a client to indicate a package has been fetched
     """
     packageFetched(identifier: VersionIdentifierInput! @hasPackagePermission(permission: VIEW)): Void
+
+    """
+    Creates a package issue
+    """
+    createPackageIssue(packageIdentifier: PackageIdentifierInput!, issue: CreatePackageIssueInput!): PackageIssue
+
+    """
+    Creates a package issue comment
+    """
+    createPackageIssueComment(
+        identifier: PackageIssueIdentifierInput!
+        comment: CreatePackageIssueCommentInput!
+    ): PackageIssueComment
 
     """
     Creates a new collection, which is managed by the requesting user

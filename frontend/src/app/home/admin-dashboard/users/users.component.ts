@@ -1,7 +1,14 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, ViewChild } from "@angular/core";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatTableDataSource } from "@angular/material/table";
-import { AdminSetUserStatusGQL, AdminDeleteUserGQL, AdminSearchUsersGQL, User } from "../../../../generated/graphql";
+import {
+    AdminSetUserStatusGQL,
+    AdminDeleteUserGQL,
+    AdminSearchUsersGQL,
+    User,
+    CreatePackageIssueGQL,
+    CreatePackageIssueCommentGQL
+} from "../../../../generated/graphql";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import Timeout = NodeJS.Timeout;
@@ -40,6 +47,8 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
     private searchTimeout: Timeout;
 
     constructor(
+        private createPackageIssue: CreatePackageIssueGQL,
+        private createPackageIssueComment: CreatePackageIssueCommentGQL,
         private searchUsersGQL: AdminSearchUsersGQL,
         private changeUserStatusGQL: AdminSetUserStatusGQL,
         private deleteUserGQL: AdminDeleteUserGQL,
@@ -73,22 +82,59 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
     }
 
     public openDeleteUserConfirmationDialog(user: User): void {
-        const dialogContent = `<p>Are you sure you want to delete user ${user.username}</p>
-      <p>This will completely delete this user's data and it will be lost forever.</p>`;
-        const dialogConfig = {
-            data: {
-                title: "Confirm user deletion",
-                content: dialogContent,
-                showConfirmationInputField: true,
-                confirmationInputFieldRequiredValue: user.username
-            }
-        };
-        this.confirmationDialogService.openFancyConfirmationDialog(dialogConfig).subscribe((confirmation) => {
-            if (confirmation) {
-                const usernameOrEmailAddress = user.emailAddress ? user.emailAddress : user.username;
-                this.deleteUserGQL.mutate({ usernameOrEmailAddress }).subscribe(() => this.loadSearchedUsers());
-            }
-        });
+        this.create2();
+        //     const dialogContent = `<p>Are you sure you want to delete user ${user.username}</p>
+        //   <p>This will completely delete this user's data and it will be lost forever.</p>`;
+        //     const dialogConfig = {
+        //         data: {
+        //             title: "Confirm user deletion",
+        //             content: dialogContent,
+        //             showConfirmationInputField: true,
+        //             confirmationInputFieldRequiredValue: user.username
+        //         }
+        //     };
+        //     this.confirmationDialogService.openFancyConfirmationDialog(dialogConfig).subscribe((confirmation) => {
+        //         if (confirmation) {
+        //             const usernameOrEmailAddress = user.emailAddress ? user.emailAddress : user.username;
+        //             this.deleteUserGQL.mutate({ usernameOrEmailAddress }).subscribe(() => this.loadSearchedUsers());
+        //         }
+        //     });
+    }
+
+    public create(): void {
+        this.createPackageIssue
+            .mutate({
+                packageIdentifier: {
+                    catalogSlug: "ermali",
+                    packageSlug: "air-data"
+                },
+                issue: {
+                    subject: "Bad package",
+                    content: "This package sucks"
+                }
+            })
+            .subscribe((result) => {
+                console.log("result", result);
+            });
+    }
+
+    public create2(): void {
+        this.createPackageIssueComment
+            .mutate({
+                identifier: {
+                    issueId: 1,
+                    package: {
+                        catalogSlug: "ermali",
+                        packageSlug: "air-data"
+                    }
+                },
+                comment: {
+                    content: "Stupid package"
+                }
+            })
+            .subscribe((result) => {
+                console.log("result", result);
+            });
     }
 
     public openUserStatusChangeConfirmationDialog(user: User): void {

@@ -8,6 +8,7 @@ import { PackageVersionComponent } from "./components/package-version/package-ve
 import { PackageSamplesComponent } from "./components/package-samples/package-samples.component";
 import { PackagePermissionComponent } from "./components/package-permission/package-permission.component";
 import { PackageDeletionConfirmationComponent } from "./components/package/package-deletion-confirmation/package-deletion-confirmation.component";
+import { PackageIssuesComponent } from "./components/package-issues/package-issues.component";
 
 const routes: Routes = [
     {
@@ -18,6 +19,10 @@ const routes: Routes = [
                 path: "",
                 component: PackageDescriptionComponent,
                 pathMatch: "full"
+            },
+            {
+                path: "issues",
+                component: PackageIssuesComponent
             },
             {
                 path: "history",

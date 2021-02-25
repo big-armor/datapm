@@ -1,0 +1,17 @@
+mutation CreatePackageIssueComment(
+    $identifier: PackageIssueIdentifierInput!
+    $comment: CreatePackageIssueCommentInput!
+) {
+    createPackageIssueComment(identifier: $identifier, comment: $comment) {
+        commentId
+        content
+        issue {
+            issueId
+        }
+        creator {
+            username
+        }
+        createdAt
+        updatedAt
+    }
+}
