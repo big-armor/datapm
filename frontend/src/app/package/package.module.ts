@@ -40,6 +40,7 @@ import { ClientWizardComponent } from "./components/package-info/download-packag
 import { MatStepperModule } from "@angular/material/stepper";
 import { MatSelectModule } from "@angular/material/select";
 import { PackageIssuesComponent } from "./components/package-issues/package-issues.component";
+import { MatCheckboxModule } from "@angular/material/checkbox";
 
 @NgModule({
     declarations: [
@@ -73,6 +74,7 @@ import { PackageIssuesComponent } from "./components/package-issues/package-issu
         MatChipsModule,
         MatInputModule,
         MatDialogModule,
+        MatCheckboxModule,
         MatSlideToggleModule,
         MatTableModule,
         MatAutocompleteModule,

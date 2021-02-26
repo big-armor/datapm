@@ -1,0 +1,14 @@
+@import "../../../../styles/variables";
+
+#packageIssues {
+    ::ng-deep.mat-checkbox-checked.mat-accent {
+        .mat-checkbox-background {
+            background-color: $color-info;
+        }
+    }
+
+    ::ng-deep.mat-checkbox-inner-container {
+        height: 14px;
+        width: 14px;
+    }
+}

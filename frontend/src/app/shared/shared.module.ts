@@ -57,6 +57,7 @@ import { UserInviteInputComponent } from "./user-invite-input/user-invite-input.
 import { MatChipsModule } from "@angular/material/chips";
 import { PackageAndCollectionComponent } from "./package-and-collection/package-and-collection.component";
 import { CollectionsHorizontalListComponent } from "./package-and-collection/collections-horizontal-list/collections-horizontal-list.component";
+import { MatCheckboxModule } from "@angular/material/checkbox";
 
 @NgModule({
     declarations: [
@@ -111,6 +112,7 @@ import { CollectionsHorizontalListComponent } from "./package-and-collection/col
         MatFormFieldModule,
         MatInputModule,
         MatProgressSpinnerModule,
+        MatCheckboxModule,
         MatSnackBarModule,
         MatStepperModule,
         MatSelectModule,
