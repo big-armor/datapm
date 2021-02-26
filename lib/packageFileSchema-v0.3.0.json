@@ -82,7 +82,7 @@
         "website": {
             "$id": "#/website",
             "type": "string",
-            "format": "iri",
+            "format": "uri",
             "maxLength": 1024,
             "title": "Website",
             "description": "The URL of the information/marketing website related to this package."
@@ -90,7 +90,7 @@
         "contactEmail": {
             "$id": "#/contactEmail",
             "type": "string",
-            "format": "idn-email",
+            "format": "email",
             "maxLength": 1024,
             "title": "Contact Email",
             "description": "An email address for contacting the author."
@@ -268,135 +268,131 @@
         },
         "sources": {
             "type": "array",
-            "allOf": [
-                {
-                    "$id": "#/sources/source",
-                    "type": "object",
-                    "title": "Data Source",
-                    "description": "A description of how the data is sourceed",
-                    "default": {},
-                    "required": ["type", "slug", "streamSet"],
-                    "properties": {
-                        "slug": {
-                            "$id": "#/sources/source/slug",
+            "items": {
+                "$id": "#/sources/source",
+                "type": "object",
+                "title": "Data Source",
+                "description": "A description of how the data is sourceed",
+                "default": {},
+                "required": ["type", "slug", "streamSets"],
+                "properties": {
+                    "slug": {
+                        "$id": "#/sources/source/slug",
+                        "type": "string",
+                        "maxLength": 128
+                    },
+                    "type": {
+                        "$id": "#/sources/source/type",
+                        "type": "string",
+                        "maxLength": 128,
+                        "title": "Source Type",
+                        "description": "The unique identifier for the source implementation.",
+                        "default": ""
+                    },
+                    "uris": {
+                        "$id": "#/sources/source/uri",
+                        "type": "array",
+                        "items": {
                             "type": "string",
-                            "maxLength": 128
-                        },
-                        "type": {
-                            "$id": "#/sources/source/type",
-                            "type": "string",
-                            "maxLength": 128,
-                            "title": "Source Type",
-                            "description": "The unique identifier for the source implementation.",
+                            "maxLength": 2048,
+                            "title": "Source URIs",
+                            "description": "Used by the source implementation to pull the data.",
                             "default": ""
-                        },
-                        "uris": {
-                            "$id": "#/sources/source/uri",
-                            "type": "array",
-                            "items": {
-                                "type": "string",
-                                "maxLength": 2048,
-                                "title": "Source URIs",
-                                "description": "Used by the source implementation to pull the data.",
-                                "default": ""
-                            }
-                        },
-                        "configuration": {
-                            "$id": "#/sources/source/configuration",
+                        }
+                    },
+                    "configuration": {
+                        "$id": "#/sources/source/configuration",
+                        "type": "object",
+                        "title": "Source Configuration",
+                        "description": "The configuration used by the source implementation to aquire and interpret the record stream.",
+                        "default": {},
+                        "required": [],
+                        "properties": {},
+                        "additionalProperties": true
+                    },
+                    "streamSets": {
+                        "type": "array",
+                        "title": "source set",
+                        "description": "An array of StreamSet objects that each define one logical unit of streaming data, which may be composed of one or more real streams",
+                        "items": {
                             "type": "object",
-                            "title": "Source Configuration",
-                            "description": "The configuration used by the source implementation to aquire and interpret the record stream.",
-                            "default": {},
-                            "required": [],
-                            "properties": {},
-                            "additionalProperties": true
-                        },
-                        "streamSets": {
-                            "type": "array",
-                            "title": "source set",
-                            "description": "An array of StreamSet objects that each define one logical unit of streaming data, which may be composed of one or more real streams",
-                            "allOf": [
-                                {
+                            "required": ["slug", "configuration", "schemaTitles"],
+                            "properties": {
+                                "slug": {
+                                    "$id": "#/sources/source/streamSet/slug",
+                                    "type": "string",
+                                    "maxLength": 128
+                                },
+                                "lastUpdateHash": {
+                                    "$id": "#/sources/source/streamSet/lastUpdateHash",
+                                    "type": "string",
+                                    "maxLength": 2048,
+                                    "title": "Last Source Update Hash",
+                                    "description": "The update hash reported by the source after generating this package file.",
+                                    "default": ""
+                                },
+                                "configuration": {
+                                    "$id": "#/sources/source/streamSet/configuration",
                                     "type": "object",
-                                    "required": ["slug", "configuration", "schemaTitles"],
+                                    "title": "Source Configuration",
+                                    "description": "The configuration used by the source implementation to aquire and interpret the record stream.",
+                                    "default": {},
+                                    "required": [],
+                                    "properties": {},
+                                    "additionalProperties": true
+                                },
+                                "schemaTitles": {
+                                    "$id": "#/sources/source/streamSet/schemaTitle",
+                                    "type": "array",
+                                    "items": { "type": "string", "maxLength": 512 }
+                                },
+                                "streamStats": {
+                                    "type": "object",
+                                    "required": ["inspectedCount"],
                                     "properties": {
-                                        "slug": {
-                                            "$id": "#/sources/source/streamSet/slug",
+                                        "byteCount": {
+                                            "$id": "#/sources/source/streamSet/byteCount",
+                                            "type": "integer",
+                                            "title": "Byte Count",
+                                            "description": "The exact or approximate number of bytes in the streamset.",
+                                            "default": 0
+                                        },
+                                        "byteCountPrecision": {
+                                            "$id": "#/sources/source/streamSet/byteCountPrecision",
                                             "type": "string",
-                                            "maxLength": 128
+                                            "title": "Byte Count Approximation Method",
+                                            "description": "How to consider the byteCount value.",
+                                            "enum": ["EXACT", "APPROXIMATE", "GREATER_THAN"]
                                         },
-                                        "lastUpdateHash": {
-                                            "$id": "#/sources/source/streamSet/lastUpdateHash",
+                                        "recordCount": {
+                                            "$id": "#/sources/source/streamSet/recordCount",
+                                            "type": "integer",
+                                            "title": "Record Count",
+                                            "description": "The exact or estamated number of records in the data set.",
+                                            "default": 0
+                                        },
+                                        "recordCountPrecision": {
+                                            "$id": "#/sources/source/streamSet/recordCountPrecision",
                                             "type": "string",
-                                            "maxLength": 2048,
-                                            "title": "Last Source Update Hash",
-                                            "description": "The update hash reported by the source after generating this package file.",
-                                            "default": ""
+                                            "title": "Record Count Approximation Method",
+                                            "description": "How to consider the recordCount value",
+                                            "enum": ["EXACT", "APPROXIMATE", "GREATER_THAN"]
                                         },
-                                        "configuration": {
-                                            "$id": "#/sources/source/streamSet/configuration",
-                                            "type": "object",
-                                            "title": "Source Configuration",
-                                            "description": "The configuration used by the source implementation to aquire and interpret the record stream.",
-                                            "default": {},
-                                            "required": [],
-                                            "properties": {},
-                                            "additionalProperties": true
-                                        },
-                                        "schemaTitles": {
-                                            "$id": "#/sources/source/streamSet/schemaTitle",
-                                            "type": "array",
-                                            "allOf": [{ "type": "string", "maxLength": 512 }]
-                                        },
-                                        "streamStats": {
-                                            "type": "object",
-                                            "required": ["inspectedCount"],
-                                            "properties": {
-                                                "byteCount": {
-                                                    "$id": "#/sources/source/streamSet/byteCount",
-                                                    "type": "integer",
-                                                    "title": "Byte Count",
-                                                    "description": "The exact or approximate number of bytes in the streamset.",
-                                                    "default": 0
-                                                },
-                                                "byteCountPrecision": {
-                                                    "$id": "#/sources/source/streamSet/byteCountPrecision",
-                                                    "type": "string",
-                                                    "title": "Byte Count Approximation Method",
-                                                    "description": "How to consider the byteCount value.",
-                                                    "enum": ["EXACT", "APPROXIMATE", "GREATER_THAN"]
-                                                },
-                                                "recordCount": {
-                                                    "$id": "#/sources/source/streamSet/recordCount",
-                                                    "type": "integer",
-                                                    "title": "Record Count",
-                                                    "description": "The exact or estamated number of records in the data set.",
-                                                    "default": 0
-                                                },
-                                                "recordCountPrecision": {
-                                                    "$id": "#/sources/source/streamSet/recordCountPrecision",
-                                                    "type": "string",
-                                                    "title": "Record Count Approximation Method",
-                                                    "description": "How to consider the recordCount value",
-                                                    "enum": ["EXACT", "APPROXIMATE", "GREATER_THAN"]
-                                                },
-                                                "inspectedCount": {
-                                                    "$id": "#/sources/source/streamSet/inspectedCount",
-                                                    "type": "integer",
-                                                    "title": "Inspected Count",
-                                                    "description": "The number of records inspected during the generation of this package file",
-                                                    "default": 0
-                                                }
-                                            }
+                                        "inspectedCount": {
+                                            "$id": "#/sources/source/streamSet/inspectedCount",
+                                            "type": "integer",
+                                            "title": "Inspected Count",
+                                            "description": "The number of records inspected during the generation of this package file",
+                                            "default": 0
                                         }
                                     }
                                 }
-                            ]
+                            }
                         }
-                    },
-                    "additionalProperties": true
-                }
-            ]
+                    }
+                },
+                "additionalProperties": true
+            }
         }
     },
     "additionalProperties": true

@@ -94,7 +94,7 @@ describe("Package Search Tests", async () => {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("696f7fac66ffd88eb72f8dbec9d55802888378b1963fe14a9554c0741e96e254");
+        expect(responseHash).equal("bf1184b458675a53c3f997c651559936999426199b9f67dcad55bcfc4b1e101b");
 
         const packageFile = parsePackageFileJSON(responsePackageFileContents);
 
