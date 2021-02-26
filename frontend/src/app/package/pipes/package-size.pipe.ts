@@ -8,17 +8,21 @@ export class PackageSizePipe implements PipeTransform {
     private readonly units = ["B", "KB", "MB", "GB"];
 
     transform(value: PackageFile): unknown {
-        const totalSize = value.sources.reduce((sum, item) => sum + item.streamStats.byteCount, 0) || 0;
+        const totalSize =
+            value.sources.reduce(
+                (sum, item) => sum + item.streamSets.reduce((sum, item) => sum + item.streamStats.byteCount, 0),
+                0
+            ) || 0;
+
         const bytes = this.convertSize(totalSize);
 
         let highestPrecision = CountPrecision.EXACT;
 
         for (const source of value.sources) {
-            if (source.streamStats.byteCountPrecision == CountPrecision.GREATER_THAN)
+            if (source.streamSets.find((s) => s.streamStats.byteCountPrecision == CountPrecision.GREATER_THAN) != null)
                 highestPrecision = CountPrecision.GREATER_THAN;
             else if (
-                highestPrecision != CountPrecision.GREATER_THAN &&
-                source.streamStats.byteCountPrecision == CountPrecision.APPROXIMATE
+                source.streamSets.find((s) => s.streamStats.byteCountPrecision == CountPrecision.APPROXIMATE) != null
             )
                 highestPrecision = CountPrecision.APPROXIMATE;
         }
