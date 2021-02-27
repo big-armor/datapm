@@ -73,7 +73,7 @@ services:
 
 ## Why Host A Private Registry?
 
-DataPM is a tool that dramatically simplifies data collaborations with other teams inside and outside your organization. While [datapm.io](https://datapm.io) offers a fantastic method to publish data packages privately on the public repository - you may have the requirement that no information about your data move outside of your network.
+DataPM is a tool that dramatically simplifies data collaborations with other teams inside and outside your organization. While [datapm.io](https://datapm.io) offers a fantastic method to publish data packages privately on the public repository - you may have the requirement that no information about your data moves outside of your network.
 
 Therefore, DataPM offers you the ability to host your own private registry. This private registry will be entirely in your control at a network firewall level, and thus the risk of an inadvertent data leak is greatly reduced.
 
