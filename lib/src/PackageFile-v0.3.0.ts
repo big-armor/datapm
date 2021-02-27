@@ -161,7 +161,7 @@ export interface Schema extends JSONSchema7 {
 
 export class PackageFile {
     /** The URL of the JSON schema file to validate this file. */
-    $schema = "https://datapm.io/docs/package-file-schema-v0.2.0.json";
+    $schema = "https://datapm.io/docs/package-file-schema-v0.3.0.json";
 
     /** The short name that identifies this package, in the context of the catalog that it is published. */
     packageSlug: string;
