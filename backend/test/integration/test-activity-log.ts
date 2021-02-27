@@ -214,8 +214,7 @@ describe("Activity Log Tests", async () => {
         } catch (error) {
             console.log(JSON.stringify(error, null, 1));
 
-            expect(true).equal(false);
-            return;
+            expect.fail("There was an error - " + error.message);
         }
 
         expect(response.errors == null, "no errors").true;
