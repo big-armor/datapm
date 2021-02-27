@@ -1,0 +1,3 @@
+query CollectionSlugAvailable($collectionSlug: String!) {
+    collectionSlugAvailable(collectionSlug: $collectionSlug)
+}
