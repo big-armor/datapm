@@ -1,8 +1,13 @@
-import { loadPackageFileFromDisk, parsePackageFileJSON, validatePackageFile } from "../src/main";
+import { loadPackageFileFromDisk, PackageFile, parsePackageFileJSON, validatePackageFile } from "../src/main";
 import { expect } from "chai";
 import fs from "fs";
 
-describe("Checking VersionUtil", () => {
+describe("PackageFile checks", () => {
+    it("Should have correct schema value", function () {
+        const test = new PackageFile();
+        expect(test.$schema).equal("https://datapm.io/docs/package-file-schema-v0.3.0.json");
+    });
+
     it("Should parse dates", function () {
         const packageFileString = fs.readFileSync("test/packageFiles/congressional-legislators.datapm.json");
         const packageFile = parsePackageFileJSON(packageFileString.toString());
