@@ -15,13 +15,13 @@ import { PackageIssueStatus } from "./PackageIssueStatus";
 import { UserEntity } from "./UserEntity";
 
 @Entity({ name: "package_issue" })
-@Unique(["issueId", "packageId"])
+@Unique(["issueNumber", "packageId"])
 export class PackageIssueEntity extends EntityBaseModel {
     @PrimaryGeneratedColumn()
     public id: number;
 
-    @Column({ name: "issue_id" })
-    public issueId: number;
+    @Column({ name: "issue_number" })
+    public issueNumber: number;
 
     @Column({ name: "package_id", nullable: false })
     public packageId: number;

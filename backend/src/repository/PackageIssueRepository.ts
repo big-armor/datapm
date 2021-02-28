@@ -4,22 +4,22 @@ import { OrderBy } from "./OrderBy";
 
 @EntityRepository(PackageIssueEntity)
 export class PackageIssueRepository extends Repository<PackageIssueEntity> {
-    public async getByIssueIdForPackage(
+    public async getByIssueNumberForPackage(
         packageId: number,
-        issueId: number,
+        issueNumber: number,
         relations: string[] = []
     ): Promise<PackageIssueEntity> {
         const ALIAS = "PackageIssueEntity";
         const issueEntity = await this.createQueryBuilder()
             .where('"PackageIssueEntity"."package_id" = :packageId')
-            .andWhere('"PackageIssueEntity"."issue_id" = :issueId')
+            .andWhere('"PackageIssueEntity"."issue_number" = :issueNumber')
             .setParameter("packageId", packageId)
-            .setParameter("issueId", issueId)
+            .setParameter("issueNumber", issueNumber)
             .addRelations(ALIAS, relations)
             .getOne();
 
         if (!issueEntity) {
-            throw new Error("Issue not found - " + issueId);
+            throw new Error("Issue not found - " + issueNumber);
         }
 
         return issueEntity;
@@ -33,7 +33,6 @@ export class PackageIssueRepository extends Repository<PackageIssueEntity> {
         relations: string[] = []
     ): Promise<[PackageIssueEntity[], number]> {
         const ALIAS = "PackageIssueEntity";
-        console.log("what", relations);
         return this.createQueryBuilder()
             .where('"PackageIssueEntity"."package_id" = :packageId')
             .setParameter("packageId", packageId)

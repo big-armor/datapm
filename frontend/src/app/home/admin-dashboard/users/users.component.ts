@@ -87,6 +87,7 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
     }
 
     public openDeleteUserConfirmationDialog(user: User): void {
+        this.getzzz();
         this.getx();
         //     const dialogContent = `<p>Are you sure you want to delete user ${user.username}</p>
         //   <p>This will completely delete this user's data and it will be lost forever.</p>`;
@@ -109,12 +110,12 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
     public getx(): void {
         this.packageIssueComments
             .fetch({
+                packageIdentifier: {
+                    catalogSlug: "ermali",
+                    packageSlug: "air-data"
+                },
                 issueIdentifier: {
-                    issueId: 1,
-                    package: {
-                        catalogSlug: "ermali",
-                        packageSlug: "air-data"
-                    }
+                    issueNumber: 1
                 },
                 limit: 10,
                 offset: 0,
@@ -161,12 +162,12 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
     public create2(): void {
         this.createPackageIssueComment
             .mutate({
-                identifier: {
-                    issueId: 1,
-                    package: {
-                        catalogSlug: "ermali",
-                        packageSlug: "air-data"
-                    }
+                packageIdentifier: {
+                    catalogSlug: "ermali",
+                    packageSlug: "air-data"
+                },
+                issueIdentifier: {
+                    issueNumber: 0
                 },
                 comment: {
                     content: "Stupid package"

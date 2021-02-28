@@ -12,7 +12,7 @@ export class IssueCommentEntity extends EntityBaseModel {
     @Column({ name: "comment_id" })
     public commentId: number;
 
-    @PrimaryColumn({ name: "issue_id", nullable: false })
+    @Column({ name: "issue_id", nullable: false })
     public issueId: number;
 
     @Column({ name: "creator_id", nullable: false })

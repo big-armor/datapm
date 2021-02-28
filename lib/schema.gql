@@ -239,7 +239,7 @@ type Package {
 A package issue represents an issue raised for a topic related to the package.
 """
 type PackageIssue {
-    issueId: Int!
+    issueNumber: Int!
     subject: String!
     content: String!
     creator: User
@@ -504,8 +504,7 @@ input PackageIdentifierInput {
 The complete identifier for a package issue
 """
 input PackageIssueIdentifierInput {
-    package: PackageIdentifierInput!
-    issueId: Int!
+    issueNumber: Int!
 }
 
 """
@@ -743,7 +742,7 @@ type Query {
     Get package issues
     """
     packageIssues(
-        packageIdentifier: PackageIdentifierInput!
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
         offset: Int!
         limit: Int!
         orderBy: OrderBy!
@@ -753,6 +752,7 @@ type Query {
     Get package issue comments
     """
     packageIssueComments(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
         issueIdentifier: PackageIssueIdentifierInput!
         offset: Int!
         limit: Int!
@@ -1037,13 +1037,17 @@ type Mutation {
     """
     Creates a package issue
     """
-    createPackageIssue(packageIdentifier: PackageIdentifierInput!, issue: CreatePackageIssueInput!): PackageIssue
+    createPackageIssue(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        issue: CreatePackageIssueInput!
+    ): PackageIssue
 
     """
     Creates a package issue comment
     """
     createPackageIssueComment(
-        identifier: PackageIssueIdentifierInput!
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        issueIdentifier: PackageIssueIdentifierInput!
         comment: CreatePackageIssueCommentInput!
     ): PackageIssueComment
 

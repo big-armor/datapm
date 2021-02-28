@@ -1,6 +1,6 @@
 mutation CreatePackageIssue($packageIdentifier: PackageIdentifierInput!, $issue: CreatePackageIssueInput!) {
     createPackageIssue(packageIdentifier: $packageIdentifier, issue: $issue) {
-        issueId
+        issueNumber
         subject
         content
         status

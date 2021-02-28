@@ -47,10 +47,10 @@ export const createPackageIssue = async (
 
     const issueRepository = context.connection.manager.getCustomRepository(PackageIssueRepository);
     const lastIssueCreatedForPackage = await issueRepository.getLastCreatedIssueForPackage(packageEntity.id);
-    const issueId = lastIssueCreatedForPackage ? lastIssueCreatedForPackage.issueId + 1 : 0;
+    const issueNumber = lastIssueCreatedForPackage ? lastIssueCreatedForPackage.issueNumber + 1 : 0;
 
     const issueEntity = new PackageIssueEntity();
-    issueEntity.issueId = issueId;
+    issueEntity.issueNumber = issueNumber;
     issueEntity.packageId = packageEntity.id;
     issueEntity.creatorId = context.me.id;
     issueEntity.subject = issue.subject;

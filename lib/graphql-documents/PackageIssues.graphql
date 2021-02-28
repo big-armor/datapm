@@ -1,7 +1,7 @@
 query PackageIssues($packageIdentifier: PackageIdentifierInput!, $offset: Int!, $limit: Int!, $orderBy: OrderBy!) {
     packageIssues(packageIdentifier: $packageIdentifier, offset: $offset, limit: $limit, orderBy: $orderBy) {
         issues {
-            issueId
+            issueNumber
             subject
             content
             creator {

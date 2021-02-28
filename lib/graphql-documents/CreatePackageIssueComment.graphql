@@ -1,12 +1,17 @@
 mutation CreatePackageIssueComment(
-    $identifier: PackageIssueIdentifierInput!
+    $packageIdentifier: PackageIdentifierInput!
+    $issueIdentifier: PackageIssueIdentifierInput!
     $comment: CreatePackageIssueCommentInput!
 ) {
-    createPackageIssueComment(identifier: $identifier, comment: $comment) {
+    createPackageIssueComment(
+        packageIdentifier: $packageIdentifier
+        issueIdentifier: $issueIdentifier
+        comment: $comment
+    ) {
         commentId
         content
         issue {
-            issueId
+            issueNumber
         }
         creator {
             username
