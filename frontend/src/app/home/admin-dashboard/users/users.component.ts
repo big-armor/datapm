@@ -7,7 +7,10 @@ import {
     AdminSearchUsersGQL,
     User,
     CreatePackageIssueGQL,
-    CreatePackageIssueCommentGQL
+    CreatePackageIssueCommentGQL,
+    PackageIssuesGQL,
+    OrderBy,
+    PackageIssueCommentsGQL
 } from "../../../../generated/graphql";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
@@ -47,6 +50,8 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
     private searchTimeout: Timeout;
 
     constructor(
+        private packageIssueComments: PackageIssueCommentsGQL,
+        private packageIssues: PackageIssuesGQL,
         private createPackageIssue: CreatePackageIssueGQL,
         private createPackageIssueComment: CreatePackageIssueCommentGQL,
         private searchUsersGQL: AdminSearchUsersGQL,
@@ -82,7 +87,7 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
     }
 
     public openDeleteUserConfirmationDialog(user: User): void {
-        this.create2();
+        this.getx();
         //     const dialogContent = `<p>Are you sure you want to delete user ${user.username}</p>
         //   <p>This will completely delete this user's data and it will be lost forever.</p>`;
         //     const dialogConfig = {
@@ -99,6 +104,41 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
         //             this.deleteUserGQL.mutate({ usernameOrEmailAddress }).subscribe(() => this.loadSearchedUsers());
         //         }
         //     });
+    }
+
+    public getx(): void {
+        this.packageIssueComments
+            .fetch({
+                issueIdentifier: {
+                    issueId: 1,
+                    package: {
+                        catalogSlug: "ermali",
+                        packageSlug: "air-data"
+                    }
+                },
+                limit: 10,
+                offset: 0,
+                orderBy: OrderBy.CREATED_AT
+            })
+            .subscribe((result) => {
+                console.log("result", result);
+            });
+    }
+
+    public getzzz(): void {
+        this.packageIssues
+            .fetch({
+                packageIdentifier: {
+                    catalogSlug: "ermali",
+                    packageSlug: "air-data"
+                },
+                limit: 10,
+                offset: 0,
+                orderBy: OrderBy.CREATED_AT
+            })
+            .subscribe((result) => {
+                console.log("result", result);
+            });
     }
 
     public create(): void {

@@ -11,10 +11,10 @@ export const getIssuesByPackage = async (
     _0: any,
     {
         packageIdentifier,
+        offset,
         limit,
-        offSet,
         orderBy
-    }: { packageIdentifier: PackageIdentifierInput; limit: number; offSet: number; orderBy: OrderBy },
+    }: { packageIdentifier: PackageIdentifierInput; offset: number; limit: number; orderBy: OrderBy },
     context: AuthenticatedContext,
     info: any
 ) => {
@@ -26,11 +26,11 @@ export const getIssuesByPackage = async (
 
     const [issues, count] = await context.connection.manager
         .getCustomRepository(PackageIssueRepository)
-        .getIssuesByPackage(packageEntity.id, limit, offSet, orderBy, relations);
+        .getIssuesByPackage(packageEntity.id, offset, limit, orderBy, relations);
 
     return {
-        hasMore: count - (offSet + limit) > 0,
-        packages: issues,
+        issues,
+        hasMore: count - (offset + limit) > 0,
         count
     };
 };

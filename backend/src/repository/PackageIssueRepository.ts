@@ -7,7 +7,7 @@ export class PackageIssueRepository extends Repository<PackageIssueEntity> {
     public async getByIssueIdForPackage(
         packageId: number,
         issueId: number,
-        relations?: string[]
+        relations: string[] = []
     ): Promise<PackageIssueEntity> {
         const ALIAS = "PackageIssueEntity";
         const issueEntity = await this.createQueryBuilder()
@@ -29,12 +29,13 @@ export class PackageIssueRepository extends Repository<PackageIssueEntity> {
         packageId: number,
         offset: number,
         limit: number,
-        orderBy: OrderBy,
-        relations?: string[]
+        orderBy: OrderBy = OrderBy.CREATED_AT,
+        relations: string[] = []
     ): Promise<[PackageIssueEntity[], number]> {
         const ALIAS = "PackageIssueEntity";
+        console.log("what", relations);
         return this.createQueryBuilder()
-            .where('"PackageIssueEntity"."packageId" = :packageId')
+            .where('"PackageIssueEntity"."package_id" = :packageId')
             .setParameter("packageId", packageId)
             .offset(offset)
             .limit(limit)
@@ -47,7 +48,7 @@ export class PackageIssueRepository extends Repository<PackageIssueEntity> {
         return this.createQueryBuilder()
             .where('"PackageIssueEntity"."package_id" = :packageId')
             .setParameter("packageId", packageId)
-            .orderBy(OrderBy.CREATED_DATE, "DESC")
+            .orderBy(OrderBy.CREATED_AT, "DESC")
             .getOne();
     }
 }

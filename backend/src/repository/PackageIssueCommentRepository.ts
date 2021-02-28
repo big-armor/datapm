@@ -13,7 +13,7 @@ export class PackageIssueCommentRepository extends Repository<IssueCommentEntity
     ): Promise<[IssueCommentEntity[], number]> {
         const ALIAS = "IssueCommentEntity";
         return this.createQueryBuilder()
-            .where('"IssueComment"."issueId" = :issueId')
+            .where('"IssueCommentEntity"."issue_id" = :issueId')
             .setParameter("issueId", issueId)
             .offset(offset)
             .limit(limit)
@@ -26,7 +26,7 @@ export class PackageIssueCommentRepository extends Repository<IssueCommentEntity
         return this.createQueryBuilder()
             .where('"IssueCommentEntity"."issue_id" = :issueId')
             .setParameter("issueId", issueId)
-            .orderBy(OrderBy.CREATED_DATE, "DESC")
+            .orderBy(OrderBy.CREATED_AT, "DESC")
             .getOne();
     }
 }

@@ -149,8 +149,8 @@ import {
 
 import { myActivity, packageActivities } from "./resolvers/ActivityLogResolver";
 import { removePackagePermissions, setPackagePermissions } from "./resolvers/UserPackagePermissionResolver";
-import { createPackageIssue } from "./resolvers/PackageIssueResolver";
-import { createPackageIssueComment } from "./resolvers/PackageIssueCommentResolver";
+import { createPackageIssue, getIssuesByPackage } from "./resolvers/PackageIssueResolver";
+import { createPackageIssueComment, getCommentsByByPackageIssue } from "./resolvers/PackageIssueCommentResolver";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -468,6 +468,8 @@ export const resolvers: {
         myAPIKeys: myAPIKeys,
 
         package: findPackage,
+        packageIssues: getIssuesByPackage,
+        packageIssueComments: getCommentsByByPackageIssue,
         latestPackages: getLatestPackages,
         myPackages: myPackages,
         myRecentlyViewedPackages: myRecentlyViewedPackages,

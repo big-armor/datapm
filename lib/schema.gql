@@ -155,6 +155,14 @@ enum PackageIssueStatus {
 }
 
 """
+Order by options
+"""
+enum OrderBy {
+    CREATED_AT
+    UPDATED_AT
+}
+
+"""
 Whether the requesting user has the specified permission on the catalog
 """
 directive @hasCatalogPermission(permission: Permission) on OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION
@@ -414,6 +422,24 @@ The response for a package search request
 """
 type SearchPackagesResult {
     packages: [Package!]
+    hasMore: Boolean!
+    count: Int!
+}
+
+"""
+The response for a package issues request
+"""
+type PackageIssuesResult {
+    issues: [PackageIssue!]
+    hasMore: Boolean!
+    count: Int!
+}
+
+"""
+The response for a package issue comments request
+"""
+type PackageIssueCommentsResult {
+    comments: [PackageIssueComment!]
     hasMore: Boolean!
     count: Int!
 }
@@ -712,6 +738,26 @@ type Query {
     Returns the package for the given identifier. Requires permission to view the package
     """
     package(identifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)): Package!
+
+    """
+    Get package issues
+    """
+    packageIssues(
+        packageIdentifier: PackageIdentifierInput!
+        offset: Int!
+        limit: Int!
+        orderBy: OrderBy!
+    ): PackageIssuesResult
+
+    """
+    Get package issue comments
+    """
+    packageIssueComments(
+        issueIdentifier: PackageIssueIdentifierInput!
+        offset: Int!
+        limit: Int!
+        orderBy: OrderBy!
+    ): PackageIssueCommentsResult
 
     """
     Returns list of the requesting users packages

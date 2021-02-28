@@ -1,4 +1,13 @@
-import { Entity, Column, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique, PrimaryColumn } from "typeorm";
+import {
+    Entity,
+    Column,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    Unique,
+    PrimaryColumn,
+    OneToOne
+} from "typeorm";
 
 import { EntityBaseModel } from "./EntityBaseModel";
 import { PackageEntity } from "./PackageEntity";

@@ -1,7 +1,5 @@
 import { AuthenticatedContext } from "../context";
 import { IssueCommentEntity } from "../entity/IssueCommentEntity";
-import { PackageIssueEntity } from "../entity/PackageIssueEntity";
-import { PackageIssueStatus } from "../entity/PackageIssueStatus";
 import { CreatePackageIssueCommentInput, PackageIssueIdentifierInput } from "../generated/graphql";
 import { OrderBy } from "../repository/OrderBy";
 import { PackageIssueCommentRepository } from "../repository/PackageIssueCommentRepository";
@@ -13,22 +11,22 @@ export const getCommentsByByPackageIssue = async (
     _0: any,
     {
         issueIdentifier,
+        offset,
         limit,
-        offSet,
         orderBy
-    }: { issueIdentifier: PackageIssueIdentifierInput; limit: number; offSet: number; orderBy: OrderBy },
+    }: { issueIdentifier: PackageIssueIdentifierInput; offset: number; limit: number; orderBy: OrderBy },
     context: AuthenticatedContext,
     info: any
 ) => {
     const relations = getGraphQlRelationName(info);
 
-    const [issues, count] = await context.connection.manager
+    const [comments, count] = await context.connection.manager
         .getCustomRepository(PackageIssueCommentRepository)
-        .getCommentsByIssue(issueIdentifier.issueId, limit, offSet, orderBy, relations);
+        .getCommentsByIssue(issueIdentifier.issueId, offset, limit, orderBy, relations);
 
     return {
-        hasMore: count - (offSet + limit) > 0,
-        packages: issues,
+        comments,
+        hasMore: count - (offset + limit) > 0,
         count
     };
 };

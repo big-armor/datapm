@@ -1,0 +1,17 @@
+query PackageIssues($packageIdentifier: PackageIdentifierInput!, $offset: Int!, $limit: Int!, $orderBy: OrderBy!) {
+    packageIssues(packageIdentifier: $packageIdentifier, offset: $offset, limit: $limit, orderBy: $orderBy) {
+        issues {
+            issueId
+            subject
+            content
+            creator {
+                username
+            }
+            status
+            createdAt
+            updatedAt
+        }
+        hasMore
+        count
+    }
+}
