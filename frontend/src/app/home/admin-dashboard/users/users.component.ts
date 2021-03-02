@@ -22,7 +22,7 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
         "isAdmin",
         "actions"
     ];
-    public readonly USERS_PER_PAGE = 2;
+    public readonly USERS_PER_PAGE = 10;
 
     private readonly destroyed = new Subject();
 
