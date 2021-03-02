@@ -829,6 +829,10 @@ button:disabled {
     letter-spacing: 0.6px;
 }
 
+::ng-deep #tinymce.mce-content-body {
+    color: red !important;
+}
+
 #homeRoutes {
     list-style-type: none;
     margin-bottom: 0px;

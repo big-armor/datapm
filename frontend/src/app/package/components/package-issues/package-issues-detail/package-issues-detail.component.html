@@ -1,0 +1,94 @@
+<div class="col-md-9 p-0" id="packageIssuseDetail">
+    <div class="container p-0 mb-3" id="packageIssues">
+        <div class="d-flex bd-highlight mb-3">
+            <div class="mr-auto bd-highlight">
+                <div class="package-details-title mb-2">Package Issues Detail</div>
+                <p class="package-light-gray">Opened by <strong>traviscollins</strong> 2 hours ago</p>
+            </div>
+            <div class="bd-highlight">
+                <button class="app-outlined-button" (click)="deleteIssue()">Delete issue</button>
+            </div>
+        </div>
+
+        <div class="issue-wrapper">
+            <div class="issue-header d-flex bd-highlight">
+                <div class="mr-auto bd-highlight">
+                    <p class="package-dark-gray">
+                        edited by
+                        <span class="font-500">traviscollins</span>
+                    </p>
+                </div>
+                <div class="bd-highlight">
+                    <a mat-button [matMenuTriggerFor]="menu" class="menu-btn">
+                        <em class="fas fa-ellipsis-h"></em>
+                    </a>
+                    <mat-menu #menu="matMenu">
+                        <button mat-menu-item id="issueBtn">
+                            <span class="package-dark-gray">Edit</span>
+                        </button>
+                        <button mat-menu-item id="issueBtn">
+                            <span class="package-dark-gray">Copy</span>
+                        </button>
+                    </mat-menu>
+                </div>
+            </div>
+            <div class="issue-box">
+                <div class="package-dark-gray">
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
+                    industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type
+                    and scrambled it to make a type specimen book.
+                </div>
+            </div>
+        </div>
+
+        <div class="px-5">
+            |
+            <div class="issue-wrapper">
+                <div class="issue-header d-flex bd-highlight">
+                    <div class="mr-auto bd-highlight">
+                        <p class="package-dark-gray">
+                            replied by
+                            <span class="font-500">bleonagjocaj</span>
+                        </p>
+                    </div>
+                    <div class="bd-highlight">
+                        <a mat-button [matMenuTriggerFor]="menu" class="menu-btn">
+                            <em class="fas fa-ellipsis-h"></em>
+                        </a>
+                        <mat-menu #menu="matMenu">
+                            <button mat-menu-item id="issueBtn">
+                                <span class="package-dark-gray">Edit</span>
+                            </button>
+                            <button mat-menu-item id="issueBtn">
+                                <span class="package-dark-gray">Copy</span>
+                            </button>
+                        </mat-menu>
+                    </div>
+                </div>
+                <div class="issue-box">
+                    <div class="package-dark-gray">That's awesome</div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="comment-section p-2">
+            <editor
+                apiKey="Get your free API key at tiny.cloud and paste it here"
+                [init]="{
+                    icons: 'material',
+                    skin: 'borderless',
+                    plugins: 'wordcount',
+                    menubar: false,
+                    min_height: 150
+                }"
+            ></editor>
+
+            <div class="mt-2 text-right">
+                <button class="app-outlined-button" (click)="closeIssue()">Close issue</button>
+                <button class="app-raised-button ml-2">Comment</button>
+            </div>
+        </div>
+    </div>
+</div>

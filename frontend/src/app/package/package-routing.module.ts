@@ -9,6 +9,7 @@ import { PackageSamplesComponent } from "./components/package-samples/package-sa
 import { PackagePermissionComponent } from "./components/package-permission/package-permission.component";
 import { PackageDeletionConfirmationComponent } from "./components/package/package-deletion-confirmation/package-deletion-confirmation.component";
 import { PackageIssuesComponent } from "./components/package-issues/package-issues.component";
+import { PackageIssuesDetailComponent } from "./components/package-issues/package-issues-detail/package-issues-detail.component";
 
 const routes: Routes = [
     {
@@ -22,7 +23,13 @@ const routes: Routes = [
             },
             {
                 path: "issues",
-                component: PackageIssuesComponent
+                component: PackageIssuesComponent,
+                children: [
+                    {
+                        path: "issues-detail",
+                        component: PackageIssuesDetailComponent
+                    }
+                ]
             },
             {
                 path: "history",

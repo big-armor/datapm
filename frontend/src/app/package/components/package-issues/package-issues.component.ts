@@ -8,5 +8,7 @@ import { Component, OnInit } from "@angular/core";
 export class PackageIssuesComponent implements OnInit {
     constructor() {}
 
+    public rren: boolean = false;
+
     ngOnInit(): void {}
 }

@@ -41,6 +41,9 @@ import { MatStepperModule } from "@angular/material/stepper";
 import { MatSelectModule } from "@angular/material/select";
 import { PackageIssuesComponent } from "./components/package-issues/package-issues.component";
 import { MatCheckboxModule } from "@angular/material/checkbox";
+import { PackageIssuesDetailComponent } from "./components/package-issues/package-issues-detail/package-issues-detail.component";
+import { EditorModule } from "@tinymce/tinymce-angular";
+import { MatMenuModule } from "@angular/material/menu";
 
 @NgModule({
     declarations: [
@@ -61,7 +64,8 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
         SharePackageComponent,
         DownloadPackageComponent,
         ClientWizardComponent,
-        PackageIssuesComponent
+        PackageIssuesComponent,
+        PackageIssuesDetailComponent
     ],
     imports: [
         CommonModule,
@@ -69,10 +73,12 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
         PackageRoutingModule,
         MatButtonModule,
         MatExpansionModule,
+        EditorModule,
         MatIconModule,
         MatTabsModule,
         MatChipsModule,
         MatInputModule,
+        MatMenuModule,
         MatDialogModule,
         MatCheckboxModule,
         MatSlideToggleModule,
