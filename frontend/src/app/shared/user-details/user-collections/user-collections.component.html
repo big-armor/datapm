@@ -8,16 +8,19 @@
                             {{ isCurrentUser ? "My Collections" : "Collections" }}
                         </div>
                         <ng-container *ngIf="collections.length === 0">
-                            <div class="col-md-12 col-lg-12">
+                            <div class="col-lg-8">
                                 <span *ngIf="isCurrentUser" class="package-dark-gray"
-                                    >Create collections to organize and share data sets you discover.</span
-                                >
+                                    >Create collections to organize and share data sets you discover.
+                                </span>
                                 <span *ngIf="!isCurrentUser" class="package-dark-gray"
-                                    >Either {{ username }} has not created a collection, or you do not have permission
-                                    to view of any of the collections they have created.
+                                    >Either <span style="font-weight: 500">{{ username }}</span> has not created a
+                                    collection, or you do not have permission to view of any of the collections they
+                                    have created.
                                 </span>
 
-                                <a target="_blank" href="/docs/concepts/collections">Learn more about collections</a>
+                                <a target="_blank" href="/docs/concepts/collections">
+                                    <span style="font-size: 13px">Learn more about collections.</span>
+                                </a>
                             </div>
                             <div class="col-md-12 col-lg-12 my-3" *ngIf="isCurrentUser">
                                 <a class="app-outlined-button" (click)="createCollection()">Create A Collection</a>
@@ -25,17 +28,19 @@
                         </ng-container>
 
                         <div *ngIf="collections.length > 0">
-                            <div class="pr-4 mb-3">
+                            <div class="pr-4 mb-3 col-lg-8">
                                 <p>
-                                    <span *ngIf="isCurrentUser" class="package-dark-gray pl-3">
+                                    <span *ngIf="isCurrentUser" class="package-dark-gray">
                                         Create collections to organize and share data sets you discover.
                                     </span>
-                                    <span *ngIf="!isCurrentUser" class="package-dark-gray pl-3">
-                                        Collections of data created by {{ username }}.
+                                    <span *ngIf="!isCurrentUser" class="package-dark-gray">
+                                        Collections of data created by
+                                        <span style="font-weight: 500">{{ username }}</span
+                                        >.
                                     </span>
-                                    <a target="_blank" href="/docs/concepts/collections"
-                                        >Learn more about collections</a
-                                    >
+                                    <a target="_blank" href="/docs/concepts/collections">
+                                        <span style="font-size: 13px"> Learn more about collections.</span>
+                                    </a>
                                 </p>
                             </div>
 

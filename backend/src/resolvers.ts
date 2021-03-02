@@ -49,7 +49,8 @@ import {
     collectionCreatedAt,
     collectionUpdatedAt,
     getLatestCollections,
-    getMyRecentlyViewedPackages
+    getMyRecentlyViewedPackages,
+    collectionSlugAvailable
 } from "./resolvers/CollectionResolver";
 import {
     createVersion,
@@ -481,6 +482,7 @@ export const resolvers: {
         usersByPackage: usersByPackage,
         userCatalogs: userCatalogs,
         userCollections: userCollections,
+        collectionSlugAvailable: collectionSlugAvailable,
         userPackages: userPackages,
         autoComplete: async (_0: any, { startsWith }, context: AutoCompleteContext, info: any) => {
             context.query = startsWith;

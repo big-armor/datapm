@@ -18,6 +18,8 @@ export class CreateCollectionComponent {
 
     public coverImgData: string;
 
+    public isPublicControl = new FormControl(false);
+
     constructor(
         private dialogRef: MatDialogRef<CreateCollectionComponent>,
         private createCollectionGQL: CreateCollectionGQL,
@@ -29,7 +31,7 @@ export class CreateCollectionComponent {
                 validators: [Validators.required]
             }),
             description: new FormControl(""),
-            isPublic: new FormControl(false)
+            isPublic: this.isPublicControl
         });
     }
 

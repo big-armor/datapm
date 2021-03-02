@@ -9,6 +9,7 @@ import { CreateCatalogComponent } from "../../create-catalog/create-catalog.comp
 import { DeleteCatalogComponent } from "../../delete-catalog/delete-catalog.component";
 import { DialogService } from "../../../services/dialog/dialog.service";
 import { MatSlideToggle, MatSlideToggleChange } from "@angular/material/slide-toggle";
+import { FormControl } from "@angular/forms";
 
 enum State {
     INIT,
@@ -35,6 +36,8 @@ export class UserCatalogsComponent implements OnInit {
     inputErrors = {
         required: "Catalog name is required"
     };
+
+    message = new FormControl("You can not delete your username catalog.");
 
     @ViewChild("deleteMyUsercatalog") deleteMyUsercatalog: TemplateRef<any>;
 

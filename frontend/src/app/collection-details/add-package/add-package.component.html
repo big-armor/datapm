@@ -50,19 +50,25 @@
                 <span class="mt-2">Collection</span>
             </div>
             <div class="bd-highlight div-answer">
-                <mat-select
+                <app-input
+                    class="flat-input px-0"
+                    [group]="form"
                     controlName="collectionSlug"
-                    [(value)]="selectedCollectionSlug"
-                    placeholder="Select a Collection"
+                    inputStyle="flat"
+                    placeholder="Collection"
+                    matInput
+                    [matAutocomplete]="collectionAutoComplete"
+                ></app-input>
+                <mat-autocomplete
+                    autoActiveFirstOption
+                    #collectionAutoComplete="matAutocomplete"
+                    (optionSelected)="selectCollection($event.option.value)"
+                    [displayWith]="displayCollection"
                 >
-                    <mat-option
-                        *ngFor="let collection of collections"
-                        [value]="collection.identifier.collectionSlug"
-                        class="flat-input"
-                    >
-                        {{ collection.name }}
+                    <mat-option *ngFor="let collection of collections" [value]="collection" class="flat-input">
+                        {{ collection.name }} ({{ collection.identifier.collectionSlug }})
                     </mat-option>
-                </mat-select>
+                </mat-autocomplete>
             </div>
         </div>
 
@@ -82,10 +88,24 @@
                 </ng-container>
             </ng-container>
         </div>
+
+        <ng-container *ngIf="!searchCollectionsTimeout">
+            <div class="text-danger mt-3" *ngIf="shouldShowCreatingNewCollectionLabel && selectedValidCollectionSlug">
+                You don't manage such a collection. A new one will be created for you.
+            </div>
+
+            <div class="text-danger mt-3" *ngIf="shouldShowCreatingNewCollectionLabel && !selectedValidCollectionSlug">
+                You don't manage such a collection and the slug you've entered is not available. Please choose another.
+            </div>
+        </ng-container>
     </div>
     <div mat-dialog-actions class="d-flex justify-content-end">
-        <button type="submit" class="mt-2 save-btn" [disabled]="form.invalid">
-            <span>add</span>
+        <button
+            type="submit"
+            class="mt-2 save-btn"
+            [disabled]="form.invalid || !selectedValidCollectionSlug || state == 'LOADING'"
+        >
+            <span>Add Package To Collection</span>
         </button>
     </div>
 </form>

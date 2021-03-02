@@ -1,6 +1,6 @@
 import { Inject, ViewChild } from "@angular/core";
 import { Component, OnInit } from "@angular/core";
-import { MatDialog, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MatStepper } from "@angular/material/stepper";
 import { PackageFile, Schema } from "datapm-lib";
 import { SourceCategory } from "datapm-lib/src/capabilities/SourceCategory";
@@ -39,6 +39,7 @@ export class DownloadPackageComponent implements OnInit {
         private dialog: MatDialog,
         private packageService: PackageService,
         private capabilitiesService: CapabilitiesServiceImpl,
+        private dialogRef: MatDialogRef<DownloadPackageComponent>,
         @Inject(MAT_DIALOG_DATA) public userPackage: Package
     ) {}
 
@@ -63,10 +64,12 @@ export class DownloadPackageComponent implements OnInit {
     }
 
     public openClientWizard() {
-        const dialogRef = this.dialog.open(ClientWizardComponent, {
+        const clientDialogRef = this.dialog.open(ClientWizardComponent, {
             width: "550px",
             panelClass: "my-custom-dialog"
         });
+
+        this.dialogRef.close();
     }
 
     private loadSources(): void {

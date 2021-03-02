@@ -23,7 +23,7 @@ export class ReservedKeywordsService {
         }
     }
 
-    private static isReservedKeyword(keyword: string): boolean {
+    public static isReservedKeyword(keyword: string): boolean {
         if (!keyword || !keyword.trim().length) {
             return false;
         }

@@ -27,7 +27,8 @@
                     (click)="confirm()"
                     [disabled]="confirmVal !== data.collectionSlug"
                 >
-                    Delete
+                    <span *ngIf="state !== 'LOADING'">Delete</span>
+                    <mat-spinner [diameter]="20" *ngIf="state === 'LOADING'"></mat-spinner>
                 </button>
             </div>
         </div>

@@ -9,6 +9,8 @@ export interface DeletePackageData {
     dontDeleteInstantly?: boolean;
 }
 
+type State = "INIT" | "LOADING" | "SUCCESS" | "ERROR";
+
 @Component({
     selector: "app-delete-package",
     templateUrl: "./delete-package.component.html",
@@ -16,6 +18,7 @@ export interface DeletePackageData {
 })
 export class DeletePackageComponent {
     public confirmVal: string = "";
+    public state: State = "INIT";
 
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: DeletePackageData,
@@ -25,6 +28,11 @@ export class DeletePackageComponent {
     ) {}
 
     public confirm(): void {
+        if (this.state === "LOADING") {
+            return;
+        }
+
+        this.state = "LOADING";
         if (this.data.dontDeleteInstantly) {
             this.dialogRef.close(true);
             return;
