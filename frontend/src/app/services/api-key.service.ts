@@ -12,12 +12,12 @@ export class ApiKeyService {
     constructor(public myAPIKeysGQL: MyAPIKeysGQL, private cap: CapabilitiesServiceImpl) {}
 
     public getMyApiKeys(reload?: boolean): Observable<APIKey[]> {
-        console.log(this.cap.getSourceDescriptions());
         if (reload || this.apiKeys.value == null) {
+            this.apiKeys.next(null);
             this.loadApiKeys();
         }
 
-        return this.apiKeys.asObservable();
+        return this.apiKeys;
     }
 
     private loadApiKeys(): void {
