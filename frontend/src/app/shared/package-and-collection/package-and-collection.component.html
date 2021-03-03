@@ -1,20 +1,20 @@
 <ng-container *ngIf="loadedCollectionsInitially && loadedPackagesInitially; else pageLoader">
     <div>
         <div *ngIf="collections.length">
-            <!-- <h3 class="sub-title">{{ subtitlesPrefix }} Collections</h3> -->
+            <div class="package-details-title ml-3">Collections</div>
             <app-collections-horizontal-list [collections]="collections"></app-collections-horizontal-list>
         </div>
     </div>
 
     <div *ngIf="packages.length">
-        <!-- <h3 class="sub-title">{{ subtitlesPrefix }} Packages</h3> -->
+        <div class="package-details-title ml-3">Packages</div>
         <div *ngFor="let package of packages">
             <app-package-item [item]="package"></app-package-item>
         </div>
 
         <a
             *ngIf="hasMorePackages"
-            class="app-outlined-button ctaButton"
+            class="app-outlined-button ctaButton ml-3"
             [class.disabled]="loadingPackages"
             (click)="requestMorePackages()"
         >
@@ -23,7 +23,7 @@
     </div>
 
     <div class="loading-spinner" *ngIf="loadingPackages">
-        <mat-spinner [diameter]="60"></mat-spinner>
+        <mat-spinner [diameter]="50"></mat-spinner>
     </div>
 
     <div *ngIf="!loadingPackages && !packages.length && !hasPackageErrors">
@@ -38,9 +38,9 @@
         <ng-container *ngTemplateOutlet="errorStateTemplate"></ng-container>
     </div>
 
-    <ng-template #collectionsLoadingTemplate> <mat-spinner [diameter]="60"></mat-spinner> </ng-template>
+    <ng-template #collectionsLoadingTemplate> <mat-spinner [diameter]="50"></mat-spinner> </ng-template>
 </ng-container>
 
-<ng-template class="loading-spinner" #pageLoader>
-    <mat-spinner [diameter]="60"></mat-spinner>
+<ng-template class="loading-spinner text-center" #pageLoader>
+    <mat-spinner style="margin: 0 auto" [diameter]="50"></mat-spinner>
 </ng-template>

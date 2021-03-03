@@ -2,24 +2,25 @@
     <div class="row">
         <div class="col-md-12 p-0" id="deleteUser">
             <div mat-dialog-title id="contentTitle">{{ title }}</div>
-            <mat-dialog-content id="contentBorder">
-                <div class="description" *ngIf="warning">
-                    <h4>{{ warning }}</h4>
+            <div mat-dialog-content id="contentBorder" style="padding-bottom: 15px">
+                <div *ngIf="warning" class="white-border">
+                    <p>{{ warning }}</p>
                 </div>
-                <div class="content">
+
+                <div>
                     <p [innerHTML]="content"></p>
+                </div>
 
-                    <div *ngIf="showConfirmationInputField">
-                        <div>
-                            Type <span class="slug">{{ confirmationInputFieldRequiredValue }}</span> here
-                        </div>
+                <div *ngIf="showConfirmationInputField">
+                    <div>
+                        Type <span class="slug">{{ confirmationInputFieldRequiredValue }}</span> here
+                    </div>
 
-                        <div class="one-line-input py-3">
-                            <input matInput [(ngModel)]="confirmationInputFieldValue" autocomplete="off" />
-                        </div>
+                    <div class="one-line-input py-3">
+                        <input matInput [(ngModel)]="confirmationInputFieldValue" autocomplete="off" />
                     </div>
                 </div>
-            </mat-dialog-content>
+            </div>
 
             <div mat-dialog-actions class="d-flex justify-content-between mb-12">
                 <button mat-button mat-dialog-close class="btn-close">{{ cancelButtonText }}</button>

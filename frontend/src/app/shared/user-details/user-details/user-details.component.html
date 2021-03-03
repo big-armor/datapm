@@ -55,8 +55,8 @@
                                 There was a problem communicating with the server. Please try again.
                             </div>
                         </div>
-                        <div *ngIf="createAPIKeyState == State.SUCCESS" class="div-with-key-command my-3">
-                            <p>
+                        <div *ngIf="createAPIKeyState == State.SUCCESS" class="div-with-key-command mt-4">
+                            <p class="package-dark-gray">
                                 Click to copy the command below. Paste it into your terminal after
                                 <a href="/docs/command-line-client/#install-the-datapm-command-line-client"
                                     >installing the command line client</a
@@ -64,13 +64,18 @@
                                 <br />
                             </p>
                             <div
-                                class="command-container"
+                                class="d-flex bd-highlight copy-wrapper"
                                 (click)="copyKeyToClipboard()"
-                                matTooltip="Copy to clipboard"
+                                style="cursor: pointer"
                             >
-                                <code>
-                                    {{ apiKeyCommandString() }}
-                                </code>
+                                <div class="bd-highlight copy-input">
+                                    <span class="copy-txt"> {{ apiKeyCommandString() }}</span>
+                                </div>
+                                <div class="ml-auto bd-highlight">
+                                    <button class="copy-btn">
+                                        <a><em class="far fa-copy"></em></a>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

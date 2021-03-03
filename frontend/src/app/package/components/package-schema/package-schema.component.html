@@ -16,8 +16,8 @@
             <mat-accordion class="schema-property" multi>
                 <mat-expansion-panel *ngFor="let property of schema?.properties | values | sortBy: 'asc':'title'">
                     <mat-expansion-panel-header>
-                        <mat-panel-title> {{ property.title }} </mat-panel-title>
-                        <mat-panel-description>
+                        <mat-panel-title class="package-dark-gray"> {{ property.title }} </mat-panel-title>
+                        <mat-panel-description class="package-dark-gray">
                             <span>{{ getPropertyTypes(property) }}</span>
                         </mat-panel-description>
                     </mat-expansion-panel-header>
@@ -29,7 +29,7 @@
                             [ngSwitch]="type.valueType"
                         >
                             <div *ngSwitchCase="'number'">
-                                <div>
+                                <div class="package-dark-gray">
                                     {{ type.valueType }}
                                     <ul>
                                         <li>
@@ -44,7 +44,7 @@
                                 </div>
                             </div>
                             <div *ngSwitchCase="'boolean'">
-                                <div>
+                                <div class="package-dark-gray">
                                     {{ type.valueType }}
                                     <ul>
                                         <li>
@@ -57,7 +57,7 @@
                             </div>
 
                             <div *ngSwitchCase="'null'">
-                                <div>
+                                <div class="package-dark-gray">
                                     {{ type.valueType }}
                                     <ul>
                                         <li>
@@ -70,7 +70,7 @@
                             </div>
 
                             <div *ngSwitchCase="'string'">
-                                <div>
+                                <div class="package-dark-gray">
                                     {{ type.valueType }}
                                     <ul>
                                         <li>
@@ -97,7 +97,7 @@
                             </div>
 
                             <div *ngSwitchCase="'date'">
-                                <div>
+                                <div class="package-dark-gray">
                                     {{ type.valueType }}
                                     <ul>
                                         <li>
