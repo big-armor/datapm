@@ -95,6 +95,7 @@ export class AvatarComponent implements OnChanges, OnDestroy {
                     this.loadImageData(imgData);
                     return;
                 }
+                this.selectedImageData = null;
 
                 if (this.user?.firstName && this.user?.lastName) {
                     this.letter =
