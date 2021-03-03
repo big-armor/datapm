@@ -8,7 +8,7 @@
             <div class="px-2 bd-highlight d-flex align-items-end">
                 <div class="catalog-header">
                     <div class="package-details-title mb-0">{{ catalog?.displayName }}</div>
-                    <div class="package-light-gray mb-1">{{ catalogSlug }}</div>
+                    <div class="package-light-gray mb-1">@{{ catalogSlug }}</div>
                     <p class="package-dark-gray" style="margin-bottom: 0px !important; line-height: 11px">
                         {{ catalog?.description }}
                     </p>
@@ -21,7 +21,12 @@
             <span *ngIf="!catalog?.isPublic" class="not-public-text">not public</span>
         </div>
 
-        <mat-tab-group [(selectedIndex)]="currentTab" disableRipple class="catalog-tabs mt-4">
+        <mat-tab-group
+            [(selectedIndex)]="currentTab"
+            (selectedTabChange)="updateTabParam()"
+            disableRipple
+            class="catalog-tabs mt-4"
+        >
             <mat-tab label="Packages"></mat-tab>
             <mat-tab label="Manage" *ngIf="canManage"></mat-tab>
         </mat-tab-group>

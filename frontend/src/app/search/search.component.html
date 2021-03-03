@@ -3,8 +3,9 @@
 <div class="container">
     <div class="row">
         <div class="col-lg-10 offset-lg-1 col-md-12 col-sm-12 mt-5 py-2">
-            <div class="row big-div-latest mb-3">
-                <div class="col-md-12 col-lg-12 pb-2 mb-4">
+            <div class="row big-div-latest">
+                <div class="package-details-title pl-4 ml-1">Search Results for '{{ query }}'</div>
+                <div class="col-md-12 col-lg-12 pb-2 text-center">
                     <app-package-and-collection
                         [title]="'Search Results'"
                         [subtitlesPrefix]="'Matching'"
@@ -13,17 +14,15 @@
                         (onLoadPackagesClick)="updatePackageFetchingQuery($event)"
                         (onLoadCollectionsClick)="updateCollectionsFetchingQuery($event)"
                     >
-                        <div packagesEmptyState>
-                            <p><span class="material-icons">search</span></p>
-                            <br />
-                            <p>We couldn’t find any packages matching '{{ query }}'</p>
-                            <p class="small-txt">Please search another name</p>
+                        <div packagesEmptyState class="mt-5 pt-5">
+                            <p><span class="material-icons search-icon">search</span></p>
+                            <p class="package-dark-gray">We couldn’t find any packages matching '{{ query }}'</p>
+                            <p class="package-dark-gray">Please search another name</p>
                         </div>
 
-                        <div packagesErrorState>
-                            <p><span class="material-icons">error</span></p>
-                            <br />
-                            <p>
+                        <div packagesErrorState class="mt-5 pt-5">
+                            <p><span class="material-icons search-icon">error</span></p>
+                            <p class="package-dark-gray">
                                 Could not search packages. Reload the page and if the issue persists please contact
                                 support.
                             </p>

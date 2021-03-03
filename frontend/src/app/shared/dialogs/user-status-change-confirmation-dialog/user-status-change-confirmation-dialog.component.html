@@ -1,32 +1,39 @@
-<div class="fixActionRow">
-    <h1 mat-dialog-title>Confirm user status change</h1>
-    <mat-dialog-content>
-        <div class="content">
-            <p>
-                Are you sure you want to change <span id="username-label">{{ user.username }}</span
-                >'s status?
-            </p>
-            <p>They will be notified for this change via email.</p>
 
-            <mat-select [(value)]="status">
-                <mat-option [value]="UserStatus.ACTIVE">Active</mat-option>
-                <mat-option [value]="UserStatus.SUSPENDED">Suspended</mat-option>
-            </mat-select>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 p-0" id="changeStatus">
+            <div mat-dialog-title id="contentTitle">Confirm user status change</div>
+            <div mat-dialog-content id="contentBorder">
+                <div>
+                    <p>
+                        Are you sure you want to change this <span id="username-label">{{ user.username }}</span
+                        >'s status?
+                    </p>
+                </div>
 
-            <div>
-                Type your message here.
-                <div class="one-line-input py-3">
-                    <input matInput [(ngModel)]="message" autocomplete="off" />
+                <div>
+                    <p>They will be notified for this change via email.</p>
+                </div>
+
+                <mat-select [(value)]="status">
+                    <mat-option [value]="UserStatus.ACTIVE">Active</mat-option>
+                    <mat-option [value]="UserStatus.SUSPENDED">Suspended</mat-option>
+                </mat-select>
+
+                <div class="mt-3">
+                    Type your message here.
+                    <div class="one-line-input py-2">
+                        <input matInput [(ngModel)]="message" autocomplete="off" />
+                    </div>
                 </div>
             </div>
-        </div>
-    </mat-dialog-content>
 
-    <div class="spacer"></div>
-    <mat-dialog-actions>
-        <button mat-button [disabled]="loading" (click)="confirm()" class="mat-flat-button confirm-button">
-            Confirm
-        </button>
-        <button mat-button (click)="cancel()" class="mat-flat-button cancel-button">Cancel</button>
-    </mat-dialog-actions>
+            <div mat-dialog-actions class="d-flex justify-content-between mb-12">
+                <button mat-button mat-dialog-close class="btn-close" (click)="cancel()">Cancel</button>
+                <button mat-button class="save-btn" (click)="confirm()" [disabled]="loading">
+                    <span class="info-txt">Confirm</span>
+                </button>
+            </div>
+        </div>
+    </div>
 </div>

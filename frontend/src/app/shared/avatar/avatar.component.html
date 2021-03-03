@@ -5,7 +5,6 @@
     [style.height]="size + 'px'"
     [style.fontSize]="size + 'px'"
 >
-    <span *ngIf="state != State.LOADED"></span>
     <span *ngIf="state == State.LOADED">
         <img [src]="selectedImageData" alt="avatar" *ngIf="selectedImageData" />
         <div class="letter" *ngIf="!selectedImageData" [style.background]="backgroundColor">{{ letter }}</div>

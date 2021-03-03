@@ -34,7 +34,6 @@ export class SearchComponent implements OnInit, OnDestroy {
     public ngOnInit(): void {
         this.route.queryParamMap.pipe(takeUntil(this.subscription)).subscribe((params: ParamMap) => {
             const newQuery = params.get("q") || "";
-            console.log(this.query, newQuery);
             if (newQuery == this.query) {
                 return;
             }

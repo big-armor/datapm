@@ -1,12 +1,12 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, ViewChild } from "@angular/core";
 import { MatPaginator } from "@angular/material/paginator";
-import { MatTableDataSource } from "@angular/material/table";
 import { AdminSetUserStatusGQL, AdminDeleteUserGQL, AdminSearchUsersGQL, User } from "../../../../generated/graphql";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import Timeout = NodeJS.Timeout;
 import { ConfirmationDialogService } from "../../../services/dialog/confirmation-dialog.service";
 import { UserStatusChangeDialogResponse } from "src/app/services/dialog/user-status-change-dialog-response";
+import { DialogSize } from "src/app/services/dialog/dialog-size";
 
 @Component({
     selector: "app-users",
@@ -22,9 +22,8 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
         "isAdmin",
         "actions"
     ];
-    public readonly USERS_PER_PAGE = 20;
+    public readonly USERS_PER_PAGE = 10;
 
-    public readonly dataSource = new MatTableDataSource<User>();
     private readonly destroyed = new Subject();
 
     @ViewChild(MatPaginator)
@@ -33,9 +32,11 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
     public loading: boolean = false;
     public searchValue: string = "";
 
-    public loadedPages: number[] = [];
-    public loadedUsers: User[] = [];
     public totalMatchingUsers: number = 0;
+    public displayedUsers: User[] = [];
+
+    private loadedUsersCount: number = 0;
+    private usersByPageIndex: Map<number, User[]> = new Map();
 
     private searchTimeout: Timeout;
 
@@ -48,7 +49,6 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
     ) {}
 
     public ngAfterViewInit(): void {
-        this.dataSource.paginator = this.paginator;
         this.subscribeToPageChangeEvent();
         this.loadUsers();
         this.changeDetectorRef.detectChanges();
@@ -93,7 +93,7 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
 
     public openUserStatusChangeConfirmationDialog(user: User): void {
         this.confirmationDialogService
-            .openUserStatusChangeConfirmationDialog({ data: user })
+            .openUserStatusChangeConfirmationDialog({ data: user, size: DialogSize.MEDIUM })
             .subscribe((response: UserStatusChangeDialogResponse) => {
                 if (response) {
                     this.changeUserStatusGQL
@@ -113,13 +113,14 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
     }
 
     private loadUsers(): void {
-        if (this.loadedPages.includes(this.paginator.pageIndex)) {
+        if (this.usersByPageIndex.has(this.paginator.pageIndex)) {
+            this.displayedUsers = this.usersByPageIndex.get(this.paginator.pageIndex);
             return;
         }
 
         this.loading = true;
         this.searchUsersGQL
-            .fetch({ value: this.searchValue, offset: this.loadedUsers.length, limit: this.USERS_PER_PAGE })
+            .fetch({ value: this.searchValue, offset: this.loadedUsersCount, limit: this.USERS_PER_PAGE })
             .subscribe(
                 (users) => {
                     const response = users.data?.adminSearchUsers;
@@ -128,23 +129,21 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
                     } else {
                         this.resetLoadedUsersData();
                     }
+                    this.loading = false;
                 },
-                () => this.resetLoadedUsersData(),
-                () => setTimeout(() => (this.loading = false), 500)
+                () => this.resetLoadedUsersData()
             );
     }
 
     private loadUsersToTheTable(users: User[], totalCount: number): void {
-        this.loadedPages.push(this.paginator.pageIndex);
-        this.loadedUsers.push(...users);
-        this.dataSource.data = this.loadedUsers;
+        this.usersByPageIndex.set(this.paginator.pageIndex, users);
+        this.displayedUsers = users;
+        this.loadedUsersCount += users.length;
         setTimeout(() => (this.paginator.length = totalCount));
     }
 
     private resetLoadedUsersData(): void {
-        this.loadedUsers = [];
-        this.loadedPages = [];
         this.totalMatchingUsers = 0;
-        this.dataSource.data = [];
+        this.usersByPageIndex = new Map();
     }
 }

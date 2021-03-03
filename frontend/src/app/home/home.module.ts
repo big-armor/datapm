@@ -22,6 +22,7 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { FormsModule } from "@angular/forms";
 import { MatInputModule } from "@angular/material/input";
 import { MatStepperModule } from "@angular/material/stepper";
+import { MatTooltipModule } from "@angular/material/tooltip";
 
 @NgModule({
     declarations: [
@@ -46,6 +47,7 @@ import { MatStepperModule } from "@angular/material/stepper";
         MatStepperModule,
         MatProgressSpinnerModule,
         MatFormFieldModule,
+        MatTooltipModule,
         MatInputModule,
         FormsModule
     ]

@@ -9,6 +9,7 @@ import { AuthenticationService } from "src/app/services/authentication.service";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import { Package, User } from "src/generated/graphql";
 import { AddUserComponent } from "../add-user/add-user.component";
+import { ClientWizardComponent } from "./download-package/client-wizard/client-wizard.component";
 import { DownloadPackageComponent } from "./download-package/download-package.component";
 import { SharePackageComponent } from "./share-package/share-package.component";
 
@@ -95,6 +96,13 @@ export class PackageInfoComponent implements OnInit, OnChanges {
         const dialogRef = this.dialog.open(DownloadPackageComponent, {
             data: this.package,
             width: "430px"
+        });
+    }
+
+    public openWizard() {
+        const dialogRef = this.dialog.open(ClientWizardComponent, {
+            width: "550px",
+            panelClass: "my-custom-dialog"
         });
     }
 

@@ -125,7 +125,9 @@ export class UserCollectionsComponent implements OnInit {
             })
             .afterClosed()
             .subscribe((confirmed: boolean) => {
-                this.loadMyCollections();
+                if (confirmed) {
+                    this.loadMyCollections();
+                }
             });
     }
 }
