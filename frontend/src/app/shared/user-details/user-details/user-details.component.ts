@@ -94,11 +94,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         const dialogConfig = new MatDialogConfig();
         dialogConfig.data = this.currentUser;
 
-        this.dialog.open(EditAccountDialogComponent, dialogConfig);
-
-        this.dialog.afterAllClosed.subscribe((result) => {
-            this.authenticationService.refreshUserInfo();
-        });
+        this.dialog
+            .open(EditAccountDialogComponent, dialogConfig)
+            .afterClosed()
+            .subscribe(() => this.authenticationService.refreshUserInfo());
     }
 
     public createAPIKey(): void {

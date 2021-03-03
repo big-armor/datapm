@@ -29,7 +29,6 @@ export class UserDetailsPageComponent implements OnInit {
         private authSvc: AuthenticationService
     ) {
         this.username = this.route.snapshot.paramMap.get("catalogSlug");
-
         if (this.username === this.authSvc.currentUser.value?.username) {
             this.isCurrentUser = true;
             this.tabs = [
@@ -56,20 +55,27 @@ export class UserDetailsPageComponent implements OnInit {
         });
     }
 
-    ngOnInit(): void {
-        this.userGQL
-            .fetch({
-                username: this.username
-            })
-            .subscribe(({ data, errors }) => {
-                if (errors) {
-                    this.state = "ERROR";
-                    return;
-                }
-
-                this.user = data.user;
+    public ngOnInit(): void {
+        if (this.isCurrentUser) {
+            this.authSvc.currentUser.pipe(takeUntil(this.subscription)).subscribe((user) => {
+                this.user = user;
                 this.state = "SUCCESS";
             });
+        } else {
+            this.userGQL
+                .fetch({
+                    username: this.username
+                })
+                .subscribe(({ data, errors }) => {
+                    if (errors) {
+                        this.state = "ERROR";
+                        return;
+                    }
+
+                    this.user = data.user;
+                    this.state = "SUCCESS";
+                });
+        }
     }
 
     ngOnDestroy() {
