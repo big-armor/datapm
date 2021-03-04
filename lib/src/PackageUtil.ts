@@ -423,6 +423,8 @@ export function diffCompatibility(diffs: Difference[]): Compability {
             case DifferenceType.CHANGE_LICENSE_MARKDOWN:
             case DifferenceType.CHANGE_WEBSITE:
             case DifferenceType.CHANGE_CONTACT_EMAIL:
+            case DifferenceType.REMOVE_HIDDEN_PROPERTY:
+            case DifferenceType.REMOVE_HIDDEN_SCHEMA:
             case DifferenceType.CHANGE_VERSION: // this just requires that the number be at least one minor version greater, it doesn't return the actual difference
                 returnValue = Math.max(returnValue, Compability.MinorChange);
                 break;
@@ -433,8 +435,6 @@ export function diffCompatibility(diffs: Difference[]): Compability {
             case DifferenceType.CHANGE_UPDATED_DATE:
             case DifferenceType.CHANGE_README_FILE:
             case DifferenceType.CHANGE_LICENSE_FILE:
-            case DifferenceType.REMOVE_HIDDEN_PROPERTY:
-            case DifferenceType.REMOVE_HIDDEN_SCHEMA:
                 // nothing to do
                 break;
 

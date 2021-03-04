@@ -815,6 +815,9 @@ describe("Checking VersionUtil", () => {
         expect(propertyHiddenDiff.length).equal(1);
         expect(propertyHiddenDiff[0].type).equal(DifferenceType.HIDE_PROPERTY);
 
+        const propertyHiddenCompatibility = diffCompatibility(propertyHiddenDiff);
+        expect(propertyHiddenCompatibility).equal(Compability.BreakingChange);
+
         (schemaA1.properties as Properties).string.hidden = true;
         delete (schemaA2.properties as Properties).string;
 
@@ -822,11 +825,12 @@ describe("Checking VersionUtil", () => {
 
         expect(removeHiddenPropertyDiff.length).equal(1);
         expect(removeHiddenPropertyDiff[0].type).equal(DifferenceType.REMOVE_HIDDEN_PROPERTY);
+
+        const removeHiddenPropertyCompatibility = diffCompatibility(removeHiddenPropertyDiff);
+        expect(removeHiddenPropertyCompatibility).equal(Compability.MinorChange);
     });
 
     // TODO Add test for removing a schema
 
     // TODO Add test for removing a hidden schema
-
-    // TODO Add test for removing a hidden property
 });
