@@ -38,6 +38,8 @@ export enum DifferenceType {
     CHANGE_STREAM_STATS = "CHANGE_SOURCE_STATS",
     CHANGE_STREAM_UPDATE_HASH = "CHANGE_SOURCE_UPDATE_HASH",
     ADD_PROPERTY = "ADD_PROPERTY",
+    HIDE_PROPERTY = "HIDE_PROPERTY",
+    UNHIDE_PROPERTY = "UNHIDE_PROPERTY",
     REMOVE_PROPERTY = "REMOVE_PROPERTY",
     REMOVE_HIDDEN_PROPERTY = "REMOVE_HIDDEN_PROPERTY",
     CHANGE_PROPERTY_TYPE = "CHANGE_PROPERTY_TYPE",
@@ -294,6 +296,12 @@ export function compareSchema(priorSchema: Schema, newSchema: Schema, pointer = 
         response.push({ type: DifferenceType.CHANGE_PROPERTY_TYPE, pointer });
     }
 
+    if (priorSchema.hidden !== true && newSchema.hidden === true) {
+        response.push({ type: DifferenceType.HIDE_PROPERTY, pointer });
+    } else if (priorSchema.hidden === true && newSchema.hidden !== true) {
+        response.push({ type: DifferenceType.UNHIDE_PROPERTY, pointer });
+    }
+
     if (priorSchema.type === "string" && priorSchema.format !== newSchema.format)
         response.push({ type: DifferenceType.CHANGE_PROPERTY_FORMAT, pointer });
 
@@ -309,10 +317,17 @@ export function compareSchema(priorSchema: Schema, newSchema: Schema, pointer = 
             const newKeys = Object.keys(newSchema.properties);
 
             if (newKeys.indexOf(priorKey) === -1) {
-                response.push({
-                    type: DifferenceType.REMOVE_PROPERTY,
-                    pointer: pointer
-                });
+                if (priorSchema.properties[priorKey].hidden) {
+                    response.push({
+                        type: DifferenceType.REMOVE_HIDDEN_PROPERTY,
+                        pointer
+                    });
+                } else {
+                    response.push({
+                        type: DifferenceType.REMOVE_PROPERTY,
+                        pointer: pointer
+                    });
+                }
                 break;
             }
 
@@ -390,11 +405,13 @@ export function diffCompatibility(diffs: Difference[]): Compability {
             case DifferenceType.REMOVE_SCHEMA:
             case DifferenceType.CHANGE_PROPERTY_FORMAT:
             case DifferenceType.CHANGE_PROPERTY_TYPE:
+            case DifferenceType.HIDE_PROPERTY:
                 returnValue = Compability.BreakingChange;
                 break;
 
             case DifferenceType.ADD_PROPERTY:
             case DifferenceType.ADD_SCHEMA:
+            case DifferenceType.UNHIDE_PROPERTY:
                 returnValue = Math.max(returnValue, Compability.CompatibleChange);
                 break;
 

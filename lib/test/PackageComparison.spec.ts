@@ -785,6 +785,45 @@ describe("Checking VersionUtil", () => {
         );
     });
 
+    it("Compare hidden properties", () => {
+        const schemaA1: Schema = {
+            title: "SchemaA",
+            type: "object",
+            properties: {
+                string: { title: "string", type: "string" },
+                number: { title: "number", type: "number" }
+            }
+        };
+
+        const schemaA2: Schema = {
+            title: "SchemaA",
+            type: "object",
+            properties: {
+                string: { title: "string", type: "string" },
+                number: { title: "number", type: "number" }
+            }
+        };
+
+        const diff = compareSchema(schemaA1, schemaA2);
+
+        expect(diff.length).equal(0);
+
+        (schemaA2.properties as Properties).string.hidden = true;
+
+        const propertyHiddenDiff = compareSchema(schemaA1, schemaA2);
+
+        expect(propertyHiddenDiff.length).equal(1);
+        expect(propertyHiddenDiff[0].type).equal(DifferenceType.HIDE_PROPERTY);
+
+        (schemaA1.properties as Properties).string.hidden = true;
+        delete (schemaA2.properties as Properties).string;
+
+        const removeHiddenPropertyDiff = compareSchema(schemaA1, schemaA2);
+
+        expect(removeHiddenPropertyDiff.length).equal(1);
+        expect(removeHiddenPropertyDiff[0].type).equal(DifferenceType.REMOVE_HIDDEN_PROPERTY);
+    });
+
     // TODO Add test for removing a schema
 
     // TODO Add test for removing a hidden schema
