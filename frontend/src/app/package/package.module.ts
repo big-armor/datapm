@@ -44,6 +44,7 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
 import { PackageIssuesDetailComponent } from "./components/package-issues/package-issues-detail/package-issues-detail.component";
 import { EditorModule } from "@tinymce/tinymce-angular";
 import { MatMenuModule } from "@angular/material/menu";
+import { CreatePackageIssueComponent } from "./components/package-issues/create-package-issue/create-package-issue.component";
 
 @NgModule({
     declarations: [
@@ -65,7 +66,8 @@ import { MatMenuModule } from "@angular/material/menu";
         DownloadPackageComponent,
         ClientWizardComponent,
         PackageIssuesComponent,
-        PackageIssuesDetailComponent
+        PackageIssuesDetailComponent,
+        CreatePackageIssueComponent
     ],
     imports: [
         CommonModule,
