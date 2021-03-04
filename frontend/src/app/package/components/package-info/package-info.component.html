@@ -60,13 +60,13 @@
             </div>
         </div>
         <div class="row mb-3">
-            <div class="col-6 mb-2">
+            <div class="col-6">
                 <p class="package-light-gray">last refreshed</p>
                 <p class="package-dark-gray">
                     {{ package?.latestVersion?.createdAt | timeAgo }}
                 </p>
             </div>
-            <div class="col-6 mb-2">
+            <div class="col-6">
                 <p class="package-light-gray">unpacked size</p>
                 <p class="package-dark-gray">{{ packageFile?.schemas | packageSize }}</p>
             </div>
