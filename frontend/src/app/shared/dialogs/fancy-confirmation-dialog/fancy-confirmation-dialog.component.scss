@@ -1,34 +1,13 @@
 @import "./src/styles/variables.scss";
 
 #deleteUser {
-    .description {
-        padding: 20px 0;
-        background: $white;
-        border-radius: 4px;
-        position: relative;
-        h4 {
-            font-size: 14px;
-            margin: 0px 20px;
-        }
+    .white-border {
+        background: #fff;
+        padding: 15px 10px;
+        margin-bottom: 10px;
 
-        &:before {
-            content: "";
-            position: absolute;
-            width: 114%;
-            height: 1px;
-            background: $gray-3;
-            top: 0px;
-            left: -24px;
-        }
-
-        &:after {
-            content: "";
-            position: absolute;
-            width: 114%;
-            height: 1px;
-            background: $gray-4;
-            bottom: 0px;
-            left: -24px;
+        p {
+            margin-bottom: 0px !important;
         }
     }
 
@@ -47,6 +26,10 @@
         font-size: $text-font;
         margin-bottom: 0;
         color: $gray-1;
+    }
+
+    .btn-delete {
+        width: unset !important;
     }
 }
 

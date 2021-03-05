@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { Observable, Subject } from "rxjs";
 import { ConfirmationDialogService } from "./confirmation-dialog.service";
 import { DialogConfig } from "./dialog-config";
+import { DialogSize } from "./dialog-size";
 
 @Injectable({
     providedIn: "root"
@@ -46,7 +47,8 @@ export class DialogService {
                 warning: "Unexpected bad things will happen if you don’t read this!",
                 content: message,
                 confirmButtonText: confirmText
-            }
+            },
+            size: DialogSize.MEDIUM
         };
 
         return this.confirmationDialogService.openFancyConfirmationDialog(dialogConfig);
@@ -73,7 +75,8 @@ export class DialogService {
                 warning: "Unexpected bad things will happen if you don’t read this!",
                 content: message,
                 confirmButtonText: confirmText
-            }
+            },
+            size: DialogSize.MEDIUM
         };
 
         return this.confirmationDialogService.openFancyConfirmationDialog(dialogConfig);

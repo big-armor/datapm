@@ -43,6 +43,7 @@ export class ImageService {
 
     public loadImage(url: string, reload?: boolean): Subject<SafeUrl> {
         const isImageCached = this.imageDataSubjectByUrl.has(url);
+
         if (!reload && isImageCached) {
             return this.imageDataSubjectByUrl.get(url);
         }

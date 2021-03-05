@@ -62,6 +62,9 @@ export class PackageComponent implements OnDestroy {
         this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe(
             (p: PackageResponse) => {
                 if (p == null) return;
+                if (this.package && p.package.identifier != this.package.identifier) {
+                    this.catalogUser = null;
+                }
 
                 if (p.package == null && p.response != null) {
                     if (p.response.errors.some((e) => e.message.includes("NOT_AUTHENTICATED")))

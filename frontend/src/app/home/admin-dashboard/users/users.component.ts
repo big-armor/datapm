@@ -73,15 +73,16 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
     }
 
     public openDeleteUserConfirmationDialog(user: User): void {
-        const dialogContent = `<p>Are you sure you want to delete user ${user.username}</p>
-      <p>This will completely delete this user's data and it will be lost forever.</p>`;
+        const dialogContent = `<p class="mb-1">Are you sure you want to delete user ${user.username}</p>
+      <p class="mb-0">This will completely delete this user's data and it will be lost forever.</p>`;
         const dialogConfig = {
             data: {
                 title: "Confirm user deletion",
                 content: dialogContent,
                 showConfirmationInputField: true,
                 confirmationInputFieldRequiredValue: user.username
-            }
+            },
+            size: DialogSize.MEDIUM
         };
         this.confirmationDialogService.openFancyConfirmationDialog(dialogConfig).subscribe((confirmation) => {
             if (confirmation) {

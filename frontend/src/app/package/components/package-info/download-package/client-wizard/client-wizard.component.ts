@@ -7,6 +7,7 @@ import { AuthenticationService } from "src/app/services/authentication.service";
 import { ApiKeyService } from "src/app/services/api-key.service";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import { Clipboard } from "@angular/cdk/clipboard";
+import { User } from "src/generated/graphql";
 
 @Component({
     selector: "app-client-wizard",
@@ -15,6 +16,7 @@ import { Clipboard } from "@angular/cdk/clipboard";
 })
 export class ClientWizardComponent implements OnInit {
     public currentIndex: number = 0;
+    public currentUser: User;
 
     username: string;
     packageUrl: string;
@@ -44,6 +46,7 @@ export class ClientWizardComponent implements OnInit {
             let user = this.authenticationService.currentUser.value;
             if (user) {
                 this.username = user.username;
+                this.currentUser = user;
             } else {
                 this.username = "username";
             }

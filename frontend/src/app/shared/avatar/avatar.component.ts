@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from "@angular/core";
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from "@angular/core";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
@@ -95,6 +95,7 @@ export class AvatarComponent implements OnChanges, OnDestroy {
                     this.loadImageData(imgData);
                     return;
                 }
+                this.selectedImageData = null;
 
                 if (this.user?.firstName && this.user?.lastName) {
                     this.letter =
