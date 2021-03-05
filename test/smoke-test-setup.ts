@@ -141,7 +141,7 @@ after(async function () {
 
     if (network) await network.stop();
 
-    registryContainerReadable.destroy();
+    if (registryContainerReadable) registryContainerReadable.destroy();
 
     const pids = pidtree(process.pid, { root: true });
     // recursively kill all child processes
