@@ -325,8 +325,6 @@ describe("Collection Tests", async () => {
             }
         });
 
-        console.log("response", response);
-
         const collectionAfterUpdate = await userAClient.query({
             query: CollectionDocument,
             variables: {

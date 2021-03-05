@@ -7,7 +7,17 @@ import {
     nextVersion,
     comparePackages
 } from "../src/PackageUtil";
-import { Schema, Properties, PackageFile, catalogSlugValid, packageSlugValid, collectionSlugValid } from "../src/main";
+import {
+    Schema,
+    Properties,
+    PackageFile,
+    catalogSlugValid,
+    packageSlugValid,
+    collectionSlugValid,
+    Source,
+    compareSource,
+    compareSources
+} from "../src/main";
 import { SemVer } from "semver";
 import { expect } from "chai";
 
@@ -303,49 +313,235 @@ describe("Checking VersionUtil", () => {
         expect(collectionSlugValid("a___c")).equal("COLLECTION_SLUG_INVALID");
     });
 
-    it("Compare identical", () => {
+    it("Compare identical schemas", () => {
         const schemaA1: Schema = {
             title: "SchemaA",
             type: "string",
-            format: "date-time",
-            source: {
-                type: "test",
-                uri: "http://datapm.io/test",
-                configuration: {},
-                lastUpdateHash: "abc123"
-            }
+            format: "date-time"
         };
 
         const schemaA2: Schema = {
             title: "SchemaA",
             type: "string",
-            format: "date-time",
-            source: {
-                type: "test",
-                uri: "http://datapm.io/test",
-                configuration: {},
-                lastUpdateHash: "abc123"
-            }
+            format: "date-time"
         };
-
-        if (schemaA2.source == null) {
-            throw new Error("source should not be null");
-        }
-
-        expect(compareSchema(schemaA1, schemaA2).length).equal(0);
-
-        schemaA2.source.uri = "https://somethingelse.datapm.io";
 
         const diffs = compareSchema(schemaA1, schemaA2);
 
-        expect(diffs[0].type).equal(DifferenceType.CHANGE_SOURCE);
+        console.log(JSON.stringify(diffs, null, 1));
 
-        schemaA2.source.uri = "http://datapm.io/test";
-        schemaA2.source.lastUpdateHash = "test1234";
+        expect(diffs.length).equal(0);
+    });
 
-        const diffs2 = compareSchema(schemaA1, schemaA2);
+    it("Compare source objects", () => {
+        const sourceA: Source = {
+            slug: "datapm",
+            type: "test",
+            uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+            configuration: {},
+            streamSets: [
+                {
+                    configuration: {},
+                    slug: "streamA",
+                    lastUpdateHash: "abc123",
+                    schemaTitles: ["A"],
+                    streamStats: {
+                        inspectedCount: 0
+                    }
+                }
+            ]
+        };
 
-        expect(diffs2[0].type).equal(DifferenceType.CHANGE_SOURCE_UPDATE_HASH);
+        const sourceB: Source = {
+            slug: "datapm",
+            type: "test",
+            uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+            configuration: {},
+            streamSets: [
+                {
+                    configuration: {},
+                    slug: "streamA",
+                    lastUpdateHash: "abc123",
+                    schemaTitles: ["A"],
+                    streamStats: {
+                        inspectedCount: 0
+                    }
+                }
+            ]
+        };
+
+        const diffs = compareSource(sourceA, sourceB);
+
+        expect(diffs.length).equals(0);
+
+        sourceA.streamSets[0].lastUpdateHash = "test";
+
+        const diffs2 = compareSource(sourceA, sourceB);
+
+        expect(diffs2[0].type).equal(DifferenceType.CHANGE_STREAM_UPDATE_HASH);
+
+        sourceA.streamSets[0].lastUpdateHash = sourceB.streamSets[0].lastUpdateHash;
+
+        sourceA.uris = ["http://datapm.io.test"];
+
+        const diffs3 = compareSource(sourceA, sourceB);
+
+        expect(diffs3[0].type).equal(DifferenceType.CHANGE_SOURCE_URIS);
+    });
+
+    it("Compare source arrays", () => {
+        const sourceA: Source[] = [
+            {
+                slug: "datapm",
+                type: "test",
+                uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+                configuration: {},
+                streamSets: [
+                    {
+                        configuration: {},
+                        slug: "streamA",
+                        lastUpdateHash: "abc123",
+                        schemaTitles: ["A"],
+                        streamStats: {
+                            inspectedCount: 0
+                        }
+                    }
+                ]
+            }
+        ];
+
+        const sourceB: Source[] = [
+            {
+                slug: "datapm",
+                type: "test",
+                uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+                configuration: {},
+                streamSets: [
+                    {
+                        configuration: {},
+                        slug: "streamA",
+                        lastUpdateHash: "abc123",
+                        schemaTitles: ["A"],
+                        streamStats: {
+                            inspectedCount: 0
+                        }
+                    }
+                ]
+            }
+        ];
+
+        const diffs = compareSources(sourceA, sourceB);
+
+        expect(diffs.length).equals(0);
+
+        sourceA[0].uris = ["test"];
+
+        const diffs2 = compareSources(sourceA, sourceB);
+
+        expect(diffs2[0].type).equal(DifferenceType.CHANGE_SOURCE_URIS);
+    });
+
+    it("Detected removed sources", () => {
+        const sourceA: Source[] = [
+            {
+                slug: "datapm",
+                type: "test",
+                uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+                configuration: {},
+                streamSets: [
+                    {
+                        configuration: {},
+                        slug: "streamA",
+                        lastUpdateHash: "abc123",
+                        schemaTitles: ["A"],
+                        streamStats: {
+                            inspectedCount: 0
+                        }
+                    }
+                ]
+            }
+        ];
+
+        const sourceB: Source[] = [
+            {
+                slug: "datapm2",
+                type: "test",
+                uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+                configuration: {},
+                streamSets: [
+                    {
+                        configuration: {},
+                        slug: "streamA",
+                        lastUpdateHash: "abc123",
+                        schemaTitles: ["A"],
+                        streamStats: {
+                            inspectedCount: 0
+                        }
+                    }
+                ]
+            }
+        ];
+
+        const diffs = compareSources(sourceA, sourceB);
+
+        expect(diffs.length).equals(1);
+        expect(diffs[0].type).equals(DifferenceType.REMOVE_SOURCE);
+    });
+
+    it("Stream status change detection", () => {
+        const sourceA: Source[] = [
+            {
+                slug: "datapm",
+                type: "test",
+                uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+                configuration: {},
+                streamSets: [
+                    {
+                        slug: "test",
+                        configuration: {},
+                        lastUpdateHash: "abc123",
+                        schemaTitles: ["A"],
+                        streamStats: {
+                            inspectedCount: 0
+                        }
+                    }
+                ]
+            }
+        ];
+
+        const sourceB: Source[] = [
+            {
+                slug: "datapm",
+                type: "test",
+                uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+                configuration: {},
+                streamSets: [
+                    {
+                        slug: "test",
+                        configuration: {},
+                        lastUpdateHash: "abc123",
+                        schemaTitles: ["A"],
+                        streamStats: {
+                            inspectedCount: 1
+                        }
+                    }
+                ]
+            }
+        ];
+
+        const diffs = compareSources(sourceA, sourceB);
+
+        expect(diffs.length).equals(1);
+
+        expect(diffs[0].type).equal(DifferenceType.CHANGE_STREAM_STATS);
+
+        sourceB[0].streamSets[0].slug += "!";
+
+        const diffs2 = compareSources(sourceA, sourceB);
+
+        expect(diffs2.length).equals(1);
+
+        expect(diffs2[0].type).equal(DifferenceType.REMOVE_STREAM_SET);
     });
 
     it("Package File updated dates", function () {
@@ -357,7 +553,8 @@ describe("Checking VersionUtil", () => {
             schemas: [],
             version: "1.0.0",
             updatedDate: new Date(),
-            description: "Back test"
+            description: "Back test",
+            sources: []
         };
 
         const packageFileB: PackageFile = {
@@ -368,7 +565,8 @@ describe("Checking VersionUtil", () => {
             schemas: [],
             version: "1.0.0",
             updatedDate: packageFileA.updatedDate,
-            description: "Back test"
+            description: "Back test",
+            sources: []
         };
 
         expect(comparePackages(packageFileA, packageFileB).some((d) => d.type === "CHANGE_UPDATED_DATE")).equal(false);
@@ -387,6 +585,7 @@ describe("Checking VersionUtil", () => {
             displayName: "test",
             generatedBy: "test",
             schemas: [],
+            sources: [],
             version: "1.0.0",
             updatedDate: new Date(),
             description: "Back test"
@@ -398,6 +597,7 @@ describe("Checking VersionUtil", () => {
             displayName: "test",
             generatedBy: "test",
             schemas: [],
+            sources: [],
             version: "1.0.0",
             updatedDate: packageFileA.updatedDate,
             description: "Back test"
@@ -419,6 +619,8 @@ describe("Checking VersionUtil", () => {
             displayName: "test",
             generatedBy: "test",
             schemas: [],
+            sources: [],
+
             version: "1.0.0",
             updatedDate: new Date(),
             description: "Back test",
@@ -431,6 +633,8 @@ describe("Checking VersionUtil", () => {
             displayName: "test",
             generatedBy: "test",
             schemas: [],
+            sources: [],
+
             version: "1.0.0",
             updatedDate: packageFileA.updatedDate,
             description: "Back test",
@@ -460,6 +664,8 @@ describe("Checking VersionUtil", () => {
             displayName: "test",
             generatedBy: "test",
             schemas: [],
+            sources: [],
+
             version: "1.0.0",
             updatedDate: new Date(),
             description: "Back test",
@@ -472,6 +678,7 @@ describe("Checking VersionUtil", () => {
             displayName: "test",
             generatedBy: "test",
             schemas: [],
+            sources: [],
             version: "1.0.0",
             updatedDate: packageFileA.updatedDate,
             description: "Back test",
@@ -501,6 +708,8 @@ describe("Checking VersionUtil", () => {
             displayName: "test",
             generatedBy: "test",
             schemas: [],
+            sources: [],
+
             version: "1.0.0",
             updatedDate: new Date(),
             description: "Back test",
@@ -514,6 +723,8 @@ describe("Checking VersionUtil", () => {
             displayName: "test",
             generatedBy: "test",
             schemas: [],
+            sources: [],
+
             version: "1.0.0",
             updatedDate: packageFileA.updatedDate,
             description: "Back test",
@@ -538,6 +749,8 @@ describe("Checking VersionUtil", () => {
             displayName: "test",
             generatedBy: "test",
             schemas: [],
+            sources: [],
+
             version: "1.0.0",
             updatedDate: new Date(),
             description: "Back test",
@@ -552,6 +765,8 @@ describe("Checking VersionUtil", () => {
             displayName: "test",
             generatedBy: "test",
             schemas: [],
+            sources: [],
+
             version: "1.0.0",
             updatedDate: packageFileA.updatedDate,
             description: "Back test",
@@ -569,4 +784,53 @@ describe("Checking VersionUtil", () => {
             true
         );
     });
+
+    it("Compare hidden properties", () => {
+        const schemaA1: Schema = {
+            title: "SchemaA",
+            type: "object",
+            properties: {
+                string: { title: "string", type: "string" },
+                number: { title: "number", type: "number" }
+            }
+        };
+
+        const schemaA2: Schema = {
+            title: "SchemaA",
+            type: "object",
+            properties: {
+                string: { title: "string", type: "string" },
+                number: { title: "number", type: "number" }
+            }
+        };
+
+        const diff = compareSchema(schemaA1, schemaA2);
+
+        expect(diff.length).equal(0);
+
+        (schemaA2.properties as Properties).string.hidden = true;
+
+        const propertyHiddenDiff = compareSchema(schemaA1, schemaA2);
+
+        expect(propertyHiddenDiff.length).equal(1);
+        expect(propertyHiddenDiff[0].type).equal(DifferenceType.HIDE_PROPERTY);
+
+        const propertyHiddenCompatibility = diffCompatibility(propertyHiddenDiff);
+        expect(propertyHiddenCompatibility).equal(Compability.BreakingChange);
+
+        (schemaA1.properties as Properties).string.hidden = true;
+        delete (schemaA2.properties as Properties).string;
+
+        const removeHiddenPropertyDiff = compareSchema(schemaA1, schemaA2);
+
+        expect(removeHiddenPropertyDiff.length).equal(1);
+        expect(removeHiddenPropertyDiff[0].type).equal(DifferenceType.REMOVE_HIDDEN_PROPERTY);
+
+        const removeHiddenPropertyCompatibility = diffCompatibility(removeHiddenPropertyDiff);
+        expect(removeHiddenPropertyCompatibility).equal(Compability.MinorChange);
+    });
+
+    // TODO Add test for removing a schema
+
+    // TODO Add test for removing a hidden schema
 });
