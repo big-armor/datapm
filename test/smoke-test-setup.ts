@@ -87,6 +87,7 @@ before(async function () {
         .withEnv("STORAGE_URL", "file:///tmp/datapm-registry")
         .withTmpFs({ "/tmp/datapm-registry": "rw,noexec,nosuid,size=65536k" })
         .withExposedPorts(4000)
+        .withDefaultLogDriver()
         .withNetworkMode(network.getName())
         .withName("registry")
         .start();
