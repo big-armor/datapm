@@ -58,53 +58,48 @@ before(async function () {
 
     console.log("Starting registry container");
 
-    try {
-        registryContainer = await new GenericContainer("datapm-registry")
-            .withEnv("REGISTRY_NAME", "client-integration-test")
-            .withEnv("REGISTRY_URL", "http://localhost:4000")
-            .withEnv("REGISTRY_HOSTNAME", "localhost")
-            .withEnv("PORT", "4000")
-            .withEnv("JWT_AUDIENCE", "localhost")
-            .withEnv("JWT_KEY", "!!!REPLACE_ME!!!")
-            .withEnv("JWT_ISSUER", "localhost")
-            .withEnv("APOLLO_GRAPH_VARIANT", "client-integration-tests")
-            .withEnv("GCLOUD_STORAGE_BUCKET_NAME", "media")
-            .withEnv("GOOGLE_CLOUD_PROJECT", "adsfasdf")
-            .withEnv("MIXPANEL_TOKEN", "asdfasdfasdf")
-            .withEnv("TYPEORM_IS_DIST", "true")
-            .withEnv("TYPEORM_PORT", "5432")
-            .withEnv("TYPEORM_HOST", "database")
-            .withEnv("TYPEORM_DATABASE", "datapm")
-            .withEnv("TYPEORM_SCHEMA", "public")
-            .withEnv("TYPEORM_USERNAME", "postgres")
-            .withEnv("TYPEORM_PASSWORD", "postgres")
-            .withEnv("SMTP_SERVER", "smtp")
-            .withEnv("SMTP_PORT", "25")
-            .withEnv("SMTP_USER", "")
-            .withEnv("SMTP_PASSWORD", "")
-            .withEnv("SMTP_SECURE", "false")
-            .withEnv("SMTP_FROM_ADDRESS", "client-integraiton-test@localhost")
-            .withEnv("SMTP_FROM_NAME", "client-integration-tests")
-            .withEnv("STORAGE_URL", "file:///temp_datapm-registry")
-            .withTmpFs({ "/temp_datapm-registry": "rw,noexec,nosuid,size=65536k" })
-            .withExposedPorts(4000)
-            .withNetworkMode(network.getName())
-            .withName("registry")
-            .withWaitStrategy(Wait.forLogMessage("🚀 Server ready at http://localhost:4000"))
-            .start();
-    } catch (error) {
-        console.error(JSON.stringify(error, null, 1));
-        exit(1);
-    }
+    registryContainer = await new GenericContainer("datapm-registry")
+        .withEnv("REGISTRY_NAME", "client-integration-test")
+        .withEnv("REGISTRY_URL", "http://localhost:4000")
+        .withEnv("REGISTRY_HOSTNAME", "localhost")
+        .withEnv("PORT", "4000")
+        .withEnv("JWT_AUDIENCE", "localhost")
+        .withEnv("JWT_KEY", "!!!REPLACE_ME!!!")
+        .withEnv("JWT_ISSUER", "localhost")
+        .withEnv("APOLLO_GRAPH_VARIANT", "client-integration-tests")
+        .withEnv("GCLOUD_STORAGE_BUCKET_NAME", "media")
+        .withEnv("GOOGLE_CLOUD_PROJECT", "adsfasdf")
+        .withEnv("MIXPANEL_TOKEN", "asdfasdfasdf")
+        .withEnv("TYPEORM_IS_DIST", "true")
+        .withEnv("TYPEORM_PORT", "5432")
+        .withEnv("TYPEORM_HOST", "database")
+        .withEnv("TYPEORM_DATABASE", "datapm")
+        .withEnv("TYPEORM_SCHEMA", "public")
+        .withEnv("TYPEORM_USERNAME", "postgres")
+        .withEnv("TYPEORM_PASSWORD", "postgres")
+        .withEnv("SMTP_SERVER", "smtp")
+        .withEnv("SMTP_PORT", "25")
+        .withEnv("SMTP_USER", "")
+        .withEnv("SMTP_PASSWORD", "")
+        .withEnv("SMTP_SECURE", "false")
+        .withEnv("SMTP_FROM_ADDRESS", "client-integraiton-test@localhost")
+        .withEnv("SMTP_FROM_NAME", "client-integration-tests")
+        .withEnv("STORAGE_URL", "file:///tmp/datapm-registry")
+        .withTmpFs({ "/tmp/datapm-registry": "rw,noexec,nosuid,size=65536k" })
+        .withExposedPorts(4000)
+        .withNetworkMode(network.getName())
+        .withName("registry")
+        .start();
 
     registryContainerReadable = await registryContainer.logs();
 
     registryContainerReadable
         .on("data", (_chunk) => {
-            // console.log(_chunk);
+            console.log(_chunk);
+            if (_chunk.includes("🚀 Server ready at http://localhost:4000")) containersStarted = true;
         })
         .on("error", (_chunk) => {
-            // console.error(_chunk);
+            console.error(_chunk);
         })
         .on("close", () => {
             console.log("DataPM registry container closed");
@@ -113,7 +108,22 @@ before(async function () {
     registryServerPort = registryContainer.getMappedPort(4000);
     console.log("Registry container started on port " + registryServerPort);
 
-    containersStarted = true;
+    const startTime = new Date().getTime();
+    return new Promise((resolve, reject) => {
+        const interval = setInterval(function () {
+            if (containersStarted) {
+                clearInterval(interval);
+                resolve();
+            }
+            const currentTime = new Date().getTime();
+
+            if (currentTime - startTime > 5000) {
+                clearInterval(interval);
+
+                reject(new Error("Server not started in time"));
+            }
+        }, 200);
+    });
 });
 
 after(async function () {
