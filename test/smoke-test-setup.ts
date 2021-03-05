@@ -1,4 +1,4 @@
-import { GenericContainer, Network, StartedNetwork, StartedTestContainer, Wait } from "testcontainers";
+import { GenericContainer, Network, StartedNetwork, StartedTestContainer } from "testcontainers";
 import { exit } from "process";
 import { LogWaitStrategy } from "testcontainers/dist/wait-strategy";
 import { Readable } from "stream";
