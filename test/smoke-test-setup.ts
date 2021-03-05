@@ -85,6 +85,7 @@ before(async function () {
         .withEnv("SMTP_FROM_ADDRESS", "client-integraiton-test@localhost")
         .withEnv("SMTP_FROM_NAME", "client-integration-tests")
         .withEnv("STORAGE_URL", "file:///tmp/datapm-registry")
+        .withEnv("DEBUG", "testcontainers*")
         .withTmpFs({ "/tmp/datapm-registry": "rw,noexec,nosuid,size=65536k" })
         .withExposedPorts(4000)
         .withDefaultLogDriver()
