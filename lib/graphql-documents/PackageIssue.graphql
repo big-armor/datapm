@@ -1,0 +1,13 @@
+query PackageIssue($packageIdentifier: PackageIdentifierInput!, $packageIssueIdentifier: PackageIssueIdentifierInput!) {
+    packageIssue(packageIdentifier: $packageIdentifier, packageIssueIdentifier: $packageIssueIdentifier) {
+        issueNumber
+        subject
+        content
+        creator {
+            username
+        }
+        status
+        createdAt
+        updatedAt
+    }
+}

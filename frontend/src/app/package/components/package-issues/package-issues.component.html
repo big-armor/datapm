@@ -1,25 +1,33 @@
 <div class="container p-0 mb-3" id="packageIssues">
     <div class="package-details-title" *ngIf="rren">Issues</div>
 
-    <div *ngIf="rren">
+    <div>
         <p class="package-dark-gray">There are issues listed this package.</p>
-        <button class="app-outlined-button" (click)="openNewIssue()">Open a new issue</button>
+        <button class="app-outlined-button" (click)="navigateToNewIssuePage()">Open a new issue</button>
     </div>
 
-    <div *ngIf="rren">
+    <div *ngIf="!loading && issues.length === 0">
         <p class="package-dark-gray">
             There are no open issues.
             <a target="_blank" href="#">Click here to view closed issues.</a>
         </p>
     </div>
 
-    <div *ngIf="rren">
+    <div *ngIf="!loading; else loadingTemplate">
+        <p [routerLink]="issue.issueNumber" *ngFor="let issue of issues">
+            {{ issue.subject }}
+        </p>
+    </div>
+
+    <!-- <div *ngIf="rren">
         <p class="package-dark-gray">Before opening a new issue, review the open issues below.</p>
         <section class="example-section">
             <mat-checkbox class="package-dark-gray"> include closed issues </mat-checkbox>
         </section>
-    </div>
+    </div> -->
 
-    <app-package-issues-detail></app-package-issues-detail>
+    <!-- <app-package-issues-detail></app-package-issues-detail> -->
     <!-- <app-create-package-issue></app-create-package-issue> -->
 </div>
+
+<ng-template #loadingTemplate> Loading... </ng-template>

@@ -1,6 +1,6 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { ReactiveFormsModule } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatIconModule } from "@angular/material/icon";
@@ -45,6 +45,7 @@ import { PackageIssuesDetailComponent } from "./components/package-issues/packag
 import { EditorModule } from "@tinymce/tinymce-angular";
 import { MatMenuModule } from "@angular/material/menu";
 import { CreatePackageIssueComponent } from "./components/package-issues/create-package-issue/create-package-issue.component";
+import { LMarkdownEditorModule } from "ngx-markdown-editor";
 
 @NgModule({
     declarations: [
@@ -71,6 +72,7 @@ import { CreatePackageIssueComponent } from "./components/package-issues/create-
     ],
     imports: [
         CommonModule,
+        FormsModule,
         ReactiveFormsModule,
         PackageRoutingModule,
         MatButtonModule,
@@ -93,6 +95,7 @@ import { CreatePackageIssueComponent } from "./components/package-issues/create-
         MatSelectModule,
         MatStepperModule,
         TableVirtualScrollModule,
+        LMarkdownEditorModule,
         MarkdownModule.forChild(),
         MatTooltipModule
     ]

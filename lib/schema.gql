@@ -739,6 +739,14 @@ type Query {
     package(identifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)): Package!
 
     """
+    Get package issue
+    """
+    packageIssue(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        packageIssueIdentifier: PackageIssueIdentifierInput!
+    ): PackageIssue
+
+    """
     Get package issues
     """
     packageIssues(

@@ -1,11 +1,40 @@
 import { AuthenticatedContext } from "../context";
 import { PackageIssueEntity } from "../entity/PackageIssueEntity";
 import { PackageIssueStatus } from "../entity/PackageIssueStatus";
-import { CreatePackageIssueInput, PackageIdentifierInput } from "../generated/graphql";
+import { CreatePackageIssueInput, PackageIdentifierInput, PackageIssueIdentifierInput } from "../generated/graphql";
 import { OrderBy } from "../repository/OrderBy";
 import { PackageIssueRepository } from "../repository/PackageIssueRepository";
 import { PackageRepository } from "../repository/PackageRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
+
+export const getPackageIssue = async (
+    _0: any,
+    {
+        packageIdentifier,
+        packageIssueIdentifier
+    }: {
+        packageIdentifier: PackageIdentifierInput;
+        packageIssueIdentifier: PackageIssueIdentifierInput;
+    },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const relations = getGraphQlRelationName(info);
+
+    const packageEntity = await context.connection.manager
+        .getCustomRepository(PackageRepository)
+        .findPackageOrFail({ identifier: packageIdentifier });
+
+    const issue = await context.connection.manager
+        .getCustomRepository(PackageIssueRepository)
+        .getByIssueNumberForPackage(packageEntity.id, packageIssueIdentifier.issueNumber, relations);
+
+    if (!issue) {
+        throw new Error("ISSUE_NOT_FOUND");
+    }
+
+    return issue;
+};
 
 export const getIssuesByPackage = async (
     _0: any,

@@ -58,6 +58,9 @@ import { MatChipsModule } from "@angular/material/chips";
 import { PackageAndCollectionComponent } from "./package-and-collection/package-and-collection.component";
 import { CollectionsHorizontalListComponent } from "./package-and-collection/collections-horizontal-list/collections-horizontal-list.component";
 import { MatCheckboxModule } from "@angular/material/checkbox";
+import { LMarkdownEditorModule } from "ngx-markdown-editor";
+import { MarkdownEditorComponent } from "./markdown-editor/markdown-editor.component";
+import { CreatePackageIssueComponent } from "../package/components/package-issues/create-package-issue/create-package-issue.component";
 
 @NgModule({
     declarations: [
@@ -99,7 +102,8 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
         UserStatusChangeConfirmationDialogComponent,
         UserInviteInputComponent,
         PackageAndCollectionComponent,
-        CollectionsHorizontalListComponent
+        CollectionsHorizontalListComponent,
+        MarkdownEditorComponent
     ],
     imports: [
         CommonModule,
@@ -119,6 +123,7 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
         MatSlideToggleModule,
         MatTableModule,
         MatChipsModule,
+        LMarkdownEditorModule,
         FormsModule,
         ReactiveFormsModule,
         RouterModule
@@ -156,7 +161,8 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
         UserDetailsComponent,
         FancyConfirmationDialogComponent,
         UserInviteInputComponent,
-        PackageAndCollectionComponent
+        PackageAndCollectionComponent,
+        MarkdownEditorComponent
     ],
     providers: [TimeAgoPipe, { provide: MAT_DIALOG_DATA, useValue: {} }]
 })

@@ -23,12 +23,29 @@
                         "polyfills": "src/polyfills.ts",
                         "tsConfig": "tsconfig.app.json",
                         "aot": true,
-                        "assets": ["src/favicon.ico", "src/assets"],
+                        "assets": [
+                            "src/favicon.ico",
+                            "src/assets",
+                            {
+                                "glob": "**/*",
+                                "input": "node_modules/ace-builds/src-min",
+                                "output": "./assets/ace-builds/"
+                            }
+                        ],
                         "styles": [
                             "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
-                            "src/styles/main.scss"
+                            "src/styles/main.scss",
+
+                            "node_modules/bootstrap/dist/css/bootstrap.min.css",
+                            "node_modules/font-awesome/css/font-awesome.min.css",
+                            "node_modules/ngx-markdown-editor/assets/highlight.js/agate.min.css"
                         ],
-                        "scripts": ["node_modules/marked/lib/marked.js"]
+                        "scripts": [
+                            "node_modules/marked/lib/marked.js",
+                            "node_modules/ngx-markdown-editor/assets/highlight.js/highlight.min.js",
+                            "node_modules/ngx-markdown-editor/assets/marked.min.js",
+                            "node_modules/ace-builds/src-min/ace.js"
+                        ]
                     },
                     "configurations": {
                         "production": {

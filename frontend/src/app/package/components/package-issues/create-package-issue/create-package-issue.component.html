@@ -1,29 +1,38 @@
 <div class="container" id="createIssue">
     <div class="row">
         <div class="col-md-12 p-0">
-            <div class="package-details-title mb-2">Describe Issue for $package.displayName</div>
-            <div class="package-light-gray">Describe the issue in enough detail for others to help you</div>
-            <br />
-            <div class="col-md-9 rounded-input p-0">
-                <div class="comment-section p-2">
-                    <input class="dpm-input-square mb-2" style="height: 40px" placeholder="Issue title" />
-                    <br />
-                    <editor
-                        apiKey="Get your free API key at tiny.cloud and paste it here"
-                        [init]="{
-                            icons: 'material',
-                            skin: 'borderless',
-                            plugins: 'wordcount',
-                            menubar: false,
-                            min_height: 150
-                        }"
-                    ></editor>
+            <ng-container *ngIf="!loading">
+                <div class="package-details-title mb-2">Describe Issue for {{ package.displayName }}</div>
+                <div class="package-light-gray">Describe the issue in enough detail for others to help you</div>
+                <br />
+                <div class="col-md-9 rounded-input p-0">
+                    <div class="comment-section p-2">
+                        <input
+                            type="text"
+                            class="dpm-input-square mb-2"
+                            style="height: 40px;"
+                            autofocus
+                            placeholder="Issue title"
+                            name="subject"
+                            [(ngModel)]="subject"
+                        />
 
-                    <div class="mt-2 text-right">
-                        <button class="app-raised-button ml-2">Submit new issue</button>
+                        <br />
+
+                        <app-markdown-editor [(content)]="content"> </app-markdown-editor>
+
+                        <div class="mt-2 text-right">
+                            <button
+                                class="app-raised-button ml-2"
+                                (click)="submitNewIssue()"
+                                [disabled]="isInvalidIssue()"
+                            >
+                                Submit new issue
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </ng-container>
         </div>
     </div>
 </div>

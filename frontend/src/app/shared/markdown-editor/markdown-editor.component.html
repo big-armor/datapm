@@ -1,0 +1,8 @@
+<md-editor
+    name="Content"
+    required
+    maxlength="500"
+    [(ngModel)]="content"
+    (ngModelChange)="contentChange.emit(content)"
+    [options]="EDITOR_OPTIONS"
+></md-editor>
