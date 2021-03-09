@@ -24,7 +24,8 @@
     .wrapper {
         padding: 15px 5px;
         margin-bottom: 30px;
-        border: 1px solid #cccccc73;
+        border: 1px solid #cccccc40;
+        border-radius: 6px;
     }
 
     .menu-btn {
@@ -39,11 +40,10 @@
 
     .issue-wrapper.comment-bg {
         .issue-header {
-            background-color: #037fb91a !important;
+            background-color: #0080b921 !important;
         }
-
         &:after {
-            border-color: transparent #e9eff2 #d4262600 transparent;
+            border-color: transparent #e3eef6 transparent transparent;
         }
     }
 
@@ -62,7 +62,7 @@
             height: 0;
             border-style: solid;
             top: 7px;
-            border-color: transparent #e0e0e0 #d4262600 transparent;
+            border-color: transparent #ededed transparent transparent;
             border-width: 10px;
         }
 
@@ -75,14 +75,14 @@
             height: 0;
             border-style: solid;
             top: 6px;
-            border-color: transparent #e1e1e1 transparent #f3f3f3;
+            border-color: transparent #e1e1e1 transparent transparent;
             border-width: 11px;
         }
 
         .issue-header {
             padding: 6px 10px;
             border-bottom: 1px solid #cccccc73;
-            background-color: $gray-5 !important;
+            background-color: #e0e0e094 !important;
 
             p {
                 margin-bottom: 0px !important;
@@ -122,8 +122,8 @@
     }
 
     .comment-section {
-        border: 1px solid #cccccc73;
-        padding: 10px 15px;
+        padding: 20px 8px 0px 8px;
+        margin-left: 47px;
     }
 
     .app-outlined-button {

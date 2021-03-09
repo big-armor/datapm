@@ -11,4 +11,73 @@
         height: 14px;
         width: 14px;
     }
+
+    .open-issue {
+        em {
+            color: $color-info;
+            font-size: 8px;
+            border: 2px solid $color-info;
+            border-radius: 50%;
+            padding: 3px 5px;
+            margin-right: 10px;
+        }
+    }
+
+    .closed-issue {
+        em {
+            color: $color-danger;
+            font-size: 8px;
+            border: 2px solid $color-danger;
+            border-radius: 50%;
+            padding: 3px 3px;
+            margin-right: 10px;
+        }
+    }
+
+    .main-wrapper {
+        margin-top: 15px;
+
+        .issue-wrapper {
+            padding: 10px 30px;
+            border: 1px solid $gray-5;
+
+            .issue-tab {
+                font-family: $family-roboto;
+                font-weight: $weight-400;
+                font-size: $text-font;
+                letter-spacing: 0.4px;
+                margin-right: 10px;
+                color: $gray-3;
+            }
+
+            .right-tab {
+                float: right;
+                margin-right: 0px;
+            }
+
+            .active {
+                color: $gray-2;
+            }
+
+            .img-comments {
+                width: 25px;
+                height: 25px;
+                margin-right: 25px;
+                border-radius: 50%;
+            }
+
+            a {
+                font-family: $family-roboto;
+                font-weight: $weight-400;
+                font-size: $default-font;
+                letter-spacing: 0.4px;
+                color: $gray-2;
+
+                &:hover {
+                    text-decoration: none;
+                    color: $color-info;
+                }
+            }
+        }
+    }
 }
