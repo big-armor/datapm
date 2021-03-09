@@ -46,7 +46,7 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
         private deleteUserGQL: AdminDeleteUserGQL,
         private changeDetectorRef: ChangeDetectorRef,
         private confirmationDialogService: ConfirmationDialogService
-    ) {}
+    ) { }
 
     public ngAfterViewInit(): void {
         this.subscribeToPageChangeEvent();
@@ -145,6 +145,8 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
 
     private resetLoadedUsersData(): void {
         this.totalMatchingUsers = 0;
+        this.loadedUsersCount = 0;
         this.usersByPageIndex = new Map();
+        this.paginator.pageIndex = 0;
     }
 }
