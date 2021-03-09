@@ -4,7 +4,7 @@ query PackageIssues($packageIdentifier: PackageIdentifierInput!, $offset: Int!, 
             issueNumber
             subject
             content
-            creator {
+            author {
                 username
             }
             status

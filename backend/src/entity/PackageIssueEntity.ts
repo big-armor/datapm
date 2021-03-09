@@ -26,8 +26,8 @@ export class PackageIssueEntity extends EntityBaseModel {
     @Column({ name: "package_id", nullable: false })
     public packageId: number;
 
-    @Column({ name: "creator_id", nullable: false })
-    public creatorId: number;
+    @Column({ name: "author_id", nullable: false })
+    public authorId: number;
 
     @Column({ name: "subject", type: "varchar", length: 255 })
     public subject: string;
@@ -43,6 +43,6 @@ export class PackageIssueEntity extends EntityBaseModel {
     public package: PackageEntity;
 
     @ManyToOne(() => UserEntity)
-    @JoinColumn({ name: "creator_id" })
-    public creator: UserEntity;
+    @JoinColumn({ name: "author_id" })
+    public author: UserEntity;
 }

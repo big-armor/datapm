@@ -1,10 +1,11 @@
 import { AuthenticatedContext } from "../context";
 import { PackageIssueEntity } from "../entity/PackageIssueEntity";
 import { PackageIssueStatus } from "../entity/PackageIssueStatus";
-import { CreatePackageIssueInput, PackageIdentifierInput, PackageIssueIdentifierInput } from "../generated/graphql";
+import { CreatePackageIssueInput, PackageIdentifierInput, PackageIssue, PackageIssueIdentifierInput } from "../generated/graphql";
 import { OrderBy } from "../repository/OrderBy";
 import { PackageIssueRepository } from "../repository/PackageIssueRepository";
 import { PackageRepository } from "../repository/PackageRepository";
+import { UserRepository } from "../repository/UserRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
 
 export const getPackageIssue = async (
@@ -64,6 +65,13 @@ export const getIssuesByPackage = async (
     };
 };
 
+export const getPackageIssueAuthor = async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+    return await context.connection.getCustomRepository(UserRepository).findOneOrFail({
+        where: { id: parent.authorId },
+        relations: getGraphQlRelationName(info)
+    });
+};
+
 export const createPackageIssue = async (
     _0: any,
     { packageIdentifier, issue }: { packageIdentifier: PackageIdentifierInput; issue: CreatePackageIssueInput },
@@ -81,7 +89,7 @@ export const createPackageIssue = async (
     const issueEntity = new PackageIssueEntity();
     issueEntity.issueNumber = issueNumber;
     issueEntity.packageId = packageEntity.id;
-    issueEntity.creatorId = context.me.id;
+    issueEntity.authorId = context.me.id;
     issueEntity.subject = issue.subject;
     issueEntity.content = issue.content;
     issueEntity.status = PackageIssueStatus.OPEN;

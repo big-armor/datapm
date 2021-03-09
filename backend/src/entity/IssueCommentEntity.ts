@@ -15,8 +15,8 @@ export class IssueCommentEntity extends EntityBaseModel {
     @Column({ name: "issue_id", nullable: false })
     public issueId: number;
 
-    @Column({ name: "creator_id", nullable: false })
-    public creatorId: number;
+    @Column({ name: "author_id", nullable: false })
+    public authorId: number;
 
     @Column({ name: "content", type: "text" })
     public content: string;
@@ -26,6 +26,6 @@ export class IssueCommentEntity extends EntityBaseModel {
     public packageIssue: PackageIssueEntity;
 
     @ManyToOne(() => UserEntity)
-    @JoinColumn({ name: "creator_id" })
-    public creator: UserEntity;
+    @JoinColumn({ name: "author_id" })
+    public author: UserEntity;
 }

@@ -1,6 +1,8 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
+import { SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Subject } from "rxjs";
+import { ImageService } from "src/app/services/image.service";
 import {
     OrderBy,
     Package,
@@ -32,9 +34,10 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
     constructor(
         private packageIssuesGQL: PackageIssuesGQL,
         private packageService: PackageService,
+        private imageService: ImageService,
         private router: Router,
         private route: ActivatedRoute
-    ) {}
+    ) { }
 
     public ngOnInit(): void {
         this.loadPackage();
@@ -51,6 +54,10 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
 
     public navigateToNewIssuePage(): void {
         this.router.navigate(["new"], { relativeTo: this.route });
+    }
+
+    public getUserAvatar(username: string): Subject<SafeUrl> {
+        return this.imageService.loadUserAvatar(username);
     }
 
     private loadPackage(): void {

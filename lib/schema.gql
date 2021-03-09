@@ -242,7 +242,7 @@ type PackageIssue {
     issueNumber: Int!
     subject: String!
     content: String!
-    creator: User
+    author: User!
     status: PackageIssueStatus!
     createdAt: Date!
     updatedAt: Date
@@ -251,8 +251,7 @@ type PackageIssue {
 type PackageIssueComment {
     commentId: Int!
     content: String!
-    issue: PackageIssue
-    creator: User
+    author: User!
     createdAt: Date!
     updatedAt: Date
 }

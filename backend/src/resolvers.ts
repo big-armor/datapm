@@ -14,7 +14,9 @@ import {
     CatalogIdentifierInput,
     AutoCompleteResultResolvers,
     RegistryStatus,
-    User
+    User,
+    PackageIssueResolvers,
+    PackageIssueCommentResolvers
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
@@ -149,8 +151,8 @@ import {
 
 import { myActivity, packageActivities } from "./resolvers/ActivityLogResolver";
 import { removePackagePermissions, setPackagePermissions } from "./resolvers/UserPackagePermissionResolver";
-import { createPackageIssue, getIssuesByPackage, getPackageIssue } from "./resolvers/PackageIssueResolver";
-import { createPackageIssueComment, getCommentsByByPackageIssue } from "./resolvers/PackageIssueCommentResolver";
+import { createPackageIssue, getIssuesByPackage, getPackageIssue, getPackageIssueAuthor } from "./resolvers/PackageIssueResolver";
+import { createPackageIssueComment, getCommentsByByPackageIssue, getPackageIssueCommentAuthor } from "./resolvers/PackageIssueCommentResolver";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -160,6 +162,8 @@ export const resolvers: {
     Catalog: CatalogResolvers;
     Collection: CollectionResolvers;
     Package: PackageResolvers;
+    PackageIssue: PackageIssueResolvers;
+    PackageIssueComment: PackageIssueCommentResolvers;
     Version: VersionResolvers;
     PackageFileJSON: GraphQLScalarType;
     Password: GraphQLScalarType;
@@ -416,6 +420,12 @@ export const resolvers: {
         updatedAt: packageUpdatedAt,
         viewedCount: packageViewedCount,
         isPublic: packageIsPublic
+    },
+    PackageIssue: {
+        author: getPackageIssueAuthor
+    },
+    PackageIssueComment: {
+        author: getPackageIssueCommentAuthor
     },
     Version: {
         identifier: versionIdentifier,

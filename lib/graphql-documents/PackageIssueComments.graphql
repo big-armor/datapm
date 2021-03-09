@@ -15,10 +15,7 @@ query PackageIssueComments(
         comments {
             commentId
             content
-            issue {
-                issueNumber
-            }
-            creator {
+            author {
                 username
             }
             createdAt
