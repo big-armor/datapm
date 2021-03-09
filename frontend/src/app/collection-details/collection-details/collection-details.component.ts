@@ -1,11 +1,10 @@
 import { Component, Input, OnDestroy, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 import { ActivatedRoute, NavigationExtras, ParamMap, Router } from "@angular/router";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { PageState } from "src/app/models/page-state";
-import { SharePackageComponent } from "src/app/package/components/package-info/share-package/share-package.component";
+import { ShareDialogComponent } from "src/app/shared/dialogs/share-dialog/share-dialog.component";
 import { EditCollectionComponent } from "src/app/shared/edit-collection/edit-collection.component";
 import {
     Collection,
@@ -33,7 +32,7 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
     public currentTab = 0;
     private unsubscribe$: Subject<any> = new Subject();
 
-    private tabs = ["", "Manage"];
+    private tabs = ["", "manage"];
 
     constructor(
         private route: ActivatedRoute,
@@ -53,6 +52,7 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
                 this.currentTab = 0;
                 this.updateTabParam();
             } else {
+                this.currentTab = index;
                 this.updateTabParam();
             }
         });
@@ -66,8 +66,11 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
     }
 
     public sharePackage() {
-        const dialogRef = this.dialog.open(SharePackageComponent, {
-            data: this.package,
+        const dialogRef = this.dialog.open(ShareDialogComponent, {
+            data: {
+                displayName: this.collection.name,
+                url: "collections/" + this.collection.identifier.collectionSlug
+            },
             width: "450px"
         });
     }
@@ -106,7 +109,6 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
                         return;
                     }
                     this.collection = data.collection as Collection;
-                    console.log(this.collection);
                     this.state = "SUCCESS";
                 },
                 () => {

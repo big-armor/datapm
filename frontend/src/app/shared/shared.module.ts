@@ -58,6 +58,7 @@ import { MatChipsModule } from "@angular/material/chips";
 import { PackageAndCollectionComponent } from "./package-and-collection/package-and-collection.component";
 import { CollectionsHorizontalListComponent } from "./package-and-collection/collections-horizontal-list/collections-horizontal-list.component";
 import { MatTooltipModule } from "@angular/material/tooltip";
+import { ShareDialogComponent } from "./dialogs/share-dialog/share-dialog.component";
 
 @NgModule({
     declarations: [
@@ -99,7 +100,8 @@ import { MatTooltipModule } from "@angular/material/tooltip";
         UserStatusChangeConfirmationDialogComponent,
         UserInviteInputComponent,
         PackageAndCollectionComponent,
-        CollectionsHorizontalListComponent
+        CollectionsHorizontalListComponent,
+        ShareDialogComponent
     ],
     imports: [
         CommonModule,

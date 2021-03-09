@@ -81,7 +81,7 @@
                                 <div class="stepper-content">
                                     <span>Schemas</span>
                                     <div class="white-div">
-                                        <a *ngFor="let schema of schemas" [href]="schema.source.uri" target="_blank">
+                                        <a *ngFor="let schema of schemas" [href]="schema.source?.uri" target="_blank">
                                             {{ schema.$id }}
                                         </a>
                                     </div>

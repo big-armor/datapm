@@ -48,10 +48,10 @@
                             <div
                                 class="progress-bar"
                                 role="progressbar"
-                                (click)="move(3)"
+                                (click)="moveToDownloadStep()"
                                 [style.width]="currentUser ? '25%' : '33%'"
                                 style="background-color: #828282a8"
-                                [class.active-bar]="currentIndex == 3"
+                                [class.active-bar]="isDownloadStepActive()"
                                 aria-valuenow="100"
                                 aria-valuemin="0"
                                 aria-valuemax="100"

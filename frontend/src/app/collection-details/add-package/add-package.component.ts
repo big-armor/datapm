@@ -107,6 +107,11 @@ export class AddPackageComponent implements OnInit, OnDestroy {
                 this.state = "SUCCESS";
             });
 
+        this.packageNameControl.valueChanges.subscribe((value) => {
+            value = value.replace(/ /g, "-");
+            this.packageNameControl.setValue(value, { emitEvent: false });
+        });
+
         this.packageNameControl.valueChanges
             .pipe(
                 debounceTime(500),

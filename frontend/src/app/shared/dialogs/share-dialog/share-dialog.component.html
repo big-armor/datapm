@@ -1,7 +1,7 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12 p-0" id="sharePackage">
-            <div mat-dialog-title id="contentTitle">Share {{ userPackage.displayName }}</div>
+            <div mat-dialog-title id="contentTitle">Share {{ info.displayName }}</div>
             <div mat-dialog-content id="contentBorder">
                 <div class="row py-3">
                     <div class="col-md-12">
@@ -11,7 +11,7 @@
                             style="cursor: pointer"
                         >
                             <div class="bd-highlight copy-input">
-                                <span class="copy-txt">{{ packageUrl() }}</span>
+                                <span class="copy-txt">{{ getUrl() }}</span>
                             </div>
                             <div class="ml-auto bd-highlight">
                                 <button class="copy-btn">

@@ -24,14 +24,14 @@ export class ApiKeyService {
         this.myAPIKeysGQL.fetch({}, { fetchPolicy: "no-cache" }).subscribe(
             (result) => {
                 if (result.error || result.errors) {
-                    this.apiKeys.error(result);
+                    this.apiKeys.next([]);
                     return;
                 }
 
                 const apiKeys = result.data.myAPIKeys;
                 this.apiKeys.next(apiKeys);
             },
-            (error) => this.apiKeys.error(error)
+            (error) => this.apiKeys.next([])
         );
     }
 }
