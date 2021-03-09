@@ -1,26 +1,5 @@
 @import "../../../styles/variables";
 
-.title {
-    font-family: $family-roboto;
-    font-style: $style-normal;
-    font-weight: $weight-300;
-    font-size: $title-font;
-    line-height: 26px;
-    letter-spacing: 0.28px;
-    color: $gray-2;
-}
-
-.sub-title {
-    font-family: $family-roboto;
-    font-style: $style-normal;
-    font-weight: $weight-300;
-    font-size: $default-font;
-    margin-bottom: 0px;
-    line-height: 26px;
-    letter-spacing: 0.28px;
-    color: $gray-2;
-}
-
 .empty-state-label {
     margin: 0 auto;
     text-align: center;
@@ -42,4 +21,15 @@
     font-size: $text-font;
     line-height: 28px;
     text-align: left;
+}
+
+.app-outlined-button {
+    padding: 8px 40px;
+}
+
+@media (max-width: 576px) {
+    .app-outlined-button {
+        padding: 8px 40px;
+        width: 100%;
+    }
 }

@@ -157,7 +157,7 @@
                                     </div>
                                 </div>
                             </mat-step>
-                            <mat-step optional>
+                            <mat-step optional *ngIf="currentUser">
                                 <div class="mat-content">
                                     <p class="stepper-title">Login to Registry</p>
                                     <div class="stepper-content mb-1">
@@ -224,8 +224,20 @@
                     Close
                 </button>
                 <button mat-button *ngIf="currentIndex != 0" (click)="previous()">Back</button>
-                <button mat-button *ngIf="currentIndex != 3" (click)="next()">Next</button>
-                <button mat-button *ngIf="currentIndex == 3" mat-dialog-close>Finish</button>
+                <button
+                    mat-button
+                    *ngIf="(currentIndex != 3 && currentUser) || (currentIndex != 2 && !currentUser)"
+                    (click)="next()"
+                >
+                    Next
+                </button>
+                <button
+                    mat-button
+                    *ngIf="(currentIndex == 3 && currentUser) || (currentIndex == 2 && !currentUser)"
+                    mat-dialog-close
+                >
+                    Finish
+                </button>
             </mat-dialog-actions>
         </div>
     </div>

@@ -1,70 +1,78 @@
-<div class="catalog-details container pt-4">
+<div class="catalog-details container-fluid px-0 pt-4">
     <ng-container *ngIf="state === 'SUCCESS'">
-        <app-cover [catalogSlug]="catalogSlug"></app-cover>
-        <div class="d-flex flex-row bd-highlight">
-            <div class="pl-3 bd-highlight">
-                <app-avatar class="catalog-avatar" [catalog]="catalog" [circled]="false" [size]="80"> </app-avatar>
-            </div>
-            <div class="px-2 bd-highlight d-flex align-items-end">
-                <div class="catalog-header">
-                    <div class="package-details-title mb-0">{{ catalog?.displayName }}</div>
-                    <div class="package-light-gray mb-1">@{{ catalogSlug }}</div>
-                    <p class="package-dark-gray" style="margin-bottom: 0px !important; line-height: 11px">
-                        {{ catalog?.description }}
-                    </p>
+        <div class="container">
+            <app-cover [catalogSlug]="catalogSlug"></app-cover>
+            <div class="d-flex flex-row bd-highlight">
+                <div class="pl-3 bd-highlight">
+                    <app-avatar class="catalog-avatar" [catalog]="catalog" [circled]="false" [size]="80"> </app-avatar>
+                </div>
+                <div class="px-2 bd-highlight d-flex align-items-end">
+                    <div class="catalog-header">
+                        <div class="package-details-title mb-0">{{ catalog?.displayName }}</div>
+                        <div class="package-light-gray mb-1">@{{ catalogSlug }}</div>
+                        <p class="package-dark-gray" style="margin-bottom: 0px !important; line-height: 11px">
+                            {{ catalog?.description }}
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <div *ngIf="catalog" class="collections-public pl-3">
-            <span *ngIf="catalog?.isPublic" class="public-text">public</span>
-            <span *ngIf="!catalog?.isPublic" class="not-public-text">not public</span>
-        </div>
-
-        <mat-tab-group
-            [(selectedIndex)]="currentTab"
-            (selectedTabChange)="updateTabParam()"
-            disableRipple
-            class="catalog-tabs mt-4"
-        >
-            <mat-tab label="Packages"></mat-tab>
-            <mat-tab label="Manage" *ngIf="canManage"></mat-tab>
-        </mat-tab-group>
-
-        <div *ngIf="currentTab === 0">
-            <app-package-item
-                [item]="package"
-                [hasImage]="true"
-                actionButtonText="Delete Package"
-                [shouldShowActionButton]="canEdit"
-                (action)="deletePackage(package)"
-                *ngFor="let package of catalog?.packages"
-            >
-            </app-package-item>
-            <div class="dpm-no-data" *ngIf="!catalog?.packages?.length">
-                <p class="package-dark-gray">
-                    This catalog contains no packages, or you do not have permission to view the packages it does
-                    contain.
-                </p>
-                <a href="/docs/publish-data/" target="_blank" *ngIf="catalog.myPermissions.includes('EDIT')"
-                    >Learn how to publish</a
-                >
+            <div *ngIf="catalog" class="collections-public pl-3">
+                <span *ngIf="catalog?.isPublic" class="public-text">public</span>
+                <span *ngIf="!catalog?.isPublic" class="not-public-text">not public</span>
             </div>
         </div>
-        <app-catalog-permissions [catalog]="catalog" *ngIf="currentTab === 1"></app-catalog-permissions>
+
+        <div class="container">
+            <mat-tab-group
+                [(selectedIndex)]="currentTab"
+                (selectedTabChange)="updateTabParam()"
+                disableRipple
+                class="catalog-tabs mt-3"
+            >
+                <mat-tab label="Packages"></mat-tab>
+                <mat-tab label="Manage" *ngIf="canManage"></mat-tab>
+            </mat-tab-group>
+        </div>
+        <hr class="header-border" />
+
+        <div class="container">
+            <div *ngIf="currentTab === 0">
+                <app-package-item
+                    [item]="package"
+                    [hasImage]="true"
+                    actionButtonText="Delete Package"
+                    [shouldShowActionButton]="canEdit"
+                    (action)="deletePackage(package)"
+                    *ngFor="let package of catalog?.packages"
+                >
+                </app-package-item>
+                <div class="dpm-no-data" *ngIf="!catalog?.packages?.length">
+                    <p class="package-dark-gray">
+                        This catalog contains no packages, or you do not have permission to view the packages it does
+                        contain.
+                    </p>
+                    <a href="/docs/publish-data/" target="_blank" *ngIf="catalog.myPermissions.includes('EDIT')"
+                        >Learn how to publish</a
+                    >
+                </div>
+            </div>
+            <app-catalog-permissions [catalog]="catalog" *ngIf="currentTab === 1"></app-catalog-permissions>
+        </div>
     </ng-container>
 
-    <div class="dpm-no-data" *ngIf="state === 'CATALOG_NOT_FOUND'">
-        <p class="package-dark-gray">The catalog does not exist.</p>
-    </div>
-    <div class="dpm-no-data" *ngIf="state === 'NOT_AUTHENTICATED'">
-        <p class="package-dark-gray">You must login to view this catalog.</p>
-        <a class="app-outlined-button mt-3 px-3" (click)="loginClicked()">Login</a>
-    </div>
-    <div class="dpm-no-data" *ngIf="state === 'ERROR'">
-        <p class="package-dark-gray">An error ocurred while getting catalog details. Please try again later.</p>
-    </div>
-    <div class="dpm-page-loading" *ngIf="state === 'LOADING'">
-        <mat-spinner [diameter]="32"></mat-spinner>
+    <div class="containers">
+        <div class="dpm-no-data" *ngIf="state === 'CATALOG_NOT_FOUND'">
+            <p class="package-dark-gray">The catalog does not exist.</p>
+        </div>
+        <div class="dpm-no-data" *ngIf="state === 'NOT_AUTHENTICATED'">
+            <p class="package-dark-gray">You must login to view this catalog.</p>
+            <a class="app-outlined-button mt-3 px-3" (click)="loginClicked()">Login</a>
+        </div>
+        <div class="dpm-no-data" *ngIf="state === 'ERROR'">
+            <p class="package-dark-gray">An error ocurred while getting catalog details. Please try again later.</p>
+        </div>
+        <div class="dpm-page-loading" *ngIf="state === 'LOADING'">
+            <mat-spinner [diameter]="32"></mat-spinner>
+        </div>
     </div>
 </div>
