@@ -25,7 +25,7 @@
 .package-title {
     font-family: $family-roboto;
     font-style: $style-normal;
-    font-weight: $weight-500;
+    font-weight: $weight-400;
     font-size: $title-font;
     line-height: 26px;
     letter-spacing: 0.4px;
@@ -49,6 +49,14 @@
     .left-div {
         padding-right: 30px;
     }
+}
+
+.copy-link {
+    color: $gray-3;
+    cursor: pointer;
+    bottom: 1px;
+    position: relative;
+    font-size: $default-font;
 }
 
 .share-data {

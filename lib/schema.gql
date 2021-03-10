@@ -797,6 +797,11 @@ type Query {
     latestPackages(offSet: Int!, limit: Int!): LatestPackagesResult!
 
     """
+    Whether the specified colleciton slug is available
+    """
+    collectionSlugAvailable(collectionSlug: String! @validCollectionSlug): Boolean!
+
+    """
     Returns the collection specified only if the user has permission to view it
     """
     collection(identifier: CollectionIdentifierInput!): Collection! @hasCollectionPermission(permission: VIEW)

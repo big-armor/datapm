@@ -7,6 +7,8 @@ export interface DeleteCatalogData {
     catalogSlug: string;
 }
 
+type State = "INIT" | "LOADING" | "SUCCESS" | "ERROR";
+
 @Component({
     selector: "app-delete-catalog",
     templateUrl: "./delete-catalog.component.html",
@@ -14,6 +16,7 @@ export interface DeleteCatalogData {
 })
 export class DeleteCatalogComponent implements OnInit {
     confirmVal: string = "";
+    public state: State = "INIT";
     type: string;
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: DeleteCatalogData,
@@ -25,6 +28,11 @@ export class DeleteCatalogComponent implements OnInit {
     ngOnInit(): void {}
 
     confirm() {
+        if (this.state === "LOADING") {
+            return;
+        }
+
+        this.state = "LOADING";
         this.deleteCatalogGQL
             .mutate({
                 identifier: {

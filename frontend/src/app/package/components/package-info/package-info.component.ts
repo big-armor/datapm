@@ -7,10 +7,11 @@ import { AddPackageComponent } from "src/app/collection-details/add-package/add-
 import { packageToIdentifier } from "src/app/helpers/IdentifierHelper";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { SnackBarService } from "src/app/services/snackBar.service";
+import { ShareDialogComponent } from "src/app/shared/dialogs/share-dialog/share-dialog.component";
 import { Package, User } from "src/generated/graphql";
 import { AddUserComponent } from "../add-user/add-user.component";
+import { ClientWizardComponent } from "./download-package/client-wizard/client-wizard.component";
 import { DownloadPackageComponent } from "./download-package/download-package.component";
-import { SharePackageComponent } from "./share-package/share-package.component";
 
 @Component({
     selector: "app-package-info",
@@ -77,8 +78,11 @@ export class PackageInfoComponent implements OnInit, OnChanges {
 
     public sharePackage() {
         if (this.package.isPublic) {
-            const dialogRef = this.dialog.open(SharePackageComponent, {
-                data: this.package,
+            const dialogRef = this.dialog.open(ShareDialogComponent, {
+                data: {
+                    displayName: this.package.displayName,
+                    url: this.package.identifier.catalogSlug + "/" + this.package.identifier.packageSlug
+                },
                 width: "450px"
             });
         } else {
@@ -95,6 +99,13 @@ export class PackageInfoComponent implements OnInit, OnChanges {
         const dialogRef = this.dialog.open(DownloadPackageComponent, {
             data: this.package,
             width: "430px"
+        });
+    }
+
+    public openWizard() {
+        const dialogRef = this.dialog.open(ClientWizardComponent, {
+            width: "550px",
+            panelClass: "my-custom-dialog"
         });
     }
 

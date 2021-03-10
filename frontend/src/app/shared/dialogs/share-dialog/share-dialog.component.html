@@ -1,17 +1,17 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12 p-0" id="sharePackage">
-            <div mat-dialog-title id="contentTitle">Share {{ userPackage.displayName }}</div>
+            <div mat-dialog-title id="contentTitle">Share {{ info.displayName }}</div>
             <div mat-dialog-content id="contentBorder">
                 <div class="row py-3">
                     <div class="col-md-12">
                         <div
                             class="d-flex bd-highlight mb-3 copy-wrapper"
                             (click)="copyPackagelink()"
-                            style="cursor: pointer"
+                            style="cursor: pointer;"
                         >
                             <div class="bd-highlight copy-input">
-                                <span>{{ packageUrl() }}</span>
+                                <span class="copy-txt">{{ getUrl() }}</span>
                             </div>
                             <div class="ml-auto bd-highlight">
                                 <button class="copy-btn">
@@ -21,38 +21,38 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <button class="social-btn twitter-share-button">
-                            <a [href]="twitterLink()" target="_blank">
+                        <a [href]="twitterLink()" target="_blank">
+                            <button class="social-btn twitter-share-button">
                                 <span class="social-square"><em class="fab fa-twitter"></em></span>
                                 <span>Share on Twitter</span>
-                            </a>
-                        </button>
+                            </button>
+                        </a>
                         <br />
-                        <button
-                            class="social-btn fb-share-button"
-                            data-href="https://developers.facebook.com/docs/plugins/"
-                        >
-                            <a target="_blank" [href]="facebookLink()" class="fb-xfbml-parse-ignore">
+                        <a target="_blank" [href]="facebookLink()" class="fb-xfbml-parse-ignore">
+                            <button
+                                class="social-btn fb-share-button"
+                                data-href="https://developers.facebook.com/docs/plugins/"
+                            >
                                 <span class="social-square"><em class="fab fa-facebook-f"></em></span>
                                 <span>Share on Facebook</span>
-                            </a>
-                        </button>
+                            </button>
+                        </a>
                     </div>
 
                     <div class="col-md-6">
-                        <button class="social-btn email-share-button">
-                            <a [href]="emailLink()">
+                        <a [href]="emailLink()">
+                            <button class="social-btn email-share-button">
                                 <span class="social-square"><em class="far fa-envelope"></em></span>
                                 <span>Email</span>
-                            </a>
-                        </button>
+                            </button>
+                        </a>
                         <br />
-                        <button class="social-btn reddit-share-button">
-                            <a target="_blank" [href]="redditLink()" class="fb-xfbml-parse-ignore">
+                        <a target="_blank" [href]="redditLink()" class="fb-xfbml-parse-ignore">
+                            <button class="social-btn reddit-share-button">
                                 <span class="social-square"><em class="fab fa-reddit-alien"></em></span>
                                 <span>Share on Reddit</span>
-                            </a>
-                        </button>
+                            </button>
+                        </a>
                     </div>
                 </div>
             </div>

@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { EditPasswordDialogComponent } from "../edit-password-dialog/edit-password-dialog.component";
 import { AuthenticationService } from "../../../services/authentication.service";
@@ -9,7 +9,7 @@ import { FormControl, FormGroup } from "@angular/forms";
 import { MatTableDataSource } from "@angular/material/table";
 import { Clipboard } from "@angular/cdk/clipboard";
 import { Subject } from "rxjs";
-import { take, takeUntil } from "rxjs/operators";
+import { takeUntil } from "rxjs/operators";
 import { EditAccountDialogComponent } from "../edit-account-dialog/edit-account-dialog.component";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import * as timeago from "timeago.js";
@@ -30,21 +30,23 @@ enum State {
     styleUrls: ["./user-details.component.scss"]
 })
 export class UserDetailsComponent implements OnInit, OnDestroy {
-    State = State;
-    state = State.INIT;
+    public State = State;
+    public state = State.INIT;
 
-    currentUser: User;
+    public deletionStatusByApiKeyId = new Map<string, boolean>();
+
+    public currentUser: User;
     public apiKeysState = State.INIT;
-    createAPIKeyState = State.INIT;
-    deleteAPIKeyState = State.INIT;
-    newAPIKey: string;
+    public createAPIKeyState = State.INIT;
 
-    columnsToDisplay = ["label", "created", "lastUsed", "actions"];
+    public newAPIKey: string;
+
+    public columnsToDisplay = ["label", "created", "lastUsed", "actions"];
 
     public myCatalogs: Catalog[];
     public myAPIKeys: APIKey[];
-    dataSource = new MatTableDataSource<APIKey>();
-    createAPIKeyForm: FormGroup;
+    public dataSource = new MatTableDataSource<APIKey>();
+    public createAPIKeyForm: FormGroup;
 
     private subscription = new Subject();
 
@@ -58,7 +60,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         private snackBarService: SnackBarService
     ) {}
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.authenticationService.currentUser.pipe(takeUntil(this.subscription)).subscribe((user: User) => {
             this.currentUser = user;
             if (user) {
@@ -66,7 +68,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
             }
         });
 
-        this.refreshAPIKeys();
+        this.refreshAPIKeys(false, true);
 
         this.createAPIKeyForm = new FormGroup({
             label: new FormControl("")
@@ -92,18 +94,22 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         const dialogConfig = new MatDialogConfig();
         dialogConfig.data = this.currentUser;
 
-        this.dialog.open(EditAccountDialogComponent, dialogConfig);
-
-        this.dialog.afterAllClosed.subscribe((result) => {
-            this.authenticationService.refreshUserInfo();
-        });
+        this.dialog
+            .open(EditAccountDialogComponent, dialogConfig)
+            .afterClosed()
+            .subscribe(() => this.authenticationService.refreshUserInfo());
     }
 
-    createAPIKey() {
+    public createAPIKey(): void {
+        if (this.createAPIKeyState === State.LOADING) {
+            return;
+        }
+
         if (this.createAPIKeyForm.value.label == "" || this.createAPIKeyForm.value.label == null) {
             this.createAPIKeyState = State.ERROR_NO_LABEL;
             return;
         }
+
         this.createAPIKeyState = State.LOADING;
 
         this.createAPIKeyGQL
@@ -113,7 +119,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
                     scopes: [Scope.MANAGE_API_KEYS, Scope.MANAGE_PRIVATE_ASSETS, Scope.READ_PRIVATE_ASSETS]
                 }
             })
-            .pipe(takeUntil(this.subscription))
             .subscribe((response) => {
                 if (response.errors?.length > 0) {
                     if (response.errors.find((e) => e.message == "APIKEY_LABEL_NOT_AVIALABLE")) {
@@ -135,46 +140,41 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
             });
     }
 
-    deleteApiKey(id: string) {
-        this.deleteAPIKeyState = State.LOADING;
-        this.apiKeysState = State.LOADING;
+    public deleteApiKey(id: string): void {
+        if (this.deletionStatusByApiKeyId.get(id)) {
+            return;
+        }
 
-        this.myAPIKeys = this.myAPIKeys.filter((k) => k.id != id);
+        this.deletionStatusByApiKeyId.set(id, true);
+        this.createAPIKeyState = State.INIT;
 
-        const deletedKey = this.myAPIKeys.find((k) => k.id == id);
+        this.deleteAPIKeyGQL.mutate({ id: id }).subscribe((response) => {
+            if (!response.errors || response.errors?.length === 0) {
+                this.createAPIKeyForm.get("label").setValue("");
+                this.refreshAPIKeys(true, false, id);
+            }
+        });
+    }
 
-        const startingArray = this.myAPIKeys;
+    public refreshAPIKeys(forceReload?: boolean, enableLoadingState?: boolean, clearApiKeyId?: string): void {
+        if (enableLoadingState) {
+            this.apiKeysState = State.LOADING;
+        }
 
-        this.deleteAPIKeyGQL
-            .mutate({ id: id })
-            .pipe(takeUntil(this.subscription))
-            .subscribe((response) => {
-                if (response.errors?.length > 0) {
-                    this.deleteAPIKeyState = State.ERROR;
-
-                    if (startingArray == this.myAPIKeys) this.myAPIKeys.push(deletedKey);
+        this.apiKeysService.getMyApiKeys(forceReload).subscribe(
+            (apiKeys) => {
+                if (apiKeys == null) {
                     return;
                 }
 
-                this.createAPIKeyForm.get("label").setValue("");
-                this.refreshAPIKeys(true);
-                this.deleteAPIKeyState = State.SUCCESS;
-            });
-    }
-
-    refreshAPIKeys(forceReload?: boolean) {
-        this.apiKeysState = State.LOADING;
-
-        this.apiKeysService
-            .getMyApiKeys(forceReload)
-            .pipe(takeUntil(this.subscription))
-            .subscribe(
-                (apiKeys) => {
-                    this.myAPIKeys = apiKeys;
-                    this.apiKeysState = State.SUCCESS;
-                },
-                () => (this.apiKeysState = State.ERROR)
-            );
+                if (clearApiKeyId) {
+                    this.deletionStatusByApiKeyId.delete(clearApiKeyId);
+                }
+                this.myAPIKeys = apiKeys;
+                this.apiKeysState = State.SUCCESS;
+            },
+            () => (this.apiKeysState = State.ERROR)
+        );
     }
 
     apiKeyCommandString() {
@@ -188,8 +188,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         this.snackBarService.openSnackBar("Copied to clipboard! Paste the command into your terminal.", "");
     }
     getMoment(date: Date) {
-        if (date == null) return "Never";
+        if (date == null) {
+            return "Never";
+        }
 
-        return timeago.format(date);
+        return timeago.format(date, null, { minInterval: 60000 });
     }
 }

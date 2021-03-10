@@ -1,13 +1,13 @@
 import { Injectable } from "@angular/core";
 import { DomSanitizer, SafeUrl } from "@angular/platform-browser";
 import { HttpClient } from "@angular/common/http";
-import { BehaviorSubject, Subject } from "rxjs";
+import { ReplaySubject, Subject } from "rxjs";
 
 @Injectable({
     providedIn: "root"
 })
 export class ImageService {
-    private imageDataSubjectByUrl = new Map<string, BehaviorSubject<SafeUrl>>();
+    private imageDataSubjectByUrl = new Map<string, ReplaySubject<SafeUrl>>();
 
     constructor(private http: HttpClient, private sanitizer: DomSanitizer) {}
 
@@ -43,6 +43,7 @@ export class ImageService {
 
     public loadImage(url: string, reload?: boolean): Subject<SafeUrl> {
         const isImageCached = this.imageDataSubjectByUrl.has(url);
+
         if (!reload && isImageCached) {
             return this.imageDataSubjectByUrl.get(url);
         }
@@ -51,14 +52,17 @@ export class ImageService {
         if (isImageCached) {
             imageSubject = this.imageDataSubjectByUrl.get(url);
         } else {
-            imageSubject = new BehaviorSubject(null);
+            imageSubject = new ReplaySubject();
             this.imageDataSubjectByUrl.set(url, imageSubject);
         }
 
-        this.http.get(url, { responseType: "blob" }).subscribe((res: Blob) => {
-            const safeImageObjectURL = this.convertBlobToSafeImageObjectUrl(res);
-            imageSubject.next(safeImageObjectURL);
-        });
+        this.http.get(url, { responseType: "blob" }).subscribe(
+            (res: Blob) => {
+                const safeImageObjectURL = this.convertBlobToSafeImageObjectUrl(res);
+                imageSubject.next(safeImageObjectURL);
+            },
+            () => imageSubject.next(null)
+        );
 
         return imageSubject;
     }

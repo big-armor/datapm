@@ -12,26 +12,26 @@ export class ApiKeyService {
     constructor(public myAPIKeysGQL: MyAPIKeysGQL, private cap: CapabilitiesServiceImpl) {}
 
     public getMyApiKeys(reload?: boolean): Observable<APIKey[]> {
-        console.log(this.cap.getSourceDescriptions());
         if (reload || this.apiKeys.value == null) {
+            this.apiKeys.next(null);
             this.loadApiKeys();
         }
 
-        return this.apiKeys.asObservable();
+        return this.apiKeys;
     }
 
     private loadApiKeys(): void {
         this.myAPIKeysGQL.fetch({}, { fetchPolicy: "no-cache" }).subscribe(
             (result) => {
                 if (result.error || result.errors) {
-                    this.apiKeys.error(result);
+                    this.apiKeys.next([]);
                     return;
                 }
 
                 const apiKeys = result.data.myAPIKeys;
                 this.apiKeys.next(apiKeys);
             },
-            (error) => this.apiKeys.error(error)
+            (error) => this.apiKeys.next([])
         );
     }
 }

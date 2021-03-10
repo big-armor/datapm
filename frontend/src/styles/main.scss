@@ -290,8 +290,7 @@ mat-select {
     transition: background-color ease 0.5s;
 
     &:hover {
-        color: $color-info;
-        background-color: $color-info-lighter;
+        background-color: #017fb9c7;
         transition: background-color ease 0.5s;
     }
 
@@ -334,6 +333,10 @@ mat-select {
             }
         }
     }
+}
+
+.info-txt {
+    color: $color-info;
 }
 
 .app-outlined-button {
@@ -409,11 +412,13 @@ mat-select {
 .public-text {
     @include text("small");
     color: $color-1;
+    line-height: 8px;
     margin-left: 0px;
 }
 
 .not-public-text {
     @include text("small");
+    line-height: 8px;
     color: $gray-3;
     margin-left: 0px;
 }
@@ -534,24 +539,26 @@ textarea.flat-input,
 }
 
 button.save-btn {
+    color: $gray-3;
     position: relative;
     top: 4px;
-    padding: 4px 24px;
+    text-align: center;
+    width: 80px;
+    height: 32px;
+    padding: 2px 15px;
+    font-weight: $weight-400;
+    border-radius: 6px;
+    letter-spacing: 0.4px;
+    background-color: transparent;
     box-shadow: $outer-shadow-1;
-    border-radius: 24px;
     border-color: transparent;
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-size: $text-font;
+    line-height: unset;
 
-    span {
-        font-family: $family-roboto;
-        font-style: $style-normal;
-        font-weight: $weight-300;
-        font-size: $default-font;
-        line-height: 24px;
-        display: flex;
-        align-items: center;
-        text-align: center;
-        letter-spacing: 0.7px;
-        color: $gray-3;
+    .mat-spinner {
+        margin: 0 auto;
     }
 }
 
@@ -712,6 +719,14 @@ button:disabled {
     color: $color-danger;
 }
 
+.border-none {
+    border: none;
+}
+
+.font-22 {
+    font-size: 22px !important;
+}
+
 #deleteCollection,
 #deleteCatalog,
 #deletePackage,
@@ -720,15 +735,22 @@ button:disabled {
         color: $color-danger;
         position: relative;
         top: 4px;
+        text-align: center;
+        width: 80px;
+        height: 32px;
         padding: 0px 15px;
         font-weight: $weight-400;
         border-radius: 6px;
         box-shadow: $outer-shadow-1;
         border-color: transparent;
-        font-family: $family-roboto-mono;
+        font-family: $family-roboto;
         font-style: $style-normal;
         font-size: $text-font;
-        line-height: 33px;
+        line-height: 30px;
+
+        .mat-spinner {
+            margin: 0 auto;
+        }
     }
 }
 
@@ -739,23 +761,30 @@ button:disabled {
     }
 
     .copy-input {
-        border: 1px solid rgb(0 0 0 / 20%);
-        padding: 5px 10px;
+        border: 1px solid rgb(0 0 0 / 10%);
+        padding: 6px 10px;
         background: $white;
         width: 100%;
+        height: 36px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        letter-spacing: 0.8px;
-        font-size: $small-font;
-        font-family: $family-roboto;
         border-top-left-radius: 6px;
         border-bottom-left-radius: 6px;
+        font-family: $family-roboto;
+
+        .copy-txt {
+            font-weight: $weight-400 !important;
+            font-size: ($text-font - 1) !important;
+            color: $gray-1 !important;
+            letter-spacing: 0.1px !important;
+        }
     }
 
     .copy-btn {
         background: #7d7d7de8;
         border: none;
+        height: 36px;
         padding: 6px 15px;
         border-top-right-radius: 6px;
         border-bottom-right-radius: 6px;
@@ -927,6 +956,9 @@ button:disabled {
             min-height: 40px;
         }
     }
+    .font-22 {
+        font-size: $title-font !important;
+    }
     #addUser {
         min-width: 260px;
     }
@@ -944,7 +976,7 @@ button:disabled {
         padding: 2px 24px;
         top: 0px;
         span {
-            font-size: $text-font;
+            font-size: $small-font;
         }
     }
     table.gray-table {
@@ -1032,7 +1064,7 @@ button:disabled {
             a {
                 font-size: $text-font;
                 padding: 0px 4px 4px 4px;
-                margin: 0px 2px;
+                margin: 0px 6px;
                 bottom: 16px;
             }
         }

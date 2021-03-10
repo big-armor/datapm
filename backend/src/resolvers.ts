@@ -51,7 +51,8 @@ import {
     collectionCreatedAt,
     collectionUpdatedAt,
     getLatestCollections,
-    getMyRecentlyViewedPackages
+    getMyRecentlyViewedPackages,
+    collectionSlugAvailable
 } from "./resolvers/CollectionResolver";
 import {
     createVersion,
@@ -151,8 +152,17 @@ import {
 
 import { myActivity, packageActivities } from "./resolvers/ActivityLogResolver";
 import { removePackagePermissions, setPackagePermissions } from "./resolvers/UserPackagePermissionResolver";
-import { createPackageIssue, getIssuesByPackage, getPackageIssue, getPackageIssueAuthor } from "./resolvers/PackageIssueResolver";
-import { createPackageIssueComment, getCommentsByByPackageIssue, getPackageIssueCommentAuthor } from "./resolvers/PackageIssueCommentResolver";
+import {
+    createPackageIssue,
+    getIssuesByPackage,
+    getPackageIssue,
+    getPackageIssueAuthor
+} from "./resolvers/PackageIssueResolver";
+import {
+    createPackageIssueComment,
+    getCommentsByByPackageIssue,
+    getPackageIssueCommentAuthor
+} from "./resolvers/PackageIssueCommentResolver";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -495,6 +505,7 @@ export const resolvers: {
         usersByPackage: usersByPackage,
         userCatalogs: userCatalogs,
         userCollections: userCollections,
+        collectionSlugAvailable: collectionSlugAvailable,
         userPackages: userPackages,
         autoComplete: async (_0: any, { startsWith }, context: AutoCompleteContext, info: any) => {
             context.query = startsWith;

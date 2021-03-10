@@ -9,7 +9,8 @@
                                 class="progress-bar"
                                 role="progressbar"
                                 (click)="move(0)"
-                                style="width: 25%; background-color: #828282a8"
+                                [style.width]="currentUser ? '25%' : '33%'"
+                                style="background-color: #828282a8;"
                                 [class.active-bar]="currentIndex == undefined || currentIndex == 0"
                                 aria-valuenow="25"
                                 aria-valuemin="0"
@@ -21,7 +22,8 @@
                                 class="progress-bar"
                                 role="progressbar"
                                 (click)="move(1)"
-                                style="width: 25%; background-color: #828282a8"
+                                [style.width]="currentUser ? '25%' : '33%'"
+                                style="background-color: #828282a8;"
                                 [class.active-bar]="currentIndex == 1"
                                 aria-valuenow="50"
                                 aria-valuemin="0"
@@ -30,10 +32,12 @@
                                 Install
                             </div>
                             <div
+                                *ngIf="currentUser"
                                 class="progress-bar"
                                 role="progressbar"
                                 (click)="move(2)"
-                                style="width: 25%; background-color: #828282a8"
+                                [style.width]="currentUser ? '25%' : '33%'"
+                                style="background-color: #828282a8;"
                                 [class.active-bar]="currentIndex == 2"
                                 aria-valuenow="75"
                                 aria-valuemin="0"
@@ -44,9 +48,10 @@
                             <div
                                 class="progress-bar"
                                 role="progressbar"
-                                (click)="move(3)"
-                                style="width: 25%; background-color: #828282a8"
-                                [class.active-bar]="currentIndex == 3"
+                                (click)="moveToDownloadStep()"
+                                [style.width]="currentUser ? '25%' : '33%'"
+                                style="background-color: #828282a8;"
+                                [class.active-bar]="isDownloadStepActive()"
                                 aria-valuenow="100"
                                 aria-valuemin="0"
                                 aria-valuemax="100"
@@ -65,9 +70,41 @@
                                         </p>
                                         <p>Verify that you have installed Node 12 or greater.</p>
                                     </div>
-                                    <div class="white-div">
-                                        <p>node -v</p>
-                                        <p>npm -v</p>
+
+                                    <div
+                                        class="d-flex bd-highlight copy-wrapper mt-2"
+                                        style="cursor: pointer;"
+                                        (click)="copyNodeVersionCmd()"
+                                    >
+                                        <div class="bd-highlight copy-input">
+                                            <span class="copy-txt">node -v</span>
+                                        </div>
+                                        <div class="ml-auto bd-highlight">
+                                            <button class="copy-btn">
+                                                <a><em class="far fa-copy"></em></a>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="d-flex bd-highlight copy-wrapper mt-3"
+                                        style="cursor: pointer;"
+                                        (click)="copyNpmVersionCmd()"
+                                    >
+                                        <div class="bd-highlight copy-input">
+                                            <span class="copy-txt">npm -v</span>
+                                        </div>
+                                        <div class="ml-auto bd-highlight">
+                                            <button class="copy-btn">
+                                                <a><em class="far fa-copy"></em></a>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-left mt-1">
+                                        <a target="_blank" href="https://test.datapm.io/docs/command-line-client/"
+                                            >Detailed documentation</a
+                                        >
                                     </div>
                                 </div>
                             </mat-step>
@@ -75,40 +112,104 @@
                                 <ng-template matStepLabel>Done</ng-template>
                                 <div class="mat-content">
                                     <p class="stepper-title">Install DataPM Client</p>
-                                    <div class="stepper-content">
+                                    <div class="stepper-content mb-1">
                                         <p>Install the datapm client</p>
                                     </div>
-                                    <div class="white-div">
-                                        <p>npm install -g datapm-client</p>
+
+                                    <div
+                                        class="d-flex bd-highlight copy-wrapper mb-3"
+                                        style="cursor: pointer;"
+                                        (click)="copyNpmInstall()"
+                                    >
+                                        <div class="bd-highlight copy-input">
+                                            <span class="copy-txt">npm install -g datapm-client</span>
+                                        </div>
+                                        <div class="ml-auto bd-highlight">
+                                            <button class="copy-btn">
+                                                <a><em class="far fa-copy"></em></a>
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div class="stepper-content mt-2">
+
+                                    <div class="stepper-content mb-1">
                                         <p>Verify that the datapm client is installed</p>
                                     </div>
-                                    <div class="white-div">
-                                        <p>datapm --version</p>
+
+                                    <div
+                                        class="d-flex bd-highlight copy-wrapper"
+                                        style="cursor: pointer;"
+                                        (click)="copyDataVersion()"
+                                    >
+                                        <div class="bd-highlight copy-input">
+                                            <span class="copy-txt">datapm --version</span>
+                                        </div>
+                                        <div class="ml-auto bd-highlight">
+                                            <button class="copy-btn">
+                                                <a><em class="far fa-copy"></em></a>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-left mt-1">
+                                        <a target="_blank" href="https://test.datapm.io/docs/command-line-client/"
+                                            >Detailed documentation</a
+                                        >
                                     </div>
                                 </div>
                             </mat-step>
-                            <mat-step optional>
+                            <mat-step optional *ngIf="currentUser">
                                 <div class="mat-content">
                                     <p class="stepper-title">Login to Registry</p>
-                                    <div class="stepper-content">
+                                    <div class="stepper-content mb-1">
                                         <p>Use the this command to login to your registry account.</p>
                                     </div>
-                                    <div class="white-div">
-                                        <p>datapm registry login {{ registryUrl }} {{ username }}</p>
+
+                                    <div
+                                        class="d-flex bd-highlight copy-wrapper"
+                                        style="cursor: pointer;"
+                                        (click)="copyRegistryLogin()"
+                                    >
+                                        <div class="bd-highlight copy-input">
+                                            <span class="copy-txt"
+                                                >datapm registry login {{ registryUrl }} {{ username }}</span
+                                            >
+                                        </div>
+                                        <div class="ml-auto bd-highlight">
+                                            <button class="copy-btn">
+                                                <a><em class="far fa-copy"></em></a>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-left mt-1">
+                                        <a target="_blank" href="https://test.datapm.io/docs/command-line-client/"
+                                            >Detailed documentation</a
+                                        >
                                     </div>
                                 </div>
                             </mat-step>
                             <mat-step optional>
                                 <div class="mat-content">
                                     <p class="stepper-title">Fetch Data</p>
-                                    <div class="stepper-content">
+                                    <div class="stepper-content mb-1">
                                         <p>Use this command to fetch the data package</p>
                                     </div>
-                                    <div class="white-div">
-                                        <p>datapm fetch {{ packageUrl }}</p>
+
+                                    <div
+                                        class="d-flex bd-highlight copy-wrapper"
+                                        style="cursor: pointer;"
+                                        (click)="copyDataFetch()"
+                                    >
+                                        <div class="bd-highlight copy-input">
+                                            <span class="copy-txt">datapm fetch {{ packageUrl }}</span>
+                                        </div>
+                                        <div class="ml-auto bd-highlight">
+                                            <button class="copy-btn">
+                                                <a><em class="far fa-copy"></em></a>
+                                            </button>
+                                        </div>
                                     </div>
+
                                     <div *ngIf="hasApiKeys" class="stepper-content mt-2">
                                         <a (click)="move(0)">How to install datapm client</a>
                                     </div>
@@ -123,8 +224,20 @@
                     Close
                 </button>
                 <button mat-button *ngIf="currentIndex != 0" (click)="previous()">Back</button>
-                <button mat-button *ngIf="currentIndex != 3" (click)="next()">Next</button>
-                <button mat-button *ngIf="currentIndex == 3" mat-dialog-close>Finish</button>
+                <button
+                    mat-button
+                    *ngIf="(currentIndex != 3 && currentUser) || (currentIndex != 2 && !currentUser)"
+                    (click)="next()"
+                >
+                    Next
+                </button>
+                <button
+                    mat-button
+                    *ngIf="(currentIndex == 3 && currentUser) || (currentIndex == 2 && !currentUser)"
+                    mat-dialog-close
+                >
+                    Finish
+                </button>
             </mat-dialog-actions>
         </div>
     </div>

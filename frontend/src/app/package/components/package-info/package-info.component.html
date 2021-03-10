@@ -1,7 +1,7 @@
 <div id="packageInfo">
     <div *ngIf="package?.latestVersion?.identifier != null">
         <div class="row pb-3 pt-1 mb-4 share-data">
-            <div class="col-12 justify-content-end" style="display: flex">
+            <div class="col-12 three-btn-div" style="display: flex;">
                 <div class="px-1 d-flex flex-column bd-highlight">
                     <button class="app-outlined-button" (click)="downloadPackage()">
                         <a>Download</a>
@@ -15,7 +15,7 @@
                 >
                     <button
                         mat-raised-button
-                        style="pointer-events: all !important"
+                        style="pointer-events: all !important;"
                         class="app-outlined-button"
                         (click)="sharePackage()"
                         [disabled]="!canShare()"
@@ -34,9 +34,9 @@
             <div class="d-flex justify-content-between">
                 <div class="package-light-gray">click to copy fetch command</div>
             </div>
-            <div class="d-flex bd-highlight copy-wrapper" (click)="copyCommand()" style="cursor: pointer">
+            <div class="d-flex bd-highlight copy-wrapper" (click)="copyCommand()" style="cursor: pointer;">
                 <div class="bd-highlight copy-input">
-                    <span>{{ generatedFetchCommand }}</span>
+                    <span class="copy-txt">{{ generatedFetchCommand }}</span>
                 </div>
                 <div class="ml-auto bd-highlight">
                     <button class="copy-btn">
@@ -44,13 +44,7 @@
                     </button>
                 </div>
             </div>
-            <a
-                target="_blank"
-                class="color-info doc-link"
-                href="/docs/command-line-client/#install-the-datapm-command-line-client"
-            >
-                How to install datapm client
-            </a>
+            <a class="doc-link" (click)="openWizard()"> How to install datapm client </a>
         </div>
 
         <div class="row mb-3">
@@ -66,15 +60,15 @@
             </div>
         </div>
         <div class="row mb-3">
-            <div class="col-6 mb-2">
+            <div class="col-6">
                 <p class="package-light-gray">last refreshed</p>
                 <p class="package-dark-gray">
                     {{ package?.latestVersion?.createdAt | timeAgo }}
                 </p>
             </div>
-            <div class="col-6 mb-2">
+            <div class="col-6">
                 <p class="package-light-gray">unpacked size</p>
-                <p class="package-dark-gray">{{ packageFile?.schemas | packageSize }}</p>
+                <p class="package-dark-gray">{{ packageFile | packageSize }}</p>
             </div>
         </div>
 

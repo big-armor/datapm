@@ -11,32 +11,20 @@
         color: $gray-2;
     }
 
+    .package-dark-gray {
+        margin-bottom: 0px !important;
+    }
+
     .schema-property {
         .mat-expansion-panel {
             box-shadow: none;
+            margin: 5px 0px !important;
+            border: 1px solid #33333314;
 
             .mat-expanded {
-                height: 46px;
+                height: 48px;
             }
 
-            .mat-expansion-panel-header {
-                padding: 4px 8px;
-                border-radius: 4px;
-                margin-bottom: 2px;
-                border: 1px solid #33333314;
-
-                .mat-expansion-panel-header-title {
-                    flex-basis: 0;
-                    font-family: $family-roboto;
-                    font-style: $style-normal;
-                    font-weight: $weight-400;
-                    font-size: $small-font;
-                    line-height: 18px;
-                    flex-grow: 100;
-                    letter-spacing: 0.6px;
-                    color: $gray-2;
-                }
-            }
             .mat-expansion-panel-header-description {
                 flex-basis: 0;
                 justify-content: flex-end;
@@ -71,17 +59,6 @@
                 }
             }
             ::ng-deep {
-                .mat-expansion-panel-content {
-                    border: 1px solid $gray-9;
-                    border-radius: 6px;
-
-                    .mat-expansion-panel-body {
-                        padding: 16px 22px 16px 22px;
-                        font-weight: $weight-400;
-                        font-size: $small-font;
-                    }
-                }
-
                 .mat-expansion-indicator::after {
                     position: relative;
                     bottom: 3px;

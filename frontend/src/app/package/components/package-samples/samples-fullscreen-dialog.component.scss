@@ -6,14 +6,22 @@
 }
 
 .dialog-close-wrapper {
+    bottom: 26px;
     left: 0px !important;
 }
 
 @media (max-width: 576px) {
     .dialog-close-wrapper {
-        font-size: $small-font;
+        span {
+            font-size: $small-font;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
     }
     .dialog-close {
-        bottom: 10px;
+        font-size: 12px;
+        bottom: 5px !important;
+        position: relative;
     }
 }

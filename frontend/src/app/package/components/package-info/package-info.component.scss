@@ -3,6 +3,10 @@
 #packageInfo {
     .share-data {
         border-bottom: 1px solid #bdbdbd54;
+
+        .three-btn-div {
+            justify-content: flex-end;
+        }
     }
 
     .share-btn {
@@ -16,6 +20,7 @@
 
     .doc-link {
         font-size: $small-font;
+        cursor: pointer;
         line-height: 18px;
     }
 
@@ -52,5 +57,16 @@
 @media (max-width: 768px) {
     .d-md-block {
         display: none !important;
+    }
+    #packageInfo {
+        padding-left: 8px;
+        .share-data {
+            border-bottom: none;
+            margin-bottom: 0px !important;
+            .three-btn-div {
+                justify-content: flex-start;
+                padding-left: 10px;
+            }
+        }
     }
 }

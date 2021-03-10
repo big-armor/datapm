@@ -10,7 +10,9 @@
             <div mat-dialog-content id="contentBorder">
                 <div class="d-flex bd-highlight">
                     <div class="pr-3 py-2 bd-highlight div-question long-txt">Make this collection public</div>
-                    <div class="ml-auto py-2 bd-highlight slide-right">
+                    <div class="ml-auto py-2 bd-highlight slide-right d-flex align-items-center">
+                        <span *ngIf="isPublicControl.value" class="public-text mr-2">public</span>
+                        <span *ngIf="!isPublicControl.value" class="not-public-text mr-2">not public</span>
                         <mat-slide-toggle class="app-slide-toggle" formControlName="isPublic"></mat-slide-toggle>
                     </div>
                 </div>
@@ -40,12 +42,25 @@
                         ></app-input>
                     </div>
                 </div>
+                <div class="d-flex bd-highlight shadow-div mb-3">
+                    <div class="pr-3 py-2 bd-highlight div-question">Description</div>
+                    <div class="bd-highlight div-answer">
+                        <app-input
+                            class="flat-input-parent"
+                            [group]="form"
+                            controlName="description"
+                            placeholder="Description"
+                            [autoFocus]="true"
+                            [multiline]="true"
+                        ></app-input>
+                    </div>
+                </div>
                 <div class="text-danger mt-3" *ngIf="state === 'ERROR'">Error occured while updating collection.</div>
             </div>
             <div mat-dialog-actions class="mb-12">
                 <button mat-button class="ml-auto save-btn" [disabled]="form.invalid" (click)="save()">
                     <span *ngIf="state !== 'LOADING'">Save</span>
-                    <mat-spinner [diameter]="16" class="mx-auto" *ngIf="state === 'LOADING'"></mat-spinner>
+                    <mat-spinner [diameter]="20" class="mx-auto" *ngIf="state === 'LOADING'"></mat-spinner>
                 </button>
             </div>
         </form>

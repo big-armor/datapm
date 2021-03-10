@@ -16,6 +16,9 @@
 
     .mat-dialog-content {
         border-top: none;
+        max-height: 400px;
+        overflow-y: scroll;
+        overflow-x: hidden;
 
         app-cover {
             img {

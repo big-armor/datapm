@@ -14,6 +14,11 @@
     }
 }
 
+.mat-tooltip-trigger {
+    background: transparent;
+    border: none;
+}
+
 @media (max-width: 576px) {
     th.mat-header-cell:first-of-type,
     td.mat-cell:first-of-type,

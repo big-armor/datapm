@@ -1,6 +1,8 @@
 @import "../../../../styles/variables";
 
 #detailsPage {
+    margin-top: 30px;
+
     .no-keys-div {
         font-family: $family-roboto-mono;
         font-style: $style-normal;
@@ -99,4 +101,8 @@
             width: 190px !important;
         }
     }
+}
+
+.disabled {
+    background-color: $gray-4;
 }

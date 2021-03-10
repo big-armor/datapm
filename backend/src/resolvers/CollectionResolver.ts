@@ -39,6 +39,23 @@ export const collectionEntityToGraphQL = (collectionEntity: CollectionEntity): C
     };
 };
 
+export const collectionSlugAvailable = async (
+    _0: any,
+    { collectionSlug }: { collectionSlug: string },
+    context: Context
+) => {
+    const isReservedKeyword = ReservedKeywordsService.isReservedKeyword(collectionSlug);
+    if (isReservedKeyword) {
+        return false;
+    }
+
+    const collection = await context.connection.manager
+        .getCustomRepository(CollectionRepository)
+        .findCollectionBySlug(collectionSlug);
+
+    return collection == null;
+};
+
 export const usersByCollection = async (
     _0: any,
     { identifier }: { identifier: CollectionIdentifierInput },

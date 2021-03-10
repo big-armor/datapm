@@ -14,7 +14,7 @@
         <div class="d-flex bd-highlight shadow-div my-3">
             <div class="pr-3 py-2 bd-highlight div-question">Catalog Name*</div>
             <div class="bd-highlight div-answer">
-                <input formControlName="displayName" class="flat-input" placeholder="Catalog Name" />
+                <input formControlName="displayName" class="flat-input" placeholder="Catalog Name" cdkFocusInitial />
             </div>
         </div>
         <div class="d-flex bd-highlight shadow-div mb-3">
@@ -42,7 +42,7 @@
     <div mat-dialog-actions class="mb-12">
         <button mat-button (click)="submit()" class="ml-auto save-btn" [class.disabled]="form.invalid">
             <span *ngIf="state !== 'LOADING'">create</span>
-            <mat-spinner [diameter]="24" *ngIf="state === 'LOADING'"></mat-spinner>
+            <mat-spinner [diameter]="20" *ngIf="state === 'LOADING'"></mat-spinner>
         </button>
     </div>
 </form>

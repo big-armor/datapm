@@ -16,7 +16,7 @@
                                                     ><img
                                                         src="../../../../../assets/images/sources/raw_file.png"
                                                         alt="csv img"
-                                                        style="width: 16px; height: 16px"
+                                                        style="width: 16px; height: 16px;"
                                                 /></a>
                                                 Download raw file
                                             </button>
@@ -33,7 +33,7 @@
                                                     ><img
                                                         src="../../../../../assets/images/sources/{{ source.slug }}.svg"
                                                         alt="{{ source.slug }} img"
-                                                        style="width: 16px; height: 16px"
+                                                        style="width: 16px; height: 16px;"
                                                 /></a>
                                                 {{ source.name }}
                                             </button>
@@ -50,7 +50,7 @@
                                                     ><img
                                                         src="../../../../../assets/images/sources/{{ source.slug }}.svg"
                                                         alt="{{ source.slug }} img"
-                                                        style="width: 16px; height: 16px"
+                                                        style="width: 16px; height: 16px;"
                                                 /></a>
                                                 {{ source.name }}
                                             </button>
@@ -67,7 +67,7 @@
                                                     ><img
                                                         src="../../../../../assets/images/sources/{{ source.slug }}.svg"
                                                         alt="{{ source.slug }} img"
-                                                        style="width: 16px; height: 16px"
+                                                        style="width: 16px; height: 16px;"
                                                 /></a>
                                                 {{ source.name }}
                                             </button>
@@ -80,9 +80,9 @@
                             <div class="mat-content">
                                 <div class="stepper-content">
                                     <span>Schemas</span>
-                                    <div class="white-div">
-                                        <a *ngFor="let schema of schemas" [href]="schema.source?.uri" target="_blank">
-                                            {{ schema.$id }}
+                                    <div class="white-div" *ngFor="let source of packageSources">
+                                        <a *ngFor="let uri of source.uris" [href]="uri" target="_blank">
+                                            {{ uri }}
                                         </a>
                                     </div>
                                 </div>

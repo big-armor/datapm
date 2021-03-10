@@ -12,7 +12,7 @@
     </div>
     <div class="container" *ngIf="state == State.ERROR">
         <div class="row">
-            <div class="col-12 mt-5">
+            <div class="col-12 mt-5 pt-3">
                 <div class="alert-warning alert">
                     There was a problem loading this page. Please refresh your browser. If that doesn't work, please
                     contact support.
@@ -23,41 +23,48 @@
 
     <div class="container" *ngIf="state == State.ERROR_NOT_AUTHENTICATED">
         <div class="row text-center">
-            <div class="col-12 mt-5">
+            <div class="col-12 mt-5 pt-3">
                 <div class="package-title">
-                    {{ getPackageIdentifierFromURL() }}
+                    <a [routerLink]="'/' + getCatalogSlugFromURL()"> {{ getCatalogSlugFromURL() }}</a
+                    >/{{ getPackageSlugFromURL() }}
                 </div>
-                You must
-                <a class="color-info" href="javascript:void(0);" (click)="loginClicked()">login to view this package</a
-                >.
+                <p class="package-dark-gray mt-3">
+                    You must <a href="javascript:void(0);" (click)="loginClicked()">login to view this package</a>.
+                </p>
             </div>
         </div>
     </div>
 
     <div class="container" *ngIf="state == State.ERROR_NOT_AUTHORIZED">
         <div class="row text-center">
-            <div class="col-12 mt-5">
+            <div class="col-12 mt-5 pt-3">
                 <div class="package-title">
-                    {{ getPackageIdentifierFromURL() }}
+                    <a [routerLink]="'/' + getCatalogSlugFromURL()"> {{ getCatalogSlugFromURL() }}</a
+                    >/{{ getPackageSlugFromURL() }}
                 </div>
-                You do not have permission to view this package. Please contact the author.
+                <p class="package-dark-gray mt-3">
+                    You do not have permission to view this package. Please contact the author.
+                </p>
             </div>
         </div>
     </div>
 
     <div class="container" *ngIf="state == State.ERROR_NOT_FOUND">
         <div class="row text-center">
-            <div class="col-12 mt-5">
+            <div class="col-12 mt-5 pt-3">
                 <div class="package-title">
-                    {{ getPackageIdentifierFromURL() }}
+                    <a [routerLink]="'/' + getCatalogSlugFromURL()"> {{ getCatalogSlugFromURL() }}</a
+                    >/{{ getPackageSlugFromURL() }}
                 </div>
-                The package was not found. Use the search bar above to find additional data. 123
+                <p class="package-dark-gray mt-3">
+                    The package was not found. Use the search bar above to find additional data.
+                </p>
             </div>
         </div>
     </div>
 
     <div *ngIf="state == State.LOADED">
-        <div class="container-fluid">
+        <div class="container-fluid px-0">
             <div class="row" id="packagePage">
                 <div class="col-xl-12 col-12 contentContainer pl-0 pr-0">
                     <app-cover
@@ -75,14 +82,15 @@
                                     <div class="d-flex">
                                         <div class="package-identifier w-100">
                                             <div class="identifier">
-                                                <app-avatar
-                                                    class="pr-3 user-img"
+                                                <a
+                                                    [routerLink]="['/' + package?.identifier.catalogSlug]"
+                                                    style="width: 40px; height: 40px; border-radius: 50%;"
                                                     *ngIf="catalogUser"
-                                                    [user]="catalogUser"
-                                                    [size]="40"
                                                 >
-                                                </app-avatar>
-                                                <div class="d-flex flex-column bd-highlight">
+                                                    <app-avatar class="user-img" [user]="catalogUser" [size]="40">
+                                                    </app-avatar>
+                                                </a>
+                                                <div class="d-flex flex-column bd-highlight ml-2">
                                                     <div class="bd-highlight">
                                                         <span
                                                             class="pt-2 package-privacy"
@@ -99,6 +107,9 @@
                                                             [routerLink]="['/' + package?.identifier.catalogSlug]"
                                                             >{{ package?.identifier.catalogSlug }}</a
                                                         >/{{ package?.identifier.packageSlug }}
+                                                        <a class="copy-link" (click)="copyCommand()">
+                                                            <em class="far fa-copy"></em>
+                                                        </a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -134,7 +145,7 @@
 
                         <div class="row" *ngIf="package?.latestVersion?.identifier != null">
                             <div class="col-md-12">
-                                <hr style="width: 100%" class="header-border" />
+                                <hr style="width: 100%;" class="header-border" />
                                 <div class="container">
                                     <ul class="p-0" id="homeRoutes">
                                         <li *ngFor="let r of routes" class="list-names">

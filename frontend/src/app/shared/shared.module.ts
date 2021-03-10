@@ -60,7 +60,8 @@ import { CollectionsHorizontalListComponent } from "./package-and-collection/col
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { LMarkdownEditorModule } from "ngx-markdown-editor";
 import { MarkdownEditorComponent } from "./markdown-editor/markdown-editor.component";
-import { CreatePackageIssueComponent } from "../package/components/package-issues/create-package-issue/create-package-issue.component";
+import { MatTooltipModule } from "@angular/material/tooltip";
+import { ShareDialogComponent } from "./dialogs/share-dialog/share-dialog.component";
 
 @NgModule({
     declarations: [
@@ -103,7 +104,8 @@ import { CreatePackageIssueComponent } from "../package/components/package-issue
         UserInviteInputComponent,
         PackageAndCollectionComponent,
         CollectionsHorizontalListComponent,
-        MarkdownEditorComponent
+        MarkdownEditorComponent,
+        ShareDialogComponent
     ],
     imports: [
         CommonModule,
@@ -124,6 +126,7 @@ import { CreatePackageIssueComponent } from "../package/components/package-issue
         MatTableModule,
         MatChipsModule,
         LMarkdownEditorModule,
+        MatTooltipModule,
         FormsModule,
         ReactiveFormsModule,
         RouterModule

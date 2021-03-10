@@ -10,6 +10,8 @@ import { MatDialog } from "@angular/material/dialog";
 import { LoginDialogComponent } from "src/app/shared/header/login-dialog/login-dialog.component";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { AddPackageComponent } from "src/app/collection-details/add-package/add-package.component";
+import { SnackBarService } from "src/app/services/snackBar.service";
+import { packageToIdentifier } from "src/app/helpers/IdentifierHelper";
 
 enum State {
     LOADING,
@@ -51,6 +53,7 @@ export class PackageComponent implements OnDestroy {
 
     constructor(
         private route: ActivatedRoute,
+        private snackBarService: SnackBarService,
         private packageService: PackageService,
         public dialog: MatDialog,
         private title: Title,
@@ -61,6 +64,9 @@ export class PackageComponent implements OnDestroy {
         this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe(
             (p: PackageResponse) => {
                 if (p == null) return;
+                if (this.package && p.package.identifier != this.package.identifier) {
+                    this.catalogUser = null;
+                }
 
                 if (p.package == null && p.response != null) {
                     if (p.response.errors.some((e) => e.message.includes("NOT_AUTHENTICATED")))
@@ -178,6 +184,16 @@ export class PackageComponent implements OnDestroy {
         });
     }
 
+    getCatalogSlugFromURL() {
+        const activeRouteParts = this.router.url.split("/");
+        return activeRouteParts[1];
+    }
+
+    getPackageSlugFromURL() {
+        const activeRouteParts = this.router.url.split("/");
+        return activeRouteParts[2];
+    }
+
     getPackageIdentifierFromURL() {
         const activeRouteParts = this.router.url.split("/");
         return activeRouteParts[1] + "/" + activeRouteParts[2];
@@ -188,8 +204,20 @@ export class PackageComponent implements OnDestroy {
             data: packageFile
         });
     }
+
     derivedFromCount(packageFile: PackageFile) {
         if (packageFile == null) return 0;
         return packageFile.schemas.reduce((count, schema) => count + (schema.derivedFrom?.length || 0), 0);
+    }
+
+    public copyCommand() {
+        const el = document.createElement("textarea");
+        el.value = packageToIdentifier(this.package.identifier);
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand("copy");
+        document.body.removeChild(el);
+
+        this.snackBarService.openSnackBar("package slug copied to clipboard!", "");
     }
 }
