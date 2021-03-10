@@ -25,6 +25,7 @@
             </a>
             <a class="issue-tab right-tab"> Opened by </a>
         </div>
+
         <!-- when there are opened or closed issues -->
         <ng-container *ngIf="state === State.SUCCESS">
             <div *ngFor="let issue of issues" class="issue-wrapper">
@@ -52,6 +53,9 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div *ngIf="hasMore">
+                <button mat-button [disabled]="loadingMoreIssues" (click)="loadMoreIssues()">Load more</button>
             </div>
         </ng-container>
 

@@ -26,6 +26,7 @@ enum State {
 interface PackageIssueCommentWithEditorStatus extends PackageIssueComment {
     editedContent?: string;
     isEditing?: boolean;
+    isSubmittingEdit?: boolean;
     errorMessage?: string;
 }
 
@@ -41,6 +42,7 @@ export class PackageIssuesDetailComponent implements OnInit {
     public state: State = State.INIT;
     public packageIssue: PackageIssue;
     public packageIssueNewContent: string;
+    public submittingPackageIssueUpdate: boolean = false;
     public editingIssue: boolean = false;
     public editingIssueErrorMessage: string;
 
@@ -80,13 +82,19 @@ export class PackageIssuesDetailComponent implements OnInit {
     }
 
     public updateIssue(): void {
-        if (!this.isValidContent(this.packageIssueNewContent)) {
+        if (!this.isIssueUpdatedContentValid()) {
             this.editingIssueErrorMessage = "Invalid issue content";
             return;
         }
 
         // TODO: Make HTTP request here to update the issue content
+        this.submittingPackageIssueUpdate = true;
         this.closeIssueEditor();
+        this.submittingPackageIssueUpdate = false;
+    }
+
+    public isIssueUpdatedContentValid(): boolean {
+        return this.isValidContent(this.packageIssueNewContent);
     }
 
     public openIssueEditor(): void {
@@ -105,9 +113,11 @@ export class PackageIssuesDetailComponent implements OnInit {
             return;
         }
 
+        comment.isSubmittingEdit = true;
         comment.content = comment.editedContent;
         // TODO: Make HTTP request here to update the comment content
         this.closeCommentEditor(comment);
+        comment.isSubmittingEdit = false;
     }
 
     public openCommentEditor(comment: PackageIssueCommentWithEditorStatus): void {

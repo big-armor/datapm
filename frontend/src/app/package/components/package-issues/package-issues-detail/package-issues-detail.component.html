@@ -67,7 +67,7 @@
                                         <button class="app-outlined-button" (click)="closeIssueEditor()">Cancel</button>
                                         <button
                                             class="app-raised-button ml-2"
-                                            [disabled]="submittingNewComment || !isValidNewCommentContent()"
+                                            [disabled]="submittingPackageIssueUpdate || !isIssueUpdatedContentValid()"
                                             (click)="updateIssue()"
                                         >
                                             Save
@@ -124,7 +124,15 @@
                                             <button class="app-outlined-button" (click)="closeCommentEditor(comment)">
                                                 Cancel
                                             </button>
-                                            <button class="app-raised-button ml-2">Save</button>
+                                            <button
+                                                class="app-raised-button ml-2"
+                                                [disabled]="
+                                                    comment.isSubmittingEdit || !isValidContent(comment.editedContent)
+                                                "
+                                                (click)="updateComment(comment)"
+                                            >
+                                                Save
+                                            </button>
                                         </div>
                                         <div *ngIf="comment.errorMessage">
                                             {{ comment.errorMessage }}

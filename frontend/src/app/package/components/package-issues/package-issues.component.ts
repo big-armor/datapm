@@ -26,14 +26,14 @@ enum State {
 export class PackageIssuesComponent implements OnInit, OnDestroy {
     public readonly State = State;
 
-    private readonly ISSUES_PER_PAGE_COUNT = 10;
+    private readonly ISSUES_PER_PAGE_COUNT = 1;
     private readonly onDestory = new Subject();
 
     public state: State = State.INIT;
 
     public issues: PackageIssue[] = [];
     public hasMore: boolean = false;
-    public loading: boolean = false;
+    public loadingMoreIssues: boolean = false;
 
     public includeOpenIssues: boolean = true;
     public includeClosedIssues: boolean = false;
@@ -103,20 +103,24 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
     }
 
     private loadPackageIssues(resetCollection: boolean = false): void {
-        this.state = resetCollection ? State.LOADING : State.LOADING_MORE_ISSUES;
+        if (resetCollection) {
+            this.state = State.LOADING;
+        } else {
+            this.loadingMoreIssues = true;
+        }
 
         const variables = {
             packageIdentifier: this.packageIdentifier,
             includeOpenIssues: this.includeOpenIssues,
             includeClosedIssues: this.includeClosedIssues,
-            offset: this.offset,
+            offset: resetCollection ? 0 : this.offset,
             limit: this.ISSUES_PER_PAGE_COUNT,
             orderBy: OrderBy.UPDATED_AT
         };
 
         this.packageIssuesGQL.fetch(variables).subscribe((issuesResponse) => {
+            this.loadingMoreIssues = false;
             if (issuesResponse.error) {
-                this.loading = false;
                 return;
             }
 
@@ -127,6 +131,7 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
             } else {
                 this.issues.push(...responseData.issues);
             }
+            this.offset = this.issues.length;
             this.updateState();
         });
     }
