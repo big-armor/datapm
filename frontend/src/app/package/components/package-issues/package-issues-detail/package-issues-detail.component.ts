@@ -4,7 +4,16 @@ import { ActivatedRoute } from "@angular/router";
 import { Subject } from "rxjs";
 import { PackageService } from "src/app/package/services/package.service";
 import { ImageService } from "src/app/services/image.service";
-import { CreatePackageIssueCommentGQL, OrderBy, PackageIdentifierInput, PackageIssue, PackageIssueComment, PackageIssueCommentsGQL, PackageIssueGQL, PackageIssueIdentifierInput } from "src/generated/graphql";
+import {
+    CreatePackageIssueCommentGQL,
+    OrderBy,
+    PackageIdentifierInput,
+    PackageIssue,
+    PackageIssueComment,
+    PackageIssueCommentsGQL,
+    PackageIssueGQL,
+    PackageIssueIdentifierInput
+} from "src/generated/graphql";
 
 @Component({
     selector: "app-package-issues-detail",
@@ -12,7 +21,6 @@ import { CreatePackageIssueCommentGQL, OrderBy, PackageIdentifierInput, PackageI
     styleUrls: ["./package-issues-detail.component.scss"]
 })
 export class PackageIssuesDetailComponent implements OnInit {
-
     private readonly COMMENTS_TO_LOAD_PER_PAGE = 10;
 
     public packageIssue: PackageIssue;
@@ -36,7 +44,7 @@ export class PackageIssuesDetailComponent implements OnInit {
         private createPackageIssueCommentGQL: CreatePackageIssueCommentGQL,
         private imageService: ImageService,
         private route: ActivatedRoute
-    ) { }
+    ) {}
 
     public ngOnInit(): void {
         const issueNumber = this.route.snapshot.params.issueNumber;
@@ -53,21 +61,23 @@ export class PackageIssuesDetailComponent implements OnInit {
     }
 
     public loadPackageIssueComments(reload = false): void {
-        this.packageIssueCommentsGQL.fetch({
-            issueIdentifier: this.issueIdentifier,
-            packageIdentifier: this.packageIdentifier,
-            offset: reload ? 0 : this.commentsOffset,
-            limit: this.COMMENTS_TO_LOAD_PER_PAGE,
-            orderBy: OrderBy.CREATED_AT
-        }).subscribe((commentsResponse) => {
-            if (commentsResponse.errors) {
-                return;
-            }
+        this.packageIssueCommentsGQL
+            .fetch({
+                issueIdentifier: this.issueIdentifier,
+                packageIdentifier: this.packageIdentifier,
+                offset: reload ? 0 : this.commentsOffset,
+                limit: this.COMMENTS_TO_LOAD_PER_PAGE,
+                orderBy: OrderBy.CREATED_AT
+            })
+            .subscribe((commentsResponse) => {
+                if (commentsResponse.errors) {
+                    return;
+                }
 
-            this.packageIssueComments = commentsResponse.data.packageIssueComments.comments;
-            this.commentsOffset == this.packageIssueComments.length;
-            this.hasMoreComments = commentsResponse.data.packageIssueComments.hasMore;
-        });
+                this.packageIssueComments = commentsResponse.data.packageIssueComments.comments;
+                this.commentsOffset == this.packageIssueComments.length;
+                this.hasMoreComments = commentsResponse.data.packageIssueComments.hasMore;
+            });
     }
 
     public createNewComment(): void {
@@ -76,17 +86,22 @@ export class PackageIssuesDetailComponent implements OnInit {
         }
 
         this.submittingNewComment = true;
-        this.createPackageIssueCommentGQL.mutate({
-            packageIdentifier: this.packageIdentifier,
-            issueIdentifier: this.issueIdentifier,
-            comment: {
-                content: this.newCommentContent
-            }
-        }).subscribe((response) => {
-            this.submittingNewComment = false;
-            this.newCommentContent = "";
-            this.loadPackageIssueComments(true);
-        }, () => this.submittingNewComment = false)
+        this.createPackageIssueCommentGQL
+            .mutate({
+                packageIdentifier: this.packageIdentifier,
+                issueIdentifier: this.issueIdentifier,
+                comment: {
+                    content: this.newCommentContent
+                }
+            })
+            .subscribe(
+                (response) => {
+                    this.submittingNewComment = false;
+                    this.newCommentContent = "";
+                    this.loadPackageIssueComments(true);
+                },
+                () => (this.submittingNewComment = false)
+            );
     }
 
     public isValidNewCommentContent(): boolean {

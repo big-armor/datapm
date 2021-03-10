@@ -37,7 +37,7 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
         private imageService: ImageService,
         private router: Router,
         private route: ActivatedRoute
-    ) { }
+    ) {}
 
     public ngOnInit(): void {
         this.loadPackage();

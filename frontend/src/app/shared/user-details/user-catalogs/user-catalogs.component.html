@@ -39,7 +39,7 @@
                             <ng-container matColumnDef="name">
                                 <th scope="col" mat-header-cell *matHeaderCellDef>Name</th>
                                 <td class="table-content" mat-cell *matCellDef="let catalog">
-                                    <a [routerLink]="['/' + catalog.identifier.catalogSlug]">{{
+                                    <a class="color-info" [routerLink]="['/' + catalog.identifier.catalogSlug]">{{
                                         catalog.displayName
                                     }}</a>
                                 </td>

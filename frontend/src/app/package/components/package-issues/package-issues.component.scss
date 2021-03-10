@@ -37,6 +37,10 @@
     .main-wrapper {
         margin-top: 15px;
 
+        .issue-header {
+            border-bottom: 0px !important;
+        }
+
         .issue-wrapper {
             padding: 10px 30px;
             border: 1px solid $gray-5;
@@ -44,10 +48,15 @@
             .issue-tab {
                 font-family: $family-roboto;
                 font-weight: $weight-400;
-                font-size: $text-font;
+                font-size: ($text-font - 1);
                 letter-spacing: 0.4px;
                 margin-right: 10px;
                 color: $gray-3;
+
+                &:hover {
+                    text-decoration: none;
+                    color: $color-info;
+                }
             }
 
             .right-tab {
@@ -56,7 +65,7 @@
             }
 
             .active {
-                color: $gray-2;
+                color: $gray-1;
             }
 
             .img-comments {
@@ -64,19 +73,6 @@
                 height: 25px;
                 margin-right: 25px;
                 border-radius: 50%;
-            }
-
-            a {
-                font-family: $family-roboto;
-                font-weight: $weight-400;
-                font-size: $default-font;
-                letter-spacing: 0.4px;
-                color: $gray-2;
-
-                &:hover {
-                    text-decoration: none;
-                    color: $color-info;
-                }
             }
         }
     }

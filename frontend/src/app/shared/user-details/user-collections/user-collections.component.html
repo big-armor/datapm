@@ -33,7 +33,7 @@
                                     <span *ngIf="!isCurrentUser" class="package-dark-gray pl-3">
                                         Collections of data created by {{ username }}.
                                     </span>
-                                    <a target="_blank" href="/docs/concepts/collections"
+                                    <a target="_blank" href="/docs/concepts/collections" class="color-info"
                                         >Learn more about collections</a
                                     >
                                 </p>
@@ -56,9 +56,11 @@
                                     <ng-container matColumnDef="name">
                                         <th scope="col" mat-header-cell *matHeaderCellDef>Name</th>
                                         <td class="table-content" mat-cell *matCellDef="let collection">
-                                            <a [routerLink]="['/collection/' + collection.identifier.collectionSlug]">{{
-                                                collection.name
-                                            }}</a>
+                                            <a
+                                                class="color-info"
+                                                [routerLink]="['/collection/' + collection.identifier.collectionSlug]"
+                                                >{{ collection.name }}</a
+                                            >
                                         </td>
                                     </ng-container>
 

@@ -13,9 +13,18 @@ body {
 a {
     color: $color-info;
 }
+
 body {
     margin: 0;
     font-family: $family-roboto !important;
+}
+
+.color-info {
+    color: $color-info;
+
+    &:hover {
+        text-decoration: none;
+    }
 }
 
 .cursor-pointer {

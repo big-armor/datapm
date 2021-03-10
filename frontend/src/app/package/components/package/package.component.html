@@ -27,8 +27,9 @@
                 <div class="package-title">
                     {{ getPackageIdentifierFromURL() }}
                 </div>
-                <br />
-                You must <a href="javascript:void(0);" (click)="loginClicked()">login to view this package</a>.
+                You must
+                <a class="color-info" href="javascript:void(0);" (click)="loginClicked()">login to view this package</a
+                >.
             </div>
         </div>
     </div>
@@ -39,7 +40,6 @@
                 <div class="package-title">
                     {{ getPackageIdentifierFromURL() }}
                 </div>
-                <br />
                 You do not have permission to view this package. Please contact the author.
             </div>
         </div>
@@ -51,7 +51,6 @@
                 <div class="package-title">
                     {{ getPackageIdentifierFromURL() }}
                 </div>
-                <br />
                 The package was not found. Use the search bar above to find additional data. 123
             </div>
         </div>
@@ -95,9 +94,10 @@
                                                         </span>
                                                     </div>
                                                     <div class="bd-highlight">
-                                                        <a [routerLink]="['/' + package?.identifier.catalogSlug]">{{
-                                                            package?.identifier.catalogSlug
-                                                        }}</a
+                                                        <a
+                                                            class="color-info"
+                                                            [routerLink]="['/' + package?.identifier.catalogSlug]"
+                                                            >{{ package?.identifier.catalogSlug }}</a
                                                         >/{{ package?.identifier.packageSlug }}
                                                     </div>
                                                 </div>

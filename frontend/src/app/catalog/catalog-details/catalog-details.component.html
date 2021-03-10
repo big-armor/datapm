@@ -41,7 +41,11 @@
                     This catalog contains no packages, or you do not have permission to view the packages it does
                     contain.
                 </p>
-                <a href="/docs/publish-data/" target="_blank" *ngIf="catalog.myPermissions.includes('EDIT')"
+                <a
+                    class="color-info"
+                    href="/docs/publish-data/"
+                    target="_blank"
+                    *ngIf="catalog.myPermissions.includes('EDIT')"
                     >Learn how to publish</a
                 >
             </div>

@@ -49,7 +49,7 @@
                 <ng-container matColumnDef="emailAddress">
                     <th mat-header-cell *matHeaderCellDef scope="col">Email Address</th>
                     <td mat-cell *matCellDef="let element">
-                        <a href="mailto: + {{ element.emailAddress }}">{{ element.emailAddress }}</a>
+                        <a class="color-info" href="mailto: + {{ element.emailAddress }}">{{ element.emailAddress }}</a>
                     </td>
                 </ng-container>
 
