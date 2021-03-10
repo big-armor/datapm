@@ -80,9 +80,9 @@
                             <div class="mat-content">
                                 <div class="stepper-content">
                                     <span>Schemas</span>
-                                    <div class="white-div">
-                                        <a *ngFor="let schema of schemas" [href]="schema.source?.uri" target="_blank">
-                                            {{ schema.$id }}
+                                    <div class="white-div" *ngFor="let source of packageSources">
+                                        <a *ngFor="let uri of source.uris" [href]="uri" target="_blank">
+                                            {{ uri }}
                                         </a>
                                     </div>
                                 </div>
