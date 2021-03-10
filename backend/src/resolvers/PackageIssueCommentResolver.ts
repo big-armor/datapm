@@ -31,7 +31,6 @@ export const getCommentsByByPackageIssue = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    console.log("info", info);
     const packageEntity = await context.connection.manager
         .getCustomRepository(PackageRepository)
         .findPackageOrFail({ identifier: packageIdentifier });
@@ -41,7 +40,6 @@ export const getCommentsByByPackageIssue = async (
         .getByIssueNumberForPackage(packageEntity.id, issueIdentifier.issueNumber);
 
     const relations = getGraphQlRelationName(info);
-    console.log("relacionet", relations);
 
     const [comments, count] = await context.connection.manager
         .getCustomRepository(PackageIssueCommentRepository)

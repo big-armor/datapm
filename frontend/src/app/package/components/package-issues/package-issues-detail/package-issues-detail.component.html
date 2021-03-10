@@ -4,18 +4,22 @@
             <div class="mr-auto bd-highlight">
                 <div class="package-details-title mb-2">{{ packageIssue.subject }}</div>
                 <p class="package-light-gray">
-                    <a *ngIf="packageIssue.status === 'OPEN'; else closedStatusIcon" class="open-status">
-                        <em class="fas fa-exclamation-circle"></em>
-                        <span>open</span>
-                    </a>
+                    <ng-container *ngIf="packageIssue.status === 'OPEN'; else closedStatusIcon">
+                        <a class="open-status">
+                            <em class="fas fa-exclamation-circle"></em>
+                            <span>open</span>
+                        </a>
+                        <strong>{{ packageIssue.author.username }}</strong> opened this issue
+                        {{ packageIssue.createdAt | timeAgo }}
+                    </ng-container>
                     <ng-template #closedStatusIcon>
                         <a class="closed-status">
                             <em class="fas fa-ban"></em>
                             <span>closed</span>
                         </a>
+                        <strong>{{ packageIssue.author.username }}</strong> closed this issue
+                        {{ packageIssue.updatedAt | timeAgo }}
                     </ng-template>
-                    <strong>{{ packageIssue.author.username }}</strong> opened this issue
-                    {{ packageIssue.createdAt | timeAgo }}
                 </p>
             </div>
             <div class="bd-highlight">
@@ -42,7 +46,7 @@
                                     <em class="fas fa-ellipsis-h"></em>
                                 </a>
                                 <mat-menu #menu="matMenu">
-                                    <button mat-menu-item id="issueBtn">
+                                    <button mat-menu-item id="issueBtn" (click)="openIssueEditor()">
                                         <span class="package-dark-gray">Edit</span>
                                     </button>
                                     <button mat-menu-item id="issueBtn">
@@ -53,7 +57,23 @@
                         </div>
                         <div class="issue-box">
                             <div class="package-dark-gray">
-                                <markdown [data]="packageIssue.content"></markdown>
+                                <markdown
+                                    *ngIf="!editingIssue; else issueEditor"
+                                    [data]="packageIssue.content"
+                                ></markdown>
+                                <ng-template #issueEditor>
+                                    <app-markdown-editor [content]="packageIssue.content"></app-markdown-editor>
+                                    <div class="mt-2 text-right">
+                                        <button class="app-outlined-button" (click)="closeIssueEditor()">Cancel</button>
+                                        <button
+                                            class="app-raised-button ml-2"
+                                            [disabled]="submittingNewComment || !isValidNewCommentContent()"
+                                            (click)="updateIssue()"
+                                        >
+                                            Save
+                                        </button>
+                                    </div>
+                                </ng-template>
                             </div>
                         </div>
                     </div>
@@ -83,7 +103,7 @@
                                         <em class="fas fa-ellipsis-h"></em>
                                     </a>
                                     <mat-menu #menu="matMenu">
-                                        <button mat-menu-item id="issueBtn">
+                                        <button mat-menu-item id="issueBtn" (click)="openCommentEditor(comment)">
                                             <span class="package-dark-gray">Edit</span>
                                         </button>
                                         <button mat-menu-item id="issueBtn">
@@ -93,14 +113,23 @@
                                 </div>
                             </div>
                             <div class="issue-box">
-                                <!-- <div class="package-dark-gray">{{ comment.content }}</div> -->
                                 <div class="package-dark-gray">
-                                    <markdown [data]="comment.content"></markdown>
-                                    <!-- <app-markdown-editor [(content)]="comment.content"></app-markdown-editor> -->
-                                    <div class="mt-2 text-right">
-                                        <button class="app-outlined-button">Cancel</button>
-                                        <button class="app-raised-button ml-2">Save</button>
-                                    </div>
+                                    <markdown
+                                        *ngIf="!comment.isEditing; else commentEditorTemplate"
+                                        [data]="comment.content"
+                                    ></markdown>
+                                    <ng-template #commentEditorTemplate>
+                                        <app-markdown-editor [(content)]="comment.editedContent"></app-markdown-editor>
+                                        <div class="mt-2 text-right">
+                                            <button class="app-outlined-button" (click)="closeCommentEditor(comment)">
+                                                Cancel
+                                            </button>
+                                            <button class="app-raised-button ml-2">Save</button>
+                                        </div>
+                                        <div *ngIf="comment.errorMessage">
+                                            {{ comment.errorMessage }}
+                                        </div>
+                                    </ng-template>
                                 </div>
                             </div>
                         </div>

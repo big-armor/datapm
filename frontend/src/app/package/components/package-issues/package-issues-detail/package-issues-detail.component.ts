@@ -22,6 +22,12 @@ enum State {
     LOADING
 }
 
+interface PackageIssueCommentWithEditorStatus extends PackageIssueComment {
+    editedContent?: string;
+    isEditing?: boolean;
+    errorMessage?: string;
+}
+
 @Component({
     selector: "app-package-issues-detail",
     templateUrl: "./package-issues-detail.component.html",
@@ -33,8 +39,11 @@ export class PackageIssuesDetailComponent implements OnInit {
 
     public state: State = State.INIT;
     public packageIssue: PackageIssue;
+    public packageIssueNewContent: string;
+    public editingIssue: boolean = false;
+    public editingIssueErrorMessage: string;
 
-    public packageIssueComments: PackageIssueComment[] = [];
+    public packageIssueComments: PackageIssueCommentWithEditorStatus[] = [];
     public hasMoreComments = false;
     public newCommentContent: string = "";
     public submittingNewComment = false;
@@ -66,6 +75,48 @@ export class PackageIssuesDetailComponent implements OnInit {
         } else {
             this.errorMessage = "Invalid issue number";
         }
+    }
+
+    public updateIssue(): void {
+        if (!this.isValidContent(this.packageIssueNewContent)) {
+            this.editingIssueErrorMessage = "Invalid issue content";
+            return;
+        }
+
+        // TODO: Make HTTP request here to update the issue content
+        this.closeIssueEditor();
+    }
+
+    public openIssueEditor(): void {
+        this.editingIssueErrorMessage = null;
+        this.editingIssue = true;
+        this.packageIssueNewContent = this.packageIssue.content;
+    }
+
+    public closeIssueEditor(): void {
+        this.editingIssue = false;
+    }
+
+    public updateComment(comment: PackageIssueCommentWithEditorStatus): void {
+        if (!this.isValidContent(comment.editedContent) || comment.editedContent.trim() != comment.content.trim()) {
+            comment.errorMessage = "Invalid comment";
+            return;
+        }
+
+        comment.content = comment.editedContent;
+        // TODO: Make HTTP request here to update the comment content
+        this.closeCommentEditor(comment);
+    }
+
+    public openCommentEditor(comment: PackageIssueCommentWithEditorStatus): void {
+        console.log("editing comment", comment.commentId);
+        comment.errorMessage = null;
+        comment.isEditing = true;
+        comment.editedContent = comment.content;
+    }
+
+    public closeCommentEditor(comment: PackageIssueCommentWithEditorStatus): void {
+        comment.isEditing = false;
     }
 
     public deleteIssue(): void {
@@ -140,11 +191,15 @@ export class PackageIssuesDetailComponent implements OnInit {
     }
 
     public isValidNewCommentContent(): boolean {
-        return this.newCommentContent.trim().length > 0;
+        return this.isValidContent(this.newCommentContent);
     }
 
     public getUserAvatar(username: string): Subject<SafeUrl> {
         return this.imageService.loadUserAvatar(username);
+    }
+
+    private isValidContent(content: string): boolean {
+        return content && content.trim().length > 0;
     }
 
     private loadPackage(): void {

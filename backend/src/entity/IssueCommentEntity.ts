@@ -9,6 +9,7 @@ export class IssueCommentEntity extends EntityBaseModel {
     @PrimaryGeneratedColumn()
     public id: number;
 
+    // TODO: RENAME THIS TO commentNumber
     @Column({ name: "comment_id" })
     public commentId: number;
 
