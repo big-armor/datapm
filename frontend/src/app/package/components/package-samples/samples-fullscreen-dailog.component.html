@@ -1,9 +1,10 @@
 <div class="dialog-wrapper" id="samples">
     <div class="d-flex dialog-close-wrapper">
-        {{ schema.sampleRecords?.length }} sample records from {{ package.identifier.catalogSlug }}/{{
-            package.identifier.packageSlug
-        }}
-
+        <span>
+            {{ schema.sampleRecords?.length }} sample records from {{ package.identifier.catalogSlug }}/{{
+                package.identifier.packageSlug
+            }}
+        </span>
         <button mat-button mat-dialog-close class="ml-auto dialog-close" (click)="close()">close</button>
     </div>
     <app-schema-samples [schema]="schema"></app-schema-samples>

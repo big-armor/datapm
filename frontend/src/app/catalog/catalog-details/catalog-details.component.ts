@@ -35,6 +35,7 @@ export class CatalogDetailsComponent implements OnInit {
                 this.currentTab = 0;
                 this.updateTabParam();
             } else {
+                this.currentTab = index;
                 this.updateTabParam();
             }
         });

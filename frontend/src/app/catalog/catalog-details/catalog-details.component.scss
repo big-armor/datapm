@@ -9,12 +9,16 @@
         border-radius: 4px;
     }
 
+    .header-border {
+        top: -1.3rem;
+    }
+
     ::ng-deep.cover {
         margin-bottom: -25px;
     }
 
     ::ng-deep.mat-tab-header {
-        border-bottom: 1px solid rgb(0 0 0 / 8%) !important;
+        border-bottom: none;
     }
 
     .catalog-tabs {
@@ -56,5 +60,8 @@
 @media (max-width: 576px) {
     .catalog-details {
         padding: 0px !important;
+        .header-border {
+            top: -0.8rem;
+        }
     }
 }

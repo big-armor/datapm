@@ -39,7 +39,11 @@ export class ClientWizardComponent implements OnInit {
         this.registryUrl = getRegistryURL();
 
         this.loading = true;
+        console.log("wow");
         combineLatest([this.apiKeysService.getMyApiKeys(), this.pacakgeService.package]).subscribe(([apiKeys, pkg]) => {
+            console.log("keys", apiKeys);
+            console.log("pkg", pkg);
+
             this.packageUrl = this.packageUrl =
                 this.registryUrl + "/" + pkg.package.identifier.catalogSlug + "/" + pkg.package.identifier.packageSlug;
 
@@ -51,12 +55,36 @@ export class ClientWizardComponent implements OnInit {
                 this.username = "username";
             }
 
-            this.hasApiKeys = apiKeys?.length > 0;
             this.loading = false;
+            this.hasApiKeys = apiKeys != null && apiKeys.length > 0;
             if (this.hasApiKeys) {
                 setTimeout(() => this.move(3), 200);
             }
         });
+    }
+
+    public moveToDownloadStep() {
+        if (this.currentUser) {
+            this.move(3);
+        } else {
+            this.move(2);
+        }
+    }
+
+    public isDownloadStepActive() {
+        if (this.currentUser) {
+            if (this.currentIndex == 3) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            if (this.currentIndex == 2) {
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 
     public move(index: number) {

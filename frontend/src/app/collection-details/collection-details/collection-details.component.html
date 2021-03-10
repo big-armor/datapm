@@ -1,68 +1,83 @@
-<div class="box-shadow"></div>
-<div class="collection-details container pt-4">
+<div class="collection-details container-fluid px-0 pt-2">
     <div *ngIf="state === 'SUCCESS'">
-        <app-cover [collectionSlug]="collectionSlug"></app-cover>
+        <div class="container">
+            <app-cover [collectionSlug]="collectionSlug"></app-cover>
 
-        <div class="collection-header pl-3">
-            <div *ngIf="collection.myPermissions.includes('MANAGE')" class="collections-public">
-                <span *ngIf="collection?.isPublic" class="public-text">public</span>
-                <span *ngIf="!collection?.isPublic" class="not-public-text">not public</span>
-            </div>
-            <div class="package-details-title mb-1">Collection: {{ collection?.name }}</div>
-            <div class="package-light-gray">{{ collectionSlug }}</div>
-            <div class="package-dark-gray">
-                {{ collection?.description }}
-            </div>
-        </div>
-
-        <mat-tab-group
-            [(selectedIndex)]="currentTab"
-            (selectedTabChange)="updateTabParam()"
-            class="collection-tabs mt-3"
-        >
-            <mat-tab label="Packages"></mat-tab>
-            <mat-tab label="Manage" *ngIf="canManage"></mat-tab>
-        </mat-tab-group>
-
-        <div *ngIf="currentTab === 0">
-            <div class="mt-4" *ngIf="collection.packages?.length > 0">
-                <p class="package-dark-gray ml-3">The following packages are included in this collection.</p>
-                <div class="mt-2 mb-4">
-                    <button class="app-outlined-button" (click)="addPackage()" *ngIf="canEdit">Add Package</button>
+            <div class="collection-header pl-3">
+                <div *ngIf="collection.myPermissions.includes('MANAGE')" class="collections-public">
+                    <span *ngIf="collection?.isPublic" class="public-text">public</span>
+                    <span *ngIf="!collection?.isPublic" class="not-public-text">not public</span>
+                </div>
+                <div class="d-flex bd-highlight">
+                    <div class="bd-highlight">
+                        <div class="package-details-title mb-1">Collection: {{ collection?.name }}</div>
+                    </div>
+                    <div class="ml-auto bd-highlight">
+                        <button class="app-outlined-button" (click)="sharePackage()">Share</button>
+                    </div>
+                </div>
+                <div class="package-light-gray">{{ collectionSlug }}</div>
+                <div class="package-dark-gray">
+                    {{ collection?.description }}
                 </div>
             </div>
-            <app-package-item
-                [item]="package"
-                [hasImage]="true"
-                actionButtonText="Remove From Collection"
-                [shouldShowActionButton]="canEdit"
-                (action)="removePackage(package)"
-                *ngFor="let package of collection.packages"
+        </div>
+
+        <div class="container">
+            <mat-tab-group
+                [(selectedIndex)]="currentTab"
+                (selectedTabChange)="updateTabParam()"
+                class="collection-tabs mt-3"
             >
-            </app-package-item>
-            <div class="dpm-no-data" *ngIf="!collection.packages?.length">
-                <p class="package-dark-gray ml-3">
-                    This collection either contains no packages, or you do not have permission to view the packages it
-                    contains.
-                </p>
-                <a class="app-outlined-button mt-2" (click)="addPackage()" *ngIf="canEdit">Add a package</a>
+                <mat-tab label="Packages"></mat-tab>
+                <mat-tab label="Manage" *ngIf="canManage"></mat-tab>
+            </mat-tab-group>
+        </div>
+        <hr class="header-border" />
+
+        <div class="container">
+            <div *ngIf="currentTab === 0">
+                <div class="mt-4" *ngIf="collection.packages?.length > 0">
+                    <p class="package-dark-gray ml-3">The following packages are included in this collection.</p>
+                    <div class="mt-2 mb-4">
+                        <button class="app-outlined-button" (click)="addPackage()" *ngIf="canEdit">Add Package</button>
+                    </div>
+                </div>
+                <app-package-item
+                    [item]="package"
+                    [hasImage]="true"
+                    actionButtonText="Remove From Collection"
+                    [shouldShowActionButton]="canEdit"
+                    (action)="removePackage(package)"
+                    *ngFor="let package of collection.packages"
+                >
+                </app-package-item>
+                <div class="dpm-no-data" *ngIf="!collection.packages?.length">
+                    <p class="package-dark-gray ml-3">
+                        This collection either contains no packages, or you do not have permission to view the packages
+                        it contains.
+                    </p>
+                    <a class="app-outlined-button mt-2" (click)="addPackage()" *ngIf="canEdit">Add a package</a>
+                </div>
+            </div>
+            <app-collection-permissions [collection]="collection" *ngIf="currentTab === 1"></app-collection-permissions>
+        </div>
+    </div>
+
+    <div class="container">
+        <div *ngIf="state === 'NOT_AUTHORIZED'">
+            <div class="dpm-no-data">
+                <p class="package-dark-gray ml-3">You do not have permission to view this collection.</p>
             </div>
         </div>
-        <app-collection-permissions [collection]="collection" *ngIf="currentTab === 1"></app-collection-permissions>
-    </div>
 
-    <div *ngIf="state === 'NOT_AUTHORIZED'">
-        <div class="dpm-no-data">
-            <p class="package-dark-gray ml-3">You do not have permission to view this collection.</p>
+        <div *ngIf="state === 'NOT_FOUND'">
+            <div class="dpm-no-data">
+                <p class="package-dark-gray ml-3">The requested collection was not found.</p>
+            </div>
         </div>
-    </div>
-
-    <div *ngIf="state === 'NOT_FOUND'">
-        <div class="dpm-no-data">
-            <p class="package-dark-gray ml-3">The requested collection was not found.</p>
+        <div class="dpm-page-loading" *ngIf="state === 'LOADING'">
+            <mat-spinner diameter="50"></mat-spinner>
         </div>
-    </div>
-    <div class="dpm-page-loading" *ngIf="state === 'LOADING'">
-        <mat-spinner></mat-spinner>
     </div>
 </div>

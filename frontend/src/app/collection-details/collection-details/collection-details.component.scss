@@ -23,10 +23,11 @@
         }
     }
 
-    .collection-tabs {
-        border-bottom: 1px solid $gray-5;
-        display: block;
+    .header-border {
+        top: -1.3rem;
+    }
 
+    .collection-tabs {
         ::ng-deep {
             .mat-tab-header {
                 border-bottom: none;
@@ -74,5 +75,8 @@
 @media (max-width: 576px) {
     .collection-details {
         padding: 0px !important;
+        .header-border {
+            top: -0.8rem;
+        }
     }
 }

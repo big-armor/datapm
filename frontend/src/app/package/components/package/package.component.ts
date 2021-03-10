@@ -11,6 +11,7 @@ import { LoginDialogComponent } from "src/app/shared/header/login-dialog/login-d
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { AddPackageComponent } from "src/app/collection-details/add-package/add-package.component";
 import { SnackBarService } from "src/app/services/snackBar.service";
+import { packageToIdentifier } from "src/app/helpers/IdentifierHelper";
 
 enum State {
     LOADING,
@@ -209,7 +210,7 @@ export class PackageComponent implements OnDestroy {
 
     public copyCommand() {
         const el = document.createElement("textarea");
-        el.value = this.package.identifier.catalogSlug + "/" + this.package.identifier.packageSlug;
+        el.value = packageToIdentifier(this.package.identifier);
         document.body.appendChild(el);
         el.select();
         document.execCommand("copy");

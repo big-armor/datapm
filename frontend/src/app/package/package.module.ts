@@ -34,7 +34,6 @@ import { PackageDeletionConfirmationComponent } from "./components/package/packa
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { MatChipsModule } from "@angular/material/chips";
 import { MatInputModule } from "@angular/material/input";
-import { SharePackageComponent } from "./components/package-info/share-package/share-package.component";
 import { DownloadPackageComponent } from "./components/package-info/download-package/download-package.component";
 import { ClientWizardComponent } from "./components/package-info/download-package/client-wizard/client-wizard.component";
 import { MatStepperModule } from "@angular/material/stepper";
@@ -56,7 +55,6 @@ import { MatSelectModule } from "@angular/material/select";
         PackagePermissionComponent,
         AddUserComponent,
         PackageDeletionConfirmationComponent,
-        SharePackageComponent,
         DownloadPackageComponent,
         ClientWizardComponent
     ],

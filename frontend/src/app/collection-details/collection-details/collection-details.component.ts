@@ -1,10 +1,10 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, Input, OnDestroy, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 import { ActivatedRoute, NavigationExtras, ParamMap, Router } from "@angular/router";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { PageState } from "src/app/models/page-state";
+import { ShareDialogComponent } from "src/app/shared/dialogs/share-dialog/share-dialog.component";
 import { EditCollectionComponent } from "src/app/shared/edit-collection/edit-collection.component";
 import {
     Collection,
@@ -24,13 +24,15 @@ type CollectionDetailsPageState = PageState | "NOT_AUTHORIZED" | "NOT_FOUND";
     styleUrls: ["./collection-details.component.scss"]
 })
 export class CollectionDetailsComponent implements OnInit, OnDestroy {
+    @Input() public package: Package;
+
     public collectionSlug: string = "";
     public collection: Collection;
     public state: CollectionDetailsPageState = "INIT";
     public currentTab = 0;
     private unsubscribe$: Subject<any> = new Subject();
 
-    private tabs = ["", "Manage"];
+    private tabs = ["", "manage"];
 
     constructor(
         private route: ActivatedRoute,
@@ -50,6 +52,7 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
                 this.currentTab = 0;
                 this.updateTabParam();
             } else {
+                this.currentTab = index;
                 this.updateTabParam();
             }
         });
@@ -60,6 +63,16 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
     ngOnDestroy() {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
+    }
+
+    public sharePackage() {
+        const dialogRef = this.dialog.open(ShareDialogComponent, {
+            data: {
+                displayName: this.collection.name,
+                url: "collections/" + this.collection.identifier.collectionSlug
+            },
+            width: "450px"
+        });
     }
 
     public updateTabParam() {
@@ -96,7 +109,6 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
                         return;
                     }
                     this.collection = data.collection as Collection;
-                    console.log(this.collection);
                     this.state = "SUCCESS";
                 },
                 () => {
