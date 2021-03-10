@@ -1057,6 +1057,14 @@ type Mutation {
     ): PackageIssue
 
     """
+    Delete a package issue
+    """
+    deletePackageIssue(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        packageIssueIdentifier: PackageIssueIdentifierInput!
+    ): Void
+
+    """
     Creates a package issue comment
     """
     createPackageIssueComment(

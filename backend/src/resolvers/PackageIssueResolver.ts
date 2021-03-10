@@ -42,6 +42,31 @@ export const getPackageIssue = async (
     return issue;
 };
 
+export const deletePackageIssue = async (
+    _0: any,
+    {
+        packageIdentifier,
+        packageIssueIdentifier
+    }: {
+        packageIdentifier: PackageIdentifierInput;
+        packageIssueIdentifier: PackageIssueIdentifierInput;
+    },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const packageEntity = await context.connection.manager
+        .getCustomRepository(PackageRepository)
+        .findPackageOrFail({ identifier: packageIdentifier });
+
+    const repository = context.connection.manager.getCustomRepository(PackageIssueRepository);
+    const issue = await repository.getByIssueNumberForPackage(packageEntity.id, packageIssueIdentifier.issueNumber);
+    if (!issue) {
+        throw new Error("ISSUE_NOT_FOUND");
+    }
+
+    await repository.delete(issue.id);
+};
+
 export const getIssuesByPackage = async (
     _0: any,
     {

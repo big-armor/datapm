@@ -7,6 +7,7 @@ import { ConfirmationDialogService } from "src/app/services/dialog/confirmation-
 import { ImageService } from "src/app/services/image.service";
 import {
     CreatePackageIssueCommentGQL,
+    DeletePackageIssueGQL,
     OrderBy,
     PackageIdentifierInput,
     PackageIssue,
@@ -59,6 +60,7 @@ export class PackageIssuesDetailComponent implements OnInit {
     constructor(
         private packageService: PackageService,
         private packageIssueGQL: PackageIssueGQL,
+        private deletePackageIssueGQL: DeletePackageIssueGQL,
         private packageIssueCommentsGQL: PackageIssueCommentsGQL,
         private createPackageIssueCommentGQL: CreatePackageIssueCommentGQL,
         private imageService: ImageService,
@@ -89,8 +91,8 @@ export class PackageIssuesDetailComponent implements OnInit {
 
     public openIssueEditor(): void {
         this.editingIssueErrorMessage = null;
-        this.editingIssue = true;
         this.packageIssueNewContent = this.packageIssue.content;
+        this.editingIssue = true;
     }
 
     public closeIssueEditor(): void {
@@ -109,10 +111,9 @@ export class PackageIssuesDetailComponent implements OnInit {
     }
 
     public openCommentEditor(comment: PackageIssueCommentWithEditorStatus): void {
-        console.log("editing comment", comment.commentId);
         comment.errorMessage = null;
-        comment.isEditing = true;
         comment.editedContent = comment.content;
+        comment.isEditing = true;
     }
 
     public closeCommentEditor(comment: PackageIssueCommentWithEditorStatus): void {
@@ -129,7 +130,16 @@ export class PackageIssuesDetailComponent implements OnInit {
             })
             .subscribe((confirmation) => {
                 if (confirmation) {
-                    this.router.navigate(["../"], { relativeTo: this.route });
+                    this.deletePackageIssueGQL
+                        .mutate({
+                            packageIdentifier: this.packageIdentifier,
+                            packageIssueIdentifier: { issueNumber: this.packageIssue.issueNumber }
+                        })
+                        .subscribe((response) => {
+                            if (!response.errors) {
+                                this.router.navigate(["../"], { relativeTo: this.route });
+                            }
+                        });
                 }
             });
     }

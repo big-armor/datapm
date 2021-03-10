@@ -154,6 +154,7 @@ import { myActivity, packageActivities } from "./resolvers/ActivityLogResolver";
 import { removePackagePermissions, setPackagePermissions } from "./resolvers/UserPackagePermissionResolver";
 import {
     createPackageIssue,
+    deletePackageIssue,
     getIssuesByPackage,
     getPackageIssue,
     getPackageIssueAuthor
@@ -590,7 +591,9 @@ export const resolvers: {
         deletePackage: deletePackage,
         packageFetched: packageFetched,
 
+        // Package issues
         createPackageIssue: createPackageIssue,
+        deletePackageIssue: deletePackageIssue,
         createPackageIssueComment: createPackageIssueComment,
 
         // Package Permissions
