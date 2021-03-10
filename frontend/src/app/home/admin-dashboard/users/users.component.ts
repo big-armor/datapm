@@ -46,7 +46,7 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
         private deleteUserGQL: AdminDeleteUserGQL,
         private changeDetectorRef: ChangeDetectorRef,
         private confirmationDialogService: ConfirmationDialogService
-    ) { }
+    ) {}
 
     public ngAfterViewInit(): void {
         this.subscribeToPageChangeEvent();
