@@ -59,6 +59,15 @@
                 }
             }
 
+            .clickable-text {
+                color: $color-info;
+                cursor: pointer;
+            }
+
+            .issue-tab-item {
+                cursor: pointer;
+            }
+
             .right-tab {
                 float: right;
                 margin-right: 0px;
@@ -66,6 +75,7 @@
 
             .active {
                 color: $gray-1;
+                font-weight: bold;
             }
 
             .img-comments {

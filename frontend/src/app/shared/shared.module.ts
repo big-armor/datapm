@@ -58,10 +58,10 @@ import { MatChipsModule } from "@angular/material/chips";
 import { PackageAndCollectionComponent } from "./package-and-collection/package-and-collection.component";
 import { CollectionsHorizontalListComponent } from "./package-and-collection/collections-horizontal-list/collections-horizontal-list.component";
 import { MatCheckboxModule } from "@angular/material/checkbox";
-import { LMarkdownEditorModule } from "ngx-markdown-editor";
 import { MarkdownEditorComponent } from "./markdown-editor/markdown-editor.component";
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { ShareDialogComponent } from "./dialogs/share-dialog/share-dialog.component";
+import { AngularSimplemdeModule } from "angular-simplemde";
 
 @NgModule({
     declarations: [
@@ -125,11 +125,11 @@ import { ShareDialogComponent } from "./dialogs/share-dialog/share-dialog.compon
         MatSlideToggleModule,
         MatTableModule,
         MatChipsModule,
-        LMarkdownEditorModule,
         MatTooltipModule,
         FormsModule,
         ReactiveFormsModule,
-        RouterModule
+        RouterModule,
+        AngularSimplemdeModule
     ],
     exports: [
         HeaderComponent,

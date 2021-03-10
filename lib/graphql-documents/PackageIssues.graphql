@@ -1,5 +1,19 @@
-query PackageIssues($packageIdentifier: PackageIdentifierInput!, $offset: Int!, $limit: Int!, $orderBy: OrderBy!) {
-    packageIssues(packageIdentifier: $packageIdentifier, offset: $offset, limit: $limit, orderBy: $orderBy) {
+query PackageIssues(
+    $packageIdentifier: PackageIdentifierInput!
+    $includeOpenIssues: Boolean!
+    $includeClosedIssues: Boolean!
+    $offset: Int!
+    $limit: Int!
+    $orderBy: OrderBy!
+) {
+    packageIssues(
+        packageIdentifier: $packageIdentifier
+        offset: $offset
+        includeOpenIssues: $includeOpenIssues
+        includeClosedIssues: $includeClosedIssues
+        limit: $limit
+        orderBy: $orderBy
+    ) {
         issues {
             issueNumber
             subject

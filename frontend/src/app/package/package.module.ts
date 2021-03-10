@@ -41,10 +41,8 @@ import { MatSelectModule } from "@angular/material/select";
 import { PackageIssuesComponent } from "./components/package-issues/package-issues.component";
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { PackageIssuesDetailComponent } from "./components/package-issues/package-issues-detail/package-issues-detail.component";
-import { EditorModule } from "@tinymce/tinymce-angular";
 import { MatMenuModule } from "@angular/material/menu";
 import { CreatePackageIssueComponent } from "./components/package-issues/create-package-issue/create-package-issue.component";
-import { LMarkdownEditorModule } from "ngx-markdown-editor";
 
 @NgModule({
     declarations: [
@@ -75,7 +73,6 @@ import { LMarkdownEditorModule } from "ngx-markdown-editor";
         PackageRoutingModule,
         MatButtonModule,
         MatExpansionModule,
-        EditorModule,
         MatIconModule,
         MatTabsModule,
         MatChipsModule,
@@ -93,7 +90,6 @@ import { LMarkdownEditorModule } from "ngx-markdown-editor";
         MatSelectModule,
         MatStepperModule,
         TableVirtualScrollModule,
-        LMarkdownEditorModule,
         MarkdownModule.forChild(),
         MatTooltipModule
     ]

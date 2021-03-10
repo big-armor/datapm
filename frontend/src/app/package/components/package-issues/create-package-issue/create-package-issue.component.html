@@ -1,8 +1,10 @@
 <div class="container" id="createIssue">
     <div class="row">
         <div class="col-md-12 p-0">
-            <ng-container *ngIf="!loading">
-                <div class="package-details-title mb-2">Describe Issue for {{ package.displayName }}</div>
+            <ng-container>
+                <div class="package-details-title mb-2">
+                    Describe Issue for <span *ngIf="!loading">{{ package.displayName }}</span>
+                </div>
                 <div class="package-light-gray">Describe the issue in enough detail for others to help you</div>
                 <br />
                 <div class="col-md-9 rounded-input p-0">
@@ -25,7 +27,7 @@
                             <button
                                 class="app-raised-button ml-2"
                                 (click)="submitNewIssue()"
-                                [disabled]="isInvalidIssue()"
+                                [disabled]="cannotSubmit()"
                             >
                                 Submit new issue
                             </button>

@@ -1,10 +1,3 @@
 <div id="markdownEditor">
-    <md-editor
-        name="Content"
-        required
-        maxlength="500"
-        [(ngModel)]="content"
-        (ngModelChange)="contentChange.emit(content)"
-        [options]="EDITOR_OPTIONS"
-    ></md-editor>
+    <angular-simplemde [(input)]="content" (inputChange)="contentChange.emit(content)"></angular-simplemde>
 </div>

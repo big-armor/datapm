@@ -27,14 +27,24 @@ export class PackageIssueRepository extends Repository<PackageIssueEntity> {
 
     public getIssuesByPackage(
         packageId: number,
+        includeOpenIssues: boolean,
+        includeClosedIssues: boolean,
         offset: number,
         limit: number,
         orderBy: OrderBy = OrderBy.CREATED_AT,
         relations: string[] = []
     ): Promise<[PackageIssueEntity[], number]> {
         const ALIAS = "PackageIssueEntity";
-        return this.createQueryBuilder()
-            .where('"PackageIssueEntity"."package_id" = :packageId')
+
+        let queryBuilder = this.createQueryBuilder().where('"PackageIssueEntity"."package_id" = :packageId');
+
+        if (includeOpenIssues && !includeClosedIssues) {
+            queryBuilder = queryBuilder.andWhere(`"PackageIssueEntity"."status" = 'OPEN'`);
+        } else if (!includeOpenIssues && includeClosedIssues) {
+            queryBuilder = queryBuilder.andWhere(`"PackageIssueEntity"."status" = 'CLOSED'`);
+        }
+
+        return queryBuilder
             .setParameter("packageId", packageId)
             .offset(offset)
             .limit(limit)

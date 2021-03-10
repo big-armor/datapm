@@ -15,6 +15,7 @@ export class CreatePackageIssueComponent implements OnInit, OnDestroy {
 
     public package: Package;
     public loading = false;
+    public submitting = false;
 
     public subject: string = "";
     public content: string = "";
@@ -35,16 +36,16 @@ export class CreatePackageIssueComponent implements OnInit, OnDestroy {
         this.destroy.complete();
     }
 
-    public isInvalidIssue(): boolean {
-        return !this.isValidIssue();
+    public cannotSubmit(): boolean {
+        return !this.canSubmit();
     }
 
-    public isValidIssue(): boolean {
-        return this.content.trim().length > 0 && this.subject.trim().length > 0;
+    public canSubmit(): boolean {
+        return this.content.trim().length > 0 && this.subject.trim().length > 0 && !this.loading && !this.submitting;
     }
 
     public submitNewIssue(): void {
-        if (this.isInvalidIssue()) {
+        if (this.cannotSubmit()) {
             return;
         }
 
@@ -58,6 +59,7 @@ export class CreatePackageIssueComponent implements OnInit, OnDestroy {
             packageSlug: this.package.identifier.packageSlug
         };
 
+        this.loading = true;
         this.createPackageIssueGQL.mutate({ issue, packageIdentifier }).subscribe((issue) => {
             if (issue.errors) {
                 return;

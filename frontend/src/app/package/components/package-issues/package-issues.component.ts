@@ -3,15 +3,20 @@ import { SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Subject } from "rxjs";
 import { ImageService } from "src/app/services/image.service";
-import {
-    OrderBy,
-    Package,
-    PackageIdentifier,
-    PackageIdentifierInput,
-    PackageIssue,
-    PackageIssuesGQL
-} from "src/generated/graphql";
+import { OrderBy, PackageIdentifierInput, PackageIssue, PackageIssuesGQL } from "src/generated/graphql";
 import { PackageService } from "../../services/package.service";
+
+enum State {
+    INIT,
+    SUCCESS,
+    LOADING,
+    LOADING_MORE_ISSUES,
+    NO_ISSUES,
+    NO_OPEN_ISSUES,
+    NO_CLOSED_ISSUES,
+    OPEN_ISSUES,
+    CLOSED_ISSUES
+}
 
 @Component({
     selector: "app-package-issues",
@@ -19,12 +24,19 @@ import { PackageService } from "../../services/package.service";
     styleUrls: ["./package-issues.component.scss"]
 })
 export class PackageIssuesComponent implements OnInit, OnDestroy {
+    public readonly State = State;
+
     private readonly ISSUES_PER_PAGE_COUNT = 10;
     private readonly onDestory = new Subject();
+
+    public state: State = State.INIT;
 
     public issues: PackageIssue[] = [];
     public hasMore: boolean = false;
     public loading: boolean = false;
+
+    public includeOpenIssues: boolean = true;
+    public includeClosedIssues: boolean = false;
 
     public rren: boolean = false;
 
@@ -60,7 +72,26 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
         return this.imageService.loadUserAvatar(username);
     }
 
+    public toggleIncludeOpenIssues(): void {
+        this.includeOpenIssues = true;
+        this.includeClosedIssues = false;
+        this.loadPackageIssues(true);
+    }
+
+    public toggleIncludeClosedIssues(): void {
+        this.includeClosedIssues = true;
+        this.includeOpenIssues = false;
+        this.loadPackageIssues(true);
+    }
+
+    public toggleIncludeAllIssues(): void {
+        this.includeOpenIssues = true;
+        this.includeClosedIssues = true;
+        this.loadPackageIssues(true);
+    }
+
     private loadPackage(): void {
+        this.state = State.LOADING;
         this.packageService.package.subscribe((packageResponse) => {
             this.packageIdentifier = {
                 catalogSlug: packageResponse.package.identifier.catalogSlug,
@@ -72,8 +103,12 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
     }
 
     private loadPackageIssues(resetCollection: boolean = false): void {
+        this.state = resetCollection ? State.LOADING : State.LOADING_MORE_ISSUES;
+
         const variables = {
             packageIdentifier: this.packageIdentifier,
+            includeOpenIssues: this.includeOpenIssues,
+            includeClosedIssues: this.includeClosedIssues,
             offset: this.offset,
             limit: this.ISSUES_PER_PAGE_COUNT,
             orderBy: OrderBy.UPDATED_AT
@@ -92,6 +127,22 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
             } else {
                 this.issues.push(...responseData.issues);
             }
+            this.updateState();
         });
+    }
+
+    private updateState(): void {
+        if (this.issues.length > 0) {
+            this.state = State.SUCCESS;
+            return;
+        }
+
+        if (this.includeOpenIssues && this.includeClosedIssues) {
+            this.state = State.NO_ISSUES;
+        } else if (this.includeOpenIssues && !this.includeClosedIssues) {
+            this.state = State.NO_OPEN_ISSUES;
+        } else if (!this.includeOpenIssues && this.includeClosedIssues) {
+            this.state = State.NO_CLOSED_ISSUES;
+        }
     }
 }

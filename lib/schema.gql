@@ -750,6 +750,8 @@ type Query {
     """
     packageIssues(
         packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        includeOpenIssues: Boolean!
+        includeClosedIssues: Boolean!
         offset: Int!
         limit: Int!
         orderBy: OrderBy!

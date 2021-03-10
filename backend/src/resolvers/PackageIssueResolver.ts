@@ -1,7 +1,12 @@
 import { AuthenticatedContext } from "../context";
 import { PackageIssueEntity } from "../entity/PackageIssueEntity";
 import { PackageIssueStatus } from "../entity/PackageIssueStatus";
-import { CreatePackageIssueInput, PackageIdentifierInput, PackageIssue, PackageIssueIdentifierInput } from "../generated/graphql";
+import {
+    CreatePackageIssueInput,
+    PackageIdentifierInput,
+    PackageIssue,
+    PackageIssueIdentifierInput
+} from "../generated/graphql";
 import { OrderBy } from "../repository/OrderBy";
 import { PackageIssueRepository } from "../repository/PackageIssueRepository";
 import { PackageRepository } from "../repository/PackageRepository";
@@ -41,10 +46,19 @@ export const getIssuesByPackage = async (
     _0: any,
     {
         packageIdentifier,
+        includeOpenIssues,
+        includeClosedIssues,
         offset,
         limit,
         orderBy
-    }: { packageIdentifier: PackageIdentifierInput; offset: number; limit: number; orderBy: OrderBy },
+    }: {
+        packageIdentifier: PackageIdentifierInput;
+        includeOpenIssues: boolean;
+        includeClosedIssues: boolean;
+        offset: number;
+        limit: number;
+        orderBy: OrderBy;
+    },
     context: AuthenticatedContext,
     info: any
 ) => {
@@ -56,7 +70,15 @@ export const getIssuesByPackage = async (
 
     const [issues, count] = await context.connection.manager
         .getCustomRepository(PackageIssueRepository)
-        .getIssuesByPackage(packageEntity.id, offset, limit, orderBy, relations);
+        .getIssuesByPackage(
+            packageEntity.id,
+            includeOpenIssues,
+            includeClosedIssues,
+            offset,
+            limit,
+            orderBy,
+            relations
+        );
 
     return {
         issues,

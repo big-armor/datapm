@@ -51,7 +51,7 @@
                         </div>
                         <div class="issue-box">
                             <div class="package-dark-gray">
-                                {{ packageIssue.content }}
+                                <markdown [data]="packageIssue.content"></markdown>
                             </div>
                         </div>
                     </div>
@@ -93,7 +93,8 @@
                             <div class="issue-box">
                                 <!-- <div class="package-dark-gray">{{ comment.content }}</div> -->
                                 <div class="package-dark-gray">
-                                    <app-markdown-editor [(content)]="comment.content"></app-markdown-editor>
+                                    <markdown [data]="comment.content"></markdown>
+                                    <!-- <app-markdown-editor [(content)]="comment.content"></app-markdown-editor> -->
                                     <div class="mt-2 text-right">
                                         <button class="app-outlined-button">Cancel</button>
                                         <button class="app-raised-button ml-2">Save</button>

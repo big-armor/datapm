@@ -1,76 +1,88 @@
 <div class="container p-0 mb-3" id="packageIssues">
     <div class="package-details-title" *ngIf="rren">Issues</div>
-
     <div>
         <p class="package-dark-gray">There are issues listed this package.</p>
         <button class="app-outlined-button" (click)="navigateToNewIssuePage()">Open a new issue</button>
     </div>
-    <!-- <div *ngIf="!loading && issues.length === 0">
-        <p class="package-dark-gray">
-            There are no open issues.
-            <a target="_blank" href="#">Click here to view closed issues.</a>
-        </p>
-    </div> -->
-    <div *ngIf="!loading; else loadingTemplate" class="main-wrapper">
+    <div class="main-wrapper">
         <div class="issue-wrapper issue-header">
-            <a href="#" class="issue-tab active"> Open </a>
-            <a href="#" class="issue-tab"> Closed </a>
-            <a href="#" class="issue-tab"> All </a>
+            <a (click)="toggleIncludeOpenIssues()" class="issue-tab issue-tab-item" [class.active]="includeOpenIssues">
+                Open
+            </a>
+            <a
+                (click)="toggleIncludeClosedIssues()"
+                class="issue-tab issue-tab-item"
+                [class.active]="includeClosedIssues"
+            >
+                Closed
+            </a>
+            <a
+                (click)="toggleIncludeAllIssues()"
+                class="issue-tab issue-tab-item"
+                [class.active]="includeOpenIssues && includeClosedIssues"
+            >
+                All
+            </a>
             <a class="issue-tab right-tab"> Opened by </a>
         </div>
         <!-- when there are opened or closed issues -->
-        <div *ngFor="let issue of issues" class="issue-wrapper">
-            <div class="d-flex flex-column bd-highlight">
-                <div class="d-flex flex-row bd-highlight">
-                    <div class="bd-highlight open-issue">
-                        <em class="fas fa-exclamation"></em>
-                    </div>
-                    <!-- <div class="bd-highlight closed-issue">
-                        <em class="fas fa-check"></em>
-                    </div> -->
-                    <div class="bd-highlight">
-                        <div class="bd-highlight">
-                            <a [routerLink]="issue.issueNumber"> {{ issue.subject }} </a>
+        <ng-container *ngIf="state === State.SUCCESS">
+            <div *ngFor="let issue of issues" class="issue-wrapper">
+                <div class="d-flex flex-column bd-highlight">
+                    <div class="d-flex flex-row bd-highlight">
+                        <div *ngIf="issue.status == 'OPEN'; else closedIssueIcon" class="bd-highlight open-issue">
+                            <em class="fas fa-exclamation"></em>
                         </div>
+                        <ng-template #closedIssueIcon class="bd-highlight closed-issue">
+                            <em class="fas fa-check"></em>
+                        </ng-template>
                         <div class="bd-highlight">
-                            <div class="package-light-gray">
-                                #{{ issue.issueNumber }} opened {{ issue.createdAt | timeAgo }} by
-                                {{ issue.author.username }}
+                            <div class="bd-highlight">
+                                <a [routerLink]="issue.issueNumber"> {{ issue.subject }} </a>
+                            </div>
+                            <div class="bd-highlight">
+                                <div class="package-light-gray">
+                                    #{{ issue.issueNumber }} opened {{ issue.createdAt | timeAgo }} by
+                                    {{ issue.author.username }}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="bd-highlight align-self-center ml-auto">
-                        <img class="img-comments" [src]="getUserAvatar(issue.author.username) | async" />
+                        <div class="bd-highlight align-self-center ml-auto">
+                            <img class="img-comments" [src]="getUserAvatar(issue.author.username) | async" />
+                        </div>
                     </div>
                 </div>
             </div>
+        </ng-container>
+
+        <!-- when issues are being loaded -->
+        <div class="issue-wrapper text-center" *ngIf="state === State.LOADING">
+            <div class="package-dark-gray py-5">Loading issues...</div>
         </div>
+
         <!-- when there are no open issues -->
-        <div class="issue-wrapper text-center" *ngIf="!loading && issues.length === 0">
+        <div class="issue-wrapper text-center" *ngIf="state === State.NO_OPEN_ISSUES">
             <div class="package-dark-gray py-5">
-                There are no open issues. Click to the 'closed' tab to view closed issues
+                There are no open issues. Click to the
+                <span class="clickable-text" (click)="toggleIncludeClosedIssues()">'closed'</span> tab to view closed
+                issues
             </div>
         </div>
         <!-- when there are no closed issues -->
-        <div class="issue-wrapper text-center" *ngIf="!loading && issues.length === 0">
+        <div class="issue-wrapper text-center" *ngIf="state === State.NO_CLOSED_ISSUES">
             <div class="package-dark-gray py-5">
-                There are no closed issues. Click to the 'open' tab to view opened issues
+                There are no closed issues. Click to the
+                <span class="clickable-text" (click)="toggleIncludeOpenIssues()">'open'</span> tab to view opened issues
             </div>
         </div>
         <!-- when there are no open/closed issues -->
-        <div class="issue-wrapper text-center" *ngIf="!loading && issues.length === 0">
+        <div class="issue-wrapper text-center" *ngIf="state === State.NO_ISSUES">
             <div class="package-dark-gray py-5">
-                There are no issues. Click to the 'open a new issue' button to create one issue.
+                There are no issues. Click to the
+                <span class="clickable-text" (click)="navigateToNewIssuePage()">'open a new issue'</span> button to
+                create one issue.
             </div>
         </div>
     </div>
-    <!-- <div *ngIf="rren">
-        <p class="package-dark-gray">Before opening a new issue, review the open issues below.</p>
-        <section class="example-section">
-            <mat-checkbox class="package-dark-gray"> include closed issues </mat-checkbox>
-        </section>
-    </div> -->
-    <!-- <app-package-issues-detail></app-package-issues-detail> -->
-    <!-- <app-create-package-issue></app-create-package-issue> -->
 </div>
 <ng-template #loadingTemplate> Loading... </ng-template>
