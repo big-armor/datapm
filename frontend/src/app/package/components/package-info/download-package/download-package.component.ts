@@ -2,7 +2,7 @@ import { Inject, ViewChild } from "@angular/core";
 import { Component, OnInit } from "@angular/core";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MatStepper } from "@angular/material/stepper";
-import { PackageFile, Schema } from "datapm-lib";
+import { PackageFile, Schema, Source } from "datapm-lib";
 import { SourceCategory } from "datapm-lib/src/capabilities/SourceCategory";
 import { SourceDescription } from "datapm-lib/src/capabilities/SourceDescription";
 import { Subject } from "rxjs";
@@ -26,7 +26,7 @@ export class DownloadPackageComponent implements OnInit {
 
     package: Package;
     packageFile: PackageFile;
-    schemas: Schema[] = [];
+    packageSources: Source[] = [];
 
     unsubscribe$ = new Subject();
 
@@ -50,10 +50,10 @@ export class DownloadPackageComponent implements OnInit {
             this.package = p.package;
             if (this.package && this.package.latestVersion) {
                 this.packageFile = JSON.parse(this.package.latestVersion.packageFile);
-                this.schemas = this.packageFile.schemas;
+                this.packageSources = this.packageFile.sources;
                 this.showRawFileButton =
-                    this.schemas.length > 0 &&
-                    this.schemas.filter((s) => s.source?.type?.toLocaleLowerCase() !== "http").length === 0;
+                    this.packageSources.length > 0 &&
+                    this.packageSources.filter((s) => s?.type?.toLocaleLowerCase() !== "http").length === 0;
             }
         });
     }

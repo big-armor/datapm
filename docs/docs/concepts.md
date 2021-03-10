@@ -9,13 +9,15 @@ DataPM stands for Data Package Manager, and consists of three major components.
 -   [Registry](registry-api.md)
 -   Clients: [Command Line](command-line-client.md) & Web Interface
 
-The registry holds packages, and the client performs actions such as searching for package and using the information in the packages to fetch data.
+The registry holds packages, and the client performs actions such as searching for packages and fetching data.
 
 This document explains the details of each component and important associated concepts.
 
 ## Registries
 
-The public global registry is available at [datapm.io](https://datapm.io) - and this is where you should start. Data owners publish data packages (currently consiting only of schemas) to this global public registry, and they can publish to their own private registries.
+The public global registry is available at [datapm.io](https://datapm.io) - and this is where you should start. Data publishers push data packages (currently consiting only of schemas) to this global public registry. The public registry supports both public and private data access use cases.
+
+You can host your own private DataPM registry, which is useful when your data security requirements do not allow for even meta-data about your data to leave your network.
 
 ### What is in a registry?
 
@@ -37,7 +39,7 @@ Also, a private DataPM registry is a great way to create catalogs of your organi
 
 ## Package Files
 
-Package Files are the descriptions of DataPM packages and contain the data schema, descriptions, and statistics about one or more data sets. Think of package files as you would a library index card. It doesn't contain the data itself - rather only a description of what data is available, how to obtain that data, and how to parse that data.
+Package Files contain metadata information, descriptions, and statistics about one or more data schemas. Think of package files as you would a library index card. It doesn't contain the data itself - rather only a description of what data is available, how to obtain, and how to parse that data.
 
 ### What is in a package file?
 

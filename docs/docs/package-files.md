@@ -60,6 +60,7 @@ The following are the top level properties in the DataPM Package File JSON file 
 | contactEmail    | String | Optional | The publishers email address                                                                                                                        |
 | packageSlug     | String | Required | The unique identifier for this package. lower case letters, numbers, and hyphens only. Must not start or end in a hyphen                            |
 | schemas         | Array  | Required | A set of schemas of the data that are available in the package. See Schemas section below.                                                          |
+| sources         | Array  | Required | See Source properties below                                                                                                                         |
 | updatedDate     | String | Required | The last updated date of the package file - not the data! In the ISO 8601 format                                                                    |
 | version         | String | Required | Semantic Versioning format of major.minor.patch                                                                                                     |
 | contributors    | Array  | Optional | A list of contributors for this package. See Contributors below                                                                                     |
@@ -67,28 +68,29 @@ The following are the top level properties in the DataPM Package File JSON file 
 | licenseFile     | String | Optional | Relative path, from the package file, to the LICENSE.md file for this package. Defaults to package-file-name-license.md or README.md in that order. |
 | readmeFile      | String | Optional | Relative path, from the package file, to the README.md for this package. Defaults to package-file-name.md or README.md in that order.               |
 | licenseMarkdown | String | Optional | Markdown formatted content that describes the license for the schema and data referenced.                                                           |
-| sampleRecords   | Array  | Optional | Extracted sample records for preview purposes.                                                                                                      |
-| readmeMarkdown  | String | Optional | Markdown formatted README content for the package.                                                                                                  |
-| registries      | Array  | Optional | See Registries properties below                                                                                                                     |
-| website         | String | Optional | Website of the person or organization that maintains and/or holds the license of this data. This is for attribution purposes only                   |
+
+| readmeMarkdown | String | Optional | Markdown formatted README content for the package. |
+| registries | Array | Optional | See Registries properties below |
+| website | String | Optional | Website of the person or organization that maintains and/or holds the license of this data. This is for attribution purposes only |
 
 ## Schemas
 
 These are the properties for the "schemas" top level array property. These schemas are validated both by the [JSON Schema Draft 07 specification](https://json-schema.org/specification-links.html#draft-7), and the DataPM Package file specification. This document contains only the properties listed in the DataPM specification - as they are generally more restrictive than the [JSON Schema Draft 07 specification](https://json-schema.org/specification-links.html#draft-7).
 
-| Property               |   Type   | Required | Description                                                                                                                                                              |
-| :--------------------- | :------: | :------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| parser                 |  Object  | Required | A configuration object describing the parser required for the data. See Parser section below                                                                             |
-| properties             |  Object  | Required | See Schema Properties table below                                                                                                                                        |
-| source                 |  Object  | Required | See Source properties below                                                                                                                                              |
-| byteCount              | Integer  | Optional | The exact or approximate number of bytes in the raw dataset. This should include only the 'values' and not the format, schema, or keys                                   |
-| byteCountApproximate   | Boolean  | Optional | Whether the provided byte count is approximate (true) or exact (false). Default is false (exact).                                                                        |
-| derivedFrom            | Object[] | Optional | See 'Derived From' properties                                                                                                                                            |
-| derivedFromDescription |  String  | Optional | A description, such as a SQL statement, or a human description of what actions were taken to derive the data in this schema.                                             |
-| recordsInspectedCount  | Integer  | Optional | The number of records inspected (not just counted) during generating this package.                                                                                       |
-| recordCount            | Integer  | Optional | The exact or estimated number of records in the data set. See recordCountPrecision                                                                                       |
-| recordCountPrecision   |  String  | Optional | Defines how to consider recordCount value. Either "EXACT", "APPROXIMATE", OR "GREATER_THAN".                                                                             |
-| unit                   |  String  | Optional | The noun(s) describing what each record represents. Example for Objects: Person, Location and Time, Point In Time, etc. Example for values: Meters, Degrees Celsius, etc |
+| Property   |  Type  | Required | Description                                                                                  |
+| :--------- | :----: | :------: | :------------------------------------------------------------------------------------------- |
+| parser     | Object | Required | A configuration object describing the parser required for the data. See Parser section below |
+| properties | Object | Required | See Schema Properties table below                                                            |
+
+| byteCount | Integer | Optional | The exact or approximate number of bytes in the raw dataset. This should include only the 'values' and not the format, schema, or keys |
+| byteCountApproximate | Boolean | Optional | Whether the provided byte count is approximate (true) or exact (false). Default is false (exact). |
+| derivedFrom | Object[] | Optional | See 'Derived From' properties |
+| derivedFromDescription | String | Optional | A description, such as a SQL statement, or a human description of what actions were taken to derive the data in this schema. |
+| recordsInspectedCount | Integer | Optional | The number of records inspected (not just counted) during generating this package. |
+| recordCount | Integer | Optional | The exact or estimated number of records in the data set. See recordCountPrecision |
+| recordCountPrecision | String | Optional | Defines how to consider recordCount value. Either "EXACT", "APPROXIMATE", OR "GREATER_THAN". |
+| sampleRecords | Array | Optional | Extracted sample records for preview purposes. |
+| unit | String | Optional | The noun(s) describing what each record represents. Example for Objects: Person, Location and Time, Point In Time, etc. Example for values: Meters, Degrees Celsius, etc |
 
 ## Schema Properties
 
@@ -100,12 +102,12 @@ The DataPM specification only additionally requires that the "type" field is spe
 
 These are the properties of the parser property of the top level schema object.
 
-| Property       |  Type  | Required | Description                                                                   |
-| :------------- | :----: | :------: | :---------------------------------------------------------------------------- |
-| type           | String | Required | The unique identifier for the source implementation.                          |
-| configuration  | Object | Optional | A plain JSON object with properties as defined by the source implementation.  |
-| lastUpdateHash | String | Optional | The last update hash provided by the source when generating the package file. |
-| uri            | String | Optional | The URI for accessing the data                                                |
+| Property       |   Type   | Required | Description                                                                   |
+| :------------- | :------: | :------: | :---------------------------------------------------------------------------- |
+| uris           | String[] | Required | An array of URIs from which to fetch the data                                 |
+| type           |  String  | Required | The unique identifier for the source implementation.                          |
+| configuration  |  Object  | Optional | A plain JSON object with properties as defined by the source implementation.  |
+| lastUpdateHash |  String  | Optional | The last update hash provided by the source when generating the package file. |
 
 ## Registries
 

@@ -89,11 +89,11 @@ describe("Upgrading package files automatically", function () {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("59749da9a9c40425a461acd629329dd6d6370f484de0379d84373510848239d7");
+        expect(responseHash).equal("08dc36313479034e9d8178328f530f8c6f4346a3b6688b0bc1154c2b3062680e");
 
         const packageFile = parsePackageFileJSON(responsePackageFileContents);
 
-        expect(packageFile.$schema).equals("https://datapm.io/docs/package-file-schema-v0.2.0.json");
+        expect(packageFile.$schema).equals("https://datapm.io/docs/package-file-schema-v0.3.0.json");
         expect(packageFile.licenseMarkdown).includes("This is not a real license. Just a test.");
     });
 });

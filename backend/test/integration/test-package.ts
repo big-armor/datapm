@@ -325,7 +325,7 @@ describe("Package Tests", async () => {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("435b885cb99b979f33c8ff1ee008ee79c67c0f6041bfdca46f6a0d9759839223");
+        expect(responseHash).equal("bf1184b458675a53c3f997c651559936999426199b9f67dcad55bcfc4b1e101b");
 
         const responsePackageFile = parsePackageFileJSON(responsePackageFileContents);
 
@@ -552,7 +552,7 @@ describe("Package Tests", async () => {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("435b885cb99b979f33c8ff1ee008ee79c67c0f6041bfdca46f6a0d9759839223");
+        expect(responseHash).equal("bf1184b458675a53c3f997c651559936999426199b9f67dcad55bcfc4b1e101b");
     });
 
     it("User A publish second version - fail no changes", async function () {
@@ -642,7 +642,6 @@ describe("Package Tests", async () => {
             })
             .catch((error: ErrorResponse) => {
                 let fetchResult = error.networkError as ServerError;
-                console.log(JSON.stringify(error, null, 1));
                 if (
                     fetchResult.result.errors.find((e: { extensions: { exception: { stacktrace: string[] } } }) => {
                         return (
@@ -718,7 +717,6 @@ describe("Package Tests", async () => {
         packageFileContents.schemas[0].properties!["new_column"] = {
             title: "new_column",
             recordCount: 1234,
-            byteCount: 5678,
             valueTypes: {
                 string: {
                     recordCount: 3238,
@@ -757,7 +755,6 @@ describe("Package Tests", async () => {
         packageFileContents.schemas[0].properties!["new_column"] = {
             title: "new_column",
             recordCount: 1234,
-            byteCount: 5678,
             valueTypes: {
                 string: {
                     recordCount: 3238,

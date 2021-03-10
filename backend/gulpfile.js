@@ -33,11 +33,18 @@ function copyDataPMLib() {
     return exec("cp -R ../lib/dist dist/node_modules/datapm-lib");
 }
 
+function slimTypeOrmDist() {
+    return exec(
+        "rm -rf browser aurora-data-api* cockroachdb cordova expo mongodb mysql react-native sap sqlite* sqljs sqlserver",
+        { cwd: "dist/node_modules/typeorm" }
+    );
+}
+
 function execLogCb(err, stdout, stderr) {
     console.log(stdout); // outputs the normal messages
     console.log(stderr); // outputs the error messages
     return err; // makes gulp continue even if the command failed
 }
 
-exports.default = series(copyFiles, copyEmailTemplates, copyModules, copyDataPMLib);
+exports.default = series(copyFiles, copyEmailTemplates, copyModules, copyDataPMLib, slimTypeOrmDist);
 exports.copyDependencies = series(copyModules, copyDataPMLib);

@@ -1,4 +1,4 @@
-import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
+import { ApolloClient, FetchResult, NormalizedCacheObject } from "@apollo/client/core";
 import { createUser } from "./test-utils";
 import {
     CreatePackageDocument,
@@ -20,7 +20,8 @@ import {
     DeleteVersionDocument,
     DeletePackageDocument,
     CreateCatalogDocument,
-    DeleteCatalogDocument
+    DeleteCatalogDocument,
+    CreateVersionMutation
 } from "./registry-client";
 import { expect } from "chai";
 import { loadPackageFileFromDisk } from "datapm-lib";
@@ -195,18 +196,26 @@ describe("Activity Log Tests", async () => {
 
         const packageFileString = JSON.stringify(packageFileContents);
 
-        let response = await userOneClient.mutate({
-            mutation: CreateVersionDocument,
-            variables: {
-                identifier: {
-                    catalogSlug: "testOne-packages",
-                    packageSlug: "congressional-legislators"
-                },
-                value: {
-                    packageFile: packageFileString
+        let response: FetchResult<CreateVersionMutation, Record<string, any>, Record<string, any>> | null = null;
+
+        try {
+            response = await userOneClient.mutate({
+                mutation: CreateVersionDocument,
+                variables: {
+                    identifier: {
+                        catalogSlug: "testOne-packages",
+                        packageSlug: "congressional-legislators"
+                    },
+                    value: {
+                        packageFile: packageFileString
+                    }
                 }
-            }
-        });
+            });
+        } catch (error) {
+            console.log(JSON.stringify(error, null, 1));
+
+            expect.fail("There was an error - " + error.message);
+        }
 
         expect(response.errors == null, "no errors").true;
 
