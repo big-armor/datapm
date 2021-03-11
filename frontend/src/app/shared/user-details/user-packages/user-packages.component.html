@@ -10,16 +10,16 @@
                     <span *ngIf="isCurrentUser" class="package-dark-gray">
                         You have no published packages on this registry.
                         <a href="/docs/publish-data" target="_blank">
-                            <span style="font-size: 13px;">Learn how to publish a package.</span>
+                            <span style="font-size: 13px">Learn how to publish a package.</span>
                         </a>
                     </span>
 
                     <p *ngIf="!isCurrentUser && packages.length > 0" class="package-dark-gray">
-                        Packages of data published by <span style="font-weight: 500;">{{ username }}</span
+                        Packages of data published by <span style="font-weight: 500">{{ username }}</span
                         >.
                     </p>
                     <p *ngIf="!isCurrentUser && packages.length == 0" class="package-dark-gray">
-                        Either <span style="font-weight: 500;">{{ username }}</span> has not published a package, or you
+                        Either <span style="font-weight: 500">{{ username }}</span> has not published a package, or you
                         do not have permission to any of the packages they have published.
                     </p>
                 </div>

@@ -1,23 +1,10 @@
 @import "../../../../../styles/variables";
 
 #createIssue {
-    .comment-section {
-        background: #fff;
-    }
-
-    ::ng-deep .tox-tinymce {
-        border: 1px solid #cccccc73;
-        border-radius: 6px;
-    }
-
-    .dpm-input-square {
-        background: #fff;
-    }
-
     .app-raised-button {
         font-size: 13px;
         border-radius: 4px;
-        border: 1px solid #ddd;
+        border: 1px solid $gray-9;
         line-height: 15px;
 
         &:disabled {
@@ -26,22 +13,46 @@
         }
     }
 
-    ::ng-deep .tox {
-        .tox-statusbar {
-            display: none !important;
+    .app-outlined-button {
+        padding: 8px 20px;
+        line-height: 15px;
+        color: $gray-2;
+    }
+
+    ::ng-deep {
+        .editor-statusbar {
+            color: #2c3e50;
+            background-color: $gray-6;
+            border-bottom: 1px solid $gray-9;
+            border-left: 1px solid $gray-9;
+            border-right: 1px solid $gray-9;
         }
 
-        .tox-toolbar,
-        .tox-toolbar__overflow,
-        .tox-toolbar__primary {
-            background: none !important;
-            border-bottom: 1px solid #cccccc73;
-            background-color: #f3f3f3 !important;
+        .CodeMirror {
+            font-family: $family-roboto;
+            letter-spacing: 0.4px;
+            background-color: #fbfbfb;
+            border-bottom-left-radius: 0px;
+            border-bottom-right-radius: 0px;
+
+            &:hover {
+                background-color: $white;
+            }
         }
 
-        .tox-toolbar__group {
-            &:first-child {
-                display: none;
+        .editor-toolbar {
+            opacity: 1;
+            background-color: $gray-6;
+            border-top: 1px solid $gray-9;
+            border-left: 1px solid $gray-9;
+            border-right: 1px solid $gray-9;
+
+            &::after {
+                margin-top: 3px;
+            }
+
+            &::before {
+                margin-bottom: 3px;
             }
         }
     }

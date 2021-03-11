@@ -35,7 +35,7 @@
         <ng-container matColumnDef="name">
             <th mat-header-cell *matHeaderCellDef scope="col">Name</th>
             <td class="table-content" mat-cell *matCellDef="let user">
-                <div style="display: flex; justify-content: start; align-content: center;">
+                <div style="display: flex; justify-content: start; align-content: center">
                     <a class="ml-2" [routerLink]="'/' + user.username"
                         ><app-avatar [user]="user" [size]="24"></app-avatar
                     ></a>

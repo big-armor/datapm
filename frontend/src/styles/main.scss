@@ -7,7 +7,7 @@ html,
 body {
     height: 100%;
     overflow-x: hidden;
-    background-color: $gray-11;
+    background-color: $gray-12;
 }
 
 a {
@@ -205,7 +205,7 @@ table.gray-table {
         outline: none;
         letter-spacing: 1px;
         font-family: $family-roboto;
-        background-color: $gray-7;
+        background-color: #fbfbfb;
         transition: background-color ease 0.5s;
 
         &:hover {
