@@ -32,9 +32,9 @@
                 <div class="px-2 bd-highlight" style="z-index: 99">
                     <img [src]="getUserAvatar(packageIssue.author.username) | async" class="img-comments" alt="hello" />
                 </div>
-                <div class="px-2 bd-highlight w-100">
-                    <div class="issue-wrapper">
-                        <div class="issue-header d-flex bd-highlight">
+                <div class="pl-2 bd-highlight w-100">
+                    <div class="issue-wrapper issues-bg">
+                        <div class="issue-header d-flex bd-highlight" [class.d-none]="editingIssue">
                             <div class="mr-auto bd-highlight">
                                 <p class="package-dark-gray font-12">
                                     <span class="font-500">{{ packageIssue.author.username }}</span>
@@ -50,20 +50,17 @@
                                         <span class="package-dark-gray">Edit</span>
                                     </button>
                                     <button mat-menu-item id="issueBtn">
-                                        <span class="package-dark-gray">Copy</span>
+                                        <span class="package-dark-gray">Delete</span>
                                     </button>
                                 </mat-menu>
                             </div>
                         </div>
-                        <div class="issue-box">
+                        <div class="issue-box" [class.no-padding]="editingIssue">
                             <div class="package-dark-gray">
-                                <markdown
-                                    *ngIf="!editingIssue; else issueEditor"
-                                    [data]="packageIssue.content"
-                                ></markdown>
-                                <ng-template #issueEditor>
-                                    <app-markdown-editor [content]="packageIssue.content"></app-markdown-editor>
-                                    <div class="mt-2 text-right">
+                                <markdown *ngIf="!editingIssue" [data]="packageIssue.content"></markdown>
+                                <div [class.d-none]="!editingIssue">
+                                    <app-markdown-editor [(content)]="packageIssueEditedContent"></app-markdown-editor>
+                                    <div class="text-right" [class.button-padding]="editingIssue">
                                         <button class="app-outlined-button" (click)="closeIssueEditor()">Cancel</button>
                                         <button
                                             class="app-raised-button ml-2"
@@ -73,7 +70,7 @@
                                             Save
                                         </button>
                                     </div>
-                                </ng-template>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -89,9 +86,9 @@
                             alt="hello"
                         />
                     </div>
-                    <div class="px-2 bd-highlight w-100">
+                    <div class="pl-2 bd-highlight w-100">
                         <div class="issue-wrapper comment-bg">
-                            <div class="issue-header d-flex bd-highlight">
+                            <div class="issue-header d-flex bd-highlight" [class.d-none]="comment.isEditing">
                                 <div class="mr-auto bd-highlight">
                                     <p class="package-dark-gray font-12">
                                         <span class="font-500">{{ comment.author.username }}</span>
@@ -112,7 +109,7 @@
                                     </mat-menu>
                                 </div>
                             </div>
-                            <div class="issue-box">
+                            <div class="issue-box" [class.no-padding]="comment.isEditing">
                                 <div class="package-dark-gray">
                                     <markdown
                                         *ngIf="!comment.isEditing; else commentEditorTemplate"
@@ -120,7 +117,7 @@
                                     ></markdown>
                                     <ng-template #commentEditorTemplate>
                                         <app-markdown-editor [(content)]="comment.editedContent"></app-markdown-editor>
-                                        <div class="mt-2 text-right">
+                                        <div class="text-right" [class.button-padding]="comment.isEditing">
                                             <button class="app-outlined-button" (click)="closeCommentEditor(comment)">
                                                 Cancel
                                             </button>
@@ -140,15 +137,17 @@
                                     </ng-template>
                                 </div>
                             </div>
+                            <div class="comment-icon" [class.d-none]="comment.isEditing">
+                                <em class="far fa-comment fa-flip-horizontal mr-2"></em>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div>
+            <div class="container text-center pl-5 mt-3" *ngIf="hasMoreComments">
                 <button
-                    mat-button
-                    *ngIf="hasMoreComments"
+                    class="app-outlined-button ctaButton"
                     [disabled]="loadingMoreComments"
                     (click)="loadPackageIssueComments()"
                 >
@@ -157,8 +156,13 @@
             </div>
             <div class="comment-section">
                 <app-markdown-editor [(content)]="newCommentContent"></app-markdown-editor>
-                <div class="mt-2 text-right">
-                    <button class="app-outlined-button">Close issue</button>
+                <div class="mt-3 text-right">
+                    <button *ngIf="packageIssue.status === 'OPEN'" class="app-outlined-button" style="color: #4f4f4f">
+                        Close issue
+                    </button>
+                    <button *ngIf="packageIssue.status === 'CLOSED'" class="app-outlined-button" style="color: #4f4f4f">
+                        Reopen issue
+                    </button>
                     <button
                         class="app-raised-button ml-2"
                         [disabled]="submittingNewComment || !isValidNewCommentContent()"

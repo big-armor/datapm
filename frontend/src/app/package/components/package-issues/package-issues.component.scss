@@ -7,9 +7,28 @@
         }
     }
 
+    .menu-btn {
+        padding: 0px;
+        min-width: 28px;
+        font-weight: $weight-400;
+        line-height: unset;
+
+        &:hover {
+            background-color: transparent;
+            background: transparent;
+            text-decoration: none;
+            color: $color-info;
+        }
+
+        button {
+            height: 30px;
+        }
+    }
+
     ::ng-deep.mat-checkbox-inner-container {
         height: 14px;
         width: 14px;
+        margin: 3px 15px 0px 0px;
     }
 
     .open-issue {
@@ -18,8 +37,10 @@
             font-size: 8px;
             border: 2px solid $color-info;
             border-radius: 50%;
-            padding: 3px 5px;
+            padding: 2px 4px;
             margin-right: 10px;
+            position: relative;
+            bottom: 2px;
         }
     }
 
@@ -29,8 +50,10 @@
             font-size: 8px;
             border: 2px solid $color-danger;
             border-radius: 50%;
-            padding: 3px 3px;
+            padding: 2px 2px;
             margin-right: 10px;
+            position: relative;
+            bottom: 2px;
         }
     }
 
@@ -45,12 +68,22 @@
             padding: 10px 30px;
             border: 1px solid $gray-5;
 
+            .package-details-title {
+                font-size: $default-font;
+
+                &:hover {
+                    text-decoration: none;
+                    color: $color-info;
+                }
+            }
+
             .issue-tab {
                 font-family: $family-roboto;
                 font-weight: $weight-400;
-                font-size: ($text-font - 1);
+                font-size: $text-font;
                 letter-spacing: 0.4px;
                 margin-right: 10px;
+                cursor: pointer;
                 color: $gray-3;
 
                 &:hover {
@@ -59,23 +92,22 @@
                 }
             }
 
+            .right-tab {
+                float: right;
+                margin-right: 0px;
+
+                &:hover {
+                    color: $gray-3;
+                }
+            }
+
             .clickable-text {
                 color: $color-info;
                 cursor: pointer;
             }
 
-            .issue-tab-item {
-                cursor: pointer;
-            }
-
-            .right-tab {
-                float: right;
-                margin-right: 0px;
-            }
-
             .active {
                 color: $gray-1;
-                font-weight: bold;
             }
 
             .img-comments {

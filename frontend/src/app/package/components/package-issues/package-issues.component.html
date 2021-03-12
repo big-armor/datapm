@@ -6,13 +6,20 @@
     </div>
     <div class="main-wrapper">
         <div class="issue-wrapper issue-header">
-            <a (click)="toggleIncludeOpenIssues()" class="issue-tab issue-tab-item" [class.active]="includeOpenIssues">
+            <a class="example-section">
+                <mat-checkbox> </mat-checkbox>
+            </a>
+            <a
+                (click)="toggleIncludeOpenIssues()"
+                class="issue-tab issue-tab-item"
+                [class.active]="includeOpenIssues && !includeClosedIssues"
+            >
                 Open
             </a>
             <a
                 (click)="toggleIncludeClosedIssues()"
                 class="issue-tab issue-tab-item"
-                [class.active]="includeClosedIssues"
+                [class.active]="!includeOpenIssues && includeClosedIssues"
             >
                 Closed
             </a>
@@ -24,38 +31,64 @@
                 All
             </a>
             <a class="issue-tab right-tab"> Opened by </a>
+            <div class="bd-highlight right-tab">
+                <a [matMenuTriggerFor]="menu" class="menu-btn mr-3 issue-tab">
+                    Actions <i class="fas fa-chevron-down"></i>
+                </a>
+                <mat-menu #menu="matMenu">
+                    <button mat-menu-item id="issueBtn" *ngIf="includeOpenIssues">
+                        <span class="package-dark-gray">Close</span>
+                    </button>
+                    <button mat-menu-item id="issueBtn" *ngIf="includeClosedIssues">
+                        <span class="package-dark-gray">Reopen</span>
+                    </button>
+                    <button mat-menu-item id="issueBtn">
+                        <span class="package-dark-gray">Delete</span>
+                    </button>
+                </mat-menu>
+            </div>
         </div>
 
         <!-- when there are opened or closed issues -->
         <ng-container *ngIf="state === State.SUCCESS">
             <div *ngFor="let issue of issues" class="issue-wrapper">
-                <div class="d-flex flex-column bd-highlight">
-                    <div class="d-flex flex-row bd-highlight">
-                        <div *ngIf="issue.status == 'OPEN'; else closedIssueIcon" class="bd-highlight open-issue">
-                            <em class="fas fa-exclamation"></em>
-                        </div>
-                        <ng-template #closedIssueIcon class="bd-highlight closed-issue">
+                <div class="d-flex flex-row bd-highlight">
+                    <section class="example-section">
+                        <mat-checkbox> </mat-checkbox>
+                    </section>
+                    <div *ngIf="issue.status == 'OPEN'; else closedIssueIcon" class="bd-highlight open-issue">
+                        <em class="fas fa-exclamation"></em>
+                    </div>
+                    <ng-template #closedIssueIcon>
+                        <div class="bd-highlight closed-issue">
                             <em class="fas fa-check"></em>
-                        </ng-template>
+                        </div>
+                    </ng-template>
+                    <div class="d-flex flex-column bd-highlight">
                         <div class="bd-highlight">
-                            <div class="bd-highlight">
-                                <a [routerLink]="issue.issueNumber"> {{ issue.subject }} </a>
-                            </div>
-                            <div class="bd-highlight">
-                                <div class="package-light-gray">
-                                    #{{ issue.issueNumber }} opened {{ issue.createdAt | timeAgo }} by
-                                    {{ issue.author.username }}
-                                </div>
+                            <a class="package-details-title" [routerLink]="issue.issueNumber"> {{ issue.subject }} </a>
+                        </div>
+                        <div class="bd-highlight">
+                            <div class="package-light-gray">
+                                #{{ issue.issueNumber }} opened {{ issue.createdAt | timeAgo }} by
+                                {{ issue.author.username }}
                             </div>
                         </div>
-                        <div class="bd-highlight align-self-center ml-auto">
-                            <img class="img-comments" [src]="getUserAvatar(issue.author.username) | async" />
-                        </div>
+                    </div>
+                    <div class="bd-highlight align-self-center ml-auto">
+                        <img class="img-comments" [src]="getUserAvatar(issue.author.username) | async" />
                     </div>
                 </div>
             </div>
-            <div *ngIf="hasMore">
-                <button mat-button [disabled]="loadingMoreIssues" (click)="loadMoreIssues()">Load more</button>
+            <div *ngIf="hasMore" class="container text-center mt-3">
+                <button
+                    class="app-outlined-button ctaButton"
+                    [disabled]="loadingMoreIssues"
+                    (click)="loadMoreIssues()"
+                    style="padding: 8px 40px"
+                >
+                    Load more
+                </button>
             </div>
         </ng-container>
 
@@ -67,24 +100,23 @@
         <!-- when there are no open issues -->
         <div class="issue-wrapper text-center" *ngIf="state === State.NO_OPEN_ISSUES">
             <div class="package-dark-gray py-5">
-                There are no open issues. Click to the
-                <span class="clickable-text" (click)="toggleIncludeClosedIssues()">'closed'</span> tab to view closed
-                issues
+                There are no open issues.
+                <br />
+                Click to the 'Closed' tab to view closed issues
             </div>
         </div>
         <!-- when there are no closed issues -->
         <div class="issue-wrapper text-center" *ngIf="state === State.NO_CLOSED_ISSUES">
             <div class="package-dark-gray py-5">
-                There are no closed issues. Click to the
-                <span class="clickable-text" (click)="toggleIncludeOpenIssues()">'open'</span> tab to view opened issues
+                There are no closed issues. <br />
+                Click to the 'Open' tab to view opened issues
             </div>
         </div>
         <!-- when there are no open/closed issues -->
         <div class="issue-wrapper text-center" *ngIf="state === State.NO_ISSUES">
             <div class="package-dark-gray py-5">
-                There are no issues. Click to the
-                <span class="clickable-text" (click)="navigateToNewIssuePage()">'open a new issue'</span> button to
-                create one issue.
+                There are no issues. <br />
+                Click to the 'open a new issue' button to create one issue.
             </div>
         </div>
     </div>
