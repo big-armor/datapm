@@ -3,8 +3,9 @@ import { IssueCommentEntity } from "../entity/IssueCommentEntity";
 import {
     CreatePackageIssueCommentInput,
     PackageIdentifierInput,
-    PackageIssueComment,
-    PackageIssueIdentifierInput
+    PackageIssueCommentIdentifierInput,
+    PackageIssueIdentifierInput,
+    UpdatePackageIssueCommentInput
 } from "../generated/graphql";
 import { OrderBy } from "../repository/OrderBy";
 import { PackageIssueCommentRepository } from "../repository/PackageIssueCommentRepository";
@@ -93,3 +94,75 @@ export const createPackageIssueComment = async (
 
     return await commentRepository.save(issueCommentEntity);
 };
+
+export const updatePackageIssueComment = async (
+    _0: any,
+    {
+        packageIdentifier,
+        issueIdentifier,
+        issueCommentIdentifier,
+        comment
+    }: {
+        packageIdentifier: PackageIdentifierInput;
+        issueIdentifier: PackageIssueIdentifierInput;
+        issueCommentIdentifier: PackageIssueCommentIdentifierInput;
+        comment: UpdatePackageIssueCommentInput;
+    },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    // TODO: CHECK WHETHER USER IS AUTHOR OR PACKAGE MANAGER
+    const commentRepository = context.connection.manager.getCustomRepository(PackageIssueCommentRepository);
+    const commentEntity = await getCommentOrFail(context, packageIdentifier, issueIdentifier, issueCommentIdentifier);
+
+    commentEntity.content = comment.content;
+    return await commentRepository.save(commentEntity);
+};
+
+export const deletePackageIssueComment = async (
+    _0: any,
+    {
+        packageIdentifier,
+        issueIdentifier,
+        issueCommentIdentifier
+    }: {
+        packageIdentifier: PackageIdentifierInput;
+        issueIdentifier: PackageIssueIdentifierInput;
+        issueCommentIdentifier: PackageIssueCommentIdentifierInput;
+    },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const commentRepository = context.connection.manager.getCustomRepository(PackageIssueCommentRepository);
+    const commentEntity = await getCommentOrFail(context, packageIdentifier, issueIdentifier, issueCommentIdentifier);
+    // TODO: CHECK IF USER HAS PERMISSIONS
+    await commentRepository.delete(commentEntity.id);
+};
+
+async function getCommentOrFail(
+    context: any,
+    packageIdentifier: PackageIdentifierInput,
+    issueIdentifier: PackageIssueIdentifierInput,
+    issueCommentIdentifier: PackageIssueCommentIdentifierInput
+) {
+    const packageEntity = await context.connection.manager
+        .getCustomRepository(PackageRepository)
+        .findPackageOrFail({ identifier: packageIdentifier });
+
+    const issueEntity = await context.connection.manager
+        .getCustomRepository(PackageIssueRepository)
+        .getByIssueNumberForPackage(packageEntity.id, issueIdentifier.issueNumber);
+
+    const commentRepository = context.connection.manager.getCustomRepository(PackageIssueCommentRepository);
+    const commentEntity = await commentRepository.getCommentByIssueIdAndCommentNumber(
+        issueEntity.id,
+        issueCommentIdentifier.commentNumber
+    );
+
+    // TODO: CHECK IF USER HAS PERMISSIONS
+    if (!commentEntity) {
+        throw new Error("COMMENT_NOT_FOUND");
+    }
+
+    return commentEntity;
+}

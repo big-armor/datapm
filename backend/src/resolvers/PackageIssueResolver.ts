@@ -4,8 +4,9 @@ import { PackageIssueStatus } from "../entity/PackageIssueStatus";
 import {
     CreatePackageIssueInput,
     PackageIdentifierInput,
-    PackageIssue,
-    PackageIssueIdentifierInput
+    PackageIssueIdentifierInput,
+    UpdatePackageIssueInput,
+    UpdatePackageIssueStatusInput
 } from "../generated/graphql";
 import { OrderBy } from "../repository/OrderBy";
 import { PackageIssueRepository } from "../repository/PackageIssueRepository";
@@ -143,3 +144,91 @@ export const createPackageIssue = async (
 
     return await issueRepository.save(issueEntity);
 };
+
+export const updatePackageIssue = async (
+    _0: any,
+    {
+        packageIdentifier,
+        issueIdentifier,
+        issue
+    }: {
+        packageIdentifier: PackageIdentifierInput;
+        issueIdentifier: PackageIssueIdentifierInput;
+        issue: UpdatePackageIssueInput;
+    },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const issueEntity = await getIssueEntity(context, packageIdentifier, issueIdentifier);
+
+    issueEntity.subject = issue.subject;
+    issueEntity.content = issue.content;
+
+    const issueRepository = context.connection.manager.getCustomRepository(PackageIssueRepository);
+    return await issueRepository.save(issueEntity);
+};
+
+export const updatePackageIssueStatus = async (
+    _0: any,
+    {
+        packageIdentifier,
+        issueIdentifier,
+        status
+    }: {
+        packageIdentifier: PackageIdentifierInput;
+        issueIdentifier: PackageIssueIdentifierInput;
+        status: UpdatePackageIssueStatusInput;
+    },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const issueEntity = await getIssueEntity(context, packageIdentifier, issueIdentifier);
+
+    issueEntity.status = status.status;
+
+    const issueRepository = context.connection.manager.getCustomRepository(PackageIssueRepository);
+    return await issueRepository.save(issueEntity);
+};
+
+export const updatePackageIssuesStatuses = async (
+    _0: any,
+    {
+        packageIdentifier,
+        issuesIdentifiers,
+        status
+    }: {
+        packageIdentifier: PackageIdentifierInput;
+        issuesIdentifiers: PackageIssueIdentifierInput[];
+        status: UpdatePackageIssueStatusInput;
+    },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const packageEntity = await context.connection.manager
+        .getCustomRepository(PackageRepository)
+        .findPackageOrFail({ identifier: packageIdentifier });
+
+    const issueRepository = context.connection.manager.getCustomRepository(PackageIssueRepository);
+    const issuesNumbers = issuesIdentifiers.map((i) => i.issueNumber);
+    const issues = await issueRepository.getIssuesByPackageAndIssueNumbers(packageEntity.id, issuesNumbers);
+
+    issues.forEach((i) => (i.status = status.status));
+    console.log("issues", issues);
+    console.log("issuesIdentifiers", issuesIdentifiers);
+    console.log("issuesNumbers", issuesNumbers);
+
+    await issueRepository.save(issues);
+};
+
+async function getIssueEntity(
+    context: any,
+    packageIdentifier: PackageIdentifierInput,
+    issueIdentifier: PackageIssueIdentifierInput
+) {
+    const packageEntity = await context.connection.manager
+        .getCustomRepository(PackageRepository)
+        .findPackageOrFail({ identifier: packageIdentifier });
+
+    const issueRepository = context.connection.manager.getCustomRepository(PackageIssueRepository);
+    return await issueRepository.getByIssueNumberForPackage(packageEntity.id, issueIdentifier.issueNumber);
+}

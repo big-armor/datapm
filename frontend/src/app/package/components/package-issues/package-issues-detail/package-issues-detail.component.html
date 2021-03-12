@@ -46,7 +46,7 @@
                                     <em class="fas fa-ellipsis-h"></em>
                                 </a>
                                 <mat-menu #menu="matMenu">
-                                    <button mat-menu-item id="issueBtn" (click)="openIssueEditor()">
+                                    <button mat-menu-item id="issueBtn" (click)="openIssueEditor(issueEditor)">
                                         <span class="package-dark-gray">Edit</span>
                                     </button>
                                     <button mat-menu-item id="issueBtn">
@@ -59,7 +59,10 @@
                             <div class="package-dark-gray">
                                 <markdown *ngIf="!editingIssue" [data]="packageIssue.content"></markdown>
                                 <div [class.d-none]="!editingIssue">
-                                    <app-markdown-editor [(content)]="packageIssueEditedContent"></app-markdown-editor>
+                                    <app-markdown-editor
+                                        #issueEditor
+                                        [(content)]="packageIssueEditedContent"
+                                    ></app-markdown-editor>
                                     <div class="text-right" [class.button-padding]="editingIssue">
                                         <button class="app-outlined-button" (click)="closeIssueEditor()">Cancel</button>
                                         <button
@@ -100,10 +103,14 @@
                                         <em class="fas fa-ellipsis-h"></em>
                                     </a>
                                     <mat-menu #menu="matMenu">
-                                        <button mat-menu-item id="issueBtn" (click)="openCommentEditor(comment)">
+                                        <button
+                                            mat-menu-item
+                                            id="issueBtn"
+                                            (click)="openCommentEditor(comment, commentEditor)"
+                                        >
                                             <span class="package-dark-gray">Edit</span>
                                         </button>
-                                        <button mat-menu-item id="issueBtn">
+                                        <button mat-menu-item id="issueBtn" (click)="deleteComment(comment.commentId)">
                                             <span class="package-dark-gray">Delete</span>
                                         </button>
                                     </mat-menu>
@@ -115,8 +122,11 @@
                                         *ngIf="!comment.isEditing; else commentEditorTemplate"
                                         [data]="comment.content"
                                     ></markdown>
-                                    <ng-template #commentEditorTemplate>
-                                        <app-markdown-editor [(content)]="comment.editedContent"></app-markdown-editor>
+                                    <div [class.d-none]="!comment.isEditing">
+                                        <app-markdown-editor
+                                            #commentEditor
+                                            [(content)]="comment.editedContent"
+                                        ></app-markdown-editor>
                                         <div class="text-right" [class.button-padding]="comment.isEditing">
                                             <button class="app-outlined-button" (click)="closeCommentEditor(comment)">
                                                 Cancel
@@ -134,7 +144,7 @@
                                         <div *ngIf="comment.errorMessage">
                                             {{ comment.errorMessage }}
                                         </div>
-                                    </ng-template>
+                                    </div>
                                 </div>
                             </div>
                             <div class="comment-icon" [class.d-none]="comment.isEditing">
@@ -155,12 +165,22 @@
                 </button>
             </div>
             <div class="comment-section">
-                <app-markdown-editor [(content)]="newCommentContent"></app-markdown-editor>
+                <app-markdown-editor #newCommentEditor [(content)]="newCommentContent"></app-markdown-editor>
                 <div class="mt-3 text-right">
-                    <button *ngIf="packageIssue.status === 'OPEN'" class="app-outlined-button" style="color: #4f4f4f">
+                    <button
+                        *ngIf="packageIssue.status === 'OPEN'"
+                        class="app-outlined-button"
+                        style="color: #4f4f4f"
+                        (click)="closeIssue()"
+                    >
                         Close issue
                     </button>
-                    <button *ngIf="packageIssue.status === 'CLOSED'" class="app-outlined-button" style="color: #4f4f4f">
+                    <button
+                        *ngIf="packageIssue.status === 'CLOSED'"
+                        class="app-outlined-button"
+                        style="color: #4f4f4f"
+                        (click)="openIssue()"
+                    >
                         Reopen issue
                     </button>
                     <button

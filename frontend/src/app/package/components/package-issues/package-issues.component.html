@@ -1,13 +1,12 @@
 <div class="container p-0 mb-3" id="packageIssues">
-    <div class="package-details-title" *ngIf="rren">Issues</div>
     <div>
-        <p class="package-dark-gray">There are issues listed this package.</p>
         <button class="app-outlined-button" (click)="navigateToNewIssuePage()">Open a new issue</button>
     </div>
     <div class="main-wrapper">
         <div class="issue-wrapper issue-header">
             <a class="example-section">
-                <mat-checkbox> </mat-checkbox>
+                <mat-checkbox [(ngModel)]="allIssuesSelected" (change)="toggleAllIssuesSelection($event.checked)">
+                </mat-checkbox>
             </a>
             <a
                 (click)="toggleIncludeOpenIssues()"
@@ -31,16 +30,16 @@
                 All
             </a>
             <a class="issue-tab right-tab"> Opened by </a>
-            <div class="bd-highlight right-tab">
+            <div class="bd-highlight right-tab" *ngIf="anyIssueSelected">
                 <a [matMenuTriggerFor]="menu" class="menu-btn mr-3 issue-tab">
                     Actions <i class="fas fa-chevron-down"></i>
                 </a>
                 <mat-menu #menu="matMenu">
-                    <button mat-menu-item id="issueBtn" *ngIf="includeOpenIssues">
-                        <span class="package-dark-gray">Close</span>
+                    <button mat-menu-item id="issueBtn" (click)="openSelectedIssues()">
+                        <span class="package-dark-gray">Open</span>
                     </button>
-                    <button mat-menu-item id="issueBtn" *ngIf="includeClosedIssues">
-                        <span class="package-dark-gray">Reopen</span>
+                    <button mat-menu-item id="issueBtn" (click)="closeSelectedIssues()">
+                        <span class="package-dark-gray">Close</span>
                     </button>
                     <button mat-menu-item id="issueBtn">
                         <span class="package-dark-gray">Delete</span>
@@ -54,7 +53,8 @@
             <div *ngFor="let issue of issues" class="issue-wrapper">
                 <div class="d-flex flex-row bd-highlight">
                     <section class="example-section">
-                        <mat-checkbox> </mat-checkbox>
+                        <mat-checkbox (change)="toggleIssue(issue, $event.checked)" [ngModel]="issue.checked">
+                        </mat-checkbox>
                     </section>
                     <div *ngIf="issue.status == 'OPEN'; else closedIssueIcon" class="bd-highlight open-issue">
                         <em class="fas fa-exclamation"></em>
@@ -102,21 +102,22 @@
             <div class="package-dark-gray py-5">
                 There are no open issues.
                 <br />
-                Click to the 'Closed' tab to view closed issues
+                Click the <span (click)="toggleIncludeClosedIssues()">'Closed'</span> tab to view closed issues
             </div>
         </div>
         <!-- when there are no closed issues -->
         <div class="issue-wrapper text-center" *ngIf="state === State.NO_CLOSED_ISSUES">
             <div class="package-dark-gray py-5">
                 There are no closed issues. <br />
-                Click to the 'Open' tab to view opened issues
+                Click the <span (click)="toggleIncludeOpenIssues()">'Open'</span> tab to view open issues
             </div>
         </div>
         <!-- when there are no open/closed issues -->
         <div class="issue-wrapper text-center" *ngIf="state === State.NO_ISSUES">
             <div class="package-dark-gray py-5">
                 There are no issues. <br />
-                Click to the 'open a new issue' button to create one issue.
+                Click to the <span (click)="toggleIncludeAllIssues()">'open a new issue'</span> button to create one
+                issue.
             </div>
         </div>
     </div>

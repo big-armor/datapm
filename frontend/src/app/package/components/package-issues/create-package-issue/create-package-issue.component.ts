@@ -69,6 +69,10 @@ export class CreatePackageIssueComponent implements OnInit, OnDestroy {
         });
     }
 
+    public cancel(): void {
+        this.router.navigate(["../"], { relativeTo: this.route });
+    }
+
     private loadPackage(): void {
         this.loading = true;
         this.packageService.package.pipe(takeUntil(this.destroy)).subscribe((packageResponse) => {

@@ -1,12 +1,14 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
 import { SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Subject } from "rxjs";
 import { PackageService } from "src/app/package/services/package.service";
 import { ConfirmationDialogService } from "src/app/services/dialog/confirmation-dialog.service";
 import { ImageService } from "src/app/services/image.service";
+import { MarkdownEditorComponent } from "src/app/shared/markdown-editor/markdown-editor.component";
 import {
     CreatePackageIssueCommentGQL,
+    DeletePackageIssueCommentGQL,
     DeletePackageIssueGQL,
     OrderBy,
     PackageIdentifierInput,
@@ -14,7 +16,11 @@ import {
     PackageIssueComment,
     PackageIssueCommentsGQL,
     PackageIssueGQL,
-    PackageIssueIdentifierInput
+    PackageIssueIdentifierInput,
+    PackageIssueStatus,
+    UpdatePackageIssueCommentGQL,
+    UpdatePackageIssueGQL,
+    UpdatePackageIssueStatusGQL
 } from "src/generated/graphql";
 
 enum State {
@@ -37,11 +43,14 @@ interface PackageIssueCommentWithEditorStatus extends PackageIssueComment {
 })
 export class PackageIssuesDetailComponent implements OnInit {
     public readonly State = State;
-    private readonly COMMENTS_TO_LOAD_PER_PAGE = 1;
+    private readonly COMMENTS_TO_LOAD_PER_PAGE = 100;
+
+    @ViewChild("newCommentEditor")
+    private newCommentEditor: MarkdownEditorComponent;
 
     public state: State = State.INIT;
     public packageIssue: PackageIssue;
-    public packageIssueNewContent: string;
+    public packageIssueEditedContent: string;
     public submittingPackageIssueUpdate: boolean = false;
     public editingIssue: boolean = false;
     public editingIssueErrorMessage: string;
@@ -62,9 +71,13 @@ export class PackageIssuesDetailComponent implements OnInit {
     constructor(
         private packageService: PackageService,
         private packageIssueGQL: PackageIssueGQL,
+        private updatePackageIssueGQL: UpdatePackageIssueGQL,
+        private updatePackageIssueStatusGQL: UpdatePackageIssueStatusGQL,
         private deletePackageIssueGQL: DeletePackageIssueGQL,
+        private deletePackageIssueCommentGQL: DeletePackageIssueCommentGQL,
         private packageIssueCommentsGQL: PackageIssueCommentsGQL,
         private createPackageIssueCommentGQL: CreatePackageIssueCommentGQL,
+        private updatePackageIssueCommentGQL: UpdatePackageIssueCommentGQL,
         private imageService: ImageService,
         private confirmationDialogService: ConfirmationDialogService,
         private router: Router,
@@ -87,19 +100,38 @@ export class PackageIssuesDetailComponent implements OnInit {
             return;
         }
 
-        // TODO: Make HTTP request here to update the issue content
         this.submittingPackageIssueUpdate = true;
-        this.closeIssueEditor();
-        this.submittingPackageIssueUpdate = false;
+        this.updatePackageIssueGQL
+            .mutate({
+                packageIdentifier: this.packageIdentifier,
+                issueIdentifier: this.issueIdentifier,
+                issue: {
+                    subject: this.packageIssue.subject,
+                    content: this.packageIssueEditedContent
+                }
+            })
+            .subscribe((response) => {
+                if (response.errors) {
+                    this.editingIssueErrorMessage = "Could not update issue content";
+                    return;
+                }
+
+                this.packageIssue = response.data.updatePackageIssue;
+                this.closeIssueEditor();
+                this.submittingPackageIssueUpdate = false;
+            });
     }
 
     public isIssueUpdatedContentValid(): boolean {
-        return this.isValidContent(this.packageIssueNewContent);
+        return this.isValidContent(this.packageIssueEditedContent);
     }
 
-    public openIssueEditor(): void {
+    public openIssueEditor(editor: MarkdownEditorComponent): void {
         this.editingIssueErrorMessage = null;
-        this.packageIssueNewContent = this.packageIssue.content;
+        this.packageIssueEditedContent = this.packageIssue.content;
+        if (editor) {
+            editor.setValue(this.packageIssueEditedContent);
+        }
         this.editingIssue = true;
     }
 
@@ -108,22 +140,39 @@ export class PackageIssuesDetailComponent implements OnInit {
     }
 
     public updateComment(comment: PackageIssueCommentWithEditorStatus): void {
-        if (!this.isValidContent(comment.editedContent) || comment.editedContent.trim() != comment.content.trim()) {
+        if (!this.isValidContent(comment.editedContent)) {
             comment.errorMessage = "Invalid comment";
             return;
         }
 
+        comment.errorMessage = null;
         comment.isSubmittingEdit = true;
-        comment.content = comment.editedContent;
-        // TODO: Make HTTP request here to update the comment content
-        this.closeCommentEditor(comment);
-        comment.isSubmittingEdit = false;
+        this.updatePackageIssueCommentGQL
+            .mutate({
+                packageIdentifier: this.packageIdentifier,
+                issueIdentifier: this.issueIdentifier,
+                issueCommentIdentifier: { commentNumber: comment.commentId },
+                comment: { content: comment.editedContent }
+            })
+            .subscribe((response) => {
+                if (response.errors) {
+                    comment.errorMessage = "There was an error saving this comment";
+                    return;
+                }
+
+                comment.content = response.data.updatePackageIssueComment.content;
+                this.closeCommentEditor(comment);
+                comment.isSubmittingEdit = false;
+            });
     }
 
-    public openCommentEditor(comment: PackageIssueCommentWithEditorStatus): void {
+    public openCommentEditor(comment: PackageIssueCommentWithEditorStatus, editor: MarkdownEditorComponent): void {
         comment.errorMessage = null;
         comment.editedContent = comment.content;
         comment.isEditing = true;
+        if (editor) {
+            editor.setValue(comment.editedContent);
+        }
     }
 
     public closeCommentEditor(comment: PackageIssueCommentWithEditorStatus): void {
@@ -148,6 +197,31 @@ export class PackageIssuesDetailComponent implements OnInit {
                         .subscribe((response) => {
                             if (!response.errors) {
                                 this.router.navigate(["../"], { relativeTo: this.route });
+                            }
+                        });
+                }
+            });
+    }
+
+    public deleteComment(commentNumber: number): void {
+        this.confirmationDialogService
+            .openFancyConfirmationDialog({
+                data: {
+                    title: "Delete comment",
+                    content: "Are you sure you want to delete this comment?"
+                }
+            })
+            .subscribe((confirmation) => {
+                if (confirmation) {
+                    this.deletePackageIssueCommentGQL
+                        .mutate({
+                            packageIdentifier: this.packageIdentifier,
+                            issueIdentifier: { issueNumber: this.packageIssue.issueNumber },
+                            issueCommentIdentifier: { commentNumber }
+                        })
+                        .subscribe((response) => {
+                            if (!response.errors) {
+                                this.loadPackageIssueComments(true);
                             }
                         });
                 }
@@ -180,6 +254,7 @@ export class PackageIssuesDetailComponent implements OnInit {
                     this.packageIssueComments.push(...commentsResponse.data.packageIssueComments.comments);
                 }
 
+                this.packageIssueComments.forEach((c) => (c.editedContent = c.content));
                 this.commentsOffset = this.packageIssueComments.length;
                 this.hasMoreComments = commentsResponse.data.packageIssueComments.hasMore;
                 this.state = State.SUCCESS;
@@ -204,10 +279,19 @@ export class PackageIssuesDetailComponent implements OnInit {
                 () => {
                     this.submittingNewComment = false;
                     this.newCommentContent = "";
+                    this.newCommentEditor.setValue("");
                     this.loadPackageIssueComments(true);
                 },
                 () => (this.submittingNewComment = false)
             );
+    }
+
+    public openIssue(): void {
+        this.changeIssueStatus(PackageIssueStatus.OPEN);
+    }
+
+    public closeIssue(): void {
+        this.changeIssueStatus(PackageIssueStatus.CLOSED);
     }
 
     public isValidNewCommentContent(): boolean {
@@ -216,6 +300,22 @@ export class PackageIssuesDetailComponent implements OnInit {
 
     public getUserAvatar(username: string): Subject<SafeUrl> {
         return this.imageService.loadUserAvatar(username);
+    }
+
+    private changeIssueStatus(status: PackageIssueStatus): void {
+        this.updatePackageIssueStatusGQL
+            .mutate({
+                packageIdentifier: this.packageIdentifier,
+                issueIdentifier: this.issueIdentifier,
+                status: { status }
+            })
+            .subscribe((response) => {
+                if (response.errors) {
+                    return;
+                }
+
+                this.packageIssue = response.data.updatePackageIssueStatus;
+            });
     }
 
     private isValidContent(content: string): boolean {
@@ -248,6 +348,7 @@ export class PackageIssuesDetailComponent implements OnInit {
                 }
 
                 this.packageIssue = response.data.packageIssue;
+                this.packageIssueEditedContent = this.packageIssue.content;
                 this.loadPackageIssueComments();
             });
     }

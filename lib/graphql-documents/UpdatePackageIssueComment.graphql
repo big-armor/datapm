@@ -1,0 +1,21 @@
+mutation UpdatePackageIssueComment(
+    $packageIdentifier: PackageIdentifierInput!
+    $issueIdentifier: PackageIssueIdentifierInput!
+    $issueCommentIdentifier: PackageIssueCommentIdentifierInput!
+    $comment: UpdatePackageIssueCommentInput!
+) {
+    updatePackageIssueComment(
+        packageIdentifier: $packageIdentifier
+        issueIdentifier: $issueIdentifier
+        issueCommentIdentifier: $issueCommentIdentifier
+        comment: $comment
+    ) {
+        commentId
+        content
+        author {
+            username
+        }
+        createdAt
+        updatedAt
+    }
+}

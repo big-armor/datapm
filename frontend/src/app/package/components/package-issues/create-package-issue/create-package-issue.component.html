@@ -21,7 +21,7 @@
                         <app-markdown-editor [(content)]="content"> </app-markdown-editor>
 
                         <div class="mt-2 text-right">
-                            <button class="app-outlined-button">Cancel</button>
+                            <button class="app-outlined-button" (click)="cancel()">Cancel</button>
                             <button
                                 class="app-raised-button ml-2"
                                 (click)="submitNewIssue()"

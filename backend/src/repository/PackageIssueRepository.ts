@@ -53,6 +53,19 @@ export class PackageIssueRepository extends Repository<PackageIssueEntity> {
             .getManyAndCount();
     }
 
+    public getIssuesByPackageAndIssueNumbers(packageId: number, issueNumbers: number[]): Promise<PackageIssueEntity[]> {
+        if (!issueNumbers || issueNumbers.length === 0) {
+            return Promise.resolve([]);
+        }
+
+        return this.createQueryBuilder()
+            .where('"PackageIssueEntity"."package_id" = :packageId')
+            .andWhere('"PackageIssueEntity"."issue_number" in (:...issueNumbers)')
+            .setParameter("packageId", packageId)
+            .setParameter("issueNumbers", issueNumbers)
+            .getMany();
+    }
+
     public getLastCreatedIssueForPackage(packageId: number): Promise<PackageIssueEntity | undefined> {
         return this.createQueryBuilder()
             .where('"PackageIssueEntity"."package_id" = :packageId')

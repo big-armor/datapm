@@ -515,9 +515,38 @@ input CreatePackageIssueInput {
 }
 
 """
+The package issue update input
+"""
+input UpdatePackageIssueInput {
+    subject: String!
+    content: String! @validMarkdown(maxLength: 50000)
+}
+
+"""
+The package issue update input
+"""
+input UpdatePackageIssueStatusInput {
+    status: PackageIssueStatus!
+}
+
+"""
+The complete identifier for a package issue comment
+"""
+input PackageIssueCommentIdentifierInput {
+    commentNumber: Int!
+}
+
+"""
 The input to create a package issue comment
 """
 input CreatePackageIssueCommentInput {
+    content: String! @validMarkdown(maxLength: 50000)
+}
+
+"""
+The input to update a package issue comment
+"""
+input UpdatePackageIssueCommentInput {
     content: String! @validMarkdown(maxLength: 50000)
 }
 
@@ -1057,6 +1086,33 @@ type Mutation {
     ): PackageIssue
 
     """
+    Updates a package issue
+    """
+    updatePackageIssue(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        issueIdentifier: PackageIssueIdentifierInput!
+        issue: UpdatePackageIssueInput!
+    ): PackageIssue
+
+    """
+    Updates a package issue's status
+    """
+    updatePackageIssueStatus(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        issueIdentifier: PackageIssueIdentifierInput!
+        status: UpdatePackageIssueStatusInput!
+    ): PackageIssue
+
+    """
+    Updates selected package issues' statuses
+    """
+    updatePackageIssuesStatuses(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        issuesIdentifiers: [PackageIssueIdentifierInput!]!
+        status: UpdatePackageIssueStatusInput!
+    ): Void
+
+    """
     Delete a package issue
     """
     deletePackageIssue(
@@ -1072,6 +1128,25 @@ type Mutation {
         issueIdentifier: PackageIssueIdentifierInput!
         comment: CreatePackageIssueCommentInput!
     ): PackageIssueComment
+
+    """
+    Creates a package issue comment
+    """
+    updatePackageIssueComment(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        issueIdentifier: PackageIssueIdentifierInput!
+        issueCommentIdentifier: PackageIssueCommentIdentifierInput!
+        comment: UpdatePackageIssueCommentInput!
+    ): PackageIssueComment
+
+    """
+    Deletes a package issue
+    """
+    deletePackageIssueComment(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        issueIdentifier: PackageIssueIdentifierInput!
+        issueCommentIdentifier: PackageIssueCommentIdentifierInput!
+    ): Void
 
     """
     Creates a new collection, which is managed by the requesting user

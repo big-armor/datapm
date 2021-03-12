@@ -1,9 +1,17 @@
+import { I } from "@angular/cdk/keycodes";
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Subject } from "rxjs";
 import { ImageService } from "src/app/services/image.service";
-import { OrderBy, PackageIdentifierInput, PackageIssue, PackageIssuesGQL } from "src/generated/graphql";
+import {
+    OrderBy,
+    PackageIdentifierInput,
+    PackageIssue,
+    PackageIssuesGQL,
+    PackageIssueStatus,
+    UpdatePackageIssuesStatusesGQL
+} from "src/generated/graphql";
 import { PackageService } from "../../services/package.service";
 
 enum State {
@@ -18,6 +26,10 @@ enum State {
     CLOSED_ISSUES
 }
 
+interface PackageIssueWithCheckedState extends PackageIssue {
+    checked?: boolean;
+}
+
 @Component({
     selector: "app-package-issues",
     templateUrl: "./package-issues.component.html",
@@ -26,19 +38,20 @@ enum State {
 export class PackageIssuesComponent implements OnInit, OnDestroy {
     public readonly State = State;
 
-    private readonly ISSUES_PER_PAGE_COUNT = 1;
+    private readonly ISSUES_PER_PAGE_COUNT = 20;
     private readonly onDestory = new Subject();
 
     public state: State = State.INIT;
 
-    public issues: PackageIssue[] = [];
+    public issues: PackageIssueWithCheckedState[] = [];
     public hasMore: boolean = false;
     public loadingMoreIssues: boolean = false;
 
     public includeOpenIssues: boolean = true;
     public includeClosedIssues: boolean = false;
 
-    public rren: boolean = false;
+    public allIssuesSelected: boolean = false;
+    public anyIssueSelected: boolean = false;
 
     private packageIdentifier: PackageIdentifierInput;
     private offset: number;
@@ -47,6 +60,7 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
         private packageIssuesGQL: PackageIssuesGQL,
         private packageService: PackageService,
         private imageService: ImageService,
+        private updatePackageIssuesStatusesGQL: UpdatePackageIssuesStatusesGQL,
         private router: Router,
         private route: ActivatedRoute
     ) {}
@@ -62,6 +76,10 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
 
     public loadMoreIssues(): void {
         this.loadPackageIssues();
+    }
+
+    public reloadIssues(): void {
+        this.loadPackageIssues(true);
     }
 
     public navigateToNewIssuePage(): void {
@@ -90,6 +108,50 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
         this.loadPackageIssues(true);
     }
 
+    public toggleAllIssuesSelection(selected: boolean): void {
+        this.issues.forEach((i) => (i.checked = selected));
+        this.updateSelectionStatuses();
+    }
+
+    public toggleIssue(issue: PackageIssueWithCheckedState, value: boolean): void {
+        issue.checked = value;
+        this.updateSelectionStatuses();
+    }
+
+    private updateSelectionStatuses(): void {
+        if (this.issues.length === 0) {
+            this.anyIssueSelected = false;
+            this.allIssuesSelected = false;
+        } else {
+            this.anyIssueSelected = this.issues.some((i) => i.checked);
+            this.allIssuesSelected = this.issues.every((i) => i.checked);
+        }
+    }
+
+    public openSelectedIssues(): void {
+        this.updateStatusesForSelectedIssues(PackageIssueStatus.OPEN);
+    }
+
+    public closeSelectedIssues(): void {
+        this.updateStatusesForSelectedIssues(PackageIssueStatus.CLOSED);
+    }
+
+    private updateStatusesForSelectedIssues(status: PackageIssueStatus): void {
+        const selectedIssues = this.issues.filter((i) => i.checked);
+        const selectedIssuesIdentifiers = selectedIssues.map((i) => ({ issueNumber: i.issueNumber }));
+        this.updatePackageIssuesStatusesGQL
+            .mutate({
+                packageIdentifier: this.packageIdentifier,
+                issuesIdentifiers: selectedIssuesIdentifiers,
+                status: { status }
+            })
+            .subscribe((response) => {
+                if (!response.errors) {
+                    this.reloadIssues();
+                }
+            });
+    }
+
     private loadPackage(): void {
         this.state = State.LOADING;
         this.packageService.package.subscribe((packageResponse) => {
@@ -98,7 +160,7 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
                 packageSlug: packageResponse.package.identifier.packageSlug
             };
             this.offset = 0;
-            this.loadPackageIssues(true);
+            this.reloadIssues();
         });
     }
 
@@ -124,6 +186,7 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
                 return;
             }
 
+            this.allIssuesSelected = false;
             const responseData = issuesResponse.data.packageIssues;
             this.hasMore = responseData.hasMore;
             if (resetCollection) {

@@ -157,12 +157,17 @@ import {
     deletePackageIssue,
     getIssuesByPackage,
     getPackageIssue,
-    getPackageIssueAuthor
+    getPackageIssueAuthor,
+    updatePackageIssue,
+    updatePackageIssuesStatuses,
+    updatePackageIssueStatus
 } from "./resolvers/PackageIssueResolver";
 import {
     createPackageIssueComment,
+    deletePackageIssueComment,
     getCommentsByByPackageIssue,
-    getPackageIssueCommentAuthor
+    getPackageIssueCommentAuthor,
+    updatePackageIssueComment
 } from "./resolvers/PackageIssueCommentResolver";
 
 export const resolvers: {
@@ -593,8 +598,13 @@ export const resolvers: {
 
         // Package issues
         createPackageIssue: createPackageIssue,
+        updatePackageIssue: updatePackageIssue,
+        updatePackageIssueStatus: updatePackageIssueStatus,
+        updatePackageIssuesStatuses: updatePackageIssuesStatuses,
         deletePackageIssue: deletePackageIssue,
         createPackageIssueComment: createPackageIssueComment,
+        updatePackageIssueComment: updatePackageIssueComment,
+        deletePackageIssueComment: deletePackageIssueComment,
 
         // Package Permissions
         setPackagePermissions: setPackagePermissions,
