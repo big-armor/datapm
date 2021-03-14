@@ -1,15 +1,18 @@
-import { AuthenticatedContext } from "../context";
+import { AuthenticatedContext, Context } from "../context";
+import { resolvePackagePermissions } from "../directive/hasPackagePermissionDirective";
 import { PackageIssueEntity } from "../entity/PackageIssueEntity";
 import { PackageIssueStatus } from "../entity/PackageIssueStatus";
 import {
     CreatePackageIssueInput,
     PackageIdentifierInput,
     PackageIssueIdentifierInput,
+    Permission,
     UpdatePackageIssueInput,
     UpdatePackageIssueStatusInput
 } from "../generated/graphql";
 import { OrderBy } from "../repository/OrderBy";
 import { PackageIssueRepository } from "../repository/PackageIssueRepository";
+import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { PackageRepository } from "../repository/PackageRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
@@ -160,6 +163,7 @@ export const updatePackageIssue = async (
     info: any
 ) => {
     const issueEntity = await getIssueEntity(context, packageIdentifier, issueIdentifier);
+    validatePermissionsToEditIssue(issueEntity, packageIdentifier, context);
 
     issueEntity.subject = issue.subject;
     issueEntity.content = issue.content;
@@ -183,6 +187,7 @@ export const updatePackageIssueStatus = async (
     info: any
 ) => {
     const issueEntity = await getIssueEntity(context, packageIdentifier, issueIdentifier);
+    validatePermissionsToEditIssue(issueEntity, packageIdentifier, context);
 
     issueEntity.status = status.status;
 
@@ -212,6 +217,8 @@ export const updatePackageIssuesStatuses = async (
     const issuesNumbers = issuesIdentifiers.map((i) => i.issueNumber);
     const issues = await issueRepository.getIssuesByPackageAndIssueNumbers(packageEntity.id, issuesNumbers);
 
+    validateEditPermissionsForIssues(issues, packageIdentifier, context);
+
     issues.forEach((i) => (i.status = status.status));
 
     await issueRepository.save(issues);
@@ -236,8 +243,10 @@ export const deletePackageIssues = async (
     const issueRepository = context.connection.manager.getCustomRepository(PackageIssueRepository);
     const issuesNumbers = issuesIdentifiers.map((i) => i.issueNumber);
     const issues = await issueRepository.getIssuesByPackageAndIssueNumbers(packageEntity.id, issuesNumbers);
-    const issuesIds = issues.map((i) => i.id);
 
+    validateEditPermissionsForIssues(issues, packageIdentifier, context);
+
+    const issuesIds = issues.map((i) => i.id);
     await issueRepository.delete(issuesIds);
 };
 
@@ -252,4 +261,56 @@ async function getIssueEntity(
 
     const issueRepository = context.connection.manager.getCustomRepository(PackageIssueRepository);
     return await issueRepository.getByIssueNumberForPackage(packageEntity.id, issueIdentifier.issueNumber);
+}
+
+async function validatePermissionsToEditIssue(
+    issueEntity: PackageIssueEntity,
+    packageIdentifier: PackageIdentifierInput,
+    context: Context
+): Promise<void> {
+    if (!context.me) {
+        throw new Error("NOT_AUTHORIZED");
+    }
+
+    const packagePermissions = await resolvePackagePermissions(context, packageIdentifier, context.me);
+    validateEditPermissionsForIssue(issueEntity, packagePermissions, context);
+}
+
+async function validateEditPermissionsForIssues(
+    issues: PackageIssueEntity[],
+    packageIdentifier: PackageIdentifierInput,
+    context: Context
+): Promise<void> {
+    if (!context.me) {
+        throw new Error("NOT_AUTHORIZED");
+    }
+
+    const packagePermissions = await resolvePackagePermissions(context, packageIdentifier, context.me);
+    validatePermissionsToEditIssues(issues, packagePermissions, context);
+}
+
+async function validatePermissionsToEditIssues(
+    issues: PackageIssueEntity[],
+    packagePermissions: Permission[],
+    context: Context
+): Promise<void> {
+    if (!context.me) {
+        throw new Error("NOT_AUTHORIZED");
+    }
+
+    issues.forEach((i) => validateEditPermissionsForIssue(i, packagePermissions, context));
+}
+
+async function validateEditPermissionsForIssue(
+    issueEntity: PackageIssueEntity,
+    packagePermissions: Permission[],
+    context: Context
+): Promise<void> {
+    if (!context.me) {
+        throw new Error("NOT_AUTHORIZED");
+    }
+
+    if (issueEntity.authorId !== context.me.id && packagePermissions.includes(Permission.MANAGE)) {
+        throw new Error("NOT_AUTHORIZED");
+    }
 }
