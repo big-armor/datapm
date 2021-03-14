@@ -12,7 +12,6 @@ import {
 } from "../generated/graphql";
 import { OrderBy } from "../repository/OrderBy";
 import { PackageIssueRepository } from "../repository/PackageIssueRepository";
-import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { PackageRepository } from "../repository/PackageRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
@@ -67,6 +66,8 @@ export const deletePackageIssue = async (
     if (!issue) {
         throw new Error("ISSUE_NOT_FOUND");
     }
+
+    await validatePermissionsToEditIssue(issue, packageIdentifier, context);
 
     await repository.delete(issue.id);
 };
@@ -163,7 +164,7 @@ export const updatePackageIssue = async (
     info: any
 ) => {
     const issueEntity = await getIssueEntity(context, packageIdentifier, issueIdentifier);
-    validatePermissionsToEditIssue(issueEntity, packageIdentifier, context);
+    await validatePermissionsToEditIssue(issueEntity, packageIdentifier, context);
 
     issueEntity.subject = issue.subject;
     issueEntity.content = issue.content;
@@ -187,7 +188,7 @@ export const updatePackageIssueStatus = async (
     info: any
 ) => {
     const issueEntity = await getIssueEntity(context, packageIdentifier, issueIdentifier);
-    validatePermissionsToEditIssue(issueEntity, packageIdentifier, context);
+    await validatePermissionsToEditIssue(issueEntity, packageIdentifier, context);
 
     issueEntity.status = status.status;
 
@@ -217,7 +218,7 @@ export const updatePackageIssuesStatuses = async (
     const issuesNumbers = issuesIdentifiers.map((i) => i.issueNumber);
     const issues = await issueRepository.getIssuesByPackageAndIssueNumbers(packageEntity.id, issuesNumbers);
 
-    validateEditPermissionsForIssues(issues, packageIdentifier, context);
+    await validateEditPermissionsForIssues(issues, packageIdentifier, context);
 
     issues.forEach((i) => (i.status = status.status));
 
@@ -244,7 +245,7 @@ export const deletePackageIssues = async (
     const issuesNumbers = issuesIdentifiers.map((i) => i.issueNumber);
     const issues = await issueRepository.getIssuesByPackageAndIssueNumbers(packageEntity.id, issuesNumbers);
 
-    validateEditPermissionsForIssues(issues, packageIdentifier, context);
+    await validateEditPermissionsForIssues(issues, packageIdentifier, context);
 
     const issuesIds = issues.map((i) => i.id);
     await issueRepository.delete(issuesIds);
