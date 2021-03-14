@@ -1113,6 +1113,14 @@ type Mutation {
     ): Void
 
     """
+    Updates selected package issues' statuses
+    """
+    deletePackageIssues(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        issuesIdentifiers: [PackageIssueIdentifierInput!]!
+    ): Void
+
+    """
     Delete a package issue
     """
     deletePackageIssue(

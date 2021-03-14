@@ -213,11 +213,32 @@ export const updatePackageIssuesStatuses = async (
     const issues = await issueRepository.getIssuesByPackageAndIssueNumbers(packageEntity.id, issuesNumbers);
 
     issues.forEach((i) => (i.status = status.status));
-    console.log("issues", issues);
-    console.log("issuesIdentifiers", issuesIdentifiers);
-    console.log("issuesNumbers", issuesNumbers);
 
     await issueRepository.save(issues);
+};
+
+export const deletePackageIssues = async (
+    _0: any,
+    {
+        packageIdentifier,
+        issuesIdentifiers
+    }: {
+        packageIdentifier: PackageIdentifierInput;
+        issuesIdentifiers: PackageIssueIdentifierInput[];
+    },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const packageEntity = await context.connection.manager
+        .getCustomRepository(PackageRepository)
+        .findPackageOrFail({ identifier: packageIdentifier });
+
+    const issueRepository = context.connection.manager.getCustomRepository(PackageIssueRepository);
+    const issuesNumbers = issuesIdentifiers.map((i) => i.issueNumber);
+    const issues = await issueRepository.getIssuesByPackageAndIssueNumbers(packageEntity.id, issuesNumbers);
+    const issuesIds = issues.map((i) => i.id);
+
+    await issueRepository.delete(issuesIds);
 };
 
 async function getIssueEntity(

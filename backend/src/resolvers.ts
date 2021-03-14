@@ -155,6 +155,7 @@ import { removePackagePermissions, setPackagePermissions } from "./resolvers/Use
 import {
     createPackageIssue,
     deletePackageIssue,
+    deletePackageIssues,
     getIssuesByPackage,
     getPackageIssue,
     getPackageIssueAuthor,
@@ -601,6 +602,7 @@ export const resolvers: {
         updatePackageIssue: updatePackageIssue,
         updatePackageIssueStatus: updatePackageIssueStatus,
         updatePackageIssuesStatuses: updatePackageIssuesStatuses,
+        deletePackageIssues: deletePackageIssues,
         deletePackageIssue: deletePackageIssue,
         createPackageIssueComment: createPackageIssueComment,
         updatePackageIssueComment: updatePackageIssueComment,

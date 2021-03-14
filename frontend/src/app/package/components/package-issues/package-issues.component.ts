@@ -3,8 +3,10 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
 import { SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Subject } from "rxjs";
+import { ConfirmationDialogService } from "src/app/services/dialog/confirmation-dialog.service";
 import { ImageService } from "src/app/services/image.service";
 import {
+    DeletePackageIssuesGQL,
     OrderBy,
     PackageIdentifierInput,
     PackageIssue,
@@ -60,7 +62,9 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
         private packageIssuesGQL: PackageIssuesGQL,
         private packageService: PackageService,
         private imageService: ImageService,
+        private confirmationDialogService: ConfirmationDialogService,
         private updatePackageIssuesStatusesGQL: UpdatePackageIssuesStatusesGQL,
+        private deletePackageIssuesGQL: DeletePackageIssuesGQL,
         private router: Router,
         private route: ActivatedRoute
     ) {}
@@ -134,6 +138,34 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
 
     public closeSelectedIssues(): void {
         this.updateStatusesForSelectedIssues(PackageIssueStatus.CLOSED);
+    }
+
+    public deleteSelectedIssues(): void {
+        this.confirmationDialogService
+            .openFancyConfirmationDialog({
+                data: {
+                    title: "Delete selected issues",
+                    content: "Are you sure you want to delete the selected issues?"
+                }
+            })
+            .subscribe((confirmation) => {
+                if (!confirmation) {
+                    return;
+                }
+
+                const selectedIssues = this.issues.filter((i) => i.checked);
+                const selectedIssuesIdentifiers = selectedIssues.map((i) => ({ issueNumber: i.issueNumber }));
+                this.deletePackageIssuesGQL
+                    .mutate({
+                        packageIdentifier: this.packageIdentifier,
+                        issuesIdentifiers: selectedIssuesIdentifiers
+                    })
+                    .subscribe((response) => {
+                        if (!response.errors) {
+                            this.reloadIssues();
+                        }
+                    });
+            });
     }
 
     private updateStatusesForSelectedIssues(status: PackageIssueStatus): void {
