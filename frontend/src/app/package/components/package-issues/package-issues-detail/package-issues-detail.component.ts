@@ -121,6 +121,7 @@ export class PackageIssuesDetailComponent implements OnInit {
             .subscribe((response) => {
                 if (response.errors) {
                     this.editingIssueErrorMessage = "Could not update issue content";
+                    this.submittingPackageIssueUpdate = false;
                     return;
                 }
 
@@ -162,16 +163,23 @@ export class PackageIssuesDetailComponent implements OnInit {
                 issueCommentIdentifier: { commentNumber: comment.commentId },
                 comment: { content: comment.editedContent }
             })
-            .subscribe((response) => {
-                if (response.errors) {
-                    comment.errorMessage = "There was an error saving this comment";
-                    return;
-                }
+            .subscribe(
+                (response) => {
+                    if (response.errors) {
+                        comment.errorMessage = "There was an error saving this comment";
+                        comment.isSubmittingEdit = false;
+                        return;
+                    }
 
-                comment.content = response.data.updatePackageIssueComment.content;
-                this.closeCommentEditor(comment);
-                comment.isSubmittingEdit = false;
-            });
+                    comment.content = response.data.updatePackageIssueComment.content;
+                    this.closeCommentEditor(comment);
+                    comment.isSubmittingEdit = false;
+                },
+                () => {
+                    comment.errorMessage = "There was an error saving this comment";
+                    comment.isSubmittingEdit = false;
+                }
+            );
     }
 
     public openCommentEditor(comment: PackageIssueCommentWithEditorStatus, editor: MarkdownEditorComponent): void {

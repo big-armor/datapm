@@ -1,6 +1,8 @@
 import { AuthenticatedContext, Context } from "../context";
 import { resolvePackagePermissions } from "../directive/hasPackagePermissionDirective";
 import { IssueCommentEntity } from "../entity/IssueCommentEntity";
+import { PackageIssueEntity } from "../entity/PackageIssueEntity";
+import { PackageIssueStatus } from "../entity/PackageIssueStatus";
 import {
     CreatePackageIssueCommentInput,
     PackageIdentifierInput,
@@ -84,6 +86,13 @@ export const createPackageIssueComment = async (
         .getCustomRepository(PackageIssueRepository)
         .getByIssueNumberForPackage(packageEntity.id, issueIdentifier.issueNumber);
 
+    if (issueEntity.status === PackageIssueStatus.CLOSED) {
+        const packagePermissions = await resolvePackagePermissions(context, packageIdentifier, context.me);
+        if (!packagePermissions.includes(Permission.MANAGE)) {
+            throwNotAuthorizedError();
+        }
+    }
+
     const commentRepository = context.connection.manager.getCustomRepository(PackageIssueCommentRepository);
     const lastCommentCreatedForIssue = await commentRepository.getLastCreatedCommentForIssue(issueEntity.id);
     const commentId = lastCommentCreatedForIssue ? lastCommentCreatedForIssue.commentId + 1 : 0;
@@ -114,9 +123,12 @@ export const updatePackageIssueComment = async (
     info: any
 ) => {
     const commentRepository = context.connection.manager.getCustomRepository(PackageIssueCommentRepository);
-    const commentEntity = await getCommentOrFail(context, packageIdentifier, issueIdentifier, issueCommentIdentifier);
-
-    await validatePermissionsToEditComment(commentEntity, packageIdentifier, context);
+    const commentEntity = await getCommentToEditOrFail(
+        context,
+        packageIdentifier,
+        issueIdentifier,
+        issueCommentIdentifier
+    );
 
     commentEntity.content = comment.content;
     return await commentRepository.save(commentEntity);
@@ -137,14 +149,16 @@ export const deletePackageIssueComment = async (
     info: any
 ) => {
     const commentRepository = context.connection.manager.getCustomRepository(PackageIssueCommentRepository);
-    const commentEntity = await getCommentOrFail(context, packageIdentifier, issueIdentifier, issueCommentIdentifier);
-
-    await validatePermissionsToEditComment(commentEntity, packageIdentifier, context);
-
+    const commentEntity = await getCommentToEditOrFail(
+        context,
+        packageIdentifier,
+        issueIdentifier,
+        issueCommentIdentifier
+    );
     await commentRepository.delete(commentEntity.id);
 };
 
-async function getCommentOrFail(
+async function getCommentToEditOrFail(
     context: any,
     packageIdentifier: PackageIdentifierInput,
     issueIdentifier: PackageIssueIdentifierInput,
@@ -168,34 +182,43 @@ async function getCommentOrFail(
         throw new Error("COMMENT_NOT_FOUND");
     }
 
-    await validatePermissionsToEditComment(commentEntity, packageIdentifier, context);
+    const canEdit = await hasPermissionsToEditComment(commentEntity, packageIdentifier, context);
+    if (!canEdit) {
+        throwNotAuthorizedError();
+    }
 
     return commentEntity;
 }
 
-async function validatePermissionsToEditComment(
+async function hasPermissionsToEditComment(
     commentEntity: IssueCommentEntity,
     packageIdentifier: PackageIdentifierInput,
     context: Context
-): Promise<void> {
+): Promise<boolean> {
     if (!context.me) {
-        throw new Error("NOT_AUTHORIZED");
+        return false;
     }
 
     const packagePermissions = await resolvePackagePermissions(context, packageIdentifier, context.me);
-    validateEditPermissionsForComment(commentEntity, packagePermissions, context);
+    return hasEditPermissionsForComment(commentEntity, packagePermissions, context);
 }
 
-async function validateEditPermissionsForComment(
+function hasEditPermissionsForComment(
     commentEntity: IssueCommentEntity,
     packagePermissions: Permission[],
     context: Context
-): Promise<void> {
+): boolean {
     if (!context.me) {
-        throw new Error("NOT_AUTHORIZED");
+        return false;
     }
 
-    if (commentEntity.authorId !== context.me.id && packagePermissions.includes(Permission.MANAGE)) {
-        throw new Error("NOT_AUTHORIZED");
+    if (packagePermissions.includes(Permission.MANAGE)) {
+        return true;
     }
+
+    return commentEntity.authorId === context.me.id;
+}
+
+function throwNotAuthorizedError(): void {
+    throw new Error("NOT_AUTHORIZED");
 }

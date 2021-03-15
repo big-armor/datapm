@@ -56,6 +56,9 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
     public anyIssueSelected: boolean = false;
 
     public isUserAPackageManager: boolean = false;
+    public openIssuesCount: number = 0;
+    public closedIssuesCount: number = 0;
+    public totalIssuesCount: number = 0;
 
     private packageIdentifier: PackageIdentifierInput;
     private offset: number;
@@ -232,6 +235,9 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
                 this.issues.push(...responseData.issues);
             }
             this.offset = this.issues.length;
+            this.openIssuesCount = responseData.openIssuesCount;
+            this.closedIssuesCount = responseData.closedIssuesCount;
+            this.totalIssuesCount = this.openIssuesCount + this.closedIssuesCount;
             this.updateState();
         });
     }

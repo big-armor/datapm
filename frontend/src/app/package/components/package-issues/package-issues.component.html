@@ -10,24 +10,24 @@
             </a>
             <a
                 (click)="toggleIncludeOpenIssues()"
-                class="issue-tab issue-tab-item"
+                class="issue-tab issue-tab-item open-issue"
                 [class.active]="includeOpenIssues && !includeClosedIssues"
             >
-                Open
+                <em class="fas fa-exclamation"></em> {{ openIssuesCount }} Open
             </a>
             <a
                 (click)="toggleIncludeClosedIssues()"
-                class="issue-tab issue-tab-item"
+                class="issue-tab issue-tab-item closed-issue"
                 [class.active]="!includeOpenIssues && includeClosedIssues"
             >
-                Closed
+                <em class="fas fa-check"></em> {{ closedIssuesCount }} Closed
             </a>
             <a
                 (click)="toggleIncludeAllIssues()"
                 class="issue-tab issue-tab-item"
                 [class.active]="includeOpenIssues && includeClosedIssues"
             >
-                All
+                {{ totalIssuesCount }} All
             </a>
             <a class="issue-tab right-tab"> Opened by </a>
             <div class="bd-highlight right-tab" *ngIf="anyIssueSelected">

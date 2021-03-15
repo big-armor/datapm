@@ -27,5 +27,7 @@ query PackageIssues(
         }
         hasMore
         count
+        openIssuesCount
+        closedIssuesCount
     }
 }

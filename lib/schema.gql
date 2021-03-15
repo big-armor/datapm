@@ -432,6 +432,8 @@ type PackageIssuesResult {
     issues: [PackageIssue!]
     hasMore: Boolean!
     count: Int!
+    openIssuesCount: Int!
+    closedIssuesCount: Int!
 }
 
 """

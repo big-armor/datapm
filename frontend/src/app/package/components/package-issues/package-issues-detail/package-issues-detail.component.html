@@ -63,6 +63,7 @@
                                         #issueEditor
                                         [(content)]="packageIssueEditedContent"
                                     ></app-markdown-editor>
+                                    <div *ngIf="editingIssueErrorMessage">{{ editingIssueErrorMessage }}</div>
                                     <div class="text-right" [class.button-padding]="editingIssue">
                                         <button class="app-outlined-button" (click)="closeIssueEditor()">Cancel</button>
                                         <button

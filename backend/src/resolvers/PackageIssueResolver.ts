@@ -67,7 +67,10 @@ export const deletePackageIssue = async (
         throw new Error("ISSUE_NOT_FOUND");
     }
 
-    await validatePermissionsToEditIssue(issue, packageIdentifier, context);
+    const canDeleteIssue = await hasPermissionsToEditIssue(issue, packageIdentifier, context);
+    if (!canDeleteIssue) {
+        throwNotAuthorizedError();
+    }
 
     await repository.delete(issue.id);
 };
@@ -98,22 +101,25 @@ export const getIssuesByPackage = async (
         .getCustomRepository(PackageRepository)
         .findPackageOrFail({ identifier: packageIdentifier });
 
-    const [issues, count] = await context.connection.manager
-        .getCustomRepository(PackageIssueRepository)
-        .getIssuesByPackage(
-            packageEntity.id,
-            includeOpenIssues,
-            includeClosedIssues,
-            offset,
-            limit,
-            orderBy,
-            relations
-        );
+    const repository = context.connection.manager.getCustomRepository(PackageIssueRepository);
+    const [issues, count] = await repository.getIssuesByPackage(
+        packageEntity.id,
+        includeOpenIssues,
+        includeClosedIssues,
+        offset,
+        limit,
+        orderBy,
+        relations
+    );
+
+    const counts = (await repository.countIssuesByPackage(packageEntity.id))[0];
 
     return {
         issues,
         hasMore: count - (offset + limit) > 0,
-        count
+        count,
+        openIssuesCount: counts.open_issues_count,
+        closedIssuesCount: counts.closed_issues_count
     };
 };
 
@@ -164,7 +170,11 @@ export const updatePackageIssue = async (
     info: any
 ) => {
     const issueEntity = await getIssueEntity(context, packageIdentifier, issueIdentifier);
-    await validatePermissionsToEditIssue(issueEntity, packageIdentifier, context);
+
+    const canEditIssue = await hasPermissionsToEditIssue(issueEntity, packageIdentifier, context);
+    if (!canEditIssue) {
+        throwNotAuthorizedError();
+    }
 
     issueEntity.subject = issue.subject;
     issueEntity.content = issue.content;
@@ -188,7 +198,11 @@ export const updatePackageIssueStatus = async (
     info: any
 ) => {
     const issueEntity = await getIssueEntity(context, packageIdentifier, issueIdentifier);
-    await validatePermissionsToEditIssue(issueEntity, packageIdentifier, context);
+
+    const canEditIssue = await hasPermissionsToEditIssue(issueEntity, packageIdentifier, context);
+    if (!canEditIssue) {
+        throwNotAuthorizedError();
+    }
 
     issueEntity.status = status.status;
 
@@ -218,7 +232,10 @@ export const updatePackageIssuesStatuses = async (
     const issuesNumbers = issuesIdentifiers.map((i) => i.issueNumber);
     const issues = await issueRepository.getIssuesByPackageAndIssueNumbers(packageEntity.id, issuesNumbers);
 
-    await validateEditPermissionsForIssues(issues, packageIdentifier, context);
+    const canEditIssues = await hasEditPermissionsForIssues(issues, packageIdentifier, context);
+    if (!canEditIssues) {
+        throwNotAuthorizedError();
+    }
 
     issues.forEach((i) => (i.status = status.status));
 
@@ -245,7 +262,10 @@ export const deletePackageIssues = async (
     const issuesNumbers = issuesIdentifiers.map((i) => i.issueNumber);
     const issues = await issueRepository.getIssuesByPackageAndIssueNumbers(packageEntity.id, issuesNumbers);
 
-    await validateEditPermissionsForIssues(issues, packageIdentifier, context);
+    const canEditIssues = await hasEditPermissionsForIssues(issues, packageIdentifier, context);
+    if (!canEditIssues) {
+        throwNotAuthorizedError();
+    }
 
     const issuesIds = issues.map((i) => i.id);
     await issueRepository.delete(issuesIds);
@@ -264,54 +284,52 @@ async function getIssueEntity(
     return await issueRepository.getByIssueNumberForPackage(packageEntity.id, issueIdentifier.issueNumber);
 }
 
-async function validatePermissionsToEditIssue(
+async function hasPermissionsToEditIssue(
     issueEntity: PackageIssueEntity,
     packageIdentifier: PackageIdentifierInput,
     context: Context
-): Promise<void> {
+): Promise<boolean> {
     if (!context.me) {
-        throw new Error("NOT_AUTHORIZED");
+        return false;
     }
 
     const packagePermissions = await resolvePackagePermissions(context, packageIdentifier, context.me);
-    validateEditPermissionsForIssue(issueEntity, packagePermissions, context);
+    return canEditIssue(issueEntity, packagePermissions, context);
 }
 
-async function validateEditPermissionsForIssues(
+async function hasEditPermissionsForIssues(
     issues: PackageIssueEntity[],
     packageIdentifier: PackageIdentifierInput,
     context: Context
-): Promise<void> {
+): Promise<boolean> {
     if (!context.me) {
-        throw new Error("NOT_AUTHORIZED");
+        return false;
     }
 
     const packagePermissions = await resolvePackagePermissions(context, packageIdentifier, context.me);
-    validatePermissionsToEditIssues(issues, packagePermissions, context);
+    return hasPermissionsToEditIssues(issues, packagePermissions, context);
 }
 
-async function validatePermissionsToEditIssues(
+function hasPermissionsToEditIssues(
     issues: PackageIssueEntity[],
     packagePermissions: Permission[],
     context: Context
-): Promise<void> {
-    if (!context.me) {
-        throw new Error("NOT_AUTHORIZED");
-    }
-
-    issues.forEach((i) => validateEditPermissionsForIssue(i, packagePermissions, context));
+): boolean {
+    return issues.every((i) => canEditIssue(i, packagePermissions, context));
 }
 
-async function validateEditPermissionsForIssue(
-    issueEntity: PackageIssueEntity,
-    packagePermissions: Permission[],
-    context: Context
-): Promise<void> {
+function canEditIssue(issueEntity: PackageIssueEntity, packagePermissions: Permission[], context: Context): boolean {
     if (!context.me) {
-        throw new Error("NOT_AUTHORIZED");
+        return false;
     }
 
-    if (issueEntity.authorId !== context.me.id && packagePermissions.includes(Permission.MANAGE)) {
-        throw new Error("NOT_AUTHORIZED");
+    if (packagePermissions.includes(Permission.MANAGE)) {
+        return true;
     }
+
+    return issueEntity.authorId === context.me.id;
+}
+
+function throwNotAuthorizedError() {
+    throw new Error("NOT_AUTHORIZED");
 }

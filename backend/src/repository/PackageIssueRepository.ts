@@ -25,6 +25,24 @@ export class PackageIssueRepository extends Repository<PackageIssueEntity> {
         return issueEntity;
     }
 
+    public async countIssuesByPackage(
+        packageId: number
+    ): Promise<
+        [
+            {
+                open_issues_count: number;
+                closed_issues_count: number;
+            }
+        ]
+    > {
+        return this.manager.query(
+            `Select
+                (Select COUNT (*) FROM package_issue WHERE package_id = $1 AND status = 'OPEN') as open_issues_count,
+                (Select COUNT (*) FROM package_issue WHERE package_id = $1 AND status = 'CLOSED') as closed_issues_count`,
+            [packageId]
+        );
+    }
+
     public getIssuesByPackage(
         packageId: number,
         includeOpenIssues: boolean,
