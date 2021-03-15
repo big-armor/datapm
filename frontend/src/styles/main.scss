@@ -1,17 +1,18 @@
 /* You can add global styles to this file, and also import other style files */
 @import "~bootstrap/dist/css/bootstrap.min.css";
 @import "./variables.scss";
+@import "./colors.scss";
 @import "./typography";
 
 html,
 body {
     height: 100%;
     overflow-x: hidden;
-    background-color: $gray-11;
+    background-color: $gray-11-color;
 }
 
 a {
-    color: $color-info;
+    color: $info-color;
 }
 body {
     margin: 0;
@@ -23,7 +24,7 @@ body {
 }
 
 .mat-spinner circle {
-    stroke: $gray-3 !important;
+    stroke: $gray-3-color !important;
 }
 
 .loading-spinner {
@@ -56,7 +57,7 @@ table.gray-table {
 
     .mat-header-row {
         height: 40px !important;
-        background-color: #ededed;
+        background-color: $gray-12-color;
     }
 
     th {
@@ -64,13 +65,13 @@ table.gray-table {
         font-size: $text-font;
         font-weight: $weight-500;
         letter-spacing: 0.4px;
-        color: $gray-1;
+        color: $gray-1-color;
     }
 
     td {
         font-family: $family-roboto;
         letter-spacing: 0.4px;
-        color: $gray-2;
+        color: $gray-2-color;
         font-size: $text-font;
         font-weight: $weight-400;
     }
@@ -78,11 +79,11 @@ table.gray-table {
 
 .gray-paginator {
     height: 58px !important;
-    background-color: #ededed;
+    background-color: $gray-12-color;
     border: 1px solid #d9d9d9;
     border-top: 0px;
     font-weight: $weight-400;
-    color: $gray-1;
+    color: $gray-1-color;
 
     .mat-paginator-icon {
         width: 22px;
@@ -102,7 +103,7 @@ table.gray-table {
 }
 
 .mat-dialog-container {
-    background-color: $gray-11;
+    background-color: $gray-11-color;
 }
 
 .loading-pane {
@@ -119,7 +120,7 @@ table.gray-table {
     button.mat-menu-item {
         border-bottom: 1px solid rgb(0 0 0 / 5%) !important;
         @include text("body");
-        color: $gray-2;
+        color: $gray-2-color;
         &:last-child {
             border-bottom: none !important;
         }
@@ -127,13 +128,13 @@ table.gray-table {
 }
 
 .notification-error {
-    background-color: $color-danger;
-    color: $white;
+    background-color: $danger-color;
+    color: $white-color;
 }
 
 .notification-success {
-    background-color: $color-success;
-    color: $white;
+    background-color: $success-color;
+    color: $white-color;
 }
 
 .submit-btn {
@@ -141,20 +142,20 @@ table.gray-table {
     transition: background-color ease 0.5s;
 
     &:hover {
-        background-color: $gray-6;
+        background-color: $gray-6-color;
         transition: background-color ease 0.5s;
     }
 
     &:focus {
-        background-color: $gray-5;
+        background-color: $gray-5-color;
     }
 
     .disabled {
-        background-color: $gray-4;
+        background-color: $gray-4-color;
         pointer-events: none;
         opacity: 0.6;
         .btn-text {
-            color: $gray-3;
+            color: $gray-3-color;
         }
     }
 }
@@ -177,10 +178,10 @@ table.gray-table {
 .app-slide-toggle.mat-checked {
     .mat-slide-toggle-bar,
     .mat-ripple-element {
-        background-color: $color-1;
+        background-color: $green-1-color;
     }
     .mat-slide-toggle-thumb {
-        background-color: $white;
+        background-color: $white-color;
     }
 }
 
@@ -192,15 +193,15 @@ table.gray-table {
         height: 44px;
         box-shadow: none;
         font-size: $text-font;
-        border: 1px solid $gray-5;
+        border: 1px solid $gray-5-color;
         outline: none;
         letter-spacing: 1px;
         font-family: $family-roboto;
-        background-color: $gray-7;
+        background-color: $gray-7-color;
         transition: background-color ease 0.5s;
 
         &:hover {
-            background-color: $white;
+            background-color: $white-color;
             transition: background-color ease 0.5s;
         }
 
@@ -213,7 +214,7 @@ table.gray-table {
             display: flex;
             align-items: flex-end;
             letter-spacing: -0.28px;
-            color: $gray-4;
+            color: $gray-4-color;
         }
     }
 }
@@ -227,7 +228,7 @@ table.gray-table {
 }
 
 mat-select {
-    background-color: $gray-7;
+    background-color: $gray-7-color;
     padding: 10px 16px;
     letter-spacing: 0.7px;
     font-family: $family-roboto;
@@ -248,12 +249,12 @@ mat-select {
     border: none;
     outline: none;
     letter-spacing: 0.7px;
-    background-color: $gray-7;
+    background-color: $gray-7-color;
     font-family: $family-roboto;
     transition: background-color ease 0.5s;
 
     &:hover {
-        background-color: $white;
+        background-color: $white-color;
         transition: background-color ease 0.5s;
     }
 
@@ -276,12 +277,12 @@ mat-select {
     align-items: center;
     text-align: center;
     padding: 8px 15px;
-    color: #fff;
-    background-color: $color-info;
+    color: $white-color;
+    background-color: $info-color;
     transition: background-color ease 0.5s;
 
     &:hover {
-        background-color: #017fb9c7;
+        background-color: rgba($info-color, 0.85);
         transition: background-color ease 0.5s;
     }
 
@@ -290,7 +291,7 @@ mat-select {
     }
 
     &:disabled {
-        background-color: $gray-5;
+        background-color: $gray-5-color;
         pointer-events: none;
         opacity: 0.6;
     }
@@ -303,7 +304,7 @@ mat-select {
 .app-fab-button.app-fab-button {
     width: 40px;
     height: 40px;
-    background: $white;
+    background: $white-color;
     box-shadow: $outer-shadow-1 !important;
 
     &:focus {
@@ -314,7 +315,7 @@ mat-select {
         padding: 0 !important;
 
         .mat-icon {
-            color: $gray-3;
+            color: $gray-3-color;
             font-size: ($title-font + 6);
             width: unset;
             height: 32px;
@@ -327,7 +328,7 @@ mat-select {
 }
 
 .info-txt {
-    color: $color-info;
+    color: $info-color;
 }
 
 .app-outlined-button {
@@ -335,10 +336,10 @@ mat-select {
     font-style: $style-normal;
     font-weight: $weight-400;
     font-size: ($text-font - 1);
-    background: $white-1;
+    background: $white-1-color;
     line-height: 13px;
-    color: $color-info;
-    border: 1px solid $gray-9;
+    color: $info-color;
+    border: 1px solid $gray-9-color;
     padding: 6px 15px;
     border-radius: 4px;
     cursor: pointer;
@@ -349,24 +350,24 @@ mat-select {
     }
 
     &:hover {
-        color: $color-info;
+        color: $info-color;
         text-decoration: none;
-        background-color: $white;
+        background-color: $white-color;
     }
 
     .delete-txt {
-        color: $color-danger-dark;
+        color: $danger-dark-color;
     }
 }
 
 .create-div {
-    color: $color-1;
+    color: $green-1-color;
     padding: 8px 15px;
 
     &:hover {
-        color: $color-1;
+        color: $green-1-color;
         text-decoration: none;
-        background-color: $white;
+        background-color: $white-color;
     }
 }
 
@@ -379,7 +380,7 @@ mat-select {
 
 .dpm-no-data {
     @include text("body");
-    color: $gray-2;
+    color: $gray-2-color;
     min-height: 240px;
     display: flex;
     flex-direction: column;
@@ -402,7 +403,7 @@ mat-select {
 
 .public-text {
     @include text("small");
-    color: $color-1;
+    color: $green-1-color;
     line-height: 8px;
     margin-left: 0px;
 }
@@ -410,7 +411,7 @@ mat-select {
 .not-public-text {
     @include text("small");
     line-height: 8px;
-    color: $gray-3;
+    color: $gray-3-color;
     margin-left: 0px;
 }
 
@@ -428,12 +429,12 @@ mat-select {
 .autocomplete-description {
     line-height: 12px;
     font-size: $small-font;
-    color: $gray-3;
+    color: $gray-3-color;
     font-weight: $weight-300;
 }
 
 .mat-option {
-    border-bottom: 1px solid $gray-6;
+    border-bottom: 1px solid $gray-6-color;
 }
 
 .header-border {
@@ -469,7 +470,7 @@ div {
             text-align: center;
             line-height: 18px;
             letter-spacing: -0.28px;
-            color: $gray-3;
+            color: $gray-3-color;
             outline: transparent solid 0px;
         }
     }
@@ -482,7 +483,7 @@ div {
         line-height: 55px;
         text-align: center;
         margin: 20px 0 10px;
-        color: $gray-1;
+        color: $gray-1-color;
         text-shadow: $text-shadow;
     }
 }
@@ -509,7 +510,7 @@ textarea.flat-input,
     display: flex;
     align-items: flex-end;
     letter-spacing: 0.7px;
-    color: $gray-1;
+    color: $gray-1-color;
 
     &:focus {
         outline: transparent solid 0px;
@@ -525,12 +526,12 @@ textarea.flat-input,
         display: flex;
         align-items: flex-end;
         letter-spacing: 0.7px;
-        color: $gray-4;
+        color: $gray-4-color;
     }
 }
 
 button.save-btn {
-    color: $gray-3;
+    color: $gray-3-color;
     position: relative;
     top: 4px;
     text-align: center;
@@ -560,12 +561,12 @@ button:focus {
 
 .disabled,
 button:disabled {
-    background-color: $gray-color-8;
+    background-color: $custom-gray-8-color;
     pointer-events: none;
     opacity: 0.6;
 
     .btn-text {
-        color: $gray-color-3;
+        color: $custom-gray-3-color;
     }
 }
 
@@ -581,12 +582,12 @@ button:disabled {
 .mat-stroked-button.mat-accent[disabled],
 .mat-stroked-button.mat-warn[disabled],
 .mat-stroked-button[disabled][disabled] {
-    background-color: $gray-color-8;
+    background-color: $custom-gray-8-color;
     pointer-events: none;
     opacity: 0.6;
 
     span {
-        color: $gray-color-3;
+        color: $custom-gray-3-color;
     }
 }
 
@@ -610,8 +611,8 @@ button:disabled {
     padding-right: 0px !important;
     max-height: calc(100vh - 130px);
     padding: 10px 0px 5px 0px;
-    border-top: 1px solid #ddddddad;
-    border-bottom: 1px solid #dddddd7a;
+    border-top: 1px solid $custom-gray-9-color;
+    border-bottom: 1px solid $custom-gray-9-color;
 }
 
 .div-question {
@@ -621,7 +622,7 @@ button:disabled {
     font-size: $text-font;
     line-height: 18px;
     letter-spacing: 0.7px;
-    color: $gray-2;
+    color: $gray-2-color;
     width: 230px;
 }
 
@@ -649,7 +650,7 @@ button:disabled {
     margin-top: 3px !important;
     font-size: 12px;
     line-height: 15px;
-    color: $color-danger !important;
+    color: $danger-color !important;
 }
 
 #addUser {
@@ -698,16 +699,16 @@ button:disabled {
     }
 
     .mat-form-field-ripple {
-        background-color: $color-info !important;
+        background-color: $info-color !important;
     }
 }
 
 .mat-focused .mat-form-field-label {
-    color: $color-info !important;
+    color: $info-color !important;
 }
 
 .slug {
-    color: $color-danger;
+    color: $danger-color;
 }
 
 .border-none {
@@ -723,7 +724,7 @@ button:disabled {
 #deletePackage,
 #deleteUser {
     .btn-delete {
-        color: $color-danger;
+        color: $danger-color;
         position: relative;
         top: 4px;
         text-align: center;
@@ -754,7 +755,7 @@ button:disabled {
     .copy-input {
         border: 1px solid rgb(0 0 0 / 10%);
         padding: 6px 10px;
-        background: $white;
+        background: $white-color;
         width: 100%;
         height: 36px;
         overflow: hidden;
@@ -767,13 +768,13 @@ button:disabled {
         .copy-txt {
             font-weight: $weight-400 !important;
             font-size: ($text-font - 1) !important;
-            color: $gray-1 !important;
+            color: $gray-1-color !important;
             letter-spacing: 0.1px !important;
         }
     }
 
     .copy-btn {
-        background: #7d7d7de8;
+        background: $gray-3-color;
         border: none;
         height: 36px;
         padding: 6px 15px;
@@ -782,7 +783,7 @@ button:disabled {
 
         a {
             font-size: $text-font !important;
-            color: $white !important;
+            color: $white-color !important;
         }
     }
 }
@@ -794,7 +795,7 @@ button:disabled {
         font-weight: $weight-400;
         font-size: $text-font;
         letter-spacing: unset;
-        color: $gray-2;
+        color: $gray-2-color;
         padding: 10px;
     }
 
@@ -825,7 +826,7 @@ button:disabled {
 }
 
 .mat-primary .mat-option.mat-selected:not(.mat-option-disabled) {
-    color: $color-info;
+    color: $info-color;
 }
 
 .package-light-gray {
@@ -834,7 +835,7 @@ button:disabled {
     font-weight: $weight-300;
     font-size: $small-font;
     letter-spacing: 0.4px;
-    color: $gray-3;
+    color: $gray-3-color;
     margin-bottom: 0px !important;
 }
 
@@ -844,7 +845,7 @@ button:disabled {
     font-weight: $weight-400;
     font-size: ($text-font - 1);
     letter-spacing: 0.4px;
-    color: $gray-2;
+    color: $gray-2-color;
     margin-bottom: 5px !important;
 }
 
@@ -854,7 +855,7 @@ button:disabled {
     font-size: $title-font;
     font-weight: $weight-400;
     margin-bottom: 15px;
-    color: $gray-1;
+    color: $gray-1-color;
     letter-spacing: 0.6px;
 }
 
@@ -872,7 +873,7 @@ button:disabled {
             letter-spacing: 0.6px;
             line-height: 24px;
             text-align: center;
-            color: $gray-3;
+            color: $gray-3-color;
             text-decoration: none;
             padding: 0px 10px 4px 10px;
             margin: 0px 10px;
@@ -890,8 +891,8 @@ button:disabled {
 
     .active {
         opacity: 1;
-        color: $gray-1 !important;
-        border-bottom: 2px solid $gray-1;
+        color: $gray-1-color !important;
+        border-bottom: 2px solid $gray-1-color;
     }
 }
 

@@ -1,4 +1,5 @@
 @import "../../../styles/variables";
+@import "../../../styles/colors";
 
 #createCollection {
     position: relative;
@@ -12,7 +13,7 @@
         padding-left: 2px;
         padding-top: 3px;
         font-size: $xsmall-font;
-        color: $color-danger;
+        color: $danger-color;
         line-height: 12px;
     }
 }

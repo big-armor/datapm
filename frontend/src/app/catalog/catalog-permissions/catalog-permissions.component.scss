@@ -1,4 +1,5 @@
 @import "../../../styles/variables";
+@import "../../../styles/colors";
 
 table.gray-table {
     .mat-column-permission {
@@ -8,7 +9,7 @@ table.gray-table {
 
 .permission-div {
     ::ng-deep mat-select {
-        border: 1px solid #dddddd;
+        border: 1px solid $gray-9-color;
         border-radius: 6px;
         padding: 6px 10px;
     }

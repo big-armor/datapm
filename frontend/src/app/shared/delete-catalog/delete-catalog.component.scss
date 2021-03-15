@@ -1,4 +1,5 @@
 @import "../../../styles/variables";
+@import "../../../styles/colors";
 
 #deleteCatalog {
     width: 500px;
@@ -7,14 +8,14 @@
     p {
         font-size: $text-font;
         margin-bottom: 0px;
-        color: $gray-1;
+        color: $gray-1-color;
     }
 
     .oneline-input {
         ::ng-deep input.mat-input-element {
             width: unset;
             border: none;
-            border-bottom: 2px solid $color-danger;
+            border-bottom: 2px solid $danger-color;
             background: transparent;
             outline: transparent solid 1px;
         }

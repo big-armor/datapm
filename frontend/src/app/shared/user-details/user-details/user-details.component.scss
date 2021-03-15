@@ -1,4 +1,5 @@
 @import "../../../../styles/variables";
+@import "../../../../styles/colors";
 
 #detailsPage {
     margin-top: 30px;
@@ -10,7 +11,7 @@
         font-size: $text-font;
         line-height: 26px;
         letter-spacing: -0.28px;
-        color: $gray-1;
+        color: $gray-1-color;
         padding: 24px;
         padding-bottom: 0;
     }
@@ -27,22 +28,22 @@
             font-size: $xsmall-font;
             line-height: 12px;
             margin-top: 5px;
-            color: $color-danger;
+            color: $danger-color;
         }
     }
 
     .command-container {
         padding: 8px;
         border-radius: 4px;
-        background-color: $white;
+        background-color: $white-color;
 
         &:hover {
             cursor: pointer;
-            background-color: $gray-9;
+            background-color: $gray-9-color;
         }
 
         &:active {
-            background-color: $gray-8;
+            background-color: $gray-8-color;
         }
     }
 
@@ -64,7 +65,7 @@
             align-items: center;
 
             input {
-                border: 1px solid $gray-5;
+                border: 1px solid $gray-5-color;
                 line-height: 23px;
                 height: 33px;
                 display: flex;
@@ -87,7 +88,7 @@
                     display: flex;
                     align-items: flex-end;
                     letter-spacing: -0.28px;
-                    color: $gray-4;
+                    color: $gray-4-color;
                 }
             }
         }
@@ -104,5 +105,5 @@
 }
 
 .disabled {
-    background-color: $gray-4;
+    background-color: $gray-4-color;
 }

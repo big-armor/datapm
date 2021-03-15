@@ -1,4 +1,5 @@
 @import "./src/styles/variables.scss";
+@import "./src/styles/colors.scss";
 
 .page-container {
     text-align: center;
@@ -19,7 +20,7 @@
     .counter {
         margin: 40px auto;
         font-size: 30px;
-        color: $color-danger;
+        color: $danger-color;
         position: relative;
         width: 50px;
         height: 50px;
@@ -42,29 +43,29 @@
         }
 
         .delete-permanently-button {
-            background: $color-danger;
-            color: white !important;
+            background: $danger-color;
+            color: $white-color !important;
 
             &:disabled {
-                background: $gray-4;
+                background: $gray-4-color;
                 cursor: not-allowed;
             }
 
             &:hover {
-                background: white !important;
-                color: $color-danger !important;
-                border: 1px solid $color-danger;
+                background: $white-color !important;
+                color: $danger-color !important;
+                border: 1px solid $danger-color;
             }
         }
 
         .cancel-button {
-            background: $gray-5;
+            background: $gray-5-color;
             color: black;
 
             &:hover {
-                background: white !important;
-                color: $color-danger !important;
-                border: 1px solid $color-danger;
+                background: $white-color !important;
+                color: $danger-color !important;
+                border: 1px solid $danger-color;
             }
         }
     }

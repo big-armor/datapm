@@ -1,8 +1,9 @@
 @import "./src/styles/variables.scss";
+@import "./src/styles/colors.scss";
 
 #deleteUser {
     .white-border {
-        background: #fff;
+        background: $white-color;
         padding: 15px 10px;
         margin-bottom: 10px;
 
@@ -16,7 +17,7 @@
             width: unset;
             border-radius: 0px;
             border-color: transparent;
-            border-bottom: 2px solid $color-danger;
+            border-bottom: 2px solid $danger-color;
             background: transparent;
             outline: transparent solid 0px;
         }
@@ -25,7 +26,7 @@
     p {
         font-size: $text-font;
         margin-bottom: 0;
-        color: $gray-1;
+        color: $gray-1-color;
     }
 
     .btn-delete {

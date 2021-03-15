@@ -1,5 +1,6 @@
 @import "../../../styles/mixins";
 @import "../../../styles/variables";
+@import "../../../styles/colors";
 
 .desktop-menu {
     max-width: 1450px;
@@ -16,7 +17,7 @@
             line-height: 14px;
             text-align: center;
             cursor: pointer;
-            color: $gray-3;
+            color: $gray-3-color;
         }
     }
 
@@ -75,7 +76,7 @@
 }
 
 .dpm-text-logo {
-    color: $gray-1;
+    color: $gray-1-color;
     cursor: pointer;
     &:hover {
         text-decoration: none;

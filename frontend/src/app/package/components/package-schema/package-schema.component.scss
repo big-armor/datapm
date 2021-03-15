@@ -1,4 +1,5 @@
 @import "../../../../styles/variables";
+@import "../../../../styles/colors";
 
 #schema {
     .schema-text {
@@ -8,7 +9,7 @@
         font-size: $xsmall-font;
         line-height: 13px;
         letter-spacing: 0.6px;
-        color: $gray-2;
+        color: $gray-2-color;
     }
 
     .package-dark-gray {
@@ -39,7 +40,7 @@
                     font-size: $small-font;
                     line-height: 18px;
                     letter-spacing: 0.6px;
-                    color: $gray-2;
+                    color: $gray-2-color;
                     padding-right: 10px;
                 }
 
@@ -53,9 +54,9 @@
                     align-items: center;
                     text-align: right;
                     letter-spacing: 0.6px;
-                    color: $gray-3;
+                    color: $gray-3-color;
                     padding-right: 6px;
-                    border-bottom: 1px solid $gray-9;
+                    border-bottom: 1px solid $gray-9-color;
                 }
             }
             ::ng-deep {

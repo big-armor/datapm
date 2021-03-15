@@ -1,0 +1,257 @@
+// black and white
+$black-color: #000;
+$black-color-dark: #fff;
+
+$white-color: #fff;
+$white-color-dark: #000;
+
+$white-1-color: #ffffffb3;
+$white-1-color-dark: #ffffffb3;
+
+$black-1-color: rgba($black-color, 0.08);
+$black-1-color-dark: rgba($black-color, 0.08);
+// balck and white
+
+// gray shades
+$gray-1-color: #333;
+$gray-1-color-dark: #333;
+
+$gray-2-color: #4f4f4f;
+$gray-2-color-dark: #4f4f4f;
+
+$gray-3-color: #828282;
+$gray-3-color-dark: #828282;
+
+$gray-4-color: #bdbdbd;
+$gray-4-color-dark: #bdbdbd;
+
+$gray-5-color: #e0e0e0;
+$gray-5-color-dark: #e0e0e0;
+
+$gray-6-color: #f2f2f2;
+$gray-6-color-dark: #f2f2f2;
+
+$gray-7-color: #f9f9f9;
+$gray-7-color-dark: #f9f9f9;
+
+$gray-8-color: #ccc;
+$gray-8-color-dark: #ccc;
+
+$gray-9-color: #ddd;
+$gray-9-color-dark: #ddd;
+
+$gray-10-color: #eee;
+$gray-10-color-dark: #eee;
+
+$gray-11-color: #f3f3f3;
+$gray-11-color-dark: #f3f3f3;
+
+$gray-12-color: #ededed;
+$gray-12-color-dark: #ededed;
+
+$custom-gray-1-color: #aeaeae;
+$custom-gray-1-color-dark: #aeaeae;
+
+$custom-gray-8-color: rgba($gray-8-color, 0.85);
+$custom-gray-8-color-dark: rgba($gray-8-color, 0.85);
+
+$custom-gray-9-color: rgba($gray-9-color, 0.85);
+$custom-gray-9-color-dark: rgba($gray-9-color, 0.85);
+
+$custom-gray-3-color: rgba($gray-3-color, 0.73);
+$custom-gray-3-color-dark: rgba($gray-3-color, 0.73);
+// gray shades
+
+$green-1-color: #00a896;
+$green-1-color-dark: #00a896;
+
+$green-2-color: rgba($green-1-color, 0.8);
+$green-3-color: rgba($green-1-color, 0.6);
+$green-4-color: rgba($green-1-color, 0.4);
+$green-5-color: rgba($green-1-color, 0.2);
+$green-6-color: rgba($green-1-color, 0.1);
+
+// main colors
+$info-color: #017fb9;
+$info-color-dark: #017fb9;
+
+$success-color: #2eb244;
+$success-color-dark: #2eb244;
+
+$warning-color: #efd54b;
+$warning-color-dark: #efd54b;
+
+$danger-color: #e23326;
+$danger-color-dark: #e23326;
+
+$danger-dark-color: #dc3545;
+$danger-dark-color-dark: #dc3545;
+
+$danger-lighter-color: #fe0000;
+$danger-lighter-color-dark: #fe0000;
+// main colors
+
+// social media
+$fb-color: #3e68c0;
+$fb-color-dark: #3e68c0;
+
+$reddit-color: #ff4500;
+$reddit-color-dark: #ff4500;
+
+$email-color: #7d7d7d;
+$email-color-dark: #7d7d7d;
+
+$twitter-color: #1b95e0;
+$twitter-color-dark: #1b95e0;
+
+$fb-hover-color: rgba($fb-color, 0.9);
+$fb-hover-color-dark: rgba($fb-color, 0.9);
+
+$reddit-hover-color: rgba($reddit-color, 0.9);
+$reddit-hover-color-dark: rgba($reddit-color, 0.9);
+
+$email-hover-color: rgba($email-color, 0.9);
+$email-hover-color-dark: rgba($email-color, 0.9);
+
+$twitter-hover-color: rgba($twitter-color, 0.9);
+$twitter-hover-color-dark: rgba($twitter-color, 0.9);
+// social media
+
+$colors: (
+    --black-color: (
+        $black-color,
+        $black-color-dark
+    ),
+    --white-color: (
+        $white-color,
+        $white-color-dark
+    ),
+    --white-1-color: (
+        $white-1-color,
+        $white-1-color-dark
+    ),
+    --black-1-color: (
+        $black-1-color,
+        $black-1-color-dark
+    ),
+    --gray-1-color: (
+        $gray-1-color,
+        $gray-1-color-dark
+    ),
+    --gray-2-color: (
+        $gray-2-color,
+        $gray-2-color-dark
+    ),
+    --gray-3-color: (
+        $gray-3-color,
+        $gray-3-color-dark
+    ),
+    --gray-4-color: (
+        $gray-4-color,
+        $gray-4-color-dark
+    ),
+    --gray-5-color: (
+        $gray-5-color,
+        $gray-5-color-dark
+    ),
+    --gray-6-color: (
+        $gray-6-color,
+        $gray-6-color-dark
+    ),
+    --gray-7-color: (
+        $gray-7-color,
+        $gray-7-color-dark
+    ),
+    --gray-8-color: (
+        $gray-8-color,
+        $gray-8-color-dark
+    ),
+    --gray-9-color: (
+        $gray-9-color,
+        $gray-9-color-dark
+    ),
+    --gray-10-color: (
+        $gray-10-color,
+        $gray-10-color-dark
+    ),
+    --gray-11-color: (
+        $gray-11-color,
+        $gray-11-color-dark
+    ),
+    --gray-12-color: (
+        $gray-12-color,
+        $gray-12-color-dark
+    ),
+    --custom-gray-1-color: (
+        $custom-gray-1-color,
+        $custom-gray-1-color-dark
+    ),
+    --custom-gray-8-color: (
+        $custom-gray-8-color,
+        $custom-gray-8-color-dark
+    ),
+    --custom-gray-9-color: (
+        $custom-gray-9-color,
+        $custom-gray-9-color-dark
+    ),
+    --custom-gray-3-color: (
+        $custom-gray-3-color,
+        $custom-gray-3-color-dark
+    ),
+    --green-1-color: (
+        $green-1-color,
+        $green-1-color-dark
+    ),
+    --info-color: (
+        $info-color,
+        $info-color-dark
+    ),
+    --success-color: (
+        $success-color,
+        $success-color-dark
+    ),
+    --warning-color: (
+        $warning-color,
+        $warning-color-dark
+    ),
+    --danger-dark-color: (
+        $danger-dark-color,
+        $danger-dark-color-dark
+    ),
+    --danger-lighter-color: (
+        $danger-lighter-color,
+        $danger-lighter-color-dark
+    ),
+    --fb-color: (
+        $fb-color,
+        $fb-color-dark
+    ),
+    --reddit-color: (
+        $reddit-color,
+        $reddit-color-dark
+    ),
+    --email-color: (
+        $email-color,
+        $email-color-dark
+    ),
+    --twitter-color: (
+        $twitter-color,
+        $twitter-color-dark
+    ),
+    --fb-hover-color: (
+        $fb-hover-color,
+        $fb-hover-color-dark
+    ),
+    --reddit-hover-color: (
+        $reddit-hover-color,
+        $reddit-hover-color-dark
+    ),
+    --email-hover-color: (
+        $email-hover-color,
+        $email-hover-color-dark
+    ),
+    --twitter-hover-color: (
+        $twitter-hover-color,
+        $twitter-hover-color-dark
+    )
+);

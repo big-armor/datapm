@@ -1,4 +1,5 @@
 @import "../../../../styles/variables";
+@import "../../../../styles/colors";
 
 #adminUsers {
     table.mat-table {
@@ -23,7 +24,7 @@
                     font-size: $text-font;
                     letter-spacing: 0.4px;
                     font-weight: $weight-300;
-                    color: $gray-4;
+                    color: $gray-4-color;
                 }
             }
         }
@@ -38,10 +39,10 @@
 
         .mat-form-field-flex {
             padding: 0px;
-            background: #f9f9f9;
+            background: $gray-7-color;
             width: 218px;
             border-radius: 6px;
-            border: 1px solid #e0e0e0;
+            border: 1px solid $gray-5-color;
         }
 
         .mat-form-field-underline {

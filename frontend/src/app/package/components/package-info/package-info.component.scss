@@ -1,8 +1,9 @@
 @import "../../../../styles/variables";
+@import "../../../../styles/colors";
 
 #packageInfo {
     .share-data {
-        border-bottom: 1px solid #bdbdbd54;
+        border-bottom: 1px solid $gray-9-color;
 
         .three-btn-div {
             justify-content: flex-end;
@@ -14,7 +15,7 @@
             box-shadow: none;
             line-height: 13px;
             padding: 6px 10px;
-            border: 1px solid #ddd;
+            border: 1px solid $gray-9-color;
         }
     }
 
@@ -26,20 +27,20 @@
 
     .rounded-div {
         box-shadow: $inner-shadow-1;
-        background-color: $white;
+        background-color: $white-color;
         border-radius: 24px;
         padding: 8px 15px;
-        color: $black;
+        color: $black-color;
         cursor: pointer;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
 
         &:hover {
-            background-color: $gray-10;
+            background-color: $gray-10-color;
         }
         &:active {
-            background-color: $gray-9;
+            background-color: $gray-9-color;
         }
 
         .install-txt {
@@ -49,7 +50,7 @@
             font-size: $text-font;
             line-height: 18px;
             letter-spacing: -0.28px;
-            color: $gray-1;
+            color: $gray-1-color;
         }
     }
 }

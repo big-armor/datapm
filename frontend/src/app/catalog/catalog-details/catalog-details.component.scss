@@ -1,8 +1,9 @@
 @import "../../../styles/variables";
+@import "../../../styles/colors";
 
 .catalog-details {
     position: relative;
-    color: $gray-1;
+    color: $gray-1-color;
 
     app-cover ::ng-deep img {
         height: 150px;
@@ -34,7 +35,7 @@
                 font-size: ($default-font - 1);
                 line-height: 24px;
                 text-align: center;
-                color: $gray-2;
+                color: $gray-2-color;
                 text-decoration: none;
                 text-transform: lowercase;
 
@@ -45,13 +46,12 @@
 
             .mat-tab-label-active {
                 opacity: 1;
-                color: #333 !important;
-                // border-bottom: 2px solid #333;
+                color: $gray-1-color !important;
             }
 
             .mat-ink-bar {
                 width: 85px !important;
-                background-color: $gray-1;
+                background-color: $gray-1-color;
             }
         }
     }

@@ -1,4 +1,5 @@
 @import "../../../../styles/variables";
+@import "../../../../styles/colors";
 
 .dialog-wrapper-account {
     .dialog-subtile {
@@ -8,7 +9,7 @@
         font-size: ($small-font + 1);
         line-height: 12px;
         letter-spacing: -0.28px;
-        color: $gray-2;
+        color: $gray-2-color;
     }
 
     .div-with-errors {
@@ -18,7 +19,7 @@
         font-weight: $weight-400;
         padding-left: 10px;
         font-size: $small-font;
-        color: $gray-1;
+        color: $gray-1-color;
         line-height: 12px;
 
         .alert-info {
