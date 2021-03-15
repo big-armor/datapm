@@ -18,7 +18,7 @@ import { ValidCollectionSlugDirective } from "./directive/ValidCollectionSlugDir
 import { ValidateImageUploadDirective } from "./directive/ValidImageUploadDirective";
 import { ValidBase64ImageUploadDirective } from "./directive/ValidBase64ImageUploadDirective";
 import { ValidUsernameOrEmailAddressDirective } from "./directive/ValidUsernameOrEmailAddressDirective";
-import { ValidateMarkdownDirective } from "./directive/validMarkdownDirective";
+import { ValidateMarkdownDirective } from "./directive/ValidMarkdownDirective";
 
 const SCHEMAS_DIRECTORY = "node_modules/datapm-lib/";
 const SCHEMA_FILES = ["schema.gql", "auth-schema.gql", "user-schema.gql", "api-key-schema.gql", "images-schema.gql"];

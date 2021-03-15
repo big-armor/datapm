@@ -136,6 +136,10 @@ export const createPackageIssue = async (
     context: AuthenticatedContext,
     info: any
 ) => {
+    if (!context.me) {
+        throwNotAuthorizedError();
+    }
+
     const packageEntity = await context.connection.manager
         .getCustomRepository(PackageRepository)
         .findPackageOrFail({ identifier: packageIdentifier });
