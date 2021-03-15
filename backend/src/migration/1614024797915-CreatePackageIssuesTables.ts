@@ -39,5 +39,5 @@ export class CreatePackageIssuesTables1614024797915 implements MigrationInterfac
         queryRunner.query(query);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> { }
+    public async down(queryRunner: QueryRunner): Promise<void> {}
 }
