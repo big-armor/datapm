@@ -4,7 +4,7 @@
     </div>
     <div class="main-wrapper">
         <div class="issue-wrapper issue-header">
-            <a class="example-section">
+            <a class="example-section" *ngIf="isUserAPackageManager">
                 <mat-checkbox [(ngModel)]="allIssuesSelected" (change)="toggleAllIssuesSelection($event.checked)">
                 </mat-checkbox>
             </a>
@@ -52,7 +52,7 @@
         <ng-container *ngIf="state === State.SUCCESS">
             <div *ngFor="let issue of issues" class="issue-wrapper">
                 <div class="d-flex flex-row bd-highlight">
-                    <section class="example-section">
+                    <section *ngIf="isUserAPackageManager" class="example-section">
                         <mat-checkbox (change)="toggleIssue(issue, $event.checked)" [ngModel]="issue.checked">
                         </mat-checkbox>
                     </section>
@@ -76,7 +76,7 @@
                         </div>
                     </div>
                     <div class="bd-highlight align-self-center ml-auto">
-                        <img class="img-comments" [src]="getUserAvatar(issue.author.username) | async" />
+                        <app-avatar [user]="issue.author" [size]="30"></app-avatar>
                     </div>
                 </div>
             </div>
@@ -102,22 +102,25 @@
             <div class="package-dark-gray py-5">
                 There are no open issues.
                 <br />
-                Click the <span (click)="toggleIncludeClosedIssues()">'Closed'</span> tab to view closed issues
+                Click the <a href="javascript::void(0)" (click)="toggleIncludeClosedIssues()">'Closed'</a> tab to view
+                closed issues
             </div>
         </div>
         <!-- when there are no closed issues -->
         <div class="issue-wrapper text-center" *ngIf="state === State.NO_CLOSED_ISSUES">
             <div class="package-dark-gray py-5">
                 There are no closed issues. <br />
-                Click the <span (click)="toggleIncludeOpenIssues()">'Open'</span> tab to view open issues
+                Click the <a href="javascript::void(0)" (click)="toggleIncludeOpenIssues()">'Open'</a> tab to view open
+                issues
             </div>
         </div>
         <!-- when there are no open/closed issues -->
         <div class="issue-wrapper text-center" *ngIf="state === State.NO_ISSUES">
             <div class="package-dark-gray py-5">
                 There are no issues. <br />
-                Click to the <span (click)="toggleIncludeAllIssues()">'open a new issue'</span> button to create one
-                issue.
+                Click to the
+                <a href="javascript::void(0)" (click)="toggleIncludeAllIssues()">'open a new issue'</a> button to create
+                one issue.
             </div>
         </div>
     </div>

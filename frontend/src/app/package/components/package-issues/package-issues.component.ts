@@ -1,4 +1,3 @@
-import { I } from "@angular/cdk/keycodes";
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -12,6 +11,7 @@ import {
     PackageIssue,
     PackageIssuesGQL,
     PackageIssueStatus,
+    Permission,
     UpdatePackageIssuesStatusesGQL
 } from "src/generated/graphql";
 import { PackageService } from "../../services/package.service";
@@ -54,6 +54,8 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
 
     public allIssuesSelected: boolean = false;
     public anyIssueSelected: boolean = false;
+
+    public isUserAPackageManager: boolean = false;
 
     private packageIdentifier: PackageIdentifierInput;
     private offset: number;
@@ -187,10 +189,13 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
     private loadPackage(): void {
         this.state = State.LOADING;
         this.packageService.package.subscribe((packageResponse) => {
+            const fetchedPackage = packageResponse.package;
             this.packageIdentifier = {
-                catalogSlug: packageResponse.package.identifier.catalogSlug,
-                packageSlug: packageResponse.package.identifier.packageSlug
+                catalogSlug: fetchedPackage.identifier.catalogSlug,
+                packageSlug: fetchedPackage.identifier.packageSlug
             };
+
+            this.isUserAPackageManager = fetchedPackage.myPermissions.includes(Permission.MANAGE);
             this.offset = 0;
             this.reloadIssues();
         });

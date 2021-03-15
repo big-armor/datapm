@@ -48,7 +48,7 @@ export class PackageIssueRepository extends Repository<PackageIssueEntity> {
             .setParameter("packageId", packageId)
             .offset(offset)
             .limit(limit)
-            .orderBy(orderBy)
+            .orderBy(orderBy, "DESC")
             .addRelations(ALIAS, relations)
             .getManyAndCount();
     }

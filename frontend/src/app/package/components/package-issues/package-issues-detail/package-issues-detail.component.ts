@@ -1,8 +1,9 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
-import { Subject } from "rxjs";
+import { combineLatest, Subject } from "rxjs";
 import { PackageService } from "src/app/package/services/package.service";
+import { AuthenticationService } from "src/app/services/authentication.service";
 import { ConfirmationDialogService } from "src/app/services/dialog/confirmation-dialog.service";
 import { ImageService } from "src/app/services/image.service";
 import { MarkdownEditorComponent } from "src/app/shared/markdown-editor/markdown-editor.component";
@@ -18,9 +19,11 @@ import {
     PackageIssueGQL,
     PackageIssueIdentifierInput,
     PackageIssueStatus,
+    Permission,
     UpdatePackageIssueCommentGQL,
     UpdatePackageIssueGQL,
-    UpdatePackageIssueStatusGQL
+    UpdatePackageIssueStatusGQL,
+    User
 } from "src/generated/graphql";
 
 enum State {
@@ -66,9 +69,14 @@ export class PackageIssuesDetailComponent implements OnInit {
 
     public errorMessage: string;
 
+    public isUserPackageManager: boolean = false;
+    public canEditIssue: boolean = false;
+
+    public user: User;
     private commentsOffset = 0;
 
     constructor(
+        private authenticationService: AuthenticationService,
         private packageService: PackageService,
         private packageIssueGQL: PackageIssueGQL,
         private updatePackageIssueGQL: UpdatePackageIssueGQL,
@@ -302,6 +310,10 @@ export class PackageIssuesDetailComponent implements OnInit {
         return this.imageService.loadUserAvatar(username);
     }
 
+    public canEditComment(comment: PackageIssueCommentWithEditorStatus): boolean {
+        return this.isUserPackageManager || comment.author.username === this.user.username;
+    }
+
     private changeIssueStatus(status: PackageIssueStatus): void {
         this.updatePackageIssueStatusGQL
             .mutate({
@@ -324,13 +336,19 @@ export class PackageIssuesDetailComponent implements OnInit {
 
     private loadPackage(): void {
         this.state = State.LOADING;
-        this.packageService.package.subscribe((packageResponse) => {
-            this.packageIdentifier = {
-                catalogSlug: packageResponse.package.identifier.catalogSlug,
-                packageSlug: packageResponse.package.identifier.packageSlug
-            };
-            this.loadPackageIssue();
-        });
+        combineLatest([this.authenticationService.currentUser, this.packageService.package]).subscribe(
+            ([user, packageResponse]) => {
+                const fetchedPackage = packageResponse.package;
+                this.packageIdentifier = {
+                    catalogSlug: fetchedPackage.identifier.catalogSlug,
+                    packageSlug: fetchedPackage.identifier.packageSlug
+                };
+
+                this.user = user;
+                this.isUserPackageManager = fetchedPackage.myPermissions.includes(Permission.MANAGE);
+                this.loadPackageIssue();
+            }
+        );
     }
 
     private loadPackageIssue(): void {
@@ -348,6 +366,8 @@ export class PackageIssuesDetailComponent implements OnInit {
                 }
 
                 this.packageIssue = response.data.packageIssue;
+                this.canEditIssue =
+                    this.isUserPackageManager || this.packageIssue.author.username === this.user.username;
                 this.packageIssueEditedContent = this.packageIssue.content;
                 this.loadPackageIssueComments();
             });
