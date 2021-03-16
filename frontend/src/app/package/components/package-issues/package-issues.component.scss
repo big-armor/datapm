@@ -14,29 +14,35 @@
         }
     }
 
-    .open-issue {
+    .open-status {
+        background: $color-info;
+        padding: 4px 11px;
+        border-radius: 14px;
+        font-size: $small-font;
+        color: #fff;
+
+        &:hover {
+            text-decoration: none;
+        }
+
         em {
-            color: $color-info;
-            font-size: 8px;
-            border: 2px solid $color-info;
-            border-radius: 50%;
-            padding: 2px 4px;
-            margin-right: 10px;
-            position: relative;
-            bottom: 2px;
+            margin-right: 3px;
         }
     }
 
-    .closed-issue {
+    .closed-status {
+        background: #828282;
+        padding: 4px 7px;
+        border-radius: 14px;
+        font-size: $small-font;
+        color: #fff;
+
+        &:hover {
+            text-decoration: none;
+        }
+
         em {
-            color: $color-danger;
-            font-size: 8px;
-            border: 2px solid $color-danger;
-            border-radius: 50%;
-            padding: 2px 2px;
-            margin-right: 10px;
-            position: relative;
-            bottom: 2px;
+            margin-right: 3px;
         }
     }
 
@@ -82,7 +88,8 @@
                 cursor: pointer;
                 color: $gray-3;
                 float: right;
-                margin-right: 0px;
+                margin-right: 13px;
+                margin-left: 10px;
                 margin-top: 3px;
                 font-size: ($text-font - 1);
 
