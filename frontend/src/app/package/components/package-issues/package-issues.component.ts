@@ -127,6 +127,10 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
         this.updateSelectionStatuses();
     }
 
+    public goToUserProfile(username: string): void {
+        this.router.navigate(["/" + username]);
+    }
+
     private updateSelectionStatuses(): void {
         if (this.issues.length === 0) {
             this.anyIssueSelected = false;

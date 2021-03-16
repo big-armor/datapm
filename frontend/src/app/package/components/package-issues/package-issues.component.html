@@ -83,7 +83,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mx-2 ml-auto" style="cursor: pointer">
+                    <div class="mx-2 ml-auto" (click)="goToUserProfile(issue.author.username)" style="cursor: pointer">
                         <app-avatar
                             [user]="issue.author"
                             [size]="25"
