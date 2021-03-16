@@ -16,10 +16,14 @@
 
     .open-status {
         background: $color-info;
-        padding: 4px 11px;
+        padding: 5px 9px;
         border-radius: 14px;
+        margin-right: 12px;
+        margin-left: 8px;
         font-size: $small-font;
         color: #fff;
+        position: relative;
+        top: 4px;
 
         &:hover {
             text-decoration: none;
@@ -32,10 +36,14 @@
 
     .closed-status {
         background: #828282;
-        padding: 4px 7px;
+        padding: 5px 6px;
         border-radius: 14px;
+        margin-right: 12px;
+        margin-left: 8px;
         font-size: $small-font;
         color: #fff;
+        position: relative;
+        top: 4px;
 
         &:hover {
             text-decoration: none;
@@ -88,7 +96,7 @@
                 cursor: pointer;
                 color: $gray-3;
                 float: right;
-                margin-right: 13px;
+                margin-right: 3px;
                 margin-left: 10px;
                 margin-top: 3px;
                 font-size: ($text-font - 1);

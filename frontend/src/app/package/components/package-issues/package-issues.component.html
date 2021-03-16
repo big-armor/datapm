@@ -29,16 +29,16 @@
             >
                 {{ totalIssuesCount }} All
             </a>
-            <a class="right-tab"> Status </a>
+            <a class="right-tab"> Opened by </a>
             <div *ngIf="anyIssueSelected" class="bd-highlight right-tab">
                 <a [matMenuTriggerFor]="menu" class="menu-btn">
                     Actions <em class="fas fa-chevron-down" style="position: relative; top: 1px"></em>
                 </a>
                 <mat-menu #menu="matMenu">
-                    <button mat-menu-item id="issueBtn" (click)="openSelectedIssues()">
+                    <button mat-menu-item id="issueBtn" *ngIf="includeClosedIssues" (click)="openSelectedIssues()">
                         <span class="package-dark-gray">Open</span>
                     </button>
-                    <button mat-menu-item id="issueBtn" (click)="closeSelectedIssues()">
+                    <button mat-menu-item id="issueBtn" *ngIf="includeOpenIssues" (click)="closeSelectedIssues()">
                         <span class="package-dark-gray">Close</span>
                     </button>
                     <button mat-menu-item id="issueBtn" (click)="deleteSelectedIssues()">
@@ -56,10 +56,23 @@
                         <mat-checkbox (change)="toggleIssue(issue, $event.checked)" [ngModel]="issue.checked">
                         </mat-checkbox>
                     </section>
-                    <div class="mx-2" style="margin-top: 2px">
-                        <app-avatar [user]="issue.author" [size]="25"></app-avatar>
+                    <div *ngIf="includeOpenIssues && includeClosedIssues">
+                        <div *ngIf="issue.status == 'OPEN'; else closedIssueIcon" class="bd-highlight align-self-start">
+                            <a class="open-status">
+                                <em class="fas fa-exclamation-circle"></em>
+                                <span>open</span>
+                            </a>
+                        </div>
+                        <ng-template #closedIssueIcon>
+                            <div class="bd-highlight align-self-start">
+                                <a class="closed-status">
+                                    <em class="fas fa-ban"></em>
+                                    <span>closed</span>
+                                </a>
+                            </div>
+                        </ng-template>
                     </div>
-                    <div class="d-flex flex-column bd-highlight">
+                    <div class="d-flex flex-column bd-highlight ml-1">
                         <div class="bd-highlight">
                             <a class="package-details-title" [routerLink]="issue.issueNumber"> {{ issue.subject }} </a>
                         </div>
@@ -70,23 +83,13 @@
                             </div>
                         </div>
                     </div>
-                    <div
-                        *ngIf="issue.status == 'OPEN'; else closedIssueIcon"
-                        class="bd-highlight align-self-center ml-auto"
-                    >
-                        <a class="open-status">
-                            <em class="fas fa-exclamation-circle"></em>
-                            <span>open</span>
-                        </a>
+                    <div class="mx-2 ml-auto" style="cursor: pointer">
+                        <app-avatar
+                            [user]="issue.author"
+                            [size]="25"
+                            matTooltip=" {{ issue.author.username }}"
+                        ></app-avatar>
                     </div>
-                    <ng-template #closedIssueIcon>
-                        <div class="bd-highlight align-self-center ml-auto">
-                            <a class="closed-status">
-                                <em class="fas fa-ban"></em>
-                                <span>closed</span>
-                            </a>
-                        </div>
-                    </ng-template>
                 </div>
             </div>
             <div *ngIf="hasMore" class="container text-center mt-3">
