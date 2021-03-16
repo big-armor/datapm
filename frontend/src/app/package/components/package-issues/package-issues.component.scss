@@ -10,7 +10,7 @@
         .mat-checkbox-inner-container {
             height: 14px;
             width: 14px;
-            margin: 3px 15px 0px 0px;
+            margin: 6px 10px 0px 0px;
         }
     }
 
@@ -48,7 +48,7 @@
         }
 
         .issue-wrapper {
-            padding: 10px 30px;
+            padding: 10px 20px;
             border: 1px solid $gray-5;
 
             .package-details-title {
@@ -83,6 +83,7 @@
                 color: $gray-3;
                 float: right;
                 margin-right: 0px;
+                margin-top: 3px;
                 font-size: ($text-font - 1);
 
                 &:hover {
