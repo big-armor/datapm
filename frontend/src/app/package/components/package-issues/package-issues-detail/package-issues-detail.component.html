@@ -9,7 +9,7 @@
                             <em class="fas fa-exclamation-circle"></em>
                             <span>open</span>
                         </a>
-                        <strong>{{ packageIssue.author.username }}</strong> opened this issue
+                        <strong>{{ packageIssue.authorDisplayName }}</strong> opened this issue
                         {{ packageIssue.createdAt | timeAgo }}
                     </ng-container>
                     <ng-template #closedStatusIcon>
@@ -17,7 +17,7 @@
                             <em class="fas fa-ban"></em>
                             <span>closed</span>
                         </a>
-                        <strong>{{ packageIssue.author.username }}</strong> closed this issue
+                        <strong>{{ packageIssue.authorDisplayName }}</strong> closed this issue
                         {{ packageIssue.updatedAt | timeAgo }}
                     </ng-template>
                 </p>
@@ -37,7 +37,7 @@
                         <div class="issue-header d-flex bd-highlight" [class.d-none]="editingIssue">
                             <div class="mr-auto bd-highlight">
                                 <p class="package-dark-gray font-12">
-                                    <span class="font-500">{{ packageIssue.author.username }}</span>
+                                    <span class="font-500">{{ packageIssue.authorDisplayName }}</span>
                                     commented {{ packageIssue.createdAt | timeAgo }}
                                 </p>
                             </div>
@@ -91,7 +91,7 @@
                             <div class="issue-header d-flex bd-highlight" [class.d-none]="comment.isEditing">
                                 <div class="mr-auto bd-highlight">
                                     <p class="package-dark-gray font-12">
-                                        <span class="font-500">{{ comment.author.username }}</span>
+                                        <span class="font-500">{{ comment.authorDisplayName }}</span>
                                         commented {{ comment.createdAt | timeAgo }}
                                     </p>
                                 </div>
@@ -107,7 +107,11 @@
                                         >
                                             <span class="package-dark-gray">Edit</span>
                                         </button>
-                                        <button mat-menu-item id="issueBtn" (click)="deleteComment(comment.commentId)">
+                                        <button
+                                            mat-menu-item
+                                            id="issueBtn"
+                                            (click)="deleteComment(comment.commentNumber)"
+                                        >
                                             <span class="package-dark-gray">Delete</span>
                                         </button>
                                     </mat-menu>

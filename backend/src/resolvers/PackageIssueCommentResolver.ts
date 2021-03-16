@@ -99,11 +99,11 @@ export const createPackageIssueComment = async (
 
     const commentRepository = context.connection.manager.getCustomRepository(PackageIssueCommentRepository);
     const lastCommentCreatedForIssue = await commentRepository.getLastCreatedCommentForIssue(issueEntity.id);
-    const commentId = lastCommentCreatedForIssue ? lastCommentCreatedForIssue.commentId + 1 : 0;
+    const commentNumber = lastCommentCreatedForIssue ? lastCommentCreatedForIssue.commentNumber + 1 : 0;
 
     const issueCommentEntity = new IssueCommentEntity();
     issueCommentEntity.issueId = issueEntity.id;
-    issueCommentEntity.commentId = commentId;
+    issueCommentEntity.commentNumber = commentNumber;
     issueCommentEntity.authorId = context.me.id;
     issueCommentEntity.content = comment.content;
 

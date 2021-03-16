@@ -28,9 +28,9 @@ export class PackageIssueCommentRepository extends Repository<IssueCommentEntity
     ): Promise<IssueCommentEntity | undefined> {
         return this.createQueryBuilder()
             .where('"IssueCommentEntity"."issue_id" = :issueId')
-            .andWhere('"IssueCommentEntity"."comment_id" = :commentId')
+            .andWhere('"IssueCommentEntity"."comment_number" = :commentNumber')
             .setParameter("issueId", issueId)
-            .setParameter("commentId", commentNumber)
+            .setParameter("commentNumber", commentNumber)
             .orderBy(OrderBy.CREATED_AT, "DESC")
             .getOne();
     }

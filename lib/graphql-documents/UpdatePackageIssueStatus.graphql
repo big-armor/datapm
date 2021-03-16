@@ -13,6 +13,8 @@ mutation UpdatePackageIssueStatus(
         content
         status
         author {
+            firstName
+            lastName
             username
         }
         createdAt

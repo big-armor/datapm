@@ -28,8 +28,9 @@ enum State {
     CLOSED_ISSUES
 }
 
-interface PackageIssueWithCheckedState extends PackageIssue {
+interface PackageIssueWithMetadata extends PackageIssue {
     checked?: boolean;
+    authorDisplayName?: string;
 }
 
 @Component({
@@ -45,7 +46,7 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
 
     public state: State = State.INIT;
 
-    public issues: PackageIssueWithCheckedState[] = [];
+    public issues: PackageIssueWithMetadata[] = [];
     public hasMore: boolean = false;
     public loadingMoreIssues: boolean = false;
 
@@ -122,7 +123,7 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
         this.updateSelectionStatuses();
     }
 
-    public toggleIssue(issue: PackageIssueWithCheckedState, value: boolean): void {
+    public toggleIssue(issue: PackageIssueWithMetadata, value: boolean): void {
         issue.checked = value;
         this.updateSelectionStatuses();
     }
@@ -248,6 +249,14 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
 
     private updateState(): void {
         if (this.issues.length > 0) {
+            this.issues.forEach((i) => {
+                const author = i.author;
+                if (author.firstName && author.lastName) {
+                    i.authorDisplayName = `${author.firstName} ${author.lastName}`;
+                } else {
+                    i.authorDisplayName = author.username;
+                }
+            });
             this.state = State.SUCCESS;
             return;
         }

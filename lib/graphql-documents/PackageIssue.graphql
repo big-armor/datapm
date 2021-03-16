@@ -4,6 +4,8 @@ query PackageIssue($packageIdentifier: PackageIdentifierInput!, $packageIssueIde
         subject
         content
         author {
+            firstName
+            lastName
             username
         }
         status

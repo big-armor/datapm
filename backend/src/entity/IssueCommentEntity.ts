@@ -4,14 +4,13 @@ import { PackageIssueEntity } from "./PackageIssueEntity";
 import { UserEntity } from "./UserEntity";
 
 @Entity({ name: "issue_comment" })
-@Unique(["commentId", "issueId"])
+@Unique(["commentNumber", "issueId"])
 export class IssueCommentEntity extends EntityBaseModel {
     @PrimaryGeneratedColumn()
     public id: number;
 
-    // TODO: RENAME THIS TO commentNumber
-    @Column({ name: "comment_id" })
-    public commentId: number;
+    @Column({ name: "comment_number" })
+    public commentNumber: number;
 
     @Column({ name: "issue_id", nullable: false })
     public issueId: number;

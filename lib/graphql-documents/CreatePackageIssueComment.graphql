@@ -8,9 +8,11 @@ mutation CreatePackageIssueComment(
         issueIdentifier: $issueIdentifier
         comment: $comment
     ) {
-        commentId
+        commentNumber
         content
         author {
+            firstName
+            lastName
             username
         }
         createdAt

@@ -79,7 +79,7 @@
                         <div class="bd-highlight">
                             <div class="package-light-gray">
                                 #{{ issue.issueNumber }} opened {{ issue.createdAt | timeAgo }} by
-                                {{ issue.author.username }}
+                                {{ issue.authorDisplayName }}
                             </div>
                         </div>
                     </div>
@@ -131,7 +131,7 @@
             <div class="package-dark-gray py-5">
                 There are no issues. <br />
                 Click to the
-                <a href="javascript::void(0)" (click)="toggleIncludeAllIssues()">'open a new issue'</a> button to create
+                <a href="javascript::void(0)" (click)="navigateToNewIssuePage()">'open a new issue'</a> button to create
                 one issue.
             </div>
         </div>

@@ -32,11 +32,16 @@ enum State {
     LOADING
 }
 
+interface PackageIssueWithMetadata extends PackageIssue {
+    authorDisplayName?: string;
+}
+
 interface PackageIssueCommentWithEditorStatus extends PackageIssueComment {
     editedContent?: string;
     isEditing?: boolean;
     isSubmittingEdit?: boolean;
     errorMessage?: string;
+    authorDisplayName?: string;
 }
 
 @Component({
@@ -52,7 +57,7 @@ export class PackageIssuesDetailComponent implements OnInit {
     private newCommentEditor: MarkdownEditorComponent;
 
     public state: State = State.INIT;
-    public packageIssue: PackageIssue;
+    public packageIssue: PackageIssueWithMetadata;
     public packageIssueEditedContent: string;
     public submittingPackageIssueUpdate: boolean = false;
     public editingIssue: boolean = false;
@@ -125,7 +130,7 @@ export class PackageIssuesDetailComponent implements OnInit {
                     return;
                 }
 
-                this.packageIssue = response.data.updatePackageIssue;
+                this.updatePackageIssue(response.data.updatePackageIssue);
                 this.closeIssueEditor();
                 this.submittingPackageIssueUpdate = false;
             });
@@ -160,7 +165,7 @@ export class PackageIssuesDetailComponent implements OnInit {
             .mutate({
                 packageIdentifier: this.packageIdentifier,
                 issueIdentifier: this.issueIdentifier,
-                issueCommentIdentifier: { commentNumber: comment.commentId },
+                issueCommentIdentifier: { commentNumber: comment.commentNumber },
                 comment: { content: comment.editedContent }
             })
             .subscribe(
@@ -270,7 +275,15 @@ export class PackageIssuesDetailComponent implements OnInit {
                     this.packageIssueComments.push(...commentsResponse.data.packageIssueComments.comments);
                 }
 
-                this.packageIssueComments.forEach((c) => (c.editedContent = c.content));
+                this.packageIssueComments.forEach((c) => {
+                    c.editedContent = c.content;
+                    const author = c.author;
+                    if (author.firstName && author.lastName) {
+                        c.authorDisplayName = `${author.firstName} ${author.lastName}`;
+                    } else {
+                        c.authorDisplayName = author.username;
+                    }
+                });
                 this.commentsOffset = this.packageIssueComments.length;
                 this.hasMoreComments = commentsResponse.data.packageIssueComments.hasMore;
                 this.state = State.SUCCESS;
@@ -334,7 +347,7 @@ export class PackageIssuesDetailComponent implements OnInit {
                     return;
                 }
 
-                this.packageIssue = response.data.updatePackageIssueStatus;
+                this.updatePackageIssue(response.data.updatePackageIssueStatus);
             });
     }
 
@@ -373,11 +386,21 @@ export class PackageIssuesDetailComponent implements OnInit {
                     return;
                 }
 
-                this.packageIssue = response.data.packageIssue;
+                this.updatePackageIssue(response.data.packageIssue);
                 this.canEditIssue =
                     this.isUserPackageManager || this.packageIssue.author.username === this.user.username;
                 this.packageIssueEditedContent = this.packageIssue.content;
                 this.loadPackageIssueComments();
             });
+    }
+
+    private updatePackageIssue(issue: PackageIssueWithMetadata): void {
+        this.packageIssue = issue;
+        const author = this.packageIssue.author;
+        if (author.firstName && author.lastName) {
+            this.packageIssue.authorDisplayName = `${author.firstName} ${author.lastName}`;
+        } else {
+            this.packageIssue.authorDisplayName = author.username;
+        }
     }
 }

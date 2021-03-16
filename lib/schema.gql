@@ -249,7 +249,7 @@ type PackageIssue {
 }
 
 type PackageIssueComment {
-    commentId: Int!
+    commentNumber: Int!
     content: String!
     author: User!
     createdAt: Date!

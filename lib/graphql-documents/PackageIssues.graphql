@@ -19,6 +19,8 @@ query PackageIssues(
             subject
             content
             author {
+                firstName
+                lastName
                 username
             }
             status

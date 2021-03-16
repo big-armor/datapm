@@ -13,9 +13,11 @@ query PackageIssueComments(
         orderBy: $orderBy
     ) {
         comments {
-            commentId
+            commentNumber
             content
             author {
+                firstName
+                lastName
                 username
             }
             createdAt

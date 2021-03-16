@@ -5,6 +5,8 @@ mutation CreatePackageIssue($packageIdentifier: PackageIdentifierInput!, $issue:
         content
         status
         author {
+            firstName
+            lastName
             username
         }
         createdAt
