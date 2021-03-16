@@ -1000,6 +1000,9 @@ button:disabled {
             font-size: $small-font;
         }
     }
+    .m-0-mobile {
+        margin-bottom: 0px !important;
+    }
     .text-danger {
         font-size: $xsmall-font;
         max-width: 240px !important;

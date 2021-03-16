@@ -6,7 +6,7 @@
                     Describe Issue for <span *ngIf="!loading">{{ package.displayName }}</span>
                 </div>
                 <div class="package-light-gray">Describe the issue in enough detail for others to help you</div>
-                <div class="col-md-9 rounded-input p-0 mt-3">
+                <div class="col-lg-9 col-md-12 rounded-input p-0 mt-3">
                     <div class="comment-section">
                         <input
                             type="text"
@@ -20,7 +20,7 @@
                         <br />
                         <app-markdown-editor [(content)]="content"> </app-markdown-editor>
 
-                        <div class="mt-2 text-right">
+                        <div class="mt-2 text-right btn-div">
                             <button class="app-outlined-button" (click)="cancel()">Cancel</button>
                             <button
                                 class="app-raised-button ml-2"

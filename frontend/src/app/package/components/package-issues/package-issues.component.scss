@@ -1,34 +1,17 @@
 @import "../../../../styles/variables";
 
 #packageIssues {
-    ::ng-deep.mat-checkbox-checked.mat-accent {
-        .mat-checkbox-background {
-            background-color: $color-info;
+    ::ng-deep {
+        .mat-checkbox-checked.mat-accent {
+            .mat-checkbox-background {
+                background-color: $color-info;
+            }
         }
-    }
-
-    .menu-btn {
-        padding: 0px;
-        min-width: 28px;
-        font-weight: $weight-400;
-        line-height: unset;
-
-        &:hover {
-            background-color: transparent;
-            background: transparent;
-            text-decoration: none;
-            color: $color-info;
+        .mat-checkbox-inner-container {
+            height: 14px;
+            width: 14px;
+            margin: 3px 15px 0px 0px;
         }
-
-        button {
-            height: 30px;
-        }
-    }
-
-    ::ng-deep.mat-checkbox-inner-container {
-        height: 14px;
-        width: 14px;
-        margin: 3px 15px 0px 0px;
     }
 
     .open-issue {
@@ -93,11 +76,26 @@
             }
 
             .right-tab {
+                font-family: $family-roboto;
+                font-weight: $weight-400;
+                letter-spacing: 0.4px;
+                cursor: pointer;
+                color: $gray-3;
                 float: right;
                 margin-right: 0px;
+                font-size: ($text-font - 1);
 
                 &:hover {
                     color: $gray-3;
+                    text-decoration: none;
+                }
+
+                a {
+                    color: $gray-3;
+
+                    &:hover {
+                        text-decoration: none;
+                    }
                 }
             }
 
@@ -115,6 +113,31 @@
                 height: 25px;
                 margin-right: 25px;
                 border-radius: 50%;
+            }
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    #packageIssues {
+        .main-wrapper {
+            .issue-wrapper {
+                padding: 6px 6px;
+                .issue-tab {
+                    font-size: $small-font;
+                    margin-right: 2px;
+                }
+                .right-tab {
+                    margin-top: 3px;
+                    font-size: ($small-font - 1);
+                }
+            }
+        }
+        ::ng-deep {
+            .mat-checkbox-inner-container {
+                height: 12px;
+                width: 12px;
+                margin: 6px 6px 0px 0px;
             }
         }
     }

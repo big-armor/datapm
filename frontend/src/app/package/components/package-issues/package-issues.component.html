@@ -13,14 +13,14 @@
                 class="issue-tab issue-tab-item open-issue"
                 [class.active]="includeOpenIssues && !includeClosedIssues"
             >
-                <em class="fas fa-exclamation"></em> {{ openIssuesCount }} Open
+                {{ openIssuesCount }} Open
             </a>
             <a
                 (click)="toggleIncludeClosedIssues()"
                 class="issue-tab issue-tab-item closed-issue"
                 [class.active]="!includeOpenIssues && includeClosedIssues"
             >
-                <em class="fas fa-check"></em> {{ closedIssuesCount }} Closed
+                {{ closedIssuesCount }} Closed
             </a>
             <a
                 (click)="toggleIncludeAllIssues()"
@@ -29,10 +29,10 @@
             >
                 {{ totalIssuesCount }} All
             </a>
-            <a class="issue-tab right-tab"> Opened by </a>
-            <div class="bd-highlight right-tab" *ngIf="anyIssueSelected">
-                <a [matMenuTriggerFor]="menu" class="menu-btn mr-3 issue-tab">
-                    Actions <i class="fas fa-chevron-down"></i>
+            <a class="right-tab"> Opened by </a>
+            <div class="bd-highlight right-tab">
+                <a [matMenuTriggerFor]="menu" class="menu-btn mr-3">
+                    Actions <em class="fas fa-chevron-down" style="position: relative; top: 1px"></em>
                 </a>
                 <mat-menu #menu="matMenu">
                     <button mat-menu-item id="issueBtn" (click)="openSelectedIssues()">

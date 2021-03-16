@@ -1,6 +1,10 @@
 @import "../../../../../styles/variables";
 
 #createIssue {
+    .btn-div {
+        display: flow-root;
+    }
+
     .app-raised-button {
         font-size: 13px;
         border-radius: 4px;
@@ -54,6 +58,18 @@
             &::before {
                 margin-bottom: 3px;
             }
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    #createIssue {
+        .btn-div {
+            display: flex;
+        }
+        .app-raised-button,
+        .app-outlined-button {
+            width: 50%;
         }
     }
 }
