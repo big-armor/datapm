@@ -7,6 +7,7 @@ import { MarkdownModule } from "ngx-markdown";
 
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
+import { UiModule } from "./ui.module";
 import { GraphQLModule } from "./graphql.module";
 import { SharedModule } from "./shared/shared.module";
 import { MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions } from "@angular/material/core";
@@ -30,6 +31,7 @@ const globalRippleConfig: RippleGlobalOptions = {
         ReactiveFormsModule,
         FormsModule,
         SharedModule,
+        UiModule,
         MarkdownModule.forRoot()
     ],
     providers: [{ provide: MAT_RIPPLE_GLOBAL_OPTIONS, useValue: globalRippleConfig }],
