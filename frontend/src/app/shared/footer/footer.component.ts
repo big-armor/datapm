@@ -1,4 +1,5 @@
 import { Component, OnInit } from "@angular/core";
+import { UiStyleToggleService } from "src/app/services/ui-style-toggle.service";
 
 @Component({
     selector: "sd-footer",
@@ -6,7 +7,11 @@ import { Component, OnInit } from "@angular/core";
     styleUrls: ["./footer.component.scss"]
 })
 export class FooterComponent implements OnInit {
-    constructor() {}
+    constructor(private uiStyleToggleService: UiStyleToggleService) {}
 
     ngOnInit(): void {}
+
+    toggleTheme() {
+        this.uiStyleToggleService.toggle();
+    }
 }

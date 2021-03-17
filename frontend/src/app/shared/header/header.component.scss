@@ -76,7 +76,7 @@
 }
 
 .dpm-text-logo {
-    color: $gray-1-color;
+    color: var(--gray-1-color);
     cursor: pointer;
     &:hover {
         text-decoration: none;

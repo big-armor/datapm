@@ -11,7 +11,7 @@
     font-family: $family-roboto;
     position: relative;
     display: flex;
-    color: $gray-2-color;
+    color: var(--gray-2-color);
     justify-content: left;
     align-items: center;
     font-weight: $weight-400;
@@ -30,7 +30,7 @@
     font-size: $title-font;
     line-height: 26px;
     letter-spacing: 0.4px;
-    color: $gray-2-color;
+    color: var(--gray-2-color);
     margin-bottom: 5px;
 }
 
@@ -41,7 +41,7 @@
     font-size: $text-font;
     line-height: 26px;
     letter-spacing: -0.28px;
-    color: $gray-3-color;
+    color: var(--gray-3-color);
 }
 
 #packageDetails {
@@ -53,7 +53,7 @@
 }
 
 .copy-link {
-    color: $gray-3-color;
+    color: var(--gray-3-color);
     cursor: pointer;
     bottom: 1px;
     position: relative;

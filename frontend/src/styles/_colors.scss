@@ -6,7 +6,7 @@ $white-color: #fff;
 $white-color-dark: #000;
 
 $white-1-color: #ffffffb3;
-$white-1-color-dark: #ffffffb3;
+$white-1-color-dark: #fff;
 
 $black-1-color: rgba($black-color, 0.08);
 $black-1-color-dark: rgba($black-color, 0.08);
@@ -14,13 +14,13 @@ $black-1-color-dark: rgba($black-color, 0.08);
 
 // gray shades
 $gray-1-color: #333;
-$gray-1-color-dark: #333;
+$gray-1-color-dark: #e6eaef;
 
 $gray-2-color: #4f4f4f;
-$gray-2-color-dark: #4f4f4f;
+$gray-2-color-dark: #dee2e6;
 
 $gray-3-color: #828282;
-$gray-3-color-dark: #828282;
+$gray-3-color-dark: #dee2e6;
 
 $gray-4-color: #bdbdbd;
 $gray-4-color-dark: #bdbdbd;
@@ -44,7 +44,7 @@ $gray-10-color: #eee;
 $gray-10-color-dark: #eee;
 
 $gray-11-color: #f3f3f3;
-$gray-11-color-dark: #f3f3f3;
+$gray-11-color-dark: #2b2b2d;
 
 $gray-12-color: #ededed;
 $gray-12-color-dark: #ededed;
@@ -116,6 +116,11 @@ $email-hover-color-dark: rgba($email-color, 0.9);
 $twitter-hover-color: rgba($twitter-color, 0.9);
 $twitter-hover-color-dark: rgba($twitter-color, 0.9);
 // social media
+
+$box-shadow-color: 0px 0 0px rgb(255 255 255), 0 0px 0px rgb(255 255 255 / 25%), 0 4px 4px rgb(191 187 187 / 25%),
+    4px 0 4px rgb(247 247 247 / 25%);
+$box-shadow-color-dark: 0px 0 0px #2b2b2d, 0 0px 0px rgb(43 43 45), 0 1px 0px rgb(221 225 229),
+    0px 0 0px rgb(247 247 247 / 25%);
 
 $colors: (
     --black-color: (
@@ -253,5 +258,9 @@ $colors: (
     --twitter-hover-color: (
         $twitter-hover-color,
         $twitter-hover-color-dark
+    ),
+    --box-shadow-color: (
+        $box-shadow-color,
+        $box-shadow-color-dark
     )
 );

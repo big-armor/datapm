@@ -3,12 +3,13 @@
 @import "./variables.scss";
 @import "./colors.scss";
 @import "./typography";
+@import "./theme";
 
 html,
 body {
     height: 100%;
     overflow-x: hidden;
-    background-color: $gray-11-color;
+    background-color: var(--gray-11-color);
 }
 
 a {
@@ -336,10 +337,10 @@ mat-select {
     font-style: $style-normal;
     font-weight: $weight-400;
     font-size: ($text-font - 1);
-    background: $white-1-color;
+    background: var(--white-1-color);
     line-height: 13px;
     color: $info-color;
-    border: 1px solid $gray-9-color;
+    border: 1px solid var(--gray-9-color);
     padding: 6px 15px;
     border-radius: 4px;
     cursor: pointer;
@@ -444,8 +445,7 @@ mat-select {
     height: 14px;
     border: 0;
     margin: 6px 0px;
-    box-shadow: 0px 0 0px rgb(255 255 255), 0 0px 0px rgb(255 255 255 / 25%), 0 4px 4px rgb(191 187 187 / 25%),
-        4px 0 4px rgb(247 247 247 / 25%);
+    box-shadow: var(--box-shadow-color);
 }
 
 .d-none {
@@ -835,7 +835,7 @@ button:disabled {
     font-weight: $weight-300;
     font-size: $small-font;
     letter-spacing: 0.4px;
-    color: $gray-3-color;
+    color: var(--gray-3-color);
     margin-bottom: 0px !important;
 }
 
@@ -845,7 +845,7 @@ button:disabled {
     font-weight: $weight-400;
     font-size: ($text-font - 1);
     letter-spacing: 0.4px;
-    color: $gray-2-color;
+    color: var(--gray-2-color);
     margin-bottom: 5px !important;
 }
 
@@ -855,7 +855,7 @@ button:disabled {
     font-size: $title-font;
     font-weight: $weight-400;
     margin-bottom: 15px;
-    color: $gray-1-color;
+    color: var(--gray-1-color);
     letter-spacing: 0.6px;
 }
 
@@ -873,7 +873,7 @@ button:disabled {
             letter-spacing: 0.6px;
             line-height: 24px;
             text-align: center;
-            color: $gray-3-color;
+            color: var(--gray-3-color);
             text-decoration: none;
             padding: 0px 10px 4px 10px;
             margin: 0px 10px;
@@ -891,8 +891,8 @@ button:disabled {
 
     .active {
         opacity: 1;
-        color: $gray-1-color !important;
-        border-bottom: 2px solid $gray-1-color;
+        color: var(--gray-1-color) !important;
+        border-bottom: 2px solid var(--gray-1-color);
     }
 }
 
@@ -1059,14 +1059,6 @@ button:disabled {
     }
 }
 
-.theme-light {
-    @each $name, $color in $colors {
-        #{name}: nth($color, 1);
-    }
-}
-
-.theme-dark {
-    @each $name, $color in $colors {
-        #{name}: nth($color, 2);
-    }
+.animate-colors-transition {
+    transition: color 0.5s, background 0.5s;
 }
