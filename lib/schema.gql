@@ -147,6 +147,22 @@ enum ActivityLogChangeType {
 }
 
 """
+The package issue status
+"""
+enum PackageIssueStatus {
+    OPEN
+    CLOSED
+}
+
+"""
+Order by options
+"""
+enum OrderBy {
+    CREATED_AT
+    UPDATED_AT
+}
+
+"""
 Whether the requesting user has the specified permission on the catalog
 """
 directive @hasCatalogPermission(permission: Permission) on OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION
@@ -175,6 +191,11 @@ directive @validPackageSlug on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 Whether the collection slug provided is valid
 """
 directive @validCollectionSlug(allowNull: Boolean) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+
+"""
+Whether the markdown provided is valid
+"""
+directive @validMarkdown(maxLength: Int) on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 
 """
 A collection of packages offered by a person or an organization.
@@ -212,6 +233,27 @@ type Package {
     myPermissions: [Permission!]
     fetchedCount: Int
     viewedCount: Int
+}
+
+"""
+A package issue represents an issue raised for a topic related to the package.
+"""
+type PackageIssue {
+    issueNumber: Int!
+    subject: String!
+    content: String!
+    author: User!
+    status: PackageIssueStatus!
+    createdAt: Date!
+    updatedAt: Date
+}
+
+type PackageIssueComment {
+    commentNumber: Int!
+    content: String!
+    author: User!
+    createdAt: Date!
+    updatedAt: Date
 }
 
 """
@@ -384,6 +426,26 @@ type SearchPackagesResult {
 }
 
 """
+The response for a package issues request
+"""
+type PackageIssuesResult {
+    issues: [PackageIssue!]
+    hasMore: Boolean!
+    count: Int!
+    openIssuesCount: Int!
+    closedIssuesCount: Int!
+}
+
+"""
+The response for a package issue comments request
+"""
+type PackageIssueCommentsResult {
+    comments: [PackageIssueComment!]
+    hasMore: Boolean!
+    count: Int!
+}
+
+"""
 The response for latest packages request
 """
 type LatestPackagesResult {
@@ -430,12 +492,64 @@ input VersionIdentifierInput {
     versionMinor: Int!
     versionPatch: Int!
 }
+
 """
 The complete identifier for a package, assuming the registry is based on the HTTP request URL
 """
 input PackageIdentifierInput {
     catalogSlug: String! @validCatalogSlug
     packageSlug: String! @validPackageSlug
+}
+
+"""
+The complete identifier for a package issue
+"""
+input PackageIssueIdentifierInput {
+    issueNumber: Int!
+}
+
+"""
+The package issue creation input
+"""
+input CreatePackageIssueInput {
+    subject: String!
+    content: String! @validMarkdown(maxLength: 50000)
+}
+
+"""
+The package issue update input
+"""
+input UpdatePackageIssueInput {
+    subject: String!
+    content: String! @validMarkdown(maxLength: 50000)
+}
+
+"""
+The package issue update input
+"""
+input UpdatePackageIssueStatusInput {
+    status: PackageIssueStatus!
+}
+
+"""
+The complete identifier for a package issue comment
+"""
+input PackageIssueCommentIdentifierInput {
+    commentNumber: Int!
+}
+
+"""
+The input to create a package issue comment
+"""
+input CreatePackageIssueCommentInput {
+    content: String! @validMarkdown(maxLength: 50000)
+}
+
+"""
+The input to update a package issue comment
+"""
+input UpdatePackageIssueCommentInput {
+    content: String! @validMarkdown(maxLength: 50000)
 }
 
 """
@@ -653,6 +767,37 @@ type Query {
     Returns the package for the given identifier. Requires permission to view the package
     """
     package(identifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)): Package!
+
+    """
+    Get package issue
+    """
+    packageIssue(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        packageIssueIdentifier: PackageIssueIdentifierInput!
+    ): PackageIssue
+
+    """
+    Get package issues
+    """
+    packageIssues(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        includeOpenIssues: Boolean!
+        includeClosedIssues: Boolean!
+        offset: Int!
+        limit: Int!
+        orderBy: OrderBy!
+    ): PackageIssuesResult
+
+    """
+    Get package issue comments
+    """
+    packageIssueComments(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        issueIdentifier: PackageIssueIdentifierInput!
+        offset: Int!
+        limit: Int!
+        orderBy: OrderBy!
+    ): PackageIssueCommentsResult
 
     """
     Returns list of the requesting users packages
@@ -933,6 +1078,85 @@ type Mutation {
     Called by a client to indicate a package has been fetched
     """
     packageFetched(identifier: VersionIdentifierInput! @hasPackagePermission(permission: VIEW)): Void
+
+    """
+    Creates a package issue
+    """
+    createPackageIssue(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        issue: CreatePackageIssueInput!
+    ): PackageIssue
+
+    """
+    Updates a package issue
+    """
+    updatePackageIssue(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        issueIdentifier: PackageIssueIdentifierInput!
+        issue: UpdatePackageIssueInput!
+    ): PackageIssue
+
+    """
+    Updates a package issue's status
+    """
+    updatePackageIssueStatus(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        issueIdentifier: PackageIssueIdentifierInput!
+        status: UpdatePackageIssueStatusInput!
+    ): PackageIssue
+
+    """
+    Updates selected package issues' statuses
+    """
+    updatePackageIssuesStatuses(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        issuesIdentifiers: [PackageIssueIdentifierInput!]!
+        status: UpdatePackageIssueStatusInput!
+    ): Void
+
+    """
+    Updates selected package issues' statuses
+    """
+    deletePackageIssues(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        issuesIdentifiers: [PackageIssueIdentifierInput!]!
+    ): Void
+
+    """
+    Delete a package issue
+    """
+    deletePackageIssue(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        packageIssueIdentifier: PackageIssueIdentifierInput!
+    ): Void
+
+    """
+    Creates a package issue comment
+    """
+    createPackageIssueComment(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        issueIdentifier: PackageIssueIdentifierInput!
+        comment: CreatePackageIssueCommentInput!
+    ): PackageIssueComment
+
+    """
+    Creates a package issue comment
+    """
+    updatePackageIssueComment(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        issueIdentifier: PackageIssueIdentifierInput!
+        issueCommentIdentifier: PackageIssueCommentIdentifierInput!
+        comment: UpdatePackageIssueCommentInput!
+    ): PackageIssueComment
+
+    """
+    Deletes a package issue
+    """
+    deletePackageIssueComment(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        issueIdentifier: PackageIssueIdentifierInput!
+        issueCommentIdentifier: PackageIssueCommentIdentifierInput!
+    ): Void
 
     """
     Creates a new collection, which is managed by the requesting user

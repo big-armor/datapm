@@ -38,9 +38,11 @@
         <th mat-header-cell *matHeaderCellDef scope="col">User</th>
         <td class="table-content" mat-cell *matCellDef="let user">
             <div style="display: flex; justify-content: start; align-content: center">
-                <a [routerLink]="'/' + user.username"><app-avatar [user]="user" [size]="24"></app-avatar></a>
+                <a class="color-info" [routerLink]="'/' + user.username"
+                    ><app-avatar [user]="user" [size]="24"></app-avatar
+                ></a>
 
-                <a class="ml-2" [routerLink]="'/' + user.username">{{ user.name }}</a>
+                <a class="color-info ml-2" [routerLink]="'/' + user.username">{{ user.name }}</a>
                 <span *ngIf="user.pendingInvitationAcceptance"> &nbsp;(pending invite acceptance)</span>
             </div>
         </td>

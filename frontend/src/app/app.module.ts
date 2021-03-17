@@ -11,6 +11,7 @@ import { UiModule } from "./ui.module";
 import { GraphQLModule } from "./graphql.module";
 import { SharedModule } from "./shared/shared.module";
 import { MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions } from "@angular/material/core";
+import { AngularSimplemdeModule } from "angular-simplemde";
 
 const globalRippleConfig: RippleGlobalOptions = {
     disabled: true,
@@ -32,7 +33,8 @@ const globalRippleConfig: RippleGlobalOptions = {
         FormsModule,
         SharedModule,
         UiModule,
-        MarkdownModule.forRoot()
+        MarkdownModule.forRoot(),
+        AngularSimplemdeModule
     ],
     providers: [{ provide: MAT_RIPPLE_GLOBAL_OPTIONS, useValue: globalRippleConfig }],
     bootstrap: [AppComponent],

@@ -40,7 +40,7 @@
                         ><app-avatar [user]="user" [size]="24"></app-avatar
                     ></a>
 
-                    <a class="ml-2" [routerLink]="'/' + user.username">{{ user.name }}</a>
+                    <a class="color-info ml-2" [routerLink]="'/' + user.username">{{ user.name }}</a>
                     <span *ngIf="user.pendingInvitationAcceptance"> &nbsp;(pending invite acceptance)</span>
                 </div>
             </td>

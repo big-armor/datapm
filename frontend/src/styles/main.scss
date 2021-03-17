@@ -15,9 +15,18 @@ body {
 a {
     color: $info-color;
 }
+
 body {
     margin: 0;
     font-family: $family-roboto !important;
+}
+
+.color-info {
+    color: $color-info;
+
+    &:hover {
+        text-decoration: none;
+    }
 }
 
 .cursor-pointer {
@@ -207,7 +216,7 @@ table.gray-table {
         }
 
         &::placeholder {
-            font-family: $family-roboto-mono;
+            font-family: $family-roboto;
             font-style: $style-normal;
             font-weight: $weight-300;
             font-size: ($small-font + 1);
@@ -859,6 +868,10 @@ button:disabled {
     letter-spacing: 0.6px;
 }
 
+::ng-deep #tinymce.mce-content-body {
+    color: red !important;
+}
+
 #homeRoutes {
     list-style-type: none;
     margin-bottom: 0px;
@@ -987,6 +1000,9 @@ button:disabled {
         &::placeholder {
             font-size: $small-font;
         }
+    }
+    .m-0-mobile {
+        margin-bottom: 0px !important;
     }
     .text-danger {
         font-size: $xsmall-font;

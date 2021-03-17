@@ -74,7 +74,7 @@
                     ></app-cover>
 
                     <div class="p-2">
-                        <div class="container mb-4">
+                        <div class="container m-0-mobile mb-4">
                             <div class="row" *ngIf="package">
                                 <div class="col-12 package-info">
                                     <!-- <div class="package-title">{{ package?.displayName }}</div> -->
@@ -102,9 +102,10 @@
                                                         </span>
                                                     </div>
                                                     <div class="bd-highlight">
-                                                        <a [routerLink]="['/' + package?.identifier.catalogSlug]">{{
-                                                            package?.identifier.catalogSlug
-                                                        }}</a
+                                                        <a
+                                                            class="color-info"
+                                                            [routerLink]="['/' + package?.identifier.catalogSlug]"
+                                                            >{{ package?.identifier.catalogSlug }}</a
                                                         >/{{ package?.identifier.packageSlug }}
                                                         <a class="copy-link" (click)="copyCommand()">
                                                             <em class="far fa-copy"></em>

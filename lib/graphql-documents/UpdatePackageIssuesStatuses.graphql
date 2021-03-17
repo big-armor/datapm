@@ -1,0 +1,11 @@
+mutation UpdatePackageIssuesStatuses(
+    $packageIdentifier: PackageIdentifierInput!
+    $issuesIdentifiers: [PackageIssueIdentifierInput!]!
+    $status: UpdatePackageIssueStatusInput!
+) {
+    updatePackageIssuesStatuses(
+        packageIdentifier: $packageIdentifier
+        issuesIdentifiers: $issuesIdentifiers
+        status: $status
+    )
+}

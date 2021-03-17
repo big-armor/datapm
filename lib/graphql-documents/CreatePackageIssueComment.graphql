@@ -1,0 +1,21 @@
+mutation CreatePackageIssueComment(
+    $packageIdentifier: PackageIdentifierInput!
+    $issueIdentifier: PackageIssueIdentifierInput!
+    $comment: CreatePackageIssueCommentInput!
+) {
+    createPackageIssueComment(
+        packageIdentifier: $packageIdentifier
+        issueIdentifier: $issueIdentifier
+        comment: $comment
+    ) {
+        commentNumber
+        content
+        author {
+            firstName
+            lastName
+            username
+        }
+        createdAt
+        updatedAt
+    }
+}

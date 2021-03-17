@@ -1,0 +1,35 @@
+query PackageIssues(
+    $packageIdentifier: PackageIdentifierInput!
+    $includeOpenIssues: Boolean!
+    $includeClosedIssues: Boolean!
+    $offset: Int!
+    $limit: Int!
+    $orderBy: OrderBy!
+) {
+    packageIssues(
+        packageIdentifier: $packageIdentifier
+        offset: $offset
+        includeOpenIssues: $includeOpenIssues
+        includeClosedIssues: $includeClosedIssues
+        limit: $limit
+        orderBy: $orderBy
+    ) {
+        issues {
+            issueNumber
+            subject
+            content
+            author {
+                firstName
+                lastName
+                username
+            }
+            status
+            createdAt
+            updatedAt
+        }
+        hasMore
+        count
+        openIssuesCount
+        closedIssuesCount
+    }
+}

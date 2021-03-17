@@ -1,0 +1,406 @@
+import { Component, OnInit, ViewChild } from "@angular/core";
+import { SafeUrl } from "@angular/platform-browser";
+import { ActivatedRoute, Router } from "@angular/router";
+import { combineLatest, Subject } from "rxjs";
+import { PackageService } from "src/app/package/services/package.service";
+import { AuthenticationService } from "src/app/services/authentication.service";
+import { ConfirmationDialogService } from "src/app/services/dialog/confirmation-dialog.service";
+import { ImageService } from "src/app/services/image.service";
+import { MarkdownEditorComponent } from "src/app/shared/markdown-editor/markdown-editor.component";
+import {
+    CreatePackageIssueCommentGQL,
+    DeletePackageIssueCommentGQL,
+    DeletePackageIssueGQL,
+    OrderBy,
+    PackageIdentifierInput,
+    PackageIssue,
+    PackageIssueComment,
+    PackageIssueCommentsGQL,
+    PackageIssueGQL,
+    PackageIssueIdentifierInput,
+    PackageIssueStatus,
+    Permission,
+    UpdatePackageIssueCommentGQL,
+    UpdatePackageIssueGQL,
+    UpdatePackageIssueStatusGQL,
+    User
+} from "src/generated/graphql";
+
+enum State {
+    INIT,
+    SUCCESS,
+    LOADING
+}
+
+interface PackageIssueWithMetadata extends PackageIssue {
+    authorDisplayName?: string;
+}
+
+interface PackageIssueCommentWithEditorStatus extends PackageIssueComment {
+    editedContent?: string;
+    isEditing?: boolean;
+    isSubmittingEdit?: boolean;
+    errorMessage?: string;
+    authorDisplayName?: string;
+}
+
+@Component({
+    selector: "app-package-issues-detail",
+    templateUrl: "./package-issues-detail.component.html",
+    styleUrls: ["./package-issues-detail.component.scss"]
+})
+export class PackageIssuesDetailComponent implements OnInit {
+    public readonly State = State;
+    private readonly COMMENTS_TO_LOAD_PER_PAGE = 100;
+
+    @ViewChild("newCommentEditor")
+    private newCommentEditor: MarkdownEditorComponent;
+
+    public state: State = State.INIT;
+    public packageIssue: PackageIssueWithMetadata;
+    public packageIssueEditedContent: string;
+    public submittingPackageIssueUpdate: boolean = false;
+    public editingIssue: boolean = false;
+    public editingIssueErrorMessage: string;
+
+    public packageIssueComments: PackageIssueCommentWithEditorStatus[] = [];
+    public hasMoreComments = false;
+    public newCommentContent: string = "";
+    public submittingNewComment = false;
+    public loadingMoreComments = false;
+
+    public packageIdentifier: PackageIdentifierInput;
+    public issueIdentifier: PackageIssueIdentifierInput;
+
+    public errorMessage: string;
+
+    public isUserPackageManager: boolean = false;
+    public canEditIssue: boolean = false;
+
+    public user: User;
+    private commentsOffset = 0;
+
+    constructor(
+        private authenticationService: AuthenticationService,
+        private packageService: PackageService,
+        private packageIssueGQL: PackageIssueGQL,
+        private updatePackageIssueGQL: UpdatePackageIssueGQL,
+        private updatePackageIssueStatusGQL: UpdatePackageIssueStatusGQL,
+        private deletePackageIssueGQL: DeletePackageIssueGQL,
+        private deletePackageIssueCommentGQL: DeletePackageIssueCommentGQL,
+        private packageIssueCommentsGQL: PackageIssueCommentsGQL,
+        private createPackageIssueCommentGQL: CreatePackageIssueCommentGQL,
+        private updatePackageIssueCommentGQL: UpdatePackageIssueCommentGQL,
+        private imageService: ImageService,
+        private confirmationDialogService: ConfirmationDialogService,
+        private router: Router,
+        private route: ActivatedRoute
+    ) {}
+
+    public ngOnInit(): void {
+        const issueNumber = this.route.snapshot.params.issueNumber;
+        if (issueNumber) {
+            this.issueIdentifier = { issueNumber: issueNumber };
+            this.loadPackage();
+        } else {
+            this.errorMessage = "Invalid issue number";
+        }
+    }
+
+    public updateIssue(): void {
+        if (!this.isIssueUpdatedContentValid()) {
+            this.editingIssueErrorMessage = "Invalid issue content";
+            return;
+        }
+
+        this.submittingPackageIssueUpdate = true;
+        this.updatePackageIssueGQL
+            .mutate({
+                packageIdentifier: this.packageIdentifier,
+                issueIdentifier: this.issueIdentifier,
+                issue: {
+                    subject: this.packageIssue.subject,
+                    content: this.packageIssueEditedContent
+                }
+            })
+            .subscribe((response) => {
+                if (response.errors) {
+                    this.editingIssueErrorMessage = "Could not update issue content";
+                    this.submittingPackageIssueUpdate = false;
+                    return;
+                }
+
+                this.updatePackageIssue(response.data.updatePackageIssue);
+                this.closeIssueEditor();
+                this.submittingPackageIssueUpdate = false;
+            });
+    }
+
+    public isIssueUpdatedContentValid(): boolean {
+        return this.isValidContent(this.packageIssueEditedContent);
+    }
+
+    public openIssueEditor(editor: MarkdownEditorComponent): void {
+        this.editingIssueErrorMessage = null;
+        this.packageIssueEditedContent = this.packageIssue.content;
+        if (editor) {
+            editor.setValue(this.packageIssueEditedContent);
+        }
+        this.editingIssue = true;
+    }
+
+    public closeIssueEditor(): void {
+        this.editingIssue = false;
+    }
+
+    public updateComment(comment: PackageIssueCommentWithEditorStatus): void {
+        if (!this.isValidContent(comment.editedContent)) {
+            comment.errorMessage = "Invalid comment";
+            return;
+        }
+
+        comment.errorMessage = null;
+        comment.isSubmittingEdit = true;
+        this.updatePackageIssueCommentGQL
+            .mutate({
+                packageIdentifier: this.packageIdentifier,
+                issueIdentifier: this.issueIdentifier,
+                issueCommentIdentifier: { commentNumber: comment.commentNumber },
+                comment: { content: comment.editedContent }
+            })
+            .subscribe(
+                (response) => {
+                    if (response.errors) {
+                        comment.errorMessage = "There was an error saving this comment";
+                        comment.isSubmittingEdit = false;
+                        return;
+                    }
+
+                    comment.content = response.data.updatePackageIssueComment.content;
+                    this.closeCommentEditor(comment);
+                    comment.isSubmittingEdit = false;
+                },
+                () => {
+                    comment.errorMessage = "There was an error saving this comment";
+                    comment.isSubmittingEdit = false;
+                }
+            );
+    }
+
+    public openCommentEditor(comment: PackageIssueCommentWithEditorStatus, editor: MarkdownEditorComponent): void {
+        comment.errorMessage = null;
+        comment.editedContent = comment.content;
+        comment.isEditing = true;
+        if (editor) {
+            editor.setValue(comment.editedContent);
+        }
+    }
+
+    public closeCommentEditor(comment: PackageIssueCommentWithEditorStatus): void {
+        comment.isEditing = false;
+    }
+
+    public deleteIssue(): void {
+        this.confirmationDialogService
+            .openFancyConfirmationDialog({
+                data: {
+                    title: "Delete issue",
+                    content: "Are you sure you want to delete this issue?"
+                }
+            })
+            .subscribe((confirmation) => {
+                if (confirmation) {
+                    this.deletePackageIssueGQL
+                        .mutate({
+                            packageIdentifier: this.packageIdentifier,
+                            packageIssueIdentifier: { issueNumber: this.packageIssue.issueNumber }
+                        })
+                        .subscribe((response) => {
+                            if (!response.errors) {
+                                this.router.navigate(["../"], { relativeTo: this.route });
+                            }
+                        });
+                }
+            });
+    }
+
+    public deleteComment(commentNumber: number): void {
+        this.confirmationDialogService
+            .openFancyConfirmationDialog({
+                data: {
+                    title: "Delete comment",
+                    content: "Are you sure you want to delete this comment?"
+                }
+            })
+            .subscribe((confirmation) => {
+                if (confirmation) {
+                    this.deletePackageIssueCommentGQL
+                        .mutate({
+                            packageIdentifier: this.packageIdentifier,
+                            issueIdentifier: { issueNumber: this.packageIssue.issueNumber },
+                            issueCommentIdentifier: { commentNumber }
+                        })
+                        .subscribe((response) => {
+                            if (!response.errors) {
+                                this.loadPackageIssueComments(true);
+                            }
+                        });
+                }
+            });
+    }
+
+    public loadPackageIssueComments(reload = false): void {
+        if (this.loadingMoreComments) {
+            return;
+        }
+
+        this.loadingMoreComments = true;
+        this.packageIssueCommentsGQL
+            .fetch({
+                issueIdentifier: this.issueIdentifier,
+                packageIdentifier: this.packageIdentifier,
+                offset: reload ? 0 : this.commentsOffset,
+                limit: this.COMMENTS_TO_LOAD_PER_PAGE,
+                orderBy: OrderBy.CREATED_AT
+            })
+            .subscribe((commentsResponse) => {
+                this.loadingMoreComments = false;
+                if (commentsResponse.errors) {
+                    return;
+                }
+
+                if (reload) {
+                    this.packageIssueComments = commentsResponse.data.packageIssueComments.comments;
+                } else {
+                    this.packageIssueComments.push(...commentsResponse.data.packageIssueComments.comments);
+                }
+
+                this.packageIssueComments.forEach((c) => {
+                    c.editedContent = c.content;
+                    const author = c.author;
+                    if (author.firstName && author.lastName) {
+                        c.authorDisplayName = `${author.firstName} ${author.lastName}`;
+                    } else {
+                        c.authorDisplayName = author.username;
+                    }
+                });
+                this.commentsOffset = this.packageIssueComments.length;
+                this.hasMoreComments = commentsResponse.data.packageIssueComments.hasMore;
+                this.state = State.SUCCESS;
+            });
+    }
+
+    public createNewComment(): void {
+        if (!this.isValidNewCommentContent()) {
+            return;
+        }
+
+        this.submittingNewComment = true;
+        this.createPackageIssueCommentGQL
+            .mutate({
+                packageIdentifier: this.packageIdentifier,
+                issueIdentifier: this.issueIdentifier,
+                comment: {
+                    content: this.newCommentContent
+                }
+            })
+            .subscribe(
+                () => {
+                    this.submittingNewComment = false;
+                    this.newCommentContent = "";
+                    this.newCommentEditor.setValue("");
+                    this.loadPackageIssueComments(true);
+                },
+                () => (this.submittingNewComment = false)
+            );
+    }
+
+    public openIssue(): void {
+        this.changeIssueStatus(PackageIssueStatus.OPEN);
+    }
+
+    public closeIssue(): void {
+        this.changeIssueStatus(PackageIssueStatus.CLOSED);
+    }
+
+    public isValidNewCommentContent(): boolean {
+        return this.isValidContent(this.newCommentContent);
+    }
+
+    public getUserAvatar(username: string): Subject<SafeUrl> {
+        return this.imageService.loadUserAvatar(username);
+    }
+
+    public canEditComment(comment: PackageIssueCommentWithEditorStatus): boolean {
+        return this.isUserPackageManager || comment.author.username === this.user.username;
+    }
+
+    private changeIssueStatus(status: PackageIssueStatus): void {
+        this.updatePackageIssueStatusGQL
+            .mutate({
+                packageIdentifier: this.packageIdentifier,
+                issueIdentifier: this.issueIdentifier,
+                status: { status }
+            })
+            .subscribe((response) => {
+                if (response.errors) {
+                    return;
+                }
+
+                this.updatePackageIssue(response.data.updatePackageIssueStatus);
+            });
+    }
+
+    private isValidContent(content: string): boolean {
+        return content && content.trim().length > 0;
+    }
+
+    private loadPackage(): void {
+        this.state = State.LOADING;
+        combineLatest([this.authenticationService.currentUser, this.packageService.package]).subscribe(
+            ([user, packageResponse]) => {
+                const fetchedPackage = packageResponse.package;
+                this.packageIdentifier = {
+                    catalogSlug: fetchedPackage.identifier.catalogSlug,
+                    packageSlug: fetchedPackage.identifier.packageSlug
+                };
+
+                this.user = user;
+                this.isUserPackageManager = fetchedPackage.myPermissions.includes(Permission.MANAGE);
+                this.loadPackageIssue();
+            }
+        );
+    }
+
+    private loadPackageIssue(): void {
+        this.packageIssueGQL
+            .fetch({
+                packageIdentifier: this.packageIdentifier,
+                packageIssueIdentifier: this.issueIdentifier
+            })
+            .subscribe((response) => {
+                if (response.errors) {
+                    if (response.errors[0].message.includes("ISSUE_NOT_FOUND")) {
+                        this.errorMessage = "Issue not found";
+                    }
+                    return;
+                }
+
+                this.updatePackageIssue(response.data.packageIssue);
+                this.canEditIssue =
+                    this.isUserPackageManager || this.packageIssue.author.username === this.user.username;
+                this.packageIssueEditedContent = this.packageIssue.content;
+                this.loadPackageIssueComments();
+            });
+    }
+
+    private updatePackageIssue(issue: PackageIssueWithMetadata): void {
+        this.packageIssue = issue;
+        const author = this.packageIssue.author;
+        if (author.firstName && author.lastName) {
+            this.packageIssue.authorDisplayName = `${author.firstName} ${author.lastName}`;
+        } else {
+            this.packageIssue.authorDisplayName = author.username;
+        }
+    }
+}

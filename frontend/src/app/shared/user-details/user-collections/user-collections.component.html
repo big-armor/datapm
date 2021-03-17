@@ -61,9 +61,11 @@
                                     <ng-container matColumnDef="name">
                                         <th scope="col" mat-header-cell *matHeaderCellDef>Name</th>
                                         <td class="table-content" mat-cell *matCellDef="let collection">
-                                            <a [routerLink]="['/collection/' + collection.identifier.collectionSlug]">{{
-                                                collection.name
-                                            }}</a>
+                                            <a
+                                                class="color-info"
+                                                [routerLink]="['/collection/' + collection.identifier.collectionSlug]"
+                                                >{{ collection.name }}</a
+                                            >
                                         </td>
                                     </ng-container>
 

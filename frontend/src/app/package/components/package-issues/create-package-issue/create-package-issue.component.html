@@ -1,0 +1,38 @@
+<div class="container" id="createIssue">
+    <div class="row">
+        <div class="col-md-12 p-0">
+            <ng-container>
+                <div class="package-details-title mb-2">
+                    Describe Issue for <span *ngIf="!loading">{{ package.displayName }}</span>
+                </div>
+                <div class="package-light-gray">Describe the issue in enough detail for others to help you</div>
+                <div class="col-lg-9 col-md-12 rounded-input p-0 mt-3">
+                    <div class="comment-section">
+                        <input
+                            type="text"
+                            class="dpm-input-square mb-2"
+                            style="height: 40px"
+                            autofocus
+                            placeholder="Issue title"
+                            name="subject"
+                            [(ngModel)]="subject"
+                        />
+                        <br />
+                        <app-markdown-editor [(content)]="content"> </app-markdown-editor>
+
+                        <div class="mt-2 text-right btn-div">
+                            <button class="app-outlined-button" (click)="cancel()">Cancel</button>
+                            <button
+                                class="app-raised-button ml-2"
+                                (click)="submitNewIssue()"
+                                [disabled]="cannotSubmit()"
+                            >
+                                Submit new issue
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</div>
