@@ -14,7 +14,9 @@ import {
     CatalogIdentifierInput,
     AutoCompleteResultResolvers,
     RegistryStatus,
-    User
+    User,
+    PackageIssueResolvers,
+    PackageIssueCommentResolvers
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
@@ -150,6 +152,24 @@ import {
 
 import { myActivity, packageActivities } from "./resolvers/ActivityLogResolver";
 import { removePackagePermissions, setPackagePermissions } from "./resolvers/UserPackagePermissionResolver";
+import {
+    createPackageIssue,
+    deletePackageIssue,
+    deletePackageIssues,
+    getIssuesByPackage,
+    getPackageIssue,
+    getPackageIssueAuthor,
+    updatePackageIssue,
+    updatePackageIssuesStatuses,
+    updatePackageIssueStatus
+} from "./resolvers/PackageIssueResolver";
+import {
+    createPackageIssueComment,
+    deletePackageIssueComment,
+    getCommentsByByPackageIssue,
+    getPackageIssueCommentAuthor,
+    updatePackageIssueComment
+} from "./resolvers/PackageIssueCommentResolver";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -159,6 +179,8 @@ export const resolvers: {
     Catalog: CatalogResolvers;
     Collection: CollectionResolvers;
     Package: PackageResolvers;
+    PackageIssue: PackageIssueResolvers;
+    PackageIssueComment: PackageIssueCommentResolvers;
     Version: VersionResolvers;
     PackageFileJSON: GraphQLScalarType;
     Password: GraphQLScalarType;
@@ -416,7 +438,12 @@ export const resolvers: {
         viewedCount: packageViewedCount,
         isPublic: packageIsPublic
     },
-
+    PackageIssue: {
+        author: getPackageIssueAuthor
+    },
+    PackageIssueComment: {
+        author: getPackageIssueCommentAuthor
+    },
     Version: {
         identifier: versionIdentifier,
         packageFile: versionPackageFile,
@@ -468,6 +495,9 @@ export const resolvers: {
         myAPIKeys: myAPIKeys,
 
         package: findPackage,
+        packageIssue: getPackageIssue,
+        packageIssues: getIssuesByPackage,
+        packageIssueComments: getCommentsByByPackageIssue,
         latestPackages: getLatestPackages,
         myPackages: myPackages,
         myRecentlyViewedPackages: myRecentlyViewedPackages,
@@ -566,6 +596,17 @@ export const resolvers: {
         setPackageCoverImage: setPackageCoverImage,
         deletePackage: deletePackage,
         packageFetched: packageFetched,
+
+        // Package issues
+        createPackageIssue: createPackageIssue,
+        updatePackageIssue: updatePackageIssue,
+        updatePackageIssueStatus: updatePackageIssueStatus,
+        updatePackageIssuesStatuses: updatePackageIssuesStatuses,
+        deletePackageIssues: deletePackageIssues,
+        deletePackageIssue: deletePackageIssue,
+        createPackageIssueComment: createPackageIssueComment,
+        updatePackageIssueComment: updatePackageIssueComment,
+        deletePackageIssueComment: deletePackageIssueComment,
 
         // Package Permissions
         setPackagePermissions: setPackagePermissions,

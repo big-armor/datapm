@@ -7,15 +7,24 @@ html,
 body {
     height: 100%;
     overflow-x: hidden;
-    background-color: $gray-11;
+    background-color: $gray-12;
 }
 
 a {
     color: $color-info;
 }
+
 body {
     margin: 0;
     font-family: $family-roboto !important;
+}
+
+.color-info {
+    color: $color-info;
+
+    &:hover {
+        text-decoration: none;
+    }
 }
 
 .cursor-pointer {
@@ -196,7 +205,7 @@ table.gray-table {
         outline: none;
         letter-spacing: 1px;
         font-family: $family-roboto;
-        background-color: $gray-7;
+        background-color: #fbfbfb;
         transition: background-color ease 0.5s;
 
         &:hover {
@@ -205,14 +214,14 @@ table.gray-table {
         }
 
         &::placeholder {
-            font-family: $family-roboto-mono;
+            font-family: $family-roboto;
             font-style: $style-normal;
             font-weight: $weight-300;
             font-size: ($small-font + 1);
             line-height: 18px;
             display: flex;
             align-items: flex-end;
-            letter-spacing: -0.28px;
+            letter-spacing: 0.4px;
             color: $gray-4;
         }
     }
@@ -858,6 +867,10 @@ button:disabled {
     letter-spacing: 0.6px;
 }
 
+::ng-deep #tinymce.mce-content-body {
+    color: red !important;
+}
+
 #homeRoutes {
     list-style-type: none;
     margin-bottom: 0px;
@@ -986,6 +999,9 @@ button:disabled {
         &::placeholder {
             font-size: $small-font;
         }
+    }
+    .m-0-mobile {
+        margin-bottom: 0px !important;
     }
     .text-danger {
         font-size: $xsmall-font;

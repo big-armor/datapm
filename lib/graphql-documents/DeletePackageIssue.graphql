@@ -1,0 +1,6 @@
+mutation DeletePackageIssue(
+    $packageIdentifier: PackageIdentifierInput!
+    $packageIssueIdentifier: PackageIssueIdentifierInput!
+) {
+    deletePackageIssue(packageIdentifier: $packageIdentifier, packageIssueIdentifier: $packageIssueIdentifier)
+}

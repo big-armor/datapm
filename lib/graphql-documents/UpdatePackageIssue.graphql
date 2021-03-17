@@ -1,0 +1,19 @@
+mutation UpdatePackageIssue(
+    $packageIdentifier: PackageIdentifierInput!
+    $issueIdentifier: PackageIssueIdentifierInput!
+    $issue: UpdatePackageIssueInput!
+) {
+    updatePackageIssue(packageIdentifier: $packageIdentifier, issueIdentifier: $issueIdentifier, issue: $issue) {
+        issueNumber
+        subject
+        content
+        status
+        author {
+            firstName
+            lastName
+            username
+        }
+        createdAt
+        updatedAt
+    }
+}

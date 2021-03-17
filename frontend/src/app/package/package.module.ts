@@ -1,6 +1,6 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { ReactiveFormsModule } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatIconModule } from "@angular/material/icon";
@@ -38,6 +38,11 @@ import { DownloadPackageComponent } from "./components/package-info/download-pac
 import { ClientWizardComponent } from "./components/package-info/download-package/client-wizard/client-wizard.component";
 import { MatStepperModule } from "@angular/material/stepper";
 import { MatSelectModule } from "@angular/material/select";
+import { PackageIssuesComponent } from "./components/package-issues/package-issues.component";
+import { MatCheckboxModule } from "@angular/material/checkbox";
+import { PackageIssuesDetailComponent } from "./components/package-issues/package-issues-detail/package-issues-detail.component";
+import { MatMenuModule } from "@angular/material/menu";
+import { CreatePackageIssueComponent } from "./components/package-issues/create-package-issue/create-package-issue.component";
 
 @NgModule({
     declarations: [
@@ -56,10 +61,14 @@ import { MatSelectModule } from "@angular/material/select";
         AddUserComponent,
         PackageDeletionConfirmationComponent,
         DownloadPackageComponent,
-        ClientWizardComponent
+        ClientWizardComponent,
+        PackageIssuesComponent,
+        PackageIssuesDetailComponent,
+        CreatePackageIssueComponent
     ],
     imports: [
         CommonModule,
+        FormsModule,
         ReactiveFormsModule,
         PackageRoutingModule,
         MatButtonModule,
@@ -68,7 +77,9 @@ import { MatSelectModule } from "@angular/material/select";
         MatTabsModule,
         MatChipsModule,
         MatInputModule,
+        MatMenuModule,
         MatDialogModule,
+        MatCheckboxModule,
         MatSlideToggleModule,
         MatTableModule,
         MatAutocompleteModule,

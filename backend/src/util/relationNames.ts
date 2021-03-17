@@ -37,7 +37,17 @@ export function getRelationNames(obj: object, parentNames: string = ""): string[
     let out: string[] = [];
 
     // TODO - This is hacky
-    const skipRelations = ["identifier", "latestVersion", "packages", "collections", "catalogs", "creator", "catalog"];
+    const skipRelations = [
+        "identifier",
+        "latestVersion",
+        "packages",
+        "collections",
+        "catalogs",
+        "issues",
+        "comments",
+        "creator",
+        "catalog"
+    ];
 
     for (let [key, val] of Object.entries(obj)) {
         if (!isEmpty(val) && skipRelations.indexOf(key) == -1) {

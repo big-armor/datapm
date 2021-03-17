@@ -1,0 +1,29 @@
+query PackageIssueComments(
+    $packageIdentifier: PackageIdentifierInput!
+    $issueIdentifier: PackageIssueIdentifierInput!
+    $offset: Int!
+    $limit: Int!
+    $orderBy: OrderBy!
+) {
+    packageIssueComments(
+        packageIdentifier: $packageIdentifier
+        issueIdentifier: $issueIdentifier
+        offset: $offset
+        limit: $limit
+        orderBy: $orderBy
+    ) {
+        comments {
+            commentNumber
+            content
+            author {
+                firstName
+                lastName
+                username
+            }
+            createdAt
+            updatedAt
+        }
+        hasMore
+        count
+    }
+}

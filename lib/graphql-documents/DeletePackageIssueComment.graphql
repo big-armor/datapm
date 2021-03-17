@@ -1,0 +1,11 @@
+mutation DeletePackageIssueComment(
+    $packageIdentifier: PackageIdentifierInput!
+    $issueIdentifier: PackageIssueIdentifierInput!
+    $issueCommentIdentifier: PackageIssueCommentIdentifierInput!
+) {
+    deletePackageIssueComment(
+        packageIdentifier: $packageIdentifier
+        issueIdentifier: $issueIdentifier
+        issueCommentIdentifier: $issueCommentIdentifier
+    )
+}
