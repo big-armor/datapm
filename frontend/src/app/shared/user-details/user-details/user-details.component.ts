@@ -14,6 +14,7 @@ import { EditAccountDialogComponent } from "../edit-account-dialog/edit-account-
 import { SnackBarService } from "src/app/services/snackBar.service";
 import * as timeago from "timeago.js";
 import { ApiKeyService } from "src/app/services/api-key.service";
+import { UiStyleToggleService } from "src/app/services/ui-style-toggle.service";
 
 enum State {
     INIT,
@@ -57,7 +58,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         private apiKeysService: ApiKeyService,
         private deleteAPIKeyGQL: DeleteAPIKeyGQL,
         private clipboard: Clipboard,
-        private snackBarService: SnackBarService
+        private snackBarService: SnackBarService,
+        private uiStyleToggleService: UiStyleToggleService
     ) {}
 
     public ngOnInit(): void {
@@ -81,6 +83,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.subscription.unsubscribe();
+    }
+
+    public toggleDarkMode(): void {
+        this.uiStyleToggleService.toggle();
     }
 
     openPasswordDialog() {

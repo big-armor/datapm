@@ -9,9 +9,6 @@ export function themeFactory(themeService: UiStyleToggleService) {
 @NgModule({
     declarations: [],
     imports: [CommonModule],
-    providers: [
-        UiStyleToggleService,
-        { provide: APP_INITIALIZER, useFactory: themeFactory, deps: [UiStyleToggleService], multi: true }
-    ]
+    providers: [UiStyleToggleService]
 })
 export class UiModule {}

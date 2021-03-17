@@ -40,7 +40,8 @@ export async function createUserDoNotVerifyEmail(
     lastName: string,
     username: string,
     emailAddress: string,
-    password: string
+    password: string,
+    uiDarkModeEnabled?: boolean
 ): Promise<{
     emailVerificationToken: string;
 }> {
@@ -63,7 +64,8 @@ export async function createUserDoNotVerifyEmail(
                         lastName: lastName,
                         username: username,
                         emailAddress: emailAddress,
-                        password: password
+                        password: password,
+                        uiDarkModeEnabled: uiDarkModeEnabled
                     }
                 }
             })
@@ -111,10 +113,11 @@ export async function createUser(
     lastName: string,
     username: string,
     emailAddress: string,
-    password: string
+    password: string,
+    uiDarkModeEnabled?: boolean
 ): Promise<ApolloClient<NormalizedCacheObject>> {
     return await new Promise(async (resolve, reject) => {
-        await createUserDoNotVerifyEmail(firstName, lastName, username, emailAddress, password)
+        await createUserDoNotVerifyEmail(firstName, lastName, username, emailAddress, password, uiDarkModeEnabled)
             .catch((error) => {
                 reject(error);
             })
