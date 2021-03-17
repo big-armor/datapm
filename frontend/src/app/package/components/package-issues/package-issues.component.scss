@@ -1,10 +1,11 @@
 @import "../../../../styles/variables";
+@import "../../../../styles/colors";
 
 #packageIssues {
     ::ng-deep {
         .mat-checkbox-checked.mat-accent {
             .mat-checkbox-background {
-                background-color: $color-info;
+                background-color: $info-color;
             }
         }
         .mat-checkbox-inner-container {
@@ -15,7 +16,7 @@
     }
 
     .open-status {
-        background: $color-info;
+        background: $info-color;
         padding: 5px 9px;
         border-radius: 14px;
         margin-right: 12px;
@@ -63,14 +64,14 @@
 
         .issue-wrapper {
             padding: 10px 20px;
-            border: 1px solid $gray-5;
+            border: 1px solid $gray-5-color;
 
             .package-details-title {
                 font-size: $default-font;
 
                 &:hover {
                     text-decoration: none;
-                    color: $color-info;
+                    color: $info-color;
                 }
             }
 
@@ -81,11 +82,11 @@
                 letter-spacing: 0.4px;
                 margin-right: 10px;
                 cursor: pointer;
-                color: $gray-3;
+                color: $gray-3-color;
 
                 &:hover {
                     text-decoration: none;
-                    color: $color-info;
+                    color: $info-color;
                 }
             }
 
@@ -94,7 +95,7 @@
                 font-weight: $weight-400;
                 letter-spacing: 0.4px;
                 cursor: pointer;
-                color: $gray-3;
+                color: $gray-3-color;
                 float: right;
                 margin-right: 3px;
                 margin-left: 10px;
@@ -102,12 +103,12 @@
                 font-size: ($text-font - 1);
 
                 &:hover {
-                    color: $gray-3;
+                    color: $gray-3-color;
                     text-decoration: none;
                 }
 
                 a {
-                    color: $gray-3;
+                    color: $gray-3-color;
 
                     &:hover {
                         text-decoration: none;
@@ -116,12 +117,12 @@
             }
 
             .clickable-text {
-                color: $color-info;
+                color: $info-color;
                 cursor: pointer;
             }
 
             .active {
-                color: $gray-1;
+                color: $gray-1-color;
             }
 
             .img-comments {
