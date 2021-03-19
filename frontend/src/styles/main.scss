@@ -13,7 +13,7 @@ body {
 }
 
 a {
-    color: $info-color;
+    color: var(--info-color);
 }
 
 body {
@@ -22,7 +22,7 @@ body {
 }
 
 .color-info {
-    color: $info-color;
+    color: var(--info-color);
 
     &:hover {
         text-decoration: none;
@@ -53,7 +53,7 @@ body {
 
 table.gray-table {
     width: 100%;
-    border: 1px solid #d9d9d9;
+    border: 1px solid var(--gray-5-color);
 
     .mat-column-name {
         width: 35%;
@@ -67,7 +67,7 @@ table.gray-table {
 
     .mat-header-row {
         height: 40px !important;
-        background-color: $gray-12-color;
+        background-color: var(--gray-12-color);
     }
 
     th {
@@ -75,25 +75,26 @@ table.gray-table {
         font-size: $text-font;
         font-weight: $weight-500;
         letter-spacing: 0.4px;
-        color: $gray-1-color;
+        color: var(--gray-1-color);
     }
 
     td {
         font-family: $family-roboto;
         letter-spacing: 0.4px;
-        color: $gray-2-color;
+        color: var(--gray-2-color);
         font-size: $text-font;
         font-weight: $weight-400;
+        border-bottom: 1px solid var(--gray-5-color);
     }
 }
 
 .gray-paginator {
     height: 58px !important;
-    background-color: $gray-12-color;
-    border: 1px solid #d9d9d9;
+    background-color: var(--gray-12-color);
+    border: 1px solid var(--gray-5-color);
     border-top: 0px;
     font-weight: $weight-400;
-    color: $gray-1-color;
+    color: var(--gray-1-color);
 
     .mat-paginator-icon {
         width: 22px;
@@ -113,7 +114,7 @@ table.gray-table {
 }
 
 .mat-dialog-container {
-    background-color: $gray-11-color;
+    background-color: var(--gray-11-color);
 }
 
 .loading-pane {
@@ -128,17 +129,22 @@ table.gray-table {
 
 .mat-menu-content {
     button.mat-menu-item {
-        border-bottom: 1px solid rgb(0 0 0 / 5%) !important;
+        border-bottom: 1px solid var(--gray-5-color) !important;
         @include text("body");
-        color: $gray-2-color;
+        border-radius: 0px;
+        background: var(--white-color);
+        color: var(--gray-2-color);
         &:last-child {
             border-bottom: none !important;
+        }
+        &:hover {
+            background-color: var(--gray-12-color);
         }
     }
 }
 
 .notification-error {
-    background-color: $danger-color;
+    background-color: var(--danger-color);
     color: $white-color;
 }
 
@@ -195,6 +201,10 @@ table.gray-table {
     }
 }
 
+.mat-slide-toggle-bar {
+    background-color: var(--gray-4-color);
+}
+
 .rounded-input {
     .dpm-input-square {
         border-radius: 6px;
@@ -203,15 +213,16 @@ table.gray-table {
         height: 44px;
         box-shadow: none;
         font-size: $text-font;
-        border: 1px solid $gray-5-color;
+        border: 1px solid var(--gray-5-color);
         outline: none;
         letter-spacing: 1px;
+        color: var(--gray-1-color);
         font-family: $family-roboto;
-        background-color: $gray-7-color;
+        background-color: var(--gray-7-color) !important;
         transition: background-color ease 0.5s;
 
         &:hover {
-            background-color: $white-color;
+            background-color: var(--custom-white-color) !important;
             transition: background-color ease 0.5s;
         }
 
@@ -223,7 +234,7 @@ table.gray-table {
             line-height: 18px;
             display: flex;
             align-items: flex-end;
-            letter-spacing: -0.28px;
+            letter-spacing: 0.4px;
             color: $gray-4-color;
         }
     }
@@ -238,7 +249,7 @@ table.gray-table {
 }
 
 mat-select {
-    background-color: $gray-7-color;
+    background-color: var(--custom-white-color);
     padding: 10px 16px;
     letter-spacing: 0.7px;
     font-family: $family-roboto;
@@ -248,6 +259,10 @@ mat-select {
         letter-spacing: 0.7px;
         font-weight: $weight-300 !important;
         font-size: $text-font;
+    }
+
+    span {
+        color: var(--gray-1-color);
     }
 }
 
@@ -259,18 +274,20 @@ mat-select {
     border: none;
     outline: none;
     letter-spacing: 0.7px;
-    background-color: $gray-7-color;
+    background-color: var(--custom-white-color);
     font-family: $family-roboto;
+    color: var(--gray-1-color);
     transition: background-color ease 0.5s;
 
     &:hover {
-        background-color: $white-color;
+        background-color: var(--custom-white-color);
         transition: background-color ease 0.5s;
     }
 
     &::placeholder {
         font-family: $family-roboto;
         letter-spacing: 0.7px;
+        color: var(--gray-1-color);
         font-weight: $weight-300;
         font-size: $text-font;
     }
@@ -279,7 +296,7 @@ mat-select {
 .app-raised-button {
     outline: none !important;
     border-radius: 6px;
-    border: none;
+    border: 1px solid var(--tranparent-border);
     font-family: $family-roboto;
     font-style: $style-normal;
     font-weight: $weight-400;
@@ -288,11 +305,11 @@ mat-select {
     text-align: center;
     padding: 8px 15px;
     color: $white-color;
-    background-color: $info-color;
+    background-color: var(--custom-info-color);
     transition: background-color ease 0.5s;
 
     &:hover {
-        background-color: rgba($info-color, 0.85);
+        background-color: var(--custom-info-hover-color);
         transition: background-color ease 0.5s;
     }
 
@@ -301,21 +318,21 @@ mat-select {
     }
 
     &:disabled {
-        background-color: $gray-5-color;
+        background-color: var(--gray-5-color);
         pointer-events: none;
         opacity: 0.6;
     }
 }
 
 .raised {
-    box-shadow: $outer-shadow-1 !important;
+    box-shadow: var(--outer-shadow-1) !important;
 }
 
 .app-fab-button.app-fab-button {
     width: 40px;
     height: 40px;
-    background: $white-color;
-    box-shadow: $outer-shadow-1 !important;
+    background: var(--white-color);
+    box-shadow: var(--outer-shadow-1) !important;
 
     &:focus {
         outline: none !important;
@@ -325,7 +342,7 @@ mat-select {
         padding: 0 !important;
 
         .mat-icon {
-            color: $gray-3-color;
+            color: var(--gray-3-color);
             font-size: ($title-font + 6);
             width: unset;
             height: 32px;
@@ -338,7 +355,7 @@ mat-select {
 }
 
 .info-txt {
-    color: $info-color;
+    color: var(--info-color);
 }
 
 .app-outlined-button {
@@ -346,9 +363,9 @@ mat-select {
     font-style: $style-normal;
     font-weight: $weight-400;
     font-size: ($text-font - 1);
-    background: var(--white-1-color);
+    background: var(--custom-white-color);
     line-height: 13px;
-    color: $info-color;
+    color: var(--info-color);
     border: 1px solid var(--gray-9-color);
     padding: 6px 15px;
     border-radius: 4px;
@@ -360,9 +377,9 @@ mat-select {
     }
 
     &:hover {
-        color: $info-color;
+        color: var(--info-color);
         text-decoration: none;
-        background-color: $white-color;
+        background-color: var(--custom-white-color);
     }
 
     .delete-txt {
@@ -434,17 +451,38 @@ mat-select {
     font-family: $family-roboto;
     letter-spacing: 0.7px;
     font-size: $text-font;
+    color: var(--gray-1-color);
 }
 
 .autocomplete-description {
     line-height: 12px;
     font-size: $small-font;
-    color: $gray-3-color;
+    color: var(--gray-3-color);
     font-weight: $weight-300;
 }
 
 .mat-option {
-    border-bottom: 1px solid $gray-6-color;
+    letter-spacing: 0.5px;
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-size: $text-font;
+    line-height: 18px;
+    color: var(--gray-1-color);
+    border-radius: 0px !important;
+    background-color: var(--white-color) !important;
+    border-bottom: 1px solid var(--gray-5-color) !important;
+
+    &:hover {
+        background-color: var(--gray-12-color) !important;
+    }
+
+    .mat-select-arrow {
+        color: var(--gray-1-color);
+    }
+}
+
+.mat-option.mat-active {
+    color: var(--gray-1-color);
 }
 
 .header-border {
@@ -479,7 +517,7 @@ div {
             text-align: center;
             line-height: 18px;
             letter-spacing: -0.28px;
-            color: $gray-3-color;
+            color: var(--gray-3-color);
             outline: transparent solid 0px;
         }
     }
@@ -492,8 +530,8 @@ div {
         line-height: 55px;
         text-align: center;
         margin: 20px 0 10px;
-        color: $gray-1-color;
-        text-shadow: $text-shadow;
+        color: var(--gray-1-color);
+        text-shadow: var(--text-shadow);
     }
 }
 
@@ -519,7 +557,8 @@ textarea.flat-input,
     display: flex;
     align-items: flex-end;
     letter-spacing: 0.7px;
-    color: $gray-1-color;
+    color: var(--gray-1-color);
+    background-color: var(--custom-white-color);
 
     &:focus {
         outline: transparent solid 0px;
@@ -535,7 +574,7 @@ textarea.flat-input,
         display: flex;
         align-items: flex-end;
         letter-spacing: 0.7px;
-        color: $gray-4-color;
+        color: var(--gray-4-color);
     }
 }
 
@@ -551,7 +590,7 @@ button.save-btn {
     border-radius: 6px;
     letter-spacing: 0.4px;
     background-color: transparent;
-    box-shadow: $outer-shadow-1;
+    box-shadow: var(--outer-shadow-1);
     border-color: transparent;
     font-family: $family-roboto;
     font-style: $style-normal;
@@ -607,6 +646,7 @@ button:disabled {
     line-height: 21px;
     font-weight: $weight-400;
     font-size: $title-font;
+    color: var(--black-color);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -620,8 +660,14 @@ button:disabled {
     padding-right: 0px !important;
     max-height: calc(100vh - 130px);
     padding: 10px 0px 5px 0px;
-    border-top: 1px solid $custom-gray-9-color;
-    border-bottom: 1px solid $custom-gray-9-color;
+    color: var(--gray-2-color);
+    border-top: 1px solid var(--custom-gray-9-color);
+    border-bottom: 1px solid var(--custom-gray-9-color);
+
+    p {
+        color: var(--gray-2-color);
+        margin-bottom: 5px i !important;
+    }
 }
 
 .div-question {
@@ -631,7 +677,7 @@ button:disabled {
     font-size: $text-font;
     line-height: 18px;
     letter-spacing: 0.7px;
-    color: $gray-2-color;
+    color: var(--gray-2-color);
     width: 230px;
 }
 
@@ -659,12 +705,16 @@ button:disabled {
     margin-top: 3px !important;
     font-size: 12px;
     line-height: 15px;
-    color: $danger-color !important;
+    color: var(--danger-color) !important;
 }
 
 #addUser {
     position: relative;
     min-width: 500px;
+}
+
+.close-dialog {
+    color: var(--gray-1-color);
 }
 
 .mat-dialog-without-padding {
@@ -708,16 +758,16 @@ button:disabled {
     }
 
     .mat-form-field-ripple {
-        background-color: $info-color !important;
+        background-color: var(--info-color) !important;
     }
 }
 
 .mat-focused .mat-form-field-label {
-    color: $info-color !important;
+    color: var(--info-color) !important;
 }
 
 .slug {
-    color: $danger-color;
+    color: var(--danger-color);
 }
 
 .border-none {
@@ -733,7 +783,7 @@ button:disabled {
 #deletePackage,
 #deleteUser {
     .btn-delete {
-        color: $danger-color;
+        color: var(--danger-color);
         position: relative;
         top: 4px;
         text-align: center;
@@ -742,7 +792,7 @@ button:disabled {
         padding: 0px 15px;
         font-weight: $weight-400;
         border-radius: 6px;
-        box-shadow: $outer-shadow-1;
+        box-shadow: var(--outer-shadow-1);
         border-color: transparent;
         font-family: $family-roboto;
         font-style: $style-normal;
@@ -764,7 +814,8 @@ button:disabled {
     .copy-input {
         border: 1px solid rgb(0 0 0 / 10%);
         padding: 6px 10px;
-        background: $white-color;
+        color: var(--gray-1-color) !important;
+        background: var(--custom-white-color);
         width: 100%;
         height: 36px;
         overflow: hidden;
@@ -777,13 +828,13 @@ button:disabled {
         .copy-txt {
             font-weight: $weight-400 !important;
             font-size: ($text-font - 1) !important;
-            color: $gray-1-color !important;
+            color: var(--gray-1-color) !important;
             letter-spacing: 0.1px !important;
         }
     }
 
     .copy-btn {
-        background: $gray-3-color;
+        background: var(--gray-3-color);
         border: none;
         height: 36px;
         padding: 6px 15px;
@@ -792,7 +843,7 @@ button:disabled {
 
         a {
             font-size: $text-font !important;
-            color: $white-color !important;
+            color: var(--custom-white-color) !important;
         }
     }
 }
@@ -835,7 +886,7 @@ button:disabled {
 }
 
 .mat-primary .mat-option.mat-selected:not(.mat-option-disabled) {
-    color: $info-color;
+    color: var(--info-color);
 }
 
 .package-light-gray {

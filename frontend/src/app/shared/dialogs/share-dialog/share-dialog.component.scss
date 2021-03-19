@@ -3,26 +3,26 @@
 
 #sharePackage {
     .email-share-button {
-        background-color: $email-color;
+        background-color: var(--email-color);
 
         &:hover {
-            background-color: $email-hover-color;
+            background-color: var(--email-hover-color);
         }
     }
 
     .reddit-share-button {
-        background-color: $reddit-color;
+        background-color: var(--reddit-color);
 
         &:hover {
-            background-color: $reddit-hover-color;
+            background-color: var(--reddit-hover-color);
         }
     }
 
     .fb-share-button {
-        background-color: $fb-color;
+        background-color: var(--fb-color);
 
         &:hover {
-            background-color: $fb-hover-color;
+            background-color: var(--fb-hover-color);
         }
 
         .social-square {
@@ -31,10 +31,10 @@
     }
 
     .twitter-share-button {
-        background-color: $twitter-color;
+        background-color: var(--twitter-color);
 
         &:hover {
-            background-color: $twitter-hover-color;
+            background-color: var(--twitter-hover-color);
         }
     }
 

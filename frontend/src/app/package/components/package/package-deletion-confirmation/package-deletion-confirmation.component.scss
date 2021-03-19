@@ -20,7 +20,7 @@
     .counter {
         margin: 40px auto;
         font-size: 30px;
-        color: $danger-color;
+        color: var(--danger-color);
         position: relative;
         width: 50px;
         height: 50px;
@@ -43,7 +43,7 @@
         }
 
         .delete-permanently-button {
-            background: $danger-color;
+            background: var(--danger-color);
             color: $white-color !important;
 
             &:disabled {
@@ -53,8 +53,8 @@
 
             &:hover {
                 background: $white-color !important;
-                color: $danger-color !important;
-                border: 1px solid $danger-color;
+                color: var(--danger-color) !important;
+                border: 1px solid var(--danger-color);
             }
         }
 
@@ -64,8 +64,8 @@
 
             &:hover {
                 background: $white-color !important;
-                color: $danger-color !important;
-                border: 1px solid $danger-color;
+                color: var(--danger-color) !important;
+                border: 1px solid var(--danger-color);
             }
         }
     }

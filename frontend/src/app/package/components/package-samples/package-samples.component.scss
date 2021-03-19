@@ -13,6 +13,6 @@
 }
 
 a {
-    color: $info-color !important;
+    color: var(--info-color) !important;
     cursor: pointer;
 }

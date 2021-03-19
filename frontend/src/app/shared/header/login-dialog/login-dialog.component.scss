@@ -10,7 +10,7 @@
         text-align: center;
         line-height: 18px;
         letter-spacing: 0.4px;
-        color: $gray-3-color;
+        color: var(--gray-3-color);
         margin-bottom: 30px;
     }
 
@@ -22,7 +22,7 @@
         letter-spacing: 0.4px;
         align-items: center;
         text-align: left;
-        color: $danger-color;
+        color: var(--danger-color);
         max-width: 347px;
         position: relative;
         line-height: 14px;
@@ -32,9 +32,9 @@
         margin-top: 10px;
         a {
             font-size: $text-font;
-            color: $info-color;
+            color: var(--info-color);
             :hover {
-                color: $info-color;
+                color: var(--info-color);
             }
         }
     }

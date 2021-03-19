@@ -28,7 +28,7 @@
             font-size: $xsmall-font;
             line-height: 12px;
             margin-top: 5px;
-            color: $danger-color;
+            color: var(--danger-color);
         }
     }
 
@@ -65,7 +65,7 @@
             align-items: center;
 
             input {
-                border: 1px solid $gray-5-color;
+                border: 1px solid var(--gray-5-color);
                 line-height: 23px;
                 height: 33px;
                 display: flex;
@@ -74,6 +74,8 @@
                 font-size: $text-font;
                 align-items: flex-end;
                 letter-spacing: -0.28px;
+                color: var(--gray-1-color);
+                background-color: var(--custom-white-color);
 
                 &:focus {
                     outline: transparent solid 0px;

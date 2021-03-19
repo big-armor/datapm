@@ -24,7 +24,7 @@
                     font-size: $text-font;
                     letter-spacing: 0.4px;
                     font-weight: $weight-300;
-                    color: $gray-4-color;
+                    color: var(--gray-4-color);
                 }
             }
         }
@@ -39,10 +39,10 @@
 
         .mat-form-field-flex {
             padding: 0px;
-            background: $gray-7-color;
+            background: var(--gray-7-color);
             width: 218px;
             border-radius: 6px;
-            border: 1px solid $gray-5-color;
+            border: 1px solid var(--gray-5-color);
         }
 
         .mat-form-field-underline {

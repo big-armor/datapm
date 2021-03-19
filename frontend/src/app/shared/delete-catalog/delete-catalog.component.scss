@@ -15,7 +15,7 @@
         ::ng-deep input.mat-input-element {
             width: unset;
             border: none;
-            border-bottom: 2px solid $danger-color;
+            border-bottom: 2px solid var(--danger-color);
             background: transparent;
             outline: transparent solid 1px;
         }

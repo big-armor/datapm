@@ -77,7 +77,7 @@
 }
 
 ::ng-deep .mat-primary .mat-option.mat-selected:not(.mat-option-disabled) {
-    color: $info-color;
+    color: var(--info-color);
 }
 
 @media (max-width: 576px) {

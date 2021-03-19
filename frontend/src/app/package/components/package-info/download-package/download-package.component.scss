@@ -14,17 +14,17 @@
         font-size: ($text-font - 1);
         line-height: 18px;
         letter-spacing: 0.4px;
-        color: $gray-3-color;
+        color: var(--gray-3-color);
     }
 
     .white-div {
-        background-color: $white-color;
+        background-color: var(--white-color);
         margin-top: 10px;
         border-radius: 6px;
         padding: 10px 15px;
 
         a {
-            color: $info-color;
+            color: var(--info-color);
             line-height: 24px;
             font-size: ($text-font - 1);
             cursor: pointer;
@@ -44,8 +44,8 @@
         width: 100%;
         border: none;
         padding: 5px 12px 5px 0px;
-        background: $white-color;
-        color: $gray-1-color;
+        background: var(--custom-white-color);
+        color: var(--gray-1-color);
         border: 1px solid #33333326;
         font-weight: $weight-400;
         letter-spacing: 0.8px;
@@ -55,7 +55,7 @@
         a {
             padding: 10px 7px;
             margin-right: 7px;
-            border-right: 1px solid $gray-9-color;
+            border-right: 1px solid var(--gray-9-color);
         }
 
         &:hover {
@@ -83,7 +83,7 @@
             font-size: ($text-font - 2);
             line-height: 18px;
             letter-spacing: 0.4px;
-            color: $gray-2-color;
+            color: var(--gray-2-color);
         }
     }
 

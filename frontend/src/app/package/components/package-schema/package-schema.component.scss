@@ -9,7 +9,7 @@
         font-size: $xsmall-font;
         line-height: 13px;
         letter-spacing: 0.6px;
-        color: $gray-2-color;
+        color: var(--gray-2-color);
     }
 
     .package-dark-gray {
@@ -20,7 +20,7 @@
         .mat-expansion-panel {
             box-shadow: none;
             margin: 5px 0px !important;
-            border: 1px solid #33333314;
+            border: 1px solid var(--gray-9-color);
 
             .mat-expanded {
                 height: 48px;
@@ -40,7 +40,7 @@
                     font-size: $small-font;
                     line-height: 18px;
                     letter-spacing: 0.6px;
-                    color: $gray-2-color;
+                    color: var(--gray-2-color);
                     padding-right: 10px;
                 }
 
@@ -54,14 +54,15 @@
                     align-items: center;
                     text-align: right;
                     letter-spacing: 0.6px;
-                    color: $gray-3-color;
+                    color: var(--gray-3-color);
                     padding-right: 6px;
-                    border-bottom: 1px solid $gray-9-color;
+                    border-bottom: 1px solid var(--gray-9-color);
                 }
             }
             ::ng-deep {
                 .mat-expansion-indicator::after {
                     position: relative;
+                    color: var(--gray-2-color);
                     bottom: 3px;
                 }
             }

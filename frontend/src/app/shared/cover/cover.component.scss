@@ -4,7 +4,7 @@
 .cover {
     height: 150px;
     position: relative;
-    background-color: $gray-9-color;
+    background-color: var(--gray-9-color);
 }
 
 img {
@@ -37,7 +37,7 @@ img {
         font-size: 48px;
         width: 48px;
         height: 48px;
-        color: white;
+        color: $white-1-color;
     }
 }
 

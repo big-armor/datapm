@@ -6,25 +6,26 @@
     white-space: nowrap;
     margin-bottom: 15px;
     border-radius: 6px;
+    // border: 1px solid var(--tranparent-border);
     padding: 20px 10px;
-    background-color: $gray-10-color;
+    background-color: var(--gray-10-color);
 }
 
 .collection-item {
     display: inline-block;
     cursor: pointer;
     margin-right: 10px;
-    border: 1px solid $gray-10-color;
-    background-color: $gray-7-color;
+    border: 1px solid var(--tranparent-border);
+    background-color: var(--gray-7-color);
     padding: 10px 10px;
     border-radius: 6px;
     font-family: $family-roboto;
     font-weight: $weight-400;
     letter-spacing: 0.6px;
     font-size: $small-font;
-    color: $gray-1-color;
+    color: var(--gray-1-color);
 
     &:hover {
-        background-color: $white-color;
+        background-color: var(--custom-white-color);
     }
 }

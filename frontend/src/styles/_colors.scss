@@ -1,12 +1,15 @@
 // black and white
 $black-color: #000;
-$black-color-dark: #fff;
+$black-color-dark: #e6eaef;
 
 $white-color: #fff;
-$white-color-dark: #000;
+$white-color-dark: #202124;
 
 $white-1-color: #ffffffb3;
 $white-1-color-dark: #fff;
+
+$custom-white-color: #fff;
+$custom-white-color-dark: #363638e8;
 
 $black-1-color: rgba($black-color, 0.08);
 $black-1-color-dark: rgba($black-color, 0.08);
@@ -14,40 +17,40 @@ $black-1-color-dark: rgba($black-color, 0.08);
 
 // gray shades
 $gray-1-color: #333;
-$gray-1-color-dark: #e6eaef;
+$gray-1-color-dark: #cccdd1;
 
 $gray-2-color: #4f4f4f;
-$gray-2-color-dark: #dee2e6;
+$gray-2-color-dark: #bfc0c3f2;
 
 $gray-3-color: #828282;
-$gray-3-color-dark: #dee2e6;
+$gray-3-color-dark: #aaabaf;
 
 $gray-4-color: #bdbdbd;
 $gray-4-color-dark: #bdbdbd;
 
 $gray-5-color: #e0e0e0;
-$gray-5-color-dark: #e0e0e0;
+$gray-5-color-dark: #5f6368;
 
 $gray-6-color: #f2f2f2;
 $gray-6-color-dark: #f2f2f2;
 
 $gray-7-color: #f9f9f9;
-$gray-7-color-dark: #f9f9f9;
+$gray-7-color-dark: #202124;
 
 $gray-8-color: #ccc;
 $gray-8-color-dark: #ccc;
 
 $gray-9-color: #ddd;
-$gray-9-color-dark: #ddd;
+$gray-9-color-dark: #5f6368;
 
 $gray-10-color: #eee;
-$gray-10-color-dark: #eee;
+$gray-10-color-dark: #363638e8;
 
 $gray-11-color: #f3f3f3;
-$gray-11-color-dark: #2b2b2d;
+$gray-11-color-dark: #202124;
 
 $gray-12-color: #ededed;
-$gray-12-color-dark: #ededed;
+$gray-12-color-dark: #343437;
 
 $custom-gray-1-color: #aeaeae;
 $custom-gray-1-color-dark: #aeaeae;
@@ -56,7 +59,7 @@ $custom-gray-8-color: rgba($gray-8-color, 0.85);
 $custom-gray-8-color-dark: rgba($gray-8-color, 0.85);
 
 $custom-gray-9-color: rgba($gray-9-color, 0.85);
-$custom-gray-9-color-dark: rgba($gray-9-color, 0.85);
+$custom-gray-9-color-dark: #5f6368;
 
 $custom-gray-3-color: rgba($gray-3-color, 0.73);
 $custom-gray-3-color-dark: rgba($gray-3-color, 0.73);
@@ -73,7 +76,7 @@ $green-6-color: rgba($green-1-color, 0.1);
 
 // main colors
 $info-color: #017fb9;
-$info-color-dark: #017fb9;
+$info-color-dark: #09a5e2;
 
 $success-color: #2eb244;
 $success-color-dark: #2eb244;
@@ -82,45 +85,64 @@ $warning-color: #efd54b;
 $warning-color-dark: #efd54b;
 
 $danger-color: #e23326;
-$danger-color-dark: #e23326;
+$danger-color-dark: #b51307;
 
 $danger-dark-color: #dc3545;
 $danger-dark-color-dark: #dc3545;
 
 $danger-lighter-color: #fe0000;
 $danger-lighter-color-dark: #fe0000;
+
+$custom-info-color: #017fb9;
+$custom-info-color-dark: #363638e8;
+
+$custom-info-hover-color: rgba($custom-info-color, 0.75);
+$custom-info-hover-color-dark: rgba($custom-info-color-dark, 0.75);
 // main colors
 
 // social media
 $fb-color: #3e68c0;
-$fb-color-dark: #3e68c0;
+$fb-color-dark: #2950a0;
 
 $reddit-color: #ff4500;
-$reddit-color-dark: #ff4500;
+$reddit-color-dark: #ab3003;
 
 $email-color: #7d7d7d;
-$email-color-dark: #7d7d7d;
+$email-color-dark: #656363;
 
 $twitter-color: #1b95e0;
-$twitter-color-dark: #1b95e0;
+$twitter-color-dark: #0f679c;
 
 $fb-hover-color: rgba($fb-color, 0.9);
-$fb-hover-color-dark: rgba($fb-color, 0.9);
+$fb-hover-color-dark: rgba($fb-color-dark, 0.9);
 
 $reddit-hover-color: rgba($reddit-color, 0.9);
-$reddit-hover-color-dark: rgba($reddit-color, 0.9);
+$reddit-hover-color-dark: rgba($reddit-color-dark, 0.9);
 
 $email-hover-color: rgba($email-color, 0.9);
-$email-hover-color-dark: rgba($email-color, 0.9);
+$email-hover-color-dark: rgba($email-color-dark, 0.9);
 
 $twitter-hover-color: rgba($twitter-color, 0.9);
-$twitter-hover-color-dark: rgba($twitter-color, 0.9);
+$twitter-hover-color-dark: rgba($twitter-color-dark, 0.9);
 // social media
 
 $box-shadow: 0px 0 0px rgb(255 255 255), 0 0px 0px rgb(255 255 255 / 25%), 0 4px 4px rgb(191 187 187 / 25%),
     4px 0 4px rgb(247 247 247 / 25%);
-$box-shadow-dark: 0px 0 0px #2b2b2d, 0 0px 0px rgb(43 43 45), 0 1px 0px rgb(221 225 229),
-    0px 0 0px rgb(247 247 247 / 25%);
+$box-shadow-dark: 0px 0 0px #2b2b2d, 0 0px 0px rgb(43 43 45), 0 1px 0px #5f6368, 0px 0 0px #5f6368;
+
+$outer-shadow-1: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+    0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+$outer-shadow-1-dark: 0px 0px 0px #5f6368, 0px 0px 0px #5f6368, 0px 0px 1px #5f6368, 0px 0px 2px #5f6368;
+
+$text-shadow: 0px -4px 4px rgba(255, 255, 255, 0.25), -4px 0px 4px rgba(255, 255, 255, 0.25),
+    4px 0px 4px rgba(183, 183, 183, 0.25), 0px 4px 4px rgba(183, 183, 183, 0.25);
+$text-shadow-dark: none;
+
+$tranparent-border: transparent;
+$tranparent-border-dark: #5f6368;
+
+$custom-th-color: #e0e0e0;
+$custom-th-color-dark: #202125;
 
 $colors: (
     --black-color: (
@@ -134,6 +156,10 @@ $colors: (
     --white-1-color: (
         $white-1-color,
         $white-1-color-dark
+    ),
+    --custom-white-color: (
+        $custom-white-color,
+        $custom-white-color-dark
     ),
     --black-1-color: (
         $black-1-color,
@@ -215,6 +241,10 @@ $colors: (
         $success-color,
         $success-color-dark
     ),
+    --danger-color: (
+        $danger-color,
+        $danger-color-dark
+    ),
     --warning-color: (
         $warning-color,
         $warning-color-dark
@@ -226,6 +256,14 @@ $colors: (
     --danger-lighter-color: (
         $danger-lighter-color,
         $danger-lighter-color-dark
+    ),
+    --custom-info-color: (
+        $custom-info-color,
+        $custom-info-color-dark
+    ),
+    --custom-info-hover-color: (
+        $custom-info-hover-color,
+        $custom-info-hover-color-dark
     ),
     --fb-color: (
         $fb-color,
@@ -262,5 +300,21 @@ $colors: (
     --box-shadow: (
         $box-shadow,
         $box-shadow-dark
+    ),
+    --outer-shadow-1: (
+        $outer-shadow-1,
+        $outer-shadow-1-dark
+    ),
+    --tranparent-border: (
+        $tranparent-border,
+        $tranparent-border-dark
+    ),
+    --text-shadow: (
+        $text-shadow,
+        $text-shadow-dark
+    ),
+    --custom-th-color: (
+        $custom-th-color,
+        $custom-th-color-dark
     )
 );

@@ -5,7 +5,7 @@
     ::ng-deep {
         .mat-checkbox-checked.mat-accent {
             .mat-checkbox-background {
-                background-color: $info-color;
+                background-color: var(--info-color);
             }
         }
         .mat-checkbox-inner-container {
@@ -16,13 +16,13 @@
     }
 
     .open-status {
-        background: $info-color;
+        background: var(--info-color);
         padding: 5px 9px;
         border-radius: 14px;
         margin-right: 12px;
         margin-left: 8px;
         font-size: $small-font;
-        color: #fff;
+        color: var(--white-color);
         position: relative;
         top: 4px;
 
@@ -36,13 +36,13 @@
     }
 
     .closed-status {
-        background: #828282;
+        background: var(--gray-3-color);
         padding: 5px 6px;
         border-radius: 14px;
         margin-right: 12px;
         margin-left: 8px;
         font-size: $small-font;
-        color: #fff;
+        color: var(--white-color);
         position: relative;
         top: 4px;
 
@@ -64,14 +64,14 @@
 
         .issue-wrapper {
             padding: 10px 20px;
-            border: 1px solid $gray-5-color;
+            border: 1px solid var(--gray-5-color);
 
             .package-details-title {
                 font-size: $default-font;
 
                 &:hover {
                     text-decoration: none;
-                    color: $info-color;
+                    color: var(--info-color);
                 }
             }
 
@@ -82,11 +82,11 @@
                 letter-spacing: 0.4px;
                 margin-right: 10px;
                 cursor: pointer;
-                color: $gray-3-color;
+                color: var(--gray-3-color);
 
                 &:hover {
                     text-decoration: none;
-                    color: $info-color;
+                    color: var(--info-color);
                 }
             }
 
@@ -95,7 +95,7 @@
                 font-weight: $weight-400;
                 letter-spacing: 0.4px;
                 cursor: pointer;
-                color: $gray-3-color;
+                color: var(--gray-3-color);
                 float: right;
                 margin-right: 3px;
                 margin-left: 10px;
@@ -103,12 +103,12 @@
                 font-size: ($text-font - 1);
 
                 &:hover {
-                    color: $gray-3-color;
+                    color: var(--gray-3-color);
                     text-decoration: none;
                 }
 
                 a {
-                    color: $gray-3-color;
+                    color: var(--gray-3-color);
 
                     &:hover {
                         text-decoration: none;
@@ -117,12 +117,12 @@
             }
 
             .clickable-text {
-                color: $info-color;
+                color: var(--info-color);
                 cursor: pointer;
             }
 
             .active {
-                color: $gray-1-color;
+                color: var(--gray-1-color);
             }
 
             .img-comments {

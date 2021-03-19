@@ -11,7 +11,7 @@
         text-align: center;
         margin: 10px 0 30px;
         color: $gray-1-color;
-        text-shadow: $text-shadow;
+        text-shadow: var(--text-shadow);
     }
 
     .dialog-subtitle {
@@ -39,7 +39,7 @@
     }
 
     .failed-icon {
-        color: $danger-color;
+        color: var(--danger-color);
     }
 }
 

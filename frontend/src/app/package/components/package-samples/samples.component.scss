@@ -4,7 +4,7 @@
 .table-wrapper {
     height: 99%;
     box-shadow: none;
-    border: 1px solid $gray-9-color;
+    border: 1px solid var(--gray-9-color);
 }
 
 #sampleTable {
@@ -17,43 +17,45 @@
 
 .mat-table {
     overflow: scroll;
-    border-left: 1px solid $gray-9-color;
+    border-left: 1px solid var(--gray-9-color);
 }
 
 .mat-header-cell {
     padding: 8px 8px 8px 8px;
-    border-right: 1px solid $gray-4-color;
-    border-top: -1px solid $gray-9-color;
+    border-right: 1px solid var(--gray-4-color);
+    border-top: -1px solid var(--gray-9-color);
+    border-bottom: 1px solid var(--gray-4-color);
     max-height: 40px;
     height: 40px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    background: $gray-5-color;
+    color: var(--gray-2-color);
+    background-color: var(--custom-th-color);
 }
 
 .mat-cell {
     padding: 8px 8px 8px 8px;
-    border-right: 1px solid $gray-9-color;
+    border-right: 1px solid var(--gray-9-color);
     max-height: 40px;
     height: 40px;
     font-family: $family-roboto;
     font-weight: $weight-400;
     font-size: $small-font;
     letter-spacing: 0.4px;
-    color: $gray-2-color;
+    color: var(--gray-2-color);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 .oddRow {
-    background-color: $white-color;
+    background-color: var(--custom-white-color);
 }
 
 tr.mat-header-row {
     height: 40px !important;
-    background-color: $gray-5-color;
+    background-color: var(--custom-th-color);
 }
 
 ::ng-deep .my-second-custom-dialog {
@@ -61,8 +63,8 @@ tr.mat-header-row {
         padding: 40px 25px 30px 25px !important;
         .mat-table thead {
             opacity: 1;
-            color: $white-color;
-            background-color: $gray-5-color;
+            color: var(--white-color);
+            background-color: var(--gray-5-color);
         }
     }
 }

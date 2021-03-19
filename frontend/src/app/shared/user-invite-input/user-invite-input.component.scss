@@ -46,7 +46,7 @@
         height: 20px;
         font-size: 20px;
         width: 22px;
-        color: $info-color;
+        color: var(--info-color);
     }
 
     ::ng-deep .mat-chip-remove {

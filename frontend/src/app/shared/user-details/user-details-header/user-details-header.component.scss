@@ -6,6 +6,13 @@
     .social-link {
         display: inline-block;
         margin-right: 20px;
+
+        em {
+            color: var(--gray-3-color);
+            font-size: $title-font;
+            position: relative;
+            top: 3px;
+        }
     }
 
     .public-text,

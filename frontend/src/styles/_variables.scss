@@ -1,9 +1,6 @@
 $cover-height: 150px;
 $page-header-height: 136px;
 
-$outer-shadow-1: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
-    0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
-
 $outer-shadow-2: -4px 0px 4px rgba(130, 130, 130, 0.25), 0px -4px 4px rgba(130, 130, 130, 0.25),
     4px 0px 4px rgba(51, 51, 51, 0.25), 0px 4px 4px rgba(51, 51, 51, 0.25);
 $outer-shadow-3: 0px 4px 4px rgba(183, 183, 183, 0.25);
@@ -12,9 +9,6 @@ $inner-shadow-1: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4p
     inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
 $inner-shadow-2: inset -4px 0px 4px rgba(130, 130, 130, 0.25), inset 0px -4px 4px rgba(130, 130, 130, 0.25),
     inset 4px 0px 4px rgba(51, 51, 51, 0.25), inset 0px 4px 4px rgba(51, 51, 51, 0.25);
-
-$text-shadow: 0px -4px 4px rgba(255, 255, 255, 0.25), -4px 0px 4px rgba(255, 255, 255, 0.25),
-    4px 0px 4px rgba(183, 183, 183, 0.25), 0px 4px 4px rgba(183, 183, 183, 0.25);
 
 $radio-outer-shadow: inset -2px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -2px 4px rgba(255, 255, 255, 0.25),
     inset 0px 2px 4px rgba(189, 189, 189, 0.25), inset 2px 0px 4px rgba(189, 189, 189, 0.25);

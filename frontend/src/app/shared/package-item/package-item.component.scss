@@ -3,24 +3,23 @@
 
 .package-item {
     cursor: pointer;
-    box-shadow: $outer-shadow-1;
-    background-color: $gray-7-color;
+    box-shadow: var(--outer-shadow-1);
+    background-color: var(--gray-7-color);
     transition: background-color 0.5s ease;
 
     &:hover {
-        background-color: $white-color;
+        background-color: var(--custom-white-color);
         transition: background-color 0.5s ease;
     }
 
     .package-identifier {
         font-family: $family-roboto-mono;
         font-size: ($default-font - 1);
-        color: $info-color;
+        color: var(--info-color);
         margin-bottom: 0px !important;
     }
 
     .img-cover {
-        margin-top: 6px;
         margin-right: 6px;
     }
 
