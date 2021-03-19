@@ -4,6 +4,9 @@ import { CreateMeGQL, EmailAddressAvailableGQL, UsernameAvailableGQL } from "src
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { MatDialogRef } from "@angular/material/dialog";
 import { usernameValidator, emailAddressValidator } from "src/app/helpers/validators";
+import { UiStyleToggleService } from "src/app/services/ui-style-toggle.service";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 enum State {
     INIT,
@@ -20,6 +23,8 @@ enum State {
     styleUrls: ["./sign-up-dialog.component.scss"]
 })
 export class SignUpDialogComponent implements OnInit {
+    private readonly destroy = new Subject<void>();
+
     State = State;
 
     state = State.INIT;
@@ -42,16 +47,23 @@ export class SignUpDialogComponent implements OnInit {
         }
     };
 
+    private darkModeEnabled = false;
+
     constructor(
         private createMeGQL: CreateMeGQL,
         private usernameAvailableGQL: UsernameAvailableGQL,
         private emailAddressAvailableGQL: EmailAddressAvailableGQL,
         private componentChangeDetector: ChangeDetectorRef,
         private dialogRef: MatDialogRef<SignUpDialogComponent>,
-        private snackbar: MatSnackBar
+        private snackbar: MatSnackBar,
+        private uiStyleToggleService: UiStyleToggleService
     ) {}
 
     ngOnInit(): void {
+        this.uiStyleToggleService.DARK_MODE_ENABLED.pipe(takeUntil(this.destroy)).subscribe(
+            (darkModeEnabled) => (this.darkModeEnabled = darkModeEnabled)
+        );
+
         this.signUpForm = new FormGroup({
             username: new FormControl("", {
                 asyncValidators: [usernameValidator(this.usernameAvailableGQL, this.componentChangeDetector, "")],
@@ -71,8 +83,6 @@ export class SignUpDialogComponent implements OnInit {
 
     formSubmit() {
         this.signUpForm.markAllAsTouched();
-        console.log("submit");
-        console.log(this.signUpForm);
         if (this.signUpForm.invalid) {
             return;
         }
@@ -82,7 +92,8 @@ export class SignUpDialogComponent implements OnInit {
                 value: {
                     username: this.signUpForm.value.username,
                     password: this.signUpForm.value.password,
-                    emailAddress: this.signUpForm.value.emailAddress
+                    emailAddress: this.signUpForm.value.emailAddress,
+                    uiDarkModeEnabled: this.darkModeEnabled
                 }
             })
             .toPromise()

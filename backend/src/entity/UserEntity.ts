@@ -107,4 +107,8 @@ export class UserEntity extends EntityBaseModel {
 
     @Column("enum", { array: false, name: "status", enum: UserStatus })
     status: UserStatus;
+
+    /** Whether the user has enabled the dark mode ui theme. */
+    @Column({ nullable: false, default: false, name: "ui_dark_mode_enabled" })
+    uiDarkModeEnabled: boolean;
 }

@@ -33,7 +33,10 @@
             </div>
             <div class="col-lg-6 col-md-4 col-sm-12 col-xs-6 main-col-footer darkmode-div">
                 <a aria-label="Angular on twitter" title="Dark theme" (click)="toggleTheme()">
-                    <span class="footer-subtitle px-2">Try the night mode! </span>
+                    <span class="footer-subtitle px-2" *ngIf="!darkModeEnabled; else lightModeLabel">
+                        Try the night mode!
+                    </span>
+                    <ng-template #lightModeLabel> Try the light mode! </ng-template>
                     <svg
                         enable-background="new 0 0 507.992 507.992"
                         height="24"
