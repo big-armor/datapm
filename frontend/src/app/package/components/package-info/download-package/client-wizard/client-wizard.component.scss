@@ -31,7 +31,7 @@
             font-size: ($text-font - 1);
             line-height: 18px;
             letter-spacing: 0.4px;
-            color: $gray-3-color;
+            color: var(--gray-3-color);
         }
     }
 
@@ -71,7 +71,8 @@
         padding: 0px;
         min-height: 46px;
         margin-bottom: 0px !important;
-        border-top: 1px solid #e5e5e5;
+        border-top: 1px solid var(--gray-9-color);
+        color: var(--gray-1-color);
     }
 }
 

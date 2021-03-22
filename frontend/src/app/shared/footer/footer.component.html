@@ -36,7 +36,9 @@
                     <span class="footer-subtitle px-2" *ngIf="!darkModeEnabled; else lightModeLabel">
                         Try the night mode!
                     </span>
-                    <ng-template #lightModeLabel> Try the light mode! </ng-template>
+                    <ng-template #lightModeLabel>
+                        <span class="footer-subtitle px-2"> Try the night mode! </span>
+                    </ng-template>
                     <svg
                         enable-background="new 0 0 507.992 507.992"
                         height="24"

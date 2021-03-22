@@ -67,7 +67,7 @@ table.gray-table {
 
     .mat-header-row {
         height: 40px !important;
-        background-color: var(--gray-12-color);
+        background-color: var(--custom-table-color);
     }
 
     th {
@@ -76,6 +76,7 @@ table.gray-table {
         font-weight: $weight-500;
         letter-spacing: 0.4px;
         color: var(--gray-1-color);
+        border-bottom: 1px solid var(--gray-5-color);
     }
 
     td {
@@ -90,7 +91,7 @@ table.gray-table {
 
 .gray-paginator {
     height: 58px !important;
-    background-color: var(--gray-12-color);
+    background-color: var(--custom-table-color);
     border: 1px solid var(--gray-5-color);
     border-top: 0px;
     font-weight: $weight-400;
@@ -167,11 +168,11 @@ table.gray-table {
     }
 
     .disabled {
-        background-color: $gray-4-color;
+        background-color: var(--gray-5-color);
         pointer-events: none;
         opacity: 0.6;
         .btn-text {
-            color: $gray-3-color;
+            color: var(--gray-3-color);
         }
     }
 }
@@ -407,7 +408,7 @@ mat-select {
 
 .dpm-no-data {
     @include text("body");
-    color: $gray-2-color;
+    color: var(--gray-2-color);
     min-height: 240px;
     display: flex;
     flex-direction: column;
@@ -430,7 +431,7 @@ mat-select {
 
 .public-text {
     @include text("small");
-    color: $green-1-color;
+    color: var(--green-1-color);
     line-height: 8px;
     margin-left: 0px;
 }
@@ -438,7 +439,7 @@ mat-select {
 .not-public-text {
     @include text("small");
     line-height: 8px;
-    color: $gray-3-color;
+    color: var(--gray-3-color);
     margin-left: 0px;
 }
 
@@ -609,12 +610,12 @@ button:focus {
 
 .disabled,
 button:disabled {
-    background-color: $custom-gray-8-color;
+    background-color: var(--gray-5-color);
     pointer-events: none;
     opacity: 0.6;
 
     .btn-text {
-        color: $custom-gray-3-color;
+        color: var(--custom-gray-3-color);
     }
 }
 
@@ -630,12 +631,12 @@ button:disabled {
 .mat-stroked-button.mat-accent[disabled],
 .mat-stroked-button.mat-warn[disabled],
 .mat-stroked-button[disabled][disabled] {
-    background-color: $custom-gray-8-color;
+    background-color: var(--gray-5-color);
     pointer-events: none;
     opacity: 0.6;
 
     span {
-        color: $custom-gray-3-color;
+        color: var(--custom-gray-3-color);
     }
 }
 
@@ -666,7 +667,7 @@ button:disabled {
 
     p {
         color: var(--gray-2-color);
-        margin-bottom: 5px i !important;
+        margin-bottom: 5px !important;
     }
 }
 
@@ -768,6 +769,7 @@ button:disabled {
 
 .slug {
     color: var(--danger-color);
+    font-size: $text-font;
 }
 
 .border-none {
@@ -848,6 +850,12 @@ button:disabled {
     }
 }
 
+.mat-select-arrow-wrapper {
+    .mat-select-arrow {
+        color: var(--gray-1-color);
+    }
+}
+
 .permission-div {
     mat-select {
         font-family: $family-roboto;
@@ -855,7 +863,7 @@ button:disabled {
         font-weight: $weight-400;
         font-size: $text-font;
         letter-spacing: unset;
-        color: $gray-2-color;
+        color: var(--gray-2-color);
         padding: 10px;
     }
 

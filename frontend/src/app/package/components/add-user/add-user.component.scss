@@ -8,8 +8,9 @@
             font-style: $style-normal;
             font-weight: $weight-400;
             font-size: $text-font;
-            letter-spacing: unset;
-            color: $gray-2-color;
+
+            letter-spacing: 0.5px;
+            color: var(--gray-2-color);
             padding: 10px;
         }
 
@@ -37,7 +38,7 @@
 
     .textarea-input {
         ::ng-deep .mat-form-field-flex {
-            background-color: $gray-7-color;
+            background-color: var(--custom-white-color);
             padding: 10px;
             border-radius: 6px;
         }
@@ -66,7 +67,7 @@
                 font-family: $family-roboto;
                 letter-spacing: 0.5px;
                 font-weight: $weight-300;
-                color: $gray-4-color;
+                color: var(--gray-4-color);
             }
         }
     }

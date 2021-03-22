@@ -221,7 +221,7 @@
             </div>
             <mat-dialog-actions class="stepper-actions d-flex justify-content-end mt-3">
                 <button mat-button *ngIf="currentIndex == undefined || currentIndex == 0" mat-dialog-close>
-                    Close
+                    <span class="close-dialog"> Close</span>
                 </button>
                 <button mat-button *ngIf="currentIndex != 0" (click)="previous()">Back</button>
                 <button

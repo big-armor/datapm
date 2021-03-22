@@ -24,7 +24,7 @@
     padding: 8px 8px 8px 8px;
     border-right: 1px solid var(--gray-4-color);
     border-top: -1px solid var(--gray-9-color);
-    border-bottom: 1px solid var(--gray-4-color);
+    border-bottom: 1px solid var(--gray-9-color);
     max-height: 40px;
     height: 40px;
     overflow: hidden;
@@ -37,6 +37,7 @@
 .mat-cell {
     padding: 8px 8px 8px 8px;
     border-right: 1px solid var(--gray-9-color);
+    border-bottom: 1px solid var(--gray-9-color);
     max-height: 40px;
     height: 40px;
     font-family: $family-roboto;

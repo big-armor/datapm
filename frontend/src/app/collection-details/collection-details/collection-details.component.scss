@@ -3,7 +3,7 @@
 
 .collection-details {
     position: relative;
-    color: $gray-1-color;
+    color: var(--gray-1-color);
 
     app-cover ::ng-deep img {
         height: $cover-height;
@@ -16,11 +16,11 @@
 
     .collection-header {
         .collection-slug {
-            color: $custom-gray-1-color;
+            color: var(--custom-gray-1-color);
         }
 
         .collection-description {
-            color: $gray-2-color;
+            color: var(--gray-2-color);
         }
     }
 
@@ -45,7 +45,7 @@
                 font-size: ($default-font - 1);
                 line-height: 24px;
                 text-align: center;
-                color: $gray-2-color;
+                color: var(--gray-2-color);
                 text-decoration: none;
                 text-transform: lowercase;
 
@@ -56,12 +56,12 @@
 
             .mat-tab-label-active {
                 opacity: 1;
-                color: $gray-1-color !important;
+                color: var(--gray-1-color) !important;
             }
 
             .mat-ink-bar {
                 width: 85px !important;
-                background-color: $gray-1-color;
+                background-color: var(--gray-1-color);
             }
         }
     }

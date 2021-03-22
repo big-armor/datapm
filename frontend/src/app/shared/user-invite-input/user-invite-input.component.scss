@@ -20,12 +20,12 @@
             font-family: Roboto, Helvetica Neue, sans-serif;
             letter-spacing: 0.5px;
             font-weight: 300;
-            color: $gray-4-color;
+            color: var(--gray-4-color);
         }
     }
 
     ::ng-deep .mat-form-field-flex {
-        background-color: $gray-7-color;
+        background-color: var(--custom-white-color);
         border-radius: 6px;
     }
 
@@ -50,7 +50,7 @@
     }
 
     ::ng-deep .mat-chip-remove {
-        color: $gray-1-color;
+        color: var(--gray-1-color);
         margin-left: 2px;
     }
 

@@ -8,16 +8,17 @@
 
     .main-menu-title {
         a {
-            font-family: $family-roboto-mono;
+            font-family: $family-roboto;
             font-style: $style-normal;
             font-weight: $weight-300;
             font-size: $default-font;
+            letter-spacing: 0.6px;
             margin-left: 8px;
             margin-right: 15px;
             line-height: 14px;
             text-align: center;
             cursor: pointer;
-            color: $gray-3-color;
+            color: var(--gray-3-color);
         }
     }
 

@@ -9,7 +9,7 @@ $white-1-color: #ffffffb3;
 $white-1-color-dark: #fff;
 
 $custom-white-color: #fff;
-$custom-white-color-dark: #363638e8;
+$custom-white-color-dark: #303033;
 
 $black-1-color: rgba($black-color, 0.08);
 $black-1-color-dark: rgba($black-color, 0.08);
@@ -29,7 +29,7 @@ $gray-4-color: #bdbdbd;
 $gray-4-color-dark: #bdbdbd;
 
 $gray-5-color: #e0e0e0;
-$gray-5-color-dark: #5f6368;
+$gray-5-color-dark: #5e5e60;
 
 $gray-6-color: #f2f2f2;
 $gray-6-color-dark: #f2f2f2;
@@ -44,7 +44,7 @@ $gray-9-color: #ddd;
 $gray-9-color-dark: #5f6368;
 
 $gray-10-color: #eee;
-$gray-10-color-dark: #363638e8;
+$gray-10-color-dark: #303033;
 
 $gray-11-color: #f3f3f3;
 $gray-11-color-dark: #202124;
@@ -94,7 +94,7 @@ $danger-lighter-color: #fe0000;
 $danger-lighter-color-dark: #fe0000;
 
 $custom-info-color: #017fb9;
-$custom-info-color-dark: #363638e8;
+$custom-info-color-dark: #303033;
 
 $custom-info-hover-color: rgba($custom-info-color, 0.75);
 $custom-info-hover-color-dark: rgba($custom-info-color-dark, 0.75);
@@ -142,7 +142,10 @@ $tranparent-border: transparent;
 $tranparent-border-dark: #5f6368;
 
 $custom-th-color: #e0e0e0;
-$custom-th-color-dark: #202125;
+$custom-th-color-dark: #19191c;
+
+$custom-table-color: #ededed;
+$custom-table-color-dark: #19191c;
 
 $colors: (
     --black-color: (
@@ -316,5 +319,9 @@ $colors: (
     --custom-th-color: (
         $custom-th-color,
         $custom-th-color-dark
+    ),
+    --custom-table-color: (
+        $custom-table-color,
+        $custom-table-color-dark
     )
 );
