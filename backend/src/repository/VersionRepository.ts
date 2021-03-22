@@ -12,6 +12,26 @@ export class VersionRepository {
     readonly packageFileStorageService = PackageFileStorageService.INSTANCE;
     constructor(private manager: EntityManager) {}
 
+    public async findVersion(
+        packageId: number,
+        majorVersion: number,
+        minorVersion: number,
+        patchVersion: number
+    ): Promise<VersionEntity | undefined> {
+        return this.manager
+            .getRepository(VersionEntity)
+            .createQueryBuilder()
+            .where('"VersionEntity"."package_id" = :packageId')
+            .andWhere('"VersionEntity"."majorVersion" = :majorVersion')
+            .andWhere('"VersionEntity"."minorVersion" = :minorVersion')
+            .andWhere('"VersionEntity"."patchVersion" = :patchVersion')
+            .setParameter("packageId", packageId)
+            .setParameter("majorVersion", majorVersion)
+            .setParameter("minorVersion", minorVersion)
+            .setParameter("patchVersion", patchVersion)
+            .getOne();
+    }
+
     async save(userId: number, identifier: PackageIdentifierInput, value: CreateVersionInput) {
         const fileStorageService: FileStorageService = FileStorageService.INSTANCE;
 

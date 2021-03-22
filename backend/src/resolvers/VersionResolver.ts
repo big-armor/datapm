@@ -112,6 +112,8 @@ export const createVersion = async (
 
             const diff = comparePackages(packageFile, newPackageFile);
 
+            // TODO: ERMAL - SAVE DIFFS HERE
+
             const compatibility = diffCompatibility(diff);
 
             const minNextVersion = nextVersion(latestVersionSemVer, compatibility);

@@ -1,6 +1,12 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, ViewChild } from "@angular/core";
 import { MatPaginator } from "@angular/material/paginator";
-import { AdminSetUserStatusGQL, AdminDeleteUserGQL, AdminSearchUsersGQL, User } from "../../../../generated/graphql";
+import {
+    AdminSetUserStatusGQL,
+    AdminDeleteUserGQL,
+    AdminSearchUsersGQL,
+    User,
+    PackageVersionsDiffGQL
+} from "../../../../generated/graphql";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import Timeout = NodeJS.Timeout;
@@ -44,6 +50,7 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
         private searchUsersGQL: AdminSearchUsersGQL,
         private changeUserStatusGQL: AdminSetUserStatusGQL,
         private deleteUserGQL: AdminDeleteUserGQL,
+        private packageVersionsDiffGql: PackageVersionsDiffGQL,
         private changeDetectorRef: ChangeDetectorRef,
         private confirmationDialogService: ConfirmationDialogService
     ) {}
@@ -73,23 +80,43 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
     }
 
     public openDeleteUserConfirmationDialog(user: User): void {
-        const dialogContent = `<p class="mb-1">Are you sure you want to delete user ${user.username}</p>
-      <p class="mb-0">This will completely delete this user's data and it will be lost forever.</p>`;
-        const dialogConfig = {
-            data: {
-                title: "Confirm user deletion",
-                content: dialogContent,
-                showConfirmationInputField: true,
-                confirmationInputFieldRequiredValue: user.username
-            },
-            size: DialogSize.MEDIUM
-        };
-        this.confirmationDialogService.openFancyConfirmationDialog(dialogConfig).subscribe((confirmation) => {
-            if (confirmation) {
-                const usernameOrEmailAddress = user.emailAddress ? user.emailAddress : user.username;
-                this.deleteUserGQL.mutate({ usernameOrEmailAddress }).subscribe(() => this.loadSearchedUsers());
-            }
-        });
+        this.packageVersionsDiffGql
+            .fetch({
+                newVersion: {
+                    catalogSlug: "ermali",
+                    packageSlug: "addresses",
+                    versionMajor: 2,
+                    versionMinor: 0,
+                    versionPatch: 0
+                },
+                oldVersion: {
+                    catalogSlug: "ermali",
+                    packageSlug: "addresses",
+                    versionMajor: 1,
+                    versionMinor: 0,
+                    versionPatch: 0
+                }
+            })
+            .subscribe((r) => {
+                console.log("r", r);
+            });
+        //     const dialogContent = `<p class="mb-1">Are you sure you want to delete user ${user.username}</p>
+        //   <p class="mb-0">This will completely delete this user's data and it will be lost forever.</p>`;
+        //     const dialogConfig = {
+        //         data: {
+        //             title: "Confirm user deletion",
+        //             content: dialogContent,
+        //             showConfirmationInputField: true,
+        //             confirmationInputFieldRequiredValue: user.username
+        //         },
+        //         size: DialogSize.MEDIUM
+        //     };
+        //     this.confirmationDialogService.openFancyConfirmationDialog(dialogConfig).subscribe((confirmation) => {
+        //         if (confirmation) {
+        //             const usernameOrEmailAddress = user.emailAddress ? user.emailAddress : user.username;
+        //             this.deleteUserGQL.mutate({ usernameOrEmailAddress }).subscribe(() => this.loadSearchedUsers());
+        //         }
+        //     });
     }
 
     public openUserStatusChangeConfirmationDialog(user: User): void {
