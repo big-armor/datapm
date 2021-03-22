@@ -16,6 +16,6 @@ query Me {
         emailAddressIsPublic
         websiteIsPublic
         isAdmin
-        uiDarkModeEnabled
+        # uiDarkModeEnabled
     }
 }
