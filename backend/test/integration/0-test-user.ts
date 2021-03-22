@@ -668,76 +668,76 @@ describe("User Tests", async () => {
         expect(userA.user.emailAddress).equal(null);
     });
 
-    it("User A dark mode default value is false", async function () {
-        let response = await userAClient.query({
-            query: MeDocument
-        });
+    // it("User A dark mode default value is false", async function () {
+    //     let response = await userAClient.query({
+    //         query: MeDocument
+    //     });
 
-        let userA = response.data;
-        expect(userA.me.uiDarkModeEnabled).to.equal(false);
-    });
+    //     let userA = response.data;
+    //     expect(userA.me.uiDarkModeEnabled).to.equal(false);
+    // });
 
-    it("Set User A toggles dark mode on", async function () {
-        let response = await userAClient.mutate({
-            mutation: UpdateMeDocument,
-            variables: {
-                value: {
-                    uiDarkModeEnabled: true
-                }
-            }
-        });
+    // it("Set User A toggles dark mode on", async function () {
+    //     let response = await userAClient.mutate({
+    //         mutation: UpdateMeDocument,
+    //         variables: {
+    //             value: {
+    //                 uiDarkModeEnabled: true
+    //             }
+    //         }
+    //     });
 
-        expect(response.data!.updateMe.uiDarkModeEnabled).to.equal(true);
-    });
+    //     expect(response.data!.updateMe.uiDarkModeEnabled).to.equal(true);
+    // });
 
-    it("User A fetches dark mode toggle value", async function () {
-        let response = await userAClient.query({
-            query: MeDocument
-        });
+    // it("User A fetches dark mode toggle value", async function () {
+    //     let response = await userAClient.query({
+    //         query: MeDocument
+    //     });
 
-        let userA = response.data;
-        expect(userA.me.uiDarkModeEnabled).to.equal(true);
-    });
+    //     let userA = response.data;
+    //     expect(userA.me.uiDarkModeEnabled).to.equal(true);
+    // });
 
-    it("Set User A toggles dark mode off", async function () {
-        let response = await userAClient.mutate({
-            mutation: UpdateMeDocument,
-            variables: {
-                value: {
-                    uiDarkModeEnabled: false
-                }
-            }
-        });
+    // it("Set User A toggles dark mode off", async function () {
+    //     let response = await userAClient.mutate({
+    //         mutation: UpdateMeDocument,
+    //         variables: {
+    //             value: {
+    //                 uiDarkModeEnabled: false
+    //             }
+    //         }
+    //     });
 
-        expect(response.data!.updateMe.uiDarkModeEnabled).to.equal(false);
-    });
+    //     expect(response.data!.updateMe.uiDarkModeEnabled).to.equal(false);
+    // });
 
-    it("User A fetches dark mode toggle", async function () {
-        let response = await userAClient.query({
-            query: MeDocument
-        });
+    // it("User A fetches dark mode toggle", async function () {
+    //     let response = await userAClient.query({
+    //         query: MeDocument
+    //     });
 
-        let userA = response.data;
-        expect(userA.me.uiDarkModeEnabled).to.equal(false);
-    });
+    //     let userA = response.data;
+    //     expect(userA.me.uiDarkModeEnabled).to.equal(false);
+    // });
 
-    it("New user registered with dark mode on", async function () {
-        const darkModeUserClient = await createUser(
-            "DarkModeUser",
-            "DarkModeUser",
-            "DarkModeUser",
-            "DarkModeUser@test.datapm.io",
-            "passwordA!",
-            true
-        );
+    // it("New user registered with dark mode on", async function () {
+    //     const darkModeUserClient = await createUser(
+    //         "DarkModeUser",
+    //         "DarkModeUser",
+    //         "DarkModeUser",
+    //         "DarkModeUser@test.datapm.io",
+    //         "passwordA!",
+    //         true
+    //     );
 
-        let response = await darkModeUserClient.query({
-            query: MeDocument
-        });
+    //     let response = await darkModeUserClient.query({
+    //         query: MeDocument
+    //     });
 
-        let darkModeUser = response.data;
-        expect(darkModeUser.me.uiDarkModeEnabled).to.equal(true);
-    });
+    //     let darkModeUser = response.data;
+    //     expect(darkModeUser.me.uiDarkModeEnabled).to.equal(true);
+    // });
 
     // TODO test login
     // TODO delete user and test

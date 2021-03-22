@@ -22,7 +22,7 @@ type User {
     websiteIsPublic: Boolean
     isAdmin: Boolean
     status: UserStatus
-    uiDarkModeEnabled: Boolean
+    # uiDarkModeEnabled: Boolean
 }
 
 """

@@ -27,7 +27,7 @@ export class UiStyleToggleService {
         this.authenticationService.currentUser.subscribe((user) => {
             if (user) {
                 this.user = user;
-                this.darkThemeSelected = user.uiDarkModeEnabled;
+                // this.darkThemeSelected = user.uiDarkModeEnabled;
                 this.setThemeOnStart();
                 this.storeThemeInLocalStorage();
             }
@@ -90,17 +90,17 @@ export class UiStyleToggleService {
             return;
         }
 
-        this.updateMeGQL
-            .mutate({
-                value: {
-                    uiDarkModeEnabled: this.darkThemeSelected
-                }
-            })
-            .subscribe((response) => {
-                const updatedUser = response.data.updateMe;
-                if (!response.errors && updatedUser) {
-                    this.authenticationService.currentUser.next(updatedUser);
-                }
-            });
+        // this.updateMeGQL
+        //     .mutate({
+        //         value: {
+        //             uiDarkModeEnabled: this.darkThemeSelected
+        //         }
+        //     })
+        //     .subscribe((response) => {
+        //         const updatedUser = response.data.updateMe;
+        //         if (!response.errors && updatedUser) {
+        //             this.authenticationService.currentUser.next(updatedUser);
+        //         }
+        //     });
     }
 }

@@ -383,7 +383,7 @@ export class UserRepository extends Repository<UserEntity> {
                 user.createdAt = now;
                 user.updatedAt = now;
 
-                user.uiDarkModeEnabled = value.uiDarkModeEnabled || false;
+                // user.uiDarkModeEnabled = value.uiDarkModeEnabled || false;
 
                 user.status = UserStatus.ACTIVE;
 
@@ -589,9 +589,9 @@ export class UserRepository extends Repository<UserEntity> {
                 dbUser.description = value.description;
             }
 
-            if (value.uiDarkModeEnabled != null) {
-                dbUser.uiDarkModeEnabled = value.uiDarkModeEnabled;
-            }
+            // if (value.uiDarkModeEnabled != null) {
+            //     dbUser.uiDarkModeEnabled = value.uiDarkModeEnabled;
+            // }
 
             dbUser.updatedAt = new Date();
             await transaction.save(dbUser);
