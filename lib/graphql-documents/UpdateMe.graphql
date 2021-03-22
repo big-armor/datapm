@@ -15,6 +15,6 @@ mutation UpdateMe($value: UpdateUserInput!) {
         gitHubHandleIsPublic
         emailAddressIsPublic
         websiteIsPublic
-        uiDarkModeEnabled
+        # uiDarkModeEnabled
     }
 }
