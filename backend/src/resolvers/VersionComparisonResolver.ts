@@ -28,13 +28,10 @@ export const packageVersionsDiff = async (
 
     const versions = getVersionsInRightOrder(newVersion, oldVersion);
     if (!versions) {
-        console.log("same ver");
         return { newVersion, oldVersion, differences: [] };
     }
 
     const { actualNewVersion, actualOldVersion } = versions;
-
-    console.log("versions", versions);
 
     const packageIdentifier = {
         catalogSlug: actualNewVersion.catalogSlug,
