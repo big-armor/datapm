@@ -12,8 +12,8 @@ export class VersionDifferenceEntity {
     @Column({ name: "version_comparison_id" })
     public versionComparisonId: number;
 
-    @Column({ name: "difference_type" })
-    public differenceType: DifferenceType;
+    @Column({ name: "type" })
+    public type: string;
 
     @Column()
     public pointer: string;

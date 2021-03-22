@@ -1,0 +1,28 @@
+<h1>Comparing versions</h1>
+
+<h3>New version</h3>
+<mat-select (selectionChange)="compareVersions()" [(value)]="newVersion">
+    <mat-option *ngFor="let version of versions" [value]="version.identifier">
+        {{ version.identifier | version }}
+    </mat-option>
+</mat-select>
+
+<h3>Old version</h3>
+<mat-select (selectionChange)="compareVersions()" [(value)]="oldVersion">
+    <mat-option *ngFor="let version of versions" [value]="version.identifier">
+        {{ version.identifier | version }}
+    </mat-option>
+</mat-select>
+
+<h3>Differences</h3>
+
+<div *ngIf="!loading; else loadingTemplate">
+    <div *ngIf="differences.length; else noDifferencesTemplate">
+        <p *ngFor="let difference of differences">{{ difference.pointer }} - {{ difference.type }}</p>
+    </div>
+</div>
+
+<button (click)="close()">Close</button>
+
+<ng-template #loadingTemplate>Loading...</ng-template>
+<ng-template #noDifferencesTemplate>No differences found.</ng-template>

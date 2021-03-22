@@ -4,7 +4,7 @@
             <tr>
                 <td class="package-light-gray">package version history</td>
             </tr>
-            <tr *ngFor="let version of versions">
+            <tr *ngFor="let version of versions" (click)="openVersionComparisonModal(version.identifier)">
                 <td class="package-dark-gray">{{ version.identifier | version }}</td>
                 <td class="package-dark-gray">{{ version.createdAt | timeAgo }}</td>
             </tr>

@@ -11,7 +11,7 @@ export class VersionDifferenceRepository extends Repository<VersionDifferenceEnt
         const entities = differences.map((difference) => {
             const entity = new VersionDifferenceEntity();
             entity.versionComparisonId = comparisonId;
-            entity.differenceType = difference.type;
+            entity.type = difference.type;
             entity.pointer = difference.pointer;
             return entity;
         });

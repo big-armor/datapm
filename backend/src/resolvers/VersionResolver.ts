@@ -36,6 +36,7 @@ import { catalogEntityToGraphQL } from "./CatalogResolver";
 import { StorageErrors } from "../storage/files/file-storage-service";
 import { hasPackagePermissions } from "./UserPackagePermissionResolver";
 import { packageEntityToGraphqlObject } from "./PackageResolver";
+import { createVersionComparison } from "./VersionComparisonResolver";
 
 export const versionEntityToGraphqlObject = async (
     context: EntityManager | Connection,
@@ -95,6 +96,8 @@ export const createVersion = async (
 
         let changeType = ActivityLogChangeType.VERSION_FIRST_VERSION;
 
+        let diff;
+
         if (latestVersion != null) {
             let packageFile;
             try {
@@ -110,9 +113,7 @@ export const createVersion = async (
 
             const latestVersionSemVer = new SemVer(packageFile!.version);
 
-            const diff = comparePackages(packageFile, newPackageFile);
-
-            // TODO: ERMAL - SAVE DIFFS HERE
+            diff = comparePackages(packageFile, newPackageFile);
 
             const compatibility = diffCompatibility(diff);
 
@@ -159,6 +160,10 @@ export const createVersion = async (
         const savedVersion = await transaction
             .getCustomRepository(VersionRepository)
             .save(context.me.id, identifier, value);
+
+        if (latestVersion && diff) {
+            await createVersionComparison(latestVersion.id, savedVersion.id, diff, context);
+        }
 
         const versionIdentifier = {
             ...identifier,

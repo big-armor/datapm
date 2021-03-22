@@ -43,6 +43,7 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
 import { PackageIssuesDetailComponent } from "./components/package-issues/package-issues-detail/package-issues-detail.component";
 import { MatMenuModule } from "@angular/material/menu";
 import { CreatePackageIssueComponent } from "./components/package-issues/create-package-issue/create-package-issue.component";
+import { VersionComparisonModalComponent } from "./components/package-version/version-comparison-modal/version-comparison-modal.component";
 
 @NgModule({
     declarations: [
@@ -64,7 +65,8 @@ import { CreatePackageIssueComponent } from "./components/package-issues/create-
         ClientWizardComponent,
         PackageIssuesComponent,
         PackageIssuesDetailComponent,
-        CreatePackageIssueComponent
+        CreatePackageIssueComponent,
+        VersionComparisonModalComponent
     ],
     imports: [
         CommonModule,
