@@ -1,14 +1,54 @@
 import { comparePackages, Difference } from "datapm-lib";
 import { SemVer } from "semver";
 import { Context } from "../context";
+import { PackageEntity } from "../entity/PackageEntity";
 import { VersionDifferenceEntity } from "../entity/VersionDifferenceEntity";
 import { VersionEntity } from "../entity/VersionEntity";
-import { PackageDifferenceType, VersionIdentifierInput } from "../generated/graphql";
+import { PackageDifferenceType, PackageIdentifierInput, VersionIdentifierInput } from "../generated/graphql";
 import { PackageRepository } from "../repository/PackageRepository";
 import { VersionComparisonRepository } from "../repository/VersionComparisonRepository";
 import { VersionDifferenceRepository } from "../repository/VersionDifferenceRepository";
 import { VersionRepository } from "../repository/VersionRepository";
 import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
+
+export const packageVersionsDiffs = async (
+    _0: any,
+    {
+        packageIdentifier,
+        offset,
+        limit
+    }: {
+        packageIdentifier: PackageIdentifierInput;
+        offset: number;
+        limit: number;
+    },
+    context: Context,
+    info: any
+) => {
+    const packageEntity = await context.connection
+        .getCustomRepository(PackageRepository)
+        .findOrFail({ identifier: packageIdentifier });
+    const versions = await context.connection
+        .getCustomRepository(VersionRepository)
+        .findVersionsWithLimitAndOffset(packageEntity.id, offset, limit);
+
+    const comparingPairs: { newVersionEntity: VersionEntity; oldVersionEntity: VersionEntity }[] = [];
+    for (let i = 0; i < versions.length; i++) {
+        if (i === versions.length - 1) {
+            break;
+        }
+
+        comparingPairs.push({ newVersionEntity: versions[i], oldVersionEntity: versions[i + 1] });
+    }
+
+    return comparingPairs.map(({ newVersionEntity, oldVersionEntity }) =>
+        packageVersionsDiffFromVersionEntities(
+            _0,
+            { packageIdentifier, packageEntity, newVersionEntity, oldVersionEntity },
+            context
+        )
+    );
+};
 
 export const packageVersionsDiff = async (
     _0: any,
@@ -59,6 +99,28 @@ export const packageVersionsDiff = async (
         throw new Error("INVALID_VERSIONS_TO_COMPARE");
     }
 
+    return packageVersionsDiffFromVersionEntities(
+        _0,
+        { packageIdentifier, packageEntity, newVersionEntity, oldVersionEntity },
+        context
+    );
+};
+
+export const packageVersionsDiffFromVersionEntities = async (
+    _0: any,
+    {
+        packageIdentifier,
+        packageEntity,
+        newVersionEntity,
+        oldVersionEntity
+    }: {
+        packageIdentifier: PackageIdentifierInput;
+        packageEntity: PackageEntity;
+        newVersionEntity: VersionEntity;
+        oldVersionEntity: VersionEntity;
+    },
+    context: Context
+) => {
     const comparisonRepository = context.connection.getCustomRepository(VersionComparisonRepository);
     const relations = ["newVersion", "oldVersion", "differences"];
     const comparisonEntity = await comparisonRepository.getComparisonByVersionIds(
@@ -142,11 +204,15 @@ export async function createVersionComparison(
         const comparisonRepository = transaction.getCustomRepository(VersionComparisonRepository);
         const comparisonEntity = await comparisonRepository.createNewComparison(newVersionId, oldVersionId);
 
-        const differencesRepository = transaction.getCustomRepository(VersionDifferenceRepository);
-        const differencesEntities = await differencesRepository.batchCreateNewDifferences(
-            comparisonEntity.id,
-            differences
-        );
+        let differencesEntities: VersionDifferenceEntity[] = [];
+
+        if (differences.length) {
+            const differencesRepository = transaction.getCustomRepository(VersionDifferenceRepository);
+            differencesEntities = await differencesRepository.batchCreateNewDifferences(
+                comparisonEntity.id,
+                differences
+            );
+        }
 
         return { comparisonEntity, differencesEntities };
     });

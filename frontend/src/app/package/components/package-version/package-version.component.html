@@ -3,11 +3,22 @@
         <tbody>
             <tr>
                 <td class="package-light-gray">package version history</td>
+                <td class="package-light-gray" *ngIf="versions.length > 1">
+                    <a href="javascript::void(0)" (click)="openVersionComparisonModal()">compare custom versions</a>
+                </td>
             </tr>
-            <tr *ngFor="let version of versions" (click)="openVersionComparisonModal(version.identifier)">
-                <td class="package-dark-gray">{{ version.identifier | version }}</td>
-                <td class="package-dark-gray">{{ version.createdAt | timeAgo }}</td>
-            </tr>
+
+            <ng-container *ngFor="let version of versions">
+                <tr>
+                    <td class="package-dark-gray">{{ version.identifier | version }}</td>
+                    <td class="package-dark-gray">{{ version.createdAt | timeAgo }}</td>
+                </tr>
+                <tr>
+                    <ul>
+                        <li *ngFor="let change of version.changes">{{ change.changeLabel }}</li>
+                    </ul>
+                </tr>
+            </ng-container>
         </tbody>
     </table>
 </div>

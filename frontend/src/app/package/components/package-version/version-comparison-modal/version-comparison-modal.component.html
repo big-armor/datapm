@@ -14,15 +14,15 @@
     </mat-option>
 </mat-select>
 
-<h3>Differences</h3>
+<h3 class="mt-3">Differences</h3>
 
-<div *ngIf="!loading; else loadingTemplate">
-    <div *ngIf="differences.length; else noDifferencesTemplate">
-        <p *ngFor="let difference of differences">{{ difference.pointer }} - {{ difference.type }}</p>
-    </div>
+<div class="mt-3" *ngIf="!loading; else loadingTemplate">
+    <ul *ngIf="differences.length; else noDifferencesTemplate">
+        <li *ngFor="let difference of differences">{{ difference.pointer }} - {{ difference.type }}</li>
+    </ul>
 </div>
 
-<button (click)="close()">Close</button>
+<button type="submit" class="app-outlined-button" (click)="close()">Close</button>
 
 <ng-template #loadingTemplate>Loading...</ng-template>
 <ng-template #noDifferencesTemplate>No differences found.</ng-template>

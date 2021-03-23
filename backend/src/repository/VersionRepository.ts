@@ -125,6 +125,30 @@ export class VersionRepository {
         return versions;
     }
 
+    async findVersionsWithLimitAndOffset(
+        packageId: number,
+        offset: number,
+        limit: number,
+        relations?: string[]
+    ): Promise<VersionEntity[]> {
+        const ALIAS = "versionsByPackageId";
+        const versions = await this.manager
+            .getRepository(VersionEntity)
+            .createQueryBuilder(ALIAS)
+            .where({ packageId })
+            .addRelations(ALIAS, relations)
+            .offset(offset)
+            .limit(limit)
+            .orderBy({
+                "versionsByPackageId.majorVersion": "DESC",
+                "versionsByPackageId.minorVersion": "DESC",
+                "versionsByPackageId.patchVersion": "DESC"
+            })
+            .getMany();
+
+        return versions;
+    }
+
     async deleteVersions(versions: VersionEntity[]): Promise<void> {
         if (versions.length == 0) return;
 

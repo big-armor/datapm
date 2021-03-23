@@ -837,6 +837,15 @@ type Query {
     ): PackageDifferences!
 
     """
+    Package versions diffs
+    """
+    packageVersionsDiffs(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        offset: Int!
+        limit: Int!
+    ): [PackageDifferences!]
+
+    """
     Get package issue
     """
     packageIssue(
