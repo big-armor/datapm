@@ -73,13 +73,23 @@ export class CatalogRepository extends Repository<CatalogEntity> {
     }
 
     async findCatalogBySlug({ slug, relations = [] }: { slug: string; relations?: string[] }) {
-        return this.manager.getRepository(CatalogEntity).findOne({ where: { slug: slug }, relations: relations });
+        return await this.manager
+            .getRepository(CatalogEntity)
+            .createQueryBuilder("catalog")
+            .where(`LOWER(slug) = :catalogSlug`)
+            .setParameter("catalogSlug", slug.toLowerCase())
+            .addRelations("catalog", relations)
+            .getOne();
     }
 
     async findCatalogBySlugOrFail(slug: string, relations?: string[]): Promise<CatalogEntity> {
         const catalog = await this.manager
             .getRepository(CatalogEntity)
-            .findOne({ where: { slug: slug }, relations: relations });
+            .createQueryBuilder("catalog")
+            .where(`LOWER(slug) = :catalogSlug`)
+            .setParameter("catalogSlug", slug.toLowerCase())
+            .addRelations("catalog", relations)
+            .getOne();
 
         if (catalog == null) {
             throw new Error(`CATALOG_NOT_FOUND ${slug}`);
