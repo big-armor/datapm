@@ -12,6 +12,10 @@
             height: 14px;
             width: 14px;
             margin: 6px 10px 0px 0px;
+
+            .mat-checkbox-frame {
+                border-color: var(--gray-3-color);
+            }
         }
     }
 

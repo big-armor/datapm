@@ -3,27 +3,28 @@
 
 #verifyEmail {
     .dialog-title {
-        font-family: $family-roboto-mono;
+        font-family: $family-roboto;
         font-style: $style-normal;
         font-weight: $weight-400;
         font-size: ($title-font + 2);
         line-height: 55px;
         text-align: center;
-        margin: 10px 0 30px;
-        color: $gray-1-color;
+        margin: 10px 0 10px;
+        color: var(--gray-1-color);
+        letter-spacing: 0.6px;
         text-shadow: var(--text-shadow);
     }
 
     .dialog-subtitle {
-        font-family: $family-roboto-mono;
+        font-family: $family-roboto;
         font-style: $style-normal;
         font-weight: $weight-300;
         font-size: ($text-font - 1);
         line-height: 18px;
         padding-left: 10px;
         padding-bottom: 5px;
-        letter-spacing: -0.28px;
-        color: $gray-3-color;
+        letter-spacing: 0.6px;
+        color: var(--gray-3-color);
         text-align: center;
     }
 

@@ -39,7 +39,7 @@
             <div *ngIf="currentTab === 0">
                 <div class="mt-4" *ngIf="collection.packages?.length > 0">
                     <p class="package-dark-gray ml-3">The following packages are included in this collection.</p>
-                    <div class="mt-2 mb-4">
+                    <div class="mt-2 mb-4 pl-3">
                         <button class="app-outlined-button" (click)="addPackage()" *ngIf="canEdit">Add Package</button>
                     </div>
                 </div>

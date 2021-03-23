@@ -3,7 +3,7 @@
 
 #deleteUser {
     .white-border {
-        background: $white-color;
+        background: var(--custom-white-color);
         padding: 15px 10px;
         margin-bottom: 10px;
 

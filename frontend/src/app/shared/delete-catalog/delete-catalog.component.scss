@@ -5,16 +5,11 @@
     width: 500px;
     position: relative;
 
-    p {
-        font-size: $text-font;
-        margin-bottom: 0px;
-        color: $gray-1-color;
-    }
-
     .oneline-input {
         ::ng-deep input.mat-input-element {
             width: unset;
             border: none;
+            color: var(--gray-1-color);
             border-bottom: 2px solid var(--danger-color);
             background: transparent;
             outline: transparent solid 1px;

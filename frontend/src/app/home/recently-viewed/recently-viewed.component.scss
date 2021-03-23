@@ -1,27 +1,2 @@
 @import "../../../styles/variables";
 @import "../../../styles/colors";
-
-.h1-title {
-    font-family: $family-roboto-mono;
-    font-style: $style-normal;
-    font-weight: $weight-300;
-    font-size: $title-font;
-    line-height: 26px;
-    letter-spacing: -0.28px;
-    color: $gray-3-color;
-}
-
-.not-found {
-    margin: 0 auto;
-    text-align: center;
-    padding-top: 25px;
-    font-family: $family-roboto-mono;
-
-    p {
-        font-style: $style-normal;
-        font-weight: $weight-400;
-        font-size: ($title-font - 2);
-        line-height: 28px;
-        text-align: left;
-    }
-}

@@ -14,6 +14,10 @@ body {
 
 a {
     color: var(--info-color);
+
+    &:hover {
+        color: var(--info-hover-color);
+    }
 }
 
 body {
@@ -29,12 +33,19 @@ body {
     }
 }
 
+.alert-warn,
+.alert-error {
+    font-size: $small-font;
+    letter-spacing: 0.4px;
+    color: var(--danger-color) !important;
+}
+
 .cursor-pointer {
     cursor: pointer;
 }
 
 .mat-spinner circle {
-    stroke: $gray-3-color !important;
+    stroke: var(--gray-3-color) !important;
 }
 
 .loading-spinner {
@@ -152,29 +163,6 @@ table.gray-table {
 .notification-success {
     background-color: $success-color;
     color: $white-color;
-}
-
-.submit-btn {
-    background-color: inherit;
-    transition: background-color ease 0.5s;
-
-    &:hover {
-        background-color: $gray-6-color;
-        transition: background-color ease 0.5s;
-    }
-
-    &:focus {
-        background-color: $gray-5-color;
-    }
-
-    .disabled {
-        background-color: var(--gray-5-color);
-        pointer-events: none;
-        opacity: 0.6;
-        .btn-text {
-            color: var(--gray-3-color);
-        }
-    }
 }
 
 .text-overflow-elipses {
@@ -301,7 +289,7 @@ mat-select {
     font-family: $family-roboto;
     font-style: $style-normal;
     font-weight: $weight-400;
-    font-size: $default-font;
+    font-size: $text-font;
     align-items: center;
     text-align: center;
     padding: 8px 15px;
@@ -384,7 +372,7 @@ mat-select {
     }
 
     .delete-txt {
-        color: $danger-dark-color;
+        color: var(--danger-darker-color);
     }
 }
 
@@ -511,26 +499,26 @@ div {
 
         .dialog-close {
             padding: 4px 8px;
-            font-family: $family-roboto-mono;
+            font-family: $family-roboto;
             font-style: $style-normal;
             font-weight: $weight-300;
             font-size: $text-font;
             text-align: center;
             line-height: 18px;
-            letter-spacing: -0.28px;
+            letter-spacing: 0.4px;
             color: var(--gray-3-color);
             outline: transparent solid 0px;
         }
     }
 
     .dialog-title {
-        font-family: $family-roboto-mono;
+        font-family: $family-roboto;
         font-style: $style-normal;
         font-weight: $weight-400;
         font-size: $dialog-font;
-        line-height: 55px;
+        line-height: 46px;
         text-align: center;
-        margin: 20px 0 10px;
+        margin: 20px 0 20px;
         color: var(--gray-1-color);
         text-shadow: var(--text-shadow);
     }
@@ -580,7 +568,7 @@ textarea.flat-input,
 }
 
 button.save-btn {
-    color: $gray-3-color;
+    color: var(--gray-3-color);
     position: relative;
     top: 4px;
     text-align: center;
@@ -666,7 +654,7 @@ button:disabled {
     border-bottom: 1px solid var(--custom-gray-9-color);
 
     p {
-        color: var(--gray-2-color);
+        color: var(--gray-1-color);
         margin-bottom: 5px !important;
     }
 }
@@ -729,7 +717,7 @@ button:disabled {
     app-input {
         display: block;
         min-width: 348px;
-        margin-top: 20px;
+        margin-top: 12px;
     }
 }
 

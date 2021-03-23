@@ -87,11 +87,14 @@ $warning-color-dark: #efd54b;
 $danger-color: #e23326;
 $danger-color-dark: #b51307;
 
-$danger-dark-color: #dc3545;
-$danger-dark-color-dark: #dc3545;
+$danger-darker-color: #dc3545;
+$danger-darker-color-dark: #dc3545;
 
 $danger-lighter-color: #fe0000;
 $danger-lighter-color-dark: #fe0000;
+
+$info-hover-color: rgba($info-color, 0.85);
+$info-hover-color-dark: rgba($info-color-dark, 0.85);
 
 $custom-info-color: #017fb9;
 $custom-info-color-dark: #303033;
@@ -252,13 +255,17 @@ $colors: (
         $warning-color,
         $warning-color-dark
     ),
-    --danger-dark-color: (
-        $danger-dark-color,
-        $danger-dark-color-dark
+    --danger-darker-color: (
+        $danger-darker-color,
+        $danger-darker-color-dark
     ),
     --danger-lighter-color: (
         $danger-lighter-color,
         $danger-lighter-color-dark
+    ),
+    --info-hover-color: (
+        $info-hover-color,
+        $info-hover-color-dark
     ),
     --custom-info-color: (
         $custom-info-color,

@@ -46,10 +46,6 @@
     ::ng-deep .mat-spinner circle {
         stroke: $white-color !important;
     }
-
-    .mat-spinner {
-        stroke: $gray-3-color;
-    }
 }
 
 @media (max-width: 576px) {

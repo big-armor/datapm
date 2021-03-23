@@ -3,11 +3,11 @@
 
 .mat-dialog-content {
     max-width: 500px;
-    font-family: $family-roboto-mono;
+    font-family: $family-roboto;
     font-style: $style-normal;
-    font-weight: $weight-500;
+    font-weight: $weight-400;
     font-size: $text-font;
-    line-height: 26px;
-    letter-spacing: -0.28px;
-    color: $gray-1-color;
+    line-height: 18px;
+    letter-spacing: 0.4px;
+    color: var(--gray-2-color);
 }

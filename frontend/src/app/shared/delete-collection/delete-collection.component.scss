@@ -6,12 +6,6 @@
     padding: 0px;
     position: relative;
 
-    p {
-        font-size: $text-font;
-        margin-bottom: 0px;
-        color: var(--gray-1-color);
-    }
-
     .oneline-input {
         ::ng-deep input.mat-input-element {
             width: unset;
