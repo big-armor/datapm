@@ -64,8 +64,8 @@ export async function createUserDoNotVerifyEmail(
                         lastName: lastName,
                         username: username,
                         emailAddress: emailAddress,
-                        password: password
-                        // uiDarkModeEnabled: uiDarkModeEnabled
+                        password: password,
+                        uiDarkModeEnabled: uiDarkModeEnabled
                     }
                 }
             })

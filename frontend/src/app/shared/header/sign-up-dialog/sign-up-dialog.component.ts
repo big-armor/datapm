@@ -92,8 +92,8 @@ export class SignUpDialogComponent implements OnInit {
                 value: {
                     username: this.signUpForm.value.username,
                     password: this.signUpForm.value.password,
-                    emailAddress: this.signUpForm.value.emailAddress
-                    // uiDarkModeEnabled: this.darkModeEnabled
+                    emailAddress: this.signUpForm.value.emailAddress,
+                    uiDarkModeEnabled: this.darkModeEnabled
                 }
             })
             .toPromise()

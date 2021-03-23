@@ -398,22 +398,22 @@ export const resolvers: {
                 .findUserByUserName({ username: parent.username });
 
             return user.status;
+        },
+        uiDarkModeEnabled: async (parent: User, _1: any, context: Context) => {
+            if (!context.me || context.me.username != parent.username) {
+                return false;
+            }
+
+            const user = await context.connection
+                .getCustomRepository(UserRepository)
+                .findUserByUserName({ username: parent.username });
+
+            if (isRequestingUserOrAdmin(context, user.username)) {
+                return user.uiDarkModeEnabled;
+            }
+
+            return false;
         }
-        // uiDarkModeEnabled: async (parent: User, _1: any, context: Context) => {
-        //     if (!context.me || context.me.username != parent.username) {
-        //         return false;
-        //     }
-
-        //     const user = await context.connection
-        //         .getCustomRepository(UserRepository)
-        //         .findUserByUserName({ username: parent.username });
-
-        //     if (isRequestingUserOrAdmin(context, user.username)) {
-        //         return user.uiDarkModeEnabled;
-        //     }
-
-        //     return false;
-        // }
     },
     Catalog: {
         identifier: catalogIdentifier,

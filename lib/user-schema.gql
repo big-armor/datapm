@@ -22,7 +22,7 @@ type User {
     websiteIsPublic: Boolean
     isAdmin: Boolean
     status: UserStatus
-    # uiDarkModeEnabled: Boolean
+    uiDarkModeEnabled: Boolean
 }
 
 """
@@ -45,7 +45,7 @@ input CreateUserInput {
     emailAddress: String! @validEmailAddress
     username: String! @validUsername
     password: String! @validPassword
-    # uiDarkModeEnabled: Boolean
+    uiDarkModeEnabled: Boolean
 }
 
 """
@@ -75,5 +75,5 @@ input UpdateUserInput {
     twitterHandleIsPublic: Boolean
     gitHubHandleIsPublic: Boolean
     emailAddressIsPublic: Boolean
-    # uiDarkModeEnabled: Boolean
+    uiDarkModeEnabled: Boolean
 }
