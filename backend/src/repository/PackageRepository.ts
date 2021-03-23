@@ -49,7 +49,7 @@ async function findPackage(
 ): Promise<PackageEntity | null> {
     const ALIAS = "PackageEntity";
 
-    const catalog = await manager.getRepository(CatalogEntity).findOne({ where: { slug: catalogSlug } });
+    const catalog = await manager.getCustomRepository(CatalogRepository).findCatalogBySlug({ slug: catalogSlug });
 
     if (catalog == undefined) {
         throw new Error("CATALOG_NOT_FOUND");
