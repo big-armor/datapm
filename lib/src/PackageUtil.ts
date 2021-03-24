@@ -6,7 +6,8 @@ import AJV from "ajv";
 import fetch from "cross-fetch";
 import { Source, StreamSet } from "./PackageFile-v0.3.0";
 import { PackageFileV020 } from "./PackageFile-v0.2.0";
-import { deepStrictEqual } from "assert";
+
+import deepEqual from "fast-deep-equal";
 
 export type DPMRecordValue =
     | number
@@ -254,14 +255,9 @@ export function compareSource(priorSource: Source, newSource: Source, pointer = 
         } else {
             const configComparison = compareConfigObjects(priorSource.configuration, newSource.configuration);
 
-            if (!configComparison) response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
+            if (!configComparison)
+                response.push({ type: DifferenceType.CHANGE_SOURCE_CONFIGURATION, pointer: pointer });
         }
-    }
-
-    try {
-        deepStrictEqual(priorSource.configuration, newSource.configuration);
-    } catch (error) {
-        response.push({ type: DifferenceType.CHANGE_SOURCE_CONFIGURATION, pointer });
     }
 
     for (const priorStreamSet of priorSource.streamSets) {
@@ -384,23 +380,7 @@ export function compareConfigObjects(
 
     if ((priorObject == null && newObject != null) || (priorObject != null && newObject == null)) return false;
 
-    const newKeys: string[] = Object.keys(newObject as DPMConfiguration);
-
-    for (const priorKey of Object.keys(priorObject as DPMConfiguration)) {
-        if (newKeys.indexOf(priorKey) === -1) return false;
-
-        const priorValue = (priorObject as DPMConfiguration)[priorKey];
-
-        const newValue = (newObject as DPMConfiguration)[priorKey];
-
-        if (typeof priorValue !== typeof newValue) return false;
-
-        if (typeof priorValue === "object" && typeof newValue === "object") {
-            if (!compareConfigObjects(priorValue as DPMConfiguration, newValue as DPMConfiguration)) return false;
-        } else if (priorValue !== newValue) return false;
-    }
-
-    return true;
+    return deepEqual(priorObject, newObject);
 }
 
 /** Given a set of differences from a schema comparison, return the compatibility */
