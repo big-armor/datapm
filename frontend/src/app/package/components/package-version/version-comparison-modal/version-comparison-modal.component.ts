@@ -1,12 +1,7 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import {
-    PackageDifference,
-    PackageIdentifierInput,
-    PackageVersionsDiffGQL,
-    Version,
-    VersionIdentifier
-} from "src/generated/graphql";
+import { PackageIdentifierInput, PackageVersionsDiffGQL, Version, VersionIdentifier } from "src/generated/graphql";
+import { Change, getReadableChangeFromDifference } from "../version-change-label-util";
 import { VersionComparisonModel } from "./version-comparison-model";
 
 @Component({
@@ -20,7 +15,7 @@ export class VersionComparisonModalComponent implements OnInit {
     public oldVersion: VersionIdentifier;
     public versions: Version[] = [];
 
-    public differences: PackageDifference[] = [];
+    public changes: Change[] = [];
 
     public loading: boolean = false;
     public errorMessage: string;
@@ -42,7 +37,7 @@ export class VersionComparisonModalComponent implements OnInit {
 
     public compareVersions(): void {
         if (this.newVersion === this.oldVersion) {
-            this.differences = [];
+            this.changes = [];
             return;
         }
 
@@ -67,7 +62,9 @@ export class VersionComparisonModalComponent implements OnInit {
                     if (differencesResponse.errors && differencesResponse.errors.length) {
                         this.errorMessage = differencesResponse.errors[0].message;
                     } else if (differencesResponse.data) {
-                        this.differences = differencesResponse.data.packageVersionsDiff.differences;
+                        this.changes = differencesResponse.data.packageVersionsDiff.differences.map((d) =>
+                            getReadableChangeFromDifference(d)
+                        );
                     }
                     this.loading = false;
                 },

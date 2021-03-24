@@ -21,9 +21,10 @@
                     <div class="package-dark-gray mt-3 w-100">Differences</div>
 
                     <div class="mt-1" *ngIf="!loading; else loadingTemplate">
-                        <ul *ngIf="differences.length; else noDifferencesTemplate">
-                            <li *ngFor="let difference of differences">
-                                {{ difference.pointer }} - {{ difference.type }}
+                        <ul *ngIf="changes.length; else noDifferencesTemplate">
+                            <li *ngFor="let change of changes">
+                                {{ change.changeLabel }}
+                                <strong *ngIf="change.changeFieldName">"{{ change.changeFieldName }}"</strong>
                             </li>
                         </ul>
                     </div>

@@ -1,13 +1,13 @@
 <div class="pb-5" id="packageVersion">
     <div class="package-details-title">package version history</div>
-    <div class="package-light-gray mt-3" *ngIf="versions.length > 1">
+    <div class="package-light-gray mt-3" *ngIf="displayedVersions.length > 1">
         <a href="javascript::void(0)" style="font-weight: 400" (click)="openVersionComparisonModal()"
             >compare custom versions</a
         >
     </div>
     <table style="width: 100%">
         <tbody>
-            <ng-container *ngFor="let version of versions">
+            <ng-container *ngFor="let version of displayedVersions">
                 <tr>
                     <td class="package-dark-gray pt-3">
                         <strong>{{ version.identifier | version }}</strong>
@@ -19,6 +19,7 @@
                         <ul>
                             <li *ngFor="let change of version.changes" class="package-dark-gray">
                                 {{ change.changeLabel }}
+                                <span *ngIf="change.changeFieldName">"{{ change.changeFieldName }}"</span>
                             </li>
                         </ul>
                     </td>
@@ -26,4 +27,7 @@
             </ng-container>
         </tbody>
     </table>
+    <a href="javascript::void(0)" *ngIf="hasMoreDifferences" style="font-weight: 400" (click)="displayMoreDifferences()"
+        >display more</a
+    >
 </div>

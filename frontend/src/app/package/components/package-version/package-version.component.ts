@@ -4,24 +4,17 @@ import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import {
     Package,
-    PackageDifference,
     PackageDifferences,
-    PackageDifferenceType,
     PackageIdentifierInput,
     PackageVersionsDiffsGQL,
     Version,
     VersionIdentifier,
-    VersionIdentifierInput,
     VersionIdentifierValues
 } from "src/generated/graphql";
 import { PackageService, PackageResponse } from "../../services/package.service";
 import { VersionComparisonModalComponent } from "./version-comparison-modal/version-comparison-modal.component";
 import { VersionComparisonModel } from "./version-comparison-modal/version-comparison-model";
-
-interface Change {
-    changeLabel?: string;
-    changeFieldName?: string;
-}
+import { Change, getReadableChangeFromDifference } from "./version-change-label-util";
 
 interface VersionWithDifferences extends Version {
     changes?: Change[];
@@ -34,11 +27,16 @@ interface VersionWithDifferences extends Version {
 })
 export class PackageVersionComponent {
     private readonly unsubscribe$ = new Subject();
+    private readonly VERSIONS_PER_PAGE = 20;
 
     public package: Package;
-    public versions: VersionWithDifferences[] = [];
+    public displayedVersions: VersionWithDifferences[] = [];
 
-    public differencesByNewVersionIdentifier = new Map<string, PackageDifferences>();
+    private versions: VersionWithDifferences[] = [];
+    private differencesByNewVersionIdentifier = new Map<string, PackageDifferences>();
+
+    public hasMoreDifferences: boolean;
+    private loadedVersionsDifferencesCount: number = 0;
     private packageIdentifier: PackageIdentifierInput;
 
     constructor(
@@ -97,6 +95,12 @@ export class PackageVersionComponent {
         });
     }
 
+    public displayMoreDifferences(): void {
+        if (this.hasMoreDifferences) {
+            this.loadDifferences();
+        }
+    }
+
     private resolveVersionToCompareTo(version: VersionIdentifier): Version {
         const index = this.versions.findIndex((v) => v.identifier === version);
         if (index === this.versions.length - 1) {
@@ -109,8 +113,8 @@ export class PackageVersionComponent {
     private loadDifferences(): void {
         this.packageVersionDiffsGQL
             .fetch({
-                limit: 10,
-                offset: 0,
+                limit: this.VERSIONS_PER_PAGE,
+                offset: this.loadedVersionsDifferencesCount,
                 packageIdentifier: this.packageIdentifier
             })
             .subscribe((response) => {
@@ -118,18 +122,33 @@ export class PackageVersionComponent {
                     return;
                 }
 
-                response.data.packageVersionsDiffs.forEach((v) =>
+                const diffs = response.data.packageVersionsDiffs;
+
+                const previouslyLoadedVersionsDifferencesCount = this.loadedVersionsDifferencesCount;
+                this.loadedVersionsDifferencesCount += diffs.length;
+                this.hasMoreDifferences = this.loadedVersionsDifferencesCount < this.versions.length - 1;
+                const numberOfNewVersionsToDisplay = this.hasMoreDifferences ? diffs.length : diffs.length + 1;
+
+                const newVersionsToDisplay = this.versions.slice(
+                    previouslyLoadedVersionsDifferencesCount,
+                    previouslyLoadedVersionsDifferencesCount + numberOfNewVersionsToDisplay
+                );
+
+                this.displayedVersions.push(...newVersionsToDisplay);
+
+                diffs.forEach((v) =>
                     this.differencesByNewVersionIdentifier.set(this.serializeVersion(v.newVersion), v)
                 );
-                this.versions.forEach((v) => {
+
+                this.displayedVersions.forEach((v) => {
                     const identifier = this.serializeVersion(v.identifier);
                     const differencesSet = this.differencesByNewVersionIdentifier.get(identifier);
                     if (!differencesSet || !differencesSet.differences || !differencesSet.differences.length) {
-                        v.changes = [{ changeLabel: "Initial version" }];
-                        return;
+                        const changeLabel = this.hasMoreDifferences ? "No changes" : "Initial Version";
+                        v.changes = [{ changeLabel }];
+                    } else {
+                        v.changes = differencesSet.differences.map((d) => getReadableChangeFromDifference(d));
                     }
-
-                    v.changes = differencesSet.differences.map((d) => this.getLabelFromChangeType(d));
                 });
             });
     }
@@ -138,100 +157,5 @@ export class PackageVersionComponent {
         return (
             versionIdentifier.versionMajor + "." + versionIdentifier.versionMinor + "." + versionIdentifier.versionPatch
         );
-    }
-
-    private getLabelFromChangeType(difference: PackageDifference): Change {
-        let changeLabel: string;
-        switch (difference.type) {
-            case PackageDifferenceType.REMOVE_SCHEMA:
-                changeLabel = "Removed schema";
-                break;
-            case PackageDifferenceType.REMOVE_HIDDEN_SCHEMA:
-                changeLabel = "Removed hidden schema";
-                break;
-            case PackageDifferenceType.ADD_SCHEMA:
-                changeLabel = "Added schema";
-                break;
-            case PackageDifferenceType.REMOVE_SOURCE:
-                changeLabel = "Removed source";
-                break;
-            case PackageDifferenceType.CHANGE_PACKAGE_DISPLAY_NAME:
-                changeLabel = "Changed package display name";
-                break;
-            case PackageDifferenceType.CHANGE_PACKAGE_DESCRIPTION:
-                changeLabel = "Changed package description";
-                break;
-            case PackageDifferenceType.CHANGE_SOURCE:
-                changeLabel = "Changed source";
-                break;
-            case PackageDifferenceType.CHANGE_SOURCE_URIS:
-                changeLabel = "Changed source URIs";
-                break;
-            case PackageDifferenceType.CHANGE_STREAM_STATS:
-                changeLabel = "Changed stream stats";
-                break;
-            case PackageDifferenceType.CHANGE_STREAM_UPDATE_HASH:
-                changeLabel = "Updated stream hash";
-                break;
-            case PackageDifferenceType.ADD_PROPERTY:
-                changeLabel = "Added property";
-                break;
-            case PackageDifferenceType.HIDE_PROPERTY:
-                changeLabel = "Hid property";
-                break;
-            case PackageDifferenceType.UNHIDE_PROPERTY:
-                changeLabel = "Unhid property";
-                break;
-            case PackageDifferenceType.REMOVE_PROPERTY:
-                changeLabel = "Removed property";
-                break;
-            case PackageDifferenceType.REMOVE_HIDDEN_PROPERTY:
-                changeLabel = "Removed hidden property";
-                break;
-            case PackageDifferenceType.CHANGE_PROPERTY_TYPE:
-                changeLabel = "Changed property type";
-                break;
-            case PackageDifferenceType.CHANGE_PROPERTY_FORMAT:
-                changeLabel = "Changed property format";
-                break;
-            case PackageDifferenceType.CHANGE_PROPERTY_DESCRIPTION:
-                changeLabel = "Changed property description";
-                break;
-            case PackageDifferenceType.CHANGE_GENERATED_BY:
-                changeLabel = "Changed author";
-                break;
-            case PackageDifferenceType.CHANGE_UPDATED_DATE:
-                changeLabel = "Changed updated date";
-                break;
-            case PackageDifferenceType.CHANGE_VERSION:
-                changeLabel = "Changed version";
-                break;
-            case PackageDifferenceType.CHANGE_README_MARKDOWN:
-                changeLabel = "Changed README markdown";
-                break;
-            case PackageDifferenceType.CHANGE_LICENSE_MARKDOWN:
-                changeLabel = "Changed license markdown";
-                break;
-            case PackageDifferenceType.CHANGE_README_FILE:
-                changeLabel = "Changed README file";
-                break;
-            case PackageDifferenceType.CHANGE_LICENSE_FILE:
-                changeLabel = "Changed LICENSE file";
-                break;
-            case PackageDifferenceType.CHANGE_WEBSITE:
-                changeLabel = "Changed website";
-                break;
-            case PackageDifferenceType.CHANGE_CONTACT_EMAIL:
-                changeLabel = "Changed contact email";
-                break;
-            case PackageDifferenceType.REMOVE_STREAM_SET:
-                changeLabel = "Removed stream set";
-                break;
-        }
-
-        return {
-            changeLabel,
-            changeFieldName: difference.pointer
-        };
     }
 }

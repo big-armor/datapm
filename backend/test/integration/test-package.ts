@@ -1774,26 +1774,65 @@ describe("Package Tests", async () => {
             if (result.data.packageVersionsDiffs) {
                 expect(result.data.packageVersionsDiffs).to.not.be.empty;
                 const differenceSets = result.data.packageVersionsDiffs;
+                expect(differenceSets.length).to.equal(2);
 
-                // const differences = result.data.packageVersionsDiffs.differences;
-                // if (differences) {
-                //     expect(differences.length).to.equal(4);
-                //     if (differences) {
-                //         if (differences[0] && differences[1] && differences[2] && differences[3]) {
-                //             expect(differences[0].pointer).to.equal("#");
-                //             expect(differences[0].type).to.equal("CHANGE_VERSION");
+                const latestVersionDiff = differenceSets[0];
+                expect(latestVersionDiff).to.not.be.null;
+                expect(latestVersionDiff.newVersion).to.not.be.null;
+                expect(latestVersionDiff.oldVersion).to.not.be.null;
+                expect(latestVersionDiff.differences).to.not.be.null;
 
-                //             expect(differences[1].pointer).to.equal("#/legislators-current.csv");
-                //             expect(differences[1].type).to.equal("REMOVE_PROPERTY");
+                if (latestVersionDiff.newVersion && latestVersionDiff.oldVersion && latestVersionDiff.differences) {
+                    expect(latestVersionDiff.newVersion.versionMajor).to.equal(2);
+                    expect(latestVersionDiff.newVersion.versionMinor).to.equal(0);
+                    expect(latestVersionDiff.newVersion.versionPatch).to.equal(0);
+                    expect(latestVersionDiff.oldVersion.versionMajor).to.equal(1);
+                    expect(latestVersionDiff.oldVersion.versionMinor).to.equal(0);
+                    expect(latestVersionDiff.oldVersion.versionPatch).to.equal(1);
+                    expect(latestVersionDiff.differences.length).to.equal(4);
 
-                //             expect(differences[2].pointer).to.equal("#/legislators-current.csv/properties/last_name");
-                //             expect(differences[2].type).to.equal("ADD_PROPERTY");
+                    const differences = latestVersionDiff.differences;
+                    expect(differences).to.not.be.null;
+                    if (differences) {
+                        expect(differences.length).to.equal(4);
+                        if (differences) {
+                            if (differences[0] && differences[1] && differences[2] && differences[3]) {
+                                expect(differences[0].pointer).to.equal("#");
+                                expect(differences[0].type).to.equal("CHANGE_VERSION");
 
-                //             expect(differences[3].pointer).to.equal("#/legislators-current.csv/properties/middle_name");
-                //             expect(differences[3].type).to.equal("ADD_PROPERTY");
-                //         }
-                //     }
-                // }
+                                expect(differences[1].pointer).to.equal("#/legislators-current.csv");
+                                expect(differences[1].type).to.equal("REMOVE_PROPERTY");
+
+                                expect(differences[2].pointer).to.equal(
+                                    "#/legislators-current.csv/properties/last_name"
+                                );
+                                expect(differences[2].type).to.equal("ADD_PROPERTY");
+
+                                expect(differences[3].pointer).to.equal(
+                                    "#/legislators-current.csv/properties/middle_name"
+                                );
+                                expect(differences[3].type).to.equal("ADD_PROPERTY");
+                            }
+                        }
+                    }
+                }
+
+                const firstVersionDiff = differenceSets[1];
+                if (firstVersionDiff.newVersion && firstVersionDiff.oldVersion && firstVersionDiff.differences) {
+                    expect(firstVersionDiff.newVersion.versionMajor).to.equal(1);
+                    expect(firstVersionDiff.newVersion.versionMinor).to.equal(0);
+                    expect(firstVersionDiff.newVersion.versionPatch).to.equal(1);
+                    expect(firstVersionDiff.oldVersion.versionMajor).to.equal(1);
+                    expect(firstVersionDiff.oldVersion.versionMinor).to.equal(0);
+                    expect(firstVersionDiff.oldVersion.versionPatch).to.equal(0);
+                    expect(firstVersionDiff.differences.length).to.equal(1);
+
+                    const difference = firstVersionDiff.differences[0];
+                    expect(difference).to.not.be.null;
+                    if (difference) {
+                        expect(difference.type).to.equal("CHANGE_VERSION");
+                    }
+                }
             }
         }
     });

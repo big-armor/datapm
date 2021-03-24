@@ -30,7 +30,7 @@ export const packageVersionsDiffs = async (
         .findOrFail({ identifier: packageIdentifier });
     const versions = await context.connection
         .getCustomRepository(VersionRepository)
-        .findVersionsWithLimitAndOffset(packageEntity.id, offset, limit);
+        .findVersionsWithLimitAndOffset(packageEntity.id, offset, limit + 1);
 
     const comparingPairs: { newVersionEntity: VersionEntity; oldVersionEntity: VersionEntity }[] = [];
     for (let i = 0; i < versions.length; i++) {
