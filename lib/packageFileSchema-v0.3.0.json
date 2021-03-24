@@ -113,7 +113,7 @@
                     "catalogSlug": {
                         "type": "string",
                         "maxLength": 38,
-                        "pattern": "^[a-z0-9](?:[a-z0-9]|-(?=[a-z0-9])){0,38}$"
+                        "pattern": "^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$"
                     },
                     "registryURL": {
                         "type": "string",
@@ -177,7 +177,7 @@
                                                     "$id": "#/schemas/derivedFrom/packageIdentifier/catalogSlug",
                                                     "type": "string",
                                                     "maxLength": 38,
-                                                    "pattern": "^[a-z0-9](?:[a-z0-9]|-(?=[a-z0-9])){0,38}$"
+                                                    "pattern": "^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$"
                                                 },
                                                 "packageSlug": {
                                                     "$id": "#/schemas/derivedFrom/packageIdentifier/packageSlug",
@@ -186,7 +186,7 @@
                                                     "title": "Short Name",
                                                     "description": "The name used to reference this package for API and developer purposes. This field is restricted to characters A-z,0-9,_,-,@",
                                                     "default": "",
-                                                    "pattern": "^[a-z0-9]+(?:(?:(?:[._]|__|[-]*)[a-z0-9]+)+)?$"
+                                                    "pattern": "^[a-zA-Z0-9]+(?:(?:(?:[._]|__|[-]*)[a-zA-Z0-9]+)+)?$"
                                                 },
                                                 "version": {
                                                     "$id": "#/schemas/derivedFrom/packageIdentifier/version",
