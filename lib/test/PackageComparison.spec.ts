@@ -544,6 +544,56 @@ describe("Checking VersionUtil", () => {
         expect(diffs2[0].type).equal(DifferenceType.REMOVE_STREAM_SET);
     });
 
+    it("Source configuration detection", () => {
+        const sourceA: Source[] = [
+            {
+                slug: "datapm",
+                type: "test",
+                uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+                configuration: {},
+                streamSets: [
+                    {
+                        slug: "test",
+                        configuration: {},
+                        lastUpdateHash: "abc123",
+                        schemaTitles: ["A"],
+                        streamStats: {
+                            inspectedCount: 1
+                        }
+                    }
+                ]
+            }
+        ];
+
+        const sourceB: Source[] = [
+            {
+                slug: "datapm",
+                type: "test",
+                uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+                configuration: {
+                    newValue: "a"
+                },
+                streamSets: [
+                    {
+                        slug: "test",
+                        configuration: {},
+                        lastUpdateHash: "abc123",
+                        schemaTitles: ["A"],
+                        streamStats: {
+                            inspectedCount: 1
+                        }
+                    }
+                ]
+            }
+        ];
+
+        const diffs = compareSources(sourceA, sourceB);
+
+        expect(diffs.length).equals(1);
+
+        expect(diffs[0].type).equal(DifferenceType.CHANGE_SOURCE_CONFIGURATION);
+    });
+
     it("Package File updated dates", function () {
         const packageFileA: PackageFile = {
             ...new PackageFile(),

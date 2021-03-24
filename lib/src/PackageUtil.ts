@@ -6,6 +6,7 @@ import AJV from "ajv";
 import fetch from "cross-fetch";
 import { Source, StreamSet } from "./PackageFile-v0.3.0";
 import { PackageFileV020 } from "./PackageFile-v0.2.0";
+import { deepStrictEqual } from "assert";
 
 export type DPMRecordValue =
     | number
@@ -34,6 +35,7 @@ export enum DifferenceType {
     CHANGE_PACKAGE_DISPLAY_NAME = "CHANGE_PACKAGE_DISPLAY_NAME",
     CHANGE_PACKAGE_DESCRIPTION = "CHANGE_PACKAGE_DESCRIPTION",
     CHANGE_SOURCE = "CHANGE_SOURCE",
+    CHANGE_SOURCE_CONFIGURATION = "CHANGE_SOURCE_CONFIGURATION",
     CHANGE_SOURCE_URIS = "CHANGE_SOURCE_URIS",
     CHANGE_STREAM_STATS = "CHANGE_SOURCE_STATS",
     CHANGE_STREAM_UPDATE_HASH = "CHANGE_SOURCE_UPDATE_HASH",
@@ -256,6 +258,12 @@ export function compareSource(priorSource: Source, newSource: Source, pointer = 
         }
     }
 
+    try {
+        deepStrictEqual(priorSource.configuration, newSource.configuration);
+    } catch (error) {
+        response.push({ type: DifferenceType.CHANGE_SOURCE_CONFIGURATION, pointer });
+    }
+
     for (const priorStreamSet of priorSource.streamSets) {
         const newStreamSet = newSource.streamSets.find((ssB) => ssB.slug === priorStreamSet.slug);
 
@@ -419,6 +427,7 @@ export function diffCompatibility(diffs: Difference[]): Compability {
             case DifferenceType.CHANGE_PACKAGE_DISPLAY_NAME:
             case DifferenceType.CHANGE_PROPERTY_DESCRIPTION:
             case DifferenceType.CHANGE_SOURCE:
+            case DifferenceType.CHANGE_SOURCE_CONFIGURATION:
             case DifferenceType.CHANGE_README_MARKDOWN:
             case DifferenceType.CHANGE_LICENSE_MARKDOWN:
             case DifferenceType.CHANGE_WEBSITE:
