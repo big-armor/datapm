@@ -1,28 +1,41 @@
-<h1>Comparing versions</h1>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 p-0" id="downloadPackage">
+            <div mat-dialog-title id="contentTitle">Comparing versions</div>
+            <div mat-dialog-content id="contentBorder">
+                <div class="row m-0">
+                    <div class="package-dark-gray">New version</div>
+                    <mat-select (selectionChange)="compareVersions()" [(value)]="newVersion">
+                        <mat-option *ngFor="let version of versions" [value]="version.identifier">
+                            {{ version.identifier | version }}
+                        </mat-option>
+                    </mat-select>
 
-<h3>New version</h3>
-<mat-select (selectionChange)="compareVersions()" [(value)]="newVersion">
-    <mat-option *ngFor="let version of versions" [value]="version.identifier">
-        {{ version.identifier | version }}
-    </mat-option>
-</mat-select>
+                    <div class="package-dark-gray mt-3">Old version</div>
+                    <mat-select (selectionChange)="compareVersions()" [(value)]="oldVersion">
+                        <mat-option *ngFor="let version of versions" [value]="version.identifier">
+                            {{ version.identifier | version }}
+                        </mat-option>
+                    </mat-select>
 
-<h3>Old version</h3>
-<mat-select (selectionChange)="compareVersions()" [(value)]="oldVersion">
-    <mat-option *ngFor="let version of versions" [value]="version.identifier">
-        {{ version.identifier | version }}
-    </mat-option>
-</mat-select>
+                    <div class="package-dark-gray mt-3 w-100">Differences</div>
 
-<h3 class="mt-3">Differences</h3>
+                    <div class="mt-1" *ngIf="!loading; else loadingTemplate">
+                        <ul *ngIf="differences.length; else noDifferencesTemplate">
+                            <li *ngFor="let difference of differences">
+                                {{ difference.pointer }} - {{ difference.type }}
+                            </li>
+                        </ul>
+                    </div>
 
-<div class="mt-3" *ngIf="!loading; else loadingTemplate">
-    <ul *ngIf="differences.length; else noDifferencesTemplate">
-        <li *ngFor="let difference of differences">{{ difference.pointer }} - {{ difference.type }}</li>
-    </ul>
+                    <ng-template #loadingTemplate>Loading...</ng-template>
+                    <ng-template #noDifferencesTemplate>No differences found.</ng-template>
+                </div>
+            </div>
+
+            <div mat-dialog-actions class="d-flex justify-content-end pt-1">
+                <button mat-button mat-dialog-close (click)="close()" type="submit">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
-
-<button type="submit" class="app-outlined-button" (click)="close()">Close</button>
-
-<ng-template #loadingTemplate>Loading...</ng-template>
-<ng-template #noDifferencesTemplate>No differences found.</ng-template>
