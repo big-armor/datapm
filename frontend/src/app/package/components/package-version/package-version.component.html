@@ -1,22 +1,27 @@
 <div class="pb-5" id="packageVersion">
+    <div class="package-details-title">package version history</div>
+    <div class="package-light-gray mt-3" *ngIf="versions.length > 1">
+        <a href="javascript::void(0)" style="font-weight: 400" (click)="openVersionComparisonModal()"
+            >compare custom versions</a
+        >
+    </div>
     <table style="width: 100%">
         <tbody>
-            <tr>
-                <td class="package-light-gray">package version history</td>
-                <td class="package-light-gray" *ngIf="versions.length > 1">
-                    <a href="javascript::void(0)" (click)="openVersionComparisonModal()">compare custom versions</a>
-                </td>
-            </tr>
-
             <ng-container *ngFor="let version of versions">
                 <tr>
-                    <td class="package-dark-gray">{{ version.identifier | version }}</td>
-                    <td class="package-dark-gray">{{ version.createdAt | timeAgo }}</td>
+                    <td class="package-dark-gray pt-3">
+                        <strong>{{ version.identifier | version }}</strong>
+                    </td>
+                    <td class="package-light-gray text-right pt-3">{{ version.createdAt | timeAgo }}</td>
                 </tr>
-                <tr>
-                    <ul>
-                        <li *ngFor="let change of version.changes">{{ change.changeLabel }}</li>
-                    </ul>
+                <tr class="second-tr">
+                    <td colspan="2">
+                        <ul>
+                            <li *ngFor="let change of version.changes" class="package-dark-gray">
+                                {{ change.changeLabel }}
+                            </li>
+                        </ul>
+                    </td>
                 </tr>
             </ng-container>
         </tbody>

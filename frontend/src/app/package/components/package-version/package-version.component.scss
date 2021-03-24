@@ -1,0 +1,10 @@
+@import "../../../../styles/variables";
+
+table {
+    .second-tr {
+        border-bottom: 1px solid #e2e2e2;
+        &:last-child {
+            border: none;
+        }
+    }
+}

@@ -92,7 +92,8 @@ export class PackageVersionComponent {
                 newVersion: version,
                 oldVersion: comparingVersion.identifier,
                 versions: this.versions
-            } as VersionComparisonModel
+            } as VersionComparisonModel,
+            width: "500px"
         });
     }
 
