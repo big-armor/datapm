@@ -7,6 +7,8 @@
 
 /* your custom css */
 
+@import "./colors.css";
+
 html,
 body {
     letter-spacing: 0.6px;
@@ -254,7 +256,7 @@ table tr:nth-child(even) {
 .hljs-link,
 .hljs-selector-attr,
 .hljs-selector-pseudo {
-    color: #e23326d4;
+    color: #e23326;
 }
 
 .footer-wrapper {

@@ -1,0 +1,22 @@
+.theme-dark {
+    --white-color: #000;
+    --black-color: #fff;
+    --gray-1-color: #cccdd1;
+    --gray-2-color: #bfc0c3f2;
+    --gray-3-color: #aaabaf;
+    --lightgray-1-color: #202124;
+    --info-color: #09a5e2;
+    --danger-color: #b51307;
+}
+
+.theme-light {
+    --body-background: #f2f2f2;
+    --white-color: #fff;
+    --black-color: #000;
+    --gray-1-color: #333;
+    --gray-2-color: #4f4f4f;
+    --gray-3-color: #828282;
+    --lightgray-1-color: #f2f2f2;
+    --info-color: #017fb9;
+    --danger-color: #e23326;
+}
