@@ -1,0 +1,18 @@
+query PackageVersionsDiff($newVersion: VersionIdentifierInput!, $oldVersion: VersionIdentifierInput!) {
+    packageVersionsDiff(newVersion: $newVersion, oldVersion: $oldVersion) {
+        newVersion {
+            versionMajor
+            versionMinor
+            versionPatch
+        }
+        oldVersion {
+            versionMajor
+            versionMinor
+            versionPatch
+        }
+        differences {
+            type
+            pointer
+        }
+    }
+}

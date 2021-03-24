@@ -14,7 +14,10 @@ import {
     Permission,
     SetPackagePermissionsDocument,
     RemovePackagePermissionsDocument,
-    UsersByPackageDocument
+    UsersByPackageDocument,
+    PackageVersionsDiffDocument,
+    CreateCatalogDocument,
+    PackageVersionsDiffsDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import * as crypto from "crypto";
@@ -1093,5 +1096,744 @@ describe("Package Tests", async () => {
             response.errors!.find((e) => e.message.includes("PACKAGE_NOT_FOUND")) != null,
             "should have not package not found error"
         ).equal(true);
+    });
+
+    it("Same version differences should return empty list", async function () {
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-1",
+                    displayName: "Congressional Legislators",
+                    description: "Test upload of Congressional Legislators"
+                }
+            }
+        });
+
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileString = JSON.stringify(packageFileContents);
+
+        await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-1"
+                },
+                value: {
+                    packageFile: packageFileString
+                }
+            }
+        });
+
+        const version = {
+            catalogSlug: "testA-packages",
+            packageSlug: "diff-pkg-1",
+            versionMajor: 1,
+            versionMinor: 0,
+            versionPatch: 0
+        };
+
+        const result = await userAClient.query({
+            query: PackageVersionsDiffDocument,
+            variables: {
+                newVersion: version,
+                oldVersion: version
+            }
+        });
+
+        expect(result.errors).to.be.undefined;
+        expect(result.data).to.not.be.undefined;
+        if (result.data) {
+            expect(result.data.packageVersionsDiff).to.not.be.undefined;
+            expect(result.data.packageVersionsDiff.differences).to.be.empty;
+        }
+    });
+
+    it("It should not be possible to compare packages from versions from different packages", async function () {
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-one",
+                    displayName: "Congressional Legislators",
+                    description: "Test upload of Congressional Legislators"
+                }
+            }
+        });
+
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-two",
+                    displayName: "Congressional Legislators",
+                    description: "Test upload of Congressional Legislators"
+                }
+            }
+        });
+
+        const result = await userAClient.query({
+            query: PackageVersionsDiffDocument,
+            variables: {
+                newVersion: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-one",
+                    versionMajor: 1,
+                    versionMinor: 0,
+                    versionPatch: 0
+                },
+                oldVersion: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-two",
+                    versionMajor: 1,
+                    versionMinor: 0,
+                    versionPatch: 1
+                }
+            }
+        });
+
+        expect(result.errors).to.not.be.undefined;
+        expect(result.data).to.be.null;
+        if (result.errors) {
+            expect(result.errors.length).to.equal(1);
+            if (result.errors[0]) {
+                expect(result.errors[0].message).to.equal("DIFFERENT_VERSIONS_PACKAGES");
+            }
+        }
+    });
+
+    it("It should not be possible to compare packages from versions from different catalogs", async function () {
+        await userAClient.mutate({
+            mutation: CreateCatalogDocument,
+            variables: {
+                value: {
+                    slug: "first-catalog",
+                    displayName: "User A Catalog v1",
+                    description: "This is an integration test User A v1 Catalog",
+                    website: "https://usera.datapm.io",
+                    isPublic: false
+                }
+            }
+        });
+
+        await userAClient.mutate({
+            mutation: CreateCatalogDocument,
+            variables: {
+                value: {
+                    slug: "second-catalog",
+                    displayName: "User A Catalog v2",
+                    description: "This is an integration test User A v2 Catalog",
+                    website: "https://usera.datapm.io",
+                    isPublic: false
+                }
+            }
+        });
+
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "first-catalog",
+                    packageSlug: "same-catalog-pkg",
+                    displayName: "Congressional Legislators",
+                    description: "Test upload of Congressional Legislators"
+                }
+            }
+        });
+
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "second-catalog",
+                    packageSlug: "same-catalog-pkg",
+                    displayName: "Congressional Legislators",
+                    description: "Test upload of Congressional Legislators"
+                }
+            }
+        });
+
+        const result = await userAClient.query({
+            query: PackageVersionsDiffDocument,
+            variables: {
+                newVersion: {
+                    catalogSlug: "first-catalog",
+                    packageSlug: "same-catalog-pkg",
+                    versionMajor: 1,
+                    versionMinor: 0,
+                    versionPatch: 0
+                },
+                oldVersion: {
+                    catalogSlug: "second-catalog",
+                    packageSlug: "same-catalog-pkg",
+                    versionMajor: 1,
+                    versionMinor: 0,
+                    versionPatch: 1
+                }
+            }
+        });
+
+        expect(result.errors).to.not.be.undefined;
+        expect(result.data).to.be.null;
+        if (result.errors) {
+            expect(result.errors.length).to.equal(1);
+            if (result.errors[0]) {
+                expect(result.errors[0].message).to.equal("DIFFERENT_VERSIONS_PACKAGES");
+            }
+        }
+    });
+
+    it("User should not be able to view version differences without view permissions", async function () {
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "user-a-pkg",
+                    displayName: "Congressional Legislators",
+                    description: "Test upload of Congressional Legislators"
+                }
+            }
+        });
+
+        const result = await userBClient.query({
+            query: PackageVersionsDiffDocument,
+            variables: {
+                newVersion: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "user-a-pkg",
+                    versionMajor: 1,
+                    versionMinor: 0,
+                    versionPatch: 0
+                },
+                oldVersion: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "user-a-pkg",
+                    versionMajor: 1,
+                    versionMinor: 0,
+                    versionPatch: 1
+                }
+            }
+        });
+
+        expect(result.errors).to.not.be.undefined;
+        expect(result.data).to.be.null;
+        if (result.errors) {
+            expect(result.errors.length).to.equal(1);
+            if (result.errors[0]) {
+                expect(result.errors[0].message).to.equal("NOT_AUTHORIZED");
+            }
+        }
+    });
+
+    it("It should single version difference between two different versions with no actual differences", async function () {
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-version-changes",
+                    displayName: "Congressional Legislators",
+                    description: "Test upload of Congressional Legislators"
+                }
+            }
+        });
+
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileString = JSON.stringify(packageFileContents);
+
+        await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-version-changes"
+                },
+                value: {
+                    packageFile: packageFileString
+                }
+            }
+        });
+
+        const newVersionPackageFileContents = loadPackageFileFromDisk(
+            "test/packageFiles/congressional-legislators-version-changed.datapm.json"
+        );
+        const newVersionPackageFileString = JSON.stringify(newVersionPackageFileContents);
+
+        await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-version-changes"
+                },
+                value: {
+                    packageFile: newVersionPackageFileString
+                }
+            }
+        });
+
+        const result = await userAClient.query({
+            query: PackageVersionsDiffDocument,
+            variables: {
+                newVersion: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-version-changes",
+                    versionMajor: 1,
+                    versionMinor: 0,
+                    versionPatch: 0
+                },
+                oldVersion: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-version-changes",
+                    versionMajor: 1,
+                    versionMinor: 0,
+                    versionPatch: 1
+                }
+            }
+        });
+
+        expect(result.errors).to.be.undefined;
+        expect(result.data).to.not.be.undefined;
+        if (result.data) {
+            expect(result.data.packageVersionsDiff).to.not.be.undefined;
+            if (result.data.packageVersionsDiff) {
+                expect(result.data.packageVersionsDiff.differences).to.not.be.empty;
+                if (result.data.packageVersionsDiff.differences) {
+                    expect(result.data.packageVersionsDiff.differences.length).to.equal(1);
+                    const difference = result.data.packageVersionsDiff.differences[0];
+                    if (difference) {
+                        expect(difference.type).to.equal("CHANGE_VERSION");
+                    }
+                }
+            }
+        }
+    });
+
+    it("It should return correct version differences results with changed versions", async function () {
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-version-changes-swapped",
+                    displayName: "Congressional Legislators",
+                    description: "Test upload of Congressional Legislators"
+                }
+            }
+        });
+
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileString = JSON.stringify(packageFileContents);
+
+        await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-version-changes-swapped"
+                },
+                value: {
+                    packageFile: packageFileString
+                }
+            }
+        });
+
+        const newVersionPackageFileContents = loadPackageFileFromDisk(
+            "test/packageFiles/congressional-legislators-version-changed.datapm.json"
+        );
+        const newVersionPackageFileString = JSON.stringify(newVersionPackageFileContents);
+
+        await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-version-changes-swapped"
+                },
+                value: {
+                    packageFile: newVersionPackageFileString
+                }
+            }
+        });
+
+        const result = await userAClient.query({
+            query: PackageVersionsDiffDocument,
+            variables: {
+                newVersion: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-version-changes-swapped",
+                    versionMajor: 1,
+                    versionMinor: 0,
+                    versionPatch: 0
+                },
+                oldVersion: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-version-changes-swapped",
+                    versionMajor: 1,
+                    versionMinor: 0,
+                    versionPatch: 1
+                }
+            }
+        });
+
+        expect(result.errors).to.be.undefined;
+        expect(result.data).to.not.be.undefined;
+        if (result.data) {
+            expect(result.data.packageVersionsDiff).to.not.be.undefined;
+            if (result.data.packageVersionsDiff) {
+                expect(result.data.packageVersionsDiff.differences).to.not.be.empty;
+                if (result.data.packageVersionsDiff.differences) {
+                    expect(result.data.packageVersionsDiff.differences.length).to.equal(1);
+                    const difference = result.data.packageVersionsDiff.differences[0];
+                    if (difference) {
+                        expect(difference.type).to.equal("CHANGE_VERSION");
+                    }
+                }
+            }
+        }
+    });
+
+    it("It should return version difference between two different versions with differences", async function () {
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-version-column-changes",
+                    displayName: "Congressional Legislators",
+                    description: "Test upload of Congressional Legislators"
+                }
+            }
+        });
+
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileString = JSON.stringify(packageFileContents);
+
+        await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-version-column-changes"
+                },
+                value: {
+                    packageFile: packageFileString
+                }
+            }
+        });
+
+        const newVersionPackageFileContents = loadPackageFileFromDisk(
+            "test/packageFiles/congressional-legislators-updated.datapm.json"
+        );
+        const newVersionPackageFileString = JSON.stringify(newVersionPackageFileContents);
+
+        await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-version-column-changes"
+                },
+                value: {
+                    packageFile: newVersionPackageFileString
+                }
+            }
+        });
+
+        const result = await userAClient.query({
+            query: PackageVersionsDiffDocument,
+            variables: {
+                newVersion: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-version-column-changes",
+                    versionMajor: 1,
+                    versionMinor: 0,
+                    versionPatch: 0
+                },
+                oldVersion: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-version-column-changes",
+                    versionMajor: 2,
+                    versionMinor: 0,
+                    versionPatch: 0
+                }
+            }
+        });
+
+        expect(result.errors).to.be.undefined;
+        expect(result.data).to.not.be.undefined;
+        if (result.data) {
+            expect(result.data.packageVersionsDiff).to.not.be.undefined;
+            if (result.data.packageVersionsDiff) {
+                expect(result.data.packageVersionsDiff.differences).to.not.be.empty;
+                const differences = result.data.packageVersionsDiff.differences;
+                if (differences) {
+                    expect(differences.length).to.equal(4);
+                    if (differences) {
+                        if (differences[0] && differences[1] && differences[2] && differences[3]) {
+                            expect(differences[0].pointer).to.equal("#");
+                            expect(differences[0].type).to.equal("CHANGE_VERSION");
+
+                            expect(differences[1].pointer).to.equal("#/legislators-current.csv");
+                            expect(differences[1].type).to.equal("REMOVE_PROPERTY");
+
+                            expect(differences[2].pointer).to.equal("#/legislators-current.csv/properties/last_name");
+                            expect(differences[2].type).to.equal("ADD_PROPERTY");
+
+                            expect(differences[3].pointer).to.equal("#/legislators-current.csv/properties/middle_name");
+                            expect(differences[3].type).to.equal("ADD_PROPERTY");
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    it("It should return version difference between two different versions (swapped) with differences", async function () {
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-version-column-changes-sw",
+                    displayName: "Congressional Legislators",
+                    description: "Test upload of Congressional Legislators"
+                }
+            }
+        });
+
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileString = JSON.stringify(packageFileContents);
+
+        await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-version-column-changes-sw"
+                },
+                value: {
+                    packageFile: packageFileString
+                }
+            }
+        });
+
+        const newVersionPackageFileContents = loadPackageFileFromDisk(
+            "test/packageFiles/congressional-legislators-updated.datapm.json"
+        );
+        const newVersionPackageFileString = JSON.stringify(newVersionPackageFileContents);
+
+        await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-version-column-changes-sw"
+                },
+                value: {
+                    packageFile: newVersionPackageFileString
+                }
+            }
+        });
+
+        const result = await userAClient.query({
+            query: PackageVersionsDiffDocument,
+            variables: {
+                newVersion: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-version-column-changes-sw",
+                    versionMajor: 2,
+                    versionMinor: 0,
+                    versionPatch: 0
+                },
+                oldVersion: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-version-column-changes-sw",
+                    versionMajor: 1,
+                    versionMinor: 0,
+                    versionPatch: 0
+                }
+            }
+        });
+
+        expect(result.errors).to.be.undefined;
+        expect(result.data).to.not.be.undefined;
+        if (result.data) {
+            expect(result.data.packageVersionsDiff).to.not.be.undefined;
+            if (result.data.packageVersionsDiff) {
+                expect(result.data.packageVersionsDiff.differences).to.not.be.empty;
+                const differences = result.data.packageVersionsDiff.differences;
+                if (differences) {
+                    expect(differences.length).to.equal(4);
+                    if (differences) {
+                        if (differences[0] && differences[1] && differences[2] && differences[3]) {
+                            expect(differences[0].pointer).to.equal("#");
+                            expect(differences[0].type).to.equal("CHANGE_VERSION");
+
+                            expect(differences[1].pointer).to.equal("#/legislators-current.csv");
+                            expect(differences[1].type).to.equal("REMOVE_PROPERTY");
+
+                            expect(differences[2].pointer).to.equal("#/legislators-current.csv/properties/last_name");
+                            expect(differences[2].type).to.equal("ADD_PROPERTY");
+
+                            expect(differences[3].pointer).to.equal("#/legislators-current.csv/properties/middle_name");
+                            expect(differences[3].type).to.equal("ADD_PROPERTY");
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    it("It should return versions differences between paginated versions of a package", async function () {
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-versions-column-changes",
+                    displayName: "Congressional Legislators",
+                    description: "Test upload of Congressional Legislators"
+                }
+            }
+        });
+
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileString = JSON.stringify(packageFileContents);
+
+        await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-versions-column-changes"
+                },
+                value: {
+                    packageFile: packageFileString
+                }
+            }
+        });
+
+        const newVersionPackageFileContents = loadPackageFileFromDisk(
+            "test/packageFiles/congressional-legislators-version-changed.datapm.json"
+        );
+        const newVersionPackageFileString = JSON.stringify(newVersionPackageFileContents);
+
+        await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-versions-column-changes"
+                },
+                value: {
+                    packageFile: newVersionPackageFileString
+                }
+            }
+        });
+
+        const newerVersionPackageFileContents = loadPackageFileFromDisk(
+            "test/packageFiles/congressional-legislators-updated.datapm.json"
+        );
+        const newerVersionPackageFileString = JSON.stringify(newerVersionPackageFileContents);
+
+        await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-versions-column-changes"
+                },
+                value: {
+                    packageFile: newerVersionPackageFileString
+                }
+            }
+        });
+
+        const result = await userAClient.query({
+            query: PackageVersionsDiffsDocument,
+            variables: {
+                packageIdentifier: {
+                    catalogSlug: "testA-packages",
+                    packageSlug: "diff-pkg-versions-column-changes"
+                },
+                offset: 0,
+                limit: 10
+            }
+        });
+
+        expect(result.errors).to.be.undefined;
+        expect(result.data).to.not.be.undefined;
+        if (result.data) {
+            expect(result.data.packageVersionsDiffs).to.not.be.undefined;
+            if (result.data.packageVersionsDiffs) {
+                expect(result.data.packageVersionsDiffs).to.not.be.empty;
+                const differenceSets = result.data.packageVersionsDiffs;
+                expect(differenceSets.length).to.equal(2);
+
+                const latestVersionDiff = differenceSets[0];
+                expect(latestVersionDiff).to.not.be.null;
+                expect(latestVersionDiff.newVersion).to.not.be.null;
+                expect(latestVersionDiff.oldVersion).to.not.be.null;
+                expect(latestVersionDiff.differences).to.not.be.null;
+
+                if (latestVersionDiff.newVersion && latestVersionDiff.oldVersion && latestVersionDiff.differences) {
+                    expect(latestVersionDiff.newVersion.versionMajor).to.equal(2);
+                    expect(latestVersionDiff.newVersion.versionMinor).to.equal(0);
+                    expect(latestVersionDiff.newVersion.versionPatch).to.equal(0);
+                    expect(latestVersionDiff.oldVersion.versionMajor).to.equal(1);
+                    expect(latestVersionDiff.oldVersion.versionMinor).to.equal(0);
+                    expect(latestVersionDiff.oldVersion.versionPatch).to.equal(1);
+                    expect(latestVersionDiff.differences.length).to.equal(4);
+
+                    const differences = latestVersionDiff.differences;
+                    expect(differences).to.not.be.null;
+                    if (differences) {
+                        expect(differences.length).to.equal(4);
+                        if (differences) {
+                            if (differences[0] && differences[1] && differences[2] && differences[3]) {
+                                expect(differences[0].pointer).to.equal("#");
+                                expect(differences[0].type).to.equal("CHANGE_VERSION");
+
+                                expect(differences[1].pointer).to.equal("#/legislators-current.csv");
+                                expect(differences[1].type).to.equal("REMOVE_PROPERTY");
+
+                                expect(differences[2].pointer).to.equal(
+                                    "#/legislators-current.csv/properties/last_name"
+                                );
+                                expect(differences[2].type).to.equal("ADD_PROPERTY");
+
+                                expect(differences[3].pointer).to.equal(
+                                    "#/legislators-current.csv/properties/middle_name"
+                                );
+                                expect(differences[3].type).to.equal("ADD_PROPERTY");
+                            }
+                        }
+                    }
+                }
+
+                const firstVersionDiff = differenceSets[1];
+                if (firstVersionDiff.newVersion && firstVersionDiff.oldVersion && firstVersionDiff.differences) {
+                    expect(firstVersionDiff.newVersion.versionMajor).to.equal(1);
+                    expect(firstVersionDiff.newVersion.versionMinor).to.equal(0);
+                    expect(firstVersionDiff.newVersion.versionPatch).to.equal(1);
+                    expect(firstVersionDiff.oldVersion.versionMajor).to.equal(1);
+                    expect(firstVersionDiff.oldVersion.versionMinor).to.equal(0);
+                    expect(firstVersionDiff.oldVersion.versionPatch).to.equal(0);
+                    expect(firstVersionDiff.differences.length).to.equal(1);
+
+                    const difference = firstVersionDiff.differences[0];
+                    expect(difference).to.not.be.null;
+                    if (difference) {
+                        expect(difference.type).to.equal("CHANGE_VERSION");
+                    }
+                }
+            }
+        }
     });
 });

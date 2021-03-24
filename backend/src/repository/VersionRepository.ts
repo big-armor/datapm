@@ -12,6 +12,26 @@ export class VersionRepository {
     readonly packageFileStorageService = PackageFileStorageService.INSTANCE;
     constructor(private manager: EntityManager) {}
 
+    public async findVersion(
+        packageId: number,
+        majorVersion: number,
+        minorVersion: number,
+        patchVersion: number
+    ): Promise<VersionEntity | undefined> {
+        return this.manager
+            .getRepository(VersionEntity)
+            .createQueryBuilder()
+            .where('"VersionEntity"."package_id" = :packageId')
+            .andWhere('"VersionEntity"."majorVersion" = :majorVersion')
+            .andWhere('"VersionEntity"."minorVersion" = :minorVersion')
+            .andWhere('"VersionEntity"."patchVersion" = :patchVersion')
+            .setParameter("packageId", packageId)
+            .setParameter("majorVersion", majorVersion)
+            .setParameter("minorVersion", minorVersion)
+            .setParameter("patchVersion", patchVersion)
+            .getOne();
+    }
+
     async save(userId: number, identifier: PackageIdentifierInput, value: CreateVersionInput) {
         const fileStorageService: FileStorageService = FileStorageService.INSTANCE;
 
@@ -100,6 +120,30 @@ export class VersionRepository {
             .createQueryBuilder(ALIAS)
             .where({ packageId })
             .addRelations(ALIAS, relations)
+            .getMany();
+
+        return versions;
+    }
+
+    async findVersionsWithLimitAndOffset(
+        packageId: number,
+        offset: number,
+        limit: number,
+        relations?: string[]
+    ): Promise<VersionEntity[]> {
+        const ALIAS = "versionsByPackageId";
+        const versions = await this.manager
+            .getRepository(VersionEntity)
+            .createQueryBuilder(ALIAS)
+            .where({ packageId })
+            .addRelations(ALIAS, relations)
+            .offset(offset)
+            .limit(limit)
+            .orderBy({
+                "versionsByPackageId.majorVersion": "DESC",
+                "versionsByPackageId.minorVersion": "DESC",
+                "versionsByPackageId.patchVersion": "DESC"
+            })
             .getMany();
 
         return versions;

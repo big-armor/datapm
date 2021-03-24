@@ -1,7 +1,6 @@
 import { Entity, Column, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { EntityBaseModel } from "./EntityBaseModel";
 import { PackageEntity } from "./PackageEntity";
-import { VersionIdentifier } from "../generated/graphql";
 import { UserEntity } from "./UserEntity";
 
 @Entity({
