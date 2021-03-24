@@ -147,7 +147,9 @@ export class PackageVersionComponent {
                         const changeLabel = this.hasMoreDifferences ? "No changes" : "Initial Version";
                         v.changes = [{ changeLabel }];
                     } else {
-                        v.changes = differencesSet.differences.map((d) => getReadableChangeFromDifference(d));
+                        v.changes = differencesSet.differences
+                            .map((d) => getReadableChangeFromDifference(d))
+                            .filter((c) => c != null);
                     }
                 });
             });

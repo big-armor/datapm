@@ -62,9 +62,9 @@ export class VersionComparisonModalComponent implements OnInit {
                     if (differencesResponse.errors && differencesResponse.errors.length) {
                         this.errorMessage = differencesResponse.errors[0].message;
                     } else if (differencesResponse.data) {
-                        this.changes = differencesResponse.data.packageVersionsDiff.differences.map((d) =>
-                            getReadableChangeFromDifference(d)
-                        );
+                        this.changes = differencesResponse.data.packageVersionsDiff.differences
+                            .map((d) => getReadableChangeFromDifference(d))
+                            .filter((c) => c != null);
                     }
                     this.loading = false;
                 },

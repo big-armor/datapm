@@ -68,9 +68,6 @@ export function getReadableChangeFromDifference(difference: PackageDifference): 
         case PackageDifferenceType.CHANGE_UPDATED_DATE:
             changeLabel = "Changed updated date";
             break;
-        case PackageDifferenceType.CHANGE_VERSION:
-            changeLabel = "Changed version";
-            break;
         case PackageDifferenceType.CHANGE_README_MARKDOWN:
             changeLabel = "Changed README markdown";
             break;
@@ -92,6 +89,8 @@ export function getReadableChangeFromDifference(difference: PackageDifference): 
         case PackageDifferenceType.REMOVE_STREAM_SET:
             changeLabel = "Removed stream set";
             break;
+        case PackageDifferenceType.CHANGE_VERSION:
+            return null;
     }
 
     let changeFieldName = difference.pointer === "#" ? "" : difference.pointer;
