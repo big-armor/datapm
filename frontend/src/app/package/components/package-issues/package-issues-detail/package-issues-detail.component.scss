@@ -8,6 +8,7 @@
         padding: 0px;
         min-width: 28px;
         line-height: unset;
+        color: var(--gray-1-color) !important;
 
         button {
             height: 30px;
@@ -20,11 +21,11 @@
 
     .issue-wrapper.comment-bg {
         .issue-header {
-            background-color: #0080b921 !important;
+            background-color: var(--blue-comment-color) !important;
         }
 
         &:after {
-            border-color: transparent #e3eef6 transparent transparent;
+            border-color: transparent var(--blue-comment-color) transparent transparent;
         }
 
         .issue-box {
@@ -33,7 +34,7 @@
 
         ::ng-deep {
             .editor-toolbar {
-                background: #e3eef6 !important;
+                background: var(--blue-comment-color) !important;
                 border: none;
                 position: relative;
                 top: 0px;
@@ -45,7 +46,7 @@
 
             .CodeMirror {
                 border: none;
-                border-bottom: 1px solid #ddd;
+                border-bottom: 1px solid var(--gray-9-color);
             }
         }
     }
@@ -53,7 +54,7 @@
     .issue-wrapper.issues-bg {
         ::ng-deep {
             .editor-toolbar {
-                background: #ededed !important;
+                background-color: var(--gray-10-color);
                 border: none;
                 position: relative;
                 top: 0px;
@@ -71,7 +72,7 @@
     }
 
     .issue-wrapper {
-        border: 1px solid #e1e1e1;
+        border: 1px solid var(--gray-9-color);
         border-radius: 3px;
         background: var(--white-color);
         position: relative;
@@ -85,7 +86,7 @@
             height: 0;
             border-style: solid;
             top: 7px;
-            border-color: transparent #ededed transparent transparent;
+            border-color: transparent var(--gray-10-color) transparent transparent;
             border-width: 10px;
         }
 
@@ -98,14 +99,14 @@
             height: 0;
             border-style: solid;
             top: 6px;
-            border-color: transparent #e1e1e1 transparent transparent;
+            border-color: transparent var(--gray-9-color) transparent transparent;
             border-width: 11px;
         }
 
         .issue-header {
             padding: 6px 10px;
             border-bottom: 1px solid #cccccc73;
-            background-color: #e0e0e094 !important;
+            background-color: var(--gray-10-color) !important;
 
             p {
                 margin-bottom: 0px !important;
@@ -123,7 +124,7 @@
 
     .button-padding {
         padding: 7px 10px 7px 0px;
-        background-color: var(--gray-6-color);
+        background-color: var(--gray-10-color);
     }
 
     .space-line {
@@ -184,8 +185,8 @@
         }
 
         .editor-statusbar {
-            color: #2c3e50;
-            background-color: var(--gray-6-color);
+            color: var(--gray-1-color) !important;
+            background-color: var(--gray-10-color);
             border-bottom: 1px solid var(--gray-9-color);
             border-left: 1px solid var(--gray-9-color);
             border-right: 1px solid var(--gray-9-color);
@@ -194,21 +195,27 @@
         .CodeMirror {
             font-family: $family-roboto;
             letter-spacing: 0.4px;
-            background-color: #fbfbfb;
+            color: var(--gray-1-color);
+            background-color: var(--white-color);
             border-bottom-left-radius: 0px;
             border-bottom-right-radius: 0px;
-
-            &:hover {
-                background-color: var(--white-color);
-            }
+            border: 1px solid var(--gray-9-color);
         }
 
         .editor-toolbar {
             opacity: 1;
-            background-color: var(--gray-6-color);
+            background-color: var(--gray-10-color);
             border-top: 1px solid var(--gray-9-color);
             border-left: 1px solid var(--gray-9-color);
             border-right: 1px solid var(--gray-9-color);
+
+            a {
+                color: var(--gray-1-color) !important;
+
+                &:hover {
+                    background-color: var(--custom-white-color);
+                }
+            }
 
             &::after {
                 margin-top: 3px;
@@ -225,7 +232,7 @@
         padding: 6px 10px;
         border-radius: 14px;
         margin-right: 6px;
-        color: #fff;
+        color: var(--white-1-color);
 
         &:hover {
             text-decoration: none;
@@ -237,11 +244,11 @@
     }
 
     .closed-status {
-        background: #828282;
+        background: #828288;
         padding: 6px 10px;
         border-radius: 14px;
         margin-right: 6px;
-        color: var(--info-color);
+        color: #fff;
 
         &:hover {
             text-decoration: none;
