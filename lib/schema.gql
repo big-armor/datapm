@@ -163,6 +163,40 @@ enum OrderBy {
 }
 
 """
+Package difference types
+"""
+enum PackageDifferenceType {
+    REMOVE_SCHEMA
+    REMOVE_HIDDEN_SCHEMA
+    ADD_SCHEMA
+    REMOVE_SOURCE
+    CHANGE_PACKAGE_DISPLAY_NAME
+    CHANGE_PACKAGE_DESCRIPTION
+    CHANGE_SOURCE
+    CHANGE_SOURCE_URIS
+    CHANGE_STREAM_STATS
+    CHANGE_STREAM_UPDATE_HASH
+    ADD_PROPERTY
+    HIDE_PROPERTY
+    UNHIDE_PROPERTY
+    REMOVE_PROPERTY
+    REMOVE_HIDDEN_PROPERTY
+    CHANGE_PROPERTY_TYPE
+    CHANGE_PROPERTY_FORMAT
+    CHANGE_PROPERTY_DESCRIPTION
+    CHANGE_GENERATED_BY
+    CHANGE_UPDATED_DATE
+    CHANGE_VERSION
+    CHANGE_README_MARKDOWN
+    CHANGE_LICENSE_MARKDOWN
+    CHANGE_README_FILE
+    CHANGE_LICENSE_FILE
+    CHANGE_WEBSITE
+    CHANGE_CONTACT_EMAIL
+    REMOVE_STREAM_SET
+}
+
+"""
 Whether the requesting user has the specified permission on the catalog
 """
 directive @hasCatalogPermission(permission: Permission) on OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION
@@ -331,6 +365,15 @@ type VersionIdentifier {
 }
 
 """
+The version values
+"""
+type VersionIdentifierValues {
+    versionMajor: Int!
+    versionMinor: Int!
+    versionPatch: Int!
+}
+
+"""
 The complete identifier for a package on a registry
 """
 type PackageIdentifier {
@@ -480,6 +523,23 @@ type ActivityLogResult {
     logs: [ActivityLog!]!
     hasMore: Boolean!
     count: Int!
+}
+
+"""
+The package differences response
+"""
+type PackageDifferences {
+    newVersion: VersionIdentifierValues
+    oldVersion: VersionIdentifierValues
+    differences: [PackageDifference]
+}
+
+"""
+The package difference type
+"""
+type PackageDifference {
+    type: PackageDifferenceType
+    pointer: String
 }
 
 """
@@ -767,6 +827,23 @@ type Query {
     Returns the package for the given identifier. Requires permission to view the package
     """
     package(identifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)): Package!
+
+    """
+    Package versions diff
+    """
+    packageVersionsDiff(
+        newVersion: VersionIdentifierInput! @hasPackagePermission(permission: VIEW)
+        oldVersion: VersionIdentifierInput! @hasPackagePermission(permission: VIEW)
+    ): PackageDifferences!
+
+    """
+    Package versions diffs
+    """
+    packageVersionsDiffs(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        offset: Int!
+        limit: Int!
+    ): [PackageDifferences!]
 
     """
     Get package issue

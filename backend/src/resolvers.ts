@@ -170,6 +170,7 @@ import {
     getPackageIssueCommentAuthor,
     updatePackageIssueComment
 } from "./resolvers/PackageIssueCommentResolver";
+import { packageVersionsDiff, packageVersionsDiffs } from "./resolvers/VersionComparisonResolver";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -495,6 +496,8 @@ export const resolvers: {
         myAPIKeys: myAPIKeys,
 
         package: findPackage,
+        packageVersionsDiff: packageVersionsDiff,
+        packageVersionsDiffs: packageVersionsDiffs,
         packageIssue: getPackageIssue,
         packageIssues: getIssuesByPackage,
         packageIssueComments: getCommentsByByPackageIssue,
