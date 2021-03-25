@@ -173,19 +173,6 @@
             }
         }
 
-        .comment-icon {
-            position: relative;
-            text-align: right;
-
-            em {
-                position: absolute;
-                right: 0px;
-                font-size: 16px;
-                color: #c9c9c9;
-                bottom: 6px;
-            }
-        }
-
         .editor-toolbar {
             opacity: 1;
             background-color: $gray-6;
