@@ -9,3 +9,19 @@
 <div *ngIf="packageFile?.licenseMarkdown">
     <markdown [data]="packageFile?.licenseMarkdown"></markdown>
 </div>
+
+<div [ngClass]="{ limitTextHeight: isShowMore }">
+    THis is long text replaced w ith read more/less link example in Angular application paragraph text shown here
+    continue continue THis is long text replaced w ith read more/less link example in Angular application paragraph text
+    shown here continue continue THis is long text replaced w ith read more/less link example in Angular application
+    paragraph text shown here continue continue THis is long text replaced w ith read more/less link example in Angular
+    application paragraph text shown here continue continue THis is long text replaced w ith read more/less link example
+    in Angular application paragraph text shown here continue continue THis is long text replaced w ith read more/less
+    link example in Angular application paragraph text shown here continue continue
+</div>
+<div class="fade-out" [class.d-none]="!isShowMore"></div>
+<p class="text-center mt-2">
+    <a class="app-outlined-button" (click)="showText()">
+        {{ isShowMore ? "Show More" : "Show Less" }}
+    </a>
+</p>

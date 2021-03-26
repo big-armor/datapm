@@ -30,3 +30,15 @@ markdown ::ng-deep {
         letter-spacing: 0.6px;
     }
 }
+
+.limitTextHeight {
+    height: 64px;
+    overflow: hidden;
+}
+
+.fade-out {
+    background: linear-gradient(to bottom, rgb(100 100 100 / 0%) 0%, #f5f5f5c9 75%);
+    height: 48px;
+    margin-top: -48px;
+    position: relative;
+}
