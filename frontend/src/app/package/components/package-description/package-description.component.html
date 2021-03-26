@@ -1,27 +1,65 @@
-<div class="package-dark-gray" *ngIf="packageFile?.readmeMarkdown == null">
+<!-- <div class="package-dark-gray" *ngIf="packageFile?.readmeMarkdown == null"> -->
+<div class="package-dark-gray">
     <div class="title">{{ packageFile?.displayName }}</div>
-    {{ package?.description }}
-</div>
-<div *ngIf="packageFile?.readmeMarkdown">
-    <markdown [data]="packageFile?.readmeMarkdown"></markdown>
-</div>
-<br />
-<div *ngIf="packageFile?.licenseMarkdown">
-    <markdown [data]="packageFile?.licenseMarkdown"></markdown>
+
+    <div [class.limitTextHeight]="!isShowingMoreDescriptionText">
+        <h3>Description</h3>
+        {{ package?.description }}
+    </div>
+    <div class="fade-out" [class.d-none]="shouldShowMoreDescriptionButton && isShowingMoreDescriptionText"></div>
+    <p class="text-center mt-2" *ngIf="shouldShowMoreDescriptionButton">
+        <a class="app-outlined-button" (click)="toggleShowMoreDescriptionText()">
+            {{ isShowingMoreDescriptionText ? "Show Less" : "Show More" }}
+        </a>
+    </p>
 </div>
 
-<div [ngClass]="{ limitTextHeight: isShowMore }">
-    THis is long text replaced w ith read more/less link example in Angular application paragraph text shown here
-    continue continue THis is long text replaced w ith read more/less link example in Angular application paragraph text
-    shown here continue continue THis is long text replaced w ith read more/less link example in Angular application
-    paragraph text shown here continue continue THis is long text replaced w ith read more/less link example in Angular
-    application paragraph text shown here continue continue THis is long text replaced w ith read more/less link example
-    in Angular application paragraph text shown here continue continue THis is long text replaced w ith read more/less
-    link example in Angular application paragraph text shown here continue continue
+<div *ngIf="package.description" class="mt-5">
+    <div [class.limitTextHeight]="!isShowingMoreReadMeText">
+        <h3>License</h3>
+        {{ package?.description }}
+    </div>
+    <div class="fade-out" [class.d-none]="shouldShowMoreReadMeButton && isShowingMoreReadMeText"></div>
+    <p class="text-center mt-2" *ngIf="shouldShowMoreReadMeButton">
+        <a class="app-outlined-button" (click)="toggleShowMoreReadMeText()">
+            {{ isShowingMoreReadMeText ? "Show Less" : "Show More" }}
+        </a>
+    </p>
 </div>
-<div class="fade-out" [class.d-none]="!isShowMore"></div>
-<p class="text-center mt-2">
-    <a class="app-outlined-button" (click)="showText()">
-        {{ isShowMore ? "Show More" : "Show Less" }}
-    </a>
-</p>
+
+<div *ngIf="package.description" class="mt-5">
+    <div [class.limitTextHeight]="!isShowingMoreLicenseText">
+        <h3>Read Me</h3>
+        {{ package?.description }}
+    </div>
+    <div class="fade-out" [class.d-none]="shouldShowMoreLicenseButton && isShowingMoreLicenseText"></div>
+    <p class="text-center mt-2" *ngIf="shouldShowMoreLicenseButton">
+        <a class="app-outlined-button" (click)="toggleShowMoreLicenseText()">
+            {{ isShowingMoreLicenseText ? "Show Less" : "Show More" }}
+        </a>
+    </p>
+</div>
+
+<!-- <div *ngIf="packageFile?.readmeMarkdown">
+    <div [class.limitTextHeight]="!isShowingMoreReadMeText">
+        <markdown [data]="packageFile?.readmeMarkdown"></markdown>
+    </div>
+    <div class="fade-out" [class.d-none]="shouldShowMoreReadMeButton && isShowingMoreReadMeText"></div>
+    <p class="text-center mt-2" *ngIf="shouldShowMoreReadMeButton">
+        <a class="app-outlined-button" (click)="toggleShowMoreReadMeText()">
+            {{ isShowingMoreReadMeText ? "Show Less" : "Show More" }}
+        </a>
+    </p>
+</div> -->
+
+<!-- <div *ngIf="packageFile?.licenseMarkdown">
+    <div [class.limitTextHeight]="!isShowingMoreLicenseText">
+        <markdown [data]="packageFile?.licenseMarkdown"></markdown>
+    </div>
+    <div class="fade-out" [class.d-none]="shouldShowMoreLicenseButton && isShowingMoreLicenseText"></div>
+    <p class="text-center mt-2" *ngIf="shouldShowMoreLicenseButton">
+        <a class="app-outlined-button" (click)="toggleShowMoreLicenseText()">
+            {{ isShowingMoreLicenseText ? "Show Less" : "Show More" }}
+        </a>
+    </p>
+</div> -->
