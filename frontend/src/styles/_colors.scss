@@ -1,18 +1,18 @@
 // black and white
-$black-color: #000;
-$black-color-dark: #e6eaef;
+$primary-color: #000;
+$primary-color-dark: #e6eaef;
 
-$white-color: #fff;
-$white-color-dark: #202124;
+$secondary-color: #fff;
+$secondary-color-dark: #202124;
 
-$white-1-color: #ffffffb3;
-$white-1-color-dark: #fff;
+$secondary-1-color: #ffffffb3;
+$secondary-1-color-dark: #fff;
 
-$custom-white-color: #fff;
-$custom-white-color-dark: #303033;
+$custom-secondary-color: #fff;
+$custom-secondary-color-dark: #303033;
 
-$black-1-color: rgba($black-color, 0.08);
-$black-1-color-dark: rgba($black-color, 0.08);
+$primary-1-color: rgba($primary-color, 0.08);
+$primary-1-color-dark: rgba($primary-color, 0.08);
 // balck and white
 
 // gray shades
@@ -154,25 +154,25 @@ $blue-comment-color: #e3eef6;
 $blue-comment-color-dark: #255874;
 
 $colors: (
-    --black-color: (
-        $black-color,
-        $black-color-dark
+    --primary-color: (
+        $primary-color,
+        $primary-color-dark
     ),
-    --white-color: (
-        $white-color,
-        $white-color-dark
+    --secondary-color: (
+        $secondary-color,
+        $secondary-color-dark
     ),
-    --white-1-color: (
-        $white-1-color,
-        $white-1-color-dark
+    --secondary-1-color: (
+        $secondary-1-color,
+        $secondary-1-color-dark
     ),
-    --custom-white-color: (
-        $custom-white-color,
-        $custom-white-color-dark
+    --custom-secondary-color: (
+        $custom-secondary-color,
+        $custom-secondary-color-dark
     ),
-    --black-1-color: (
-        $black-1-color,
-        $black-1-color-dark
+    --primary-1-color: (
+        $primary-1-color,
+        $primary-1-color-dark
     ),
     --gray-1-color: (
         $gray-1-color,

@@ -51,7 +51,7 @@
 }
 
 .oddRow {
-    background-color: var(--custom-white-color);
+    background-color: var(--custom-secondary-color);
 }
 
 tr.mat-header-row {
@@ -64,7 +64,7 @@ tr.mat-header-row {
         padding: 40px 25px 30px 25px !important;
         .mat-table thead {
             opacity: 1;
-            color: var(--white-color);
+            color: var(--secondary-color);
             background-color: var(--gray-5-color);
         }
     }

@@ -144,7 +144,7 @@ table.gray-table {
         border-bottom: 1px solid var(--gray-5-color) !important;
         @include text("body");
         border-radius: 0px;
-        background: var(--white-color);
+        background: var(--secondary-color);
         color: var(--gray-2-color);
         &:last-child {
             border-bottom: none !important;
@@ -157,12 +157,12 @@ table.gray-table {
 
 .notification-error {
     background-color: var(--danger-color);
-    color: $white-color;
+    color: $secondary-color;
 }
 
 .notification-success {
     background-color: $success-color;
-    color: $white-color;
+    color: $secondary-color;
 }
 
 .text-overflow-elipses {
@@ -186,7 +186,7 @@ table.gray-table {
         background-color: $green-1-color;
     }
     .mat-slide-toggle-thumb {
-        background-color: $white-color;
+        background-color: $secondary-color;
     }
 }
 
@@ -211,7 +211,7 @@ table.gray-table {
         transition: background-color ease 0.5s;
 
         &:hover {
-            background-color: var(--custom-white-color) !important;
+            background-color: var(--custom-secondary-color) !important;
             transition: background-color ease 0.5s;
         }
 
@@ -238,7 +238,7 @@ table.gray-table {
 }
 
 mat-select {
-    background-color: var(--custom-white-color);
+    background-color: var(--custom-secondary-color);
     padding: 10px 16px;
     letter-spacing: 0.7px;
     font-family: $family-roboto;
@@ -263,13 +263,13 @@ mat-select {
     border: none;
     outline: none;
     letter-spacing: 0.7px;
-    background-color: var(--custom-white-color);
+    background-color: var(--custom-secondary-color);
     font-family: $family-roboto;
     color: var(--gray-1-color);
     transition: background-color ease 0.5s;
 
     &:hover {
-        background-color: var(--custom-white-color);
+        background-color: var(--custom-secondary-color);
         transition: background-color ease 0.5s;
     }
 
@@ -293,7 +293,7 @@ mat-select {
     align-items: center;
     text-align: center;
     padding: 8px 15px;
-    color: $white-color;
+    color: $secondary-color;
     background-color: var(--custom-info-color);
     transition: background-color ease 0.5s;
 
@@ -320,7 +320,7 @@ mat-select {
 .app-fab-button.app-fab-button {
     width: 40px;
     height: 40px;
-    background: var(--white-color);
+    background: var(--secondary-color);
     box-shadow: var(--outer-shadow-1) !important;
 
     &:focus {
@@ -352,7 +352,7 @@ mat-select {
     font-style: $style-normal;
     font-weight: $weight-400;
     font-size: ($text-font - 1);
-    background: var(--custom-white-color);
+    background: var(--custom-secondary-color);
     line-height: 13px;
     color: var(--info-color);
     border: 1px solid var(--gray-9-color);
@@ -368,7 +368,7 @@ mat-select {
     &:hover {
         color: var(--info-color);
         text-decoration: none;
-        background-color: var(--custom-white-color);
+        background-color: var(--custom-secondary-color);
     }
 
     .delete-txt {
@@ -383,7 +383,7 @@ mat-select {
     &:hover {
         color: $green-1-color;
         text-decoration: none;
-        background-color: $white-color;
+        background-color: $secondary-color;
     }
 }
 
@@ -458,7 +458,7 @@ mat-select {
     line-height: 18px;
     color: var(--gray-1-color);
     border-radius: 0px !important;
-    background-color: var(--white-color) !important;
+    background-color: var(--secondary-color) !important;
     border-bottom: 1px solid var(--gray-5-color) !important;
 
     &:hover {
@@ -547,7 +547,7 @@ textarea.flat-input,
     align-items: flex-end;
     letter-spacing: 0.7px;
     color: var(--gray-1-color);
-    background-color: var(--custom-white-color);
+    background-color: var(--custom-secondary-color);
 
     &:focus {
         outline: transparent solid 0px;
@@ -635,7 +635,7 @@ button:disabled {
     line-height: 21px;
     font-weight: $weight-400;
     font-size: $title-font;
-    color: var(--black-color);
+    color: var(--primary-color);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -805,7 +805,7 @@ button:disabled {
         border: 1px solid rgb(0 0 0 / 10%);
         padding: 6px 10px;
         color: var(--gray-1-color) !important;
-        background: var(--custom-white-color);
+        background: var(--custom-secondary-color);
         width: 100%;
         height: 36px;
         overflow: hidden;
@@ -833,7 +833,7 @@ button:disabled {
 
         a {
             font-size: $text-font !important;
-            color: var(--custom-white-color) !important;
+            color: var(--custom-secondary-color) !important;
         }
     }
 }

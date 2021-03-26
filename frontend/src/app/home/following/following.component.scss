@@ -61,7 +61,7 @@
         span {
             font-size: 14px;
             font-weight: 500;
-            color: $black-1-color;
+            color: $primary-1-color;
         }
     }
 
@@ -157,12 +157,12 @@
         button {
             width: 26px;
             height: 26px;
-            background-color: $white-color;
+            background-color: $secondary-color;
             box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
                 0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
 
             &:focus {
-                outline: $white-color auto 0px !important;
+                outline: $secondary-color auto 0px !important;
             }
 
             ::ng-deep.mat-button-wrapper {
@@ -175,7 +175,7 @@
                     font-size: 18px;
 
                     &:focus {
-                        outline: $white-color auto 0px !important;
+                        outline: $secondary-color auto 0px !important;
                     }
                 }
             }
@@ -184,7 +184,7 @@
             background-color: #f49636c7 !important;
 
             .mat-icon {
-                color: $white-color;
+                color: $secondary-color;
             }
         }
     }
@@ -197,13 +197,13 @@
             font-size: 10px;
             line-height: 13px;
             letter-spacing: -0.28px;
-            color: $black-color;
+            color: $primary-color;
             padding: 0px 10px;
             min-height: 18px;
             border-radius: 24px;
             cursor: pointer;
             margin: 0px 6px 6px 6px;
-            background-color: $white-color;
+            background-color: $secondary-color;
             box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25),
                 inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
         }
@@ -245,7 +245,7 @@
                 margin: 5px 4px;
                 height: 1px;
                 width: 100%;
-                background: $white-color !important;
+                background: $secondary-color !important;
                 box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
                     0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
                 border-radius: 24px;
@@ -255,7 +255,7 @@
                 font-size: 10px;
                 line-height: 13px;
                 letter-spacing: -0.28px;
-                color: $black-color;
+                color: $primary-color;
             }
         }
 

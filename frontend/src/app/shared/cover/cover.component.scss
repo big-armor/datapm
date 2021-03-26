@@ -30,14 +30,14 @@ img {
     transition: background-color 0.5s linear;
 
     &:hover {
-        background-color: rgba($black-color, 0.45);
+        background-color: rgba($primary-color, 0.45);
     }
 
     mat-icon {
         font-size: 48px;
         width: 48px;
         height: 48px;
-        color: $white-1-color;
+        color: $secondary-1-color;
     }
 }
 
@@ -50,7 +50,7 @@ img {
             font-size: 35px;
             width: 35px;
             height: 35px;
-            color: $white-color;
+            color: $secondary-color;
         }
     }
 }

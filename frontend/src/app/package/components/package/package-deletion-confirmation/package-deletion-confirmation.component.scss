@@ -48,7 +48,7 @@
 
         .delete-permanently-button {
             background: var(--danger-color);
-            color: $white-color !important;
+            color: $secondary-color !important;
 
             &:disabled {
                 background: $gray-4-color;
@@ -56,7 +56,7 @@
             }
 
             &:hover {
-                background: $white-color !important;
+                background: $secondary-color !important;
                 color: var(--danger-color) !important;
                 border: 1px solid var(--danger-color);
             }
@@ -67,7 +67,7 @@
             color: $gray-1-color;
 
             &:hover {
-                background: $white-color !important;
+                background: $secondary-color !important;
                 color: var(--danger-color) !important;
                 border: 1px solid var(--danger-color);
             }

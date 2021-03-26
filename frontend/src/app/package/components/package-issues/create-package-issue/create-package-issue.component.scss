@@ -37,7 +37,7 @@
             font-family: $family-roboto;
             letter-spacing: 0.4px;
             color: var(--gray-1-color);
-            background-color: var(--white-color);
+            background-color: var(--secondary-color);
             border-bottom-left-radius: 0px;
             border-bottom-right-radius: 0px;
             border: 1px solid var(--gray-9-color);
@@ -54,7 +54,7 @@
                 color: var(--gray-1-color) !important;
 
                 &:hover {
-                    background-color: var(--custom-white-color);
+                    background-color: var(--custom-secondary-color);
                 }
             }
 

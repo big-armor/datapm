@@ -46,7 +46,7 @@
     .issue-wrapper {
         border: 1px solid var(--gray-9-color);
         border-radius: 3px;
-        background: var(--white-color);
+        background: var(--secondary-color);
         position: relative;
 
         &:after {
@@ -167,7 +167,7 @@
             font-family: $family-roboto;
             letter-spacing: 0.4px;
             color: var(--gray-1-color);
-            background-color: var(--white-color);
+            background-color: var(--secondary-color);
             border-bottom-left-radius: 0px;
             border-bottom-right-radius: 0px;
             border: 1px solid var(--gray-9-color);
@@ -184,7 +184,7 @@
                 color: var(--gray-1-color) !important;
 
                 &:hover {
-                    background-color: var(--custom-white-color);
+                    background-color: var(--custom-secondary-color);
                 }
             }
 
@@ -203,7 +203,7 @@
         padding: 6px 10px;
         border-radius: 14px;
         margin-right: 6px;
-        color: var(--white-1-color);
+        color: var(--secondary-1-color);
 
         &:hover {
             text-decoration: none;

@@ -112,12 +112,12 @@
     button {
         width: 32px;
         height: 32px;
-        background-color: $white-color;
+        background-color: $secondary-color;
         box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
             0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
 
         &:focus {
-            outline: $white-color auto 0px !important;
+            outline: $secondary-color auto 0px !important;
         }
 
         ::ng-deep.mat-button-wrapper {
@@ -129,7 +129,7 @@
                 color: $gray-3-color;
 
                 &:focus {
-                    outline: $white-color auto 0px !important;
+                    outline: $secondary-color auto 0px !important;
                 }
             }
         }
@@ -138,7 +138,7 @@
         background-color: #f49636c7 !important;
 
         .mat-icon {
-            color: $white-color;
+            color: $secondary-color;
         }
     }
 }
@@ -186,13 +186,13 @@
         font-size: 10px;
         line-height: 13px;
         letter-spacing: -0.28px;
-        color: $black-color;
+        color: $primary-color;
         padding: 0px 9px;
         min-height: 18px;
         border-radius: 24px;
         cursor: pointer;
         margin: 0px 8px;
-        background-color: $white-color;
+        background-color: $secondary-color;
         box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25),
             inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
     }
