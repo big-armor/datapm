@@ -12,7 +12,7 @@
 html,
 body {
     letter-spacing: 0.6px;
-    background-color: var(--white-color);
+    background-color: var(--body-background);
 }
 
 @media only screen and (max-width: 576px) {
@@ -43,22 +43,21 @@ body {
         flex: 0 0 190px;
     }
     .navigationSlider .slidingNav ul li {
-        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
-            0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
+        box-shadow: var( --button-box-shadow);
         border-radius: 24px;
-        background: #f9f9f9;
+        background: var(--custom-light-color);
     }
     .navigationSlider .slidingNav ul li a:hover,
     .navigationSlider .slidingNav ul li a:active,
     .navigationSlider .slidingNav ul li a:focus,
     .navigationSlider .slidingNav ul li a:focus-within {
-        background-color: #ffffff8a;
+        background-color: var(--custom-light-color);
         text-decoration: none;
         border-radius: 24px;
-        color: #828282;
+        color: var(--gray-3-color);
     }
     .navigationSlider .slidingNav ul li:hover {
-        background-color: #fff;
+        background-color: var(--custom-light-color);
     }
     .navigationSlider .slidingNav ul li a {
         font-family: "RobotoLight";
@@ -66,9 +65,10 @@ body {
         font-weight: normal;
         font-size: 15px;
         line-height: 20px;
+        border-radius: 24px;
         align-items: center;
         text-align: center;
-        color: #828282;
+        color: var(--gray-3-color);
         text-transform: none;
         padding: 5px 25px;
     }
@@ -85,7 +85,7 @@ body {
         margin-top: 15px;
     }
     .navigationSlider .slidingNav ul {
-        background-color: #828282;
+        background-color: var(--gray-3-color);
     }
     .navigationSlider .slidingNav ul li > a:hover,
     .navigationSlider .slidingNav ul li > a:active,
@@ -123,12 +123,12 @@ body {
 
 .button {
     font-family: "RobotoMedium";
-    background: #ffffff6e;
+    background: var(--custom-light-color);
     font-style: normal;
     font-weight: 400;
     font-size: 13px;
     line-height: 20px;
-    color: #017fb9;
+    color: var(--info-color);
     border: 1px solid #dddddd99;
     padding: 5px 20px;
     border-radius: 4px;
@@ -140,37 +140,41 @@ body {
     font-style: normal;
     align-items: center;
     text-align: center;
-    color: #017fb9;
+    color: var(--info-color);
     text-transform: none;
 }
 
 .button:hover {
-    background-color: #fff;
+    background-color: var(--custom-light-color);
     text-decoration: none;
-    color: #333;
+    color: var(--gray-1-color);
 }
 
 h1 {
     font-size: 26px;
     font-weight: 300;
+    color: var(--gray-1-color);
     font-family: "RobotoMedium";
 }
 
 h2 {
     font-size: 22px;
     font-weight: 300;
+    color: var(--gray-2-color);
     font-family: "RobotoMedium";
 }
 
 h3 {
     font-size: 20px;
     font-weight: 300;
+    color: var(--gray-2-color);
     font-family: "RobotoMedium";
 }
 
 h4 {
     font-size: 16px;
     font-weight: 300;
+    color: var(--gray-2-color);
     font-family: "RobotoMedium";
 }
 
@@ -178,13 +182,13 @@ p {
     font-family: "Roboto";
     font-weight: 400;
     font-size: 13px;
-    color: #4f4f4f;
+    color: var(--gray-3-color);
     font-style: normal;
     margin-bottom: 6px;
 }
 
 a {
-    color: #017fb9;
+    color: var(--info-color);
     font-size: 13px;
     font-family: "Roboto";
 }
@@ -192,7 +196,7 @@ a {
 ul li {
     font-family: "Roboto";
     font-size: 13px;
-    color: #4f4f4f;
+    color: var(--gray-2-color);
     font-style: normal;
     margin-bottom: 6px;
 }
@@ -200,33 +204,38 @@ ul li {
 ol li {
     font-family: "Roboto";
     font-size: 13px;
-    color: #4f4f4f;
+    color: var(--gray-2-color);
     font-style: normal;
     margin-bottom: 6px;
 }
 
 a:hover {
-    color: #017fb9;
+    color: var(--info-color);
     text-decoration: underline;
 }
 
 table th {
     font-size: 13px;
     font-family: "Roboto";
-    background-color: #d4d7da;
+    color: var(--gray-1-color);
+    border: 1px solid #5f6367;
+    background-color: var(--custom-table-color);
 }
 
 table td {
     font-size: 12px;
+    color: var(--gray-2-color);
     font-family: "RobotoLight";
+    border: 1px solid #5f6367;
 }
 
 table tr:nth-child(odd) {
-    background: #fff;
+    color: var(--gray-2-color);
+    background: var(--custom-light-color);
 }
 
 table tr:nth-child(even) {
-    background: #ffffff8a;
+    background: var(--lightgray-1-color);
 }
 
 .function-name-prevnext {
@@ -279,7 +288,7 @@ table tr:nth-child(even) {
     font-weight: 400;
     font-size: 14px;
     line-height: 18px;
-    color: #4f4f4f;
+    color: var(--gray-1-color);
     margin-bottom: 10px;
 }
 
@@ -288,28 +297,28 @@ table tr:nth-child(even) {
     font-style: normal;
     font-weight: 400;
     font-size: 10px;
+    color: var(--gray-2-color);
     line-height: 13px;
 }
 
 .nav-footer {
-    background: #ededed !important;
+    background: var(--body-background) !important;
     padding: 40px 15px;
     width: 100%;
-    box-shadow: 4px 0 4px hsla(0, 0%, 100%, 0.25), 0 4px 4px hsla(0, 0%, 100%, 0.25),
-        0 -4px 4px hsla(0, 0%, 74.1%, 0.25), -4px 0 4px hsla(0, 0%, 74.1%, 0.25);
-    background: hsla(0, 0%, 94.9%, 0.28);
+    border-top: 1px solid var(--lightgray-2-color);
 }
 
 .nav-footer .copyright {
     font-size: 14px;
     line-height: 18px;
-    color: #4f4f4f;
+    color: var(--gray-2-color);
     font-family: "RobotoLight";
     font-style: normal;
 }
 
 .hljs {
-    background: #ffffff8a;
+    background: var(--custom-light-color);
+    color: var(--gray-2-color);
     font-size: 13px;
     font-family: "Roboto";
     font-style: normal;
@@ -319,14 +328,14 @@ table tr:nth-child(even) {
 .toc .toggleNav ul li a,
 .onPageNav a {
     font-size: 12px;
-    color: #828282;
+    color: var(--gray-3-color);
     font-style: normal;
     font-family: "RobotoLight";
 }
 
 .toc .toggleNav ul li a:hover,
 .onPageNav a:hover {
-    color: #017fb9;
+    color: var(--info-color);
     text-decoration: none;
 }
 
@@ -334,7 +343,7 @@ table tr:nth-child(even) {
 .onPageNav .toc-headings > li > a.active,
 .onPageNav .toc-headings > li > a.hover {
     font-weight: 400;
-    color: #017fb9;
+    color: var(--info-color);
     font-family: "RobotoMedium";
 }
 
@@ -342,15 +351,14 @@ table tr:nth-child(even) {
     font-family: "RobotoMedium";
     font-style: normal;
     font-weight: 300;
-    color: #333;
+    color: var(--gray-1-color);
 }
 
 .fixedHeaderContainer {
     padding: 25px 0px;
-    background-color: #f2f2f2;
-    background: #f2f2f2;
-    box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
-        0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+    background-color: var(--body-background);
+    background: var(--body-background);
+    box-shadow: var(--box-shadow);
 }
 
 .fixedHeaderContainer header .headerTitle {
@@ -359,7 +367,7 @@ table tr:nth-child(even) {
     font-style: normal;
     font-weight: 400;
     line-height: 46px;
-    color: #333;
+    color: var(--gray-1-color);
     cursor: pointer;
 }
 
@@ -373,7 +381,7 @@ table tr:nth-child(even) {
     font-weight: 300;
     line-height: 42px;
     font-size: 30px;
-    color: #333;
+    color: var(--gray-1-color);
 }
 
 .toc .toggleNav .navGroup {
