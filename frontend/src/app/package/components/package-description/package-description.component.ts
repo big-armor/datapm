@@ -14,6 +14,7 @@ export class PackageDescriptionComponent {
     public package: Package;
     public packageFile: PackageFile;
     private unsubscribe$ = new Subject();
+    isShowMore = true
 
     constructor(private packageService: PackageService) {
         this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe((p: PackageResponse) => {
@@ -24,6 +25,12 @@ export class PackageDescriptionComponent {
             validatePackageFileInBrowser(p.package.latestVersion.packageFile);
             this.packageFile = parsePackageFileJSON(p.package.latestVersion.packageFile);
         });
+    }
+
+
+
+    showText() {
+       this.isShowMore = !this.isShowMore
     }
 
     ngOnDestroy(): void {
