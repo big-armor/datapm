@@ -1127,7 +1127,7 @@ button:disabled {
 }
 
 .markdown-quote-block {
-    color: $gray-3;
+    color: var(--gray-3-color);
     border-left: 2px solid var(--gray-5-color);
     padding-left: 10px;
 }
