@@ -15,8 +15,11 @@
                 <div class="package-div panel-div">
                     <div class="package-details-title">Options</div>
                     <div class="d-flex flex-row bd-highlight">
-                        <div class="mb-3">
-                            <mat-slide-toggle [checked]="currentUser.uiDarkModeEnabled" (change)="toggleDarkMode()"
+                        <div class="mb-3 package-dark-gray">
+                            <mat-slide-toggle
+                                class="app-slide-toggle"
+                                [checked]="currentUser.uiDarkModeEnabled"
+                                (change)="toggleDarkMode()"
                                 >Dark mode</mat-slide-toggle
                             >
                         </div>
