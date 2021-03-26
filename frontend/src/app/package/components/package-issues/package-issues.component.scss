@@ -136,7 +136,7 @@
             }
 
             .package-details-title {
-                font-size: $default-font;
+                font-size: ($default-font - 1);
                 color: $color-info;
 
                 &:hover {
