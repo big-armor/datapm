@@ -43,7 +43,7 @@ body {
         flex: 0 0 190px;
     }
     .navigationSlider .slidingNav ul li {
-        box-shadow: var( --button-box-shadow);
+        box-shadow: var(--button-box-shadow);
         border-radius: 24px;
         background: var(--custom-light-color);
     }
