@@ -213,6 +213,7 @@ a:hover {
 table th {
     font-size: 13px;
     font-family: "Roboto";
+    background-color: #d4d7da;
 }
 
 table td {
