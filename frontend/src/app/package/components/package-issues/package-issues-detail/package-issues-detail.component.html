@@ -29,7 +29,7 @@
 
         <div class="wrapper">
             <div class="d-flex flex-row bd-highlight">
-                <div class="px-2 bd-highlight" style="z-index: 99">
+                <div class="px-2 bd-highlight">
                     <app-avatar [user]="packageIssue.author" [size]="30"></app-avatar>
                 </div>
                 <div class="pl-2 bd-highlight w-100">
@@ -46,6 +46,9 @@
                                     <em class="fas fa-ellipsis-h"></em>
                                 </a>
                                 <mat-menu #menu="matMenu">
+                                    <button mat-menu-item id="issueBtn" (click)="insertQuote(packageIssue.content)">
+                                        <span class="package-dark-gray">Quote reply</span>
+                                    </button>
                                     <button mat-menu-item id="issueBtn" (click)="openIssueEditor(issueEditor)">
                                         <span class="package-dark-gray">Edit</span>
                                     </button>
@@ -83,7 +86,7 @@
             <div class="pl-5" *ngFor="let comment of packageIssueComments; let i = index">
                 <div class="space-line"></div>
                 <div class="d-flex flex-row bd-highlight">
-                    <div class="px-2 bd-highlight" style="z-index: 99">
+                    <div class="px-2 bd-highlight">
                         <app-avatar [user]="comment.author" [size]="30"></app-avatar>
                     </div>
                     <div class="pl-2 bd-highlight w-100">
@@ -100,6 +103,9 @@
                                         <em class="fas fa-ellipsis-h"></em>
                                     </a>
                                     <mat-menu #menu="matMenu">
+                                        <button mat-menu-item id="issueBtn" (click)="insertQuote(comment.content)">
+                                            <span class="package-dark-gray">Quote reply</span>
+                                        </button>
                                         <button
                                             mat-menu-item
                                             id="issueBtn"
@@ -148,9 +154,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="comment-icon" [class.d-none]="comment.isEditing">
-                                <em class="far fa-comment fa-flip-horizontal mr-2"></em>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -165,7 +168,7 @@
                     Load more
                 </button>
             </div>
-            <div class="comment-section" *ngIf="canEditIssue || packageIssue.status === 'OPEN'">
+            <div class="comment-section">
                 <app-markdown-editor #newCommentEditor [(content)]="newCommentContent"></app-markdown-editor>
                 <div class="mt-3 text-right">
                     <button

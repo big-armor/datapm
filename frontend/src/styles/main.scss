@@ -1074,3 +1074,9 @@ button:disabled {
         }
     }
 }
+
+.markdown-quote-block {
+    color: $gray-3;
+    border-left: 2px solid $gray-5;
+    padding-left: 10px;
+}

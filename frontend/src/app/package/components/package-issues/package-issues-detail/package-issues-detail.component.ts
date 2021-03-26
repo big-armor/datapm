@@ -315,6 +315,10 @@ export class PackageIssuesDetailComponent implements OnInit {
             );
     }
 
+    public insertQuote(content: string): void {
+        this.newCommentEditor.insertQuote(content);
+    }
+
     public openIssue(): void {
         this.changeIssueStatus(PackageIssueStatus.OPEN);
     }

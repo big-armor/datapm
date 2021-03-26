@@ -90,13 +90,6 @@ export const createPackageIssueComment = async (
         .getCustomRepository(PackageIssueRepository)
         .getByIssueNumberForPackage(packageEntity.id, issueIdentifier.issueNumber);
 
-    if (issueEntity.status === PackageIssueStatus.CLOSED) {
-        const packagePermissions = await resolvePackagePermissions(context, packageIdentifier, context.me);
-        if (!packagePermissions.includes(Permission.MANAGE)) {
-            throwNotAuthorizedError();
-        }
-    }
-
     const commentRepository = context.connection.manager.getCustomRepository(PackageIssueCommentRepository);
     const lastCommentCreatedForIssue = await commentRepository.getLastCreatedCommentForIssue(issueEntity.id);
     const commentNumber = lastCommentCreatedForIssue ? lastCommentCreatedForIssue.commentNumber + 1 : 0;
