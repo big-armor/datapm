@@ -1125,3 +1125,9 @@ button:disabled {
 .animate-colors-transition {
     transition: color 0.5s, background 0.5s;
 }
+
+.markdown-quote-block {
+    color: $gray-3;
+    border-left: 2px solid var(--gray-5-color);
+    padding-left: 10px;
+}

@@ -3,7 +3,7 @@ import { NgModule } from "@angular/core";
 import { HttpClientModule } from "@angular/common/http";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { MarkdownModule } from "ngx-markdown";
+import { MarkdownModule, MarkedOptions, MarkedRenderer } from "ngx-markdown";
 
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
@@ -12,6 +12,7 @@ import { GraphQLModule } from "./graphql.module";
 import { SharedModule } from "./shared/shared.module";
 import { MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions } from "@angular/material/core";
 import { AngularSimplemdeModule } from "angular-simplemde";
+import { buildMarkedOptionsFactory } from "./markdown-options";
 
 const globalRippleConfig: RippleGlobalOptions = {
     disabled: true,
@@ -33,7 +34,12 @@ const globalRippleConfig: RippleGlobalOptions = {
         FormsModule,
         SharedModule,
         UiModule,
-        MarkdownModule.forRoot(),
+        MarkdownModule.forRoot({
+            markedOptions: {
+                provide: MarkedOptions,
+                useFactory: buildMarkedOptionsFactory
+            }
+        }),
         AngularSimplemdeModule
     ],
     providers: [{ provide: MAT_RIPPLE_GLOBAL_OPTIONS, useValue: globalRippleConfig }],

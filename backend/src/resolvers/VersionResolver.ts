@@ -36,6 +36,7 @@ import { catalogEntityToGraphQL } from "./CatalogResolver";
 import { StorageErrors } from "../storage/files/file-storage-service";
 import { hasPackagePermissions } from "./UserPackagePermissionResolver";
 import { packageEntityToGraphqlObject } from "./PackageResolver";
+import { createVersionComparison } from "./VersionComparisonResolver";
 
 export const versionEntityToGraphqlObject = async (
     context: EntityManager | Connection,
@@ -79,9 +80,11 @@ export const createVersion = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const fileStorageService = PackageFileStorageService.INSTANCE;
+    let latestVersion: VersionEntity | undefined | null;
+    let savedVersion: VersionEntity | undefined | null;
+    let diff = null;
 
-    return await context.connection.manager.nestedTransaction(async (transaction) => {
+    const transactionResult = await context.connection.manager.nestedTransaction(async (transaction) => {
         const proposedNewVersion = new SemVer(value.packageFile.version);
 
         const rawPackageFile = value.packageFile as PackageFile;
@@ -89,7 +92,7 @@ export const createVersion = async (
         const newPackageFile = upgradePackageFile(rawPackageFile);
 
         // get the latest version
-        const latestVersion = await transaction
+        latestVersion = await transaction
             .getCustomRepository(VersionRepository)
             .findLatestVersion({ identifier, relations: ["package"] });
 
@@ -110,7 +113,7 @@ export const createVersion = async (
 
             const latestVersionSemVer = new SemVer(packageFile!.version);
 
-            const diff = comparePackages(packageFile, newPackageFile);
+            diff = comparePackages(packageFile, newPackageFile);
 
             const compatibility = diffCompatibility(diff);
 
@@ -154,9 +157,7 @@ export const createVersion = async (
             }
         }
 
-        const savedVersion = await transaction
-            .getCustomRepository(VersionRepository)
-            .save(context.me.id, identifier, value);
+        savedVersion = await transaction.getCustomRepository(VersionRepository).save(context.me.id, identifier, value);
 
         const versionIdentifier = {
             ...identifier,
@@ -198,6 +199,12 @@ export const createVersion = async (
         });
         return versionEntityToGraphqlObject(transaction, recalledVersion);
     });
+
+    if (latestVersion && diff && savedVersion) {
+        await createVersionComparison(latestVersion.id, savedVersion.id, diff, context);
+    }
+
+    return transactionResult;
 };
 
 export const deleteVersion = async (

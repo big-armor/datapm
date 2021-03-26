@@ -11,7 +11,7 @@
         .mat-checkbox-inner-container {
             height: 14px;
             width: 14px;
-            margin: 6px 10px 0px 0px;
+            margin: 6px 12px 0px 0px;
 
             .mat-checkbox-frame {
                 border-color: var(--gray-3-color);
@@ -24,7 +24,6 @@
         padding: 5px 9px;
         border-radius: 14px;
         margin-right: 12px;
-        margin-left: 8px;
         font-size: $small-font;
         color: var(--white-color);
         position: relative;
@@ -44,7 +43,6 @@
         padding: 5px 6px;
         border-radius: 14px;
         margin-right: 12px;
-        margin-left: 8px;
         font-size: $small-font;
         color: var(--white-color);
         position: relative;
@@ -63,12 +61,9 @@
         margin-top: 15px;
 
         .issue-header {
-            border-bottom: 0px !important;
-        }
-
-        .issue-wrapper {
             padding: 10px 20px;
             border: 1px solid var(--gray-5-color);
+            background-color: var(--gray-5-color);
 
             .package-details-title {
                 font-size: $default-font;
@@ -82,7 +77,7 @@
             .issue-tab {
                 font-family: $family-roboto;
                 font-weight: $weight-400;
-                font-size: $text-font;
+                font-size: ($text-font - 1);
                 letter-spacing: 0.4px;
                 margin-right: 10px;
                 cursor: pointer;
@@ -103,7 +98,6 @@
                 float: right;
                 margin-right: 3px;
                 margin-left: 10px;
-                margin-top: 3px;
                 font-size: ($text-font - 1);
 
                 &:hover {
@@ -127,6 +121,41 @@
 
             .active {
                 color: var(--gray-1-color);
+            }
+        }
+
+        .oddRow {
+            background-color: $white;
+        }
+
+        .diff-bg {
+            background-color: #f5f5f5;
+            &:nth-child(2n) {
+                background-color: #f9f9f9;
+            }
+            &:hover {
+                background-color: #fff;
+                transition: background-color 0.5s ease;
+            }
+        }
+
+        .issue-wrapper {
+            padding: 10px 20px;
+            border: 1px solid $gray-5;
+            border-top: none;
+            cursor: pointer;
+
+            &:first-child {
+                cursor: default;
+            }
+
+            .package-details-title {
+                font-size: ($default-font - 1);
+                color: $color-info;
+
+                &:hover {
+                    text-decoration: none;
+                }
             }
 
             .img-comments {

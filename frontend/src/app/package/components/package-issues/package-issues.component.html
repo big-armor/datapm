@@ -3,7 +3,7 @@
         <button class="app-outlined-button" (click)="navigateToNewIssuePage()">Open a new issue</button>
     </div>
     <div class="main-wrapper">
-        <div class="issue-wrapper issue-header">
+        <div class="issue-header">
             <a class="example-section" *ngIf="isUserAPackageManager">
                 <mat-checkbox [(ngModel)]="allIssuesSelected" (change)="toggleAllIssuesSelection($event.checked)">
                 </mat-checkbox>
@@ -50,7 +50,7 @@
 
         <!-- when there are opened or closed issues -->
         <ng-container *ngIf="state === State.SUCCESS">
-            <div *ngFor="let issue of issues" class="issue-wrapper">
+            <div *ngFor="let issue of issues" class="issue-wrapper diff-bg" [routerLink]="issue.issueNumber">
                 <div class="d-flex flex-row bd-highlight">
                     <section *ngIf="isUserAPackageManager" class="example-section">
                         <mat-checkbox (change)="toggleIssue(issue, $event.checked)" [ngModel]="issue.checked">
@@ -83,7 +83,11 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mx-2 ml-auto" (click)="goToUserProfile(issue.author.username)" style="cursor: pointer">
+                    <div
+                        class="mr-4 ml-auto align-self-center"
+                        (click)="goToUserProfile(issue.author.username)"
+                        style="cursor: pointer"
+                    >
                         <app-avatar
                             [user]="issue.author"
                             [size]="25"
