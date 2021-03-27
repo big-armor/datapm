@@ -1,29 +1,8 @@
-import { ApolloClient, NormalizedCacheObject, ServerError } from "@apollo/client/core";
-import { ErrorResponse } from "apollo-link-error";
+import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 import { expect } from "chai";
-import {
-    DeleteCatalogDocument,
-    UpdateCatalogDocument,
-    MyCatalogsDocument,
-    MyCatalogsQuery,
-    MyCatalogsQueryVariables,
-    CreateCatalogDocument,
-    GetCatalogDocument,
-    CreatePackageDocument,
-    UpdatePackageDocument,
-    PackageDocument,
-    CatalogPackagesDocument,
-    CreateVersionDocument,
-    UpdateMeDocument,
-    Permission,
-    UserCatalogsDocument,
-    SetUserCatalogPermissionDocument,
-    SetPackagePermissionsDocument,
-    DeleteUserCatalogPermissionsDocument
-} from "./registry-client";
-import { createAnonymousClient, createUser } from "./test-utils";
+import { CreateCatalogDocument, GetCatalogDocument } from "./registry-client";
+import { createUser } from "./test-utils";
 import { describe, it } from "mocha";
-import { loadPackageFileFromDisk } from "datapm-lib";
 
 describe("Catalog Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;

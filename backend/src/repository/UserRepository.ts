@@ -37,28 +37,6 @@ SelectQueryBuilder.prototype.filterUserCatalog = function (topLevelAlias: string
     });
 };
 
-async function getUser({
-    username,
-    manager,
-    relations = []
-}: {
-    username: string;
-    catalogId?: number;
-    manager: EntityManager;
-    relations?: string[];
-}): Promise<UserEntity | null> {
-    const ALIAS = "users";
-    let query = manager
-        .getRepository(UserEntity)
-        .createQueryBuilder(ALIAS)
-        .where({ username: username })
-        .addRelations(ALIAS, relations);
-
-    const val = await query.getOne();
-
-    return val || null;
-}
-
 async function getUserByUserName({
     username,
     manager,
@@ -72,7 +50,8 @@ async function getUserByUserName({
     let query = manager
         .getRepository(UserEntity)
         .createQueryBuilder(ALIAS)
-        .where({ username: username })
+        .where(`LOWER(username) = :username`)
+        .setParameter("username", username.toLowerCase())
         .addRelations(ALIAS, relations);
 
     const val = await query.getOne();
@@ -89,7 +68,7 @@ async function getUserOrFail({
     manager: EntityManager;
     relations?: string[];
 }): Promise<UserEntity> {
-    const user = await getUser({
+    const user = await getUserByUserName({
         username,
         manager,
         relations
@@ -148,7 +127,7 @@ export class UserRepository extends Repository<UserEntity> {
     getUserByUsername(username: string) {
         const ALIAS = "getUsername";
 
-        const user = this.createQueryBuilder(ALIAS).where([{ username }]).getOne();
+        const user = getUserByUserName({ username, manager: this.manager });
 
         return user;
     }
@@ -157,9 +136,9 @@ export class UserRepository extends Repository<UserEntity> {
         const ALIAS = "getUsername";
 
         const user = this.createQueryBuilder(ALIAS)
-            .where([{ username }])
-            .orWhere('("getUsername"."emailAddress" = :username)')
-            .setParameter("username", username)
+            .where(`LOWER(username) = :username`)
+            .orWhere('(LOWER("getUsername"."emailAddress") = :username)')
+            .setParameter("username", username.toLowerCase())
             .getOne();
 
         return user;
@@ -178,7 +157,10 @@ export class UserRepository extends Repository<UserEntity> {
     getUserByEmail(emailAddress: string) {
         const ALIAS = "getByEmailAddress";
 
-        const user = this.createQueryBuilder(ALIAS).where([{ emailAddress }]).getOne();
+        const user = this.createQueryBuilder(ALIAS)
+            .where(`LOWER("getByEmailAddress"."emailAddress") = :emailAddress`)
+            .setParameter("emailAddress", emailAddress.toLowerCase())
+            .getOne();
         return user;
     }
 
@@ -186,7 +168,8 @@ export class UserRepository extends Repository<UserEntity> {
         const ALIAS = "getByLogin";
 
         const user = this.createQueryBuilder(ALIAS)
-            .where([{ username }, { emailAddress: username }])
+            .where(`LOWER("getByLogin"."emailAddress") = :username OR LOWER(username) = :username`)
+            .setParameter("username", username.toLowerCase())
             .addRelations(ALIAS, relations)
             .getOne();
 
