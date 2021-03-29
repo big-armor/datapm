@@ -1,4 +1,5 @@
 @import "../../../styles/variables";
+@import "../../../styles/colors";
 
 #inviteInput {
     ::ng-deep .mat-form-field-infix {
@@ -19,12 +20,12 @@
             font-family: Roboto, Helvetica Neue, sans-serif;
             letter-spacing: 0.5px;
             font-weight: 300;
-            color: $gray-4;
+            color: var(--gray-4-color);
         }
     }
 
     ::ng-deep .mat-form-field-flex {
-        background-color: #f9f9f9;
+        background-color: var(--custom-secondary-color);
         border-radius: 6px;
     }
 
@@ -45,11 +46,11 @@
         height: 20px;
         font-size: 20px;
         width: 22px;
-        color: $color-info;
+        color: var(--info-color);
     }
 
     ::ng-deep .mat-chip-remove {
-        color: $gray-1;
+        color: var(--gray-1-color);
         margin-left: 2px;
     }
 

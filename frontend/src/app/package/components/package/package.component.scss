@@ -1,4 +1,5 @@
 @import "../../../../styles/variables";
+@import "../../../../styles/colors";
 
 :host {
     ::ng-deep .avatar {
@@ -10,7 +11,7 @@
     font-family: $family-roboto;
     position: relative;
     display: flex;
-    color: $gray-2;
+    color: var(--gray-2-color);
     justify-content: left;
     align-items: center;
     font-weight: $weight-400;
@@ -29,7 +30,7 @@
     font-size: $title-font;
     line-height: 26px;
     letter-spacing: 0.4px;
-    color: $gray-2;
+    color: var(--gray-2-color);
     margin-bottom: 5px;
 }
 
@@ -40,7 +41,7 @@
     font-size: $text-font;
     line-height: 26px;
     letter-spacing: -0.28px;
-    color: $gray-3;
+    color: var(--gray-3-color);
 }
 
 #packageDetails {
@@ -52,44 +53,11 @@
 }
 
 .copy-link {
-    color: $gray-3;
+    color: var(--gray-3-color);
     cursor: pointer;
     bottom: 1px;
     position: relative;
     font-size: $default-font;
-}
-
-.share-data {
-    button {
-        border-radius: 26px;
-        width: 58px;
-        height: 52px;
-        line-height: 15px;
-        padding: 2px;
-        border: none;
-        background-color: transparent;
-
-        &:hover {
-            background-color: #e8e8e8;
-        }
-
-        .bd-text {
-            font-size: 11px;
-            font-family: Roboto, "Helvetica Neue", sans-serif;
-            font-style: normal;
-            font-weight: 300;
-            letter-spacing: -0.28px;
-            color: $gray-2;
-        }
-
-        p {
-            margin-bottom: 0px;
-            a {
-                color: $gray-2;
-                font-size: 18px;
-            }
-        }
-    }
 }
 
 .derivedFromSubtitle {

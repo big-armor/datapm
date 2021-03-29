@@ -1,4 +1,5 @@
 @import "../../../../../../styles/variables";
+@import "../../../../../../styles/colors";
 
 #clientWizard {
     .stepper-title {
@@ -14,7 +15,7 @@
     }
 
     a {
-        color: $color-info;
+        color: var(--info-color);
         line-height: 24px;
         font-size: ($text-font - 1);
         cursor: pointer;
@@ -30,7 +31,7 @@
             font-size: ($text-font - 1);
             line-height: 18px;
             letter-spacing: 0.4px;
-            color: $gray-3;
+            color: var(--gray-3-color);
         }
     }
 
@@ -39,7 +40,7 @@
         font-weight: $weight-300;
 
         .active-bar {
-            background-color: #017fb9 !important;
+            background-color: var(--info-color) !important;
         }
 
         .inactive-bar {
@@ -48,6 +49,7 @@
 
         .progress-bar {
             cursor: pointer;
+            color: var(--secondary-color);
             border-right: 1px solid rgb(255 255 255 / 25%) !important;
         }
     }
@@ -70,7 +72,8 @@
         padding: 0px;
         min-height: 46px;
         margin-bottom: 0px !important;
-        border-top: 1px solid #e5e5e5;
+        border-top: 1px solid var(--gray-9-color);
+        color: var(--gray-1-color);
     }
 }
 

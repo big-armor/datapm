@@ -1,56 +1,6 @@
 $cover-height: 150px;
 $page-header-height: 136px;
 
-$black: #000;
-$white: #fff;
-$white-1: #ffffffb3;
-$black-1: rgba($black, 0.08);
-$gray-1: #333;
-$gray-2: #4f4f4f;
-$gray-3: #828282;
-$gray-4: #bdbdbd;
-$gray-5: #e0e0e0;
-$gray-6: #f2f2f2;
-$gray-7: #f9f9f9;
-$gray-8: #ccc;
-$gray-9: #ddd;
-$gray-10: #eee;
-$gray-11: #f3f3f3;
-$gray-12: #f3f3f38f;
-
-$fb-color: #3e68c0;
-$fb-hover-color: rgba($fb-color, 0.9);
-
-$reddit-color: #ff4500;
-$reddit-hover-color: rgba($reddit-color, 0.9);
-
-$email-color: #7d7d7d;
-$email-hover-color: rgba($email-color, 0.9);
-
-$twitter-color: #1b95e0;
-$twitter-hover-color: rgba($twitter-color, 0.9);
-
-$gray-color-5: rgba($gray-5, 0.45);
-$gray-color-8: rgba($gray-8, 0.85);
-$gray-color-3: rgba($gray-3, 0.73);
-
-$custom-gray-1: #aeaeae;
-$color-1: #00a896;
-$color-2: rgba($color-1, 0.8);
-$color-3: rgba($color-1, 0.6);
-$color-4: rgba($color-1, 0.4);
-$color-5: rgba($color-1, 0.2);
-$color-6: rgba($color-1, 0.1);
-$color-info: #017fb9;
-$color-success: #2eb244;
-$color-warning: #efd54b;
-$color-danger: #e23326;
-$color-info-lighter: #017fb912;
-$color-danger-dark: #dc3545;
-$color-danger-lighter: #fe0000;
-
-$outer-shadow-1: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
-    0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
 $outer-shadow-2: -4px 0px 4px rgba(130, 130, 130, 0.25), 0px -4px 4px rgba(130, 130, 130, 0.25),
     4px 0px 4px rgba(51, 51, 51, 0.25), 0px 4px 4px rgba(51, 51, 51, 0.25);
 $outer-shadow-3: 0px 4px 4px rgba(183, 183, 183, 0.25);
@@ -59,9 +9,6 @@ $inner-shadow-1: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4p
     inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
 $inner-shadow-2: inset -4px 0px 4px rgba(130, 130, 130, 0.25), inset 0px -4px 4px rgba(130, 130, 130, 0.25),
     inset 4px 0px 4px rgba(51, 51, 51, 0.25), inset 0px 4px 4px rgba(51, 51, 51, 0.25);
-
-$text-shadow: 0px -4px 4px rgba(255, 255, 255, 0.25), -4px 0px 4px rgba(255, 255, 255, 0.25),
-    4px 0px 4px rgba(183, 183, 183, 0.25), 0px 4px 4px rgba(183, 183, 183, 0.25);
 
 $radio-outer-shadow: inset -2px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -2px 4px rgba(255, 255, 255, 0.25),
     inset 0px 2px 4px rgba(189, 189, 189, 0.25), inset 2px 0px 4px rgba(189, 189, 189, 0.25);

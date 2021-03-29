@@ -1,11 +1,18 @@
 @import "../../../../styles/variables";
 @import "../../../../styles/mixins";
-@import "../../../../styles/variables";
+@import "../../../../styles/colors";
 
 #detailsHeader {
     .social-link {
         display: inline-block;
         margin-right: 20px;
+
+        em {
+            color: var(--gray-3-color);
+            font-size: $title-font;
+            position: relative;
+            top: 3px;
+        }
     }
 
     .public-text,
@@ -21,7 +28,7 @@
         }
 
         .username {
-            color: $gray-3;
+            color: var(--gray-3-color);
             font-weight: 300;
             margin-top: 0px !important;
             margin-bottom: 0px !important;

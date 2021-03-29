@@ -1,4 +1,5 @@
 @import "../../../../styles/variables";
+@import "../../../../styles/colors";
 
 .collections-container {
     overflow-x: scroll;
@@ -6,24 +7,24 @@
     margin-bottom: 15px;
     border-radius: 6px;
     padding: 20px 10px;
-    background-color: #ebebeb;
+    background-color: var(--gray-10-color);
 }
 
 .collection-item {
     display: inline-block;
     cursor: pointer;
     margin-right: 10px;
-    border: 1px solid #3333330d;
-    background-color: #f9f9f9;
+    border: 1px solid var(--tranparent-border);
+    background-color: var(--gray-7-color);
     padding: 10px 10px;
     border-radius: 6px;
     font-family: $family-roboto;
     font-weight: $weight-400;
     letter-spacing: 0.6px;
     font-size: $small-font;
-    color: $gray-1;
+    color: var(--gray-1-color);
 
     &:hover {
-        background-color: $white;
+        background-color: var(--custom-secondary-color);
     }
 }

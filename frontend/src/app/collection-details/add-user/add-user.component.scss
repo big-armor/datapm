@@ -1,4 +1,5 @@
 @import "../../../styles/variables";
+@import "../../../styles/colors";
 
 #addUser {
     .shadow-div {
@@ -7,9 +8,16 @@
 
     .textarea-input {
         ::ng-deep .mat-form-field-flex {
-            background-color: #f9f9f9;
+            background-color: var(--custom-secondary-color);
             padding: 10px;
             border-radius: 6px;
+            &::placeholder {
+                font-size: ($text-font - 1);
+                font-family: $family-roboto;
+                letter-spacing: 0.4px;
+                font-weight: $weight-300;
+                color: var(--gray-4-color);
+            }
         }
 
         ::ng-deep .mat-form-field-outline {
@@ -36,7 +44,7 @@
                 font-family: $family-roboto;
                 letter-spacing: 0.5px;
                 font-weight: $weight-300;
-                color: $gray-4;
+                color: var(--gray-4-color);
             }
         }
     }
@@ -48,7 +56,8 @@
             font-weight: $weight-400;
             font-size: $text-font;
             letter-spacing: unset;
-            color: $gray-2;
+            letter-spacing: 0.5px;
+            color: var(--gray-2-color);
             padding: 10px;
         }
 
@@ -62,6 +71,9 @@
         ::ng-deep .mat-select-arrow-wrapper {
             position: relative;
             top: 7px;
+            .mat-select-arrow {
+                color: var(--gray-1-color);
+            }
         }
 
         ::ng-deep .mat-form-field-flex {
@@ -76,7 +88,7 @@
 }
 
 ::ng-deep .mat-primary .mat-option.mat-selected:not(.mat-option-disabled) {
-    color: $color-info;
+    color: var(--info-color);
 }
 
 @media (max-width: 576px) {

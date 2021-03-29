@@ -366,6 +366,8 @@ export class UserRepository extends Repository<UserEntity> {
                 user.createdAt = now;
                 user.updatedAt = now;
 
+                user.uiDarkModeEnabled = value.uiDarkModeEnabled || false;
+
                 user.status = UserStatus.ACTIVE;
 
                 if (!FirstUserStatusHolder.IS_FIRST_USER_CREATED) {
@@ -568,6 +570,10 @@ export class UserRepository extends Repository<UserEntity> {
 
             if (value.description != null) {
                 dbUser.description = value.description;
+            }
+
+            if (value.uiDarkModeEnabled != null) {
+                dbUser.uiDarkModeEnabled = value.uiDarkModeEnabled;
             }
 
             dbUser.updatedAt = new Date();

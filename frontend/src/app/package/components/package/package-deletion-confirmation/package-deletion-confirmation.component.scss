@@ -1,25 +1,30 @@
 @import "./src/styles/variables.scss";
+@import "./src/styles/colors.scss";
 
 .page-container {
     text-align: center;
     padding: 80px 0;
 
     h2 {
-        font-size: 32px;
+        font-size: $logo-font;
+        color: var(--gray-1-color);
     }
 
     .page-content {
         margin: 45px 0;
 
         p {
-            font-size: 16px;
+            font-size: $text-font;
+            font-weight: $weight-400;
+            letter-spacing: 0.6px;
+            color: var(--gray-1-color);
         }
     }
 
     .counter {
         margin: 40px auto;
         font-size: 30px;
-        color: $color-danger;
+        color: var(--danger-color);
         position: relative;
         width: 50px;
         height: 50px;
@@ -42,29 +47,29 @@
         }
 
         .delete-permanently-button {
-            background: $color-danger;
-            color: white !important;
+            background: var(--danger-color);
+            color: $secondary-color !important;
 
             &:disabled {
-                background: $gray-4;
+                background: $gray-4-color;
                 cursor: not-allowed;
             }
 
             &:hover {
-                background: white !important;
-                color: $color-danger !important;
-                border: 1px solid $color-danger;
+                background: $secondary-color !important;
+                color: var(--danger-color) !important;
+                border: 1px solid var(--danger-color);
             }
         }
 
         .cancel-button {
-            background: $gray-5;
-            color: black;
+            background: $gray-5-color;
+            color: $gray-1-color;
 
             &:hover {
-                background: white !important;
-                color: $color-danger !important;
-                border: 1px solid $color-danger;
+                background: $secondary-color !important;
+                color: var(--danger-color) !important;
+                border: 1px solid var(--danger-color);
             }
         }
     }

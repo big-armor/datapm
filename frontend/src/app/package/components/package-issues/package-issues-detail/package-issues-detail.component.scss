@@ -1,10 +1,12 @@
 @import "../../../../../styles/variables";
+@import "../../../../../styles/colors";
 
 #packageIssuseDetail {
     .menu-btn {
         padding: 0px;
         min-width: 28px;
         line-height: unset;
+        color: var(--gray-1-color) !important;
 
         button {
             height: 30px;
@@ -17,16 +19,16 @@
 
     .issue-wrapper.comment-bg {
         .issue-header {
-            background-color: #0080b921 !important;
+            background-color: var(--blue-comment-color) !important;
         }
 
         &:after {
-            border-color: transparent #e3eef6 transparent transparent;
+            border-color: transparent var(--blue-comment-color) transparent transparent;
         }
 
         ::ng-deep {
             .editor-toolbar {
-                background: #e3eef6 !important;
+                background: var(--blue-comment-color) !important;
                 border: none;
             }
         }
@@ -35,16 +37,16 @@
     .issue-wrapper.issues-bg {
         ::ng-deep {
             .editor-toolbar {
-                background: #ededed !important;
+                background-color: var(--gray-10-color);
                 border: none;
             }
         }
     }
 
     .issue-wrapper {
-        border: 1px solid #e1e1e1;
+        border: 1px solid var(--gray-9-color);
         border-radius: 3px;
-        background: #fff;
+        background: var(--secondary-color);
         position: relative;
 
         &:after {
@@ -56,7 +58,7 @@
             height: 0;
             border-style: solid;
             top: 7px;
-            border-color: transparent #ededed transparent transparent;
+            border-color: transparent var(--gray-10-color) transparent transparent;
             border-width: 10px;
         }
 
@@ -69,7 +71,7 @@
             height: 0;
             border-style: solid;
             top: 6px;
-            border-color: transparent #e1e1e1 transparent transparent;
+            border-color: transparent var(--gray-9-color) transparent transparent;
             border-width: 11px;
         }
 
@@ -87,7 +89,7 @@
         .issue-header {
             padding: 6px 10px;
             border-bottom: 1px solid #cccccc73;
-            background-color: #e0e0e094 !important;
+            background-color: var(--gray-10-color) !important;
 
             p {
                 margin-bottom: 0px !important;
@@ -105,7 +107,7 @@
 
     .button-padding {
         padding: 7px 10px 7px 0px;
-        background-color: $gray-6;
+        background-color: var(--gray-10-color);
     }
 
     .space-line {
@@ -125,7 +127,7 @@
     .app-raised-button {
         font-size: 13px;
         border-radius: 4px;
-        border: 1px solid #ddd;
+        border: 1px solid var(--gray-9-color);
         line-height: 15px;
     }
 
@@ -154,31 +156,37 @@
         }
 
         .editor-statusbar {
-            color: #2c3e50;
-            background-color: $gray-6;
-            border-bottom: 1px solid $gray-9;
-            border-left: 1px solid $gray-9;
-            border-right: 1px solid $gray-9;
+            color: var(--gray-1-color) !important;
+            background-color: var(--gray-10-color);
+            border-bottom: 1px solid var(--gray-9-color);
+            border-left: 1px solid var(--gray-9-color);
+            border-right: 1px solid var(--gray-9-color);
         }
 
         .CodeMirror {
             font-family: $family-roboto;
             letter-spacing: 0.4px;
-            background-color: #fbfbfb;
+            color: var(--gray-1-color);
+            background-color: var(--secondary-color);
             border-bottom-left-radius: 0px;
             border-bottom-right-radius: 0px;
-
-            &:hover {
-                background-color: $white;
-            }
+            border: 1px solid var(--gray-9-color);
         }
 
         .editor-toolbar {
             opacity: 1;
-            background-color: $gray-6;
-            border-top: 1px solid $gray-9;
-            border-left: 1px solid $gray-9;
-            border-right: 1px solid $gray-9;
+            background-color: var(--gray-10-color);
+            border-top: 1px solid var(--gray-9-color);
+            border-left: 1px solid var(--gray-9-color);
+            border-right: 1px solid var(--gray-9-color);
+
+            a {
+                color: var(--gray-1-color) !important;
+
+                &:hover {
+                    background-color: var(--custom-secondary-color);
+                }
+            }
 
             &::after {
                 margin-top: 3px;
@@ -191,11 +199,11 @@
     }
 
     .open-status {
-        background: $color-info;
+        background: var(--info-color);
         padding: 6px 10px;
         border-radius: 14px;
         margin-right: 6px;
-        color: #fff;
+        color: var(--secondary-1-color);
 
         &:hover {
             text-decoration: none;
@@ -207,7 +215,7 @@
     }
 
     .closed-status {
-        background: #828282;
+        background: #828288;
         padding: 6px 10px;
         border-radius: 14px;
         margin-right: 6px;
