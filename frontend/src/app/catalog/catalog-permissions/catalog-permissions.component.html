@@ -31,7 +31,7 @@
     </div>
 
     <!-- Package without thumbnail -->
-    <table mat-table [dataSource]="users" *ngIf="users.length > 0" class="gray-table">
+    <table mat-table [dataSource]="users" *ngIf="users.length > 0" class="gray-table" aria-labelledby="permissions">
         <ng-container matColumnDef="name">
             <th mat-header-cell *matHeaderCellDef scope="col">Name</th>
             <td class="table-content" mat-cell *matCellDef="let user">
