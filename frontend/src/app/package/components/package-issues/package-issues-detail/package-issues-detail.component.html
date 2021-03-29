@@ -1,6 +1,6 @@
 <div class="col-md-9 p-0" id="packageIssuseDetail">
     <div class="container p-0 mb-3" id="packageIssues" *ngIf="state === State.SUCCESS; else issueLoadingTemplate">
-        <div class="d-flex bd-highlight mb-4">
+        <div class="d-flex bd-highlight mb-4 d-block-mobile">
             <div class="mr-auto bd-highlight">
                 <div class="package-details-title mb-2">{{ packageIssue.subject }}</div>
                 <p class="package-light-gray">
@@ -83,7 +83,7 @@
                     </div>
                 </div>
             </div>
-            <div class="pl-5" *ngFor="let comment of packageIssueComments; let i = index">
+            <div class="pl-5 no-p-mobile" *ngFor="let comment of packageIssueComments; let i = index">
                 <div class="space-line"></div>
                 <div class="d-flex flex-row bd-highlight">
                     <div class="px-2 bd-highlight">
