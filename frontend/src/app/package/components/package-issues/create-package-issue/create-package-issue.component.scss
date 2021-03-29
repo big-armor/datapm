@@ -78,5 +78,9 @@
         .app-outlined-button {
             width: 50%;
         }
+        ::ng-deep .CodeMirror {
+            max-height: 150px;
+            height: unset;
+        }
     }
 }
