@@ -173,23 +173,46 @@
 
 @media (max-width: 576px) {
     #packageIssues {
+        .closed-status {
+            padding: 4px 4px;
+            margin-right: 2px;
+            font-size: $xsmall-font;
+        }
+        .open-status {
+            padding: 4px 8px;
+            margin-right: 2px;
+            font-size: $xsmall-font;
+        }
+        .package-light-gray {
+            overflow: hidden;
+            line-height: 14px;
+            text-overflow: ellipsis;
+            font-size: $xsmall-font;
+        }
         .main-wrapper {
             .issue-wrapper {
                 padding: 6px 6px;
+                line-height: 18px;
+                .package-details-title {
+                    font-size: ($text-font - 2);
+                }
+            }
+            .issue-header {
+                padding: 8px 6px;
                 .issue-tab {
                     font-size: $small-font;
-                    margin-right: 2px;
+                    margin-right: 4px;
                 }
                 .right-tab {
-                    margin-top: 3px;
+                    margin-top: 0px;
                     font-size: ($small-font - 1);
                 }
             }
         }
         ::ng-deep {
             .mat-checkbox-inner-container {
-                height: 12px;
-                width: 12px;
+                height: 11px;
+                width: 11px;
                 margin: 6px 6px 0px 0px;
             }
         }

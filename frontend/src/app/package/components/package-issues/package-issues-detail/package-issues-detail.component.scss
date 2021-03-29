@@ -203,7 +203,7 @@
         padding: 6px 10px;
         border-radius: 14px;
         margin-right: 6px;
-        color: var(--secondary-1-color);
+        color: $secondary-color;
 
         &:hover {
             text-decoration: none;
@@ -219,7 +219,7 @@
         padding: 6px 10px;
         border-radius: 14px;
         margin-right: 6px;
-        color: #fff;
+        color: $secondary-color;
 
         &:hover {
             text-decoration: none;
@@ -229,8 +229,34 @@
             margin-right: 3px;
         }
     }
+
+    .d-block-mobile {
+        display: flex !important;
+    }
 }
 
 #issueBtn {
     height: 38px !important;
+}
+
+@media (max-width: 576px) {
+    #packageIssuseDetail {
+        .comment-section {
+            margin-left: 0px;
+        }
+        .d-block-mobile {
+            display: block !important;
+        }
+        .app-outlined-button {
+            padding: 7px 10px;
+            margin-top: 16px;
+        }
+        .no-p-mobile {
+            padding-left: 0px !important;
+        }
+        .app-raised-button {
+            width: unset;
+            padding: 7px 15px;
+        }
+    }
 }
