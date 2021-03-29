@@ -62,7 +62,9 @@
         "typescript": "^4.0.5",
         "why-is-node-running": "^2.2.0"
     },
-    "dependencies": {},
+    "dependencies": {
+        "through2": "^4.0.2"
+    },
     "husky": {
         "hooks": {
             "pre-commit": "pretty-quick --staged"
