@@ -27,7 +27,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: node_modules
-                  key: datampm-registry-${{ runner.OS }}-root-${{ hashFiles('package.json') }}
+                  key: datampm-registry-${{ runner.OS }}-root-${{ hashFiles('package.json', 'package-lock.json') }}
 
             - name: Install Dependencies
               if: steps.cache-root-node-modules.outputs.cache-hit != 'true'
