@@ -284,12 +284,12 @@ mat-select {
 
 .app-raised-button {
     outline: none !important;
-    border-radius: 6px;
+    border-radius: 4px;
     border: 1px solid var(--tranparent-border);
     font-family: $family-roboto;
     font-style: $style-normal;
     font-weight: $weight-400;
-    font-size: $text-font;
+    font-size: ($text-font - 1);
     align-items: center;
     text-align: center;
     padding: 8px 15px;
@@ -311,6 +311,11 @@ mat-select {
         pointer-events: none;
         opacity: 0.6;
     }
+}
+
+.app-raised-button.follow {
+    padding: 6px 14px;
+    line-height: 13px;
 }
 
 .raised {
@@ -353,7 +358,7 @@ mat-select {
     font-weight: $weight-400;
     font-size: ($text-font - 1);
     background: var(--custom-secondary-color);
-    line-height: 13px;
+    line-height: 14px;
     color: var(--info-color);
     border: 1px solid var(--gray-9-color);
     padding: 6px 15px;
