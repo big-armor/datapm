@@ -240,12 +240,12 @@ table.gray-table {
 mat-select {
     background-color: var(--custom-secondary-color);
     padding: 10px 16px;
-    letter-spacing: 0.7px;
+    letter-spacing: 0.4px;
     font-family: $family-roboto;
 
     &::placeholder {
         font-family: $family-roboto;
-        letter-spacing: 0.7px;
+        letter-spacing: 0.4px;
         font-weight: $weight-300 !important;
         font-size: $text-font;
     }
@@ -313,8 +313,13 @@ mat-select {
     }
 }
 
-.app-raised-button.follow {
-    padding: 6px 14px;
+.app-raised-button.follow-btn {
+    padding: 6px 16px;
+    line-height: 13px;
+}
+
+.app-outlined-button.follow-btn {
+    padding: 7px 10px;
     line-height: 13px;
 }
 
@@ -456,7 +461,7 @@ mat-select {
 }
 
 .mat-option {
-    letter-spacing: 0.5px;
+    letter-spacing: 0.4px;
     font-family: $family-roboto;
     font-style: $style-normal;
     font-size: $text-font;

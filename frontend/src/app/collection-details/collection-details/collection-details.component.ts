@@ -4,6 +4,7 @@ import { ActivatedRoute, NavigationExtras, ParamMap, Router } from "@angular/rou
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { PageState } from "src/app/models/page-state";
+import { FollowDialogComponent } from "src/app/shared/dialogs/follow-dialog/follow-dialog.component";
 import { ShareDialogComponent } from "src/app/shared/dialogs/share-dialog/share-dialog.component";
 import { EditCollectionComponent } from "src/app/shared/edit-collection/edit-collection.component";
 import {
@@ -63,6 +64,12 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
     ngOnDestroy() {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
+    }
+
+    public createFollow() {
+        const dlgRef = this.dialog.open(FollowDialogComponent, {
+            width: "500px"
+        });
     }
 
     public sharePackage() {

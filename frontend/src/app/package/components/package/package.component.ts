@@ -12,6 +12,7 @@ import { AuthenticationService } from "src/app/services/authentication.service";
 import { AddPackageComponent } from "src/app/collection-details/add-package/add-package.component";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import { packageToIdentifier } from "src/app/helpers/IdentifierHelper";
+import { FollowDialogComponent } from "src/app/shared/dialogs/follow-dialog/follow-dialog.component";
 
 enum State {
     LOADING,
@@ -208,6 +209,12 @@ export class PackageComponent implements OnDestroy {
     derivedFromCount(packageFile: PackageFile) {
         if (packageFile == null) return 0;
         return packageFile.schemas.reduce((count, schema) => count + (schema.derivedFrom?.length || 0), 0);
+    }
+
+    public createFollow() {
+        const dlgRef = this.dialog.open(FollowDialogComponent, {
+            width: "500px"
+        });
     }
 
     public copyCommand() {

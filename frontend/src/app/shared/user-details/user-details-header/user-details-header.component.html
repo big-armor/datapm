@@ -20,7 +20,12 @@
                 </div>
             </div>
             <div class="p-2 ml-auto d-flex align-items-center">
-                <button class="app-raised-button follow"><em class="fas fa-bell mr-1"></em> Follow</button>
+                <button class="app-raised-button follow-btn" (click)="createFollow()">
+                    <em class="fas fa-bell mr-1"></em> Follow
+                </button>
+                <button class="app-outlined-button follow-btn" *ngIf="follow">
+                    <em class="fas fa-bell-slash"></em> Unfollow
+                </button>
             </div>
         </div>
         <div class="px-3 pt-1">

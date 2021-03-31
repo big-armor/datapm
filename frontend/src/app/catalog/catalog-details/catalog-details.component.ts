@@ -8,6 +8,7 @@ import { DialogService } from "../../services/dialog/dialog.service";
 import { DeletePackageComponent } from "../../shared/delete-package/delete-package.component";
 import { takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";
+import { FollowDialogComponent } from "src/app/shared/dialogs/follow-dialog/follow-dialog.component";
 
 @Component({
     selector: "app-catalog-details",
@@ -38,6 +39,12 @@ export class CatalogDetailsComponent implements OnInit {
                 this.currentTab = index;
                 this.updateTabParam();
             }
+        });
+    }
+
+    public createFollow() {
+        const dlgRef = this.dialog.open(FollowDialogComponent, {
+            width: "500px"
         });
     }
 

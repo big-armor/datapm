@@ -62,6 +62,7 @@ import { MarkdownEditorComponent } from "./markdown-editor/markdown-editor.compo
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { ShareDialogComponent } from "./dialogs/share-dialog/share-dialog.component";
 import { AngularSimplemdeModule } from "angular-simplemde";
+import { FollowDialogComponent } from "./dialogs/follow-dialog/follow-dialog.component";
 
 @NgModule({
     declarations: [
@@ -105,7 +106,8 @@ import { AngularSimplemdeModule } from "angular-simplemde";
         PackageAndCollectionComponent,
         CollectionsHorizontalListComponent,
         MarkdownEditorComponent,
-        ShareDialogComponent
+        ShareDialogComponent,
+        FollowDialogComponent
     ],
     imports: [
         CommonModule,

@@ -1,7 +1,9 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { Subscription } from "rxjs";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { User } from "src/generated/graphql";
+import { FollowDialogComponent } from "../../dialogs/follow-dialog/follow-dialog.component";
 
 @Component({
     selector: "app-user-details-header",
@@ -13,7 +15,7 @@ export class UserDetailsHeaderComponent implements OnInit {
     private currentUser: User;
     private subscription: Subscription;
 
-    constructor(private authService: AuthenticationService) {
+    constructor(private authService: AuthenticationService, public dialog: MatDialog) {
         this.subscription = this.authService.currentUser.subscribe((user: User) => {
             this.currentUser = user;
         });
@@ -27,5 +29,11 @@ export class UserDetailsHeaderComponent implements OnInit {
 
     public get isCurrentUser() {
         return this.user && this.currentUser?.username === this.user.username;
+    }
+
+    public createFollow() {
+        const dlgRef = this.dialog.open(FollowDialogComponent, {
+            width: "500px"
+        });
     }
 }
