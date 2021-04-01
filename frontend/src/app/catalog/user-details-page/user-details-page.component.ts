@@ -35,7 +35,8 @@ export class UserDetailsPageComponent implements OnInit {
                 { name: "my account", value: "" },
                 { name: "packages", value: "packages" },
                 { name: "collections", value: "collections" },
-                { name: "catalogs", value: "catalogs" }
+                { name: "catalogs", value: "catalogs" },
+                { name: "following", value: "userFollowing" }
             ];
         } else {
             this.tabs = [
@@ -91,5 +92,7 @@ export class UserDetailsPageComponent implements OnInit {
         if (tab !== "") extras.fragment = tab;
 
         this.router.navigate(["."], extras);
+
+        console.log("selected tab" + this.selectedTab);
     }
 }

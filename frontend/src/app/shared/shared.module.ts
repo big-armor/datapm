@@ -63,6 +63,7 @@ import { MatTooltipModule } from "@angular/material/tooltip";
 import { ShareDialogComponent } from "./dialogs/share-dialog/share-dialog.component";
 import { AngularSimplemdeModule } from "angular-simplemde";
 import { FollowDialogComponent } from "./dialogs/follow-dialog/follow-dialog.component";
+import { UserFollowingComponent } from "./user-details/user-following/user-following.component";
 
 @NgModule({
     declarations: [
@@ -107,7 +108,8 @@ import { FollowDialogComponent } from "./dialogs/follow-dialog/follow-dialog.com
         CollectionsHorizontalListComponent,
         MarkdownEditorComponent,
         ShareDialogComponent,
-        FollowDialogComponent
+        FollowDialogComponent,
+        UserFollowingComponent
     ],
     imports: [
         CommonModule,
@@ -167,7 +169,9 @@ import { FollowDialogComponent } from "./dialogs/follow-dialog/follow-dialog.com
         FancyConfirmationDialogComponent,
         UserInviteInputComponent,
         PackageAndCollectionComponent,
-        MarkdownEditorComponent
+        MarkdownEditorComponent,
+        FollowDialogComponent,
+        UserFollowingComponent
     ],
     providers: [TimeAgoPipe, { provide: MAT_DIALOG_DATA, useValue: {} }]
 })
