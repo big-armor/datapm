@@ -52,7 +52,8 @@ import {
     collectionUpdatedAt,
     getLatestCollections,
     getMyRecentlyViewedPackages,
-    collectionSlugAvailable
+    collectionSlugAvailable,
+    getPackageCollections
 } from "./resolvers/CollectionResolver";
 import {
     createVersion,
@@ -498,6 +499,7 @@ export const resolvers: {
         package: findPackage,
         packageVersionsDiff: packageVersionsDiff,
         packageVersionsDiffs: packageVersionsDiffs,
+        packageCollections: getPackageCollections,
         packageIssue: getPackageIssue,
         packageIssues: getIssuesByPackage,
         packageIssueComments: getCommentsByByPackageIssue,

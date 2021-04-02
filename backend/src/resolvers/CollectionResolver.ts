@@ -11,7 +11,8 @@ import {
     Collection,
     ActivityLogEventType,
     ActivityLogChangeType,
-    ActivityLogResult
+    ActivityLogResult,
+    CollectionBasicData
 } from "../generated/graphql";
 import { CollectionPackageRepository } from "../repository/CollectionPackageRepository";
 import { CollectionRepository } from "../repository/CollectionRepository";
@@ -36,6 +37,18 @@ export const collectionEntityToGraphQL = (collectionEntity: CollectionEntity): C
         identifier: {
             collectionSlug: collectionEntity.collectionSlug
         }
+    };
+};
+
+export const collectionEntityToGraphQLWithNameAndDescription = (
+    collectionEntity: CollectionEntity
+): CollectionBasicData => {
+    return {
+        identifier: {
+            collectionSlug: collectionEntity.collectionSlug
+        },
+        name: collectionEntity.name,
+        description: collectionEntity.description
     };
 };
 
@@ -355,6 +368,27 @@ export const findCollectionBySlug = async (
             }
         };
     });
+};
+
+export const getPackageCollections = async (
+    _0: any,
+    { packageIdentifier, limit, offset }: { packageIdentifier: PackageIdentifierInput; limit: number; offset: number },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const relations = getGraphQlRelationName(info);
+    const packageEntity = await context.connection.manager
+        .getCustomRepository(PackageRepository)
+        .findOrFail({ identifier: packageIdentifier });
+    const [collections, count] = await context.connection.manager
+        .getCustomRepository(CollectionPackageRepository)
+        .packageCollections(context.me.id, packageEntity.id, limit, offset, relations);
+
+    return {
+        hasMore: count - (offset + limit) > 0,
+        collections: collections.map((c) => collectionEntityToGraphQLWithNameAndDescription(c)),
+        count
+    };
 };
 
 export const searchCollections = async (

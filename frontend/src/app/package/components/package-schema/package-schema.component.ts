@@ -1,10 +1,7 @@
-import { Component, TemplateRef, ViewChild } from "@angular/core";
+import { Component, Input, OnChanges, OnDestroy } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { PackageFile, Schema, ValueTypes, ValueTypeStatistics } from "datapm-lib";
+import { Schema, ValueTypeStatistics } from "datapm-lib";
 import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
-import { Package } from "src/generated/graphql";
-import { PackageService, PackageResponse } from "../../services/package.service";
 import { SamplesFullScreenDialog } from "../package-samples/samples-fullscreen-dialog.component";
 
 @Component({
@@ -12,36 +9,50 @@ import { SamplesFullScreenDialog } from "../package-samples/samples-fullscreen-d
     templateUrl: "./package-schema.component.html",
     styleUrls: ["./package-schema.component.scss"]
 })
-export class PackageSchemaComponent {
-    public package: Package;
-    public packageFile: PackageFile;
+export class PackageSchemaComponent implements OnDestroy, OnChanges {
+    private readonly MAX_PROPERTIES_TO_SHOW_INITIALLY = 2; // TODO: CHANGE THIS TO 5
+
+    @Input()
+    public schema: Schema;
+
+    public propertiesToShowCount = this.MAX_PROPERTIES_TO_SHOW_INITIALLY;
+
+    public shouldShowMorePropertiesButton: boolean = false;
+    public isShowingMorePropertiesText: boolean = false;
+
     private unsubscribe$ = new Subject();
 
-    constructor(private packageService: PackageService, private dialog: MatDialog) {
-        this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe((p: PackageResponse) => {
-            if (p == null || p.package == null) return;
-            this.package = p.package;
-            if (this.package && this.package.latestVersion) {
-                this.packageFile = JSON.parse(this.package.latestVersion.packageFile);
-            }
-        });
+    constructor(private dialog: MatDialog) {}
+
+    public ngOnChanges(): void {
+        console.log(this.schemaPropertiesLength(this.schema));
+        this.shouldShowMorePropertiesButton =
+            this.schemaPropertiesLength(this.schema) > this.MAX_PROPERTIES_TO_SHOW_INITIALLY;
+        console.log(this.shouldShowMorePropertiesButton);
     }
 
-    getPropertyTypes(property: Schema) {
-        const keys = Object.keys(property.valueTypes).sort();
-        return keys.join(",");
+    public toggleShowMoreProperties(): void {
+        this.isShowingMorePropertiesText = !this.isShowingMorePropertiesText;
+        this.propertiesToShowCount = this.isShowingMorePropertiesText
+            ? this.schemaPropertiesLength(this.schema)
+            : this.MAX_PROPERTIES_TO_SHOW_INITIALLY;
     }
 
-    ngOnDestroy(): void {
+    public ngOnDestroy(): void {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
     }
 
-    schemaPropertiesLength(schema: Schema) {
+    public getPropertyTypes(property: Schema): string {
+        const keys = Object.keys(property.valueTypes).sort();
+        return keys.join(",");
+    }
+
+    public schemaPropertiesLength(schema: Schema): number {
         return Object.keys(schema.properties).length;
     }
 
-    showSamplesFullscreen(schema: Schema) {
+    public showSamplesFullscreen(schema: Schema): void {
         this.dialog.open(SamplesFullScreenDialog, {
             width: "95vw",
             height: "95vh",
@@ -53,7 +64,7 @@ export class PackageSchemaComponent {
         });
     }
 
-    stringOptions(valueTypes: ValueTypeStatistics): { name: string; value: number }[] {
+    public stringOptions(valueTypes: ValueTypeStatistics): { name: string; value: number }[] {
         return Object.keys(valueTypes)
             .map((v) => {
                 return {
