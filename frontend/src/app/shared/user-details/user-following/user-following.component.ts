@@ -8,9 +8,7 @@ export interface PeriodicElement {
 
 const ELEMENT_DATA: PeriodicElement[] = [
     { position: 1, name: "Hydrogen", weight: 1.0079 },
-    { position: 2, name: "Helium", weight: 1.0079 },
-    { position: 3, name: "Lithium", weight: 1.0079 },
-    { position: 4, name: "Beryllium", weight: 1.0079 }
+    { position: 2, name: "Helium", weight: 1.0079 }
 ];
 
 @Component({
