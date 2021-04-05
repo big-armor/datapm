@@ -85,7 +85,7 @@ body {
         margin-top: 15px;
     }
     .navigationSlider .slidingNav ul {
-        background-color: var(--gray-3-color);
+        background-color: var(--gray-4-color);
     }
     .navigationSlider .slidingNav ul li > a:hover,
     .navigationSlider .slidingNav ul li > a:active,
