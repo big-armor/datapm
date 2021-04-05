@@ -9,7 +9,6 @@ import { filter, takeUntil } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
 import { LoginDialogComponent } from "src/app/shared/header/login-dialog/login-dialog.component";
 import { AuthenticationService } from "src/app/services/authentication.service";
-import { AddPackageComponent } from "src/app/collection-details/add-package/add-package.component";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import { packageToIdentifier } from "src/app/helpers/IdentifierHelper";
 
@@ -40,8 +39,6 @@ export class PackageComponent implements OnDestroy {
     public routes = [
         { linkName: "description", url: "", showDetails: true },
         { linkName: "issues", url: "issues", showDetails: true },
-        { linkName: "preview", url: "preview", showDetails: true },
-        { linkName: "schema", url: "schema", showDetails: true },
         { linkName: "history", url: "history", showDetails: true }
     ];
 

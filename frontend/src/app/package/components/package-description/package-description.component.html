@@ -15,34 +15,9 @@
     </p>
 </div>
 
-<div *ngIf="package.description" class="pb-4">
+<div *ngIf="packageFile?.readmeMarkdown" class="pb-4">
     <h3 class="mb-0">Read me</h3>
     <div [class.limitTextHeight]="shouldShowMoreReadMeButton && !isShowingMoreReadMeText">
-        <markdown [data]="package.description"></markdown>
-    </div>
-    <div class="fade-out" [class.d-none]="!shouldShowMoreReadMeButton || isShowingMoreReadMeText"></div>
-    <p class="text-center mt-3" *ngIf="shouldShowMoreReadMeButton">
-        <a class="app-outlined-button" (click)="toggleShowMoreReadMeText()">
-            {{ isShowingMoreReadMeText ? "Show Less" : "Show More" }}
-        </a>
-    </p>
-</div>
-
-<div *ngIf="package.description" class="pb-4">
-    <h3 class="mb-0">License</h3>
-    <div [class.limitTextHeight]="shouldShowMoreLicenseButton && !isShowingMoreLicenseText">
-        <markdown [data]="package.description"></markdown>
-    </div>
-    <div class="fade-out" [class.d-none]="!shouldShowMoreLicenseButton || isShowingMoreLicenseText"></div>
-    <p class="text-center mt-3" *ngIf="shouldShowMoreLicenseButton">
-        <a class="app-outlined-button" (click)="toggleShowMoreLicenseText()">
-            {{ isShowingMoreLicenseText ? "Show Less" : "Show More" }}
-        </a>
-    </p>
-</div>
-
-<!-- <div *ngIf="packageFile?.readmeMarkdown" class="pb-4">
-    <div [class.limitTextHeight]="!isShowingMoreReadMeText">
         <markdown [data]="packageFile?.readmeMarkdown"></markdown>
     </div>
     <div class="fade-out" [class.d-none]="!shouldShowMoreReadMeButton || isShowingMoreReadMeText"></div>
@@ -54,7 +29,8 @@
 </div>
 
 <div *ngIf="packageFile?.licenseMarkdown" class="pb-4">
-    <div [class.limitTextHeight]="!isShowingMoreLicenseText">
+    <h3 class="mb-0">License</h3>
+    <div [class.limitTextHeight]="shouldShowMoreLicenseButton && !isShowingMoreLicenseText">
         <markdown [data]="packageFile?.licenseMarkdown"></markdown>
     </div>
     <div class="fade-out" [class.d-none]="!shouldShowMoreLicenseButton || isShowingMoreLicenseText"></div>
@@ -63,7 +39,7 @@
             {{ isShowingMoreLicenseText ? "Show Less" : "Show More" }}
         </a>
     </p>
-</div> -->
+</div>
 
 <div>
     <mat-select (selectionChange)="selectSchema($event.value)" [value]="selectedSchema">
