@@ -1,5 +1,5 @@
 <div class="schema" id="schema">
-    <div class="package-details-title">{{ schema.title }}</div>
+    <h3 class="mb-0">{{ schema.title }}</h3>
     <div class="schema-content">
         <div class="schema-text">
             {{ schema.description }}
@@ -120,11 +120,7 @@
                         </div>
                     </div>
                 </mat-expansion-panel>
-                <div
-                    class="fade-out"
-                    [class.d-none]="!shouldShowMorePropertiesButton || isShowingMorePropertiesText"
-                ></div>
-                <p class="text-center mt-2" *ngIf="shouldShowMorePropertiesButton">
+                <p class="text-center mt-3" *ngIf="shouldShowMorePropertiesButton">
                     <a class="app-outlined-button" (click)="toggleShowMoreProperties()">
                         {{ isShowingMorePropertiesText ? "Show Less" : "Show More" }}
                     </a>

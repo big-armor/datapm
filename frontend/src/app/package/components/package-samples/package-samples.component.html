@@ -8,7 +8,7 @@
     <ng-container *ngSwitchCase="'LOADED'">
         <div class="samples" *ngIf="schema">
             <div>
-                <div class="package-details-title">{{ schema.title }}</div>
+                <h3 class="mb-0">{{ schema.title }}</h3>
                 <div class="d-flex">
                     <div class="package-dark-gray">
                         {{ schema.sampleRecords?.length }} {{ schema.unit || "" }} sample records
