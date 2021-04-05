@@ -27,7 +27,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: node_modules
-                  key: datampm-registry-${{ runner.OS }}-root-${{ hashFiles('package.json') }}
+                  key: datampm-registry-${{ runner.OS }}-root-${{ hashFiles('package.json', 'package-lock.json') }}
 
             - name: Install Dependencies
               if: steps.cache-root-node-modules.outputs.cache-hit != 'true'
@@ -69,11 +69,11 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: lib/node_modules
-                  key: datampm-registry-${{ runner.OS }}-lib-node-modules-${{ hashFiles('lib/package.json') }}
+                  key: datampm-registry-${{ runner.OS }}-lib-node-modules-${{ hashFiles('lib/package.json', 'lib/package-lock.json') }}
 
             - name: Install Lib Dependencies
               id: install-lib-Dependencies
-              if: steps.cache-lib-all-files.outputs.cache-hit != 'true' && steps.cache-lib-node-modules.outputs.cache-hit != 'true'
+              if: steps.cache-lib-all-files.outputs.cache-hit != 'true' || steps.cache-lib-node-modules.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: lib
 
@@ -96,11 +96,11 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: backend/node_modules
-                  key: datampm-registry-${{ runner.OS }}-backend-node-modules-${{ hashFiles('backend/package.json') }}
+                  key: datampm-registry-${{ runner.OS }}-backend-node-modules-${{ hashFiles('backend/package.json', 'backend/package-lock.json') }}
 
             - name: Install Backend Dependencies
               id: install-backend-Dependencies
-              if: steps.cache-backend-all-files.outputs.cache-hit != 'true' && steps.cache-backend-node-modules.outputs.cache-hit != 'true'
+              if: steps.cache-backend-all-files.outputs.cache-hit != 'true' || steps.cache-backend-node-modules.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: backend
 
@@ -123,11 +123,11 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: frontend/node_modules
-                  key: datampm-registry-${{ runner.OS }}-frontend-node-modules-${{ hashFiles('frontend/package.json') }}
+                  key: datampm-registry-${{ runner.OS }}-frontend-node-modules-${{ hashFiles('frontend/package.json', 'frontend/package-lock.json') }}
 
             - name: Install Frontend Dependencies
               id: install-fronend-dependencies
-              if: steps.cache-frontend-all-files.outputs.cache-hit != 'true' && steps.cache-frontend-node-modules.outputs.cache-hit != 'true'
+              if: steps.cache-frontend-all-files.outputs.cache-hit != 'true' || steps.cache-frontend-node-modules.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: frontend
 
@@ -142,7 +142,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: docs/website/node_modules
-                  key: datampm-registry-${{ runner.OS }}-docs-${{ hashFiles('docs/website/package.json') }}
+                  key: datampm-registry-${{ runner.OS }}-docs-${{ hashFiles('docs/website/package.json', 'docs/website/package-lock.json') }}
 
             - name: Install Docs Dependencies
               id: install-docs-dependencies
