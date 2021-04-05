@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { UiStyleToggleService } from "src/app/services/ui-style-toggle.service";
+import { User } from "src/generated/graphql";
 
 @Component({
     selector: "sd-footer",
