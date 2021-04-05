@@ -1,9 +1,20 @@
 @import "../../../styles/variables";
+@import "../../../styles/colors";
 
 .footer-bg {
     padding: 40px 15px 40px 15px;
     width: 100%;
-    border-top: 1px solid $gray-5;
+    border-top: 1px solid var(--gray-5-color);
+
+    .darkmode-div {
+        cursor: pointer;
+        text-align: right;
+        align-self: flex-end;
+    }
+
+    .display-mobile {
+        display: none;
+    }
 
     .main-col-footer {
         padding: 0px 20px;
@@ -15,7 +26,7 @@
             font-size: $text-font;
             line-height: 18px;
             letter-spacing: 0.7px;
-            color: $gray-2;
+            color: var(--gray-2-color);
             margin-bottom: 8px;
         }
 
@@ -26,8 +37,10 @@
             font-size: $small-font;
             line-height: 13px;
             letter-spacing: 0.7px;
+            color: var(--gray-2-color);
+
             a {
-                color: $gray-2;
+                color: var(--gray-2-color);
             }
         }
     }
@@ -36,6 +49,21 @@
 @media (max-width: 992px) {
     .main-col-footer {
         margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-bg {
+        .darkmode-div {
+            text-align: left;
+            align-self: flex-start;
+            .display-desktop {
+                display: none;
+            }
+            .display-mobile {
+                display: inline !important;
+            }
+        }
     }
 }
 

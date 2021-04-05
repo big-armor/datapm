@@ -1,4 +1,5 @@
 @import "../../../../styles/variables";
+@import "../../../../styles/colors";
 
 .title {
     font-family: $family-roboto;
@@ -6,7 +7,7 @@
     font-size: ($title-font + 4);
     font-weight: $weight-400;
     margin-bottom: 15px;
-    color: $gray-1;
+    color: var(--gray-1-color);
     letter-spacing: 0.6px;
 }
 
@@ -36,7 +37,7 @@ markdown ::ng-deep {
         font-weight: $weight-400;
         font-size: ($text-font - 1);
         letter-spacing: 0.4px;
-        color: $gray-2;
+        color: var(--gray-2-color);
     }
 
     h1 {
@@ -45,7 +46,7 @@ markdown ::ng-deep {
         font-size: ($title-font + 2);
         font-weight: $weight-400;
         margin-bottom: 0px !important;
-        color: $gray-1;
+        color: var(--gray-1-color);
         letter-spacing: 0.6px;
     }
 }

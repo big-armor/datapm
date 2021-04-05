@@ -12,9 +12,9 @@
                 </div>
 
                 <div *ngIf="showConfirmationInputField">
-                    <div>
+                    <p>
                         Type <span class="slug">{{ confirmationInputFieldRequiredValue }}</span> here
-                    </div>
+                    </p>
 
                     <div class="one-line-input py-3">
                         <input matInput [(ngModel)]="confirmationInputFieldValue" autocomplete="off" />
@@ -24,7 +24,7 @@
 
             <div mat-dialog-actions class="d-flex justify-content-between mb-12">
                 <button class="d-none" cdkFocusInitial></button>
-                <button mat-button mat-dialog-close class="btn-close">{{ cancelButtonText }}</button>
+                <button mat-button mat-dialog-close class="btn-close close-dialog">{{ cancelButtonText }}</button>
                 <button mat-button class="btn-delete" (click)="confirm()" [disabled]="shouldDisableConfirmButton">
                     {{ confirmButtonText }}
                 </button>

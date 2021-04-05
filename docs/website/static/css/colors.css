@@ -1,0 +1,32 @@
+.theme-light {
+    --body-background: #f3f3f3;
+    --custom-light-color: #fff;
+    --gray-1-color: #333;
+    --gray-2-color: #4f4f4f;
+    --gray-3-color: #828282;
+    --lightgray-1-color: #f2f2f2;
+    --lightgray-2-color: #e0e0e0;
+    --info-color: #017fb9;
+    --danger-color: #e23326;
+    --box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+        0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+    --button-box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
+        0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
+    --custom-table-color: #e0e0e0;
+}
+
+.theme-dark {
+    --body-background: #202124;
+    --custom-light-color: #303033;
+    --gray-1-color: #cccdd1;
+    --gray-2-color: #bfc0c3f2;
+    --gray-3-color: #aaabaf;
+    --lightgray-1-color: #202124;
+    --lightgray-2-color: #5e5e60;
+    --info-color: #09a5e2;
+    --danger-color: #b51307;
+    --box-shadow: 0px 0 0px #2b2b2d, 0 0px 0px rgb(43 43 45), 0 1px 0px #5f6368, 0px 0 0px #5f6368;
+    --button-box-shadow: 0px 0px 2px rgb(83 87 90), 0px 0px 0px rgb(95 99 103), 0px 0px 0px rgb(95 99 103),
+        0px 0px 3px rgb(95 99 103);
+    --custom-table-color: #19191c;
+}

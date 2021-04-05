@@ -20,7 +20,6 @@ export function usernameValidator(
                 return;
             }
             usernameAvailableGQL.fetch({ username: control.value }).subscribe((result) => {
-                console.log("mali", result.errors);
                 if (result.errors?.length > 0) {
                     success({
                         [result.errors[0].message]: true

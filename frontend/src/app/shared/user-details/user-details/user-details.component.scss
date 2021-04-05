@@ -1,19 +1,8 @@
 @import "../../../../styles/variables";
+@import "../../../../styles/colors";
 
 #detailsPage {
     margin-top: 30px;
-
-    .no-keys-div {
-        font-family: $family-roboto-mono;
-        font-style: $style-normal;
-        font-weight: $weight-500;
-        font-size: $text-font;
-        line-height: 26px;
-        letter-spacing: -0.28px;
-        color: $gray-1;
-        padding: 24px;
-        padding-bottom: 0;
-    }
 
     .api-key-form {
         padding: 0px 24px 24px 0px;
@@ -24,25 +13,10 @@
             font-style: $style-normal;
             font-weight: $weight-400;
             padding-left: 2px;
-            font-size: $xsmall-font;
+            font-size: $small-font;
             line-height: 12px;
             margin-top: 5px;
-            color: $color-danger;
-        }
-    }
-
-    .command-container {
-        padding: 8px;
-        border-radius: 4px;
-        background-color: $white;
-
-        &:hover {
-            cursor: pointer;
-            background-color: $gray-9;
-        }
-
-        &:active {
-            background-color: $gray-8;
+            color: var(--danger-color);
         }
     }
 
@@ -64,7 +38,7 @@
             align-items: center;
 
             input {
-                border: 1px solid $gray-5;
+                border: 1px solid var(--gray-5-color);
                 line-height: 23px;
                 height: 33px;
                 display: flex;
@@ -73,6 +47,8 @@
                 font-size: $text-font;
                 align-items: flex-end;
                 letter-spacing: -0.28px;
+                color: var(--gray-1-color);
+                background-color: var(--custom-secondary-color);
 
                 &:focus {
                     outline: transparent solid 0px;
@@ -87,7 +63,7 @@
                     display: flex;
                     align-items: flex-end;
                     letter-spacing: -0.28px;
-                    color: $gray-4;
+                    color: var(--gray-5-color);
                 }
             }
         }
@@ -101,8 +77,4 @@
             width: 190px !important;
         }
     }
-}
-
-.disabled {
-    background-color: $gray-4;
 }

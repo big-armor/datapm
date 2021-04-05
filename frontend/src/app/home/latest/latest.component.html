@@ -11,14 +11,14 @@
                         (onLoadCollectionsClick)="updateCollectionFetchingQuery($event)"
                     >
                         <div packagesEmptyState class="empty-state-label pl-3">
-                            <p>
+                            <p class="package-dark-gray">
                                 Either no packages have been published to this registry, or you do not have access to
                                 any of the published packages
                             </p>
                             <a href="/docs/publish-data/" class="color-info pt-3">Learn how to publish packages</a>
                         </div>
-                        <div packagesErrorState class="empty-state-label">
-                            <p>
+                        <div packagesErrorState class="empty-state-label pl-3">
+                            <p class="package-dark-gray">
                                 Could not load the latest packages. Reload the page and if the issue persists please
                                 contact support.
                             </p>

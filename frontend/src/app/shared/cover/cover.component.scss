@@ -1,9 +1,10 @@
 @import "../../../styles/variables";
+@import "../../../styles/colors";
 
 .cover {
     height: 150px;
     position: relative;
-    background-color: #ddd;
+    background-color: var(--gray-9-color);
 }
 
 img {
@@ -29,14 +30,14 @@ img {
     transition: background-color 0.5s linear;
 
     &:hover {
-        background-color: rgba(#000, 0.45);
+        background-color: rgba($primary-color, 0.45);
     }
 
     mat-icon {
         font-size: 48px;
         width: 48px;
         height: 48px;
-        color: white;
+        color: $secondary-1-color;
     }
 }
 
@@ -49,7 +50,7 @@ img {
             font-size: 35px;
             width: 35px;
             height: 35px;
-            color: $white;
+            color: $secondary-color;
         }
     }
 }

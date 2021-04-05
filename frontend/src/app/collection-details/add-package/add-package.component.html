@@ -65,7 +65,7 @@
                     (optionSelected)="selectCollection($event.option.value)"
                     [displayWith]="displayCollection"
                 >
-                    <mat-option *ngFor="let collection of collections" [value]="collection" class="flat-input">
+                    <mat-option *ngFor="let collection of collections" [value]="collection">
                         {{ collection.name }} ({{ collection.identifier.collectionSlug }})
                     </mat-option>
                 </mat-autocomplete>

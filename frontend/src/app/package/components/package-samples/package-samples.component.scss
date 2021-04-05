@@ -1,4 +1,5 @@
 @import "../../../../styles/variables";
+@import "../../../../styles/colors";
 
 .samples {
     width: 100%;
@@ -12,6 +13,6 @@
 }
 
 a {
-    color: $color-info !important;
+    color: var(--info-color) !important;
     cursor: pointer;
 }

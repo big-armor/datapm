@@ -1,26 +1,31 @@
 @import "../../../../styles/variables";
+@import "../../../../styles/colors";
 
 #packageIssues {
     ::ng-deep {
         .mat-checkbox-checked.mat-accent {
             .mat-checkbox-background {
-                background-color: $color-info;
+                background-color: var(--info-color);
             }
         }
         .mat-checkbox-inner-container {
             height: 14px;
             width: 14px;
             margin: 6px 12px 0px 0px;
+
+            .mat-checkbox-frame {
+                border-color: var(--gray-3-color);
+            }
         }
     }
 
     .open-status {
-        background: $color-info;
+        background: var(--info-color);
         padding: 5px 9px;
         border-radius: 14px;
         margin-right: 12px;
         font-size: $small-font;
-        color: #fff;
+        color: var(--secondary-color);
         position: relative;
         top: 4px;
 
@@ -34,12 +39,12 @@
     }
 
     .closed-status {
-        background: #828282;
+        background: var(--gray-3-color);
         padding: 5px 6px;
         border-radius: 14px;
         margin-right: 12px;
         font-size: $small-font;
-        color: #fff;
+        color: var(--secondary-color);
         position: relative;
         top: 4px;
 
@@ -57,8 +62,17 @@
 
         .issue-header {
             padding: 10px 20px;
-            border: 1px solid $gray-5;
-            background: $gray-color-5;
+            border: 1px solid var(--gray-5-color);
+            background-color: var(--custom-table-color);
+
+            .package-details-title {
+                font-size: $default-font;
+
+                &:hover {
+                    text-decoration: none;
+                    color: var(--info-color);
+                }
+            }
 
             .issue-tab {
                 font-family: $family-roboto;
@@ -67,11 +81,11 @@
                 letter-spacing: 0.4px;
                 margin-right: 10px;
                 cursor: pointer;
-                color: $gray-3;
+                color: var(--gray-3-color);
 
                 &:hover {
                     text-decoration: none;
-                    color: $color-info;
+                    color: var(--info-color);
                 }
             }
 
@@ -80,19 +94,19 @@
                 font-weight: $weight-400;
                 letter-spacing: 0.4px;
                 cursor: pointer;
-                color: $gray-3;
+                color: var(--gray-3-color);
                 float: right;
                 margin-right: 3px;
                 margin-left: 10px;
                 font-size: ($text-font - 1);
 
                 &:hover {
-                    color: $gray-3;
+                    color: var(--gray-3-color);
                     text-decoration: none;
                 }
 
                 a {
-                    color: $gray-3;
+                    color: var(--gray-3-color);
 
                     &:hover {
                         text-decoration: none;
@@ -101,33 +115,36 @@
             }
 
             .clickable-text {
-                color: $color-info;
+                color: var(--info-color);
                 cursor: pointer;
             }
 
             .active {
-                color: $gray-1;
+                color: var(--gray-1-color);
             }
-        }
-
-        .oddRow {
-            background-color: $white;
         }
 
         .diff-bg {
-            background-color: #f5f5f5;
-            &:nth-child(2n) {
-                background-color: #f9f9f9;
-            }
+            background-color: var(--gray-11-color);
+
             &:hover {
-                background-color: #fff;
+                background-color: var(--custom-secondary-color);
                 transition: background-color 0.5s ease;
+            }
+
+            &:nth-child(2n) {
+                background-color: var(--gray-7-color);
+
+                &:hover {
+                    background-color: var(--custom-secondary-color);
+                    transition: background-color 0.5s ease;
+                }
             }
         }
 
         .issue-wrapper {
             padding: 10px 20px;
-            border: 1px solid $gray-5;
+            border: 1px solid var(--gray-5-color);
             border-top: none;
             cursor: pointer;
 
@@ -137,7 +154,7 @@
 
             .package-details-title {
                 font-size: ($default-font - 1);
-                color: $color-info;
+                color: var(--info-color);
 
                 &:hover {
                     text-decoration: none;
@@ -156,23 +173,46 @@
 
 @media (max-width: 576px) {
     #packageIssues {
+        .closed-status {
+            padding: 4px 4px;
+            margin-right: 2px;
+            font-size: $xsmall-font;
+        }
+        .open-status {
+            padding: 4px 8px;
+            margin-right: 2px;
+            font-size: $xsmall-font;
+        }
+        .package-light-gray {
+            overflow: hidden;
+            line-height: 14px;
+            text-overflow: ellipsis;
+            font-size: $xsmall-font;
+        }
         .main-wrapper {
             .issue-wrapper {
                 padding: 6px 6px;
+                line-height: 18px;
+                .package-details-title {
+                    font-size: ($text-font - 2);
+                }
+            }
+            .issue-header {
+                padding: 8px 6px;
                 .issue-tab {
                     font-size: $small-font;
-                    margin-right: 2px;
+                    margin-right: 4px;
                 }
                 .right-tab {
-                    margin-top: 3px;
+                    margin-top: 0px;
                     font-size: ($small-font - 1);
                 }
             }
         }
         ::ng-deep {
             .mat-checkbox-inner-container {
-                height: 12px;
-                width: 12px;
+                height: 11px;
+                width: 11px;
                 margin: 6px 6px 0px 0px;
             }
         }

@@ -1,26 +1,27 @@
 @import "../../../styles/variables";
+@import "../../../styles/colors";
 
 .collection-item {
     cursor: pointer;
-    box-shadow: $outer-shadow-1;
+    box-shadow: var(--outer-shadow-1);
 
     .collection-identifier {
-        font-family: $family-roboto-mono;
+        font-family: $family-roboto;
         font-weight: $weight-500;
         font-size: ($title-font + 2);
         line-height: 26px;
-        color: $gray-1;
-        letter-spacing: -0.28px;
+        color: var(--gray-1-color);
+        letter-spacing: 0.6px;
     }
 
     .collection-description {
-        font-family: $family-roboto-mono;
+        font-family: $family-roboto;
         font-style: $style-normal;
         font-weight: $weight-300;
         font-size: $text-font;
         line-height: 18px;
-        letter-spacing: -0.28px;
-        color: $gray-2;
+        letter-spacing: 0.6px;
+        color: var(--gray-2-color);
         max-height: 111px;
         overflow: hidden;
     }
@@ -37,29 +38,29 @@
             vertical-align: middle;
             margin-bottom: 10px;
             margin-left: 5px;
-            font-family: $family-roboto-mono;
+            font-family: $family-roboto;
             font-style: $style-normal;
             font-weight: $weight-400;
             font-size: $xsmall-font;
             line-height: 13px;
-            letter-spacing: -0.28px;
+            letter-spacing: 0.6px;
 
             .public-text {
-                color: $color-1;
+                color: var(--gray-1-color);
             }
             .not-public-text {
-                color: $gray-3;
+                color: var(--gray-3-color);
             }
         }
 
         .name {
-            font-family: $family-roboto-mono;
+            font-family: $family-roboto;
             font-style: $style-normal;
-            letter-spacing: -0.28px;
+            letter-spacing: 0.6px;
             font-weight: $weight-300;
             font-size: $text-font;
             line-height: 18px;
-            color: $gray-3;
+            color: var(--gray-3-color);
             padding: 4px 10px;
             margin-bottom: 0 !important;
         }
@@ -73,20 +74,20 @@
 
     .collection-actions {
         .edit-button {
-            font-family: $family-roboto-mono;
+            font-family: $family-roboto;
             font-style: $style-normal;
             font-weight: $weight-400;
             font-size: $small-font;
             line-height: 13px;
-            letter-spacing: -0.28px;
-            color: $color-info;
-            border: 1px solid $gray-9;
+            letter-spacing: 0.6px;
+            color: var(--info-color);
+            border: 1px solid var(--gray-9-color);
             padding: 3px 15px;
             border-radius: 4px;
             cursor: pointer;
             &:hover {
                 text-decoration: none;
-                background-color: $gray-9;
+                background-color: var(--gray-9-color);
             }
         }
     }

@@ -1,4 +1,5 @@
 @import "../../../../styles/variables";
+@import "../../../../styles/colors";
 
 .dialog-wrapper-account {
     .dialog-description {
@@ -9,7 +10,7 @@
         text-align: center;
         line-height: 18px;
         letter-spacing: 0.4px;
-        color: $gray-3;
+        color: var(--gray-3-color);
         margin-bottom: 30px;
     }
 
@@ -21,7 +22,7 @@
         letter-spacing: 0.4px;
         align-items: center;
         text-align: left;
-        color: $color-danger;
+        color: var(--danger-color);
         max-width: 347px;
         position: relative;
         line-height: 14px;
@@ -31,9 +32,9 @@
         margin-top: 10px;
         a {
             font-size: $text-font;
-            color: $color-info;
+            color: var(--info-color);
             :hover {
-                color: $color-info;
+                color: var(--info-color);
             }
         }
     }
@@ -43,11 +44,7 @@
     }
 
     ::ng-deep .mat-spinner circle {
-        stroke: $white !important;
-    }
-
-    .mat-spinner {
-        stroke: $gray-3;
+        stroke: $secondary-color !important;
     }
 }
 

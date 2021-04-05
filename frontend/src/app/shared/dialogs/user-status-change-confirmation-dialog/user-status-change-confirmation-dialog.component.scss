@@ -1,8 +1,9 @@
 @import "./src/styles/variables.scss";
+@import "../../../../styles/colors.scss";
 
 #changeStatus {
     #username-label {
-        color: $color-info;
+        color: var(--info-color);
     }
 
     ::ng-deep.mat-select {
@@ -15,7 +16,7 @@
         ::ng-deep input.mat-input-element {
             border: none;
             width: unset;
-            border-bottom: 2px solid $color-info;
+            border-bottom: 2px solid var(--info-color);
             background: transparent;
             outline: transparent solid 1px;
         }

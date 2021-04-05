@@ -1,8 +1,9 @@
 @import "../../../../styles/variables";
+@import "../../../../styles/colors";
 
 #packageInfo {
     .share-data {
-        border-bottom: 1px solid #bdbdbd54;
+        border-bottom: 1px solid var(--gray-9-color);
 
         .three-btn-div {
             justify-content: flex-end;
@@ -14,7 +15,7 @@
             box-shadow: none;
             line-height: 13px;
             padding: 6px 10px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--gray-9-color);
         }
     }
 
@@ -22,35 +23,7 @@
         font-size: $small-font;
         cursor: pointer;
         line-height: 18px;
-    }
-
-    .rounded-div {
-        box-shadow: $inner-shadow-1;
-        background-color: $white;
-        border-radius: 24px;
-        padding: 8px 15px;
-        color: $black;
-        cursor: pointer;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-
-        &:hover {
-            background-color: $gray-10;
-        }
-        &:active {
-            background-color: $gray-9;
-        }
-
-        .install-txt {
-            font-family: $family-roboto-mono;
-            font-style: $style-normal;
-            font-weight: $weight-400;
-            font-size: $text-font;
-            line-height: 18px;
-            letter-spacing: -0.28px;
-            color: $gray-1;
-        }
+        color: var(--info-color);
     }
 }
 

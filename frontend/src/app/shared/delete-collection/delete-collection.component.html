@@ -11,16 +11,18 @@
                 </div>
 
                 <div>
-                    Type <span class="slug">{{ data.collectionSlug }}</span> here
+                    <p>
+                        Type <span class="slug">{{ data.collectionSlug }}</span> here
+                    </p>
                 </div>
 
-                <div class="oneline-input py-3">
+                <div class="oneline-input pb-3 pt-2">
                     <input matInput [(ngModel)]="confirmVal" autocomplete="off" />
                 </div>
             </div>
 
             <div mat-dialog-actions class="d-flex justify-content-between mb-12">
-                <button mat-button mat-dialog-close class="btn-close">Cancel</button>
+                <button mat-button mat-dialog-close class="btn-close close-dialog">Cancel</button>
                 <button
                     mat-button
                     class="btn-delete"
