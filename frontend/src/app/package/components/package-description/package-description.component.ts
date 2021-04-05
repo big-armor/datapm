@@ -59,7 +59,9 @@ export class PackageDescriptionComponent {
                 this.packageFile.licenseMarkdown?.length > this.SHOW_MORE_CHARACTER_LIMIT;
 
             this.initializeSch();
-            this.selectedSchema = this.schemas[0];
+            if (this.schemas.length) {
+                this.selectedSchema = this.schemas[0];
+            }
         });
     }
 
