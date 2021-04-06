@@ -3,6 +3,7 @@ const { series, src, dest, parallel } = require("gulp");
 const spawn = require("child_process").spawn;
 const fs = require("fs");
 const through = require("through2");
+const merge = require("merge-stream");
 
 const path = require("path");
 
@@ -151,7 +152,7 @@ function listUtilDirectory() {
 }
 
 function listDistUtilDirectory() {
-    return src(path.join(__dirname, "dist", "backend", "dist", "util", "*")).pipe(
+    return src(path.join(DESTINATION_DIR, "backend", "dist", "util", "*")).pipe(
         through.obj(function (file, _enc, cb) {
             console.log(file.path);
             cb(null);
@@ -185,22 +186,20 @@ function showGitDiff() {
  * context is the "dist" directory in the root project folder.
  */
 function prepareDockerBuildAssets() {
-    return new Promise((resolve) => {
-        src(["backend/package.json", "backend/package-lock.json", "backend/gulpfile.js"]).pipe(
-            dest(path.join(DESTINATION_DIR, "backend"))
-        );
+    const task1 = src(["backend/package.json", "backend/package-lock.json", "backend/gulpfile.js"]).pipe(
+        dest(path.join(DESTINATION_DIR, "backend"))
+    );
 
-        src(["lib/dist/**"]).pipe(dest(path.join(DESTINATION_DIR, "lib", "dist")));
+    const task2 = src(["lib/dist/**"]).pipe(dest(path.join(DESTINATION_DIR, "lib", "dist")));
 
-        src(["backend/dist/**", "!backend/dist/node_modules/**"]).pipe(
-            dest(path.join(DESTINATION_DIR, "backend", "dist"))
-        );
+    const task3 = src(["backend/dist/**", "!backend/dist/node_modules/**"]).pipe(
+        dest(path.join(DESTINATION_DIR, "backend", "dist"))
+    );
 
-        src(["frontend/dist/**"]).pipe(dest(path.join(DESTINATION_DIR, "frontend")));
-        src(["docs/website/build/datapm/**"]).pipe(dest(path.join(DESTINATION_DIR, "docs")));
+    const task4 = src(["frontend/dist/**"]).pipe(dest(path.join(DESTINATION_DIR, "frontend")));
+    const task5 = src(["docs/website/build/datapm/**"]).pipe(dest(path.join(DESTINATION_DIR, "docs")));
 
-        resolve();
-    });
+    return merge(task1, task2, task3, task4, task5);
 }
 
 exports.default = series(
