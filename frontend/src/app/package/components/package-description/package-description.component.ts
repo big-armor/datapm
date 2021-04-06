@@ -19,9 +19,6 @@ export class PackageDescriptionComponent {
     public schemas: any[] = [];
     public selectedSchema: Schema;
 
-    public shouldShowMoreDescriptionButton: boolean;
-    public isShowingMoreDescriptionText: boolean;
-
     public shouldShowMoreLicenseButton: boolean;
     public isShowingMoreLicenseText: boolean;
 
@@ -47,8 +44,6 @@ export class PackageDescriptionComponent {
                 .fetch({ packageIdentifier, limit: 10, offset: 0 })
                 .subscribe((response) => (this.collections = response.data.packageCollections.collections));
 
-            this.shouldShowMoreDescriptionButton = this.package.description?.length > this.SHOW_MORE_CHARACTER_LIMIT;
-
             validatePackageFileInBrowser(p.package.latestVersion.packageFile);
             this.packageFile = parsePackageFileJSON(p.package.latestVersion.packageFile);
             this.schemas = this.packageFile.schemas;
@@ -61,10 +56,6 @@ export class PackageDescriptionComponent {
                 this.selectedSchema = this.schemas[0];
             }
         });
-    }
-
-    public toggleShowMoreDescriptionText() {
-        this.isShowingMoreDescriptionText = !this.isShowingMoreDescriptionText;
     }
 
     public toggleShowMoreReadMeText() {
