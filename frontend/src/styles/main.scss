@@ -25,6 +25,13 @@ body {
     font-family: $family-roboto !important;
 }
 
+h1,
+.logo-div {
+    &:focus {
+        outline: none;
+    }
+}
+
 .color-info {
     color: var(--info-color);
 
@@ -184,6 +191,12 @@ table.gray-table {
     }
 }
 
+@media (hover: none) {
+    .mat-expansion-panel:not(.mat-expanded):not([aria-disabled="true"]) .mat-expansion-panel-header:hover {
+        background: var(--gray-11-color);
+    }
+}
+
 .app-slide-toggle.mat-checked {
     .mat-slide-toggle-bar,
     .mat-ripple-element {
@@ -232,7 +245,7 @@ table.gray-table {
         font-size: $text-font;
         border: 1px solid var(--gray-5-color);
         outline: none;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
         color: var(--gray-1-color);
         font-family: $family-roboto;
         background-color: var(--gray-7-color) !important;
@@ -246,13 +259,14 @@ table.gray-table {
         &::placeholder {
             font-family: $family-roboto;
             font-style: $style-normal;
+            font-size: $text-font;
             font-weight: $weight-300;
-            font-size: ($small-font + 1);
             line-height: 18px;
             display: flex;
             align-items: flex-end;
-            letter-spacing: 0.4px;
-            color: $gray-4-color;
+            letter-spacing: 0.5px;
+            opacity: 0.9;
+            color: var(--gray-3-color);
         }
     }
 }
@@ -304,7 +318,8 @@ mat-select {
     &::placeholder {
         font-family: $family-roboto;
         letter-spacing: 0.7px;
-        color: var(--gray-1-color);
+        opacity: 0.9;
+        color: var(--gray-3-color);
         font-weight: $weight-300;
         font-size: $text-font;
     }
@@ -337,7 +352,7 @@ mat-select {
     &:disabled {
         background-color: var(--gray-5-color);
         pointer-events: none;
-        opacity: 0.6;
+        opacity: 0.5;
     }
 }
 
@@ -591,7 +606,8 @@ textarea.flat-input,
         display: flex;
         align-items: flex-end;
         letter-spacing: 0.7px;
-        color: var(--gray-4-color);
+        opacity: 0.8;
+        color: var(--gray-3-color);
     }
 }
 
@@ -629,10 +645,6 @@ button:disabled {
     background-color: var(--gray-5-color);
     pointer-events: none;
     opacity: 0.6;
-
-    .btn-text {
-        color: var(--custom-gray-3-color);
-    }
 }
 
 .mat-button.mat-primary[disabled],
@@ -684,6 +696,7 @@ button:disabled {
     p {
         color: var(--gray-1-color);
         margin-bottom: 5px !important;
+        letter-spacing: 0.4px;
     }
 }
 
@@ -1057,7 +1070,7 @@ button:disabled {
     }
     table.gray-table {
         .mat-column-name {
-            width: 44% !important;
+            width: 39% !important;
         }
         th {
             font-size: $small-font;
@@ -1074,20 +1087,27 @@ button:disabled {
 
         &::placeholder {
             font-size: $small-font;
+            font-weight: $weight-400;
         }
     }
     .m-0-mobile {
         margin-bottom: 0px !important;
     }
     .text-danger {
+        margin-top: 1px !important;
         font-size: $xsmall-font;
         max-width: 240px !important;
     }
     .rounded-input {
         .dpm-input-square {
-            height: 38px;
+            height: unset;
+            padding: 6px 10px;
+            line-height: 21px;
+            font-size: $small-font;
             &::placeholder {
-                font-size: $small-font !important;
+                font-weight: $weight-400;
+                font-size: $small-font;
+                font-size: ($text-font - 2) !important;
             }
         }
     }
@@ -1097,7 +1117,7 @@ button:disabled {
         width: 100%;
     }
     .dialog-wrapper-account {
-        padding: 0px;
+        padding: 10px 30px 20px 30px;
         min-width: 236px;
         app-input {
             min-width: 208px;
@@ -1110,7 +1130,12 @@ button:disabled {
     .dpm-input-flat {
         &::placeholder {
             font-size: $small-font;
+            font-weight: $weight-400;
         }
+    }
+    .public-text,
+    .not-public-text {
+        font-size: 9px;
     }
     div {
         .dialog-description {
@@ -1119,7 +1144,7 @@ button:disabled {
         }
         .dialog-close-wrapper {
             bottom: 10px;
-            left: 22px;
+            left: 42px;
             .dialog-close {
                 font-size: $small-font;
             }
@@ -1136,12 +1161,18 @@ button:disabled {
         margin: 3px;
     }
     .mat-dialog-container {
-        padding: 12px 15px 15px 15px !important;
+        padding: 10px 20px 15px 20px !important;
+    }
+    #contentBorder {
+        p,
+        .slug {
+            font-size: $small-font + 1;
+        }
     }
     #homeRoutes {
         li {
             a {
-                font-size: $text-font;
+                font-size: ($text-font - 1);
                 padding: 0px 4px 4px 4px;
                 margin: 0px 6px;
                 bottom: 16px;
