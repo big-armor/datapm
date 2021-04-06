@@ -150,6 +150,15 @@ function listUtilDirectory() {
     );
 }
 
+function listDistUtilDirectory() {
+    return src(path.join(__dirname, "dist", "backend", "dist", "util", "*")).pipe(
+        through.obj(function (file, _enc, cb) {
+            console.log(file.path);
+            cb(null);
+        })
+    );
+}
+
 /* function libPublish() {
     return spawnAndLog("lib-publish", "npm", ["publish"], { cwd: "lib" });
 } */
@@ -237,5 +246,5 @@ exports.deployAssets = series(
 );
 
 exports.buildBackend = buildBackend;
-exports.buildDockerImage = series(listUtilDirectory, prepareDockerBuildAssets, buildDockerImage);
+exports.buildDockerImage = series(listUtilDirectory, prepareDockerBuildAssets, listDistUtilDirectory, buildDockerImage);
 exports.prepareDockerBuildAssets = prepareDockerBuildAssets;
