@@ -25,6 +25,10 @@ body {
     font-family: $family-roboto !important;
 }
 
+h3 {
+    color: var(--gray-1-color);
+}
+
 .color-info {
     color: var(--info-color);
 
