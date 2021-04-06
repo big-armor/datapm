@@ -68,4 +68,10 @@
             }
         }
     }
+    .fade-out {
+        background: var(--fade-out-shadow);
+        height: 150px;
+        margin-top: -150px;
+        position: relative;
+    }
 }

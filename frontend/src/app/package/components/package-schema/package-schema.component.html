@@ -1,15 +1,10 @@
 <div class="schema" id="schema">
-    <h3 class="mb-0">{{ schema.title }}</h3>
     <div class="schema-content">
-        <div class="schema-text">
-            {{ schema.description }}
-        </div>
-
         <div class="schema-stats">
-            <div class="schema-samples package-light-gray mb-0" *ngIf="schema.sampleRecords?.length > 0">
+            <span class="schema-samples package-light-gray mb-0" *ngIf="schema.recordCount > 0">
                 {{ schema.recordCount | number }} {{ schema.unit || "" }} records<br />
-            </div>
-            <div class="package-light-gray mb-0">{{ schemaPropertiesLength(schema) | number }} Properties</div>
+            </span>
+            <span class="package-light-gray mb-0">{{ schemaPropertiesLength(schema) | number }} Properties</span>
         </div>
 
         <div class="accordions-group mt-2">
@@ -120,6 +115,11 @@
                         </div>
                     </div>
                 </mat-expansion-panel>
+                <div
+                    class="fade-out"
+                    [class.d-none]="!shouldShowMorePropertiesButton || isShowingMorePropertiesText"
+                ></div>
+
                 <p class="text-center mt-3" *ngIf="shouldShowMorePropertiesButton">
                     <a class="app-outlined-button" (click)="toggleShowMoreProperties()">
                         {{ isShowingMorePropertiesText ? "Show Less" : "Show More" }}

@@ -10,7 +10,7 @@ import { SamplesFullScreenDialog } from "../package-samples/samples-fullscreen-d
     styleUrls: ["./package-schema.component.scss"]
 })
 export class PackageSchemaComponent implements OnDestroy, OnChanges {
-    private readonly MAX_PROPERTIES_TO_SHOW_INITIALLY = 2; // TODO: CHANGE THIS TO 5
+    private readonly MAX_PROPERTIES_TO_SHOW_INITIALLY = 5;
 
     @Input()
     public schema: Schema;
