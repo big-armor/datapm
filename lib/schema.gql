@@ -313,6 +313,24 @@ type Collection {
 }
 
 """
+The basic data used to display a collection
+"""
+type CollectionBasicData {
+    identifier: CollectionIdentifier!
+    name: String
+    description: String
+}
+
+"""
+The basic data used to display a collection
+"""
+type PackageCollectionsResult {
+    collections: [CollectionBasicData!]
+    hasMore: Boolean!
+    count: Int!
+}
+
+"""
 Represents a single package's listing in a collection, and information about how it was added
 """
 type CollectionPackage {
@@ -849,6 +867,15 @@ type Query {
         offset: Int!
         limit: Int!
     ): [PackageDifferences!]
+
+    """
+    Package related collections
+    """
+    packageCollections(
+        packageIdentifier: PackageIdentifierInput! @hasPackagePermission(permission: VIEW)
+        offset: Int!
+        limit: Int!
+    ): PackageCollectionsResult
 
     """
     Get package issue

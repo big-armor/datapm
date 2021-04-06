@@ -1,0 +1,13 @@
+query PackageCollections($packageIdentifier: PackageIdentifierInput!, $limit: Int!, $offset: Int!) {
+    packageCollections(packageIdentifier: $packageIdentifier, limit: $limit, offset: $offset) {
+        collections {
+            identifier {
+                collectionSlug
+            }
+            name
+            description
+        }
+        hasMore
+        count
+    }
+}
