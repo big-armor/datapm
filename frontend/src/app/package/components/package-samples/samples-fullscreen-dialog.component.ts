@@ -10,17 +10,14 @@ import { Package } from "src/generated/graphql";
 })
 export class SamplesFullScreenDialog {
     public schema: Schema;
-    public packageFile: PackageFile;
     public package: Package;
-    constructor(
-        @Inject(MAT_DIALOG_DATA) public data: { schema: Schema; packageFile: PackageFile; package: Package },
-        private dialog: MatDialog
-    ) {
+
+    constructor(@Inject(MAT_DIALOG_DATA) public data: { schema: Schema; package: Package }, private dialog: MatDialog) {
         this.schema = data.schema;
-        this.packageFile = data.packageFile;
         this.package = data.package;
     }
-    close() {
+
+    public close(): void {
         this.dialog.closeAll();
     }
 }

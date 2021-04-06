@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnChanges } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Schema } from "datapm-lib";
 import { TableVirtualScrollDataSource } from "ng-table-virtual-scroll";
@@ -8,8 +8,9 @@ import { TableVirtualScrollDataSource } from "ng-table-virtual-scroll";
     templateUrl: "./samples.component.html",
     styleUrls: ["./samples.component.scss"]
 })
-export class SamplesComponent implements OnInit {
-    @Input() public schema: Schema;
+export class SamplesComponent implements OnChanges {
+    @Input()
+    public schema: Schema;
 
     public columns: string[];
     public columnsUnits: string[] = [];
@@ -20,7 +21,7 @@ export class SamplesComponent implements OnInit {
 
     constructor(private dialog: MatDialog) {}
 
-    public ngOnInit(): void {
+    public ngOnChanges(): void {
         this.dataSource = new TableVirtualScrollDataSource(this.buildSchemaSampleValues(this.schema));
         this.columns = this.buildSchemaColumns(this.schema);
         this.columnsUnits = this.buildSchemaColumnsUnits(this.schema);
