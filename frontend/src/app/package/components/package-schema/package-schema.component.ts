@@ -52,18 +52,6 @@ export class PackageSchemaComponent implements OnDestroy, OnChanges {
         return Object.keys(schema.properties).length;
     }
 
-    public showSamplesFullscreen(schema: Schema): void {
-        this.dialog.open(SamplesFullScreenDialog, {
-            width: "95vw",
-            height: "95vh",
-            maxWidth: "95vw",
-            maxHeight: "95vh",
-            data: {
-                schema
-            }
-        });
-    }
-
     public stringOptions(valueTypes: ValueTypeStatistics): { name: string; value: number }[] {
         return Object.keys(valueTypes)
             .map((v) => {

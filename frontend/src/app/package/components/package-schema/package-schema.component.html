@@ -13,8 +13,8 @@
                     *ngFor="
                         let property of schema?.properties
                             | values
-                            | slice: 0:propertiesToShowCount
                             | sortBy: 'asc':'title'
+                            | slice: 0:propertiesToShowCount
                     "
                 >
                     <mat-expansion-panel-header>
