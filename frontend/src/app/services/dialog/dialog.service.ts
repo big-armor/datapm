@@ -44,7 +44,6 @@ export class DialogService {
         const dialogConfig: DialogConfig = {
             data: {
                 title: "Are you sure?",
-                warning: "Unexpected bad things will happen if you don’t read this!",
                 content: message,
                 confirmButtonText: confirmText
             },
@@ -65,14 +64,13 @@ export class DialogService {
         } else {
             message =
                 "All packages in this catalog will be marked private, and any that were previously public will no " +
-                "longer be accessible without specific access permissions.";
+                "longer be accessible without providing other users specific access permissions.";
             confirmText = "Disable Public Access";
         }
 
         const dialogConfig = {
             data: {
                 title: "Are you sure?",
-                warning: "Unexpected bad things will happen if you don’t read this!",
                 content: message,
                 confirmButtonText: confirmText
             },
