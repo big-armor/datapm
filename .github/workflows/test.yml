@@ -27,7 +27,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: lib/node_modules
-                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/package.json') }}
+                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/package.json', 'lib/package-lock.json') }}
 
             - name: Install Lib Dependencies
               id: install-lib-Dependencies
@@ -68,7 +68,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: lib/node_modules
-                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/package.json') }}
+                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/package.json', 'lib/package-lock.json') }}
 
             - name: Install Lib Dependencies
               id: install-lib-Dependencies
@@ -86,7 +86,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: backend/node_modules
-                  key: datampm-registry-${{ runner.OS }}-backend-${{ hashFiles('backend/package.json') }}
+                  key: datampm-registry-${{ runner.OS }}-backend-${{ hashFiles('backend/package.json', 'backend/package-lock.json') }}
 
             - name: Install Backend Dependencies
               id: install-backend-Dependencies
@@ -122,7 +122,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: lib/node_modules
-                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/package.json') }}
+                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/package.json', 'lib/package-lock.json') }}
 
             - name: Install Lib Dependencies
               id: install-lib-Dependencies
@@ -140,7 +140,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: frontend/node_modules
-                  key: datampm-registry-${{ runner.OS }}-frontend-${{ hashFiles('frontend/package.json') }}
+                  key: datampm-registry-${{ runner.OS }}-frontend-${{ hashFiles('frontend/package.json', 'frontend/package-lock.json') }}
 
             - name: Install Frontend Dependencies
               id: install-fronend-dependencies

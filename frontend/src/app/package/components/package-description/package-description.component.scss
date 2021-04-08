@@ -11,6 +11,25 @@
     letter-spacing: 0.6px;
 }
 
+.ul-data {
+    list-style: none;
+    border: 1px solid #e6e6e6;
+    border-radius: 4px;
+    padding-left: 0px !important;
+    li {
+        padding: 8px 12px;
+        border-bottom: 1px solid #e6e6e6;
+        &:last-child {
+            border-bottom: none !important;
+        }
+    }
+    .ul-links {
+        color: var(--info-color);
+        cursor: pointer;
+        font-size: $text-font;
+    }
+}
+
 markdown ::ng-deep {
     p {
         font-family: $family-roboto;
@@ -30,4 +49,27 @@ markdown ::ng-deep {
         color: var(--gray-1-color);
         letter-spacing: 0.6px;
     }
+}
+
+h1 {
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-size: ($title-font + 2);
+    font-weight: $weight-400;
+    margin-bottom: 0px !important;
+    color: var(--gray-1-color);
+    letter-spacing: 0.6px;
+}
+
+.limitTextHeight {
+    height: 120px;
+    overflow: hidden;
+}
+
+.fade-out {
+    background: var(--fade-out-shadow);
+    height: 48px;
+    margin-top: -48px;
+    position: relative;
+    pointer-events: none;
 }

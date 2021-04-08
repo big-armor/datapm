@@ -1,20 +1,22 @@
-<div class="schema" id="schema" *ngFor="let schema of packageFile?.schemas">
-    <div class="package-details-title">{{ schema.title }}</div>
+<div class="schema" id="schema">
     <div class="schema-content">
-        <div class="schema-text">
-            {{ schema.description }}
-        </div>
-
         <div class="schema-stats">
-            <div class="schema-samples package-light-gray mb-0" *ngIf="schema.sampleRecords?.length > 0">
+            <span class="schema-samples package-light-gray mb-0" *ngIf="schema.recordCount > 0">
                 {{ schema.recordCount | number }} {{ schema.unit || "" }} records<br />
-            </div>
-            <div class="package-light-gray mb-0">{{ schemaPropertiesLength(schema) | number }} Properties</div>
+            </span>
+            <span class="package-light-gray mb-0">{{ schemaPropertiesLength(schema) | number }} Properties</span>
         </div>
 
         <div class="accordions-group mt-2">
             <mat-accordion class="schema-property" multi>
-                <mat-expansion-panel *ngFor="let property of schema?.properties | values | sortBy: 'asc':'title'">
+                <mat-expansion-panel
+                    *ngFor="
+                        let property of schema?.properties
+                            | values
+                            | sortBy: 'asc':'title'
+                            | slice: 0:propertiesToShowCount
+                    "
+                >
                     <mat-expansion-panel-header>
                         <mat-panel-title class="package-dark-gray"> {{ property.title }} </mat-panel-title>
                         <mat-panel-description class="package-dark-gray">
@@ -113,6 +115,16 @@
                         </div>
                     </div>
                 </mat-expansion-panel>
+                <div
+                    class="fade-out"
+                    [class.d-none]="!shouldShowMorePropertiesButton || isShowingMorePropertiesText"
+                ></div>
+
+                <p class="text-center mt-3" *ngIf="shouldShowMorePropertiesButton">
+                    <a class="app-outlined-button" (click)="toggleShowMoreProperties()">
+                        {{ isShowingMorePropertiesText ? "Show Less" : "Show More" }}
+                    </a>
+                </p>
             </mat-accordion>
         </div>
     </div>

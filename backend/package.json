@@ -1,6 +1,6 @@
 {
     "name": "datapm-registry-backend",
-    "description": "The datapm-registry server backend",
+    "description": "The datapm-registry server backend.",
     "main": "dist/index.js",
     "typings": "dist/index.d.ts",
     "module": "dist/index.js",

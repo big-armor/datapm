@@ -39,14 +39,6 @@ const routes: Routes = [
                 component: PackageVersionComponent
             },
             {
-                path: "schema",
-                component: PackageSchemaComponent
-            },
-            {
-                path: "preview",
-                component: PackageSamplesComponent
-            },
-            {
                 path: "manage",
                 component: PackagePermissionComponent
             },

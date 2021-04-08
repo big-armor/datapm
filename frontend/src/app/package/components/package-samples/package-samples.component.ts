@@ -1,57 +1,47 @@
-import { Component } from "@angular/core";
+import { Component, Input, OnChanges, OnDestroy, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { PackageFile, Schema } from "datapm-lib";
+import { Schema } from "datapm-lib";
 import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
 import { Package } from "src/generated/graphql";
-import { PackageService, PackageResponse } from "../../services/package.service";
 import { SamplesFullScreenDialog } from "./samples-fullscreen-dialog.component";
 
-type State = "NO_SAMPLES" | "LOADING" | "ERROR" | "LOADED";
+type State = "NO_SAMPLES" | "LOADING" | "LOADED";
 
 @Component({
     selector: "samples",
     templateUrl: "./package-samples.component.html",
     styleUrls: ["./package-samples.component.scss"]
 })
-export class PackageSamplesComponent {
-    public package: Package;
-    public packageFile: PackageFile;
-    private unsubscribe$ = new Subject();
-    public state: State = "LOADING";
+export class PackageSamplesComponent implements OnChanges, OnDestroy {
+    private readonly unsubscribe$ = new Subject();
 
+    @Input()
+    public package: Package;
+
+    @Input()
+    public schema: Schema;
+
+    public state: State = "LOADING";
     public valuesToDisplay: { [key: string]: string }[];
 
-    constructor(private packageService: PackageService, private dialog: MatDialog) {
+    constructor(private dialog: MatDialog) {}
+
+    public ngOnChanges(): void {
         this.state = "LOADING";
+        if (!this.schema || this.schema.sampleRecords == null || this.schema.sampleRecords.length == 0) {
+            this.state = "NO_SAMPLES";
+            return;
+        }
 
-        this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe((p: PackageResponse) => {
-            if (p == null || p.package == null) return;
-            this.package = p.package;
-            if (this.package && this.package.latestVersion) {
-                this.packageFile = JSON.parse(this.package.latestVersion.packageFile);
-
-                if (
-                    this.packageFile.schemas[0].sampleRecords == null ||
-                    this.packageFile.schemas[0].sampleRecords.length == 0
-                ) {
-                    this.state = "NO_SAMPLES";
-                    return;
-                }
-
-                this.state = "LOADED";
-
-                //Object.keys(this.packageFile.schemas[0].properties);
-            }
-        });
+        this.state = "LOADED";
     }
 
-    ngOnDestroy(): void {
+    public ngOnDestroy(): void {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
     }
 
-    showSchemaFullScreen(schema: Schema) {
+    public showSchemaFullScreen(schema: Schema) {
         this.dialog.open(SamplesFullScreenDialog, {
             width: "100%",
             height: "100%",
@@ -60,7 +50,6 @@ export class PackageSamplesComponent {
             maxHeight: "100%",
             data: {
                 schema,
-                packageFile: this.packageFile,
                 package: this.package
             }
         });
