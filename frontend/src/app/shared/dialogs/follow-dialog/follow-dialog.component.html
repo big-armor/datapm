@@ -3,21 +3,21 @@
         <div class="col-md-12 p-0">
             <div mat-dialog-title id="contentTitle">Follow Dialog</div>
             <div mat-dialog-content id="contentBorder">
-                <p class="package-dark-gray">Choose one option:</p>
+                <p class="package-dark-gray">Notification Frequency:</p>
                 <mat-form-field appearance="fill" floatLabel="never">
-                    <mat-select value="option1">
-                        <mat-option value="option1"> option 1 </mat-option>
-                        <mat-option value="option2"> option 2 </mat-option>
-                        <mat-option value="option3"> option 3 </mat-option>
+                    <mat-select [(value)]="selectedFrequency">
+                        <mat-option *ngFor="let frequency of frequencies" [value]="frequency">
+                            {{ frequency | titlecase }}
+                        </mat-option>
                     </mat-select>
                 </mat-form-field>
             </div>
             <div mat-dialog-actions class="d-flex justify-content-end pb-3 pt-2">
-                <button mat-button type="submit" class="save-btn">
-                    <span>Apply</span>
+                <button mat-button type="submit" class="save-btn" (click)="save()">
+                    <span>Save</span>
                 </button>
-                <button mat-button type="submit" class="save-btn" style="width: unset">
-                    <span>Unfollow</span>
+                <button mat-button type="submit" class="save-btn" style="width: unset" (click)="cancel()">
+                    <span>Cancel</span>
                 </button>
             </div>
         </div>

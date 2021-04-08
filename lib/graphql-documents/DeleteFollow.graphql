@@ -1,0 +1,3 @@
+mutation DeleteFollow($follow: FollowIdentifierInput!) {
+    deleteFollow(follow: $follow)
+}

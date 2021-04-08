@@ -172,6 +172,7 @@ import {
     updatePackageIssueComment
 } from "./resolvers/PackageIssueCommentResolver";
 import { packageVersionsDiff, packageVersionsDiffs } from "./resolvers/VersionComparisonResolver";
+import { deleteAllMyFollows, deleteFollow, getAllMyFollows, getFollow, saveFollow } from "./resolvers/FollowResolver";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -571,7 +572,9 @@ export const resolvers: {
         searchUsers: searchUsers,
         adminSearchUsers: adminSearchUsers,
         myActivity: myActivity,
-        packageActivities: packageActivities
+        packageActivities: packageActivities,
+        getFollow: getFollow,
+        myFollows: getAllMyFollows
     },
 
     Mutation: {
@@ -647,6 +650,11 @@ export const resolvers: {
         // Version
         createVersion: createVersion,
         deleteVersion: deleteVersion,
+
+        // Follow
+        saveFollow: saveFollow,
+        deleteFollow: deleteFollow,
+        deleteAllMyFollows: deleteAllMyFollows,
 
         track: (_, { actions }, context: Context) => mixpanel.track(actions, context.request)
     }

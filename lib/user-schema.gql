@@ -25,6 +25,10 @@ type User {
     uiDarkModeEnabled: Boolean
 }
 
+input UserIdentifierInput {
+    username: String! @validUsername
+}
+
 """
 For creating an new user for other people as an administrator
 """

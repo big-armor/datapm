@@ -1,7 +1,17 @@
 import { Component, OnInit } from "@angular/core";
-import { Catalog, GetCatalogGQL, Package, Permission } from "src/generated/graphql";
+import {
+    Catalog,
+    DeleteFollowGQL,
+    Follow,
+    GetCatalogGQL,
+    GetFollowGQL,
+    NotificationFrequency,
+    Package,
+    Permission,
+    SaveFollowGQL
+} from "src/generated/graphql";
 import { ActivatedRoute, NavigationExtras, Router } from "@angular/router";
-import { MatDialog } from "@angular/material/dialog";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { EditCatalogComponent } from "src/app/shared/edit-catalog/edit-catalog.component";
 import { PageState } from "src/app/models/page-state";
 import { DialogService } from "../../services/dialog/dialog.service";
@@ -23,12 +33,18 @@ export class CatalogDetailsComponent implements OnInit {
     private unsubscribe$: Subject<any> = new Subject();
     private tabs = ["", "manage"];
 
+    public catalogFollow: Follow;
+    public isFollowing: boolean;
+
     constructor(
         private getCatalogGQL: GetCatalogGQL,
         private dialog: MatDialog,
         private router: Router,
         private route: ActivatedRoute,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private getFollowGQL: GetFollowGQL,
+        private saveFollowGQL: SaveFollowGQL,
+        private deleteFollowGQL: DeleteFollowGQL
     ) {
         this.route.fragment.pipe(takeUntil(this.unsubscribe$)).subscribe((fragment: string) => {
             const index = this.tabs.findIndex((tab) => tab === fragment);
@@ -39,12 +55,6 @@ export class CatalogDetailsComponent implements OnInit {
                 this.currentTab = index;
                 this.updateTabParam();
             }
-        });
-    }
-
-    public createFollow() {
-        const dlgRef = this.dialog.open(FollowDialogComponent, {
-            width: "500px"
         });
     }
 
@@ -77,6 +87,7 @@ export class CatalogDetailsComponent implements OnInit {
             }
 
             this.catalog = data.catalog as Catalog;
+            this.getFollow();
             this.state = "SUCCESS";
         });
     }
@@ -126,5 +137,69 @@ export class CatalogDetailsComponent implements OnInit {
 
     public get canEdit(): boolean {
         return this.catalog && this.catalog.myPermissions?.includes(Permission.EDIT);
+    }
+
+    public follow(): void {
+        this.openFollowModal()
+            .afterClosed()
+            .subscribe((result) => {
+                if (!result) {
+                    return;
+                } else if (result.notificationFrequency === NotificationFrequency.NEVER) {
+                    this.deleteFollow();
+                    return;
+                }
+
+                this.saveFollowGQL
+                    .mutate({
+                        follow: {
+                            catalog: {
+                                catalogSlug: this.catalogSlug
+                            },
+                            notificationFrequency: result.notificationFrequency
+                        }
+                    })
+                    .subscribe(() => this.updatePackageFollow(result));
+            });
+    }
+
+    private deleteFollow(): void {
+        this.deleteFollowGQL
+            .mutate({
+                follow: {
+                    catalog: {
+                        catalogSlug: this.catalogSlug
+                    }
+                }
+            })
+            .subscribe(() => this.updatePackageFollow(null));
+    }
+
+    private getFollow(): void {
+        this.getFollowGQL
+            .fetch({
+                follow: {
+                    catalog: {
+                        catalogSlug: this.catalogSlug
+                    }
+                }
+            })
+            .subscribe((response) => this.updatePackageFollow(response.data?.getFollow));
+    }
+
+    private openFollowModal(): MatDialogRef<FollowDialogComponent, Follow> {
+        return this.dialog.open(FollowDialogComponent, {
+            width: "500px",
+            data: this.catalogFollow
+        });
+    }
+
+    private updatePackageFollow(follow: Follow): void {
+        this.catalogFollow = follow;
+        if (!follow) {
+            this.isFollowing = false;
+        } else {
+            this.isFollowing = follow.notificationFrequency !== NotificationFrequency.NEVER;
+        }
     }
 }

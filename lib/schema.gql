@@ -202,6 +202,43 @@ enum PackageDifferenceType {
 }
 
 """
+Follow Type
+"""
+enum FollowType {
+    CATALOG
+    COLLECTION
+    PACKAGE
+    PACKAGE_ISSUE
+    USER
+}
+
+"""
+Notification frequency
+"""
+enum NotificationFrequency {
+    INSTANT
+    DAILY
+    WEEKLY
+    MONTHLY
+    NEVER
+}
+
+"""
+Notification Event type
+"""
+enum NotificationEventType {
+    PACKAGE_PATCH_CHANGE
+    PACKAGE_MINOR_CHANGE
+    PACKAGE_MAJOR_CHANGE
+    COLLECTION_PACKAGE_ADDED
+    COLLECTION_PACKAGE_REMOVED
+    CATALOG_PACKAGE_ADDED
+    CATALOG_PACKAGE_REMOVED
+    PACKAGE_ISSUE_COMMENT_ADDED
+    PACKAGE_ISSUE_STAUS_CHANGE
+}
+
+"""
 Whether the requesting user has the specified permission on the catalog
 """
 directive @hasCatalogPermission(permission: Permission) on OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION
@@ -326,6 +363,15 @@ The basic data used to display a collection
 """
 type PackageCollectionsResult {
     collections: [CollectionBasicData!]
+    hasMore: Boolean!
+    count: Int!
+}
+
+"""
+My Follows result
+"""
+type MyFollowsResult {
+    follows: [Follow!]
     hasMore: Boolean!
     count: Int!
 }
@@ -566,6 +612,19 @@ type PackageDifference {
 }
 
 """
+The follow type
+"""
+type Follow {
+    user: User
+    notificationFrequency: NotificationFrequency!
+    eventTypes: [NotificationEventType]!
+    catalog: Catalog
+    package: Package
+    collection: Collection
+    packageIssue: PackageIssue
+}
+
+"""
 The complete identifier for a version of a package, assuming the registry is based on the HTTP request URL
 """
 input VersionIdentifierInput {
@@ -588,6 +647,14 @@ input PackageIdentifierInput {
 The complete identifier for a package issue
 """
 input PackageIssueIdentifierInput {
+    issueNumber: Int!
+}
+
+"""
+The complete identifier for a package issue
+"""
+input PackageIssueFullIdentifierInput {
+    packageIdentifier: PackageIdentifierInput!
     issueNumber: Int!
 }
 
@@ -763,6 +830,29 @@ input ActivityLogFilterInput {
     eventType: [ActivityLogEventType]
     limit: Int!
     offset: Int!
+}
+
+"""
+The follow identifier input
+"""
+input FollowIdentifierInput {
+    catalog: CatalogIdentifierInput
+    package: PackageIdentifierInput
+    collection: CollectionIdentifierInput
+    packageIssue: PackageIssueFullIdentifierInput
+    user: UserIdentifierInput
+}
+
+"""
+The save follow identifier input
+"""
+input SaveFollowInput {
+    notificationFrequency: NotificationFrequency!
+    catalog: CatalogIdentifierInput
+    package: PackageIdentifierInput
+    collection: CollectionIdentifierInput
+    packageIssue: PackageIssueFullIdentifierInput
+    user: UserIdentifierInput
 }
 
 type Query {
@@ -1027,9 +1117,19 @@ type Query {
     ): ActivityLogResult! @isAuthenticated
 
     """
+    Follow object for a target entity
+    """
+    getFollow(follow: FollowIdentifierInput!): Follow
+
+    """
     For validating that the server is up, and requesting it's status
     """
     registryStatus: RegistryStatus
+
+    """
+    Get authenticated user's follows
+    """
+    myFollows(type: FollowType!, offset: Int!, limit: Int!): MyFollowsResult!
 }
 
 type Mutation {
@@ -1378,4 +1478,19 @@ type Mutation {
     Accept invite emails to finish creating user
     """
     acceptInvite(token: String!, username: String! @validUsername, password: String! @validPassword): Void
+
+    """
+    Follow changes for a catalog, package, collection, issue or user.
+    """
+    saveFollow(follow: SaveFollowInput!): Void
+
+    """
+    Delete a follow
+    """
+    deleteFollow(follow: FollowIdentifierInput!): Void
+
+    """
+    Delete all authenticated user's follows
+    """
+    deleteAllMyFollows: Void @isAuthenticated
 }

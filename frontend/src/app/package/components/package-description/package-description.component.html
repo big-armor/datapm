@@ -41,7 +41,7 @@
     </p>
 </div>
 
-<div>
+<div *ngIf="schemas.length > 1">
     <mat-select (selectionChange)="selectSchema($event.value)" [value]="selectedSchema">
         <mat-option *ngFor="let schema of schemas" [value]="schema">
             {{ schema.title }}
@@ -53,9 +53,6 @@
     <div class="package-details-title mt-4 mb-1">Samples</div>
     <samples [package]="package" [schema]="selectedSchema"></samples>
 </ng-container>
-
-<!-- <div class="pt-5"></div>
-<div class="mt-5"></div> -->
 
 <ng-container *ngIf="packageFile">
     <div class="package-details-title mt-4 mb-1">Schema</div>

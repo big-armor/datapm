@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { ActivatedRoute, NavigationExtras, ParamMap, Router } from "@angular/router";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
@@ -10,9 +10,14 @@ import { EditCollectionComponent } from "src/app/shared/edit-collection/edit-col
 import {
     Collection,
     CollectionGQL,
+    DeleteFollowGQL,
+    Follow,
+    GetFollowGQL,
+    NotificationFrequency,
     Package,
     Permission,
     RemovePackageFromCollectionGQL,
+    SaveFollowGQL,
     UpdateCollectionGQL
 } from "src/generated/graphql";
 import { AddPackageComponent } from "../add-package/add-package.component";
@@ -35,12 +40,18 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
 
     private tabs = ["", "manage"];
 
+    public collectionFollow: Follow;
+    public isFollowing: boolean;
+
     constructor(
         private route: ActivatedRoute,
         private router: Router,
         private collectionGQL: CollectionGQL,
         private removePackageFromCollectionGQL: RemovePackageFromCollectionGQL,
-        private dialog: MatDialog
+        private dialog: MatDialog,
+        private getFollowGQL: GetFollowGQL,
+        private saveFollowGQL: SaveFollowGQL,
+        private deleteFollowGQL: DeleteFollowGQL
     ) {
         this.route.paramMap.pipe(takeUntil(this.unsubscribe$)).subscribe((paramMap: ParamMap) => {
             this.collectionSlug = paramMap.get("collectionSlug") || "";
@@ -117,6 +128,7 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
                     }
                     this.collection = data.collection as Collection;
                     this.state = "SUCCESS";
+                    this.getFollow();
                 },
                 () => {
                     this.state = "ERROR";
@@ -178,5 +190,69 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
 
     public get canEdit() {
         return this.collection && this.collection.myPermissions?.includes(Permission.EDIT);
+    }
+
+    public follow(): void {
+        this.openFollowModal()
+            .afterClosed()
+            .subscribe((result) => {
+                if (!result) {
+                    return;
+                } else if (result.notificationFrequency === NotificationFrequency.NEVER) {
+                    this.deleteFollow();
+                    return;
+                }
+
+                this.saveFollowGQL
+                    .mutate({
+                        follow: {
+                            collection: {
+                                collectionSlug: this.collectionSlug
+                            },
+                            notificationFrequency: result.notificationFrequency
+                        }
+                    })
+                    .subscribe(() => this.updatePackageFollow(result));
+            });
+    }
+
+    private deleteFollow(): void {
+        this.deleteFollowGQL
+            .mutate({
+                follow: {
+                    collection: {
+                        collectionSlug: this.collectionSlug
+                    }
+                }
+            })
+            .subscribe(() => this.updatePackageFollow(null));
+    }
+
+    private getFollow(): void {
+        this.getFollowGQL
+            .fetch({
+                follow: {
+                    collection: {
+                        collectionSlug: this.collectionSlug
+                    }
+                }
+            })
+            .subscribe((response) => this.updatePackageFollow(response.data?.getFollow));
+    }
+
+    private openFollowModal(): MatDialogRef<FollowDialogComponent, Follow> {
+        return this.dialog.open(FollowDialogComponent, {
+            width: "500px",
+            data: this.collectionFollow
+        });
+    }
+
+    private updatePackageFollow(follow: Follow): void {
+        this.collectionFollow = follow;
+        if (!follow) {
+            this.isFollowing = false;
+        } else {
+            this.isFollowing = follow.notificationFrequency !== NotificationFrequency.NEVER;
+        }
     }
 }

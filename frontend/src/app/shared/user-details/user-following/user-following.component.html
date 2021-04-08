@@ -5,7 +5,7 @@
                 <div class="package-details-title">
                     {{ isCurrentUser ? "My Follows" : "Follows" }}
                 </div>
-                <div class="text-left" *ngIf="unfollow">
+                <div class="text-left" *ngIf="!isFollowing">
                     <p class="package-dark-gray">
                         Use the 'follow' button throughout this registry to be notified of changes
                     </p>

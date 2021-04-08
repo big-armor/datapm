@@ -46,7 +46,8 @@ export function getRelationNames(obj: object, parentNames: string = ""): string[
         "issues",
         "comments",
         "creator",
-        "catalog"
+        "catalog",
+        "follows"
     ];
 
     for (let [key, val] of Object.entries(obj)) {
