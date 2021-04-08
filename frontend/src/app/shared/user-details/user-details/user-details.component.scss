@@ -71,11 +71,15 @@
     }
 }
 
-@media (max-width: 480px) {
-    .div-answer {
-        flex-direction: column;
-        input {
-            width: 190px !important;
+@media (max-width: 576px) {
+    #detailsPage {
+        margin-top: 15px;
+        padding-left: 0px !important;
+        .div-answer {
+            flex-direction: column;
+            input {
+                width: 190px !important;
+            }
         }
     }
 }

@@ -80,8 +80,7 @@
         }
 
         .btn-wrapper {
-            display: flex;
-            border: none;
+            display: table-cell;
         }
 
         table.gray-table td {
@@ -89,9 +88,9 @@
         }
 
         .app-outlined-button {
-            padding: 6px 2px;
-            margin: 0;
-            width: 93px;
+            padding: 6px 3px;
+            margin: 3px 0px;
+            width: 101px;
         }
         ::ng-deep {
             .mat-form-field-infix {

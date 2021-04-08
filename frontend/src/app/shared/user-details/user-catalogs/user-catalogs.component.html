@@ -4,10 +4,10 @@
             <div id="catalogsPage">
                 <div class="catalogs-div panel-div">
                     <ng-container *ngIf="catalogState !== State.LOADING">
-                        <div class="package-details-title pl-3">
+                        <div class="package-details-title col-md-12 no-pd-mobile">
                             {{ isCurrentUser ? "My Catalogs" : "Catalogs" }}
                         </div>
-                        <p class="col-lg-8">
+                        <p class="col-lg-8 no-pd-mobile">
                             <span *ngIf="isCurrentUser" class="package-dark-gray"
                                 >Catalogs represent a single individual or organization. All data packages belong to one
                                 and only one catalog.</span
@@ -25,12 +25,15 @@
                             </span>
                         </p>
 
-                        <div class="ml-3 mb-4" *ngIf="catalogState !== State.LOADING && isCurrentUser">
+                        <div
+                            class="mb-4 col-md-12 no-pd-mobile"
+                            *ngIf="catalogState !== State.LOADING && isCurrentUser"
+                        >
                             <a class="app-outlined-button" (click)="createCatalog()">Create A Catalog</a>
                         </div>
                     </ng-container>
 
-                    <div class="container">
+                    <div class="container no-pd-mobile">
                         <table
                             aria-describedby="catalogTable"
                             *ngIf="catalogState === State.SUCCESS && myCatalogs && myCatalogs.length > 0"
@@ -70,19 +73,13 @@
                                         (click)="editCatalog(catalog)"
                                         >Edit</a
                                     >
-                                    <button
-                                        [matTooltip]="message.value"
-                                        [matTooltipPosition]="'above'"
-                                        [matTooltipDisabled]="canModifyCatalog(catalog.identifier.catalogSlug)"
+                                    <a
+                                        class="app-outlined-button"
+                                        [class.disabled]="!canModifyCatalog(catalog.identifier.catalogSlug)"
+                                        (click)="deleteCatalog(catalog)"
                                     >
-                                        <a
-                                            class="app-outlined-button"
-                                            [class.disabled]="!canModifyCatalog(catalog.identifier.catalogSlug)"
-                                            (click)="deleteCatalog(catalog)"
-                                        >
-                                            <span class="delete-txt">Delete</span>
-                                        </a>
-                                    </button>
+                                        <span class="delete-txt">Delete</span>
+                                    </a>
                                 </td>
                             </ng-container>
 

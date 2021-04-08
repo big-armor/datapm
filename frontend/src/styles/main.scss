@@ -14,6 +14,10 @@ body {
 
 a {
     color: var(--info-color);
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-weight: $weight-400;
+    letter-spacing: 0.4px;
 
     &:hover {
         color: var(--info-hover-color);
@@ -130,6 +134,11 @@ table.gray-table {
     }
 }
 
+.mat-menu-panel,
+.mat-select-panel {
+    border-radius: 0px !important;
+}
+
 .cdk-global-scrollblock {
     position: static !important;
     width: initial !important;
@@ -155,7 +164,7 @@ table.gray-table {
         border-bottom: 1px solid var(--gray-5-color) !important;
         @include text("body");
         border-radius: 0px;
-        background: var(--secondary-color);
+        background: var(--custom-secondary-color);
         color: var(--gray-2-color);
         &:last-child {
             border-bottom: none !important;
@@ -501,7 +510,7 @@ mat-select {
     line-height: 18px;
     color: var(--gray-1-color);
     border-radius: 0px !important;
-    background-color: var(--secondary-color) !important;
+    background-color: var(--custom-secondary-color) !important;
     border-bottom: 1px solid var(--gray-5-color) !important;
 
     &:hover {
@@ -1045,6 +1054,10 @@ button:disabled {
             min-height: 40px;
         }
     }
+    .package-light-gray,
+    .package-dark-gray {
+        line-height: 17px;
+    }
     .font-22 {
         font-size: $title-font !important;
     }
@@ -1068,16 +1081,23 @@ button:disabled {
             font-size: $small-font;
         }
     }
+    .no-mt-mobile {
+        margin-top: 10px !important;
+    }
+    .no-pd-mobile {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
     table.gray-table {
         .mat-column-name {
             width: 39% !important;
         }
         th {
-            font-size: $small-font;
+            font-size: $small-font + 1;
         }
 
         td {
-            font-size: $small-font;
+            font-size: $small-font + 1;
         }
     }
     .flat-input,
@@ -1100,14 +1120,9 @@ button:disabled {
     }
     .rounded-input {
         .dpm-input-square {
-            height: unset;
-            padding: 6px 10px;
-            line-height: 21px;
-            font-size: $small-font;
             &::placeholder {
                 font-weight: $weight-400;
-                font-size: $small-font;
-                font-size: ($text-font - 2) !important;
+                font-size: $small-font + 1 !important;
             }
         }
     }
@@ -1124,7 +1139,7 @@ button:disabled {
         }
     }
     .app-outlined-button {
-        padding: 6px 6px;
+        padding: 7px 13px;
         font-size: $small-font;
     }
     .dpm-input-flat {
@@ -1132,10 +1147,6 @@ button:disabled {
             font-size: $small-font;
             font-weight: $weight-400;
         }
-    }
-    .public-text,
-    .not-public-text {
-        font-size: 9px;
     }
     div {
         .dialog-description {
@@ -1172,9 +1183,9 @@ button:disabled {
     #homeRoutes {
         li {
             a {
-                font-size: ($text-font - 1);
-                padding: 0px 4px 4px 4px;
-                margin: 0px 6px;
+                font-size: $text-font;
+                padding: 0px 3px 4px 3px;
+                margin: 0px 4px;
                 bottom: 16px;
             }
         }

@@ -28,3 +28,10 @@
         background-color: var(--custom-secondary-color);
     }
 }
+
+@media (max-width: 576px) {
+    .container {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+}

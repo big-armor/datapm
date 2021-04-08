@@ -29,7 +29,7 @@
                 </span>
             </div>
 
-            <div class="py-1">
+            <div>
                 <span class="social-link" *ngIf="user.emailAddressIsPublic || isCurrentUser">
                     <a target="_blank" href="mailto:{{ user.emailAddress }}" class="social-img">
                         <em class="far fa-envelope"></em>
@@ -61,7 +61,7 @@
                 </span>
             </div>
 
-            <p class="package-dark-gray">
+            <p class="package-dark-gray pt-1">
                 {{ user.description }}
             </p>
         </div>

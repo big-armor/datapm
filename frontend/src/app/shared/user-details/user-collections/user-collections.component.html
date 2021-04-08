@@ -4,11 +4,11 @@
             <div id="myCollections" class="big-div-collection">
                 <div class="mb-3">
                     <div *ngIf="state === State.SUCCESS">
-                        <div class="package-details-title pl-3">
+                        <div class="package-details-title col-md-12 no-pd-mobile">
                             {{ isCurrentUser ? "My Collections" : "Collections" }}
                         </div>
                         <ng-container *ngIf="collections.length === 0">
-                            <div class="col-lg-8">
+                            <div class="mb-3 col-lg-8 no-pd-mobile">
                                 <span *ngIf="isCurrentUser" class="package-dark-gray"
                                     >Create collections to organize and share data sets you discover.
                                 </span>
@@ -22,13 +22,13 @@
                                     <span style="font-size: 13px">Learn more about collections.</span>
                                 </a>
                             </div>
-                            <div class="col-md-12 col-lg-12 my-3" *ngIf="isCurrentUser">
+                            <div class="col-md-12 no-pd-mobile my-3" *ngIf="isCurrentUser">
                                 <a class="app-outlined-button" (click)="createCollection()">Create A Collection</a>
                             </div>
                         </ng-container>
 
                         <div *ngIf="collections.length > 0">
-                            <div class="pr-4 mb-3 col-lg-8">
+                            <div class="mb-3 col-lg-8 no-pd-mobile">
                                 <p>
                                     <span *ngIf="isCurrentUser" class="package-dark-gray">
                                         Create collections to organize and share data sets you discover.
@@ -44,7 +44,7 @@
                                 </p>
                             </div>
 
-                            <div class="ml-3 mb-4" *ngIf="state !== State.LOADING && isCurrentUser">
+                            <div class="mb-4 col-md-12 no-pd-mobile" *ngIf="state !== State.LOADING && isCurrentUser">
                                 <a class="app-outlined-button" (click)="createCollection()">Create A Collection</a>
                             </div>
 
