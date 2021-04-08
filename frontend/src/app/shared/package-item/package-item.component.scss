@@ -16,11 +16,12 @@
         font-family: $family-roboto-mono;
         font-size: ($default-font - 1);
         color: var(--info-color);
-        margin-bottom: 0px !important;
+        margin-bottom: 2px !important;
     }
 
     .img-cover {
         margin-right: 6px;
+        margin-top: 4px;
     }
 
     .package-wrapper {

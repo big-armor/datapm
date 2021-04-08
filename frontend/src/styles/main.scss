@@ -134,6 +134,10 @@ table.gray-table {
     }
 }
 
+.font-500 {
+    font-weight: 500;
+}
+
 .mat-menu-panel,
 .mat-select-panel {
     border-radius: 0px !important;
@@ -940,6 +944,7 @@ button:disabled {
     font-style: $style-normal;
     font-weight: $weight-300;
     font-size: $small-font;
+    line-height: 16px;
     letter-spacing: 0.4px;
     color: var(--gray-3-color);
     margin-bottom: 0px !important;
