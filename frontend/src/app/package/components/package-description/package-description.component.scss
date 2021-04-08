@@ -51,6 +51,16 @@ markdown ::ng-deep {
     }
 }
 
+h1 {
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-size: ($title-font + 2);
+    font-weight: $weight-400;
+    margin-bottom: 0px !important;
+    color: var(--gray-1-color);
+    letter-spacing: 0.6px;
+}
+
 .limitTextHeight {
     height: 120px;
     overflow: hidden;
@@ -61,4 +71,5 @@ markdown ::ng-deep {
     height: 48px;
     margin-top: -48px;
     position: relative;
+    pointer-events: none;
 }

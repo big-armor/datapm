@@ -8,13 +8,16 @@
         </p>
         <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center public-toggle">
-                <div class="package-dark-gray">Make this catalog public</div>
                 <div class="ml-auto px-2 pb-1 slide-right">
                     <mat-slide-toggle
                         class="app-slide-toggle"
                         [checked]="isCatalogPublic"
                         (change)="updatePublic($event)"
                     ></mat-slide-toggle>
+                </div>
+                <div class="pr-2 package-dark-gray" style="margin-bottom: 0px !important">
+                    <span class="public-text" *ngIf="isCatalogPublic">Public</span>
+                    <span class="not-public-text" *ngIf="!isCatalogPublic">Not Public</span>
                 </div>
             </div>
         </div>
