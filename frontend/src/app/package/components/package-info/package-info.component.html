@@ -32,7 +32,7 @@
         </div>
         <div class="d-md-block pb-3">
             <div class="d-flex justify-content-between">
-                <div class="package-light-gray">click to copy fetch command</div>
+                <div class="text-light-gray">click to copy fetch command</div>
             </div>
             <div class="d-flex bd-highlight copy-wrapper" (click)="copyCommand()" style="cursor: pointer">
                 <div class="bd-highlight copy-input">
@@ -49,33 +49,33 @@
 
         <div class="row mb-3">
             <div class="col-6 col-sm-6">
-                <p class="package-light-gray">version</p>
-                <p class="package-dark-gray">
+                <p class="text-light-gray">version</p>
+                <p class="text-dark-gray">
                     {{ package?.latestVersion.identifier | version }}
                 </p>
             </div>
             <div class="col-6">
-                <p class="package-light-gray">record count</p>
-                <p class="package-dark-gray">{{ getRecordCount(packageFile) | number }} {{ packageUnit }} records</p>
+                <p class="text-light-gray">record count</p>
+                <p class="text-dark-gray">{{ getRecordCount(packageFile) | number }} {{ packageUnit }} records</p>
             </div>
         </div>
         <div class="row mb-3">
             <div class="col-6">
-                <p class="package-light-gray">last refreshed</p>
-                <p class="package-dark-gray">
+                <p class="text-light-gray">last refreshed</p>
+                <p class="text-dark-gray">
                     {{ package?.latestVersion?.createdAt | timeAgo }}
                 </p>
             </div>
             <div class="col-6">
-                <p class="package-light-gray">unpacked size</p>
-                <p class="package-dark-gray">{{ packageFile | packageSize }}</p>
+                <p class="text-light-gray">unpacked size</p>
+                <p class="text-dark-gray">{{ packageFile | packageSize }}</p>
             </div>
         </div>
 
         <div class="row mb-3" *ngIf="packageFile?.website">
             <div class="col-12 mb-2">
-                <p class="package-light-gray">website</p>
-                <p class="package-dark-gray text-overflow-elipses">
+                <p class="text-light-gray">website</p>
+                <p class="text-dark-gray text-overflow-elipses">
                     <a class="color-info" target="_blank" href="{{ packageFile?.website }}">{{
                         packageFile?.website
                     }}</a>
@@ -84,8 +84,8 @@
         </div>
         <div class="row" *ngIf="packageFile?.contactEmail">
             <div class="col-12 mb-4">
-                <p class="package-light-gray">contact</p>
-                <p class="package-dark-gray text-overflow-elipses">
+                <p class="text-light-gray">contact</p>
+                <p class="text-dark-gray text-overflow-elipses">
                     <a href="mailto:{{ packageFile?.contactEmail }}">{{ packageFile?.contactEmail }}</a>
                 </p>
             </div>

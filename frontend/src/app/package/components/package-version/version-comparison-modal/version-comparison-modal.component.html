@@ -4,21 +4,21 @@
             <div mat-dialog-title id="contentTitle">Comparing versions</div>
             <div mat-dialog-content id="contentBorder">
                 <div class="row m-0">
-                    <div class="package-dark-gray">New version</div>
+                    <div class="text-dark-gray">New version</div>
                     <mat-select (selectionChange)="compareVersions()" [(value)]="newVersion">
                         <mat-option *ngFor="let version of versions" [value]="version.identifier">
                             {{ version.identifier | version }}
                         </mat-option>
                     </mat-select>
 
-                    <div class="package-dark-gray mt-3">Old version</div>
+                    <div class="text-dark-gray mt-3">Old version</div>
                     <mat-select (selectionChange)="compareVersions()" [(value)]="oldVersion">
                         <mat-option *ngFor="let version of versions" [value]="version.identifier">
                             {{ version.identifier | version }}
                         </mat-option>
                     </mat-select>
 
-                    <div class="package-dark-gray mt-3 w-100">Differences</div>
+                    <div class="text-dark-gray mt-3 w-100">Differences</div>
 
                     <div class="mt-1" *ngIf="!loading; else loadingTemplate">
                         <ul *ngIf="changes.length; else noDifferencesTemplate">

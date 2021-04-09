@@ -4,15 +4,15 @@
             <div id="myCollections" class="big-div-collection">
                 <div class="mb-3">
                     <div *ngIf="state === State.SUCCESS">
-                        <div class="package-details-title col-md-12 no-pd-mobile">
+                        <div class="text-main-title col-md-12 no-pd-mobile">
                             {{ isCurrentUser ? "My Collections" : "Collections" }}
                         </div>
                         <ng-container *ngIf="collections.length === 0">
                             <div class="mb-3 col-lg-8 no-pd-mobile">
-                                <span *ngIf="isCurrentUser" class="package-dark-gray"
+                                <span *ngIf="isCurrentUser" class="text-dark-gray"
                                     >Create collections to organize and share data sets you discover.
                                 </span>
-                                <span *ngIf="!isCurrentUser" class="package-dark-gray"
+                                <span *ngIf="!isCurrentUser" class="text-dark-gray"
                                     >Either <span style="font-weight: 500">{{ username }}</span> has not created a
                                     collection, or you do not have permission to view of any of the collections they
                                     have created.
@@ -30,10 +30,10 @@
                         <div *ngIf="collections.length > 0">
                             <div class="mb-3 col-lg-8 no-pd-mobile">
                                 <p>
-                                    <span *ngIf="isCurrentUser" class="package-dark-gray">
+                                    <span *ngIf="isCurrentUser" class="text-dark-gray">
                                         Create collections to organize and share data sets you discover.
                                     </span>
-                                    <span *ngIf="!isCurrentUser" class="package-dark-gray">
+                                    <span *ngIf="!isCurrentUser" class="text-dark-gray">
                                         Collections of data created by
                                         <span style="font-weight: 500">{{ username }}</span
                                         >.

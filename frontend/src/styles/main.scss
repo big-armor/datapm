@@ -943,7 +943,7 @@ button:disabled {
     color: var(--info-color);
 }
 
-.package-light-gray {
+.text-light-gray {
     font-family: $family-roboto;
     font-style: $style-normal;
     font-weight: $weight-300;
@@ -954,7 +954,7 @@ button:disabled {
     margin-bottom: 0px !important;
 }
 
-.package-dark-gray {
+.text-dark-gray {
     font-family: $family-roboto;
     font-style: $style-normal;
     font-weight: $weight-400;
@@ -964,7 +964,7 @@ button:disabled {
     margin-bottom: 5px !important;
 }
 
-.package-details-title {
+.text-main-title {
     font-family: $family-roboto;
     font-style: $style-normal;
     font-size: $title-font;
@@ -1063,8 +1063,8 @@ button:disabled {
             min-height: 40px;
         }
     }
-    .package-light-gray,
-    .package-dark-gray {
+    .text-light-gray,
+    .text-dark-gray {
         line-height: 17px;
     }
     .font-22 {

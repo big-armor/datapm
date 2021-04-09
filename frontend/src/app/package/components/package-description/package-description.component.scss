@@ -13,14 +13,32 @@
 
 .ul-data {
     list-style: none;
-    border: 1px solid #e6e6e6;
-    border-radius: 4px;
-    padding-left: 0px !important;
+    overflow-x: scroll;
+    white-space: nowrap;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    padding: 20px 10px;
+    background-color: var(--gray-10-color);
+
     li {
-        padding: 8px 12px;
-        border-bottom: 1px solid #e6e6e6;
-        &:last-child {
-            border-bottom: none !important;
+        display: inline-block;
+        cursor: pointer;
+        margin-right: 10px;
+        border: 1px solid var(--tranparent-border);
+        background-color: var(--gray-7-color);
+        padding: 10px;
+        border-radius: 6px;
+        font-family: $family-roboto;
+        font-weight: 400;
+        letter-spacing: 0.6px;
+        font-size: $small-font;
+        color: var(--gray-1-color);
+
+        p {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 100px;
         }
     }
     .ul-links {
@@ -28,6 +46,10 @@
         cursor: pointer;
         font-size: $text-font;
     }
+}
+
+.related-data-div {
+    border-top: 1px solid var(--gray-9-color);
 }
 
 markdown ::ng-deep {
@@ -62,7 +84,7 @@ h1 {
 }
 
 .limitTextHeight {
-    height: 120px;
+    height: 128px;
     overflow: hidden;
 }
 

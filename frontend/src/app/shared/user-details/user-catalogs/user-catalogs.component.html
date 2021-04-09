@@ -4,19 +4,19 @@
             <div id="catalogsPage">
                 <div class="catalogs-div panel-div">
                     <ng-container *ngIf="catalogState !== State.LOADING">
-                        <div class="package-details-title col-md-12 no-pd-mobile">
+                        <div class="text-main-title col-md-12 no-pd-mobile">
                             {{ isCurrentUser ? "My Catalogs" : "Catalogs" }}
                         </div>
                         <p class="col-lg-8 no-pd-mobile">
-                            <span *ngIf="isCurrentUser" class="package-dark-gray"
+                            <span *ngIf="isCurrentUser" class="text-dark-gray"
                                 >Catalogs represent a single individual or organization. All data packages belong to one
                                 and only one catalog.</span
                             >
-                            <span *ngIf="!isCurrentUser && myCatalogs.length > 0" class="package-dark-gray"
+                            <span *ngIf="!isCurrentUser && myCatalogs.length > 0" class="text-dark-gray"
                                 >Catalogs created by <span style="font-weight: 500">{{ username }}</span>
                             </span>
 
-                            <span *ngIf="!isCurrentUser && myCatalogs.length == 0" class="package-dark-gray">
+                            <span *ngIf="!isCurrentUser && myCatalogs.length == 0" class="text-dark-gray">
                                 Either <span style="font-weight: 500">{{ username }}</span> has not created any
                                 catalogs, or you do not have permission to view any of the catalogs they have created.
                                 <a target="_blank" href="/docs/catalogs">
