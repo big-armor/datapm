@@ -16,7 +16,7 @@
                                                     ><img
                                                         src="../../../../../assets/images/sources/raw_file.png"
                                                         alt="csv img"
-                                                        style="width: 16px; height: 16px"
+                                                        style="width: 20px; height: 20px"
                                                 /></a>
                                                 Download raw file
                                             </button>
@@ -33,7 +33,7 @@
                                                     ><img
                                                         src="../../../../../assets/images/sources/{{ source.slug }}.svg"
                                                         alt="{{ source.slug }} img"
-                                                        style="width: 16px; height: 16px"
+                                                        style="width: 20px; height: 20px"
                                                 /></a>
                                                 {{ source.name }}
                                             </button>
@@ -50,7 +50,7 @@
                                                     ><img
                                                         src="../../../../../assets/images/sources/{{ source.slug }}.svg"
                                                         alt="{{ source.slug }} img"
-                                                        style="width: 16px; height: 16px"
+                                                        style="width: 20px; height: 20px"
                                                 /></a>
                                                 {{ source.name }}
                                             </button>
@@ -67,7 +67,7 @@
                                                     ><img
                                                         src="../../../../../assets/images/sources/{{ source.slug }}.svg"
                                                         alt="{{ source.slug }} img"
-                                                        style="width: 16px; height: 16px"
+                                                        style="width: 20px; height: 20px"
                                                 /></a>
                                                 {{ source.name }}
                                             </button>
@@ -93,7 +93,7 @@
             </div>
 
             <div mat-dialog-actions class="d-flex justify-content-end pt-1">
-                <button mat-button (click)="move(0)" *ngIf="currentIndex == 1">Back</button>
+                <button mat-button (click)="move(0)" *ngIf="currentIndex == 1" class="back-btn">Back</button>
                 <button mat-button mat-dialog-close class="close-dialog">Close</button>
             </div>
         </div>

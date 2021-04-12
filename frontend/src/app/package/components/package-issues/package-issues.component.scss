@@ -65,7 +65,7 @@
             border: 1px solid var(--gray-5-color);
             background-color: var(--custom-table-color);
 
-            .package-details-title {
+            .text-main-title {
                 font-size: $default-font;
 
                 &:hover {
@@ -152,7 +152,7 @@
                 cursor: default;
             }
 
-            .package-details-title {
+            .text-main-title {
                 font-size: ($default-font - 1);
                 color: var(--info-color);
 
@@ -183,7 +183,7 @@
             margin-right: 2px;
             font-size: $xsmall-font;
         }
-        .package-light-gray {
+        .text-light-gray {
             overflow: hidden;
             line-height: 14px;
             text-overflow: ellipsis;
@@ -193,7 +193,7 @@
             .issue-wrapper {
                 padding: 6px 6px;
                 line-height: 18px;
-                .package-details-title {
+                .text-main-title {
                     font-size: ($text-font - 2);
                 }
             }

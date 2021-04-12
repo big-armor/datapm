@@ -1,6 +1,6 @@
 <div class="pb-5" id="packageVersion">
-    <div class="package-details-title">schema history</div>
-    <div class="package-light-gray mt-3" *ngIf="displayedVersions.length > 1">
+    <div class="text-main-title">schema history</div>
+    <div class="text-light-gray mt-3" *ngIf="displayedVersions.length > 1">
         <a href="javascript::void(0)" style="font-weight: 400" (click)="openVersionComparisonModal()"
             >Select versions to compare</a
         >
@@ -9,15 +9,15 @@
         <tbody>
             <ng-container *ngFor="let version of displayedVersions">
                 <tr>
-                    <td class="package-dark-gray pt-3">
-                        <strong>{{ version.identifier | version }}</strong>
+                    <td class="text-dark-gray pt-3">
+                        <span class="font-500">{{ version.identifier | version }}</span>
                     </td>
-                    <td class="package-light-gray text-right pt-3">{{ version.createdAt | timeAgo }}</td>
+                    <td class="text-light-gray text-right pt-3">{{ version.createdAt | timeAgo }}</td>
                 </tr>
                 <tr class="second-tr">
                     <td colspan="2">
                         <ul>
-                            <li *ngFor="let change of version.changes" class="package-dark-gray">
+                            <li *ngFor="let change of version.changes" class="text-dark-gray">
                                 {{ change.changeLabel }}
                                 <span *ngIf="change.changeFieldName">"{{ change.changeFieldName }}"</span>
                             </li>

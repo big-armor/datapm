@@ -91,11 +91,11 @@
 
         <ng-container *ngIf="!searchCollectionsTimeout">
             <div class="text-danger mt-3" *ngIf="shouldShowCreatingNewCollectionLabel && selectedValidCollectionSlug">
-                You don't manage such a collection. A new one will be created for you.
+                A new collection will be created.
             </div>
 
             <div class="text-danger mt-3" *ngIf="shouldShowCreatingNewCollectionLabel && !selectedValidCollectionSlug">
-                You don't manage such a collection and the slug you've entered is not available. Please choose another.
+                You do not have permission to edit this collection. Please choose another name.
             </div>
         </ng-container>
     </div>

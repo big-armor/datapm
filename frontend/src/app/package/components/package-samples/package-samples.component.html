@@ -9,11 +9,11 @@
         <div class="samples" *ngIf="schema">
             <div>
                 <div class="d-flex">
-                    <div class="package-dark-gray">
-                        {{ schema.sampleRecords?.length }} {{ schema.unit || "" }} sample {{ schema.title }} records
+                    <div class="text-dark-gray">
+                        {{ schema.sampleRecords?.length }} {{ schema.unit || "" }} sample records
                     </div>
 
-                    <div class="ml-auto package-dark-gray">
+                    <div class="ml-auto text-dark-gray">
                         <a (click)="showSchemaFullScreen(schema)">view full screen</a>
                     </div>
                 </div>

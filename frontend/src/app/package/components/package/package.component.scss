@@ -85,9 +85,6 @@
     .left-div {
         padding-right: 15px !important;
     }
-    .identifier {
-        font-size: ($default-font + 1);
-    }
 }
 
 @media (max-width: 768px) {
@@ -111,6 +108,6 @@
         top: 0px;
     }
     .identifier {
-        font-size: $default-font;
+        font-size: $default-font + 1;
     }
 }

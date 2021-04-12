@@ -16,11 +16,12 @@
         font-family: $family-roboto-mono;
         font-size: ($default-font - 1);
         color: var(--info-color);
-        margin-bottom: 0px !important;
+        margin-bottom: 2px !important;
     }
 
     .img-cover {
         margin-right: 6px;
+        margin-top: 4px;
     }
 
     .package-wrapper {
@@ -50,10 +51,15 @@
 }
 
 @media (max-width: 575px) {
+    .container {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
     .package-item {
         padding: 15px 10px;
         .package-identifier {
-            font-size: $small-font;
+            margin: 1px 7px 5px 7px !important;
+            line-height: 15px;
         }
         .img-cover {
             margin-top: 0px;

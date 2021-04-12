@@ -1,4 +1,5 @@
 import { Component } from "@angular/core";
+import { Router } from "@angular/router";
 import { PackageFile, parsePackageFileJSON, Schema, validatePackageFileInBrowser } from "datapm-lib";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
@@ -27,7 +28,11 @@ export class PackageDescriptionComponent {
 
     public collections: CollectionBasicData[] = [];
 
-    constructor(private packageService: PackageService, private packageCollectionsGQL: PackageCollectionsGQL) {
+    constructor(
+        private packageService: PackageService,
+        private packageCollectionsGQL: PackageCollectionsGQL,
+        private router: Router
+    ) {
         this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe((p: PackageResponse) => {
             if (p == null || p.package == null) {
                 return;
@@ -56,6 +61,10 @@ export class PackageDescriptionComponent {
                 this.selectedSchema = this.schemas[0];
             }
         });
+    }
+
+    public goToCollection(collectionSlug: string): void {
+        this.router.navigate(["collection/" + collectionSlug]);
     }
 
     public toggleShowMoreReadMeText() {

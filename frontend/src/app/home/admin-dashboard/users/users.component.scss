@@ -24,7 +24,8 @@
                     font-size: $text-font;
                     letter-spacing: 0.4px;
                     font-weight: $weight-300;
-                    color: var(--gray-4-color);
+                    opacity: 0.9;
+                    color: var(--gray-3-color);
                 }
             }
         }
@@ -79,8 +80,7 @@
         }
 
         .btn-wrapper {
-            display: flex;
-            border: none;
+            display: table-cell;
         }
 
         table.gray-table td {
@@ -88,9 +88,19 @@
         }
 
         .app-outlined-button {
-            padding: 6px 2px;
-            margin: 0;
-            width: 93px;
+            padding: 6px 3px;
+            margin: 3px 0px;
+            width: 101px;
+        }
+        ::ng-deep {
+            .mat-form-field-infix {
+                input {
+                    &::placeholder {
+                        font-weight: $weight-400;
+                        font-size: $small-font;
+                    }
+                }
+            }
         }
     }
 }

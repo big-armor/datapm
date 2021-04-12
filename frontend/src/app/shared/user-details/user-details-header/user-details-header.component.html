@@ -7,15 +7,13 @@
             </div>
             <div class="p-2 align-self-center" [class.not-current-user]="!isCurrentUser">
                 <span *ngIf="user.firstName && user.lastName && (user.nameIsPublic || isCurrentUser)">
-                    <span class="package-details-title font-22">{{ user | username }}</span>
+                    <span class="text-main-title font-22">{{ user | username }}</span>
                     <span *ngIf="user.nameIsPublic" class="public-text">(public)</span>
                     <span *ngIf="!user.nameIsPublic" class="not-public-text">(not public)</span><br />
                 </span>
 
                 <div class="username dpm-text-body my-2">
-                    <span [class.package-details-title]="!user.firstName && !user.lastName">{{
-                        "@" + user.username
-                    }}</span>
+                    <span [class.text-main-title]="!user.firstName && !user.lastName">{{ "@" + user.username }}</span>
                     <span class="public-text">(public)</span>
                 </div>
             </div>
@@ -29,7 +27,7 @@
                 </span>
             </div>
 
-            <div class="py-1">
+            <div>
                 <span class="social-link" *ngIf="user.emailAddressIsPublic || isCurrentUser">
                     <a target="_blank" href="mailto:{{ user.emailAddress }}" class="social-img">
                         <em class="far fa-envelope"></em>
@@ -61,7 +59,7 @@
                 </span>
             </div>
 
-            <p class="package-dark-gray">
+            <p class="text-dark-gray pt-1">
                 {{ user.description }}
             </p>
         </div>
