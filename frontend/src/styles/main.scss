@@ -531,7 +531,8 @@ mat-select {
 }
 
 .mat-option.mat-active {
-    color: var(--gray-1-color);
+    color: var(--gray-1-color) !important;
+    background-color: var(--active-option) !important;
 }
 
 .header-border {

@@ -58,7 +58,7 @@
                 <a class="text-dark-gray ul-links" (click)="goToCollection(collection.identifier.collectionSlug)">{{
                     collection.name
                 }}</a>
-                <p class="text-light-gray">{{ collection.description }}</p>
+                <p class="text-light-gray" [class.p-width]="collection.description">{{ collection.description }}</p>
             </li>
         </ul>
     </div>

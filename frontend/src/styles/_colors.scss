@@ -159,6 +159,9 @@ $cdk-overlay-background-dark: rgb(0 0 0 / 61%);
 $fade-out-shadow: linear-gradient(to bottom, rgb(243 243 243 / 0%) 0%, #f5f5f5e0 75%);
 $fade-out-shadow-dark: linear-gradient(to bottom, #20212400, #202124d9 75%);
 
+$active-option: #f3f3f3;
+$active-option-dark: #4d8cd6;
+
 $colors: (
     --primary-color: (
         $primary-color,
@@ -351,5 +354,9 @@ $colors: (
     --fade-out-shadow: (
         $fade-out-shadow,
         $fade-out-shadow-dark
+    ),
+    --active-option: (
+        $active-option,
+        $active-option-dark
     )
 );

@@ -17,7 +17,7 @@
     white-space: nowrap;
     margin-bottom: 15px;
     border-radius: 6px;
-    padding: 20px 10px;
+    padding: 13px 13px;
     background-color: var(--gray-10-color);
 
     li {
@@ -34,7 +34,7 @@
         font-size: $small-font;
         color: var(--gray-1-color);
 
-        p {
+        .p-width {
             text-overflow: ellipsis;
             white-space: nowrap;
             overflow: hidden;

@@ -16,9 +16,9 @@
                                 [matAutocomplete]="auto"
                             ></app-input>
                             <mat-autocomplete
+                                autoActiveFirstOption
                                 #auto="matAutocomplete"
                                 class="search-autocomplete"
-                                (keyup)="(autoCompleteOptionSelected)"
                                 (optionSelected)="autoCompleteOptionSelected($event)"
                             >
                                 <mat-option *ngIf="!autoCompleteResult && searchControl.value.length > 1">
