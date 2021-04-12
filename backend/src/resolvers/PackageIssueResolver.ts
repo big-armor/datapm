@@ -15,6 +15,7 @@ import { PackageIssueRepository } from "../repository/PackageIssueRepository";
 import { PackageRepository } from "../repository/PackageRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
+import { packageEntityToGraphqlObjectWithExtraData } from "./PackageResolver";
 
 export const getPackageIssue = async (
     _0: any,
@@ -128,6 +129,26 @@ export const getPackageIssueAuthor = async (parent: any, _1: any, context: Authe
         where: { id: parent.authorId },
         relations: getGraphQlRelationName(info)
     });
+};
+
+export const getPackageIssuePackageIdentifier = async (
+    parent: any,
+    _1: any,
+    context: AuthenticatedContext,
+    info: any
+) => {
+    if (!parent.packageId) {
+        return null;
+    }
+
+    const packageEntity = await context.connection
+        .getCustomRepository(PackageRepository)
+        .findPackageByIdOrFail({ packageId: parent.packageId, relations: ["catalog"] });
+
+    return {
+        catalogSlug: packageEntity.catalog.slug,
+        packageSlug: packageEntity.slug
+    };
 };
 
 export const createPackageIssue = async (

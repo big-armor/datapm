@@ -1,222 +1,32 @@
-<div class="container" id="userFollowing">
+<div class="container" id="user-following">
     <div class="row">
         <div class="col-md-12">
             <div class="panel-div pl-2">
-                <div class="package-details-title">
-                    {{ isCurrentUser ? "My Follows" : "Follows" }}
-                </div>
+                <div class="package-details-title">My Follows</div>
                 <div class="text-left" *ngIf="!isFollowing">
                     <p class="package-dark-gray">
                         Use the 'follow' button throughout this registry to be notified of changes
                     </p>
                 </div>
-                <div class="package-div mt-4">
-                    <div class="package-details-title font-16">Packages</div>
-                    <div class="table-content">
-                        <table
-                            mat-table
-                            [dataSource]="dataSource"
-                            class="w-100 gray-table"
-                            aria-labelledby="userfollowing"
-                        >
-                            <!--- Note that these columns can be defined in any order.
-                                  The actual rendered columns are set as a property on the row definition" -->
-
-                            <!-- Position Column -->
-                            <ng-container matColumnDef="position">
-                                <th mat-header-cell *matHeaderCellDef scope="col">Name</th>
-                                <td mat-cell *matCellDef="let element">
-                                    <a href="#">ermali/tree-data</a>
-                                </td>
-                            </ng-container>
-
-                            <!-- Name Column -->
-                            <ng-container matColumnDef="name">
-                                <th mat-header-cell *matHeaderCellDef scope="col">Frequency</th>
-                                <td mat-cell *matCellDef="let element">
-                                    <mat-form-field appearance="fill" class="permission-div">
-                                        <mat-select value="VIEW">
-                                            <mat-option value="VIEW">View </mat-option>
-                                            <mat-option value="EDIT">Edit </mat-option>
-                                            <mat-option value="MANAGE">Manage </mat-option>
-                                        </mat-select>
-                                    </mat-form-field>
-                                </td>
-                            </ng-container>
-
-                            <!-- Weight Column -->
-                            <ng-container matColumnDef="weight">
-                                <th mat-header-cell *matHeaderCellDef scope="col">Action</th>
-                                <td mat-cell *matCellDef="let element">
-                                    <button
-                                        (click)="openDeleteUserConfirmationDialog(element)"
-                                        class="app-outlined-button"
-                                    >
-                                        <span class="delete-txt">Delete</span>
-                                    </button>
-                                </td>
-                            </ng-container>
-
-                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-                        </table>
-                    </div>
+                <div class="catalog-div mt-4">
+                    <div class="package-details-title font-16">Catalogs</div>
+                    <app-user-type-following [type]="FollowType.CATALOG"></app-user-type-following>
                 </div>
                 <div class="collection-div mt-4">
                     <div class="package-details-title font-16">Collections</div>
-                    <div class="table-content">
-                        <table
-                            mat-table
-                            [dataSource]="dataSource"
-                            class="w-100 gray-table"
-                            aria-labelledby="userfollowing"
-                        >
-                            <!--- Note that these columns can be defined in any order.
-                                  The actual rendered columns are set as a property on the row definition" -->
-
-                            <!-- Position Column -->
-                            <ng-container matColumnDef="position">
-                                <th mat-header-cell *matHeaderCellDef scope="col">Name</th>
-                                <td mat-cell *matCellDef="let element">
-                                    <a href="#">ermali/tree-data</a>
-                                </td>
-                            </ng-container>
-
-                            <!-- Name Column -->
-                            <ng-container matColumnDef="name">
-                                <th mat-header-cell *matHeaderCellDef scope="col">Frequency</th>
-                                <td mat-cell *matCellDef="let element">
-                                    <mat-form-field appearance="fill" class="permission-div">
-                                        <mat-select value="VIEW">
-                                            <mat-option value="VIEW">View </mat-option>
-                                            <mat-option value="EDIT">Edit </mat-option>
-                                            <mat-option value="MANAGE">Manage </mat-option>
-                                        </mat-select>
-                                    </mat-form-field>
-                                </td>
-                            </ng-container>
-
-                            <!-- Weight Column -->
-                            <ng-container matColumnDef="weight">
-                                <th mat-header-cell *matHeaderCellDef scope="col">Action</th>
-                                <td mat-cell *matCellDef="let element">
-                                    <button
-                                        (click)="openDeleteUserConfirmationDialog(element)"
-                                        class="app-outlined-button"
-                                    >
-                                        <span class="delete-txt">Delete</span>
-                                    </button>
-                                </td>
-                            </ng-container>
-
-                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-                        </table>
-                    </div>
+                    <app-user-type-following [type]="FollowType.COLLECTION"></app-user-type-following>
                 </div>
-                <div class="catalog-div mt-4">
-                    <div class="package-details-title font-16">Catalogs</div>
-                    <div class="table-content">
-                        <table
-                            mat-table
-                            [dataSource]="dataSource"
-                            class="w-100 gray-table"
-                            aria-labelledby="userfollowing"
-                        >
-                            <!--- Note that these columns can be defined in any order.
-                                  The actual rendered columns are set as a property on the row definition" -->
-
-                            <!-- Position Column -->
-                            <ng-container matColumnDef="position">
-                                <th mat-header-cell *matHeaderCellDef scope="col">Name</th>
-                                <td mat-cell *matCellDef="let element">
-                                    <a href="#">ermali/tree-data</a>
-                                </td>
-                            </ng-container>
-
-                            <!-- Name Column -->
-                            <ng-container matColumnDef="name">
-                                <th mat-header-cell *matHeaderCellDef scope="col">Frequency</th>
-                                <td mat-cell *matCellDef="let element">
-                                    <mat-form-field appearance="fill" class="permission-div">
-                                        <mat-select value="VIEW">
-                                            <mat-option value="VIEW">View </mat-option>
-                                            <mat-option value="EDIT">Edit </mat-option>
-                                            <mat-option value="MANAGE">Manage </mat-option>
-                                        </mat-select>
-                                    </mat-form-field>
-                                </td>
-                            </ng-container>
-
-                            <!-- Weight Column -->
-                            <ng-container matColumnDef="weight">
-                                <th mat-header-cell *matHeaderCellDef scope="col">Action</th>
-                                <td mat-cell *matCellDef="let element">
-                                    <button
-                                        (click)="openDeleteUserConfirmationDialog(element)"
-                                        class="app-outlined-button"
-                                    >
-                                        <span class="delete-txt">Delete</span>
-                                    </button>
-                                </td>
-                            </ng-container>
-
-                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-                        </table>
-                    </div>
+                <div class="package-div mt-4">
+                    <div class="package-details-title font-16">Packages</div>
+                    <app-user-type-following [type]="FollowType.PACKAGE"></app-user-type-following>
+                </div>
+                <div class="user-div mt-4">
+                    <div class="package-details-title font-16">Package Issues</div>
+                    <app-user-type-following [type]="FollowType.PACKAGE_ISSUE"></app-user-type-following>
                 </div>
                 <div class="user-div mt-4">
                     <div class="package-details-title font-16">Users</div>
-                    <div class="table-content">
-                        <table
-                            mat-table
-                            [dataSource]="dataSource"
-                            class="w-100 gray-table"
-                            aria-labelledby="userfollowing"
-                        >
-                            <!--- Note that these columns can be defined in any order.
-                                  The actual rendered columns are set as a property on the row definition" -->
-
-                            <!-- Position Column -->
-                            <ng-container matColumnDef="position">
-                                <th mat-header-cell *matHeaderCellDef scope="col">Name</th>
-                                <td mat-cell *matCellDef="let element">
-                                    <a href="#">ermali/tree-data</a>
-                                </td>
-                            </ng-container>
-
-                            <!-- Name Column -->
-                            <ng-container matColumnDef="name">
-                                <th mat-header-cell *matHeaderCellDef scope="col">Frequency</th>
-                                <td mat-cell *matCellDef="let element">
-                                    <mat-form-field appearance="fill" class="permission-div">
-                                        <mat-select value="VIEW">
-                                            <mat-option value="VIEW">View </mat-option>
-                                            <mat-option value="EDIT">Edit </mat-option>
-                                            <mat-option value="MANAGE">Manage </mat-option>
-                                        </mat-select>
-                                    </mat-form-field>
-                                </td>
-                            </ng-container>
-
-                            <!-- Weight Column -->
-                            <ng-container matColumnDef="weight">
-                                <th mat-header-cell *matHeaderCellDef scope="col">Action</th>
-                                <td mat-cell *matCellDef="let element">
-                                    <button
-                                        (click)="openDeleteUserConfirmationDialog(element)"
-                                        class="app-outlined-button"
-                                    >
-                                        <span class="delete-txt">Delete</span>
-                                    </button>
-                                </td>
-                            </ng-container>
-
-                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-                        </table>
-                    </div>
+                    <app-user-type-following [type]="FollowType.USER"></app-user-type-following>
                 </div>
             </div>
         </div>

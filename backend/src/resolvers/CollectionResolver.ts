@@ -40,6 +40,22 @@ export const collectionEntityToGraphQL = (collectionEntity: CollectionEntity): C
     };
 };
 
+export const collectionEntityToGraphQLWithNameAndDescriptionCollection = (
+    collectionEntity: CollectionEntity
+): Collection | null => {
+    if (!collectionEntity) {
+        return null;
+    }
+
+    return {
+        identifier: {
+            collectionSlug: collectionEntity.collectionSlug
+        },
+        name: collectionEntity.name,
+        description: collectionEntity.description
+    };
+};
+
 export const collectionEntityToGraphQLWithNameAndDescription = (
     collectionEntity: CollectionEntity
 ): CollectionBasicData => {

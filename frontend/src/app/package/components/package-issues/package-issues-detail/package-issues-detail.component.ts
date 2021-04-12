@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
 import { combineLatest, Subject } from "rxjs";
@@ -6,11 +7,16 @@ import { PackageService } from "src/app/package/services/package.service";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { ConfirmationDialogService } from "src/app/services/dialog/confirmation-dialog.service";
 import { ImageService } from "src/app/services/image.service";
+import { FollowDialogComponent } from "src/app/shared/dialogs/follow-dialog/follow-dialog.component";
 import { MarkdownEditorComponent } from "src/app/shared/markdown-editor/markdown-editor.component";
 import {
     CreatePackageIssueCommentGQL,
+    DeleteFollowGQL,
     DeletePackageIssueCommentGQL,
     DeletePackageIssueGQL,
+    Follow,
+    GetFollowGQL,
+    NotificationFrequency,
     OrderBy,
     PackageIdentifierInput,
     PackageIssue,
@@ -20,6 +26,7 @@ import {
     PackageIssueIdentifierInput,
     PackageIssueStatus,
     Permission,
+    SaveFollowGQL,
     UpdatePackageIssueCommentGQL,
     UpdatePackageIssueGQL,
     UpdatePackageIssueStatusGQL,
@@ -77,6 +84,9 @@ export class PackageIssuesDetailComponent implements OnInit {
     public isUserPackageManager: boolean = false;
     public canEditIssue: boolean = false;
 
+    public issueFollow: Follow;
+    public isFollowing: boolean;
+
     public user: User;
     private commentsOffset = 0;
 
@@ -94,7 +104,11 @@ export class PackageIssuesDetailComponent implements OnInit {
         private imageService: ImageService,
         private confirmationDialogService: ConfirmationDialogService,
         private router: Router,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private getFollowGQL: GetFollowGQL,
+        private saveFollowGQL: SaveFollowGQL,
+        private deleteFollowGQL: DeleteFollowGQL,
+        private dialog: MatDialog
     ) {}
 
     public ngOnInit(): void {
@@ -339,6 +353,73 @@ export class PackageIssuesDetailComponent implements OnInit {
         return this.isUserPackageManager || comment.author.username === this.user.username;
     }
 
+    public follow(): void {
+        this.openFollowModal()
+            .afterClosed()
+            .subscribe((result) => {
+                if (!result) {
+                    return;
+                } else if (result.notificationFrequency === NotificationFrequency.NEVER) {
+                    this.deleteFollow();
+                    return;
+                }
+
+                this.saveFollowGQL
+                    .mutate({
+                        follow: {
+                            packageIssue: {
+                                packageIdentifier: this.packageIdentifier,
+                                issueNumber: this.packageIssue.issueNumber
+                            },
+                            notificationFrequency: result.notificationFrequency
+                        }
+                    })
+                    .subscribe(() => this.updatePackageFollow(result));
+            });
+    }
+
+    private deleteFollow(): void {
+        this.deleteFollowGQL
+            .mutate({
+                follow: {
+                    packageIssue: {
+                        packageIdentifier: this.packageIdentifier,
+                        issueNumber: this.packageIssue.issueNumber
+                    }
+                }
+            })
+            .subscribe(() => this.updatePackageFollow(null));
+    }
+
+    private getFollow(): void {
+        this.getFollowGQL
+            .fetch({
+                follow: {
+                    packageIssue: {
+                        packageIdentifier: this.packageIdentifier,
+                        issueNumber: this.packageIssue.issueNumber
+                    }
+                }
+            })
+            .subscribe((response) => this.updatePackageFollow(response.data?.getFollow));
+    }
+
+    private openFollowModal(): MatDialogRef<FollowDialogComponent, Follow> {
+        return this.dialog.open(FollowDialogComponent, {
+            width: "500px",
+            data: this.issueFollow
+        });
+    }
+
+    private updatePackageFollow(follow: Follow): void {
+        this.issueFollow = follow;
+        if (!follow) {
+            this.isFollowing = false;
+        } else {
+            this.isFollowing = follow.notificationFrequency !== NotificationFrequency.NEVER;
+        }
+    }
+
     private changeIssueStatus(status: PackageIssueStatus): void {
         this.updatePackageIssueStatusGQL
             .mutate({
@@ -394,6 +475,7 @@ export class PackageIssuesDetailComponent implements OnInit {
                 this.canEditIssue =
                     this.isUserPackageManager || this.packageIssue.author.username === this.user.username;
                 this.packageIssueEditedContent = this.packageIssue.content;
+                this.getFollow();
                 this.loadPackageIssueComments();
             });
     }

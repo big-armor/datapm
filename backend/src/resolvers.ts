@@ -16,7 +16,8 @@ import {
     RegistryStatus,
     User,
     PackageIssueResolvers,
-    PackageIssueCommentResolvers
+    PackageIssueCommentResolvers,
+    FollowResolvers
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
@@ -160,6 +161,7 @@ import {
     getIssuesByPackage,
     getPackageIssue,
     getPackageIssueAuthor,
+    getPackageIssuePackageIdentifier,
     updatePackageIssue,
     updatePackageIssuesStatuses,
     updatePackageIssueStatus
@@ -172,7 +174,14 @@ import {
     updatePackageIssueComment
 } from "./resolvers/PackageIssueCommentResolver";
 import { packageVersionsDiff, packageVersionsDiffs } from "./resolvers/VersionComparisonResolver";
-import { deleteAllMyFollows, deleteFollow, getAllMyFollows, getFollow, saveFollow } from "./resolvers/FollowResolver";
+import {
+    deleteAllMyFollows,
+    deleteFollow,
+    followPackage,
+    getAllMyFollows,
+    getFollow,
+    saveFollow
+} from "./resolvers/FollowResolver";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -194,6 +203,7 @@ export const resolvers: {
     EmailAddress: GraphQLScalarType;
     CollectionSlug: GraphQLScalarType;
     AutoCompleteResult: AutoCompleteResultResolvers;
+    Follow: FollowResolvers;
 } = {
     AutoCompleteResult: {
         packages: async (parent: any, args: any, context: AutoCompleteContext, info: any) => {
@@ -457,7 +467,8 @@ export const resolvers: {
         isPublic: packageIsPublic
     },
     PackageIssue: {
-        author: getPackageIssueAuthor
+        author: getPackageIssueAuthor,
+        packageIdentifier: getPackageIssuePackageIdentifier
     },
     PackageIssueComment: {
         author: getPackageIssueCommentAuthor
@@ -469,6 +480,9 @@ export const resolvers: {
         createdAt: versionCreatedAt,
         package: versionPackage,
         updatedAt: versionUpdatedAt
+    },
+    Follow: {
+        package: followPackage
     },
 
     Query: {

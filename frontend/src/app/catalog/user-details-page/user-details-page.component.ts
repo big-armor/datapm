@@ -36,7 +36,7 @@ export class UserDetailsPageComponent implements OnInit {
                 { name: "packages", value: "packages" },
                 { name: "collections", value: "collections" },
                 { name: "catalogs", value: "catalogs" },
-                { name: "following", value: "userFollowing" }
+                { name: "following", value: "user-following" }
             ];
         } else {
             this.tabs = [

@@ -56,11 +56,11 @@ export class FollowEntity extends EntityBaseModel {
     @JoinColumn({ name: "target_package_id" })
     public package: PackageEntity;
 
-    @ManyToOne(() => PackageEntity, { eager: false })
+    @ManyToOne(() => CollectionEntity, { eager: false })
     @JoinColumn({ name: "target_collection_id" })
     public collection: CollectionEntity;
 
-    @ManyToOne(() => PackageEntity, { eager: false })
+    @ManyToOne(() => PackageIssueEntity, { eager: false })
     @JoinColumn({ name: "target_package_issue_id" })
     public packageIssue: PackageIssueEntity;
 

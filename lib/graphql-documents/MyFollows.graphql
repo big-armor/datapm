@@ -21,6 +21,10 @@ query MyFollows($type: FollowType!, $offset: Int!, $limit: Int!) {
             packageIssue {
                 issueNumber
                 subject
+                packageIdentifier {
+                    catalogSlug
+                    packageSlug
+                }
             }
             collection {
                 identifier {

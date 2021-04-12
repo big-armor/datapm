@@ -64,6 +64,7 @@ import { ShareDialogComponent } from "./dialogs/share-dialog/share-dialog.compon
 import { AngularSimplemdeModule } from "angular-simplemde";
 import { FollowDialogComponent } from "./dialogs/follow-dialog/follow-dialog.component";
 import { UserFollowingComponent } from "./user-details/user-following/user-following.component";
+import { UserTypeFollowingComponent } from "./user-details/user-following/user-type-following/user-type-following.component";
 
 @NgModule({
     declarations: [
@@ -109,7 +110,8 @@ import { UserFollowingComponent } from "./user-details/user-following/user-follo
         MarkdownEditorComponent,
         ShareDialogComponent,
         FollowDialogComponent,
-        UserFollowingComponent
+        UserFollowingComponent,
+        UserTypeFollowingComponent
     ],
     imports: [
         CommonModule,

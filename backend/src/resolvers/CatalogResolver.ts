@@ -7,11 +7,9 @@ import {
     ActivityLogEventType,
     Base64ImageUpload,
     Catalog,
-    CatalogIdentifier,
     CatalogIdentifierInput,
     CreateCatalogInput,
     Permission,
-    SetUserCatalogPermissionInput,
     UpdateCatalogInput
 } from "../generated/graphql";
 import { createActivityLog } from "../repository/ActivityLogRepository";
@@ -24,13 +22,25 @@ import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 import { packageEntityToGraphqlObject } from "./PackageResolver";
 import { hasCatalogPermissions } from "./UserCatalogPermissionResolver";
-import { ReservedKeywordsService } from "../service/reserved-keywords-service";
 
 export const catalogEntityToGraphQL = (catalogEntity: CatalogEntity): Catalog => {
     return {
         identifier: {
             catalogSlug: catalogEntity.slug
         }
+    };
+};
+
+export const catalogEntityToGraphQLWithDisplayName = (catalogEntity: CatalogEntity): Catalog | null => {
+    if (!catalogEntity) {
+        return null;
+    }
+
+    return {
+        identifier: {
+            catalogSlug: catalogEntity.slug
+        },
+        displayName: catalogEntity.displayName
     };
 };
 

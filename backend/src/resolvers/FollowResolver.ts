@@ -1,4 +1,4 @@
-import graphqlFields from "graphql-fields";
+import { Connection, EntityManager } from "typeorm";
 import { AuthenticatedContext } from "../context";
 import { FollowEntity } from "../entity/FollowEntity";
 import {
@@ -8,17 +8,25 @@ import {
     Follow,
     NotificationFrequency,
     FollowType,
-    MyFollowsResult
+    MyFollowsResult,
+    Package,
+    Collection,
+    Permission
 } from "../generated/graphql";
+import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { getCatalogOrFail } from "../repository/CatalogRepository";
 import { CollectionRepository } from "../repository/CollectionRepository";
 import { FollowRepository } from "../repository/FollowRepository";
 import { PackageIssueRepository } from "../repository/PackageIssueRepository";
+import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { PackageRepository } from "../repository/PackageRepository";
+import { UserCollectionPermissionRepository } from "../repository/UserCollectionPermissionRepository";
 import { UserRepository } from "../repository/UserRepository";
-import { getGraphQlRelationName } from "../util/relationNames";
+import { catalogEntityToGraphQLWithDisplayName } from "./CatalogResolver";
+import { collectionEntityToGraphQLWithNameAndDescriptionCollection } from "./CollectionResolver";
+import { packageEntityToGraphqlObjectWithExtraData } from "./PackageResolver";
 
-export const entityToGraphqlObject = (entity: FollowEntity | undefined) => {
+export const entityToGraphqlObject = async (context: EntityManager | Connection, entity: FollowEntity | undefined) => {
     if (!entity) {
         return {
             notificationFrequency: NotificationFrequency.NEVER,
@@ -28,7 +36,12 @@ export const entityToGraphqlObject = (entity: FollowEntity | undefined) => {
 
     return {
         notificationFrequency: entity.notificationFrequency,
-        eventTypes: entity.eventTypes
+        eventTypes: entity.eventTypes,
+        catalog: catalogEntityToGraphQLWithDisplayName(entity.catalog),
+        collection: collectionEntityToGraphQLWithNameAndDescriptionCollection(entity.collection),
+        package: await packageEntityToGraphqlObjectWithExtraData(context, entity.package),
+        packageIssue: entity.packageIssue,
+        user: entity.targetUser
     };
 };
 
@@ -52,12 +65,27 @@ export const saveFollow = async (
         const catalog = await getCatalogOrFail({ slug: follow.catalog.catalogSlug, manager });
         existingFollowEntity = await followRepository.getFollowByCatalogId(userId, catalog.id);
 
+        const hasPermission = await manager
+            .getCustomRepository(UserCatalogPermissionRepository)
+            .doesUserHavePermission(userId, catalog.id, Permission.VIEW);
+        if (!hasPermission) {
+            throw new Error("NOT_AUTHORIZED");
+        }
+
         followEntity.catalogId = catalog.id;
         followEntity.eventTypes = getCatalogEventTypes();
     } else if (follow.collection) {
         const collection = await manager
             .getCustomRepository(CollectionRepository)
             .findCollectionBySlugOrFail(follow.collection.collectionSlug);
+
+        const hasPermission = await manager
+            .getCustomRepository(UserCollectionPermissionRepository)
+            .hasPermission(userId, collection.id, Permission.VIEW);
+        if (!hasPermission) {
+            throw new Error("NOT_AUTHORIZED");
+        }
+
         existingFollowEntity = await followRepository.getFollowByCollectionId(userId, collection.id);
 
         followEntity.collectionId = collection.id;
@@ -66,6 +94,14 @@ export const saveFollow = async (
         const packageEntity = await manager
             .getCustomRepository(PackageRepository)
             .findPackageOrFail({ identifier: follow.package });
+
+        const hasPermission = await manager
+            .getCustomRepository(PackagePermissionRepository)
+            .hasPermission(userId, packageEntity.id, Permission.VIEW);
+        if (!hasPermission) {
+            throw new Error("NOT_AUTHORIZED");
+        }
+
         existingFollowEntity = await followRepository.getFollowByPackageId(userId, packageEntity.id);
 
         followEntity.packageId = packageEntity.id;
@@ -74,6 +110,14 @@ export const saveFollow = async (
         const packageEntity = await manager
             .getCustomRepository(PackageRepository)
             .findPackageOrFail({ identifier: follow.packageIssue.packageIdentifier });
+
+        const hasPermission = await manager
+            .getCustomRepository(PackagePermissionRepository)
+            .hasPermission(userId, packageEntity.id, Permission.VIEW);
+        if (!hasPermission) {
+            throw new Error("NOT_AUTHORIZED");
+        }
+
         const issueEntity = await manager
             .getCustomRepository(PackageIssueRepository)
             .getIssueByPackageAndIssueNumber(packageEntity.id, follow.packageIssue.issueNumber);
@@ -111,19 +155,19 @@ export const getFollow = async (
     if (follow.catalog) {
         const catalog = await getCatalogOrFail({ slug: follow.catalog.catalogSlug, manager });
         const entity = await followRepository.getFollowByCatalogId(userId, catalog.id);
-        return entityToGraphqlObject(entity);
+        return await entityToGraphqlObject(context.connection, entity);
     } else if (follow.collection) {
         const collection = await manager
             .getCustomRepository(CollectionRepository)
             .findCollectionBySlugOrFail(follow.collection.collectionSlug);
         const entity = await followRepository.getFollowByCollectionId(userId, collection.id);
-        return entityToGraphqlObject(entity);
+        return await entityToGraphqlObject(context.connection, entity);
     } else if (follow.package) {
         const packageEntity = await manager
             .getCustomRepository(PackageRepository)
             .findPackageOrFail({ identifier: follow.package });
         const entity = await followRepository.getFollowByPackageId(userId, packageEntity.id);
-        return entityToGraphqlObject(entity);
+        return await entityToGraphqlObject(context.connection, entity);
     } else if (follow.packageIssue) {
         const packageEntity = await manager
             .getCustomRepository(PackageRepository)
@@ -132,13 +176,13 @@ export const getFollow = async (
             .getCustomRepository(PackageIssueRepository)
             .getIssueByPackageAndIssueNumber(packageEntity.id, follow.packageIssue.issueNumber);
         const entity = await followRepository.getFollowByPackageIssueId(userId, issueEntity.id);
-        return entityToGraphqlObject(entity);
+        return await entityToGraphqlObject(context.connection, entity);
     } else if (follow.user) {
         const userEntity = await manager
             .getCustomRepository(UserRepository)
             .findUser({ username: follow.user.username });
         const entity = await followRepository.getFollowByUserId(userId, userEntity.id);
-        return entityToGraphqlObject(entity);
+        return await entityToGraphqlObject(context.connection, entity);
     } else {
         throw new Error("FOLLOW_NOT_FOUND");
     }
@@ -153,29 +197,28 @@ export const getAllMyFollows = async (
     const manager = context.connection.manager;
     const userId = context.me.id;
     const followRepository = manager.getCustomRepository(FollowRepository);
-    const relations = getGraphQlRelationName(info);
-    console.log("wowz", relations);
-    let followEntities = [];
+    let followEntities: FollowEntity[] = [];
     let count = 0;
 
     switch (type) {
         case FollowType.CATALOG:
-            let [catalogFollows, cfCount] = await followRepository.getCatalogFollows(userId, offset, limit, relations);
+            let [catalogFollows, cfCount] = await followRepository.getCatalogFollows(userId, offset, limit, [
+                "catalog"
+            ]);
             followEntities = catalogFollows;
             count = cfCount;
             break;
         case FollowType.COLLECTION:
-            let [collectionFollows, clCount] = await followRepository.getCollectionFollows(
-                userId,
-                offset,
-                limit,
-                relations
-            );
+            let [collectionFollows, clCount] = await followRepository.getCollectionFollows(userId, offset, limit, [
+                "collection"
+            ]);
             followEntities = collectionFollows;
             count = clCount;
             break;
         case FollowType.PACKAGE:
-            let [packageFollows, pkgCount] = await followRepository.getPackageFollows(userId, offset, limit, relations);
+            let [packageFollows, pkgCount] = await followRepository.getPackageFollows(userId, offset, limit, [
+                "package"
+            ]);
             followEntities = packageFollows;
             count = pkgCount;
             break;
@@ -184,20 +227,27 @@ export const getAllMyFollows = async (
                 userId,
                 offset,
                 limit,
-                relations
+                ["packageIssue"]
             );
             followEntities = packageIssueFollows;
             count = pkgICount;
             break;
         case FollowType.USER:
-            let [userFollows, uCount] = await followRepository.getUserFollows(userId, offset, limit, relations);
+            let [userFollows, uCount] = await followRepository.getUserFollows(userId, offset, limit, ["targetUser"]);
             followEntities = userFollows;
             count = uCount;
             break;
     }
 
+    let follows: Follow[] = [];
+
+    for (let f of followEntities) {
+        const follow = await entityToGraphqlObject(context.connection, f);
+        follows.push(follow);
+    }
+
     return {
-        follows: followEntities.map((f) => entityToGraphqlObject(f)),
+        follows: follows,
         hasMore: count - (offset + limit) > 0,
         count
     };
@@ -213,7 +263,6 @@ export const deleteFollow = async (
     const userId = context.me.id;
     const followRepository = manager.getCustomRepository(FollowRepository);
 
-    // TODO: CHECK FOR PERMISSIONS
     if (follow.catalog) {
         const catalog = await getCatalogOrFail({ slug: follow.catalog.catalogSlug, manager });
         await followRepository.deleteFollowByCatalogId(userId, catalog.id);
@@ -272,4 +321,33 @@ const getPackageIssueEventTypes = (): NotificationEventType[] => {
 
 const getUserEventTypes = (): NotificationEventType[] => {
     return [];
+};
+
+export const followPackage = async (
+    parent: Follow,
+    _1: any,
+    context: AuthenticatedContext,
+    info: any
+): Promise<Package | null> => {
+    if (!parent.package) {
+        return null;
+    }
+
+    const packageEntity = await context.connection
+        .getCustomRepository(PackageRepository)
+        .findPackageOrFail({ identifier: parent.package.identifier });
+    return packageEntityToGraphqlObjectWithExtraData(context.connection, packageEntity);
+};
+
+export const followCollection = async (
+    parent: Follow,
+    _1: any,
+    context: AuthenticatedContext,
+    info: any
+): Promise<Collection | null> => {
+    if (!parent.collection) {
+        return null;
+    }
+
+    return parent.collection;
 };

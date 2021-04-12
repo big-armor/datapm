@@ -317,10 +317,11 @@ A package issue represents an issue raised for a topic related to the package.
 type PackageIssue {
     issueNumber: Int!
     subject: String!
-    content: String!
-    author: User!
-    status: PackageIssueStatus!
-    createdAt: Date!
+    content: String
+    author: User
+    packageIdentifier: BasePackageIdentifier
+    status: PackageIssueStatus
+    createdAt: Date
     updatedAt: Date
 }
 
@@ -447,6 +448,14 @@ The complete identifier for a package on a registry
 """
 type PackageIdentifier {
     registryURL: String!
+    catalogSlug: String!
+    packageSlug: String!
+}
+
+"""
+The complete identifier for a package on a registry
+"""
+type BasePackageIdentifier {
     catalogSlug: String!
     packageSlug: String!
 }
