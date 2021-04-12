@@ -12,8 +12,7 @@ import {
 
 @Component({
     selector: "app-user-type-following",
-    templateUrl: "./user-type-following.component.html",
-    styleUrls: ["./user-type-following.component.scss"]
+    templateUrl: "./user-type-following.component.html"
 })
 export class UserTypeFollowingComponent implements OnInit {
     public readonly NotificationFrequency = NotificationFrequency;
