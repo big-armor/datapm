@@ -9,6 +9,7 @@ import {
     NotificationFrequency,
     SaveFollowGQL
 } from "src/generated/graphql";
+import { FollowStats } from "../user-following.component";
 
 @Component({
     selector: "app-user-type-following",
@@ -25,6 +26,9 @@ export class UserTypeFollowingComponent implements OnInit {
 
     @Input()
     public type: FollowType;
+
+    @Input()
+    public stats: FollowStats;
 
     public follows: Follow[] = [];
     public hasMore: boolean = false;
@@ -126,6 +130,7 @@ export class UserTypeFollowingComponent implements OnInit {
                 this.offset += follows.length;
                 this.follows = [...this.follows, ...follows];
                 this.hasMore = responseData.hasMore;
+                this.updateStats();
             });
     }
 
@@ -178,6 +183,26 @@ export class UserTypeFollowingComponent implements OnInit {
                 };
             default:
                 return null;
+        }
+    }
+
+    private updateStats(): void {
+        switch (this.type) {
+            case FollowType.CATALOG:
+                this.stats.catalogFollowsCount = this.follows.length;
+                break;
+            case FollowType.COLLECTION:
+                this.stats.collectionFollowsCount = this.follows.length;
+                break;
+            case FollowType.PACKAGE:
+                this.stats.packageFollowsCount = this.follows.length;
+                break;
+            case FollowType.PACKAGE_ISSUE:
+                this.stats.packageIssueFollowsCount = this.follows.length;
+                break;
+            case FollowType.USER:
+                this.stats.userFollowsCount = this.follows.length;
+                break;
         }
     }
 }
