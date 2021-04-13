@@ -211,6 +211,7 @@ async function main() {
     );
 
     app.use("/assets", express.static(path.join(__dirname, "..", "static", "assets")));
+    app.use("/favicon.ico", express.static(path.join(__dirname, "favicon.ico")));
 
     // set express for the Apollo GraphQL server
     server.applyMiddleware({ app, bodyParserConfig: { limit: "20mb" } });
