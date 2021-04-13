@@ -392,7 +392,8 @@ export class PackageIssuesDetailComponent implements OnInit {
 
                 this.updatePackageIssue(response.data.packageIssue);
                 this.canEditIssue =
-                    this.isUserPackageManager || this.packageIssue.author.username === this.user.username;
+                    this.isUserPackageManager ||
+                    (this.user && this.packageIssue.author.username === this.user.username);
                 this.packageIssueEditedContent = this.packageIssue.content;
                 this.loadPackageIssueComments();
             });
