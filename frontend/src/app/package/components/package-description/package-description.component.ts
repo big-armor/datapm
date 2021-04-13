@@ -47,7 +47,7 @@ export class PackageDescriptionComponent {
 
             this.packageCollectionsGQL
                 .fetch({ packageIdentifier, limit: 10, offset: 0 })
-                .subscribe((response) => (this.collections = response.data.packageCollections.collections));
+                .subscribe((response) => (this.collections = response.data.packageCollections?.collections));
 
             validatePackageFileInBrowser(p.package.latestVersion.packageFile);
             this.packageFile = parsePackageFileJSON(p.package.latestVersion.packageFile);
