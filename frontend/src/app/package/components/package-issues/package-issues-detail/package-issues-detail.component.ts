@@ -336,7 +336,7 @@ export class PackageIssuesDetailComponent implements OnInit {
     }
 
     public canEditComment(comment: PackageIssueCommentWithEditorStatus): boolean {
-        return this.isUserPackageManager || comment.author.username === this.user.username;
+        return this.isUserPackageManager || (this.user && comment.author.username === this.user.username);
     }
 
     private changeIssueStatus(status: PackageIssueStatus): void {
