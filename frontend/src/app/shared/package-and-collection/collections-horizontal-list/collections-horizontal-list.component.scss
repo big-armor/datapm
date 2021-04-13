@@ -1,32 +1,57 @@
 @import "../../../../styles/variables";
 @import "../../../../styles/colors";
 
-.collections-container {
-    overflow-x: scroll;
-    white-space: nowrap;
-    margin-bottom: 15px;
-    text-align: left;
-    border-radius: 6px;
-    padding: 20px 10px;
-    background-color: var(--gray-10-color);
-}
+#collectionList {
+    ::ng-deep {
+        .carousel-slide {
+            width: 200px;
+            margin-right: 20px;
+        }
 
-.collection-item {
-    display: inline-block;
-    cursor: pointer;
-    margin-right: 10px;
-    border: 1px solid var(--tranparent-border);
-    background-color: var(--gray-7-color);
-    padding: 10px 10px;
-    border-radius: 6px;
-    font-family: $family-roboto;
-    font-weight: $weight-400;
-    letter-spacing: 0.6px;
-    font-size: $small-font;
-    color: var(--gray-1-color);
+        .mat-button.mat-accent,
+        .mat-icon-button.mat-accent,
+        .mat-stroked-button.mat-accent {
+            color: #333333;
+            background: #e7e7e7;
+        }
 
-    &:hover {
-        background-color: var(--custom-secondary-color);
+        .carousel > button:first-of-type {
+            left: 0px;
+        }
+
+        .carousel > button:last-of-type {
+            right: 0px;
+        }
+
+        .material-icons {
+            font-size: 18px;
+        }
+    }
+
+    .collections-container {
+        border-radius: 6px;
+        padding: 20px 15px;
+        background-color: var(--gray-10-color);
+    }
+
+    .collection-item {
+        display: inline-block;
+        cursor: pointer;
+        width: 100%;
+        border: 1px solid var(--tranparent-border);
+        background-color: var(--gray-7-color);
+        padding: 15px 15px;
+        border-radius: 6px;
+        text-align: center;
+        font-family: $family-roboto;
+        font-weight: $weight-400;
+        letter-spacing: 0.6px;
+        font-size: $text-font;
+        color: var(--gray-1-color);
+
+        &:hover {
+            background-color: var(--custom-secondary-color);
+        }
     }
 }
 

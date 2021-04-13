@@ -1,5 +1,5 @@
 <ng-container *ngIf="loadedCollectionsInitially && loadedPackagesInitially; else pageLoader">
-    <div>
+    <div class="mb-5">
         <div *ngIf="collections?.length">
             <div class="text-main-title col-md-12 text-left no-pd-mobile">Collections</div>
             <app-collections-horizontal-list [collections]="collections"></app-collections-horizontal-list>

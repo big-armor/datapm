@@ -2,6 +2,8 @@
 @import "../../../../../styles/colors";
 
 #createIssue {
+    caret-color: red !important;
+    color: red;
     .btn-div {
         display: flow-root;
     }
@@ -36,6 +38,7 @@
         .CodeMirror {
             font-family: $family-roboto;
             letter-spacing: 0.4px;
+            cursor: text;
             color: var(--gray-1-color);
             background-color: var(--secondary-color);
             border-bottom-left-radius: 0px;
