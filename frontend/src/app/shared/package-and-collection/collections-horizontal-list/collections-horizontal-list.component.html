@@ -1,47 +1,13 @@
 <div id="collectionList">
-    <!-- <div class="container mb-4 pb-1">
-        <div class="collections-container">
-            <div *ngFor="let collectionsRow of rowsWithCollections">
-                <div
-                    class="collection-item"
-                    *ngFor="let collection of collectionsRow"
-                    (click)="goToCollection(collection.identifier.collectionSlug)"
-                >
-                    {{ collection.name }}
-                </div>
-            </div>
-        </div>
-    </div> -->
-
     <div class="container mb-4 pb-1">
         <div class="collections-container">
-            <mat-carousel
-                timings="250ms ease-in"
-                [autoplay]="false"
-                interval="5000"
-                color="accent"
-                maxWidth="auto"
-                proportion="6"
-                slides="8"
-                [loop]="false"
-                [hideArrows]="false"
-                [hideIndicators]="true"
-                [useKeyboard]="true"
-                [useMouseWheel]="false"
-                orientation="ltr"
-                *ngFor="let collectionsRow of rowsWithCollections"
-            >
-                <mat-carousel-slide
-                    #matCarouselSlide
-                    *ngFor="let collection of collectionsRow"
-                    overlayColor="#00000040"
-                    [hideOverlay]="true"
-                >
+            <carousel *ngFor="let collectionsRow of rowsWithCollections" style="height: 53px" arrowsTheme="light">
+                <div class="carousel-cell" *ngFor="let collection of collectionsRow">
                     <div class="collection-item">
                         {{ collection.name }}
                     </div>
-                </mat-carousel-slide>
-            </mat-carousel>
+                </div>
+            </carousel>
         </div>
     </div>
 </div>

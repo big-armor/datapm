@@ -33,7 +33,7 @@
         "@angular/platform-browser-dynamic": "~10.0.11",
         "@angular/router": "~10.0.11",
         "@apollo/client": "^3.0.0",
-        "@ngmodule/material-carousel": "^0.6.0",
+        "angular-responsive-carousel": "^2.0.2",
         "angular-simplemde": "0.0.4",
         "apollo-angular": "^2.0.3",
         "apollo-link-scalars": "^2.0.2",

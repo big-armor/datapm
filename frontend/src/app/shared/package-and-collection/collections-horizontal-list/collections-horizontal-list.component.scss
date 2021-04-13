@@ -3,34 +3,23 @@
 
 #collectionList {
     ::ng-deep {
-        .carousel-slide {
-            width: 200px;
-            margin-right: 15px;
+        .carousel-arrow-disabled {
+            cursor: default;
+            opacity: 0;
         }
 
-        .mat-button.mat-accent,
-        .mat-icon-button.mat-accent,
-        .mat-stroked-button.mat-accent {
-            color: #333333;
-            background: #e7e7e7;
+        .carousel-arrow-next {
+            right: -10px;
         }
 
-        .carousel > button:first-of-type {
-            left: 0px;
-        }
-
-        .carousel > button:last-of-type {
-            right: 0px;
-        }
-
-        .material-icons {
-            font-size: 18px;
+        .carousel-arrow-prev {
+            left: -10px;
         }
     }
 
     .collections-container {
         border-radius: 6px;
-        padding: 20px 15px;
+        padding: 22px 15px 20px 15px;
         background-color: var(--gray-10-color);
     }
 
@@ -45,7 +34,7 @@
         text-align: center;
         font-family: $family-roboto;
         font-weight: $weight-400;
-        letter-spacing: 0.6px;
+        letter-spacing: 0.4px;
         font-size: $text-font;
         color: var(--gray-1-color);
 
@@ -56,6 +45,11 @@
 }
 
 @media (max-width: 576px) {
+    // #collectionList {
+    //     .collection-item {
+    //         font-size: $small-font;
+    //     }
+    // }
     .container {
         padding-left: 0px;
         padding-right: 0px;
