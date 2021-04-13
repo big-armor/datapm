@@ -3,7 +3,13 @@ import { Router } from "@angular/router";
 import { PackageFile, parsePackageFileJSON, Schema, validatePackageFileInBrowser } from "datapm-lib";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
-import { CollectionBasicData, Package, PackageCollectionsGQL } from "src/generated/graphql";
+import {
+    Collection,
+    CollectionBasicData,
+    Package,
+    PackageCollectionsGQL,
+    PackageIdentifierInput
+} from "src/generated/graphql";
 import { PackageService, PackageResponse } from "../../services/package.service";
 @Component({
     selector: "package-description",
@@ -26,7 +32,7 @@ export class PackageDescriptionComponent {
     public shouldShowMoreReadMeButton: boolean;
     public isShowingMoreReadMeText: boolean;
 
-    public collections: CollectionBasicData[] = [];
+    public collections: Collection[] = [];
 
     constructor(
         private packageService: PackageService,
@@ -47,7 +53,9 @@ export class PackageDescriptionComponent {
 
             this.packageCollectionsGQL
                 .fetch({ packageIdentifier, limit: 10, offset: 0 })
-                .subscribe((response) => (this.collections = response.data.packageCollections?.collections));
+                .subscribe(
+                    (response) => (this.collections = response.data.packageCollections?.collections as Collection[])
+                );
 
             validatePackageFileInBrowser(p.package.latestVersion.packageFile);
             this.packageFile = parsePackageFileJSON(p.package.latestVersion.packageFile);
@@ -65,6 +73,10 @@ export class PackageDescriptionComponent {
 
     public goToCollection(collectionSlug: string): void {
         this.router.navigate(["collection/" + collectionSlug]);
+    }
+
+    public goToPackage(packageIdentifier: PackageIdentifierInput): void {
+        this.router.navigate([packageIdentifier.catalogSlug, packageIdentifier.packageSlug]);
     }
 
     public toggleShowMoreReadMeText() {

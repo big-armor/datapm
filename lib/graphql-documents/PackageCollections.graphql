@@ -4,6 +4,13 @@ query PackageCollections($packageIdentifier: PackageIdentifierInput!, $limit: In
             identifier {
                 collectionSlug
             }
+            packages {
+                identifier {
+                    catalogSlug
+                    packageSlug
+                }
+                displayName
+            }
             name
             description
         }

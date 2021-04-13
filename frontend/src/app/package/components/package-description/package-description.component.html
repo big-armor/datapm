@@ -59,6 +59,13 @@
                     collection.name
                 }}</a>
                 <p class="text-light-gray" [class.p-width]="collection.description">{{ collection.description }}</p>
+                <div>
+                    <ul>
+                        <li *ngFor="let package of collection.packages" (click)="goToPackage(package.identifier)">
+                            {{ package.displayName }}
+                        </li>
+                    </ul>
+                </div>
             </li>
         </ul>
     </div>
