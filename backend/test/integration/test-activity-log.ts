@@ -256,6 +256,73 @@ describe("Activity Log Tests", async () => {
         expect(line).to.be.not.undefined;
     });
 
+    it("Should show VERSION_UPDATED", async function () {
+        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+
+        packageFileContents.schemas[0].recordCount! += 1;
+
+        const packageFileString = JSON.stringify(packageFileContents);
+
+        let response: FetchResult<CreateVersionMutation, Record<string, any>, Record<string, any>> | null = null;
+
+        try {
+            response = await userOneClient.mutate({
+                mutation: CreateVersionDocument,
+                variables: {
+                    identifier: {
+                        catalogSlug: "testOne-packages",
+                        packageSlug: "congressional-legislators"
+                    },
+                    value: {
+                        packageFile: packageFileString
+                    }
+                }
+            });
+        } catch (error) {
+            console.log(JSON.stringify(error, null, 1));
+
+            expect.fail("There was an error - " + error.message);
+        }
+
+        expect(response.errors == null, "no errors").true;
+
+        const activityLogResponse = await userOneClient.query({
+            query: MyActivityDocument,
+            variables: { filter: { eventType: [ActivityLogEventType.VERSION_UPDATED], limit: 100, offset: 0 } }
+        });
+
+        expect(response.data).to.exist;
+        expect(activityLogResponse.data.myActivity).to.exist;
+        expect(activityLogResponse.data.myActivity.logs.length).to.equal(1);
+        expect(activityLogResponse.data.myActivity.logs[0]?.eventType).to.equal(ActivityLogEventType.VERSION_UPDATED);
+        expect(activityLogResponse.data.myActivity.logs[0]?.user?.username).to.equal(userOne.username);
+        expect(activityLogResponse.data.myActivity.logs[0]?.targetPackage!.identifier.catalogSlug).to.equal(
+            "testOne-packages"
+        );
+        expect(activityLogResponse.data.myActivity.logs[0]?.targetPackage!.identifier.packageSlug).to.equal(
+            "congressional-legislators"
+        );
+
+        const version = activityLogResponse.data.myActivity.logs[0]?.targetPackageVersion!;
+
+        expect(version.identifier.versionMajor).to.equal(1);
+        expect(version.identifier.versionMinor).to.equal(0);
+        expect(version.identifier.versionPatch).to.equal(0);
+
+        const line = serverLogLines.find((l: any) =>
+            findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
+                return (
+                    activityLogLine.eventType == ActivityLogEventType.VERSION_UPDATED &&
+                    activityLogLine.username == userOne.username &&
+                    activityLogLine.targetPackageIdentifier == "testOne-packages/congressional-legislators" &&
+                    activityLogLine.targetVersionNumber == "1.0.0"
+                );
+            })
+        );
+
+        expect(line).to.be.not.undefined;
+    });
+
     it("Should show CATALOG_EDIT", async function () {
         let response = await userOneClient.mutate({
             mutation: UpdateCatalogDocument,

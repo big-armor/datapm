@@ -417,13 +417,16 @@ export function diffCompatibility(diffs: Difference[]): Compability {
             case DifferenceType.CHANGE_VERSION: // this just requires that the number be at least one minor version greater, it doesn't return the actual difference
             case DifferenceType.REMOVE_SOURCE:
             case DifferenceType.REMOVE_STREAM_SET:
+                returnValue = Math.max(returnValue, Compability.MinorChange);
+                break;
+
             case DifferenceType.CHANGE_STREAM_UPDATE_HASH:
             case DifferenceType.CHANGE_STREAM_STATS:
             case DifferenceType.CHANGE_GENERATED_BY:
             case DifferenceType.CHANGE_UPDATED_DATE:
             case DifferenceType.CHANGE_README_FILE:
             case DifferenceType.CHANGE_LICENSE_FILE:
-                returnValue = Math.max(returnValue, Compability.MinorChange);
+                // nothing to do
                 break;
 
             default:
@@ -448,7 +451,7 @@ export function nextVersion(currentVersion: SemVer, diffCompatibility: Compabili
             return copy.inc("patch");
 
         case Compability.Identical:
-            return copy.inc("patch");
+            return copy;
 
         default:
             throw new Error("Unrecognized compability " + diffCompatibility);

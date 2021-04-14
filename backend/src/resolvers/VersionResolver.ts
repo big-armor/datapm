@@ -29,7 +29,7 @@ import { PackageRepository } from "../repository/PackageRepository";
 import { getGraphQlRelationName } from "./../util/relationNames";
 import { VersionEntity } from "../entity/VersionEntity";
 import { createActivityLog } from "./../repository/ActivityLogRepository";
-import { Connection, EntityManager } from "typeorm";
+import { Connection, EntityManager, TransactionManager } from "typeorm";
 import { PackageEntity } from "../entity/PackageEntity";
 import { CatalogEntity } from "../entity/CatalogEntity";
 import { catalogEntityToGraphQL } from "./CatalogResolver";
@@ -122,42 +122,43 @@ export const createVersion = async (
             const minVersionCompare = minNextVersion.compare(proposedNewVersion.version);
 
             if (compatibility == Compability.Identical) {
-                throw new ApolloError(
-                    identifier.catalogSlug +
-                        "/" +
-                        identifier.packageSlug +
-                        "/" +
-                        latestVersionSemVer.version +
-                        " already exists, and the submission is identical to it",
-                    VersionConflict.VERSION_EXISTS,
-                    { existingVersion: latestVersionSemVer.version }
-                );
-            } else if (minVersionCompare == 1) {
-                throw new ApolloError(
-                    identifier.catalogSlug +
-                        "/" +
-                        identifier.packageSlug +
-                        " has current version " +
-                        latestVersionSemVer.version +
-                        ", and this new version has " +
-                        compatibilityToString(compatibility) +
-                        " changes - requiring a minimum version number of " +
-                        minNextVersion.version +
-                        ", but you submitted version number " +
-                        proposedNewVersion.version,
-                    VersionConflict.HIGHER_VERSION_REQUIRED,
-                    { existingVersion: latestVersionSemVer.version, minNextVersion: minNextVersion.version }
-                );
-            } else if (compatibility == Compability.MinorChange) {
-                changeType = ActivityLogChangeType.VERSION_PATCH_CHANGE;
-            } else if (compatibility == Compability.CompatibleChange) {
-                changeType = ActivityLogChangeType.VERSION_MINOR_CHANGE;
-            } else if (compatibility == Compability.BreakingChange) {
-                changeType = ActivityLogChangeType.VERSION_MAJOR_CHANGE;
-            }
-        }
+                changeType = ActivityLogChangeType.VERSION_TRIVIAL_CHANGE;
+                latestVersion.updatedAt = new Date();
+                savedVersion = await transaction.getRepository(VersionEntity).save(latestVersion);
+            } else {
+                if (minVersionCompare == 1) {
+                    throw new ApolloError(
+                        identifier.catalogSlug +
+                            "/" +
+                            identifier.packageSlug +
+                            " has current version " +
+                            latestVersionSemVer.version +
+                            ", and this new version has " +
+                            compatibilityToString(compatibility) +
+                            " changes - requiring a minimum version number of " +
+                            minNextVersion.version +
+                            ", but you submitted version number " +
+                            proposedNewVersion.version,
+                        VersionConflict.HIGHER_VERSION_REQUIRED,
+                        { existingVersion: latestVersionSemVer.version, minNextVersion: minNextVersion.version }
+                    );
+                } else if (compatibility == Compability.MinorChange) {
+                    changeType = ActivityLogChangeType.VERSION_PATCH_CHANGE;
+                } else if (compatibility == Compability.CompatibleChange) {
+                    changeType = ActivityLogChangeType.VERSION_MINOR_CHANGE;
+                } else if (compatibility == Compability.BreakingChange) {
+                    changeType = ActivityLogChangeType.VERSION_MAJOR_CHANGE;
+                }
 
-        savedVersion = await transaction.getCustomRepository(VersionRepository).save(context.me.id, identifier, value);
+                savedVersion = await transaction
+                    .getCustomRepository(VersionRepository)
+                    .save(context.me.id, identifier, value);
+            }
+        } else {
+            savedVersion = await transaction
+                .getCustomRepository(VersionRepository)
+                .save(context.me.id, identifier, value);
+        }
 
         const versionIdentifier = {
             ...identifier,
@@ -192,7 +193,10 @@ export const createVersion = async (
 
         await createActivityLog(transaction, {
             userId: context.me.id,
-            eventType: ActivityLogEventType.VERSION_CREATED,
+            eventType:
+                changeType === ActivityLogChangeType.VERSION_TRIVIAL_CHANGE
+                    ? ActivityLogEventType.VERSION_UPDATED
+                    : ActivityLogEventType.VERSION_CREATED,
             changeType,
             targetPackageVersionId: savedVersion?.id,
             targetPackageId: packageEntity.id

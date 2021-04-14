@@ -2,7 +2,6 @@
 const { series, src, dest, parallel } = require("gulp");
 const spawn = require("child_process").spawn;
 const fs = require("fs");
-const through = require("through2");
 const merge = require("merge-stream");
 
 const path = require("path");
@@ -142,24 +141,6 @@ function gitPush() {
     return spawnAndLog("git-push", "git", ["push"]);
 }
 
-function listUtilDirectory() {
-    return src(path.join(__dirname, "backend", "dist", "util", "*")).pipe(
-        through.obj(function (file, _enc, cb) {
-            console.log(file.path);
-            cb(null);
-        })
-    );
-}
-
-function listDistUtilDirectory() {
-    return src(path.join(DESTINATION_DIR, "backend", "dist", "util", "*")).pipe(
-        through.obj(function (file, _enc, cb) {
-            console.log(file.path);
-            cb(null);
-        })
-    );
-}
-
 /* function libPublish() {
     return spawnAndLog("lib-publish", "npm", ["publish"], { cwd: "lib" });
 } */
@@ -203,7 +184,6 @@ function prepareDockerBuildAssets() {
 }
 
 exports.default = series(
-    listUtilDirectory,
     installLibDependencies,
     buildLib,
     testLib,
@@ -245,5 +225,5 @@ exports.deployAssets = series(
 );
 
 exports.buildBackend = buildBackend;
-exports.buildDockerImage = series(listUtilDirectory, prepareDockerBuildAssets, listDistUtilDirectory, buildDockerImage);
+exports.buildDockerImage = series(prepareDockerBuildAssets, buildDockerImage);
 exports.prepareDockerBuildAssets = prepareDockerBuildAssets;

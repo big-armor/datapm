@@ -6,15 +6,6 @@ var through = require("through2");
 const DESTINATION_DIR = path.join(__dirname, "dist");
 const SCHEMA_DIR = path.join(__dirname, "node_modules", "datapm-lib");
 
-function listUtilDirectory() {
-    return src(DESTINATION_DIR + path.sep + "util" + path.sep + "*").pipe(
-        through.obj(function (file, enc, cb) {
-            console.log(file.path);
-            cb(null);
-        })
-    );
-}
-
 function copyFiles() {
     return src([
         "ormconfig.js",
@@ -56,5 +47,5 @@ function execLogCb(err, stdout, stderr) {
     return err; // makes gulp continue even if the command failed
 }
 
-exports.default = series(copyFiles, copyEmailTemplates, copyModules, copyDataPMLib, slimTypeOrmDist, listUtilDirectory);
+exports.default = series(copyFiles, copyEmailTemplates, copyModules, copyDataPMLib, slimTypeOrmDist);
 exports.copyDependencies = series(copyModules, copyDataPMLib);
