@@ -1,9 +1,8 @@
 import { AuthenticatedContext, Context } from "../context";
 import { resolvePackagePermissions } from "../directive/hasPackagePermissionDirective";
 import { IssueCommentEntity } from "../entity/IssueCommentEntity";
-import { PackageIssueEntity } from "../entity/PackageIssueEntity";
-import { PackageIssueStatus } from "../entity/PackageIssueStatus";
 import {
+    ActivityLogEventType,
     CreatePackageIssueCommentInput,
     PackageIdentifierInput,
     PackageIssueCommentIdentifierInput,
@@ -17,6 +16,7 @@ import { PackageIssueRepository } from "../repository/PackageIssueRepository";
 import { PackageRepository } from "../repository/PackageRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
+import { createActivityLog } from "../repository/ActivityLogRepository";
 
 export const getCommentsByByPackageIssue = async (
     _0: any,
@@ -100,7 +100,17 @@ export const createPackageIssueComment = async (
     issueCommentEntity.authorId = context.me.id;
     issueCommentEntity.content = comment.content;
 
-    return await commentRepository.save(issueCommentEntity);
+    return await context.connection.transaction(async (transaction) => {
+        const savedComment = await commentRepository.save(issueCommentEntity);
+
+        await createActivityLog(transaction, {
+            userId: context!.me!.id,
+            eventType: ActivityLogEventType.PACKAGE_ISSUE_COMMENT_CREATED,
+            targetPackageIssueId: savedComment.id
+        });
+
+        return savedComment;
+    });
 };
 
 export const updatePackageIssueComment = async (
@@ -128,7 +138,18 @@ export const updatePackageIssueComment = async (
     );
 
     commentEntity.content = comment.content;
-    return await commentRepository.save(commentEntity);
+
+    return await context.connection.transaction(async (transaction) => {
+        const savedComment = await commentRepository.save(commentEntity);
+
+        await createActivityLog(transaction, {
+            userId: context!.me!.id,
+            eventType: ActivityLogEventType.PACKAGE_ISSUE_COMMENT_EDIT,
+            targetPackageIssueId: savedComment.id
+        });
+
+        return savedComment;
+    });
 };
 
 export const deletePackageIssueComment = async (
@@ -152,7 +173,16 @@ export const deletePackageIssueComment = async (
         issueIdentifier,
         issueCommentIdentifier
     );
-    await commentRepository.delete(commentEntity.id);
+
+    await context.connection.transaction(async (transaction) => {
+        await commentRepository.delete(commentEntity.id);
+
+        await createActivityLog(transaction, {
+            userId: context!.me!.id,
+            eventType: ActivityLogEventType.PACKAGE_ISSUE_COMMENT_DELETED,
+            targetPackageIssueId: commentEntity.id
+        });
+    });
 };
 
 async function getCommentToEditOrFail(
