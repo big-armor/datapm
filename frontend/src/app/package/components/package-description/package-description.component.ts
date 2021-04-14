@@ -33,6 +33,7 @@ export class PackageDescriptionComponent {
     public isShowingMoreReadMeText: boolean;
 
     public collections: Collection[] = [];
+    public relatedPackages: Package[] = [];
 
     constructor(
         private packageService: PackageService,
@@ -51,11 +52,22 @@ export class PackageDescriptionComponent {
                 packageSlug: this.package.identifier.packageSlug
             };
 
-            this.packageCollectionsGQL
-                .fetch({ packageIdentifier, limit: 10, offset: 0 })
-                .subscribe(
-                    (response) => (this.collections = response.data.packageCollections?.collections as Collection[])
-                );
+            this.packageCollectionsGQL.fetch({ packageIdentifier, limit: 10, offset: 0 }).subscribe((response) => {
+                this.collections = response.data.packageCollections?.collections as Collection[];
+
+                const packageByIdentifier = new Map<string, Package>();
+                const thisPackageIdentifier = this.packageIdentifierToString(this.package.identifier);
+                this.collections.forEach((c) => {
+                    c.packages.forEach((p) => {
+                        const identifier = this.packageIdentifierToString(p.identifier);
+                        if (thisPackageIdentifier != identifier && !packageByIdentifier.has(identifier)) {
+                            packageByIdentifier.set(identifier, p);
+                        }
+                    });
+                });
+
+                this.relatedPackages = [...packageByIdentifier.values()];
+            });
 
             validatePackageFileInBrowser(p.package.latestVersion.packageFile);
             this.packageFile = parsePackageFileJSON(p.package.latestVersion.packageFile);
@@ -94,5 +106,9 @@ export class PackageDescriptionComponent {
     public ngOnDestroy(): void {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
+    }
+
+    private packageIdentifierToString(packageIdentifier: PackageIdentifierInput): string {
+        return packageIdentifier.catalogSlug + "." + packageIdentifier.packageSlug;
     }
 }
