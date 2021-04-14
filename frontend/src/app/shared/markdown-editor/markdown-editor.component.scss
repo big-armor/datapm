@@ -1,29 +1,5 @@
 @import "../../../styles/variables";
 
 #markdownEditor {
-    ::ng-deep {
-        .ace_content {
-            font-family: $family-roboto;
-            letter-spacing: 0.4px;
-            font-size: $text-font;
-        }
-
-        .ace-tm {
-            .ace_gutter {
-                background: #f9f9f9;
-            }
-        }
-
-        .md-editor-container {
-            .md-layout {
-                .md-footer {
-                    background: #f9f9f9;
-                }
-
-                .tool-bar {
-                    background: #f9f9f9;
-                }
-            }
-        }
-    }
+    caret-color: var(--gray-1-color);
 }

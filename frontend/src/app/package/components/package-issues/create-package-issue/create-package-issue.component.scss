@@ -2,8 +2,8 @@
 @import "../../../../../styles/colors";
 
 #createIssue {
-    caret-color: red !important;
-    color: red;
+    caret-color: var(--gray-1-color);
+
     .btn-div {
         display: flow-root;
     }
@@ -39,11 +39,21 @@
             font-family: $family-roboto;
             letter-spacing: 0.4px;
             cursor: text;
+            caret-color: var(--gray-1-color);
             color: var(--gray-1-color);
             background-color: var(--secondary-color);
             border-bottom-left-radius: 0px;
             border-bottom-right-radius: 0px;
             border: 1px solid var(--gray-9-color);
+
+            &:hover {
+                color: var(--gray-1-color);
+            }
+
+            &::placeholder {
+                caret-color: var(--gray-1-color);
+                color: var(--gray-1-color);
+            }
         }
 
         .editor-toolbar {

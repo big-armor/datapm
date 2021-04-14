@@ -174,18 +174,16 @@
                     <button
                         *ngIf="canEditIssue && packageIssue.status === 'OPEN'"
                         class="app-outlined-button"
-                        style="color: #4f4f4f"
                         (click)="closeIssue()"
                     >
-                        Close issue
+                        <span class="gray-txt"> Close issue</span>
                     </button>
                     <button
                         *ngIf="canEditIssue && packageIssue.status === 'CLOSED'"
                         class="app-outlined-button"
-                        style="color: #4f4f4f"
                         (click)="openIssue()"
                     >
-                        Reopen issue
+                        <span class="gray-txt">Reopen issue</span>
                     </button>
                     <button
                         class="app-raised-button ml-2"
