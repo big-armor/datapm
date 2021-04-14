@@ -62,7 +62,6 @@ import { MarkdownEditorComponent } from "./markdown-editor/markdown-editor.compo
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { ShareDialogComponent } from "./dialogs/share-dialog/share-dialog.component";
 import { AngularSimplemdeModule } from "angular-simplemde";
-import { MatCarouselModule } from "@ngmodule/material-carousel";
 import { IvyCarouselModule } from "angular-responsive-carousel";
 
 @NgModule({
@@ -132,8 +131,7 @@ import { IvyCarouselModule } from "angular-responsive-carousel";
         ReactiveFormsModule,
         RouterModule,
         AngularSimplemdeModule,
-        IvyCarouselModule,
-        MatCarouselModule.forRoot()
+        IvyCarouselModule
     ],
     exports: [
         HeaderComponent,
