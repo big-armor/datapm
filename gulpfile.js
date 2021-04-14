@@ -2,7 +2,6 @@
 const { series, src, dest, parallel } = require("gulp");
 const spawn = require("child_process").spawn;
 const fs = require("fs");
-const through = require("through2");
 const merge = require("merge-stream");
 
 const path = require("path");
