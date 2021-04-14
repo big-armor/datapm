@@ -1,12 +1,8 @@
 <div id="collectionList">
-    <div class="container mb-4 pb-1">
+    <div class="mb-4 pb-1">
         <div class="collections-container">
-            <carousel
-                *ngFor="let collectionsRow of rowsWithCollections"
-                style="height: 53px; z-index: 999"
-                arrowsTheme="light"
-            >
-                <div class="carousel-cell" *ngFor="let collection of collectionsRow">
+            <carousel style="height: 53px; z-index: 999" arrowsTheme="light">
+                <div class="carousel-cell" *ngFor="let collection of collections">
                     <div class="collection-item" (click)="goToCollection(collection.identifier.collectionSlug)">
                         {{ collection.name }}
                     </div>

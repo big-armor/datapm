@@ -53,20 +53,23 @@
     <div class="related-data-div mt-5">
         <div class="text-main-title mt-4 pt-2 mb-2">Related Data</div>
         <div class="text-dark-gray">Other data that are related to this package</div>
-        <ul class="ul-data">
-            <li *ngFor="let collection of collections">
-                <a class="text-dark-gray ul-links" (click)="goToCollection(collection.identifier.collectionSlug)">{{
-                    collection.name
-                }}</a>
-                <p class="text-light-gray" [class.p-width]="collection.description">{{ collection.description }}</p>
-                <div>
-                    <ul>
-                        <li *ngFor="let package of collection.packages" (click)="goToPackage(package.identifier)">
-                            {{ package.displayName }}
-                        </li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
+        <app-collections-horizontal-list [collections]="collections"></app-collections-horizontal-list>
+
+        <div *ngIf="relatedPackages.length">
+            <div class="text-main-title text-left no-pd-mobile">Packages</div>
+            <div *ngFor="let package of relatedPackages">
+                <app-package-item [item]="package"></app-package-item>
+            </div>
+
+            <div *ngIf="hasMorePackages" class="container text-center">
+                <button
+                    class="app-outlined-button ctaButton"
+                    [class.disabled]="loadingPackages"
+                    (click)="requestMorePackages()"
+                >
+                    Load More
+                </button>
+            </div>
+        </div>
     </div>
 </ng-container>

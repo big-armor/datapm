@@ -17,6 +17,7 @@ a {
     font-family: $family-roboto;
     font-style: $style-normal;
     font-weight: $weight-400;
+    font-size: $small-font + 1;
     letter-spacing: 0.4px;
 
     &:hover {
