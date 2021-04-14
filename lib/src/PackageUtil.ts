@@ -448,7 +448,7 @@ export function nextVersion(currentVersion: SemVer, diffCompatibility: Compabili
             return copy.inc("patch");
 
         case Compability.Identical:
-            return copy;
+            return copy.inc("patch");
 
         default:
             throw new Error("Unrecognized compability " + diffCompatibility);
