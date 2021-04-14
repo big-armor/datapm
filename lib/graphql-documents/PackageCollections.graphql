@@ -10,6 +10,10 @@ query PackageCollections($packageIdentifier: PackageIdentifierInput!, $limit: In
                     packageSlug
                 }
                 displayName
+                description
+                creator {
+                    username
+                }
             }
             name
             description

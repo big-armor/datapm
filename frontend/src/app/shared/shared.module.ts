@@ -165,6 +165,7 @@ import { IvyCarouselModule } from "angular-responsive-carousel";
         EditPasswordDialogComponent,
         UserDetailsComponent,
         FancyConfirmationDialogComponent,
+        CollectionsHorizontalListComponent,
         UserInviteInputComponent,
         PackageAndCollectionComponent,
         MarkdownEditorComponent
