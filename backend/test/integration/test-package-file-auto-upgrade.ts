@@ -93,7 +93,7 @@ describe("Upgrading package files automatically", function () {
 
         const packageFile = parsePackageFileJSON(responsePackageFileContents);
 
-        expect(packageFile.$schema).equals("https://datapm.io/docs/package-file-schema-v0.3.0.json");
+        expect(packageFile.$schema).equals("https://datapm.io/docs/package-file-schema-v0.4.0.json");
         expect(packageFile.licenseMarkdown).includes("This is not a real license. Just a test.");
     });
 });
