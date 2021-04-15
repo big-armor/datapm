@@ -196,8 +196,9 @@
             </div>
             <div class="mt-4 pl-5 ml-5" *ngIf="!currentUser">
                 <p class="text-dark-gray pl-2">
-                    You must login to comment on this issue. Don't have an account?
-                    <a class="doc-link cursor-pointer">Sign up.</a>
+                    You must <a class="doc-link cursor-pointer" (click)="openLoginDialog()"> login</a> to comment on
+                    this issue. Don't have an account?
+                    <a class="doc-link cursor-pointer" (click)="openSignUpDialog()">Sign up.</a>
                 </p>
             </div>
         </div>

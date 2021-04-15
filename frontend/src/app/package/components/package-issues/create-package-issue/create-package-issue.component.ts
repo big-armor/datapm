@@ -46,6 +46,10 @@ export class CreatePackageIssueComponent implements OnInit, OnDestroy {
         this.dialog.openSignupDialog();
     }
 
+    public openLoginDialog(): void {
+        this.dialog.openLoginDialog();
+    }
+
     public ngOnDestroy(): void {
         this.destroy.next();
         this.destroy.complete();
