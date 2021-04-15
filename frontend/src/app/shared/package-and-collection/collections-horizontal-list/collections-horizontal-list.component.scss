@@ -9,11 +9,19 @@
         }
 
         .carousel-arrow-next {
-            right: -10px;
+            right: -30px;
         }
 
         .carousel-arrow-prev {
-            left: -10px;
+            left: -30px;
+        }
+
+        .carousel-container {
+            display: block;
+            overflow-x: auto;
+            overflow-y: hidden;
+            position: relative;
+            white-space: nowrap;
         }
     }
 

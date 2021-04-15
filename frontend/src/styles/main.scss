@@ -17,7 +17,6 @@ a {
     font-family: $family-roboto;
     font-style: $style-normal;
     font-weight: $weight-400;
-    font-size: $small-font + 1;
     letter-spacing: 0.4px;
 
     &:hover {
@@ -141,6 +140,14 @@ table.gray-table {
         height: 30px;
         line-height: 30px;
     }
+}
+
+.doc-link {
+    font-size: $small-font;
+    cursor: pointer;
+    line-height: 18px;
+    font-size: $small-font + 1;
+    color: var(--info-color);
 }
 
 .font-500 {
