@@ -2,7 +2,7 @@
     <div class="row pl-0 pt-3 pr-0 pb-3 desktop-menu">
         <div class="px-0 col-md-10 col-sm-12">
             <div class="d-flex flex-row bd-highlight">
-                <div class="pr-2 pt-2 pb-2 bd-highlight align-self-center">
+                <div class="pr-2 pt-2 pb-2 bd-highlight align-self-center logo-div">
                     <h1 class="mr-4 mb-0"><a class="dpm-text-logo" (click)="goHome()">datapm</a></h1>
                 </div>
                 <div class="p-2 bd-highlight w-100">
@@ -16,6 +16,7 @@
                                 [matAutocomplete]="auto"
                             ></app-input>
                             <mat-autocomplete
+                                autoActiveFirstOption
                                 #auto="matAutocomplete"
                                 class="search-autocomplete"
                                 (optionSelected)="autoCompleteOptionSelected($event)"
@@ -53,7 +54,7 @@
                                     </mat-option>
                                 </ng-container>
                             </mat-autocomplete>
-                            <button mat-icon-button>
+                            <button mat-icon-button (click)="search()">
                                 <mat-icon>search</mat-icon>
                             </button>
                         </form>
@@ -97,7 +98,7 @@
 
 <div class="mobile-menu">
     <div class="row pt-3 px-3">
-        <div class="col-7">
+        <div class="col-7 logo-div">
             <h1 routerLink="/"><a class="dpm-text-logo" (click)="goHome()">datapm</a></h1>
         </div>
 
@@ -126,46 +127,48 @@
     </div>
     <div class="row px-3">
         <div class="col-12 mobile-search-box mt-3">
-            <app-input
-                class="rounded-input"
-                placeholder="Search For Data"
-                [control]="searchControl"
-                [matAutocomplete]="autoCompleteMobile"
-                (keyEnter)="search()"
-            ></app-input>
-            <mat-autocomplete
-                #autoCompleteMobile="matAutocomplete"
-                class="search-autocomplete"
-                (optionSelected)="autoCompleteOptionSelected($event)"
-            >
-                <mat-option *ngIf="!autoCompleteResult && searchControl.value.length > 1">
-                    <mat-spinner [diameter]="30" class="ml-3"></mat-spinner>
-                </mat-option>
-                <ng-container *ngIf="autoCompleteResult">
-                    <mat-option
-                        *ngFor="let option of autoCompleteResult.packages"
-                        [value]="option.identifier.catalogSlug + '/' + option.identifier.packageSlug"
-                    >
-                        <div class="d-flex">
-                            <div>
-                                <app-avatar class="align-top user-img" [user]="option.creator" [size]="40">
-                                </app-avatar>
-                            </div>
-
-                            <div class="autocomplete-contents">
-                                <div class="autocomplete-title">
-                                    {{ option.identifier.catalogSlug + " / " + option.identifier.packageSlug }}
+            <form (ngSubmit)="search()" class="search-form w-100">
+                <app-input
+                    placeholder="Search For Data..."
+                    [control]="searchControl"
+                    class="rounded-input search-input"
+                    matInput
+                    [matAutocomplete]="auto"
+                ></app-input>
+                <mat-autocomplete
+                    #auto="matAutocomplete"
+                    class="search-autocomplete"
+                    (optionSelected)="autoCompleteOptionSelected($event)"
+                >
+                    <mat-option *ngIf="!autoCompleteResult && searchControl.value.length > 1">
+                        <mat-spinner [diameter]="30" class="ml-3"></mat-spinner>
+                    </mat-option>
+                    <ng-container *ngIf="autoCompleteResult">
+                        <mat-option
+                            *ngFor="let option of autoCompleteResult.packages"
+                            [value]="option.identifier.catalogSlug + '/' + option.identifier.packageSlug"
+                        >
+                            <div class="d-flex">
+                                <div>
+                                    <app-avatar class="align-top user-img" [user]="option.creator" [size]="40">
+                                    </app-avatar>
                                 </div>
 
-                                <div class="autocomplete-description">{{ option.description }}</div>
+                                <div class="autocomplete-contents">
+                                    <div class="autocomplete-title">
+                                        {{ option.identifier.catalogSlug + " / " + option.identifier.packageSlug }}
+                                    </div>
+
+                                    <div class="autocomplete-description">{{ option.description }}</div>
+                                </div>
                             </div>
-                        </div>
-                    </mat-option>
-                </ng-container>
-            </mat-autocomplete>
-            <button mat-icon-button (onclick)="search()">
-                <mat-icon>search</mat-icon>
-            </button>
+                        </mat-option>
+                    </ng-container>
+                </mat-autocomplete>
+                <button mat-icon-button (click)="search()">
+                    <mat-icon>search</mat-icon>
+                </button>
+            </form>
         </div>
     </div>
 </div>

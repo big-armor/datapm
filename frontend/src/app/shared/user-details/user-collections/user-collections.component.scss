@@ -65,6 +65,18 @@
     td.mat-footer-cell:last-of-type {
         padding: 0px 10px;
     }
+    #myCollections {
+        margin-top: 15px;
+        .container {
+            padding-left: 0px;
+            padding-right: 0px;
+        }
+        .mat-column-name {
+            a {
+                font-size: $text-font - 1;
+            }
+        }
+    }
 }
 
 @media (max-width: 480px) {

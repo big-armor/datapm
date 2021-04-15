@@ -8,3 +8,9 @@
 .big-div-package {
     margin-top: 30px;
 }
+
+@media (max-width: 576px) {
+    .big-div-package {
+        margin-top: 15px;
+    }
+}

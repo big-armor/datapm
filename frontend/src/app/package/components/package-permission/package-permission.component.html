@@ -1,13 +1,12 @@
 <div class="container p-0 mb-3" id="packagePermission">
-    <div class="package-details-title">Public Access</div>
-    <p class="package-dark-gray">
+    <div class="text-main-title">Public Access</div>
+    <p class="text-dark-gray">
         Enabling public access allows all users, including anonymous users, access to view and fetch this package.
     </p>
 
     <div class="d-flex align-items-center justify-content-between mb-3">
         <div class="d-flex align-items-center public-toggle">
-            <div class="pr-2 package-dark-gray" style="margin-bottom: 0px !important">Make this package public</div>
-            <div class="ml-auto px-3 py-1 slide-right">
+            <div class="px-2 py-1 slide-right">
                 <mat-slide-toggle
                     class="app-slide-toggle"
                     matTooltip="Can't edit visibility of a package inside a private catalog"
@@ -19,15 +18,19 @@
                     (change)="updatePublic($event)"
                 ></mat-slide-toggle>
             </div>
+            <div class="pr-2 text-dark-gray" style="margin-bottom: 0px !important">
+                <span class="public-text" *ngIf="package?.isPublic">Public</span>
+                <span class="not-public-text" *ngIf="!package?.isPublic">Not Public</span>
+            </div>
         </div>
     </div>
 
-    <div class="package-details-title mt-4 pt-3">Manage Package</div>
+    <div class="text-main-title mt-4 pt-3">Manage Package</div>
     <button class="app-outlined-button" (click)="deletePackage()">Delete This Package</button>
 
     <div *ngIf="users?.length">
-        <div class="package-details-title mt-4 pt-3">Users With Access</div>
-        <p class="package-dark-gray">The following users have permission to access this package.</p>
+        <div class="text-main-title mt-4 pt-3">Users With Access</div>
+        <p class="text-dark-gray">The following users have permission to access this package.</p>
         <button class="app-outlined-button mt-2" (click)="addUser()" *ngIf="users.length > 0">Add User</button>
     </div>
 </div>

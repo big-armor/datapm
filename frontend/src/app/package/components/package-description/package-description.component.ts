@@ -1,4 +1,5 @@
 import { Component } from "@angular/core";
+import { Router } from "@angular/router";
 import { PackageFile, parsePackageFileJSON, Schema, validatePackageFileInBrowser } from "datapm-lib";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
@@ -19,9 +20,6 @@ export class PackageDescriptionComponent {
     public schemas: any[] = [];
     public selectedSchema: Schema;
 
-    public shouldShowMoreDescriptionButton: boolean;
-    public isShowingMoreDescriptionText: boolean;
-
     public shouldShowMoreLicenseButton: boolean;
     public isShowingMoreLicenseText: boolean;
 
@@ -30,7 +28,11 @@ export class PackageDescriptionComponent {
 
     public collections: CollectionBasicData[] = [];
 
-    constructor(private packageService: PackageService, private packageCollectionsGQL: PackageCollectionsGQL) {
+    constructor(
+        private packageService: PackageService,
+        private packageCollectionsGQL: PackageCollectionsGQL,
+        private router: Router
+    ) {
         this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe((p: PackageResponse) => {
             if (p == null || p.package == null) {
                 return;
@@ -45,9 +47,7 @@ export class PackageDescriptionComponent {
 
             this.packageCollectionsGQL
                 .fetch({ packageIdentifier, limit: 10, offset: 0 })
-                .subscribe((response) => (this.collections = response.data.packageCollections.collections));
-
-            this.shouldShowMoreDescriptionButton = this.package.description?.length > this.SHOW_MORE_CHARACTER_LIMIT;
+                .subscribe((response) => (this.collections = response.data.packageCollections?.collections));
 
             validatePackageFileInBrowser(p.package.latestVersion.packageFile);
             this.packageFile = parsePackageFileJSON(p.package.latestVersion.packageFile);
@@ -63,8 +63,8 @@ export class PackageDescriptionComponent {
         });
     }
 
-    public toggleShowMoreDescriptionText() {
-        this.isShowingMoreDescriptionText = !this.isShowingMoreDescriptionText;
+    public goToCollection(collectionSlug: string): void {
+        this.router.navigate(["collection/" + collectionSlug]);
     }
 
     public toggleShowMoreReadMeText() {

@@ -2,8 +2,8 @@
     <div class="container p-0 mb-3" id="packageIssues" *ngIf="state === State.SUCCESS; else issueLoadingTemplate">
         <div class="d-flex bd-highlight mb-4 d-block-mobile">
             <div class="mr-auto bd-highlight">
-                <div class="package-details-title mb-2">{{ packageIssue.subject }}</div>
-                <p class="package-light-gray">
+                <div class="text-main-title mb-2">{{ packageIssue.subject }}</div>
+                <p class="text-light-gray">
                     <ng-container *ngIf="packageIssue.status === 'OPEN'; else closedStatusIcon">
                         <a class="open-status">
                             <em class="fas fa-exclamation-circle"></em>
@@ -36,7 +36,7 @@
                     <div class="issue-wrapper issues-bg">
                         <div class="issue-header d-flex bd-highlight" [class.d-none]="editingIssue">
                             <div class="mr-auto bd-highlight">
-                                <p class="package-dark-gray font-12">
+                                <p class="text-dark-gray font-12">
                                     <span class="font-500">{{ packageIssue.authorDisplayName }}</span>
                                     commented {{ packageIssue.createdAt | timeAgo }}
                                 </p>
@@ -47,7 +47,7 @@
                                 </a>
                                 <mat-menu #menu="matMenu">
                                     <button mat-menu-item id="issueBtn" (click)="insertQuote(packageIssue.content)">
-                                        <span class="package-dark-gray">Quote reply</span>
+                                        <span class="text-dark-gray">Quote reply</span>
                                     </button>
                                     <button
                                         mat-menu-item
@@ -68,7 +68,7 @@
                             </div>
                         </div>
                         <div class="issue-box" [class.no-padding]="editingIssue">
-                            <div class="package-dark-gray">
+                            <div class="text-dark-gray">
                                 <markdown *ngIf="!editingIssue" [data]="packageIssue.content"></markdown>
                                 <div [class.d-none]="!editingIssue">
                                     <app-markdown-editor
@@ -102,7 +102,7 @@
                         <div class="issue-wrapper comment-bg">
                             <div class="issue-header d-flex bd-highlight" [class.d-none]="comment.isEditing">
                                 <div class="mr-auto bd-highlight">
-                                    <p class="package-dark-gray font-12">
+                                    <p class="text-dark-gray font-12">
                                         <span class="font-500">{{ comment.authorDisplayName }}</span>
                                         commented {{ comment.createdAt | timeAgo }}
                                     </p>
@@ -113,27 +113,27 @@
                                     </a>
                                     <mat-menu #menu="matMenu">
                                         <button mat-menu-item id="issueBtn" (click)="insertQuote(comment.content)">
-                                            <span class="package-dark-gray">Quote reply</span>
+                                            <span class="text-dark-gray">Quote reply</span>
                                         </button>
                                         <button
                                             mat-menu-item
                                             id="issueBtn"
                                             (click)="openCommentEditor(comment, commentEditor)"
                                         >
-                                            <span class="package-dark-gray">Edit</span>
+                                            <span class="text-dark-gray">Edit</span>
                                         </button>
                                         <button
                                             mat-menu-item
                                             id="issueBtn"
                                             (click)="deleteComment(comment.commentNumber)"
                                         >
-                                            <span class="package-dark-gray">Delete</span>
+                                            <span class="text-dark-gray">Delete</span>
                                         </button>
                                     </mat-menu>
                                 </div>
                             </div>
                             <div class="issue-box" [class.no-padding]="comment.isEditing">
-                                <div class="package-dark-gray">
+                                <div class="text-dark-gray">
                                     <markdown
                                         *ngIf="!comment.isEditing; else commentEditorTemplate"
                                         [data]="comment.content"

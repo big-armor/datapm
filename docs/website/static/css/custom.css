@@ -85,12 +85,29 @@ body {
         margin-top: 15px;
     }
     .navigationSlider .slidingNav ul {
-        background-color: var(--gray-3-color);
+        background-color: var(--custom-table-color);
     }
-    .navigationSlider .slidingNav ul li > a:hover,
-    .navigationSlider .slidingNav ul li > a:active,
-    .navigationSlider .slidingNav ul li > a:focus {
-        background-color: rgba(255, 255, 255, 0.25);
+    .navigationSlider .slidingNav ul li a {
+        font-size: 14px;
+        color: var(--gray-1-color);
+    }
+    .docsNavContainer .toc .navBreadcrumb {
+        background-color: var(--custom-light-color);
+    }
+    .navBreadcrumb a,
+    .navBreadcrumb span,
+    .tocToggler {
+        color: var(--gray-1-color);
+    }
+    .line1,
+    .line2,
+    .line3 {
+        background-color: var(--gray-1-color);
+    }
+    .docsNavContainer,
+    .tocActive .onPageNav,
+    .docsSliderActive .toc section .navGroups {
+        background-color: var(--body-background);
     }
 }
 
@@ -269,6 +286,11 @@ table tr:nth-child(even) {
     color: #e23326;
 }
 
+.docsSliderActive .toc .navBreadcrumb,
+.tocActive .navBreadcrumb {
+    border-bottom: 1px solid #dddddd6e;
+}
+
 .footer-wrapper {
     max-width: 850px;
     display: flex;
@@ -295,9 +317,9 @@ table tr:nth-child(even) {
 .footer-subtitle {
     font-family: "RobotoLight";
     font-style: normal;
-    font-weight: 400;
-    font-size: 10px;
-    color: var(--gray-2-color);
+    font-weight: 300;
+    font-size: 12px;
+    color: var(--gray-1-color);
     line-height: 13px;
 }
 

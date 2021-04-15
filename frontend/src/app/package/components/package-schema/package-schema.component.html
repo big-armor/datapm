@@ -1,15 +1,10 @@
 <div class="schema" id="schema">
-    <h3 class="mb-0">{{ schema.title }}</h3>
     <div class="schema-content">
-        <div class="schema-text">
-            {{ schema.description }}
-        </div>
-
         <div class="schema-stats">
-            <div class="schema-samples package-light-gray mb-0" *ngIf="schema.sampleRecords?.length > 0">
+            <span class="schema-samples text-light-gray mb-0" *ngIf="schema.recordCount > 0">
                 {{ schema.recordCount | number }} {{ schema.unit || "" }} records<br />
-            </div>
-            <div class="package-light-gray mb-0">{{ schemaPropertiesLength(schema) | number }} Properties</div>
+            </span>
+            <span class="text-light-gray mb-0">{{ schemaPropertiesLength(schema) | number }} Properties</span>
         </div>
 
         <div class="accordions-group mt-2">
@@ -18,13 +13,13 @@
                     *ngFor="
                         let property of schema?.properties
                             | values
-                            | slice: 0:propertiesToShowCount
                             | sortBy: 'asc':'title'
+                            | slice: 0:propertiesToShowCount
                     "
                 >
                     <mat-expansion-panel-header>
-                        <mat-panel-title class="package-dark-gray"> {{ property.title }} </mat-panel-title>
-                        <mat-panel-description class="package-dark-gray">
+                        <mat-panel-title class="text-dark-gray"> {{ property.title }} </mat-panel-title>
+                        <mat-panel-description class="text-dark-gray">
                             <span>{{ getPropertyTypes(property) }}</span>
                         </mat-panel-description>
                     </mat-expansion-panel-header>
@@ -36,7 +31,7 @@
                             [ngSwitch]="type.valueType"
                         >
                             <div *ngSwitchCase="'number'">
-                                <div class="package-dark-gray">
+                                <div class="text-dark-gray">
                                     {{ type.valueType }}
                                     <ul>
                                         <li>
@@ -51,7 +46,7 @@
                                 </div>
                             </div>
                             <div *ngSwitchCase="'boolean'">
-                                <div class="package-dark-gray">
+                                <div class="text-dark-gray">
                                     {{ type.valueType }}
                                     <ul>
                                         <li>
@@ -64,7 +59,7 @@
                             </div>
 
                             <div *ngSwitchCase="'null'">
-                                <div class="package-dark-gray">
+                                <div class="text-dark-gray">
                                     {{ type.valueType }}
                                     <ul>
                                         <li>
@@ -77,7 +72,7 @@
                             </div>
 
                             <div *ngSwitchCase="'string'">
-                                <div class="package-dark-gray">
+                                <div class="text-dark-gray">
                                     {{ type.valueType }}
                                     <ul>
                                         <li>
@@ -104,7 +99,7 @@
                             </div>
 
                             <div *ngSwitchCase="'date'">
-                                <div class="package-dark-gray">
+                                <div class="text-dark-gray">
                                     {{ type.valueType }}
                                     <ul>
                                         <li>
@@ -120,6 +115,11 @@
                         </div>
                     </div>
                 </mat-expansion-panel>
+                <div
+                    class="fade-out"
+                    [class.d-none]="!shouldShowMorePropertiesButton || isShowingMorePropertiesText"
+                ></div>
+
                 <p class="text-center mt-3" *ngIf="shouldShowMorePropertiesButton">
                     <a class="app-outlined-button" (click)="toggleShowMoreProperties()">
                         {{ isShowingMorePropertiesText ? "Show Less" : "Show More" }}

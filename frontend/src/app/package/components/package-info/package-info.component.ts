@@ -98,7 +98,7 @@ export class PackageInfoComponent implements OnInit, OnChanges {
     public downloadPackage() {
         const dialogRef = this.dialog.open(DownloadPackageComponent, {
             data: this.package,
-            width: "430px"
+            width: "500px"
         });
     }
 

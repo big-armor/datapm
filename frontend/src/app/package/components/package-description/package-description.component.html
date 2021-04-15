@@ -1,22 +1,4 @@
-<div class="package-dark-gray pb-4">
-    <div class="package-details-title">{{ packageFile?.displayName }}</div>
-    <h3 class="mb-0">Description</h3>
-    <div
-        [class.limitTextHeight]="shouldShowMoreDescriptionButton && !isShowingMoreDescriptionText"
-        class="package-dark-gray"
-    >
-        {{ package?.description }}
-    </div>
-    <div class="fade-out" [class.d-none]="!shouldShowMoreDescriptionButton || isShowingMoreDescriptionText"></div>
-    <p class="text-center mt-3" *ngIf="shouldShowMoreDescriptionButton">
-        <a class="app-outlined-button" (click)="toggleShowMoreDescriptionText()">
-            {{ isShowingMoreDescriptionText ? "Show Less" : "Show More" }}
-        </a>
-    </p>
-</div>
-
 <div *ngIf="packageFile?.readmeMarkdown" class="pb-4">
-    <h3 class="mb-0">Read me</h3>
     <div [class.limitTextHeight]="shouldShowMoreReadMeButton && !isShowingMoreReadMeText">
         <markdown [data]="packageFile?.readmeMarkdown"></markdown>
     </div>
@@ -29,7 +11,6 @@
 </div>
 
 <div *ngIf="packageFile?.licenseMarkdown" class="pb-4">
-    <h3 class="mb-0">License</h3>
     <div [class.limitTextHeight]="shouldShowMoreLicenseButton && !isShowingMoreLicenseText">
         <markdown [data]="packageFile?.licenseMarkdown"></markdown>
     </div>
@@ -40,8 +21,9 @@
         </a>
     </p>
 </div>
+<h1>Preview</h1>
 
-<div *ngIf="schemas.length > 1">
+<div *ngIf="schemas?.length > 1">
     <mat-select (selectionChange)="selectSchema($event.value)" [value]="selectedSchema">
         <mat-option *ngFor="let schema of schemas" [value]="schema">
             {{ schema.title }}
@@ -50,21 +32,36 @@
 </div>
 
 <ng-container *ngIf="packageFile">
-    <div class="package-details-title mt-4 mb-1">Samples</div>
-    <samples [package]="package" [schema]="selectedSchema"></samples>
+    <div class="mb-150">
+        <samples [package]="package" [schema]="selectedSchema"></samples>
+    </div>
 </ng-container>
 
 <ng-container *ngIf="packageFile">
-    <div class="package-details-title mt-4 mb-1">Schema</div>
-    <schema [schema]="selectedSchema"></schema>
+    <div class="mt-4 py-2">
+        <div class="text-main-title mb-1">Schema</div>
+        <div *ngIf="schemas?.length > 1">
+            <mat-select (selectionChange)="selectSchema($event.value)" [value]="selectedSchema">
+                <mat-option *ngFor="let schema of schemas" [value]="schema">
+                    {{ schema.title }}
+                </mat-option>
+            </mat-select>
+        </div>
+        <schema [schema]="selectedSchema"></schema>
+    </div>
 </ng-container>
 
-<ng-container *ngIf="collections.length">
-    <div class="package-details-title mt-5">Related data</div>
-    <ul class="ul-data">
-        <li *ngFor="let collection of collections">
-            <a class="package-dark-gray ul-links">{{ collection.name }}</a>
-            <p class="package-light-gray">{{ collection.description }}</p>
-        </li>
-    </ul>
+<ng-container *ngIf="collections?.length">
+    <div class="related-data-div mt-5">
+        <div class="text-main-title mt-4 pt-2 mb-2">Related Data</div>
+        <div class="text-dark-gray">Other data that are related to this package</div>
+        <ul class="ul-data">
+            <li *ngFor="let collection of collections">
+                <a class="text-dark-gray ul-links" (click)="goToCollection(collection.identifier.collectionSlug)">{{
+                    collection.name
+                }}</a>
+                <p class="text-light-gray" [class.p-width]="collection.description">{{ collection.description }}</p>
+            </li>
+        </ul>
+    </div>
 </ng-container>

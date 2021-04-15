@@ -8,13 +8,12 @@
     <ng-container *ngSwitchCase="'LOADED'">
         <div class="samples" *ngIf="schema">
             <div>
-                <h3 class="mb-0">{{ schema.title }}</h3>
                 <div class="d-flex">
-                    <div class="package-dark-gray">
+                    <div class="text-dark-gray">
                         {{ schema.sampleRecords?.length }} {{ schema.unit || "" }} sample records
                     </div>
 
-                    <div class="ml-auto package-dark-gray">
+                    <div class="ml-auto text-dark-gray">
                         <a (click)="showSchemaFullScreen(schema)">view full screen</a>
                     </div>
                 </div>

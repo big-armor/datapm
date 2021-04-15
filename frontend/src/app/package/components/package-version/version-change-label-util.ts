@@ -32,6 +32,9 @@ export function getReadableChangeFromDifference(difference: PackageDifference): 
         case PackageDifferenceType.CHANGE_SOURCE_URIS:
             changeLabel = "Changed source URIs";
             break;
+        case PackageDifferenceType.CHANGE_SOURCE_CONFIGURATION:
+            changeLabel = "Changed source configuration";
+            break;
         case PackageDifferenceType.CHANGE_STREAM_STATS:
             changeLabel = "Changed stream stats";
             break;

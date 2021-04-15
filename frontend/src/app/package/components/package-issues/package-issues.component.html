@@ -36,13 +36,13 @@
                 </a>
                 <mat-menu #menu="matMenu">
                     <button mat-menu-item id="issueBtn" *ngIf="includeClosedIssues" (click)="openSelectedIssues()">
-                        <span class="package-dark-gray">Open</span>
+                        <span class="text-dark-gray">Open</span>
                     </button>
                     <button mat-menu-item id="issueBtn" *ngIf="includeOpenIssues" (click)="closeSelectedIssues()">
-                        <span class="package-dark-gray">Close</span>
+                        <span class="text-dark-gray">Close</span>
                     </button>
                     <button mat-menu-item id="issueBtn" (click)="deleteSelectedIssues()">
-                        <span class="package-dark-gray">Delete</span>
+                        <span class="text-dark-gray">Delete</span>
                     </button>
                 </mat-menu>
             </div>
@@ -74,10 +74,10 @@
                     </div>
                     <div class="d-flex flex-column bd-highlight ml-1">
                         <div class="bd-highlight">
-                            <a class="package-details-title" [routerLink]="issue.issueNumber"> {{ issue.subject }} </a>
+                            <a class="text-main-title" [routerLink]="issue.issueNumber"> {{ issue.subject }} </a>
                         </div>
                         <div class="bd-highlight">
-                            <div class="package-light-gray">
+                            <div class="text-light-gray">
                                 #{{ issue.issueNumber }} opened {{ issue.createdAt | timeAgo }} by
                                 {{ issue.authorDisplayName }}
                             </div>
@@ -110,12 +110,12 @@
 
         <!-- when issues are being loaded -->
         <div class="issue-wrapper text-center" *ngIf="state === State.LOADING">
-            <div class="package-dark-gray py-5">Loading issues...</div>
+            <div class="text-dark-gray py-5">Loading issues...</div>
         </div>
 
         <!-- when there are no open issues -->
         <div class="issue-wrapper text-center" *ngIf="state === State.NO_OPEN_ISSUES">
-            <div class="package-dark-gray py-5">
+            <div class="text-dark-gray py-5">
                 There are no open issues.
                 <br />
                 Click the <a href="javascript::void(0)" (click)="toggleIncludeClosedIssues()">'Closed'</a> tab to view
@@ -124,7 +124,7 @@
         </div>
         <!-- when there are no closed issues -->
         <div class="issue-wrapper text-center" *ngIf="state === State.NO_CLOSED_ISSUES">
-            <div class="package-dark-gray py-5">
+            <div class="text-dark-gray py-5">
                 There are no closed issues. <br />
                 Click the <a href="javascript::void(0)" (click)="toggleIncludeOpenIssues()">'Open'</a> tab to view open
                 issues
@@ -132,7 +132,7 @@
         </div>
         <!-- when there are no open/closed issues -->
         <div class="issue-wrapper text-center" *ngIf="state === State.NO_ISSUES">
-            <div class="package-dark-gray py-5">
+            <div class="text-dark-gray py-5">
                 There are no issues. <br />
                 Click to the
                 <a href="javascript::void(0)" (click)="navigateToNewIssuePage()">'open a new issue'</a> button to create

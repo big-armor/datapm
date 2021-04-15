@@ -1,14 +1,13 @@
 <div class="container mt-4 pt-2">
     <div class="mb-4 pb-3">
-        <div class="package-details-title">Public Access</div>
-        <p class="package-dark-gray col-md-8 p-0">
+        <div class="text-main-title">Public Access</div>
+        <p class="text-dark-gray col-md-8 p-0">
             Enabling public access allows all users, including anonymous users, to view the name, description, and
             packages in this collection. Users must have access to each individual package to view them.
         </p>
 
         <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center public-toggle">
-                <div class="package-dark-gray">Make this collection public</div>
                 <div class="ml-auto px-2 pb-1 slide-right">
                     <mat-slide-toggle
                         class="app-slide-toggle"
@@ -16,17 +15,21 @@
                         (change)="updatePublic($event)"
                     ></mat-slide-toggle>
                 </div>
+                <div class="pr-2 text-dark-gray" style="margin-bottom: 0px !important">
+                    <span class="public-text" *ngIf="collection?.isPublic">Public</span>
+                    <span class="not-public-text" *ngIf="!collection?.isPublic">Not Public</span>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="package-details-title">Manage Collection</div>
+    <div class="text-main-title">Manage Collection</div>
     <button class="app-outlined-button mr-2" (click)="editCollection()">Edit Collection Details</button>
     <button class="app-outlined-button" (click)="deleteCollection()">Delete This Collection</button>
 
     <div class="mt-4 py-3" *ngIf="users?.length">
-        <div class="package-details-title">Users With Access</div>
-        <p class="package-dark-gray">The following users have individual permission this collection.</p>
+        <div class="text-main-title">Users With Access</div>
+        <p class="text-dark-gray">The following users have individual permission this collection.</p>
         <button class="app-outlined-button" (click)="addUser()" *ngIf="users.length > 0">Add User</button>
     </div>
 

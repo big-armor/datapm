@@ -2,3 +2,9 @@
     min-height: 450px;
     overflow-y: scroll;
 }
+
+@media (max-width: 576px) {
+    .fixed-height {
+        min-height: 300px;
+    }
+}

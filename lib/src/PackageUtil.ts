@@ -47,6 +47,7 @@ export enum DifferenceType {
     REMOVE_HIDDEN_PROPERTY = "REMOVE_HIDDEN_PROPERTY",
     CHANGE_PROPERTY_TYPE = "CHANGE_PROPERTY_TYPE",
     CHANGE_PROPERTY_FORMAT = "CHANGE_PROPERTY_FORMAT",
+    CHANGE_PROPERTY_UNIT = "CHANGE_PROPERTY_UNIT",
     CHANGE_PROPERTY_DESCRIPTION = "CHANGE_PROPERTY_DESCRIPTION",
     CHANGE_GENERATED_BY = "CHANGE_GENERATED_BY",
     CHANGE_UPDATED_DATE = "CHANGE_UPDATED_DATE",
@@ -309,6 +310,8 @@ export function compareSchema(priorSchema: Schema, newSchema: Schema, pointer = 
     if (priorSchema.type === "string" && priorSchema.format !== newSchema.format)
         response.push({ type: DifferenceType.CHANGE_PROPERTY_FORMAT, pointer });
 
+    if (priorSchema.unit !== newSchema.unit) response.push({ type: DifferenceType.CHANGE_PROPERTY_UNIT, pointer });
+
     if (priorSchema.type === "object") {
         if (priorSchema.properties == null)
             throw new Error("Prior Schema property type is object, but has no properties");
@@ -415,6 +418,9 @@ export function diffCompatibility(diffs: Difference[]): Compability {
             case DifferenceType.REMOVE_HIDDEN_PROPERTY:
             case DifferenceType.REMOVE_HIDDEN_SCHEMA:
             case DifferenceType.CHANGE_VERSION: // this just requires that the number be at least one minor version greater, it doesn't return the actual difference
+            case DifferenceType.REMOVE_SOURCE:
+            case DifferenceType.REMOVE_STREAM_SET:
+            case DifferenceType.CHANGE_PROPERTY_UNIT:
                 returnValue = Math.max(returnValue, Compability.MinorChange);
                 break;
 

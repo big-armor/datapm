@@ -1,14 +1,13 @@
 <div class="container mt-4 pt-2">
     <div class="mb-4 pb-4">
-        <div class="package-details-title">Public Access</div>
-        <p class="package-dark-gray col-md-8 p-0">
+        <div class="text-main-title">Public Access</div>
+        <p class="text-dark-gray col-md-8 p-0">
             Enabling public access allows all users, including anonymous users, to view these catalog details. Users
             must have access to each individual package to view them. Packages in this catalog can not be set public
             until this catalog is public.
         </p>
         <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center public-toggle">
-                <div class="package-dark-gray">Make this catalog public</div>
                 <div class="ml-auto px-2 pb-1 slide-right">
                     <mat-slide-toggle
                         class="app-slide-toggle"
@@ -16,17 +15,21 @@
                         (change)="updatePublic($event)"
                     ></mat-slide-toggle>
                 </div>
+                <div class="pr-2 text-dark-gray" style="margin-bottom: 0px !important">
+                    <span class="public-text" *ngIf="isCatalogPublic">Public</span>
+                    <span class="not-public-text" *ngIf="!isCatalogPublic">Not Public</span>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="package-details-title">Manage This Catalog</div>
+    <div class="text-main-title">Manage This Catalog</div>
     <a class="app-outlined-button mr-3" (click)="editCatalog()">Edit Catalog Details</a>
     <a class="app-outlined-button mr-3" (click)="deleteCatalog()">Delete This Catalog</a>
 
     <div class="mt-4 py-4" *ngIf="users?.length">
-        <div class="package-details-title">Users With Access</div>
-        <p class="package-dark-gray">The following users have individual permission this catalog.</p>
+        <div class="text-main-title">Users With Access</div>
+        <p class="text-dark-gray">The following users have individual permission this catalog.</p>
         <button class="app-outlined-button" (click)="addUser()" *ngIf="users.length > 0">Add User</button>
     </div>
 

@@ -14,6 +14,10 @@ body {
 
 a {
     color: var(--info-color);
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-weight: $weight-400;
+    letter-spacing: 0.4px;
 
     &:hover {
         color: var(--info-hover-color);
@@ -23,6 +27,13 @@ a {
 body {
     margin: 0;
     font-family: $family-roboto !important;
+}
+
+h1,
+.logo-div {
+    &:focus {
+        outline: none;
+    }
 }
 
 h3 {
@@ -64,6 +75,10 @@ h3 {
 .mat-stepper-horizontal,
 .mat-card {
     background-color: inherit;
+}
+
+.cdk-overlay-dark-backdrop {
+    background: var(--cdk-overlay-background);
 }
 
 table.gray-table {
@@ -123,6 +138,15 @@ table.gray-table {
     }
 }
 
+.font-500 {
+    font-weight: 500;
+}
+
+.mat-menu-panel,
+.mat-select-panel {
+    border-radius: 0px !important;
+}
+
 .cdk-global-scrollblock {
     position: static !important;
     width: initial !important;
@@ -148,7 +172,7 @@ table.gray-table {
         border-bottom: 1px solid var(--gray-5-color) !important;
         @include text("body");
         border-radius: 0px;
-        background: var(--secondary-color);
+        background: var(--custom-secondary-color);
         color: var(--gray-2-color);
         &:last-child {
             border-bottom: none !important;
@@ -184,10 +208,16 @@ table.gray-table {
     }
 }
 
+@media (hover: none) {
+    .mat-expansion-panel:not(.mat-expanded):not([aria-disabled="true"]) .mat-expansion-panel-header:hover {
+        background: var(--gray-11-color);
+    }
+}
+
 .app-slide-toggle.mat-checked {
     .mat-slide-toggle-bar,
     .mat-ripple-element {
-        background-color: $green-1-color;
+        background-color: var(--green-1-color);
     }
     .mat-slide-toggle-thumb {
         background-color: $secondary-color;
@@ -196,6 +226,30 @@ table.gray-table {
 
 .mat-slide-toggle-bar {
     background-color: var(--gray-4-color);
+}
+
+.footer-slide-toggle {
+    .mat-slide-toggle-thumb-container {
+        left: -3px;
+    }
+    .mat-slide-toggle-thumb {
+        background-color: #000;
+        height: 18px;
+        width: 18px;
+    }
+    .mat-slide-toggle-bar {
+        width: 28px;
+        height: 13px;
+    }
+}
+
+.footer-slide-toggle.mat-checked {
+    .mat-slide-toggle-thumb {
+        background-color: #fff;
+    }
+    .mat-slide-toggle-bar {
+        background-color: #bdbdbd;
+    }
 }
 
 .rounded-input {
@@ -208,7 +262,7 @@ table.gray-table {
         font-size: $text-font;
         border: 1px solid var(--gray-5-color);
         outline: none;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
         color: var(--gray-1-color);
         font-family: $family-roboto;
         background-color: var(--gray-7-color) !important;
@@ -222,13 +276,14 @@ table.gray-table {
         &::placeholder {
             font-family: $family-roboto;
             font-style: $style-normal;
+            font-size: $text-font;
             font-weight: $weight-300;
-            font-size: ($small-font + 1);
             line-height: 18px;
             display: flex;
             align-items: flex-end;
-            letter-spacing: 0.4px;
-            color: $gray-4-color;
+            letter-spacing: 0.5px;
+            opacity: 0.9;
+            color: var(--gray-3-color);
         }
     }
 }
@@ -280,7 +335,8 @@ mat-select {
     &::placeholder {
         font-family: $family-roboto;
         letter-spacing: 0.7px;
-        color: var(--gray-1-color);
+        opacity: 0.9;
+        color: var(--gray-3-color);
         font-weight: $weight-300;
         font-size: $text-font;
     }
@@ -313,7 +369,7 @@ mat-select {
     &:disabled {
         background-color: var(--gray-5-color);
         pointer-events: none;
-        opacity: 0.6;
+        opacity: 0.5;
     }
 }
 
@@ -477,7 +533,7 @@ mat-select {
     line-height: 18px;
     color: var(--gray-1-color);
     border-radius: 0px !important;
-    background-color: var(--secondary-color) !important;
+    background-color: var(--custom-secondary-color) !important;
     border-bottom: 1px solid var(--gray-5-color) !important;
 
     &:hover {
@@ -490,7 +546,8 @@ mat-select {
 }
 
 .mat-option.mat-active {
-    color: var(--gray-1-color);
+    color: var(--gray-1-color) !important;
+    background-color: var(--active-option) !important;
 }
 
 .header-border {
@@ -582,7 +639,8 @@ textarea.flat-input,
         display: flex;
         align-items: flex-end;
         letter-spacing: 0.7px;
-        color: var(--gray-4-color);
+        opacity: 0.8;
+        color: var(--gray-3-color);
     }
 }
 
@@ -620,10 +678,6 @@ button:disabled {
     background-color: var(--gray-5-color);
     pointer-events: none;
     opacity: 0.6;
-
-    .btn-text {
-        color: var(--custom-gray-3-color);
-    }
 }
 
 .mat-button.mat-primary[disabled],
@@ -675,6 +729,7 @@ button:disabled {
     p {
         color: var(--gray-1-color);
         margin-bottom: 5px !important;
+        letter-spacing: 0.4px;
     }
 }
 
@@ -703,6 +758,10 @@ button:disabled {
 
 .mb-12 {
     margin-bottom: -12px !important;
+}
+
+.mb-150 {
+    margin-bottom: 150px !important;
 }
 
 .long-txt {
@@ -916,17 +975,18 @@ button:disabled {
     color: var(--info-color);
 }
 
-.package-light-gray {
+.text-light-gray {
     font-family: $family-roboto;
     font-style: $style-normal;
     font-weight: $weight-300;
     font-size: $small-font;
+    line-height: 16px;
     letter-spacing: 0.4px;
     color: var(--gray-3-color);
     margin-bottom: 0px !important;
 }
 
-.package-dark-gray {
+.text-dark-gray {
     font-family: $family-roboto;
     font-style: $style-normal;
     font-weight: $weight-400;
@@ -936,7 +996,7 @@ button:disabled {
     margin-bottom: 5px !important;
 }
 
-.package-details-title {
+.text-main-title {
     font-family: $family-roboto;
     font-style: $style-normal;
     font-size: $title-font;
@@ -1035,6 +1095,10 @@ button:disabled {
             min-height: 40px;
         }
     }
+    .text-light-gray,
+    .text-dark-gray {
+        line-height: 17px;
+    }
     .font-22 {
         font-size: $title-font !important;
     }
@@ -1058,16 +1122,23 @@ button:disabled {
             font-size: $small-font;
         }
     }
+    .no-mt-mobile {
+        margin-top: 10px !important;
+    }
+    .no-pd-mobile {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
     table.gray-table {
         .mat-column-name {
-            width: 44% !important;
+            width: 39% !important;
         }
         th {
-            font-size: $small-font;
+            font-size: $small-font + 1;
         }
 
         td {
-            font-size: $small-font;
+            font-size: $small-font + 1;
         }
     }
     .flat-input,
@@ -1077,20 +1148,22 @@ button:disabled {
 
         &::placeholder {
             font-size: $small-font;
+            font-weight: $weight-400;
         }
     }
     .m-0-mobile {
         margin-bottom: 0px !important;
     }
     .text-danger {
+        margin-top: 1px !important;
         font-size: $xsmall-font;
         max-width: 240px !important;
     }
     .rounded-input {
         .dpm-input-square {
-            height: 38px;
             &::placeholder {
-                font-size: $small-font !important;
+                font-weight: $weight-400;
+                font-size: $small-font + 1 !important;
             }
         }
     }
@@ -1100,19 +1173,20 @@ button:disabled {
         width: 100%;
     }
     .dialog-wrapper-account {
-        padding: 0px;
+        padding: 10px 30px 20px 30px;
         min-width: 236px;
         app-input {
             min-width: 208px;
         }
     }
     .app-outlined-button {
-        padding: 6px 6px;
+        padding: 7px 13px;
         font-size: $small-font;
     }
     .dpm-input-flat {
         &::placeholder {
             font-size: $small-font;
+            font-weight: $weight-400;
         }
     }
     div {
@@ -1122,7 +1196,7 @@ button:disabled {
         }
         .dialog-close-wrapper {
             bottom: 10px;
-            left: 22px;
+            left: 42px;
             .dialog-close {
                 font-size: $small-font;
             }
@@ -1139,14 +1213,20 @@ button:disabled {
         margin: 3px;
     }
     .mat-dialog-container {
-        padding: 12px 15px 15px 15px !important;
+        padding: 10px 20px 15px 20px !important;
+    }
+    #contentBorder {
+        p,
+        .slug {
+            font-size: $small-font + 1;
+        }
     }
     #homeRoutes {
         li {
             a {
                 font-size: $text-font;
-                padding: 0px 4px 4px 4px;
-                margin: 0px 6px;
+                padding: 0px 3px 4px 3px;
+                margin: 0px 4px;
                 bottom: 16px;
             }
         }

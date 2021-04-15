@@ -10,7 +10,7 @@
                 </div>
                 <div class="d-flex bd-highlight">
                     <div class="bd-highlight">
-                        <div class="package-details-title mb-1">Collection: {{ collection?.name }}</div>
+                        <div class="text-main-title mb-1">Collection: {{ collection?.name }}</div>
                     </div>
                     <div class="ml-auto bd-highlight">
                         <button class="app-raised-button follow-btn" (click)="follow()">
@@ -19,8 +19,8 @@
                         </button>
                     </div>
                 </div>
-                <div class="package-light-gray">{{ collectionSlug }}</div>
-                <div class="package-dark-gray">
+                <div class="text-light-gray">{{ collectionSlug }}</div>
+                <div class="text-dark-gray">
                     {{ collection?.description }}
                 </div>
             </div>
@@ -41,7 +41,7 @@
         <div class="container">
             <div *ngIf="currentTab === 0">
                 <div class="mt-4" *ngIf="collection.packages?.length > 0">
-                    <p class="package-dark-gray ml-3">The following packages are included in this collection.</p>
+                    <p class="text-dark-gray ml-3">The following packages are included in this collection.</p>
                     <div class="mt-2 mb-4 pl-3">
                         <button class="app-outlined-button" (click)="addPackage()" *ngIf="canEdit">Add Package</button>
                     </div>
@@ -56,7 +56,7 @@
                 >
                 </app-package-item>
                 <div class="dpm-no-data" *ngIf="!collection.packages?.length">
-                    <p class="package-dark-gray ml-3">
+                    <p class="text-dark-gray ml-3">
                         This collection either contains no packages, or you do not have permission to view the packages
                         it contains.
                     </p>
@@ -70,13 +70,13 @@
     <div class="container">
         <div *ngIf="state === 'NOT_AUTHORIZED'">
             <div class="dpm-no-data">
-                <p class="package-dark-gray ml-3">You do not have permission to view this collection.</p>
+                <p class="text-dark-gray ml-3">You do not have permission to view this collection.</p>
             </div>
         </div>
 
         <div *ngIf="state === 'NOT_FOUND'">
             <div class="dpm-no-data">
-                <p class="package-dark-gray ml-3">The requested collection was not found.</p>
+                <p class="text-dark-gray ml-3">The requested collection was not found.</p>
             </div>
         </div>
         <div class="dpm-page-loading" *ngIf="state === 'LOADING'">

@@ -92,6 +92,11 @@ export class CatalogDetailsComponent implements OnInit {
         });
     }
 
+    ngOnDestroy(): void {
+        this.unsubscribe$.next();
+        this.unsubscribe$.complete();
+    }
+
     public editCatalog(): void {
         this.dialog
             .open(EditCatalogComponent, {

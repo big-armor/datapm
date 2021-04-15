@@ -39,17 +39,17 @@
     }
 
     .download-btn {
-        border-radius: 6px;
+        border-radius: 4px;
         text-align: left;
         width: 100%;
         border: none;
-        padding: 5px 12px 5px 0px;
+        padding: 6px 12px 6px 0px;
         background: var(--custom-secondary-color);
         color: var(--gray-1-color);
         border: 1px solid #33333326;
         font-weight: $weight-400;
         letter-spacing: 0.8px;
-        font-size: ($small-font - 1);
+        font-size: $small-font;
         font-family: $family-roboto;
 
         a {
@@ -71,7 +71,7 @@
 
     .format-category {
         width: 100%;
-        margin-bottom: 15px;
+        margin-bottom: 10px;
     }
 
     .form-check {
@@ -95,8 +95,7 @@
         padding: 0px;
     }
 
-    .next-btn {
-        border: none;
-        background: transparent;
+    .back-btn {
+        color: var(--gray-1-color);
     }
 }

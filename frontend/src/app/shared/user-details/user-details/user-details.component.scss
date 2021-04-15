@@ -46,7 +46,7 @@
                 box-shadow: none;
                 font-size: $text-font;
                 align-items: flex-end;
-                letter-spacing: -0.28px;
+                letter-spacing: 0.7px;
                 color: var(--gray-1-color);
                 background-color: var(--custom-secondary-color);
 
@@ -59,22 +59,27 @@
                     font-family: $family-roboto;
                     font-style: $style-normal;
                     font-weight: $weight-300;
-                    font-size: $text-font;
+                    font-size: $text-font - 1;
                     display: flex;
                     align-items: flex-end;
-                    letter-spacing: -0.28px;
-                    color: var(--gray-5-color);
+                    letter-spacing: 0.7px;
+                    opacity: 0.7;
+                    color: var(--gray-3-color);
                 }
             }
         }
     }
 }
 
-@media (max-width: 480px) {
-    .div-answer {
-        flex-direction: column;
-        input {
-            width: 190px !important;
+@media (max-width: 576px) {
+    #detailsPage {
+        margin-top: 15px;
+        padding-left: 0px !important;
+        .div-answer {
+            flex-direction: column;
+            input {
+                width: 190px !important;
+            }
         }
     }
 }
