@@ -1,18 +1,18 @@
 import { JSONSchema7, JSONSchema7TypeName } from "json-schema";
 import { DPMConfiguration } from "./main";
 
-export enum CountPrecisionV030 {
+export enum CountPrecision {
     EXACT = "EXACT",
     APPROXIMATE = "APPROXIMATE",
     GREATER_THAN = "GREATER_THAN"
 }
-export interface StreamStatsV030 {
+export interface StreamStats {
     /** The number of bytes observed in the stream. See byteCountPrecision
      * for whether this is an exact, estimated, or "greater than" number.
      */
     byteCount?: number;
 
-    byteCountPrecision?: CountPrecisionV030;
+    byteCountPrecision?: CountPrecision;
 
     /** The number of records deeply inspected during the stream */
     inspectedCount: number;
@@ -21,11 +21,11 @@ export interface StreamStatsV030 {
      * this is an exact, estimated, or "greater than" number.
      */
     recordCount?: number;
-    recordCountPrecision?: CountPrecisionV030;
+    recordCountPrecision?: CountPrecision;
 }
 
 /** A description of where the package file should be published. */
-export interface RegistryReferenceV030 {
+export interface RegistryReference {
     /** The HTTP or HTTPS URL to reach the registry server. */
     url: string;
 
@@ -37,7 +37,7 @@ export interface RegistryReferenceV030 {
  * a file system/SFTP/NFS select of *.xml from a particular directory would be one stream set. Each table in a database would
  * be another stream set.
  */
-export interface StreamSetV030 {
+export interface StreamSet {
     /** The unique identifier for the stream set in a single source */
     slug: string;
 
@@ -53,13 +53,13 @@ export interface StreamSetV030 {
     lastUpdateHash?: string;
 
     /** The number of records last observed */
-    streamStats: StreamStatsV030;
+    streamStats: StreamStats;
 }
 
 /** Describes where the data resides, and how to access one or more logical sets of streams. For example, how to
  * access a database, and which tables are each an individual stream set.
  */
-export interface SourceV030 {
+export interface Source {
     /** The universally unique identifier for the sourceInterface implementation */
     type: string;
 
@@ -75,10 +75,22 @@ export interface SourceV030 {
      */
     configuration?: DPMConfiguration;
 
-    streamSets: StreamSetV030[];
+    streamSets: StreamSet[];
 }
 
-export interface ValueTypeStatisticsV030 {
+/** Predefined content labels for marking content types discovered in fields */
+export enum ContentLabels {
+    PHONE_NUMBER = "PHONE_NUMBER",
+    EMAIL_ADDRESS = "EMAIL_ADDRESS",
+    UNITED_STATES_SOCIAL_SECURITY_NUMBER = "UNITED_STATES_SOCIAL_SECURITY_NUMBER",
+    STREET_ADDRESS = "STREET_ADDRESS",
+    CITY = "CITY",
+    STATE_REGION = "STATE_REGION",
+    POSTAL_CODE = "POSTAL_CODE",
+    PERSON_NAME = "PERSON_NAME"
+}
+
+export interface ValueTypeStatistics {
     valueType: JSONSchema7TypeName | "date";
 
     /** The number of records on which this property was observed. If schema recordCountApproximate property is true,
@@ -92,13 +104,20 @@ export interface ValueTypeStatisticsV030 {
     dateMaxValue?: Date;
     dateMinValue?: Date;
     stringOptions?: { [key: string]: number };
+
+    /** A dictionary of content labels referencing a boolean value as to whether they should be displayed. This
+     * allows content labels to be "hidden" by a package editor - and to keep that fact for future iterations.
+     */
+    contentLabels?: {
+        [key: string]: boolean;
+    };
 }
 
 // eslint-disable-next-line no-use-before-define
-export type PropertiesV030 = { [key: string]: SchemaV030 };
-export type ValueTypesV030 = { [key: string]: ValueTypeStatisticsV030 };
+export type Properties = { [key: string]: Schema };
+export type ValueTypes = { [key: string]: ValueTypeStatistics };
 
-export interface SchemaIdentifierV030 {
+export interface SchemaIdentifier {
     registryUrl: string;
     catalogSlug: string;
     packageSlug: string;
@@ -106,7 +125,7 @@ export interface SchemaIdentifierV030 {
     schemaTitle: string;
 }
 
-export interface DerivedFromV030 {
+export interface DerivedFrom {
     /** User friendly name for the upstream data */
     displayName: string;
 
@@ -114,15 +133,15 @@ export interface DerivedFromV030 {
     url?: string;
 
     /** The identifier for the specific version of the datapm package version and schema title. Url or schemaIdentifier must be defined.  */
-    schemaIdentifier?: SchemaIdentifierV030;
+    schemaIdentifier?: SchemaIdentifier;
 }
 
 /** The JSON Schema Draft 07 compliant schema object, extended with properties that describe
  * how to obtain the data, and details the values of the data properties.
  */
-export interface SchemaV030 extends JSONSchema7 {
+export interface Schema extends JSONSchema7 {
     /** The JSON Schema Draft 07 compliant property list for the object */
-    properties?: PropertiesV030;
+    properties?: Properties;
 
     /** Whether the consumer should by default include this schema/property in the regular output */
     hidden?: boolean;
@@ -144,10 +163,10 @@ export interface SchemaV030 extends JSONSchema7 {
     recordsNotPresent?: number;
 
     /** How to consider the recordCount value - as one of exact, approximate, or greater than. */
-    recordCountPrecision?: CountPrecisionV030;
+    recordCountPrecision?: CountPrecision;
 
-    /** A object which has keys that the property type (string, array, date, boolean, object, etc). The values of this object describe the property type. */
-    valueTypes?: ValueTypesV030;
+    /** An object which has keys that the property type (string, array, date, boolean, object, etc). The values of this object describe the values of the property. */
+    valueTypes?: ValueTypes;
 
     /** A  selected set of sample records that are representative of the schema */
     sampleRecords?: { [key: string]: unknown }[];
@@ -156,12 +175,12 @@ export interface SchemaV030 extends JSONSchema7 {
     derivedFromDescription?: string;
 
     /** A list of references to upstream data from which this schema was derived. This is also called "Provenance" */
-    derivedFrom?: DerivedFromV030[];
+    derivedFrom?: DerivedFrom[];
 }
 
-export class PackageFileV030 {
+export class PackageFile {
     /** The URL of the JSON schema file to validate this file. */
-    $schema = "https://datapm.io/docs/package-file-schema-v0.3.0.json";
+    $schema = "https://datapm.io/docs/package-file-schema-v0.4.0.json";
 
     /** The short name that identifies this package, in the context of the catalog that it is published. */
     packageSlug: string;
@@ -173,10 +192,10 @@ export class PackageFileV030 {
     description: string;
 
     /** An object describing how to access the record stream of the data */
-    sources: SourceV030[];
+    sources: Source[];
 
     /** The json-schema.org Draft 7 compliant schemas, extended to support the features of datapm. */
-    schemas: SchemaV030[];
+    schemas: Schema[];
 
     /** The semver compatible version number. */
     version: string;
@@ -209,5 +228,5 @@ export class PackageFileV030 {
      * the local client to determine where to publish. The client will remove private and local registry references
      * before publishing to each registry.
      */
-    registries?: RegistryReferenceV030[];
+    registries?: RegistryReference[];
 }
