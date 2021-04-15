@@ -4,7 +4,7 @@ import fs from "fs";
 import path from "path";
 import AJV from "ajv";
 import fetch from "cross-fetch";
-import { Source, StreamSet, ValueTypes, ValueTypeStatistics } from "./PackageFile-v0.4.0";
+import { Source, StreamSet, ValueTypeStatistics } from "./PackageFile-v0.4.0";
 import { PackageFileV020 } from "./PackageFile-v0.2.0";
 
 import deepEqual from "fast-deep-equal";
