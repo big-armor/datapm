@@ -10,19 +10,32 @@
                 </div>
                 <div class="catalog-div mt-4" [hidden]="stats.catalogFollowsCount == 0">
                     <div class="package-details-title font-16">Catalogs</div>
-                    <app-user-type-following [stats]="stats" [type]="FollowType.CATALOG"></app-user-type-following>
+                    <app-user-type-following
+                        [itemsName]="'catalogs'"
+                        [stats]="stats"
+                        [type]="FollowType.CATALOG"
+                    ></app-user-type-following>
                 </div>
                 <div class="collection-div mt-4" [hidden]="stats.collectionFollowsCount == 0">
                     <div class="package-details-title font-16">Collections</div>
-                    <app-user-type-following [stats]="stats" [type]="FollowType.COLLECTION"></app-user-type-following>
+                    <app-user-type-following
+                        [itemsName]="'collections'"
+                        [stats]="stats"
+                        [type]="FollowType.COLLECTION"
+                    ></app-user-type-following>
                 </div>
                 <div class="package-div mt-4" [hidden]="stats.packageFollowsCount == 0">
                     <div class="package-details-title font-16">Packages</div>
-                    <app-user-type-following [stats]="stats" [type]="FollowType.PACKAGE"></app-user-type-following>
+                    <app-user-type-following
+                        [itemsName]="'packages'"
+                        [stats]="stats"
+                        [type]="FollowType.PACKAGE"
+                    ></app-user-type-following>
                 </div>
                 <div class="user-div mt-4" [hidden]="stats.packageIssueFollowsCount == 0">
                     <div class="package-details-title font-16">Package Issues</div>
                     <app-user-type-following
+                        [itemsName]="'package issues'"
                         [stats]="stats"
                         [type]="FollowType.PACKAGE_ISSUE"
                     ></app-user-type-following>
@@ -30,7 +43,11 @@
 
                 <div class="user-div mt-4" [hidden]="stats.userFollowsCount == 0">
                     <div class="package-details-title font-16">Users</div>
-                    <app-user-type-following [stats]="stats" [type]="FollowType.USER"></app-user-type-following>
+                    <app-user-type-following
+                        [itemsName]="'users'"
+                        [stats]="stats"
+                        [type]="FollowType.USER"
+                    ></app-user-type-following>
                 </div>
             </div>
         </div>

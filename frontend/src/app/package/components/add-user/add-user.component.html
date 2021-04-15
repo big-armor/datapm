@@ -15,7 +15,7 @@
                     <textarea [formControl]="messageControl" matInput placeholder="Write message" rows="4"></textarea>
                 </mat-form-field>
             </div>
-            <div class="permission-div w-50">
+            <div class="permission-div modal-select w-50">
                 <label class="div-question pl-1 mb-0">Package permissions</label>
                 <mat-form-field appearance="fill" class="w-100">
                     <mat-select [value]="permission" (selectionChange)="updateSelectedPermission($event.value)">

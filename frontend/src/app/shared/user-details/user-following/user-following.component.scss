@@ -10,19 +10,4 @@
         margin-bottom: 6px;
         font-size: ($title-font - 4);
     }
-
-    .permission-div {
-        ::ng-deep {
-            mat-select {
-                border: 1px solid var(--gray-9-color);
-                letter-spacing: 0.4px;
-                border-radius: 4px;
-                padding: 8px 10px;
-            }
-
-            .mat-form-field-wrapper {
-                padding: 6px 0px !important;
-            }
-        }
-    }
 }

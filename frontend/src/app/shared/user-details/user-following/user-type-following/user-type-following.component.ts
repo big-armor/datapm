@@ -25,6 +25,9 @@ export class UserTypeFollowingComponent implements OnInit {
     private readonly MAXIMUM_FOLLOWS_PER_REQUEST = 1;
 
     @Input()
+    public itemsName: string;
+
+    @Input()
     public type: FollowType;
 
     @Input()

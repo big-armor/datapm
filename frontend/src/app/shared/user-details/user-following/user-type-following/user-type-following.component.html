@@ -33,5 +33,9 @@
         <tr mat-row *matRowDef="let row; columns: COLUMNS"></tr>
     </table>
 
-    <button *ngIf="hasMore" [disabled]="loading" (click)="loadFollows()">Load more</button>
+    <div class="text-right mt-1">
+        <a *ngIf="hasMore" [disabled]="loading" (click)="loadFollows()" class="cursor-pointer"
+            >Show more {{ itemsName }}
+        </a>
+    </div>
 </div>

@@ -318,14 +318,19 @@ mat-select {
 }
 
 .app-raised-button.follow-btn {
-    padding: 6px 16px;
+    padding: 8px 8px;
+    width: 40px;
+    height: 40px;
     line-height: 13px;
+    border-radius: 50%;
+    border: 1px solid var(--info-color);
+    background-color: var(--info-color);
 }
 
-.app-outlined-button.follow-btn {
-    padding: 7px 10px;
-    line-height: 13px;
-}
+// .app-outlined-button.follow-btn {
+//     padding: 7px 10px;
+//     line-height: 13px;
+// }
 
 .raised {
     box-shadow: var(--outer-shadow-1) !important;
@@ -858,6 +863,17 @@ button:disabled {
     }
 }
 
+.permission-div.modal-select {
+    mat-select {
+        color: var(--gray-2-color);
+        padding: 10px;
+    }
+
+    .mat-form-field-wrapper {
+        padding: 0px 0px 10px 0px !important;
+    }
+}
+
 .permission-div {
     mat-select {
         font-family: $family-roboto;
@@ -865,8 +881,9 @@ button:disabled {
         font-weight: $weight-400;
         font-size: $text-font;
         letter-spacing: unset;
-        color: var(--gray-2-color);
-        padding: 10px;
+        border: 1px solid var(--gray-9-color);
+        border-radius: 6px;
+        padding: 7px 10px;
     }
 
     .mat-form-field-underline {
