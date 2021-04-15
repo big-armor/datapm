@@ -22,7 +22,7 @@ export class UserTypeFollowingComponent implements OnInit {
     );
 
     public readonly COLUMNS = ["name", "frequency", "action"];
-    private readonly MAXIMUM_FOLLOWS_PER_REQUEST = 1;
+    private readonly MAXIMUM_FOLLOWS_PER_REQUEST = 10;
 
     @Input()
     public itemsName: string;
