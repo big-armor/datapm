@@ -44,6 +44,7 @@ import { PackageIssuesDetailComponent } from "./components/package-issues/packag
 import { MatMenuModule } from "@angular/material/menu";
 import { CreatePackageIssueComponent } from "./components/package-issues/create-package-issue/create-package-issue.component";
 import { VersionComparisonModalComponent } from "./components/package-version/version-comparison-modal/version-comparison-modal.component";
+import { EditPropertyDialogComponent } from "./components/package-schema/edit-property-dialog/edit-property-dialog.component";
 
 @NgModule({
     declarations: [
@@ -66,7 +67,8 @@ import { VersionComparisonModalComponent } from "./components/package-version/ve
         PackageIssuesComponent,
         PackageIssuesDetailComponent,
         CreatePackageIssueComponent,
-        VersionComparisonModalComponent
+        VersionComparisonModalComponent,
+        EditPropertyDialogComponent
     ],
     imports: [
         CommonModule,

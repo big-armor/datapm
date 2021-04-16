@@ -18,13 +18,15 @@
                     "
                 >
                     <mat-expansion-panel-header>
-                        <mat-panel-title class="text-dark-gray"> {{ property.title }} </mat-panel-title>
+                        <mat-panel-title class="text-dark-gray font-14 weight-500">
+                            {{ property.title }}
+                        </mat-panel-title>
                         <mat-panel-description class="text-dark-gray">
                             <span>{{ getPropertyTypes(property) }}</span>
                         </mat-panel-description>
                     </mat-expansion-panel-header>
                     <div>
-                        <div>{{ property.description }}</div>
+                        <div class="text-dark-gray weight-500">hihi {{ property.description }}</div>
                         <div
                             class="d-flex align-items-center justify-content-between"
                             *ngFor="let type of property.valueTypes | values"
@@ -32,7 +34,7 @@
                         >
                             <div *ngSwitchCase="'number'">
                                 <div class="text-dark-gray">
-                                    {{ type.valueType }}
+                                    <div class="weight-500">{{ type.valueType }}</div>
                                     <ul>
                                         <li>
                                             present in {{ type.recordCount | number }} ({{
@@ -47,7 +49,7 @@
                             </div>
                             <div *ngSwitchCase="'boolean'">
                                 <div class="text-dark-gray">
-                                    {{ type.valueType }}
+                                    <div class="weight-500">{{ type.valueType }}</div>
                                     <ul>
                                         <li>
                                             present in {{ type.recordCount | number }} ({{
@@ -60,7 +62,7 @@
 
                             <div *ngSwitchCase="'null'">
                                 <div class="text-dark-gray">
-                                    {{ type.valueType }}
+                                    <div class="weight-500">{{ type.valueType }}</div>
                                     <ul>
                                         <li>
                                             present in {{ type.recordCount | number }} ({{
@@ -73,7 +75,7 @@
 
                             <div *ngSwitchCase="'string'">
                                 <div class="text-dark-gray">
-                                    {{ type.valueType }}
+                                    <div class="weight-500">{{ type.valueType }}</div>
                                     <ul>
                                         <li>
                                             present in {{ type.recordCount | number }} records ({{
@@ -100,7 +102,7 @@
 
                             <div *ngSwitchCase="'date'">
                                 <div class="text-dark-gray">
-                                    {{ type.valueType }}
+                                    <div class="weight-500">{{ type.valueType }}</div>
                                     <ul>
                                         <li>
                                             present in {{ type.recordCount | number }} ({{
@@ -112,6 +114,13 @@
                                     </ul>
                                 </div>
                             </div>
+                        </div>
+                        <div class="text-dark-gray text-right">
+                            <a class="cursor-pointer doc-link" (click)="editPropertyDialog()">Edit Property</a>
+                            <span class="px-2">|</span>
+                            <a class="cursor-pointer doc-link" (click)="editPropertyDialog()">Copy Link</a>
+                            <span class="px-2">|</span>
+                            <a class="cursor-pointer doc-link" (click)="createIssue()">Create Issue</a>
                         </div>
                     </div>
                 </mat-expansion-panel>

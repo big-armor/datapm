@@ -1,8 +1,10 @@
 import { Component, Input, OnChanges, OnDestroy } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
+import { ActivatedRoute, Router } from "@angular/router";
 import { Schema, ValueTypeStatistics } from "datapm-lib";
 import { Subject } from "rxjs";
 import { SamplesFullScreenDialog } from "../package-samples/samples-fullscreen-dialog.component";
+import { EditPropertyDialogComponent } from "./edit-property-dialog/edit-property-dialog.component";
 
 @Component({
     selector: "schema",
@@ -22,7 +24,7 @@ export class PackageSchemaComponent implements OnDestroy, OnChanges {
 
     private unsubscribe$ = new Subject();
 
-    constructor(private dialog: MatDialog) {}
+    constructor(private dialog: MatDialog, private router: Router, private route: ActivatedRoute) {}
 
     public ngOnChanges(): void {
         console.log(this.schemaPropertiesLength(this.schema));
@@ -50,6 +52,17 @@ export class PackageSchemaComponent implements OnDestroy, OnChanges {
 
     public schemaPropertiesLength(schema: Schema): number {
         return Object.keys(schema.properties).length;
+    }
+
+    public createIssue() {
+        this.router.navigate(["issues/new"], { relativeTo: this.route });
+    }
+
+    public editPropertyDialog() {
+        this.dialog.open(EditPropertyDialogComponent, {
+            width: "500px",
+            disableClose: true
+        });
     }
 
     public stringOptions(valueTypes: ValueTypeStatistics): { name: string; value: number }[] {

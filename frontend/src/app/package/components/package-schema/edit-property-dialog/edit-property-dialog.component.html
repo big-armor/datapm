@@ -1,0 +1,38 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 p-0" id="sharePackage">
+            <div mat-dialog-title id="contentTitle">Edit Property</div>
+            <div mat-dialog-content id="contentBorder">
+                <div class="row py-3">
+                    <div class="col-md-12">
+                        <div class="permission-div modal-select">
+                            <label class="div-question pl-1">Package permissions</label>
+                            <mat-form-field appearance="fill" class="w-100">
+                                <mat-select>
+                                    <mat-option value="VIEW" selected>View </mat-option>
+                                    <mat-option value="EDIT">Edit </mat-option>
+                                    <mat-option value="MANAGE">Manage </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="mb-3">
+                            <label class="div-question pl-1">Property title</label>
+                            <app-input class="flat-input-parent" placeholder="Property title"></app-input>
+                        </div>
+                        <div class="mb-3">
+                            <label class="div-question pl-1">Description</label>
+                            <div class="bd-highlight div-answer">
+                                <textarea class="flat-input" placeholder="Add your bio"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div mat-dialog-actions class="d-flex justify-content-end pb-3 pt-2">
+                <button mat-button mat-dialog-close class="close-dialog">Close</button>
+                <button mat-button>Save</button>
+            </div>
+        </div>
+    </div>
+</div>
