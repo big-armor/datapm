@@ -5,14 +5,7 @@
     "title": "DataPM Package File",
     "description": "The root definition file for version 1 of the datapm package file system.",
     "default": {},
-    "required": [
-        "updatedDate",
-        "displayName",
-        "packageSlug",
-        "version",
-        "description",
-        "schemas"
-    ],
+    "required": ["updatedDate", "displayName", "packageSlug", "version", "description", "schemas"],
     "properties": {
         "generatedBy": {
             "$id": "#/generatedBy",
@@ -113,10 +106,7 @@
                     "pattern": "^https?:\\/\\/.*"
                 }
             ],
-            "required": [
-                "hostname",
-                "port"
-            ],
+            "required": ["hostname", "port"],
             "items": {
                 "type": "object",
                 "properties": {
@@ -158,9 +148,7 @@
                                                 "$ref": "http://json-schema.org/draft-07/schema"
                                             },
                                             {
-                                                "required": [
-                                                    "type"
-                                                ],
+                                                "required": ["type"],
                                                 "properties": {
                                                     "valueTypes": {
                                                         "$id": "#/valueTypes",
@@ -225,19 +213,13 @@
                                 "default": [],
                                 "items": {
                                     "type": "object",
-                                    "required": [
-                                        "displayName"
-                                    ],
+                                    "required": ["displayName"],
                                     "oneOf": [
                                         {
-                                            "required": [
-                                                "packageIdentifier"
-                                            ]
+                                            "required": ["packageIdentifier"]
                                         },
                                         {
-                                            "required": [
-                                                "url"
-                                            ]
+                                            "required": ["url"]
                                         }
                                     ],
                                     "properties": {
@@ -247,12 +229,7 @@
                                         },
                                         "schemaIdentifier": {
                                             "type": "object",
-                                            "required": [
-                                                "registryUrl",
-                                                "catalogSlug",
-                                                "packageSlug",
-                                                "version"
-                                            ],
+                                            "required": ["registryUrl", "catalogSlug", "packageSlug", "version"],
                                             "description": "Optionally, The identifier for the upstream schema.",
                                             "properties": {
                                                 "registryUrl": {
@@ -329,11 +306,7 @@
                                 "type": "string",
                                 "title": "Record Count Approximation Method",
                                 "description": "How to consider the recordCount value",
-                                "enum": [
-                                    "EXACT",
-                                    "APPROXIMATE",
-                                    "GREATER_THAN"
-                                ]
+                                "enum": ["EXACT", "APPROXIMATE", "GREATER_THAN"]
                             },
                             "unit": {
                                 "$id": "#/schemas/unit",
@@ -365,11 +338,7 @@
                 "title": "Data Source",
                 "description": "A description of how the data is sourceed",
                 "default": {},
-                "required": [
-                    "type",
-                    "slug",
-                    "streamSets"
-                ],
+                "required": ["type", "slug", "streamSets"],
                 "properties": {
                     "slug": {
                         "$id": "#/sources/source/slug",
@@ -411,11 +380,7 @@
                         "description": "An array of StreamSet objects that each define one logical unit of streaming data, which may be composed of one or more real streams",
                         "items": {
                             "type": "object",
-                            "required": [
-                                "slug",
-                                "configuration",
-                                "schemaTitles"
-                            ],
+                            "required": ["slug", "configuration", "schemaTitles"],
                             "properties": {
                                 "slug": {
                                     "$id": "#/sources/source/streamSet/slug",
@@ -450,9 +415,7 @@
                                 },
                                 "streamStats": {
                                     "type": "object",
-                                    "required": [
-                                        "inspectedCount"
-                                    ],
+                                    "required": ["inspectedCount"],
                                     "properties": {
                                         "byteCount": {
                                             "$id": "#/sources/source/streamSet/byteCount",
@@ -466,11 +429,7 @@
                                             "type": "string",
                                             "title": "Byte Count Approximation Method",
                                             "description": "How to consider the byteCount value.",
-                                            "enum": [
-                                                "EXACT",
-                                                "APPROXIMATE",
-                                                "GREATER_THAN"
-                                            ]
+                                            "enum": ["EXACT", "APPROXIMATE", "GREATER_THAN"]
                                         },
                                         "recordCount": {
                                             "$id": "#/sources/source/streamSet/recordCount",
@@ -484,11 +443,7 @@
                                             "type": "string",
                                             "title": "Record Count Approximation Method",
                                             "description": "How to consider the recordCount value",
-                                            "enum": [
-                                                "EXACT",
-                                                "APPROXIMATE",
-                                                "GREATER_THAN"
-                                            ]
+                                            "enum": ["EXACT", "APPROXIMATE", "GREATER_THAN"]
                                         },
                                         "inspectedCount": {
                                             "$id": "#/sources/source/streamSet/inspectedCount",
