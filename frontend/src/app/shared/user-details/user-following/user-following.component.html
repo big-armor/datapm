@@ -2,14 +2,14 @@
     <div class="row">
         <div class="col-md-12">
             <div class="panel-div pl-2">
-                <div class="package-details-title">My Follows</div>
+                <div class="text-main-title">My Follows</div>
                 <div class="text-left" *ngIf="!hasFollows">
-                    <p class="package-dark-gray">
+                    <p class="text-dark-gray">
                         Use the 'follow' button throughout this registry to be notified of changes
                     </p>
                 </div>
                 <div class="catalog-div mt-4" [hidden]="stats.catalogFollowsCount == 0">
-                    <div class="package-details-title font-16">Catalogs</div>
+                    <div class="text-main-title font-16">Catalogs</div>
                     <app-user-type-following
                         [itemsName]="'catalogs'"
                         [stats]="stats"
@@ -17,7 +17,7 @@
                     ></app-user-type-following>
                 </div>
                 <div class="collection-div mt-4" [hidden]="stats.collectionFollowsCount == 0">
-                    <div class="package-details-title font-16">Collections</div>
+                    <div class="text-main-title font-16">Collections</div>
                     <app-user-type-following
                         [itemsName]="'collections'"
                         [stats]="stats"
@@ -25,7 +25,7 @@
                     ></app-user-type-following>
                 </div>
                 <div class="package-div mt-4" [hidden]="stats.packageFollowsCount == 0">
-                    <div class="package-details-title font-16">Packages</div>
+                    <div class="text-main-title font-16">Packages</div>
                     <app-user-type-following
                         [itemsName]="'packages'"
                         [stats]="stats"
@@ -33,7 +33,7 @@
                     ></app-user-type-following>
                 </div>
                 <div class="user-div mt-4" [hidden]="stats.packageIssueFollowsCount == 0">
-                    <div class="package-details-title font-16">Package Issues</div>
+                    <div class="text-main-title font-16">Package Issues</div>
                     <app-user-type-following
                         [itemsName]="'package issues'"
                         [stats]="stats"
@@ -42,7 +42,7 @@
                 </div>
 
                 <div class="user-div mt-4" [hidden]="stats.userFollowsCount == 0">
-                    <div class="package-details-title font-16">Users</div>
+                    <div class="text-main-title font-16">Users</div>
                     <app-user-type-following
                         [itemsName]="'users'"
                         [stats]="stats"
