@@ -4,21 +4,22 @@ import { ActivatedRoute, NavigationExtras, ParamMap, Router } from "@angular/rou
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { PageState } from "src/app/models/page-state";
-import { FollowDialogComponent } from "src/app/shared/dialogs/follow-dialog/follow-dialog.component";
+import {
+    FollowDialogComponent,
+    FollowDialogResult
+} from "src/app/shared/dialogs/follow-dialog/follow-dialog.component";
 import { ShareDialogComponent } from "src/app/shared/dialogs/share-dialog/share-dialog.component";
 import { EditCollectionComponent } from "src/app/shared/edit-collection/edit-collection.component";
 import {
     Collection,
     CollectionGQL,
-    DeleteFollowGQL,
     Follow,
+    FollowIdentifierInput,
     GetFollowGQL,
     NotificationFrequency,
     Package,
     Permission,
-    RemovePackageFromCollectionGQL,
-    SaveFollowGQL,
-    UpdateCollectionGQL
+    RemovePackageFromCollectionGQL
 } from "src/generated/graphql";
 import { AddPackageComponent } from "../add-package/add-package.component";
 
@@ -29,7 +30,7 @@ type CollectionDetailsPageState = PageState | "NOT_AUTHORIZED" | "NOT_FOUND";
     templateUrl: "./collection-details.component.html",
     styleUrls: ["./collection-details.component.scss"]
 })
-export class CollectionDetailsComponent implements OnInit, OnDestroy {
+export class CollectionDetailsComponent implements OnDestroy {
     @Input() public package: Package;
 
     public collectionSlug: string = "";
@@ -49,9 +50,7 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
         private collectionGQL: CollectionGQL,
         private removePackageFromCollectionGQL: RemovePackageFromCollectionGQL,
         private dialog: MatDialog,
-        private getFollowGQL: GetFollowGQL,
-        private saveFollowGQL: SaveFollowGQL,
-        private deleteFollowGQL: DeleteFollowGQL
+        private getFollowGQL: GetFollowGQL
     ) {
         this.route.paramMap.pipe(takeUntil(this.unsubscribe$)).subscribe((paramMap: ParamMap) => {
             this.collectionSlug = paramMap.get("collectionSlug") || "";
@@ -69,8 +68,6 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
             }
         });
     }
-
-    ngOnInit(): void {}
 
     ngOnDestroy() {
         this.unsubscribe$.next();
@@ -198,61 +195,40 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
             .subscribe((result) => {
                 if (!result) {
                     return;
-                } else if (result.notificationFrequency === NotificationFrequency.NEVER) {
-                    this.deleteFollow();
-                    return;
                 }
 
-                this.saveFollowGQL
-                    .mutate({
-                        follow: {
-                            collection: {
-                                collectionSlug: this.collectionSlug
-                            },
-                            notificationFrequency: result.notificationFrequency
-                        }
-                    })
-                    .subscribe(() => this.updatePackageFollow(result));
+                this.updatePackageFollow(result.follow);
             });
-    }
-
-    private deleteFollow(): void {
-        this.deleteFollowGQL
-            .mutate({
-                follow: {
-                    collection: {
-                        collectionSlug: this.collectionSlug
-                    }
-                }
-            })
-            .subscribe(() => this.updatePackageFollow(null));
     }
 
     private getFollow(): void {
         this.getFollowGQL
             .fetch({
-                follow: {
-                    collection: {
-                        collectionSlug: this.collectionSlug
-                    }
-                }
+                follow: this.buildFollowIdentifier()
             })
             .subscribe((response) => this.updatePackageFollow(response.data?.getFollow));
     }
 
-    private openFollowModal(): MatDialogRef<FollowDialogComponent, Follow> {
+    private buildFollowIdentifier(): FollowIdentifierInput {
+        return {
+            collection: {
+                collectionSlug: this.collectionSlug
+            }
+        };
+    }
+
+    private openFollowModal(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
         return this.dialog.open(FollowDialogComponent, {
             width: "500px",
-            data: this.collectionFollow
+            data: {
+                follow: this.collectionFollow,
+                followIdentifier: this.buildFollowIdentifier()
+            }
         });
     }
 
     private updatePackageFollow(follow: Follow): void {
         this.collectionFollow = follow;
-        if (!follow) {
-            this.isFollowing = false;
-        } else {
-            this.isFollowing = follow.notificationFrequency !== NotificationFrequency.NEVER;
-        }
+        this.isFollowing = follow != null;
     }
 }

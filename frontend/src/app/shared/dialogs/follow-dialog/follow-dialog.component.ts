@@ -1,6 +1,27 @@
 import { Component, Inject } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { Follow, NotificationFrequency } from "src/generated/graphql";
+import {
+    DeleteFollowGQL,
+    Follow,
+    FollowIdentifierInput,
+    NotificationFrequency,
+    SaveFollowGQL
+} from "src/generated/graphql";
+
+export interface FollowDialogData {
+    follow: Follow;
+    followIdentifier: FollowIdentifierInput;
+}
+
+export interface FollowDialogResult {
+    follow: Follow;
+    type: FollowDialogResultType;
+}
+
+export enum FollowDialogResultType {
+    FOLLOW_DELETED,
+    FOLLOW_UPDATED
+}
 
 @Component({
     selector: "app-follow-dialog",
@@ -10,16 +31,25 @@ import { Follow, NotificationFrequency } from "src/generated/graphql";
 export class FollowDialogComponent {
     public readonly frequencies: NotificationFrequency[] = Object.values(NotificationFrequency);
 
-    public selectedFrequency: NotificationFrequency = NotificationFrequency.DAILY;
-    public isFollowing = false;
-
     public follow: Follow;
+    public isFollowing = false;
+    public selectedFrequency: NotificationFrequency = NotificationFrequency.DAILY;
 
-    constructor(@Inject(MAT_DIALOG_DATA) public data: Follow, private dialogRef: MatDialogRef<FollowDialogComponent>) {
+    private followIdentifier: FollowIdentifierInput;
+
+    constructor(
+        @Inject(MAT_DIALOG_DATA) public data: FollowDialogData,
+        private dialogRef: MatDialogRef<FollowDialogComponent>,
+        private saveFollowGQL: SaveFollowGQL,
+        private deleteFollowGQL: DeleteFollowGQL
+    ) {
         if (data) {
-            this.isFollowing = true;
-            this.follow = Object.assign({}, data);
-            this.selectedFrequency = this.follow.notificationFrequency;
+            this.follow = Object.assign({}, data.follow);
+            if (data.follow) {
+                this.isFollowing = true;
+                this.selectedFrequency = data.follow.notificationFrequency;
+            }
+            this.followIdentifier = data.followIdentifier;
         }
     }
 
@@ -29,10 +59,42 @@ export class FollowDialogComponent {
         }
 
         this.follow.notificationFrequency = this.selectedFrequency;
-        this.dialogRef.close(this.follow);
+        this.saveFollow();
     }
 
     public cancel(): void {
-        this.dialogRef.close();
+        this.close();
+    }
+
+    public deleteFollow(): void {
+        this.deleteFollowGQL
+            .mutate({
+                follow: this.followIdentifier
+            })
+            .subscribe(() => this.closeWithValues(null, FollowDialogResultType.FOLLOW_DELETED));
+    }
+
+    private saveFollow(): void {
+        this.saveFollowGQL
+            .mutate({
+                follow: {
+                    ...this.followIdentifier,
+                    notificationFrequency: this.selectedFrequency
+                }
+            })
+            .subscribe(() => this.closeWithValues(this.follow, FollowDialogResultType.FOLLOW_UPDATED));
+    }
+
+    private closeWithValues(follow: Follow, type: FollowDialogResultType): void {
+        const result = this.buildResult(follow, type);
+        this.close(result);
+    }
+
+    private buildResult(follow: Follow, type: FollowDialogResultType): FollowDialogResult {
+        return { follow, type };
+    }
+
+    private close(result?: FollowDialogResult): void {
+        this.dialogRef.close(result);
     }
 }

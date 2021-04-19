@@ -28,10 +28,7 @@ import { packageEntityToGraphqlObjectWithExtraData } from "./PackageResolver";
 
 export const entityToGraphqlObject = async (context: EntityManager | Connection, entity: FollowEntity | undefined) => {
     if (!entity) {
-        return {
-            notificationFrequency: NotificationFrequency.NEVER,
-            eventTypes: []
-        };
+        return null;
     }
 
     return {
@@ -60,7 +57,6 @@ export const saveFollow = async (
     followEntity.userId = userId;
     followEntity.notificationFrequency = follow.notificationFrequency;
 
-    // TODO: CHECK FOR PERMISSIONS
     if (follow.catalog) {
         const catalog = await getCatalogOrFail({ slug: follow.catalog.catalogSlug, manager });
         existingFollowEntity = await followRepository.getFollowByCatalogId(userId, catalog.id);
@@ -146,12 +142,11 @@ export const getFollow = async (
     { follow }: { follow: FollowIdentifierInput },
     context: AuthenticatedContext,
     info: any
-): Promise<Follow> => {
+): Promise<Follow | null> => {
     const manager = context.connection.manager;
     const userId = context.me.id;
     const followRepository = manager.getCustomRepository(FollowRepository);
 
-    // TODO: CHECK FOR PERMISSIONS
     if (follow.catalog) {
         const catalog = await getCatalogOrFail({ slug: follow.catalog.catalogSlug, manager });
         const entity = await followRepository.getFollowByCatalogId(userId, catalog.id);
@@ -184,7 +179,7 @@ export const getFollow = async (
         const entity = await followRepository.getFollowByUserId(userId, userEntity.id);
         return await entityToGraphqlObject(context.connection, entity);
     } else {
-        throw new Error("FOLLOW_NOT_FOUND");
+        throw new Error("FOLLOW_TYPE_NOT_FOUND");
     }
 };
 
@@ -243,7 +238,9 @@ export const getAllMyFollows = async (
 
     for (let f of followEntities) {
         const follow = await entityToGraphqlObject(context.connection, f);
-        follows.push(follow);
+        if (follow) {
+            follows.push(follow);
+        }
     }
 
     return {

@@ -2,15 +2,8 @@ import { Component, Input, OnChanges, SimpleChanges } from "@angular/core";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { Subscription } from "rxjs";
 import { AuthenticationService } from "src/app/services/authentication.service";
-import {
-    DeleteFollowGQL,
-    Follow,
-    GetFollowGQL,
-    NotificationFrequency,
-    SaveFollowGQL,
-    User
-} from "src/generated/graphql";
-import { FollowDialogComponent } from "../../dialogs/follow-dialog/follow-dialog.component";
+import { Follow, FollowIdentifierInput, GetFollowGQL, NotificationFrequency, User } from "src/generated/graphql";
+import { FollowDialogComponent, FollowDialogResult } from "../../dialogs/follow-dialog/follow-dialog.component";
 
 @Component({
     selector: "app-user-details-header",
@@ -28,9 +21,7 @@ export class UserDetailsHeaderComponent implements OnChanges {
     constructor(
         public dialog: MatDialog,
         private authService: AuthenticationService,
-        private getFollowGQL: GetFollowGQL,
-        private saveFollowGQL: SaveFollowGQL,
-        private deleteFollowGQL: DeleteFollowGQL
+        private getFollowGQL: GetFollowGQL
     ) {
         this.subscription = this.authService.currentUser.subscribe((user: User) => {
             this.currentUser = user;
@@ -57,61 +48,40 @@ export class UserDetailsHeaderComponent implements OnChanges {
             .subscribe((result) => {
                 if (!result) {
                     return;
-                } else if (result.notificationFrequency === NotificationFrequency.NEVER) {
-                    this.deleteFollow();
-                    return;
                 }
 
-                this.saveFollowGQL
-                    .mutate({
-                        follow: {
-                            user: {
-                                username: this.user.username
-                            },
-                            notificationFrequency: result.notificationFrequency
-                        }
-                    })
-                    .subscribe(() => this.updatePackageFollow(result));
+                this.updatePackageFollow(result.follow);
             });
-    }
-
-    private deleteFollow(): void {
-        this.deleteFollowGQL
-            .mutate({
-                follow: {
-                    user: {
-                        username: this.user.username
-                    }
-                }
-            })
-            .subscribe(() => this.updatePackageFollow(null));
     }
 
     private getFollow(): void {
         this.getFollowGQL
             .fetch({
-                follow: {
-                    user: {
-                        username: this.user.username
-                    }
-                }
+                follow: this.buildFollowIdentifier()
             })
             .subscribe((response) => this.updatePackageFollow(response.data?.getFollow));
     }
 
-    private openFollowModal(): MatDialogRef<FollowDialogComponent, Follow> {
+    private buildFollowIdentifier(): FollowIdentifierInput {
+        return {
+            user: {
+                username: this.user.username
+            }
+        };
+    }
+
+    private openFollowModal(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
         return this.dialog.open(FollowDialogComponent, {
             width: "500px",
-            data: this.userFollow
+            data: {
+                follow: this.userFollow,
+                followIdentifier: this.buildFollowIdentifier()
+            }
         });
     }
 
     private updatePackageFollow(follow: Follow): void {
         this.userFollow = follow;
-        if (!follow) {
-            this.isFollowing = false;
-        } else {
-            this.isFollowing = follow.notificationFrequency !== NotificationFrequency.NEVER;
-        }
+        this.isFollowing = follow != null;
     }
 }

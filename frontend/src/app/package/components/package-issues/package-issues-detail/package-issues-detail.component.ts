@@ -7,16 +7,19 @@ import { PackageService } from "src/app/package/services/package.service";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { ConfirmationDialogService } from "src/app/services/dialog/confirmation-dialog.service";
 import { ImageService } from "src/app/services/image.service";
-import { FollowDialogComponent } from "src/app/shared/dialogs/follow-dialog/follow-dialog.component";
+import {
+    FollowDialogComponent,
+    FollowDialogData,
+    FollowDialogResult
+} from "src/app/shared/dialogs/follow-dialog/follow-dialog.component";
 import { MarkdownEditorComponent } from "src/app/shared/markdown-editor/markdown-editor.component";
 import {
     CreatePackageIssueCommentGQL,
-    DeleteFollowGQL,
     DeletePackageIssueCommentGQL,
     DeletePackageIssueGQL,
     Follow,
+    FollowIdentifierInput,
     GetFollowGQL,
-    NotificationFrequency,
     OrderBy,
     PackageIdentifierInput,
     PackageIssue,
@@ -26,7 +29,6 @@ import {
     PackageIssueIdentifierInput,
     PackageIssueStatus,
     Permission,
-    SaveFollowGQL,
     UpdatePackageIssueCommentGQL,
     UpdatePackageIssueGQL,
     UpdatePackageIssueStatusGQL,
@@ -106,8 +108,6 @@ export class PackageIssuesDetailComponent implements OnInit {
         private router: Router,
         private route: ActivatedRoute,
         private getFollowGQL: GetFollowGQL,
-        private saveFollowGQL: SaveFollowGQL,
-        private deleteFollowGQL: DeleteFollowGQL,
         private dialog: MatDialog
     ) {}
 
@@ -359,65 +359,42 @@ export class PackageIssuesDetailComponent implements OnInit {
             .subscribe((result) => {
                 if (!result) {
                     return;
-                } else if (result.notificationFrequency === NotificationFrequency.NEVER) {
-                    this.deleteFollow();
-                    return;
                 }
 
-                this.saveFollowGQL
-                    .mutate({
-                        follow: {
-                            packageIssue: {
-                                packageIdentifier: this.packageIdentifier,
-                                issueNumber: this.packageIssue.issueNumber
-                            },
-                            notificationFrequency: result.notificationFrequency
-                        }
-                    })
-                    .subscribe(() => this.updatePackageFollow(result));
+                this.updatePackageFollow(result.follow);
             });
-    }
-
-    private deleteFollow(): void {
-        this.deleteFollowGQL
-            .mutate({
-                follow: {
-                    packageIssue: {
-                        packageIdentifier: this.packageIdentifier,
-                        issueNumber: this.packageIssue.issueNumber
-                    }
-                }
-            })
-            .subscribe(() => this.updatePackageFollow(null));
     }
 
     private getFollow(): void {
         this.getFollowGQL
             .fetch({
-                follow: {
-                    packageIssue: {
-                        packageIdentifier: this.packageIdentifier,
-                        issueNumber: this.packageIssue.issueNumber
-                    }
-                }
+                follow: this.buildFollowIdentifier()
             })
             .subscribe((response) => this.updatePackageFollow(response.data?.getFollow));
     }
 
-    private openFollowModal(): MatDialogRef<FollowDialogComponent, Follow> {
+    private openFollowModal(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
         return this.dialog.open(FollowDialogComponent, {
             width: "500px",
-            data: this.issueFollow
+            data: {
+                follow: this.issueFollow,
+                followIdentifier: this.buildFollowIdentifier()
+            } as FollowDialogData
         });
+    }
+
+    private buildFollowIdentifier(): FollowIdentifierInput {
+        return {
+            packageIssue: {
+                packageIdentifier: this.packageIdentifier,
+                issueNumber: this.packageIssue.issueNumber
+            }
+        };
     }
 
     private updatePackageFollow(follow: Follow): void {
         this.issueFollow = follow;
-        if (!follow) {
-            this.isFollowing = false;
-        } else {
-            this.isFollowing = follow.notificationFrequency !== NotificationFrequency.NEVER;
-        }
+        this.isFollowing = follow != null;
     }
 
     private changeIssueStatus(status: PackageIssueStatus): void {

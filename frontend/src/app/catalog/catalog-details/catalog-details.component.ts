@@ -1,14 +1,13 @@
 import { Component, OnInit } from "@angular/core";
 import {
     Catalog,
-    DeleteFollowGQL,
     Follow,
+    FollowIdentifierInput,
     GetCatalogGQL,
     GetFollowGQL,
     NotificationFrequency,
     Package,
-    Permission,
-    SaveFollowGQL
+    Permission
 } from "src/generated/graphql";
 import { ActivatedRoute, NavigationExtras, Router } from "@angular/router";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
@@ -18,7 +17,10 @@ import { DialogService } from "../../services/dialog/dialog.service";
 import { DeletePackageComponent } from "../../shared/delete-package/delete-package.component";
 import { takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";
-import { FollowDialogComponent } from "src/app/shared/dialogs/follow-dialog/follow-dialog.component";
+import {
+    FollowDialogComponent,
+    FollowDialogResult
+} from "src/app/shared/dialogs/follow-dialog/follow-dialog.component";
 
 @Component({
     selector: "app-catalog-details",
@@ -42,9 +44,7 @@ export class CatalogDetailsComponent implements OnInit {
         private router: Router,
         private route: ActivatedRoute,
         private dialogService: DialogService,
-        private getFollowGQL: GetFollowGQL,
-        private saveFollowGQL: SaveFollowGQL,
-        private deleteFollowGQL: DeleteFollowGQL
+        private getFollowGQL: GetFollowGQL
     ) {
         this.route.fragment.pipe(takeUntil(this.unsubscribe$)).subscribe((fragment: string) => {
             const index = this.tabs.findIndex((tab) => tab === fragment);
@@ -150,61 +150,40 @@ export class CatalogDetailsComponent implements OnInit {
             .subscribe((result) => {
                 if (!result) {
                     return;
-                } else if (result.notificationFrequency === NotificationFrequency.NEVER) {
-                    this.deleteFollow();
-                    return;
                 }
 
-                this.saveFollowGQL
-                    .mutate({
-                        follow: {
-                            catalog: {
-                                catalogSlug: this.catalogSlug
-                            },
-                            notificationFrequency: result.notificationFrequency
-                        }
-                    })
-                    .subscribe(() => this.updatePackageFollow(result));
+                this.updatePackageFollow(result.follow);
             });
-    }
-
-    private deleteFollow(): void {
-        this.deleteFollowGQL
-            .mutate({
-                follow: {
-                    catalog: {
-                        catalogSlug: this.catalogSlug
-                    }
-                }
-            })
-            .subscribe(() => this.updatePackageFollow(null));
     }
 
     private getFollow(): void {
         this.getFollowGQL
             .fetch({
-                follow: {
-                    catalog: {
-                        catalogSlug: this.catalogSlug
-                    }
-                }
+                follow: this.buildFollowIdentifier()
             })
             .subscribe((response) => this.updatePackageFollow(response.data?.getFollow));
     }
 
-    private openFollowModal(): MatDialogRef<FollowDialogComponent, Follow> {
+    private openFollowModal(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
         return this.dialog.open(FollowDialogComponent, {
             width: "500px",
-            data: this.catalogFollow
+            data: {
+                follow: this.catalogFollow,
+                followIdentifier: this.buildFollowIdentifier()
+            }
         });
+    }
+
+    private buildFollowIdentifier(): FollowIdentifierInput {
+        return {
+            catalog: {
+                catalogSlug: this.catalogSlug
+            }
+        };
     }
 
     private updatePackageFollow(follow: Follow): void {
         this.catalogFollow = follow;
-        if (!follow) {
-            this.isFollowing = false;
-        } else {
-            this.isFollowing = follow.notificationFrequency !== NotificationFrequency.NEVER;
-        }
+        this.isFollowing = follow != null;
     }
 }

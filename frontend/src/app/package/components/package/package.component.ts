@@ -4,16 +4,14 @@ import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { PackageFile } from "datapm-lib";
 import { Subject } from "rxjs";
 import {
-    SaveFollowGQL,
     Follow,
     Package,
     Permission,
     User,
     UserGQL,
-    SaveFollowInput,
     GetFollowGQL,
     NotificationFrequency,
-    DeleteFollowGQL
+    FollowIdentifierInput
 } from "src/generated/graphql";
 import { PackageService, PackageResponse } from "../../services/package.service";
 import { filter, takeUntil } from "rxjs/operators";
@@ -22,7 +20,10 @@ import { LoginDialogComponent } from "src/app/shared/header/login-dialog/login-d
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import { packageToIdentifier } from "src/app/helpers/IdentifierHelper";
-import { FollowDialogComponent } from "src/app/shared/dialogs/follow-dialog/follow-dialog.component";
+import {
+    FollowDialogComponent,
+    FollowDialogResult
+} from "src/app/shared/dialogs/follow-dialog/follow-dialog.component";
 
 enum State {
     LOADING,
@@ -73,9 +74,7 @@ export class PackageComponent implements OnDestroy {
         private router: Router,
         private userGql: UserGQL,
         private authenticationService: AuthenticationService,
-        private getFollowGQL: GetFollowGQL,
-        private saveFollowGQL: SaveFollowGQL,
-        private deleteFollowGQL: DeleteFollowGQL
+        private getFollowGQL: GetFollowGQL
     ) {
         this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe(
             (p: PackageResponse) => {
@@ -242,64 +241,41 @@ export class PackageComponent implements OnDestroy {
             .subscribe((result) => {
                 if (!result) {
                     return;
-                } else if (result.notificationFrequency === NotificationFrequency.NEVER) {
-                    this.deleteFollow();
-                    return;
                 }
 
-                this.saveFollowGQL
-                    .mutate({
-                        follow: {
-                            package: {
-                                catalogSlug: this.package.identifier.catalogSlug,
-                                packageSlug: this.package.identifier.packageSlug
-                            },
-                            notificationFrequency: result.notificationFrequency
-                        }
-                    })
-                    .subscribe(() => this.updatePackageFollow(result));
+                this.updatePackageFollow(result.follow);
             });
-    }
-
-    private deleteFollow(): void {
-        this.deleteFollowGQL
-            .mutate({
-                follow: {
-                    package: {
-                        catalogSlug: this.package.identifier.catalogSlug,
-                        packageSlug: this.package.identifier.packageSlug
-                    }
-                }
-            })
-            .subscribe(() => this.updatePackageFollow(null));
     }
 
     private getFollow(): void {
         this.getFollowGQL
             .fetch({
-                follow: {
-                    package: {
-                        catalogSlug: this.package.identifier.catalogSlug,
-                        packageSlug: this.package.identifier.packageSlug
-                    }
-                }
+                follow: this.buildFollowIdentifier()
             })
             .subscribe((response) => this.updatePackageFollow(response.data?.getFollow));
     }
 
-    private openFollowModal(): MatDialogRef<FollowDialogComponent, Follow> {
+    private buildFollowIdentifier(): FollowIdentifierInput {
+        return {
+            package: {
+                catalogSlug: this.package.identifier.catalogSlug,
+                packageSlug: this.package.identifier.packageSlug
+            }
+        };
+    }
+
+    private openFollowModal(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
         return this.dialog.open(FollowDialogComponent, {
             width: "500px",
-            data: this.packageFollow
+            data: {
+                follow: this.packageFollow,
+                followIdentifier: this.buildFollowIdentifier()
+            }
         });
     }
 
     private updatePackageFollow(follow: Follow): void {
         this.packageFollow = follow;
-        if (!follow) {
-            this.isFollowing = false;
-        } else {
-            this.isFollowing = follow.notificationFrequency !== NotificationFrequency.NEVER;
-        }
+        this.isFollowing = follow != null;
     }
 }

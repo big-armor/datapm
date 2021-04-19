@@ -13,6 +13,9 @@
                 </mat-form-field>
             </div>
             <div mat-dialog-actions class="d-flex justify-content-end pb-3 pt-2">
+                <button *ngIf="isFollowing" (click)="deleteFollow()" mat-button type="submit" class="save-btn">
+                    <span>Unfollow</span>
+                </button>
                 <button mat-button type="submit" class="save-btn" (click)="save()">
                     <span>Save</span>
                 </button>

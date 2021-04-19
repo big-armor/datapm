@@ -1,9 +1,8 @@
 import { Component, OnInit } from "@angular/core";
-import { ActivatedRoute, ActivatedRouteSnapshot, ParamMap, Router } from "@angular/router";
+import { ActivatedRoute, ParamMap, Router } from "@angular/router";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { PageState } from "src/app/models/page-state";
-import { AuthenticationService } from "src/app/services/authentication.service";
 import { User, UserGQL } from "src/generated/graphql";
 
 @Component({
@@ -17,12 +16,7 @@ export class CatalogComponent implements OnInit {
     state: PageState = "INIT";
     private subscription = new Subject();
 
-    constructor(
-        private authenticationService: AuthenticationService,
-        private route: ActivatedRoute,
-        private router: Router,
-        private userGQL: UserGQL
-    ) {}
+    constructor(private route: ActivatedRoute, private userGQL: UserGQL) {}
 
     ngOnInit(): void {
         this.route.paramMap.pipe(takeUntil(this.subscription)).subscribe((paramMap: ParamMap) => {
