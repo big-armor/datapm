@@ -603,6 +603,14 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
                 for (const oldValueTypeName in property.valueTypes) {
                     const oldValueType = property.valueTypes[oldValueTypeName];
 
+                    if (oldValueType.dateMaxValue === null) {
+                        delete oldValueType.dateMaxValue;
+                    }
+
+                    if (oldValueType.dateMinValue === null) {
+                        delete oldValueType.dateMinValue;
+                    }
+
                     if (typeof oldValueType.numberMaxValue === "string") {
                         const oldValueTypeString = oldValueType.numberMaxValue as string;
                         const newValueTypeStatistic = (property.valueTypes[

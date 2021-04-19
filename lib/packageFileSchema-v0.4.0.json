@@ -150,6 +150,16 @@
                                             {
                                                 "required": ["type"],
                                                 "properties": {
+                                                    "description": {
+                                                        "type": "string",
+                                                        "maxLength": 4096
+                                                    },
+                                                    "hidden": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "unit": {
+                                                        "type": "string"
+                                                    },
                                                     "valueTypes": {
                                                         "$id": "#/valueTypes",
                                                         "type": "object",
@@ -176,7 +186,7 @@
                                                                         "type": "string"
                                                                     },
                                                                     "dateMinValue": {
-                                                                        "type": "number"
+                                                                        "type": "string"
                                                                     },
                                                                     "stringOptions": {
                                                                         "type": "object",
@@ -204,6 +214,10 @@
                                         ]
                                     }
                                 }
+                            },
+                            "description": {
+                                "type": "string",
+                                "maxLength": 4096
                             },
                             "derivedFrom": {
                                 "$id": "#/schemas/derivedFrom",

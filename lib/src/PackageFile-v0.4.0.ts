@@ -140,6 +140,9 @@ export interface DerivedFrom {
  * how to obtain the data, and details the values of the data properties.
  */
 export interface Schema extends JSONSchema7 {
+    /** A description about the schema or property. This is flat text and should be kept to a few scentences.  */
+    description?: string;
+
     /** The JSON Schema Draft 07 compliant property list for the object */
     properties?: Properties;
 
