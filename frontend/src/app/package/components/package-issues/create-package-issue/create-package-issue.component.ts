@@ -1,9 +1,11 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, Input, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { PackageService } from "src/app/package/services/package.service";
-import { CreatePackageIssueGQL, Package } from "src/generated/graphql";
+import { AuthenticationService } from "src/app/services/authentication.service";
+import { DialogService } from "src/app/services/dialog/dialog.service";
+import { CreatePackageIssueGQL, Package, User } from "src/generated/graphql";
 
 @Component({
     selector: "app-create-package-issue",
@@ -17,18 +19,35 @@ export class CreatePackageIssueComponent implements OnInit, OnDestroy {
     public loading = false;
     public submitting = false;
 
+    public currentUser: User;
+
     public subject: string = "";
     public content: string = "";
+
+    private unsubscribe$ = new Subject();
 
     constructor(
         private packageService: PackageService,
         private createPackageIssueGQL: CreatePackageIssueGQL,
         private router: Router,
-        private route: ActivatedRoute
+        private dialog: DialogService,
+        private route: ActivatedRoute,
+        private authenticationService: AuthenticationService
     ) {}
 
     public ngOnInit(): void {
         this.loadPackage();
+        this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
+            this.currentUser = user;
+        });
+    }
+
+    public openSignUpDialog(): void {
+        this.dialog.openSignupDialog();
+    }
+
+    public openLoginDialog(): void {
+        this.dialog.openLoginDialog();
     }
 
     public ngOnDestroy(): void {
