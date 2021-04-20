@@ -1,4 +1,4 @@
-<div class="pb-5" id="packageVersion">
+<div class="pb-5" id="packageVersion" *ngIf="state == State.LOADED">
     <div class="text-main-title">schema history</div>
     <div class="text-light-gray mt-3" *ngIf="displayedVersions.length > 1">
         <a href="javascript::void(0)" style="font-weight: 400" (click)="openVersionComparisonModal()"
@@ -30,4 +30,11 @@
     <a href="javascript::void(0)" *ngIf="hasMoreDifferences" style="font-weight: 400" (click)="displayMoreDifferences()"
         >display more</a
     >
+</div>
+<div class="pb-5" id="errorLoading" *ngIf="state == State.ERROR">
+    <span class="text-dark-gray"
+        >There was a problem reading the package file version history.<br />
+        Please reload this page, or
+        <a href="/contact">Contact Support</a>
+    </span>
 </div>

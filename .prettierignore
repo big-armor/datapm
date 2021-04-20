@@ -7,4 +7,6 @@ frontend/node_modules
 frontend/dist
 docs/website/build
 docs/website/node_modules
-
+backend/src/generated/graphql.ts
+backend/test/integration/registry-client.ts
+frontend/src/generated/graphql.ts

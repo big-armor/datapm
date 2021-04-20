@@ -20,6 +20,13 @@ interface VersionWithDifferences extends Version {
     changes?: Change[];
 }
 
+enum State {
+    LOADING,
+    LOADED,
+    ERROR,
+    ERROR_NOT_AUTHORIZED,
+    ERROR_NOT_FOUND
+}
 @Component({
     selector: "version",
     templateUrl: "./package-version.component.html",
@@ -28,6 +35,9 @@ interface VersionWithDifferences extends Version {
 export class PackageVersionComponent {
     private readonly unsubscribe$ = new Subject();
     private readonly VERSIONS_PER_PAGE = 20;
+
+    State = State;
+    state = State.LOADING;
 
     public package: Package;
     public displayedVersions: VersionWithDifferences[] = [];
@@ -111,6 +121,7 @@ export class PackageVersionComponent {
     }
 
     private loadDifferences(): void {
+        this.state = State.LOADING;
         this.packageVersionDiffsGQL
             .fetch({
                 limit: this.VERSIONS_PER_PAGE,
@@ -119,8 +130,11 @@ export class PackageVersionComponent {
             })
             .subscribe((response) => {
                 if (response.errors) {
+                    this.state = State.ERROR;
                     return;
                 }
+
+                this.state = State.LOADED;
 
                 const diffs = response.data.packageVersionsDiffs;
 
