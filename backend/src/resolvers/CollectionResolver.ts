@@ -402,7 +402,7 @@ export const getPackageCollections = async (
 
     return {
         hasMore: count - (offset + limit) > 0,
-        collections: collections.map((c) => collectionEntityToGraphQLWithNameAndDescription(c)),
+        collections: collections.map((c) => collectionEntityToGraphQL(c)),
         count
     };
 };

@@ -65,6 +65,7 @@ import { AngularSimplemdeModule } from "angular-simplemde";
 import { FollowDialogComponent } from "./dialogs/follow-dialog/follow-dialog.component";
 import { UserFollowingComponent } from "./user-details/user-following/user-following.component";
 import { UserTypeFollowingComponent } from "./user-details/user-following/user-type-following/user-type-following.component";
+import { IvyCarouselModule } from "angular-responsive-carousel";
 
 @NgModule({
     declarations: [
@@ -135,7 +136,8 @@ import { UserTypeFollowingComponent } from "./user-details/user-following/user-t
         FormsModule,
         ReactiveFormsModule,
         RouterModule,
-        AngularSimplemdeModule
+        AngularSimplemdeModule,
+        IvyCarouselModule
     ],
     exports: [
         HeaderComponent,
@@ -169,6 +171,7 @@ import { UserTypeFollowingComponent } from "./user-details/user-following/user-t
         EditPasswordDialogComponent,
         UserDetailsComponent,
         FancyConfirmationDialogComponent,
+        CollectionsHorizontalListComponent,
         UserInviteInputComponent,
         PackageAndCollectionComponent,
         MarkdownEditorComponent,
