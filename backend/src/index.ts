@@ -21,6 +21,7 @@ import { UserRepository } from "./repository/UserRepository";
 import { PackageRepository } from "./repository/PackageRepository";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { CollectionRepository } from "./repository/CollectionRepository";
+import { PlatformSettingsRepository } from "./repository/PlatformSettingsRepository";
 console.log("DataPM Registry Server Starting...");
 
 const dataLibPackageFile = fs.readFileSync("node_modules/datapm-lib/package.json");
@@ -212,6 +213,18 @@ async function main() {
 
     app.use("/assets", express.static(path.join(__dirname, "..", "static", "assets")));
     app.use("/favicon.ico", express.static(path.join(__dirname, "favicon.ico")));
+
+    app.use("/api/platform-settings/:key", async (req, res, next) => {
+        try {
+            const contextObject = await context({ req });
+            const settings = await contextObject.connection
+                .getCustomRepository(PlatformSettingsRepository)
+                .findPublicSettingsByKey(req.params.key);
+            res.json(settings);
+        } catch (err) {
+            res.status(404).send();
+        }
+    });
 
     // set express for the Apollo GraphQL server
     server.applyMiddleware({ app, bodyParserConfig: { limit: "20mb" } });
