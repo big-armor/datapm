@@ -33,7 +33,7 @@ export class FollowDialogComponent {
 
     public follow: Follow;
     public isFollowing = false;
-    public selectedFrequency: NotificationFrequency = NotificationFrequency.DAILY;
+    public selectedFrequency: NotificationFrequency = NotificationFrequency.WEEKLY;
 
     private followIdentifier: FollowIdentifierInput;
 
