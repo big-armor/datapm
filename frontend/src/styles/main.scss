@@ -375,12 +375,15 @@ mat-select {
 
 .app-raised-button.follow-btn {
     padding: 8px 8px;
-    width: 40px;
-    height: 40px;
+    width: 100px;
     line-height: 13px;
-    border-radius: 50%;
+    border-radius: 4px;
     border: 1px solid var(--info-color);
     background-color: var(--info-color);
+
+    em {
+        margin-right: 4px;
+    }
 }
 
 // .app-outlined-button.follow-btn {

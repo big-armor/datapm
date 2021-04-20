@@ -4,6 +4,7 @@ import { ActivatedRoute, NavigationExtras, ParamMap, Router } from "@angular/rou
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { PageState } from "src/app/models/page-state";
+import { AuthenticationService } from "src/app/services/authentication.service";
 import {
     FollowDialogComponent,
     FollowDialogResult
@@ -19,7 +20,8 @@ import {
     NotificationFrequency,
     Package,
     Permission,
-    RemovePackageFromCollectionGQL
+    RemovePackageFromCollectionGQL,
+    User
 } from "src/generated/graphql";
 import { AddPackageComponent } from "../add-package/add-package.component";
 
@@ -39,6 +41,8 @@ export class CollectionDetailsComponent implements OnDestroy {
     public currentTab = 0;
     private unsubscribe$: Subject<any> = new Subject();
 
+    public currentUser: User;
+
     private tabs = ["", "manage"];
 
     public collectionFollow: Follow;
@@ -50,7 +54,8 @@ export class CollectionDetailsComponent implements OnDestroy {
         private collectionGQL: CollectionGQL,
         private removePackageFromCollectionGQL: RemovePackageFromCollectionGQL,
         private dialog: MatDialog,
-        private getFollowGQL: GetFollowGQL
+        private getFollowGQL: GetFollowGQL,
+        private authenticationService: AuthenticationService
     ) {
         this.route.paramMap.pipe(takeUntil(this.unsubscribe$)).subscribe((paramMap: ParamMap) => {
             this.collectionSlug = paramMap.get("collectionSlug") || "";
@@ -66,6 +71,10 @@ export class CollectionDetailsComponent implements OnDestroy {
                 this.currentTab = index;
                 this.updateTabParam();
             }
+        });
+
+        this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
+            this.currentUser = user;
         });
     }
 

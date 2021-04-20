@@ -12,10 +12,10 @@
                     <div class="bd-highlight">
                         <div class="text-main-title mb-1">Collection: {{ collection?.name }}</div>
                     </div>
-                    <div class="ml-auto bd-highlight">
+                    <div *ngIf="currentUser" class="ml-auto bd-highlight">
                         <button class="app-raised-button follow-btn" (click)="follow()">
-                            <em class="fas fa-bell-slash" *ngIf="isFollowing"></em>
-                            <em class="fas fa-bell" *ngIf="!isFollowing"></em>
+                            <span *ngIf="isFollowing"><em class="fas fa-bell-slash"></em>Unfollow </span>
+                            <span *ngIf="!isFollowing"><em class="fas fa-bell"></em>Follow</span>
                         </button>
                     </div>
                 </div>

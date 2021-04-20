@@ -57,7 +57,7 @@
                                     >
                                         <span class="text-dark-gray">Edit</span>
                                     </button>
-                                    <button mat-menu-item id="issueBtn" (click)="follow()">
+                                    <button *ngIf="user" mat-menu-item id="issueBtn" (click)="follow()">
                                         <span class="text-dark-gray" *ngIf="!isFollowing">Follow</span>
                                         <span class="text-dark-gray" *ngIf="isFollowing">Unfollow</span>
                                     </button>

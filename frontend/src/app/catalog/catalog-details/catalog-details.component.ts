@@ -7,7 +7,8 @@ import {
     GetFollowGQL,
     NotificationFrequency,
     Package,
-    Permission
+    Permission,
+    User
 } from "src/generated/graphql";
 import { ActivatedRoute, NavigationExtras, Router } from "@angular/router";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
@@ -21,6 +22,7 @@ import {
     FollowDialogComponent,
     FollowDialogResult
 } from "src/app/shared/dialogs/follow-dialog/follow-dialog.component";
+import { AuthenticationService } from "src/app/services/authentication.service";
 
 @Component({
     selector: "app-catalog-details",
@@ -32,11 +34,14 @@ export class CatalogDetailsComponent implements OnInit {
     public catalog: Catalog;
     public state: PageState | "CATALOG_NOT_FOUND" | "NOT_AUTHENTICATED" = "INIT";
     public currentTab = 0;
-    private unsubscribe$: Subject<any> = new Subject();
-    private tabs = ["", "manage"];
+
+    public currentUser: User;
 
     public catalogFollow: Follow;
     public isFollowing: boolean;
+
+    private unsubscribe$: Subject<any> = new Subject();
+    private tabs = ["", "manage"];
 
     constructor(
         private getCatalogGQL: GetCatalogGQL,
@@ -44,7 +49,8 @@ export class CatalogDetailsComponent implements OnInit {
         private router: Router,
         private route: ActivatedRoute,
         private dialogService: DialogService,
-        private getFollowGQL: GetFollowGQL
+        private getFollowGQL: GetFollowGQL,
+        private authenticationService: AuthenticationService
     ) {
         this.route.fragment.pipe(takeUntil(this.unsubscribe$)).subscribe((fragment: string) => {
             const index = this.tabs.findIndex((tab) => tab === fragment);
@@ -72,6 +78,10 @@ export class CatalogDetailsComponent implements OnInit {
     }
 
     public ngOnInit(): void {
+        this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
+            this.currentUser = user;
+        });
+
         this.catalogSlug = this.route.snapshot.paramMap.get("catalogSlug");
         this.state = "LOADING";
         this.getCatalogGQL.fetch({ identifier: { catalogSlug: this.catalogSlug } }).subscribe(({ data, errors }) => {

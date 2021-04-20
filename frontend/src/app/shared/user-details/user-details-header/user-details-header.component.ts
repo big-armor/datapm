@@ -11,8 +11,10 @@ import { FollowDialogComponent, FollowDialogResult } from "../../dialogs/follow-
     styleUrls: ["./user-details-header.component.scss"]
 })
 export class UserDetailsHeaderComponent implements OnChanges {
-    @Input() user: User;
-    private currentUser: User;
+    @Input()
+    public user: User;
+    public currentUser: User;
+
     private subscription: Subscription;
 
     public userFollow: Follow;
