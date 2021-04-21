@@ -159,6 +159,9 @@ $fade-out-shadow-dark: linear-gradient(to bottom, #20212400, #202124d9 75%);
 $active-option: #f3f3f3;
 $active-option-dark: #4d8cd6;
 
+$carousel-arrows: #fff;
+$carousel-arrows-dark: #c2c3c5;
+
 $colors: (
     --primary-color: (
         $primary-color,
@@ -351,5 +354,9 @@ $colors: (
     --active-option: (
         $active-option,
         $active-option-dark
+    ),
+    --carousel-arrows: (
+        $carousel-arrows,
+        $carousel-arrows-dark
     )
 );
