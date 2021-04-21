@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { AfterContentChecked, Component, ElementRef } from "@angular/core";
 import { ResourceImporterService } from "../resource-importer.service";
 
 @Component({
@@ -6,28 +6,31 @@ import { ResourceImporterService } from "../resource-importer.service";
     templateUrl: "./terms-and-conditions.component.html",
     styleUrls: ["./terms-and-conditions.component.scss"]
 })
-export class TermsAndConditionsComponent implements OnInit {
+export class TermsAndConditionsComponent implements AfterContentChecked {
     private readonly PAGE_STATIC_FILE_NAME = "terms";
 
     public html: string;
     public loading: boolean = false;
 
-    constructor(private resourceImporterService: ResourceImporterService) {}
+    constructor(private resourceImporterService: ResourceImporterService, private elementRef: ElementRef) {}
 
-    public ngOnInit(): void {
-        this.loadExternalHtml();
+    public ngAfterContentChecked(): void {
+        this.loadExternalContent();
     }
 
-    private loadExternalHtml(): void {
+    private loadExternalContent(): void {
         this.loading = true;
         this.resourceImporterService.getHtml(this.PAGE_STATIC_FILE_NAME).subscribe(
             (html) => {
                 this.html = html;
+                this.loadExternalJavascript();
                 this.loading = false;
             },
-            () => {
-                this.loading = false;
-            }
+            () => (this.loading = false)
         );
+    }
+
+    private loadExternalJavascript(): void {
+        this.resourceImporterService.appendBuilderIOScriptToElementRef(this.elementRef);
     }
 }

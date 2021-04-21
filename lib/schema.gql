@@ -567,6 +567,31 @@ type PackageDifference {
 }
 
 """
+Platform settings type
+"""
+type PlatformSettings {
+    key: String!
+    serializedSettings: String!
+    isPublic: Boolean!
+}
+
+"""
+Platform template settings type
+"""
+type BuilderIOSettings {
+    apiKey: String!
+    templates: [BuilderIOTemplate!]
+}
+
+"""
+Template type
+"""
+type BuilderIOTemplate {
+    key: String!
+    entry: String!
+}
+
+"""
 The complete identifier for a version of a package, assuming the registry is based on the HTTP request URL
 """
 input VersionIdentifierInput {
@@ -764,6 +789,15 @@ input ActivityLogFilterInput {
     eventType: [ActivityLogEventType]
     limit: Int!
     offset: Int!
+}
+
+"""
+Platform settings type
+"""
+input PlatformSettingsInput {
+    key: String!
+    serializedSettings: String!
+    isPublic: Boolean!
 }
 
 type Query {
@@ -1031,6 +1065,16 @@ type Query {
     For validating that the server is up, and requesting it's status
     """
     registryStatus: RegistryStatus
+
+    """
+    Get platform settings
+    """
+    platformSettings: [PlatformSettings!] @isAdmin
+
+    """
+    Get platform settings
+    """
+    publicPlatformSettingsByKey(key: String!): PlatformSettings!
 }
 
 type Mutation {
@@ -1379,4 +1423,9 @@ type Mutation {
     Accept invite emails to finish creating user
     """
     acceptInvite(token: String!, username: String! @validUsername, password: String! @validPassword): Void
+
+    """
+    Create or update platform settings
+    """
+    savePlatformSettings(settings: PlatformSettingsInput!): PlatformSettings! @isAdmin
 }

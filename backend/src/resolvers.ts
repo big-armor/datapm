@@ -172,6 +172,11 @@ import {
     updatePackageIssueComment
 } from "./resolvers/PackageIssueCommentResolver";
 import { packageVersionsDiff, packageVersionsDiffs } from "./resolvers/VersionComparisonResolver";
+import {
+    getPlatformSettingsByKey,
+    getPublicPlatformSettingsByKey,
+    savePlatformSettings
+} from "./resolvers/PlatformSettingsResolver";
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -571,7 +576,9 @@ export const resolvers: {
         searchUsers: searchUsers,
         adminSearchUsers: adminSearchUsers,
         myActivity: myActivity,
-        packageActivities: packageActivities
+        packageActivities: packageActivities,
+        platformSettings: getPlatformSettingsByKey,
+        publicPlatformSettingsByKey: getPublicPlatformSettingsByKey
     },
 
     Mutation: {
@@ -647,6 +654,8 @@ export const resolvers: {
         // Version
         createVersion: createVersion,
         deleteVersion: deleteVersion,
+
+        savePlatformSettings: savePlatformSettings,
 
         track: (_, { actions }, context: Context) => mixpanel.track(actions, context.request)
     }
