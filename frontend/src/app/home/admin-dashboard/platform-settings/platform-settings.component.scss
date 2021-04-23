@@ -2,6 +2,10 @@
 @import "../../../../styles/colors";
 
 #platformSettings {
+    .platform-wrapper {
+        padding: 0px 50px;
+    }
+
     ::ng-deep {
         .platform-input {
             .dpm-input-square {
@@ -28,6 +32,14 @@
                     color: var(--gray-3-color);
                 }
             }
+        }
+    }
+}
+
+@media (max-width: 767px) {
+    #platformSettings {
+        .platform-wrapper {
+            padding: 0px 0px;
         }
     }
 }

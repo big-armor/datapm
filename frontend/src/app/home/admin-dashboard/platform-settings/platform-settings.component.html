@@ -1,23 +1,35 @@
-<div class="container mt-5" id="platformSettings">
-    <div class="px-4">
-        <h1>Builder IO</h1>
-        <div>
-            <h3 class="text-dark-gray ml-1">API Key</h3>
-            <app-input [control]="builderIOApiKeyControl" placeholder="Input 1" class="platform-input"></app-input>
-        </div>
-        <div class="mt-3">
-            <h3>Templates</h3>
-            <div *ngFor="let template of templates">
-                <label class="text-dark-gray ml-1">{{ template.key }}</label>
-                <app-input [control]="template.entryFormControl" placeholder="Entry" class="platform-input"></app-input>
+<div class="container mt-4" id="platformSettings">
+    <div class="platform-wrapper">
+        <div class="row mb-2">
+            <div class="col-md-12">
+                <div class="text-main-title">Builder IO</div>
+            </div>
+            <div class="col-md-7 col-lg-7 mb-2">
+                <h3 class="mb-1 mt-1">API Key</h3>
+                <app-input [control]="builderIOApiKeyControl" placeholder="Input 1" class="platform-input"></app-input>
+            </div>
+            <div class="col-md-7 col-lg-7">
+                <h3 class="mb-1 mt-3">Templates</h3>
+                <div *ngFor="let template of templates" class="mb-2">
+                    <label class="text-light-gray ml-1">{{ template.key }}</label>
+                    <app-input
+                        [control]="template.entryFormControl"
+                        placeholder="Entry"
+                        class="platform-input"
+                    ></app-input>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="row mt-2">
-        <div class="col-md-2">
-            <button (click)="saveBuilderIOSettings()" class="app-outlined-button" style="width: 120px; height: 30px">
-                Save
-            </button>
+        <div class="row">
+            <div class="col-md-7 col-lg-7 text-right">
+                <button
+                    (click)="saveBuilderIOSettings()"
+                    class="app-outlined-button"
+                    style="width: 120px; height: 30px"
+                >
+                    Save
+                </button>
+            </div>
         </div>
     </div>
 </div>
