@@ -1,8 +1,11 @@
 import { Component, Input, OnChanges, OnDestroy } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
+import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Schema, ValueTypeStatistics } from "datapm-lib";
 import { Subject } from "rxjs";
+import { Clipboard } from "@angular/cdk/clipboard";
+import { SnackBarService } from "src/app/services/snackBar.service";
 import { SamplesFullScreenDialog } from "../package-samples/samples-fullscreen-dialog.component";
 import { EditPropertyDialogComponent } from "./edit-property-dialog/edit-property-dialog.component";
 
@@ -24,7 +27,13 @@ export class PackageSchemaComponent implements OnDestroy, OnChanges {
 
     private unsubscribe$ = new Subject();
 
-    constructor(private dialog: MatDialog, private router: Router, private route: ActivatedRoute) {}
+    constructor(
+        private dialog: MatDialog,
+        private router: Router,
+        private route: ActivatedRoute,
+        private snackBarService: SnackBarService,
+        private clipboard: Clipboard
+    ) {}
 
     public ngOnChanges(): void {
         console.log(this.schemaPropertiesLength(this.schema));
@@ -58,10 +67,19 @@ export class PackageSchemaComponent implements OnDestroy, OnChanges {
         this.router.navigate(["issues/new"], { relativeTo: this.route });
     }
 
-    public editPropertyDialog() {
+    public copyLink(property: any) {
+        this.clipboard.copy(property.title);
+        this.snackBarService.openSnackBar("copied to clipboard!", "");
+    }
+
+    public editPropertyDialog(property: any) {
         this.dialog.open(EditPropertyDialogComponent, {
             width: "500px",
-            disableClose: true
+            disableClose: true,
+            data: {
+                schema: this.schema,
+                property: property
+            }
         });
     }
 

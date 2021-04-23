@@ -8,21 +8,33 @@
                         <div class="permission-div modal-select">
                             <label class="div-question pl-1">Package permissions</label>
                             <mat-form-field appearance="fill" class="w-100">
-                                <mat-select>
-                                    <mat-option value="VIEW" selected>View </mat-option>
-                                    <mat-option value="EDIT">Edit </mat-option>
-                                    <mat-option value="MANAGE">Manage </mat-option>
+                                <mat-select [(value)]="selectedProperty" (selectionChange)="updateSelectedProperty()">
+                                    <mat-option *ngFor="let property of properties" [value]="property">{{
+                                        property.title
+                                    }}</mat-option>
                                 </mat-select>
                             </mat-form-field>
                         </div>
                         <div class="mb-3">
                             <label class="div-question pl-1">Property title</label>
-                            <app-input class="flat-input-parent" placeholder="Property title"></app-input>
+                            <app-input
+                                [control]="titleControl"
+                                class="flat-input-parent"
+                                placeholder="Property title"
+                            ></app-input>
+                        </div>
+                        <div class="mb-3">
+                            <label class="div-question pl-1">Units</label>
+                            <app-input [(ngModel)]="unit" class="flat-input-parent" placeholder="Units"></app-input>
                         </div>
                         <div class="mb-3">
                             <label class="div-question pl-1">Description</label>
                             <div class="bd-highlight div-answer">
-                                <textarea class="flat-input" placeholder="Add your bio"></textarea>
+                                <textarea
+                                    [(ngModel)]="description"
+                                    class="flat-input"
+                                    placeholder="Add your bio"
+                                ></textarea>
                             </div>
                         </div>
                     </div>

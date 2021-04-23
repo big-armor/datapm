@@ -41,7 +41,7 @@ h3 {
 }
 
 .color-info {
-    color: var(--info-color);
+    color: var(--info-color) !important;
 
     &:hover {
         text-decoration: none;
@@ -200,6 +200,7 @@ table.gray-table {
 .text-overflow-elipses {
     white-space: nowrap;
     overflow: hidden;
+    width: 100%;
     text-overflow: ellipsis;
 }
 
@@ -936,7 +937,7 @@ button:disabled {
     }
 
     .mat-form-field-wrapper {
-        padding: 0px 0px 10px 0px !important;
+        padding: 10px 0px 10px 0px !important;
     }
 
     .mat-form-field-flex {

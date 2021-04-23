@@ -11,6 +11,7 @@ import { PackageDeletionConfirmationComponent } from "./components/package/packa
 import { PackageIssuesComponent } from "./components/package-issues/package-issues.component";
 import { PackageIssuesDetailComponent } from "./components/package-issues/package-issues-detail/package-issues-detail.component";
 import { CreatePackageIssueComponent } from "./components/package-issues/create-package-issue/create-package-issue.component";
+import { EditMarkdownComponent } from "./components/edit-markdown/edit-markdown.component";
 
 const routes: Routes = [
     {
@@ -21,6 +22,10 @@ const routes: Routes = [
                 path: "",
                 component: PackageDescriptionComponent,
                 pathMatch: "full"
+            },
+            {
+                path: "lona",
+                component: EditMarkdownComponent
             },
             {
                 path: "issues",

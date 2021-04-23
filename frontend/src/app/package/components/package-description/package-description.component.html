@@ -8,6 +8,9 @@
             {{ isShowingMoreReadMeText ? "Show Less" : "Show More" }}
         </a>
     </p>
+    <div class="text-dark-gray">
+        <a class="color-info cursor-pointer" (click)="editLicense()" *ngIf="canManage()">edit readme</a>
+    </div>
 </div>
 
 <div *ngIf="packageFile?.licenseMarkdown" class="pb-4">
@@ -20,6 +23,9 @@
             {{ isShowingMoreLicenseText ? "Show Less" : "Show More" }}
         </a>
     </p>
+    <div class="text-dark-gray">
+        <a class="color-info cursor-pointer" (click)="editLicense()" *ngIf="canManage()">edit license</a>
+    </div>
 </div>
 <h1>Preview</h1>
 
