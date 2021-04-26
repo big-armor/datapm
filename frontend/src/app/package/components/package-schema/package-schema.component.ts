@@ -1,4 +1,15 @@
-import { Component, Input, OnChanges, OnDestroy } from "@angular/core";
+import {
+    AfterViewChecked,
+    AfterViewInit,
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
+    Input,
+    OnChanges,
+    OnDestroy,
+    QueryList,
+    ViewChildren
+} from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -8,22 +19,34 @@ import { Clipboard } from "@angular/cdk/clipboard";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import { SamplesFullScreenDialog } from "../package-samples/samples-fullscreen-dialog.component";
 import { EditPropertyDialogComponent } from "./edit-property-dialog/edit-property-dialog.component";
+import { getRegistryURL } from "src/app/helpers/RegistryAccessHelper";
+import { packageToIdentifier } from "src/app/helpers/IdentifierHelper";
+import { Package } from "src/generated/graphql";
+import { MatExpansionPanel } from "@angular/material/expansion";
 
 @Component({
     selector: "schema",
     templateUrl: "./package-schema.component.html",
     styleUrls: ["./package-schema.component.scss"]
 })
-export class PackageSchemaComponent implements OnDestroy, OnChanges {
+export class PackageSchemaComponent implements OnDestroy, OnChanges, AfterViewInit {
     private readonly MAX_PROPERTIES_TO_SHOW_INITIALLY = 10;
 
     @Input()
+    public package: Package;
+
+    @Input()
     public schema: Schema;
+
+    @ViewChildren(MatExpansionPanel)
+    public collapsableProperties: ElementRef<MatExpansionPanel>;
 
     public propertiesToShowCount = this.MAX_PROPERTIES_TO_SHOW_INITIALLY;
 
     public shouldShowMorePropertiesButton: boolean = false;
     public isShowingMorePropertiesText: boolean = false;
+
+    public focusedPropertyId: string;
 
     private unsubscribe$ = new Subject();
 
@@ -32,14 +55,25 @@ export class PackageSchemaComponent implements OnDestroy, OnChanges {
         private router: Router,
         private route: ActivatedRoute,
         private snackBarService: SnackBarService,
-        private clipboard: Clipboard
+        private clipboard: Clipboard,
+        private cdr: ChangeDetectorRef
     ) {}
 
     public ngOnChanges(): void {
-        console.log(this.schemaPropertiesLength(this.schema));
         this.shouldShowMorePropertiesButton =
             this.schemaPropertiesLength(this.schema) > this.MAX_PROPERTIES_TO_SHOW_INITIALLY;
-        console.log(this.shouldShowMorePropertiesButton);
+    }
+
+    public ngAfterViewInit(): void {
+        const fragment = this.route.snapshot.fragment;
+        if (fragment) {
+            const el: any = document.getElementById(fragment);
+            if (el) {
+                this.focusedPropertyId = fragment;
+                el.scrollIntoView({ behavior: "smooth" });
+                this.cdr.detectChanges();
+            }
+        }
     }
 
     public toggleShowMoreProperties(): void {
@@ -67,9 +101,14 @@ export class PackageSchemaComponent implements OnDestroy, OnChanges {
         this.router.navigate(["issues/new"], { relativeTo: this.route });
     }
 
-    public copyLink(property: any) {
-        this.clipboard.copy(property.title);
+    public copyLink(property: Schema) {
+        const url = packageToIdentifier(this.package.identifier) + "#" + this.getPropertyId(property);
+        this.clipboard.copy(url);
         this.snackBarService.openSnackBar("copied to clipboard!", "");
+    }
+
+    public getPropertyId(property: Schema): string {
+        return this.schema.$id + "-" + property.title;
     }
 
     public editPropertyDialog(property: any) {

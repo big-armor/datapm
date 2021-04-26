@@ -1,19 +1,19 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { EditMarkdownComponent } from "./edit-markdown.component";
+import { EditPackageMarkdownComponent } from "./edit-package-markdown.component";
 
 describe("EditMarkdownComponent", () => {
-    let component: EditMarkdownComponent;
-    let fixture: ComponentFixture<EditMarkdownComponent>;
+    let component: EditPackageMarkdownComponent;
+    let fixture: ComponentFixture<EditPackageMarkdownComponent>;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [EditMarkdownComponent]
+            declarations: [EditPackageMarkdownComponent]
         }).compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(EditMarkdownComponent);
+        fixture = TestBed.createComponent(EditPackageMarkdownComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

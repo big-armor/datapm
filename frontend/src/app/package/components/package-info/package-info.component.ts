@@ -12,6 +12,7 @@ import { Package, User } from "src/generated/graphql";
 import { AddUserComponent } from "../add-user/add-user.component";
 import { ClientWizardComponent } from "./download-package/client-wizard/client-wizard.component";
 import { DownloadPackageComponent } from "./download-package/download-package.component";
+import { EditWebsiteDialogComponent } from "./edit-website-dialog/edit-website-dialog.component";
 
 @Component({
     selector: "app-package-info",
@@ -106,6 +107,12 @@ export class PackageInfoComponent implements OnInit, OnChanges {
         const dialogRef = this.dialog.open(ClientWizardComponent, {
             width: "550px",
             panelClass: "my-custom-dialog"
+        });
+    }
+
+    public editLink() {
+        const dialogRef = this.dialog.open(EditWebsiteDialogComponent, {
+            width: "450px"
         });
     }
 

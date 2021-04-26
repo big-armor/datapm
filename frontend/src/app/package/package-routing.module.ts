@@ -3,15 +3,13 @@ import { Routes, RouterModule } from "@angular/router";
 
 import { PackageComponent } from "./components/package/package.component";
 import { PackageDescriptionComponent } from "./components/package-description/package-description.component";
-import { PackageSchemaComponent } from "./components/package-schema/package-schema.component";
 import { PackageVersionComponent } from "./components/package-version/package-version.component";
-import { PackageSamplesComponent } from "./components/package-samples/package-samples.component";
 import { PackagePermissionComponent } from "./components/package-permission/package-permission.component";
 import { PackageDeletionConfirmationComponent } from "./components/package/package-deletion-confirmation/package-deletion-confirmation.component";
 import { PackageIssuesComponent } from "./components/package-issues/package-issues.component";
 import { PackageIssuesDetailComponent } from "./components/package-issues/package-issues-detail/package-issues-detail.component";
 import { CreatePackageIssueComponent } from "./components/package-issues/create-package-issue/create-package-issue.component";
-import { EditMarkdownComponent } from "./components/edit-markdown/edit-markdown.component";
+import { EditPackageMarkdownComponent } from "./components/edit-package-markdown/edit-package-markdown.component";
 
 const routes: Routes = [
     {
@@ -24,8 +22,12 @@ const routes: Routes = [
                 pathMatch: "full"
             },
             {
-                path: "lona",
-                component: EditMarkdownComponent
+                path: "readme",
+                component: EditPackageMarkdownComponent
+            },
+            {
+                path: "license",
+                component: EditPackageMarkdownComponent
             },
             {
                 path: "issues",

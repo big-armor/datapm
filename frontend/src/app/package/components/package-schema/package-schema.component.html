@@ -16,6 +16,8 @@
                             | sortBy: 'asc':'title'
                             | slice: 0:propertiesToShowCount
                     "
+                    [id]="getPropertyId(property)"
+                    [expanded]="getPropertyId(property) == focusedPropertyId"
                 >
                     <mat-expansion-panel-header>
                         <mat-panel-title class="text-dark-gray font-14 weight-500">

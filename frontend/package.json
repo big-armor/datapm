@@ -45,6 +45,7 @@
         "ng-table-virtual-scroll": "^1.3.4",
         "ngx-markdown": "^11.1.2",
         "rxjs": "^6.5.5",
+        "semver": "^7.3.5",
         "simplemde": "^1.11.2",
         "stream": "0.0.2",
         "timeago.js": "^4.0.2",

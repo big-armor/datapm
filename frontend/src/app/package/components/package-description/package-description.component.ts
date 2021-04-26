@@ -69,8 +69,12 @@ export class PackageDescriptionComponent {
         return isPublic;
     }
 
+    public editReadme(): void {
+        this.router.navigate(["readme"], { relativeTo: this.route });
+    }
+
     public editLicense(): void {
-        this.router.navigate(["lona"], { relativeTo: this.route });
+        this.router.navigate(["license"], { relativeTo: this.route });
     }
 
     public goToCollection(collectionSlug: string): void {

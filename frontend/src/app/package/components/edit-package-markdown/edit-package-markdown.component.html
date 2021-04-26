@@ -1,0 +1,18 @@
+<div *ngIf="loading">
+    <a (click)="goBack()" class="cursor-pointer back-btn"> <em class="fas fa-arrow-left"></em> Back</a>
+    <div class="container mt-3 p-0" id="editMarkdown">
+        <div class="row">
+            <div class="col-lg-9 col-md-12">
+                <div class="text-main-title mb-3">Edit {{ title }}</div>
+                <app-markdown-editor [(content)]="content"></app-markdown-editor>
+                <div class="text-right mt-2">
+                    <button class="app-raised-button" (click)="save()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="loading-shade" *ngIf="!loading">
+    <mat-spinner diameter="50"></mat-spinner>
+</div>
