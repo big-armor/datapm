@@ -5,35 +5,6 @@
     .platform-wrapper {
         padding: 0px 50px;
     }
-
-    ::ng-deep {
-        .platform-input {
-            .dpm-input-square {
-                border-radius: 6px;
-                padding: 7px 10px;
-                width: 100%;
-                box-shadow: none;
-                font-size: $text-font - 1;
-                border: 1px solid var(--gray-5-color);
-                outline: none;
-                letter-spacing: 0.5px;
-                color: var(--gray-1-color);
-                font-family: $family-roboto;
-                background-color: var(--gray-7-color) !important;
-
-                &::placeholder {
-                    font-family: $family-roboto;
-                    font-style: $style-normal;
-                    font-size: $text-font - 1;
-                    font-weight: $weight-300;
-                    line-height: 18px;
-                    letter-spacing: 0.5px;
-                    opacity: 0.6;
-                    color: var(--gray-3-color);
-                }
-            }
-        }
-    }
 }
 
 @media (max-width: 767px) {
