@@ -197,11 +197,29 @@
                                                                         }
                                                                     },
                                                                     "contentLabels": {
-                                                                        "type": "object",
-                                                                        "description": "Contains mapping of content label to boolean, where the boolean represents whether the label should be hidden from the viewer. This is to allow 'removing labels' while retaining that they are hidden for future content detection.",
-                                                                        "patternProperties": {
-                                                                            ".*": {
-                                                                                "type": "boolean"
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "required": ["label"],
+                                                                            "properties": {
+                                                                                "label": {
+                                                                                    "type": "string",
+                                                                                    "maxLength": 75
+                                                                                },
+                                                                                "hidden": {
+                                                                                    "type": "boolean"
+                                                                                },
+                                                                                "appliedByContentDetector": {
+                                                                                    "type": "string",
+                                                                                    "description": "The name of the content detector that applied the label"
+                                                                                },
+                                                                                "confidence": {
+                                                                                    "type": "number",
+                                                                                    "description": "A number zero to one that describes the confidence of the label"
+                                                                                },
+                                                                                "occurrence": {
+                                                                                    "type": "number",
+                                                                                    "description": "The number of times the content was detected"
+                                                                                }
                                                                             }
                                                                         }
                                                                     }

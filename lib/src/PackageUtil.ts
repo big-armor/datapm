@@ -478,7 +478,7 @@ export function compatibilityToString(compatibility: Compability): string {
 }
 
 export function loadPackageFileFromDisk(packageFilePath: string): PackageFile {
-    if (!fs.existsSync(packageFilePath)) throw new Error("FILE_NOT_FOUND");
+    if (!fs.existsSync(packageFilePath)) throw new Error("FILE_NOT_FOUND - " + packageFilePath);
 
     let packageFileAbsolutePath;
     if (path.isAbsolute(packageFilePath)) {
