@@ -25,7 +25,11 @@
                         </div>
                         <div class="mb-3">
                             <label class="div-question pl-1">Units</label>
-                            <app-input [(ngModel)]="unit" class="flat-input-parent" placeholder="Units"></app-input>
+                            <app-input
+                                [control]="unitControl"
+                                class="flat-input-parent"
+                                placeholder="Units"
+                            ></app-input>
                         </div>
                         <div class="mb-3">
                             <label class="div-question pl-1">Description</label>
@@ -43,7 +47,7 @@
 
             <div mat-dialog-actions class="d-flex justify-content-end pb-3 pt-2">
                 <button mat-button mat-dialog-close class="close-dialog">Close</button>
-                <button mat-button>Save</button>
+                <button mat-button (click)="save()" [disabled]="loading" class="save-btn"><span>Save</span></button>
             </div>
         </div>
     </div>

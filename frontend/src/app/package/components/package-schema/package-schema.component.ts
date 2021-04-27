@@ -13,7 +13,7 @@ import {
 import { MatDialog } from "@angular/material/dialog";
 import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
-import { Schema, ValueTypeStatistics } from "datapm-lib";
+import { PackageFile, Schema, ValueTypeStatistics } from "datapm-lib";
 import { Subject } from "rxjs";
 import { Clipboard } from "@angular/cdk/clipboard";
 import { SnackBarService } from "src/app/services/snackBar.service";
@@ -34,6 +34,9 @@ export class PackageSchemaComponent implements OnDestroy, OnChanges, AfterViewIn
 
     @Input()
     public package: Package;
+
+    @Input()
+    public packageFile: PackageFile;
 
     @Input()
     public schema: Schema;
@@ -97,14 +100,24 @@ export class PackageSchemaComponent implements OnDestroy, OnChanges, AfterViewIn
         return Object.keys(schema.properties).length;
     }
 
-    public createIssue() {
-        this.router.navigate(["issues/new"], { relativeTo: this.route });
+    public createIssue(property: Schema) {
+        this.router.navigate(["issues/new"], {
+            relativeTo: this.route,
+            queryParams: {
+                subject: property.title,
+                content: this.createLink(property)
+            }
+        });
     }
 
     public copyLink(property: Schema) {
         const url = packageToIdentifier(this.package.identifier) + "#" + this.getPropertyId(property);
         this.clipboard.copy(url);
         this.snackBarService.openSnackBar("copied to clipboard!", "");
+    }
+
+    public createLink(property: Schema) {
+        return packageToIdentifier(this.package.identifier) + "#" + this.getPropertyId(property);
     }
 
     public getPropertyId(property: Schema): string {
@@ -117,7 +130,9 @@ export class PackageSchemaComponent implements OnDestroy, OnChanges, AfterViewIn
             disableClose: true,
             data: {
                 schema: this.schema,
-                property: property
+                property: property,
+                packageFile: this.packageFile,
+                package: this.package
             }
         });
     }

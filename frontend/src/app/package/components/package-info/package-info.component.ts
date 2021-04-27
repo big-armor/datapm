@@ -112,7 +112,11 @@ export class PackageInfoComponent implements OnInit, OnChanges {
 
     public editLink() {
         const dialogRef = this.dialog.open(EditWebsiteDialogComponent, {
-            width: "450px"
+            width: "450px",
+            data: {
+                package: this.package,
+                packageFile: this.packageFile
+            }
         });
     }
 

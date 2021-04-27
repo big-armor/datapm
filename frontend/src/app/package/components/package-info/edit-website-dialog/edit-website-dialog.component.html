@@ -1,22 +1,28 @@
-<div class="container">
+<div class="container" id="editWebsite">
     <div class="row">
-        <div class="col-md-12 p-0" id="sharePackage">
+        <div class="col-md-12 p-0">
             <div mat-dialog-title id="contentTitle">Edit website link</div>
             <div mat-dialog-content id="contentBorder">
-                <div class="row py-3">
+                <div class="row pb-3 pt-1">
                     <div class="col-md-12">
-                        <form class="example-form">
-                            <mat-form-field class="example-full-width">
-                                <mat-label>Email</mat-label>
-                                <app-input type="text" placeholder="Ex. pat@example.com"> </app-input>
-                            </mat-form-field>
-                        </form>
+                        <div class="text-light-gray pl-1">Website</div>
+                        <app-input
+                            [control]="control"
+                            type="text"
+                            placeholder="Ex. pat@example.com"
+                            class="rounded-input"
+                        >
+                        </app-input>
+                        <div *ngIf="errorMessage" class="text-danger">
+                            {{ errorMessage }}
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div mat-dialog-actions class="d-flex justify-content-end pb-3 pt-2">
+            <div mat-dialog-actions class="mat-dialog-actions d-flex justify-content-between mb-12">
                 <button mat-button mat-dialog-close class="close-dialog">Close</button>
+                <button mat-button class="ml-0 save-btn" [disabled]="loading" (click)="submit()">Submit</button>
             </div>
         </div>
     </div>
