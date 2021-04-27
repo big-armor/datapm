@@ -6,16 +6,16 @@
             </div>
             <div class="col-md-7 col-lg-7 mb-2">
                 <h3 class="mb-1 mt-1">API Key</h3>
-                <app-input [control]="builderIOApiKeyControl" placeholder="Input 1" class="light-input"></app-input>
+                <app-input [control]="builderIOApiKeyControl" placeholder="Input 1" class="rounded-input"></app-input>
             </div>
             <div class="col-md-7 col-lg-7">
                 <h3 class="mb-1 mt-3">Templates</h3>
-                <div *ngFor="let template of templates" class="mb-2">
-                    <label class="text-light-gray ml-1">{{ template.key }}</label>
+                <div *ngFor="let template of templates" class="div-wrapper">
+                    <label class="text-light-gray pb-1">{{ template.key }}</label>
                     <app-input
                         [control]="template.entryFormControl"
                         placeholder="Entry"
-                        class="light-input"
+                        class="rounded-input"
                     ></app-input>
                 </div>
             </div>
