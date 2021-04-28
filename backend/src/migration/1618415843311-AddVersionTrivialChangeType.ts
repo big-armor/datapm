@@ -5,7 +5,7 @@ ALTER TYPE activity_log_event_type_enum ADD VALUE 'VERSION_UPDATED';
 `;
 export class AddVersionTrivialChangeType1618415843311 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.commitTransaction();
+        if (queryRunner.isTransactionActive) await queryRunner.commitTransaction();
         queryRunner.query(sql);
     }
 
