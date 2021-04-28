@@ -121,7 +121,7 @@ export class PackageSchemaComponent implements OnDestroy, OnChanges, AfterViewIn
     }
 
     public getPropertyId(property: Schema): string {
-        return this.schema.$id + "-" + property.title;
+        return this.schema.title + "-" + property.title;
     }
 
     public editPropertyDialog(property: any) {

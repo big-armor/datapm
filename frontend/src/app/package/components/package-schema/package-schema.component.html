@@ -28,12 +28,16 @@
                         </mat-panel-description>
                     </mat-expansion-panel-header>
                     <div>
-                        <div class="text-dark-gray">
+                        <div class="text-dark-gray mb-2">
+                            <a class="cursor-pointer doc-link" (click)="editPropertyDialog(property)">Edit Property</a>
+                            <span class="px-2">|</span>
                             <a class="cursor-pointer doc-link" (click)="createIssue(property)">Create Issue</a>
                             <span class="px-2">|</span>
                             <a class="cursor-pointer doc-link" (click)="copyLink(property)">Copy Link</a>
                         </div>
-                        <div class="text-dark-gray weight-500">{{ property.description }}</div>
+                        <div *ngIf="property.description?.length > 0" class="text-dark-gray weight-400 mt-2 mb-2">
+                            {{ property.description }}
+                        </div>
                         <div
                             class="d-flex align-items-center justify-content-between"
                             *ngFor="let type of property.valueTypes | values"
@@ -121,9 +125,6 @@
                                     </ul>
                                 </div>
                             </div>
-                        </div>
-                        <div class="text-dark-gray text-right">
-                            <a class="cursor-pointer doc-link" (click)="editPropertyDialog(property)">Edit Property</a>
                         </div>
                     </div>
                 </mat-expansion-panel>
