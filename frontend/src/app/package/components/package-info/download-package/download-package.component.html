@@ -25,6 +25,15 @@
                                 </div>
 
                                 <div class="format-category">
+                                    <div class="row">
+                                        <div class="col-12 mt-2 mb-2">
+                                            <span>
+                                                The DataPM command line client can download this data directly to the
+                                                following databases and file systems. Click any option below to learn
+                                                how to quickly load and use this data in your work flows.
+                                            </span>
+                                        </div>
+                                    </div>
                                     <div class="stepper-content">Database Options</div>
                                     <div class="row">
                                         <div class="col-md-6 mb-2" *ngFor="let source of databaseSources">
@@ -92,7 +101,7 @@
                 </div>
             </div>
 
-            <div mat-dialog-actions class="d-flex justify-content-end pt-1">
+            <div mat-dialog-actions class="d-flex justify-content-between pt-1">
                 <button mat-button (click)="move(0)" *ngIf="currentIndex == 1" class="back-btn">Back</button>
                 <button mat-button mat-dialog-close class="close-dialog">Close</button>
             </div>

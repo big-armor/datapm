@@ -6,7 +6,6 @@ import {
     NotificationEventType,
     FollowIdentifierInput,
     Follow,
-    NotificationFrequency,
     FollowType,
     MyFollowsResult,
     Package,
