@@ -21,6 +21,7 @@ import { UserRepository } from "./repository/UserRepository";
 import { PackageRepository } from "./repository/PackageRepository";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { CollectionRepository } from "./repository/CollectionRepository";
+import { DataStorageService } from "./storage/data/data-storage-service";
 console.log("DataPM Registry Server Starting...");
 
 const dataLibPackageFile = fs.readFileSync("node_modules/datapm-lib/package.json");
@@ -309,6 +310,24 @@ async function main() {
                 .getCustomRepository(CollectionRepository)
                 .findCollectionBySlugOrFail(req.params.collectionSlug);
             await respondWithImage(await imageService.readCollectionCoverImage(collection.id), res);
+        } catch (err) {
+            res.status(404).send();
+            return;
+        }
+    });
+
+    app.use("/data/:catalogSlug/:packageSlug/:sourceSlug", async (req, res, next) => {
+        try {
+            const contextObject = context({ req });
+
+            // TODO: ERMAL - Check for permissions
+            const packageEntity = await (await contextObject).connection
+                .getCustomRepository(PackageRepository)
+                .findPackageOrFail({
+                    identifier: { catalogSlug: req.params.catalogSlug, packageSlug: req.params.packageSlug }
+                });
+
+            await DataStorageService.INSTANCE.writeFileFromStream(packageEntity.id, req.params.sourceSlug, req.body);
         } catch (err) {
             res.status(404).send();
             return;
