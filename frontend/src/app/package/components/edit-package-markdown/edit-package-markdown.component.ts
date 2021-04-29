@@ -14,6 +14,7 @@ import { CreateVersionGQL, Package } from "src/generated/graphql";
 import { PackageService } from "../../services/package.service";
 import SemVer from "semver/classes/semver";
 import { Subject } from "rxjs";
+import { PageState } from "src/app/models/page-state";
 
 enum Field {
     README,
@@ -26,14 +27,15 @@ enum Field {
     styleUrls: ["./edit-package-markdown.component.scss"]
 })
 export class EditPackageMarkdownComponent implements OnInit, OnDestroy {
+    public pageState: PageState = "LOADING";
+    public saveState: PageState = "INIT";
+
     public title: string;
     public content: string;
     public package: Package;
 
     public packageFile: PackageFile;
     public modifiedPackageFile: PackageFile;
-
-    public loading: boolean = false;
 
     public field: Field;
     public compatibilty: Compability;
@@ -49,7 +51,8 @@ export class EditPackageMarkdownComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit(): void {
-        this.loading = true;
+        this.pageState = "LOADING";
+
         this.packageService.package.subscribe((p) => {
             this.package = p.package;
 
@@ -66,6 +69,8 @@ export class EditPackageMarkdownComponent implements OnInit, OnDestroy {
                 this.content = this.packageFile.licenseMarkdown;
                 this.title = "License";
             }
+
+            this.pageState = "SUCCESS";
         });
     }
 
@@ -91,6 +96,8 @@ export class EditPackageMarkdownComponent implements OnInit, OnDestroy {
     }
 
     public confirmSave(): void {
+        this.saveState = "LOADING";
+
         const currentVersion = new SemVer(this.modifiedPackageFile.version);
         const newVersion = nextVersion(currentVersion, this.compatibilty);
         this.modifiedPackageFile.version = newVersion.version;
@@ -105,7 +112,15 @@ export class EditPackageMarkdownComponent implements OnInit, OnDestroy {
                     packageFile: JSON.stringify(this.modifiedPackageFile)
                 }
             })
-            .subscribe(() => this.goBack());
+            .subscribe((result) => {
+                if (result.errors) {
+                    console.error(result.errors);
+                    this.saveState = "ERROR";
+                    return;
+                }
+                this.saveState = "SUCCESS";
+                this.goBack();
+            });
     }
 
     public goBack(): void {

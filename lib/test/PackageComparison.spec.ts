@@ -232,14 +232,17 @@ describe("Checking VersionUtil", () => {
         expect(compatibleComparison).equal(Compability.CompatibleChange);
 
         ((schemaA1.properties as Properties).object.properties as Properties).string3 = { type: "string" };
+        ((schemaA1.properties as Properties).object.properties as Properties).string4 = { type: "string" };
 
         const breakingDiff = compareSchema(schemaA1, schemaA2);
-        expect(breakingDiff).length(2);
+        expect(breakingDiff).length(3);
 
         expect(breakingDiff[0].type).equal(DifferenceType.REMOVE_PROPERTY);
-        expect(breakingDiff[0].pointer).equal("#/SchemaA/properties/object");
-        expect(breakingDiff[1].type).equal(DifferenceType.ADD_PROPERTY);
-        expect(breakingDiff[1].pointer).equal("#/SchemaA/properties/object/properties/string2");
+        expect(breakingDiff[0].pointer).equal("#/SchemaA/properties/object/properties/string3");
+        expect(breakingDiff[1].type).equal(DifferenceType.REMOVE_PROPERTY);
+        expect(breakingDiff[1].pointer).equal("#/SchemaA/properties/object/properties/string4");
+        expect(breakingDiff[2].type).equal(DifferenceType.ADD_PROPERTY);
+        expect(breakingDiff[2].pointer).equal("#/SchemaA/properties/object/properties/string2");
 
         const breakingChange = diffCompatibility(breakingDiff);
 
@@ -247,6 +250,7 @@ describe("Checking VersionUtil", () => {
 
         ((schemaA1.properties as Properties).object.properties as Properties).string2 = { type: "string" };
         ((schemaA2.properties as Properties).object.properties as Properties).string3 = { type: "string" };
+        ((schemaA2.properties as Properties).object.properties as Properties).string4 = { type: "string" };
 
         const finalDiff = compareSchema(schemaA1, schemaA2);
 

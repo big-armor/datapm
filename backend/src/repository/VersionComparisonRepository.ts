@@ -1,5 +1,27 @@
-import { EntityRepository, Repository } from "typeorm";
+import { Difference } from "datapm-lib";
+import { EntityManager, EntityRepository, Repository } from "typeorm";
 import { VersionComparisonEntity } from "../entity/VersionComparisonEntity";
+import { VersionDifferenceEntity } from "../entity/VersionDifferenceEntity";
+import { VersionDifferenceRepository } from "./VersionDifferenceRepository";
+
+export async function saveVersionComparison(
+    transaction: EntityManager,
+    newVersionId: number,
+    oldVersionId: number,
+    differences: Difference[]
+) {
+    const comparisonRepository = transaction.getCustomRepository(VersionComparisonRepository);
+    const comparisonEntity = await comparisonRepository.createNewComparison(newVersionId, oldVersionId);
+
+    let differencesEntities: VersionDifferenceEntity[] = [];
+
+    if (differences.length) {
+        const differencesRepository = transaction.getCustomRepository(VersionDifferenceRepository);
+        differencesEntities = await differencesRepository.batchCreateNewDifferences(comparisonEntity.id, differences);
+    }
+
+    return { comparisonEntity, differencesEntities };
+}
 
 @EntityRepository(VersionComparisonEntity)
 export class VersionComparisonRepository extends Repository<VersionComparisonEntity> {
