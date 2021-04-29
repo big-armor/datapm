@@ -24,13 +24,15 @@
                         </p>
                     </div>
 
-                    <app-package-item
-                        [item]="package"
-                        shouldShowActionButton="true"
-                        actionButtonText="Add To Collection"
-                        (action)="addToCollection(package)"
-                        *ngFor="let package of packages"
-                    ></app-package-item>
+                    <div class="container">
+                        <app-package-item
+                            [item]="package"
+                            shouldShowActionButton="true"
+                            actionButtonText="Add To Collection"
+                            (action)="addToCollection(package)"
+                            *ngFor="let package of packages"
+                        ></app-package-item>
+                    </div>
                 </div>
             </div>
         </div>

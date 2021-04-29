@@ -1,25 +1,29 @@
 <ng-container *ngIf="loadedCollectionsInitially && loadedPackagesInitially; else pageLoader">
-    <div>
+    <div class="mb-5">
         <div *ngIf="collections?.length">
-            <div class="text-main-title col-md-12 text-left no-pd-mobile">Collections</div>
-            <app-collections-horizontal-list [collections]="collections"></app-collections-horizontal-list>
+            <div class="container">
+                <div class="text-main-title text-left no-pd-mobile">Collections</div>
+                <app-collections-horizontal-list [collections]="collections"></app-collections-horizontal-list>
+            </div>
         </div>
     </div>
 
     <div *ngIf="packages.length">
-        <div class="text-main-title col-md-12 text-left no-pd-mobile">Packages</div>
-        <div *ngFor="let package of packages">
-            <app-package-item [item]="package"></app-package-item>
-        </div>
+        <div class="container">
+            <div class="text-main-title text-left no-pd-mobile">Packages</div>
+            <div *ngFor="let package of packages">
+                <app-package-item [item]="package"></app-package-item>
+            </div>
 
-        <div *ngIf="hasMorePackages" class="container text-center">
-            <button
-                class="app-outlined-button ctaButton"
-                [class.disabled]="loadingPackages"
-                (click)="requestMorePackages()"
-            >
-                Load More
-            </button>
+            <div *ngIf="hasMorePackages" class="container text-center">
+                <button
+                    class="app-outlined-button ctaButton"
+                    [class.disabled]="loadingPackages"
+                    (click)="requestMorePackages()"
+                >
+                    Load More
+                </button>
+            </div>
         </div>
     </div>
 

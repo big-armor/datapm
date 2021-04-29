@@ -5,7 +5,7 @@ import fs from "fs";
 describe("PackageFile checks", () => {
     it("Should have correct schema value", function () {
         const test = new PackageFile();
-        expect(test.$schema).equal("https://datapm.io/docs/package-file-schema-v0.3.0.json");
+        expect(test.$schema).equal("https://datapm.io/docs/package-file-schema-v0.4.0.json");
     });
 
     it("Should parse dates", function () {
@@ -30,6 +30,30 @@ describe("PackageFile checks", () => {
         expect(packageFile.sources[0].uris[0]).equal(
             "https://theunitedstates.io/congress-legislators/legislators-current.csv"
         );
+    });
+
+    it("Should have v0.4.0 max and min number values from schemas", function () {
+        const packageFile = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        expect(packageFile.schemas.length).equal(1);
+        expect(
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            Object.values(packageFile.schemas[0].properties!.district.valueTypes!).find(
+                (a) => typeof a.numberMaxValue === "string"
+            )
+        ).equal(undefined);
+
+        expect(
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            Object.values(packageFile.schemas[0].properties!.district.valueTypes!).find(
+                (a) => typeof a.numberMinValue === "string"
+            )
+        ).equal(undefined);
+
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        expect(packageFile.schemas[0].properties!.district.valueTypes!.number.numberMaxValue === 9);
+
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        expect(packageFile.schemas[0].properties!.district.valueTypes!.number.numberMaxValue === 0);
     });
 
     it("Should throw invalid package file error", function () {

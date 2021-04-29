@@ -74,6 +74,12 @@
         margin-bottom: 0px !important;
         border-top: 1px solid var(--gray-9-color);
         color: var(--gray-1-color);
+
+        button {
+            &:hover {
+                background-color: var(--gray-10-color);
+            }
+        }
     }
 }
 
