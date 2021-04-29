@@ -1,10 +1,10 @@
 import { SemVer } from "semver";
-import { Schema, PackageFile, CountPrecision, PackageFileV010 } from "./main";
+import { Schema, PackageFile, CountPrecision, PackageFileV010, PackageFileV030 } from "./main";
 import fs from "fs";
 import path from "path";
 import AJV from "ajv";
 import fetch from "cross-fetch";
-import { Source, StreamSet } from "./PackageFile-v0.3.0";
+import { Source, StreamSet, ValueTypeStatistics } from "./PackageFile-v0.4.0";
 import { PackageFileV020 } from "./PackageFile-v0.2.0";
 
 import deepEqual from "fast-deep-equal";
@@ -478,7 +478,7 @@ export function compatibilityToString(compatibility: Compability): string {
 }
 
 export function loadPackageFileFromDisk(packageFilePath: string): PackageFile {
-    if (!fs.existsSync(packageFilePath)) throw new Error("FILE_NOT_FOUND");
+    if (!fs.existsSync(packageFilePath)) throw new Error("FILE_NOT_FOUND - " + packageFilePath);
 
     let packageFileAbsolutePath;
     if (path.isAbsolute(packageFilePath)) {
@@ -588,6 +588,63 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
                 ];
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 delete schema.source;
+            }
+        }
+    }
+
+    if (packageFileObject.$schema === "https://datapm.io/docs/package-file-schema-v0.3.0.json") {
+        packageFileObject.$schema = "https://datapm.io/docs/package-file-schema-v0.4.0.json";
+
+        const oldPackageFile = packageFileObject as PackageFileV030;
+
+        for (const oldSchema of oldPackageFile.schemas) {
+            for (const propertyName in oldSchema.properties) {
+                const property = oldSchema.properties[propertyName];
+                for (const oldValueTypeName in property.valueTypes) {
+                    const oldValueType = property.valueTypes[oldValueTypeName];
+
+                    if (oldValueType.dateMaxValue === null) {
+                        delete oldValueType.dateMaxValue;
+                    }
+
+                    if (oldValueType.dateMinValue === null) {
+                        delete oldValueType.dateMinValue;
+                    }
+
+                    if (typeof oldValueType.numberMaxValue === "string") {
+                        const oldValueTypeString = oldValueType.numberMaxValue as string;
+                        const newValueTypeStatistic = (property.valueTypes[
+                            oldValueTypeName
+                        ] as unknown) as ValueTypeStatistics;
+
+                        try {
+                            if (oldValueTypeString.indexOf(".") !== -1) {
+                                newValueTypeStatistic.numberMaxValue = Number.parseFloat(oldValueTypeString);
+                            } else {
+                                newValueTypeStatistic.numberMaxValue = Number.parseInt(oldValueTypeString);
+                            }
+                        } catch (error) {
+                            delete newValueTypeStatistic.numberMaxValue;
+                        }
+                    }
+
+                    if (typeof oldValueType.numberMinValue === "string") {
+                        const oldValueTypeString = oldValueType.numberMinValue as string;
+                        const newValueTypeStatistic = (property.valueTypes[
+                            oldValueTypeName
+                        ] as unknown) as ValueTypeStatistics;
+
+                        try {
+                            if (oldValueTypeString.indexOf(".") !== -1) {
+                                newValueTypeStatistic.numberMinValue = Number.parseFloat(oldValueTypeString);
+                            } else {
+                                newValueTypeStatistic.numberMinValue = Number.parseInt(oldValueTypeString);
+                            }
+                        } catch (error) {
+                            delete newValueTypeStatistic.numberMinValue;
+                        }
+                    }
+                }
             }
         }
     }

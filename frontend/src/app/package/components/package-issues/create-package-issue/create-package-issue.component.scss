@@ -2,6 +2,8 @@
 @import "../../../../../styles/colors";
 
 #createIssue {
+    caret-color: var(--gray-1-color);
+
     .btn-div {
         display: flow-root;
     }

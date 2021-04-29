@@ -82,6 +82,7 @@
 
             .CodeMirror {
                 border: none;
+                caret-color: var(--gray-1-color);
                 border-bottom: 1px solid #ddd;
             }
         }
@@ -123,7 +124,6 @@
     .app-raised-button {
         font-size: 13px;
         border-radius: 4px;
-        border: 1px solid var(--gray-9-color);
         line-height: 15px;
     }
 
@@ -133,7 +133,7 @@
     }
 
     .app-outlined-button {
-        line-height: 14px;
+        line-height: 16px;
         padding: 8px 15px;
     }
 

@@ -43,15 +43,17 @@
                         <button class="app-outlined-button" (click)="addPackage()" *ngIf="canEdit">Add Package</button>
                     </div>
                 </div>
-                <app-package-item
-                    [item]="package"
-                    [hasImage]="true"
-                    actionButtonText="Remove From Collection"
-                    [shouldShowActionButton]="canEdit"
-                    (action)="removePackage(package)"
-                    *ngFor="let package of collection.packages"
-                >
-                </app-package-item>
+                <div class="container">
+                    <app-package-item
+                        [item]="package"
+                        [hasImage]="true"
+                        actionButtonText="Remove From Collection"
+                        [shouldShowActionButton]="canEdit"
+                        (action)="removePackage(package)"
+                        *ngFor="let package of collection.packages"
+                    >
+                    </app-package-item>
+                </div>
                 <div class="dpm-no-data" *ngIf="!collection.packages?.length">
                     <p class="text-dark-gray ml-3">
                         This collection either contains no packages, or you do not have permission to view the packages

@@ -37,7 +37,7 @@
                         <div class="issue-header d-flex bd-highlight" [class.d-none]="editingIssue">
                             <div class="mr-auto bd-highlight">
                                 <p class="text-dark-gray font-12">
-                                    <span class="font-500">{{ packageIssue.authorDisplayName }}</span>
+                                    <span class="weight-500">{{ packageIssue.authorDisplayName }}</span>
                                     commented {{ packageIssue.createdAt | timeAgo }}
                                 </p>
                             </div>
@@ -94,7 +94,7 @@
                             <div class="issue-header d-flex bd-highlight" [class.d-none]="comment.isEditing">
                                 <div class="mr-auto bd-highlight">
                                     <p class="text-dark-gray font-12">
-                                        <span class="font-500">{{ comment.authorDisplayName }}</span>
+                                        <span class="weight-500">{{ comment.authorDisplayName }}</span>
                                         commented {{ comment.createdAt | timeAgo }}
                                     </p>
                                 </div>
@@ -168,24 +168,22 @@
                     Load more
                 </button>
             </div>
-            <div class="comment-section">
+            <div class="comment-section" *ngIf="currentUser">
                 <app-markdown-editor #newCommentEditor [(content)]="newCommentContent"></app-markdown-editor>
                 <div class="mt-3 text-right">
                     <button
                         *ngIf="canEditIssue && packageIssue.status === 'OPEN'"
                         class="app-outlined-button"
-                        style="color: #4f4f4f"
                         (click)="closeIssue()"
                     >
-                        Close issue
+                        <span class="gray-txt"> Close issue</span>
                     </button>
                     <button
                         *ngIf="canEditIssue && packageIssue.status === 'CLOSED'"
                         class="app-outlined-button"
-                        style="color: #4f4f4f"
                         (click)="openIssue()"
                     >
-                        Reopen issue
+                        <span class="gray-txt">Reopen issue</span>
                     </button>
                     <button
                         class="app-raised-button ml-2"
@@ -195,6 +193,13 @@
                         Comment
                     </button>
                 </div>
+            </div>
+            <div class="mt-4 pl-5 ml-5" *ngIf="!currentUser">
+                <p class="text-dark-gray pl-2">
+                    You must <a class="doc-link cursor-pointer" (click)="openLoginDialog()"> login</a> to comment on
+                    this issue. Don't have an account?
+                    <a class="doc-link cursor-pointer" (click)="openSignUpDialog()">Sign up.</a>
+                </p>
             </div>
         </div>
     </div>

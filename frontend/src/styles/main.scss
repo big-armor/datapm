@@ -40,6 +40,10 @@ h3 {
     color: var(--gray-1-color);
 }
 
+.gray-txt {
+    color: var(--gray-2-color);
+}
+
 .color-info {
     color: var(--info-color) !important;
 
@@ -144,6 +148,18 @@ table.gray-table {
 
 .font-14 {
     font-size: 14px !important;
+}
+
+.doc-link {
+    font-size: $small-font;
+    cursor: pointer;
+    line-height: 18px;
+    font-weight: $weight-400;
+    color: var(--info-color);
+
+    &:hover {
+        text-decoration: none;
+    }
 }
 
 .mat-menu-panel,
@@ -350,7 +366,7 @@ mat-select {
 .app-raised-button {
     outline: none !important;
     border-radius: 6px;
-    border: 1px solid var(--tranparent-border);
+    border: 1px solid var(--info-color);
     font-family: $family-roboto;
     font-style: $style-normal;
     font-weight: $weight-400;
@@ -359,22 +375,17 @@ mat-select {
     text-align: center;
     padding: 8px 15px;
     color: $secondary-color;
-    background-color: var(--custom-info-color);
+    background-color: var(--info-color);
     transition: background-color ease 0.5s;
 
     &:hover {
-        background-color: var(--custom-info-hover-color);
+        background-color: var(--info-hover-color);
+        border: 1px solid var(--info-hover-color);
         transition: background-color ease 0.5s;
     }
 
     &:active {
         box-shadow: none !important;
-    }
-
-    &:disabled {
-        background-color: var(--gray-5-color);
-        pointer-events: none;
-        opacity: 0.5;
     }
 }
 
@@ -421,7 +432,7 @@ mat-select {
     line-height: 13px;
     color: var(--info-color);
     border: 1px solid var(--gray-9-color);
-    padding: 6px 15px;
+    padding: 8px 15px;
     border-radius: 4px;
     cursor: pointer;
 
@@ -433,7 +444,7 @@ mat-select {
     &:hover {
         color: var(--info-color);
         text-decoration: none;
-        background-color: var(--custom-secondary-color);
+        background: var(--custom-secondary-hover-color);
     }
 
     .delete-txt {
@@ -645,6 +656,7 @@ button.save-btn {
     font-weight: $weight-400;
     border-radius: 6px;
     letter-spacing: 0.4px;
+    cursor: pointer;
     background-color: transparent;
     box-shadow: var(--outer-shadow-1);
     border-color: transparent;
@@ -652,6 +664,10 @@ button.save-btn {
     font-style: $style-normal;
     font-size: $text-font;
     line-height: unset;
+
+    &:hover {
+        background-color: var(--gray-10-color);
+    }
 
     .mat-spinner {
         margin: 0 auto;
@@ -665,9 +681,11 @@ button:focus {
 
 .disabled,
 button:disabled {
-    background-color: var(--gray-5-color);
+    background-color: var(--gray-5-color) !important;
+    border: 1px solid var(--gray-5-color) !important;
+    color: var(--gray-3-color) !important;
     pointer-events: none;
-    opacity: 0.6;
+    opacity: 0.5;
 }
 
 .mat-button.mat-primary[disabled],
@@ -947,6 +965,14 @@ button:disabled {
     .mat-form-field-infix {
         border-top: 0px;
         padding: 0px;
+    }
+}
+
+.mat-dialog-actions {
+    button {
+        &:hover {
+            background-color: var(--gray-10-color);
+        }
     }
 }
 
