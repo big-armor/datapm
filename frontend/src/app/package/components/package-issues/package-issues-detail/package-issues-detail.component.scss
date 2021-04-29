@@ -185,10 +185,12 @@
         }
         .d-block-mobile {
             display: block !important;
+            .app-outlined-button {
+                margin-top: 15px;
+            }
         }
         .app-outlined-button {
             padding: 7px 10px;
-            margin-top: 16px;
         }
         .no-p-mobile {
             padding-left: 0px !important;

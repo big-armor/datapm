@@ -84,3 +84,16 @@
         }
     }
 }
+
+@media (max-width: 576px) {
+    ::ng-deep {
+        #markdownEditor {
+            .editor-toolbar {
+                a {
+                    width: 24px;
+                    height: 30px;
+                }
+            }
+        }
+    }
+}
