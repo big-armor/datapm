@@ -262,6 +262,7 @@ table.gray-table {
     outline: none;
     letter-spacing: 0.5px;
     color: var(--gray-1-color);
+    border-color: var(--gray-5-color) !important;
     font-family: $family-roboto;
     background-color: var(--gray-7-color) !important;
 
