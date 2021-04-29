@@ -1,14 +1,35 @@
-import { DataStorageService } from "../storage/data/data-storage-service";
+import avro from "avsc";
+import { Readable } from "stream";
+const peek = require("buffer-peek-stream").promise;
 
-const avro = require("avsc");
+export class AvroService {
+    public static readonly INSTANCE = new AvroService();
 
-const writePackageData = (packageId, sourceSlug, req, res) => {
-    const value = req.body.messageBuffer.data;
+    public isValidAvroSchema(schema: string): boolean {
+        return avro.Type.isType(schema);
+    }
 
-    const typeTask = avro.Type.forSchema(value); // How do we get schema
+    public async validateRows(schema: string, dataStream: Readable): void {
+        const avroType = avro.Type.forSchema(schema);
+        const buffer = await this.convertStreamToBuffer(dataStream);
+    }
 
-    var buf = new Buffer(value, "binary");
-    var decodedMessage = typeTask.fromBuffer(buf.slice(0));
-    DataStorageService.INSTANCE.writeFileFromStream(packageId, sourceSlug, value);
-    res.json({ messageBuffer: decodedMessage });
-};
+    private convertBufferToStream(value: Buffer): Readable {
+        const bufferStream = new Readable();
+        bufferStream.push(value);
+        bufferStream.push(null);
+        return bufferStream;
+    }
+
+    private convertStreamToBuffer(stream: Readable): Promise<Buffer> {
+        return new Promise((resolve, reject) => {
+            const bufferParts: any = [];
+            stream.on("data", (d) => bufferParts.push(d));
+            stream.on("end", () => {
+                const buffer = Buffer.concat(bufferParts);
+                resolve(buffer);
+            });
+            stream.on("error", (e) => reject(e));
+        });
+    }
+}

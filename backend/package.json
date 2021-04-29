@@ -35,6 +35,7 @@
         "apollo-server": "^2.11.0",
         "atob": "^2.1.2",
         "avsc": "^5.6.2",
+        "buffer-peek-stream": "^1.1.0",
         "dataloader": "^2.0.0",
         "datapm-lib": "file:../lib/dist",
         "express-enforces-ssl": "^1.1.0",
