@@ -25,6 +25,7 @@ import { catalogEntityToGraphQLWithDisplayName } from "./CatalogResolver";
 import { collectionEntityToGraphQLWithNameAndDescriptionCollection } from "./CollectionResolver";
 import { packageEntityToGraphqlObjectWithExtraData } from "./PackageResolver";
 
+// TODO: Use the root level resolvers instead of mapping the entities manually
 export const entityToGraphqlObject = async (context: EntityManager | Connection, entity: FollowEntity | undefined) => {
     if (!entity) {
         return null;
@@ -149,6 +150,10 @@ export const getFollow = async (
     if (follow.catalog) {
         const catalog = await getCatalogOrFail({ slug: follow.catalog.catalogSlug, manager });
         const entity = await followRepository.getFollowByCatalogId(userId, catalog.id);
+        if (!entity) {
+            return null;
+        }
+
         return await entityToGraphqlObject(context.connection, entity);
     } else if (follow.collection) {
         const collection = await manager
@@ -196,28 +201,28 @@ export const getAllMyFollows = async (
 
     switch (type) {
         case FollowType.CATALOG:
-            let [catalogFollows, cfCount] = await followRepository.getCatalogFollows(userId, offset, limit, [
+            const [catalogFollows, cfCount] = await followRepository.getCatalogFollows(userId, offset, limit, [
                 "catalog"
             ]);
             followEntities = catalogFollows;
             count = cfCount;
             break;
         case FollowType.COLLECTION:
-            let [collectionFollows, clCount] = await followRepository.getCollectionFollows(userId, offset, limit, [
+            const [collectionFollows, clCount] = await followRepository.getCollectionFollows(userId, offset, limit, [
                 "collection"
             ]);
             followEntities = collectionFollows;
             count = clCount;
             break;
         case FollowType.PACKAGE:
-            let [packageFollows, pkgCount] = await followRepository.getPackageFollows(userId, offset, limit, [
+            const [packageFollows, pkgCount] = await followRepository.getPackageFollows(userId, offset, limit, [
                 "package"
             ]);
             followEntities = packageFollows;
             count = pkgCount;
             break;
         case FollowType.PACKAGE_ISSUE:
-            let [packageIssueFollows, pkgICount] = await followRepository.getPackageIssueFollows(
+            const [packageIssueFollows, pkgICount] = await followRepository.getPackageIssueFollows(
                 userId,
                 offset,
                 limit,
@@ -227,15 +232,15 @@ export const getAllMyFollows = async (
             count = pkgICount;
             break;
         case FollowType.USER:
-            let [userFollows, uCount] = await followRepository.getUserFollows(userId, offset, limit, ["targetUser"]);
+            const [userFollows, uCount] = await followRepository.getUserFollows(userId, offset, limit, ["targetUser"]);
             followEntities = userFollows;
             count = uCount;
             break;
     }
 
-    let follows: Follow[] = [];
+    const follows: Follow[] = [];
 
-    for (let f of followEntities) {
+    for (const f of followEntities) {
         const follow = await entityToGraphqlObject(context.connection, f);
         if (follow) {
             follows.push(follow);
