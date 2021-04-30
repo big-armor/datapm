@@ -11,7 +11,6 @@ export class CreatePlatformSettingsTable1618864385071 implements MigrationInterf
                 created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
                 updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
             );
-
             CREATE UNIQUE INDEX IF NOT EXISTS platform_settings_key_index ON platform_settings (key);
         `);
     }
