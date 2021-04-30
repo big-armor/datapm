@@ -87,7 +87,8 @@ describe("Publish trival package changes", function () {
     });
 
     it("Should allow trivial package changes to be published without changing the version", async () => {
-        packageFile.updatedDate = new Date();
+        const date = new Date();
+        packageFile.updatedDate = date;
 
         const packageFileString = JSON.stringify(packageFile);
 
@@ -117,12 +118,9 @@ describe("Publish trival package changes", function () {
 
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
-        // have to update this hash value if the package file contents change
-        expect(responseHash).equal("500f546b1e6578bf7d1a8ffd71cdbe31ee57aabb8ed6c5ed141d4b7794b79cf1");
-
         packageFile = parsePackageFileJSON(responsePackageFileContents);
 
         expect(packageFile.version).equal("1.0.0");
-        expect(packageFile.displayName).equal("Testing");
+        expect(packageFile.updatedDate.toISOString()).equal(date.toISOString());
     });
 });
