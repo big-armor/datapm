@@ -80,6 +80,7 @@
                         packageFile?.website
                     }}</a>
                 </p>
+                <a *ngIf="canManage()" class="text-light-gray doc-link edit-link" (click)="editLink()">(edit link)</a>
             </div>
         </div>
         <div class="row" *ngIf="packageFile?.contactEmail">

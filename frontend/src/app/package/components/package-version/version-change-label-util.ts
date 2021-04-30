@@ -72,16 +72,16 @@ export function getReadableChangeFromDifference(difference: PackageDifference): 
             changeLabel = "Changed updated date";
             break;
         case PackageDifferenceType.CHANGE_README_MARKDOWN:
-            changeLabel = "Changed README markdown";
+            changeLabel = "Changed README text";
             break;
         case PackageDifferenceType.CHANGE_LICENSE_MARKDOWN:
-            changeLabel = "Changed license markdown";
+            changeLabel = "Changed license text";
             break;
         case PackageDifferenceType.CHANGE_README_FILE:
-            changeLabel = "Changed README file";
+            changeLabel = "Changed README text";
             break;
         case PackageDifferenceType.CHANGE_LICENSE_FILE:
-            changeLabel = "Changed LICENSE file";
+            changeLabel = "Changed LICENSE text";
             break;
         case PackageDifferenceType.CHANGE_WEBSITE:
             changeLabel = "Changed website";

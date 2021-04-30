@@ -25,61 +25,6 @@
         line-height: 15px;
         color: var(--gray-2-color);
     }
-
-    ::ng-deep {
-        .editor-statusbar {
-            color: var(--gray-1-color) !important;
-            background-color: var(--gray-10-color);
-            border-bottom: 1px solid var(--gray-9-color);
-            border-left: 1px solid var(--gray-9-color);
-            border-right: 1px solid var(--gray-9-color);
-        }
-
-        .CodeMirror {
-            font-family: $family-roboto;
-            letter-spacing: 0.4px;
-            cursor: text;
-            caret-color: var(--gray-1-color);
-            color: var(--gray-1-color);
-            background-color: var(--secondary-color);
-            border-bottom-left-radius: 0px;
-            border-bottom-right-radius: 0px;
-            border: 1px solid var(--gray-9-color);
-
-            &:hover {
-                color: var(--gray-1-color);
-            }
-
-            &::placeholder {
-                caret-color: var(--gray-1-color);
-                color: var(--gray-1-color);
-            }
-        }
-
-        .editor-toolbar {
-            opacity: 1;
-            background-color: var(--gray-10-color);
-            border-top: 1px solid var(--gray-9-color);
-            border-left: 1px solid var(--gray-9-color);
-            border-right: 1px solid var(--gray-9-color);
-
-            a {
-                color: var(--gray-1-color) !important;
-
-                &:hover {
-                    background-color: var(--custom-secondary-color);
-                }
-            }
-
-            &::after {
-                margin-top: 3px;
-            }
-
-            &::before {
-                margin-bottom: 3px;
-            }
-        }
-    }
 }
 
 @media (max-width: 576px) {
@@ -90,10 +35,6 @@
         .app-raised-button,
         .app-outlined-button {
             width: 50%;
-        }
-        ::ng-deep .CodeMirror {
-            max-height: 150px;
-            height: unset;
         }
     }
 }

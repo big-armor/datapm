@@ -18,6 +18,23 @@
             border: 1px solid var(--gray-9-color);
         }
     }
+
+    .edit-link {
+        float: left;
+        margin-top: -4px;
+    }
+
+    .doc-link {
+        font-size: $small-font;
+        cursor: pointer;
+        line-height: 18px;
+        font-weight: $weight-400;
+        color: var(--info-color);
+
+        &:hover {
+            text-decoration: none;
+        }
+    }
 }
 
 @media (max-width: 768px) {

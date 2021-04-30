@@ -1,5 +1,99 @@
 @import "../../../styles/variables";
 
 #markdownEditor {
-    caret-color: var(--gray-1-color);
+    ::ng-deep {
+        .ace_content {
+            font-family: $family-roboto;
+            letter-spacing: 0.4px;
+            font-size: $text-font;
+        }
+
+        .ace-tm {
+            .ace_gutter {
+                background: #f9f9f9;
+            }
+        }
+
+        .md-editor-container {
+            .md-layout {
+                .md-footer {
+                    background: #f9f9f9;
+                }
+
+                .tool-bar {
+                    background: #f9f9f9;
+                }
+            }
+        }
+    }
+
+    ::ng-deep {
+        markdown {
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6,
+            p {
+                margin-bottom: 0px !important;
+                white-space: normal;
+            }
+        }
+
+        .editor-statusbar {
+            color: var(--gray-1-color) !important;
+            background-color: var(--gray-10-color);
+            border-bottom: 1px solid var(--gray-9-color);
+            border-left: 1px solid var(--gray-9-color);
+            border-right: 1px solid var(--gray-9-color);
+        }
+
+        .CodeMirror {
+            font-family: $family-roboto;
+            letter-spacing: 0.4px;
+            color: var(--gray-1-color);
+            background-color: var(--secondary-color);
+            border-bottom-left-radius: 0px;
+            border-bottom-right-radius: 0px;
+            border: 1px solid var(--gray-9-color);
+        }
+
+        .editor-toolbar {
+            opacity: 1;
+            background-color: var(--gray-10-color);
+            border-top: 1px solid var(--gray-9-color);
+            border-left: 1px solid var(--gray-9-color);
+            border-right: 1px solid var(--gray-9-color);
+
+            a {
+                color: var(--gray-1-color) !important;
+
+                &:hover {
+                    background-color: var(--custom-secondary-color);
+                }
+            }
+
+            &::after {
+                margin-top: 3px;
+            }
+
+            &::before {
+                margin-bottom: 3px;
+            }
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    ::ng-deep {
+        #markdownEditor {
+            .editor-toolbar {
+                a {
+                    width: 24px;
+                    height: 30px;
+                }
+            }
+        }
+    }
 }

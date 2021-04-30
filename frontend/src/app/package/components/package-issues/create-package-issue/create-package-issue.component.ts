@@ -37,6 +37,7 @@ export class CreatePackageIssueComponent implements OnInit, OnDestroy {
 
     public ngOnInit(): void {
         this.loadPackage();
+        this.fillInputsFromQueryParams();
         this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
             this.currentUser = user;
         });
@@ -98,5 +99,10 @@ export class CreatePackageIssueComponent implements OnInit, OnDestroy {
             this.package = packageResponse.package;
             this.loading = false;
         });
+    }
+
+    private fillInputsFromQueryParams(): void {
+        this.subject = this.route.snapshot.queryParams.subject || "";
+        this.content = this.route.snapshot.queryParams.content || "";
     }
 }

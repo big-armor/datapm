@@ -1,0 +1,56 @@
+<div class="container" id="editProperty">
+    <div class="row">
+        <div class="col-md-12 p-0">
+            <div mat-dialog-title id="contentTitle">Edit Property</div>
+            <div mat-dialog-content id="contentBorder">
+                <div class="row pb-3">
+                    <div class="col-md-12">
+                        <div class="permission-div modal-select mb-3">
+                            <label class="div-question pl-1">Select property</label>
+                            <mat-form-field appearance="fill" class="w-100">
+                                <mat-select [(value)]="selectedProperty" (selectionChange)="updateSelectedProperty()">
+                                    <mat-option *ngFor="let property of properties" [value]="property">{{
+                                        property.title
+                                    }}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="mb-3">
+                            <label class="div-question pl-1">Property title</label>
+                            <app-input
+                                [control]="titleControl"
+                                class="flat-input-parent"
+                                placeholder="Property title"
+                            ></app-input>
+                        </div>
+                        <div class="mb-3">
+                            <label class="div-question pl-1">Units</label>
+                            <app-input
+                                [control]="unitControl"
+                                class="flat-input-parent"
+                                placeholder="Units"
+                            ></app-input>
+                        </div>
+                        <div class="mb-3">
+                            <label class="div-question pl-1">Description</label>
+                            <div class="bd-highlight div-answer">
+                                <textarea
+                                    [(ngModel)]="description"
+                                    class="flat-input"
+                                    placeholder="Add your bio"
+                                ></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div mat-dialog-actions class="d-flex justify-content-between pb-3">
+                <button mat-button mat-dialog-close class="close-dialog">Close</button>
+                <button mat-button (click)="save()" [disabled]="loading" class="ml-0 save-btn">
+                    <span>Save</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
