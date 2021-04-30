@@ -28,12 +28,12 @@ export class SamplesComponent implements OnChanges {
     }
 
     private buildSchemaColumns(schema: Schema) {
-        return Object.keys(schema.properties);
+        return Object.values(schema.properties).map((p) => p.title);
     }
 
     private buildSchemaColumnsUnits(schema: Schema) {
         return Object.values(schema.properties).map((value) => {
-            if (typeof value.type == "number" || (value.type.length && value.type[0] == "number")) {
+            if (value.unit != null) {
                 return `(${value.unit})`;
             }
 
@@ -50,9 +50,11 @@ export class SamplesComponent implements OnChanges {
             returnValue._oddEven = index++ % 2 == 0 ? "odd" : "even";
 
             for (const key of Object.keys(schema.properties)) {
+                const propertyTitle = schema.properties[key].title;
+
                 const value = r[key];
                 if (value == null) {
-                    returnValue[key] = null;
+                    returnValue[propertyTitle] = null;
                     continue;
                 }
 
@@ -61,20 +63,20 @@ export class SamplesComponent implements OnChanges {
 
                     if (value.length > 100) shortValue = value.substr(0, 97) + "...";
 
-                    returnValue[key] = shortValue;
+                    returnValue[propertyTitle] = shortValue;
                     continue;
                 }
                 if (typeof value === "number") {
-                    returnValue[key] = (value as number).toString();
+                    returnValue[propertyTitle] = (value as number).toString();
                     continue;
                 }
 
                 if (typeof value === "boolean") {
-                    returnValue[key] = value ? "True" : "False";
+                    returnValue[propertyTitle] = value ? "True" : "False";
                     continue;
                 }
 
-                returnValue[key] = value.toString !== undefined ? value.toString() : "";
+                returnValue[propertyTitle] = value.toString !== undefined ? value.toString() : "";
             }
 
             return returnValue;

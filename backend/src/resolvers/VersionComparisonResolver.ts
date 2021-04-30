@@ -6,7 +6,7 @@ import { VersionDifferenceEntity } from "../entity/VersionDifferenceEntity";
 import { VersionEntity } from "../entity/VersionEntity";
 import { PackageDifferenceType, PackageIdentifierInput, VersionIdentifierInput } from "../generated/graphql";
 import { PackageRepository } from "../repository/PackageRepository";
-import { VersionComparisonRepository } from "../repository/VersionComparisonRepository";
+import { VersionComparisonRepository, saveVersionComparison } from "../repository/VersionComparisonRepository";
 import { VersionDifferenceRepository } from "../repository/VersionDifferenceRepository";
 import { VersionRepository } from "../repository/VersionRepository";
 import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
@@ -132,7 +132,7 @@ export const packageVersionsDiffFromVersionEntities = async (
     if (comparisonEntity) {
         return {
             newVersion: versionEntityToVersionValuesObject(comparisonEntity.newVersion),
-            oldVersion: versionEntityToVersionValuesObject(comparisonEntity.newVersion),
+            oldVersion: versionEntityToVersionValuesObject(comparisonEntity.oldVersion),
             differences: versionDifferenceEntityToVersionValuesObject(comparisonEntity.differences)
         };
     }
@@ -201,20 +201,7 @@ export async function createVersionComparison(
     context: Context
 ) {
     const result = await context.connection.manager.nestedTransaction(async (transaction) => {
-        const comparisonRepository = transaction.getCustomRepository(VersionComparisonRepository);
-        const comparisonEntity = await comparisonRepository.createNewComparison(newVersionId, oldVersionId);
-
-        let differencesEntities: VersionDifferenceEntity[] = [];
-
-        if (differences.length) {
-            const differencesRepository = transaction.getCustomRepository(VersionDifferenceRepository);
-            differencesEntities = await differencesRepository.batchCreateNewDifferences(
-                comparisonEntity.id,
-                differences
-            );
-        }
-
-        return { comparisonEntity, differencesEntities };
+        return saveVersionComparison(transaction, newVersionId, oldVersionId, differences);
     });
 
     const createdComparisonEntity = await getComparisonByVersionIdsOrThrowError(newVersionId, oldVersionId, context);

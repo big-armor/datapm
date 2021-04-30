@@ -37,9 +37,9 @@ export class PackageComponent implements OnDestroy {
     private unsubscribe$ = new Subject();
 
     public routes = [
-        { linkName: "description", url: "", showDetails: true },
-        { linkName: "issues", url: "issues", showDetails: true },
-        { linkName: "history", url: "history", showDetails: true }
+        { linkName: "description", url: "", showDetails: true, isHidden: false },
+        { linkName: "issues", url: "issues", showDetails: true, isHidden: false },
+        { linkName: "history", url: "history", showDetails: true, isHidden: false }
     ];
 
     private catalogSlug = "";
@@ -102,12 +102,14 @@ export class PackageComponent implements OnDestroy {
                     });
 
                 this.routes = [
-                    { linkName: "description", url: "", showDetails: true },
-                    { linkName: "issues", url: "issues", showDetails: false },
-                    { linkName: "history", url: "history", showDetails: true }
+                    { linkName: "description", url: "", showDetails: true, isHidden: false },
+                    { linkName: "issues", url: "issues", showDetails: false, isHidden: false },
+                    { linkName: "history", url: "history", showDetails: true, isHidden: false }
                 ];
                 if (this.package?.myPermissions.includes(Permission.MANAGE)) {
-                    this.routes.push({ linkName: "manage", url: "manage", showDetails: false });
+                    this.routes.push({ linkName: "manage", url: "manage", showDetails: false, isHidden: false });
+                    this.routes.push({ linkName: "readme", url: "readme", showDetails: false, isHidden: true });
+                    this.routes.push({ linkName: "license", url: "license", showDetails: false, isHidden: true });
                 }
             },
             (error) => {
@@ -161,6 +163,10 @@ export class PackageComponent implements OnDestroy {
 
         if (activeRouteParts.length == 3) return route.url == "";
         return activeRouteParts[3] == route.url;
+    }
+
+    shouldShowDetails(): boolean {
+        return this.getActiveTab().showDetails;
     }
 
     getActiveTab() {

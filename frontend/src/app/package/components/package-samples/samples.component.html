@@ -11,7 +11,7 @@
         <ng-container [matColumnDef]="column" *ngFor="let column of columns; let i = index">
             <th mat-header-cell scope="col" *matHeaderCellDef style="min-width: 130px">
                 {{ column }}
-                {{ columnsUnits[i] }}
+                <div *ngIf="columnsUnits[i]">{{ columnsUnits[i] }}</div>
             </th>
             <td [ngClass]="{ oddRow: element._oddEven == 'odd' }" mat-cell *matCellDef="let element">
                 {{ element[column] }}

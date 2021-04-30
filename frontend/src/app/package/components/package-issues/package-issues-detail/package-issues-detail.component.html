@@ -37,7 +37,7 @@
                         <div class="issue-header d-flex bd-highlight" [class.d-none]="editingIssue">
                             <div class="mr-auto bd-highlight">
                                 <p class="text-dark-gray font-12">
-                                    <span class="font-500">{{ packageIssue.authorDisplayName }}</span>
+                                    <span class="weight-500">{{ packageIssue.authorDisplayName }}</span>
                                     commented {{ packageIssue.createdAt | timeAgo }}
                                 </p>
                             </div>
@@ -94,7 +94,7 @@
                             <div class="issue-header d-flex bd-highlight" [class.d-none]="comment.isEditing">
                                 <div class="mr-auto bd-highlight">
                                     <p class="text-dark-gray font-12">
-                                        <span class="font-500">{{ comment.authorDisplayName }}</span>
+                                        <span class="weight-500">{{ comment.authorDisplayName }}</span>
                                         commented {{ comment.createdAt | timeAgo }}
                                     </p>
                                 </div>

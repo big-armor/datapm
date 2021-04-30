@@ -45,7 +45,7 @@ h3 {
 }
 
 .color-info {
-    color: var(--info-color);
+    color: var(--info-color) !important;
 
     &:hover {
         text-decoration: none;
@@ -146,16 +146,24 @@ table.gray-table {
     color: var(--primary-color);
 }
 
+.weight-500 {
+    font-weight: 500 !important;
+}
+
+.font-14 {
+    font-size: 14px !important;
+}
+
 .doc-link {
     font-size: $small-font;
     cursor: pointer;
     line-height: 18px;
-    font-size: $small-font + 1;
+    font-weight: $weight-400;
     color: var(--info-color);
-}
 
-.font-500 {
-    font-weight: 500;
+    &:hover {
+        text-decoration: none;
+    }
 }
 
 .mat-menu-panel,
@@ -212,6 +220,7 @@ table.gray-table {
 .text-overflow-elipses {
     white-space: nowrap;
     overflow: hidden;
+    width: 100%;
     text-overflow: ellipsis;
 }
 
@@ -341,12 +350,12 @@ table.gray-table {
 mat-select {
     background-color: var(--custom-secondary-color);
     padding: 10px 16px;
-    letter-spacing: 0.7px;
+    letter-spacing: 0.5px;
     font-family: $family-roboto;
 
     &::placeholder {
         font-family: $family-roboto;
-        letter-spacing: 0.7px;
+        letter-spacing: 0.5px;
         font-weight: $weight-300 !important;
         font-size: $text-font;
     }
@@ -363,7 +372,7 @@ mat-select {
     height: 44px;
     border: none;
     outline: none;
-    letter-spacing: 0.7px;
+    letter-spacing: 0.5px;
     background-color: var(--custom-secondary-color);
     font-family: $family-roboto;
     color: var(--gray-1-color);
@@ -376,7 +385,7 @@ mat-select {
 
     &::placeholder {
         font-family: $family-roboto;
-        letter-spacing: 0.7px;
+        letter-spacing: 0.5px;
         opacity: 0.9;
         color: var(--gray-3-color);
         font-weight: $weight-300;
@@ -641,7 +650,7 @@ textarea.flat-input,
 .flat-input-parent textarea {
     height: 35px;
     width: 100%;
-    border-radius: 6px;
+    border-radius: 4px;
     padding: 0px 15px;
     border: none !important;
     font-family: $family-roboto;
@@ -675,9 +684,9 @@ textarea.flat-input,
 }
 
 button.save-btn {
-    color: var(--gray-3-color);
+    color: var(--gray-2-color);
     position: relative;
-    top: 4px;
+    top: 2px;
     text-align: center;
     width: 80px;
     height: 32px;
@@ -818,7 +827,7 @@ button:disabled {
 }
 
 .close-dialog {
-    color: var(--gray-1-color);
+    color: var(--gray-2-color);
 }
 
 .mat-dialog-without-padding {
@@ -965,7 +974,8 @@ button:disabled {
         font-style: $style-normal;
         font-weight: $weight-400;
         font-size: $text-font;
-        letter-spacing: unset;
+        letter-spacing: 0.5px;
+        border-radius: 4px;
         color: var(--gray-2-color);
         padding: 10px;
     }
@@ -983,7 +993,7 @@ button:disabled {
     }
 
     .mat-form-field-wrapper {
-        padding: 10px 0px !important;
+        padding: 10px 0px 10px 0px !important;
     }
 
     .mat-form-field-flex {
