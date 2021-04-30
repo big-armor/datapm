@@ -14,7 +14,7 @@ import path from "path";
 import { getSecretVariable, setAppEngineServiceAccountJson } from "./util/secrets";
 import { GraphQLError } from "graphql";
 import { superCreateConnection } from "./util/databaseCreation";
-import { Readable, Stream } from "stream";
+import { Readable } from "stream";
 import fs from "fs";
 import { ImageStorageService } from "./storage/images/image-storage-service";
 import { UserRepository } from "./repository/UserRepository";

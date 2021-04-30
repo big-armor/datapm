@@ -23,6 +23,7 @@ import { FormsModule } from "@angular/forms";
 import { MatInputModule } from "@angular/material/input";
 import { MatStepperModule } from "@angular/material/stepper";
 import { MatTooltipModule } from "@angular/material/tooltip";
+import { PlatformSettingsComponent } from "./admin-dashboard/platform-settings/platform-settings.component";
 
 @NgModule({
     declarations: [
@@ -32,7 +33,8 @@ import { MatTooltipModule } from "@angular/material/tooltip";
         TrendingComponent,
         AdminDashboardComponent,
         UsersComponent,
-        RecentlyViewedComponent
+        RecentlyViewedComponent,
+        PlatformSettingsComponent
     ],
     imports: [
         CommonModule,

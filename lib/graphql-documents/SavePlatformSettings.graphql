@@ -1,0 +1,7 @@
+mutation SavePlatformSettings($settings: PlatformSettingsInput!) {
+    savePlatformSettings(settings: $settings) {
+        key
+        isPublic
+        serializedSettings
+    }
+}

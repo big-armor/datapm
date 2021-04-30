@@ -1,0 +1,7 @@
+query PlatformSettings {
+    platformSettings {
+        key
+        isPublic
+        serializedSettings
+    }
+}

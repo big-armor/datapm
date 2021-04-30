@@ -4,7 +4,7 @@
         <div class="col-md-12">
             <ul class="p-0" id="homeRoutes">
                 <li *ngFor="let route of routes" class="list-names">
-                    <a [routerLink]="route.url" routerLinkActive="active">
+                    <a [routerLink]="route.url" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
                         {{ route.linkName }}
                     </a>
                 </li>

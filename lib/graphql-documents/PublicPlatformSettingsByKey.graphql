@@ -1,0 +1,5 @@
+query PublicPlatformSettingsByKey($key: String!) {
+    publicPlatformSettingsByKey(key: $key) {
+        serializedSettings
+    }
+}

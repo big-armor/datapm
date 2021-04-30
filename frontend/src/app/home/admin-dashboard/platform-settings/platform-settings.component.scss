@@ -1,0 +1,32 @@
+@import "../../../../styles/variables";
+@import "../../../../styles/colors";
+
+#platformSettings {
+    .platform-wrapper {
+        padding: 0px 50px;
+
+        .div-wrapper {
+            margin-bottom: 15px;
+        }
+
+        ::ng-deep .rounded-input {
+            .dpm-input-square {
+                padding: 7px 10px;
+                height: unset;
+                font-size: $text-font - 1;
+
+                &::placeholder {
+                    font-size: $text-font - 1;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 767px) {
+    #platformSettings {
+        .platform-wrapper {
+            padding: 0px 0px;
+        }
+    }
+}

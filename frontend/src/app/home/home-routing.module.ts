@@ -9,6 +9,7 @@ import { AdminDashboardComponent } from "./admin-dashboard/admin-dashboard.compo
 import { UsersComponent } from "./admin-dashboard/users/users.component";
 import { AuthGuard } from "../helpers/auth-guard";
 import { RecentlyViewedComponent } from "./recently-viewed/recently-viewed.component";
+import { PlatformSettingsComponent } from "./admin-dashboard/platform-settings/platform-settings.component";
 
 const routes: Routes = [
     {
@@ -46,6 +47,10 @@ const routes: Routes = [
             {
                 path: "users",
                 component: UsersComponent
+            },
+            {
+                path: "platform-settings",
+                component: PlatformSettingsComponent
             }
         ]
     }
