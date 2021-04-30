@@ -20,8 +20,8 @@ describe("Platform Settings Tests", async () => {
         normalUserClient = await createUser(
             "FirstB",
             "LastB",
-            "testB-package-issues",
-            "testB-package-issues@test.datapm.io",
+            "testB-platform-settings",
+            "testB-platform-settings@test.datapm.io",
             "passwordB!"
         );
         expect(adminUserClient).to.exist;
