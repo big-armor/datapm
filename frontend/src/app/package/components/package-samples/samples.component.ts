@@ -33,7 +33,7 @@ export class SamplesComponent implements OnChanges {
 
     private buildSchemaColumnsUnits(schema: Schema) {
         return Object.values(schema.properties).map((value) => {
-            if (typeof value.type == "number" || (value.type.length && value.type[0] == "number")) {
+            if (value.unit != null) {
                 return `(${value.unit})`;
             }
 
