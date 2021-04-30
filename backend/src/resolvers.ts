@@ -183,6 +183,12 @@ import {
     saveFollow
 } from "./resolvers/FollowResolver";
 
+import {
+    getPlatformSettingsByKey,
+    getPublicPlatformSettingsByKey,
+    savePlatformSettings
+} from "./resolvers/PlatformSettingsResolver";
+
 export const resolvers: {
     Query: QueryResolvers;
     Mutation: MutationResolvers;
@@ -588,7 +594,9 @@ export const resolvers: {
         myActivity: myActivity,
         packageActivities: packageActivities,
         getFollow: getFollow,
-        myFollows: getAllMyFollows
+        myFollows: getAllMyFollows,
+        platformSettings: getPlatformSettingsByKey,
+        publicPlatformSettingsByKey: getPublicPlatformSettingsByKey
     },
 
     Mutation: {
@@ -669,6 +677,7 @@ export const resolvers: {
         saveFollow: saveFollow,
         deleteFollow: deleteFollow,
         deleteAllMyFollows: deleteAllMyFollows,
+        savePlatformSettings: savePlatformSettings,
 
         track: (_, { actions }, context: Context) => mixpanel.track(actions, context.request)
     }

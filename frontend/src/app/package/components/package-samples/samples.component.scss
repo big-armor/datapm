@@ -9,6 +9,7 @@
 
 #sampleTable {
     border-collapse: unset;
+    width: -webkit-fill-available;
     tbody {
         overflow-y: scroll;
     }
@@ -16,7 +17,7 @@
 
 .mat-table {
     overflow: scroll;
-    border-left: 1px solid var(--gray-9-color);
+    // border-left: 1px solid var(--gray-9-color);
 }
 
 .mat-header-cell {
@@ -26,6 +27,10 @@
     border-right: 1px solid var(--gray-4-color);
     border-top: -1px solid var(--gray-9-color);
     border-bottom: 1px solid var(--gray-9-color);
+
+    &:last-child {
+        border-right: none;
+    }
 }
 
 .mat-cell {
@@ -37,6 +42,10 @@
     font-size: $small-font;
     letter-spacing: 0.4px;
     color: var(--gray-2-color);
+
+    &:last-child {
+        border-right: none;
+    }
 }
 
 th.mat-header-cell:first-of-type,

@@ -1,9 +1,10 @@
-import { Component } from "@angular/core";
-import { Router } from "@angular/router";
+import { Component, Input } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
 import { PackageFile, parsePackageFileJSON, Schema, validatePackageFileInBrowser } from "datapm-lib";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import {
+    User,
     Collection,
     CollectionBasicData,
     Package,
@@ -38,7 +39,8 @@ export class PackageDescriptionComponent {
     constructor(
         private packageService: PackageService,
         private packageCollectionsGQL: PackageCollectionsGQL,
-        private router: Router
+        private router: Router,
+        private route: ActivatedRoute
     ) {
         this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe((p: PackageResponse) => {
             if (p == null || p.package == null) {
@@ -84,6 +86,19 @@ export class PackageDescriptionComponent {
                 this.selectedSchema = this.schemas[0];
             }
         });
+    }
+
+    public canManage() {
+        const isPublic = this.package.myPermissions.filter((permission) => permission === "MANAGE").length > 0;
+        return isPublic;
+    }
+
+    public editReadme(): void {
+        this.router.navigate(["readme"], { relativeTo: this.route });
+    }
+
+    public editLicense(): void {
+        this.router.navigate(["license"], { relativeTo: this.route });
     }
 
     public goToCollection(collectionSlug: string): void {

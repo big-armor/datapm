@@ -3,16 +3,7 @@ import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { PackageFile } from "datapm-lib";
 import { Subject } from "rxjs";
-import {
-    Follow,
-    Package,
-    Permission,
-    User,
-    UserGQL,
-    GetFollowGQL,
-    NotificationFrequency,
-    FollowIdentifierInput
-} from "src/generated/graphql";
+import { Follow, Package, Permission, User, UserGQL, GetFollowGQL, FollowIdentifierInput } from "src/generated/graphql";
 import { PackageService, PackageResponse } from "../../services/package.service";
 import { filter, takeUntil } from "rxjs/operators";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
@@ -51,9 +42,9 @@ export class PackageComponent implements OnDestroy {
     public packageFile: PackageFile;
 
     public routes = [
-        { linkName: "description", url: "", showDetails: true },
-        { linkName: "issues", url: "issues", showDetails: true },
-        { linkName: "history", url: "history", showDetails: true }
+        { linkName: "description", url: "", showDetails: true, isHidden: false },
+        { linkName: "issues", url: "issues", showDetails: true, isHidden: false },
+        { linkName: "history", url: "history", showDetails: true, isHidden: false }
     ];
 
     public catalogUser: User;
@@ -121,12 +112,14 @@ export class PackageComponent implements OnDestroy {
                     });
 
                 this.routes = [
-                    { linkName: "description", url: "", showDetails: true },
-                    { linkName: "issues", url: "issues", showDetails: false },
-                    { linkName: "history", url: "history", showDetails: true }
+                    { linkName: "description", url: "", showDetails: true, isHidden: false },
+                    { linkName: "issues", url: "issues", showDetails: false, isHidden: false },
+                    { linkName: "history", url: "history", showDetails: true, isHidden: false }
                 ];
                 if (this.package?.myPermissions.includes(Permission.MANAGE)) {
-                    this.routes.push({ linkName: "manage", url: "manage", showDetails: false });
+                    this.routes.push({ linkName: "manage", url: "manage", showDetails: false, isHidden: false });
+                    this.routes.push({ linkName: "readme", url: "readme", showDetails: false, isHidden: true });
+                    this.routes.push({ linkName: "license", url: "license", showDetails: false, isHidden: true });
                 }
             },
             (error) => {
@@ -180,6 +173,10 @@ export class PackageComponent implements OnDestroy {
 
         if (activeRouteParts.length == 3) return route.url == "";
         return activeRouteParts[3] == route.url;
+    }
+
+    shouldShowDetails(): boolean {
+        return this.getActiveTab().showDetails;
     }
 
     getActiveTab() {

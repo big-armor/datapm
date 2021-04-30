@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from "@angular/core";
+import { Component, Input, OnDestroy } from "@angular/core";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { ActivatedRoute, NavigationExtras, ParamMap, Router } from "@angular/router";
 import { Subject } from "rxjs";
@@ -17,7 +17,6 @@ import {
     Follow,
     FollowIdentifierInput,
     GetFollowGQL,
-    NotificationFrequency,
     Package,
     Permission,
     RemovePackageFromCollectionGQL,

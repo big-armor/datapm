@@ -645,6 +645,31 @@ type Follow {
 }
 
 """
+Platform settings type
+"""
+type PlatformSettings {
+    key: String!
+    serializedSettings: String!
+    isPublic: Boolean!
+}
+
+"""
+Platform template settings type
+"""
+type BuilderIOSettings {
+    apiKey: String!
+    templates: [BuilderIOTemplate!]
+}
+
+"""
+Template type
+"""
+type BuilderIOTemplate {
+    key: String!
+    entry: String!
+}
+
+"""
 The complete identifier for a version of a package, assuming the registry is based on the HTTP request URL
 """
 input VersionIdentifierInput {
@@ -873,6 +898,15 @@ input SaveFollowInput {
     collection: CollectionIdentifierInput
     packageIssue: PackageIssueFullIdentifierInput
     user: UserIdentifierInput
+}
+
+"""
+Platform settings type
+"""
+input PlatformSettingsInput {
+    key: String!
+    serializedSettings: String!
+    isPublic: Boolean!
 }
 
 type Query {
@@ -1150,6 +1184,16 @@ type Query {
     Get authenticated user's follows
     """
     myFollows(type: FollowType!, offset: Int!, limit: Int!): MyFollowsResult!
+
+    """
+    Get platform settings
+    """
+    platformSettings: [PlatformSettings!] @isAdmin
+
+    """
+    Get platform settings
+    """
+    publicPlatformSettingsByKey(key: String!): PlatformSettings!
 }
 
 type Mutation {
@@ -1513,4 +1557,9 @@ type Mutation {
     Delete all authenticated user's follows
     """
     deleteAllMyFollows: Void @isAuthenticated
+
+    """
+    Create or update platform settings
+    """
+    savePlatformSettings(settings: PlatformSettingsInput!): PlatformSettings! @isAdmin
 }

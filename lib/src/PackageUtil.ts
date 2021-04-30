@@ -327,15 +327,15 @@ export function compareSchema(priorSchema: Schema, newSchema: Schema, pointer = 
                 if (priorSchema.properties[priorKey].hidden) {
                     response.push({
                         type: DifferenceType.REMOVE_HIDDEN_PROPERTY,
-                        pointer
+                        pointer: propertyPointer + "/" + priorKey
                     });
                 } else {
                     response.push({
                         type: DifferenceType.REMOVE_PROPERTY,
-                        pointer: pointer
+                        pointer: propertyPointer + "/" + priorKey
                     });
                 }
-                break;
+                continue;
             }
 
             const priorProperty = priorSchema.properties[priorKey];
@@ -406,21 +406,21 @@ export function diffCompatibility(diffs: Difference[]): Compability {
                 returnValue = Math.max(returnValue, Compability.CompatibleChange);
                 break;
 
-            case DifferenceType.CHANGE_PACKAGE_DESCRIPTION:
-            case DifferenceType.CHANGE_PACKAGE_DISPLAY_NAME:
-            case DifferenceType.CHANGE_PROPERTY_DESCRIPTION:
             case DifferenceType.CHANGE_SOURCE:
             case DifferenceType.CHANGE_SOURCE_CONFIGURATION:
-            case DifferenceType.CHANGE_README_MARKDOWN:
-            case DifferenceType.CHANGE_LICENSE_MARKDOWN:
-            case DifferenceType.CHANGE_WEBSITE:
-            case DifferenceType.CHANGE_CONTACT_EMAIL:
             case DifferenceType.REMOVE_HIDDEN_PROPERTY:
             case DifferenceType.REMOVE_HIDDEN_SCHEMA:
             case DifferenceType.CHANGE_VERSION: // this just requires that the number be at least one minor version greater, it doesn't return the actual difference
             case DifferenceType.REMOVE_SOURCE:
             case DifferenceType.REMOVE_STREAM_SET:
             case DifferenceType.CHANGE_PROPERTY_UNIT:
+            case DifferenceType.CHANGE_PACKAGE_DESCRIPTION:
+            case DifferenceType.CHANGE_PACKAGE_DISPLAY_NAME:
+            case DifferenceType.CHANGE_PROPERTY_DESCRIPTION:
+            case DifferenceType.CHANGE_README_MARKDOWN:
+            case DifferenceType.CHANGE_LICENSE_MARKDOWN:
+            case DifferenceType.CHANGE_WEBSITE:
+            case DifferenceType.CHANGE_CONTACT_EMAIL:
                 returnValue = Math.max(returnValue, Compability.MinorChange);
                 break;
 
@@ -478,7 +478,7 @@ export function compatibilityToString(compatibility: Compability): string {
 }
 
 export function loadPackageFileFromDisk(packageFilePath: string): PackageFile {
-    if (!fs.existsSync(packageFilePath)) throw new Error("FILE_NOT_FOUND");
+    if (!fs.existsSync(packageFilePath)) throw new Error("FILE_NOT_FOUND - " + packageFilePath);
 
     let packageFileAbsolutePath;
     if (path.isAbsolute(packageFilePath)) {

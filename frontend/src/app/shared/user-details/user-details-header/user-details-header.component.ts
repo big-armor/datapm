@@ -2,7 +2,7 @@ import { Component, Input, OnChanges, SimpleChanges } from "@angular/core";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { Subscription } from "rxjs";
 import { AuthenticationService } from "src/app/services/authentication.service";
-import { Follow, FollowIdentifierInput, GetFollowGQL, NotificationFrequency, User } from "src/generated/graphql";
+import { Follow, FollowIdentifierInput, GetFollowGQL, User } from "src/generated/graphql";
 import { FollowDialogComponent, FollowDialogResult } from "../../dialogs/follow-dialog/follow-dialog.component";
 
 @Component({

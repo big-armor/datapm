@@ -5,7 +5,6 @@ import {
     FollowIdentifierInput,
     GetCatalogGQL,
     GetFollowGQL,
-    NotificationFrequency,
     Package,
     Permission,
     User
@@ -20,6 +19,7 @@ import { takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";
 import {
     FollowDialogComponent,
+    FollowDialogData,
     FollowDialogResult
 } from "src/app/shared/dialogs/follow-dialog/follow-dialog.component";
 import { AuthenticationService } from "src/app/services/authentication.service";
@@ -180,7 +180,7 @@ export class CatalogDetailsComponent implements OnInit {
             data: {
                 follow: this.catalogFollow,
                 followIdentifier: this.buildFollowIdentifier()
-            }
+            } as FollowDialogData
         });
     }
 

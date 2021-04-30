@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component } from "@angular/core";
 
 @Component({
     selector: "app-admin-dashboard",
@@ -7,7 +7,9 @@ import { Component, OnInit } from "@angular/core";
 })
 export class AdminDashboardComponent {
     private readonly URL_PREFIX = "/admin";
-    public routes = [{ linkName: "users", url: this.URL_PREFIX }];
 
-    constructor() {}
+    public routes = [
+        { linkName: "users", url: this.URL_PREFIX + "/users" },
+        { linkName: "platform settings", url: this.URL_PREFIX + "/platform-settings" }
+    ];
 }

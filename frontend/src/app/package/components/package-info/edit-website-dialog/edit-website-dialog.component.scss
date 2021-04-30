@@ -1,0 +1,11 @@
+#editWebsite {
+    ::ng-deep {
+        .rounded-input {
+            .dpm-input-square {
+                border-radius: 6px;
+                padding: 7px 10px;
+                height: unset;
+            }
+        }
+    }
+}

@@ -10,7 +10,7 @@
             <ng-container *ngFor="let version of displayedVersions">
                 <tr>
                     <td class="text-dark-gray pt-3">
-                        <span class="font-500">{{ version.identifier | version }}</span>
+                        <span class="weight-500">{{ version.identifier | version }}</span>
                     </td>
                     <td class="text-light-gray text-right pt-3">{{ version.createdAt | timeAgo }}</td>
                 </tr>
