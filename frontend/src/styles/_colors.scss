@@ -13,6 +13,9 @@ $custom-secondary-color-dark: #303033;
 
 $primary-1-color: rgba($primary-color, 0.08);
 $primary-1-color-dark: rgba($primary-color-dark, 0.08);
+
+$custom-secondary-hover-color: #fffdfd;
+$custom-secondary-hover-color-dark: rgb(65 67 70);
 // balck and white
 
 // gray shades
@@ -93,14 +96,8 @@ $danger-darker-color-dark: #f70c09;
 $danger-lighter-color: #fe0000;
 $danger-lighter-color-dark: #fe0000;
 
-$info-hover-color: rgba($info-color, 0.85);
-$info-hover-color-dark: rgba($info-color-dark, 0.85);
-
-$custom-info-color: #017fb9;
-$custom-info-color-dark: #303033;
-
-$custom-info-hover-color: rgba($custom-info-color, 0.75);
-$custom-info-hover-color-dark: rgba($custom-info-color-dark, 0.75);
+$info-hover-color: rgba($info-color, 0.7);
+$info-hover-color-dark: rgba($info-color-dark, 0.8);
 // main colors
 
 // social media
@@ -162,6 +159,9 @@ $fade-out-shadow-dark: linear-gradient(to bottom, #20212400, #202124d9 75%);
 $active-option: #f3f3f3;
 $active-option-dark: #4d8cd6;
 
+$carousel-arrows: #fff;
+$carousel-arrows-dark: #c2c3c5;
+
 $colors: (
     --primary-color: (
         $primary-color,
@@ -178,6 +178,10 @@ $colors: (
     --custom-secondary-color: (
         $custom-secondary-color,
         $custom-secondary-color-dark
+    ),
+    --custom-secondary-hover-color: (
+        $custom-secondary-hover-color,
+        $custom-secondary-hover-color-dark
     ),
     --primary-1-color: (
         $primary-1-color,
@@ -279,14 +283,6 @@ $colors: (
         $info-hover-color,
         $info-hover-color-dark
     ),
-    --custom-info-color: (
-        $custom-info-color,
-        $custom-info-color-dark
-    ),
-    --custom-info-hover-color: (
-        $custom-info-hover-color,
-        $custom-info-hover-color-dark
-    ),
     --fb-color: (
         $fb-color,
         $fb-color-dark
@@ -358,5 +354,9 @@ $colors: (
     --active-option: (
         $active-option,
         $active-option-dark
+    ),
+    --carousel-arrows: (
+        $carousel-arrows,
+        $carousel-arrows-dark
     )
 );

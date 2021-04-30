@@ -11,6 +11,33 @@
     left: 0px !important;
 }
 
+#samples {
+    ::ng-deep {
+        table {
+            table-layout: unset !important;
+            width: 100%;
+            th {
+                min-width: 250px !important;
+            }
+        }
+        .table-wrapper {
+            height: 100% !important;
+        }
+    }
+}
+
+@media (max-width: 992px) {
+    #samples {
+        ::ng-deep {
+            table {
+                th {
+                    min-width: 130px !important;
+                }
+            }
+        }
+    }
+}
+
 @media (max-width: 576px) {
     .dialog-close-wrapper {
         span {

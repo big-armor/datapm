@@ -880,6 +880,40 @@ describe("Checking VersionUtil", () => {
         expect(removeHiddenPropertyCompatibility).equal(Compability.MinorChange);
     });
 
+    it("Compare changing property unit", () => {
+        const schemaA1: Schema = {
+            title: "SchemaA",
+            type: "object",
+            properties: {
+                string: { title: "string", type: "string" },
+                number: { title: "number", type: "number", unit: "something" }
+            }
+        };
+
+        const schemaA2: Schema = {
+            title: "SchemaA",
+            type: "object",
+            properties: {
+                string: { title: "string", type: "string" },
+                number: { title: "number", type: "number", unit: "something" }
+            }
+        };
+
+        const diff = compareSchema(schemaA1, schemaA2);
+
+        expect(diff.length).equal(0);
+
+        (schemaA2.properties as Properties).number.unit = "something else";
+
+        const propertyHiddenDiff = compareSchema(schemaA1, schemaA2);
+
+        expect(propertyHiddenDiff.length).equal(1);
+        expect(propertyHiddenDiff[0].type).equal(DifferenceType.CHANGE_PROPERTY_UNIT);
+
+        const propertyHiddenCompatibility = diffCompatibility(propertyHiddenDiff);
+        expect(propertyHiddenCompatibility).equal(Compability.MinorChange);
+    });
+
     // TODO Add test for removing a schema
 
     // TODO Add test for removing a hidden schema
