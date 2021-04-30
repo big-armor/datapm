@@ -2,9 +2,11 @@ import { Component, OnInit, ViewChild } from "@angular/core";
 import { SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
 import { combineLatest, Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 import { PackageService } from "src/app/package/services/package.service";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { ConfirmationDialogService } from "src/app/services/dialog/confirmation-dialog.service";
+import { DialogService } from "src/app/services/dialog/dialog.service";
 import { ImageService } from "src/app/services/image.service";
 import { MarkdownEditorComponent } from "src/app/shared/markdown-editor/markdown-editor.component";
 import {
@@ -80,6 +82,9 @@ export class PackageIssuesDetailComponent implements OnInit {
     public user: User;
     private commentsOffset = 0;
 
+    public currentUser: User;
+    private unsubscribe$ = new Subject();
+
     constructor(
         private authenticationService: AuthenticationService,
         private packageService: PackageService,
@@ -94,7 +99,8 @@ export class PackageIssuesDetailComponent implements OnInit {
         private imageService: ImageService,
         private confirmationDialogService: ConfirmationDialogService,
         private router: Router,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private dialog: DialogService
     ) {}
 
     public ngOnInit(): void {
@@ -105,6 +111,18 @@ export class PackageIssuesDetailComponent implements OnInit {
         } else {
             this.errorMessage = "Invalid issue number";
         }
+
+        this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
+            this.currentUser = user;
+        });
+    }
+
+    public openSignUpDialog(): void {
+        this.dialog.openSignupDialog();
+    }
+
+    public openLoginDialog(): void {
+        this.dialog.openLoginDialog();
     }
 
     public updateIssue(): void {
