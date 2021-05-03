@@ -28,7 +28,7 @@ function copyEmailTemplates() {
 
 function copyStaticTemplates() {
     return src(["static/builder-io-templates/*"]).pipe(
-        dest(path.join(DESTINATION_DIR, "..", "static", "builder-io-templates"))
+        dest(path.join(DESTINATION_DIR, "static", "builder-io-templates"))
     );
 }
 
