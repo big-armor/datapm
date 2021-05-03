@@ -219,26 +219,32 @@
                     </div>
                 </div>
             </div>
-            <mat-dialog-actions class="stepper-actions d-flex justify-content-end mt-3">
-                <button mat-button *ngIf="currentIndex == undefined || currentIndex == 0" mat-dialog-close>
-                    <span class="close-dialog"> Close</span>
-                </button>
-                <button mat-button *ngIf="currentIndex != 0" (click)="previous()">Back</button>
+            <div mat-dialog-actions class="d-flex justify-content-end">
                 <button
-                    mat-button
+                    class="modal-close-btn mr-2"
+                    *ngIf="currentIndex == undefined || currentIndex == 0"
+                    mat-dialog-close
+                >
+                    <span> Close</span>
+                </button>
+                <button *ngIf="currentIndex != 0" class="modal-close-btn mr-2" (click)="previous()">
+                    <span>Back</span>
+                </button>
+                <button
+                    class="modal-submit-btn"
                     *ngIf="(currentIndex != 3 && currentUser) || (currentIndex != 2 && !currentUser)"
                     (click)="next()"
                 >
-                    Next
+                    <span> Next</span>
                 </button>
                 <button
-                    mat-button
+                    class="modal-submit-btn"
                     *ngIf="(currentIndex == 3 && currentUser) || (currentIndex == 2 && !currentUser)"
                     mat-dialog-close
                 >
-                    Finish
+                    <span>Finish</span>
                 </button>
-            </mat-dialog-actions>
+            </div>
         </div>
     </div>
 </div>

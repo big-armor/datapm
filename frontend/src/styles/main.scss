@@ -1142,6 +1142,26 @@ button:disabled {
 }
 
 @media (max-width: 768px) {
+    .modal-submit-btn,
+    .modal-close-btn {
+        min-width: 70px;
+        font-size: $small-font;
+        padding: 4px 15px;
+    }
+    #deleteCollection,
+    #deleteCatalog,
+    #deletePackage,
+    #deleteUser {
+        .btn-delete {
+            min-width: 70px;
+            font-size: $small-font;
+            padding: 4px 15px;
+        }
+        .btn-close {
+            font-size: ($small-font + 1);
+            line-height: 26px;
+        }
+    }
     .permission-div {
         mat-select {
             font-size: $small-font;
@@ -1172,23 +1192,6 @@ button:disabled {
 }
 
 @media (max-width: 576px) {
-    #deleteCollection,
-    #deleteCatalog,
-    #deletePackage,
-    #deleteUser {
-        .btn-delete {
-            font-size: $small-font;
-            line-height: 26px;
-            top: 0px;
-        }
-        .btn-close {
-            font-size: ($small-font + 1);
-            line-height: 26px;
-        }
-        .mat-dialog-actions {
-            min-height: 40px;
-        }
-    }
     .text-light-gray,
     .text-dark-gray {
         line-height: 17px;
@@ -1307,7 +1310,7 @@ button:disabled {
         margin: 3px;
     }
     .mat-dialog-container {
-        padding: 10px 20px 15px 20px !important;
+        padding: 12px 16px 24px 16px !important;
     }
     #contentBorder {
         p,
@@ -1319,7 +1322,7 @@ button:disabled {
         li {
             a {
                 font-size: $text-font;
-                padding: 0px 3px 4px 3px;
+                padding: 0px 5px 4px 5px;
                 margin: 0px 4px;
                 bottom: 16px;
             }

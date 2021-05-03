@@ -1,7 +1,7 @@
 <form [formGroup]="form" (submit)="submit($event)" id="addUser">
     <div mat-dialog-title id="contentTitle">Share {{ userPackage.displayName }}</div>
     <div mat-dialog-content id="contentBorder">
-        <div class="bd-highlight py-4 shadow-div">
+        <div class="bd-highlight shadow-div">
             <app-user-invite-input
                 #userInviteInput
                 [usernameControl]="usernameControl"
@@ -57,8 +57,8 @@
             </div>
         </div>
     </div>
-    <div mat-dialog-actions class="mat-dialog-actions text-right pb-3">
-        <button mat-button type="submit" class="ml-auto save-btn" [disabled]="loading || hasErrors">
+    <div mat-dialog-actions class="mat-dialog-actions">
+        <button type="submit" class="ml-auto modal-submit-btn" [disabled]="loading || hasErrors">
             <span>add</span>
         </button>
     </div>

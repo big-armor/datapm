@@ -134,12 +134,11 @@
             </div>
         </div>
     </div>
-    <div mat-dialog-actions class="pb-3">
+    <div mat-dialog-actions>
         <button
-            mat-button
             [mat-dialog-close]="true"
             (click)="submit()"
-            class="ml-auto save-btn"
+            class="ml-auto modal-submit-btn"
             [class.disabled]="form.invalid || form.pending"
             [disabled]="form.invalid || form.pending"
         >

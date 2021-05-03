@@ -22,7 +22,7 @@
             </div>
 
             <div mat-dialog-actions class="d-flex justify-content-between">
-                <button class="modal-close-btn">Cancel</button>
+                <button mat-dialog-close class="modal-close-btn">Cancel</button>
                 <button class="btn-delete" (click)="confirm()" [disabled]="confirmVal !== data.collectionSlug">
                     <span *ngIf="state !== 'LOADING'">Delete</span>
                     <mat-spinner [diameter]="20" *ngIf="state === 'LOADING'"></mat-spinner>

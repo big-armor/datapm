@@ -10,7 +10,6 @@ table.gray-table {
 .permission-div {
     ::ng-deep mat-select {
         border: 1px solid var(--gray-9-color);
-        border-radius: 6px;
         padding: 6px 10px;
     }
 }
