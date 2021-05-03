@@ -393,6 +393,56 @@ mat-select {
     }
 }
 
+.modal-close-btn {
+    outline: none !important;
+    border-radius: 4px;
+    min-width: 77px;
+    border: 1px solid var(--custom-gray-9-color);
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-weight: $weight-400;
+    letter-spacing: 0.4px;
+    font-size: $text-font;
+    align-items: center;
+    text-align: center;
+    padding: 6px 17px;
+    color: var(--gray-2-color);
+    background-color: var(--secondary-color);
+    transition: background-color ease 0.5s;
+}
+
+.modal-submit-btn {
+    outline: none !important;
+    border-radius: 4px;
+    min-width: 77px;
+    border: 1px solid var(--info-color);
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-weight: $weight-400;
+    letter-spacing: 0.4px;
+    font-size: $text-font;
+    align-items: center;
+    text-align: center;
+    padding: 6px 17px;
+    color: $secondary-color;
+    background-color: var(--info-color);
+    transition: background-color ease 0.5s;
+
+    .mat-spinner {
+        margin: 0 auto;
+    }
+
+    &:hover {
+        background-color: var(--info-hover-color) !important;
+        border: 1px solid var(--info-hover-color);
+        transition: background-color ease 0.5s;
+    }
+
+    &:active {
+        box-shadow: none !important;
+    }
+}
+
 .app-raised-button {
     outline: none !important;
     border-radius: 6px;
@@ -897,21 +947,18 @@ button:disabled {
 #deletePackage,
 #deleteUser {
     .btn-delete {
-        color: var(--danger-color);
-        position: relative;
-        top: 4px;
+        color: $secondary-color;
         text-align: center;
-        width: 80px;
-        height: 32px;
-        padding: 0px 15px;
+        min-width: 77px;
+        padding: 6px 17px;
         font-weight: $weight-400;
-        border-radius: 6px;
-        box-shadow: var(--outer-shadow-1);
-        border-color: transparent;
+        border-radius: 4px;
+        letter-spacing: 0.4px;
+        border: 1px solid var(--danger-color);
+        background-color: var(--danger-color);
         font-family: $family-roboto;
         font-style: $style-normal;
         font-size: $text-font;
-        line-height: 30px;
 
         .mat-spinner {
             margin: 0 auto;
@@ -1007,6 +1054,10 @@ button:disabled {
 }
 
 .mat-dialog-actions {
+    .mat-spinner circle {
+        stroke: $secondary-color !important;
+    }
+
     button {
         &:hover {
             background-color: var(--gray-10-color);
