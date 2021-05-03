@@ -224,7 +224,7 @@ async function main() {
         })
     );
 
-    // set express for the Apollo GraphQL server
+    // Set express for the Apollo GraphQL server
     server.applyMiddleware({ app, bodyParserConfig: { limit: "20mb" } });
 
     const respondWithImage = async (imageStream: Readable, response: express.Response) => {
