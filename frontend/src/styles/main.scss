@@ -350,12 +350,13 @@ table.gray-table {
 mat-select {
     background-color: var(--custom-secondary-color);
     padding: 10px 16px;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.4px;
+    border-radius: 4px;
     font-family: $family-roboto;
 
     &::placeholder {
         font-family: $family-roboto;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.4px;
         font-weight: $weight-300 !important;
         font-size: $text-font;
     }
@@ -1322,9 +1323,19 @@ button:disabled {
         li {
             a {
                 font-size: $text-font;
-                padding: 0px 5px 4px 5px;
+                padding: 0px 10px 5px 10px;
                 margin: 0px 4px;
                 bottom: 16px;
+            }
+        }
+    }
+}
+
+@media (max-width: 380px) {
+    #homeRoutes {
+        li {
+            a {
+                padding: 0px 5px 5px 5px;
             }
         }
     }

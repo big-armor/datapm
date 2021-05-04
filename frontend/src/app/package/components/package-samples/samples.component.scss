@@ -9,7 +9,6 @@
 
 #sampleTable {
     border-collapse: unset;
-    width: -webkit-fill-available;
     tbody {
         overflow-y: scroll;
     }
@@ -42,6 +41,10 @@
     font-size: $small-font;
     letter-spacing: 0.4px;
     color: var(--gray-2-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 250px;
 
     &:last-child {
         border-right: none;

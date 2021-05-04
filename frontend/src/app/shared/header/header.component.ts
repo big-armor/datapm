@@ -127,6 +127,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     public search(): void {
         this.router.navigate(["/search"], { queryParams: { q: this.searchControl.value } });
+        console.log("lonaa" + this.searchControl.value);
     }
 
     public goHome(): void {
