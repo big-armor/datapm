@@ -31,19 +31,6 @@ export const catalogEntityToGraphQL = (catalogEntity: CatalogEntity): Catalog =>
     };
 };
 
-export const catalogEntityToGraphQLWithDisplayName = (catalogEntity: CatalogEntity): Catalog | null => {
-    if (!catalogEntity) {
-        return null;
-    }
-
-    return {
-        identifier: {
-            catalogSlug: catalogEntity.slug
-        },
-        displayName: catalogEntity.displayName
-    };
-};
-
 export const catalogIdentifier = async (parent: Catalog, _1: any, context: Context) => {
     const catalog = await context.connection
         .getCustomRepository(CatalogRepository)

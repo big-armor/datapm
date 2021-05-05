@@ -66,20 +66,6 @@ export const packageEntityToGraphqlObject = async (
     };
 };
 
-export const packageEntityToGraphqlObjectWithExtraData = async (
-    context: EntityManager | Connection,
-    packageEntity: PackageEntity
-): Promise<Package | null> => {
-    if (!packageEntity) {
-        return null;
-    }
-
-    return {
-        ...(await packageEntityToGraphqlObject(context, packageEntity)),
-        displayName: packageEntity.displayName
-    };
-};
-
 export const usersByPackage = async (
     _0: any,
     { identifier }: { identifier: PackageIdentifierInput },

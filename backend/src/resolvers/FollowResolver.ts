@@ -21,11 +21,10 @@ import { PackagePermissionRepository } from "../repository/PackagePermissionRepo
 import { PackageRepository } from "../repository/PackageRepository";
 import { UserCollectionPermissionRepository } from "../repository/UserCollectionPermissionRepository";
 import { UserRepository } from "../repository/UserRepository";
-import { catalogEntityToGraphQLWithDisplayName } from "./CatalogResolver";
-import { collectionEntityToGraphQLWithNameAndDescriptionCollection } from "./CollectionResolver";
-import { packageEntityToGraphqlObjectWithExtraData } from "./PackageResolver";
+import { catalogEntityToGraphQL } from "./CatalogResolver";
+import { collectionEntityToGraphQL } from "./CollectionResolver";
+import { packageEntityToGraphqlObject } from "./PackageResolver";
 
-// TODO: Use the root level resolvers instead of mapping the entities manually
 export const entityToGraphqlObject = async (context: EntityManager | Connection, entity: FollowEntity | undefined) => {
     if (!entity) {
         return null;
@@ -34,9 +33,9 @@ export const entityToGraphqlObject = async (context: EntityManager | Connection,
     return {
         notificationFrequency: entity.notificationFrequency,
         eventTypes: entity.eventTypes,
-        catalog: catalogEntityToGraphQLWithDisplayName(entity.catalog),
-        collection: collectionEntityToGraphQLWithNameAndDescriptionCollection(entity.collection),
-        package: await packageEntityToGraphqlObjectWithExtraData(context, entity.package),
+        catalog: catalogEntityToGraphQL(entity.catalog),
+        collection: collectionEntityToGraphQL(entity.collection),
+        package: await packageEntityToGraphqlObject(context, entity.package),
         packageIssue: entity.packageIssue,
         user: entity.targetUser
     };
@@ -337,7 +336,7 @@ export const followPackage = async (
     const packageEntity = await context.connection
         .getCustomRepository(PackageRepository)
         .findPackageOrFail({ identifier: parent.package.identifier });
-    return packageEntityToGraphqlObjectWithExtraData(context.connection, packageEntity);
+    return packageEntityToGraphqlObject(context.connection, packageEntity);
 };
 
 export const followCollection = async (
