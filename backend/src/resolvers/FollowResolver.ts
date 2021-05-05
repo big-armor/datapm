@@ -21,9 +21,9 @@ import { PackagePermissionRepository } from "../repository/PackagePermissionRepo
 import { PackageRepository } from "../repository/PackageRepository";
 import { UserCollectionPermissionRepository } from "../repository/UserCollectionPermissionRepository";
 import { UserRepository } from "../repository/UserRepository";
-import { catalogEntityToGraphQL } from "./CatalogResolver";
-import { collectionEntityToGraphQL } from "./CollectionResolver";
-import { packageEntityToGraphqlObject } from "./PackageResolver";
+import { catalogEntityToGraphQLOrNull } from "./CatalogResolver";
+import { collectionEntityToGraphQLOrNull } from "./CollectionResolver";
+import { packageEntityToGraphqlObject, packageEntityToGraphqlObjectOrNull } from "./PackageResolver";
 
 export const entityToGraphqlObject = async (context: EntityManager | Connection, entity: FollowEntity | undefined) => {
     if (!entity) {
@@ -33,9 +33,9 @@ export const entityToGraphqlObject = async (context: EntityManager | Connection,
     return {
         notificationFrequency: entity.notificationFrequency,
         eventTypes: entity.eventTypes,
-        catalog: catalogEntityToGraphQL(entity.catalog),
-        collection: collectionEntityToGraphQL(entity.collection),
-        package: await packageEntityToGraphqlObject(context, entity.package),
+        catalog: catalogEntityToGraphQLOrNull(entity.catalog),
+        collection: collectionEntityToGraphQLOrNull(entity.collection),
+        package: await packageEntityToGraphqlObjectOrNull(context, entity.package),
         packageIssue: entity.packageIssue,
         user: entity.targetUser
     };

@@ -31,6 +31,14 @@ import { packageEntityToGraphqlObject } from "./PackageResolver";
 import { ReservedKeywordsService } from "../service/reserved-keywords-service";
 import { activtyLogEntityToGraphQL } from "./ActivityLogResolver";
 
+export const collectionEntityToGraphQLOrNull = (collectionEntity: CollectionEntity): Collection | null => {
+    if (!collectionEntity) {
+        return null;
+    }
+
+    return collectionEntityToGraphQL(collectionEntity);
+};
+
 export const collectionEntityToGraphQL = (collectionEntity: CollectionEntity): Collection => {
     return {
         identifier: {

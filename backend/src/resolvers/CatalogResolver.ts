@@ -23,6 +23,14 @@ import { getGraphQlRelationName, getRelationNames } from "../util/relationNames"
 import { packageEntityToGraphqlObject } from "./PackageResolver";
 import { hasCatalogPermissions } from "./UserCatalogPermissionResolver";
 
+export const catalogEntityToGraphQLOrNull = (catalogEntity: CatalogEntity): Catalog | null => {
+    if (!catalogEntity) {
+        return null;
+    }
+
+    return catalogEntityToGraphQL(catalogEntity);
+};
+
 export const catalogEntityToGraphQL = (catalogEntity: CatalogEntity): Catalog => {
     return {
         identifier: {
