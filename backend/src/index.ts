@@ -22,7 +22,6 @@ import { PackageRepository } from "./repository/PackageRepository";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { CollectionRepository } from "./repository/CollectionRepository";
 import { DataStorageService } from "./storage/data/data-storage-service";
-import { AvroService } from "./avro/avro-service";
 console.log("DataPM Registry Server Starting...");
 
 const dataLibPackageFile = fs.readFileSync("node_modules/datapm-lib/package.json");
@@ -317,49 +316,41 @@ async function main() {
         }
     });
 
-    app.route("/data/:catalogSlug/:packageSlug/:sourceSlug")
-        .post(async (req, res, next) => {
-            try {
-                const contextObject = await context({ req });
-                const schema = req.header("data-schema");
-                if (!schema) {
-                    res.status(404);
-                    return;
-                }
+    app.route("/data/:catalogSlug/:packageSlug/:sourceSlug").post(async (req, res, next) => {
+        try {
+            // console.log("req", req);
+            // req.on("data", (d) => console.log("reqData", d));
+            // const contextObject = await context({ req });
 
-                // TODO: ERMAL - Check for permissions
-                const packageEntity = await contextObject.connection
-                    .getCustomRepository(PackageRepository)
-                    .findPackageOrFail({
-                        identifier: { catalogSlug: req.params.catalogSlug, packageSlug: req.params.packageSlug }
-                    });
-
-                await DataStorageService.INSTANCE.writePackageDataFromStream(
-                    packageEntity.id,
-                    req.params.sourceSlug,
-                    req.params.schema,
-                    req.body
-                );
-            } catch (err) {
-                res.status(404).send();
-                return;
-            }
-        })
-        .get(async (req, res, next) => {
-            const contextObject = context({ req });
             // TODO: ERMAL - Check for permissions
-            const packageEntity = await (await contextObject).connection
-                .getCustomRepository(PackageRepository)
-                .findPackageOrFail({
-                    identifier: { catalogSlug: req.params.catalogSlug, packageSlug: req.params.packageSlug }
-                });
+            // const packageEntity = await contextObject.connection
+            //     .getCustomRepository(PackageRepository)
+            //     .findPackageOrFail({
+            //         identifier: { catalogSlug: req.params.catalogSlug, packageSlug: req.params.packageSlug }
+            //     });
 
-            const stream = await DataStorageService.INSTANCE.readPackageDataFromStream(
-                packageEntity.id,
-                req.params.sourceSlug
-            );
-            stream.pipe(res); // TODO - ERMAL: Test this
-        });
+            await DataStorageService.INSTANCE.writePackageDataFromStream(123, req);
+            res.send({ status: "Okay" });
+        } catch (err) {
+            res.status(404).send();
+            return;
+        }
+    });
+    // .get(async (req, res, next) => {
+    //     const contextObject = context({ req });
+    //     // TODO: ERMAL - Check for permissions
+    //     const packageEntity = await (await contextObject).connection
+    //         .getCustomRepository(PackageRepository)
+    //         .findPackageOrFail({
+    //             identifier: { catalogSlug: req.params.catalogSlug, packageSlug: req.params.packageSlug }
+    //         });
+
+    //     const stream = await DataStorageService.INSTANCE.readPackageDataFromStream(
+    //         packageEntity.id,
+    //         req.params.sourceSlug
+    //     );
+    //     stream.pipe(res); // TODO - ERMAL: Test this
+    // });
 
     // any route not yet defined goes to index.html
     app.use("*", (req, res, next) => {
