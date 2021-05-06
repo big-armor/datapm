@@ -318,6 +318,7 @@ table.gray-table {
         font-family: $family-roboto;
         background-color: var(--gray-7-color) !important;
         transition: background-color ease 0.5s;
+        border-color: var(--gray-5-color) !important;
 
         &:hover {
             background-color: var(--custom-secondary-color) !important;
@@ -454,6 +455,12 @@ mat-select {
         p {
             color: var(--gray-1-color);
         }
+    }
+}
+
+.icon-wrapper {
+    .fas {
+        color: var(--gray-1-color);
     }
 }
 
