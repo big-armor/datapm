@@ -57,7 +57,7 @@
                 </div>
                 <div class="text-danger mt-3" *ngIf="state === 'ERROR'">Error occured while updating collection.</div>
             </div>
-            <div mat-dialog-actions class="mb-12">
+            <div mat-dialog-actions class="pb-3">
                 <button mat-button class="ml-auto save-btn" [disabled]="form.invalid" (click)="save()">
                     <span *ngIf="state !== 'LOADING'">Save</span>
                     <mat-spinner [diameter]="20" class="mx-auto" *ngIf="state === 'LOADING'"></mat-spinner>

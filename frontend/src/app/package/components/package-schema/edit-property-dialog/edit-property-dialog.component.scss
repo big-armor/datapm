@@ -1,0 +1,17 @@
+@import "../../../../../styles/variables";
+@import "../../../../../styles/colors";
+
+#editProperty {
+    ::ng-deep {
+        .permission-div {
+            .mat-form-field-wrapper {
+                padding: 0px 0px 10px 0px !important;
+            }
+        }
+    }
+
+    .modal-select {
+        border-bottom: 1px solid var(--custom-gray-9-color);
+        padding-bottom: 10px;
+    }
+}

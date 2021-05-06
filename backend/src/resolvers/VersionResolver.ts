@@ -6,7 +6,8 @@ import {
     nextVersion,
     PackageFile,
     Compability,
-    upgradePackageFile
+    upgradePackageFile,
+    Difference
 } from "datapm-lib";
 import { VersionRepository } from "./../repository/VersionRepository";
 import { PackageFileStorageService } from "./../storage/packages/package-file-storage-service";
@@ -37,6 +38,7 @@ import { StorageErrors } from "../storage/files/file-storage-service";
 import { hasPackagePermissions } from "./UserPackagePermissionResolver";
 import { packageEntityToGraphqlObject } from "./PackageResolver";
 import { createVersionComparison } from "./VersionComparisonResolver";
+import { saveVersionComparison } from "../repository/VersionComparisonRepository";
 
 export const versionEntityToGraphqlObject = async (
     context: EntityManager | Connection,
@@ -82,7 +84,7 @@ export const createVersion = async (
 ) => {
     let latestVersion: VersionEntity | undefined | null;
     let savedVersion: VersionEntity | undefined | null;
-    let diff = null;
+    let diff: Difference[] | null = null;
 
     const transactionResult = await context.connection.manager.nestedTransaction(async (transaction) => {
         const proposedNewVersion = new SemVer(value.packageFile.version);
@@ -173,13 +175,6 @@ export const createVersion = async (
             .getCustomRepository(PackageRepository)
             .updatePackageReadmeVectors(identifier, newPackageFile.readmeMarkdown);
 
-        if (value.packageFile)
-            await PackageFileStorageService.INSTANCE.writePackageFile(
-                packageEntity.id,
-                versionIdentifier,
-                value.packageFile
-            );
-
         const ALIAS = "findVersion";
         const recalledVersion = await transaction
             .getRepository(VersionEntity)
@@ -201,12 +196,20 @@ export const createVersion = async (
             targetPackageVersionId: savedVersion?.id,
             targetPackageId: packageEntity.id
         });
+
+        if (latestVersion && diff && diff.length > 0 && savedVersion && latestVersion.id !== savedVersion.id) {
+            await saveVersionComparison(transaction, savedVersion.id, latestVersion.id, diff);
+        }
+
+        if (value.packageFile)
+            await PackageFileStorageService.INSTANCE.writePackageFile(
+                packageEntity.id,
+                versionIdentifier,
+                value.packageFile
+            );
+
         return versionEntityToGraphqlObject(transaction, recalledVersion);
     });
-
-    if (latestVersion && diff && savedVersion) {
-        await createVersionComparison(latestVersion.id, savedVersion.id, diff, context);
-    }
 
     return transactionResult;
 };

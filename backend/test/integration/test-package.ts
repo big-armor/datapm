@@ -1578,13 +1578,13 @@ describe("Package Tests", async () => {
                             expect(differences[0].pointer).to.equal("#");
                             expect(differences[0].type).to.equal("CHANGE_VERSION");
 
-                            expect(differences[1].pointer).to.equal("#/legislators-current.csv");
+                            expect(differences[1].pointer).to.equal("#/legislators-current.csv/properties/last_name");
                             expect(differences[1].type).to.equal("REMOVE_PROPERTY");
 
-                            expect(differences[2].pointer).to.equal("#/legislators-current.csv/properties/last_name");
-                            expect(differences[2].type).to.equal("ADD_PROPERTY");
+                            expect(differences[2].pointer).to.equal("#/legislators-current.csv/properties/middle_name");
+                            expect(differences[2].type).to.equal("REMOVE_PROPERTY");
 
-                            expect(differences[3].pointer).to.equal("#/legislators-current.csv/properties/middle_name");
+                            expect(differences[3].pointer).to.equal("#/legislators-current.csv/properties/nick_name");
                             expect(differences[3].type).to.equal("ADD_PROPERTY");
                         }
                     }
@@ -1674,13 +1674,13 @@ describe("Package Tests", async () => {
                             expect(differences[0].pointer).to.equal("#");
                             expect(differences[0].type).to.equal("CHANGE_VERSION");
 
-                            expect(differences[1].pointer).to.equal("#/legislators-current.csv");
+                            expect(differences[1].pointer).to.equal("#/legislators-current.csv/properties/last_name");
                             expect(differences[1].type).to.equal("REMOVE_PROPERTY");
 
-                            expect(differences[2].pointer).to.equal("#/legislators-current.csv/properties/last_name");
-                            expect(differences[2].type).to.equal("ADD_PROPERTY");
+                            expect(differences[2].pointer).to.equal("#/legislators-current.csv/properties/middle_name");
+                            expect(differences[2].type).to.equal("REMOVE_PROPERTY");
 
-                            expect(differences[3].pointer).to.equal("#/legislators-current.csv/properties/middle_name");
+                            expect(differences[3].pointer).to.equal("#/legislators-current.csv/properties/nick_name");
                             expect(differences[3].type).to.equal("ADD_PROPERTY");
                         }
                     }
@@ -1799,16 +1799,18 @@ describe("Package Tests", async () => {
                                 expect(differences[0].pointer).to.equal("#");
                                 expect(differences[0].type).to.equal("CHANGE_VERSION");
 
-                                expect(differences[1].pointer).to.equal("#/legislators-current.csv");
+                                expect(differences[1].pointer).to.equal(
+                                    "#/legislators-current.csv/properties/last_name"
+                                );
                                 expect(differences[1].type).to.equal("REMOVE_PROPERTY");
 
                                 expect(differences[2].pointer).to.equal(
-                                    "#/legislators-current.csv/properties/last_name"
+                                    "#/legislators-current.csv/properties/middle_name"
                                 );
-                                expect(differences[2].type).to.equal("ADD_PROPERTY");
+                                expect(differences[2].type).to.equal("REMOVE_PROPERTY");
 
                                 expect(differences[3].pointer).to.equal(
-                                    "#/legislators-current.csv/properties/middle_name"
+                                    "#/legislators-current.csv/properties/nick_name"
                                 );
                                 expect(differences[3].type).to.equal("ADD_PROPERTY");
                             }

@@ -1,0 +1,34 @@
+<div *ngIf="pageState == 'SUCCESS'">
+    <a (click)="goBack()" class="cursor-pointer back-btn"> <em class="fas fa-arrow-left"></em> Back</a>
+    <div class="container mt-3 p-0" id="editMarkdown">
+        <div class="row">
+            <div class="col-lg-9 col-md-12">
+                <div class="text-main-title mb-3">Edit {{ title }}</div>
+                <app-markdown-editor [(content)]="content"></app-markdown-editor>
+
+                <div class="d-flex justify-content-between mt-2">
+                    <button class="app-outlined-button" (click)="goBack()">Cancel</button>
+
+                    <button class="app-raised-button ml-2" (click)="save()">
+                        <span *ngIf="saveState != 'LOADING'" class="btn-text">Save</span>
+                        <span *ngIf="saveState == 'LOADING'" class="loading-spinner">
+                            <mat-spinner diameter="20"></mat-spinner>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4" *ngIf="this.saveState == 'ERROR'">
+            <div class="col-12 text-center">
+                <span class="alert alert-warning">
+                    There was an error when trying to save the edits. Please try again or
+                    <a href="/contact">contact support</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="loading-shade" *ngIf="pageState == 'LOADING'">
+    <mat-spinner diameter="50"></mat-spinner>
+</div>

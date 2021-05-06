@@ -38,7 +38,7 @@ export const getPublicPlatformSettingsByKey = async (
     const repository = context.connection.getCustomRepository(PlatformSettingsRepository);
     const settings = await repository.findPublicSettingsByKey(key);
     if (!settings) {
-        throw new Error("Platform settings not found");
+        throw new Error("PLATFORM_SETTINGS_NOT_FOUND");
     }
 
     return settings;
