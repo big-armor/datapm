@@ -62,6 +62,9 @@ import { MarkdownEditorComponent } from "./markdown-editor/markdown-editor.compo
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { ShareDialogComponent } from "./dialogs/share-dialog/share-dialog.component";
 import { AngularSimplemdeModule } from "angular-simplemde";
+import { FollowDialogComponent } from "./dialogs/follow-dialog/follow-dialog.component";
+import { UserFollowingComponent } from "./user-details/user-following/user-following.component";
+import { UserTypeFollowingComponent } from "./user-details/user-following/user-type-following/user-type-following.component";
 import { IvyCarouselModule } from "angular-responsive-carousel";
 
 @NgModule({
@@ -106,7 +109,10 @@ import { IvyCarouselModule } from "angular-responsive-carousel";
         PackageAndCollectionComponent,
         CollectionsHorizontalListComponent,
         MarkdownEditorComponent,
-        ShareDialogComponent
+        ShareDialogComponent,
+        FollowDialogComponent,
+        UserFollowingComponent,
+        UserTypeFollowingComponent
     ],
     imports: [
         CommonModule,
@@ -168,7 +174,9 @@ import { IvyCarouselModule } from "angular-responsive-carousel";
         CollectionsHorizontalListComponent,
         UserInviteInputComponent,
         PackageAndCollectionComponent,
-        MarkdownEditorComponent
+        MarkdownEditorComponent,
+        FollowDialogComponent,
+        UserFollowingComponent
     ],
     providers: [TimeAgoPipe, { provide: MAT_DIALOG_DATA, useValue: {} }]
 })

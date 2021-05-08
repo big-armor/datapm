@@ -6,6 +6,7 @@ import { VersionEntity } from "./VersionEntity";
 import { CatalogEntity } from "./CatalogEntity";
 import { CollectionEntity } from "./CollectionEntity";
 import { ActivityLogChangeType, ActivityLogEventType } from "../generated/graphql";
+import { PackageIssueEntity } from "./PackageIssueEntity";
 
 @Entity({ name: "activity_log" })
 @Index(["userId", "eventType"])
@@ -32,9 +33,16 @@ export class ActivityLogEntity extends EntityBaseModel {
     @Column({ name: "target_package_id", nullable: true })
     public targetPackageId?: number;
 
+    @Column({ name: "target_package_issue_id", nullable: true })
+    public targetPackageIssueId?: number;
+
     @ManyToOne(() => PackageEntity, { onDelete: "CASCADE", eager: true })
     @JoinColumn({ name: "target_package_id" })
     public targetPackage: PackageEntity | null;
+
+    @ManyToOne(() => PackageIssueEntity, { onDelete: "CASCADE", eager: true })
+    @JoinColumn({ name: "target_package_issue_id" })
+    public targetPackageIssue: PackageIssueEntity | null;
 
     @Column({ name: "target_package_version_id", nullable: true })
     public targetPackageVersionId?: number;

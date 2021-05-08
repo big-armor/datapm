@@ -192,6 +192,15 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
         return userCatalogPermission.permissions.indexOf(permission) != -1;
     }
 
+    async doesUserHavePermission(userId: number, catalogId: number, permission: Permission): Promise<boolean> {
+        const userCatalogPermission = await this.manager.getRepository(UserCatalogPermissionEntity).findOneOrFail({
+            userId,
+            catalogId
+        });
+
+        return userCatalogPermission.permissions.indexOf(permission) != -1;
+    }
+
     public async findByUserAndCatalogId(
         userId: number,
         catalogId: number

@@ -9,10 +9,10 @@ import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { UiModule } from "./ui.module";
 import { GraphQLModule } from "./graphql.module";
-import { SharedModule } from "./shared/shared.module";
 import { MAT_RIPPLE_GLOBAL_OPTIONS, RippleGlobalOptions } from "@angular/material/core";
 import { AngularSimplemdeModule } from "angular-simplemde";
 import { buildMarkedOptionsFactory } from "./markdown-options";
+import { SharedModule } from "./shared/shared.module";
 
 const globalRippleConfig: RippleGlobalOptions = {
     disabled: true,

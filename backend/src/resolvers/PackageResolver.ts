@@ -39,6 +39,17 @@ import { catalogEntityToGraphQL } from "./CatalogResolver";
 import { CollectionRepository } from "../repository/CollectionRepository";
 import { activtyLogEntityToGraphQL } from "./ActivityLogResolver";
 
+export const packageEntityToGraphqlObjectOrNull = async (
+    context: EntityManager | Connection,
+    packageEntity: PackageEntity
+): Promise<Package | null> => {
+    if (!packageEntity) {
+        return null;
+    }
+
+    return packageEntityToGraphqlObject(context, packageEntity);
+};
+
 export const packageEntityToGraphqlObject = async (
     context: EntityManager | Connection,
     packageEntity: PackageEntity
