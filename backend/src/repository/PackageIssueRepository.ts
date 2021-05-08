@@ -71,6 +71,21 @@ export class PackageIssueRepository extends Repository<PackageIssueEntity> {
             .getManyAndCount();
     }
 
+    public async getIssueByPackageAndIssueNumber(packageId: number, issueNumber: number): Promise<PackageIssueEntity> {
+        const entity = await this.createQueryBuilder()
+            .where('"PackageIssueEntity"."package_id" = :packageId')
+            .andWhere('"PackageIssueEntity"."issue_number" = :issueNumber')
+            .setParameter("packageId", packageId)
+            .setParameter("issueNumber", issueNumber)
+            .getOne();
+
+        if (!entity) {
+            throw new Error("ISSUE_NOT_FOUND");
+        }
+
+        return entity;
+    }
+
     public getIssuesByPackageAndIssueNumbers(packageId: number, issueNumbers: number[]): Promise<PackageIssueEntity[]> {
         if (!issueNumbers || issueNumbers.length === 0) {
             return Promise.resolve([]);

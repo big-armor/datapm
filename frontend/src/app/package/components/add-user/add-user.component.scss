@@ -2,40 +2,6 @@
 @import "../../../../styles/colors";
 
 #addUser {
-    .permission-div {
-        ::ng-deep mat-select {
-            font-family: $family-roboto;
-            font-style: $style-normal;
-            font-weight: $weight-400;
-            font-size: $text-font;
-
-            letter-spacing: 0.5px;
-            color: var(--gray-2-color);
-            padding: 10px;
-        }
-
-        ::ng-deep .mat-form-field-underline {
-            display: none;
-            &::before {
-                height: 0px;
-            }
-        }
-
-        ::ng-deep .mat-select-arrow-wrapper {
-            position: relative;
-            top: 7px;
-        }
-
-        ::ng-deep .mat-form-field-flex {
-            padding: 0px;
-        }
-
-        ::ng-deep .mat-form-field-infix {
-            border-top: 0px;
-            padding: 0px;
-        }
-    }
-
     .textarea-input {
         ::ng-deep .mat-form-field-flex {
             background-color: var(--custom-secondary-color);

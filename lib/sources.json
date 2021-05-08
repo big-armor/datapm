@@ -22,6 +22,11 @@
             "category": "DATABASE"
         },
         {
+            "name": "AWS Redshift",
+            "slug": "redshift",
+            "category": "DATABASE"
+        },
+        {
             "name": "Google Big Query",
             "slug": "big-query",
             "category": "DATABASE"
@@ -34,6 +39,11 @@
         {
             "name": "Pipe to Standard Out",
             "slug": "stdout",
+            "category": "FILE_REPOSITORY"
+        },
+        {
+            "name": "Amazon S3",
+            "slug": "s3",
             "category": "FILE_REPOSITORY"
         },
         {

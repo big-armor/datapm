@@ -1,18 +1,26 @@
-import { Component, Input, OnDestroy, OnInit } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
+import { Component, Input, OnDestroy } from "@angular/core";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { ActivatedRoute, NavigationExtras, ParamMap, Router } from "@angular/router";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { PageState } from "src/app/models/page-state";
+import { AuthenticationService } from "src/app/services/authentication.service";
+import {
+    FollowDialogComponent,
+    FollowDialogResult
+} from "src/app/shared/dialogs/follow-dialog/follow-dialog.component";
 import { ShareDialogComponent } from "src/app/shared/dialogs/share-dialog/share-dialog.component";
 import { EditCollectionComponent } from "src/app/shared/edit-collection/edit-collection.component";
 import {
     Collection,
     CollectionGQL,
+    Follow,
+    FollowIdentifierInput,
+    GetFollowGQL,
     Package,
     Permission,
     RemovePackageFromCollectionGQL,
-    UpdateCollectionGQL
+    User
 } from "src/generated/graphql";
 import { AddPackageComponent } from "../add-package/add-package.component";
 
@@ -23,7 +31,7 @@ type CollectionDetailsPageState = PageState | "NOT_AUTHORIZED" | "NOT_FOUND";
     templateUrl: "./collection-details.component.html",
     styleUrls: ["./collection-details.component.scss"]
 })
-export class CollectionDetailsComponent implements OnInit, OnDestroy {
+export class CollectionDetailsComponent implements OnDestroy {
     @Input() public package: Package;
 
     public collectionSlug: string = "";
@@ -32,14 +40,21 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
     public currentTab = 0;
     private unsubscribe$: Subject<any> = new Subject();
 
+    public currentUser: User;
+
     private tabs = ["", "manage"];
+
+    public collectionFollow: Follow;
+    public isFollowing: boolean;
 
     constructor(
         private route: ActivatedRoute,
         private router: Router,
         private collectionGQL: CollectionGQL,
         private removePackageFromCollectionGQL: RemovePackageFromCollectionGQL,
-        private dialog: MatDialog
+        private dialog: MatDialog,
+        private getFollowGQL: GetFollowGQL,
+        private authenticationService: AuthenticationService
     ) {
         this.route.paramMap.pipe(takeUntil(this.unsubscribe$)).subscribe((paramMap: ParamMap) => {
             this.collectionSlug = paramMap.get("collectionSlug") || "";
@@ -56,13 +71,21 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
                 this.updateTabParam();
             }
         });
-    }
 
-    ngOnInit(): void {}
+        this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
+            this.currentUser = user;
+        });
+    }
 
     ngOnDestroy() {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
+    }
+
+    public createFollow() {
+        const dlgRef = this.dialog.open(FollowDialogComponent, {
+            width: "500px"
+        });
     }
 
     public sharePackage() {
@@ -110,6 +133,7 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
                     }
                     this.collection = data.collection as Collection;
                     this.state = "SUCCESS";
+                    this.getFollow();
                 },
                 () => {
                     this.state = "ERROR";
@@ -171,5 +195,48 @@ export class CollectionDetailsComponent implements OnInit, OnDestroy {
 
     public get canEdit() {
         return this.collection && this.collection.myPermissions?.includes(Permission.EDIT);
+    }
+
+    public follow(): void {
+        this.openFollowModal()
+            .afterClosed()
+            .subscribe((result) => {
+                if (!result) {
+                    return;
+                }
+
+                this.updatePackageFollow(result.follow);
+            });
+    }
+
+    private getFollow(): void {
+        this.getFollowGQL
+            .fetch({
+                follow: this.buildFollowIdentifier()
+            })
+            .subscribe((response) => this.updatePackageFollow(response.data?.getFollow));
+    }
+
+    private buildFollowIdentifier(): FollowIdentifierInput {
+        return {
+            collection: {
+                collectionSlug: this.collectionSlug
+            }
+        };
+    }
+
+    private openFollowModal(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
+        return this.dialog.open(FollowDialogComponent, {
+            width: "500px",
+            data: {
+                follow: this.collectionFollow,
+                followIdentifier: this.buildFollowIdentifier()
+            }
+        });
+    }
+
+    private updatePackageFollow(follow: Follow): void {
+        this.collectionFollow = follow;
+        this.isFollowing = follow != null;
     }
 }

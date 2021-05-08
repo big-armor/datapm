@@ -168,7 +168,7 @@ async function main() {
     });
 
     app.use("/docs/datapm-package-file-schema-*", function (req, res, next) {
-        const version = req.url.match(/^\/docs\/datapm-package-file-schema-v(.*)\.json$/i);
+        const version = req.baseUrl.match(/^\/docs\/datapm-package-file-schema-v(.*)\.json$/i);
         if (version == null) {
             res.sendStatus(404);
             return;

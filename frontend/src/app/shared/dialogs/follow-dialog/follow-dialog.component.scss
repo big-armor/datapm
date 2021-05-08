@@ -1,0 +1,36 @@
+@import "../../../../styles/colors";
+@import "../../../../styles/variables";
+
+#followDialog {
+    ::ng-deep {
+        mat-select {
+            font-family: $family-roboto;
+            font-style: $style-normal;
+            font-weight: $weight-400;
+            font-size: $text-font;
+            color: var(--gray-2-color);
+            padding: 10px;
+        }
+
+        .mat-form-field-underline {
+            display: none;
+            &::before {
+                height: 0px;
+            }
+        }
+
+        .mat-select-arrow-wrapper {
+            position: relative;
+            top: 7px;
+        }
+
+        .mat-form-field-flex {
+            padding: 0px;
+        }
+
+        .mat-form-field-infix {
+            border-top: 0px;
+            padding: 0px;
+        }
+    }
+}

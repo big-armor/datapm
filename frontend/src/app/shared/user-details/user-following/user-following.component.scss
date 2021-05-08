@@ -1,0 +1,13 @@
+@import "../../../../styles/variables";
+@import "../../../../styles/colors";
+
+#user-following {
+    .panel-div {
+        margin-top: 30px;
+    }
+
+    .font-16 {
+        margin-bottom: 6px;
+        font-size: ($title-font - 4);
+    }
+}
