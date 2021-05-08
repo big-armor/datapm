@@ -8,8 +8,17 @@ import {
     SavePlatformSettingsGQL
 } from "src/generated/graphql";
 
-export interface BuilderIOTemplateWithFormControl extends BuilderIOTemplate {
+export interface BuilderIOTemplateWithFormControls extends BuilderIOTemplate {
+    keyFormControl?: FormControl;
     entryFormControl?: FormControl;
+}
+
+enum State {
+    LOADING,
+    SAVING,
+    LOADED,
+    ERROR_DUPLICATE_KEYS,
+    ERROR_INTERNAL
 }
 
 @Component({
@@ -19,12 +28,11 @@ export interface BuilderIOTemplateWithFormControl extends BuilderIOTemplate {
 })
 export class PlatformSettingsComponent implements OnInit {
     public static readonly BUILDER_IO_SETTINGS_KEY = "builder-io-settings";
-    private readonly BUILDER_IO_TEMPLATES = ["404", "contact", "footer", "header", "privacy"];
 
-    public loading: boolean;
+    public state = State.LOADING;
 
     public builderIOApiKeyControl = new FormControl();
-    public templates: BuilderIOTemplateWithFormControl[] = [];
+    public templates: BuilderIOTemplateWithFormControls[] = [];
 
     constructor(
         private platformSettingsGQL: PlatformSettingsGQL,
@@ -35,10 +43,23 @@ export class PlatformSettingsComponent implements OnInit {
         this.loadPlatformSettings();
     }
 
+    public get isLoading(): boolean {
+        return State.LOADING === this.state;
+    }
+
+    public get hasValidationErrors(): boolean {
+        return State.ERROR_DUPLICATE_KEYS === this.state;
+    }
+
     public saveBuilderIOSettings(): void {
+        this.validateKeysBeforeSaving();
+        if (this.hasValidationErrors) {
+            return;
+        }
+
         const templatesToSerialize = this.templates.map((t) => {
             return {
-                key: t.key,
+                key: t.keyFormControl.value,
                 entry: t.entryFormControl.value
             };
         });
@@ -53,55 +74,62 @@ export class PlatformSettingsComponent implements OnInit {
             isPublic: true,
             serializedSettings: JSON.stringify(settingsToSerialize)
         } as PlatformSettings;
+
         this.savePlatformSettingsGQL
             .mutate({ settings })
             .subscribe((response) => this.setUpBuilderIOSettings(response.data.savePlatformSettings));
     }
 
+    public addNewEntry(): void {
+        const newEntry = this.buildTemplateWithControl("", "");
+        this.templates.push(newEntry);
+    }
+
+    public deleteEntry(index: number): void {
+        this.templates.splice(index, 1);
+    }
+
+    private validateKeysBeforeSaving(): void {
+        const usedKeys = [];
+        const duplicateKeys = [];
+        this.templates.forEach((t) => {
+            if (usedKeys.includes(t.key)) {
+                duplicateKeys.push(t.key);
+            }
+
+            usedKeys.push(t.key);
+        });
+
+        this.state = duplicateKeys.length ? State.ERROR_DUPLICATE_KEYS : State.SAVING;
+    }
+
     private loadPlatformSettings(): void {
-        this.loading = true;
+        this.state = State.LOADING;
         this.platformSettingsGQL.fetch().subscribe(
             (result) => {
                 const builderIOPlatformSettings = result.data.platformSettings.find(
                     (p) => p.key === PlatformSettingsComponent.BUILDER_IO_SETTINGS_KEY
                 );
                 this.setUpBuilderIOSettings(builderIOPlatformSettings);
-                this.loading = false;
+                this.state = State.LOADED;
             },
-            () => (this.loading = false)
+            () => (this.state = State.ERROR_INTERNAL)
         );
     }
 
     private setUpBuilderIOSettings(builderIOPlatformSettings: PlatformSettings): void {
-        if (!builderIOPlatformSettings) {
-            this.buildDefaultBuilderIOTemplates();
-        } else {
-            this.buildBuilderIOTemplates(builderIOPlatformSettings);
-        }
-    }
-
-    private buildDefaultBuilderIOTemplates(): void {
-        this.builderIOApiKeyControl = this.buildFormControlWithValue("");
-        this.templates = this.BUILDER_IO_TEMPLATES.map((t) => {
-            return {
-                key: t,
-                entry: "",
-                entryFormControl: this.buildFormControlWithValue("")
-            } as BuilderIOTemplateWithFormControl;
-        });
-    }
-
-    private buildBuilderIOTemplates(builderIOPlatformSettings: PlatformSettings): void {
         const deserializedSettings = JSON.parse(builderIOPlatformSettings.serializedSettings) as BuilderIOSettings;
         this.builderIOApiKeyControl = this.buildFormControlWithValue(deserializedSettings.apiKey);
-        this.templates = this.BUILDER_IO_TEMPLATES.map((t) => {
-            const savedTemplate = deserializedSettings.templates.find((tp) => tp.key === t) || { key: t, entry: "" };
-            return {
-                key: t,
-                entry: savedTemplate.entry,
-                entryFormControl: this.buildFormControlWithValue(savedTemplate.entry)
-            } as BuilderIOTemplateWithFormControl;
-        });
+        this.templates = deserializedSettings.templates.map((t) => this.buildTemplateWithControl(t.key, t.entry));
+    }
+
+    private buildTemplateWithControl(key?: string, entry?: string): BuilderIOTemplateWithFormControls {
+        return {
+            key,
+            entry,
+            keyFormControl: this.buildFormControlWithValue(key),
+            entryFormControl: this.buildFormControlWithValue(entry)
+        };
     }
 
     private buildFormControlWithValue(value?: string): FormControl {

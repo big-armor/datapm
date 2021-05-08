@@ -1,5 +1,0 @@
-<ng-container *ngIf="!loading">
-    <ng-container *ngIf="html; else backupTemplate"> <div [innerHTML]="html | safeHtml"></div></ng-container>
-</ng-container>
-
-<ng-template #backupTemplate>We value privacy</ng-template>

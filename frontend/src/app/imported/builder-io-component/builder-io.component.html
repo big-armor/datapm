@@ -1,0 +1,7 @@
+<ng-container *ngIf="!loading">
+    <div *ngIf="builderTemplate; else backupTemplate" [innerHTML]="builderTemplate | safeHtml"></div>
+</ng-container>
+
+<ng-template #backupTemplate>
+    <div class="container">Page has not been found.</div>
+</ng-template>
