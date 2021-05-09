@@ -16,7 +16,8 @@ let serverProcess: execa.ExecaChildProcess;
 let mailServer: any;
 export let mailObservable: Observable<any>;
 
-export const TEMP_STORAGE_URL = "file://tmp-registry-server-storage-" + new RandomUuid().nextUuid();
+export const TEMP_STORAGE_PATH = "tmp-registry-server-storage-" + new RandomUuid().nextUuid();
+export const TEMP_STORAGE_URL = "file://" + TEMP_STORAGE_PATH;
 
 // These hold the standard out log lines from the datapm server
 export let serverLogLines: string[] = [];
