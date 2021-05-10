@@ -13,7 +13,7 @@
         "start-nowatch": ". ./env.sh && ts-node src/index.ts",
         "start:server": ". ./env.sh && cd dist && TYPEORM_IS_DIST=true  node index.js",
         "pretest": "npm run codegen",
-        "test": "mocha -r ts-node/register --slow 2000 test/integration/test-data.ts",
+        "test": "mocha -r ts-node/register --slow 2000 test/integration/*.ts src/**/*.spec.ts",
         "test:debug": "npm run build && npx mocha --slow 3000 --timeout 999999 -r ts-node/register",
         "codegen": "graphql-codegen --config codegen.yml && graphql-codegen --config codegen-test.yml"
     },

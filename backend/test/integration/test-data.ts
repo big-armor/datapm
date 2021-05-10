@@ -105,8 +105,51 @@ describe("Package Data Tests", async () => {
         dataRequest.catch(() => (threwException = true)).then(() => expect(threwException).equal(true));
     });
 
-    it("Should allow user to push data for package with edit permissions", async function () {
+    it("Should not allow user to push data for package with non existent source", async function () {
         const packageSlug = "legislators-2";
+
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: userAUsername,
+                    packageSlug: packageSlug,
+                    displayName: "Congressional LegislatorsA",
+                    description: "Test upload of congressional legislatorsA"
+                }
+            }
+        });
+        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileString = JSON.stringify(packageFileContents);
+
+        await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: userAUsername,
+                    packageSlug: packageSlug
+                },
+                value: {
+                    packageFile: packageFileString
+                }
+            }
+        });
+
+        const version = "1.0.0";
+        const url = `${DATA_ENDPOINT_URL}/${userAUsername}/${packageSlug}/${version}/bad-slug`;
+
+        const dataFile = fs.readFileSync("test/data-files/data.avro");
+        let threwException = false;
+        request
+            .post(url)
+            .set("Authorization", userAToken)
+            .send(dataFile)
+            .catch(() => (threwException = true))
+            .then(() => expect(threwException).equal(true));
+    });
+
+    it("Should allow user to push data for package with edit permissions", async function () {
+        const packageSlug = "legislators-3";
 
         await userAClient.mutate({
             mutation: CreatePackageDocument,
@@ -150,7 +193,7 @@ describe("Package Data Tests", async () => {
     });
 
     it("Should not allow storing data for invalid package", async function () {
-        const packageSlug = "legislators-3";
+        const packageSlug = "legislators-4";
 
         await userAClient.mutate({
             mutation: CreatePackageDocument,
@@ -190,7 +233,7 @@ describe("Package Data Tests", async () => {
     });
 
     it("Should not allow user to download data for package without view permissions", async function () {
-        const packageSlug = "legislators-4";
+        const packageSlug = "legislators-5";
 
         await userAClient.mutate({
             mutation: CreatePackageDocument,
@@ -233,7 +276,7 @@ describe("Package Data Tests", async () => {
     });
 
     it("Should allow user to download data for package with view permissions", async function () {
-        const packageSlug = "legislators-5";
+        const packageSlug = "legislators-6";
 
         await userAClient.mutate({
             mutation: CreatePackageDocument,
@@ -272,8 +315,51 @@ describe("Package Data Tests", async () => {
         expect(downloadData).equal(dataFile.toString("base64"));
     });
 
+    it("Should not allow user to download data with non existent slug", async function () {
+        const packageSlug = "legislators-7";
+
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: userAUsername,
+                    packageSlug: packageSlug,
+                    displayName: "Congressional LegislatorsA",
+                    description: "Test upload of congressional legislatorsA"
+                }
+            }
+        });
+        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileString = JSON.stringify(packageFileContents);
+
+        await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: userAUsername,
+                    packageSlug: packageSlug
+                },
+                value: {
+                    packageFile: packageFileString
+                }
+            }
+        });
+
+        const version = "1.0.0";
+        const url = `${DATA_ENDPOINT_URL}/${userAUsername}/${packageSlug}/${version}/${URL_ENCODED_SOURCE_SLUG}`;
+        const dataFile = fs.readFileSync("test/data-files/data.avro");
+        await request.post(url).set("Authorization", userAToken).send(dataFile);
+
+        const dataDownloadRequest = request
+            .get(url + "-slug-breaker")
+            .buffer(true)
+            .set("Authorization", userAToken);
+        let threwException = false;
+        dataDownloadRequest.catch(() => (threwException = true)).then(() => expect(threwException).equal(true));
+    });
+
     it("Should not download any data for invalid packages", async function () {
-        const packageSlug = "legislators-6";
+        const packageSlug = "legislators-8";
 
         const version = "1.0.0";
         const url = `${DATA_ENDPOINT_URL}/${userAUsername}/${packageSlug}/${version}/${URL_ENCODED_SOURCE_SLUG}`;
