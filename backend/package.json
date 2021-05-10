@@ -14,6 +14,7 @@
         "start:server": ". ./env.sh && cd dist && TYPEORM_IS_DIST=true  node index.js",
         "pretest": "npm run codegen",
         "test": "mocha -r ts-node/register --slow 2000 test/integration/*.ts src/**/*.spec.ts",
+        "test:debug": "npm run build && npx mocha --slow 3000 --timeout 999999 -r ts-node/register",
         "codegen": "graphql-codegen --config codegen.yml && graphql-codegen --config codegen-test.yml"
     },
     "repository": {
@@ -27,6 +28,7 @@
     },
     "homepage": "https://github.com/big-armor/datapm-registry#readme",
     "dependencies": {
+        "datapm-lib": "file:../lib/dist",
         "@google-cloud/secret-manager": "^3.1.0",
         "@google-cloud/storage": "^5.1.1",
         "@types/nodemailer": "^6.4.0",
@@ -34,14 +36,10 @@
         "ajv": "^6.12.3",
         "apollo-server": "^2.11.0",
         "atob": "^2.1.2",
-        "avsc": "^5.6.2",
-        "buffer-peek-stream": "^1.1.0",
         "dataloader": "^2.0.0",
-        "datapm-lib": "file:../lib/dist",
         "express-enforces-ssl": "^1.1.0",
         "express-http-proxy": "^1.6.0",
         "express-jwt": "^6.0.0",
-        "fetch-blob": "^2.1.2",
         "graphql": "^15.3.0",
         "graphql-fields": "^2.0.3",
         "graphql-scalars": "^1.2.2",

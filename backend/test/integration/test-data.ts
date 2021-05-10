@@ -6,20 +6,20 @@ import { describe, it } from "mocha";
 import request = require("superagent");
 import { loadPackageFileFromDisk } from "datapm-lib";
 import fs from "fs";
-import { TEMP_STORAGE_PATH, TEMP_STORAGE_URL } from "./setup";
+import { TEMP_STORAGE_PATH } from "./setup";
 
-describe("Package Tests", async () => {
+describe("Package Data Tests", async () => {
     const DATA_ENDPOINT_URL = "localhost:4000/data";
 
     const userAUsername = "legislatorA";
     const userBUsername = "legislatorB";
 
+    let userAToken: string = "Bearer ";
+    let userBToken: string = "Bearer ";
+
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
     let anonymousClient = createAnonymousClient();
-
-    let userAToken: string = "Bearer ";
-    let userBToken: string = "Bearer ";
 
     before(async () => {});
 
