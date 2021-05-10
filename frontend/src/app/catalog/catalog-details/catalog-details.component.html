@@ -15,6 +15,12 @@
                         </p>
                     </div>
                 </div>
+                <div *ngIf="currentUser" class="d-flex flex-row bd-highlight ml-auto align-self-end mr-2">
+                    <button class="app-raised-button follow-btn" (click)="follow()">
+                        <span *ngIf="isFollowing"><em class="fas fa-bell-slash"></em>Unfollow </span>
+                        <span *ngIf="!isFollowing"><em class="fas fa-bell"></em>Follow</span>
+                    </button>
+                </div>
             </div>
             <div *ngIf="catalog" class="collections-public pl-3">
                 <span *ngIf="catalog?.isPublic" class="public-text">public</span>
@@ -37,15 +43,17 @@
 
         <div class="container">
             <div *ngIf="currentTab === 0">
-                <app-package-item
-                    [item]="package"
-                    [hasImage]="true"
-                    actionButtonText="Delete Package"
-                    [shouldShowActionButton]="canEdit"
-                    (action)="deletePackage(package)"
-                    *ngFor="let package of catalog?.packages"
-                >
-                </app-package-item>
+                <div class="container">
+                    <app-package-item
+                        [item]="package"
+                        [hasImage]="true"
+                        actionButtonText="Delete Package"
+                        [shouldShowActionButton]="canEdit"
+                        (action)="deletePackage(package)"
+                        *ngFor="let package of catalog?.packages"
+                    >
+                    </app-package-item>
+                </div>
                 <div class="dpm-no-data" *ngIf="!catalog?.packages?.length">
                     <p class="text-dark-gray">
                         This catalog contains no packages, or you do not have permission to view the packages it does

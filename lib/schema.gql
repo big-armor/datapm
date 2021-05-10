@@ -114,7 +114,16 @@ enum ActivityLogEventType {
     PACKAGE_PUBLIC_CHANGED
     PACKAGE_EDIT
 
+    PACKAGE_ISSUE_CREATED
+    PACKAGE_ISSUE_EDIT
+    PACKAGE_ISSUE_COMMENT_CREATED
+    PACKAGE_ISSUE_COMMENT_EDIT
+    PACKAGE_ISSUE_COMMENT_DELETED
+    PACKAGE_ISSUE_CLOSED
+    PACKAGE_ISSUE_DELETED
+
     VERSION_CREATED
+    VERSION_UPDATED
     VERSION_DELETED
 
     COLLECTION_CREATED
@@ -138,6 +147,7 @@ enum ActivityLogEventType {
 
 enum ActivityLogChangeType {
     VERSION_FIRST_VERSION
+    VERSION_TRIVIAL_CHANGE
     VERSION_PATCH_CHANGE
     VERSION_MINOR_CHANGE
     VERSION_MAJOR_CHANGE
@@ -200,6 +210,43 @@ enum PackageDifferenceType {
     CHANGE_WEBSITE
     CHANGE_CONTACT_EMAIL
     REMOVE_STREAM_SET
+}
+
+"""
+Follow Type
+"""
+enum FollowType {
+    CATALOG
+    COLLECTION
+    PACKAGE
+    PACKAGE_ISSUE
+    USER
+}
+
+"""
+Notification frequency
+"""
+enum NotificationFrequency {
+    INSTANT
+    DAILY
+    WEEKLY
+    MONTHLY
+    NEVER
+}
+
+"""
+Notification Event type
+"""
+enum NotificationEventType {
+    PACKAGE_PATCH_CHANGE
+    PACKAGE_MINOR_CHANGE
+    PACKAGE_MAJOR_CHANGE
+    COLLECTION_PACKAGE_ADDED
+    COLLECTION_PACKAGE_REMOVED
+    CATALOG_PACKAGE_ADDED
+    CATALOG_PACKAGE_REMOVED
+    PACKAGE_ISSUE_COMMENT_ADDED
+    PACKAGE_ISSUE_STAUS_CHANGE
 }
 
 """
@@ -281,10 +328,11 @@ A package issue represents an issue raised for a topic related to the package.
 type PackageIssue {
     issueNumber: Int!
     subject: String!
-    content: String!
-    author: User!
-    status: PackageIssueStatus!
-    createdAt: Date!
+    content: String
+    author: User
+    packageIdentifier: BasePackageIdentifier
+    status: PackageIssueStatus
+    createdAt: Date
     updatedAt: Date
 }
 
@@ -326,7 +374,16 @@ type CollectionBasicData {
 The basic data used to display a collection
 """
 type PackageCollectionsResult {
-    collections: [CollectionBasicData!]
+    collections: [Collection!]
+    hasMore: Boolean!
+    count: Int!
+}
+
+"""
+My Follows result
+"""
+type MyFollowsResult {
+    follows: [Follow!]
     hasMore: Boolean!
     count: Int!
 }
@@ -402,6 +459,14 @@ The complete identifier for a package on a registry
 """
 type PackageIdentifier {
     registryURL: String!
+    catalogSlug: String!
+    packageSlug: String!
+}
+
+"""
+The complete identifier for a package on a registry
+"""
+type BasePackageIdentifier {
     catalogSlug: String!
     packageSlug: String!
 }
@@ -567,6 +632,19 @@ type PackageDifference {
 }
 
 """
+The follow type
+"""
+type Follow {
+    user: User
+    notificationFrequency: NotificationFrequency!
+    eventTypes: [NotificationEventType]!
+    catalog: Catalog
+    package: Package
+    collection: Collection
+    packageIssue: PackageIssue
+}
+
+"""
 Platform settings type
 """
 type PlatformSettings {
@@ -614,6 +692,14 @@ input PackageIdentifierInput {
 The complete identifier for a package issue
 """
 input PackageIssueIdentifierInput {
+    issueNumber: Int!
+}
+
+"""
+The complete identifier for a package issue
+"""
+input PackageIssueFullIdentifierInput {
+    packageIdentifier: PackageIdentifierInput!
     issueNumber: Int!
 }
 
@@ -789,6 +875,29 @@ input ActivityLogFilterInput {
     eventType: [ActivityLogEventType]
     limit: Int!
     offset: Int!
+}
+
+"""
+The follow identifier input
+"""
+input FollowIdentifierInput {
+    catalog: CatalogIdentifierInput
+    package: PackageIdentifierInput
+    collection: CollectionIdentifierInput
+    packageIssue: PackageIssueFullIdentifierInput
+    user: UserIdentifierInput
+}
+
+"""
+The save follow identifier input
+"""
+input SaveFollowInput {
+    notificationFrequency: NotificationFrequency!
+    catalog: CatalogIdentifierInput
+    package: PackageIdentifierInput
+    collection: CollectionIdentifierInput
+    packageIssue: PackageIssueFullIdentifierInput
+    user: UserIdentifierInput
 }
 
 """
@@ -1062,9 +1171,19 @@ type Query {
     ): ActivityLogResult! @isAuthenticated
 
     """
+    Follow object for a target entity
+    """
+    getFollow(follow: FollowIdentifierInput!): Follow
+
+    """
     For validating that the server is up, and requesting it's status
     """
     registryStatus: RegistryStatus
+
+    """
+    Get authenticated user's follows
+    """
+    myFollows(type: FollowType!, offset: Int!, limit: Int!): MyFollowsResult!
 
     """
     Get platform settings
@@ -1423,6 +1542,21 @@ type Mutation {
     Accept invite emails to finish creating user
     """
     acceptInvite(token: String!, username: String! @validUsername, password: String! @validPassword): Void
+
+    """
+    Follow changes for a catalog, package, collection, issue or user.
+    """
+    saveFollow(follow: SaveFollowInput!): Void
+
+    """
+    Delete a follow
+    """
+    deleteFollow(follow: FollowIdentifierInput!): Void
+
+    """
+    Delete all authenticated user's follows
+    """
+    deleteAllMyFollows: Void @isAuthenticated
 
     """
     Create or update platform settings

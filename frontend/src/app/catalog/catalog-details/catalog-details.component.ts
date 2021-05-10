@@ -1,13 +1,28 @@
 import { Component, OnInit } from "@angular/core";
-import { Catalog, GetCatalogGQL, Package, Permission } from "src/generated/graphql";
+import {
+    Catalog,
+    Follow,
+    FollowIdentifierInput,
+    GetCatalogGQL,
+    GetFollowGQL,
+    Package,
+    Permission,
+    User
+} from "src/generated/graphql";
 import { ActivatedRoute, NavigationExtras, Router } from "@angular/router";
-import { MatDialog } from "@angular/material/dialog";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { EditCatalogComponent } from "src/app/shared/edit-catalog/edit-catalog.component";
 import { PageState } from "src/app/models/page-state";
 import { DialogService } from "../../services/dialog/dialog.service";
 import { DeletePackageComponent } from "../../shared/delete-package/delete-package.component";
 import { takeUntil } from "rxjs/operators";
 import { Subject } from "rxjs";
+import {
+    FollowDialogComponent,
+    FollowDialogData,
+    FollowDialogResult
+} from "src/app/shared/dialogs/follow-dialog/follow-dialog.component";
+import { AuthenticationService } from "src/app/services/authentication.service";
 
 @Component({
     selector: "app-catalog-details",
@@ -19,6 +34,12 @@ export class CatalogDetailsComponent implements OnInit {
     public catalog: Catalog;
     public state: PageState | "CATALOG_NOT_FOUND" | "NOT_AUTHENTICATED" = "INIT";
     public currentTab = 0;
+
+    public currentUser: User;
+
+    public catalogFollow: Follow;
+    public isFollowing: boolean;
+
     private unsubscribe$: Subject<any> = new Subject();
     private tabs = ["", "manage"];
 
@@ -27,7 +48,9 @@ export class CatalogDetailsComponent implements OnInit {
         private dialog: MatDialog,
         private router: Router,
         private route: ActivatedRoute,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private getFollowGQL: GetFollowGQL,
+        private authenticationService: AuthenticationService
     ) {
         this.route.fragment.pipe(takeUntil(this.unsubscribe$)).subscribe((fragment: string) => {
             const index = this.tabs.findIndex((tab) => tab === fragment);
@@ -55,6 +78,10 @@ export class CatalogDetailsComponent implements OnInit {
     }
 
     public ngOnInit(): void {
+        this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
+            this.currentUser = user;
+        });
+
         this.catalogSlug = this.route.snapshot.paramMap.get("catalogSlug");
         this.state = "LOADING";
         this.getCatalogGQL.fetch({ identifier: { catalogSlug: this.catalogSlug } }).subscribe(({ data, errors }) => {
@@ -70,6 +97,7 @@ export class CatalogDetailsComponent implements OnInit {
             }
 
             this.catalog = data.catalog as Catalog;
+            this.getFollow();
             this.state = "SUCCESS";
         });
     }
@@ -124,5 +152,48 @@ export class CatalogDetailsComponent implements OnInit {
 
     public get canEdit(): boolean {
         return this.catalog && this.catalog.myPermissions?.includes(Permission.EDIT);
+    }
+
+    public follow(): void {
+        this.openFollowModal()
+            .afterClosed()
+            .subscribe((result) => {
+                if (!result) {
+                    return;
+                }
+
+                this.updatePackageFollow(result.follow);
+            });
+    }
+
+    private getFollow(): void {
+        this.getFollowGQL
+            .fetch({
+                follow: this.buildFollowIdentifier()
+            })
+            .subscribe((response) => this.updatePackageFollow(response.data?.getFollow));
+    }
+
+    private openFollowModal(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
+        return this.dialog.open(FollowDialogComponent, {
+            width: "500px",
+            data: {
+                follow: this.catalogFollow,
+                followIdentifier: this.buildFollowIdentifier()
+            } as FollowDialogData
+        });
+    }
+
+    private buildFollowIdentifier(): FollowIdentifierInput {
+        return {
+            catalog: {
+                catalogSlug: this.catalogSlug
+            }
+        };
+    }
+
+    private updatePackageFollow(follow: Follow): void {
+        this.catalogFollow = follow;
+        this.isFollowing = follow != null;
     }
 }

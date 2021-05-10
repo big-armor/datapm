@@ -1,0 +1,30 @@
+@import "../../../../styles/colors";
+@import "../../../../styles/variables";
+
+#editMarkdown {
+    .app-raised-button {
+        font-size: 13px;
+        border-radius: 4px;
+        // border: 1px solid var(--gray-9-color);
+        line-height: 15px;
+    }
+
+    ::ng-deep .mat-spinner circle {
+        stroke: $secondary-color !important;
+    }
+
+    ::ng-deep #markdownEditor {
+        margin-bottom: 25px;
+    }
+}
+
+.alert-warning {
+    margin-bottom: 0px;
+}
+.back-btn {
+    position: absolute;
+    top: -20px;
+    &:hover {
+        text-decoration: none;
+    }
+}

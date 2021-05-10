@@ -1,7 +1,7 @@
 <div class="container" id="createIssue">
     <div class="row">
         <div class="col-md-12 p-0">
-            <ng-container>
+            <ng-container *ngIf="currentUser; else submitIssue">
                 <div class="text-main-title mb-2">
                     Describe Issue for <span *ngIf="!loading">{{ package.displayName }}</span>
                 </div>
@@ -33,6 +33,15 @@
                     </div>
                 </div>
             </ng-container>
+            <ng-template #submitIssue>
+                <div class="m-5 pt-2 text-center">
+                    <p class="text-dark-gray">
+                        You must <a class="doc-link cursor-pointer" (click)="openLoginDialog()"> login</a> to submit an
+                        issue. Don't have an account?
+                        <a class="doc-link cursor-pointer" (click)="openSignUpDialog()"> Sign up.</a>
+                    </p>
+                </div>
+            </ng-template>
         </div>
     </div>
 </div>

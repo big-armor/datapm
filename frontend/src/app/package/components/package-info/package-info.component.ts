@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { PackageFile } from "datapm-lib";
+import { CountPrecision, PackageFile } from "datapm-lib";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { AddPackageComponent } from "src/app/collection-details/add-package/add-package.component";
@@ -12,6 +12,7 @@ import { Package, User } from "src/generated/graphql";
 import { AddUserComponent } from "../add-user/add-user.component";
 import { ClientWizardComponent } from "./download-package/client-wizard/client-wizard.component";
 import { DownloadPackageComponent } from "./download-package/download-package.component";
+import { EditWebsiteDialogComponent } from "./edit-website-dialog/edit-website-dialog.component";
 
 @Component({
     selector: "app-package-info",
@@ -43,12 +44,29 @@ export class PackageInfoComponent implements OnInit, OnChanges {
         this.packageUnit = this.parsePackageUnit();
     }
 
-    public getRecordCount(packageFile): string {
+    public getRecordCount(packageFile: PackageFile): string {
         if (packageFile == null) {
             return "";
         }
 
-        return packageFile.schemas.reduce((a, b) => a + (b.recordCount || 0), 0);
+        const count = packageFile.schemas.reduce((a, b) => a + (b.recordCount || 0), 0);
+
+        let prefix = "";
+
+        let highestPrecision = CountPrecision.EXACT;
+
+        if (packageFile.schemas.find((s) => s.recordCountPrecision == CountPrecision.GREATER_THAN) != null)
+            highestPrecision = CountPrecision.GREATER_THAN;
+        else if (packageFile.schemas.find((s) => s.recordCountPrecision == CountPrecision.APPROXIMATE) != null)
+            highestPrecision = CountPrecision.APPROXIMATE;
+
+        if (highestPrecision == CountPrecision.GREATER_THAN) {
+            prefix = ">";
+        } else if (highestPrecision == CountPrecision.APPROXIMATE) {
+            prefix = "~";
+        }
+
+        return prefix + count;
     }
 
     public get generatedFetchCommand() {
@@ -106,6 +124,16 @@ export class PackageInfoComponent implements OnInit, OnChanges {
         const dialogRef = this.dialog.open(ClientWizardComponent, {
             width: "550px",
             panelClass: "my-custom-dialog"
+        });
+    }
+
+    public editLink() {
+        const dialogRef = this.dialog.open(EditWebsiteDialogComponent, {
+            width: "450px",
+            data: {
+                package: this.package,
+                packageFile: this.packageFile
+            }
         });
     }
 

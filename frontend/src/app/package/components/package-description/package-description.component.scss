@@ -59,6 +59,7 @@ markdown ::ng-deep {
         font-weight: $weight-400;
         font-size: ($text-font - 1);
         letter-spacing: 0.4px;
+        margin-bottom: 0px !important;
         color: var(--gray-2-color);
     }
 

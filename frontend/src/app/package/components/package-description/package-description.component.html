@@ -8,6 +8,9 @@
             {{ isShowingMoreReadMeText ? "Show Less" : "Show More" }}
         </a>
     </p>
+    <div class="text-dark-gray" *ngIf="canManage()">
+        <a class="color-info cursor-pointer" (click)="editReadme()">edit readme</a>
+    </div>
 </div>
 
 <div *ngIf="packageFile?.licenseMarkdown" class="pb-4">
@@ -20,6 +23,9 @@
             {{ isShowingMoreLicenseText ? "Show Less" : "Show More" }}
         </a>
     </p>
+    <div class="text-dark-gray" *ngIf="canManage()">
+        <a class="color-info cursor-pointer" (click)="editLicense()">edit license</a>
+    </div>
 </div>
 <h1>Preview</h1>
 
@@ -32,11 +38,13 @@
 </div>
 
 <ng-container *ngIf="packageFile">
-    <samples [package]="package" [schema]="selectedSchema"></samples>
+    <div class="mb-150">
+        <samples [package]="package" [schema]="selectedSchema"></samples>
+    </div>
 </ng-container>
 
 <ng-container *ngIf="packageFile">
-    <div class="mt-5 py-2">
+    <div class="mt-4 py-2">
         <div class="text-main-title mb-1">Schema</div>
         <div *ngIf="schemas?.length > 1">
             <mat-select (selectionChange)="selectSchema($event.value)" [value]="selectedSchema">
@@ -45,7 +53,7 @@
                 </mat-option>
             </mat-select>
         </div>
-        <schema [schema]="selectedSchema"></schema>
+        <schema [package]="package" [schema]="selectedSchema" [packageFile]="packageFile"></schema>
     </div>
 </ng-container>
 
@@ -53,13 +61,23 @@
     <div class="related-data-div mt-5">
         <div class="text-main-title mt-4 pt-2 mb-2">Related Data</div>
         <div class="text-dark-gray">Other data that are related to this package</div>
-        <ul class="ul-data">
-            <li *ngFor="let collection of collections">
-                <a class="text-dark-gray ul-links" (click)="goToCollection(collection.identifier.collectionSlug)">{{
-                    collection.name
-                }}</a>
-                <p class="text-light-gray" [class.p-width]="collection.description">{{ collection.description }}</p>
-            </li>
-        </ul>
+        <app-collections-horizontal-list [collections]="collections"></app-collections-horizontal-list>
+
+        <div *ngIf="relatedPackages.length">
+            <div class="text-main-title text-left no-pd-mobile">Packages</div>
+            <div *ngFor="let package of relatedPackages">
+                <app-package-item [item]="package"></app-package-item>
+            </div>
+
+            <div *ngIf="hasMorePackages" class="container text-center">
+                <button
+                    class="app-outlined-button ctaButton"
+                    [class.disabled]="loadingPackages"
+                    (click)="requestMorePackages()"
+                >
+                    Load More
+                </button>
+            </div>
+        </div>
     </div>
 </ng-container>

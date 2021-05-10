@@ -1,7 +1,6 @@
 import fs from "fs";
 import { promisify } from "util";
 import { makeExecutableSchema } from "apollo-server";
-
 import { resolvers } from "./resolvers";
 import { IsAuthenticatedDirective } from "./directive/isAuthenticatedDirective";
 import { HasCatalogPermissionDirective } from "./directive/hasCatalogPermissionDirective";

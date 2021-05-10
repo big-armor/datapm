@@ -169,7 +169,7 @@ async function main() {
     });
 
     app.use("/docs/datapm-package-file-schema-*", function (req, res, next) {
-        const version = req.url.match(/^\/docs\/datapm-package-file-schema-v(.*)\.json$/i);
+        const version = req.baseUrl.match(/^\/docs\/datapm-package-file-schema-v(.*)\.json$/i);
         if (version == null) {
             res.sendStatus(404);
             return;
@@ -188,7 +188,7 @@ async function main() {
         }
     });
 
-    // these three routes serve angular static content
+    // These three routes serve angular static content
     app.use(
         "/static",
         express.static(path.join(__dirname, "..", "static"), {
@@ -214,7 +214,18 @@ async function main() {
     app.use("/assets", express.static(path.join(__dirname, "..", "static", "assets")));
     app.use("/favicon.ico", express.static(path.join(__dirname, "favicon.ico")));
 
-    // set express for the Apollo GraphQL server
+    app.use(
+        "/static/builder-io-templates",
+        express.static(path.join(__dirname, "static", "builder-io-templates"), {
+            setHeaders: (res, path) => {
+                // set cache to 1 year for anything that includes a hash
+                const maxAge = path.match(/\.[a-fA-F0-9]{20}\.[^\/]+$/) ? 31536000 : 0;
+                res.setHeader("Cache-Control", `public, max-age=${maxAge}`);
+            }
+        })
+    );
+
+    // Set express for the Apollo GraphQL server
     server.applyMiddleware({ app, bodyParserConfig: { limit: "20mb" } });
 
     const respondWithImage = async (imageStream: Readable, response: express.Response) => {

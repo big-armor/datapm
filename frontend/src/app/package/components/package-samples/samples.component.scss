@@ -8,8 +8,8 @@
 }
 
 #sampleTable {
-    width: 100%;
-
+    border-collapse: unset;
+    width: -webkit-fill-available;
     tbody {
         overflow-y: scroll;
     }
@@ -17,37 +17,41 @@
 
 .mat-table {
     overflow: scroll;
-    border-left: 1px solid var(--gray-9-color);
+    // border-left: 1px solid var(--gray-9-color);
 }
 
 .mat-header-cell {
-    padding: 8px 8px 8px 8px;
+    padding: 6px 6px;
+    color: var(--gray-2-color);
+    background-color: var(--custom-th-color);
     border-right: 1px solid var(--gray-4-color);
     border-top: -1px solid var(--gray-9-color);
     border-bottom: 1px solid var(--gray-9-color);
-    max-height: 40px;
-    height: 40px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    color: var(--gray-2-color);
-    background-color: var(--custom-th-color);
+
+    &:last-child {
+        border-right: none;
+    }
 }
 
 .mat-cell {
-    padding: 8px 8px 8px 8px;
     border-right: 1px solid var(--gray-9-color);
     border-bottom: 1px solid var(--gray-9-color);
-    max-height: 40px;
-    height: 40px;
+    padding: 0px 6px;
     font-family: $family-roboto;
     font-weight: $weight-400;
     font-size: $small-font;
     letter-spacing: 0.4px;
     color: var(--gray-2-color);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+
+    &:last-child {
+        border-right: none;
+    }
+}
+
+th.mat-header-cell:first-of-type,
+td.mat-cell:first-of-type,
+td.mat-footer-cell:first-of-type {
+    padding-left: 6px;
 }
 
 .oddRow {
@@ -55,7 +59,7 @@
 }
 
 tr.mat-header-row {
-    height: 40px !important;
+    height: unset !important;
     background-color: var(--custom-th-color);
 }
 

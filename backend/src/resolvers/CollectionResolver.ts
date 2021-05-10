@@ -11,8 +11,7 @@ import {
     Collection,
     ActivityLogEventType,
     ActivityLogChangeType,
-    ActivityLogResult,
-    CollectionBasicData
+    ActivityLogResult
 } from "../generated/graphql";
 import { CollectionPackageRepository } from "../repository/CollectionPackageRepository";
 import { CollectionRepository } from "../repository/CollectionRepository";
@@ -32,23 +31,19 @@ import { packageEntityToGraphqlObject } from "./PackageResolver";
 import { ReservedKeywordsService } from "../service/reserved-keywords-service";
 import { activtyLogEntityToGraphQL } from "./ActivityLogResolver";
 
+export const collectionEntityToGraphQLOrNull = (collectionEntity: CollectionEntity): Collection | null => {
+    if (!collectionEntity) {
+        return null;
+    }
+
+    return collectionEntityToGraphQL(collectionEntity);
+};
+
 export const collectionEntityToGraphQL = (collectionEntity: CollectionEntity): Collection => {
     return {
         identifier: {
             collectionSlug: collectionEntity.collectionSlug
         }
-    };
-};
-
-export const collectionEntityToGraphQLWithNameAndDescription = (
-    collectionEntity: CollectionEntity
-): CollectionBasicData => {
-    return {
-        identifier: {
-            collectionSlug: collectionEntity.collectionSlug
-        },
-        name: collectionEntity.name,
-        description: collectionEntity.description
     };
 };
 
@@ -386,7 +381,7 @@ export const getPackageCollections = async (
 
     return {
         hasMore: count - (offset + limit) > 0,
-        collections: collections.map((c) => collectionEntityToGraphQLWithNameAndDescription(c)),
+        collections: collections.map((c) => collectionEntityToGraphQL(c)),
         count
     };
 };

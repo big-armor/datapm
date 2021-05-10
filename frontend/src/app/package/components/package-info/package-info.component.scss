@@ -13,17 +13,27 @@
     .share-btn {
         ::ng-deep .mat-raised-button {
             box-shadow: none;
-            line-height: 13px;
-            padding: 6px 10px;
+            line-height: 10px;
+            padding: 9px 10px;
             border: 1px solid var(--gray-9-color);
         }
+    }
+
+    .edit-link {
+        float: left;
+        margin-top: -4px;
     }
 
     .doc-link {
         font-size: $small-font;
         cursor: pointer;
         line-height: 18px;
+        font-weight: $weight-400;
         color: var(--info-color);
+
+        &:hover {
+            text-decoration: none;
+        }
     }
 }
 

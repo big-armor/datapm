@@ -40,8 +40,12 @@ h3 {
     color: var(--gray-1-color);
 }
 
+.gray-txt {
+    color: var(--gray-2-color);
+}
+
 .color-info {
-    color: var(--info-color);
+    color: var(--info-color) !important;
 
     &:hover {
         text-decoration: none;
@@ -138,8 +142,28 @@ table.gray-table {
     }
 }
 
-.font-500 {
-    font-weight: 500;
+.theme-color {
+    color: var(--primary-color);
+}
+
+.weight-500 {
+    font-weight: 500 !important;
+}
+
+.font-14 {
+    font-size: 14px !important;
+}
+
+.doc-link {
+    font-size: $small-font;
+    cursor: pointer;
+    line-height: 18px;
+    font-weight: $weight-400;
+    color: var(--info-color);
+
+    &:hover {
+        text-decoration: none;
+    }
 }
 
 .mat-menu-panel,
@@ -196,6 +220,7 @@ table.gray-table {
 .text-overflow-elipses {
     white-space: nowrap;
     overflow: hidden;
+    width: 100%;
     text-overflow: ellipsis;
 }
 
@@ -262,6 +287,7 @@ table.gray-table {
     outline: none;
     letter-spacing: 0.5px;
     color: var(--gray-1-color);
+    border-color: var(--gray-5-color) !important;
     font-family: $family-roboto;
     background-color: var(--gray-7-color) !important;
 
@@ -324,12 +350,12 @@ table.gray-table {
 mat-select {
     background-color: var(--custom-secondary-color);
     padding: 10px 16px;
-    letter-spacing: 0.7px;
+    letter-spacing: 0.5px;
     font-family: $family-roboto;
 
     &::placeholder {
         font-family: $family-roboto;
-        letter-spacing: 0.7px;
+        letter-spacing: 0.5px;
         font-weight: $weight-300 !important;
         font-size: $text-font;
     }
@@ -346,7 +372,7 @@ mat-select {
     height: 44px;
     border: none;
     outline: none;
-    letter-spacing: 0.7px;
+    letter-spacing: 0.5px;
     background-color: var(--custom-secondary-color);
     font-family: $family-roboto;
     color: var(--gray-1-color);
@@ -359,7 +385,7 @@ mat-select {
 
     &::placeholder {
         font-family: $family-roboto;
-        letter-spacing: 0.7px;
+        letter-spacing: 0.5px;
         opacity: 0.9;
         color: var(--gray-3-color);
         font-weight: $weight-300;
@@ -369,34 +395,47 @@ mat-select {
 
 .app-raised-button {
     outline: none !important;
-    border-radius: 6px;
+    border-radius: 4px;
     border: 1px solid var(--tranparent-border);
     font-family: $family-roboto;
     font-style: $style-normal;
     font-weight: $weight-400;
-    font-size: $text-font;
+    font-size: ($text-font - 1);
     align-items: center;
     text-align: center;
     padding: 8px 15px;
     color: $secondary-color;
-    background-color: var(--custom-info-color);
+    background-color: var(--info-color);
     transition: background-color ease 0.5s;
 
     &:hover {
-        background-color: var(--custom-info-hover-color);
+        background-color: var(--info-hover-color);
+        border: 1px solid var(--info-hover-color);
         transition: background-color ease 0.5s;
     }
 
     &:active {
         box-shadow: none !important;
     }
+}
 
-    &:disabled {
-        background-color: var(--gray-5-color);
-        pointer-events: none;
-        opacity: 0.5;
+.app-raised-button.follow-btn {
+    padding: 8px 8px;
+    width: 100px;
+    line-height: 13px;
+    border-radius: 4px;
+    border: 1px solid var(--info-color);
+    background-color: var(--info-color);
+
+    em {
+        margin-right: 4px;
     }
 }
+
+// .app-outlined-button.follow-btn {
+//     padding: 7px 10px;
+//     line-height: 13px;
+// }
 
 .raised {
     box-shadow: var(--outer-shadow-1) !important;
@@ -446,10 +485,10 @@ mat-select {
     font-weight: $weight-400;
     font-size: ($text-font - 1);
     background: var(--custom-secondary-color);
-    line-height: 13px;
+    line-height: 14px;
     color: var(--info-color);
     border: 1px solid var(--gray-9-color);
-    padding: 6px 15px;
+    padding: 8px 15px;
     border-radius: 4px;
     cursor: pointer;
 
@@ -461,7 +500,7 @@ mat-select {
     &:hover {
         color: var(--info-color);
         text-decoration: none;
-        background-color: var(--custom-secondary-color);
+        background: var(--custom-secondary-hover-color);
     }
 
     .delete-txt {
@@ -544,7 +583,7 @@ mat-select {
 }
 
 .mat-option {
-    letter-spacing: 0.5px;
+    letter-spacing: 0.4px;
     font-family: $family-roboto;
     font-style: $style-normal;
     font-size: $text-font;
@@ -629,7 +668,7 @@ textarea.flat-input,
 .flat-input-parent textarea {
     height: 35px;
     width: 100%;
-    border-radius: 6px;
+    border-radius: 4px;
     padding: 0px 15px;
     border: none !important;
     font-family: $family-roboto;
@@ -663,9 +702,9 @@ textarea.flat-input,
 }
 
 button.save-btn {
-    color: var(--gray-3-color);
+    color: var(--gray-2-color);
     position: relative;
-    top: 4px;
+    top: 2px;
     text-align: center;
     width: 80px;
     height: 32px;
@@ -673,6 +712,7 @@ button.save-btn {
     font-weight: $weight-400;
     border-radius: 6px;
     letter-spacing: 0.4px;
+    cursor: pointer;
     background-color: transparent;
     box-shadow: var(--outer-shadow-1);
     border-color: transparent;
@@ -680,6 +720,10 @@ button.save-btn {
     font-style: $style-normal;
     font-size: $text-font;
     line-height: unset;
+
+    &:hover {
+        background-color: var(--gray-10-color);
+    }
 
     .mat-spinner {
         margin: 0 auto;
@@ -693,9 +737,11 @@ button:focus {
 
 .disabled,
 button:disabled {
-    background-color: var(--gray-5-color);
+    background-color: var(--gray-5-color) !important;
+    border: 1px solid var(--gray-5-color) !important;
+    color: var(--gray-3-color) !important;
     pointer-events: none;
-    opacity: 0.6;
+    opacity: 0.5;
 }
 
 .mat-button.mat-primary[disabled],
@@ -778,6 +824,10 @@ button:disabled {
     margin-bottom: -12px !important;
 }
 
+.mb-150 {
+    margin-bottom: 150px !important;
+}
+
 .long-txt {
     width: 300px;
 }
@@ -795,7 +845,7 @@ button:disabled {
 }
 
 .close-dialog {
-    color: var(--gray-1-color);
+    color: var(--gray-2-color);
 }
 
 .mat-dialog-without-padding {
@@ -936,13 +986,26 @@ button:disabled {
     }
 }
 
+.permission-div.modal-select {
+    mat-select {
+        color: var(--gray-2-color);
+        padding: 10px;
+    }
+
+    .mat-form-field-wrapper {
+        padding: 0px 0px 10px 0px !important;
+    }
+}
+
 .permission-div {
     mat-select {
         font-family: $family-roboto;
         font-style: $style-normal;
         font-weight: $weight-400;
         font-size: $text-font;
-        letter-spacing: unset;
+        border: 1px solid var(--gray-9-color);
+        letter-spacing: 0.5px;
+        border-radius: 4px;
         color: var(--gray-2-color);
         padding: 10px;
     }
@@ -960,7 +1023,7 @@ button:disabled {
     }
 
     .mat-form-field-wrapper {
-        padding: 10px 0px !important;
+        padding: 10px 0px 10px 0px !important;
     }
 
     .mat-form-field-flex {
@@ -970,6 +1033,14 @@ button:disabled {
     .mat-form-field-infix {
         border-top: 0px;
         padding: 0px;
+    }
+}
+
+.mat-dialog-actions {
+    button {
+        &:hover {
+            background-color: var(--gray-10-color);
+        }
     }
 }
 

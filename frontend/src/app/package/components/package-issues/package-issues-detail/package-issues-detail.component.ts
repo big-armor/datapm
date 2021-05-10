@@ -1,16 +1,27 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
 import { combineLatest, Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 import { PackageService } from "src/app/package/services/package.service";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { ConfirmationDialogService } from "src/app/services/dialog/confirmation-dialog.service";
+import { DialogService } from "src/app/services/dialog/dialog.service";
 import { ImageService } from "src/app/services/image.service";
+import {
+    FollowDialogComponent,
+    FollowDialogData,
+    FollowDialogResult
+} from "src/app/shared/dialogs/follow-dialog/follow-dialog.component";
 import { MarkdownEditorComponent } from "src/app/shared/markdown-editor/markdown-editor.component";
 import {
     CreatePackageIssueCommentGQL,
     DeletePackageIssueCommentGQL,
     DeletePackageIssueGQL,
+    Follow,
+    FollowIdentifierInput,
+    GetFollowGQL,
     OrderBy,
     PackageIdentifierInput,
     PackageIssue,
@@ -77,8 +88,14 @@ export class PackageIssuesDetailComponent implements OnInit {
     public isUserPackageManager: boolean = false;
     public canEditIssue: boolean = false;
 
+    public issueFollow: Follow;
+    public isFollowing: boolean;
+
     public user: User;
     private commentsOffset = 0;
+
+    public currentUser: User;
+    private unsubscribe$ = new Subject();
 
     constructor(
         private authenticationService: AuthenticationService,
@@ -94,7 +111,10 @@ export class PackageIssuesDetailComponent implements OnInit {
         private imageService: ImageService,
         private confirmationDialogService: ConfirmationDialogService,
         private router: Router,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private getFollowGQL: GetFollowGQL,
+        private dialog: MatDialog,
+        private dialogService: DialogService
     ) {}
 
     public ngOnInit(): void {
@@ -105,6 +125,18 @@ export class PackageIssuesDetailComponent implements OnInit {
         } else {
             this.errorMessage = "Invalid issue number";
         }
+
+        this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
+            this.currentUser = user;
+        });
+    }
+
+    public openSignUpDialog(): void {
+        this.dialogService.openSignupDialog();
+    }
+
+    public openLoginDialog(): void {
+        this.dialogService.openLoginDialog();
     }
 
     public updateIssue(): void {
@@ -339,6 +371,50 @@ export class PackageIssuesDetailComponent implements OnInit {
         return this.isUserPackageManager || (this.user && comment.author.username === this.user.username);
     }
 
+    public follow(): void {
+        this.openFollowModal()
+            .afterClosed()
+            .subscribe((result) => {
+                if (!result) {
+                    return;
+                }
+
+                this.updatePackageFollow(result.follow);
+            });
+    }
+
+    private getFollow(): void {
+        this.getFollowGQL
+            .fetch({
+                follow: this.buildFollowIdentifier()
+            })
+            .subscribe((response) => this.updatePackageFollow(response.data?.getFollow));
+    }
+
+    private openFollowModal(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
+        return this.dialog.open(FollowDialogComponent, {
+            width: "500px",
+            data: {
+                follow: this.issueFollow,
+                followIdentifier: this.buildFollowIdentifier()
+            } as FollowDialogData
+        });
+    }
+
+    private buildFollowIdentifier(): FollowIdentifierInput {
+        return {
+            packageIssue: {
+                packageIdentifier: this.packageIdentifier,
+                issueNumber: this.packageIssue.issueNumber
+            }
+        };
+    }
+
+    private updatePackageFollow(follow: Follow): void {
+        this.issueFollow = follow;
+        this.isFollowing = follow != null;
+    }
+
     private changeIssueStatus(status: PackageIssueStatus): void {
         this.updatePackageIssueStatusGQL
             .mutate({
@@ -395,6 +471,7 @@ export class PackageIssuesDetailComponent implements OnInit {
                     this.isUserPackageManager ||
                     (this.user && this.packageIssue.author.username === this.user.username);
                 this.packageIssueEditedContent = this.packageIssue.content;
+                this.getFollow();
                 this.loadPackageIssueComments();
             });
     }

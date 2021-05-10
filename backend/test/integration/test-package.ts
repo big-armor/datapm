@@ -328,7 +328,7 @@ describe("Package Tests", async () => {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("bf1184b458675a53c3f997c651559936999426199b9f67dcad55bcfc4b1e101b");
+        expect(responseHash).equal("0f3fb8c85f1b3e121edb624c7a380b8c7d3ab95ed61139d4838a00bb81e129b5");
 
         const responsePackageFile = parsePackageFileJSON(responsePackageFileContents);
 
@@ -555,10 +555,10 @@ describe("Package Tests", async () => {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("bf1184b458675a53c3f997c651559936999426199b9f67dcad55bcfc4b1e101b");
+        expect(responseHash).equal("0f3fb8c85f1b3e121edb624c7a380b8c7d3ab95ed61139d4838a00bb81e129b5");
     });
 
-    it("User A publish second version - fail no changes", async function () {
+    it("User A publish second version - allow update without version change", async function () {
         let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
 
         const packageFileString = JSON.stringify(packageFileContents);
@@ -576,11 +576,10 @@ describe("Package Tests", async () => {
             }
         });
 
-        expect(response.errors != null, "should have errors").to.equal(true);
-        expect(
-            response.errors!.find((e) => e.extensions!.code == "VERSION_EXISTS") != null,
-            "should have version exists"
-        ).equal(true);
+        expect(response.errors == null, "should not have errors").to.equal(true);
+        expect(response.data!.createVersion.identifier.versionMajor).equal(1);
+        expect(response.data!.createVersion.identifier.versionMinor).equal(0);
+        expect(response.data!.createVersion.identifier.versionPatch).equal(0);
     });
 
     it("User A publish malformed package JSON", async function () {
@@ -1579,13 +1578,13 @@ describe("Package Tests", async () => {
                             expect(differences[0].pointer).to.equal("#");
                             expect(differences[0].type).to.equal("CHANGE_VERSION");
 
-                            expect(differences[1].pointer).to.equal("#/legislators-current.csv");
+                            expect(differences[1].pointer).to.equal("#/legislators-current.csv/properties/last_name");
                             expect(differences[1].type).to.equal("REMOVE_PROPERTY");
 
-                            expect(differences[2].pointer).to.equal("#/legislators-current.csv/properties/last_name");
-                            expect(differences[2].type).to.equal("ADD_PROPERTY");
+                            expect(differences[2].pointer).to.equal("#/legislators-current.csv/properties/middle_name");
+                            expect(differences[2].type).to.equal("REMOVE_PROPERTY");
 
-                            expect(differences[3].pointer).to.equal("#/legislators-current.csv/properties/middle_name");
+                            expect(differences[3].pointer).to.equal("#/legislators-current.csv/properties/nick_name");
                             expect(differences[3].type).to.equal("ADD_PROPERTY");
                         }
                     }
@@ -1675,13 +1674,13 @@ describe("Package Tests", async () => {
                             expect(differences[0].pointer).to.equal("#");
                             expect(differences[0].type).to.equal("CHANGE_VERSION");
 
-                            expect(differences[1].pointer).to.equal("#/legislators-current.csv");
+                            expect(differences[1].pointer).to.equal("#/legislators-current.csv/properties/last_name");
                             expect(differences[1].type).to.equal("REMOVE_PROPERTY");
 
-                            expect(differences[2].pointer).to.equal("#/legislators-current.csv/properties/last_name");
-                            expect(differences[2].type).to.equal("ADD_PROPERTY");
+                            expect(differences[2].pointer).to.equal("#/legislators-current.csv/properties/middle_name");
+                            expect(differences[2].type).to.equal("REMOVE_PROPERTY");
 
-                            expect(differences[3].pointer).to.equal("#/legislators-current.csv/properties/middle_name");
+                            expect(differences[3].pointer).to.equal("#/legislators-current.csv/properties/nick_name");
                             expect(differences[3].type).to.equal("ADD_PROPERTY");
                         }
                     }
@@ -1800,16 +1799,18 @@ describe("Package Tests", async () => {
                                 expect(differences[0].pointer).to.equal("#");
                                 expect(differences[0].type).to.equal("CHANGE_VERSION");
 
-                                expect(differences[1].pointer).to.equal("#/legislators-current.csv");
+                                expect(differences[1].pointer).to.equal(
+                                    "#/legislators-current.csv/properties/last_name"
+                                );
                                 expect(differences[1].type).to.equal("REMOVE_PROPERTY");
 
                                 expect(differences[2].pointer).to.equal(
-                                    "#/legislators-current.csv/properties/last_name"
+                                    "#/legislators-current.csv/properties/middle_name"
                                 );
-                                expect(differences[2].type).to.equal("ADD_PROPERTY");
+                                expect(differences[2].type).to.equal("REMOVE_PROPERTY");
 
                                 expect(differences[3].pointer).to.equal(
-                                    "#/legislators-current.csv/properties/middle_name"
+                                    "#/legislators-current.csv/properties/nick_name"
                                 );
                                 expect(differences[3].type).to.equal("ADD_PROPERTY");
                             }

@@ -1,7 +1,14 @@
+<hr class="header-border" />
 <div class="container">
-    <ng-container *ngIf="!loading">
-        <ng-container *ngIf="html; else backupTemplate"> <div [innerHTML]="html | safeHtml"></div></ng-container>
-    </ng-container>
+    <div class="row">
+        <div class="col-lg-12">
+            <ng-container *ngIf="!loading">
+                <ng-container *ngIf="html; else backupTemplate">
+                    <div [innerHTML]="html | safeHtml"></div
+                ></ng-container>
+            </ng-container>
 
-    <ng-template #backupTemplate>Not found</ng-template>
+            <ng-template #backupTemplate>Not found</ng-template>
+        </div>
+    </div>
 </div>
