@@ -327,7 +327,7 @@ async function main() {
         }
     });
 
-    app.route("/data/:catalogSlug/:packageSlug/:version")
+    app.route("/data/:catalogSlug/:packageSlug/:version/:sourceSlug")
         .post(async (req, res, next) => {
             try {
                 const contextObject = await context({ req });
@@ -336,6 +336,7 @@ async function main() {
                     req.params.catalogSlug,
                     req.params.packageSlug,
                     req.params.version,
+                    req.params.sourceSlug,
                     req
                 );
                 res.send();
@@ -351,7 +352,8 @@ async function main() {
                     contextObject,
                     req.params.catalogSlug,
                     req.params.packageSlug,
-                    req.params.version
+                    req.params.version,
+                    req.params.sourceSlug
                 );
                 stream.pipe(res);
             } catch (err) {

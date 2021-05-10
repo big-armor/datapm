@@ -3,6 +3,7 @@ import { Readable } from "stream";
 import * as fs from "fs";
 import { DpmStorageStreamHolder } from "./dpm-storage-stream-holder";
 import { StorageErrors } from "./files/file-storage-service";
+import sanitize from "sanitize-filename";
 
 export class FileStorage implements DPMStorage {
     public static readonly SCHEMA_URL_PREFIX = "file";
@@ -26,12 +27,14 @@ export class FileStorage implements DPMStorage {
     }
 
     public itemExists(namespace: string, itemId: string): Promise<boolean> {
-        const path = this.buildPath(namespace, itemId);
+        const sanitizedItemId = sanitize(itemId);
+        const path = this.buildPath(namespace, sanitizedItemId);
         return Promise.resolve(fs.existsSync(path));
     }
 
     public deleteItem(namespace: string, itemId: string): Promise<void> {
-        const path = this.buildPath(namespace, itemId);
+        const sanitizedItemId = sanitize(itemId);
+        const path = this.buildPath(namespace, sanitizedItemId);
 
         if (!fs.existsSync(path)) return Promise.resolve();
 
@@ -40,7 +43,8 @@ export class FileStorage implements DPMStorage {
     }
 
     public async getItem(namespace: string, itemId: string): Promise<Readable> {
-        const path = this.buildPath(namespace, itemId);
+        const sanitizedItemId = sanitize(itemId);
+        const path = this.buildPath(namespace, sanitizedItemId);
 
         if (!fs.existsSync(path)) {
             throw new Error(StorageErrors.FILE_DOES_NOT_EXIST);
@@ -53,7 +57,8 @@ export class FileStorage implements DPMStorage {
 
     public async writeItem(namespace: string, itemId: string, byteStream: Readable, transformer?: any): Promise<void> {
         this.createItemDirectoryIfMissing(namespace);
-        const path = this.buildPath(namespace, itemId);
+        const sanitizedItemId = sanitize(itemId);
+        const path = this.buildPath(namespace, sanitizedItemId);
         const writeStream = fs.createWriteStream(path);
         return this.streamHelper.copyToStream(byteStream, writeStream, transformer);
     }

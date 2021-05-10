@@ -7,9 +7,12 @@ import request = require("superagent");
 import { loadPackageFileFromDisk } from "datapm-lib";
 import fs from "fs";
 import { TEMP_STORAGE_PATH } from "./setup";
+import sanitize from "sanitize-filename";
 
 describe("Package Data Tests", async () => {
     const DATA_ENDPOINT_URL = "localhost:4000/data";
+    const ORIGINAL_SOURCE_SLUG = "https://theunitedstates.io/congress-legislators/legislators-current.csv";
+    const URL_ENCODED_SOURCE_SLUG = "https%3A%2F%2Ftheunitedstates.io%2Fcongress-legislators%2Flegislators-current.csv";
 
     const userAUsername = "legislatorA";
     const userBUsername = "legislatorB";
@@ -91,7 +94,7 @@ describe("Package Data Tests", async () => {
         });
 
         const version = "1.0.0";
-        const url = `${DATA_ENDPOINT_URL}/${userAUsername}/${packageSlug}/${version}`;
+        const url = `${DATA_ENDPOINT_URL}/${userAUsername}/${packageSlug}/${version}/${URL_ENCODED_SOURCE_SLUG}`;
         const dataRequest = request.post(url);
         const dataFile = fs.readFileSync("test/data-files/data.avro");
 
@@ -133,14 +136,15 @@ describe("Package Data Tests", async () => {
         });
 
         const version = "1.0.0";
-        const url = `${DATA_ENDPOINT_URL}/${userAUsername}/${packageSlug}/${version}`;
+        const url = `${DATA_ENDPOINT_URL}/${userAUsername}/${packageSlug}/${version}/${URL_ENCODED_SOURCE_SLUG}`;
 
         const dataFile = fs.readFileSync("test/data-files/data.avro");
         const dataUploadResponse = await request.post(url).set("Authorization", userAToken).send(dataFile);
 
         expect(dataUploadResponse.status).equal(200);
 
-        const storageLocation = `${TEMP_STORAGE_PATH}/data/${userAUsername}/${packageSlug}/${version}.avro`;
+        const sanitizedSlug = sanitize(ORIGINAL_SOURCE_SLUG);
+        const storageLocation = `${TEMP_STORAGE_PATH}/data/${userAUsername}/${packageSlug}/${version}/${sanitizedSlug}`;
         const storedFile = fs.readFileSync(storageLocation).toString("base64");
         expect(dataFile.toString("base64")).equal(storedFile);
     });
@@ -176,7 +180,7 @@ describe("Package Data Tests", async () => {
         });
 
         const version = "1.0.0";
-        const url = `${DATA_ENDPOINT_URL}/${userAUsername}/${packageSlug}-invalid/${version}`;
+        const url = `${DATA_ENDPOINT_URL}/${userAUsername}/${packageSlug}-invalid/${version}/${URL_ENCODED_SOURCE_SLUG}`;
 
         const dataFile = fs.readFileSync("test/data-files/data.avro");
         const dataUploadRequest = request.post(url).set("Authorization", userAToken).send(dataFile);
@@ -216,7 +220,7 @@ describe("Package Data Tests", async () => {
         });
 
         const version = "1.0.0";
-        const url = `${DATA_ENDPOINT_URL}/${userAUsername}/${packageSlug}/${version}`;
+        const url = `${DATA_ENDPOINT_URL}/${userAUsername}/${packageSlug}/${version}/${URL_ENCODED_SOURCE_SLUG}`;
         const dataFile = fs.readFileSync("test/data-files/data.avro");
         await request.post(url).set("Authorization", userAToken).send(dataFile);
 
@@ -259,7 +263,7 @@ describe("Package Data Tests", async () => {
         });
 
         const version = "1.0.0";
-        const url = `${DATA_ENDPOINT_URL}/${userAUsername}/${packageSlug}/${version}`;
+        const url = `${DATA_ENDPOINT_URL}/${userAUsername}/${packageSlug}/${version}/${URL_ENCODED_SOURCE_SLUG}`;
         const dataFile = fs.readFileSync("test/data-files/data.avro");
         await request.post(url).set("Authorization", userAToken).send(dataFile);
 
@@ -272,7 +276,7 @@ describe("Package Data Tests", async () => {
         const packageSlug = "legislators-6";
 
         const version = "1.0.0";
-        const url = `${DATA_ENDPOINT_URL}/${userAUsername}/${packageSlug}/${version}`;
+        const url = `${DATA_ENDPOINT_URL}/${userAUsername}/${packageSlug}/${version}/${URL_ENCODED_SOURCE_SLUG}`;
         const dataDownloadRequest = request.get(url).buffer(true).set("Authorization", userAToken);
 
         let threwException = false;
