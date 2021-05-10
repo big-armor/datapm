@@ -82,6 +82,15 @@ export class CatalogRepository extends Repository<CatalogEntity> {
             .getOne();
     }
 
+    public async findAllUnclaimed(relations: string[] = []) {
+        return await this.manager
+            .getRepository(CatalogEntity)
+            .createQueryBuilder("catalog")
+            .where("unclaimed IS true")
+            .addRelations("catalog", relations)
+            .getMany();
+    }
+
     async findCatalogBySlugOrFail(slug: string, relations?: string[]): Promise<CatalogEntity> {
         const catalog = await this.manager
             .getRepository(CatalogEntity)

@@ -81,6 +81,14 @@ export const catalogIsPublic = async (parent: Catalog, _1: any, context: Context
     return catalog.isPublic;
 };
 
+export const catalogIsUnclaimed = async (parent: Catalog, _1: any, context: Context): Promise<boolean> => {
+    const catalog = await context.connection
+        .getCustomRepository(CatalogRepository)
+        .findCatalogBySlugOrFail(parent.identifier.catalogSlug);
+
+    return catalog.unclaimed;
+};
+
 export const catalogDisplayName = async (parent: Catalog, _1: any, context: Context) => {
     const catalog = await context.connection
         .getCustomRepository(CatalogRepository)
@@ -314,8 +322,14 @@ export const myCatalogs = async (_0: any, {}, context: AuthenticatedContext) => 
         .getCustomRepository(UserCatalogPermissionRepository)
         .findByUser({ username: context.me?.username, relations: ["catalog"] });
 
-    return permissions
-        .filter((p) => p.catalog != null)
-        .map((p) => p.catalog)
-        .map((c) => catalogEntityToGraphQL(c));
+    const catalogs = permissions.filter((p) => p.catalog != null).map((p) => p.catalog);
+
+    if (context.me.isAdmin) {
+        const unclaimedCatalogs = await context.connection.manager
+            .getCustomRepository(CatalogRepository)
+            .findAllUnclaimed();
+        catalogs.push(...unclaimedCatalogs);
+    }
+
+    return catalogs.map((c) => catalogEntityToGraphQL(c));
 };

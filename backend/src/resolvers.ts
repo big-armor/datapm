@@ -138,6 +138,7 @@ import {
     catalogEntityToGraphQL,
     catalogIdentifier,
     catalogIsPublic,
+    catalogIsUnclaimed,
     catalogPackagesForUser,
     catalogWebsite,
     createCatalog,
@@ -442,7 +443,8 @@ export const resolvers: {
         description: catalogDescription,
         displayName: catalogDisplayName,
         website: catalogWebsite,
-        isPublic: catalogIsPublic
+        isPublic: catalogIsPublic,
+        unclaimed: catalogIsUnclaimed
     },
     Collection: {
         name: collectionName,
