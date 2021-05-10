@@ -145,8 +145,48 @@ describe("Package Data Tests", async () => {
         expect(dataFile.toString("base64")).equal(storedFile);
     });
 
-    it("Should not allow user to download data for package without view permissions", async function () {
+    it("Should not allow storing data for invalid package", async function () {
         const packageSlug = "legislators-3";
+
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: userAUsername,
+                    packageSlug: packageSlug,
+                    displayName: "Congressional LegislatorsA",
+                    description: "Test upload of congressional legislatorsA"
+                }
+            }
+        });
+        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileString = JSON.stringify(packageFileContents);
+
+        await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: userAUsername,
+                    packageSlug: packageSlug
+                },
+                value: {
+                    packageFile: packageFileString
+                }
+            }
+        });
+
+        const version = "1.0.0";
+        const url = `${DATA_ENDPOINT_URL}/${userAUsername}/${packageSlug}-invalid/${version}`;
+
+        const dataFile = fs.readFileSync("test/data-files/data.avro");
+        const dataUploadRequest = request.post(url).set("Authorization", userAToken).send(dataFile);
+
+        let threwException = false;
+        dataUploadRequest.catch(() => (threwException = true)).then(() => expect(threwException).equal(true));
+    });
+
+    it("Should not allow user to download data for package without view permissions", async function () {
+        const packageSlug = "legislators-4";
 
         await userAClient.mutate({
             mutation: CreatePackageDocument,
@@ -189,7 +229,7 @@ describe("Package Data Tests", async () => {
     });
 
     it("Should allow user to download data for package with view permissions", async function () {
-        const packageSlug = "legislators-4";
+        const packageSlug = "legislators-5";
 
         await userAClient.mutate({
             mutation: CreatePackageDocument,
@@ -226,5 +266,16 @@ describe("Package Data Tests", async () => {
         const downloadResponse = await request.get(url).buffer(true).set("Authorization", userAToken);
         const downloadData = downloadResponse.body.toString("base64");
         expect(downloadData).equal(dataFile.toString("base64"));
+    });
+
+    it("Should not download any data for invalid packages", async function () {
+        const packageSlug = "legislators-6";
+
+        const version = "1.0.0";
+        const url = `${DATA_ENDPOINT_URL}/${userAUsername}/${packageSlug}/${version}`;
+        const dataDownloadRequest = request.get(url).buffer(true).set("Authorization", userAToken);
+
+        let threwException = false;
+        dataDownloadRequest.catch(() => (threwException = true)).then(() => expect(threwException).equal(true));
     });
 });
