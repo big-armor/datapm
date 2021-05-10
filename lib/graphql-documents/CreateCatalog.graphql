@@ -8,5 +8,6 @@ mutation CreateCatalog($value: CreateCatalogInput!) {
         description
         website
         isPublic
+        unclaimed
     }
 }
