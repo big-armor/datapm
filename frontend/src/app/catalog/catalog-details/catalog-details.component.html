@@ -26,6 +26,10 @@
                 <span *ngIf="catalog?.isPublic" class="public-text">public</span>
                 <span *ngIf="!catalog?.isPublic" class="not-public-text">not public</span>
             </div>
+
+            <div *ngIf="catalog?.unclaimed">
+                Are you the data originator? <a href="/docs/unclaimed-listings">Click here to learn more</a>
+            </div>
         </div>
 
         <div class="container">

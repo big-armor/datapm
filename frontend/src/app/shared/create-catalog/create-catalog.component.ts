@@ -1,9 +1,10 @@
-import { Component, Inject } from "@angular/core";
+import { Component, Inject, OnDestroy } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { CreateCatalogGQL, SetCatalogAvatarImageGQL, SetCatalogCoverImageGQL } from "src/generated/graphql";
-import { ImageService } from "../../services/image.service";
-import { combineLatest, merge, Observable, of } from "rxjs";
+import { CreateCatalogGQL, SetCatalogAvatarImageGQL, SetCatalogCoverImageGQL, User } from "src/generated/graphql";
+import { combineLatest, Observable, of, Subject } from "rxjs";
+import { AuthenticationService } from "src/app/services/authentication.service";
+import { takeUntil } from "rxjs/operators";
 
 type State = "INIT" | "LOADING" | "SUCCESS" | "ERROR";
 
@@ -12,7 +13,9 @@ type State = "INIT" | "LOADING" | "SUCCESS" | "ERROR";
     templateUrl: "./create-catalog.component.html",
     styleUrls: ["./create-catalog.component.scss"]
 })
-export class CreateCatalogComponent {
+export class CreateCatalogComponent implements OnDestroy {
+    private readonly destroy = new Subject<void>();
+
     public form: FormGroup;
     public state: State = "INIT";
     public error = "";
@@ -20,12 +23,14 @@ export class CreateCatalogComponent {
     public avatarImgData: string;
     public coverImgData: string;
 
+    public user: User;
+
     constructor(
         private dialogRef: MatDialogRef<CreateCatalogComponent>,
         private createCatalog: CreateCatalogGQL,
         private setCatalogAvatarImageGQL: SetCatalogAvatarImageGQL,
         private setCatalogCoverImage: SetCatalogCoverImageGQL,
-        private imageService: ImageService,
+        private authenticationService: AuthenticationService,
         @Inject(MAT_DIALOG_DATA) data: { input: string }
     ) {
         this.form = new FormGroup({
@@ -34,8 +39,16 @@ export class CreateCatalogComponent {
             }),
             description: new FormControl(""),
             website: new FormControl(""),
-            isPublic: new FormControl(false)
+            isPublic: new FormControl(false),
+            unclaimed: new FormControl(undefined)
         });
+
+        this.authenticationService.currentUser.pipe(takeUntil(this.destroy)).subscribe((u) => (this.user = u));
+    }
+
+    public ngOnDestroy(): void {
+        this.destroy.next();
+        this.destroy.complete();
     }
 
     public submit(): void {

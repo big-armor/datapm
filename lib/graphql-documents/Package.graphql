@@ -9,6 +9,7 @@ query Package($identifier: PackageIdentifierInput!) {
             displayName
             myPermissions
             isPublic
+            unclaimed
         }
         isPublic
         myPermissions
