@@ -16,9 +16,8 @@ RUN cd /build/backend/ \
     && cp -R /build/backend/dist/node_modules /usr/src/app \
     && rm -rf /build
 
-RUN ls /usr/src/app/util/*
-
 EXPOSE 4000
+
 WORKDIR /usr/src/app
 
 CMD [ "sh", "/usr/src/app/startServer.sh" ]

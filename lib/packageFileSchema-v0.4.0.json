@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://datapm.io/docs/package-file-schema-v0.3.0.json",
+    "$id": "https://datapm.io/docs/package-file-schema-v0.4.0.json",
     "type": "object",
     "title": "DataPM Package File",
     "description": "The root definition file for version 1 of the datapm package file system.",

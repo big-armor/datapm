@@ -59,16 +59,19 @@ export class PackageDescriptionComponent {
 
                 const packageByIdentifier = new Map<string, Package>();
                 const thisPackageIdentifier = this.packageIdentifierToString(this.package.identifier);
-                this.collections.forEach((c) => {
-                    c.packages.forEach((p) => {
-                        const identifier = this.packageIdentifierToString(p.identifier);
-                        if (thisPackageIdentifier != identifier && !packageByIdentifier.has(identifier)) {
-                            packageByIdentifier.set(identifier, p);
-                        }
-                    });
-                });
 
-                this.relatedPackages = [...packageByIdentifier.values()];
+                if (this.collections) {
+                    this.collections.forEach((c) => {
+                        c.packages.forEach((p) => {
+                            const identifier = this.packageIdentifierToString(p.identifier);
+                            if (thisPackageIdentifier != identifier && !packageByIdentifier.has(identifier)) {
+                                packageByIdentifier.set(identifier, p);
+                            }
+                        });
+                    });
+
+                    this.relatedPackages = [...packageByIdentifier.values()];
+                }
             });
 
             validatePackageFileInBrowser(p.package.latestVersion.packageFile);

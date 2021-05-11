@@ -1,0 +1,28 @@
+<div class="container" id="followDialog">
+    <div class="row">
+        <div class="col-md-12 p-0">
+            <div mat-dialog-title id="contentTitle">Following Options</div>
+            <div mat-dialog-content id="contentBorder">
+                <p class="text-dark-gray">Notification Frequency:</p>
+                <mat-form-field appearance="fill" floatLabel="never">
+                    <mat-select [(value)]="selectedFrequency">
+                        <mat-option *ngFor="let frequency of frequencies" [value]="frequency">
+                            {{ frequency | titlecase }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div mat-dialog-actions class="d-flex justify-content-between pb-3 pt-2">
+                <button *ngIf="isFollowing" (click)="deleteFollow()" mat-button type="submit" class="save-btn">
+                    <span>Unfollow</span>
+                </button>
+                <button *ngIf="!isFollowing" (click)="close()" mat-button type="submit" class="save-btn">
+                    <span>Cancel</span>
+                </button>
+                <button mat-button type="submit" class="save-btn" (click)="save()">
+                    <span>Save</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

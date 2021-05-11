@@ -395,12 +395,12 @@ mat-select {
 
 .app-raised-button {
     outline: none !important;
-    border-radius: 6px;
-    border: 1px solid var(--info-color);
+    border-radius: 4px;
+    border: 1px solid var(--tranparent-border);
     font-family: $family-roboto;
     font-style: $style-normal;
     font-weight: $weight-400;
-    font-size: $text-font;
+    font-size: ($text-font - 1);
     align-items: center;
     text-align: center;
     padding: 8px 15px;
@@ -418,6 +418,24 @@ mat-select {
         box-shadow: none !important;
     }
 }
+
+.app-raised-button.follow-btn {
+    padding: 8px 8px;
+    width: 100px;
+    line-height: 13px;
+    border-radius: 4px;
+    border: 1px solid var(--info-color);
+    background-color: var(--info-color);
+
+    em {
+        margin-right: 4px;
+    }
+}
+
+// .app-outlined-button.follow-btn {
+//     padding: 7px 10px;
+//     line-height: 13px;
+// }
 
 .raised {
     box-shadow: var(--outer-shadow-1) !important;
@@ -467,7 +485,7 @@ mat-select {
     font-weight: $weight-400;
     font-size: ($text-font - 1);
     background: var(--custom-secondary-color);
-    line-height: 13px;
+    line-height: 14px;
     color: var(--info-color);
     border: 1px solid var(--gray-9-color);
     padding: 8px 15px;
@@ -565,7 +583,7 @@ mat-select {
 }
 
 .mat-option {
-    letter-spacing: 0.5px;
+    letter-spacing: 0.4px;
     font-family: $family-roboto;
     font-style: $style-normal;
     font-size: $text-font;
@@ -968,12 +986,24 @@ button:disabled {
     }
 }
 
+.permission-div.modal-select {
+    mat-select {
+        color: var(--gray-2-color);
+        padding: 10px;
+    }
+
+    .mat-form-field-wrapper {
+        padding: 0px 0px 10px 0px !important;
+    }
+}
+
 .permission-div {
     mat-select {
         font-family: $family-roboto;
         font-style: $style-normal;
         font-weight: $weight-400;
         font-size: $text-font;
+        border: 1px solid var(--gray-9-color);
         letter-spacing: 0.5px;
         border-radius: 4px;
         color: var(--gray-2-color);

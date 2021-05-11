@@ -10,6 +10,7 @@ import { DialogSize } from "./dialog-size";
 import { ConfirmationDialogConfig } from "./confirmation-dialog-config";
 import { DialogConfig } from "./dialog-config";
 import { UserStatusChangeDialogResponse } from "./user-status-change-dialog-response";
+import { FollowIdentifierInput } from "src/generated/graphql";
 
 @Injectable({
     providedIn: "root"
@@ -20,6 +21,12 @@ export class ConfirmationDialogService {
     public openUserStatusChangeConfirmationDialog(config: DialogConfig): Observable<UserStatusChangeDialogResponse> {
         const matDialogConfig = this.buildDialogConfig(config.data, config.size);
         return this.dialog.open(UserStatusChangeConfirmationDialogComponent, matDialogConfig).afterClosed();
+    }
+
+    public openFollowDeleteConfirmationDialog(): Observable<UserStatusChangeDialogResponse> {
+        const data = { title: "Delete follow", content: "Are you sure you want to unfollow?" };
+        const matDialogConfig = this.buildDialogConfig(data, DialogSize.SMALL);
+        return this.dialog.open(FancyConfirmationDialogComponent, matDialogConfig).afterClosed();
     }
 
     public openFancyConfirmationDialog(config: ConfirmationDialogConfig): Observable<boolean> {

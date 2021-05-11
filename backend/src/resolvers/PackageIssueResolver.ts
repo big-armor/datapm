@@ -3,6 +3,7 @@ import { resolvePackagePermissions } from "../directive/hasPackagePermissionDire
 import { PackageIssueEntity } from "../entity/PackageIssueEntity";
 import { PackageIssueStatus } from "../entity/PackageIssueStatus";
 import {
+    ActivityLogEventType,
     CreatePackageIssueInput,
     PackageIdentifierInput,
     PackageIssueIdentifierInput,
@@ -15,6 +16,7 @@ import { PackageIssueRepository } from "../repository/PackageIssueRepository";
 import { PackageRepository } from "../repository/PackageRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
+import { createActivityLog } from "../repository/ActivityLogRepository";
 
 export const getPackageIssue = async (
     _0: any,
@@ -72,7 +74,15 @@ export const deletePackageIssue = async (
         throwNotAuthorizedError();
     }
 
-    await repository.delete(issue.id);
+    await context.connection.transaction(async (transaction) => {
+        await repository.delete(issue.id);
+
+        await createActivityLog(transaction, {
+            userId: context!.me!.id,
+            eventType: ActivityLogEventType.PACKAGE_ISSUE_DELETED,
+            targetPackageIssueId: issue.id
+        });
+    });
 };
 
 export const getIssuesByPackage = async (
@@ -130,6 +140,26 @@ export const getPackageIssueAuthor = async (parent: any, _1: any, context: Authe
     });
 };
 
+export const getPackageIssuePackageIdentifier = async (
+    parent: any,
+    _1: any,
+    context: AuthenticatedContext,
+    info: any
+) => {
+    if (!parent.packageId) {
+        return null;
+    }
+
+    const packageEntity = await context.connection
+        .getCustomRepository(PackageRepository)
+        .findPackageByIdOrFail({ packageId: parent.packageId, relations: ["catalog"] });
+
+    return {
+        catalogSlug: packageEntity.catalog.slug,
+        packageSlug: packageEntity.slug
+    };
+};
+
 export const createPackageIssue = async (
     _0: any,
     { packageIdentifier, issue }: { packageIdentifier: PackageIdentifierInput; issue: CreatePackageIssueInput },
@@ -139,24 +169,33 @@ export const createPackageIssue = async (
     if (!context.me) {
         throwNotAuthorizedError();
     }
+    return await context.connection.transaction(async (transaction) => {
+        const packageEntity = await context.connection.manager
+            .getCustomRepository(PackageRepository)
+            .findPackageOrFail({ identifier: packageIdentifier });
 
-    const packageEntity = await context.connection.manager
-        .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier: packageIdentifier });
+        const issueRepository = context.connection.manager.getCustomRepository(PackageIssueRepository);
+        const lastIssueCreatedForPackage = await issueRepository.getLastCreatedIssueForPackage(packageEntity.id);
+        const issueNumber = lastIssueCreatedForPackage ? lastIssueCreatedForPackage.issueNumber + 1 : 0;
 
-    const issueRepository = context.connection.manager.getCustomRepository(PackageIssueRepository);
-    const lastIssueCreatedForPackage = await issueRepository.getLastCreatedIssueForPackage(packageEntity.id);
-    const issueNumber = lastIssueCreatedForPackage ? lastIssueCreatedForPackage.issueNumber + 1 : 0;
+        const issueEntity = new PackageIssueEntity();
+        issueEntity.issueNumber = issueNumber;
+        issueEntity.packageId = packageEntity.id;
+        issueEntity.authorId = context.me.id;
+        issueEntity.subject = issue.subject;
+        issueEntity.content = issue.content;
+        issueEntity.status = PackageIssueStatus.OPEN;
 
-    const issueEntity = new PackageIssueEntity();
-    issueEntity.issueNumber = issueNumber;
-    issueEntity.packageId = packageEntity.id;
-    issueEntity.authorId = context.me.id;
-    issueEntity.subject = issue.subject;
-    issueEntity.content = issue.content;
-    issueEntity.status = PackageIssueStatus.OPEN;
+        const savedIssueEntity = await issueRepository.save(issueEntity);
 
-    return await issueRepository.save(issueEntity);
+        await createActivityLog(transaction, {
+            userId: context!.me!.id,
+            eventType: ActivityLogEventType.PACKAGE_ISSUE_CREATED,
+            targetPackageIssueId: savedIssueEntity.id
+        });
+
+        return savedIssueEntity;
+    });
 };
 
 export const updatePackageIssue = async (
@@ -180,11 +219,21 @@ export const updatePackageIssue = async (
         throwNotAuthorizedError();
     }
 
-    issueEntity.subject = issue.subject;
-    issueEntity.content = issue.content;
+    return await context.connection.transaction(async (transaction) => {
+        issueEntity.subject = issue.subject;
+        issueEntity.content = issue.content;
 
-    const issueRepository = context.connection.manager.getCustomRepository(PackageIssueRepository);
-    return await issueRepository.save(issueEntity);
+        const issueRepository = context.connection.manager.getCustomRepository(PackageIssueRepository);
+        const savedIssueEntity = await issueRepository.save(issueEntity);
+
+        await createActivityLog(transaction, {
+            userId: context!.me!.id,
+            eventType: ActivityLogEventType.PACKAGE_ISSUE_EDIT,
+            targetPackageIssueId: savedIssueEntity.id
+        });
+
+        return savedIssueEntity;
+    });
 };
 
 export const updatePackageIssueStatus = async (
@@ -208,10 +257,22 @@ export const updatePackageIssueStatus = async (
         throwNotAuthorizedError();
     }
 
-    issueEntity.status = status.status;
+    return await context.connection.transaction(async (transaction) => {
+        issueEntity.status = status.status;
 
-    const issueRepository = context.connection.manager.getCustomRepository(PackageIssueRepository);
-    return await issueRepository.save(issueEntity);
+        const issueRepository = context.connection.manager.getCustomRepository(PackageIssueRepository);
+        const savedIssueEntity = await issueRepository.save(issueEntity);
+
+        if (PackageIssueStatus.CLOSED === status.status) {
+            await createActivityLog(transaction, {
+                userId: context!.me!.id,
+                eventType: ActivityLogEventType.PACKAGE_ISSUE_CLOSED,
+                targetPackageIssueId: savedIssueEntity.id
+            });
+        }
+
+        return savedIssueEntity;
+    });
 };
 
 export const updatePackageIssuesStatuses = async (
@@ -241,9 +302,21 @@ export const updatePackageIssuesStatuses = async (
         throwNotAuthorizedError();
     }
 
-    issues.forEach((i) => (i.status = status.status));
+    const isClosingIssues = PackageIssueStatus.CLOSED === status.status;
+    await context.connection.transaction(async (transaction) => {
+        issues.forEach(async (issue) => {
+            issue.status = status.status;
 
-    await issueRepository.save(issues);
+            if (isClosingIssues) {
+                await createActivityLog(transaction, {
+                    userId: context!.me!.id,
+                    eventType: ActivityLogEventType.PACKAGE_ISSUE_CLOSED,
+                    targetPackageIssueId: issue.id
+                });
+            }
+        });
+        await issueRepository.save(issues);
+    });
 };
 
 export const deletePackageIssues = async (
@@ -272,7 +345,18 @@ export const deletePackageIssues = async (
     }
 
     const issuesIds = issues.map((i) => i.id);
-    await issueRepository.delete(issuesIds);
+
+    await context.connection.transaction(async (transaction) => {
+        await issueRepository.delete(issuesIds);
+
+        issuesIds.forEach(async (issueId) => {
+            await createActivityLog(transaction, {
+                userId: context!.me!.id,
+                eventType: ActivityLogEventType.PACKAGE_ISSUE_DELETED,
+                targetPackageIssueId: issueId
+            });
+        });
+    });
 };
 
 async function getIssueEntity(
