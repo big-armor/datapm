@@ -3,14 +3,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { PackageFile, parsePackageFileJSON, Schema, validatePackageFileInBrowser } from "datapm-lib";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
-import {
-    User,
-    Collection,
-    CollectionBasicData,
-    Package,
-    PackageCollectionsGQL,
-    PackageIdentifierInput
-} from "src/generated/graphql";
+import { User, Collection, Package, PackageCollectionsGQL, PackageIdentifierInput } from "src/generated/graphql";
 import { PackageService, PackageResponse } from "../../services/package.service";
 @Component({
     selector: "package-description",

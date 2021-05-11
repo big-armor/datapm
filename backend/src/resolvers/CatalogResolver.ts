@@ -185,6 +185,10 @@ export const createCatalog = async (
     context: AuthenticatedContext,
     info: any
 ) => {
+    if (!context.me.isAdmin && value.unclaimed === true) {
+        throw new Error("NOT_AUTHORIZED");
+    }
+
     const catalogEntity = await context.connection.manager.getCustomRepository(CatalogRepository).createCatalog({
         userId: context.me?.id,
         value,
@@ -207,11 +211,26 @@ export const updateCatalog = async (
     info: any
 ) => {
     return context.connection.transaction(async (transaction) => {
+        if (!context.me.isAdmin && value.unclaimed !== undefined) {
+            throw new Error("NOT_AUTHORIZED");
+        }
+
         const catalog = await transaction.getCustomRepository(CatalogRepository).updateCatalog({
             identifier,
             value,
             relations: getGraphQlRelationName(info)
         });
+
+        if (value.unclaimed !== undefined) {
+            await createActivityLog(transaction, {
+                userId: context.me.id,
+                eventType: ActivityLogEventType.CATALOG_PUBLIC_CHANGED,
+                targetCatalogId: catalog.id,
+                changeType: value.unclaimed
+                    ? ActivityLogChangeType.UNCLAIMED_ENABLED
+                    : ActivityLogChangeType.UNCLAIMED_DISABLED
+            });
+        }
 
         await createActivityLog(transaction, {
             userId: context.me.id,
@@ -219,6 +238,17 @@ export const updateCatalog = async (
             targetCatalogId: catalog.id,
             propertiesEdited: Object.keys(value).map((k) => (k == "newSlug" ? "slug" : k))
         });
+
+        if (value.isPublic !== undefined) {
+            await createActivityLog(transaction, {
+                userId: context.me.id,
+                eventType: ActivityLogEventType.CATALOG_PUBLIC_CHANGED,
+                targetCatalogId: catalog.id,
+                changeType: value.isPublic
+                    ? ActivityLogChangeType.PUBLIC_ENABLED
+                    : ActivityLogChangeType.PUBLIC_DISABLED
+            });
+        }
 
         if (value.isPublic !== undefined) {
             await createActivityLog(transaction, {
