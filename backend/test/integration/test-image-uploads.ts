@@ -201,7 +201,7 @@ describe("Image Upload Tests", async () => {
         expect(imageResponse.errors == null).true;
 
         const imageServingResult = await request.get(
-            "localhost:4000/images/package/first-user-username/image-test-package/avatar"
+            "localhost:4000/images/package/first-user-username/image-test-package/cover"
         );
 
         expect(imageServingResult.status).equal(200);
