@@ -12,8 +12,10 @@ import { sendInviteUser, sendShareNotification, validateMessageContents } from "
 
 export const hasPackagePermissions = async (context: Context, packageId: number, permission: Permission) => {
     if (permission == Permission.VIEW) {
-        const collection = await context.connection.getRepository(PackageEntity).findOneOrFail({ id: packageId });
-        if (collection?.isPublic) return true;
+        const packageEntity = await context.connection.getRepository(PackageEntity).findOneOrFail({ id: packageId });
+        if (packageEntity?.isPublic) {
+            return true;
+        }
     }
 
     if (context.me == null) {
@@ -23,6 +25,26 @@ export const hasPackagePermissions = async (context: Context, packageId: number,
     return context.connection
         .getCustomRepository(PackagePermissionRepository)
         .hasPermission(context.me.id, packageId, permission);
+};
+
+export const hasPackageEntityPermissions = async (
+    context: Context,
+    packageEntity: PackageEntity,
+    permission: Permission
+) => {
+    if (permission == Permission.VIEW) {
+        if (packageEntity?.isPublic) {
+            return true;
+        }
+    }
+
+    if (context.me == null) {
+        return false;
+    }
+
+    return context.connection
+        .getCustomRepository(PackagePermissionRepository)
+        .hasPermission(context.me.id, packageEntity.id, permission);
 };
 
 export const setPackagePermissions = async (

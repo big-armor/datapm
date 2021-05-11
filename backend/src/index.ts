@@ -21,6 +21,7 @@ import { UserRepository } from "./repository/UserRepository";
 import { PackageRepository } from "./repository/PackageRepository";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { CollectionRepository } from "./repository/CollectionRepository";
+import { PackageDataStorageService } from "./storage/data/package-data-storage-service";
 console.log("DataPM Registry Server Starting...");
 
 const dataLibPackageFile = fs.readFileSync("node_modules/datapm-lib/package.json");
@@ -325,6 +326,40 @@ async function main() {
             return;
         }
     });
+
+    app.route("/data/:catalogSlug/:packageSlug/:version/:sourceSlug")
+        .post(async (req, res, next) => {
+            try {
+                const contextObject = await context({ req });
+                await PackageDataStorageService.INSTANCE.writePackageDataFromStream(
+                    contextObject,
+                    req.params.catalogSlug,
+                    req.params.packageSlug,
+                    req.params.version,
+                    req.params.sourceSlug,
+                    req
+                );
+                res.send();
+            } catch (err) {
+                res.status(400).send();
+            }
+        })
+        .get(async (req, res, next) => {
+            try {
+                res.header("Content-Type", "application/octet-stream");
+                const contextObject = await context({ req });
+                const stream = await PackageDataStorageService.INSTANCE.readPackageDataFromStream(
+                    contextObject,
+                    req.params.catalogSlug,
+                    req.params.packageSlug,
+                    req.params.version,
+                    req.params.sourceSlug
+                );
+                stream.pipe(res);
+            } catch (err) {
+                res.status(400).send();
+            }
+        });
 
     // any route not yet defined goes to index.html
     app.use("*", (req, res, next) => {

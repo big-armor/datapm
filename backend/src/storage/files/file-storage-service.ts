@@ -1,7 +1,6 @@
 import { DPMStorage } from "../dpm-storage";
 import { StorageProvider } from "../storage-provider";
-import { Readable, Stream } from "stream";
-import fs from "fs";
+import { Readable } from "stream";
 
 export enum StorageErrors {
     FILE_DOES_NOT_EXIST = "FILE_DOES_NOT_EXIST"
@@ -19,6 +18,15 @@ export class FileStorageService {
         transformer?: any
     ): Promise<void> {
         const stream = this.convertBufferToStream(contents);
+        return this.storageService.writeItem(namespace, itemId, stream, transformer);
+    }
+
+    public async writeFileFromStream(
+        namespace: string,
+        itemId: string,
+        stream: Readable,
+        transformer?: any
+    ): Promise<void> {
         return this.storageService.writeItem(namespace, itemId, stream, transformer);
     }
 
