@@ -1,44 +1,5 @@
-<div class="footer-bg">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-3 col-md-4 col-sm-6 col-xs-6 main-col-footer">
-                <div class="footer-title px-2">about</div>
-                <div class="d-flex flex-row bd-highlight">
-                    <div class="bd-highlight pr-5 mr-2">
-                        <div class="d-flex flex-column bd-highlight">
-                            <div class="px-2 py-1 bd-highlight footer-subtitle">
-                                <a href="/docs">documentation</a>
-                            </div>
-                            <div class="px-2 py-1 bd-highlight footer-subtitle">
-                                <a href="/contact">contact</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-4 col-sm-6 col-xs-6 main-col-footer">
-                <div class="footer-title px-2">terms and policies</div>
-                <div class="d-flex flex-row bd-highlight">
-                    <div class="bd-highlight pr-5 mr-2">
-                        <div class="d-flex flex-column bd-highlight">
-                            <div class="px-2 py-1 bd-highlight footer-subtitle">
-                                <a href="/terms">terms of use</a>
-                            </div>
-                            <div class="px-2 py-1 bd-highlight footer-subtitle">
-                                <a href="/privacy">privacy policy</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6 col-md-4 col-sm-12 col-xs-6 main-col-footer darkmode-div">
-                <a aria-label="Angular on twitter" title="Dark theme" class="px-2">
-                    <mat-slide-toggle class="footer-slide-toggle" [checked]="darkModeEnabled" (change)="toggleTheme()">
-                        <span class="text-dark-gray" *ngIf="!darkModeEnabled">Dark mode</span>
-                        <span class="text-dark-gray" *ngIf="darkModeEnabled">Light mode</span>
-                    </mat-slide-toggle>
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
+<app-builder-io-renderer *ngIf="loaded; else loadingTemplate" [apiKey]="apiKey" [entry]="entry">
+    <div class="container">Failed to load footer</div>
+</app-builder-io-renderer>
+
+<ng-template #loadingTemplate></ng-template>

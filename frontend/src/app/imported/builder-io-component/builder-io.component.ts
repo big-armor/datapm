@@ -1,5 +1,7 @@
 import { AfterContentChecked, Component, ElementRef } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 import { BuilderIOService } from "../resource-importer.service";
 
 @Component({
@@ -8,39 +10,54 @@ import { BuilderIOService } from "../resource-importer.service";
     styleUrls: ["./builder-io.component.scss"]
 })
 export class BuilderIOComponent implements AfterContentChecked {
-    private readonly ENTRY_TAG = "{{entry}}";
-    private readonly API_KEY_TAG = "{{apiKey}}";
-    private readonly BUILDER_UI_TEMPLATE = `<builder-component name="page" entry="${this.ENTRY_TAG}" api-key="${this.API_KEY_TAG}"></builder-component>`;
-
     private readonly JAVASCRIPT_ELEMENT_TYPE = "script";
     private readonly JAVASCRIPT_SCRIPT_TYPE = "text/javascript";
 
+    public entry: string;
+    public apiKey: string;
+
+    public loaded: boolean;
     public builderTemplate: string;
-    public loading: boolean = false;
+
+    private destroy$ = new Subject();
 
     constructor(
-        private resourceImporterService: BuilderIOService,
+        private builderIOService: BuilderIOService,
         private route: ActivatedRoute,
         private elementRef: ElementRef
     ) {}
 
     public ngAfterContentChecked(): void {
-        this.loadExternalContent();
-    }
-
-    private loadExternalContent(): void {
-        this.loading = true;
         this.loadContent();
     }
 
     private loadContent(): void {
-        this.resourceImporterService.getBuilderIOScript().subscribe(
-            (js) => {
+        this.loaded = false;
+        this.builderIOService
+            .getBuilderIOApiKey()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((apiKey) => {
+                const pageKey = this.route.snapshot.params.page;
+                const entry = this.builderIOService.getTemplateEntryByPageKey(pageKey);
+
+                if (entry) {
+                    this.loadJavascriptAndInjectIntoTemplate(apiKey, entry);
+                } else {
+                    this.loaded = true;
+                }
+            });
+    }
+
+    private loadJavascriptAndInjectIntoTemplate(apiKey: string, entry: string): void {
+        this.builderIOService
+            .getBuilderIOScript()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((js) => {
+                this.apiKey = apiKey;
+                this.entry = entry;
                 this.injectJavascriptIntoTemplate(js);
-                this.loadPageEntryAndApiKey();
-            },
-            () => (this.loading = false)
-        );
+                this.loaded = true;
+            });
     }
 
     private injectJavascriptIntoTemplate(js: string): void {
@@ -48,23 +65,5 @@ export class BuilderIOComponent implements AfterContentChecked {
         script.type = this.JAVASCRIPT_SCRIPT_TYPE;
         script.innerHTML = js;
         this.elementRef.nativeElement.appendChild(script);
-    }
-
-    private loadPageEntryAndApiKey(): void {
-        this.resourceImporterService.getBuilderIOApiKey().subscribe(
-            (apiKey) => {
-                const pageKey = this.route.snapshot.params.page;
-                const pageEntry = this.resourceImporterService.getTemplateEntryByPageKey(pageKey);
-                if (pageEntry) {
-                    this.builderTemplate = this.BUILDER_UI_TEMPLATE.replace(this.API_KEY_TAG, apiKey).replace(
-                        this.ENTRY_TAG,
-                        pageEntry
-                    );
-                }
-
-                this.loading = false;
-            },
-            () => (this.loading = false)
-        );
     }
 }

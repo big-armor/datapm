@@ -1,7 +1,5 @@
-<ng-container *ngIf="!loading">
-    <div *ngIf="builderTemplate; else backupTemplate" [innerHTML]="builderTemplate | safeHtml"></div>
-</ng-container>
-
-<ng-template #backupTemplate>
+<app-builder-io-renderer *ngIf="loaded; else loadingTemplate" [apiKey]="apiKey" [entry]="entry">
     <div class="container">Page has not been found.</div>
-</ng-template>
+</app-builder-io-renderer>
+
+<ng-template #loadingTemplate></ng-template>
