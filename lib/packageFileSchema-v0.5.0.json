@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://datapm.io/docs/package-file-schema-v0.4.0.json",
+    "$id": "https://datapm.io/docs/package-file-schema-v0.5.0.json",
     "type": "object",
     "title": "DataPM Package File",
     "description": "The root definition file for version 1 of the datapm package file system.",
@@ -384,17 +384,6 @@
                         "title": "Source Type",
                         "description": "The unique identifier for the source implementation.",
                         "default": ""
-                    },
-                    "uris": {
-                        "$id": "#/sources/source/uri",
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "maxLength": 2048,
-                            "title": "Source URIs",
-                            "description": "Used by the source implementation to pull the data.",
-                            "default": ""
-                        }
                     },
                     "configuration": {
                         "$id": "#/sources/source/configuration",

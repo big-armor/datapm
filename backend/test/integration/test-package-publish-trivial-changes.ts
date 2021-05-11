@@ -81,7 +81,7 @@ describe("Publish trival package changes", function () {
         const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         // have to update this hash value if the package file contents change
-        expect(responseHash).equal("5469bdba1f633d7e7a6ebf8f01ad372212b205ed038148a7458ffc8d4f83a73b");
+        expect(responseHash).equal("b79982df4bc5a9a180c4ec2f858554242544f552f40ca54e351d2a81df7ba039");
 
         packageFile = parsePackageFileJSON(responsePackageFileContents);
     });
