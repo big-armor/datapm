@@ -624,6 +624,10 @@ mat-select {
     box-shadow: var(--box-shadow);
 }
 
+.header-line {
+    box-shadow: var(--box-shadow);
+}
+
 .d-none {
     display: none !important;
 }
@@ -911,6 +915,10 @@ button:disabled {
 
 .border-none {
     border: none;
+}
+
+.paragraph-txt {
+    color: var(--gray-2-color) !important;
 }
 
 .font-22 {
