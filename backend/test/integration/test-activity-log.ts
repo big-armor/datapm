@@ -351,7 +351,7 @@ describe("Activity Log Tests", async () => {
 
         expect(response.data).to.exist;
         expect(activityLogResponse.data.myActivity).to.exist;
-        expect(activityLogResponse.data.myActivity.logs.length).to.equal(2);
+        expect(activityLogResponse.data.myActivity.logs.length).to.equal(3);
         expect(activityLogResponse.data.myActivity.logs[0]?.eventType).to.equal(ActivityLogEventType.CATALOG_EDIT);
         expect(activityLogResponse.data.myActivity.logs[0]?.user?.username).to.equal(userOne.username);
         expect(activityLogResponse.data.myActivity.logs[0]?.targetCatalog!.identifier.catalogSlug).to.equal(
