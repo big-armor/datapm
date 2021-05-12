@@ -4,52 +4,54 @@
             <div class="col-md-12">
                 <div class="text-main-title">Builder IO</div>
             </div>
-            <div class="col-md-7 col-lg-7 mb-2">
+            <div class="col-md-12 col-lg-7 mb-2">
                 <h3 class="mb-1 mt-1">API Key</h3>
                 <app-input [control]="builderIOApiKeyControl" placeholder="Input 1" class="rounded-input"></app-input>
             </div>
-            <div class="col-md-7 col-lg-7">
-                <h3 class="mb-1 mt-3">Templates</h3>
-                <!-- TODO: Improve the UI here -->
-                <div *ngFor="let template of templates; let i = index" class="div-wrapper">
-                    <div class="row">
-                        <app-input
-                            [control]="template.keyFormControl"
-                            placeholder="Key"
-                            class="rounded-input"
-                        ></app-input>
-                        <app-input
-                            [control]="template.entryFormControl"
-                            placeholder="Entry"
-                            class="rounded-input"
-                        ></app-input>
-                        <span (click)="deleteEntry(i)">X</span>
+            <div class="col-md-12 col-lg-7">
+                <div class="d-flex bd-highlight">
+                    <div class="bd-highlight">
+                        <h3 class="mb-1 mt-3">Templates</h3>
+                    </div>
+                    <div class="bd-highlight ml-auto d-flex align-items-center">
+                        <button (click)="addNewEntry()" [disabled]="isLoading" class="btn-link">Add Entry</button>
                     </div>
                 </div>
-                <button
-                    (click)="addNewEntry()"
-                    [disabled]="isLoading"
-                    class="app-outlined-button"
-                    style="width: 120px; height: 30px"
-                >
-                    Add Entry
-                </button>
+                <!-- TODO: Improve the UI here -->
+                <div *ngFor="let template of templates; let i = index" class="div-wrapper">
+                    <div class="d-flex flex-row bd-highlight mb-3">
+                        <div class="bd-highlight pr-2">
+                            <app-input
+                                [control]="template.keyFormControl"
+                                placeholder="Key"
+                                class="rounded-input"
+                            ></app-input>
+                        </div>
+                        <div class="bd-highlight pr-2">
+                            <app-input
+                                [control]="template.entryFormControl"
+                                placeholder="Entry"
+                                class="rounded-input"
+                            ></app-input>
+                        </div>
+                        <div class="bd-highlight d-flex align-items-center">
+                            <span (click)="deleteEntry(i)" class="delete-span">X</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="">
+                    <button
+                        (click)="saveBuilderIOSettings()"
+                        [disabled]="isLoading"
+                        class="app-outlined-button"
+                        style="width: 120px; height: 30px"
+                    >
+                        Save
+                    </button>
+                </div>
             </div>
         </div>
 
         <div *ngIf="hasValidationErrors">You have used duplicate keys in your templates.</div>
-
-        <div class="row">
-            <div class="col-md-7 col-lg-7 text-right">
-                <button
-                    (click)="saveBuilderIOSettings()"
-                    [disabled]="isLoading"
-                    class="app-outlined-button"
-                    style="width: 120px; height: 30px"
-                >
-                    Save
-                </button>
-            </div>
-        </div>
     </div>
 </div>
