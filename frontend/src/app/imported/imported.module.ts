@@ -1,24 +1,13 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ImportedRoutingModule } from "./imported-routing.module";
-import { PrivacyComponent } from "./privacy/privacy.component";
-import { ContactComponent } from "./contact/contact.component";
-import { NotFoundComponent } from "./not-found/not-found.component";
-import { TermsAndConditionsComponent } from "./terms-and-conditions/terms-and-conditions.component";
-import { HeaderComponent } from "./header/header.component";
-import { FooterComponent } from "./footer/footer.component";
+import { BuilderIOComponent } from "./builder-io-component/builder-io.component";
 import { SafeHtmlPipe } from "./safe-html.pipe";
+import { BuilderIoRendererComponent } from "./builder-io-component/builder-io-renderer/builder-io-renderer.component";
 
 @NgModule({
-    declarations: [
-        PrivacyComponent,
-        ContactComponent,
-        NotFoundComponent,
-        TermsAndConditionsComponent,
-        HeaderComponent,
-        FooterComponent,
-        SafeHtmlPipe
-    ],
-    imports: [CommonModule, ImportedRoutingModule]
+    declarations: [BuilderIOComponent, SafeHtmlPipe, BuilderIoRendererComponent],
+    imports: [CommonModule, ImportedRoutingModule],
+    exports: [BuilderIoRendererComponent]
 })
 export class ImportedModule {}

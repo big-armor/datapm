@@ -5,13 +5,28 @@
     .platform-wrapper {
         padding: 0px 50px;
 
+        .btn-link {
+            border: none;
+            border-width: 0px;
+            color: var(--info-color);
+            background-color: unset;
+        }
+
         .div-wrapper {
             margin-bottom: 15px;
+
+            .delete-span {
+                padding: 6px 18px;
+                border: 1px solid var(--gray-5-color);
+                background-color: var(--secondary-color);
+                border-radius: 4px;
+            }
         }
 
         ::ng-deep .rounded-input {
             .dpm-input-square {
                 padding: 7px 10px;
+                width: 256px;
                 height: unset;
                 font-size: $text-font - 1;
 
@@ -27,6 +42,35 @@
     #platformSettings {
         .platform-wrapper {
             padding: 0px 0px;
+            ::ng-deep .rounded-input {
+                .dpm-input-square {
+                    width: 220px;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    #platformSettings {
+        .platform-wrapper {
+            .div-wrapper {
+                .delete-span {
+                    padding: 6px 10px;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    #platformSettings {
+        .platform-wrapper {
+            ::ng-deep .rounded-input {
+                .dpm-input-square {
+                    width: unset;
+                }
+            }
         }
     }
 }

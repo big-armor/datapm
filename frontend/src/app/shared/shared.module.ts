@@ -66,6 +66,7 @@ import { FollowDialogComponent } from "./dialogs/follow-dialog/follow-dialog.com
 import { UserFollowingComponent } from "./user-details/user-following/user-following.component";
 import { UserTypeFollowingComponent } from "./user-details/user-following/user-type-following/user-type-following.component";
 import { IvyCarouselModule } from "angular-responsive-carousel";
+import { ImportedModule } from "../imported/imported.module";
 
 @NgModule({
     declarations: [
@@ -137,7 +138,8 @@ import { IvyCarouselModule } from "angular-responsive-carousel";
         ReactiveFormsModule,
         RouterModule,
         AngularSimplemdeModule,
-        IvyCarouselModule
+        IvyCarouselModule,
+        ImportedModule
     ],
     exports: [
         HeaderComponent,

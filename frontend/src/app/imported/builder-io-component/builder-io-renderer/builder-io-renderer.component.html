@@ -1,0 +1,7 @@
+<ng-container *ngIf="builderTemplate; else backupTemplate">
+    <div [innerHTML]="builderTemplate | safeHtml"></div>
+</ng-container>
+
+<ng-template #backupTemplate>
+    <ng-content></ng-content>
+</ng-template>

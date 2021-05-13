@@ -318,6 +318,7 @@ table.gray-table {
         font-family: $family-roboto;
         background-color: var(--gray-7-color) !important;
         transition: background-color ease 0.5s;
+        border-color: var(--gray-5-color) !important;
 
         &:hover {
             background-color: var(--custom-secondary-color) !important;
@@ -475,6 +476,12 @@ mat-select {
     }
 }
 
+.icon-wrapper {
+    .fas {
+        color: var(--gray-1-color);
+    }
+}
+
 .info-txt {
     color: var(--info-color);
 }
@@ -614,6 +621,10 @@ mat-select {
     height: 14px;
     border: 0;
     margin: 6px 0px;
+    box-shadow: var(--box-shadow);
+}
+
+.header-line {
     box-shadow: var(--box-shadow);
 }
 
@@ -904,6 +915,10 @@ button:disabled {
 
 .border-none {
     border: none;
+}
+
+.paragraph-txt {
+    color: var(--gray-2-color) !important;
 }
 
 .font-22 {
