@@ -3,7 +3,7 @@ import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { PackageFile } from "datapm-lib";
 import { Subject } from "rxjs";
-import { Package, Permission, User, UserGQL } from "src/generated/graphql";
+import { OrderBy, Package, PackageIssuesGQL, Permission, User, UserGQL } from "src/generated/graphql";
 import { PackageService, PackageResponse } from "../../services/package.service";
 import { filter, takeUntil } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
@@ -48,6 +48,8 @@ export class PackageComponent implements OnDestroy {
     public catalogUser: User;
     public currentUser: User;
 
+    public issuesCount: number;
+
     constructor(
         private route: ActivatedRoute,
         private snackBarService: SnackBarService,
@@ -56,7 +58,8 @@ export class PackageComponent implements OnDestroy {
         private title: Title,
         private router: Router,
         private userGql: UserGQL,
-        private authenticationService: AuthenticationService
+        private authenticationService: AuthenticationService,
+        private packageIssuesGQL: PackageIssuesGQL
     ) {
         this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe(
             (p: PackageResponse) => {
@@ -81,6 +84,7 @@ export class PackageComponent implements OnDestroy {
                     return;
                 }
                 this.package = p.package;
+                this.loadPackageIssues();
                 if (this.package && this.package.latestVersion) {
                     this.packageFile = JSON.parse(this.package.latestVersion.packageFile);
                 } else {
@@ -103,7 +107,7 @@ export class PackageComponent implements OnDestroy {
 
                 this.routes = [
                     { linkName: "description", url: "", showDetails: true, isHidden: false },
-                    { linkName: "issues", url: "issues", showDetails: false, isHidden: false },
+                    { linkName: "issues", url: "issues", showDetails: true, isHidden: false },
                     { linkName: "history", url: "history", showDetails: true, isHidden: false }
                 ];
                 if (this.package?.myPermissions.includes(Permission.MANAGE)) {
@@ -220,5 +224,28 @@ export class PackageComponent implements OnDestroy {
         document.body.removeChild(el);
 
         this.snackBarService.openSnackBar("package slug copied to clipboard!", "");
+    }
+
+    private loadPackageIssues(): void {
+        const variables = {
+            packageIdentifier: {
+                catalogSlug: this.catalogSlug,
+                packageSlug: this.packageSlug
+            },
+            includeOpenIssues: false,
+            includeClosedIssues: false,
+            offset: 0,
+            limit: 0,
+            orderBy: OrderBy.UPDATED_AT
+        };
+
+        this.packageIssuesGQL.fetch(variables).subscribe((issuesResponse) => {
+            if (issuesResponse.error) {
+                return;
+            }
+
+            const responseData = issuesResponse.data.packageIssues;
+            this.issuesCount = responseData.openIssuesCount;
+        });
     }
 }

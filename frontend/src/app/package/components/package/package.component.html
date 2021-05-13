@@ -153,6 +153,12 @@
                                                 [ngClass]="{ active: isActiveTab(r) }"
                                             >
                                                 {{ r.linkName }}
+                                                <span
+                                                    class="span-nr"
+                                                    *ngIf="r.linkName === 'issues' && issuesCount > 0"
+                                                >
+                                                    {{ issuesCount }}
+                                                </span>
                                             </a>
                                         </li>
                                     </ul>

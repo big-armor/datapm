@@ -155,7 +155,7 @@ table.gray-table {
 }
 
 .doc-link {
-    font-size: $small-font;
+    font-size: $small-font + 1;
     cursor: pointer;
     line-height: 18px;
     font-weight: $weight-400;
@@ -1126,6 +1126,17 @@ button:disabled {
             position: relative;
             cursor: pointer;
             bottom: 25px;
+
+            .span-nr {
+                font-size: $small-font - 1;
+                padding: 3px 7px;
+                font-weight: $weight-500;
+                color: var(--gray-2-color);
+                border-radius: 50%;
+                position: relative;
+                bottom: 2px;
+                background-color: var(--gray-5-color);
+            }
         }
 
         &:first-child {
