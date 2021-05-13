@@ -341,9 +341,8 @@ describe("Checking VersionUtil", () => {
         const sourceA: Source = {
             slug: "datapm",
             type: "test",
-            configuration: {
-                uris: ["http://datapm.io/test", "http://datapm.io/test2"]
-            },
+            uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+            configuration: {},
             streamSets: [
                 {
                     configuration: {},
@@ -360,7 +359,8 @@ describe("Checking VersionUtil", () => {
         const sourceB: Source = {
             slug: "datapm",
             type: "test",
-            configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
+            uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+            configuration: {},
             streamSets: [
                 {
                     configuration: {},
@@ -386,14 +386,11 @@ describe("Checking VersionUtil", () => {
 
         sourceA.streamSets[0].lastUpdateHash = sourceB.streamSets[0].lastUpdateHash;
 
-        expect(sourceA.configuration != null).eq(true);
-
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        sourceA.configuration!.uris = ["http://datapm.io.test"];
+        sourceA.uris = ["http://datapm.io.test"];
 
         const diffs3 = compareSource(sourceA, sourceB);
 
-        expect(diffs3[0].type).equal(DifferenceType.CHANGE_SOURCE_CONFIGURATION);
+        expect(diffs3[0].type).equal(DifferenceType.CHANGE_SOURCE_URIS);
     });
 
     it("Compare source arrays", () => {
@@ -401,7 +398,8 @@ describe("Checking VersionUtil", () => {
             {
                 slug: "datapm",
                 type: "test",
-                configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
+                uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+                configuration: {},
                 streamSets: [
                     {
                         configuration: {},
@@ -420,7 +418,8 @@ describe("Checking VersionUtil", () => {
             {
                 slug: "datapm",
                 type: "test",
-                configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
+                uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+                configuration: {},
                 streamSets: [
                     {
                         configuration: {},
@@ -439,12 +438,11 @@ describe("Checking VersionUtil", () => {
 
         expect(diffs.length).equals(0);
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        sourceA[0].configuration!.uris = ["test"];
+        sourceA[0].uris = ["test"];
 
         const diffs2 = compareSources(sourceA, sourceB);
 
-        expect(diffs2[0].type).equal(DifferenceType.CHANGE_SOURCE_CONFIGURATION);
+        expect(diffs2[0].type).equal(DifferenceType.CHANGE_SOURCE_URIS);
     });
 
     it("Detected removed sources", () => {
@@ -452,7 +450,8 @@ describe("Checking VersionUtil", () => {
             {
                 slug: "datapm",
                 type: "test",
-                configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
+                uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+                configuration: {},
                 streamSets: [
                     {
                         configuration: {},
@@ -471,7 +470,8 @@ describe("Checking VersionUtil", () => {
             {
                 slug: "datapm2",
                 type: "test",
-                configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
+                uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+                configuration: {},
                 streamSets: [
                     {
                         configuration: {},
@@ -497,7 +497,8 @@ describe("Checking VersionUtil", () => {
             {
                 slug: "datapm",
                 type: "test",
-                configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
+                uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+                configuration: {},
                 streamSets: [
                     {
                         slug: "test",
@@ -516,7 +517,8 @@ describe("Checking VersionUtil", () => {
             {
                 slug: "datapm",
                 type: "test",
-                configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
+                uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+                configuration: {},
                 streamSets: [
                     {
                         slug: "test",
@@ -551,7 +553,8 @@ describe("Checking VersionUtil", () => {
             {
                 slug: "datapm",
                 type: "test",
-                configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
+                uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+                configuration: {},
                 streamSets: [
                     {
                         slug: "test",
@@ -570,8 +573,8 @@ describe("Checking VersionUtil", () => {
             {
                 slug: "datapm",
                 type: "test",
+                uris: ["http://datapm.io/test", "http://datapm.io/test2"],
                 configuration: {
-                    uris: ["http://datapm.io/test", "http://datapm.io/test2"],
                     newValue: "a"
                 },
                 streamSets: [

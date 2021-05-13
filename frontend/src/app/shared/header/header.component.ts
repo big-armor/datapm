@@ -54,7 +54,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
             .pipe(
                 debounceTime(500),
                 switchMap((value) => {
-                    if (!value || value.length < 2) {
+                    if (value.length < 2) {
                         this.autoCompleteResult = null;
                         return [];
                     }
@@ -62,11 +62,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
                 })
             )
             .subscribe((result) => {
-                if (result.errors != null) {
-                    this.autoCompleteResult = null;
-                } else {
-                    this.autoCompleteResult = result.data.autoComplete;
-                }
+                if (result.errors != null) this.autoCompleteResult = null;
+                else this.autoCompleteResult = result.data.autoComplete;
             });
 
         this.route.queryParamMap.pipe(takeUntil(this.subscription)).subscribe((queryParams: ParamMap) => {
@@ -151,10 +148,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
 
     public autoCompleteOptionSelected(event): void {
-        if (!event.option || !event.option.value) {
-            return;
-        }
-
         this.router.navigate(["/" + event.option.value]);
         this.searchControl.setValue("");
         this.autoCompleteResult = null;

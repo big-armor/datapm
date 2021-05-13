@@ -1,23 +1,13 @@
 import { SemVer } from "semver";
-import {
-    Schema,
-    PackageFile,
-    CountPrecision,
-    PackageFileV010,
-    PackageFileV030,
-    Source,
-    StreamSet,
-    ValueTypeStatistics,
-    PackageFile040
-} from "./main";
+import { Schema, PackageFile, CountPrecision, PackageFileV010, PackageFileV030 } from "./main";
 import fs from "fs";
 import path from "path";
 import AJV from "ajv";
 import fetch from "cross-fetch";
+import { Source, StreamSet, ValueTypeStatistics } from "./PackageFile-v0.4.0";
 import { PackageFileV020 } from "./PackageFile-v0.2.0";
 
 import deepEqual from "fast-deep-equal";
-import { CountPrecisionV030 } from "./PackageFile-v0.3.0";
 
 export type DPMRecordValue =
     | number
@@ -29,10 +19,7 @@ export type DPMRecordValue =
     | Array<DPMRecordValue>
     | null;
 export type DPMRecord = Record<string, DPMRecordValue>;
-export type DPMConfiguration = Record<
-    string,
-    number | string | boolean | { [key: string]: unknown } | string[] | number[] | boolean[] | null
->;
+export type DPMConfiguration = Record<string, number | string | boolean | { [key: string]: unknown } | null>;
 
 export enum Compability {
     Identical = 0,
@@ -50,7 +37,7 @@ export enum DifferenceType {
     CHANGE_PACKAGE_DESCRIPTION = "CHANGE_PACKAGE_DESCRIPTION",
     CHANGE_SOURCE = "CHANGE_SOURCE",
     CHANGE_SOURCE_CONFIGURATION = "CHANGE_SOURCE_CONFIGURATION",
-    CHANGE_SOURCE_URIS = "CHANGE_SOURCE_URIS", // APPLIES ONLY TO PackageFileV040 and earlier
+    CHANGE_SOURCE_URIS = "CHANGE_SOURCE_URIS",
     CHANGE_STREAM_STATS = "CHANGE_SOURCE_STATS",
     CHANGE_STREAM_UPDATE_HASH = "CHANGE_SOURCE_UPDATE_HASH",
     ADD_PROPERTY = "ADD_PROPERTY",
@@ -253,12 +240,18 @@ export function compareStream(priorStreamSet: StreamSet, newStreamSet: StreamSet
 export function compareSource(priorSource: Source, newSource: Source, pointer = "#"): Difference[] {
     let response: Difference[] = [];
 
+    if (!sourceURIsEquivalent(priorSource.uris, newSource.uris)) {
+        response.push({ type: DifferenceType.CHANGE_SOURCE_URIS, pointer });
+    }
+
     if (priorSource == null && newSource != null) {
         response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
     } else if (newSource == null && priorSource != null) {
         response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
     } else if (priorSource != null && newSource != null) {
         if (priorSource.type !== newSource.type) {
+            response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
+        } else if (!sourceURIsEquivalent(priorSource.uris, newSource.uris)) {
             response.push({ type: DifferenceType.CHANGE_SOURCE, pointer: pointer });
         } else {
             const configComparison = compareConfigObjects(priorSource.configuration, newSource.configuration);
@@ -564,7 +557,7 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
         packageFileObject.$schema = "https://datapm.io/docs/package-file-schema-v0.3.0.json";
 
         const oldPackageFile = packageFileObject as PackageFileV020;
-        const newPackagefile = packageFileObject as PackageFileV030;
+        const newPackagefile = packageFileObject as PackageFile;
 
         for (const schema of oldPackageFile.schemas) {
             if (schema && schema.source) {
@@ -585,9 +578,9 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
                                 streamStats: {
                                     inspectedCount: schema.recordsInspectedCount || 0,
                                     byteCount: schema.byteCount,
-                                    byteCountPrecision: (schema.byteCountPrecision as unknown) as CountPrecisionV030,
+                                    byteCountPrecision: (schema.byteCountPrecision as unknown) as CountPrecision,
                                     recordCount: schema.recordCount,
-                                    recordCountPrecision: (schema.recordCountPrecision as unknown) as CountPrecisionV030
+                                    recordCountPrecision: (schema.recordCountPrecision as unknown) as CountPrecision
                                 }
                             }
                         ]
@@ -653,16 +646,6 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
                     }
                 }
             }
-        }
-    }
-
-    if (packageFileObject.$schema === "https://datapm.io/docs/package-file-schema-v0.4.0.json") {
-        packageFileObject.$schema = "https://datapm.io/docs/package-file-schema-v0.5.0.json";
-
-        const oldPackageFile = packageFileObject as PackageFile040;
-
-        for (const oldSchema of oldPackageFile.sources) {
-            (oldSchema.configuration as DPMConfiguration).uris = oldSchema.uris;
         }
     }
 
