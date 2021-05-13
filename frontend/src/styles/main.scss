@@ -1162,6 +1162,8 @@ button:disabled {
                 padding: 3px 7px;
                 font-weight: $weight-500;
                 color: var(--gray-2-color);
+                position: relative;
+                bottom: 1px;
                 border-radius: 50%;
                 background-color: var(--gray-5-color);
             }

@@ -44,7 +44,7 @@ export class PackageComponent implements OnDestroy {
 
     public routes = [
         { linkName: "description", url: "", showDetails: true, isHidden: false },
-        { linkName: "issues", url: "issues", showDetails: true, isHidden: false },
+        { linkName: "issues", url: "issues", showDetails: false, isHidden: false },
         { linkName: "history", url: "history", showDetails: true, isHidden: false }
     ];
 
@@ -117,7 +117,7 @@ export class PackageComponent implements OnDestroy {
 
                 this.routes = [
                     { linkName: "description", url: "", showDetails: true, isHidden: false },
-                    { linkName: "issues", url: "issues", showDetails: true, isHidden: false },
+                    { linkName: "issues", url: "issues", showDetails: false, isHidden: false },
                     { linkName: "history", url: "history", showDetails: true, isHidden: false }
                 ];
                 if (this.package?.myPermissions.includes(Permission.MANAGE)) {
