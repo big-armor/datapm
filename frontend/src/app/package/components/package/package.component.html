@@ -110,19 +110,6 @@
                                                         </a>
                                                     </div>
                                                 </div>
-                                                <div
-                                                    *ngIf="currentUser"
-                                                    class="d-flex flex-column bd-highlight ml-auto mr-2"
-                                                >
-                                                    <button class="app-raised-button follow-btn" (click)="follow()">
-                                                        <span *ngIf="isFollowing"
-                                                            ><em class="fas fa-bell-slash"></em>Unfollow
-                                                        </span>
-                                                        <span *ngIf="!isFollowing"
-                                                            ><em class="fas fa-bell"></em>Follow</span
-                                                        >
-                                                    </button>
-                                                </div>
                                             </div>
                                             <div class="derivedFromSubtitle" *ngIf="derivedFromCount(packageFile) > 0">
                                                 Derived from
@@ -166,6 +153,9 @@
                                                 [ngClass]="{ active: isActiveTab(r) }"
                                             >
                                                 {{ r.linkName }}
+                                                <span *ngIf="r.linkName === 'issues' && issuesCount > 0">{{
+                                                    issuesCount
+                                                }}</span>
                                             </a>
                                         </li>
                                     </ul>

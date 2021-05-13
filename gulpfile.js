@@ -186,17 +186,29 @@ function prepareDockerBuildAssets() {
 exports.default = series(
     installLibDependencies,
     buildLib,
+    //   testLib,
+    installBackendDependencies,
+    buildBackend,
+    //   testBackend,
+    installFrontendDependencies,
+    buildFrontend,
+    //   testFrontend,
+    installDocsDependencies,
+    buildDocs,
+    prepareDockerBuildAssets,
+    buildDockerImage
+);
+
+exports.test = series(
+    installLibDependencies,
+    buildLib,
     testLib,
     installBackendDependencies,
     buildBackend,
     testBackend,
     installFrontendDependencies,
     buildFrontend,
-    testFrontend,
-    installDocsDependencies,
-    buildDocs,
-    prepareDockerBuildAssets,
-    buildDockerImage
+    testFrontend
 );
 
 exports.buildParallel = series(
