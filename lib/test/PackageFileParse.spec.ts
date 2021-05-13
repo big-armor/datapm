@@ -5,7 +5,7 @@ import fs from "fs";
 describe("PackageFile checks", () => {
     it("Should have correct schema value", function () {
         const test = new PackageFile();
-        expect(test.$schema).equal("https://datapm.io/docs/package-file-schema-v0.4.0.json");
+        expect(test.$schema).equal("https://datapm.io/docs/package-file-schema-v0.5.0.json");
     });
 
     it("Should parse dates", function () {
@@ -26,8 +26,10 @@ describe("PackageFile checks", () => {
     it("Should have v0.3.0 sources array separate from schemas", function () {
         const packageFile = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         expect(packageFile.sources.length).equal(1);
-        expect(packageFile.sources[0].uris.length).equal(1);
-        expect(packageFile.sources[0].uris[0]).equal(
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        expect((packageFile.sources[0].configuration!.uris! as string[]).length).equal(1);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        expect((packageFile.sources[0].configuration!.uris! as string[])[0]).equal(
             "https://theunitedstates.io/congress-legislators/legislators-current.csv"
         );
     });

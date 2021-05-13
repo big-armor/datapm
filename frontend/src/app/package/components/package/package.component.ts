@@ -3,14 +3,19 @@ import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { PackageFile } from "datapm-lib";
 import { Subject } from "rxjs";
-import { OrderBy, Package, PackageIssuesGQL, Permission, User, UserGQL } from "src/generated/graphql";
+import { OrderBy, PackageIssuesGQL } from "src/generated/graphql";
+import { Follow, Package, Permission, User, UserGQL, GetFollowGQL, FollowIdentifierInput } from "src/generated/graphql";
 import { PackageService, PackageResponse } from "../../services/package.service";
 import { filter, takeUntil } from "rxjs/operators";
-import { MatDialog } from "@angular/material/dialog";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { LoginDialogComponent } from "src/app/shared/header/login-dialog/login-dialog.component";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import { packageToIdentifier } from "src/app/helpers/IdentifierHelper";
+import {
+    FollowDialogComponent,
+    FollowDialogResult
+} from "src/app/shared/dialogs/follow-dialog/follow-dialog.component";
 
 enum State {
     LOADING,
@@ -26,15 +31,16 @@ enum State {
     styleUrls: ["./package.component.scss"]
 })
 export class PackageComponent implements OnDestroy {
-    @ViewChild("derivedFrom") derivedFromDialogTemplate: TemplateRef<any>;
+    private readonly unsubscribe$ = new Subject();
 
-    State = State;
-    state = State.LOADING;
+    @ViewChild("derivedFrom")
+    public derivedFromDialogTemplate: TemplateRef<any>;
+
+    public State = State;
+    public state = State.LOADING;
 
     public package: Package;
     public packageFile: PackageFile;
-
-    private unsubscribe$ = new Subject();
 
     public routes = [
         { linkName: "description", url: "", showDetails: true, isHidden: false },
@@ -42,24 +48,27 @@ export class PackageComponent implements OnDestroy {
         { linkName: "history", url: "history", showDetails: true, isHidden: false }
     ];
 
-    private catalogSlug = "";
-    private packageSlug = "";
-
     public catalogUser: User;
     public currentUser: User;
 
     public issuesCount: number;
+    public packageFollow: Follow;
+    public isFollowing: boolean;
+
+    private catalogSlug = "";
+    private packageSlug = "";
 
     constructor(
+        public dialog: MatDialog,
         private route: ActivatedRoute,
         private snackBarService: SnackBarService,
         private packageService: PackageService,
-        public dialog: MatDialog,
         private title: Title,
         private router: Router,
         private userGql: UserGQL,
         private authenticationService: AuthenticationService,
-        private packageIssuesGQL: PackageIssuesGQL
+        private packageIssuesGQL: PackageIssuesGQL,
+        private getFollowGQL: GetFollowGQL
     ) {
         this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe(
             (p: PackageResponse) => {
@@ -85,6 +94,7 @@ export class PackageComponent implements OnDestroy {
                 }
                 this.package = p.package;
                 this.loadPackageIssues();
+                this.getFollow();
                 if (this.package && this.package.latestVersion) {
                     this.packageFile = JSON.parse(this.package.latestVersion.packageFile);
                 } else {
@@ -247,5 +257,48 @@ export class PackageComponent implements OnDestroy {
             const responseData = issuesResponse.data.packageIssues;
             this.issuesCount = responseData.openIssuesCount;
         });
+    }
+    public follow(): void {
+        this.openFollowModal()
+            .afterClosed()
+            .subscribe((result) => {
+                if (!result) {
+                    return;
+                }
+
+                this.updatePackageFollow(result.follow);
+            });
+    }
+
+    private getFollow(): void {
+        this.getFollowGQL
+            .fetch({
+                follow: this.buildFollowIdentifier()
+            })
+            .subscribe((response) => this.updatePackageFollow(response.data?.getFollow));
+    }
+
+    private buildFollowIdentifier(): FollowIdentifierInput {
+        return {
+            package: {
+                catalogSlug: this.package.identifier.catalogSlug,
+                packageSlug: this.package.identifier.packageSlug
+            }
+        };
+    }
+
+    private openFollowModal(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
+        return this.dialog.open(FollowDialogComponent, {
+            width: "500px",
+            data: {
+                follow: this.packageFollow,
+                followIdentifier: this.buildFollowIdentifier()
+            }
+        });
+    }
+
+    private updatePackageFollow(follow: Follow): void {
+        this.packageFollow = follow;
+        this.isFollowing = follow != null;
     }
 }

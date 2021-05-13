@@ -26,6 +26,12 @@ function copyEmailTemplates() {
     return src(["static/email-templates/*"]).pipe(dest(path.join(DESTINATION_DIR, "static", "email-templates")));
 }
 
+function copyStaticTemplates() {
+    return src(["static/builder-io-templates/*"]).pipe(
+        dest(path.join(DESTINATION_DIR, "static", "builder-io-templates"))
+    );
+}
+
 function copyModules() {
     return exec("npx copy-node-modules ./ dist/", execLogCb);
 }
@@ -47,5 +53,12 @@ function execLogCb(err, stdout, stderr) {
     return err; // makes gulp continue even if the command failed
 }
 
-exports.default = series(copyFiles, copyEmailTemplates, copyModules, copyDataPMLib, slimTypeOrmDist);
+exports.default = series(
+    copyFiles,
+    copyEmailTemplates,
+    copyStaticTemplates,
+    copyModules,
+    copyDataPMLib,
+    slimTypeOrmDist
+);
 exports.copyDependencies = series(copyModules, copyDataPMLib);

@@ -35,6 +35,11 @@
                     [username]="username"
                     *ngSwitchCase="'packages'"
                 ></app-user-packages>
+                <app-user-following
+                    [isCurrentUser]="isCurrentUser"
+                    [username]="username"
+                    *ngSwitchCase="'user-following'"
+                ></app-user-following>
                 <app-user-details *ngSwitchDefault></app-user-details>
             </div>
 

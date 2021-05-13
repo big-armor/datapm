@@ -12,6 +12,7 @@ export interface ActivityLogTemp {
     eventType: ActivityLogEventType;
     changeType?: ActivityLogChangeType;
     targetPackageId?: number;
+    targetPackageIssueId?: number;
     targetPackageVersionId?: number;
     targetCatalogId?: number;
     targetCollectionId?: number;
@@ -26,6 +27,7 @@ export async function createActivityLog(connection: EntityManager | Connection, 
     activityLog.changeType = activityLogTemp.changeType;
     activityLog.userId = activityLogTemp.userId;
     activityLog.targetPackageId = activityLogTemp.targetPackageId;
+    activityLog.targetPackageIssueId = activityLogTemp.targetPackageIssueId;
     activityLog.targetPackageVersionId = activityLogTemp.targetPackageVersionId;
     activityLog.targetCatalogId = activityLogTemp.targetCatalogId;
     activityLog.targetCollectionId = activityLogTemp.targetCollectionId;

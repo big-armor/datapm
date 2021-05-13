@@ -21,6 +21,7 @@ import { UserRepository } from "./repository/UserRepository";
 import { PackageRepository } from "./repository/PackageRepository";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { CollectionRepository } from "./repository/CollectionRepository";
+import { PackageDataStorageService } from "./storage/data/package-data-storage-service";
 console.log("DataPM Registry Server Starting...");
 
 const dataLibPackageFile = fs.readFileSync("node_modules/datapm-lib/package.json");
@@ -168,7 +169,7 @@ async function main() {
     });
 
     app.use("/docs/datapm-package-file-schema-*", function (req, res, next) {
-        const version = req.url.match(/^\/docs\/datapm-package-file-schema-v(.*)\.json$/i);
+        const version = req.baseUrl.match(/^\/docs\/datapm-package-file-schema-v(.*)\.json$/i);
         if (version == null) {
             res.sendStatus(404);
             return;
@@ -187,7 +188,7 @@ async function main() {
         }
     });
 
-    // these three routes serve angular static content
+    // These three routes serve angular static content
     app.use(
         "/static",
         express.static(path.join(__dirname, "..", "static"), {
@@ -213,7 +214,18 @@ async function main() {
     app.use("/assets", express.static(path.join(__dirname, "..", "static", "assets")));
     app.use("/favicon.ico", express.static(path.join(__dirname, "favicon.ico")));
 
-    // set express for the Apollo GraphQL server
+    app.use(
+        "/static/builder-io-templates",
+        express.static(path.join(__dirname, "static", "builder-io-templates"), {
+            setHeaders: (res, path) => {
+                // set cache to 1 year for anything that includes a hash
+                const maxAge = path.match(/\.[a-fA-F0-9]{20}\.[^\/]+$/) ? 31536000 : 0;
+                res.setHeader("Cache-Control", `public, max-age=${maxAge}`);
+            }
+        })
+    );
+
+    // Set express for the Apollo GraphQL server
     server.applyMiddleware({ app, bodyParserConfig: { limit: "20mb" } });
 
     const respondWithImage = async (imageStream: Readable, response: express.Response) => {
@@ -314,6 +326,40 @@ async function main() {
             return;
         }
     });
+
+    app.route("/data/:catalogSlug/:packageSlug/:version/:sourceSlug")
+        .post(async (req, res, next) => {
+            try {
+                const contextObject = await context({ req });
+                await PackageDataStorageService.INSTANCE.writePackageDataFromStream(
+                    contextObject,
+                    req.params.catalogSlug,
+                    req.params.packageSlug,
+                    req.params.version,
+                    req.params.sourceSlug,
+                    req
+                );
+                res.send();
+            } catch (err) {
+                res.status(400).send();
+            }
+        })
+        .get(async (req, res, next) => {
+            try {
+                res.header("Content-Type", "application/octet-stream");
+                const contextObject = await context({ req });
+                const stream = await PackageDataStorageService.INSTANCE.readPackageDataFromStream(
+                    contextObject,
+                    req.params.catalogSlug,
+                    req.params.packageSlug,
+                    req.params.version,
+                    req.params.sourceSlug
+                );
+                stream.pipe(res);
+            } catch (err) {
+                res.status(400).send();
+            }
+        });
 
     // any route not yet defined goes to index.html
     app.use("*", (req, res, next) => {

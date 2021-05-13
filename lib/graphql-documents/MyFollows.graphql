@@ -1,0 +1,44 @@
+query MyFollows($type: FollowType!, $offset: Int!, $limit: Int!) {
+    myFollows(type: $type, offset: $offset, limit: $limit) {
+        follows {
+            notificationFrequency
+            eventTypes
+            catalog {
+                identifier {
+                    registryURL
+                    catalogSlug
+                }
+                displayName
+            }
+            package {
+                identifier {
+                    registryURL
+                    catalogSlug
+                    packageSlug
+                }
+                displayName
+            }
+            packageIssue {
+                issueNumber
+                subject
+                packageIdentifier {
+                    catalogSlug
+                    packageSlug
+                }
+            }
+            collection {
+                identifier {
+                    collectionSlug
+                }
+                name
+            }
+            user {
+                firstName
+                lastName
+                username
+            }
+        }
+        hasMore
+        count
+    }
+}

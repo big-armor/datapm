@@ -28,7 +28,7 @@ SelectQueryBuilder.prototype.filterUserCatalog = function (topLevelAlias: string
     });
 };
 
-async function getCatalogOrFail({
+export async function getCatalogOrFail({
     slug,
     manager,
     relations = []

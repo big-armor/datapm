@@ -16,7 +16,7 @@ export class ResourceImporterService {
     private readonly JAVASCRIPT_SCRIPT_TYPE = "text/javascript";
 
     private readonly GET_METHOD_TYPE = "GET";
-    private readonly PATH_PREFIX = "/static/";
+    private readonly PATH_PREFIX = "/static/builder-io-templates/";
     private readonly HTML_PATH_POSTFIX = ".html";
     private readonly JAVASCRIPT_PATH_POSTFIX = ".js";
     private readonly API_KEY_REGEX = "{{apiKey}}";

@@ -2,7 +2,6 @@ import { DPMStorage } from "./dpm-storage";
 import { Stream, Readable } from "stream";
 import { Bucket, File, Storage } from "@google-cloud/storage";
 import { DpmStorageStreamHolder } from "./dpm-storage-stream-holder";
-import { fileURLToPath } from "url";
 import { StorageErrors } from "./files/file-storage-service";
 
 export class GoogleCloudStorage implements DPMStorage {

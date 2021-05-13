@@ -1,0 +1,6 @@
+query GetFollow($follow: FollowIdentifierInput!) {
+    getFollow(follow: $follow) {
+        notificationFrequency
+        eventTypes
+    }
+}

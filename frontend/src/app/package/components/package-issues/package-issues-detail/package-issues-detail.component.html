@@ -41,7 +41,7 @@
                                     commented {{ packageIssue.createdAt | timeAgo }}
                                 </p>
                             </div>
-                            <div class="bd-highlight" *ngIf="canEditIssue">
+                            <div class="bd-highlight">
                                 <a mat-button [matMenuTriggerFor]="menu" class="menu-btn">
                                     <em class="fas fa-ellipsis-h"></em>
                                 </a>
@@ -49,10 +49,19 @@
                                     <button mat-menu-item id="issueBtn" (click)="insertQuote(packageIssue.content)">
                                         <span class="text-dark-gray">Quote reply</span>
                                     </button>
-                                    <button mat-menu-item id="issueBtn" (click)="openIssueEditor(issueEditor)">
+                                    <button
+                                        mat-menu-item
+                                        id="issueBtn"
+                                        *ngIf="canEditIssue"
+                                        (click)="openIssueEditor(issueEditor)"
+                                    >
                                         <span class="text-dark-gray">Edit</span>
                                     </button>
-                                    <button mat-menu-item id="issueBtn" (click)="deleteIssue()">
+                                    <button *ngIf="user" mat-menu-item id="issueBtn" (click)="follow()">
+                                        <span class="text-dark-gray" *ngIf="!isFollowing">Follow</span>
+                                        <span class="text-dark-gray" *ngIf="isFollowing">Unfollow</span>
+                                    </button>
+                                    <button mat-menu-item id="issueBtn" *ngIf="canEditIssue" (click)="deleteIssue()">
                                         <span class="text-dark-gray">Delete</span>
                                     </button>
                                 </mat-menu>
