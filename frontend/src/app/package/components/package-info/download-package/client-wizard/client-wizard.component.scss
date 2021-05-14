@@ -10,7 +10,7 @@
     }
 
     .mat-content {
-        height: 210px;
+        height: 215px;
         display: block;
     }
 
@@ -62,29 +62,24 @@
         padding: 0px;
     }
 
+    ::ng-deep.mat-dialog-actions {
+        border-top: 1px solid var(--gray-9-color);
+    }
+
     #contentBorder {
         border: 0px;
         padding: 0px;
     }
-
-    .stepper-actions {
-        text-align: right;
-        padding: 0px;
-        min-height: 46px;
-        margin-bottom: 0px !important;
-        border-top: 1px solid var(--gray-9-color);
-        color: var(--gray-1-color);
-
-        button {
-            &:hover {
-                background-color: var(--gray-10-color);
-            }
-        }
-    }
 }
 
-::ng-deep .my-custom-dialog {
-    .mat-dialog-container {
-        padding: 25px 25px 3px 25px !important;
+@media (max-width: 768px) {
+    #clientWizard {
+        .stepper-title {
+            margin-top: 0px;
+            font-size: 16px;
+        }
+        .mat-content {
+            height: 240px;
+        }
     }
 }
