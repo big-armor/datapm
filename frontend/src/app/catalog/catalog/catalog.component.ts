@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, ParamMap } from "@angular/router";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
+import { PlatformSettingsComponent } from "src/app/home/admin-dashboard/platform-settings/platform-settings.component";
 import { PageState } from "src/app/models/page-state";
 import { BuilderIOSettings, Catalog, GetPageContentGQL, User } from "src/generated/graphql";
 
@@ -18,6 +19,8 @@ enum PageType {
     styleUrls: ["./catalog.component.scss"]
 })
 export class CatalogComponent implements OnInit {
+    public readonly NOT_FOUND_BUILDER_IO_ENTRY_KEY = PlatformSettingsComponent.NOT_FOUND_PAGE_ENTRY_KEY;
+
     public PageType = PageType;
     public pageType: PageType;
 

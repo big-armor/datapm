@@ -2,4 +2,6 @@
     <ng-content></ng-content>
 </app-builder-io-renderer>
 
-<ng-template #loadingTemplate>Loading...</ng-template>
+<ng-template #loadingTemplate>
+    <mat-spinner [diameter]="32"></mat-spinner>
+</ng-template>

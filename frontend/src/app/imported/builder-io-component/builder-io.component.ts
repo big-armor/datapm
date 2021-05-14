@@ -18,6 +18,9 @@ export class BuilderIOComponent implements AfterViewChecked {
     @Input()
     public entry: string;
 
+    @Input()
+    public entryKey: string;
+
     public builderTemplate: string;
 
     private destroy$ = new Subject();
@@ -25,17 +28,20 @@ export class BuilderIOComponent implements AfterViewChecked {
     constructor(private builderIOService: BuilderIOService, private elementRef: ElementRef) {}
 
     public ngAfterViewChecked(): void {
-        this.loadJavascriptAndInjectIntoTemplate(this.apiKey, this.entry);
+        this.loadJavascriptAndInjectIntoTemplate();
     }
 
-    private loadJavascriptAndInjectIntoTemplate(apiKey: string, entry: string): void {
+    private loadJavascriptAndInjectIntoTemplate(): void {
         this.builderIOService
             .getBuilderIOScript()
             .pipe(takeUntil(this.destroy$))
             .subscribe((js) => {
-                this.apiKey = apiKey;
-                this.entry = entry;
-                this.injectJavascriptIntoTemplate(js);
+                setTimeout(() => {
+                    if (!this.entry && this.entryKey) {
+                        this.entry = this.builderIOService.getTemplateEntryByPageKey(this.entryKey);
+                    }
+                    this.injectJavascriptIntoTemplate(js);
+                });
             });
     }
 

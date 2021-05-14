@@ -9,7 +9,11 @@
         <div class="container">Failed to load page</div>
     </app-builder-io>
 </div>
-<div class="dpm-no-data" *ngIf="state === 'ERROR'">No users, catalogs or pages were found</div>
+<div class="dpm-no-data" *ngIf="state === 'ERROR'">
+    <app-builder-io [apiKey]="builderIOApiKey" [entryKey]="NOT_FOUND_BUILDER_IO_ENTRY_KEY">
+        <div class="container">Failed to load page</div>
+    </app-builder-io>
+</div>
 <ng-template *ngIf="state === 'LOADING'">
     <mat-spinner [diameter]="32"></mat-spinner>
 </ng-template>
