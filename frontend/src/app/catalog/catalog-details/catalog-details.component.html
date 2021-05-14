@@ -1,7 +1,7 @@
 <div class="catalog-details container-fluid px-0 pt-2">
     <ng-container *ngIf="state === 'SUCCESS'">
         <div class="container">
-            <app-cover [catalogSlug]="catalogSlug"></app-cover>
+            <app-cover [catalogSlug]="catalog?.identifier.catalogSlug"></app-cover>
             <div class="d-flex flex-row bd-highlight">
                 <div class="pl-3 bd-highlight">
                     <app-avatar class="catalog-avatar" [catalog]="catalog" [circled]="false" [size]="80"> </app-avatar>

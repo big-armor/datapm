@@ -1,3 +1,4 @@
+import { UserInputError } from "apollo-server";
 import graphqlFields from "graphql-fields";
 import { AuthenticatedContext, Context } from "../context";
 import { resolveCatalogPermissions } from "../directive/hasCatalogPermissionDirective";
@@ -318,4 +319,44 @@ export const myCatalogs = async (_0: any, {}, context: AuthenticatedContext) => 
         .filter((p) => p.catalog != null)
         .map((p) => p.catalog)
         .map((c) => catalogEntityToGraphQL(c));
+};
+
+export const getCatalogByIdentifierOrFail = async (
+    _0: any,
+    { identifier }: { identifier: CatalogIdentifierInput },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const graphQLRelationName = info ? getGraphQlRelationName(info) : [];
+
+    const catalog = await context.connection.getCustomRepository(CatalogRepository).findCatalogBySlug({
+        slug: identifier.catalogSlug,
+        relations: graphQLRelationName
+    });
+
+    if (catalog == null) {
+        throw new UserInputError("CATALOG_NOT_FOUND");
+    }
+
+    return catalogEntityToGraphQL(catalog);
+};
+
+export const getCatalogByIdentifier = async (
+    _0: any,
+    { identifier }: { identifier: CatalogIdentifierInput },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const graphQLRelationName = info ? getGraphQlRelationName(info) : [];
+
+    const catalog = await context.connection.getCustomRepository(CatalogRepository).findCatalogBySlug({
+        slug: identifier.catalogSlug,
+        relations: graphQLRelationName
+    });
+
+    if (catalog == null) {
+        return undefined;
+    }
+
+    return catalogEntityToGraphQL(catalog);
 };

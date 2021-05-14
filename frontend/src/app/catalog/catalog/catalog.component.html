@@ -1,8 +1,15 @@
 <div class="page-content" *ngIf="state === 'SUCCESS'">
-    <app-catalog-details *ngIf="!isPersonal"></app-catalog-details>
-    <app-user-details-page *ngIf="isPersonal"></app-user-details-page>
+    <app-user-details-page *ngIf="pageType == PageType.USER" [user]="user"></app-user-details-page>
+    <app-catalog-details *ngIf="pageType == PageType.CATALOG" [catalog]="catalog"></app-catalog-details>
+    <app-builder-io
+        *ngIf="pageType == PageType.BUILDER_IO_TEMPLATE"
+        [apiKey]="builderIOApiKey"
+        [entry]="builderIOPageEntry"
+    >
+        <div class="container">Failed to load page</div>
+    </app-builder-io>
 </div>
-<div class="dpm-no-data" *ngIf="state === 'ERROR'">Error occured while getting catalog details.</div>
+<div class="dpm-no-data" *ngIf="state === 'ERROR'">No users, catalogs or pages were found</div>
 <ng-template *ngIf="state === 'LOADING'">
     <mat-spinner [diameter]="32"></mat-spinner>
 </ng-template>

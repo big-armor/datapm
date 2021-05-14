@@ -1,5 +1,4 @@
-import { AfterContentChecked, Component, ElementRef } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
+import { AfterViewChecked, Component, ElementRef, Input } from "@angular/core";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { BuilderIOService } from "../resource-importer.service";
@@ -9,43 +8,24 @@ import { BuilderIOService } from "../resource-importer.service";
     templateUrl: "./builder-io.component.html",
     styleUrls: ["./builder-io.component.scss"]
 })
-export class BuilderIOComponent implements AfterContentChecked {
+export class BuilderIOComponent implements AfterViewChecked {
     private readonly JAVASCRIPT_ELEMENT_TYPE = "script";
     private readonly JAVASCRIPT_SCRIPT_TYPE = "text/javascript";
 
-    public entry: string;
+    @Input()
     public apiKey: string;
 
-    public loaded: boolean;
+    @Input()
+    public entry: string;
+
     public builderTemplate: string;
 
     private destroy$ = new Subject();
 
-    constructor(
-        private builderIOService: BuilderIOService,
-        private route: ActivatedRoute,
-        private elementRef: ElementRef
-    ) {}
+    constructor(private builderIOService: BuilderIOService, private elementRef: ElementRef) {}
 
-    public ngAfterContentChecked(): void {
-        this.loadContent();
-    }
-
-    private loadContent(): void {
-        this.loaded = false;
-        this.builderIOService
-            .getBuilderIOApiKey()
-            .pipe(takeUntil(this.destroy$))
-            .subscribe((apiKey) => {
-                const pageKey = this.route.snapshot.params.page;
-                const entry = this.builderIOService.getTemplateEntryByPageKey(pageKey);
-
-                if (entry) {
-                    this.loadJavascriptAndInjectIntoTemplate(apiKey, entry);
-                } else {
-                    this.loaded = true;
-                }
-            });
+    public ngAfterViewChecked(): void {
+        this.loadJavascriptAndInjectIntoTemplate(this.apiKey, this.entry);
     }
 
     private loadJavascriptAndInjectIntoTemplate(apiKey: string, entry: string): void {
@@ -56,7 +36,6 @@ export class BuilderIOComponent implements AfterContentChecked {
                 this.apiKey = apiKey;
                 this.entry = entry;
                 this.injectJavascriptIntoTemplate(js);
-                this.loaded = true;
             });
     }
 
