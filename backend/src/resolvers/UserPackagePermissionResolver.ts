@@ -13,7 +13,7 @@ import { sendInviteUser, sendShareNotification, validateMessageContents } from "
 export const hasPackagePermissions = async (context: Context, packageId: number, permission: Permission) => {
     if (permission == Permission.VIEW) {
         const packageEntity = await context.connection.getRepository(PackageEntity).findOneOrFail({ id: packageId });
-        if (packageEntity?.isPublic || packageEntity.catalog.unclaimed) {
+        if (packageEntity?.isPublic) {
             return true;
         }
     }
