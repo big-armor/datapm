@@ -81,6 +81,14 @@ export const catalogIsPublic = async (parent: Catalog, _1: any, context: Context
     return catalog.isPublic;
 };
 
+export const catalogIsUnclaimed = async (parent: Catalog, _1: any, context: Context): Promise<boolean> => {
+    const catalog = await context.connection
+        .getCustomRepository(CatalogRepository)
+        .findCatalogBySlugOrFail(parent.identifier.catalogSlug);
+
+    return catalog.unclaimed;
+};
+
 export const catalogDisplayName = async (parent: Catalog, _1: any, context: Context) => {
     const catalog = await context.connection
         .getCustomRepository(CatalogRepository)
@@ -177,6 +185,10 @@ export const createCatalog = async (
     context: AuthenticatedContext,
     info: any
 ) => {
+    if (!context.me.isAdmin && value.unclaimed === true) {
+        throw new Error("NOT_AUTHORIZED");
+    }
+
     const catalogEntity = await context.connection.manager.getCustomRepository(CatalogRepository).createCatalog({
         userId: context.me?.id,
         value,
@@ -199,11 +211,26 @@ export const updateCatalog = async (
     info: any
 ) => {
     return context.connection.transaction(async (transaction) => {
+        if (!context.me.isAdmin && value.unclaimed !== undefined) {
+            throw new Error("NOT_AUTHORIZED");
+        }
+
         const catalog = await transaction.getCustomRepository(CatalogRepository).updateCatalog({
             identifier,
             value,
             relations: getGraphQlRelationName(info)
         });
+
+        if (value.unclaimed !== undefined) {
+            await createActivityLog(transaction, {
+                userId: context.me.id,
+                eventType: ActivityLogEventType.CATALOG_PUBLIC_CHANGED,
+                targetCatalogId: catalog.id,
+                changeType: value.unclaimed
+                    ? ActivityLogChangeType.UNCLAIMED_ENABLED
+                    : ActivityLogChangeType.UNCLAIMED_DISABLED
+            });
+        }
 
         await createActivityLog(transaction, {
             userId: context.me.id,
@@ -211,6 +238,17 @@ export const updateCatalog = async (
             targetCatalogId: catalog.id,
             propertiesEdited: Object.keys(value).map((k) => (k == "newSlug" ? "slug" : k))
         });
+
+        if (value.isPublic !== undefined) {
+            await createActivityLog(transaction, {
+                userId: context.me.id,
+                eventType: ActivityLogEventType.CATALOG_PUBLIC_CHANGED,
+                targetCatalogId: catalog.id,
+                changeType: value.isPublic
+                    ? ActivityLogChangeType.PUBLIC_ENABLED
+                    : ActivityLogChangeType.PUBLIC_DISABLED
+            });
+        }
 
         if (value.isPublic !== undefined) {
             await createActivityLog(transaction, {
@@ -314,8 +352,14 @@ export const myCatalogs = async (_0: any, {}, context: AuthenticatedContext) => 
         .getCustomRepository(UserCatalogPermissionRepository)
         .findByUser({ username: context.me?.username, relations: ["catalog"] });
 
-    return permissions
-        .filter((p) => p.catalog != null)
-        .map((p) => p.catalog)
-        .map((c) => catalogEntityToGraphQL(c));
+    const catalogs = permissions.filter((p) => p.catalog != null).map((p) => p.catalog);
+
+    if (context.me.isAdmin) {
+        const unclaimedCatalogs = await context.connection.manager
+            .getCustomRepository(CatalogRepository)
+            .findAllUnclaimed();
+        catalogs.push(...unclaimedCatalogs);
+    }
+
+    return catalogs.map((c) => catalogEntityToGraphQL(c));
 };

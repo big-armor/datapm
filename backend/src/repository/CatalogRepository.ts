@@ -82,6 +82,15 @@ export class CatalogRepository extends Repository<CatalogEntity> {
             .getOne();
     }
 
+    public async findAllUnclaimed(relations: string[] = []) {
+        return await this.manager
+            .getRepository(CatalogEntity)
+            .createQueryBuilder("catalog")
+            .where("unclaimed IS true")
+            .addRelations("catalog", relations)
+            .getMany();
+    }
+
     async findCatalogBySlugOrFail(slug: string, relations?: string[]): Promise<CatalogEntity> {
         const catalog = await this.manager
             .getRepository(CatalogEntity)
@@ -129,6 +138,7 @@ export class CatalogRepository extends Repository<CatalogEntity> {
             catalog.displayName = value.displayName;
             catalog.description = value.description || null;
             catalog.isPublic = value.isPublic;
+            catalog.unclaimed = value.unclaimed || false;
             catalog.createdAt = now;
             catalog.website = value.website ? value.website : "";
             catalog.updatedAt = now;
@@ -184,6 +194,10 @@ export class CatalogRepository extends Repository<CatalogEntity> {
                         await transaction.save(packageEntity);
                     }
                 }
+            }
+
+            if (value.unclaimed != null) {
+                catalog.unclaimed = value.unclaimed;
             }
 
             if (value.description) {

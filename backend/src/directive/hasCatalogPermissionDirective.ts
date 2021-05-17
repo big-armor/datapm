@@ -1,4 +1,4 @@
-import { SchemaDirectiveVisitor, AuthenticationError, ForbiddenError, UserInputError } from "apollo-server";
+import { SchemaDirectiveVisitor, AuthenticationError, ForbiddenError } from "apollo-server";
 import {
     GraphQLObjectType,
     GraphQLField,
@@ -8,10 +8,19 @@ import {
     EnumValueNode
 } from "graphql";
 import { Context } from "../context";
+import { CatalogEntity } from "../entity/CatalogEntity";
 import { UserEntity } from "../entity/UserEntity";
 import { CatalogIdentifierInput, Permission } from "../generated/graphql";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { CatalogRepository } from "../repository/CatalogRepository";
+
+export const buildUnclaimedCatalogPermissions = (context: Context): Permission[] => {
+    const permissions = [Permission.VIEW];
+    if (context.me?.isAdmin) {
+        permissions.push(Permission.EDIT, Permission.MANAGE);
+    }
+    return permissions;
+};
 
 export async function resolveCatalogPermissions(
     context: Context,
@@ -22,11 +31,19 @@ export async function resolveCatalogPermissions(
         .getCustomRepository(CatalogRepository)
         .findCatalogBySlugOrFail(identifier.catalogSlug);
 
+    return resolveCatalogPermissionsForEntity(context, catalog, user);
+}
+
+export async function resolveCatalogPermissionsForEntity(context: Context, catalog: CatalogEntity, user?: UserEntity) {
     const permissions: Permission[] = [];
 
-    if (catalog.isPublic) permissions.push(Permission.VIEW);
+    if (catalog.isPublic) {
+        permissions.push(Permission.VIEW);
+    }
 
-    if (user == null) return permissions;
+    if (user == null) {
+        return permissions;
+    }
 
     const userPermission = await context.connection
         .getCustomRepository(UserCatalogPermissionRepository)
@@ -36,7 +53,9 @@ export async function resolveCatalogPermissions(
         });
 
     userPermission?.permissions.forEach((p) => {
-        if (!permissions.includes(p)) permissions.push(p);
+        if (!permissions.includes(p)) {
+            permissions.push(p);
+        }
     });
 
     return permissions;
@@ -79,21 +98,37 @@ export class HasCatalogPermissionDirective extends SchemaDirectiveVisitor {
                 (args.identifier && args.identifier.catalogSlug) ||
                 undefined;
 
-            if (catalogSlug === undefined) throw new Error("No catalog slug defined in the request");
+            if (catalogSlug === undefined) {
+                throw new Error("No catalog slug defined in the request");
+            }
 
             await self.validatePermission(context, catalogSlug, permission);
-
             return resolve.apply(this, [source, args, context, info]);
         };
     }
 
-    async validatePermission(context: Context, catalogSlug: string, permission: Permission) {
-        const permissions = await resolveCatalogPermissions(context, { catalogSlug }, context.me);
+    private async validatePermission(context: Context, catalogSlug: string, permission: Permission) {
+        const catalog = await context.connection
+            .getCustomRepository(CatalogRepository)
+            .findCatalogBySlugOrFail(catalogSlug);
 
-        if (permissions.includes(permission)) return;
+        const permissions = await this.getUserCatalogPermissions(context, catalog);
+        if (permissions.includes(permission)) {
+            return;
+        }
 
-        if (context.me == null) throw new AuthenticationError(`NOT_AUTHENTICATED`);
+        if (context.me == null) {
+            throw new AuthenticationError(`NOT_AUTHENTICATED`);
+        }
 
         throw new ForbiddenError("NOT_AUTHORIZED");
+    }
+
+    private async getUserCatalogPermissions(context: Context, catalog: CatalogEntity): Promise<Permission[]> {
+        if (catalog.unclaimed) {
+            return buildUnclaimedCatalogPermissions(context);
+        } else {
+            return await resolveCatalogPermissionsForEntity(context, catalog, context.me);
+        }
     }
 }

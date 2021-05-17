@@ -3,9 +3,18 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { slugValidator } from "src/app/helpers/validators";
 import { PageState } from "src/app/models/page-state";
-import { Catalog, SetCatalogAvatarImageGQL, SetCatalogCoverImageGQL, UpdateCatalogGQL } from "src/generated/graphql";
+import {
+    Catalog,
+    SetCatalogAvatarImageGQL,
+    SetCatalogCoverImageGQL,
+    UpdateCatalogGQL,
+    User
+} from "src/generated/graphql";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
 import { ImageService } from "../../services/image.service";
+import { AuthenticationService } from "src/app/services/authentication.service";
+import { takeUntil } from "rxjs/operators";
+import { Subject } from "rxjs";
 
 @Component({
     selector: "app-edit-catalog",
@@ -13,6 +22,8 @@ import { ImageService } from "../../services/image.service";
     styleUrls: ["./edit-catalog.component.scss"]
 })
 export class EditCatalogComponent {
+    private readonly destroy = new Subject<void>();
+
     form: FormGroup;
     public readonly errorMsg = {
         displayName: {
@@ -29,6 +40,8 @@ export class EditCatalogComponent {
     state: PageState = "INIT";
     confirmDialogOpened: boolean = false;
 
+    public user: User;
+
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: Catalog,
         private setCatalogAvatarImageGQL: SetCatalogAvatarImageGQL,
@@ -36,10 +49,12 @@ export class EditCatalogComponent {
         private updateCatalog: UpdateCatalogGQL,
         private dialogRef: MatDialogRef<EditCatalogComponent>,
         private dialog: MatDialog,
-        private imageService: ImageService
+        private imageService: ImageService,
+        private authenticationService: AuthenticationService
     ) {
         this.form = new FormGroup({
             isPublic: new FormControl(data.isPublic),
+            unclaimed: new FormControl(data.unclaimed),
             displayName: new FormControl(data.displayName, {
                 validators: [Validators.required]
             }),
@@ -48,6 +63,8 @@ export class EditCatalogComponent {
             }),
             description: new FormControl(data.description)
         });
+
+        this.authenticationService.currentUser.pipe(takeUntil(this.destroy)).subscribe((u) => (this.user = u));
     }
 
     public uploadAvatar(data: any): void {

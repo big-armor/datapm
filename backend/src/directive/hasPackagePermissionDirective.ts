@@ -1,10 +1,4 @@
-import {
-    SchemaDirectiveVisitor,
-    AuthenticationError,
-    ForbiddenError,
-    UserInputError,
-    ApolloError
-} from "apollo-server";
+import { SchemaDirectiveVisitor, AuthenticationError, ForbiddenError, ApolloError } from "apollo-server";
 import {
     GraphQLObjectType,
     GraphQLField,
@@ -19,6 +13,7 @@ import { PackageRepository } from "../repository/PackageRepository";
 import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { UserEntity } from "../entity/UserEntity";
+import { buildUnclaimedCatalogPermissions } from "./hasCatalogPermissionDirective";
 
 export async function resolvePackagePermissions(
     context: Context,
@@ -31,9 +26,17 @@ export async function resolvePackagePermissions(
         .getCustomRepository(PackageRepository)
         .findPackageOrFail({ identifier });
 
-    if (packageEntity.isPublic) permissions.push(Permission.VIEW);
+    if (packageEntity.catalog.unclaimed) {
+        return buildUnclaimedCatalogPermissions(context);
+    }
 
-    if (user == null) return permissions;
+    if (packageEntity.isPublic) {
+        permissions.push(Permission.VIEW);
+    }
+
+    if (user == null) {
+        return permissions;
+    }
 
     const userPermission = await context.connection
         .getCustomRepository(PackagePermissionRepository)
@@ -42,22 +45,25 @@ export async function resolvePackagePermissions(
             userId: user.id
         });
 
-    if (userPermission != null)
+    if (userPermission != null) {
         userPermission.permissions.forEach((p) => {
-            if (!permissions.includes(p)) permissions.push(p);
+            if (!permissions.includes(p)) {
+                permissions.push(p);
+            }
         });
+    }
 
     const catalogPermissions = await context.connection
         .getCustomRepository(UserCatalogPermissionRepository)
-        .findCatalogPermissions({
-            catalogId: packageEntity.catalogId,
-            userId: user!.id
-        });
+        .findCatalogPermissions({ catalogId: packageEntity.catalogId, userId: user!.id });
 
-    if (catalogPermissions != null)
+    if (catalogPermissions != null) {
         catalogPermissions.packagePermission.forEach((p) => {
-            if (!permissions.includes(p)) permissions.push(p);
+            if (!permissions.includes(p)) {
+                permissions.push(p);
+            }
         });
+    }
 
     return permissions;
 }

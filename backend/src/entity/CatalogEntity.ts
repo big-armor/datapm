@@ -2,8 +2,6 @@ import { Entity, Column, PrimaryGeneratedColumn, Unique, OneToMany, ManyToOne, J
 import { EntityBaseModel } from "./EntityBaseModel";
 import { UserCatalogPermissionEntity } from "./UserCatalogPermissionEntity";
 import { PackageEntity } from "./PackageEntity";
-import { CatalogIdentifier, Permission } from "../generated/graphql";
-import { Permissions } from "./Permissions";
 import { UserEntity } from "./UserEntity";
 
 @Entity({
@@ -25,6 +23,9 @@ export class CatalogEntity extends EntityBaseModel {
 
     @Column()
     isPublic: boolean;
+
+    @Column()
+    unclaimed: boolean;
 
     @Column({ type: "text", nullable: true })
     description: string | null;
