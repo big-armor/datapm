@@ -1,6 +1,6 @@
 {
     "docs": {
-        "Overview": ["quick-start", "concepts", "about"],
+        "Overview": ["quick-start", "concepts", "about", "data-notice"],
         "Use Cases": ["find-data", "publish-data", "devops"],
         "Documentation": ["command-line-client", "package-files", "connectors", "registry-api", "private-registry"]
     }
