@@ -1,6 +1,6 @@
 ---
-id: data-notice
-title: Data Notice
+id: unclaimed-listings
+title: Unclaimed Listings
 ---
 
 This page describes some functionalities of DataPM.

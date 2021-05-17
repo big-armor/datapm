@@ -221,53 +221,6 @@ describe("Package Tests", async () => {
         expect(response.data!.package!.versions?.length).equal(0);
     });
 
-    it("User A can get package in unclaimed catalog", async function () {
-        await AdminHolder.adminClient.mutate({
-            mutation: CreateCatalogDocument,
-            variables: {
-                value: {
-                    slug: "unclaimed-catalog",
-                    displayName: "Unclaimed catalog",
-                    description: "This is an integration test",
-                    website: "https://usera.datapm.io",
-                    isPublic: false,
-                    unclaimed: true
-                }
-            }
-        });
-
-        await AdminHolder.adminClient.mutate({
-            mutation: CreatePackageDocument,
-            variables: {
-                value: {
-                    catalogSlug: "unclaimed-catalog",
-                    packageSlug: "congressional-legislators",
-                    displayName: "Congressional Legislators",
-                    description: "Test upload of congressional legislators"
-                }
-            }
-        });
-
-        let response = await userAClient.query({
-            query: PackageDocument,
-            variables: {
-                identifier: {
-                    catalogSlug: "unclaimed-catalog",
-                    packageSlug: "congressional-legislators"
-                }
-            }
-        });
-
-        expect(response.errors == null, "no errors").equal(true);
-        expect(response.data!.package!.catalog?.displayName).to.equal("Unclaimed catalog");
-        expect(response.data!.package!.description).to.equal("Test upload of congressional legislators");
-        expect(response.data!.package!.displayName).to.equal("Congressional Legislators");
-        expect(response.data!.package!.identifier.catalogSlug).to.equal("unclaimed-catalog");
-        expect(response.data!.package!.identifier.packageSlug).to.equal("congressional-legislators");
-        expect(response.data!.package!.latestVersion).to.equal(null);
-        expect(response.data!.package!.versions?.length).equal(0);
-    });
-
     it("User A update catalog to be public", async function () {
         let response = await userAClient.mutate({
             mutation: UpdateCatalogDocument,
