@@ -101,9 +101,9 @@
                 </div>
             </div>
 
-            <div mat-dialog-actions class="d-flex justify-content-between pt-1">
-                <button mat-button (click)="move(0)" *ngIf="currentIndex == 1" class="back-btn">Back</button>
-                <button mat-button mat-dialog-close class="close-dialog">Close</button>
+            <div mat-dialog-actions class="d-flex justify-content-end">
+                <button (click)="move(0)" *ngIf="currentIndex == 1" class="modal-close-btn mr-3">Back</button>
+                <button mat-dialog-close class="modal-close-btn">Close</button>
             </div>
         </div>
     </div>

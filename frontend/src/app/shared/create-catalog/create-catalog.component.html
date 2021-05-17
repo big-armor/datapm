@@ -45,8 +45,8 @@
             {{ error }}
         </div>
     </div>
-    <div mat-dialog-actions class="pb-3">
-        <button mat-button (click)="submit()" class="ml-auto save-btn" [class.disabled]="form.invalid">
+    <div mat-dialog-actions>
+        <button (click)="submit()" class="ml-auto modal-submit-btn" [class.disabled]="form.invalid">
             <span *ngIf="state !== 'LOADING'">create</span>
             <mat-spinner [diameter]="20" *ngIf="state === 'LOADING'"></mat-spinner>
         </button>

@@ -67,8 +67,8 @@
         </div>
         <div class="text-danger mt-3" *ngIf="state === 'ERROR'">Error occured while updating catalog.</div>
     </div>
-    <div mat-dialog-actions class="pb-3">
-        <button mat-button class="ml-auto save-btn" [disabled]="form.invalid" (click)="save()">
+    <div mat-dialog-actions>
+        <button class="ml-auto modal-submit-btn" [disabled]="form.invalid" (click)="save()">
             <span *ngIf="state !== 'LOADING'">save</span>
             <mat-spinner [diameter]="20" *ngIf="state === 'LOADING'">Save</mat-spinner>
         </button>

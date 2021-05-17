@@ -214,17 +214,6 @@ async function main() {
     app.use("/assets", express.static(path.join(__dirname, "..", "static", "assets")));
     app.use("/favicon.ico", express.static(path.join(__dirname, "favicon.ico")));
 
-    app.use(
-        "/static/builder-io-templates",
-        express.static(path.join(__dirname, "static", "builder-io-templates"), {
-            setHeaders: (res, path) => {
-                // set cache to 1 year for anything that includes a hash
-                const maxAge = path.match(/\.[a-fA-F0-9]{20}\.[^\/]+$/) ? 31536000 : 0;
-                res.setHeader("Cache-Control", `public, max-age=${maxAge}`);
-            }
-        })
-    );
-
     // Set express for the Apollo GraphQL server
     server.applyMiddleware({ app, bodyParserConfig: { limit: "20mb" } });
 

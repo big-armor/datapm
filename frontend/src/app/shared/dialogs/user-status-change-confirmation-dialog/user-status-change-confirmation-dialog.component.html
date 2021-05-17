@@ -27,10 +27,10 @@
                 </div>
             </div>
 
-            <div mat-dialog-actions class="d-flex justify-content-between pb-3">
-                <button mat-button mat-dialog-close class="btn-close close-dialog" (click)="cancel()">Cancel</button>
-                <button mat-button class="save-btn" (click)="confirm()" [disabled]="loading">
-                    <span class="info-txt">Confirm</span>
+            <div mat-dialog-actions class="d-flex justify-content-between">
+                <button mat-dialog-close class="modal-close-btn" (click)="cancel()">Cancel</button>
+                <button class="modal-submit-btn" (click)="confirm()" [disabled]="loading">
+                    <span>Confirm</span>
                 </button>
             </div>
         </div>

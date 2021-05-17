@@ -7,6 +7,13 @@ table.gray-table {
     }
 }
 
+.permission-div {
+    ::ng-deep mat-select {
+        border: 1px solid var(--gray-9-color);
+        padding: 6px 10px;
+    }
+}
+
 @media (max-width: 768px) {
     th.mat-header-cell:first-of-type,
     td.mat-cell:first-of-type,
