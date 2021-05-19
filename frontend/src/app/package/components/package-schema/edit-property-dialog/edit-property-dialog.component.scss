@@ -10,6 +10,71 @@
         }
     }
 
+    #inviteInput {
+        ::ng-deep .mat-form-field-infix {
+            border-top: none;
+            font-family: $family-roboto;
+            font-style: $style-normal;
+            font-weight: $weight-400;
+            font-size: $small-font;
+            line-height: 18px;
+            padding: 0.15em 0;
+        }
+
+        input {
+            height: 35px;
+            font-size: $small-font;
+
+            &::placeholder {
+                font-size: $small-font;
+                font-family: $family-roboto;
+                letter-spacing: 0.5px;
+                font-weight: $weight-300;
+                color: var(--gray-4-color);
+            }
+        }
+
+        ::ng-deep .mat-form-field-flex {
+            background-color: var(--custom-secondary-color);
+            border-radius: 4px;
+        }
+
+        ::ng-deep .mat-form-field-wrapper {
+            padding-bottom: 0px;
+        }
+
+        ::ng-deep .mat-chip {
+            font-family: $family-roboto;
+            font-style: $style-normal;
+            font-weight: $weight-400;
+            font-size: $small-font;
+            min-height: 24px;
+            letter-spacing: 0.5px;
+            padding-top: 4px;
+            padding-bottom: 4px;
+            padding-right: 4px;
+            padding-left: 7px;
+        }
+
+        ::ng-deep .mat-icon {
+            height: 12px;
+            font-size: $small-font;
+            width: 12px;
+            color: var(--info-color);
+        }
+
+        ::ng-deep .mat-chip-remove {
+            color: var(--gray-1-color);
+            margin-left: 2px;
+        }
+
+        ::ng-deep .mat-form-field-outline {
+            color: transparent !important;
+            height: 0px !important;
+            border: 0;
+        }
+    }
+
     .modal-select {
         border-bottom: 1px solid var(--custom-gray-9-color);
         padding-bottom: 10px;

@@ -12,9 +12,6 @@
         color: var(--gray-2-color);
     }
 
-    .text-dark-gray {
-    }
-
     .schema-property {
         .mat-expansion-panel {
             box-shadow: none;
@@ -23,6 +20,14 @@
 
             .mat-expanded {
                 height: 48px;
+            }
+
+            .header-chips {
+                .mat-standard-chip {
+                    padding: 6px 6px;
+                    font-size: 10px;
+                    min-height: 16px;
+                }
             }
 
             .mat-expansion-panel-header-description {

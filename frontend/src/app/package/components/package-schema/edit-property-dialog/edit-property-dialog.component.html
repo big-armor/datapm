@@ -8,7 +8,11 @@
                         <div class="permission-div modal-select mb-3">
                             <label class="div-question pl-1">Select property</label>
                             <mat-form-field appearance="fill" class="w-100">
-                                <mat-select [(value)]="selectedProperty" (selectionChange)="updateSelectedProperty()">
+                                <mat-select
+                                    [(value)]="selectedProperty"
+                                    (selectionChange)="updateSelectedProperty()"
+                                    style="border: none !important"
+                                >
                                     <mat-option *ngFor="let property of properties" [value]="property">{{
                                         property.title
                                     }}</mat-option>
@@ -22,6 +26,39 @@
                                 class="flat-input-parent"
                                 placeholder="Property title"
                             ></app-input>
+                        </div>
+                        <div class="mb-3">
+                            <label class="div-question pl-1"> Content labels </label>
+                            <div *ngFor="let valueTypes of valueTypeValues">
+                                {{ valueTypes.length }}
+                                <mat-form-field class="w-100" id="inviteInput" appearance="outline">
+                                    <mat-chip-list #chipList aria-label="Fruit selection">
+                                        <mat-chip
+                                            *ngFor="let contentLabel of valueTypes.contentLabels"
+                                            [selectable]="false"
+                                            [removable]="true"
+                                            (removed)="removeFromSelection(contentLabel, valueTypes.contentLabels)"
+                                        >
+                                            {{ contentLabel.label }}
+                                            <mat-icon matChipRemove>remove</mat-icon>
+                                        </mat-chip>
+
+                                        <input
+                                            matInput
+                                            #usernameInput
+                                            class="flat-input-parent"
+                                            controlName="username"
+                                            inputStyle="flat"
+                                            [disabled]="loading"
+                                            [formControl]="contentLabelControl"
+                                            placeholder="Content Label"
+                                            [matChipInputFor]="chipList"
+                                            [matChipInputSeparatorKeyCodes]="CHIP_SEPARATOR_KEY_CODES"
+                                            (matChipInputTokenEnd)="add($event, valueTypes.contentLabels)"
+                                        />
+                                    </mat-chip-list>
+                                </mat-form-field>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="div-question pl-1">Units</label>
