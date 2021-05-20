@@ -96,8 +96,6 @@ export class EditPropertyDialogComponent {
             return;
         }
 
-        console.log("Saving");
-
         this.selectedProperty.title = this.titleControl.value;
         this.selectedProperty.unit = this.unitControl.value;
         this.selectedProperty.description = this.description;
@@ -148,13 +146,12 @@ export class EditPropertyDialogComponent {
     }
 
     public getContentLabels(valueType) {
-        let labels = [];
         if (valueType.contentLabels) {
-            valueType.contentLabels.forEach((l) => {
-                labels.push(l);
-            });
+            return valueType.contentLabels;
+        } else {
+            valueType.contentLabels = [];
+            return valueType.contentLabels;
         }
-        return labels;
     }
 
     public addFromInputControlValue(values: ContentLabel[]): void {
@@ -180,7 +177,11 @@ export class EditPropertyDialogComponent {
         const index = values.indexOf(label);
 
         if (index >= 0) {
-            values.splice(index, 1);
+            if (label.appliedByContentDetector) {
+                label.hidden = true;
+            } else {
+                values.splice(index, 1);
+            }
             this.hasChangedContentLabels = true;
         }
     }

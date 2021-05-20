@@ -1,9 +1,10 @@
 @import "../../../styles/colors";
+@import "../../../styles/variables";
 
 .h1-title {
-    font-family: Roboto Mono;
-    font-style: normal;
-    font-weight: 300;
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-weight: $weight-300;
     font-size: 20px;
     line-height: 26px;
     letter-spacing: -0.28px;
@@ -40,9 +41,9 @@
 
 .up-header {
     div {
-        font-family: Roboto Mono;
-        font-style: normal;
-        font-weight: 300;
+        font-family: $family-roboto;
+        font-style: $style-normal;
+        font-weight: $weight-300;
         font-size: 10px;
         line-height: 13px;
         text-align: right;
@@ -59,9 +60,9 @@
 }
 
 .person-card-name {
-    font-family: Roboto Mono;
-    font-style: normal;
-    font-weight: 300;
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-weight: $weight-300;
     font-size: 14px;
     line-height: 18px;
     letter-spacing: -0.28px;
@@ -71,8 +72,8 @@
 }
 
 .content-title {
-    font-family: Roboto Mono;
-    font-style: normal;
+    font-family: $family-roboto;
+    font-style: $style-normal;
     font-weight: 500;
     font-size: 20px;
     line-height: 26px;
@@ -83,9 +84,9 @@
 .content-list {
     ul {
         li {
-            font-family: Roboto Mono;
-            font-style: normal;
-            font-weight: 300;
+            font-family: $family-roboto;
+            font-style: $style-normal;
+            font-weight: $weight-300;
             font-size: 14px;
             line-height: 18px;
             letter-spacing: -0.28px;
@@ -101,8 +102,8 @@
 
 .content-actions {
     .content-nr {
-        font-family: Roboto Mono;
-        font-style: normal;
+        font-family: $family-roboto;
+        font-style: $style-normal;
         font-weight: 500;
         font-size: 10px;
         text-transform: uppercase;
@@ -156,9 +157,9 @@
         }
 
         .content-description {
-            font-family: Roboto Mono;
-            font-style: normal;
-            font-weight: 300;
+            font-family: $family-roboto;
+            font-style: $style-normal;
+            font-weight: $weight-300;
             font-size: 14px;
             line-height: 18px;
             letter-spacing: -0.28px;
@@ -180,8 +181,8 @@
 
 .package-chips {
     ::ng-deep.mat-chip {
-        font-family: Roboto Mono;
-        font-style: normal;
+        font-family: $family-roboto;
+        font-style: $style-normal;
         font-weight: normal;
         font-size: 10px;
         line-height: 13px;
