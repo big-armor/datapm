@@ -330,5 +330,5 @@ export const versionPackage = async (
         .getCustomRepository(VersionRepository)
         .findOneOrFail({ identifier: parent.identifier });
 
-    return packageEntityToGraphqlObject(context.connection, version.package);
+    return packageEntityToGraphqlObject(context, version.package);
 };

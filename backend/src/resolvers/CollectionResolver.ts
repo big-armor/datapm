@@ -200,7 +200,7 @@ export const collectionPackages = async (
         .getCustomRepository(CollectionPackageRepository)
         .collectionPackages(user.id, collectionEntity.id, limit, offset, relations);
 
-    return entities.map((e) => packageEntityToGraphqlObject(context.connection, e));
+    return entities.map((e) => packageEntityToGraphqlObject(context, e));
 };
 
 export const setCollectionCoverImage = async (
@@ -595,7 +595,7 @@ export const getMyRecentlyViewedPackages = async (
 
     return {
         hasMore: count - (offset + limit) > 0,
-        logs: await Promise.all(searchResponse.map((c) => activtyLogEntityToGraphQL(context.connection, c))),
+        logs: await Promise.all(searchResponse.map((c) => activtyLogEntityToGraphQL(context, context.connection, c))),
         count
     };
 };

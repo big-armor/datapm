@@ -1,7 +1,7 @@
 import { Connection, EntityManager, In } from "typeorm";
 import graphqlFields from "graphql-fields";
 
-import { AuthenticatedContext } from "../context";
+import { AuthenticatedContext, Context } from "../context";
 import { ActivityLogEntity } from "../entity/ActivityLogEntity";
 import { getRelationNames } from "../util/relationNames";
 import {
@@ -24,6 +24,7 @@ import { versionEntityToGraphqlObject } from "./VersionResolver";
 import { VersionEntity } from "../entity/VersionEntity";
 
 export const activtyLogEntityToGraphQL = async function (
+    context: Context,
     connection: Connection | EntityManager,
     activityLogEntity: ActivityLogEntity
 ): Promise<ActivityLog> {
@@ -64,10 +65,10 @@ export const activtyLogEntityToGraphQL = async function (
 
     if (activityLogEntity.targetPackageId) {
         if (activityLogEntity.targetPackage)
-            activityLog.targetPackage = await packageEntityToGraphqlObject(connection, activityLogEntity.targetPackage);
+            activityLog.targetPackage = await packageEntityToGraphqlObject(context, activityLogEntity.targetPackage);
         else {
             activityLog.targetPackage = await packageEntityToGraphqlObject(
-                connection,
+                context,
                 await connection.getRepository(PackageEntity).findOneOrFail(activityLogEntity.targetPackageId)
             );
         }
@@ -113,7 +114,7 @@ export const myActivity = async (
         .take(limit)
         .getManyAndCount();
 
-    const logObjects = await Promise.all(logs.map((l) => activtyLogEntityToGraphQL(context.connection, l)));
+    const logObjects = await Promise.all(logs.map((l) => activtyLogEntityToGraphQL(context, context.connection, l)));
 
     return {
         logs: logObjects,
@@ -150,7 +151,7 @@ export const collectionActivities = async (
         .take(limit)
         .getManyAndCount();
 
-    const logObjects = await Promise.all(logs.map((l) => activtyLogEntityToGraphQL(context.connection, l)));
+    const logObjects = await Promise.all(logs.map((l) => activtyLogEntityToGraphQL(context, context.connection, l)));
 
     return {
         logs: logObjects,
@@ -188,7 +189,7 @@ export const packageActivities = async (
         .take(limit)
         .getManyAndCount();
 
-    const logObjects = await Promise.all(logs.map((l) => activtyLogEntityToGraphQL(context.connection, l)));
+    const logObjects = await Promise.all(logs.map((l) => activtyLogEntityToGraphQL(context, context.connection, l)));
 
     return {
         logs: logObjects,

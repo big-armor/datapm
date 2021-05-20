@@ -176,7 +176,7 @@ export const catalogPackagesForUser = async (parent: Catalog, _1: any, context: 
         relations: getGraphQlRelationName(info)
     });
 
-    return packages.map((p) => packageEntityToGraphqlObject(context.connection, p));
+    return packages.map((p) => packageEntityToGraphqlObject(context, p));
 };
 
 export const createCatalog = async (

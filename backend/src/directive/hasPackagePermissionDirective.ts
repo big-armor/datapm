@@ -14,6 +14,7 @@ import { PackagePermissionRepository } from "../repository/PackagePermissionRepo
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { UserEntity } from "../entity/UserEntity";
 import { buildUnclaimedCatalogPermissions } from "./hasCatalogPermissionDirective";
+import { getPackageFromCacheOrDb } from "../resolvers/PackageResolver";
 
 export async function resolvePackagePermissions(
     context: Context,
@@ -22,14 +23,7 @@ export async function resolvePackagePermissions(
 ): Promise<Permission[]> {
     const permissions: Permission[] = [];
 
-    const packageEntity = await context.connection
-        .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier });
-
-    if (packageEntity.catalog.unclaimed) {
-        return buildUnclaimedCatalogPermissions(context);
-    }
-
+    const packageEntity = await getPackageFromCacheOrDb(context, identifier);
     if (packageEntity.isPublic) {
         permissions.push(Permission.VIEW);
     }

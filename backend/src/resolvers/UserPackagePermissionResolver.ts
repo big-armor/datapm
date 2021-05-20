@@ -12,8 +12,9 @@ import { sendInviteUser, sendShareNotification, validateMessageContents } from "
 
 export const hasPackagePermissions = async (context: Context, packageId: number, permission: Permission) => {
     if (permission == Permission.VIEW) {
-        const packageEntity = await context.connection.getRepository(PackageEntity).findOneOrFail({ id: packageId });
-        if (packageEntity?.isPublic || packageEntity.catalog.unclaimed) {
+        const packagePromise = context.connection.getRepository(PackageEntity).findOneOrFail({ id: packageId });
+        const packageEntity = await context.cache.loadDataAsync("PACKAGE", "ID-" + packageId, packagePromise);
+        if (packageEntity?.isPublic) {
             return true;
         }
     }
@@ -22,9 +23,15 @@ export const hasPackagePermissions = async (context: Context, packageId: number,
         return false;
     }
 
-    return context.connection
+    const permissionPromise = context.connection
         .getCustomRepository(PackagePermissionRepository)
         .hasPermission(context.me.id, packageId, permission);
+
+    return await context.cache.loadDataAsync(
+        "PACKAGE_PERMISSION",
+        "uID:" + context.me.id + "-pID:" + packageId,
+        permissionPromise
+    );
 };
 
 export const hasPackageEntityPermissions = async (
@@ -42,9 +49,15 @@ export const hasPackageEntityPermissions = async (
         return false;
     }
 
-    return context.connection
+    const permissionPromise = context.connection
         .getCustomRepository(PackagePermissionRepository)
         .hasPermission(context.me.id, packageEntity.id, permission);
+
+    return await context.cache.loadDataAsync(
+        "PACKAGE_PERMISSION",
+        "uID:" + context.me.id + "-pID:" + packageEntity.id,
+        permissionPromise
+    );
 };
 
 export const setPackagePermissions = async (

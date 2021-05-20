@@ -1,5 +1,5 @@
 import { Connection, EntityManager } from "typeorm";
-import { AuthenticatedContext } from "../context";
+import { AuthenticatedContext, Context } from "../context";
 import { FollowEntity } from "../entity/FollowEntity";
 import {
     SaveFollowInput,
@@ -25,7 +25,7 @@ import { catalogEntityToGraphQLOrNull } from "./CatalogResolver";
 import { collectionEntityToGraphQLOrNull } from "./CollectionResolver";
 import { packageEntityToGraphqlObject, packageEntityToGraphqlObjectOrNull } from "./PackageResolver";
 
-export const entityToGraphqlObject = async (context: EntityManager | Connection, entity: FollowEntity | undefined) => {
+export const entityToGraphqlObject = async (context: Context, entity: FollowEntity | undefined) => {
     if (!entity) {
         return null;
     }
@@ -153,19 +153,19 @@ export const getFollow = async (
             return null;
         }
 
-        return await entityToGraphqlObject(context.connection, entity);
+        return await entityToGraphqlObject(context, entity);
     } else if (follow.collection) {
         const collection = await manager
             .getCustomRepository(CollectionRepository)
             .findCollectionBySlugOrFail(follow.collection.collectionSlug);
         const entity = await followRepository.getFollowByCollectionId(userId, collection.id);
-        return await entityToGraphqlObject(context.connection, entity);
+        return await entityToGraphqlObject(context, entity);
     } else if (follow.package) {
         const packageEntity = await manager
             .getCustomRepository(PackageRepository)
             .findPackageOrFail({ identifier: follow.package });
         const entity = await followRepository.getFollowByPackageId(userId, packageEntity.id);
-        return await entityToGraphqlObject(context.connection, entity);
+        return await entityToGraphqlObject(context, entity);
     } else if (follow.packageIssue) {
         const packageEntity = await manager
             .getCustomRepository(PackageRepository)
@@ -174,13 +174,13 @@ export const getFollow = async (
             .getCustomRepository(PackageIssueRepository)
             .getIssueByPackageAndIssueNumber(packageEntity.id, follow.packageIssue.issueNumber);
         const entity = await followRepository.getFollowByPackageIssueId(userId, issueEntity.id);
-        return await entityToGraphqlObject(context.connection, entity);
+        return await entityToGraphqlObject(context, entity);
     } else if (follow.user) {
         const userEntity = await manager
             .getCustomRepository(UserRepository)
             .findUser({ username: follow.user.username });
         const entity = await followRepository.getFollowByUserId(userId, userEntity.id);
-        return await entityToGraphqlObject(context.connection, entity);
+        return await entityToGraphqlObject(context, entity);
     } else {
         throw new Error("FOLLOW_TYPE_NOT_FOUND");
     }
@@ -240,7 +240,7 @@ export const getAllMyFollows = async (
     const follows: Follow[] = [];
 
     for (const f of followEntities) {
-        const follow = await entityToGraphqlObject(context.connection, f);
+        const follow = await entityToGraphqlObject(context, f);
         if (follow) {
             follows.push(follow);
         }
@@ -336,7 +336,7 @@ export const followPackage = async (
     const packageEntity = await context.connection
         .getCustomRepository(PackageRepository)
         .findPackageOrFail({ identifier: parent.package.identifier });
-    return packageEntityToGraphqlObject(context.connection, packageEntity);
+    return packageEntityToGraphqlObject(context, packageEntity);
 };
 
 export const followCollection = async (

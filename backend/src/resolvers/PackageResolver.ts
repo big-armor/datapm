@@ -32,15 +32,14 @@ import { VersionRepository } from "../repository/VersionRepository";
 import { hasCollectionPermissions } from "./UserCollectionPermissionResolver";
 import { CatalogRepository } from "../repository/CatalogRepository";
 import { resolvePackagePermissions } from "../directive/hasPackagePermissionDirective";
-import { hasPackagePermissions } from "./UserPackagePermissionResolver";
-import { Connection, EntityManager } from "typeorm";
+import { hasPackageEntityPermissions, hasPackagePermissions } from "./UserPackagePermissionResolver";
 import { versionEntityToGraphqlObject } from "./VersionResolver";
 import { catalogEntityToGraphQL } from "./CatalogResolver";
 import { CollectionRepository } from "../repository/CollectionRepository";
 import { activtyLogEntityToGraphQL } from "./ActivityLogResolver";
 
 export const packageEntityToGraphqlObjectOrNull = async (
-    context: EntityManager | Connection,
+    context: Context,
     packageEntity: PackageEntity
 ): Promise<Package | null> => {
     if (!packageEntity) {
@@ -51,7 +50,7 @@ export const packageEntityToGraphqlObjectOrNull = async (
 };
 
 export const packageEntityToGraphqlObject = async (
-    context: EntityManager | Connection,
+    context: Context,
     packageEntity: PackageEntity
 ): Promise<Package> => {
     if (packageEntity.catalog != null) {
@@ -64,9 +63,11 @@ export const packageEntityToGraphqlObject = async (
         };
     }
 
-    const packageEntityLoaded = await context
+    const packagePromise = context.connection
         .getRepository(PackageEntity)
         .findOneOrFail({ where: { id: packageEntity.id } });
+
+    const packageEntityLoaded = await context.cache.loadDataAsync("PACKAGE", "PID:" + packageEntity.id, packagePromise);
 
     return {
         identifier: {
@@ -107,7 +108,7 @@ export const myRecentlyViewedPackages = async (
 
     return {
         hasMore: count - (offSet + limit) > 0,
-        logs: await Promise.all(searchResponse.map((p) => activtyLogEntityToGraphQL(context.connection, p))),
+        logs: await Promise.all(searchResponse.map((p) => activtyLogEntityToGraphQL(context, context.connection, p))),
         count
     };
 };
@@ -125,7 +126,7 @@ export const myPackages = async (
 
     return {
         hasMore: count - (offset + limit) > 0,
-        packages: await Promise.all(searchResponse.map((p) => packageEntityToGraphqlObject(context.connection, p))),
+        packages: await Promise.all(searchResponse.map((p) => packageEntityToGraphqlObject(context, p))),
         count
     };
 };
@@ -143,15 +144,13 @@ export const getLatestPackages = async (
 
     return {
         hasMore: count - (offSet + limit) > 0,
-        packages: await Promise.all(searchResponse.map((p) => packageEntityToGraphqlObject(context.connection, p))),
+        packages: await Promise.all(searchResponse.map((p) => packageEntityToGraphqlObject(context, p))),
         count
     };
 };
 
 export const packageVersions = async (parent: Package, _1: any, context: AuthenticatedContext, info: any) => {
-    const packageEntity = await context.connection
-        .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier: parent.identifier });
+    const packageEntity = await getPackageFromCacheOrDb(context, parent.identifier);
 
     const versions = await context.connection
         .getCustomRepository(VersionRepository)
@@ -166,17 +165,14 @@ export const packageCatalog = async (
     context: AuthenticatedContext,
     info: any
 ): Promise<Catalog> => {
-    const packageEntity = await context.connection
-        .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier: parent.identifier });
-
+    const packageEntity = await getPackageFromCacheOrDb(context, parent.identifier);
     const catalog = await context.connection.getCustomRepository(CatalogRepository).findOne(packageEntity.catalogId, {
         relations: getRelationNames(graphqlFields(info))
     });
 
     if (!catalog) throw new Error("CATALOG_NOT_FOUND");
 
-    if (!(await hasPackagePermissions(context, packageEntity.id, Permission.VIEW))) {
+    if (!(await hasPackageEntityPermissions(context, packageEntity, Permission.VIEW))) {
         return {
             identifier: {
                 catalogSlug: catalog.slug,
@@ -194,11 +190,8 @@ export const packageLatestVersion = async (
     context: AuthenticatedContext,
     info: any
 ): Promise<Version | null> => {
-    const packageEntity = await context.connection
-        .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier: parent.identifier });
-
-    if (!(await hasPackagePermissions(context, packageEntity.id, Permission.VIEW))) {
+    const packageEntity = await getPackageFromCacheOrDb(context, parent.identifier);
+    if (!(await hasPackageEntityPermissions(context, packageEntity, Permission.VIEW))) {
         return null;
     }
 
@@ -243,7 +236,7 @@ export const findPackagesForCollection = async (
         .getCustomRepository(PackageRepository)
         .findPackagesForCollection(context.me?.id, collectionEntity.id, getGraphQlRelationName(info));
 
-    return await Promise.all(packages.map((p) => packageEntityToGraphqlObject(context.connection, p)));
+    return await Promise.all(packages.map((p) => packageEntityToGraphqlObject(context, p)));
 };
 
 export const findPackageIdentifier = async (parent: Package, _1: any, context: AuthenticatedContext, info: any) => {
@@ -251,10 +244,7 @@ export const findPackageIdentifier = async (parent: Package, _1: any, context: A
 };
 
 export const myPackagePermissions = async (parent: Package, _0: any, context: AuthenticatedContext) => {
-    const packageEntity = await context.connection
-        .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier: parent.identifier });
-
+    const packageEntity = await getPackageFromCacheOrDb(context, parent.identifier);
     const catalog = await context.connection.getRepository(CatalogEntity).findOne(packageEntity.catalogId);
 
     if (catalog == null) throw new Error("CATALOG_NOT_FOUND - " + packageEntity.catalogId);
@@ -270,10 +260,7 @@ export const myPackagePermissions = async (parent: Package, _0: any, context: Au
 };
 
 export const findPackageCreator = async (parent: Package, _1: any, context: AuthenticatedContext, info: any) => {
-    const packageEntity = await context.connection
-        .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier: parent.identifier });
-
+    const packageEntity = await getPackageFromCacheOrDb(context, parent.identifier);
     return await context.connection.getCustomRepository(UserRepository).findOneOrFail({
         where: { id: packageEntity.creatorId },
         relations: getGraphQlRelationName(info)
@@ -287,10 +274,13 @@ export const findPackage = async (
     info: any
 ) => {
     return context.connection.transaction(async (transaction) => {
-        const packageEntity = await transaction.getCustomRepository(PackageRepository).findPackageOrFail({
+        const packagePromise = transaction.getCustomRepository(PackageRepository).findPackageOrFail({
             identifier,
             relations: getGraphQlRelationName(info)
         });
+
+        const serializedIdentifier = identifier.catalogSlug + "-" + identifier.packageSlug;
+        const packageEntity = await context.cache.loadDataAsync("PACKAGE", serializedIdentifier, packagePromise);
 
         packageEntity.viewCount++;
         await transaction.save(packageEntity);
@@ -303,7 +293,7 @@ export const findPackage = async (
             });
         }
 
-        return packageEntityToGraphqlObject(transaction, packageEntity);
+        return packageEntityToGraphqlObject(context, packageEntity);
     });
 };
 
@@ -345,7 +335,7 @@ export const searchPackages = async (
 
     return {
         hasMore: count - (offSet + limit) > 0,
-        packages: await Promise.all(searchResponse.map((p) => packageEntityToGraphqlObject(context.connection, p))),
+        packages: await Promise.all(searchResponse.map((p) => packageEntityToGraphqlObject(context, p))),
         count
     };
 };
@@ -370,7 +360,7 @@ export const createPackage = async (
                 targetPackageId: packageEntity?.id
             });
 
-            return await packageEntityToGraphqlObject(transaction, packageEntity);
+            return await packageEntityToGraphqlObject(context, packageEntity);
         } catch (error) {
             if (error.message == "CATALOG_NOT_FOUND") {
                 throw new UserInputError("CATALOG_NOT_FOUND");
@@ -434,7 +424,7 @@ export const updatePackage = async (
             relations: getGraphQlRelationName(info)
         });
 
-        return packageEntityToGraphqlObject(context.connection, packageEntityUpdated);
+        return packageEntityToGraphqlObject(context, packageEntityUpdated);
     });
 };
 
@@ -487,7 +477,7 @@ export const userPackages = async (
 
     return {
         hasMore: count - (offSet + limit) > 0,
-        packages: await Promise.all(searchResponse.map((p) => packageEntityToGraphqlObject(context.connection, p))),
+        packages: await Promise.all(searchResponse.map((p) => packageEntityToGraphqlObject(context, p))),
         count
     };
 };
@@ -505,15 +495,12 @@ export const catalogPackages = async (
         .getCustomRepository(CatalogRepository)
         .catalogPackages(catalogEntity.id, limit, offset, relations);
 
-    return packages.map((p) => packageEntityToGraphqlObject(context.connection, p));
+    return packages.map((p) => packageEntityToGraphqlObject(context, p));
 };
 
 export const packageDescription = async (parent: Package, _1: any, context: Context): Promise<string | null> => {
-    const packageEntity = await context.connection
-        .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier: parent.identifier });
-
-    if (!(await hasPackagePermissions(context, packageEntity.id, Permission.VIEW))) {
+    const packageEntity = await getPackageFromCacheOrDb(context, parent.identifier);
+    if (!(await hasPackageEntityPermissions(context, packageEntity, Permission.VIEW))) {
         return null;
     }
 
@@ -521,11 +508,8 @@ export const packageDescription = async (parent: Package, _1: any, context: Cont
 };
 
 export const packageDisplayName = async (parent: Package, _1: any, context: Context): Promise<string | null> => {
-    const packageEntity = await context.connection
-        .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier: parent.identifier });
-
-    if (!(await hasPackagePermissions(context, packageEntity.id, Permission.VIEW))) {
+    const packageEntity = await getPackageFromCacheOrDb(context, parent.identifier);
+    if (!(await hasPackageEntityPermissions(context, packageEntity, Permission.VIEW))) {
         return null;
     }
 
@@ -533,11 +517,8 @@ export const packageDisplayName = async (parent: Package, _1: any, context: Cont
 };
 
 export const packageCreatedAt = async (parent: Package, _1: any, context: Context): Promise<Date | null> => {
-    const packageEntity = await context.connection
-        .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier: parent.identifier });
-
-    if (!(await hasPackagePermissions(context, packageEntity.id, Permission.VIEW))) {
+    const packageEntity = await getPackageFromCacheOrDb(context, parent.identifier);
+    if (!(await hasPackageEntityPermissions(context, packageEntity, Permission.VIEW))) {
         return null;
     }
 
@@ -545,11 +526,8 @@ export const packageCreatedAt = async (parent: Package, _1: any, context: Contex
 };
 
 export const packageUpdatedAt = async (parent: Package, _1: any, context: Context): Promise<Date | null> => {
-    const packageEntity = await context.connection
-        .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier: parent.identifier });
-
-    if (!(await hasPackagePermissions(context, packageEntity.id, Permission.VIEW))) {
+    const packageEntity = await getPackageFromCacheOrDb(context, parent.identifier);
+    if (!(await hasPackageEntityPermissions(context, packageEntity, Permission.VIEW))) {
         return null;
     }
 
@@ -557,11 +535,8 @@ export const packageUpdatedAt = async (parent: Package, _1: any, context: Contex
 };
 
 export const packageFetchCount = async (parent: Package, _1: any, context: Context): Promise<number | null> => {
-    const packageEntity = await context.connection
-        .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier: parent.identifier });
-
-    if (!(await hasPackagePermissions(context, packageEntity.id, Permission.VIEW))) {
+    const packageEntity = await getPackageFromCacheOrDb(context, parent.identifier);
+    if (!(await hasPackageEntityPermissions(context, packageEntity, Permission.VIEW))) {
         return null;
     }
 
@@ -569,11 +544,8 @@ export const packageFetchCount = async (parent: Package, _1: any, context: Conte
 };
 
 export const packageViewedCount = async (parent: Package, _1: any, context: Context): Promise<number | null> => {
-    const packageEntity = await context.connection
-        .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier: parent.identifier });
-
-    if (!(await hasPackagePermissions(context, packageEntity.id, Permission.VIEW))) {
+    const packageEntity = await getPackageFromCacheOrDb(context, parent.identifier);
+    if (!(await hasPackageEntityPermissions(context, packageEntity, Permission.VIEW))) {
         return null;
     }
 
@@ -581,9 +553,18 @@ export const packageViewedCount = async (parent: Package, _1: any, context: Cont
 };
 
 export const packageIsPublic = async (parent: Package, _1: any, context: Context): Promise<boolean> => {
-    const packageEntity = await context.connection
-        .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier: parent.identifier });
-
+    const packageEntity = await getPackageFromCacheOrDb(context, parent.identifier);
     return packageEntity.isPublic;
+};
+
+export const getPackageFromCacheOrDb = async (
+    context: Context,
+    packageIdentifier: PackageIdentifier | PackageIdentifierInput
+) => {
+    const packagePromise = context.connection
+        .getCustomRepository(PackageRepository)
+        .findPackageOrFail({ identifier: packageIdentifier });
+
+    const serializedIdentifier = packageIdentifier.catalogSlug + "-" + packageIdentifier.packageSlug;
+    return await context.cache.loadDataAsync("PACKAGE", serializedIdentifier, packagePromise);
 };

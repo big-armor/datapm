@@ -222,7 +222,7 @@ export const resolvers: {
                     relations: getRelationNames(graphqlFields(info))
                 });
 
-            return packageEntities.map((p) => packageEntityToGraphqlObject(context.connection, p));
+            return packageEntities.map((p) => packageEntityToGraphqlObject(context, p));
         },
         users: async (parent: any, args: any, context: AutoCompleteContext, info: any) => {
             return await context.connection.manager.getCustomRepository(UserRepository).autocomplete({
