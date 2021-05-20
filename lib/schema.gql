@@ -674,6 +674,15 @@ type BuilderIOTemplate {
 }
 
 """
+Root page content
+"""
+type PageContent {
+    builderIOSettings: BuilderIOSettings
+    catalog: Catalog
+    user: User
+}
+
+"""
 The complete identifier for a version of a package, assuming the registry is based on the HTTP request URL
 """
 input VersionIdentifierInput {
@@ -1200,6 +1209,11 @@ type Query {
     Get platform settings
     """
     publicPlatformSettingsByKey(key: String!): PlatformSettings!
+
+    """
+    Get root page content
+    """
+    pageContent(route: String!): PageContent!
 }
 
 type Mutation {

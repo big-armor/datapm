@@ -28,6 +28,8 @@ enum State {
 })
 export class PlatformSettingsComponent implements OnInit {
     public static readonly BUILDER_IO_SETTINGS_KEY = "builder-io-settings";
+    public static readonly NOT_FOUND_PAGE_ENTRY_KEY = "404";
+    private static readonly REQUIRED_PLATFORM_KEYS = [PlatformSettingsComponent.NOT_FOUND_PAGE_ENTRY_KEY, "footer"];
 
     public state = State.LOADING;
 
@@ -57,6 +59,7 @@ export class PlatformSettingsComponent implements OnInit {
             return;
         }
 
+        this.addRequiredTemplatesBeforeSaving();
         const templatesToSerialize = this.templates.map((t) => {
             return {
                 key: t.keyFormControl.value,
@@ -78,6 +81,13 @@ export class PlatformSettingsComponent implements OnInit {
         this.savePlatformSettingsGQL
             .mutate({ settings })
             .subscribe((response) => this.setUpBuilderIOSettings(response.data.savePlatformSettings));
+    }
+
+    private addRequiredTemplatesBeforeSaving(): void {
+        const missingTemplateKeys = PlatformSettingsComponent.REQUIRED_PLATFORM_KEYS.filter(
+            (p) => !this.templates.some((t) => p === t.key)
+        );
+        missingTemplateKeys.map((k) => this.buildTemplateWithControl(k)).forEach((t) => this.templates.push(t));
     }
 
     public addNewEntry(): void {

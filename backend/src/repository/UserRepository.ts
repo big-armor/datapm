@@ -37,7 +37,7 @@ SelectQueryBuilder.prototype.filterUserCatalog = function (topLevelAlias: string
     });
 };
 
-async function getUserByUserName({
+export async function getUserByUserName({
     username,
     manager,
     relations = []

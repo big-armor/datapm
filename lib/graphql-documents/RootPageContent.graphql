@@ -1,0 +1,63 @@
+query GetPageContent($route: String!) {
+    pageContent(route: $route) {
+        catalog {
+            identifier {
+                catalogSlug
+            }
+            displayName
+            description
+            website
+            myPermissions
+            isPublic
+            packages {
+                identifier {
+                    catalogSlug
+                    packageSlug
+                }
+                displayName
+                description
+                latestVersion {
+                    identifier {
+                        catalogSlug
+                        packageSlug
+                        versionMajor
+                        versionMinor
+                        versionPatch
+                    }
+                    createdAt
+                    updatedAt
+                    packageFile
+                }
+                creator {
+                    username
+                }
+            }
+        }
+
+        user {
+            emailAddress
+            firstName
+            lastName
+            username
+            nameIsPublic
+            location
+            twitterHandle
+            gitHubHandle
+            website
+            locationIsPublic
+            twitterHandleIsPublic
+            gitHubHandleIsPublic
+            emailAddressIsPublic
+            websiteIsPublic
+            description
+        }
+
+        builderIOSettings {
+            apiKey
+            templates {
+                key
+                entry
+            }
+        }
+    }
+}

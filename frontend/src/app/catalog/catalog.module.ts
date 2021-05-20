@@ -18,6 +18,7 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { MatSelectModule } from "@angular/material/select";
 import { MatTooltipModule } from "@angular/material/tooltip";
+import { ImportedModule } from "../imported/imported.module";
 
 @NgModule({
     declarations: [
@@ -41,6 +42,7 @@ import { MatTooltipModule } from "@angular/material/tooltip";
         MatInputModule,
         MatTooltipModule,
         MatFormFieldModule,
+        ImportedModule,
         SharedModule
     ]
 })
