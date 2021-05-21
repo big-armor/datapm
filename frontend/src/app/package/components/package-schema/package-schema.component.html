@@ -59,7 +59,13 @@
                                     <div class="weight-500">{{ type.valueType }}</div>
                                     <ul>
                                         <li *ngIf="getPropertyChips(property).length">
-                                            <span *ngFor="let cl of getPropertyChips(property)">{{ cl.label }} </span>
+                                            content labels:
+                                            <span
+                                                *ngFor="let cl of getPropertyChips(property); last as isLast"
+                                                [hidden]="cl.hidden"
+                                                >{{ cl.label }}
+                                                <span *ngIf="!isLast">,</span>
+                                            </span>
                                         </li>
                                         <li>
                                             present in {{ type.recordCount | number }} ({{
@@ -77,7 +83,13 @@
                                     <div class="weight-500">{{ type.valueType }}</div>
                                     <ul>
                                         <li *ngIf="getPropertyChips(property).length">
-                                            <span *ngFor="let cl of getPropertyChips(property)">{{ cl.label }} </span>
+                                            content labels:
+                                            <span
+                                                *ngFor="let cl of getPropertyChips(property); last as isLast"
+                                                [hidden]="cl.hidden"
+                                                >{{ cl.label }}
+                                                <span *ngIf="!isLast">,</span>
+                                            </span>
                                         </li>
                                         <li>
                                             present in {{ type.recordCount | number }} ({{
@@ -93,7 +105,13 @@
                                     <div class="weight-500">{{ type.valueType }}</div>
                                     <ul>
                                         <li *ngIf="getPropertyChips(property).length">
-                                            <span *ngFor="let cl of getPropertyChips(property)">{{ cl.label }} </span>
+                                            content labels:
+                                            <span
+                                                *ngFor="let cl of getPropertyChips(property); last as isLast"
+                                                [hidden]="cl.hidden"
+                                                >{{ cl.label }}
+                                                <span *ngIf="!isLast">,</span>
+                                            </span>
                                         </li>
                                         <li>
                                             present in {{ type.recordCount | number }} ({{
@@ -109,7 +127,13 @@
                                     <div class="weight-500">{{ type.valueType }}</div>
                                     <ul>
                                         <li *ngIf="getPropertyChips(property).length">
-                                            <span *ngFor="let cl of getPropertyChips(property)">{{ cl.label }} </span>
+                                            content labels:
+                                            <span
+                                                *ngFor="let cl of getPropertyChips(property); last as isLast"
+                                                [hidden]="cl.hidden"
+                                                >{{ cl.label }}
+                                                <span *ngIf="!isLast">,</span>
+                                            </span>
                                         </li>
                                         <li>
                                             present in {{ type.recordCount | number }} records ({{
@@ -139,7 +163,13 @@
                                     <div class="weight-500">{{ type.valueType }}</div>
                                     <ul>
                                         <li *ngIf="getPropertyChips(property).length">
-                                            <span *ngFor="let cl of getPropertyChips(property)">{{ cl.label }} </span>
+                                            content labels:
+                                            <span
+                                                *ngFor="let cl of getPropertyChips(property); last as isLast"
+                                                [hidden]="cl.hidden"
+                                                >{{ cl.label }}
+                                                <span *ngIf="!isLast">,</span>
+                                            </span>
                                         </li>
                                         <li>
                                             present in {{ type.recordCount | number }} ({{

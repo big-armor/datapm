@@ -28,15 +28,16 @@
                             ></app-input>
                         </div>
                         <div class="mb-3">
-                            <label class="div-question pl-1"> Content labels </label>
+                            <label class="div-question pl-1 mb-0"> Content labels </label>
                             <div *ngFor="let valueTypes of valueTypeValues">
-                                {{ valueTypes.length }}
-                                <mat-form-field class="w-100" id="inviteInput" appearance="outline">
+                                <span class="text-dark-gray pl-1">{{ valueTypes.valueType }}</span>
+                                <mat-form-field class="w-100 mb-1" id="inviteInput" appearance="outline">
                                     <mat-chip-list #chipList aria-label="Fruit selection">
                                         <mat-chip
                                             *ngFor="let contentLabel of valueTypes.contentLabels"
+                                            [hidden]="contentLabel.hidden"
                                             [selectable]="false"
-                                            [removable]="true"
+                                            [removable]="!contentLabel.hidden"
                                             (removed)="removeFromSelection(contentLabel, valueTypes.contentLabels)"
                                         >
                                             {{ contentLabel.label }}

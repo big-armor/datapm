@@ -142,7 +142,6 @@ export class EditPropertyDialogComponent {
                 v.contentLabels = [];
             }
         });
-        console.log("this.valueTypeValues", this.valueTypeValues);
     }
 
     public getContentLabels(valueType) {
