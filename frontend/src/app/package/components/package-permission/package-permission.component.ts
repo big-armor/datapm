@@ -20,6 +20,7 @@ import { PackageResponse, PackageService } from "../../services/package.service"
 import { AddUserComponent } from "../add-user/add-user.component";
 import { DialogService } from "../../../services/dialog/dialog.service";
 import { getEffectivePermissions } from "../../../services/permissions.service";
+import { MovePackageComponent } from "src/app/shared/move-package/move-package.component";
 
 @Component({
     selector: "app-package-permission",
@@ -127,6 +128,12 @@ export class PackagePermissionComponent implements OnInit {
                 this.router.navigate(["/" + this.authenticationService.currentUser.getValue().username], {
                     fragment: "packages"
                 });
+        });
+    }
+
+    public movePackage(): void {
+        const dlgRef = this.dialog.open(MovePackageComponent, {
+            width: "500px"
         });
     }
 
