@@ -6,10 +6,10 @@ export class SessionCache {
         const dataKey = this.buildDataKey(dataType, dataId);
         const cachedData = this.loadedData.get(dataKey);
         if (cachedData) {
-            // console.log("Found cached data", dataType, dataId);
             return cachedData;
         }
 
+        console.log("Didn't find cached data", dataType, dataId);
         const resolvedData = await dataPromise;
         this.loadedData.set(dataKey, resolvedData);
 

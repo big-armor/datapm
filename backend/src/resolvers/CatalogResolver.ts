@@ -7,6 +7,7 @@ import {
     ActivityLogEventType,
     Base64ImageUpload,
     Catalog,
+    CatalogIdentifier,
     CatalogIdentifierInput,
     CreateCatalogInput,
     Permission,
@@ -40,11 +41,8 @@ export const catalogEntityToGraphQL = (catalogEntity: CatalogEntity): Catalog =>
 };
 
 export const catalogIdentifier = async (parent: Catalog, _1: any, context: Context) => {
-    const catalog = await context.connection
-        .getCustomRepository(CatalogRepository)
-        .findCatalogBySlugOrFail(parent.identifier.catalogSlug);
-
-    if (!(await hasCatalogPermissions(context, catalog.id, Permission.VIEW))) {
+    const catalog = await getCatalogFromCacheOrDb(context, parent.identifier);
+    if (!(await hasCatalogPermissions(context, catalog, Permission.VIEW))) {
         return {
             catalogSlug: "private",
             registryURL: getEnvVariable("REGISTRY_URL")
@@ -58,43 +56,27 @@ export const catalogIdentifier = async (parent: Catalog, _1: any, context: Conte
 };
 
 export const catalogWebsite = async (parent: Catalog, _1: any, context: Context) => {
-    const catalog = await context.connection
-        .getCustomRepository(CatalogRepository)
-        .findCatalogBySlugOrFail(parent.identifier.catalogSlug);
-
-    if (!(await hasCatalogPermissions(context, catalog.id, Permission.VIEW))) {
+    const catalog = await getCatalogFromCacheOrDb(context, parent.identifier);
+    if (!(await hasCatalogPermissions(context, catalog, Permission.VIEW))) {
         return null;
     }
 
-    if (catalog.description != null) return catalog.website;
-
-    const catalogEntity = context.connection.getRepository(CatalogEntity).findOneOrFail(catalog.id);
-
-    return (await catalogEntity).website;
+    return catalog.website;
 };
 
 export const catalogIsPublic = async (parent: Catalog, _1: any, context: Context): Promise<boolean> => {
-    const catalog = await context.connection
-        .getCustomRepository(CatalogRepository)
-        .findCatalogBySlugOrFail(parent.identifier.catalogSlug);
-
+    const catalog = await getCatalogFromCacheOrDb(context, parent.identifier);
     return catalog.isPublic;
 };
 
 export const catalogIsUnclaimed = async (parent: Catalog, _1: any, context: Context): Promise<boolean> => {
-    const catalog = await context.connection
-        .getCustomRepository(CatalogRepository)
-        .findCatalogBySlugOrFail(parent.identifier.catalogSlug);
-
+    const catalog = await getCatalogFromCacheOrDb(context, parent.identifier);
     return catalog.unclaimed;
 };
 
 export const catalogDisplayName = async (parent: Catalog, _1: any, context: Context) => {
-    const catalog = await context.connection
-        .getCustomRepository(CatalogRepository)
-        .findCatalogBySlugOrFail(parent.identifier.catalogSlug);
-
-    if (!(await hasCatalogPermissions(context, catalog.id, Permission.VIEW))) {
+    const catalog = await getCatalogFromCacheOrDb(context, parent.identifier);
+    if (!(await hasCatalogPermissions(context, catalog, Permission.VIEW))) {
         return "private";
     }
 
@@ -106,11 +88,8 @@ export const catalogDisplayName = async (parent: Catalog, _1: any, context: Cont
 };
 
 export const catalogDescription = async (parent: Catalog, _1: any, context: Context) => {
-    const catalog = await context.connection
-        .getCustomRepository(CatalogRepository)
-        .findCatalogBySlugOrFail(parent.identifier.catalogSlug);
-
-    if (!(await hasCatalogPermissions(context, catalog.id, Permission.VIEW))) {
+    const catalog = await getCatalogFromCacheOrDb(context, parent.identifier);
+    if (!(await hasCatalogPermissions(context, catalog, Permission.VIEW))) {
         return null;
     }
 
@@ -122,11 +101,8 @@ export const catalogDescription = async (parent: Catalog, _1: any, context: Cont
 };
 
 export const catalogCreator = async (parent: Catalog, _1: any, context: Context, info: any) => {
-    const catalog = await context.connection
-        .getCustomRepository(CatalogRepository)
-        .findCatalogBySlugOrFail(parent.identifier.catalogSlug);
-
-    if (!(await hasCatalogPermissions(context, catalog.id, Permission.VIEW))) {
+    const catalog = await getCatalogFromCacheOrDb(context, parent.identifier);
+    if (!(await hasCatalogPermissions(context, catalog, Permission.VIEW))) {
         return null;
     }
 
@@ -136,10 +112,7 @@ export const catalogCreator = async (parent: Catalog, _1: any, context: Context,
 };
 
 export const myCatalogPermissions = async (parent: Catalog, _1: any, context: Context) => {
-    const catalog = await context.connection
-        .getCustomRepository(CatalogRepository)
-        .findCatalogBySlugOrFail(parent.identifier.catalogSlug);
-
+    const catalog = await getCatalogFromCacheOrDb(context, parent.identifier);
     return resolveCatalogPermissions(context, { catalogSlug: catalog.slug }, context.me);
 };
 
@@ -162,11 +135,8 @@ export const userCatalogs = async (
 };
 
 export const catalogPackagesForUser = async (parent: Catalog, _1: any, context: Context, info: any) => {
-    const catalog = await context.connection
-        .getCustomRepository(CatalogRepository)
-        .findCatalogBySlugOrFail(parent.identifier.catalogSlug);
-
-    if (!(await hasCatalogPermissions(context, catalog.id, Permission.VIEW))) {
+    const catalog = await getCatalogFromCacheOrDb(context, parent.identifier);
+    if (!(await hasCatalogPermissions(context, catalog, Permission.VIEW))) {
         return [];
     }
 
@@ -275,9 +245,7 @@ export const setCatalogAvatarImage = async (
         throw new Error("AVATAR_NOT_ALLOWED_ON_USER_CATALOGS");
     }
 
-    const catalog = await context.connection.manager
-        .getCustomRepository(CatalogRepository)
-        .findCatalogBySlugOrFail(identifier.catalogSlug);
+    const catalog = await getCatalogFromCacheOrDb(context, identifier);
     await ImageStorageService.INSTANCE.saveCatalogAvatarImage(catalog.id, image.base64);
 };
 
@@ -287,9 +255,7 @@ export const deleteCatalogAvatarImage = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const catalog = await context.connection.manager
-        .getCustomRepository(CatalogRepository)
-        .findCatalogBySlugOrFail(identifier.catalogSlug);
+    const catalog = await getCatalogFromCacheOrDb(context, identifier);
     await ImageStorageService.INSTANCE.deleteCatalogAvatarImage(catalog.id);
 };
 
@@ -299,9 +265,7 @@ export const setCatalogCoverImage = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const catalog = await context.connection.manager
-        .getCustomRepository(CatalogRepository)
-        .findCatalogBySlugOrFail(identifier.catalogSlug);
+    const catalog = await getCatalogFromCacheOrDb(context, identifier);
     await ImageStorageService.INSTANCE.saveCatalogCoverImage(catalog.id, image.base64);
 };
 
@@ -311,10 +275,7 @@ export const deleteCatalog = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const catalog = await context.connection.manager
-        .getCustomRepository(CatalogRepository)
-        .findCatalogBySlugOrFail(identifier.catalogSlug);
-
+    const catalog = await getCatalogFromCacheOrDb(context, identifier);
     await createActivityLog(context.connection, {
         userId: context.me.id,
         eventType: ActivityLogEventType.CATALOG_DELETED,
@@ -362,4 +323,15 @@ export const myCatalogs = async (_0: any, {}, context: AuthenticatedContext) => 
     }
 
     return catalogs.map((c) => catalogEntityToGraphQL(c));
+};
+
+export const getCatalogFromCacheOrDb = async (
+    context: Context,
+    identifier: CatalogIdentifier | CatalogIdentifierInput
+) => {
+    const catalogPromise = context.connection.manager
+        .getCustomRepository(CatalogRepository)
+        .findCatalogBySlugOrFail(identifier.catalogSlug);
+
+    return await context.cache.loadDataAsync("CATALOG", identifier.catalogSlug, catalogPromise);
 };

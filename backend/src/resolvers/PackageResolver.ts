@@ -32,7 +32,7 @@ import { VersionRepository } from "../repository/VersionRepository";
 import { hasCollectionPermissions } from "./UserCollectionPermissionResolver";
 import { CatalogRepository } from "../repository/CatalogRepository";
 import { resolvePackagePermissions } from "../directive/hasPackagePermissionDirective";
-import { hasPackageEntityPermissions, hasPackagePermissions } from "./UserPackagePermissionResolver";
+import { hasPackageEntityPermissions } from "./UserPackagePermissionResolver";
 import { versionEntityToGraphqlObject } from "./VersionResolver";
 import { catalogEntityToGraphQL } from "./CatalogResolver";
 import { CollectionRepository } from "../repository/CollectionRepository";
@@ -228,7 +228,7 @@ export const findPackagesForCollection = async (
         .getCustomRepository(CollectionRepository)
         .findCollectionBySlugOrFail(parent.identifier.collectionSlug);
 
-    if (!(await hasCollectionPermissions(context, collectionEntity.id, Permission.VIEW))) {
+    if (!(await hasCollectionPermissions(context, collectionEntity, Permission.VIEW))) {
         return [];
     }
 
@@ -274,13 +274,7 @@ export const findPackage = async (
     info: any
 ) => {
     return context.connection.transaction(async (transaction) => {
-        const packagePromise = transaction.getCustomRepository(PackageRepository).findPackageOrFail({
-            identifier,
-            relations: getGraphQlRelationName(info)
-        });
-
-        const serializedIdentifier = identifier.catalogSlug + "-" + identifier.packageSlug;
-        const packageEntity = await context.cache.loadDataAsync("PACKAGE", serializedIdentifier, packagePromise);
+        const packageEntity = await getPackageFromCacheOrDb(context, identifier, getGraphQlRelationName(info));
 
         packageEntity.viewCount++;
         await transaction.save(packageEntity);
@@ -304,10 +298,7 @@ export const packageFetched = async (
     info: any
 ) => {
     return await context.connection.transaction(async (transaction) => {
-        const packageEntity = await transaction.getCustomRepository(PackageRepository).findPackageOrFail({
-            identifier,
-            relations: getGraphQlRelationName(info)
-        });
+        const packageEntity = await getPackageFromCacheOrDb(context, identifier, getGraphQlRelationName(info));
 
         const versionEntity = await transaction.getCustomRepository(VersionRepository).findOneOrFail({ identifier });
 
@@ -434,9 +425,7 @@ export const setPackageCoverImage = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const packageEntity = await context.connection
-        .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier });
+    const packageEntity = await getPackageFromCacheOrDb(context, identifier);
     return ImageStorageService.INSTANCE.savePackageCoverImage(packageEntity.id, image.base64);
 };
 
@@ -559,7 +548,8 @@ export const packageIsPublic = async (parent: Package, _1: any, context: Context
 
 export const getPackageFromCacheOrDb = async (
     context: Context,
-    packageIdentifier: PackageIdentifier | PackageIdentifierInput
+    packageIdentifier: PackageIdentifier | PackageIdentifierInput,
+    relations: string[] = []
 ) => {
     const packagePromise = context.connection
         .getCustomRepository(PackageRepository)

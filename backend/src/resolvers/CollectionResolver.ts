@@ -25,7 +25,6 @@ import { grantAllCollectionPermissionsForUser, hasCollectionPermissions } from "
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { CollectionEntity } from "../entity/CollectionEntity";
 import { ActivityLogRepository, createActivityLog } from "../repository/ActivityLogRepository";
-import { Connection, EntityManager } from "typeorm";
 import { getEnvVariable } from "../util/getEnvVariable";
 import { packageEntityToGraphqlObject } from "./PackageResolver";
 import { ReservedKeywordsService } from "../service/reserved-keywords-service";
@@ -57,11 +56,7 @@ export const collectionSlugAvailable = async (
         return false;
     }
 
-    const collection = await context.connection.manager
-        .getCustomRepository(CollectionRepository)
-        .findCollectionBySlug(collectionSlug);
-
-    return collection == null;
+    return (await getCollectionFromCacheOrDb(context, { collectionSlug })) == null;
 };
 
 export const usersByCollection = async (
@@ -71,10 +66,7 @@ export const usersByCollection = async (
     info: any
 ) => {
     const relations = getGraphQlRelationName(info);
-
-    const collectionEntity = await context.connection.manager
-        .getCustomRepository(CollectionRepository)
-        .findCollectionBySlugOrFail(identifier.collectionSlug);
+    const collectionEntity = await getCollectionFromCacheOrDb(context, identifier, relations);
 
     return await context.connection.manager
         .getCustomRepository(UserCollectionPermissionRepository)
@@ -122,8 +114,7 @@ export const updateCollection = async (
 ) => {
     return context.connection.transaction(async (transaction) => {
         const repository = transaction.getCustomRepository(CollectionRepository);
-
-        const collection = await repository.findCollectionBySlugOrFail(identifier.collectionSlug);
+        const collection = await getCollectionFromCacheOrDb(context, identifier);
 
         if (value.newCollectionSlug && identifier.collectionSlug != value.newCollectionSlug) {
             ReservedKeywordsService.validateReservedKeyword(value.newCollectionSlug);
@@ -188,14 +179,8 @@ export const collectionPackages = async (
 
     if (!user) throw new UserInputError(`USER_NOT_FOUND - ${context.me.username}`);
 
-    const collectionEntity = await context.connection.manager
-        .getCustomRepository(CollectionRepository)
-        .findCollectionBySlugOrFail(identifier.collectionSlug);
-
-    if (!collectionEntity) throw new UserInputError("COLLECTION_NOT_FOUND");
-
+    const collectionEntity = await getCollectionFromCacheOrDb(context, identifier);
     const relations = getGraphQlRelationName(info);
-
     const entities = await context.connection.manager
         .getCustomRepository(CollectionPackageRepository)
         .collectionPackages(user.id, collectionEntity.id, limit, offset, relations);
@@ -209,10 +194,8 @@ export const setCollectionCoverImage = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const collection = await context.connection
-        .getCustomRepository(CollectionRepository)
-        .findCollectionBySlugOrFail(identifier.collectionSlug);
-    return ImageStorageService.INSTANCE.saveCollectionCoverImage(collection.id, image.base64);
+    const collectionEntity = await getCollectionFromCacheOrDb(context, identifier);
+    return ImageStorageService.INSTANCE.saveCollectionCoverImage(collectionEntity.id, image.base64);
 };
 
 export const deleteCollection = async (
@@ -222,16 +205,12 @@ export const deleteCollection = async (
     info: any
 ) => {
     return context.connection.transaction(async (transaction) => {
-        const relations = getGraphQlRelationName(info);
-
-        const collection = await transaction
-            .getCustomRepository(CollectionRepository)
-            .findCollectionBySlugOrFail(identifier.collectionSlug);
+        const collectionEntity = await getCollectionFromCacheOrDb(context, identifier);
 
         await createActivityLog(transaction, {
             userId: context.me.id,
             eventType: ActivityLogEventType.COLLECTION_DELETED,
-            targetCollectionId: collection.id
+            targetCollectionId: collectionEntity.id
         });
 
         await transaction.getCustomRepository(CollectionRepository).deleteCollection(identifier.collectionSlug);
@@ -308,8 +287,7 @@ export const removePackageFromCollection = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const repository = context.connection.manager.getCustomRepository(CollectionRepository);
-    const collectionEntity = await repository.findCollectionBySlugOrFail(collectionIdentifier.collectionSlug);
+    const collectionEntity = await getCollectionFromCacheOrDb(context, collectionIdentifier);
     const identifier = packageIdentifier;
     const packageEntity = await context.connection
         .getCustomRepository(PackageRepository)
@@ -344,9 +322,7 @@ export const findCollectionBySlug = async (
 ): Promise<Collection> => {
     return context.connection.transaction(async (transaction) => {
         const relations = getGraphQlRelationName(info);
-        const collectionEntity = await context.connection.manager
-            .getCustomRepository(CollectionRepository)
-            .findCollectionBySlugOrFail(identifier.collectionSlug, relations);
+        const collectionEntity = await getCollectionFromCacheOrDb(context, identifier, relations);
 
         if (context.me) {
             await createActivityLog(transaction, {
@@ -424,7 +400,7 @@ export const userCollections = async (
 
 export const myPermissions = async (parent: Collection, _0: any, context: Context) => {
     return userCollectionPermissions(
-        context.connection,
+        context,
         {
             collectionSlug: parent.identifier.collectionSlug!
         },
@@ -433,11 +409,8 @@ export const myPermissions = async (parent: Collection, _0: any, context: Contex
 };
 
 export const collectionIdentifier = async (parent: Collection, _1: any, context: Context) => {
-    const collectionEntity = await context.connection
-        .getCustomRepository(CollectionRepository)
-        .findCollectionBySlugOrFail(parent.identifier.collectionSlug);
-
-    if (!(await hasCollectionPermissions(context, collectionEntity.id, Permission.VIEW))) {
+    const collectionEntity = await getCollectionFromCacheOrDb(context, parent.identifier);
+    if (!(await hasCollectionPermissions(context, collectionEntity, Permission.VIEW))) {
         return {
             registryURL: getEnvVariable("REGISTRY_URL"),
             collectionSlug: "private"
@@ -451,11 +424,8 @@ export const collectionIdentifier = async (parent: Collection, _1: any, context:
 };
 
 export const collectionCreator = async (parent: Collection, _1: any, context: Context, info: any) => {
-    const collectionEntity = await context.connection
-        .getCustomRepository(CollectionRepository)
-        .findCollectionBySlugOrFail(parent.identifier.collectionSlug, ["creator"]);
-
-    if (!(await hasCollectionPermissions(context, collectionEntity.id, Permission.VIEW))) {
+    const collectionEntity = await getCollectionFromCacheOrDb(context, parent.identifier, ["creator"]);
+    if (!(await hasCollectionPermissions(context, collectionEntity, Permission.VIEW))) {
         return null;
     }
 
@@ -470,10 +440,7 @@ export const collectionIsPublic = async (
     context: Context,
     info: any
 ): Promise<boolean> => {
-    const collectionEntity = await context.connection
-        .getCustomRepository(CollectionRepository)
-        .findCollectionBySlugOrFail(parent.identifier.collectionSlug);
-
+    const collectionEntity = await getCollectionFromCacheOrDb(context, parent.identifier);
     return collectionEntity.isPublic;
 };
 
@@ -483,19 +450,13 @@ export const collectionIsRecommended = async (
     context: Context,
     info: any
 ): Promise<boolean> => {
-    const collectionEntity = await context.connection
-        .getCustomRepository(CollectionRepository)
-        .findCollectionBySlugOrFail(parent.identifier.collectionSlug);
-
+    const collectionEntity = await getCollectionFromCacheOrDb(context, parent.identifier);
     return collectionEntity.isRecommended;
 };
 
 export const collectionDescription = async (parent: Collection, _1: any, context: Context): Promise<string | null> => {
-    const collectionEntity = await context.connection
-        .getCustomRepository(CollectionRepository)
-        .findCollectionBySlugOrFail(parent.identifier.collectionSlug);
-
-    if (!(await hasCollectionPermissions(context, collectionEntity.id, Permission.VIEW))) {
+    const collectionEntity = await getCollectionFromCacheOrDb(context, parent.identifier);
+    if (!(await hasCollectionPermissions(context, collectionEntity, Permission.VIEW))) {
         return null;
     }
 
@@ -503,11 +464,8 @@ export const collectionDescription = async (parent: Collection, _1: any, context
 };
 
 export const collectionCreatedAt = async (parent: Collection, _1: any, context: Context): Promise<Date | null> => {
-    const collectionEntity = await context.connection
-        .getCustomRepository(CollectionRepository)
-        .findCollectionBySlugOrFail(parent.identifier.collectionSlug);
-
-    if (!(await hasCollectionPermissions(context, collectionEntity.id, Permission.VIEW))) {
+    const collectionEntity = await getCollectionFromCacheOrDb(context, parent.identifier);
+    if (!(await hasCollectionPermissions(context, collectionEntity, Permission.VIEW))) {
         return null;
     }
 
@@ -515,11 +473,8 @@ export const collectionCreatedAt = async (parent: Collection, _1: any, context: 
 };
 
 export const collectionUpdatedAt = async (parent: Collection, _1: any, context: Context): Promise<Date | null> => {
-    const collectionEntity = await context.connection
-        .getCustomRepository(CollectionRepository)
-        .findCollectionBySlugOrFail(parent.identifier.collectionSlug);
-
-    if (!(await hasCollectionPermissions(context, collectionEntity.id, Permission.VIEW))) {
+    const collectionEntity = await getCollectionFromCacheOrDb(context, parent.identifier);
+    if (!(await hasCollectionPermissions(context, collectionEntity, Permission.VIEW))) {
         return null;
     }
 
@@ -527,11 +482,8 @@ export const collectionUpdatedAt = async (parent: Collection, _1: any, context: 
 };
 
 export const collectionName = async (parent: Collection, _1: any, context: Context) => {
-    const collectionEntity = await context.connection
-        .getCustomRepository(CollectionRepository)
-        .findCollectionBySlugOrFail(parent.identifier.collectionSlug);
-
-    if (!(await hasCollectionPermissions(context, collectionEntity.id, Permission.VIEW))) {
+    const collectionEntity = await getCollectionFromCacheOrDb(context, parent.identifier);
+    if (!(await hasCollectionPermissions(context, collectionEntity, Permission.VIEW))) {
         return "private";
     }
 
@@ -539,22 +491,22 @@ export const collectionName = async (parent: Collection, _1: any, context: Conte
 };
 
 export const userCollectionPermissions = async (
-    connection: Connection | EntityManager,
+    context: Context,
     identifier: CollectionIdentifierInput,
     username?: string
 ): Promise<Permission[]> => {
-    const collection = await connection
-        .getCustomRepository(CollectionRepository)
-        .findCollectionBySlugOrFail(identifier.collectionSlug);
+    const collection = await getCollectionFromCacheOrDb(context, identifier);
 
     if (username == null) {
-        if (collection.isPublic) return [Permission.VIEW];
-        else return [];
+        if (collection.isPublic) {
+            return [Permission.VIEW];
+        } else {
+            return [];
+        }
     }
 
-    const user = await connection.getCustomRepository(UserRepository).findUserByUserName({ username });
-
-    const userPermission = await connection
+    const user = await context.connection.getCustomRepository(UserRepository).findUserByUserName({ username });
+    const userPermission = await context.connection
         .getCustomRepository(UserCollectionPermissionRepository)
         .findCollectionPermissions({
             collectionId: collection.id,
@@ -598,4 +550,16 @@ export const getMyRecentlyViewedPackages = async (
         logs: await Promise.all(searchResponse.map((c) => activtyLogEntityToGraphQL(context, context.connection, c))),
         count
     };
+};
+
+export const getCollectionFromCacheOrDb = async (
+    context: Context,
+    identifier: CollectionIdentifierInput,
+    relations: string[] = []
+) => {
+    const collectionPromise = context.connection
+        .getCustomRepository(CollectionRepository)
+        .findCollectionBySlugOrFail(identifier.collectionSlug, relations);
+
+    return await context.cache.loadDataAsync("COLLECTION", identifier.collectionSlug, collectionPromise);
 };
