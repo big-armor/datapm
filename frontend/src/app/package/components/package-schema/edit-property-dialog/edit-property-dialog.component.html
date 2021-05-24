@@ -84,8 +84,8 @@
             </div>
 
             <div mat-dialog-actions class="d-flex justify-content-between pb-3">
-                <button mat-button mat-dialog-close class="close-dialog">Close</button>
-                <button mat-button (click)="save()" [disabled]="loading" class="ml-0 save-btn">
+                <button mat-dialog-close class="modal-close-btn">Close</button>
+                <button (click)="save()" [disabled]="loading" class="ml-0 modal-submit-btn">
                     <span>Save</span>
                 </button>
             </div>
