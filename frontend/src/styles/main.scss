@@ -484,11 +484,6 @@ mat-select {
     }
 }
 
-// .app-outlined-button.follow-btn {
-//     padding: 7px 10px;
-//     line-height: 13px;
-// }
-
 .raised {
     box-shadow: var(--outer-shadow-1) !important;
 }
@@ -1245,6 +1240,12 @@ button:disabled {
         width: 100%;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+    }
+    .app-raised-button.follow-btn {
+        padding: 5px;
+        width: 80px;
+        line-height: 10px;
+        font-size: $small-font;
     }
 }
 
