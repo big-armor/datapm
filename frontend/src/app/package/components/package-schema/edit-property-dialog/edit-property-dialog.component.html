@@ -32,7 +32,7 @@
                             <div *ngFor="let valueTypes of valueTypeValues">
                                 <span class="text-dark-gray pl-1">{{ valueTypes.valueType }}</span>
                                 <mat-form-field class="w-100 mb-1" id="inviteInput" appearance="outline">
-                                    <mat-chip-list #chipList aria-label="Fruit selection">
+                                    <mat-chip-list #chipList aria-label="Content labels">
                                         <mat-chip
                                             *ngFor="let contentLabel of valueTypes.contentLabels"
                                             [hidden]="contentLabel.hidden"
