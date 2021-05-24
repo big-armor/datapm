@@ -2,6 +2,7 @@ import { ValidationError } from "apollo-server";
 import { emailAddressValid } from "datapm-lib";
 import { AuthenticatedContext, Context } from "../context";
 import { CatalogEntity } from "../entity/CatalogEntity";
+import { UserCatalogPermissionEntity } from "../entity/UserCatalogPermissionEntity";
 import { UserEntity } from "../entity/UserEntity";
 import { CatalogIdentifierInput, Permission, SetUserCatalogPermissionInput, UserStatus } from "../generated/graphql";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
@@ -21,7 +22,7 @@ export const hasCatalogPermissions = async (context: Context, catalog: CatalogEn
         return false;
     }
 
-    return await getCatalogPermissionsFromCacheOrDb(context, catalog.id, permission);
+    return await getCatalogPermissionsStatusFromCacheOrDb(context, catalog.id, permission);
 };
 
 export const setUserCatalogPermission = async (
@@ -107,7 +108,7 @@ export const deleteUserCatalogPermissions = async (
     });
 };
 
-export const getCatalogPermissionsFromCacheOrDb = async (
+export const getCatalogPermissionsStatusFromCacheOrDb = async (
     context: Context,
     catalogId: number,
     permission: Permission
@@ -120,5 +121,16 @@ export const getCatalogPermissionsFromCacheOrDb = async (
         .getCustomRepository(UserCatalogPermissionRepository)
         .hasPermission(context.me.id, catalogId, permission);
 
-    return await context.cache.loadPackagePermissionsStatusById(catalogId, permission, permissionsPromise);
+    return await context.cache.loadCatalogPermissionsStatusById(catalogId, permission, permissionsPromise);
+};
+
+export const getCatalogPermissionsFromCacheOrDb = async (
+    context: Context,
+    catalogId: number,
+    userId: number
+) => {
+    const catalogPermissionsPromise = context.connection
+        .getCustomRepository(UserCatalogPermissionRepository)
+        .findCatalogPermissions({ catalogId, userId }) as Promise<UserCatalogPermissionEntity>;
+    return context.cache.loadCatalogPermissionsById(catalogId, catalogPermissionsPromise);
 };

@@ -1,14 +1,38 @@
 import { CatalogEntity } from "./entity/CatalogEntity";
 import { CollectionEntity } from "./entity/CollectionEntity";
 import { PackageEntity } from "./entity/PackageEntity";
-import { PackageIdentifier, PackageIdentifierInput, Permission } from "./generated/graphql";
+import { UserCatalogPermissionEntity } from "./entity/UserCatalogPermissionEntity";
+import { UserEntity } from "./entity/UserEntity";
+import { UserPackagePermissionEntity } from "./entity/UserPackagePermissionEntity";
+import { VersionEntity } from "./entity/VersionEntity";
+import { PackageIdentifier, PackageIdentifierInput, Permission, VersionIdentifierInput } from "./generated/graphql";
 
 export class SessionCache {
-    private readonly loadedData = new Map<string, Promise<any>>();
+    // TODO: ERMAL - ADD FORCE RELOAD FOR EVERY METHOD
+    private readonly cache = new Map<string, Promise<any>>();
 
-    public async loadPackage(id: number, packagePromise: Promise<PackageEntity>): Promise<PackageEntity> {
+    public storePackageToCache(packageEntity: PackageEntity): void {
+        const cacheId = this.buildDataKeyForPackageId(packageEntity.id);
+        this.storeToCache(cacheId, packageEntity);
+    }
+
+    public storeToCache(key: string, data: any): void {
+        this.cache.set(key, Promise.resolve(data));
+    }
+
+    public async loadUser(id: number, userPromise: Promise<UserEntity>, forceReload?: boolean): Promise<UserEntity> {
+        const cacheId = this.buildDataKeyForUserId(id);
+        return this.loadDataAsync(cacheId, userPromise, forceReload);
+    }
+
+    public async loadUserByUsername(username: string, userPromise: Promise<UserEntity>, forceReload?: boolean): Promise<UserEntity> {
+        const cacheId = this.buildDataKeyForUserByUsername(username);
+        return this.loadDataAsync(cacheId, userPromise, forceReload);
+    }
+
+    public async loadPackage(id: number, packagePromise: Promise<PackageEntity>, forceReload?: boolean): Promise<PackageEntity> {
         const cacheId = this.buildDataKeyForPackageId(id);
-        return this.loadDataAsync(cacheId, packagePromise);
+        return this.loadDataAsync(cacheId, packagePromise, forceReload);
     }
 
     public async loadPackageByIdentifier(identifier: PackageIdentifier | PackageIdentifierInput, packagePromise: Promise<PackageEntity>): Promise<PackageEntity> {
@@ -16,14 +40,29 @@ export class SessionCache {
         return this.loadDataAsync(cacheId, packagePromise);
     }
 
+    public async loadLatestPackageVersion(packageId: number, versionPromise: Promise<VersionEntity>, forceReload?: boolean): Promise<VersionEntity> {
+        const cacheId = this.buildDataKeyForLatestPackageVersionId(packageId);
+        return this.loadDataAsync(cacheId, versionPromise, forceReload);
+    }
+
+    public async loadPackageVersion(identifier: VersionIdentifierInput, versionPromise: Promise<VersionEntity>, forceReload?: boolean): Promise<VersionEntity> {
+        const cacheId = this.buildDataKeyForVersionIdentifier(identifier);
+        return this.loadDataAsync(cacheId, versionPromise, forceReload);
+    }
+
+    public async loadPackageVersions(packageId: number, versionsPromise: Promise<VersionEntity[]>, forceReload?: boolean): Promise<VersionEntity[]> {
+        const cacheId = this.buildDataKeyForPackageVersionId(packageId);
+        return this.loadDataAsync(cacheId, versionsPromise, forceReload);
+    }
+
     public async loadCatalog(id: number, catalogPromise: Promise<CatalogEntity>): Promise<CatalogEntity> {
         const cacheId = this.buildDataKeyForCatalogId(id);
         return this.loadDataAsync(cacheId, catalogPromise);
     }
 
-    public async loadCatalogBySlug(slug: string, catalogPromise: Promise<CatalogEntity>): Promise<CatalogEntity> {
+    public async loadCatalogBySlug(slug: string, catalogPromise: Promise<CatalogEntity>, forceReload?: boolean): Promise<CatalogEntity> {
         const cacheId = this.buildDataKeyForCatalogSlug(slug);
-        return this.loadDataAsync(cacheId, catalogPromise);
+        return this.loadDataAsync(cacheId, catalogPromise, forceReload);
     }
 
     public async loadCollection(id: number, collectionPromise: Promise<CollectionEntity>): Promise<CollectionEntity> {
@@ -36,8 +75,23 @@ export class SessionCache {
         return this.loadDataAsync(cacheId, collectionPromise);
     }
 
+    public async loadPackagePermissionsById(id: number, permissionPromise: Promise<UserPackagePermissionEntity>): Promise<UserPackagePermissionEntity> {
+        const cacheId = this.buildDataKeyForPackagePermissions(id);
+        return this.loadDataAsync(cacheId, permissionPromise);
+    }
+
     public async loadPackagePermissionsStatusById(id: number, permission: Permission, permissionPromise: Promise<Boolean>): Promise<Boolean> {
         const cacheId = this.buildDataKeyForPackagePermission(id, permission);
+        return this.loadDataAsync(cacheId, permissionPromise);
+    }
+
+    public async loadCatalogPermissionsStatusById(id: number, permission: Permission, permissionPromise: Promise<Boolean>): Promise<Boolean> {
+        const cacheId = this.buildDataKeyForCatalogPermission(id, permission);
+        return this.loadDataAsync(cacheId, permissionPromise);
+    }
+
+    public async loadCatalogPermissionsById(id: number, permissionPromise: Promise<UserCatalogPermissionEntity>): Promise<UserCatalogPermissionEntity> {
+        const cacheId = this.buildDataKeyForCatalogPermissions(id);
         return this.loadDataAsync(cacheId, permissionPromise);
     }
 
@@ -46,23 +100,27 @@ export class SessionCache {
         return this.loadDataAsync(cacheId, permissionPromise);
     }
 
-    public async loadDataAsync(dataKey: string, dataPromise: Promise<any>): Promise<any> {
-        const cachedData = this.loadedData.get(dataKey);
-        if (cachedData) {
+    public async loadDataAsync(dataKey: string, dataPromise: Promise<any>, forceReload?: boolean): Promise<any> {
+        const cachedData = this.cache.get(dataKey);
+        if (cachedData && !forceReload) {
             return cachedData;
         }
 
-        const resolvedDataPRomise = new Promise(async (res, rej) => {
+        const resolvedDataPromise = new Promise(async (res, rej) => {
             dataPromise
-                .then((data) => {
-                    console.log("Doing things for " + dataKey);
-                    res(data);
-                })
+                .then((data) => res(data))
                 .catch((error) => rej(error));
         });
-        this.loadedData.set(dataKey, resolvedDataPRomise);
-        // console.log("Couldn't find cache for ", dataKey);
-        return resolvedDataPRomise;
+        this.cache.set(dataKey, resolvedDataPromise);
+        return resolvedDataPromise;
+    }
+
+    private buildDataKeyForUserId(id: number): string {
+        return "USER_ID-" + id;
+    }
+
+    private buildDataKeyForUserByUsername(username: string): string {
+        return "USER_USERNAME-" + username;
     }
 
     private buildDataKeyForPackageId(id: number): string {
@@ -73,8 +131,32 @@ export class SessionCache {
         return "PACKAGE_ID-" + identifier.catalogSlug + "/" + identifier.packageSlug;
     }
 
+    private buildDataKeyForVersionIdentifier(identifier: VersionIdentifierInput): string {
+        return "VERSION_ID-" + identifier.catalogSlug + "/" + identifier.packageSlug + "/" + identifier.versionMajor + "." + identifier.versionMinor + "." + identifier.versionPatch;
+    }
+
+    private buildDataKeyForLatestPackageVersionId(id: number): string {
+        return "PACKAGE_LATEST_VERSION_ID-" + id;
+    }
+
+    private buildDataKeyForPackageVersionId(id: number): string {
+        return "PACKAGE_VERSION_ID-" + id;
+    }
+
+    private buildDataKeyForPackagePermissions(id: number): string {
+        return "PACKAGE_PERMISSIONS_ID-" + id;
+    }
+
+    private buildDataKeyForCatalogPermissions(id: number): string {
+        return "CATALOG_PERMISSIONS_ID-" + id;
+    }
+
     private buildDataKeyForPackagePermission(id: number, permission: Permission): string {
         return "PACKAGE_PERMISSION_ID-" + id + "_" + permission;
+    }
+
+    private buildDataKeyForCatalogPermission(id: number, permission: Permission): string {
+        return "CATALOG_PERMISSION_ID-" + id + "_" + permission;
     }
 
     private buildDataKeyForCatalogId(id: number): string {

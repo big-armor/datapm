@@ -29,6 +29,7 @@ import { getEnvVariable } from "../util/getEnvVariable";
 import { packageEntityToGraphqlObject } from "./PackageResolver";
 import { ReservedKeywordsService } from "../service/reserved-keywords-service";
 import { activtyLogEntityToGraphQL } from "./ActivityLogResolver";
+import { getUserFromCacheOrDbById, getUserFromCacheOrDbByUsername } from "./UserResolver";
 
 export const collectionEntityToGraphQLOrNull = (collectionEntity: CollectionEntity): Collection | null => {
     if (!collectionEntity) {
@@ -427,9 +428,7 @@ export const collectionCreator = async (parent: Collection, _1: any, context: Co
         return null;
     }
 
-    return await context.connection
-        .getCustomRepository(UserRepository)
-        .findOneOrFail({ where: { id: collectionEntity.creator.id }, relations: getGraphQlRelationName(info) });
+    return await getUserFromCacheOrDbById(context, collectionEntity.creatorId, getGraphQlRelationName(info));
 };
 
 export const collectionIsPublic = async (
@@ -503,7 +502,8 @@ export const userCollectionPermissions = async (
         }
     }
 
-    const user = await context.connection.getCustomRepository(UserRepository).findUserByUserName({ username });
+    const user = await getUserFromCacheOrDbByUsername(context, username);
+    // TODO: ERMAL - DOES THIS NEED TO BE CACHED
     const userPermission = await context.connection
         .getCustomRepository(UserCollectionPermissionRepository)
         .findCollectionPermissions({

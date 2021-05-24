@@ -1,7 +1,9 @@
 import graphqlFields from "graphql-fields";
+import { Connection, EntityManager } from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
 import { resolveCatalogPermissions } from "../directive/hasCatalogPermissionDirective";
 import { CatalogEntity } from "../entity/CatalogEntity";
+import { UserCatalogPermissionEntity } from "../entity/UserCatalogPermissionEntity";
 import {
     ActivityLogChangeType,
     ActivityLogEventType,
@@ -23,6 +25,7 @@ import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 import { packageEntityToGraphqlObject } from "./PackageResolver";
 import { hasCatalogPermissions } from "./UserCatalogPermissionResolver";
+import { getUserFromCacheOrDbById } from "./UserResolver";
 
 export const catalogEntityToGraphQLOrNull = (catalogEntity: CatalogEntity): Catalog | null => {
     if (!catalogEntity) {
@@ -80,11 +83,12 @@ export const catalogDisplayName = async (parent: Catalog, _1: any, context: Cont
         return "private";
     }
 
-    if (catalog.description != null) return catalog.displayName;
+    if (catalog.description != null) {
+        return catalog.displayName;
+    }
 
-    const catalogEntity = context.connection.getRepository(CatalogEntity).findOneOrFail(catalog.id);
-
-    return (await catalogEntity).displayName;
+    const catalogEntity = await getCatalogFromCacheOrDb(context, parent.identifier, true);
+    return catalogEntity.displayName;
 };
 
 export const catalogDescription = async (parent: Catalog, _1: any, context: Context) => {
@@ -93,11 +97,12 @@ export const catalogDescription = async (parent: Catalog, _1: any, context: Cont
         return null;
     }
 
-    if (catalog.description != null) return catalog.description;
+    if (catalog.description != null) {
+        return catalog.description;
+    }
 
-    const catalogEntity = context.connection.getRepository(CatalogEntity).findOneOrFail(catalog.id);
-
-    return (await catalogEntity).description;
+    const catalogEntity = await getCatalogFromCacheOrDb(context, parent.identifier, true);
+    return catalogEntity.description;
 };
 
 export const catalogCreator = async (parent: Catalog, _1: any, context: Context, info: any) => {
@@ -106,9 +111,7 @@ export const catalogCreator = async (parent: Catalog, _1: any, context: Context,
         return null;
     }
 
-    return await context.connection
-        .getCustomRepository(UserRepository)
-        .findOneOrFail({ where: { id: catalog.creatorId }, relations: getGraphQlRelationName(info) });
+    return await getUserFromCacheOrDbById(context, catalog.creatorId, getGraphQlRelationName(info));
 };
 
 export const myCatalogPermissions = async (parent: Catalog, _1: any, context: Context) => {
@@ -325,13 +328,39 @@ export const myCatalogs = async (_0: any, { }, context: AuthenticatedContext) =>
     return catalogs.map((c) => catalogEntityToGraphQL(c));
 };
 
+export const getCatalogFromCacheOrDbById = async (
+    context: Context,
+    catalogId: number,
+    relations: string[] = []
+) => {
+    const catalogPromise = context.connection.manager
+        .getCustomRepository(CatalogRepository)
+        .findOne(catalogId, { relations }) as Promise<CatalogEntity>;
+
+    return await context.cache.loadCatalog(catalogId, catalogPromise);
+};
+
+export const getCatalogFromCacheOrDbByIdOrFail = async (
+    context: Context,
+    connection: EntityManager | Connection,
+    catalogId: number,
+    relations: string[] = []
+) => {
+    const catalogPromise = connection
+        .getCustomRepository(CatalogRepository)
+        .findOneOrFail(catalogId, { relations });
+
+    return await context.cache.loadCatalog(catalogId, catalogPromise);
+};
+
 export const getCatalogFromCacheOrDb = async (
     context: Context,
-    identifier: CatalogIdentifier | CatalogIdentifierInput
+    identifier: CatalogIdentifier | CatalogIdentifierInput,
+    forceReload?: boolean
 ) => {
     const catalogPromise = context.connection.manager
         .getCustomRepository(CatalogRepository)
         .findCatalogBySlugOrFail(identifier.catalogSlug);
 
-    return await context.cache.loadCatalogBySlug(identifier.catalogSlug, catalogPromise);
+    return await context.cache.loadCatalogBySlug(identifier.catalogSlug, catalogPromise, forceReload);
 };

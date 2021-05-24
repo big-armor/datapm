@@ -11,7 +11,7 @@ import {
 } from "datapm-lib";
 import { VersionRepository } from "./../repository/VersionRepository";
 import { PackageFileStorageService } from "./../storage/packages/package-file-storage-service";
-import { AuthenticatedContext } from "./../context";
+import { AuthenticatedContext, Context } from "./../context";
 import {
     ActivityLogChangeType,
     ActivityLogEventType,
@@ -30,25 +30,24 @@ import { PackageRepository } from "../repository/PackageRepository";
 import { getGraphQlRelationName } from "./../util/relationNames";
 import { VersionEntity } from "../entity/VersionEntity";
 import { createActivityLog } from "./../repository/ActivityLogRepository";
-import { Connection, EntityManager, TransactionManager } from "typeorm";
 import { PackageEntity } from "../entity/PackageEntity";
 import { CatalogEntity } from "../entity/CatalogEntity";
-import { catalogEntityToGraphQL } from "./CatalogResolver";
+import { getCatalogFromCacheOrDbByIdOrFail } from "./CatalogResolver";
 import { StorageErrors } from "../storage/files/file-storage-service";
 import { hasPackagePermissions } from "./UserPackagePermissionResolver";
-import { packageEntityToGraphqlObject } from "./PackageResolver";
-import { createVersionComparison } from "./VersionComparisonResolver";
+import { getPackageFromCacheOrDbById, packageEntityToGraphqlObject } from "./PackageResolver";
 import { saveVersionComparison } from "../repository/VersionComparisonRepository";
+import { Connection, EntityManager } from "typeorm";
 
 export const versionEntityToGraphqlObject = async (
-    context: EntityManager | Connection,
+    context: Context,
+    connection: EntityManager | Connection,
     versionEntity: VersionEntity
 ): Promise<Version> => {
     let packageSlug: string;
     let catalogSlug: string;
-    const packageEntity = await context
-        .getRepository(PackageEntity)
-        .findOneOrFail({ where: { id: versionEntity.packageId } });
+
+    const packageEntity = await getPackageFromCacheOrDbById(context, connection, versionEntity.packageId);
     packageSlug = packageEntity.slug;
 
     if (versionEntity.package?.catalog != null) {
@@ -56,13 +55,9 @@ export const versionEntityToGraphqlObject = async (
     } else if (packageEntity.catalog != null) {
         catalogSlug = packageEntity.catalog.slug;
     } else {
-        const catalogEntity = await context.getRepository(CatalogEntity).findOneOrFail({ id: packageEntity.id });
+        const catalogEntity = await getCatalogFromCacheOrDbByIdOrFail(context, connection, packageEntity.catalogId);
         catalogSlug = catalogEntity.slug;
     }
-
-    const packageEntityLoaded = await context
-        .getRepository(PackageEntity)
-        .findOneOrFail({ where: { id: packageEntity.id } });
 
     return {
         identifier: {
@@ -131,16 +126,16 @@ export const createVersion = async (
                 if (minVersionCompare == 1) {
                     throw new ApolloError(
                         identifier.catalogSlug +
-                            "/" +
-                            identifier.packageSlug +
-                            " has current version " +
-                            latestVersionSemVer.version +
-                            ", and this new version has " +
-                            compatibilityToString(compatibility) +
-                            " changes - requiring a minimum version number of " +
-                            minNextVersion.version +
-                            ", but you submitted version number " +
-                            proposedNewVersion.version,
+                        "/" +
+                        identifier.packageSlug +
+                        " has current version " +
+                        latestVersionSemVer.version +
+                        ", and this new version has " +
+                        compatibilityToString(compatibility) +
+                        " changes - requiring a minimum version number of " +
+                        minNextVersion.version +
+                        ", but you submitted version number " +
+                        proposedNewVersion.version,
                         VersionConflict.HIGHER_VERSION_REQUIRED,
                         { existingVersion: latestVersionSemVer.version, minNextVersion: minNextVersion.version }
                     );
@@ -208,7 +203,7 @@ export const createVersion = async (
                 value.packageFile
             );
 
-        return versionEntityToGraphqlObject(transaction, recalledVersion);
+        return versionEntityToGraphqlObject(context, transaction, recalledVersion);
     });
 
     return transactionResult;
@@ -234,21 +229,12 @@ export const deleteVersion = async (
 };
 
 export const versionPackageFile = async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
-    const version = await context.connection
-        .getCustomRepository(VersionRepository)
-        .findOneOrFail({ identifier: parent.identifier });
-
-    const packageEntity = await context.connection
-        .getRepository(PackageEntity)
-        .findOneOrFail({ id: version.packageId });
-
-    const catalog = await context.connection
-        .getRepository(CatalogEntity)
-        .findOneOrFail({ id: packageEntity.catalogId });
+    const version = await getPackageVersionFromCacheOrDbById(context, parent.identifier);
+    const packageEntity = await getPackageFromCacheOrDbById(context, context.connection, version.packageId);
 
     try {
         return await PackageFileStorageService.INSTANCE.readPackageFile(packageEntity.id, {
-            catalogSlug: catalog.slug,
+            catalogSlug: packageEntity.catalog.slug,
             packageSlug: packageEntity.slug,
             versionMajor: version.majorVersion,
             versionMinor: version.minorVersion,
@@ -269,9 +255,7 @@ export const versionAuthor = async (
     context: AuthenticatedContext,
     info: any
 ): Promise<User | null> => {
-    const version = await context.connection
-        .getCustomRepository(VersionRepository)
-        .findOneOrFail({ identifier: parent.identifier, relations: ["author"] });
+    const version = await getPackageVersionFromCacheOrDbById(context, parent.identifier, ["author"]);
 
     if (!(await hasPackagePermissions(context, version.packageId, Permission.VIEW))) {
         return null;
@@ -294,13 +278,11 @@ export const versionCreatedAt = async (
     context: AuthenticatedContext,
     info: any
 ): Promise<Date | null> => {
-    const version = await context.connection
-        .getCustomRepository(VersionRepository)
-        .findOneOrFail({ identifier: parent.identifier });
-
+    const version = await getPackageVersionFromCacheOrDbById(context, parent.identifier);
     if (!(await hasPackagePermissions(context, version.packageId, Permission.VIEW))) {
         return null;
     }
+
     return version.createdAt;
 };
 
@@ -310,13 +292,11 @@ export const versionUpdatedAt = async (
     context: AuthenticatedContext,
     info: any
 ): Promise<Date | null> => {
-    const version = await context.connection
-        .getCustomRepository(VersionRepository)
-        .findOneOrFail({ identifier: parent.identifier });
-
+    const version = await getPackageVersionFromCacheOrDbById(context, parent.identifier);
     if (!(await hasPackagePermissions(context, version.packageId, Permission.VIEW))) {
         return null;
     }
+
     return version.updatedAt;
 };
 
@@ -326,9 +306,18 @@ export const versionPackage = async (
     context: AuthenticatedContext,
     info: any
 ): Promise<Package | null> => {
-    const version = await context.connection
-        .getCustomRepository(VersionRepository)
-        .findOneOrFail({ identifier: parent.identifier });
-
+    const version = await getPackageVersionFromCacheOrDbById(context, parent.identifier);
     return packageEntityToGraphqlObject(context, version.package);
+};
+
+export const getPackageVersionFromCacheOrDbById = async (
+    context: Context,
+    identifier: VersionIdentifierInput,
+    relations: string[] = []
+) => {
+    const versionPromise = context.connection
+        .getCustomRepository(VersionRepository)
+        .findOneOrFail({ identifier, relations });
+
+    return await context.cache.loadPackageVersion(identifier, versionPromise);
 };

@@ -10,7 +10,7 @@ import { PackageFileStorageService } from "../storage/packages/package-file-stor
 @EntityRepository()
 export class VersionRepository {
     readonly packageFileStorageService = PackageFileStorageService.INSTANCE;
-    constructor(private manager: EntityManager) {}
+    constructor(private manager: EntityManager) { }
 
     public async findVersion(
         packageId: number,
@@ -70,6 +70,27 @@ export class VersionRepository {
             .getRepository(VersionEntity)
             .createQueryBuilder(ALIAS)
             .where({ packageId: packageRef.id })
+            .orderBy({
+                "findLatestVersion.majorVersion": "DESC",
+                "findLatestVersion.minorVersion": "DESC",
+                "findLatestVersion.patchVersion": "DESC"
+            })
+            .addRelations(ALIAS, relations)
+            .getOne();
+    }
+
+    async findLatestVersionByPackageId({
+        packageId,
+        relations = []
+    }: {
+        packageId: number;
+        relations?: string[];
+    }): Promise<Maybe<VersionEntity>> {
+        const ALIAS = "findLatestVersion";
+        return this.manager
+            .getRepository(VersionEntity)
+            .createQueryBuilder(ALIAS)
+            .where({ packageId })
             .orderBy({
                 "findLatestVersion.majorVersion": "DESC",
                 "findLatestVersion.minorVersion": "DESC",

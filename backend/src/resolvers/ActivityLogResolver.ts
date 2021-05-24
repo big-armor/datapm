@@ -77,11 +77,13 @@ export const activtyLogEntityToGraphQL = async function (
     if (activityLogEntity.targetPackageVersionId) {
         if (activityLogEntity.targetPackageVersion)
             activityLog.targetPackageVersion = await versionEntityToGraphqlObject(
+                context,
                 connection,
                 activityLogEntity.targetPackageVersion
             );
         else {
             activityLog.targetPackageVersion = await versionEntityToGraphqlObject(
+                context,
                 connection,
                 await connection.getRepository(VersionEntity).findOneOrFail(activityLogEntity.targetPackageVersionId)
             );

@@ -88,7 +88,8 @@ import {
     acceptInvite,
     adminSearchUsers,
     adminDeleteUser,
-    adminSetUserStatus
+    adminSetUserStatus,
+    getUserFromCacheOrDbByUsername
 } from "./resolvers/UserResolver";
 import { createAPIKey, deleteAPIKey, myAPIKeys } from "./resolvers/ApiKeyResolver";
 import {
@@ -336,10 +337,7 @@ export const resolvers: {
             return parent.username;
         },
         firstName: async (parent: User, _1: any, context: Context) => {
-            const user = await context.connection
-                .getCustomRepository(UserRepository)
-                .findUserByUserName({ username: parent.username });
-
+            const user = await getUserFromCacheOrDbByUsername(context, parent.username);
             if (isRequestingUserOrAdmin(context, user.username) || user.nameIsPublic) {
                 return user.firstName || null;
             }
@@ -347,10 +345,7 @@ export const resolvers: {
             return null;
         },
         lastName: async (parent: User, _1: any, context: Context) => {
-            const user = await context.connection
-                .getCustomRepository(UserRepository)
-                .findUserByUserName({ username: parent.username });
-
+            const user = await getUserFromCacheOrDbByUsername(context, parent.username);
             if (isRequestingUserOrAdmin(context, user.username) || user.nameIsPublic) {
                 return user.lastName || null;
             }
@@ -358,10 +353,7 @@ export const resolvers: {
             return null;
         },
         emailAddress: async (parent: User, _1: any, context: Context) => {
-            const user = await context.connection
-                .getCustomRepository(UserRepository)
-                .findUserByUserName({ username: parent.username });
-
+            const user = await getUserFromCacheOrDbByUsername(context, parent.username);
             if (isRequestingUserOrAdmin(context, user.username) || user.emailAddressIsPublic) {
                 return user.emailAddress;
             }
@@ -369,10 +361,7 @@ export const resolvers: {
             return null;
         },
         twitterHandle: async (parent: User, _1: any, context: Context) => {
-            const user = await context.connection
-                .getCustomRepository(UserRepository)
-                .findUserByUserName({ username: parent.username });
-
+            const user = await getUserFromCacheOrDbByUsername(context, parent.username);
             if (isRequestingUserOrAdmin(context, user.username) || user.twitterHandleIsPublic) {
                 return user.twitterHandle || null;
             }
@@ -380,10 +369,7 @@ export const resolvers: {
             return null;
         },
         gitHubHandle: async (parent: User, _1: any, context: Context) => {
-            const user = await context.connection
-                .getCustomRepository(UserRepository)
-                .findUserByUserName({ username: parent.username });
-
+            const user = await getUserFromCacheOrDbByUsername(context, parent.username);
             if (isRequestingUserOrAdmin(context, user.username) || user.gitHubHandleIsPublic) {
                 return user.gitHubHandle || null;
             }
@@ -391,10 +377,7 @@ export const resolvers: {
             return null;
         },
         website: async (parent: User, _1: any, context: Context) => {
-            const user = await context.connection
-                .getCustomRepository(UserRepository)
-                .findUserByUserName({ username: parent.username });
-
+            const user = await getUserFromCacheOrDbByUsername(context, parent.username);
             if (isRequestingUserOrAdmin(context, user.username) || user.websiteIsPublic) {
                 return user.website || null;
             }
@@ -402,10 +385,7 @@ export const resolvers: {
             return null;
         },
         location: async (parent: User, _1: any, context: Context) => {
-            const user = await context.connection
-                .getCustomRepository(UserRepository)
-                .findUserByUserName({ username: parent.username });
-
+            const user = await getUserFromCacheOrDbByUsername(context, parent.username);
             if (isRequestingUserOrAdmin(context, user.username) || user.locationIsPublic) {
                 return user.location || null;
             }
@@ -413,10 +393,7 @@ export const resolvers: {
             return null;
         },
         status: async (parent: User, _1: any, context: Context) => {
-            const user = await context.connection
-                .getCustomRepository(UserRepository)
-                .findUserByUserName({ username: parent.username });
-
+            const user = await getUserFromCacheOrDbByUsername(context, parent.username);
             return user.status;
         },
         uiDarkModeEnabled: async (parent: User, _1: any, context: Context) => {
@@ -424,10 +401,7 @@ export const resolvers: {
                 return false;
             }
 
-            const user = await context.connection
-                .getCustomRepository(UserRepository)
-                .findUserByUserName({ username: parent.username });
-
+            const user = await getUserFromCacheOrDbByUsername(context, parent.username);
             if (isRequestingUserOrAdmin(context, user.username)) {
                 return user.uiDarkModeEnabled;
             }
@@ -437,7 +411,7 @@ export const resolvers: {
     },
     Catalog: {
         identifier: catalogIdentifier,
-        packages: catalogPackagesForUser,
+        packages: catalogPackagesForUser, // TODO: ERMAL - Check how we can cache this
         myPermissions: myCatalogPermissions,
         creator: catalogCreator,
         description: catalogDescription,
@@ -458,7 +432,6 @@ export const resolvers: {
         isRecommended: collectionIsRecommended,
         updatedAt: collectionUpdatedAt
     },
-
     Package: {
         latestVersion: packageLatestVersion,
         catalog: packageCatalog,
@@ -498,23 +471,11 @@ export const resolvers: {
             return RegistryStatus.SERVING_REQUESTS;
         },
         me: async (_0: any, _1: any, context: AuthenticatedContext, info: any) => {
-            const user = await context.connection.getCustomRepository(UserRepository).findUserByUserName({
-                username: context.me.username,
-                relations: getGraphQlRelationName(info)
-            });
-
-            return user;
+            return await getUserFromCacheOrDbByUsername(context, context.me.username, getGraphQlRelationName(info));
         },
-
         user: async (_0: any, args: { username: string }, context: AuthenticatedContext, info: any) => {
-            const user = await context.connection.getCustomRepository(UserRepository).findUser({
-                username: args.username,
-                relations: getGraphQlRelationName(info)
-            });
-
-            return user;
+            return await getUserFromCacheOrDbByUsername(context, args.username, getGraphQlRelationName(info));
         },
-
         catalog: async (_0: any, { identifier }, context: AuthenticatedContext, info: any) => {
             const graphQLRelationName = getGraphQlRelationName(info);
 

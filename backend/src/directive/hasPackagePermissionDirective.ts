@@ -9,12 +9,11 @@ import {
 } from "graphql";
 import { AuthenticatedContext, Context } from "../context";
 import { Permission, PackageIdentifier, PackageIdentifierInput } from "../generated/graphql";
-import { PackageRepository } from "../repository/PackageRepository";
 import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
-import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { UserEntity } from "../entity/UserEntity";
-import { buildUnclaimedCatalogPermissions } from "./hasCatalogPermissionDirective";
 import { getPackageFromCacheOrDb } from "../resolvers/PackageResolver";
+import { UserPackagePermissionEntity } from "../entity/UserPackagePermissionEntity";
+import { getCatalogPermissionsFromCacheOrDb } from "../resolvers/UserCatalogPermissionResolver";
 
 export async function resolvePackagePermissions(
     context: Context,
@@ -32,12 +31,13 @@ export async function resolvePackagePermissions(
         return permissions;
     }
 
-    const userPermission = await context.connection
+    const userPermissionPromise = context.connection
         .getCustomRepository(PackagePermissionRepository)
         .findPackagePermissions({
             packageId: packageEntity.id,
             userId: user.id
-        });
+        }) as Promise<UserPackagePermissionEntity>;
+    const userPermission = await context.cache.loadPackagePermissionsById(packageEntity.id, userPermissionPromise)
 
     if (userPermission != null) {
         userPermission.permissions.forEach((p) => {
@@ -47,10 +47,7 @@ export async function resolvePackagePermissions(
         });
     }
 
-    const catalogPermissions = await context.connection
-        .getCustomRepository(UserCatalogPermissionRepository)
-        .findCatalogPermissions({ catalogId: packageEntity.catalogId, userId: user!.id });
-
+    const catalogPermissions = await getCatalogPermissionsFromCacheOrDb(context, packageEntity.catalogId, user!.id);
     if (catalogPermissions != null) {
         catalogPermissions.packagePermission.forEach((p) => {
             if (!permissions.includes(p)) {
@@ -70,11 +67,15 @@ async function hasPermission(
     // Check that the package exists
     const permissions = await resolvePackagePermissions(context, identifier, context.me);
 
-    if (permissions.includes(permission)) return;
+    if (permissions.includes(permission)) {
+        return;
+    }
 
-    if (context.me == null) throw new AuthenticationError(`NOT_AUTHENTICATED`);
+    if (context.me == null) {
+        throw new AuthenticationError("NOT_AUTHENTICATED");
+    }
 
-    throw new ForbiddenError(`NOT_AUTHORIZED`);
+    throw new ForbiddenError("NOT_AUTHORIZED");
 }
 
 export class HasPackagePermissionDirective extends SchemaDirectiveVisitor {

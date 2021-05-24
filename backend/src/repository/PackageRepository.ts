@@ -1,4 +1,4 @@
-import { EntityRepository, EntityManager, FindOneOptions } from "typeorm";
+import { EntityRepository, EntityManager, FindOneOptions, Repository } from "typeorm";
 
 import { CreatePackageInput, UpdatePackageInput, PackageIdentifierInput, Permission } from "../generated/graphql";
 import { AuthenticatedContext } from "../context";
@@ -76,8 +76,8 @@ function validation(packageEntity: PackageEntity) {
     if (getNameLength(packageEntity.description) === 0) throw new Error("PACKAGE_DESCRIPTION_REQUIRED");
 }
 
-@EntityRepository()
-export class PackageRepository {
+@EntityRepository(PackageEntity)
+export class PackageRepository extends Repository<PackageEntity>{
     async userPackages({
         user,
         username,
@@ -103,7 +103,6 @@ export class PackageRepository {
 
         return response;
     }
-    constructor(private manager: EntityManager) {}
 
     public async findPackagesForCollection(
         userId: number,

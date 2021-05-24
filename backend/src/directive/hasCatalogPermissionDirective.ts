@@ -11,8 +11,9 @@ import { Context } from "../context";
 import { CatalogEntity } from "../entity/CatalogEntity";
 import { UserEntity } from "../entity/UserEntity";
 import { CatalogIdentifierInput, Permission } from "../generated/graphql";
-import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { CatalogRepository } from "../repository/CatalogRepository";
+import { getCatalogFromCacheOrDb } from "../resolvers/CatalogResolver";
+import { getCatalogPermissionsFromCacheOrDb } from "../resolvers/UserCatalogPermissionResolver";
 
 export const buildUnclaimedCatalogPermissions = (context: Context): Permission[] => {
     const permissions = [Permission.VIEW];
@@ -27,10 +28,7 @@ export async function resolveCatalogPermissions(
     identifier: CatalogIdentifierInput,
     user?: UserEntity
 ) {
-    const catalog = await context.connection
-        .getCustomRepository(CatalogRepository)
-        .findCatalogBySlugOrFail(identifier.catalogSlug);
-
+    const catalog = await getCatalogFromCacheOrDb(context, identifier)
     return resolveCatalogPermissionsForEntity(context, catalog, user);
 }
 
@@ -45,13 +43,7 @@ export async function resolveCatalogPermissionsForEntity(context: Context, catal
         return permissions;
     }
 
-    const userPermission = await context.connection
-        .getCustomRepository(UserCatalogPermissionRepository)
-        .findCatalogPermissions({
-            catalogId: catalog.id,
-            userId: user.id
-        });
-
+    const userPermission = await getCatalogPermissionsFromCacheOrDb(context, catalog.id, user!.id);
     userPermission?.permissions.forEach((p) => {
         if (!permissions.includes(p)) {
             permissions.push(p);
