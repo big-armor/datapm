@@ -152,9 +152,5 @@ export const getCollectionPermissionsFromCacheOrDb = async (
         .getCustomRepository(UserCollectionPermissionRepository)
         .hasPermission(context.me.id, collection.id, permission);
 
-    return await context.cache.loadDataAsync(
-        "COLLECTION_PERMISSION",
-        collection.collectionSlug + context.me.id + permission,
-        collectionPromise
-    );
+    return await context.cache.loadCollectionPermissionsStatusById(collection.id, permission, collectionPromise);
 };

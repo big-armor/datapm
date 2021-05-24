@@ -66,8 +66,7 @@ export const packageEntityToGraphqlObject = async (
     const packagePromise = context.connection
         .getRepository(PackageEntity)
         .findOneOrFail({ where: { id: packageEntity.id } });
-
-    const packageEntityLoaded = await context.cache.loadDataAsync("PACKAGE", "PID:" + packageEntity.id, packagePromise);
+    const packageEntityLoaded = await context.cache.loadPackage(packageEntity.id, packagePromise);
 
     return {
         identifier: {
@@ -85,10 +84,7 @@ export const usersByPackage = async (
     info: any
 ) => {
     const relations = getGraphQlRelationName(info);
-
-    const packageEntity = await context.connection.manager
-        .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier });
+    const packageEntity = await getPackageFromCacheOrDb(context, identifier);
 
     return await context.connection.manager
         .getCustomRepository(PackagePermissionRepository)
@@ -548,13 +544,11 @@ export const packageIsPublic = async (parent: Package, _1: any, context: Context
 
 export const getPackageFromCacheOrDb = async (
     context: Context,
-    packageIdentifier: PackageIdentifier | PackageIdentifierInput,
+    identifier: PackageIdentifier | PackageIdentifierInput,
     relations: string[] = []
 ) => {
-    const packagePromise = context.connection
+    const packagePromise = context.connection.manager
         .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier: packageIdentifier });
-
-    const serializedIdentifier = packageIdentifier.catalogSlug + "-" + packageIdentifier.packageSlug;
-    return await context.cache.loadDataAsync("PACKAGE", serializedIdentifier, packagePromise);
+        .findPackageOrFail({ identifier, relations });
+    return await context.cache.loadPackageByIdentifier(identifier, packagePromise);
 };

@@ -308,7 +308,7 @@ export const searchCatalogs = async (
     };
 };
 
-export const myCatalogs = async (_0: any, {}, context: AuthenticatedContext) => {
+export const myCatalogs = async (_0: any, { }, context: AuthenticatedContext) => {
     const permissions = await context.connection.manager
         .getCustomRepository(UserCatalogPermissionRepository)
         .findByUser({ username: context.me?.username, relations: ["catalog"] });
@@ -333,5 +333,5 @@ export const getCatalogFromCacheOrDb = async (
         .getCustomRepository(CatalogRepository)
         .findCatalogBySlugOrFail(identifier.catalogSlug);
 
-    return await context.cache.loadDataAsync("CATALOG", identifier.catalogSlug, catalogPromise);
+    return await context.cache.loadCatalogBySlug(identifier.catalogSlug, catalogPromise);
 };

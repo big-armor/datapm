@@ -120,5 +120,5 @@ export const getCatalogPermissionsFromCacheOrDb = async (
         .getCustomRepository(UserCatalogPermissionRepository)
         .hasPermission(context.me.id, catalogId, permission);
 
-    return await context.cache.loadDataAsync("CATALOG_PERMISSION", permission + catalogId, permissionsPromise);
+    return await context.cache.loadPackagePermissionsStatusById(catalogId, permission, permissionsPromise);
 };
