@@ -3,7 +3,7 @@
         <div class="container">
             <app-cover [collectionSlug]="collectionSlug"></app-cover>
 
-            <div class="collection-header pl-3">
+            <div class="collection-header pr-2 pl-3">
                 <div *ngIf="collection.myPermissions.includes('MANAGE')" class="collections-public">
                     <span *ngIf="collection?.isPublic" class="public-text">public</span>
                     <span *ngIf="!collection?.isPublic" class="not-public-text">not public</span>

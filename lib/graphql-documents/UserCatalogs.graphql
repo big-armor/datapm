@@ -9,6 +9,7 @@ query UserCatalogs($username: String!, $offSet: Int!, $limit: Int!) {
             description
             website
             isPublic
+            unclaimed
             myPermissions
         }
         hasMore

@@ -13,7 +13,9 @@ export const hasCatalogPermissions = async (context: Context, catalogId: number,
     if (permission == Permission.VIEW) {
         const collection = await context.connection.getCustomRepository(CatalogRepository).findOne({ id: catalogId });
 
-        if (collection?.isPublic) return true;
+        if (collection?.isPublic || collection?.unclaimed) {
+            return true;
+        }
     }
 
     if (context.me == null) {

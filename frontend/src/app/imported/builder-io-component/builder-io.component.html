@@ -1,5 +1,7 @@
-<app-builder-io-renderer *ngIf="loaded; else loadingTemplate" [apiKey]="apiKey" [entry]="entry">
-    <div class="container">Page has not been found.</div>
+<app-builder-io-renderer *ngIf="apiKey && entry; else loadingTemplate" [apiKey]="apiKey" [entry]="entry">
+    <ng-content></ng-content>
 </app-builder-io-renderer>
 
-<ng-template #loadingTemplate></ng-template>
+<ng-template #loadingTemplate>
+    <mat-spinner [diameter]="32"></mat-spinner>
+</ng-template>

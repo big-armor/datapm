@@ -1,14 +1,5 @@
-import { Component, OnInit } from "@angular/core";
-import {
-    Catalog,
-    Follow,
-    FollowIdentifierInput,
-    GetCatalogGQL,
-    GetFollowGQL,
-    Package,
-    Permission,
-    User
-} from "src/generated/graphql";
+import { Component, Input, OnInit } from "@angular/core";
+import { Catalog, Follow, FollowIdentifierInput, GetFollowGQL, Package, Permission, User } from "src/generated/graphql";
 import { ActivatedRoute, NavigationExtras, Router } from "@angular/router";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { EditCatalogComponent } from "src/app/shared/edit-catalog/edit-catalog.component";
@@ -30,7 +21,7 @@ import { AuthenticationService } from "src/app/services/authentication.service";
     styleUrls: ["./catalog-details.component.scss"]
 })
 export class CatalogDetailsComponent implements OnInit {
-    public catalogSlug = "";
+    @Input()
     public catalog: Catalog;
     public state: PageState | "CATALOG_NOT_FOUND" | "NOT_AUTHENTICATED" = "INIT";
     public currentTab = 0;
@@ -44,7 +35,6 @@ export class CatalogDetailsComponent implements OnInit {
     private tabs = ["", "manage"];
 
     constructor(
-        private getCatalogGQL: GetCatalogGQL,
         private dialog: MatDialog,
         private router: Router,
         private route: ActivatedRoute,
@@ -82,24 +72,8 @@ export class CatalogDetailsComponent implements OnInit {
             this.currentUser = user;
         });
 
-        this.catalogSlug = this.route.snapshot.paramMap.get("catalogSlug");
         this.state = "LOADING";
-        this.getCatalogGQL.fetch({ identifier: { catalogSlug: this.catalogSlug } }).subscribe(({ data, errors }) => {
-            if (errors) {
-                if (errors.find((e) => e.message.includes("CATALOG_NOT_FOUND"))) {
-                    this.state = "CATALOG_NOT_FOUND";
-                } else if (errors.find((e) => e.message.includes("NOT_AUTHENTICATED"))) {
-                    this.state = "NOT_AUTHENTICATED";
-                } else {
-                    this.state = "ERROR";
-                }
-                return;
-            }
-
-            this.catalog = data.catalog as Catalog;
-            this.getFollow();
-            this.state = "SUCCESS";
-        });
+        this.getFollow();
     }
 
     ngOnDestroy(): void {
@@ -187,7 +161,7 @@ export class CatalogDetailsComponent implements OnInit {
     private buildFollowIdentifier(): FollowIdentifierInput {
         return {
             catalog: {
-                catalogSlug: this.catalogSlug
+                catalogSlug: this.catalog.identifier.catalogSlug
             }
         };
     }
@@ -195,5 +169,6 @@ export class CatalogDetailsComponent implements OnInit {
     private updatePackageFollow(follow: Follow): void {
         this.catalogFollow = follow;
         this.isFollowing = follow != null;
+        this.state = "SUCCESS";
     }
 }

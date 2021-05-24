@@ -17,7 +17,6 @@
                         <button (click)="addNewEntry()" [disabled]="isLoading" class="btn-link">Add Entry</button>
                     </div>
                 </div>
-                <!-- TODO: Improve the UI here -->
                 <div *ngFor="let template of templates; let i = index" class="div-wrapper">
                     <div class="d-flex flex-row bd-highlight mb-3">
                         <div class="bd-highlight pr-2">
@@ -34,7 +33,7 @@
                                 class="rounded-input"
                             ></app-input>
                         </div>
-                        <div class="bd-highlight d-flex align-items-center">
+                        <div class="cursor-pointer bd-highlight d-flex align-items-center">
                             <span (click)="deleteEntry(i)" class="delete-span">X</span>
                         </div>
                     </div>

@@ -1,4 +1,10 @@
-<cdk-virtual-scroll-viewport tvsItemSize="48" headerHeight="50" style="height: 400px" class="table-wrapper w-100">
+<cdk-virtual-scroll-viewport
+    tvsItemSize="48"
+    headerHeight="56"
+    style="height: 400px"
+    bufferMultiplier="100"
+    class="table-wrapper"
+>
     <table
         mat-table
         [dataSource]="dataSource"
@@ -9,7 +15,12 @@
         <tr mat-header-row *matHeaderRowDef="columns; sticky: true"></tr>
         <tr mat-row *matRowDef="let row; columns: columns"></tr>
         <ng-container [matColumnDef]="column" *ngFor="let column of columns; let i = index">
-            <th mat-header-cell scope="col" *matHeaderCellDef style="min-width: 130px">
+            <th
+                mat-header-cell
+                scope="col"
+                *matHeaderCellDef
+                style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap"
+            >
                 {{ column }}
                 <div *ngIf="columnsUnits[i]">{{ columnsUnits[i] }}</div>
             </th>

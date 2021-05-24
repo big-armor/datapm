@@ -29,7 +29,7 @@ export const getPlatformSettingsByKey = async (_0: any, {}, context: Authenticat
     return await repository.createQueryBuilder().getMany();
 };
 
-export const getPublicPlatformSettingsByKey = async (
+export const getPublicPlatformSettingsByKeyOrFail = async (
     _0: any,
     { key }: { key: string },
     context: AuthenticatedContext,
@@ -42,4 +42,19 @@ export const getPublicPlatformSettingsByKey = async (
     }
 
     return settings;
+};
+
+export const getDeserializedPublicPlatformSettingsByKey = async (
+    _0: any,
+    { key }: { key: string },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const repository = context.connection.getCustomRepository(PlatformSettingsRepository);
+    const entity = await repository.findPublicSettingsByKey(key);
+    if (!entity) {
+        return null;
+    }
+
+    return JSON.parse(entity.serializedSettings);
 };

@@ -7,7 +7,7 @@
                 </div>
                 <div class="p-2 bd-highlight w-100">
                     <div class="input-group mt-1 search-box">
-                        <form (ngSubmit)="search()" class="search-form">
+                        <form class="search-form">
                             <app-input
                                 placeholder="Search For Data..."
                                 [control]="searchControl"
@@ -16,12 +16,11 @@
                                 [matAutocomplete]="auto"
                             ></app-input>
                             <mat-autocomplete
-                                autoActiveFirstOption
                                 #auto="matAutocomplete"
                                 class="search-autocomplete"
                                 (optionSelected)="autoCompleteOptionSelected($event)"
                             >
-                                <mat-option *ngIf="!autoCompleteResult && searchControl.value.length > 1">
+                                <mat-option *ngIf="!autoCompleteResult && searchControl.value?.length > 1">
                                     <mat-spinner [diameter]="30" class="ml-3"></mat-spinner>
                                 </mat-option>
                                 <ng-container *ngIf="autoCompleteResult">
@@ -127,7 +126,7 @@
     </div>
     <div class="row px-3">
         <div class="col-12 mobile-search-box mt-3">
-            <form (ngSubmit)="search()" class="search-form w-100">
+            <form class="search-form w-100">
                 <app-input
                     placeholder="Search For Data..."
                     [control]="searchControl"
@@ -140,7 +139,7 @@
                     class="search-autocomplete"
                     (optionSelected)="autoCompleteOptionSelected($event)"
                 >
-                    <mat-option *ngIf="!autoCompleteResult && searchControl.value.length > 1">
+                    <mat-option *ngIf="!autoCompleteResult && searchControl.value?.length > 1">
                         <mat-spinner [diameter]="30" class="ml-3"></mat-spinner>
                     </mat-option>
                     <ng-container *ngIf="autoCompleteResult">

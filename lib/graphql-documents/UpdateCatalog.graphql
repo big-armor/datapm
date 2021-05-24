@@ -7,5 +7,6 @@ mutation UpdateCatalog($identifier: CatalogIdentifierInput!, $value: UpdateCatal
         description
         website
         isPublic
+        unclaimed
     }
 }

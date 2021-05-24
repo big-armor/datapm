@@ -19,8 +19,10 @@ import {
     UserCatalogsDocument,
     SetUserCatalogPermissionDocument,
     SetPackagePermissionsDocument,
-    DeleteUserCatalogPermissionsDocument
+    DeleteUserCatalogPermissionsDocument,
+    SetUserCollectionPermissionsDocument
 } from "./registry-client";
+import { AdminHolder } from "./admin-holder";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
 import { loadPackageFileFromDisk } from "datapm-lib";
@@ -29,6 +31,8 @@ describe("Catalog Tests", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
     let anonymousClient: ApolloClient<NormalizedCacheObject>;
+
+    let adminClient: ApolloClient<NormalizedCacheObject>;
 
     before(async () => {});
 
@@ -49,8 +53,11 @@ describe("Catalog Tests", async () => {
         );
         anonymousClient = createAnonymousClient();
 
+        adminClient = AdminHolder.adminClient;
+
         expect(userAClient).to.exist;
         expect(userBClient).to.exist;
+        expect(adminClient).to.exist;
     });
 
     it("MyCatalog for user A", async function () {
@@ -216,6 +223,177 @@ describe("Catalog Tests", async () => {
             .then((client) => {
                 expect(errorFound, "catalog slug too long error returned").equal(true);
             });
+    });
+
+    it("Non admin user can't create unclaimed catalog", async function () {
+        let response = await userAClient.mutate({
+            mutation: CreateCatalogDocument,
+            variables: {
+                value: {
+                    slug: "user-a-unclaimed-catalog",
+                    displayName: "User A Second Catalog",
+                    description: "This is an integration test User A second catalog",
+                    website: "https://usera.datapm.io",
+                    isPublic: false,
+                    unclaimed: true
+                }
+            }
+        });
+
+        expect(response.data).equal(null);
+        if (!response.errors || !response.errors[0]) {
+            expect(true, "Should've received not authorized error for non admin user").equal(false);
+            return;
+        }
+
+        expect(response.errors[0].message === "NOT_AUTHORIZED");
+    });
+
+    it("Non admin user can't update unclaimed catalog with manage permissions", async function () {
+        await adminClient.mutate({
+            mutation: CreateCatalogDocument,
+            variables: {
+                value: {
+                    slug: "shared-admin-unclaimed-catalog",
+                    displayName: "User A Second Catalog",
+                    description: "This is an integration test User A second catalog",
+                    website: "https://usera.datapm.io",
+                    isPublic: false,
+                    unclaimed: true
+                }
+            }
+        });
+
+        await userBClient.mutate({
+            mutation: SetUserCollectionPermissionsDocument,
+            variables: {
+                identifier: {
+                    collectionSlug: "shared-admin-unclaimed-catalog"
+                },
+                value: [
+                    {
+                        usernameOrEmailAddress: "testA-catalog@test.datapm.io",
+                        permissions: [Permission.VIEW, Permission.EDIT, Permission.MANAGE]
+                    }
+                ],
+                message: "Test"
+            }
+        });
+
+        const response = await userAClient.mutate({
+            mutation: UpdateCatalogDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "admin-user-unclaimed-catalog"
+                },
+                value: {
+                    description: "Second description",
+                    displayName: "Display after update",
+                    isPublic: true,
+                    unclaimed: false,
+                    newSlug: "update-shared-admin-unclaimed-catalog",
+                    website: "https://second-website.co.uk"
+                }
+            }
+        });
+
+        expect(response.data).equal(null);
+        if (!response.errors || !response.errors[0]) {
+            expect(true, "Should've received not authorized error for non admin user").equal(false);
+            return;
+        }
+
+        expect(response.errors[0].message === "NOT_AUTHORIZED");
+    });
+
+    it("Admin user can create unclaimed catalog", async function () {
+        let response = await adminClient.mutate({
+            mutation: CreateCatalogDocument,
+            variables: {
+                value: {
+                    slug: "user-a-unclaimed-catalog",
+                    displayName: "User A Second Catalog",
+                    description: "This is an integration test User A second catalog",
+                    website: "https://usera.datapm.io",
+                    isPublic: false,
+                    unclaimed: true
+                }
+            }
+        });
+
+        expect(response.errors).equal(undefined);
+        if (!response.data || !response.data.createCatalog) {
+            expect(true, "Should've been able to create unclaimed catalog").equal(false);
+            return;
+        }
+    });
+
+    it("Admin user can update unclaimed catalog", async function () {
+        await adminClient.mutate({
+            mutation: CreateCatalogDocument,
+            variables: {
+                value: {
+                    slug: "admin-user-unclaimed-catalog",
+                    displayName: "User A Second Catalog",
+                    description: "This is an integration test User A second catalog",
+                    website: "https://usera.datapm.io",
+                    isPublic: false,
+                    unclaimed: true
+                }
+            }
+        });
+
+        const response = await adminClient.mutate({
+            mutation: UpdateCatalogDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "admin-user-unclaimed-catalog"
+                },
+                value: {
+                    description: "Second description",
+                    displayName: "Display after update",
+                    isPublic: true,
+                    unclaimed: false,
+                    newSlug: "updated-admin-user-unclaimed-catalog",
+                    website: "https://second-website.co.uk"
+                }
+            }
+        });
+
+        expect(response.errors).equal(undefined);
+        if (!response.data || !response.data.updateCatalog) {
+            expect(true, "Should've been able to create unclaimed catalog").equal(false);
+            return;
+        }
+    });
+
+    it("All users can access unclaimed catalogs", async function () {
+        await adminClient.mutate({
+            mutation: CreateCatalogDocument,
+            variables: {
+                value: {
+                    slug: "public-unclaimed-catalog",
+                    displayName: "User A Second Catalog",
+                    description: "This is an integration test User A second catalog",
+                    website: "https://usera.datapm.io",
+                    isPublic: false,
+                    unclaimed: true
+                }
+            }
+        });
+
+        const response = await userAClient.query({
+            query: GetCatalogDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "public-unclaimed-catalog"
+                }
+            }
+        });
+
+        expect(response.data).to.not.equal(null);
+        expect(response.data).to.not.equal(undefined);
+        expect(response.error).to.equal(undefined);
     });
 
     it("User A Create Second Catalog", async function () {
