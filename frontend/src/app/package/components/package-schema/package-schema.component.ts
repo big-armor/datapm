@@ -148,7 +148,7 @@ export class PackageSchemaComponent implements OnDestroy, OnChanges, AfterViewIn
             .sort((a, b) => a.name.localeCompare(b.name));
     }
 
-    public getPropertyChips(property) {
+    public getAllPropertyChips(property) {
         let labels = new Set();
         let values: any[] = Object.values(property.valueTypes);
 
@@ -161,6 +161,19 @@ export class PackageSchemaComponent implements OnDestroy, OnChanges, AfterViewIn
                 value.contentLabels = [];
             }
         });
+        return [...labels];
+    }
+
+    public getPropertyChips(value) {
+        let labels = new Set();
+
+        if (value.contentLabels) {
+            value.contentLabels.forEach((l) => {
+                labels.add(l);
+            });
+        } else {
+            value.contentLabels = [];
+        }
         return [...labels];
     }
 }

@@ -27,7 +27,7 @@
                                 </div>
                                 <div class="bd-highlight">
                                     <mat-chip-list class="header-chips">
-                                        <mat-chip *ngFor="let cl of getPropertyChips(property)">{{
+                                        <mat-chip *ngFor="let cl of getAllPropertyChips(property)">{{
                                             cl.label
                                         }}</mat-chip>
                                     </mat-chip-list>
@@ -58,13 +58,12 @@
                                 <div class="text-dark-gray">
                                     <div class="weight-500">{{ type.valueType }}</div>
                                     <ul>
-                                        <li *ngIf="getPropertyChips(property).length">
+                                        <li *ngIf="getPropertyChips(type).length">
                                             content labels:
                                             <span
-                                                *ngFor="let cl of getPropertyChips(property); last as isLast"
+                                                *ngFor="let cl of getPropertyChips(type); last as isLast"
                                                 [hidden]="cl.hidden"
-                                                >{{ cl.label }}
-                                                <span *ngIf="!isLast">,</span>
+                                                >{{ cl.label }}<span *ngIf="!isLast">, </span>
                                             </span>
                                         </li>
                                         <li>
@@ -82,13 +81,12 @@
                                 <div class="text-dark-gray">
                                     <div class="weight-500">{{ type.valueType }}</div>
                                     <ul>
-                                        <li *ngIf="getPropertyChips(property).length">
+                                        <li *ngIf="getPropertyChips(type).length">
                                             content labels:
                                             <span
-                                                *ngFor="let cl of getPropertyChips(property); last as isLast"
+                                                *ngFor="let cl of getPropertyChips(type); last as isLast"
                                                 [hidden]="cl.hidden"
-                                                >{{ cl.label }}
-                                                <span *ngIf="!isLast">,</span>
+                                                >{{ cl.label }}<span *ngIf="!isLast">, </span>
                                             </span>
                                         </li>
                                         <li>
@@ -104,13 +102,12 @@
                                 <div class="text-dark-gray">
                                     <div class="weight-500">{{ type.valueType }}</div>
                                     <ul>
-                                        <li *ngIf="getPropertyChips(property).length">
+                                        <li *ngIf="getPropertyChips(type).length">
                                             content labels:
                                             <span
-                                                *ngFor="let cl of getPropertyChips(property); last as isLast"
+                                                *ngFor="let cl of getPropertyChips(type); last as isLast"
                                                 [hidden]="cl.hidden"
-                                                >{{ cl.label }}
-                                                <span *ngIf="!isLast">,</span>
+                                                >{{ cl.label }}<span *ngIf="!isLast">, </span>
                                             </span>
                                         </li>
                                         <li>
@@ -126,13 +123,12 @@
                                 <div class="text-dark-gray">
                                     <div class="weight-500">{{ type.valueType }}</div>
                                     <ul>
-                                        <li *ngIf="getPropertyChips(property).length">
+                                        <li *ngIf="getPropertyChips(type).length">
                                             content labels:
                                             <span
-                                                *ngFor="let cl of getPropertyChips(property); last as isLast"
+                                                *ngFor="let cl of getPropertyChips(type); last as isLast"
                                                 [hidden]="cl.hidden"
-                                                >{{ cl.label }}
-                                                <span *ngIf="!isLast">,</span>
+                                                >{{ cl.label }}<span *ngIf="!isLast">, </span>
                                             </span>
                                         </li>
                                         <li>
@@ -162,13 +158,12 @@
                                 <div class="text-dark-gray">
                                     <div class="weight-500">{{ type.valueType }}</div>
                                     <ul>
-                                        <li *ngIf="getPropertyChips(property).length">
+                                        <li *ngIf="getPropertyChips(type).length">
                                             content labels:
                                             <span
-                                                *ngFor="let cl of getPropertyChips(property); last as isLast"
+                                                *ngFor="let cl of getPropertyChips(type); last as isLast"
                                                 [hidden]="cl.hidden"
-                                                >{{ cl.label }}
-                                                <span *ngIf="!isLast">,</span>
+                                                >{{ cl.label }}<span *ngIf="!isLast">, </span>
                                             </span>
                                         </li>
                                         <li>
