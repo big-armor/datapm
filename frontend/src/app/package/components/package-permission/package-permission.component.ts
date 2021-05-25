@@ -133,7 +133,7 @@ export class PackagePermissionComponent implements OnInit {
 
     public movePackage(): void {
         const dlgRef = this.dialog.open(MovePackageComponent, {
-            width: "500px"
+            width: "550px"
         });
     }
 

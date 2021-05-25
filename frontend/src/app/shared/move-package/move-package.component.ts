@@ -6,6 +6,9 @@ import { Component, OnInit } from "@angular/core";
     styleUrls: ["./move-package.component.scss"]
 })
 export class MovePackageComponent implements OnInit {
+    public existCatalog: boolean = false;
+    public editPermission: boolean = false;
+
     constructor() {}
 
     ngOnInit(): void {}

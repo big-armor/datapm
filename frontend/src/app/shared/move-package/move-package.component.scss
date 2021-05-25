@@ -1,0 +1,25 @@
+@import "../../../styles/colors";
+@import "../../../styles/variables";
+
+#movePackage {
+    span.checkbox-txt {
+        font-size: 10px;
+    }
+
+    ::ng-deep {
+        .mat-checkbox-checked {
+            .mat-checkbox-checkmark {
+                background: var(--info-color);
+            }
+        }
+    }
+    // ::ng-deep {
+    //     .mat-checkbox-layout {
+    //         .mat-checkbox-label {
+    //             span.checkbox-txt {
+    //                 font-size: 11px;
+    //             }
+    //         }
+    //     }
+    // }
+}
