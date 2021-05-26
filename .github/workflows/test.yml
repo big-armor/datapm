@@ -4,6 +4,44 @@ on:
     push:
 
 jobs:
+    lint:
+        name: "Build And Deploy"
+        timeout-minutes: 20
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+
+            - uses: actions/setup-node@v2-beta
+              with:
+                  node-version: "12"
+
+            - name: Print npm verion
+              run: npm --version
+
+            - name: Print node verion
+              run: node --version
+
+            - name: Cache Root Node_modules
+              id: cache-root-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: node_modules
+                  key: datampm-registry-${{ runner.OS }}-root-${{ hashFiles('package.json', 'package-lock.json') }}
+
+            - name: Install Dependencies
+              if: steps.cache-root-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+
+            - name: Run ESLint
+              run: npm run lint
+
+            - name: Run Prettier linter
+              uses: wearerequired/lint-action@v1.6.0
+              with:
+                  github_token: ${{ secrets.github_token }}
+                  prettier: true
+
     testLib:
         name: "Test Lib"
         timeout-minutes: 5
