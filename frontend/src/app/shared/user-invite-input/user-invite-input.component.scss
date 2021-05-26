@@ -4,10 +4,10 @@
 #inviteInput {
     ::ng-deep .mat-form-field-infix {
         border-top: none;
-        font-family: Roboto, Helvetica Neue, sans-serif;
-        font-style: normal;
-        font-weight: 400;
-        font-size: 14px;
+        font-family: $family-roboto;
+        font-style: $style-normal;
+        font-weight: $weight-400;
+        font-size: $text-font;
         line-height: 18px;
         padding: 0.5em 0;
     }
@@ -16,10 +16,10 @@
         height: 30px;
 
         &::placeholder {
-            font-size: 13px;
-            font-family: Roboto, Helvetica Neue, sans-serif;
+            font-size: $small-font;
+            font-family: $family-roboto;
             letter-spacing: 0.5px;
-            font-weight: 300;
+            font-weight: $weight-300;
             color: var(--gray-4-color);
         }
     }
@@ -30,10 +30,10 @@
     }
 
     ::ng-deep .mat-chip {
-        font-family: Roboto, Helvetica Neue, sans-serif;
-        font-style: normal;
-        font-weight: 400;
-        font-size: 12px;
+        font-family: $family-roboto;
+        font-style: $style-normal;
+        font-weight: $weight-400;
+        font-size: $small-font;
         line-height: 18px;
         letter-spacing: 0.5px;
         padding-top: 4px;
@@ -44,7 +44,7 @@
 
     ::ng-deep .mat-icon {
         height: 20px;
-        font-size: 20px;
+        font-size: $title-font;
         width: 22px;
         color: var(--info-color);
     }
