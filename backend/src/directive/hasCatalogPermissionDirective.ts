@@ -12,7 +12,7 @@ import { CatalogEntity } from "../entity/CatalogEntity";
 import { UserEntity } from "../entity/UserEntity";
 import { CatalogIdentifierInput, Permission } from "../generated/graphql";
 import { CatalogRepository } from "../repository/CatalogRepository";
-import { getCatalogFromCacheOrDb } from "../resolvers/CatalogResolver";
+import { getCatalogFromCacheOrDbOrFail } from "../resolvers/CatalogResolver";
 import { getCatalogPermissionsFromCacheOrDb } from "../resolvers/UserCatalogPermissionResolver";
 
 export const buildUnclaimedCatalogPermissions = (context: Context): Permission[] => {
@@ -28,7 +28,7 @@ export async function resolveCatalogPermissions(
     identifier: CatalogIdentifierInput,
     user?: UserEntity
 ) {
-    const catalog = await getCatalogFromCacheOrDb(context, identifier)
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, identifier)
     return resolveCatalogPermissionsForEntity(context, catalog, user);
 }
 

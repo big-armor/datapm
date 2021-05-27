@@ -23,21 +23,21 @@
                 <textarea formControlName="description" class="flat-input" placeholder="Description"></textarea>
             </div>
         </div>
-        <div class="d-flex bd-highlight shadow-div mb-3">
+        <div class="d-flex bd-highlight shadow-div mb-1">
             <div class="pr-3 py-2 bd-highlight div-question">Website</div>
             <div class="bd-highlight div-answer">
                 <input formControlName="website" class="flat-input" placeholder="Website" />
             </div>
         </div>
-        <div class="d-flex bd-highlight shadow-div mb-3">
+        <div class="d-flex bd-highlight shadow-div">
             <div class="pr-3 py-2 bd-highlight div-question">Public</div>
-            <div class="bd-highlight div-answer">
+            <div class="bd-highlight d-flex align-items-center div-answer">
                 <mat-slide-toggle class="app-slide-toggle" formControlName="isPublic"></mat-slide-toggle>
             </div>
         </div>
         <div class="d-flex bd-highlight shadow-div mb-3" *ngIf="user.isAdmin">
             <div class="pr-3 py-2 bd-highlight div-question">Unclaimed</div>
-            <div class="bd-highlight div-answer">
+            <div class="bd-highlight d-flex align-items-center div-answer">
                 <mat-slide-toggle class="app-slide-toggle" formControlName="unclaimed"></mat-slide-toggle>
             </div>
         </div>

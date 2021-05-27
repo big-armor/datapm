@@ -1,3 +1,4 @@
+import { UserInputError } from "apollo-server";
 import graphqlFields from "graphql-fields";
 import { Connection, EntityManager } from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
@@ -44,7 +45,7 @@ export const catalogEntityToGraphQL = (catalogEntity: CatalogEntity): Catalog =>
 };
 
 export const catalogIdentifier = async (parent: Catalog, _1: any, context: Context) => {
-    const catalog = await getCatalogFromCacheOrDb(context, parent.identifier);
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
     if (!(await hasCatalogPermissions(context, catalog, Permission.VIEW))) {
         return {
             catalogSlug: "private",
@@ -59,7 +60,7 @@ export const catalogIdentifier = async (parent: Catalog, _1: any, context: Conte
 };
 
 export const catalogWebsite = async (parent: Catalog, _1: any, context: Context) => {
-    const catalog = await getCatalogFromCacheOrDb(context, parent.identifier);
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
     if (!(await hasCatalogPermissions(context, catalog, Permission.VIEW))) {
         return null;
     }
@@ -68,17 +69,17 @@ export const catalogWebsite = async (parent: Catalog, _1: any, context: Context)
 };
 
 export const catalogIsPublic = async (parent: Catalog, _1: any, context: Context): Promise<boolean> => {
-    const catalog = await getCatalogFromCacheOrDb(context, parent.identifier);
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
     return catalog.isPublic;
 };
 
 export const catalogIsUnclaimed = async (parent: Catalog, _1: any, context: Context): Promise<boolean> => {
-    const catalog = await getCatalogFromCacheOrDb(context, parent.identifier);
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
     return catalog.unclaimed;
 };
 
 export const catalogDisplayName = async (parent: Catalog, _1: any, context: Context) => {
-    const catalog = await getCatalogFromCacheOrDb(context, parent.identifier);
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
     if (!(await hasCatalogPermissions(context, catalog, Permission.VIEW))) {
         return "private";
     }
@@ -87,12 +88,12 @@ export const catalogDisplayName = async (parent: Catalog, _1: any, context: Cont
         return catalog.displayName;
     }
 
-    const catalogEntity = await getCatalogFromCacheOrDb(context, parent.identifier, true);
+    const catalogEntity = await getCatalogFromCacheOrDbOrFail(context, parent.identifier, true);
     return catalogEntity.displayName;
 };
 
 export const catalogDescription = async (parent: Catalog, _1: any, context: Context) => {
-    const catalog = await getCatalogFromCacheOrDb(context, parent.identifier);
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
     if (!(await hasCatalogPermissions(context, catalog, Permission.VIEW))) {
         return null;
     }
@@ -101,12 +102,12 @@ export const catalogDescription = async (parent: Catalog, _1: any, context: Cont
         return catalog.description;
     }
 
-    const catalogEntity = await getCatalogFromCacheOrDb(context, parent.identifier, true);
+    const catalogEntity = await getCatalogFromCacheOrDbOrFail(context, parent.identifier, true);
     return catalogEntity.description;
 };
 
 export const catalogCreator = async (parent: Catalog, _1: any, context: Context, info: any) => {
-    const catalog = await getCatalogFromCacheOrDb(context, parent.identifier);
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
     if (!(await hasCatalogPermissions(context, catalog, Permission.VIEW))) {
         return null;
     }
@@ -115,7 +116,7 @@ export const catalogCreator = async (parent: Catalog, _1: any, context: Context,
 };
 
 export const myCatalogPermissions = async (parent: Catalog, _1: any, context: Context) => {
-    const catalog = await getCatalogFromCacheOrDb(context, parent.identifier);
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
     return resolveCatalogPermissions(context, { catalogSlug: catalog.slug }, context.me);
 };
 
@@ -138,7 +139,7 @@ export const userCatalogs = async (
 };
 
 export const catalogPackagesForUser = async (parent: Catalog, _1: any, context: Context, info: any) => {
-    const catalog = await getCatalogFromCacheOrDb(context, parent.identifier);
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
     if (!(await hasCatalogPermissions(context, catalog, Permission.VIEW))) {
         return [];
     }
@@ -248,7 +249,7 @@ export const setCatalogAvatarImage = async (
         throw new Error("AVATAR_NOT_ALLOWED_ON_USER_CATALOGS");
     }
 
-    const catalog = await getCatalogFromCacheOrDb(context, identifier);
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, identifier);
     await ImageStorageService.INSTANCE.saveCatalogAvatarImage(catalog.id, image.base64);
 };
 
@@ -258,7 +259,7 @@ export const deleteCatalogAvatarImage = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const catalog = await getCatalogFromCacheOrDb(context, identifier);
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, identifier);
     await ImageStorageService.INSTANCE.deleteCatalogAvatarImage(catalog.id);
 };
 
@@ -268,7 +269,7 @@ export const setCatalogCoverImage = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const catalog = await getCatalogFromCacheOrDb(context, identifier);
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, identifier);
     await ImageStorageService.INSTANCE.saveCatalogCoverImage(catalog.id, image.base64);
 };
 
@@ -278,7 +279,7 @@ export const deleteCatalog = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const catalog = await getCatalogFromCacheOrDb(context, identifier);
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, identifier);
     await createActivityLog(context.connection, {
         userId: context.me.id,
         eventType: ActivityLogEventType.CATALOG_DELETED,
@@ -328,6 +329,38 @@ export const myCatalogs = async (_0: any, { }, context: AuthenticatedContext) =>
     return catalogs.map((c) => catalogEntityToGraphQL(c));
 };
 
+export const getCatalogByIdentifierOrFail = async (
+    _0: any,
+    { identifier }: { identifier: CatalogIdentifierInput },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const graphQLRelationName = info ? getGraphQlRelationName(info) : [];
+    const catalog = await getCatalogFromCacheOrDbBySlug(context, identifier.catalogSlug, graphQLRelationName);
+
+    if (catalog == null) {
+        throw new UserInputError("CATALOG_NOT_FOUND");
+    }
+
+    return catalogEntityToGraphQL(catalog);
+};
+
+export const getCatalogByIdentifier = async (
+    _0: any,
+    { identifier }: { identifier: CatalogIdentifierInput },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const graphQLRelationName = info ? getGraphQlRelationName(info) : [];
+    const catalog = await getCatalogFromCacheOrDbBySlug(context, identifier.catalogSlug, graphQLRelationName);
+
+    if (catalog == null) {
+        return undefined;
+    }
+
+    return catalogEntityToGraphQL(catalog);
+};
+
 export const getCatalogFromCacheOrDbById = async (
     context: Context,
     catalogId: number,
@@ -353,7 +386,7 @@ export const getCatalogFromCacheOrDbByIdOrFail = async (
     return await context.cache.loadCatalog(catalogId, catalogPromise);
 };
 
-export const getCatalogFromCacheOrDb = async (
+export const getCatalogFromCacheOrDbOrFail = async (
     context: Context,
     identifier: CatalogIdentifier | CatalogIdentifierInput,
     forceReload?: boolean
@@ -363,4 +396,16 @@ export const getCatalogFromCacheOrDb = async (
         .findCatalogBySlugOrFail(identifier.catalogSlug);
 
     return await context.cache.loadCatalogBySlug(identifier.catalogSlug, catalogPromise, forceReload);
-};
+}
+
+export const getCatalogFromCacheOrDbBySlug = async (
+    context: Context,
+    slug: string,
+    relations?: string[]
+) => {
+    const catalogPromise = context.connection.manager
+        .getCustomRepository(CatalogRepository)
+        .findCatalogBySlug({ slug, relations }) as Promise<CatalogEntity>;
+
+    return await context.cache.loadCatalogBySlug(slug, catalogPromise);
+}

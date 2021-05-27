@@ -1,6 +1,6 @@
 import "./util/prototypeExtensions";
 import { GraphQLScalarType } from "graphql";
-import { UserRepository } from "./repository/UserRepository";
+import { getUserByUserName, UserRepository } from "./repository/UserRepository";
 import { AuthenticatedContext, AutoCompleteContext, Context } from "./context";
 import { PackageRepository } from "./repository/PackageRepository";
 import {
@@ -21,10 +21,9 @@ import {
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
-import { CatalogRepository } from "./repository/CatalogRepository";
+import { CatalogRepository, getCatalogOrFail } from "./repository/CatalogRepository";
 import { UserCatalogPermissionRepository } from "./repository/CatalogPermissionRepository";
 import { isRequestingUserOrAdmin } from "./util/contextHelpers";
-import { UserInputError } from "apollo-server";
 import { parsePackageFileJSON, validatePackageFile } from "datapm-lib";
 import graphqlFields from "graphql-fields";
 import {
@@ -145,6 +144,8 @@ import {
     createCatalog,
     deleteCatalog,
     deleteCatalogAvatarImage,
+    getCatalogByIdentifier,
+    getCatalogByIdentifierOrFail,
     myCatalogPermissions,
     myCatalogs,
     searchCatalogs,
@@ -187,9 +188,35 @@ import {
 
 import {
     getPlatformSettingsByKey,
-    getPublicPlatformSettingsByKey,
+    getDeserializedPublicPlatformSettingsByKey,
+    getPublicPlatformSettingsByKeyOrFail,
     savePlatformSettings
 } from "./resolvers/PlatformSettingsResolver";
+
+export const getPageContentByRoute = async (
+    _0: any,
+    { route }: { route: string },
+    context: AuthenticatedContext,
+    info: any
+) => {
+    const user = await getUserByUserName({ username: route, manager: context.connection.manager });
+    if (user) {
+        return { user };
+    }
+
+    const catalog = await getCatalogByIdentifier(_0, { identifier: { catalogSlug: route } }, context, null);
+    if (catalog) {
+        return { catalog };
+    }
+
+    const builderIOSettings = await getDeserializedPublicPlatformSettingsByKey(
+        _0,
+        { key: "builder-io-settings" },
+        context,
+        info
+    );
+    return { builderIOSettings };
+};
 
 export const resolvers: {
     Query: QueryResolvers;
@@ -476,21 +503,8 @@ export const resolvers: {
         user: async (_0: any, args: { username: string }, context: AuthenticatedContext, info: any) => {
             return await getUserFromCacheOrDbByUsername(context, args.username, getGraphQlRelationName(info));
         },
-        catalog: async (_0: any, { identifier }, context: AuthenticatedContext, info: any) => {
-            const graphQLRelationName = getGraphQlRelationName(info);
 
-            const catalog = await context.connection.getCustomRepository(CatalogRepository).findCatalogBySlug({
-                slug: identifier.catalogSlug,
-                relations: graphQLRelationName
-            });
-
-            if (catalog == null) {
-                throw new UserInputError("CATALOG_NOT_FOUND");
-            }
-
-            return catalogEntityToGraphQL(catalog);
-        },
-
+        catalog: getCatalogByIdentifierOrFail,
         myCatalogs: myCatalogs,
 
         myAPIKeys: myAPIKeys,
@@ -559,7 +573,8 @@ export const resolvers: {
         getFollow: getFollow,
         myFollows: getAllMyFollows,
         platformSettings: getPlatformSettingsByKey,
-        publicPlatformSettingsByKey: getPublicPlatformSettingsByKey
+        publicPlatformSettingsByKey: getPublicPlatformSettingsByKeyOrFail,
+        pageContent: getPageContentByRoute
     },
 
     Mutation: {

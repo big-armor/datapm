@@ -1,7 +1,7 @@
 <div class="catalog-details container-fluid px-0 pt-2">
     <ng-container *ngIf="state === 'SUCCESS'">
         <div class="container">
-            <app-cover [catalogSlug]="catalogSlug"></app-cover>
+            <app-cover [catalogSlug]="catalog?.identifier.catalogSlug"></app-cover>
             <div class="d-flex flex-row bd-highlight">
                 <div class="pl-3 bd-highlight">
                     <app-avatar class="catalog-avatar" [catalog]="catalog" [circled]="false" [size]="80"> </app-avatar>
@@ -15,7 +15,7 @@
                         </p>
                     </div>
                 </div>
-                <div *ngIf="currentUser" class="d-flex flex-row bd-highlight ml-auto align-self-end mr-2">
+                <div *ngIf="currentUser" class="d-flex flex-row bd-highlight ml-auto align-self-end">
                     <button class="app-raised-button follow-btn" (click)="follow()">
                         <span *ngIf="isFollowing"><em class="fas fa-bell-slash"></em>Unfollow </span>
                         <span *ngIf="!isFollowing"><em class="fas fa-bell"></em>Follow</span>
@@ -27,8 +27,8 @@
                 <span *ngIf="!catalog?.isPublic" class="not-public-text">not public</span>
             </div>
 
-            <div *ngIf="catalog?.unclaimed">
-                Are you the data originator? <a href="/docs/unclaimed-listings">Click here to learn more</a>
+            <div *ngIf="catalog?.unclaimed" class="pl-3 text-dark-gray pt-2">
+                Are you the data originator? <a href="/docs/unclaimed-listings">Click here to learn more.</a>
             </div>
         </div>
 

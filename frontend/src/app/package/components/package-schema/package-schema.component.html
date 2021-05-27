@@ -20,8 +20,19 @@
                     [expanded]="getPropertyId(property) == focusedPropertyId"
                 >
                     <mat-expansion-panel-header>
-                        <mat-panel-title class="text-dark-gray font-14 weight-500">
-                            {{ property.title }}
+                        <mat-panel-title class="text-dark-gray weight-500">
+                            <div class="d-flex flex-column bd-highlight">
+                                <div class="bd-highlight">
+                                    {{ property.title }}
+                                </div>
+                                <div class="bd-highlight">
+                                    <mat-chip-list class="header-chips">
+                                        <mat-chip *ngFor="let cl of getAllPropertyChips(property)">{{
+                                            cl.label
+                                        }}</mat-chip>
+                                    </mat-chip-list>
+                                </div>
+                            </div>
                         </mat-panel-title>
                         <mat-panel-description class="text-dark-gray">
                             <span>{{ getPropertyTypes(property) }}</span>
@@ -47,6 +58,14 @@
                                 <div class="text-dark-gray">
                                     <div class="weight-500">{{ type.valueType }}</div>
                                     <ul>
+                                        <li *ngIf="getPropertyChips(type).length">
+                                            content labels:
+                                            <span
+                                                *ngFor="let cl of getPropertyChips(type); last as isLast"
+                                                [hidden]="cl.hidden"
+                                                >{{ cl.label }}<span *ngIf="!isLast">, </span>
+                                            </span>
+                                        </li>
                                         <li>
                                             present in {{ type.recordCount | number }} ({{
                                                 type.recordCount / schema.recordCount | percent
@@ -62,6 +81,14 @@
                                 <div class="text-dark-gray">
                                     <div class="weight-500">{{ type.valueType }}</div>
                                     <ul>
+                                        <li *ngIf="getPropertyChips(type).length">
+                                            content labels:
+                                            <span
+                                                *ngFor="let cl of getPropertyChips(type); last as isLast"
+                                                [hidden]="cl.hidden"
+                                                >{{ cl.label }}<span *ngIf="!isLast">, </span>
+                                            </span>
+                                        </li>
                                         <li>
                                             present in {{ type.recordCount | number }} ({{
                                                 type.recordCount / schema.recordCount | percent
@@ -75,6 +102,14 @@
                                 <div class="text-dark-gray">
                                     <div class="weight-500">{{ type.valueType }}</div>
                                     <ul>
+                                        <li *ngIf="getPropertyChips(type).length">
+                                            content labels:
+                                            <span
+                                                *ngFor="let cl of getPropertyChips(type); last as isLast"
+                                                [hidden]="cl.hidden"
+                                                >{{ cl.label }}<span *ngIf="!isLast">, </span>
+                                            </span>
+                                        </li>
                                         <li>
                                             present in {{ type.recordCount | number }} ({{
                                                 type.recordCount / schema.recordCount | percent
@@ -88,6 +123,14 @@
                                 <div class="text-dark-gray">
                                     <div class="weight-500">{{ type.valueType }}</div>
                                     <ul>
+                                        <li *ngIf="getPropertyChips(type).length">
+                                            content labels:
+                                            <span
+                                                *ngFor="let cl of getPropertyChips(type); last as isLast"
+                                                [hidden]="cl.hidden"
+                                                >{{ cl.label }}<span *ngIf="!isLast">, </span>
+                                            </span>
+                                        </li>
                                         <li>
                                             present in {{ type.recordCount | number }} records ({{
                                                 type.recordCount / schema.recordCount | percent
@@ -115,6 +158,14 @@
                                 <div class="text-dark-gray">
                                     <div class="weight-500">{{ type.valueType }}</div>
                                     <ul>
+                                        <li *ngIf="getPropertyChips(type).length">
+                                            content labels:
+                                            <span
+                                                *ngFor="let cl of getPropertyChips(type); last as isLast"
+                                                [hidden]="cl.hidden"
+                                                >{{ cl.label }}<span *ngIf="!isLast">, </span>
+                                            </span>
+                                        </li>
                                         <li>
                                             present in {{ type.recordCount | number }} ({{
                                                 type.recordCount / schema.recordCount | percent

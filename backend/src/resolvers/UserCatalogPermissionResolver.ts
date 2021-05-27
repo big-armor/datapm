@@ -9,7 +9,7 @@ import { UserCatalogPermissionRepository } from "../repository/CatalogPermission
 import { UserRepository } from "../repository/UserRepository";
 import { asyncForEach } from "../util/AsyncForEach";
 import { sendInviteUser, sendShareNotification, validateMessageContents } from "../util/smtpUtil";
-import { getCatalogFromCacheOrDb } from "./CatalogResolver";
+import { getCatalogFromCacheOrDbOrFail } from "./CatalogResolver";
 
 export const hasCatalogPermissions = async (context: Context, catalog: CatalogEntity, permission: Permission) => {
     if (permission == Permission.VIEW) {
@@ -41,7 +41,7 @@ export const setUserCatalogPermission = async (
 ) => {
     validateMessageContents(message);
 
-    const catalog = await getCatalogFromCacheOrDb(context, identifier);
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, identifier);
     const inviteUsers: UserEntity[] = [];
     const existingUsers: UserEntity[] = [];
 
