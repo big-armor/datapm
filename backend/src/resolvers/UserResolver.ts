@@ -255,7 +255,7 @@ export const setMyAvatarImage = async (
     return ImageStorageService.INSTANCE.saveUserAvatarImage(context.me.id, image.base64);
 };
 
-export const deleteMe = async (_0: any, { }, context: AuthenticatedContext, info: any) => {
+export const deleteMe = async (_0: any, {}, context: AuthenticatedContext, info: any) => {
     return await deleteUserAndLogAction(context.me.username, context);
 };
 
@@ -334,11 +334,9 @@ export const getUserFromCacheOrDbById = async (
     return context.cache.loadUser(id, userPromise);
 };
 
-export const getUserFromCacheOrDbByUsername = async (
-    context: Context,
-    username: string,
-    relations: string[] = []
-) => {
-    const userPromise = context.connection.getCustomRepository(UserRepository).findUserByUserName({ username, relations });
+export const getUserFromCacheOrDbByUsername = async (context: Context, username: string, relations: string[] = []) => {
+    const userPromise = context.connection
+        .getCustomRepository(UserRepository)
+        .findUserByUserName({ username, relations });
     return context.cache.loadUserByUsername(username, userPromise);
 };

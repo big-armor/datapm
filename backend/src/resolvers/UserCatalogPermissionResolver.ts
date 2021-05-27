@@ -124,11 +124,7 @@ export const getCatalogPermissionsStatusFromCacheOrDb = async (
     return await context.cache.loadCatalogPermissionsStatusById(catalogId, permission, permissionsPromise);
 };
 
-export const getCatalogPermissionsFromCacheOrDb = async (
-    context: Context,
-    catalogId: number,
-    userId: number
-) => {
+export const getCatalogPermissionsFromCacheOrDb = async (context: Context, catalogId: number, userId: number) => {
     const catalogPermissionsPromise = context.connection
         .getCustomRepository(UserCatalogPermissionRepository)
         .findCatalogPermissions({ catalogId, userId }) as Promise<UserCatalogPermissionEntity>;

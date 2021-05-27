@@ -120,7 +120,9 @@ export const myPackages = async (
 
     return {
         hasMore: count - (offset + limit) > 0,
-        packages: await Promise.all(searchResponse.map((p) => packageEntityToGraphqlObject(context, context.connection, p))),
+        packages: await Promise.all(
+            searchResponse.map((p) => packageEntityToGraphqlObject(context, context.connection, p))
+        ),
         count
     };
 };
@@ -136,8 +138,10 @@ export const getLatestPackages = async (
         .getCustomRepository(PackageRepository)
         .getLatestPackages(context.me, limit, offSet, relations);
 
-    searchResponse.forEach(p => context.cache.storePackageToCache(p));
-    const resolvedPackages = await Promise.all(searchResponse.map((p) => packageEntityToGraphqlObject(context, context.connection, p)));
+    searchResponse.forEach((p) => context.cache.storePackageToCache(p));
+    const resolvedPackages = await Promise.all(
+        searchResponse.map((p) => packageEntityToGraphqlObject(context, context.connection, p))
+    );
 
     return {
         hasMore: count - (offSet + limit) > 0,
@@ -148,7 +152,11 @@ export const getLatestPackages = async (
 
 export const packageVersions = async (parent: Package, _1: any, context: AuthenticatedContext, info: any) => {
     const packageEntity = await getPackageFromCacheOrDb(context, parent.identifier);
-    const versions = await getPackageVersionsFromCacheOrDbById(context, packageEntity.id, getRelationNames(graphqlFields(info)))
+    const versions = await getPackageVersionsFromCacheOrDbById(
+        context,
+        packageEntity.id,
+        getRelationNames(graphqlFields(info))
+    );
     return versions.map(async (v) => await versionEntityToGraphqlObject(context, context.connection, v));
 };
 
@@ -159,7 +167,11 @@ export const packageCatalog = async (
     info: any
 ): Promise<Catalog> => {
     const packageEntity = await getPackageFromCacheOrDb(context, parent.identifier);
-    const catalog = await getCatalogFromCacheOrDbById(context, packageEntity.catalogId, getRelationNames(graphqlFields(info)));
+    const catalog = await getCatalogFromCacheOrDbById(
+        context,
+        packageEntity.catalogId,
+        getRelationNames(graphqlFields(info))
+    );
     if (!catalog) {
         throw new Error("CATALOG_NOT_FOUND");
     }
@@ -192,7 +204,11 @@ export const packageLatestVersion = async (
         throw new ApolloError("Could not find catalog " + packageEntity.catalogId, "CATALOG_NOT_FOUND");
     }
 
-    const version = await getPackageLatestVersionFromCacheOrDbById(context, packageEntity.id, getGraphQlRelationName(info));
+    const version = await getPackageLatestVersionFromCacheOrDbById(
+        context,
+        packageEntity.id,
+        getGraphQlRelationName(info)
+    );
     if (version == undefined) {
         return null;
     }
@@ -206,7 +222,11 @@ export const findPackagesForCollection = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const collectionEntity = await getCollectionFromCacheOrDbOrFail(context, context.connection, parent.identifier.collectionSlug);
+    const collectionEntity = await getCollectionFromCacheOrDbOrFail(
+        context,
+        context.connection,
+        parent.identifier.collectionSlug
+    );
     if (!(await hasCollectionPermissions(context, collectionEntity, Permission.VIEW))) {
         return [];
     }
@@ -214,7 +234,7 @@ export const findPackagesForCollection = async (
     const packages = await context.connection
         .getCustomRepository(PackageRepository)
         .findPackagesForCollection(context.me?.id, collectionEntity.id, getGraphQlRelationName(info));
-    packages.forEach(p => context.cache.storePackageToCache(p));
+    packages.forEach((p) => context.cache.storePackageToCache(p));
 
     return await Promise.all(packages.map((p) => packageEntityToGraphqlObject(context, context.connection, p)));
 };
@@ -305,7 +325,9 @@ export const searchPackages = async (
 
     return {
         hasMore: count - (offSet + limit) > 0,
-        packages: await Promise.all(searchResponse.map((p) => packageEntityToGraphqlObject(context, context.connection, p))),
+        packages: await Promise.all(
+            searchResponse.map((p) => packageEntityToGraphqlObject(context, context.connection, p))
+        ),
         count
     };
 };
@@ -445,7 +467,9 @@ export const userPackages = async (
 
     return {
         hasMore: count - (offSet + limit) > 0,
-        packages: await Promise.all(searchResponse.map((p) => packageEntityToGraphqlObject(context, context.connection, p))),
+        packages: await Promise.all(
+            searchResponse.map((p) => packageEntityToGraphqlObject(context, context.connection, p))
+        ),
         count
     };
 };

@@ -77,7 +77,7 @@ function validation(packageEntity: PackageEntity) {
 }
 
 @EntityRepository(PackageEntity)
-export class PackageRepository extends Repository<PackageEntity>{
+export class PackageRepository extends Repository<PackageEntity> {
     async userPackages({
         user,
         username,

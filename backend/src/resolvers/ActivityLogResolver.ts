@@ -62,7 +62,11 @@ export const activtyLogEntityToGraphQL = async function (
 
     if (activityLogEntity.targetPackageId) {
         if (activityLogEntity.targetPackage)
-            activityLog.targetPackage = await packageEntityToGraphqlObject(context, context.connection, activityLogEntity.targetPackage);
+            activityLog.targetPackage = await packageEntityToGraphqlObject(
+                context,
+                context.connection,
+                activityLogEntity.targetPackage
+            );
         else {
             activityLog.targetPackage = await packageEntityToGraphqlObject(
                 context,

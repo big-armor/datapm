@@ -28,7 +28,7 @@ export async function resolveCatalogPermissions(
     identifier: CatalogIdentifierInput,
     user?: UserEntity
 ) {
-    const catalog = await getCatalogFromCacheOrDbOrFail(context, identifier)
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, identifier);
     return resolveCatalogPermissionsForEntity(context, catalog, user);
 }
 

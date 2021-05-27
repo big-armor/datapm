@@ -124,16 +124,16 @@ export const createVersion = async (
                 if (minVersionCompare == 1) {
                     throw new ApolloError(
                         identifier.catalogSlug +
-                        "/" +
-                        identifier.packageSlug +
-                        " has current version " +
-                        latestVersionSemVer.version +
-                        ", and this new version has " +
-                        compatibilityToString(compatibility) +
-                        " changes - requiring a minimum version number of " +
-                        minNextVersion.version +
-                        ", but you submitted version number " +
-                        proposedNewVersion.version,
+                            "/" +
+                            identifier.packageSlug +
+                            " has current version " +
+                            latestVersionSemVer.version +
+                            ", and this new version has " +
+                            compatibilityToString(compatibility) +
+                            " changes - requiring a minimum version number of " +
+                            minNextVersion.version +
+                            ", but you submitted version number " +
+                            proposedNewVersion.version,
                         VersionConflict.HIGHER_VERSION_REQUIRED,
                         { existingVersion: latestVersionSemVer.version, minNextVersion: minNextVersion.version }
                     );

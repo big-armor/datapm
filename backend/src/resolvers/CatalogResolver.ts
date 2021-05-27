@@ -312,7 +312,7 @@ export const searchCatalogs = async (
     };
 };
 
-export const myCatalogs = async (_0: any, { }, context: AuthenticatedContext) => {
+export const myCatalogs = async (_0: any, {}, context: AuthenticatedContext) => {
     const permissions = await context.connection.manager
         .getCustomRepository(UserCatalogPermissionRepository)
         .findByUser({ username: context.me?.username, relations: ["catalog"] });
@@ -361,11 +361,7 @@ export const getCatalogByIdentifier = async (
     return catalogEntityToGraphQL(catalog);
 };
 
-export const getCatalogFromCacheOrDbById = async (
-    context: Context,
-    catalogId: number,
-    relations: string[] = []
-) => {
+export const getCatalogFromCacheOrDbById = async (context: Context, catalogId: number, relations: string[] = []) => {
     const catalogPromise = context.connection.manager
         .getCustomRepository(CatalogRepository)
         .findOne(catalogId, { relations }) as Promise<CatalogEntity>;
@@ -379,9 +375,7 @@ export const getCatalogFromCacheOrDbByIdOrFail = async (
     catalogId: number,
     relations: string[] = []
 ) => {
-    const catalogPromise = connection
-        .getCustomRepository(CatalogRepository)
-        .findOneOrFail(catalogId, { relations });
+    const catalogPromise = connection.getCustomRepository(CatalogRepository).findOneOrFail(catalogId, { relations });
 
     return await context.cache.loadCatalog(catalogId, catalogPromise);
 };
@@ -396,16 +390,12 @@ export const getCatalogFromCacheOrDbOrFail = async (
         .findCatalogBySlugOrFail(identifier.catalogSlug);
 
     return await context.cache.loadCatalogBySlug(identifier.catalogSlug, catalogPromise, forceReload);
-}
+};
 
-export const getCatalogFromCacheOrDbBySlug = async (
-    context: Context,
-    slug: string,
-    relations?: string[]
-) => {
+export const getCatalogFromCacheOrDbBySlug = async (context: Context, slug: string, relations?: string[]) => {
     const catalogPromise = context.connection.manager
         .getCustomRepository(CatalogRepository)
         .findCatalogBySlug({ slug, relations }) as Promise<CatalogEntity>;
 
     return await context.cache.loadCatalogBySlug(slug, catalogPromise);
-}
+};

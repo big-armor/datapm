@@ -8,7 +8,6 @@ import { VersionEntity } from "./entity/VersionEntity";
 import { PackageIdentifier, PackageIdentifierInput, Permission, VersionIdentifierInput } from "./generated/graphql";
 
 export class SessionCache {
-
     private readonly cache = new Map<string, Promise<any>>();
 
     public storePackageToCache(packageEntity: PackageEntity): void {
@@ -25,32 +24,55 @@ export class SessionCache {
         return this.loadDataAsync(cacheId, userPromise, forceReload);
     }
 
-    public async loadUserByUsername(username: string, userPromise: Promise<UserEntity>, forceReload?: boolean): Promise<UserEntity> {
+    public async loadUserByUsername(
+        username: string,
+        userPromise: Promise<UserEntity>,
+        forceReload?: boolean
+    ): Promise<UserEntity> {
         const cacheId = this.buildDataKeyForUserByUsername(username);
         return this.loadDataAsync(cacheId, userPromise, forceReload);
     }
 
-    public async loadPackage(id: number, packagePromise: Promise<PackageEntity>, forceReload?: boolean): Promise<PackageEntity> {
+    public async loadPackage(
+        id: number,
+        packagePromise: Promise<PackageEntity>,
+        forceReload?: boolean
+    ): Promise<PackageEntity> {
         const cacheId = this.buildDataKeyForPackageId(id);
         return this.loadDataAsync(cacheId, packagePromise, forceReload);
     }
 
-    public async loadPackageByIdentifier(identifier: PackageIdentifier | PackageIdentifierInput, packagePromise: Promise<PackageEntity>): Promise<PackageEntity> {
+    public async loadPackageByIdentifier(
+        identifier: PackageIdentifier | PackageIdentifierInput,
+        packagePromise: Promise<PackageEntity>
+    ): Promise<PackageEntity> {
         const cacheId = this.buildDataKeyForPackageIdentifier(identifier);
         return this.loadDataAsync(cacheId, packagePromise);
     }
 
-    public async loadLatestPackageVersion(packageId: number, versionPromise: Promise<VersionEntity>, forceReload?: boolean): Promise<VersionEntity> {
+    public async loadLatestPackageVersion(
+        packageId: number,
+        versionPromise: Promise<VersionEntity>,
+        forceReload?: boolean
+    ): Promise<VersionEntity> {
         const cacheId = this.buildDataKeyForLatestPackageVersionId(packageId);
         return this.loadDataAsync(cacheId, versionPromise, forceReload);
     }
 
-    public async loadPackageVersion(identifier: VersionIdentifierInput, versionPromise: Promise<VersionEntity>, forceReload?: boolean): Promise<VersionEntity> {
+    public async loadPackageVersion(
+        identifier: VersionIdentifierInput,
+        versionPromise: Promise<VersionEntity>,
+        forceReload?: boolean
+    ): Promise<VersionEntity> {
         const cacheId = this.buildDataKeyForVersionIdentifier(identifier);
         return this.loadDataAsync(cacheId, versionPromise, forceReload);
     }
 
-    public async loadPackageVersions(packageId: number, versionsPromise: Promise<VersionEntity[]>, forceReload?: boolean): Promise<VersionEntity[]> {
+    public async loadPackageVersions(
+        packageId: number,
+        versionsPromise: Promise<VersionEntity[]>,
+        forceReload?: boolean
+    ): Promise<VersionEntity[]> {
         const cacheId = this.buildDataKeyForPackageVersionId(packageId);
         return this.loadDataAsync(cacheId, versionsPromise, forceReload);
     }
@@ -60,7 +82,11 @@ export class SessionCache {
         return this.loadDataAsync(cacheId, catalogPromise);
     }
 
-    public async loadCatalogBySlug(slug: string, catalogPromise: Promise<CatalogEntity>, forceReload?: boolean): Promise<CatalogEntity> {
+    public async loadCatalogBySlug(
+        slug: string,
+        catalogPromise: Promise<CatalogEntity>,
+        forceReload?: boolean
+    ): Promise<CatalogEntity> {
         const cacheId = this.buildDataKeyForCatalogSlug(slug);
         return this.loadDataAsync(cacheId, catalogPromise, forceReload);
     }
@@ -70,32 +96,53 @@ export class SessionCache {
         return this.loadDataAsync(cacheId, collectionPromise);
     }
 
-    public async loadCollectionBySlug(slug: string, collectionPromise: Promise<CollectionEntity>): Promise<CollectionEntity> {
+    public async loadCollectionBySlug(
+        slug: string,
+        collectionPromise: Promise<CollectionEntity>
+    ): Promise<CollectionEntity> {
         const cacheId = this.buildDataKeyForCollectionSlug(slug);
         return this.loadDataAsync(cacheId, collectionPromise);
     }
 
-    public async loadPackagePermissionsById(id: number, permissionPromise: Promise<UserPackagePermissionEntity>): Promise<UserPackagePermissionEntity> {
+    public async loadPackagePermissionsById(
+        id: number,
+        permissionPromise: Promise<UserPackagePermissionEntity>
+    ): Promise<UserPackagePermissionEntity> {
         const cacheId = this.buildDataKeyForPackagePermissions(id);
         return this.loadDataAsync(cacheId, permissionPromise);
     }
 
-    public async loadPackagePermissionsStatusById(id: number, permission: Permission, permissionPromise: Promise<Boolean>): Promise<Boolean> {
+    public async loadPackagePermissionsStatusById(
+        id: number,
+        permission: Permission,
+        permissionPromise: Promise<Boolean>
+    ): Promise<Boolean> {
         const cacheId = this.buildDataKeyForPackagePermission(id, permission);
         return this.loadDataAsync(cacheId, permissionPromise);
     }
 
-    public async loadCatalogPermissionsStatusById(id: number, permission: Permission, permissionPromise: Promise<Boolean>): Promise<Boolean> {
+    public async loadCatalogPermissionsStatusById(
+        id: number,
+        permission: Permission,
+        permissionPromise: Promise<Boolean>
+    ): Promise<Boolean> {
         const cacheId = this.buildDataKeyForCatalogPermission(id, permission);
         return this.loadDataAsync(cacheId, permissionPromise);
     }
 
-    public async loadCatalogPermissionsById(id: number, permissionPromise: Promise<UserCatalogPermissionEntity>): Promise<UserCatalogPermissionEntity> {
+    public async loadCatalogPermissionsById(
+        id: number,
+        permissionPromise: Promise<UserCatalogPermissionEntity>
+    ): Promise<UserCatalogPermissionEntity> {
         const cacheId = this.buildDataKeyForCatalogPermissions(id);
         return this.loadDataAsync(cacheId, permissionPromise);
     }
 
-    public async loadCollectionPermissionsStatusById(id: number, permission: Permission, permissionPromise: Promise<Boolean>): Promise<Boolean> {
+    public async loadCollectionPermissionsStatusById(
+        id: number,
+        permission: Permission,
+        permissionPromise: Promise<Boolean>
+    ): Promise<Boolean> {
         const cacheId = this.buildDataKeyForCollectionPermission(id, permission);
         return this.loadDataAsync(cacheId, permissionPromise);
     }
@@ -107,9 +154,7 @@ export class SessionCache {
         }
 
         const resolvedDataPromise = new Promise(async (res, rej) => {
-            dataPromise
-                .then((data) => res(data))
-                .catch((error) => rej(error));
+            dataPromise.then((data) => res(data)).catch((error) => rej(error));
         });
         this.cache.set(dataKey, resolvedDataPromise);
         return resolvedDataPromise;
@@ -132,7 +177,18 @@ export class SessionCache {
     }
 
     private buildDataKeyForVersionIdentifier(identifier: VersionIdentifierInput): string {
-        return "VERSION_ID-" + identifier.catalogSlug + "/" + identifier.packageSlug + "/" + identifier.versionMajor + "." + identifier.versionMinor + "." + identifier.versionPatch;
+        return (
+            "VERSION_ID-" +
+            identifier.catalogSlug +
+            "/" +
+            identifier.packageSlug +
+            "/" +
+            identifier.versionMajor +
+            "." +
+            identifier.versionMinor +
+            "." +
+            identifier.versionPatch
+        );
     }
 
     private buildDataKeyForLatestPackageVersionId(id: number): string {

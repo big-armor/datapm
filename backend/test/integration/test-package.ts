@@ -30,7 +30,7 @@ describe("Package Tests", async () => {
     let userBClient: ApolloClient<NormalizedCacheObject>;
     let anonymousClient = createAnonymousClient();
 
-    before(async () => { });
+    before(async () => {});
 
     it("Create users A & B", async function () {
         userAClient = await createUser(

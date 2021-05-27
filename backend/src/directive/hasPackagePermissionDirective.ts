@@ -37,7 +37,7 @@ export async function resolvePackagePermissions(
             packageId: packageEntity.id,
             userId: user.id
         }) as Promise<UserPackagePermissionEntity>;
-    const userPermission = await context.cache.loadPackagePermissionsById(packageEntity.id, userPermissionPromise)
+    const userPermission = await context.cache.loadPackagePermissionsById(packageEntity.id, userPermissionPromise);
 
     if (userPermission != null) {
         userPermission.permissions.forEach((p) => {

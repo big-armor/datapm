@@ -10,7 +10,7 @@ import { PackageFileStorageService } from "../storage/packages/package-file-stor
 @EntityRepository()
 export class VersionRepository {
     readonly packageFileStorageService = PackageFileStorageService.INSTANCE;
-    constructor(private manager: EntityManager) { }
+    constructor(private manager: EntityManager) {}
 
     public async findVersion(
         packageId: number,
