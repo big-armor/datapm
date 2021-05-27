@@ -1,4 +1,3 @@
-import { Connection, EntityManager } from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
 import { FollowEntity } from "../entity/FollowEntity";
 import {
@@ -35,7 +34,7 @@ export const entityToGraphqlObject = async (context: Context, entity: FollowEnti
         eventTypes: entity.eventTypes,
         catalog: catalogEntityToGraphQLOrNull(entity.catalog),
         collection: collectionEntityToGraphQLOrNull(entity.collection),
-        package: await packageEntityToGraphqlObjectOrNull(context, entity.package),
+        package: await packageEntityToGraphqlObjectOrNull(context, context.connection, entity.package),
         packageIssue: entity.packageIssue,
         user: entity.targetUser
     };
@@ -294,7 +293,7 @@ export const deleteFollow = async (
     }
 };
 
-export const deleteAllMyFollows = async (_0: any, {}, context: AuthenticatedContext, info: any): Promise<void> => {
+export const deleteAllMyFollows = async (_0: any, { }, context: AuthenticatedContext, info: any): Promise<void> => {
     const manager = context.connection.manager;
     await manager.getCustomRepository(FollowRepository).deleteAllFollowsByUserId(context.me.id);
 };
@@ -336,7 +335,7 @@ export const followPackage = async (
     const packageEntity = await context.connection
         .getCustomRepository(PackageRepository)
         .findPackageOrFail({ identifier: parent.package.identifier });
-    return packageEntityToGraphqlObject(context, packageEntity);
+    return packageEntityToGraphqlObject(context, context.connection, packageEntity);
 };
 
 export const followCollection = async (

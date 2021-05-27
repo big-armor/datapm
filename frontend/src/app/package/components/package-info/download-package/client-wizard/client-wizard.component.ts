@@ -31,7 +31,7 @@ export class ClientWizardComponent implements OnInit {
         public pacakgeService: PackageService,
         private snackBarService: SnackBarService,
         private clipboard: Clipboard
-    ) {}
+    ) { }
 
     @ViewChild("stepper") private myStepper: MatStepper;
 
@@ -39,11 +39,7 @@ export class ClientWizardComponent implements OnInit {
         this.registryUrl = getRegistryURL();
 
         this.loading = true;
-        console.log("wow");
         combineLatest([this.apiKeysService.getMyApiKeys(), this.pacakgeService.package]).subscribe(([apiKeys, pkg]) => {
-            console.log("keys", apiKeys);
-            console.log("pkg", pkg);
-
             this.packageUrl = this.packageUrl =
                 this.registryUrl + "/" + pkg.package.identifier.catalogSlug + "/" + pkg.package.identifier.packageSlug;
 

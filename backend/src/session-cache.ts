@@ -8,7 +8,7 @@ import { VersionEntity } from "./entity/VersionEntity";
 import { PackageIdentifier, PackageIdentifierInput, Permission, VersionIdentifierInput } from "./generated/graphql";
 
 export class SessionCache {
-    // TODO: ERMAL - ADD FORCE RELOAD FOR EVERY METHOD
+
     private readonly cache = new Map<string, Promise<any>>();
 
     public storePackageToCache(packageEntity: PackageEntity): void {

@@ -26,7 +26,7 @@ describe("Collection Tests", async () => {
     let userBClient: ApolloClient<NormalizedCacheObject>;
     let anonymousUser = createAnonymousClient();
 
-    before(async () => {});
+    before(async () => { });
 
     it("Create users A & B", async function () {
         userAClient = await createUser(
@@ -438,6 +438,7 @@ describe("Collection Tests", async () => {
                 }
             }
         });
+
         expect(response.errors == null, "no errors").true;
         expect(response.data!.updateCollection.identifier.collectionSlug).equal("testA-collection");
         expect(response.data!.updateCollection.isPublic).equal(true);

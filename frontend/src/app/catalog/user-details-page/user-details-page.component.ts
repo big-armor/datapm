@@ -92,7 +92,5 @@ export class UserDetailsPageComponent implements OnInit {
         if (tab !== "") extras.fragment = tab;
 
         this.router.navigate(["."], extras);
-
-        console.log("selected tab" + this.selectedTab);
     }
 }

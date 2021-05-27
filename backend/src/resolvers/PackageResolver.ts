@@ -20,12 +20,9 @@ import {
     ActivityLogChangeType,
     ActivityLogResult
 } from "../generated/graphql";
-import { CatalogEntity } from "../entity/CatalogEntity";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { PackageRepository } from "../repository/PackageRepository";
-import { UserRepository } from "../repository/UserRepository";
-import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { VersionRepository } from "../repository/VersionRepository";
@@ -35,26 +32,27 @@ import { resolvePackagePermissions } from "../directive/hasPackagePermissionDire
 import { hasPackageEntityPermissions } from "./UserPackagePermissionResolver";
 import { versionEntityToGraphqlObject } from "./VersionResolver";
 import { catalogEntityToGraphQL, getCatalogFromCacheOrDbById } from "./CatalogResolver";
-import { CollectionRepository } from "../repository/CollectionRepository";
 import { activtyLogEntityToGraphQL } from "./ActivityLogResolver";
 import { Connection, EntityManager } from "typeorm";
 import { VersionEntity } from "../entity/VersionEntity";
 import { getUserFromCacheOrDbById } from "./UserResolver";
-import { getCollectionFromCacheOrDb } from "./CollectionResolver";
+import { getCollectionFromCacheOrDbOrFail } from "./CollectionResolver";
 
 export const packageEntityToGraphqlObjectOrNull = async (
     context: Context,
+    connection: EntityManager | Connection,
     packageEntity: PackageEntity
 ): Promise<Package | null> => {
     if (!packageEntity) {
         return null;
     }
 
-    return packageEntityToGraphqlObject(context, packageEntity);
+    return packageEntityToGraphqlObject(context, connection, packageEntity);
 };
 
 export const packageEntityToGraphqlObject = async (
     context: Context,
+    connection: EntityManager | Connection,
     packageEntity: PackageEntity
 ): Promise<Package> => {
     if (packageEntity.catalog != null) {
@@ -67,7 +65,7 @@ export const packageEntityToGraphqlObject = async (
         };
     }
 
-    const packageEntityLoaded = await getPackageFromCacheOrDbByIdOrFail(context, context.connection, packageEntity.id, true);
+    const packageEntityLoaded = await getPackageFromCacheOrDbByIdOrFail(context, connection, packageEntity.id, true);
     return {
         identifier: {
             registryURL: process.env["REGISTRY_URL"]!,
@@ -122,7 +120,7 @@ export const myPackages = async (
 
     return {
         hasMore: count - (offset + limit) > 0,
-        packages: await Promise.all(searchResponse.map((p) => packageEntityToGraphqlObject(context, p))),
+        packages: await Promise.all(searchResponse.map((p) => packageEntityToGraphqlObject(context, context.connection, p))),
         count
     };
 };
@@ -138,9 +136,8 @@ export const getLatestPackages = async (
         .getCustomRepository(PackageRepository)
         .getLatestPackages(context.me, limit, offSet, relations);
 
-    // TODO: ERMAL - USE THIS FOR OTHER BATCH REQUESTS AS WELL
     searchResponse.forEach(p => context.cache.storePackageToCache(p));
-    const resolvedPackages = await Promise.all(searchResponse.map((p) => packageEntityToGraphqlObject(context, p)));
+    const resolvedPackages = await Promise.all(searchResponse.map((p) => packageEntityToGraphqlObject(context, context.connection, p)));
 
     return {
         hasMore: count - (offSet + limit) > 0,
@@ -209,17 +206,17 @@ export const findPackagesForCollection = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const collectionEntity = await getCollectionFromCacheOrDb(context, parent.identifier.collectionSlug);
+    const collectionEntity = await getCollectionFromCacheOrDbOrFail(context, context.connection, parent.identifier.collectionSlug);
     if (!(await hasCollectionPermissions(context, collectionEntity, Permission.VIEW))) {
         return [];
     }
 
-    // TODO: ERMAL - THINK OF CACHING THIS
     const packages = await context.connection
         .getCustomRepository(PackageRepository)
         .findPackagesForCollection(context.me?.id, collectionEntity.id, getGraphQlRelationName(info));
+    packages.forEach(p => context.cache.storePackageToCache(p));
 
-    return await Promise.all(packages.map((p) => packageEntityToGraphqlObject(context, p)));
+    return await Promise.all(packages.map((p) => packageEntityToGraphqlObject(context, context.connection, p)));
 };
 
 export const findPackageIdentifier = async (parent: Package, _1: any, context: AuthenticatedContext, info: any) => {
@@ -246,7 +243,7 @@ export const myPackagePermissions = async (parent: Package, _0: any, context: Au
 
 export const findPackageCreator = async (parent: Package, _1: any, context: AuthenticatedContext, info: any) => {
     const packageEntity = await getPackageFromCacheOrDb(context, parent.identifier);
-    return getUserFromCacheOrDbById(context, packageEntity.creatorId, getGraphQlRelationName(info));
+    return getUserFromCacheOrDbById(context, context.connection, packageEntity.creatorId, getGraphQlRelationName(info));
 };
 
 export const findPackage = async (
@@ -269,7 +266,7 @@ export const findPackage = async (
             });
         }
 
-        return packageEntityToGraphqlObject(context, packageEntity);
+        return packageEntityToGraphqlObject(context, context.connection, packageEntity);
     });
 };
 
@@ -308,7 +305,7 @@ export const searchPackages = async (
 
     return {
         hasMore: count - (offSet + limit) > 0,
-        packages: await Promise.all(searchResponse.map((p) => packageEntityToGraphqlObject(context, p))),
+        packages: await Promise.all(searchResponse.map((p) => packageEntityToGraphqlObject(context, context.connection, p))),
         count
     };
 };
@@ -333,7 +330,7 @@ export const createPackage = async (
                 targetPackageId: packageEntity?.id
             });
 
-            return await packageEntityToGraphqlObject(context, packageEntity);
+            return await packageEntityToGraphqlObject(context, transaction, packageEntity);
         } catch (error) {
             if (error.message == "CATALOG_NOT_FOUND") {
                 throw new UserInputError("CATALOG_NOT_FOUND");
@@ -397,7 +394,7 @@ export const updatePackage = async (
             relations: getGraphQlRelationName(info)
         });
 
-        return packageEntityToGraphqlObject(context, packageEntityUpdated);
+        return packageEntityToGraphqlObject(context, transaction, packageEntityUpdated);
     });
 };
 
@@ -448,7 +445,7 @@ export const userPackages = async (
 
     return {
         hasMore: count - (offSet + limit) > 0,
-        packages: await Promise.all(searchResponse.map((p) => packageEntityToGraphqlObject(context, p))),
+        packages: await Promise.all(searchResponse.map((p) => packageEntityToGraphqlObject(context, context.connection, p))),
         count
     };
 };
@@ -466,7 +463,7 @@ export const catalogPackages = async (
         .getCustomRepository(CatalogRepository)
         .catalogPackages(catalogEntity.id, limit, offset, relations);
 
-    return packages.map((p) => packageEntityToGraphqlObject(context, p));
+    return packages.map((p) => packageEntityToGraphqlObject(context, context.connection, p));
 };
 
 export const packageDescription = async (parent: Package, _1: any, context: Context): Promise<string | null> => {
@@ -549,7 +546,7 @@ export const getPackageFromCacheOrDbByIdOrFail = async (
 ) => {
     const packagePromise = connection
         .getCustomRepository(PackageRepository)
-        .findOneOrFail(packageId, { relations });
+        .findOneOrFail({ id: packageId }, { relations });
     return await context.cache.loadPackage(packageId, packagePromise, forceReload);
 };
 

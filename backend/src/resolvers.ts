@@ -223,7 +223,7 @@ export const resolvers: {
                     relations: getRelationNames(graphqlFields(info))
                 });
 
-            return packageEntities.map((p) => packageEntityToGraphqlObject(context, p));
+            return packageEntities.map((p) => packageEntityToGraphqlObject(context, context.connection, p));
         },
         users: async (parent: any, args: any, context: AutoCompleteContext, info: any) => {
             return await context.connection.manager.getCustomRepository(UserRepository).autocomplete({
@@ -411,7 +411,7 @@ export const resolvers: {
     },
     Catalog: {
         identifier: catalogIdentifier,
-        packages: catalogPackagesForUser, // TODO: ERMAL - Check how we can cache this
+        packages: catalogPackagesForUser,
         myPermissions: myCatalogPermissions,
         creator: catalogCreator,
         description: catalogDescription,

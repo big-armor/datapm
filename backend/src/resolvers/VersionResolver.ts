@@ -30,8 +30,6 @@ import { PackageRepository } from "../repository/PackageRepository";
 import { getGraphQlRelationName } from "./../util/relationNames";
 import { VersionEntity } from "../entity/VersionEntity";
 import { createActivityLog } from "./../repository/ActivityLogRepository";
-import { PackageEntity } from "../entity/PackageEntity";
-import { CatalogEntity } from "../entity/CatalogEntity";
 import { getCatalogFromCacheOrDbByIdOrFail } from "./CatalogResolver";
 import { StorageErrors } from "../storage/files/file-storage-service";
 import { hasPackagePermissions } from "./UserPackagePermissionResolver";
@@ -229,7 +227,7 @@ export const deleteVersion = async (
 };
 
 export const versionPackageFile = async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
-    const version = await getPackageVersionFromCacheOrDbById(context, parent.identifier);
+    const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
     const packageEntity = await getPackageFromCacheOrDbById(context, context.connection, version.packageId);
 
     try {
@@ -255,8 +253,7 @@ export const versionAuthor = async (
     context: AuthenticatedContext,
     info: any
 ): Promise<User | null> => {
-    const version = await getPackageVersionFromCacheOrDbById(context, parent.identifier, ["author"]);
-
+    const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier, ["author"], true);
     if (!(await hasPackagePermissions(context, version.packageId, Permission.VIEW))) {
         return null;
     }
@@ -278,7 +275,7 @@ export const versionCreatedAt = async (
     context: AuthenticatedContext,
     info: any
 ): Promise<Date | null> => {
-    const version = await getPackageVersionFromCacheOrDbById(context, parent.identifier);
+    const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
     if (!(await hasPackagePermissions(context, version.packageId, Permission.VIEW))) {
         return null;
     }
@@ -292,7 +289,7 @@ export const versionUpdatedAt = async (
     context: AuthenticatedContext,
     info: any
 ): Promise<Date | null> => {
-    const version = await getPackageVersionFromCacheOrDbById(context, parent.identifier);
+    const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
     if (!(await hasPackagePermissions(context, version.packageId, Permission.VIEW))) {
         return null;
     }
@@ -306,18 +303,19 @@ export const versionPackage = async (
     context: AuthenticatedContext,
     info: any
 ): Promise<Package | null> => {
-    const version = await getPackageVersionFromCacheOrDbById(context, parent.identifier);
-    return packageEntityToGraphqlObject(context, version.package);
+    const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
+    return packageEntityToGraphqlObject(context, context.connection, version.package);
 };
 
-export const getPackageVersionFromCacheOrDbById = async (
+export const getPackageVersionFromCacheOrDbByIdentifier = async (
     context: Context,
     identifier: VersionIdentifierInput,
-    relations: string[] = []
+    relations?: string[],
+    forceReload?: boolean
 ) => {
     const versionPromise = context.connection
         .getCustomRepository(VersionRepository)
         .findOneOrFail({ identifier, relations });
 
-    return await context.cache.loadPackageVersion(identifier, versionPromise);
+    return await context.cache.loadPackageVersion(identifier, versionPromise, forceReload);
 };

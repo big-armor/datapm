@@ -111,7 +111,7 @@ export const catalogCreator = async (parent: Catalog, _1: any, context: Context,
         return null;
     }
 
-    return await getUserFromCacheOrDbById(context, catalog.creatorId, getGraphQlRelationName(info));
+    return await getUserFromCacheOrDbById(context, context.connection, catalog.creatorId, getGraphQlRelationName(info));
 };
 
 export const myCatalogPermissions = async (parent: Catalog, _1: any, context: Context) => {
@@ -149,7 +149,7 @@ export const catalogPackagesForUser = async (parent: Catalog, _1: any, context: 
         relations: getGraphQlRelationName(info)
     });
 
-    return packages.map((p) => packageEntityToGraphqlObject(context, p));
+    return packages.map((p) => packageEntityToGraphqlObject(context, context.connection, p));
 };
 
 export const createCatalog = async (
