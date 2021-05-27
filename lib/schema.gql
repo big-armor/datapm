@@ -1582,4 +1582,9 @@ type Mutation {
     Create or update platform settings
     """
     savePlatformSettings(settings: PlatformSettingsInput!): PlatformSettings! @isAdmin
+
+    """
+    Run a single pass of the scheduler
+    """
+    runScheduler(key: String!): Void
 }

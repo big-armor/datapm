@@ -250,6 +250,15 @@ resource "google_cloud_run_service" "default" {
           name  = "ACTIVITY_LOG"
           value = "true"
         }
+
+        env {
+          name = "SCHEDULER_KEY"
+          value = random_password.scheduler_key.result
+        }
+        env {
+          name = "LEADER_ELECTION_DISABLED"
+          value = "true"
+        }
       }
     }
 
@@ -281,6 +290,12 @@ resource "google_cloud_run_service_iam_policy" "noauth" {
   service  = google_cloud_run_service.default.name
 
   policy_data = data.google_iam_policy.noauth.policy_data
+}
+
+resource "random_password" "scheduler_key" {
+  length           = 16
+  special          = true
+  override_special = "_%@"
 }
 
 resource "random_password" "jwt_key" {
@@ -346,5 +361,23 @@ resource "google_cloud_run_domain_mapping" "default" {
 
   spec {
     route_name = google_cloud_run_service.default.name
+  }
+}
+
+resource "google_cloud_scheduler_job" "job" {
+  name             = "datapm-notifications-invoker"
+  description      = "Invoke a command to run notifications"
+  schedule         = "*/5 * * * *"
+  time_zone        = "America/New_York"
+  attempt_deadline = "320s"
+
+  retry_config {
+    retry_count = 1
+  }
+
+  http_target {
+    http_method = "POST"
+    uri         = "https://test.datapm.io/graphql"
+    body        = "{ \"query\":\"mutation { runScheduler(key: \\"${random_password.scheduler_key.result}\\") }\" }"
   }
 }

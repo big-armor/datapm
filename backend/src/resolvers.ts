@@ -192,6 +192,8 @@ import {
     savePlatformSettings
 } from "./resolvers/PlatformSettingsResolver";
 
+import { runScheduler } from "./resolvers/SchedulerResolver";
+
 export const getPageContentByRoute = async (
     _0: any,
     { route }: { route: string },
@@ -694,6 +696,8 @@ export const resolvers: {
         deleteFollow: deleteFollow,
         deleteAllMyFollows: deleteAllMyFollows,
         savePlatformSettings: savePlatformSettings,
+
+        runScheduler,
 
         track: (_, { actions }, context: Context) => mixpanel.track(actions, context.request)
     }
