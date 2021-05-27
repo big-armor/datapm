@@ -31,7 +31,7 @@ export class ClientWizardComponent implements OnInit {
         public pacakgeService: PackageService,
         private snackBarService: SnackBarService,
         private clipboard: Clipboard
-    ) { }
+    ) {}
 
     @ViewChild("stepper") private myStepper: MatStepper;
 

@@ -27,7 +27,7 @@ export class FooterComponent implements OnInit, OnDestroy, AfterViewInit {
         private uiStyleToggleService: UiStyleToggleService,
         private builderIOService: BuilderIOService,
         private elementRef: ElementRef
-    ) { }
+    ) {}
 
     public ngOnInit(): void {
         this.uiStyleToggleService.DARK_MODE_ENABLED.pipe(takeUntil(this.destroy)).subscribe(
