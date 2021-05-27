@@ -1,4 +1,4 @@
-import { AfterContentChecked, Component, ElementRef, OnDestroy, OnInit } from "@angular/core";
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit } from "@angular/core";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { BuilderIOService } from "src/app/imported/resource-importer.service";
@@ -9,7 +9,7 @@ import { UiStyleToggleService } from "src/app/services/ui-style-toggle.service";
     templateUrl: "./footer.component.html",
     styleUrls: ["./footer.component.scss"]
 })
-export class FooterComponent implements OnInit, OnDestroy, AfterContentChecked {
+export class FooterComponent implements OnInit, OnDestroy, AfterViewInit {
     private readonly destroy = new Subject<void>();
 
     private readonly JAVASCRIPT_ELEMENT_TYPE = "script";
@@ -27,7 +27,7 @@ export class FooterComponent implements OnInit, OnDestroy, AfterContentChecked {
         private uiStyleToggleService: UiStyleToggleService,
         private builderIOService: BuilderIOService,
         private elementRef: ElementRef
-    ) {}
+    ) { }
 
     public ngOnInit(): void {
         this.uiStyleToggleService.DARK_MODE_ENABLED.pipe(takeUntil(this.destroy)).subscribe(
@@ -35,7 +35,7 @@ export class FooterComponent implements OnInit, OnDestroy, AfterContentChecked {
         );
     }
 
-    public ngAfterContentChecked(): void {
+    public ngAfterViewInit(): void {
         this.loadContent();
     }
 
