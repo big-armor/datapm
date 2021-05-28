@@ -141,6 +141,13 @@ table.gray-table {
         line-height: 30px;
     }
 }
+.dpm-text-logo {
+    color: var(--gray-1-color);
+    cursor: pointer;
+    &:hover {
+        text-decoration: none;
+    }
+}
 
 .theme-color {
     color: var(--primary-color);
@@ -443,6 +450,33 @@ mat-select {
     &:active {
         box-shadow: none !important;
     }
+}
+
+.hero-blue-btn {
+    outline: none !important;
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-weight: $weight-400;
+    font-size: ($text-font - 1);
+    color: $secondary-color !important;
+    background-color: var(--info-color) !important;
+    transition: background-color ease 0.5s;
+
+    &:hover {
+        text-decoration: none;
+    }
+}
+
+.hero-white-btn {
+    font-family: $family-roboto;
+    font-style: $style-normal;
+    font-weight: $weight-400;
+    font-size: ($text-font - 1);
+    background: var(--custom-secondary-color) !important;
+    line-height: 14px;
+    color: var(--info-color) !important;
+    border: 1px solid var(--gray-9-color) !important;
+    cursor: pointer;
 }
 
 .app-raised-button {
@@ -1194,6 +1228,11 @@ button:disabled {
 }
 
 @media (max-width: 768px) {
+    .dpm-text-logo {
+        font-size: ($title-font + 8);
+        line-height: 31px;
+        margin-bottom: 0px;
+    }
     .modal-submit-btn,
     .modal-close-btn {
         min-width: 70px;

@@ -83,14 +83,6 @@
     }
 }
 
-.dpm-text-logo {
-    color: var(--gray-1-color);
-    cursor: pointer;
-    &:hover {
-        text-decoration: none;
-    }
-}
-
 button.mat-menu-item {
     &:focus {
         outline: transparent solid 0px !important;
@@ -124,11 +116,6 @@ app-avatar {
         display: none;
     }
     h1 {
-        margin-bottom: 0px;
-    }
-    .dpm-text-logo {
-        font-size: ($title-font + 8);
-        line-height: 31px;
         margin-bottom: 0px;
     }
 }

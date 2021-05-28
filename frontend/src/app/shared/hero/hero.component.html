@@ -1,11 +1,11 @@
-<div class="container">
+<!-- <div class="container">
     <div class="row">
-        <div class="col-md-10">
-            <app-builder-io-renderer *ngIf="loaded; else loadingTemplate" [apiKey]="apiKey" [entry]="entry">
-                <div class="container">Failed to load hero</div>
-            </app-builder-io-renderer>
+        <div class="col-md-10"> -->
+<app-builder-io-renderer *ngIf="loaded; else loadingTemplate" [apiKey]="apiKey" [entry]="entry">
+    <div class="container">Failed to load hero</div>
+</app-builder-io-renderer>
 
-            <ng-template #loadingTemplate></ng-template>
-        </div>
+<ng-template #loadingTemplate>loadingzz</ng-template>
+<!-- </div>
     </div>
-</div>
+</div> -->

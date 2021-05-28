@@ -180,7 +180,8 @@ import { HeroComponent } from "./hero/hero.component";
         PackageAndCollectionComponent,
         MarkdownEditorComponent,
         FollowDialogComponent,
-        UserFollowingComponent
+        UserFollowingComponent,
+        HeroComponent
     ],
     providers: [TimeAgoPipe, { provide: MAT_DIALOG_DATA, useValue: {} }]
 })
