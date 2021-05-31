@@ -30,6 +30,7 @@ export const catalogEntityToGraphQLOrNull = (catalogEntity: CatalogEntity): Cata
     if (!catalogEntity) {
         return null;
     }
+
     return catalogEntityToGraphQL(catalogEntity);
 };
 
