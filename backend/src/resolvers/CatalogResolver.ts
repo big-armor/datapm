@@ -376,6 +376,7 @@ export const getCatalogFromCacheOrDbByIdOrFail = async (
 ) => {
     const catalogPromiseFunction = () =>
         connection.getCustomRepository(CatalogRepository).findOneOrFail(catalogId, { relations });
+
     return await context.cache.loadCatalog(catalogId, catalogPromiseFunction);
 };
 
