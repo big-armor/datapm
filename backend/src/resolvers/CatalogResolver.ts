@@ -361,9 +361,9 @@ export const getCatalogByIdentifier = async (
 
 export const getCatalogFromCacheOrDbById = async (context: Context, catalogId: number, relations: string[] = []) => {
     const catalogPromiseFunction = () =>
-        context.connection.manager
-            .getCustomRepository(CatalogRepository)
-            .findOne(catalogId, { relations }) as Promise<CatalogEntity>;
+        context.connection.manager.getCustomRepository(CatalogRepository).findOne(catalogId, { relations }) as Promise<
+            CatalogEntity
+        >;
 
     return await context.cache.loadCatalog(catalogId, catalogPromiseFunction);
 };
