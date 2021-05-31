@@ -310,7 +310,7 @@ export const searchCatalogs = async (
     };
 };
 
-export const myCatalogs = async (_0: any, { }, context: AuthenticatedContext) => {
+export const myCatalogs = async (_0: any, {}, context: AuthenticatedContext) => {
     const permissions = await context.connection.manager
         .getCustomRepository(UserCatalogPermissionRepository)
         .findByUser({ username: context.me?.username, relations: ["catalog"] });
@@ -360,9 +360,10 @@ export const getCatalogByIdentifier = async (
 };
 
 export const getCatalogFromCacheOrDbById = async (context: Context, catalogId: number, relations: string[] = []) => {
-    const catalogPromiseFunction = () => context.connection.manager
-        .getCustomRepository(CatalogRepository)
-        .findOne(catalogId, { relations }) as Promise<CatalogEntity>;
+    const catalogPromiseFunction = () =>
+        context.connection.manager
+            .getCustomRepository(CatalogRepository)
+            .findOne(catalogId, { relations }) as Promise<CatalogEntity>;
 
     return await context.cache.loadCatalog(catalogId, catalogPromiseFunction);
 };
@@ -373,9 +374,8 @@ export const getCatalogFromCacheOrDbByIdOrFail = async (
     catalogId: number,
     relations: string[] = []
 ) => {
-    const catalogPromiseFunction = () => connection
-        .getCustomRepository(CatalogRepository)
-        .findOneOrFail(catalogId, { relations });
+    const catalogPromiseFunction = () =>
+        connection.getCustomRepository(CatalogRepository).findOneOrFail(catalogId, { relations });
 
     return await context.cache.loadCatalog(catalogId, catalogPromiseFunction);
 };
@@ -385,17 +385,19 @@ export const getCatalogFromCacheOrDbOrFail = async (
     identifier: CatalogIdentifier | CatalogIdentifierInput,
     forceReload?: boolean
 ) => {
-    const catalogPromiseFunction = () => context.connection.manager
-        .getCustomRepository(CatalogRepository)
-        .findCatalogBySlugOrFail(identifier.catalogSlug);
+    const catalogPromiseFunction = () =>
+        context.connection.manager
+            .getCustomRepository(CatalogRepository)
+            .findCatalogBySlugOrFail(identifier.catalogSlug);
 
     return await context.cache.loadCatalogBySlug(identifier.catalogSlug, catalogPromiseFunction, forceReload);
 };
 
 export const getCatalogFromCacheOrDbBySlug = async (context: Context, slug: string, relations?: string[]) => {
-    const catalogPromiseFunction = () => context.connection.manager
-        .getCustomRepository(CatalogRepository)
-        .findCatalogBySlug({ slug, relations }) as Promise<CatalogEntity>;
+    const catalogPromiseFunction = () =>
+        context.connection.manager
+            .getCustomRepository(CatalogRepository)
+            .findCatalogBySlug({ slug, relations }) as Promise<CatalogEntity>;
 
     return await context.cache.loadCatalogBySlug(slug, catalogPromiseFunction);
 };
