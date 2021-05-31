@@ -5,6 +5,7 @@ query GetLatestPackages($offset: Int!, $limit: Int!) {
                 catalogSlug
                 packageSlug
             }
+            myPermissions
             isPublic
             displayName
             description

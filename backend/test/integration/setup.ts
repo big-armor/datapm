@@ -28,6 +28,7 @@ before(async function () {
     console.log("Starting postgres temporary container");
 
     this.timeout(120000);
+
     container = await new GenericContainer("postgres")
         .withEnv("POSTGRES_PASSWORD", "postgres")
         .withEnv("POSTGRES_DB", "datapm")

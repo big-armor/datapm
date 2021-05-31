@@ -621,9 +621,8 @@ export const getCollectionFromCacheOrDbById = async (
     connection: EntityManager | Connection,
     id: number
 ) => {
-    const collectionPromise = connection.getCustomRepository(CollectionRepository).findOneOrFail({ id });
-
-    return await context.cache.loadCollection(id, collectionPromise);
+    const collectionPromiseFunction = () => connection.getCustomRepository(CollectionRepository).findOneOrFail({ id });
+    return await context.cache.loadCollection(id, collectionPromiseFunction);
 };
 
 export const getCollectionFromCacheOrDbOrFail = async (
@@ -632,9 +631,8 @@ export const getCollectionFromCacheOrDbOrFail = async (
     slug: string,
     relations: string[] = []
 ) => {
-    const collectionPromise = connection
-        .getCustomRepository(CollectionRepository)
-        .findCollectionBySlugOrFail(slug, relations);
+    const collectionPromiseFunction = () =>
+        connection.getCustomRepository(CollectionRepository).findCollectionBySlugOrFail(slug, relations);
 
-    return await context.cache.loadCollectionBySlug(slug, collectionPromise);
+    return await context.cache.loadCollectionBySlug(slug, collectionPromiseFunction);
 };

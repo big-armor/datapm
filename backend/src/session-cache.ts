@@ -19,14 +19,18 @@ export class SessionCache {
         this.cache.set(key, Promise.resolve(data));
     }
 
-    public async loadUser(id: number, userPromise: Promise<UserEntity>, forceReload?: boolean): Promise<UserEntity> {
+    public async loadUser(
+        id: number,
+        userPromise: () => Promise<UserEntity>,
+        forceReload?: boolean
+    ): Promise<UserEntity> {
         const cacheId = this.buildDataKeyForUserId(id);
         return this.loadDataAsync(cacheId, userPromise, forceReload);
     }
 
     public async loadUserByUsername(
         username: string,
-        userPromise: Promise<UserEntity>,
+        userPromise: () => Promise<UserEntity>,
         forceReload?: boolean
     ): Promise<UserEntity> {
         const cacheId = this.buildDataKeyForUserByUsername(username);
@@ -35,7 +39,7 @@ export class SessionCache {
 
     public async loadPackage(
         id: number,
-        packagePromise: Promise<PackageEntity>,
+        packagePromise: () => Promise<PackageEntity>,
         forceReload?: boolean
     ): Promise<PackageEntity> {
         const cacheId = this.buildDataKeyForPackageId(id);
@@ -44,7 +48,7 @@ export class SessionCache {
 
     public async loadPackageByIdentifier(
         identifier: PackageIdentifier | PackageIdentifierInput,
-        packagePromise: Promise<PackageEntity>
+        packagePromise: () => Promise<PackageEntity>
     ): Promise<PackageEntity> {
         const cacheId = this.buildDataKeyForPackageIdentifier(identifier);
         return this.loadDataAsync(cacheId, packagePromise);
@@ -52,7 +56,7 @@ export class SessionCache {
 
     public async loadLatestPackageVersion(
         packageId: number,
-        versionPromise: Promise<VersionEntity>,
+        versionPromise: () => Promise<VersionEntity>,
         forceReload?: boolean
     ): Promise<VersionEntity> {
         const cacheId = this.buildDataKeyForLatestPackageVersionId(packageId);
@@ -61,7 +65,7 @@ export class SessionCache {
 
     public async loadPackageVersion(
         identifier: VersionIdentifierInput,
-        versionPromise: Promise<VersionEntity>,
+        versionPromise: () => Promise<VersionEntity>,
         forceReload?: boolean
     ): Promise<VersionEntity> {
         const cacheId = this.buildDataKeyForVersionIdentifier(identifier);
@@ -70,35 +74,38 @@ export class SessionCache {
 
     public async loadPackageVersions(
         packageId: number,
-        versionsPromise: Promise<VersionEntity[]>,
+        versionsPromise: () => Promise<VersionEntity[]>,
         forceReload?: boolean
     ): Promise<VersionEntity[]> {
         const cacheId = this.buildDataKeyForPackageVersionId(packageId);
         return this.loadDataAsync(cacheId, versionsPromise, forceReload);
     }
 
-    public async loadCatalog(id: number, catalogPromise: Promise<CatalogEntity>): Promise<CatalogEntity> {
+    public async loadCatalog(id: number, catalogPromise: () => Promise<CatalogEntity>): Promise<CatalogEntity> {
         const cacheId = this.buildDataKeyForCatalogId(id);
         return this.loadDataAsync(cacheId, catalogPromise);
     }
 
     public async loadCatalogBySlug(
         slug: string,
-        catalogPromise: Promise<CatalogEntity>,
+        catalogPromise: () => Promise<CatalogEntity>,
         forceReload?: boolean
     ): Promise<CatalogEntity> {
         const cacheId = this.buildDataKeyForCatalogSlug(slug);
         return this.loadDataAsync(cacheId, catalogPromise, forceReload);
     }
 
-    public async loadCollection(id: number, collectionPromise: Promise<CollectionEntity>): Promise<CollectionEntity> {
+    public async loadCollection(
+        id: number,
+        collectionPromise: () => Promise<CollectionEntity>
+    ): Promise<CollectionEntity> {
         const cacheId = this.buildDataKeyForCollectionId(id);
         return this.loadDataAsync(cacheId, collectionPromise);
     }
 
     public async loadCollectionBySlug(
         slug: string,
-        collectionPromise: Promise<CollectionEntity>
+        collectionPromise: () => Promise<CollectionEntity>
     ): Promise<CollectionEntity> {
         const cacheId = this.buildDataKeyForCollectionSlug(slug);
         return this.loadDataAsync(cacheId, collectionPromise);
@@ -106,7 +113,7 @@ export class SessionCache {
 
     public async loadPackagePermissionsById(
         id: number,
-        permissionPromise: Promise<UserPackagePermissionEntity>
+        permissionPromise: () => Promise<UserPackagePermissionEntity>
     ): Promise<UserPackagePermissionEntity> {
         const cacheId = this.buildDataKeyForPackagePermissions(id);
         return this.loadDataAsync(cacheId, permissionPromise);
@@ -115,7 +122,7 @@ export class SessionCache {
     public async loadPackagePermissionsStatusById(
         id: number,
         permission: Permission,
-        permissionPromise: Promise<Boolean>
+        permissionPromise: () => Promise<Boolean>
     ): Promise<Boolean> {
         const cacheId = this.buildDataKeyForPackagePermission(id, permission);
         return this.loadDataAsync(cacheId, permissionPromise);
@@ -124,7 +131,7 @@ export class SessionCache {
     public async loadCatalogPermissionsStatusById(
         id: number,
         permission: Permission,
-        permissionPromise: Promise<Boolean>
+        permissionPromise: () => Promise<Boolean>
     ): Promise<Boolean> {
         const cacheId = this.buildDataKeyForCatalogPermission(id, permission);
         return this.loadDataAsync(cacheId, permissionPromise);
@@ -132,7 +139,7 @@ export class SessionCache {
 
     public async loadCatalogPermissionsById(
         id: number,
-        permissionPromise: Promise<UserCatalogPermissionEntity>
+        permissionPromise: () => Promise<UserCatalogPermissionEntity>
     ): Promise<UserCatalogPermissionEntity> {
         const cacheId = this.buildDataKeyForCatalogPermissions(id);
         return this.loadDataAsync(cacheId, permissionPromise);
@@ -141,20 +148,26 @@ export class SessionCache {
     public async loadCollectionPermissionsStatusById(
         id: number,
         permission: Permission,
-        permissionPromise: Promise<Boolean>
+        permissionPromise: () => Promise<Boolean>
     ): Promise<Boolean> {
         const cacheId = this.buildDataKeyForCollectionPermission(id, permission);
         return this.loadDataAsync(cacheId, permissionPromise);
     }
 
-    public async loadDataAsync(dataKey: string, dataPromise: Promise<any>, forceReload?: boolean): Promise<any> {
+    public async loadDataAsync(
+        dataKey: string,
+        dataPromiseFunction: () => Promise<any>,
+        forceReload?: boolean
+    ): Promise<any> {
         const cachedData = this.cache.get(dataKey);
         if (cachedData && !forceReload) {
             return cachedData;
         }
 
         const resolvedDataPromise = new Promise(async (res, rej) => {
-            dataPromise.then((data) => res(data)).catch((error) => rej(error));
+            dataPromiseFunction()
+                .then((data) => res(data))
+                .catch((error) => rej(error));
         });
         this.cache.set(dataKey, resolvedDataPromise);
         return resolvedDataPromise;

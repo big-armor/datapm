@@ -326,17 +326,17 @@ export const getUserFromCacheOrDbById = async (
     id: number,
     relations: string[] = []
 ) => {
-    const userPromise = connection.getCustomRepository(UserRepository).findOneOrFail({
-        where: { id },
-        relations
-    });
+    const userPromiseFunction = () =>
+        connection.getCustomRepository(UserRepository).findOneOrFail({
+            where: { id },
+            relations
+        });
 
-    return context.cache.loadUser(id, userPromise);
+    return context.cache.loadUser(id, userPromiseFunction);
 };
 
 export const getUserFromCacheOrDbByUsername = async (context: Context, username: string, relations: string[] = []) => {
-    const userPromise = context.connection
-        .getCustomRepository(UserRepository)
-        .findUserByUserName({ username, relations });
-    return context.cache.loadUserByUsername(username, userPromise);
+    const userPromiseFunction = () =>
+        context.connection.getCustomRepository(UserRepository).findUserByUserName({ username, relations });
+    return context.cache.loadUserByUsername(username, userPromiseFunction);
 };

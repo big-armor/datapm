@@ -555,10 +555,9 @@ export const getPackageFromCacheOrDbById = async (
     packageId: number,
     relations: string[] = []
 ) => {
-    const packagePromise = connection
-        .getCustomRepository(PackageRepository)
-        .findOne(packageId, { relations }) as Promise<PackageEntity>;
-    return await context.cache.loadPackage(packageId, packagePromise);
+    const packagePromiseFunction = () =>
+        connection.getCustomRepository(PackageRepository).findOne(packageId, { relations }) as Promise<PackageEntity>;
+    return await context.cache.loadPackage(packageId, packagePromiseFunction);
 };
 
 export const getPackageFromCacheOrDbByIdOrFail = async (
@@ -568,10 +567,9 @@ export const getPackageFromCacheOrDbByIdOrFail = async (
     forceReload?: boolean,
     relations: string[] = []
 ) => {
-    const packagePromise = connection
-        .getCustomRepository(PackageRepository)
-        .findOneOrFail({ id: packageId }, { relations });
-    return await context.cache.loadPackage(packageId, packagePromise, forceReload);
+    const packagePromiseFunction = () =>
+        connection.getCustomRepository(PackageRepository).findOneOrFail({ id: packageId }, { relations });
+    return await context.cache.loadPackage(packageId, packagePromiseFunction, forceReload);
 };
 
 export const getPackageFromCacheOrDb = async (
@@ -579,10 +577,9 @@ export const getPackageFromCacheOrDb = async (
     identifier: PackageIdentifier | PackageIdentifierInput,
     relations: string[] = []
 ) => {
-    const packagePromise = context.connection.manager
-        .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier, relations });
-    return await context.cache.loadPackageByIdentifier(identifier, packagePromise);
+    const packagePromiseFunction = () =>
+        context.connection.manager.getCustomRepository(PackageRepository).findPackageOrFail({ identifier, relations });
+    return await context.cache.loadPackageByIdentifier(identifier, packagePromiseFunction);
 };
 
 export const getPackageLatestVersionFromCacheOrDbById = async (
@@ -590,11 +587,12 @@ export const getPackageLatestVersionFromCacheOrDbById = async (
     packageId: number,
     relations: string[] = []
 ) => {
-    const versionPromise = context.connection.getCustomRepository(VersionRepository).findLatestVersionByPackageId({
-        packageId,
-        relations
-    }) as Promise<VersionEntity>;
-    return await context.cache.loadLatestPackageVersion(packageId, versionPromise);
+    const versionPromiseFunction = () =>
+        context.connection.getCustomRepository(VersionRepository).findLatestVersionByPackageId({
+            packageId,
+            relations
+        }) as Promise<VersionEntity>;
+    return await context.cache.loadLatestPackageVersion(packageId, versionPromiseFunction);
 };
 
 export const getPackageVersionsFromCacheOrDbById = async (
@@ -602,8 +600,7 @@ export const getPackageVersionsFromCacheOrDbById = async (
     packageId: number,
     relations: string[] = []
 ) => {
-    const versionsPromise = context.connection
-        .getCustomRepository(VersionRepository)
-        .findVersions({ packageId, relations });
-    return await context.cache.loadPackageVersions(packageId, versionsPromise);
+    const versionsPromiseFunction = () =>
+        context.connection.getCustomRepository(VersionRepository).findVersions({ packageId, relations });
+    return await context.cache.loadPackageVersions(packageId, versionsPromiseFunction);
 };

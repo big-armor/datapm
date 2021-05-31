@@ -31,13 +31,15 @@ export async function resolvePackagePermissions(
         return permissions;
     }
 
-    const userPermissionPromise = context.connection
-        .getCustomRepository(PackagePermissionRepository)
-        .findPackagePermissions({
+    const userPermissionPromiseFunction = () =>
+        context.connection.getCustomRepository(PackagePermissionRepository).findPackagePermissions({
             packageId: packageEntity.id,
             userId: user.id
         }) as Promise<UserPackagePermissionEntity>;
-    const userPermission = await context.cache.loadPackagePermissionsById(packageEntity.id, userPermissionPromise);
+    const userPermission = await context.cache.loadPackagePermissionsById(
+        packageEntity.id,
+        userPermissionPromiseFunction
+    );
 
     if (userPermission != null) {
         userPermission.permissions.forEach((p) => {
@@ -94,7 +96,6 @@ export class HasPackagePermissionDirective extends SchemaDirectiveVisitor {
         }
     ): GraphQLArgument | void | null {
         const { resolve = defaultFieldResolver } = details.field;
-        const self = this;
         const permission = (argument
             .astNode!.directives!.find((d) => d.name.value == "hasPackagePermission")!
             .arguments!.find((a) => a.name.value == "permission")!.value as EnumValueNode).value as Permission;

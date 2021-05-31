@@ -4,7 +4,6 @@ import { Connection, EntityManager } from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
 import { resolveCatalogPermissions } from "../directive/hasCatalogPermissionDirective";
 import { CatalogEntity } from "../entity/CatalogEntity";
-import { UserCatalogPermissionEntity } from "../entity/UserCatalogPermissionEntity";
 import {
     ActivityLogChangeType,
     ActivityLogEventType,
@@ -20,7 +19,6 @@ import { createActivityLog } from "../repository/ActivityLogRepository";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { CatalogRepository } from "../repository/CatalogRepository";
 import { PackageRepository } from "../repository/PackageRepository";
-import { UserRepository } from "../repository/UserRepository";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
@@ -362,11 +360,12 @@ export const getCatalogByIdentifier = async (
 };
 
 export const getCatalogFromCacheOrDbById = async (context: Context, catalogId: number, relations: string[] = []) => {
-    const catalogPromise = context.connection.manager
-        .getCustomRepository(CatalogRepository)
-        .findOne(catalogId, { relations }) as Promise<CatalogEntity>;
+    const catalogPromiseFunction = () =>
+        context.connection.manager
+            .getCustomRepository(CatalogRepository)
+            .findOne(catalogId, { relations }) as Promise<CatalogEntity>;
 
-    return await context.cache.loadCatalog(catalogId, catalogPromise);
+    return await context.cache.loadCatalog(catalogId, catalogPromiseFunction);
 };
 
 export const getCatalogFromCacheOrDbByIdOrFail = async (
@@ -375,9 +374,9 @@ export const getCatalogFromCacheOrDbByIdOrFail = async (
     catalogId: number,
     relations: string[] = []
 ) => {
-    const catalogPromise = connection.getCustomRepository(CatalogRepository).findOneOrFail(catalogId, { relations });
-
-    return await context.cache.loadCatalog(catalogId, catalogPromise);
+    const catalogPromiseFunction = () =>
+        connection.getCustomRepository(CatalogRepository).findOneOrFail(catalogId, { relations });
+    return await context.cache.loadCatalog(catalogId, catalogPromiseFunction);
 };
 
 export const getCatalogFromCacheOrDbOrFail = async (
@@ -385,17 +384,19 @@ export const getCatalogFromCacheOrDbOrFail = async (
     identifier: CatalogIdentifier | CatalogIdentifierInput,
     forceReload?: boolean
 ) => {
-    const catalogPromise = context.connection.manager
-        .getCustomRepository(CatalogRepository)
-        .findCatalogBySlugOrFail(identifier.catalogSlug);
+    const catalogPromiseFunction = () =>
+        context.connection.manager
+            .getCustomRepository(CatalogRepository)
+            .findCatalogBySlugOrFail(identifier.catalogSlug);
 
-    return await context.cache.loadCatalogBySlug(identifier.catalogSlug, catalogPromise, forceReload);
+    return await context.cache.loadCatalogBySlug(identifier.catalogSlug, catalogPromiseFunction, forceReload);
 };
 
 export const getCatalogFromCacheOrDbBySlug = async (context: Context, slug: string, relations?: string[]) => {
-    const catalogPromise = context.connection.manager
-        .getCustomRepository(CatalogRepository)
-        .findCatalogBySlug({ slug, relations }) as Promise<CatalogEntity>;
+    const catalogPromiseFunction = () =>
+        context.connection.manager
+            .getCustomRepository(CatalogRepository)
+            .findCatalogBySlug({ slug, relations }) as Promise<CatalogEntity>;
 
-    return await context.cache.loadCatalogBySlug(slug, catalogPromise);
+    return await context.cache.loadCatalogBySlug(slug, catalogPromiseFunction);
 };

@@ -117,16 +117,19 @@ export const getCatalogPermissionsStatusFromCacheOrDb = async (
         return false;
     }
 
-    const permissionsPromise = context.connection
-        .getCustomRepository(UserCatalogPermissionRepository)
-        .hasPermission(context.me.id, catalogId, permission);
+    const userId = context.me.id;
+    const permissionsPromiseFunction = () =>
+        context.connection
+            .getCustomRepository(UserCatalogPermissionRepository)
+            .hasPermission(userId, catalogId, permission);
 
-    return await context.cache.loadCatalogPermissionsStatusById(catalogId, permission, permissionsPromise);
+    return await context.cache.loadCatalogPermissionsStatusById(catalogId, permission, permissionsPromiseFunction);
 };
 
 export const getCatalogPermissionsFromCacheOrDb = async (context: Context, catalogId: number, userId: number) => {
-    const catalogPermissionsPromise = context.connection
-        .getCustomRepository(UserCatalogPermissionRepository)
-        .findCatalogPermissions({ catalogId, userId }) as Promise<UserCatalogPermissionEntity>;
-    return context.cache.loadCatalogPermissionsById(catalogId, catalogPermissionsPromise);
+    const catalogPermissionsPromiseFunction = () =>
+        context.connection
+            .getCustomRepository(UserCatalogPermissionRepository)
+            .findCatalogPermissions({ catalogId, userId }) as Promise<UserCatalogPermissionEntity>;
+    return context.cache.loadCatalogPermissionsById(catalogId, catalogPermissionsPromiseFunction);
 };

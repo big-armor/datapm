@@ -313,9 +313,8 @@ export const getPackageVersionFromCacheOrDbByIdentifier = async (
     relations?: string[],
     forceReload?: boolean
 ) => {
-    const versionPromise = context.connection
-        .getCustomRepository(VersionRepository)
-        .findOneOrFail({ identifier, relations });
+    const versionPromiseFunction = () =>
+        context.connection.getCustomRepository(VersionRepository).findOneOrFail({ identifier, relations });
 
-    return await context.cache.loadPackageVersion(identifier, versionPromise, forceReload);
+    return await context.cache.loadPackageVersion(identifier, versionPromiseFunction, forceReload);
 };
