@@ -452,6 +452,13 @@ mat-select {
     }
 }
 
+.hero-section {
+    border-radius: 6px;
+    padding: 22px 15px 20px 15px;
+    border: 1px solid var(--tranparent-border);
+    background-color: var(--gray-hero-color);
+}
+
 .hero-blue-btn {
     outline: none !important;
     font-family: $family-roboto;
@@ -476,7 +483,13 @@ mat-select {
     line-height: 14px;
     color: var(--info-color) !important;
     border: 1px solid var(--gray-9-color) !important;
+    scroll-behavior: smooth;
+    animation: move 3s ease-out infinite;
     cursor: pointer;
+
+    &:hover {
+        text-decoration: none;
+    }
 }
 
 .app-raised-button {
