@@ -1,6 +1,7 @@
 import { Connection } from "typeorm";
 import { Request } from "express";
 import { UserEntity } from "./entity/UserEntity";
+import { SessionCache } from "./session-cache";
 
 enum Scope {
     // Need to determine what these should be
@@ -14,6 +15,7 @@ export interface Context {
     request: Request;
     me?: UserEntity;
     scopes?: Scope[];
+    cache: SessionCache;
 }
 
 export interface AuthenticatedContext extends Context {

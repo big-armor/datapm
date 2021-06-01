@@ -1,19 +1,19 @@
 import { ValidationError } from "apollo-server";
 import { emailAddressValid } from "datapm-lib";
 import { AuthenticatedContext, Context } from "../context";
+import { CatalogEntity } from "../entity/CatalogEntity";
+import { UserCatalogPermissionEntity } from "../entity/UserCatalogPermissionEntity";
 import { UserEntity } from "../entity/UserEntity";
 import { CatalogIdentifierInput, Permission, SetUserCatalogPermissionInput, UserStatus } from "../generated/graphql";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
-import { CatalogRepository } from "../repository/CatalogRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { asyncForEach } from "../util/AsyncForEach";
 import { sendInviteUser, sendShareNotification, validateMessageContents } from "../util/smtpUtil";
+import { getCatalogFromCacheOrDbOrFail } from "./CatalogResolver";
 
-export const hasCatalogPermissions = async (context: Context, catalogId: number, permission: Permission) => {
+export const hasCatalogPermissions = async (context: Context, catalog: CatalogEntity, permission: Permission) => {
     if (permission == Permission.VIEW) {
-        const collection = await context.connection.getCustomRepository(CatalogRepository).findOne({ id: catalogId });
-
-        if (collection?.isPublic || collection?.unclaimed) {
+        if (catalog?.isPublic || catalog?.unclaimed) {
             return true;
         }
     }
@@ -22,9 +22,7 @@ export const hasCatalogPermissions = async (context: Context, catalogId: number,
         return false;
     }
 
-    return context.connection
-        .getCustomRepository(UserCatalogPermissionRepository)
-        .hasPermission(context.me.id, catalogId, permission);
+    return await getCatalogPermissionsStatusFromCacheOrDb(context, catalog.id, permission);
 };
 
 export const setUserCatalogPermission = async (
@@ -43,10 +41,7 @@ export const setUserCatalogPermission = async (
 ) => {
     validateMessageContents(message);
 
-    const catalogEntity = await context.connection
-        .getCustomRepository(CatalogRepository)
-        .findCatalogBySlugOrFail(identifier.catalogSlug);
-
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, identifier);
     const inviteUsers: UserEntity[] = [];
     const existingUsers: UserEntity[] = [];
 
@@ -94,17 +89,11 @@ export const setUserCatalogPermission = async (
     });
 
     await asyncForEach(inviteUsers, async (user) => {
-        await sendShareNotification(
-            user,
-            context.me.displayName,
-            catalogEntity.displayName,
-            "/" + catalogEntity.slug,
-            message
-        );
+        await sendShareNotification(user, context.me.displayName, catalog.displayName, "/" + catalog.slug, message);
     });
 
     await asyncForEach(inviteUsers, async (user) => {
-        await sendInviteUser(user, context.me.displayName, catalogEntity.displayName, message);
+        await sendInviteUser(user, context.me.displayName, catalog.displayName, message);
     });
 };
 
@@ -117,4 +106,30 @@ export const deleteUserCatalogPermissions = async (
         identifier,
         usernameOrEmailAddress
     });
+};
+
+export const getCatalogPermissionsStatusFromCacheOrDb = async (
+    context: Context,
+    catalogId: number,
+    permission: Permission
+) => {
+    if (!context.me) {
+        return false;
+    }
+
+    const userId = context.me.id;
+    const permissionsPromiseFunction = () =>
+        context.connection
+            .getCustomRepository(UserCatalogPermissionRepository)
+            .hasPermission(userId, catalogId, permission);
+
+    return await context.cache.loadCatalogPermissionsStatusById(catalogId, permission, permissionsPromiseFunction);
+};
+
+export const getCatalogPermissionsFromCacheOrDb = async (context: Context, catalogId: number, userId: number) => {
+    const catalogPermissionsPromiseFunction = () =>
+        context.connection
+            .getCustomRepository(UserCatalogPermissionRepository)
+            .findCatalogPermissions({ catalogId, userId }) as Promise<UserCatalogPermissionEntity>;
+    return context.cache.loadCatalogPermissionsById(catalogId, catalogPermissionsPromiseFunction);
 };

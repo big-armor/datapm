@@ -12,8 +12,10 @@ import { sendInviteUser, sendShareNotification, validateMessageContents } from "
 
 export const hasPackagePermissions = async (context: Context, packageId: number, permission: Permission) => {
     if (permission == Permission.VIEW) {
-        const packageEntity = await context.connection.getRepository(PackageEntity).findOneOrFail({ id: packageId });
-        if (packageEntity?.isPublic || packageEntity.catalog.unclaimed) {
+        const packagePromiseFunction = () =>
+            context.connection.getRepository(PackageEntity).findOneOrFail({ id: packageId });
+        const packageEntity = await context.cache.loadPackage(packageId, packagePromiseFunction);
+        if (packageEntity?.isPublic) {
             return true;
         }
     }
@@ -22,9 +24,13 @@ export const hasPackagePermissions = async (context: Context, packageId: number,
         return false;
     }
 
-    return context.connection
-        .getCustomRepository(PackagePermissionRepository)
-        .hasPermission(context.me.id, packageId, permission);
+    const userId = context.me.id;
+    const permissionPromiseFunction = () =>
+        context.connection
+            .getCustomRepository(PackagePermissionRepository)
+            .hasPermission(userId, packageId, permission);
+
+    return await context.cache.loadPackagePermissionsStatusById(packageId, permission, permissionPromiseFunction);
 };
 
 export const hasPackageEntityPermissions = async (
@@ -42,9 +48,17 @@ export const hasPackageEntityPermissions = async (
         return false;
     }
 
-    return context.connection
-        .getCustomRepository(PackagePermissionRepository)
-        .hasPermission(context.me.id, packageEntity.id, permission);
+    const userId = context.me.id;
+    const permissionPromiseFunction = () =>
+        context.connection
+            .getCustomRepository(PackagePermissionRepository)
+            .hasPermission(userId, packageEntity.id, permission);
+
+    return await context.cache.loadPackagePermissionsStatusById(
+        packageEntity.id,
+        permission,
+        permissionPromiseFunction
+    );
 };
 
 export const setPackagePermissions = async (

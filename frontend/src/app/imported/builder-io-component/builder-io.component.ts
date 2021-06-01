@@ -25,7 +25,7 @@ export class BuilderIOComponent implements AfterViewInit {
 
     private destroy$ = new Subject();
 
-    constructor(private builderIOService: BuilderIOService, private elementRef: ElementRef) { }
+    constructor(private builderIOService: BuilderIOService, private elementRef: ElementRef) {}
 
     public ngAfterViewInit(): void {
         this.loadJavascriptAndInjectIntoTemplate();
