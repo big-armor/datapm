@@ -3,7 +3,14 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { PackageFile, parsePackageFileJSON, Schema, validatePackageFileInBrowser } from "datapm-lib";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
-import { User, Collection, Package, PackageCollectionsGQL, PackageIdentifierInput } from "src/generated/graphql";
+import {
+    User,
+    Collection,
+    Package,
+    PackageCollectionsGQL,
+    PackageIdentifierInput,
+    MovePackageGQL
+} from "src/generated/graphql";
 import { PackageService, PackageResponse } from "../../services/package.service";
 @Component({
     selector: "package-description",
@@ -32,6 +39,7 @@ export class PackageDescriptionComponent {
     constructor(
         private packageService: PackageService,
         private packageCollectionsGQL: PackageCollectionsGQL,
+        private movePackageGQL: MovePackageGQL,
         private router: Router,
         private route: ActivatedRoute
     ) {
@@ -79,6 +87,20 @@ export class PackageDescriptionComponent {
                 this.selectedSchema = this.schemas[0];
             }
         });
+
+        this.move();
+    }
+
+    private move() {
+        // this.movePackageGQL.mutate({
+        //     identifier: {
+        //         catalogSlug: "moli",
+        //         packageSlug: "adresari"
+        //     },
+        //     targetCatalog: {
+        //         catalogSlug: "malezi"
+        //     }
+        // }).subscribe();
     }
 
     public canManage() {

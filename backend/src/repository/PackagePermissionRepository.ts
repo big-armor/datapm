@@ -1,4 +1,4 @@
-import { EntityRepository, EntityManager } from "typeorm";
+import { EntityRepository, EntityManager, DeleteResult } from "typeorm";
 
 import { UserPackagePermissionEntity } from "../entity/UserPackagePermissionEntity";
 import { UserRepository } from "./UserRepository";
@@ -69,6 +69,19 @@ export class PackagePermissionRepository {
             .addRelations(ALIAS, relations)
             .where({ packageId: packageEntity.id })
             .getMany();
+    }
+
+    public async deleteUsersPermissionsByPackageIdExceptUser(packageId: number, userId: number): Promise<DeleteResult> {
+        return await this.manager
+            .getRepository(UserPackagePermissionEntity)
+            .createQueryBuilder("UserPackagePermissionEntity")
+            .where('"package_id" = :packageId')
+            .andWhere('"user_id" != :userId')
+            .setParameter("packageId", packageId)
+            .setParameter("userId", userId)
+            .delete()
+            .from(UserPackagePermissionEntity)
+            .execute();
     }
 
     public async setPackagePermissions({

@@ -88,6 +88,7 @@ export class HasCatalogPermissionDirective extends SchemaDirectiveVisitor {
                 args.catalogSlug ||
                 (args.value && args.value.catalogSlug) ||
                 (args.identifier && args.identifier.catalogSlug) ||
+                (args.catalogIdentifier && args.catalogIdentifier.catalogSlug) ||
                 undefined;
 
             if (catalogSlug === undefined) {
@@ -100,6 +101,7 @@ export class HasCatalogPermissionDirective extends SchemaDirectiveVisitor {
     }
 
     private async validatePermission(context: Context, catalogSlug: string, permission: Permission) {
+        // TODO: ERMAL USE CACHE
         const catalog = await context.connection
             .getCustomRepository(CatalogRepository)
             .findCatalogBySlugOrFail(catalogSlug);

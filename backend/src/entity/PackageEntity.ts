@@ -4,7 +4,6 @@ import { EntityBaseModel } from "./EntityBaseModel";
 import { CatalogEntity } from "./CatalogEntity";
 import { VersionEntity } from "./VersionEntity";
 import { UserEntity } from "./UserEntity";
-import { PackageIdentifier } from "../generated/graphql";
 
 @Entity({
     name: "package"

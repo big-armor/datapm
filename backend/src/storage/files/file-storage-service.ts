@@ -48,6 +48,10 @@ export class FileStorageService {
         return this.storageService.itemExists(namespace, itemId);
     }
 
+    public async moveFile(oldFilePath: string, newFilePath: string, callback: any): Promise<void> {
+        return this.storageService.moveFile(oldFilePath, newFilePath, callback);
+    }
+
     public async deleteFile(namespace: string, itemId: string): Promise<void> {
         try {
             return this.storageService.deleteItem(namespace, itemId);

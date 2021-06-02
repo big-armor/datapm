@@ -1,9 +1,10 @@
 import { DPMStorage } from "./dpm-storage";
 import { Readable } from "stream";
-import * as fs from "fs";
 import { DpmStorageStreamHolder } from "./dpm-storage-stream-holder";
 import { StorageErrors } from "./files/file-storage-service";
 import sanitize from "sanitize-filename";
+
+const fs = require("fs-extra");
 
 export class FileStorage implements DPMStorage {
     public static readonly SCHEMA_URL_PREFIX = "file";
@@ -29,14 +30,18 @@ export class FileStorage implements DPMStorage {
     public itemExists(namespace: string, itemId: string): Promise<boolean> {
         const sanitizedItemId = sanitize(itemId);
         const path = this.buildPath(namespace, sanitizedItemId);
-        return Promise.resolve(fs.existsSync(path));
+        console.log("checking path", path);
+        const itemExistsInPath = this.itemExistsInAbsolutePath(path);
+        return Promise.resolve(itemExistsInPath);
     }
 
     public deleteItem(namespace: string, itemId: string): Promise<void> {
         const sanitizedItemId = sanitize(itemId);
         const path = this.buildPath(namespace, sanitizedItemId);
 
-        if (!fs.existsSync(path)) return Promise.resolve();
+        if (!fs.existsSync(path)) {
+            return Promise.resolve();
+        }
 
         fs.unlinkSync(path);
         return Promise.resolve();
@@ -63,6 +68,16 @@ export class FileStorage implements DPMStorage {
         return this.streamHelper.copyToStream(byteStream, writeStream, transformer);
     }
 
+    public async moveFile(oldFilePath: string, newFilePath: string, callback?: any): Promise<void> {
+        const oldFileFinalPath = this.buildBasePath(oldFilePath);
+        if (!this.itemExistsInAbsolutePath(oldFileFinalPath)) {
+            throw new Error(StorageErrors.FILE_DOES_NOT_EXIST);
+        }
+
+        const newFileFinalPath = this.buildBasePath(newFilePath);
+        return fs.move(oldFileFinalPath, newFileFinalPath, { overwrite: true }, callback);
+    }
+
     public stop(): boolean {
         return this.streamHelper.destroyOpenStreams();
     }
@@ -84,7 +99,15 @@ export class FileStorage implements DPMStorage {
         }
     }
 
+    private itemExistsInAbsolutePath(path: string): boolean {
+        return fs.existsSync(path);
+    }
+
     private buildPath(namespace: string, itemId: string): string {
-        return `${this.SCHEMA_URL}/${namespace}/${itemId}`;
+        return `${this.buildBasePath(namespace)}/${itemId}`;
+    }
+
+    private buildBasePath(namespace: string): string {
+        return `${this.SCHEMA_URL}/${namespace}`;
     }
 }

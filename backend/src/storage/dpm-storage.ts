@@ -5,6 +5,7 @@ export interface DPMStorage {
     writeItem(namespace: string, itemId: string, byteStream: Readable, transformer?: any): Promise<void>;
     getItem(namespace: string, itemId: string): Promise<Readable>;
     deleteItem(namespace: string, itemId: string): Promise<void>;
+    moveFile(oldFilePath: string, newFilePath: string, callback: any): Promise<void>;
     itemExists(namespace: string, itemId: string): Promise<boolean>;
     stop(): boolean;
 }

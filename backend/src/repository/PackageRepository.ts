@@ -1,4 +1,4 @@
-import { EntityRepository, EntityManager, FindOneOptions, Repository } from "typeorm";
+import { EntityRepository, EntityManager, FindOneOptions, Repository, Connection } from "typeorm";
 
 import { CreatePackageInput, UpdatePackageInput, PackageIdentifierInput, Permission } from "../generated/graphql";
 import { AuthenticatedContext } from "../context";
@@ -13,8 +13,6 @@ import { UserEntity } from "../entity/UserEntity";
 import { UserInputError } from "apollo-server";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { UserRepository } from "./UserRepository";
-import { ActivityLogRepository } from "./ActivityLogRepository";
-import { ActivityLogEntity } from "../entity/ActivityLogEntity";
 
 const PUBLIC_PACKAGES_QUERY = '("PackageEntity"."isPublic" is true)';
 const AUTHENTICATED_USER_PACKAGES_QUERY = `
@@ -263,27 +261,36 @@ export class PackageRepository extends Repository<PackageEntity> {
             packageEntity.updatedAt = new Date();
             packageEntity.creatorId = userId;
 
-            validation(packageEntity);
-
-            const insertedPackage = await transaction.save(packageEntity);
-
-            // add user as package manager of new package
-            await transaction.getRepository(UserPackagePermissionEntity).insert({
-                packageId: insertedPackage.id,
-                userId,
-                permissions: allPermissions(),
-                createdAt: new Date()
-            });
-
-            // requery resulting inserted person for graphql query result
-            // needed to add proper joins
-            const queryPackage = await findPackageById(transaction, insertedPackage.id, relations);
-            if (!queryPackage) {
-                throw new Error("Unable to retrieve newly created package - this should never happen");
-            }
-
-            return queryPackage;
+            return await this.createPackageEntity(transaction, userId, packageEntity, relations);
         });
+    }
+
+    async createPackageEntity(
+        connection: EntityManager,
+        userId: number,
+        packageEntity: PackageEntity,
+        relations: string[] = []
+    ): Promise<PackageEntity> {
+        validation(packageEntity);
+
+        const insertedPackage = await connection.save(packageEntity);
+
+        // add user as package manager of new package
+        await connection.getRepository(UserPackagePermissionEntity).insert({
+            packageId: insertedPackage.id,
+            userId,
+            permissions: allPermissions(),
+            createdAt: new Date()
+        });
+
+        // requery resulting inserted person for graphql query result
+        // needed to add proper joins
+        const queryPackage = await findPackageById(connection, insertedPackage.id, relations);
+        if (!queryPackage) {
+            throw new Error("Unable to retrieve newly created package - this should never happen");
+        }
+
+        return queryPackage;
     }
 
     updatePackage({
