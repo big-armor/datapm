@@ -1,8 +1,15 @@
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1 col-md-12 col-sm-12">
+            <sd-hero></sd-hero>
+        </div>
+    </div>
+</div>
 <hr style="width: 100%" class="header-border" />
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <ul class="p-0" id="homeRoutes">
+            <ul class="px-2" id="homeRoutes">
                 <span *ngFor="let route of routes">
                     <li *ngIf="!route.authRequired || currentUser != null" class="list-names">
                         <a
@@ -15,13 +22,6 @@
                     </li>
                 </span>
             </ul>
-        </div>
-    </div>
-</div>
-<div class="container">
-    <div class="row">
-        <div class="col-lg-10 offset-lg-1 col-md-12 col-sm-12 mt-5 py-2">
-            <sd-hero></sd-hero>
         </div>
     </div>
 </div>
