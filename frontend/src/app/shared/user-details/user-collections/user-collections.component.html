@@ -48,16 +48,39 @@
                                 <a class="app-outlined-button" (click)="createCollection()">Create A Collection</a>
                             </div>
 
-                            <div class="container">
-                                <!-- Package without thumbnail -->
-                                <table
+                            <div class="col-md-10">
+                                <mat-card class="box-line my-3" (click)="goToComponent()">
+                                    <mat-card-content>
+                                        <div class="d-flex bd-highlight d-flex align-items-center">
+                                            <div class="p-2 flex-grow-1 bd-highlight">
+                                                <div
+                                                    [class.public-text]="item?.isPublic"
+                                                    [class.not-public-text]="!item?.isPublic"
+                                                >
+                                                    {{ item?.isPublic ? "public" : "not public" }}
+                                                </div>
+                                                <a class="box-name">Collection name</a>
+                                                <div class="text-light-gray">collection description</div>
+                                            </div>
+                                            <div class="p-2 bd-highlight">
+                                                <a class="app-outlined-button mr-2" (click)="editCollection(collection)"
+                                                    >Edit</a
+                                                >
+                                                <a class="app-outlined-button" (click)="deleteCollection(collection)"
+                                                    ><span class="delete-txt">Delete</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </mat-card-content>
+                                </mat-card>
+                                <!-- <table
                                     *ngIf="collections && collections.length > 0"
                                     mat-table
                                     class="gray-table"
                                     [dataSource]="collections"
                                     aria-describedby="collectionsTable"
                                 >
-                                    <!-- Label column -->
+
                                     <ng-container matColumnDef="name">
                                         <th scope="col" mat-header-cell *matHeaderCellDef>Name</th>
                                         <td class="table-content" mat-cell *matCellDef="let collection">
@@ -81,7 +104,7 @@
                                         </td>
                                     </ng-container>
 
-                                    <!-- Actions column -->
+
                                     <ng-container matColumnDef="actions">
                                         <th scope="col" mat-header-cell *matHeaderCellDef>Actions</th>
                                         <td mat-cell *matCellDef="let collection">
@@ -96,7 +119,7 @@
 
                                     <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
                                     <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
-                                </table>
+                                </table> -->
                             </div>
                         </div>
                     </div>

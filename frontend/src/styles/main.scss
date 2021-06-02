@@ -490,6 +490,26 @@ mat-select {
     }
 }
 
+.box-line {
+    cursor: pointer;
+    padding: 6px 16px !important;
+    box-shadow: var(--outer-shadow-1) !important;
+    background-color: var(--gray-7-color);
+    transition: background-color 0.5s ease !important;
+
+    &:hover {
+        background-color: var(--custom-secondary-color);
+        transition: background-color 0.5s ease;
+    }
+
+    .box-name {
+        font-family: $family-roboto;
+        font-size: ($default-font - 1);
+        color: var(--info-color);
+        margin-bottom: 2px !important;
+    }
+}
+
 .app-raised-button {
     outline: none !important;
     border-radius: 4px;
