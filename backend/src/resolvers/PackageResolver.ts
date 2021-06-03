@@ -43,6 +43,7 @@ import { VersionEntity } from "../entity/VersionEntity";
 import { getUserFromCacheOrDbById } from "./UserResolver";
 import { getCollectionFromCacheOrDbOrFail } from "./CollectionResolver";
 import { PackageDataStorageService } from "../storage/data/package-data-storage-service";
+import { getCatalogPermissionsFromCacheOrDb } from "./UserCatalogPermissionResolver";
 
 export const packageEntityToGraphqlObjectOrNull = async (
     context: Context,
@@ -463,7 +464,13 @@ export const movePackage = async (
         await transaction.getCustomRepository(PackageRepository).save(packageEntity);
         await transaction
             .getCustomRepository(PackagePermissionRepository)
-            .deleteUsersPermissionsByPackageIdExceptUser(packageEntity.id, context.me.id);
+            .deleteUsersPermissionsByPackageId(packageEntity.id);
+
+        const userPermission = await getCatalogPermissionsFromCacheOrDb(context, targetCatalogEntity.id, context.me.id);
+        await transaction
+            .getCustomRepository(PackagePermissionRepository)
+            .storePackagePermissions(transaction, context.me.id, packageEntity.id, userPermission.permissions);
+
         await PackageDataStorageService.INSTANCE.movePackageDataInNewCatalog(
             context,
             identifier.catalogSlug,
