@@ -1,5 +1,6 @@
 import { Connection, EntityManager } from "typeorm";
 import { AuthenticatedContext } from "../context";
+import { resolveCatalogPermissionsForEntity } from "../directive/hasCatalogPermissionDirective";
 import { FollowEntity } from "../entity/FollowEntity";
 import {
     SaveFollowInput,
@@ -32,7 +33,7 @@ export const entityToGraphqlObject = async (context: EntityManager | Connection,
 
     return {
         notificationFrequency: entity.notificationFrequency,
-        eventTypes: entity.eventTypes,
+        eventTypes: entity.eventTypes || [],
         catalog: catalogEntityToGraphQLOrNull(entity.catalog),
         collection: collectionEntityToGraphQLOrNull(entity.collection),
         package: await packageEntityToGraphqlObjectOrNull(context, entity.package),
@@ -60,10 +61,12 @@ export const saveFollow = async (
         const catalog = await getCatalogOrFail({ slug: follow.catalog.catalogSlug, manager });
         existingFollowEntity = await followRepository.getFollowByCatalogId(userId, catalog.id);
 
-        const hasPermission = await manager
-            .getCustomRepository(UserCatalogPermissionRepository)
-            .doesUserHavePermission(userId, catalog.id, Permission.VIEW);
-        if (!hasPermission) {
+        // check that this user has the right to move this package to a different catalog
+        const hasViewPermission = (await resolveCatalogPermissionsForEntity(context, catalog)).includes(
+            Permission.VIEW
+        );
+
+        if (!hasViewPermission) {
             throw new Error("NOT_AUTHORIZED");
         }
 

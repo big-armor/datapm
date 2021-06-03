@@ -1,5 +1,6 @@
 import { Component, Inject } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { PageState } from "src/app/models/page-state";
 import {
     DeleteFollowGQL,
     Follow,
@@ -30,6 +31,8 @@ export enum FollowDialogResultType {
 })
 export class FollowDialogComponent {
     public readonly frequencies: NotificationFrequency[] = Object.values(NotificationFrequency);
+
+    submitState: PageState = "INIT";
 
     public follow: Follow;
     public isFollowing = false;
@@ -82,7 +85,19 @@ export class FollowDialogComponent {
                     notificationFrequency: this.selectedFrequency
                 }
             })
-            .subscribe(() => this.closeWithValues(this.follow, FollowDialogResultType.FOLLOW_UPDATED));
+            .subscribe(
+                ({ data, errors }) => {
+                    if (errors) {
+                        this.submitState = "ERROR";
+                        console.error(errors);
+                        return;
+                    }
+                    this.closeWithValues(this.follow, FollowDialogResultType.FOLLOW_UPDATED);
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
     }
 
     private closeWithValues(follow: Follow, type: FollowDialogResultType): void {

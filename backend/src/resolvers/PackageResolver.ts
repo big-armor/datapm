@@ -38,6 +38,7 @@ import { versionEntityToGraphqlObject } from "./VersionResolver";
 import { catalogEntityToGraphQL } from "./CatalogResolver";
 import { CollectionRepository } from "../repository/CollectionRepository";
 import { activtyLogEntityToGraphQL } from "./ActivityLogResolver";
+import { resolveCatalogPermissionsForEntity } from "../directive/hasCatalogPermissionDirective";
 
 export const packageEntityToGraphqlObjectOrNull = async (
     context: EntityManager | Connection,
@@ -370,7 +371,7 @@ export const createPackage = async (
                 targetPackageId: packageEntity?.id
             });
 
-            await createActivityLog(context.connection, {
+            await createActivityLog(transaction, {
                 userId: context.me.id,
                 eventType: ActivityLogEventType.CATALOG_PACKAGE_ADDED,
                 targetCatalogId: packageEntity.catalogId,
@@ -395,16 +396,15 @@ export const updatePackage = async (
     info: any
 ) => {
     if (value.newCatalogSlug) {
+        const catalog = await context.connection
+            .getCustomRepository(CatalogRepository)
+            .findCatalogBySlugOrFail(value.newCatalogSlug);
         // check that this user has the right to move this package to a different catalog
-        const hasPermission = await context.connection
-            .getCustomRepository(UserCatalogPermissionRepository)
-            .userHasPermission({
-                username: context.me.username,
-                catalogSlug: value.newCatalogSlug,
-                permission: Permission.EDIT
-            });
+        const hasEditPermission = (await resolveCatalogPermissionsForEntity(context, catalog)).includes(
+            Permission.EDIT
+        );
 
-        if (!hasPermission) {
+        if (!hasEditPermission) {
             throw new ForbiddenError("NOT_AUTHORIZED");
         }
     }

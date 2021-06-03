@@ -167,40 +167,6 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
             .getMany();
     }
 
-    async userHasPermission({
-        username,
-        catalogSlug,
-        permission
-    }: {
-        username: string;
-        catalogSlug: string;
-        permission: Permission;
-    }): Promise<boolean> {
-        const catalog = await this.manager.getRepository(CatalogEntity).findOneOrFail({
-            slug: catalogSlug
-        });
-
-        const user = await this.manager.getRepository(UserEntity).findOneOrFail({
-            username
-        });
-
-        const userCatalogPermission = await this.manager.getRepository(UserCatalogPermissionEntity).findOneOrFail({
-            userId: user.id,
-            catalogId: catalog.id
-        });
-
-        return userCatalogPermission.permissions.indexOf(permission) != -1;
-    }
-
-    async doesUserHavePermission(userId: number, catalogId: number, permission: Permission): Promise<boolean> {
-        const userCatalogPermission = await this.manager.getRepository(UserCatalogPermissionEntity).findOneOrFail({
-            userId,
-            catalogId
-        });
-
-        return userCatalogPermission.permissions.indexOf(permission) != -1;
-    }
-
     public async findByUserAndCatalogId(
         userId: number,
         catalogId: number

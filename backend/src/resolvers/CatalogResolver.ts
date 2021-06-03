@@ -212,8 +212,8 @@ export const updateCatalog = async (
     info: any
 ) => {
     return context.connection.transaction(async (transaction) => {
-        if (!context.me.isAdmin && value.unclaimed !== undefined) {
-            throw new Error("NOT_AUTHORIZED");
+        if (!context.me.isAdmin && value.unclaimed === true) {
+            throw new Error("NOT_AUTHORIZED"); // TODO move this into the directive logic for hasCatalogPermission
         }
 
         const catalog = await transaction.getCustomRepository(CatalogRepository).updateCatalog({

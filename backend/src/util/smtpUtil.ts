@@ -2,6 +2,7 @@ import { UserEntity } from "../entity/UserEntity";
 import { createTransport } from "nodemailer";
 import * as fs from "fs";
 import { Address } from "nodemailer/lib/mailer";
+import Mustache from "mustache";
 
 export enum EMAIL_SUBJECTS {
     NEW_API_KEY = "⚠ New API Key Created",
@@ -9,6 +10,48 @@ export enum EMAIL_SUBJECTS {
     FORGOT_PASSWORD = "⚠ Recover Your Account",
     INVITE_USER = "🚀 Data Invite",
     USER_SUSPENDED = "Your account has been suspended"
+}
+
+export interface NotificationEmail {
+    frequency: string;
+    firstName: string;
+    username: string;
+    catalogs: {
+        slug: string;
+        displayName: string;
+        edited: boolean;
+        editedBy: {
+            username: string;
+            usernameOrName: string;
+        }[];
+        hasPackagesAdded: boolean;
+        packagesAdded: {
+            catalogSlug: string;
+            packageSlug: string;
+        }[];
+        hasPackagesRemoved: boolean;
+        packagesRemoved: {
+            catalogSlug: string;
+            packageSlug: string;
+        }[];
+    }[];
+}
+
+export async function sendFollowNotificationEmail(
+    user: UserEntity,
+    frequency: string,
+    notification: NotificationEmail
+) {
+    let emailText = fs.readFileSync("./static/email-templates/follow-notification.txt", "utf8");
+    let emailHTML = fs.readFileSync("./static/email-templates/follow-notification.html", "utf8");
+
+    emailText = replaceCommonTokens(user, emailText);
+    emailText = Mustache.render(emailText, notification);
+
+    emailHTML = replaceCommonTokens(user, emailHTML);
+    emailHTML = Mustache.render(emailHTML, notification);
+
+    sendEmail(user, frequency.toLowerCase() + ` data updates`, emailText, emailHTML);
 }
 
 export async function sendAPIKeyCreatedEmail(user: UserEntity, apiKeyLabel: string) {
@@ -21,7 +64,7 @@ export async function sendAPIKeyCreatedEmail(user: UserEntity, apiKeyLabel: stri
     emailHTML = replaceCommonTokens(user, emailHTML);
     emailHTML = emailHTML.replace(/{{api_key_label}}/g, apiKeyLabel);
 
-    sendEmail(user, EMAIL_SUBJECTS.NEW_API_KEY, emailText, emailHTML);
+    await sendEmail(user, EMAIL_SUBJECTS.NEW_API_KEY, emailText, emailHTML);
 }
 
 export async function sendUserSuspendedEmail(user: UserEntity, message: string) {

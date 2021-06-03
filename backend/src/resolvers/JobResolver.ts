@@ -33,5 +33,7 @@ export const runJob = async (
         dailyNotifications();
     } else if (job === "weeklyNotifications") {
         weeklyNotifications();
+    } else {
+        throw new Error("JOB_NOT_RECOGNIZED - " + job);
     }
 };

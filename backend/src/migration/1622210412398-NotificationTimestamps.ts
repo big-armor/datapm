@@ -6,6 +6,14 @@ const sql = `
 
     ALTER TYPE activity_log_event_type_enum ADD VALUE 'CATALOG_PACKAGE_ADDED';
     ALTER TYPE activity_log_event_type_enum ADD VALUE 'CATALOG_PACKAGE_REMOVED';
+
+    delete from "activity_log" where target_package_version_id not in (select id from "version" v2 );
+
+    delete from "activity_log" where target_package_issue_id not in (select id from package_issue v2 );
+    
+    ALTER TABLE "public"."activity_log" ADD CONSTRAINT activity_log_target_package_version_id_fkey FOREIGN KEY (target_package_version_id) REFERENCES "public"."version" (id) ON DELETE CASCADE;
+    ALTER TABLE "public"."activity_log" ADD CONSTRAINT activity_log_target_package_issue_id_fkey FOREIGN KEY (target_package_issue_id) REFERENCES "public"."package_issue" (id) ON DELETE CASCADE;
+    
     
     DROP FROM "follow";
     ALTER TABLE "follow" DROP COLUMN event_types;

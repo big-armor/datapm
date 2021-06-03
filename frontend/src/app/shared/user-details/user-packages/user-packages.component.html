@@ -8,7 +8,12 @@
                     </div>
                     <div class="col-lg-9 no-pd-mobile">
                         <span *ngIf="isCurrentUser" class="text-dark-gray">
-                            Below are the packages you have published in your user catalog on this registry.
+                            <span *ngIf="packages.length == 0">
+                                You have no published packages in your user catalog on this registry.
+                            </span>
+                            <span *ngIf="packages.length > 0">
+                                Below are the packages you have published in your user catalog on this registry.
+                            </span>
                             <a href="/docs/publish-data" target="_blank">
                                 <span style="font-size: 13px">Learn how to publish a package.</span>
                             </a>

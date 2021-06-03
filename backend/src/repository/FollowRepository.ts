@@ -219,7 +219,7 @@ export class FollowRepository extends Repository<FollowEntity> {
            where
            a.created_at  > $2
            AND a.created_at <= $3 
-           and a.target_catalog_id  = f.target_catalog_id 
+           and a.target_catalog_id = f.target_catalog_id 
            and a.event_type in (select * from unnest( f.event_types)) 
            and a.user_id <> f.user_id 
            group by a.event_type

@@ -1,10 +1,15 @@
 import { Connection } from "typeorm";
-import { NotificationFrequency } from "../generated/graphql";
+import { ActivityLogEventType, NotificationFrequency } from "../generated/graphql";
 import { FollowRepository } from "../repository/FollowRepository";
 import { combineNotifications, Notification } from "../util/notificationUtil";
 import { CronJob } from "cron";
 import { PlatformStateRepository } from "../repository/PlatformStateRepository";
 import { PlatformStateEntity } from "../entity/PlatformStateEntity";
+import { UserRepository } from "../repository/UserRepository";
+import { NotificationEmail, sendFollowNotificationEmail } from "../util/smtpUtil";
+import { CatalogRepository } from "../repository/CatalogRepository";
+import { PackageEntity } from "../entity/PackageEntity";
+import { PackageRepository } from "../repository/PackageRepository";
 
 let databaseConnection: Connection | null;
 
@@ -38,6 +43,9 @@ async function prepareAndSendNotifications(stateKey: string, frequency: Notifica
     if (result) {
         lastNotificationDate = new Date(result.serializedState);
     }
+
+    console.log("REMOVE THE LINE BELOW THIS! JUST FOR TESTING");
+    lastNotificationDate = new Date(0); // REMOVE ME JUST FOR TESTING
 
     const now = new Date();
 
@@ -73,6 +81,97 @@ async function sendNotifications(
     connection: Connection
 ) {
     const pendingNotifications = await getPendingNotification(connection, frequency, startDate, endDate);
+
+    for (const notification of pendingNotifications) {
+        const user = await connection.getCustomRepository(UserRepository).findOneOrFail({
+            where: {
+                id: notification.userId
+            }
+        });
+
+        const notificationEmail: NotificationEmail = {
+            username: user.username,
+            firstName: user.firstName || "",
+            frequency: frequency.toString().toLowerCase(),
+            catalogs: await Promise.all(
+                notification.catalogNotifications.map(async (n) => {
+                    const catalogEntity = await connection
+                        .getCustomRepository(CatalogRepository)
+                        .findOneOrFail(n.catalogId);
+
+                    const editedAction = n.actions.find((n) => n.event_type == ActivityLogEventType.CATALOG_EDIT);
+
+                    const edited = editedAction != null;
+
+                    let madePublic = false;
+                    let madeNotPublic = false;
+                    if (editedAction?.properties_edited.includes("public")) {
+                        if (catalogEntity.isPublic) {
+                            madePublic = true;
+                        } else {
+                            madeNotPublic = true;
+                        }
+                    }
+
+                    const editedBy = await Promise.all(
+                        n.actions
+                            .find((n) => n.event_type == ActivityLogEventType.CATALOG_EDIT)
+                            ?.action_users.map(async (u) => {
+                                const editorEntity = await connection
+                                    .getCustomRepository(UserRepository)
+                                    .findOneOrFail(u);
+
+                                return {
+                                    username: editorEntity.username,
+                                    usernameOrName: editorEntity.displayName
+                                };
+                            }) || []
+                    );
+
+                    let packagesAdded: {
+                        packageSlug: string;
+                        catalogSlug: string;
+                    }[] = [];
+
+                    try {
+                        packagesAdded = await Promise.all(
+                            n.actions
+                                .find((n) => n.event_type === ActivityLogEventType.CATALOG_PACKAGE_ADDED)
+                                ?.package_ids.map(async (p) => {
+                                    const packageEntity = await connection
+                                        .getCustomRepository(PackageRepository)
+                                        .findPackageByIdOrFail({ packageId: p, relations: ["catalog"] });
+                                    return {
+                                        catalogSlug: packageEntity.catalog.slug,
+                                        packageSlug: packageEntity.slug
+                                    };
+                                }) || []
+                        );
+                    } catch (error) {
+                        console.error(error);
+                    }
+
+                    return {
+                        madePublic,
+                        madeNotPublic,
+                        changedSlug: editedAction?.properties_edited.includes("slug"),
+                        changedName: editedAction?.properties_edited.includes("displayName"),
+                        changedDescription: editedAction?.properties_edited.includes("description"),
+                        displayName: catalogEntity.displayName,
+                        slug: catalogEntity.slug,
+                        editedBy: editedBy,
+                        edited,
+                        hasPackagesAdded: packagesAdded.length > 0,
+                        packagesAdded,
+                        hasPackagesRemoved: false,
+                        packagesRemoved: [] // TODO - database doesn't keep removed packages
+                    };
+                })
+            )
+        };
+
+        sendFollowNotificationEmail(user, frequency, notificationEmail);
+    }
 }
 
 /** Returns pending notifications for each user based on the start and end date range of the actions
