@@ -1,0 +1,61 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 p-0" id="movePackage">
+            <div mat-dialog-title id="contentTitle">Move Package</div>
+            <div mat-dialog-content id="contentBorder">
+                <div class="pt-1 pb-3">
+                    <label class="div-question pl-1"> Choose Catalog </label>
+                    <div class="div-answer my-2">
+                        <app-input
+                            class="flat-input px-0"
+                            controlName="collectionSlug"
+                            inputStyle="flat"
+                            placeholder="Catalog"
+                            matInput
+                        ></app-input>
+                        <mat-autocomplete autoActiveFirstOption>
+                            <mat-option> option 1 </mat-option>
+                            <mat-option> option 2 </mat-option>
+                            <mat-option> option 3 </mat-option>
+                        </mat-autocomplete>
+                    </div>
+                    <div class="ml-1 text-danger" *ngIf="existCatalog">This catalog doesn't exist.</div>
+                    <div class="ml-1 text-danger" *ngIf="editPermission">
+                        You do not have EDIT permission on this Catalog.
+                    </div>
+                    <div class="ml-1 text-light-gray" *ngIf="editPermission" style="font-size: 11px">
+                        *This package will no longer be public, because the CATALOG_NAME catalog is not public
+                    </div>
+                    <!-- <section class="example-section">
+                        <mat-checkbox class="example-margin ml-1 text-light-gray">
+                            <span class="checkbox-txt"
+                                >Moving this package is permanent, and you will have Permission permission after this
+                                move</span
+                            >
+                        </mat-checkbox>
+                    </section>
+                    <section class="example-section">
+                        <mat-checkbox class="example-margin ml-1 text-light-gray">
+                            <span>All existing links and URLs to this package will be broken</span>
+                        </mat-checkbox>
+                    </section> -->
+                    <section class="example-section">
+                        <mat-checkbox class="example-margin ml-1 text-light-gray">
+                            <span
+                                >All other users will loose access to this package, and the new package manager must
+                                re-add other target users</span
+                            >
+                        </mat-checkbox>
+                    </section>
+                </div>
+            </div>
+
+            <div mat-dialog-actions class="d-flex justify-content-between">
+                <button mat-dialog-close class="modal-close-btn">Cancel</button>
+                <button class="modal-submit-btn">
+                    <span>Confirm Move</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
