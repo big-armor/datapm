@@ -7,7 +7,11 @@ import { CountPrecision, PackageFile, Schema } from "datapm-lib";
 export class PackageSizePipe implements PipeTransform {
     private readonly units = ["B", "KB", "MB", "GB"];
 
-    transform(value: PackageFile): unknown {
+    public transform(value: PackageFile): unknown {
+        if (!value) {
+            return 0;
+        }
+
         const totalSize =
             value.sources.reduce(
                 (sum, item) => sum + item.streamSets.reduce((sum, item) => sum + item.streamStats.byteCount, 0),

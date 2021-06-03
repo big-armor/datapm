@@ -9,7 +9,8 @@ import {
     Package,
     PackageCollectionsGQL,
     PackageIdentifierInput,
-    MovePackageGQL
+    MovePackageGQL,
+    Permission
 } from "src/generated/graphql";
 import { PackageService, PackageResponse } from "../../services/package.service";
 @Component({
@@ -36,10 +37,11 @@ export class PackageDescriptionComponent {
     public collections: Collection[] = [];
     public relatedPackages: Package[] = [];
 
+    public hasEditPackagePermissions: boolean = false;
+
     constructor(
         private packageService: PackageService,
         private packageCollectionsGQL: PackageCollectionsGQL,
-        private movePackageGQL: MovePackageGQL,
         private router: Router,
         private route: ActivatedRoute
     ) {
@@ -49,6 +51,7 @@ export class PackageDescriptionComponent {
             }
 
             this.package = p.package;
+            this.hasEditPackagePermissions = this.package.myPermissions?.includes(Permission.EDIT);
 
             const packageIdentifier = {
                 catalogSlug: this.package.identifier.catalogSlug,
@@ -75,32 +78,25 @@ export class PackageDescriptionComponent {
                 }
             });
 
-            validatePackageFileInBrowser(p.package.latestVersion.packageFile);
-            this.packageFile = parsePackageFileJSON(p.package.latestVersion.packageFile);
-            this.schemas = this.packageFile.schemas;
+            const serializedPackageFile = p.package.latestVersion.packageFile;
+            if (serializedPackageFile) {
+                validatePackageFileInBrowser(serializedPackageFile);
+                this.packageFile = parsePackageFileJSON(serializedPackageFile);
 
-            this.shouldShowMoreReadMeButton = this.packageFile.readmeMarkdown?.length > this.SHOW_MORE_CHARACTER_LIMIT;
-            this.shouldShowMoreLicenseButton =
-                this.packageFile.licenseMarkdown?.length > this.SHOW_MORE_CHARACTER_LIMIT;
+                if (this.packageFile) {
+                    this.schemas = this.packageFile.schemas;
 
-            if (this.schemas.length) {
-                this.selectedSchema = this.schemas[0];
+                    this.shouldShowMoreReadMeButton =
+                        this.packageFile.readmeMarkdown?.length > this.SHOW_MORE_CHARACTER_LIMIT;
+                    this.shouldShowMoreLicenseButton =
+                        this.packageFile.licenseMarkdown?.length > this.SHOW_MORE_CHARACTER_LIMIT;
+
+                    if (this.schemas.length) {
+                        this.selectedSchema = this.schemas[0];
+                    }
+                }
             }
         });
-
-        this.move();
-    }
-
-    private move() {
-        // this.movePackageGQL.mutate({
-        //     identifier: {
-        //         catalogSlug: "moli",
-        //         packageSlug: "adresari"
-        //     },
-        //     targetCatalog: {
-        //         catalogSlug: "malezi"
-        //     }
-        // }).subscribe();
     }
 
     public canManage() {
