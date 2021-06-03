@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { Catalog, UpdateCatalogGQL, DeleteCatalogGQL, UserCatalogsGQL } from "src/generated/graphql";
+import { Catalog, UpdateCatalogGQL, DeleteCatalogGQL, UserCatalogsGQL, Permission } from "src/generated/graphql";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
@@ -86,7 +86,7 @@ export class UserCatalogsComponent implements OnInit {
     }
 
     public deleteCatalog(catalog: Catalog): void {
-        if (!this.canModifyCatalog(catalog.identifier.catalogSlug)) {
+        if (!this.canManageCatalog(catalog)) {
             return;
         }
 
@@ -108,7 +108,7 @@ export class UserCatalogsComponent implements OnInit {
     }
 
     public editCatalog(catalog: Catalog): void {
-        if (!this.canModifyCatalog(catalog.identifier.catalogSlug)) {
+        if (!this.canModifyCatalog(catalog)) {
             return;
         }
 
@@ -126,8 +126,16 @@ export class UserCatalogsComponent implements OnInit {
             });
     }
 
-    public canModifyCatalog(catalogSlug: string): boolean {
-        return catalogSlug && catalogSlug !== this.username;
+    public canModifyCatalog(catalog: Catalog): boolean {
+        return (
+            catalog &&
+            catalog.identifier.catalogSlug !== this.username &&
+            catalog.myPermissions?.includes(Permission.EDIT)
+        );
+    }
+
+    public canManageCatalog(catalog: Catalog): boolean {
+        return catalog && catalog.myPermissions?.includes(Permission.MANAGE);
     }
 
     public updateCatalogVisibility(catalog: Catalog, changeEvent: MatSlideToggleChange): void {

@@ -622,4 +622,12 @@ export class UserRepository extends Repository<UserEntity> {
             console.error(error.message);
         }
     }
+
+    async getMaxInstantUserNotificationDate(): Promise<Date> {
+        const response = await this.query('SELECT MAX(u.last_instant_notification) FROM "user" u');
+
+        const value = response[0].max as Date;
+
+        return value || new Date();
+    }
 }

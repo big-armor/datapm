@@ -2,8 +2,14 @@ import { Context } from "../context";
 import { hashPassword } from "../util/PasswordUtil";
 import { v4 as uuid } from "uuid";
 import { AuthenticationError } from "apollo-server-errors";
+import { dailyNotifications, weeklyNotifications } from "../service/notification-service";
 
-export const runScheduler = async (_0: any, { key }: { key: string }, context: Context, info: any): Promise<void> => {
+export const runJob = async (
+    _0: any,
+    { key, job }: { key: string; job: string },
+    context: Context,
+    info: any
+): Promise<void> => {
     if (process.env["SCHEDULER_KEY"] == null) {
         throw new Error("SCHEDULER_KEY environment variable not defined");
     }
@@ -22,5 +28,10 @@ export const runScheduler = async (_0: any, { key }: { key: string }, context: C
     if (hashedKeyValue !== process.env["SCHEDULER_KEY"]) {
         throw new AuthenticationError("SCHEDULER_KEY not correct");
     }
-    console.log("scheduler invoked via graphql!");
+
+    if (job === "dailyNotifications") {
+        dailyNotifications();
+    } else if (job === "weeklyNotifications") {
+        weeklyNotifications();
+    }
 };

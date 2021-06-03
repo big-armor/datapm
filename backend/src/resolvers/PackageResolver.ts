@@ -370,6 +370,13 @@ export const createPackage = async (
                 targetPackageId: packageEntity?.id
             });
 
+            await createActivityLog(context.connection, {
+                userId: context.me.id,
+                eventType: ActivityLogEventType.CATALOG_PACKAGE_ADDED,
+                targetCatalogId: packageEntity.catalogId,
+                targetPackageId: packageEntity.id
+            });
+
             return await packageEntityToGraphqlObject(transaction, packageEntity);
         } catch (error) {
             if (error.message == "CATALOG_NOT_FOUND") {

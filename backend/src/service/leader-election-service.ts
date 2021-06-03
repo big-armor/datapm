@@ -1,4 +1,5 @@
 import PGMutexLock from "pg-mutex-lock";
+import { Connection } from "typeorm";
 import { startNotificationService, stopNotificationService } from "./notification-service";
 
 let mutex: PGMutexLock | null;
@@ -9,7 +10,7 @@ let continueAttempting = true;
 
 let leader = false;
 
-export async function startLeaderElection() {
+export async function startLeaderElection(connection: Connection) {
     if (process.env["LEADER_ELECTION_DISABLED"] === "true") {
         console.log("LEADER_ELECTION_DISABLED is true. Not starting liferaft.");
         return;
@@ -36,7 +37,7 @@ export async function startLeaderElection() {
             leader = await mutex.acquireLock(LEADER_KEY);
             if (leader) {
                 console.log("I am the leader");
-                startLeaderServices();
+                startLeaderServices(connection);
             }
         } catch (error) {
             await new Promise((resolve) => {
@@ -55,8 +56,8 @@ export async function stopLeaderElection() {
     }
 }
 
-function startLeaderServices() {
-    startNotificationService();
+function startLeaderServices(connection: Connection) {
+    startNotificationService(connection);
 }
 
 async function stopLeaderServices() {

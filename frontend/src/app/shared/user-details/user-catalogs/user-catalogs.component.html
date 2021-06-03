@@ -69,13 +69,13 @@
                                 <td mat-cell *matCellDef="let catalog">
                                     <a
                                         class="app-outlined-button mr-3"
-                                        [class.disabled]="!canModifyCatalog(catalog.identifier.catalogSlug)"
+                                        [class.disabled]="!canModifyCatalog(catalog)"
                                         (click)="editCatalog(catalog)"
                                         >Edit</a
                                     >
                                     <a
                                         class="app-outlined-button"
-                                        [class.disabled]="!canModifyCatalog(catalog.identifier.catalogSlug)"
+                                        [class.disabled]="!canManageCatalog(catalog)"
                                         (click)="deleteCatalog(catalog)"
                                     >
                                         <span class="delete-txt">Delete</span>

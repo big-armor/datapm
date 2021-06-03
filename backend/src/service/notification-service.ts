@@ -1,48 +1,107 @@
-import AwaitLock from "await-lock";
+import { Connection } from "typeorm";
+import { NotificationFrequency } from "../generated/graphql";
+import { FollowRepository } from "../repository/FollowRepository";
+import { combineNotifications, Notification } from "../util/notificationUtil";
+import { CronJob } from "cron";
+import { PlatformStateRepository } from "../repository/PlatformStateRepository";
+import { PlatformStateEntity } from "../entity/PlatformStateEntity";
 
-let timeout: NodeJS.Timeout | null;
-let continueRunning = false;
-let isRunningValue = false;
-let stateLock = new AwaitLock();
+let databaseConnection: Connection | null;
 
-export function startNotificationService() {
-    continueRunning = true;
-    nextIteration();
+const dailyJob = new CronJob("0 0 8 1/1 * *", dailyNotifications, null, false, "America/New_York");
+const weeklyJob = new CronJob("0 0 8 1/1 * MON", weeklyNotifications, null, false, "America/New_York");
+
+export function startNotificationService(connection: Connection) {
+    databaseConnection = connection;
+    dailyJob.start();
+    weeklyJob.start();
 }
-
-async function isRunning() {}
 
 export async function stopNotificationService() {
-    continueRunning = false;
-    if (timeout) clearTimeout(timeout);
-
-    await stateLock.acquireAsync();
-    stateLock.release();
+    dailyJob.stop();
+    weeklyJob.start();
 }
 
-async function nextIteration() {
-    if (!continueRunning) {
-        return;
+export async function dailyNotifications() {
+    await prepareAndSendNotifications("lastDailyNotificationDate", NotificationFrequency.DAILY);
+}
+
+export async function weeklyNotifications() {
+    await prepareAndSendNotifications("lastWeeklyNotificationDate", NotificationFrequency.WEEKLY);
+}
+
+async function prepareAndSendNotifications(stateKey: string, frequency: NotificationFrequency) {
+    const result = await databaseConnection?.getCustomRepository(PlatformStateRepository).findStateByKey(stateKey);
+
+    let lastNotificationDate = new Date(new Date().getTime() - 1000);
+
+    if (result) {
+        lastNotificationDate = new Date(result.serializedState);
     }
 
-    timeout = setTimeout(async () => {
-        await stateLock.acquireAsync();
+    const now = new Date();
 
-        try {
-            isRunningValue = true;
-            await sendNotifications();
-        } finally {
-            isRunningValue = false;
-            stateLock.release();
-            nextIteration();
-        }
-    }, 5 * 1000);
+    try {
+        await sendNotifications(
+            NotificationFrequency.DAILY,
+            lastNotificationDate,
+            now,
+            databaseConnection as Connection
+        );
+    } catch (error) {
+        console.error("There was an error sending " + frequency + " notifications!");
+        console.error(error);
+    } finally {
+        await databaseConnection?.transaction(async (entityManager) => {
+            if (result) {
+                result.serializedState = now.toISOString();
+                await entityManager.save(result);
+            } else {
+                const newValue = entityManager.create(PlatformStateEntity);
+                newValue.key = stateKey;
+                newValue.serializedState = now.toISOString();
+                await entityManager.save([newValue]);
+            }
+        });
+    }
 }
 
-async function sendNotifications() {
-    console.log("Sending notifications");
-    await new Promise((resolve) => {
-        setTimeout(resolve, 15000);
+async function sendNotifications(
+    frequency: NotificationFrequency,
+    startDate: Date,
+    endDate: Date,
+    connection: Connection
+) {
+    const pendingNotifications = await getPendingNotification(connection, frequency, startDate, endDate);
+}
+
+/** Returns pending notifications for each user based on the start and end date range of the actions
+ * taken.
+ */
+async function getPendingNotification(
+    databaseConnection: Connection,
+    frequency: NotificationFrequency,
+    startDate: Date,
+    endDaate: Date
+): Promise<Notification[]> {
+    const pendingCatalogNotifications = databaseConnection?.manager
+        .getCustomRepository(FollowRepository)
+        .getCatalogFollowsForNotifications(startDate, endDaate, frequency);
+
+    const [catalogNotifications] = await Promise.all([pendingCatalogNotifications]);
+
+    const allNotifications = catalogNotifications; // todo combine others
+
+    const notificationsByUser: Record<number, Notification> = {};
+
+    allNotifications.forEach((v) => {
+        if (notificationsByUser[v.userId] == null) {
+            notificationsByUser[v.userId] = v;
+            return;
+        }
+
+        combineNotifications(notificationsByUser[v.userId], v);
     });
-    console.log("Finished sending notifications");
+
+    return Object.values(notificationsByUser);
 }

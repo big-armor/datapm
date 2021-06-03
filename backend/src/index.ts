@@ -54,7 +54,7 @@ async function main() {
     // Create Database Connection
     const connection = await superCreateConnection();
 
-    startLeaderElection();
+    startLeaderElection(connection);
 
     const context = async ({ req }: { req: express.Request }): Promise<Context> => ({
         request: req,

@@ -107,7 +107,13 @@ export class EditCatalogComponent {
                 value: this.form.value
             })
             .subscribe(
-                ({ data }) => {
+                ({ data, errors }) => {
+                    if (errors) {
+                        console.error(errors);
+                        this.state = "ERROR";
+                        return;
+                    }
+
                     this.state = "SUCCESS";
                     this.dialogRef.close(data.updateCatalog);
                 },

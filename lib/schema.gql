@@ -138,6 +138,8 @@ enum ActivityLogEventType {
     CATALOG_DELETED
     CATALOG_PUBLIC_CHANGED
     CATALOG_EDIT
+    CATALOG_PACKAGE_ADDED
+    CATALOG_PACKAGE_REMOVED
 
     USER_CREATED
     USER_DELETED
@@ -1584,7 +1586,7 @@ type Mutation {
     savePlatformSettings(settings: PlatformSettingsInput!): PlatformSettings! @isAdmin
 
     """
-    Run a single pass of the scheduler
+    Run a named job. Key is a shared key. Job is the name of the job to run
     """
-    runScheduler(key: String!): Void
+    runJob(key: String!, job: String!): Void
 }

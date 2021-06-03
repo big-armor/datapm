@@ -251,17 +251,6 @@ export const updateCatalog = async (
             });
         }
 
-        if (value.isPublic !== undefined) {
-            await createActivityLog(transaction, {
-                userId: context.me.id,
-                eventType: ActivityLogEventType.CATALOG_PUBLIC_CHANGED,
-                targetCatalogId: catalog.id,
-                changeType: value.isPublic
-                    ? ActivityLogChangeType.PUBLIC_ENABLED
-                    : ActivityLogChangeType.PUBLIC_DISABLED
-            });
-        }
-
         return catalogEntityToGraphQL(catalog);
     });
 };
