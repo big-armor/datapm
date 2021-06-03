@@ -48,7 +48,31 @@
                                 <a class="app-outlined-button" (click)="createCollection()">Create A Collection</a>
                             </div>
 
-                            <div class="col-md-10">
+                            <div class="col-lg-10 col-md-12 no-pd-mobile">
+                                <mat-card class="box-line my-3" (click)="goToComponent()">
+                                    <mat-card-content>
+                                        <div class="d-flex bd-highlight d-flex align-items-center">
+                                            <div class="p-2 flex-grow-1 bd-highlight">
+                                                <div
+                                                    [class.public-text]="item?.isPublic"
+                                                    [class.not-public-text]="!item?.isPublic"
+                                                >
+                                                    {{ item?.isPublic ? "public" : "not public" }}
+                                                </div>
+                                                <a class="box-name">Collection name</a>
+                                                <div class="text-light-gray">collection description</div>
+                                            </div>
+                                            <div class="p-2 bd-highlight">
+                                                <a class="app-outlined-button mr-2" (click)="editCollection(collection)"
+                                                    >Edit</a
+                                                >
+                                                <a class="app-outlined-button" (click)="deleteCollection(collection)"
+                                                    ><span class="delete-txt">Delete</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </mat-card-content>
+                                </mat-card>
                                 <mat-card class="box-line my-3" (click)="goToComponent()">
                                     <mat-card-content>
                                         <div class="d-flex bd-highlight d-flex align-items-center">
