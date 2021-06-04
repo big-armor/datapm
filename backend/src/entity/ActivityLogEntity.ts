@@ -33,6 +33,9 @@ export class ActivityLogEntity extends EntityBaseModel {
     @Column({ name: "target_package_id", nullable: true })
     public targetPackageId?: number;
 
+    @Column({ name: "removed_item_name", nullable: true })
+    public removedItemName?: string;
+
     @Column({ name: "target_package_issue_id", nullable: true })
     public targetPackageIssueId?: number;
 

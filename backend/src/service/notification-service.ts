@@ -8,24 +8,26 @@ import { PlatformStateEntity } from "../entity/PlatformStateEntity";
 import { UserRepository } from "../repository/UserRepository";
 import { NotificationEmail, sendFollowNotificationEmail } from "../util/smtpUtil";
 import { CatalogRepository } from "../repository/CatalogRepository";
-import { PackageEntity } from "../entity/PackageEntity";
 import { PackageRepository } from "../repository/PackageRepository";
 import { hasPackageEntityPermissions } from "../resolvers/UserPackagePermissionResolver";
 
 let databaseConnection: Connection | null;
 
-const dailyJob = new CronJob("0 0 8 1/1 * *", dailyNotifications, null, false, "America/New_York");
-const weeklyJob = new CronJob("0 0 8 1/1 * MON", weeklyNotifications, null, false, "America/New_York");
+const dailyJob = new CronJob("0 0 8 * * *", dailyNotifications, null, false, "America/New_York");
+const weeklyJob = new CronJob("0 0 8 * * MON", weeklyNotifications, null, false, "America/New_York");
+const monthlyJob = new CronJob("0 0 12 1 * *", monthlyNotifications, null, false, "America/New_York");
 
 export function startNotificationService(connection: Connection) {
     databaseConnection = connection;
     dailyJob.start();
     weeklyJob.start();
+    monthlyJob.start();
 }
 
 export async function stopNotificationService() {
     dailyJob.stop();
-    weeklyJob.start();
+    weeklyJob.stop();
+    monthlyJob.stop();
 }
 
 export async function dailyNotifications() {
@@ -36,17 +38,22 @@ export async function weeklyNotifications() {
     await prepareAndSendNotifications("lastWeeklyNotificationDate", NotificationFrequency.WEEKLY);
 }
 
+export async function monthlyNotifications() {
+    await prepareAndSendNotifications("lastMonthlyNotificationDate", NotificationFrequency.MONTHLY);
+}
+
 async function prepareAndSendNotifications(stateKey: string, frequency: NotificationFrequency) {
     const result = await databaseConnection?.getCustomRepository(PlatformStateRepository).findStateByKey(stateKey);
 
-    let lastNotificationDate = new Date(new Date().getTime() - 1000);
+    let lastNotificationDate = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
 
     if (result) {
         lastNotificationDate = new Date(result.serializedState);
     }
 
+    // !!!!!!!! REMOVE MOVE ME!!!!!!!!!!!!!!!!!
     console.log("REMOVE THE LINE BELOW THIS! JUST FOR TESTING");
-    lastNotificationDate = new Date(0); // REMOVE ME JUST FOR TESTING
+    lastNotificationDate = new Date(0);
 
     const now = new Date();
 
@@ -138,6 +145,45 @@ async function sendNotifications(
                         packagesAdded = await Promise.all(
                             n.actions
                                 .find((n) => n.event_type === ActivityLogEventType.CATALOG_PACKAGE_ADDED)
+                                ?.package_ids.map(async (p) => {
+                                    const packageEntity = await connection
+                                        .getCustomRepository(PackageRepository)
+                                        .findPackageByIdOrFail({ packageId: p, relations: ["catalog"] });
+
+                                    return {
+                                        catalogSlug: packageEntity.catalog.slug,
+                                        packageSlug: packageEntity.slug
+                                    };
+                                }) || []
+                        );
+
+                        packagesAdded = await packagesAdded.asyncFilter(async (p) => {
+                            const packageEntity = await connection
+                                .getCustomRepository(PackageRepository)
+                                .findPackageOrFail({
+                                    identifier: p
+                                });
+
+                            const hasViewPermission = await hasPackageEntityPermissions(
+                                connection,
+                                user,
+                                packageEntity,
+                                Permission.VIEW
+                            );
+
+                            return hasViewPermission;
+                        });
+                    } catch (error) {
+                        console.error(error);
+                    }
+
+                    let packagesRemoved: {
+                        name: string;
+                    }[] = [];
+                    try {
+                        packagesAdded = await Promise.all(
+                            n.actions
+                                .find((n) => n.event_type === ActivityLogEventType.CATALOG_PACKAGE_REMOVED)
                                 ?.package_ids.map(async (p) => {
                                     const packageEntity = await connection
                                         .getCustomRepository(PackageRepository)

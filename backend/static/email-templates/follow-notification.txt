@@ -40,3 +40,6 @@ Catalogs that have changed:
 {{/catalogs}}
 
 
+You can manage your following notifications at the link below. 
+
+{{registry_url}}/{{username}}#user-following

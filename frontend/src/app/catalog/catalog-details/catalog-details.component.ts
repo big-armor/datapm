@@ -136,7 +136,7 @@ export class CatalogDetailsComponent implements OnInit {
                     return;
                 }
 
-                this.updatePackageFollow(result.follow);
+                this.updateCatalogFollow(result.follow);
             });
     }
 
@@ -145,7 +145,7 @@ export class CatalogDetailsComponent implements OnInit {
             .fetch({
                 follow: this.buildFollowIdentifier()
             })
-            .subscribe((response) => this.updatePackageFollow(response.data?.getFollow));
+            .subscribe((response) => this.updateCatalogFollow(response.data?.getFollow));
     }
 
     private openFollowModal(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
@@ -166,7 +166,7 @@ export class CatalogDetailsComponent implements OnInit {
         };
     }
 
-    private updatePackageFollow(follow: Follow): void {
+    private updateCatalogFollow(follow: Follow): void {
         this.catalogFollow = follow;
         this.isFollowing = follow != null;
         this.state = "SUCCESS";
