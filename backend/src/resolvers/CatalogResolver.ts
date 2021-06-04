@@ -193,6 +193,8 @@ export const updateCatalog = async (
             relations: getGraphQlRelationName(info)
         });
 
+        context.cache.storeCatalogToCache(catalog);
+
         if (value.unclaimed !== undefined) {
             await createActivityLog(transaction, {
                 userId: context.me.id,

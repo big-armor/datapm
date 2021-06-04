@@ -15,6 +15,11 @@ export class SessionCache {
         this.storeToCache(cacheId, packageEntity);
     }
 
+    public storeCatalogToCache(catalogEntity: CatalogEntity): void {
+        const cacheId = this.buildDataKeyForCatalogSlug(catalogEntity.slug);
+        this.storeToCache(cacheId, catalogEntity);
+    }
+
     public storeToCache(key: string, data: any): void {
         this.cache.set(key, Promise.resolve(data));
     }
