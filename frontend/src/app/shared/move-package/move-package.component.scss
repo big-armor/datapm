@@ -2,8 +2,10 @@
 @import "../../../styles/variables";
 
 #movePackage {
-    span.checkbox-txt {
-        font-size: 10px;
+    .text-light-gray {
+        top: 1px;
+        font-size: 11px;
+        position: relative;
     }
 
     ::ng-deep {
@@ -12,14 +14,16 @@
                 background: var(--info-color);
             }
         }
+
+        .mat-checkbox-inner-container {
+            width: 14px;
+            height: 14px;
+        }
+
+        .long-txt {
+            .mat-checkbox-label {
+                line-height: 6px;
+            }
+        }
     }
-    // ::ng-deep {
-    //     .mat-checkbox-layout {
-    //         .mat-checkbox-label {
-    //             span.checkbox-txt {
-    //                 font-size: 11px;
-    //             }
-    //         }
-    //     }
-    // }
 }
