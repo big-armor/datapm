@@ -67,7 +67,12 @@ export class PackageDataStorageService {
         packageEntity: PackageEntity,
         permission: Permission
     ): Promise<void> {
-        const hasPermissions = await hasPackageEntityPermissions(context, packageEntity, permission);
+        const hasPermissions = await hasPackageEntityPermissions(
+            context.connection,
+            context.me,
+            packageEntity,
+            permission
+        );
         if (!hasPermissions) {
             throw new Error("NOT_AUTHORIZED");
         }

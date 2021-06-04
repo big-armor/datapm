@@ -20,3 +20,26 @@ export async function parallelAsyncForEach<T>(
 
     return Promise.all(promises);
 }
+
+declare global {
+    interface Array<T> {
+        asyncFilter<T>(predicate: (value: T, index: number, array: T[]) => unknown, thisArg?: any): Promise<T[]>;
+        asyncForEach(array: Array<T>, callback: (object: T, index: number, array: Array<T>) => Promise<void>): void;
+        parallelAsyncForEach<T>(
+            array: Array<T>,
+            callback: (object: T, index: number, array: Array<T>) => Promise<void>
+        ): void;
+    }
+}
+
+Array.prototype.asyncForEach = asyncForEach;
+Array.prototype.parallelAsyncForEach = parallelAsyncForEach;
+
+Array.prototype.asyncFilter = async function <T>(
+    predicate: (value: T, index: number, array: T[]) => unknown,
+    thisArg?: any
+): Promise<T[]> {
+    var array = this;
+    var booleans = await Promise.all(array.map(predicate));
+    return array.filter((x, i) => booleans[i]);
+};

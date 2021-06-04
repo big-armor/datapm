@@ -1,5 +1,5 @@
 import { Connection } from "typeorm";
-import { ActivityLogEventType, NotificationFrequency } from "../generated/graphql";
+import { ActivityLogEventType, NotificationFrequency, Permission } from "../generated/graphql";
 import { FollowRepository } from "../repository/FollowRepository";
 import { combineNotifications, Notification } from "../util/notificationUtil";
 import { CronJob } from "cron";
@@ -10,6 +10,7 @@ import { NotificationEmail, sendFollowNotificationEmail } from "../util/smtpUtil
 import { CatalogRepository } from "../repository/CatalogRepository";
 import { PackageEntity } from "../entity/PackageEntity";
 import { PackageRepository } from "../repository/PackageRepository";
+import { hasPackageEntityPermissions } from "../resolvers/UserPackagePermissionResolver";
 
 let databaseConnection: Connection | null;
 
@@ -141,12 +142,30 @@ async function sendNotifications(
                                     const packageEntity = await connection
                                         .getCustomRepository(PackageRepository)
                                         .findPackageByIdOrFail({ packageId: p, relations: ["catalog"] });
+
                                     return {
                                         catalogSlug: packageEntity.catalog.slug,
                                         packageSlug: packageEntity.slug
                                     };
                                 }) || []
                         );
+
+                        packagesAdded = await packagesAdded.asyncFilter(async (p) => {
+                            const packageEntity = await connection
+                                .getCustomRepository(PackageRepository)
+                                .findPackageOrFail({
+                                    identifier: p
+                                });
+
+                            const hasViewPermission = await hasPackageEntityPermissions(
+                                connection,
+                                user,
+                                packageEntity,
+                                Permission.VIEW
+                            );
+
+                            return hasViewPermission;
+                        });
                     } catch (error) {
                         console.error(error);
                     }

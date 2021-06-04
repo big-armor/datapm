@@ -1,5 +1,6 @@
 import { ValidationError } from "apollo-server";
 import { emailAddressValid } from "datapm-lib";
+import { Connection } from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
 import { PackageEntity } from "../entity/PackageEntity";
 import { UserEntity } from "../entity/UserEntity";
@@ -28,7 +29,8 @@ export const hasPackagePermissions = async (context: Context, packageId: number,
 };
 
 export const hasPackageEntityPermissions = async (
-    context: Context,
+    connection: Connection,
+    userEntity: UserEntity | undefined,
     packageEntity: PackageEntity,
     permission: Permission
 ) => {
@@ -38,13 +40,13 @@ export const hasPackageEntityPermissions = async (
         }
     }
 
-    if (context.me == null) {
+    if (userEntity == null) {
         return false;
     }
 
-    return context.connection
+    return connection
         .getCustomRepository(PackagePermissionRepository)
-        .hasPermission(context.me.id, packageEntity.id, permission);
+        .hasPermission(userEntity.id, packageEntity.id, permission);
 };
 
 export const setPackagePermissions = async (
