@@ -87,20 +87,6 @@ export class PackageDescriptionComponent {
                 this.selectedSchema = this.schemas[0];
             }
         });
-
-        this.move();
-    }
-
-    private move() {
-        // this.movePackageGQL.mutate({
-        //     identifier: {
-        //         catalogSlug: "moli",
-        //         packageSlug: "adresari"
-        //     },
-        //     targetCatalog: {
-        //         catalogSlug: "malezi"
-        //     }
-        // }).subscribe();
     }
 
     public canManage() {
