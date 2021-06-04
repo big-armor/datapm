@@ -55,6 +55,9 @@ $gray-11-color-dark: #202124;
 $gray-12-color: #ededed;
 $gray-12-color-dark: #343437;
 
+$gray-hero-color: #eee;
+$gray-hero-color-dark: #202124;
+
 $custom-gray-1-color: #aeaeae;
 $custom-gray-1-color-dark: #aeaeae;
 
@@ -234,6 +237,10 @@ $colors: (
     --gray-12-color: (
         $gray-12-color,
         $gray-12-color-dark
+    ),
+    --gray-hero-color: (
+        $gray-hero-color,
+        $gray-hero-color-dark
     ),
     --custom-gray-1-color: (
         $custom-gray-1-color,

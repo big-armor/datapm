@@ -68,6 +68,7 @@ import { UserTypeFollowingComponent } from "./user-details/user-following/user-t
 import { IvyCarouselModule } from "angular-responsive-carousel";
 import { ImportedModule } from "../imported/imported.module";
 import { MovePackageComponent } from "./move-package/move-package.component";
+import { HeroComponent } from "./hero/hero.component";
 
 @NgModule({
     declarations: [
@@ -115,7 +116,8 @@ import { MovePackageComponent } from "./move-package/move-package.component";
         FollowDialogComponent,
         UserFollowingComponent,
         UserTypeFollowingComponent,
-        MovePackageComponent
+        MovePackageComponent,
+        HeroComponent
     ],
     imports: [
         CommonModule,
@@ -180,7 +182,8 @@ import { MovePackageComponent } from "./move-package/move-package.component";
         PackageAndCollectionComponent,
         MarkdownEditorComponent,
         FollowDialogComponent,
-        UserFollowingComponent
+        UserFollowingComponent,
+        HeroComponent
     ],
     providers: [TimeAgoPipe, { provide: MAT_DIALOG_DATA, useValue: {} }]
 })

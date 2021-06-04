@@ -1,0 +1,8 @@
+<div class="row">
+    <div class="col-md-12">
+        <app-builder-io-renderer *ngIf="loaded; else loadingTemplate" [apiKey]="apiKey" [entry]="entry">
+            <div class="container">Failed to load hero</div>
+        </app-builder-io-renderer>
+        <ng-template #loadingTemplate>loading..</ng-template>
+    </div>
+</div>
