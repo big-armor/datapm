@@ -4,7 +4,7 @@ import { DpmStorageStreamHolder } from "./dpm-storage-stream-holder";
 import { StorageErrors } from "./files/file-storage-service";
 import sanitize from "sanitize-filename";
 
-const fs = require("fs-extra");
+import fs from "fs-extra";
 
 export class FileStorage implements DPMStorage {
     public static readonly SCHEMA_URL_PREFIX = "file";
@@ -30,7 +30,6 @@ export class FileStorage implements DPMStorage {
     public itemExists(namespace: string, itemId: string): Promise<boolean> {
         const sanitizedItemId = sanitize(itemId);
         const path = this.buildPath(namespace, sanitizedItemId);
-        console.log("checking path", path);
         const itemExistsInPath = this.itemExistsInAbsolutePath(path);
         return Promise.resolve(itemExistsInPath);
     }

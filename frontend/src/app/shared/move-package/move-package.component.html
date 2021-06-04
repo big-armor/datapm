@@ -26,6 +26,9 @@
                             </mat-option>
                         </mat-autocomplete>
                     </div>
+                    <div class="ml-1 pb-1 text-danger text-light-gray" *ngIf="serverError">
+                        Internal server error occurred. Please contact support.
+                    </div>
                     <div class="ml-1 pb-1 text-danger text-light-gray" *ngIf="catalogDoesntExist">
                         This catalog doesn't exist.
                     </div>

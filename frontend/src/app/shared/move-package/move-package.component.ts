@@ -36,6 +36,9 @@ export class MovePackageComponent implements OnInit, OnDestroy {
     public packageLinksCheckbox = false;
     public usersPermissionsCheckbox = false;
 
+    public serverError: boolean = false;
+    public submitting: boolean = false;
+
     private packageObject: Package;
 
     constructor(
@@ -100,11 +103,17 @@ export class MovePackageComponent implements OnInit, OnDestroy {
             !this.isMissingCatalogEditPermissions &&
             this.catalogPermissionsCheckbox &&
             this.packageLinksCheckbox &&
-            this.usersPermissionsCheckbox
+            this.usersPermissionsCheckbox &&
+            !this.submitting
         );
     }
 
     public submit(): void {
+        if (this.submitting) {
+            return;
+        }
+
+        this.submitting = true;
         const packageIdentifier = this.packageObject.identifier;
         const targetCatalogSlug = this.selectedCatalog.identifier.catalogSlug;
         this.movePackageGQL
@@ -117,14 +126,19 @@ export class MovePackageComponent implements OnInit, OnDestroy {
                     catalogSlug: targetCatalogSlug
                 }
             })
-            .subscribe((response) => {
-                if (response.errors) {
-                    return;
-                }
+            .subscribe(
+                (response) => {
+                    if (response.errors) {
+                        console.error(response.errors);
+                        this.serverError = true;
+                        return;
+                    }
 
-                this.router.navigate([targetCatalogSlug, packageIdentifier.packageSlug]);
-                this.close();
-            });
+                    this.router.navigate([targetCatalogSlug, packageIdentifier.packageSlug]);
+                    this.close();
+                },
+                () => (this.serverError = true)
+            );
     }
 
     public close(): void {
@@ -136,6 +150,7 @@ export class MovePackageComponent implements OnInit, OnDestroy {
             .pipe(debounceTime(this.VALIDATE_TIMEOUT_IN_MS), takeUntil(this.destroy$))
             .subscribe((value) => {
                 if (typeof value == "string") {
+                    this.serverError = false;
                     this.selectCatalog(null);
                     this.loadMatchingCatalogs(value);
                 }

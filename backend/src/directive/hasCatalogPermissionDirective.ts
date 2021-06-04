@@ -101,11 +101,7 @@ export class HasCatalogPermissionDirective extends SchemaDirectiveVisitor {
     }
 
     private async validatePermission(context: Context, catalogSlug: string, permission: Permission) {
-        // TODO: ERMAL USE CACHE
-        const catalog = await context.connection
-            .getCustomRepository(CatalogRepository)
-            .findCatalogBySlugOrFail(catalogSlug);
-
+        const catalog = await getCatalogFromCacheOrDbOrFail(context, { catalogSlug });
         const permissions = await this.getUserCatalogPermissions(context, catalog);
         if (permissions.includes(permission)) {
             return;
