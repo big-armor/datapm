@@ -1,6 +1,6 @@
 import { DPMStorage } from "./dpm-storage";
 import { Stream, Readable } from "stream";
-import { Bucket, File, Storage } from "@google-cloud/storage";
+import { Bucket, File, MoveCallback, Storage } from "@google-cloud/storage";
 import { DpmStorageStreamHolder } from "./dpm-storage-stream-holder";
 import { StorageErrors } from "./files/file-storage-service";
 
@@ -56,8 +56,9 @@ export class GoogleCloudStorage implements DPMStorage {
         const file = await this.getBucketFile(namespace, itemId);
 
         const fileExists = await file.exists();
-        if (!fileExists[0])
+        if (!fileExists[0]) {
             throw new Error(StorageErrors.FILE_DOES_NOT_EXIST.toString() + " - " + this.buildPath(namespace, itemId));
+        }
 
         const fileReadStream = file.createReadStream();
         this.streamHelper.registerReadStream(fileReadStream);
@@ -71,16 +72,22 @@ export class GoogleCloudStorage implements DPMStorage {
         return this.streamHelper.copyToStream(byteStream, writeStream, transformer);
     }
 
+    public async moveFile(oldFilePath: string, newFilePath: string, callback: any): Promise<void> {
+        const oldFile = await this.getBucketFileByPath(oldFilePath);
+        oldFile.move(newFilePath, callback as MoveCallback);
+    }
+
     public stop(): boolean {
         return this.streamHelper.destroyOpenStreams();
     }
 
     private async getBucketFile(namespace: string, itemId: string): Promise<File> {
         const filePath = this.buildPath(namespace, itemId);
+        return this.getBucketFileByPath(filePath);
+    }
 
-        const file = this.bucket.file(filePath);
-
-        return file;
+    private async getBucketFileByPath(path: string): Promise<File> {
+        return this.bucket.file(path);
     }
 
     private buildPath(namespace: string, itemId: string): string {

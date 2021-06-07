@@ -88,6 +88,7 @@ export class HasCatalogPermissionDirective extends SchemaDirectiveVisitor {
                 args.catalogSlug ||
                 (args.value && args.value.catalogSlug) ||
                 (args.identifier && args.identifier.catalogSlug) ||
+                (args.catalogIdentifier && args.catalogIdentifier.catalogSlug) ||
                 undefined;
 
             if (catalogSlug === undefined) {
@@ -100,10 +101,7 @@ export class HasCatalogPermissionDirective extends SchemaDirectiveVisitor {
     }
 
     private async validatePermission(context: Context, catalogSlug: string, permission: Permission) {
-        const catalog = await context.connection
-            .getCustomRepository(CatalogRepository)
-            .findCatalogBySlugOrFail(catalogSlug);
-
+        const catalog = await getCatalogFromCacheOrDbOrFail(context, { catalogSlug });
         const permissions = await this.getUserCatalogPermissions(context, catalog);
         if (permissions.includes(permission)) {
             return;

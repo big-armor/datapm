@@ -11,7 +11,7 @@ import { AuthenticatedContext, Context } from "../context";
 import { Permission, PackageIdentifier, PackageIdentifierInput } from "../generated/graphql";
 import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { UserEntity } from "../entity/UserEntity";
-import { getPackageFromCacheOrDb } from "../resolvers/PackageResolver";
+import { getPackageFromCacheOrDbOrFail } from "../resolvers/PackageResolver";
 import { UserPackagePermissionEntity } from "../entity/UserPackagePermissionEntity";
 import { getCatalogPermissionsFromCacheOrDb } from "../resolvers/UserCatalogPermissionResolver";
 
@@ -22,7 +22,7 @@ export async function resolvePackagePermissions(
 ): Promise<Permission[]> {
     const permissions: Permission[] = [];
 
-    const packageEntity = await getPackageFromCacheOrDb(context, identifier);
+    const packageEntity = await getPackageFromCacheOrDbOrFail(context, identifier);
     if (packageEntity.isPublic) {
         permissions.push(Permission.VIEW);
     }

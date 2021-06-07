@@ -193,6 +193,8 @@ export const updateCatalog = async (
             relations: getGraphQlRelationName(info)
         });
 
+        context.cache.storeCatalogToCache(catalog);
+
         if (value.unclaimed !== undefined) {
             await createActivityLog(transaction, {
                 userId: context.me.id,
@@ -334,7 +336,12 @@ export const getCatalogByIdentifierOrFail = async (
     info: any
 ) => {
     const graphQLRelationName = info ? getGraphQlRelationName(info) : [];
-    const catalog = await getCatalogFromCacheOrDbBySlug(context, identifier.catalogSlug, graphQLRelationName);
+    const catalog = await getCatalogFromCacheOrDbBySlug(
+        context,
+        context.connection,
+        identifier.catalogSlug,
+        graphQLRelationName
+    );
 
     if (catalog == null) {
         throw new UserInputError("CATALOG_NOT_FOUND");
@@ -350,7 +357,12 @@ export const getCatalogByIdentifier = async (
     info: any
 ) => {
     const graphQLRelationName = info ? getGraphQlRelationName(info) : [];
-    const catalog = await getCatalogFromCacheOrDbBySlug(context, identifier.catalogSlug, graphQLRelationName);
+    const catalog = await getCatalogFromCacheOrDbBySlug(
+        context,
+        context.connection,
+        identifier.catalogSlug,
+        graphQLRelationName
+    );
 
     if (catalog == null) {
         return undefined;
@@ -393,11 +405,16 @@ export const getCatalogFromCacheOrDbOrFail = async (
     return await context.cache.loadCatalogBySlug(identifier.catalogSlug, catalogPromiseFunction, forceReload);
 };
 
-export const getCatalogFromCacheOrDbBySlug = async (context: Context, slug: string, relations?: string[]) => {
+export const getCatalogFromCacheOrDbBySlug = async (
+    context: Context,
+    connection: EntityManager | Connection,
+    slug: string,
+    relations?: string[]
+) => {
     const catalogPromiseFunction = () =>
-        context.connection.manager
-            .getCustomRepository(CatalogRepository)
-            .findCatalogBySlug({ slug, relations }) as Promise<CatalogEntity>;
+        connection.getCustomRepository(CatalogRepository).findCatalogBySlug({ slug, relations }) as Promise<
+            CatalogEntity
+        >;
 
     return await context.cache.loadCatalogBySlug(slug, catalogPromiseFunction);
 };

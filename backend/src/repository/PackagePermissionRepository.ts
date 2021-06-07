@@ -1,4 +1,4 @@
-import { EntityRepository, EntityManager } from "typeorm";
+import { EntityRepository, EntityManager, DeleteResult, Connection } from "typeorm";
 
 import { UserPackagePermissionEntity } from "../entity/UserPackagePermissionEntity";
 import { UserRepository } from "./UserRepository";
@@ -71,6 +71,17 @@ export class PackagePermissionRepository {
             .getMany();
     }
 
+    public async deleteUsersPermissionsByPackageId(packageId: number): Promise<DeleteResult> {
+        return await this.manager
+            .getRepository(UserPackagePermissionEntity)
+            .createQueryBuilder("UserPackagePermissionEntity")
+            .where('"package_id" = :packageId')
+            .setParameter("packageId", packageId)
+            .delete()
+            .from(UserPackagePermissionEntity)
+            .execute();
+    }
+
     public async setPackagePermissions({
         identifier,
         userId,
@@ -100,11 +111,7 @@ export class PackagePermissionRepository {
             // If user does not exist in collection permissions, it creates new record
             if (packagePermissions == undefined) {
                 try {
-                    const collectionPermissionEntry = transaction.create(UserPackagePermissionEntity);
-                    collectionPermissionEntry.userId = user.id;
-                    collectionPermissionEntry.packageId = packageEntity.id;
-                    collectionPermissionEntry.permissions = permissions;
-                    return await transaction.save(collectionPermissionEntry);
+                    return await this.storePackagePermissions(transaction, user.id, packageEntity.id, permissions);
                 } catch (e) {
                     console.log(e);
                 }
@@ -124,6 +131,19 @@ export class PackagePermissionRepository {
             }
             return;
         });
+    }
+
+    public async storePackagePermissions(
+        transaction: EntityManager,
+        userId: number,
+        packageId: number,
+        permissions: Permission[]
+    ): Promise<UserPackagePermissionEntity> {
+        const collectionPermissionEntry = transaction.create(UserPackagePermissionEntity);
+        collectionPermissionEntry.userId = userId;
+        collectionPermissionEntry.packageId = packageId;
+        collectionPermissionEntry.permissions = permissions;
+        return await transaction.save(collectionPermissionEntry);
     }
 
     public removePackagePermission({

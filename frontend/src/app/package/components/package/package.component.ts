@@ -220,8 +220,10 @@ export class PackageComponent implements OnDestroy {
         });
     }
 
-    derivedFromCount(packageFile: PackageFile) {
-        if (packageFile == null) return 0;
+    public derivedFromCount(packageFile: PackageFile): number {
+        if (packageFile == null) {
+            return 0;
+        }
         return packageFile.schemas.reduce((count, schema) => count + (schema.derivedFrom?.length || 0), 0);
     }
 

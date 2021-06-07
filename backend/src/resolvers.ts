@@ -119,7 +119,8 @@ import {
     packageUpdatedAt,
     packageViewedCount,
     packageIsPublic,
-    myRecentlyViewedPackages
+    myRecentlyViewedPackages,
+    movePackage
 } from "./resolvers/PackageResolver";
 
 import { validatePassword } from "./directive/ValidPasswordDirective";
@@ -616,6 +617,7 @@ export const resolvers: {
         // Package
         createPackage: createPackage,
         updatePackage: updatePackage,
+        movePackage: movePackage,
         setPackageCoverImage: setPackageCoverImage,
         deletePackage: deletePackage,
         packageFetched: packageFetched,

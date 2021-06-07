@@ -1,0 +1,29 @@
+@import "../../../styles/colors";
+@import "../../../styles/variables";
+
+#movePackage {
+    .text-light-gray {
+        top: 1px;
+        font-size: 11px;
+        position: relative;
+    }
+
+    ::ng-deep {
+        .mat-checkbox-checked {
+            .mat-checkbox-checkmark {
+                background: var(--info-color);
+            }
+        }
+
+        .mat-checkbox-inner-container {
+            width: 14px;
+            height: 14px;
+        }
+
+        .long-txt {
+            .mat-checkbox-label {
+                line-height: 6px;
+            }
+        }
+    }
+}
