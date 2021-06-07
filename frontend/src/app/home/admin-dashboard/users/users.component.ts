@@ -7,6 +7,7 @@ import Timeout = NodeJS.Timeout;
 import { ConfirmationDialogService } from "../../../services/dialog/confirmation-dialog.service";
 import { UserStatusChangeDialogResponse } from "src/app/services/dialog/user-status-change-dialog-response";
 import { DialogSize } from "src/app/services/dialog/dialog-size";
+import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 
 @Component({
     selector: "app-users",
@@ -25,6 +26,8 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
     public readonly USERS_PER_PAGE = 10;
 
     private readonly destroyed = new Subject();
+
+    disabled = false;
 
     @ViewChild(MatPaginator)
     public paginator: MatPaginator;
@@ -45,7 +48,8 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
         private changeUserStatusGQL: AdminSetUserStatusGQL,
         private deleteUserGQL: AdminDeleteUserGQL,
         private changeDetectorRef: ChangeDetectorRef,
-        private confirmationDialogService: ConfirmationDialogService
+        private confirmationDialogService: ConfirmationDialogService,
+        private confirmModalService: ConfirmationDialogService
     ) {}
 
     public ngAfterViewInit(): void {
@@ -71,6 +75,23 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
         this.searchValue = "";
         this.searchUsers();
     }
+
+    public updateAdmin(changeEvent: MatSlideToggleChange): void {
+        this.confirmModalService
+            .openFancyConfirmationDialog({
+                data: {
+                    title: "Confirm admin",
+                    content: "Are you sure that you want to make this user as an admin?"
+                }
+            })
+            .subscribe((confirmed) => {
+                if (confirmed) {
+                    this.confirmSave();
+                }
+            });
+    }
+
+    public confirmSave(): void {}
 
     public openDeleteUserConfirmationDialog(user: User): void {
         const dialogContent = `<p class="mb-1">Are you sure you want to delete user ${user.username}</p>

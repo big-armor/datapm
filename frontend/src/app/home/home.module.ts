@@ -23,6 +23,7 @@ import { FormsModule } from "@angular/forms";
 import { MatInputModule } from "@angular/material/input";
 import { MatStepperModule } from "@angular/material/stepper";
 import { MatTooltipModule } from "@angular/material/tooltip";
+import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { PlatformSettingsComponent } from "./admin-dashboard/platform-settings/platform-settings.component";
 
 @NgModule({
@@ -52,7 +53,8 @@ import { PlatformSettingsComponent } from "./admin-dashboard/platform-settings/p
         MatTooltipModule,
         MatInputModule,
         FormsModule,
-        SharedModule
+        SharedModule,
+        MatSlideToggleModule
     ]
 })
 export class HomeModule {}

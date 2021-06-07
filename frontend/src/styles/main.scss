@@ -529,6 +529,7 @@ mat-select {
         background-color: var(--info-hover-color);
         border: 1px solid var(--info-hover-color);
         transition: background-color ease 0.5s;
+        color: $secondary-color;
     }
 
     &:active {
