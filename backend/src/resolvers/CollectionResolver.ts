@@ -19,7 +19,10 @@ import { PackageRepository } from "../repository/PackageRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { VersionRepository } from "../repository/VersionRepository";
 
-import { UserCollectionPermissionRepository } from "../repository/UserCollectionPermissionRepository";
+import {
+    getAllCollectionPermissions,
+    UserCollectionPermissionRepository
+} from "../repository/UserCollectionPermissionRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { grantAllCollectionPermissionsForUser, hasCollectionPermissions } from "./UserCollectionPermissionResolver";
 import { ImageStorageService } from "../storage/images/image-storage-service";
@@ -31,6 +34,7 @@ import { ReservedKeywordsService } from "../service/reserved-keywords-service";
 import { activtyLogEntityToGraphQL } from "./ActivityLogResolver";
 import { getUserFromCacheOrDbById, getUserFromCacheOrDbByUsername } from "./UserResolver";
 import { Connection, EntityManager } from "typeorm";
+import { deleteFollowsByIds, getCollectionFollowsByCollectionId } from "./FollowResolver";
 
 export const collectionEntityToGraphQLOrNull = (collectionEntity: CollectionEntity): Collection | null => {
     if (!collectionEntity) {
@@ -71,8 +75,7 @@ export const usersByCollection = async (
     const collectionEntity = await getCollectionFromCacheOrDbOrFail(
         context,
         context.connection,
-        identifier.collectionSlug,
-        relations
+        identifier.collectionSlug
     );
 
     return await context.connection.manager
@@ -140,6 +143,10 @@ export const updateCollection = async (
                     ? ActivityLogChangeType.PUBLIC_ENABLED
                     : ActivityLogChangeType.PUBLIC_DISABLED
             });
+
+            if (!value.isPublic) {
+                await deleteCollectionFollowsForUsersWithNoPermissions(collection.id, transaction);
+            }
         }
 
         await createActivityLog(transaction, {
@@ -154,6 +161,21 @@ export const updateCollection = async (
 
         return collectionEntityToGraphQL(collectionEntity);
     });
+};
+
+export const deleteCollectionFollowsForUsersWithNoPermissions = async (
+    collectionId: number,
+    manager: EntityManager
+) => {
+    const packagePermissions = await getAllCollectionPermissions(manager, collectionId);
+    const follows = await getCollectionFollowsByCollectionId(collectionId, manager);
+
+    const userIds = packagePermissions.map((f) => f.userId);
+    const distinctUserIds = new Set(userIds);
+
+    const followsIdsToDelete = follows.filter((f) => !distinctUserIds.has(f.userId)).map((f) => f.id);
+
+    return deleteFollowsByIds(followsIdsToDelete, manager);
 };
 
 export const myCollections = async (
