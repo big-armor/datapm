@@ -366,7 +366,7 @@ export const getPackageFollowsByPackageId = async (packageId: number, manager: E
 };
 
 export const getPackageFollowsByPackageIssuesIds = async (packageIssueIds: number[], manager: EntityManager) => {
-    if (packageIssueIds == null || !packageIssueIds.length) {
+    if (packageIssueIds == null || packageIssueIds.length === 0) {
         return [];
     }
 

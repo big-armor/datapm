@@ -174,6 +174,10 @@ export class FollowRepository extends Repository<FollowEntity> {
     }
 
     public deleteFollowsByPackageIssueIds(userId: number, packageIssueIds: number[]): Promise<DeleteResult> {
+        if (packageIssueIds == null || packageIssueIds.length === 0) {
+            return Promise.resolve({ raw: null, affected: 0 });
+        }
+
         return this.getFollowsByPackageIssuesIdsQuery(userId, packageIssueIds).delete().from(FollowEntity).execute();
     }
 
