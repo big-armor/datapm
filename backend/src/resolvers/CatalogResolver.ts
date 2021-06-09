@@ -198,7 +198,7 @@ export const updateCatalog = async (
         if (propertiesChanged.includes("unclaimed")) {
             await createActivityLog(transaction, {
                 userId: context.me.id,
-                eventType: ActivityLogEventType.CATALOG_PUBLIC_CHANGED,
+                eventType: ActivityLogEventType.CATALOG_EDIT,
                 targetCatalogId: catalog.id,
                 changeType: value.unclaimed
                     ? ActivityLogChangeType.UNCLAIMED_ENABLED

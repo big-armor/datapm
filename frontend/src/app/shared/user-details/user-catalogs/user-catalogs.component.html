@@ -13,7 +13,8 @@
                                 and only one catalog.</span
                             >
                             <span *ngIf="!isCurrentUser && myCatalogs.length > 0" class="text-dark-gray"
-                                >Catalogs created by <span style="font-weight: 500">{{ username }}</span>
+                                >Catalogs created or contributed to by
+                                <span style="font-weight: 500">{{ username }}</span>
                             </span>
 
                             <span *ngIf="!isCurrentUser && myCatalogs.length == 0" class="text-dark-gray">

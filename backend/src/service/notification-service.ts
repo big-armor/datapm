@@ -13,12 +13,8 @@ import {
     NotificationActionTemplate
 } from "../util/smtpUtil";
 import { CatalogRepository } from "../repository/CatalogRepository";
-import { PackageRepository } from "../repository/PackageRepository";
-import { hasPackageEntityPermissions } from "../resolvers/UserPackagePermissionResolver";
 import { UserEntity } from "../entity/UserEntity";
-import { VersionRepository } from "../repository/VersionRepository";
 import { VersionEntity } from "../entity/VersionEntity";
-import { version } from "uuid";
 import { PackageEntity } from "../entity/PackageEntity";
 import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 

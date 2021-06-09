@@ -201,7 +201,7 @@ export class CatalogRepository extends Repository<CatalogEntity> {
                 propertiesChanged.push("isPublic");
             }
 
-            if (value.unclaimed != null) {
+            if (value.unclaimed != null && value.unclaimed != catalog.unclaimed) {
                 catalog.unclaimed = value.unclaimed;
                 propertiesChanged.push("unclaimed");
             }
@@ -314,11 +314,14 @@ export class CatalogRepository extends Repository<CatalogEntity> {
     }): Promise<[CatalogEntity[], number]> {
         const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
         const response = await this.createQueryBuilderWithUserConditions(user, Permission.VIEW)
-            .andWhere(`("CatalogEntity"."creator_id" = :targetUserId)`)
+            .andWhere(
+                `("CatalogEntity"."creator_id" = :targetUserId or "CatalogEntity".id in (select catalog_id from user_catalog uc where uc.user_id  = :targetUserId and 'EDIT' = any(uc."permission")))`
+            )
             .andWhere(`("CatalogEntity"."unclaimed" IS NOT TRUE)`)
             .setParameter("targetUserId", targetUser.id)
             .offset(offSet)
             .limit(limit)
+            .orderBy('lower("CatalogEntity"."displayName")')
             .addRelations("CatalogEntity", relations)
             .getManyAndCount();
 

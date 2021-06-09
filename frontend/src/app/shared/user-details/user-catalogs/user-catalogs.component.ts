@@ -31,6 +31,7 @@ export class UserCatalogsComponent implements OnInit {
     State = State;
     catalogState = State.INIT;
     public myCatalogs: Catalog[];
+    public otherCatalogs: Catalog[];
     private subscription = new Subject();
     columnsToDisplay = ["name", "public", "actions"];
     inputErrors = {

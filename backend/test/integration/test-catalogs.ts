@@ -804,6 +804,21 @@ describe("Catalog Tests", async () => {
         expect(response.data!.catalog.myPermissions!.includes(Permission.MANAGE)).equal(true);
     });
 
+    it("User A request user catalogs, should include second catalog", async function () {
+        let response = await userAClient.query({
+            query: UserCatalogsDocument,
+            variables: {
+                username: "testB-catalog",
+                limit: 100,
+                offSet: 0
+            }
+        });
+        expect(response.errors == null, "no errors").to.equal(true);
+        expect(
+            response.data!.userCatalogs.catalogs!.find((c) => c.identifier.catalogSlug == "user-a-second-catalog-v2")
+        ).to.not.equal(undefined);
+    });
+
     it("User A grant catalog permissions to User B", async function () {
         let response = await userAClient.mutate({
             mutation: SetUserCatalogPermissionDocument,
