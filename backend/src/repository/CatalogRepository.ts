@@ -169,23 +169,27 @@ export class CatalogRepository extends Repository<CatalogEntity> {
         identifier: CatalogIdentifierInput;
         value: UpdateCatalogInput;
         relations?: string[];
-    }): Promise<CatalogEntity> {
+    }): Promise<[CatalogEntity, string[]]> {
+        const propertiesChanged: string[] = [];
+
         return this.manager.nestedTransaction(async (transaction) => {
             const catalog = await transaction.getRepository(CatalogEntity).findOneOrFail({
                 where: { slug: identifier.catalogSlug },
                 relations: ["packages"]
             });
 
-            if (value.newSlug) {
+            if (value.newSlug && catalog.slug != value.newSlug) {
                 ReservedKeywordsService.validateReservedKeyword(value.newSlug);
                 catalog.slug = value.newSlug;
+                propertiesChanged.push("slug");
             }
 
-            if (value.displayName) {
+            if (value.displayName && catalog.displayName != value.displayName) {
                 catalog.displayName = value.displayName;
+                propertiesChanged.push("displayName");
             }
 
-            if (value.isPublic != null) {
+            if (value.isPublic != null && catalog.isPublic != value.isPublic) {
                 catalog.isPublic = value.isPublic;
 
                 if (catalog.isPublic == false) {
@@ -194,28 +198,35 @@ export class CatalogRepository extends Repository<CatalogEntity> {
                         await transaction.save(packageEntity);
                     }
                 }
+                propertiesChanged.push("isPublic");
             }
 
             if (value.unclaimed != null) {
                 catalog.unclaimed = value.unclaimed;
+                propertiesChanged.push("unclaimed");
             }
 
-            if (value.description) {
+            if (value.description && catalog.description != value.description) {
                 catalog.description = value.description;
+                propertiesChanged.push("description");
             }
 
-            if (value.website) {
+            if (value.website && catalog.website != value.website) {
                 catalog.website = value.website;
+                propertiesChanged.push("website");
             }
 
             await transaction.save(catalog);
 
             // return result with requested relations
-            return getCatalogOrFail({
-                slug: value.newSlug ? value.newSlug : identifier.catalogSlug,
-                manager: transaction,
-                relations
-            });
+            return [
+                await getCatalogOrFail({
+                    slug: value.newSlug ? value.newSlug : identifier.catalogSlug,
+                    manager: transaction,
+                    relations
+                }),
+                propertiesChanged
+            ];
         });
     }
 

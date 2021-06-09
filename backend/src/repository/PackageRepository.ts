@@ -297,7 +297,9 @@ export class PackageRepository {
         packageSlug: string;
         packageInput: UpdatePackageInput;
         relations?: string[];
-    }): Promise<PackageEntity> {
+    }): Promise<[PackageEntity, string[]]> {
+        const propertiesEdited: string[] = [];
+
         return this.manager.nestedTransaction(async (transaction) => {
             const ALIAS = "packageentity";
 
@@ -315,23 +317,31 @@ export class PackageRepository {
                 throw new Error("PACKAGE_NOT_FOUND");
             }
 
-            if (packageInput.newCatalogSlug) {
+            if (packageInput.newCatalogSlug && packageInput.newCatalogSlug != packageEntity.catalog.slug) {
                 packageEntity.catalogId = (
                     await transaction
                         .getCustomRepository(CatalogRepository)
                         .findOneOrFail({ slug: packageInput.newCatalogSlug })
                 ).id;
+                propertiesEdited.push("catalogSlug");
             }
 
-            if (packageInput.newPackageSlug) {
+            if (packageInput.newPackageSlug && packageInput.newPackageSlug != packageEntity.slug) {
                 packageEntity.slug = packageInput.newPackageSlug;
+                propertiesEdited.push("slug");
             }
 
-            if (packageInput.displayName) packageEntity.displayName = packageInput.displayName;
+            if (packageInput.displayName && packageInput.displayName != packageEntity.displayName) {
+                packageEntity.displayName = packageInput.displayName;
+                propertiesEdited.push("displayName");
+            }
 
-            if (packageInput.description) packageEntity.description = packageInput.description;
+            if (packageInput.description && packageInput.description != packageEntity.description) {
+                packageEntity.description = packageInput.description;
+                propertiesEdited.push("description");
+            }
 
-            if (packageInput.isPublic != null) {
+            if (packageInput.isPublic != null && packageInput.isPublic != packageEntity.isPublic) {
                 if (packageInput.isPublic == true && packageEntity.catalog.isPublic == false) {
                     throw new Error("CATALOG_NOT_PUBLIC");
                 }
@@ -339,6 +349,7 @@ export class PackageRepository {
                     throw new Error("PACKAGE_HAS_NO_VERSIONS");
                 }
                 packageEntity.isPublic = packageInput.isPublic;
+                propertiesEdited.push("isPublic");
             }
 
             validation(packageEntity);
@@ -352,7 +363,7 @@ export class PackageRepository {
                 throw new Error("Unable to retrieve updated package - this should never happen");
             }
 
-            return queryPackage;
+            return [queryPackage, propertiesEdited];
         });
     }
 

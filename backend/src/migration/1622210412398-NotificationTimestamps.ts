@@ -4,14 +4,20 @@ const sql = `
 
     alter table activity_log alter column event_type type activity_log_event_type_enum using event_type::activity_log_event_type_enum;
     ALTER TABLE activity_log ADD column "removed_item_name"  text;
+    ALTER TABLE activity_log ADD column "removed_item_id"  bigint;
 
     ALTER TYPE activity_log_event_type_enum ADD VALUE 'CATALOG_PACKAGE_ADDED';
     ALTER TYPE activity_log_event_type_enum ADD VALUE 'CATALOG_PACKAGE_REMOVED';
     ALTER TYPE activity_log_event_type_enum ADD VALUE 'PACKAGE_ISSUE_CREATED';
     ALTER TYPE activity_log_event_type_enum ADD VALUE 'PACKAGE_ISSUE_COMMENT_CREATED';
+    ALTER TYPE activity_log_event_type_enum ADD VALUE 'PACKAGE_ISSUE_COMMENT_EDIT';
+    ALTER TYPE activity_log_event_type_enum ADD VALUE 'PACKAGE_ISSUE_COMMENT_DELETED';
+    ALTER TYPE activity_log_event_type_enum ADD VALUE 'PACKAGE_ISSUE_CLOSED';
+    ALTER TYPE activity_log_event_type_enum ADD VALUE 'PACKAGE_ISSUE_DELETED';
     ALTER TYPE activity_log_event_type_enum ADD VALUE 'PACKAGE_MAJOR_CHANGE';
     ALTER TYPE activity_log_event_type_enum ADD VALUE 'PACKAGE_MINOR_CHANGE';
     ALTER TYPE activity_log_event_type_enum ADD VALUE 'PACKAGE_PATCH_CHANGE';
+    ALTER TYPE activity_log_event_type_enum ADD VALUE 'PACKAGE_ISSUE_EDIT';
 
 
     delete from "activity_log" where target_package_version_id not in (select id from "version" v2 );
@@ -21,7 +27,7 @@ const sql = `
     ALTER TABLE "public"."activity_log" ADD CONSTRAINT activity_log_target_package_version_id_fkey FOREIGN KEY (target_package_version_id) REFERENCES "public"."version" (id) ON DELETE CASCADE;
     ALTER TABLE "public"."activity_log" ADD CONSTRAINT activity_log_target_package_issue_id_fkey FOREIGN KEY (target_package_issue_id) REFERENCES "public"."package_issue" (id) ON DELETE CASCADE;
     
-    DROP FROM "follow";
+    delete FROM "follow";
     ALTER TABLE "follow" DROP COLUMN event_types;
     ALTER TABLE "follow" ADD COLUMN event_types activity_log_event_type_enum[];
 

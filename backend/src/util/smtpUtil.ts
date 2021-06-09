@@ -12,35 +12,31 @@ export enum EMAIL_SUBJECTS {
     USER_SUSPENDED = "Your account has been suspended"
 }
 
-export interface NotificationEmail {
+export interface NotificationActionTemplate {
+    userDisplayName: string;
+    action: string;
+    timeAgo: string;
+}
+
+export interface NotificationResourceTypeTemplate {
+    slug: string;
+    displayName: string;
+    actions: NotificationActionTemplate[];
+}
+
+export interface NotificationEmailTemplate {
     frequency: string;
-    firstName: string;
-    username: string;
-    catalogs: {
-        slug: string;
-        displayName: string;
-        edited: boolean;
-        editedBy: {
-            username: string;
-            usernameOrName: string;
-        }[];
-        hasPackagesAdded: boolean;
-        packagesAdded: {
-            catalogSlug: string;
-            packageSlug: string;
-        }[];
-        hasPackagesRemoved: boolean;
-        packagesRemoved: {
-            catalogSlug: string;
-            packageSlug: string;
-        }[];
-    }[];
+    recipientFirstName?: string;
+    hasPackageChanges: boolean;
+    packages: NotificationResourceTypeTemplate[];
+    hasCatalogChanges: boolean;
+    catalogs: NotificationResourceTypeTemplate[];
 }
 
 export async function sendFollowNotificationEmail(
     user: UserEntity,
     frequency: string,
-    notification: NotificationEmail
+    notification: NotificationEmailTemplate
 ) {
     let emailText = fs.readFileSync("./static/email-templates/follow-notification.txt", "utf8");
     let emailHTML = fs.readFileSync("./static/email-templates/follow-notification.html", "utf8");

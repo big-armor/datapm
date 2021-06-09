@@ -1,43 +1,31 @@
-{{first_name}}
+{{#recipientFirstName}}{{recipientFirstName}},{{/recipientFirstName}}
 
 This is your {{frequency}} update about items you have followed. Click the link below to view the details of these changes. 
 
 {{registry_url}}/following
 
+{{#hasPackageChanges}}
+Packages that have changed:
+{{#packages}}
+    {{displayName}} ({{&slug}})
+    {{#actions}}
+        {{username}} {{&action}}
+    {{/actions}}
 
+{{/packages}}
+{{/hasPackageChanges}}
+
+
+{{#hasCatalogChanges}}
 Catalogs that have changed:
 {{#catalogs}}
-    {{displayName}} ({{slug}})
-        {{#madePublic}}
-        Now publicly viewable (warning!)
-        {{/madePublic}}
-        {{#madeNotPublic}}
-        Now not publicly viewable
-        {{/madeNotPublic}}
-        {{#changedSlug}}
-        Changed slug (this breaks old URL links)
-        {{/changedSlug}}
-        {{#changedName}}
-        Changed friendly name
-        {{/changedName}}
-        {{#changedDescription}}
-        Changed description
-        {{/changedDescription}}
-        {{#hasPackagesAdded}}
-        Packages added:
-            {{#packagesAdded}}
-            {{catalogSlug}}/{{packageSlug}}
-            {{/packagesAdded}}
-        {{/hasPackagesAdded}}
-
-        {{#hasPackagesRemoved}}
-        Packages removed:
-            {{#packagesRemoved}}
-            {{catalogSlug}}/{{packageSlug}}
-            {{/packagesRemoved}}
-        {{/hasPackagesRemoved}}
+    {{displayName}} ({{&slug}})
+    {{#actions}}
+        {{username}} {{&action}}
+    {{/actions}}
 
 {{/catalogs}}
+{{/hasCatalogChanges}}
 
 
 You can manage your following notifications at the link below. 

@@ -216,13 +216,13 @@ export const updateCatalog = async (
             throw new Error("NOT_AUTHORIZED"); // TODO move this into the directive logic for hasCatalogPermission
         }
 
-        const catalog = await transaction.getCustomRepository(CatalogRepository).updateCatalog({
+        const [catalog, propertiesChanged] = await transaction.getCustomRepository(CatalogRepository).updateCatalog({
             identifier,
             value,
             relations: getGraphQlRelationName(info)
         });
 
-        if (value.unclaimed !== undefined) {
+        if (propertiesChanged.includes("unclaimed")) {
             await createActivityLog(transaction, {
                 userId: context.me.id,
                 eventType: ActivityLogEventType.CATALOG_PUBLIC_CHANGED,
@@ -233,14 +233,16 @@ export const updateCatalog = async (
             });
         }
 
-        await createActivityLog(transaction, {
-            userId: context.me.id,
-            eventType: ActivityLogEventType.CATALOG_EDIT,
-            targetCatalogId: catalog.id,
-            propertiesEdited: Object.keys(value).map((k) => (k == "newSlug" ? "slug" : k))
-        });
+        if (propertiesChanged.length > 0) {
+            await createActivityLog(transaction, {
+                userId: context.me.id,
+                eventType: ActivityLogEventType.CATALOG_EDIT,
+                targetCatalogId: catalog.id,
+                propertiesEdited: propertiesChanged
+            });
+        }
 
-        if (value.isPublic !== undefined) {
+        if (propertiesChanged.includes("isPublic")) {
             await createActivityLog(transaction, {
                 userId: context.me.id,
                 eventType: ActivityLogEventType.CATALOG_PUBLIC_CHANGED,
