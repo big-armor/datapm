@@ -52,8 +52,9 @@ export async function stopLeaderElection() {
 
     if (leader) {
         await stopLeaderServices();
-        mutex?.releaseLock(LEADER_KEY);
+        await mutex?.releaseLock(LEADER_KEY);
     }
+    await mutex?.end();
 }
 
 function startLeaderServices(connection: Connection) {

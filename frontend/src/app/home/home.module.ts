@@ -51,7 +51,8 @@ import { PlatformSettingsComponent } from "./admin-dashboard/platform-settings/p
         MatFormFieldModule,
         MatTooltipModule,
         MatInputModule,
-        FormsModule
+        FormsModule,
+        SharedModule
     ]
 })
 export class HomeModule {}

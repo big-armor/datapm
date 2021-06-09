@@ -22,7 +22,8 @@ import { PackageRepository } from "./repository/PackageRepository";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { CollectionRepository } from "./repository/CollectionRepository";
 import { PackageDataStorageService } from "./storage/data/package-data-storage-service";
-import { startLeaderElection } from "./service/leader-election-service";
+import { startLeaderElection, stopLeaderElection } from "./service/leader-election-service";
+import { SessionCache } from "./session-cache";
 
 console.log("DataPM Registry Server Starting...");
 
@@ -56,10 +57,16 @@ async function main() {
 
     startLeaderElection(connection);
 
+    process.on("exit", async () => {
+        console.log("DataPM Registry Server Stoping... ");
+        await stopLeaderElection();
+    });
+
     const context = async ({ req }: { req: express.Request }): Promise<Context> => ({
         request: req,
         me: await getMeRequest(req, connection.manager),
-        connection: connection
+        connection: connection,
+        cache: new SessionCache()
     });
 
     const schema = await makeSchema();

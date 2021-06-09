@@ -20,7 +20,6 @@ describe("User Tests", async () => {
 
     it("Create users A & B", async function () {
         userAClient = await createUser("FirstA", "LastA", "testA-user", "testA-user@test.datapm.io", "passwordA!");
-        AdminHolder.adminClient = userAClient;
 
         userBClient = await createUser("FirstB", "LastB", "testB-user", "testB-user@test.datapm.io", "passwordB!");
         expect(userAClient).to.exist;
@@ -28,14 +27,14 @@ describe("User Tests", async () => {
     });
 
     it("The first created user is an admin and the second one isn't", async function () {
-        let firstUserResponse = await userAClient.query({
+        let firstUserResponse = await AdminHolder.adminClient.query({
             query: MeDocument
         });
 
         let userA = firstUserResponse.data;
         expect(userA.me.isAdmin).is.true;
 
-        let secondUserResponse = await userBClient.query({
+        let secondUserResponse = await userAClient.query({
             query: MeDocument
         });
 
@@ -83,7 +82,7 @@ describe("User Tests", async () => {
     });
 
     it("First created user in registry is an admin", async function () {
-        let response = await userAClient.query({
+        let response = await AdminHolder.adminClient.query({
             query: MeDocument
         });
 
@@ -205,8 +204,24 @@ describe("User Tests", async () => {
         expect(username.data?.searchUsers["users"][0]?.username).to.equal("testA-user");
     });
 
+    it("Make userA an admin", async function () {
+        await AdminHolder.adminClient.mutate({
+            mutation: SetAsAdminDocument,
+            variables: {
+                username: "testA-user",
+                isAdmin: true
+            }
+        });
+
+        let userAResponse = await userAClient.query({
+            query: MeDocument
+        });
+
+        expect(userAResponse.data?.me.isAdmin).to.equal(true);
+    });
+
     it("Make a user an admin", async function () {
-        await userAClient.mutate({
+        await AdminHolder.adminClient.mutate({
             mutation: SetAsAdminDocument,
             variables: {
                 username: "testB-user",
@@ -241,12 +256,12 @@ describe("User Tests", async () => {
         const adminStatusChangeResponse = await userBClient.mutate({
             mutation: SetAsAdminDocument,
             variables: {
-                username: "testA-user",
+                username: AdminHolder.adminUsername,
                 isAdmin: false
             }
         });
 
-        const userAProfileResponse = await userAClient.query({
+        const userAProfileResponse = await AdminHolder.adminClient.query({
             query: MeDocument
         });
 

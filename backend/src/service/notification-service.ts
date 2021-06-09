@@ -20,6 +20,7 @@ import { VersionRepository } from "../repository/VersionRepository";
 import { VersionEntity } from "../entity/VersionEntity";
 import { version } from "uuid";
 import { PackageEntity } from "../entity/PackageEntity";
+import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 
 let databaseConnection: Connection | null;
 
@@ -309,7 +310,11 @@ async function getCatalogChanges(
                                     .getRepository(PackageEntity)
                                     .findOneOrFail({ where: { id: a.package_id } });
 
-                                if (!hasPackageEntityPermissions(connection, user, packageEntity, Permission.VIEW)) {
+                                const hasPermission = await connection
+                                    .getCustomRepository(PackagePermissionRepository)
+                                    .hasPermission(user.id, packageEntity.id, Permission.VIEW);
+
+                                if (!hasPermission) {
                                     return [];
                                 }
 

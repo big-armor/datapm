@@ -6,7 +6,6 @@ import {
     UserStatus
 } from "../generated/graphql";
 import { UserCollectionPermissionRepository } from "../repository/UserCollectionPermissionRepository";
-import { getGraphQlRelationName } from "../util/relationNames";
 import { EntityManager } from "typeorm";
 import { CollectionEntity } from "../entity/CollectionEntity";
 import { UserEntity } from "../entity/UserEntity";
@@ -17,9 +16,11 @@ import { CollectionRepository } from "../repository/CollectionRepository";
 import { asyncForEach } from "../util/AsyncForEach";
 import { ValidationError } from "apollo-server";
 
-export const hasCollectionPermissions = async (context: Context, collectionId: number, permission: Permission) => {
-    const collection = await context.connection.getRepository(CollectionEntity).findOneOrFail(collectionId);
-
+export const hasCollectionPermissions = async (
+    context: Context,
+    collection: CollectionEntity,
+    permission: Permission
+) => {
     if (permission == Permission.VIEW) {
         if (collection?.isPublic) return true;
     }
@@ -28,9 +29,7 @@ export const hasCollectionPermissions = async (context: Context, collectionId: n
         return false;
     }
 
-    return context.connection
-        .getCustomRepository(UserCollectionPermissionRepository)
-        .hasPermission(context.me.id, collection.id, permission);
+    return getCollectionPermissionsFromCacheOrDb(context, collection, permission);
 };
 
 export const grantAllCollectionPermissionsForUser = async (
@@ -138,4 +137,26 @@ export const deleteUserCollectionPermissions = async (
         identifier,
         usernameOrEmailAddress
     });
+};
+
+export const getCollectionPermissionsFromCacheOrDb = async (
+    context: Context,
+    collection: CollectionEntity,
+    permission: Permission
+) => {
+    if (!context.me) {
+        return false;
+    }
+
+    const userId = context.me.id;
+    const collectionPromiseFunction = () =>
+        context.connection
+            .getCustomRepository(UserCollectionPermissionRepository)
+            .hasPermission(userId, collection.id, permission);
+
+    return await context.cache.loadCollectionPermissionsStatusById(
+        collection.id,
+        permission,
+        collectionPromiseFunction
+    );
 };

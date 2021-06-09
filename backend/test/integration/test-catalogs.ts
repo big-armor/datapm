@@ -226,7 +226,7 @@ describe("Catalog Tests", async () => {
     });
 
     it("Non admin user can't create unclaimed catalog", async function () {
-        let response = await userAClient.mutate({
+        let response = await userBClient.mutate({
             mutation: CreateCatalogDocument,
             variables: {
                 value: {
@@ -394,6 +394,20 @@ describe("Catalog Tests", async () => {
         expect(response.data).to.not.equal(null);
         expect(response.data).to.not.equal(undefined);
         expect(response.error).to.equal(undefined);
+    });
+
+    it("Unclaimed catalogs are not included in user catalogs", async function () {
+        const response = await userAClient.query({
+            query: UserCatalogsDocument,
+            variables: {
+                username: AdminHolder.adminUsername,
+                limit: 5,
+                offSet: 0
+            }
+        });
+        expect(response.error).to.equal(undefined);
+
+        expect(response.data.userCatalogs.catalogs?.length).equal(1);
     });
 
     it("User A Create Second Catalog", async function () {

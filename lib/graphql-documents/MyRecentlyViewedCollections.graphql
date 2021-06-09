@@ -14,13 +14,6 @@ query MyRecentlyViewedCollections($offset: Int!, $limit: Int!) {
                     }
                     displayName
                     description
-                    latestVersion {
-                        identifier {
-                            versionMajor
-                            versionMinor
-                            versionPatch
-                        }
-                    }
                 }
                 isPublic
                 isRecommended

@@ -92,7 +92,6 @@ before(async function () {
         .withNetworkMode(network.getName())
         .withName("registry")
         .start();
-
     registryContainerReadable = await registryContainer.logs();
 
     registryContainerReadable

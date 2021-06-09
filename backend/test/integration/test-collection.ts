@@ -438,6 +438,7 @@ describe("Collection Tests", async () => {
                 }
             }
         });
+
         expect(response.errors == null, "no errors").true;
         expect(response.data!.updateCollection.identifier.collectionSlug).equal("testA-collection");
         expect(response.data!.updateCollection.isPublic).equal(true);

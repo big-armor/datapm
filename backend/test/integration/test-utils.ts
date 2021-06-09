@@ -5,12 +5,14 @@ import {
     CreateMeMutationVariables,
     LoginDocument,
     LoginMutation,
+    MeDocument,
     VerifyEmailAddressDocument,
     VerifyEmailAddressMutation
 } from "./registry-client";
 import fetch from "cross-fetch";
 import { mailObservable } from "./setup";
 import { expect } from "chai";
+import { AdminHolder } from "./admin-holder";
 
 export function createAnonymousClient() {
     return new ApolloClient({

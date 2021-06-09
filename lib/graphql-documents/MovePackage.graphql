@@ -1,0 +1,3 @@
+mutation MovePackage($identifier: PackageIdentifierInput!, $catalogIdentifier: CatalogIdentifierInput!) {
+    movePackage(identifier: $identifier, catalogIdentifier: $catalogIdentifier)
+}

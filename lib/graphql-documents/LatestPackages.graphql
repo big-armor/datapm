@@ -5,26 +5,10 @@ query GetLatestPackages($offset: Int!, $limit: Int!) {
                 catalogSlug
                 packageSlug
             }
-            catalog {
-                myPermissions
-            }
             myPermissions
             isPublic
             displayName
             description
-            description
-            latestVersion {
-                identifier {
-                    versionMajor
-                    versionMinor
-                    versionPatch
-                }
-                createdAt
-                updatedAt
-                author {
-                    username
-                }
-            }
             creator {
                 username
                 firstName

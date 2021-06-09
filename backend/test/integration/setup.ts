@@ -6,9 +6,10 @@ import { Observable } from "@apollo/client/core";
 import fs from "fs";
 import { before } from "mocha";
 import { RandomUuid } from "testcontainers/dist/uuid";
-import { createTestClient } from "./test-utils";
+import { createTestClient, createUser } from "./test-utils";
 import { RegistryStatusDocument } from "./registry-client";
 import { expect } from "chai";
+import { AdminHolder } from "./admin-holder";
 const maildev = require("maildev");
 
 let container: StartedTestContainer;
@@ -28,6 +29,7 @@ before(async function () {
     console.log("Starting postgres temporary container");
 
     this.timeout(120000);
+
     container = await new GenericContainer("postgres")
         .withEnv("POSTGRES_PASSWORD", "postgres")
         .withEnv("POSTGRES_DB", "datapm")
@@ -105,16 +107,26 @@ before(async function () {
     });
 
     // Wait for the server to start
-    await new Promise(async (r) => {
+    await new Promise<void>(async (r) => {
         let serverReady = false;
 
         console.log("Waiting for server to start");
-        serverProcess.stdout!.on("data", (buffer: Buffer) => {
+        serverProcess.stdout!.on("data", async (buffer: Buffer) => {
             const line = buffer.toString();
             //console.log(line);
             if (line.indexOf("🚀") != -1) {
                 console.log("Server started!");
                 serverReady = true;
+
+                AdminHolder.adminClient = await createUser(
+                    "admin",
+                    "user",
+                    "admin-user",
+                    "admin@test.comc",
+                    "admin1234",
+                    false
+                );
+                AdminHolder.adminUsername = "admin-user";
 
                 r();
             }
@@ -146,24 +158,30 @@ after(async function () {
 
     fs.rmdirSync(TEMP_STORAGE_URL.replace("file://", ""), { recursive: true });
 
-    if (container) await container.stop();
-
-    console.log("postgres container stopped normally");
-
     serverProcess.stdout!.destroy();
     serverProcess.stderr!.destroy();
 
-    let pids = pidtree(serverProcess.pid, { root: true });
+    try {
+        let pids = pidtree(serverProcess.pid, { root: true });
 
-    // recursively kill all child processes
-    (await pids).forEach((p) => {
-        console.log("Killing process " + p);
-        try {
-            process.kill(p);
-        } catch (error) {
-            console.error("Error killing process " + p);
-            console.error(error);
-        }
-    });
+        // recursively kill all child processes
+        (await pids).forEach((p) => {
+            console.log("Killing process " + p);
+            try {
+                process.kill(p);
+            } catch (error) {
+                console.error("Error killing process " + p);
+                console.error(error);
+            }
+        });
+    } catch (error) {
+        console.log("error stopping processes " + error.message);
+    }
+
+    if (container) {
+        await container.stop();
+        console.log("postgres container stopped normally");
+    }
+
     mailServer.close();
 });

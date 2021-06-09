@@ -315,6 +315,7 @@ export class CatalogRepository extends Repository<CatalogEntity> {
         const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
         const response = await this.createQueryBuilderWithUserConditions(user, Permission.VIEW)
             .andWhere(`("CatalogEntity"."creator_id" = :targetUserId)`)
+            .andWhere(`("CatalogEntity"."unclaimed" IS NOT TRUE)`)
             .setParameter("targetUserId", targetUser.id)
             .offset(offSet)
             .limit(limit)

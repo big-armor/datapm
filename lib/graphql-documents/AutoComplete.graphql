@@ -111,6 +111,7 @@ query AutoCompleteCatalog($startsWith: String!) {
             displayName
             description
             isPublic
+            myPermissions
         }
     }
 }

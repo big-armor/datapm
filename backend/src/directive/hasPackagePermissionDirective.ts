@@ -9,11 +9,11 @@ import {
 } from "graphql";
 import { AuthenticatedContext, Context } from "../context";
 import { Permission, PackageIdentifier, PackageIdentifierInput } from "../generated/graphql";
-import { PackageRepository } from "../repository/PackageRepository";
 import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
-import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { UserEntity } from "../entity/UserEntity";
-import { buildUnclaimedCatalogPermissions } from "./hasCatalogPermissionDirective";
+import { getPackageFromCacheOrDbOrFail } from "../resolvers/PackageResolver";
+import { UserPackagePermissionEntity } from "../entity/UserPackagePermissionEntity";
+import { getCatalogPermissionsFromCacheOrDb } from "../resolvers/UserCatalogPermissionResolver";
 
 export async function resolvePackagePermissions(
     context: Context,
@@ -22,14 +22,7 @@ export async function resolvePackagePermissions(
 ): Promise<Permission[]> {
     const permissions: Permission[] = [];
 
-    const packageEntity = await context.connection
-        .getCustomRepository(PackageRepository)
-        .findPackageOrFail({ identifier });
-
-    if (packageEntity.catalog.unclaimed) {
-        return buildUnclaimedCatalogPermissions(context);
-    }
-
+    const packageEntity = await getPackageFromCacheOrDbOrFail(context, identifier);
     if (packageEntity.isPublic) {
         permissions.push(Permission.VIEW);
     }
@@ -38,12 +31,15 @@ export async function resolvePackagePermissions(
         return permissions;
     }
 
-    const userPermission = await context.connection
-        .getCustomRepository(PackagePermissionRepository)
-        .findPackagePermissions({
+    const userPermissionPromiseFunction = () =>
+        context.connection.getCustomRepository(PackagePermissionRepository).findPackagePermissions({
             packageId: packageEntity.id,
             userId: user.id
-        });
+        }) as Promise<UserPackagePermissionEntity>;
+    const userPermission = await context.cache.loadPackagePermissionsById(
+        packageEntity.id,
+        userPermissionPromiseFunction
+    );
 
     if (userPermission != null) {
         userPermission.permissions.forEach((p) => {
@@ -53,10 +49,7 @@ export async function resolvePackagePermissions(
         });
     }
 
-    const catalogPermissions = await context.connection
-        .getCustomRepository(UserCatalogPermissionRepository)
-        .findCatalogPermissions({ catalogId: packageEntity.catalogId, userId: user!.id });
-
+    const catalogPermissions = await getCatalogPermissionsFromCacheOrDb(context, packageEntity.catalogId, user!.id);
     if (catalogPermissions != null) {
         catalogPermissions.packagePermission.forEach((p) => {
             if (!permissions.includes(p)) {
@@ -76,11 +69,15 @@ async function hasPermission(
     // Check that the package exists
     const permissions = await resolvePackagePermissions(context, identifier, context.me);
 
-    if (permissions.includes(permission)) return;
+    if (permissions.includes(permission)) {
+        return;
+    }
 
-    if (context.me == null) throw new AuthenticationError(`NOT_AUTHENTICATED`);
+    if (context.me == null) {
+        throw new AuthenticationError("NOT_AUTHENTICATED");
+    }
 
-    throw new ForbiddenError(`NOT_AUTHORIZED`);
+    throw new ForbiddenError("NOT_AUTHORIZED");
 }
 
 export class HasPackagePermissionDirective extends SchemaDirectiveVisitor {
@@ -99,7 +96,6 @@ export class HasPackagePermissionDirective extends SchemaDirectiveVisitor {
         }
     ): GraphQLArgument | void | null {
         const { resolve = defaultFieldResolver } = details.field;
-        const self = this;
         const permission = (argument
             .astNode!.directives!.find((d) => d.name.value == "hasPackagePermission")!
             .arguments!.find((a) => a.name.value == "permission")!.value as EnumValueNode).value as Permission;

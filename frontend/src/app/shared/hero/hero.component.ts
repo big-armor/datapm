@@ -1,39 +1,29 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit } from "@angular/core";
+import { AfterContentChecked, AfterViewInit, Component, ElementRef, OnDestroy, OnInit } from "@angular/core";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { BuilderIOService } from "src/app/imported/resource-importer.service";
-import { UiStyleToggleService } from "src/app/services/ui-style-toggle.service";
 
 @Component({
-    selector: "sd-footer",
-    templateUrl: "./footer.component.html",
-    styleUrls: ["./footer.component.scss"]
+    selector: "sd-hero",
+    templateUrl: "./hero.component.html",
+    styleUrls: ["./hero.component.scss"]
 })
-export class FooterComponent implements OnInit, OnDestroy, AfterViewInit {
+export class HeroComponent implements OnInit, OnDestroy, AfterViewInit {
     private readonly destroy = new Subject<void>();
+
+    public loaded: boolean = false;
 
     private readonly JAVASCRIPT_ELEMENT_TYPE = "script";
     private readonly JAVASCRIPT_SCRIPT_TYPE = "text/javascript";
 
-    private readonly BUILDER_IO_ENTRY_KEY = "footer";
-
-    public darkModeEnabled = false;
-    public loaded: boolean = false;
+    private readonly BUILDER_IO_ENTRY_KEY = "hero";
 
     public apiKey: string;
     public entry: string;
 
-    constructor(
-        private uiStyleToggleService: UiStyleToggleService,
-        private builderIOService: BuilderIOService,
-        private elementRef: ElementRef
-    ) {}
+    constructor(private builderIOService: BuilderIOService, private elementRef: ElementRef) {}
 
-    public ngOnInit(): void {
-        this.uiStyleToggleService.DARK_MODE_ENABLED.pipe(takeUntil(this.destroy)).subscribe(
-            (darkModeEnabled) => (this.darkModeEnabled = darkModeEnabled)
-        );
-    }
+    ngOnInit(): void {}
 
     public ngAfterViewInit(): void {
         this.loadContent();
@@ -44,10 +34,6 @@ export class FooterComponent implements OnInit, OnDestroy, AfterViewInit {
         this.destroy.complete();
     }
 
-    public toggleTheme(): void {
-        this.uiStyleToggleService.toggle();
-    }
-
     private loadContent(): void {
         this.loaded = false;
         this.builderIOService
@@ -56,9 +42,11 @@ export class FooterComponent implements OnInit, OnDestroy, AfterViewInit {
             .subscribe((apiKey) => {
                 const entry = this.builderIOService.getTemplateEntryByPageKey(this.BUILDER_IO_ENTRY_KEY);
                 if (entry) {
+                    console.log("wowz");
                     this.loadJavascriptAndInjectIntoTemplate(apiKey, entry);
                 } else {
                     this.loaded = true;
+                    console.log(" trueeee" + this.loaded);
                 }
             });
     }

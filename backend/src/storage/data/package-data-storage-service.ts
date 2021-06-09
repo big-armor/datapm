@@ -1,9 +1,10 @@
+import { rejects } from "assert";
 import { SemVer } from "semver";
 import { Readable } from "stream";
 import { Context } from "../../context";
 import { PackageEntity } from "../../entity/PackageEntity";
 import { Permission } from "../../generated/graphql";
-import { PackageRepository } from "../../repository/PackageRepository";
+import { getPackageFromCacheOrDbOrFail } from "../../resolvers/PackageResolver";
 import { hasPackageEntityPermissions } from "../../resolvers/UserPackagePermissionResolver";
 import { FileStorageService } from "../files/file-storage-service";
 import { PackageFileStorageService } from "../packages/package-file-storage-service";
@@ -14,6 +15,38 @@ export class PackageDataStorageService {
     private readonly NAMESPACE = "data";
 
     private readonly fileStorageService = FileStorageService.INSTANCE;
+
+    public async movePackageDataInNewCatalog(
+        context: Context,
+        oldCatalogSlug: string,
+        newCatalogSlug: string,
+        packageSlug: string
+    ): Promise<void> {
+        const packageEntity = await this.getPackage(context, oldCatalogSlug, packageSlug);
+        await this.validatePackageManagePermissions(context, packageEntity);
+
+        const oldCatalogNamespace = this.buildCatalogNamespace(oldCatalogSlug);
+        const hasDataStored = await this.fileStorageService.fileExists(oldCatalogNamespace, packageSlug);
+        if (!hasDataStored) {
+            return;
+        }
+
+        const oldPackagePath = this.buildPackageNamespace(oldCatalogSlug, packageSlug);
+        const newPackagePath = this.buildPackageNamespace(newCatalogSlug, packageSlug);
+
+        return new Promise(
+            async (res, rej) =>
+                await this.fileStorageService
+                    .moveFile(oldPackagePath, newPackagePath, (error: any) => {
+                        if (error) {
+                            rej(error);
+                        } else {
+                            res();
+                        }
+                    })
+                    .catch((e) => rej(e))
+        );
+    }
 
     public async writePackageDataFromStream(
         context: Context,
@@ -41,7 +74,7 @@ export class PackageDataStorageService {
         sourceSlug: string
     ): Promise<Readable> {
         const packageEntity = await this.getPackage(context, catalogSlug, packageSlug);
-        await this.validatePackageEditPermissions(context, packageEntity);
+        await this.validatePackageViewPermissions(context, packageEntity);
         await this.validatePackageSlug(packageEntity, version, sourceSlug);
 
         const namespace = this.buildDataNamespace(catalogSlug, packageSlug, version);
@@ -49,9 +82,11 @@ export class PackageDataStorageService {
     }
 
     private async getPackage(context: Context, catalogSlug: string, packageSlug: string): Promise<PackageEntity> {
-        return context.connection.getCustomRepository(PackageRepository).findPackageOrFail({
-            identifier: { catalogSlug: catalogSlug, packageSlug: packageSlug }
-        });
+        return await getPackageFromCacheOrDbOrFail(context, { catalogSlug, packageSlug });
+    }
+
+    private async validatePackageManagePermissions(context: Context, packageEntity: PackageEntity): Promise<void> {
+        return this.validatePackagePermissions(context, packageEntity, Permission.MANAGE);
     }
 
     private async validatePackageEditPermissions(context: Context, packageEntity: PackageEntity): Promise<void> {
@@ -67,12 +102,7 @@ export class PackageDataStorageService {
         packageEntity: PackageEntity,
         permission: Permission
     ): Promise<void> {
-        const hasPermissions = await hasPackageEntityPermissions(
-            context.connection,
-            context.me,
-            packageEntity,
-            permission
-        );
+        const hasPermissions = await hasPackageEntityPermissions(context, packageEntity, permission);
         if (!hasPermissions) {
             throw new Error("NOT_AUTHORIZED");
         }
@@ -99,6 +129,14 @@ export class PackageDataStorageService {
     }
 
     private buildDataNamespace(catalogSlug: string, packageSlug: string, version: string): string {
-        return this.NAMESPACE + "/" + catalogSlug + "/" + packageSlug + "/" + version + "/";
+        return this.buildPackageNamespace(catalogSlug, packageSlug) + version + "/";
+    }
+
+    private buildPackageNamespace(catalogSlug: string, packageSlug: string): string {
+        return this.buildCatalogNamespace(catalogSlug) + packageSlug + "/";
+    }
+
+    private buildCatalogNamespace(catalogSlug: string): string {
+        return this.NAMESPACE + "/" + catalogSlug + "/";
     }
 }

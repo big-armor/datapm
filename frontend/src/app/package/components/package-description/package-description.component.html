@@ -1,61 +1,70 @@
-<div *ngIf="packageFile?.readmeMarkdown" class="pb-4">
-    <div [class.limitTextHeight]="shouldShowMoreReadMeButton && !isShowingMoreReadMeText">
-        <markdown [data]="packageFile?.readmeMarkdown"></markdown>
-    </div>
-    <div class="fade-out" [class.d-none]="!shouldShowMoreReadMeButton || isShowingMoreReadMeText"></div>
-    <p class="text-center mt-3" *ngIf="shouldShowMoreReadMeButton">
-        <a class="app-outlined-button" (click)="toggleShowMoreReadMeText()">
-            {{ isShowingMoreReadMeText ? "Show Less" : "Show More" }}
-        </a>
-    </p>
-    <div class="text-dark-gray" *ngIf="canManage()">
-        <a class="color-info cursor-pointer" (click)="editReadme()">edit readme</a>
-    </div>
-</div>
-
-<div *ngIf="packageFile?.licenseMarkdown" class="pb-4">
-    <div [class.limitTextHeight]="shouldShowMoreLicenseButton && !isShowingMoreLicenseText">
-        <markdown [data]="packageFile?.licenseMarkdown"></markdown>
-    </div>
-    <div class="fade-out" [class.d-none]="!shouldShowMoreLicenseButton || isShowingMoreLicenseText"></div>
-    <p class="text-center mt-3" *ngIf="shouldShowMoreLicenseButton">
-        <a class="app-outlined-button" (click)="toggleShowMoreLicenseText()">
-            {{ isShowingMoreLicenseText ? "Show Less" : "Show More" }}
-        </a>
-    </p>
-    <div class="text-dark-gray" *ngIf="canManage()">
-        <a class="color-info cursor-pointer" (click)="editLicense()">edit license</a>
-    </div>
-</div>
-<h1>Preview</h1>
-
-<div *ngIf="schemas?.length > 1" class="mb-2">
-    <mat-select (selectionChange)="selectSchema($event.value)" [value]="selectedSchema">
-        <mat-option *ngFor="let schema of schemas" [value]="schema">
-            {{ schema.title }}
-        </mat-option>
-    </mat-select>
-</div>
-
-<ng-container *ngIf="packageFile">
-    <div class="mb-150">
-        <samples [package]="package" [schema]="selectedSchema"></samples>
-    </div>
-</ng-container>
-
-<ng-container *ngIf="packageFile">
-    <div class="mt-4 py-2">
-        <div class="text-main-title mb-1">Schema</div>
-        <div *ngIf="schemas?.length > 1" class="mb-2">
-            <mat-select (selectionChange)="selectSchema($event.value)" [value]="selectedSchema">
-                <mat-option *ngFor="let schema of schemas" [value]="schema">
-                    {{ schema.title }}
-                </mat-option>
-            </mat-select>
+<ng-container *ngIf="packageFile; else noPackageFileTemplate">
+    <div *ngIf="packageFile?.readmeMarkdown" class="pb-4">
+        <div [class.limitTextHeight]="shouldShowMoreReadMeButton && !isShowingMoreReadMeText">
+            <markdown [data]="packageFile?.readmeMarkdown"></markdown>
         </div>
-        <schema [package]="package" [schema]="selectedSchema" [packageFile]="packageFile"></schema>
+        <div class="fade-out" [class.d-none]="!shouldShowMoreReadMeButton || isShowingMoreReadMeText"></div>
+        <p class="text-center mt-3" *ngIf="shouldShowMoreReadMeButton">
+            <a class="app-outlined-button" (click)="toggleShowMoreReadMeText()">
+                {{ isShowingMoreReadMeText ? "Show Less" : "Show More" }}
+            </a>
+        </p>
+        <div class="text-dark-gray" *ngIf="canManage()">
+            <a class="color-info cursor-pointer" (click)="editReadme()">edit readme</a>
+        </div>
     </div>
+
+    <div *ngIf="packageFile?.licenseMarkdown" class="pb-4">
+        <div [class.limitTextHeight]="shouldShowMoreLicenseButton && !isShowingMoreLicenseText">
+            <markdown [data]="packageFile?.licenseMarkdown"></markdown>
+        </div>
+        <div class="fade-out" [class.d-none]="!shouldShowMoreLicenseButton || isShowingMoreLicenseText"></div>
+        <p class="text-center mt-3" *ngIf="shouldShowMoreLicenseButton">
+            <a class="app-outlined-button" (click)="toggleShowMoreLicenseText()">
+                {{ isShowingMoreLicenseText ? "Show Less" : "Show More" }}
+            </a>
+        </p>
+        <div class="text-dark-gray" *ngIf="canManage()">
+            <a class="color-info cursor-pointer" (click)="editLicense()">edit license</a>
+        </div>
+    </div>
+    <h1>Preview</h1>
+
+    <div *ngIf="schemas?.length > 1" class="mb-2">
+        <mat-select (selectionChange)="selectSchema($event.value)" [value]="selectedSchema">
+            <mat-option *ngFor="let schema of schemas" [value]="schema">
+                {{ schema.title }}
+            </mat-option>
+        </mat-select>
+    </div>
+
+    <ng-container *ngIf="packageFile">
+        <div class="mb-150">
+            <samples [package]="package" [schema]="selectedSchema"></samples>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="packageFile">
+        <div class="mt-4 py-2">
+            <div class="text-main-title mb-1">Schema</div>
+            <div *ngIf="schemas?.length > 1" class="mb-2">
+                <mat-select (selectionChange)="selectSchema($event.value)" [value]="selectedSchema">
+                    <mat-option *ngFor="let schema of schemas" [value]="schema">
+                        {{ schema.title }}
+                    </mat-option>
+                </mat-select>
+            </div>
+            <schema [package]="package" [schema]="selectedSchema" [packageFile]="packageFile"></schema>
+        </div>
+    </ng-container>
 </ng-container>
+
+<ng-template #noPackageFileTemplate>
+    <p>There was an error finding the package file.</p>
+    <p>
+        Please contact support<span *ngIf="hasEditPackagePermissions"> or publish a new package file</span>.
+    </p></ng-template
+>
 
 <ng-container *ngIf="collections?.length">
     <div class="related-data-div mt-5">

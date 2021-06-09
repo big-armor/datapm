@@ -20,8 +20,11 @@ import { EditWebsiteDialogComponent } from "./edit-website-dialog/edit-website-d
     styleUrls: ["./package-info.component.scss"]
 })
 export class PackageInfoComponent implements OnInit, OnChanges {
-    @Input() public package: Package;
-    @Input() public packageFile: PackageFile;
+    @Input()
+    public package: Package;
+
+    @Input()
+    public packageFile: PackageFile;
 
     public currentUser: User;
     public packageUnit: string;
@@ -35,9 +38,9 @@ export class PackageInfoComponent implements OnInit, OnChanges {
     ) {}
 
     public ngOnInit(): void {
-        this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
-            this.currentUser = user;
-        });
+        this.authenticationService.currentUser
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe((user: User) => (this.currentUser = user));
     }
 
     public ngOnChanges(): void {
