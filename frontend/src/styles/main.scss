@@ -26,6 +26,7 @@ a {
 
 body {
     margin: 0;
+    scroll-behavior: smooth;
     font-family: $family-roboto !important;
 }
 
@@ -481,8 +482,6 @@ mat-select {
     line-height: 14px;
     color: var(--info-color) !important;
     border: 1px solid var(--gray-9-color) !important;
-    scroll-behavior: smooth;
-    animation: move 3s ease-out infinite;
     cursor: pointer;
 
     &:hover {

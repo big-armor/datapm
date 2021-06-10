@@ -54,6 +54,7 @@
                                             [formControl]="contentLabelControl"
                                             placeholder="Content Label"
                                             [matChipInputFor]="chipList"
+                                            [matChipInputAddOnBlur]="addOnBlur"
                                             [matChipInputSeparatorKeyCodes]="CHIP_SEPARATOR_KEY_CODES"
                                             (matChipInputTokenEnd)="add($event, valueTypes.contentLabels)"
                                         />

@@ -68,14 +68,13 @@
                                 </div>
                             </mat-card-content>
                         </mat-card>
-                        <!-- <table
+                        <table
                             aria-describedby="catalogTable"
                             *ngIf="catalogState === State.SUCCESS && myCatalogs && myCatalogs.length > 0"
                             mat-table
                             class="gray-table"
                             [dataSource]="myCatalogs"
                         >
-
                             <ng-container matColumnDef="name">
                                 <th scope="col" mat-header-cell *matHeaderCellDef>Name</th>
                                 <td class="table-content" mat-cell *matCellDef="let catalog">
@@ -118,7 +117,7 @@
 
                             <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
                             <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
-                        </table> -->
+                        </table>
                         <div class="loading-container" *ngIf="catalogState === State.LOADING">
                             <mat-spinner [diameter]="40"></mat-spinner>
                         </div>

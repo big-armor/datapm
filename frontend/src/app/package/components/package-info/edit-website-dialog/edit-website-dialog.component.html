@@ -3,9 +3,11 @@
         <div class="col-md-12 p-0">
             <div mat-dialog-title id="contentTitle">Edit Website URL</div>
             <div mat-dialog-content id="contentBorder">
-                <div class="row mb-2">
+                <div class="row">
                     <div class="col-md-12">
-                        Enter the URL to a website for the data's author or extended information below.
+                        <div class="text-dark-gray">
+                            Enter the URL to a website for the data's author or extended information below.
+                        </div>
                     </div>
                 </div>
                 <div class="row pb-3 pt-1">
@@ -25,9 +27,11 @@
                 </div>
             </div>
 
-            <div mat-dialog-actions class="mat-dialog-actions d-flex justify-content-between pb-3">
-                <button mat-button mat-dialog-close class="close-dialog">Close</button>
-                <button mat-button class="ml-0 save-btn" [disabled]="loading" (click)="submit()">Submit</button>
+            <div mat-dialog-actions class="d-flex justify-content-between pb-2">
+                <button mat-dialog-close class="modal-close-btn">Close</button>
+                <button (click)="submit()" [disabled]="loading" class="ml-0 modal-submit-btn">
+                    <span>Submit</span>
+                </button>
             </div>
         </div>
     </div>

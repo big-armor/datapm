@@ -33,6 +33,8 @@ export interface PropertyDialogData {
 export class EditPropertyDialogComponent {
     public readonly CHIP_SEPARATOR_KEY_CODES: number[] = [ENTER, COMMA];
 
+    addOnBlur = true;
+
     public selectedProperty: Schema;
     public selectedPropertyTitle: string;
     public properties: Schema[] = [];
