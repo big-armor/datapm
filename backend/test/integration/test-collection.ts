@@ -14,7 +14,6 @@ import {
     CollectionPackagesDocument,
     CreateVersionDocument,
     UserCollectionsDocument,
-    DeleteUserCollectionPermissionsDocument,
     RemovePackageFromCollectionDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";

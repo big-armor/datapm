@@ -2,7 +2,7 @@ import { EntityRepository, EntityManager, DeleteResult, Connection } from "typeo
 
 import { UserPackagePermissionEntity } from "../entity/UserPackagePermissionEntity";
 import { UserRepository } from "./UserRepository";
-import { Permission, PackageIdentifier, PackageIdentifierInput } from "../generated/graphql";
+import { Permission, PackageIdentifier, PackageIdentifierInput, User } from "../generated/graphql";
 import { PackageRepository } from "./PackageRepository";
 import { PackageEntity } from "../entity/PackageEntity";
 import { UserEntity } from "../entity/UserEntity";
@@ -25,6 +25,20 @@ async function getPackagePermissions({
         .addRelations(ALIAS, relations)
         .where({ packageId, userId })
         .getOne();
+}
+
+export async function getAllPackagePermissions(
+    manager: EntityManager,
+    packageId: number,
+    relations?: string[]
+): Promise<UserPackagePermissionEntity[]> {
+    const ALIAS = "userPackagePermission";
+    return manager
+        .getRepository(UserPackagePermissionEntity)
+        .createQueryBuilder(ALIAS)
+        .addRelations(ALIAS, relations)
+        .where({ packageId })
+        .getMany();
 }
 
 @EntityRepository()
@@ -144,26 +158,6 @@ export class PackagePermissionRepository {
         collectionPermissionEntry.packageId = packageId;
         collectionPermissionEntry.permissions = permissions;
         return await transaction.save(collectionPermissionEntry);
-    }
-
-    public removePackagePermission({
-        identifier,
-        usernameOrEmailAddress
-    }: {
-        identifier: PackageIdentifierInput;
-        usernameOrEmailAddress: string;
-        relations?: string[];
-    }): Promise<void> {
-        return this.manager.nestedTransaction(async (transaction) => {
-            const user = await transaction
-                .getCustomRepository(UserRepository)
-                .getUserByUsernameOrEmailAddress(usernameOrEmailAddress);
-            if (!user) {
-                throw new Error("USER_NOT_FOUND-" + usernameOrEmailAddress);
-            }
-
-            await this.removePackagePermissionForUser({ identifier, user });
-        });
     }
 
     public removePackagePermissionForUser({
