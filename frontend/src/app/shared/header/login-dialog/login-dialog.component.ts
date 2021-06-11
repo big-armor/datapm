@@ -100,4 +100,12 @@ export class LoginDialogComponent implements OnInit, OnDestroy {
             this.dialog.openForgotPasswordDialog();
         });
     }
+
+    openSignupDialog(ev: any) {
+        ev.preventDefault();
+        this.dialogRef.close();
+        this.dialogRef.afterClosed().subscribe(() => {
+            this.dialog.openSignupDialog();
+        });
+    }
 }

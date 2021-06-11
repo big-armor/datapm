@@ -93,7 +93,8 @@ export class CatalogPermissionsComponent implements OnChanges {
     public editCatalog(): void {
         this.dialog
             .open(EditCatalogComponent, {
-                data: this.catalog
+                data: this.catalog,
+                disableClose: true
             })
             .afterClosed()
             .subscribe((newCatalog: Catalog) => {
