@@ -26,7 +26,8 @@
     </div>
 
     <div class="text-main-title mt-4 pt-3">Manage Package</div>
-    <button class="app-outlined-button" (click)="deletePackage()">Delete This Package</button>
+    <button class="app-outlined-button mr-3" (click)="movePackage()">Move Package</button>
+    <button class="app-outlined-button" (click)="deletePackage()">Delete Package</button>
 
     <div *ngIf="users?.length">
         <div class="text-main-title mt-4 pt-3">Users With Access</div>

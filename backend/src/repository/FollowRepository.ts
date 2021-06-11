@@ -51,6 +51,38 @@ export class FollowRepository extends Repository<FollowEntity> {
             .getManyAndCount();
     }
 
+    public getFollowsByPackageId(packageId: number, relations: string[] = []): Promise<FollowEntity[]> {
+        return this.createQueryBuilder("FollowEntity")
+            .where('"target_package_id" = :packageId')
+            .setParameter("packageId", packageId)
+            .addRelations("FollowEntity", relations)
+            .getMany();
+    }
+
+    public getFollowsByPackageIssuesIds(packageIssueIds: number[], relations: string[] = []): Promise<FollowEntity[]> {
+        return this.createQueryBuilder("FollowEntity")
+            .where('"target_package_issue_id" IN (:...packageIssueIds)')
+            .setParameter("packageIssueIds", packageIssueIds)
+            .addRelations("FollowEntity", relations)
+            .getMany();
+    }
+
+    public getFollowsByCatalogId(catalogId: number, relations: string[] = []): Promise<FollowEntity[]> {
+        return this.createQueryBuilder("FollowEntity")
+            .where('"target_catalog_id" = :catalogId')
+            .setParameter("catalogId", catalogId)
+            .addRelations("FollowEntity", relations)
+            .getMany();
+    }
+
+    public getFollowsByCollectionId(collectionId: number, relations: string[] = []): Promise<FollowEntity[]> {
+        return this.createQueryBuilder("FollowEntity")
+            .where('"target_collection_id" = :collectionId')
+            .setParameter("collectionId", collectionId)
+            .addRelations("FollowEntity", relations)
+            .getMany();
+    }
+
     public getPackageIssueFollows(
         userId: number,
         offset: number,
@@ -141,6 +173,14 @@ export class FollowRepository extends Repository<FollowEntity> {
         return this.getFollowByPackageIssueIdQuery(userId, packageIssueId).delete().from(FollowEntity).execute();
     }
 
+    public deleteFollowsByPackageIssueIds(userId: number, packageIssueIds: number[]): Promise<DeleteResult> {
+        if (packageIssueIds == null || packageIssueIds.length === 0) {
+            return Promise.resolve({ raw: null, affected: 0 });
+        }
+
+        return this.getFollowsByPackageIssuesIdsQuery(userId, packageIssueIds).delete().from(FollowEntity).execute();
+    }
+
     public deleteFollowByUserId(userId: number, targetUserId: number): Promise<DeleteResult> {
         return this.getFollowByUserIdQuery(userId, targetUserId).delete().from(FollowEntity).execute();
     }
@@ -190,6 +230,17 @@ export class FollowRepository extends Repository<FollowEntity> {
             .andWhere('"target_package_issue_id" = :packageIssueId')
             .setParameter("userId", userId)
             .setParameter("packageIssueId", packageIssueId);
+    }
+
+    private getFollowsByPackageIssuesIdsQuery(
+        userId: number,
+        packageIssueIds: number[]
+    ): SelectQueryBuilder<FollowEntity | undefined> {
+        return this.createQueryBuilder("FollowEntity")
+            .where('"user_id" = :userId')
+            .andWhere('"target_package_issue_id" in (:...packageIssueId)')
+            .setParameter("userId", userId)
+            .setParameter("packageIssueId", packageIssueIds);
     }
 
     private getFollowByUserIdQuery(userId: number, targetUserId: number): SelectQueryBuilder<FollowEntity | undefined> {

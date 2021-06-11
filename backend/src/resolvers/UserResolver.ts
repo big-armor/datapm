@@ -20,6 +20,7 @@ import { FirstUserStatusHolder } from "./FirstUserStatusHolder";
 import { UserEntity } from "../entity/UserEntity";
 import { ReservedKeywordsService } from "../service/reserved-keywords-service";
 import { sendUserSuspendedEmail } from "../util/smtpUtil";
+import { Connection, EntityManager } from "typeorm";
 
 const USER_SEARCH_RESULT_LIMIT = 100;
 export const searchUsers = async (
@@ -317,4 +318,25 @@ export const acceptInvite = async (
 
         await transaction.save(user);
     });
+};
+
+export const getUserFromCacheOrDbById = async (
+    context: Context,
+    connection: EntityManager | Connection,
+    id: number,
+    relations: string[] = []
+) => {
+    const userPromiseFunction = () =>
+        connection.getCustomRepository(UserRepository).findOneOrFail({
+            where: { id },
+            relations
+        });
+
+    return context.cache.loadUser(id, userPromiseFunction);
+};
+
+export const getUserFromCacheOrDbByUsername = async (context: Context, username: string, relations: string[] = []) => {
+    const userPromiseFunction = () =>
+        context.connection.getCustomRepository(UserRepository).findUserByUserName({ username, relations });
+    return context.cache.loadUserByUsername(username, userPromiseFunction);
 };

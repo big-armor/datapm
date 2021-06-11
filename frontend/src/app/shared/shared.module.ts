@@ -67,6 +67,7 @@ import { UserFollowingComponent } from "./user-details/user-following/user-follo
 import { UserTypeFollowingComponent } from "./user-details/user-following/user-type-following/user-type-following.component";
 import { IvyCarouselModule } from "angular-responsive-carousel";
 import { ImportedModule } from "../imported/imported.module";
+import { MovePackageComponent } from "./move-package/move-package.component";
 import { HeroComponent } from "./hero/hero.component";
 
 @NgModule({
@@ -115,6 +116,7 @@ import { HeroComponent } from "./hero/hero.component";
         FollowDialogComponent,
         UserFollowingComponent,
         UserTypeFollowingComponent,
+        MovePackageComponent,
         HeroComponent
     ],
     imports: [

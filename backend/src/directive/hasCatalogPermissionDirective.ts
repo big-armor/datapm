@@ -11,8 +11,9 @@ import { Context } from "../context";
 import { CatalogEntity } from "../entity/CatalogEntity";
 import { UserEntity } from "../entity/UserEntity";
 import { CatalogIdentifierInput, Permission } from "../generated/graphql";
-import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { CatalogRepository } from "../repository/CatalogRepository";
+import { getCatalogFromCacheOrDbOrFail } from "../resolvers/CatalogResolver";
+import { getCatalogPermissionsFromCacheOrDb } from "../resolvers/UserCatalogPermissionResolver";
 
 export const buildUnclaimedCatalogPermissions = (context: Context): Permission[] => {
     const permissions = [Permission.VIEW];
@@ -27,10 +28,7 @@ export async function resolveCatalogPermissions(
     identifier: CatalogIdentifierInput,
     user?: UserEntity
 ) {
-    const catalog = await context.connection
-        .getCustomRepository(CatalogRepository)
-        .findCatalogBySlugOrFail(identifier.catalogSlug);
-
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, identifier);
     return resolveCatalogPermissionsForEntity(context, catalog, user);
 }
 
@@ -45,13 +43,7 @@ export async function resolveCatalogPermissionsForEntity(context: Context, catal
         return permissions;
     }
 
-    const userPermission = await context.connection
-        .getCustomRepository(UserCatalogPermissionRepository)
-        .findCatalogPermissions({
-            catalogId: catalog.id,
-            userId: user.id
-        });
-
+    const userPermission = await getCatalogPermissionsFromCacheOrDb(context, catalog.id, user!.id);
     userPermission?.permissions.forEach((p) => {
         if (!permissions.includes(p)) {
             permissions.push(p);
@@ -96,6 +88,7 @@ export class HasCatalogPermissionDirective extends SchemaDirectiveVisitor {
                 args.catalogSlug ||
                 (args.value && args.value.catalogSlug) ||
                 (args.identifier && args.identifier.catalogSlug) ||
+                (args.catalogIdentifier && args.catalogIdentifier.catalogSlug) ||
                 undefined;
 
             if (catalogSlug === undefined) {
@@ -108,10 +101,7 @@ export class HasCatalogPermissionDirective extends SchemaDirectiveVisitor {
     }
 
     private async validatePermission(context: Context, catalogSlug: string, permission: Permission) {
-        const catalog = await context.connection
-            .getCustomRepository(CatalogRepository)
-            .findCatalogBySlugOrFail(catalogSlug);
-
+        const catalog = await getCatalogFromCacheOrDbOrFail(context, { catalogSlug });
         const permissions = await this.getUserCatalogPermissions(context, catalog);
         if (permissions.includes(permission)) {
             return;

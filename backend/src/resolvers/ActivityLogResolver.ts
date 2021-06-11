@@ -1,7 +1,7 @@
 import { Connection, EntityManager, In } from "typeorm";
 import graphqlFields from "graphql-fields";
 
-import { AuthenticatedContext } from "../context";
+import { AuthenticatedContext, Context } from "../context";
 import { ActivityLogEntity } from "../entity/ActivityLogEntity";
 import { getRelationNames } from "../util/relationNames";
 import {
@@ -13,17 +13,15 @@ import {
     PackageIdentifierInput
 } from "../generated/graphql";
 import { PackageRepository } from "../repository/PackageRepository";
-import { UserEntity } from "../entity/UserEntity";
-import { catalogEntityToGraphQL } from "./CatalogResolver";
-import { CatalogEntity } from "../entity/CatalogEntity";
-import { collectionEntityToGraphQL } from "./CollectionResolver";
-import { CollectionEntity } from "../entity/CollectionEntity";
-import { packageEntityToGraphqlObject } from "./PackageResolver";
-import { PackageEntity } from "../entity/PackageEntity";
+import { catalogEntityToGraphQL, getCatalogFromCacheOrDbByIdOrFail } from "./CatalogResolver";
+import { collectionEntityToGraphQL, getCollectionFromCacheOrDbById } from "./CollectionResolver";
+import { getPackageFromCacheOrDbByIdOrFail, packageEntityToGraphqlObject } from "./PackageResolver";
 import { versionEntityToGraphqlObject } from "./VersionResolver";
 import { VersionEntity } from "../entity/VersionEntity";
+import { getUserFromCacheOrDbById } from "./UserResolver";
 
 export const activtyLogEntityToGraphQL = async function (
+    context: Context,
     connection: Connection | EntityManager,
     activityLogEntity: ActivityLogEntity
 ): Promise<ActivityLog> {
@@ -38,7 +36,7 @@ export const activtyLogEntityToGraphQL = async function (
     if (activityLogEntity.userId) {
         if (activityLogEntity.user) activityLog.user = activityLogEntity.user;
         else {
-            activityLog.user = await connection.getRepository(UserEntity).findOneOrFail(activityLogEntity.userId);
+            activityLog.user = await getUserFromCacheOrDbById(context, connection, activityLogEntity.userId);
         }
     }
 
@@ -47,7 +45,7 @@ export const activtyLogEntityToGraphQL = async function (
             activityLog.targetCatalog = catalogEntityToGraphQL(activityLogEntity.targetCatalog);
         else {
             activityLog.targetCatalog = catalogEntityToGraphQL(
-                await connection.getRepository(CatalogEntity).findOneOrFail(activityLogEntity.targetCatalogId)
+                await getCatalogFromCacheOrDbByIdOrFail(context, connection, activityLogEntity.targetCatalogId)
             );
         }
     }
@@ -57,18 +55,23 @@ export const activtyLogEntityToGraphQL = async function (
             activityLog.targetCollection = collectionEntityToGraphQL(activityLogEntity.targetCollection);
         else {
             activityLog.targetCollection = collectionEntityToGraphQL(
-                await connection.getRepository(CollectionEntity).findOneOrFail(activityLogEntity.targetCollectionId)
+                await getCollectionFromCacheOrDbById(context, connection, activityLogEntity.targetCollectionId)
             );
         }
     }
 
     if (activityLogEntity.targetPackageId) {
         if (activityLogEntity.targetPackage)
-            activityLog.targetPackage = await packageEntityToGraphqlObject(connection, activityLogEntity.targetPackage);
+            activityLog.targetPackage = await packageEntityToGraphqlObject(
+                context,
+                context.connection,
+                activityLogEntity.targetPackage
+            );
         else {
             activityLog.targetPackage = await packageEntityToGraphqlObject(
-                connection,
-                await connection.getRepository(PackageEntity).findOneOrFail(activityLogEntity.targetPackageId)
+                context,
+                context.connection,
+                await getPackageFromCacheOrDbByIdOrFail(context, connection, activityLogEntity.targetPackageId)
             );
         }
     }
@@ -76,11 +79,13 @@ export const activtyLogEntityToGraphQL = async function (
     if (activityLogEntity.targetPackageVersionId) {
         if (activityLogEntity.targetPackageVersion)
             activityLog.targetPackageVersion = await versionEntityToGraphqlObject(
+                context,
                 connection,
                 activityLogEntity.targetPackageVersion
             );
         else {
             activityLog.targetPackageVersion = await versionEntityToGraphqlObject(
+                context,
                 connection,
                 await connection.getRepository(VersionEntity).findOneOrFail(activityLogEntity.targetPackageVersionId)
             );
@@ -113,7 +118,7 @@ export const myActivity = async (
         .take(limit)
         .getManyAndCount();
 
-    const logObjects = await Promise.all(logs.map((l) => activtyLogEntityToGraphQL(context.connection, l)));
+    const logObjects = await Promise.all(logs.map((l) => activtyLogEntityToGraphQL(context, context.connection, l)));
 
     return {
         logs: logObjects,
@@ -150,7 +155,7 @@ export const collectionActivities = async (
         .take(limit)
         .getManyAndCount();
 
-    const logObjects = await Promise.all(logs.map((l) => activtyLogEntityToGraphQL(context.connection, l)));
+    const logObjects = await Promise.all(logs.map((l) => activtyLogEntityToGraphQL(context, context.connection, l)));
 
     return {
         logs: logObjects,
@@ -188,7 +193,7 @@ export const packageActivities = async (
         .take(limit)
         .getManyAndCount();
 
-    const logObjects = await Promise.all(logs.map((l) => activtyLogEntityToGraphQL(context.connection, l)));
+    const logObjects = await Promise.all(logs.map((l) => activtyLogEntityToGraphQL(context, context.connection, l)));
 
     return {
         logs: logObjects,

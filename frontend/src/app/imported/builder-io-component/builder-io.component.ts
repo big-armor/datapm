@@ -1,4 +1,4 @@
-import { AfterViewChecked, Component, ElementRef, Input } from "@angular/core";
+import { AfterViewInit, Component, ElementRef, Input } from "@angular/core";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { BuilderIOService } from "../resource-importer.service";
@@ -8,7 +8,7 @@ import { BuilderIOService } from "../resource-importer.service";
     templateUrl: "./builder-io.component.html",
     styleUrls: ["./builder-io.component.scss"]
 })
-export class BuilderIOComponent implements AfterViewChecked {
+export class BuilderIOComponent implements AfterViewInit {
     private readonly JAVASCRIPT_ELEMENT_TYPE = "script";
     private readonly JAVASCRIPT_SCRIPT_TYPE = "text/javascript";
 
@@ -27,7 +27,7 @@ export class BuilderIOComponent implements AfterViewChecked {
 
     constructor(private builderIOService: BuilderIOService, private elementRef: ElementRef) {}
 
-    public ngAfterViewChecked(): void {
+    public ngAfterViewInit(): void {
         this.loadJavascriptAndInjectIntoTemplate();
     }
 

@@ -71,6 +71,13 @@ export class PackageIssueRepository extends Repository<PackageIssueEntity> {
             .getManyAndCount();
     }
 
+    public getAllIssuesByPackage(packageId: number): Promise<PackageIssueEntity[]> {
+        return this.createQueryBuilder()
+            .where('"package_id" = :packageId')
+            .setParameter("packageId", packageId)
+            .getMany();
+    }
+
     public async getIssueByPackageAndIssueNumber(packageId: number, issueNumber: number): Promise<PackageIssueEntity> {
         const entity = await this.createQueryBuilder()
             .where('"PackageIssueEntity"."package_id" = :packageId')

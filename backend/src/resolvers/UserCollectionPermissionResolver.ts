@@ -6,7 +6,6 @@ import {
     UserStatus
 } from "../generated/graphql";
 import { UserCollectionPermissionRepository } from "../repository/UserCollectionPermissionRepository";
-import { getGraphQlRelationName } from "../util/relationNames";
 import { EntityManager } from "typeorm";
 import { CollectionEntity } from "../entity/CollectionEntity";
 import { UserEntity } from "../entity/UserEntity";
@@ -16,10 +15,14 @@ import { sendInviteUser, sendShareNotification, validateMessageContents } from "
 import { CollectionRepository } from "../repository/CollectionRepository";
 import { asyncForEach } from "../util/AsyncForEach";
 import { ValidationError } from "apollo-server";
+import { getCollectionFromCacheOrDbOrFail } from "./CollectionResolver";
+import { deleteCollectionFollowByUserId } from "./FollowResolver";
 
-export const hasCollectionPermissions = async (context: Context, collectionId: number, permission: Permission) => {
-    const collection = await context.connection.getRepository(CollectionEntity).findOneOrFail(collectionId);
-
+export const hasCollectionPermissions = async (
+    context: Context,
+    collection: CollectionEntity,
+    permission: Permission
+) => {
     if (permission == Permission.VIEW) {
         if (collection?.isPublic) return true;
     }
@@ -28,9 +31,7 @@ export const hasCollectionPermissions = async (context: Context, collectionId: n
         return false;
     }
 
-    return context.connection
-        .getCustomRepository(UserCollectionPermissionRepository)
-        .hasPermission(context.me.id, collection.id, permission);
+    return getCollectionPermissionsFromCacheOrDb(context, collection, permission);
 };
 
 export const grantAllCollectionPermissionsForUser = async (
@@ -84,6 +85,9 @@ export const setUserCollectionPermissions = async (
                     return;
                 }
 
+                if (!collectionEntity.isPublic) {
+                    await deleteCollectionFollowByUserId(transaction, collectionEntity.id, user.id);
+                }
                 return await collectionPermissionRepository.deleteUserCollectionPermissionsForUser({
                     identifier,
                     user
@@ -134,8 +138,50 @@ export const deleteUserCollectionPermissions = async (
     { identifier, usernameOrEmailAddress }: { identifier: CollectionIdentifierInput; usernameOrEmailAddress: string },
     context: AuthenticatedContext
 ) => {
-    return context.connection.getCustomRepository(UserCollectionPermissionRepository).deleteUserCollectionPermissions({
-        identifier,
-        usernameOrEmailAddress
+    return context.connection.transaction(async (transaction) => {
+        const user = await transaction
+            .getCustomRepository(UserRepository)
+            .getUserByUsernameOrEmailAddress(usernameOrEmailAddress);
+        if (!user) {
+            throw new Error("USER_NOT_FOUND-" + usernameOrEmailAddress);
+        }
+
+        const collectionEntity = await getCollectionFromCacheOrDbOrFail(
+            context,
+            transaction,
+            identifier.collectionSlug
+        );
+        if (!collectionEntity.isPublic) {
+            await deleteCollectionFollowByUserId(transaction, collectionEntity.id, user.id);
+        }
+
+        return transaction
+            .getCustomRepository(UserCollectionPermissionRepository)
+            .deleteUserCollectionPermissionsForUser({
+                identifier,
+                user
+            });
     });
+};
+
+export const getCollectionPermissionsFromCacheOrDb = async (
+    context: Context,
+    collection: CollectionEntity,
+    permission: Permission
+) => {
+    if (!context.me) {
+        return false;
+    }
+
+    const userId = context.me.id;
+    const collectionPromiseFunction = () =>
+        context.connection
+            .getCustomRepository(UserCollectionPermissionRepository)
+            .hasPermission(userId, collection.id, permission);
+
+    return await context.cache.loadCollectionPermissionsStatusById(
+        collection.id,
+        permission,
+        collectionPromiseFunction
+    );
 };

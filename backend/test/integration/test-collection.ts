@@ -14,7 +14,6 @@ import {
     CollectionPackagesDocument,
     CreateVersionDocument,
     UserCollectionsDocument,
-    DeleteUserCollectionPermissionsDocument,
     RemovePackageFromCollectionDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
@@ -438,6 +437,7 @@ describe("Collection Tests", async () => {
                 }
             }
         });
+
         expect(response.errors == null, "no errors").true;
         expect(response.data!.updateCollection.identifier.collectionSlug).equal("testA-collection");
         expect(response.data!.updateCollection.isPublic).equal(true);

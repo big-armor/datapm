@@ -137,6 +137,7 @@ enum ActivityLogEventType {
     CATALOG_CREATED
     CATALOG_DELETED
     CATALOG_PUBLIC_CHANGED
+    CATALOG_UNCLAIMED_CHANGED
     CATALOG_EDIT
 
     USER_CREATED
@@ -1353,6 +1354,14 @@ type Mutation {
         identifier: PackageIdentifierInput! @hasPackagePermission(permission: EDIT)
         value: UpdatePackageInput!
     ): Package!
+
+    """
+    Moves a package to a different catalog
+    """
+    movePackage(
+        identifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
+        catalogIdentifier: CatalogIdentifierInput! @hasCatalogPermission(permission: EDIT)
+    ): Void @isAuthenticated
 
     """
     Updates the cover image of the package

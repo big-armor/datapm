@@ -73,7 +73,7 @@ export class HasCollectionPermissionDirective extends SchemaDirectiveVisitor {
             return;
         }
 
-        const hasRequiredPermission = await hasCollectionPermissions(context, collection.id, permission);
+        const hasRequiredPermission = await hasCollectionPermissions(context, collection, permission);
         if (!hasRequiredPermission) {
             throw new ForbiddenError(`NOT_AUTHORIZED`);
         }

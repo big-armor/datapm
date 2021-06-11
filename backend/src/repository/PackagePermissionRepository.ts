@@ -1,8 +1,8 @@
-import { EntityRepository, EntityManager } from "typeorm";
+import { EntityRepository, EntityManager, DeleteResult, Connection } from "typeorm";
 
 import { UserPackagePermissionEntity } from "../entity/UserPackagePermissionEntity";
 import { UserRepository } from "./UserRepository";
-import { Permission, PackageIdentifier, PackageIdentifierInput } from "../generated/graphql";
+import { Permission, PackageIdentifier, PackageIdentifierInput, User } from "../generated/graphql";
 import { PackageRepository } from "./PackageRepository";
 import { PackageEntity } from "../entity/PackageEntity";
 import { UserEntity } from "../entity/UserEntity";
@@ -25,6 +25,20 @@ async function getPackagePermissions({
         .addRelations(ALIAS, relations)
         .where({ packageId, userId })
         .getOne();
+}
+
+export async function getAllPackagePermissions(
+    manager: EntityManager,
+    packageId: number,
+    relations?: string[]
+): Promise<UserPackagePermissionEntity[]> {
+    const ALIAS = "userPackagePermission";
+    return manager
+        .getRepository(UserPackagePermissionEntity)
+        .createQueryBuilder(ALIAS)
+        .addRelations(ALIAS, relations)
+        .where({ packageId })
+        .getMany();
 }
 
 @EntityRepository()
@@ -71,6 +85,17 @@ export class PackagePermissionRepository {
             .getMany();
     }
 
+    public async deleteUsersPermissionsByPackageId(packageId: number): Promise<DeleteResult> {
+        return await this.manager
+            .getRepository(UserPackagePermissionEntity)
+            .createQueryBuilder("UserPackagePermissionEntity")
+            .where('"package_id" = :packageId')
+            .setParameter("packageId", packageId)
+            .delete()
+            .from(UserPackagePermissionEntity)
+            .execute();
+    }
+
     public async setPackagePermissions({
         identifier,
         userId,
@@ -100,11 +125,7 @@ export class PackagePermissionRepository {
             // If user does not exist in collection permissions, it creates new record
             if (packagePermissions == undefined) {
                 try {
-                    const collectionPermissionEntry = transaction.create(UserPackagePermissionEntity);
-                    collectionPermissionEntry.userId = user.id;
-                    collectionPermissionEntry.packageId = packageEntity.id;
-                    collectionPermissionEntry.permissions = permissions;
-                    return await transaction.save(collectionPermissionEntry);
+                    return await this.storePackagePermissions(transaction, user.id, packageEntity.id, permissions);
                 } catch (e) {
                     console.log(e);
                 }
@@ -126,24 +147,17 @@ export class PackagePermissionRepository {
         });
     }
 
-    public removePackagePermission({
-        identifier,
-        usernameOrEmailAddress
-    }: {
-        identifier: PackageIdentifierInput;
-        usernameOrEmailAddress: string;
-        relations?: string[];
-    }): Promise<void> {
-        return this.manager.nestedTransaction(async (transaction) => {
-            const user = await transaction
-                .getCustomRepository(UserRepository)
-                .getUserByUsernameOrEmailAddress(usernameOrEmailAddress);
-            if (!user) {
-                throw new Error("USER_NOT_FOUND-" + usernameOrEmailAddress);
-            }
-
-            await this.removePackagePermissionForUser({ identifier, user });
-        });
+    public async storePackagePermissions(
+        transaction: EntityManager,
+        userId: number,
+        packageId: number,
+        permissions: Permission[]
+    ): Promise<UserPackagePermissionEntity> {
+        const collectionPermissionEntry = transaction.create(UserPackagePermissionEntity);
+        collectionPermissionEntry.userId = userId;
+        collectionPermissionEntry.packageId = packageId;
+        collectionPermissionEntry.permissions = permissions;
+        return await transaction.save(collectionPermissionEntry);
     }
 
     public removePackagePermissionForUser({

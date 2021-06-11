@@ -1,0 +1,79 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 p-0" id="movePackage">
+            <div mat-dialog-title id="contentTitle">Move Package</div>
+            <div mat-dialog-content id="contentBorder">
+                <div class="pt-1 pb-2">
+                    <label class="div-question pl-1"> Choose Catalog </label>
+                    <div class="div-answer my-2">
+                        <app-input
+                            class="flat-input px-0"
+                            [control]="catalogControl"
+                            inputStyle="flat"
+                            placeholder="Catalog"
+                            (blur)="onFocusOut()"
+                            matInput
+                            [matAutocomplete]="catalogAutoComplete"
+                        ></app-input>
+                        <mat-autocomplete
+                            autoActiveFirstOption
+                            #catalogAutoComplete="matAutocomplete"
+                            (optionSelected)="selectCatalog($event.option.value)"
+                            [displayWith]="displayCatalog"
+                        >
+                            <mat-option *ngFor="let catalog of catalogs" [value]="catalog">
+                                {{ displayCatalog(catalog) }}
+                            </mat-option>
+                        </mat-autocomplete>
+                    </div>
+                    <div class="ml-1 pb-1 text-danger text-light-gray" *ngIf="serverError">
+                        Internal server error occurred. Please contact support.
+                    </div>
+                    <div class="ml-1 pb-1 text-danger text-light-gray" *ngIf="catalogDoesntExist">
+                        This catalog doesn't exist.
+                    </div>
+                    <div class="ml-1 pb-1 text-danger text-light-gray" *ngIf="isMissingCatalogEditPermissions">
+                        You do not have EDIT permission on this Catalog.
+                    </div>
+                    <div class="ml-1 pb-1 text-danger text-light-gray" *ngIf="sameCatalogSelected">
+                        This package is already part of this catalog.
+                    </div>
+                    <div class="ml-1 pb-1 text-danger text-light-gray" *ngIf="packageWillBePrivateAfterMove">
+                        * This package will no longer be public, because the
+                        <strong>{{ selectedCatalog?.displayName }}</strong> catalog is not public
+                    </div>
+                    <section class="example-section mt-1 d-flex" *ngIf="selectedCatalogPermission">
+                        <mat-checkbox class="example-margin ml-1" [(ngModel)]="catalogPermissionsCheckbox">
+                            <div class="checkbox-txt text-light-gray">
+                                Moving this package is permanent, and you will have
+                                <strong>{{ selectedCatalogPermission }}</strong> permission after this move
+                            </div>
+                        </mat-checkbox>
+                    </section>
+                    <section class="example-section mt-1 d-flex">
+                        <mat-checkbox class="example-margin ml-1" [(ngModel)]="packageLinksCheckbox">
+                            <div class="text-light-gray">
+                                All existing links and URLs to this package will be broken
+                            </div>
+                        </mat-checkbox>
+                    </section>
+                    <section class="example-section mt-1 d-flex" *ngIf="hasOtherUsers">
+                        <mat-checkbox class="example-margin ml-1 mr-2" [(ngModel)]="usersPermissionsCheckbox">
+                        </mat-checkbox>
+                        <div class="text-light-gray">
+                            All other users will loose access to this package, and the new package manager must re-add
+                            other target users
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <div mat-dialog-actions class="d-flex justify-content-between">
+                <button mat-dialog-close class="modal-close-btn" (click)="close()">Cancel</button>
+                <button class="modal-submit-btn" (click)="submit()" [disabled]="!canSubmit()">
+                    <span>Confirm Move</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

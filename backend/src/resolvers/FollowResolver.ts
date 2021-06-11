@@ -1,5 +1,5 @@
-import { Connection, EntityManager } from "typeorm";
-import { AuthenticatedContext } from "../context";
+import { EntityManager } from "typeorm";
+import { AuthenticatedContext, Context } from "../context";
 import { FollowEntity } from "../entity/FollowEntity";
 import {
     SaveFollowInput,
@@ -25,7 +25,7 @@ import { catalogEntityToGraphQLOrNull } from "./CatalogResolver";
 import { collectionEntityToGraphQLOrNull } from "./CollectionResolver";
 import { packageEntityToGraphqlObject, packageEntityToGraphqlObjectOrNull } from "./PackageResolver";
 
-export const entityToGraphqlObject = async (context: EntityManager | Connection, entity: FollowEntity | undefined) => {
+export const entityToGraphqlObject = async (context: Context, entity: FollowEntity | undefined) => {
     if (!entity) {
         return null;
     }
@@ -35,7 +35,7 @@ export const entityToGraphqlObject = async (context: EntityManager | Connection,
         eventTypes: entity.eventTypes,
         catalog: catalogEntityToGraphQLOrNull(entity.catalog),
         collection: collectionEntityToGraphQLOrNull(entity.collection),
-        package: await packageEntityToGraphqlObjectOrNull(context, entity.package),
+        package: await packageEntityToGraphqlObjectOrNull(context, context.connection, entity.package),
         packageIssue: entity.packageIssue,
         user: entity.targetUser
     };
@@ -60,11 +60,13 @@ export const saveFollow = async (
         const catalog = await getCatalogOrFail({ slug: follow.catalog.catalogSlug, manager });
         existingFollowEntity = await followRepository.getFollowByCatalogId(userId, catalog.id);
 
-        const hasPermission = await manager
-            .getCustomRepository(UserCatalogPermissionRepository)
-            .doesUserHavePermission(userId, catalog.id, Permission.VIEW);
-        if (!hasPermission) {
-            throw new Error("NOT_AUTHORIZED");
+        if (!catalog.isPublic) {
+            const hasPermission = await manager
+                .getCustomRepository(UserCatalogPermissionRepository)
+                .doesUserHavePermission(userId, catalog.id, Permission.VIEW);
+            if (!hasPermission) {
+                throw new Error("NOT_AUTHORIZED");
+            }
         }
 
         followEntity.catalogId = catalog.id;
@@ -74,11 +76,13 @@ export const saveFollow = async (
             .getCustomRepository(CollectionRepository)
             .findCollectionBySlugOrFail(follow.collection.collectionSlug);
 
-        const hasPermission = await manager
-            .getCustomRepository(UserCollectionPermissionRepository)
-            .hasPermission(userId, collection.id, Permission.VIEW);
-        if (!hasPermission) {
-            throw new Error("NOT_AUTHORIZED");
+        if (!collection.isPublic) {
+            const hasPermission = await manager
+                .getCustomRepository(UserCollectionPermissionRepository)
+                .hasPermission(userId, collection.id, Permission.VIEW);
+            if (!hasPermission) {
+                throw new Error("NOT_AUTHORIZED");
+            }
         }
 
         existingFollowEntity = await followRepository.getFollowByCollectionId(userId, collection.id);
@@ -90,11 +94,14 @@ export const saveFollow = async (
             .getCustomRepository(PackageRepository)
             .findPackageOrFail({ identifier: follow.package });
 
-        const hasPermission = await manager
-            .getCustomRepository(PackagePermissionRepository)
-            .hasPermission(userId, packageEntity.id, Permission.VIEW);
-        if (!hasPermission) {
-            throw new Error("NOT_AUTHORIZED");
+        if (!packageEntity.isPublic) {
+            const hasPermission = await manager
+                .getCustomRepository(PackagePermissionRepository)
+                .hasPermission(userId, packageEntity.id, Permission.VIEW);
+
+            if (!hasPermission) {
+                throw new Error("NOT_AUTHORIZED");
+            }
         }
 
         existingFollowEntity = await followRepository.getFollowByPackageId(userId, packageEntity.id);
@@ -106,11 +113,13 @@ export const saveFollow = async (
             .getCustomRepository(PackageRepository)
             .findPackageOrFail({ identifier: follow.packageIssue.packageIdentifier });
 
-        const hasPermission = await manager
-            .getCustomRepository(PackagePermissionRepository)
-            .hasPermission(userId, packageEntity.id, Permission.VIEW);
-        if (!hasPermission) {
-            throw new Error("NOT_AUTHORIZED");
+        if (!packageEntity.isPublic) {
+            const hasPermission = await manager
+                .getCustomRepository(PackagePermissionRepository)
+                .hasPermission(userId, packageEntity.id, Permission.VIEW);
+            if (!hasPermission) {
+                throw new Error("NOT_AUTHORIZED");
+            }
         }
 
         const issueEntity = await manager
@@ -153,19 +162,19 @@ export const getFollow = async (
             return null;
         }
 
-        return await entityToGraphqlObject(context.connection, entity);
+        return await entityToGraphqlObject(context, entity);
     } else if (follow.collection) {
         const collection = await manager
             .getCustomRepository(CollectionRepository)
             .findCollectionBySlugOrFail(follow.collection.collectionSlug);
         const entity = await followRepository.getFollowByCollectionId(userId, collection.id);
-        return await entityToGraphqlObject(context.connection, entity);
+        return await entityToGraphqlObject(context, entity);
     } else if (follow.package) {
         const packageEntity = await manager
             .getCustomRepository(PackageRepository)
             .findPackageOrFail({ identifier: follow.package });
         const entity = await followRepository.getFollowByPackageId(userId, packageEntity.id);
-        return await entityToGraphqlObject(context.connection, entity);
+        return await entityToGraphqlObject(context, entity);
     } else if (follow.packageIssue) {
         const packageEntity = await manager
             .getCustomRepository(PackageRepository)
@@ -174,13 +183,13 @@ export const getFollow = async (
             .getCustomRepository(PackageIssueRepository)
             .getIssueByPackageAndIssueNumber(packageEntity.id, follow.packageIssue.issueNumber);
         const entity = await followRepository.getFollowByPackageIssueId(userId, issueEntity.id);
-        return await entityToGraphqlObject(context.connection, entity);
+        return await entityToGraphqlObject(context, entity);
     } else if (follow.user) {
         const userEntity = await manager
             .getCustomRepository(UserRepository)
             .findUser({ username: follow.user.username });
         const entity = await followRepository.getFollowByUserId(userId, userEntity.id);
-        return await entityToGraphqlObject(context.connection, entity);
+        return await entityToGraphqlObject(context, entity);
     } else {
         throw new Error("FOLLOW_TYPE_NOT_FOUND");
     }
@@ -240,7 +249,7 @@ export const getAllMyFollows = async (
     const follows: Follow[] = [];
 
     for (const f of followEntities) {
-        const follow = await entityToGraphqlObject(context.connection, f);
+        const follow = await entityToGraphqlObject(context, f);
         if (follow) {
             follows.push(follow);
         }
@@ -336,7 +345,7 @@ export const followPackage = async (
     const packageEntity = await context.connection
         .getCustomRepository(PackageRepository)
         .findPackageOrFail({ identifier: parent.package.identifier });
-    return packageEntityToGraphqlObject(context.connection, packageEntity);
+    return packageEntityToGraphqlObject(context, context.connection, packageEntity);
 };
 
 export const followCollection = async (
@@ -350,4 +359,50 @@ export const followCollection = async (
     }
 
     return parent.collection;
+};
+
+export const getPackageFollowsByPackageId = async (packageId: number, manager: EntityManager) => {
+    return await manager.getCustomRepository(FollowRepository).getFollowsByPackageId(packageId);
+};
+
+export const getPackageFollowsByPackageIssuesIds = async (packageIssueIds: number[], manager: EntityManager) => {
+    if (packageIssueIds == null || packageIssueIds.length === 0) {
+        return [];
+    }
+
+    return await manager.getCustomRepository(FollowRepository).getFollowsByPackageIssuesIds(packageIssueIds);
+};
+
+export const getCatalogFollowsByCatalogId = async (catalogId: number, manager: EntityManager) => {
+    return await manager.getCustomRepository(FollowRepository).getFollowsByCatalogId(catalogId);
+};
+
+export const getCollectionFollowsByCollectionId = async (collectionId: number, manager: EntityManager) => {
+    return await manager.getCustomRepository(FollowRepository).getFollowsByCollectionId(collectionId);
+};
+
+export const deletePackageFollowByUserId = async (manager: EntityManager, packageId: number, userId: number) => {
+    return await manager.getCustomRepository(FollowRepository).deleteFollowByPackageId(userId, packageId);
+};
+
+export const deletePackageIssuesFollowsByUserId = async (manager: EntityManager, packageId: number, userId: number) => {
+    const packageIssues = await manager.getCustomRepository(PackageIssueRepository).getAllIssuesByPackage(packageId);
+    const packageIssuesIds = packageIssues.map((p) => p.id);
+    return await manager.getCustomRepository(FollowRepository).deleteFollowsByPackageIssueIds(userId, packageIssuesIds);
+};
+
+export const deleteCatalogFollowByUserId = async (manager: EntityManager, catalogId: number, userId: number) => {
+    return await manager.getCustomRepository(FollowRepository).deleteFollowByCatalogId(userId, catalogId);
+};
+
+export const deleteCollectionFollowByUserId = async (manager: EntityManager, collectionId: number, userId: number) => {
+    return await manager.getCustomRepository(FollowRepository).deleteFollowByCollectionId(userId, collectionId);
+};
+
+export const deleteFollowsByIds = async (ids: number[], manager: EntityManager) => {
+    if (!ids || !ids.length) {
+        return;
+    }
+
+    return await manager.getCustomRepository(FollowRepository).delete(ids);
 };
