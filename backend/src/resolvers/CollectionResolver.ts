@@ -71,8 +71,7 @@ export const usersByCollection = async (
     const collectionEntity = await getCollectionFromCacheOrDbOrFail(
         context,
         context.connection,
-        identifier.collectionSlug,
-        relations
+        identifier.collectionSlug
     );
 
     return await context.connection.manager
@@ -122,6 +121,14 @@ export const updateCollection = async (
     return context.connection.transaction(async (transaction) => {
         const repository = transaction.getCustomRepository(CollectionRepository);
         const collection = await repository.findCollectionBySlugOrFail(identifier.collectionSlug);
+
+        if (
+            value.isPublic != null &&
+            value.isPublic != collection.isPublic &&
+            !(await hasCollectionPermissions(context, collection, Permission.MANAGE))
+        ) {
+            throw new ValidationError("NOT_AUTHORIZED - must be manager to change public status");
+        }
 
         if (value.newCollectionSlug && identifier.collectionSlug != value.newCollectionSlug) {
             ReservedKeywordsService.validateReservedKeyword(value.newCollectionSlug);

@@ -3,6 +3,6 @@
         <app-builder-io-renderer *ngIf="loaded; else loadingTemplate" [apiKey]="apiKey" [entry]="entry">
             <div class="container">Failed to load hero</div>
         </app-builder-io-renderer>
-        <ng-template #loadingTemplate>loading..</ng-template>
+        <ng-template #loadingTemplate></ng-template>
     </div>
 </div>

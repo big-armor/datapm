@@ -364,10 +364,29 @@ resource "google_cloud_run_domain_mapping" "default" {
   }
 }
 
+
+resource "google_cloud_scheduler_job" "job" {
+  name             = "datapm-instant-notifications"
+  description      = "To invoke sending daily notifications"
+  schedule         = "1/1 * * * *"
+  time_zone        = "America/New_York"
+  attempt_deadline = "320s"
+
+  retry_config {
+    retry_count = 1
+  }
+
+  http_target {
+    http_method = "POST"
+    uri         = "https://test.datapm.io/graphql"
+    body        = "{ \"query\":\"mutation { runJob(key: \\"${random_password.scheduler_key.result}\\", job: \\"instantNotifications\\") }\" }"
+  }
+}
+
 resource "google_cloud_scheduler_job" "job" {
   name             = "datapm-daily-notifications"
   description      = "To invoke sending daily notifications"
-  schedule         = "0 0 8 1/1 * ? *"
+  schedule         = "0 8 * * *"
   time_zone        = "America/New_York"
   attempt_deadline = "320s"
 
@@ -379,5 +398,42 @@ resource "google_cloud_scheduler_job" "job" {
     http_method = "POST"
     uri         = "https://test.datapm.io/graphql"
     body        = "{ \"query\":\"mutation { runJob(key: \\"${random_password.scheduler_key.result}\\", job: \\"dailyNotifications\\") }\" }"
+  }
+}
+
+resource "google_cloud_scheduler_job" "job" {
+  name             = "datapm-weekly-notifications"
+  description      = "To invoke sending weekly notifications"
+  schedule         = "0 8 * * MON"
+  time_zone        = "America/New_York"
+  attempt_deadline = "320s"
+
+  retry_config {
+    retry_count = 1
+  }
+
+  http_target {
+    http_method = "POST"
+    uri         = "https://test.datapm.io/graphql"
+    body        = "{ \"query\":\"mutation { runJob(key: \\"${random_password.scheduler_key.result}\\", job: \\"weeklyNotifications\\") }\" }"
+  }
+}
+
+
+resource "google_cloud_scheduler_job" "job" {
+  name             = "datapm-monthly-notifications"
+  description      = "To invoke sending monthly notifications"
+  schedule         = "0 8 * * MON"
+  time_zone        = "America/New_York"
+  attempt_deadline = "320s"
+
+  retry_config {
+    retry_count = 1
+  }
+
+  http_target {
+    http_method = "POST"
+    uri         = "https://test.datapm.io/graphql"
+    body        = "{ \"query\":\"mutation { runJob(key: \\"${random_password.scheduler_key.result}\\", job: \\"monthlyNotifications\\") }\" }"
   }
 }

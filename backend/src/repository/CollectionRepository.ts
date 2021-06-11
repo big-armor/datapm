@@ -60,10 +60,12 @@ export class CollectionRepository extends Repository<CollectionEntity> {
         user: UserEntity,
         limit: number,
         offSet: number,
-        relations?: string[]
+        relations: string[] = []
     ): Promise<[CollectionEntity[], number]> {
-        return this.createQueryBuilder()
+        return this.createQueryBuilder("collection")
+            .leftJoin("collection_user", "permission", "permission.collection_id = collection.id")
             .where("creator_id = :userId", { userId: user.id })
+            .orWhere("permission.user_id = :userId", { userId: user.id })
             .orderBy('"CollectionEntity"."updated_at"', "DESC")
             .limit(limit)
             .offset(offSet)
@@ -87,7 +89,7 @@ export class CollectionRepository extends Repository<CollectionEntity> {
 
         const response = await this.createQueryBuilderWithUserConditions(user?.id)
             .andWhere(
-                `("CollectionEntity".id IN (SELECT collection_id FROM collection_user WHERE user_id = :targetUserId AND 'MANAGE' = ANY( permissions) ))`
+                `("CollectionEntity".id IN (SELECT collection_id FROM collection_user WHERE user_id = :targetUserId AND 'EDIT' = ANY( permissions) ))`
             )
             .setParameter("targetUserId", targetUser.id)
             .offset(offSet)

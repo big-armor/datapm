@@ -31,8 +31,12 @@ async function getPackagePermissions({
 export class PackagePermissionRepository {
     constructor(private manager: EntityManager) {}
 
-    public async hasPermission(userId: number, packageId: number, permission: Permission): Promise<boolean> {
-        const permissionsEntity = await this.findPackagePermissions({ packageId, userId });
+    public async hasPermission(userId: number, packageEntity: PackageEntity, permission: Permission): Promise<boolean> {
+        if (packageEntity.isPublic && permission == Permission.VIEW) {
+            return true;
+        }
+
+        const permissionsEntity = await this.findPackagePermissions({ packageId: packageEntity.id, userId });
         if (!permissionsEntity) {
             return false;
         }

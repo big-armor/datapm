@@ -1,6 +1,6 @@
 {{#recipientFirstName}}{{recipientFirstName}},{{/recipientFirstName}}
 
-This is your {{frequency}} update about items you have followed. Click the link below to view the details of these changes. 
+This is your {{frequency}} update about items you have followed. Use the link below to view these changes.
 
 {{registry_url}}/following
 
@@ -9,19 +9,30 @@ Packages that have changed:
 {{#packages}}
     {{displayName}} ({{&slug}})
     {{#actions}}
-        {{username}} {{&action}}
+        {{userDisplayName}} {{&action}}
     {{/actions}}
 
 {{/packages}}
 {{/hasPackageChanges}}
 
 
+{{#hasCollectionChanges}}
+Collections that have changed:
+{{#collections}}
+    {{displayName}} ({{&slug}})
+    {{#actions}}
+        {{userDisplayName}} {{&action}}
+    {{/actions}}
+
+{{/collections}}
+{{/hasCollectionChanges}}
+
 {{#hasCatalogChanges}}
 Catalogs that have changed:
 {{#catalogs}}
     {{displayName}} ({{&slug}})
     {{#actions}}
-        {{username}} {{&action}}
+        {{userDisplayName}} {{&action}}
     {{/actions}}
 
 {{/catalogs}}

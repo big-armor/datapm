@@ -17,9 +17,11 @@ import { UserEntity } from "../entity/UserEntity";
 import { VersionEntity } from "../entity/VersionEntity";
 import { PackageEntity } from "../entity/PackageEntity";
 import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
+import { CollectionRepository } from "../repository/CollectionRepository";
 
 let databaseConnection: Connection | null;
 
+const instantJob = new CronJob("1/1 * * * *", instantNotifications, null, false, "America/New_York");
 const dailyJob = new CronJob("0 0 8 * * *", dailyNotifications, null, false, "America/New_York");
 const weeklyJob = new CronJob("0 0 8 * * MON", weeklyNotifications, null, false, "America/New_York");
 const monthlyJob = new CronJob("0 0 12 1 * *", monthlyNotifications, null, false, "America/New_York");
@@ -35,6 +37,10 @@ export async function stopNotificationService() {
     dailyJob.stop();
     weeklyJob.stop();
     monthlyJob.stop();
+}
+
+export async function instantNotifications() {
+    await prepareAndSendNotifications("lastInstantNotificationDate", NotificationFrequency.INSTANT);
 }
 
 export async function dailyNotifications() {
@@ -65,12 +71,7 @@ async function prepareAndSendNotifications(stateKey: string, frequency: Notifica
     const now = new Date();
 
     try {
-        await sendNotifications(
-            NotificationFrequency.DAILY,
-            lastNotificationDate,
-            now,
-            databaseConnection as Connection
-        );
+        await sendNotifications(frequency, lastNotificationDate, now, databaseConnection as Connection);
     } catch (error) {
         console.error("There was an error sending " + frequency + " notifications!");
         console.error(error);
@@ -106,6 +107,7 @@ async function sendNotifications(
 
         const catalogChanges = await getCatalogChanges(user, notification, connection);
         const packageChanges = await getPackageChanges(user, notification, connection);
+        const collectionChanges = await getCollectionChanges(user, notification, connection);
 
         const notificationEmail: NotificationEmailTemplate = {
             recipientFirstName: user.firstName,
@@ -113,7 +115,9 @@ async function sendNotifications(
             hasCatalogChanges: catalogChanges.length > 0,
             catalogs: catalogChanges,
             hasPackageChanges: packageChanges.length > 0,
-            packages: packageChanges
+            packages: packageChanges,
+            hasCollectionChanges: collectionChanges.length > 0,
+            collections: collectionChanges
         };
 
         sendFollowNotificationEmail(user, frequency, notificationEmail);
@@ -216,6 +220,26 @@ async function getPackageChanges(
                                 };
                             })
                         );
+                    } else if (n.event_type == ActivityLogEventType.VERSION_DELETED) {
+                        actionsTaken = actionsTaken.concat(
+                            await n.actions.asyncMap(async (a) => {
+                                const version = await connection
+                                    .getRepository(VersionEntity)
+                                    .findOneOrFail({ where: { id: a.package_version_id } });
+
+                                return {
+                                    action:
+                                        "deleted version " +
+                                        version.majorVersion +
+                                        "." +
+                                        version.minorVersion +
+                                        "." +
+                                        version.patchVersion,
+                                    userDisplayName: userDisplayName,
+                                    timeAgo: "test"
+                                };
+                            })
+                        );
                     }
 
                     return actionsTaken;
@@ -308,7 +332,7 @@ async function getCatalogChanges(
 
                                 const hasPermission = await connection
                                     .getCustomRepository(PackagePermissionRepository)
-                                    .hasPermission(user.id, packageEntity.id, Permission.VIEW);
+                                    .hasPermission(user.id, packageEntity, Permission.VIEW);
 
                                 if (!hasPermission) {
                                     return [];
@@ -323,7 +347,118 @@ async function getCatalogChanges(
                                 ];
                             })
                         );
+                    } // Can not include CATALOG_PACKAGE_REMOVED because we don't know who had permission to view it once it's deleted
+                    // include CATALOG_PACKAGE_REMOVED in instant notifications
+
+                    return actionsTaken;
+                })
+            };
+        })) || []
+    );
+}
+
+async function getCollectionChanges(
+    user: UserEntity,
+    notification: Notification,
+    connection: Connection
+): Promise<NotificationResourceTypeTemplate[]> {
+    return await Promise.all(
+        (await notification.collectionNotifications?.asyncMap(async (cn) => {
+            const collectionEntity = await connection
+                .getCustomRepository(CollectionRepository)
+                .findOneOrFail(cn.collectionId);
+
+            return {
+                displayName: collectionEntity.name,
+                slug: collectionEntity.collectionSlug,
+                actions: await cn.pending_notifications.asyncFlatMap(async (n) => {
+                    let actionsTaken: NotificationActionTemplate[] = [];
+
+                    const user = await connection.getRepository(UserEntity).findOne({
+                        where: {
+                            id: n.actions[0].user_id
+                        }
+                    });
+
+                    if (user == null) {
+                        throw new Error("USER_NOT_FOUND_DURING_ACTIVITY_LOOKUP");
                     }
+
+                    let userDisplayName = user?.displayName;
+                    let action = "took an unknown action";
+
+                    if (n.actions.length > 1) {
+                        const uniqueUsers = [
+                            ...new Set(n.actions.map((a) => a.user_id).filter((f) => f != n.actions[0].user_id))
+                        ];
+
+                        userDisplayName += " and " + uniqueUsers.length + " other users";
+                    }
+
+                    const timeAgo = "unknown time ago";
+
+                    if (n.event_type == ActivityLogEventType.COLLECTION_EDIT) {
+                        const alertableProperties = n.properties_edited.filter((p) =>
+                            ["description", "name", "collectionSlug"].includes(p)
+                        );
+
+                        action = "edited " + alertableProperties.join(", ");
+
+                        actionsTaken.push({
+                            action,
+                            userDisplayName: userDisplayName,
+                            timeAgo
+                        });
+
+                        actionsTaken = actionsTaken.concat(
+                            n.actions
+                                .filter((a) => a.change_type == ActivityLogChangeType.PUBLIC_ENABLED)
+                                .map((p) => {
+                                    return {
+                                        action: "enabled public access!",
+                                        userDisplayName: userDisplayName,
+                                        timeAgo
+                                    };
+                                })
+                        );
+
+                        actionsTaken = actionsTaken.concat(
+                            n.actions
+                                .filter((a) => a.change_type == ActivityLogChangeType.PUBLIC_DISABLED)
+                                .map((p) => {
+                                    return {
+                                        action: "disabled public access",
+                                        userDisplayName: userDisplayName,
+                                        timeAgo
+                                    };
+                                })
+                        );
+                    } else if (n.event_type == ActivityLogEventType.COLLECTION_PACKAGE_ADDED) {
+                        actionsTaken = actionsTaken.concat(
+                            await n.actions.asyncFlatMap(async (a) => {
+                                const packageEntity = await connection
+                                    .getRepository(PackageEntity)
+                                    .findOneOrFail({ where: { id: a.package_id }, relations: ["catalog"] });
+
+                                const hasPermission = await connection
+                                    .getCustomRepository(PackagePermissionRepository)
+                                    .hasPermission(user.id, packageEntity, Permission.VIEW);
+
+                                if (!hasPermission) {
+                                    return [];
+                                }
+
+                                return [
+                                    {
+                                        action: `added package ${packageEntity.catalog.slug}/${packageEntity.slug}`,
+                                        userDisplayName: userDisplayName,
+                                        timeAgo
+                                    }
+                                ];
+                            })
+                        );
+                    } // Can not include COLLECTION_PACKAGE_REMOVED because we don't know who had permission to view it once it's deleted
+                    // include COLLECTION_PACKAGE_REMOVED in instant notifications
 
                     return actionsTaken;
                 })
@@ -349,12 +484,17 @@ async function getPendingNotifications(
         .getCustomRepository(FollowRepository)
         .getPackageFollowsForNotifications(startDate, endDaate, frequency);
 
-    const [catalogNotifications, packageNotifications] = await Promise.all([
+    const pendingCollectionNotificaitons = databaseConnection?.manager
+        .getCustomRepository(FollowRepository)
+        .getCollectionFollowsForNotifications(startDate, endDaate, frequency);
+
+    const [catalogNotifications, packageNotifications, collectionNotifications] = await Promise.all([
         pendingCatalogNotifications,
-        pendingPackageNotificaitons
+        pendingPackageNotificaitons,
+        pendingCollectionNotificaitons
     ]);
 
-    const allNotifications = catalogNotifications.concat(packageNotifications); // todo combine others
+    const allNotifications = catalogNotifications.concat(packageNotifications).concat(collectionNotifications);
 
     const notificationsByUser: Record<number, Notification> = {};
 

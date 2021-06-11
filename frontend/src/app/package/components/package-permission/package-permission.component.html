@@ -56,10 +56,7 @@
         <th mat-header-cell *matHeaderCellDef scope="col">Permission</th>
         <td class="table-content" mat-cell *matCellDef="let user">
             <mat-form-field appearance="fill" class="permission-div">
-                <mat-select
-                    [value]="user.permission"
-                    (selectionChange)="updatePermission(user.username, $event.target.value)"
-                >
+                <mat-select [value]="user.permission" (selectionChange)="updatePermission(user.username, $event.value)">
                     <mat-option value="VIEW">View </mat-option>
                     <mat-option value="EDIT">Edit </mat-option>
                     <mat-option value="MANAGE">Manage </mat-option>

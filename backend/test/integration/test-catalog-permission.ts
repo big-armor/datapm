@@ -5,7 +5,8 @@ import {
     CreatePackageDocument,
     Permission,
     SetUserCatalogPermissionDocument,
-    GetCatalogDocument
+    GetCatalogDocument,
+    UpdateCatalogDocument
 } from "./registry-client";
 import { createUser } from "./test-utils";
 import { describe, it } from "mocha";
@@ -256,5 +257,65 @@ describe("Catalog Permissions", async () => {
         });
 
         expect(response.errors! == null).true;
+    });
+
+    it("user with EDIT but without MANAGE permission trying to set the public value", async function () {
+        await userAClient.mutate({
+            mutation: CreateCatalogDocument,
+            variables: {
+                value: {
+                    slug: "user-a-catalog-v4",
+                    displayName: "User A Catalog v4",
+                    description: "This is an integration test User A v4 Catalog",
+                    website: "https://usera.datapm.io",
+                    isPublic: false
+                }
+            }
+        });
+
+        await userAClient.mutate({
+            mutation: CreatePackageDocument,
+            variables: {
+                value: {
+                    catalogSlug: "user-a-catalog-v4",
+                    packageSlug: "congressional-legislators1",
+                    displayName: "Congressional Legislators1",
+                    description: "Test upload of congressional legislators4"
+                }
+            }
+        });
+
+        const newPermissions = [Permission.VIEW, Permission.EDIT];
+
+        await userAClient.mutate({
+            mutation: SetUserCatalogPermissionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "user-a-catalog-v4"
+                },
+                value: [
+                    {
+                        usernameOrEmailAddress: "my-test-user201",
+                        permission: newPermissions,
+                        packagePermission: []
+                    }
+                ],
+                message: "Testing messages"
+            }
+        });
+
+        let response = await userBClient.mutate({
+            mutation: UpdateCatalogDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "user-a-catalog-v4"
+                },
+                value: {
+                    isPublic: true
+                }
+            }
+        });
+
+        expect(response.errors![0].message).includes("NOT_AUTHORIZED");
     });
 });

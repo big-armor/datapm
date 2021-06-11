@@ -6,7 +6,9 @@ import {
     Permission,
     SetUserCollectionPermissionsDocument,
     DeleteUserCollectionPermissionsDocument,
-    CollectionDocument
+    CollectionDocument,
+    UsersByCollectionDocument,
+    UpdateCollectionDocument
 } from "./registry-client";
 import { createUser } from "./test-utils";
 import { describe, it } from "mocha";
@@ -136,6 +138,25 @@ describe("Collection Permissions", async () => {
         expect(response.errors! == null).true;
     });
 
+    it("get users list for collection", async function () {
+        let response = await userAClient.query({
+            query: UsersByCollectionDocument,
+            variables: {
+                identifier: {
+                    collectionSlug: "testA-collection-permissions"
+                }
+            }
+        });
+
+        const testUserPersmission = response.data.usersByCollection.find((f) => f.user.username === "my-test-user101");
+
+        expect(response.errors! == null).true;
+        expect(testUserPersmission).to.not.equal(undefined);
+        expect(testUserPersmission!.permissions.includes(Permission.VIEW)).to.equal(true);
+        expect(testUserPersmission!.permissions.includes(Permission.EDIT)).to.equal(false);
+        expect(testUserPersmission!.permissions.includes(Permission.MANAGE)).to.equal(false);
+    });
+
     it("update collection user permissions by changing the permissions list", async function () {
         const newPermissions = [Permission.VIEW, Permission.EDIT, Permission.MANAGE];
 
@@ -158,8 +179,27 @@ describe("Collection Permissions", async () => {
         expect(response.errors! == null).true;
     });
 
+    it("get users list for collection part 2", async function () {
+        let response = await userAClient.query({
+            query: UsersByCollectionDocument,
+            variables: {
+                identifier: {
+                    collectionSlug: "testA-collection-permissions"
+                }
+            }
+        });
+
+        const testUserPersmission = response.data.usersByCollection.find((f) => f.user.username === "my-test-user101");
+
+        expect(response.errors! == null).true;
+        expect(testUserPersmission).to.not.equal(undefined);
+        expect(testUserPersmission!.permissions.includes(Permission.VIEW)).to.equal(true);
+        expect(testUserPersmission!.permissions.includes(Permission.EDIT)).to.equal(true);
+        expect(testUserPersmission!.permissions.includes(Permission.MANAGE)).to.equal(true);
+    });
+
     it("Should not allow other user to remove creator permissions", async function () {
-        let response = await userAClient.mutate({
+        let response = await userBClient.mutate({
             mutation: DeleteUserCollectionPermissionsDocument,
             variables: {
                 identifier: {
@@ -239,5 +279,80 @@ describe("Collection Permissions", async () => {
         expect(afterGrantedViewOnUserB.data?.collection.description).to.equal(
             "UserB Will Find This After Granted View Permissions"
         );
+    });
+
+    it("remove user B manage permission", async function () {
+        const newPermissions = [Permission.VIEW, Permission.EDIT];
+
+        let response = await userAClient.mutate({
+            mutation: SetUserCollectionPermissionsDocument,
+            variables: {
+                identifier: {
+                    collectionSlug: "testA-collection-permissions"
+                },
+                value: [
+                    {
+                        usernameOrEmailAddress: "my-test-user101",
+                        permissions: newPermissions
+                    }
+                ],
+                message: "Testing test"
+            }
+        });
+
+        expect(response.errors! == null).true;
+    });
+
+    it("get users list for collection part 2", async function () {
+        let response = await userAClient.query({
+            query: UsersByCollectionDocument,
+            variables: {
+                identifier: {
+                    collectionSlug: "testA-collection-permissions"
+                }
+            }
+        });
+
+        const testUserPersmission = response.data.usersByCollection.find((f) => f.user.username === "my-test-user101");
+
+        expect(response.errors! == null).true;
+        expect(testUserPersmission).to.not.equal(undefined);
+        expect(testUserPersmission!.permissions.includes(Permission.VIEW)).to.equal(true);
+        expect(testUserPersmission!.permissions.includes(Permission.EDIT)).to.equal(true);
+        expect(testUserPersmission!.permissions.includes(Permission.MANAGE)).to.equal(false);
+    });
+
+    it("should allow user b to edit the collection", async function () {
+        let response = await userBClient.mutate({
+            mutation: UpdateCollectionDocument,
+            variables: {
+                identifier: {
+                    collectionSlug: "testA-collection-permissions"
+                },
+                value: {
+                    description: "new description"
+                }
+            }
+        });
+
+        expect(response.errors! == null).true;
+        expect(response.data!.updateCollection.description).equal("new description");
+    });
+
+    it("should not allow user b to change the collection public setting", async function () {
+        let response = await userBClient.mutate({
+            mutation: UpdateCollectionDocument,
+            variables: {
+                identifier: {
+                    collectionSlug: "testA-collection-permissions"
+                },
+                value: {
+                    isPublic: true
+                }
+            }
+        });
+
+        expect(response.errors!.length).equal(1);
+        expect(response.errors!.find((e) => e.message.startsWith("NOT_AUTHORIZED"))).to.not.equal(undefined);
     });
 });

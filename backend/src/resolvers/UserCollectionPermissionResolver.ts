@@ -152,7 +152,7 @@ export const getCollectionPermissionsFromCacheOrDb = async (
     const collectionPromiseFunction = () =>
         context.connection
             .getCustomRepository(UserCollectionPermissionRepository)
-            .hasPermission(userId, collection.id, permission);
+            .hasPermission(userId, collection, permission);
 
     return await context.cache.loadCollectionPermissionsStatusById(
         collection.id,

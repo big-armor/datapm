@@ -31,6 +31,8 @@ export class CatalogPermissionsComponent implements OnChanges {
     public columnsToDisplay = ["name", "permission", "actions"];
     public users: any[] = [];
 
+    Permission = Permission;
+
     constructor(
         private dialog: MatDialog,
         private dialogService: DialogService,
@@ -45,6 +47,10 @@ export class CatalogPermissionsComponent implements OnChanges {
 
     public ngOnChanges(changes: SimpleChanges): void {
         if (changes.catalog && changes.catalog.currentValue) {
+            if (!this.catalog.myPermissions.includes(Permission.MANAGE)) {
+                this.columnsToDisplay = ["name", "permission"];
+            }
+
             this.setCatalogVariables(changes.catalog.currentValue);
             this.getUserList();
         }
@@ -209,5 +215,15 @@ export class CatalogPermissionsComponent implements OnChanges {
     private setCatalogVariables(catalog: Catalog): void {
         this.catalog = catalog;
         this.isCatalogPublic = catalog.isPublic;
+    }
+
+    public myCatalogPermission(permissions: Permission[]): string {
+        if (permissions.includes(Permission.MANAGE)) return "Manage";
+
+        if (permissions.includes(Permission.EDIT)) return "Edit";
+
+        if (permissions.includes(Permission.VIEW)) return "View";
+
+        return "";
     }
 }

@@ -10,6 +10,8 @@ mutation UpdatePackage($identifier: PackageIdentifierInput!, $value: UpdatePacka
         }
         displayName
         description
+        myPermissions
+        isPublic
         latestVersion {
             identifier {
                 versionMajor

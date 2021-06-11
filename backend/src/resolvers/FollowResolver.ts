@@ -79,7 +79,8 @@ export const saveFollow = async (
 
         const hasPermission = await manager
             .getCustomRepository(UserCollectionPermissionRepository)
-            .hasPermission(userId, collection.id, Permission.VIEW);
+            .hasPermission(userId, collection, Permission.VIEW);
+
         if (!hasPermission) {
             throw new Error("NOT_AUTHORIZED");
         }
@@ -95,7 +96,7 @@ export const saveFollow = async (
 
         const hasPermission = await manager
             .getCustomRepository(PackagePermissionRepository)
-            .hasPermission(userId, packageEntity.id, Permission.VIEW);
+            .hasPermission(userId, packageEntity, Permission.VIEW);
         if (!hasPermission) {
             throw new Error("NOT_AUTHORIZED");
         }
@@ -111,7 +112,8 @@ export const saveFollow = async (
 
         const hasPermission = await manager
             .getCustomRepository(PackagePermissionRepository)
-            .hasPermission(userId, packageEntity.id, Permission.VIEW);
+            .hasPermission(userId, packageEntity, Permission.VIEW);
+
         if (!hasPermission) {
             throw new Error("NOT_AUTHORIZED");
         }

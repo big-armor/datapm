@@ -2,7 +2,12 @@ import { Context } from "../context";
 import { hashPassword } from "../util/PasswordUtil";
 import { v4 as uuid } from "uuid";
 import { AuthenticationError } from "apollo-server-errors";
-import { dailyNotifications, weeklyNotifications } from "../service/notification-service";
+import {
+    dailyNotifications,
+    instantNotifications,
+    monthlyNotifications,
+    weeklyNotifications
+} from "../service/notification-service";
 
 export const runJob = async (
     _0: any,
@@ -29,10 +34,14 @@ export const runJob = async (
         throw new AuthenticationError("SCHEDULER_KEY not correct");
     }
 
-    if (job === "dailyNotifications") {
+    if (job === "instantNotifications") {
+        instantNotifications();
+    } else if (job === "dailyNotifications") {
         dailyNotifications();
     } else if (job === "weeklyNotifications") {
         weeklyNotifications();
+    } else if (job === "monthlyNotifications") {
+        monthlyNotifications();
     } else {
         throw new Error("JOB_NOT_RECOGNIZED - " + job);
     }

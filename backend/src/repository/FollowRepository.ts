@@ -1,9 +1,7 @@
 import { DeleteResult, EntityRepository, Repository, SelectQueryBuilder } from "typeorm";
-import { ActivityLogEntity } from "../entity/ActivityLogEntity";
 import { FollowEntity } from "../entity/FollowEntity";
-import { UserEntity } from "../entity/UserEntity";
 import { ActivityLogChangeType, ActivityLogEventType, NotificationFrequency } from "../generated/graphql";
-import { Notification, CatalogNotification } from "../util/notificationUtil";
+import { Notification } from "../util/notificationUtil";
 
 @EntityRepository(FollowEntity)
 export class FollowRepository extends Repository<FollowEntity> {
@@ -301,6 +299,58 @@ export class FollowRepository extends Repository<FollowEntity> {
                 packageNotifications: [
                     {
                         packageId: v.target_package_id,
+                        pending_notifications: v.pending_notifications
+                    }
+                ]
+            };
+        });
+    }
+
+    public async getCollectionFollowsForNotifications(
+        startDate: Date,
+        endDate: Date,
+        frequency: NotificationFrequency
+    ): Promise<Notification[]> {
+        const sql = `select f.user_id, f.target_collection_id, json_agg(al) as pending_notifications, COUNT(al) as count from follow f 
+    join lateral(
+       select a.event_type, 
+              json_agg(json_build_object('created_at', a.created_at, 'user_id', a.user_id , 'package_id', a.target_package_id, 'properties_edited', a.properties_edited, 'change_type', a.change_type ) order by a.created_at ) as actions,
+           array_accum(distinct a.properties_edited) as properties_edited 
+       from activity_log a 
+       where
+       a.created_at  > $2
+       AND a.created_at <= $3 
+       and a.target_collection_id  = f.target_collection_id 
+       and a.event_type in (select * from unnest( f.event_types)) 
+       and a.user_id <> f.user_id 
+       group by a.event_type
+   ) al on true
+   and f.notification_frequency = $1
+   group by f.user_id, f.target_collection_id 
+   order by f.user_id`;
+
+        const query = (await this.query(sql, [frequency, startDate, endDate])) as {
+            user_id: number;
+            target_collection_id: number;
+            pending_notifications: {
+                actions: {
+                    user_id: number;
+                    created_at: string[];
+                    package_id: number | null;
+                    properties_edited: string[] | null;
+                    change_type: ActivityLogChangeType;
+                }[];
+                event_type: ActivityLogEventType;
+                properties_edited: string[];
+            }[];
+        }[];
+
+        return query.map((v) => {
+            return {
+                userId: v.user_id,
+                collectionNotifications: [
+                    {
+                        collectionId: v.target_collection_id,
                         pending_notifications: v.pending_notifications
                     }
                 ]

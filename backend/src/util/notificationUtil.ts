@@ -4,6 +4,22 @@ export interface Notification {
     userId: number;
     catalogNotifications?: CatalogNotification[];
     packageNotifications?: PackageNotification[];
+    collectionNotifications?: CollectionNotification[];
+}
+
+export interface CollectionNotification {
+    collectionId: number;
+    pending_notifications: {
+        actions: {
+            user_id: number;
+            created_at: string[];
+            package_id: number | null;
+            properties_edited: string[] | null;
+            change_type: string;
+        }[];
+        event_type: ActivityLogEventType;
+        properties_edited: string[];
+    }[];
 }
 
 export interface CatalogNotification {
@@ -44,4 +60,8 @@ export function combineNotifications(a: Notification, b: Notification) {
     if (a.packageNotifications && b.packageNotifications)
         a.packageNotifications = a.packageNotifications.concat(b.packageNotifications);
     else if (b.packageNotifications) a.packageNotifications = b.packageNotifications;
+
+    if (a.collectionNotifications && b.collectionNotifications)
+        a.collectionNotifications = a.collectionNotifications.concat(b.collectionNotifications);
+    else if (b.collectionNotifications) a.collectionNotifications = b.collectionNotifications;
 }

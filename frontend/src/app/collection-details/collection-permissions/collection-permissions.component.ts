@@ -25,6 +25,8 @@ export class CollectionPermissionsComponent implements OnChanges {
     @Input() collection: Collection;
     @Output() collectionEdited: EventEmitter<Collection> = new EventEmitter();
 
+    Permission = Permission;
+
     public columnsToDisplay = ["name", "permission", "actions"];
     public users: any[] = [];
 
@@ -42,6 +44,10 @@ export class CollectionPermissionsComponent implements OnChanges {
     ngOnChanges(changes: SimpleChanges) {
         if (changes.collection && changes.collection.currentValue) {
             this.collection = changes.collection.currentValue;
+
+            if (!this.collection.myPermissions.includes(Permission.MANAGE)) {
+                this.columnsToDisplay = ["name", "permission"];
+            }
             this.getUserList();
         }
     }
@@ -174,5 +180,15 @@ export class CollectionPermissionsComponent implements OnChanges {
                     fragment: "collections"
                 });
         });
+    }
+
+    public permissionString(permissions: Permission[]): string {
+        if (permissions.includes(Permission.MANAGE)) return "Manage";
+
+        if (permissions.includes(Permission.EDIT)) return "Edit";
+
+        if (permissions.includes(Permission.VIEW)) return "View";
+
+        return "";
     }
 }

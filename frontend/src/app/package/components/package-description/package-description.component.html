@@ -60,9 +60,10 @@
 </ng-container>
 
 <ng-template #noPackageFileTemplate>
-    <p>There was an error finding the package file.</p>
-    <p>
-        Please contact support<span *ngIf="hasEditPackagePermissions"> or publish a new package file</span>.
+    <p class="text-dark-gray">There was an error finding the package file.</p>
+    <p class="text-dark-gray">
+        Please <a href="/contact">contact support</a
+        ><span *ngIf="hasEditPackagePermissions"> or publish a new package file</span>.
     </p></ng-template
 >
 

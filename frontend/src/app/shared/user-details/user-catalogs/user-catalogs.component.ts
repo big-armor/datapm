@@ -33,10 +33,12 @@ export class UserCatalogsComponent implements OnInit {
     public myCatalogs: Catalog[];
     public otherCatalogs: Catalog[];
     private subscription = new Subject();
-    columnsToDisplay = ["name", "public", "actions"];
+    columnsToDisplay = ["name", "permission", "public", "actions"];
     inputErrors = {
         required: "Catalog name is required"
     };
+
+    Permission = Permission;
 
     message = new FormControl("You can not delete your username catalog.");
 
@@ -160,5 +162,12 @@ export class UserCatalogsComponent implements OnInit {
                 }
             })
             .subscribe(() => (catalog.isPublic = isPublic));
+    }
+
+    catalogPermission(collection: Catalog): string {
+        if (collection.myPermissions.includes(Permission.MANAGE)) return "Manage";
+        if (collection.myPermissions.includes(Permission.EDIT)) return "Edit";
+        if (collection.myPermissions.includes(Permission.VIEW)) return "View";
+        return "";
     }
 }

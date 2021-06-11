@@ -69,12 +69,20 @@
                                         </td>
                                     </ng-container>
 
+                                    <ng-container matColumnDef="permission">
+                                        <th scope="col" mat-header-cell *matHeaderCellDef>Permission</th>
+                                        <td class="table-content" mat-cell *matCellDef="let collection">
+                                            {{ collectionPermission(collection) }}
+                                        </td>
+                                    </ng-container>
+
                                     <ng-container matColumnDef="public">
                                         <th scope="col" mat-header-cell *matHeaderCellDef>Public</th>
                                         <td class="table-content" mat-cell *matCellDef="let collection">
                                             <mat-slide-toggle
                                                 class="app-slide-toggle"
                                                 [(ngModel)]="collection.isPublic"
+                                                [disabled]="!collection.myPermissions.includes('MANAGE')"
                                                 (change)="updateCollectionVisibility(collection, $event.checked)"
                                             >
                                             </mat-slide-toggle>

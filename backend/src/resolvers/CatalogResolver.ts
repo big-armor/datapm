@@ -1,4 +1,4 @@
-import { UserInputError } from "apollo-server";
+import { UserInputError, ValidationError } from "apollo-server";
 import graphqlFields from "graphql-fields";
 import { Connection, EntityManager } from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
@@ -183,23 +183,37 @@ export const updateCatalog = async (
     info: any
 ) => {
     return context.connection.transaction(async (transaction) => {
-        if (!context.me.isAdmin && value.unclaimed === true) {
-            throw new Error("NOT_AUTHORIZED"); // TODO move this into the directive logic for hasCatalogPermission
+        if (!context.me.isAdmin && value.unclaimed != null) {
+            throw new Error("NOT_AUTHORIZED - must be admin to set unclaimed status");
         }
 
-        const [catalog, propertiesChanged] = await transaction.getCustomRepository(CatalogRepository).updateCatalog({
-            identifier,
-            value,
-            relations: getGraphQlRelationName(info)
-        });
+        const catalog = await transaction
+            .getCustomRepository(CatalogRepository)
+            .findCatalogBySlugOrFail(identifier.catalogSlug);
 
-        context.cache.storeCatalogToCache(catalog);
+        if (
+            value.isPublic != null &&
+            value.isPublic != catalog.isPublic &&
+            !(await hasCatalogPermissions(context, catalog, Permission.MANAGE))
+        ) {
+            throw new ValidationError("NOT_AUTHORIZED - must be manager to set public status");
+        }
+
+        const [updatedCatalog, propertiesChanged] = await transaction
+            .getCustomRepository(CatalogRepository)
+            .updateCatalog({
+                identifier,
+                value,
+                relations: getGraphQlRelationName(info)
+            });
+
+        context.cache.storeCatalogToCache(updatedCatalog);
 
         if (propertiesChanged.includes("unclaimed")) {
             await createActivityLog(transaction, {
                 userId: context.me.id,
                 eventType: ActivityLogEventType.CATALOG_EDIT,
-                targetCatalogId: catalog.id,
+                targetCatalogId: updatedCatalog.id,
                 changeType: value.unclaimed
                     ? ActivityLogChangeType.UNCLAIMED_ENABLED
                     : ActivityLogChangeType.UNCLAIMED_DISABLED
@@ -210,7 +224,7 @@ export const updateCatalog = async (
             await createActivityLog(transaction, {
                 userId: context.me.id,
                 eventType: ActivityLogEventType.CATALOG_EDIT,
-                targetCatalogId: catalog.id,
+                targetCatalogId: updatedCatalog.id,
                 propertiesEdited: propertiesChanged
             });
         }
@@ -219,14 +233,14 @@ export const updateCatalog = async (
             await createActivityLog(transaction, {
                 userId: context.me.id,
                 eventType: ActivityLogEventType.CATALOG_PUBLIC_CHANGED,
-                targetCatalogId: catalog.id,
+                targetCatalogId: updatedCatalog.id,
                 changeType: value.isPublic
                     ? ActivityLogChangeType.PUBLIC_ENABLED
                     : ActivityLogChangeType.PUBLIC_DISABLED
             });
         }
 
-        return catalogEntityToGraphQL(catalog);
+        return catalogEntityToGraphQL(updatedCatalog);
     });
 };
 

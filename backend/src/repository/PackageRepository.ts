@@ -93,6 +93,9 @@ export class PackageRepository extends Repository<PackageEntity> {
 
         const response = await this.createQueryBuilderWithUserConditions(user, Permission.VIEW)
             .andWhere(`("PackageEntity"."creator_id" = :targetUserId )`)
+            .orWhere(
+                `("PackageEntity"."id" in (select package_id from user_package_permission up where up.user_id  = :userId))`
+            )
             .setParameter("targetUserId", targetUser.id)
             .offset(offSet)
             .limit(limit)
@@ -499,9 +502,11 @@ export class PackageRepository extends Repository<PackageEntity> {
         const ALIAS = "myPackages";
         return this.manager
             .getRepository(PackageEntity)
-            .createQueryBuilder()
-            .where("creator_id = :userId")
-            .orderBy('"PackageEntity"."updated_at"', "DESC")
+            .createQueryBuilder("Package")
+            .where(
+                `("Package"."creator_id" = :userId or "Package".id in (select package_id from user_package_permission up where up.user_id  = :userId))`
+            )
+            .orderBy('"Package"."updated_at"', "DESC")
             .limit(limit)
             .offset(offSet)
             .addRelations(ALIAS, relations)

@@ -3,7 +3,7 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { slugValidator } from "src/app/helpers/validators";
 import { PageState } from "src/app/models/page-state";
-import { Collection, SetCollectionCoverImageGQL, UpdateCollectionGQL } from "src/generated/graphql";
+import { Collection, Permission, SetCollectionCoverImageGQL, UpdateCollectionGQL } from "src/generated/graphql";
 import { ConfirmationDialogComponent } from "../confirmation-dialog/confirmation-dialog.component";
 import { ImageService } from "../../services/image.service";
 
@@ -29,6 +29,7 @@ export class EditCollectionComponent {
     confirmDialogOpened: boolean = false;
     state: PageState = "INIT";
 
+    Permission = Permission;
     public isPublicControl = new FormControl(false);
 
     constructor(
@@ -68,6 +69,8 @@ export class EditCollectionComponent {
         if (!this.form.valid) {
             return;
         }
+
+        if (!this.data.myPermissions.includes(Permission.MANAGE)) delete this.form.valid["isPublic"];
 
         this.state = "LOADING";
         this.updateCollection

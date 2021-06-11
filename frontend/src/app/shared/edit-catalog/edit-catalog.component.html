@@ -14,7 +14,7 @@
     </app-avatar>
 
     <div mat-dialog-content id="contentBorder">
-        <div class="d-flex bd-highlight mb-1">
+        <div class="d-flex bd-highlight mb-1" *ngIf="data.myPermissions.includes(Permission.MANAGE)">
             <div class="pr-3 py-2 bd-highlight div-question long-txt">Make this catalog public</div>
             <div class="ml-auto py-2 bd-highlight slide-right">
                 <mat-slide-toggle class="app-slide-toggle" formControlName="isPublic"></mat-slide-toggle>

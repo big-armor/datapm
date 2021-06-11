@@ -52,12 +52,20 @@
                                 </td>
                             </ng-container>
 
+                            <ng-container matColumnDef="permission">
+                                <th scope="col" mat-header-cell *matHeaderCellDef>Permission</th>
+                                <td class="table-content" mat-cell *matCellDef="let catalog">
+                                    {{ catalogPermission(catalog) }}
+                                </td>
+                            </ng-container>
+
                             <ng-container matColumnDef="public">
                                 <th scope="col" mat-header-cell *matHeaderCellDef>Public</th>
                                 <td class="table-content" mat-cell *matCellDef="let catalog">
                                     <mat-slide-toggle
                                         class="app-slide-toggle"
                                         [checked]="catalog.isPublic"
+                                        [disabled]="!catalog.myPermissions.includes(Permission.MANAGE)"
                                         (change)="updateCatalogVisibility(catalog, $event)"
                                     >
                                     </mat-slide-toggle>

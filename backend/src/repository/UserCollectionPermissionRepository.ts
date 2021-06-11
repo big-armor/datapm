@@ -53,8 +53,12 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
         return this.save(permissionEntity);
     }
 
-    public async hasPermission(userId: number, collectionId: number, permission: Permission): Promise<boolean> {
-        const permissionsEntity = await this.findByUserAndCollectionId(userId, collectionId);
+    public async hasPermission(userId: number, collection: CollectionEntity, permission: Permission): Promise<boolean> {
+        if (permission == Permission.VIEW && collection.isPublic) {
+            return true;
+        }
+
+        const permissionsEntity = await this.findByUserAndCollectionId(userId, collection.id);
         if (!permissionsEntity) {
             return false;
         }

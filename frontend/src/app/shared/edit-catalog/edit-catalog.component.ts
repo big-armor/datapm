@@ -5,6 +5,7 @@ import { slugValidator } from "src/app/helpers/validators";
 import { PageState } from "src/app/models/page-state";
 import {
     Catalog,
+    Permission,
     SetCatalogAvatarImageGQL,
     SetCatalogCoverImageGQL,
     UpdateCatalogGQL,
@@ -39,6 +40,7 @@ export class EditCatalogComponent {
     };
     state: PageState = "INIT";
     confirmDialogOpened: boolean = false;
+    Permission = Permission;
 
     public user: User;
 
@@ -97,6 +99,8 @@ export class EditCatalogComponent {
         if (!this.form.valid) {
             return;
         }
+
+        if (!this.data.myPermissions.includes(Permission.MANAGE)) delete this.form.valid["isPublic"];
 
         this.state = "LOADING";
         this.updateCatalog
