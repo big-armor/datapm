@@ -66,7 +66,7 @@ export class CollectionRepository extends Repository<CollectionEntity> {
             .leftJoin("collection_user", "permission", "permission.collection_id = collection.id")
             .where("creator_id = :userId", { userId: user.id })
             .orWhere("permission.user_id = :userId", { userId: user.id })
-            .orderBy('"CollectionEntity"."updated_at"', "DESC")
+            .orderBy('"collection"."updated_at"', "DESC")
             .limit(limit)
             .offset(offSet)
             .getManyAndCount();
