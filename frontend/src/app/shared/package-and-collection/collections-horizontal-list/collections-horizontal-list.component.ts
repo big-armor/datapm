@@ -18,6 +18,30 @@ export class CollectionsHorizontalListComponent implements OnChanges {
 
     public constructor(private router: Router) {}
 
+    slideConfig = {
+        slidesToShow: 3,
+        slidesToScroll: 1,
+        rows: 2,
+        draggable: true,
+        focusOnSelect: true,
+        infinite: false,
+        touchMove: true,
+        responsive: [
+            {
+                breakpoint: 767,
+                settings: {
+                    slidesToShow: 2
+                }
+            },
+            {
+                breakpoint: 567,
+                settings: {
+                    slidesToShow: 1
+                }
+            }
+        ]
+    };
+
     public ngOnChanges(): void {
         this.createGridSystem();
     }

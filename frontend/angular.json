@@ -27,9 +27,15 @@
                         "styles": [
                             "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
                             "src/styles/main.scss",
-                            "node_modules/simplemde/dist/simplemde.min.css"
+                            "node_modules/simplemde/dist/simplemde.min.css",
+                            "node_modules/slick-carousel/slick/slick.scss",
+                            "node_modules/slick-carousel/slick/slick-theme.scss"
                         ],
-                        "scripts": ["node_modules/marked/lib/marked.js"]
+                        "scripts": [
+                            "node_modules/jquery/dist/jquery.min.js",
+                            "node_modules/slick-carousel/slick/slick.min.js",
+                            "node_modules/marked/lib/marked.js"
+                        ]
                     },
                     "configurations": {
                         "production": {

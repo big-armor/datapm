@@ -2,58 +2,37 @@
 @import "../../../../styles/colors";
 
 #collectionList {
-    ::ng-deep {
-        .carousel-arrow-disabled {
-            cursor: default;
-            opacity: 0;
-        }
-
-        .carousel-arrow-next {
-            right: -30px;
-        }
-
-        .carousel-arrow-prev {
-            left: -30px;
-        }
-
-        .carousel-arrow {
-            background-color: var(--carousel-arrows);
-        }
-    }
-
     .collections-container {
         border-radius: 6px;
-        padding: 22px 15px 20px 15px;
+        padding: 15px;
         background-color: var(--gray-10-color);
     }
 
-    .collection-item {
-        display: inline-block;
-        cursor: pointer;
-        width: 100%;
-        border: 1px solid var(--tranparent-border);
-        background-color: var(--gray-7-color);
-        padding: 15px 15px;
-        border-radius: 6px;
-        text-align: center;
-        font-family: $family-roboto;
-        font-weight: $weight-400;
-        letter-spacing: 0.4px;
-        font-size: $text-font;
-        color: var(--gray-1-color);
+    .collection-cell {
+        padding: 7px;
+        .collection-item {
+            display: inline-block;
+            cursor: pointer;
+            width: 100%;
+            border: 1px solid var(--tranparent-border);
+            background-color: var(--gray-7-color);
+            padding: 15px 15px;
+            border-radius: 6px;
+            text-align: center;
+            font-family: $family-roboto;
+            font-weight: $weight-400;
+            letter-spacing: 0.4px;
+            font-size: $text-font;
+            color: var(--gray-1-color);
 
-        &:hover {
-            background-color: var(--custom-secondary-color);
+            &:hover {
+                background-color: var(--custom-secondary-color);
+            }
         }
     }
 }
 
 @media (max-width: 576px) {
-    // #collectionList {
-    //     .collection-item {
-    //         font-size: $small-font;
-    //     }
-    // }
     .container {
         padding-left: 0px;
         padding-right: 0px;
