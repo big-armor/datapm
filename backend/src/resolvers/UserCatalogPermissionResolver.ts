@@ -10,6 +10,8 @@ import { UserRepository } from "../repository/UserRepository";
 import { asyncForEach } from "../util/AsyncForEach";
 import { sendInviteUser, sendShareNotification, validateMessageContents } from "../util/smtpUtil";
 import { getCatalogFromCacheOrDbOrFail } from "./CatalogResolver";
+import { deleteCatalogFollowByUserId } from "./FollowResolver";
+import { deletePackageFollowsForUsersWithNoPermissions } from "./PackageResolver";
 
 export const hasCatalogPermissions = async (context: Context, catalog: CatalogEntity, permission: Permission) => {
     if (permission == Permission.VIEW) {
@@ -41,7 +43,7 @@ export const setUserCatalogPermission = async (
 ) => {
     validateMessageContents(message);
 
-    const catalog = await getCatalogFromCacheOrDbOrFail(context, identifier);
+    const catalog = await getCatalogFromCacheOrDbOrFail(context, identifier, ["packages"]);
     const inviteUsers: UserEntity[] = [];
     const existingUsers: UserEntity[] = [];
 
@@ -55,6 +57,16 @@ export const setUserCatalogPermission = async (
             if (userCatalogPermission.permission.length === 0) {
                 if (!user) {
                     return;
+                }
+
+                if (!catalog.isPublic) {
+                    await deleteCatalogFollowByUserId(transaction, catalog.id, user.id);
+                    if (catalog.packages) {
+                        const packageFollowRemovalPromises = catalog.packages.map((pkg) =>
+                            deletePackageFollowsForUsersWithNoPermissions(pkg.id, transaction)
+                        );
+                        await Promise.all(packageFollowRemovalPromises);
+                    }
                 }
 
                 return await catalogPermissionRepository.deleteUserCatalogPermissionsForUser({
@@ -102,9 +114,27 @@ export const deleteUserCatalogPermissions = async (
     { identifier, usernameOrEmailAddress }: { identifier: CatalogIdentifierInput; usernameOrEmailAddress: string },
     context: AuthenticatedContext
 ) => {
-    return context.connection.getCustomRepository(UserCatalogPermissionRepository).deleteUserCatalogPermissions({
-        identifier,
-        usernameOrEmailAddress
+    return context.connection.transaction(async (transaction) => {
+        const user = await transaction
+            .getCustomRepository(UserRepository)
+            .getUserByUsernameOrEmailAddress(usernameOrEmailAddress);
+        if (!user) {
+            throw new Error("USER_NOT_FOUND-" + usernameOrEmailAddress);
+        }
+
+        const catalogEntity = await getCatalogFromCacheOrDbOrFail(context, identifier, ["packages"], true);
+        if (!catalogEntity.isPublic) {
+            await deleteCatalogFollowByUserId(transaction, catalogEntity.id, user.id);
+            const packageFollowRemovalPromises = catalogEntity.packages.map((pkg) =>
+                deletePackageFollowsForUsersWithNoPermissions(pkg.id, transaction)
+            );
+            await Promise.all(packageFollowRemovalPromises);
+        }
+
+        return transaction.getCustomRepository(UserCatalogPermissionRepository).deleteUserCatalogPermissionsForUser({
+            identifier,
+            user
+        });
     });
 };
 

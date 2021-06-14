@@ -95,7 +95,7 @@ export class CatalogRepository extends Repository<CatalogEntity> {
         const catalog = await this.manager
             .getRepository(CatalogEntity)
             .createQueryBuilder("catalog")
-            .where(`LOWER(slug) = :catalogSlug`)
+            .where(`LOWER("catalog"."slug") = :catalogSlug`)
             .setParameter("catalogSlug", slug.toLowerCase())
             .addRelations("catalog", relations)
             .getOne();

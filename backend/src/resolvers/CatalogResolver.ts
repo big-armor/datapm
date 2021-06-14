@@ -16,13 +16,14 @@ import {
     UpdateCatalogInput
 } from "../generated/graphql";
 import { createActivityLog } from "../repository/ActivityLogRepository";
-import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
+import { getAllCatalogPermissions, UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { CatalogRepository } from "../repository/CatalogRepository";
 import { PackageRepository } from "../repository/PackageRepository";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
-import { packageEntityToGraphqlObject } from "./PackageResolver";
+import { deleteFollowsByIds, getCatalogFollowsByCatalogId } from "./FollowResolver";
+import { deletePackageFollowsForUsersWithNoPermissions, packageEntityToGraphqlObject } from "./PackageResolver";
 import { hasCatalogPermissions } from "./UserCatalogPermissionResolver";
 import { getUserFromCacheOrDbById } from "./UserResolver";
 
@@ -86,7 +87,7 @@ export const catalogDisplayName = async (parent: Catalog, _1: any, context: Cont
         return catalog.displayName;
     }
 
-    const catalogEntity = await getCatalogFromCacheOrDbOrFail(context, parent.identifier, true);
+    const catalogEntity = await getCatalogFromCacheOrDbOrFail(context, parent.identifier, [], true);
     return catalogEntity.displayName;
 };
 
@@ -100,7 +101,7 @@ export const catalogDescription = async (parent: Catalog, _1: any, context: Cont
         return catalog.description;
     }
 
-    const catalogEntity = await getCatalogFromCacheOrDbOrFail(context, parent.identifier, true);
+    const catalogEntity = await getCatalogFromCacheOrDbOrFail(context, parent.identifier, [], true);
     return catalogEntity.description;
 };
 
@@ -207,13 +208,18 @@ export const updateCatalog = async (
                 relations: getGraphQlRelationName(info)
             });
 
+        const relations = getGraphQlRelationName(info);
+        if (!relations.includes("packages")) {
+            relations.push("packages");
+        }
+
         context.cache.storeCatalogToCache(updatedCatalog);
 
         if (propertiesChanged.includes("unclaimed")) {
             await createActivityLog(transaction, {
                 userId: context.me.id,
-                eventType: ActivityLogEventType.CATALOG_EDIT,
-                targetCatalogId: updatedCatalog.id,
+                eventType: ActivityLogEventType.CATALOG_UNCLAIMED_CHANGED,
+                targetCatalogId: catalog.id,
                 changeType: value.unclaimed
                     ? ActivityLogChangeType.UNCLAIMED_ENABLED
                     : ActivityLogChangeType.UNCLAIMED_DISABLED
@@ -228,7 +234,6 @@ export const updateCatalog = async (
                 propertiesEdited: propertiesChanged
             });
         }
-
         if (propertiesChanged.includes("isPublic")) {
             await createActivityLog(transaction, {
                 userId: context.me.id,
@@ -240,8 +245,28 @@ export const updateCatalog = async (
             });
         }
 
+        if (!value.isPublic) {
+            await deleteCatalogFollowsForUsersWithNoPermissions(catalog.id, transaction);
+            const packageFollowRemovalPromises = catalog.packages.map((pkg) =>
+                deletePackageFollowsForUsersWithNoPermissions(pkg.id, transaction)
+            );
+            await Promise.all(packageFollowRemovalPromises);
+        }
+
         return catalogEntityToGraphQL(updatedCatalog);
     });
+};
+
+export const deleteCatalogFollowsForUsersWithNoPermissions = async (catalogId: number, manager: EntityManager) => {
+    const catalogPermissions = await getAllCatalogPermissions(manager, catalogId);
+    const follows = await getCatalogFollowsByCatalogId(catalogId, manager);
+
+    const userIds = catalogPermissions.map((f) => f.userId);
+    const distinctUserIds = new Set(userIds);
+
+    const followsIdsToDelete = follows.filter((f) => !distinctUserIds.has(f.userId)).map((f) => f.id);
+
+    return deleteFollowsByIds(followsIdsToDelete, manager);
 };
 
 export const setCatalogAvatarImage = async (
@@ -400,12 +425,13 @@ export const getCatalogFromCacheOrDbByIdOrFail = async (
 export const getCatalogFromCacheOrDbOrFail = async (
     context: Context,
     identifier: CatalogIdentifier | CatalogIdentifierInput,
+    relations: string[] = [],
     forceReload?: boolean
 ) => {
     const catalogPromiseFunction = () =>
         context.connection.manager
             .getCustomRepository(CatalogRepository)
-            .findCatalogBySlugOrFail(identifier.catalogSlug);
+            .findCatalogBySlugOrFail(identifier.catalogSlug, relations);
 
     return await context.cache.loadCatalogBySlug(identifier.catalogSlug, catalogPromiseFunction, forceReload);
 };

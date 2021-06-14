@@ -15,6 +15,8 @@ import { sendInviteUser, sendShareNotification, validateMessageContents } from "
 import { CollectionRepository } from "../repository/CollectionRepository";
 import { asyncForEach } from "../util/AsyncForEach";
 import { ValidationError } from "apollo-server";
+import { getCollectionFromCacheOrDbOrFail } from "./CollectionResolver";
+import { deleteCollectionFollowByUserId } from "./FollowResolver";
 
 export const hasCollectionPermissions = async (
     context: Context,
@@ -83,6 +85,9 @@ export const setUserCollectionPermissions = async (
                     return;
                 }
 
+                if (!collectionEntity.isPublic) {
+                    await deleteCollectionFollowByUserId(transaction, collectionEntity.id, user.id);
+                }
                 return await collectionPermissionRepository.deleteUserCollectionPermissionsForUser({
                     identifier,
                     user
@@ -133,9 +138,29 @@ export const deleteUserCollectionPermissions = async (
     { identifier, usernameOrEmailAddress }: { identifier: CollectionIdentifierInput; usernameOrEmailAddress: string },
     context: AuthenticatedContext
 ) => {
-    return context.connection.getCustomRepository(UserCollectionPermissionRepository).deleteUserCollectionPermissions({
-        identifier,
-        usernameOrEmailAddress
+    return context.connection.transaction(async (transaction) => {
+        const user = await transaction
+            .getCustomRepository(UserRepository)
+            .getUserByUsernameOrEmailAddress(usernameOrEmailAddress);
+        if (!user) {
+            throw new Error("USER_NOT_FOUND-" + usernameOrEmailAddress);
+        }
+
+        const collectionEntity = await getCollectionFromCacheOrDbOrFail(
+            context,
+            transaction,
+            identifier.collectionSlug
+        );
+        if (!collectionEntity.isPublic) {
+            await deleteCollectionFollowByUserId(transaction, collectionEntity.id, user.id);
+        }
+
+        return transaction
+            .getCustomRepository(UserCollectionPermissionRepository)
+            .deleteUserCollectionPermissionsForUser({
+                identifier,
+                user
+            });
     });
 };
 

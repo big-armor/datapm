@@ -223,7 +223,7 @@ describe("Catalog Permissions", async () => {
         expect(afterGrantedViewOnUserB.data?.catalog.description).to.equal("This is an integration test User A v2");
     });
 
-    it("inserting empty permissions array and deleting if empty", async function () {
+    it("Inserting empty permissions array and deleting if empty", async function () {
         await userAClient.mutate({
             mutation: CreateCatalogDocument,
             variables: {
@@ -256,6 +256,7 @@ describe("Catalog Permissions", async () => {
             }
         });
 
+        console.log("response", response);
         expect(response.errors! == null).true;
     });
 

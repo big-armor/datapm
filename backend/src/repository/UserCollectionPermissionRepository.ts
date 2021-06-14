@@ -1,5 +1,4 @@
-import { EntityRepository, Repository } from "typeorm";
-import { ForbiddenError } from "apollo-server";
+import { EntityManager, EntityRepository, Repository } from "typeorm";
 
 import {
     Permission,
@@ -13,6 +12,20 @@ import { CollectionEntity } from "../entity/CollectionEntity";
 
 import { UserRepository } from "./UserRepository";
 import { CollectionRepository } from "./CollectionRepository";
+
+export async function getAllCollectionPermissions(
+    manager: EntityManager,
+    collectionId: number,
+    relations?: string[]
+): Promise<UserCollectionPermissionEntity[]> {
+    const ALIAS = "userCollectionPermission";
+    return manager
+        .getRepository(UserCollectionPermissionEntity)
+        .createQueryBuilder(ALIAS)
+        .addRelations(ALIAS, relations)
+        .where({ collectionId })
+        .getMany();
+}
 
 @EntityRepository(UserCollectionPermissionEntity)
 export class UserCollectionPermissionRepository extends Repository<UserCollectionPermissionEntity> {
@@ -162,26 +175,6 @@ export class UserCollectionPermissionRepository extends Repository<UserCollectio
                 }
             }
             return;
-        });
-    }
-
-    deleteUserCollectionPermissions({
-        identifier,
-        usernameOrEmailAddress
-    }: {
-        identifier: CollectionIdentifierInput;
-        usernameOrEmailAddress: string;
-        relations?: string[];
-    }): Promise<void> {
-        return this.manager.nestedTransaction(async (transaction) => {
-            const user = await transaction
-                .getCustomRepository(UserRepository)
-                .getUserByUsernameOrEmailAddress(usernameOrEmailAddress);
-            if (!user) {
-                throw new Error("USER_NOT_FOUND-" + usernameOrEmailAddress);
-            }
-
-            await this.deleteUserCollectionPermissionsForUser({ identifier, user });
         });
     }
 

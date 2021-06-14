@@ -10,6 +10,8 @@ import { PackageRepository } from "../repository/PackageRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { asyncForEach } from "../util/AsyncForEach";
 import { sendInviteUser, sendShareNotification, validateMessageContents } from "../util/smtpUtil";
+import { deletePackageFollowByUserId, deletePackageIssuesFollowsByUserId } from "./FollowResolver";
+import { getPackageFromCacheOrDbOrFail, getPackageFromCacheOrDbByIdOrFail } from "./PackageResolver";
 
 export const hasPackagePermissions = async (context: Context, packageId: number, permission: Permission) => {
     const packagePromiseFunction = () =>
@@ -17,6 +19,7 @@ export const hasPackagePermissions = async (context: Context, packageId: number,
     const packageEntity = await context.cache.loadPackage(packageId, packagePromiseFunction);
 
     if (permission == Permission.VIEW) {
+        const packageEntity = await getPackageFromCacheOrDbByIdOrFail(context, context.connection, packageId);
         if (packageEntity?.isPublic) {
             return true;
         }
@@ -102,6 +105,11 @@ export const setPackagePermissions = async (
                     return;
                 }
 
+                if (!packageEntity.isPublic) {
+                    await deletePackageFollowByUserId(transaction, packageEntity.id, user.id);
+                    await deletePackageIssuesFollowsByUserId(transaction, packageEntity.id, user.id);
+                }
+
                 return await packagePermissionRepository.removePackagePermissionForUser({
                     identifier,
                     user
@@ -155,8 +163,23 @@ export const removePackagePermissions = async (
     { identifier, usernameOrEmailAddress }: { identifier: PackageIdentifierInput; usernameOrEmailAddress: string },
     context: AuthenticatedContext
 ) => {
-    return context.connection.getCustomRepository(PackagePermissionRepository).removePackagePermission({
-        identifier,
-        usernameOrEmailAddress
+    return context.connection.transaction(async (transaction) => {
+        const user = await transaction
+            .getCustomRepository(UserRepository)
+            .getUserByUsernameOrEmailAddress(usernameOrEmailAddress);
+        if (!user) {
+            throw new Error("USER_NOT_FOUND-" + usernameOrEmailAddress);
+        }
+
+        const packageEntity = await getPackageFromCacheOrDbOrFail(context, identifier);
+        if (!packageEntity.isPublic) {
+            await deletePackageFollowByUserId(transaction, packageEntity.id, user.id);
+            await deletePackageIssuesFollowsByUserId(transaction, packageEntity.id, user.id);
+        }
+
+        return transaction.getCustomRepository(PackagePermissionRepository).removePackagePermissionForUser({
+            identifier,
+            user
+        });
     });
 };

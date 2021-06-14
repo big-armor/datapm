@@ -120,6 +120,20 @@ async function getUserCatalogPermission({
     return catalog || null;
 }
 
+export async function getAllCatalogPermissions(
+    manager: EntityManager,
+    catalogId: number,
+    relations?: string[]
+): Promise<UserCatalogPermissionEntity[]> {
+    const ALIAS = "userCatalogPermission";
+    return manager
+        .getRepository(UserCatalogPermissionEntity)
+        .createQueryBuilder(ALIAS)
+        .addRelations(ALIAS, relations)
+        .where({ catalogId })
+        .getMany();
+}
+
 @EntityRepository(UserCatalogPermissionEntity)
 export class UserCatalogPermissionRepository extends Repository<UserCatalogPermissionEntity> {
     public async hasPermission(userId: number, catalogId: number, permission: Permission): Promise<boolean> {
@@ -260,26 +274,6 @@ export class UserCatalogPermissionRepository extends Repository<UserCatalogPermi
                 }
             }
             return;
-        });
-    }
-
-    public deleteUserCatalogPermissions({
-        identifier,
-        usernameOrEmailAddress
-    }: {
-        identifier: CatalogIdentifierInput;
-        usernameOrEmailAddress: string;
-        relations?: string[];
-    }): Promise<void> {
-        return this.manager.nestedTransaction(async (transaction) => {
-            const user = await transaction
-                .getCustomRepository(UserRepository)
-                .getUserByUsernameOrEmailAddress(usernameOrEmailAddress);
-            if (!user) {
-                throw new Error("USER_NOT_FOUND-" + usernameOrEmailAddress);
-            }
-
-            await this.deleteUserCatalogPermissionsForUser({ identifier, user });
         });
     }
 

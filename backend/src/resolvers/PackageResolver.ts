@@ -21,7 +21,7 @@ import {
     ActivityLogResult
 } from "../generated/graphql";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
-import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
+import { getAllPackagePermissions, PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { PackageRepository } from "../repository/PackageRepository";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 import { ImageStorageService } from "../storage/images/image-storage-service";
@@ -45,6 +45,12 @@ import { getUserFromCacheOrDbById } from "./UserResolver";
 import { getCollectionFromCacheOrDbOrFail } from "./CollectionResolver";
 import { PackageDataStorageService } from "../storage/data/package-data-storage-service";
 import { getCatalogPermissionsFromCacheOrDb } from "./UserCatalogPermissionResolver";
+import {
+    deleteFollowsByIds,
+    getPackageFollowsByPackageId,
+    getPackageFollowsByPackageIssuesIds
+} from "./FollowResolver";
+import { PackageIssueRepository } from "../repository/PackageIssueRepository";
 
 export const packageEntityToGraphqlObjectOrNull = async (
     context: Context,
@@ -428,6 +434,10 @@ export const updatePackage = async (
                     ? ActivityLogChangeType.PUBLIC_ENABLED
                     : ActivityLogChangeType.PUBLIC_DISABLED
             });
+
+            if (!value.isPublic) {
+                await deletePackageFollowsForUsersWithNoPermissions(packageEntity.id, transaction);
+            }
         }
 
         return packageEntityToGraphqlObject(context, transaction, packageEntityUpdated);
@@ -464,14 +474,16 @@ export const movePackage = async (
         packageEntity.catalog = targetCatalogEntity;
         packageEntity.catalogId = targetCatalogEntity.id;
 
-        if (!targetCatalogEntity.isPublic) {
-            packageEntity.isPublic = false;
-        }
-
-        await transaction.getCustomRepository(PackageRepository).save(packageEntity);
         await transaction
             .getCustomRepository(PackagePermissionRepository)
             .deleteUsersPermissionsByPackageId(packageEntity.id);
+
+        if (!targetCatalogEntity.isPublic) {
+            packageEntity.isPublic = false;
+            await deletePackageFollowsForUsersWithNoPermissions(packageEntity.id, transaction);
+        }
+
+        await transaction.getCustomRepository(PackageRepository).save(packageEntity);
 
         const userPermission = await getCatalogPermissionsFromCacheOrDb(context, targetCatalogEntity.id, context.me.id);
         await transaction
@@ -485,6 +497,24 @@ export const movePackage = async (
             identifier.packageSlug
         );
     });
+};
+
+export const deletePackageFollowsForUsersWithNoPermissions = async (packageId: number, manager: EntityManager) => {
+    const packagePermissions = await getAllPackagePermissions(manager, packageId);
+    const packageFollows = await getPackageFollowsByPackageId(packageId, manager);
+
+    const packageIssues = await manager.getCustomRepository(PackageIssueRepository).getAllIssuesByPackage(packageId);
+    const packageIssuesIds = packageIssues.map((p) => p.id);
+    const packageIssuesFollows = await getPackageFollowsByPackageIssuesIds(packageIssuesIds, manager);
+
+    const allFollows = [...packageFollows, ...packageIssuesFollows];
+
+    const userIds = packagePermissions.map((f) => f.userId);
+    const distinctUserIds = new Set(userIds);
+
+    const followsIdsToDelete = allFollows.filter((f) => !distinctUserIds.has(f.userId)).map((f) => f.id);
+
+    return deleteFollowsByIds(followsIdsToDelete, manager);
 };
 
 export const setPackageCoverImage = async (

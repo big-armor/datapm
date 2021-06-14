@@ -18,6 +18,7 @@ const sql = `
     ALTER TYPE activity_log_event_type_enum ADD VALUE 'PACKAGE_MINOR_CHANGE';
     ALTER TYPE activity_log_event_type_enum ADD VALUE 'PACKAGE_PATCH_CHANGE';
     ALTER TYPE activity_log_event_type_enum ADD VALUE 'PACKAGE_ISSUE_EDIT';
+    ALTER TYPE activity_log_event_type_enum ADD VALUE 'CATALOG_UNCLAIMED_CHANGED';
 
 
     delete from "activity_log" where target_package_version_id not in (select id from "version" v2 );

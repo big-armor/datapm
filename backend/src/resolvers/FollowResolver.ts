@@ -1,4 +1,4 @@
-import { Connection, EntityManager } from "typeorm";
+import { EntityManager } from "typeorm";
 import { resolveCatalogPermissionsForEntity } from "../directive/hasCatalogPermissionDirective";
 import { AuthenticatedContext, Context } from "../context";
 import { FollowEntity } from "../entity/FollowEntity";
@@ -110,12 +110,13 @@ export const saveFollow = async (
             .getCustomRepository(PackageRepository)
             .findPackageOrFail({ identifier: follow.packageIssue.packageIdentifier });
 
-        const hasPermission = await manager
-            .getCustomRepository(PackagePermissionRepository)
-            .hasPermission(userId, packageEntity, Permission.VIEW);
-
-        if (!hasPermission) {
-            throw new Error("NOT_AUTHORIZED");
+        if (!packageEntity.isPublic) {
+            const hasPermission = await manager
+                .getCustomRepository(PackagePermissionRepository)
+                .hasPermission(userId, packageEntity, Permission.VIEW);
+            if (!hasPermission) {
+                throw new Error("NOT_AUTHORIZED");
+            }
         }
 
         const issueEntity = await manager
@@ -355,4 +356,50 @@ export const followCollection = async (
     }
 
     return parent.collection;
+};
+
+export const getPackageFollowsByPackageId = async (packageId: number, manager: EntityManager) => {
+    return await manager.getCustomRepository(FollowRepository).getFollowsByPackageId(packageId);
+};
+
+export const getPackageFollowsByPackageIssuesIds = async (packageIssueIds: number[], manager: EntityManager) => {
+    if (packageIssueIds == null || packageIssueIds.length === 0) {
+        return [];
+    }
+
+    return await manager.getCustomRepository(FollowRepository).getFollowsByPackageIssuesIds(packageIssueIds);
+};
+
+export const getCatalogFollowsByCatalogId = async (catalogId: number, manager: EntityManager) => {
+    return await manager.getCustomRepository(FollowRepository).getFollowsByCatalogId(catalogId);
+};
+
+export const getCollectionFollowsByCollectionId = async (collectionId: number, manager: EntityManager) => {
+    return await manager.getCustomRepository(FollowRepository).getFollowsByCollectionId(collectionId);
+};
+
+export const deletePackageFollowByUserId = async (manager: EntityManager, packageId: number, userId: number) => {
+    return await manager.getCustomRepository(FollowRepository).deleteFollowByPackageId(userId, packageId);
+};
+
+export const deletePackageIssuesFollowsByUserId = async (manager: EntityManager, packageId: number, userId: number) => {
+    const packageIssues = await manager.getCustomRepository(PackageIssueRepository).getAllIssuesByPackage(packageId);
+    const packageIssuesIds = packageIssues.map((p) => p.id);
+    return await manager.getCustomRepository(FollowRepository).deleteFollowsByPackageIssueIds(userId, packageIssuesIds);
+};
+
+export const deleteCatalogFollowByUserId = async (manager: EntityManager, catalogId: number, userId: number) => {
+    return await manager.getCustomRepository(FollowRepository).deleteFollowByCatalogId(userId, catalogId);
+};
+
+export const deleteCollectionFollowByUserId = async (manager: EntityManager, collectionId: number, userId: number) => {
+    return await manager.getCustomRepository(FollowRepository).deleteFollowByCollectionId(userId, collectionId);
+};
+
+export const deleteFollowsByIds = async (ids: number[], manager: EntityManager) => {
+    if (!ids || !ids.length) {
+        return;
+    }
+
+    return await manager.getCustomRepository(FollowRepository).delete(ids);
 };
