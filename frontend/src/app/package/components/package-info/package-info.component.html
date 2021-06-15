@@ -9,7 +9,9 @@
                 </div>
                 <div
                     class="px-1 d-flex flex-column bd-highlight share-btn"
-                    [matTooltip]="'You do not have the Manage permission for this package'"
+                    [matTooltip]="
+                        'This package is not public, and you do not have the Manage permission for this package'
+                    "
                     matTooltipClass="disabled-tooltip"
                     [matTooltipDisabled]="canShare()"
                 >

@@ -5,6 +5,23 @@ export interface Notification {
     catalogNotifications?: CatalogNotification[];
     packageNotifications?: PackageNotification[];
     collectionNotifications?: CollectionNotification[];
+    userNotifications?: UserNotification[];
+}
+
+export interface UserNotification {
+    userId: number;
+    pending_notifications: {
+        actions: {
+            user_id: number;
+            created_at: string[];
+            package_id: number | null;
+            package_version_id: number | null;
+            properties_edited: string[] | null;
+            change_type: string;
+        }[];
+        event_type: ActivityLogEventType;
+        properties_edited: string[];
+    }[];
 }
 
 export interface CollectionNotification {

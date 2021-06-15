@@ -4,7 +4,19 @@ This is your {{frequency}} update about items you have followed. Use the link be
 
 {{registry_url}}/following
 
+
+{{#hasUserChanges}}
+These users you follow made changes:
+{{#users}}
+    {{displayName}} {{#slug}}({{&slug}}){{/slug}}
+    {{#actions}}
+        {{&action}}
+    {{/actions}}
+
+{{/users}}
+{{/hasUserChanges}}
 {{#hasPackageChanges}}
+
 Packages that have changed:
 {{#packages}}
     {{displayName}} ({{&slug}})
@@ -14,9 +26,8 @@ Packages that have changed:
 
 {{/packages}}
 {{/hasPackageChanges}}
-
-
 {{#hasCollectionChanges}}
+
 Collections that have changed:
 {{#collections}}
     {{displayName}} ({{&slug}})
@@ -26,8 +37,8 @@ Collections that have changed:
 
 {{/collections}}
 {{/hasCollectionChanges}}
-
 {{#hasCatalogChanges}}
+
 Catalogs that have changed:
 {{#catalogs}}
     {{displayName}} ({{&slug}})

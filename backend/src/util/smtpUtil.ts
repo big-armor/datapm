@@ -33,6 +33,8 @@ export interface NotificationEmailTemplate {
     catalogs: NotificationResourceTypeTemplate[];
     hasCollectionChanges: boolean;
     collections: NotificationResourceTypeTemplate[];
+    hasUserChanges: boolean;
+    users: NotificationResourceTypeTemplate[];
 }
 
 export async function sendFollowNotificationEmail(

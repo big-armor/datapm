@@ -108,6 +108,7 @@ async function sendNotifications(
         const catalogChanges = await getCatalogChanges(user, notification, connection);
         const packageChanges = await getPackageChanges(user, notification, connection);
         const collectionChanges = await getCollectionChanges(user, notification, connection);
+        const userChanges = await getUserChanges(user, notification, connection);
 
         const notificationEmail: NotificationEmailTemplate = {
             recipientFirstName: user.firstName,
@@ -117,11 +118,91 @@ async function sendNotifications(
             hasPackageChanges: packageChanges.length > 0,
             packages: packageChanges,
             hasCollectionChanges: collectionChanges.length > 0,
-            collections: collectionChanges
+            collections: collectionChanges,
+            hasUserChanges: userChanges.length > 0,
+            users: userChanges
         };
 
         sendFollowNotificationEmail(user, frequency, notificationEmail);
     }
+}
+
+async function getUserChanges(
+    user: UserEntity,
+    notification: Notification,
+    connection: Connection
+): Promise<NotificationResourceTypeTemplate[]> {
+    return await Promise.all(
+        (await notification.userNotifications?.asyncMap(async (pn) => {
+            const userEntity = await connection.getRepository(UserEntity).findOneOrFail(pn.userId);
+
+            return {
+                displayName: userEntity.displayName,
+                slug: userEntity.displayName === userEntity.username ? "" : "@" + userEntity.username,
+                actions: await pn.pending_notifications.asyncFlatMap(async (n) => {
+                    let actionsTaken: NotificationActionTemplate[] = [];
+
+                    const user = await connection.getRepository(UserEntity).findOne({
+                        where: {
+                            id: n.actions[0].user_id
+                        }
+                    });
+
+                    if (user == null) {
+                        throw new Error("USER_NOT_FOUND_DURING_ACTIVITY_LOOKUP");
+                    }
+
+                    let userDisplayName = "";
+                    let action = "took an unknown action";
+
+                    const timeAgo = "unknown time ago";
+
+                    if (n.event_type == ActivityLogEventType.PACKAGE_CREATED) {
+                        actionsTaken = actionsTaken.concat(
+                            await n.actions.asyncMap(async (a) => {
+                                const packageEntity = await connection
+                                    .getRepository(PackageEntity)
+                                    .findOneOrFail({ where: { id: a.package_id }, relations: ["catalog"] });
+
+                                return {
+                                    action: "created " + packageEntity.catalog.slug + "/" + packageEntity.slug,
+                                    userDisplayName: userDisplayName,
+                                    timeAgo: "test"
+                                };
+                            })
+                        );
+                    } else if (n.event_type == ActivityLogEventType.VERSION_CREATED) {
+                        actionsTaken = actionsTaken.concat(
+                            await n.actions.asyncMap(async (a) => {
+                                const version = await connection.getRepository(VersionEntity).findOneOrFail({
+                                    where: { id: a.package_version_id },
+                                    relations: ["package", "package.catalog"]
+                                });
+
+                                return {
+                                    action:
+                                        "published " +
+                                        version.package.catalog.slug +
+                                        "/" +
+                                        version.package.slug +
+                                        " version " +
+                                        version.majorVersion +
+                                        "." +
+                                        version.minorVersion +
+                                        "." +
+                                        version.patchVersion,
+                                    userDisplayName: userDisplayName,
+                                    timeAgo: "test"
+                                };
+                            })
+                        );
+                    }
+
+                    return actionsTaken;
+                })
+            };
+        })) || []
+    );
 }
 
 async function getPackageChanges(
@@ -488,13 +569,21 @@ async function getPendingNotifications(
         .getCustomRepository(FollowRepository)
         .getCollectionFollowsForNotifications(startDate, endDaate, frequency);
 
-    const [catalogNotifications, packageNotifications, collectionNotifications] = await Promise.all([
+    const pendingUserNotificaitons = databaseConnection?.manager
+        .getCustomRepository(FollowRepository)
+        .getUserFollowsForNotifications(startDate, endDaate, frequency);
+
+    const [catalogNotifications, packageNotifications, collectionNotifications, userNotifications] = await Promise.all([
         pendingCatalogNotifications,
         pendingPackageNotificaitons,
-        pendingCollectionNotificaitons
+        pendingCollectionNotificaitons,
+        pendingUserNotificaitons
     ]);
 
-    const allNotifications = catalogNotifications.concat(packageNotifications).concat(collectionNotifications);
+    const allNotifications = catalogNotifications
+        .concat(packageNotifications)
+        .concat(collectionNotifications)
+        .concat(userNotifications);
 
     const notificationsByUser: Record<number, Notification> = {};
 
