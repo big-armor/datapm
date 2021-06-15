@@ -23,7 +23,7 @@
         </div>
     </div>
 
-    <div class="mb-2 pb-4">
+    <div class="mb-2 pb-4" *ngIf="user?.isAdmin">
         <div class="text-main-title">Unclaimed</div>
         <p class="text-dark-gray col-md-8 p-0">
             An unclaimed catalog is managed by any administrator, and is intended for the use case where the data
@@ -34,13 +34,13 @@
                 <div class="ml-auto pr-2 pb-1 slide-right">
                     <mat-slide-toggle
                         class="app-slide-toggle"
-                        [checked]="isCatalogPublic"
-                        formControlName="unclaimed"
+                        [checked]="isCatalogUnclaimed"
+                        (change)="updateUnclaimed($event)"
                     ></mat-slide-toggle>
                 </div>
                 <div class="pr-2 text-dark-gray" style="margin-bottom: 0px !important">
-                    <span class="public-text" *ngIf="isCatalogPublic">Unclaimed</span>
-                    <span class="not-public-text" *ngIf="!isCatalogPublic">Unclaimed</span>
+                    <span class="public-text" *ngIf="isCatalogUnclaimed">Unclaimed</span>
+                    <span class="not-public-text" *ngIf="!isCatalogUnclaimed">Claimed</span>
                 </div>
             </div>
         </div>

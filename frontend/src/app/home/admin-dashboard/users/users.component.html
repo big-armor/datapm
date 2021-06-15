@@ -70,7 +70,7 @@
                                 <mat-slide-toggle
                                     class="app-slide-toggle"
                                     [checked]="element.isAdmin"
-                                    (change)="updateAdmin($event)"
+                                    (change)="updateAdmin($event, element)"
                                     [disabled]="disabled"
                                 >
                                 </mat-slide-toggle>

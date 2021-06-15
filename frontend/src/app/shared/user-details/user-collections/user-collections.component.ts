@@ -130,4 +130,8 @@ export class UserCollectionsComponent implements OnInit {
                 }
             });
     }
+
+    public goToCollection(collection: Collection): void {
+        this.router.navigate(["/collection/" + collection.identifier.collectionSlug]);
+    }
 }

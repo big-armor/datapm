@@ -33,8 +33,6 @@ export interface PropertyDialogData {
 export class EditPropertyDialogComponent {
     public readonly CHIP_SEPARATOR_KEY_CODES: number[] = [ENTER, COMMA];
 
-    addOnBlur = true;
-
     public selectedProperty: Schema;
     public selectedPropertyTitle: string;
     public properties: Schema[] = [];
@@ -144,6 +142,12 @@ export class EditPropertyDialogComponent {
                 v.contentLabels = [];
             }
         });
+    }
+
+    public addOnBlur(values: ContentLabel[]): void {
+        if (this.contentLabelControl.value && this.contentLabelControl.value.length) {
+            this.addLabelChip(this.contentLabelControl.value, values);
+        }
     }
 
     public getContentLabels(valueType) {

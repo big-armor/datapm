@@ -1,6 +1,12 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, ViewChild } from "@angular/core";
 import { MatPaginator } from "@angular/material/paginator";
-import { AdminSetUserStatusGQL, AdminDeleteUserGQL, AdminSearchUsersGQL, User } from "../../../../generated/graphql";
+import {
+    AdminSetUserStatusGQL,
+    AdminDeleteUserGQL,
+    AdminSearchUsersGQL,
+    User,
+    SetAsAdminGQL
+} from "../../../../generated/graphql";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import Timeout = NodeJS.Timeout;
@@ -47,6 +53,7 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
         private searchUsersGQL: AdminSearchUsersGQL,
         private changeUserStatusGQL: AdminSetUserStatusGQL,
         private deleteUserGQL: AdminDeleteUserGQL,
+        private setAsAdminGQL: SetAsAdminGQL,
         private changeDetectorRef: ChangeDetectorRef,
         private confirmationDialogService: ConfirmationDialogService,
         private confirmModalService: ConfirmationDialogService
@@ -76,7 +83,7 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
         this.searchUsers();
     }
 
-    public updateAdmin(changeEvent: MatSlideToggleChange): void {
+    public updateAdmin(changeEvent: MatSlideToggleChange, user: User): void {
         this.confirmModalService
             .openFancyConfirmationDialog({
                 data: {
@@ -86,12 +93,21 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
             })
             .subscribe((confirmed) => {
                 if (confirmed) {
-                    this.confirmSave();
+                    this.confirmSave(user.username, changeEvent.checked);
+                } else {
+                    changeEvent.source.writeValue(!changeEvent.checked);
                 }
             });
     }
 
-    public confirmSave(): void {}
+    public confirmSave(username: string, isAdmin: boolean): void {
+        this.setAsAdminGQL
+            .mutate({
+                username: username,
+                isAdmin: isAdmin
+            })
+            .subscribe();
+    }
 
     public openDeleteUserConfirmationDialog(user: User): void {
         const dialogContent = `<p class="mb-1">Are you sure you want to delete user ${user.username}</p>

@@ -68,7 +68,11 @@
                     >
                 </div>
             </div>
-            <app-catalog-permissions [catalog]="catalog" *ngIf="currentTab === 1"></app-catalog-permissions>
+            <app-catalog-permissions
+                (onCatalogUpdate)="onCatalogUpdate.emit($event)"
+                [catalog]="catalog"
+                *ngIf="currentTab === 1"
+            ></app-catalog-permissions>
         </div>
     </ng-container>
 
