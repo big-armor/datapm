@@ -190,7 +190,7 @@ export const updateCatalog = async (
 
         const catalog = await transaction
             .getCustomRepository(CatalogRepository)
-            .findCatalogBySlugOrFail(identifier.catalogSlug);
+            .findCatalogBySlugOrFail(identifier.catalogSlug, ["packages"]);
 
         if (
             value.isPublic != null &&

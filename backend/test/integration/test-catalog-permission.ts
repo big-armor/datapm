@@ -256,7 +256,6 @@ describe("Catalog Permissions", async () => {
             }
         });
 
-        console.log("response", response);
         expect(response.errors! == null).true;
     });
 
