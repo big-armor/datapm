@@ -19,6 +19,7 @@ import { getPackageFromCacheOrDbByIdOrFail, packageEntityToGraphqlObject } from 
 import { versionEntityToGraphqlObject } from "./VersionResolver";
 import { VersionEntity } from "../entity/VersionEntity";
 import { getUserFromCacheOrDbById } from "./UserResolver";
+import { ActivityLogRepository } from "../repository/ActivityLogRepository";
 
 export const activtyLogEntityToGraphQL = async function (
     context: Context,
@@ -212,5 +213,21 @@ export const catalogActivities = async (
         logs: [],
         count: 0,
         hasMore: false
+    };
+};
+
+export const myFollowingActivity = async (
+    _0: any,
+    { offset, limit }: { offset: number; limit: number },
+    context: AuthenticatedContext,
+    _info: any
+): Promise<any> => {
+    const [logs, count] = await context.connection.manager
+        .getCustomRepository(ActivityLogRepository)
+        .getUserFollowingActivity(context.me.id, limit, offset);
+    return {
+        logs,
+        count,
+        hasMore: logs.length < count
     };
 };

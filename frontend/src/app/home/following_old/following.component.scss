@@ -1,0 +1,369 @@
+@import "../../../styles/colors";
+@import "../../../styles/variables";
+
+#followingTab {
+    padding: 40px 10px;
+
+    .h1-title {
+        font-family: $family-roboto;
+        font-style: $style-normal;
+        font-weight: $weight-300;
+        font-size: 20px;
+        line-height: 26px;
+        letter-spacing: -0.28px;
+        color: $gray-3-color;
+    }
+
+    .mat-card {
+        margin-left: 50px;
+        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+            0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+
+        .mat-card-image {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            margin: 0px !important;
+        }
+
+        .content-description {
+            font-family: $family-roboto;
+            font-style: $style-normal;
+            font-weight: $weight-300;
+            font-size: 12px;
+            line-height: 18px;
+            letter-spacing: -0.28px;
+            color: #4f4f4f;
+            max-height: 55px;
+            overflow: hidden;
+        }
+    }
+
+    .hr-divider {
+        border: 0;
+        clear: both;
+        display: none;
+        width: 97%;
+        background-color: #73736a2b;
+        height: 1px;
+        margin-top: 0.2rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .info-div {
+        font-family: $family-roboto;
+        font-style: $style-normal;
+        font-weight: $weight-300;
+        font-size: 14px;
+        line-height: 16px;
+        text-align: left;
+        letter-spacing: -0.28px;
+        color: $gray-3-color;
+        span {
+            font-size: 14px;
+            font-weight: 500;
+            color: $primary-1-color;
+        }
+    }
+
+    .info-div-download {
+        font-family: $family-roboto;
+        font-style: $style-normal;
+        font-weight: $weight-300;
+        font-size: 10px;
+        line-height: 15px;
+        text-align: left;
+        padding-right: 10px;
+        letter-spacing: -0.28px;
+        color: $gray-3-color;
+    }
+
+    .person-card-photo {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        box-shadow: 0px 0px 5px 1px #666666a1;
+    }
+
+    .person-card-name {
+        font-family: $family-roboto;
+        font-style: $style-normal;
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 28px;
+        padding-left: 10px;
+        letter-spacing: -0.28px;
+        cursor: pointer;
+        color: $gray-1-color;
+        margin-bottom: 0px !important;
+    }
+
+    ::ng-deep.card-header-mat {
+        .mat-card-header-text {
+            margin: 6px 0px;
+        }
+
+        .mat-card-avatar {
+            height: unset;
+            width: unset;
+            margin-right: 7px;
+        }
+    }
+
+    .content-title {
+        font-family: $family-roboto;
+        font-style: $style-normal;
+        font-weight: 500;
+        font-size: 18px;
+        line-height: 26px;
+        letter-spacing: -0.28px;
+        cursor: pointer;
+        color: $gray-1-color;
+    }
+
+    .content-list {
+        ul {
+            li {
+                font-family: $family-roboto;
+                font-style: $style-normal;
+                font-weight: $weight-300;
+                font-size: 13px;
+                line-height: 16px;
+                letter-spacing: -0.28px;
+                color: #4f4f4f;
+                margin-top: 3px;
+                a {
+                    color: #4f4f4f;
+                }
+            }
+
+            li:first-child {
+                margin-top: 6px;
+            }
+        }
+    }
+
+    .content-actions {
+        .content-nr {
+            font-family: $family-roboto;
+            font-style: $style-normal;
+            font-weight: 500;
+            font-size: 10px;
+            text-transform: uppercase;
+            color: $gray-3-color;
+            position: relative;
+            bottom: 5px;
+        }
+
+        button {
+            width: 26px;
+            height: 26px;
+            background-color: $secondary-color;
+            box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+                0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+
+            &:focus {
+                outline: $secondary-color auto 0px !important;
+            }
+
+            ::ng-deep.mat-button-wrapper {
+                padding: 0px 0;
+                line-height: 20px;
+
+                .mat-icon {
+                    height: 30px;
+                    color: $gray-3-color;
+                    font-size: 18px;
+
+                    &:focus {
+                        outline: $secondary-color auto 0px !important;
+                    }
+                }
+            }
+        }
+        .yellow {
+            background-color: #f49636c7 !important;
+
+            .mat-icon {
+                color: $secondary-color;
+            }
+        }
+    }
+
+    .following-chips {
+        ::ng-deep.mat-chip {
+            font-family: $family-roboto;
+            font-style: $style-normal;
+            font-weight: normal;
+            font-size: 10px;
+            line-height: 13px;
+            letter-spacing: -0.28px;
+            color: $primary-color;
+            padding: 0px 10px;
+            min-height: 18px;
+            border-radius: 24px;
+            cursor: pointer;
+            margin: 0px 6px 6px 6px;
+            background-color: $secondary-color;
+            box-shadow: inset -4px 0px 4px rgba(255, 255, 255, 0.25), inset 0px -4px 4px rgba(255, 255, 255, 0.25),
+                inset 0px 4px 4px rgba(189, 189, 189, 0.25), inset 4px 0px 4px rgba(189, 189, 189, 0.25);
+        }
+    }
+
+    .following-div {
+        margin-bottom: 50px;
+
+        .content-text {
+            margin-bottom: 15px;
+        }
+    }
+
+    .div-shadow {
+        padding: 16px 16px 20px 16px;
+        box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+            0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+
+        .topics-title {
+            font-family: $family-roboto;
+            font-style: $style-normal;
+            font-weight: 400;
+            font-size: 20px;
+            line-height: 26px;
+            letter-spacing: -0.28px;
+            color: #4f4f4f;
+            margin-bottom: 20px;
+        }
+
+        .big-chips {
+            .mat-chip.mat-standard-chip {
+                transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+                display: unset;
+                padding: 2px 12px;
+                border-radius: 16px;
+                text-align: center;
+                cursor: pointer;
+                min-height: 20px;
+                margin: 5px 4px;
+                height: 1px;
+                width: 100%;
+                background: $secondary-color !important;
+                box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.25), 0px -4px 4px rgba(255, 255, 255, 0.25),
+                    0px 4px 4px rgba(189, 189, 189, 0.25), 4px 0px 4px rgba(189, 189, 189, 0.25);
+                border-radius: 24px;
+                font-family: $family-roboto;
+                font-style: $style-normal;
+                font-weight: normal;
+                font-size: 10px;
+                line-height: 13px;
+                letter-spacing: -0.28px;
+                color: $primary-color;
+            }
+        }
+
+        .big-chip-btn {
+            width: 100%;
+            border-radius: 24px;
+            box-shadow: -4px 0px 4px rgba(255, 255, 255, 0.5), 0px -4px 4px rgba(255, 255, 255, 0.25),
+                0px 4px 4px rgba(183, 183, 183, 0.25), 4px 0px 4px rgba(183, 183, 183, 0.25);
+            border: none;
+            font-family: $family-roboto;
+            font-weight: $weight-300;
+            font-size: 18px;
+            padding: 6px 10px;
+            line-height: 24px;
+            letter-spacing: -0.28px;
+            color: $gray-3-color;
+        }
+    }
+}
+
+@media (max-width: 767px) {
+    .following-div {
+        .flex-row {
+            flex-direction: column !important;
+            div {
+                width: 100% !important;
+            }
+            .last-row {
+                padding-left: 2.6rem;
+            }
+        }
+        .up-header {
+            margin-bottom: 10px !important;
+        }
+        .following-chips {
+            .mat-chip {
+                margin: 4px 4px;
+            }
+        }
+        .mat-card {
+            margin-left: 0px !important;
+        }
+        .info-div-download {
+            margin-top: 6px;
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    #followingTab {
+        padding: 40px 10px 0px 10px;
+        .big-div-following {
+            margin-bottom: 0px !important;
+            .h1-title {
+                font-size: 18px;
+            }
+            .div-shadow {
+                .big-chips {
+                    .mat-chip.mat-standard-chip {
+                        width: 30% !important;
+                        margin-bottom: 10px;
+                    }
+                }
+                .big-chip-btn {
+                    font-size: 14px;
+                    padding: 3px 9px;
+                    margin-top: 10px;
+                    line-height: 21px;
+                }
+                .topics-title {
+                    font-size: 17px;
+                    line-height: 26px;
+                    margin-bottom: 15px;
+                }
+            }
+            .person-card-name {
+                font-size: 12px;
+            }
+            .info-div {
+                font-size: 10px;
+                span {
+                    font-size: 12px;
+                }
+            }
+            .content-title {
+                font-size: 16px;
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .following-actions {
+        .d-flex {
+            flex-direction: column !important;
+            div {
+                padding: 4px 8px !important;
+            }
+        }
+    }
+    .up-header {
+        flex-direction: column-reverse;
+        .info-div {
+            margin-left: unset !important;
+            margin-right: auto;
+            text-align: left !important;
+            margin-bottom: 10px;
+        }
+    }
+}

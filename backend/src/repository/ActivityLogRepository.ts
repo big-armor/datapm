@@ -5,7 +5,7 @@ import { CollectionEntity } from "../entity/CollectionEntity";
 import { PackageEntity } from "../entity/PackageEntity";
 import { UserEntity } from "../entity/UserEntity";
 import { VersionEntity } from "../entity/VersionEntity";
-import { ActivityLog, ActivityLogChangeType, ActivityLogEventType } from "../generated/graphql";
+import { ActivityLogChangeType, ActivityLogEventType } from "../generated/graphql";
 
 export interface ActivityLogTemp {
     userId: number;
@@ -159,4 +159,123 @@ export class ActivityLogRepository {
 
         return [activityLogEntities, count];
     }
+
+    async getUserFollowingActivity(
+        userId: number,
+        limit: number,
+        offset: number,
+        relations?: string[]
+    ): Promise<[ActivityLogEntity[], number]> {
+        if (relations == null) {
+            relations = [];
+        }
+
+        if (!relations?.includes("targetCollection")) {
+            relations.push("targetCollection");
+        }
+
+        const alias = "AuditLog";
+        // return await this.manager.query(updatesQuery, [userId, limit, offset]);
+        // return await this.manager.createQueryBuilder()
+        //     .innerJoin(alias, "f", "f.", {}).getMany();
+        // (updatesQuery, [userId, limit, offset]);
+
+        const logs = [
+            {
+                user: {
+                    username: "Ermaliii",
+                    firstName: "Ermal",
+                    lastName: "Ferati"
+                },
+                targetPackage: {
+                    displayName: "Package test"
+                },
+                eventType: ActivityLogEventType.PACKAGE_CREATED,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            } as ActivityLogEntity,
+            {
+                user: {
+                    username: "Ermaliii",
+                    firstName: "Ermal",
+                    lastName: "Ferati"
+                },
+                targetCatalog: {
+                    displayName: "Catalog test"
+                },
+                eventType: ActivityLogEventType.CATALOG_CREATED,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            } as ActivityLogEntity,
+            {
+                user: {
+                    username: "Ermaliii",
+                    firstName: "Ermal",
+                    lastName: "Ferati"
+                },
+                targetCollection: {
+                    name: "Collection test"
+                },
+                eventType: ActivityLogEventType.COLLECTION_CREATED,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            } as ActivityLogEntity,
+            {
+                user: {
+                    username: "Ermaliii",
+                    firstName: "Ermal",
+                    lastName: "Ferati"
+                },
+                targetPackageIssue: {
+                    subject: "Test package issue"
+                },
+                eventType: ActivityLogEventType.PACKAGE_ISSUE_CREATED,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            } as ActivityLogEntity
+        ];
+        return Promise.resolve([logs, logs.length]);
+    }
 }
+
+const updatesQuery = `
+        SELECT DISTINCT (a.id), a.*
+        FROM activity_log a
+        JOIN LATERAL (
+            SELECT f.event_types, f.target_collection_id
+            FROM follow f
+            WHERE f.target_collection_id  = a.target_collection_id
+            AND f.user_id = $1
+            AND a.event_type IN (SELECT * FROM unnest(f.event_types))
+            AND
+            CASE
+                WHEN f.target_collection_id IS NOT NULL THEN
+                    (
+                        (SELECT c.is_public FROM collection c WHERE c.id = a.target_collection_id) IS TRUE
+                        OR EXISTS (SELECT cu.collection_id FROM collection_user cu WHERE a.target_collection_id = cu.collection_id AND cu.user_id = f.user_id)
+                    )
+                WHEN f.target_catalog_id IS NOT NULL THEN
+                    (
+                        (SELECT c."isPublic" FROM catalog c WHERE c.id = a.target_catalog_id) IS TRUE
+                        OR EXISTS (SELECT cu.catalog_id FROM user_catalog cu WHERE a.target_catalog_id = cu.catalog_id AND cu.user_id = f.user_id)
+                    )
+                WHEN f.target_package_issue_id IS NOT NULL THEN
+                    (
+                        (SELECT c."isPublic" FROM catalog c WHERE c.id = a.target_catalog_id) IS TRUE
+                        OR EXISTS (SELECT cu.catalog_id FROM user_catalog cu WHERE a.target_catalog_id = cu.catalog_id AND cu.user_id = f.user_id)
+                    )
+                END
+                    AND (
+                        CASE
+                            WHEN a.target_package_id IS NULL THEN TRUE
+                            WHEN a.target_package_id IS NOT NULL THEN
+                                (SELECT pkg."isPublic" FROM package pkg WHERE pkg.id = a.target_package_id) IS TRUE
+                                OR EXISTS (SELECT pu.package_id FROM user_package_permission pu WHERE a.target_package_id = pu.package_id AND pu.user_id = f.user_id
+                            )
+                        END
+                    )
+        ) f ON TRUE
+        ORDER BY a.created_at DESC
+        LIMIT $2
+        OFFSET $3;
+`;

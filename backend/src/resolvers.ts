@@ -156,7 +156,7 @@ import {
     userCatalogs
 } from "./resolvers/CatalogResolver";
 
-import { myActivity, packageActivities } from "./resolvers/ActivityLogResolver";
+import { myActivity, myFollowingActivity, packageActivities } from "./resolvers/ActivityLogResolver";
 import { removePackagePermissions, setPackagePermissions } from "./resolvers/UserPackagePermissionResolver";
 import {
     createPackageIssue,
@@ -573,6 +573,7 @@ export const resolvers: {
         packageActivities: packageActivities,
         getFollow: getFollow,
         myFollows: getAllMyFollows,
+        myFollowingActivity: myFollowingActivity,
         platformSettings: getPlatformSettingsByKey,
         publicPlatformSettingsByKey: getPublicPlatformSettingsByKeyOrFail,
         pageContent: getPageContentByRoute
@@ -657,6 +658,7 @@ export const resolvers: {
         saveFollow: saveFollow,
         deleteFollow: deleteFollow,
         deleteAllMyFollows: deleteAllMyFollows,
+
         savePlatformSettings: savePlatformSettings,
 
         track: (_, { actions }, context: Context) => mixpanel.track(actions, context.request)
