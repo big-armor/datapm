@@ -271,12 +271,12 @@
                                                                                         "
                                                                                     >
                                                                                         <p>
-                                                                                            {{#recipientFirstName}}{{recipientFirstName}},
+                                                                                            {{#recipientFirstName}}{{&recipientFirstName}},
                                                                                             t{{/recipientFirstName}}{{^recipientFirstName}}T{{/recipientFirstName}}his
                                                                                             is your {{frequency}} update
                                                                                             about
                                                                                             <a
-                                                                                                href="{{registry_url}}/{{username}}#user-following"
+                                                                                                href="{{registry_url}}/{{&username}}#user-following"
                                                                                                 >items you have
                                                                                                 followed</a
                                                                                             >.
@@ -290,8 +290,8 @@
                                                                                             {{#users}}
                                                                                             <li>
                                                                                                 <a
-                                                                                                    href="{{registry_url}}/{{slug}}"
-                                                                                                    >{{displayName}}</a
+                                                                                                    href="{{registry_url}}/{{&slug}}"
+                                                                                                    >{{&displayName}}</a
                                                                                                 >
                                                                                                 <ul>
                                                                                                     {{#actions}}
@@ -316,7 +316,7 @@
                                                                                         {{/hasUserChanges}}
                                                                                         {{#hasPackageChanges}}
 
-                                                                                        <p>
+                                                                                        <p style="margin-top: 1em">
                                                                                             Packages that have changed:
                                                                                         </p>
                                                                                         <ul>
@@ -324,16 +324,25 @@
                                                                                             <li>
                                                                                                 <a
                                                                                                     href="{{registry_url}}/{{&slug}}"
-                                                                                                    >{{displayName}}</a
+                                                                                                    >{{&displayName}}</a
                                                                                                 >
                                                                                                 <ul>
                                                                                                     {{#actions}}
                                                                                                     <li>
                                                                                                         <a
                                                                                                             href="{{registry_url}}/{{&userSlug}}"
-                                                                                                            >{{userDisplayName}}</a
+                                                                                                            >{{&userDisplayName}}</a
                                                                                                         >
-                                                                                                        {{&action}}
+                                                                                                        {{#hasPrefix}}{{prefix}}{{/hasPrefix}}
+                                                                                                        {{#hasItemNameAndSlug}}
+                                                                                                        <a
+                                                                                                            href="{{registry_url}}/{{&itemSlug}}"
+                                                                                                            >{{&itemName}}</a
+                                                                                                        >{{/hasItemNameAndSlug}}
+                                                                                                        {{#hasItemNameNotSlug}}
+                                                                                                        {{&itemName}}{{/hasItemNameNotSlug}}
+                                                                                                        {{#hasPostfix}}
+                                                                                                        {{postfix}}{{/hasPostfix}}
                                                                                                     </li>
                                                                                                     {{/actions}}
                                                                                                 </ul>
@@ -343,20 +352,34 @@
                                                                                         {{/hasPackageChanges}}
                                                                                         {{#hasCollectionChanges}}
 
-                                                                                        <p>
+                                                                                        <p style="margin-top: 1em">
                                                                                             Collections that have
                                                                                             changed:
                                                                                         </p>
                                                                                         <ul>
                                                                                             {{#collections}}
                                                                                             <li>
-                                                                                                {{displayName}}
-                                                                                                ({{&slug}})
+                                                                                                <a
+                                                                                                    href="{{registry_url}}/collection/{{&slug}}"
+                                                                                                    >{{&displayName}}</a
+                                                                                                >
                                                                                                 <ul>
                                                                                                     {{#actions}}
                                                                                                     <li>
-                                                                                                        {{userDisplayName}}
-                                                                                                        {{&action}}
+                                                                                                        <a
+                                                                                                            href="{{registry_url}}/{{&userSlug}}"
+                                                                                                            >{{&userDisplayName}}</a
+                                                                                                        >
+                                                                                                        {{#hasPrefix}}{{prefix}}{{/hasPrefix}}
+                                                                                                        {{#hasItemNameAndSlug}}
+                                                                                                        <a
+                                                                                                            href="{{registry_url}}/{{&itemSlug}}"
+                                                                                                            >{{&itemName}}</a
+                                                                                                        >{{/hasItemNameAndSlug}}
+                                                                                                        {{#hasItemNameNotSlug}}
+                                                                                                        {{&itemName}}{{/hasItemNameNotSlug}}
+                                                                                                        {{#hasPostfix}}
+                                                                                                        {{postfix}}{{/hasPostfix}}
                                                                                                     </li>
                                                                                                     {{/actions}}
                                                                                                 </ul>
@@ -366,19 +389,33 @@
                                                                                         {{/hasCollectionChanges}}
                                                                                         {{#hasCatalogChanges}}
 
-                                                                                        <p>
+                                                                                        <p style="margin-top: 1em">
                                                                                             Catalogs that have changed:
                                                                                         </p>
                                                                                         <ul>
                                                                                             {{#catalogs}}
                                                                                             <li>
-                                                                                                {{displayName}}
-                                                                                                ({{&slug}})
+                                                                                                <a
+                                                                                                    href="{{registry_url}}/{{&slug}}"
+                                                                                                    >{{&displayName}}</a
+                                                                                                >
                                                                                                 <ul>
                                                                                                     {{#actions}}
                                                                                                     <li>
-                                                                                                        {{userDisplayName}}
-                                                                                                        {{&action}}
+                                                                                                        <a
+                                                                                                            href="{{registry_url}}/{{&userSlug}}"
+                                                                                                            >{{&userDisplayName}}</a
+                                                                                                        >
+                                                                                                        {{#hasPrefix}}{{prefix}}{{/hasPrefix}}
+                                                                                                        {{#hasItemNameAndSlug}}
+                                                                                                        <a
+                                                                                                            href="{{registry_url}}/{{&itemSlug}}"
+                                                                                                            >{{&itemName}}</a
+                                                                                                        >{{/hasItemNameAndSlug}}
+                                                                                                        {{#hasItemNameNotSlug}}
+                                                                                                        {{&itemName}}{{/hasItemNameNotSlug}}
+                                                                                                        {{#hasPostfix}}
+                                                                                                        {{postfix}}{{/hasPostfix}}
                                                                                                     </li>
                                                                                                     {{/actions}}
                                                                                                 </ul>

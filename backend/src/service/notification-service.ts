@@ -256,11 +256,10 @@ async function getPackageChanges(
                     let userDisplayName = user?.displayName;
                     let action = "took an unknown action";
 
-                    if (n.actions.length > 1) {
-                        const uniqueUsers = [
-                            ...new Set(n.actions.map((a) => a.user_id).filter((f) => f != n.actions[0].user_id))
-                        ];
-
+                    const uniqueUsers = [
+                        ...new Set(n.actions.map((a) => a.user_id).filter((f) => f != n.actions[0].user_id))
+                    ];
+                    if (uniqueUsers.length > 1) {
                         userDisplayName += " and " + uniqueUsers.length + " other users";
                     }
 
@@ -381,11 +380,10 @@ async function getCatalogChanges(
                     let userDisplayName = user?.displayName;
                     let action = "took an unknown action";
 
-                    if (n.actions.length > 1) {
-                        const uniqueUsers = [
-                            ...new Set(n.actions.map((a) => a.user_id).filter((f) => f != n.actions[0].user_id))
-                        ];
-
+                    const uniqueUsers = [
+                        ...new Set(n.actions.map((a) => a.user_id).filter((f) => f != n.actions[0].user_id))
+                    ];
+                    if (uniqueUsers.length > 1) {
                         userDisplayName += " and " + uniqueUsers.length + " other users";
                     }
 
@@ -493,11 +491,10 @@ async function getCollectionChanges(
                     let userDisplayName = user?.displayName;
                     let action = "took an unknown action";
 
-                    if (n.actions.length > 1) {
-                        const uniqueUsers = [
-                            ...new Set(n.actions.map((a) => a.user_id).filter((f) => f != n.actions[0].user_id))
-                        ];
-
+                    const uniqueUsers = [
+                        ...new Set(n.actions.map((a) => a.user_id).filter((f) => f != n.actions[0].user_id))
+                    ];
+                    if (uniqueUsers.length > 1) {
                         userDisplayName += " and " + uniqueUsers.length + " other users";
                     }
 
