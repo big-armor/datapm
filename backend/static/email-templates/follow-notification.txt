@@ -6,11 +6,11 @@ This is your {{frequency}} update about items you have followed. Use the link be
 
 
 {{#hasUserChanges}}
-These users you follow made changes:
+These users you follow have made changes:
 {{#users}}
-    {{displayName}} {{#slug}}({{&slug}}){{/slug}}
+    {{displayName}}
     {{#actions}}
-        {{&action}}
+        {{#hasPrefix}}{{prefix}}{{/hasPrefix}}{{#hasItemName}} {{&itemName}}{{/hasItemName}}{{#hasPostfix}} {{postfix}}{{/hasPostfix}}
     {{/actions}}
 
 {{/users}}
@@ -21,7 +21,7 @@ Packages that have changed:
 {{#packages}}
     {{displayName}} ({{&slug}})
     {{#actions}}
-        {{userDisplayName}} {{&action}}
+        {{userDisplayName}} {{#hasPrefix}}{{prefix}}{{/hasPrefix}}{{#hasItemName}} {{&itemName}}{{/hasItemName}}{{#hasPostfix}} {{postfix}}{{/hasPostfix}}
     {{/actions}}
 
 {{/packages}}
@@ -32,7 +32,7 @@ Collections that have changed:
 {{#collections}}
     {{displayName}} ({{&slug}})
     {{#actions}}
-        {{userDisplayName}} {{&action}}
+        {{userDisplayName}} {{#hasPrefix}}{{prefix}}{{/hasPrefix}}{{#hasItemName}} {{&itemName}}{{/hasItemName}}{{#hasPostfix}} {{postfix}}{{/hasPostfix}}
     {{/actions}}
 
 {{/collections}}
@@ -43,7 +43,7 @@ Catalogs that have changed:
 {{#catalogs}}
     {{displayName}} ({{&slug}})
     {{#actions}}
-        {{userDisplayName}} {{&action}}
+        {{userDisplayName}} {{#hasPrefix}}{{prefix}}{{/hasPrefix}}{{#hasItemName}} {{&itemName}}{{/hasItemName}}{{#hasPostfix}} {{postfix}}{{/hasPostfix}}
     {{/actions}}
 
 {{/catalogs}}
