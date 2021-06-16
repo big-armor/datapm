@@ -1,6 +1,7 @@
 query MyFollowingActivity($offset: Int!, $limit: Int!) {
     myFollowingActivity(offset: $offset, limit: $limit) {
         logs {
+            id
             targetCatalog {
                 identifier {
                     catalogSlug

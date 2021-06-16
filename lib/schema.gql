@@ -496,6 +496,7 @@ type CollectionIdentifier {
 Represents a logged user activity
 """
 type ActivityLog {
+    id: Int!
     user: User
     targetPackage: Package
     targetPackageIssue: PackageIssue

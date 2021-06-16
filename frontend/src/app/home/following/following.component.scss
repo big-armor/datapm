@@ -50,6 +50,18 @@
         margin-bottom: 0.8rem;
     }
 
+    .sentence-link {
+        font-family: $family-roboto;
+        font-style: $style-normal;
+        font-weight: $weight-300;
+        font-size: 14px;
+        line-height: 16px;
+        text-align: left;
+        letter-spacing: -0.28px;
+        color: $gray-3-color;
+        cursor: pointer;
+    }
+
     .info-div {
         font-family: $family-roboto;
         font-style: $style-normal;

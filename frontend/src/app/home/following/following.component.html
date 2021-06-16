@@ -8,18 +8,41 @@
                 <div class="col-md-12 col-lg-12 pb-2 following-div" *ngFor="let log of logs">
                     <div class="d-flex flex-row bd-highlight up-header mb-1">
                         <div class="px-2 bd-highlight">
-                            <img
-                                src="../../../assets/images/user-male.jpg"
-                                alt="User image card"
-                                class="person-card-photo"
-                            />
-                            <span class="person-card-name">{{ getUserName(log) }}</span>
-                            <span class="info-div"> updated </span>
+                            <app-avatar class="catalog-avatar" [user]="log.author" [size]="30"> </app-avatar>
+                            <span class="person-card-name" [routerLink]="'/' + log.author.username"
+                                >{{ log.authorFullName }}
+                            </span>
+                            {{ log.changeTypeLabel }}
+                            <span *ngIf="log.changedEntityInformation.affectedEntityInformation">
+                                {{ log.changedEntityInformation.affectedEntityInformation.type }}
+                                <span
+                                    [routerLink]="log.changedEntityInformation.affectedEntityInformation.url"
+                                    class="sentence-link"
+                                    >{{ log.changedEntityInformation.affectedEntityInformation.name }}</span
+                                ></span
+                            >
+                            {{ log.entitiesBinderLabel }}
                         </div>
                         <div class="bd-highlight d-flex align-items-center last-row">
-                            <div class="info-div"><span>Catalog name/package</span> 15 min ago.</div>
+                            <div>
+                                {{ log.changedEntityInformation.type }}
+                                <span [routerLink]="log.changedEntityInformation.url" class="sentence-link">{{
+                                    log.changedEntityInformation.name
+                                }}</span>
+                                {{ log.timeAgoLabel }}.
+                            </div>
                         </div>
                     </div>
+                </div>
+
+                <div *ngIf="hasMore" class="container text-center">
+                    <button
+                        class="app-outlined-button ctaButton"
+                        [class.disabled]="loadingLogs"
+                        (click)="loadMoreLogs()"
+                    >
+                        Load More
+                    </button>
                 </div>
             </div>
         </div>

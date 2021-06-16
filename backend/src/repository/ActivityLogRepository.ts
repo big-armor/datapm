@@ -1,4 +1,4 @@
-import { Connection, EntityManager, EntityRepository } from "typeorm";
+import { Connection, EntityManager, EntityRepository, In, Repository } from "typeorm";
 import { ActivityLogEntity } from "../entity/ActivityLogEntity";
 import { CatalogEntity } from "../entity/CatalogEntity";
 import { CollectionEntity } from "../entity/CollectionEntity";
@@ -71,13 +71,11 @@ export async function createActivityLog(connection: EntityManager | Connection, 
         activityLog.targetCollectionSlug = collection.collectionSlug;
     }
 
-    await connection.getCustomRepository(ActivityLogRepository).create(activityLog);
+    await connection.getCustomRepository(ActivityLogRepository).createLog(activityLog);
 }
 @EntityRepository(ActivityLogEntity)
-export class ActivityLogRepository {
-    constructor(private manager: EntityManager) {}
-
-    async create(activityLog: ActivityLogEntity): Promise<void> {
+export class ActivityLogRepository extends Repository<ActivityLogEntity> {
+    async createLog(activityLog: ActivityLogEntity): Promise<void> {
         return this.manager.nestedTransaction(async (transaction) => {
             const entity = transaction.create(ActivityLogEntity, activityLog);
             if (
@@ -182,59 +180,74 @@ export class ActivityLogRepository {
 
         const logs = [
             {
+                id: 1,
                 user: {
-                    username: "Ermaliii",
+                    username: "ermali",
                     firstName: "Ermal",
                     lastName: "Ferati"
                 },
-                targetPackage: {
-                    displayName: "Package test"
-                },
+                targetPackageId: 16,
                 eventType: ActivityLogEventType.PACKAGE_CREATED,
                 createdAt: new Date(),
                 updatedAt: new Date()
             } as ActivityLogEntity,
             {
+                id: 2,
                 user: {
-                    username: "Ermaliii",
+                    username: "ermali",
                     firstName: "Ermal",
-                    lastName: "Ferati"
+                    lastName: "Ferati",
+                    nameIsPublic: true
                 },
-                targetCatalog: {
-                    displayName: "Catalog test"
-                },
+                targetCatalogId: 1,
                 eventType: ActivityLogEventType.CATALOG_CREATED,
                 createdAt: new Date(),
                 updatedAt: new Date()
             } as ActivityLogEntity,
             {
+                id: 3,
                 user: {
-                    username: "Ermaliii",
-                    firstName: "Ermal",
-                    lastName: "Ferati"
+                    username: "ermali2",
+                    firstName: "Ermal2",
+                    lastName: "Ferati",
+                    nameIsPublic: true
                 },
-                targetCollection: {
-                    name: "Collection test"
-                },
+                targetCollectionId: 19,
                 eventType: ActivityLogEventType.COLLECTION_CREATED,
                 createdAt: new Date(),
                 updatedAt: new Date()
             } as ActivityLogEntity,
             {
+                id: 4,
                 user: {
-                    username: "Ermaliii",
-                    firstName: "Ermal",
-                    lastName: "Ferati"
+                    username: "ermali1",
+                    firstName: "Ermal1",
+                    lastName: "Ferati",
+                    nameIsPublic: true
                 },
-                targetPackageIssue: {
-                    subject: "Test package issue"
-                },
+                targetPackageIssueId: 1,
                 eventType: ActivityLogEventType.PACKAGE_ISSUE_CREATED,
                 createdAt: new Date(),
                 updatedAt: new Date()
             } as ActivityLogEntity
         ];
-        return Promise.resolve([logs, logs.length]);
+        // return Promise.resolve([logs, logs.length]);
+        return this.createQueryBuilder()
+            .where({
+                userId: 1,
+                eventType: In([
+                    ActivityLogEventType.COLLECTION_PACKAGE_ADDED,
+                    ActivityLogEventType.COLLECTION_PACKAGE_REMOVED,
+                    ActivityLogEventType.PACKAGE_CREATED,
+                    ActivityLogEventType.PACKAGE_DELETED,
+                    ActivityLogEventType.COLLECTION_CREATED,
+                    ActivityLogEventType.COLLECTION_DELETED
+                ])
+            })
+            .offset(offset)
+            .limit(limit)
+            .orderBy('"ActivityLogEntity"."created_at"', "DESC")
+            .getManyAndCount();
     }
 }
 
