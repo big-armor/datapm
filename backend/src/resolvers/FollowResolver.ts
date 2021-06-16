@@ -326,7 +326,7 @@ const getPackageIssueEventTypes = (): NotificationEventType[] => {
 };
 
 const getUserEventTypes = (): NotificationEventType[] => {
-    return [];
+    return [NotificationEventType.PACKAGE_CREATED, NotificationEventType.VERSION_CREATED];
 };
 
 export const followPackage = async (

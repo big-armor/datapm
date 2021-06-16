@@ -244,6 +244,8 @@ enum NotificationFrequency {
 Notification Event type
 """
 enum NotificationEventType {
+    PACKAGE_CREATED
+    VERSION_CREATED
     PACKAGE_PATCH_CHANGE
     PACKAGE_MINOR_CHANGE
     PACKAGE_MAJOR_CHANGE

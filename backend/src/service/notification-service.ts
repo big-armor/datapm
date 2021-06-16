@@ -159,16 +159,26 @@ async function getUserChanges(
 
                     if (n.event_type == ActivityLogEventType.PACKAGE_CREATED) {
                         actionsTaken = actionsTaken.concat(
-                            await n.actions.asyncMap(async (a) => {
+                            await n.actions.asyncFlatMap(async (a) => {
                                 const packageEntity = await connection
                                     .getRepository(PackageEntity)
                                     .findOneOrFail({ where: { id: a.package_id }, relations: ["catalog"] });
 
-                                return {
-                                    action: "created " + packageEntity.catalog.slug + "/" + packageEntity.slug,
-                                    userDisplayName: userDisplayName,
-                                    timeAgo: "test"
-                                };
+                                const hasPermission = await connection
+                                    .getCustomRepository(PackagePermissionRepository)
+                                    .hasPermission(user.id, packageEntity, Permission.VIEW);
+
+                                if (!hasPermission) {
+                                    return [];
+                                }
+
+                                return [
+                                    {
+                                        action: "created " + packageEntity.catalog.slug + "/" + packageEntity.slug,
+                                        userDisplayName: userDisplayName,
+                                        timeAgo: "test"
+                                    }
+                                ];
                             })
                         );
                     } else if (n.event_type == ActivityLogEventType.VERSION_CREATED) {
@@ -210,11 +220,19 @@ async function getPackageChanges(
     notification: Notification,
     connection: Connection
 ): Promise<NotificationResourceTypeTemplate[]> {
-    return await Promise.all(
+    const values = await Promise.all(
         (await notification.packageNotifications?.asyncMap(async (pn) => {
             const packageEntity = await connection
                 .getRepository(PackageEntity)
                 .findOneOrFail(pn.packageId, { relations: ["catalog"] });
+
+            const hasPermission = await connection
+                .getCustomRepository(PackagePermissionRepository)
+                .hasPermission(user.id, packageEntity, Permission.VIEW);
+
+            if (!hasPermission) {
+                return null;
+            }
 
             return {
                 displayName: packageEntity.displayName,
@@ -328,6 +346,8 @@ async function getPackageChanges(
             };
         })) || []
     );
+
+    return values.filter((f) => f != null) as NotificationResourceTypeTemplate[];
 }
 
 async function getCatalogChanges(
