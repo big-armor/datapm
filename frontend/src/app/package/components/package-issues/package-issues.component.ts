@@ -123,6 +123,10 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
         this.updateSelectionStatuses();
     }
 
+    public checkIssue(ev): void {
+        ev.stopPropagation();
+    }
+
     public toggleIssue(issue: PackageIssueWithMetadata, value: boolean): void {
         issue.checked = value;
         this.updateSelectionStatuses();

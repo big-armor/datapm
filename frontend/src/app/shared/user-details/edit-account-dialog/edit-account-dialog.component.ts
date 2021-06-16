@@ -124,8 +124,7 @@ export class EditAccountDialogComponent implements OnInit, OnDestroy {
     public openConfirmDialog(): void {
         if (this.confirmDialogOpened === false) {
             this.dialog.open(ConfirmationDialogComponent, {
-                data:
-                    "Changing your username will change your catalog name and potentially break links you have to packages outside of datapm."
+                data: "Changing your username will change your catalog name and potentially break links you have to packages outside of datapm."
             });
             this.confirmDialogOpened = true;
         }

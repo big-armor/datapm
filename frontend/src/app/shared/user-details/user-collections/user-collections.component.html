@@ -67,10 +67,14 @@
                                                 <div class="text-light-gray">{{ collection.description }}</div>
                                             </div>
                                             <div class="p-2 bd-highlight">
-                                                <a class="app-outlined-button mr-2" (click)="editCollection(collection)"
+                                                <a
+                                                    class="app-outlined-button mr-2"
+                                                    (click)="editCollection($event, collection)"
                                                     >Edit</a
                                                 >
-                                                <a class="app-outlined-button" (click)="deleteCollection(collection)"
+                                                <a
+                                                    class="app-outlined-button"
+                                                    (click)="deleteCollection($event, collection)"
                                                     ><span class="delete-txt">Delete</span>
                                                 </a>
                                             </div>

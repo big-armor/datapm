@@ -101,7 +101,8 @@ export class UserCollectionsComponent implements OnInit {
             });
     }
 
-    editCollection(collection: Collection): void {
+    editCollection(ev, collection: Collection): void {
+        ev.stopPropagation();
         this.dialog
             .open(EditCollectionComponent, {
                 data: collection
@@ -116,7 +117,8 @@ export class UserCollectionsComponent implements OnInit {
             });
     }
 
-    deleteCollection(collection: Collection): void {
+    deleteCollection(ev, collection: Collection): void {
+        ev.stopPropagation();
         this.dialog
             .open(DeleteCollectionComponent, {
                 data: {

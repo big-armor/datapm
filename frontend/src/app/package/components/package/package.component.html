@@ -186,7 +186,11 @@
                                         <div class="col-md-12" id="packageDetails">
                                             <div class="row flex-lg-row-reverse">
                                                 <div
-                                                    class="col-lg-5 col-md-12 col-lg-push-7 right-div d-lg-block d-sm-none"
+                                                    class="
+                                                        col-lg-5 col-md-12 col-lg-push-7
+                                                        right-div
+                                                        d-lg-block d-sm-none
+                                                    "
                                                     *ngIf="shouldShowDetails()"
                                                 >
                                                     <app-package-info
@@ -196,7 +200,8 @@
                                                 </div>
                                                 <div
                                                     [ngClass]="{
-                                                        'col-lg-7 col-md-12 col-lg-pull-5 left-div': shouldShowDetails(),
+                                                        'col-lg-7 col-md-12 col-lg-pull-5 left-div':
+                                                            shouldShowDetails(),
                                                         'col-12': !shouldShowDetails()
                                                     }"
                                                 >

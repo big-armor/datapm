@@ -55,13 +55,13 @@
                                         <a
                                             class="app-outlined-button mr-2"
                                             [class.disabled]="!canModifyCatalog(catalog)"
-                                            (click)="editCatalog(catalog)"
+                                            (click)="editCatalog($event, catalog)"
                                             >Edit</a
                                         >
                                         <a
                                             class="app-outlined-button"
                                             [class.disabled]="!canModifyCatalog(catalog)"
-                                            (click)="deleteCatalog(catalog)"
+                                            (click)="deleteCatalog($event, catalog)"
                                         >
                                             <span class="delete-txt">Delete</span>
                                         </a>
