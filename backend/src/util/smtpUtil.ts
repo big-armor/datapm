@@ -12,10 +12,54 @@ export enum EMAIL_SUBJECTS {
     USER_SUSPENDED = "Your account has been suspended"
 }
 
-export interface NotificationActionTemplate {
-    userDisplayName: string;
-    action: string;
-    timeAgo: string;
+export class NotificationActionTemplate {
+    constructor(values: {
+        userDisplayName?: string;
+        userSlug?: string;
+        prefix?: string;
+        itemSlug?: string;
+        itemName?: string;
+        postfix?: string;
+    }) {
+        this.userDisplayName = values.userDisplayName;
+        this.userSlug = values.userSlug;
+        this.prefix = values.prefix;
+        this.itemSlug = values.itemSlug;
+        this.itemName = values.itemName;
+        this.postfix = values.postfix;
+    }
+
+    userDisplayName?: string;
+    get hasUserDisplayName(): boolean {
+        return this.userDisplayName != undefined;
+    }
+    userSlug?: string;
+    get hasUserSlug(): boolean {
+        return this.userSlug != undefined;
+    }
+    prefix?: string;
+    get hasPrefix(): boolean {
+        return this.prefix != undefined;
+    }
+    itemSlug?: string;
+    get hasItemSlug(): boolean {
+        return this.itemSlug != undefined;
+    }
+    itemName?: string;
+    get hasItemName(): boolean {
+        return this.itemName != undefined;
+    }
+    get hasItemNameAndSlug(): boolean {
+        return this.hasItemName && this.hasItemSlug;
+    }
+    get hasItemNameNotSlug(): boolean {
+        return this.hasItemName && !this.hasItemSlug;
+    }
+    postfix?: string;
+
+    get hasPostfix(): boolean {
+        return this.postfix != undefined;
+    }
 }
 
 export interface NotificationResourceTypeTemplate {

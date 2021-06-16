@@ -128,7 +128,7 @@ async function sendNotifications(
 }
 
 async function getUserChanges(
-    user: UserEntity,
+    notificationUser: UserEntity,
     notification: Notification,
     connection: Connection
 ): Promise<NotificationResourceTypeTemplate[]> {
@@ -138,7 +138,7 @@ async function getUserChanges(
 
             return {
                 displayName: userEntity.displayName,
-                slug: userEntity.displayName === userEntity.username ? "" : "@" + userEntity.username,
+                slug: userEntity.username,
                 actions: await pn.pending_notifications.asyncFlatMap(async (n) => {
                     let actionsTaken: NotificationActionTemplate[] = [];
 
@@ -172,13 +172,15 @@ async function getUserChanges(
                                     return [];
                                 }
 
-                                return [
-                                    {
-                                        action: "created " + packageEntity.catalog.slug + "/" + packageEntity.slug,
-                                        userDisplayName: userDisplayName,
-                                        timeAgo: "test"
-                                    }
-                                ];
+                                const actionTemplate = new NotificationActionTemplate({
+                                    prefix: "created ",
+                                    itemSlug: packageEntity.catalog.slug + "/" + packageEntity.slug,
+                                    itemName: packageEntity.catalog.slug + "/" + packageEntity.slug,
+                                    userDisplayName: userDisplayName,
+                                    userSlug: user.username
+                                });
+
+                                return [actionTemplate];
                             })
                         );
                     } else if (n.event_type == ActivityLogEventType.VERSION_CREATED) {
@@ -189,12 +191,11 @@ async function getUserChanges(
                                     relations: ["package", "package.catalog"]
                                 });
 
-                                return {
-                                    action:
-                                        "published " +
-                                        version.package.catalog.slug +
-                                        "/" +
-                                        version.package.slug +
+                                const actionTemplate = new NotificationActionTemplate({
+                                    prefix: "published ",
+                                    itemSlug: version.package.catalog.slug + "/" + version.package.slug,
+                                    itemName: version.package.catalog.slug + "/" + version.package.slug,
+                                    postfix:
                                         " version " +
                                         version.majorVersion +
                                         "." +
@@ -202,8 +203,10 @@ async function getUserChanges(
                                         "." +
                                         version.patchVersion,
                                     userDisplayName: userDisplayName,
-                                    timeAgo: "test"
-                                };
+                                    userSlug: user.username
+                                });
+
+                                return actionTemplate;
                             })
                         );
                     }
@@ -268,23 +271,23 @@ async function getPackageChanges(
                             ["description", "displayName", "slug"].includes(p)
                         );
 
-                        action = "edited " + alertableProperties.join(", ");
-
-                        actionsTaken.push({
-                            action,
-                            userDisplayName: userDisplayName,
-                            timeAgo
-                        });
+                        actionsTaken.push(
+                            new NotificationActionTemplate({
+                                prefix: "edited " + alertableProperties.join(", "),
+                                userDisplayName: userDisplayName,
+                                userSlug: user.username
+                            })
+                        );
 
                         actionsTaken = actionsTaken.concat(
                             n.actions
                                 .filter((a) => a.change_type == ActivityLogChangeType.PUBLIC_ENABLED)
                                 .map((p) => {
-                                    return {
-                                        action: " enabled public access!",
+                                    return new NotificationActionTemplate({
+                                        prefix: " enabled public access!",
                                         userDisplayName: userDisplayName,
-                                        timeAgo
-                                    };
+                                        userSlug: user.username
+                                    });
                                 })
                         );
 
@@ -292,11 +295,11 @@ async function getPackageChanges(
                             n.actions
                                 .filter((a) => a.change_type == ActivityLogChangeType.PUBLIC_DISABLED)
                                 .map((p) => {
-                                    return {
-                                        action: " disabled public access",
+                                    return new NotificationActionTemplate({
+                                        prefix: " disabled public access",
                                         userDisplayName: userDisplayName,
-                                        timeAgo
-                                    };
+                                        userSlug: user.username
+                                    });
                                 })
                         );
                     } else if (n.event_type == ActivityLogEventType.VERSION_CREATED) {
@@ -306,8 +309,8 @@ async function getPackageChanges(
                                     .getRepository(VersionEntity)
                                     .findOneOrFail({ where: { id: a.package_version_id } });
 
-                                return {
-                                    action:
+                                return new NotificationActionTemplate({
+                                    prefix:
                                         "published version " +
                                         version.majorVersion +
                                         "." +
@@ -315,8 +318,8 @@ async function getPackageChanges(
                                         "." +
                                         version.patchVersion,
                                     userDisplayName: userDisplayName,
-                                    timeAgo: "test"
-                                };
+                                    userSlug: user.username
+                                });
                             })
                         );
                     } else if (n.event_type == ActivityLogEventType.VERSION_DELETED) {
@@ -326,8 +329,8 @@ async function getPackageChanges(
                                     .getRepository(VersionEntity)
                                     .findOneOrFail({ where: { id: a.package_version_id } });
 
-                                return {
-                                    action:
+                                return new NotificationActionTemplate({
+                                    prefix:
                                         "deleted version " +
                                         version.majorVersion +
                                         "." +
@@ -335,8 +338,8 @@ async function getPackageChanges(
                                         "." +
                                         version.patchVersion,
                                     userDisplayName: userDisplayName,
-                                    timeAgo: "test"
-                                };
+                                    userSlug: user.username
+                                });
                             })
                         );
                     }
@@ -393,23 +396,23 @@ async function getCatalogChanges(
                             ["description", "displayName", "slug", "website"].includes(p)
                         );
 
-                        action = "edited " + alertableProperties.join(", ");
-
-                        actionsTaken.push({
-                            action,
-                            userDisplayName: userDisplayName,
-                            timeAgo
-                        });
+                        actionsTaken.push(
+                            new NotificationActionTemplate({
+                                prefix: "edited " + alertableProperties.join(", "),
+                                userDisplayName: userDisplayName,
+                                userSlug: user.username
+                            })
+                        );
 
                         actionsTaken = actionsTaken.concat(
                             n.actions
                                 .filter((a) => a.change_type == ActivityLogChangeType.PUBLIC_ENABLED)
                                 .map((p) => {
-                                    return {
-                                        action: "enabled public access!",
+                                    return new NotificationActionTemplate({
+                                        prefix: "enabled public access!",
                                         userDisplayName: userDisplayName,
-                                        timeAgo
-                                    };
+                                        userSlug: user.username
+                                    });
                                 })
                         );
 
@@ -417,11 +420,11 @@ async function getCatalogChanges(
                             n.actions
                                 .filter((a) => a.change_type == ActivityLogChangeType.PUBLIC_DISABLED)
                                 .map((p) => {
-                                    return {
-                                        action: "disabled public access",
+                                    return new NotificationActionTemplate({
+                                        prefix: "disabled public access",
                                         userDisplayName: userDisplayName,
-                                        timeAgo
-                                    };
+                                        userSlug: user.username
+                                    });
                                 })
                         );
                     } else if (n.event_type == ActivityLogEventType.CATALOG_PACKAGE_ADDED) {
@@ -440,11 +443,13 @@ async function getCatalogChanges(
                                 }
 
                                 return [
-                                    {
-                                        action: `added package ${catalogEntity.slug}/${packageEntity.slug}`,
+                                    new NotificationActionTemplate({
+                                        prefix: `added package`,
+                                        itemName: `${catalogEntity.slug}/${packageEntity.slug}`,
+                                        itemSlug: `${catalogEntity.slug}/${packageEntity.slug}`,
                                         userDisplayName: userDisplayName,
-                                        timeAgo
-                                    }
+                                        userSlug: user.username
+                                    })
                                 ];
                             })
                         );
@@ -503,23 +508,23 @@ async function getCollectionChanges(
                             ["description", "name", "collectionSlug"].includes(p)
                         );
 
-                        action = "edited " + alertableProperties.join(", ");
-
-                        actionsTaken.push({
-                            action,
-                            userDisplayName: userDisplayName,
-                            timeAgo
-                        });
+                        actionsTaken.push(
+                            new NotificationActionTemplate({
+                                prefix: "edited " + alertableProperties.join(", "),
+                                userDisplayName: userDisplayName,
+                                userSlug: user.username
+                            })
+                        );
 
                         actionsTaken = actionsTaken.concat(
                             n.actions
                                 .filter((a) => a.change_type == ActivityLogChangeType.PUBLIC_ENABLED)
                                 .map((p) => {
-                                    return {
-                                        action: "enabled public access!",
+                                    return new NotificationActionTemplate({
+                                        prefix: "enabled public access!",
                                         userDisplayName: userDisplayName,
-                                        timeAgo
-                                    };
+                                        userSlug: user.username
+                                    });
                                 })
                         );
 
@@ -527,11 +532,11 @@ async function getCollectionChanges(
                             n.actions
                                 .filter((a) => a.change_type == ActivityLogChangeType.PUBLIC_DISABLED)
                                 .map((p) => {
-                                    return {
-                                        action: "disabled public access",
+                                    return new NotificationActionTemplate({
+                                        prefix: "disabled public access",
                                         userDisplayName: userDisplayName,
-                                        timeAgo
-                                    };
+                                        userSlug: user.username
+                                    });
                                 })
                         );
                     } else if (n.event_type == ActivityLogEventType.COLLECTION_PACKAGE_ADDED) {
@@ -550,11 +555,13 @@ async function getCollectionChanges(
                                 }
 
                                 return [
-                                    {
-                                        action: `added package ${packageEntity.catalog.slug}/${packageEntity.slug}`,
+                                    new NotificationActionTemplate({
+                                        prefix: `added package`,
+                                        itemName: `${packageEntity.catalog.slug}/${packageEntity.slug}`,
+                                        itemSlug: `${packageEntity.catalog.slug}/${packageEntity.slug}`,
                                         userDisplayName: userDisplayName,
-                                        timeAgo
-                                    }
+                                        userSlug: user.username
+                                    })
                                 ];
                             })
                         );

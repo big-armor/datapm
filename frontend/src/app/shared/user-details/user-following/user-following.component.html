@@ -8,14 +8,23 @@
                         Use the 'follow' button throughout this registry to be notified of changes
                     </p>
                 </div>
-                <div class="catalog-div mt-4" [hidden]="stats.catalogFollowsCount == 0">
-                    <div class="text-main-title font-16">Catalogs</div>
+
+                <div class="text-left" *ngIf="hasFollows">
+                    <p class="text-dark-gray">
+                        Below are the resources you've chosen to follow by clicking the "Follow" button throughout this
+                        site.
+                    </p>
+                </div>
+
+                <div class="user-div mt-4" [hidden]="stats.userFollowsCount == 0">
+                    <div class="text-main-title font-16">Users</div>
                     <app-user-type-following
-                        [itemsName]="'catalogs'"
+                        [itemsName]="'users'"
                         [stats]="stats"
-                        [type]="FollowType.CATALOG"
+                        [type]="FollowType.USER"
                     ></app-user-type-following>
                 </div>
+
                 <div class="collection-div mt-4" [hidden]="stats.collectionFollowsCount == 0">
                     <div class="text-main-title font-16">Collections</div>
                     <app-user-type-following
@@ -24,6 +33,7 @@
                         [type]="FollowType.COLLECTION"
                     ></app-user-type-following>
                 </div>
+
                 <div class="package-div mt-4" [hidden]="stats.packageFollowsCount == 0">
                     <div class="text-main-title font-16">Packages</div>
                     <app-user-type-following
@@ -32,6 +42,7 @@
                         [type]="FollowType.PACKAGE"
                     ></app-user-type-following>
                 </div>
+
                 <div class="user-div mt-4" [hidden]="stats.packageIssueFollowsCount == 0">
                     <div class="text-main-title font-16">Package Issues</div>
                     <app-user-type-following
@@ -41,12 +52,12 @@
                     ></app-user-type-following>
                 </div>
 
-                <div class="user-div mt-4" [hidden]="stats.userFollowsCount == 0">
-                    <div class="text-main-title font-16">Users</div>
+                <div class="catalog-div mt-4" [hidden]="stats.catalogFollowsCount == 0">
+                    <div class="text-main-title font-16">Catalogs</div>
                     <app-user-type-following
-                        [itemsName]="'users'"
+                        [itemsName]="'catalogs'"
                         [stats]="stats"
-                        [type]="FollowType.USER"
+                        [type]="FollowType.CATALOG"
                     ></app-user-type-following>
                 </div>
             </div>
