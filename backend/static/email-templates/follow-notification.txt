@@ -1,12 +1,12 @@
 {{#recipientFirstName}}{{recipientFirstName}},{{/recipientFirstName}}
 
-This is your {{frequency}} update about items you have followed. Use the link below to view these changes.
+This is your {{frequency}} "following" update. Use the link below to view these changes.
 
 {{registry_url}}/following
 
 
 {{#hasUserChanges}}
-These users you follow have made changes:
+These users have made changes:
 {{#users}}
     {{displayName}}
     {{#actions}}

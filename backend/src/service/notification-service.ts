@@ -64,10 +64,6 @@ async function prepareAndSendNotifications(stateKey: string, frequency: Notifica
         lastNotificationDate = new Date(result.serializedState);
     }
 
-    // !!!!!!!! REMOVE MOVE ME!!!!!!!!!!!!!!!!!
-    console.log("REMOVE THE LINE BELOW THIS! JUST FOR TESTING");
-    lastNotificationDate = new Date(0);
-
     const now = new Date();
 
     try {
