@@ -4,10 +4,12 @@ import { v4 as uuid } from "uuid";
 import { AuthenticationError } from "apollo-server-errors";
 import {
     dailyNotifications,
+    hourlyNotifications,
     instantNotifications,
     monthlyNotifications,
     weeklyNotifications
 } from "../service/notification-service";
+import { JobType } from "../generated/graphql";
 
 export const runJob = async (
     _0: any,
@@ -34,13 +36,15 @@ export const runJob = async (
         throw new AuthenticationError("SCHEDULER_KEY not correct");
     }
 
-    if (job === "instantNotifications") {
+    if (job === JobType.INSTANT_NOTIFICATIONS) {
         instantNotifications();
-    } else if (job === "dailyNotifications") {
+    } else if (job === JobType.HOURLY_NOTIFICATIONS) {
+        hourlyNotifications();
+    } else if (job === JobType.DAILY_NOTIFICATIONS) {
         dailyNotifications();
-    } else if (job === "weeklyNotifications") {
+    } else if (job === JobType.WEEKLY_NOTIFICATIONS) {
         weeklyNotifications();
-    } else if (job === "monthlyNotifications") {
+    } else if (job === JobType.MONTHLY_NOTIFICATIONS) {
         monthlyNotifications();
     } else {
         throw new Error("JOB_NOT_RECOGNIZED - " + job);

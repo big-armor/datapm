@@ -3,7 +3,9 @@ import { expect } from "chai";
 import { loadPackageFileFromDisk } from "../../../lib/dist/src/PackageUtil";
 import { AdminHolder } from "./admin-holder";
 import {
+    AddPackageToCollectionDocument,
     CreateCatalogDocument,
+    CreateCollectionDocument,
     CreatePackageDocument,
     CreateVersionDocument,
     JobType,
@@ -23,6 +25,7 @@ describe("Follow Tests", async () => {
 
     const userASecondCatalogSlug = "user-a-follow-notification-2";
     const userAPackageSlug = "follow-test";
+    const collectionSlug = "user-a-follow-test-collection";
 
     it("Create users A & B", async function () {
         userAClient = await createUser(
@@ -58,6 +61,22 @@ describe("Follow Tests", async () => {
         expect(catalogResponse.errors).to.be.equal(undefined);
     });
 
+    it("Should allow user A to create a new collection", async () => {
+        const collectionResponse = await userAClient.mutate({
+            mutation: CreateCollectionDocument,
+            variables: {
+                value: {
+                    collectionSlug: collectionSlug,
+                    name: "User A follow Test Collection",
+                    description: "test",
+                    isPublic: true
+                }
+            }
+        });
+
+        expect(collectionResponse.errors).to.be.equal(undefined);
+    });
+
     it("Should allow user B to follow user A", async () => {
         const followResponse = await userBClient.mutate({
             mutation: SaveFollowDocument,
@@ -86,6 +105,22 @@ describe("Follow Tests", async () => {
                 }
             }
         });
+        expect(followResponse.errors).to.be.equal(undefined);
+    });
+
+    it("Should allow user B to follow collection", async () => {
+        const followResponse = await userBClient.mutate({
+            mutation: SaveFollowDocument,
+            variables: {
+                follow: {
+                    collection: {
+                        collectionSlug: collectionSlug
+                    },
+                    notificationFrequency: NotificationFrequency.WEEKLY
+                }
+            }
+        });
+        expect(followResponse.errors).to.be.equal(undefined);
     });
 
     it("Should allow user A to create a package", async () => {
@@ -121,6 +156,23 @@ describe("Follow Tests", async () => {
         expect(createVersionResponse.errors).to.equal(undefined);
     });
 
+    it("Should allow user A to add package to collection", async () => {
+        const response = await userAClient.mutate({
+            mutation: AddPackageToCollectionDocument,
+            variables: {
+                packageIdentifier: {
+                    catalogSlug: userASecondCatalogSlug,
+                    packageSlug: userAPackageSlug
+                },
+                collectionIdentifier: {
+                    collectionSlug
+                }
+            }
+        });
+
+        expect(response.errors).to.equal(undefined);
+    });
+
     it("Should send email after instant notification updates", async () => {
         let userBEmail: any = null;
 
@@ -146,6 +198,7 @@ describe("Follow Tests", async () => {
         expect(response.errors).eq(undefined);
 
         await verifyEmailPromise.then(() => {
+            expect(userBEmail.text).to.contain("This is your instant");
             expect(userBEmail.text).to.contain("published  user-a-follow-notification-2/follow-test  version 1.0.0\n");
             expect(userBEmail.text).to.contain("http://localhost:4200/follow-notification-user-b#user-following");
         });
@@ -176,8 +229,44 @@ describe("Follow Tests", async () => {
         expect(response.errors).eq(undefined);
 
         await verifyEmailPromise.then(() => {
-            expect(userBEmail.text).to.contain("published  user-a-follow-notification-2/follow-test  version 1.0.0\n");
-            expect(userBEmail.text).to.contain("http://localhost:4200/follow-notification-user-b#user-following");
+            expect(userBEmail.text).to.contain("This is your daily");
+            expect(userBEmail.text).to.contain("Catalogs that have changed");
+            expect(userBEmail.text).to.contain(
+                "follow-notification-user-a added package user-a-follow-notification-2/follow-test"
+            );
+        });
+    });
+
+    it("Should send email after weekly notification updates", async () => {
+        let userBEmail: any = null;
+
+        let verifyEmailPromise = new Promise<void>((r) => {
+            let subscription = mailObservable.subscribe((email) => {
+                if (email.to[0].address === userBUsername + "@test.datapm.io") userBEmail = email;
+
+                if (userBEmail) {
+                    subscription.unsubscribe();
+                    r();
+                }
+            });
+        });
+
+        const response = await AdminHolder.adminClient.mutate({
+            mutation: RunJobDocument,
+            variables: {
+                key: "TEST_JOB_KEY",
+                job: JobType.WEEKLY_NOTIFICATIONS
+            }
+        });
+
+        expect(response.errors).eq(undefined);
+
+        await verifyEmailPromise.then(() => {
+            expect(userBEmail.text).to.contain("his is your weekly");
+            expect(userBEmail.text).to.contain("Collections that have changed:");
+            expect(userBEmail.text).to.contain(
+                "follow-notification-user-a added package user-a-follow-notification-2/follow-test"
+            );
         });
     });
 });
