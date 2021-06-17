@@ -20,6 +20,9 @@
                     <span class="not-public-text" *ngIf="!isCatalogPublic">Not Public</span>
                 </div>
             </div>
+            <div *ngIf="hasCatalogPublicErrors">
+                Error occurred when saving Catalog. Please refresh the page and try again.
+            </div>
         </div>
     </div>
 
@@ -42,6 +45,9 @@
                     <span class="public-text" *ngIf="isCatalogUnclaimed">Unclaimed</span>
                     <span class="not-public-text" *ngIf="!isCatalogUnclaimed">Claimed</span>
                 </div>
+            </div>
+            <div *ngIf="hasCatalogUnclaimedErrors">
+                Error occurred when saving Catalog. Please refresh the page and try again.
             </div>
         </div>
     </div>

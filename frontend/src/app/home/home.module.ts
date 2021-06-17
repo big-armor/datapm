@@ -25,6 +25,7 @@ import { MatStepperModule } from "@angular/material/stepper";
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { PlatformSettingsComponent } from "./admin-dashboard/platform-settings/platform-settings.component";
+import { AdminStatusConfirmationComponent } from "./admin-dashboard/users/admin-status-confirmation/admin-status-confirmation.component";
 
 @NgModule({
     declarations: [
@@ -35,7 +36,8 @@ import { PlatformSettingsComponent } from "./admin-dashboard/platform-settings/p
         AdminDashboardComponent,
         UsersComponent,
         RecentlyViewedComponent,
-        PlatformSettingsComponent
+        PlatformSettingsComponent,
+        AdminStatusConfirmationComponent
     ],
     imports: [
         CommonModule,

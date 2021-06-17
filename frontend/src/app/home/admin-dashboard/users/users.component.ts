@@ -14,6 +14,8 @@ import { ConfirmationDialogService } from "../../../services/dialog/confirmation
 import { UserStatusChangeDialogResponse } from "src/app/services/dialog/user-status-change-dialog-response";
 import { DialogSize } from "src/app/services/dialog/dialog-size";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
+import { MatDialog } from "@angular/material/dialog";
+import { AdminStatusConfirmationComponent } from "./admin-status-confirmation/admin-status-confirmation.component";
 
 @Component({
     selector: "app-users",
@@ -53,10 +55,9 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
         private searchUsersGQL: AdminSearchUsersGQL,
         private changeUserStatusGQL: AdminSetUserStatusGQL,
         private deleteUserGQL: AdminDeleteUserGQL,
-        private setAsAdminGQL: SetAsAdminGQL,
+        private dialog: MatDialog,
         private changeDetectorRef: ChangeDetectorRef,
-        private confirmationDialogService: ConfirmationDialogService,
-        private confirmModalService: ConfirmationDialogService
+        private confirmationDialogService: ConfirmationDialogService
     ) {}
 
     public ngAfterViewInit(): void {
@@ -84,29 +85,21 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
     }
 
     public updateAdmin(changeEvent: MatSlideToggleChange, user: User): void {
-        this.confirmModalService
-            .openFancyConfirmationDialog({
+        this.dialog
+            .open(AdminStatusConfirmationComponent, {
+                width: "500px",
+                disableClose: true,
                 data: {
-                    title: "Confirm admin",
-                    content: "Are you sure that you want to make this user as an admin?"
+                    isAdmin: changeEvent.checked,
+                    username: user.username
                 }
             })
+            .afterClosed()
             .subscribe((confirmed) => {
-                if (confirmed) {
-                    this.confirmSave(user.username, changeEvent.checked);
-                } else {
+                if (!confirmed) {
                     changeEvent.source.writeValue(!changeEvent.checked);
                 }
             });
-    }
-
-    public confirmSave(username: string, isAdmin: boolean): void {
-        this.setAsAdminGQL
-            .mutate({
-                username: username,
-                isAdmin: isAdmin
-            })
-            .subscribe();
     }
 
     public openDeleteUserConfirmationDialog(user: User): void {

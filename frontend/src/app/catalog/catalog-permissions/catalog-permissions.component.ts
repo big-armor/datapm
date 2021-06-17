@@ -35,6 +35,8 @@ export class CatalogPermissionsComponent implements OnInit, OnChanges, OnDestroy
     public users: any[] = [];
 
     public user: User;
+    public hasCatalogPublicErrors: boolean;
+    public hasCatalogUnclaimedErrors: boolean;
 
     @Output()
     public onCatalogUpdate = new EventEmitter<Catalog>();
@@ -230,6 +232,7 @@ export class CatalogPermissionsComponent implements OnInit, OnChanges, OnDestroy
     }
 
     private updateCatalogVisibility(isPublic: boolean): void {
+        this.hasCatalogPublicErrors = false;
         this.updateCatalogGQL
             .mutate({
                 identifier: {
@@ -239,10 +242,22 @@ export class CatalogPermissionsComponent implements OnInit, OnChanges, OnDestroy
                     isPublic
                 }
             })
-            .subscribe(({ data }) => this.setCatalogVariables(data.updateCatalog as Catalog));
+            .subscribe(
+                ({ data, errors }) => {
+                    if (errors) {
+                        this.hasCatalogPublicErrors = true;
+                    } else {
+                        this.setCatalogVariables(data.updateCatalog as Catalog);
+                    }
+                },
+                (errors) => {
+                    this.hasCatalogPublicErrors = true;
+                }
+            );
     }
 
     private updateCatalogUnclaimed(unclaimed: boolean): void {
+        this.hasCatalogUnclaimedErrors = false;
         this.updateCatalogGQL
             .mutate({
                 identifier: {
@@ -252,7 +267,18 @@ export class CatalogPermissionsComponent implements OnInit, OnChanges, OnDestroy
                     unclaimed
                 }
             })
-            .subscribe(({ data }) => this.setCatalogVariables(data.updateCatalog as Catalog));
+            .subscribe(
+                ({ data, errors }) => {
+                    if (errors) {
+                        this.hasCatalogUnclaimedErrors = true;
+                    } else {
+                        this.setCatalogVariables(data.updateCatalog as Catalog);
+                    }
+                },
+                (errors) => {
+                    this.hasCatalogUnclaimedErrors = true;
+                }
+            );
     }
 
     private setCatalogVariables(catalog: Catalog): void {
