@@ -71,7 +71,9 @@ before(async function () {
             SMTP_FROM_ADDRESS: "test@localhost",
             SMTP_FROM_NAME: "local-test",
             STORAGE_URL: TEMP_STORAGE_URL,
-            ACTIVITY_LOG: "false"
+            ACTIVITY_LOG: "false",
+            LEADER_ELECTION_DISABLED: "true",
+            SCHEDULER_KEY: "TEST_JOB_KEY"
         }
     });
 

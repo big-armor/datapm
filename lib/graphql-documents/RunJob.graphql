@@ -1,0 +1,3 @@
+mutation RunJob($key: String!, $job: String!) {
+    runJob(key: $key, job: $job)
+}

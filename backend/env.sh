@@ -7,7 +7,7 @@ export JWT_KEY="!!!!REPLACE_ME!!!"
 # SCHEDULER_KEY is only necessary for short lived instance environments (like aws lambda and google-cloud-run)
 # where an outside service must be used to invoke the instance to run scheduled services
 # This is an alternative to the leader election solution below
-export SCHEDULER_KEY="!!!!REPLACE_ME!!!!"
+export SCHEDULER_KEY=${SCHEDULER_KEY:="!!!!REPLACE_ME!!!!"}
 
 # LEADER_ELECTION_DISABLED (default false) allows you to disable starting and running the leader election service,
 # for leader election. Leader election is necessary for long lived instance environments 
