@@ -5,12 +5,13 @@
                 <div class="col-md-12 col-lg-12 following-div">
                     <div class="h1-title">All activity</div>
                 </div>
-                <div class="col-md-12 col-lg-12 pb-2 following-div" *ngFor="let log of logs">
+                <div class="col-md-12 col-lg-12 pb-3" *ngFor="let log of logs">
                     <div class="d-flex flex-row bd-highlight up-header mb-1">
                         <div class="px-2 bd-highlight">
-                            <app-avatar class="catalog-avatar" [user]="log.author" [size]="30"> </app-avatar>
-                            <span class="person-card-name" [routerLink]="'/' + log.author.username"
-                                >{{ log.authorFullName }}
+                            <span class="cursor-pointer">
+                                <app-avatar [user]="log.author" [routerLink]="'/' + log.author.username" [size]="30">
+                                </app-avatar>
+                                <span class="person-card-name">{{ log.authorFullName }} </span>
                             </span>
                             {{ log.changeTypeLabel }}
                             <span *ngIf="log.changedEntityInformation.affectedEntityInformation">
@@ -22,17 +23,17 @@
                                 ></span
                             >
                             {{ log.entitiesBinderLabel }}
-                        </div>
-                        <div class="bd-highlight d-flex align-items-center last-row">
-                            <div>
-                                {{ log.changedEntityInformation.type }}
-                                <span [routerLink]="log.changedEntityInformation.url" class="sentence-link">{{
-                                    log.changedEntityInformation.name
-                                }}</span>
-                                {{ log.timeAgoLabel }}.
-                            </div>
+                            {{ log.changedEntityInformation.type }}
+                            <span [routerLink]="log.changedEntityInformation.url" class="sentence-link">{{
+                                log.changedEntityInformation.name
+                            }}</span>
+                            {{ log.timeAgoLabel }}.
                         </div>
                     </div>
+                </div>
+
+                <div class="col-md-12 col-lg-12 pb-3" *ngIf="loadingLogs">
+                    <mat-spinner diameter="25"></mat-spinner>
                 </div>
 
                 <div *ngIf="hasMore" class="container text-center">
@@ -43,6 +44,9 @@
                     >
                         Load More
                     </button>
+                </div>
+                <div>
+                    <span *ngIf="errorLoadingLogs"> An error occurred when trying to load updates. </span>
                 </div>
             </div>
         </div>

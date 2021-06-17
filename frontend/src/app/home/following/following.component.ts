@@ -39,6 +39,7 @@ export class FollowingComponent implements OnInit {
     public logs: LogWithListingMetadata[] = [];
     public hasMore: boolean;
     public loadingLogs: boolean;
+    public errorLoadingLogs: boolean;
 
     private offset: number = 0;
 
@@ -57,23 +58,37 @@ export class FollowingComponent implements OnInit {
     }
 
     private loadLogs(): void {
+        this.loadingLogs = true;
         this.myFollowingActivityGQL
             .fetch({
                 offset: this.offset,
                 limit: this.MAX_ACTIVITIES_LOADED_PER_PAGE
             })
-            .subscribe((result) => {
-                const returnedData = result.data.myFollowingActivity;
-                this.addLogs(returnedData.logs as ActivityLog[]);
-                this.hasMore = returnedData.hasMore;
-                this.offset = this.logs.length;
-            });
+            .subscribe(
+                ({ data, errors }) => {
+                    if (errors) {
+                        this.loadingLogs = false;
+                        this.errorLoadingLogs = true;
+                        return;
+                    }
+                    const returnedData = data.myFollowingActivity;
+                    this.addLogs(returnedData.logs as ActivityLog[]);
+                    this.hasMore = returnedData.hasMore;
+                    this.offset = this.logs.length;
+                    this.loadingLogs = false;
+                },
+                (error) => {
+                    this.loadingLogs = false;
+                    this.errorLoadingLogs = true;
+                }
+            );
     }
 
     private addLogs(logs: ActivityLog[]): void {
-        const logsWithMetadata = logs.map((log) => this.mapLogToLogWithMetadata(log));
+        const logsWithMetadata = logs
+            .map((log) => this.mapLogToLogWithMetadata(log))
+            .filter((log) => !!log.changedEntityInformation);
         this.logs.push(...logsWithMetadata);
-        console.log("logjz", this.logs);
     }
 
     private mapLogToLogWithMetadata(log: ActivityLog): LogWithListingMetadata {

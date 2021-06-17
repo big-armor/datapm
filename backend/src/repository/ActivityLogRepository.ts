@@ -241,7 +241,14 @@ export class ActivityLogRepository extends Repository<ActivityLogEntity> {
                     ActivityLogEventType.PACKAGE_CREATED,
                     ActivityLogEventType.PACKAGE_DELETED,
                     ActivityLogEventType.COLLECTION_CREATED,
-                    ActivityLogEventType.COLLECTION_DELETED
+                    ActivityLogEventType.COLLECTION_DELETED,
+                    ActivityLogEventType.CATALOG_CREATED,
+                    ActivityLogEventType.CATALOG_DELETED,
+                    ActivityLogEventType.CATALOG_DELETED,
+                    ActivityLogEventType.PACKAGE_ISSUE_CREATED,
+                    ActivityLogEventType.PACKAGE_ISSUE_DELETED,
+                    ActivityLogEventType.PACKAGE_ISSUE_CLOSED,
+                    ActivityLogEventType.PACKAGE_ISSUE_COMMENT_CREATED
                 ])
             })
             .offset(offset)
