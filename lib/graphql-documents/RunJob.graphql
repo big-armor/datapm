@@ -1,3 +1,3 @@
-mutation RunJob($key: String!, $job: String!) {
+mutation RunJob($key: String!, $job: JobType!) {
     runJob(key: $key, job: $job)
 }

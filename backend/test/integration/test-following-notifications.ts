@@ -6,6 +6,7 @@ import {
     CreateCatalogDocument,
     CreatePackageDocument,
     CreateVersionDocument,
+    JobType,
     NotificationFrequency,
     RunJobDocument,
     SaveFollowDocument
@@ -73,6 +74,20 @@ describe("Follow Tests", async () => {
         expect(followResponse.errors).to.be.equal(undefined);
     });
 
+    it("Should allow user B to follow second catalog", async () => {
+        const followResponse = await userBClient.mutate({
+            mutation: SaveFollowDocument,
+            variables: {
+                follow: {
+                    catalog: {
+                        catalogSlug: userASecondCatalogSlug
+                    },
+                    notificationFrequency: NotificationFrequency.DAILY
+                }
+            }
+        });
+    });
+
     it("Should allow user A to create a package", async () => {
         const createPackageResponse = await userAClient.mutate({
             mutation: CreatePackageDocument,
@@ -124,14 +139,43 @@ describe("Follow Tests", async () => {
             mutation: RunJobDocument,
             variables: {
                 key: "TEST_JOB_KEY",
-                job: "instantNotifications"
+                job: JobType.INSTANT_NOTIFICATIONS
             }
         });
 
         expect(response.errors).eq(undefined);
 
         await verifyEmailPromise.then(() => {
-            expect(userBEmail.text).to.contain("created  user-a-follow-notification-2/follow-test\n");
+            expect(userBEmail.text).to.contain("published  user-a-follow-notification-2/follow-test  version 1.0.0\n");
+            expect(userBEmail.text).to.contain("http://localhost:4200/follow-notification-user-b#user-following");
+        });
+    });
+
+    it("Should send email after daily notification updates", async () => {
+        let userBEmail: any = null;
+
+        let verifyEmailPromise = new Promise<void>((r) => {
+            let subscription = mailObservable.subscribe((email) => {
+                if (email.to[0].address === userBUsername + "@test.datapm.io") userBEmail = email;
+
+                if (userBEmail) {
+                    subscription.unsubscribe();
+                    r();
+                }
+            });
+        });
+
+        const response = await AdminHolder.adminClient.mutate({
+            mutation: RunJobDocument,
+            variables: {
+                key: "TEST_JOB_KEY",
+                job: JobType.DAILY_NOTIFICATIONS
+            }
+        });
+
+        expect(response.errors).eq(undefined);
+
+        await verifyEmailPromise.then(() => {
             expect(userBEmail.text).to.contain("published  user-a-follow-notification-2/follow-test  version 1.0.0\n");
             expect(userBEmail.text).to.contain("http://localhost:4200/follow-notification-user-b#user-following");
         });

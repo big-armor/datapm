@@ -22,18 +22,23 @@ import { CollectionRepository } from "../repository/CollectionRepository";
 let databaseConnection: Connection | null;
 
 const instantJob = new CronJob("1/1 * * * *", instantNotifications, null, false, "America/New_York");
+const hourlyJob = new CronJob("0 1/1 * * *", hourlyNotifications, null, false, "America/New_York");
 const dailyJob = new CronJob("0 0 8 * * *", dailyNotifications, null, false, "America/New_York");
 const weeklyJob = new CronJob("0 0 8 * * MON", weeklyNotifications, null, false, "America/New_York");
 const monthlyJob = new CronJob("0 0 12 1 * *", monthlyNotifications, null, false, "America/New_York");
 
 export function startNotificationService(connection: Connection) {
     databaseConnection = connection;
+    instantJob.start();
+    hourlyJob.start();
     dailyJob.start();
     weeklyJob.start();
     monthlyJob.start();
 }
 
 export async function stopNotificationService() {
+    instantJob.stop();
+    hourlyJob.stop();
     dailyJob.stop();
     weeklyJob.stop();
     monthlyJob.stop();
@@ -41,6 +46,10 @@ export async function stopNotificationService() {
 
 export async function instantNotifications() {
     await prepareAndSendNotifications("lastInstantNotificationDate", NotificationFrequency.INSTANT);
+}
+
+export async function hourlyNotifications() {
+    await prepareAndSendNotifications("lastInstantNotificationDate", NotificationFrequency.HOURLY);
 }
 
 export async function dailyNotifications() {
@@ -153,33 +162,7 @@ async function getUserChanges(
 
                     const timeAgo = "unknown time ago";
 
-                    if (n.event_type == ActivityLogEventType.PACKAGE_CREATED) {
-                        actionsTaken = actionsTaken.concat(
-                            await n.actions.asyncFlatMap(async (a) => {
-                                const packageEntity = await connection
-                                    .getRepository(PackageEntity)
-                                    .findOneOrFail({ where: { id: a.package_id }, relations: ["catalog"] });
-
-                                const hasPermission = await connection
-                                    .getCustomRepository(PackagePermissionRepository)
-                                    .hasPermission(user.id, packageEntity, Permission.VIEW);
-
-                                if (!hasPermission) {
-                                    return [];
-                                }
-
-                                const actionTemplate = new NotificationActionTemplate({
-                                    prefix: "created ",
-                                    itemSlug: packageEntity.catalog.slug + "/" + packageEntity.slug,
-                                    itemName: packageEntity.catalog.slug + "/" + packageEntity.slug,
-                                    userDisplayName: userDisplayName,
-                                    userSlug: user.username
-                                });
-
-                                return [actionTemplate];
-                            })
-                        );
-                    } else if (n.event_type == ActivityLogEventType.VERSION_CREATED) {
+                    if (n.event_type == ActivityLogEventType.VERSION_CREATED) {
                         actionsTaken = actionsTaken.concat(
                             await n.actions.asyncMap(async (a) => {
                                 const version = await connection.getRepository(VersionEntity).findOneOrFail({
@@ -205,7 +188,8 @@ async function getUserChanges(
                                 return actionTemplate;
                             })
                         );
-                    }
+                    } // TODO support CREATE_COLLECTION action. Requires some consideration for when the collection is made public
+                    // must filter out collections that the notification reciever doesn't have access to.
 
                     return actionsTaken;
                 })

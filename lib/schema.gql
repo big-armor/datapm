@@ -234,6 +234,7 @@ Notification frequency
 """
 enum NotificationFrequency {
     INSTANT
+    HOURLY
     DAILY
     WEEKLY
     MONTHLY
@@ -255,6 +256,14 @@ enum NotificationEventType {
     CATALOG_PACKAGE_REMOVED
     PACKAGE_ISSUE_COMMENT_ADDED
     PACKAGE_ISSUE_STAUS_CHANGE
+}
+
+enum JobType {
+    INSTANT_NOTIFICATIONS
+    HOURLY_NOTIFICATIONS
+    DAILY_NOTIFICATIONS
+    WEEKLY_NOTIFICATIONS
+    MONTHLY_NOTIFICATIONS
 }
 
 """
@@ -1599,5 +1608,5 @@ type Mutation {
     """
     Run a named job. Key is a shared key. Job is the name of the job to run
     """
-    runJob(key: String!, job: String!): Void
+    runJob(key: String!, job: JobType!): Void
 }

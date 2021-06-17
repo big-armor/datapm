@@ -379,7 +379,25 @@ resource "google_cloud_scheduler_job" "job" {
   http_target {
     http_method = "POST"
     uri         = "https://test.datapm.io/graphql"
-    body        = "{ \"query\":\"mutation { runJob(key: \\"${random_password.scheduler_key.result}\\", job: \\"instantNotifications\\") }\" }"
+    body        = "{ \"query\":\"mutation { runJob(key: \"${random_password.scheduler_key.result}\", job: \"INSTANT_NOTIFICATIONS\") }\" }"
+  }
+}
+
+resource "google_cloud_scheduler_job" "job" {
+  name             = "datapm-hourly-notifications"
+  description      = "To invoke sending hourly notifications"
+  schedule         = "0 1/1 * * *"
+  time_zone        = "America/New_York"
+  attempt_deadline = "320s"
+
+  retry_config {
+    retry_count = 1
+  }
+
+  http_target {
+    http_method = "POST"
+    uri         = "https://test.datapm.io/graphql"
+    body        = "{ \"query\":\"mutation { runJob(key: \"${random_password.scheduler_key.result}\", job: \"HOURLY_NOTIFICATIONS\") }\" }"
   }
 }
 
@@ -397,7 +415,7 @@ resource "google_cloud_scheduler_job" "job" {
   http_target {
     http_method = "POST"
     uri         = "https://test.datapm.io/graphql"
-    body        = "{ \"query\":\"mutation { runJob(key: \\"${random_password.scheduler_key.result}\\", job: \\"dailyNotifications\\") }\" }"
+    body        = "{ \"query\":\"mutation { runJob(key: \"${random_password.scheduler_key.result}\", job: \"DAILY_NOTIFICATIONS\") }\" }"
   }
 }
 
@@ -415,7 +433,7 @@ resource "google_cloud_scheduler_job" "job" {
   http_target {
     http_method = "POST"
     uri         = "https://test.datapm.io/graphql"
-    body        = "{ \"query\":\"mutation { runJob(key: \\"${random_password.scheduler_key.result}\\", job: \\"weeklyNotifications\\") }\" }"
+    body        = "{ \"query\":\"mutation { runJob(key: \"${random_password.scheduler_key.result}\", job: \"WEEKLY_NOTIFICATIONS\") }\" }"
   }
 }
 
@@ -434,6 +452,6 @@ resource "google_cloud_scheduler_job" "job" {
   http_target {
     http_method = "POST"
     uri         = "https://test.datapm.io/graphql"
-    body        = "{ \"query\":\"mutation { runJob(key: \\"${random_password.scheduler_key.result}\\", job: \\"monthlyNotifications\\") }\" }"
+    body        = "{ \"query\":\"mutation { runJob(key: \"${random_password.scheduler_key.result}\", job: \"MONTHLY_NOTIFICATIONS\") }\" }"
   }
 }
