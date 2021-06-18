@@ -365,7 +365,7 @@ resource "google_cloud_run_domain_mapping" "default" {
 }
 
 
-resource "google_cloud_scheduler_job" "job" {
+resource "google_cloud_scheduler_job" "instant_notifications_job" {
   name             = "datapm-instant-notifications"
   description      = "To invoke sending daily notifications"
   schedule         = "1/1 * * * *"
@@ -383,7 +383,7 @@ resource "google_cloud_scheduler_job" "job" {
   }
 }
 
-resource "google_cloud_scheduler_job" "job" {
+resource "google_cloud_scheduler_job" "hourly_notifications_job" {
   name             = "datapm-hourly-notifications"
   description      = "To invoke sending hourly notifications"
   schedule         = "0 1/1 * * *"
@@ -401,7 +401,7 @@ resource "google_cloud_scheduler_job" "job" {
   }
 }
 
-resource "google_cloud_scheduler_job" "job" {
+resource "google_cloud_scheduler_job" "daily_notifications_job" {
   name             = "datapm-daily-notifications"
   description      = "To invoke sending daily notifications"
   schedule         = "0 8 * * *"
@@ -419,7 +419,7 @@ resource "google_cloud_scheduler_job" "job" {
   }
 }
 
-resource "google_cloud_scheduler_job" "job" {
+resource "google_cloud_scheduler_job" "weekly_notifications_job" {
   name             = "datapm-weekly-notifications"
   description      = "To invoke sending weekly notifications"
   schedule         = "0 8 * * MON"
@@ -438,7 +438,7 @@ resource "google_cloud_scheduler_job" "job" {
 }
 
 
-resource "google_cloud_scheduler_job" "job" {
+resource "google_cloud_scheduler_job" "monthly_notifications_job" {
   name             = "datapm-monthly-notifications"
   description      = "To invoke sending monthly notifications"
   schedule         = "0 8 * * MON"
