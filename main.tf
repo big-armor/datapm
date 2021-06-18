@@ -379,7 +379,7 @@ resource "google_cloud_scheduler_job" "instant_notifications_job" {
   http_target {
     http_method = "POST"
     uri         = "https://test.datapm.io/graphql"
-    body        = "{ \"query\":\"mutation { runJob(key: \"${random_password.scheduler_key.result}\", job: \"INSTANT_NOTIFICATIONS\") }\" }"
+    body        = base64encode("{ \"query\":\"mutation { runJob(key: \"${random_password.scheduler_key.result}\", job: \"INSTANT_NOTIFICATIONS\") }\" }")
   }
 }
 
@@ -397,7 +397,7 @@ resource "google_cloud_scheduler_job" "hourly_notifications_job" {
   http_target {
     http_method = "POST"
     uri         = "https://test.datapm.io/graphql"
-    body        = "{ \"query\":\"mutation { runJob(key: \"${random_password.scheduler_key.result}\", job: \"HOURLY_NOTIFICATIONS\") }\" }"
+    body        = base64encode("{ \"query\":\"mutation { runJob(key: \"${random_password.scheduler_key.result}\", job: \"HOURLY_NOTIFICATIONS\") }\" }")
   }
 }
 
@@ -415,7 +415,7 @@ resource "google_cloud_scheduler_job" "daily_notifications_job" {
   http_target {
     http_method = "POST"
     uri         = "https://test.datapm.io/graphql"
-    body        = "{ \"query\":\"mutation { runJob(key: \"${random_password.scheduler_key.result}\", job: \"DAILY_NOTIFICATIONS\") }\" }"
+    body        = base64encode("{ \"query\":\"mutation { runJob(key: \"${random_password.scheduler_key.result}\", job: \"DAILY_NOTIFICATIONS\") }\" }")
   }
 }
 
@@ -433,7 +433,7 @@ resource "google_cloud_scheduler_job" "weekly_notifications_job" {
   http_target {
     http_method = "POST"
     uri         = "https://test.datapm.io/graphql"
-    body        = "{ \"query\":\"mutation { runJob(key: \"${random_password.scheduler_key.result}\", job: \"WEEKLY_NOTIFICATIONS\") }\" }"
+    body        = base64encode("{ \"query\":\"mutation { runJob(key: \"${random_password.scheduler_key.result}\", job: \"WEEKLY_NOTIFICATIONS\") }\" }")
   }
 }
 
@@ -452,6 +452,6 @@ resource "google_cloud_scheduler_job" "monthly_notifications_job" {
   http_target {
     http_method = "POST"
     uri         = "https://test.datapm.io/graphql"
-    body        = "{ \"query\":\"mutation { runJob(key: \"${random_password.scheduler_key.result}\", job: \"MONTHLY_NOTIFICATIONS\") }\" }"
+    body        = base64encode("{ \"query\":\"mutation { runJob(key: \"${random_password.scheduler_key.result}\", job: \"MONTHLY_NOTIFICATIONS\") }\" }")
   }
 }
