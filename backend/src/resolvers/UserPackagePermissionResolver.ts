@@ -1,10 +1,10 @@
 import { ValidationError } from "apollo-server";
 import { emailAddressValid } from "datapm-lib";
+import { Connection } from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
 import { PackageEntity } from "../entity/PackageEntity";
 import { UserEntity } from "../entity/UserEntity";
 import { PackageIdentifierInput, Permission, SetPackagePermissionInput, UserStatus } from "../generated/graphql";
-import { PackageIssueRepository } from "../repository/PackageIssueRepository";
 import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { PackageRepository } from "../repository/PackageRepository";
 import { UserRepository } from "../repository/UserRepository";
@@ -14,6 +14,10 @@ import { deletePackageFollowByUserId, deletePackageIssuesFollowsByUserId } from 
 import { getPackageFromCacheOrDbOrFail, getPackageFromCacheOrDbByIdOrFail } from "./PackageResolver";
 
 export const hasPackagePermissions = async (context: Context, packageId: number, permission: Permission) => {
+    const packagePromiseFunction = () =>
+        context.connection.getRepository(PackageEntity).findOneOrFail({ id: packageId });
+    const packageEntity = await context.cache.loadPackage(packageId, packagePromiseFunction);
+
     if (permission == Permission.VIEW) {
         const packageEntity = await getPackageFromCacheOrDbByIdOrFail(context, context.connection, packageId);
         if (packageEntity?.isPublic) {
@@ -29,7 +33,7 @@ export const hasPackagePermissions = async (context: Context, packageId: number,
     const permissionPromiseFunction = () =>
         context.connection
             .getCustomRepository(PackagePermissionRepository)
-            .hasPermission(userId, packageId, permission);
+            .hasPermission(userId, packageEntity, permission);
 
     return await context.cache.loadPackagePermissionsStatusById(packageId, permission, permissionPromiseFunction);
 };
@@ -53,7 +57,7 @@ export const hasPackageEntityPermissions = async (
     const permissionPromiseFunction = () =>
         context.connection
             .getCustomRepository(PackagePermissionRepository)
-            .hasPermission(userId, packageEntity.id, permission);
+            .hasPermission(userId, packageEntity, permission);
 
     return await context.cache.loadPackagePermissionsStatusById(
         packageEntity.id,

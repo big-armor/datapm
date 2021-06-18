@@ -1,12 +1,21 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, ViewChild } from "@angular/core";
 import { MatPaginator } from "@angular/material/paginator";
-import { AdminSetUserStatusGQL, AdminDeleteUserGQL, AdminSearchUsersGQL, User } from "../../../../generated/graphql";
+import {
+    AdminSetUserStatusGQL,
+    AdminDeleteUserGQL,
+    AdminSearchUsersGQL,
+    User,
+    SetAsAdminGQL
+} from "../../../../generated/graphql";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import Timeout = NodeJS.Timeout;
 import { ConfirmationDialogService } from "../../../services/dialog/confirmation-dialog.service";
 import { UserStatusChangeDialogResponse } from "src/app/services/dialog/user-status-change-dialog-response";
 import { DialogSize } from "src/app/services/dialog/dialog-size";
+import { MatSlideToggleChange } from "@angular/material/slide-toggle";
+import { MatDialog } from "@angular/material/dialog";
+import { AdminStatusConfirmationComponent } from "./admin-status-confirmation/admin-status-confirmation.component";
 
 @Component({
     selector: "app-users",
@@ -26,6 +35,8 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
 
     private readonly destroyed = new Subject();
 
+    disabled = false;
+
     @ViewChild(MatPaginator)
     public paginator: MatPaginator;
 
@@ -44,6 +55,7 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
         private searchUsersGQL: AdminSearchUsersGQL,
         private changeUserStatusGQL: AdminSetUserStatusGQL,
         private deleteUserGQL: AdminDeleteUserGQL,
+        private dialog: MatDialog,
         private changeDetectorRef: ChangeDetectorRef,
         private confirmationDialogService: ConfirmationDialogService
     ) {}
@@ -70,6 +82,24 @@ export class UsersComponent implements AfterViewInit, OnDestroy {
     public clearUserSearch(): void {
         this.searchValue = "";
         this.searchUsers();
+    }
+
+    public updateAdmin(changeEvent: MatSlideToggleChange, user: User): void {
+        this.dialog
+            .open(AdminStatusConfirmationComponent, {
+                width: "500px",
+                disableClose: true,
+                data: {
+                    isAdmin: changeEvent.checked,
+                    username: user.username
+                }
+            })
+            .afterClosed()
+            .subscribe((confirmed) => {
+                if (!confirmed) {
+                    changeEvent.source.writeValue(!changeEvent.checked);
+                }
+            });
     }
 
     public openDeleteUserConfirmationDialog(user: User): void {

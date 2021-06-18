@@ -139,6 +139,8 @@ enum ActivityLogEventType {
     CATALOG_PUBLIC_CHANGED
     CATALOG_UNCLAIMED_CHANGED
     CATALOG_EDIT
+    CATALOG_PACKAGE_ADDED
+    CATALOG_PACKAGE_REMOVED
 
     USER_CREATED
     USER_DELETED
@@ -232,6 +234,7 @@ Notification frequency
 """
 enum NotificationFrequency {
     INSTANT
+    HOURLY
     DAILY
     WEEKLY
     MONTHLY
@@ -242,6 +245,8 @@ enum NotificationFrequency {
 Notification Event type
 """
 enum NotificationEventType {
+    PACKAGE_CREATED
+    VERSION_CREATED
     PACKAGE_PATCH_CHANGE
     PACKAGE_MINOR_CHANGE
     PACKAGE_MAJOR_CHANGE
@@ -251,6 +256,14 @@ enum NotificationEventType {
     CATALOG_PACKAGE_REMOVED
     PACKAGE_ISSUE_COMMENT_ADDED
     PACKAGE_ISSUE_STAUS_CHANGE
+}
+
+enum JobType {
+    INSTANT_NOTIFICATIONS
+    HOURLY_NOTIFICATIONS
+    DAILY_NOTIFICATIONS
+    WEEKLY_NOTIFICATIONS
+    MONTHLY_NOTIFICATIONS
 }
 
 """
@@ -950,22 +963,22 @@ type Query {
     Returns all of the users for a given catalog
     """
     usersByPackage(
-        identifier: PackageIdentifierInput! @hasPackagePermission(permission: MANAGE)
-    ): [UserPackagePermissions]!
+        identifier: PackageIdentifierInput! @hasPackagePermission(permission: EDIT)
+    ): [UserPackagePermissions!]!
 
     """
     Returns all of the users for a given catalog
     """
     usersByCatalog(
-        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: MANAGE)
-    ): [UserCatalogPermissions]!
+        identifier: CatalogIdentifierInput! @hasCatalogPermission(permission: EDIT)
+    ): [UserCatalogPermissions!]!
 
     """
     Returns all of the users for a given collection
     """
     usersByCollection(
-        identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: MANAGE)
-    ): [UserCollectionPermissions]!
+        identifier: CollectionIdentifierInput! @hasCollectionPermission(permission: EDIT)
+    ): [UserCollectionPermissions!]!
 
     """
     Return a user by a given username, and returns only the properties on that user the requester should be able to view
@@ -1591,4 +1604,9 @@ type Mutation {
     Create or update platform settings
     """
     savePlatformSettings(settings: PlatformSettingsInput!): PlatformSettings! @isAdmin
+
+    """
+    Run a named job. Key is a shared key. Job is the name of the job to run
+    """
+    runJob(key: String!, job: JobType!): Void
 }

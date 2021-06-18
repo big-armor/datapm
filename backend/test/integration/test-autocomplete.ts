@@ -316,6 +316,8 @@ describe("Autocomplete tests", async () => {
             }
         });
 
+        expect(catalogToNotPublic.errors).to.equal(undefined);
+
         let packages = await userBClient.query({
             query: AutoCompleteDocument,
             variables: {

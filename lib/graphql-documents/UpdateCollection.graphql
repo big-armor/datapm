@@ -5,6 +5,7 @@ mutation UpdateCollection($identifier: CollectionIdentifierInput!, $value: Updat
         }
         name
         description
+        myPermissions
         packages {
             identifier {
                 catalogSlug

@@ -1,5 +1,7 @@
 import { DeleteResult, EntityRepository, Repository, SelectQueryBuilder } from "typeorm";
 import { FollowEntity } from "../entity/FollowEntity";
+import { ActivityLogChangeType, ActivityLogEventType, NotificationFrequency } from "../generated/graphql";
+import { Notification } from "../util/notificationUtil";
 
 @EntityRepository(FollowEntity)
 export class FollowRepository extends Repository<FollowEntity> {
@@ -249,5 +251,214 @@ export class FollowRepository extends Repository<FollowEntity> {
             .andWhere('"target_user_id" = :targetUserId')
             .setParameter("userId", userId)
             .setParameter("targetUserId", targetUserId);
+    }
+
+    public async getCatalogFollowsForNotifications(
+        startDate: Date,
+        endDate: Date,
+        frequency: NotificationFrequency
+    ): Promise<Notification[]> {
+        const sql = `select f.user_id, f.target_catalog_id, json_agg(al) as pending_notifications, COUNT(al) as count from follow f 
+        join lateral(
+           select a.event_type, 
+           	   json_agg(json_build_object('created_at', a.created_at, 'user_id', a.user_id , 'package_id', a.target_package_id, 'properties_edited', a.properties_edited, 'change_type', a.change_type ) order by a.created_at ) as actions,
+               array_accum(distinct a.properties_edited) as properties_edited 
+           from activity_log a 
+           where
+           a.created_at  > $2
+           AND a.created_at <= $3 
+           and a.target_catalog_id  = f.target_catalog_id 
+           and a.event_type in (select * from unnest( f.event_types)) 
+           and a.user_id <> f.user_id 
+           group by a.event_type
+       ) al on true
+       and f.notification_frequency = $1
+       group by f.user_id, f.target_catalog_id 
+       order by f.user_id`;
+
+        const query = (await this.query(sql, [frequency, startDate, endDate])) as {
+            user_id: number;
+            target_catalog_id: number;
+            pending_notifications: {
+                actions: {
+                    user_id: number;
+                    created_at: string[];
+                    package_id: number | null;
+                    properties_edited: string[] | null;
+                    change_type: ActivityLogChangeType;
+                }[];
+                event_type: ActivityLogEventType;
+                properties_edited: string[];
+            }[];
+        }[];
+
+        return query.map((v) => {
+            return {
+                userId: v.user_id,
+                catalogNotifications: [
+                    {
+                        catalogId: v.target_catalog_id,
+                        pending_notifications: v.pending_notifications
+                    }
+                ]
+            };
+        });
+    }
+
+    public async getPackageFollowsForNotifications(
+        startDate: Date,
+        endDate: Date,
+        frequency: NotificationFrequency
+    ): Promise<Notification[]> {
+        const sql = `select f.user_id, f.target_package_id, json_agg(al) as pending_notifications, COUNT(al) as count from follow f 
+        join lateral(
+           select a.event_type, 
+           	   json_agg(json_build_object('created_at', a.created_at, 'user_id', a.user_id , 'package_version_id', a.target_package_version_id, 'properties_edited', a.properties_edited, 'change_type', a.change_type ) order by a.created_at ) as actions,
+               array_accum(distinct a.properties_edited) as properties_edited 
+           from activity_log a 
+           where
+           a.created_at  > $2
+           AND a.created_at <= $3 
+           and a.target_package_id  = f.target_package_id 
+           and a.event_type in (select * from unnest( f.event_types)) 
+           and a.user_id <> f.user_id 
+           group by a.event_type
+       ) al on true
+       and f.notification_frequency = $1
+       group by f.user_id, f.target_package_id 
+       order by f.user_id`;
+
+        const query = (await this.query(sql, [frequency, startDate, endDate])) as {
+            user_id: number;
+            target_package_id: number;
+            pending_notifications: {
+                actions: {
+                    user_id: number;
+                    created_at: string[];
+                    package_version_id: number | null;
+                    properties_edited: string[] | null;
+                    change_type: ActivityLogChangeType;
+                }[];
+                event_type: ActivityLogEventType;
+                properties_edited: string[];
+            }[];
+        }[];
+
+        return query.map((v) => {
+            return {
+                userId: v.user_id,
+                packageNotifications: [
+                    {
+                        packageId: v.target_package_id,
+                        pending_notifications: v.pending_notifications
+                    }
+                ]
+            };
+        });
+    }
+
+    public async getCollectionFollowsForNotifications(
+        startDate: Date,
+        endDate: Date,
+        frequency: NotificationFrequency
+    ): Promise<Notification[]> {
+        const sql = `select f.user_id, f.target_collection_id, json_agg(al) as pending_notifications, COUNT(al) as count from follow f 
+    join lateral(
+       select a.event_type, 
+              json_agg(json_build_object('created_at', a.created_at, 'user_id', a.user_id , 'package_id', a.target_package_id, 'properties_edited', a.properties_edited, 'change_type', a.change_type ) order by a.created_at ) as actions,
+           array_accum(distinct a.properties_edited) as properties_edited 
+       from activity_log a 
+       where
+       a.created_at  > $2
+       AND a.created_at <= $3 
+       and a.target_collection_id  = f.target_collection_id 
+       and a.event_type in (select * from unnest( f.event_types)) 
+       and a.user_id <> f.user_id 
+       group by a.event_type
+   ) al on true
+   and f.notification_frequency = $1
+   group by f.user_id, f.target_collection_id 
+   order by f.user_id`;
+
+        const query = (await this.query(sql, [frequency, startDate, endDate])) as {
+            user_id: number;
+            target_collection_id: number;
+            pending_notifications: {
+                actions: {
+                    user_id: number;
+                    created_at: string[];
+                    package_id: number | null;
+                    properties_edited: string[] | null;
+                    change_type: ActivityLogChangeType;
+                }[];
+                event_type: ActivityLogEventType;
+                properties_edited: string[];
+            }[];
+        }[];
+
+        return query.map((v) => {
+            return {
+                userId: v.user_id,
+                collectionNotifications: [
+                    {
+                        collectionId: v.target_collection_id,
+                        pending_notifications: v.pending_notifications
+                    }
+                ]
+            };
+        });
+    }
+
+    public async getUserFollowsForNotifications(
+        startDate: Date,
+        endDate: Date,
+        frequency: NotificationFrequency
+    ): Promise<Notification[]> {
+        const sql = `select f.user_id, f.target_user_id, json_agg(al) as pending_notifications, COUNT(al) as count from follow f 
+    join lateral(
+       select a.event_type, 
+              json_agg(json_build_object('created_at', a.created_at, 'user_id', a.user_id , 'package_id', a.target_package_id, 'package_version_id', a.target_package_version_id, 'properties_edited', a.properties_edited, 'change_type', a.change_type ) order by a.created_at ) as actions,
+           array_accum(distinct a.properties_edited) as properties_edited 
+       from activity_log a 
+       where
+       a.created_at  > $2
+       AND a.created_at <= $3 
+       and a.user_id  = f.target_user_id 
+       and a.event_type in (select * from unnest( f.event_types)) 
+       and a.user_id <> f.user_id 
+       group by a.event_type
+   ) al on true
+   and f.notification_frequency = $1
+   group by f.user_id, f.target_user_id 
+   order by f.user_id`;
+
+        const query = (await this.query(sql, [frequency, startDate, endDate])) as {
+            user_id: number;
+            target_user_id: number;
+            pending_notifications: {
+                actions: {
+                    user_id: number;
+                    created_at: string[];
+                    package_id: number | null;
+                    package_version_id: number | null;
+                    properties_edited: string[] | null;
+                    change_type: ActivityLogChangeType;
+                }[];
+                event_type: ActivityLogEventType;
+                properties_edited: string[];
+            }[];
+        }[];
+
+        return query.map((v) => {
+            return {
+                userId: v.user_id,
+                userNotifications: [
+                    {
+                        userId: v.target_user_id,
+                        pending_notifications: v.pending_notifications
+                    }
+                ]
+            };
+        });
     }
 }

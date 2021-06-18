@@ -19,7 +19,7 @@
             </div>
             <div *ngIf="!isCurrentUser && currentUser" class="p-2 ml-auto d-flex align-items-center">
                 <button class="app-raised-button follow-btn" (click)="follow()">
-                    <span *ngIf="isFollowing"><em class="fas fa-bell-slash"></em>Unfollow </span>
+                    <span *ngIf="isFollowing"><em class="fas fa-bell-slash"></em>Following</span>
                     <span *ngIf="!isFollowing"><em class="fas fa-bell"></em>Follow</span>
                 </button>
             </div>

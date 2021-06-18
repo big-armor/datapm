@@ -1,0 +1,55 @@
+{{#recipientFirstName}}{{recipientFirstName}},{{/recipientFirstName}}
+
+This is your {{frequency}} "following" update. Use the link below to view these changes.
+
+{{registry_url}}/following
+
+
+{{#hasUserChanges}}
+These users have made changes:
+{{#users}}
+    {{displayName}}
+    {{#actions}}
+        {{#hasPrefix}}{{prefix}}{{/hasPrefix}}{{#hasItemName}} {{&itemName}}{{/hasItemName}}{{#hasPostfix}} {{postfix}}{{/hasPostfix}}
+    {{/actions}}
+
+{{/users}}
+{{/hasUserChanges}}
+{{#hasPackageChanges}}
+
+Packages that have changed:
+{{#packages}}
+    {{displayName}} ({{&slug}})
+    {{#actions}}
+        {{userDisplayName}} {{#hasPrefix}}{{prefix}}{{/hasPrefix}}{{#hasItemName}} {{&itemName}}{{/hasItemName}}{{#hasPostfix}} {{postfix}}{{/hasPostfix}}
+    {{/actions}}
+
+{{/packages}}
+{{/hasPackageChanges}}
+{{#hasCollectionChanges}}
+
+Collections that have changed:
+{{#collections}}
+    {{displayName}} ({{&slug}})
+    {{#actions}}
+        {{userDisplayName}} {{#hasPrefix}}{{prefix}}{{/hasPrefix}}{{#hasItemName}} {{&itemName}}{{/hasItemName}}{{#hasPostfix}} {{postfix}}{{/hasPostfix}}
+    {{/actions}}
+
+{{/collections}}
+{{/hasCollectionChanges}}
+{{#hasCatalogChanges}}
+
+Catalogs that have changed:
+{{#catalogs}}
+    {{displayName}} ({{&slug}})
+    {{#actions}}
+        {{userDisplayName}} {{#hasPrefix}}{{prefix}}{{/hasPrefix}}{{#hasItemName}} {{&itemName}}{{/hasItemName}}{{#hasPostfix}} {{postfix}}{{/hasPostfix}}
+    {{/actions}}
+
+{{/catalogs}}
+{{/hasCatalogChanges}}
+
+
+You can manage your following notifications at the link below. 
+
+{{registry_url}}/{{username}}#user-following

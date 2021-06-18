@@ -2,6 +2,7 @@ import { UserEntity } from "../entity/UserEntity";
 import { createTransport } from "nodemailer";
 import * as fs from "fs";
 import { Address } from "nodemailer/lib/mailer";
+import Mustache from "mustache";
 
 export enum EMAIL_SUBJECTS {
     NEW_API_KEY = "⚠ New API Key Created",
@@ -9,6 +10,92 @@ export enum EMAIL_SUBJECTS {
     FORGOT_PASSWORD = "⚠ Recover Your Account",
     INVITE_USER = "🚀 Data Invite",
     USER_SUSPENDED = "Your account has been suspended"
+}
+
+export class NotificationActionTemplate {
+    constructor(values: {
+        userDisplayName?: string;
+        userSlug?: string;
+        prefix?: string;
+        itemSlug?: string;
+        itemName?: string;
+        postfix?: string;
+    }) {
+        this.userDisplayName = values.userDisplayName;
+        this.userSlug = values.userSlug;
+        this.prefix = values.prefix;
+        this.itemSlug = values.itemSlug;
+        this.itemName = values.itemName;
+        this.postfix = values.postfix;
+    }
+
+    userDisplayName?: string;
+    get hasUserDisplayName(): boolean {
+        return this.userDisplayName != undefined;
+    }
+    userSlug?: string;
+    get hasUserSlug(): boolean {
+        return this.userSlug != undefined;
+    }
+    prefix?: string;
+    get hasPrefix(): boolean {
+        return this.prefix != undefined;
+    }
+    itemSlug?: string;
+    get hasItemSlug(): boolean {
+        return this.itemSlug != undefined;
+    }
+    itemName?: string;
+    get hasItemName(): boolean {
+        return this.itemName != undefined;
+    }
+    get hasItemNameAndSlug(): boolean {
+        return this.hasItemName && this.hasItemSlug;
+    }
+    get hasItemNameNotSlug(): boolean {
+        return this.hasItemName && !this.hasItemSlug;
+    }
+    postfix?: string;
+
+    get hasPostfix(): boolean {
+        return this.postfix != undefined;
+    }
+}
+
+export interface NotificationResourceTypeTemplate {
+    slug: string;
+    displayName: string;
+    actions: NotificationActionTemplate[];
+}
+
+export interface NotificationEmailTemplate {
+    frequency: string;
+    recipientFirstName?: string;
+    hasPackageChanges: boolean;
+    packages: NotificationResourceTypeTemplate[];
+    hasCatalogChanges: boolean;
+    catalogs: NotificationResourceTypeTemplate[];
+    hasCollectionChanges: boolean;
+    collections: NotificationResourceTypeTemplate[];
+    hasUserChanges: boolean;
+    users: NotificationResourceTypeTemplate[];
+}
+
+export async function sendFollowNotificationEmail(
+    user: UserEntity,
+    frequency: string,
+    notification: NotificationEmailTemplate
+) {
+    let emailText = fs.readFileSync("./static/email-templates/follow-notification.txt", "utf8");
+    let emailHTML = fs.readFileSync("./static/email-templates/follow-notification.html", "utf8");
+
+    emailText = replaceCommonTokens(user, emailText);
+    emailText = Mustache.render(emailText, notification);
+
+    emailHTML = replaceCommonTokens(user, emailHTML);
+    emailHTML = Mustache.render(emailHTML, notification);
+
+    sendEmail(user, frequency.toLowerCase() + ` data updates`, emailText, emailHTML);
 }
 
 export async function sendAPIKeyCreatedEmail(user: UserEntity, apiKeyLabel: string) {
@@ -21,7 +108,7 @@ export async function sendAPIKeyCreatedEmail(user: UserEntity, apiKeyLabel: stri
     emailHTML = replaceCommonTokens(user, emailHTML);
     emailHTML = emailHTML.replace(/{{api_key_label}}/g, apiKeyLabel);
 
-    sendEmail(user, EMAIL_SUBJECTS.NEW_API_KEY, emailText, emailHTML);
+    await sendEmail(user, EMAIL_SUBJECTS.NEW_API_KEY, emailText, emailHTML);
 }
 
 export async function sendUserSuspendedEmail(user: UserEntity, message: string) {

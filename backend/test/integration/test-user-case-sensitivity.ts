@@ -11,7 +11,6 @@ describe("User Tests", async () => {
 
     it("Create user", async function () {
         userAClient = await createUser("FirstA", "LastA", "testA-case", "testA-case@test.datapm.io", "passwordA!");
-        AdminHolder.adminClient = userAClient;
 
         expect(userAClient).to.exist;
     });

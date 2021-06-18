@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from "@angular/core";
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 import { Router } from "@angular/router";
@@ -18,18 +18,31 @@ import {
 
 import { AddUserComponent } from "../add-user/add-user.component";
 import { DialogService } from "../../services/dialog/dialog.service";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
     selector: "app-catalog-permissions",
     templateUrl: "./catalog-permissions.component.html",
     styleUrls: ["./catalog-permissions.component.scss"]
 })
-export class CatalogPermissionsComponent implements OnChanges {
+export class CatalogPermissionsComponent implements OnInit, OnChanges, OnDestroy {
     @Input() catalog: Catalog;
 
     public isCatalogPublic: boolean;
+    public isCatalogUnclaimed: boolean;
     public columnsToDisplay = ["name", "permission", "actions"];
     public users: any[] = [];
+
+    Permission = Permission;
+    public user: User;
+    public hasCatalogPublicErrors: boolean;
+    public hasCatalogUnclaimedErrors: boolean;
+
+    @Output()
+    public onCatalogUpdate = new EventEmitter<Catalog>();
+
+    public destroy = new Subject();
 
     constructor(
         private dialog: MatDialog,
@@ -43,16 +56,36 @@ export class CatalogPermissionsComponent implements OnChanges {
         private snackBarService: SnackBarService
     ) {}
 
+    public ngOnInit(): void {
+        this.authenticationService.currentUser.pipe(takeUntil(this.destroy)).subscribe((user) => {
+            this.user = user;
+        });
+    }
+
     public ngOnChanges(changes: SimpleChanges): void {
         if (changes.catalog && changes.catalog.currentValue) {
+            if (!this.catalog.myPermissions.includes(Permission.MANAGE)) {
+                this.columnsToDisplay = ["name", "permission"];
+            }
+
             this.setCatalogVariables(changes.catalog.currentValue);
             this.getUserList();
         }
     }
 
+    public ngOnDestroy(): void {
+        this.destroy.next();
+        this.destroy.complete();
+    }
+
     public updatePublic(ev: MatSlideToggleChange): void {
         this.isCatalogPublic = ev.checked;
         this.openPackageVisibilityChangeDialog(ev.checked);
+    }
+
+    public updateUnclaimed(ev: MatSlideToggleChange): void {
+        this.isCatalogUnclaimed = ev.checked;
+        this.openPackageUnclaimedStatusDialog(ev.checked);
     }
 
     public addUser(): void {
@@ -93,11 +126,12 @@ export class CatalogPermissionsComponent implements OnChanges {
     public editCatalog(): void {
         this.dialog
             .open(EditCatalogComponent, {
-                data: this.catalog
+                data: this.catalog,
+                disableClose: true
             })
             .afterClosed()
             .subscribe((newCatalog: Catalog) => {
-                this.getUserList();
+                this.catalog = newCatalog;
             });
     }
 
@@ -109,8 +143,7 @@ export class CatalogPermissionsComponent implements OnChanges {
         });
 
         dlgRef.afterClosed().subscribe((confirmed: boolean) => {
-            if (confirmed)
-                this.router.navigate(["/" + this.authenticationService.currentUser.getValue().username + "#catalogs"]);
+            if (confirmed) this.router.navigate(["/" + this.user.username + "#catalogs"]);
         });
     }
 
@@ -193,7 +226,18 @@ export class CatalogPermissionsComponent implements OnChanges {
         });
     }
 
+    private openPackageUnclaimedStatusDialog(unclaimed: boolean): void {
+        this.dialogService.openCatalogUnclaimedStatusConfirmationDialog(unclaimed).subscribe((confirmed) => {
+            if (confirmed) {
+                this.updateCatalogUnclaimed(unclaimed);
+            } else {
+                this.isCatalogUnclaimed = !unclaimed;
+            }
+        });
+    }
+
     private updateCatalogVisibility(isPublic: boolean): void {
+        this.hasCatalogPublicErrors = false;
         this.updateCatalogGQL
             .mutate({
                 identifier: {
@@ -203,11 +247,59 @@ export class CatalogPermissionsComponent implements OnChanges {
                     isPublic
                 }
             })
-            .subscribe(({ data }) => this.setCatalogVariables(data.updateCatalog as Catalog));
+            .subscribe(
+                ({ data, errors }) => {
+                    if (errors) {
+                        this.hasCatalogPublicErrors = true;
+                    } else {
+                        this.setCatalogVariables(data.updateCatalog as Catalog);
+                    }
+                },
+                (errors) => {
+                    this.hasCatalogPublicErrors = true;
+                }
+            );
+    }
+
+    private updateCatalogUnclaimed(unclaimed: boolean): void {
+        this.hasCatalogUnclaimedErrors = false;
+        this.updateCatalogGQL
+            .mutate({
+                identifier: {
+                    catalogSlug: this.catalog.identifier.catalogSlug
+                },
+                value: {
+                    unclaimed
+                }
+            })
+            .subscribe(
+                ({ data, errors }) => {
+                    if (errors) {
+                        this.hasCatalogUnclaimedErrors = true;
+                    } else {
+                        this.setCatalogVariables(data.updateCatalog as Catalog);
+                    }
+                },
+                (errors) => {
+                    this.hasCatalogUnclaimedErrors = true;
+                }
+            );
     }
 
     private setCatalogVariables(catalog: Catalog): void {
         this.catalog = catalog;
         this.isCatalogPublic = catalog.isPublic;
+        this.isCatalogUnclaimed = catalog.unclaimed;
+        this.onCatalogUpdate.emit(catalog);
+    }
+
+    public myCatalogPermission(permissions: Permission[]): string {
+        if (permissions.includes(Permission.MANAGE)) return "Manage";
+
+        if (permissions.includes(Permission.EDIT)) return "Edit";
+
+        if (permissions.includes(Permission.VIEW)) return "View";
+
+        return "";
     }
 }

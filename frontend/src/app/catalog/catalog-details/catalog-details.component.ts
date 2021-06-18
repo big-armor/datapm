@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Catalog, Follow, FollowIdentifierInput, GetFollowGQL, Package, Permission, User } from "src/generated/graphql";
 import { ActivatedRoute, NavigationExtras, Router } from "@angular/router";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
@@ -30,6 +30,9 @@ export class CatalogDetailsComponent implements OnInit {
 
     public catalogFollow: Follow;
     public isFollowing: boolean;
+
+    @Output()
+    public onCatalogUpdate = new EventEmitter<Catalog>();
 
     private unsubscribe$: Subject<any> = new Subject();
     private tabs = ["", "manage"];
@@ -90,6 +93,7 @@ export class CatalogDetailsComponent implements OnInit {
             .subscribe((newCatalog: Catalog) => {
                 if (newCatalog) {
                     this.catalog = newCatalog;
+                    this.onCatalogUpdate.emit(newCatalog);
                 }
             });
     }
@@ -136,7 +140,7 @@ export class CatalogDetailsComponent implements OnInit {
                     return;
                 }
 
-                this.updatePackageFollow(result.follow);
+                this.updateCatalogFollow(result.follow);
             });
     }
 
@@ -145,7 +149,7 @@ export class CatalogDetailsComponent implements OnInit {
             .fetch({
                 follow: this.buildFollowIdentifier()
             })
-            .subscribe((response) => this.updatePackageFollow(response.data?.getFollow));
+            .subscribe((response) => this.updateCatalogFollow(response.data?.getFollow));
     }
 
     private openFollowModal(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
@@ -166,7 +170,7 @@ export class CatalogDetailsComponent implements OnInit {
         };
     }
 
-    private updatePackageFollow(follow: Follow): void {
+    private updateCatalogFollow(follow: Follow): void {
         this.catalogFollow = follow;
         this.isFollowing = follow != null;
         this.state = "SUCCESS";

@@ -22,7 +22,9 @@ import { PackageRepository } from "./repository/PackageRepository";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { CollectionRepository } from "./repository/CollectionRepository";
 import { PackageDataStorageService } from "./storage/data/package-data-storage-service";
+import { startLeaderElection, stopLeaderElection } from "./service/leader-election-service";
 import { SessionCache } from "./session-cache";
+
 console.log("DataPM Registry Server Starting...");
 
 const dataLibPackageFile = fs.readFileSync("node_modules/datapm-lib/package.json");
@@ -50,7 +52,15 @@ async function main() {
 
     await setAppEngineServiceAccountJson();
 
+    // Create Database Connection
     const connection = await superCreateConnection();
+
+    startLeaderElection(connection);
+
+    process.on("exit", async () => {
+        console.log("DataPM Registry Server Stoping... ");
+        await stopLeaderElection();
+    });
 
     const context = async ({ req }: { req: express.Request }): Promise<Context> => ({
         request: req,

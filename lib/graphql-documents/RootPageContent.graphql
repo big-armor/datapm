@@ -9,6 +9,7 @@ query GetPageContent($route: String!) {
             website
             myPermissions
             isPublic
+            unclaimed
             packages {
                 identifier {
                     catalogSlug

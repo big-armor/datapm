@@ -123,6 +123,10 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
         this.updateSelectionStatuses();
     }
 
+    public checkIssue(ev): void {
+        ev.stopPropagation();
+    }
+
     public toggleIssue(issue: PackageIssueWithMetadata, value: boolean): void {
         issue.checked = value;
         this.updateSelectionStatuses();
@@ -172,7 +176,11 @@ export class PackageIssuesComponent implements OnInit, OnDestroy {
                     })
                     .subscribe((response) => {
                         if (!response.errors) {
-                            this.reloadIssues();
+                            // this.reloadIssues();
+                            this.packageService.getPackage(
+                                this.packageIdentifier.catalogSlug,
+                                this.packageIdentifier.packageSlug
+                            );
                         }
                     });
             });

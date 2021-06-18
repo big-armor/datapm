@@ -92,7 +92,10 @@ export class PackageRepository extends Repository<PackageEntity> {
         const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
 
         const response = await this.createQueryBuilderWithUserConditions(user, Permission.VIEW)
-            .andWhere(`("PackageEntity"."creator_id" = :targetUserId )`)
+            .andWhere(
+                `("PackageEntity"."creator_id" = :targetUserId or "PackageEntity"."id" in (select package_id from user_package_permission up where up.user_id  = :targetUserId))`
+            )
+
             .setParameter("targetUserId", targetUser.id)
             .offset(offSet)
             .limit(limit)
@@ -303,7 +306,9 @@ export class PackageRepository extends Repository<PackageEntity> {
         packageSlug: string;
         packageInput: UpdatePackageInput;
         relations?: string[];
-    }): Promise<PackageEntity> {
+    }): Promise<[PackageEntity, string[]]> {
+        const propertiesEdited: string[] = [];
+
         return this.manager.nestedTransaction(async (transaction) => {
             const ALIAS = "packageentity";
 
@@ -321,23 +326,31 @@ export class PackageRepository extends Repository<PackageEntity> {
                 throw new Error("PACKAGE_NOT_FOUND");
             }
 
-            if (packageInput.newCatalogSlug) {
+            if (packageInput.newCatalogSlug && packageInput.newCatalogSlug != packageEntity.catalog.slug) {
                 packageEntity.catalogId = (
                     await transaction
                         .getCustomRepository(CatalogRepository)
                         .findOneOrFail({ slug: packageInput.newCatalogSlug })
                 ).id;
+                propertiesEdited.push("catalogSlug");
             }
 
-            if (packageInput.newPackageSlug) {
+            if (packageInput.newPackageSlug && packageInput.newPackageSlug != packageEntity.slug) {
                 packageEntity.slug = packageInput.newPackageSlug;
+                propertiesEdited.push("slug");
             }
 
-            if (packageInput.displayName) packageEntity.displayName = packageInput.displayName;
+            if (packageInput.displayName && packageInput.displayName != packageEntity.displayName) {
+                packageEntity.displayName = packageInput.displayName;
+                propertiesEdited.push("displayName");
+            }
 
-            if (packageInput.description) packageEntity.description = packageInput.description;
+            if (packageInput.description && packageInput.description != packageEntity.description) {
+                packageEntity.description = packageInput.description;
+                propertiesEdited.push("description");
+            }
 
-            if (packageInput.isPublic != null) {
+            if (packageInput.isPublic != null && packageInput.isPublic != packageEntity.isPublic) {
                 if (packageInput.isPublic == true && packageEntity.catalog.isPublic == false) {
                     throw new Error("CATALOG_NOT_PUBLIC");
                 }
@@ -345,6 +358,7 @@ export class PackageRepository extends Repository<PackageEntity> {
                     throw new Error("PACKAGE_HAS_NO_VERSIONS");
                 }
                 packageEntity.isPublic = packageInput.isPublic;
+                propertiesEdited.push("isPublic");
             }
 
             validation(packageEntity);
@@ -358,7 +372,7 @@ export class PackageRepository extends Repository<PackageEntity> {
                 throw new Error("Unable to retrieve updated package - this should never happen");
             }
 
-            return queryPackage;
+            return [queryPackage, propertiesEdited];
         });
     }
 
@@ -488,9 +502,11 @@ export class PackageRepository extends Repository<PackageEntity> {
         const ALIAS = "myPackages";
         return this.manager
             .getRepository(PackageEntity)
-            .createQueryBuilder()
-            .where("creator_id = :userId")
-            .orderBy('"PackageEntity"."updated_at"', "DESC")
+            .createQueryBuilder("Package")
+            .where(
+                `("Package"."creator_id" = :userId or "Package".id in (select package_id from user_package_permission up where up.user_id = :userId))`
+            )
+            .orderBy('"Package"."updated_at"', "DESC")
             .limit(limit)
             .offset(offSet)
             .addRelations(ALIAS, relations)

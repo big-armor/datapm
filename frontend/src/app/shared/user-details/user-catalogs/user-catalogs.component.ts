@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { Catalog, UpdateCatalogGQL, DeleteCatalogGQL, UserCatalogsGQL } from "src/generated/graphql";
+import { Catalog, UpdateCatalogGQL, DeleteCatalogGQL, UserCatalogsGQL, Permission } from "src/generated/graphql";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
@@ -31,11 +31,14 @@ export class UserCatalogsComponent implements OnInit {
     State = State;
     catalogState = State.INIT;
     public myCatalogs: Catalog[];
+    public otherCatalogs: Catalog[];
     private subscription = new Subject();
-    columnsToDisplay = ["name", "public", "actions"];
+    columnsToDisplay = ["name", "permission", "public", "actions"];
     inputErrors = {
         required: "Catalog name is required"
     };
+
+    Permission = Permission;
 
     message = new FormControl("You can not delete your username catalog.");
 
@@ -85,8 +88,9 @@ export class UserCatalogsComponent implements OnInit {
             });
     }
 
-    public deleteCatalog(catalog: Catalog): void {
-        if (!this.canModifyCatalog(catalog.identifier.catalogSlug)) {
+    public deleteCatalog(ev: Event, catalog: Catalog): void {
+        ev.stopPropagation();
+        if (!this.canManageCatalog(catalog)) {
             return;
         }
 
@@ -107,8 +111,9 @@ export class UserCatalogsComponent implements OnInit {
         });
     }
 
-    public editCatalog(catalog: Catalog): void {
-        if (!this.canModifyCatalog(catalog.identifier.catalogSlug)) {
+    public editCatalog(ev: Event, catalog: Catalog): void {
+        ev.stopPropagation();
+        if (!this.canModifyCatalog(catalog)) {
             return;
         }
 
@@ -126,8 +131,16 @@ export class UserCatalogsComponent implements OnInit {
             });
     }
 
-    public canModifyCatalog(catalogSlug: string): boolean {
-        return catalogSlug && catalogSlug !== this.username;
+    public canModifyCatalog(catalog: Catalog): boolean {
+        return (
+            catalog &&
+            catalog.identifier.catalogSlug !== this.username &&
+            catalog.myPermissions?.includes(Permission.EDIT)
+        );
+    }
+
+    public canManageCatalog(catalog: Catalog): boolean {
+        return catalog && catalog.myPermissions?.includes(Permission.MANAGE);
     }
 
     public updateCatalogVisibility(catalog: Catalog, changeEvent: MatSlideToggleChange): void {
@@ -151,5 +164,12 @@ export class UserCatalogsComponent implements OnInit {
                 }
             })
             .subscribe(() => (catalog.isPublic = isPublic));
+    }
+
+    catalogPermission(collection: Catalog): string {
+        if (collection.myPermissions.includes(Permission.MANAGE)) return "Manage";
+        if (collection.myPermissions.includes(Permission.EDIT)) return "Edit";
+        if (collection.myPermissions.includes(Permission.VIEW)) return "View";
+        return "";
     }
 }

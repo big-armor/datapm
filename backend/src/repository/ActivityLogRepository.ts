@@ -18,6 +18,8 @@ export interface ActivityLogTemp {
     targetCollectionId?: number;
     targetUserId?: number;
     propertiesEdited?: string[];
+    removedItemName?: string;
+    removedItemId?: number;
 }
 
 /** Creates a new ActivityLog entry in the database, and logs it */
@@ -32,6 +34,8 @@ export async function createActivityLog(connection: EntityManager | Connection, 
     activityLog.targetCatalogId = activityLogTemp.targetCatalogId;
     activityLog.targetCollectionId = activityLogTemp.targetCollectionId;
     activityLog.propertiesEdited = activityLogTemp.propertiesEdited;
+    activityLog.removedItemName = activityLogTemp.removedItemName;
+    activityLog.removedItemId = activityLogTemp.removedItemId;
 
     if (activityLogTemp.userId) {
         const user = await connection.getRepository(UserEntity).findOneOrFail({ id: activityLogTemp.userId });
@@ -82,6 +86,7 @@ export class ActivityLogRepository {
             const entity = transaction.create(ActivityLogEntity, activityLog);
             if (
                 activityLog.eventType !== ActivityLogEventType.PACKAGE_DELETED &&
+                activityLog.eventType !== ActivityLogEventType.PACKAGE_ISSUE_DELETED &&
                 activityLog.eventType !== ActivityLogEventType.VERSION_DELETED &&
                 activityLog.eventType !== ActivityLogEventType.COLLECTION_DELETED &&
                 activityLog.eventType !== ActivityLogEventType.CATALOG_DELETED &&

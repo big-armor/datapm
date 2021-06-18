@@ -99,6 +99,19 @@
 
         .issue-box {
             padding: 18px 20px;
+            .text-dark-gray {
+                ::ng-deep {
+                    th,
+                    td {
+                        border: 1px solid var(--gray-9-color);
+                        padding: 4px 8px;
+                    }
+                    th {
+                        font-weight: $weight-500;
+                        color: var(--primary-color);
+                    }
+                }
+            }
         }
     }
 

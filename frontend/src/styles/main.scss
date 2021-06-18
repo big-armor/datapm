@@ -26,6 +26,7 @@ a {
 
 body {
     margin: 0;
+    scroll-behavior: smooth;
     font-family: $family-roboto !important;
 }
 
@@ -481,12 +482,30 @@ mat-select {
     line-height: 14px;
     color: var(--info-color) !important;
     border: 1px solid var(--gray-9-color) !important;
-    scroll-behavior: smooth;
-    animation: move 3s ease-out infinite;
     cursor: pointer;
 
     &:hover {
         text-decoration: none;
+    }
+}
+
+.box-line {
+    cursor: pointer;
+    padding: 8px 10px !important;
+    box-shadow: var(--outer-shadow-1) !important;
+    background-color: var(--gray-7-color);
+    transition: background-color 0.5s ease !important;
+
+    &:hover {
+        background-color: var(--custom-secondary-color);
+        transition: background-color 0.5s ease;
+    }
+
+    .box-name {
+        font-family: $family-roboto;
+        font-size: ($default-font - 1);
+        color: var(--info-color);
+        margin-bottom: 2px !important;
     }
 }
 
@@ -509,6 +528,7 @@ mat-select {
         background-color: var(--info-hover-color);
         border: 1px solid var(--info-hover-color);
         transition: background-color ease 0.5s;
+        color: $secondary-color;
     }
 
     &:active {

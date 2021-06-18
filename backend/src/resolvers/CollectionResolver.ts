@@ -126,6 +126,14 @@ export const updateCollection = async (
         const repository = transaction.getCustomRepository(CollectionRepository);
         const collection = await repository.findCollectionBySlugOrFail(identifier.collectionSlug);
 
+        if (
+            value.isPublic != null &&
+            value.isPublic != collection.isPublic &&
+            !(await hasCollectionPermissions(context, collection, Permission.MANAGE))
+        ) {
+            throw new ValidationError("NOT_AUTHORIZED - must be manager to change public status");
+        }
+
         if (value.newCollectionSlug && identifier.collectionSlug != value.newCollectionSlug) {
             ReservedKeywordsService.validateReservedKeyword(value.newCollectionSlug);
             const existingCollection = await repository.findCollectionBySlug(value.newCollectionSlug);

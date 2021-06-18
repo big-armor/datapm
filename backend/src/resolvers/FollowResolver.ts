@@ -1,4 +1,5 @@
 import { EntityManager } from "typeorm";
+import { resolveCatalogPermissionsForEntity } from "../directive/hasCatalogPermissionDirective";
 import { AuthenticatedContext, Context } from "../context";
 import { FollowEntity } from "../entity/FollowEntity";
 import {
@@ -32,7 +33,7 @@ export const entityToGraphqlObject = async (context: Context, entity: FollowEnti
 
     return {
         notificationFrequency: entity.notificationFrequency,
-        eventTypes: entity.eventTypes,
+        eventTypes: entity.eventTypes || [],
         catalog: catalogEntityToGraphQLOrNull(entity.catalog),
         collection: collectionEntityToGraphQLOrNull(entity.collection),
         package: await packageEntityToGraphqlObjectOrNull(context, context.connection, entity.package),
@@ -60,13 +61,13 @@ export const saveFollow = async (
         const catalog = await getCatalogOrFail({ slug: follow.catalog.catalogSlug, manager });
         existingFollowEntity = await followRepository.getFollowByCatalogId(userId, catalog.id);
 
-        if (!catalog.isPublic) {
-            const hasPermission = await manager
-                .getCustomRepository(UserCatalogPermissionRepository)
-                .doesUserHavePermission(userId, catalog.id, Permission.VIEW);
-            if (!hasPermission) {
-                throw new Error("NOT_AUTHORIZED");
-            }
+        // check that this user has the right to move this package to a different catalog
+        const hasViewPermission = (await resolveCatalogPermissionsForEntity(context, catalog)).includes(
+            Permission.VIEW
+        );
+
+        if (!hasViewPermission) {
+            throw new Error("NOT_AUTHORIZED");
         }
 
         followEntity.catalogId = catalog.id;
@@ -76,13 +77,12 @@ export const saveFollow = async (
             .getCustomRepository(CollectionRepository)
             .findCollectionBySlugOrFail(follow.collection.collectionSlug);
 
-        if (!collection.isPublic) {
-            const hasPermission = await manager
-                .getCustomRepository(UserCollectionPermissionRepository)
-                .hasPermission(userId, collection.id, Permission.VIEW);
-            if (!hasPermission) {
-                throw new Error("NOT_AUTHORIZED");
-            }
+        const hasPermission = await manager
+            .getCustomRepository(UserCollectionPermissionRepository)
+            .hasPermission(userId, collection, Permission.VIEW);
+
+        if (!hasPermission) {
+            throw new Error("NOT_AUTHORIZED");
         }
 
         existingFollowEntity = await followRepository.getFollowByCollectionId(userId, collection.id);
@@ -94,14 +94,11 @@ export const saveFollow = async (
             .getCustomRepository(PackageRepository)
             .findPackageOrFail({ identifier: follow.package });
 
-        if (!packageEntity.isPublic) {
-            const hasPermission = await manager
-                .getCustomRepository(PackagePermissionRepository)
-                .hasPermission(userId, packageEntity.id, Permission.VIEW);
-
-            if (!hasPermission) {
-                throw new Error("NOT_AUTHORIZED");
-            }
+        const hasPermission = await manager
+            .getCustomRepository(PackagePermissionRepository)
+            .hasPermission(userId, packageEntity, Permission.VIEW);
+        if (!hasPermission) {
+            throw new Error("NOT_AUTHORIZED");
         }
 
         existingFollowEntity = await followRepository.getFollowByPackageId(userId, packageEntity.id);
@@ -116,7 +113,7 @@ export const saveFollow = async (
         if (!packageEntity.isPublic) {
             const hasPermission = await manager
                 .getCustomRepository(PackagePermissionRepository)
-                .hasPermission(userId, packageEntity.id, Permission.VIEW);
+                .hasPermission(userId, packageEntity, Permission.VIEW);
             if (!hasPermission) {
                 throw new Error("NOT_AUTHORIZED");
             }
@@ -329,7 +326,7 @@ const getPackageIssueEventTypes = (): NotificationEventType[] => {
 };
 
 const getUserEventTypes = (): NotificationEventType[] => {
-    return [];
+    return [NotificationEventType.PACKAGE_CREATED, NotificationEventType.VERSION_CREATED];
 };
 
 export const followPackage = async (

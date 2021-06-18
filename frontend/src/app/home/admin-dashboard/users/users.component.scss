@@ -21,10 +21,10 @@
 
                 &::placeholder {
                     font-family: $family-roboto;
-                    font-size: $text-font;
+                    font-size: $text-font - 1;
                     letter-spacing: 0.4px;
                     font-weight: $weight-300;
-                    opacity: 0.9;
+                    opacity: 0.8;
                     color: var(--gray-3-color);
                 }
             }
@@ -40,10 +40,14 @@
 
         .mat-form-field-flex {
             padding: 0px;
-            background-color: var(--custom-secondary-color);
+            background-color: var(--gray-7-color) !important;
             width: 218px;
-            border-radius: 6px;
+            border-radius: 4px;
             border: 1px solid var(--gray-5-color);
+
+            &:hover {
+                background-color: var(--custom-secondary-color) !important;
+            }
         }
 
         .mat-form-field-underline {

@@ -9,7 +9,7 @@
                 <div class="px-2 bd-highlight d-flex align-items-end">
                     <div class="catalog-header">
                         <div class="text-main-title mb-0">{{ catalog?.displayName }}</div>
-                        <div class="text-light-gray mb-1">@{{ catalogSlug }}</div>
+                        <div class="text-light-gray mb-1">@{{ catalog?.identifier.catalogSlug }}</div>
                         <p class="text-dark-gray" style="margin-bottom: 0px !important; line-height: 11px">
                             {{ catalog?.description }}
                         </p>
@@ -17,7 +17,7 @@
                 </div>
                 <div *ngIf="currentUser" class="d-flex flex-row bd-highlight ml-auto align-self-end">
                     <button class="app-raised-button follow-btn" (click)="follow()">
-                        <span *ngIf="isFollowing"><em class="fas fa-bell-slash"></em>Unfollow </span>
+                        <span *ngIf="isFollowing"><em class="fas fa-bell-slash"></em>Following</span>
                         <span *ngIf="!isFollowing"><em class="fas fa-bell"></em>Follow</span>
                     </button>
                 </div>
@@ -40,7 +40,7 @@
                 class="catalog-tabs mt-3"
             >
                 <mat-tab label="Packages"></mat-tab>
-                <mat-tab label="Manage" *ngIf="canManage"></mat-tab>
+                <mat-tab label="Manage" *ngIf="canEdit"></mat-tab>
             </mat-tab-group>
         </div>
         <hr class="header-border" />
@@ -68,7 +68,11 @@
                     >
                 </div>
             </div>
-            <app-catalog-permissions [catalog]="catalog" *ngIf="currentTab === 1"></app-catalog-permissions>
+            <app-catalog-permissions
+                (onCatalogUpdate)="onCatalogUpdate.emit($event)"
+                [catalog]="catalog"
+                *ngIf="currentTab === 1"
+            ></app-catalog-permissions>
         </div>
     </ng-container>
 
@@ -84,7 +88,7 @@
             <p class="text-dark-gray">An error ocurred while getting catalog details. Please try again later.</p>
         </div>
         <div class="dpm-page-loading" *ngIf="state === 'LOADING'">
-            <mat-spinner [diameter]="32"></mat-spinner>
+            <mat-spinner [diameter]="60"></mat-spinner>
         </div>
     </div>
 </div>

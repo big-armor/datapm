@@ -38,6 +38,7 @@ import {
     getCatalogFromCacheOrDbBySlug
 } from "./CatalogResolver";
 import { activtyLogEntityToGraphQL } from "./ActivityLogResolver";
+import { resolveCatalogPermissionsForEntity } from "../directive/hasCatalogPermissionDirective";
 import { Connection, EntityManager } from "typeorm";
 import { VersionEntity } from "../entity/VersionEntity";
 import { getUserFromCacheOrDbById } from "./UserResolver";
@@ -365,6 +366,13 @@ export const createPackage = async (
                 targetPackageId: packageEntity?.id
             });
 
+            await createActivityLog(transaction, {
+                userId: context.me.id,
+                eventType: ActivityLogEventType.CATALOG_PACKAGE_ADDED,
+                targetCatalogId: packageEntity.catalogId,
+                targetPackageId: packageEntity.id
+            });
+
             return await packageEntityToGraphqlObject(context, transaction, packageEntity);
         } catch (error) {
             if (error.message == "CATALOG_NOT_FOUND") {
@@ -383,16 +391,15 @@ export const updatePackage = async (
     info: any
 ) => {
     if (value.newCatalogSlug) {
+        const catalog = await context.connection
+            .getCustomRepository(CatalogRepository)
+            .findCatalogBySlugOrFail(value.newCatalogSlug);
         // check that this user has the right to move this package to a different catalog
-        const hasPermission = await context.connection
-            .getCustomRepository(UserCatalogPermissionRepository)
-            .userHasPermission({
-                username: context.me.username,
-                catalogSlug: value.newCatalogSlug,
-                permission: Permission.EDIT
-            });
+        const hasEditPermission = (await resolveCatalogPermissionsForEntity(context, catalog)).includes(
+            Permission.EDIT
+        );
 
-        if (!hasPermission) {
+        if (!hasEditPermission) {
             throw new ForbiddenError("NOT_AUTHORIZED");
         }
     }
@@ -402,13 +409,20 @@ export const updatePackage = async (
             .getCustomRepository(PackageRepository)
             .findPackageOrFail({ identifier });
 
+        const [packageEntityUpdated, propertiesChanged] = await transaction
+            .getCustomRepository(PackageRepository)
+            .updatePackage({
+                catalogSlug: identifier.catalogSlug,
+                packageSlug: identifier.packageSlug,
+                packageInput: value,
+                relations: getGraphQlRelationName(info)
+            });
+
         await createActivityLog(transaction, {
             userId: context.me.id,
             eventType: ActivityLogEventType.PACKAGE_EDIT,
             targetPackageId: packageEntity.id,
-            propertiesEdited: Object.keys(value)
-                .map((k) => (k == "newPackageSlug" ? "slug" : k))
-                .map((k) => (k == "newCatalogSlug" ? "catalogSlug" : k))
+            propertiesEdited: propertiesChanged
         });
 
         if (value.isPublic !== undefined) {
@@ -425,13 +439,6 @@ export const updatePackage = async (
                 await deletePackageFollowsForUsersWithNoPermissions(packageEntity.id, transaction);
             }
         }
-
-        const packageEntityUpdated = await transaction.getCustomRepository(PackageRepository).updatePackage({
-            catalogSlug: identifier.catalogSlug,
-            packageSlug: identifier.packageSlug,
-            packageInput: value,
-            relations: getGraphQlRelationName(info)
-        });
 
         return packageEntityToGraphqlObject(context, transaction, packageEntityUpdated);
     });
@@ -534,7 +541,16 @@ export const deletePackage = async (
         await createActivityLog(transaction, {
             userId: context.me!.id,
             eventType: ActivityLogEventType.PACKAGE_DELETED,
-            targetPackageId: packageEntity.id
+            targetPackageId: packageEntity.id,
+            targetCatalogId: packageEntity.catalogId
+        });
+
+        await createActivityLog(transaction, {
+            userId: context.me!.id,
+            eventType: ActivityLogEventType.CATALOG_PACKAGE_REMOVED,
+            targetCatalogId: packageEntity.catalog.id,
+            removedItemName: identifier.catalogSlug + "/" + identifier.packageSlug,
+            removedItemId: packageEntity.id
         });
 
         return transaction.getCustomRepository(PackageRepository).deletePackage({

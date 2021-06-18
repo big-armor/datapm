@@ -1,4 +1,4 @@
-import { UserInputError } from "apollo-server";
+import { UserInputError, ValidationError } from "apollo-server";
 import graphqlFields from "graphql-fields";
 import { Connection, EntityManager } from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
@@ -184,24 +184,38 @@ export const updateCatalog = async (
     info: any
 ) => {
     return context.connection.transaction(async (transaction) => {
-        if (!context.me.isAdmin && value.unclaimed !== undefined) {
-            throw new Error("NOT_AUTHORIZED");
+        if (!context.me.isAdmin && value.unclaimed != null) {
+            throw new Error("NOT_AUTHORIZED - must be admin to set unclaimed status");
         }
+
+        const catalog = await transaction
+            .getCustomRepository(CatalogRepository)
+            .findCatalogBySlugOrFail(identifier.catalogSlug, ["packages"]);
+
+        if (
+            value.isPublic != null &&
+            value.isPublic != catalog.isPublic &&
+            !(await hasCatalogPermissions(context, catalog, Permission.MANAGE))
+        ) {
+            throw new ValidationError("NOT_AUTHORIZED - must be manager to set public status");
+        }
+
+        const [updatedCatalog, propertiesChanged] = await transaction
+            .getCustomRepository(CatalogRepository)
+            .updateCatalog({
+                identifier,
+                value,
+                relations: getGraphQlRelationName(info)
+            });
 
         const relations = getGraphQlRelationName(info);
         if (!relations.includes("packages")) {
             relations.push("packages");
         }
 
-        const catalog = await transaction.getCustomRepository(CatalogRepository).updateCatalog({
-            identifier,
-            value,
-            relations
-        });
+        context.cache.storeCatalogToCache(updatedCatalog);
 
-        context.cache.storeCatalogToCache(catalog);
-
-        if (value.unclaimed !== undefined) {
+        if (propertiesChanged.includes("unclaimed")) {
             await createActivityLog(transaction, {
                 userId: context.me.id,
                 eventType: ActivityLogEventType.CATALOG_UNCLAIMED_CHANGED,
@@ -212,33 +226,34 @@ export const updateCatalog = async (
             });
         }
 
-        await createActivityLog(transaction, {
-            userId: context.me.id,
-            eventType: ActivityLogEventType.CATALOG_EDIT,
-            targetCatalogId: catalog.id,
-            propertiesEdited: Object.keys(value).map((k) => (k == "newSlug" ? "slug" : k))
-        });
-
-        if (value.isPublic !== undefined) {
+        if (propertiesChanged.length > 0) {
+            await createActivityLog(transaction, {
+                userId: context.me.id,
+                eventType: ActivityLogEventType.CATALOG_EDIT,
+                targetCatalogId: updatedCatalog.id,
+                propertiesEdited: propertiesChanged
+            });
+        }
+        if (propertiesChanged.includes("isPublic")) {
             await createActivityLog(transaction, {
                 userId: context.me.id,
                 eventType: ActivityLogEventType.CATALOG_PUBLIC_CHANGED,
-                targetCatalogId: catalog.id,
+                targetCatalogId: updatedCatalog.id,
                 changeType: value.isPublic
                     ? ActivityLogChangeType.PUBLIC_ENABLED
                     : ActivityLogChangeType.PUBLIC_DISABLED
             });
-
-            if (!value.isPublic) {
-                await deleteCatalogFollowsForUsersWithNoPermissions(catalog.id, transaction);
-                const packageFollowRemovalPromises = catalog.packages.map((pkg) =>
-                    deletePackageFollowsForUsersWithNoPermissions(pkg.id, transaction)
-                );
-                await Promise.all(packageFollowRemovalPromises);
-            }
         }
 
-        return catalogEntityToGraphQL(catalog);
+        if (!value.isPublic) {
+            await deleteCatalogFollowsForUsersWithNoPermissions(catalog.id, transaction);
+            const packageFollowRemovalPromises = catalog.packages.map((pkg) =>
+                deletePackageFollowsForUsersWithNoPermissions(pkg.id, transaction)
+            );
+            await Promise.all(packageFollowRemovalPromises);
+        }
+
+        return catalogEntityToGraphQL(updatedCatalog);
     });
 };
 
