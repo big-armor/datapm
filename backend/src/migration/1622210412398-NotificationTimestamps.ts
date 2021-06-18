@@ -2,7 +2,6 @@ import { MigrationInterface, QueryRunner } from "typeorm";
 
 const sql = `
 
-    alter table activity_log alter column event_type type activity_log_event_type_enum using event_type::activity_log_event_type_enum;
     ALTER TABLE activity_log ADD column "removed_item_name"  text;
     ALTER TABLE activity_log ADD column "removed_item_id"  bigint;
 
@@ -20,7 +19,9 @@ const sql = `
     ALTER TYPE activity_log_event_type_enum ADD VALUE 'PACKAGE_ISSUE_EDIT';
     ALTER TYPE activity_log_event_type_enum ADD VALUE 'CATALOG_UNCLAIMED_CHANGED';
     ALTER TYPE activity_log_event_type_enum ADD VALUE 'PACKAGE_ISSUE_STAUS_CHANGE';
-    ALTER TYPE activity_log_event_type_enum ADD VALUE 'PACKAGE_ISSUE_COMMENT_ADDED';
+
+    alter table activity_log alter column event_type type activity_log_event_type_enum using event_type::activity_log_event_type_enum;
+
 
     delete from "activity_log" where target_package_version_id not in (select id from "version" v2 );
 
