@@ -1,6 +1,6 @@
 {
     "name": "datapm-lib",
-    "version": "0.6.228",
+    "version": "0.6.229",
     "description": "Definitions and utilities for managing datapm package files.",
     "main": "src/main.js",
     "scripts": {
