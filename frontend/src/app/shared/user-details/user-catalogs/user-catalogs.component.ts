@@ -88,7 +88,8 @@ export class UserCatalogsComponent implements OnInit {
             });
     }
 
-    public deleteCatalog(catalog: Catalog): void {
+    public deleteCatalog(ev: Event, catalog: Catalog): void {
+        ev.stopPropagation();
         if (!this.canManageCatalog(catalog)) {
             return;
         }
@@ -110,7 +111,8 @@ export class UserCatalogsComponent implements OnInit {
         });
     }
 
-    public editCatalog(catalog: Catalog): void {
+    public editCatalog(ev: Event, catalog: Catalog): void {
+        ev.stopPropagation();
         if (!this.canModifyCatalog(catalog)) {
             return;
         }

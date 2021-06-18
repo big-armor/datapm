@@ -79,4 +79,27 @@ export class DialogService {
 
         return this.confirmationDialogService.openFancyConfirmationDialog(dialogConfig);
     }
+
+    public openCatalogUnclaimedStatusConfirmationDialog(unclaimed: boolean): Observable<boolean> {
+        let message: string;
+        let confirmText: string;
+        if (unclaimed) {
+            message = "<p>This catalog will become claimed.</p>";
+            confirmText = "Set as claimed";
+        } else {
+            message = "<p>This catalog will become unclaimed.</p>";
+            confirmText = "Set as unclaimed";
+        }
+
+        const dialogConfig = {
+            data: {
+                title: "Are you sure?",
+                content: message,
+                confirmButtonText: confirmText
+            },
+            size: DialogSize.MEDIUM
+        };
+
+        return this.confirmationDialogService.openFancyConfirmationDialog(dialogConfig);
+    }
 }

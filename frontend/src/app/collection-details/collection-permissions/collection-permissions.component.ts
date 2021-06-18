@@ -91,7 +91,8 @@ export class CollectionPermissionsComponent implements OnChanges {
     public editCollection() {
         this.dialog
             .open(EditCollectionComponent, {
-                data: this.collection
+                data: this.collection,
+                disableClose: true
             })
             .afterClosed()
             .subscribe((collection: Collection) => {

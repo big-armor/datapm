@@ -1,6 +1,10 @@
 <div class="page-content" *ngIf="state === 'SUCCESS'">
     <app-user-details-page *ngIf="pageType == PageType.USER" [user]="user"></app-user-details-page>
-    <app-catalog-details *ngIf="pageType == PageType.CATALOG" [catalog]="catalog"></app-catalog-details>
+    <app-catalog-details
+        (onCatalogUpdate)="updateCatalog($event)"
+        *ngIf="pageType == PageType.CATALOG"
+        [catalog]="catalog"
+    ></app-catalog-details>
     <app-builder-io
         *ngIf="pageType == PageType.BUILDER_IO_TEMPLATE"
         [apiKey]="builderIOApiKey"

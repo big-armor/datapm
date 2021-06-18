@@ -53,6 +53,7 @@
                                             [disabled]="loading"
                                             [formControl]="contentLabelControl"
                                             placeholder="Content Label"
+                                            (blur)="addOnBlur(valueTypes.contentLabels)"
                                             [matChipInputFor]="chipList"
                                             [matChipInputSeparatorKeyCodes]="CHIP_SEPARATOR_KEY_CODES"
                                             (matChipInputTokenEnd)="add($event, valueTypes.contentLabels)"

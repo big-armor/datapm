@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Catalog, Follow, FollowIdentifierInput, GetFollowGQL, Package, Permission, User } from "src/generated/graphql";
 import { ActivatedRoute, NavigationExtras, Router } from "@angular/router";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
@@ -30,6 +30,9 @@ export class CatalogDetailsComponent implements OnInit {
 
     public catalogFollow: Follow;
     public isFollowing: boolean;
+
+    @Output()
+    public onCatalogUpdate = new EventEmitter<Catalog>();
 
     private unsubscribe$: Subject<any> = new Subject();
     private tabs = ["", "manage"];
@@ -90,6 +93,7 @@ export class CatalogDetailsComponent implements OnInit {
             .subscribe((newCatalog: Catalog) => {
                 if (newCatalog) {
                     this.catalog = newCatalog;
+                    this.onCatalogUpdate.emit(newCatalog);
                 }
             });
     }

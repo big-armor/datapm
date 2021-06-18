@@ -34,67 +34,44 @@
                         </div>
                     </ng-container>
 
-                    <div class="container no-pd-mobile">
-                        <table
-                            aria-describedby="catalogTable"
-                            *ngIf="catalogState === State.SUCCESS && myCatalogs && myCatalogs.length > 0"
-                            mat-table
-                            class="gray-table"
-                            [dataSource]="myCatalogs"
+                    <div class="col-lg-10 col-md-12 no-pd-mobile">
+                        <mat-card
+                            class="box-line my-3"
+                            *ngFor="let catalog of myCatalogs"
+                            [routerLink]="'/' + catalog.identifier.catalogSlug"
                         >
-                            <!-- Label column -->
-                            <ng-container matColumnDef="name">
-                                <th scope="col" mat-header-cell *matHeaderCellDef>Name</th>
-                                <td class="table-content" mat-cell *matCellDef="let catalog">
-                                    <a class="color-info" [routerLink]="['/' + catalog.identifier.catalogSlug]">{{
-                                        catalog.displayName
-                                    }}</a>
-                                </td>
-                            </ng-container>
+                            <mat-card-content>
+                                <div class="d-flex bd-highlight d-flex align-items-center">
+                                    <div class="p-2 flex-grow-1 bd-highlight">
+                                        <div
+                                            [class.public-text]="catalog?.isPublic"
+                                            [class.not-public-text]="!catalog?.isPublic"
+                                        >
+                                            {{ catalog.isPublic ? "public" : "not public" }}
+                                        </div>
+                                        <a class="box-name">{{ catalog.displayName }}</a>
+                                        <div class="text-light-gray">{{ catalog.description }}</div>
+                                    </div>
+                                    <div class="p-2 bd-highlight">
+                                        <span class="mr-2">{{ catalogPermission(catalog) }} Permission</span>
 
-                            <ng-container matColumnDef="permission">
-                                <th scope="col" mat-header-cell *matHeaderCellDef>Permission</th>
-                                <td class="table-content" mat-cell *matCellDef="let catalog">
-                                    {{ catalogPermission(catalog) }}
-                                </td>
-                            </ng-container>
-
-                            <ng-container matColumnDef="public">
-                                <th scope="col" mat-header-cell *matHeaderCellDef>Public</th>
-                                <td class="table-content" mat-cell *matCellDef="let catalog">
-                                    <mat-slide-toggle
-                                        class="app-slide-toggle"
-                                        [checked]="catalog.isPublic"
-                                        [disabled]="!catalog.myPermissions.includes(Permission.MANAGE)"
-                                        (change)="updateCatalogVisibility(catalog, $event)"
-                                    >
-                                    </mat-slide-toggle>
-                                </td>
-                            </ng-container>
-
-                            <!-- Actions column -->
-                            <ng-container matColumnDef="actions">
-                                <th scope="col" mat-header-cell *matHeaderCellDef>Actions</th>
-                                <td mat-cell *matCellDef="let catalog">
-                                    <a
-                                        class="app-outlined-button mr-3"
-                                        [class.disabled]="!canModifyCatalog(catalog)"
-                                        (click)="editCatalog(catalog)"
-                                        >Edit</a
-                                    >
-                                    <a
-                                        class="app-outlined-button"
-                                        [class.disabled]="!canManageCatalog(catalog)"
-                                        (click)="deleteCatalog(catalog)"
-                                    >
-                                        <span class="delete-txt">Delete</span>
-                                    </a>
-                                </td>
-                            </ng-container>
-
-                            <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-                            <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
-                        </table>
+                                        <a
+                                            class="app-outlined-button mr-2"
+                                            [class.disabled]="!canModifyCatalog(catalog)"
+                                            (click)="editCatalog($event, catalog)"
+                                            >Edit</a
+                                        >
+                                        <a
+                                            class="app-outlined-button"
+                                            [class.disabled]="!canModifyCatalog(catalog)"
+                                            (click)="deleteCatalog($event, catalog)"
+                                        >
+                                            <span class="delete-txt">Delete</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </mat-card-content>
+                        </mat-card>
                         <div class="loading-container" *ngIf="catalogState === State.LOADING">
                             <mat-spinner [diameter]="40"></mat-spinner>
                         </div>

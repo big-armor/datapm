@@ -134,6 +134,7 @@ export class PackagePermissionComponent implements OnInit {
     public movePackage(): void {
         this.dialog.open(MovePackageComponent, {
             width: "550px",
+            disableClose: true,
             data: {
                 packageObject: this.package,
                 hasOtherUsers: this.users.length > 1
