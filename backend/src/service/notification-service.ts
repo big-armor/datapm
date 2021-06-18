@@ -67,7 +67,17 @@ export async function monthlyNotifications() {
 async function prepareAndSendNotifications(stateKey: string, frequency: NotificationFrequency) {
     const result = await databaseConnection?.getCustomRepository(PlatformStateRepository).findStateByKey(stateKey);
 
-    let lastNotificationDate = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
+    let lastNotificationDate = new Date();
+
+    if (frequency == NotificationFrequency.DAILY) {
+        lastNotificationDate = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
+    } else if (frequency === NotificationFrequency.HOURLY) {
+        lastNotificationDate = new Date(new Date().getTime() - 1 * 60 * 60 * 1000);
+    } else if (frequency === NotificationFrequency.WEEKLY) {
+        lastNotificationDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000);
+    } else if (frequency === NotificationFrequency.MONTHLY) {
+        lastNotificationDate = new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000);
+    }
 
     if (result) {
         lastNotificationDate = new Date(result.serializedState);

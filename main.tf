@@ -252,11 +252,11 @@ resource "google_cloud_run_service" "default" {
         }
 
         env {
-          name = "SCHEDULER_KEY"
+          name  = "SCHEDULER_KEY"
           value = random_password.scheduler_key.result
         }
         env {
-          name = "LEADER_ELECTION_DISABLED"
+          name  = "LEADER_ELECTION_DISABLED"
           value = "true"
         }
       }
