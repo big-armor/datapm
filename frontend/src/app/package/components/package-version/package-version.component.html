@@ -8,43 +8,63 @@
     <table style="width: 100%">
         <tbody>
             <ng-container *ngFor="let version of displayedVersions">
-                <tr>
-                    <td class="text-dark-gray pt-3">
-                        <span class="weight-500">{{ version.identifier | version }}</span>
-                    </td>
-                    <td class="text-light-gray text-right pt-3">
+                <div class="d-flex bd-highlight second-tr">
+                    <div class="bd-highlight">
                         <div class="d-flex flex-column bd-highlight">
                             <div class="bd-highlight">
-                                <app-avatar
-                                    [user]="version.author"
-                                    [routerLink]="'/' + version.author.username"
-                                    [size]="17"
-                                >
-                                </app-avatar>
-                                <span class="ml-1" style="position: relative; bottom: 4px">{{
-                                    version.author.username
-                                }}</span>
+                                <tr>
+                                    <td class="text-dark-gray" colspan="2">
+                                        <span class="weight-500">{{ version.identifier | version }}</span>
+                                    </td>
+                                </tr>
                             </div>
-                            <div class="bd-highlight">{{ version.createdAt | timeAgo }}</div>
+                            <div class="bd-highlight">
+                                <tr>
+                                    <td class="pb-1">
+                                        <ul class="history-ul">
+                                            <li *ngFor="let change of version.changes" class="text-dark-gray">
+                                                {{ change.changeLabel }}
+                                                <span *ngIf="change.changeFieldName"
+                                                    >"{{ change.changeFieldName }}"</span
+                                                >
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </div>
                         </div>
-                    </td>
-                </tr>
-                <tr class="second-tr">
-                    <td colspan="2">
-                        <ul>
-                            <li *ngFor="let change of version.changes" class="text-dark-gray">
-                                {{ change.changeLabel }}
-                                <span *ngIf="change.changeFieldName">"{{ change.changeFieldName }}"</span>
-                            </li>
-                        </ul>
-                    </td>
-                </tr>
+                    </div>
+                    <div class="ml-auto bd-highlight">
+                        <td class="text-light-gray text-right pb-2">
+                            <div class="d-flex flex-column bd-highlight">
+                                <div class="bd-highlight">
+                                    <app-avatar
+                                        [user]="version.author"
+                                        [routerLink]="'/' + version.author.username"
+                                        [size]="18"
+                                    >
+                                    </app-avatar>
+                                    <span class="ml-1" style="position: relative; bottom: 6px">{{
+                                        version.author.username
+                                    }}</span>
+                                </div>
+                                <div class="bd-highlight">{{ version.createdAt | timeAgo }}</div>
+                            </div>
+                        </td>
+                    </div>
+                </div>
             </ng-container>
         </tbody>
     </table>
-    <a href="javascript::void(0)" *ngIf="hasMoreDifferences" style="font-weight: 400" (click)="displayMoreDifferences()"
-        >display more</a
-    >
+    <div class="text-center mt-3">
+        <a
+            href="javascript::void(0)"
+            *ngIf="hasMoreDifferences"
+            (click)="displayMoreDifferences()"
+            class="app-outlined-button"
+            >display more</a
+        >
+    </div>
 </div>
 <div class="pb-5" id="errorLoading" *ngIf="state == State.ERROR">
     <span class="text-dark-gray"
