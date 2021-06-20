@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from "@angular/core";
 import { Catalog, Follow, FollowIdentifierInput, GetFollowGQL, Package, Permission, User } from "src/generated/graphql";
 import { ActivatedRoute, NavigationExtras, Router } from "@angular/router";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
@@ -20,7 +20,7 @@ import { AuthenticationService } from "src/app/services/authentication.service";
     templateUrl: "./catalog-details.component.html",
     styleUrls: ["./catalog-details.component.scss"]
 })
-export class CatalogDetailsComponent implements OnInit {
+export class CatalogDetailsComponent implements OnInit, OnDestroy {
     @Input()
     public catalog: Catalog;
     public state: PageState | "CATALOG_NOT_FOUND" | "NOT_AUTHENTICATED" = "INIT";
@@ -35,7 +35,9 @@ export class CatalogDetailsComponent implements OnInit {
     public onCatalogUpdate = new EventEmitter<Catalog>();
 
     private unsubscribe$: Subject<any> = new Subject();
-    private tabs = ["", "manage"];
+    private tabs = [""];
+
+    private ignoreFragments = ["catalogs"];
 
     constructor(
         private dialog: MatDialog,
@@ -44,18 +46,7 @@ export class CatalogDetailsComponent implements OnInit {
         private dialogService: DialogService,
         private getFollowGQL: GetFollowGQL,
         private authenticationService: AuthenticationService
-    ) {
-        this.route.fragment.pipe(takeUntil(this.unsubscribe$)).subscribe((fragment: string) => {
-            const index = this.tabs.findIndex((tab) => tab === fragment);
-            if (index < 0) {
-                this.currentTab = 0;
-                this.updateTabParam();
-            } else {
-                this.currentTab = index;
-                this.updateTabParam();
-            }
-        });
-    }
+    ) {}
 
     public updateTabParam() {
         const tab = this.tabs[this.currentTab];
@@ -67,6 +58,8 @@ export class CatalogDetailsComponent implements OnInit {
             extras.fragment = tab;
         }
 
+        console.log(tab);
+
         this.router.navigate(["."], extras);
     }
 
@@ -74,12 +67,28 @@ export class CatalogDetailsComponent implements OnInit {
         this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
             this.currentUser = user;
         });
+        if (this.canEdit) {
+            this.tabs.push("manage");
+        }
+
+        this.route.fragment.pipe(takeUntil(this.unsubscribe$)).subscribe((fragment: string) => {
+            const index = this.tabs.findIndex((tab) => tab === fragment);
+            if (index < 0) {
+                if (!this.ignoreFragments.includes(fragment)) {
+                    this.currentTab = 0;
+                    this.updateTabParam();
+                }
+            } else {
+                this.currentTab = index;
+                this.updateTabParam();
+            }
+        });
 
         this.state = "LOADING";
         this.getFollow();
     }
 
-    ngOnDestroy(): void {
+    public ngOnDestroy(): void {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
     }
