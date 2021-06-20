@@ -17,6 +17,7 @@ import { PackageRepository } from "../repository/PackageRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { createActivityLog } from "../repository/ActivityLogRepository";
+import { PackageEntity } from "../entity/PackageEntity";
 
 export const getPackageIssue = async (
     _0: any,
@@ -80,7 +81,8 @@ export const deletePackageIssue = async (
         await createActivityLog(transaction, {
             userId: context!.me!.id,
             eventType: ActivityLogEventType.PACKAGE_ISSUE_DELETED,
-            targetPackageIssueId: issue.id
+            targetPackageIssueId: issue.id,
+            targetCatalogId: packageEntity.id
         });
     });
 };
@@ -191,7 +193,8 @@ export const createPackageIssue = async (
         await createActivityLog(transaction, {
             userId: context!.me!.id,
             eventType: ActivityLogEventType.PACKAGE_ISSUE_CREATED,
-            targetPackageIssueId: savedIssueEntity.id
+            targetPackageIssueId: savedIssueEntity.id,
+            targetPackageId: packageEntity.id
         });
 
         return savedIssueEntity;
@@ -212,7 +215,10 @@ export const updatePackageIssue = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const issueEntity = await getIssueEntity(context, packageIdentifier, issueIdentifier);
+    const packageEntity = await context.connection.manager
+        .getCustomRepository(PackageRepository)
+        .findPackageOrFail({ identifier: packageIdentifier });
+    const issueEntity = await getIssueEntityWithPackage(context, packageEntity, issueIdentifier);
 
     const canEditIssue = await hasPermissionsToEditIssue(issueEntity, packageIdentifier, context);
     if (!canEditIssue) {
@@ -229,7 +235,8 @@ export const updatePackageIssue = async (
         await createActivityLog(transaction, {
             userId: context!.me!.id,
             eventType: ActivityLogEventType.PACKAGE_ISSUE_EDIT,
-            targetPackageIssueId: savedIssueEntity.id
+            targetPackageIssueId: savedIssueEntity.id,
+            targetPackageId: packageEntity.id
         });
 
         return savedIssueEntity;
@@ -250,7 +257,10 @@ export const updatePackageIssueStatus = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const issueEntity = await getIssueEntity(context, packageIdentifier, issueIdentifier);
+    const packageEntity = await context.connection.manager
+        .getCustomRepository(PackageRepository)
+        .findPackageOrFail({ identifier: packageIdentifier });
+    const issueEntity = await getIssueEntityWithPackage(context, packageEntity, issueIdentifier);
 
     const canEditIssue = await hasPermissionsToEditIssue(issueEntity, packageIdentifier, context);
     if (!canEditIssue) {
@@ -267,7 +277,8 @@ export const updatePackageIssueStatus = async (
             await createActivityLog(transaction, {
                 userId: context!.me!.id,
                 eventType: ActivityLogEventType.PACKAGE_ISSUE_CLOSED,
-                targetPackageIssueId: savedIssueEntity.id
+                targetPackageIssueId: savedIssueEntity.id,
+                targetPackageId: packageEntity.id
             });
         }
 
@@ -311,7 +322,8 @@ export const updatePackageIssuesStatuses = async (
                 await createActivityLog(transaction, {
                     userId: context!.me!.id,
                     eventType: ActivityLogEventType.PACKAGE_ISSUE_CLOSED,
-                    targetPackageIssueId: issue.id
+                    targetPackageIssueId: issue.id,
+                    targetPackageId: packageEntity.id
                 });
             }
         });
@@ -353,7 +365,8 @@ export const deletePackageIssues = async (
             await createActivityLog(transaction, {
                 userId: context!.me!.id,
                 eventType: ActivityLogEventType.PACKAGE_ISSUE_DELETED,
-                targetPackageIssueId: issueId
+                targetPackageIssueId: issueId,
+                targetPackageId: packageEntity.id
             });
         });
     });
@@ -368,6 +381,14 @@ async function getIssueEntity(
         .getCustomRepository(PackageRepository)
         .findPackageOrFail({ identifier: packageIdentifier });
 
+    return getIssueEntityWithPackage(context, packageEntity, issueIdentifier);
+}
+
+async function getIssueEntityWithPackage(
+    context: any,
+    packageEntity: PackageEntity,
+    issueIdentifier: PackageIssueIdentifierInput
+) {
     const issueRepository = context.connection.manager.getCustomRepository(PackageIssueRepository);
     return await issueRepository.getByIssueNumberForPackage(packageEntity.id, issueIdentifier.issueNumber);
 }

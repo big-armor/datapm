@@ -229,15 +229,16 @@ export const myFollowingActivity = async (
     _0: any,
     { offset, limit }: { offset: number; limit: number },
     context: AuthenticatedContext,
-    _info: any
+    info: any
 ): Promise<any> => {
+    const relations = getRelationNames(graphqlFields(info).logs);
     const [logs, count] = await context.connection.manager
         .getCustomRepository(ActivityLogRepository)
-        .getUserFollowingActivity(context.me.id, limit, offset);
+        .getUserFollowingActivity(context.me.id, offset, limit, relations);
     return {
         logs,
         count,
-        hasMore: logs.length < count
+        hasMore: count - (limit + offset) > 0
     };
 };
 
@@ -266,10 +267,6 @@ export const logPackage = async (
     context: AuthenticatedContext,
     info: any
 ): Promise<Package | null> => {
-    if (parent.targetPackage) {
-        return parent.targetPackage;
-    }
-
     const cachedLog = await getActivityLogFromCacheOrDbByIdOrFail(context, context.connection, parent.id, false, [
         "targetPackage"
     ]);
@@ -294,10 +291,6 @@ export const logPackageIssue = async (
     context: AuthenticatedContext,
     info: any
 ): Promise<PackageIssue | null> => {
-    if (parent.targetPackageIssue) {
-        return parent.targetPackageIssue;
-    }
-
     const cachedLog = await getActivityLogFromCacheOrDbByIdOrFail(context, context.connection, parent.id, false, [
         "targetPackageIssue"
     ]);
@@ -322,10 +315,6 @@ export const logCatalog = async (
     context: AuthenticatedContext,
     info: any
 ): Promise<Catalog | null> => {
-    if (parent.targetCatalog) {
-        return parent.targetCatalog;
-    }
-
     const cachedLog = await getActivityLogFromCacheOrDbByIdOrFail(context, context.connection, parent.id, false, [
         "targetCatalog"
     ]);
@@ -350,10 +339,6 @@ export const logCollection = async (
     context: AuthenticatedContext,
     info: any
 ): Promise<Collection | null> => {
-    if (parent.targetCollection) {
-        return parent.targetCollection;
-    }
-
     const cachedLog = await getActivityLogFromCacheOrDbByIdOrFail(context, context.connection, parent.id, false, [
         "targetCollection"
     ]);

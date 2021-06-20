@@ -2,6 +2,7 @@ import { Connection, EntityManager, EntityRepository, In, Repository } from "typ
 import { ActivityLogEntity } from "../entity/ActivityLogEntity";
 import { CatalogEntity } from "../entity/CatalogEntity";
 import { CollectionEntity } from "../entity/CollectionEntity";
+import { FollowEntity } from "../entity/FollowEntity";
 import { PackageEntity } from "../entity/PackageEntity";
 import { UserEntity } from "../entity/UserEntity";
 import { VersionEntity } from "../entity/VersionEntity";
@@ -160,112 +161,98 @@ export class ActivityLogRepository extends Repository<ActivityLogEntity> {
 
     async getUserFollowingActivity(
         userId: number,
-        limit: number,
         offset: number,
+        limit: number,
         relations?: string[]
     ): Promise<[ActivityLogEntity[], number]> {
         if (relations == null) {
             relations = [];
         }
 
-        if (!relations?.includes("targetCollection")) {
-            relations.push("targetCollection");
-        }
-
-        const alias = "AuditLog";
-        // return await this.manager.query(updatesQuery, [userId, limit, offset]);
-        // return await this.manager.createQueryBuilder()
-        //     .innerJoin(alias, "f", "f.", {}).getMany();
-        // (updatesQuery, [userId, limit, offset]);
-
-        const logs = [
-            {
-                id: 1,
-                user: {
-                    username: "ermali",
-                    firstName: "Ermal",
-                    lastName: "Ferati"
-                },
-                targetPackageId: 16,
-                eventType: ActivityLogEventType.PACKAGE_CREATED,
-                createdAt: new Date(),
-                updatedAt: new Date()
-            } as ActivityLogEntity,
-            {
-                id: 2,
-                user: {
-                    username: "ermali",
-                    firstName: "Ermal",
-                    lastName: "Ferati",
-                    nameIsPublic: true
-                },
-                targetCatalogId: 1,
-                eventType: ActivityLogEventType.CATALOG_CREATED,
-                createdAt: new Date(),
-                updatedAt: new Date()
-            } as ActivityLogEntity,
-            {
-                id: 3,
-                user: {
-                    username: "ermali2",
-                    firstName: "Ermal2",
-                    lastName: "Ferati",
-                    nameIsPublic: true
-                },
-                targetCollectionId: 19,
-                eventType: ActivityLogEventType.COLLECTION_CREATED,
-                createdAt: new Date(),
-                updatedAt: new Date()
-            } as ActivityLogEntity,
-            {
-                id: 4,
-                user: {
-                    username: "ermali1",
-                    firstName: "Ermal1",
-                    lastName: "Ferati",
-                    nameIsPublic: true
-                },
-                targetPackageIssueId: 1,
-                eventType: ActivityLogEventType.PACKAGE_ISSUE_CREATED,
-                createdAt: new Date(),
-                updatedAt: new Date()
-            } as ActivityLogEntity
-        ];
-        // return Promise.resolve([logs, logs.length]);
-        return this.createQueryBuilder()
-            .where({
-                userId: 1,
-                eventType: In([
-                    ActivityLogEventType.COLLECTION_PACKAGE_ADDED,
-                    ActivityLogEventType.COLLECTION_PACKAGE_REMOVED,
-                    ActivityLogEventType.PACKAGE_CREATED,
-                    ActivityLogEventType.PACKAGE_DELETED,
-                    ActivityLogEventType.COLLECTION_CREATED,
-                    ActivityLogEventType.COLLECTION_DELETED,
-                    ActivityLogEventType.CATALOG_CREATED,
-                    ActivityLogEventType.CATALOG_DELETED,
-                    ActivityLogEventType.CATALOG_DELETED,
-                    ActivityLogEventType.PACKAGE_ISSUE_CREATED,
-                    ActivityLogEventType.PACKAGE_ISSUE_DELETED,
-                    ActivityLogEventType.PACKAGE_ISSUE_CLOSED,
-                    ActivityLogEventType.PACKAGE_ISSUE_COMMENT_CREATED
-                ])
-            })
+        const alias = "ActivityLog";
+        const wow = this.manager
+            .getRepository(ActivityLogEntity)
+            .createQueryBuilder(alias)
+            .distinctOn(["id"])
+            .innerJoin(
+                (sb) => sb.select('"f".*').from(FollowEntity, "f").where('"f"."user_id" = :userId'),
+                "Follow",
+                `"ActivityLog"."event_type" IN (SELECT * FROM unnest("Follow"."event_types"))
+                AND
+                CASE
+                    WHEN "Follow"."target_collection_id" IS NOT NULL THEN
+                        (
+                            (SELECT c.is_public FROM collection c WHERE c.id = "ActivityLog".target_collection_id) IS TRUE
+                            OR EXISTS (SELECT cu.collection_id FROM collection_user cu WHERE "ActivityLog".target_collection_id = cu.collection_id AND cu.user_id = "Follow".user_id)
+                        )
+                    WHEN "Follow".target_catalog_id IS NOT NULL THEN
+                        (
+                            (SELECT c."isPublic" FROM catalog c WHERE c.id = "ActivityLog".target_catalog_id) IS TRUE
+                            OR EXISTS (SELECT cu.catalog_id FROM user_catalog cu WHERE "ActivityLog".target_catalog_id = cu.catalog_id AND cu.user_id = "Follow".user_id)
+                        )
+                    END
+                AND (
+                    CASE
+                        WHEN "ActivityLog".target_package_id IS NULL THEN TRUE
+                        ELSE
+                            (SELECT pkg."isPublic" FROM package pkg WHERE pkg.id = "ActivityLog".target_package_id) IS TRUE
+                            OR EXISTS (SELECT pu.package_id FROM user_package_permission pu WHERE "ActivityLog".target_package_id = pu.package_id AND pu.user_id = "Follow".user_id)
+                    END
+                )`
+            )
+            .setParameter("userId", userId)
+            .orderBy('"ActivityLog"."created_at"', "DESC")
             .offset(offset)
             .limit(limit)
-            .orderBy('"ActivityLogEntity"."created_at"', "DESC")
+            .addRelations(alias, relations);
+
+        console.log(wow.getQuery());
+        return await this.manager
+            .getRepository(ActivityLogEntity)
+            .createQueryBuilder(alias)
+            .distinct(true)
+            .innerJoin(
+                (sb) => sb.select('"f".*').from(FollowEntity, "f").where('"f"."user_id" = :userId'),
+                "Follow",
+                `"ActivityLog"."event_type" IN (SELECT * FROM unnest("Follow"."event_types"))
+                AND
+                CASE
+                    WHEN "Follow"."target_collection_id" IS NOT NULL THEN
+                        (
+                            (SELECT c.is_public FROM collection c WHERE c.id = "ActivityLog".target_collection_id) IS TRUE
+                            OR EXISTS (SELECT cu.collection_id FROM collection_user cu WHERE "ActivityLog".target_collection_id = cu.collection_id AND cu.user_id = "Follow".user_id)
+                        )
+                    WHEN "Follow".target_catalog_id IS NOT NULL THEN
+                        (
+                            (SELECT c."isPublic" FROM catalog c WHERE c.id = "ActivityLog".target_catalog_id) IS TRUE
+                            OR EXISTS (SELECT cu.catalog_id FROM user_catalog cu WHERE "ActivityLog".target_catalog_id = cu.catalog_id AND cu.user_id = "Follow".user_id)
+                        )
+                    END
+                AND (
+                    CASE
+                        WHEN "ActivityLog".target_package_id IS NULL THEN TRUE
+                        ELSE
+                            (SELECT pkg."isPublic" FROM package pkg WHERE pkg.id = "ActivityLog".target_package_id) IS TRUE
+                            OR EXISTS (SELECT pu.package_id FROM user_package_permission pu WHERE "ActivityLog".target_package_id = pu.package_id AND pu.user_id = "Follow".user_id)
+                    END
+                )`
+            )
+            .setParameter("userId", userId)
+            .orderBy('"ActivityLog"."id"', "DESC")
+            .offset(offset)
+            .limit(limit)
+            .addRelations(alias, relations)
             .getManyAndCount();
     }
 }
 
 const updatesQuery = `
-        SELECT DISTINCT (a.id), a.*
+        SELECT DISTINCT ON (a.id) a.*, u.username, u.first_name, u.last_name
         FROM activity_log a
         JOIN LATERAL (
-            SELECT f.event_types, f.target_collection_id
+            SELECT f.event_types, f.user_id, f.notification_frequency, f.target_catalog_id, f.target_package_id, f.target_collection_id, f.target_package_issue_id, f.target_user_id
             FROM follow f
-            WHERE f.target_collection_id  = a.target_collection_id
-            AND f.user_id = $1
+            WHERE f.user_id = $1
             AND a.event_type IN (SELECT * FROM unnest(f.event_types))
             AND
             CASE
@@ -295,7 +282,7 @@ const updatesQuery = `
                         END
                     )
         ) f ON TRUE
-        ORDER BY a.created_at DESC
-        LIMIT $2
-        OFFSET $3;
+        ORDER BY a.id DESC
+        OFFSET $2
+        LIMIT $3;
 `;
