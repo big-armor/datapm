@@ -12,7 +12,22 @@
                     <td class="text-dark-gray pt-3">
                         <span class="weight-500">{{ version.identifier | version }}</span>
                     </td>
-                    <td class="text-light-gray text-right pt-3">{{ version.createdAt | timeAgo }}</td>
+                    <td class="text-light-gray text-right pt-3">
+                        <div class="d-flex flex-column bd-highlight">
+                            <div class="bd-highlight">
+                                <app-avatar
+                                    [user]="version.author"
+                                    [routerLink]="'/' + version.author.username"
+                                    [size]="17"
+                                >
+                                </app-avatar>
+                                <span class="ml-1" style="position: relative; bottom: 4px">{{
+                                    version.author.username
+                                }}</span>
+                            </div>
+                            <div class="bd-highlight">{{ version.createdAt | timeAgo }}</div>
+                        </div>
+                    </td>
                 </tr>
                 <tr class="second-tr">
                     <td colspan="2">
