@@ -303,7 +303,7 @@ export const deleteFollow = async (
     }
 };
 
-export const deleteAllMyFollows = async (_0: any, {}, context: AuthenticatedContext, info: any): Promise<void> => {
+export const deleteAllMyFollows = async (_0: any, { }, context: AuthenticatedContext, info: any): Promise<void> => {
     const manager = context.connection.manager;
     await manager.getCustomRepository(FollowRepository).deleteAllFollowsByUserId(context.me.id);
 };
@@ -325,7 +325,7 @@ const getPackageEventTypes = (): NotificationEventType[] => {
 };
 
 const getPackageIssueEventTypes = (): NotificationEventType[] => {
-    return [NotificationEventType.PACKAGE_ISSUE_STAUS_CHANGE, NotificationEventType.PACKAGE_ISSUE_COMMENT_ADDED];
+    return [NotificationEventType.PACKAGE_ISSUE_STATUS_CHANGE, NotificationEventType.PACKAGE_ISSUE_COMMENT_ADDED];
 };
 
 const getUserEventTypes = (): NotificationEventType[] => {

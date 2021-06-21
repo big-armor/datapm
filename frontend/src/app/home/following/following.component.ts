@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { TimeAgoPipe } from "src/app/shared/pipes/time-ago.pipe";
 import {
     ActivityLog,
+    ActivityLogChangeType,
     ActivityLogEventType,
     MyFollowingActivityGQL,
     PackageIdentifier,
@@ -43,7 +44,10 @@ export class FollowingComponent implements OnInit {
 
     private offset: number = 0;
 
-    constructor(private myFollowingActivityGQL: MyFollowingActivityGQL, private timeAgoPipe: TimeAgoPipe) {}
+    constructor(
+        private myFollowingActivityGQL: MyFollowingActivityGQL,
+        private timeAgoPipe: TimeAgoPipe
+    ) { }
 
     public ngOnInit(): void {
         this.loadLogs();
@@ -71,6 +75,7 @@ export class FollowingComponent implements OnInit {
                         this.errorLoadingLogs = true;
                         return;
                     }
+
                     const returnedData = data.myFollowingActivity;
                     this.addLogs(returnedData.logs as ActivityLog[]);
                     this.hasMore = returnedData.hasMore;
@@ -119,8 +124,15 @@ export class FollowingComponent implements OnInit {
                 return { changeTypeLabel: "deleted" };
             case ActivityLogEventType.PACKAGE_ISSUE_COMMENT_CREATED:
                 return { changeTypeLabel: "commented on" };
-            case ActivityLogEventType.PACKAGE_ISSUE_CLOSED:
-                return { changeTypeLabel: "closed" };
+            case ActivityLogEventType.PACKAGE_ISSUE_STATUS_CHANGE:
+                switch (log.changeType) {
+                    case ActivityLogChangeType.CLOSED:
+                        return { changeTypeLabel: "closed" };
+                    case ActivityLogChangeType.OPENED:
+                        return { changeTypeLabel: "opened" };
+                    default:
+                        return { changeTypeLabel: "updated" };
+                }
             case ActivityLogEventType.COLLECTION_PACKAGE_ADDED:
                 return { changeTypeLabel: "added", entitiesBinderLabel: "to" };
             case ActivityLogEventType.COLLECTION_PACKAGE_REMOVED:

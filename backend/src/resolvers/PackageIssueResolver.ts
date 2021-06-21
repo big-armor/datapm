@@ -3,6 +3,7 @@ import { resolvePackagePermissions } from "../directive/hasPackagePermissionDire
 import { PackageIssueEntity } from "../entity/PackageIssueEntity";
 import { PackageIssueStatus } from "../entity/PackageIssueStatus";
 import {
+    ActivityLogChangeType,
     ActivityLogEventType,
     CreatePackageIssueInput,
     PackageIdentifierInput,
@@ -276,7 +277,8 @@ export const updatePackageIssueStatus = async (
         if (PackageIssueStatus.CLOSED === status.status) {
             await createActivityLog(transaction, {
                 userId: context!.me!.id,
-                eventType: ActivityLogEventType.PACKAGE_ISSUE_CLOSED,
+                eventType: ActivityLogEventType.PACKAGE_ISSUE_STATUS_CHANGE,
+                changeType: ActivityLogChangeType.CLOSED,
                 targetPackageIssueId: savedIssueEntity.id,
                 targetPackageId: packageEntity.id
             });
@@ -321,7 +323,8 @@ export const updatePackageIssuesStatuses = async (
             if (isClosingIssues) {
                 await createActivityLog(transaction, {
                     userId: context!.me!.id,
-                    eventType: ActivityLogEventType.PACKAGE_ISSUE_CLOSED,
+                    eventType: ActivityLogEventType.PACKAGE_ISSUE_STATUS_CHANGE,
+                    changeType: ActivityLogChangeType.CLOSED,
                     targetPackageIssueId: issue.id,
                     targetPackageId: packageEntity.id
                 });
