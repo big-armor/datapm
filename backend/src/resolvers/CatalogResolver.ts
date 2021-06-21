@@ -403,9 +403,9 @@ export const getCatalogByIdentifier = async (
 
 export const getCatalogFromCacheOrDbById = async (context: Context, catalogId: number, relations: string[] = []) => {
     const catalogPromiseFunction = () =>
-        context.connection.manager
-            .getCustomRepository(CatalogRepository)
-            .findOne(catalogId, { relations }) as Promise<CatalogEntity>;
+        context.connection.manager.getCustomRepository(CatalogRepository).findOne(catalogId, { relations }) as Promise<
+            CatalogEntity
+        >;
 
     return await context.cache.loadCatalog(catalogId, catalogPromiseFunction);
 };
@@ -443,9 +443,9 @@ export const getCatalogFromCacheOrDbBySlug = async (
     relations?: string[]
 ) => {
     const catalogPromiseFunction = () =>
-        connection
-            .getCustomRepository(CatalogRepository)
-            .findCatalogBySlug({ slug, relations }) as Promise<CatalogEntity>;
+        connection.getCustomRepository(CatalogRepository).findCatalogBySlug({ slug, relations }) as Promise<
+            CatalogEntity
+        >;
 
     return await context.cache.loadCatalogBySlug(slug, catalogPromiseFunction);
 };
