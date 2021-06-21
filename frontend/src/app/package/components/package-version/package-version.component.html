@@ -1,7 +1,7 @@
 <div class="pb-5" id="packageVersion" *ngIf="state == State.LOADED">
     <div class="text-main-title">schema history</div>
-    <div class="text-light-gray mt-3" *ngIf="displayedVersions.length > 1">
-        <a href="javascript::void(0)" style="font-weight: 400" (click)="openVersionComparisonModal()"
+    <div *ngIf="displayedVersions.length > 1">
+        <a href="javascript::void(0)" (click)="openVersionComparisonModal()" class="text-dark-gray color-info"
             >Select versions to compare</a
         >
     </div>

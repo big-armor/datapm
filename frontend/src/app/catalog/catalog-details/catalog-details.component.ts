@@ -58,8 +58,6 @@ export class CatalogDetailsComponent implements OnInit, OnDestroy {
             extras.fragment = tab;
         }
 
-        console.log(tab);
-
         this.router.navigate(["."], extras);
     }
 

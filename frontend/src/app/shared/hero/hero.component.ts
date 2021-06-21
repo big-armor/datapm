@@ -42,11 +42,9 @@ export class HeroComponent implements OnInit, OnDestroy, AfterViewInit {
             .subscribe((apiKey) => {
                 const entry = this.builderIOService.getTemplateEntryByPageKey(this.BUILDER_IO_ENTRY_KEY);
                 if (entry) {
-                    console.log("wowz");
                     this.loadJavascriptAndInjectIntoTemplate(apiKey, entry);
                 } else {
                     this.loaded = true;
-                    console.log(" trueeee" + this.loaded);
                 }
             });
     }

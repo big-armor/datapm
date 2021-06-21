@@ -98,7 +98,6 @@ export class AddPackageComponent implements OnInit, OnDestroy {
             })
             .subscribe(({ errors, data }) => {
                 if (errors) {
-                    console.log(errors);
                     return;
                 }
 
