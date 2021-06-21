@@ -197,11 +197,10 @@ describe("Follow Tests", async () => {
 
         expect(response.errors).eq(undefined);
 
-        await verifyEmailPromise.then(() => {
-            expect(userBEmail.text).to.contain("This is your instant");
-            expect(userBEmail.text).to.contain("published  user-a-follow-notification-2/follow-test  version 1.0.0\n");
-            expect(userBEmail.text).to.contain("http://localhost:4200/follow-notification-user-b#user-following");
-        });
+        await verifyEmailPromise;
+        expect(userBEmail.text).to.contain("This is your instant");
+        expect(userBEmail.text).to.contain("published  user-a-follow-notification-2/follow-test  version 1.0.0\n");
+        expect(userBEmail.text).to.contain("http://localhost:4200/follow-notification-user-b#user-following");
     });
 
     it("Should send email after daily notification updates", async () => {
