@@ -221,19 +221,19 @@ jobs:
                   PROJECT_ID: data-test-terraform
                   GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
 
+            - name: Add GCR Revision
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: gcloud run deploy datapm-registry --project datapm-test-terraform --image gcr.io/datapm-test-terraform/datapm-registry --region us-central1 --platform managed
+              env:
+                  PROJECT_ID: data-test-terraform
+                  GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
+
             - name: Terraform Apply
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: terraform apply -auto-approve
               env:
                   TF_VAR_APOLLO_KEY: ${{secrets.TF_VAR_APOLLO_KEY}}
                   TF_VAR_smtp_password: ${{secrets.TF_VAR_SMTP_PASSWORD}}
-                  PROJECT_ID: data-test-terraform
-                  GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
-
-            - name: Add GCR Revision
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-              run: gcloud run deploy datapm-registry --project datapm-test-terraform --image gcr.io/datapm-test-terraform/datapm-registry --region us-central1 --platform managed
-              env:
                   PROJECT_ID: data-test-terraform
                   GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
 
