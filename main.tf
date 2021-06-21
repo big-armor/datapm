@@ -367,6 +367,8 @@ resource "google_cloud_run_domain_mapping" "default" {
 
 resource "google_cloud_scheduler_job" "instant_notifications_job" {
   name             = "datapm-instant-notifications"
+  project          = google_project.project.project_id
+  region           = "us-central1"
   description      = "To invoke sending daily notifications"
   schedule         = "1/1 * * * *"
   time_zone        = "America/New_York"
@@ -385,6 +387,8 @@ resource "google_cloud_scheduler_job" "instant_notifications_job" {
 
 resource "google_cloud_scheduler_job" "hourly_notifications_job" {
   name             = "datapm-hourly-notifications"
+  project          = google_project.project.project_id
+  region           = "us-central1"
   description      = "To invoke sending hourly notifications"
   schedule         = "0 1/1 * * *"
   time_zone        = "America/New_York"
@@ -403,6 +407,8 @@ resource "google_cloud_scheduler_job" "hourly_notifications_job" {
 
 resource "google_cloud_scheduler_job" "daily_notifications_job" {
   name             = "datapm-daily-notifications"
+  project          = google_project.project.project_id
+  region           = "us-central1"
   description      = "To invoke sending daily notifications"
   schedule         = "0 8 * * *"
   time_zone        = "America/New_York"
@@ -421,6 +427,8 @@ resource "google_cloud_scheduler_job" "daily_notifications_job" {
 
 resource "google_cloud_scheduler_job" "weekly_notifications_job" {
   name             = "datapm-weekly-notifications"
+  project          = google_project.project.project_id
+  region           = "us-central1"
   description      = "To invoke sending weekly notifications"
   schedule         = "0 8 * * MON"
   time_zone        = "America/New_York"
@@ -440,6 +448,8 @@ resource "google_cloud_scheduler_job" "weekly_notifications_job" {
 
 resource "google_cloud_scheduler_job" "monthly_notifications_job" {
   name             = "datapm-monthly-notifications"
+  project          = google_project.project.project_id
+  region           = "us-central1"
   description      = "To invoke sending monthly notifications"
   schedule         = "0 8 * * MON"
   time_zone        = "America/New_York"
