@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { CreateCollectionComponent } from "../../create-collection/create-collection.component";
 import { EditCollectionComponent } from "../../edit-collection/edit-collection.component";
-import { Collection, UpdateCollectionGQL, UserCollectionsGQL } from "src/generated/graphql";
+import { Collection, Permission, UpdateCollectionGQL, UserCollectionsGQL } from "src/generated/graphql";
 import { DeleteCollectionComponent } from "../../delete-collection/delete-collection.component";
 import { FewPackagesAlertComponent } from "../few-packages-alert/few-packages-alert.component";
 import { Router } from "@angular/router";
@@ -24,7 +24,7 @@ export class UserCollectionsComponent implements OnInit {
     @Input() isCurrentUser: boolean;
 
     public collections: Collection[] = [];
-    columnsToDisplay = ["name", "public", "actions"];
+    columnsToDisplay = ["name", "permission", "public", "actions"];
     State = State;
     state = State.INIT;
     inputErrors = {
@@ -101,7 +101,8 @@ export class UserCollectionsComponent implements OnInit {
             });
     }
 
-    editCollection(collection: Collection): void {
+    editCollection(ev, collection: Collection): void {
+        ev.stopPropagation();
         this.dialog
             .open(EditCollectionComponent, {
                 data: collection
@@ -116,7 +117,8 @@ export class UserCollectionsComponent implements OnInit {
             });
     }
 
-    deleteCollection(collection: Collection): void {
+    deleteCollection(ev, collection: Collection): void {
+        ev.stopPropagation();
         this.dialog
             .open(DeleteCollectionComponent, {
                 data: {
@@ -129,5 +131,16 @@ export class UserCollectionsComponent implements OnInit {
                     this.loadMyCollections();
                 }
             });
+    }
+
+    collectionPermission(collection: Collection): string {
+        if (collection.myPermissions.includes(Permission.MANAGE)) return "Manage";
+        if (collection.myPermissions.includes(Permission.EDIT)) return "Edit";
+        if (collection.myPermissions.includes(Permission.VIEW)) return "View";
+        return "";
+    }
+
+    public goToCollection(collection: Collection): void {
+        this.router.navigate(["/collection/" + collection.identifier.collectionSlug]);
     }
 }

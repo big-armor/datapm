@@ -148,6 +148,17 @@ describe("Activity Log Tests", async () => {
                 })
             )
         ).to.be.not.undefined;
+
+        expect(
+            serverLogLines.find((l: any) =>
+                findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
+                    return (
+                        activityLogLine.eventType == ActivityLogEventType.CATALOG_PACKAGE_ADDED &&
+                        activityLogLine.targetCatalogSlug == "testOne-packages"
+                    );
+                })
+            )
+        ).to.be.not.undefined;
     });
 
     it("Should show CATALOG_CREATED", async function () {
@@ -940,12 +951,24 @@ describe("Activity Log Tests", async () => {
                 return (
                     activityLogLine.eventType == ActivityLogEventType.PACKAGE_DELETED &&
                     activityLogLine.username == userOne.username &&
-                    activityLogLine.targetPackageIdentifier == "testOne-packages/congressional-legislators"
+                    activityLogLine.targetPackageIdentifier == "testOne-packages/congressional-legislators" &&
+                    activityLogLine.targetCatalogSlug == "testOne-packages"
                 );
             })
         );
 
         expect(line).to.be.not.undefined;
+
+        expect(
+            serverLogLines.find((l: any) =>
+                findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
+                    return (
+                        activityLogLine.eventType == ActivityLogEventType.CATALOG_PACKAGE_REMOVED &&
+                        activityLogLine.targetCatalogSlug == "testOne-packages"
+                    );
+                })
+            )
+        ).to.be.not.undefined;
     });
 
     it("Should show CATALOG_DELETED", async function () {

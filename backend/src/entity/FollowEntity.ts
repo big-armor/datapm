@@ -1,5 +1,5 @@
 import { Entity, Column, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { NotificationEventType, NotificationFrequency } from "../generated/graphql";
+import { ActivityLogEventType, NotificationEventType, NotificationFrequency } from "../generated/graphql";
 import { CatalogEntity } from "./CatalogEntity";
 import { CollectionEntity } from "./CollectionEntity";
 import { EntityBaseModel } from "./EntityBaseModel";
@@ -22,11 +22,7 @@ export class FollowEntity extends EntityBaseModel {
     })
     public notificationFrequency: NotificationFrequency;
 
-    @Column({
-        name: "event_types",
-        array: true,
-        type: "varchar"
-    })
+    @Column("enum", { array: true, name: "event_types", enum: ActivityLogEventType })
     public eventTypes: NotificationEventType[];
 
     @Column({ name: "target_catalog_id" })

@@ -1,7 +1,7 @@
 <div class="container" id="followDialog">
     <div class="row">
         <div class="col-md-12 p-0">
-            <div mat-dialog-title id="contentTitle">Following Options</div>
+            <div mat-dialog-title id="contentTitle">Following</div>
             <div mat-dialog-content id="contentBorder">
                 <p class="text-dark-gray">Notification Frequency:</p>
                 <mat-form-field appearance="fill" floatLabel="never">
@@ -11,15 +11,21 @@
                         </mat-option>
                     </mat-select>
                 </mat-form-field>
+
+                <div class="alert-div">
+                    <div class="alert-warn" *ngIf="submitState == 'ERROR'">
+                        There was a problem communicating with the server. Please try again, or contact support.
+                    </div>
+                </div>
             </div>
             <div mat-dialog-actions class="d-flex justify-content-between pb-3 pt-2">
-                <button *ngIf="isFollowing" (click)="deleteFollow()" mat-button type="submit" class="save-btn">
+                <button *ngIf="isFollowing" (click)="deleteFollow()" mat-button type="submit" class="modal-close-btn">
                     <span>Unfollow</span>
                 </button>
-                <button *ngIf="!isFollowing" (click)="close()" mat-button type="submit" class="save-btn">
+                <button *ngIf="!isFollowing" (click)="close()" mat-button type="submit" class="modal-close-btn">
                     <span>Cancel</span>
                 </button>
-                <button mat-button type="submit" class="save-btn" (click)="save()">
+                <button mat-button type="submit" class="modal-submit-btn" (click)="save()">
                     <span>Save</span>
                 </button>
             </div>

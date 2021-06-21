@@ -23,12 +23,6 @@ export class ConfirmationDialogService {
         return this.dialog.open(UserStatusChangeConfirmationDialogComponent, matDialogConfig).afterClosed();
     }
 
-    public openFollowDeleteConfirmationDialog(): Observable<UserStatusChangeDialogResponse> {
-        const data = { title: "Delete follow", content: "Are you sure you want to unfollow?" };
-        const matDialogConfig = this.buildDialogConfig(data, DialogSize.SMALL);
-        return this.dialog.open(FancyConfirmationDialogComponent, matDialogConfig).afterClosed();
-    }
-
     public openFancyConfirmationDialog(config: ConfirmationDialogConfig): Observable<boolean> {
         const matDialogConfig = this.buildDialogConfig(config.data, config.size);
         return this.dialog

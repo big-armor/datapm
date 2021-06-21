@@ -250,6 +250,15 @@ resource "google_cloud_run_service" "default" {
           name  = "ACTIVITY_LOG"
           value = "true"
         }
+
+        env {
+          name  = "SCHEDULER_KEY"
+          value = random_password.scheduler_key.result
+        }
+        env {
+          name  = "LEADER_ELECTION_DISABLED"
+          value = "true"
+        }
       }
     }
 
@@ -281,6 +290,12 @@ resource "google_cloud_run_service_iam_policy" "noauth" {
   service  = google_cloud_run_service.default.name
 
   policy_data = data.google_iam_policy.noauth.policy_data
+}
+
+resource "random_password" "scheduler_key" {
+  length           = 16
+  special          = true
+  override_special = "_%@"
 }
 
 resource "random_password" "jwt_key" {
@@ -346,5 +361,107 @@ resource "google_cloud_run_domain_mapping" "default" {
 
   spec {
     route_name = google_cloud_run_service.default.name
+  }
+}
+
+
+resource "google_cloud_scheduler_job" "instant_notifications_job" {
+  name             = "datapm-instant-notifications"
+  project          = google_project.project.project_id
+  region           = "us-central1"
+  description      = "To invoke sending daily notifications"
+  schedule         = "1/1 * * * *"
+  time_zone        = "America/New_York"
+  attempt_deadline = "320s"
+
+  retry_config {
+    retry_count = 1
+  }
+
+  http_target {
+    http_method = "POST"
+    uri         = "https://test.datapm.io/graphql"
+    body        = base64encode("{ \"query\":\"mutation { runJob(key: \"${random_password.scheduler_key.result}\", job: \"INSTANT_NOTIFICATIONS\") }\" }")
+  }
+}
+
+resource "google_cloud_scheduler_job" "hourly_notifications_job" {
+  name             = "datapm-hourly-notifications"
+  project          = google_project.project.project_id
+  region           = "us-central1"
+  description      = "To invoke sending hourly notifications"
+  schedule         = "0 1/1 * * *"
+  time_zone        = "America/New_York"
+  attempt_deadline = "320s"
+
+  retry_config {
+    retry_count = 1
+  }
+
+  http_target {
+    http_method = "POST"
+    uri         = "https://test.datapm.io/graphql"
+    body        = base64encode("{ \"query\":\"mutation { runJob(key: \"${random_password.scheduler_key.result}\", job: \"HOURLY_NOTIFICATIONS\") }\" }")
+  }
+}
+
+resource "google_cloud_scheduler_job" "daily_notifications_job" {
+  name             = "datapm-daily-notifications"
+  project          = google_project.project.project_id
+  region           = "us-central1"
+  description      = "To invoke sending daily notifications"
+  schedule         = "0 8 * * *"
+  time_zone        = "America/New_York"
+  attempt_deadline = "320s"
+
+  retry_config {
+    retry_count = 1
+  }
+
+  http_target {
+    http_method = "POST"
+    uri         = "https://test.datapm.io/graphql"
+    body        = base64encode("{ \"query\":\"mutation { runJob(key: \"${random_password.scheduler_key.result}\", job: \"DAILY_NOTIFICATIONS\") }\" }")
+  }
+}
+
+resource "google_cloud_scheduler_job" "weekly_notifications_job" {
+  name             = "datapm-weekly-notifications"
+  project          = google_project.project.project_id
+  region           = "us-central1"
+  description      = "To invoke sending weekly notifications"
+  schedule         = "0 8 * * MON"
+  time_zone        = "America/New_York"
+  attempt_deadline = "320s"
+
+  retry_config {
+    retry_count = 1
+  }
+
+  http_target {
+    http_method = "POST"
+    uri         = "https://test.datapm.io/graphql"
+    body        = base64encode("{ \"query\":\"mutation { runJob(key: \"${random_password.scheduler_key.result}\", job: \"WEEKLY_NOTIFICATIONS\") }\" }")
+  }
+}
+
+
+resource "google_cloud_scheduler_job" "monthly_notifications_job" {
+  name             = "datapm-monthly-notifications"
+  project          = google_project.project.project_id
+  region           = "us-central1"
+  description      = "To invoke sending monthly notifications"
+  schedule         = "0 8 * * MON"
+  time_zone        = "America/New_York"
+  attempt_deadline = "320s"
+
+  retry_config {
+    retry_count = 1
+  }
+
+  http_target {
+    http_method = "POST"
+    uri         = "https://test.datapm.io/graphql"
+    body        = base64encode("{ \"query\":\"mutation { runJob(key: \"${random_password.scheduler_key.result}\", job: \"MONTHLY_NOTIFICATIONS\") }\" }")
   }
 }

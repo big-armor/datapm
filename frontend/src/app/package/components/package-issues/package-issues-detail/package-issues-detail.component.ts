@@ -1,9 +1,9 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
 import { combineLatest, Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
+import { skip, take, takeUntil } from "rxjs/operators";
 import { PackageService } from "src/app/package/services/package.service";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { ConfirmationDialogService } from "src/app/services/dialog/confirmation-dialog.service";
@@ -60,7 +60,7 @@ interface PackageIssueCommentWithEditorStatus extends PackageIssueComment {
     templateUrl: "./package-issues-detail.component.html",
     styleUrls: ["./package-issues-detail.component.scss"]
 })
-export class PackageIssuesDetailComponent implements OnInit {
+export class PackageIssuesDetailComponent implements OnInit, OnDestroy {
     public readonly State = State;
     private readonly COMMENTS_TO_LOAD_PER_PAGE = 100;
 
@@ -129,6 +129,11 @@ export class PackageIssuesDetailComponent implements OnInit {
         this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
             this.currentUser = user;
         });
+    }
+
+    public ngOnDestroy(): void {
+        this.unsubscribe$.next();
+        this.unsubscribe$.complete();
     }
 
     public openSignUpDialog(): void {
@@ -249,7 +254,13 @@ export class PackageIssuesDetailComponent implements OnInit {
                         })
                         .subscribe((response) => {
                             if (!response.errors) {
-                                this.router.navigate(["../"], { relativeTo: this.route });
+                                this.packageService.package
+                                    .pipe(takeUntil(this.unsubscribe$), skip(1))
+                                    .subscribe((pkg) => this.router.navigate(["../"], { relativeTo: this.route }));
+                                this.packageService.getPackage(
+                                    this.packageIdentifier.catalogSlug,
+                                    this.packageIdentifier.packageSlug
+                                );
                             }
                         });
                 }

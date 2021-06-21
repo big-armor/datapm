@@ -147,7 +147,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     public logout(): void {
         this.authenticationService.logout();
         setTimeout(() => (this.currentUser = null), 500);
-        this.router.navigate(["/"]);
+        window.location.reload();
     }
 
     public autoCompleteOptionSelected(event): void {

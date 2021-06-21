@@ -33,6 +33,8 @@ services:
       - REGISTRY_URL=http://localhost:4000
       - JWT_KEY=!!!!REPLACE_ME!!!
       - JWT_AUDIENCE=localhost
+      - SCHEDULER_KEY="!!!!REPLACE_ME!!!!"
+      - LEADER_ELECTION_DISABLED=false
       - JWT_ISSUER=localhost
       - STORAGE_URL="file:///var/lib/datapm-registry/data"
       - TYPEORM_IS_DIST=true

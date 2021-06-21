@@ -205,6 +205,8 @@ import {
     savePlatformSettings
 } from "./resolvers/PlatformSettingsResolver";
 
+import { runJob } from "./resolvers/JobResolver";
+
 export const getPageContentByRoute = async (
     _0: any,
     { route }: { route: string },
@@ -680,6 +682,8 @@ export const resolvers: {
         deleteAllMyFollows: deleteAllMyFollows,
 
         savePlatformSettings: savePlatformSettings,
+
+        runJob,
 
         track: (_, { actions }, context: Context) => mixpanel.track(actions, context.request)
     }

@@ -1,5 +1,11 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { ConfirmationDialogService } from "src/app/services/dialog/confirmation-dialog.service";
+import {
+    FollowDialogComponent,
+    FollowDialogData,
+    FollowDialogResult
+} from "src/app/shared/dialogs/follow-dialog/follow-dialog.component";
 import {
     DeleteFollowGQL,
     Follow,
@@ -17,12 +23,9 @@ import { FollowStats } from "../user-following.component";
 })
 export class UserTypeFollowingComponent implements OnInit {
     public readonly NotificationFrequency = NotificationFrequency;
-    public readonly NOTIFICATION_FREQUENCIES: NotificationFrequency[] = Object.values(NotificationFrequency).filter(
-        (f) => NotificationFrequency.NEVER != f
-    );
+    public readonly NOTIFICATION_FREQUENCIES: NotificationFrequency[] = Object.values(NotificationFrequency);
 
     public readonly COLUMNS = ["name", "frequency", "action"];
-    private readonly MAXIMUM_FOLLOWS_PER_REQUEST = 10;
 
     @Input()
     public itemsName: string;
@@ -39,12 +42,7 @@ export class UserTypeFollowingComponent implements OnInit {
 
     private offset: number = 0;
 
-    constructor(
-        private myFollowsGQL: MyFollowsGQL,
-        private saveFollowGQL: SaveFollowGQL,
-        private deleteFollowGQL: DeleteFollowGQL,
-        private confirmationDialogService: ConfirmationDialogService
-    ) {}
+    constructor(private dialog: MatDialog, private myFollowsGQL: MyFollowsGQL, private saveFollowGQL: SaveFollowGQL) {}
 
     public ngOnInit(): void {
         this.loadFollows();
@@ -106,20 +104,30 @@ export class UserTypeFollowingComponent implements OnInit {
             .subscribe();
     }
 
-    public openDeleteFollowModal(follow: Follow): void {
-        this.confirmationDialogService.openFollowDeleteConfirmationDialog().subscribe((confirmed) => {
-            if (confirmed) {
-                this.deleteFollow(follow);
-            }
-        });
+    public openFollowModal(follow): void {
+        this.dialog
+            .open(FollowDialogComponent, {
+                width: "500px",
+                data: {
+                    follow,
+                    followIdentifier: this.getFollowIdentifier(follow)
+                } as FollowDialogData
+            })
+            .afterClosed()
+            .subscribe((result) => {
+                this.offset = 0;
+                const limit = this.follows?.length || 10;
+                this.follows = [];
+                this.loadFollows();
+            });
     }
 
-    public loadFollows(): void {
+    public loadFollows(limit: number = 10): void {
         this.loading = true;
         this.myFollowsGQL
             .fetch({
                 type: this.type,
-                limit: this.MAXIMUM_FOLLOWS_PER_REQUEST,
+                limit: limit,
                 offset: this.offset
             })
             .subscribe((response) => {
@@ -135,10 +143,6 @@ export class UserTypeFollowingComponent implements OnInit {
                 this.hasMore = responseData.hasMore;
                 this.updateStats();
             });
-    }
-
-    private deleteFollow(follow: Follow): void {
-        this.deleteFollowGQL.mutate({ follow: this.getFollowIdentifier(follow) }).subscribe(() => this.reloadFollows());
     }
 
     private reloadFollows(): void {

@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
+import { skip, takeUntil } from "rxjs/operators";
 import { PackageService } from "src/app/package/services/package.service";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { DialogService } from "src/app/services/dialog/dialog.service";
@@ -85,7 +85,12 @@ export class CreatePackageIssueComponent implements OnInit, OnDestroy {
                 return;
             }
 
-            this.router.navigate(["../", issue.data.createPackageIssue.issueNumber], { relativeTo: this.route });
+            this.packageService.package
+                .pipe(takeUntil(this.destroy), skip(1))
+                .subscribe((pkg) =>
+                    this.router.navigate(["../", issue.data.createPackageIssue.issueNumber], { relativeTo: this.route })
+                );
+            this.packageService.getPackage(this.package.identifier.catalogSlug, this.package.identifier.packageSlug);
         });
     }
 

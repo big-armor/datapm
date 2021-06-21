@@ -144,6 +144,12 @@ export class EditPropertyDialogComponent {
         });
     }
 
+    public addOnBlur(values: ContentLabel[]): void {
+        if (this.contentLabelControl.value && this.contentLabelControl.value.length) {
+            this.addLabelChip(this.contentLabelControl.value, values);
+        }
+    }
+
     public getContentLabels(valueType) {
         if (valueType.contentLabels) {
             return valueType.contentLabels;

@@ -53,7 +53,11 @@
             <div *ngFor="let issue of issues" class="issue-wrapper diff-bg" [routerLink]="issue.issueNumber">
                 <div class="d-flex flex-row bd-highlight">
                     <section *ngIf="isUserAPackageManager" class="example-section">
-                        <mat-checkbox (change)="toggleIssue(issue, $event.checked)" [ngModel]="issue.checked">
+                        <mat-checkbox
+                            (change)="toggleIssue(issue, $event.checked)"
+                            (click)="checkIssue($event)"
+                            [ngModel]="issue.checked"
+                        >
                         </mat-checkbox>
                     </section>
                     <div *ngIf="includeOpenIssues && includeClosedIssues">

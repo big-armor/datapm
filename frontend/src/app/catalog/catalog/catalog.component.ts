@@ -67,6 +67,11 @@ export class CatalogComponent implements OnInit {
         );
     }
 
+    public updateCatalog(catalog: Catalog): void {
+        console.log("received", catalog);
+        this.catalog = catalog;
+    }
+
     private updatePageType(route: string, content: any): void {
         if (content.user) {
             this.updateUserSettings(content);
