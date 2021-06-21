@@ -294,6 +294,7 @@ export const logPackageIssue = async (
     const cachedLog = await getActivityLogFromCacheOrDbByIdOrFail(context, context.connection, parent.id, false, [
         "targetPackageIssue"
     ]);
+
     if (!cachedLog.targetPackageIssueId) {
         return null;
     }

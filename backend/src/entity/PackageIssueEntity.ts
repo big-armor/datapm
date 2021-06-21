@@ -4,9 +4,7 @@ import {
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
-    Unique,
-    PrimaryColumn,
-    OneToOne
+    Unique
 } from "typeorm";
 
 import { EntityBaseModel } from "./EntityBaseModel";

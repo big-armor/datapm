@@ -2,8 +2,6 @@
 @import "../../../styles/variables";
 
 #followingTab {
-    padding: 40px 10px;
-
     .h1-title {
         font-family: $family-roboto;
         font-style: $style-normal;
@@ -48,18 +46,6 @@
         height: 1px;
         margin-top: 0.2rem;
         margin-bottom: 0.8rem;
-    }
-
-    .sentence-link {
-        font-family: $family-roboto;
-        font-style: $style-normal;
-        font-weight: $weight-300;
-        font-size: 14px;
-        line-height: 16px;
-        text-align: left;
-        letter-spacing: -0.28px;
-        color: $gray-3-color;
-        cursor: pointer;
     }
 
     .info-div {

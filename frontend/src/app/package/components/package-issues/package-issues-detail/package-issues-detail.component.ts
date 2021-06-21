@@ -115,7 +115,7 @@ export class PackageIssuesDetailComponent implements OnInit {
         private getFollowGQL: GetFollowGQL,
         private dialog: MatDialog,
         private dialogService: DialogService
-    ) {}
+    ) { }
 
     public ngOnInit(): void {
         const issueNumber = this.route.snapshot.params.issueNumber;

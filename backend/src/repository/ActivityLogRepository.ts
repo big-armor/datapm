@@ -170,43 +170,6 @@ export class ActivityLogRepository extends Repository<ActivityLogEntity> {
         }
 
         const alias = "ActivityLog";
-        const wow = this.manager
-            .getRepository(ActivityLogEntity)
-            .createQueryBuilder(alias)
-            .distinctOn(["id"])
-            .innerJoin(
-                (sb) => sb.select('"f".*').from(FollowEntity, "f").where('"f"."user_id" = :userId'),
-                "Follow",
-                `"ActivityLog"."event_type" IN (SELECT * FROM unnest("Follow"."event_types"))
-                AND
-                CASE
-                    WHEN "Follow"."target_collection_id" IS NOT NULL THEN
-                        (
-                            (SELECT c.is_public FROM collection c WHERE c.id = "ActivityLog".target_collection_id) IS TRUE
-                            OR EXISTS (SELECT cu.collection_id FROM collection_user cu WHERE "ActivityLog".target_collection_id = cu.collection_id AND cu.user_id = "Follow".user_id)
-                        )
-                    WHEN "Follow".target_catalog_id IS NOT NULL THEN
-                        (
-                            (SELECT c."isPublic" FROM catalog c WHERE c.id = "ActivityLog".target_catalog_id) IS TRUE
-                            OR EXISTS (SELECT cu.catalog_id FROM user_catalog cu WHERE "ActivityLog".target_catalog_id = cu.catalog_id AND cu.user_id = "Follow".user_id)
-                        )
-                    END
-                AND (
-                    CASE
-                        WHEN "ActivityLog".target_package_id IS NULL THEN TRUE
-                        ELSE
-                            (SELECT pkg."isPublic" FROM package pkg WHERE pkg.id = "ActivityLog".target_package_id) IS TRUE
-                            OR EXISTS (SELECT pu.package_id FROM user_package_permission pu WHERE "ActivityLog".target_package_id = pu.package_id AND pu.user_id = "Follow".user_id)
-                    END
-                )`
-            )
-            .setParameter("userId", userId)
-            .orderBy('"ActivityLog"."created_at"', "DESC")
-            .offset(offset)
-            .limit(limit)
-            .addRelations(alias, relations);
-
-        console.log(wow.getQuery());
         return await this.manager
             .getRepository(ActivityLogEntity)
             .createQueryBuilder(alias)
@@ -216,19 +179,30 @@ export class ActivityLogRepository extends Repository<ActivityLogEntity> {
                 "Follow",
                 `"ActivityLog"."event_type" IN (SELECT * FROM unnest("Follow"."event_types"))
                 AND
-                CASE
-                    WHEN "Follow"."target_collection_id" IS NULL THEN TRUE
-                    WHEN "Follow"."target_collection_id" IS NOT NULL THEN
-                        (
-                            (SELECT c.is_public FROM collection c WHERE c.id = "ActivityLog".target_collection_id) IS TRUE
-                            OR EXISTS (SELECT cu.collection_id FROM collection_user cu WHERE "ActivityLog".target_collection_id = cu.collection_id AND cu.user_id = "Follow".user_id)
-                        )
-                    WHEN "Follow"."target_catalog_id" IS NULL THEN TRUE
-                    WHEN "Follow".target_catalog_id IS NOT NULL THEN
-                        (
-                            (SELECT c."isPublic" FROM catalog c WHERE c.id = "ActivityLog".target_catalog_id) IS TRUE
-                            OR EXISTS (SELECT cu.catalog_id FROM user_catalog cu WHERE "ActivityLog".target_catalog_id = cu.catalog_id AND cu.user_id = "Follow".user_id)
-                        )
+                    CASE
+                        WHEN "Follow"."target_collection_id" IS NULL THEN TRUE
+                        ELSE
+                            (
+                                (SELECT c.is_public FROM collection c WHERE c.id = "ActivityLog".target_collection_id) IS TRUE
+                                OR EXISTS (SELECT cu.collection_id FROM collection_user cu WHERE "ActivityLog".target_collection_id = cu.collection_id AND cu.user_id = "Follow".user_id)
+                            )
+                    END
+                AND
+                    CASE
+                        WHEN "Follow".target_catalog_id IS NULL THEN TRUE
+                        ELSE
+                            (
+                                (SELECT c."isPublic" FROM catalog c WHERE c.id = "ActivityLog".target_catalog_id) IS TRUE
+                                OR EXISTS (SELECT cu.catalog_id FROM user_catalog cu WHERE "ActivityLog".target_catalog_id = cu.catalog_id AND cu.user_id = "Follow".user_id)
+                            )
+                    END
+                AND
+                    CASE
+                        WHEN "Follow".target_package_issue_id IS NULL THEN TRUE
+                        ELSE
+                            (
+                                (EXISTS (SELECT pi.id FROM package_issue pi WHERE "ActivityLog".target_package_issue_id = pi.id))
+                            )
                     END
                 AND (
                     CASE

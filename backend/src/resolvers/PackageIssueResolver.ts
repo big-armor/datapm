@@ -76,16 +76,7 @@ export const deletePackageIssue = async (
         throwNotAuthorizedError();
     }
 
-    await context.connection.transaction(async (transaction) => {
-        await repository.delete(issue.id);
-
-        await createActivityLog(transaction, {
-            userId: context!.me!.id,
-            eventType: ActivityLogEventType.PACKAGE_ISSUE_DELETED,
-            targetPackageIssueId: issue.id,
-            targetCatalogId: packageEntity.id
-        });
-    });
+    await repository.delete(issue.id);
 };
 
 export const getIssuesByPackage = async (

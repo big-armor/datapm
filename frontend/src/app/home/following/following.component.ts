@@ -143,7 +143,7 @@ export class FollowingComponent implements OnInit {
     }
 
     private buildChangedObjectInformation(log: ActivityLog): EntityInformation {
-        // TODO: Ermal - Discuss how to show the names of catalogs
+        // TODO: Discuss how to show the names of catalogs
         if (log.targetPackageIssue) {
             return this.buildPackageIssueEntityInformation(log);
         } else if (log.targetCatalog) {
