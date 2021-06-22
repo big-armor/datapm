@@ -31,13 +31,6 @@ export class CollectionsHorizontalListComponent implements OnChanges {
         this.router.navigate(["collection/" + collectionSlug]);
     }
 
-    onSwiper(swiper) {
-        console.log(swiper);
-    }
-    onSlideChange() {
-        console.log("slide change");
-    }
-
     private createGridSystem(): void {
         if (this.collections.length < this.COLLECTIONS_PER_ROW_COUNT + this.COLLECTIONS_PER_ROW_COUNT / 2) {
             this.rowsWithCollections = [this.collections];
