@@ -308,7 +308,7 @@ export const updatePackageIssuesStatuses = async (
 
     const isClosingIssues = PackageIssueStatus.CLOSED === status.status;
     await context.connection.transaction(async (transaction) => {
-        issues.forEach(async (issue) => issue.status = status.status);
+        issues.forEach(async (issue) => (issue.status = status.status));
 
         if (isClosingIssues) {
             const logsPromises = issues.map((issue) =>
@@ -318,7 +318,8 @@ export const updatePackageIssuesStatuses = async (
                     changeType: ActivityLogChangeType.CLOSED,
                     targetPackageIssueId: issue.id,
                     targetPackageId: packageEntity.id
-                }));
+                })
+            );
             await Promise.all(logsPromises);
         }
 
@@ -362,7 +363,8 @@ export const deletePackageIssues = async (
                 eventType: ActivityLogEventType.PACKAGE_ISSUE_DELETED,
                 targetPackageIssueId: issueId,
                 targetPackageId: packageEntity.id
-            }));
+            })
+        );
 
         await Promise.all(logsPromises);
     });
