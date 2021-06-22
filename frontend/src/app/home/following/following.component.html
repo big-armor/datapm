@@ -4,39 +4,41 @@
             <div class="row big-div-following mb-3">
                 <div class="col-md-12 col-lg-12 pb-2 mb-4">
                     <div class="text-main-title pl-2 mb-4">All activity</div>
-                    <div class="d-flex px-2 flex-row bd-highlight mb-4" *ngFor="let log of logs">
-                        <div class="bd-highlight">
-                            <app-avatar
-                                class="cursor-pointer"
-                                [user]="log.author"
-                                [routerLink]="'/' + log.author.username"
-                                [size]="30"
-                            >
-                            </app-avatar>
-                        </div>
-                        <div class="bd-highlight">
-                            <a class="person-card-name" [routerLink]="'/' + log.author.username"
-                                >{{ log.authorFullName }}
-                            </a>
-                            <span class="text-dark-gray">
-                                {{ log.changeTypeLabel }}
-                                <span *ngIf="log.changedEntityInformation.affectedEntityInformation">
-                                    {{ log.changedEntityInformation.affectedEntityInformation.type }}
-                                    <a
-                                        [routerLink]="log.changedEntityInformation.affectedEntityInformation.url"
-                                        class="weight-500"
-                                        >{{ log.changedEntityInformation.affectedEntityInformation.name }}</a
-                                    ></span
+                    <ng-container *ngIf="logs.length">
+                        <div class="d-flex px-2 flex-row bd-highlight mb-4" *ngFor="let log of logs">
+                            <div class="bd-highlight">
+                                <app-avatar
+                                    class="cursor-pointer"
+                                    [user]="log.author"
+                                    [routerLink]="'/' + log.author.username"
+                                    [size]="30"
                                 >
-                                {{ log.entitiesBinderLabel }}
-                                {{ log.changedEntityInformation.type }}
-                                <a [routerLink]="log.changedEntityInformation.url" class="weight-500">{{
-                                    log.changedEntityInformation.name
-                                }}</a>
-                                {{ log.timeAgoLabel }}.
-                            </span>
+                                </app-avatar>
+                            </div>
+                            <div class="bd-highlight">
+                                <a class="person-card-name" [routerLink]="'/' + log.author.username"
+                                    >{{ log.authorFullName }}
+                                </a>
+                                <span class="text-dark-gray">
+                                    {{ log.changeTypeLabel }}
+                                    <span *ngIf="log.changedEntityInformation.affectedEntityInformation">
+                                        {{ log.changedEntityInformation.affectedEntityInformation.type }}
+                                        <a
+                                            [routerLink]="log.changedEntityInformation.affectedEntityInformation.url"
+                                            class="weight-500"
+                                            >{{ log.changedEntityInformation.affectedEntityInformation.name }}</a
+                                        ></span
+                                    >
+                                    {{ log.entitiesBinderLabel }}
+                                    {{ log.changedEntityInformation.type }}
+                                    <a [routerLink]="log.changedEntityInformation.url" class="weight-500">{{
+                                        log.changedEntityInformation.name
+                                    }}</a>
+                                    {{ log.timeAgoLabel }}.
+                                </span>
+                            </div>
                         </div>
-                    </div>
+                    </ng-container>
 
                     <div class="pb-3" *ngIf="loadingLogs">
                         <mat-spinner diameter="25"></mat-spinner>
@@ -52,7 +54,13 @@
                         </button>
                     </div>
                     <div>
-                        <span *ngIf="errorLoadingLogs"> An error occurred when trying to load updates. </span>
+                        <span *ngIf="errorLoadingLogs">
+                            An error occurred when trying to load updates. Please refresh the page and try again or
+                            contact support.</span
+                        >
+                    </div>
+                    <div>
+                        <span *ngIf="!loadingLogs && !logs.length"> No updates were made recently. </span>
                     </div>
                 </div>
             </div>
