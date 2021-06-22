@@ -41,6 +41,9 @@
                     class="rounded-input"
                     [error]="signUpForm | inputError: 'username':errorMessages['username'] | async"
                 ></app-input>
+                <div class="signup-info">
+                    <a href="#" (click)="openLoginDialog($event)">Already have an account?</a>
+                </div>
             </div>
 
             <div class="div-with-errors">
