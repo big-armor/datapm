@@ -37,6 +37,7 @@ query MyFollowingActivity($offset: Int!, $limit: Int!) {
             changeType
             createdAt
             updatedAt
+            propertiesEdited
         }
         hasMore
         count

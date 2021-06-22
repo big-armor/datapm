@@ -174,6 +174,7 @@ export class ActivityLogRepository extends Repository<ActivityLogEntity> {
             relations = [];
         }
 
+        // AND "ActivityLog"."user_id" != "Follow"."user_id"
         const alias = "ActivityLog";
         return await this.manager
             .getRepository(ActivityLogEntity)

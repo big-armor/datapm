@@ -171,6 +171,7 @@ export const updateMe = async (
     return context.connection.transaction(async (transaction) => {
         await createActivityLog(transaction, {
             userId: context.me.id,
+            targetUserId: context.me.id,
             eventType: ActivityLogEventType.USER_EDIT,
             propertiesEdited: Object.keys(value)
         });
@@ -255,7 +256,7 @@ export const setMyAvatarImage = async (
     return ImageStorageService.INSTANCE.saveUserAvatarImage(context.me.id, image.base64);
 };
 
-export const deleteMe = async (_0: any, {}, context: AuthenticatedContext, info: any) => {
+export const deleteMe = async (_0: any, { }, context: AuthenticatedContext, info: any) => {
     return await deleteUserAndLogAction(context.me.username, context);
 };
 

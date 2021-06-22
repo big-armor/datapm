@@ -164,6 +164,7 @@ import {
     logId,
     logPackage,
     logPackageIssue,
+    logPropertiesEdited,
     myActivity,
     myFollowingActivity,
     packageActivities
@@ -509,6 +510,7 @@ export const resolvers: {
     },
     ActivityLog: {
         id: logId,
+        propertiesEdited: logPropertiesEdited,
         user: logAuthor,
         targetPackage: logPackage,
         targetPackageIssue: logPackageIssue,

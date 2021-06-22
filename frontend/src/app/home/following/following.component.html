@@ -20,8 +20,8 @@
                                     >{{ log.authorFullName }}
                                 </a>
                                 <span class="text-dark-gray">
-                                    {{ log.changeTypeLabel }}
-                                    <span *ngIf="log.changedEntityInformation.affectedEntityInformation">
+                                    <span>{{ log.changeTypeLabel }}</span>
+                                    <span *ngIf="log.changedEntityInformation?.affectedEntityInformation">
                                         {{ log.changedEntityInformation.affectedEntityInformation.type }}
                                         <a
                                             [routerLink]="log.changedEntityInformation.affectedEntityInformation.url"
@@ -30,10 +30,12 @@
                                         ></span
                                     >
                                     {{ log.entitiesBinderLabel }}
-                                    {{ log.changedEntityInformation.type }}
-                                    <a [routerLink]="log.changedEntityInformation.url" class="weight-500">{{
-                                        log.changedEntityInformation.name
-                                    }}</a>
+                                    <ng-container *ngIf="log.changedEntityInformation">
+                                        {{ log.changedEntityInformation.type }}
+                                        <a [routerLink]="log.changedEntityInformation.url" class="weight-500">{{
+                                            log.changedEntityInformation.name
+                                        }}</a>
+                                    </ng-container>
                                     {{ log.timeAgoLabel }}.
                                 </span>
                             </div>
