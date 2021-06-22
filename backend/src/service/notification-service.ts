@@ -67,7 +67,7 @@ export async function monthlyNotifications() {
 async function prepareAndSendNotifications(stateKey: string, frequency: NotificationFrequency) {
     const result = await databaseConnection?.getCustomRepository(PlatformStateRepository).findStateByKey(stateKey);
 
-    let lastNotificationDate = new Date();
+    let lastNotificationDate = new Date(new Date().getTime() - 60 * 1000);
 
     if (frequency == NotificationFrequency.DAILY) {
         lastNotificationDate = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
