@@ -174,7 +174,6 @@ export class ActivityLogRepository extends Repository<ActivityLogEntity> {
             relations = [];
         }
 
-        // AND "ActivityLog"."user_id" != "Follow"."user_id"
         const alias = "ActivityLog";
         return await this.manager
             .getRepository(ActivityLogEntity)
@@ -184,6 +183,7 @@ export class ActivityLogRepository extends Repository<ActivityLogEntity> {
                 (sb) => sb.select('"f".*').from(FollowEntity, "f").where('"f"."user_id" = :userId'),
                 "Follow",
                 `"ActivityLog"."event_type" IN (SELECT * FROM unnest("Follow"."event_types"))
+                AND "ActivityLog"."user_id" != "Follow"."user_id"
                 AND
                     CASE
                         WHEN "Follow"."target_collection_id" IS NULL THEN TRUE

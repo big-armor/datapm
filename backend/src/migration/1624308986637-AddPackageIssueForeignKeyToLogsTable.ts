@@ -1,7 +1,6 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class AddPackageIssueForeignKeyToLogsTable1624308986637 implements MigrationInterface {
-
     public async up(queryRunner: QueryRunner): Promise<void> {
         const query = `
         DELETE FROM activity_log
@@ -20,7 +19,5 @@ export class AddPackageIssueForeignKeyToLogsTable1624308986637 implements Migrat
         return queryRunner.query(query);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-    }
-
+    public async down(queryRunner: QueryRunner): Promise<void> {}
 }

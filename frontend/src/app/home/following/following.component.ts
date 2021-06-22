@@ -44,10 +44,7 @@ export class FollowingComponent implements OnInit {
 
     private offset: number = 0;
 
-    constructor(
-        private myFollowingActivityGQL: MyFollowingActivityGQL,
-        private timeAgoPipe: TimeAgoPipe
-    ) { }
+    constructor(private myFollowingActivityGQL: MyFollowingActivityGQL, private timeAgoPipe: TimeAgoPipe) {}
 
     public ngOnInit(): void {
         this.loadLogs();
@@ -91,7 +88,6 @@ export class FollowingComponent implements OnInit {
 
     private addLogs(logs: ActivityLog[]): void {
         const logsWithMetadata = logs.map((log) => this.mapLogToLogWithMetadata(log));
-        console.log("logjz", logsWithMetadata);
         this.logs.push(...logsWithMetadata);
     }
 
@@ -127,12 +123,12 @@ export class FollowingComponent implements OnInit {
                     fieldsSentence = ` the ${editedFieldsLabel} ${fieldsLabel} of`;
                 }
                 return {
-                    changeTypeLabel: "edited" + fieldsSentence,
+                    changeTypeLabel: "edited" + fieldsSentence
                 };
             case ActivityLogEventType.USER_EDIT:
                 const userFieldsSentence = log.propertiesEdited.join(", ");
                 return {
-                    changeTypeLabel: "edited their " + userFieldsSentence,
+                    changeTypeLabel: "edited their " + userFieldsSentence
                 };
             case ActivityLogEventType.PACKAGE_DELETED:
             case ActivityLogEventType.PACKAGE_ISSUE_DELETED:

@@ -140,12 +140,7 @@ export const updatePackageIssueComment = async (
         .getCustomRepository(PackageIssueRepository)
         .getByIssueNumberForPackage(packageEntity.id, issueIdentifier.issueNumber);
 
-    const commentEntity = await getCommentToEditOrFail(
-        context,
-        packageIdentifier,
-        issueCommentIdentifier,
-        issueEntity
-    );
+    const commentEntity = await getCommentToEditOrFail(context, packageIdentifier, issueCommentIdentifier, issueEntity);
 
     commentEntity.content = comment.content;
 
@@ -186,12 +181,7 @@ export const deletePackageIssueComment = async (
         .getCustomRepository(PackageIssueRepository)
         .getByIssueNumberForPackage(packageEntity.id, issueIdentifier.issueNumber);
 
-    const commentEntity = await getCommentToEditOrFail(
-        context,
-        packageIdentifier,
-        issueCommentIdentifier,
-        issueEntity
-    );
+    const commentEntity = await getCommentToEditOrFail(context, packageIdentifier, issueCommentIdentifier, issueEntity);
 
     await context.connection.transaction(async (transaction) => {
         await commentRepository.delete(commentEntity.id);
@@ -203,7 +193,7 @@ export const deletePackageIssueComment = async (
             targetPackageId: packageEntity.id
         });
     });
-}
+};
 
 async function getCommentToEditOrFail(
     context: any,
