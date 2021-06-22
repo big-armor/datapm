@@ -20,6 +20,8 @@ const sql = `
     ALTER TYPE activity_log_event_type_enum ADD VALUE 'CATALOG_UNCLAIMED_CHANGED';
     ALTER TYPE activity_log_event_type_enum ADD VALUE 'PACKAGE_ISSUE_STAUS_CHANGE';
 
+    COMMIT;
+
     alter table activity_log alter column event_type type activity_log_event_type_enum using event_type::activity_log_event_type_enum;
 
 
