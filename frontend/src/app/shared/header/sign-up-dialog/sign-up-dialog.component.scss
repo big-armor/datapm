@@ -30,6 +30,17 @@
         }
     }
 
+    .signup-info {
+        margin-top: 5px;
+        a {
+            font-size: $text-font - 1;
+            color: var(--info-color);
+            :hover {
+                color: var(--info-color);
+            }
+        }
+    }
+
     ::ng-deep.text-danger {
         max-width: 336px !important;
     }

@@ -34,5 +34,6 @@ mutation UpdateCollection($identifier: CollectionIdentifierInput!, $value: Updat
         }
         isPublic
         isRecommended
+        myPermissions
     }
 }
