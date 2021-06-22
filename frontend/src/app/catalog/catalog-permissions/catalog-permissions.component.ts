@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { SnackBarService } from "src/app/services/snackBar.service";
 import { DeleteCatalogComponent } from "src/app/shared/delete-catalog/delete-catalog.component";
@@ -53,7 +53,8 @@ export class CatalogPermissionsComponent implements OnInit, OnChanges, OnDestroy
         private updateCatalogGQL: UpdateCatalogGQL,
         private setUserCatalogPermissionGQL: SetUserCatalogPermissionGQL,
         private deleteUserCatalogPermissionGQL: DeleteUserCatalogPermissionsGQL,
-        private snackBarService: SnackBarService
+        private snackBarService: SnackBarService,
+        private route: ActivatedRoute
     ) {}
 
     public ngOnInit(): void {
@@ -131,7 +132,7 @@ export class CatalogPermissionsComponent implements OnInit, OnChanges, OnDestroy
             })
             .afterClosed()
             .subscribe((newCatalog: Catalog) => {
-                this.catalog = newCatalog;
+                this.setCatalogVariables(newCatalog);
             });
     }
 
@@ -143,7 +144,7 @@ export class CatalogPermissionsComponent implements OnInit, OnChanges, OnDestroy
         });
 
         dlgRef.afterClosed().subscribe((confirmed: boolean) => {
-            if (confirmed) this.router.navigate(["/" + this.user.username + "#catalogs"]);
+            if (confirmed) this.router.navigate([this.user.username], { fragment: "catalogs" });
         });
     }
 

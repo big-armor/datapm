@@ -7,6 +7,7 @@ import { usernameValidator, emailAddressValidator } from "src/app/helpers/valida
 import { UiStyleToggleService } from "src/app/services/ui-style-toggle.service";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
+import { DialogService } from "src/app/services/dialog/dialog.service";
 
 enum State {
     INIT,
@@ -56,6 +57,7 @@ export class SignUpDialogComponent implements OnInit {
         private componentChangeDetector: ChangeDetectorRef,
         private dialogRef: MatDialogRef<SignUpDialogComponent>,
         private snackbar: MatSnackBar,
+        private dialog: DialogService,
         private uiStyleToggleService: UiStyleToggleService
     ) {}
 
@@ -139,5 +141,13 @@ export class SignUpDialogComponent implements OnInit {
             control.setErrors(null);
             this.componentChangeDetector.detectChanges();
         }
+    }
+
+    openLoginDialog(ev: any) {
+        ev.preventDefault();
+        this.dialogRef.close();
+        this.dialogRef.afterClosed().subscribe(() => {
+            this.dialog.openLoginDialog();
+        });
     }
 }

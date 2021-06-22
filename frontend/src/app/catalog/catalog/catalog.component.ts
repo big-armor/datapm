@@ -68,7 +68,6 @@ export class CatalogComponent implements OnInit {
     }
 
     public updateCatalog(catalog: Catalog): void {
-        console.log("received", catalog);
         this.catalog = catalog;
     }
 

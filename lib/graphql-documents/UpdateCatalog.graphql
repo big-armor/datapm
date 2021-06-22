@@ -9,5 +9,6 @@ mutation UpdateCatalog($identifier: CatalogIdentifierInput!, $value: UpdateCatal
         website
         isPublic
         unclaimed
+        myPermissions
     }
 }

@@ -9,7 +9,7 @@
         <div class="container">
             <ul class="user-routes" id="homeRoutes">
                 <li *ngFor="let tab of tabs; let i = index" class="list-names" (click)="selectTab(tab.value)">
-                    <a [class.active]="tab.value == selectedTab">
+                    <a [class.active]="tab.value == currentTab">
                         {{ tab.name }}
                     </a>
                 </li>
@@ -19,7 +19,7 @@
 
     <div class="row">
         <div class="container fixed-height">
-            <div class="p-0" *ngIf="isCurrentUser" [ngSwitch]="selectedTab">
+            <div class="p-0" *ngIf="isCurrentUser" [ngSwitch]="currentTab">
                 <app-user-collections
                     [isCurrentUser]="isCurrentUser"
                     [username]="username"
@@ -43,7 +43,7 @@
                 <app-user-details *ngSwitchDefault></app-user-details>
             </div>
 
-            <div class="p-0" *ngIf="!isCurrentUser" [ngSwitch]="selectedTab">
+            <div class="p-0" *ngIf="!isCurrentUser" [ngSwitch]="currentTab">
                 <app-user-collections
                     [isCurrentUser]="isCurrentUser"
                     [username]="username"

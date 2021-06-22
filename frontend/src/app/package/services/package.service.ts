@@ -32,7 +32,6 @@ export class PackageService {
                 },
                 (error) => {
                     console.log(error);
-
                     this.package.next({
                         package: null,
                         response: null
