@@ -24,18 +24,24 @@ export class AdminStatusConfirmationComponent implements OnInit {
     ngOnInit(): void {}
 
     public confirmSave(): void {
+        this.hasErrors = false;
         this.setAsAdminGQL
             .mutate({
                 username: this.modalData.username,
                 isAdmin: this.modalData.isAdmin
             })
-            .subscribe(({ errors }) => {
-                if (errors) {
+            .subscribe(
+                ({ errors }) => {
+                    if (errors) {
+                        this.hasErrors = true;
+                    } else {
+                        this.dialogRef.close(true);
+                    }
+                },
+                (errors) => {
                     this.hasErrors = true;
-                } else {
-                    this.dialogRef.close(true);
                 }
-            });
+            );
     }
 
     public cancel(): void {

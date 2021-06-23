@@ -12,7 +12,7 @@ import { User } from "src/generated/graphql";
     templateUrl: "./user-details-page.component.html",
     styleUrls: ["./user-details-page.component.scss"]
 })
-export class UserDetailsPageComponent implements OnChanges {
+export class UserDetailsPageComponent implements OnChanges, OnInit {
     @Input()
     public user: User;
     public username: string;
@@ -21,7 +21,7 @@ export class UserDetailsPageComponent implements OnChanges {
     public state: PageState = "INIT";
 
     public tabs: TabModel[] = [];
-    public selectedTab: string = "";
+    public currentTab: string = "";
 
     private readonly subscription = new Subject();
 
@@ -43,13 +43,17 @@ export class UserDetailsPageComponent implements OnChanges {
                 { name: "catalogs", value: "catalogs" }
             ];
         }
+    }
 
+    public ngOnInit(): void {
         this.route.fragment.pipe(takeUntil(this.subscription)).subscribe((fragment: string) => {
-            const index = this.tabs.findIndex((tab) => tab.value === (fragment || ""));
-            if (index < 0) {
-                this.selectTab(this.tabs[0].value);
+            const tab = this.tabs.find((tab) => tab.value === fragment);
+            if (!tab) {
+                this.currentTab = "";
+                this.updateTabParam();
             } else {
-                this.selectedTab = fragment || "";
+                this.currentTab = tab.value;
+                this.updateTabParam();
             }
         });
     }
@@ -66,12 +70,17 @@ export class UserDetailsPageComponent implements OnChanges {
     }
 
     public selectTab(tab: string): void {
+        this.currentTab = tab;
+        this.updateTabParam();
+    }
+
+    public updateTabParam() {
         const extras: NavigationExtras = {
             relativeTo: this.route
         };
 
-        if (tab !== "") {
-            extras.fragment = tab;
+        if (this.currentTab !== "") {
+            extras.fragment = this.currentTab;
         }
 
         this.router.navigate(["."], extras);

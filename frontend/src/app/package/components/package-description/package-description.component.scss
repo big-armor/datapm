@@ -60,6 +60,7 @@ markdown ::ng-deep {
         font-size: ($text-font - 1);
         letter-spacing: 0.4px;
         color: var(--gray-2-color);
+        margin-bottom: 0px !important;
     }
 
     h1 {

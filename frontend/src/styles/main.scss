@@ -913,7 +913,7 @@ button:disabled {
     padding-left: 0px !important;
     padding-right: 0px !important;
     max-height: calc(100vh - 130px);
-    padding: 10px 0px 5px 0px;
+    padding: 15px 0px 5px 0px;
     color: var(--gray-2-color);
     border-top: 1px solid var(--custom-gray-9-color);
     border-bottom: 1px solid var(--custom-gray-9-color);
@@ -1189,7 +1189,7 @@ button:disabled {
     line-height: 16px;
     letter-spacing: 0.4px;
     color: var(--gray-3-color);
-    margin-bottom: 0px !important;
+    margin-bottom: 0px;
 }
 
 .text-dark-gray {

@@ -85,6 +85,7 @@ export class CollectionPermissionsComponent implements OnChanges {
             })
             .subscribe(({ data }) => {
                 this.collection.isPublic = (data.updateCollection as Collection).isPublic;
+                this.collectionEdited.emit(this.collection);
             });
     }
 

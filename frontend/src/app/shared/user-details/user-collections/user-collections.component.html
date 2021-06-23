@@ -55,8 +55,8 @@
                                     *ngFor="let collection of collections"
                                 >
                                     <mat-card-content>
-                                        <div class="d-flex bd-highlight d-flex align-items-center">
-                                            <div class="p-2 flex-grow-1 bd-highlight">
+                                        <div class="d-flex bd-highlight d-flex align-items-top">
+                                            <div class="p-1 pl-2 flex-grow-1 bd-highlight align-self-center">
                                                 <div
                                                     [class.public-text]="collection?.isPublic"
                                                     [class.not-public-text]="!collection?.isPublic"
@@ -66,13 +66,13 @@
                                                 <a class="box-name">{{ collection.name }}</a>
                                                 <div class="text-light-gray">{{ collection.description }}</div>
                                             </div>
-                                            <div class="p-2 bd-highlight">
-                                                <span class="mr-2"
-                                                    >{{ collectionPermission(collection) }} Permission</span
-                                                >
+                                            <div class="p-1 bd-highlight action-div text-center">
+                                                <div class="text-light-gray mb-2">
+                                                    {{ collectionPermission(collection) }} Permission
+                                                </div>
 
                                                 <button
-                                                    class="app-outlined-button mr-2"
+                                                    class="app-outlined-button mr-1"
                                                     [disabled]="!collection.myPermissions.includes('EDIT')"
                                                     (click)="editCollection($event, collection)"
                                                 >

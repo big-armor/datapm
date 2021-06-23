@@ -22,7 +22,7 @@
 
                     <div class="mt-1" *ngIf="!loading; else loadingTemplate">
                         <ul *ngIf="changes.length; else noDifferencesTemplate">
-                            <li *ngFor="let change of changes">
+                            <li *ngFor="let change of changes" class="text-dark-gray">
                                 {{ change.changeLabel }}
                                 <strong *ngIf="change.changeFieldName">"{{ change.changeFieldName }}"</strong>
                             </li>
@@ -34,8 +34,8 @@
                 </div>
             </div>
 
-            <div mat-dialog-actions class="d-flex justify-content-end pt-1">
-                <button mat-button mat-dialog-close (click)="close()" type="submit" class="close-dialog">Close</button>
+            <div mat-dialog-actions class="d-flex justify-content-end pt-2">
+                <button mat-dialog-close class="modal-close-btn" (click)="close()" type="submit">Close</button>
             </div>
         </div>
     </div>
