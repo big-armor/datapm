@@ -51,8 +51,10 @@
                             Load More
                         </button>
                     </div>
-                    <div>
-                        <span *ngIf="errorLoadingLogs"> An error occurred when trying to load updates. </span>
+                    <div class="px-2">
+                        <span *ngIf="errorLoadingLogs" class="text-dark-gray">
+                            An error occurred when trying to load updates.
+                        </span>
                     </div>
                 </div>
             </div>
