@@ -25,6 +25,8 @@ query MyActivity($filter: ActivityLogFilterInput!) {
                 }
                 author {
                     username
+                    firstName
+                    lastName
                     emailAddress
                 }
             }
