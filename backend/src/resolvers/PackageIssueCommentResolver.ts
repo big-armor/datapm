@@ -102,7 +102,8 @@ export const createPackageIssueComment = async (
     issueCommentEntity.content = comment.content;
 
     return await context.connection.transaction(async (transaction) => {
-        const savedComment = await commentRepository.save(issueCommentEntity);
+        const commentRepoForTransaction = transaction.getCustomRepository(PackageIssueCommentRepository);
+        const savedComment = await commentRepoForTransaction.save(issueCommentEntity);
 
         await createActivityLog(transaction, {
             userId: context!.me!.id,
@@ -140,17 +141,13 @@ export const updatePackageIssueComment = async (
         .getCustomRepository(PackageIssueRepository)
         .getByIssueNumberForPackage(packageEntity.id, issueIdentifier.issueNumber);
 
-    const commentEntity = await getCommentToEditOrFail(
-        context,
-        packageIdentifier,
-        issueCommentIdentifier,
-        issueEntity
-    );
+    const commentEntity = await getCommentToEditOrFail(context, packageIdentifier, issueCommentIdentifier, issueEntity);
 
     commentEntity.content = comment.content;
 
     return await context.connection.transaction(async (transaction) => {
-        const savedComment = await commentRepository.save(commentEntity);
+        const commentRepoForTransaction = transaction.getCustomRepository(PackageIssueCommentRepository);
+        const savedComment = await commentRepoForTransaction.save(commentEntity);
 
         await createActivityLog(transaction, {
             userId: context!.me!.id,
@@ -177,7 +174,6 @@ export const deletePackageIssueComment = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const commentRepository = context.connection.manager.getCustomRepository(PackageIssueCommentRepository);
     const packageEntity = await context.connection.manager
         .getCustomRepository(PackageRepository)
         .findPackageOrFail({ identifier: packageIdentifier });
@@ -186,15 +182,11 @@ export const deletePackageIssueComment = async (
         .getCustomRepository(PackageIssueRepository)
         .getByIssueNumberForPackage(packageEntity.id, issueIdentifier.issueNumber);
 
-    const commentEntity = await getCommentToEditOrFail(
-        context,
-        packageIdentifier,
-        issueCommentIdentifier,
-        issueEntity
-    );
+    const commentEntity = await getCommentToEditOrFail(context, packageIdentifier, issueCommentIdentifier, issueEntity);
 
     await context.connection.transaction(async (transaction) => {
-        await commentRepository.delete(commentEntity.id);
+        const commentRepoForTransaction = transaction.getCustomRepository(PackageIssueCommentRepository);
+        await commentRepoForTransaction.delete(commentEntity.id);
 
         await createActivityLog(transaction, {
             userId: context!.me!.id,
@@ -203,7 +195,7 @@ export const deletePackageIssueComment = async (
             targetPackageId: packageEntity.id
         });
     });
-}
+};
 
 async function getCommentToEditOrFail(
     context: any,

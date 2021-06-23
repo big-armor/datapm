@@ -1,26 +1,14 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class AddPackageIssueForeignKeyToLogsTable1624308986637 implements MigrationInterface {
-
     public async up(queryRunner: QueryRunner): Promise<void> {
-        const query = `
-        DELETE FROM activity_log
-        WHERE target_package_issue_id IS NOT NULL
-        AND NOT EXISTS(
-                SELECT id
-                FROM package_issue
-                WHERE id = target_package_issue_id
-            );
-
-        ALTER TABLE activity_log
-        ADD CONSTRAINT activity_log_target_package_issue_id_fkey
-        FOREIGN KEY (target_package_issue_id)
-        REFERENCES package_issue(id)
-        ON DELETE CASCADE;`;
-        return queryRunner.query(query);
+        await queryRunner.connection.query("DELETE FROM activity_log WHERE event_type = 'PACKAGE_ISSUE_STAUS_CHANGE'");
+        await queryRunner.connection.query(
+            "ALTER TYPE activity_log_event_type_enum ADD VALUE 'PACKAGE_ISSUE_STATUS_CHANGE'"
+        );
+        await queryRunner.connection.query("ALTER TYPE activity_log_change_type_enum ADD VALUE 'OPENED'");
+        await queryRunner.connection.query("ALTER TYPE activity_log_change_type_enum ADD VALUE 'CLOSED'");
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-    }
-
+    public async down(queryRunner: QueryRunner): Promise<void> {}
 }

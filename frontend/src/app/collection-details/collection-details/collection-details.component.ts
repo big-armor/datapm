@@ -32,8 +32,6 @@ type CollectionDetailsPageState = PageState | "NOT_AUTHORIZED" | "NOT_FOUND";
     styleUrls: ["./collection-details.component.scss"]
 })
 export class CollectionDetailsComponent implements OnDestroy {
-    @Input() public package: Package;
-
     public collectionSlug: string = "";
     public collection: Collection;
     public state: CollectionDetailsPageState = "INIT";
@@ -42,7 +40,7 @@ export class CollectionDetailsComponent implements OnDestroy {
 
     public currentUser: User;
 
-    private tabs = ["", "manage"];
+    private tabs = [""];
 
     public collectionFollow: Follow;
     public isFollowing: boolean;
@@ -59,17 +57,6 @@ export class CollectionDetailsComponent implements OnDestroy {
         this.route.paramMap.pipe(takeUntil(this.unsubscribe$)).subscribe((paramMap: ParamMap) => {
             this.collectionSlug = paramMap.get("collectionSlug") || "";
             this.getCollectionDetails();
-        });
-
-        this.route.fragment.pipe(takeUntil(this.unsubscribe$)).subscribe((fragment: string) => {
-            const index = this.tabs.findIndex((tab) => tab === fragment);
-            if (index < 0) {
-                this.currentTab = 0;
-                this.updateTabParam();
-            } else {
-                this.currentTab = index;
-                this.updateTabParam();
-            }
         });
 
         this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
@@ -132,6 +119,20 @@ export class CollectionDetailsComponent implements OnDestroy {
                         return;
                     }
                     this.collection = data.collection as Collection;
+                    if (this.collection.myPermissions.includes(Permission.MANAGE)) {
+                        this.tabs.push("manage");
+
+                        this.route.fragment.pipe(takeUntil(this.unsubscribe$)).subscribe((fragment: string) => {
+                            const index = this.tabs.findIndex((tab) => tab === fragment);
+                            if (index < 0) {
+                                this.currentTab = 0;
+                                this.updateTabParam();
+                            } else {
+                                this.currentTab = index;
+                                this.updateTabParam();
+                            }
+                        });
+                    }
                     this.state = "SUCCESS";
                     this.getFollow();
                 },
@@ -185,8 +186,12 @@ export class CollectionDetailsComponent implements OnDestroy {
             })
             .afterClosed()
             .subscribe((newCollection: Collection) => {
-                this.collection = newCollection;
+                this.setCollectionVariables(newCollection);
             });
+    }
+
+    public setCollectionVariables(collection: Collection) {
+        this.collection = collection;
     }
 
     public get canManage() {

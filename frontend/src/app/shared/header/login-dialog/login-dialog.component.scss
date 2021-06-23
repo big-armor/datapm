@@ -30,7 +30,7 @@
 
     .forgot-pass {
         a {
-            font-size: $text-font;
+            font-size: $text-font - 1;
             color: var(--info-color);
             :hover {
                 color: var(--info-color);

@@ -65,7 +65,11 @@
                     <a class="app-outlined-button mt-2" (click)="addPackage()" *ngIf="canEdit">Add a package</a>
                 </div>
             </div>
-            <app-collection-permissions [collection]="collection" *ngIf="currentTab === 1"></app-collection-permissions>
+            <app-collection-permissions
+                (collectionEdited)="setCollectionVariables($event)"
+                [collection]="collection"
+                *ngIf="currentTab === 1"
+            ></app-collection-permissions>
         </div>
     </div>
 

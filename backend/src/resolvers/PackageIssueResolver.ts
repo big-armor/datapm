@@ -308,19 +308,21 @@ export const updatePackageIssuesStatuses = async (
 
     const isClosingIssues = PackageIssueStatus.CLOSED === status.status;
     await context.connection.transaction(async (transaction) => {
-        issues.forEach(async (issue) => {
-            issue.status = status.status;
+        issues.forEach(async (issue) => (issue.status = status.status));
 
-            if (isClosingIssues) {
-                await createActivityLog(transaction, {
+        if (isClosingIssues) {
+            const logsPromises = issues.map((issue) =>
+                createActivityLog(transaction, {
                     userId: context!.me!.id,
                     eventType: ActivityLogEventType.PACKAGE_ISSUE_STATUS_CHANGE,
                     changeType: ActivityLogChangeType.CLOSED,
                     targetPackageIssueId: issue.id,
                     targetPackageId: packageEntity.id
-                });
-            }
-        });
+                })
+            );
+            await Promise.all(logsPromises);
+        }
+
         await issueRepository.save(issues);
     });
 };
@@ -355,14 +357,16 @@ export const deletePackageIssues = async (
     await context.connection.transaction(async (transaction) => {
         await issueRepository.delete(issuesIds);
 
-        issuesIds.forEach(async (issueId) => {
-            await createActivityLog(transaction, {
+        const logsPromises = issuesIds.map((issueId) =>
+            createActivityLog(transaction, {
                 userId: context!.me!.id,
                 eventType: ActivityLogEventType.PACKAGE_ISSUE_DELETED,
                 targetPackageIssueId: issueId,
                 targetPackageId: packageEntity.id
-            });
-        });
+            })
+        );
+
+        await Promise.all(logsPromises);
     });
 };
 

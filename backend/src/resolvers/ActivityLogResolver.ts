@@ -251,6 +251,15 @@ export const logId = async (
     return parent.id;
 };
 
+export const logPropertiesEdited = async (
+    parent: ActivityLog,
+    _1: any,
+    context: AuthenticatedContext,
+    info: any
+): Promise<any> => {
+    return parent.propertiesEdited;
+};
+
 export const logAuthor = async (
     parent: ActivityLog,
     _1: any,

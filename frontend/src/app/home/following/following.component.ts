@@ -87,9 +87,7 @@ export class FollowingComponent implements OnInit {
     }
 
     private addLogs(logs: ActivityLog[]): void {
-        const logsWithMetadata = logs
-            .map((log) => this.mapLogToLogWithMetadata(log))
-            .filter((log) => !!log.changedEntityInformation);
+        const logsWithMetadata = logs.map((log) => this.mapLogToLogWithMetadata(log));
         this.logs.push(...logsWithMetadata);
     }
 
@@ -114,6 +112,24 @@ export class FollowingComponent implements OnInit {
             case ActivityLogEventType.CATALOG_CREATED:
             case ActivityLogEventType.COLLECTION_CREATED:
                 return { changeTypeLabel: "created" };
+            case ActivityLogEventType.PACKAGE_EDIT:
+            case ActivityLogEventType.PACKAGE_ISSUE_EDIT:
+            case ActivityLogEventType.CATALOG_EDIT:
+            case ActivityLogEventType.COLLECTION_EDIT:
+                let fieldsSentence = "";
+                if (log.propertiesEdited) {
+                    const editedFieldsLabel = log.propertiesEdited.join(", ");
+                    const fieldsLabel = log.propertiesEdited.length > 1 ? "properties" : "property";
+                    fieldsSentence = ` the ${editedFieldsLabel} ${fieldsLabel} of`;
+                }
+                return {
+                    changeTypeLabel: "edited" + fieldsSentence
+                };
+            case ActivityLogEventType.USER_EDIT:
+                const userFieldsSentence = log.propertiesEdited.join(", ");
+                return {
+                    changeTypeLabel: "edited their " + userFieldsSentence
+                };
             case ActivityLogEventType.PACKAGE_DELETED:
             case ActivityLogEventType.PACKAGE_ISSUE_DELETED:
             case ActivityLogEventType.CATALOG_DELETED:

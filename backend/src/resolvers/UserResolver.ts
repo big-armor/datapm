@@ -171,6 +171,7 @@ export const updateMe = async (
     return context.connection.transaction(async (transaction) => {
         await createActivityLog(transaction, {
             userId: context.me.id,
+            targetUserId: context.me.id,
             eventType: ActivityLogEventType.USER_EDIT,
             propertiesEdited: Object.keys(value)
         });
