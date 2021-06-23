@@ -34,11 +34,17 @@
         align-items: center;
     }
 
-    .swiper-button-prev,
-    .swiper-button-next {
-        color: var(--info-color);
+    .swiper-button-prev {
         &::after {
-            font-size: 40px;
+            font-size: 20px;
+            content: "";
+        }
+    }
+
+    .swiper-button-next {
+        &::after {
+            font-size: 20px;
+            content: "";
         }
     }
 
@@ -46,12 +52,40 @@
     .swiper-container-rtl .swiper-button-prev {
         right: 0px;
         left: auto;
+        background-position: 50%;
+        background-repeat: no-repeat;
+        background-size: 31px;
+        border-radius: 100px;
+        box-shadow: 0 0 5px rgb(0 0 0 / 15%);
+        cursor: pointer;
+        height: 40px;
+        margin-top: -20px;
+        position: absolute;
+        top: 50%;
+        width: 40px;
+        z-index: 10;
+        background-color: #fff;
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0Ij48cGF0aCBkPSJNOC41OSAxNi41OUwxMy4xNyAxMiA4LjU5IDcuNDEgMTAgNmw2IDYtNiA2LTEuNDEtMS40MXoiLz48cGF0aCBkPSJNMCAwaDI0djI0SDBWMHoiIGZpbGw9Im5vbmUiLz48L3N2Zz4=);
     }
 
     .swiper-button-prev,
     .swiper-container-rtl .swiper-button-next {
         left: 0px;
         right: auto;
+        background-position: 50%;
+        background-repeat: no-repeat;
+        background-size: 31px;
+        border-radius: 100px;
+        box-shadow: 0 0 5px rgb(0 0 0 / 15%);
+        cursor: pointer;
+        height: 40px;
+        margin-top: -20px;
+        position: absolute;
+        top: 50%;
+        width: 40px;
+        z-index: 10;
+        background-color: #fff;
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0Ij48cGF0aCBkPSJNMTUuNDEgMTYuNTlMMTAuODMgMTJsNC41OC00LjU5TDE0IDZsLTYgNiA2IDYgMS40MS0xLjQxeiIvPjxwYXRoIGQ9Ik0wIDBoMjR2MjRIMFYweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==);
     }
 
     .swiper-button-disabled {
