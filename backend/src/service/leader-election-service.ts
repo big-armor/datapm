@@ -12,7 +12,9 @@ let leader = false;
 
 export async function startLeaderElection(connection: Connection) {
     if (process.env["LEADER_ELECTION_DISABLED"] === "true") {
-        console.log("LEADER_ELECTION_DISABLED is true. Not starting liferaft.");
+        console.log(
+            "LEADER_ELECTION_DISABLED is true. Not starting leader election, no background services will run on this instance."
+        );
         return;
     }
 
