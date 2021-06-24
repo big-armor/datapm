@@ -43,7 +43,7 @@ describe("Following Catalogs Activity Log Tests", async () => {
         const catalogSlug = "usr-fol-sdx-ctg";
         const packageSlug = "usr-fol-sdx-pkg";
 
-        const a = await userTwoClient.mutate({
+        await userTwoClient.mutate({
             mutation: CreateCatalogDocument,
             variables: {
                 value: {
@@ -54,9 +54,8 @@ describe("Following Catalogs Activity Log Tests", async () => {
                 }
             }
         });
-        console.log("a", a);
 
-        const b = await userTwoClient.mutate({
+        await userTwoClient.mutate({
             mutation: CreatePackageDocument,
             variables: {
                 value: {
@@ -67,12 +66,11 @@ describe("Following Catalogs Activity Log Tests", async () => {
                 }
             }
         });
-        console.log("b", b);
 
         const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         const packageFileString = JSON.stringify(packageFileContents);
 
-        const c = await userTwoClient.mutate({
+        await userTwoClient.mutate({
             mutation: CreateVersionDocument,
             variables: {
                 identifier: {
@@ -84,9 +82,8 @@ describe("Following Catalogs Activity Log Tests", async () => {
                 }
             }
         });
-        console.log("c", c);
 
-        const d = await userTwoClient.mutate({
+        await userTwoClient.mutate({
             mutation: UpdatePackageDocument,
             variables: {
                 identifier: {
@@ -98,9 +95,8 @@ describe("Following Catalogs Activity Log Tests", async () => {
                 }
             }
         });
-        console.log("d", d);
 
-        const e = await userOneClient.mutate({
+        await userOneClient.mutate({
             mutation: SaveFollowDocument,
             variables: {
                 follow: {
@@ -111,14 +107,12 @@ describe("Following Catalogs Activity Log Tests", async () => {
                 }
             }
         });
-        console.log("e", e);
 
         const activitiesResponse = await userOneClient.query({
             query: MyFollowingActivityDocument,
             variables: { limit: 10, offset: 0 }
         });
 
-        console.log("hm", activitiesResponse);
 
         expect(activitiesResponse.data).to.exist;
 
