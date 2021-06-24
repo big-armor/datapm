@@ -10,6 +10,11 @@
         padding: 20px 0 40px;
         width: 100%;
     }
+
+    .action-div {
+        align-self: center;
+        min-width: 140px;
+    }
 }
 
 @media (max-width: 767px) {
@@ -18,7 +23,12 @@
         flex-direction: column;
         button {
             width: 112px;
-            margin-top: 6px;
+            margin-bottom: 6px;
+            align-self: center;
+
+            &:last-child {
+                margin-bottom: 0px;
+            }
         }
     }
 }

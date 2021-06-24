@@ -13,6 +13,10 @@
             width: 100%;
         }
     }
+    .action-div {
+        align-self: center;
+        min-width: 140px;
+    }
 }
 
 .mat-tooltip-trigger {
@@ -24,10 +28,14 @@
     .action-div {
         display: flex;
         flex-direction: column;
-        a {
+        button {
             width: 112px;
-            margin-top: 6px;
-            text-align: center;
+            margin-bottom: 6px;
+            align-self: center;
+
+            &:last-child {
+                margin-bottom: 0px;
+            }
         }
     }
 }
