@@ -15,7 +15,6 @@ import { expect } from "chai";
 import { loadPackageFileFromDisk } from "datapm-lib";
 
 describe("Following Catalogs Activity Log Tests", async () => {
-
     const userOneUsername = "FollowOneCatalog";
     const userTwoUsername = "FollowTwoCatalog";
 
@@ -88,7 +87,7 @@ describe("Following Catalogs Activity Log Tests", async () => {
             variables: {
                 identifier: {
                     catalogSlug: catalogSlug,
-                    packageSlug: packageSlug,
+                    packageSlug: packageSlug
                 },
                 value: {
                     isPublic: true
@@ -113,17 +112,22 @@ describe("Following Catalogs Activity Log Tests", async () => {
             variables: { limit: 10, offset: 0 }
         });
 
-
         expect(activitiesResponse.data).to.exist;
 
-        if (!activitiesResponse.data || !activitiesResponse.data.myFollowingActivity || !activitiesResponse.data.myFollowingActivity.logs) {
+        if (
+            !activitiesResponse.data ||
+            !activitiesResponse.data.myFollowingActivity ||
+            !activitiesResponse.data.myFollowingActivity.logs
+        ) {
             expect(true).to.equal(false, "Should've returned created following activity collection");
             return;
         }
 
         expect(activitiesResponse.data.myFollowingActivity.logs.length > 0).to.equal(true);
 
-        const createdLog = activitiesResponse.data.myFollowingActivity.logs.find((l) => ActivityLogEventType.CATALOG_PACKAGE_ADDED === l.eventType);
+        const createdLog = activitiesResponse.data.myFollowingActivity.logs.find(
+            (l) => ActivityLogEventType.CATALOG_PACKAGE_ADDED === l.eventType
+        );
         if (!createdLog || !createdLog.user || !createdLog.targetPackage || !createdLog.targetCatalog) {
             expect(true).equal(false, "Should've returned created following activity with log data");
             return;
@@ -187,7 +191,7 @@ describe("Following Catalogs Activity Log Tests", async () => {
             variables: {
                 identifier: {
                     catalogSlug: catalogSlug,
-                    packageSlug: packageSlug,
+                    packageSlug: packageSlug
                 },
                 value: {
                     isPublic: true
@@ -200,7 +204,7 @@ describe("Following Catalogs Activity Log Tests", async () => {
             variables: {
                 identifier: {
                     catalogSlug: catalogSlug,
-                    packageSlug: packageSlug,
+                    packageSlug: packageSlug
                 }
             }
         });
@@ -224,14 +228,20 @@ describe("Following Catalogs Activity Log Tests", async () => {
 
         expect(activitiesResponse.data).to.exist;
 
-        if (!activitiesResponse.data || !activitiesResponse.data.myFollowingActivity || !activitiesResponse.data.myFollowingActivity.logs) {
+        if (
+            !activitiesResponse.data ||
+            !activitiesResponse.data.myFollowingActivity ||
+            !activitiesResponse.data.myFollowingActivity.logs
+        ) {
             expect(true).to.equal(false, "Should've returned created following activity collection");
             return;
         }
 
         expect(activitiesResponse.data.myFollowingActivity.logs.length > 0).to.equal(true);
 
-        const createdLog = activitiesResponse.data.myFollowingActivity.logs.find((l) => ActivityLogEventType.CATALOG_PACKAGE_REMOVED === l.eventType);
+        const createdLog = activitiesResponse.data.myFollowingActivity.logs.find(
+            (l) => ActivityLogEventType.CATALOG_PACKAGE_REMOVED === l.eventType
+        );
         if (!createdLog || !createdLog.user || !createdLog.targetCatalog) {
             expect(true).equal(false, "Should've returned created following activity with log data");
             return;

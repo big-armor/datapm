@@ -11,13 +11,12 @@ import {
     CreateVersionDocument,
     Permission,
     SetPackagePermissionsDocument,
-    UpdatePackageDocument,
+    UpdatePackageDocument
 } from "./registry-client";
 import { expect } from "chai";
 import { loadPackageFileFromDisk } from "datapm-lib";
 
 describe("Following User Activity Log Tests", async () => {
-
     const userOneUsername = "FollowOUser";
     const userTwoUsername = "FollowTUser";
 
@@ -31,7 +30,7 @@ describe("Following User Activity Log Tests", async () => {
             userOneUsername,
             "tstUsrOne@test.datapm.io",
             "passwordOne!"
-        );;
+        );
         userTwoClient = await createUser(
             "FirstTwo",
             "LastTwo",
@@ -78,7 +77,11 @@ describe("Following User Activity Log Tests", async () => {
 
         expect(activitiesResponse.data).to.exist;
 
-        if (!activitiesResponse.data || !activitiesResponse.data.myFollowingActivity || !activitiesResponse.data.myFollowingActivity.logs) {
+        if (
+            !activitiesResponse.data ||
+            !activitiesResponse.data.myFollowingActivity ||
+            !activitiesResponse.data.myFollowingActivity.logs
+        ) {
             expect(true).to.equal(false, "Should've returned created following activity collection");
             console.log(activitiesResponse);
             return;
@@ -142,7 +145,6 @@ describe("Following User Activity Log Tests", async () => {
         });
         expect(createPackageResponse.errors == null).to.equal(true);
 
-
         const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         const packageFileString = JSON.stringify(packageFileContents);
 
@@ -164,7 +166,7 @@ describe("Following User Activity Log Tests", async () => {
             variables: {
                 identifier: {
                     catalogSlug: catalogSlug,
-                    packageSlug: packageSlug,
+                    packageSlug: packageSlug
                 },
                 value: {
                     isPublic: true
@@ -181,14 +183,20 @@ describe("Following User Activity Log Tests", async () => {
 
         expect(activitiesResponse.data).to.exist;
 
-        if (!activitiesResponse.data || !activitiesResponse.data.myFollowingActivity || !activitiesResponse.data.myFollowingActivity.logs) {
+        if (
+            !activitiesResponse.data ||
+            !activitiesResponse.data.myFollowingActivity ||
+            !activitiesResponse.data.myFollowingActivity.logs
+        ) {
             expect(true).to.equal(false, "Should've returned created following activity collection");
             return;
         }
 
         expect(activitiesResponse.data.myFollowingActivity.logs.length > 0).to.equal(true);
 
-        const createdLog = activitiesResponse.data.myFollowingActivity.logs.find((l) => ActivityLogEventType.PACKAGE_CREATED === l.eventType);
+        const createdLog = activitiesResponse.data.myFollowingActivity.logs.find(
+            (l) => ActivityLogEventType.PACKAGE_CREATED === l.eventType
+        );
 
         if (!createdLog || !createdLog.user || !createdLog.targetPackage) {
             expect(true).equal(false, "Should've returned created following activity with user and package data");
@@ -255,7 +263,6 @@ describe("Following User Activity Log Tests", async () => {
         });
         expect(createPackageResponse.errors == null).to.equal(true);
 
-
         const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         const packageFileString = JSON.stringify(packageFileContents);
 
@@ -277,13 +284,15 @@ describe("Following User Activity Log Tests", async () => {
             variables: {
                 identifier: {
                     catalogSlug: catalogSlug,
-                    packageSlug: packageSlug,
+                    packageSlug: packageSlug
                 },
                 message: "Hello",
-                value: [{
-                    usernameOrEmailAddress: userOneUsername,
-                    permissions: [Permission.VIEW]
-                }]
+                value: [
+                    {
+                        usernameOrEmailAddress: userOneUsername,
+                        permissions: [Permission.VIEW]
+                    }
+                ]
             }
         });
         expect(addUserPermissions.errors == null).to.equal(true);
@@ -295,14 +304,20 @@ describe("Following User Activity Log Tests", async () => {
 
         expect(activitiesResponse.data).to.exist;
 
-        if (!activitiesResponse.data || !activitiesResponse.data.myFollowingActivity || !activitiesResponse.data.myFollowingActivity.logs) {
+        if (
+            !activitiesResponse.data ||
+            !activitiesResponse.data.myFollowingActivity ||
+            !activitiesResponse.data.myFollowingActivity.logs
+        ) {
             expect(true).to.equal(false, "Should've returned created following activity collection");
             return;
         }
 
         expect(activitiesResponse.data.myFollowingActivity.logs.length > 0).to.equal(true);
 
-        const createdLog = activitiesResponse.data.myFollowingActivity.logs.find((l) => ActivityLogEventType.PACKAGE_CREATED === l.eventType);
+        const createdLog = activitiesResponse.data.myFollowingActivity.logs.find(
+            (l) => ActivityLogEventType.PACKAGE_CREATED === l.eventType
+        );
 
         if (!createdLog || !createdLog.user || !createdLog.targetPackage) {
             expect(true).equal(false, "Should've returned created following activity with user and package data");
@@ -369,7 +384,6 @@ describe("Following User Activity Log Tests", async () => {
         });
         expect(createPackageResponse.errors == null).to.equal(true);
 
-
         const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
         const packageFileString = JSON.stringify(packageFileContents);
 
@@ -391,7 +405,7 @@ describe("Following User Activity Log Tests", async () => {
             variables: {
                 identifier: {
                     catalogSlug: catalogSlug,
-                    packageSlug: packageSlug,
+                    packageSlug: packageSlug
                 },
                 value: {
                     isPublic: true
@@ -408,14 +422,20 @@ describe("Following User Activity Log Tests", async () => {
 
         expect(activitiesResponse.data).to.exist;
 
-        if (!activitiesResponse.data || !activitiesResponse.data.myFollowingActivity || !activitiesResponse.data.myFollowingActivity.logs) {
+        if (
+            !activitiesResponse.data ||
+            !activitiesResponse.data.myFollowingActivity ||
+            !activitiesResponse.data.myFollowingActivity.logs
+        ) {
             expect(true).to.equal(false, "Should've returned created following activity collection");
             return;
         }
 
         expect(activitiesResponse.data.myFollowingActivity.logs.length > 0).to.equal(true);
 
-        const createdLog = activitiesResponse.data.myFollowingActivity.logs.find((l) => ActivityLogEventType.VERSION_CREATED === l.eventType);
+        const createdLog = activitiesResponse.data.myFollowingActivity.logs.find(
+            (l) => ActivityLogEventType.VERSION_CREATED === l.eventType
+        );
 
         if (!createdLog || !createdLog.user || !createdLog.targetPackage) {
             expect(true).equal(false, "Should've returned created following activity with user and package data");
