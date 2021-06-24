@@ -370,7 +370,7 @@ resource "google_cloud_scheduler_job" "instant_notifications_job" {
   project          = google_project.project.project_id
   region           = "us-central1"
   description      = "To invoke sending daily notifications"
-  schedule         = "1/1 * * * *"
+  schedule         = "* * * * *"
   time_zone        = "America/New_York"
   attempt_deadline = "320s"
 
@@ -390,7 +390,7 @@ resource "google_cloud_scheduler_job" "hourly_notifications_job" {
   project          = google_project.project.project_id
   region           = "us-central1"
   description      = "To invoke sending hourly notifications"
-  schedule         = "0 1/1 * * *"
+  schedule         = "0 * * * *"
   time_zone        = "America/New_York"
   attempt_deadline = "320s"
 
@@ -451,7 +451,7 @@ resource "google_cloud_scheduler_job" "monthly_notifications_job" {
   project          = google_project.project.project_id
   region           = "us-central1"
   description      = "To invoke sending monthly notifications"
-  schedule         = "0 8 * * MON"
+  schedule         = "0 8 1 * *"
   time_zone        = "America/New_York"
   attempt_deadline = "320s"
 
