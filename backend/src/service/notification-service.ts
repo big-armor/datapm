@@ -571,19 +571,19 @@ async function getPendingNotifications(
     startDate: Date,
     endDaate: Date
 ): Promise<Notification[]> {
-    const pendingCatalogNotifications = databaseConnection?.manager
+    const pendingCatalogNotifications = databaseConnection.manager
         .getCustomRepository(FollowRepository)
         .getCatalogFollowsForNotifications(startDate, endDaate, frequency);
 
-    const pendingPackageNotificaitons = databaseConnection?.manager
+    const pendingPackageNotificaitons = databaseConnection.manager
         .getCustomRepository(FollowRepository)
         .getPackageFollowsForNotifications(startDate, endDaate, frequency);
 
-    const pendingCollectionNotificaitons = databaseConnection?.manager
+    const pendingCollectionNotificaitons = databaseConnection.manager
         .getCustomRepository(FollowRepository)
         .getCollectionFollowsForNotifications(startDate, endDaate, frequency);
 
-    const pendingUserNotificaitons = databaseConnection?.manager
+    const pendingUserNotificaitons = databaseConnection.manager
         .getCustomRepository(FollowRepository)
         .getUserFollowsForNotifications(startDate, endDaate, frequency);
 
