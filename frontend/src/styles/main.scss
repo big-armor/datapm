@@ -4,6 +4,7 @@
 @import "./colors.scss";
 @import "./typography";
 @import "./theme";
+@import "~swiper/swiper-bundle";
 
 html,
 body {
@@ -122,6 +123,11 @@ table.gray-table {
         font-weight: $weight-400;
         border-bottom: 1px solid var(--gray-5-color);
     }
+}
+
+.swiper-container-multirow-column > .swiper-wrapper {
+    flex-wrap: wrap;
+    flex-direction: row !important;
 }
 
 .gray-paginator {

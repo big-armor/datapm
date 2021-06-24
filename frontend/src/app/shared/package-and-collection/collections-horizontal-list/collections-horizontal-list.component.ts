@@ -1,11 +1,16 @@
-import { Component, Input, OnChanges } from "@angular/core";
+import { Component, Input, OnChanges, ViewEncapsulation } from "@angular/core";
 import { Router } from "@angular/router";
 import { Collection } from "src/generated/graphql";
+import SwiperCore, { Keyboard, Navigation, Pagination, Scrollbar, Mousewheel, A11y } from "swiper/core";
+
+// install Swiper modules
+SwiperCore.use([Keyboard, Navigation, Pagination, Scrollbar, Mousewheel, A11y]);
 
 @Component({
     selector: "app-collections-horizontal-list",
     templateUrl: "./collections-horizontal-list.component.html",
-    styleUrls: ["./collections-horizontal-list.component.scss"]
+    styleUrls: ["./collections-horizontal-list.component.scss"],
+    encapsulation: ViewEncapsulation.None
 })
 export class CollectionsHorizontalListComponent implements OnChanges {
     @Input()
