@@ -69,6 +69,7 @@ import { IvyCarouselModule } from "angular-responsive-carousel";
 import { ImportedModule } from "../imported/imported.module";
 import { MovePackageComponent } from "./move-package/move-package.component";
 import { HeroComponent } from "./hero/hero.component";
+import { SwiperModule } from "swiper/angular";
 
 @NgModule({
     declarations: [
@@ -143,7 +144,8 @@ import { HeroComponent } from "./hero/hero.component";
         RouterModule,
         AngularSimplemdeModule,
         IvyCarouselModule,
-        ImportedModule
+        ImportedModule,
+        SwiperModule
     ],
     exports: [
         HeaderComponent,

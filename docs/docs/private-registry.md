@@ -52,7 +52,7 @@ services:
       - SMTP_FROM_ADDRESS="datapm@localhost"
       - SMTP_SECURE=false
   postgres:
-    image: postgres:11
+    image: postgres:13.3
     volumes:
       - type: volume
         source: postgres_data_local

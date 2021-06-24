@@ -37,15 +37,15 @@ export const runJob = async (
     }
 
     if (job === JobType.INSTANT_NOTIFICATIONS) {
-        instantNotifications();
+        instantNotifications(context.connection);
     } else if (job === JobType.HOURLY_NOTIFICATIONS) {
-        hourlyNotifications();
+        hourlyNotifications(context.connection);
     } else if (job === JobType.DAILY_NOTIFICATIONS) {
-        dailyNotifications();
+        dailyNotifications(context.connection);
     } else if (job === JobType.WEEKLY_NOTIFICATIONS) {
-        weeklyNotifications();
+        weeklyNotifications(context.connection);
     } else if (job === JobType.MONTHLY_NOTIFICATIONS) {
-        monthlyNotifications();
+        monthlyNotifications(context.connection);
     } else {
         throw new Error("JOB_NOT_RECOGNIZED - " + job);
     }

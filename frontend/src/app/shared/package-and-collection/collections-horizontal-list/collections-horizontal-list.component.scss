@@ -1,29 +1,100 @@
 @import "../../../../styles/variables";
 @import "../../../../styles/colors";
+@import "~swiper/swiper";
+@import "~swiper/components/pagination/pagination";
 
 #collectionList {
-    ::ng-deep {
-        .carousel-arrow-disabled {
-            cursor: default;
-            opacity: 0;
-        }
+    .swiper-container {
+        width: 100%;
+        height: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
 
-        .carousel-arrow-next {
-            right: -30px;
-        }
+    .swiper-slide {
+        text-align: center;
+        font-size: 18px;
+        background: unset;
+        height: calc((100% - 30px) / 2);
+        margin: 0px !important;
+        padding: 5px;
 
-        .carousel-arrow-prev {
-            left: -30px;
-        }
+        /* Center slide text vertically */
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        -webkit-justify-content: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        -webkit-align-items: center;
+        align-items: center;
+    }
 
-        .carousel-arrow {
-            background-color: var(--carousel-arrows);
+    .swiper-button-prev {
+        &::after {
+            font-size: 20px;
+            content: "";
         }
+    }
+
+    .swiper-button-next {
+        &::after {
+            font-size: 20px;
+            content: "";
+        }
+    }
+
+    .swiper-button-next,
+    .swiper-container-rtl .swiper-button-prev {
+        right: 0px;
+        left: auto;
+        background-position: 50%;
+        background-repeat: no-repeat;
+        background-size: 31px;
+        border-radius: 100px;
+        box-shadow: 0 0 5px rgb(0 0 0 / 15%);
+        cursor: pointer;
+        height: 40px;
+        margin-top: -20px;
+        position: absolute;
+        top: 50%;
+        width: 40px;
+        z-index: 10;
+        background-color: #fff;
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0Ij48cGF0aCBkPSJNOC41OSAxNi41OUwxMy4xNyAxMiA4LjU5IDcuNDEgMTAgNmw2IDYtNiA2LTEuNDEtMS40MXoiLz48cGF0aCBkPSJNMCAwaDI0djI0SDBWMHoiIGZpbGw9Im5vbmUiLz48L3N2Zz4=);
+    }
+
+    .swiper-button-prev,
+    .swiper-container-rtl .swiper-button-next {
+        left: 0px;
+        right: auto;
+        background-position: 50%;
+        background-repeat: no-repeat;
+        background-size: 31px;
+        border-radius: 100px;
+        box-shadow: 0 0 5px rgb(0 0 0 / 15%);
+        cursor: pointer;
+        height: 40px;
+        margin-top: -20px;
+        position: absolute;
+        top: 50%;
+        width: 40px;
+        z-index: 10;
+        background-color: #fff;
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0Ij48cGF0aCBkPSJNMTUuNDEgMTYuNTlMMTAuODMgMTJsNC41OC00LjU5TDE0IDZsLTYgNiA2IDYgMS40MS0xLjQxeiIvPjxwYXRoIGQ9Ik0wIDBoMjR2MjRIMFYweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==);
+    }
+
+    .swiper-button-disabled {
+        display: none;
     }
 
     .collections-container {
         border-radius: 6px;
-        padding: 22px 15px 20px 15px;
+        padding: 12px 15px 12px 15px;
         background-color: var(--gray-10-color);
     }
 
@@ -45,17 +116,5 @@
         &:hover {
             background-color: var(--custom-secondary-color);
         }
-    }
-}
-
-@media (max-width: 576px) {
-    // #collectionList {
-    //     .collection-item {
-    //         font-size: $small-font;
-    //     }
-    // }
-    .container {
-        padding-left: 0px;
-        padding-right: 0px;
     }
 }

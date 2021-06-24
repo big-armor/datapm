@@ -89,7 +89,6 @@ export async function createUserDoNotVerifyEmail(
                 verifyEmailPromise
                     .catch((error) => reject(error))
                     .then((email) => {
-
                         expect(email.html).to.not.contain("{{registry_name}}");
                         expect(email.html).to.not.contain("{{registry_url}}");
                         expect(email.html).to.not.contain("{{token}}");

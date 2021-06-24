@@ -21,11 +21,11 @@ import { CollectionRepository } from "../repository/CollectionRepository";
 
 let databaseConnection: Connection | null;
 
-const instantJob = new CronJob("1/1 * * * *", instantNotifications, null, false, "America/New_York");
-const hourlyJob = new CronJob("0 1/1 * * *", hourlyNotifications, null, false, "America/New_York");
-const dailyJob = new CronJob("0 0 8 * * *", dailyNotifications, null, false, "America/New_York");
-const weeklyJob = new CronJob("0 0 8 * * MON", weeklyNotifications, null, false, "America/New_York");
-const monthlyJob = new CronJob("0 0 12 1 * *", monthlyNotifications, null, false, "America/New_York");
+const instantJob = new CronJob("1/1 * * * *", instantNotificationJob, null, false, "America/New_York");
+const hourlyJob = new CronJob("0 1/1 * * *", hourlyNotificationsJob, null, false, "America/New_York");
+const dailyJob = new CronJob("0 0 8 * * *", dailyNotificationsJob, null, false, "America/New_York");
+const weeklyJob = new CronJob("0 0 8 * * MON", weeklyNotificationsJob, null, false, "America/New_York");
+const monthlyJob = new CronJob("0 0 12 1 * *", monthlyNotificationsJob, null, false, "America/New_York");
 
 export function startNotificationService(connection: Connection) {
     databaseConnection = connection;
@@ -44,28 +44,52 @@ export async function stopNotificationService() {
     monthlyJob.stop();
 }
 
-export async function instantNotifications() {
-    await prepareAndSendNotifications("lastInstantNotificationDate", NotificationFrequency.INSTANT);
+async function instantNotificationJob() {
+    instantNotifications(databaseConnection!);
 }
 
-export async function hourlyNotifications() {
-    await prepareAndSendNotifications("lastInstantNotificationDate", NotificationFrequency.HOURLY);
+async function hourlyNotificationsJob() {
+    hourlyNotifications(databaseConnection!);
 }
 
-export async function dailyNotifications() {
-    await prepareAndSendNotifications("lastDailyNotificationDate", NotificationFrequency.DAILY);
+async function dailyNotificationsJob() {
+    dailyNotifications(databaseConnection!);
 }
 
-export async function weeklyNotifications() {
-    await prepareAndSendNotifications("lastWeeklyNotificationDate", NotificationFrequency.WEEKLY);
+async function weeklyNotificationsJob() {
+    weeklyNotifications(databaseConnection!);
 }
 
-export async function monthlyNotifications() {
-    await prepareAndSendNotifications("lastMonthlyNotificationDate", NotificationFrequency.MONTHLY);
+async function monthlyNotificationsJob() {
+    monthlyNotifications(databaseConnection!);
 }
 
-async function prepareAndSendNotifications(stateKey: string, frequency: NotificationFrequency) {
-    const result = await databaseConnection?.getCustomRepository(PlatformStateRepository).findStateByKey(stateKey);
+export async function instantNotifications(databaseConnection: Connection) {
+    await prepareAndSendNotifications(databaseConnection, "lastInstantNotificationDate", NotificationFrequency.INSTANT);
+}
+
+export async function hourlyNotifications(databaseConnection: Connection) {
+    await prepareAndSendNotifications(databaseConnection, "lastInstantNotificationDate", NotificationFrequency.HOURLY);
+}
+
+export async function dailyNotifications(databaseConnection: Connection) {
+    await prepareAndSendNotifications(databaseConnection, "lastDailyNotificationDate", NotificationFrequency.DAILY);
+}
+
+export async function weeklyNotifications(databaseConnection: Connection) {
+    await prepareAndSendNotifications(databaseConnection, "lastWeeklyNotificationDate", NotificationFrequency.WEEKLY);
+}
+
+export async function monthlyNotifications(databaseConnection: Connection) {
+    await prepareAndSendNotifications(databaseConnection, "lastMonthlyNotificationDate", NotificationFrequency.MONTHLY);
+}
+
+async function prepareAndSendNotifications(
+    databaseConnection: Connection,
+    stateKey: string,
+    frequency: NotificationFrequency
+) {
+    const result = await databaseConnection.getCustomRepository(PlatformStateRepository).findStateByKey(stateKey);
 
     let lastNotificationDate = new Date(new Date().getTime() - 60 * 1000);
 
@@ -91,7 +115,7 @@ async function prepareAndSendNotifications(stateKey: string, frequency: Notifica
         console.error("There was an error sending " + frequency + " notifications!");
         console.error(error);
     } finally {
-        await databaseConnection?.transaction(async (entityManager) => {
+        await databaseConnection.transaction(async (entityManager) => {
             if (result) {
                 result.serializedState = now.toISOString();
                 await entityManager.save(result);
@@ -571,19 +595,19 @@ async function getPendingNotifications(
     startDate: Date,
     endDaate: Date
 ): Promise<Notification[]> {
-    const pendingCatalogNotifications = databaseConnection?.manager
+    const pendingCatalogNotifications = databaseConnection.manager
         .getCustomRepository(FollowRepository)
         .getCatalogFollowsForNotifications(startDate, endDaate, frequency);
 
-    const pendingPackageNotificaitons = databaseConnection?.manager
+    const pendingPackageNotificaitons = databaseConnection.manager
         .getCustomRepository(FollowRepository)
         .getPackageFollowsForNotifications(startDate, endDaate, frequency);
 
-    const pendingCollectionNotificaitons = databaseConnection?.manager
+    const pendingCollectionNotificaitons = databaseConnection.manager
         .getCustomRepository(FollowRepository)
         .getCollectionFollowsForNotifications(startDate, endDaate, frequency);
 
-    const pendingUserNotificaitons = databaseConnection?.manager
+    const pendingUserNotificaitons = databaseConnection.manager
         .getCustomRepository(FollowRepository)
         .getUserFollowsForNotifications(startDate, endDaate, frequency);
 
