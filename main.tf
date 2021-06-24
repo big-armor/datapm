@@ -381,7 +381,10 @@ resource "google_cloud_scheduler_job" "instant_notifications_job" {
   http_target {
     http_method = "POST"
     uri         = "https://test.datapm.io/graphql"
-    body        = base64encode("{\"operationName\":\"runJob\",\"variables\":{\"key\":\"${random_password.scheduler_key.result}\",\"job\":\"INSTANT_NOTIFICATIONS\"},\"query\":\"mutation runJob($key: String!, $job: JobType!) {\n  runJob(key: $key, job: $job)\n}\n\"}")
+    headers = {
+      Content-Type = "application/json"
+    }
+    body = base64encode("{\"operationName\":\"runJob\",\"variables\":{\"key\":\"${random_password.scheduler_key.result}\",\"job\":\"INSTANT_NOTIFICATIONS\"},\"query\":\"mutation runJob($key: String!, $job: JobType!) {\n  runJob(key: $key, job: $job)\n}\n\"}")
   }
 }
 
@@ -401,7 +404,10 @@ resource "google_cloud_scheduler_job" "hourly_notifications_job" {
   http_target {
     http_method = "POST"
     uri         = "https://test.datapm.io/graphql"
-    body        = base64encode("{\"operationName\":\"runJob\",\"variables\":{\"key\":\"${random_password.scheduler_key.result}\",\"job\":\"HOURLY_NOTIFICATIONS\"},\"query\":\"mutation runJob($key: String!, $job: JobType!) {\n  runJob(key: $key, job: $job)\n}\n\"}")
+    headers = {
+      Content-Type = "application/json"
+    }
+    body = base64encode("{\"operationName\":\"runJob\",\"variables\":{\"key\":\"${random_password.scheduler_key.result}\",\"job\":\"HOURLY_NOTIFICATIONS\"},\"query\":\"mutation runJob($key: String!, $job: JobType!) {\n  runJob(key: $key, job: $job)\n}\n\"}")
   }
 }
 
@@ -421,7 +427,10 @@ resource "google_cloud_scheduler_job" "daily_notifications_job" {
   http_target {
     http_method = "POST"
     uri         = "https://test.datapm.io/graphql"
-    body        = base64encode("{\"operationName\":\"runJob\",\"variables\":{\"key\":\"${random_password.scheduler_key.result}\",\"job\":\"DAILY_NOTIFICATIONS\"},\"query\":\"mutation runJob($key: String!, $job: JobType!) {\n  runJob(key: $key, job: $job)\n}\n\"}")
+    headers = {
+      Content-Type = "application/json"
+    }
+    body = base64encode("{\"operationName\":\"runJob\",\"variables\":{\"key\":\"${random_password.scheduler_key.result}\",\"job\":\"DAILY_NOTIFICATIONS\"},\"query\":\"mutation runJob($key: String!, $job: JobType!) {\n  runJob(key: $key, job: $job)\n}\n\"}")
   }
 }
 
@@ -441,7 +450,10 @@ resource "google_cloud_scheduler_job" "weekly_notifications_job" {
   http_target {
     http_method = "POST"
     uri         = "https://test.datapm.io/graphql"
-    body        = base64encode("{\"operationName\":\"runJob\",\"variables\":{\"key\":\"${random_password.scheduler_key.result}\",\"job\":\"WEEKLY_NOTIFICATIONS\"},\"query\":\"mutation runJob($key: String!, $job: JobType!) {\n  runJob(key: $key, job: $job)\n}\n\"}")
+    headers = {
+      Content-Type = "application/json"
+    }
+    body = base64encode("{\"operationName\":\"runJob\",\"variables\":{\"key\":\"${random_password.scheduler_key.result}\",\"job\":\"WEEKLY_NOTIFICATIONS\"},\"query\":\"mutation runJob($key: String!, $job: JobType!) {\n  runJob(key: $key, job: $job)\n}\n\"}")
   }
 }
 
@@ -462,7 +474,10 @@ resource "google_cloud_scheduler_job" "monthly_notifications_job" {
   http_target {
     http_method = "POST"
     uri         = "https://test.datapm.io/graphql"
-    body        = base64encode("{\"operationName\":\"runJob\",\"variables\":{\"key\":\"${random_password.scheduler_key.result}\",\"job\":\"MONTHLY_NOTIFICATIONS\"},\"query\":\"mutation runJob($key: String!, $job: JobType!) {\n  runJob(key: $key, job: $job)\n}\n\"}")
+    headers = {
+      Content-Type = "application/json"
+    }
+    body = base64encode("{\"operationName\":\"runJob\",\"variables\":{\"key\":\"${random_password.scheduler_key.result}\",\"job\":\"MONTHLY_NOTIFICATIONS\"},\"query\":\"mutation runJob($key: String!, $job: JobType!) {\n  runJob(key: $key, job: $job)\n}\n\"}")
   }
 }
 
