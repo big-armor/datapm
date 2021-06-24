@@ -39,6 +39,7 @@ query GetPageContent($route: String!) {
             emailAddress
             firstName
             lastName
+            displayName
             username
             nameIsPublic
             location

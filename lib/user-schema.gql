@@ -6,6 +6,7 @@ Represents one real world person, and their information
 """
 type User {
     username: String!
+    displayName: String!
     firstName: String
     lastName: String
     location: String

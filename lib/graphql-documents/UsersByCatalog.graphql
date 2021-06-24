@@ -5,6 +5,7 @@ query UsersByCatalog($identifier: CatalogIdentifierInput!) {
             firstName
             lastName
             nameIsPublic
+            displayName
         }
         permissions
     }

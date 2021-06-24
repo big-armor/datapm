@@ -36,6 +36,7 @@ query MyFollows($type: FollowType!, $offset: Int!, $limit: Int!) {
                 firstName
                 lastName
                 username
+                displayName
             }
         }
         hasMore

@@ -6,6 +6,7 @@ query CollectionActivities($identifier: CollectionIdentifierInput!, $filter: Act
                 username
                 firstName
                 lastName
+                displayName
             }
             targetPackage {
                 creator {
