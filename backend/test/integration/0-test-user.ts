@@ -200,7 +200,6 @@ describe("User Tests", async () => {
 
         expect(firstName.data?.searchUsers["users"][0]?.firstName).to.equal("FirstA");
         expect(lastName.data?.searchUsers["users"][0]?.lastName).to.equal("LastA");
-        expect(email.data?.searchUsers["users"][0]?.emailAddress).to.equal("testA-user@test.datapm.io");
         expect(username.data?.searchUsers["users"][0]?.username).to.equal("testA-user");
     });
 

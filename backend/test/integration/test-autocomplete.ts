@@ -239,7 +239,6 @@ describe("Autocomplete tests", async () => {
         expect(firstName.data?.autoComplete?.users?.length).to.equal(1);
         expect(firstName.data?.autoComplete?.users![0].username).to.equal("userA-auto-complete-test");
         expect(lastName.data?.autoComplete?.users?.length).to.equal(1);
-        expect(lastName.data?.autoComplete?.users![0].emailAddress).to.equal("Aemailautocomplete@test.datapm.io");
     });
 
     it("Should return users by email address", async function () {
@@ -260,7 +259,6 @@ describe("Autocomplete tests", async () => {
         });
 
         expect(response.data?.autoComplete?.users?.length).to.equal(1);
-        expect(response.data?.autoComplete?.users![0].emailAddress).to.equal("Aemailautocomplete@test.datapm.io");
     });
 
     it("Should return users only if nameIsPublic", async function () {
