@@ -7,12 +7,11 @@ import {
     SaveFollowDocument,
     NotificationFrequency,
     MyFollowingActivityDocument,
-    SetPackagePermissionsDocument,
-    Permission,
     AddPackageToCollectionDocument,
     CreateCollectionDocument,
     RemovePackageFromCollectionDocument,
-    CreateVersionDocument
+    CreateVersionDocument,
+    UpdatePackageDocument
 } from "./registry-client";
 import { expect } from "chai";
 import { loadPackageFileFromDisk } from "datapm-lib";
@@ -88,6 +87,19 @@ describe("Following Collections Activity Log Tests", async () => {
         });
 
         await userTwoClient.mutate({
+            mutation: UpdatePackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: catalogSlug,
+                    packageSlug: packageSlug,
+                },
+                value: {
+                    isPublic: true
+                }
+            }
+        });
+
+        await userTwoClient.mutate({
             mutation: CreateCollectionDocument,
             variables: {
                 value: {
@@ -109,21 +121,6 @@ describe("Following Collections Activity Log Tests", async () => {
                 collectionIdentifier: {
                     collectionSlug
                 }
-            }
-        });
-
-        await userTwoClient.mutate({
-            mutation: SetPackagePermissionsDocument,
-            variables: {
-                identifier: {
-                    catalogSlug: catalogSlug,
-                    packageSlug: packageSlug,
-                },
-                message: "Hello",
-                value: [{
-                    usernameOrEmailAddress: userOneUsername,
-                    permissions: [Permission.VIEW]
-                }]
             }
         });
 
@@ -214,6 +211,19 @@ describe("Following Collections Activity Log Tests", async () => {
         });
 
         await userTwoClient.mutate({
+            mutation: UpdatePackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: catalogSlug,
+                    packageSlug: packageSlug,
+                },
+                value: {
+                    isPublic: true
+                }
+            }
+        });
+
+        await userTwoClient.mutate({
             mutation: CreateCollectionDocument,
             variables: {
                 value: {
@@ -248,21 +258,6 @@ describe("Following Collections Activity Log Tests", async () => {
                 collectionIdentifier: {
                     collectionSlug
                 }
-            }
-        });
-
-        await userTwoClient.mutate({
-            mutation: SetPackagePermissionsDocument,
-            variables: {
-                identifier: {
-                    catalogSlug: catalogSlug,
-                    packageSlug: packageSlug,
-                },
-                message: "Hello",
-                value: [{
-                    usernameOrEmailAddress: userOneUsername,
-                    permissions: [Permission.VIEW]
-                }]
             }
         });
 

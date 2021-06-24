@@ -7,11 +7,12 @@ import {
     SaveFollowDocument,
     NotificationFrequency,
     MyFollowingActivityDocument,
-    SetPackagePermissionsDocument,
-    Permission,
-    DeletePackageDocument
+    DeletePackageDocument,
+    CreateVersionDocument,
+    UpdatePackageDocument
 } from "./registry-client";
 import { expect } from "chai";
+import { loadPackageFileFromDisk } from "datapm-lib";
 
 describe("Following Catalogs Activity Log Tests", async () => {
 
@@ -42,7 +43,7 @@ describe("Following Catalogs Activity Log Tests", async () => {
         const catalogSlug = "usr-fol-sdx-ctg";
         const packageSlug = "usr-fol-sdx-pkg";
 
-        await userTwoClient.mutate({
+        const a = await userTwoClient.mutate({
             mutation: CreateCatalogDocument,
             variables: {
                 value: {
@@ -53,8 +54,9 @@ describe("Following Catalogs Activity Log Tests", async () => {
                 }
             }
         });
+        console.log("a", a);
 
-        await userTwoClient.mutate({
+        const b = await userTwoClient.mutate({
             mutation: CreatePackageDocument,
             variables: {
                 value: {
@@ -65,23 +67,40 @@ describe("Following Catalogs Activity Log Tests", async () => {
                 }
             }
         });
+        console.log("b", b);
 
-        await userTwoClient.mutate({
-            mutation: SetPackagePermissionsDocument,
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileString = JSON.stringify(packageFileContents);
+
+        const c = await userTwoClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: catalogSlug,
+                    packageSlug: packageSlug
+                },
+                value: {
+                    packageFile: packageFileString
+                }
+            }
+        });
+        console.log("c", c);
+
+        const d = await userTwoClient.mutate({
+            mutation: UpdatePackageDocument,
             variables: {
                 identifier: {
                     catalogSlug: catalogSlug,
                     packageSlug: packageSlug,
                 },
-                message: "Hello",
-                value: [{
-                    usernameOrEmailAddress: userOneUsername,
-                    permissions: [Permission.VIEW]
-                }]
+                value: {
+                    isPublic: true
+                }
             }
         });
+        console.log("d", d);
 
-        await userOneClient.mutate({
+        const e = await userOneClient.mutate({
             mutation: SaveFollowDocument,
             variables: {
                 follow: {
@@ -92,11 +111,14 @@ describe("Following Catalogs Activity Log Tests", async () => {
                 }
             }
         });
+        console.log("e", e);
 
         const activitiesResponse = await userOneClient.query({
             query: MyFollowingActivityDocument,
             variables: { limit: 10, offset: 0 }
         });
+
+        console.log("hm", activitiesResponse);
 
         expect(activitiesResponse.data).to.exist;
 
@@ -150,18 +172,32 @@ describe("Following Catalogs Activity Log Tests", async () => {
             }
         });
 
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileString = JSON.stringify(packageFileContents);
+
         await userTwoClient.mutate({
-            mutation: SetPackagePermissionsDocument,
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: catalogSlug,
+                    packageSlug: packageSlug
+                },
+                value: {
+                    packageFile: packageFileString
+                }
+            }
+        });
+
+        await userTwoClient.mutate({
+            mutation: UpdatePackageDocument,
             variables: {
                 identifier: {
                     catalogSlug: catalogSlug,
                     packageSlug: packageSlug,
                 },
-                message: "Hello",
-                value: [{
-                    usernameOrEmailAddress: userOneUsername,
-                    permissions: [Permission.VIEW]
-                }]
+                value: {
+                    isPublic: true
+                }
             }
         });
 

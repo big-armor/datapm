@@ -12,8 +12,6 @@ import {
     CreatePackageIssueDocument,
     UpdatePackageIssueStatusDocument,
     PackageIssueStatus,
-    SetPackagePermissionsDocument,
-    Permission,
     CreatePackageIssueCommentDocument
 } from "./registry-client";
 import { expect } from "chai";
@@ -234,18 +232,32 @@ describe("Following Package Issues Activity Log Tests", async () => {
             }
         });
 
+        const packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        const packageFileString = JSON.stringify(packageFileContents);
+
         await userTwoClient.mutate({
-            mutation: SetPackagePermissionsDocument,
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: catalogSlug,
+                    packageSlug: packageSlug
+                },
+                value: {
+                    packageFile: packageFileString
+                }
+            }
+        });
+
+        await userTwoClient.mutate({
+            mutation: UpdatePackageDocument,
             variables: {
                 identifier: {
                     catalogSlug: catalogSlug,
                     packageSlug: packageSlug,
                 },
-                message: "Hello",
-                value: [{
-                    usernameOrEmailAddress: userOneUsername,
-                    permissions: [Permission.VIEW]
-                }]
+                value: {
+                    isPublic: true
+                }
             }
         });
 

@@ -186,47 +186,49 @@ export class ActivityLogRepository extends Repository<ActivityLogEntity> {
                     "ActivityLog"."user_id" != "Follow"."user_id"
                 AND "ActivityLog"."event_type" IN (SELECT * FROM unnest("Follow"."event_types"))
                 AND
+                    (
+                        "ActivityLog"."user_id" = "Follow"."target_user_id"
+                        OR "ActivityLog"."target_collection_id" = "Follow"."target_collection_id"
+                        OR "ActivityLog"."target_catalog_id" = "Follow"."target_catalog_id"
+                        OR "ActivityLog"."target_package_issue_id" = "Follow"."target_package_issue_id"
+                        OR "ActivityLog"."target_package_id" = "Follow"."target_package_id"
+                    )
+                AND
                     CASE
-                        WHEN "Follow"."target_collection_id" IS NULL THEN TRUE
+                        WHEN "ActivityLog"."target_collection_id" IS NULL THEN TRUE
                         ELSE
                             (
-                                "ActivityLog"."target_collection_id" = "Follow"."target_collection_id"
-                                AND
-                                (SELECT c.is_public FROM collection c WHERE c.id = "Follow"."target_collection_id") IS TRUE
-                                OR EXISTS (SELECT cu.collection_id FROM collection_user cu WHERE "Follow"."target_collection_id" = cu.collection_id AND cu.user_id = "Follow".user_id)
+                                (SELECT c.is_public FROM collection c WHERE c.id = "ActivityLog"."target_collection_id") IS TRUE
+                                OR
+                                (EXISTS (SELECT cu.collection_id FROM collection_user cu WHERE "ActivityLog"."target_collection_id" = cu.collection_id AND cu.user_id = "Follow".user_id))
                             )
                     END
                 AND
                     CASE
-                        WHEN "Follow"."target_catalog_id" IS NULL THEN TRUE
+                        WHEN "ActivityLog"."target_catalog_id" IS NULL THEN TRUE
                         ELSE
                             (
-                                "ActivityLog"."target_catalog_id" = "Follow"."target_catalog_id"
-                                AND
-                                (SELECT c."isPublic" FROM catalog c WHERE c.id = "Follow"."target_catalog_id") IS TRUE
-                                OR EXISTS (SELECT cu.catalog_id FROM user_catalog cu WHERE "Follow"."target_catalog_id" = cu.catalog_id AND cu.user_id = "Follow".user_id)
+                                (SELECT c."isPublic" FROM catalog c WHERE c.id = "ActivityLog"."target_catalog_id") IS TRUE
+                                OR
+                                (EXISTS (SELECT cu.catalog_id FROM user_catalog cu WHERE "ActivityLog"."target_catalog_id" = cu.catalog_id AND cu.user_id = "Follow".user_id))
                             )
                     END
                 AND
                     CASE
-                        WHEN "Follow"."target_package_issue_id" IS NULL THEN TRUE
+                        WHEN "ActivityLog"."target_package_issue_id" IS NULL THEN TRUE
+                        ELSE (EXISTS (SELECT pi.id FROM package_issue pi WHERE "ActivityLog"."target_package_issue_id" = pi.id))
+                    END
+                AND
+                    CASE
+                        WHEN "ActivityLog"."target_package_id" IS NULL THEN TRUE
                         ELSE
                             (
-                                "ActivityLog"."target_package_issue_id" = "Follow"."target_package_issue_id"
-                                AND
-                                (EXISTS (SELECT pi.id FROM package_issue pi WHERE "Follow"."target_package_issue_id" = pi.id))
+                                (SELECT pkg."isPublic" FROM package pkg WHERE pkg.id = "ActivityLog"."target_package_id") IS TRUE
+                                OR
+                                (EXISTS (SELECT pu.package_id FROM user_package_permission pu WHERE "ActivityLog"."target_package_id" = pu.package_id AND pu.user_id = "Follow".user_id))
                             )
                     END
-                AND (
-                    CASE
-                        WHEN "Follow"."target_package_id" IS NULL THEN TRUE
-                        ELSE
-                            "ActivityLog"."target_package_id" = "Follow"."target_package_id"
-                            AND
-                            (SELECT pkg."isPublic" FROM package pkg WHERE pkg.id = "Follow"."target_package_id") IS TRUE
-                            OR EXISTS (SELECT pu.package_id FROM user_package_permission pu WHERE "Follow"."target_package_id" = pu.package_id AND pu.user_id = "Follow".user_id)
-                    END
-                )`
+                `
             )
             .setParameter("userId", userId)
             .orderBy('"ActivityLog"."created_at"', "DESC")

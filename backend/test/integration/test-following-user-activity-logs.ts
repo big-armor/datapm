@@ -80,9 +80,11 @@ describe("Following User Activity Log Tests", async () => {
 
         if (!activitiesResponse.data || !activitiesResponse.data.myFollowingActivity || !activitiesResponse.data.myFollowingActivity.logs) {
             expect(true).to.equal(false, "Should've returned created following activity collection");
+            console.log(activitiesResponse);
             return;
         }
 
+        console.log(activitiesResponse.data.myFollowingActivity.logs);
         expect(activitiesResponse.data.myFollowingActivity.logs.length).to.equal(0);
 
         const deleteFollow = await userOneClient.mutate({
