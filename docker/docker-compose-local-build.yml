@@ -17,7 +17,7 @@ services:
               target: /var/lib/datapm-registry/data
               consistency: cached
     postgres:
-        image: postgres:13.3
+        image: postgres:11
         volumes:
             - type: volume
               source: postgres_data_local

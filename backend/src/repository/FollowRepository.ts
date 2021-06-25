@@ -1,7 +1,8 @@
 import { DeleteResult, EntityRepository, Repository, SelectQueryBuilder } from "typeorm";
 import { FollowEntity } from "../entity/FollowEntity";
-import { ActivityLogChangeType, ActivityLogEventType, NotificationFrequency } from "../generated/graphql";
+import { ActivityLogChangeType, ActivityLogEventType, NotificationFrequency, User } from "../generated/graphql";
 import { Notification } from "../util/notificationUtil";
+import { UserRepository } from "./UserRepository";
 
 @EntityRepository(FollowEntity)
 export class FollowRepository extends Repository<FollowEntity> {
@@ -115,6 +116,185 @@ export class FollowRepository extends Repository<FollowEntity> {
             .limit(limit)
             .addRelations("FollowEntity", relations)
             .getManyAndCount();
+    }
+
+    public getFollowersByPackageId(packageId: number, offset: number, limit: number): Promise<[User[], number]> {
+        return this.manager
+            .getCustomRepository(UserRepository)
+            .createQueryBuilder("UserEntity")
+            .addSelect('"FollowEntity"."created_at"')
+            .distinct(true)
+            .innerJoin(
+                (sb) => sb.select("f.*").from(FollowEntity, "f"),
+                "FollowEntity",
+                '"FollowEntity"."user_id" = "UserEntity"."id"'
+            )
+            .where('"FollowEntity"."target_package_id" = :packageId')
+            .setParameter("packageId", packageId)
+            .offset(offset)
+            .limit(limit)
+            .orderBy('"FollowEntity"."created_at"', "ASC")
+            .getManyAndCount();
+    }
+
+    public getFollowersByPackageIssueId(
+        packageIssueId: number,
+        offset: number,
+        limit: number
+    ): Promise<[User[], number]> {
+        return this.manager
+            .getCustomRepository(UserRepository)
+            .createQueryBuilder("UserEntity")
+            .addSelect('"FollowEntity"."created_at"')
+            .distinct(true)
+            .innerJoin(
+                (sb) => sb.select("f.*").from(FollowEntity, "f"),
+                "FollowEntity",
+                '"FollowEntity"."user_id" = "UserEntity"."id"'
+            )
+            .where('"FollowEntity"."target_package_issue_id" = :packageIssueId')
+            .setParameter("packageIssueId", packageIssueId)
+            .offset(offset)
+            .limit(limit)
+            .orderBy('"FollowEntity"."created_at"', "ASC")
+            .getManyAndCount();
+    }
+
+    public getFollowersByCatalogId(catalogId: number, offset: number, limit: number): Promise<[User[], number]> {
+        return this.manager
+            .getCustomRepository(UserRepository)
+            .createQueryBuilder("UserEntity")
+            .addSelect('"FollowEntity"."created_at"')
+            .distinct(true)
+            .innerJoin(
+                (sb) => sb.select("f.*").from(FollowEntity, "f"),
+                "FollowEntity",
+                '"FollowEntity"."user_id" = "UserEntity"."id"'
+            )
+            .where('"FollowEntity"."target_catalog_id" = :catalogId')
+            .setParameter("catalogId", catalogId)
+            .offset(offset)
+            .limit(limit)
+            .orderBy('"FollowEntity"."created_at"', "ASC")
+            .getManyAndCount();
+    }
+
+    public getFollowersByCollectionId(collectionId: number, offset: number, limit: number): Promise<[User[], number]> {
+        return this.manager
+            .getCustomRepository(UserRepository)
+            .createQueryBuilder("UserEntity")
+            .addSelect('"FollowEntity"."created_at"')
+            .distinct(true)
+            .innerJoin(
+                (sb) => sb.select("f.*").from(FollowEntity, "f"),
+                "FollowEntity",
+                '"FollowEntity"."user_id" = "UserEntity"."id"'
+            )
+            .where('"FollowEntity"."target_collection_id" = :collectionId')
+            .setParameter("collectionId", collectionId)
+            .offset(offset)
+            .limit(limit)
+            .orderBy('"FollowEntity"."created_at"', "ASC")
+            .getManyAndCount();
+    }
+
+    public getFollowersByUserId(userId: number, offset: number, limit: number): Promise<[User[], number]> {
+        return this.manager
+            .getCustomRepository(UserRepository)
+            .createQueryBuilder("UserEntity")
+            .addSelect('"FollowEntity"."created_at"')
+            .distinct(true)
+            .innerJoin(
+                (sb) => sb.select("f.*").from(FollowEntity, "f"),
+                "FollowEntity",
+                '"FollowEntity"."user_id" = "UserEntity"."id"'
+            )
+            .where('"FollowEntity"."target_user_id" = :userId')
+            .setParameter("userId", userId)
+            .offset(offset)
+            .limit(limit)
+            .orderBy('"FollowEntity"."created_at"', "ASC")
+            .getManyAndCount();
+    }
+
+    public getFollowersByPackageIdCount(packageId: number): Promise<number> {
+        return this.manager
+            .getCustomRepository(UserRepository)
+            .createQueryBuilder("UserEntity")
+            .addSelect('"FollowEntity"."created_at"')
+            .distinct(true)
+            .innerJoin(
+                (sb) => sb.select("f.*").from(FollowEntity, "f"),
+                "FollowEntity",
+                '"FollowEntity"."user_id" = "UserEntity"."id"'
+            )
+            .where('"FollowEntity"."target_package_id" = :packageId')
+            .setParameter("packageId", packageId)
+            .getCount();
+    }
+
+    public getFollowersByPackageIssueIdCount(packageIssueId: number): Promise<number> {
+        return this.manager
+            .getCustomRepository(UserRepository)
+            .createQueryBuilder("UserEntity")
+            .addSelect('"FollowEntity"."created_at"')
+            .distinct(true)
+            .innerJoin(
+                (sb) => sb.select("f.*").from(FollowEntity, "f"),
+                "FollowEntity",
+                '"FollowEntity"."user_id" = "UserEntity"."id"'
+            )
+            .where('"FollowEntity"."target_package_issue_id" = :packageIssueId')
+            .setParameter("packageIssueId", packageIssueId)
+            .getCount();
+    }
+
+    public getFollowersByCatalogIdCount(catalogId: number): Promise<number> {
+        return this.manager
+            .getCustomRepository(UserRepository)
+            .createQueryBuilder("UserEntity")
+            .addSelect('"FollowEntity"."created_at"')
+            .distinct(true)
+            .innerJoin(
+                (sb) => sb.select("f.*").from(FollowEntity, "f"),
+                "FollowEntity",
+                '"FollowEntity"."user_id" = "UserEntity"."id"'
+            )
+            .where('"FollowEntity"."target_catalog_id" = :catalogId')
+            .setParameter("catalogId", catalogId)
+            .getCount();
+    }
+
+    public getFollowersByCollectionIdCount(collectionId: number): Promise<number> {
+        return this.manager
+            .getCustomRepository(UserRepository)
+            .createQueryBuilder("UserEntity")
+            .addSelect('"FollowEntity"."created_at"')
+            .distinct(true)
+            .innerJoin(
+                (sb) => sb.select("f.*").from(FollowEntity, "f"),
+                "FollowEntity",
+                '"FollowEntity"."user_id" = "UserEntity"."id"'
+            )
+            .where('"FollowEntity"."target_collection_id" = :collectionId')
+            .setParameter("collectionId", collectionId)
+            .getCount();
+    }
+
+    public getFollowersByUserIdCount(userId: number): Promise<number> {
+        return this.manager
+            .getCustomRepository(UserRepository)
+            .createQueryBuilder("UserEntity")
+            .addSelect('"FollowEntity"."created_at"')
+            .distinct(true)
+            .innerJoin(
+                (sb) => sb.select("f.*").from(FollowEntity, "f"),
+                "FollowEntity",
+                '"FollowEntity"."user_id" = "UserEntity"."id"'
+            )
+            .where('"FollowEntity"."target_user_id" = :userId')
+            .setParameter("userId", userId)
+            .getCount();
     }
 
     public getFollowByCatalogId(

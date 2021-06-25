@@ -2,48 +2,41 @@
     <div class="row mb-4 pb-2">
         <div class="col-md-8">
             <div class="text-main-title">Followers</div>
-            <p class="text-dark-gray col-md-8 p-0">These users follow this .. description.</p>
-            <div class="d-flex flex-row bd-highlight followers-div py-2">
+            <div class="d-flex flex-row bd-highlight followers-div py-2" *ngFor="let follower of followers">
                 <div class="p-2 bd-highlight align-self-center">
-                    <app-avatar class="user-img d-flex align-items-center" [user]="user1" [size]="45"> </app-avatar>
+                    <app-avatar class="user-img d-flex align-items-center" [user]="follower" [size]="45"> </app-avatar>
                 </div>
                 <div class="p-2 bd-highlight align-self-center">
                     <div class="text-dark-gray" style="margin-bottom: 0px !important">
-                        <a href="#">Bleona Gjocaj</a>
+                        <a href="#">{{ follower.username }}</a>
                     </div>
-                    <div class="text-light-gray">bleonagjocaj</div>
+                    <div class="text-light-gray">{{ follower.username }}</div>
                 </div>
                 <div class="ml-auto p-2 bd-highlight align-self-center">
                     <button class="app-outlined-button">View profile</button>
                 </div>
             </div>
-            <div class="d-flex flex-row bd-highlight followers-div py-2">
-                <div class="p-2 bd-highlight align-self-center">
-                    <app-avatar class="user-img d-flex align-items-center" [user]="user" [size]="45"> </app-avatar>
-                </div>
-                <div class="p-2 bd-highlight align-self-center">
-                    <div class="text-dark-gray" style="margin-bottom: 0px !important">
-                        <a href="#">John Doe</a>
-                    </div>
-                    <div class="text-light-gray">johndoe</div>
-                </div>
-                <div class="ml-auto p-2 bd-highlight align-self-center">
-                    <button class="app-outlined-button">View profile</button>
-                </div>
+            <div class="pb-3" *ngIf="loadingFollowers">
+                <mat-spinner diameter="25"></mat-spinner>
             </div>
-            <div class="d-flex flex-row bd-highlight followers-div py-2">
-                <div class="p-2 bd-highlight align-self-center">
-                    <app-avatar class="user-img d-flex align-items-center" [user]="user2" [size]="45"> </app-avatar>
-                </div>
-                <div class="p-2 bd-highlight align-self-center">
-                    <div class="text-dark-gray" style="margin-bottom: 0px !important">
-                        <a href="#">Sam Smith</a>
-                    </div>
-                    <div class="text-light-gray">samsmith</div>
-                </div>
-                <div class="ml-auto p-2 bd-highlight align-self-center">
-                    <button class="app-outlined-button">View profile</button>
-                </div>
+
+            <div *ngIf="hasMoreFollowers" class="px-2 text-left">
+                <button
+                    class="app-outlined-button ctaButton"
+                    [class.disabled]="loadingFollowers"
+                    (click)="requestMoreFollowers()"
+                >
+                    Load More
+                </button>
+            </div>
+            <div class="px-2">
+                <span *ngIf="hasLoadingErrors">
+                    An error occurred when trying to load followers. Please refresh the page and try again or contact
+                    support.
+                </span>
+            </div>
+            <div class="px-2">
+                <span *ngIf="!loadingFollowers && !followers.length"> There are no followers here just yet. </span>
             </div>
         </div>
     </div>

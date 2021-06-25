@@ -13,6 +13,7 @@ import { ShareDialogComponent } from "src/app/shared/dialogs/share-dialog/share-
 import { EditCollectionComponent } from "src/app/shared/edit-collection/edit-collection.component";
 import {
     Collection,
+    CollectionFollowersCountGQL,
     CollectionGQL,
     Follow,
     FollowIdentifierInput,
@@ -43,6 +44,7 @@ export class CollectionDetailsComponent implements OnDestroy {
     private tabs = ["", "followers"];
 
     public collectionFollow: Follow;
+    public followersCount: number;
     public isFollowing: boolean;
 
     constructor(
@@ -52,6 +54,7 @@ export class CollectionDetailsComponent implements OnDestroy {
         private removePackageFromCollectionGQL: RemovePackageFromCollectionGQL,
         private dialog: MatDialog,
         private getFollowGQL: GetFollowGQL,
+        private collectionFollowersCountGQL: CollectionFollowersCountGQL,
         private authenticationService: AuthenticationService
     ) {
         this.route.paramMap.pipe(takeUntil(this.unsubscribe$)).subscribe((paramMap: ParamMap) => {
@@ -119,6 +122,7 @@ export class CollectionDetailsComponent implements OnDestroy {
                         return;
                     }
                     this.collection = data.collection as Collection;
+                    this.loadFollowersCount();
                     if (this.collection.myPermissions.includes(Permission.MANAGE)) {
                         this.tabs.push("manage");
 
@@ -212,6 +216,23 @@ export class CollectionDetailsComponent implements OnDestroy {
 
                 this.updatePackageFollow(result.follow);
             });
+    }
+
+    private loadFollowersCount(): void {
+        const variables = {
+            identifier: {
+                collectionSlug: this.collection.identifier.collectionSlug
+            }
+        };
+
+        this.collectionFollowersCountGQL.fetch(variables).subscribe((countResponse) => {
+            if (countResponse.error) {
+                return;
+            }
+
+            const responseData = countResponse.data;
+            this.followersCount = responseData.collectionFollowersCount;
+        });
     }
 
     private getFollow(): void {

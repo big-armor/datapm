@@ -1,0 +1,7 @@
+<app-followers
+    [followers]="followers"
+    [hasLoadingErrors]="hasLoadingErrors"
+    [hasMoreFollowers]="hasMoreFollowers"
+    [loadingFollowers]="loadingFollowers"
+    (onMoreFollowersRequested)="loadFollowers($event)"
+></app-followers>

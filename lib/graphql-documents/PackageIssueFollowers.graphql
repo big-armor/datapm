@@ -1,0 +1,14 @@
+query PackageIssueFollowers(
+    $identifier: PackageIdentifierInput!
+    $issueIdentifier: PackageIssueIdentifierInput!
+    $limit: Int!
+    $offset: Int!
+) {
+    packageIssueFollowers(identifier: $identifier, issueIdentifier: $issueIdentifier, limit: $limit, offset: $offset) {
+        followers {
+            username
+        }
+        hasMore
+        count
+    }
+}

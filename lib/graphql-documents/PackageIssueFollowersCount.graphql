@@ -1,0 +1,3 @@
+query PackageIssueFollowersCount($identifier: PackageIdentifierInput!, $issueIdentifier: PackageIssueIdentifierInput!) {
+    packageIssueFollowersCount(identifier: $identifier, issueIdentifier: $issueIdentifier)
+}

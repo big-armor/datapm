@@ -1,5 +1,15 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from "@angular/core";
-import { Catalog, Follow, FollowIdentifierInput, GetFollowGQL, Package, Permission, User } from "src/generated/graphql";
+import {
+    Catalog,
+    CatalogFollowersCountGQL,
+    CatalogFollowersGQL,
+    Follow,
+    FollowIdentifierInput,
+    GetFollowGQL,
+    Package,
+    Permission,
+    User
+} from "src/generated/graphql";
 import { ActivatedRoute, NavigationExtras, Router } from "@angular/router";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { EditCatalogComponent } from "src/app/shared/edit-catalog/edit-catalog.component";
@@ -30,6 +40,7 @@ export class CatalogDetailsComponent implements OnInit, OnDestroy {
 
     public catalogFollow: Follow;
     public isFollowing: boolean;
+    public followersCount: number;
 
     @Output()
     public onCatalogUpdate = new EventEmitter<Catalog>();
@@ -45,6 +56,7 @@ export class CatalogDetailsComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private dialogService: DialogService,
         private getFollowGQL: GetFollowGQL,
+        private catalogFollowersCountGQL: CatalogFollowersCountGQL,
         private authenticationService: AuthenticationService
     ) {}
 
@@ -84,6 +96,7 @@ export class CatalogDetailsComponent implements OnInit, OnDestroy {
 
         this.state = "LOADING";
         this.getFollow();
+        this.loadFollowersCount();
     }
 
     public ngOnDestroy(): void {
@@ -149,6 +162,23 @@ export class CatalogDetailsComponent implements OnInit, OnDestroy {
 
                 this.updateCatalogFollow(result.follow);
             });
+    }
+
+    private loadFollowersCount(): void {
+        const variables = {
+            identifier: {
+                catalogSlug: this.catalog.identifier.catalogSlug
+            }
+        };
+
+        this.catalogFollowersCountGQL.fetch(variables).subscribe((countResponse) => {
+            if (countResponse.error) {
+                return;
+            }
+
+            const responseData = countResponse.data;
+            this.followersCount = responseData.catalogFollowersCount;
+        });
     }
 
     private getFollow(): void {

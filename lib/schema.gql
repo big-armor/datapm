@@ -545,6 +545,15 @@ type SearchCollectionResult {
 }
 
 """
+The response for followers list request
+"""
+type FollowersResult {
+    followers: [User!]
+    hasMore: Boolean!
+    count: Int!
+}
+
+"""
 The response for packages list request
 """
 type PackagesResult {
@@ -1247,6 +1256,67 @@ type Query {
     Get following entities activities
     """
     myFollowingActivity(offset: Int!, limit: Int!): FollowingActivity
+
+    """
+    Get package followers
+    """
+    packageFollowers(identifier: PackageIdentifierInput!, offset: Int!, limit: Int!): FollowersResult!
+        @hasPackagePermission(permission: VIEW)
+
+    """
+    Get package issue followers
+    """
+    packageIssueFollowers(
+        identifier: PackageIdentifierInput!
+        issueIdentifier: PackageIssueIdentifierInput!
+        offset: Int!
+        limit: Int!
+    ): FollowersResult! @hasPackagePermission(permission: VIEW)
+
+    """
+    Get catalog followers
+    """
+    catalogFollowers(identifier: CatalogIdentifierInput!, offset: Int!, limit: Int!): FollowersResult!
+        @hasCatalogPermission(permission: VIEW)
+
+    """
+    Get collection followers
+    """
+    collectionFollowers(identifier: CollectionIdentifierInput!, offset: Int!, limit: Int!): FollowersResult!
+        @hasCollectionPermission(permission: VIEW)
+
+    """
+    Get user followers
+    """
+    userFollowers(username: String!, offset: Int!, limit: Int!): FollowersResult!
+
+    """
+    Get package followers count
+    """
+    packageFollowersCount(identifier: PackageIdentifierInput!): Int! @hasPackagePermission(permission: VIEW)
+
+    """
+    Get package issue followers count
+    """
+    packageIssueFollowersCount(
+        identifier: PackageIdentifierInput!
+        issueIdentifier: PackageIssueIdentifierInput!
+    ): Int! @hasPackagePermission(permission: VIEW)
+
+    """
+    Get catalog followers count
+    """
+    catalogFollowersCount(identifier: CatalogIdentifierInput!): Int! @hasCatalogPermission(permission: VIEW)
+
+    """
+    Get collection followers count
+    """
+    collectionFollowersCount(identifier: CollectionIdentifierInput!): Int! @hasCollectionPermission(permission: VIEW)
+
+    """
+    Get user followers count
+    """
+    userFollowersCount(username: String!): Int!
 }
 
 type Mutation {

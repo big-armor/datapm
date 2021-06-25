@@ -191,12 +191,22 @@ import {
 } from "./resolvers/PackageIssueCommentResolver";
 import { packageVersionsDiff, packageVersionsDiffs } from "./resolvers/VersionComparisonResolver";
 import {
+    catalogFollowers,
+    catalogFollowersCount,
+    collectionFollowers,
+    collectionFollowersCount,
     deleteAllMyFollows,
     deleteFollow,
     followPackage,
     getAllMyFollows,
     getFollow,
-    saveFollow
+    packageFollowers,
+    packageFollowersCount,
+    packageIssueFollowers,
+    packageIssueFollowersCount,
+    saveFollow,
+    userFollowers,
+    userFollowersCount
 } from "./resolvers/FollowResolver";
 
 import {
@@ -600,7 +610,17 @@ export const resolvers: {
         myFollowingActivity: myFollowingActivity,
         platformSettings: getPlatformSettingsByKey,
         publicPlatformSettingsByKey: getPublicPlatformSettingsByKeyOrFail,
-        pageContent: getPageContentByRoute
+        pageContent: getPageContentByRoute,
+        packageFollowers: packageFollowers,
+        packageIssueFollowers: packageIssueFollowers,
+        catalogFollowers: catalogFollowers,
+        collectionFollowers: collectionFollowers,
+        userFollowers: userFollowers,
+        packageFollowersCount: packageFollowersCount,
+        packageIssueFollowersCount: packageIssueFollowersCount,
+        catalogFollowersCount: catalogFollowersCount,
+        collectionFollowersCount: collectionFollowersCount,
+        userFollowersCount: userFollowersCount
     },
 
     Mutation: {

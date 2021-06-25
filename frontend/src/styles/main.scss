@@ -1216,6 +1216,17 @@ button:disabled {
     color: red !important;
 }
 
+.tab-count {
+    font-size: $small-font - 1;
+    padding: 3px 7px;
+    font-weight: $weight-500;
+    color: var(--gray-2-color);
+    position: relative;
+    bottom: 1px;
+    border-radius: 50%;
+    background-color: var(--gray-5-color);
+}
+
 #homeRoutes {
     list-style-type: none;
     margin-bottom: 0px;

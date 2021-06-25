@@ -1,5 +1,10 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { User } from "src/generated/graphql";
+
+export interface FollowersRequest {
+    offset: number;
+    limit: number;
+}
 
 @Component({
     selector: "app-followers",
@@ -7,19 +12,35 @@ import { User } from "src/generated/graphql";
     styleUrls: ["./followers.component.scss"]
 })
 export class FollowersComponent implements OnInit {
-    user = {
-        username: "ermali"
-    };
+    private readonly FOLLOWERS_PER_PAGE = 1;
 
-    user1 = {
-        username: "bleonatest4"
-    };
+    @Input()
+    public hasLoadingErrors: boolean;
 
-    user2 = {
-        username: "ermalitest6"
-    };
+    @Input()
+    public followers: User[] = [];
 
-    constructor() {}
+    @Input()
+    public hasMoreFollowers: boolean;
 
-    ngOnInit(): void {}
+    @Input()
+    public loadingFollowers: boolean;
+
+    @Output()
+    public onMoreFollowersRequested = new EventEmitter<FollowersRequest>();
+
+    public ngOnInit(): void {
+        this.requestMoreFollowers();
+    }
+
+    public requestMoreFollowers(): void {
+        if (this.loadingFollowers) {
+            return;
+        }
+
+        this.onMoreFollowersRequested.emit({
+            offset: this.followers.length,
+            limit: this.FOLLOWERS_PER_PAGE
+        });
+    }
 }

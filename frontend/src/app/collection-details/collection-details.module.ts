@@ -19,9 +19,16 @@ import { MatSelectModule } from "@angular/material/select";
 import { MatStepperModule } from "@angular/material/stepper";
 import { MatInputModule } from "@angular/material/input";
 import { MatFormFieldModule } from "@angular/material/form-field";
+import { CollectionFollowersComponent } from "./collection-details/collection-followers/collection-followers.component";
 
 @NgModule({
-    declarations: [CollectionDetailsComponent, AddPackageComponent, AddUserComponent, CollectionPermissionsComponent],
+    declarations: [
+        CollectionDetailsComponent,
+        AddPackageComponent,
+        AddUserComponent,
+        CollectionPermissionsComponent,
+        CollectionFollowersComponent
+    ],
     imports: [
         CommonModule,
         FormsModule,

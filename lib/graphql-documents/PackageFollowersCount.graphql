@@ -1,0 +1,3 @@
+query PackageFollowersCount($identifier: PackageIdentifierInput!) {
+    packageFollowersCount(identifier: $identifier)
+}

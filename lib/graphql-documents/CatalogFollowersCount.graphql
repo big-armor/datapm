@@ -1,0 +1,3 @@
+query CatalogFollowersCount($identifier: CatalogIdentifierInput!) {
+    catalogFollowersCount(identifier: $identifier)
+}
