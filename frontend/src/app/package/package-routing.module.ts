@@ -10,6 +10,7 @@ import { PackageIssuesComponent } from "./components/package-issues/package-issu
 import { PackageIssuesDetailComponent } from "./components/package-issues/package-issues-detail/package-issues-detail.component";
 import { CreatePackageIssueComponent } from "./components/package-issues/create-package-issue/create-package-issue.component";
 import { EditPackageMarkdownComponent } from "./components/edit-package-markdown/edit-package-markdown.component";
+import { FollowersComponent } from "../shared/followers/followers.component";
 
 const routes: Routes = [
     {
@@ -48,6 +49,10 @@ const routes: Routes = [
             {
                 path: "manage",
                 component: PackagePermissionComponent
+            },
+            {
+                path: "followers",
+                component: FollowersComponent
             },
             {
                 path: "**",

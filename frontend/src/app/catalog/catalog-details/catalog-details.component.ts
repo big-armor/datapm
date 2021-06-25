@@ -35,7 +35,7 @@ export class CatalogDetailsComponent implements OnInit, OnDestroy {
     public onCatalogUpdate = new EventEmitter<Catalog>();
 
     private unsubscribe$: Subject<any> = new Subject();
-    private tabs = [""];
+    private tabs = ["", "followers"];
 
     private ignoreFragments = ["catalogs"];
 

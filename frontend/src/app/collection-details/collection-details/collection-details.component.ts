@@ -40,7 +40,7 @@ export class CollectionDetailsComponent implements OnDestroy {
 
     public currentUser: User;
 
-    private tabs = [""];
+    private tabs = ["", "followers"];
 
     public collectionFollow: Follow;
     public isFollowing: boolean;

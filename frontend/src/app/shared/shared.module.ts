@@ -70,6 +70,7 @@ import { ImportedModule } from "../imported/imported.module";
 import { MovePackageComponent } from "./move-package/move-package.component";
 import { HeroComponent } from "./hero/hero.component";
 import { SwiperModule } from "swiper/angular";
+import { FollowersComponent } from "./followers/followers.component";
 
 @NgModule({
     declarations: [
@@ -118,7 +119,8 @@ import { SwiperModule } from "swiper/angular";
         UserFollowingComponent,
         UserTypeFollowingComponent,
         MovePackageComponent,
-        HeroComponent
+        HeroComponent,
+        FollowersComponent
     ],
     imports: [
         CommonModule,
@@ -185,7 +187,8 @@ import { SwiperModule } from "swiper/angular";
         MarkdownEditorComponent,
         FollowDialogComponent,
         UserFollowingComponent,
-        HeroComponent
+        HeroComponent,
+        FollowersComponent
     ],
     providers: [TimeAgoPipe, { provide: MAT_DIALOG_DATA, useValue: {} }]
 })

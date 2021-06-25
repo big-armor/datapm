@@ -40,6 +40,7 @@
                 class="catalog-tabs mt-3"
             >
                 <mat-tab label="Packages"></mat-tab>
+                <mat-tab label="Followers"></mat-tab>
                 <mat-tab label="Manage" *ngIf="canEdit"></mat-tab>
             </mat-tab-group>
         </div>
@@ -68,10 +69,11 @@
                     >
                 </div>
             </div>
+            <app-followers *ngIf="currentTab === 1"></app-followers>
             <app-catalog-permissions
                 (onCatalogUpdate)="onCatalogUpdate.emit($event)"
                 [catalog]="catalog"
-                *ngIf="currentTab === 1"
+                *ngIf="currentTab === 2"
             ></app-catalog-permissions>
         </div>
     </ng-container>
