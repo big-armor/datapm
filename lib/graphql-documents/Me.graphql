@@ -1,6 +1,7 @@
 query Me {
     me {
         emailAddress
+        displayName
         firstName
         lastName
         username

@@ -1,6 +1,7 @@
 mutation UpdateMe($value: UpdateUserInput!) {
     updateMe(value: $value) {
         emailAddress
+        displayName
         firstName
         lastName
         username

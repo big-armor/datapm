@@ -5,6 +5,7 @@ query UsersByCollection($identifier: CollectionIdentifierInput!) {
             firstName
             lastName
             nameIsPublic
+            displayName
         }
         permissions
     }

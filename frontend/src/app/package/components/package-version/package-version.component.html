@@ -38,15 +38,12 @@
                         <td class="text-light-gray text-right pb-2">
                             <div class="d-flex flex-column bd-highlight">
                                 <div class="bd-highlight">
-                                    <app-avatar
-                                        [user]="version.author"
-                                        [routerLink]="'/' + version.author.username"
-                                        [size]="18"
+                                    <a [routerLink]="'/' + version.author.username">
+                                        <app-avatar [user]="version.author" [size]="18"> </app-avatar>
+                                        <span class="ml-1" style="position: relative; bottom: 6px">{{
+                                            version.author.displayName
+                                        }}</span></a
                                     >
-                                    </app-avatar>
-                                    <span class="ml-1" style="position: relative; bottom: 6px">{{
-                                        version.author.username
-                                    }}</span>
                                 </div>
                                 <div class="bd-highlight">{{ version.createdAt | timeAgo }}</div>
                             </div>
