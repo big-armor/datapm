@@ -3,6 +3,7 @@ import { resolvePackagePermissions } from "../directive/hasPackagePermissionDire
 import { PackageIssueEntity } from "../entity/PackageIssueEntity";
 import { PackageIssueStatus } from "../entity/PackageIssueStatus";
 import {
+    ActivityLogChangeType,
     ActivityLogEventType,
     CreatePackageIssueInput,
     PackageIdentifierInput,
@@ -17,6 +18,7 @@ import { PackageRepository } from "../repository/PackageRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { createActivityLog } from "../repository/ActivityLogRepository";
+import { PackageEntity } from "../entity/PackageEntity";
 
 export const getPackageIssue = async (
     _0: any,
@@ -74,15 +76,7 @@ export const deletePackageIssue = async (
         throwNotAuthorizedError();
     }
 
-    await context.connection.transaction(async (transaction) => {
-        await repository.delete(issue.id);
-
-        await createActivityLog(transaction, {
-            userId: context!.me!.id,
-            eventType: ActivityLogEventType.PACKAGE_ISSUE_DELETED,
-            targetPackageIssueId: issue.id
-        });
-    });
+    await repository.delete(issue.id);
 };
 
 export const getIssuesByPackage = async (
@@ -191,7 +185,8 @@ export const createPackageIssue = async (
         await createActivityLog(transaction, {
             userId: context!.me!.id,
             eventType: ActivityLogEventType.PACKAGE_ISSUE_CREATED,
-            targetPackageIssueId: savedIssueEntity.id
+            targetPackageIssueId: savedIssueEntity.id,
+            targetPackageId: packageEntity.id
         });
 
         return savedIssueEntity;
@@ -212,7 +207,10 @@ export const updatePackageIssue = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const issueEntity = await getIssueEntity(context, packageIdentifier, issueIdentifier);
+    const packageEntity = await context.connection.manager
+        .getCustomRepository(PackageRepository)
+        .findPackageOrFail({ identifier: packageIdentifier });
+    const issueEntity = await getIssueEntityWithPackage(context, packageEntity, issueIdentifier);
 
     const canEditIssue = await hasPermissionsToEditIssue(issueEntity, packageIdentifier, context);
     if (!canEditIssue) {
@@ -229,7 +227,8 @@ export const updatePackageIssue = async (
         await createActivityLog(transaction, {
             userId: context!.me!.id,
             eventType: ActivityLogEventType.PACKAGE_ISSUE_EDIT,
-            targetPackageIssueId: savedIssueEntity.id
+            targetPackageIssueId: savedIssueEntity.id,
+            targetPackageId: packageEntity.id
         });
 
         return savedIssueEntity;
@@ -250,7 +249,10 @@ export const updatePackageIssueStatus = async (
     context: AuthenticatedContext,
     info: any
 ) => {
-    const issueEntity = await getIssueEntity(context, packageIdentifier, issueIdentifier);
+    const packageEntity = await context.connection.manager
+        .getCustomRepository(PackageRepository)
+        .findPackageOrFail({ identifier: packageIdentifier });
+    const issueEntity = await getIssueEntityWithPackage(context, packageEntity, issueIdentifier);
 
     const canEditIssue = await hasPermissionsToEditIssue(issueEntity, packageIdentifier, context);
     if (!canEditIssue) {
@@ -266,8 +268,10 @@ export const updatePackageIssueStatus = async (
         if (PackageIssueStatus.CLOSED === status.status) {
             await createActivityLog(transaction, {
                 userId: context!.me!.id,
-                eventType: ActivityLogEventType.PACKAGE_ISSUE_CLOSED,
-                targetPackageIssueId: savedIssueEntity.id
+                eventType: ActivityLogEventType.PACKAGE_ISSUE_STATUS_CHANGE,
+                changeType: ActivityLogChangeType.CLOSED,
+                targetPackageIssueId: savedIssueEntity.id,
+                targetPackageId: packageEntity.id
             });
         }
 
@@ -304,17 +308,21 @@ export const updatePackageIssuesStatuses = async (
 
     const isClosingIssues = PackageIssueStatus.CLOSED === status.status;
     await context.connection.transaction(async (transaction) => {
-        issues.forEach(async (issue) => {
-            issue.status = status.status;
+        issues.forEach(async (issue) => (issue.status = status.status));
 
-            if (isClosingIssues) {
-                await createActivityLog(transaction, {
+        if (isClosingIssues) {
+            const logsPromises = issues.map((issue) =>
+                createActivityLog(transaction, {
                     userId: context!.me!.id,
-                    eventType: ActivityLogEventType.PACKAGE_ISSUE_CLOSED,
-                    targetPackageIssueId: issue.id
-                });
-            }
-        });
+                    eventType: ActivityLogEventType.PACKAGE_ISSUE_STATUS_CHANGE,
+                    changeType: ActivityLogChangeType.CLOSED,
+                    targetPackageIssueId: issue.id,
+                    targetPackageId: packageEntity.id
+                })
+            );
+            await Promise.all(logsPromises);
+        }
+
         await issueRepository.save(issues);
     });
 };
@@ -349,13 +357,16 @@ export const deletePackageIssues = async (
     await context.connection.transaction(async (transaction) => {
         await issueRepository.delete(issuesIds);
 
-        issuesIds.forEach(async (issueId) => {
-            await createActivityLog(transaction, {
+        const logsPromises = issuesIds.map((issueId) =>
+            createActivityLog(transaction, {
                 userId: context!.me!.id,
                 eventType: ActivityLogEventType.PACKAGE_ISSUE_DELETED,
-                targetPackageIssueId: issueId
-            });
-        });
+                targetPackageIssueId: issueId,
+                targetPackageId: packageEntity.id
+            })
+        );
+
+        await Promise.all(logsPromises);
     });
 };
 
@@ -368,6 +379,14 @@ async function getIssueEntity(
         .getCustomRepository(PackageRepository)
         .findPackageOrFail({ identifier: packageIdentifier });
 
+    return getIssueEntityWithPackage(context, packageEntity, issueIdentifier);
+}
+
+async function getIssueEntityWithPackage(
+    context: any,
+    packageEntity: PackageEntity,
+    issueIdentifier: PackageIssueIdentifierInput
+) {
     const issueRepository = context.connection.manager.getCustomRepository(PackageIssueRepository);
     return await issueRepository.getByIssueNumberForPackage(packageEntity.id, issueIdentifier.issueNumber);
 }

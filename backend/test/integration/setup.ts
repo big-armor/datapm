@@ -30,7 +30,7 @@ before(async function () {
 
     this.timeout(120000);
 
-    container = await new GenericContainer("postgres")
+    container = await new GenericContainer("postgres", "13.3")
         .withEnv("POSTGRES_PASSWORD", "postgres")
         .withEnv("POSTGRES_DB", "datapm")
         .withTmpFs({ "/temp_pgdata": "rw,noexec,nosuid,size=65536k" })

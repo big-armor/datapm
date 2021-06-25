@@ -100,8 +100,13 @@ export class PackageDescriptionComponent {
     }
 
     public canManage() {
-        const isPublic = this.package.myPermissions.filter((permission) => permission === "MANAGE").length > 0;
-        return isPublic;
+        const manage = this.package.myPermissions.filter((permission) => permission === Permission.MANAGE).length > 0;
+        return manage;
+    }
+
+    public canEdit() {
+        const edit = this.package.myPermissions.filter((permission) => permission === Permission.EDIT).length > 0;
+        return edit;
     }
 
     public editReadme(): void {

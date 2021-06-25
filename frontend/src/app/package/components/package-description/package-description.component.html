@@ -9,7 +9,7 @@
                 {{ isShowingMoreReadMeText ? "Show Less" : "Show More" }}
             </a>
         </p>
-        <div class="text-dark-gray" *ngIf="canManage()">
+        <div class="text-dark-gray" *ngIf="canEdit()">
             <a class="color-info cursor-pointer" (click)="editReadme()">edit readme</a>
         </div>
     </div>
@@ -24,7 +24,7 @@
                 {{ isShowingMoreLicenseText ? "Show Less" : "Show More" }}
             </a>
         </p>
-        <div class="text-dark-gray" *ngIf="canManage()">
+        <div class="text-dark-gray" *ngIf="canEdit()">
             <a class="color-info cursor-pointer" (click)="editLicense()">edit license</a>
         </div>
     </div>

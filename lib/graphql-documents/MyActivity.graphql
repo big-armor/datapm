@@ -17,6 +17,19 @@ query MyActivity($filter: ActivityLogFilterInput!) {
                     packageSlug
                 }
             }
+            targetPackageIssue {
+                issueNumber
+                packageIdentifier {
+                    catalogSlug
+                    packageSlug
+                }
+                author {
+                    username
+                    firstName
+                    lastName
+                    emailAddress
+                }
+            }
             targetPackageVersion {
                 identifier {
                     versionMajor

@@ -10,21 +10,20 @@ import { User } from "src/generated/graphql";
     styleUrls: ["./homepage.component.scss"]
 })
 export class HomepageComponent implements OnInit {
-    private unsubscribe$ = new Subject();
-    public currentUser: User;
-
-    public routes = [
-        // {linkName:'trending',url:'/trending'},
+    public readonly routes = [
         { linkName: "latest", url: "", authRequired: false },
+        { linkName: "following", url: "/following", authRequired: true },
         { linkName: "recently viewed", url: "/viewed", authRequired: true }
-        // {linkName:'premium',url:'/premium'},
     ];
+    private readonly unsubscribe$ = new Subject();
+
+    public currentUser: User;
 
     constructor(private authenticationService: AuthenticationService) {}
 
-    ngOnInit(): void {
-        this.authenticationService.currentUser.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
-            this.currentUser = user;
-        });
+    public ngOnInit(): void {
+        this.authenticationService.currentUser
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe((user: User) => (this.currentUser = user));
     }
 }

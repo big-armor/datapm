@@ -1,11 +1,12 @@
-import { Connection, EntityManager, EntityRepository } from "typeorm";
+import { Connection, EntityManager, EntityRepository, In, Repository } from "typeorm";
 import { ActivityLogEntity } from "../entity/ActivityLogEntity";
 import { CatalogEntity } from "../entity/CatalogEntity";
 import { CollectionEntity } from "../entity/CollectionEntity";
+import { FollowEntity } from "../entity/FollowEntity";
 import { PackageEntity } from "../entity/PackageEntity";
 import { UserEntity } from "../entity/UserEntity";
 import { VersionEntity } from "../entity/VersionEntity";
-import { ActivityLog, ActivityLogChangeType, ActivityLogEventType } from "../generated/graphql";
+import { ActivityLogChangeType, ActivityLogEventType } from "../generated/graphql";
 
 export interface ActivityLogTemp {
     userId: number;
@@ -75,13 +76,11 @@ export async function createActivityLog(connection: EntityManager | Connection, 
         activityLog.targetCollectionSlug = collection.collectionSlug;
     }
 
-    await connection.getCustomRepository(ActivityLogRepository).create(activityLog);
+    await connection.getCustomRepository(ActivityLogRepository).createLog(activityLog);
 }
 @EntityRepository(ActivityLogEntity)
-export class ActivityLogRepository {
-    constructor(private manager: EntityManager) {}
-
-    async create(activityLog: ActivityLogEntity): Promise<void> {
+export class ActivityLogRepository extends Repository<ActivityLogEntity> {
+    async createLog(activityLog: ActivityLogEntity): Promise<void> {
         return this.manager.nestedTransaction(async (transaction) => {
             const entity = transaction.create(ActivityLogEntity, activityLog);
             if (
@@ -163,5 +162,79 @@ export class ActivityLogRepository {
             .getManyAndCount();
 
         return [activityLogEntities, count];
+    }
+
+    async getUserFollowingActivity(
+        userId: number,
+        offset: number,
+        limit: number,
+        relations?: string[]
+    ): Promise<[ActivityLogEntity[], number]> {
+        if (relations == null) {
+            relations = [];
+        }
+
+        const alias = "ActivityLog";
+        return await this.manager
+            .getRepository(ActivityLogEntity)
+            .createQueryBuilder(alias)
+            .distinct(true)
+            .innerJoin(
+                (sb) => sb.select('"f".*').from(FollowEntity, "f").where('"f"."user_id" = :userId'),
+                "Follow",
+                `
+                    "ActivityLog"."user_id" != "Follow"."user_id"
+                AND "ActivityLog"."event_type" IN (SELECT * FROM unnest("Follow"."event_types"))
+                AND
+                    (
+                        "ActivityLog"."user_id" = "Follow"."target_user_id"
+                        OR "ActivityLog"."target_collection_id" = "Follow"."target_collection_id"
+                        OR "ActivityLog"."target_catalog_id" = "Follow"."target_catalog_id"
+                        OR "ActivityLog"."target_package_issue_id" = "Follow"."target_package_issue_id"
+                        OR "ActivityLog"."target_package_id" = "Follow"."target_package_id"
+                    )
+                AND
+                    CASE
+                        WHEN "ActivityLog"."target_collection_id" IS NULL THEN TRUE
+                        ELSE
+                            (
+                                (SELECT c.is_public FROM collection c WHERE c.id = "ActivityLog"."target_collection_id") IS TRUE
+                                OR
+                                (EXISTS (SELECT cu.collection_id FROM collection_user cu WHERE "ActivityLog"."target_collection_id" = cu.collection_id AND cu.user_id = "Follow".user_id))
+                            )
+                    END
+                AND
+                    CASE
+                        WHEN "ActivityLog"."target_catalog_id" IS NULL THEN TRUE
+                        ELSE
+                            (
+                                (SELECT c."isPublic" FROM catalog c WHERE c.id = "ActivityLog"."target_catalog_id") IS TRUE
+                                OR
+                                (EXISTS (SELECT cu.catalog_id FROM user_catalog cu WHERE "ActivityLog"."target_catalog_id" = cu.catalog_id AND cu.user_id = "Follow".user_id))
+                            )
+                    END
+                AND
+                    CASE
+                        WHEN "ActivityLog"."target_package_issue_id" IS NULL THEN TRUE
+                        ELSE (EXISTS (SELECT pi.id FROM package_issue pi WHERE "ActivityLog"."target_package_issue_id" = pi.id))
+                    END
+                AND
+                    CASE
+                        WHEN "ActivityLog"."target_package_id" IS NULL THEN TRUE
+                        ELSE
+                            (
+                                (SELECT pkg."isPublic" FROM package pkg WHERE pkg.id = "ActivityLog"."target_package_id") IS TRUE
+                                OR
+                                (EXISTS (SELECT pu.package_id FROM user_package_permission pu WHERE "ActivityLog"."target_package_id" = pu.package_id AND pu.user_id = "Follow".user_id))
+                            )
+                    END
+                `
+            )
+            .setParameter("userId", userId)
+            .orderBy('"ActivityLog"."created_at"', "DESC")
+            .offset(offset)
+            .limit(limit)
+            .addRelations(alias, relations)
+            .getManyAndCount();
     }
 }

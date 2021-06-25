@@ -86,7 +86,9 @@ export class LoginDialogComponent implements OnInit, OnDestroy {
                 if (returnUrl) {
                     this.router.navigate([returnUrl], { fragment: this.fragment });
                 } else {
-                    window.location.reload();
+                    if (window.location.href.includes("validate-email"))
+                        window.location.href = "/" + this.loginForm.value.username;
+                    else window.location.reload();
                 }
                 this.dialogRef.close();
             },

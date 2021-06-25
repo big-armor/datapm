@@ -322,7 +322,7 @@ const getPackageEventTypes = (): NotificationEventType[] => {
 };
 
 const getPackageIssueEventTypes = (): NotificationEventType[] => {
-    return [NotificationEventType.PACKAGE_ISSUE_STAUS_CHANGE, NotificationEventType.PACKAGE_ISSUE_COMMENT_CREATED];
+    return [NotificationEventType.PACKAGE_ISSUE_STATUS_CHANGE, NotificationEventType.PACKAGE_ISSUE_COMMENT_CREATED];
 };
 
 const getUserEventTypes = (): NotificationEventType[] => {

@@ -1,0 +1,45 @@
+query MyFollowingActivity($offset: Int!, $limit: Int!) {
+    myFollowingActivity(offset: $offset, limit: $limit) {
+        logs {
+            id
+            targetCatalog {
+                identifier {
+                    catalogSlug
+                }
+                displayName
+            }
+            targetPackage {
+                identifier {
+                    catalogSlug
+                    packageSlug
+                }
+                displayName
+            }
+            targetPackageIssue {
+                packageIdentifier {
+                    catalogSlug
+                    packageSlug
+                }
+                issueNumber
+            }
+            targetCollection {
+                identifier {
+                    collectionSlug
+                }
+                name
+            }
+            user {
+                firstName
+                lastName
+                username
+            }
+            eventType
+            changeType
+            createdAt
+            updatedAt
+            propertiesEdited
+        }
+        hasMore
+        count
+    }
+}
