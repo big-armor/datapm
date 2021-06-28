@@ -1,6 +1,8 @@
 query CatalogFollowers($identifier: CatalogIdentifierInput!, $limit: Int!, $offset: Int!) {
     catalogFollowers(identifier: $identifier, limit: $limit, offset: $offset) {
         followers {
+            firstName
+            lastName
             username
         }
         hasMore
