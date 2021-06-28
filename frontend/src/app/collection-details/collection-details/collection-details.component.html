@@ -36,7 +36,8 @@
                 <mat-tab>
                     <ng-template mat-tab-label>
                         Followers
-                        <span class="tab-count" *ngIf="followersCount > 0">
+                        <span *ngIf="followersCount > 0">&nbsp;</span>
+                        <span class="span-nr d-flex align-items-center round-20" *ngIf="followersCount > 0">
                             {{ followersCount }}
                         </span>
                     </ng-template></mat-tab

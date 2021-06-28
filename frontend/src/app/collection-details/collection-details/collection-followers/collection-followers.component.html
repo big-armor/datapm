@@ -1,7 +1,9 @@
-<app-followers
-    [followers]="followers"
-    [hasLoadingErrors]="hasLoadingErrors"
-    [hasMoreFollowers]="hasMoreFollowers"
-    [loadingFollowers]="loadingFollowers"
-    (onMoreFollowersRequested)="loadFollowers($event)"
-></app-followers>
+<div class="mt-4 pt-2">
+    <app-followers
+        [followers]="followers"
+        [hasLoadingErrors]="hasLoadingErrors"
+        [hasMoreFollowers]="hasMoreFollowers"
+        [loadingFollowers]="loadingFollowers"
+        (onMoreFollowersRequested)="loadFollowers($event)"
+    ></app-followers>
+</div>
