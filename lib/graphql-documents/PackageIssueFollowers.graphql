@@ -6,6 +6,8 @@ query PackageIssueFollowers(
 ) {
     packageIssueFollowers(identifier: $identifier, issueIdentifier: $issueIdentifier, limit: $limit, offset: $offset) {
         followers {
+            firstName
+            lastName
             username
         }
         hasMore

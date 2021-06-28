@@ -1,6 +1,8 @@
 query PackageFollowers($identifier: PackageIdentifierInput!, $limit: Int!, $offset: Int!) {
     packageFollowers(identifier: $identifier, limit: $limit, offset: $offset) {
         followers {
+            firstName
+            lastName
             username
         }
         hasMore
