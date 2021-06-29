@@ -17,7 +17,8 @@ import {
     PackageIssueIdentifierInput,
     CatalogIdentifierInput,
     CollectionIdentifierInput,
-    UserIdentifierInput
+    UserIdentifierInput,
+    ActivityLogChangeType
 } from "../generated/graphql";
 import { getCatalogOrFail } from "../repository/CatalogRepository";
 import { CollectionRepository } from "../repository/CollectionRepository";
@@ -68,7 +69,6 @@ export const saveFollow = async (
         const catalog = await getCatalogOrFail({ slug: follow.catalog.catalogSlug, manager });
         existingFollowEntity = await followRepository.getFollowByCatalogId(userId, catalog.id);
 
-        // check that this user has the right to move this package to a different catalog
         const hasViewPermission = (await resolveCatalogPermissionsForEntity(context, catalog)).includes(
             Permission.VIEW
         );
@@ -78,7 +78,7 @@ export const saveFollow = async (
         }
 
         followEntity.catalogId = catalog.id;
-        followEntity.eventTypes = getCatalogEventTypes();
+        followEntity.eventTypes = getCatalogEventTypes(follow);
     } else if (follow.collection) {
         const collection = await manager
             .getCustomRepository(CollectionRepository)
@@ -95,7 +95,7 @@ export const saveFollow = async (
         existingFollowEntity = await followRepository.getFollowByCollectionId(userId, collection.id);
 
         followEntity.collectionId = collection.id;
-        followEntity.eventTypes = getCollectionEventTypes();
+        followEntity.eventTypes = getCollectionEventTypes(follow);
     } else if (follow.package) {
         const packageEntity = await manager
             .getCustomRepository(PackageRepository)
@@ -111,7 +111,7 @@ export const saveFollow = async (
         existingFollowEntity = await followRepository.getFollowByPackageId(userId, packageEntity.id);
 
         followEntity.packageId = packageEntity.id;
-        followEntity.eventTypes = getPackageEventTypes();
+        followEntity.eventTypes = getPackageEventTypes(follow);
     } else if (follow.packageIssue) {
         const packageEntity = await manager
             .getCustomRepository(PackageRepository)
@@ -307,25 +307,23 @@ export const deleteFollow = async (
     }
 };
 
-export const deleteAllMyFollows = async (_0: any, {}, context: AuthenticatedContext, info: any): Promise<void> => {
+export const deleteAllMyFollows = async (_0: any, { }, context: AuthenticatedContext, info: any): Promise<void> => {
     const manager = context.connection.manager;
     await manager.getCustomRepository(FollowRepository).deleteAllFollowsByUserId(context.me.id);
 };
 
-const getCatalogEventTypes = (): NotificationEventType[] => {
-    return [NotificationEventType.CATALOG_PACKAGE_ADDED, NotificationEventType.CATALOG_PACKAGE_REMOVED];
+const getCatalogEventTypes = (follow: SaveFollowInput): NotificationEventType[] => {
+    const events = [NotificationEventType.CATALOG_PACKAGE_ADDED, NotificationEventType.CATALOG_PACKAGE_REMOVED];
+    const childEvents = getChildPackagesEventTypes(follow);
+    events.push(...childEvents);
+    return events;
 };
 
-const getCollectionEventTypes = (): NotificationEventType[] => {
-    return [NotificationEventType.COLLECTION_PACKAGE_ADDED, NotificationEventType.COLLECTION_PACKAGE_REMOVED];
-};
-
-const getPackageEventTypes = (): NotificationEventType[] => {
-    return [
-        NotificationEventType.PACKAGE_MAJOR_CHANGE,
-        NotificationEventType.PACKAGE_MINOR_CHANGE,
-        NotificationEventType.PACKAGE_PATCH_CHANGE
-    ];
+const getCollectionEventTypes = (follow: SaveFollowInput): NotificationEventType[] => {
+    const events = [NotificationEventType.COLLECTION_PACKAGE_ADDED, NotificationEventType.COLLECTION_PACKAGE_REMOVED];
+    const childEvents = getChildPackagesEventTypes(follow);
+    events.push(...childEvents);
+    return events;
 };
 
 const getPackageIssueEventTypes = (): NotificationEventType[] => {
@@ -334,6 +332,48 @@ const getPackageIssueEventTypes = (): NotificationEventType[] => {
 
 const getUserEventTypes = (): NotificationEventType[] => {
     return [NotificationEventType.PACKAGE_CREATED, NotificationEventType.VERSION_CREATED];
+};
+
+const getChildPackagesEventTypes = (follow: SaveFollowInput) => {
+    if (!follow.followAllPackages) {
+        return [];
+    }
+
+    return getPackageEventTypes(follow);
+}
+
+const getPackageEventTypes = (follow: SaveFollowInput) => {
+    const requiredChangeTypes = getRequiredPackageChangeTypes();
+    const changeTypes = (follow.changeType || []) as ActivityLogChangeType[];
+    const hasPackageSettings = changeTypes.some((p) => requiredChangeTypes.includes(p));
+    if (!hasPackageSettings) {
+        throw new Error("MISSING_PACKAGE_CHANGE_TYPES");
+    }
+
+    return changeTypes
+        .map((c) => convertLogChangeTypeToNotificationType(c))
+        .filter((c) => c != null) as NotificationEventType[];
+}
+
+const convertLogChangeTypeToNotificationType = (logChangeType: ActivityLogChangeType) => {
+    switch (logChangeType) {
+        case ActivityLogChangeType.VERSION_PATCH_CHANGE:
+            return NotificationEventType.PACKAGE_PATCH_CHANGE;
+        case ActivityLogChangeType.VERSION_MINOR_CHANGE:
+            return NotificationEventType.PACKAGE_MINOR_CHANGE;
+        case ActivityLogChangeType.VERSION_MAJOR_CHANGE:
+            return NotificationEventType.PACKAGE_MAJOR_CHANGE;
+        default:
+            return null;
+    }
+}
+
+const getRequiredPackageChangeTypes = (): ActivityLogChangeType[] => {
+    return [
+        ActivityLogChangeType.VERSION_PATCH_CHANGE,
+        ActivityLogChangeType.VERSION_MINOR_CHANGE,
+        ActivityLogChangeType.VERSION_MAJOR_CHANGE
+    ];
 };
 
 export const followPackage = async (

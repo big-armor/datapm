@@ -11,7 +11,6 @@ import { Context } from "../context";
 import { CatalogEntity } from "../entity/CatalogEntity";
 import { UserEntity } from "../entity/UserEntity";
 import { CatalogIdentifierInput, Permission } from "../generated/graphql";
-import { CatalogRepository } from "../repository/CatalogRepository";
 import { getCatalogFromCacheOrDbOrFail } from "../resolvers/CatalogResolver";
 import { getCatalogPermissionsFromCacheOrDb } from "../resolvers/UserCatalogPermissionResolver";
 

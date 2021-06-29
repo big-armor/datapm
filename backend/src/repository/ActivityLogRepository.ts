@@ -192,6 +192,15 @@ export class ActivityLogRepository extends Repository<ActivityLogEntity> {
                         OR "ActivityLog"."target_catalog_id" = "Follow"."target_catalog_id"
                         OR "ActivityLog"."target_package_issue_id" = "Follow"."target_package_issue_id"
                         OR "ActivityLog"."target_package_id" = "Follow"."target_package_id"
+                        OR "ActivityLog"."target_package_id" IN
+                            (
+                                SELECT id
+                                FROM collection_package cp
+                                INNER JOIN collection c
+                                ON (
+                                    c.id = cp.collection_id
+                                    AND collection_id = "Follow"."target_collection_id" AND
+                            )
                     )
                 AND
                     CASE
@@ -236,5 +245,7 @@ export class ActivityLogRepository extends Repository<ActivityLogEntity> {
             .limit(limit)
             .addRelations(alias, relations)
             .getManyAndCount();
+
+        // TODO: ERMAL - Should we create entries for all the packages of a followed collection/catalog or force all of them to be followed
     }
 }

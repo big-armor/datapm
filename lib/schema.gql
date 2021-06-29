@@ -674,6 +674,9 @@ type Follow {
     package: Package
     collection: Collection
     packageIssue: PackageIssue
+    followAllPackages: Boolean
+    followAllPackageIssues: Boolean
+    changeType: [ActivityLogChangeType]
 }
 
 """
@@ -950,6 +953,9 @@ input SaveFollowInput {
     collection: CollectionIdentifierInput
     packageIssue: PackageIssueFullIdentifierInput
     user: UserIdentifierInput
+    followAllPackages: Boolean
+    followAllPackageIssues: Boolean
+    changeType: [ActivityLogChangeType]
 }
 
 """
