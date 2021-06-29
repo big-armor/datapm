@@ -26,6 +26,9 @@ export class FollowersComponent implements OnInit {
     @Input()
     public loadingFollowers: boolean;
 
+    @Input()
+    public objectType: string;
+
     @Output()
     public onMoreFollowersRequested = new EventEmitter<FollowersRequest>();
 
