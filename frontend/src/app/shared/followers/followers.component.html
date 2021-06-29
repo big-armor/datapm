@@ -1,7 +1,8 @@
 <div class="container">
     <div class="row mb-4 pb-2">
         <div class="col-md-12 pl-0 followers-div">
-            <div class="text-main-title">Followers</div>
+            <div class="text-main-title mb-1">Followers</div>
+            <div class="text-dark-gray pb-3">These users follow this {{ objectType }}.</div>
         </div>
         <div class="col-lg-4 col-md-6 col-sm-12" *ngFor="let follower of followers">
             <div class="d-flex flex-row bd-highlight py-3 followers-div">
