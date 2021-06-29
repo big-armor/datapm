@@ -4,3 +4,14 @@
 .followers-div {
     border-bottom: 1px solid var(--gray-9-color);
 }
+
+.height-17 {
+    line-height: 17px;
+}
+
+.col-md-4 {
+    padding-left: 0px;
+    &:nth-child(3n + 1) {
+        padding-right: 0px;
+    }
+}
