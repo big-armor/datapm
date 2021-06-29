@@ -3,14 +3,14 @@
         <div class="col-md-12 pl-0 followers-div">
             <div class="text-main-title">Followers</div>
         </div>
-        <div class="col-md-4">
-            <div class="d-flex flex-row bd-highlight py-3 followers-div" *ngFor="let follower of followers">
+        <div class="col-lg-4 col-md-6 col-sm-12" *ngFor="let follower of followers">
+            <div class="d-flex flex-row bd-highlight py-3 followers-div">
                 <div class="bd-highlight pr-3 align-self-center">
                     <app-avatar
                         [routerLink]="'/' + follower.username"
-                        class="user-img d-flex align-items-center"
+                        class="user-img cursor-pointer d-flex align-items-center"
                         [user]="follower"
-                        [size]="45"
+                        [size]="40"
                     >
                     </app-avatar>
                 </div>
@@ -19,7 +19,7 @@
                         <div class="bd-highlight">
                             <div
                                 *ngIf="follower.firstName && follower.lastName"
-                                class="text-dark-gray font-16 color-info"
+                                class="text-dark-gray font-16 color-info cursor-pointer"
                                 style="margin-bottom: 0px !important"
                                 [routerLink]="'/' + follower.username"
                             >
@@ -29,7 +29,7 @@
                         <div class="bd-highlight">
                             <span
                                 *ngIf="!follower.firstName"
-                                class="text-light-gray"
+                                class="text-dark-gray font-16 color-info cursor-pointer"
                                 style="margin-bottom: 0px !important"
                             >
                                 <a>{{ follower.username }}</a>
@@ -43,7 +43,7 @@
             </div>
         </div>
 
-        <div class="col-md-12 pl-0 pt-3">
+        <div class="col-md-12 pl-0 pt-4">
             <div class="pb-3" *ngIf="loadingFollowers">
                 <mat-spinner diameter="25"></mat-spinner>
             </div>
