@@ -1,17 +1,17 @@
 <div class="container">
     <div class="row mb-4 pb-2">
-        <div class="col-md-12 pl-0 followers-div">
+        <div class="col-md-12 pl-0">
             <div class="text-main-title mb-1">Followers</div>
             <div class="text-dark-gray pb-3">These users follow this {{ objectType }}.</div>
         </div>
         <div class="col-lg-4 col-md-6 col-sm-12" *ngFor="let follower of followers">
-            <div class="d-flex flex-row bd-highlight py-3 followers-div">
-                <div class="bd-highlight pr-3 align-self-center">
+            <div class="d-flex flex-row bd-highlight py-3">
+                <div class="bd-highlight pr-2 align-self-center">
                     <app-avatar
                         [routerLink]="'/' + follower.username"
                         class="user-img cursor-pointer d-flex align-items-center"
                         [user]="follower"
-                        [size]="40"
+                        [size]="38"
                     >
                     </app-avatar>
                 </div>
@@ -20,7 +20,7 @@
                         <div class="bd-highlight">
                             <div
                                 *ngIf="follower.firstName && follower.lastName"
-                                class="text-dark-gray font-16 color-info cursor-pointer"
+                                class="text-dark-gray font-14 color-info cursor-pointer"
                                 style="margin-bottom: 0px !important"
                                 [routerLink]="'/' + follower.username"
                             >
@@ -30,7 +30,7 @@
                         <div class="bd-highlight">
                             <span
                                 *ngIf="!follower.firstName"
-                                class="text-dark-gray font-16 color-info cursor-pointer"
+                                class="text-dark-gray font-14 color-info cursor-pointer"
                                 style="margin-bottom: 0px !important"
                             >
                                 <a>{{ follower.username }}</a>
