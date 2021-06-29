@@ -18,7 +18,7 @@ export class PackageFollowersComponent implements OnInit, OnDestroy {
     public hasMoreFollowers: boolean;
     public loadingFollowers: boolean;
 
-    constructor(private packageService: PackageService, private packageFollowersGQL: PackageFollowersGQL) {}
+    constructor(private packageService: PackageService, private packageFollowersGQL: PackageFollowersGQL) { }
 
     public ngOnInit(): void {
         this.packageService.package.pipe(takeUntil(this.destroy$)).subscribe((pkg) => (this.package = pkg.package));
@@ -49,14 +49,6 @@ export class PackageFollowersComponent implements OnInit, OnDestroy {
                     }
 
                     const fetchedFollowers = data.packageFollowers.followers;
-                    this.followers.push(...fetchedFollowers);
-                    this.followers.push(...fetchedFollowers);
-                    this.followers.push(...fetchedFollowers);
-                    this.followers.push(...fetchedFollowers);
-                    this.followers.push(...fetchedFollowers);
-                    this.followers.push(...fetchedFollowers);
-                    this.followers.push(...fetchedFollowers);
-                    this.followers.push(...fetchedFollowers);
                     this.followers.push(...fetchedFollowers);
                     this.hasMoreFollowers = data.packageFollowers.hasMore;
                     this.loadingFollowers = false;
