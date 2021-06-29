@@ -2,7 +2,6 @@
 @import "../../../styles/_variables.scss";
 
 .followers-div {
-    border-bottom: 1px solid var(--gray-9-color);
     border-top: 1px solid var(--gray-9-color);
 }
 
@@ -28,5 +27,8 @@
 @media (max-width: 767px) {
     .col-lg-4 {
         padding-right: 0px;
+    }
+    .show-more-btn {
+        padding: 0px;
     }
 }

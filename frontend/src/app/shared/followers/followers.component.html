@@ -4,41 +4,43 @@
             <div class="text-main-title mb-1">Followers</div>
             <div class="text-dark-gray pb-3">These users follow this {{ objectType }}.</div>
         </div>
-        <div class="followers-div" *ngIf="!hasLoadingErrors">
-            <div class="col-lg-4 col-md-6 col-sm-12" *ngFor="let follower of followers">
-                <div class="d-flex flex-row bd-highlight py-3">
-                    <div class="bd-highlight pr-2 align-self-center">
-                        <app-avatar
-                            [routerLink]="'/' + follower.username"
-                            class="user-img cursor-pointer d-flex align-items-center"
-                            [user]="follower"
-                            [size]="38"
-                        >
-                        </app-avatar>
-                    </div>
-                    <div class="bd-highlight align-self-center pl-2 height-17">
-                        <div class="d-flex flex-column bd-highlight">
-                            <div class="bd-highlight">
-                                <div
-                                    *ngIf="follower.firstName && follower.lastName"
-                                    class="text-dark-gray font-14 color-info cursor-pointer"
-                                    style="margin-bottom: 0px !important"
-                                    [routerLink]="'/' + follower.username"
-                                >
-                                    <a>{{ follower.firstName }} {{ follower.lastName }}</a>
+        <div class="col-md-12 py-2 followers-div" *ngIf="!hasLoadingErrors">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12" *ngFor="let follower of followers">
+                    <div class="d-flex flex-row bd-highlight py-3">
+                        <div class="bd-highlight pr-2 align-self-center">
+                            <app-avatar
+                                [routerLink]="'/' + follower.username"
+                                class="user-img cursor-pointer d-flex align-items-center"
+                                [user]="follower"
+                                [size]="38"
+                            >
+                            </app-avatar>
+                        </div>
+                        <div class="bd-highlight align-self-center pl-2 height-17">
+                            <div class="d-flex flex-column bd-highlight">
+                                <div class="bd-highlight">
+                                    <div
+                                        *ngIf="follower.firstName && follower.lastName"
+                                        class="text-dark-gray font-14 color-info cursor-pointer"
+                                        style="margin-bottom: 0px !important"
+                                        [routerLink]="'/' + follower.username"
+                                    >
+                                        <a>{{ follower.firstName }} {{ follower.lastName }}</a>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="bd-highlight">
-                                <span
-                                    *ngIf="!follower.firstName"
-                                    class="text-dark-gray font-14 color-info cursor-pointer"
-                                    style="margin-bottom: 0px !important"
-                                >
-                                    <a>{{ follower.username }}</a>
-                                </span>
-                                <span *ngIf="follower.firstName && follower.lastName" class="text-light-gray">
-                                    {{ follower.username }}
-                                </span>
+                                <div class="bd-highlight">
+                                    <span
+                                        *ngIf="!follower.firstName"
+                                        class="text-dark-gray font-14 color-info cursor-pointer"
+                                        style="margin-bottom: 0px !important"
+                                    >
+                                        <a>{{ follower.username }}</a>
+                                    </span>
+                                    <span *ngIf="follower.firstName && follower.lastName" class="text-light-gray">
+                                        {{ follower.username }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -46,12 +48,9 @@
             </div>
         </div>
 
-        <div class="col-md-12 pl-0">
-            <div class="pb-3" *ngIf="loadingFollowers">
-                <mat-spinner diameter="25"></mat-spinner>
-            </div>
-
-            <div *ngIf="hasMoreFollowers" class="text-center">
+        <div class="col-md-4"></div>
+        <div class="col-md-4 show-more-btn">
+            <div *ngIf="hasMoreFollowers" class="text-left mt-3">
                 <button
                     class="app-outlined-button ctaButton"
                     [class.disabled]="loadingFollowers"
@@ -60,6 +59,14 @@
                     Load More
                 </button>
             </div>
+        </div>
+        <div class="col-md-4"></div>
+
+        <div class="col-md-12 pl-0">
+            <div class="pb-3" *ngIf="loadingFollowers">
+                <mat-spinner diameter="25"></mat-spinner>
+            </div>
+
             <div>
                 <span *ngIf="hasLoadingErrors" class="text-dark-gray">
                     An error occurred when trying to load followers. Please refresh the page and try again or contact
