@@ -119,8 +119,8 @@ enum ActivityLogEventType {
     PACKAGE_ISSUE_COMMENT_CREATED
     PACKAGE_ISSUE_COMMENT_EDIT
     PACKAGE_ISSUE_COMMENT_DELETED
-    PACKAGE_ISSUE_CLOSED
     PACKAGE_ISSUE_DELETED
+    PACKAGE_ISSUE_STATUS_CHANGE
 
     VERSION_CREATED
     VERSION_UPDATED
@@ -157,6 +157,9 @@ enum ActivityLogChangeType {
 
     PUBLIC_ENABLED
     PUBLIC_DISABLED
+
+    OPENED
+    CLOSED
 
     UNCLAIMED_ENABLED
     UNCLAIMED_DISABLED
@@ -253,7 +256,7 @@ enum NotificationEventType {
     CATALOG_PACKAGE_ADDED
     CATALOG_PACKAGE_REMOVED
     PACKAGE_ISSUE_COMMENT_CREATED
-    PACKAGE_ISSUE_STAUS_CHANGE
+    PACKAGE_ISSUE_STATUS_CHANGE
 }
 
 enum JobType {
@@ -507,8 +510,10 @@ type CollectionIdentifier {
 Represents a logged user activity
 """
 type ActivityLog {
+    id: Int!
     user: User
     targetPackage: Package
+    targetPackageIssue: PackageIssue
     targetPackageVersion: Version
     targetCollection: Collection
     targetCatalog: Catalog
@@ -658,6 +663,15 @@ type Follow {
     package: Package
     collection: Collection
     packageIssue: PackageIssue
+}
+
+"""
+The following entities activity logs type
+"""
+type FollowingActivity {
+    logs: [ActivityLog!]!
+    hasMore: Boolean!
+    count: Int!
 }
 
 """
@@ -1226,6 +1240,11 @@ type Query {
     Get root page content
     """
     pageContent(route: String!): PageContent!
+
+    """
+    Get following entities activities
+    """
+    myFollowingActivity(offset: Int!, limit: Int!): FollowingActivity
 }
 
 type Mutation {

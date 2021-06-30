@@ -1,3 +1,4 @@
+import { ActivityLogEntity } from "./entity/ActivityLogEntity";
 import { CatalogEntity } from "./entity/CatalogEntity";
 import { CollectionEntity } from "./entity/CollectionEntity";
 import { PackageEntity } from "./entity/PackageEntity";
@@ -159,6 +160,15 @@ export class SessionCache {
         return this.loadDataAsync(cacheId, permissionPromise);
     }
 
+    public async loadActivityLog(
+        id: number,
+        logPromise: () => Promise<ActivityLogEntity>,
+        forceReload?: boolean
+    ): Promise<ActivityLogEntity> {
+        const cacheId = this.buildDataKeyForActivityLogId(id);
+        return this.loadDataAsync(cacheId, logPromise, forceReload);
+    }
+
     public async loadDataAsync(
         dataKey: string,
         dataPromiseFunction: () => Promise<any>,
@@ -188,6 +198,10 @@ export class SessionCache {
 
     private buildDataKeyForPackageId(id: number): string {
         return "PACKAGE_ID-" + id;
+    }
+
+    private buildDataKeyForActivityLogId(id: number): string {
+        return "ACTIVITY_LOG_ID-" + id;
     }
 
     private buildDataKeyForPackageIdentifier(identifier: PackageIdentifier | PackageIdentifierInput): string {

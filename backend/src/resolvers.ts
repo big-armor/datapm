@@ -17,7 +17,8 @@ import {
     User,
     PackageIssueResolvers,
     PackageIssueCommentResolvers,
-    FollowResolvers
+    FollowResolvers,
+    ActivityLogResolvers
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
@@ -156,7 +157,18 @@ import {
     userCatalogs
 } from "./resolvers/CatalogResolver";
 
-import { myActivity, packageActivities } from "./resolvers/ActivityLogResolver";
+import {
+    logAuthor,
+    logCatalog,
+    logCollection,
+    logId,
+    logPackage,
+    logPackageIssue,
+    logPropertiesEdited,
+    myActivity,
+    myFollowingActivity,
+    packageActivities
+} from "./resolvers/ActivityLogResolver";
 import { removePackagePermissions, setPackagePermissions } from "./resolvers/UserPackagePermissionResolver";
 import {
     createPackageIssue,
@@ -242,6 +254,7 @@ export const resolvers: {
     CollectionSlug: GraphQLScalarType;
     AutoCompleteResult: AutoCompleteResultResolvers;
     Follow: FollowResolvers;
+    ActivityLog: ActivityLogResolvers;
 } = {
     AutoCompleteResult: {
         packages: async (parent: any, args: any, context: AutoCompleteContext, info: any) => {
@@ -495,6 +508,15 @@ export const resolvers: {
     Follow: {
         package: followPackage
     },
+    ActivityLog: {
+        id: logId,
+        propertiesEdited: logPropertiesEdited,
+        user: logAuthor,
+        targetPackage: logPackage,
+        targetPackageIssue: logPackageIssue,
+        targetCatalog: logCatalog,
+        targetCollection: logCollection
+    },
 
     Query: {
         registryStatus: (_0: any, _1: any, context: AuthenticatedContext, info: any) => {
@@ -575,6 +597,7 @@ export const resolvers: {
         packageActivities: packageActivities,
         getFollow: getFollow,
         myFollows: getAllMyFollows,
+        myFollowingActivity: myFollowingActivity,
         platformSettings: getPlatformSettingsByKey,
         publicPlatformSettingsByKey: getPublicPlatformSettingsByKeyOrFail,
         pageContent: getPageContentByRoute
@@ -659,6 +682,7 @@ export const resolvers: {
         saveFollow: saveFollow,
         deleteFollow: deleteFollow,
         deleteAllMyFollows: deleteAllMyFollows,
+
         savePlatformSettings: savePlatformSettings,
 
         runJob,
