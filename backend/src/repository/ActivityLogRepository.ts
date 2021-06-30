@@ -192,15 +192,28 @@ export class ActivityLogRepository extends Repository<ActivityLogEntity> {
                         OR "ActivityLog"."target_catalog_id" = "Follow"."target_catalog_id"
                         OR "ActivityLog"."target_package_issue_id" = "Follow"."target_package_issue_id"
                         OR "ActivityLog"."target_package_id" = "Follow"."target_package_id"
-                        OR "ActivityLog"."target_package_id" IN
-                            (
-                                SELECT id
-                                FROM collection_package cp
-                                INNER JOIN collection c
-                                ON (
-                                    c.id = cp.collection_id
-                                    AND collection_id = "Follow"."target_collection_id" AND
-                            )
+                        OR (
+                            "Follow"."follow_all_packages"
+                            AND "ActivityLog"."target_package_id" IN
+                                (
+                                    SELECT id
+                                    FROM collection_package cp
+                                    INNER JOIN collection c
+                                    ON (
+                                        c.id = cp.collection_id
+                                        AND c.id = "Follow"."target_collection_id"
+                                    )
+                                )
+                        )
+                        OR (
+                            "Follow"."follow_all_packages"
+                            AND "ActivityLog"."target_package_id" IN
+                                (
+                                    SELECT id
+                                    FROM package
+                                    WHERE catalog_id = "ActivityLog"."target_catalog_id"
+                                )
+                        )
                     )
                 AND
                     CASE

@@ -43,10 +43,10 @@ export class FollowEntity extends EntityBaseModel {
     @Column({ name: "follow_all_packages" })
     public followAllPackages: boolean;
 
-    @Column({ name: "follow_package_issues" })
-    public followPackageIssues: boolean;
+    @Column({ name: "follow_all_package_issues" })
+    public followAllPackageIssues: boolean;
 
-    @Column({ name: "change_type" })
+    @Column("enum", { array: true, name: "change_type", enum: ActivityLogChangeType })
     public changeType: ActivityLogChangeType[];
 
     @ManyToOne(() => UserEntity)

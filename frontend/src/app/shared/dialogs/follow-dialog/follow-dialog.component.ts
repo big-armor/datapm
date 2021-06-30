@@ -2,6 +2,7 @@ import { Component, Inject } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { PageState } from "src/app/models/page-state";
 import {
+    ActivityLogChangeType,
     DeleteFollowGQL,
     Follow,
     FollowIdentifierInput,
@@ -24,6 +25,11 @@ export enum FollowDialogResultType {
     FOLLOW_UPDATED
 }
 
+interface PackageChangeType {
+    label: string;
+    changeType: ActivityLogChangeType;
+}
+
 @Component({
     selector: "app-follow-dialog",
     templateUrl: "./follow-dialog.component.html",
@@ -31,12 +37,17 @@ export enum FollowDialogResultType {
 })
 export class FollowDialogComponent {
     public readonly frequencies: NotificationFrequency[] = Object.values(NotificationFrequency);
+    public readonly PACKAGE_CHANGE_TYPES = this.buildPackageChangeTypeOptions();
 
-    submitState: PageState = "INIT";
+    public submitState: PageState = "INIT";
 
     public follow: Follow;
     public isFollowing = false;
     public selectedFrequency: NotificationFrequency = NotificationFrequency.WEEKLY;
+
+    public followAllPackages: boolean = true;
+    public followAllPackageIssues: boolean = true;
+    public selectedChangeTypes: PackageChangeType[] = [...this.PACKAGE_CHANGE_TYPES];
 
     private followIdentifier: FollowIdentifierInput;
 
@@ -56,12 +67,22 @@ export class FollowDialogComponent {
         }
     }
 
+    public canFollowAllPackages(): boolean {
+        return this.followIdentifier.catalog != null || this.followIdentifier.collection != null;
+    }
+
+    public canFollowPackageContent(): boolean {
+        return this.canFollowAllPackages() || this.followIdentifier.package != null;
+    }
+
     public save(): void {
         if (!this.follow) {
             this.follow = {} as Follow;
         }
 
         this.follow.notificationFrequency = this.selectedFrequency;
+        this.follow.followAllPackages = this.followAllPackages;
+        this.follow.followAllPackageIssues = this.followAllPackageIssues;
         this.saveFollow();
     }
 
@@ -111,5 +132,22 @@ export class FollowDialogComponent {
 
     private close(result?: FollowDialogResult): void {
         this.dialogRef.close(result);
+    }
+
+    private buildPackageChangeTypeOptions(): PackageChangeType[] {
+        return [
+            {
+                label: "Breaking",
+                changeType: ActivityLogChangeType.VERSION_MAJOR_CHANGE
+            },
+            {
+                label: "Adaptive",
+                changeType: ActivityLogChangeType.VERSION_MINOR_CHANGE
+            },
+            {
+                label: "Descriptive",
+                changeType: ActivityLogChangeType.VERSION_PATCH_CHANGE
+            }
+        ];
     }
 }

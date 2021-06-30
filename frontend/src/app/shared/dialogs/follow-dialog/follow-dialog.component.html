@@ -3,7 +3,7 @@
         <div class="col-md-12 p-0">
             <div mat-dialog-title id="contentTitle">Following</div>
             <div mat-dialog-content id="contentBorder">
-                <p class="text-dark-gray">Notification Frequency:</p>
+                <p class="text-dark-gray">Notification Frequency</p>
                 <mat-form-field appearance="fill" floatLabel="never">
                     <mat-select [(value)]="selectedFrequency">
                         <mat-option *ngFor="let frequency of frequencies" [value]="frequency">
@@ -11,6 +11,29 @@
                         </mat-option>
                     </mat-select>
                 </mat-form-field>
+
+                <div *ngIf="canFollowAllPackages()">
+                    <mat-checkbox class="example-margin" [(ngModel)]="followAllPackages">
+                        Follow all packages
+                    </mat-checkbox>
+                </div>
+
+                <ng-container *ngIf="canFollowPackageContent()">
+                    <p class="text-dark-gray">Change type</p>
+                    <mat-form-field appearance="fill" floatLabel="never">
+                        <mat-select [disabled]="!followAllPackages" [(value)]="selectedChangeTypes" multiple>
+                            <mat-option *ngFor="let changeType of PACKAGE_CHANGE_TYPES" [value]="changeType">
+                                {{ changeType.label | titlecase }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </ng-container>
+
+                <div *ngIf="canFollowPackageContent()">
+                    <mat-checkbox class="example-margin" [(ngModel)]="followAllPackageIssues">
+                        Follow all package issues
+                    </mat-checkbox>
+                </div>
 
                 <div class="alert-div">
                     <div class="alert-warn" *ngIf="submitState == 'ERROR'">

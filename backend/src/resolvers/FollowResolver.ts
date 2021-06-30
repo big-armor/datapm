@@ -64,6 +64,8 @@ export const saveFollow = async (
     const followEntity = new FollowEntity();
     followEntity.userId = userId;
     followEntity.notificationFrequency = follow.notificationFrequency;
+    followEntity.followAllPackages = follow.followAllPackages || false;
+    followEntity.followAllPackageIssues = follow.followAllPackageIssues || false;
 
     if (follow.catalog) {
         const catalog = await getCatalogOrFail({ slug: follow.catalog.catalogSlug, manager });
