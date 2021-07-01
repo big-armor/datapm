@@ -21,25 +21,12 @@
                             <div class="d-flex flex-column bd-highlight">
                                 <div class="bd-highlight">
                                     <div
-                                        *ngIf="follower.firstName && follower.lastName"
                                         class="text-dark-gray font-14 color-info cursor-pointer"
                                         style="margin-bottom: 0px !important"
                                         [routerLink]="'/' + follower.username"
                                     >
-                                        <a>{{ follower.firstName }} {{ follower.lastName }}</a>
+                                        <a>{{ follower.displayName }}</a>
                                     </div>
-                                </div>
-                                <div class="bd-highlight">
-                                    <span
-                                        *ngIf="!follower.firstName"
-                                        class="text-dark-gray font-14 color-info cursor-pointer"
-                                        style="margin-bottom: 0px !important"
-                                    >
-                                        <a>{{ follower.username }}</a>
-                                    </span>
-                                    <span *ngIf="follower.firstName && follower.lastName" class="text-light-gray">
-                                        {{ follower.username }}
-                                    </span>
                                 </div>
                             </div>
                         </div>
