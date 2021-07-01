@@ -46,7 +46,7 @@ export class FollowDialogComponent {
     public selectedFrequency: NotificationFrequency = NotificationFrequency.WEEKLY;
 
     public followAllPackages: boolean = true;
-    public followAllPackageIssues: boolean = true;
+    public followAllPackageIssues: boolean = false;
     public selectedChangeTypes: PackageChangeType[] = [...this.PACKAGE_CHANGE_TYPES];
 
     private followIdentifier: FollowIdentifierInput;
@@ -62,6 +62,13 @@ export class FollowDialogComponent {
             if (data.follow) {
                 this.isFollowing = true;
                 this.selectedFrequency = data.follow.notificationFrequency;
+                this.followAllPackages = data.follow.followAllPackages;
+                this.followAllPackageIssues = data.follow.followAllPackageIssues;
+                if (data.follow.changeType) {
+                    this.selectedChangeTypes = this.PACKAGE_CHANGE_TYPES.filter((c) => data.follow.changeType.includes(c.changeType));
+                } else {
+                    this.selectedChangeTypes = [];
+                }
             }
             this.followIdentifier = data.followIdentifier;
         }
@@ -83,6 +90,7 @@ export class FollowDialogComponent {
         this.follow.notificationFrequency = this.selectedFrequency;
         this.follow.followAllPackages = this.followAllPackages;
         this.follow.followAllPackageIssues = this.followAllPackageIssues;
+        this.follow.changeType = this.selectedChangeTypes.map((c) => c.changeType);
         this.saveFollow();
     }
 
@@ -103,7 +111,10 @@ export class FollowDialogComponent {
             .mutate({
                 follow: {
                     ...this.followIdentifier,
-                    notificationFrequency: this.selectedFrequency
+                    notificationFrequency: this.selectedFrequency,
+                    followAllPackages: this.followAllPackages,
+                    followAllPackageIssues: this.followAllPackageIssues,
+                    changeType: this.follow.changeType
                 }
             })
             .subscribe(

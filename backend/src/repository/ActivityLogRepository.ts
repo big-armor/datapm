@@ -193,25 +193,21 @@ export class ActivityLogRepository extends Repository<ActivityLogEntity> {
                         OR "ActivityLog"."target_package_issue_id" = "Follow"."target_package_issue_id"
                         OR "ActivityLog"."target_package_id" = "Follow"."target_package_id"
                         OR (
-                            "Follow"."follow_all_packages"
+                            "Follow"."follow_all_packages" IS TRUE
                             AND "ActivityLog"."target_package_id" IN
                                 (
-                                    SELECT id
-                                    FROM collection_package cp
-                                    INNER JOIN collection c
-                                    ON (
-                                        c.id = cp.collection_id
-                                        AND c.id = "Follow"."target_collection_id"
-                                    )
+                                    SELECT package_id
+                                    FROM collection_package
+                                    WHERE collection_id = "Follow"."target_collection_id"
                                 )
                         )
                         OR (
-                            "Follow"."follow_all_packages"
+                            "Follow"."follow_all_packages" IS TRUE
                             AND "ActivityLog"."target_package_id" IN
                                 (
                                     SELECT id
                                     FROM package
-                                    WHERE catalog_id = "ActivityLog"."target_catalog_id"
+                                    WHERE catalog_id = "Follow"."target_catalog_id"
                                 )
                         )
                     )
@@ -245,9 +241,17 @@ export class ActivityLogRepository extends Repository<ActivityLogEntity> {
                         WHEN "ActivityLog"."target_package_id" IS NULL THEN TRUE
                         ELSE
                             (
-                                (SELECT pkg."isPublic" FROM package pkg WHERE pkg.id = "ActivityLog"."target_package_id") IS TRUE
-                                OR
-                                (EXISTS (SELECT pu.package_id FROM user_package_permission pu WHERE "ActivityLog"."target_package_id" = pu.package_id AND pu.user_id = "Follow".user_id))
+                                CASE
+                                    WHEN "ActivityLog"."event_type" != 'VERSION_CREATED'::activity_log_event_type_enum THEN TRUE
+                                    ELSE ("ActivityLog"."change_type"::activity_log_change_type_enum IN (SELECT * FROM unnest("Follow"."change_type")))
+                                END
+                                AND
+                                -- Permission check
+                                (
+                                    (SELECT pkg."isPublic" FROM package pkg WHERE pkg.id = "ActivityLog"."target_package_id") IS TRUE
+                                    OR
+                                    (EXISTS (SELECT pu.package_id FROM user_package_permission pu WHERE "ActivityLog"."target_package_id" = pu.package_id AND pu.user_id = "Follow".user_id))
+                                )
                             )
                     END
                 `
@@ -258,7 +262,5 @@ export class ActivityLogRepository extends Repository<ActivityLogEntity> {
             .limit(limit)
             .addRelations(alias, relations)
             .getManyAndCount();
-
-        // TODO: ERMAL - Should we create entries for all the packages of a followed collection/catalog or force all of them to be followed
     }
 }

@@ -17,7 +17,6 @@ import {
     PackageIssueIdentifierInput,
     CatalogIdentifierInput,
     CollectionIdentifierInput,
-    UserIdentifierInput,
     ActivityLogChangeType
 } from "../generated/graphql";
 import { getCatalogOrFail } from "../repository/CatalogRepository";
@@ -42,6 +41,9 @@ export const entityToGraphqlObject = async (context: Context, entity: FollowEnti
     return {
         notificationFrequency: entity.notificationFrequency,
         eventTypes: entity.eventTypes || [],
+        changeType: entity.changeType || [],
+        followAllPackages: entity.followAllPackages,
+        followAllPackageIssues: entity.followAllPackageIssues,
         catalog: catalogEntityToGraphQLOrNull(entity.catalog),
         collection: collectionEntityToGraphQLOrNull(entity.collection),
         package: await packageEntityToGraphqlObjectOrNull(context, context.connection, entity.package),
@@ -66,6 +68,7 @@ export const saveFollow = async (
     followEntity.notificationFrequency = follow.notificationFrequency;
     followEntity.followAllPackages = follow.followAllPackages || false;
     followEntity.followAllPackageIssues = follow.followAllPackageIssues || false;
+    followEntity.changeType = (follow.changeType || []) as ActivityLogChangeType[];
 
     if (follow.catalog) {
         const catalog = await getCatalogOrFail({ slug: follow.catalog.catalogSlug, manager });
@@ -113,7 +116,7 @@ export const saveFollow = async (
         existingFollowEntity = await followRepository.getFollowByPackageId(userId, packageEntity.id);
 
         followEntity.packageId = packageEntity.id;
-        followEntity.eventTypes = getPackageEventTypes(follow);
+        followEntity.eventTypes = getDefaultPackageEventTypes();
     } else if (follow.packageIssue) {
         const packageEntity = await manager
             .getCustomRepository(PackageRepository)
@@ -336,6 +339,15 @@ const getUserEventTypes = (): NotificationEventType[] => {
     return [NotificationEventType.PACKAGE_CREATED, NotificationEventType.VERSION_CREATED];
 };
 
+const getDefaultPackageEventTypes = (): NotificationEventType[] => {
+    return [
+        NotificationEventType.VERSION_CREATED,
+        NotificationEventType.PACKAGE_MAJOR_CHANGE,
+        NotificationEventType.PACKAGE_MINOR_CHANGE,
+        NotificationEventType.PACKAGE_PATCH_CHANGE
+    ];
+};
+
 const getChildPackagesEventTypes = (follow: SaveFollowInput) => {
     if (!follow.followAllPackages) {
         return [];
@@ -352,9 +364,12 @@ const getPackageEventTypes = (follow: SaveFollowInput) => {
         throw new Error("MISSING_PACKAGE_CHANGE_TYPES");
     }
 
-    return changeTypes
+    const eventTypes = changeTypes
         .map((c) => convertLogChangeTypeToNotificationType(c))
         .filter((c) => c != null) as NotificationEventType[];
+
+    eventTypes.push(NotificationEventType.VERSION_CREATED);
+    return eventTypes;
 }
 
 const convertLogChangeTypeToNotificationType = (logChangeType: ActivityLogChangeType) => {

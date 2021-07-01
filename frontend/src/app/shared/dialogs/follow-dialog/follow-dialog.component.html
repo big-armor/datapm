@@ -30,7 +30,11 @@
                 </ng-container>
 
                 <div *ngIf="canFollowPackageContent()">
-                    <mat-checkbox class="example-margin" [(ngModel)]="followAllPackageIssues">
+                    <mat-checkbox
+                        [disabled]="!followAllPackages"
+                        class="example-margin"
+                        [(ngModel)]="followAllPackageIssues"
+                    >
                         Follow all package issues
                     </mat-checkbox>
                 </div>
