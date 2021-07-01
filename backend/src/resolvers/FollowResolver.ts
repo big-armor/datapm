@@ -321,11 +321,7 @@ const getCollectionEventTypes = (): NotificationEventType[] => {
 };
 
 const getPackageEventTypes = (): NotificationEventType[] => {
-    return [
-        NotificationEventType.PACKAGE_MAJOR_CHANGE,
-        NotificationEventType.PACKAGE_MINOR_CHANGE,
-        NotificationEventType.PACKAGE_PATCH_CHANGE
-    ];
+    return [NotificationEventType.VERSION_CREATED, NotificationEventType.PACKAGE_EDIT];
 };
 
 const getPackageIssueEventTypes = (): NotificationEventType[] => {

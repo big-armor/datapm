@@ -22,6 +22,7 @@ query PackageIssues(
                 firstName
                 lastName
                 username
+                displayName
             }
             status
             createdAt

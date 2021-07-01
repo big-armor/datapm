@@ -8,6 +8,7 @@ mutation CreatePackageIssue($packageIdentifier: PackageIdentifierInput!, $issue:
             firstName
             lastName
             username
+            displayName
         }
         createdAt
         updatedAt

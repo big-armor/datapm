@@ -12,6 +12,7 @@ mutation UpdatePackageIssue(
             firstName
             lastName
             username
+            displayName
         }
         createdAt
         updatedAt
