@@ -4,6 +4,7 @@ query CollectionFollowers($identifier: CollectionIdentifierInput!, $limit: Int!,
             firstName
             lastName
             username
+            displayName
         }
         hasMore
         count
