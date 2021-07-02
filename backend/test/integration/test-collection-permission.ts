@@ -16,15 +16,18 @@ import { describe, it } from "mocha";
 describe("Collection Permissions", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
+    let userCClient: ApolloClient<NormalizedCacheObject>;
 
     before(async () => {});
 
     it("Create users A & B", async function () {
         userAClient = await createUser("Alol", "Aulu", "my-test-user100", "hellocat12@test.datapm.io", "catPassword2!");
         userBClient = await createUser("Foo1", "Bar2", "my-test-user101", "hellocat13@test.datapm.io", "catPassword2!");
+        userCClient = await createUser("Foo3", "Bar3", "my-test-user102", "hellocat14@test.datapm.io", "catPassword2!");
 
         expect(userAClient).to.exist;
         expect(userBClient).to.exist;
+        expect(userCClient).to.exist;
     });
 
     it("user attempting to grant permissions to a collection on which they do not have the MANAGE permission", async function () {
@@ -83,7 +86,7 @@ describe("Collection Permissions", async () => {
                 },
                 value: [
                     {
-                        usernameOrEmailAddress: "my-test-user102",
+                        usernameOrEmailAddress: "my-test-user103",
                         permissions: newPermissions
                     }
                 ],
@@ -91,7 +94,7 @@ describe("Collection Permissions", async () => {
             }
         });
 
-        expect(response.errors![0].message).to.equal("USER_NOT_FOUND - my-test-user102");
+        expect(response.errors![0].message).to.equal("USER_NOT_FOUND - my-test-user103");
     });
 
     it("Can not set permissions for creator", async function () {
@@ -354,5 +357,35 @@ describe("Collection Permissions", async () => {
 
         expect(response.errors!.length).equal(1);
         expect(response.errors!.find((e) => e.message.startsWith("NOT_AUTHORIZED"))).to.not.equal(undefined);
+    });
+
+    it("should allow user a to make the collection public", async function () {
+        let response = await userAClient.mutate({
+            mutation: UpdateCollectionDocument,
+            variables: {
+                identifier: {
+                    collectionSlug: "testA-collection-permissions"
+                },
+                value: {
+                    isPublic: true
+                }
+            }
+        });
+
+        expect(response.errors).to.be.undefined;
+    });
+
+    it("should return only view permission for user C", async function () {
+        let response = await userCClient.query({
+            query: CollectionDocument,
+            variables: {
+                identifier: {
+                    collectionSlug: "testA-collection-permissions"
+                }
+            }
+        });
+
+        expect(response.data.collection.myPermissions!.length).equal(1);
+        expect(response.data.collection.myPermissions![0]).equal(Permission.VIEW);
     });
 });

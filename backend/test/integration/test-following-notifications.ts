@@ -315,7 +315,6 @@ describe("Follow Tests", async () => {
         expect(response.errors).eq(undefined);
 
         await verifyEmailPromise.then(() => {
-            console.log(userBEmail.text);
             expect(userBEmail.text).to.contain("This is your hourly");
             expect(userBEmail.text).to.contain("Packages that have changed");
             expect(userBEmail.text).to.contain("follow-notification-user-a published version 1.0.1");

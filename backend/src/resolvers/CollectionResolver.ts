@@ -607,7 +607,13 @@ export const userCollectionPermissions = async (
             userId: user.id
         });
 
-    return userPermission?.permissions || [];
+    if (userPermission) {
+        return userPermission.permissions;
+    }
+
+    if (collection.isPublic) return [Permission.VIEW];
+
+    return [];
 };
 
 export const getLatestCollections = async (
