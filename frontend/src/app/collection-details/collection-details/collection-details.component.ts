@@ -244,6 +244,7 @@ export class CollectionDetailsComponent implements OnDestroy {
         if (!this.currentUser) {
             return;
         }
+
         this.getFollowGQL
             .fetch({
                 follow: this.buildFollowIdentifier()

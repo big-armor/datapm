@@ -76,7 +76,8 @@ export class UserDetailsPageComponent implements OnChanges, OnInit {
 
     public updateTabParam() {
         const extras: NavigationExtras = {
-            relativeTo: this.route
+            relativeTo: this.route,
+            queryParamsHandling: "preserve"
         };
 
         if (this.currentTab !== "") {
