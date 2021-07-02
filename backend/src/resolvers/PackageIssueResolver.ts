@@ -19,6 +19,7 @@ import { UserRepository } from "../repository/UserRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 import { PackageEntity } from "../entity/PackageEntity";
+import { Connection, EntityManager } from "typeorm";
 
 export const getPackageIssue = async (
     _0: any,
@@ -33,12 +34,20 @@ export const getPackageIssue = async (
     info: any
 ) => {
     const relations = getGraphQlRelationName(info);
+    return await getPackageIssueByIdentifiers(context.connection, packageIdentifier, packageIssueIdentifier, relations);
+};
 
-    const packageEntity = await context.connection.manager
+export const getPackageIssueByIdentifiers = async (
+    connection: EntityManager | Connection,
+    packageIdentifier: PackageIdentifierInput,
+    packageIssueIdentifier: PackageIssueIdentifierInput,
+    relations: string[] = []
+) => {
+    const packageEntity = await connection
         .getCustomRepository(PackageRepository)
         .findPackageOrFail({ identifier: packageIdentifier });
 
-    const issue = await context.connection.manager
+    const issue = await connection
         .getCustomRepository(PackageIssueRepository)
         .getByIssueNumberForPackage(packageEntity.id, packageIssueIdentifier.issueNumber, relations);
 

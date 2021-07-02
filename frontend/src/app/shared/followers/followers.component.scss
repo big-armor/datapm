@@ -1,0 +1,30 @@
+@import "../../../styles/_colors.scss";
+@import "../../../styles/_variables.scss";
+
+.height-17 {
+    line-height: 17px;
+}
+
+.col-lg-4 {
+    padding-left: 0px;
+    &:nth-child(3n + 1) {
+        padding-right: 0px;
+    }
+}
+
+@media (max-width: 992px) {
+    .col-lg-4 {
+        &:nth-child(2n + 1) {
+            padding-right: 0px;
+        }
+    }
+}
+
+@media (max-width: 767px) {
+    .col-lg-4 {
+        padding-right: 0px;
+    }
+    .show-more-btn {
+        padding: 0px;
+    }
+}

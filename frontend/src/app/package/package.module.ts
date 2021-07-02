@@ -47,6 +47,7 @@ import { VersionComparisonModalComponent } from "./components/package-version/ve
 import { EditPropertyDialogComponent } from "./components/package-schema/edit-property-dialog/edit-property-dialog.component";
 import { EditPackageMarkdownComponent } from "./components/edit-package-markdown/edit-package-markdown.component";
 import { EditWebsiteDialogComponent } from "./components/package-info/edit-website-dialog/edit-website-dialog.component";
+import { PackageFollowersComponent } from "./components/package-followers/package-followers.component";
 
 @NgModule({
     declarations: [
@@ -72,7 +73,8 @@ import { EditWebsiteDialogComponent } from "./components/package-info/edit-websi
         VersionComparisonModalComponent,
         EditPropertyDialogComponent,
         EditPackageMarkdownComponent,
-        EditWebsiteDialogComponent
+        EditWebsiteDialogComponent,
+        PackageFollowersComponent
     ],
     imports: [
         CommonModule,

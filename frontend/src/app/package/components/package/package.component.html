@@ -172,6 +172,12 @@
                                                 >
                                                     {{ issuesCount }}
                                                 </span>
+                                                <span
+                                                    class="span-nr"
+                                                    *ngIf="r.linkName === 'followers' && followersCount > 0"
+                                                >
+                                                    {{ followersCount }}
+                                                </span>
                                             </a>
                                         </li>
                                     </ul>

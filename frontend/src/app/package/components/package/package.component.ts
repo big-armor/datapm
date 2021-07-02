@@ -3,7 +3,7 @@ import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { PackageFile } from "datapm-lib";
 import { Subject } from "rxjs";
-import { OrderBy, PackageIssuesGQL } from "src/generated/graphql";
+import { OrderBy, PackageFollowersCountGQL, PackageIssuesGQL } from "src/generated/graphql";
 import { Follow, Package, Permission, User, UserGQL, GetFollowGQL, FollowIdentifierInput } from "src/generated/graphql";
 import { PackageService, PackageResponse } from "../../services/package.service";
 import { filter, takeUntil } from "rxjs/operators";
@@ -45,13 +45,15 @@ export class PackageComponent implements OnDestroy {
     public routes = [
         { linkName: "description", url: "", showDetails: true, isHidden: false },
         { linkName: "issues", url: "issues", showDetails: false, isHidden: false },
-        { linkName: "history", url: "history", showDetails: true, isHidden: false }
+        { linkName: "history", url: "history", showDetails: true, isHidden: false },
+        { linkName: "followers", url: "followers", showDetails: false, isHidden: false }
     ];
 
     public catalogUser: User;
     public currentUser: User;
 
     public issuesCount: number;
+    public followersCount: number;
     public packageFollow: Follow;
     public isFollowing: boolean;
 
@@ -68,7 +70,8 @@ export class PackageComponent implements OnDestroy {
         private userGql: UserGQL,
         private authenticationService: AuthenticationService,
         private packageIssuesGQL: PackageIssuesGQL,
-        private getFollowGQL: GetFollowGQL
+        private getFollowGQL: GetFollowGQL,
+        private packageFollowersCountGQL: PackageFollowersCountGQL
     ) {
         this.packageService.package.pipe(takeUntil(this.unsubscribe$)).subscribe(
             (p: PackageResponse) => {
@@ -94,6 +97,7 @@ export class PackageComponent implements OnDestroy {
                 }
                 this.package = p.package;
                 this.loadPackageIssues();
+                this.loadPackageFollowersCount();
                 this.getFollow();
                 if (this.package && this.package.latestVersion) {
                     this.packageFile = JSON.parse(this.package.latestVersion.packageFile);
@@ -118,7 +122,8 @@ export class PackageComponent implements OnDestroy {
                 this.routes = [
                     { linkName: "description", url: "", showDetails: true, isHidden: false },
                     { linkName: "issues", url: "issues", showDetails: false, isHidden: false },
-                    { linkName: "history", url: "history", showDetails: true, isHidden: false }
+                    { linkName: "history", url: "history", showDetails: true, isHidden: false },
+                    { linkName: "followers", url: "followers", showDetails: false, isHidden: false }
                 ];
                 if (this.package?.myPermissions.includes(Permission.MANAGE)) {
                     this.routes.push({ linkName: "manage", url: "manage", showDetails: false, isHidden: false });
@@ -260,6 +265,25 @@ export class PackageComponent implements OnDestroy {
             this.issuesCount = responseData.openIssuesCount;
         });
     }
+
+    private loadPackageFollowersCount(): void {
+        const variables = {
+            identifier: {
+                catalogSlug: this.catalogSlug,
+                packageSlug: this.packageSlug
+            }
+        };
+
+        this.packageFollowersCountGQL.fetch(variables).subscribe((countResponse) => {
+            if (countResponse.error) {
+                return;
+            }
+
+            const responseData = countResponse.data;
+            this.followersCount = responseData.packageFollowersCount;
+        });
+    }
+
     public follow(): void {
         this.openFollowModal()
             .afterClosed()

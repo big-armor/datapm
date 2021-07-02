@@ -1,0 +1,3 @@
+query UserFollowersCount($username: String!) {
+    userFollowersCount(username: $username)
+}

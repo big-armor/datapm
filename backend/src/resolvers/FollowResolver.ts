@@ -11,9 +11,14 @@ import {
     MyFollowsResult,
     Package,
     Collection,
-    Permission
+    Permission,
+    PackageIdentifierInput,
+    FollowersResult,
+    PackageIssueIdentifierInput,
+    CatalogIdentifierInput,
+    CollectionIdentifierInput,
+    UserIdentifierInput
 } from "../generated/graphql";
-import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { getCatalogOrFail } from "../repository/CatalogRepository";
 import { CollectionRepository } from "../repository/CollectionRepository";
 import { FollowRepository } from "../repository/FollowRepository";
@@ -22,9 +27,11 @@ import { PackagePermissionRepository } from "../repository/PackagePermissionRepo
 import { PackageRepository } from "../repository/PackageRepository";
 import { UserCollectionPermissionRepository } from "../repository/UserCollectionPermissionRepository";
 import { UserRepository } from "../repository/UserRepository";
-import { catalogEntityToGraphQLOrNull } from "./CatalogResolver";
-import { collectionEntityToGraphQLOrNull } from "./CollectionResolver";
+import { catalogEntityToGraphQLOrNull, getCatalogFromCacheOrDbOrFail } from "./CatalogResolver";
+import { collectionEntityToGraphQLOrNull, getCollectionFromCacheOrDbOrFail } from "./CollectionResolver";
 import { packageEntityToGraphqlObject, packageEntityToGraphqlObjectOrNull } from "./PackageResolver";
+import { getPackageIssueByIdentifiers } from "./PackageIssueResolver";
+import { getUserFromCacheOrDbByUsername } from "./UserResolver";
 
 export const entityToGraphqlObject = async (context: Context, entity: FollowEntity | undefined) => {
     if (!entity) {
@@ -339,6 +346,189 @@ export const followPackage = async (
         .getCustomRepository(PackageRepository)
         .findPackageOrFail({ identifier: parent.package.identifier });
     return packageEntityToGraphqlObject(context, context.connection, packageEntity);
+};
+
+export const packageFollowers = async (
+    _1: any,
+    { identifier, offset, limit }: { identifier: PackageIdentifierInput; offset: number; limit: number },
+    context: AuthenticatedContext,
+    info: any
+): Promise<FollowersResult> => {
+    const packageEntity = await context.connection
+        .getCustomRepository(PackageRepository)
+        .findPackageOrFail({ identifier });
+
+    const [followers, count] = await context.connection
+        .getCustomRepository(FollowRepository)
+        .getFollowersByPackageId(packageEntity.id, offset, limit);
+
+    return {
+        followers,
+        count,
+        hasMore: count - (limit + offset) > 0
+    };
+};
+
+export const packageIssueFollowers = async (
+    _1: any,
+    {
+        identifier,
+        issueIdentifier,
+        offset,
+        limit
+    }: {
+        identifier: PackageIdentifierInput;
+        issueIdentifier: PackageIssueIdentifierInput;
+        offset: number;
+        limit: number;
+    },
+    context: AuthenticatedContext,
+    info: any
+): Promise<FollowersResult> => {
+    const packageIssueEntity = await getPackageIssueByIdentifiers(context.connection, identifier, issueIdentifier);
+
+    const [followers, count] = await context.connection
+        .getCustomRepository(FollowRepository)
+        .getFollowersByPackageIssueId(packageIssueEntity.id, offset, limit);
+
+    return {
+        followers,
+        count,
+        hasMore: count - (limit + offset) > 0
+    };
+};
+
+export const catalogFollowers = async (
+    _1: any,
+    { identifier, offset, limit }: { identifier: CatalogIdentifierInput; offset: number; limit: number },
+    context: AuthenticatedContext,
+    info: any
+): Promise<FollowersResult> => {
+    const catalogEntity = await getCatalogFromCacheOrDbOrFail(context, identifier);
+
+    const [followers, count] = await context.connection
+        .getCustomRepository(FollowRepository)
+        .getFollowersByCatalogId(catalogEntity.id, offset, limit);
+
+    return {
+        followers,
+        count,
+        hasMore: count - (limit + offset) > 0
+    };
+};
+
+export const collectionFollowers = async (
+    _1: any,
+    { identifier, offset, limit }: { identifier: CollectionIdentifierInput; offset: number; limit: number },
+    context: AuthenticatedContext,
+    info: any
+): Promise<FollowersResult> => {
+    const collectionEntity = await getCollectionFromCacheOrDbOrFail(
+        context,
+        context.connection,
+        identifier.collectionSlug
+    );
+
+    const [followers, count] = await context.connection
+        .getCustomRepository(FollowRepository)
+        .getFollowersByCollectionId(collectionEntity.id, offset, limit);
+
+    return {
+        followers,
+        count,
+        hasMore: count - (limit + offset) > 0
+    };
+};
+
+export const userFollowers = async (
+    _1: any,
+    { username, offset, limit }: { username: string; offset: number; limit: number },
+    context: AuthenticatedContext,
+    info: any
+): Promise<FollowersResult> => {
+    const userEntity = await getUserFromCacheOrDbByUsername(context, username);
+
+    const [followers, count] = await context.connection
+        .getCustomRepository(FollowRepository)
+        .getFollowersByUserId(userEntity.id, offset, limit);
+
+    return {
+        followers,
+        count,
+        hasMore: count - (limit + offset) > 0
+    };
+};
+
+export const packageFollowersCount = async (
+    _1: any,
+    { identifier }: { identifier: PackageIdentifierInput },
+    context: AuthenticatedContext,
+    info: any
+): Promise<number> => {
+    const packageEntity = await context.connection
+        .getCustomRepository(PackageRepository)
+        .findPackageOrFail({ identifier });
+
+    return await context.connection
+        .getCustomRepository(FollowRepository)
+        .getFollowersByPackageIdCount(packageEntity.id);
+};
+
+export const packageIssueFollowersCount = async (
+    _1: any,
+    {
+        identifier,
+        issueIdentifier
+    }: { identifier: PackageIdentifierInput; issueIdentifier: PackageIssueIdentifierInput },
+    context: AuthenticatedContext,
+    info: any
+): Promise<number> => {
+    const packageIssueEntity = await getPackageIssueByIdentifiers(context.connection, identifier, issueIdentifier);
+
+    return await context.connection
+        .getCustomRepository(FollowRepository)
+        .getFollowersByPackageIssueIdCount(packageIssueEntity.id);
+};
+
+export const catalogFollowersCount = async (
+    _1: any,
+    { identifier }: { identifier: CatalogIdentifierInput },
+    context: AuthenticatedContext,
+    info: any
+): Promise<number> => {
+    const catalogEntity = await getCatalogFromCacheOrDbOrFail(context, identifier);
+
+    return await context.connection
+        .getCustomRepository(FollowRepository)
+        .getFollowersByCatalogIdCount(catalogEntity.id);
+};
+
+export const collectionFollowersCount = async (
+    _1: any,
+    { identifier }: { identifier: CollectionIdentifierInput },
+    context: AuthenticatedContext,
+    info: any
+): Promise<number> => {
+    const collectionEntity = await getCollectionFromCacheOrDbOrFail(
+        context,
+        context.connection,
+        identifier.collectionSlug
+    );
+
+    return await context.connection
+        .getCustomRepository(FollowRepository)
+        .getFollowersByCollectionIdCount(collectionEntity.id);
+};
+
+export const userFollowersCount = async (
+    _1: any,
+    { username }: { username: string },
+    context: AuthenticatedContext,
+    info: any
+): Promise<number> => {
+    const userEntity = await getUserFromCacheOrDbByUsername(context, username);
+
+    return await context.connection.getCustomRepository(FollowRepository).getFollowersByUserIdCount(userEntity.id);
 };
 
 export const followCollection = async (

@@ -1,0 +1,3 @@
+query CollectionFollowersCount($identifier: CollectionIdentifierInput!) {
+    collectionFollowersCount(identifier: $identifier)
+}

@@ -33,6 +33,15 @@
                 class="collection-tabs mt-3"
             >
                 <mat-tab label="Packages"></mat-tab>
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        Followers
+                        <span *ngIf="followersCount > 0">&nbsp;</span>
+                        <span class="span-nr d-flex align-items-center round-20" *ngIf="followersCount > 0">
+                            {{ followersCount }}
+                        </span>
+                    </ng-template></mat-tab
+                >
                 <mat-tab label="Manage" *ngIf="canEdit"></mat-tab>
             </mat-tab-group>
         </div>
@@ -65,10 +74,11 @@
                     <a class="app-outlined-button mt-2" (click)="addPackage()" *ngIf="canEdit">Add a package</a>
                 </div>
             </div>
+            <app-collection-followers *ngIf="currentTab === 1" [collection]="collection"></app-collection-followers>
             <app-collection-permissions
                 (collectionEdited)="setCollectionVariables($event)"
                 [collection]="collection"
-                *ngIf="currentTab === 1"
+                *ngIf="currentTab === 2"
             ></app-collection-permissions>
         </div>
     </div>

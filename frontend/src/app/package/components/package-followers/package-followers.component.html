@@ -1,0 +1,9 @@
+<app-followers
+    *ngIf="package"
+    [followers]="followers"
+    [hasLoadingErrors]="hasLoadingErrors"
+    [hasMoreFollowers]="hasMoreFollowers"
+    [loadingFollowers]="loadingFollowers"
+    [objectType]="'package'"
+    (onMoreFollowersRequested)="loadFollowers($event)"
+></app-followers>

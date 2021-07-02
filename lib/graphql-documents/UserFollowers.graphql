@@ -1,0 +1,12 @@
+query UserFollowers($username: String!, $limit: Int!, $offset: Int!) {
+    userFollowers(username: $username, limit: $limit, offset: $offset) {
+        followers {
+            firstName
+            lastName
+            username
+            displayName
+        }
+        hasMore
+        count
+    }
+}

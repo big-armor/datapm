@@ -1,0 +1,12 @@
+query CollectionFollowers($identifier: CollectionIdentifierInput!, $limit: Int!, $offset: Int!) {
+    collectionFollowers(identifier: $identifier, limit: $limit, offset: $offset) {
+        followers {
+            firstName
+            lastName
+            username
+            displayName
+        }
+        hasMore
+        count
+    }
+}

@@ -19,6 +19,7 @@ import { MatInputModule } from "@angular/material/input";
 import { MatSelectModule } from "@angular/material/select";
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { ImportedModule } from "../imported/imported.module";
+import { CatalogFollowersComponent } from "./catalog-details/catalog-followers/catalog-followers.component";
 
 @NgModule({
     declarations: [
@@ -26,7 +27,8 @@ import { ImportedModule } from "../imported/imported.module";
         CatalogDetailsComponent,
         UserDetailsPageComponent,
         AddUserComponent,
-        CatalogPermissionsComponent
+        CatalogPermissionsComponent,
+        CatalogFollowersComponent
     ],
     imports: [
         CommonModule,

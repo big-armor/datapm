@@ -106,7 +106,7 @@ describe("Package Search Tests", async () => {
         let response = await userAClient.query({
             query: SearchPackagesDocument,
             variables: {
-                limit: 10,
+                limit: 999,
                 offset: 0,
                 query: "congress"
             }
@@ -125,7 +125,7 @@ describe("Package Search Tests", async () => {
         let response = await userAClient.query({
             query: SearchPackagesDocument,
             variables: {
-                limit: 10,
+                limit: 999,
                 offset: 0,
                 query: "readme"
             }
@@ -144,7 +144,7 @@ describe("Package Search Tests", async () => {
         let response = await anonymousClient.query({
             query: SearchPackagesDocument,
             variables: {
-                limit: 10,
+                limit: 999,
                 offset: 0,
                 query: "congress"
             }
@@ -194,7 +194,7 @@ describe("Package Search Tests", async () => {
         let response = await anonymousClient.query({
             query: SearchPackagesDocument,
             variables: {
-                limit: 10,
+                limit: 999,
                 offset: 0,
                 query: "congress"
             }
@@ -225,7 +225,7 @@ describe("Package Search Tests", async () => {
         let response = await anonymousClient.query({
             query: SearchPackagesDocument,
             variables: {
-                limit: 10,
+                limit: 999,
                 offset: 0,
                 query: "congress"
             }
