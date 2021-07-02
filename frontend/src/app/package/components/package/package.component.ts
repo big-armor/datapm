@@ -285,23 +285,37 @@ export class PackageComponent implements OnDestroy {
     }
 
     public follow(): void {
-        this.openFollowModal()
-            .afterClosed()
-            .subscribe((result) => {
-                if (!result) {
-                    return;
-                }
+        const followDialogRef = this.openFollowModal();
+        if (followDialogRef) {
+            followDialogRef.afterClosed()
+                .subscribe((result) => {
+                    if (!result) {
+                        return;
+                    }
 
-                this.updatePackageFollow(result.follow);
-            });
+                    this.updatePackageFollow(result.follow);
+                });
+        }
     }
 
     private getFollow(): void {
+        if (!this.currentUser) {
+            return;
+        }
+
         this.getFollowGQL
             .fetch({
                 follow: this.buildFollowIdentifier()
             })
-            .subscribe((response) => this.updatePackageFollow(response.data?.getFollow));
+            .subscribe((response) => {
+                this.updatePackageFollow(response.data?.getFollow);
+                if (!this.isFollowing) {
+                    const shouldOpenFollowModal = this.route.snapshot.queryParamMap.get("following");
+                    if (shouldOpenFollowModal) {
+                        this.follow();
+                    }
+                }
+            });
     }
 
     private buildFollowIdentifier(): FollowIdentifierInput {
@@ -314,6 +328,27 @@ export class PackageComponent implements OnDestroy {
     }
 
     private openFollowModal(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
+        if (!this.currentUser) {
+            this.openLoginDialog();
+            return null;
+        } else {
+            return this.openFollowDialog();
+        }
+    }
+
+    private updatePackageFollow(follow: Follow): void {
+        this.packageFollow = follow;
+        this.isFollowing = follow != null;
+    }
+
+    private openLoginDialog(): void {
+        this.router.navigate([], { queryParams: { "following": true } });
+        this.dialog.open(LoginDialogComponent, {
+            disableClose: true
+        });
+    }
+
+    private openFollowDialog(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
         return this.dialog.open(FollowDialogComponent, {
             width: "500px",
             data: {
@@ -321,10 +356,5 @@ export class PackageComponent implements OnDestroy {
                 followIdentifier: this.buildFollowIdentifier()
             }
         });
-    }
-
-    private updatePackageFollow(follow: Follow): void {
-        this.packageFollow = follow;
-        this.isFollowing = follow != null;
     }
 }
