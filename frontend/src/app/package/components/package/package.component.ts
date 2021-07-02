@@ -140,7 +140,7 @@ export class PackageComponent implements OnDestroy {
         );
     }
 
-    ngOnInit() {
+    public ngOnInit(): void {
         this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((event: NavigationEnd) => {
             this.updateFromUrl();
         });
@@ -152,43 +152,36 @@ export class PackageComponent implements OnDestroy {
         });
     }
 
-    updateFromUrl() {
-        const newCatalog = this.route.snapshot.paramMap.get("catalogSlug");
-        const newPackage = this.route.snapshot.paramMap.get("packageSlug");
-
-        if (this.catalogSlug != newCatalog || this.packageSlug != newPackage) {
-            this.state = State.LOADING;
-            this.catalogSlug = newCatalog;
-            this.packageSlug = newPackage;
-
-            this.packageService.getPackage(this.catalogSlug, this.packageSlug);
-        }
-    }
-
-    ngOnDestroy(): void {
+    public ngOnDestroy(): void {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
     }
 
-    tabClick(url) {
-        let route = this.catalogSlug + "/" + this.packageSlug + "/" + url;
-        if (url == "") route = this.catalogSlug + "/" + this.packageSlug;
+    public tabClick(url: string): void {
+        let route;
+        if (url == "") {
+            route = this.catalogSlug + "/" + this.packageSlug;
+        } else {
+            route = this.catalogSlug + "/" + this.packageSlug + "/" + url;
+        }
 
         this.router.navigate([route]);
     }
 
-    isActiveTab(route) {
+    public isActiveTab(route): boolean {
         const activeRouteParts = this.router.url.split("/");
+        if (activeRouteParts.length == 3) {
+            return route.url == "";
+        }
 
-        if (activeRouteParts.length == 3) return route.url == "";
-        return activeRouteParts[3] == route.url;
+        return activeRouteParts[3].split("?")[0] == route.url;
     }
 
     shouldShowDetails(): boolean {
         return this.getActiveTab().showDetails;
     }
 
-    getActiveTab() {
+    public getActiveTab() {
         const activeRouteParts = this.router.url.split("/");
 
         let route = this.routes.find((r) => r.url == activeRouteParts[3]);
@@ -198,28 +191,28 @@ export class PackageComponent implements OnDestroy {
         return route;
     }
 
-    loginClicked() {
+    public loginClicked(): void {
         this.dialog.open(LoginDialogComponent, {
             disableClose: true
         });
     }
 
-    getCatalogSlugFromURL() {
+    public getCatalogSlugFromURL(): string {
         const activeRouteParts = this.router.url.split("/");
         return activeRouteParts[1];
     }
 
-    getPackageSlugFromURL() {
+    public getPackageSlugFromURL(): string {
         const activeRouteParts = this.router.url.split("/");
         return activeRouteParts[2];
     }
 
-    getPackageIdentifierFromURL() {
+    public getPackageIdentifierFromURL(): string {
         const activeRouteParts = this.router.url.split("/");
         return activeRouteParts[1] + "/" + activeRouteParts[2];
     }
 
-    openDerivedFromModal(packageFile: PackageFile) {
+    public openDerivedFromModal(packageFile: PackageFile): void {
         this.dialog.open(this.derivedFromDialogTemplate, {
             data: packageFile
         });
@@ -241,6 +234,33 @@ export class PackageComponent implements OnDestroy {
         document.body.removeChild(el);
 
         this.snackBarService.openSnackBar("package slug copied to clipboard!", "");
+    }
+
+    public follow(): void {
+        const followDialogRef = this.openFollowModal();
+        if (followDialogRef) {
+            followDialogRef.afterClosed()
+                .subscribe((result) => {
+                    if (!result) {
+                        return;
+                    }
+
+                    this.updatePackageFollow(result.follow);
+                });
+        }
+    }
+
+    private updateFromUrl(): void {
+        const newCatalog = this.route.snapshot.paramMap.get("catalogSlug");
+        const newPackage = this.route.snapshot.paramMap.get("packageSlug");
+
+        if (this.catalogSlug != newCatalog || this.packageSlug != newPackage) {
+            this.state = State.LOADING;
+            this.catalogSlug = newCatalog;
+            this.packageSlug = newPackage;
+
+            this.packageService.getPackage(this.catalogSlug, this.packageSlug);
+        }
     }
 
     private loadPackageIssues(): void {
@@ -284,20 +304,6 @@ export class PackageComponent implements OnDestroy {
         });
     }
 
-    public follow(): void {
-        const followDialogRef = this.openFollowModal();
-        if (followDialogRef) {
-            followDialogRef.afterClosed()
-                .subscribe((result) => {
-                    if (!result) {
-                        return;
-                    }
-
-                    this.updatePackageFollow(result.follow);
-                });
-        }
-    }
-
     private getFollow(): void {
         if (!this.currentUser) {
             return;
@@ -309,11 +315,13 @@ export class PackageComponent implements OnDestroy {
             })
             .subscribe((response) => {
                 this.updatePackageFollow(response.data?.getFollow);
-                if (!this.isFollowing) {
-                    const shouldOpenFollowModal = this.route.snapshot.queryParamMap.get("following");
-                    if (shouldOpenFollowModal) {
+                const shouldOpenFollowModal = this.route.snapshot.queryParamMap.get("following");
+
+                if (shouldOpenFollowModal) {
+                    if (!this.isFollowing) {
                         this.follow();
                     }
+                    this.router.navigate([], { preserveFragment: true });
                 }
             });
     }
@@ -330,7 +338,6 @@ export class PackageComponent implements OnDestroy {
     private openFollowModal(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
         if (!this.currentUser) {
             this.openLoginDialog();
-            return null;
         } else {
             return this.openFollowDialog();
         }
@@ -342,10 +349,12 @@ export class PackageComponent implements OnDestroy {
     }
 
     private openLoginDialog(): void {
-        this.router.navigate([], { queryParams: { "following": true } });
+        this.router.navigate([], { queryParams: { "following": true }, preserveFragment: true });
         this.dialog.open(LoginDialogComponent, {
             disableClose: true
-        });
+        })
+            .afterClosed()
+            .subscribe(() => this.router.navigate([], { preserveFragment: true }));
     }
 
     private openFollowDialog(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
