@@ -194,8 +194,39 @@ export class ActivityLogRepository extends Repository<ActivityLogEntity> {
                     OR "ActivityLog"."target_package_id" = "Follow"."target_package_id"
 
                     OR
+                    -- Include all package issues of a package if follow_all_package_issues is true on a package/catalog/collection
                     (
-                        -- Include all packages of a catalog/collection if follow_all_packages is true
+                        "Follow"."follow_all_package_issues" IS TRUE
+                        AND "ActivityLog"."target_package_issue_id" IS NOT NULL
+                        AND
+                        (
+                            -- Include catalog's packages' issues logs if catalog is not null
+                            (
+                                "Follow"."target_catalog_id" IS NOT NULL
+                                AND "ActivityLog"."target_package_id" IN
+                                (
+                                    SELECT id
+                                    FROM package
+                                    WHERE catalog_id = "Follow"."target_catalog_id"
+                                )
+                            )
+                            OR
+                            -- Include collection's packages' issues logs if collection is not null
+                            (
+                                "Follow"."target_collection_id" IS NOT NULL
+                                AND "ActivityLog"."target_package_id" IN
+                                (
+                                    SELECT package_id
+                                    FROM collection_package
+                                    WHERE collection_id = "Follow"."target_collection_id"
+                                )
+                            )
+                        )
+                    )
+                    
+                    OR
+                    -- Include all packages of a catalog/collection if follow_all_packages is true
+                    (
                         "Follow"."follow_all_packages" IS TRUE
                         AND "ActivityLog"."target_package_id" IS NOT NULL
                         AND
@@ -224,6 +255,8 @@ export class ActivityLogRepository extends Repository<ActivityLogEntity> {
                         )
                     )
                 )
+
+                -- Permission checks
                 AND
                     CASE
                         WHEN "ActivityLog"."target_collection_id" IS NULL THEN TRUE

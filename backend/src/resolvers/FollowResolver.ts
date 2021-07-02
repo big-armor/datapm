@@ -319,15 +319,25 @@ export const deleteAllMyFollows = async (_0: any, { }, context: AuthenticatedCon
 
 const getCatalogEventTypes = (follow: SaveFollowInput): NotificationEventType[] => {
     const events = [NotificationEventType.CATALOG_PACKAGE_ADDED, NotificationEventType.CATALOG_PACKAGE_REMOVED];
-    const childEvents = getChildPackagesEventTypes(follow);
-    events.push(...childEvents);
+
+    const packageEvents = getChildPackagesEventTypes(follow);
+    events.push(...packageEvents);
+
+    const packageIssuesEvents = getChildPackageIssuesEventTypes(follow);
+    events.push(...packageIssuesEvents);
+
     return events;
 };
 
 const getCollectionEventTypes = (follow: SaveFollowInput): NotificationEventType[] => {
     const events = [NotificationEventType.COLLECTION_PACKAGE_ADDED, NotificationEventType.COLLECTION_PACKAGE_REMOVED];
-    const childEvents = getChildPackagesEventTypes(follow);
-    events.push(...childEvents);
+
+    const packageEvents = getChildPackagesEventTypes(follow);
+    events.push(...packageEvents);
+
+    const packageIssuesEvents = getChildPackageIssuesEventTypes(follow);
+    events.push(...packageIssuesEvents);
+
     return events;
 };
 
@@ -354,6 +364,14 @@ const getChildPackagesEventTypes = (follow: SaveFollowInput) => {
     }
 
     return getPackageEventTypes(follow);
+}
+
+const getChildPackageIssuesEventTypes = (follow: SaveFollowInput) => {
+    if (!follow.followAllPackageIssues) {
+        return [];
+    }
+
+    return [NotificationEventType.PACKAGE_ISSUE_STATUS_CHANGE, NotificationEventType.PACKAGE_ISSUE_COMMENT_CREATED];
 }
 
 const getPackageEventTypes = (follow: SaveFollowInput) => {
