@@ -47,7 +47,7 @@ export class FollowDialogComponent {
 
     public followAllPackages: boolean = true;
     public followAllPackageIssues: boolean = false;
-    public selectedChangeTypes: PackageChangeType[] = [...this.PACKAGE_CHANGE_TYPES];
+    public selectedChangeType: PackageChangeType = this.getDefaultChangeType();
 
     private followIdentifier: FollowIdentifierInput;
 
@@ -65,9 +65,9 @@ export class FollowDialogComponent {
                 this.followAllPackages = data.follow.followAllPackages;
                 this.followAllPackageIssues = data.follow.followAllPackageIssues;
                 if (data.follow.changeType) {
-                    this.selectedChangeTypes = this.PACKAGE_CHANGE_TYPES.filter((c) => data.follow.changeType.includes(c.changeType));
+                    this.selectedChangeType = this.PACKAGE_CHANGE_TYPES.find((c) => data.follow.changeType.includes(c.changeType));
                 } else {
-                    this.selectedChangeTypes = [];
+                    this.selectedChangeType = this.getDefaultChangeType();
                 }
             }
             this.followIdentifier = data.followIdentifier;
@@ -90,7 +90,7 @@ export class FollowDialogComponent {
         this.follow.notificationFrequency = this.selectedFrequency;
         this.follow.followAllPackages = this.followAllPackages;
         this.follow.followAllPackageIssues = this.followAllPackageIssues;
-        this.follow.changeType = this.selectedChangeTypes.map((c) => c.changeType);
+        this.follow.changeType = this.getChangeTypesForSelectedPackageChangeType();
         this.saveFollow();
     }
 
@@ -104,6 +104,23 @@ export class FollowDialogComponent {
                 follow: this.followIdentifier
             })
             .subscribe(() => this.closeWithValues(null, FollowDialogResultType.FOLLOW_DELETED));
+    }
+
+    private getDefaultChangeType(): PackageChangeType {
+        return this.PACKAGE_CHANGE_TYPES[2];
+    }
+
+    private getChangeTypesForSelectedPackageChangeType(): ActivityLogChangeType[] {
+        switch (this.selectedChangeType.changeType) {
+            case ActivityLogChangeType.VERSION_MAJOR_CHANGE:
+                return [ActivityLogChangeType.VERSION_MAJOR_CHANGE];
+            case ActivityLogChangeType.VERSION_MINOR_CHANGE:
+                return [ActivityLogChangeType.VERSION_MINOR_CHANGE, ActivityLogChangeType.VERSION_MAJOR_CHANGE];
+            case ActivityLogChangeType.VERSION_PATCH_CHANGE:
+                return [ActivityLogChangeType.VERSION_PATCH_CHANGE, ActivityLogChangeType.VERSION_MINOR_CHANGE, ActivityLogChangeType.VERSION_MAJOR_CHANGE];
+            default:
+                return [];
+        }
     }
 
     private saveFollow(): void {

@@ -21,7 +21,7 @@
                 <ng-container *ngIf="canFollowPackageContent()">
                     <p class="text-dark-gray">Change type</p>
                     <mat-form-field appearance="fill" floatLabel="never">
-                        <mat-select [disabled]="!followAllPackages" [(value)]="selectedChangeTypes" multiple>
+                        <mat-select [disabled]="!followAllPackages" [(value)]="selectedChangeType">
                             <mat-option *ngFor="let changeType of PACKAGE_CHANGE_TYPES" [value]="changeType">
                                 {{ changeType.label | titlecase }}
                             </mat-option>
