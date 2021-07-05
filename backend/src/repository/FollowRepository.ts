@@ -530,7 +530,7 @@ export class FollowRepository extends Repository<FollowEntity> {
                         )
                     )
                )
-           and a.event_type in (select * from unnest( f.event_types)) 
+           and a.event_type in (select * from unnest(f.event_types)) 
            and a.user_id <> f.user_id 
            group by a.event_type
        ) al on true

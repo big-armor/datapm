@@ -313,7 +313,7 @@ export const deleteFollow = async (
     }
 };
 
-export const deleteAllMyFollows = async (_0: any, { }, context: AuthenticatedContext, info: any): Promise<void> => {
+export const deleteAllMyFollows = async (_0: any, {}, context: AuthenticatedContext, info: any): Promise<void> => {
     const manager = context.connection.manager;
     await manager.getCustomRepository(FollowRepository).deleteAllFollowsByUserId(context.me.id);
 };
@@ -385,7 +385,7 @@ const getPackageEventTypes = (follow: SaveFollowInput) => {
     const changeTypes = (follow.changeType || []) as ActivityLogChangeType[];
     const hasPackageSettings = changeTypes.some((p) => requiredChangeTypes.includes(p));
     if (!hasPackageSettings) {
-        throw new Error("MISSING_PACKAGE_CHANGE_TYPES");
+        changeTypes.push(...requiredChangeTypes);
     }
 
     return getPackageNotificationEventTypes(changeTypes);
