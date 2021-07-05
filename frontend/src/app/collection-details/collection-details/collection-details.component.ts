@@ -211,15 +211,13 @@ export class CollectionDetailsComponent implements OnDestroy {
     public follow(): void {
         const followDialogRef = this.openFollowModal();
         if (followDialogRef) {
-            followDialogRef
-                .afterClosed()
-                .subscribe((result) => {
-                    if (!result) {
-                        return;
-                    }
+            followDialogRef.afterClosed().subscribe((result) => {
+                if (!result) {
+                    return;
+                }
 
-                    this.updatePackageFollow(result.follow);
-                });
+                this.updatePackageFollow(result.follow);
+            });
         }
     }
 
@@ -294,10 +292,11 @@ export class CollectionDetailsComponent implements OnDestroy {
     }
 
     private openLoginDialog(): void {
-        this.router.navigate([], { queryParams: { "following": true }, preserveFragment: true });
-        this.dialog.open(LoginDialogComponent, {
-            disableClose: true
-        })
+        this.router.navigate([], { queryParams: { following: true }, preserveFragment: true });
+        this.dialog
+            .open(LoginDialogComponent, {
+                disableClose: true
+            })
             .afterClosed()
             .subscribe(() => this.router.navigate([], { preserveFragment: true }));
     }

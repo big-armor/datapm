@@ -65,7 +65,9 @@ export class FollowDialogComponent {
                 this.followAllPackages = data.follow.followAllPackages;
                 this.followAllPackageIssues = data.follow.followAllPackageIssues;
                 if (data.follow.changeType) {
-                    this.selectedChangeType = this.PACKAGE_CHANGE_TYPES.find((c) => data.follow.changeType.includes(c.changeType));
+                    this.selectedChangeType = this.PACKAGE_CHANGE_TYPES.find((c) =>
+                        data.follow.changeType.includes(c.changeType)
+                    );
                 } else {
                     this.selectedChangeType = this.getDefaultChangeType();
                 }
@@ -117,7 +119,11 @@ export class FollowDialogComponent {
             case ActivityLogChangeType.VERSION_MINOR_CHANGE:
                 return [ActivityLogChangeType.VERSION_MINOR_CHANGE, ActivityLogChangeType.VERSION_MAJOR_CHANGE];
             case ActivityLogChangeType.VERSION_PATCH_CHANGE:
-                return [ActivityLogChangeType.VERSION_PATCH_CHANGE, ActivityLogChangeType.VERSION_MINOR_CHANGE, ActivityLogChangeType.VERSION_MAJOR_CHANGE];
+                return [
+                    ActivityLogChangeType.VERSION_PATCH_CHANGE,
+                    ActivityLogChangeType.VERSION_MINOR_CHANGE,
+                    ActivityLogChangeType.VERSION_MAJOR_CHANGE
+                ];
             default:
                 return [];
         }

@@ -313,7 +313,7 @@ export const deleteFollow = async (
     }
 };
 
-export const deleteAllMyFollows = async (_0: any, { }, context: AuthenticatedContext, info: any): Promise<void> => {
+export const deleteAllMyFollows = async (_0: any, {}, context: AuthenticatedContext, info: any): Promise<void> => {
     const manager = context.connection.manager;
     await manager.getCustomRepository(FollowRepository).deleteAllFollowsByUserId(context.me.id);
 };
@@ -370,7 +370,7 @@ const getChildPackagesEventTypes = (follow: SaveFollowInput) => {
     }
 
     return getPackageEventTypes(follow);
-}
+};
 
 const getChildPackageIssuesEventTypes = (follow: SaveFollowInput) => {
     if (!follow.followAllPackageIssues) {
@@ -378,7 +378,7 @@ const getChildPackageIssuesEventTypes = (follow: SaveFollowInput) => {
     }
 
     return [NotificationEventType.PACKAGE_ISSUE_STATUS_CHANGE, NotificationEventType.PACKAGE_ISSUE_COMMENT_CREATED];
-}
+};
 
 const getPackageEventTypes = (follow: SaveFollowInput) => {
     const requiredChangeTypes = getRequiredPackageChangeTypes();
@@ -389,7 +389,7 @@ const getPackageEventTypes = (follow: SaveFollowInput) => {
     }
 
     return getPackageNotificationEventTypes(changeTypes);
-}
+};
 
 const getPackageNotificationEventTypes = (changeTypes: ActivityLogChangeType[]) => {
     const eventTypes = changeTypes
@@ -398,7 +398,7 @@ const getPackageNotificationEventTypes = (changeTypes: ActivityLogChangeType[]) 
 
     eventTypes.push(NotificationEventType.VERSION_CREATED);
     return eventTypes;
-}
+};
 
 const convertLogChangeTypeToNotificationType = (logChangeType: ActivityLogChangeType) => {
     switch (logChangeType) {
@@ -411,7 +411,7 @@ const convertLogChangeTypeToNotificationType = (logChangeType: ActivityLogChange
         default:
             return null;
     }
-}
+};
 
 const getRequiredPackageChangeTypes = (): ActivityLogChangeType[] => {
     return [

@@ -32,7 +32,6 @@ import { LoginDialogComponent } from "src/app/shared/header/login-dialog/login-d
     styleUrls: ["./catalog-details.component.scss"]
 })
 export class CatalogDetailsComponent implements OnInit, OnDestroy {
-
     @Input()
     public catalog: Catalog;
     public state: PageState | "CATALOG_NOT_FOUND" | "NOT_AUTHENTICATED" = "INIT";
@@ -60,7 +59,7 @@ export class CatalogDetailsComponent implements OnInit, OnDestroy {
         private getFollowGQL: GetFollowGQL,
         private catalogFollowersCountGQL: CatalogFollowersCountGQL,
         private authenticationService: AuthenticationService
-    ) { }
+    ) {}
 
     public updateTabParam() {
         const tab = this.tabs[this.currentTab];
@@ -158,15 +157,13 @@ export class CatalogDetailsComponent implements OnInit, OnDestroy {
     public follow(): void {
         const followDialogRef = this.openFollowModal();
         if (followDialogRef) {
-            followDialogRef
-                .afterClosed()
-                .subscribe((result) => {
-                    if (!result) {
-                        return;
-                    }
+            followDialogRef.afterClosed().subscribe((result) => {
+                if (!result) {
+                    return;
+                }
 
-                    this.updateCatalogFollow(result.follow);
-                });
+                this.updateCatalogFollow(result.follow);
+            });
         }
     }
 
@@ -243,10 +240,11 @@ export class CatalogDetailsComponent implements OnInit, OnDestroy {
     }
 
     private openLoginDialog(): void {
-        this.router.navigate([], { queryParams: { "following": true }, preserveFragment: true });
-        this.dialog.open(LoginDialogComponent, {
-            disableClose: true
-        })
+        this.router.navigate([], { queryParams: { following: true }, preserveFragment: true });
+        this.dialog
+            .open(LoginDialogComponent, {
+                disableClose: true
+            })
             .afterClosed()
             .subscribe(() => this.router.navigate([], { preserveFragment: true }));
     }

@@ -1,7 +1,6 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class AddExtraNotificationFieldsToFollowEntity1624904654313 implements MigrationInterface {
-
     public async up(queryRunner: QueryRunner): Promise<void> {
         return queryRunner.query(`
             ALTER TABLE "follow" ADD COLUMN "follow_all_packages" BOOLEAN DEFAULT FALSE;
@@ -16,7 +15,5 @@ export class AddExtraNotificationFieldsToFollowEntity1624904654313 implements Mi
         `);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-    }
-
+    public async down(queryRunner: QueryRunner): Promise<void> {}
 }

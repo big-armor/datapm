@@ -36,7 +36,7 @@ export class CatalogComponent implements OnInit {
 
     private subscription = new Subject();
 
-    constructor(private route: ActivatedRoute, private pageContentGQL: GetPageContentGQL) { }
+    constructor(private route: ActivatedRoute, private pageContentGQL: GetPageContentGQL) {}
 
     public ngOnInit(): void {
         this.route.paramMap.pipe(takeUntil(this.subscription)).subscribe((paramMap: ParamMap) => {

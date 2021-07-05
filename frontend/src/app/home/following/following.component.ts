@@ -44,10 +44,7 @@ export class FollowingComponent implements OnInit {
 
     private offset: number = 0;
 
-    constructor(
-        private myFollowingActivityGQL: MyFollowingActivityGQL,
-        private timeAgoPipe: TimeAgoPipe
-    ) { }
+    constructor(private myFollowingActivityGQL: MyFollowingActivityGQL, private timeAgoPipe: TimeAgoPipe) {}
 
     public ngOnInit(): void {
         this.loadLogs();

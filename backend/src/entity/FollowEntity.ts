@@ -1,5 +1,10 @@
 import { Entity, Column, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { ActivityLogChangeType, ActivityLogEventType, NotificationEventType, NotificationFrequency } from "../generated/graphql";
+import {
+    ActivityLogChangeType,
+    ActivityLogEventType,
+    NotificationEventType,
+    NotificationFrequency
+} from "../generated/graphql";
 import { CatalogEntity } from "./CatalogEntity";
 import { CollectionEntity } from "./CollectionEntity";
 import { EntityBaseModel } from "./EntityBaseModel";

@@ -23,7 +23,6 @@ enum State {
     styleUrls: ["./login-dialog.component.scss"]
 })
 export class LoginDialogComponent implements OnInit, OnDestroy {
-
     public State = State;
     public state = State.LOGGED_OUT;
 
@@ -42,7 +41,7 @@ export class LoginDialogComponent implements OnInit, OnDestroy {
         private router: Router,
         private dialog: DialogService,
         private dialogRef: MatDialogRef<LoginDialogComponent>
-    ) { }
+    ) {}
 
     public ngOnInit(): void {
         if (this.authenticationService.currentUser.value != null) {

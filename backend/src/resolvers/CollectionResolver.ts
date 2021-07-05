@@ -358,7 +358,7 @@ export const removePackageFromCollection = async (
     });
 };
 
-export const findCollectionsForAuthenticatedUser = async (_0: any, { }, context: AuthenticatedContext, info: any) => {
+export const findCollectionsForAuthenticatedUser = async (_0: any, {}, context: AuthenticatedContext, info: any) => {
     const relations = getGraphQlRelationName(info);
     const collectionEntities = await context.connection.manager
         .getCustomRepository(CollectionRepository)
