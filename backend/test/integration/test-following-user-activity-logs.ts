@@ -53,6 +53,7 @@ describe("Following User Activity Log Tests", async () => {
             }
         });
 
+        console.log("follow", follow);
         expect(follow.errors == null).to.equal(true);
 
         const packageSlug = "usr-flw-wds-dwasd";
@@ -437,6 +438,7 @@ describe("Following User Activity Log Tests", async () => {
             (l) => ActivityLogEventType.VERSION_CREATED === l.eventType
         );
 
+        console.log("activitiesResponse.data.myFollowingActivity.logs", activitiesResponse.data.myFollowingActivity.logs);
         if (!createdLog || !createdLog.user || !createdLog.targetPackage) {
             expect(true).equal(false, "Should've returned created following activity with user and package data");
             return;

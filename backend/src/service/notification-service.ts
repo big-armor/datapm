@@ -586,8 +586,8 @@ async function getCollectionChanges(
     );
 }
 
-/** Returns pending notifications for each user based on the start and end date range of the actions
- * taken.
+/**
+ * Returns pending notifications for each user based on the start and end date range of the actions taken.
  */
 async function getPendingNotifications(
     databaseConnection: Connection,

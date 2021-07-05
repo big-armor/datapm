@@ -499,7 +499,37 @@ export class FollowRepository extends Repository<FollowEntity> {
            where
            a.created_at  > $2
            AND a.created_at <= $3 
-           and a.target_package_id  = f.target_package_id 
+           and (
+                a.target_package_id  = f.target_package_id
+                OR
+                    (
+                        f.follow_all_packages IS TRUE
+                        AND
+                        (
+                            -- Include catalog's packages logs if catalog is not null
+                            (
+                                f."target_catalog_id" IS NOT NULL
+                                AND a."target_package_id" IN
+                                (
+                                    SELECT id
+                                    FROM package
+                                    WHERE catalog_id = f."target_catalog_id"
+                                )
+                            )
+                            OR
+                            -- Include collection's packages logs if collection is not null
+                            (
+                                f."target_collection_id" IS NOT NULL
+                                AND a."target_package_id" IN
+                                (
+                                    SELECT package_id
+                                    FROM collection_package
+                                    WHERE collection_id = f."target_collection_id"
+                                )
+                            )
+                        )
+                    )
+               )
            and a.event_type in (select * from unnest( f.event_types)) 
            and a.user_id <> f.user_id 
            group by a.event_type

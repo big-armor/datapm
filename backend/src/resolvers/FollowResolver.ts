@@ -145,7 +145,8 @@ export const saveFollow = async (
         existingFollowEntity = await followRepository.getFollowByUserId(userId, userEntity.id);
 
         followEntity.targetUserId = userEntity.id;
-        followEntity.eventTypes = getUserEventTypes();
+        followEntity.eventTypes = getUserEventTypes(follow);
+        followEntity.changeType.push(ActivityLogChangeType.VERSION_FIRST_VERSION);
     }
 
     if (existingFollowEntity) {
@@ -345,8 +346,13 @@ const getPackageIssueEventTypes = (): NotificationEventType[] => {
     return [NotificationEventType.PACKAGE_ISSUE_STATUS_CHANGE, NotificationEventType.PACKAGE_ISSUE_COMMENT_CREATED];
 };
 
-const getUserEventTypes = (): NotificationEventType[] => {
-    return [NotificationEventType.PACKAGE_CREATED, NotificationEventType.VERSION_CREATED];
+const getUserEventTypes = (follow: SaveFollowInput): NotificationEventType[] => {
+    const events = [NotificationEventType.PACKAGE_CREATED, NotificationEventType.VERSION_CREATED];
+
+    const packageEvents = getDefaultPackageEventTypes();
+    events.push(...packageEvents);
+
+    return events;
 };
 
 const getDefaultPackageEventTypes = (): NotificationEventType[] => {
@@ -382,6 +388,10 @@ const getPackageEventTypes = (follow: SaveFollowInput) => {
         throw new Error("MISSING_PACKAGE_CHANGE_TYPES");
     }
 
+    return getPackageNotificationEventTypes(changeTypes);
+}
+
+const getPackageNotificationEventTypes = (changeTypes: ActivityLogChangeType[]) => {
     const eventTypes = changeTypes
         .map((c) => convertLogChangeTypeToNotificationType(c))
         .filter((c) => c != null) as NotificationEventType[];
