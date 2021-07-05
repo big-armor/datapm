@@ -12,7 +12,7 @@ export interface FollowersRequest {
     styleUrls: ["./followers.component.scss"]
 })
 export class FollowersComponent implements OnInit {
-    private readonly FOLLOWERS_PER_PAGE = 1;
+    private readonly FOLLOWERS_PER_PAGE = 9;
 
     @Input()
     public hasLoadingErrors: boolean;
@@ -25,6 +25,9 @@ export class FollowersComponent implements OnInit {
 
     @Input()
     public loadingFollowers: boolean;
+
+    @Input()
+    public objectType: string;
 
     @Output()
     public onMoreFollowersRequested = new EventEmitter<FollowersRequest>();

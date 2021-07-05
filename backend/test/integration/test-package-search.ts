@@ -19,7 +19,7 @@ describe("Package Search Tests", async () => {
     let userBClient: ApolloClient<NormalizedCacheObject>;
     let anonymousClient = createAnonymousClient();
 
-    before(async () => {});
+    before(async () => { });
 
     it("Create users A & B", async function () {
         userAClient = await createUser(
@@ -106,7 +106,7 @@ describe("Package Search Tests", async () => {
         let response = await userAClient.query({
             query: SearchPackagesDocument,
             variables: {
-                limit: 10,
+                limit: 999,
                 offset: 0,
                 query: "congress"
             }
@@ -115,7 +115,7 @@ describe("Package Search Tests", async () => {
         expect(response.errors == null, "no errors").true;
         expect(
             response.data!.searchPackages.packages!.find((p) => p.identifier.catalogSlug == "testA-packages-search") !=
-                null,
+            null,
             "package returned"
         ).true;
         expect(response.data!.searchPackages.packages![0].displayName).to.equal("Congressional Legislators");
@@ -134,7 +134,7 @@ describe("Package Search Tests", async () => {
         expect(response.errors == null, "no errors").true;
         expect(
             response.data!.searchPackages.packages!.find((p) => p.identifier.catalogSlug == "testA-packages-search") !=
-                null,
+            null,
             "package returned"
         ).true;
         expect(response.data!.searchPackages.packages![0].displayName).to.equal("Congressional Legislators");
@@ -144,7 +144,7 @@ describe("Package Search Tests", async () => {
         let response = await anonymousClient.query({
             query: SearchPackagesDocument,
             variables: {
-                limit: 10,
+                limit: 999,
                 offset: 0,
                 query: "congress"
             }
@@ -153,7 +153,7 @@ describe("Package Search Tests", async () => {
         expect(response.errors == null, "no errors").true;
         expect(
             response.data!.searchPackages.packages!.find((p) => p.identifier.catalogSlug == "testA-packages-search") ==
-                null,
+            null,
             "package not returned"
         ).true;
     });
@@ -194,7 +194,7 @@ describe("Package Search Tests", async () => {
         let response = await anonymousClient.query({
             query: SearchPackagesDocument,
             variables: {
-                limit: 10,
+                limit: 999,
                 offset: 0,
                 query: "congress"
             }
@@ -225,7 +225,7 @@ describe("Package Search Tests", async () => {
         let response = await anonymousClient.query({
             query: SearchPackagesDocument,
             variables: {
-                limit: 10,
+                limit: 999,
                 offset: 0,
                 query: "congress"
             }
@@ -234,7 +234,7 @@ describe("Package Search Tests", async () => {
         expect(response.errors == null, "no errors").true;
         expect(
             response.data!.searchPackages.packages!.find((p) => p.identifier.catalogSlug == "testA-packages-search") ==
-                null,
+            null,
             "package not returned"
         ).true;
     });

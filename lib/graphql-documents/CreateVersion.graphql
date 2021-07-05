@@ -21,6 +21,7 @@ mutation CreateVersion($identifier: PackageIdentifierInput!, $value: CreateVersi
             username
             firstName
             lastName
+            displayName
             emailAddress
             twitterHandle
             gitHubHandle

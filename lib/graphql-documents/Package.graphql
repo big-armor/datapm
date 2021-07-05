@@ -35,6 +35,7 @@ query Package($identifier: PackageIdentifierInput!) {
                 firstName
                 lastName
                 username
+                displayName
             }
             createdAt
         }

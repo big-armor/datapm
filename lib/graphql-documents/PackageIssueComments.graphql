@@ -19,6 +19,7 @@ query PackageIssueComments(
                 firstName
                 lastName
                 username
+                displayName
             }
             createdAt
             updatedAt

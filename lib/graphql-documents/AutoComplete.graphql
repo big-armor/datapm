@@ -14,6 +14,7 @@ query AutoComplete($startsWith: String!) {
                 username
                 firstName
                 lastName
+                displayName
                 nameIsPublic
             }
             updatedAt
@@ -42,8 +43,10 @@ query AutoComplete($startsWith: String!) {
             description
         }
         users {
+            firstName
+            lastName
             username
-            emailAddress
+            displayName
         }
     }
 }
@@ -52,9 +55,9 @@ query AutoCompleteUser($startsWith: String!) {
     autoComplete(startsWith: $startsWith) {
         users {
             username
-            emailAddress
             firstName
             lastName
+            displayName
         }
     }
 }

@@ -4,6 +4,7 @@ query CatalogFollowers($identifier: CatalogIdentifierInput!, $limit: Int!, $offs
             firstName
             lastName
             username
+            displayName
         }
         hasMore
         count

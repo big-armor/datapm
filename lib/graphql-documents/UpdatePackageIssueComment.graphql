@@ -16,6 +16,7 @@ mutation UpdatePackageIssueComment(
             firstName
             lastName
             username
+            displayName
         }
         createdAt
         updatedAt

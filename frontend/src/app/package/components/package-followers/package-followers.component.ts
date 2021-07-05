@@ -38,7 +38,7 @@ export class PackageFollowersComponent implements OnInit, OnDestroy {
                     packageSlug: this.package.identifier.packageSlug
                 },
                 limit: request.limit,
-                offset: request.offset
+                offset: 0
             })
             .subscribe(
                 ({ data, errors }) => {

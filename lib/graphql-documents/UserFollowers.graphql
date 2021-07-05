@@ -4,6 +4,7 @@ query UserFollowers($username: String!, $limit: Int!, $offset: Int!) {
             firstName
             lastName
             username
+            displayName
         }
         hasMore
         count

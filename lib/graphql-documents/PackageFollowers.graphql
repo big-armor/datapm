@@ -4,6 +4,7 @@ query PackageFollowers($identifier: PackageIdentifierInput!, $limit: Int!, $offs
             firstName
             lastName
             username
+            displayName
         }
         hasMore
         count

@@ -69,7 +69,7 @@ export async function instantNotifications(databaseConnection: Connection) {
 }
 
 export async function hourlyNotifications(databaseConnection: Connection) {
-    await prepareAndSendNotifications(databaseConnection, "lastInstantNotificationDate", NotificationFrequency.HOURLY);
+    await prepareAndSendNotifications(databaseConnection, "lastHourlyNotificationDate", NotificationFrequency.HOURLY);
 }
 
 export async function dailyNotifications(databaseConnection: Connection) {

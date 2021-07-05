@@ -5,6 +5,7 @@ query UsersByPackage($identifier: PackageIdentifierInput!) {
             firstName
             lastName
             nameIsPublic
+            displayName
         }
         permissions
     }

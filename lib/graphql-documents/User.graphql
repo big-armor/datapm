@@ -4,6 +4,7 @@ query User($username: String!) {
         firstName
         lastName
         username
+        displayName
         nameIsPublic
         location
         twitterHandle

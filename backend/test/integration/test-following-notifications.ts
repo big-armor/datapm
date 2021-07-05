@@ -11,7 +11,8 @@ import {
     JobType,
     NotificationFrequency,
     RunJobDocument,
-    SaveFollowDocument
+    SaveFollowDocument,
+    UpdatePackageDocument
 } from "./registry-client";
 import { mailObservable } from "./setup";
 import { createUser } from "./test-utils";
@@ -156,6 +157,59 @@ describe("Follow Tests", async () => {
         expect(createVersionResponse.errors).to.equal(undefined);
     });
 
+    it("Should allow user A to make package public", async () => {
+        const response = await userAClient.mutate({
+            mutation: UpdatePackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: userASecondCatalogSlug,
+                    packageSlug: userAPackageSlug
+                },
+                value: {
+                    isPublic: true
+                }
+            }
+        });
+        expect(response.errors).to.be.equal(undefined);
+    });
+
+    it("Should allow user B to follow package", async () => {
+        const followResponse = await userBClient.mutate({
+            mutation: SaveFollowDocument,
+            variables: {
+                follow: {
+                    package: {
+                        catalogSlug: userASecondCatalogSlug,
+                        packageSlug: userAPackageSlug
+                    },
+                    notificationFrequency: NotificationFrequency.HOURLY
+                }
+            }
+        });
+        expect(followResponse.errors).to.be.equal(undefined);
+    });
+
+    it("Should allow user A to create a new package version", async () => {
+        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        packageFileContents.readmeMarkdown = "A new readme value";
+        packageFileContents.version = "1.0.1";
+        const packageFileString = JSON.stringify(packageFileContents);
+
+        const createVersionResponse = await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: userASecondCatalogSlug,
+                    packageSlug: userAPackageSlug
+                },
+                value: {
+                    packageFile: packageFileString
+                }
+            }
+        });
+        expect(createVersionResponse.errors).to.equal(undefined);
+    });
+
     it("Should allow user A to add package to collection", async () => {
         const response = await userAClient.mutate({
             mutation: AddPackageToCollectionDocument,
@@ -233,6 +287,37 @@ describe("Follow Tests", async () => {
             expect(userBEmail.text).to.contain(
                 "follow-notification-user-a added package user-a-follow-notification-2/follow-test"
             );
+        });
+    });
+
+    it("Should send email after hourly notification updates", async () => {
+        let userBEmail: any = null;
+
+        let verifyEmailPromise = new Promise<void>((r) => {
+            let subscription = mailObservable.subscribe((email) => {
+                if (email.to[0].address === userBUsername + "@test.datapm.io") userBEmail = email;
+
+                if (userBEmail) {
+                    subscription.unsubscribe();
+                    r();
+                }
+            });
+        });
+
+        const response = await AdminHolder.adminClient.mutate({
+            mutation: RunJobDocument,
+            variables: {
+                key: "TEST_JOB_KEY",
+                job: JobType.HOURLY_NOTIFICATIONS
+            }
+        });
+
+        expect(response.errors).eq(undefined);
+
+        await verifyEmailPromise.then(() => {
+            expect(userBEmail.text).to.contain("This is your hourly");
+            expect(userBEmail.text).to.contain("Packages that have changed");
+            expect(userBEmail.text).to.contain("follow-notification-user-a published version 1.0.1");
         });
     });
 
