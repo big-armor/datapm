@@ -541,7 +541,7 @@ export class FollowRepository extends Repository<FollowEntity> {
        order by f.user_id`;
 
         const queryResult = await this.query(sql, [frequency, startDate, endDate]);
-        const query = (queryResult) as {
+        const query = queryResult as {
             user_id: number;
             target_package_id: number;
             pending_notifications: {
