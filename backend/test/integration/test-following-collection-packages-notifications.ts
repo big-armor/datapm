@@ -17,7 +17,7 @@ import {
 import { mailObservable } from "./setup";
 import { createUser } from "./test-utils";
 
-describe("Follow Tests", async () => {
+describe("Follow Collection's Packages Notifications Tests", async () => {
     const userAUsername = "follow-col-packages-user-a";
     const userBUsername = "follow-col-packages-user-b";
 
