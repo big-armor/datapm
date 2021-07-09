@@ -117,7 +117,11 @@ export class FollowDialogComponent {
             case ActivityLogChangeType.VERSION_MAJOR_CHANGE:
                 return [ActivityLogChangeType.VERSION_FIRST_VERSION, ActivityLogChangeType.VERSION_MAJOR_CHANGE];
             case ActivityLogChangeType.VERSION_MINOR_CHANGE:
-                return [ActivityLogChangeType.VERSION_FIRST_VERSION, ActivityLogChangeType.VERSION_MINOR_CHANGE, ActivityLogChangeType.VERSION_MAJOR_CHANGE];
+                return [
+                    ActivityLogChangeType.VERSION_FIRST_VERSION,
+                    ActivityLogChangeType.VERSION_MINOR_CHANGE,
+                    ActivityLogChangeType.VERSION_MAJOR_CHANGE
+                ];
             case ActivityLogChangeType.VERSION_PATCH_CHANGE:
                 return [
                     ActivityLogChangeType.VERSION_FIRST_VERSION,
