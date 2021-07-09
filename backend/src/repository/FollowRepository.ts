@@ -509,25 +509,29 @@ export class FollowRepository extends Repository<FollowEntity> {
                         f.follow_all_packages IS TRUE
                         AND
                         (
-                            -- Include catalog's packages logs if catalog is not null
+                            a."change_type"::activity_log_change_type_enum IN (SELECT * FROM unnest(f."change_type"))
+                            AND
                             (
-                                f."target_catalog_id" IS NOT NULL
-                                AND a."target_package_id" IN
+                                -- Include catalog's packages logs if catalog is not null
                                 (
-                                    SELECT id
-                                    FROM package
-                                    WHERE catalog_id = f."target_catalog_id"
+                                    f."target_catalog_id" IS NOT NULL
+                                    AND a."target_package_id" IN
+                                    (
+                                        SELECT id
+                                        FROM package
+                                        WHERE catalog_id = f."target_catalog_id"
+                                    )
                                 )
-                            )
-                            OR
-                            -- Include collection's packages logs if collection is not null
-                            (
-                                f."target_collection_id" IS NOT NULL
-                                AND a."target_package_id" IN
+                                OR
+                                -- Include collection's packages logs if collection is not null
                                 (
-                                    SELECT package_id
-                                    FROM collection_package
-                                    WHERE collection_id = f."target_collection_id"
+                                    f."target_collection_id" IS NOT NULL
+                                    AND a."target_package_id" IN
+                                    (
+                                        SELECT package_id
+                                        FROM collection_package
+                                        WHERE collection_id = f."target_collection_id"
+                                    )
                                 )
                             )
                         )

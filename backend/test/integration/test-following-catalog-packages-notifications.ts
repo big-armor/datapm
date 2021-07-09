@@ -3,6 +3,7 @@ import { expect } from "chai";
 import { loadPackageFileFromDisk } from "datapm-lib/src/PackageUtil";
 import { AdminHolder } from "./admin-holder";
 import {
+    ActivityLogChangeType,
     CreateCatalogDocument,
     CreatePackageDocument,
     CreateVersionDocument,
@@ -68,7 +69,8 @@ describe("Follow Catalog's Packages Notifications Tests", async () => {
                         catalogSlug: userASecondCatalogSlug
                     },
                     followAllPackages: true,
-                    notificationFrequency: NotificationFrequency.INSTANT
+                    notificationFrequency: NotificationFrequency.INSTANT,
+                    changeType: [ActivityLogChangeType.VERSION_FIRST_VERSION]
                 }
             }
         });
