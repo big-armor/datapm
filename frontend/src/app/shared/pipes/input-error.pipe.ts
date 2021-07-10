@@ -15,6 +15,7 @@ const defaultMessages = {
     INVALID_CHARACTERS: (errors: any) =>
         "Passwords less than 16 characters must include one number or a special character (@ # $ % !)",
     INVALID_FORMAT: (errors: any) => "Invalid format",
+    INVALID_EMAIL_ADDRESS_FORMAT: (errors: any) => "Not a valid email address",
     TOO_LONG: (errors: any) => "Too long",
     RESERVED_KEYWORD: (errors: any) => "This is a reserved keyword. Please choose a different word",
     PASSWORDS_DONT_MATCH: (errors: any) => "The entered passwords must match."
@@ -32,6 +33,7 @@ const errorKeys = [
     "USERNAME_TOO_LONG",
     "NOT_AVAILABLE",
     "INVALID_FORMAT",
+    "INVALID_EMAIL_ADDRESS_FORMAT",
     "TOO_LONG",
     "RESERVED_KEYWORD",
     "PASSWORDS_DONT_MATCH"

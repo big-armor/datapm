@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "es2017",
+        "target": "es2019",
         "outDir": "dist",
         "moduleResolution": "node",
         "module": "commonjs",
@@ -35,7 +35,7 @@
         "emitDecoratorMetadata": true /* Enables experimental support for emitting type metadata for decorators. */,
         "resolveJsonModule": true,
 
-        "lib": ["es2017", "dom"],
+        "lib": ["es2019", "dom"],
         "typeRoots": ["node_modules/@types", "src/types"]
     },
 
