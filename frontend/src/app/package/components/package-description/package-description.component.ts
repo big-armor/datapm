@@ -1,17 +1,9 @@
-import { Component, Input } from "@angular/core";
+import { Component } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { PackageFile, parsePackageFileJSON, Schema, validatePackageFileInBrowser } from "datapm-lib";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
-import {
-    User,
-    Collection,
-    Package,
-    PackageCollectionsGQL,
-    PackageIdentifierInput,
-    MovePackageGQL,
-    Permission
-} from "src/generated/graphql";
+import { Collection, Package, PackageCollectionsGQL, PackageIdentifierInput, Permission } from "src/generated/graphql";
 import { PackageService, PackageResponse } from "../../services/package.service";
 @Component({
     selector: "package-description",

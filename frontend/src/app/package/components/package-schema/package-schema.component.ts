@@ -1,5 +1,4 @@
 import {
-    AfterViewChecked,
     AfterViewInit,
     ChangeDetectorRef,
     Component,
@@ -7,21 +6,18 @@ import {
     Input,
     OnChanges,
     OnDestroy,
-    QueryList,
+    OnInit,
     ViewChildren
 } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
 import { PackageFile, Schema, ValueTypeStatistics } from "datapm-lib";
 import { Subject } from "rxjs";
 import { Clipboard } from "@angular/cdk/clipboard";
 import { SnackBarService } from "src/app/services/snackBar.service";
-import { SamplesFullScreenDialog } from "../package-samples/samples-fullscreen-dialog.component";
 import { EditPropertyDialogComponent } from "./edit-property-dialog/edit-property-dialog.component";
-import { getRegistryURL } from "src/app/helpers/RegistryAccessHelper";
 import { packageToIdentifier } from "src/app/helpers/IdentifierHelper";
-import { Package } from "src/generated/graphql";
+import { Package, Permission } from "src/generated/graphql";
 import { MatExpansionPanel } from "@angular/material/expansion";
 
 @Component({
@@ -29,7 +25,7 @@ import { MatExpansionPanel } from "@angular/material/expansion";
     templateUrl: "./package-schema.component.html",
     styleUrls: ["./package-schema.component.scss"]
 })
-export class PackageSchemaComponent implements OnDestroy, OnChanges, AfterViewInit {
+export class PackageSchemaComponent implements OnInit, OnDestroy, OnChanges, AfterViewInit {
     private readonly MAX_PROPERTIES_TO_SHOW_INITIALLY = 10;
 
     @Input()
@@ -51,6 +47,8 @@ export class PackageSchemaComponent implements OnDestroy, OnChanges, AfterViewIn
 
     public focusedPropertyId: string;
 
+    public hasEditPermissions: boolean;
+
     private unsubscribe$ = new Subject();
 
     constructor(
@@ -67,16 +65,31 @@ export class PackageSchemaComponent implements OnDestroy, OnChanges, AfterViewIn
             this.schemaPropertiesLength(this.schema) > this.MAX_PROPERTIES_TO_SHOW_INITIALLY;
     }
 
+    public ngOnInit(): void {
+        this.hasEditPermissions = this.package.myPermissions.includes(Permission.EDIT);
+    }
+
     public ngAfterViewInit(): void {
         const fragment = this.route.snapshot.fragment;
         if (fragment) {
             const el: any = document.getElementById(fragment);
             if (el) {
-                this.focusedPropertyId = fragment;
-                el.scrollIntoView({ behavior: "smooth" });
-                this.cdr.detectChanges();
+                if (el.hidden) {
+                    this.toggleShowMoreProperties();
+                }
+
+                setTimeout(() => {
+                    this.focusedPropertyId = fragment;
+                    el.scrollIntoView({ behavior: "smooth" });
+                    this.cdr.detectChanges();
+                });
             }
         }
+    }
+
+    public ngOnDestroy(): void {
+        this.unsubscribe$.next();
+        this.unsubscribe$.complete();
     }
 
     public toggleShowMoreProperties(): void {
@@ -84,11 +97,6 @@ export class PackageSchemaComponent implements OnDestroy, OnChanges, AfterViewIn
         this.propertiesToShowCount = this.isShowingMorePropertiesText
             ? this.schemaPropertiesLength(this.schema)
             : this.MAX_PROPERTIES_TO_SHOW_INITIALLY;
-    }
-
-    public ngOnDestroy(): void {
-        this.unsubscribe$.next();
-        this.unsubscribe$.complete();
     }
 
     public getPropertyTypes(property: Schema): string {

@@ -3,7 +3,7 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { CreateMeGQL, EmailAddressAvailableGQL, UsernameAvailableGQL } from "src/generated/graphql";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { MatDialogRef } from "@angular/material/dialog";
-import { usernameValidator, emailAddressValidator } from "src/app/helpers/validators";
+import { usernameValidator, emailAddressValidator, newPasswordValidator } from "src/app/helpers/validators";
 import { UiStyleToggleService } from "src/app/services/ui-style-toggle.service";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
@@ -26,11 +26,10 @@ enum State {
 export class SignUpDialogComponent implements OnInit {
     private readonly destroy = new Subject<void>();
 
-    State = State;
+    public State = State;
+    public state = State.INIT;
 
-    state = State.INIT;
-
-    signUpForm: FormGroup;
+    public signUpForm: FormGroup;
 
     public errorMessages = {
         emailAddress: {
@@ -45,6 +44,12 @@ export class SignUpDialogComponent implements OnInit {
             TOO_LONG: "Username must be less than 40 characters long.",
             NOT_AVAILABLE: "That username is not available. Try a different username.",
             RESERVED_KEYWORD: "The username you used is a restricted keyword. Please choose another name"
+        },
+        password: {
+            INVALID_CHARACTERS: "Password must contain letters and at least a number.",
+            PASSWORD_TOO_LONG: "Password must be less than 99 characters long.",
+            PASSWORD_TOO_SHORT: "Password must be more than 8 characters long.",
+            REQUIRED: "Password is required."
         }
     };
 
@@ -61,7 +66,7 @@ export class SignUpDialogComponent implements OnInit {
         private uiStyleToggleService: UiStyleToggleService
     ) {}
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.uiStyleToggleService.DARK_MODE_ENABLED.pipe(takeUntil(this.destroy)).subscribe(
             (darkModeEnabled) => (this.darkModeEnabled = darkModeEnabled)
         );
@@ -78,12 +83,13 @@ export class SignUpDialogComponent implements OnInit {
                 updateOn: "blur"
             }),
             password: new FormControl("", {
-                validators: [Validators.required]
+                asyncValidators: [newPasswordValidator()],
+                updateOn: "blur"
             })
         });
     }
 
-    formSubmit() {
+    public formSubmit(): void {
         this.signUpForm.markAllAsTouched();
         if (this.signUpForm.invalid) {
             return;
@@ -116,6 +122,7 @@ export class SignUpDialogComponent implements OnInit {
                         });
                     }
 
+                    this.state = State.ERROR;
                     return;
                 }
 
@@ -128,19 +135,8 @@ export class SignUpDialogComponent implements OnInit {
                     verticalPosition: "top",
                     horizontalPosition: "right"
                 });
+                this.state = State.ERROR;
             });
-    }
-
-    openForgotPassword() {
-        this.dialogRef.close("forgotPassword");
-    }
-
-    clearError(field: string) {
-        const control = this.signUpForm.get(field);
-        if (control.errors !== null) {
-            control.setErrors(null);
-            this.componentChangeDetector.detectChanges();
-        }
     }
 
     openLoginDialog(ev: any) {

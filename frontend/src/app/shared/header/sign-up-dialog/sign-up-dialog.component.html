@@ -26,7 +26,7 @@
                     autocomplete="rutjfkde"
                     inputType="password"
                     class="rounded-input"
-                    [error]="signUpForm | inputError: 'password' | async"
+                    [error]="signUpForm | inputError: 'password':errorMessages['password'] | async"
                 ></app-input>
 
                 <br />
@@ -57,7 +57,7 @@
             </div>
 
             <div class="text-center">
-                <button type="submit" class="app-raised-button" [disabled]="!signUpForm.valid">
+                <button type="submit" class="app-raised-button">
                     <span class="btn-text">Sign Up</span>
                 </button>
             </div>

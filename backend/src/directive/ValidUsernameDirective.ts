@@ -1,4 +1,4 @@
-import { SchemaDirectiveVisitor, ApolloError, ValidationError } from "apollo-server";
+import { SchemaDirectiveVisitor, ValidationError } from "apollo-server";
 import { Kind } from "graphql";
 import {
     GraphQLField,
