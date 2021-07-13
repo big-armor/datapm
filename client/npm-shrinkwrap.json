@@ -2967,6 +2967,11 @@
             "integrity": "sha512-xdOvNmXmrZqqPy3kuCQ+fz6wA0xU5pji9cd1nDrflWaAWtYLLGk5ykW0H6yg5TVyehHP1pfmuuSaZkhP+kspVA==",
             "dev": true
         },
+        "@types/json-schema": {
+            "version": "7.0.8",
+            "resolved": "https://registry.npmjs.org/@types/json-schema/-/json-schema-7.0.8.tgz",
+            "integrity": "sha512-YSBPTLTVm2e2OoQIDYx8HaeWJ5tTToLH67kXR7zYNGupXMEHa2++G8k+DczX2cFVgalypqtyZIcU19AFcmOpmg=="
+        },
         "@types/json-stable-stringify": {
             "version": "1.0.32",
             "resolved": "https://registry.npmjs.org/@types/json-stable-stringify/-/json-stable-stringify-1.0.32.tgz",
