@@ -7,6 +7,7 @@ import {
     CreateCatalogDocument,
     CreatePackageDocument,
     CreateVersionDocument,
+    DeleteFollowDocument,
     JobType,
     NotificationFrequency,
     RunJobDocument,
@@ -156,6 +157,176 @@ describe("Follow Catalog's Packages Notifications Tests", async () => {
         expect(userBEmail.text).to.contain("This is your instant");
         expect(userBEmail.text).to.contain("added package user-a-ctg-packages-2/follow-test");
         expect(userBEmail.text).to.contain("follow-ctg-packages-user-a published version 1.0.0");
+        expect(userBEmail.text).to.contain("http://localhost:4200/follow-ctg-packages-user-b#user-following");
+    });
+
+    it("Should allow user A to create patch version change", async () => {
+        let packageFileContents = loadPackageFileFromDisk(
+            "test/packageFiles/congressional-legislators-version-changed.datapm.json"
+        );
+        const packageFileString = JSON.stringify(packageFileContents);
+
+        const createVersionResponse = await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: userASecondCatalogSlug,
+                    packageSlug: userAPackageSlug
+                },
+                value: {
+                    packageFile: packageFileString
+                }
+            }
+        });
+        expect(createVersionResponse.errors).to.equal(undefined);
+    });
+
+    it("Should allow user B to unfollow and follow collection", async () => {
+        const unfollowResponse = await userBClient.mutate({
+            mutation: DeleteFollowDocument,
+            variables: {
+                follow: {
+                    catalog: {
+                        catalogSlug: userASecondCatalogSlug
+                    }
+                }
+            }
+        });
+
+        expect(unfollowResponse.errors).to.be.equal(undefined);
+
+        const followResponse = await userBClient.mutate({
+            mutation: SaveFollowDocument,
+            variables: {
+                follow: {
+                    catalog: {
+                        catalogSlug: userASecondCatalogSlug
+                    },
+                    followAllPackages: true,
+                    notificationFrequency: NotificationFrequency.DAILY,
+                    changeType: [ActivityLogChangeType.VERSION_MINOR_CHANGE, ActivityLogChangeType.VERSION_MAJOR_CHANGE]
+                }
+            }
+        });
+
+        expect(followResponse.errors).to.be.equal(undefined);
+    });
+
+    it("Should send email after daily notification updates not containing package because of the following options selected", async () => {
+        let userBEmail: any = null;
+
+        let emailPromise = new Promise<void>((r) => {
+            let subscription = mailObservable.subscribe((email) => {
+                if (email.to[0].address === userBUsername + "@test.datapm.io") {
+                    userBEmail = email;
+                }
+
+                if (userBEmail) {
+                    subscription.unsubscribe();
+                    r();
+                }
+            });
+        });
+
+        const response = await AdminHolder.adminClient.mutate({
+            mutation: RunJobDocument,
+            variables: {
+                key: "TEST_JOB_KEY",
+                job: JobType.DAILY_NOTIFICATIONS
+            }
+        });
+
+        expect(response.errors).eq(undefined);
+
+        await emailPromise;
+
+        expect(userBEmail.text).to.contain("This is your daily");
+        expect(userBEmail.text).to.not.contain("follow-ctg-packages-user-a published version 1.0.0");
+        expect(userBEmail.text).to.contain("http://localhost:4200/follow-ctg-packages-user-b#user-following");
+    });
+
+    it("Should allow user A to create major version change", async () => {
+        let packageFileContents = loadPackageFileFromDisk(
+            "test/packageFiles/congressional-legislators-updated.datapm.json"
+        );
+        const packageFileString = JSON.stringify(packageFileContents);
+
+        const createVersionResponse = await userAClient.mutate({
+            mutation: CreateVersionDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: userASecondCatalogSlug,
+                    packageSlug: userAPackageSlug
+                },
+                value: {
+                    packageFile: packageFileString
+                }
+            }
+        });
+        expect(createVersionResponse.errors).to.equal(undefined);
+    });
+
+    it("Should allow user B to unfollow and follow collection", async () => {
+        const unfollowResponse = await userBClient.mutate({
+            mutation: DeleteFollowDocument,
+            variables: {
+                follow: {
+                    catalog: {
+                        catalogSlug: userASecondCatalogSlug
+                    }
+                }
+            }
+        });
+
+        expect(unfollowResponse.errors).to.be.equal(undefined);
+
+        const followResponse = await userBClient.mutate({
+            mutation: SaveFollowDocument,
+            variables: {
+                follow: {
+                    catalog: {
+                        catalogSlug: userASecondCatalogSlug
+                    },
+                    followAllPackages: true,
+                    notificationFrequency: NotificationFrequency.WEEKLY,
+                    changeType: [ActivityLogChangeType.VERSION_MAJOR_CHANGE]
+                }
+            }
+        });
+
+        expect(followResponse.errors).to.be.equal(undefined);
+    });
+
+    it("Should send email after daily notification updates containing package because of major change", async () => {
+        let userBEmail: any = null;
+
+        let emailPromise = new Promise<void>((r) => {
+            let subscription = mailObservable.subscribe((email) => {
+                if (email.to[0].address === userBUsername + "@test.datapm.io") {
+                    userBEmail = email;
+                }
+
+                if (userBEmail) {
+                    subscription.unsubscribe();
+                    r();
+                }
+            });
+        });
+
+        const response = await AdminHolder.adminClient.mutate({
+            mutation: RunJobDocument,
+            variables: {
+                key: "TEST_JOB_KEY",
+                job: JobType.WEEKLY_NOTIFICATIONS
+            }
+        });
+
+        expect(response.errors).eq(undefined);
+
+        await emailPromise;
+
+        expect(userBEmail.text).to.contain("This is your weekly");
+        expect(userBEmail.text).to.contain("follow-ctg-packages-user-a published version 2.0.0");
         expect(userBEmail.text).to.contain("http://localhost:4200/follow-ctg-packages-user-b#user-following");
     });
 });
