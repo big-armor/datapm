@@ -6,7 +6,7 @@ on:
 jobs:
     lint:
         name: "Lint"
-        timeout-minutes: 20
+        timeout-minutes: 5
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -191,7 +191,7 @@ jobs:
     testClient:
         name: "Test Client"
         needs: lint
-        timeout-minutes: 5
+        timeout-minutes: 20
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
