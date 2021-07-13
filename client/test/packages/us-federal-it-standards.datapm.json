@@ -1,0 +1,151 @@
+{
+	"generatedBy": "`datapm package` command. Visit datapm.io to learn about the open source tools and to discover other data packages",
+	"updatedDate": "2020-09-14T22:05:48.223Z",
+	"displayName": "US Federal IT Standards",
+	"packageSlug": "us-federal-it-standards",
+	"version": "1.0.1",
+	"description": "Standards of the US Federal Government, as published by the GSA on github.com. ",
+	"readmeFile": "us-federal-it-standards.README.md",
+	"schemas": [
+		{
+			"$schema": "http://json-schema.org/draft-07/schema",
+			"$id": "it-standards.csv",
+			"properties": {
+				"Standard Name": {
+					"title": "Standard Name",
+					"recordCount": 1916,
+					"byteCount": 93754,
+					"valueTypes": {
+						"string": {
+							"recordCount": 1916,
+							"valueType": "string",
+							"stringMaxLength": 80,
+							"stringMinLength": 2
+						}
+					},
+					"type": ["string"]
+				},
+				"Description": {
+					"title": "Description",
+					"recordCount": 1916,
+					"byteCount": 1098040,
+					"valueTypes": {
+						"string": {
+							"recordCount": 1914,
+							"valueType": "string",
+							"stringMaxLength": 1188,
+							"stringMinLength": 12
+						},
+						"null": {
+							"recordCount": 2,
+							"valueType": "null",
+							"stringOptions": {
+								"": 2
+							}
+						}
+					},
+					"type": ["string", "null"]
+				},
+				"Category": {
+					"title": "Category",
+					"recordCount": 1916,
+					"byteCount": 81844,
+					"valueTypes": {
+						"string": {
+							"recordCount": 1857,
+							"valueType": "string",
+							"stringMaxLength": 80,
+							"stringMinLength": 5
+						},
+						"null": {
+							"recordCount": 59,
+							"valueType": "null",
+							"stringOptions": {
+								"": 59
+							}
+						}
+					},
+					"type": ["string", "null"]
+				},
+				"Status": {
+					"title": "Status",
+					"recordCount": 1916,
+					"byteCount": 29920,
+					"valueTypes": {
+						"string": {
+							"recordCount": 1916,
+							"valueType": "string",
+							"stringOptions": {
+								"Approved": 1112,
+								"Sunsetting": 149,
+								"Denied": 360,
+								"Proposed": 81,
+								"Pilot": 40,
+								"Exception": 174
+							},
+							"stringMaxLength": 10,
+							"stringMinLength": 5
+						}
+					},
+					"type": ["string"]
+				},
+				"Deployment Type": {
+					"title": "Deployment Type",
+					"recordCount": 1916,
+					"byteCount": 23954,
+					"valueTypes": {
+						"string": {
+							"recordCount": 1891,
+							"valueType": "string",
+							"stringOptions": {
+								"Desktop": 1050,
+								"SaaS": 169,
+								"Server": 595,
+								"Other": 73,
+								"PaaS": 4
+							},
+							"stringMaxLength": 7,
+							"stringMinLength": 4
+						},
+						"null": {
+							"recordCount": 25,
+							"valueType": "null",
+							"stringOptions": {
+								"": 25
+							}
+						}
+					},
+					"type": ["string", "null"]
+				},
+				"Approval Expiration Date": {
+					"title": "Approval Expiration Date",
+					"recordCount": 1916,
+					"byteCount": 30688,
+					"valueTypes": {
+						"string": {
+							"recordCount": 1916,
+							"valueType": "string",
+							"stringMaxLength": 10,
+							"stringMinLength": 1
+						}
+					},
+					"type": ["string"]
+				}
+			},
+			"recordCount": 1916,
+			"byteCount": 696084,
+			"type": "object",
+			"parser": {
+				"mimeType": "text/csv"
+			},
+			"title": "it-standards.csv",
+			"source": {
+				"protocol": "HTTP",
+				"configuration": {
+					"url": "https://raw.githubusercontent.com/GSA/data/master/enterprise-architecture/it-standards.csv"
+				}
+			}
+		}
+	],
+	"registries": []
+}

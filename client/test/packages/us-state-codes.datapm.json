@@ -1,0 +1,57 @@
+{
+	"generatedBy": "`datapm package` command. Visit datapm.io to learn about the open source tools and to discover other data packages",
+	"updatedDate": "2020-10-08T19:43:58.138Z",
+	"displayName": "US State codes",
+	"packageSlug": "us-state-codes",
+	"version": "1.0.0",
+	"description": "ASDfasdf",
+	"schemas": [
+		{
+			"$schema": "http://json-schema.org/draft-07/schema",
+			"$id": "state-codes.csv",
+			"properties": {
+				"State Code": {
+					"title": "State Code",
+					"recordCount": 51,
+					"byteCount": 204,
+					"valueTypes": {
+						"string": {
+							"recordCount": 51,
+							"valueType": "string",
+							"stringMaxLength": 2,
+							"stringMinLength": 2
+						}
+					},
+					"type": ["string"]
+				},
+				"State Name": {
+					"title": "State Name",
+					"recordCount": 51,
+					"byteCount": 884,
+					"valueTypes": {
+						"string": {
+							"recordCount": 51,
+							"valueType": "string",
+							"stringMaxLength": 20,
+							"stringMinLength": 4
+						}
+					},
+					"type": ["string"]
+				}
+			},
+			"recordCount": 51,
+			"byteCount": 875,
+			"type": "object",
+			"parser": {
+				"mimeType": "text/csv"
+			},
+			"title": "state-codes.csv",
+			"source": {
+				"protocol": "HTTP",
+				"configuration": {
+					"url": "https://test.datapm.io/docs/test-data/state-codes.csv"
+				}
+			}
+		}
+	]
+}

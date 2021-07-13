@@ -1,0 +1,45 @@
+on:
+    push:
+
+jobs:
+    build:
+        runs-on: windows-latest
+        name: Node sample
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: "14"
+                  architecture: "x64" # optional, x64 or x86. If not specified, x64 will be used by default
+
+            - name: Cache Node_modules
+              if: steps.cache-node-modules.outputs.cache-hit != 'true'
+              id: cache-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: client/node_modules
+                  key: datampm-client-${{ runner.OS }}-node-modules-${{ hashFiles('package.json','package-lock.json') }}
+
+            - run: npm ci
+              if: steps.cache-node-modules.outputs.cache-hit != 'true'
+
+            - name: Run Linters
+              run: npm run lint
+              working-directory: client
+
+            - name: Run build
+              run: npm run build
+              working-directory: client
+
+            - run: npm run package:win64
+              working-directory: client
+              env:
+                  CERTIFICATE_BASE64: ${{ secrets.CERTIFICATE_BASE64 }}
+                  CERTIFICATE_PASSWORD: ${{ secrets.CERTFICATE_PASSWORD }}
+
+            - name: "Save Windows Executable"
+              uses: actions/upload-artifact@v2
+              with:
+                  name: datapm-client-windows
+                  path: client/datapm-*.msix
+                  retention-days: 5

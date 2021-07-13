@@ -1,0 +1,93 @@
+import { Redshift } from "aws-sdk";
+import { expect } from "chai";
+import { loadPackageFileFromDisk, Properties, Schema } from "datapm-lib";
+import Knex from "knex";
+import { getRedshiftClusterConfiguration } from "../../src/util/AwsUtil";
+import { removePackageFiles, testCmd, TestResults } from "../integration/test-utils";
+
+describe("Redshift Source Test", function () {
+	const region = "us-east-2";
+	const bucketName = "datapm-test";
+	const clusterIdentifier = "datapm-test-cluster";
+	const schemaName = "datapm_source";
+	const tableName = "covid_02_01_2020";
+	let knexClient: Knex;
+
+	before(async function () {
+		const redshiftClient = new Redshift({ region });
+		const clusterConfiguration = await getRedshiftClusterConfiguration(redshiftClient, clusterIdentifier);
+		knexClient = Knex({
+			client: "pg",
+			connection: {
+				host: clusterConfiguration.host,
+				port: clusterConfiguration.port,
+				user: clusterConfiguration.username,
+				password: clusterConfiguration.password,
+				database: clusterConfiguration.database,
+				ssl: true
+			} as Knex.PgConnectionConfig
+		});
+	});
+
+	after(async function () {
+		removePackageFiles(["covid_02_01_2020"]);
+	});
+
+	it("Should generate package from postgres source without issue", async function () {
+		const results: TestResults = {
+			messageFound: false
+		};
+
+		const cmdResult = await testCmd(
+			"package",
+			[
+				`redshift://${clusterIdentifier}`,
+				"--defaults",
+				"--sourceConfiguration",
+				JSON.stringify({ region, bucket: bucketName, schema: schemaName, tables: tableName })
+			],
+			[],
+			(line: string) => {
+				if (line.includes("datapm publish ")) {
+					results.messageFound = true;
+				}
+			}
+		);
+
+		expect(cmdResult.code, "Exit code").equals(0);
+		expect(results.messageFound, "Found success message").equals(true);
+	});
+
+	it("Validate the contents of the JSON file", async function () {
+		const newPackageFile = loadPackageFileFromDisk("covid_02_01_2020.datapm.json");
+		const columns = await knexClient("information_schema.columns")
+			.where({ table_schema: schemaName })
+			.where({ table_name: tableName });
+		const typeMatch: Record<string, Record<string, [string]>> = {
+			bigint: {
+				format: ["integer"],
+				type: ["number"]
+			},
+			"character varying": {
+				format: ["string"],
+				type: ["string"]
+			},
+			"timestamp without time zone": {
+				format: ["date-time"],
+				type: ["string"]
+			}
+		};
+		expect(columns.length).equals(6);
+		expect(newPackageFile.schemas.length).equals(1);
+
+		const properties = newPackageFile.schemas[0].properties as Properties;
+		columns.forEach((column) => {
+			const property = properties[column.column_name as string] as Schema;
+			expect(property.title).equal(column.column_name);
+			expect(property.recordCount).equal(67);
+			expect(property.format?.split(",")).include.members(typeMatch[column.data_type].format);
+			expect(property.type).include.members(typeMatch[column.data_type].type);
+		});
+		knexClient.destroy();
+	});
+});

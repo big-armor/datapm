@@ -44,6 +44,7 @@ jobs:
 
     testLib:
         name: "Test Lib"
+        needs: lint
         timeout-minutes: 5
         runs-on: ubuntu-latest
         steps:
@@ -190,3 +191,57 @@ jobs:
               id: test-frontend-Dependencies
               run: npm run test:ci
               working-directory: frontend
+
+    testClient:
+        name: "Test Client"
+        timeout-minutes: 5
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+
+            - uses: actions/setup-node@v2-beta
+              with:
+                  node-version: "12"
+
+            - name: Print npm verion
+              run: npm --version
+
+            - name: Print node verion
+              run: node --version
+
+            - name: Cache Lib Node_modules
+              id: cache-lib-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: lib/node_modules
+                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/package.json', 'lib/package-lock.json') }}
+
+            - name: Install Lib Dependencies
+              id: install-lib-Dependencies
+              if: steps.cache-lib-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: lib
+
+            - name: Build Lib
+              id: build-lib-Dependencies
+              run: npm run build
+              working-directory: lib
+
+            - name: Cache Client Node_modules
+              id: cache-client-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: client/node_modules
+                  key: datampm-client-${{ runner.OS }}-${{ hashFiles('client/package.json', 'client/package-lock.json') }}
+
+            - name: Install Client Dependencies
+              id: install-client-dependencies
+              if: steps.cache-client-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: client
+
+            - name: Test Client
+              id: test-client-Dependencies
+              run: npm run test
+              working-directory: client

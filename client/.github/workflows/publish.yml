@@ -1,0 +1,56 @@
+on:
+    push:
+
+jobs:
+    publish:
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v1
+              with:
+                  node-version: 14
+
+            - name: Write Test Paid Credentials file
+              run: echo $GOOGLE_CREDENTIALS > gcloud-test-paid.key
+              env:
+                  GOOGLE_CREDENTIALS: ${{secrets.TEST_GOOGLE_APPLICATION_PAID_CREDENTIALS}}
+
+            - name: Write Test Free Credentials file
+              run: echo $GOOGLE_CREDENTIALS > gcloud-test-free.key
+              env:
+                  GOOGLE_CREDENTIALS: ${{secrets.TEST_GOOGLE_APPLICATION_FREE_CREDENTIALS}}
+
+            - name: Cache Node_modules
+              if: steps.cache-node-modules.outputs.cache-hit != 'true'
+              id: cache-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: node_modules
+                  key: datampm-client-${{ runner.OS }}-node-modules-${{ hashFiles('package.json','package-lock.json') }}
+
+            - run: npm ci
+              if: steps.cache-node-modules.outputs.cache-hit != 'true'
+
+            - name: Run Linters
+              run: npm run lint
+
+            - name: NPM Run Test
+              run: npm run test:full
+              env:
+                  AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+                  AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+                  GOOGLE_APPLICATION_FREE_CREDENTIALS: "gcloud-test-free.key"
+                  GOOGLE_APPLICATION_PAID_CREDENTIALS: "gcloud-test-paid.key"
+
+            - name: "Automated Version Bump"
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              uses: "phips28/gh-action-bump-version@master"
+              with:
+                  tag-prefix: "release-"
+
+            - run: npm run build
+            - uses: JS-DevTools/npm-publish@v1
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              with:
+                  token: ${{ secrets.NPM_TOKEN }}

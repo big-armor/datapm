@@ -1,0 +1,179 @@
+{
+	"generatedBy": "`datapm package` command. Visit datapm.io to learn about the open source tools and to discover other data packages",
+	"updatedDate": "2020-09-04T15:54:07.918Z",
+	"displayName": "US Federal Websites",
+	"packageSlug": "us-federal-websites",
+	"version": "1.0.7",
+	"description": "Websites as listed by the GSA",
+	"schemas": [
+		{
+			"$schema": "http://json-schema.org/draft-07/schema",
+			"$id": "current-federal.csv",
+			"properties": {
+				"Domain Name": {
+					"title": "Domain Name",
+					"recordCount": 1262,
+					"byteCount": 30908,
+					"valueTypes": {
+						"string": {
+							"recordCount": 1262,
+							"valueType": "string",
+							"stringMaxLength": 37,
+							"stringMinLength": 6
+						}
+					},
+					"type": ["string"]
+				},
+				"Domain Type": {
+					"title": "Domain Type",
+					"recordCount": 1262,
+					"byteCount": 66034,
+					"valueTypes": {
+						"string": {
+							"recordCount": 1262,
+							"valueType": "string",
+							"stringOptions": {
+								"Federal Agency - Executive": 1125,
+								"Federal Agency - Judicial": 23,
+								"Federal Agency - Legislative": 114
+							},
+							"stringMaxLength": 28,
+							"stringMinLength": 25
+						}
+					},
+					"type": ["string"]
+				},
+				"Agency": {
+					"title": "Agency",
+					"recordCount": 1262,
+					"byteCount": 72970,
+					"valueTypes": {
+						"string": {
+							"recordCount": 1262,
+							"valueType": "string",
+							"stringMaxLength": 75,
+							"stringMinLength": 6
+						}
+					},
+					"type": ["string"]
+				},
+				"Organization": {
+					"title": "Organization",
+					"description": "The owning organizations",
+					"recordCount": 1262,
+					"byteCount": 79140,
+					"valueTypes": {
+						"string": {
+							"recordCount": 1262,
+							"valueType": "string",
+							"stringMaxLength": 100,
+							"stringMinLength": 3
+						}
+					},
+					"type": ["string"]
+				},
+				"City": {
+					"title": "City",
+					"description": "City for which the website is created",
+					"recordCount": 1262,
+					"byteCount": 23920,
+					"valueTypes": {
+						"string": {
+							"recordCount": 1262,
+							"valueType": "string",
+							"stringMaxLength": 22,
+							"stringMinLength": 4
+						}
+					},
+					"type": ["string"]
+				},
+				"State": {
+					"title": "State",
+					"description": "The state that owns the website",
+					"recordCount": 1262,
+					"byteCount": 5076,
+					"valueTypes": {
+						"string": {
+							"recordCount": 1262,
+							"valueType": "string",
+							"stringOptions": {
+								"DC": 780,
+								"VA": 124,
+								"AL": 6,
+								"MD": 176,
+								"MS": 3,
+								"AK": 3,
+								"CO": 29,
+								"NC": 10,
+								"FL": 11,
+								"SC": 2,
+								"CA": 9,
+								"IA": 1,
+								"IL": 6,
+								"WA": 8,
+								"NY": 1,
+								"OR": 4,
+								"TN": 16,
+								"NM": 6,
+								"ID": 12,
+								"NJ": 1,
+								"KY": 1,
+								"OK": 3,
+								"PA": 1,
+								"NV": 2,
+								"GA": 15,
+								"WV": 8,
+								"TX": 2,
+								"Jakarta": 1,
+								"AZ": 5,
+								"LA": 5,
+								"SD": 2,
+								"WI": 1,
+								"MA": 1,
+								"MO": 1,
+								"NE": 1,
+								"OH": 1,
+								"AR": 1,
+								"Puerto Rico": 1,
+								"NH": 1,
+								"UT": 1
+							},
+							"stringMaxLength": 11,
+							"stringMinLength": 2
+						}
+					},
+					"type": ["string"]
+				},
+				"Security Contact Email": {
+					"title": "Security Contact Email",
+					"description": "Email address of the primary security contact, for issue reporting.",
+					"recordCount": 1262,
+					"byteCount": 30130,
+					"valueTypes": {
+						"string": {
+							"recordCount": 1262,
+							"valueType": "string",
+							"stringMaxLength": 41,
+							"stringMinLength": 7
+						}
+					},
+					"type": ["string"]
+				}
+			},
+			"recordCount": 1262,
+			"byteCount": 164409,
+			"type": "object",
+			"parser": {
+				"mimeType": "text/csv"
+			},
+			"title": "current-federal.csv",
+			"source": {
+				"protocol": "HTTP",
+				"configuration": {
+					"url": "https://raw.githubusercontent.com/GSA/data/master/dotgov-domains/current-federal.csv"
+				}
+			}
+		}
+	],
+	"registries": []
+}
