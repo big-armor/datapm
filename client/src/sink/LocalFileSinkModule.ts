@@ -3,7 +3,7 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import { getRecordSerializer, DPMRecordSerializer } from "./writer/RecordSerializerUtil";
-import { Parameter, ParameterType } from "../util/ParameterUtils";
+import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { AbstractFileSink, RecordSerializedContext } from "./AbstractFileSink";
 import { Writable, Readable, Transform } from "stream";
 import { RecordSerializerCSV } from "./writer/RecordSerializerCSV";

@@ -1,8 +1,8 @@
 import chalk from "chalk";
 import ora from "ora";
 import prompts from "prompts";
-import { defaultPromptOptions } from "../util/ParameterUtils";
 import { getRegistryConfigs, RegistryConfig } from "../util/ConfigUtil";
+import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
 import { getRegistryClientWithConfig } from "../util/RegistryClient";
 import { packageString } from "../util/RegistryReferenceUtil";
 import { SearchArguments } from "./SearchCommand";

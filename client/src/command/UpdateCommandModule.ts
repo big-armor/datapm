@@ -22,10 +22,11 @@ import { writeLicenseFile, writePackageFile, writeReadmeFile, differenceToString
 import { RegistryClient } from "../util/RegistryClient";
 import { publishPackage } from "./PublishPackageCommand";
 import clone from "rfdc";
-import { cliHandleParameters, defaultPromptOptions } from "../util/ParameterUtils";
 import { LogType } from "../util/LoggingUtils";
 import { UpdateArguments } from "./UpdateCommand";
 import { inspectSource, inspectStreamSet } from "./PackageCommandModule";
+import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
+import { cliHandleParameters } from "../util/parameters/ParameterUtils";
 
 async function schemaPrompts(schema: Schema): Promise<void> {
     if (schema.properties == null) return;

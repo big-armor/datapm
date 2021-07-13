@@ -14,7 +14,7 @@ import {
     uploadToS3,
     getS3ObjectMetaData
 } from "../util/AwsUtil";
-import { Parameter, ParameterType } from "../util/ParameterUtils";
+import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { StreamSetProcessingMethod } from "../util/StreamToSinkUtil";
 import { AbstractFileSink, RecordSerializedContext } from "./AbstractFileSink";
 import { DISPLAY_NAME, TYPE } from "./S3Sink";

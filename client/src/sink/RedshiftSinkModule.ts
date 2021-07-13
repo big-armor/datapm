@@ -14,7 +14,7 @@ import {
     getS3BucketList,
     uploadToS3
 } from "../util/AwsUtil";
-import { Parameter, ParameterType } from "../util/ParameterUtils";
+import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { KnexSink } from "./KnexSink";
 import { DISPLAY_NAME, TYPE } from "./RedshiftSink";
 import { WritableWithContext } from "./SinkUtil";

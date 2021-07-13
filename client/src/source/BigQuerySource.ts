@@ -3,7 +3,7 @@ import { DPMConfiguration } from "datapm-lib";
 import fs from "fs";
 import { BigQuery, BigQueryDatetime, BigQueryTimestamp } from "@google-cloud/bigquery";
 import { Transform } from "stream";
-import { Parameter, ParameterType } from "../util/ParameterUtils";
+import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import {
     RecordContext,
     SourceInspectionContext,

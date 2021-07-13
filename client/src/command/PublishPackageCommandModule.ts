@@ -9,7 +9,7 @@ import { getRegistryConfigs, RegistryConfig } from "../util/ConfigUtil";
 import { identifierToString } from "../util/IdentifierUtil";
 import { getPackage, PackageFileWithContext } from "../util/PackageAccessUtil";
 import { writePackageFile } from "../util/PackageUtil";
-import { defaultPromptOptions } from "../util/ParameterUtils";
+import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
 import { getRegistryClientWithConfig } from "../util/RegistryClient";
 import { PublishArguments } from "./PublishPackageCommand";
 

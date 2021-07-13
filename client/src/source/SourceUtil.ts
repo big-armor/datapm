@@ -14,7 +14,7 @@ import { clearInterval } from "timers";
 import { Maybe } from "../generated/graphql";
 import { StreamState } from "../sink/SinkUtil";
 import { LogType } from "../util/LoggingUtils";
-import { Parameter } from "../util/ParameterUtils";
+import { Parameter } from "../util/parameters/Parameter";
 import { BatchingTransform } from "./transforms/BatchingTransform";
 import { InflatedByteCountTransform } from "./transforms/InflatedByteCountTransform";
 import { StatsTransform } from "./transforms/StatsTransform";

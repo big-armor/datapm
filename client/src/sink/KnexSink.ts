@@ -4,7 +4,7 @@ import { Transform } from "stream";
 import { Maybe } from "../generated/graphql";
 import { ExtendedJSONSchema7TypeName, RecordStreamContext, UpdateMethod } from "../source/SourceUtil";
 import { convertValueByValueType, discoverValueType } from "../source/transforms/StatsTransform";
-import { Parameter } from "../util/ParameterUtils";
+import { Parameter } from "../util/parameters/Parameter";
 import { StreamSetProcessingMethod } from "../util/StreamToSinkUtil";
 import { Sink, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWithContext } from "./SinkUtil";
 
@@ -333,9 +333,8 @@ export abstract class KnexSink implements Sink {
                             .where({
                                 [this.mapSinkStateKeyToColumnName("catalogSlug")]: _sinkStateKey.catalogSlug,
                                 [this.mapSinkStateKeyToColumnName("packageSlug")]: _sinkStateKey.packageSlug,
-                                [this.mapSinkStateKeyToColumnName(
-                                    "packageMajorVersion"
-                                )]: _sinkStateKey.packageMajorVersion
+                                [this.mapSinkStateKeyToColumnName("packageMajorVersion")]:
+                                    _sinkStateKey.packageMajorVersion
                             });
 
                         if (state == null || state.length === 0) resolve(null);

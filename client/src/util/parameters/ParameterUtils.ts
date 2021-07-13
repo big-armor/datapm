@@ -1,38 +1,6 @@
-import chalk from "chalk";
-import { DPMConfiguration } from "datapm-lib";
 import prompts, { PromptObject } from "prompts";
-
-export interface Parameter {
-    type: ParameterType;
-    name: string;
-    defaultValue?: string | boolean | number;
-    message: string;
-    options?: { title: string; value?: string | boolean | number; selected?: boolean }[];
-    min?: number;
-    validate?: (value: string | number | boolean) => boolean | string;
-
-    /** The configuration object on which the parameter value should be set. Required because
-     * configurations can be heirarchical (for nested use cases)
-     */
-    configuration: DPMConfiguration;
-}
-
-export const defaultPromptOptions = {
-    onCancel: (): void => {
-        console.log(chalk.red("User canceled"));
-        process.exit(1);
-    }
-};
-
-export enum ParameterType {
-    AutoComplete = "autocomplete",
-    Confirm = "confirm",
-    Text = "text",
-    Select = "select",
-    MultiSelect = "multiselect",
-    Number = "number",
-    Password = "password"
-}
+import { defaultPromptOptions } from "./DefaultParameterOptions";
+import { Parameter, ParameterType } from "./Parameter";
 
 export function parametersToPrompts(parameters: Parameter[]): PromptObject[] {
     return parameters.map((promptParameter) => {

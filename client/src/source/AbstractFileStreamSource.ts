@@ -3,7 +3,7 @@ import chalk from "chalk";
 import { DPMConfiguration } from "datapm-lib";
 import numeral from "numeral";
 import streamMmmagic from "stream-mmmagic";
-import { Parameter, ParameterType } from "../util/ParameterUtils";
+import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import {
     StreamSetPreview,
     SourceInspectionContext,
@@ -92,7 +92,7 @@ export abstract class AbstractFileStreamSource implements SourceInterface {
             if (
                 configuration.updateMethod == null ||
                 !parserInspectionResults.updateMethods.includes(
-                    UpdateMethod[(configuration.updateMethod as string) as keyof typeof UpdateMethod]
+                    UpdateMethod[configuration.updateMethod as string as keyof typeof UpdateMethod]
                 )
             ) {
                 await context.parameterPrompt([

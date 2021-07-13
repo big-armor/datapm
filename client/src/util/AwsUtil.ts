@@ -6,7 +6,7 @@ import os from "os";
 import path from "path";
 import readline from "readline";
 import { Readable } from "stream";
-import { Parameter, ParameterType } from "./ParameterUtils";
+import { Parameter, ParameterType } from "./parameters/Parameter";
 
 export const RS_NODE_TYPES = [
     "ds2.xlarge",

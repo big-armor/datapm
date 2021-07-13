@@ -2,7 +2,7 @@ import chalk from "chalk";
 import { DPMConfiguration, PackageFile, Schema } from "datapm-lib";
 import Knex, { Ref, Transaction } from "knex";
 import { SemVer } from "semver";
-import { Parameter, ParameterType } from "../util/ParameterUtils";
+import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { KnexSink } from "./KnexSink";
 import { DISPLAY_NAME, TYPE } from "./PostgresSink";
 import { SinkErrors, WritableWithContext } from "./SinkUtil";

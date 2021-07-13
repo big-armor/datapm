@@ -4,7 +4,7 @@ import { RecordContext, SourceInspectionContext, UpdateMethod } from "../source/
 import { FileBufferSummary, ParserInspectionResults, Parser } from "./ParserUtil";
 
 import XmlParser from "xml-streamer";
-import { ParameterType } from "../util/ParameterUtils";
+import { ParameterType } from "../util/parameters/Parameter";
 
 export class XMLParser implements Parser {
     getFileExtensions(): string[] {

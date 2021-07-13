@@ -2,7 +2,7 @@ import { DPMConfiguration, PackageFile, Schema } from "datapm-lib";
 import { Transform } from "stream";
 import { Maybe } from "../../generated/graphql";
 import { RecordContext, UpdateMethod } from "../../source/SourceUtil";
-import { Parameter } from "../../util/ParameterUtils";
+import { Parameter } from "../../util/parameters/Parameter";
 import { RecordSerializerCSV } from "./RecordSerializerCSV";
 import { RecordSerializerJSON } from "./RecordSerializerJSON";
 import { RecordSerializerAVRO } from "./RecordSerializerAVRO";

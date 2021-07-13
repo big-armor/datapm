@@ -12,7 +12,7 @@ import {
     getS3BucketList,
     getStreamFromS3
 } from "../util/AwsUtil";
-import { Parameter, ParameterType } from "../util/ParameterUtils";
+import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { AbstractFileStreamSource } from "./AbstractFileStreamSource";
 import { S3Source } from "./S3Source";
 import { SourceInterface } from "./SourceUtil";

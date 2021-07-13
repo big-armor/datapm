@@ -5,7 +5,7 @@ import { Transform } from "stream";
 import { Maybe } from "../generated/graphql";
 import { ExtendedJSONSchema7TypeName, RecordStreamContext, UpdateMethod } from "../source/SourceUtil";
 import { convertValueByValueType, discoverValueType } from "../source/transforms/StatsTransform";
-import { Parameter, ParameterType } from "../util/ParameterUtils";
+import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { StreamSetProcessingMethod } from "../util/StreamToSinkUtil";
 import { DISPLAY_NAME, TYPE } from "./MongoSink";
 import { Sink, SinkErrors, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWithContext } from "./SinkUtil";

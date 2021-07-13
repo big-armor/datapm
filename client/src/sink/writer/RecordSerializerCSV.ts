@@ -2,7 +2,7 @@ import stringify from "csv-stringify/lib/sync";
 import { DPMConfiguration, PackageFile, Schema } from "datapm-lib";
 import { Transform } from "stream";
 import { RecordStreamContext, UpdateMethod } from "../../source/SourceUtil";
-import { Parameter, ParameterType } from "../../util/ParameterUtils";
+import { Parameter, ParameterType } from "../../util/parameters/Parameter";
 import { RecordSerializedContext } from "../AbstractFileSink";
 import { DPMRecordSerializer } from "./RecordSerializerUtil";
 

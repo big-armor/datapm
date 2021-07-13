@@ -2,7 +2,7 @@ import chalk from "chalk";
 import { DPMConfiguration } from "datapm-lib";
 import Knex from "knex";
 import { parse } from "pg-connection-string";
-import { Parameter, ParameterType } from "../util/ParameterUtils";
+import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import {
     StreamSetPreview,
     SourceErrors,

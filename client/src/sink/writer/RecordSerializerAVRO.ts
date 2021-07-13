@@ -4,7 +4,7 @@ import { JSONSchema7TypeName } from "json-schema";
 import { Transform, TransformCallback, Writable } from "stream";
 import { RecordStreamContext, UpdateMethod } from "../../source/SourceUtil";
 import { convertValueByValueType } from "../../source/transforms/StatsTransform";
-import { Parameter } from "../../util/ParameterUtils";
+import { Parameter } from "../../util/parameters/Parameter";
 import { RecordSerializedContext } from "../AbstractFileSink";
 import { DPMRecordSerializer } from "./RecordSerializerUtil";
 

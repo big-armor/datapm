@@ -4,7 +4,7 @@ import fetch from "cross-fetch";
 import mime from "mime-types";
 import { FileStreamContext } from "../parser/ParserUtil";
 import { getAwsParameters, getStreamFromS3, getS3ObjectMetaData } from "../util/AwsUtil";
-import { Parameter, ParameterType } from "../util/ParameterUtils";
+import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { AbstractFileStreamSource } from "./AbstractFileStreamSource";
 import { HTTPSource } from "./HTTPSource";
 import { SourceInterface } from "./SourceUtil";

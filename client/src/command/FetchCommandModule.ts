@@ -7,7 +7,7 @@ import { SemVer } from "semver";
 import { getSink, getSinks, SinkState, SinkStateKey } from "../sink/SinkUtil";
 import { OraQuiet } from "../util/OraQuiet";
 import { getPackage } from "../util/PackageAccessUtil";
-import { cliHandleParameters, defaultPromptOptions, parametersToPrompts, Parameter } from "../util/ParameterUtils";
+import { cliHandleParameters, parametersToPrompts } from "../util/parameters/ParameterUtils";
 import { inspectSourceConnection } from "../util/SchemaUtil";
 
 import ON_DEATH from "death";
@@ -17,6 +17,8 @@ import { formatRemainingTime } from "../util/DateUtil";
 import { Listr, ListrTask } from "listr2";
 import { FetchArguments } from "./FetchCommand";
 import { TYPE as STANDARD_OUT_SINK_TYPE } from "../sink/StandardOutSink";
+import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
+import { Parameter } from "../util/parameters/Parameter";
 
 export async function fetchPackage(argv: FetchArguments): Promise<void> {
     if (argv.quiet) {

@@ -2,7 +2,7 @@ import { DPMConfiguration } from "datapm-lib";
 import { Writable } from "stream";
 import unzipper, { Entry } from "unzipper";
 import { SourceInspectionContext } from "../source/SourceUtil";
-import { ParameterType } from "../util/ParameterUtils";
+import { ParameterType } from "../util/parameters/Parameter";
 import { AbstractArchiveParser, FileIterator } from "./AbstractArchiveParser";
 import { FileBufferSummary } from "./ParserUtil";
 

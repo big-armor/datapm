@@ -11,7 +11,7 @@ import {
     initOAuth2Client,
     setCredentials
 } from "../util/GoogleUtil";
-import { Parameter, ParameterType } from "../util/ParameterUtils";
+import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { QuoteTransform } from "../source/transforms/QuoteTransform";
 import { RecordCountOffsetTransform } from "../source/transforms/RecordCountOffsetTransform";
 import { ByteBatchingTransform } from "../source/transforms/ByteBatchingTransform";

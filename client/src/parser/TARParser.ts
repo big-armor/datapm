@@ -2,7 +2,7 @@ import { DPMConfiguration } from "datapm-lib";
 import { Readable } from "stream";
 import tar from "tar-stream";
 import { SourceInspectionContext } from "../source/SourceUtil";
-import { ParameterType } from "../util/ParameterUtils";
+import { ParameterType } from "../util/parameters/Parameter";
 import { AbstractArchiveParser, FileIterator } from "./AbstractArchiveParser";
 import { FileBufferSummary } from "./ParserUtil";
 

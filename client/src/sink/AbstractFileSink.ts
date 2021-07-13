@@ -2,7 +2,7 @@ import { DPMConfiguration, PackageFile, Schema } from "datapm-lib";
 import { Readable, Transform, Writable } from "stream";
 import { Maybe } from "../generated/graphql";
 import { RecordStreamContext, UpdateMethod } from "../source/SourceUtil";
-import { Parameter, ParameterType } from "../util/ParameterUtils";
+import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { Sink, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWithContext } from "./SinkUtil";
 import { RecordSerializerCSV } from "./writer/RecordSerializerCSV";
 import { RecordSerializerJSON } from "./writer/RecordSerializerJSON";

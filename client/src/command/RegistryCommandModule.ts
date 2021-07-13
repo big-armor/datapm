@@ -18,7 +18,6 @@ import { addRegistry, getRegistryConfigs, getRegistryConfig, removeRegistry, Reg
 import { getRegistryClientWithConfig, RegistryClient } from "../util/RegistryClient";
 import os from "os";
 import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from "@apollo/client";
-import { defaultPromptOptions } from "../util/ParameterUtils";
 import {
     Commands,
     RegistryAddArguments,
@@ -26,6 +25,7 @@ import {
     RegistryLogoutArguments,
     RegistryRemoveArguments
 } from "./RegistryCommand";
+import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
 
 export async function defaultRegistryCommandHandler(args: unknown): Promise<void> {
     const commandPromptResult = await prompts({

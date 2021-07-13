@@ -10,7 +10,7 @@ import { StreamState } from "../sink/SinkUtil";
 import { RecordContext, SourceInspectionContext, UpdateMethod } from "../source/SourceUtil";
 import { ByteBatchingTransform } from "../source/transforms/ByteBatchingTransform";
 import { RecordCountOffsetTransform } from "../source/transforms/RecordCountOffsetTransform";
-import { ParameterType } from "../util/ParameterUtils";
+import { ParameterType } from "../util/parameters/Parameter";
 import { ParserInspectionResults, Parser } from "./ParserUtil";
 
 export class CSVParser implements Parser {

@@ -3,7 +3,7 @@ import fs from "fs";
 import mime from "mime-types";
 import path from "path";
 import { FileStreamContext } from "../parser/ParserUtil";
-import { Parameter, ParameterType } from "../util/ParameterUtils";
+import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { AbstractFileStreamSource } from "./AbstractFileStreamSource";
 import { SourceInterface } from "./SourceUtil";
 import globParent from "glob-parent";

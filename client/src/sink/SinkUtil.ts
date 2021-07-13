@@ -2,7 +2,7 @@ import { DPMConfiguration, PackageFile, Schema } from "datapm-lib";
 import { Transform } from "stream";
 import { Maybe } from "../generated/graphql";
 import { UpdateMethod } from "../source/SourceUtil";
-import { Parameter } from "../util/ParameterUtils";
+import { Parameter } from "../util/parameters/Parameter";
 import { BigQuerySinkDescription } from "./BigQuerySink";
 import { LocalFileSinkDescription } from "./LocalFileSink";
 import { MongoSinkDescription } from "./MongoSink";

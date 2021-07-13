@@ -4,7 +4,7 @@ import prompts from "prompts";
 import { Readable } from "stream";
 import { FakerCategories, FakerTypes } from "../util/FakerUtil";
 import { toSentenceCase } from "../util/NameUtil";
-import { defaultPromptOptions, Parameter } from "../util/ParameterUtils";
+import { Parameter } from "../util/parameters/Parameter";
 import {
     StreamSetPreview,
     SourceInspectionContext,
@@ -48,37 +48,31 @@ export class StreamTestSource implements SourceInterface {
         const attributeNames: string[] = [];
         let attributeCount = 0;
 
-        const recordCountResponse = await prompts(
-            [
-                {
-                    type: "number",
-                    name: "recordCount",
-                    message: "How many test records?",
-                    validate: (value) => (value < 1 ? "Record count should be greater than 1" : true)
-                }
-            ],
-            defaultPromptOptions
-        );
+        const recordCountResponse = await prompts([
+            {
+                type: "number",
+                name: "recordCount",
+                message: "How many test records?",
+                validate: (value) => (value < 1 ? "Record count should be greater than 1" : true)
+            }
+        ]);
         this.configuration.recordCount = recordCountResponse.recordCount;
 
         while (true) {
-            const attributeNameResponse = await prompts(
-                [
-                    {
-                        type: "text",
-                        name: "attributeName",
-                        message: "Name of attribute?",
-                        validate: (value) => {
-                            if (attributeCount === 0 && !value) return "There should be at least 1 attribute";
-                            if (value && attributeNames.includes(value)) {
-                                return `'${value}' attribute is already existing`;
-                            }
-                            return true;
+            const attributeNameResponse = await prompts([
+                {
+                    type: "text",
+                    name: "attributeName",
+                    message: "Name of attribute?",
+                    validate: (value) => {
+                        if (attributeCount === 0 && !value) return "There should be at least 1 attribute";
+                        if (value && attributeNames.includes(value)) {
+                            return `'${value}' attribute is already existing`;
                         }
+                        return true;
                     }
-                ],
-                defaultPromptOptions
-            );
+                }
+            ]);
             if (!attributeNameResponse.attributeName) {
                 break;
             }

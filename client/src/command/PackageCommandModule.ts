@@ -30,7 +30,8 @@ import { validPackageDisplayName, validShortPackageDescription, validUnit, valid
 import { LogType } from "../util/LoggingUtils";
 import { nameToSlug } from "../util/NameUtil";
 import { writeLicenseFile, writePackageFile, writeReadmeFile, PublishType } from "../util/PackageUtil";
-import { cliHandleParameters, defaultPromptOptions } from "../util/ParameterUtils";
+import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
+import { cliHandleParameters } from "../util/parameters/ParameterUtils";
 import * as SchemaUtil from "../util/SchemaUtil";
 import { PackageArguments } from "./PackageCommand";
 import { PublishPackageCommandModule } from "./PublishPackageCommandModule";
