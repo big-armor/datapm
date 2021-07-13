@@ -1492,7 +1492,7 @@ button:disabled {
     transition: color 0.5s, background 0.5s;
 }
 
-.markdown-quote-block {
+blockquote {
     color: var(--gray-3-color);
     border-left: 2px solid var(--gray-5-color);
     padding-left: 10px;

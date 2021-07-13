@@ -2,7 +2,9 @@
     <div class="row mb-4 pb-2">
         <div class="col-md-12 pl-0">
             <div class="text-main-title mb-1">Followers</div>
-            <div class="text-dark-gray pb-2">These users follow this {{ objectType }}.</div>
+            <div class="text-dark-gray pb-2" *ngIf="followers.length > 0">
+                These users follow this {{ objectType }}.
+            </div>
         </div>
         <div class="col-md-12" *ngIf="!hasLoadingErrors">
             <div class="row">
