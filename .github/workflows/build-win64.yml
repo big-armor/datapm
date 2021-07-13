@@ -12,17 +12,29 @@ jobs:
                   node-version: "14"
                   architecture: "x64" # optional, x64 or x86. If not specified, x64 will be used by default
 
-            - name: Cache Node_modules
-              if: steps.cache-node-modules.outputs.cache-hit != 'true'
-              id: cache-node-modules
+            - name: Cache Lib Node_modules
+              if: steps.cache-lib-node-modules.outputs.cache-hit != 'true'
+              id: cache-lib-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: lib/node_modules
+                  key: datampm-lib-${{ runner.OS }}-node-modules-${{ hashFiles('lib/package.json','lib/package-lock.json') }}
+
+            - name: Cache Client Node_modules
+              if: steps.cache-client-node-modules.outputs.cache-hit != 'true'
+              id: cache-client-node-modules
               uses: actions/cache@v1
               with:
                   path: client/node_modules
-                  key: datampm-client-${{ runner.OS }}-node-modules-${{ hashFiles('package.json','package-lock.json') }}
+                  key: datampm-client-${{ runner.OS }}-node-modules-${{ hashFiles('client/package.json','client/package-lock.json') }}
+
+            - run: npm ci
+              working-directory: lib
+              if: steps.cache-lib-node-modules.outputs.cache-hit != 'true'
 
             - run: npm ci
               working-directory: client
-              if: steps.cache-node-modules.outputs.cache-hit != 'true'
+              if: steps.cache-client-node-modules.outputs.cache-hit != 'true'
 
             - name: Run Linters
               run: npm run lint
