@@ -66,8 +66,8 @@ jobs:
             - run: npm run package:win64
               working-directory: client
               env:
-                  CERTIFICATE_BASE64: ${{ secrets.CERTIFICATE_BASE64 }}
-                  CERTIFICATE_PASSWORD: ${{ secrets.CERTFICATE_PASSWORD }}
+                  CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_BASE64 }}
+                  CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_PASSWORD }}
 
             - name: "Save Windows Executable"
               uses: actions/upload-artifact@v2
