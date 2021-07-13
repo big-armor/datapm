@@ -2,10 +2,10 @@ import prompts from "prompts";
 import { Argv } from "yargs";
 import { Command } from "./Command";
 import { fetchPackage } from "./FetchCommand";
-import { generatePackage } from "./PackageCommand";
-import { authenticateToRegistry, logoutFromRegistry } from "./RegistryCommand";
+import { packageCommand } from "./PackageCommand";
+import { authenticateToRegistry, defaultRegistryCommand, logoutFromRegistry } from "./RegistryCommand";
 import { handleSearch } from "./SearchCommand";
-import { updatePackage } from "./UpdateCommand";
+import { updateCommandHandler } from "./UpdateCommand";
 
 const enum Commands {
     FETCH = "Fetch",
@@ -36,17 +36,17 @@ export class FallbackCommand implements Command {
                     .command({
                         command: "package",
                         describe: "Package data",
-                        handler: generatePackage
+                        handler: packageCommand
                     })
                     .command({
                         command: "update",
                         describe: "Update package",
-                        handler: updatePackage
+                        handler: updateCommandHandler
                     })
                     .command({
                         command: "registry",
                         describe: "registry actions",
-                        handler: updatePackage
+                        handler: defaultRegistryCommand
                     });
             },
             handler: async () => {
@@ -91,11 +91,11 @@ export class FallbackCommand implements Command {
     }
 
     async runPackageCommand(): Promise<void> {
-        await generatePackage({});
+        await packageCommand({});
     }
 
     async runUpdateCommand(): Promise<void> {
-        await updatePackage({});
+        await updateCommandHandler({});
     }
 
     async runLoginCommand(): Promise<void> {
