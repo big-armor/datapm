@@ -13,6 +13,14 @@ jobs:
                   node-version: "14"
                   architecture: "x64" # optional, x64 or x86. If not specified, x64 will be used by default
 
+            - name: Cache Root Node_modules
+              if: steps.cache-root-node-modules.outputs.cache-hit != 'true'
+              id: cache-root-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: node_modules
+                  key: datampm-root-${{ runner.OS }}-node-modules-${{ hashFiles('package.json','package-lock.json') }}
+
             - name: Cache Lib Build
               if: steps.cache-lib-build.outputs.cache-hit != 'true'
               id: cache-lib-build
@@ -27,7 +35,11 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: client/node_modules
-                  key: datampm-client-${{ runner.OS }}-node-modules-${{ hashFiles('client/package.json','client/package-lock.json') }}
+                  key: datampm-client-${{ runner.OS }}-node-modules-${{ hashFiles('client/package.json','client/package-lock.json', 'client/npm-shrinkwrap.json') }}
+
+            - name: Install Root Dependencies
+              run: npm ci
+              if: steps.cache-root-node-modules.outputs.cache-hit != 'true'
 
             - name: Install Lib Dependencies
               run: npm ci
