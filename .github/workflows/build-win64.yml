@@ -21,6 +21,7 @@ jobs:
                   key: datampm-client-${{ runner.OS }}-node-modules-${{ hashFiles('package.json','package-lock.json') }}
 
             - run: npm ci
+              working-directory: client
               if: steps.cache-node-modules.outputs.cache-hit != 'true'
 
             - name: Run Linters
