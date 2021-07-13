@@ -5,7 +5,6 @@ import ora from "ora";
 import prompts, { PromptObject } from "prompts";
 import { SemVer } from "semver";
 import { getSink, getSinks, SinkState, SinkStateKey } from "../sink/SinkUtil";
-import { StandardOutSink } from "../sink/StandardOutSink";
 import { OraQuiet } from "../util/OraQuiet";
 import { getPackage } from "../util/PackageAccessUtil";
 import { cliHandleParameters, defaultPromptOptions, parametersToPrompts, Parameter } from "../util/ParameterUtils";
@@ -17,6 +16,7 @@ import { StreamSetPreview, InspectionResults } from "../source/SourceUtil";
 import { formatRemainingTime } from "../util/DateUtil";
 import { Listr, ListrTask } from "listr2";
 import { FetchArguments } from "./FetchCommand";
+import { TYPE as STANDARD_OUT_SINK_TYPE } from "../sink/StandardOutSink";
 
 export async function fetchPackage(argv: FetchArguments): Promise<void> {
     if (argv.quiet) {
@@ -136,7 +136,7 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
         oraRef.start(`Finding the sink named ${sinkType}`);
     }
 
-    const sink = getSink(sinkType);
+    const sink = await getSink(sinkType);
 
     if (sink == null) {
         oraRef.fail(`Could not find sink type: ${sinkType}`);
@@ -380,7 +380,7 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
         // This prints the password on the console :/
 
         let command = `datapm fetch ${argv.reference} `;
-        if (sink.getType() === new StandardOutSink().getType()) {
+        if (sink.getType() === STANDARD_OUT_SINK_TYPE) {
             command += "--quiet ";
         }
         command += `--sink ${sink.getType()} --sinkConfig '${JSON.stringify(

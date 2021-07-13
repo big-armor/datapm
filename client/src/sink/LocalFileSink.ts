@@ -1,157 +1,19 @@
-import { DPMConfiguration, PackageFile } from "datapm-lib";
-import fs from "fs";
-import os from "os";
-import path from "path";
-import { getRecordSerializer, DPMRecordSerializer } from "./writer/RecordSerializerUtil";
-import { Parameter, ParameterType } from "../util/ParameterUtils";
-import { AbstractFileSink, RecordSerializedContext } from "./AbstractFileSink";
-import { Writable, Readable, Transform } from "stream";
-import { RecordSerializerCSV } from "./writer/RecordSerializerCSV";
-import { Maybe } from "../generated/graphql";
-import { SinkState, SinkStateKey, SinkSupportedStreamOptions } from "./SinkUtil";
-import { UpdateMethod } from "../source/SourceUtil";
-import { StreamSetProcessingMethod } from "../util/StreamToSinkUtil";
+import { Sink, SinkDescription } from "./SinkUtil";
 
-export class LocalFileSink extends AbstractFileSink {
+export const DISPLAY_NAME = "Local File";
+export const TYPE = "file";
+
+export class LocalFileSinkDescription implements SinkDescription {
     getType(): string {
-        return "file";
+        return TYPE;
     }
 
     getDisplayName(): string {
-        return "Local File";
+        return DISPLAY_NAME;
     }
 
-    getDefaultParameterValues(
-        catalogSlug: string | undefined,
-        packageFile: PackageFile,
-        configuration: DPMConfiguration
-    ): DPMConfiguration {
-        const serializerTransform = getRecordSerializer(
-            (configuration.format as string) || new RecordSerializerCSV().getOutputMimeType()
-        ) as DPMRecordSerializer;
-
-        const location = path.join(
-            os.homedir(),
-            "datapm",
-            "data",
-            catalogSlug !== undefined ? catalogSlug : "_no-catalog",
-            packageFile.packageSlug,
-            packageFile.version,
-            serializerTransform.getFileExtension()
-        );
-
-        return {
-            ...super.getDefaultParameterValues(catalogSlug, packageFile, configuration),
-            fileLocation: location,
-            ...configuration
-        };
-    }
-
-    /** Return a list of supported update methods, based on the configuration, schema, and current sink state */
-    getSupportedStreamOptions(_configuration: DPMConfiguration, _sinkState: SinkState): SinkSupportedStreamOptions {
-        return {
-            updateMethods: [UpdateMethod.BATCH_FULL_SET, UpdateMethod.APPEND_ONLY_LOG],
-            streamSetProcessingMethods: [StreamSetProcessingMethod.PER_STREAM_SET, StreamSetProcessingMethod.PER_STREAM]
-        };
-    }
-
-    async getFileSinkParameters(
-        catalogSlug: string | undefined,
-        packageFile: PackageFile,
-        configuration: DPMConfiguration
-    ): Promise<Parameter[]> {
-        const defaultParameterValues: DPMConfiguration = this.getDefaultParameterValues(
-            catalogSlug,
-            packageFile,
-            configuration
-        );
-
-        if (configuration.fileLocation == null) {
-            return [
-                {
-                    configuration,
-                    type: ParameterType.Text,
-                    name: "fileLocation",
-                    defaultValue: defaultParameterValues.fileLocation as string,
-                    message: "File Location?"
-                }
-            ];
-        }
-
-        return [];
-    }
-
-    async getWritableTransform(
-        fileName: string,
-        configuration: DPMConfiguration,
-        updateMethod: UpdateMethod
-    ): Promise<{ writingTransform: Transform; outputUrl: string }> {
-        const outputUrl = configuration.fileLocation + `/${fileName}`;
-
-        if (!fs.existsSync(configuration.fileLocation as string)) {
-            fs.mkdirSync(configuration.fileLocation as string, { recursive: true });
-        }
-
-        let mode = "w";
-        if (updateMethod === UpdateMethod.APPEND_ONLY_LOG) mode = "a";
-
-        const fileHandle = fs.openSync(outputUrl, mode);
-
-        const writingTransform = new Transform({
-            objectMode: true,
-            transform: (chunk: RecordSerializedContext, encoding, callback) => {
-                fs.write(fileHandle, chunk.serializedValue, (error) => {
-                    callback(error, chunk.originalRecord);
-                });
-            },
-            final: (callback) => {
-                fs.closeSync(fileHandle);
-                callback();
-            }
-        });
-
-        return { writingTransform, outputUrl };
-    }
-
-    async getSinkStateWritable(sinkStateKey: SinkStateKey, configuration: DPMConfiguration): Promise<Writable> {
-        if (typeof configuration.fileLocation !== "string")
-            throw new Error("fileLocation configuration must be a string");
-
-        const dirname = configuration.fileLocation;
-
-        if (!fs.existsSync(dirname)) {
-            throw new Error("FileSink directory not present when saving sink state. This should not be possible!");
-        }
-
-        return fs.createWriteStream(
-            path.join(
-                dirname,
-                `${sinkStateKey.catalogSlug}-${sinkStateKey.packageSlug}-${sinkStateKey.packageMajorVersion}-state.json`
-            ),
-            {
-                flags: "w"
-            }
-        );
-    }
-
-    /** Return a list of supported update methods, based on the configuration, schema, and current sink state */
-    getSupportedUpdateMethods(_configuration: DPMConfiguration, _sinkState: SinkState): UpdateMethod[] {
-        return [UpdateMethod.BATCH_FULL_SET, UpdateMethod.APPEND_ONLY_LOG];
-    }
-
-    async getSinkStateReadable(sinkStateKey: SinkStateKey, configuration: DPMConfiguration): Promise<Maybe<Readable>> {
-        if (typeof configuration.fileLocation !== "string")
-            throw new Error("fileLocation configuration must be a string");
-
-        const dirname = configuration.fileLocation;
-
-        const stateFilePath = path.join(
-            dirname,
-            `${sinkStateKey.catalogSlug}-${sinkStateKey.packageSlug}-${sinkStateKey.packageMajorVersion}-state.json`
-        );
-
-        if (!fs.existsSync(stateFilePath)) return null;
-
-        return fs.createReadStream(stateFilePath);
+    async loadSinkFromModule(): Promise<Sink> {
+        const module = await import("./LocalFileSinkModule");
+        return new module.LocalFileSinkModule();
     }
 }

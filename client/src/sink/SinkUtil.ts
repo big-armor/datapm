@@ -3,14 +3,14 @@ import { Transform } from "stream";
 import { Maybe } from "../generated/graphql";
 import { UpdateMethod } from "../source/SourceUtil";
 import { Parameter } from "../util/ParameterUtils";
-import { BigQuerySink } from "./BigQuerySink";
-import { LocalFileSink } from "./LocalFileSink";
-import { MongoSink } from "./MongoSink";
-import { MySqlSink } from "./MySqlSink";
-import { PostgresSink } from "./PostgresSink";
-import { RedshiftSink } from "./RedshiftSink";
-import { StandardOutSink } from "./StandardOutSink";
-import { S3Sink } from "./S3Sink";
+import { BigQuerySinkDescription } from "./BigQuerySink";
+import { LocalFileSinkDescription } from "./LocalFileSink";
+import { MongoSinkDescription } from "./MongoSink";
+import { MySqlSinkDescription } from "./MySqlSink";
+import { PostgresSinkDescription } from "./PostgresSink";
+import { RedshiftSinkDescription } from "./RedshiftSink";
+import { StandardOutSinkDescription } from "./StandardOutSink";
+import { S3SinkDescription } from "./S3Sink";
 import { StreamSetProcessingMethod } from "../util/StreamToSinkUtil";
 
 export enum SinkErrors {
@@ -84,6 +84,16 @@ export interface SinkSupportedStreamOptions {
     streamSetProcessingMethods: StreamSetProcessingMethod[];
 }
 
+export interface SinkDescription {
+    /** The universally unique short name, used for configuration reference, of the sink implementation.  */
+    getType(): string;
+
+    /** The user friendly name of the sink implementation */
+    getDisplayName(): string;
+
+    /** Get the sink implementation from a module, which delays instantiating all the imports */
+    loadSinkFromModule(): Promise<Sink>;
+}
 export interface Sink {
     /** The universally unique short name, used for configuration reference, of the sink implementation.  */
     getType(): string;
@@ -154,19 +164,23 @@ export interface Sink {
     getSinkState(configuration: DPMConfiguration, SinkStateKey: SinkStateKey): Promise<Maybe<SinkState>>;
 }
 
-export function getSinks(): Sink[] {
+export function getSinks(): SinkDescription[] {
     return [
-        new LocalFileSink(),
-        new StandardOutSink(),
-        new MySqlSink(),
-        new PostgresSink(),
-        new MongoSink(),
-        new BigQuerySink(),
-        new RedshiftSink(),
-        new S3Sink()
+        new LocalFileSinkDescription(),
+        new StandardOutSinkDescription(),
+        new MySqlSinkDescription(),
+        new PostgresSinkDescription(),
+        new MongoSinkDescription(),
+        new BigQuerySinkDescription(),
+        new RedshiftSinkDescription(),
+        new S3SinkDescription()
     ];
 }
 
-export function getSink(type: string): Maybe<Sink> {
-    return getSinks().find((sink) => sink.getType() === type) || null;
+export async function getSink(type: string): Promise<Maybe<Sink>> {
+    return (
+        getSinks()
+            .find((sink) => sink.getType() === type)
+            ?.loadSinkFromModule() || null
+    );
 }
