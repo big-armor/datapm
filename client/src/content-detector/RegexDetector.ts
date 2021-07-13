@@ -5,47 +5,47 @@ export const PHONE_NUMBER_LABEL = "phone_number";
 
 /** Applies the 'phone_number' label when any single phone number is found in any value */
 export abstract class RegexDetector implements ContentLabelDetectorInterface {
-	abstract getRegExp(): RegExp;
-	abstract getLabel(): string;
+    abstract getRegExp(): RegExp;
+    abstract getLabel(): string;
 
-	valueTestedCount = 0;
-	ocurrenceCount = 0;
+    valueTestedCount = 0;
+    ocurrenceCount = 0;
 
-	getApplicableTypes(): ("string" | "number" | "boolean" | "date" | "date-time")[] {
-		return ["string"];
-	}
+    getApplicableTypes(): ("string" | "number" | "boolean" | "date" | "date-time")[] {
+        return ["string"];
+    }
 
-	getOccurenceCount(): number {
-		return this.ocurrenceCount;
-	}
+    getOccurenceCount(): number {
+        return this.ocurrenceCount;
+    }
 
-	getValueTestCount(): number {
-		return this.valueTestedCount;
-	}
+    getValueTestCount(): number {
+        return this.valueTestedCount;
+    }
 
-	inspectValue(value: string | number): void {
-		const stringValue = typeof value === "number" ? value.toString() : value;
+    inspectValue(value: string | number): void {
+        const stringValue = typeof value === "number" ? value.toString() : value;
 
-		const adjustedValue = stringValue.toLocaleString().trim();
+        const adjustedValue = stringValue.toLocaleString().trim();
 
-		const regex = this.getRegExp();
+        const regex = this.getRegExp();
 
-		if (adjustedValue.match(regex)) {
-			this.ocurrenceCount++;
-		}
+        if (adjustedValue.match(regex)) {
+            this.ocurrenceCount++;
+        }
 
-		this.valueTestedCount++;
-	}
+        this.valueTestedCount++;
+    }
 
-	getContentLabels(_propertyName: string, _existingLabels: ContentLabel[]): ContentLabel[] {
-		return [
-			{
-				ocurrenceCount: this.ocurrenceCount,
-				valuesTestedCount: this.valueTestedCount,
-				hidden: false,
-				label: this.getLabel(),
-				appliedByContentDetector: this.constructor.name
-			}
-		];
-	}
+    getContentLabels(_propertyName: string, _existingLabels: ContentLabel[]): ContentLabel[] {
+        return [
+            {
+                ocurrenceCount: this.ocurrenceCount,
+                valuesTestedCount: this.valueTestedCount,
+                hidden: false,
+                label: this.getLabel(),
+                appliedByContentDetector: this.constructor.name
+            }
+        ];
+    }
 }

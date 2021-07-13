@@ -1,5 +1,5 @@
 declare module "random-fruits-name" {
-	function getRandomFruitsName(language: string, option?: { maxWords: number }): string;
+    function getRandomFruitsName(language: string, option?: { maxWords: number }): string;
 
-	export = getRandomFruitsName;
+    export = getRandomFruitsName;
 }

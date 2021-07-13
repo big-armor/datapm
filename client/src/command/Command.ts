@@ -1,5 +1,5 @@
 import { Argv } from "yargs";
 
 export interface Command {
-	prepareCommand(argv: Argv): Argv;
+    prepareCommand(argv: Argv): Argv;
 }

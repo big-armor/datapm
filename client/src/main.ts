@@ -16,33 +16,33 @@ import { FallbackCommand } from "./command/FallbackCommand";
 let argv = yargs;
 
 const commands = [
-	new ConfigurationCommand(),
-	new RegistryCommand(),
+    new ConfigurationCommand(),
+    new RegistryCommand(),
 
-	new SearchCommand(),
-	new InfoCommand(),
-	new FetchCommand(),
-	new CompareCommand(),
+    new SearchCommand(),
+    new InfoCommand(),
+    new FetchCommand(),
+    new CompareCommand(),
 
-	new PackageCommand(),
-	new PublishPackageCommand(),
-	new UpdateCommand(),
+    new PackageCommand(),
+    new PublishPackageCommand(),
+    new UpdateCommand(),
 
-	new CatalogsCommand(),
+    new CatalogsCommand(),
 
-	new FallbackCommand()
+    new FallbackCommand()
 ];
 
 commands.forEach((command) => {
-	argv = command.prepareCommand(argv);
+    argv = command.prepareCommand(argv);
 });
 
 // eslint-disable-next-line no-unused-expressions
 yargs
-	.option("defaults", {
-		type: "boolean",
-		describe: "Use default settings"
-	})
-	.recommendCommands()
-	.strict()
-	.help().argv;
+    .option("defaults", {
+        type: "boolean",
+        describe: "Use default settings"
+    })
+    .recommendCommands()
+    .strict()
+    .help().argv;

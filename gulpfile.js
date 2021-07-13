@@ -139,6 +139,7 @@ function tagRegistryDockerImageVersion() {
     ]);
 }
 
+/* 
 function tagClientDockerImageLatest() {
     return spawnAndLog("client-docker-tag", "docker", ["tag", "datapm-client", "datapm/datapm-client:latest"]);
 }
@@ -151,6 +152,7 @@ function tagClientDockerImageVersion() {
     ]);
 }
 
+*/
 function pushRegistryDockerImage() {
     return spawnAndLog("registry-docker-push-docker", "docker", [
         "push",
@@ -162,6 +164,7 @@ function pushRegistryDockerImageLatest() {
     return spawnAndLog("registry-docker-push-docker", "docker", ["push", "datapm/datapm-registry:latest"]);
 }
 
+/* 
 function pushClientDockerImage() {
     return spawnAndLog("client-docker-push-docker", "docker", ["push", "datapm/datapm-client:" + readPackageVersion()]);
 }
@@ -169,6 +172,7 @@ function pushClientDockerImage() {
 function pushClientDockerImageLatest() {
     return spawnAndLog("client-docker-push-docker", "docker", ["push", "datapm/datapm-client:latest"]);
 }
+*/
 
 function gitPushTag() {
     return spawnAndLog("git-tag-push", "git", ["push", "origin", "v" + readPackageVersion()]);
@@ -272,7 +276,7 @@ exports.deployAssets = series(
     pushRegistryGCRImageLatest,
     pushRegistryDockerImage,
     pushRegistryDockerImageLatest
-    //vpushClientDockerImage,
+    // pushClientDockerImage,
     // pushClientDockerImageLatest
 );
 

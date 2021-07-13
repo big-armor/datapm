@@ -9,131 +9,131 @@ import { RecordSerializedContext } from "../AbstractFileSink";
 import { DPMRecordSerializer } from "./RecordSerializerUtil";
 
 class BlockEncoder extends avro.streams.BlockEncoder {
-	// eslint-disable-next-line
-	_transform(chunk: any, _encoding: BufferEncoding, callback: TransformCallback) {
-		callback(null, chunk);
-	}
+    // eslint-disable-next-line
+    _transform(chunk: any, _encoding: BufferEncoding, callback: TransformCallback) {
+        callback(null, chunk);
+    }
 
-	_flush(callback: TransformCallback) {
-		callback();
-	}
+    _flush(callback: TransformCallback) {
+        callback();
+    }
 }
 
 export class RecordSerializerAVRO implements DPMRecordSerializer {
-	fileStream: Writable;
-	schema: Schema;
-	configuration: DPMConfiguration;
+    fileStream: Writable;
+    schema: Schema;
+    configuration: DPMConfiguration;
 
-	getDisplayName(): string {
-		return "AVRO";
-	}
+    getDisplayName(): string {
+        return "AVRO";
+    }
 
-	isStronglyTyped(_configuration: DPMConfiguration): boolean {
-		return true;
-	}
+    isStronglyTyped(_configuration: DPMConfiguration): boolean {
+        return true;
+    }
 
-	getOutputMimeType(): string {
-		return "application/avro";
-	}
+    getOutputMimeType(): string {
+        return "application/avro";
+    }
 
-	getFileExtension(): string {
-		return "avro";
-	}
+    getFileExtension(): string {
+        return "avro";
+    }
 
-	getDefaultParameterValues(
-		_catalogSlug: string | undefined,
-		_packageFile: PackageFile,
-		_configuration: DPMConfiguration
-	): DPMConfiguration {
-		return {};
-	}
+    getDefaultParameterValues(
+        _catalogSlug: string | undefined,
+        _packageFile: PackageFile,
+        _configuration: DPMConfiguration
+    ): DPMConfiguration {
+        return {};
+    }
 
-	/** Return parameters interatively until no more questions are needed to be answered */
-	getParameters(_packageFile: PackageFile, _configuration: DPMConfiguration): Parameter[] {
-		return [];
-	}
+    /** Return parameters interatively until no more questions are needed to be answered */
+    getParameters(_packageFile: PackageFile, _configuration: DPMConfiguration): Parameter[] {
+        return [];
+    }
 
-	sanitizeName(name: string): string {
-		return name.replace(/[\s-/]/g, "_");
-	}
+    sanitizeName(name: string): string {
+        return name.replace(/[\s-/]/g, "_");
+    }
 
-	getAvroSchema(schema: Schema): avro.Type {
-		return avro.Type.forSchema({
-			name: this.sanitizeName(schema.title as string),
-			type: "record",
-			fields: Object.keys(schema.properties as Properties).map((field) => {
-				const property = (schema.properties as Properties)[field];
-				const propertyTypes = (property.type as JSONSchema7TypeName[]).filter((type) => type !== "null");
-				let propertyType = propertyTypes[0] as string;
-				if (propertyTypes.includes("number")) {
-					if (property.format?.includes("float")) propertyType = "float";
-					else propertyType = "int";
-				}
-				return {
-					name: this.sanitizeName(field),
-					type: propertyType
-				};
-			})
-		});
-	}
+    getAvroSchema(schema: Schema): avro.Type {
+        return avro.Type.forSchema({
+            name: this.sanitizeName(schema.title as string),
+            type: "record",
+            fields: Object.keys(schema.properties as Properties).map((field) => {
+                const property = (schema.properties as Properties)[field];
+                const propertyTypes = (property.type as JSONSchema7TypeName[]).filter((type) => type !== "null");
+                let propertyType = propertyTypes[0] as string;
+                if (propertyTypes.includes("number")) {
+                    if (property.format?.includes("float")) propertyType = "float";
+                    else propertyType = "int";
+                }
+                return {
+                    name: this.sanitizeName(field),
+                    type: propertyType
+                };
+            })
+        });
+    }
 
-	async getTransforms(
-		schema: Schema,
-		configuration: DPMConfiguration,
-		_updateMethod: UpdateMethod
-	): Promise<Transform[]> {
-		// eslint-disable-next-line
-		const self = this;
-		this.schema = schema;
-		this.configuration = configuration;
-		const avroSchema = this.getAvroSchema(schema);
+    async getTransforms(
+        schema: Schema,
+        configuration: DPMConfiguration,
+        _updateMethod: UpdateMethod
+    ): Promise<Transform[]> {
+        // eslint-disable-next-line
+        const self = this;
+        this.schema = schema;
+        this.configuration = configuration;
+        const avroSchema = this.getAvroSchema(schema);
 
-		return [
-			new Transform({
-				objectMode: true,
-				transform(records: RecordStreamContext[], _encoding, callback) {
-					for (const record of records) {
-						const recordData = record.recordContext.record;
-						Object.keys(recordData).forEach((key) => {
-							const validKey = self.sanitizeName(key);
-							recordData[validKey] = recordData[key];
-							if (validKey !== key) {
-								delete recordData[key];
-							}
+        return [
+            new Transform({
+                objectMode: true,
+                transform(records: RecordStreamContext[], _encoding, callback) {
+                    for (const record of records) {
+                        const recordData = record.recordContext.record;
+                        Object.keys(recordData).forEach((key) => {
+                            const validKey = self.sanitizeName(key);
+                            recordData[validKey] = recordData[key];
+                            if (validKey !== key) {
+                                delete recordData[key];
+                            }
 
-							const property = (schema.properties as Properties)[key];
-							const types = (property.type as JSONSchema7TypeName[]).filter((type) => type !== "null");
-							const formats = (property.format || "").split(",").filter((type) => type !== "null");
-							const valueType = {
-								type: types[0],
-								format: formats[0]
-							};
-							recordData[validKey] = convertValueByValueType(recordData[validKey], valueType);
-							if (recordData[validKey] === null) {
-								if (valueType.type === "string") {
-									recordData[validKey] = "";
-								} else if (valueType.type === "number") {
-									recordData[validKey] = 0;
-								}
-							}
-						});
-						this.push(recordData);
-					}
-					callback(null);
-				}
-			}),
-			new BlockEncoder(avroSchema),
-			new Transform({
-				objectMode: true,
-				transform(chunk, _encoding, callback) {
-					const recordSerializedContext: RecordSerializedContext = {
-						originalRecord: null,
-						serializedValue: chunk
-					};
+                            const property = (schema.properties as Properties)[key];
+                            const types = (property.type as JSONSchema7TypeName[]).filter((type) => type !== "null");
+                            const formats = (property.format || "").split(",").filter((type) => type !== "null");
+                            const valueType = {
+                                type: types[0],
+                                format: formats[0]
+                            };
+                            recordData[validKey] = convertValueByValueType(recordData[validKey], valueType);
+                            if (recordData[validKey] === null) {
+                                if (valueType.type === "string") {
+                                    recordData[validKey] = "";
+                                } else if (valueType.type === "number") {
+                                    recordData[validKey] = 0;
+                                }
+                            }
+                        });
+                        this.push(recordData);
+                    }
+                    callback(null);
+                }
+            }),
+            new BlockEncoder(avroSchema),
+            new Transform({
+                objectMode: true,
+                transform(chunk, _encoding, callback) {
+                    const recordSerializedContext: RecordSerializedContext = {
+                        originalRecord: null,
+                        serializedValue: chunk
+                    };
 
-					callback(null, recordSerializedContext);
-				}
-			})
-		];
-	}
+                    callback(null, recordSerializedContext);
+                }
+            })
+        ];
+    }
 }

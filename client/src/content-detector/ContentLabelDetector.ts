@@ -21,129 +21,129 @@ import { GeoLongitudePropertyNameDetector } from "./GeoLongitudePropertyNameDete
 declare type Class<T extends ContentLabelDetectorInterface> = new () => T;
 
 export const ContentLabelDetectors: Class<ContentLabelDetectorInterface>[] = [
-	SocialSecurityNumberDetector,
-	CreditCardNumberDetector,
-	IpV6AddressDetector,
-	IpV4AddressDetector,
-	PhoneNumberDetector,
-	PersonNameDetector,
-	EmailAddressDetector,
-	GenderPropertyNameDetector,
-	DateOfBirthPropertyNameDetector,
-	DriversLicensePropertyNameDetector,
-	AgePropertyNameDetector,
-	UsernamePropertyNameDetector,
-	EthnicityPropertyNameDetector,
-	SecretPropertyNameDetector,
-	PassportPropertyNameDetector,
-	NPIPropertyNameDetector,
-	GeoLatitudePropertyNameDetector,
-	GeoLongitudePropertyNameDetector
+    SocialSecurityNumberDetector,
+    CreditCardNumberDetector,
+    IpV6AddressDetector,
+    IpV4AddressDetector,
+    PhoneNumberDetector,
+    PersonNameDetector,
+    EmailAddressDetector,
+    GenderPropertyNameDetector,
+    DateOfBirthPropertyNameDetector,
+    DriversLicensePropertyNameDetector,
+    AgePropertyNameDetector,
+    UsernamePropertyNameDetector,
+    EthnicityPropertyNameDetector,
+    SecretPropertyNameDetector,
+    PassportPropertyNameDetector,
+    NPIPropertyNameDetector,
+    GeoLatitudePropertyNameDetector,
+    GeoLongitudePropertyNameDetector
 
-	/* 
+    /* 
 	DEATH DATE
 	PERSONAL ATTRIBUTE (HEIGHT, WEIGHT, )
 	DNA?  */
 ];
 
 export interface ContentLabelDetectorInterface {
-	getApplicableTypes(): ("string" | "number" | "boolean" | "date" | "date-time")[];
+    getApplicableTypes(): ("string" | "number" | "boolean" | "date" | "date-time")[];
 
-	/** Given a value, return a list of the labels present
-	 */
-	inspectValue(value: string | number): void;
+    /** Given a value, return a list of the labels present
+     */
+    inspectValue(value: string | number): void;
 
-	getOccurenceCount(): number;
+    getOccurenceCount(): number;
 
-	getValueTestCount(): number;
+    getValueTestCount(): number;
 
-	/** Based on the observed state, and the existing labels applied by the same implementation, return a complete set of content labels that should be applied  */
-	getContentLabels(propertyName: string, existingLabels: ContentLabel[]): ContentLabel[];
+    /** Based on the observed state, and the existing labels applied by the same implementation, return a complete set of content labels that should be applied  */
+    getContentLabels(propertyName: string, existingLabels: ContentLabel[]): ContentLabel[];
 }
 
 export function getContentLabelDetectorsForValueType(valueType: string): ContentLabelDetectorInterface[] {
-	const returnValue: ContentLabelDetectorInterface[] = [];
+    const returnValue: ContentLabelDetectorInterface[] = [];
 
-	for (const detector of ContentLabelDetectors) {
-		// eslint-disable-next-line new-cap
-		const instance = new detector();
+    for (const detector of ContentLabelDetectors) {
+        // eslint-disable-next-line new-cap
+        const instance = new detector();
 
-		if (instance.getApplicableTypes().includes(valueType as "string" | "number")) returnValue.push(instance);
-	}
+        if (instance.getApplicableTypes().includes(valueType as "string" | "number")) returnValue.push(instance);
+    }
 
-	return returnValue;
+    return returnValue;
 }
 export class ContentLabelDetector {
-	/** First level is the property name, second is the value type  */
-	contentLabelDetectors: Record<string, Record<string, ContentLabelDetectorInterface[]>>;
+    /** First level is the property name, second is the value type  */
+    contentLabelDetectors: Record<string, Record<string, ContentLabelDetectorInterface[]>>;
 
-	constructor() {
-		this.contentLabelDetectors = {};
-	}
+    constructor() {
+        this.contentLabelDetectors = {};
+    }
 
-	inspectValue(schemaSlug: string, propertyName: string, value: unknown): void {
-		const valueType = typeof value;
+    inspectValue(_schemaSlug: string, propertyName: string, value: unknown): void {
+        const valueType = typeof value;
 
-		if (this.contentLabelDetectors[propertyName] == null) this.contentLabelDetectors[propertyName] = {};
+        if (this.contentLabelDetectors[propertyName] == null) this.contentLabelDetectors[propertyName] = {};
 
-		if (this.contentLabelDetectors[propertyName][valueType] == null)
-			this.contentLabelDetectors[propertyName][valueType] = getContentLabelDetectorsForValueType(valueType);
+        if (this.contentLabelDetectors[propertyName][valueType] == null)
+            this.contentLabelDetectors[propertyName][valueType] = getContentLabelDetectorsForValueType(valueType);
 
-		for (const contentLabelDetector of this.contentLabelDetectors[propertyName][valueType]) {
-			const valueTestedCount = contentLabelDetector.getValueTestCount();
+        for (const contentLabelDetector of this.contentLabelDetectors[propertyName][valueType]) {
+            const valueTestedCount = contentLabelDetector.getValueTestCount();
 
-			let inspect = true;
+            let inspect = true;
 
-			if (valueTestedCount > 100) inspect = Math.random() < 1 / valueTestedCount;
+            if (valueTestedCount > 100) inspect = Math.random() < 1 / valueTestedCount;
 
-			if (inspect) contentLabelDetector.inspectValue(value as string | number);
-		}
-	}
+            if (inspect) contentLabelDetector.inspectValue(value as string | number);
+        }
+    }
 
-	/** Applies the detected labels to the schema, while preserving prior labels and their hidden attribute */
-	applyLabelsToSchemas(schemas: Schema[]): void {
-		for (const schema of schemas) {
-			if (schema.properties == null) continue;
+    /** Applies the detected labels to the schema, while preserving prior labels and their hidden attribute */
+    applyLabelsToSchemas(schemas: Schema[]): void {
+        for (const schema of schemas) {
+            if (schema.properties == null) continue;
 
-			for (const propertyName of Object.keys(schema.properties)) {
-				const property = schema.properties[propertyName];
+            for (const propertyName of Object.keys(schema.properties)) {
+                const property = schema.properties[propertyName];
 
-				if (property.valueTypes == null) continue;
+                if (property.valueTypes == null) continue;
 
-				for (const valueType of Object.keys(property.valueTypes || {})) {
-					const labels: ContentLabel[] = [];
+                for (const valueType of Object.keys(property.valueTypes || {})) {
+                    const labels: ContentLabel[] = [];
 
-					const contentLabelDetectors = this.contentLabelDetectors[propertyName][valueType];
+                    const contentLabelDetectors = this.contentLabelDetectors[propertyName][valueType];
 
-					if (contentLabelDetectors == null) continue;
+                    if (contentLabelDetectors == null) continue;
 
-					for (const contentLabelDetector of contentLabelDetectors) {
-						const existingLabels = property.valueTypes[valueType].contentLabels;
+                    for (const contentLabelDetector of contentLabelDetectors) {
+                        const existingLabels = property.valueTypes[valueType].contentLabels;
 
-						const newLabels = contentLabelDetector.getContentLabels(propertyName, existingLabels || []);
+                        const newLabels = contentLabelDetector.getContentLabels(propertyName, existingLabels || []);
 
-						for (const newLabel of newLabels) {
-							if (newLabel.ocurrenceCount === 0) continue;
+                        for (const newLabel of newLabels) {
+                            if (newLabel.ocurrenceCount === 0) continue;
 
-							const oldLabel = existingLabels?.find((l) => l.label === newLabel.label);
+                            const oldLabel = existingLabels?.find((l) => l.label === newLabel.label);
 
-							if (oldLabel != null) {
-								newLabel.hidden = oldLabel.hidden === true ? true : newLabel.hidden;
-							}
+                            if (oldLabel != null) {
+                                newLabel.hidden = oldLabel.hidden === true ? true : newLabel.hidden;
+                            }
 
-							labels.push(newLabel);
-						}
+                            labels.push(newLabel);
+                        }
 
-						for (const oldLabel of existingLabels || []) {
-							const newLabel = labels.find((l) => l.label === oldLabel.label);
-							if (newLabel != null) continue;
-							labels.push(oldLabel);
-						}
-					}
+                        for (const oldLabel of existingLabels || []) {
+                            const newLabel = labels.find((l) => l.label === oldLabel.label);
+                            if (newLabel != null) continue;
+                            labels.push(oldLabel);
+                        }
+                    }
 
-					property.valueTypes[valueType].contentLabels = labels;
-				}
-			}
-		}
-	}
+                    property.valueTypes[valueType].contentLabels = labels;
+                }
+            }
+        }
+    }
 }

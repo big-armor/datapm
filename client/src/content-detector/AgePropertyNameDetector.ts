@@ -2,15 +2,15 @@ import { PropertyNameDetectorBase } from "./PropertyNameDetectorBase";
 
 export const AGE_LABEL = "age";
 export class AgePropertyNameDetector extends PropertyNameDetectorBase {
-	getApplicableTypes(): ("string" | "number" | "boolean" | "date" | "date-time")[] {
-		return ["number"];
-	}
+    getApplicableTypes(): ("string" | "number" | "boolean" | "date" | "date-time")[] {
+        return ["number"];
+    }
 
-	getPropertyNameMatches(): RegExp[] {
-		return [/^age$/i];
-	}
+    getPropertyNameMatches(): RegExp[] {
+        return [/^age$/i];
+    }
 
-	getLabel(): string {
-		return AGE_LABEL;
-	}
+    getLabel(): string {
+        return AGE_LABEL;
+    }
 }

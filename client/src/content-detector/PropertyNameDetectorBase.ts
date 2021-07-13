@@ -2,43 +2,43 @@ import { ContentLabel } from "datapm-lib";
 import { ContentLabelDetectorInterface } from "./ContentLabelDetector";
 
 export abstract class PropertyNameDetectorBase implements ContentLabelDetectorInterface {
-	abstract getApplicableTypes(): ("string" | "number" | "boolean" | "date" | "date-time")[];
-	abstract getPropertyNameMatches(): RegExp[];
-	abstract getLabel(): string;
+    abstract getApplicableTypes(): ("string" | "number" | "boolean" | "date" | "date-time")[];
+    abstract getPropertyNameMatches(): RegExp[];
+    abstract getLabel(): string;
 
-	valueTestCount = 0;
+    valueTestCount = 0;
 
-	inspectValue(_value: string | number): void {
-		// Do nothing, because we're just looking at the property name
-	}
+    inspectValue(_value: string | number): void {
+        // Do nothing, because we're just looking at the property name
+    }
 
-	getOccurenceCount(): number {
-		return 0;
-	}
+    getOccurenceCount(): number {
+        return 0;
+    }
 
-	getValueTestCount(): number {
-		return this.valueTestCount;
-	}
+    getValueTestCount(): number {
+        return this.valueTestCount;
+    }
 
-	getContentLabels(propertyName: string, _existingLabels: ContentLabel[]): ContentLabel[] {
-		const propertyNameMatches = this.getPropertyNameMatches();
+    getContentLabels(propertyName: string, _existingLabels: ContentLabel[]): ContentLabel[] {
+        const propertyNameMatches = this.getPropertyNameMatches();
 
-		let found = false;
-		for (const match of propertyNameMatches) {
-			if (propertyName.match(match) != null) {
-				found = true;
-				break;
-			}
-		}
+        let found = false;
+        for (const match of propertyNameMatches) {
+            if (propertyName.match(match) != null) {
+                found = true;
+                break;
+            }
+        }
 
-		return [
-			{
-				ocurrenceCount: found ? 1 : 0,
-				valuesTestedCount: this.valueTestCount,
-				hidden: !found,
-				label: this.getLabel(),
-				appliedByContentDetector: this.constructor.name
-			}
-		];
-	}
+        return [
+            {
+                ocurrenceCount: found ? 1 : 0,
+                valuesTestedCount: this.valueTestCount,
+                hidden: !found,
+                label: this.getLabel(),
+                appliedByContentDetector: this.constructor.name
+            }
+        ];
+    }
 }

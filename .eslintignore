@@ -1,20 +1,13 @@
-node_modules
-dist
-
-backend
-#backend/node_modules
-#backend/dist
-#backend/src/generated
-#backend/test/integration/registry-client.ts
-
-frontend
-#frontend/node_modules
-#frontend/dist
-#frontend/src/generated
-
-lib/node_modules
-lib/dist
+# TODO Needs Linting
 
 docs
-# docs/website/node_modules
-# docs/website/build
+
+# Has its own linting
+frontend
+client
+
+# Never Lint
+node_modules
+dist
+lib/node_modules
+lib/dist

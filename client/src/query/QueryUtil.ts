@@ -1,19 +1,19 @@
 import { PostgresQueryEngine } from "./PostgresQueryEngine";
 
 export interface QueryEngine {
-	identifier(): string;
-	prepare(): Promise<boolean>;
-	query(query: string): Promise<QueryResults>;
+    identifier(): string;
+    prepare(): Promise<boolean>;
+    query(query: string): Promise<QueryResults>;
 }
 
 export interface QueryResults {
-	success: boolean;
+    success: boolean;
 }
 
 export function getQueryEngines(): QueryEngine[] {
-	return [new PostgresQueryEngine()];
+    return [new PostgresQueryEngine()];
 }
 
 export function getQueryEngine(identifier: string): QueryEngine | undefined {
-	return getQueryEngines().find((queryEngine) => queryEngine.identifier() === identifier);
+    return getQueryEngines().find((queryEngine) => queryEngine.identifier() === identifier);
 }

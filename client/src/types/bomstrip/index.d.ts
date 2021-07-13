@@ -1,7 +1,7 @@
 declare module "bomstrip" {
-	import { Readable, Transform } from "stream";
+    import { Readable, Transform } from "stream";
 
-	class BomStrippingStream extends Transform {}
+    class BomStrippingStream extends Transform {}
 
-	export = BomStrippingStream;
+    export = BomStrippingStream;
 }

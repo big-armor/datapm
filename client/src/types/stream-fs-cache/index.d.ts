@@ -1,9 +1,9 @@
 declare module "stream-fs-cache" {
-	import { Duplex, DuplexOptions } from "stream";
+    import { Duplex, DuplexOptions } from "stream";
 
-	class StreamFsCache extends Duplex {
-		constructor(path: string, opts?: DuplexOptions);
-	}
+    class StreamFsCache extends Duplex {
+        constructor(path: string, opts?: DuplexOptions);
+    }
 
-	export = StreamFsCache;
+    export = StreamFsCache;
 }
