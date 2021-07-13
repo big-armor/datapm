@@ -12,13 +12,13 @@ jobs:
                   node-version: "14"
                   architecture: "x64" # optional, x64 or x86. If not specified, x64 will be used by default
 
-            - name: Cache Lib Node_modules
-              if: steps.cache-lib-node-modules.outputs.cache-hit != 'true'
-              id: cache-lib-node-modules
+            - name: Cache Lib Build
+              if: steps.cache-lib-build.outputs.cache-hit != 'true'
+              id: cache-lib-build
               uses: actions/cache@v1
               with:
-                  path: lib/node_modules
-                  key: datampm-lib-${{ runner.OS }}-node-modules-${{ hashFiles('lib/package.json','lib/package-lock.json') }}
+                  path: lib/dist
+                  key: datampm-lib-${{ runner.OS }}-build-${{ hashFiles('lib/*') }}
 
             - name: Cache Client Node_modules
               if: steps.cache-client-node-modules.outputs.cache-hit != 'true'
@@ -28,9 +28,15 @@ jobs:
                   path: client/node_modules
                   key: datampm-client-${{ runner.OS }}-node-modules-${{ hashFiles('client/package.json','client/package-lock.json') }}
 
-            - run: npm ci
+            - name: Install Lib Dependencies
+              run: npm ci
               working-directory: lib
-              if: steps.cache-lib-node-modules.outputs.cache-hit != 'true'
+              if: steps.cache-lib-build.outputs.cache-hit != 'true'
+
+            - name: Build Lib
+              run: npm run build
+              working-directory: lib
+              if: steps.cache-lib-build.outputs.cache-hit != 'true'
 
             - run: npm ci
               working-directory: client
