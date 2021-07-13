@@ -333,8 +333,9 @@ export abstract class KnexSink implements Sink {
                             .where({
                                 [this.mapSinkStateKeyToColumnName("catalogSlug")]: _sinkStateKey.catalogSlug,
                                 [this.mapSinkStateKeyToColumnName("packageSlug")]: _sinkStateKey.packageSlug,
-                                [this.mapSinkStateKeyToColumnName("packageMajorVersion")]:
-                                    _sinkStateKey.packageMajorVersion
+                                [this.mapSinkStateKeyToColumnName(
+                                    "packageMajorVersion"
+                                )]: _sinkStateKey.packageMajorVersion
                             });
 
                         if (state == null || state.length === 0) resolve(null);

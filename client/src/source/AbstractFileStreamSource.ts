@@ -92,7 +92,7 @@ export abstract class AbstractFileStreamSource implements SourceInterface {
             if (
                 configuration.updateMethod == null ||
                 !parserInspectionResults.updateMethods.includes(
-                    UpdateMethod[configuration.updateMethod as string as keyof typeof UpdateMethod]
+                    UpdateMethod[(configuration.updateMethod as string) as keyof typeof UpdateMethod]
                 )
             ) {
                 await context.parameterPrompt([

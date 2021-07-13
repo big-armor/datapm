@@ -370,7 +370,7 @@ function createRegistryClient(url: string, jwt: string | undefined) {
     }
 
     const httpLink = new HttpLink({
-        fetch: fetch as unknown as WindowOrWorkerGlobalScope["fetch"],
+        fetch: (fetch as unknown) as WindowOrWorkerGlobalScope["fetch"],
         headers,
         uri: `${url}/graphql`
     });
