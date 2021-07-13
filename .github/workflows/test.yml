@@ -225,6 +225,19 @@ jobs:
               run: npm run build
               working-directory: lib
 
+            - name: Cache Backend Node_modules
+              id: cache-backend-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: backend/node_modules
+                  key: datampm-registry-${{ runner.OS }}-backend-${{ hashFiles('backend/package.json', 'backend/package-lock.json') }}
+
+            - name: Install Backend Dependencies
+              id: install-backend-Dependencies
+              if: steps.cache-backend-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: backend
+
             - name: Cache Client Node_modules
               id: cache-client-node-modules
               uses: actions/cache@v1
