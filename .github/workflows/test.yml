@@ -36,12 +36,6 @@ jobs:
             - name: Run ESLint
               run: npm run lint
 
-            - name: Run Prettier linter
-              uses: wearerequired/lint-action@v1.6.0
-              with:
-                  github_token: ${{ secrets.github_token }}
-                  prettier: true
-
     testLib:
         name: "Test Lib"
         needs: lint
@@ -86,6 +80,7 @@ jobs:
 
     testBackend:
         name: "Test Backend"
+        needs: lint
         timeout-minutes: 5
         runs-on: ubuntu-latest
         steps:
@@ -140,6 +135,7 @@ jobs:
 
     testFrontend:
         name: "Test Frontend"
+        needs: lint
         timeout-minutes: 5
         runs-on: ubuntu-latest
         steps:
@@ -194,6 +190,7 @@ jobs:
 
     testClient:
         name: "Test Client"
+        needs: lint
         timeout-minutes: 5
         runs-on: ubuntu-latest
         steps:
@@ -233,7 +230,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: client/node_modules
-                  key: datampm-client-${{ runner.OS }}-${{ hashFiles('client/package.json', 'client/package-lock.json') }}
+                  key: datampm-client-${{ runner.OS }}-${{ hashFiles('client/package.json', 'client/package-lock.json', 'client/npm-shrinkwrap.json') }}
 
             - name: Install Client Dependencies
               id: install-client-dependencies

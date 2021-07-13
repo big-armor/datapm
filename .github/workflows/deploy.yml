@@ -38,12 +38,6 @@ jobs:
             - name: Run ESLint
               run: npm run lint
 
-            - name: Run Prettier linter
-              uses: wearerequired/lint-action@v1.6.0
-              with:
-                  github_token: ${{ secrets.github_token }}
-                  prettier: true
-
             - name: Setup Terraform
               uses: hashicorp/setup-terraform@v1
 

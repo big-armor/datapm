@@ -4,7 +4,7 @@ on:
 jobs:
     build:
         runs-on: windows-latest
-        name: Node sample
+        name: Windows Build Node Client
         steps:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v2
