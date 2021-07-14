@@ -13,7 +13,7 @@ import { UserRepository } from "../repository/UserRepository";
 import { emailAddressValid } from "datapm-lib";
 import { sendInviteUser, sendShareNotification, validateMessageContents } from "../util/smtpUtil";
 import { CollectionRepository } from "../repository/CollectionRepository";
-import { asyncForEach } from "../util/AsyncForEach";
+import { asyncForEach } from "../util/AsyncUtils";
 import { ValidationError } from "apollo-server";
 import { getCollectionFromCacheOrDbOrFail } from "./CollectionResolver";
 import { deleteCollectionFollowByUserId } from "./FollowResolver";
