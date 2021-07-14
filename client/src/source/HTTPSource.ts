@@ -1,7 +1,7 @@
 import { DPMConfiguration } from "datapm-lib";
 import http, { IncomingMessage } from "http";
 import https from "https";
-import { FileOpenStreamContext, FileStreamContext } from "../parser/ParserUtil";
+import { FileOpenStreamContext, FileStreamContext } from "../parser/Parser";
 import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { AbstractFileStreamSource } from "./AbstractFileStreamSource";
 

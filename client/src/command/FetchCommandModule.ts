@@ -4,7 +4,7 @@ import numeral from "numeral";
 import ora from "ora";
 import prompts, { PromptObject } from "prompts";
 import { SemVer } from "semver";
-import { getSink, getSinks, SinkState, SinkStateKey } from "../sink/SinkUtil";
+import { SinkState, SinkStateKey } from "../sink/Sink";
 import { OraQuiet } from "../util/OraQuiet";
 import { getPackage } from "../util/PackageAccessUtil";
 import { cliHandleParameters, parametersToPrompts } from "../util/parameters/ParameterUtils";
@@ -12,13 +12,14 @@ import { inspectSourceConnection } from "../util/SchemaUtil";
 
 import ON_DEATH from "death";
 import { fetch, FetchOutcome, newRecordsAvailable } from "../util/StreamToSinkUtil";
-import { StreamSetPreview, InspectionResults } from "../source/SourceUtil";
+import { StreamSetPreview, InspectionResults } from "../source/Source";
 import { formatRemainingTime } from "../util/DateUtil";
 import { Listr, ListrTask } from "listr2";
 import { FetchArguments } from "./FetchCommand";
 import { TYPE as STANDARD_OUT_SINK_TYPE } from "../sink/StandardOutSink";
 import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
 import { Parameter } from "../util/parameters/Parameter";
+import { getSink, getSinks } from "../sink/SinkUtil";
 
 export async function fetchPackage(argv: FetchArguments): Promise<void> {
     if (argv.quiet) {
@@ -164,7 +165,7 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
     }
 
     if (argv.defaults) {
-        sinkConfiguration = sink.getDefaultParameterValues(
+        sinkConfiguration = await sink.getDefaultParameterValues(
             packageFileWithContext.catalogSlug,
             packageFile,
             sinkConfiguration

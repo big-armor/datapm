@@ -4,14 +4,15 @@ import { ColumnOption } from "csv-parse";
 import csvParser from "csv-parse/lib/sync";
 import { DPMConfiguration, DPMRecord } from "datapm-lib";
 import { Transform } from "stream";
-import { Maybe } from "../generated/graphql";
-import { FileBufferSummary } from "../parser/ParserUtil";
-import { StreamState } from "../sink/SinkUtil";
-import { RecordContext, SourceInspectionContext, UpdateMethod } from "../source/SourceUtil";
+
+import { FileBufferSummary } from "../parser/Parser";
+import { StreamState } from "../sink/Sink";
+import { RecordContext, SourceInspectionContext, UpdateMethod } from "../source/Source";
 import { ByteBatchingTransform } from "../source/transforms/ByteBatchingTransform";
 import { RecordCountOffsetTransform } from "../source/transforms/RecordCountOffsetTransform";
+import { Maybe } from "../util/Maybe";
 import { ParameterType } from "../util/parameters/Parameter";
-import { ParserInspectionResults, Parser } from "./ParserUtil";
+import { ParserInspectionResults, Parser } from "./Parser";
 
 export class CSVParser implements Parser {
     getFileExtensions(): string[] {

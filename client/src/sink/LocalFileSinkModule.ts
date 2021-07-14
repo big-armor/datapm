@@ -2,16 +2,17 @@ import { DPMConfiguration, PackageFile } from "datapm-lib";
 import fs from "fs";
 import os from "os";
 import path from "path";
-import { getRecordSerializer, DPMRecordSerializer } from "./writer/RecordSerializerUtil";
+import { getRecordSerializer } from "./writer/RecordSerializerUtil";
 import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { AbstractFileSink, RecordSerializedContext } from "./AbstractFileSink";
 import { Writable, Readable, Transform } from "stream";
 import { RecordSerializerCSV } from "./writer/RecordSerializerCSV";
-import { Maybe } from "../generated/graphql";
-import { SinkState, SinkStateKey, SinkSupportedStreamOptions } from "./SinkUtil";
-import { UpdateMethod } from "../source/SourceUtil";
+import { Maybe } from "../util/Maybe";
+import { SinkState, SinkStateKey, SinkSupportedStreamOptions } from "./Sink";
+import { UpdateMethod } from "../source/Source";
 import { StreamSetProcessingMethod } from "../util/StreamToSinkUtil";
 import { DISPLAY_NAME, TYPE } from "./LocalFileSink";
+import { DPMRecordSerializer } from "./writer/RecordSerializer";
 
 export class LocalFileSinkModule extends AbstractFileSink {
     getType(): string {
@@ -22,14 +23,14 @@ export class LocalFileSinkModule extends AbstractFileSink {
         return DISPLAY_NAME;
     }
 
-    getDefaultParameterValues(
+    async getDefaultParameterValues(
         catalogSlug: string | undefined,
         packageFile: PackageFile,
         configuration: DPMConfiguration
-    ): DPMConfiguration {
-        const serializerTransform = getRecordSerializer(
+    ): Promise<DPMConfiguration> {
+        const serializerTransform = (await getRecordSerializer(
             (configuration.format as string) || new RecordSerializerCSV().getOutputMimeType()
-        ) as DPMRecordSerializer;
+        )) as DPMRecordSerializer;
 
         const location = path.join(
             os.homedir(),
@@ -61,7 +62,7 @@ export class LocalFileSinkModule extends AbstractFileSink {
         packageFile: PackageFile,
         configuration: DPMConfiguration
     ): Promise<Parameter[]> {
-        const defaultParameterValues: DPMConfiguration = this.getDefaultParameterValues(
+        const defaultParameterValues: DPMConfiguration = await this.getDefaultParameterValues(
             catalogSlug,
             packageFile,
             configuration

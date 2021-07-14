@@ -5,11 +5,11 @@ import { BigQuery, TableField } from "@google-cloud/bigquery";
 import moment from "moment";
 import { SemVer } from "semver";
 import { Transform } from "stream";
-import { Maybe } from "../generated/graphql";
-import { ExtendedJSONSchema7TypeName, RecordStreamContext, UpdateMethod } from "../source/SourceUtil";
+import { Maybe } from "../util/Maybe";
+import { ExtendedJSONSchema7TypeName, RecordStreamContext, UpdateMethod } from "../source/Source";
 import { convertValueByValueType, discoverValueType } from "../source/transforms/StatsTransform";
 import { Parameter, ParameterType } from "../util/parameters/Parameter";
-import { Sink, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWithContext } from "./SinkUtil";
+import { Sink, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWithContext } from "./Sink";
 import { StreamSetProcessingMethod } from "../util/StreamToSinkUtil";
 import { DISPLAY_NAME, TYPE } from "./BigQuerySink";
 
@@ -52,11 +52,11 @@ export class BigQuerySinkModule implements Sink {
         return name.replace(/[.\-\s/\\]/g, "_");
     }
 
-    getDefaultParameterValues(
+    async getDefaultParameterValues(
         catalogSlug: string | undefined,
         packageFile: PackageFile,
         configuration: DPMConfiguration
-    ): DPMConfiguration {
+    ): Promise<DPMConfiguration> {
         return {
             projectId: configuration.projectId || null,
             dataset:
@@ -91,7 +91,7 @@ export class BigQuerySinkModule implements Sink {
         }
 
         const parameters: Parameter[] = [];
-        const defaultParameterValues: DPMConfiguration = this.getDefaultParameterValues(
+        const defaultParameterValues: DPMConfiguration = await this.getDefaultParameterValues(
             catalogSlug,
             packageFile,
             configuration

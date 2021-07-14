@@ -1,9 +1,9 @@
 import { DPMConfiguration, PackageFile, Schema } from "datapm-lib";
 import { Transform, Writable } from "stream";
-import { RecordStreamContext, UpdateMethod } from "../../source/SourceUtil";
+import { RecordStreamContext, UpdateMethod } from "../../source/Source";
 import { Parameter } from "../../util/parameters/Parameter";
 import { RecordSerializedContext } from "../AbstractFileSink";
-import { DPMRecordSerializer } from "./RecordSerializerUtil";
+import { DPMRecordSerializer } from "./RecordSerializer";
 
 export class RecordSerializerJSON implements DPMRecordSerializer {
     fileStream: Writable;

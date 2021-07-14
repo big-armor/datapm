@@ -17,7 +17,7 @@ import {
 import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { KnexSink } from "./KnexSink";
 import { DISPLAY_NAME, TYPE } from "./RedshiftSink";
-import { WritableWithContext } from "./SinkUtil";
+import { WritableWithContext } from "./Sink";
 
 export class RedshiftSinkModule extends KnexSink {
     redshiftClient: Redshift;

@@ -15,17 +15,14 @@ import ora from "ora";
 import { exit } from "process";
 import prompts from "prompts";
 import {
-    findSourceForUri,
-    generateSchemasFromSourceStreams,
-    getSources,
-    getSourceByType,
     InspectionResults,
     InspectProgress,
-    SourceInterface,
-    StreamSetPreview,
     SourceInspectionContext,
-    SourceStreamsInspectionResult
-} from "../source/SourceUtil";
+    SourceInterface,
+    SourceStreamsInspectionResult,
+    StreamSetPreview
+} from "../source/Source";
+import { findSourceForUri, generateSchemasFromSourceStreams, getSources, getSourceByType } from "../source/SourceUtil";
 import { validPackageDisplayName, validShortPackageDescription, validUnit, validVersion } from "../util/IdentifierUtil";
 import { LogType } from "../util/LoggingUtils";
 import { nameToSlug } from "../util/NameUtil";

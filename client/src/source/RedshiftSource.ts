@@ -3,7 +3,7 @@ import chalk from "chalk";
 import { DPMConfiguration } from "datapm-lib";
 import Knex from "knex";
 import mime from "mime-types";
-import { FileOpenStreamContext, FileStreamContext } from "../parser/ParserUtil";
+import { FileOpenStreamContext, FileStreamContext } from "../parser/Parser";
 import {
     createS3Bucket,
     getAwsParameters,
@@ -15,7 +15,7 @@ import {
 import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { AbstractFileStreamSource } from "./AbstractFileStreamSource";
 import { S3Source } from "./S3Source";
-import { SourceInterface } from "./SourceUtil";
+import { SourceInterface } from "./Source";
 
 export class RedshiftSource extends AbstractFileStreamSource implements SourceInterface {
     redshiftClient: Redshift;

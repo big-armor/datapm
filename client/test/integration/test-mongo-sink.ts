@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import mongoose from "mongoose";
 import { GenericContainer, StartedTestContainer } from "testcontainers";
-import { SinkErrors } from "../../src/sink/SinkUtil";
+import { SinkErrors } from "../../src/sink/Sink";
 import {
     createTestPackage,
     getPromptInputs,

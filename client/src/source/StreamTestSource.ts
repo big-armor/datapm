@@ -13,7 +13,7 @@ import {
     StreamSummary,
     UpdateMethod,
     RecordContext
-} from "./SourceUtil";
+} from "./Source";
 
 interface TestSourceAttribute {
     name: string;

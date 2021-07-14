@@ -1,8 +1,8 @@
 import avro from "avsc";
 import { DPMConfiguration, DPMRecord } from "datapm-lib";
 import { Transform, TransformCallback } from "stream";
-import { RecordContext, SourceInspectionContext, UpdateMethod } from "../source/SourceUtil";
-import { FileBufferSummary, ParserInspectionResults, Parser } from "./ParserUtil";
+import { RecordContext, SourceInspectionContext, UpdateMethod } from "../source/Source";
+import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
 
 class BlockDecoder extends avro.streams.BlockDecoder {
     // eslint-disable-next-line

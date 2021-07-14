@@ -4,18 +4,13 @@ import { DPMConfiguration } from "datapm-lib";
 import numeral from "numeral";
 import streamMmmagic from "stream-mmmagic";
 import { Parameter, ParameterType } from "../util/parameters/Parameter";
-import {
-    StreamSetPreview,
-    SourceInspectionContext,
-    InspectionResults,
-    SourceInterface,
-    UpdateMethod
-} from "./SourceUtil";
-import { Maybe } from "../generated/graphql";
-import { getParser, getParsers, FileStreamContext, FileBufferSummary, Parser } from "../parser/ParserUtil";
+import { StreamSetPreview, SourceInspectionContext, InspectionResults, SourceInterface, UpdateMethod } from "./Source";
+import { Maybe } from "../util/Maybe";
+import { getParser, getParsers } from "../parser/ParserUtil";
 import { LogType } from "../util/LoggingUtils";
 import { nameFromUrls } from "../util/NameUtil";
-import { StreamState } from "../sink/SinkUtil";
+import { StreamState } from "../sink/Sink";
+import { FileBufferSummary, FileStreamContext, Parser } from "../parser/Parser";
 
 export abstract class AbstractFileStreamSource implements SourceInterface {
     abstract sourceType(): string;

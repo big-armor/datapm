@@ -1,4 +1,4 @@
-import { Sink, SinkDescription } from "./SinkUtil";
+import { Sink, SinkDescription } from "./Sink";
 export const DISPLAY_NAME = "MySQL";
 export const TYPE = "mysql";
 export class MySqlSinkDescription implements SinkDescription {

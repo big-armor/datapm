@@ -3,7 +3,7 @@ import { loadPackageFileFromDisk, Properties, Schema } from "datapm-lib";
 import Knex from "knex";
 import { GenericContainer, StartedTestContainer } from "testcontainers";
 import { LogWaitStrategy } from "testcontainers/dist/wait-strategy";
-import { SourceErrors } from "../../src/source/SourceUtil";
+import { SourceErrors } from "../../src/source/Source";
 import {
     createTestPackage,
     getPromptInputs,

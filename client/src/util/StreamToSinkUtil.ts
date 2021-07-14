@@ -1,9 +1,9 @@
 import { DPMConfiguration, PackageFile, Schema } from "datapm-lib";
 import ON_DEATH from "death";
 import { Readable, Transform, Writable } from "stream";
-import { Maybe } from "../generated/graphql";
-import { Sink, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWithContext } from "../sink/SinkUtil";
-import { RecordStreamContext, StreamSetPreview, UpdateMethod } from "../source/SourceUtil";
+import { Maybe } from "../util/Maybe";
+import { Sink, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWithContext } from "../sink/Sink";
+import { RecordStreamContext, StreamSetPreview, UpdateMethod } from "../source/Source";
 import { Parameter, ParameterType } from "./parameters/Parameter";
 import {
     checkSchemaDataTypeConflicts,

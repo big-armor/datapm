@@ -1,12 +1,13 @@
 import { DPMConfiguration, PackageFile, Schema } from "datapm-lib";
 import { Readable, Transform, Writable } from "stream";
-import { Maybe } from "../generated/graphql";
-import { RecordStreamContext, UpdateMethod } from "../source/SourceUtil";
+import { Maybe } from "../util/Maybe";
+import { RecordStreamContext, UpdateMethod } from "../source/Source";
 import { Parameter, ParameterType } from "../util/parameters/Parameter";
-import { Sink, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWithContext } from "./SinkUtil";
+import { Sink, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWithContext } from "./Sink";
 import { RecordSerializerCSV } from "./writer/RecordSerializerCSV";
 import { RecordSerializerJSON } from "./writer/RecordSerializerJSON";
-import { DPMRecordSerializer, getRecordSerializer, getRecordSerializers } from "./writer/RecordSerializerUtil";
+import { getRecordSerializer, getRecordSerializers } from "./writer/RecordSerializerUtil";
+import { DPMRecordSerializer } from "./writer/RecordSerializer";
 
 export abstract class AbstractFileSink implements Sink {
     abstract getType(): string;
@@ -69,21 +70,21 @@ export abstract class AbstractFileSink implements Sink {
         return sinkState;
     }
 
-    isStronglyTyped(configuration: DPMConfiguration): boolean {
-        const serializerTransform = getRecordSerializer(
+    async isStronglyTyped(configuration: DPMConfiguration): Promise<boolean> {
+        const serializerTransform = (await getRecordSerializer(
             (configuration.format as string) || new RecordSerializerJSON().getOutputMimeType()
-        ) as DPMRecordSerializer;
+        )) as DPMRecordSerializer;
         return serializerTransform.isStronglyTyped(configuration);
     }
 
-    getDefaultParameterValues(
+    async getDefaultParameterValues(
         catalogSlug: string | undefined,
         packageFile: PackageFile,
         configuration: DPMConfiguration
-    ): DPMConfiguration {
-        const serializerTransform = getRecordSerializer(
+    ): Promise<DPMConfiguration> {
+        const serializerTransform = (await getRecordSerializer(
             (configuration.format as string) || new RecordSerializerCSV().getOutputMimeType()
-        ) as DPMRecordSerializer;
+        )) as DPMRecordSerializer;
 
         return {
             format: serializerTransform?.getOutputMimeType(),
@@ -103,7 +104,7 @@ export abstract class AbstractFileSink implements Sink {
         packageFile: PackageFile,
         configuration: DPMConfiguration
     ): Promise<Parameter[]> {
-        const defaultParameterValues: DPMConfiguration = this.getDefaultParameterValues(
+        const defaultParameterValues: DPMConfiguration = await this.getDefaultParameterValues(
             catalogSlug,
             packageFile,
             configuration
@@ -129,9 +130,9 @@ export abstract class AbstractFileSink implements Sink {
         if (fileSinkParameters.length > 0) return fileSinkParameters;
 
         // TODO pass back parameters from writer
-        const serializerTransform = getRecordSerializer(
+        const serializerTransform = (await getRecordSerializer(
             (configuration.format as string) || new RecordSerializerJSON().getOutputMimeType()
-        ) as DPMRecordSerializer;
+        )) as DPMRecordSerializer;
 
         const serializerParameters = serializerTransform.getParameters(packageFile, configuration);
 
@@ -158,7 +159,7 @@ export abstract class AbstractFileSink implements Sink {
 
         if (typeof configuration.format !== "string") throw new Error("format configuration must be a string");
 
-        const serializerTransform = getRecordSerializer(configuration.format);
+        const serializerTransform = await getRecordSerializer(configuration.format);
 
         if (serializerTransform == null)
             throw new Error(`Serializer for format ${configuration.format} was not found!`);
@@ -178,12 +179,12 @@ export abstract class AbstractFileSink implements Sink {
         };
     }
 
-    filterDefaultConfigValues(
+    async filterDefaultConfigValues(
         catalogSlug: string | undefined,
         packageFile: PackageFile,
         configuration: DPMConfiguration
-    ): void {
-        const defaultValues = this.getDefaultParameterValues(catalogSlug, packageFile, configuration);
+    ): Promise<void> {
+        const defaultValues = await this.getDefaultParameterValues(catalogSlug, packageFile, configuration);
 
         if (configuration.fileLocation === defaultValues.fileLocation) delete configuration.fileLocation;
     }

@@ -5,20 +5,19 @@ import numeral from "numeral";
 import { Choice } from "prompts";
 import { PassThrough, Readable, Transform } from "stream";
 import { BatchingTransform } from "../source/transforms/BatchingTransform";
-import { Maybe } from "../generated/graphql";
-import { SinkState, StreamState } from "../sink/SinkUtil";
+import { Maybe } from "../util/Maybe";
+import { SinkState, StreamState } from "../sink/Sink";
 import {
-    getSourceByType,
     RecordContext,
     InspectionResults,
     StreamAndTransforms,
     StreamSetPreview,
     ExtendedJSONSchema7TypeName,
-    mergeValueFormats,
     RecordStreamContext,
     StreamSummary
-} from "../source/SourceUtil";
+} from "../source/Source";
 import { convertValueByValueType, discoverValueType } from "../source/transforms/StatsTransform";
+import { getSourceByType, mergeValueFormats } from "../source/SourceUtil";
 
 export enum DeconflictOptions {
     CAST_TO_BOOLEAN = "CAST_TO_BOOLEAN",

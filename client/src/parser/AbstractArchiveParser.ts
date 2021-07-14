@@ -3,16 +3,11 @@ import { DPMConfiguration } from "datapm-lib";
 import mime from "mime-types";
 import { Transform } from "stream";
 import streamMmmagic from "stream-mmmagic";
-import { StreamState } from "../sink/SinkUtil";
+import { StreamState } from "../sink/Sink";
 import { findParser } from "../source/AbstractFileStreamSource";
-import { SourceInspectionContext } from "../source/SourceUtil";
-import {
-    getParserByMimeType,
-    FileBufferSummary,
-    ParserInspectionResults,
-    Parser,
-    FileStreamContext
-} from "./ParserUtil";
+import { SourceInspectionContext } from "../source/Source";
+import { FileBufferSummary, ParserInspectionResults, Parser, FileStreamContext } from "./Parser";
+import { getParserByMimeType } from "./ParserUtil";
 
 export interface FileIterator {
     moveToNextFile(): Promise<FileStreamContext | null>;

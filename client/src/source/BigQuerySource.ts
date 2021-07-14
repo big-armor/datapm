@@ -11,7 +11,7 @@ import {
     StreamSetPreview,
     UpdateMethod,
     InspectionResults
-} from "./SourceUtil";
+} from "./Source";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sqlParser = require("js-sql-parser");

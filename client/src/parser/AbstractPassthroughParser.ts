@@ -3,10 +3,11 @@ import { DPMConfiguration } from "datapm-lib";
 import mime from "mime-types";
 import { Readable, Transform } from "stream";
 import streamMmmagic from "stream-mmmagic";
-import { StreamState } from "../sink/SinkUtil";
+import { StreamState } from "../sink/Sink";
 import { findParser } from "../source/AbstractFileStreamSource";
-import { SourceInspectionContext } from "../source/SourceUtil";
-import { getParserByMimeType, FileBufferSummary, ParserInspectionResults, Parser } from "./ParserUtil";
+import { SourceInspectionContext } from "../source/Source";
+import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
+import { getParserByMimeType } from "./ParserUtil";
 
 export abstract class AbstractPassThroughParser implements Parser {
     abstract getDisplayName(): string;

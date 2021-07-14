@@ -2,12 +2,12 @@ import { S3 } from "aws-sdk";
 import { DPMConfiguration } from "datapm-lib";
 import fetch from "cross-fetch";
 import mime from "mime-types";
-import { FileStreamContext } from "../parser/ParserUtil";
+import { FileStreamContext } from "../parser/Parser";
 import { getAwsParameters, getStreamFromS3, getS3ObjectMetaData } from "../util/AwsUtil";
 import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { AbstractFileStreamSource } from "./AbstractFileStreamSource";
 import { HTTPSource } from "./HTTPSource";
-import { SourceInterface } from "./SourceUtil";
+import { SourceInterface } from "./Source";
 
 export class S3Source extends AbstractFileStreamSource implements SourceInterface {
     sourceType(): string {

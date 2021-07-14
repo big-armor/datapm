@@ -4,7 +4,7 @@ import { test } from "mocha";
 import { Transform } from "stream";
 
 import { CSVParser } from "../src/parser/CSVParser";
-import { RecordContext } from "../src/source/SourceUtil";
+import { RecordContext } from "../src/source/Source";
 
 describe("Checking transforms", () => {
     test("DPM record transform test", () => {

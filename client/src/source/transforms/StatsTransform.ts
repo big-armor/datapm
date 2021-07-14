@@ -1,7 +1,7 @@
 import { DPMRecord, DPMRecordValue, Schema, ValueTypeStatistics } from "datapm-lib";
 import { Transform, TransformCallback, TransformOptions } from "stream";
 import { createUTCDateFromString, isDate, isTime } from "../../util/DateUtil";
-import { ExtendedJSONSchema7TypeName, RecordContext } from "../SourceUtil";
+import { ExtendedJSONSchema7TypeName, RecordContext } from "../Source";
 import isNumber from "is-number";
 import { JSONSchema7TypeName } from "json-schema";
 import { ContentLabelDetector } from "../../content-detector/ContentLabelDetector";

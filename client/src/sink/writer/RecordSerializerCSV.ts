@@ -1,10 +1,10 @@
 import stringify from "csv-stringify/lib/sync";
 import { DPMConfiguration, PackageFile, Schema } from "datapm-lib";
 import { Transform } from "stream";
-import { RecordStreamContext, UpdateMethod } from "../../source/SourceUtil";
+import { RecordStreamContext, UpdateMethod } from "../../source/Source";
 import { Parameter, ParameterType } from "../../util/parameters/Parameter";
 import { RecordSerializedContext } from "../AbstractFileSink";
-import { DPMRecordSerializer } from "./RecordSerializerUtil";
+import { DPMRecordSerializer } from "./RecordSerializer";
 
 export class RecordSerializerCSV implements DPMRecordSerializer {
     getDisplayName(): string {

@@ -1,10 +1,10 @@
 import { DPMConfiguration } from "datapm-lib";
 import { Readable } from "stream";
 import tar from "tar-stream";
-import { SourceInspectionContext } from "../source/SourceUtil";
+import { SourceInspectionContext } from "../source/Source";
 import { ParameterType } from "../util/parameters/Parameter";
 import { AbstractArchiveParser, FileIterator } from "./AbstractArchiveParser";
-import { FileBufferSummary } from "./ParserUtil";
+import { FileBufferSummary } from "./Parser";
 
 export class TARParser extends AbstractArchiveParser {
     getDisplayName(): string {

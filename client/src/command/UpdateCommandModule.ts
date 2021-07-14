@@ -14,7 +14,7 @@ import { exit } from "process";
 import prompts, { Choice } from "prompts";
 import { SemVer } from "semver";
 import { Permission } from "../generated/graphql";
-import { getSourceByType, SourceInspectionContext } from "../source/SourceUtil";
+import { getSourceByType } from "../source/SourceUtil";
 import { getRegistryConfig } from "../util/ConfigUtil";
 import { validPackageDisplayName, validShortPackageDescription, validUnit, validVersion } from "../util/IdentifierUtil";
 import { getPackage } from "../util/PackageAccessUtil";
@@ -27,6 +27,7 @@ import { UpdateArguments } from "./UpdateCommand";
 import { inspectSource, inspectStreamSet } from "./PackageCommandModule";
 import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
 import { cliHandleParameters } from "../util/parameters/ParameterUtils";
+import { SourceInspectionContext } from "../source/Source";
 
 async function schemaPrompts(schema: Schema): Promise<void> {
     if (schema.properties == null) return;

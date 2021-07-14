@@ -1,8 +1,8 @@
 import { DPMConfiguration, DPMRecord } from "datapm-lib";
 import { Transform, TransformCallback } from "stream";
 import XLSX from "xlsx";
-import { RecordContext, SourceInspectionContext, UpdateMethod } from "../source/SourceUtil";
-import { FileBufferSummary, ParserInspectionResults, Parser } from "./ParserUtil";
+import { RecordContext, SourceInspectionContext, UpdateMethod } from "../source/Source";
+import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
 
 class BufferTransform extends Transform {
     buffers: Buffer[] = [];

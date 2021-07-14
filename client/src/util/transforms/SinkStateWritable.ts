@@ -1,6 +1,6 @@
 import { Writable } from "stream";
-import { SinkState } from "../../sink/SinkUtil";
-import { RecordStreamContext } from "../../source/SourceUtil";
+import { SinkState } from "../../sink/Sink";
+import { RecordStreamContext } from "../../source/Source";
 
 /** this class updates the provided SinkState object with the observed records that are received to this writable.
  * This SinkState is later used to persist the successfully written records.

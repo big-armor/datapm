@@ -4,8 +4,8 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import { Readable, Transform, Writable } from "stream";
-import { Maybe } from "../generated/graphql";
-import { UpdateMethod } from "../source/SourceUtil";
+import { Maybe } from "../util/Maybe";
+import { UpdateMethod } from "../source/Source";
 import {
     createS3Bucket,
     getAwsParameters,
@@ -18,9 +18,10 @@ import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { StreamSetProcessingMethod } from "../util/StreamToSinkUtil";
 import { AbstractFileSink, RecordSerializedContext } from "./AbstractFileSink";
 import { DISPLAY_NAME, TYPE } from "./S3Sink";
-import { SinkState, SinkStateKey, SinkSupportedStreamOptions } from "./SinkUtil";
+import { SinkState, SinkStateKey, SinkSupportedStreamOptions } from "./Sink";
 import { RecordSerializerCSV } from "./writer/RecordSerializerCSV";
-import { DPMRecordSerializer, getRecordSerializer } from "./writer/RecordSerializerUtil";
+import { getRecordSerializer } from "./writer/RecordSerializerUtil";
+import { DPMRecordSerializer } from "./writer/RecordSerializer";
 
 export class S3SinkModule extends AbstractFileSink {
     s3Client: S3;
@@ -33,14 +34,14 @@ export class S3SinkModule extends AbstractFileSink {
         return DISPLAY_NAME;
     }
 
-    getDefaultParameterValues(
+    async getDefaultParameterValues(
         catalogSlug: string | undefined,
         packageFile: PackageFile,
         configuration: DPMConfiguration
-    ): DPMConfiguration {
-        const serializerTransform = getRecordSerializer(
+    ): Promise<DPMConfiguration> {
+        const serializerTransform = (await getRecordSerializer(
             (configuration.format as string) || new RecordSerializerCSV().getOutputMimeType()
-        ) as DPMRecordSerializer;
+        )) as DPMRecordSerializer;
 
         const location = path.join(
             os.homedir(),
@@ -72,7 +73,7 @@ export class S3SinkModule extends AbstractFileSink {
         packageFile: PackageFile,
         configuration: DPMConfiguration
     ): Promise<Parameter[]> {
-        const defaultParameterValues: DPMConfiguration = this.getDefaultParameterValues(
+        const defaultParameterValues: DPMConfiguration = await this.getDefaultParameterValues(
             catalogSlug,
             packageFile,
             configuration

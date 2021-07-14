@@ -22,7 +22,7 @@ import {
     SourceInterface,
     UpdateMethod,
     RecordContext
-} from "./SourceUtil";
+} from "./Source";
 import BomStrippingStream from "bomstrip";
 import { ColumnOption } from "csv-parse";
 import { LogType } from "../util/LoggingUtils";

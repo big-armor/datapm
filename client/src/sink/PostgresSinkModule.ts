@@ -5,7 +5,7 @@ import { SemVer } from "semver";
 import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { KnexSink } from "./KnexSink";
 import { DISPLAY_NAME, TYPE } from "./PostgresSink";
-import { SinkErrors, WritableWithContext } from "./SinkUtil";
+import { SinkErrors, WritableWithContext } from "./Sink";
 
 export class PostgresSinkModule extends KnexSink {
     tableExists: boolean;

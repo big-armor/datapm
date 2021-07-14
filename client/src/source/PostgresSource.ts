@@ -11,7 +11,7 @@ import {
     SourceInterface,
     UpdateMethod,
     RecordContext
-} from "./SourceUtil";
+} from "./Source";
 import { Transform } from "stream";
 import { table } from "console";
 

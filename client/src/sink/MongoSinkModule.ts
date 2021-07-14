@@ -2,13 +2,13 @@ import { DPMConfiguration, DPMRecordValue, PackageFile, Schema } from "datapm-li
 import mongoose, { Document, Model, Mongoose, SchemaDefinition } from "mongoose";
 import { SemVer } from "semver";
 import { Transform } from "stream";
-import { Maybe } from "../generated/graphql";
-import { ExtendedJSONSchema7TypeName, RecordStreamContext, UpdateMethod } from "../source/SourceUtil";
+import { Maybe } from "../util/Maybe";
+import { ExtendedJSONSchema7TypeName, RecordStreamContext, UpdateMethod } from "../source/Source";
 import { convertValueByValueType, discoverValueType } from "../source/transforms/StatsTransform";
 import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { StreamSetProcessingMethod } from "../util/StreamToSinkUtil";
 import { DISPLAY_NAME, TYPE } from "./MongoSink";
-import { Sink, SinkErrors, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWithContext } from "./SinkUtil";
+import { Sink, SinkErrors, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWithContext } from "./Sink";
 
 export class MongoSinkModule implements Sink {
     client: Mongoose;

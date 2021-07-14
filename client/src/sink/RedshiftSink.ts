@@ -1,4 +1,4 @@
-import { Sink, SinkDescription } from "./SinkUtil";
+import { Sink, SinkDescription } from "./Sink";
 export const DISPLAY_NAME = "PostgreSQL";
 export const TYPE = "postgres";
 export class RedshiftSinkDescription implements SinkDescription {

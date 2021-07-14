@@ -1,12 +1,12 @@
 import { DPMConfiguration, PackageFile, Schema } from "datapm-lib";
 import fs from "fs";
 import { getRecordSerializer, getRecordSerializers } from "./writer/RecordSerializerUtil";
-import { Sink, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWithContext } from "./SinkUtil";
+import { Sink, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWithContext } from "./Sink";
 import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { RecordSerializerJSON } from "./writer/RecordSerializerJSON";
-import { Maybe } from "../generated/graphql";
+import { Maybe } from "../util/Maybe";
 import { Transform } from "stream";
-import { UpdateMethod } from "../source/SourceUtil";
+import { UpdateMethod } from "../source/Source";
 import { RecordSerializedContext } from "./AbstractFileSink";
 import { StreamSetProcessingMethod } from "../util/StreamToSinkUtil";
 import { DISPLAY_NAME, TYPE } from "./StandardOutSink";
@@ -109,7 +109,7 @@ export class StandardOutSinkModule implements Sink {
     ): Promise<WritableWithContext> {
         if (typeof configuration.format !== "string") throw new Error("format configuration must be a string");
 
-        const serializer = getRecordSerializer(configuration.format);
+        const serializer = await getRecordSerializer(configuration.format);
 
         if (serializer == null) throw new Error("Writer for format " + configuration.format + " was not found!");
 

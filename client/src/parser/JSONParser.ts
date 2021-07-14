@@ -1,9 +1,9 @@
 import { DPMConfiguration, DPMRecord } from "datapm-lib";
 import * as jsonStream from "jsonstream-next";
 import { Transform } from "stream";
-import { RecordContext, SourceInspectionContext, UpdateMethod } from "../source/SourceUtil";
+import { RecordContext, SourceInspectionContext, UpdateMethod } from "../source/Source";
 import { ParameterType } from "../util/parameters/Parameter";
-import { FileBufferSummary, ParserInspectionResults, Parser } from "./ParserUtil";
+import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
 
 export class JSONParser implements Parser {
     getFileExtensions(): string[] {

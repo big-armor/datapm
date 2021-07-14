@@ -1,10 +1,10 @@
 import { DPMConfiguration } from "datapm-lib";
 import { Writable } from "stream";
 import unzipper, { Entry } from "unzipper";
-import { SourceInspectionContext } from "../source/SourceUtil";
+import { SourceInspectionContext } from "../source/Source";
 import { ParameterType } from "../util/parameters/Parameter";
 import { AbstractArchiveParser, FileIterator } from "./AbstractArchiveParser";
-import { FileBufferSummary } from "./ParserUtil";
+import { FileBufferSummary } from "./Parser";
 
 class WritablePassThrough extends Writable {
     // eslint-disable-next-line
