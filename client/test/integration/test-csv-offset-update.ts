@@ -6,7 +6,7 @@ import { registryServerPort } from "./setup";
 import fs from "fs";
 import { SinkState } from "../../src/sink/Sink";
 
-describe("CSV Tests", function () {
+describe("CSV Offset Tests", function () {
     before(async () => {
         resetConfiguration();
         const userAClient = await createTestUser();
@@ -131,7 +131,7 @@ describe("CSV Tests", function () {
                 },
                 {
                     message: "File Format?",
-                    input: KEYS.ENTER
+                    input: "JSON" + KEYS.ENTER
                 },
                 {
                     message: "File Location?",
@@ -178,7 +178,7 @@ describe("CSV Tests", function () {
                 },
                 {
                     message: "File Format?",
-                    input: KEYS.ENTER
+                    input: "JSON" + KEYS.ENTER
                 },
                 {
                     message: "File Location?",

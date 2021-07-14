@@ -7,7 +7,7 @@ import { Sink, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWith
 import { RecordSerializerJSON } from "./writer/RecordSerializerJSON";
 import { getRecordSerializer, getRecordSerializers } from "./writer/RecordSerializerUtil";
 import { DPMRecordSerializer } from "./writer/RecordSerializer";
-import { RecordSerializerCSVDescription } from "./writer/RecordSerializerCSVDescription";
+import { RecordSerializerJSONDescription } from "./writer/RecordSerializerJSONDescription";
 
 export abstract class AbstractFileSink implements Sink {
     abstract getType(): string;
@@ -72,7 +72,7 @@ export abstract class AbstractFileSink implements Sink {
 
     async isStronglyTyped(configuration: DPMConfiguration): Promise<boolean> {
         const serializerTransform = (await getRecordSerializer(
-            (configuration.format as string) || new RecordSerializerCSVDescription().getOutputMimeType()
+            (configuration.format as string) || new RecordSerializerJSONDescription().getOutputMimeType()
         )) as DPMRecordSerializer;
         return serializerTransform.isStronglyTyped(configuration);
     }
@@ -83,7 +83,7 @@ export abstract class AbstractFileSink implements Sink {
         configuration: DPMConfiguration
     ): Promise<DPMConfiguration> {
         const serializerTransform = await getRecordSerializer(
-            (configuration.format as string) || new RecordSerializerCSVDescription().getOutputMimeType()
+            (configuration.format as string) || new RecordSerializerJSONDescription().getOutputMimeType()
         );
 
         if (serializerTransform == null) throw new Error("Record Serializer for " + configuration.format + "not found");
@@ -120,9 +120,11 @@ export abstract class AbstractFileSink implements Sink {
                     name: "format",
                     defaultValue: defaultParameterValues.format as string,
                     message: "File Format?",
-                    options: getRecordSerializers().map((writer) => {
-                        return { title: writer.getDisplayName(), value: writer.getOutputMimeType() };
-                    })
+                    options: getRecordSerializers()
+                        .map((writer) => {
+                            return { title: writer.getDisplayName(), value: writer.getOutputMimeType() };
+                        })
+                        .sort()
                 }
             ];
         }
