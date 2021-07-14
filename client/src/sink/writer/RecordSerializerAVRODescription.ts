@@ -18,7 +18,7 @@ export class RecordSerializerAVRODescription implements DPMRecordSerializerDescr
     }
 
     async getRecordSerializer(): Promise<DPMRecordSerializer> {
-        const module = await import("./RecordSerializerAvro");
+        const module = await import("./RecordSerializerAVRO");
         return new module.RecordSerializerAVRO();
     }
 }
