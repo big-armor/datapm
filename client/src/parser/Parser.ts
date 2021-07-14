@@ -20,6 +20,16 @@ export interface ParserInspectionResults {
     moveToNextStream?(): Promise<FileStreamContext | null>;
 }
 
+export interface ParserDescription {
+    /** The user friendly name shown during selection */
+    getDisplayName(): string;
+
+    /** The unique identifier for the parser implementation */
+    getMimeType(): string;
+
+    getParser(): Promise<Parser>;
+}
+
 export interface Parser {
     /** The user friendly name shown during selection */
     getDisplayName(): string;
@@ -28,7 +38,7 @@ export interface Parser {
     getMimeType(): string;
 
     /** The file extensions supported by this parser */
-    getFileExtensions(configuration: DPMConfiguration): string[];
+    getFileExtensions(configuration: DPMConfiguration): Promise<string[]> | string[];
 
     /** Should return true if the parser implementation will support parsing the given FileStreamSummary */
     supportsFileStream(streamSummary: FileBufferSummary): boolean;
@@ -41,7 +51,11 @@ export interface Parser {
     ): Promise<ParserInspectionResults>;
 
     /** Returns the transforms necessary parse based on the configuration */
-    getTransforms(schemaPrefix: string, configuration: DPMConfiguration, sinkState: Maybe<StreamState>): Transform[];
+    getTransforms(
+        schemaPrefix: string,
+        configuration: DPMConfiguration,
+        sinkState: Maybe<StreamState>
+    ): Promise<Transform[]> | Transform[];
 }
 export interface FileSetContext {
     fileStreamIterator: Iterator<FileStreamContext>;

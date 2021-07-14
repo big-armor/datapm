@@ -6,7 +6,7 @@ import streamMmmagic from "stream-mmmagic";
 import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { StreamSetPreview, SourceInspectionContext, InspectionResults, SourceInterface, UpdateMethod } from "./Source";
 import { Maybe } from "../util/Maybe";
-import { getParser, getParsers } from "../parser/ParserUtil";
+import { getParser, getParserByMimeType, getParsers } from "../parser/ParserUtil";
 import { LogType } from "../util/LoggingUtils";
 import { nameFromUrls } from "../util/NameUtil";
 import { StreamState } from "../sink/Sink";
@@ -128,7 +128,7 @@ export abstract class AbstractFileStreamSource implements SourceInterface {
         };
 
         if (parserInspectionResults.stream) {
-            streamSetPreview.streamSummaries = fileStreamSummaries.map((f) => {
+            streamSetPreview.streamSummaries = await fileStreamSummaries.asyncMap(async (f) => {
                 return {
                     name: f.fileName,
                     expectedTotalRawBytes: f.fileSize,
@@ -138,7 +138,7 @@ export abstract class AbstractFileStreamSource implements SourceInterface {
 
                         return {
                             stream: fileStreamContext.stream,
-                            transforms: parser.getTransforms(streamSetPreview.slug, configuration, {
+                            transforms: await parser.getTransforms(streamSetPreview.slug, configuration, {
                                 schemaStates: {}
                             }),
                             expectedTotalRawBytes: f.fileSize
@@ -161,7 +161,7 @@ export abstract class AbstractFileStreamSource implements SourceInterface {
                         const fileStream = await fileInspectionResult.openStream(sinkState);
                         return {
                             stream: fileStream.stream,
-                            transforms: parser.getTransforms(streamSetPreview.slug, configuration, {
+                            transforms: await parser.getTransforms(streamSetPreview.slug, configuration, {
                                 schemaStates: {}
                             }),
                             expectedTotalRawBytes: fileStream.fileSize
@@ -217,9 +217,9 @@ export async function findParser(
     let parser: Maybe<Parser> = null;
 
     if (configuration.parserMimeType != null) {
-        parser = getParsers().find((p) => p.getMimeType() === configuration.parserMimeType) || null;
+        parser = await getParserByMimeType(configuration.parserMimeType as string);
     } else {
-        parser = getParser(fileStreamSummary);
+        parser = await getParser(fileStreamSummary);
     }
 
     if (context != null && parser == null) {
@@ -256,7 +256,7 @@ export async function findParser(
             }
         ]);
 
-        parser = getParsers().find((p) => p.getMimeType() === configuration.parserMimeType) || null;
+        parser = await getParserByMimeType(configuration.parserMimeType as string);
     }
 
     if (parser == null) {

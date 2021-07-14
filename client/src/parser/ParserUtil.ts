@@ -1,36 +1,51 @@
 import { Maybe } from "../util/Maybe";
 
-import { BZip2Parser } from "./BZip2Parser";
-import { CSVParser } from "./CSVParser";
-import { GZipParser } from "./GZipParser";
-import { JSONParser } from "./JSONParser";
-import { XMLParser } from "./XMLParser";
-import { AVROParser } from "./AVROParser";
-import { XLSXParser } from "./XLSXParser";
-import { ZIPParser } from "./ZIPParser";
-import { TARParser } from "./TARParser";
-import { FileBufferSummary, Parser } from "./Parser";
+import { FileBufferSummary, Parser, ParserDescription } from "./Parser";
+import { CSVParserDescription } from "./CSVParserDescription";
+import { XMLParserDescription } from "./XMLParserDescription";
+import { JSONParserDescription } from "./JSONParserDescription";
+import { AVROParserDescription } from "./AVROParserDescription";
+import { XLSXParserDescription } from "./XLSXParserDescription";
+import { GZipParserDescription } from "./GZipParserDescription";
+import { BZip2ParserDescription } from "./BZip2ParserDescription";
+import { TARParserDescription } from "./TARParserDescription";
+import { ZIPParserDescription } from "./ZIPParserDescription";
 
-export function getParsers(): Parser[] {
+export function getParsers(): ParserDescription[] {
     return [
-        new CSVParser(),
-        new XMLParser(),
-        new JSONParser(),
-        new AVROParser(),
-        new XLSXParser(),
-        new GZipParser(),
-        new BZip2Parser(),
-        new ZIPParser(),
-        new TARParser()
+        new CSVParserDescription(),
+        new XMLParserDescription(),
+        new JSONParserDescription(),
+        new AVROParserDescription(),
+        new XLSXParserDescription(),
+        new GZipParserDescription(),
+        new BZip2ParserDescription(),
+        new ZIPParserDescription(),
+        new TARParserDescription()
     ];
 }
 
-export function getParser(streamSummary: FileBufferSummary): Maybe<Parser> {
-    const parsers = getParsers();
-    return parsers.find((parser) => parser.supportsFileStream(streamSummary)) || null;
+export async function getParser(streamSummary: FileBufferSummary): Promise<Maybe<Parser>> {
+    const parserDescriptions = getParsers();
+
+    for (const parserDescription of parserDescriptions) {
+        const parser = await parserDescription.getParser();
+        if (parser.supportsFileStream(streamSummary)) {
+            return parser;
+        }
+    }
+
+    return null;
 }
 
-export function getParserByMimeType(mimeType: string): Maybe<Parser> {
-    const parsers = getParsers();
-    return parsers.find((parser) => parser.getMimeType() === mimeType) || null;
+export async function getParserByMimeType(mimeType: string): Promise<Maybe<Parser>> {
+    const parserDescriptions = getParsers();
+
+    for (const parserDescription of parserDescriptions) {
+        if (parserDescription.getMimeType() === mimeType) {
+            return parserDescription.getParser();
+        }
+    }
+
+    return null;
 }

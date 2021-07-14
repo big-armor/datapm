@@ -3,6 +3,7 @@ import * as jsonStream from "jsonstream-next";
 import { Transform } from "stream";
 import { RecordContext, SourceInspectionContext, UpdateMethod } from "../source/Source";
 import { ParameterType } from "../util/parameters/Parameter";
+import { DISPLAY_NAME, MIME_TYPE } from "./JSONParserDescription";
 import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
 
 export class JSONParser implements Parser {
@@ -11,12 +12,12 @@ export class JSONParser implements Parser {
     }
 
     getDisplayName(): string {
-        return "JSON";
+        return DISPLAY_NAME;
     }
 
     /** The unique identifier for the parser implementation */
     getMimeType(): string {
-        return "application/json";
+        return MIME_TYPE;
     }
 
     /** Should return true if the parser implementation will support parsing the given FileStreamSummary */

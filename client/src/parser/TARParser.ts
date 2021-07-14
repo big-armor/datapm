@@ -5,19 +5,20 @@ import { SourceInspectionContext } from "../source/Source";
 import { ParameterType } from "../util/parameters/Parameter";
 import { AbstractArchiveParser, FileIterator } from "./AbstractArchiveParser";
 import { FileBufferSummary } from "./Parser";
+import { DISPLAY_NAME, MIME_TYPE } from "./TARParserDescription";
 
 export class TARParser extends AbstractArchiveParser {
     getDisplayName(): string {
-        return "TAR";
+        return DISPLAY_NAME;
     }
 
-    getFileExtensions(): string[] {
+    async getFileExtensions(): Promise<string[]> {
         return ["tar"];
     }
 
     /** The unique identifier for the parser implementation */
     getMimeType(): string {
-        return "application/tar";
+        return MIME_TYPE;
     }
 
     getSupportedMimeTypes(): string[] {

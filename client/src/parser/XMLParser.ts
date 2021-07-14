@@ -5,6 +5,7 @@ import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
 
 import XmlParser from "xml-streamer";
 import { ParameterType } from "../util/parameters/Parameter";
+import { DISPLAY_NAME, MIME_TYPE } from "./XMLParserDescription";
 
 export class XMLParser implements Parser {
     getFileExtensions(): string[] {
@@ -12,12 +13,12 @@ export class XMLParser implements Parser {
     }
 
     getDisplayName(): string {
-        return "XML";
+        return DISPLAY_NAME;
     }
 
     /** The unique identifier for the parser implementation */
     getMimeType(): string {
-        return "text/xml";
+        return MIME_TYPE;
     }
 
     /** Should return true if the parser implementation will support parsing the given FileStreamSummary */

@@ -12,6 +12,7 @@ import { ByteBatchingTransform } from "../source/transforms/ByteBatchingTransfor
 import { RecordCountOffsetTransform } from "../source/transforms/RecordCountOffsetTransform";
 import { Maybe } from "../util/Maybe";
 import { ParameterType } from "../util/parameters/Parameter";
+import { DISPLAY_NAME, MIME_TYPE } from "./CSVParserDescription";
 import { ParserInspectionResults, Parser } from "./Parser";
 
 export class CSVParser implements Parser {
@@ -20,11 +21,11 @@ export class CSVParser implements Parser {
     }
 
     public getDisplayName(): string {
-        return "Comma Separated Values (CSV)";
+        return DISPLAY_NAME;
     }
 
     public getMimeType(): string {
-        return "text/csv";
+        return MIME_TYPE;
     }
 
     public supportsFileStream(fileSummary: FileBufferSummary): boolean {

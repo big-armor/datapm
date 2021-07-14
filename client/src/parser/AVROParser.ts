@@ -2,6 +2,7 @@ import avro from "avsc";
 import { DPMConfiguration, DPMRecord } from "datapm-lib";
 import { Transform, TransformCallback } from "stream";
 import { RecordContext, SourceInspectionContext, UpdateMethod } from "../source/Source";
+import { DISPLAY_NAME, MIME_TYPE } from "./AVROParserDescription";
 import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
 
 class BlockDecoder extends avro.streams.BlockDecoder {
@@ -21,12 +22,12 @@ export class AVROParser implements Parser {
     }
 
     getDisplayName(): string {
-        return "AVRO";
+        return DISPLAY_NAME;
     }
 
     /** The unique identifier for the parser implementation */
     getMimeType(): string {
-        return "application/avro";
+        return MIME_TYPE;
     }
 
     /** Should return true if the parser implementation will support parsing the given FileStreamSummary */

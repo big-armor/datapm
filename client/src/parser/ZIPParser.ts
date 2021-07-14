@@ -5,6 +5,7 @@ import { SourceInspectionContext } from "../source/Source";
 import { ParameterType } from "../util/parameters/Parameter";
 import { AbstractArchiveParser, FileIterator } from "./AbstractArchiveParser";
 import { FileBufferSummary } from "./Parser";
+import { DISPLAY_NAME, MIME_TYPE } from "./ZIPParserDescription";
 
 class WritablePassThrough extends Writable {
     // eslint-disable-next-line
@@ -15,16 +16,16 @@ class WritablePassThrough extends Writable {
 
 export class ZIPParser extends AbstractArchiveParser {
     getDisplayName(): string {
-        return "ZIP";
+        return DISPLAY_NAME;
     }
 
-    getFileExtensions(): string[] {
+    async getFileExtensions(): Promise<string[]> {
         return ["zip"];
     }
 
     /** The unique identifier for the parser implementation */
     getMimeType(): string {
-        return "application/zip";
+        return MIME_TYPE;
     }
 
     getSupportedMimeTypes(): string[] {

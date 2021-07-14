@@ -3,6 +3,7 @@ import { Transform, TransformCallback } from "stream";
 import XLSX from "xlsx";
 import { RecordContext, SourceInspectionContext, UpdateMethod } from "../source/Source";
 import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
+import { DISPLAY_NAME, MIME_TYPE } from "./XLSXParserDescription";
 
 class BufferTransform extends Transform {
     buffers: Buffer[] = [];
@@ -25,12 +26,12 @@ export class XLSXParser implements Parser {
     }
 
     getDisplayName(): string {
-        return "XLSX";
+        return DISPLAY_NAME;
     }
 
     /** The unique identifier for the parser implementation */
     getMimeType(): string {
-        return "application/xlsx";
+        return MIME_TYPE;
     }
 
     /** Should return true if the parser implementation will support parsing the given FileStreamSummary */

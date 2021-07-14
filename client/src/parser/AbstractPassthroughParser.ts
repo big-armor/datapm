@@ -19,12 +19,12 @@ export abstract class AbstractPassThroughParser implements Parser {
 
     abstract getSupportedMimeTypes(): string[];
 
-    getFileExtensions(configuration: DPMConfiguration): string[] {
+    async getFileExtensions(configuration: DPMConfiguration): Promise<string[]> {
         const parserMimeTypeValue = configuration.innerFileMimeType;
 
         if (typeof parserMimeTypeValue !== "string") throw new Error("PASSTHROUGH_PARSER_MIME_TYPE_NOT_FOUND");
 
-        const parser = getParserByMimeType(parserMimeTypeValue);
+        const parser = await getParserByMimeType(parserMimeTypeValue);
 
         if (parser == null) throw new Error("PARSER_NOT_FOUND - " + parserMimeTypeValue);
 
@@ -33,7 +33,7 @@ export abstract class AbstractPassThroughParser implements Parser {
         if (typeof innerConfiguration !== "object") throw new Error("PASSTHROUGH_INNER_CONFIGURATION_NOT_AN_OBJECT");
 
         return this.getSupportedFileExtensions(configuration).concat(
-            parser.getFileExtensions(innerConfiguration as DPMConfiguration)
+            await parser.getFileExtensions(innerConfiguration as DPMConfiguration)
         );
     }
 
@@ -52,19 +52,25 @@ export abstract class AbstractPassThroughParser implements Parser {
 
     abstract getPassThroughTransforms(configuration: DPMConfiguration): Transform[];
 
-    getTransforms(schemaPrefix: string, configuration: DPMConfiguration, streamState: StreamState): Transform[] {
-        const parser = getParserByMimeType(configuration.innerFileMimeType as string);
+    async getTransforms(
+        schemaPrefix: string,
+        configuration: DPMConfiguration,
+        streamState: StreamState
+    ): Promise<Transform[]> {
+        const parser = await getParserByMimeType(configuration.innerFileMimeType as string);
 
         let transforms: Transform[] = this.getPassThroughTransforms(configuration);
 
         if (parser == null) throw new Error("PARSER_NOT_FOUND - " + configuration.innerFileMimeType);
 
-        for (const fileExtension of parser.getFileExtensions(configuration.innerFileConfiguration as DPMConfiguration))
+        for (const fileExtension of await parser.getFileExtensions(
+            configuration.innerFileConfiguration as DPMConfiguration
+        ))
             schemaPrefix = schemaPrefix.replace(new RegExp(`\\.${fileExtension}$`, "i"), "");
 
         if (parser)
             transforms = transforms.concat(
-                parser.getTransforms(
+                await parser.getTransforms(
                     schemaPrefix,
                     configuration.innerFileConfiguration as DPMConfiguration,
                     streamState
@@ -125,7 +131,7 @@ export abstract class AbstractPassThroughParser implements Parser {
 
         configuration.innerFileMimeType = parser.getMimeType();
 
-        for (const extension of parser.getFileExtensions(configuration)) {
+        for (const extension of await parser.getFileExtensions(configuration)) {
             innerFileName = innerFileName?.replace(new RegExp(`\\.${extension}$`, "i"), "");
         }
 
