@@ -4,6 +4,7 @@ import { RecordStreamContext, UpdateMethod } from "../../source/Source";
 import { Parameter } from "../../util/parameters/Parameter";
 import { RecordSerializedContext } from "../AbstractFileSink";
 import { DPMRecordSerializer } from "./RecordSerializer";
+import { DISPLAY_NAME, EXTENSION, MIME_TYPE } from "./RecordSerializerJSONDescription";
 
 export class RecordSerializerJSON implements DPMRecordSerializer {
     fileStream: Writable;
@@ -11,7 +12,7 @@ export class RecordSerializerJSON implements DPMRecordSerializer {
     configuration: DPMConfiguration;
 
     getDisplayName(): string {
-        return "JSON (JavaScript Object Notation)";
+        return DISPLAY_NAME;
     }
 
     isStronglyTyped(_configuration: DPMConfiguration): boolean {
@@ -19,11 +20,11 @@ export class RecordSerializerJSON implements DPMRecordSerializer {
     }
 
     getOutputMimeType(): string {
-        return "application/json";
+        return MIME_TYPE;
     }
 
     getFileExtension(): string {
-        return "json";
+        return EXTENSION;
     }
 
     getDefaultParameterValues(

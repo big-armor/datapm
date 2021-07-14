@@ -6,13 +6,13 @@ import { getRecordSerializer } from "./writer/RecordSerializerUtil";
 import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { AbstractFileSink, RecordSerializedContext } from "./AbstractFileSink";
 import { Writable, Readable, Transform } from "stream";
-import { RecordSerializerCSV } from "./writer/RecordSerializerCSV";
 import { Maybe } from "../util/Maybe";
 import { SinkState, SinkStateKey, SinkSupportedStreamOptions } from "./Sink";
 import { UpdateMethod } from "../source/Source";
 import { StreamSetProcessingMethod } from "../util/StreamToSinkUtil";
 import { DISPLAY_NAME, TYPE } from "./LocalFileSink";
 import { DPMRecordSerializer } from "./writer/RecordSerializer";
+import { RecordSerializerCSVDescription } from "./writer/RecordSerializerCSVDescription";
 
 export class LocalFileSinkModule extends AbstractFileSink {
     getType(): string {
@@ -29,7 +29,7 @@ export class LocalFileSinkModule extends AbstractFileSink {
         configuration: DPMConfiguration
     ): Promise<DPMConfiguration> {
         const serializerTransform = (await getRecordSerializer(
-            (configuration.format as string) || new RecordSerializerCSV().getOutputMimeType()
+            (configuration.format as string) || new RecordSerializerCSVDescription().getOutputMimeType()
         )) as DPMRecordSerializer;
 
         const location = path.join(
@@ -43,7 +43,7 @@ export class LocalFileSinkModule extends AbstractFileSink {
         );
 
         return {
-            ...super.getDefaultParameterValues(catalogSlug, packageFile, configuration),
+            ...(await super.getDefaultParameterValues(catalogSlug, packageFile, configuration)),
             fileLocation: location,
             ...configuration
         };

@@ -26,34 +26,17 @@ import {
 import BomStrippingStream from "bomstrip";
 import { ColumnOption } from "csv-parse";
 import { LogType } from "../util/LoggingUtils";
+import { getSpreadsheetID, TYPE } from "./GoogleSheetSourceDescription";
 
 export class GoogleSheetSource implements SourceInterface {
     sourceType(): string {
-        return "googlesheet";
-    }
-
-    supportsURI(uri: string): boolean {
-        if (uri.startsWith("https://docs.google.com/spreadsheets")) {
-            if (!this.getSpreadsheetID(uri)) {
-                console.log(chalk.red("Invalid google sheet URI"));
-                process.exit(1);
-            }
-            return true;
-        }
-        return false;
+        return TYPE;
     }
 
     removeSecretConfigValues(
         _configuration: DPMConfiguration
         // eslint-disable-next-line @typescript-eslint/no-empty-function
     ): void {}
-
-    getSpreadsheetID(uri: string): string | null {
-        const regExp = /([\w-]){44}/;
-        const result = uri.match(regExp);
-        if (!result) return null;
-        return result[0];
-    }
 
     async getInspectParameters(configuration: DPMConfiguration): Promise<Parameter[]> {
         const parameters: Parameter[] = [];
@@ -90,7 +73,7 @@ export class GoogleSheetSource implements SourceInterface {
         await initOAuth2Client();
         let isAllPublic = true;
         for (const uri of configuration.uris as string[]) {
-            const spreadsheetId = this.getSpreadsheetID(uri) as string;
+            const spreadsheetId = getSpreadsheetID(uri) as string;
             isAllPublic = isAllPublic && !!(await getSpreadsheetMetadata(spreadsheetId));
         }
 
@@ -154,7 +137,7 @@ export class GoogleSheetSource implements SourceInterface {
         // TODO - Support wildcard in paths, to read many files in single batch set
         // A wild card would indicate one set of files for a single stream
 
-        const spreadsheetId = this.getSpreadsheetID(uri) as string;
+        const spreadsheetId = getSpreadsheetID(uri) as string;
         const spreadsheetMetadata = await getSpreadsheetMetadata(spreadsheetId);
         const accessToken = getOAuth2Client().credentials.access_token;
 

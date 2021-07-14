@@ -14,6 +14,7 @@ import {
 } from "../util/AwsUtil";
 import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { AbstractFileStreamSource } from "./AbstractFileStreamSource";
+import { TYPE } from "./RedshiftSourceDescription";
 import { S3Source } from "./S3Source";
 import { SourceInterface } from "./Source";
 
@@ -24,7 +25,7 @@ export class RedshiftSource extends AbstractFileStreamSource implements SourceIn
     clusterList: Redshift.ClusterList = [];
 
     sourceType(): string {
-        return "redshift";
+        return TYPE;
     }
 
     supportsURI(uri: string): boolean {

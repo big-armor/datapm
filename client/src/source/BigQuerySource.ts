@@ -12,6 +12,7 @@ import {
     UpdateMethod,
     InspectionResults
 } from "./Source";
+import { TYPE } from "./BigQuerySourceDescription";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sqlParser = require("js-sql-parser");
@@ -24,11 +25,7 @@ interface FullPath {
 
 export class BigQuerySource implements SourceInterface {
     sourceType(): string {
-        return "googleBigQuery";
-    }
-
-    supportsURI(uri: string): boolean {
-        return uri.startsWith("bigQuery://");
+        return TYPE;
     }
 
     removeSecretConfigValues(

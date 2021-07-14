@@ -4,10 +4,10 @@ import { Maybe } from "../util/Maybe";
 import { RecordStreamContext, UpdateMethod } from "../source/Source";
 import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { Sink, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWithContext } from "./Sink";
-import { RecordSerializerCSV } from "./writer/RecordSerializerCSV";
 import { RecordSerializerJSON } from "./writer/RecordSerializerJSON";
 import { getRecordSerializer, getRecordSerializers } from "./writer/RecordSerializerUtil";
 import { DPMRecordSerializer } from "./writer/RecordSerializer";
+import { RecordSerializerCSVDescription } from "./writer/RecordSerializerCSVDescription";
 
 export abstract class AbstractFileSink implements Sink {
     abstract getType(): string;
@@ -72,7 +72,7 @@ export abstract class AbstractFileSink implements Sink {
 
     async isStronglyTyped(configuration: DPMConfiguration): Promise<boolean> {
         const serializerTransform = (await getRecordSerializer(
-            (configuration.format as string) || new RecordSerializerJSON().getOutputMimeType()
+            (configuration.format as string) || new RecordSerializerCSVDescription().getOutputMimeType()
         )) as DPMRecordSerializer;
         return serializerTransform.isStronglyTyped(configuration);
     }
@@ -82,12 +82,14 @@ export abstract class AbstractFileSink implements Sink {
         packageFile: PackageFile,
         configuration: DPMConfiguration
     ): Promise<DPMConfiguration> {
-        const serializerTransform = (await getRecordSerializer(
-            (configuration.format as string) || new RecordSerializerCSV().getOutputMimeType()
-        )) as DPMRecordSerializer;
+        const serializerTransform = await getRecordSerializer(
+            (configuration.format as string) || new RecordSerializerCSVDescription().getOutputMimeType()
+        );
+
+        if (serializerTransform == null) throw new Error("Record Serializer for " + configuration.format + "not found");
 
         return {
-            format: serializerTransform?.getOutputMimeType(),
+            format: serializerTransform.getOutputMimeType(),
             ...serializerTransform.getDefaultParameterValues(catalogSlug, packageFile, configuration),
             ...configuration
         };

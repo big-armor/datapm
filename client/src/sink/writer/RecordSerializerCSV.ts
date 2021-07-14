@@ -5,10 +5,11 @@ import { RecordStreamContext, UpdateMethod } from "../../source/Source";
 import { Parameter, ParameterType } from "../../util/parameters/Parameter";
 import { RecordSerializedContext } from "../AbstractFileSink";
 import { DPMRecordSerializer } from "./RecordSerializer";
+import { DISPLAY_NAME, EXTENSION, MIME_TYPE } from "./RecordSerializerCSVDescription";
 
 export class RecordSerializerCSV implements DPMRecordSerializer {
     getDisplayName(): string {
-        return "CSV (Comma Separated Values)";
+        return DISPLAY_NAME;
     }
 
     isStronglyTyped(_configuration: DPMConfiguration): boolean {
@@ -16,11 +17,11 @@ export class RecordSerializerCSV implements DPMRecordSerializer {
     }
 
     getOutputMimeType(): string {
-        return "text/csv";
+        return MIME_TYPE;
     }
 
     getFileExtension(): string {
-        return "csv";
+        return EXTENSION;
     }
 
     getDefaultParameterValues(

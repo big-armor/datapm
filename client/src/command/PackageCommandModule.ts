@@ -71,11 +71,11 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
             },
             defaultPromptOptions
         );
-        const maybeSource = getSourceByType(urlsPromptResult.source);
+        const maybeSourceDescription = getSourceByType(urlsPromptResult.source);
 
-        if (maybeSource == null) throw new Error("SOURCE_NOT_FOUND - " + urlsPromptResult.source);
+        if (maybeSourceDescription == null) throw new Error("SOURCE_NOT_FOUND - " + urlsPromptResult.source);
 
-        source = maybeSource;
+        source = await maybeSourceDescription.getSource();
     } else {
         let uris = [];
         if (Array.isArray(argv.urls)) {

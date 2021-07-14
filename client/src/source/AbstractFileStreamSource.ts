@@ -15,8 +15,6 @@ import { FileBufferSummary, FileStreamContext, Parser } from "../parser/Parser";
 export abstract class AbstractFileStreamSource implements SourceInterface {
     abstract sourceType(): string;
 
-    abstract supportsURI(uri: string): boolean;
-
     abstract removeSecretConfigValues(configuration: DPMConfiguration): void;
 
     /** Given a URL, return a set of ordered readers that will be used to parse records */

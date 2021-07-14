@@ -14,6 +14,7 @@ import {
     UpdateMethod,
     RecordContext
 } from "./Source";
+import { TYPE } from "./StreamTestSourceDescription";
 
 interface TestSourceAttribute {
     name: string;
@@ -30,11 +31,7 @@ export class StreamTestSource implements SourceInterface {
     configuration: TestSourceConfiguration;
 
     sourceType(): string {
-        return "test";
-    }
-
-    supportsURI(uri: string): boolean {
-        return uri.startsWith("test://");
+        return TYPE;
     }
 
     removeSecretConfigValues(

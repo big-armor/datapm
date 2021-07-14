@@ -19,9 +19,9 @@ import { StreamSetProcessingMethod } from "../util/StreamToSinkUtil";
 import { AbstractFileSink, RecordSerializedContext } from "./AbstractFileSink";
 import { DISPLAY_NAME, TYPE } from "./S3Sink";
 import { SinkState, SinkStateKey, SinkSupportedStreamOptions } from "./Sink";
-import { RecordSerializerCSV } from "./writer/RecordSerializerCSV";
 import { getRecordSerializer } from "./writer/RecordSerializerUtil";
 import { DPMRecordSerializer } from "./writer/RecordSerializer";
+import { RecordSerializerCSVDescription } from "./writer/RecordSerializerCSVDescription";
 
 export class S3SinkModule extends AbstractFileSink {
     s3Client: S3;
@@ -40,7 +40,7 @@ export class S3SinkModule extends AbstractFileSink {
         configuration: DPMConfiguration
     ): Promise<DPMConfiguration> {
         const serializerTransform = (await getRecordSerializer(
-            (configuration.format as string) || new RecordSerializerCSV().getOutputMimeType()
+            (configuration.format as string) || new RecordSerializerCSVDescription().getOutputMimeType()
         )) as DPMRecordSerializer;
 
         const location = path.join(
@@ -54,7 +54,7 @@ export class S3SinkModule extends AbstractFileSink {
         );
 
         return {
-            ...super.getDefaultParameterValues(catalogSlug, packageFile, configuration),
+            ...(await super.getDefaultParameterValues(catalogSlug, packageFile, configuration)),
             fileLocation: location,
             ...configuration
         };

@@ -14,17 +14,11 @@ import { Maybe } from "../util/Maybe";
 import { BatchingTransform } from "./transforms/BatchingTransform";
 import { InflatedByteCountTransform } from "./transforms/InflatedByteCountTransform";
 import { StatsTransform } from "./transforms/StatsTransform";
-import { BigQuerySource } from "./BigQuerySource";
-import { GoogleSheetSource } from "./GoogleSheetSource";
-import { HTTPSource } from "./HTTPSource";
-import { LocalFileSource } from "./LocalFileSource";
-import { PostgresSource } from "./PostgresSource";
-import { RedshiftSource } from "./RedshiftSource";
-import { S3Source } from "./S3Source";
-import { StreamTestSource } from "./StreamTestSource";
+import { S3SourceDescription } from "./S3SourceDescription";
 import { ContentLabelDetector } from "../content-detector/ContentLabelDetector";
 import {
     ExtendedJSONSchema7TypeName,
+    SourceDescription,
     SourceInspectionContext,
     SourceInterface,
     SourceStreamsInspectionResult,
@@ -33,32 +27,39 @@ import {
     StreamStatusContext
 } from "./Source";
 import { JSONSchema7TypeName } from "json-schema";
+import { BigQuerySourceDescription } from "./BigQuerySourceDescription";
+import { GoogleSheetSourceDescription } from "./GoogleSheetSourceDescription";
+import { HTTPSourceDescription } from "./HTTPSourceDescription";
+import { RedshiftSourceDescription } from "./RedshiftSourceDescription";
+import { PostgresSourceDescription } from "./PostgresSourceDescription";
+import { LocalFileSourceDescription } from "./LocalFileSourceDescription";
+import { StreamTestSourceDescription } from "./StreamTestSourceDescription";
 
-const SUPPORTED_SOURCES: Array<SourceInterface> = [
-    new GoogleSheetSource(),
-    new HTTPSource(),
-    new PostgresSource(),
-    new RedshiftSource(),
-    new BigQuerySource(),
-    new S3Source(),
-    new LocalFileSource()
+const SUPPORTED_SOURCES: Array<SourceDescription> = [
+    new GoogleSheetSourceDescription(),
+    new HTTPSourceDescription(),
+    new PostgresSourceDescription(),
+    new RedshiftSourceDescription(),
+    new BigQuerySourceDescription(),
+    new S3SourceDescription(),
+    new LocalFileSourceDescription()
 ];
-const EXTENDED_SOURCES = [...SUPPORTED_SOURCES, new StreamTestSource()];
+const EXTENDED_SOURCES: SourceDescription[] = [...SUPPORTED_SOURCES, new StreamTestSourceDescription()];
 
-export function getSources(): Array<SourceInterface> {
+export function getSources(): Array<SourceDescription> {
     return SUPPORTED_SOURCES;
 }
 
-export function getSourceByType(type: string): Maybe<SourceInterface> {
+export function getSourceByType(type: string): Maybe<SourceDescription> {
     return EXTENDED_SOURCES.find((source) => source.sourceType() === type) || null;
 }
 
 export async function findSourceForUri(uri: string): Promise<SourceInterface> {
     for (let i = 0; i < EXTENDED_SOURCES.length; i++) {
-        const source = EXTENDED_SOURCES[i];
+        const sourceDescription = EXTENDED_SOURCES[i];
 
-        if (source.supportsURI(uri)) {
-            return source;
+        if (sourceDescription.supportsURI(uri)) {
+            return sourceDescription.getSource();
         }
     }
 

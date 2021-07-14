@@ -119,7 +119,8 @@ export interface SourceInspectionContext {
     /** Whether the quiet flag is enabled - in which no user outputs are allowed. */
     quiet: boolean;
 }
-export interface SourceInterface {
+
+export interface SourceDescription {
     /** A universally unique identifier for the source implementation. */
     sourceType(): string;
 
@@ -127,6 +128,12 @@ export interface SourceInterface {
      * would return true for the string 'mysql://` or even just `mysql.
      */
     supportsURI(uri: string): boolean;
+
+    getSource(): Promise<SourceInterface>;
+}
+export interface SourceInterface {
+    /** A universally unique identifier for the source implementation. */
+    sourceType(): string;
 
     /** Remove sensitive config values from the configuration before saving into package file */
     removeSecretConfigValues(configuration: DPMConfiguration): void;

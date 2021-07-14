@@ -4,14 +4,11 @@ import https from "https";
 import { FileOpenStreamContext, FileStreamContext } from "../parser/Parser";
 import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { AbstractFileStreamSource } from "./AbstractFileStreamSource";
+import { TYPE } from "./HTTPSourceDescription";
 
 export class HTTPSource extends AbstractFileStreamSource {
     sourceType(): string {
-        return "http";
-    }
-
-    supportsURI(uri: string): boolean {
-        return uri.startsWith("http://") || uri.startsWith("https://");
+        return TYPE;
     }
 
     removeSecretConfigValues(

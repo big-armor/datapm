@@ -6,21 +6,12 @@ import { FileStreamContext } from "../parser/Parser";
 import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { AbstractFileStreamSource } from "./AbstractFileStreamSource";
 import { SourceInterface } from "./Source";
-import globParent from "glob-parent";
 import glob from "glob";
-import isGlob from "is-glob";
+import { TYPE } from "./LocalFileSourceDescription";
 
 export class LocalFileSource extends AbstractFileStreamSource implements SourceInterface {
     sourceType(): string {
-        return "file";
-    }
-
-    supportsURI(uri: string): boolean {
-        if (uri.startsWith("file://")) return true;
-
-        if (isGlob(uri) && fs.existsSync(globParent(uri))) return true;
-
-        return fs.existsSync(uri);
+        return TYPE;
     }
 
     removeSecretConfigValues(

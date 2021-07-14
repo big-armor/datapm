@@ -45,9 +45,11 @@ export interface RecordStreamEventContext {
  * fetching data unnecessarily.
  */
 export async function inspectSourceConnection(source: Source): Promise<InspectionResults> {
-    const sourceImplementation = getSourceByType(source.type);
+    const sourceDescription = getSourceByType(source.type);
 
-    if (sourceImplementation == null) throw new Error(`Unable to find source method for type ${source.type}`);
+    if (sourceDescription == null) throw new Error(`Unable to find source method for type ${source.type}`);
+
+    const sourceImplementation = await sourceDescription.getSource();
 
     const sourceInspectResult = await sourceImplementation.inspectURIs(source.configuration || {}, {
         defaults: true,

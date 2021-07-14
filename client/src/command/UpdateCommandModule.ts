@@ -299,7 +299,8 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
     newPackageFile.sources = [];
 
     for (const sourceObject of oldPackageFile.sources) {
-        const source = getSourceByType(sourceObject.type);
+        const sourceDescription = getSourceByType(sourceObject.type);
+        const source = await sourceDescription?.getSource();
 
         if (source == null) {
             oraRef.fail("No source implementation found to inspect this data - " + sourceObject.type);

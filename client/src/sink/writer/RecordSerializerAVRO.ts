@@ -7,6 +7,7 @@ import { convertValueByValueType } from "../../source/transforms/StatsTransform"
 import { Parameter } from "../../util/parameters/Parameter";
 import { RecordSerializedContext } from "../AbstractFileSink";
 import { DPMRecordSerializer } from "./RecordSerializer";
+import { DISPLAY_NAME, EXTENSION, MIME_TYPE } from "./RecordSerializerAVRODescription";
 
 class BlockEncoder extends avro.streams.BlockEncoder {
     // eslint-disable-next-line
@@ -25,7 +26,7 @@ export class RecordSerializerAVRO implements DPMRecordSerializer {
     configuration: DPMConfiguration;
 
     getDisplayName(): string {
-        return "AVRO";
+        return DISPLAY_NAME;
     }
 
     isStronglyTyped(_configuration: DPMConfiguration): boolean {
@@ -33,11 +34,11 @@ export class RecordSerializerAVRO implements DPMRecordSerializer {
     }
 
     getOutputMimeType(): string {
-        return "application/avro";
+        return MIME_TYPE;
     }
 
     getFileExtension(): string {
-        return "avro";
+        return EXTENSION;
     }
 
     getDefaultParameterValues(

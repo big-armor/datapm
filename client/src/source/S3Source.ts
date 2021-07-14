@@ -8,10 +8,11 @@ import { Parameter, ParameterType } from "../util/parameters/Parameter";
 import { AbstractFileStreamSource } from "./AbstractFileStreamSource";
 import { HTTPSource } from "./HTTPSource";
 import { SourceInterface } from "./Source";
+import { TYPE } from "./S3SourceDescription";
 
 export class S3Source extends AbstractFileStreamSource implements SourceInterface {
     sourceType(): string {
-        return "s3";
+        return TYPE;
     }
 
     supportsURI(uri: string): boolean {

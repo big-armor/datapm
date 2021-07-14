@@ -14,14 +14,11 @@ import {
 } from "./Source";
 import { Transform } from "stream";
 import { table } from "console";
+import { TYPE } from "./PostgresSourceDescription";
 
 export class PostgresSource implements SourceInterface {
     sourceType(): string {
-        return "postgres";
-    }
-
-    supportsURI(uri: string): boolean {
-        return uri.startsWith("postgres://");
+        return TYPE;
     }
 
     removeSecretConfigValues(
