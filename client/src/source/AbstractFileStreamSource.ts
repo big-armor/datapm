@@ -11,6 +11,7 @@ import { LogType } from "../util/LoggingUtils";
 import { nameFromUrls } from "../util/NameUtil";
 import { StreamState } from "../sink/Sink";
 import { FileBufferSummary, FileStreamContext, Parser } from "../parser/Parser";
+import { asyncMap } from "../util/AsyncUtils";
 
 export abstract class AbstractFileStreamSource implements SourceInterface {
     abstract sourceType(): string;
@@ -128,7 +129,7 @@ export abstract class AbstractFileStreamSource implements SourceInterface {
         };
 
         if (parserInspectionResults.stream) {
-            streamSetPreview.streamSummaries = await fileStreamSummaries.asyncMap(async (f) => {
+            streamSetPreview.streamSummaries = await asyncMap(fileStreamSummaries, async (f) => {
                 return {
                     name: f.fileName,
                     expectedTotalRawBytes: f.fileSize,

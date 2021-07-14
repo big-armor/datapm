@@ -7,7 +7,7 @@ import { UserEntity } from "../entity/UserEntity";
 import { CatalogIdentifierInput, Permission, SetUserCatalogPermissionInput, UserStatus } from "../generated/graphql";
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { UserRepository } from "../repository/UserRepository";
-import { asyncForEach } from "../util/AsyncForEach";
+import { asyncForEach } from "../util/AsyncUtils";
 import { sendInviteUser, sendShareNotification, validateMessageContents } from "../util/smtpUtil";
 import { getCatalogFromCacheOrDbOrFail } from "./CatalogResolver";
 import { deleteCatalogFollowByUserId } from "./FollowResolver";

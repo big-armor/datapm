@@ -68,6 +68,6 @@ function flatten<T>(arr: T[][]): T[] {
     return ([] as T[]).concat(...arr);
 }
 
-function asyncMap<T, O>(arr: T[], asyncFn: (t: T) => Promise<O>): Promise<O[]> {
+export function asyncMap<T, O>(arr: T[], asyncFn: (t: T) => Promise<O>): Promise<O[]> {
     return Promise.all(arr.map(asyncFn));
 }

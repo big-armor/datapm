@@ -89,6 +89,7 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
             source = await findSourceForUri(uris[0]);
             oraRef.succeed(`Found ${source.sourceType()} source`);
         } catch (error) {
+            console.error(error);
             oraRef.fail("No source implementation found to inspect this data - " + uris[0]);
             exit(1);
         }

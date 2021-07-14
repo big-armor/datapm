@@ -8,7 +8,7 @@ import { PackageIdentifierInput, Permission, SetPackagePermissionInput, UserStat
 import { PackagePermissionRepository } from "../repository/PackagePermissionRepository";
 import { PackageRepository } from "../repository/PackageRepository";
 import { UserRepository } from "../repository/UserRepository";
-import { asyncForEach } from "../util/AsyncForEach";
+import { asyncForEach } from "../util/AsyncUtils";
 import { sendInviteUser, sendShareNotification, validateMessageContents } from "../util/smtpUtil";
 import { deletePackageFollowByUserId, deletePackageIssuesFollowsByUserId } from "./FollowResolver";
 import { getPackageFromCacheOrDbOrFail, getPackageFromCacheOrDbByIdOrFail } from "./PackageResolver";

@@ -59,7 +59,7 @@ export async function findSourceForUri(uri: string): Promise<SourceInterface> {
         const sourceDescription = EXTENDED_SOURCES[i];
 
         if (sourceDescription.supportsURI(uri)) {
-            return sourceDescription.getSource();
+            return await sourceDescription.getSource();
         }
     }
 
