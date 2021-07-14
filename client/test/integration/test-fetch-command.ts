@@ -192,7 +192,7 @@ describe("Fetch Command Tests", async function () {
     });
 
     it("Fetch package with file sink", async function () {
-        const prompts = getFetchCommandPromptInputs([KEYS.DOWN]);
+        const prompts = getFetchCommandPromptInputs([KEYS.DOWN, "Local" + KEYS.ENTER, "JSON" + KEYS.ENTER]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -268,7 +268,12 @@ describe("Fetch Command Tests", async function () {
     });
 
     it("Should honor the excluded and renamed attributes", async function () {
-        const prompts = getFetchCommandPromptInputs([KEYS.DOWN, "", "", "tmp-files"]);
+        const prompts = getFetchCommandPromptInputs([
+            KEYS.DOWN + KEYS.ENTER,
+            "Local" + KEYS.ENTER,
+            "JSON" + KEYS.ENTER,
+            "tmp-files"
+        ]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -278,11 +283,8 @@ describe("Fetch Command Tests", async function () {
             "fetch",
             ["package-b.datapm.json", "--forceUpdate"],
             prompts,
-            (line: string, promptIndex: number) => {
-                if (
-                    promptIndex === prompts.length &&
-                    line.includes("Next time you can run this same configuration in a single command.")
-                ) {
+            (line: string) => {
+                if (line.includes("Finished writing 51 records")) {
                     results.messageFound = true;
                 }
             }
