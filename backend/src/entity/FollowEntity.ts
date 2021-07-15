@@ -1,5 +1,10 @@
 import { Entity, Column, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { ActivityLogEventType, NotificationEventType, NotificationFrequency } from "../generated/graphql";
+import {
+    ActivityLogChangeType,
+    ActivityLogEventType,
+    NotificationEventType,
+    NotificationFrequency
+} from "../generated/graphql";
 import { CatalogEntity } from "./CatalogEntity";
 import { CollectionEntity } from "./CollectionEntity";
 import { EntityBaseModel } from "./EntityBaseModel";
@@ -39,6 +44,15 @@ export class FollowEntity extends EntityBaseModel {
 
     @Column({ name: "target_user_id" })
     public targetUserId: number;
+
+    @Column({ name: "follow_all_packages" })
+    public followAllPackages: boolean;
+
+    @Column({ name: "follow_all_package_issues" })
+    public followAllPackageIssues: boolean;
+
+    @Column("enum", { array: true, name: "change_type", enum: ActivityLogChangeType })
+    public changeType: ActivityLogChangeType[];
 
     @ManyToOne(() => UserEntity)
     @JoinColumn({ name: "user_id" })

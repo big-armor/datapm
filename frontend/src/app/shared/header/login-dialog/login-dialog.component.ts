@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { Router, ActivatedRoute } from "@angular/router";
+import { Router, ActivatedRoute, Params } from "@angular/router";
 import { MatDialogRef } from "@angular/material/dialog";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { AUTHENTICATION_ERROR, User } from "src/generated/graphql";
@@ -23,16 +23,17 @@ enum State {
     styleUrls: ["./login-dialog.component.scss"]
 })
 export class LoginDialogComponent implements OnInit, OnDestroy {
-    State = State;
-
+    public State = State;
     public state = State.LOGGED_OUT;
-    private subscription: Subscription;
 
-    loginForm = new FormGroup({
+    public loginForm = new FormGroup({
         username: new FormControl("", Validators.required),
         password: new FormControl("", Validators.required)
     });
-    fragment: string;
+
+    private subscription: Subscription;
+    private queryParams: Params;
+    private fragment: string;
 
     constructor(
         private authenticationService: AuthenticationService,
@@ -42,7 +43,7 @@ export class LoginDialogComponent implements OnInit, OnDestroy {
         private dialogRef: MatDialogRef<LoginDialogComponent>
     ) {}
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         if (this.authenticationService.currentUser.value != null) {
             this.state = State.LOGGED_IN;
         }
@@ -55,13 +56,14 @@ export class LoginDialogComponent implements OnInit, OnDestroy {
             }
         });
         this.fragment = this.route.snapshot.fragment || null;
+        this.queryParams = this.route.snapshot.queryParams || [];
     }
 
-    ngOnDestroy(): void {
+    public ngOnDestroy(): void {
         this.subscription.unsubscribe();
     }
 
-    formSubmit() {
+    public formSubmit(): void {
         this.state = State.AWAITING_RESPONSE;
 
         this.authenticationService.login(this.loginForm.value.username, this.loginForm.value.password).subscribe(
@@ -84,7 +86,7 @@ export class LoginDialogComponent implements OnInit, OnDestroy {
                 this.state = State.LOGGED_IN;
                 const returnUrl = this.route.queryParams["returnUrl"];
                 if (returnUrl) {
-                    this.router.navigate([returnUrl], { fragment: this.fragment });
+                    this.router.navigate([returnUrl], { queryParams: this.queryParams, fragment: this.fragment });
                 } else {
                     if (window.location.href.includes("validate-email"))
                         window.location.href = "/" + this.loginForm.value.username;
@@ -98,7 +100,7 @@ export class LoginDialogComponent implements OnInit, OnDestroy {
         );
     }
 
-    openForgotPasswordDialog(ev: any) {
+    public openForgotPasswordDialog(ev: any): void {
         ev.preventDefault();
         this.dialogRef.close();
         this.dialogRef.afterClosed().subscribe(() => {
@@ -106,7 +108,7 @@ export class LoginDialogComponent implements OnInit, OnDestroy {
         });
     }
 
-    openSignupDialog(ev: any) {
+    public openSignupDialog(ev: any): void {
         ev.preventDefault();
         this.dialogRef.close();
         this.dialogRef.afterClosed().subscribe(() => {

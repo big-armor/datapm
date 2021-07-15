@@ -25,7 +25,7 @@ export class ValidPasswordDirective extends SchemaDirectiveVisitor {
     ): GraphQLArgument | void | null {
         const { resolve = defaultFieldResolver } = details.field;
         details.field.resolve = function (source, args, context: Context, info) {
-            const password: string | undefined = args.password || args.value.password || undefined;
+            const password: string | undefined = args.password || args.value?.password || undefined;
             validatePassword(password);
             return resolve.apply(this, [source, args, context, info]);
         };
@@ -36,7 +36,7 @@ export class ValidPasswordDirective extends SchemaDirectiveVisitor {
         field.resolve = function (source, args, context: Context, info) {
             const password: string | undefined = args.password || args.value.password || undefined;
 
-            validatePassword(args.password);
+            validatePassword(password);
 
             return resolve.apply(this, [source, args, context, info]);
         };

@@ -10,14 +10,10 @@
         <div class="accordions-group mt-2">
             <mat-accordion class="schema-property" multi>
                 <mat-expansion-panel
-                    *ngFor="
-                        let property of schema?.properties
-                            | values
-                            | sortBy: 'asc':'title'
-                            | slice: 0:propertiesToShowCount
-                    "
+                    *ngFor="let property of schema?.properties | values | sortBy: 'asc':'title'; let i = index"
                     [id]="getPropertyId(property)"
                     [expanded]="getPropertyId(property) == focusedPropertyId"
+                    [hidden]="propertiesToShowCount < i + 1"
                 >
                     <mat-expansion-panel-header>
                         <mat-panel-title class="text-dark-gray weight-500">
@@ -40,8 +36,12 @@
                     </mat-expansion-panel-header>
                     <div>
                         <div class="text-dark-gray mb-2">
-                            <a class="cursor-pointer doc-link" (click)="editPropertyDialog(property)">Edit Property</a>
-                            <span class="px-2">|</span>
+                            <ng-container *ngIf="hasEditPermissions">
+                                <a class="cursor-pointer doc-link" (click)="editPropertyDialog(property)"
+                                    >Edit Property</a
+                                >
+                                <span class="px-2">|</span>
+                            </ng-container>
                             <a class="cursor-pointer doc-link" (click)="createIssue(property)">Create Issue</a>
                             <span class="px-2">|</span>
                             <a class="cursor-pointer doc-link" (click)="copyLink(property)">Copy Link</a>

@@ -57,11 +57,12 @@ export class CatalogComponent implements OnInit {
                 const data = response.data;
                 if (!data) {
                     this.pageType = PageType.UNKNOWN;
+                    this.state = "ERROR";
                     return;
                 }
 
                 this.updatePageType(route, data.pageContent);
-                this.state = PageType.UNKNOWN === this.pageType ? "ERROR" : "SUCCESS";
+                this.state = "SUCCESS";
             },
             () => (this.state = "ERROR")
         );
@@ -80,6 +81,7 @@ export class CatalogComponent implements OnInit {
             this.updateTemplateSettings(route, content);
         } else {
             this.pageType = PageType.UNKNOWN;
+            this.state = "ERROR";
         }
     }
 

@@ -1,9 +1,11 @@
 import { Component, Input, OnChanges, SimpleChanges } from "@angular/core";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { ActivatedRoute, Router } from "@angular/router";
 import { Subscription } from "rxjs";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { Follow, FollowIdentifierInput, GetFollowGQL, User } from "src/generated/graphql";
 import { FollowDialogComponent, FollowDialogResult } from "../../dialogs/follow-dialog/follow-dialog.component";
+import { LoginDialogComponent } from "../../header/login-dialog/login-dialog.component";
 
 @Component({
     selector: "app-user-details-header",
@@ -23,7 +25,9 @@ export class UserDetailsHeaderComponent implements OnChanges {
     constructor(
         public dialog: MatDialog,
         private authService: AuthenticationService,
-        private getFollowGQL: GetFollowGQL
+        private getFollowGQL: GetFollowGQL,
+        private router: Router,
+        private route: ActivatedRoute
     ) {
         this.subscription = this.authService.currentUser.subscribe((user: User) => {
             this.currentUser = user;
@@ -45,23 +49,38 @@ export class UserDetailsHeaderComponent implements OnChanges {
     }
 
     public follow(): void {
-        this.openFollowModal()
-            .afterClosed()
-            .subscribe((result) => {
+        const followDialogRef = this.openFollowModal();
+        if (followDialogRef) {
+            followDialogRef.afterClosed().subscribe((result) => {
                 if (!result) {
                     return;
                 }
 
                 this.updatePackageFollow(result.follow);
             });
+        }
     }
 
     private getFollow(): void {
+        if (!this.currentUser) {
+            return;
+        }
+
         this.getFollowGQL
             .fetch({
                 follow: this.buildFollowIdentifier()
             })
-            .subscribe((response) => this.updatePackageFollow(response.data?.getFollow));
+            .subscribe((response) => {
+                this.updatePackageFollow(response.data?.getFollow);
+                const shouldOpenFollowModal = this.route.snapshot.queryParamMap.get("following");
+
+                if (shouldOpenFollowModal) {
+                    if (!this.isFollowing) {
+                        this.follow();
+                    }
+                    this.router.navigate([], { preserveFragment: true });
+                }
+            });
     }
 
     private buildFollowIdentifier(): FollowIdentifierInput {
@@ -73,6 +92,19 @@ export class UserDetailsHeaderComponent implements OnChanges {
     }
 
     private openFollowModal(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
+        if (!this.currentUser) {
+            this.openLoginDialog();
+        } else {
+            return this.openFollowDialog();
+        }
+    }
+
+    private updatePackageFollow(follow: Follow): void {
+        this.userFollow = follow;
+        this.isFollowing = follow != null;
+    }
+
+    private openFollowDialog(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
         return this.dialog.open(FollowDialogComponent, {
             width: "500px",
             data: {
@@ -82,8 +114,13 @@ export class UserDetailsHeaderComponent implements OnChanges {
         });
     }
 
-    private updatePackageFollow(follow: Follow): void {
-        this.userFollow = follow;
-        this.isFollowing = follow != null;
+    private openLoginDialog(): void {
+        this.router.navigate([], { queryParams: { following: true }, preserveFragment: true });
+        this.dialog
+            .open(LoginDialogComponent, {
+                disableClose: true
+            })
+            .afterClosed()
+            .subscribe(() => this.router.navigate([], { preserveFragment: true }));
     }
 }

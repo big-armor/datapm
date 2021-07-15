@@ -4,7 +4,7 @@ export function buildMarkedOptionsFactory(): MarkedOptions {
     const renderer = new MarkedRenderer();
 
     renderer.blockquote = (text: string) => {
-        return '<blockquote class="markdown-quote-block"><p>' + text + "</p></blockquote>";
+        return "<blockquote><p>" + text + "</p></blockquote>";
     };
 
     return {

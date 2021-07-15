@@ -490,25 +490,62 @@ export class FollowRepository extends Repository<FollowEntity> {
         endDate: Date,
         frequency: NotificationFrequency
     ): Promise<Notification[]> {
-        const sql = `select f.user_id, f.target_package_id, json_agg(al) as pending_notifications, COUNT(al) as count from follow f 
+        const sql = `select f.user_id, al.target_package_id, json_agg(al) as pending_notifications, COUNT(al) as count from follow f
         join lateral(
-           select a.event_type, 
-           	   json_agg(json_build_object('created_at', a.created_at, 'user_id', a.user_id , 'package_version_id', a.target_package_version_id, 'properties_edited', a.properties_edited, 'change_type', a.change_type ) order by a.created_at ) as actions,
+           select a.event_type,
+               a.target_package_id,
+           	   json_agg(json_build_object('created_at', a.created_at, 'user_id', a.user_id, 'package_version_id', a.target_package_version_id, 'properties_edited', a.properties_edited, 'change_type', a.change_type ) order by a.created_at ) as actions,
                array_accum(distinct a.properties_edited) as properties_edited 
-           from activity_log a 
-           where
+           from activity_log a where
            a.created_at  > $2
            AND a.created_at <= $3 
-           and a.target_package_id  = f.target_package_id 
-           and a.event_type in (select * from unnest( f.event_types)) 
-           and a.user_id <> f.user_id 
-           group by a.event_type
-       ) al on true
+           AND (
+            a.event_type in (select * from unnest(f.event_types))
+            AND a.user_id <> f.user_id
+            AND (
+                a.target_package_id = f.target_package_id
+                OR
+                    (
+                        f.follow_all_packages IS TRUE
+                        AND
+                        (
+                            a."change_type"::activity_log_change_type_enum IN (SELECT * FROM unnest(f."change_type"))
+                            AND
+                            (
+                                -- Include catalog's packages logs if catalog is not null
+                                (
+                                    f."target_catalog_id" IS NOT NULL
+                                    AND a."target_package_id" IN
+                                    (
+                                        SELECT id
+                                        FROM package
+                                        WHERE catalog_id = f."target_catalog_id"
+                                    )
+                                )
+                                OR
+                                -- Include collection's packages logs if collection is not null
+                                (
+                                    f."target_collection_id" IS NOT NULL
+                                    AND a."target_package_id" IN
+                                    (
+                                        SELECT package_id
+                                        FROM collection_package
+                                        WHERE collection_id = f."target_collection_id"
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+            group by a.event_type, a.target_package_id
+        ) al on true
        and f.notification_frequency = $1
-       group by f.user_id, f.target_package_id 
+       group by f.user_id, al.target_package_id 
        order by f.user_id`;
 
-        const query = (await this.query(sql, [frequency, startDate, endDate])) as {
+        const queryResult = await this.query(sql, [frequency, startDate, endDate]);
+        const query = queryResult as {
             user_id: number;
             target_package_id: number;
             pending_notifications: {

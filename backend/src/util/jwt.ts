@@ -1,10 +1,6 @@
-import { promisify } from "util";
 import { AuthenticationError, ApolloError } from "apollo-server";
-import { EntityManager } from "typeorm";
-import jwks from "jwks-rsa";
 import jwt from "jsonwebtoken";
 import express from "express";
-import fetch from "node-fetch";
 
 import { UserEntity } from "../entity/UserEntity";
 import { getEnvVariable } from "./getEnvVariable";
@@ -97,16 +93,4 @@ export function createJwt(user: UserEntity): string {
         audience: getEnvVariable("JWT_AUDIENCE"),
         issuer: getEnvVariable("JWT_ISSUER")
     });
-}
-
-interface UserInfo {
-    sub: string;
-    given_name?: string;
-    family_name?: string;
-    nickname?: string;
-    name: string;
-    picture: string;
-    updated_at: string;
-    emailAddress: string;
-    email_verified: boolean;
 }

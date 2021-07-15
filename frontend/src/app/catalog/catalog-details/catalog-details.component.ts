@@ -24,6 +24,7 @@ import {
     FollowDialogResult
 } from "src/app/shared/dialogs/follow-dialog/follow-dialog.component";
 import { AuthenticationService } from "src/app/services/authentication.service";
+import { LoginDialogComponent } from "src/app/shared/header/login-dialog/login-dialog.component";
 
 @Component({
     selector: "app-catalog-details",
@@ -63,7 +64,8 @@ export class CatalogDetailsComponent implements OnInit, OnDestroy {
     public updateTabParam() {
         const tab = this.tabs[this.currentTab];
         const extras: NavigationExtras = {
-            relativeTo: this.route
+            relativeTo: this.route,
+            queryParamsHandling: "preserve"
         };
 
         if (tab !== "") {
@@ -153,15 +155,16 @@ export class CatalogDetailsComponent implements OnInit, OnDestroy {
     }
 
     public follow(): void {
-        this.openFollowModal()
-            .afterClosed()
-            .subscribe((result) => {
+        const followDialogRef = this.openFollowModal();
+        if (followDialogRef) {
+            followDialogRef.afterClosed().subscribe((result) => {
                 if (!result) {
                     return;
                 }
 
                 this.updateCatalogFollow(result.follow);
             });
+        }
     }
 
     private loadFollowersCount(): void {
@@ -182,21 +185,34 @@ export class CatalogDetailsComponent implements OnInit, OnDestroy {
     }
 
     private getFollow(): void {
+        if (!this.currentUser) {
+            this.updateCatalogFollow(null);
+            return;
+        }
+
         this.getFollowGQL
             .fetch({
                 follow: this.buildFollowIdentifier()
             })
-            .subscribe((response) => this.updateCatalogFollow(response.data?.getFollow));
+            .subscribe((response) => {
+                this.updateCatalogFollow(response.data?.getFollow);
+                const shouldOpenFollowModal = this.route.snapshot.queryParamMap.get("following");
+
+                if (shouldOpenFollowModal) {
+                    if (!this.isFollowing) {
+                        this.follow();
+                    }
+                    this.router.navigate([], { preserveFragment: true });
+                }
+            });
     }
 
     private openFollowModal(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
-        return this.dialog.open(FollowDialogComponent, {
-            width: "500px",
-            data: {
-                follow: this.catalogFollow,
-                followIdentifier: this.buildFollowIdentifier()
-            } as FollowDialogData
-        });
+        if (!this.currentUser) {
+            this.openLoginDialog();
+        } else {
+            return this.openFollowDialog();
+        }
     }
 
     private buildFollowIdentifier(): FollowIdentifierInput {
@@ -211,5 +227,25 @@ export class CatalogDetailsComponent implements OnInit, OnDestroy {
         this.catalogFollow = follow;
         this.isFollowing = follow != null;
         this.state = "SUCCESS";
+    }
+
+    private openFollowDialog(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
+        return this.dialog.open(FollowDialogComponent, {
+            width: "500px",
+            data: {
+                follow: this.catalogFollow,
+                followIdentifier: this.buildFollowIdentifier()
+            } as FollowDialogData
+        });
+    }
+
+    private openLoginDialog(): void {
+        this.router.navigate([], { queryParams: { following: true }, preserveFragment: true });
+        this.dialog
+            .open(LoginDialogComponent, {
+                disableClose: true
+            })
+            .afterClosed()
+            .subscribe(() => this.router.navigate([], { preserveFragment: true }));
     }
 }

@@ -250,6 +250,9 @@ Notification Event type
 enum NotificationEventType {
     PACKAGE_CREATED
     VERSION_CREATED
+    PACKAGE_PATCH_CHANGE
+    PACKAGE_MINOR_CHANGE
+    PACKAGE_MAJOR_CHANGE
     PACKAGE_EDIT
     COLLECTION_PACKAGE_ADDED
     COLLECTION_PACKAGE_REMOVED
@@ -672,6 +675,9 @@ type Follow {
     package: Package
     collection: Collection
     packageIssue: PackageIssue
+    followAllPackages: Boolean
+    followAllPackageIssues: Boolean
+    changeType: [ActivityLogChangeType]
 }
 
 """
@@ -948,6 +954,9 @@ input SaveFollowInput {
     collection: CollectionIdentifierInput
     packageIssue: PackageIssueFullIdentifierInput
     user: UserIdentifierInput
+    followAllPackages: Boolean
+    followAllPackageIssues: Boolean
+    changeType: [ActivityLogChangeType]
 }
 
 """

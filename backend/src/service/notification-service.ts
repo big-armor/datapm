@@ -268,7 +268,6 @@ async function getPackageChanges(
                     }
 
                     let userDisplayName = user?.displayName;
-                    let action = "took an unknown action";
 
                     const uniqueUsers = [
                         ...new Set(n.actions.map((a) => a.user_id).filter((f) => f != n.actions[0].user_id))
@@ -276,8 +275,6 @@ async function getPackageChanges(
                     if (uniqueUsers.length > 1) {
                         userDisplayName += " and " + uniqueUsers.length + " other users";
                     }
-
-                    const timeAgo = "unknown time ago";
 
                     if (n.event_type == ActivityLogEventType.PACKAGE_EDIT) {
                         const alertableProperties = n.properties_edited.filter((p) =>
@@ -586,8 +583,8 @@ async function getCollectionChanges(
     );
 }
 
-/** Returns pending notifications for each user based on the start and end date range of the actions
- * taken.
+/**
+ * Returns pending notifications for each user based on the start and end date range of the actions taken.
  */
 async function getPendingNotifications(
     databaseConnection: Connection,

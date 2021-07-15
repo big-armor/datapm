@@ -11,6 +11,7 @@ import {
 } from "src/app/shared/dialogs/follow-dialog/follow-dialog.component";
 import { ShareDialogComponent } from "src/app/shared/dialogs/share-dialog/share-dialog.component";
 import { EditCollectionComponent } from "src/app/shared/edit-collection/edit-collection.component";
+import { LoginDialogComponent } from "src/app/shared/header/login-dialog/login-dialog.component";
 import {
     Collection,
     CollectionFollowersCountGQL,
@@ -67,7 +68,7 @@ export class CollectionDetailsComponent implements OnDestroy {
         });
     }
 
-    ngOnDestroy() {
+    public ngOnDestroy(): void {
         this.unsubscribe$.next();
         this.unsubscribe$.complete();
     }
@@ -91,7 +92,8 @@ export class CollectionDetailsComponent implements OnDestroy {
     public updateTabParam() {
         const tab = this.tabs[this.currentTab];
         const extras: NavigationExtras = {
-            relativeTo: this.route
+            relativeTo: this.route,
+            queryParamsHandling: "preserve"
         };
 
         if (tab !== "") {
@@ -125,18 +127,18 @@ export class CollectionDetailsComponent implements OnDestroy {
                     this.loadFollowersCount();
                     if (this.collection.myPermissions.includes(Permission.MANAGE)) {
                         this.tabs.push("manage");
-
-                        this.route.fragment.pipe(takeUntil(this.unsubscribe$)).subscribe((fragment: string) => {
-                            const index = this.tabs.findIndex((tab) => tab === fragment);
-                            if (index < 0) {
-                                this.currentTab = 0;
-                                this.updateTabParam();
-                            } else {
-                                this.currentTab = index;
-                                this.updateTabParam();
-                            }
-                        });
                     }
+
+                    this.route.fragment.pipe(takeUntil(this.unsubscribe$)).subscribe((fragment: string) => {
+                        const index = this.tabs.findIndex((tab) => tab === fragment);
+                        if (index < 0) {
+                            this.currentTab = 0;
+                            this.updateTabParam();
+                        } else {
+                            this.currentTab = index;
+                            this.updateTabParam();
+                        }
+                    });
                     this.state = "SUCCESS";
                     this.getFollow();
                 },
@@ -207,15 +209,16 @@ export class CollectionDetailsComponent implements OnDestroy {
     }
 
     public follow(): void {
-        this.openFollowModal()
-            .afterClosed()
-            .subscribe((result) => {
+        const followDialogRef = this.openFollowModal();
+        if (followDialogRef) {
+            followDialogRef.afterClosed().subscribe((result) => {
                 if (!result) {
                     return;
                 }
 
                 this.updatePackageFollow(result.follow);
             });
+        }
     }
 
     private loadFollowersCount(): void {
@@ -236,11 +239,25 @@ export class CollectionDetailsComponent implements OnDestroy {
     }
 
     private getFollow(): void {
+        if (!this.currentUser) {
+            return;
+        }
+
         this.getFollowGQL
             .fetch({
                 follow: this.buildFollowIdentifier()
             })
-            .subscribe((response) => this.updatePackageFollow(response.data?.getFollow));
+            .subscribe((response) => {
+                this.updatePackageFollow(response.data?.getFollow);
+                const shouldOpenFollowModal = this.route.snapshot.queryParamMap.get("following");
+
+                if (shouldOpenFollowModal) {
+                    if (!this.isFollowing) {
+                        this.follow();
+                    }
+                    this.router.navigate([], { preserveFragment: true });
+                }
+            });
     }
 
     private buildFollowIdentifier(): FollowIdentifierInput {
@@ -252,6 +269,19 @@ export class CollectionDetailsComponent implements OnDestroy {
     }
 
     private openFollowModal(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
+        if (!this.currentUser) {
+            this.openLoginDialog();
+        } else {
+            return this.openFollowDialog();
+        }
+    }
+
+    private updatePackageFollow(follow: Follow): void {
+        this.collectionFollow = follow;
+        this.isFollowing = follow != null;
+    }
+
+    private openFollowDialog(): MatDialogRef<FollowDialogComponent, FollowDialogResult> {
         return this.dialog.open(FollowDialogComponent, {
             width: "500px",
             data: {
@@ -261,8 +291,13 @@ export class CollectionDetailsComponent implements OnDestroy {
         });
     }
 
-    private updatePackageFollow(follow: Follow): void {
-        this.collectionFollow = follow;
-        this.isFollowing = follow != null;
+    private openLoginDialog(): void {
+        this.router.navigate([], { queryParams: { following: true }, preserveFragment: true });
+        this.dialog
+            .open(LoginDialogComponent, {
+                disableClose: true
+            })
+            .afterClosed()
+            .subscribe(() => this.router.navigate([], { preserveFragment: true }));
     }
 }

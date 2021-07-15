@@ -125,7 +125,7 @@ describe("Package Search Tests", async () => {
         let response = await userAClient.query({
             query: SearchPackagesDocument,
             variables: {
-                limit: 999,
+                limit: 1000,
                 offset: 0,
                 query: "readme"
             }

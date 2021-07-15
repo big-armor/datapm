@@ -186,13 +186,77 @@ export class ActivityLogRepository extends Repository<ActivityLogEntity> {
                     "ActivityLog"."user_id" != "Follow"."user_id"
                 AND "ActivityLog"."event_type" IN (SELECT * FROM unnest("Follow"."event_types"))
                 AND
+                (
+                    "ActivityLog"."user_id" = "Follow"."target_user_id"
+                    OR "ActivityLog"."target_collection_id" = "Follow"."target_collection_id"
+                    OR "ActivityLog"."target_catalog_id" = "Follow"."target_catalog_id"
+                    OR "ActivityLog"."target_package_issue_id" = "Follow"."target_package_issue_id"
+                    OR "ActivityLog"."target_package_id" = "Follow"."target_package_id"
+
+                    OR
+                    -- Include all package issues of a package if follow_all_package_issues is true on a package/catalog/collection
                     (
-                        "ActivityLog"."user_id" = "Follow"."target_user_id"
-                        OR "ActivityLog"."target_collection_id" = "Follow"."target_collection_id"
-                        OR "ActivityLog"."target_catalog_id" = "Follow"."target_catalog_id"
-                        OR "ActivityLog"."target_package_issue_id" = "Follow"."target_package_issue_id"
-                        OR "ActivityLog"."target_package_id" = "Follow"."target_package_id"
+                        "Follow"."follow_all_package_issues" IS TRUE
+                        AND "ActivityLog"."target_package_issue_id" IS NOT NULL
+                        AND
+                        (
+                            -- Include catalog's packages' issues logs if catalog is not null
+                            (
+                                "Follow"."target_catalog_id" IS NOT NULL
+                                AND "ActivityLog"."target_package_id" IN
+                                (
+                                    SELECT id
+                                    FROM package
+                                    WHERE catalog_id = "Follow"."target_catalog_id"
+                                )
+                            )
+                            OR
+                            -- Include collection's packages' issues logs if collection is not null
+                            (
+                                "Follow"."target_collection_id" IS NOT NULL
+                                AND "ActivityLog"."target_package_id" IN
+                                (
+                                    SELECT package_id
+                                    FROM collection_package
+                                    WHERE collection_id = "Follow"."target_collection_id"
+                                )
+                            )
+                        )
                     )
+                    
+                    OR
+                    -- Include all packages of a catalog/collection if follow_all_packages is true
+                    (
+                        "Follow"."follow_all_packages" IS TRUE
+                        AND "ActivityLog"."target_package_id" IS NOT NULL
+                        AND
+                        (
+                            -- Include catalog's packages logs if catalog is not null
+                            (
+                                "Follow"."target_catalog_id" IS NOT NULL
+                                AND "ActivityLog"."target_package_id" IN
+                                (
+                                    SELECT id
+                                    FROM package
+                                    WHERE catalog_id = "Follow"."target_catalog_id"
+                                )
+                            )
+                            OR
+                            -- Include collection's packages logs if collection is not null
+                            (
+                                "Follow"."target_collection_id" IS NOT NULL
+                                AND "ActivityLog"."target_package_id" IN
+                                (
+                                    SELECT package_id
+                                    FROM collection_package
+                                    WHERE collection_id = "Follow"."target_collection_id"
+                                )
+                            )
+                        )
+                    )
+                )
+
+                -- Permission checks
                 AND
                     CASE
                         WHEN "ActivityLog"."target_collection_id" IS NULL THEN TRUE
@@ -223,9 +287,18 @@ export class ActivityLogRepository extends Repository<ActivityLogEntity> {
                         WHEN "ActivityLog"."target_package_id" IS NULL THEN TRUE
                         ELSE
                             (
-                                (SELECT pkg."isPublic" FROM package pkg WHERE pkg.id = "ActivityLog"."target_package_id") IS TRUE
-                                OR
-                                (EXISTS (SELECT pu.package_id FROM user_package_permission pu WHERE "ActivityLog"."target_package_id" = pu.package_id AND pu.user_id = "Follow".user_id))
+                                -- Check whether the log is included in user's log level follow settings
+                                CASE
+                                    WHEN "ActivityLog"."event_type" != 'VERSION_CREATED'::activity_log_event_type_enum THEN TRUE
+                                    ELSE ("ActivityLog"."change_type"::activity_log_change_type_enum IN (SELECT * FROM unnest("Follow"."change_type")))
+                                END
+                                AND
+                                -- Permission check
+                                (
+                                    (SELECT pkg."isPublic" FROM package pkg WHERE pkg.id = "ActivityLog"."target_package_id") IS TRUE
+                                    OR
+                                    (EXISTS (SELECT pu.package_id FROM user_package_permission pu WHERE "ActivityLog"."target_package_id" = pu.package_id AND pu.user_id = "Follow".user_id))
+                                )
                             )
                     END
                 `
