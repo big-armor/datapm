@@ -30,14 +30,6 @@ export class AVROParser implements Parser {
         return MIME_TYPE;
     }
 
-    /** Should return true if the parser implementation will support parsing the given FileStreamSummary */
-    supportsFileStream(streamSummary: FileBufferSummary): boolean {
-        const firstFourBytes = streamSummary.buffer.toString("ascii", 0, 4);
-
-        if (firstFourBytes === "Obj" + String.fromCharCode(1)) return true;
-        return streamSummary.uri.endsWith(".avro") || streamSummary.fileName?.toLowerCase().endsWith(".avro") || false;
-    }
-
     /** Returns a set of parameters based on the provided uri and configuration */
     async inspectFile(
         fileStreamSummary: FileBufferSummary,

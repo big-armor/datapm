@@ -20,23 +20,6 @@ export class JSONParser implements Parser {
         return MIME_TYPE;
     }
 
-    /** Should return true if the parser implementation will support parsing the given FileStreamSummary */
-    supportsFileStream(streamSummary: FileBufferSummary): boolean {
-        if (
-            streamSummary.detectedMimeType !== null &&
-            streamSummary.detectedMimeType !== "application/json" &&
-            streamSummary.detectedMimeType !== "text/plain"
-        )
-            return false;
-        return (
-            streamSummary.uri.endsWith(".json") ||
-            streamSummary.detectedMimeType === "application/json" ||
-            streamSummary.reportedMimeType === "application/json" ||
-            streamSummary.fileName?.toLowerCase().endsWith(".json") ||
-            false
-        );
-    }
-
     /** Returns a set of parameters based on the provided uri and configuration */
     async inspectFile(
         fileStreamSummary: FileBufferSummary,

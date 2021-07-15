@@ -2,7 +2,7 @@ import { Transform } from "stream";
 import { AbstractPassThroughParser } from "./AbstractPassthroughParser";
 import zlip from "zlib";
 import { DPMConfiguration } from "datapm-lib";
-import { DISPLAY_NAME, MIME_TYPE } from "./GZipParserDescription";
+import { DISPLAY_NAME, FILE_EXTENSIONS, MIME_TYPE, MIME_TYPES } from "./GZipParserDescription";
 
 export class GZipParser extends AbstractPassThroughParser {
     getDisplayName(): string {
@@ -14,11 +14,11 @@ export class GZipParser extends AbstractPassThroughParser {
     }
 
     getSupportedMimeTypes(): string[] {
-        return ["application/gzip", "application/x-gzip"];
+        return MIME_TYPES;
     }
 
-    getSupportedFileExtensions(_configuration: DPMConfiguration): string[] {
-        return ["gzip", "gz"];
+    getFileExtensions(): string[] {
+        return FILE_EXTENSIONS;
     }
 
     getPassThroughTransforms(_configuration: DPMConfiguration): Transform[] {

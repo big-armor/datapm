@@ -28,6 +28,9 @@ export interface ParserDescription {
     getMimeType(): string;
 
     getParser(): Promise<Parser>;
+
+    /** Should return true if the parser implementation will support parsing the given FileStreamSummary */
+    supportsFileStream(streamSummary: FileBufferSummary): boolean;
 }
 
 export interface Parser {
@@ -38,10 +41,7 @@ export interface Parser {
     getMimeType(): string;
 
     /** The file extensions supported by this parser */
-    getFileExtensions(configuration: DPMConfiguration): Promise<string[]> | string[];
-
-    /** Should return true if the parser implementation will support parsing the given FileStreamSummary */
-    supportsFileStream(streamSummary: FileBufferSummary): boolean;
+    getFileExtensions(): string[];
 
     /** Returns a set of parameters based on the provided uri and configuration */
     inspectFile(

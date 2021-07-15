@@ -34,13 +34,6 @@ export class XLSXParser implements Parser {
         return MIME_TYPE;
     }
 
-    /** Should return true if the parser implementation will support parsing the given FileStreamSummary */
-    supportsFileStream(streamSummary: FileBufferSummary): boolean {
-        if (streamSummary.detectedMimeType === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-            return true;
-        return streamSummary.uri.endsWith(".xlsx") || streamSummary.fileName?.toLowerCase().endsWith(".xlsx") || false;
-    }
-
     /** Returns a set of parameters based on the provided uri and configuration */
     async inspectFile(
         fileStreamSummary: FileBufferSummary,

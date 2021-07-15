@@ -28,21 +28,6 @@ export class CSVParser implements Parser {
         return MIME_TYPE;
     }
 
-    public supportsFileStream(fileSummary: FileBufferSummary): boolean {
-        if (
-            fileSummary.detectedMimeType !== null &&
-            fileSummary.detectedMimeType !== "text/csv" &&
-            fileSummary.detectedMimeType !== "text/plain"
-        )
-            return false;
-        return (
-            fileSummary.detectedMimeType === "text/csv" ||
-            fileSummary.reportedMimeType === "text/csv" ||
-            fileSummary.fileName?.endsWith("csv") ||
-            false
-        );
-    }
-
     public showPreview(lines: string[], startIndex = 0, paragraphLength = 10): number {
         const endIndex = Math.min(startIndex + paragraphLength, lines.length);
         for (let index = startIndex; index < endIndex; index += 1) {

@@ -1,7 +1,7 @@
 import { AbstractPassThroughParser } from "./AbstractPassthroughParser";
 import unbzip2 from "unbzip2-stream";
 import { Transform } from "stream";
-import { DISPLAY_NAME, MIME_TYPE } from "./BZip2ParserDescription";
+import { DISPLAY_NAME, MIME_TYPE, MIME_TYPES, FILE_EXTENSIONS } from "./BZip2ParserDescription";
 
 export class BZip2Parser extends AbstractPassThroughParser {
     getDisplayName(): string {
@@ -13,11 +13,11 @@ export class BZip2Parser extends AbstractPassThroughParser {
     }
 
     getSupportedMimeTypes(): string[] {
-        return ["application/bzip2", "application/x-bzip2"];
+        return MIME_TYPES;
     }
 
-    getSupportedFileExtensions(): string[] {
-        return ["bzip2", "bz2"];
+    getFileExtensions(): string[] {
+        return FILE_EXTENSIONS;
     }
 
     getPassThroughTransforms(): Transform[] {

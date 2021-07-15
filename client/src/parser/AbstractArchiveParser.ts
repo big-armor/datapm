@@ -19,28 +19,9 @@ export abstract class AbstractArchiveParser implements Parser {
     /** The unique identifier for the implementing parser */
     abstract getMimeType(): string;
 
-    abstract getSupportedFileExtensions(configuration: DPMConfiguration): string[];
-
     abstract getSupportedMimeTypes(): string[];
 
-    /** TODO Should this actually pass through file extensions? Or just be an abstract that returns the file extensions returned */
-    async getFileExtensions(configuration: DPMConfiguration): Promise<string[]> {
-        const parserMimeTypeValue = configuration.innerFileMimeType;
-
-        if (typeof parserMimeTypeValue !== "string") throw new Error("PASSTHROUGH_PARSER_MIME_TYPE_NOT_FOUND");
-
-        const parser = await getParserByMimeType(parserMimeTypeValue);
-
-        if (parser == null) throw new Error("PARSER_NOT_FOUND - " + parserMimeTypeValue);
-
-        const innerConfiguration = configuration.innerFileConfiguration;
-
-        if (typeof innerConfiguration !== "object") throw new Error("PASSTHROUGH_INNER_CONFIGURATION_NOT_AN_OBJECT");
-
-        return this.getSupportedFileExtensions(configuration).concat(
-            await parser.getFileExtensions(innerConfiguration as DPMConfiguration)
-        );
-    }
+    abstract getFileExtensions(): string[];
 
     supportsFileStream(streamSummary: FileBufferSummary): boolean {
         if (
@@ -49,8 +30,7 @@ export abstract class AbstractArchiveParser implements Parser {
         )
             return true;
 
-        if (this.getSupportedFileExtensions({}).find((e) => streamSummary.fileName?.endsWith("." + e)) != null)
-            return true;
+        if (this.getFileExtensions().find((e) => streamSummary.fileName?.endsWith("." + e)) != null) return true;
 
         return false;
     }
@@ -72,9 +52,7 @@ export abstract class AbstractArchiveParser implements Parser {
 
         if (parser == null) throw new Error("PARSER_NOT_FOUND - " + configuration.innerFileMimeType);
 
-        for (const fileExtension of await parser.getFileExtensions(
-            configuration.innerFileConfiguration as DPMConfiguration
-        ))
+        for (const fileExtension of parser.getFileExtensions())
             schemaPrefix = schemaPrefix.replace(new RegExp(`\\.${fileExtension}$`, "i"), "");
 
         if (parser)
@@ -117,7 +95,7 @@ export abstract class AbstractArchiveParser implements Parser {
         let innerFileName = firstInnerFile.fileName;
 
         if (innerFileName !== undefined) {
-            for (const e of this.getSupportedFileExtensions(configuration.innerFileConfiguration as DPMConfiguration)) {
+            for (const e of this.getFileExtensions()) {
                 innerFileName = innerFileName.replace("." + e, "");
             }
         }
@@ -140,7 +118,7 @@ export abstract class AbstractArchiveParser implements Parser {
 
         configuration.innerFileMimeType = parser.getMimeType();
 
-        for (const extension of await parser.getFileExtensions(configuration)) {
+        for (const extension of parser.getFileExtensions()) {
             innerFileName = innerFileName?.replace(new RegExp(`\\.${extension}$`, "i"), "");
         }
 

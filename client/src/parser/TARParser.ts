@@ -5,15 +5,11 @@ import { SourceInspectionContext } from "../source/Source";
 import { ParameterType } from "../util/parameters/Parameter";
 import { AbstractArchiveParser, FileIterator } from "./AbstractArchiveParser";
 import { FileBufferSummary } from "./Parser";
-import { DISPLAY_NAME, MIME_TYPE } from "./TARParserDescription";
+import { DISPLAY_NAME, EXTENSIONS, MIME_TYPE, MIME_TYPES } from "./TARParserDescription";
 
 export class TARParser extends AbstractArchiveParser {
     getDisplayName(): string {
         return DISPLAY_NAME;
-    }
-
-    async getFileExtensions(): Promise<string[]> {
-        return ["tar"];
     }
 
     /** The unique identifier for the parser implementation */
@@ -22,25 +18,11 @@ export class TARParser extends AbstractArchiveParser {
     }
 
     getSupportedMimeTypes(): string[] {
-        return ["application/tar"];
+        return MIME_TYPES;
     }
 
-    getSupportedFileExtensions(_configuration: DPMConfiguration): string[] {
-        return ["tar"];
-    }
-
-    /** Should return true if the parser implementation will support parsing the given FileStreamSummary */
-    supportsFileStream(streamSummary: FileBufferSummary): boolean {
-        if (
-            streamSummary.detectedMimeType != null &&
-            this.getSupportedMimeTypes().includes(streamSummary.detectedMimeType)
-        )
-            return true;
-
-        if (this.getSupportedFileExtensions({}).find((e) => streamSummary.fileName?.endsWith("." + e)) != null)
-            return true;
-
-        return false;
+    getFileExtensions(): string[] {
+        return EXTENSIONS;
     }
 
     /** Returns a set of parameters based on the provided uri and configuration */

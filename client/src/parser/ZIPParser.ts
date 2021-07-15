@@ -5,7 +5,7 @@ import { SourceInspectionContext } from "../source/Source";
 import { ParameterType } from "../util/parameters/Parameter";
 import { AbstractArchiveParser, FileIterator } from "./AbstractArchiveParser";
 import { FileBufferSummary } from "./Parser";
-import { DISPLAY_NAME, MIME_TYPE } from "./ZIPParserDescription";
+import { DISPLAY_NAME, EXTENSIONS, MIME_TYPE, MIME_TYPES } from "./ZIPParserDescription";
 
 class WritablePassThrough extends Writable {
     // eslint-disable-next-line
@@ -19,8 +19,8 @@ export class ZIPParser extends AbstractArchiveParser {
         return DISPLAY_NAME;
     }
 
-    async getFileExtensions(): Promise<string[]> {
-        return ["zip"];
+    getFileExtensions(): string[] {
+        return EXTENSIONS;
     }
 
     /** The unique identifier for the parser implementation */
@@ -29,25 +29,7 @@ export class ZIPParser extends AbstractArchiveParser {
     }
 
     getSupportedMimeTypes(): string[] {
-        return ["application/zip"];
-    }
-
-    getSupportedFileExtensions(_configuration: DPMConfiguration): string[] {
-        return ["zip"];
-    }
-
-    /** Should return true if the parser implementation will support parsing the given FileStreamSummary */
-    supportsFileStream(streamSummary: FileBufferSummary): boolean {
-        if (
-            streamSummary.detectedMimeType != null &&
-            this.getSupportedMimeTypes().includes(streamSummary.detectedMimeType)
-        )
-            return true;
-
-        if (this.getSupportedFileExtensions({}).find((e) => streamSummary.fileName?.endsWith("." + e)) != null)
-            return true;
-
-        return false;
+        return MIME_TYPES;
     }
 
     /** Returns a set of parameters based on the provided uri and configuration */

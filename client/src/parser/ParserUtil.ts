@@ -29,8 +29,8 @@ export async function getParser(streamSummary: FileBufferSummary): Promise<Maybe
     const parserDescriptions = getParsers();
 
     for (const parserDescription of parserDescriptions) {
-        const parser = await parserDescription.getParser();
-        if (parser.supportsFileStream(streamSummary)) {
+        if (parserDescription.supportsFileStream(streamSummary)) {
+            const parser = await parserDescription.getParser();
             return parser;
         }
     }
