@@ -10,7 +10,7 @@ export class PackageArguments {
 export class PackageCommand implements Command {
     prepareCommand(argv: Argv): Argv {
         return argv.command({
-            command: "package [urls..]",
+            command: "package [reference]",
             describe: "Generate a new package listing file (ex: datapm-package.json) from a url",
             builder: (argv) =>
                 argv

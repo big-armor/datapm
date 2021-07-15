@@ -169,7 +169,7 @@ jobs:
             - name: Install Client Dependencies
               id: install-client-dependencies
               if: steps.cache-client-all-files.outputs.cache-hit != 'true' || steps.cache-client-node-modules.outputs.cache-hit != 'true'
-              run: npm ci
+              run: npm ci --production
               working-directory: client
 
             - name: Build Client
