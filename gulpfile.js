@@ -97,6 +97,10 @@ function bumpLibVersion() {
     return spawnAndLog("bump-lib-version", "npm", ["version", readPackageVersion()], { cwd: "lib" });
 }
 
+function bumpClientVersion() {
+    return spawnAndLog("bump-client-version", "npm", ["version", readPackageVersion()], { cwd: "client" });
+}
+
 function tagRegistryGCRDockerImageVersion() {
     return spawnAndLog("registry-docker-tag", "docker", [
         "tag",
@@ -262,7 +266,7 @@ exports.buildParallel = series(
     series(prepareRegistryDockerBuildAssets, buildRegistryDockerImage)
 );
 
-exports.bumpVersion = series(showGitDiff, bumpRootVersion, bumpLibVersion);
+exports.bumpVersion = series(showGitDiff, bumpRootVersion, bumpLibVersion, bumpClientVersion);
 exports.gitPushTag = series(gitStageChanges, gitCommit, gitPush, gitPushTag);
 exports.deployAssets = series(
     // libPublish, // current done in the github action
