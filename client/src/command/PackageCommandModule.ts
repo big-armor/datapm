@@ -56,7 +56,7 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
 
     let source: SourceInterface;
 
-    if (argv.urls == null || argv.urls.length === 0) {
+    if (argv.references == null || argv.references.length === 0) {
         const urlsPromptResult = await prompts(
             {
                 type: "select",
@@ -78,10 +78,10 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
         source = await maybeSourceDescription.getSource();
     } else {
         let uris = [];
-        if (Array.isArray(argv.urls)) {
-            uris = argv.urls;
+        if (Array.isArray(argv.references)) {
+            uris = argv.references;
         } else {
-            uris = [argv.urls];
+            uris = [argv.references];
         }
 
         sourceConfiguration.uris = uris;
@@ -199,7 +199,7 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
         responses = {
             packageSlug: suggestedSlug,
             version: "1.0.0",
-            description: `Generated from ${argv.urls}`,
+            description: `Generated from ${argv.references}`,
             website: "", // TODO - Better websites defaults. Handle github, etc,
             sampleRecordCount: 100
         };
