@@ -10,7 +10,9 @@
         "postbuild": "gulp",
         "prestart": "npm run codegen",
         "start": "TS_NODE_FILES=true . ./env.sh && nodemon --watch 'src' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts",
+        "prestart-nowatch": "npm run codegen",
         "start-nowatch": ". ./env.sh && ts-node src/index.ts",
+        "prestart:server": "npm run codegen",
         "start:server": ". ./env.sh && cd dist && TYPEORM_IS_DIST=true  node index.js",
         "pretest": "npm run codegen",
         "test": "mocha -r ts-node/register --slow 2000 test/integration/*.ts src/**/*.spec.ts",
@@ -122,7 +124,7 @@
     },
     "husky": {
         "hooks": {
-            "pre-commit": "pretty-quick --staged"
+            "pre-commit": "npm run lint:fix"
         }
     }
 }

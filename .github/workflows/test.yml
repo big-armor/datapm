@@ -6,7 +6,7 @@ on:
 jobs:
     lint:
         name: "Lint"
-        timeout-minutes: 20
+        timeout-minutes: 5
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -36,14 +36,9 @@ jobs:
             - name: Run ESLint
               run: npm run lint
 
-            - name: Run Prettier linter
-              uses: wearerequired/lint-action@v1.6.0
-              with:
-                  github_token: ${{ secrets.github_token }}
-                  prettier: true
-
     testLib:
         name: "Test Lib"
+        needs: lint
         timeout-minutes: 5
         runs-on: ubuntu-latest
         steps:
@@ -85,6 +80,7 @@ jobs:
 
     testBackend:
         name: "Test Backend"
+        needs: lint
         timeout-minutes: 5
         runs-on: ubuntu-latest
         steps:
@@ -139,6 +135,7 @@ jobs:
 
     testFrontend:
         name: "Test Frontend"
+        needs: lint
         timeout-minutes: 5
         runs-on: ubuntu-latest
         steps:
@@ -190,3 +187,71 @@ jobs:
               id: test-frontend-Dependencies
               run: npm run test:ci
               working-directory: frontend
+
+    testClient:
+        name: "Test Client"
+        needs: lint
+        timeout-minutes: 20
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+
+            - uses: actions/setup-node@v2-beta
+              with:
+                  node-version: "12"
+
+            - name: Print npm verion
+              run: npm --version
+
+            - name: Print node verion
+              run: node --version
+
+            - name: Cache Lib Node_modules
+              id: cache-lib-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: lib/node_modules
+                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/package.json', 'lib/package-lock.json') }}
+
+            - name: Install Lib Dependencies
+              id: install-lib-Dependencies
+              if: steps.cache-lib-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: lib
+
+            - name: Build Lib
+              id: build-lib-Dependencies
+              run: npm run build
+              working-directory: lib
+
+            - name: Cache Backend Node_modules
+              id: cache-backend-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: backend/node_modules
+                  key: datampm-registry-${{ runner.OS }}-backend-${{ hashFiles('backend/package.json', 'backend/package-lock.json') }}
+
+            - name: Install Backend Dependencies
+              id: install-backend-Dependencies
+              if: steps.cache-backend-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: backend
+
+            - name: Cache Client Node_modules
+              id: cache-client-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: client/node_modules
+                  key: datampm-client-${{ runner.OS }}-${{ hashFiles('client/package.json', 'client/package-lock.json', 'client/npm-shrinkwrap.json') }}
+
+            - name: Install Client Dependencies
+              id: install-client-dependencies
+              if: steps.cache-client-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: client
+
+            - name: Test Client
+              id: test-client-Dependencies
+              run: npm run test
+              working-directory: client

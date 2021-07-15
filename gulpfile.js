@@ -55,12 +55,16 @@ function installDocsDependencies() {
     return spawnAndLog("docs-deps", "npm", ["ci"], { cwd: "docs/website" });
 }
 
+function installClientDependencies() {
+    return spawnAndLog("client-deps", "npm", ["ci"], { cwd: "client" });
+}
+
 function buildDocs() {
     return spawnAndLog("docs-build", "npm", ["run", "build"], { cwd: "docs/website" });
 }
 
-function buildDockerImage() {
-    return spawnAndLog("docker-build", "docker", [
+function buildRegistryDockerImage() {
+    return spawnAndLog("registry-docker-build", "docker", [
         "build",
         "-t",
         "datapm-registry",
@@ -68,6 +72,21 @@ function buildDockerImage() {
         "-f",
         "docker/Dockerfile"
     ]);
+}
+
+/* function buildClientDockerImage() {
+    return spawnAndLog("client-docker-build", "docker", [
+        "build",
+        "-t",
+        "datapm-client",
+        "./client/dist",
+        "-f",
+        "client/docker/Dockerfile"
+    ]);
+} */
+
+function buildClient() {
+    return spawnAndLog("client-build", "npm", ["run", "build"], { cwd: "client" });
 }
 
 function bumpRootVersion() {
@@ -78,52 +97,82 @@ function bumpLibVersion() {
     return spawnAndLog("bump-lib-version", "npm", ["version", readPackageVersion()], { cwd: "lib" });
 }
 
-function tagGCRDockerImageVersion() {
-    return spawnAndLog("docker-tag", "docker", [
+function tagRegistryGCRDockerImageVersion() {
+    return spawnAndLog("registry-docker-tag", "docker", [
         "tag",
         "datapm-registry",
         "gcr.io/datapm-test-terraform/datapm-registry:" + readPackageVersion()
     ]);
 }
 
-function tagGCRDockerImageLatest() {
-    return spawnAndLog("docker-tag", "docker", [
+function tagRegistryGCRDockerImageLatest() {
+    return spawnAndLog("registry-docker-tag", "docker", [
         "tag",
         "datapm-registry",
         "gcr.io/datapm-test-terraform/datapm-registry:latest"
     ]);
 }
 
-function pushGCRImage() {
-    return spawnAndLog("docker-push-gcr", "docker", [
+function pushRegistryGCRImage() {
+    return spawnAndLog("registry-docker-push-gcr", "docker", [
         "push",
         "gcr.io/datapm-test-terraform/datapm-registry:" + readPackageVersion()
     ]);
 }
 
-function pushGCRImageLatest() {
-    return spawnAndLog("docker-push-gcr", "docker", ["push", "gcr.io/datapm-test-terraform/datapm-registry:latest"]);
+function pushRegistryGCRImageLatest() {
+    return spawnAndLog("registry-docker-push-gcr", "docker", [
+        "push",
+        "gcr.io/datapm-test-terraform/datapm-registry:latest"
+    ]);
 }
 
-function tagDockerImageLatest() {
-    return spawnAndLog("docker-tag", "docker", ["tag", "datapm-registry", "datapm/datapm-registry:latest"]);
+function tagRegistryDockerImageLatest() {
+    return spawnAndLog("registry-docker-tag", "docker", ["tag", "datapm-registry", "datapm/datapm-registry:latest"]);
 }
 
-function tagDockerImageVersion() {
-    return spawnAndLog("docker-tag", "docker", [
+function tagRegistryDockerImageVersion() {
+    return spawnAndLog("registry-docker-tag", "docker", [
         "tag",
         "datapm-registry",
         "datapm/datapm-registry:" + readPackageVersion()
     ]);
 }
 
-function pushDockerImage() {
-    return spawnAndLog("docker-push-docker", "docker", ["push", "datapm/datapm-registry:" + readPackageVersion()]);
+/* 
+function tagClientDockerImageLatest() {
+    return spawnAndLog("client-docker-tag", "docker", ["tag", "datapm-client", "datapm/datapm-client:latest"]);
 }
 
-function pushDockerImageLatest() {
-    return spawnAndLog("docker-push-docker", "docker", ["push", "datapm/datapm-registry:latest"]);
+function tagClientDockerImageVersion() {
+    return spawnAndLog("client-docker-tag", "docker", [
+        "tag",
+        "datapm-client",
+        "datapm/datapm-client:" + readPackageVersion()
+    ]);
 }
+
+*/
+function pushRegistryDockerImage() {
+    return spawnAndLog("registry-docker-push-docker", "docker", [
+        "push",
+        "datapm/datapm-registry:" + readPackageVersion()
+    ]);
+}
+
+function pushRegistryDockerImageLatest() {
+    return spawnAndLog("registry-docker-push-docker", "docker", ["push", "datapm/datapm-registry:latest"]);
+}
+
+/* 
+function pushClientDockerImage() {
+    return spawnAndLog("client-docker-push-docker", "docker", ["push", "datapm/datapm-client:" + readPackageVersion()]);
+}
+
+function pushClientDockerImageLatest() {
+    return spawnAndLog("client-docker-push-docker", "docker", ["push", "datapm/datapm-client:latest"]);
+}
+*/
 
 function gitPushTag() {
     return spawnAndLog("git-tag-push", "git", ["push", "origin", "v" + readPackageVersion()]);
@@ -166,7 +215,7 @@ function showGitDiff() {
 /** Tasks that must be completed before running the docker file. The docker file's build
  * context is the "dist" directory in the root project folder.
  */
-function prepareDockerBuildAssets() {
+function prepareRegistryDockerBuildAssets() {
     const task1 = src(["backend/package.json", "backend/package-lock.json", "backend/gulpfile.js"]).pipe(
         dest(path.join(DESTINATION_DIR, "backend"))
     );
@@ -195,20 +244,11 @@ exports.default = series(
     //   testFrontend,
     installDocsDependencies,
     buildDocs,
-    prepareDockerBuildAssets,
-    buildDockerImage
-);
-
-exports.test = series(
-    installLibDependencies,
-    buildLib,
-    testLib,
-    installBackendDependencies,
-    buildBackend,
-    testBackend,
-    installFrontendDependencies,
-    buildFrontend,
-    testFrontend
+    prepareRegistryDockerBuildAssets,
+    buildRegistryDockerImage,
+    installClientDependencies,
+    buildClient
+    //   buildClientDockerImage
 );
 
 exports.buildParallel = series(
@@ -216,26 +256,28 @@ exports.buildParallel = series(
     parallel(
         series(installBackendDependencies, parallel(buildBackend, testBackend)),
         series(installFrontendDependencies, parallel(buildFrontend, testFrontend)),
-        series(installDocsDependencies, buildDocs)
+        series(installDocsDependencies, buildDocs),
+        series(installClientDependencies, buildClient) // buildClientDockerImage
     ),
-    prepareDockerBuildAssets,
-    buildDockerImage
+    series(prepareRegistryDockerBuildAssets, buildRegistryDockerImage)
 );
 
 exports.bumpVersion = series(showGitDiff, bumpRootVersion, bumpLibVersion);
 exports.gitPushTag = series(gitStageChanges, gitCommit, gitPush, gitPushTag);
 exports.deployAssets = series(
     // libPublish, // current done in the github action
-    tagGCRDockerImageLatest,
-    tagGCRDockerImageVersion,
-    tagDockerImageLatest,
-    tagDockerImageVersion,
-    pushGCRImage,
-    pushGCRImageLatest,
-    pushDockerImage,
-    pushDockerImageLatest
+    tagRegistryGCRDockerImageLatest,
+    tagRegistryGCRDockerImageVersion,
+    tagRegistryDockerImageLatest,
+    tagRegistryDockerImageVersion,
+    // tagClientDockerImageLatest,
+    // tagClientDockerImageVersion,
+    pushRegistryGCRImage,
+    pushRegistryGCRImageLatest,
+    pushRegistryDockerImage,
+    pushRegistryDockerImageLatest
+    // pushClientDockerImage,
+    // pushClientDockerImageLatest
 );
 
-exports.buildBackend = buildBackend;
-exports.buildDockerImage = series(prepareDockerBuildAssets, buildDockerImage);
-exports.prepareDockerBuildAssets = prepareDockerBuildAssets;
+exports.buildRegistryDockerImage = series(prepareRegistryDockerBuildAssets, buildRegistryDockerImage);

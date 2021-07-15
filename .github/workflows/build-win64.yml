@@ -1,0 +1,77 @@
+on:
+    pull_request:
+
+jobs:
+    build:
+        runs-on: windows-latest
+        timeout-minutes: 10
+        name: Windows Build Node Client
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: "14"
+                  architecture: "x64" # optional, x64 or x86. If not specified, x64 will be used by default
+
+            - name: Cache Root Node_modules
+              if: steps.cache-root-node-modules.outputs.cache-hit != 'true'
+              id: cache-root-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: node_modules
+                  key: datampm-root-${{ runner.OS }}-node-modules-${{ hashFiles('package.json','package-lock.json') }}
+
+            - name: Cache Lib Build
+              if: steps.cache-lib-build.outputs.cache-hit != 'true'
+              id: cache-lib-build
+              uses: actions/cache@v1
+              with:
+                  path: lib/dist
+                  key: datampm-lib-${{ runner.OS }}-build-${{ hashFiles('lib/*') }}
+
+            - name: Cache Client Node_modules
+              if: steps.cache-client-node-modules.outputs.cache-hit != 'true'
+              id: cache-client-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: client/node_modules
+                  key: datampm-client-${{ runner.OS }}-node-modules-${{ hashFiles('client/package.json','client/package-lock.json', 'client/npm-shrinkwrap.json') }}
+
+            - name: Install Root Dependencies
+              run: npm ci
+              if: steps.cache-root-node-modules.outputs.cache-hit != 'true'
+
+            - name: Install Lib Dependencies
+              run: npm ci
+              working-directory: lib
+              if: steps.cache-lib-build.outputs.cache-hit != 'true'
+
+            - name: Build Lib
+              run: npm run build
+              working-directory: lib
+              if: steps.cache-lib-build.outputs.cache-hit != 'true'
+
+            - run: npm ci
+              working-directory: client
+              if: steps.cache-client-node-modules.outputs.cache-hit != 'true'
+
+            - name: Run Linters
+              run: npm run lint
+              working-directory: client
+
+            - name: Run build
+              run: npm run build
+              working-directory: client
+
+            - run: npm run package:win64
+              working-directory: client
+              env:
+                  CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_BASE64 }}
+                  CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_PASSWORD }}
+
+            - name: "Save Windows Executable"
+              uses: actions/upload-artifact@v2
+              with:
+                  name: datapm-client-windows
+                  path: client/datapm-*.msix
+                  retention-days: 5

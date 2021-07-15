@@ -1,6 +1,7 @@
 import { GenericContainer, StartedTestContainer, Wait } from "testcontainers";
 
 import execa from "execa";
+import { ExecaChildProcess } from "execa";
 import pidtree from "pidtree";
 import { Observable } from "@apollo/client/core";
 import fs from "fs";
@@ -13,17 +14,17 @@ import { AdminHolder } from "./admin-holder";
 const maildev = require("maildev");
 
 let container: StartedTestContainer;
-let serverProcess: execa.ExecaChildProcess;
+let serverProcess: ExecaChildProcess;
 let mailServer: any;
 export let mailObservable: Observable<any>;
 
 export const TEMP_STORAGE_PATH = "tmp-registry-server-storage-" + new RandomUuid().nextUuid();
 export const TEMP_STORAGE_URL = "file://" + TEMP_STORAGE_PATH;
+const MAX_SERVER_LOG_LINES = 25;
 
 // These hold the standard out log lines from the datapm server
 export let serverLogLines: string[] = [];
 export let serverErrorLogLines: string[] = [];
-const MAX_SERVER_LOG_LINES = 25;
 
 before(async function () {
     console.log("Starting postgres temporary container");

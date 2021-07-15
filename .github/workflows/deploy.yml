@@ -38,12 +38,6 @@ jobs:
             - name: Run ESLint
               run: npm run lint
 
-            - name: Run Prettier linter
-              uses: wearerequired/lint-action@v1.6.0
-              with:
-                  github_token: ${{ secrets.github_token }}
-                  prettier: true
-
             - name: Setup Terraform
               uses: hashicorp/setup-terraform@v1
 
@@ -128,7 +122,7 @@ jobs:
                   key: datampm-registry-${{ runner.OS }}-frontend-node-modules-${{ hashFiles('frontend/package.json', 'frontend/package-lock.json') }}
 
             - name: Install Frontend Dependencies
-              id: install-fronend-dependencies
+              id: install-frontend-dependencies
               if: steps.cache-frontend-all-files.outputs.cache-hit != 'true' || steps.cache-frontend-node-modules.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: frontend
@@ -157,10 +151,37 @@ jobs:
               run: npm run build
               working-directory: docs/website
 
-            - name: Build Docker Container
-              run: gulp buildDockerImage
+            - name: Cache Client Dist
+              id: cache-client-all-files
+              uses: actions/cache@v1
+              with:
+                  path: client/dist
+                  key: datampm-client-${{ runner.OS }}-dist-${{ hashFiles('client/**', 'lib/**') }}
 
-            - name: Smoke Test Docker Image
+            - name: Cache Client Node_modules
+              id: cache-client-node-modules
+              if: steps.cache-client-all-files.outputs.cache-hit != 'true'
+              uses: actions/cache@v1
+              with:
+                  path: client/node_modules
+                  key: datampm-client-${{ runner.OS }}-node-modules-${{ hashFiles('client/package.json', 'client/package-lock.json') }}
+
+            - name: Install Client Dependencies
+              id: install-client-dependencies
+              if: steps.cache-client-all-files.outputs.cache-hit != 'true' || steps.cache-client-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: client
+
+            - name: Build Client
+              id: build-client-Dependencies
+              if: steps.cache-client-all-files.outputs.cache-hit != 'true'
+              run: npm run build
+              working-directory: client
+
+            - name: Build Registry Docker Container
+              run: gulp buildRegistryDockerImage
+
+            - name: Smoke Test Registry Docker Image
               run: npm run test
 
             - name: Tag
@@ -203,6 +224,12 @@ jobs:
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               with:
                   package: ./lib/dist/package.json
+                  token: ${{ secrets.NPM_TOKEN }}
+
+            - uses: JS-DevTools/npm-publish@v1
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              with:
+                  package: ./client/package.json
                   token: ${{ secrets.NPM_TOKEN }}
 
             - name: Terraform Init to
