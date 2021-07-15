@@ -12,7 +12,6 @@
         "package:win86": "gulp buildWindows86",
         "package:win64": "gulp buildWindows64",
         "prebuild": "npm run codegen",
-        "pretest": "npm run build",
         "test": "mocha --slow 3000 --timeout 60000 -r ts-node/register test/integration/*.ts",
         "test:debug": "npm run build && npx mocha --slow 3000 --timeout 999999 -r ts-node/register",
         "test:full": "npm run pretest; mocha --slow 3000 --timeout 60000 -r ts-node/register test/**/*.ts",

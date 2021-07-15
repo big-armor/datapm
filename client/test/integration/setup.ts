@@ -27,6 +27,8 @@ let network: StartedNetwork;
 export let databaseIpAddress: string;
 export let databasePortNumber: number;
 export let mailDevWebPortNumber: number;
+let mailDevSMTPPortNumber: number;
+let mailDevIpAddress: string;
 export const registryServerPort: number = Math.floor(Math.random() * (65535 - 1024) + 1024);
 export const dataServerPort: number = Math.floor(Math.random() * (65535 - 1024) + 1024);
 
@@ -39,84 +41,121 @@ before(async function () {
 
     console.log("Run name is " + runName);
 
-    console.log("Starting postgres temporary container");
+    // eslint-disable-next-line no-async-promise-executor
+    const buildClientPromise = new Promise<void>(async (resolve) => {
+        console.log("building client");
 
-    this.timeout(300000);
-    databaseContainer = await new GenericContainer("postgres", "13.3")
-        .withEnv("POSTGRES_USER", "postgres")
-        .withEnv("POSTGRES_PASSWORD", "postgres")
-        .withEnv("POSTGRES_DB", "datapm")
-        .withTmpFs({ "/temp_pgdata": "rw,noexec,nosuid,size=65536k" })
-        .withExposedPorts(5432)
-        .withName("database-" + runName)
-        .withNetworkMode(network.getName())
-        .withWaitStrategy(new LogWaitStrategy("database system is ready to accept connections"))
-        .start();
+        await execa("npm", ["run", "build"]);
+        console.log("client built");
 
-    databasePortNumber = databaseContainer.getMappedPort(5432);
-    databaseIpAddress = databaseContainer.getContainerIpAddress();
-    console.log("Postgres started on " + databaseIpAddress + ":" + databasePortNumber);
+        resolve();
+    });
 
-    mailDevContainer = await new GenericContainer("maildev/maildev")
-        .withExposedPorts(80, 25)
-        .withName("smtp-" + runName)
-        .withNetworkMode(network.getName())
-        .start();
+    // eslint-disable-next-line no-async-promise-executor
+    const startPostgres = new Promise<void>(async (resolve) => {
+        console.log("Starting postgres temporary container");
 
-    mailDevWebPortNumber = mailDevContainer.getMappedPort(80);
-    const mailDevSMTPPortNumber = mailDevContainer.getMappedPort(25);
-    const mailDevIpAddress = mailDevContainer.getContainerIpAddress();
+        this.timeout(300000);
+        databaseContainer = await new GenericContainer("postgres", "13.3")
+            .withEnv("POSTGRES_USER", "postgres")
+            .withEnv("POSTGRES_PASSWORD", "postgres")
+            .withEnv("POSTGRES_DB", "datapm")
+            .withTmpFs({ "/temp_pgdata": "rw,noexec,nosuid,size=65536k" })
+            .withExposedPorts(5432)
+            .withName("database-" + runName)
+            .withNetworkMode(network.getName())
+            .withWaitStrategy(new LogWaitStrategy("database system is ready to accept connections"))
+            .start();
 
-    console.log(
-        "maildev started on " +
-            mailDevIpAddress +
-            ", web port " +
-            mailDevWebPortNumber +
-            " smtp port " +
-            mailDevSMTPPortNumber
-    );
+        databasePortNumber = databaseContainer.getMappedPort(5432);
+        databaseIpAddress = databaseContainer.getContainerIpAddress();
+        console.log("Postgres started on " + databaseIpAddress + ":" + databasePortNumber);
+        resolve();
+    });
 
-    testDataServerProcess = (
-        await startServerProcess(
-            "Test data",
-            "npm",
-            ["run", "start:test-data-server"],
-            "./",
-            {
-                PORT: dataServerPort.toString()
-            },
-            [],
-            []
-        )
-    ).serverProcess;
+    // eslint-disable-next-line no-async-promise-executor
+    const startMailDev = new Promise<void>(async (resolve) => {
+        console.log("Starting mail dev container");
+        mailDevContainer = await new GenericContainer("maildev/maildev")
+            .withExposedPorts(80, 25)
+            .withName("smtp-" + runName)
+            .withNetworkMode(network.getName())
+            .start();
 
-    console.log("Test data server started on port " + dataServerPort);
+        mailDevWebPortNumber = mailDevContainer.getMappedPort(80);
+        mailDevSMTPPortNumber = mailDevContainer.getMappedPort(25);
+        mailDevIpAddress = mailDevContainer.getContainerIpAddress();
+        console.log(
+            "maildev started on " +
+                mailDevIpAddress +
+                ", web port " +
+                mailDevWebPortNumber +
+                " smtp port " +
+                mailDevSMTPPortNumber
+        );
 
-    registryServerProcess = (
-        await startServerProcess(
-            "Registry",
-            "npm",
-            ["run", "start-nowatch"],
-            "../backend",
-            {
-                PORT: registryServerPort.toString(),
-                TYPEORM_PORT: databasePortNumber.toString(),
-                SMTP_PORT: mailDevSMTPPortNumber.toString(),
-                SMTP_SERVER: "localhost",
-                SMTP_USER: "",
-                SMTP_PASSWORD: "",
-                SMTP_SECURE: "false",
-                SMTP_FROM_ADDRESS: "test@localhost",
-                SMTP_FROM_NAME: "local-test",
-                STORAGE_URL: TEMP_STORAGE_URL,
-                ACTIVITY_LOG: "false",
-                LEADER_ELECTION_DISABLED: "true",
-                SCHEDULER_KEY: "TEST_JOB_KEY"
-            },
-            serverLogLines,
-            serverErrorLogLines
-        )
-    ).serverProcess;
+        resolve();
+    });
+
+    // eslint-disable-next-line no-async-promise-executor
+    const startTestDataServer = new Promise<void>(async (resolve) => {
+        testDataServerProcess = (
+            await startServerProcess(
+                "Test data",
+                "npm",
+                ["run", "start:test-data-server"],
+                "./",
+                {
+                    PORT: dataServerPort.toString()
+                },
+                [],
+                []
+            )
+        ).serverProcess;
+
+        console.log("Test data server started on port " + dataServerPort);
+
+        resolve();
+    });
+
+    // eslint-disable-next-line no-async-promise-executor
+
+    await Promise.all([
+        buildClientPromise,
+        Promise.all([startPostgres, startMailDev, startTestDataServer]).then(async () => {
+            // eslint-disable-next-line no-async-promise-executor
+            return new Promise<void>(async (resolve) => {
+                registryServerProcess = (
+                    await startServerProcess(
+                        "Registry",
+                        "npm",
+                        ["run", "start-nowatch"],
+                        "../backend",
+                        {
+                            PORT: registryServerPort.toString(),
+                            TYPEORM_PORT: databasePortNumber.toString(),
+                            SMTP_PORT: mailDevSMTPPortNumber.toString(),
+                            SMTP_SERVER: "localhost",
+                            SMTP_USER: "",
+                            SMTP_PASSWORD: "",
+                            SMTP_SECURE: "false",
+                            SMTP_FROM_ADDRESS: "test@localhost",
+                            SMTP_FROM_NAME: "local-test",
+                            STORAGE_URL: TEMP_STORAGE_URL,
+                            ACTIVITY_LOG: "false",
+                            LEADER_ELECTION_DISABLED: "true",
+                            SCHEDULER_KEY: "TEST_JOB_KEY"
+                        },
+                        serverLogLines,
+                        serverErrorLogLines
+                    )
+                ).serverProcess;
+                console.log("Registry server started on port " + registryServerPort);
+
+                resolve();
+            });
+        })
+    ]);
 
     /* const registryContainerReadable = await registryContainer.logs();
 
@@ -131,7 +170,6 @@ before(async function () {
 			console.log("DataPM registry container closed");
 		}); */
 
-    console.log("Registry server started on port " + registryServerPort);
     setTestSourceFiles();
 });
 
@@ -186,12 +224,12 @@ async function startServerProcess(
     await new Promise<void>((resolve) => {
         let serverReady = false;
 
-        console.log("Waiting for server to start");
+        console.log("Waiting for " + name + " to start");
         serverProcess.stdout?.on("data", async (buffer: Buffer) => {
             const line = buffer.toString();
             // console.log(line);
             if (line.indexOf("🚀") !== -1) {
-                console.log(name + "server started!");
+                console.log(name + " server started!");
                 serverReady = true;
 
                 resolve();
