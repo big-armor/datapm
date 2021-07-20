@@ -14,7 +14,7 @@ import { exit } from "process";
 import prompts, { Choice } from "prompts";
 import { SemVer } from "semver";
 import { Permission } from "../generated/graphql";
-import { getSourceByType } from "../source/SourceUtil";
+import { getSourceByType } from "../repository/SourceUtil";
 import { getRegistryConfig } from "../util/ConfigUtil";
 import { validPackageDisplayName, validShortPackageDescription, validUnit, validVersion } from "../util/IdentifierUtil";
 import { getPackage } from "../util/PackageAccessUtil";
@@ -27,7 +27,7 @@ import { UpdateArguments } from "./UpdateCommand";
 import { inspectSource, inspectStreamSet } from "./PackageCommandModule";
 import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
 import { cliHandleParameters } from "../util/parameters/ParameterUtils";
-import { SourceInspectionContext } from "../source/Source";
+import { SourceInspectionContext } from "../repository/Source";
 
 async function schemaPrompts(schema: Schema): Promise<void> {
     if (schema.properties == null) return;
@@ -300,7 +300,7 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
 
     for (const sourceObject of oldPackageFile.sources) {
         const sourceDescription = getSourceByType(sourceObject.type);
-        const source = await sourceDescription?.getSource();
+        const source = await (await sourceDescription)?.getSource();
 
         if (source == null) {
             oraRef.fail("No source implementation found to inspect this data - " + sourceObject.type);

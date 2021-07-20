@@ -9,11 +9,11 @@ import {
     StreamSetPreview,
     SourceInspectionContext,
     InspectionResults,
-    SourceInterface,
+    Source,
     StreamSummary,
     UpdateMethod,
     RecordContext
-} from "./Source";
+} from "../repository/Source";
 import { TYPE } from "./StreamTestSourceDescription";
 
 interface TestSourceAttribute {
@@ -27,7 +27,7 @@ interface TestSourceConfiguration {
     attributes?: TestSourceAttribute[];
 }
 
-export class StreamTestSource implements SourceInterface {
+export class StreamTestSource implements Source {
     configuration: TestSourceConfiguration;
 
     sourceType(): string {

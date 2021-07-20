@@ -4,7 +4,7 @@ import { expect } from "chai";
 import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
 import fs from "fs";
-import { SinkState } from "../../src/sink/Sink";
+import { SinkState } from "../../src/repository/Sink";
 
 describe("CSV Offset Tests", function () {
     before(async () => {

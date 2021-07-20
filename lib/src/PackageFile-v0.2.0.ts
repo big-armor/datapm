@@ -12,7 +12,7 @@ export interface RegistryReferenceV020 {
 
 /** Describes where the data resides, and how to access to byte stream of the data. */
 export interface SourceV020 {
-    /** The universally unique identifier for the sourceInterface implementation */
+    /** The universally unique identifier for the Source implementation */
     type: string;
 
     /** The URI used for accessing the data */

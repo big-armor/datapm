@@ -18,11 +18,16 @@ import {
     InspectionResults,
     InspectProgress,
     SourceInspectionContext,
-    SourceInterface,
+    Source as SourceImplementation,
     SourceStreamsInspectionResult,
     StreamSetPreview
-} from "../source/Source";
-import { findSourceForUri, generateSchemasFromSourceStreams, getSources, getSourceByType } from "../source/SourceUtil";
+} from "../repository/Source";
+import {
+    findSourceForUri,
+    generateSchemasFromSourceStreams,
+    getSourceByType,
+    getSourcesDescriptions
+} from "../repository/SourceUtil";
 import { validPackageDisplayName, validShortPackageDescription, validUnit, validVersion } from "../util/IdentifierUtil";
 import { LogType } from "../util/LoggingUtils";
 import { nameToSlug } from "../util/NameUtil";
@@ -54,7 +59,7 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
 
     // Inspecting source
 
-    let source: SourceInterface;
+    let source: SourceImplementation;
 
     if (argv.references == null || argv.references.length === 0) {
         const urlsPromptResult = await prompts(
@@ -62,7 +67,7 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
                 type: "select",
                 name: "source",
                 message: "Source?",
-                choices: getSources()
+                choices: (await getSourcesDescriptions())
                     .sort((a, b) => a.sourceType().localeCompare(b.sourceType()))
                     .map((s) => {
                         return { value: s.sourceType(), title: s.sourceType() };
@@ -71,7 +76,7 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
             },
             defaultPromptOptions
         );
-        const maybeSourceDescription = getSourceByType(urlsPromptResult.source);
+        const maybeSourceDescription = await getSourceByType(urlsPromptResult.source);
 
         if (maybeSourceDescription == null) throw new Error("SOURCE_NOT_FOUND - " + urlsPromptResult.source);
 
@@ -630,7 +635,7 @@ async function schemaSpecificQuestions(schema: Schema) {
 
 /** Inspect a one or more URIs, with a given config, and implementation. This is generally one schema */
 export async function inspectSource(
-    source: SourceInterface,
+    source: SourceImplementation,
     sourceInspectionContext: SourceInspectionContext,
     oraRef: ora.Ora,
     configuration: DPMConfiguration

@@ -4,9 +4,9 @@ import moment from "moment";
 import numeral from "numeral";
 import { Choice } from "prompts";
 import { PassThrough, Readable, Transform } from "stream";
-import { BatchingTransform } from "../source/transforms/BatchingTransform";
+import { BatchingTransform } from "../transforms/BatchingTransform";
 import { Maybe } from "../util/Maybe";
-import { SinkState, StreamState } from "../sink/Sink";
+import { SinkState, StreamState } from "../repository/Sink";
 import {
     RecordContext,
     InspectionResults,
@@ -15,9 +15,9 @@ import {
     ExtendedJSONSchema7TypeName,
     RecordStreamContext,
     StreamSummary
-} from "../source/Source";
-import { convertValueByValueType, discoverValueType } from "../source/transforms/StatsTransform";
-import { getSourceByType, mergeValueFormats } from "../source/SourceUtil";
+} from "../repository/Source";
+import { convertValueByValueType, discoverValueType } from "../transforms/StatsTransform";
+import { getSourceByType, mergeValueFormats } from "../repository/SourceUtil";
 
 export enum DeconflictOptions {
     CAST_TO_BOOLEAN = "CAST_TO_BOOLEAN",
@@ -45,7 +45,7 @@ export interface RecordStreamEventContext {
  * fetching data unnecessarily.
  */
 export async function inspectSourceConnection(source: Source): Promise<InspectionResults> {
-    const sourceDescription = getSourceByType(source.type);
+    const sourceDescription = await getSourceByType(source.type);
 
     if (sourceDescription == null) throw new Error(`Unable to find source method for type ${source.type}`);
 

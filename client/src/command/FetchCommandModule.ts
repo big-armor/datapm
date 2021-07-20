@@ -4,7 +4,7 @@ import numeral from "numeral";
 import ora from "ora";
 import prompts, { PromptObject } from "prompts";
 import { SemVer } from "semver";
-import { SinkState, SinkStateKey } from "../sink/Sink";
+import { SinkState, SinkStateKey } from "../repository/Sink";
 import { OraQuiet } from "../util/OraQuiet";
 import { getPackage } from "../util/PackageAccessUtil";
 import { cliHandleParameters, parametersToPrompts } from "../util/parameters/ParameterUtils";
@@ -12,14 +12,14 @@ import { inspectSourceConnection } from "../util/SchemaUtil";
 
 import ON_DEATH from "death";
 import { fetch, FetchOutcome, newRecordsAvailable } from "../util/StreamToSinkUtil";
-import { StreamSetPreview, InspectionResults } from "../source/Source";
+import { StreamSetPreview, InspectionResults } from "../repository/Source";
 import { formatRemainingTime } from "../util/DateUtil";
 import { Listr, ListrTask } from "listr2";
 import { FetchArguments } from "./FetchCommand";
-import { TYPE as STANDARD_OUT_SINK_TYPE } from "../sink/StandardOutSink";
+import { TYPE as STANDARD_OUT_SINK_TYPE } from "../repository/file-based/standard-out/StandardOutRepositoryDescription";
 import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
 import { Parameter } from "../util/parameters/Parameter";
-import { getSink, getSinks } from "../sink/SinkUtil";
+import { getSinkDescription, getSinkDescriptions } from "../repository/SinkUtil";
 
 export async function fetchPackage(argv: FetchArguments): Promise<void> {
     if (argv.quiet) {
@@ -112,7 +112,7 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
     } else if (argv.defaults) {
         sinkType = "file";
     } else {
-        const sinks = getSinks();
+        const sinkDescriptions = await getSinkDescriptions();
 
         const sinkSelect = await prompts(
             [
@@ -120,7 +120,7 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
                     type: "select",
                     name: "type",
                     message: "Destination?",
-                    choices: sinks.map((sink) => {
+                    choices: sinkDescriptions.map((sink) => {
                         return {
                             title: sink.getDisplayName(),
                             value: sink.getType()
@@ -139,15 +139,15 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
         oraRef.start(`Finding the sink named ${sinkType}`);
     }
 
-    const sink = await getSink(sinkType);
+    const sinkDescription = await getSinkDescription(sinkType);
 
-    if (sink == null) {
+    if (sinkDescription == null) {
         oraRef.fail(`Could not find sink type: ${sinkType}`);
         return;
     }
 
     if (argv.sink) {
-        oraRef.succeed(`Found the ${sink.getDisplayName()} sink`);
+        oraRef.succeed(`Found the ${sinkDescription.getDisplayName()} sink`);
     }
 
     // Prompt parameters
@@ -164,37 +164,46 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
         }
     }
 
-    if (argv.defaults) {
-        sinkConfiguration = await sink.getDefaultParameterValues(
-            packageFileWithContext.catalogSlug,
-            packageFile,
-            sinkConfiguration
-        );
-    } else {
-        let remainingParameters = await sink.getParameters(
-            packageFileWithContext.catalogSlug,
-            packageFile,
-            sinkConfiguration
-        );
+    const sink = await sinkDescription.loadSinkFromModule();
 
-        while (remainingParameters.length > 0) {
-            parameterCount += remainingParameters.length;
-            const promptObjects: PromptObject[] = parametersToPrompts(remainingParameters);
+    let remainingParameters = await sink.getParameters(
+        packageFileWithContext.catalogSlug,
+        packageFile,
+        sinkConfiguration
+    );
 
-            // TODO Skip existing configs
-            const newSinkConfig = await prompts(promptObjects, defaultPromptOptions);
+    while (remainingParameters.length > 0) {
+        if (argv.defaults) {
+            const noDefaults: Parameter[] = [];
+            for (const parameter of remainingParameters) {
+                if (parameter.defaultValue) {
+                    parameter.configuration[parameter.type] = parameter.defaultValue;
+                } else {
+                    noDefaults.push(parameter);
+                }
+            }
 
-            Object.keys(newSinkConfig).forEach((key) => {
-                const parameter = remainingParameters.find((parameter) => parameter.name === key) as Parameter;
-                parameter.configuration[key] = newSinkConfig[key];
-            });
+            remainingParameters = noDefaults;
 
-            remainingParameters = await sink.getParameters(
-                packageFileWithContext.catalogSlug,
-                packageFile,
-                sinkConfiguration
-            );
+            if (remainingParameters.length === 0) continue;
         }
+
+        parameterCount += remainingParameters.length;
+        const promptObjects: PromptObject[] = parametersToPrompts(remainingParameters);
+
+        // TODO Skip existing configs
+        const newSinkConfig = await prompts(promptObjects, defaultPromptOptions);
+
+        Object.keys(newSinkConfig).forEach((key) => {
+            const parameter = remainingParameters.find((parameter) => parameter.name === key) as Parameter;
+            parameter.configuration[key] = newSinkConfig[key];
+        });
+
+        remainingParameters = await sink.getParameters(
+            packageFileWithContext.catalogSlug,
+            packageFile,
+            sinkConfiguration
+        );
     }
 
     // Write records

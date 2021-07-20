@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { EventEmitter } from "events";
 import { test } from "mocha";
 import { Writable } from "stream";
-import { LineCountOffsetTransform } from "../src/source/transforms/LineCountOffsetTransform";
+import { LineCountOffsetTransform } from "../src/transforms/LineCountOffsetTransform";
 
 async function awaitEvent(event: string, subject: EventEmitter, timeoutMS = 1000) {
     return new Promise<void>((resolve, reject) => {

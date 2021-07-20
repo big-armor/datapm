@@ -3,8 +3,8 @@ import fs from "fs";
 import { test } from "mocha";
 import { Transform } from "stream";
 
-import { CSVParser } from "../src/parser/CSVParser";
-import { RecordContext } from "../src/source/Source";
+import { CSVParser } from "../src/repository/file-based/parser/CSVParser";
+import { RecordContext } from "../src/repository/Source";
 
 describe("Checking transforms", () => {
     test("DPM record transform test", () => {
