@@ -4,13 +4,7 @@ import csvParser from "csv-parse/lib/sync";
 import { DPMConfiguration, DPMRecord } from "datapm-lib";
 import { https } from "follow-redirects";
 import { Readable, Transform } from "stream";
-import {
-    authorize,
-    getOAuth2Client,
-    getSpreadsheetMetadata,
-    initOAuth2Client,
-    setCredentials
-} from "../../../util/GoogleUtil";
+import { getOAuth2Client, getSpreadsheetMetadata } from "../../../util/GoogleUtil";
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
 import { QuoteTransform } from "../../../transforms/QuoteTransform";
 import { RecordCountOffsetTransform } from "../../../transforms/RecordCountOffsetTransform";
