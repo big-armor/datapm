@@ -59,7 +59,7 @@ export async function findSourceForUri(uri: string): Promise<Source> {
     for (let i = 0; i < EXTENDED_REPOSITORIES.length; i++) {
         const repository = EXTENDED_REPOSITORIES[i];
 
-        if (repository.hasSource()) continue;
+        if (!repository.hasSource()) continue;
 
         const sourceDescription = await repository.getSourceDescription();
 
