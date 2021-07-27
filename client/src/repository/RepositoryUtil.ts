@@ -7,7 +7,7 @@ import { GoogleSheetRepositoryDescription } from "./file-based/google-sheet/Goog
 import { HTTPRepositoryDescription } from "./file-based/http/HTTPRepositoryDescription";
 import { LocalFileRepositoryDescription } from "./file-based/local-file/LocalFileRepositoryDescription";
 import { StandardOutRepositoryDescription } from "./file-based/standard-out/StandardOutRepositoryDescription";
-import { Repository, RepositoryDescription } from "./Repository";
+import { RepositoryDescription } from "./Repository";
 
 export const REPOSITORIES: RepositoryDescription[] = [
     new BigQueryRepositoryDescription(),
