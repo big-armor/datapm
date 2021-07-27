@@ -129,8 +129,6 @@ describe("Test Stream Source Test", function () {
             ["test://"],
             prompts,
             (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
-                console.log(line);
-
                 if (promptIndex === 5 && line.includes("'Zip Code' attribute is already existing")) {
                     results.messageFound = true;
                     cmdProcess.kill("SIGINT");

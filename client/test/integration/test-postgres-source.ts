@@ -61,9 +61,19 @@ describe("Postgres Source Test", function () {
                 message: "Do you want to use the default options?",
                 input: KEYS.DOWN + KEYS.ENTER
             },
-            ...getPostgresSourcePromptInputs([postgresHost, postgresPort.toString(), "", "", "", "", ""])
+            ...getPostgresSourcePromptInputs([
+                postgresHost,
+                postgresPort.toString(),
+                "postgres",
+                "postgres",
+                "",
+                "",
+                ""
+            ])
         ];
-        await testCmd("fetch", [packageAFilePath, "--sink", "postgres"], prompts);
+        const exitCode = await testCmd("fetch", [packageAFilePath, "--sink", "postgres"], prompts);
+
+        expect(exitCode.code).to.equal(0);
     });
 
     after(async function () {
@@ -141,7 +151,6 @@ describe("Postgres Source Test", function () {
             ],
             prompts,
             (line: string) => {
-                console.log(line);
                 if (line.includes("datapm publish ")) {
                     results.messageFound = true;
                 }

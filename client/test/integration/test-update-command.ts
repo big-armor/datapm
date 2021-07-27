@@ -616,6 +616,7 @@ describe("Update Package Command Tests", async () => {
             ["package-b.datapm.json", "--forceUpdate"],
             prompts,
             (line: string) => {
+                console.log(line);
                 if (line.includes("When you are ready, you can publish with the following command")) {
                     results.messageFound = true;
                 }
