@@ -137,8 +137,8 @@ describe("Postgres Sink Test", function () {
             KEYS.DOWN,
             postgresHost,
             postgresPort.toString(),
-            "",
-            "",
+            "postgres",
+            "postgres",
             "invalid database $$$"
         ]);
         const results: TestResults = {
@@ -162,7 +162,13 @@ describe("Postgres Sink Test", function () {
     });
 
     it("Should import data without error", async function () {
-        const prompts = getPostgresSinkPromptInputs([KEYS.DOWN, postgresHost, postgresPort.toString()]);
+        const prompts = getPostgresSinkPromptInputs([
+            KEYS.DOWN,
+            postgresHost,
+            postgresPort.toString(),
+            "postgres",
+            "postgres"
+        ]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -228,7 +234,13 @@ describe("Postgres Sink Test", function () {
     });
 
     it("Should not rewrite if there isn't any new records", async function () {
-        const prompts = getPostgresSinkPromptInputs([KEYS.DOWN, postgresHost, postgresPort.toString()]);
+        const prompts = getPostgresSinkPromptInputs([
+            KEYS.DOWN,
+            postgresHost,
+            postgresPort.toString(),
+            "postgres",
+            "postgres"
+        ]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -259,7 +271,15 @@ describe("Postgres Sink Test", function () {
     });
 
     it("Should import data again if force update flag set", async function () {
-        const prompts = getPostgresSinkPromptInputs([KEYS.DOWN, postgresHost, postgresPort.toString(), "", "", "", ""]);
+        const prompts = getPostgresSinkPromptInputs([
+            KEYS.DOWN,
+            postgresHost,
+            postgresPort.toString(),
+            "postgres",
+            "postgres",
+            "",
+            ""
+        ]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -291,7 +311,15 @@ describe("Postgres Sink Test", function () {
 
     it("Should resolve conflicts while importing data", async function () {
         const prompts = [
-            ...getPostgresSinkPromptInputs([KEYS.DOWN, postgresHost, postgresPort.toString(), "", "", "", ""]),
+            ...getPostgresSinkPromptInputs([
+                KEYS.DOWN,
+                postgresHost,
+                postgresPort.toString(),
+                "postgres",
+                "postgres",
+                "",
+                ""
+            ]),
             {
                 message: "Integer_Float has integer and number values.",
                 input: `${KEYS.ENTER}`
@@ -422,7 +450,15 @@ describe("Postgres Sink Test", function () {
 
     it("Casting to null should work correctly", async function () {
         const prompts = [
-            ...getPostgresSinkPromptInputs([KEYS.DOWN, postgresHost, postgresPort.toString(), "", "", "", ""]),
+            ...getPostgresSinkPromptInputs([
+                KEYS.DOWN,
+                postgresHost,
+                postgresPort.toString(),
+                "postgres",
+                "postgres",
+                "",
+                ""
+            ]),
             {
                 message: "facebook has integer and string values.",
                 input: `${KEYS.DOWN}${KEYS.ENTER}`
