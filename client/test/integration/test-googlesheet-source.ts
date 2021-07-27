@@ -83,7 +83,6 @@ describe("Googlesheet Source Test", function () {
                 }
             ], // there are two sheets
             (line: string) => {
-                console.log(line);
                 if (line.includes("datapm publish ")) {
                     results.messageFound = true;
                 }

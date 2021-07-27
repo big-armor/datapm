@@ -13,7 +13,7 @@ import { expect } from "chai";
 import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
 
-describe("CSV Tests", function () {
+describe("CSV Source Tests", function () {
     before(async () => {
         resetConfiguration();
         const userAClient = await createTestUser();

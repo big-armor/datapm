@@ -4,7 +4,7 @@ import { registryServerPort } from "./setup";
 import { loadPackageFileFromDisk } from "datapm-lib";
 import { expect } from "chai";
 
-describe("CSV Tests", function () {
+describe("Multiple CSV Tests", function () {
     before(async () => {
         resetConfiguration();
         const userAClient = await createTestUser();

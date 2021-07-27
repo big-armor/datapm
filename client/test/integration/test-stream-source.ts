@@ -48,6 +48,7 @@ describe("Test Stream Source Test", function () {
             ["test://"],
             prompts,
             (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
+                console.log(line);
                 if (promptIndex === 1 && line.includes("Record count should be greater than 1")) {
                     results.messageFound = true;
                     cmdProcess.kill("SIGINT");
@@ -81,6 +82,8 @@ describe("Test Stream Source Test", function () {
             ["test://"],
             prompts,
             (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
+                console.log(line);
+
                 if (promptIndex === 2 && line.includes("There should be at least 1 attribute")) {
                     results.messageFound = true;
                     cmdProcess.kill("SIGINT");
@@ -126,6 +129,8 @@ describe("Test Stream Source Test", function () {
             ["test://"],
             prompts,
             (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
+                console.log(line);
+
                 if (promptIndex === 5 && line.includes("'Zip Code' attribute is already existing")) {
                     results.messageFound = true;
                     cmdProcess.kill("SIGINT");

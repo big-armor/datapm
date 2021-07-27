@@ -61,7 +61,7 @@ describe("Package - Derived From", () => {
             "",
             "",
             "",
-            KEYS.DOWN + KEYS.ENTER,
+            KEYS.DOWN,
             "https://test.datapm-not-a-site.io",
             "Upstream Data",
             "",

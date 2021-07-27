@@ -2,7 +2,7 @@ import { removePackageFiles, TEST_SOURCE_FILES, testCmd, getPromptInputs } from 
 import { expect } from "chai";
 import { loadPackageFileFromDisk } from "datapm-lib";
 
-describe("CSV Tests", function () {
+describe("ZIP Tests", function () {
     after(() => {
         removePackageFiles(["source"]);
     });

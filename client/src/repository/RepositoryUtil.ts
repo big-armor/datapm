@@ -8,6 +8,7 @@ import { HTTPRepositoryDescription } from "./file-based/http/HTTPRepositoryDescr
 import { LocalFileRepositoryDescription } from "./file-based/local-file/LocalFileRepositoryDescription";
 import { StandardOutRepositoryDescription } from "./file-based/standard-out/StandardOutRepositoryDescription";
 import { RepositoryDescription } from "./Repository";
+import { StreamTestRepositoryDescription } from "./stream/StreamTestRepositoryDescription";
 
 export const REPOSITORIES: RepositoryDescription[] = [
     new BigQueryRepositoryDescription(),
@@ -23,7 +24,9 @@ export const REPOSITORIES: RepositoryDescription[] = [
 
 /** These are never presented to the user as an option, but are available if the user knows they exist.
  * This can be used for hiding 'test' and depreciated implementations */
-export const EXTENDED_REPOSITORIES: RepositoryDescription[] = REPOSITORIES.concat([]);
+export const EXTENDED_REPOSITORIES: RepositoryDescription[] = REPOSITORIES.concat([
+    new StreamTestRepositoryDescription()
+]);
 
 export function getRepositoryDescriptions(): RepositoryDescription[] {
     return REPOSITORIES.sort((a, b) => a.getDisplayName().localeCompare(b.getDisplayName()));

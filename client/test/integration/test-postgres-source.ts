@@ -141,6 +141,7 @@ describe("Postgres Source Test", function () {
             ],
             prompts,
             (line: string) => {
+                console.log(line);
                 if (line.includes("datapm publish ")) {
                     results.messageFound = true;
                 }

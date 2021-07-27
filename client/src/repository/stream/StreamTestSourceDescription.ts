@@ -1,5 +1,5 @@
-import { SourceDescription, Source } from "../repository/Source";
-export const TYPE = "test";
+import { SourceDescription, Source } from "../../repository/Source";
+import { TYPE } from "./StreamTestRepositoryDescription";
 
 export class StreamTestSourceDescription implements SourceDescription {
     sourceType(): string {
