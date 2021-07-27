@@ -76,7 +76,7 @@ export class StreamTestSource implements Source {
 
             const attributeCategoryResponse = await prompts([
                 {
-                    type: "select",
+                    type: "autocomplete",
                     name: "attributeCategory",
                     message: `Category of '${attributeNameResponse.attributeName}' attribute?`,
                     choices: FakerCategories.map((category) => ({
@@ -91,7 +91,7 @@ export class StreamTestSource implements Source {
             if (attributeTypes.length > 0) {
                 const attributeTypeResponse = await prompts([
                     {
-                        type: "select",
+                        type: "autocomplete",
                         name: "attributeType",
                         message: `Type of '${attributeNameResponse.attributeName}' attribute?`,
                         choices: attributeTypes.map((type) => ({

@@ -34,7 +34,6 @@ describe("Standard Out Sink", function () {
                 !line.startsWith("Debugger attached.") &&
                 !line.startsWith("Waiting for the debugger")
             ) {
-                console.log(line);
                 results.nonJSONLineFound = true;
             }
         });

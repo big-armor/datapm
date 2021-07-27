@@ -79,7 +79,7 @@ export class PublishPackageCommandModule {
 
             const targetRegistryActionResponse = await prompts(
                 {
-                    type: "select",
+                    type: "autocomplete",
                     name: "targetRegistry",
                     message: "Target registry?",
                     choices: registries.map((registry: RegistryConfig) => ({
@@ -114,7 +114,7 @@ export class PublishPackageCommandModule {
 
             const catalogSlugActionResponse = await prompts(
                 {
-                    type: "select",
+                    type: "autocomplete",
                     name: "catalogSlug",
                     message: "Catalog short name?",
                     choices: (registryCatalogSlugs || []).map((catalogSlug: string) => ({

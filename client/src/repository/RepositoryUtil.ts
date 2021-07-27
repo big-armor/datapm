@@ -29,6 +29,6 @@ export function getRepositoryDescriptions(): RepositoryDescription[] {
     return REPOSITORIES.sort((a, b) => a.getDisplayName().localeCompare(b.getDisplayName()));
 }
 
-export function getRepositoryByType(type: string): Promise<Repository> | undefined {
-    return EXTENDED_REPOSITORIES.find((r) => r.getType() === type)?.getRepository();
+export function getRepositoryDescriptionByType(type: string): RepositoryDescription | undefined {
+    return EXTENDED_REPOSITORIES.find((r) => r.getType() === type);
 }

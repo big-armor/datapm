@@ -1,9 +1,10 @@
 import { Maybe } from "../util/Maybe";
 import { getRepositoryDescriptions } from "./RepositoryUtil";
 import { SinkDescription } from "./Sink";
+import { asyncMap } from "../util/AsyncUtils";
 
 export async function getSinkDescriptions(): Promise<SinkDescription[]> {
-    const values = await (await Promise.all(getRepositoryDescriptions())).asyncMap((s) => s.getSinkDescription());
+    const values = await asyncMap(getRepositoryDescriptions(), (r) => r.getSinkDescription());
 
     return values.filter((f) => f != null) as SinkDescription[];
 }

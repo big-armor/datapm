@@ -22,7 +22,7 @@ describe("Googlesheet Source Test", function () {
             [
                 {
                     message: "Source?",
-                    input: KEYS.DOWN + KEYS.DOWN + KEYS.ENTER
+                    input: "googlesheet" + KEYS.ENTER
                 },
                 {
                     message: "URL of Google Sheet?",
@@ -83,6 +83,7 @@ describe("Googlesheet Source Test", function () {
                 }
             ], // there are two sheets
             (line: string) => {
+                console.log(line);
                 if (line.includes("datapm publish ")) {
                     results.messageFound = true;
                 }

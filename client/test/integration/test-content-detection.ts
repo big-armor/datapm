@@ -20,19 +20,14 @@ import { SOCIAL_SECURITY_NUMBER_LABEL } from "../../src/content-detector/SocialS
 import { USERNAME_LABEL } from "../../src/content-detector/UsernamePropertyNameDetector";
 import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
-import {
-    createApiKey,
-    createTestPackage,
-    createTestUser,
-    removePackageFiles,
-    KEYS,
-    TEST_SOURCE_FILES
-} from "./test-utils";
+import { createApiKey, createTestPackage, createTestUser, removePackageFiles, TEST_SOURCE_FILES } from "./test-utils";
 
 describe("Content Detection Tests", async function () {
     let packageA: PackageFile;
 
     before(async () => {
+        resetConfiguration();
+
         const userAClient = await createTestUser();
         const apiKey = await createApiKey(userAClient);
         addRegistry({
@@ -50,7 +45,7 @@ describe("Content Detection Tests", async function () {
                 [
                     {
                         message: "What does each content-detection record represent?",
-                        input: KEYS.ENTER
+                        input: "\n"
                     },
                     {
                         message: "Do you want to specify units for the",

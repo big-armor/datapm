@@ -1,6 +1,51 @@
 import prompts, { PromptObject } from "prompts";
+import { DPMConfiguration } from "../../../../lib/dist/src/PackageUtil";
 import { defaultPromptOptions } from "./DefaultParameterOptions";
 import { Parameter, ParameterType } from "./Parameter";
+
+/** Continuously calls the call back until it returns no parameters. Returns the number of prompts completed */
+export async function repeatedlyPromptParameters(
+    callBack: () => Promise<Parameter[]>,
+    configuration: DPMConfiguration,
+    defaults: boolean
+): Promise<number> {
+    let parameterCount = 0;
+    let remainingParameters = await callBack();
+    while (remainingParameters.length > 0) {
+        if (defaults) {
+            const noDefaults: Parameter[] = [];
+            for (const parameter of remainingParameters) {
+                if (parameter.defaultValue) {
+                    parameter.configuration[parameter.name] = parameter.defaultValue;
+                } else {
+                    noDefaults.push(parameter);
+                }
+            }
+
+            remainingParameters = noDefaults;
+
+            if (remainingParameters.length === 0) {
+                remainingParameters = await callBack();
+                continue;
+            }
+        }
+
+        parameterCount += remainingParameters.length;
+        const promptObjects: PromptObject[] = parametersToPrompts(remainingParameters);
+
+        // TODO Skip existing configs
+        const newSinkConfig = await prompts(promptObjects, defaultPromptOptions);
+
+        Object.keys(newSinkConfig).forEach((key) => {
+            const parameter = remainingParameters.find((parameter) => parameter.name === key) as Parameter;
+            parameter.configuration[key] = newSinkConfig[key];
+        });
+
+        remainingParameters = await callBack();
+    }
+
+    return parameterCount;
+}
 
 export function parametersToPrompts(parameters: Parameter[]): PromptObject[] {
     return parameters.map((promptParameter) => {
@@ -24,6 +69,9 @@ export function parametersToPrompts(parameters: Parameter[]): PromptObject[] {
                     `Prompt ${promptParameter.name} is a ${promptParameter.type}, but no options were provided`
                 );
             }
+
+            if (promptParameter.type === ParameterType.Select) promptParameter.type = ParameterType.AutoComplete;
+
             return {
                 type: promptParameter.type,
                 name: promptParameter.name,

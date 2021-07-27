@@ -29,7 +29,7 @@ import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions
 
 export async function defaultRegistryCommandHandler(args: unknown): Promise<void> {
     const commandPromptResult = await prompts({
-        type: "select",
+        type: "autocomplete",
         name: "command",
         message: "What action would you like to take?",
         choices: [

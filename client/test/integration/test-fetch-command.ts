@@ -154,7 +154,7 @@ describe("Fetch Command Tests", async function () {
     });
 
     it("Can't fetch package with invalid sink configuration", async function () {
-        const prompts = getFetchCommandPromptInputs([KEYS.DOWN]);
+        const prompts = getFetchCommandPromptInputs([KEYS.DOWN + KEYS.ENTER]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -192,7 +192,7 @@ describe("Fetch Command Tests", async function () {
     });
 
     it("Fetch package with file sink", async function () {
-        const prompts = getFetchCommandPromptInputs([KEYS.DOWN, "Local" + KEYS.ENTER, "JSON" + KEYS.ENTER]);
+        const prompts = getFetchCommandPromptInputs([KEYS.DOWN, "Local", "JSON"]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -268,12 +268,7 @@ describe("Fetch Command Tests", async function () {
     });
 
     it("Should honor the excluded and renamed attributes", async function () {
-        const prompts = getFetchCommandPromptInputs([
-            KEYS.DOWN + KEYS.ENTER,
-            "Local" + KEYS.ENTER,
-            "JSON" + KEYS.ENTER,
-            "tmp-files"
-        ]);
+        const prompts = getFetchCommandPromptInputs([KEYS.DOWN, "Local", "JSON", "tmp-files"]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false

@@ -14,6 +14,7 @@ import numeral from "numeral";
 import ora from "ora";
 import { exit } from "process";
 import prompts from "prompts";
+import { getRepositoryDescriptionByType } from "../repository/RepositoryUtil";
 import {
     InspectionResults,
     InspectProgress,
@@ -22,18 +23,19 @@ import {
     SourceStreamsInspectionResult,
     StreamSetPreview
 } from "../repository/Source";
+import { RepositoryDescription } from "../repository/Repository";
 import {
-    findSourceForUri,
+    findRepositoryForSourceUri,
     generateSchemasFromSourceStreams,
-    getSourceByType,
     getSourcesDescriptions
 } from "../repository/SourceUtil";
 import { validPackageDisplayName, validShortPackageDescription, validUnit, validVersion } from "../util/IdentifierUtil";
 import { LogType } from "../util/LoggingUtils";
+import { Maybe } from "../util/Maybe";
 import { nameToSlug } from "../util/NameUtil";
 import { writeLicenseFile, writePackageFile, writeReadmeFile, PublishType } from "../util/PackageUtil";
 import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
-import { cliHandleParameters } from "../util/parameters/ParameterUtils";
+import { cliHandleParameters, repeatedlyPromptParameters } from "../util/parameters/ParameterUtils";
 import * as SchemaUtil from "../util/SchemaUtil";
 import { PackageArguments } from "./PackageCommand";
 import { PublishPackageCommandModule } from "./PublishPackageCommandModule";
@@ -59,12 +61,12 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
 
     // Inspecting source
 
-    let source: SourceImplementation;
+    let maybeRepositoryDescription: Maybe<RepositoryDescription>;
 
     if (argv.references == null || argv.references.length === 0) {
         const urlsPromptResult = await prompts(
             {
-                type: "select",
+                type: "autocomplete",
                 name: "source",
                 message: "Source?",
                 choices: (await getSourcesDescriptions())
@@ -76,11 +78,7 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
             },
             defaultPromptOptions
         );
-        const maybeSourceDescription = await getSourceByType(urlsPromptResult.source);
-
-        if (maybeSourceDescription == null) throw new Error("SOURCE_NOT_FOUND - " + urlsPromptResult.source);
-
-        source = await maybeSourceDescription.getSource();
+        maybeRepositoryDescription = getRepositoryDescriptionByType(urlsPromptResult.source) || null;
     } else {
         let uris = [];
         if (Array.isArray(argv.references)) {
@@ -91,14 +89,45 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
 
         sourceConfiguration.uris = uris;
         try {
-            source = await findSourceForUri(uris[0]);
-            oraRef.succeed(`Found ${source.sourceType()} source`);
+            maybeRepositoryDescription = (await findRepositoryForSourceUri(uris[0])) || null;
         } catch (error) {
             console.error(error);
             oraRef.fail("No source implementation found to inspect this data - " + uris[0]);
             exit(1);
         }
     }
+
+    if (maybeRepositoryDescription == null) {
+        oraRef.fail("No repository implementation found to inspect this data ");
+        process.exit(1);
+    }
+
+    const repository = await maybeRepositoryDescription.getRepository();
+
+    await repeatedlyPromptParameters(
+        async () => {
+            return repository.getConnectionParameters(sourceConfiguration);
+        },
+        sourceConfiguration,
+        argv.defaults || false
+    );
+
+    await repeatedlyPromptParameters(
+        async () => {
+            return repository.getAuthenticationParameters(sourceConfiguration, sourceConfiguration);
+        },
+        sourceConfiguration,
+        argv.defaults || false
+    );
+
+    const sourceDescription = await maybeRepositoryDescription.getSourceDescription();
+
+    if (sourceDescription == null) {
+        oraRef.fail("No source impelementation found for " + maybeRepositoryDescription.getType());
+        process.exit(1);
+    }
+
+    const source = await sourceDescription.getSource();
 
     const sourceInspectionContext: SourceInspectionContext = {
         defaults: argv.defaults || false,
@@ -399,15 +428,25 @@ async function schemaSpecificQuestions(schema: Schema) {
     const ignoreAttributesResponse = await prompts(
         [
             {
-                type: "confirm",
+                type: "autocomplete",
                 name: "ignoreAttributes",
                 message: `Exclude any attributes from ${schema.title}?`,
-                initial: false
+                choices: [
+                    {
+                        title: "No",
+                        value: false,
+                        selected: true
+                    },
+                    {
+                        title: "Yes",
+                        value: true
+                    }
+                ]
             }
         ],
         defaultPromptOptions
     );
-    if (ignoreAttributesResponse.ignoreAttributes) {
+    if (ignoreAttributesResponse.ignoreAttributes !== "No") {
         const attributesToIgnoreResponse = await prompts(
             [
                 {
@@ -431,15 +470,25 @@ async function schemaSpecificQuestions(schema: Schema) {
     const renameAttributesResponse = await prompts(
         [
             {
-                type: "confirm",
+                type: "autocomplete",
                 name: "renameAttributes",
                 message: `Rename attributes from ${schema.title}?`,
-                initial: false
+                choices: [
+                    {
+                        title: "No",
+                        value: false,
+                        selected: true
+                    },
+                    {
+                        title: "Yes",
+                        value: true
+                    }
+                ]
             }
         ],
         defaultPromptOptions
     );
-    if (renameAttributesResponse.renameAttributes) {
+    if (renameAttributesResponse.renameAttributes !== "No") {
         const attributeNameMap: Record<string, string> = {};
         const attributesToRenameResponse = await prompts(
             [
@@ -491,11 +540,11 @@ async function schemaSpecificQuestions(schema: Schema) {
         const wasDerivedResponse = await prompts(
             [
                 {
-                    type: "select",
+                    type: "autocomplete",
                     name: "wasDerived",
                     message: message,
                     choices: [
-                        { title: "No", value: false },
+                        { title: "No", value: false, selected: true },
                         {
                             title: "Yes",
                             value: true
@@ -506,7 +555,7 @@ async function schemaSpecificQuestions(schema: Schema) {
             defaultPromptOptions
         );
 
-        if (!wasDerivedResponse.wasDerived) break;
+        if (wasDerivedResponse.wasDerived === "No") break;
 
         const derivedFromUrlResponse = await prompts(
             [

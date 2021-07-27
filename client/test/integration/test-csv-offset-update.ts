@@ -127,7 +127,7 @@ describe("CSV Offset Tests", function () {
                 },
                 {
                     message: "Destination?",
-                    input: KEYS.ENTER
+                    input: "Local" + KEYS.ENTER
                 },
                 {
                     message: "File Format?",
@@ -174,7 +174,7 @@ describe("CSV Offset Tests", function () {
                 },
                 {
                     message: "Destination?",
-                    input: KEYS.ENTER
+                    input: "Local" + KEYS.ENTER
                 },
                 {
                     message: "File Format?",

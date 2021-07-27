@@ -19,12 +19,12 @@ import {
     ExtendedJSONSchema7TypeName,
     SourceDescription,
     SourceInspectionContext,
-    Source,
     SourceStreamsInspectionResult,
     StreamAndTransforms,
     StreamSetPreview,
     StreamStatusContext
 } from "./Source";
+import { RepositoryDescription } from "./Repository";
 import { JSONSchema7TypeName } from "json-schema";
 import { EXTENDED_REPOSITORIES } from "./RepositoryUtil";
 
@@ -34,7 +34,7 @@ export async function getSourcesDescriptions(): Promise<SourceDescription[]> {
     for (let i = 0; i < EXTENDED_REPOSITORIES.length; i++) {
         const repository = EXTENDED_REPOSITORIES[i];
 
-        if (repository.hasSource()) continue;
+        if (!repository.hasSource()) continue;
 
         const sourceDescription = await repository.getSourceDescription();
 
@@ -55,7 +55,7 @@ export async function getSourceByType(type: string): Promise<Maybe<SourceDescrip
     );
 }
 
-export async function findSourceForUri(uri: string): Promise<Source> {
+export async function findRepositoryForSourceUri(uri: string): Promise<RepositoryDescription> {
     for (let i = 0; i < EXTENDED_REPOSITORIES.length; i++) {
         const repository = EXTENDED_REPOSITORIES[i];
 
@@ -67,7 +67,7 @@ export async function findSourceForUri(uri: string): Promise<Source> {
             throw new Error(repository.getType() + " hasSource is true, but has no sourceDescription.");
 
         if (sourceDescription.supportsURI(uri)) {
-            return await sourceDescription.getSource();
+            return repository;
         }
     }
 

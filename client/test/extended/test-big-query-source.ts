@@ -198,7 +198,6 @@ describe("Big Query Source Test", function () {
             ["bigQuery://"],
             promptInputs,
             (line: string, promptIndex: number) => {
-                console.log(line);
                 if (promptIndex === prompts.length && line.includes("datapm publish ")) {
                     results.messageFound = true;
                 }

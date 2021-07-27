@@ -51,7 +51,7 @@ export class FallbackCommand implements Command {
             },
             handler: async () => {
                 const commandPromptResult = await prompts({
-                    type: "select",
+                    type: "autocomplete",
                     name: "command",
                     message: "What action would you like to take?",
                     choices: [

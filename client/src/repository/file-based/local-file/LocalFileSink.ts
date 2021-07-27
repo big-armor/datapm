@@ -143,7 +143,9 @@ export class LocalFileSink extends AbstractFileSink {
 
     async getSinkStateReadable(sinkStateKey: SinkStateKey, configuration: DPMConfiguration): Promise<Maybe<Readable>> {
         if (typeof configuration.fileLocation !== "string")
-            throw new Error("fileLocation configuration must be a string");
+            throw new Error(
+                "fileLocation configuration must be a string. It is a " + typeof configuration.fileLocation
+            );
 
         const dirname = configuration.fileLocation;
 
