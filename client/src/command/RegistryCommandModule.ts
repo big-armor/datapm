@@ -298,15 +298,25 @@ export async function authenticateToRegistry(args: RegistryAuthenticateArguments
         const confirmDeleteResponse = await prompts(
             [
                 {
-                    type: "confirm",
+                    type: "autocomplete",
                     name: "delete",
-                    message: "An API Key named '" + hostname + "' already exists. Delete it?"
+                    message: "An API Key named '" + hostname + "' already exists. Delete it?",
+                    choices: [
+                        {
+                            title: "Yes",
+                            value: true
+                        },
+                        {
+                            title: "No",
+                            value: false
+                        }
+                    ]
                 }
             ],
             defaultPromptOptions
         );
 
-        if (!confirmDeleteResponse.delete) {
+        if (confirmDeleteResponse.delete !== true) {
             console.log("Not deleting existing API key. Exiting");
             exit(1);
         }

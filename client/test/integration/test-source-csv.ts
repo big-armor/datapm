@@ -92,7 +92,7 @@ describe("CSV Source Tests", function () {
             },
             {
                 message: "Do you want to specify units",
-                input: "n"
+                input: "n" + KEYS.ENTER
             }
         ];
 
@@ -132,7 +132,7 @@ describe("CSV Source Tests", function () {
             },
             {
                 message: "Do you want to specify units",
-                input: "y"
+                input: "y" + KEYS.ENTER
             },
             {
                 message: "Unit for attribute 'Column0'?",

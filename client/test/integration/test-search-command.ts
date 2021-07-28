@@ -29,7 +29,7 @@ describe("Search Command Tests", async function () {
             },
             {
                 message: "Do you want to specify units for the 3 number properties?",
-                input: "n"
+                input: "n" + KEYS.ENTER
             }
         ]);
     });

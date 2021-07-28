@@ -40,7 +40,8 @@ export class HTTPRepository implements Repository {
                     configuration: connectionConfiguration,
                     type: ParameterType.Confirm,
                     message: "Add another file?",
-                    name: "addAnother"
+                    name: "addAnother",
+                    defaultValue: false
                 }
             ];
         }

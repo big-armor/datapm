@@ -320,7 +320,7 @@ describe("Package Command Tests", async () => {
             },
             {
                 message: "Do you want to specify units for the 3 number properties?",
-                input: "Y"
+                input: "Y" + KEYS.ENTER
             },
             {
                 message: "Unit for attribute 'Confirmed'?",

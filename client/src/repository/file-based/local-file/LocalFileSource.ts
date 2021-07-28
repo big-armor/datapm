@@ -62,7 +62,8 @@ export class LocalFileSource extends AbstractFileStreamSource implements Source 
                     configuration,
                     type: ParameterType.Confirm,
                     message: "Add another file?",
-                    name: "addAnother"
+                    name: "addAnother",
+                    defaultValue: false
                 }
             ];
         }

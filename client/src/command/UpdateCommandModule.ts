@@ -39,18 +39,34 @@ async function schemaPrompts(schema: Schema): Promise<void> {
         else return [];
     });
 
+    const ignoreAttributesChoices = [
+        {
+            title: "Yes",
+            value: true
+        },
+        {
+            title: "No",
+            value: false
+        }
+    ];
+
+    if (currentExcludedAttributes.length === 0) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        ignoreAttributesChoices.push(ignoreAttributesChoices.shift()!);
+    }
+
     const ignoreAttributesResponse = await prompts(
         [
             {
-                type: "confirm",
+                type: "autocomplete",
                 name: "ignoreAttributes",
                 message: "Exclude any attributes?",
-                initial: currentExcludedAttributes.length > 0
+                choices: ignoreAttributesChoices
             }
         ],
         defaultPromptOptions
     );
-    if (ignoreAttributesResponse.ignoreAttributes) {
+    if (ignoreAttributesResponse.ignoreAttributes === true) {
         const attributesToIgnoreResponse = await prompts(
             [
                 {
@@ -90,20 +106,36 @@ async function schemaPrompts(schema: Schema): Promise<void> {
         return schema.properties![key].title !== key;
     });
 
+    const renameAttributesChoices = [
+        {
+            title: "Yes",
+            value: true
+        },
+        {
+            title: "No",
+            value: false
+        }
+    ];
+
+    if (currentRenamedAttributes.length === 0) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        renameAttributesChoices.push(renameAttributesChoices.shift()!);
+    }
+
     // Rename Attributes
     const renameAttributesResponse = await prompts(
         [
             {
-                type: "confirm",
+                type: "autocomplete",
                 name: "renameAttributes",
                 message: "Rename attributes?",
-                initial: currentRenamedAttributes.length > 0
+                choices: renameAttributesChoices
             }
         ],
         defaultPromptOptions
     );
 
-    if (renameAttributesResponse.renameAttributes) {
+    if (renameAttributesResponse.renameAttributes === true) {
         const attributesToRenameResponse = await prompts(
             [
                 {
@@ -182,15 +214,25 @@ async function schemaPrompts(schema: Schema): Promise<void> {
         const confirmContinueResponse = await prompts(
             [
                 {
-                    type: "confirm",
+                    type: "autocomplete",
                     name: "confirm",
                     message: `Do you want to edit units for the ${keys.length} number properties?`,
-                    initial: false
+                    choices: [
+                        {
+                            title: "No",
+                            value: false,
+                            selected: true
+                        },
+                        {
+                            title: "Yes",
+                            value: true
+                        }
+                    ]
                 }
             ],
             defaultPromptOptions
         );
-        if (confirmContinueResponse.confirm) {
+        if (confirmContinueResponse.confirm === true) {
             for (const key of keys) {
                 const property = properties[key] as Schema;
                 const columnUnitResponse = await prompts(

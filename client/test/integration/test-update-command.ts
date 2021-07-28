@@ -198,7 +198,7 @@ describe("Update Package Command Tests", async () => {
             },
             {
                 message: "Do you want to edit units for the ",
-                input: "y"
+                input: "y" + KEYS.ENTER
             },
             {
                 message: "Unit for attribute 'Random integer'?",
@@ -580,32 +580,41 @@ describe("Update Package Command Tests", async () => {
     });
 
     it("Should honor the excluded and renamed attributes", async () => {
-        const updateCommandPrompts = [
-            "Exclude any attributes",
-            "Attributes to exclude?",
-            "Rename attributes",
-            "Attributes to rename?",
-            `New attribute name for "New State Name [original: State Name]"?`,
-            "What does each state-codes record represent?",
-            "User friendly package name?",
-            "Next version?",
-            "Short package description?",
-            "Website?",
-            "Number of sample records?"
+        const prompts = [
+            { message: "Exclude any attributes", input: `y${KEYS.ENTER}` },
+            { message: "Attributes to exclude?", input: ` ${KEYS.ENTER}` },
+            { message: "Rename attributes", input: `y${KEYS.ENTER}` },
+            { message: "Attributes to rename?", input: `${KEYS.ENTER}` },
+            {
+                message: `New attribute name for "New State Name [original: State Name]"?`,
+                input: `New State Name 2${KEYS.ENTER}`
+            },
+            {
+                message: `What does each state-codes record represent?`,
+                input: `unit2${KEYS.ENTER}`
+            },
+            {
+                message: `User friendly package name?`,
+                input: `updated package b${KEYS.ENTER}`
+            },
+            {
+                message: `Next version?`,
+                input: `${KEYS.ENTER}`
+            },
+            {
+                message: `Short package description?`,
+                input: `Updated Package b${KEYS.ENTER}`
+            },
+            {
+                message: `Website?`,
+                input: `https://website-b.com${KEYS.ENTER}`
+            },
+            {
+                message: `Number of sample records?`,
+                input: `9${KEYS.ENTER}`
+            }
         ];
-        const prompts = getPromptInputs(updateCommandPrompts, [
-            "y",
-            " ",
-            "y",
-            KEYS.DOWN,
-            "New State Name 2",
-            "unit2",
-            "updated package b",
-            "",
-            "Updated Package b",
-            "https://website-b.com",
-            "9"
-        ]);
+
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -616,7 +625,6 @@ describe("Update Package Command Tests", async () => {
             ["package-b.datapm.json", "--forceUpdate"],
             prompts,
             (line: string) => {
-                console.log(line);
                 if (line.includes("When you are ready, you can publish with the following command")) {
                     results.messageFound = true;
                 }

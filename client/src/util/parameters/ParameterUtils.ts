@@ -49,11 +49,22 @@ export async function repeatedlyPromptParameters(
 
 export function parametersToPrompts(parameters: Parameter[]): PromptObject[] {
     return parameters.map((promptParameter) => {
-        if (
-            [ParameterType.Confirm, ParameterType.Text, ParameterType.Password, ParameterType.Number].includes(
-                promptParameter.type
-            )
-        ) {
+        if ([ParameterType.Confirm].includes(promptParameter.type)) {
+            return {
+                type: "autocomplete",
+                name: promptParameter.name,
+                message: promptParameter.message,
+                choices: [
+                    {
+                        title: "Yes",
+                        value: true,
+                        selected: promptParameter.defaultValue === true
+                    },
+                    { title: "No", value: false, selected: promptParameter.defaultValue !== true }
+                ],
+                validate: promptParameter.validate
+            };
+        } else if ([ParameterType.Text, ParameterType.Password, ParameterType.Number].includes(promptParameter.type)) {
             return {
                 type: promptParameter.type,
                 name: promptParameter.name,

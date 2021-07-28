@@ -162,7 +162,8 @@ export class GoogleSheetSource implements Source {
                     configuration: sheetConfiguration,
                     name: "hasHeaderRow",
                     message: "Is there a header line above?",
-                    type: ParameterType.Confirm
+                    type: ParameterType.Confirm,
+                    defaultValue: true
                 }
             ]);
         }

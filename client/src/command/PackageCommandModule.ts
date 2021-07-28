@@ -648,15 +648,24 @@ async function schemaSpecificQuestions(schema: Schema) {
         const confirmContinueResponse = await prompts(
             [
                 {
-                    type: "confirm",
+                    type: "autocomplete",
                     name: "confirm",
                     message: `Do you want to specify units for the ${keys.length} number properties?`,
-                    initial: true
+                    choices: [
+                        {
+                            title: "Yes",
+                            value: true
+                        },
+                        {
+                            title: "No",
+                            value: false
+                        }
+                    ]
                 }
             ],
             defaultPromptOptions
         );
-        if (!confirmContinueResponse.confirm) {
+        if (confirmContinueResponse.confirm !== true) {
             promptForNumberUnits = false;
         }
     }

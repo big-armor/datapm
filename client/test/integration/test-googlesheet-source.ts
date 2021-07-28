@@ -30,7 +30,7 @@ describe("Googlesheet Source Test", function () {
                 },
                 {
                     message: "Is there a header line above?",
-                    input: "Y"
+                    input: "Y" + KEYS.ENTER
                 },
                 {
                     message: "Header row line number?",
@@ -38,7 +38,7 @@ describe("Googlesheet Source Test", function () {
                 },
                 {
                     message: "Is there a header line above?",
-                    input: "Y"
+                    input: "Y" + KEYS.ENTER
                 },
                 {
                     message: "Header row line number?",
@@ -67,7 +67,7 @@ describe("Googlesheet Source Test", function () {
             [
                 {
                     message: "Is there a header line above?",
-                    input: "Y"
+                    input: "Y" + KEYS.ENTER
                 },
                 {
                     message: "Header row line number?",
@@ -75,7 +75,7 @@ describe("Googlesheet Source Test", function () {
                 },
                 {
                     message: "Is there a header line above?",
-                    input: "Y"
+                    input: "Y" + KEYS.ENTER
                 },
                 {
                     message: "Header row line number?",
