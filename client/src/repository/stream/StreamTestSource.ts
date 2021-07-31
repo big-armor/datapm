@@ -34,11 +34,6 @@ export class StreamTestSource implements Source {
         return TYPE;
     }
 
-    removeSecretConfigValues(
-        _configuration: DPMConfiguration
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-    ): void {}
-
     async getInspectParameters(_configuration: DPMConfiguration): Promise<Parameter[]> {
         this.configuration = { recordCount: 0 };
         this.configuration.attributes = [];
@@ -115,7 +110,12 @@ export class StreamTestSource implements Source {
         return [];
     }
 
-    async inspectURIs(configuration: DPMConfiguration, context: SourceInspectionContext): Promise<InspectionResults> {
+    async inspectURIs(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        context: SourceInspectionContext
+    ): Promise<InspectionResults> {
         await this.getInspectParameters(configuration);
 
         return {

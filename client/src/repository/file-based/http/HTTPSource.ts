@@ -11,11 +11,6 @@ export class HTTPSource extends AbstractFileStreamSource {
         return TYPE;
     }
 
-    removeSecretConfigValues(
-        _configuration: DPMConfiguration
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-    ): void {}
-
     async getInspectParameters(_configuration: DPMConfiguration): Promise<Parameter[]> {
         return [];
     }

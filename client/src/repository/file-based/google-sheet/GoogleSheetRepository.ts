@@ -5,6 +5,22 @@ import { Repository } from "../../Repository";
 import { getSpreadsheetID } from "./GoogleSheetSourceDescription";
 
 export class GoogleSheetRepository implements Repository {
+    requiresConnectionConfiguration(): boolean {
+        return true;
+    }
+
+    requiresCredentialsConfiguration(): boolean {
+        return true;
+    }
+
+    async getConnectionIdentifierFromConfiguration(_configuration: DPMConfiguration): Promise<string> {
+        return "Google Sheets"; // TODO Should probably move these from Source and Sink implementations to here
+    }
+
+    async getCredentialsIdentifierFromConfiguration(_configuration: DPMConfiguration): Promise<string> {
+        return "OAuth"; // TODO Figure out how to use the Oauth token to extract a username if necessary
+    }
+
     getConnectionParameters(connectionConfiguration: DPMConfiguration): Parameter[] | Promise<Parameter[]> {
         const parameters: Parameter[] = [];
 
@@ -77,7 +93,7 @@ export class GoogleSheetRepository implements Repository {
         return true; // TODO Implement
     }
 
-    async testAuthentication(
+    async testCredentials(
         _connectionConfiguration: DPMConfiguration,
         _authenticationConfiguration: DPMConfiguration
     ): Promise<string | true> {

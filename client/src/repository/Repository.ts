@@ -27,6 +27,34 @@ export interface RepositoryDescription {
 }
 
 export interface Repository {
+    /** The same unique identifier as RepositoryDescription.getType() */
+    getType(): string;
+
+    /** Whether this source requires the user provide connection configuration information. Example: MySql and Postgres
+     * will require the host and port. Google Big Query is a PaaS that does not require the user provide connection information */
+    requiresConnectionConfiguration(): boolean;
+
+    /** Whether this source requires the user provide authentication information. Example: MySql and Postgres will require the
+     * user to enter a username and password. A local file system does not. */
+    requiresCredentialsConfiguration(): boolean;
+
+    /** Given a complete connnection configuration object, return a string that the user would use
+     * to uniquely identify the repository. This is used to identify the repository in the UI.
+     *
+     * Example: MySQL would return hostname:port. A PaaS like Google Big Query would return a static string because there is only one public instance
+     *
+     * Return false if no repository information should be saved  */
+    getConnectionIdentifierFromConfiguration(configuration: DPMConfiguration): Promise<string>;
+
+    /** Given a complete credentels configuration object, return a string that the user would use
+     * to uniquely identify the access credentials. This is used to identify the credentials in the UI.
+     *
+     * This will not be called if there are no keys on the credentials configuration object */
+    getCredentialsIdentifierFromConfiguration(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration
+    ): Promise<string>;
+
     /** Returns the configuration parameters necessary to complete the basic unauthenticated connection. Called
      * repeatedly until no parameters are returned.
      */
@@ -37,7 +65,7 @@ export interface Repository {
      */
     getAuthenticationParameters(
         connectionConfiguration: DPMConfiguration,
-        authenticationConfiguration: DPMConfiguration
+        credentialsConfiguration: DPMConfiguration
     ): Promise<Parameter[]> | Parameter[];
 
     /** Called after getConnectionParameters, but BEFORE authentication parameters, to validate that the
@@ -52,8 +80,8 @@ export interface Repository {
     /** Called after testConnection(...) returns true and the user has completed getAuthenticationParameters(...). This
      * test validates that the service is reachable and that the provided authentication information is valid.
      */
-    testAuthentication(
+    testCredentials(
         connectionConfiguration: DPMConfiguration,
-        authenticationConfiguration: DPMConfiguration
+        credentialsConfiguration: DPMConfiguration
     ): Promise<string | true>;
 }

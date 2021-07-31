@@ -28,11 +28,6 @@ export class BigQuerySource implements Source {
         return TYPE;
     }
 
-    removeSecretConfigValues(
-        _configuration: DPMConfiguration
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-    ): void {}
-
     parseUri(uri: string): DPMConfiguration {
         const parsedUri = uri.replace("bigQuery://", "").split("/");
         const connectionOptions: DPMConfiguration = {
@@ -55,6 +50,7 @@ export class BigQuerySource implements Source {
     }
 
     async getInspectParameters(configuration: DPMConfiguration): Promise<Parameter[]> {
+        // TODO Make this use the credentials configuration
         if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
             console.log(
                 chalk.red(
@@ -174,7 +170,12 @@ export class BigQuerySource implements Source {
         return parameters;
     }
 
-    async inspectURIs(configuration: DPMConfiguration, context: SourceInspectionContext): Promise<InspectionResults> {
+    async inspectURIs(
+        _connectionConfiguration: DPMConfiguration,
+        _credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        context: SourceInspectionContext
+    ): Promise<InspectionResults> {
         let remainingParameter = await this.getInspectParameters(configuration);
 
         while (remainingParameter.length > 0) {

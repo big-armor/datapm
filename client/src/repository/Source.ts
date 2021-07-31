@@ -129,17 +129,21 @@ export interface SourceDescription {
      */
     supportsURI(uri: string): boolean;
 
+    /** Returns an instance of the source. Use a delayed import pattern to ensure that loading of dependencies is
+     * delayed until the source is actually used. */
     getSource(): Promise<Source>;
 }
 export interface Source {
     /** A universally unique identifier for the source implementation. */
     sourceType(): string;
 
-    /** Remove sensitive config values from the configuration before saving into package file */
-    removeSecretConfigValues(configuration: DPMConfiguration): void;
-
-    /** Inspects a given URI and discovers the content */
-    inspectURIs(configuration: DPMConfiguration, context: SourceInspectionContext): Promise<InspectionResults>;
+    /** Inspects a given URI and returns an InspectionResult, which includes stream set previews */
+    inspectURIs(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        context: SourceInspectionContext
+    ): Promise<InspectionResults>;
 }
 
 export interface Property {

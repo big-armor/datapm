@@ -402,7 +402,8 @@
                 "required": [
                     "type",
                     "slug",
-                    "streamSets"
+                    "streamSets",
+                    "connectionConfiguration"
                 ],
                 "properties": {
                     "slug": {
@@ -418,11 +419,21 @@
                         "description": "The unique identifier for the source implementation.",
                         "default": ""
                     },
+                    "connectionConfiguration": {
+                        "$id": "#/sources/source/connectionConfiguration",
+                        "type": "object",
+                        "title": "Source Connection Configuration",
+                        "description": "The configuration used by the source implementation to connect to the target system",
+                        "default": {},
+                        "required": [],
+                        "properties": {},
+                        "additionalProperties": true
+                    },
                     "configuration": {
                         "$id": "#/sources/source/configuration",
                         "type": "object",
-                        "title": "Source Configuration",
-                        "description": "The configuration used by the source implementation to aquire and interpret the record stream.",
+                        "title": "Source Options Configuration",
+                        "description": "The configuration used by the source implementation to aquire and interpret the record stream, after connecting and authenticating",
                         "default": {},
                         "required": [],
                         "properties": {},

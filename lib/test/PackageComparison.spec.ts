@@ -341,6 +341,7 @@ describe("Checking VersionUtil", () => {
         const sourceA: Source = {
             slug: "datapm",
             type: "test",
+            connectionConfiguration: {},
             configuration: {
                 uris: ["http://datapm.io/test", "http://datapm.io/test2"]
             },
@@ -360,6 +361,7 @@ describe("Checking VersionUtil", () => {
         const sourceB: Source = {
             slug: "datapm",
             type: "test",
+            connectionConfiguration: {},
             configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
             streamSets: [
                 {
@@ -401,6 +403,7 @@ describe("Checking VersionUtil", () => {
             {
                 slug: "datapm",
                 type: "test",
+                connectionConfiguration: {},
                 configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
                 streamSets: [
                     {
@@ -420,6 +423,7 @@ describe("Checking VersionUtil", () => {
             {
                 slug: "datapm",
                 type: "test",
+                connectionConfiguration: {},
                 configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
                 streamSets: [
                     {
@@ -452,6 +456,7 @@ describe("Checking VersionUtil", () => {
             {
                 slug: "datapm",
                 type: "test",
+                connectionConfiguration: {},
                 configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
                 streamSets: [
                     {
@@ -471,6 +476,7 @@ describe("Checking VersionUtil", () => {
             {
                 slug: "datapm2",
                 type: "test",
+                connectionConfiguration: {},
                 configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
                 streamSets: [
                     {
@@ -497,6 +503,7 @@ describe("Checking VersionUtil", () => {
             {
                 slug: "datapm",
                 type: "test",
+                connectionConfiguration: {},
                 configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
                 streamSets: [
                     {
@@ -516,6 +523,7 @@ describe("Checking VersionUtil", () => {
             {
                 slug: "datapm",
                 type: "test",
+                connectionConfiguration: {},
                 configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
                 streamSets: [
                     {
@@ -546,11 +554,113 @@ describe("Checking VersionUtil", () => {
         expect(diffs2[0].type).equal(DifferenceType.REMOVE_STREAM_SET);
     });
 
+    it("Source connection detection", () => {
+        const sourceA: Source[] = [
+            {
+                slug: "datapm",
+                type: "test",
+                connectionConfiguration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
+                configuration: {},
+                streamSets: [
+                    {
+                        slug: "test",
+                        configuration: {},
+                        lastUpdateHash: "abc123",
+                        schemaTitles: ["A"],
+                        streamStats: {
+                            inspectedCount: 1
+                        }
+                    }
+                ]
+            }
+        ];
+
+        const sourceB: Source[] = [
+            {
+                slug: "datapm",
+                type: "test",
+                connectionConfiguration: {
+                    uris: ["http://datapm.io/test", "http://datapm.io/test2"],
+                    newValue: "a"
+                },
+                configuration: {},
+                streamSets: [
+                    {
+                        slug: "test",
+                        configuration: {},
+                        lastUpdateHash: "abc123",
+                        schemaTitles: ["A"],
+                        streamStats: {
+                            inspectedCount: 1
+                        }
+                    }
+                ]
+            }
+        ];
+
+        const diffs = compareSources(sourceA, sourceB);
+
+        expect(diffs.length).equals(1);
+
+        expect(diffs[0].type).equal(DifferenceType.CHANGE_SOURCE_CONNECTION);
+    });
+
+    it("Source credentials detection", () => {
+        const sourceA: Source[] = [
+            {
+                slug: "datapm",
+                type: "test",
+                credentialsIdentifier: "test",
+                connectionConfiguration: {},
+                configuration: {},
+                streamSets: [
+                    {
+                        slug: "test",
+                        configuration: {},
+                        lastUpdateHash: "abc123",
+                        schemaTitles: ["A"],
+                        streamStats: {
+                            inspectedCount: 1
+                        }
+                    }
+                ]
+            }
+        ];
+
+        const sourceB: Source[] = [
+            {
+                slug: "datapm",
+                type: "test",
+                credentialsIdentifier: "test2",
+                connectionConfiguration: {},
+                configuration: {},
+                streamSets: [
+                    {
+                        slug: "test",
+                        configuration: {},
+                        lastUpdateHash: "abc123",
+                        schemaTitles: ["A"],
+                        streamStats: {
+                            inspectedCount: 1
+                        }
+                    }
+                ]
+            }
+        ];
+
+        const diffs = compareSources(sourceA, sourceB);
+
+        expect(diffs.length).equals(1);
+
+        expect(diffs[0].type).equal(DifferenceType.CHANGE_SOURCE_CREDENTIALS);
+    });
+
     it("Source configuration detection", () => {
         const sourceA: Source[] = [
             {
                 slug: "datapm",
                 type: "test",
+                connectionConfiguration: {},
                 configuration: { uris: ["http://datapm.io/test", "http://datapm.io/test2"] },
                 streamSets: [
                     {
@@ -574,6 +684,7 @@ describe("Checking VersionUtil", () => {
                     uris: ["http://datapm.io/test", "http://datapm.io/test2"],
                     newValue: "a"
                 },
+                connectionConfiguration: {},
                 streamSets: [
                     {
                         slug: "test",

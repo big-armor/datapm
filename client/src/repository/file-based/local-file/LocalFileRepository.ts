@@ -3,6 +3,25 @@ import { Parameter } from "../../../util/parameters/Parameter";
 import { Repository } from "../../Repository";
 
 export class LocalFileRepository implements Repository {
+    requiresConnectionConfiguration(): boolean {
+        return false;
+    }
+
+    requiresCredentialsConfiguration(): boolean {
+        return false;
+    }
+
+    async getConnectionIdentifierFromConfiguration(_configuration: DPMConfiguration): Promise<string> {
+        return "local";
+    }
+
+    getCredentialsIdentifierFromConfiguration(
+        _connectionConfiguration: DPMConfiguration,
+        _credentialsConfiguration: DPMConfiguration
+    ): Promise<string> {
+        throw new Error("Method not implemented.");
+    }
+
     getConnectionParameters(_connectionConfiguration: DPMConfiguration): Parameter[] | Promise<Parameter[]> {
         return []; // The source and sink implementations define how to access the files
     }
@@ -18,7 +37,7 @@ export class LocalFileRepository implements Repository {
         return true;
     }
 
-    async testAuthentication(
+    async testCredentials(
         _connectionConfiguration: DPMConfiguration,
         _authenticationConfiguration: DPMConfiguration
     ): Promise<string | true> {

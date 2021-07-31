@@ -15,7 +15,7 @@ import prompts, { Choice } from "prompts";
 import { SemVer } from "semver";
 import { Permission } from "../generated/graphql";
 import { getSourceByType } from "../repository/SourceUtil";
-import { getRegistryConfig } from "../util/ConfigUtil";
+import { getRegistryConfig, getRepositoryCredential } from "../util/ConfigUtil";
 import { validPackageDisplayName, validShortPackageDescription, validUnit, validVersion } from "../util/IdentifierUtil";
 import { getPackage } from "../util/PackageAccessUtil";
 import { writeLicenseFile, writePackageFile, writeReadmeFile, differenceToString } from "../util/PackageUtil";
@@ -28,6 +28,9 @@ import { inspectSource, inspectStreamSet } from "./PackageCommandModule";
 import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
 import { cliHandleParameters } from "../util/parameters/ParameterUtils";
 import { SourceInspectionContext } from "../repository/Source";
+import { getRepositoryDescriptionByType } from "../repository/RepositoryUtil";
+import { obtainConnectionConfiguration } from "../util/ConnectionUtil";
+import { obtainCredentialsConfiguration } from "../util/CredentialsUtil";
 
 async function schemaPrompts(schema: Schema): Promise<void> {
     if (schema.properties == null) return;
@@ -341,6 +344,15 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
     newPackageFile.sources = [];
 
     for (const sourceObject of oldPackageFile.sources) {
+        const repositoryDescription = getRepositoryDescriptionByType(sourceObject.type);
+
+        if (repositoryDescription == null) {
+            oraRef.fail("No repository found to inspect this data - " + sourceObject.type);
+            exit(1);
+        }
+
+        const repository = await repositoryDescription.getRepository();
+
         const sourceDescription = getSourceByType(sourceObject.type);
         const source = await (await sourceDescription)?.getSource();
 
@@ -349,10 +361,43 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
             exit(1);
         }
 
+        const connectionConfiguration = await obtainConnectionConfiguration(
+            oraRef,
+            repository,
+            sourceObject.connectionConfiguration,
+            argv.defaults
+        );
+
+        const repositoryIdentifier = await repository.getConnectionIdentifierFromConfiguration(connectionConfiguration);
+
+        let credentialsConfiguration = {};
+
+        if (sourceObject.credentialsIdentifier) {
+            try {
+                credentialsConfiguration = await getRepositoryCredential(
+                    repository.getType(),
+                    repositoryIdentifier,
+                    sourceObject.credentialsIdentifier
+                );
+            } catch (error) {
+                oraRef.warn("The credential " + sourceObject.credentialsIdentifier + " could not be found or read.");
+            }
+        }
+
+        credentialsConfiguration = await obtainCredentialsConfiguration(
+            oraRef,
+            repository,
+            connectionConfiguration,
+            credentialsConfiguration,
+            argv.defaults
+        );
+
         const uriInspectionResults = await inspectSource(
             source,
             sourceInspectionContext,
             oraRef,
+            sourceObject.connectionConfiguration,
+            credentialsConfiguration,
             sourceObject.configuration || {}
         );
 

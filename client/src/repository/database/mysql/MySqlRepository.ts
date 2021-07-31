@@ -3,6 +3,25 @@ import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
 import { Repository } from "../../Repository";
 
 export class MySqlRepository implements Repository {
+    requiresConnectionConfiguration(): boolean {
+        return true;
+    }
+
+    requiresCredentialsConfiguration(): boolean {
+        return true;
+    }
+
+    async getConnectionIdentifierFromConfiguration(configuration: DPMConfiguration): Promise<string> {
+        return configuration.host + ":" + configuration.port;
+    }
+
+    async getCredentialsIdentifierFromConfiguration(
+        _connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration
+    ): Promise<string> {
+        return credentialsConfiguration.username as string;
+    }
+
     getDefaultParameterValues(configuration: DPMConfiguration): DPMConfiguration {
         return {
             host: configuration.host || "localhost",
@@ -73,7 +92,7 @@ export class MySqlRepository implements Repository {
         return true; // TODO implement TCP ping of port
     }
 
-    async testAuthentication(
+    async testCredentials(
         _connectionConfiguration: DPMConfiguration,
         _authenticationConfiguration: DPMConfiguration
     ): Promise<string | true> {

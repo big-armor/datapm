@@ -39,6 +39,15 @@ import { cliHandleParameters, repeatedlyPromptParameters } from "../util/paramet
 import * as SchemaUtil from "../util/SchemaUtil";
 import { PackageArguments } from "./PackageCommand";
 import { PublishPackageCommandModule } from "./PublishPackageCommandModule";
+import {
+    getRepositoryCredential,
+    getRepositoryConfigs,
+    RepositoryConfig,
+    saveRepositoryCredential,
+    saveRepositoryConfig
+} from "../util/ConfigUtil";
+import { obtainCredentialsConfiguration } from "../util/CredentialsUtil";
+import { obtainConnectionConfiguration } from "../util/ConnectionUtil";
 
 export async function generatePackage(argv: PackageArguments): Promise<void> {
     const oraRef = ora({
@@ -47,10 +56,35 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
         text: `Inspecting URIs...`
     });
 
+    let connectionConfiguration: DPMConfiguration = {};
+    let credentialsConfiguration: DPMConfiguration = {};
     let sourceConfiguration: DPMConfiguration = {};
-    if (argv.sourceConfiguration) {
+
+    if (argv.connection) {
         try {
-            const correctJson = argv.sourceConfiguration.replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, '"$2": ');
+            const correctJson = argv.connection.replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, '"$2": ');
+
+            connectionConfiguration = JSON.parse(correctJson);
+        } catch (error) {
+            oraRef.fail("Could not parse the connection parameter as JSON");
+            process.exit(1);
+        }
+    }
+
+    if (argv.credentials) {
+        try {
+            const correctJson = argv.credentials.replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, '"$2": ');
+
+            credentialsConfiguration = JSON.parse(correctJson);
+        } catch (error) {
+            oraRef.fail("Could not parse the credentials parameter as JSON");
+            process.exit(1);
+        }
+    }
+
+    if (argv.configuration) {
+        try {
+            const correctJson = argv.configuration.replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, '"$2": ');
 
             sourceConfiguration = JSON.parse(correctJson);
         } catch (error) {
@@ -103,29 +137,27 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
     }
 
     const repository = await maybeRepositoryDescription.getRepository();
-
-    await repeatedlyPromptParameters(
-        async () => {
-            return repository.getConnectionParameters(sourceConfiguration);
-        },
-        sourceConfiguration,
-        argv.defaults || false
-    );
-
-    await repeatedlyPromptParameters(
-        async () => {
-            return repository.getAuthenticationParameters(sourceConfiguration, sourceConfiguration);
-        },
-        sourceConfiguration,
-        argv.defaults || false
-    );
-
     const sourceDescription = await maybeRepositoryDescription.getSourceDescription();
 
     if (sourceDescription == null) {
         oraRef.fail("No source impelementation found for " + maybeRepositoryDescription.getType());
         process.exit(1);
     }
+
+    connectionConfiguration = await obtainConnectionConfiguration(
+        oraRef,
+        repository,
+        connectionConfiguration,
+        argv.defaults
+    );
+
+    credentialsConfiguration = await obtainCredentialsConfiguration(
+        oraRef,
+        repository,
+        connectionConfiguration,
+        credentialsConfiguration,
+        argv.defaults
+    );
 
     const source = await sourceDescription.getSource();
 
@@ -143,7 +175,14 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
         }
     };
 
-    const uriInspectionResults = await inspectSource(source, sourceInspectionContext, oraRef, sourceConfiguration);
+    const uriInspectionResults = await inspectSource(
+        source,
+        sourceInspectionContext,
+        oraRef,
+        connectionConfiguration,
+        credentialsConfiguration,
+        sourceConfiguration
+    );
 
     console.log("");
     console.log(chalk.magenta("Inspecting Data Streams"));
@@ -179,14 +218,12 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
         streamSets.push(streamSet);
     }
 
-    const sanitizedSourceConfiguration = { ...sourceConfiguration };
-    source.removeSecretConfigValues(sanitizedSourceConfiguration);
-
     const sourceObject: Source = {
         slug: source.sourceType(),
         streamSets,
         type: source.sourceType(),
-        configuration: sanitizedSourceConfiguration
+        connectionConfiguration,
+        configuration: sourceConfiguration
     };
     // build sources array
 
@@ -696,13 +733,17 @@ export async function inspectSource(
     source: SourceImplementation,
     sourceInspectionContext: SourceInspectionContext,
     oraRef: ora.Ora,
+    connectionConfiguration: DPMConfiguration,
+    credentialsConfiguration: DPMConfiguration,
     configuration: DPMConfiguration
 ): Promise<InspectionResults> {
     // Inspecting URL
-    const uriInspectionResults = await source.inspectURIs(configuration, sourceInspectionContext).catch((error) => {
-        oraRef.fail(error.message);
-        process.exit(1);
-    });
+    const uriInspectionResults = await source
+        .inspectURIs(connectionConfiguration, credentialsConfiguration, configuration, sourceInspectionContext)
+        .catch((error) => {
+            oraRef.fail(error.message);
+            process.exit(1);
+        });
 
     return uriInspectionResults;
 }

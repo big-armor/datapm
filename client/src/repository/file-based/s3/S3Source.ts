@@ -19,11 +19,6 @@ export class S3Source extends AbstractFileStreamSource implements Source {
         return uri.startsWith("s3://");
     }
 
-    removeSecretConfigValues(
-        _configuration: DPMConfiguration
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-    ): void {}
-
     getFileName(uri: string): string {
         const parts = uri.replace("s3://", "").split("/");
         return parts[parts.length - 1] || "";

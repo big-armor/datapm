@@ -14,11 +14,6 @@ export class LocalFileSource extends AbstractFileStreamSource implements Source 
         return TYPE;
     }
 
-    removeSecretConfigValues(
-        _configuration: DPMConfiguration
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-    ): void {}
-
     getFilePath(uri: string): string {
         return uri.replace("file://", "");
     }

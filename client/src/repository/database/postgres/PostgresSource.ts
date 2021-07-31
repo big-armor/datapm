@@ -20,11 +20,6 @@ export class PostgresSource implements Source {
         return TYPE;
     }
 
-    removeSecretConfigValues(
-        _configuration: DPMConfiguration
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-    ): void {}
-
     getDefaultParameterValues(configuration: DPMConfiguration): DPMConfiguration {
         return {
             database: configuration.database || "postgres",
@@ -32,7 +27,11 @@ export class PostgresSource implements Source {
         };
     }
 
-    async getInspectParameters(configuration: DPMConfiguration): Promise<Parameter[]> {
+    async getInspectParameters(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<Parameter[]> {
         const parameters: Parameter[] = [];
 
         if (configuration.database == null) {
@@ -57,7 +56,11 @@ export class PostgresSource implements Source {
 
         if (parameters.length === 0 && !configuration.tables) {
             try {
-                const client = await this.checkConnection(configuration);
+                const client = await this.checkConnection(
+                    connectionConfiguration,
+                    credentialsConfiguration,
+                    configuration
+                );
                 const tableNames = await this.fetchSchemaTableNames(client, configuration.schema as string);
                 if (tableNames.length === 0) {
                     console.log(chalk("No table exists in the schema"));
@@ -87,18 +90,37 @@ export class PostgresSource implements Source {
         return parameters;
     }
 
-    async inspectURIs(configuration: DPMConfiguration, context: URIInspectionContext): Promise<InspectionResults> {
-        let remainingParameter = await this.getInspectParameters(configuration);
+    async inspectURIs(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        context: URIInspectionContext
+    ): Promise<InspectionResults> {
+        let remainingParameter = await this.getInspectParameters(
+            connectionConfiguration,
+            credentialsConfiguration,
+            configuration
+        );
 
         while (remainingParameter.length > 0) {
             await context.parameterPrompt(remainingParameter);
-            remainingParameter = await this.getInspectParameters(configuration);
+            remainingParameter = await this.getInspectParameters(
+                connectionConfiguration,
+                credentialsConfiguration,
+                configuration
+            );
         }
 
         const tableStreams: StreamSetPreview[] = [];
 
         for (const table of (configuration.tables as string).split(",")) {
-            const tableStream = await this.getTableStream(table, configuration, context);
+            const tableStream = await this.getTableStream(
+                table,
+                connectionConfiguration,
+                credentialsConfiguration,
+                configuration,
+                context
+            );
 
             tableStreams.push(tableStream);
         }
@@ -116,12 +138,18 @@ export class PostgresSource implements Source {
 
     async getTableStream(
         tableName: string,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
         _context: URIInspectionContext
     ): Promise<StreamSetPreview> {
         if (configuration == null) throw new Error("");
 
-        const client = this.createClient(configuration as DPMConfiguration);
+        const client = this.createClient(
+            connectionConfiguration,
+            credentialsConfiguration,
+            configuration as DPMConfiguration
+        );
 
         // Get Last Modified Date
         let updateHash = new Date().toISOString();
@@ -173,24 +201,32 @@ export class PostgresSource implements Source {
         };
     }
 
-    private createClient(configuration: DPMConfiguration): Knex {
+    private createClient(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Knex {
         // Open a connection to the database
         return Knex({
             client: "pg",
             connection: {
-                host: configuration.host,
-                port: configuration.port,
-                user: configuration.username,
-                password: configuration.password,
+                host: connectionConfiguration.host,
+                port: connectionConfiguration.port,
+                user: credentialsConfiguration.username,
+                password: credentialsConfiguration.password,
                 database: configuration.database,
                 connectTimeout: 3000
             } as Knex.PgConnectionConfig
         });
     }
 
-    private async checkConnection(configuration: DPMConfiguration): Promise<Knex> {
+    private async checkConnection(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<Knex> {
         // Open a connection to the database
-        const client = this.createClient(configuration);
+        const client = this.createClient(connectionConfiguration, credentialsConfiguration, configuration);
 
         // Check DB Existence
         try {

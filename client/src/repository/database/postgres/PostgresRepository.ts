@@ -4,6 +4,25 @@ import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
 import { Repository } from "../../Repository";
 
 export class PostgresRepository implements Repository {
+    requiresConnectionConfiguration(): boolean {
+        return true;
+    }
+
+    requiresCredentialsConfiguration(): boolean {
+        return true;
+    }
+
+    async getConnectionIdentifierFromConfiguration(configuration: DPMConfiguration): Promise<string> {
+        return configuration.host + ":" + configuration.port;
+    }
+
+    async getCredentialsIdentifierFromConfiguration(
+        _connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration
+    ): Promise<string> {
+        return credentialsConfiguration.username as string;
+    }
+
     getDefaultConnectionParameterValues(configuration: DPMConfiguration): DPMConfiguration {
         return {
             host: configuration.host || "localhost",
@@ -39,6 +58,7 @@ export class PostgresRepository implements Repository {
                 type: ParameterType.Text,
                 name: "host",
                 message: "Hostname or IP?",
+                min: 1,
                 defaultValue: defaultParameterValues.host as string
             });
         }
@@ -49,6 +69,7 @@ export class PostgresRepository implements Repository {
                 type: ParameterType.Number,
                 name: "port",
                 message: "Port?",
+                min: 1,
                 defaultValue: defaultParameterValues.port as number
             });
         }
@@ -68,6 +89,7 @@ export class PostgresRepository implements Repository {
                 type: ParameterType.Text,
                 name: "username",
                 message: "Username?",
+                min: 1,
                 defaultValue: this.getDefaultAuthenticationParameterValues(authenticationConfiguration)
                     .username as string
             });
@@ -79,6 +101,7 @@ export class PostgresRepository implements Repository {
                 type: ParameterType.Password,
                 name: "password",
                 message: "Password?",
+                min: 1,
                 defaultValue: this.getDefaultAuthenticationParameterValues(authenticationConfiguration)
                     .password as string
             });
@@ -91,7 +114,7 @@ export class PostgresRepository implements Repository {
         return true; // TODO Implement
     }
 
-    async testAuthentication(
+    async testCredentials(
         _connectionConfiguration: DPMConfiguration,
         _authenticationConfiguration: DPMConfiguration
     ): Promise<string | true> {

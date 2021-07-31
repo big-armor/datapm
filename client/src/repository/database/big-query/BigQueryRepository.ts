@@ -3,6 +3,25 @@ import { Parameter } from "../../../util/parameters/Parameter";
 import { Repository } from "../../Repository";
 
 export class BigQueryRepository implements Repository {
+    requiresConnectionConfiguration(): boolean {
+        return false;
+    }
+
+    requiresCredentialsConfiguration(): boolean {
+        return true;
+    }
+
+    async getConnectionIdentifierFromConfiguration(_configuration: DPMConfiguration): Promise<string> {
+        return "Big Query"; // Fixed for now. Should probably move configuration for project ID and data set from source into this file
+    }
+
+    async getCredentialsIdentifierFromConfiguration(
+        _connectionConfiguration: DPMConfiguration,
+        _credentialsConfiguration: DPMConfiguration
+    ): Promise<string> {
+        return "Environment Variables"; // Fixed for now. See above
+    }
+
     getConnectionParameters(_connectionConfiguration: DPMConfiguration): Parameter[] | Promise<Parameter[]> {
         return [];
     }
@@ -21,7 +40,7 @@ export class BigQueryRepository implements Repository {
         return true;
     }
 
-    async testAuthentication(
+    async testCredentials(
         _connectionConfiguration: DPMConfiguration,
         _authenticationConfiguration: DPMConfiguration
     ): Promise<string | true> {

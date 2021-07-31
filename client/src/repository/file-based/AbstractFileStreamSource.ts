@@ -16,14 +16,17 @@ import { asyncMap } from "../../util/AsyncUtils";
 export abstract class AbstractFileStreamSource implements Source {
     abstract sourceType(): string;
 
-    abstract removeSecretConfigValues(configuration: DPMConfiguration): void;
-
     /** Given a URL, return a set of ordered readers that will be used to parse records */
     abstract getFileStreams(configuration?: DPMConfiguration): Promise<FileStreamContext[]>;
 
     abstract getInspectParameters(configuration: DPMConfiguration): Promise<Parameter[]>;
 
-    async inspectURIs(configuration: DPMConfiguration, context: SourceInspectionContext): Promise<InspectionResults> {
+    async inspectURIs(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        context: SourceInspectionContext
+    ): Promise<InspectionResults> {
         // Loop over each URI
 
         let remainingParameter = await this.getInspectParameters(configuration);

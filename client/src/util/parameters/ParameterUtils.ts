@@ -54,6 +54,7 @@ export function parametersToPrompts(parameters: Parameter[]): PromptObject[] {
                 type: "autocomplete",
                 name: promptParameter.name,
                 message: promptParameter.message,
+                min: promptParameter.min,
                 choices: [
                     {
                         title: "Yes",
@@ -70,6 +71,7 @@ export function parametersToPrompts(parameters: Parameter[]): PromptObject[] {
                 name: promptParameter.name,
                 message: promptParameter.message,
                 initial: promptParameter.defaultValue,
+                min: promptParameter.min,
                 validate: promptParameter.validate
             };
         } else if (

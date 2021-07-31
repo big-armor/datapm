@@ -4,6 +4,22 @@ import { Parameter } from "../../../util/parameters/Parameter";
 import { Repository } from "../../Repository";
 
 export class RedshiftRepository implements Repository {
+    requiresConnectionConfiguration(): boolean {
+        return false;
+    }
+
+    requiresCredentialsConfiguration(): boolean {
+        return true;
+    }
+
+    async getConnectionIdentifierFromConfiguration(_configuration: DPMConfiguration): Promise<string> {
+        return "Redshift"; // TODO Should probably move these from Source and Sink implementations to here
+    }
+
+    async getCredentialsIdentifierFromConfiguration(_configuration: DPMConfiguration): Promise<string> {
+        return "Environment Variables"; // TODO Should probably move these from Source and Sink implementations to here
+    }
+
     getConnectionParameters(_connectionConfiguration: DPMConfiguration): Parameter[] | Promise<Parameter[]> {
         return [];
     }
@@ -20,7 +36,7 @@ export class RedshiftRepository implements Repository {
         return true;
     }
 
-    async testAuthentication(
+    async testCredentials(
         _connectionConfiguration: DPMConfiguration,
         _authenticationConfiguration: DPMConfiguration
     ): Promise<string | true> {

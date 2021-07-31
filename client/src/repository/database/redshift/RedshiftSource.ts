@@ -31,13 +31,6 @@ export class RedshiftSource extends AbstractFileStreamSource implements Source {
         return uri.startsWith("redshift://");
     }
 
-    removeSecretConfigValues(
-        configuration: DPMConfiguration
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-    ): void {
-        ["host", "port", "username", "password"].forEach((key) => delete configuration[key]);
-    }
-
     parseUri(uri: string): Record<string, string> {
         const parts = uri.replace("redshift://", "").split("/");
         const cluster = parts[0] || "";

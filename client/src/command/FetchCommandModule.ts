@@ -218,7 +218,7 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
     for (const source of packageFile.sources) {
         if (interupted) break;
 
-        const schemaUriInspectionResults = await inspectSourceConnection(source);
+        const schemaUriInspectionResults = await inspectSourceConnection(oraRef, source, argv.defaults);
 
         for (const streamSetPreview of schemaUriInspectionResults.streamSetPreviews) {
             const sinkStateKey: SinkStateKey = {

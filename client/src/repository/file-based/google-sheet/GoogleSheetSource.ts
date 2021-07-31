@@ -28,16 +28,16 @@ export class GoogleSheetSource implements Source {
         return TYPE;
     }
 
-    removeSecretConfigValues(
-        _configuration: DPMConfiguration
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-    ): void {}
-
     async getInspectParameters(_configuration: DPMConfiguration): Promise<Parameter[]> {
         return [];
     }
 
-    async inspectURIs(configuration: DPMConfiguration, context: URIInspectionContext): Promise<InspectionResults> {
+    async inspectURIs(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        context: URIInspectionContext
+    ): Promise<InspectionResults> {
         const uris = configuration.uris as string[];
         if (uris != null && uris.length > 1) {
             throw new Error("GOOGLE_SHEET_SOURCE_DOES_NOT_SUPPORT_MULTIPLE_URIS");
