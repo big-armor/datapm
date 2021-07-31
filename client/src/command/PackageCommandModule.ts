@@ -35,17 +35,10 @@ import { Maybe } from "../util/Maybe";
 import { nameToSlug } from "../util/NameUtil";
 import { writeLicenseFile, writePackageFile, writeReadmeFile, PublishType } from "../util/PackageUtil";
 import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
-import { cliHandleParameters, repeatedlyPromptParameters } from "../util/parameters/ParameterUtils";
+import { cliHandleParameters } from "../util/parameters/ParameterUtils";
 import * as SchemaUtil from "../util/SchemaUtil";
 import { PackageArguments } from "./PackageCommand";
 import { PublishPackageCommandModule } from "./PublishPackageCommandModule";
-import {
-    getRepositoryCredential,
-    getRepositoryConfigs,
-    RepositoryConfig,
-    saveRepositoryCredential,
-    saveRepositoryConfig
-} from "../util/ConfigUtil";
 import { obtainCredentialsConfiguration } from "../util/CredentialsUtil";
 import { obtainConnectionConfiguration } from "../util/ConnectionUtil";
 
