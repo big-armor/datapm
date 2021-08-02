@@ -1,8 +1,13 @@
-import { DPMConfiguration } from "../../../../../lib/dist/src/PackageUtil";
+import { DPMConfiguration } from "datapm-lib";
 import { Parameter } from "../../../util/parameters/Parameter";
 import { Repository } from "../../Repository";
+import { TYPE } from "./StandardOutRepositoryDescription";
 
 export class StandardOutRepository implements Repository {
+    getType(): string {
+        return TYPE;
+    }
+
     requiresConnectionConfiguration(): boolean {
         return false;
     }

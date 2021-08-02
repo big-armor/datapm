@@ -1,4 +1,4 @@
-import { DPMConfiguration } from "../../../../lib/dist/src/PackageUtil";
+import { DPMConfiguration } from "datapm-lib";
 
 export enum ParameterType {
     AutoComplete = "autocomplete",

@@ -13,9 +13,9 @@ import {
 } from "../../../util/AwsUtil";
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
 import { AbstractFileStreamSource } from "../../file-based/AbstractFileStreamSource";
-import { TYPE } from "./RedshiftSourceDescription";
 import { S3Source } from "../../file-based/s3/S3Source";
 import { Source } from "../../Source";
+import { TYPE } from "./RedshiftRepositoryDescription";
 
 export class RedshiftSource extends AbstractFileStreamSource implements Source {
     redshiftClient: Redshift;

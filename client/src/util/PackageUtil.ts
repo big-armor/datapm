@@ -41,7 +41,9 @@ export const DifferenceTypeMessages: Record<DifferenceType, string> = {
     [DifferenceType.CHANGE_WEBSITE]: "Changed Website",
     [DifferenceType.CHANGE_CONTACT_EMAIL]: "Changed Contact Email",
     [DifferenceType.HIDE_PROPERTY]: "Property Hidden",
-    [DifferenceType.UNHIDE_PROPERTY]: "Property Unhidden"
+    [DifferenceType.UNHIDE_PROPERTY]: "Property Unhidden",
+    [DifferenceType.CHANGE_SOURCE_CONNECTION]: "Changed Source Connection Configuration",
+    [DifferenceType.CHANGE_SOURCE_CREDENTIALS]: "Changed Source Credentials"
 };
 
 export function differenceToString(difference: Difference): string {

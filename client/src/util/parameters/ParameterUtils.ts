@@ -1,5 +1,5 @@
 import prompts, { PromptObject } from "prompts";
-import { DPMConfiguration } from "../../../../lib/dist/src/PackageUtil";
+import { DPMConfiguration } from "datapm-lib";
 import { defaultPromptOptions } from "./DefaultParameterOptions";
 import { Parameter, ParameterType } from "./Parameter";
 

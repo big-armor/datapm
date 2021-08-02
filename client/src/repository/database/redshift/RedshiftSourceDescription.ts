@@ -1,5 +1,5 @@
 import { SourceDescription, Source } from "../../../repository/Source";
-export const TYPE = "redshift";
+import { TYPE } from "./RedshiftRepositoryDescription";
 
 export class RedshiftSourceDescription implements SourceDescription {
     sourceType(): string {

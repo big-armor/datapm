@@ -42,10 +42,16 @@ before(async function () {
     console.log("Run name is " + runName);
 
     // eslint-disable-next-line no-async-promise-executor
-    const buildClientPromise = new Promise<void>(async (resolve) => {
+    const buildClientPromise = new Promise<void>(async (resolve, reject) => {
         console.log("building client");
 
-        await execa("npm", ["run", "build"]);
+        try {
+            await execa("npm", ["run", "build"]);
+        } catch (error) {
+            console.error(error);
+            reject(error);
+            return;
+        }
         console.log("client built");
 
         resolve();

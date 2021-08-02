@@ -1,6 +1,6 @@
 import { Ora } from "ora";
 import prompts from "prompts";
-import { DPMConfiguration } from "../../../lib/dist/src/main";
+import { DPMConfiguration } from "datapm-lib";
 import { Repository } from "../repository/Repository";
 import {
     getRepositoryConfigs,

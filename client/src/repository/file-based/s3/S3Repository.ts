@@ -1,9 +1,14 @@
-import { DPMConfiguration } from "../../../../../lib/dist/src/PackageUtil";
+import { DPMConfiguration } from "datapm-lib";
 import { getAwsAuthenticationParameters } from "../../../util/AwsUtil";
 import { Parameter } from "../../../util/parameters/Parameter";
 import { Repository } from "../../Repository";
+import { TYPE } from "./S3RepositoryDescription";
 
 export class S3Repository implements Repository {
+    getType(): string {
+        return TYPE;
+    }
+
     requiresConnectionConfiguration(): boolean {
         return false;
     }

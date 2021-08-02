@@ -1,8 +1,13 @@
-import { DPMConfiguration } from "../../../../../lib/dist/src/PackageUtil";
+import { DPMConfiguration } from "datapm-lib";
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
 import { Repository } from "../../Repository";
+import { TYPE } from "./MySqlRepositoryDescription";
 
 export class MySqlRepository implements Repository {
+    getType(): string {
+        return TYPE;
+    }
+
     requiresConnectionConfiguration(): boolean {
         return true;
     }

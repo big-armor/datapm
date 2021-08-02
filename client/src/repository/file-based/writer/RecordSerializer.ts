@@ -1,6 +1,6 @@
 import { Transform } from "stream";
-import { PackageFile, Schema } from "../../../../../lib/dist/src/PackageFile-v0.5.0";
-import { DPMConfiguration } from "../../../../../lib/dist/src/PackageUtil";
+import { PackageFile, Schema, DPMConfiguration } from "datapm-lib";
+
 import { UpdateMethod } from "../../Source";
 import { Parameter } from "../../../util/parameters/Parameter";
 

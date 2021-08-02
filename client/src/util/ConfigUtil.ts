@@ -1,5 +1,5 @@
 import Conf from "conf";
-import { DPMConfiguration } from "../../../lib/dist/src/PackageUtil";
+import { DPMConfiguration } from "datapm-lib";
 import { getPassword, setPassword } from "keytar";
 import * as crypto from "crypto";
 import { v4 as uuid } from "uuid";

@@ -1,4 +1,4 @@
-import { DPMConfiguration } from "../../../lib/dist/src/PackageUtil";
+import { DPMConfiguration } from "datapm-lib";
 import { SinkDescription } from "./Sink";
 import { SourceDescription } from "./Source";
 import { Parameter } from "../util/parameters/Parameter";

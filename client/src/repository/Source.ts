@@ -1,9 +1,8 @@
-import { DPMConfiguration, DPMRecord } from "../../../lib/dist/src/PackageUtil";
+import { DPMConfiguration, DPMRecord, Schema, StreamStats } from "datapm-lib";
 import { JSONSchema7TypeName } from "json-schema";
 import { StreamState } from "./Sink";
 import { Maybe } from "../util/Maybe";
 import { Readable, Transform } from "stream";
-import { Schema, StreamStats } from "../../../lib/dist/src/PackageFile-v0.5.0";
 import { LogType } from "../util/LoggingUtils";
 import { Parameter } from "../util/parameters/Parameter";
 

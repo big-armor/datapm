@@ -1,10 +1,15 @@
-import { DPMConfiguration } from "../../../../../lib/dist/src/PackageUtil";
+import { DPMConfiguration } from "datapm-lib";
 import { authorize, getSpreadsheetMetadata, initOAuth2Client, setCredentials } from "../../../util/GoogleUtil";
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
 import { Repository } from "../../Repository";
+import { TYPE } from "./GoogleSheetRepositoryDescription";
 import { getSpreadsheetID } from "./GoogleSheetSourceDescription";
 
 export class GoogleSheetRepository implements Repository {
+    getType(): string {
+        return TYPE;
+    }
+
     requiresConnectionConfiguration(): boolean {
         return true;
     }
