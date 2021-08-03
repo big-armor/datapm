@@ -10,60 +10,70 @@ export async function obtainConnectionConfiguration(
     repository: Repository,
     connectionConfiguration: DPMConfiguration,
     defaults: boolean | undefined
-): Promise<DPMConfiguration> {
-    if (repository.requiresConnectionConfiguration()) {
-        // Check whether there are existing configurations for this type of repository
-        const existingConfiguration = getRepositoryConfigs(repository.getType());
+): Promise<DPMConfiguration | false> {
+    if (!repository.requiresConnectionConfiguration()) return connectionConfiguration;
 
-        if (existingConfiguration.length > 0) {
-            const choices: {
-                value: RepositoryConfig;
-                title: string;
-            }[] = [
-                {
-                    value: {
-                        identifier: "**NEW**",
-                        connectionConfiguration: {}
-                    },
-                    title: "New Repository"
+    // Check whether there are existing configurations for this type of repository
+    const existingConfiguration = getRepositoryConfigs(repository.getType());
+
+    const pendingParameters = await repository.getConnectionParameters(connectionConfiguration);
+
+    if (
+        repository.userSelectableConnectionHistory() &&
+        pendingParameters.length > 0 &&
+        existingConfiguration.length > 0
+    ) {
+        const choices: {
+            value: RepositoryConfig;
+            title: string;
+        }[] = [
+            {
+                value: {
+                    identifier: "**NEW**",
+                    connectionConfiguration: {}
                 },
-                ...existingConfiguration.map((c) => {
-                    return { value: c, title: c.identifier };
-                })
-            ];
+                title: "New Repository"
+            },
+            ...existingConfiguration.map((c) => {
+                return { value: c, title: c.identifier };
+            })
+        ];
 
-            const existingConfigurationPromptResult = await prompts({
-                name: "connectionConfiguration",
-                type: "autocomplete",
-                message: "Repository?",
-                choices
-            });
+        const existingConfigurationPromptResult = await prompts({
+            name: "connectionConfiguration",
+            type: "autocomplete",
+            message: "Repository?",
+            choices
+        });
 
-            if (existingConfigurationPromptResult.connectionConfiguration.identifier !== "**NEW**") {
-                connectionConfiguration = (existingConfigurationPromptResult.connectionConfiguration as RepositoryConfig)
-                    .connectionConfiguration;
-            }
+        if (existingConfigurationPromptResult.connectionConfiguration == null) {
+            return false;
         }
 
-        let connectionSuccess = false;
+        if (existingConfigurationPromptResult.connectionConfiguration.identifier !== "**NEW**") {
+            connectionConfiguration = (existingConfigurationPromptResult.connectionConfiguration as RepositoryConfig)
+                .connectionConfiguration;
+        }
+    }
 
-        while (!connectionSuccess) {
-            await repeatedlyPromptParameters(
-                async () => {
-                    return repository.getConnectionParameters(connectionConfiguration);
-                },
-                connectionConfiguration,
-                defaults || false
-            );
+    let connectionSuccess = false;
 
-            const connectionTestResults = await repository.testConnection(connectionConfiguration);
+    while (!connectionSuccess) {
+        await repeatedlyPromptParameters(
+            async () => {
+                return repository.getConnectionParameters(connectionConfiguration);
+            },
+            connectionConfiguration,
+            defaults || false
+        );
 
-            if (typeof connectionTestResults === "string") {
-                oraRef.warn("Connection failed: " + connectionTestResults);
-                connectionConfiguration = {};
-            } else {
-                connectionSuccess = true;
-            }
+        const connectionTestResults = await repository.testConnection(connectionConfiguration);
+
+        if (typeof connectionTestResults === "string") {
+            oraRef.warn("Connection failed: " + connectionTestResults);
+            connectionConfiguration = {};
+        } else {
+            connectionSuccess = true;
         }
     }
 

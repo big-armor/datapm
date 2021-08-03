@@ -49,7 +49,11 @@ export class BigQuerySource implements Source {
         };
     }
 
-    async getInspectParameters(configuration: DPMConfiguration): Promise<Parameter[]> {
+    async getInspectParameters(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<Parameter[]> {
         // TODO Make this use the credentials configuration
         if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
             console.log(
@@ -64,8 +68,8 @@ export class BigQuerySource implements Source {
 
         const parameters: Parameter[] = [];
 
-        if (configuration.uris != null) {
-            const parsedUri = this.parseUri((configuration.uris as string[])[0]);
+        if (connectionConfiguration.uris != null) {
+            const parsedUri = this.parseUri((connectionConfiguration.uris as string[])[0]);
             Object.keys(parsedUri).forEach((key) => {
                 if (!configuration[key]) {
                     configuration[key] = parsedUri[key];
@@ -171,16 +175,24 @@ export class BigQuerySource implements Source {
     }
 
     async inspectURIs(
-        _connectionConfiguration: DPMConfiguration,
-        _credentialsConfiguration: DPMConfiguration,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
         context: SourceInspectionContext
     ): Promise<InspectionResults> {
-        let remainingParameter = await this.getInspectParameters(configuration);
+        let remainingParameter = await this.getInspectParameters(
+            connectionConfiguration,
+            credentialsConfiguration,
+            configuration
+        );
 
         while (remainingParameter.length > 0) {
             await context.parameterPrompt(remainingParameter);
-            remainingParameter = await this.getInspectParameters(configuration);
+            remainingParameter = await this.getInspectParameters(
+                connectionConfiguration,
+                credentialsConfiguration,
+                configuration
+            );
         }
 
         const streamSetPreviews: StreamSetPreview[] = [];

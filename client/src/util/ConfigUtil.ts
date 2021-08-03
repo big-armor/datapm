@@ -68,7 +68,7 @@ export interface RepositoryConfig {
     connectionConfiguration: DPMConfiguration;
 
     /** An array of string identifiers for each access credential. */
-    accessCredentials?: RepositoryCredentialsConfig[];
+    crdentials?: RepositoryCredentialsConfig[];
 }
 
 export interface RepositoryType {
@@ -107,7 +107,7 @@ export function saveRepositoryConfig(
     saveRepositoryConfigInternal(type, {
         identifier: repositoryIdentifer,
         connectionConfiguration,
-        accessCredentials: repositoryConfig ? repositoryConfig.accessCredentials : []
+        crdentials: repositoryConfig ? repositoryConfig.crdentials : []
     });
 }
 
@@ -144,7 +144,7 @@ export async function getRepositoryCredential(
         throw new Error(`No repository configuration found for ${repositoryType} ${repositoryIdentifier}`);
     }
 
-    const credentials = repositoryConfig.accessCredentials?.find((c) => c.identifier === credentialsIdentifier);
+    const credentials = repositoryConfig.crdentials?.find((c) => c.identifier === credentialsIdentifier);
 
     if (!credentials) {
         throw new Error(`No credentials found for ${repositoryType} ${repositoryIdentifier} ${credentialsIdentifier}`);
@@ -179,13 +179,11 @@ export async function saveRepositoryCredential(
 
     const hash = encrypt(jsonString, secretKey);
 
-    if (repositoryConfig.accessCredentials == null) repositoryConfig.accessCredentials = [];
+    if (repositoryConfig.crdentials == null) repositoryConfig.crdentials = [];
 
-    repositoryConfig.accessCredentials = repositoryConfig.accessCredentials.filter(
-        (c) => c.identifier !== credentialsIdentifier
-    );
+    repositoryConfig.crdentials = repositoryConfig.crdentials.filter((c) => c.identifier !== credentialsIdentifier);
 
-    repositoryConfig.accessCredentials.push({
+    repositoryConfig.crdentials.push({
         identifier: credentialsIdentifier,
         encryptedConfiguration: hash.content,
         iv: hash.iv
@@ -205,9 +203,9 @@ export async function deleteRepositoryAccessCredential(
         throw new Error(`No repository configuration found for ${repositoryType} ${repositoryIdentifier}`);
     }
 
-    const credentials = repositoryConfig.accessCredentials?.filter((c) => c.identifier !== credentialsIdentifier);
+    const credentials = repositoryConfig.crdentials?.filter((c) => c.identifier !== credentialsIdentifier);
 
-    repositoryConfig.accessCredentials = credentials;
+    repositoryConfig.crdentials = credentials;
 
     saveRepositoryConfigInternal(repositoryType, repositoryConfig);
 }

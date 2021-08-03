@@ -12,6 +12,10 @@ export class LocalFileRepository implements Repository {
         return false;
     }
 
+    userSelectableConnectionHistory(): boolean {
+        return false;
+    }
+
     requiresCredentialsConfiguration(): boolean {
         return false;
     }
@@ -28,10 +32,10 @@ export class LocalFileRepository implements Repository {
     }
 
     getConnectionParameters(_connectionConfiguration: DPMConfiguration): Parameter[] | Promise<Parameter[]> {
-        return []; // The source and sink implementations define how to access the files
+        return [];
     }
 
-    getAuthenticationParameters(
+    getCredentialsParameters(
         _connectionConfiguration: DPMConfiguration,
         _authenticationConfiguration: DPMConfiguration
     ): Parameter[] | Promise<Parameter[]> {

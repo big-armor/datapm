@@ -51,6 +51,10 @@ describe("Mongo Sink Test", function () {
         packageAFilePath = await createTestPackage(TEST_SOURCE_FILES.FILE1, true);
         packageBFilePath = await createTestPackage(TEST_SOURCE_FILES.FILE4, true);
         packageCFilePath = await createTestPackage(TEST_SOURCE_FILES.FILE5, true);
+
+        expect(packageAFilePath.length).to.be.greaterThan(0);
+        expect(packageBFilePath.length).to.be.greaterThan(0);
+        expect(packageCFilePath.length).to.be.greaterThan(0);
     });
 
     after(async function () {
@@ -60,7 +64,7 @@ describe("Mongo Sink Test", function () {
         await mongoContainer.stop();
     });
 
-    it("Can't connect to unreachable mongo URI", async function () {
+    /* it("Can't connect to unreachable mongo URI", async function () {
         const prompts = getMongoSinkPromptInputs([KEYS.DOWN, "localhost", "333", "", "", ""]);
         const results: TestResults = {
             exitCode: -1,
@@ -80,7 +84,7 @@ describe("Mongo Sink Test", function () {
 
         expect(cmdResult.code, "Exit code").equals(1);
         expect(results.messageFound, "Found error message").equals(true);
-    });
+    }); */
 
     it("Can't connect to mongo URI with wrong credential", async function () {
         const prompts = getMongoSinkPromptInputs([

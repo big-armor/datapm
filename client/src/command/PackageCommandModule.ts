@@ -81,7 +81,7 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
 
             sourceConfiguration = JSON.parse(correctJson);
         } catch (error) {
-            oraRef.fail("Could not parse the sourceConfiguration parameter as JSON");
+            oraRef.fail("Could not parse the configuration parameter as JSON");
             process.exit(1);
         }
     }
@@ -114,7 +114,7 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
             uris = [argv.references];
         }
 
-        sourceConfiguration.uris = uris;
+        connectionConfiguration.uris = uris;
         try {
             maybeRepositoryDescription = (await findRepositoryForSourceUri(uris[0])) || null;
         } catch (error) {
@@ -137,20 +137,31 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
         process.exit(1);
     }
 
-    connectionConfiguration = await obtainConnectionConfiguration(
+    const connectionConfigurationOrCancel = await obtainConnectionConfiguration(
         oraRef,
         repository,
         connectionConfiguration,
         argv.defaults
     );
 
-    credentialsConfiguration = await obtainCredentialsConfiguration(
+    if (connectionConfigurationOrCancel === false) {
+        process.exit(1);
+    }
+    connectionConfiguration = connectionConfigurationOrCancel;
+
+    const credentialsConfigurationOrCancel = await obtainCredentialsConfiguration(
         oraRef,
         repository,
         connectionConfiguration,
         credentialsConfiguration,
         argv.defaults
     );
+
+    if (credentialsConfigurationOrCancel === false) {
+        process.exit(1);
+    }
+
+    credentialsConfiguration = credentialsConfigurationOrCancel;
 
     const source = await sourceDescription.getSource();
 

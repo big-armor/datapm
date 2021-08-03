@@ -2,8 +2,8 @@ import { Repository, RepositoryDescription } from "../../Repository";
 import { SinkDescription } from "../../Sink";
 import { SourceDescription } from "../../Source";
 
-export const DISPLAY_NAME = "PostgreSQL";
-export const TYPE = "postgres";
+export const DISPLAY_NAME = "Redshift";
+export const TYPE = "redshift";
 
 export class RedshiftRepositoryDescription implements RepositoryDescription {
     getDisplayName(): string {

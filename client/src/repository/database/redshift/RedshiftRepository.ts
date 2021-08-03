@@ -1,6 +1,7 @@
+import { Redshift, S3 } from "aws-sdk";
 import { DPMConfiguration } from "datapm-lib";
-import { getAwsAuthenticationParameters } from "../../../util/AwsUtil";
-import { Parameter } from "../../../util/parameters/Parameter";
+import { getAwsAuthenticationParameters, getRedshiftClusters, getS3BucketList } from "../../../util/AwsUtil";
+import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
 import { Repository } from "../../Repository";
 import { TYPE } from "./RedshiftRepositoryDescription";
 
@@ -10,7 +11,11 @@ export class RedshiftRepository implements Repository {
     }
 
     requiresConnectionConfiguration(): boolean {
-        return false;
+        return true;
+    }
+
+    userSelectableConnectionHistory(): boolean {
+        return true;
     }
 
     requiresCredentialsConfiguration(): boolean {
@@ -25,11 +30,73 @@ export class RedshiftRepository implements Repository {
         return "Environment Variables"; // TODO Should probably move these from Source and Sink implementations to here
     }
 
-    getConnectionParameters(_connectionConfiguration: DPMConfiguration): Parameter[] | Promise<Parameter[]> {
+    parseUri(uri: string): Record<string, string> {
+        const parts = uri.replace("redshift://", "").split("/");
+        const cluster = parts[0] || "";
+        return {
+            cluster
+        };
+    }
+
+    async getConnectionParameters(connectionConfiguration: DPMConfiguration): Promise<Parameter[]> {
+        const uris = connectionConfiguration.uris as string[];
+
+        const parsedUri = this.parseUri(uris[0]);
+        if (parsedUri.cluster) {
+            connectionConfiguration.cluster = parsedUri.cluster;
+        }
+
+        const parameters: Parameter[] = [];
+
+        const redshiftClient = new Redshift({ region: connectionConfiguration.region as string });
+        const s3Client = new S3();
+
+        if (connectionConfiguration.bucket == null) {
+            const bucketList = await getS3BucketList(s3Client);
+            if (bucketList.length > 0) {
+                parameters.push({
+                    configuration: connectionConfiguration,
+                    type: ParameterType.AutoComplete,
+                    name: "bucket",
+                    message: "S3 Bucket?",
+                    options: bucketList.map((bucket) => ({
+                        title: bucket,
+                        value: bucket
+                    }))
+                });
+            } else {
+                parameters.push({
+                    configuration: connectionConfiguration,
+                    type: ParameterType.Text,
+                    name: "bucket",
+                    message: "New S3 Bucket Name?"
+                });
+            }
+
+            return parameters;
+        }
+        if (!connectionConfiguration.cluster) {
+            const clusterList = await getRedshiftClusters(redshiftClient);
+            if (clusterList.length === 0) {
+                throw new Error("No Redshift Clusters Existing!");
+            }
+            parameters.push({
+                configuration: connectionConfiguration,
+                type: ParameterType.AutoComplete,
+                name: "cluster",
+                message: "Redshift Cluster?",
+                options: clusterList.map((cluster) => ({
+                    title: cluster.ClusterIdentifier as string,
+                    value: cluster.ClusterIdentifier as string
+                }))
+            });
+
+            return parameters;
+        }
         return [];
     }
 
-    async getAuthenticationParameters(
+    async getCredentialsParameters(
         _connectionConfiguration: DPMConfiguration,
         authenticationConfiguration: DPMConfiguration
     ): Promise<Parameter[]> {

@@ -12,6 +12,12 @@ export class CatalogsCommand implements Command {
 }
 
 export async function viewCatalogs(): Promise<void> {
-    const viewCatalogs = await import("./CatalogsCommandModule");
-    await viewCatalogs.viewCatalogs();
+    try {
+        const viewCatalogs = await import("./CatalogsCommandModule");
+
+        await viewCatalogs.viewCatalogs();
+    } catch (e) {
+        console.error(e);
+        process.exit(1);
+    }
 }

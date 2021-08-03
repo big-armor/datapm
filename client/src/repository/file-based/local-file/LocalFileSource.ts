@@ -22,7 +22,16 @@ export class LocalFileSource extends AbstractFileStreamSource implements Source 
         return path.basename(filePath);
     }
 
-    async getInspectParameters(configuration: DPMConfiguration): Promise<Parameter[]> {
+    async getInspectParameters(
+        connectionConfiguration: DPMConfiguration,
+        _credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<Parameter[]> {
+        if (connectionConfiguration.uris) {
+            configuration.uris = connectionConfiguration.uris;
+            delete connectionConfiguration.uris;
+        }
+
         if (typeof configuration.uri === "string") {
             configuration.uris = [configuration.uri];
             delete configuration.uri;
@@ -37,7 +46,7 @@ export class LocalFileSource extends AbstractFileStreamSource implements Source 
         ) {
             parameters = [
                 {
-                    configuration,
+                    configuration: configuration,
                     type: ParameterType.Text,
                     name: "uri",
                     message: "File path?",
@@ -54,7 +63,7 @@ export class LocalFileSource extends AbstractFileStreamSource implements Source 
                     }
                 },
                 {
-                    configuration,
+                    configuration: configuration,
                     type: ParameterType.Confirm,
                     message: "Add another file?",
                     name: "addAnother",
@@ -77,10 +86,18 @@ export class LocalFileSource extends AbstractFileStreamSource implements Source 
         return parameters;
     }
 
-    async getFileStreams(configuration?: DPMConfiguration): Promise<FileStreamContext[]> {
+    async getFileStreams(
+        _connectionConfiguration: DPMConfiguration,
+        _credentialsConfiguration: DPMConfiguration,
+        configuration?: DPMConfiguration
+    ): Promise<FileStreamContext[]> {
         // Each URI is a file pattern, representing one or more files as a streamSet
 
         const uris = configuration?.uris as string[];
+
+        if (uris == null || uris.length === 0) {
+            throw new Error("No files listed in configuration.uris");
+        }
 
         // Build a list of files
         const inputFilePaths = uris.map((u) => this.getFilePath(u));

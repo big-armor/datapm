@@ -17,9 +17,17 @@ export abstract class AbstractFileStreamSource implements Source {
     abstract sourceType(): string;
 
     /** Given a URL, return a set of ordered readers that will be used to parse records */
-    abstract getFileStreams(configuration?: DPMConfiguration): Promise<FileStreamContext[]>;
+    abstract getFileStreams(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration?: DPMConfiguration
+    ): Promise<FileStreamContext[]>;
 
-    abstract getInspectParameters(configuration: DPMConfiguration): Promise<Parameter[]>;
+    abstract getInspectParameters(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<Parameter[]>;
 
     async inspectURIs(
         connectionConfiguration: DPMConfiguration,
@@ -29,28 +37,52 @@ export abstract class AbstractFileStreamSource implements Source {
     ): Promise<InspectionResults> {
         // Loop over each URI
 
-        let remainingParameter = await this.getInspectParameters(configuration);
+        let remainingParameter = await this.getInspectParameters(
+            connectionConfiguration,
+            credentialsConfiguration,
+            configuration
+        );
 
         while (remainingParameter.length > 0) {
             await context.parameterPrompt(remainingParameter);
-            remainingParameter = await this.getInspectParameters(configuration);
+            remainingParameter = await this.getInspectParameters(
+                connectionConfiguration,
+                credentialsConfiguration,
+                configuration
+            );
         }
 
-        const displayName = nameFromUrls(configuration.uris as string[]);
+        const uris = (connectionConfiguration.uris || configuration.uris) as string[];
+
+        if (uris == null || uris.length === 0) {
+            throw new Error(
+                "Could not find URIs in connectionConfiguration or configuration. This is a problem with the source implementation."
+            );
+        }
+
+        const displayName = nameFromUrls(uris);
 
         return {
             defaultDisplayName: displayName,
             source: this,
             configuration,
-            streamSetPreviews: [await this.getRecordStreams(configuration, context)]
+            streamSetPreviews: [
+                await this.getRecordStreams(connectionConfiguration, credentialsConfiguration, configuration, context)
+            ]
         };
     }
 
     async getRecordStreams(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
         context: SourceInspectionContext
     ): Promise<StreamSetPreview> {
-        const fileStreamSummaries = await this.getFileStreams(configuration);
+        const fileStreamSummaries = await this.getFileStreams(
+            connectionConfiguration,
+            credentialsConfiguration,
+            configuration
+        );
 
         const commonFileName = nameFromUrls(fileStreamSummaries.map((f) => f.uri));
 

@@ -13,6 +13,10 @@ export class S3Repository implements Repository {
         return false;
     }
 
+    userSelectableConnectionHistory(): boolean {
+        return false;
+    }
+
     requiresCredentialsConfiguration(): boolean {
         return true;
     }
@@ -32,7 +36,7 @@ export class S3Repository implements Repository {
         return []; // TODO consider moving bucket info here, and access credentials below
     }
 
-    getAuthenticationParameters(
+    getCredentialsParameters(
         _connectionConfiguration: DPMConfiguration,
         authenticationConfiguration: DPMConfiguration
     ): Parameter[] | Promise<Parameter[]> {

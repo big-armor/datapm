@@ -34,6 +34,11 @@ export interface Repository {
      * will require the host and port. Google Big Query is a PaaS that does not require the user provide connection information */
     requiresConnectionConfiguration(): boolean;
 
+    /** Whether to ever allow the user to select a repository from a history of repositories. For example, it is often
+     * useful to present the user a list of database repositories based on prior use. But it is not useful to present
+     * the user a list of previously used URLs for HTTP sources - as they are never re-used. */
+    userSelectableConnectionHistory(): boolean;
+
     /** Whether this source requires the user provide authentication information. Example: MySql and Postgres will require the
      * user to enter a username and password. A local file system does not. */
     requiresCredentialsConfiguration(): boolean;
@@ -53,7 +58,7 @@ export interface Repository {
     getCredentialsIdentifierFromConfiguration(
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration
-    ): Promise<string>;
+    ): Promise<string | "ANONYMOUS">;
 
     /** Returns the configuration parameters necessary to complete the basic unauthenticated connection. Called
      * repeatedly until no parameters are returned.
@@ -63,7 +68,7 @@ export interface Repository {
     /** Returns the parameters necessary to complete the account configuration. Called repeatedly until no
      * parameters are returned
      */
-    getAuthenticationParameters(
+    getCredentialsParameters(
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration
     ): Promise<Parameter[]> | Parameter[];

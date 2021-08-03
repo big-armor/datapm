@@ -11,7 +11,11 @@ export class HTTPSource extends AbstractFileStreamSource {
         return TYPE;
     }
 
-    async getInspectParameters(_configuration: DPMConfiguration): Promise<Parameter[]> {
+    async getInspectParameters(
+        _connectionConfiguration: DPMConfiguration,
+        _credentialsConfiguration: DPMConfiguration,
+        _configuration: DPMConfiguration
+    ): Promise<Parameter[]> {
         return [];
     }
 
@@ -51,12 +55,17 @@ export class HTTPSource extends AbstractFileStreamSource {
         return fileName;
     }
 
-    async getFileStreams(configuration?: DPMConfiguration, _startHash?: string): Promise<FileStreamContext[]> {
-        if (configuration?.uris == null) {
+    async getFileStreams(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration?: DPMConfiguration,
+        _startHash?: string
+    ): Promise<FileStreamContext[]> {
+        if (connectionConfiguration?.uris == null) {
             throw new Error("HTTPSource requires uris configuration object");
         }
 
-        const uris: string[] = configuration?.uris as string[];
+        const uris: string[] = connectionConfiguration?.uris as string[];
 
         return Promise.all(
             uris.map<Promise<FileStreamContext>>((uri) => {

@@ -12,6 +12,10 @@ export class MongoRepository implements Repository {
         return true;
     }
 
+    userSelectableConnectionHistory(): boolean {
+        return true;
+    }
+
     requiresCredentialsConfiguration(): boolean {
         return true;
     }
@@ -65,7 +69,7 @@ export class MongoRepository implements Repository {
         return parameters;
     }
 
-    getAuthenticationParameters(
+    getCredentialsParameters(
         _connectionConfiguration: DPMConfiguration,
         authenticationConfiguration: DPMConfiguration
     ): Parameter[] | Promise<Parameter[]> {

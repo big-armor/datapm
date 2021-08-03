@@ -4,10 +4,12 @@ import Knex from "knex";
 import { GenericContainer, StartedTestContainer } from "testcontainers";
 import { LogWaitStrategy } from "testcontainers/dist/wait-strategy";
 import { SourceErrors } from "../../src/repository/Source";
+import { resetConfiguration } from "../../src/util/ConfigUtil";
 import {
     createTestPackage,
     getPromptInputs,
     KEYS,
+    PromptInput,
     removePackageFiles,
     testCmd,
     TestResults,
@@ -16,8 +18,8 @@ import {
 
 const postgresSourcePrompts = ["Hostname or IP?", "Port?", "Username?", "Password?", "Database?", "Schema?", "Tables?"];
 
-const getPostgresSourcePromptInputs = (inputs?: Array<string | null>, skip = 0, count = 20) =>
-    getPromptInputs(postgresSourcePrompts, inputs, skip, count);
+const getPostgresSourcePromptInputs = (inputs?: Array<string | null>, skip = 0, lastIndex = 20) =>
+    getPromptInputs(postgresSourcePrompts, inputs, skip, lastIndex);
 
 describe("Postgres Source Test", function () {
     let postgresContainer: StartedTestContainer;
@@ -28,6 +30,7 @@ describe("Postgres Source Test", function () {
     const schemaAName = "undefined_covid-02-01-2020-v1";
 
     before(async function () {
+        resetConfiguration();
         this.timeout(200000);
 
         console.log("Starting postgres source container");
@@ -84,7 +87,7 @@ describe("Postgres Source Test", function () {
     });
 
     it("Can't connect to invalid URI", async function () {
-        const prompts = getPostgresSourcePromptInputs([null, "5432", "", "", null, "schema"]);
+        const prompts = getPostgresSourcePromptInputs(["", "", "", "schema"], 2, 6);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -92,7 +95,7 @@ describe("Postgres Source Test", function () {
 
         const cmdResult = await testCmd(
             "package",
-            [`postgres://invalid hostname/database`],
+            [`postgres://invalid-hostname/database`],
             prompts,
             (line: string, promptIndex: number) => {
                 if (promptIndex === 4 && line.includes(SourceErrors.CONNECTION_FAILED)) {
@@ -106,14 +109,8 @@ describe("Postgres Source Test", function () {
     });
 
     it("Can't connect to database with wrong credential", async function () {
-        const prompts = getPostgresSourcePromptInputs([
-            null,
-            postgresPort.toString(),
-            "username",
-            "password",
-            null,
-            "schema"
-        ]);
+        resetConfiguration();
+        const prompts = getPostgresSourcePromptInputs(["username", "password", "", "schema"], 2, 6);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -121,10 +118,10 @@ describe("Postgres Source Test", function () {
 
         const cmdResult = await testCmd(
             "package",
-            [`postgres://${postgresHost}/database`],
+            [`postgres://${postgresHost}:${postgresPort}/database`],
             prompts,
-            (line: string, promptIndex: number) => {
-                if (promptIndex === 4 && line.includes(SourceErrors.AUTHENTICATION_FAILED)) {
+            (line: string) => {
+                if (line.includes(SourceErrors.AUTHENTICATION_FAILED)) {
                     results.messageFound = true;
                 }
             }
@@ -135,7 +132,7 @@ describe("Postgres Source Test", function () {
     });
 
     it("Should generate package from postgres source without issue", async function () {
-        const prompts = getPostgresSourcePromptInputs([null, null, "postgres", "postgres", null, schemaAName, ""]);
+        const prompts: PromptInput[] = [];
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -146,11 +143,14 @@ describe("Postgres Source Test", function () {
             [
                 `postgres://${postgresHost}:${postgresPort}/postgres`,
                 "--defaults",
-                "--sourceConfiguration",
-                JSON.stringify({ username: "postgres", password: "postgres", schema: schemaAName })
+                "--credentials",
+                JSON.stringify({ username: "postgres", password: "postgres" }),
+                "--configuration",
+                JSON.stringify({ schema: schemaAName })
             ],
             prompts,
             (line: string) => {
+                console.log(line);
                 if (line.includes("datapm publish ")) {
                     results.messageFound = true;
                 }
@@ -199,5 +199,37 @@ describe("Postgres Source Test", function () {
             expect(property.format?.split(",")).include.members(typeMatch[column.data_type].format);
             expect(property.type).include.members(typeMatch[column.data_type].type);
         });
+    });
+
+    it("Should allow the user to select from a previously known repository", async function () {
+        const prompts: PromptInput[] = [
+            {
+                message: "Repository?",
+                input: "localhost" + KEYS.ENTER
+            },
+            {
+                message: "Credentials?",
+                input: "postgres" + KEYS.ENTER
+            }
+        ];
+        const results: TestResults = {
+            exitCode: -1,
+            messageFound: false
+        };
+
+        const cmdResult = await testCmd(
+            "package",
+            [`postgres://`, "--defaults", "--configuration", JSON.stringify({ schema: schemaAName })],
+            prompts,
+            (line: string) => {
+                console.log(line);
+                if (line.includes("datapm publish ")) {
+                    results.messageFound = true;
+                }
+            }
+        );
+
+        expect(cmdResult.code, "Exit code").equals(0);
+        expect(results.messageFound, "Found success message").equals(true);
     });
 });

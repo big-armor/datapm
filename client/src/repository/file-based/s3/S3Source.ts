@@ -50,7 +50,16 @@ export class S3Source extends AbstractFileStreamSource implements Source {
         }
     }
 
-    async getInspectParameters(configuration: DPMConfiguration): Promise<Parameter[]> {
+    async getInspectParameters(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<Parameter[]> {
+        if (connectionConfiguration.uris) {
+            configuration.uris = connectionConfiguration.uris;
+            delete connectionConfiguration.uris;
+        }
+
         if (typeof configuration.uri === "string") {
             configuration.uris = [configuration.uri];
             delete configuration.uri;
@@ -104,7 +113,11 @@ export class S3Source extends AbstractFileStreamSource implements Source {
         return [];
     }
 
-    async getFileStreams(configuration?: DPMConfiguration): Promise<FileStreamContext[]> {
+    async getFileStreams(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration?: DPMConfiguration
+    ): Promise<FileStreamContext[]> {
         const uris = configuration?.uris as string[];
 
         // TODO - Support wildcard in paths, to read many files in single batch set
@@ -151,7 +164,11 @@ export class S3Source extends AbstractFileStreamSource implements Source {
             }
         }
         if (httpUris.length) {
-            const httpSourceResponses: FileStreamContext[] = await httpSource.getFileStreams({ uris: httpUris });
+            const httpSourceResponses: FileStreamContext[] = await httpSource.getFileStreams(
+                connectionConfiguration,
+                credentialsConfiguration,
+                { uris: httpUris }
+            );
             sourceResponses = [...sourceResponses, ...httpSourceResponses];
         }
 

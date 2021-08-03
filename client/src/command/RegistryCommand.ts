@@ -107,16 +107,31 @@ export class RegistryCommand implements Command {
 }
 
 export async function logoutFromRegistry(args: RegistryLogoutArguments): Promise<void> {
-    const module = await import("./RegistryCommandModule");
-    await module.logoutFromRegistry(args);
+    try {
+        const module = await import("./RegistryCommandModule");
+        await module.logoutFromRegistry(args);
+    } catch (e) {
+        console.error(e);
+        process.exit(1);
+    }
 }
 
 export async function authenticateToRegistry(args: RegistryAuthenticateArguments): Promise<void> {
-    const module = await import("./RegistryCommandModule");
-    await module.authenticateToRegistry(args);
+    try {
+        const module = await import("./RegistryCommandModule");
+        await module.authenticateToRegistry(args);
+    } catch (e) {
+        console.error(e);
+        process.exit(1);
+    }
 }
 
 export async function defaultRegistryCommand(args: unknown): Promise<void> {
-    const module = await import("./RegistryCommandModule");
-    await module.defaultRegistryCommandHandler(args);
+    try {
+        const module = await import("./RegistryCommandModule");
+        await module.defaultRegistryCommandHandler(args);
+    } catch (e) {
+        console.error(e);
+        process.exit(1);
+    }
 }

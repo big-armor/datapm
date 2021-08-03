@@ -14,6 +14,10 @@ export class GoogleSheetRepository implements Repository {
         return true;
     }
 
+    userSelectableConnectionHistory(): boolean {
+        return false;
+    }
+
     requiresCredentialsConfiguration(): boolean {
         return true;
     }
@@ -61,7 +65,7 @@ export class GoogleSheetRepository implements Repository {
         return parameters;
     }
 
-    async getAuthenticationParameters(
+    async getCredentialsParameters(
         connectionConfiguration: DPMConfiguration,
         authenticationConfiguration: DPMConfiguration
     ): Promise<Parameter[]> {

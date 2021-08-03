@@ -18,8 +18,14 @@ export class InfoCommand implements Command {
                 });
             },
             handler: async (args: InfoArguments) => {
-                const infoCommandInternal = await import("./InfoCommandModule");
-                await infoCommandInternal.getInfo(args);
+                try {
+                    const infoCommandInternal = await import("./InfoCommandModule");
+
+                    await infoCommandInternal.getInfo(args);
+                } catch (e) {
+                    console.error(e);
+                    process.exit(1);
+                }
             }
         });
     }

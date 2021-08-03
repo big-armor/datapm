@@ -4,13 +4,7 @@ import { DPMConfiguration } from "datapm-lib";
 import Knex from "knex";
 import mime from "mime-types";
 import { FileOpenStreamContext, FileStreamContext } from "../../file-based/parser/Parser";
-import {
-    createS3Bucket,
-    getRedshiftClusters,
-    getRedshiftClusterConfiguration,
-    getS3BucketList,
-    getStreamFromS3
-} from "../../../util/AwsUtil";
+import { createS3Bucket, getRedshiftClusterConfiguration, getStreamFromS3 } from "../../../util/AwsUtil";
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
 import { AbstractFileStreamSource } from "../../file-based/AbstractFileStreamSource";
 import { S3Source } from "../../file-based/s3/S3Source";
@@ -31,74 +25,20 @@ export class RedshiftSource extends AbstractFileStreamSource implements Source {
         return uri.startsWith("redshift://");
     }
 
-    parseUri(uri: string): Record<string, string> {
-        const parts = uri.replace("redshift://", "").split("/");
-        const cluster = parts[0] || "";
-        return {
-            cluster
-        };
-    }
-
-    async getInspectParameters(configuration: DPMConfiguration): Promise<Parameter[]> {
-        const uris = configuration.uris as string[];
-
-        const parsedUri = this.parseUri(uris[0]);
-        if (parsedUri.cluster) {
-            configuration.cluster = parsedUri.cluster;
-        }
-
+    async getInspectParameters(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<Parameter[]> {
         const parameters: Parameter[] = [];
-
-        this.redshiftClient = new Redshift({ region: configuration.region as string });
-        this.s3Client = new S3();
-
-        if (configuration.bucket == null) {
-            const bucketList = await getS3BucketList(this.s3Client);
-            if (bucketList.length > 0) {
-                parameters.push({
-                    configuration,
-                    type: ParameterType.AutoComplete,
-                    name: "bucket",
-                    message: "S3 Bucket?",
-                    options: bucketList.map((bucket) => ({
-                        title: bucket,
-                        value: bucket
-                    }))
-                });
-            } else {
-                parameters.push({
-                    configuration,
-                    type: ParameterType.Text,
-                    name: "bucket",
-                    message: "New S3 Bucket Name?"
-                });
-            }
-
-            return parameters;
-        }
-        if (!configuration.cluster) {
-            this.clusterList = await getRedshiftClusters(this.redshiftClient);
-            if (this.clusterList.length === 0) {
-                console.error(chalk.red("No Redshift Clusters Existing!"));
-                process.exit(1);
-            }
-            parameters.push({
-                configuration,
-                type: ParameterType.AutoComplete,
-                name: "cluster",
-                message: "Redshift Cluster?",
-                options: this.clusterList.map((cluster) => ({
-                    title: cluster.ClusterIdentifier as string,
-                    value: cluster.ClusterIdentifier as string
-                }))
-            });
-
-            return parameters;
-        }
-        this.client = await this.createClient(configuration);
+        this.client = await this.createClient(connectionConfiguration);
 
         if (configuration.schema == null) {
-            await createS3Bucket(this.s3Client, configuration.region as string, configuration.bucket as string);
+            await createS3Bucket(
+                this.s3Client,
+                connectionConfiguration.region as string,
+                connectionConfiguration.bucket as string
+            );
 
             parameters.push({
                 configuration,
@@ -200,8 +140,12 @@ export class RedshiftSource extends AbstractFileStreamSource implements Source {
         return s3PathList;
     }
 
-    async getFileStreams(configuration: DPMConfiguration): Promise<FileStreamContext[]> {
-        const uris = configuration.uris as string[];
+    async getFileStreams(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<FileStreamContext[]> {
+        const uris = connectionConfiguration.uris as string[];
 
         // TODO - Support wildcard in paths, to read many files in single batch set
         // A wild card would indicate one set of files for a single stream
@@ -212,7 +156,11 @@ export class RedshiftSource extends AbstractFileStreamSource implements Source {
         const s3PathList: string[] = await this.copyToS3(configuration);
         const s3Source = new S3Source();
 
-        const fileStreamContexts: FileStreamContext[] = await s3Source.getFileStreams({ uris: s3PathList });
+        const fileStreamContexts: FileStreamContext[] = await s3Source.getFileStreams(
+            connectionConfiguration,
+            credentialsConfiguration,
+            { uris: s3PathList }
+        );
 
         // This is just a temporary solution
         let readyToDeleteFromS3 = false;

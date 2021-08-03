@@ -5,7 +5,7 @@ import { DPMConfiguration, DPMRecord } from "datapm-lib";
 import { https } from "follow-redirects";
 import { Readable, Transform } from "stream";
 import { getOAuth2Client, getSpreadsheetMetadata } from "../../../util/GoogleUtil";
-import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
+import { ParameterType } from "../../../util/parameters/Parameter";
 import { QuoteTransform } from "../../../transforms/QuoteTransform";
 import { RecordCountOffsetTransform } from "../../../transforms/RecordCountOffsetTransform";
 import { ByteBatchingTransform } from "../../../transforms/ByteBatchingTransform";
@@ -28,33 +28,22 @@ export class GoogleSheetSource implements Source {
         return TYPE;
     }
 
-    async getInspectParameters(_configuration: DPMConfiguration): Promise<Parameter[]> {
-        return [];
-    }
-
     async inspectURIs(
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
         context: URIInspectionContext
     ): Promise<InspectionResults> {
-        const uris = configuration.uris as string[];
+        const uris = connectionConfiguration.uris as string[];
         if (uris != null && uris.length > 1) {
             throw new Error("GOOGLE_SHEET_SOURCE_DOES_NOT_SUPPORT_MULTIPLE_URIS");
-        }
-
-        let remainingParameter = await this.getInspectParameters(configuration);
-
-        while (remainingParameter.length > 0) {
-            await context.parameterPrompt(remainingParameter);
-            remainingParameter = await this.getInspectParameters(configuration);
         }
 
         let spreedsheetStreams: StreamSetPreview[] = [];
 
         const titles: string[] = [];
 
-        for (const uri of configuration.uris as string[]) {
+        for (const uri of connectionConfiguration.uris as string[]) {
             const sheetMetadata = await this.getSheetStreams(uri, configuration, context);
             titles.push(sheetMetadata.fileName);
 

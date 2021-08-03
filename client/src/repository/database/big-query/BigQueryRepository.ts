@@ -12,6 +12,10 @@ export class BigQueryRepository implements Repository {
         return false;
     }
 
+    userSelectableConnectionHistory(): boolean {
+        return false;
+    }
+
     requiresCredentialsConfiguration(): boolean {
         return true;
     }
@@ -31,7 +35,7 @@ export class BigQueryRepository implements Repository {
         return [];
     }
 
-    getAuthenticationParameters(
+    getCredentialsParameters(
         _connectionConfiguration: DPMConfiguration,
         _authenticationConfiguration: DPMConfiguration
     ): Parameter[] | Promise<Parameter[]> {

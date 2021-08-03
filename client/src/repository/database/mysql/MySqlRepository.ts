@@ -12,6 +12,10 @@ export class MySqlRepository implements Repository {
         return true;
     }
 
+    userSelectableConnectionHistory(): boolean {
+        return true;
+    }
+
     requiresCredentialsConfiguration(): boolean {
         return true;
     }
@@ -63,7 +67,7 @@ export class MySqlRepository implements Repository {
         return parameters;
     }
 
-    getAuthenticationParameters(
+    getCredentialsParameters(
         connectionConfiguration: DPMConfiguration,
         authenticationConfiguration: DPMConfiguration
     ): Parameter[] | Promise<Parameter[]> {

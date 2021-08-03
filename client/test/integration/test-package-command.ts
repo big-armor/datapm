@@ -118,10 +118,10 @@ describe("Package Command Tests", async () => {
 
         const cmdResult = await testCmd(
             "package",
-            [TEST_SOURCE_FILES.HTTP1, "--sourceConfiguration", "invalid"],
+            [TEST_SOURCE_FILES.HTTP1, "--configuration", "invalid"],
             [],
             (line: string) => {
-                if (line.includes("Could not parse the sourceConfiguration parameter as JSON")) {
+                if (line.includes("Could not parse the configuration parameter as JSON")) {
                     results.messageFound = true;
                 }
             }

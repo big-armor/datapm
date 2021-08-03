@@ -31,6 +31,12 @@ export class CompareCommand implements Command {
 }
 
 export async function comparePackages(args: CompareArguments): Promise<void> {
-    const fetchCommand = await import("./CompareCommandModule");
-    await fetchCommand.comparePackagesCommand(args);
+    try {
+        const fetchCommand = await import("./CompareCommandModule");
+
+        await fetchCommand.comparePackagesCommand(args);
+    } catch (e) {
+        console.error(e);
+        process.exit(1);
+    }
 }

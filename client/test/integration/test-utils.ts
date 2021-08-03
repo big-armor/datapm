@@ -286,6 +286,8 @@ export function testCmd(
             conditionedArgs = ["dist/src/main.js", cmd, ...args];
         }
 
+        console.log("Running: node " + conditionedArgs.join(" "));
+
         cmdProcess = execa("node", conditionedArgs);
 
         // if (cmdProcess.stdout) cmdProcess.stdout.pipe(process.stdout, { end: false });
@@ -362,13 +364,13 @@ export function getPromptInputs(
     defaultPrompts: string[],
     inputs?: Array<string | null>,
     skip = 0,
-    count = 20
+    lastIndex = 20
 ): PromptInput[] {
     const defaultPromptInputs: PromptInput[] = defaultPrompts.map((message) => ({
         message,
         input: KEYS.ENTER
     }));
-    const promptInputs = defaultPromptInputs.slice(skip, count);
+    const promptInputs = defaultPromptInputs.slice(skip, lastIndex);
 
     if (inputs === undefined) return promptInputs;
 
@@ -402,7 +404,7 @@ export async function createTestPackage(
         options.push("--defaults");
     }
     if (configuration) {
-        options.push("--sourceConfiguration", configuration);
+        options.push("--configuration", configuration);
     }
     let packageFilePath = "";
 

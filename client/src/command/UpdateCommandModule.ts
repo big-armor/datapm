@@ -368,6 +368,11 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
             argv.defaults
         );
 
+        if (connectionConfiguration === false) {
+            oraRef.fail("User canceled");
+            process.exit(1);
+        }
+
         const repositoryIdentifier = await repository.getConnectionIdentifierFromConfiguration(connectionConfiguration);
 
         let credentialsConfiguration = {};

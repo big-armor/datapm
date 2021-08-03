@@ -83,26 +83,55 @@ export class FallbackCommand implements Command {
     }
 
     async runFetchCommand(): Promise<void> {
-        await fetchPackage({});
+        try {
+            await fetchPackage({});
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     async runSearchCommand(): Promise<void> {
-        await handleSearch({});
+        try {
+            await handleSearch({});
+        } catch (e) {
+            console.error(e);
+            process.exit(1);
+        }
     }
 
     async runPackageCommand(): Promise<void> {
-        await packageCommand({});
+        try {
+            await packageCommand({});
+        } catch (e) {
+            console.error(e);
+            process.exit(1);
+        }
     }
 
     async runUpdateCommand(): Promise<void> {
-        await updateCommandHandler({});
+        try {
+            await updateCommandHandler({});
+        } catch (e) {
+            console.error(e);
+            process.exit(1);
+        }
     }
 
     async runLoginCommand(): Promise<void> {
-        await authenticateToRegistry({});
+        try {
+            await authenticateToRegistry({});
+        } catch (e) {
+            console.error(e);
+            process.exit(1);
+        }
     }
 
     async runLogoutCommand(): Promise<void> {
-        await logoutFromRegistry({});
+        try {
+            await logoutFromRegistry({});
+        } catch (e) {
+            console.error(e);
+            process.exit(1);
+        }
     }
 }

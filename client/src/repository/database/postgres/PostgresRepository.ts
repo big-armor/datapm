@@ -13,6 +13,10 @@ export class PostgresRepository implements Repository {
         return true;
     }
 
+    userSelectableConnectionHistory(): boolean {
+        return true;
+    }
+
     requiresCredentialsConfiguration(): boolean {
         return true;
     }
@@ -42,24 +46,26 @@ export class PostgresRepository implements Repository {
         };
     }
 
-    async getConnectionParameters(configuration: DPMConfiguration): Promise<Parameter[]> {
-        if (configuration.uris != null && (configuration.uris as string[]).length > 0) {
-            const urlConfiguration = this.parseUri((configuration.uris as string[])[0]);
+    async getConnectionParameters(connectionConfiguration: DPMConfiguration): Promise<Parameter[]> {
+        if (connectionConfiguration.uris != null && (connectionConfiguration.uris as string[]).length > 0) {
+            const urlConfiguration = this.parseUri((connectionConfiguration.uris as string[])[0]);
 
             for (const key of Object.keys(urlConfiguration)) {
-                configuration[key] = urlConfiguration[key];
+                connectionConfiguration[key] = urlConfiguration[key];
             }
 
-            delete configuration.uris;
+            delete connectionConfiguration.uris;
         }
 
         const parameters: Parameter[] = [];
 
-        const defaultParameterValues: DPMConfiguration = this.getDefaultConnectionParameterValues(configuration);
+        const defaultParameterValues: DPMConfiguration = this.getDefaultConnectionParameterValues(
+            connectionConfiguration
+        );
 
-        if (configuration.host == null) {
+        if (connectionConfiguration.host == null) {
             parameters.push({
-                configuration,
+                configuration: connectionConfiguration,
                 type: ParameterType.Text,
                 name: "host",
                 message: "Hostname or IP?",
@@ -68,9 +74,9 @@ export class PostgresRepository implements Repository {
             });
         }
 
-        if (configuration.port == null) {
+        if (connectionConfiguration.port == null) {
             parameters.push({
-                configuration,
+                configuration: connectionConfiguration,
                 type: ParameterType.Number,
                 name: "port",
                 message: "Port?",
@@ -82,7 +88,7 @@ export class PostgresRepository implements Repository {
         return parameters;
     }
 
-    async getAuthenticationParameters(
+    async getCredentialsParameters(
         connectionConfiguration: DPMConfiguration,
         authenticationConfiguration: DPMConfiguration
     ): Promise<Parameter[]> {
@@ -130,7 +136,7 @@ export class PostgresRepository implements Repository {
         const parsedUri = parse(uri);
         const connectionOptions: DPMConfiguration = {
             host: parsedUri.host,
-            port: parsedUri.port || null,
+            port: parsedUri.port || (parsedUri.database !== null ? 5432 : null),
             username: parsedUri.user || null,
             password: parsedUri.password || null,
             database: parsedUri.database || null

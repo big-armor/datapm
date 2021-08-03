@@ -12,6 +12,10 @@ export class StandardOutRepository implements Repository {
         return false;
     }
 
+    userSelectableConnectionHistory(): boolean {
+        return false;
+    }
+
     requiresCredentialsConfiguration(): boolean {
         return false;
     }
@@ -31,7 +35,7 @@ export class StandardOutRepository implements Repository {
         return [];
     }
 
-    getAuthenticationParameters(
+    getCredentialsParameters(
         _connectionConfiguration: DPMConfiguration,
         _authenticationConfiguration: DPMConfiguration
     ): Parameter[] | Promise<Parameter[]> {

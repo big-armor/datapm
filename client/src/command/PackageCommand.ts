@@ -46,6 +46,12 @@ export class PackageCommand implements Command {
 }
 
 export async function packageCommand(args: PackageArguments): Promise<void> {
-    const fetchCommand = await import("./PackageCommandModule");
-    await fetchCommand.generatePackage(args);
+    try {
+        const command = await import("./PackageCommandModule");
+
+        await command.generatePackage(args);
+    } catch (e) {
+        console.error(e);
+        process.exit(1);
+    }
 }

@@ -162,7 +162,7 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
 
     parameterCount += await repeatedlyPromptParameters(
         async () => {
-            return sinkRepository.getAuthenticationParameters(sinkConfiguration, sinkConfiguration);
+            return sinkRepository.getCredentialsParameters(sinkConfiguration, sinkConfiguration);
         },
         sinkConfiguration,
         argv.defaults || false

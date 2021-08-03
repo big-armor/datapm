@@ -13,12 +13,16 @@ export class HTTPRepository implements Repository {
         return true;
     }
 
+    userSelectableConnectionHistory(): boolean {
+        return false;
+    }
+
     requiresCredentialsConfiguration(): boolean {
         return true;
     }
 
-    async getConnectionIdentifierFromConfiguration(configuration: DPMConfiguration): Promise<string> {
-        const myUrl = new url.URL((configuration.uris as string[])[0] as string);
+    async getConnectionIdentifierFromConfiguration(connectionConfiguration: DPMConfiguration): Promise<string> {
+        const myUrl = new url.URL((connectionConfiguration.uris as string[])[0] as string);
 
         let key = myUrl.protocol + "://" + myUrl.hostname + (myUrl.port !== "" ? ":" + myUrl.port : "");
 
@@ -29,11 +33,11 @@ export class HTTPRepository implements Repository {
         return key;
     }
 
-    getCredentialsIdentifierFromConfiguration(
+    async getCredentialsIdentifierFromConfiguration(
         _connectionConfiguration: DPMConfiguration,
         _credentialsConfiguration: DPMConfiguration
     ): Promise<string> {
-        throw new Error("Method not implemented.");
+        return "anonymous"; // TODO implement HTTP auth detection and return parameters;
     }
 
     getConnectionParameters(connectionConfiguration: DPMConfiguration): Parameter[] | Promise<Parameter[]> {
@@ -84,7 +88,7 @@ export class HTTPRepository implements Repository {
         return parameters;
     }
 
-    getAuthenticationParameters(
+    getCredentialsParameters(
         _connectionConfiguration: DPMConfiguration,
         _authenticationConfiguration: DPMConfiguration
     ): Parameter[] | Promise<Parameter[]> {
