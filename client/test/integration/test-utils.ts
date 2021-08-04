@@ -286,7 +286,7 @@ export function testCmd(
             conditionedArgs = ["dist/src/main.js", cmd, ...args];
         }
 
-        console.log("Running: node " + conditionedArgs.join(" "));
+        // console.log("Running: node " + conditionedArgs.join(" "));
 
         cmdProcess = execa("node", conditionedArgs);
 
