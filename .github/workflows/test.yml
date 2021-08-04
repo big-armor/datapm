@@ -201,6 +201,9 @@ jobs:
               with:
                   node-version: "12"
 
+            - name: Install libsecret
+              run: sudo apt-get install libsecret-1-dev
+
             - name: Print npm verion
               run: npm --version
 
