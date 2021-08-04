@@ -205,7 +205,7 @@ jobs:
               run: sudo apt-get install libsecret-1-dev pass gnupg2
 
             - name: Setup GPG Key
-              run: gpg2 --gen-key
+              run: gpg2 --gen-key --no-tty
 
             - name: Setup pass
               run: pass init $gpg_id
