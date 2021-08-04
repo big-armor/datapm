@@ -98,6 +98,7 @@ describe("Postgres Source Test", function () {
             [`postgres://invalid-hostname/database`],
             prompts,
             (line: string) => {
+                console.log(line);
                 if (line.includes(SourceErrors.CONNECTION_FAILED)) {
                     results.messageFound = true;
                 }
@@ -121,6 +122,8 @@ describe("Postgres Source Test", function () {
             [`postgres://${postgresHost}:${postgresPort}/database`],
             prompts,
             (line: string) => {
+                console.log(line);
+
                 if (line.includes(SourceErrors.AUTHENTICATION_FAILED)) {
                     results.messageFound = true;
                 }
@@ -150,6 +153,8 @@ describe("Postgres Source Test", function () {
             ],
             prompts,
             (line: string) => {
+                console.log(line);
+
                 if (line.includes("datapm publish ")) {
                     results.messageFound = true;
                 }
