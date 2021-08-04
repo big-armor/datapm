@@ -204,11 +204,14 @@ jobs:
             - name: Install libsecret
               run: sudo apt-get install libsecret-1-dev pass gnupg2
 
+            # https://www.gnupg.org/documentation/manuals/gnupg/Unattended-GPG-key-generation.html
             - name: Setup GPG Key
-              run: gpg2 --gen-key --no-tty
+              run: gpg2 --batch --gen-key assets/gpg-test-key
+              working-directory: client
 
             - name: Setup pass
-              run: pass init $gpg_id
+              run: pass init "test@tester.com"
+              working-directory: client
 
             - name: Print npm verion
               run: npm --version
