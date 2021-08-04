@@ -99,7 +99,7 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
                 choices: (await getSourcesDescriptions())
                     .sort((a, b) => a.sourceType().localeCompare(b.sourceType()))
                     .map((s) => {
-                        return { value: s.sourceType(), title: s.sourceType() };
+                        return { value: s.sourceType(), title: s.getDisplayName() };
                     })
                     .sort((a, b) => a.title.localeCompare(b.title))
             },

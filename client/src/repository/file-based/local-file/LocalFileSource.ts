@@ -7,7 +7,7 @@ import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
 import { AbstractFileStreamSource } from "../AbstractFileStreamSource";
 import { Source } from "../../Source";
 import glob from "glob";
-import { TYPE } from "./LocalFileSourceDescription";
+import { TYPE } from "./LocalFileRepositoryDescription";
 
 export class LocalFileSource extends AbstractFileStreamSource implements Source {
     sourceType(): string {

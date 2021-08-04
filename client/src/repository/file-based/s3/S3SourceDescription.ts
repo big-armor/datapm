@@ -1,9 +1,13 @@
 import { SourceDescription, Source } from "../../../repository/Source";
-export const TYPE = "s3";
-
+import { TYPE, DISPLAY_NAME } from "./S3RepositoryDescription";
 export class S3SourceDescription implements SourceDescription {
     sourceType(): string {
         return TYPE;
+    }
+
+    /** The user friendly name of the source implementation */
+    getDisplayName(): string {
+        return DISPLAY_NAME;
     }
 
     supportsURI(uri: string): boolean {

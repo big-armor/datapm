@@ -97,8 +97,9 @@ describe("Postgres Source Test", function () {
             "package",
             [`postgres://invalid-hostname/database`],
             prompts,
-            (line: string, promptIndex: number) => {
-                if (promptIndex === 4 && line.includes(SourceErrors.CONNECTION_FAILED)) {
+            (line: string) => {
+                console.log(line);
+                if (line.includes(SourceErrors.CONNECTION_FAILED)) {
                     results.messageFound = true;
                 }
             }

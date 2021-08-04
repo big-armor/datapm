@@ -2,11 +2,16 @@ import globParent from "glob-parent";
 import isGlob from "is-glob";
 import { SourceDescription, Source } from "../../../repository/Source";
 import fs from "fs";
-export const TYPE = "file";
+import { TYPE, DISPLAY_NAME } from "./LocalFileRepositoryDescription";
 
 export class LocalFileSourceDescription implements SourceDescription {
     sourceType(): string {
         return TYPE;
+    }
+
+    /** The user friendly name of the source implementation */
+    getDisplayName(): string {
+        return DISPLAY_NAME;
     }
 
     supportsURI(uri: string): boolean {

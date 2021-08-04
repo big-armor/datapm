@@ -123,6 +123,9 @@ export interface SourceDescription {
     /** A universally unique identifier for the source implementation. */
     sourceType(): string;
 
+    /** The user friendly name of the source implementation */
+    getDisplayName(): string;
+
     /** Given a full or partial URI, return a boolean as to whether it could be supported. Example, a MySQL implementation
      * would return true for the string 'mysql://` or even just `mysql.
      */

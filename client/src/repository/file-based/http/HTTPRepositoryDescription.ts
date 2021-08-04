@@ -2,7 +2,7 @@ import { Repository, RepositoryDescription } from "../../Repository";
 import { SinkDescription } from "../../Sink";
 import { SourceDescription } from "../../Source";
 
-export const DISPLAY_NAME = "Big Query";
+export const DISPLAY_NAME = "HTTP";
 export const TYPE = "http";
 
 export class HTTPRepositoryDescription implements RepositoryDescription {

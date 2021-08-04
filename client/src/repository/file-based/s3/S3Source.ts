@@ -8,7 +8,7 @@ import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
 import { AbstractFileStreamSource } from "../AbstractFileStreamSource";
 import { HTTPSource } from "../http/HTTPSource";
 import { Source } from "../../Source";
-import { TYPE } from "./S3SourceDescription";
+import { TYPE } from "./S3RepositoryDescription";
 
 export class S3Source extends AbstractFileStreamSource implements Source {
     sourceType(): string {

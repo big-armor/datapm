@@ -1,9 +1,14 @@
 import { SourceDescription, Source } from "../../../repository/Source";
-import { TYPE } from "./GoogleSheetRepositoryDescription";
+import { TYPE, DISPLAY_NAME } from "./GoogleSheetRepositoryDescription";
 
 export class GoogleSheetSourceDescription implements SourceDescription {
     sourceType(): string {
         return TYPE;
+    }
+
+    /** The user friendly name of the source implementation */
+    getDisplayName(): string {
+        return DISPLAY_NAME;
     }
 
     supportsURI(uri: string): boolean {

@@ -4,11 +4,16 @@ import https from "https";
 import { FileOpenStreamContext, FileStreamContext } from "../parser/Parser";
 import { Parameter } from "../../../util/parameters/Parameter";
 import { AbstractFileStreamSource } from "../AbstractFileStreamSource";
-import { TYPE } from "./HTTPSourceDescription";
+import { TYPE, DISPLAY_NAME } from "./HTTPRepositoryDescription";
 
 export class HTTPSource extends AbstractFileStreamSource {
     sourceType(): string {
         return TYPE;
+    }
+
+    /** The user friendly name of the source implementation */
+    getDisplayName(): string {
+        return DISPLAY_NAME;
     }
 
     async getInspectParameters(

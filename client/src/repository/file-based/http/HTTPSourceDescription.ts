@@ -1,10 +1,12 @@
 import { SourceDescription, Source } from "../../../repository/Source";
-
-export const TYPE = "http";
-
+import { TYPE, DISPLAY_NAME } from "./HTTPRepositoryDescription";
 export class HTTPSourceDescription implements SourceDescription {
     sourceType(): string {
         return TYPE;
+    }
+
+    getDisplayName(): string {
+        return DISPLAY_NAME;
     }
 
     supportsURI(uri: string): boolean {
