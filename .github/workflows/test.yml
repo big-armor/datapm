@@ -201,18 +201,6 @@ jobs:
               with:
                   node-version: "12"
 
-            - name: Install libsecret
-              run: sudo apt-get install libsecret-1-dev pass gnupg2
-
-            # https://www.gnupg.org/documentation/manuals/gnupg/Unattended-GPG-key-generation.html
-            - name: Setup GPG Key
-              run: gpg2 --batch --gen-key assets/gpg-test-key
-              working-directory: client
-
-            - name: Setup pass
-              run: pass init "test@tester.com"
-              working-directory: client
-
             - name: Print npm verion
               run: npm --version
 
@@ -267,3 +255,5 @@ jobs:
               id: test-client-Dependencies
               run: npm run test
               working-directory: client
+              env:
+                  CREDENTIALS_SECRET_KEY: test-key-not-for-production

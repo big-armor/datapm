@@ -236,6 +236,10 @@ function decrypt(iv: string, content: string, secretKey: string) {
 }
 
 async function getCredentialSecretKey(): Promise<string | null> {
+    if (process.env.CREDENTIALS_SECRET_KEY != null) {
+        return process.env.CREDENTIALS_SECRET_KEY;
+    }
+
     let secret = await getPassword("datapm", "default");
 
     if (secret === null) {
