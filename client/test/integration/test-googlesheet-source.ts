@@ -22,7 +22,7 @@ describe("Googlesheet Source Test", function () {
             [
                 {
                     message: "Source?",
-                    input: "googlesheet" + KEYS.ENTER
+                    input: "Google Sheets" + KEYS.ENTER
                 },
                 {
                     message: "URL of Google Sheet?",
