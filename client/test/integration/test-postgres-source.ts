@@ -150,7 +150,6 @@ describe("Postgres Source Test", function () {
             ],
             prompts,
             (line: string) => {
-                console.log(line);
                 if (line.includes("datapm publish ")) {
                     results.messageFound = true;
                 }
@@ -222,7 +221,6 @@ describe("Postgres Source Test", function () {
             [`postgres://`, "--defaults", "--configuration", JSON.stringify({ schema: schemaAName })],
             prompts,
             (line: string) => {
-                console.log(line);
                 if (line.includes("datapm publish ")) {
                     results.messageFound = true;
                 }
