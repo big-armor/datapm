@@ -202,7 +202,7 @@ jobs:
                   node-version: "12"
 
             - name: Install libsecret
-              run: sudo apt-get install libsecret-1-dev install pass gnupg2
+              run: sudo apt-get install libsecret-1-dev pass gnupg2
 
             - name: Setup GPG Key
               run: gpg2 --gen-key
