@@ -156,7 +156,7 @@ export async function fetch(
     let returnPromiseReject: (error: Error) => void;
     let returnPromiseResolve: (value: FetchResult | PromiseLike<FetchResult>) => void;
 
-    if (sink.isStronglyTyped(sinkConfiguration)) {
+    if (await sink.isStronglyTyped(sinkConfiguration)) {
         for (const schema of schemas) {
             const conflictedPropertyTypes = await checkSchemaDataTypeConflicts(schema);
             const conflictedTitles = Object.keys(conflictedPropertyTypes);

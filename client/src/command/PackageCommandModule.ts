@@ -137,19 +137,19 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
         process.exit(1);
     }
 
-    const connectionConfigurationOrCancel = await obtainConnectionConfiguration(
+    const connectionConfigurationResults = await obtainConnectionConfiguration(
         oraRef,
         repository,
         connectionConfiguration,
         argv.defaults
     );
 
-    if (connectionConfigurationOrCancel === false) {
+    if (connectionConfigurationResults === false) {
         process.exit(1);
     }
-    connectionConfiguration = connectionConfigurationOrCancel;
+    connectionConfiguration = connectionConfigurationResults.connectionConfiguration;
 
-    const credentialsConfigurationOrCancel = await obtainCredentialsConfiguration(
+    const credentialsConfigurationResults = await obtainCredentialsConfiguration(
         oraRef,
         repository,
         connectionConfiguration,
@@ -157,11 +157,11 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
         argv.defaults
     );
 
-    if (credentialsConfigurationOrCancel === false) {
+    if (credentialsConfigurationResults === false) {
         process.exit(1);
     }
 
-    credentialsConfiguration = credentialsConfigurationOrCancel;
+    credentialsConfiguration = credentialsConfigurationResults.credentialsConfiguration;
 
     const source = await sourceDescription.getSource();
 

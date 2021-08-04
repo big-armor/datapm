@@ -19,9 +19,9 @@ export async function obtainCredentialsConfiguration(
     connectionConfiguration: DPMConfiguration,
     credentialsConfiguration: DPMConfiguration,
     defaults: boolean | undefined
-): Promise<DPMConfiguration | false> {
+): Promise<{ credentialsConfiguration: DPMConfiguration; parameterCount: number } | false> {
     if (!repository.requiresCredentialsConfiguration()) {
-        return credentialsConfiguration;
+        return { credentialsConfiguration, parameterCount: 0 };
     }
 
     const repositoryIdentifier = await repository.getConnectionIdentifierFromConfiguration(connectionConfiguration);
@@ -79,9 +79,9 @@ export async function obtainCredentialsConfiguration(
     }
 
     let credentialsSuccess = false;
-
+    let parameterCount = 0;
     while (!credentialsSuccess) {
-        await repeatedlyPromptParameters(
+        parameterCount += await repeatedlyPromptParameters(
             async () => {
                 return repository.getCredentialsParameters(connectionConfiguration, credentialsConfiguration);
             },
@@ -119,5 +119,5 @@ export async function obtainCredentialsConfiguration(
         );
     }
 
-    return credentialsConfiguration;
+    return { credentialsConfiguration, parameterCount };
 }

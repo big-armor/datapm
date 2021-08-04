@@ -361,17 +361,17 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
             exit(1);
         }
 
-        const connectionConfiguration = await obtainConnectionConfiguration(
+        const connectionConfigurationResults = await obtainConnectionConfiguration(
             oraRef,
             repository,
             sourceObject.connectionConfiguration,
             argv.defaults
         );
 
-        if (connectionConfiguration === false) {
-            oraRef.fail("User canceled");
+        if (connectionConfigurationResults === false) {
             process.exit(1);
         }
+        const connectionConfiguration = connectionConfigurationResults.connectionConfiguration;
 
         const repositoryIdentifier = await repository.getConnectionIdentifierFromConfiguration(connectionConfiguration);
 
@@ -389,13 +389,19 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
             }
         }
 
-        credentialsConfiguration = await obtainCredentialsConfiguration(
+        const credentialsConfigurationResults = await obtainCredentialsConfiguration(
             oraRef,
             repository,
             connectionConfiguration,
             credentialsConfiguration,
             argv.defaults
         );
+
+        if (credentialsConfigurationResults === false) {
+            process.exit(1);
+        }
+
+        credentialsConfiguration = credentialsConfigurationResults.credentialsConfiguration;
 
         const uriInspectionResults = await inspectSource(
             source,

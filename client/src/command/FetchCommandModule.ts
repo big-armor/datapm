@@ -20,6 +20,8 @@ import { TYPE as STANDARD_OUT_SINK_TYPE } from "../repository/file-based/standar
 import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
 import { getSinkDescriptions } from "../repository/SinkUtil";
 import { getRepositoryDescriptionByType } from "../repository/RepositoryUtil";
+import { obtainConnectionConfiguration } from "../util/ConnectionUtil";
+import { obtainCredentialsConfiguration } from "../util/CredentialsUtil";
 
 export async function fetchPackage(argv: FetchArguments): Promise<void> {
     if (argv.quiet) {
@@ -135,14 +137,14 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
     }
 
     // Prompt parameters
+    const sinkConnectionConfiguration: DPMConfiguration = {};
+    const sinkCredentialsConfiguration: DPMConfiguration = {};
     let sinkConfiguration: DPMConfiguration = {};
 
     // Finding sink
-    if (argv.sink) {
+    if (argv.sink || argv.defaults) {
         oraRef.start(`Finding the sink named ${sinkType}`);
     }
-
-    let parameterCount = 0;
 
     const sinkRepositoryDescription = getRepositoryDescriptionByType(sinkType);
 
@@ -152,21 +154,33 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
 
     if (sinkRepository == null) throw new Error("Could not find repository for " + sinkType);
 
-    parameterCount += await repeatedlyPromptParameters(
-        async () => {
-            return sinkRepository.getConnectionParameters(sinkConfiguration);
-        },
-        sinkConfiguration,
-        argv.defaults || false
+    const obtainConnectionConfigurationResult = await obtainConnectionConfiguration(
+        oraRef,
+        sinkRepository,
+        sinkConnectionConfiguration,
+        argv.defaults
     );
 
-    parameterCount += await repeatedlyPromptParameters(
-        async () => {
-            return sinkRepository.getCredentialsParameters(sinkConfiguration, sinkConfiguration);
-        },
-        sinkConfiguration,
-        argv.defaults || false
+    if (obtainConnectionConfigurationResult === false) {
+        oraRef.fail("User canceled");
+        process.exit(1);
+    }
+
+    const obtainCredentialsConfigurationResult = await obtainCredentialsConfiguration(
+        oraRef,
+        sinkRepository,
+        sinkConnectionConfiguration,
+        sinkCredentialsConfiguration,
+        argv.defaults
     );
+
+    if (obtainCredentialsConfigurationResult === false) {
+        oraRef.fail("User canceled");
+        process.exit(1);
+    }
+
+    let parameterCount =
+        obtainConnectionConfigurationResult.parameterCount + obtainCredentialsConfigurationResult.parameterCount;
 
     const sinkDescription = await sinkRepositoryDescription.getSinkDescription();
 
@@ -175,7 +189,7 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
         return;
     }
 
-    if (argv.sink) {
+    if (argv.sink || argv.defaults) {
         oraRef.succeed(`Found the ${sinkDescription.getDisplayName()} sink`);
     }
 

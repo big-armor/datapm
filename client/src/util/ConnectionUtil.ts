@@ -10,8 +10,8 @@ export async function obtainConnectionConfiguration(
     repository: Repository,
     connectionConfiguration: DPMConfiguration,
     defaults: boolean | undefined
-): Promise<DPMConfiguration | false> {
-    if (!repository.requiresConnectionConfiguration()) return connectionConfiguration;
+): Promise<{ connectionConfiguration: DPMConfiguration; parameterCount: number } | false> {
+    if (!repository.requiresConnectionConfiguration()) return { connectionConfiguration, parameterCount: 0 };
 
     // Check whether there are existing configurations for this type of repository
     const existingConfiguration = getRepositoryConfigs(repository.getType());
@@ -58,8 +58,9 @@ export async function obtainConnectionConfiguration(
 
     let connectionSuccess = false;
 
+    let parameterCount = 0;
     while (!connectionSuccess) {
-        await repeatedlyPromptParameters(
+        parameterCount += await repeatedlyPromptParameters(
             async () => {
                 return repository.getConnectionParameters(connectionConfiguration);
             },
@@ -77,5 +78,5 @@ export async function obtainConnectionConfiguration(
         }
     }
 
-    return connectionConfiguration;
+    return { connectionConfiguration, parameterCount };
 }
