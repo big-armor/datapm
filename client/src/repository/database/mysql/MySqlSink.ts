@@ -12,14 +12,18 @@ export class MySqlSink extends KnexSink implements Sink {
     tableName: string;
     tableExists: boolean;
 
-    async createClient(configuration: DPMConfiguration): Promise<Knex> {
+    async createClient(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<Knex> {
         return Knex({
             client: "mysql",
             connection: {
-                host: configuration.host,
-                port: configuration.port,
-                user: configuration.username,
-                password: configuration.password,
+                host: connectionConfiguration.host,
+                port: connectionConfiguration.port,
+                user: credentialsConfiguration.username,
+                password: credentialsConfiguration.password,
                 database: configuration.database,
                 charset: "utf8mb4"
             } as Knex.MySqlConnectionConfig
@@ -34,8 +38,13 @@ export class MySqlSink extends KnexSink implements Sink {
         return DISPLAY_NAME;
     }
 
-    getOutputLocationString(schema: Schema, configuration: Record<string, string | number | boolean | null>): string {
-        return `mysql://${configuration.username}@${configuration.host}:${configuration.port}/${configuration.database}`;
+    getOutputLocationString(
+        schema: Schema,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): string {
+        return `mysql://${credentialsConfiguration.username}@${connectionConfiguration.host}:${connectionConfiguration.port}/${configuration.database}`;
     }
 
     filterDefaultConfigValues(
@@ -81,22 +90,29 @@ export class MySqlSink extends KnexSink implements Sink {
         return tx.schema;
     }
 
-    async getWriteable(schema: Schema, configuration: DPMConfiguration): Promise<WritableWithContext> {
-        if (configuration.host == null) throw new Error("'host' is a required configuration value for mysql");
-        if (configuration.port == null) throw new Error("'port' is a required configuration value for mysql");
-        if (configuration.username == null) throw new Error("'username' is a required configuration value for mysql");
-        if (configuration.password == null) throw new Error("'password' is a required configuration value for mysql");
+    async getWriteable(
+        schema: Schema,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<WritableWithContext> {
+        if (connectionConfiguration.host == null) throw new Error("'host' is a required configuration value for mysql");
+        if (connectionConfiguration.port == null) throw new Error("'port' is a required configuration value for mysql");
+        if (credentialsConfiguration.username == null)
+            throw new Error("'username' is a required configuration value for mysql");
+        if (credentialsConfiguration.password == null)
+            throw new Error("'password' is a required configuration value for mysql");
         if (configuration.database == null) throw new Error("'database' is a required configuration value for mysql");
         if (schema.title == null) throw new Error("Schema name in configuration not definied, and are required");
         if (schema.type !== "object") throw new Error("not a schema object!");
 
         // Open a connection to the database
-        this.client = await this.createClient(configuration);
+        this.client = await this.createClient(connectionConfiguration, credentialsConfiguration, configuration);
 
         // Check DB Existence
         this.checkDBExistence(this.client, configuration);
 
-        const writable = super.getWriteable(schema, configuration);
+        const writable = super.getWriteable(schema, connectionConfiguration, credentialsConfiguration, configuration);
 
         await this.client.transaction(async (tx) => {
             await this.createTableFromSchema(tx, schema);
@@ -125,7 +141,7 @@ export class MySqlSink extends KnexSink implements Sink {
                 console.log(
                     chalk.yellow(`\nDatabase ${configuration.database} does not yet exists. Attempting to create it.\n`)
                 );
-                await this.createDatabase(configuration);
+                await this.createDatabase(client, configuration);
             } else {
                 throw error;
             }
@@ -144,17 +160,7 @@ export class MySqlSink extends KnexSink implements Sink {
         });
     }
 
-    async createDatabase(configuration: DPMConfiguration): Promise<void> {
-        const client = Knex({
-            client: "mysql",
-            connection: {
-                host: configuration.host,
-                port: configuration.port,
-                user: configuration.username,
-                password: configuration.password,
-                connectTimeout: 3000
-            } as Knex.MySqlConnectionConfig
-        });
+    async createDatabase(client: Knex, configuration: DPMConfiguration): Promise<void> {
         await client.raw(`CREATE DATABASE ${configuration.database}`);
         client.destroy();
     }

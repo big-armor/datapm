@@ -241,7 +241,12 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
                 packageMajorVersion: new SemVer(packageFile.version).major
             };
 
-            let sinkState = await sink.getSinkState(sinkConfiguration, sinkStateKey);
+            let sinkState = await sink.getSinkState(
+                sinkConnectionConfiguration,
+                sinkCredentialsConfiguration,
+                sinkConfiguration,
+                sinkStateKey
+            );
 
             if (argv.forceUpdate) sinkState = null;
 
@@ -358,6 +363,8 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
                     packageFile,
                     fetchPreparation.streamSetPreview,
                     sink,
+                    sinkConnectionConfiguration,
+                    sinkCredentialsConfiguration,
                     sinkConfiguration,
                     fetchPreparation.sinkStateKey,
                     fetchPreparation.sinkState,

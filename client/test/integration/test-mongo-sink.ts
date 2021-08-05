@@ -2,6 +2,7 @@ import { expect } from "chai";
 import mongoose from "mongoose";
 import { GenericContainer, StartedTestContainer } from "testcontainers";
 import { SinkErrors } from "../../src/repository/Sink";
+import { resetConfiguration } from "../../src/util/ConfigUtil";
 import {
     createTestPackage,
     getPromptInputs,
@@ -37,6 +38,7 @@ describe("Mongo Sink Test", function () {
     const collectionCName = "undefined_legislators-v1_legislators";
 
     before(async function () {
+        resetConfiguration();
         this.timeout(200000);
 
         console.log("Starting Mongo Sink Container");
@@ -87,6 +89,8 @@ describe("Mongo Sink Test", function () {
     }); */
 
     it("Can't connect to mongo URI with wrong credential", async function () {
+        resetConfiguration();
+
         const prompts = getMongoSinkPromptInputs([
             KEYS.DOWN,
             mongoHost,
@@ -105,6 +109,7 @@ describe("Mongo Sink Test", function () {
             [packageAFilePath, "--sink", "mongo"],
             prompts,
             (line: string, promptIndex: number) => {
+                console.log(line);
                 if (promptIndex === prompts.length && line.includes(SinkErrors.AUTHENTICATION_FAILED)) {
                     results.messageFound = true;
                 }
@@ -116,6 +121,8 @@ describe("Mongo Sink Test", function () {
     });
 
     it("Should import data without error", async function () {
+        resetConfiguration();
+
         const prompts = getMongoSinkPromptInputs([KEYS.DOWN, mongoHost, mongoPort.toString(), "", "", ""]);
         const results: TestResults = {
             exitCode: -1,
@@ -160,6 +167,8 @@ describe("Mongo Sink Test", function () {
     });
 
     it("Should not rewrite if there isn't any new records", async function () {
+        resetConfiguration();
+
         const prompts = getMongoSinkPromptInputs([KEYS.DOWN, mongoHost, mongoPort.toString(), "", "", ""]);
         const results: TestResults = {
             exitCode: -1,
@@ -189,6 +198,8 @@ describe("Mongo Sink Test", function () {
     });
 
     it("Should import data again if force-update flag set", async function () {
+        resetConfiguration();
+
         const prompts = getMongoSinkPromptInputs([KEYS.DOWN, mongoHost, mongoPort.toString(), "", "", ""]);
         const results: TestResults = {
             exitCode: -1,
@@ -223,6 +234,8 @@ describe("Mongo Sink Test", function () {
     });
 
     it("Should resolve conflicts while importing data", async function () {
+        resetConfiguration();
+
         const prompts = [
             ...getMongoSinkPromptInputs([KEYS.DOWN, mongoHost, mongoPort.toString(), "", "", ""]),
             {
@@ -286,6 +299,8 @@ describe("Mongo Sink Test", function () {
     });
 
     it("Casting to null should work correctly", async function () {
+        resetConfiguration();
+
         const prompts = [
             ...getMongoSinkPromptInputs([KEYS.DOWN, mongoHost, mongoPort.toString(), "", "", ""]),
             {

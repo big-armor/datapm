@@ -10,22 +10,31 @@ import { DISPLAY_NAME, TYPE } from "./PostgresRepositoryDescription";
 export class PostgresSink extends KnexSink {
     tableExists: boolean;
 
-    async createClient(configuration: DPMConfiguration): Promise<Knex> {
+    async createClient(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<Knex> {
         return Knex({
             client: "pg",
             connection: {
-                host: configuration.host,
-                port: configuration.port,
-                user: configuration.username,
-                password: configuration.password,
+                host: connectionConfiguration.host,
+                port: connectionConfiguration.port,
+                user: credentialsConfiguration.username,
+                password: credentialsConfiguration.password,
                 database: configuration.database,
                 connectTimeout: 3000
             } as Knex.PgConnectionConfig
         });
     }
 
-    getOutputLocationString(schema: Schema, configuration: Record<string, string | number | boolean | null>): string {
-        return `postgresql://${configuration.username}@${configuration.host}:${configuration.port}/${configuration.database}?currentSchema=${configuration.schema}`;
+    getOutputLocationString(
+        schema: Schema,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: Record<string, string | number | boolean | null>
+    ): string {
+        return `postgresql://${credentialsConfiguration.username}@${connectionConfiguration.host}:${connectionConfiguration.port}/${configuration.database}?currentSchema=${configuration.schema}`;
     }
 
     getType(): string {
@@ -148,12 +157,19 @@ export class PostgresSink extends KnexSink {
         return tx.schema.withSchema(configuration.schema as string);
     }
 
-    async getWriteable(schema: Schema, configuration: DPMConfiguration): Promise<WritableWithContext> {
-        if (configuration.host == null) throw new Error("'host' is a required configuration value for postgresql");
-        if (configuration.port == null) throw new Error("'port' is a required configuration value for postgresql");
-        if (configuration.username == null)
+    async getWriteable(
+        schema: Schema,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<WritableWithContext> {
+        if (connectionConfiguration.host == null)
+            throw new Error("'host' is a required configuration value for postgresql");
+        if (connectionConfiguration.port == null)
+            throw new Error("'port' is a required configuration value for postgresql");
+        if (credentialsConfiguration.username == null)
             throw new Error("'username' is a required configuration value for postgresql");
-        if (configuration.password == null)
+        if (credentialsConfiguration.password == null)
             throw new Error("'password' is a required configuration value for postgresql");
         if (configuration.database == null)
             throw new Error("'database' is a required configuration value for postgresql");
@@ -161,12 +177,12 @@ export class PostgresSink extends KnexSink {
         if (schema.title == null) throw new Error("Schema name in configuration not definied, and are required");
 
         // Open a connection to the database
-        this.client = await this.createClient(configuration);
+        this.client = await this.createClient(connectionConfiguration, credentialsConfiguration, configuration);
 
         // Check DB Existence
         await this.checkDBExistence(this.client, configuration);
 
-        const writable = super.getWriteable(schema, configuration);
+        const writable = super.getWriteable(schema, connectionConfiguration, credentialsConfiguration, configuration);
 
         await this.client.transaction(async (tx) => {
             await tx.raw(`CREATE SCHEMA IF NOT EXISTS "${configuration.schema}"`);

@@ -449,6 +449,8 @@ export class BigQuerySink implements Sink {
     }
 
     async saveSinkState(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
         sinkStateKey: SinkStateKey,
         sinkState: SinkState
@@ -496,7 +498,12 @@ export class BigQuerySink implements Sink {
         await client.createQueryJob({ query: deleteQuery });
     }
 
-    async getSinkState(_configuration: DPMConfiguration, _sinkStateKey: SinkStateKey): Promise<Maybe<SinkState>> {
+    async getSinkState(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        _configuration: DPMConfiguration,
+        _sinkStateKey: SinkStateKey
+    ): Promise<Maybe<SinkState>> {
         if (_configuration.insertMethod === "Bulk") return null;
 
         const client = new BigQuery();

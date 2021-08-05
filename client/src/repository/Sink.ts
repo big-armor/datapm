@@ -7,7 +7,8 @@ import { StreamSetProcessingMethod } from "../util/StreamToSinkUtil";
 
 export enum SinkErrors {
     AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED",
-    CONNECTION_FAILED = "CONNECTION_FAILED"
+    CONNECTION_FAILED = "CONNECTION_FAILED",
+    CONFIGURATION_FAILED = "CONFIGURATION_FAILED"
 }
 
 export interface WritableWithContext {
@@ -112,6 +113,8 @@ export interface Sink {
     /** Apply the configuration to the sink */
     getWriteable(
         schema: Schema,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
         updateMethod: UpdateMethod
     ): Promise<WritableWithContext>;
@@ -135,7 +138,13 @@ export interface Sink {
      * @param sinkState An object that identifies the last observed state of the sink. This method should create or
      * overwrite the value referenced by the sinkStatekey.
      */
-    saveSinkState(configuration: DPMConfiguration, sinkStateKey: SinkStateKey, sinkState: SinkState): Promise<void>;
+    saveSinkState(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        sinkStateKey: SinkStateKey,
+        sinkState: SinkState
+    ): Promise<void>;
 
     /** Called when evaluating the current state of a sink, usually before writing new records. The Sink
      * implementation should use the
@@ -144,5 +153,10 @@ export interface Sink {
      *
      * @param sinkStateKey Use all of the properties of this object to retreive the SinkState object that was previously saved - if available.
      */
-    getSinkState(configuration: DPMConfiguration, SinkStateKey: SinkStateKey): Promise<Maybe<SinkState>>;
+    getSinkState(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        SinkStateKey: SinkStateKey
+    ): Promise<Maybe<SinkState>>;
 }

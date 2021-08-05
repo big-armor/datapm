@@ -45,18 +45,22 @@ export class MongoSinkModule implements Sink {
         };
     }
 
-    getUriFromConfiguration(configuration: DPMConfiguration): string {
+    getUriFromConfiguration(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): string {
         let uri = "mongodb://";
-        if (configuration.username) {
-            uri = `${uri}${configuration.username}`;
+        if (credentialsConfiguration.username) {
+            uri = `${uri}${credentialsConfiguration.username}`;
 
-            if (configuration.password) {
-                uri = `${uri}:${configuration.password}`;
+            if (credentialsConfiguration.password) {
+                uri = `${uri}:${credentialsConfiguration.password}`;
             }
 
             uri = `${uri}@`;
         }
-        uri = `${uri}${configuration.host}:${configuration.port}/${configuration.database}`;
+        uri = `${uri}${connectionConfiguration.host}:${connectionConfiguration.port}/${configuration.database}`;
         return uri;
     }
 
@@ -94,20 +98,27 @@ export class MongoSinkModule implements Sink {
         return parameters;
     }
 
-    async getConnection(configuration: DPMConfiguration): Promise<Mongoose> {
+    async getConnection(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<Mongoose> {
         try {
             mongoose.set("useUnifiedTopology", true);
-            const client = await mongoose.connect(this.getUriFromConfiguration(configuration), {
-                connectTimeoutMS: 3000,
-                socketTimeoutMS: 3000,
-                waitQueueTimeoutMS: 3000,
-                keepAlive: false,
-                maxIdleTimeMS: 3000,
-                autoReconnect: false,
-                useNewUrlParser: true,
-                useUnifiedTopology: true,
-                useFindAndModify: false
-            });
+            const client = await mongoose.connect(
+                this.getUriFromConfiguration(connectionConfiguration, credentialsConfiguration, configuration),
+                {
+                    connectTimeoutMS: 3000,
+                    socketTimeoutMS: 3000,
+                    waitQueueTimeoutMS: 3000,
+                    keepAlive: false,
+                    maxIdleTimeMS: 3000,
+                    autoReconnect: false,
+                    useNewUrlParser: true,
+                    useUnifiedTopology: true,
+                    useFindAndModify: false
+                }
+            );
             return client;
         } catch (error) {
             if (error.message.includes("ENOTFOUND")) {
@@ -126,15 +137,24 @@ export class MongoSinkModule implements Sink {
         }
     }
 
-    async getWriteable(schema: Schema, configuration: DPMConfiguration): Promise<WritableWithContext> {
-        if (configuration.host == null) throw new Error("'host' is a required configuration value for MongoDB");
-        if (configuration.port == null) throw new Error("'port' is a required configuration value for MongoDB");
-        if (configuration.username == null) throw new Error("'username' is a required configuration value for MongoDB");
-        if (configuration.password == null) throw new Error("'password' is a required configuration value for MongoDB");
+    async getWriteable(
+        schema: Schema,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<WritableWithContext> {
+        if (connectionConfiguration.host == null)
+            throw new Error("'host' is a required configuration value for MongoDB");
+        if (connectionConfiguration.port == null)
+            throw new Error("'port' is a required configuration value for MongoDB");
+        if (credentialsConfiguration.username == null)
+            throw new Error("'username' is a required configuration value for MongoDB");
+        if (credentialsConfiguration.password == null)
+            throw new Error("'password' is a required configuration value for MongoDB");
         if (configuration.database == null) throw new Error("'database' is a required configuration value for MongoDB");
         this.schema = schema;
         // Open a connection to the database
-        this.client = await this.getConnection(configuration);
+        this.client = await this.getConnection(connectionConfiguration, credentialsConfiguration, configuration);
         // Create a model from the schema
         await this.createModelFromSchema(schema);
 
@@ -142,7 +162,11 @@ export class MongoSinkModule implements Sink {
         const self = this;
 
         return {
-            outputLocation: this.getUriFromConfiguration(configuration),
+            outputLocation: this.getUriFromConfiguration(
+                connectionConfiguration,
+                credentialsConfiguration,
+                configuration
+            ),
             writable: new Transform({
                 objectMode: true,
                 transform: async function (records: RecordStreamContext[], encoding, callback) {
@@ -300,11 +324,13 @@ export class MongoSinkModule implements Sink {
     }
 
     async saveSinkState(
-        _configuration: DPMConfiguration,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
         _sinkStateKey: SinkStateKey,
         _sinkState: SinkState
     ): Promise<void> {
-        const client = await this.getConnection(_configuration);
+        const client = await this.getConnection(connectionConfiguration, credentialsConfiguration, configuration);
         const collectionInfo = client.connection.db.listCollections({ name: this.stateCollectionName });
 
         const schema: SchemaDefinition = {
@@ -347,8 +373,13 @@ export class MongoSinkModule implements Sink {
         client.connection.close();
     }
 
-    async getSinkState(_configuration: DPMConfiguration, _sinkStateKey: SinkStateKey): Promise<Maybe<SinkState>> {
-        const client = await this.getConnection(_configuration);
+    async getSinkState(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        _sinkStateKey: SinkStateKey
+    ): Promise<Maybe<SinkState>> {
+        const client = await this.getConnection(connectionConfiguration, credentialsConfiguration, configuration);
         const collectionInfo = await client.connection.db.listCollections({ name: this.stateCollectionName });
 
         if (!collectionInfo) {

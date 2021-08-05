@@ -29,6 +29,8 @@ export class StandardOutSinkModule implements Sink {
     }
 
     async saveSinkState(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
         _configuration: DPMConfiguration,
         _sinkStateKey: SinkStateKey,
         _sinkState: SinkState
@@ -38,7 +40,12 @@ export class StandardOutSinkModule implements Sink {
         fs.writeFileSync(stateFilePath, sinkStateStr);
     }
 
-    async getSinkState(configuration: DPMConfiguration, _sinkStateKey: SinkStateKey): Promise<Maybe<SinkState>> {
+    async getSinkState(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        _sinkStateKey: SinkStateKey
+    ): Promise<Maybe<SinkState>> {
         const stateFilePath = `${_sinkStateKey.catalogSlug}_${_sinkStateKey.packageSlug}_v${_sinkStateKey.packageMajorVersion}.datapm.state.json`;
 
         if (!fs.existsSync(stateFilePath)) return null;
@@ -112,6 +119,8 @@ export class StandardOutSinkModule implements Sink {
 
     async getWriteable(
         schema: Schema,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
         updateMethod: UpdateMethod
     ): Promise<WritableWithContext> {

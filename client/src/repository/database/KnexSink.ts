@@ -47,9 +47,18 @@ export abstract class KnexSink implements Sink {
         configuration: DPMConfiguration
     ): Ref<string, { [x: string]: string }>;
 
-    abstract getOutputLocationString(schema: Schema, configuration: DPMConfiguration): string;
+    abstract getOutputLocationString(
+        schema: Schema,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): string;
 
-    abstract createClient(configuration: DPMConfiguration): Promise<Knex>;
+    abstract createClient(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<Knex>;
 
     abstract checkDBExistence(client: Transaction | Knex, configuration: DPMConfiguration): Promise<void>;
 
@@ -67,7 +76,12 @@ export abstract class KnexSink implements Sink {
         };
     }
 
-    async getWriteable(schema: Schema, configuration: DPMConfiguration): Promise<WritableWithContext> {
+    async getWriteable(
+        schema: Schema,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<WritableWithContext> {
         this.schema = schema;
         this.configuration = configuration;
 
@@ -75,7 +89,12 @@ export abstract class KnexSink implements Sink {
         const self = this;
 
         return {
-            outputLocation: this.getOutputLocationString(schema, configuration),
+            outputLocation: this.getOutputLocationString(
+                schema,
+                connectionConfiguration,
+                credentialsConfiguration,
+                configuration
+            ),
             writable: new Transform({
                 objectMode: true,
                 transform: async function (chunk: RecordStreamContext[], encoding, callback) {
@@ -248,25 +267,27 @@ export abstract class KnexSink implements Sink {
     }
 
     async saveSinkState(
-        _configuration: DPMConfiguration,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
         _sinkStateKey: SinkStateKey,
         _sinkState: SinkState
     ): Promise<void> {
-        const client = await this.createClient(_configuration);
-        await this.checkDBExistence(client, _configuration);
+        const client = await this.createClient(connectionConfiguration, credentialsConfiguration, configuration);
+        await this.checkDBExistence(client, configuration);
 
         await client.transaction(async (tx) => {
-            const tableExists = await this.checkStateTableExists(tx, _configuration);
+            const tableExists = await this.checkStateTableExists(tx, configuration);
 
             if (!tableExists) {
                 try {
-                    await this.createStateTable(tx, _configuration);
+                    await this.createStateTable(tx, configuration);
                 } catch (error) {
                     throw new Error("state table not created yet!");
                 }
             }
 
-            const tableRef = this.getStateTableRef(tx, _configuration);
+            const tableRef = this.getStateTableRef(tx, configuration);
             const oldStates = await tx
                 .table(tableRef)
                 .select(...["streamSets", "packageVersion", "timestamp"].map(this.mapSinkStateKeyToColumnName))
@@ -307,18 +328,23 @@ export abstract class KnexSink implements Sink {
         });
     }
 
-    async getSinkState(_configuration: DPMConfiguration, _sinkStateKey: SinkStateKey): Promise<Maybe<SinkState>> {
-        const client = await this.createClient(_configuration);
-        await this.checkDBExistence(client, _configuration);
+    async getSinkState(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        _sinkStateKey: SinkStateKey
+    ): Promise<Maybe<SinkState>> {
+        const client = await this.createClient(connectionConfiguration, credentialsConfiguration, configuration);
+        await this.checkDBExistence(client, configuration);
 
         return new Promise((resolve) => {
             client
                 .transaction(async (tx) => {
-                    const tableExists = await this.checkStateTableExists(tx, _configuration);
+                    const tableExists = await this.checkStateTableExists(tx, configuration);
                     if (!tableExists) {
                         resolve(null);
                     } else {
-                        const tableRef = tx.ref(this.stateTableName).withSchema(_configuration.schema as string);
+                        const tableRef = tx.ref(this.stateTableName).withSchema(configuration.schema as string);
                         const state = await tx
                             .table(tableRef)
                             .select(

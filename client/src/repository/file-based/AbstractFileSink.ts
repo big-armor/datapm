@@ -20,21 +20,35 @@ export abstract class AbstractFileSink implements Sink {
         updateMethod: UpdateMethod
     ): Promise<{ writingTransform: Transform; outputUrl: string }>;
 
-    abstract getSinkStateWritable(sinkStateKey: SinkStateKey, configuration: DPMConfiguration): Promise<Writable>;
+    abstract getSinkStateWritable(
+        sinkStateKey: SinkStateKey,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<Writable>;
 
     abstract getSinkStateReadable(
         sinkStateKey: SinkStateKey,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration
     ): Promise<Maybe<Readable>>;
 
     async saveSinkState(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
         sinkStateKey: SinkStateKey,
         sinkState: SinkState
     ): Promise<void> {
         const sinkStateString = JSON.stringify(sinkState);
 
-        const writableStream = await this.getSinkStateWritable(sinkStateKey, configuration);
+        const writableStream = await this.getSinkStateWritable(
+            sinkStateKey,
+            connectionConfiguration,
+            credentialsConfiguration,
+            configuration
+        );
 
         return new Promise((resolve, reject) => {
             writableStream.write(sinkStateString, () => {
@@ -45,8 +59,18 @@ export abstract class AbstractFileSink implements Sink {
         });
     }
 
-    async getSinkState(configuration: DPMConfiguration, sinkStateKey: SinkStateKey): Promise<Maybe<SinkState>> {
-        const stream = await this.getSinkStateReadable(sinkStateKey, configuration);
+    async getSinkState(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        sinkStateKey: SinkStateKey
+    ): Promise<Maybe<SinkState>> {
+        const stream = await this.getSinkStateReadable(
+            sinkStateKey,
+            connectionConfiguration,
+            credentialsConfiguration,
+            configuration
+        );
 
         if (stream == null) return null;
 
@@ -153,6 +177,8 @@ export abstract class AbstractFileSink implements Sink {
 
     async getWriteable(
         schema: Schema,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
         updateMethod: UpdateMethod
     ): Promise<WritableWithContext> {

@@ -36,8 +36,13 @@ export class RedshiftSink extends KnexSink {
         return true;
     }
 
-    getOutputLocationString(_schema: Schema, configuration: Record<string, string | number | boolean | null>): string {
-        return `redshift://${configuration.cluster}/${configuration.database}?currentSchema=${configuration.schema}`;
+    getOutputLocationString(
+        schema: Schema,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: Record<string, string | number | boolean | null>
+    ): string {
+        return `redshift://${connectionConfiguration.cluster}/${configuration.database}?currentSchema=${configuration.schema}`;
     }
 
     getSafeTableName(name: string): string {
@@ -136,7 +141,11 @@ export class RedshiftSink extends KnexSink {
         return parameters;
     }
 
-    async createClient(configuration: DPMConfiguration): Promise<Knex> {
+    async createClient(
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<Knex> {
         if (!configuration.host) {
             // Get PG Connection Information
             const clusterConfiguration = await getRedshiftClusterConfiguration(
@@ -212,13 +221,18 @@ export class RedshiftSink extends KnexSink {
         return csvContent;
     }
 
-    async getWriteable(schema: Schema, configuration: DPMConfiguration): Promise<WritableWithContext> {
+    async getWriteable(
+        schema: Schema,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<WritableWithContext> {
         this.fileName = `${schema.title}_${Date.now()}.csv`;
 
         // Open a connection to the database
-        this.client = await this.createClient(configuration);
+        this.client = await this.createClient(connectionConfiguration, credentialsConfiguration, configuration);
 
-        const writable = super.getWriteable(schema, configuration);
+        const writable = super.getWriteable(schema, connectionConfiguration, credentialsConfiguration, configuration);
 
         await this.client.transaction(async (tx) => {
             await tx.raw(`CREATE SCHEMA IF NOT EXISTS "${configuration.schema}"`);

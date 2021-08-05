@@ -3,6 +3,7 @@ import Knex from "knex";
 import { GenericContainer, StartedTestContainer } from "testcontainers";
 import { LogWaitStrategy } from "testcontainers/dist/wait-strategy";
 import { SinkErrors } from "../../src/repository/Sink";
+import { resetConfiguration } from "../../src/util/ConfigUtil";
 import {
     createTestPackage,
     getPromptInputs,
@@ -42,6 +43,7 @@ describe("Postgres Sink Test", function () {
     const tableCName = "legislators";
 
     before(async function () {
+        resetConfiguration();
         this.timeout(200000);
 
         console.log("Starting postgres sink container");
@@ -105,6 +107,8 @@ describe("Postgres Sink Test", function () {
     });
 
     it("Can't connect to database with wrong credential", async function () {
+        resetConfiguration();
+
         const prompts = getPostgresSinkPromptInputs([
             KEYS.DOWN,
             postgresHost,
@@ -133,6 +137,8 @@ describe("Postgres Sink Test", function () {
     });
 
     it("Can't create database with invalid name", async function () {
+        resetConfiguration();
+
         const prompts = getPostgresSinkPromptInputs([
             KEYS.DOWN,
             postgresHost,
@@ -162,6 +168,8 @@ describe("Postgres Sink Test", function () {
     });
 
     it("Should import data without error", async function () {
+        resetConfiguration();
+
         const prompts = getPostgresSinkPromptInputs([
             KEYS.DOWN,
             postgresHost,
@@ -234,6 +242,8 @@ describe("Postgres Sink Test", function () {
     });
 
     it("Should not rewrite if there isn't any new records", async function () {
+        resetConfiguration();
+
         const prompts = getPostgresSinkPromptInputs([
             KEYS.DOWN,
             postgresHost,
@@ -271,6 +281,8 @@ describe("Postgres Sink Test", function () {
     });
 
     it("Should import data again if force update flag set", async function () {
+        resetConfiguration();
+
         const prompts = getPostgresSinkPromptInputs([
             KEYS.DOWN,
             postgresHost,
@@ -310,6 +322,8 @@ describe("Postgres Sink Test", function () {
     });
 
     it("Should resolve conflicts while importing data", async function () {
+        resetConfiguration();
+
         const prompts = [
             ...getPostgresSinkPromptInputs([
                 KEYS.DOWN,
@@ -449,6 +463,8 @@ describe("Postgres Sink Test", function () {
     });
 
     it("Casting to null should work correctly", async function () {
+        resetConfiguration();
+
         const prompts = [
             ...getPostgresSinkPromptInputs([
                 KEYS.DOWN,
