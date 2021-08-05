@@ -164,7 +164,12 @@ export class S3Sink extends AbstractFileSink {
         return { writingTransform, outputUrl };
     }
 
-    async getSinkStateWritable(sinkStateKey: SinkStateKey, configuration: DPMConfiguration): Promise<Writable> {
+    async getSinkStateWritable(
+        sinkStateKey: SinkStateKey,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<Writable> {
         if (typeof configuration.fileLocation !== "string")
             throw new Error("fileLocation configuration must be a string");
 
@@ -189,7 +194,12 @@ export class S3Sink extends AbstractFileSink {
         return writable;
     }
 
-    async getSinkStateReadable(sinkStateKey: SinkStateKey, configuration: DPMConfiguration): Promise<Maybe<Readable>> {
+    async getSinkStateReadable(
+        sinkStateKey: SinkStateKey,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<Maybe<Readable>> {
         const stateFileName = `${sinkStateKey.catalogSlug}-${sinkStateKey.packageSlug}-${sinkStateKey.packageMajorVersion}-state.json`;
         const key = `${configuration.path}/${stateFileName}`;
 

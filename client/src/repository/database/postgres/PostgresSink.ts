@@ -81,46 +81,6 @@ export class PostgresSink extends KnexSink {
             configuration
         );
 
-        if (configuration.host == null) {
-            parameters.push({
-                configuration,
-                type: ParameterType.Text,
-                name: "host",
-                message: "Hostname or IP?",
-                defaultValue: defaultParameterValues.host as string
-            });
-        }
-
-        if (configuration.port == null) {
-            parameters.push({
-                configuration,
-                type: ParameterType.Number,
-                name: "port",
-                message: "Port?",
-                defaultValue: defaultParameterValues.port as number
-            });
-        }
-
-        if (configuration.username == null) {
-            parameters.push({
-                configuration,
-                type: ParameterType.Text,
-                name: "username",
-                message: "Username?",
-                defaultValue: defaultParameterValues.username as string
-            });
-        }
-
-        if (configuration.password == null) {
-            parameters.push({
-                configuration,
-                type: ParameterType.Password,
-                name: "password",
-                message: "Password?",
-                defaultValue: defaultParameterValues.password as string
-            });
-        }
-
         if (configuration.database == null) {
             parameters.push({
                 configuration,

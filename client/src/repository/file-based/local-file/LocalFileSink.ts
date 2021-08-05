@@ -115,7 +115,12 @@ export class LocalFileSink extends AbstractFileSink {
         return { writingTransform, outputUrl };
     }
 
-    async getSinkStateWritable(sinkStateKey: SinkStateKey, configuration: DPMConfiguration): Promise<Writable> {
+    async getSinkStateWritable(
+        sinkStateKey: SinkStateKey,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<Writable> {
         if (typeof configuration.fileLocation !== "string")
             throw new Error("fileLocation configuration must be a string");
 
@@ -141,7 +146,12 @@ export class LocalFileSink extends AbstractFileSink {
         return [UpdateMethod.BATCH_FULL_SET, UpdateMethod.APPEND_ONLY_LOG];
     }
 
-    async getSinkStateReadable(sinkStateKey: SinkStateKey, configuration: DPMConfiguration): Promise<Maybe<Readable>> {
+    async getSinkStateReadable(
+        sinkStateKey: SinkStateKey,
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration
+    ): Promise<Maybe<Readable>> {
         if (typeof configuration.fileLocation !== "string")
             throw new Error(
                 "fileLocation configuration must be a string. It is a " + typeof configuration.fileLocation
