@@ -158,15 +158,8 @@ export class BigQuerySource implements Source {
                     type: ParameterType.Text,
                     name: "query",
                     message: "Query?",
-                    validate: (value) => {
-                        if (!value) {
-                            return "Query required";
-                        }
-                        if (value && !(value as string).toUpperCase().startsWith("SELECT")) {
-                            return "Should be a SELECT query";
-                        }
-                        return true;
-                    }
+                    stringMinimumLength: 15,
+                    stringRegExp: { pattern: /SELECT/, message: "Should be a SELECT query" }
                 });
             }
         }

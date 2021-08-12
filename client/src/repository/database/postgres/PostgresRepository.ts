@@ -69,7 +69,7 @@ export class PostgresRepository implements Repository {
                 type: ParameterType.Text,
                 name: "host",
                 message: "Hostname or IP?",
-                min: 1,
+                stringMaximumLength: 1,
                 defaultValue: defaultParameterValues.host as string
             });
         }
@@ -80,7 +80,8 @@ export class PostgresRepository implements Repository {
                 type: ParameterType.Number,
                 name: "port",
                 message: "Port?",
-                min: 1,
+                numberMinimumValue: 1,
+                numberMaximumValue: 65535,
                 defaultValue: defaultParameterValues.port as number
             });
         }
@@ -100,7 +101,7 @@ export class PostgresRepository implements Repository {
                 type: ParameterType.Text,
                 name: "username",
                 message: "Username?",
-                min: 1,
+                stringMinimumLength: 1,
                 defaultValue: this.getDefaultAuthenticationParameterValues(authenticationConfiguration)
                     .username as string
             });
@@ -112,7 +113,7 @@ export class PostgresRepository implements Repository {
                 type: ParameterType.Password,
                 name: "password",
                 message: "Password?",
-                min: 1,
+                stringMinimumLength: 1,
                 defaultValue: this.getDefaultAuthenticationParameterValues(authenticationConfiguration)
                     .password as string
             });

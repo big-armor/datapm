@@ -79,7 +79,7 @@ export class PostgresSource implements Source {
                     name: "tables",
                     message: "Tables?",
                     options: tableOptions,
-                    min: 1
+                    numberMinimumValue: 1
                 });
             } catch (error) {
                 console.log(chalk(error.message));

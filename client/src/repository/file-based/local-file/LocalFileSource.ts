@@ -50,17 +50,9 @@ export class LocalFileSource extends AbstractFileStreamSource implements Source 
                     type: ParameterType.Text,
                     name: "uri",
                     message: "File path?",
-                    validate: (value: string | number | boolean) => {
-                        if (value == null || (value as string).length === 0) {
-                            return "File path required";
-                        }
-
-                        if (!fs.existsSync(value as string)) {
-                            return "File not found";
-                        }
-
-                        return true;
-                    }
+                    stringMinimumLength: 1
+                    // TODO implement some sort of other call back validation to ensure the file exists
+                    // Can't be a closure because this might be called in another routine
                 },
                 {
                     configuration: configuration,

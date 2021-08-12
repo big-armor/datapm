@@ -14,7 +14,7 @@
         "package:win64": "gulp buildWindows64",
         "pretest": "npm run codegen",
         "test": "mocha --slow 3000 --timeout 60000 -r ts-node/register test/integration/*.ts",
-        "test:debug": "npm run build && npx mocha --slow 3000 --timeout 999999 -r ts-node/register",
+        "test:debug": "npx mocha --slow 3000 --timeout 999999 -r ts-node/register",
         "test:full": "npm run pretest; mocha --slow 3000 --timeout 60000 -r ts-node/register test/**/*.ts",
         "lint": "npm run eslint",
         "lint:fix": "npm run eslint:fix",

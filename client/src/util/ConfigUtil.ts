@@ -97,6 +97,28 @@ export function getRepositoryConfig(type: string, identifier: string): Repositor
     return getRepositoryConfigs(type).find((r) => r.identifier === identifier);
 }
 
+export function removeRepositoryConfig(type: string, repositoryIdentifer: string): void {
+    const repositoryConfigs = (config.get("repositories") as RepositoryType[]) || null;
+
+    if (repositoryConfigs == null) {
+        throw new Error("There are no saved repositories.");
+    }
+
+    const repositoryType = repositoryConfigs.find((f) => f.type === type);
+
+    if (repositoryType == null) {
+        throw new Error(`Repository type ${type} not found in saved configurations`);
+    }
+
+    repositoryType.configs = repositoryType.configs.filter((r) => r.identifier !== repositoryIdentifer);
+
+    if (repositoryType.configs.length === 0) {
+        repositoryConfigs.splice(repositoryConfigs.indexOf(repositoryType), 1);
+    }
+
+    config.set("repositories", repositoryConfigs);
+}
+
 export function saveRepositoryConfig(
     type: string,
     repositoryIdentifer: string,

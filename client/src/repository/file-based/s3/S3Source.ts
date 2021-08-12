@@ -78,16 +78,9 @@ export class S3Source extends AbstractFileStreamSource implements Source {
                     type: ParameterType.Text,
                     name: "uri",
                     message: "S3 File URI?",
-                    validate: (value: string | number | boolean) => {
-                        if (value == null || (value as string).length === 0) {
-                            return "File path required";
-                        }
-
-                        if (!value.toString().startsWith("s3://")) {
-                            return "Must be an S3 URI (start with 's3://')";
-                        }
-
-                        return true;
+                    stringRegExp: {
+                        pattern: /^s3:\/\/\//,
+                        message: "Must start with s3:///"
                     }
                 },
                 {

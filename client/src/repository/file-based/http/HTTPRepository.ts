@@ -59,18 +59,9 @@ export class HTTPRepository implements Repository {
                     type: ParameterType.Text,
                     name: "uri",
                     message: "URL of file?",
-                    validate: (value: string | number | boolean) => {
-                        if (value == null || (value as string).length === 0) {
-                            return "URL required";
-                        }
-
-                        const strValue = value as string;
-
-                        if (!strValue.startsWith("http://") && !strValue.startsWith("https://")) {
-                            return "Must start with http:// or https://";
-                        }
-
-                        return true;
+                    stringRegExp: {
+                        pattern: /^https:\/\/|^http:\/\//,
+                        message: "Must start with http:// or https://"
                     }
                 },
                 {

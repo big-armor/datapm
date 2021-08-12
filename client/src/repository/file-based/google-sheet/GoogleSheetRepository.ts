@@ -45,18 +45,9 @@ export class GoogleSheetRepository implements Repository {
                     type: ParameterType.Text,
                     name: "uri",
                     message: "URL of Google Sheet?",
-                    validate: (value: string | number | boolean) => {
-                        if (value == null || (value as string).length === 0) {
-                            return "URL required";
-                        }
-
-                        const strValue = value as string;
-
-                        if (!strValue.startsWith("https://docs.google.com/spreadsheets")) {
-                            return "Must start with https://docs.google.com/spreadsheets";
-                        }
-
-                        return true;
+                    stringRegExp: {
+                        pattern: /https:\/\/docs.google.com\/spreadsheets/,
+                        message: "Must be a Google Sheet URL"
                     }
                 }
             ];

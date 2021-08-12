@@ -31,7 +31,7 @@ export async function repeatedlyPromptParameters(
         }
 
         parameterCount += remainingParameters.length;
-        const promptObjects: PromptObject[] = parametersToPrompts(remainingParameters);
+        const promptObjects = parametersToPrompts(remainingParameters);
 
         // TODO Skip existing configs
         const newSinkConfig = await prompts(promptObjects, defaultPromptOptions);
@@ -47,6 +47,58 @@ export async function repeatedlyPromptParameters(
     return parameterCount;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function validatePromptResponse(value: any, parameter: Parameter): string | true {
+    if (parameter.type === ParameterType.Text || parameter.type === ParameterType.Password) {
+        if (parameter.stringRegExp !== undefined) {
+            if (value[0] === undefined) return "Please enter a value";
+
+            if (!value[0].match(parameter.stringRegExp)) {
+                return parameter.stringRegExp.message;
+            }
+        }
+
+        if (
+            parameter.stringMinimumLength !== undefined &&
+            (value[0] === undefined || value[0].length < parameter.stringMinimumLength)
+        ) {
+            return (
+                "Must have at least " +
+                parameter.stringMinimumLength +
+                " character" +
+                (parameter.stringMinimumLength > 1 ? "s" : "")
+            );
+        }
+
+        if (
+            parameter.stringMaximumLength !== undefined &&
+            value[0] !== undefined &&
+            value[0].length > parameter.stringMaximumLength
+        ) {
+            return (
+                "May not have more than " +
+                parameter.stringMaximumLength +
+                " character" +
+                (parameter.stringMaximumLength > 1 ? "s" : "")
+            );
+        }
+    }
+
+    if (parameter.type === ParameterType.Number) {
+        const valueToEvaluate =
+            value === "" && parameter.defaultValue !== undefined ? parameter.defaultValue : (value as number);
+
+        if (parameter.numberMaximumValue !== undefined && (valueToEvaluate as number) > parameter.numberMaximumValue) {
+            return "Must be less than " + parameter.numberMaximumValue;
+        }
+
+        if (parameter.numberMinimumValue !== undefined && (valueToEvaluate as number) < parameter.numberMinimumValue) {
+            return "Must be greater than " + parameter.numberMinimumValue;
+        }
+    }
+    return true;
+}
+
 export function parametersToPrompts(parameters: Parameter[]): PromptObject[] {
     return parameters.map((promptParameter) => {
         if ([ParameterType.Confirm].includes(promptParameter.type)) {
@@ -54,7 +106,8 @@ export function parametersToPrompts(parameters: Parameter[]): PromptObject[] {
                 type: "autocomplete",
                 name: promptParameter.name,
                 message: promptParameter.message,
-                min: promptParameter.min,
+                min: promptParameter.numberMinimumValue,
+                max: promptParameter.numberMaximumValue,
                 choices: [
                     {
                         title: "Yes",
@@ -63,7 +116,7 @@ export function parametersToPrompts(parameters: Parameter[]): PromptObject[] {
                     },
                     { title: "No", value: false, selected: promptParameter.defaultValue !== true }
                 ],
-                validate: promptParameter.validate
+                validate: (value) => validatePromptResponse(value, promptParameter)
             };
         } else if ([ParameterType.Text, ParameterType.Password, ParameterType.Number].includes(promptParameter.type)) {
             return {
@@ -71,8 +124,8 @@ export function parametersToPrompts(parameters: Parameter[]): PromptObject[] {
                 name: promptParameter.name,
                 message: promptParameter.message,
                 initial: promptParameter.defaultValue,
-                min: promptParameter.min,
-                validate: promptParameter.validate
+                min: promptParameter.numberMinimumValue,
+                validate: (value) => validatePromptResponse(value, promptParameter)
             };
         } else if (
             [ParameterType.AutoComplete, ParameterType.Select, ParameterType.MultiSelect].includes(promptParameter.type)
@@ -90,8 +143,8 @@ export function parametersToPrompts(parameters: Parameter[]): PromptObject[] {
                 name: promptParameter.name,
                 message: promptParameter.message,
                 choices: promptParameter.options,
-                min: promptParameter.min,
-                validate: promptParameter.validate
+                min: promptParameter.numberMinimumValue,
+                validate: (value) => validatePromptResponse(value, promptParameter)
             };
         }
 
