@@ -2,17 +2,21 @@
 @import "../../../styles/variables";
 
 #followingTab {
-    .person-card-name {
-        font-family: $family-roboto;
-        font-style: $style-normal;
-        font-weight: 500;
-        font-size: 14px;
-        line-height: 28px;
-        padding-left: 10px;
-        letter-spacing: -0.28px;
-        cursor: pointer;
-        color: $gray-1-color;
-        margin-bottom: 0px !important;
+    .following-box {
+        top: 1px;
+        position: relative;
+        .person-card-name {
+            font-family: $family-roboto;
+            font-style: $style-normal;
+            font-weight: 500;
+            font-size: $small-font;
+            line-height: 28px;
+            padding-left: 10px;
+            letter-spacing: 0.4px;
+            cursor: pointer;
+            color: var(--gray-1-color);
+            margin-bottom: 0px !important;
+        }
     }
 }
 
