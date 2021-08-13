@@ -7,11 +7,19 @@ import { Parameter, ParameterType } from "./Parameter";
 export async function repeatedlyPromptParameters(
     callBack: () => Promise<Parameter[]>,
     configuration: DPMConfiguration,
-    defaults: boolean
+    defaults: boolean,
+    overrideDefaultValues: DPMConfiguration = {}
 ): Promise<number> {
     let parameterCount = 0;
     let remainingParameters = await callBack();
+
     while (remainingParameters.length > 0) {
+        for (const parameter of remainingParameters) {
+            if (overrideDefaultValues[parameter.name] !== undefined) {
+                parameter.defaultValue = overrideDefaultValues[parameter.name] as string | boolean | number;
+            }
+        }
+
         if (defaults) {
             const noDefaults: Parameter[] = [];
             for (const parameter of remainingParameters) {

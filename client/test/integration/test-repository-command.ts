@@ -46,7 +46,6 @@ describe("Repository Command Tests", async function () {
         expect(repositories.length).equal(1);
         expect(repositories[0].connectionConfiguration.host).equal(`testhost`);
         expect(repositories[0].connectionConfiguration.port).equal(`999`);
-        expect((repositories[0].crdentials as RepositoryCredentialsConfig[])[0].identifier).equal(`postgres`);
-        expect((repositories[0].crdentials as RepositoryCredentialsConfig[])[1].identifier).equal(`postgres2`);
+        expect((repositories[0].credentials as RepositoryCredentialsConfig[])[0].identifier).equal(`postgres`);
     });
 });

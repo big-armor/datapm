@@ -68,7 +68,7 @@ export interface RepositoryConfig {
     connectionConfiguration: DPMConfiguration;
 
     /** An array of string identifiers for each access credential. */
-    crdentials?: RepositoryCredentialsConfig[];
+    credentials?: RepositoryCredentialsConfig[];
 }
 
 export interface RepositoryType {
@@ -119,17 +119,11 @@ export function removeRepositoryConfig(type: string, repositoryIdentifer: string
     config.set("repositories", repositoryConfigs);
 }
 
-export function saveRepositoryConfig(
-    type: string,
-    repositoryIdentifer: string,
-    connectionConfiguration: DPMConfiguration
-): void {
-    const repositoryConfig = getRepositoryConfig(type, repositoryIdentifer);
-
+export function saveRepositoryConfig(type: string, repositoryConfig: RepositoryConfig): void {
     saveRepositoryConfigInternal(type, {
-        identifier: repositoryIdentifer,
-        connectionConfiguration,
-        crdentials: repositoryConfig ? repositoryConfig.crdentials : []
+        identifier: repositoryConfig.identifier,
+        connectionConfiguration: repositoryConfig.connectionConfiguration,
+        credentials: repositoryConfig ? repositoryConfig.credentials : []
     });
 }
 
@@ -166,7 +160,7 @@ export async function getRepositoryCredential(
         throw new Error(`No repository configuration found for ${repositoryType} ${repositoryIdentifier}`);
     }
 
-    const credentials = repositoryConfig.crdentials?.find((c) => c.identifier === credentialsIdentifier);
+    const credentials = repositoryConfig.credentials?.find((c) => c.identifier === credentialsIdentifier);
 
     if (!credentials) {
         throw new Error(`No credentials found for ${repositoryType} ${repositoryIdentifier} ${credentialsIdentifier}`);
@@ -201,11 +195,11 @@ export async function saveRepositoryCredential(
 
     const hash = encrypt(jsonString, secretKey);
 
-    if (repositoryConfig.crdentials == null) repositoryConfig.crdentials = [];
+    if (repositoryConfig.credentials == null) repositoryConfig.credentials = [];
 
-    repositoryConfig.crdentials = repositoryConfig.crdentials.filter((c) => c.identifier !== credentialsIdentifier);
+    repositoryConfig.credentials = repositoryConfig.credentials.filter((c) => c.identifier !== credentialsIdentifier);
 
-    repositoryConfig.crdentials.push({
+    repositoryConfig.credentials.push({
         identifier: credentialsIdentifier,
         encryptedConfiguration: hash.content,
         iv: hash.iv
@@ -225,9 +219,9 @@ export async function deleteRepositoryAccessCredential(
         throw new Error(`No repository configuration found for ${repositoryType} ${repositoryIdentifier}`);
     }
 
-    const credentials = repositoryConfig.crdentials?.filter((c) => c.identifier !== credentialsIdentifier);
+    const credentials = repositoryConfig.credentials?.filter((c) => c.identifier !== credentialsIdentifier);
 
-    repositoryConfig.crdentials = credentials;
+    repositoryConfig.credentials = credentials;
 
     saveRepositoryConfigInternal(repositoryType, repositoryConfig);
 }
@@ -307,4 +301,42 @@ export function removeRegistry(url: string): void {
     } else {
         console.log(`There are no registries in the local configuration`);
     }
+}
+
+export function removeCredentialsConfig(
+    repositoryType: string,
+    repositoryIdentifer: string,
+    credentialsIdentifier: string
+): void {
+    const repositoryConfigs = (config.get("repositories") as RepositoryType[]) || null;
+
+    if (repositoryConfigs == null) {
+        throw new Error("There are no saved repositories.");
+    }
+
+    const repositoryTypeConfigObject = repositoryConfigs.find((f) => f.type === repositoryType);
+
+    if (repositoryTypeConfigObject == null) {
+        throw new Error(`Repository type ${repositoryType} not found in saved configurations`);
+    }
+
+    const repositoryConfig = repositoryTypeConfigObject.configs.find((r) => r.identifier === repositoryIdentifer);
+
+    if (repositoryConfig == null) {
+        throw new Error(`Repository ${repositoryType} ${repositoryIdentifer} not found in saved configurations`);
+    }
+
+    if (repositoryConfig.credentials == null || repositoryConfig.credentials.length === 0) {
+        throw new Error(`Repository ${repositoryType} ${repositoryIdentifer} does not have any credentials`);
+    }
+
+    const credentialsConfig = repositoryConfig.credentials.find((c) => c.identifier === credentialsIdentifier);
+
+    if (credentialsConfig == null) {
+        throw new Error(`Credentials ${credentialsIdentifier} not found in ${repositoryType} ${repositoryIdentifer}`);
+    }
+
+    repositoryConfig.credentials.splice(repositoryConfig.credentials.indexOf(credentialsConfig), 1);
+
+    config.set("repositories", repositoryConfigs);
 }

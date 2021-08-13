@@ -18,7 +18,8 @@ export async function obtainCredentialsConfiguration(
     repository: Repository,
     connectionConfiguration: DPMConfiguration,
     credentialsConfiguration: DPMConfiguration,
-    defaults: boolean | undefined
+    defaults: boolean | undefined,
+    overrideDefaultValues: DPMConfiguration = {}
 ): Promise<{ credentialsConfiguration: DPMConfiguration; parameterCount: number } | false> {
     if (!repository.requiresCredentialsConfiguration()) {
         return { credentialsConfiguration, parameterCount: 0 };
@@ -30,6 +31,10 @@ export async function obtainCredentialsConfiguration(
         (c) => c.identifier === repositoryIdentifier
     );
 
+    if (repositoryConfig == null) {
+        throw new Error("Cound not find repository configuration for " + repositoryIdentifier);
+    }
+
     const pendingParameters = await repository.getCredentialsParameters(
         connectionConfiguration,
         credentialsConfiguration
@@ -38,16 +43,16 @@ export async function obtainCredentialsConfiguration(
     if (
         Object.keys(credentialsConfiguration).length === 0 &&
         pendingParameters.length > 0 &&
-        repositoryConfig != null &&
-        repositoryConfig.crdentials &&
-        repositoryConfig.crdentials.length > 0
+        repositoryConfig.credentials &&
+        repositoryConfig.credentials.length > 0
     ) {
         const choices: {
             value: string | null;
             title: string;
         }[] = [
-            { value: "**NEW**", title: "Add or Update Credentials" },
-            ...repositoryConfig.crdentials.map((c) => {
+            { value: "**NEW**", title: "Add Credentials" },
+            { value: "**EXIT**", title: "Don't add or update credentials" },
+            ...repositoryConfig.credentials.map((c) => {
                 return { value: c.identifier, title: c.identifier };
             })
         ];
@@ -60,6 +65,10 @@ export async function obtainCredentialsConfiguration(
         });
 
         if (credentialsPromptResult.credentialsIdentifier == null) {
+            return false;
+        }
+
+        if (credentialsPromptResult.credentialsIdentifier === "**EXIT**") {
             return false;
         }
 
@@ -86,7 +95,8 @@ export async function obtainCredentialsConfiguration(
                 return repository.getCredentialsParameters(connectionConfiguration, credentialsConfiguration);
             },
             credentialsConfiguration,
-            defaults || false
+            defaults || false,
+            overrideDefaultValues
         );
 
         const credentialsTestResult = await repository.testCredentials(
@@ -109,7 +119,7 @@ export async function obtainCredentialsConfiguration(
             credentialsConfiguration
         );
 
-        saveRepositoryConfig(repository.getType(), repositoryIdentifier, connectionConfiguration);
+        saveRepositoryConfig(repository.getType(), repositoryConfig);
 
         await saveRepositoryCredential(
             repository.getType(),

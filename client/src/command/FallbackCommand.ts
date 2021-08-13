@@ -4,6 +4,7 @@ import { Command } from "./Command";
 import { fetchPackage } from "./FetchCommand";
 import { packageCommand } from "./PackageCommand";
 import { authenticateToRegistry, defaultRegistryCommand, logoutFromRegistry } from "./RegistryCommand";
+import { addRepository, removeRepository } from "./RepositoryCommand";
 import { handleSearch } from "./SearchCommand";
 import { updateCommandHandler } from "./UpdateCommand";
 
@@ -13,7 +14,9 @@ const enum Commands {
     PACKAGE = "Package",
     UPDATE = "Update",
     LOGIN = "Login",
-    LOGOUT = "Logout"
+    LOGOUT = "Logout",
+    ADD_REPOSITORY = "AddRepository",
+    REMOVE_REPOSITORY = "RemoveRepository"
 }
 
 export class FallbackCommand implements Command {
@@ -60,7 +63,9 @@ export class FallbackCommand implements Command {
                         { title: "Package and publish new data", value: Commands.PACKAGE },
                         { title: "Update and publish an existing data package", value: Commands.UPDATE },
                         { title: "Log into a registry", value: Commands.LOGIN },
-                        { title: "Log out of a registry", value: Commands.LOGOUT }
+                        { title: "Log out of a registry", value: Commands.LOGOUT },
+                        { title: "Add or Update a Repository", value: Commands.ADD_REPOSITORY },
+                        { title: "Remove a Repository or Credential", value: Commands.REMOVE_REPOSITORY }
                     ],
                     initial: 0
                 });
@@ -77,6 +82,10 @@ export class FallbackCommand implements Command {
                     await this.runLoginCommand();
                 } else if (commandPromptResult.command === Commands.LOGOUT) {
                     await this.runLogoutCommand();
+                } else if (commandPromptResult.command === Commands.ADD_REPOSITORY) {
+                    await this.runAddRepositoryCommand();
+                } else if (commandPromptResult.command === Commands.REMOVE_REPOSITORY) {
+                    await this.runRemoveRepositoryCommand();
                 }
             }
         });
@@ -129,6 +138,24 @@ export class FallbackCommand implements Command {
     async runLogoutCommand(): Promise<void> {
         try {
             await logoutFromRegistry({});
+        } catch (e) {
+            console.error(e);
+            process.exit(1);
+        }
+    }
+
+    async runAddRepositoryCommand(): Promise<void> {
+        try {
+            await addRepository({});
+        } catch (e) {
+            console.error(e);
+            process.exit(1);
+        }
+    }
+
+    async runRemoveRepositoryCommand(): Promise<void> {
+        try {
+            await removeRepository({});
         } catch (e) {
             console.error(e);
             process.exit(1);

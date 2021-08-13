@@ -1,7 +1,6 @@
 import { Argv } from "yargs";
 
 import { Command } from "./Command";
-import { removeRepository } from "./RepositoryCommandModule";
 
 export const enum Commands {
     ADD = "ADD",
@@ -63,6 +62,20 @@ export class RepositoryCommand implements Command {
                         handler: addRepository
                     })
                     .command({
+                        command: "update [repositoryType] [repositoryIdentifier]",
+                        describe: "",
+                        builder: (yargs) => {
+                            return yargs
+                                .positional("repositoryType", {
+                                    type: "string"
+                                })
+                                .positional("repositoryIdentifier", {
+                                    type: "string"
+                                });
+                        },
+                        handler: updateRepository
+                    })
+                    .command({
                         command: "remove [repositoryType] [repositoryIdentifier]",
                         describe: "",
                         builder: (yargs) => {
@@ -73,6 +86,30 @@ export class RepositoryCommand implements Command {
                                 .positional("repositoryIdentifier", {
                                     type: "string"
                                 });
+                        },
+                        handler: removeRepository
+                    })
+                    .command({
+                        command: "credentials",
+                        describe: "",
+                        builder: (yargs) => {
+                            return yargs.command({
+                                command: "remove [repositoryType] [repositoryIdentifier] [credentialsIdentifier]",
+                                describe: "",
+                                builder: (yargs) => {
+                                    return yargs
+                                        .positional("repositoryType", {
+                                            type: "string"
+                                        })
+                                        .positional("repositoryIdentifier", {
+                                            type: "string"
+                                        })
+                                        .positional("credentialsIdentifier", {
+                                            type: "string"
+                                        });
+                                },
+                                handler: removeCredentials
+                            });
                         },
                         handler: removeRepository
                     });
@@ -96,6 +133,36 @@ export async function addRepository(args: RepositoryAddArguments): Promise<void>
     try {
         const module = await import("./RepositoryCommandModule");
         await module.addRepository(args);
+    } catch (error) {
+        console.error(error);
+        process.exit(1);
+    }
+}
+
+export async function updateRepository(args: RepositoryUpdateArguments): Promise<void> {
+    try {
+        const module = await import("./RepositoryCommandModule");
+        await module.updateRepository(args);
+    } catch (error) {
+        console.error(error);
+        process.exit(1);
+    }
+}
+
+export async function removeRepository(args: RepositoryRemoveArguments): Promise<void> {
+    try {
+        const module = await import("./RepositoryCommandModule");
+        await module.removeRepository(args);
+    } catch (error) {
+        console.error(error);
+        process.exit(1);
+    }
+}
+
+export async function removeCredentials(args: CredentialsRemoveArguments): Promise<void> {
+    try {
+        const module = await import("./RepositoryCommandModule");
+        await module.removeCredentials(args);
     } catch (error) {
         console.error(error);
         process.exit(1);

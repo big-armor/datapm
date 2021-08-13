@@ -9,7 +9,8 @@ export async function obtainConnectionConfiguration(
     oraRef: Ora,
     repository: Repository,
     connectionConfiguration: DPMConfiguration,
-    defaults: boolean | undefined
+    defaults: boolean | undefined,
+    overrideDefaultValues: DPMConfiguration = {}
 ): Promise<{ connectionConfiguration: DPMConfiguration; parameterCount: number } | false> {
     if (!repository.requiresConnectionConfiguration()) return { connectionConfiguration, parameterCount: 0 };
 
@@ -56,16 +57,35 @@ export async function obtainConnectionConfiguration(
         }
     }
 
+    return promptForConnectionConfiguration(
+        oraRef,
+        repository,
+        connectionConfiguration,
+        defaults,
+        overrideDefaultValues
+    );
+}
+
+export async function promptForConnectionConfiguration(
+    oraRef: Ora,
+    repository: Repository,
+    connectionConfiguration: DPMConfiguration,
+    defaults: boolean | undefined,
+    overrideDefaultValues: DPMConfiguration = {}
+): Promise<{ connectionConfiguration: DPMConfiguration; parameterCount: number }> {
     let connectionSuccess = false;
 
     let parameterCount = 0;
     while (!connectionSuccess) {
         parameterCount += await repeatedlyPromptParameters(
             async () => {
-                return repository.getConnectionParameters(connectionConfiguration);
+                const parameters = await repository.getConnectionParameters(connectionConfiguration);
+
+                return parameters;
             },
             connectionConfiguration,
-            defaults || false
+            defaults || false,
+            overrideDefaultValues
         );
 
         const connectionTestResults = await repository.testConnection(connectionConfiguration);
@@ -77,6 +97,5 @@ export async function obtainConnectionConfiguration(
             connectionSuccess = true;
         }
     }
-
     return { connectionConfiguration, parameterCount };
 }
