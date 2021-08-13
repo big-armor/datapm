@@ -87,10 +87,5 @@
         "ts-node": "~8.3.0",
         "tslint": "~6.1.0",
         "typescript": "~3.9.5"
-    },
-    "husky": {
-        "hooks": {
-            "pre-commit": "npm run lint:fix"
-        }
     }
 }
