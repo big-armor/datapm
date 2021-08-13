@@ -428,11 +428,7 @@ export async function addCredentials(argv: CredentialsAddArguments): Promise<voi
         throw new Error("Repository configuration for " + argv.repositoryIdentifier + " not found.");
     }
 
-    const credentialsConfig = promptForCredentialsConfiguration(
-
-        FINISH HERE....
-
-
+    /** More to do here */
 }
 
 export async function removeCredentials(argv: CredentialsRemoveArguments): Promise<void> {
