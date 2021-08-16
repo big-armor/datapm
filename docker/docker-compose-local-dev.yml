@@ -5,20 +5,6 @@ volumes:
     registry_file_store: {}
 
 services:
-    datapm-registry:
-        image: datapm-registry
-        ports:
-            - "4000:4000"
-        depends_on:
-            - "postgres"
-            - "smtp"
-        env_file:
-            - Docker-env
-        volumes:
-            - type: volume
-              source: registry_file_store
-              target: /var/lib/datapm-registry/data
-              consistency: cached
     postgres:
         image: postgres:13.3
         volumes:

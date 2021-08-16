@@ -1,9 +1,9 @@
 # TODO Needs Linting
 backend
+frontend
 docs
 
 # Has its own linting
-frontend
 client
 
 # Never Lint

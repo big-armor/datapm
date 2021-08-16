@@ -8,7 +8,7 @@
         "prebuild": "rm -rf dist; npm run codegen",
         "build": "tsc",
         "postbuild": "gulp",
-        "prestart": "npm run codegen",
+        "prestart": "npm run codegen && docker-compose -f ../docker/docker-compose-local-dev.yml  up -d ",
         "start": "TS_NODE_FILES=true . ./env.sh && nodemon --watch 'src' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts",
         "prestart-nowatch": "npm run codegen",
         "start-nowatch": ". ./env.sh && ts-node src/index.ts",
@@ -121,10 +121,5 @@
         "tsc-watch": "^4.2.3",
         "tslint": "^6.1.2",
         "typescript": "^4.0.3"
-    },
-    "husky": {
-        "hooks": {
-            "pre-commit": "npm run lint:fix"
-        }
     }
 }

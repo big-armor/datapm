@@ -15,11 +15,11 @@
                                 >
                                 </app-avatar>
                             </div>
-                            <div class="bd-highlight">
+                            <div class="following-box bd-highlight">
                                 <a class="person-card-name" [routerLink]="'/' + log.author.username"
                                     >{{ log.authorFullName }}
                                 </a>
-                                <span class="text-dark-gray">
+                                <span class="text-light-gray">
                                     <span>{{ log.changeTypeLabel }}</span>
                                     <span *ngIf="log.changedEntityInformation?.affectedEntityInformation">
                                         {{ log.changedEntityInformation.affectedEntityInformation.type }}

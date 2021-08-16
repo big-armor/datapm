@@ -1,6 +1,6 @@
 {
     "name": "datapm-client",
-    "version": "0.6.255",
+    "version": "0.6.259",
     "description": "The client for manipulating data",
     "scripts": {
         "prebuild": "npm run codegen",
