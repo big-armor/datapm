@@ -6,6 +6,7 @@
     "typings": "backend/dist/index.d.ts",
     "module": "backend/dist/index.js",
     "scripts": {
+        "prepare-dev-environment": "gulp prepareDevEnvironment",
         "clean": "rm -rf node_modules dist lib/node_modules lib/dist frontend/dist frontend/node_modules backend/dist backend/node_modules frontend/node_modules docs/website/node_modules docs/website/build",
         "build": "gulp",
         "build:parallel": "gulp buildParallel",

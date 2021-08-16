@@ -15,6 +15,10 @@ function readPackageVersion() {
     return packageFile.version;
 }
 
+function installRootDependencies() {
+    return spawnAndLog("root-deps", "npm", ["ci"]);
+}
+
 function installLibDependencies() {
     return spawnAndLog("lib-deps", "npm", ["ci"], { cwd: "lib" });
 }
@@ -285,3 +289,13 @@ exports.deployAssets = series(
 );
 
 exports.buildRegistryDockerImage = series(prepareRegistryDockerBuildAssets, buildRegistryDockerImage);
+
+exports.prepareDevEnvironment = series(
+    installRootDependencies,
+    installLibDependencies,
+    buildLib,
+    series(installBackendDependencies, parallel(buildBackend)),
+    series(installFrontendDependencies),
+    series(installDocsDependencies),
+    series(installClientDependencies)
+);
