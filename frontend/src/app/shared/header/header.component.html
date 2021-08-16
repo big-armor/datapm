@@ -1,12 +1,17 @@
-<div class="container">
-    <div class="row pl-0 pt-3 pr-0 pb-3 desktop-menu">
+<div class="container-fluid p-0">
+    <app-builder-io-renderer *ngIf="loadedBuilderTemplate; else loadingTemplate" [apiKey]="apiKey" [entry]="entry">
+        <div class="container">Failed to load footer</div>
+    </app-builder-io-renderer>
+
+    <ng-template #loadingTemplate></ng-template>
+    <div class="row p-2 desktop-menu">
         <div class="px-0 col-md-10 col-sm-12">
             <div class="d-flex flex-row bd-highlight">
                 <div class="pr-2 pt-2 pb-2 bd-highlight align-self-center logo-div">
                     <h1 class="mr-4 mb-0"><a class="dpm-text-logo" (click)="goHome()">datapm</a></h1>
                 </div>
                 <div class="p-2 bd-highlight w-100">
-                    <div class="input-group mt-1 search-box">
+                    <div class="input-group search-box">
                         <form class="search-form">
                             <app-input
                                 placeholder="Search For Data..."

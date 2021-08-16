@@ -3,8 +3,9 @@
 @import "../../../styles/colors";
 
 .desktop-menu {
-    max-width: 1450px;
-    margin: 0 auto 15px auto;
+    background-color: var(--header-color);
+    border-top: 1px solid var(--gray-5-color);
+    margin: 0;
 
     .main-menu-title {
         a {
@@ -111,6 +112,8 @@ app-avatar {
     .mobile-menu {
         display: block;
         padding-bottom: 15px;
+        background-color: var(--header-color);
+        border-top: 1px solid #33333321;
     }
     .desktop-menu {
         display: none;

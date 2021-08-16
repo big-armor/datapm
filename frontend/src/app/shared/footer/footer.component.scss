@@ -4,7 +4,12 @@
 .footer-bg {
     padding: 20px 15px 20px 15px;
     width: 100%;
-    border-top: 1px solid var(--gray-5-color);
+    border-top: 1px solid var(--gray-4-color);
+    background: var(--footer-bg);
+
+    &:first-child {
+        border-top: 1px solid var(--tranparent-border);
+    }
 
     .darkmode-div {
         cursor: pointer;

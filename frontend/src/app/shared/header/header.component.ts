@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Component, OnInit, OnDestroy, ElementRef, AfterViewInit } from "@angular/core";
 import { ActivatedRoute, ParamMap, Router } from "@angular/router";
 import { FormControl } from "@angular/forms";
 import { takeUntil, startWith, map, filter, debounceTime, switchMap } from "rxjs/operators";
@@ -11,6 +11,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { LoginDialogComponent } from "./login-dialog/login-dialog.component";
 import { SignUpDialogComponent } from "./sign-up-dialog/sign-up-dialog.component";
 import { ForgotPasswordDialogComponent } from "./forgot-password-dialog/forgot-password-dialog.component";
+import { BuilderIOService } from "src/app/imported/resource-importer.service";
 
 enum State {
     INIT,
@@ -29,8 +30,18 @@ interface Option {
     templateUrl: "./header.component.html",
     styleUrls: ["./header.component.scss"]
 })
-export class HeaderComponent implements OnInit, OnDestroy {
+export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
     state = State.INIT;
+
+    private readonly BUILDER_IO_ENTRY_KEY = "header";
+
+    private readonly JAVASCRIPT_ELEMENT_TYPE = "script";
+    private readonly JAVASCRIPT_SCRIPT_TYPE = "text/javascript";
+
+    public apiKey: string;
+    public entry: string;
+
+    public loadedBuilderTemplate = false;
 
     currentUser: User;
     searchControl: FormControl;
@@ -44,7 +55,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
         private router: Router,
         private route: ActivatedRoute,
         private authenticationService: AuthenticationService,
-        private autocomplete: AutoCompleteGQL
+        private autocomplete: AutoCompleteGQL,
+        private builderIOService: BuilderIOService,
+        private elementRef: ElementRef
     ) {
         this.searchControl = new FormControl("");
     }
@@ -109,6 +122,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
         });
     }
 
+    public ngAfterViewInit(): void {
+        this.loadContent();
+    }
+
     public autoComplete(val: string): void {
         this.autocomplete.fetch({ startsWith: val }).subscribe(({ data }) => {
             if (!data) return;
@@ -158,5 +175,39 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.router.navigate(["/" + event.option.value]);
         this.searchControl.setValue("");
         this.autoCompleteResult = null;
+    }
+
+    private loadContent(): void {
+        this.loadedBuilderTemplate = false;
+        this.builderIOService
+            .getBuilderIOApiKey()
+            .pipe(takeUntil(this.subscription))
+            .subscribe((apiKey) => {
+                const entry = this.builderIOService.getTemplateEntryByPageKey(this.BUILDER_IO_ENTRY_KEY);
+                if (entry) {
+                    this.loadJavascriptAndInjectIntoTemplate(apiKey, entry);
+                } else {
+                    this.loadedBuilderTemplate = true;
+                }
+            });
+    }
+
+    private loadJavascriptAndInjectIntoTemplate(apiKey: string, entry: string): void {
+        this.builderIOService
+            .getBuilderIOScript()
+            .pipe(takeUntil(this.subscription))
+            .subscribe((js) => {
+                this.apiKey = apiKey;
+                this.entry = entry;
+                this.injectJavascriptIntoTemplate(js);
+                this.loadedBuilderTemplate = true;
+            });
+    }
+
+    private injectJavascriptIntoTemplate(js: string): void {
+        const script = document.createElement(this.JAVASCRIPT_ELEMENT_TYPE);
+        script.type = this.JAVASCRIPT_SCRIPT_TYPE;
+        script.innerHTML = js;
+        this.elementRef.nativeElement.appendChild(script);
     }
 }

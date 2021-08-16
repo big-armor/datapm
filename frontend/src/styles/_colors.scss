@@ -4,6 +4,9 @@ $primary-color-dark: #e6eaef;
 $secondary-color: #fff;
 $secondary-color-dark: #202124;
 
+$footer-bg: #dfe1e4;
+$footer-bg-dark: #202124;
+
 $secondary-1-color: #ffffffb3;
 $secondary-1-color-dark: #fff;
 
@@ -16,6 +19,9 @@ $primary-1-color-dark: rgba($primary-color-dark, 0.08);
 $custom-secondary-hover-color: #fffdfd;
 $custom-secondary-hover-color-dark: rgb(65 67 70);
 
+$header-color: #f1f5f9;
+$header-color-dark: #202124;
+
 $gray-1-color: #333;
 $gray-1-color-dark: #fff;
 
@@ -26,7 +32,7 @@ $gray-3-color: #828282;
 $gray-3-color-dark: #f1f2f3;
 
 $gray-4-color: #bdbdbd;
-$gray-4-color-dark: #bdbdbd;
+$gray-4-color-dark: #bdbdbd52;
 
 $gray-5-color: #e0e0e0;
 $gray-5-color-dark: #5e5e60;
@@ -157,6 +163,44 @@ $active-option-dark: #4d8cd6;
 $carousel-arrows: #fff;
 $carousel-arrows-dark: #c2c3c5;
 
+$demo-section-color: #5086b8;
+$demo-section-color-dark: #303033;
+
+// dark/light theme
+$main-slider-color: url("https://cdn.builder.io/api/v1/image/assets%2Ff0159525731347b78cac1dcc848d4ff6%2F1ba2488b17cd48b7bd8edccd58059417?width=1160");
+$main-slider-color-dark: url("/assets/images/slider.jpg");
+
+$solution-color: url("https://cdn.builder.io/api/v1/image/assets%2Ff0159525731347b78cac1dcc848d4ff6%2Fb6c64520ad6742999fcda113396b3b9c?width=1160");
+$solution-color-dark: url("/assets/images/solution.jpg");
+
+$bullet-color: url("https://cdn.builder.io/api/v1/image/assets%2Ff0159525731347b78cac1dcc848d4ff6%2F4120185e33564c1cbb6fe7a6495199aa?width=20");
+$bullet-color-dark: url("/assets/images/bullet.png");
+
+$catalog-color: url("https://cdn.builder.io/api/v1/image/assets%2Ff0159525731347b78cac1dcc848d4ff6%2F0feed2a1d2914f679f9ea171e3f1de9d?width=898");
+$catalog-color-dark: url("/assets/images/data-catalog.png");
+
+$automatic-data-color: url("https://cdn.builder.io/api/v1/image/assets%2Ff0159525731347b78cac1dcc848d4ff6%2F02c01ca2126a4c8780decd2c5f751896");
+$automatic-data-color-dark: url("/assets/images/automatic-data.png");
+
+$data-marketplace-color: url("https://cdn.builder.io/api/v1/image/assets%2Ff0159525731347b78cac1dcc848d4ff6%2F58422933a16d490e839b795573f56e38?width=898");
+$data-marketplace-color-dark: url("/assets/images/data-marketplace.png");
+
+$no-code-color: url("https://cdn.builder.io/api/v1/image/assets%2Ff0159525731347b78cac1dcc848d4ff6%2F4ddfc47a37bb46cab6005cb94b5513cd?width=898");
+$no-code-color-dark: url("/assets/images/no-code.png");
+
+$convenient-color: url("https://cdn.builder.io/api/v1/image/assets%2Ff0159525731347b78cac1dcc848d4ff6%2F1ad683acd61a4226b309c1af9f796ea1?width=898");
+$convenient-color-dark: url("/assets/images/convenient.png");
+
+$streamlined-color: url("https://cdn.builder.io/api/v1/image/assets%2Ff0159525731347b78cac1dcc848d4ff6%2Fdf607f7d7331486ba18c0b44c28e08d2?width=898");
+$streamlined-color-dark: url("/assets/images/streamlined.png");
+
+$brimming-color: url("https://cdn.builder.io/api/v1/image/assets%2Ff0159525731347b78cac1dcc848d4ff6%2F7e846cb33ebe44ba8064f05de7c31040?width=898");
+$brimming-color-dark: url("/assets/images/brimming.png");
+
+$synergistic-color: url("https://cdn.builder.io/api/v1/image/assets%2Ff0159525731347b78cac1dcc848d4ff6%2F9ef67aaaf75543f9b0f9461349dddfd6?width=898");
+$synergistic-color-dark: url("/assets/images/synergistic.png");
+// dark/light theme
+
 $colors: (
     --primary-color: (
         $primary-color,
@@ -165,6 +209,10 @@ $colors: (
     --secondary-color: (
         $secondary-color,
         $secondary-color-dark
+    ),
+    --footer-bg: (
+        $footer-bg,
+        $footer-bg-dark
     ),
     --secondary-1-color: (
         $secondary-1-color,
@@ -177,6 +225,10 @@ $colors: (
     --custom-secondary-hover-color: (
         $custom-secondary-hover-color,
         $custom-secondary-hover-color-dark
+    ),
+    --header-color: (
+        $header-color,
+        $header-color-dark
     ),
     --primary-1-color: (
         $primary-1-color,
@@ -357,5 +409,53 @@ $colors: (
     --carousel-arrows: (
         $carousel-arrows,
         $carousel-arrows-dark
+    ),
+    --main-slider-color: (
+        $main-slider-color,
+        $main-slider-color-dark
+    ),
+    --demo-section-color: (
+        $demo-section-color,
+        $demo-section-color-dark
+    ),
+    --solution-color: (
+        $solution-color,
+        $solution-color-dark
+    ),
+    --bullet-color: (
+        $bullet-color,
+        $bullet-color-dark
+    ),
+    --catalog-color: (
+        $catalog-color,
+        $catalog-color-dark
+    ),
+    --automatic-data-color: (
+        $automatic-data-color,
+        $automatic-data-color-dark
+    ),
+    --data-marketplace-color: (
+        $data-marketplace-color,
+        $data-marketplace-color-dark
+    ),
+    --no-code-color: (
+        $no-code-color,
+        $no-code-color-dark
+    ),
+    --convenient-color: (
+        $convenient-color,
+        $convenient-color-dark
+    ),
+    --streamlined-color: (
+        $streamlined-color,
+        $streamlined-color-dark
+    ),
+    --brimming-color: (
+        $brimming-color,
+        $brimming-color-dark
+    ),
+    --synergistic-color: (
+        $synergistic-color,
+        $synergistic-color-dark
     )
 );

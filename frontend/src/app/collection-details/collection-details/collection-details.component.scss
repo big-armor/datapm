@@ -4,6 +4,7 @@
 .collection-details {
     position: relative;
     color: var(--gray-1-color);
+    margin-top: 20px;
 
     app-cover ::ng-deep img {
         height: $cover-height;
