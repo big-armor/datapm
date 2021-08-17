@@ -1,17 +1,18 @@
 import chalk from "chalk";
 import ora, { Ora } from "ora";
 import prompts from "prompts";
-import { DPMConfiguration } from "../../../lib/dist/src/PackageUtil";
+import { DPMConfiguration } from "datapm-lib";
 import { Repository, RepositoryDescription } from "../repository/Repository";
 import { getRepositoryDescriptionByType, getRepositoryDescriptions } from "../repository/RepositoryUtil";
 import {
     getRepositoryConfigs,
     removeCredentialsConfig,
     removeRepositoryConfig,
-    saveRepositoryConfig
+    saveRepositoryConfig,
+    saveRepositoryCredential
 } from "../util/ConfigUtil";
 import { promptForConnectionConfiguration } from "../util/ConnectionUtil";
-import { obtainCredentialsConfiguration } from "../util/CredentialsUtil";
+import { obtainCredentialsConfiguration, promptForCredentials } from "../util/CredentialsUtil";
 import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
 import {
     Commands,
@@ -69,8 +70,6 @@ async function promptForRepositoryType(
         );
 
         repositoryType = repositoryTypeResult.type;
-    } else {
-        console.log(chalk.magenta("Adding a " + repositoryType + " Repository"));
     }
 
     if (repositoryType == null) {
@@ -189,6 +188,15 @@ export async function updateRepository(argv: RepositoryUpdateArguments): Promise
         // select repository from configuration
         const existingConnectionConfigurations = getRepositoryConfigs(repositoryDescription.getType());
 
+        if (existingConnectionConfigurations.length === 0) {
+            oraRef.fail(
+                "There are no saved " +
+                    repositoryDescription.getDisplayName() +
+                    " repositories. Use the 'datapm repository add' command."
+            );
+            process.exit(1);
+        }
+
         const connectionConfigurationResult = await prompts(
             [
                 {
@@ -292,6 +300,8 @@ export async function addRepository(argv: RepositoryAddArguments): Promise<void>
 
     let connectionConfiguration: DPMConfiguration = {};
 
+    console.log(chalk.magenta(repositoryDescription.getDisplayName() + " Connection Information"));
+
     const connectionConfigurationResponse = await promptForConnectionConfiguration(
         oraRef,
         repository,
@@ -321,7 +331,7 @@ export async function addRepository(argv: RepositoryAddArguments): Promise<void>
 
     if (repository.requiresCredentialsConfiguration()) {
         console.log("\n");
-        console.log(chalk.magenta("Repository Credentials"));
+        console.log(chalk.magenta(repositoryIdentifier + " Credentials"));
 
         const credentialsResult = await obtainCredentialsConfiguration(
             oraRef,
@@ -428,7 +438,55 @@ export async function addCredentials(argv: CredentialsAddArguments): Promise<voi
         throw new Error("Repository configuration for " + argv.repositoryIdentifier + " not found.");
     }
 
-    /** More to do here */
+    const repository = await repositoryDescription.getRepository();
+
+    if (!repository.requiresCredentialsConfiguration()) {
+        console.log("Repository type " + repositoryDescription.getType() + " does not require credentials");
+        process.exit(1);
+    }
+
+    console.log("\n");
+    console.log(chalk.magenta("Repository Credentials"));
+
+    const credentialsResult = await promptForCredentials(
+        oraRef,
+        repository,
+        repositoryConfig.connectionConfiguration,
+        {},
+        false,
+        {}
+    );
+
+    const credentialsConfiguration = credentialsResult.credentialsConfiguration;
+
+    const credentialsIdentifier = await repository.getCredentialsIdentifierFromConfiguration(
+        credentialsResult.credentialsConfiguration,
+        credentialsConfiguration
+    );
+
+    const repositoryIdentifier = await repository.getConnectionIdentifierFromConfiguration(
+        repositoryConfig.connectionConfiguration
+    );
+
+    repositoryConfig.credentials = repositoryConfig.credentials?.filter((c) => c.identifier === credentialsIdentifier);
+
+    saveRepositoryConfig(repositoryDescription.getType(), repositoryConfig);
+
+    saveRepositoryCredential(
+        repository.getType(),
+        repositoryIdentifier,
+        credentialsIdentifier,
+        credentialsConfiguration
+    );
+
+    oraRef.succeed(
+        "Saved " +
+            repository.getType() +
+            " " +
+            repositoryConfig.identifier +
+            " credentials for " +
+            credentialsIdentifier
+    );
 }
 
 export async function removeCredentials(argv: CredentialsRemoveArguments): Promise<void> {

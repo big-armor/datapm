@@ -28,7 +28,7 @@ const configSchema = {
                         type: "object",
                         properties: {
                             identifier: { type: "string" },
-                            encryptedCredentials: { type: "string" },
+                            encryptedConfiguration: { type: "string" },
                             iv: { type: "string" }
                         }
                     }

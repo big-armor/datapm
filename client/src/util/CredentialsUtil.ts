@@ -87,6 +87,42 @@ export async function obtainCredentialsConfiguration(
         }
     }
 
+    const credentialsPromptResponse = await promptForCredentials(
+        oraRef,
+        repository,
+        connectionConfiguration,
+        credentialsConfiguration,
+        defaults || false,
+        overrideDefaultValues
+    );
+
+    if (Object.keys(credentialsConfiguration).length > 0) {
+        const credentialsIdentifier = await repository.getCredentialsIdentifierFromConfiguration(
+            connectionConfiguration,
+            credentialsConfiguration
+        );
+
+        saveRepositoryConfig(repository.getType(), repositoryConfig);
+
+        await saveRepositoryCredential(
+            repository.getType(),
+            repositoryIdentifier,
+            credentialsIdentifier,
+            credentialsConfiguration
+        );
+    }
+
+    return { credentialsConfiguration, parameterCount: credentialsPromptResponse.parameterCount };
+}
+
+export async function promptForCredentials(
+    oraRef: Ora,
+    repository: Repository,
+    connectionConfiguration: DPMConfiguration,
+    credentialsConfiguration: DPMConfiguration,
+    defaults: boolean,
+    overrideDefaultValues: DPMConfiguration
+): Promise<{ credentialsConfiguration: DPMConfiguration; parameterCount: number }> {
     let credentialsSuccess = false;
     let parameterCount = 0;
     while (!credentialsSuccess) {
@@ -113,21 +149,8 @@ export async function obtainCredentialsConfiguration(
         }
     }
 
-    if (Object.keys(credentialsConfiguration).length > 0) {
-        const credentialsIdentifier = await repository.getCredentialsIdentifierFromConfiguration(
-            connectionConfiguration,
-            credentialsConfiguration
-        );
-
-        saveRepositoryConfig(repository.getType(), repositoryConfig);
-
-        await saveRepositoryCredential(
-            repository.getType(),
-            repositoryIdentifier,
-            credentialsIdentifier,
-            credentialsConfiguration
-        );
-    }
-
-    return { credentialsConfiguration, parameterCount };
+    return {
+        credentialsConfiguration,
+        parameterCount
+    };
 }

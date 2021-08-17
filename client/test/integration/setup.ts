@@ -112,7 +112,7 @@ before(async function () {
 
             console.log("Test data server started on port " + dataServerPort);
         },
-        title: "Start Server Process"
+        title: "Start test data server"
     });
 
     // eslint-disable-next-line no-async-promise-executor

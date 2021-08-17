@@ -90,26 +90,41 @@ export class RepositoryCommand implements Command {
                         handler: removeRepository
                     })
                     .command({
-                        command: "credentials",
+                        command: "credential",
                         describe: "",
                         builder: (yargs) => {
-                            return yargs.command({
-                                command: "remove [repositoryType] [repositoryIdentifier] [credentialsIdentifier]",
-                                describe: "",
-                                builder: (yargs) => {
-                                    return yargs
-                                        .positional("repositoryType", {
-                                            type: "string"
-                                        })
-                                        .positional("repositoryIdentifier", {
-                                            type: "string"
-                                        })
-                                        .positional("credentialsIdentifier", {
-                                            type: "string"
-                                        });
-                                },
-                                handler: removeCredentials
-                            });
+                            return yargs
+                                .command({
+                                    command: "add [repositoryType] [repositoryIdentifier]",
+                                    describe: "",
+                                    builder: (yargs) => {
+                                        return yargs
+                                            .positional("repositoryType", {
+                                                type: "string"
+                                            })
+                                            .positional("repositoryIdentifier", {
+                                                type: "string"
+                                            });
+                                    },
+                                    handler: addCredentials
+                                })
+                                .command({
+                                    command: "remove [repositoryType] [repositoryIdentifier] [credentialsIdentifier]",
+                                    describe: "",
+                                    builder: (yargs) => {
+                                        return yargs
+                                            .positional("repositoryType", {
+                                                type: "string"
+                                            })
+                                            .positional("repositoryIdentifier", {
+                                                type: "string"
+                                            })
+                                            .positional("credentialsIdentifier", {
+                                                type: "string"
+                                            });
+                                    },
+                                    handler: removeCredentials
+                                });
                         },
                         handler: removeRepository
                     });
@@ -153,6 +168,16 @@ export async function removeRepository(args: RepositoryRemoveArguments): Promise
     try {
         const module = await import("./RepositoryCommandModule");
         await module.removeRepository(args);
+    } catch (error) {
+        console.error(error);
+        process.exit(1);
+    }
+}
+
+export async function addCredentials(args: CredentialsAddArguments): Promise<void> {
+    try {
+        const module = await import("./RepositoryCommandModule");
+        await module.addCredentials(args);
     } catch (error) {
         console.error(error);
         process.exit(1);
