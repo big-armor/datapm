@@ -84,7 +84,7 @@ describe("Repository Command Tests", async function () {
             ]
         );
 
-        expect(exitCode).equal(0);
+        expect(exitCode.code).equal(0);
         const repositories = getRepositoryConfigs(POSTGRES_TYPE);
 
         expect(repositories.length).equal(1);
@@ -93,6 +93,73 @@ describe("Repository Command Tests", async function () {
         expect((repositories[0].credentials as RepositoryCredentialsConfig[])[0].identifier).equal(`postgres`);
         expect((repositories[0].credentials as RepositoryCredentialsConfig[])[1].identifier).equal(`another`);
     });
+
+    it("Add Credential", async function () {
+        const exitCode = await testCmd(
+            "repository",
+            ["credential", "add"],
+            [
+                {
+                    message: "Repository Type?",
+                    input: "Postgres" + KEYS.ENTER
+                },
+                {
+                    message: "Repository?",
+                    input: "newhost:888" + KEYS.ENTER
+                },
+                {
+                    message: "Username?",
+                    input: "another2" + KEYS.ENTER
+                },
+                {
+                    message: "Password",
+                    input: "testing" + KEYS.ENTER
+                }
+            ]
+        );
+
+        expect(exitCode.code).equal(0);
+        const repositories = getRepositoryConfigs(POSTGRES_TYPE);
+
+        expect(repositories.length).equal(1);
+        expect(repositories[0].connectionConfiguration.host).equal(`newhost`);
+        expect(repositories[0].connectionConfiguration.port).equal(888);
+        expect((repositories[0].credentials as RepositoryCredentialsConfig[])[0].identifier).equal(`postgres`);
+        expect((repositories[0].credentials as RepositoryCredentialsConfig[])[1].identifier).equal(`another`);
+        expect((repositories[0].credentials as RepositoryCredentialsConfig[])[2].identifier).equal(`another2`);
+    });
+
+    it("Remove Credential", async function () {
+        const exitCode = await testCmd(
+            "repository",
+            ["credential", "remove"],
+            [
+                {
+                    message: "Repository Type?",
+                    input: "Postgres" + KEYS.ENTER
+                },
+                {
+                    message: "Repository?",
+                    input: "newhost:888" + KEYS.ENTER
+                },
+                {
+                    message: "Credential to Remove?",
+                    input: "postgres" + KEYS.ENTER
+                }
+            ],
+            (line) => console.log(line)
+        );
+
+        expect(exitCode.code).equal(0);
+        const repositories = getRepositoryConfigs(POSTGRES_TYPE);
+
+        expect(repositories.length).equal(1);
+        expect(repositories[0].connectionConfiguration.host).equal(`newhost`);
+        expect(repositories[0].connectionConfiguration.port).equal(888);
+        expect((repositories[0].credentials as RepositoryCredentialsConfig[])[0].identifier).equal(`another`);
+        expect((repositories[0].credentials as RepositoryCredentialsConfig[])[1].identifier).equal(`another2`);
+    });
+
     it("Remove repository", async function () {
         const exitCode = await testCmd(
             "repository",
@@ -103,7 +170,7 @@ describe("Repository Command Tests", async function () {
                     input: "Postgres" + KEYS.ENTER
                 },
                 {
-                    message: "Repository?",
+                    message: "Repository to remove?",
                     input: "newhost:888" + KEYS.ENTER
                 }
             ]

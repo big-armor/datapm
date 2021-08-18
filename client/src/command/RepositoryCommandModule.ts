@@ -155,7 +155,7 @@ export async function removeRepository(argv: RepositoryRemoveArguments): Promise
         const existingConfigurationPromptResult = await prompts({
             name: "connectionConfiguration",
             type: "autocomplete",
-            message: "Repository?",
+            message: "Repository to Remove?",
             choices
         });
 
@@ -468,10 +468,6 @@ export async function addCredentials(argv: CredentialsAddArguments): Promise<voi
         repositoryConfig.connectionConfiguration
     );
 
-    repositoryConfig.credentials = repositoryConfig.credentials?.filter((c) => c.identifier === credentialsIdentifier);
-
-    saveRepositoryConfig(repositoryDescription.getType(), repositoryConfig);
-
     saveRepositoryCredential(
         repository.getType(),
         repositoryIdentifier,
@@ -584,7 +580,7 @@ export async function removeCredentials(argv: CredentialsRemoveArguments): Promi
     }
 
     if (argv.credentialsIdentifier == null) {
-        oraRef.info("Credential identifier not provided.");
+        oraRef.info("Credential identifier not found.");
         return;
     }
 

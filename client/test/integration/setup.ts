@@ -53,6 +53,15 @@ before(async function () {
 
     listrTasks.push({
         task: async function (): Promise<void> {
+            await execa("npm", ["run", "build"], {
+                cwd: "../backend"
+            });
+        },
+        title: "Build Server"
+    });
+
+    listrTasks.push({
+        task: async function (): Promise<void> {
             databaseContainer = await new GenericContainer("postgres", "13.3")
                 .withEnv("POSTGRES_USER", "postgres")
                 .withEnv("POSTGRES_PASSWORD", "postgres")
@@ -133,7 +142,7 @@ before(async function () {
         await startServerProcess(
             "Registry",
             "npm",
-            ["run", "start-nowatch"],
+            ["run", "start:server"],
             "../backend",
             {
                 PORT: registryServerPort.toString(),
