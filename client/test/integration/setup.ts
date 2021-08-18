@@ -10,7 +10,8 @@ import { RandomUuid } from "testcontainers/dist/uuid";
 import { Listr, ListrContext, ListrTask } from "listr2";
 // const log = require("why-is-node-running");
 
-export const TEMP_STORAGE_PATH = "tmp-registry-server-storage-" + new RandomUuid().nextUuid();
+const TEMP_STORAGE_PREFIX = "tmp-registry-server-storage-";
+export const TEMP_STORAGE_PATH = TEMP_STORAGE_PREFIX + new RandomUuid().nextUuid();
 export const TEMP_STORAGE_URL = "file://" + TEMP_STORAGE_PATH;
 const MAX_SERVER_LOG_LINES = 25;
 
@@ -51,14 +52,14 @@ before(async function () {
         title: "Build Client"
     });
 
-    listrTasks.push({
+    /* listrTasks.push({
         task: async function (): Promise<void> {
             await execa("npm", ["run", "build"], {
                 cwd: "../backend"
             });
         },
         title: "Build Server"
-    });
+    }); */
 
     listrTasks.push({
         task: async function (): Promise<void> {
@@ -122,6 +123,12 @@ before(async function () {
             console.log("Test data server started on port " + dataServerPort);
         },
         title: "Start test data server"
+    });
+
+    listrTasks.push({
+        task: async function (): Promise<void> {
+            fs.rmdirSync(TEMP_STORAGE_PATH, { recursive: true });
+        }
     });
 
     // eslint-disable-next-line no-async-promise-executor

@@ -155,7 +155,7 @@ export async function removeRepository(argv: RepositoryRemoveArguments): Promise
         const existingConfigurationPromptResult = await prompts({
             name: "connectionConfiguration",
             type: "autocomplete",
-            message: "Repository to Remove?",
+            message: "Repository to remove?",
             choices
         });
 
@@ -169,6 +169,7 @@ export async function removeRepository(argv: RepositoryRemoveArguments): Promise
     removeRepositoryConfig(argv.repositoryType, argv.repositoryIdentifier);
 
     oraRef.succeed("The " + argv.repositoryType + " repository " + argv.repositoryIdentifier + " has been removed.");
+    process.exit(0);
 }
 
 export async function updateRepository(argv: RepositoryUpdateArguments): Promise<void> {
@@ -361,6 +362,8 @@ export async function addRepository(argv: RepositoryAddArguments): Promise<void>
         console.log(chalk.green("datapm repository update " + repository.getType() + " " + repositoryIdentifier));
         console.log("\n");
     }
+
+    process.exit(0);
 }
 
 export async function addCredentials(argv: CredentialsAddArguments): Promise<void> {
@@ -468,7 +471,7 @@ export async function addCredentials(argv: CredentialsAddArguments): Promise<voi
         repositoryConfig.connectionConfiguration
     );
 
-    saveRepositoryCredential(
+    await saveRepositoryCredential(
         repository.getType(),
         repositoryIdentifier,
         credentialsIdentifier,
@@ -483,6 +486,8 @@ export async function addCredentials(argv: CredentialsAddArguments): Promise<voi
             " credentials for " +
             credentialsIdentifier
     );
+
+    process.exit(0);
 }
 
 export async function removeCredentials(argv: CredentialsRemoveArguments): Promise<void> {
@@ -595,4 +600,6 @@ export async function removeCredentials(argv: CredentialsRemoveArguments): Promi
             argv.credentialsIdentifier +
             " has been removed."
     );
+
+    process.exit(0);
 }

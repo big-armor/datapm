@@ -50,6 +50,11 @@ export class FallbackCommand implements Command {
                         command: "registry",
                         describe: "registry actions",
                         handler: defaultRegistryCommand
+                    })
+                    .command({
+                        command: "repository",
+                        describe: "repository actions",
+                        handler: defaultRegistryCommand
                     });
             },
             handler: async () => {

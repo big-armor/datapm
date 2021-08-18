@@ -115,7 +115,8 @@ describe("Repository Command Tests", async function () {
                     message: "Password",
                     input: "testing" + KEYS.ENTER
                 }
-            ]
+            ],
+            (line) => console.log(line)
         );
 
         expect(exitCode.code).equal(0);
@@ -146,8 +147,7 @@ describe("Repository Command Tests", async function () {
                     message: "Credential to Remove?",
                     input: "postgres" + KEYS.ENTER
                 }
-            ],
-            (line) => console.log(line)
+            ]
         );
 
         expect(exitCode.code).equal(0);
@@ -173,17 +173,14 @@ describe("Repository Command Tests", async function () {
                     message: "Repository to remove?",
                     input: "newhost:888" + KEYS.ENTER
                 }
-            ]
+            ],
+            (line) => console.log(line)
         );
 
-        console.log("exited");
         const repositories = getRepositoryConfigs(POSTGRES_TYPE);
-        console.log("got configs");
 
-        expect(exitCode).equal(0);
-        console.log("evaluted exitcode");
+        expect(exitCode.code).equal(0);
 
         expect(repositories.length).equal(0);
-        console.log("evaluated length");
     });
 });
