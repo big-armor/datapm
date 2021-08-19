@@ -218,11 +218,16 @@ describe("Update Package Command Tests", async () => {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("update", ["test.datapm.json", "--forceUpdate"], prompts, async (line: string) => {
-            if (line.includes("When you are ready, you can publish with the following command")) {
-                results.messageFound = true;
+        const cmdResult = await testCmd(
+            "update",
+            ["test.datapm.json", "--forceUpdate"],
+            prompts,
+            async (line: string) => {
+                if (line.includes("When you are ready, you can publish with the following command")) {
+                    results.messageFound = true;
+                }
             }
-        });
+        );
 
         const newPackageFile: PackageFile = loadPackageFileFromDisk("test.datapm.json");
 
@@ -281,11 +286,16 @@ describe("Update Package Command Tests", async () => {
 
         const oldPackageFile: PackageFile = loadPackageFileFromDisk("test.datapm.json");
 
-        const cmdResult = await testCmd("update", ["test.datapm.json", "--forceUpdate"], prompts, async (line: string) => {
-            if (line.includes("When you are ready, you can publish with the following command")) {
-                results.messageFound = true;
+        const cmdResult = await testCmd(
+            "update",
+            ["test.datapm.json", "--forceUpdate"],
+            prompts,
+            async (line: string) => {
+                if (line.includes("When you are ready, you can publish with the following command")) {
+                    results.messageFound = true;
+                }
             }
-        });
+        );
 
         const newPackageFile: PackageFile = loadPackageFileFromDisk("test.datapm.json");
 

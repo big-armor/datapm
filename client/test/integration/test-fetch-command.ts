@@ -198,18 +198,23 @@ describe("Fetch Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("fetch", [packageAFilePath], prompts, async (line: string, promptIndex: number) => {
-            if (
-                promptIndex === prompts.length &&
-                line.includes("Next time you can run this same configuration in a single command.")
-            ) {
-                results.messageFound = true;
-            }
+        const cmdResult = await testCmd(
+            "fetch",
+            [packageAFilePath],
+            prompts,
+            async (line: string, promptIndex: number) => {
+                if (
+                    promptIndex === prompts.length &&
+                    line.includes("Next time you can run this same configuration in a single command.")
+                ) {
+                    results.messageFound = true;
+                }
 
-            if (line.includes("--sinkConfig") && line.includes("--defaults")) {
-                results.defaultsFound = true;
+                if (line.includes("--sinkConfig") && line.includes("--defaults")) {
+                    results.defaultsFound = true;
+                }
             }
-        });
+        );
 
         expect(cmdResult.code, "Exit code").equals(0);
         expect(results.messageFound, "Found success message").equals(true);
