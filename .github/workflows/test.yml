@@ -226,23 +226,30 @@ jobs:
               run: npm run build
               working-directory: lib
 
+            - name: Cache Backend Dependencies
+              id: cache-backend-dependencies
+              uses: actions/cache@v1
+              with:
+                  path: backend/node_modules
+                  key: datampm-registry-${{ runner.OS }}-backend-dependencies-${{ hashFiles('backend/package.json','backend/package-lock.json') }}
+
+            - name: Install Backend Dependencies
+              id: install-backend-Dependencies
+              if: steps.cache-backend-dependencies.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: backend
+
             - name: Cache Backend Dist
               id: cache-backend-dist
               uses: actions/cache@v1
               with:
                   path: backend/dist
-                  key: datampm-registry-${{ runner.OS }}-backend-${{ hashFiles('backend/**','lib/**') }}
-
-            - name: Install Backend Dependencies
-              id: install-backend-Dependencies
-              if: steps.cache-backend-dist.outputs.cache-hit != 'true'
-              run: npm ci
-              working-directory: backend
+                  key: datampm-registry-${{ runner.OS }}-backend-dist-${{ hashFiles('backend/**','lib/**') }}
 
             - name: Build Backend
               id: build-backend
               if: steps.cache-backend-dist.outputs.cache-hit != 'true'
-              run: npm ci
+              run: npm run build
               working-directory: backend
 
             - name: Cache Client Node_modules
