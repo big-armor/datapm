@@ -87,7 +87,7 @@ describe("Postgres Source Test", function () {
     });
 
     it("Can't connect to invalid URI", async function () {
-        const prompts = getPostgresSourcePromptInputs(["", "", "", "schema"], 2, 6);
+        const prompts = getPostgresSourcePromptInputs(["test", "test", "test", "schema"], 2, 6);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -98,7 +98,6 @@ describe("Postgres Source Test", function () {
             [`postgres://invalid-hostname/database`],
             prompts,
             async (line: string) => {
-                console.log(line);
                 if (line.includes(SourceErrors.CONNECTION_FAILED)) {
                     results.messageFound = true;
                 }
@@ -122,8 +121,6 @@ describe("Postgres Source Test", function () {
             [`postgres://${postgresHost}:${postgresPort}/database`],
             prompts,
             async (line: string) => {
-                console.log(line);
-
                 if (line.includes(SourceErrors.AUTHENTICATION_FAILED)) {
                     results.messageFound = true;
                 }
@@ -153,8 +150,6 @@ describe("Postgres Source Test", function () {
             ],
             prompts,
             async (line: string) => {
-                console.log(line);
-
                 if (line.includes("datapm publish ")) {
                     results.messageFound = true;
                 }
