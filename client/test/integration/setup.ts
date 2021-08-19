@@ -35,6 +35,7 @@ export const registryServerPort: number = Math.floor(Math.random() * (65535 - 10
 export const dataServerPort: number = Math.floor(Math.random() * (65535 - 1024) + 1024);
 
 before(async function () {
+    this.timeout(90000);
     network = await new Network().start();
 
     const runName = getRandomFruitsName("en")
@@ -145,6 +146,8 @@ before(async function () {
         process.exit(1);
     }
 
+    console.log("Starting registry server for tests");
+
     registryServerProcess = (
         await startServerProcess(
             "Registry",
@@ -170,6 +173,7 @@ before(async function () {
             serverErrorLogLines
         )
     ).serverProcess;
+
     console.log("Registry server started on port " + registryServerPort);
 
     /* const registryContainerReadable = await registryContainer.logs();
