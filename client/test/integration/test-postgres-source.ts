@@ -97,7 +97,7 @@ describe("Postgres Source Test", function () {
             "package",
             [`postgres://invalid-hostname/database`],
             prompts,
-            (line: string) => {
+            async (line: string) => {
                 console.log(line);
                 if (line.includes(SourceErrors.CONNECTION_FAILED)) {
                     results.messageFound = true;
@@ -121,7 +121,7 @@ describe("Postgres Source Test", function () {
             "package",
             [`postgres://${postgresHost}:${postgresPort}/database`],
             prompts,
-            (line: string) => {
+            async (line: string) => {
                 console.log(line);
 
                 if (line.includes(SourceErrors.AUTHENTICATION_FAILED)) {
@@ -152,7 +152,7 @@ describe("Postgres Source Test", function () {
                 JSON.stringify({ schema: schemaAName })
             ],
             prompts,
-            (line: string) => {
+            async (line: string) => {
                 console.log(line);
 
                 if (line.includes("datapm publish ")) {
@@ -225,7 +225,7 @@ describe("Postgres Source Test", function () {
             "package",
             [`postgres://`, "--defaults", "--configuration", JSON.stringify({ schema: schemaAName })],
             prompts,
-            (line: string) => {
+            async (line: string) => {
                 if (line.includes("datapm publish ")) {
                     results.messageFound = true;
                 }

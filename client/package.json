@@ -15,7 +15,7 @@
         "pretest": "npm run codegen",
         "test": "CREDENTIALS_SECRET_KEY=test mocha --slow 3000 --timeout 60000 -r ts-node/register test/integration/*.ts",
         "test:debug": "CREDENTIALS_SECRET_KEY=test npx mocha --slow 3000 --timeout 999999 -r ts-node/register",
-        "test:full": "npm run pretest; mocha --slow 3000 --timeout 60000 -r ts-node/register test/**/*.ts",
+        "test:full": "CREDENTIALS_SECRET_KEY=test mocha --slow 3000 --timeout 60000 -r ts-node/register test/**/*.ts",
         "lint": "npm run eslint",
         "lint:fix": "npm run eslint:fix",
         "eslint": "npx eslint \"src/**/*.ts\" \"test/**/*.ts\"",

@@ -270,7 +270,7 @@ export function testCmd(
         isDone?: boolean;
     }> = [],
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    callback: (line: string, index: number, cmdProcess: execa.ExecaChildProcess) => void = () => {}
+    callback: (line: string, index: number, cmdProcess: execa.ExecaChildProcess) => Promise<void> = async () => {}
 ): Promise<CmdResult> {
     let cmdProcess: execa.ExecaChildProcess;
 
@@ -298,7 +298,7 @@ export function testCmd(
         if (cmdProcess.stdin == null) throw new Error("Expected stdin, but it's null");
         if (cmdProcess.stderr == null) throw new Error("Expected stderr, but it's null");
 
-        cmdProcess.stdout.on("data", (buffer: Buffer) => {
+        cmdProcess.stdout.on("data", async (buffer: Buffer) => {
             line = buffer.toString();
             callback && callback(line, promptIndex, cmdProcess);
             if (copiedPrompts.length > 0) {
@@ -320,7 +320,7 @@ export function testCmd(
             }
         });
 
-        cmdProcess.stderr.on("data", (buffer: Buffer) => {
+        cmdProcess.stderr.on("data", async (buffer: Buffer) => {
             line = buffer.toString();
             callback && callback(line, promptIndex, cmdProcess);
         });
@@ -409,7 +409,7 @@ export async function createTestPackage(
     let packageFilePath = "";
 
     if (defaults) {
-        await testCmd("package", options, defaultPromptInputsForCSVs, (line: string) => {
+        await testCmd("package", options, defaultPromptInputsForCSVs, async (line: string) => {
             if (line.includes("datapm publish ")) {
                 const matches = line.match(/datapm\spublish\s(.*)/);
                 if (matches == null) throw new Error("No matches");
@@ -452,7 +452,7 @@ export async function createTestPackage(
             ""
         ]);
         prompts.splice(6, 0, ...unitPrompts);
-        await testCmd("package", options, prompts, (line: string) => {
+        await testCmd("package", options, prompts, async (line: string) => {
             if (line.includes("datapm fetch ")) {
                 const matches = line.match(/datapm\sfetch\s(.*)/);
                 if (matches == null) throw new Error("No matches");

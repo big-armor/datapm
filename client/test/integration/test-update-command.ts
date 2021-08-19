@@ -218,7 +218,7 @@ describe("Update Package Command Tests", async () => {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("update", ["test.datapm.json", "--forceUpdate"], prompts, (line: string) => {
+        const cmdResult = await testCmd("update", ["test.datapm.json", "--forceUpdate"], prompts, async (line: string) => {
             if (line.includes("When you are ready, you can publish with the following command")) {
                 results.messageFound = true;
             }
@@ -281,7 +281,7 @@ describe("Update Package Command Tests", async () => {
 
         const oldPackageFile: PackageFile = loadPackageFileFromDisk("test.datapm.json");
 
-        const cmdResult = await testCmd("update", ["test.datapm.json", "--forceUpdate"], prompts, (line: string) => {
+        const cmdResult = await testCmd("update", ["test.datapm.json", "--forceUpdate"], prompts, async (line: string) => {
             if (line.includes("When you are ready, you can publish with the following command")) {
                 results.messageFound = true;
             }
@@ -353,7 +353,7 @@ describe("Update Package Command Tests", async () => {
             "update",
             ["us-covid.datapm.json", "--forceUpdate"],
             prompts,
-            (line: string) => {
+            async (line: string) => {
                 if (line.includes("When you are ready, you can publish with the following command")) {
                     results.messageFound = true;
                 }
@@ -372,7 +372,7 @@ describe("Update Package Command Tests", async () => {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("publish", ["test.datapm.json"], prompts, (line: string) => {
+        const cmdResult = await testCmd("publish", ["test.datapm.json"], prompts, async (line: string) => {
             if (line.includes("datapm fetch ")) {
                 const matches = line.match(/datapm\sfetch\s(.*)/);
                 if (matches == null) throw new Error("no match found");
@@ -439,7 +439,7 @@ describe("Update Package Command Tests", async () => {
             "update",
             [`http://localhost:${registryServerPort}/testa-update-command/test`],
             prompts,
-            (line: string) => {
+            async (line: string) => {
                 if (line.includes("NOT_AUTHORIZED")) {
                     results.messageFound = true;
                 }
@@ -483,7 +483,7 @@ describe("Update Package Command Tests", async () => {
             "update",
             [`http://localhost:${registryServerPort}/testa-update-command/test`],
             prompts,
-            (line: string) => {
+            async (line: string) => {
                 if (line.includes("The registry reports that you do not have permission to edit this package")) {
                     results.messageFound = true;
                 }
@@ -511,7 +511,7 @@ describe("Update Package Command Tests", async () => {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("update", [packageAFilePath, "--defaults"], [], (line: string) => {
+        const cmdResult = await testCmd("update", [packageAFilePath, "--defaults"], [], async (line: string) => {
             if (
                 line.includes(
                     "You do not have an API key configured for this registry. You must first create an API Key, and add it to this client. Then you can retry this command"
@@ -569,7 +569,7 @@ describe("Update Package Command Tests", async () => {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("package", [TEST_SOURCE_FILES.HTTP1], promptInputs, (line: string) => {
+        const cmdResult = await testCmd("package", [TEST_SOURCE_FILES.HTTP1], promptInputs, async (line: string) => {
             if (line.includes("When you are ready, you can publish with the following command")) {
                 results.messageFound = true;
             }
@@ -624,7 +624,7 @@ describe("Update Package Command Tests", async () => {
             "update",
             ["package-b.datapm.json", "--forceUpdate"],
             prompts,
-            (line: string) => {
+            async (line: string) => {
                 if (line.includes("When you are ready, you can publish with the following command")) {
                     results.messageFound = true;
                 }

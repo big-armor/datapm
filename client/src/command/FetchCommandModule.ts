@@ -72,7 +72,7 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
           });
 
     // Finding package
-    oraRef.start("Finding package...");
+    oraRef.start("Finding package " + argv.reference);
 
     const packageFileWithContext = await getPackage(argv.reference).catch((error) => {
         oraRef.fail();

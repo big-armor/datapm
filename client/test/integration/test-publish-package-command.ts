@@ -47,7 +47,7 @@ describe("Publish Package Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("publish", ["non-existing.datapm.json"], [], (line: string) => {
+        const cmdResult = await testCmd("publish", ["non-existing.datapm.json"], [], async (line: string) => {
             if (
                 line.includes(
                     "is either not a valid package identifier, a valid package url, or url pointing to a valid package file."
@@ -67,7 +67,7 @@ describe("Publish Package Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("publish", [packageAFilePath, "--defaults"], [], (line: string) => {
+        const cmdResult = await testCmd("publish", [packageAFilePath, "--defaults"], [], async (line: string) => {
             if (line.includes("Package file has no registries defined. Can not use --defaults option")) {
                 results.messageFound = true;
             }
@@ -83,7 +83,7 @@ describe("Publish Package Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("publish", [packageAFilePath], [], (line: string) => {
+        const cmdResult = await testCmd("publish", [packageAFilePath], [], async (line: string) => {
             if (line.includes("You have not added a registry API key.")) {
                 results.messageFound = true;
             }
@@ -105,7 +105,7 @@ describe("Publish Package Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("publish", [newPackageFileLocation, "--defaults"], [], (line: string) => {
+        const cmdResult = await testCmd("publish", [newPackageFileLocation, "--defaults"], [], async (line: string) => {
             if (line.includes("README_FILE_NOT_FOUND")) {
                 results.messageFound = true;
             }
@@ -127,7 +127,7 @@ describe("Publish Package Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("publish", [newPackageFileLocation, "--defaults"], [], (line: string) => {
+        const cmdResult = await testCmd("publish", [newPackageFileLocation, "--defaults"], [], async (line: string) => {
             if (line.includes("LICENSE_FILE_NOT_FOUND")) {
                 results.messageFound = true;
             }
@@ -152,7 +152,7 @@ describe("Publish Package Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("publish", [packageAFilePath], prompts, (line: string) => {
+        const cmdResult = await testCmd("publish", [packageAFilePath], prompts, async (line: string) => {
             if (line.includes("User canceled")) {
                 results.messageFound = true;
             }
@@ -169,14 +169,19 @@ describe("Publish Package Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("publish", [packageAFilePath], prompts, (line: string, promptIndex: number) => {
-            if (
-                promptIndex === prompts.length &&
-                line.includes("Share the command below to fetch the data in this package")
-            ) {
-                results.messageFound = true;
+        const cmdResult = await testCmd(
+            "publish",
+            [packageAFilePath],
+            prompts,
+            async (line: string, promptIndex: number) => {
+                if (
+                    promptIndex === prompts.length &&
+                    line.includes("Share the command below to fetch the data in this package")
+                ) {
+                    results.messageFound = true;
+                }
             }
-        });
+        );
 
         expect(cmdResult.code, "Exit code").equals(0);
         expect(results.messageFound, "Found success message").equals(true);
@@ -188,7 +193,7 @@ describe("Publish Package Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("publish", [packageAFilePath, "--defaults"], [], (line: string) => {
+        const cmdResult = await testCmd("publish", [packageAFilePath, "--defaults"], [], async (line: string) => {
             if (line.includes("Share the command below to fetch the data in this package")) {
                 results.messageFound = true;
             }
@@ -213,7 +218,7 @@ describe("Publish Package Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("publish", [newPackageFileLocation, "--defaults"], [], (line: string) => {
+        const cmdResult = await testCmd("publish", [newPackageFileLocation, "--defaults"], [], async (line: string) => {
             if (line.includes("Share the command below to fetch the data in this package")) {
                 results.messageFound = true;
             }

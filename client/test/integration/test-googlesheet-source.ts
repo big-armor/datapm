@@ -45,7 +45,7 @@ describe("Googlesheet Source Test", function () {
                     input: "0" + KEYS.ENTER
                 }
             ],
-            (line: string) => {
+            async (line: string) => {
                 if (line.includes("datapm publish ")) {
                     results.messageFound = true;
                 }
@@ -82,7 +82,7 @@ describe("Googlesheet Source Test", function () {
                     input: "0" + KEYS.ENTER
                 }
             ], // there are two sheets
-            (line: string) => {
+            async (line: string) => {
                 if (line.includes("datapm publish ")) {
                     results.messageFound = true;
                 }

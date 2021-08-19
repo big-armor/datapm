@@ -85,7 +85,7 @@ describe("Package - Derived From", () => {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("package", [TEST_SOURCE_FILES.HTTP1], prompts, (line: string) => {
+        const cmdResult = await testCmd("package", [TEST_SOURCE_FILES.HTTP1], prompts, async (line: string) => {
             if (line.includes("Share the command below to fetch the data in this package")) {
                 results.messageFound = true;
             }

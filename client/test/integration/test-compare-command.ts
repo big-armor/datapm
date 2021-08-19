@@ -111,7 +111,7 @@ describe("Compare Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("compare", ["invalid", packageAFilePath], [], (line: string) => {
+        const cmdResult = await testCmd("compare", ["invalid", packageAFilePath], [], async (line: string) => {
             if (
                 line.includes(
                     "either not a valid package identifier, a valid package url, or url pointing to a valid package file."
@@ -135,7 +135,7 @@ describe("Compare Command Tests", async function () {
             "compare",
             ["https://test.datapm.xyz", packageAFilePath],
             [],
-            (line: string) => {
+            async (line: string) => {
                 if (line.includes("ENOTFOUND")) {
                     results.messageFound = true;
                 }
@@ -152,11 +152,16 @@ describe("Compare Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("compare", ["https://google.com", packageAFilePath], [], (line: string) => {
-            if (line.includes("ERROR_PARSING_PACKAGE_FILE")) {
-                results.messageFound = true;
+        const cmdResult = await testCmd(
+            "compare",
+            ["https://google.com", packageAFilePath],
+            [],
+            async (line: string) => {
+                if (line.includes("ERROR_PARSING_PACKAGE_FILE")) {
+                    results.messageFound = true;
+                }
             }
-        });
+        );
 
         expect(cmdResult.code, "Exit code").equals(1);
         expect(results.messageFound, "Found error message").equals(true);
@@ -168,7 +173,7 @@ describe("Compare Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("compare", [packageAFilePath, packageAFilePath], [], (line: string) => {
+        const cmdResult = await testCmd("compare", [packageAFilePath, packageAFilePath], [], async (line: string) => {
             if (line.includes("No differences found")) {
                 results.messageFound = true;
             }
@@ -184,7 +189,7 @@ describe("Compare Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("compare", [packageAFilePath, packageBFilePath], [], (line: string) => {
+        const cmdResult = await testCmd("compare", [packageAFilePath, packageBFilePath], [], async (line: string) => {
             if (line.includes("Found 9 differences")) {
                 results.messageFound = true;
             }

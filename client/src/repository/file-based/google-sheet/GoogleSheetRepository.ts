@@ -46,7 +46,7 @@ export class GoogleSheetRepository implements Repository {
                     name: "uri",
                     message: "URL of Google Sheet?",
                     stringRegExp: {
-                        pattern: /https:\/\/docs.google.com\/spreadsheets/,
+                        pattern: /^https:\/\/docs\.google\.com\/spreadsheets/i,
                         message: "Must be a Google Sheet URL"
                     }
                 }

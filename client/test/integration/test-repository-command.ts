@@ -115,8 +115,7 @@ describe("Repository Command Tests", async function () {
                     message: "Password",
                     input: "testing" + KEYS.ENTER
                 }
-            ],
-            (line) => console.log(line)
+            ]
         );
 
         expect(exitCode.code).equal(0);
@@ -173,8 +172,7 @@ describe("Repository Command Tests", async function () {
                     message: "Repository to remove?",
                     input: "newhost:888" + KEYS.ENTER
                 }
-            ],
-            (line) => console.log(line)
+            ]
         );
 
         const repositories = getRepositoryConfigs(POSTGRES_TYPE);

@@ -34,7 +34,7 @@ describe("Registry Command Tests", async function () {
             "registry",
             ["login", `http://localhost:${registryServerPort}`, "testRegistry-userC", "passwordC!"],
             [],
-            (line) => {
+            async (line) => {
                 if (line.includes("will now be authenticated as user")) messagesFound.authenticated = true;
             }
         );
@@ -45,7 +45,7 @@ describe("Registry Command Tests", async function () {
 
     it("Should error for invalid URL", async function () {
         const messagesFound = { errorFound: false };
-        const exitCode = await testCmd("registry", ["login", "invalid-url"], [], (line) => {
+        const exitCode = await testCmd("registry", ["login", "invalid-url"], [], async (line) => {
             if (line.includes("Only absolute URLs are supported")) messagesFound.errorFound = true;
         });
         expect(exitCode.code).equal(1);
@@ -80,7 +80,7 @@ describe("Registry Command Tests", async function () {
                     input: "y\n"
                 }
             ],
-            (line) => {
+            async (line) => {
                 if (line.includes("Authenticated")) messagesFound.authenticated = true;
                 else if (line.includes("Found an existing API Key named")) messagesFound.existingApiKeyFound = true;
                 else if (line.includes("Created and saved new API Key")) messagesFound.savedKey = true;
@@ -108,7 +108,7 @@ describe("Registry Command Tests", async function () {
                     input: `http://localhost:${registryServerPort}\n`
                 }
             ],
-            (line) => {
+            async (line) => {
                 if (line.includes("Deleted API Key from registry")) messagesFound.deletedAPIKey = true;
                 else if (line.includes("Removed local copy of API key")) messagesFound.removedAPIKey = true;
             }
@@ -145,7 +145,7 @@ describe("Registry Command Tests", async function () {
                     input: "wrongPassword1\n"
                 }
             ],
-            (line) => {
+            async (line) => {
                 if (line.includes("Authentication failed")) messagesFound.authenticationFailed = true;
             }
         );

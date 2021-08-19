@@ -73,7 +73,7 @@ describe("Fetch Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("fetch", ["invalid"], prompts, (line: string) => {
+        const cmdResult = await testCmd("fetch", ["invalid"], prompts, async (line: string) => {
             if (line.includes("is either not a valid package identifier")) {
                 results.messageFound = true;
             }
@@ -92,7 +92,7 @@ describe("Fetch Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("fetch", [invalidPackageFileName, "--defaults"], [], (line: string) => {
+        const cmdResult = await testCmd("fetch", [invalidPackageFileName, "--defaults"], [], async (line: string) => {
             if (line.includes("INVALID_PACKAGE_FILE_SCHEMA")) {
                 results.messageFound = true;
             }
@@ -116,7 +116,7 @@ describe("Fetch Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("fetch", ["https://test.datapm.xyz"], prompts, (line: string) => {
+        const cmdResult = await testCmd("fetch", ["https://test.datapm.xyz"], prompts, async (line: string) => {
             if (line.includes("ENOTFOUND")) {
                 results.messageFound = true;
             }
@@ -142,7 +142,7 @@ describe("Fetch Command Tests", async function () {
             "fetch",
             [`http://localhost:${registryServerPort}/some-invalid-catalog/test-data`],
             prompts,
-            (line: string) => {
+            async (line: string) => {
                 if (line.includes("CATALOG_NOT_FOUND")) {
                     results.messageFound = true;
                 }
@@ -164,7 +164,7 @@ describe("Fetch Command Tests", async function () {
             "fetch",
             [packageAFilePath, "--sinkConfig", "invalid"],
             prompts,
-            (line: string) => {
+            async (line: string) => {
                 if (line.includes("ERROR_PARSING_SINK_CONFIG")) {
                     results.messageFound = true;
                 }
@@ -181,7 +181,7 @@ describe("Fetch Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("fetch", [packageAFilePath, "--defaults"], [], (line: string) => {
+        const cmdResult = await testCmd("fetch", [packageAFilePath, "--defaults"], [], async (line: string) => {
             if (line.includes("Finished writing 51 records")) {
                 results.messageFound = true;
             }
@@ -198,7 +198,7 @@ describe("Fetch Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("fetch", [packageAFilePath], prompts, (line: string, promptIndex: number) => {
+        const cmdResult = await testCmd("fetch", [packageAFilePath], prompts, async (line: string, promptIndex: number) => {
             if (
                 promptIndex === prompts.length &&
                 line.includes("Next time you can run this same configuration in a single command.")
@@ -257,7 +257,7 @@ describe("Fetch Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("package", [TEST_SOURCE_FILES.HTTP1], promptInputs, (line: string) => {
+        const cmdResult = await testCmd("package", [TEST_SOURCE_FILES.HTTP1], promptInputs, async (line: string) => {
             if (line.includes("When you are ready, you can publish with the following command")) {
                 results.messageFound = true;
             }
@@ -278,7 +278,7 @@ describe("Fetch Command Tests", async function () {
             "fetch",
             ["package-b.datapm.json", "--forceUpdate"],
             prompts,
-            (line: string) => {
+            async (line: string) => {
                 if (line.includes("Finished writing 51 records")) {
                     results.messageFound = true;
                 }

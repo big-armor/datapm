@@ -71,7 +71,7 @@ describe("Registry Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("registry", ["list"], [], (line: string) => {
+        const cmdResult = await testCmd("registry", ["list"], [], async (line: string) => {
             if (line.includes("localhost:" + registryServerPort)) {
                 results.messageFound = true;
             }

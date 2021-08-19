@@ -27,12 +27,16 @@ export async function obtainCredentialsConfiguration(
 
     const repositoryIdentifier = await repository.getConnectionIdentifierFromConfiguration(connectionConfiguration);
 
-    const repositoryConfig = getRepositoryConfigs(repository.getType()).find(
+    let repositoryConfig = getRepositoryConfigs(repository.getType()).find(
         (c) => c.identifier === repositoryIdentifier
     );
 
     if (repositoryConfig == null) {
-        throw new Error("Cound not find repository configuration for " + repositoryIdentifier);
+        repositoryConfig = {
+            identifier: repositoryIdentifier,
+            connectionConfiguration,
+            credentials: []
+        };
     }
 
     const pendingParameters = await repository.getCredentialsParameters(

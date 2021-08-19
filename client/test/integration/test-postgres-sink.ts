@@ -95,7 +95,7 @@ describe("Postgres Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "postgres"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes(SinkErrors.CONNECTION_FAILED)) {
                     results.messageFound = true;
                 }
@@ -125,7 +125,7 @@ describe("Postgres Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "postgres"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes(SinkErrors.AUTHENTICATION_FAILED)) {
                     results.messageFound = true;
                 }
@@ -156,7 +156,7 @@ describe("Postgres Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "postgres"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 console.log(line);
 
                 if (promptIndex === prompts.length && line.includes("syntax error")) {
@@ -188,7 +188,7 @@ describe("Postgres Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "postgres"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
                     results.messageFound = true;
                 }
@@ -262,7 +262,7 @@ describe("Postgres Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "postgres"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("No new records available")) {
                     results.messageFound = true;
                 }
@@ -303,7 +303,7 @@ describe("Postgres Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "postgres", "--force-update"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
                     results.messageFound = true;
                 }
@@ -359,7 +359,7 @@ describe("Postgres Sink Test", function () {
             "fetch",
             [packageBFilePath, "--sink", "postgres"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 100 records")) {
                     results.messageFound = true;
                 }
@@ -491,7 +491,7 @@ describe("Postgres Sink Test", function () {
             "fetch",
             [packageCFilePath, "--sink", "postgres"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 538 records")) {
                     results.messageFound = true;
                 }

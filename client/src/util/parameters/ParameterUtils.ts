@@ -59,16 +59,16 @@ export async function repeatedlyPromptParameters(
 function validatePromptResponse(value: any, parameter: Parameter): string | true {
     if (parameter.type === ParameterType.Text || parameter.type === ParameterType.Password) {
         if (parameter.stringRegExp !== undefined) {
-            if (value[0] === undefined) return "Please enter a value";
+            if (value === undefined) return "Please enter a value";
 
-            if (!value[0].match(parameter.stringRegExp)) {
+            if (!value.match(parameter.stringRegExp)) {
                 return parameter.stringRegExp.message;
             }
         }
 
         if (
             parameter.stringMinimumLength !== undefined &&
-            (value[0] === undefined || value[0].length < parameter.stringMinimumLength)
+            (value === undefined || value.length < parameter.stringMinimumLength)
         ) {
             return (
                 "Must have at least " +
@@ -80,8 +80,8 @@ function validatePromptResponse(value: any, parameter: Parameter): string | true
 
         if (
             parameter.stringMaximumLength !== undefined &&
-            value[0] !== undefined &&
-            value[0].length > parameter.stringMaximumLength
+            value !== undefined &&
+            value.length > parameter.stringMaximumLength
         ) {
             return (
                 "May not have more than " +

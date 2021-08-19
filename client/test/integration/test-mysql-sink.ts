@@ -90,7 +90,7 @@ describe("MySQL Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "mysql"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes(SinkErrors.CONNECTION_FAILED)) {
                     results.messageFound = true;
                 }
@@ -121,7 +121,7 @@ describe("MySQL Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "mysql"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes(SinkErrors.AUTHENTICATION_FAILED)) {
                     results.messageFound = true;
                 }
@@ -152,7 +152,7 @@ describe("MySQL Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "mysql"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 console.log(line);
 
                 if (promptIndex === prompts.length && line.includes("ER_PARSE_ERROR")) {
@@ -178,7 +178,7 @@ describe("MySQL Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "mysql"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
                     results.messageFound = true;
                 }
@@ -241,7 +241,7 @@ describe("MySQL Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "mysql"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("No new records available")) {
                     results.messageFound = true;
                 }
@@ -274,7 +274,7 @@ describe("MySQL Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "mysql", "--force-update"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
                     results.messageFound = true;
                 }
@@ -322,7 +322,7 @@ describe("MySQL Sink Test", function () {
             "fetch",
             [packageBFilePath, "--sink", "mysql"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 100 records")) {
                     results.messageFound = true;
                 }
@@ -439,7 +439,7 @@ describe("MySQL Sink Test", function () {
             "fetch",
             [packageCFilePath, "--sink", "mysql"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 538 records")) {
                     results.messageFound = true;
                 }

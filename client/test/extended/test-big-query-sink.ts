@@ -61,7 +61,7 @@ describe("Big Query Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "big-query"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === 1 && line.includes("The Application Default Credentials are not available")) {
                     results.messageFound = true;
                 }
@@ -85,7 +85,7 @@ describe("Big Query Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "big-query"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === 1 && line.includes("no such file or directory")) {
                     results.messageFound = true;
                 }
@@ -111,7 +111,7 @@ describe("Big Query Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "big-query", "--sinkConfig", '{"projectId":"wrong-project-id"}'],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (
                     promptIndex === prompts.length &&
                     line.includes("Unable to detect this Project Id in the current environment")
@@ -138,7 +138,7 @@ describe("Big Query Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "big-query"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (
                     promptIndex === prompts.length &&
                     line.includes("Streaming insert is not allowed in the free tier")
@@ -165,7 +165,7 @@ describe("Big Query Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "big-query"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
                     results.messageFound = true;
                 }
@@ -217,7 +217,7 @@ describe("Big Query Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "big-query", "--forceUpdate"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
                     results.messageFound = true;
                 }
@@ -241,7 +241,7 @@ describe("Big Query Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "big-query"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("No new records available")) {
                     results.messageFound = true;
                 }
@@ -280,7 +280,7 @@ describe("Big Query Sink Test", function () {
             "fetch",
             [packageBFilePath, "--sink", "big-query", "--forceUpdate"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 100 records")) {
                     results.messageFound = true;
                 }
@@ -386,7 +386,7 @@ describe("Big Query Sink Test", function () {
             "fetch",
             [packageCFilePath, "--sink", "big-query", "--forceUpdate"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 538 records")) {
                     results.messageFound = true;
                 }

@@ -63,7 +63,7 @@ describe("Redshift Sink Test", function () {
 			"fetch",
 			[packageAFilePath, "--sink", "redshift"],
 			prompts,
-			(line: string, promptIndex: number) => {
+			async (line: string, promptIndex: number) => {
 				if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
 					results.messageFound = true;
 				}
@@ -219,7 +219,7 @@ describe("Redshift Sink Test", function () {
 			"fetch",
 			[packageAFilePath, "--sink", "redshift", "--force-update"],
 			prompts,
-			(line: string, promptIndex: number) => {
+			async (line: string, promptIndex: number) => {
 				if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
 					results.messageFound = true;
 				}

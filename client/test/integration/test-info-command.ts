@@ -46,7 +46,7 @@ describe("Info Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("info", [packageAFilePath], [], (line: string) => {
+        const cmdResult = await testCmd("info", [packageAFilePath], [], async (line: string) => {
             if (line.includes("NOT_AUTHENTICATED")) {
                 results.messageFound = true;
             }
@@ -67,7 +67,7 @@ describe("Info Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("info", [packageAFilePath], [], (line: string) => {
+        const cmdResult = await testCmd("info", [packageAFilePath], [], async (line: string) => {
             if (line.includes("Package: package-a")) {
                 results.messageFound = true;
             }

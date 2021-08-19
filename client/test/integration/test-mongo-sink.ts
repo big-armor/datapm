@@ -77,7 +77,7 @@ describe("Mongo Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "mongo"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes(SinkErrors.CONNECTION_FAILED)) {
                     results.messageFound = true;
                 }
@@ -108,7 +108,7 @@ describe("Mongo Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "mongo"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes(SinkErrors.AUTHENTICATION_FAILED)) {
                     results.messageFound = true;
                 }
@@ -132,7 +132,7 @@ describe("Mongo Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "mongo"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
                     results.messageFound = true;
                 }
@@ -174,11 +174,16 @@ describe("Mongo Sink Test", function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("fetch", [packageAFilePath, "--sink", "mongo"], prompts, (line: string) => {
-            if (line.includes("No new records available")) {
-                results.messageFound = true;
+        const cmdResult = await testCmd(
+            "fetch",
+            [packageAFilePath, "--sink", "mongo"],
+            prompts,
+            async (line: string) => {
+                if (line.includes("No new records available")) {
+                    results.messageFound = true;
+                }
             }
-        });
+        );
 
         expect(cmdResult.code, "Exit code").equals(0);
         expect(results.messageFound, "Found no new records available message").equals(true);
@@ -209,7 +214,7 @@ describe("Mongo Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "mongo", "--force-update"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
                     results.messageFound = true;
                 }
@@ -260,7 +265,7 @@ describe("Mongo Sink Test", function () {
             "fetch",
             [packageBFilePath, "--sink", "mongo"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 100 records")) {
                     results.messageFound = true;
                 }
@@ -316,7 +321,7 @@ describe("Mongo Sink Test", function () {
             "fetch",
             [packageCFilePath, "--sink", "mongo"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 538 records")) {
                     results.messageFound = true;
                 }
