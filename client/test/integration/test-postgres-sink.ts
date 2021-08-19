@@ -85,7 +85,14 @@ describe("Postgres Sink Test", function () {
     });
 
     it("Can't connect to invalid URI", async function () {
-        const prompts = getPostgresSinkPromptInputs([KEYS.DOWN, "invalid-hostname"]);
+        const prompts = getPostgresSinkPromptInputs([
+            KEYS.DOWN,
+            "invalid-hostname",
+            "postgres",
+            "password",
+            "test-db",
+            "schema"
+        ]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -114,7 +121,9 @@ describe("Postgres Sink Test", function () {
             postgresHost,
             postgresPort.toString(),
             "username",
-            "password"
+            "password",
+            "test-db",
+            "schema"
         ]);
         const results: TestResults = {
             exitCode: -1,

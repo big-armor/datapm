@@ -69,7 +69,7 @@ export class PostgresRepository implements Repository {
                 type: ParameterType.Text,
                 name: "host",
                 message: "Hostname or IP?",
-                stringMaximumLength: 1,
+                stringMinimumLength: 1,
                 defaultValue: defaultParameterValues.host as string
             });
         }
