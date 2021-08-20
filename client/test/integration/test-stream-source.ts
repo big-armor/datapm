@@ -47,7 +47,7 @@ describe("Test Stream Source Test", function () {
             "package",
             ["test://"],
             prompts,
-            (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
+            async (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
                 if (promptIndex === 1 && line.includes("Record count should be greater than 1")) {
                     results.messageFound = true;
                     cmdProcess.kill("SIGINT");
@@ -80,7 +80,7 @@ describe("Test Stream Source Test", function () {
             "package",
             ["test://"],
             prompts,
-            (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
+            async (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
                 if (promptIndex === 2 && line.includes("There should be at least 1 attribute")) {
                     results.messageFound = true;
                     cmdProcess.kill("SIGINT");
@@ -125,7 +125,7 @@ describe("Test Stream Source Test", function () {
             "package",
             ["test://"],
             prompts,
-            (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
+            async (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
                 if (promptIndex === 5 && line.includes("'Zip Code' attribute is already existing")) {
                     results.messageFound = true;
                     cmdProcess.kill("SIGINT");
@@ -199,7 +199,7 @@ describe("Test Stream Source Test", function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("package", ["test://"], prompts, (line: string) => {
+        const cmdResult = await testCmd("package", ["test://"], prompts, async (line: string) => {
             if (line.includes("datapm publish ")) {
                 results.messageFound = true;
             }

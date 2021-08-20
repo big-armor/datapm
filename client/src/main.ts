@@ -12,12 +12,14 @@ import { RegistryCommand } from "./command/RegistryCommand";
 import { SearchCommand } from "./command/SearchCommand";
 import { UpdateCommand } from "./command/UpdateCommand";
 import { FallbackCommand } from "./command/FallbackCommand";
+import { RepositoryCommand } from "./command/RepositoryCommand";
 
 let argv = yargs;
 
 const commands = [
     new ConfigurationCommand(),
     new RegistryCommand(),
+    new RepositoryCommand(),
 
     new SearchCommand(),
     new InfoCommand(),

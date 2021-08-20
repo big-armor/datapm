@@ -4,6 +4,7 @@ import execa from "execa";
 import faker from "faker";
 import fs from "fs";
 import moment from "moment";
+import { Writable } from "stream";
 import * as request from "superagent";
 import {
     CreateAPIKeyDocument,
@@ -269,7 +270,7 @@ export function testCmd(
         isDone?: boolean;
     }> = [],
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    callback: (line: string, index: number, cmdProcess: execa.ExecaChildProcess) => void = () => {}
+    callback: (line: string, index: number, cmdProcess: execa.ExecaChildProcess) => Promise<void> = async () => {}
 ): Promise<CmdResult> {
     let cmdProcess: execa.ExecaChildProcess;
 
@@ -285,6 +286,8 @@ export function testCmd(
             conditionedArgs = ["dist/src/main.js", cmd, ...args];
         }
 
+        // console.log("Running: node " + conditionedArgs.join(" "));
+
         cmdProcess = execa("node", conditionedArgs);
 
         // if (cmdProcess.stdout) cmdProcess.stdout.pipe(process.stdout, { end: false });
@@ -292,10 +295,10 @@ export function testCmd(
         // if (cmdProcess.stderr) cmdProcess.stderr.pipe(process.stderr, { end: false });
 
         if (cmdProcess.stdout == null) throw new Error("Expected stdout, but it's null");
-        if (cmdProcess.stdin == null) throw new Error("Expected stdout, but it's null");
-        if (cmdProcess.stderr == null) throw new Error("Expected stdout, but it's null");
+        if (cmdProcess.stdin == null) throw new Error("Expected stdin, but it's null");
+        if (cmdProcess.stderr == null) throw new Error("Expected stderr, but it's null");
 
-        cmdProcess.stdout.on("data", (buffer: Buffer) => {
+        cmdProcess.stdout.on("data", async (buffer: Buffer) => {
             line = buffer.toString();
             callback && callback(line, promptIndex, cmdProcess);
             if (copiedPrompts.length > 0) {
@@ -305,15 +308,19 @@ export function testCmd(
                     !currentPrompt.isDone &&
                     line.includes(currentPrompt.message)
                 ) {
-                    if (cmdProcess.stdin == null) throw new Error("Expected stdout, but it's null");
-                    cmdProcess.stdin.write(currentPrompt.input);
+                    if (cmdProcess.stdin == null) throw new Error("Expected stdin, but it's null");
+
+                    // Write with a pause between each character
+                    // note that this is not awaiting the delayed result
+                    // so the buffer writing continues asynchronously
+                    writeSlowlyToBuffer(cmdProcess.stdin, currentPrompt.input);
                     currentPrompt.isDone = true;
                     promptIndex += 1;
                 }
             }
         });
 
-        cmdProcess.stderr.on("data", (buffer: Buffer) => {
+        cmdProcess.stderr.on("data", async (buffer: Buffer) => {
             line = buffer.toString();
             callback && callback(line, promptIndex, cmdProcess);
         });
@@ -340,17 +347,30 @@ export function testCmd(
     });
 }
 
+async function writeSlowlyToBuffer(writable: Writable, charactersRemaining: string): Promise<void> {
+    const indexOfEnter = charactersRemaining.lastIndexOf("\n");
+
+    if (indexOfEnter === -1) {
+        writable.write(charactersRemaining);
+        return;
+    }
+
+    writable.write(charactersRemaining.substring(0, indexOfEnter));
+    await delay(10);
+    writable.write(charactersRemaining.substring(indexOfEnter));
+}
+
 export function getPromptInputs(
     defaultPrompts: string[],
     inputs?: Array<string | null>,
     skip = 0,
-    count = 20
+    lastIndex = 20
 ): PromptInput[] {
     const defaultPromptInputs: PromptInput[] = defaultPrompts.map((message) => ({
         message,
         input: KEYS.ENTER
     }));
-    const promptInputs = defaultPromptInputs.slice(skip, count);
+    const promptInputs = defaultPromptInputs.slice(skip, lastIndex);
 
     if (inputs === undefined) return promptInputs;
 
@@ -363,11 +383,11 @@ export function getPromptInputs(
 export const defaultPromptInputsForCSVs = [
     {
         message: "Is there a header line above?",
-        input: KEYS.ENTER
+        input: "\n"
     },
     {
         message: "Header row line number?",
-        input: "0" + KEYS.ENTER
+        input: "\n"
     }
 ];
 
@@ -384,12 +404,12 @@ export async function createTestPackage(
         options.push("--defaults");
     }
     if (configuration) {
-        options.push("--sourceConfiguration", configuration);
+        options.push("--configuration", configuration);
     }
     let packageFilePath = "";
 
     if (defaults) {
-        await testCmd("package", options, defaultPromptInputsForCSVs, (line: string) => {
+        await testCmd("package", options, defaultPromptInputsForCSVs, async (line: string) => {
             if (line.includes("datapm publish ")) {
                 const matches = line.match(/datapm\spublish\s(.*)/);
                 if (matches == null) throw new Error("No matches");
@@ -432,7 +452,7 @@ export async function createTestPackage(
             ""
         ]);
         prompts.splice(6, 0, ...unitPrompts);
-        await testCmd("package", options, prompts, (line: string) => {
+        await testCmd("package", options, prompts, async (line: string) => {
             if (line.includes("datapm fetch ")) {
                 const matches = line.match(/datapm\sfetch\s(.*)/);
                 if (matches == null) throw new Error("No matches");

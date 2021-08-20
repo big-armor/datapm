@@ -4,9 +4,9 @@ import moment from "moment";
 import numeral from "numeral";
 import { Choice } from "prompts";
 import { PassThrough, Readable, Transform } from "stream";
-import { BatchingTransform } from "../source/transforms/BatchingTransform";
+import { BatchingTransform } from "../transforms/BatchingTransform";
 import { Maybe } from "../util/Maybe";
-import { SinkState, StreamState } from "../sink/Sink";
+import { SinkState, StreamState } from "../repository/Sink";
 import {
     RecordContext,
     InspectionResults,
@@ -15,9 +15,13 @@ import {
     ExtendedJSONSchema7TypeName,
     RecordStreamContext,
     StreamSummary
-} from "../source/Source";
-import { convertValueByValueType, discoverValueType } from "../source/transforms/StatsTransform";
-import { getSourceByType, mergeValueFormats } from "../source/SourceUtil";
+} from "../repository/Source";
+import { convertValueByValueType, discoverValueType } from "../transforms/StatsTransform";
+import { getSourceByType, mergeValueFormats } from "../repository/SourceUtil";
+import { getRepositoryDescriptionByType } from "../repository/RepositoryUtil";
+import { getRepositoryCredential } from "./ConfigUtil";
+import { obtainCredentialsConfiguration } from "./CredentialsUtil";
+import { Ora } from "ora";
 
 export enum DeconflictOptions {
     CAST_TO_BOOLEAN = "CAST_TO_BOOLEAN",
@@ -41,42 +45,91 @@ export interface RecordStreamEventContext {
     bytesReceived(streamSlug: string, byteCount: number): void;
 }
 
-/** Given a schema, run a URI inspection. This is useful to determine if anything has changed before
+/** Given a source, run an inspection results. This is useful to determine if anything has changed before
  * fetching data unnecessarily.
  */
-export async function inspectSourceConnection(source: Source): Promise<InspectionResults> {
-    const sourceDescription = getSourceByType(source.type);
+export async function inspectSourceConnection(
+    oraRef: Ora,
+    source: Source,
+    defaults: boolean | undefined
+): Promise<InspectionResults> {
+    const repositoryDescription = getRepositoryDescriptionByType(source.type);
 
-    if (sourceDescription == null) throw new Error(`Unable to find source method for type ${source.type}`);
+    if (repositoryDescription == null) throw new Error(`Unable to find repository  for type ${source.type}`);
+
+    const repository = await repositoryDescription.getRepository();
+
+    const connectionParameters = await repository.getConnectionParameters(source.connectionConfiguration);
+
+    if (connectionParameters.length > 0) {
+        throw new Error(
+            "SOURCE_CONNECTION_NOT_COMPLETE - The package maintianer needs to run the `datapm update ...` command to make it compatible with this version of datapm"
+        );
+    }
+
+    const repositoryIdentifier = await repository.getConnectionIdentifierFromConfiguration(
+        source.connectionConfiguration
+    );
+
+    let credentialsConfiguration = {};
+
+    if (source.credentialsIdentifier) {
+        try {
+            credentialsConfiguration = await getRepositoryCredential(
+                repository.getType(),
+                repositoryIdentifier,
+                source.credentialsIdentifier
+            );
+        } catch (error) {
+            oraRef.warn("The credential " + source.credentialsIdentifier + " could not be found or read.");
+        }
+    }
+
+    credentialsConfiguration = obtainCredentialsConfiguration(
+        oraRef,
+        repository,
+        source.connectionConfiguration,
+        credentialsConfiguration,
+        defaults
+    );
+
+    const sourceDescription = await getSourceByType(source.type);
+
+    if (sourceDescription == null) throw new Error(`Unable to find source  for type ${source.type}`);
 
     const sourceImplementation = await sourceDescription.getSource();
 
-    const sourceInspectResult = await sourceImplementation.inspectURIs(source.configuration || {}, {
-        defaults: true,
-        quiet: true,
-        parameterPrompt: async (parameters) => {
-            for (const parameter of parameters) {
-                if (parameter.defaultValue == null) {
-                    throw new Error(
-                        "SOURCE_CONFIGURATION_NOT_COMPLETE - Missing value for parameter " +
-                            parameter.name +
-                            " from source " +
-                            source.slug +
-                            ", and no default is provided. The package owner needs to run the `datapm update ...` command to make it compatible with this version of datapm"
-                    );
+    const sourceInspectResult = await sourceImplementation.inspectURIs(
+        source.connectionConfiguration,
+        credentialsConfiguration,
+        source.configuration || {},
+        {
+            defaults: true,
+            quiet: true,
+            parameterPrompt: async (parameters) => {
+                for (const parameter of parameters) {
+                    if (parameter.defaultValue == null) {
+                        throw new Error(
+                            "SOURCE_CONFIGURATION_NOT_COMPLETE - Missing value for parameter " +
+                                parameter.name +
+                                " from source " +
+                                source.slug +
+                                ", and no default is provided. The package owner needs to run the `datapm update ...` command to make it compatible with this version of datapm"
+                        );
+                    }
+
+                    if (source.configuration == null) source.configuration = {};
+
+                    source.configuration[parameter.name] = parameter.defaultValue;
                 }
 
-                if (source.configuration == null) source.configuration = {};
-
-                source.configuration[parameter.name] = parameter.defaultValue;
+                // TODO support this?
+            },
+            log: (type, message) => {
+                console.log(message);
             }
-
-            // TODO support this?
-        },
-        log: (type, message) => {
-            console.log(message);
         }
-    });
+    );
 
     return sourceInspectResult;
 }

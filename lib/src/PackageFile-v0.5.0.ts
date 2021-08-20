@@ -1,18 +1,18 @@
 import { JSONSchema7, JSONSchema7TypeName } from "json-schema";
 import { DPMConfiguration } from "./main";
 
-export enum CountPrecision {
+export enum CountPrecision050 {
     EXACT = "EXACT",
     APPROXIMATE = "APPROXIMATE",
     GREATER_THAN = "GREATER_THAN"
 }
-export interface StreamStats {
+export interface StreamStats050 {
     /** The number of bytes observed in the stream. See byteCountPrecision
      * for whether this is an exact, estimated, or "greater than" number.
      */
     byteCount?: number;
 
-    byteCountPrecision?: CountPrecision;
+    byteCountPrecision?: CountPrecision050;
 
     /** The number of records deeply inspected during the stream */
     inspectedCount: number;
@@ -21,11 +21,11 @@ export interface StreamStats {
      * this is an exact, estimated, or "greater than" number.
      */
     recordCount?: number;
-    recordCountPrecision?: CountPrecision;
+    recordCountPrecision?: CountPrecision050;
 }
 
 /** A description of where the package file should be published. */
-export interface RegistryReference {
+export interface RegistryReference050 {
     /** The HTTP or HTTPS URL to reach the registry server. */
     url: string;
 
@@ -37,7 +37,7 @@ export interface RegistryReference {
  * a file system/SFTP/NFS select of *.xml from a particular directory would be one stream set. Each table in a database would
  * be another stream set.
  */
-export interface StreamSet {
+export interface StreamSet050 {
     /** The unique identifier for the stream set in a single source */
     slug: string;
 
@@ -53,14 +53,14 @@ export interface StreamSet {
     lastUpdateHash?: string;
 
     /** The number of records last observed */
-    streamStats: StreamStats;
+    streamStats: StreamStats050;
 }
 
 /** Describes where the data resides, and how to access one or more logical sets of streams. For example, how to
  * access a database, and which tables are each an individual stream set.
  */
-export interface Source {
-    /** The universally unique identifier for the sourceInterface implementation */
+export interface Source050 {
+    /** The universally unique identifier for the Source implementation */
     type: string;
 
     /** The unique identifier for this source in the package */
@@ -72,10 +72,10 @@ export interface Source {
      */
     configuration?: DPMConfiguration;
 
-    streamSets: StreamSet[];
+    streamSets: StreamSet050[];
 }
 
-export interface ContentLabel {
+export interface ContentLabel050 {
     /** The keyword identifier for the content  */
     label: string;
 
@@ -92,7 +92,7 @@ export interface ContentLabel {
     valuesTestedCount?: number;
 }
 
-export interface ValueTypeStatistics {
+export interface ValueTypeStatistics050 {
     valueType: JSONSchema7TypeName | "date";
 
     /** The number of records on which this property was observed. If schema recordCountApproximate property is true,
@@ -110,14 +110,14 @@ export interface ValueTypeStatistics {
     /** A dictionary of content labels referencing a boolean value as to whether they should be displayed. This
      * allows content labels to be "hidden" by a package editor - and to keep that fact for future iterations.
      */
-    contentLabels?: ContentLabel[];
+    contentLabels?: ContentLabel050[];
 }
 
 // eslint-disable-next-line no-use-before-define
-export type Properties = { [key: string]: Schema };
-export type ValueTypes = { [key: string]: ValueTypeStatistics };
+export type Properties050 = { [key: string]: Schema050 };
+export type ValueTypes050 = { [key: string]: ValueTypeStatistics050 };
 
-export interface SchemaIdentifier {
+export interface SchemaIdentifier050 {
     registryUrl: string;
     catalogSlug: string;
     packageSlug: string;
@@ -125,7 +125,7 @@ export interface SchemaIdentifier {
     schemaTitle: string;
 }
 
-export interface DerivedFrom {
+export interface DerivedFrom050 {
     /** User friendly name for the upstream data */
     displayName: string;
 
@@ -133,18 +133,18 @@ export interface DerivedFrom {
     url?: string;
 
     /** The identifier for the specific version of the datapm package version and schema title. Url or schemaIdentifier must be defined.  */
-    schemaIdentifier?: SchemaIdentifier;
+    schemaIdentifier?: SchemaIdentifier050;
 }
 
 /** The JSON Schema Draft 07 compliant schema object, extended with properties that describe
  * how to obtain the data, and details the values of the data properties.
  */
-export interface Schema extends JSONSchema7 {
+export interface Schema050 extends JSONSchema7 {
     /** A description about the schema or property. This is flat text and should be kept to a few scentences.  */
     description?: string;
 
     /** The JSON Schema Draft 07 compliant property list for the object */
-    properties?: Properties;
+    properties?: Properties050;
 
     /** Whether the consumer should by default include this schema/property in the regular output */
     hidden?: boolean;
@@ -166,10 +166,10 @@ export interface Schema extends JSONSchema7 {
     recordsNotPresent?: number;
 
     /** How to consider the recordCount value - as one of exact, approximate, or greater than. */
-    recordCountPrecision?: CountPrecision;
+    recordCountPrecision?: CountPrecision050;
 
     /** An object which has keys that the property type (string, array, date, boolean, object, etc). The values of this object describe the values of the property. */
-    valueTypes?: ValueTypes;
+    valueTypes?: ValueTypes050;
 
     /** A  selected set of sample records that are representative of the schema */
     sampleRecords?: { [key: string]: unknown }[];
@@ -178,10 +178,10 @@ export interface Schema extends JSONSchema7 {
     derivedFromDescription?: string;
 
     /** A list of references to upstream data from which this schema was derived. This is also called "Provenance" */
-    derivedFrom?: DerivedFrom[];
+    derivedFrom?: DerivedFrom050[];
 }
 
-export class PackageFile {
+export class PackageFile050 {
     /** The URL of the JSON schema file to validate this file. */
     $schema = "https://datapm.io/docs/package-file-schema-v0.5.0.json";
 
@@ -195,10 +195,10 @@ export class PackageFile {
     description: string;
 
     /** An object describing how to access the record stream of the data */
-    sources: Source[];
+    sources: Source050[];
 
     /** The json-schema.org Draft 7 compliant schemas, extended to support the features of datapm. */
-    schemas: Schema[];
+    schemas: Schema050[];
 
     /** The semver compatible version number. */
     version: string;
@@ -231,5 +231,5 @@ export class PackageFile {
      * the local client to determine where to publish. The client will remove private and local registry references
      * before publishing to each registry.
      */
-    registries?: RegistryReference[];
+    registries?: RegistryReference050[];
 }

@@ -13,7 +13,7 @@ import { expect } from "chai";
 import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
 
-describe("CSV Tests", function () {
+describe("CSV Source Tests", function () {
     before(async () => {
         resetConfiguration();
         const userAClient = await createTestUser();
@@ -92,7 +92,7 @@ describe("CSV Tests", function () {
             },
             {
                 message: "Do you want to specify units",
-                input: "n"
+                input: "n" + KEYS.ENTER
             }
         ];
 
@@ -132,7 +132,7 @@ describe("CSV Tests", function () {
             },
             {
                 message: "Do you want to specify units",
-                input: "y"
+                input: "y" + KEYS.ENTER
             },
             {
                 message: "Unit for attribute 'Column0'?",

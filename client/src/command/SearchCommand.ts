@@ -36,6 +36,11 @@ export class SearchCommand implements Command {
 }
 
 export async function handleSearch(args: SearchArguments): Promise<void> {
-    const command = await import("./SearchCommandModule");
-    await command.handleSearch(args);
+    try {
+        const command = await import("./SearchCommandModule");
+        await command.handleSearch(args);
+    } catch (e) {
+        console.error(e);
+        process.exit(1);
+    }
 }

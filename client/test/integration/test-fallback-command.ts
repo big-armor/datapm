@@ -12,7 +12,7 @@ describe("Fallback command", async function () {
 
     it("Should fallback to top level menu", async () => {
         let lineFound = false;
-        await testCmd(null, [], [], (line, index, process) => {
+        await testCmd(null, [], [], async (line: string, index, process) => {
             if (line.includes("What action would you like to take?")) {
                 lineFound = true;
                 process.kill(9);
@@ -24,7 +24,7 @@ describe("Fallback command", async function () {
 
     it("Should fallback for fetch command", async () => {
         let lineFound = false;
-        await testCmd("fetch", [], [], (line, index, process) => {
+        await testCmd("fetch", [], [], async (line: string, index, process) => {
             if (line.includes("What is the package file name or url?")) {
                 lineFound = true;
                 process.kill(9);
@@ -36,7 +36,7 @@ describe("Fallback command", async function () {
 
     it("Should fallback for package command", async () => {
         let lineFound = false;
-        await testCmd("package", [], [], (line, index, process) => {
+        await testCmd("package", [], [], async (line: string, index, process) => {
             if (line.includes("Source?")) {
                 lineFound = true;
                 process.kill(9);
@@ -48,7 +48,7 @@ describe("Fallback command", async function () {
 
     it("Should fallback for update command", async () => {
         let lineFound = false;
-        await testCmd("update", [], [], (line, index, process) => {
+        await testCmd("update", [], [], async (line: string, index, process) => {
             if (line.includes("What is the package file name or url?")) {
                 lineFound = true;
                 process.kill(9);
@@ -60,7 +60,7 @@ describe("Fallback command", async function () {
 
     it("Should fallback for registry command", async () => {
         let lineFound = false;
-        await testCmd("registry", [], [], (line, index, process) => {
+        await testCmd("registry", [], [], async (line: string, index, process) => {
             if (line.includes("What action would you like to take?")) {
                 lineFound = true;
                 process.kill(9);
@@ -72,7 +72,7 @@ describe("Fallback command", async function () {
 
     it("Should fallback for login command", async () => {
         let lineFound = false;
-        await testCmd("registry", ["login"], [], (line, index, process) => {
+        await testCmd("registry", ["login"], [], async (line: string, index, process) => {
             if (line.includes("Registry URL?")) {
                 lineFound = true;
                 process.kill(9);
@@ -84,7 +84,7 @@ describe("Fallback command", async function () {
 
     it("Should fallback for logout command", async () => {
         let lineFound = false;
-        await testCmd("registry", ["logout"], [], (line, index, process) => {
+        await testCmd("registry", ["logout"], [], async (line: string, index, process) => {
             if (line.includes("Registry URL?")) {
                 lineFound = true;
                 process.kill(9);

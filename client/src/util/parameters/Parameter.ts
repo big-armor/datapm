@@ -1,4 +1,4 @@
-import { DPMConfiguration } from "../../../../lib/dist/src/PackageUtil";
+import { DPMConfiguration } from "datapm-lib";
 
 export enum ParameterType {
     AutoComplete = "autocomplete",
@@ -16,8 +16,12 @@ export interface Parameter {
     defaultValue?: string | boolean | number;
     message: string;
     options?: { title: string; value?: string | boolean | number; selected?: boolean }[];
-    min?: number;
-    validate?: (value: string | number | boolean) => boolean | string;
+    numberMinimumValue?: number;
+    numberMaximumValue?: number;
+    stringMinimumLength?: number;
+    stringMaximumLength?: number;
+    stringRegExp?: { pattern: RegExp; message: string };
+    validate2?: (value: string | number | boolean) => boolean | string;
 
     /** The configuration object on which the parameter value should be set. Required because
      * configurations can be heirarchical (for nested use cases)

@@ -54,7 +54,7 @@ describe("S3 Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "s3"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
                     results.messageFound = true;
                 }
@@ -126,7 +126,7 @@ describe("S3 Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "s3"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("No new records available")) {
                     results.messageFound = true;
                 }
@@ -147,7 +147,7 @@ describe("S3 Sink Test", function () {
             "fetch",
             [packageAFilePath, "--sink", "s3", "--force-update"],
             prompts,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("Finished writing 67 records")) {
                     results.messageFound = true;
                 }

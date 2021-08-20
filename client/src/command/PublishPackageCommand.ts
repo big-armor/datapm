@@ -22,8 +22,13 @@ export class PublishPackageCommand implements Command {
 }
 
 export async function publishPackage(args: PublishArguments): Promise<void> {
-    const publishCommand = await import("./PublishPackageCommandModule");
+    try {
+        const publishCommand = await import("./PublishPackageCommandModule");
 
-    const module = new publishCommand.PublishPackageCommandModule();
-    await module.handleCommand(args);
+        const module = new publishCommand.PublishPackageCommandModule();
+        await module.handleCommand(args);
+    } catch (e) {
+        console.error(e);
+        process.exit(1);
+    }
 }

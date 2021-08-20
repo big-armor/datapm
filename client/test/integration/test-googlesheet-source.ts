@@ -22,7 +22,7 @@ describe("Googlesheet Source Test", function () {
             [
                 {
                     message: "Source?",
-                    input: KEYS.DOWN + KEYS.DOWN + KEYS.ENTER
+                    input: "Google Sheets" + KEYS.ENTER
                 },
                 {
                     message: "URL of Google Sheet?",
@@ -30,7 +30,7 @@ describe("Googlesheet Source Test", function () {
                 },
                 {
                     message: "Is there a header line above?",
-                    input: "Y"
+                    input: "Y" + KEYS.ENTER
                 },
                 {
                     message: "Header row line number?",
@@ -38,14 +38,14 @@ describe("Googlesheet Source Test", function () {
                 },
                 {
                     message: "Is there a header line above?",
-                    input: "Y"
+                    input: "Y" + KEYS.ENTER
                 },
                 {
                     message: "Header row line number?",
                     input: "0" + KEYS.ENTER
                 }
             ],
-            (line: string) => {
+            async (line: string) => {
                 if (line.includes("datapm publish ")) {
                     results.messageFound = true;
                 }
@@ -67,7 +67,7 @@ describe("Googlesheet Source Test", function () {
             [
                 {
                     message: "Is there a header line above?",
-                    input: "Y"
+                    input: "Y" + KEYS.ENTER
                 },
                 {
                     message: "Header row line number?",
@@ -75,14 +75,14 @@ describe("Googlesheet Source Test", function () {
                 },
                 {
                     message: "Is there a header line above?",
-                    input: "Y"
+                    input: "Y" + KEYS.ENTER
                 },
                 {
                     message: "Header row line number?",
                     input: "0" + KEYS.ENTER
                 }
             ], // there are two sheets
-            (line: string) => {
+            async (line: string) => {
                 if (line.includes("datapm publish ")) {
                     results.messageFound = true;
                 }

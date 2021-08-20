@@ -21,7 +21,7 @@ describe("Catalogs Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("catalogs", [], [], (line: string) => {
+        const cmdResult = await testCmd("catalogs", [], [], async (line: string) => {
             if (line.includes("No registries added yet")) {
                 results.messageFound = true;
             }
@@ -40,7 +40,7 @@ describe("Catalogs Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("catalogs", [], [], (line: string) => {
+        const cmdResult = await testCmd("catalogs", [], [], async (line: string) => {
             if (line.includes("Only absolute URLs are supported")) {
                 results.messageFound = true;
             }
@@ -59,7 +59,7 @@ describe("Catalogs Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("catalogs", [], [], (line: string) => {
+        const cmdResult = await testCmd("catalogs", [], [], async (line: string) => {
             if (line.includes("ENOTFOUND")) {
                 results.messageFound = true;
             }
@@ -78,7 +78,7 @@ describe("Catalogs Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("catalogs", [], [], (line: string) => {
+        const cmdResult = await testCmd("catalogs", [], [], async (line: string) => {
             if (line.includes("Unexpected token < in JSON at position 0")) {
                 results.messageFound = true;
             }
@@ -97,7 +97,7 @@ describe("Catalogs Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("catalogs", [], [], (line: string) => {
+        const cmdResult = await testCmd("catalogs", [], [], async (line: string) => {
             if (line.includes("NOT_AUTHENTICATED")) {
                 results.messageFound = true;
             }
@@ -124,7 +124,7 @@ describe("Catalogs Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("catalogs", [], [], (line: string) => {
+        const cmdResult = await testCmd("catalogs", [], [], async (line: string) => {
             if (line.includes(data.myCatalogs[0].displayName as string)) {
                 results.messageFound = true;
             }

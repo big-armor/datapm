@@ -61,7 +61,7 @@ describe("Package Command Tests", async () => {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("package", ["invalid"], [], (line: string) => {
+        const cmdResult = await testCmd("package", ["invalid"], [], async (line: string) => {
             if (line.includes("No source implementation found to inspect this data")) {
                 results.messageFound = true;
             }
@@ -77,7 +77,7 @@ describe("Package Command Tests", async () => {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("package", ["https://test.datapm.xyz"], [], (line: string) => {
+        const cmdResult = await testCmd("package", ["https://test.datapm.xyz"], [], async (line: string) => {
             if (line.includes("ENOTFOUND")) {
                 results.messageFound = true;
             }
@@ -97,7 +97,7 @@ describe("Package Command Tests", async () => {
             "package",
             [TEST_SOURCE_FILES.HTTP2],
             [],
-            (line: string, index: number, cmdProcess: ExecaChildProcess) => {
+            async (line: string, index: number, cmdProcess: ExecaChildProcess) => {
                 if (line.includes("Could not automatically detect file type")) {
                     results.messageFound = true;
                     if (cmdProcess.stdin) cmdProcess.stdin.end();
@@ -118,10 +118,10 @@ describe("Package Command Tests", async () => {
 
         const cmdResult = await testCmd(
             "package",
-            [TEST_SOURCE_FILES.HTTP1, "--sourceConfiguration", "invalid"],
+            [TEST_SOURCE_FILES.HTTP1, "--configuration", "invalid"],
             [],
-            (line: string) => {
-                if (line.includes("Could not parse the sourceConfiguration parameter as JSON")) {
+            async (line: string) => {
+                if (line.includes("Could not parse the configuration parameter as JSON")) {
                     results.messageFound = true;
                 }
             }
@@ -147,7 +147,7 @@ describe("Package Command Tests", async () => {
             "package",
             [TEST_SOURCE_FILES.HTTP1],
             prompts,
-            (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
+            async (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
                 if (line.includes("Must be a valid name")) {
                     results.messageFound = true;
                     cmdProcess.kill("SIGINT");
@@ -175,7 +175,7 @@ describe("Package Command Tests", async () => {
             "package",
             [TEST_SOURCE_FILES.HTTP1],
             prompts,
-            (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
+            async (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
                 if (line.includes("Must include only letters, numbers, periods, underscores, and hyphens")) {
                     results.messageFound = true;
                     cmdProcess.kill("SIGINT");
@@ -203,7 +203,7 @@ describe("Package Command Tests", async () => {
             "package",
             [TEST_SOURCE_FILES.HTTP1],
             prompts,
-            (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
+            async (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
                 if (line.includes("Must be in format of 1.2.3")) {
                     results.messageFound = true;
                     cmdProcess.kill("SIGINT");
@@ -230,7 +230,7 @@ describe("Package Command Tests", async () => {
             "package",
             [TEST_SOURCE_FILES.HTTP1],
             prompts,
-            (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
+            async (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
                 if (line.includes("Must be longer than 3 characters")) {
                     results.messageFound = true;
                     cmdProcess.kill("SIGINT");
@@ -253,7 +253,7 @@ describe("Package Command Tests", async () => {
             "package",
             [TEST_SOURCE_FILES.FILE5, "--defaults"],
             defaultPromptInputsForCSVs,
-            (line: string) => {
+            async (line: string) => {
                 if (line.includes("senate_class") && line.includes("number(18.59%), null(81.41%)")) {
                     results.senateClassStatsFound = true;
                 }
@@ -320,7 +320,7 @@ describe("Package Command Tests", async () => {
             },
             {
                 message: "Do you want to specify units for the 3 number properties?",
-                input: "Y"
+                input: "Y" + KEYS.ENTER
             },
             {
                 message: "Unit for attribute 'Confirmed'?",
@@ -339,7 +339,7 @@ describe("Package Command Tests", async () => {
             exitCode: -1,
             messageFound: false
         };
-        const cmdResult = await testCmd("package", [TEST_SOURCE_FILES.FILE1], prompts, (line: string) => {
+        const cmdResult = await testCmd("package", [TEST_SOURCE_FILES.FILE1], prompts, async (line: string) => {
             if (line.includes("When you are ready, you can publish with the following command")) {
                 results.messageFound = true;
             }
@@ -389,7 +389,7 @@ describe("Package Command Tests", async () => {
             exitCode: -1,
             messageFound: false
         };
-        const cmdResult = await testCmd("package", [TEST_SOURCE_FILES.FILE6], prompts, (line: string) => {
+        const cmdResult = await testCmd("package", [TEST_SOURCE_FILES.FILE6], prompts, async (line: string) => {
             if (line.includes("When you are ready, you can publish with the following command")) {
                 results.messageFound = true;
             }
@@ -439,7 +439,7 @@ describe("Package Command Tests", async () => {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("package", [TEST_SOURCE_FILES.HTTP1], promptInputs, (line: string) => {
+        const cmdResult = await testCmd("package", [TEST_SOURCE_FILES.HTTP1], promptInputs, async (line: string) => {
             if (line.includes("When you are ready, you can publish with the following command")) {
                 results.messageFound = true;
             }
@@ -488,7 +488,7 @@ describe("Package Command Tests", async () => {
                 errorMessageFound: false,
                 helperMessageFound: false
             };
-            const cmdResult = await testCmd("package", [TEST_SOURCE_FILES.HTTP1], prompts, (line: string) => {
+            const cmdResult = await testCmd("package", [TEST_SOURCE_FILES.HTTP1], prompts, async (line: string) => {
                 if (line.includes("You have not added a registry API key")) {
                     results.errorMessageFound = true;
                 }
@@ -530,7 +530,7 @@ describe("Package Command Tests", async () => {
                 exitCode: -1,
                 messageFound: false
             };
-            const cmdResult = await testCmd("package", [TEST_SOURCE_FILES.HTTP1], prompts, (line: string) => {
+            const cmdResult = await testCmd("package", [TEST_SOURCE_FILES.HTTP1], prompts, async (line: string) => {
                 if (line.includes("When you are ready, you can publish with the following command")) {
                     results.messageFound = true;
                 }
@@ -552,7 +552,7 @@ describe("Package Command Tests", async () => {
                 "package",
                 [TEST_SOURCE_FILES.HTTP1, "--defaults"],
                 defaultPromptInputsForCSVs,
-                (line: string) => {
+                async (line: string) => {
                     if (line.includes("When you are ready, you can publish with the following command")) {
                         results.messageFound = true;
                     }
@@ -587,7 +587,7 @@ describe("Package Command Tests", async () => {
                 exitCode: -1,
                 messageFound: false
             };
-            const cmdResult = await testCmd("package", [TEST_SOURCE_FILES.HTTP1], prompts, (line: string) => {
+            const cmdResult = await testCmd("package", [TEST_SOURCE_FILES.HTTP1], prompts, async (line: string) => {
                 if (line.includes("Share the command below to fetch the data in this package")) {
                     results.messageFound = true;
                 }

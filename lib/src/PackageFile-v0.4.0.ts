@@ -60,7 +60,7 @@ export interface StreamSet040 {
  * access a database, and which tables are each an individual stream set.
  */
 export interface Source040 {
-    /** The universally unique identifier for the sourceInterface implementation */
+    /** The universally unique identifier for the Source implementation */
     type: string;
 
     /** The unique identifier for this source in the package */
