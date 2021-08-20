@@ -620,7 +620,7 @@ describe("Package Issues and Comments Tests", async () => {
         });
 
         const version = "1.0.0";
-        const url = `${DATA_ENDPOINT_URL}/${inintialPackageCatalogSlug}/${packageSlug}/${version}/${URL_ENCODED_SOURCE_SLUG}`;
+        const url = `${DATA_ENDPOINT_URL}/${inintialPackageCatalogSlug}/${packageSlug}/${version}/${URL_ENCODED_SOURCE_SLUG}/${URL_ENCODED_SOURCE_SLUG}`;
 
         const dataFile = fs.readFileSync("test/data-files/data.avro");
         const dataUploadResponse = await request.post(url).set("Authorization", userAToken).send(dataFile);
@@ -641,7 +641,7 @@ describe("Package Issues and Comments Tests", async () => {
         });
 
         const sanitizedSlug = sanitize(ORIGINAL_SOURCE_SLUG);
-        const storageLocation = `${TEMP_STORAGE_PATH}/data/${targetPackageCatalogSlug}/${packageSlug}/${version}/${sanitizedSlug}`;
+        const storageLocation = `${TEMP_STORAGE_PATH}/data/${targetPackageCatalogSlug}/${packageSlug}/1/${sanitizedSlug}/${sanitizedSlug}`;
 
         const storedFile = fs.readFileSync(storageLocation).toString("base64");
         expect(dataFile.toString("base64")).equal(storedFile);

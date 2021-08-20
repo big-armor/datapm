@@ -33,7 +33,7 @@ export class PackageDataStorageService {
         return new Promise(
             async (res, rej) =>
                 await this.fileStorageService
-                    .moveFile([oldCatalogSlug], packageSlug,[newCatalogSlug],packageSlug,(error: any) => {
+                    .moveFile([this.NAMESPACE,oldCatalogSlug], packageSlug,[this.NAMESPACE,newCatalogSlug],packageSlug,(error: any) => {
                         if (error) {
                             rej(error);
                         } else {

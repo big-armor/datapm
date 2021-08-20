@@ -59,8 +59,7 @@ export class FileStorage implements DPMStorage {
 
     public async writeItem(namespace: string[], itemId: string, byteStream: Readable, transformer?: any): Promise<void> {
         this.createItemDirectoryIfMissing(namespace);
-        const sanitizedItemId = sanitize(itemId);
-        const path = this.buildPath(namespace, sanitizedItemId);
+        const path = this.buildPath(namespace, itemId);
         const writeStream = fs.createWriteStream(path);
         return this.streamHelper.copyToStream(byteStream, writeStream, transformer);
     }

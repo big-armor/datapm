@@ -364,6 +364,10 @@ async function main() {
             }
         });
 
+    app.route("/data/*").get(async (req, res, next) => {
+        res.status(404).send();
+    });
+
     // any route not yet defined goes to index.html
     app.use("*", (req, res, next) => {
         res.setHeader("x-datapm-version", REGISTRY_API_VERSION);
