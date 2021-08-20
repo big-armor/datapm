@@ -1,4 +1,3 @@
-import { rejects } from "assert";
 import { SemVer } from "semver";
 import { Readable } from "stream";
 import { Context } from "../../context";
@@ -31,13 +30,10 @@ export class PackageDataStorageService {
             return;
         }
 
-        const oldPackagePath = this.buildPackageNamespace(oldCatalogSlug, packageSlug);
-        const newPackagePath = this.buildPackageNamespace(newCatalogSlug, packageSlug);
-
         return new Promise(
             async (res, rej) =>
                 await this.fileStorageService
-                    .moveFile(oldPackagePath, newPackagePath, (error: any) => {
+                    .moveFile([oldCatalogSlug], packageSlug,[newCatalogSlug],packageSlug,(error: any) => {
                         if (error) {
                             rej(error);
                         } else {
@@ -54,16 +50,25 @@ export class PackageDataStorageService {
         packageSlug: string,
         version: string,
         sourceSlug: string,
+        streamSetSlug: string,
         dataStream: Readable
     ): Promise<void> {
         // TODO: Validate that the data is in a valid avro format
 
+        // TODO: allow multiple paries to write data to different streams, effectively each controlling
+        // one or more streams. The package maintainer allows contributors to write either to their own streams
+        // or to one stream
+
+        // TODO: allow the user to specify whether to replace the existing stream, or create a new stream
+
         const packageEntity = await this.getPackage(context, catalogSlug, packageSlug);
         await this.validatePackageEditPermissions(context, packageEntity);
-        await this.validatePackageSlug(packageEntity, version, sourceSlug);
+        await this.validatePackageSourceSlug(packageEntity, version, sourceSlug);
 
-        const namespace = this.buildDataNamespace(catalogSlug, packageSlug, version);
-        return this.fileStorageService.writeFileFromStream(namespace, sourceSlug, dataStream);
+        const semVer = new SemVer(version);
+
+        const namespace = this.buildSourceNamespace(catalogSlug, packageSlug, semVer.major, sourceSlug);
+        return this.fileStorageService.writeFileFromStream(namespace, streamSetSlug, dataStream);
     }
 
     public async readPackageDataFromStream(
@@ -71,14 +76,17 @@ export class PackageDataStorageService {
         catalogSlug: string,
         packageSlug: string,
         version: string,
-        sourceSlug: string
+        sourceSlug: string,
+        streamSetSlug: string
     ): Promise<Readable> {
         const packageEntity = await this.getPackage(context, catalogSlug, packageSlug);
         await this.validatePackageViewPermissions(context, packageEntity);
-        await this.validatePackageSlug(packageEntity, version, sourceSlug);
+        await this.validatePackageSourceSlug(packageEntity, version, sourceSlug);
 
-        const namespace = this.buildDataNamespace(catalogSlug, packageSlug, version);
-        return await this.fileStorageService.readFile(namespace, sourceSlug);
+        const semVer = new SemVer(version);
+
+        const namespace = this.buildSourceNamespace(catalogSlug, packageSlug, semVer.major, sourceSlug);
+        return await this.fileStorageService.readFile(namespace, streamSetSlug);
     }
 
     private async getPackage(context: Context, catalogSlug: string, packageSlug: string): Promise<PackageEntity> {
@@ -108,7 +116,7 @@ export class PackageDataStorageService {
         }
     }
 
-    private async validatePackageSlug(
+    private async validatePackageSourceSlug(
         packageEntity: PackageEntity,
         version: string,
         sourceSlug: string
@@ -128,15 +136,25 @@ export class PackageDataStorageService {
         }
     }
 
-    private buildDataNamespace(catalogSlug: string, packageSlug: string, version: string): string {
-        return this.buildPackageNamespace(catalogSlug, packageSlug) + version + "/";
+    private buildStreamSetNamespace(catalogSlug: string, packageSlug: string, majorVersion: number,sourceSlug:string, streamSetSlug: string): string[] {
+        return [...this.buildSourceNamespace(catalogSlug, packageSlug, majorVersion, sourceSlug), streamSetSlug ];
+
     }
 
-    private buildPackageNamespace(catalogSlug: string, packageSlug: string): string {
-        return this.buildCatalogNamespace(catalogSlug) + packageSlug + "/";
+    private buildSourceNamespace(catalogSlug: string, packageSlug: string, majorVersion: number,sourceSlug:string): string[] {
+        return [...this.buildVersionNamespace(catalogSlug, packageSlug, majorVersion), sourceSlug];
+
     }
 
-    private buildCatalogNamespace(catalogSlug: string): string {
-        return this.NAMESPACE + "/" + catalogSlug + "/";
+    private buildVersionNamespace(catalogSlug: string, packageSlug: string, majorVersion: number): string[] {
+        return [...this.buildPackageNamespace(catalogSlug, packageSlug), majorVersion.toString() ];
+    }
+
+    private buildPackageNamespace(catalogSlug: string, packageSlug: string): string[] {
+        return [...this.buildCatalogNamespace(catalogSlug),packageSlug];
+    }
+
+    private buildCatalogNamespace(catalogSlug: string): string[] {
+        return [this.NAMESPACE, catalogSlug];
     }
 }

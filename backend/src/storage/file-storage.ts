@@ -4,6 +4,7 @@ import { DpmStorageStreamHolder } from "./dpm-storage-stream-holder";
 import { StorageErrors } from "./files/file-storage-service";
 import sanitize from "sanitize-filename";
 
+import path from "path";
 import fs from "fs-extra";
 
 export class FileStorage implements DPMStorage {
@@ -27,16 +28,14 @@ export class FileStorage implements DPMStorage {
         }
     }
 
-    public itemExists(namespace: string, itemId: string): Promise<boolean> {
-        const sanitizedItemId = sanitize(itemId);
-        const path = this.buildPath(namespace, sanitizedItemId);
+    public itemExists(namespace: string[], itemId: string): Promise<boolean> {
+        const path = this.buildPath(namespace, itemId);
         const itemExistsInPath = this.itemExistsInAbsolutePath(path);
         return Promise.resolve(itemExistsInPath);
     }
 
-    public deleteItem(namespace: string, itemId: string): Promise<void> {
-        const sanitizedItemId = sanitize(itemId);
-        const path = this.buildPath(namespace, sanitizedItemId);
+    public deleteItem(namespace: string[], itemId: string): Promise<void> {
+        const path = this.buildPath(namespace, itemId);
 
         if (!fs.existsSync(path)) {
             return Promise.resolve();
@@ -46,9 +45,8 @@ export class FileStorage implements DPMStorage {
         return Promise.resolve();
     }
 
-    public async getItem(namespace: string, itemId: string): Promise<Readable> {
-        const sanitizedItemId = sanitize(itemId);
-        const path = this.buildPath(namespace, sanitizedItemId);
+    public async getItem(namespace: string[], itemId: string): Promise<Readable> {
+        const path = this.buildPath(namespace, itemId);
 
         if (!fs.existsSync(path)) {
             throw new Error(StorageErrors.FILE_DOES_NOT_EXIST);
@@ -59,7 +57,7 @@ export class FileStorage implements DPMStorage {
         return Promise.resolve(readStream);
     }
 
-    public async writeItem(namespace: string, itemId: string, byteStream: Readable, transformer?: any): Promise<void> {
+    public async writeItem(namespace: string[], itemId: string, byteStream: Readable, transformer?: any): Promise<void> {
         this.createItemDirectoryIfMissing(namespace);
         const sanitizedItemId = sanitize(itemId);
         const path = this.buildPath(namespace, sanitizedItemId);
@@ -67,13 +65,13 @@ export class FileStorage implements DPMStorage {
         return this.streamHelper.copyToStream(byteStream, writeStream, transformer);
     }
 
-    public async moveFile(oldFilePath: string, newFilePath: string, callback?: any): Promise<void> {
-        const oldFileFinalPath = this.buildBasePath(oldFilePath);
+    public async moveFile(oldNamespace: string[], oldItemId:string, newNamespace:string[], newItemId:string, callback?: any): Promise<void> {
+        const oldFileFinalPath = this.buildPath(oldNamespace,oldItemId);
         if (!this.itemExistsInAbsolutePath(oldFileFinalPath)) {
             throw new Error(StorageErrors.FILE_DOES_NOT_EXIST);
         }
 
-        const newFileFinalPath = this.buildBasePath(newFilePath);
+        const newFileFinalPath = this.buildPath(newNamespace,newItemId);
         return fs.move(oldFileFinalPath, newFileFinalPath, { overwrite: true }, callback);
     }
 
@@ -91,8 +89,8 @@ export class FileStorage implements DPMStorage {
         }
     }
 
-    private createItemDirectoryIfMissing(namespace: string): void {
-        const path = `${this.SCHEMA_URL}/${namespace}`;
+    private createItemDirectoryIfMissing(namespace: string[]): void {
+        const path = this.buildBasePath(namespace);
         if (!fs.existsSync(path)) {
             fs.mkdirSync(path, { recursive: true });
         }
@@ -102,11 +100,13 @@ export class FileStorage implements DPMStorage {
         return fs.existsSync(path);
     }
 
-    private buildPath(namespace: string, itemId: string): string {
-        return `${this.buildBasePath(namespace)}/${itemId}`;
+    private buildPath(namespace: string[], itemId: string): string {
+        const sanitizedItemId = sanitize(itemId);
+        return [this.buildBasePath(namespace), sanitizedItemId].join(path.sep);
     }
 
-    private buildBasePath(namespace: string): string {
-        return `${this.SCHEMA_URL}/${namespace}`;
+    private buildBasePath(namespace: string[]): string {
+        const sanitizedNamespace = namespace.map(n => sanitize(n));
+        return [this.SCHEMA_URL,...sanitizedNamespace].join(path.sep);
     }
 }

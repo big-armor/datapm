@@ -12,7 +12,7 @@ export class FileStorageService {
     private readonly storageService: DPMStorage = StorageProvider.getStorage();
 
     public async writeFileFromBuffer(
-        namespace: string,
+        namespace: string[],
         itemId: string,
         contents: Buffer,
         transformer?: any
@@ -22,7 +22,7 @@ export class FileStorageService {
     }
 
     public async writeFileFromStream(
-        namespace: string,
+        namespace: string[],
         itemId: string,
         stream: Readable,
         transformer?: any
@@ -31,7 +31,7 @@ export class FileStorageService {
     }
 
     public async writeFileFromString(
-        namespace: string,
+        namespace: string[],
         itemId: string,
         contents: string,
         transformer?: any
@@ -40,19 +40,19 @@ export class FileStorageService {
         return this.storageService.writeItem(namespace, itemId, stream, transformer);
     }
 
-    public async writeFile(namespace: string, itemId: string, stream: Readable, transformer?: any): Promise<void> {
+    public async writeFile(namespace: string[], itemId: string, stream: Readable, transformer?: any): Promise<void> {
         return this.storageService.writeItem(namespace, itemId, stream, transformer);
     }
 
-    public async fileExists(namespace: string, itemId: string): Promise<boolean> {
+    public async fileExists(namespace: string[], itemId: string): Promise<boolean> {
         return this.storageService.itemExists(namespace, itemId);
     }
 
-    public async moveFile(oldFilePath: string, newFilePath: string, callback: any): Promise<void> {
-        return this.storageService.moveFile(oldFilePath, newFilePath, callback);
+    public async moveFile(oldNamespace: string[], oldItemId:string, newNamespace:string[], newItemId:string,  callback: any): Promise<void> {
+        return this.storageService.moveFile(oldNamespace, oldItemId, newNamespace, newItemId, callback);
     }
 
-    public async deleteFile(namespace: string, itemId: string): Promise<void> {
+    public async deleteFile(namespace: string[], itemId: string): Promise<void> {
         try {
             return this.storageService.deleteItem(namespace, itemId);
         } catch (error) {
@@ -65,7 +65,7 @@ export class FileStorageService {
         }
     }
 
-    public async readFile(namespace: string, itemId: string): Promise<Readable> {
+    public async readFile(namespace: string[], itemId: string): Promise<Readable> {
         return this.storageService.getItem(namespace, itemId);
     }
 
