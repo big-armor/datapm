@@ -208,17 +208,24 @@ jobs:
               run: node --version
 
             - name: Cache Lib Node_modules
+              id: cache-lib-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: lib/node_modules
+                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/package.json','lib/package-lock.json') }}
+
+            - name: Install Lib Dependencies
+              id: install-lib-Dependencies
+              if: steps.cache-lib-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: lib
+
+            - name: Cache Lib Dist
               id: cache-lib-dist
               uses: actions/cache@v1
               with:
                   path: lib/dist
                   key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/**') }}
-
-            - name: Install Lib Dependencies
-              id: install-lib-Dependencies
-              if: steps.cache-lib-dist.outputs.cache-hit != 'true'
-              run: npm ci
-              working-directory: lib
 
             - name: Build Lib
               id: build-lib-Dependencies
