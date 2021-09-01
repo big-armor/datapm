@@ -97,9 +97,11 @@ describe("AVRO Sink Test", function () {
 });
 
 function cleanup() {
-    fs.unlinkSync("covid-02-01-2020.avro");
-    fs.unlinkSync("_no_catalog-covid-02-01-2020-1-state.json");
-    fs.unlinkSync("weird-headers.avro");
-    fs.unlinkSync("__no_catalog-weird-headers-1-state.json");
+    if (fs.existsSync("covid-02-01-2020.avro")) fs.unlinkSync("covid-02-01-2020.avro");
+    if (fs.existsSync("_no_catalog-covid-02-01-2020-1-state.json"))
+        fs.unlinkSync("_no_catalog-covid-02-01-2020-1-state.json");
+    if (fs.existsSync("weird-headers.avro")) fs.unlinkSync("weird-headers.avro");
+    if (fs.existsSync("_no_catalog-weird-headers-1-state.json"))
+        fs.unlinkSync("_no_catalog-weird-headers-1-state.json");
     removePackageFiles(["covid-02-01-2020", "weird-headers"]);
 }
