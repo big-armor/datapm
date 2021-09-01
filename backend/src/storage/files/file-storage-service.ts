@@ -52,6 +52,11 @@ export class FileStorageService {
         return this.storageService.moveFile(oldNamespace, oldItemId, newNamespace, newItemId, callback);
     }
 
+    public async deleteFiles(namespace: string[]): Promise<void> {
+        
+        return this.storageService.deleteAllItems(namespace);
+    }
+
     public async deleteFile(namespace: string[], itemId: string): Promise<void> {
         try {
             return this.storageService.deleteItem(namespace, itemId);
@@ -63,6 +68,10 @@ export class FileStorageService {
 
             throw error;
         }
+    }
+
+    public async listFiles(namespace:string[]): Promise<string[]> {
+        return this.storageService.listItems(namespace);
     }
 
     public async readFile(namespace: string[], itemId: string): Promise<Readable> {

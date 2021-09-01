@@ -374,7 +374,7 @@ export const getCatalogByIdentifierOrFail = async (
     );
 
     if (catalog == null) {
-        throw new UserInputError("CATALOG_NOT_FOUND");
+        throw new UserInputError("CATALOG_NOT_FOUND: " + identifier.catalogSlug);
     }
 
     return catalogEntityToGraphQL(catalog);

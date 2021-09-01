@@ -187,7 +187,7 @@ export const packageCatalog = async (
         getRelationNames(graphqlFields(info))
     );
     if (!catalog) {
-        throw new Error("CATALOG_NOT_FOUND");
+        throw new Error("CATALOG_NOT_FOUND: " + packageEntity.catalogId);
     }
 
     if (!(await hasPackageEntityPermissions(context, packageEntity, Permission.VIEW))) {
@@ -262,7 +262,7 @@ export const myPackagePermissions = async (parent: Package, _0: any, context: Au
 
     const catalog = await getCatalogFromCacheOrDbById(context, packageEntity.catalogId);
     if (catalog == null) {
-        throw new Error("CATALOG_NOT_FOUND - " + packageEntity.catalogId);
+        throw new Error("CATALOG_NOT_FOUND: " + packageEntity.catalogId);
     }
 
     return resolvePackagePermissions(
@@ -375,8 +375,8 @@ export const createPackage = async (
 
             return await packageEntityToGraphqlObject(context, transaction, packageEntity);
         } catch (error) {
-            if (error.message == "CATALOG_NOT_FOUND") {
-                throw new UserInputError("CATALOG_NOT_FOUND");
+            if (error.message.startsWith("CATALOG_NOT_FOUND")) {
+                throw new UserInputError(error.message);
             }
 
             throw new ApolloError("UNKNOWN_ERROR - " + error.message);

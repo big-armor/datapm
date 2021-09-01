@@ -50,7 +50,7 @@ async function findPackage(
     const catalog = await manager.getCustomRepository(CatalogRepository).findCatalogBySlug({ slug: catalogSlug });
 
     if (catalog == undefined) {
-        throw new Error("CATALOG_NOT_FOUND");
+        throw new Error("CATALOG_NOT_FOUND: " + catalogSlug);
     }
     const options: FindOneOptions<PackageEntity> = {
         where: { catalogId: catalog.id, slug: packageSlug },
@@ -251,7 +251,7 @@ export class PackageRepository extends Repository<PackageEntity> {
                 .findCatalogBySlug({ slug: packageInput.catalogSlug });
 
             if (catalog == undefined) {
-                throw new Error("CATALOG_NOT_FOUND");
+                throw new Error("CATALOG_NOT_FOUND: " + packageInput.catalogSlug);
             }
 
             const packageEntity = transaction.getRepository(PackageEntity).create();

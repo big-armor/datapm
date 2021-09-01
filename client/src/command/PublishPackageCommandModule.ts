@@ -174,7 +174,7 @@ export class PublishPackageCommandModule {
 
             const publishMethod = await this.obtainPublishMethod(oraRef, packageFile, PublishMethod.SCHEMA_ONLY);
 
-            if (publishMethod === PublishMethod.PROXY_DATA) {
+            if (publishMethod === PublishMethod.SCHEMA_PROXY_DATA) {
                 const sourceCredentials = new Map<string, DPMConfiguration>();
                 credentialsByPackageIdentifier.packages.set(
                     targetRegistryActionResponse.targetRegistry + "/" + catalogSlugActionResponse.catalogSlug,
@@ -508,10 +508,10 @@ export class PublishPackageCommandModule {
         // filter out all othe registries
         packageFile.registries = [registryReference];
 
-        if (registryReference.publishMethod === PublishMethod.DATA_AND_SCHEMA) {
+        if (registryReference.publishMethod === PublishMethod.SCHEMA_AND_DATA) {
             // Change all sources to use the target registry as the data repository
             throw new Error("Data publishing not yet implemented");
-        } else if (registryReference.publishMethod === PublishMethod.PROXY_DATA) {
+        } else if (registryReference.publishMethod === PublishMethod.SCHEMA_PROXY_DATA) {
             throw new Error("Publishing with credentials not yet implemented");
         }
 
@@ -568,13 +568,13 @@ export class PublishPackageCommandModule {
                 },
                 {
                     title: "Publish schema, proxy data through registry",
-                    selected: defaultValue === PublishMethod.PROXY_DATA,
-                    value: PublishMethod.PROXY_DATA
+                    selected: defaultValue === PublishMethod.SCHEMA_PROXY_DATA,
+                    value: PublishMethod.SCHEMA_PROXY_DATA
                 },
                 {
                     title: "Publish schema and data to registry",
-                    selected: defaultValue === PublishMethod.DATA_AND_SCHEMA,
-                    value: PublishMethod.DATA_AND_SCHEMA
+                    selected: defaultValue === PublishMethod.SCHEMA_AND_DATA,
+                    value: PublishMethod.SCHEMA_AND_DATA
                 }
             ];
 
@@ -631,7 +631,7 @@ export class PublishPackageCommandModule {
                 return PublishMethod.SCHEMA_ONLY;
             }
 
-            if (publishTypeSelection.method === PublishMethod.DATA_AND_SCHEMA) {
+            if (publishTypeSelection.method === PublishMethod.SCHEMA_AND_DATA) {
                 oraRef.info(
                     "The data in this package will be copied, as a current snapshot or update, to the registry."
                 );
@@ -660,10 +660,10 @@ export class PublishPackageCommandModule {
                     continue;
                 }
 
-                return PublishMethod.DATA_AND_SCHEMA;
+                return PublishMethod.SCHEMA_AND_DATA;
             }
 
-            if (publishTypeSelection.method === PublishMethod.PROXY_DATA) {
+            if (publishTypeSelection.method === PublishMethod.SCHEMA_PROXY_DATA) {
                 if (packageFile.sources.find((s) => s.credentialsIdentifier !== undefined) !== undefined) {
                     oraRef.info(
                         "The registry will act as a proxy for this data, and therefore you must provide the registry with access credentials for the data."
@@ -695,7 +695,7 @@ export class PublishPackageCommandModule {
                         continue;
                     }
 
-                    return PublishMethod.PROXY_DATA;
+                    return PublishMethod.SCHEMA_PROXY_DATA;
                 }
             }
         }

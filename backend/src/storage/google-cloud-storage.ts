@@ -33,6 +33,11 @@ export class GoogleCloudStorage implements DPMStorage {
         this.ensureConnectionEstablished();
     }
 
+    public async deleteAllItems(namespace: string[]): Promise<void> {
+        this.ensureConnectionEstablished();
+        await this.bucket.deleteFiles({ prefix: this.buildPath(namespace, "") });
+    }
+
     public async deleteItem(namespace: string[], itemId: string) {
         this.ensureConnectionEstablished();
         const file = await this.getBucketFile(namespace, itemId);
@@ -63,6 +68,15 @@ export class GoogleCloudStorage implements DPMStorage {
         const fileReadStream = file.createReadStream();
         this.streamHelper.registerReadStream(fileReadStream);
         return Promise.resolve(fileReadStream);
+    }
+
+    public async listItems(namespace: string[]): Promise<string[]> {
+        this.ensureConnectionEstablished();
+        const fileList = await this.bucket.getFiles({ prefix: this.buildPath(namespace, "") });
+        return fileList.map((file) => {
+            const parts = file.name.split("/");
+            return parts[parts.length - 1];
+        });
     }
 
     public async writeItem(namespace: string[], itemId: string, byteStream: Readable, transformer?: any): Promise<void> {

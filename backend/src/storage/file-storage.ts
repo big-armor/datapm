@@ -64,6 +64,29 @@ export class FileStorage implements DPMStorage {
         return this.streamHelper.copyToStream(byteStream, writeStream, transformer);
     }
 
+    public async deleteAllItems(namespace: string[]): Promise<void> {
+        const basePath = this.buildBasePath(namespace);
+        if (!this.itemExistsInAbsolutePath(basePath)) {
+            return;
+        }
+
+        fs.unlinkSync(basePath);
+    }
+
+
+    public async listItems(namespace: string[]): Promise<string[]> {
+        const basePath = this.buildBasePath(namespace);
+        if(!this.itemExistsInAbsolutePath(basePath)) {
+            return [];
+        }
+
+        return fs.readdirSync(basePath).map(f => {
+            const parts =  f.split(path.sep);
+            return parts[parts.length - 1];
+        });
+
+    }
+
     public async moveFile(oldNamespace: string[], oldItemId:string, newNamespace:string[], newItemId:string, callback?: any): Promise<void> {
         const oldFileFinalPath = this.buildPath(oldNamespace,oldItemId);
         if (!this.itemExistsInAbsolutePath(oldFileFinalPath)) {

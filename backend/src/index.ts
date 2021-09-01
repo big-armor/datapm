@@ -21,7 +21,7 @@ import { UserRepository } from "./repository/UserRepository";
 import { PackageRepository } from "./repository/PackageRepository";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { CollectionRepository } from "./repository/CollectionRepository";
-import { PackageDataStorageService } from "./storage/data/package-data-storage-service";
+import { PackageDataStorageService, UpdateMethod } from "./storage/data/package-data-storage-service";
 import { startLeaderElection, stopLeaderElection } from "./service/leader-election-service";
 import { SessionCache } from "./session-cache";
 
@@ -329,6 +329,33 @@ async function main() {
     });
 
     app.route("/data/:catalogSlug/:packageSlug/:version/:sourceSlug/:streamSetSlug")
+        .options(async (req, res) => {
+            try {
+                const contextObject = await context({ req });
+                const readDataResult = await PackageDataStorageService.INSTANCE.getLatestFileNameForDataStream(
+                    contextObject,
+                    req.params.catalogSlug,
+                    req.params.packageSlug,
+                    req.params.version,
+                    req.params.sourceSlug,
+                    req.params.streamSetSlug
+                );
+
+
+                res.header("Etag", readDataResult);
+                res.send();
+            } catch (err) {
+
+                if(err.message.includes("_NOT_FOUND")) {
+                    res.status(404).send(err.message);
+                } else if(err.message.includes("NOT_AUTHORIZED")) {
+                    res.status(401).send(err.message);
+                } else {
+                    console.error(err);
+                    res.status(500).send("There was a problem retreiving the latest offset name: " + err.message);
+                }
+            }
+        })
         .post(async (req, res, next) => {
             try {
                 const contextObject = await context({ req });
@@ -339,28 +366,49 @@ async function main() {
                     req.params.version,
                     req.params.sourceSlug,
                     req.params.streamSetSlug,
+                    req.query["updateMethod"] as unknown as UpdateMethod,
                     req
                 );
                 res.send();
             } catch (err) {
-                res.status(400).send();
+                if(err.message.includes("_NOT_FOUND")) {
+                    res.status(404).send(err.message);
+                } else if(err.message.includes("NOT_AUTHORIZED")) {
+                    res.status(401).send(err.message);
+                }  else {
+                    console.error(err);
+                    res.status(500).send("There was a problem saving the file: " + err.message);
+                }
             }
         })
         .get(async (req, res, next) => {
             try {
-                res.header("Content-Type", "application/octet-stream");
                 const contextObject = await context({ req });
-                const stream = await PackageDataStorageService.INSTANCE.readPackageDataFromStream(
+                const readDataResult = await PackageDataStorageService.INSTANCE.readPackageDataFromStream(
                     contextObject,
                     req.params.catalogSlug,
                     req.params.packageSlug,
                     req.params.version,
                     req.params.sourceSlug,
-                    req.params.streamSetSlug
+                    req.params.streamSetSlug,
+                    req.query["offsetHash"] as string | undefined
                 );
-                stream.pipe(res);
+                res.header("Content-Type", "application/avro");
+                res.header("Content-Disposition", `attachment; filename="${readDataResult.fileName}"` );
+                readDataResult.stream.pipe(res);
             } catch (err) {
-                res.status(400).send();
+
+                if(err.message === "NO_NEW_DATA_AVAILABLE") {
+                    res.status(204).send();
+                } else if(err.message.includes("NOT_AUTHORIZED")) {
+                    res.status(401).send(err.message);
+                } else if(err.message.includes("_NOT_FOUND")) {
+                    res.status(404).send(err.message);
+                } else {
+                    console.error(err);
+                    res.status(500).send("There was a problem finding the file: " + err.message);
+                }
+                
             }
         });
 

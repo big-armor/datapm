@@ -64,7 +64,7 @@ describe("Package Tests", async () => {
 
         expect(response.errors != null, "should have errors").to.equal(true);
         expect(
-            response.errors!.find((e) => e.message == "CATALOG_NOT_FOUND") != null,
+            response.errors!.find((e) => e.message.startsWith("CATALOG_NOT_FOUND")) != null,
             "should have catalog not found error"
         ).equal(true);
     });
