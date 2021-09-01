@@ -55,7 +55,7 @@ export class RecordSerializerAVRO implements DPMRecordSerializer {
     }
 
     sanitizeName(name: string): string {
-        return name.replace(/[\s-/]/g, "_");
+        return name.replace(/[^a-zA-Z0-9_/]/g, "");
     }
 
     getAvroSchema(schema: Schema): avro.Type {
