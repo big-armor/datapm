@@ -17,7 +17,7 @@ import {
     StreamSummary
 } from "../repository/Source";
 import { convertValueByValueType, discoverValueType } from "../transforms/StatsTransform";
-import { getSourceByType, mergeValueFormats } from "../repository/SourceUtil";
+import { mergeValueFormats } from "../repository/SourceUtil";
 import { getRepositoryDescriptionByType } from "../repository/RepositoryUtil";
 import { getRepositoryCredential } from "./ConfigUtil";
 import { obtainCredentialsConfiguration } from "./CredentialsUtil";
@@ -85,7 +85,7 @@ export async function inspectSourceConnection(
         }
     }
 
-    credentialsConfiguration = obtainCredentialsConfiguration(
+    credentialsConfiguration = await obtainCredentialsConfiguration(
         oraRef,
         repository,
         source.connectionConfiguration,
@@ -93,9 +93,9 @@ export async function inspectSourceConnection(
         defaults
     );
 
-    const sourceDescription = await getSourceByType(source.type);
+    const sourceDescription = await repositoryDescription.getSourceDescription();
 
-    if (sourceDescription == null) throw new Error(`Unable to find source  for type ${source.type}`);
+    if (sourceDescription == null) throw new Error(`Unable to find source description for type ${source.type}`);
 
     const sourceImplementation = await sourceDescription.getSource();
 
