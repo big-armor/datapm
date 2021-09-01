@@ -228,6 +228,8 @@ describe("Activity Log Tests", async () => {
             expect.fail("There was an error - " + error.message);
         }
 
+        console.log(JSON.stringify(response.errors));
+
         expect(response.errors == null, "no errors").true;
 
         const activityLogResponse = await userOneClient.query({

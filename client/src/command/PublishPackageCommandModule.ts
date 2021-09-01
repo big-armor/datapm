@@ -1,15 +1,18 @@
 import chalk from "chalk";
-import { RegistryReference } from "datapm-lib";
+import { PackageFile, RegistryReference, PublishMethod, DPMConfiguration, Source } from "datapm-lib";
 import ora, { Ora } from "ora";
 import prompts from "prompts";
 import { valid, SemVer } from "semver";
 import { exit } from "yargs";
 import { Catalog, CreateVersionInput, PackageIdentifier } from "../generated/graphql";
+import { getRepositoryDescriptionByType } from "../repository/RepositoryUtil";
 import { getRegistryConfigs, RegistryConfig } from "../util/ConfigUtil";
+import { promptForCredentials } from "../util/CredentialsUtil";
 import { identifierToString } from "../util/IdentifierUtil";
 import { getPackage, PackageFileWithContext } from "../util/PackageAccessUtil";
 import { writePackageFile } from "../util/PackageUtil";
 import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
+import { ParameterOption } from "../util/parameters/Parameter";
 import { getRegistryClientWithConfig } from "../util/RegistryClient";
 import { PublishArguments } from "./PublishPackageCommand";
 
@@ -30,6 +33,15 @@ export enum PublishSteps {
 
 export interface PublishProgress {
     updateStep(step: PublishSteps, registry: RegistryReference): void;
+}
+
+/** A set of registries and their related credentials for the purposes of publishing */
+interface CredentialsByPackageIdentifier {
+    packages: Map<string, CredentialsBySourceSlug>;
+}
+
+interface CredentialsBySourceSlug {
+    sourceSlugs: Map<string, DPMConfiguration>;
 }
 
 export class PublishPackageCommandModule {
@@ -61,10 +73,42 @@ export class PublishPackageCommandModule {
             }
         }
 
+        const credentialsByPackageIdentifier: CredentialsByPackageIdentifier = {
+            packages: new Map<string, CredentialsBySourceSlug>()
+        };
+
         let targetRegistries: RegistryReference[] = [];
-        if (argv.defaults) {
-            targetRegistries = packageFile.registries || [];
-        } else {
+
+        if (argv.defaults && packageFile.registries && packageFile.registries.length > 0) {
+            oraRef.info("Publishing to " + packageFile.registries.join(", "));
+            targetRegistries = packageFile.registries;
+        } else if (packageFile.registries && packageFile.registries.length > 0) {
+            const promptResponse = await prompts([
+                {
+                    type: "autocomplete",
+                    message: "Publish to " + packageFile.registries.join(", ") + "?",
+                    name: "confirm",
+                    choices: [
+                        {
+                            title: "Yes, Continue",
+                            value: true
+                        },
+                        {
+                            title: "No, Choose A Different Registry",
+                            value: false
+                        }
+                    ]
+                }
+            ]);
+
+            if (promptResponse.confirm === false) {
+                targetRegistries = [];
+            } else {
+                targetRegistries = packageFile.registries;
+            }
+        }
+
+        if (targetRegistries.length === 0) {
             const registries: RegistryConfig[] = getRegistryConfigs().filter(
                 (registry: RegistryConfig) => !!registry.apiKey
             );
@@ -128,34 +172,44 @@ export class PublishPackageCommandModule {
                 defaultPromptOptions
             );
 
-            targetRegistries = [
-                {
-                    url: targetRegistryActionResponse.targetRegistry,
-                    catalogSlug: catalogSlugActionResponse.catalogSlug
+            const publishMethod = await this.obtainPublishMethod(oraRef, packageFile, PublishMethod.SCHEMA_ONLY);
+
+            if (publishMethod === PublishMethod.PROXY_DATA) {
+                const sourceCredentials = new Map<string, DPMConfiguration>();
+                credentialsByPackageIdentifier.packages.set(
+                    targetRegistryActionResponse.targetRegistry + "/" + catalogSlugActionResponse.catalogSlug,
+                    {
+                        sourceSlugs: sourceCredentials
+                    }
+                );
+
+                for (const source of packageFile.sources) {
+                    const credentials = await this.obtainCredentials(oraRef, source);
+                    sourceCredentials.set(source.slug, credentials);
                 }
-            ];
-
-            if (packageFileRegistryReferences.length === 0) {
-                packageFile.registries = [...(packageFile.registries || []), ...targetRegistries];
-            } else {
-                packageFileRegistryReferences[0].catalogSlug = catalogSlugActionResponse.catalogSlug;
             }
 
-            oraRef.start("Updating package file...");
+            targetRegistries.push({
+                url: targetRegistryActionResponse.targetRegistry,
+                catalogSlug: catalogSlugActionResponse.catalogSlug,
+                publishMethod: publishMethod
+            });
+        }
 
-            try {
-                const packageFileLocation = writePackageFile(packageFile);
+        oraRef.start("Updating package file...");
 
-                oraRef.succeed(`Updated package file ${packageFileLocation}`);
-            } catch (error) {
-                oraRef.fail(`Unable to update the package files. ${error.message}`);
-                throw error;
-            }
+        try {
+            const packageFileLocation = writePackageFile(packageFile);
+
+            oraRef.succeed(`Updated package file ${packageFileLocation}`);
+        } catch (error) {
+            oraRef.fail(`Unable to update the package files. ${error.message}`);
+            throw error;
         }
 
         oraRef.start("Publishing...");
 
-        await this.attemptPublish(oraRef, packageFileWithContext, targetRegistries)
+        await this.attemptPublish(oraRef, packageFileWithContext, targetRegistries, credentialsByPackageIdentifier)
 
             .catch(async (error) => {
                 if (error.networkError) {
@@ -238,7 +292,12 @@ export class PublishPackageCommandModule {
                     // oraRef.start("Publishing to registry after version update");
 
                     try {
-                        await this.attemptPublish(oraRef, packageFileWithContext, targetRegistries);
+                        await this.attemptPublish(
+                            oraRef,
+                            packageFileWithContext,
+                            targetRegistries,
+                            credentialsByPackageIdentifier
+                        );
                     } catch (error) {
                         oraRef.fail(`Error publishing version after version change. ${error.messasge}`);
                         throw error;
@@ -297,9 +356,10 @@ export class PublishPackageCommandModule {
     async attemptPublish(
         oraRef: Ora,
         packageFileWithContext: PackageFileWithContext,
-        targetRegistries: RegistryReference[]
+        targetRegistries: RegistryReference[],
+        credentialsBySourceSlug: CredentialsByPackageIdentifier
     ): Promise<void> {
-        await this.publishPackageFile(packageFileWithContext, targetRegistries, {
+        await this.publishPackageFile(packageFileWithContext, targetRegistries, credentialsBySourceSlug, {
             updateStep: (step: PublishSteps, registryRef: RegistryReference) => {
                 switch (step) {
                     case PublishSteps.FIND_EXISTING_PACKAGE:
@@ -360,6 +420,7 @@ export class PublishPackageCommandModule {
     async publishPackageFile(
         packageFileWithContext: PackageFileWithContext,
         targetRegistries: RegistryReference[],
+        credentialsBySourceSlug: CredentialsByPackageIdentifier,
         context: PublishProgress
     ): Promise<Map<RegistryReference, boolean>> {
         const returnValue: Map<RegistryReference, boolean> = new Map();
@@ -415,7 +476,7 @@ export class PublishPackageCommandModule {
 
             context.updateStep(PublishSteps.CREATE_VERSION, registryRef);
 
-            const versions = this.generateCreateVersion(packageFileWithContext);
+            const versions = this.generateCreateVersion(packageFileWithContext, registryRef, credentialsBySourceSlug);
 
             const serverResponse = await registry.createVersion(versions, {
                 catalogSlug: registryRef.catalogSlug,
@@ -436,11 +497,209 @@ export class PublishPackageCommandModule {
         return returnValue;
     }
 
-    generateCreateVersion(packageFileWithContext: PackageFileWithContext): CreateVersionInput {
+    generateCreateVersion(
+        packageFileWithContext: PackageFileWithContext,
+        registryReference: RegistryReference,
+        _credentialsByPackageIdentifier: CredentialsByPackageIdentifier
+    ): CreateVersionInput {
+        // deep copy the package file
+        const packageFile = JSON.parse(JSON.stringify(packageFileWithContext.packageFile)) as PackageFile;
+
+        // filter out all othe registries
+        packageFile.registries = [registryReference];
+
+        if (registryReference.publishMethod === PublishMethod.DATA_AND_SCHEMA) {
+            // Change all sources to use the target registry as the data repository
+            throw new Error("Data publishing not yet implemented");
+        } else if (registryReference.publishMethod === PublishMethod.PROXY_DATA) {
+            throw new Error("Publishing with credentials not yet implemented");
+        }
+
         const version: CreateVersionInput = {
             packageFile: JSON.stringify(packageFileWithContext.packageFile)
         };
 
         return version;
+    }
+
+    async obtainCredentials(oraRef: Ora, source: Source): Promise<DPMConfiguration> {
+        const repositoryDescription = getRepositoryDescriptionByType(source.type);
+
+        if (repositoryDescription === undefined) {
+            throw new Error(`Could not find repository description for type ${source.type}`);
+        }
+        const repository = await repositoryDescription?.getRepository();
+
+        if (repository === undefined) {
+            throw new Error(`Could not find repository implementation for type ${source.type}`);
+        }
+
+        const connectionIdentifier = repository.getConnectionIdentifierFromConfiguration(
+            source.connectionConfiguration
+        );
+
+        console.log(`For the ${repositoryDescription.getDisplayName()} repository ${connectionIdentifier}`);
+
+        const credentialsPromptResponse = await promptForCredentials(
+            oraRef,
+            repository,
+            source.connectionConfiguration,
+            {},
+            false,
+            {}
+        );
+
+        return credentialsPromptResponse.credentialsConfiguration;
+    }
+
+    async obtainPublishMethod(
+        oraRef: Ora,
+        packageFile: PackageFile,
+        defaultValue: PublishMethod
+    ): Promise<PublishMethod> {
+        // Detemine if any of the packageFile sources require credentials
+
+        while (true) {
+            const choices: ParameterOption[] = [
+                {
+                    title: "Publish schema, client direct connects for data",
+                    selected: defaultValue === PublishMethod.SCHEMA_ONLY,
+                    value: PublishMethod.SCHEMA_ONLY
+                },
+                {
+                    title: "Publish schema, proxy data through registry",
+                    selected: defaultValue === PublishMethod.PROXY_DATA,
+                    value: PublishMethod.PROXY_DATA
+                },
+                {
+                    title: "Publish schema and data to registry",
+                    selected: defaultValue === PublishMethod.DATA_AND_SCHEMA,
+                    value: PublishMethod.DATA_AND_SCHEMA
+                }
+            ];
+
+            // prompt the user whether they want to publish a proxied file or not
+            const publishTypeSelection = await prompts([
+                {
+                    type: "autocomplete",
+                    name: "method",
+                    message: "Data Access Method?",
+                    choices: choices
+                }
+            ]);
+
+            if (publishTypeSelection.method === PublishMethod.SCHEMA_ONLY) {
+                if (packageFile.sources.find((s) => s.credentialsIdentifier !== undefined) !== undefined) {
+                    // Credentials are required, so tell the user they will have to enter
+                    oraRef.info(
+                        "Access to this data requires access credentials, and those access credentials will not be published to the server. You will need to share the access credentials with the users of this package manually. Or they will need to obtain their own access credentials to the data source(s) for this package"
+                    );
+
+                    oraRef.info(
+                        "Because this package requires access credentials, this package can not be made public"
+                    );
+
+                    break;
+                } else {
+                    oraRef.info(
+                        "The package will be published to the registry, and consumers will access the data directly. This requires direct connectivity from the client."
+                    );
+                }
+
+                const confirmAccessRequirements = await prompts([
+                    {
+                        name: "confirmed",
+                        type: "autocomplete",
+                        message: "Is the above ok?",
+                        choices: [
+                            {
+                                title: "Yes",
+                                value: "yes"
+                            },
+                            {
+                                title: "No",
+                                value: "no"
+                            }
+                        ]
+                    }
+                ]);
+
+                if (confirmAccessRequirements.confirmed === "no") {
+                    continue;
+                }
+
+                return PublishMethod.SCHEMA_ONLY;
+            }
+
+            if (publishTypeSelection.method === PublishMethod.DATA_AND_SCHEMA) {
+                oraRef.info(
+                    "The data in this package will be copied, as a current snapshot or update, to the registry."
+                );
+                oraRef.info(
+                    "Consumers will not receive data updates until you run the 'datapm update' command on this package."
+                );
+                const confirmDatacopy = await prompts([
+                    {
+                        type: "autocomplete",
+                        name: "confirmed",
+                        message: "Is the above ok?",
+                        choices: [
+                            {
+                                title: "Yes",
+                                value: "yes"
+                            },
+                            {
+                                title: "No",
+                                value: "no"
+                            }
+                        ]
+                    }
+                ]);
+
+                if (confirmDatacopy.confirmed === "no") {
+                    continue;
+                }
+
+                return PublishMethod.DATA_AND_SCHEMA;
+            }
+
+            if (publishTypeSelection.method === PublishMethod.PROXY_DATA) {
+                if (packageFile.sources.find((s) => s.credentialsIdentifier !== undefined) !== undefined) {
+                    oraRef.info(
+                        "The registry will act as a proxy for this data, and therefore you must provide the registry with access credentials for the data."
+                    );
+
+                    oraRef.info(
+                        "You should supply credentials with limited read-only access necessary to consume the required data."
+                    );
+
+                    const confirmProxy = await prompts([
+                        {
+                            type: "autocomplete",
+                            name: "confirmed",
+                            message: "Is the above ok?",
+                            choices: [
+                                {
+                                    title: "Yes",
+                                    value: "yes"
+                                },
+                                {
+                                    title: "No",
+                                    value: "no"
+                                }
+                            ]
+                        }
+                    ]);
+
+                    if (confirmProxy.confirmed === "no") {
+                        continue;
+                    }
+
+                    return PublishMethod.PROXY_DATA;
+                }
+            }
+        }
+
+        return PublishMethod.SCHEMA_ONLY; // Never actually called
     }
 }

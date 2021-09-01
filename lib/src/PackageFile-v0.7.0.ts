@@ -1,18 +1,30 @@
 import { JSONSchema7, JSONSchema7TypeName } from "json-schema";
 import { DPMConfiguration } from "./main";
 
-export enum CountPrecision060 {
+export enum CountPrecision {
     EXACT = "EXACT",
     APPROXIMATE = "APPROXIMATE",
     GREATER_THAN = "GREATER_THAN"
 }
-export interface StreamStats060 {
+
+export enum PublishMethod {
+    /** Publishes only the schema. Client must manually obtain the access credentials to the data */
+    SCHEMA_ONLY = "SCHEMA_ONLY",
+
+    /** Publishes the schema and the data as a snapshot or update to the registry */
+    SCHEMA_AND_DATA = "SCHEMA_AND_DATA",
+
+    /** Publishes the schema, and sends the necessary access credentials to the registry */
+    SCHEMA_PROXY_DATA = "SCHEMA_PROXY_DATA"
+}
+
+export interface StreamStats {
     /** The number of bytes observed in the stream. See byteCountPrecision
      * for whether this is an exact, estimated, or "greater than" number.
      */
     byteCount?: number;
 
-    byteCountPrecision?: CountPrecision060;
+    byteCountPrecision?: CountPrecision;
 
     /** The number of records deeply inspected during the stream */
     inspectedCount: number;
@@ -21,23 +33,27 @@ export interface StreamStats060 {
      * this is an exact, estimated, or "greater than" number.
      */
     recordCount?: number;
-    recordCountPrecision?: CountPrecision060;
+    recordCountPrecision?: CountPrecision;
 }
 
 /** A description of where the package file should be published. */
-export interface RegistryReference060 {
+export interface RegistryReference {
     /** The HTTP or HTTPS URL to reach the registry server. */
     url: string;
 
     /** The short name (not the user friendly name) of the catalog in which to publish the package. */
     catalogSlug: string;
+
+    /** How the schema and the data are published to a registry. The various options dictate how the schema is modified before
+     * saving it to the registry, and how the data is accessed by the client. */
+    publishMethod: PublishMethod;
 }
 
 /** Represents a single logical unit of streaming data from a source. For example
  * a file system/SFTP/NFS select of *.xml from a particular directory would be one stream set. Each table in a database would
  * be another stream set.
  */
-export interface StreamSet060 {
+export interface StreamSet {
     /** The unique identifier for the stream set in a single source */
     slug: string;
 
@@ -53,13 +69,13 @@ export interface StreamSet060 {
     lastUpdateHash?: string;
 
     /** The number of records last observed */
-    streamStats: StreamStats060;
+    streamStats: StreamStats;
 }
 
 /** Describes where the data resides, and how to access one or more logical sets of streams. For example, how to
  * access a database, and which tables are each an individual stream set.
  */
-export interface Source060 {
+export interface Source {
     /** The universally unique identifier for the Source implementation */
     type: string;
 
@@ -81,10 +97,10 @@ export interface Source060 {
      */
     configuration?: DPMConfiguration;
 
-    streamSets: StreamSet060[];
+    streamSets: StreamSet[];
 }
 
-export interface ContentLabel060 {
+export interface ContentLabel {
     /** The keyword identifier for the content  */
     label: string;
 
@@ -101,7 +117,7 @@ export interface ContentLabel060 {
     valuesTestedCount?: number;
 }
 
-export interface ValueTypeStatistics060 {
+export interface ValueTypeStatistics {
     valueType: JSONSchema7TypeName | "date";
 
     /** The number of records on which this property was observed. If schema recordCountApproximate property is true,
@@ -119,14 +135,14 @@ export interface ValueTypeStatistics060 {
     /** A dictionary of content labels referencing a boolean value as to whether they should be displayed. This
      * allows content labels to be "hidden" by a package editor - and to keep that fact for future iterations.
      */
-    contentLabels?: ContentLabel060[];
+    contentLabels?: ContentLabel[];
 }
 
 // eslint-disable-next-line no-use-before-define
-export type Properties060 = { [key: string]: Schema060 };
-export type ValueTypes060 = { [key: string]: ValueTypeStatistics060 };
+export type Properties = { [key: string]: Schema };
+export type ValueTypes = { [key: string]: ValueTypeStatistics };
 
-export interface SchemaIdentifier060 {
+export interface SchemaIdentifier {
     registryUrl: string;
     catalogSlug: string;
     packageSlug: string;
@@ -134,7 +150,7 @@ export interface SchemaIdentifier060 {
     schemaTitle: string;
 }
 
-export interface DerivedFrom060 {
+export interface DerivedFrom {
     /** User friendly name for the upstream data */
     displayName: string;
 
@@ -142,18 +158,18 @@ export interface DerivedFrom060 {
     url?: string;
 
     /** The identifier for the specific version of the datapm package version and schema title. Url or schemaIdentifier must be defined.  */
-    schemaIdentifier?: SchemaIdentifier060;
+    schemaIdentifier?: SchemaIdentifier;
 }
 
 /** The JSON Schema Draft 07 compliant schema object, extended with properties that describe
  * how to obtain the data, and details the values of the data properties.
  */
-export interface Schema060 extends JSONSchema7 {
+export interface Schema extends JSONSchema7 {
     /** A description about the schema or property. This is flat text and should be kept to a few scentences.  */
     description?: string;
 
     /** The JSON Schema Draft 07 compliant property list for the object */
-    properties?: Properties060;
+    properties?: Properties;
 
     /** Whether the consumer should by default include this schema/property in the regular output */
     hidden?: boolean;
@@ -175,10 +191,10 @@ export interface Schema060 extends JSONSchema7 {
     recordsNotPresent?: number;
 
     /** How to consider the recordCount value - as one of exact, approximate, or greater than. */
-    recordCountPrecision?: CountPrecision060;
+    recordCountPrecision?: CountPrecision;
 
     /** An object which has keys that the property type (string, array, date, boolean, object, etc). The values of this object describe the values of the property. */
-    valueTypes?: ValueTypes060;
+    valueTypes?: ValueTypes;
 
     /** A  selected set of sample records that are representative of the schema */
     sampleRecords?: { [key: string]: unknown }[];
@@ -187,12 +203,12 @@ export interface Schema060 extends JSONSchema7 {
     derivedFromDescription?: string;
 
     /** A list of references to upstream data from which this schema was derived. This is also called "Provenance" */
-    derivedFrom?: DerivedFrom060[];
+    derivedFrom?: DerivedFrom[];
 }
 
-export class PackageFile060 {
+export class PackageFile {
     /** The URL of the JSON schema file to validate this file. */
-    $schema = "https://datapm.io/docs/package-file-schema-v0.6.0.json";
+    $schema = "https://datapm.io/docs/package-file-schema-v0.7.0.json";
 
     /** The short name that identifies this package, in the context of the catalog that it is published. */
     packageSlug: string;
@@ -204,10 +220,10 @@ export class PackageFile060 {
     description: string;
 
     /** An object describing how to access the record stream of the data */
-    sources: Source060[];
+    sources: Source[];
 
     /** The json-schema.org Draft 7 compliant schemas, extended to support the features of datapm. */
-    schemas: Schema060[];
+    schemas: Schema[];
 
     /** The semver compatible version number. */
     version: string;
@@ -240,5 +256,5 @@ export class PackageFile060 {
      * the local client to determine where to publish. The client will remove private and local registry references
      * before publishing to each registry.
      */
-    registries?: RegistryReference060[];
+    registries?: RegistryReference[];
 }

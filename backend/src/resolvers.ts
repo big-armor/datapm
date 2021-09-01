@@ -694,7 +694,7 @@ export const resolvers: {
         setUserCollectionPermissions: setUserCollectionPermissions,
         deleteUserCollectionPermissions: deleteUserCollectionPermissions,
 
-        // Version
+        // Version 
         createVersion: createVersion,
         deleteVersion: deleteVersion,
 

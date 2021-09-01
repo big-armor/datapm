@@ -7,7 +7,9 @@ import {
     PackageFile,
     Compability,
     upgradePackageFile,
-    Difference
+    Difference,
+    PublishMethod,
+    Source
 } from "datapm-lib";
 import { VersionRepository } from "./../repository/VersionRepository";
 import { PackageFileStorageService } from "./../storage/packages/package-file-storage-service";
@@ -85,6 +87,17 @@ export const createVersion = async (
         const rawPackageFile = value.packageFile as PackageFile;
 
         const newPackageFile = upgradePackageFile(rawPackageFile);
+
+        const registryReference = newPackageFile.registries?.find(registry => registry.url === process.env["REGISTRY_URL"]);
+
+        const publishMethod = registryReference?.publishMethod || PublishMethod.SCHEMA_ONLY;
+
+        if(publishMethod === PublishMethod.SCHEMA_PROXY_DATA) {
+            // TODO check that the referenced credentials are available
+            // TODO check that the data can be accessed
+        } else if(publishMethod === PublishMethod.SCHEMA_ONLY) {
+            // TODO check that the data can be accessed??? (or maybe it doesn't matter until they try to set it public)
+        }
 
         // get the latest version
         latestVersion = await transaction
@@ -230,14 +243,16 @@ export const versionPackageFile = async (parent: any, _1: any, context: Authenti
     const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
     const packageEntity = await getPackageFromCacheOrDbById(context, context.connection, version.packageId);
 
+    let packageFile:PackageFile;
     try {
-        return await PackageFileStorageService.INSTANCE.readPackageFile(packageEntity.id, {
+        packageFile = await PackageFileStorageService.INSTANCE.readPackageFile(packageEntity.id, {
             catalogSlug: packageEntity.catalog.slug,
             packageSlug: packageEntity.slug,
             versionMajor: version.majorVersion,
             versionMinor: version.minorVersion,
             versionPatch: version.patchVersion
         });
+
     } catch (error) {
         if (error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST.toString())) {
             throw new Error("PACKAGE_FILE_NOT_FOUND");
@@ -245,6 +260,72 @@ export const versionPackageFile = async (parent: any, _1: any, context: Authenti
 
         throw error;
     }
+    // Find this registry in the package file
+    const registry = (packageFile.registries || []).find(reg => reg.url === process.env.REGISTRY_URL);
+
+
+    const publishMethod = registry?.publishMethod || PublishMethod.SCHEMA_ONLY;
+
+    // If the publish method was to store data or proxy, 
+    // then we need to replace the sources with the registry based source
+    if(publishMethod === PublishMethod.SCHEMA_AND_DATA) {
+        // This means that this registry contains the data, and therefore we need to replace the source with this registry
+        const registrySources: Source[] = packageFile.sources.map<Source>(source => {
+
+            return {
+                connectionConfiguration: {
+                    url: process.env.REGISTRY_URL as string
+                },
+                slug: source.slug,
+                type: "datapmRegistry",
+                configuration: {
+                    catalogSlug: packageEntity.catalog.slug,
+                    packageSlug: packageEntity.slug,
+                    sourceSlug: source.slug
+                },
+                streamSets: source.streamSets.map(streamSet => {
+                    return {
+                        ...streamSet,
+                        configuration: {
+                            streamSetSlug: streamSet.slug
+                        }
+                    }
+                })
+            }
+
+        });
+
+        packageFile.sources = registrySources;
+    } else if(publishMethod === PublishMethod.SCHEMA_PROXY_DATA) {
+        const registrySources: Source[] = packageFile.sources.map<Source>(source => {
+            return {
+                connectionConfiguration: {
+                    url: process.env.REGISTRY_URL as string
+                },
+                slug: source.slug,
+                type: "datapmRegistryProxy",
+                configuration: {
+                    catalogSlug: packageEntity.catalog.slug,
+                    packageSlug: packageEntity.slug,
+                    sourceSlug: source.slug
+                },
+                streamSets: source.streamSets.map(streamSet => {
+                    return {
+                        ...streamSet,
+                        configuration: {
+                            streamSetSlug: streamSet.slug
+                        }
+                    }
+                })
+            }
+        });
+
+        packageFile.sources = registrySources;
+    }
+
+    return packageFile;
+
+
 };
 
 export const versionAuthor = async (

@@ -19,6 +19,8 @@ import { PackageFileV020 } from "./PackageFile-v0.2.0";
 import deepEqual from "fast-deep-equal";
 import { CountPrecisionV030 } from "./PackageFile-v0.3.0";
 import { PackageFile050 } from "./PackageFile-v0.5.0";
+import { PackageFile060 } from "./PackageFile-v0.6.0";
+import { PublishMethod, RegistryReference } from "./PackageFile-v0.7.0";
 
 export type DPMRecordValue =
     | number
@@ -688,6 +690,17 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
         for (const oldSource of oldPackageFile.sources) {
             const newSource = oldSource as Source;
             newSource.connectionConfiguration = oldSource.configuration || {};
+        }
+    }
+
+    if (packageFileObject.$schema === "https://datapm.io/docs/package-file-schema-v0.6.0.json") {
+        packageFileObject.$schema = "https://datapm.io/docs/package-file-schema-v0.7.0.json";
+
+        const oldPackageFile = packageFileObject as PackageFile060;
+
+        for (const oldRegistry of oldPackageFile.registries || []) {
+            const newRegistry = oldRegistry as RegistryReference;
+            newRegistry.publishMethod = PublishMethod.SCHEMA_ONLY;
         }
     }
 
