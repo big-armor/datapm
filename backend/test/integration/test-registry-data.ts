@@ -223,6 +223,18 @@ describe("Package Tests", async () => {
 
     });
 
+    it("User cannot upload avro data that doesn't match the sheet", async function () {
+
+        const dataFile = fs.readFileSync("test/data-files/start-small-donations.avro");
+        const response = await request.post(`http://localhost:4000/data/testA-registry-data/congressional-legislators/1.0.0/${slugUrlEncoded}/${slugUrlEncoded}`)
+            .set("Authorization", userAToken)
+            .send(dataFile);
+
+        expect(response.status).equal(400);
+        expect(response.text).include("DATA_NOT_COMPATIBLE_WITH_PACKAGE");
+
+    });
+
     it("User without any permission can not upload data", async function () {
 
         const dataFile = fs.readFileSync("test/data-files/data.avro");

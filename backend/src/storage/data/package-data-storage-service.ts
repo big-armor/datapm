@@ -7,11 +7,25 @@ import { getPackageFromCacheOrDbOrFail } from "../../resolvers/PackageResolver";
 import { hasPackageEntityPermissions } from "../../resolvers/UserPackagePermissionResolver";
 import { FileStorageService } from "../files/file-storage-service";
 import { PackageFileStorageService } from "../packages/package-file-storage-service";
+import bufferPeek from "buffer-peek-stream";
+import { TransformCallback } from "stream";
+import avro from "avsc";
 
 
 export enum UpdateMethod {
     REPLACE_ALL,
     APPEND
+}
+
+class BlockDecoder extends avro.streams.BlockDecoder {
+    // eslint-disable-next-line
+    _transform(chunk: any, _encoding: BufferEncoding, callback: TransformCallback) {
+        callback(null, chunk);
+    }
+
+    _flush(callback: TransformCallback) {
+        callback();
+    }
 }
 
 export class PackageDataStorageService {
@@ -61,12 +75,17 @@ export class PackageDataStorageService {
         dataStream: Readable
     ): Promise<string> {
         // TODO: Validate that the data is in a valid avro format
-        // TODO: Validate that the provided AVRO is compatible with the given package schema
 
         const packageEntity = await this.getPackage(context, catalogSlug, packageSlug);
         await this.validatePackageEditPermissions(context, packageEntity);
         await this.validatePackageSourceAndStreamSetSlug(packageEntity, version, sourceSlug, streamSetSlug);
         // TODO: Validate that the requester can upload to the given streamset
+
+        // TODO: Validate that the provided AVRO is compatible with the given package schema
+        const [rawFileBuffer, rawPeekStream] = await bufferPeek.promise(dataStream,Math.pow(2, 20));
+        const blockDecoder = new BlockDecoder();
+        Readable.from(rawFileBuffer).pipe(blockDecoder).on();
+        
 
         const semVer = new SemVer(version);
 
