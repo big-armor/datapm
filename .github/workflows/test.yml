@@ -207,11 +207,11 @@ jobs:
             - name: Print node verion
               run: node --version
 
-            - name: Cache Lib Node_modules
+            - name: Cache Lib Build
               id: cache-lib-dist
               uses: actions/cache@v1
               with:
-                  path: lib/dist
+                  path: lib
                   key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/**') }}
 
             - name: Install Lib Dependencies
@@ -231,7 +231,7 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: backend/node_modules
-                  key: datampm-registry-${{ runner.OS }}-backend-dependencies-${{ hashFiles('backend/package.json','backend/package-lock.json') }}
+                  key: datampm-registry-${{ runner.OS }}-backend-dependencies-${{ hashFiles('backend/package.json','backend/package-lock.json', 'lib/**') }}
 
             - name: Install Backend Dependencies
               id: install-backend-Dependencies
