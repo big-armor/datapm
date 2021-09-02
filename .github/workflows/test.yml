@@ -97,21 +97,22 @@ jobs:
             - name: Print node verion
               run: node --version
 
-            - name: Cache Lib Node_modules
-              id: cache-lib-node-modules
+            - name: Cache Lib Build
+              id: cache-lib
               uses: actions/cache@v1
               with:
-                  path: lib/node_modules
-                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/package.json', 'lib/package-lock.json') }}
+                  path: lib
+                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/**') }}
 
             - name: Install Lib Dependencies
-              id: install-lib-Dependencies
-              if: steps.cache-lib-node-modules.outputs.cache-hit != 'true'
+              id: install-lib-dependencies
+              if: steps.cache-lib.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: lib
 
             - name: Build Lib
-              id: build-lib-Dependencies
+              id: build-lib-dependencies
+              if: steps.cache-lib.outputs.cache-hit != 'true'
               run: npm run build
               working-directory: lib
 
@@ -152,23 +153,43 @@ jobs:
             - name: Print node verion
               run: node --version
 
-            - name: Cache Lib Node_modules
-              id: cache-lib-node-modules
+            - name: Cache Lib Build
+              id: cache-lib
               uses: actions/cache@v1
               with:
-                  path: lib/node_modules
-                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/package.json', 'lib/package-lock.json') }}
+                  path: lib
+                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/**') }}
 
             - name: Install Lib Dependencies
-              id: install-lib-Dependencies
-              if: steps.cache-lib-node-modules.outputs.cache-hit != 'true'
+              id: install-lib-dependencies
+              if: steps.cache-lib.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: lib
 
             - name: Build Lib
-              id: build-lib-Dependencies
+              id: build-lib-dependencies
+              if: steps.cache-lib.outputs.cache-hit != 'true'
               run: npm run build
               working-directory: lib
+
+            - name: Cache Backend
+              id: cache-backend
+              uses: actions/cache@v1
+              with:
+                  path: backend
+                  key: datampm-registry-${{ runner.OS }}-backend-${{ hashFiles('backend/**', 'lib/**') }}
+
+            - name: Install Backend Dependencies
+              id: install-backend-Dependencies
+              if: steps.cache-backend.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: backend
+
+            - name: Build Backend
+              id: build-backend
+              if: steps.cache-backend.outputs.cache-hit != 'true'
+              run: npm run build
+              working-directory: backend
 
             - name: Cache Frontend Node_modules
               id: cache-frontend-node-modules
@@ -207,55 +228,41 @@ jobs:
             - name: Print node verion
               run: node --version
 
-            - name: Cache Lib Node_modules
-              id: cache-lib-node-modules
+            - name: Cache Lib Build
+              id: cache-lib
               uses: actions/cache@v1
               with:
-                  path: lib/node_modules
-                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/package.json','lib/package-lock.json') }}
+                  path: lib
+                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/**') }}
 
             - name: Install Lib Dependencies
-              id: install-lib-Dependencies
-              if: steps.cache-lib-node-modules.outputs.cache-hit != 'true'
+              id: install-lib-dependencies
+              if: steps.cache-lib.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: lib
 
-            - name: Cache Lib Dist
-              id: cache-lib-dist
-              uses: actions/cache@v1
-              with:
-                  path: lib/dist
-                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/**') }}
-
             - name: Build Lib
-              id: build-lib-Dependencies
-              if: steps.cache-lib-dist.outputs.cache-hit != 'true'
+              id: build-lib-dependencies
+              if: steps.cache-lib.outputs.cache-hit != 'true'
               run: npm run build
               working-directory: lib
 
-            - name: Cache Backend Dependencies
-              id: cache-backend-dependencies
+            - name: Cache Backend
+              id: cache-backend
               uses: actions/cache@v1
               with:
-                  path: backend/node_modules
-                  key: datampm-registry-${{ runner.OS }}-backend-dependencies-${{ hashFiles('backend/package.json','backend/package-lock.json') }}
+                  path: backend
+                  key: datampm-registry-${{ runner.OS }}-backend-${{ hashFiles('backend/**', 'lib/**') }}
 
             - name: Install Backend Dependencies
               id: install-backend-Dependencies
-              if: steps.cache-backend-dependencies.outputs.cache-hit != 'true'
+              if: steps.cache-backend.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: backend
 
-            - name: Cache Backend Dist
-              id: cache-backend-dist
-              uses: actions/cache@v1
-              with:
-                  path: backend/dist
-                  key: datampm-registry-${{ runner.OS }}-backend-dist-${{ hashFiles('backend/**','lib/**') }}
-
             - name: Build Backend
               id: build-backend
-              if: steps.cache-backend-dist.outputs.cache-hit != 'true'
+              if: steps.cache-backend.outputs.cache-hit != 'true'
               run: npm run build
               working-directory: backend
 
