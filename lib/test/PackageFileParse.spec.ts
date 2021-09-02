@@ -5,7 +5,7 @@ import fs from "fs";
 describe("PackageFile checks", () => {
     it("Should have correct schema value", function () {
         const test = new PackageFile();
-        expect(test.$schema).equal("https://datapm.io/docs/package-file-schema-v0.6.0.json");
+        expect(test.$schema).equal("https://datapm.io/docs/package-file-schema-v0.7.0.json");
     });
 
     it("Should parse dates", function () {
