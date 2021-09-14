@@ -70,7 +70,8 @@ export function setTestSourceFiles(): void {
         FILE22: "file://./test/sources/covid-02-01-2020.avro",
         FILE23: "file://./test/sources/us-covid.xlsx",
         FILE24: "file://./test/sources/source.zip",
-        FILE25: "file://./test/sources/source.tar"
+        FILE25: "file://./test/sources/source.tar",
+        FILE26: "file://./test/sources/weird-headers.csv"
     };
 }
 

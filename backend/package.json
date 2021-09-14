@@ -43,6 +43,7 @@
         "await-lock": "^2.1.0",
         "buffer-peek-stream": "^1.1.0",
         "cron": "^1.8.2",
+        "csv-parse": "^4.16.3",
         "dataloader": "^2.0.0",
         "datapm-lib": "file:../lib/dist",
         "express-enforces-ssl": "^1.1.0",
@@ -121,6 +122,6 @@
         "ts-node": "^8.8.1",
         "tsc-watch": "^4.2.3",
         "tslint": "^6.1.2",
-        "typescript": "^4.0.3"
+        "typescript": "^4.4.2"
     }
 }

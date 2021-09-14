@@ -784,7 +784,7 @@ export function validatePackageFile(packageFile: string): void {
     const schemaVersion = getSchemaVersionFromPackageFile(packageFileObject);
 
     try {
-        const pathToDataPmLib = require.resolve("datapm-lib").replace(path.sep + "src" + path.sep + "main.js", "");
+        const pathToDataPmLib = "../";
         packageSchemaFile = fs.readFileSync(
             path.join(pathToDataPmLib, "packageFileSchema-v" + schemaVersion + ".json"),
             "utf8"

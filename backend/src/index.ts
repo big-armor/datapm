@@ -375,6 +375,8 @@ async function main() {
                     res.status(404).send(err.message);
                 } else if(err.message.includes("NOT_AUTHORIZED")) {
                     res.status(401).send(err.message);
+                } else if(err.message.includes("_NOT_RECOGNIZED")){
+                    res.status(400).send(err.message);
                 }  else {
                     console.error(err);
                     res.status(500).send("There was a problem saving the file: " + err.message);

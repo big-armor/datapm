@@ -8,3 +8,5 @@ export * from "./PackageFile-v0.7.0";
 export * from "./PackageUtil";
 export * from "./Validators";
 export * from "./CountPrecisionUtil";
+export * from "./AvroUtil";
+export * as base62 from "./Base62Util";

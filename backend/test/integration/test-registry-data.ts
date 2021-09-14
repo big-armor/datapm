@@ -9,11 +9,13 @@ import {
     LoginDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
-import * as crypto from "crypto";
-import { parsePackageFileJSON, loadPackageFileFromDisk, PublishMethod } from "datapm-lib";
+import csvParser from "csv-parse/lib/sync";
+import { DPM_AVRO_DOC_URL_V1, parsePackageFileJSON, loadPackageFileFromDisk, PublishMethod, base62, toAvroPropertyName } from "datapm-lib";
 import { describe, it } from "mocha";
 import request = require("superagent");
 import fs from 'fs';
+import avro from "avsc";
+
 
 /** Tests when the registry is used as a repository for the data of a package */
 describe("Package Tests", async () => {
@@ -24,8 +26,6 @@ describe("Package Tests", async () => {
     let userAToken: string = "Bearer ";
     let userBToken: string = "Bearer ";
 
-
-    const slugUrlEncoded = encodeURIComponent("https://theunitedstates.io/congress-legislators/legislators-current.csv");
 
     before(async () => {});
 
@@ -84,24 +84,24 @@ describe("Package Tests", async () => {
             variables: {
                 value: {
                     catalogSlug: "testA-registry-data",
-                    packageSlug: "congressional-legislators",
-                    displayName: "Congressional Legislators",
-                    description: "Test upload of congressional legislators"
+                    packageSlug: "simple",
+                    displayName: "Simple",
+                    description: "Test of simple values"
                 }
             }
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
         expect(response.data!.createPackage.catalog?.displayName).to.equal("testA-registry-data");
-        expect(response.data!.createPackage.description).to.equal("Test upload of congressional legislators");
-        expect(response.data!.createPackage.displayName).to.equal("Congressional Legislators");
+        expect(response.data!.createPackage.description).to.equal("Test of simple values");
+        expect(response.data!.createPackage.displayName).to.equal("Simple");
         expect(response.data!.createPackage.identifier.catalogSlug).to.equal("testA-registry-data");
-        expect(response.data!.createPackage.identifier.packageSlug).to.equal("congressional-legislators");
+        expect(response.data!.createPackage.identifier.packageSlug).to.equal("simple");
         expect(response.data!.createPackage.latestVersion).to.equal(null);
     });
 
     it("User A publish first version", async function () {
-        let packageFileContents = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        let packageFileContents = loadPackageFileFromDisk("test/data-files/simple/simple.datapm.json");
 
         packageFileContents.registries = [{
             catalogSlug: "testA-registry-data",
@@ -116,7 +116,7 @@ describe("Package Tests", async () => {
             variables: {
                 identifier: {
                     catalogSlug: "testA-registry-data",
-                    packageSlug: "congressional-legislators"
+                    packageSlug: "simple"
                 },
                 value: {
                     packageFile: packageFileString
@@ -132,12 +132,12 @@ describe("Package Tests", async () => {
 
         const responsePackageFile = parsePackageFileJSON(responsePackageFileContents);
 
-        expect(responsePackageFile.readmeMarkdown).includes("This is where a readme might go");
-        expect(responsePackageFile.licenseMarkdown).includes("This is not a real license. Just a test.");
+        expect(responsePackageFile.readmeMarkdown).includes("Simple");
+        expect(responsePackageFile.licenseMarkdown).includes("License not defined");
 
         expect(responsePackageFile.registries![0].publishMethod).equal(PublishMethod.SCHEMA_AND_DATA);
         expect(responsePackageFile.sources![0].type).equal("datapmRegistry");
-        expect(responsePackageFile.sources![0].streamSets[0].slug).equal("https://theunitedstates.io/congress-legislators/legislators-current.csv");
+        expect(responsePackageFile.sources![0].streamSets[0].slug).equal("simple");
         
         
     });
@@ -148,7 +148,7 @@ describe("Package Tests", async () => {
         let errorCaught = false;
         try {
             const response = await request
-            .options(`http://localhost:4000/data/incorrect-catalog-name/congressional-legislators/1.0.0/${slugUrlEncoded}/${slugUrlEncoded}`).buffer(true).send();
+            .options(`http://localhost:4000/data/incorrect-catalog-name/simple/1.0.0/file/simple`).buffer(true).send();
         } catch (e) {
             errorCaught = true;
             expect(e.status).equal(404);
@@ -165,7 +165,7 @@ describe("Package Tests", async () => {
         let errorCaught = false;
         try {
             const response = await request
-            .options(`http://localhost:4000/data/testA-registry-data/incorrect-package-name/1.0.0/${slugUrlEncoded}/${slugUrlEncoded}`).set("Authorization", userAToken).send();
+            .options(`http://localhost:4000/data/testA-registry-data/incorrect-package-name/1.0.0/file/simple`).set("Authorization", userAToken).send();
         } catch (e) {
             errorCaught = true;
             expect(e.status).equal(404);
@@ -183,7 +183,7 @@ describe("Package Tests", async () => {
         let errorCaught = false;
         try {
             const response = await request
-            .options(`http://localhost:4000/data/testA-registry-data/congressional-legislators/1.0.0/invalid-source-slug/${slugUrlEncoded}`).set("Authorization", userAToken).send();
+            .options(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/invalid-source-slug/simple`).set("Authorization", userAToken).send();
         } catch (e) {
             errorCaught = true;
             expect(e.status).equal(404);
@@ -199,12 +199,12 @@ describe("Package Tests", async () => {
         let errorCaught = false;
         try {
             const response = await request
-            .options(`http://localhost:4000/data/testA-registry-data/congressional-legislators/1.0.0/${slugUrlEncoded}/invalid-stream-set`).set("Authorization", userAToken).send();
+            .options(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/file/invalid-stream-set`).set("Authorization", userAToken).send();
             console.log(JSON.stringify(response));
         } catch (e) {
             errorCaught = true;
             expect(e.status).equal(404);
-            expect(e.response.text as string).include("STREAM_SET_NOT_FOUND");
+            expect(e.response.text as string).include("SCHEMA_NOT_FOUND");
         }
 
         expect(errorCaught).to.equal(true);
@@ -212,10 +212,98 @@ describe("Package Tests", async () => {
     });
 
 
+    it("Convert csv to registry formated avro", async function(){
+
+
+        const csvFile = fs.readFileSync("test/data-files/simple/simple.csv");
+        
+        const values = csvParser(csvFile,{
+            delimiter: ",",
+            columns: true,
+        }) as {}[];
+
+        const avroEncoder = avro.createFileEncoder("./simple.avro", 
+        {
+            type: "record",
+            name: "simple",
+            doc: DPM_AVRO_DOC_URL_V1,
+            fields: 
+                [
+                    {
+                        name: "dpm_a2v1pU4V_string",
+                        type: "string"
+                    },
+                    {
+                        name: "dpm_YUCnH7eU_number_int",
+                        type: ["int","null"]
+                    },
+                    {
+                        name: "dpm_YUCnH7eU_number_double",
+                        type: ["double","null"]
+                    },
+                    {
+                        name: "dpm_22tiXZ5XlW_boolean",
+                        type: "boolean"
+                    },
+                    {
+                        name: "dpm_1pyLWX_date",
+                        type: "long",
+                    },
+                    {
+                        name: "dpm_ZaEwmvIyoBvx_datetime",
+                        type: "long"
+                    },
+                    {
+                        name: "dpm_BFmVA6pEofQIqsV_string",
+                        type: ["string","null"]
+                    }
+                        
+                ]
+        });
+
+        await new Promise<void>((resolve,reject) => {
+            avroEncoder.write({
+                dpm_a2v1pU4V_string: "hey",
+                dpm_YUCnH7eU_number_int: 1,
+                dpm_YUCnH7eU_number_double: null,
+                dpm_22tiXZ5XlW_boolean: true,
+                dpm_1pyLWX_date: 1631631962,
+                dpm_ZaEwmvIyoBvx_datetime: 1631629762,
+                dpm_BFmVA6pEofQIqsV_string: null
+            }, undefined, (error) => {
+                if(error)
+                    reject(error);
+                else resolve();
+            });
+        });
+
+        await new Promise<void>((resolve,reject) => {
+            avroEncoder.write({
+                dpm_a2v1pU4V_string: "yo",
+                dpm_YUCnH7eU_number_int: null,
+                dpm_YUCnH7eU_number_double: 2.2,
+                dpm_22tiXZ5XlW_boolean: false,
+                dpm_1pyLWX_date: 1631630962,
+                dpm_ZaEwmvIyoBvx_datetime: 1621629762,
+                dpm_BFmVA6pEofQIqsV_string: "something something dark side"
+            }, undefined, (error) => {
+                if(error)
+                    reject(error);
+                else resolve();
+            });
+        });
+
+        await new Promise((resolve,reject) => {avroEncoder.end(resolve)});
+
+
+
+    });
+
+
     it("User A can upload avro data", async function () {
 
-        const dataFile = fs.readFileSync("test/data-files/data.avro");
-        const response = await request.post(`http://localhost:4000/data/testA-registry-data/congressional-legislators/1.0.0/${slugUrlEncoded}/${slugUrlEncoded}`)
+        const dataFile = fs.readFileSync("./simple.avro");
+        const response = await request.post(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/file/simple`)
             .set("Authorization", userAToken)
             .send(dataFile);
 
@@ -223,10 +311,30 @@ describe("Package Tests", async () => {
 
     });
 
+    it("User cannot upload avro data that isn't generated by datapm", async function () {
+
+        let errorCaught = false;
+        try {
+
+            const dataFile = fs.readFileSync("test/data-files/start-small-donations.avro");
+            const response = await request.post(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/file/simple`)
+                .set("Authorization", userAToken)
+                .send(dataFile);
+            console.log(JSON.stringify(response));
+        } catch (e) {
+            errorCaught = true;
+            expect(e.status).equal(400);
+            expect(e.response.text as string).include("AVRO_DOC_VALUE_NOT_RECOGNIZED");
+        }
+
+        expect(errorCaught).to.equal(true);
+
+    });
+
     it("User cannot upload avro data that doesn't match the sheet", async function () {
 
         const dataFile = fs.readFileSync("test/data-files/start-small-donations.avro");
-        const response = await request.post(`http://localhost:4000/data/testA-registry-data/congressional-legislators/1.0.0/${slugUrlEncoded}/${slugUrlEncoded}`)
+        const response = await request.post(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/file/simple`)
             .set("Authorization", userAToken)
             .send(dataFile);
 
@@ -241,7 +349,7 @@ describe("Package Tests", async () => {
 
         let errorCaught = false;
         try {
-            const response = await request.post(`http://localhost:4000/data/testA-registry-data/congressional-legislators/1.0.0/${slugUrlEncoded}/${slugUrlEncoded}`)
+            const response = await request.post(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/file/simple`)
             .set("Authorization", userBToken)
             .send(dataFile);
         } catch (e) {
@@ -281,7 +389,7 @@ describe("Package Tests", async () => {
             variables: {
                 identifier: {
                     catalogSlug: "testA-registry-data",
-                    packageSlug: "congressional-legislators"
+                    packageSlug: "simple"
                 },
                 value: {
                     isPublic: true,
@@ -306,7 +414,7 @@ describe("Package Tests", async () => {
             variables: {
                 identifier: {
                     catalogSlug: "testA-registry-data",
-                    packageSlug: "congressional-legislators"
+                    packageSlug: "simple"
                 }
             }
         });
@@ -321,9 +429,9 @@ describe("Package Tests", async () => {
         expect(responsePackageFile.sources.length).to.equal(1);
         expect(responsePackageFile.sources[0].type).equal("datapmRegistry");
         expect(responsePackageFile.sources[0].configuration!.catalogSlug).equal("testA-registry-data");
-        expect(responsePackageFile.sources[0].configuration!.packageSlug).equal("congressional-legislators");
-        expect(responsePackageFile.sources[0].streamSets[0].slug).equal("https://theunitedstates.io/congress-legislators/legislators-current.csv");
-        expect(responsePackageFile.sources[0].streamSets[0].configuration.streamSetSlug).equal("https://theunitedstates.io/congress-legislators/legislators-current.csv");
+        expect(responsePackageFile.sources[0].configuration!.packageSlug).equal("simple");
+        expect(responsePackageFile.sources[0].streamSets[0].slug).equal("simple");
+        expect(responsePackageFile.sources[0].streamSets[0].configuration.streamSetSlug).equal("simple");
         
     });
 
@@ -334,7 +442,7 @@ describe("Package Tests", async () => {
 
         let errorCaught = false;
         try {
-            const response = await request.post(`http://localhost:4000/data/testA-registry-data/congressional-legislators/1.0.0/${slugUrlEncoded}/${slugUrlEncoded}`)
+            const response = await request.post(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/file/simple`)
             .set("Authorization", userBToken)
             .send(dataFile);
         } catch (e) {

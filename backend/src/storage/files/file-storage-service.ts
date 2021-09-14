@@ -1,6 +1,7 @@
 import { DPMStorage } from "../dpm-storage";
 import { StorageProvider } from "../storage-provider";
 import { Readable } from "stream";
+import { off } from "process";
 
 export enum StorageErrors {
     FILE_DOES_NOT_EXIST = "FILE_DOES_NOT_EXIST"
@@ -52,9 +53,15 @@ export class FileStorageService {
         return this.storageService.moveFile(oldNamespace, oldItemId, newNamespace, newItemId, callback);
     }
 
-    public async deleteFiles(namespace: string[]): Promise<void> {
+    public async deleteFiles(namespace: string[], fileNames:string[] = []): Promise<void> {
         
-        return this.storageService.deleteAllItems(namespace);
+        if(fileNames.length === 0) 
+            return this.storageService.deleteAllItems(namespace);
+        else {
+            for(let i = 0; i < fileNames.length; i++) {
+                await this.deleteFile(namespace, fileNames[i]);
+            }
+        }
     }
 
     public async deleteFile(namespace: string[], itemId: string): Promise<void> {
