@@ -24,15 +24,7 @@ jobs:
             - name: Print node verion
               run: node --version
 
-            - name: Cache Root Node_modules
-              id: cache-root-node-modules
-              uses: actions/cache@v1
-              with:
-                  path: node_modules
-                  key: datampm-registry-${{ runner.OS }}-root-${{ hashFiles('package.json', 'package-lock.json') }}
-
             - name: Install Dependencies
-              if: steps.cache-root-node-modules.outputs.cache-hit != 'true'
               run: npm ci
 
             - name: Run ESLint
@@ -52,89 +44,51 @@ jobs:
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: npm run bump-version
 
-            - name: Cache Lib Dist
-              id: cache-lib-all-files
-              uses: actions/cache@v1
-              with:
-                  path: lib/dist
-                  key: datampm-registry-${{ runner.OS }}-lib-dist-${{ hashFiles('lib/**') }}
-
             - name: Install Lib Dependencies
               id: install-lib-Dependencies
-              if: steps.cache-lib-all-files.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: lib
 
             - name: Build Lib
               id: build-lib-Dependencies
-              if: steps.cache-lib-all-files.outputs.cache-hit != 'true'
               run: npm run build
               working-directory: lib
 
-            - name: Cache Backend Dist
-              id: cache-backend-all-files
-              uses: actions/cache@v1
+            - uses: JS-DevTools/npm-publish@v1
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               with:
-                  path: backend/dist
-                  key: datampm-registry-${{ runner.OS }}-backend-dist-${{ hashFiles('backend/**', 'lib/**') }}
+                  package: ./lib/dist/package.json
+                  token: ${{ secrets.NPM_TOKEN }}
 
-            - name: Cache Backend Node_modules
-              id: cache-backend-node-modules
-              if: steps.cache-backend-all-files.outputs.cache-hit != 'true'
-              uses: actions/cache@v1
-              with:
-                  path: backend/node_modules
-                  key: datampm-registry-${{ runner.OS }}-backend-node-modules-${{ hashFiles('backend/package.json', 'backend/package-lock.json') }}
+            - name: Bump Package Files Lib Versions
+              run: npm run bump-package-lib-versions
+
+            - name: Tag
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: npm run tag
 
             - name: Install Backend Dependencies
               id: install-backend-Dependencies
-              if: steps.cache-backend-all-files.outputs.cache-hit != 'true' || steps.cache-backend-node-modules.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: backend
 
             - name: Build Backend
               id: build-backend-Dependencies
-              if: steps.cache-backend-all-files.outputs.cache-hit != 'true'
               run: npm run build
               working-directory: backend
 
-            - name: Cache Frontend Dist
-              id: cache-frontend-all-files
-              uses: actions/cache@v1
-              with:
-                  path: frontend/dist
-                  key: datampm-registry-${{ runner.OS }}-frontend-dist-${{ hashFiles('frontend/**', 'lib/**') }}
-
-            - name: Cache Frontend Node_modules
-              id: cache-frontend-node-modules
-              if: steps.cache-frontend-all-files.outputs.cache-hit != 'true'
-              uses: actions/cache@v1
-              with:
-                  path: frontend/node_modules
-                  key: datampm-registry-${{ runner.OS }}-frontend-node-modules-${{ hashFiles('frontend/package.json', 'frontend/package-lock.json') }}
-
             - name: Install Frontend Dependencies
               id: install-frontend-dependencies
-              if: steps.cache-frontend-all-files.outputs.cache-hit != 'true' || steps.cache-frontend-node-modules.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: frontend
 
             - name: Build Frontend
               id: build-frontend-Dependencies
-              if: steps.cache-frontend-all-files.outputs.cache-hit != 'true'
               run: npm run build
               working-directory: frontend
 
-            - name: Cache Docs Node_modules
-              id: cache-docs-node-modules
-              uses: actions/cache@v1
-              with:
-                  path: docs/website/node_modules
-                  key: datampm-registry-${{ runner.OS }}-docs-${{ hashFiles('docs/website/package.json', 'docs/website/package-lock.json') }}
-
             - name: Install Docs Dependencies
               id: install-docs-dependencies
-              if: steps.cache-docs-node-modules.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: docs/website
 
@@ -143,30 +97,13 @@ jobs:
               run: npm run build
               working-directory: docs/website
 
-            - name: Cache Client Dist
-              id: cache-client-all-files
-              uses: actions/cache@v1
-              with:
-                  path: client/dist
-                  key: datampm-client-${{ runner.OS }}-dist-${{ hashFiles('client/**', 'lib/**') }}
-
-            - name: Cache Client Node_modules
-              id: cache-client-node-modules
-              if: steps.cache-client-all-files.outputs.cache-hit != 'true'
-              uses: actions/cache@v1
-              with:
-                  path: client/node_modules
-                  key: datampm-client-${{ runner.OS }}-node-modules-${{ hashFiles('client/package.json', 'client/package-lock.json') }}
-
             - name: Install Client Dependencies
               id: install-client-dependencies
-              if: steps.cache-client-all-files.outputs.cache-hit != 'true' || steps.cache-client-node-modules.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: client
 
             - name: Build Client
               id: build-client-Dependencies
-              if: steps.cache-client-all-files.outputs.cache-hit != 'true'
               run: npm run build
               working-directory: client
 
@@ -175,10 +112,6 @@ jobs:
 
             - name: Smoke Test Registry Docker Image
               run: npm run test
-
-            - name: Tag
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-              run: npm run tag
 
             - name: Echo Docker Password to file
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
@@ -211,12 +144,6 @@ jobs:
               env:
                   PROJECT_ID: data-test-terraform
                   GOOGLE_CREDENTIALS: ~/gcloud.key
-
-            - uses: JS-DevTools/npm-publish@v1
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-              with:
-                  package: ./lib/dist/package.json
-                  token: ${{ secrets.NPM_TOKEN }}
 
             - uses: JS-DevTools/npm-publish@v1
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'

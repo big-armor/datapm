@@ -42,7 +42,7 @@
         "await-lock": "^2.1.0",
         "cron": "^1.8.2",
         "dataloader": "^2.0.0",
-        "datapm-lib": "file:../lib/dist",
+        "datapm-lib": "^0.6.265",
         "express-enforces-ssl": "^1.1.0",
         "express-http-proxy": "^1.6.0",
         "express-jwt": "^6.0.0",

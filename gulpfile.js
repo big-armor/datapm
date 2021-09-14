@@ -31,6 +31,22 @@ function buildLib() {
     return spawnAndLog("lib-build", "npm", ["run", "build"], { cwd: "lib" });
 }
 
+function linkLib() {
+    return spawnAndLog("link-lib", "npm", ["link"], { cwd: "lib" });
+}
+
+function linkLibBackend() {
+    return spawnAndLog("link-lib", "npm", ["link", "datapm-lib"], { cwd: "backend" });
+}
+
+function linkLibClient() {
+    return spawnAndLog("link-lib", "npm", ["link", "datapm-lib"], { cwd: "client" });
+}
+
+function linkLibFrontend() {
+    return spawnAndLog("link-lib", "npm", ["link", "datapm-lib"], { cwd: "frontend" });
+}
+
 function installBackendDependencies() {
     return spawnAndLog("backend-deps", "npm", ["ci"], { cwd: "backend" });
 }
@@ -99,6 +115,23 @@ function bumpRootVersion() {
 
 function bumpLibVersion() {
     return spawnAndLog("bump-lib-version", "npm", ["version", readPackageVersion()], { cwd: "lib" });
+}
+
+function bumpBackendLibVersion() {
+    return spawnAndLog("bump-backend-lib-version", "npm", ["install", "datapm-lib@" + readPackageVersion()], {
+        cwd: "backend"
+    });
+}
+
+function bumpClientLibVersion() {
+    return spawnAndLog("bump-backend-lib-version", "npm", ["install", "datapm-lib@" + readPackageVersion()], {
+        cwd: "client"
+    });
+}
+function bumpFrontendLibVersion() {
+    return spawnAndLog("bump-backend-lib-version", "npm", ["install", "datapm-lib@" + readPackageVersion()], {
+        cwd: "frontend"
+    });
 }
 
 function bumpClientVersion() {
@@ -271,6 +304,10 @@ exports.buildParallel = series(
 );
 
 exports.bumpVersion = series(showGitDiff, bumpRootVersion, bumpLibVersion, bumpClientVersion);
+exports.bumpPackageLibVersions = parallel(bumpBackendLibVersion, bumpClientLibVersion, bumpFrontendLibVersion);
+
+exports.linkLib = parallel(linkLibBackend, linkLibClient, linkLibFrontend);
+
 exports.gitPushTag = series(gitStageChanges, gitCommit, gitPush, gitPushTag);
 exports.deployAssets = series(
     // libPublish, // current done in the github action
@@ -294,8 +331,11 @@ exports.prepareDevEnvironment = series(
     installRootDependencies,
     installLibDependencies,
     buildLib,
-    series(installBackendDependencies, parallel(buildBackend)),
-    series(installFrontendDependencies),
-    series(installDocsDependencies),
-    series(installClientDependencies)
+    linkLib,
+    installBackendDependencies,
+    installFrontendDependencies,
+    installDocsDependencies,
+    installClientDependencies,
+    parallel(linkLibBackend, linkLibClient, linkLibFrontend),
+    parallel(buildBackend)
 );
