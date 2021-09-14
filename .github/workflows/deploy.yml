@@ -63,10 +63,6 @@ jobs:
             - name: Bump Package Files Lib Versions
               run: npm run bump-package-lib-versions
 
-            - name: Tag
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-              run: npm run tag
-
             - name: Install Backend Dependencies
               id: install-backend-Dependencies
               run: npm ci
@@ -112,6 +108,10 @@ jobs:
 
             - name: Smoke Test Registry Docker Image
               run: npm run test
+
+            - name: Tag
+              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+              run: npm run tag
 
             - name: Echo Docker Password to file
               if: github.ref == 'refs/heads/master' && github.event_name == 'push'
