@@ -32,7 +32,7 @@ function buildLib() {
 }
 
 function linkLib() {
-    return spawnAndLog("link-lib", "npm", ["link"], { cwd: "lib" });
+    return spawnAndLog("link-lib", "npm", ["link"], { cwd: "lib/dist" });
 }
 
 function linkLibBackend() {
