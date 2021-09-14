@@ -10,10 +10,9 @@ jobs:
         name: "Build And Deploy"
         timeout-minutes: 20
         runs-on: ubuntu-latest
+        env:
+            INPUT_TOKEN: "" # See https://github.com/JS-DevTools/npm-publish/issues/15
         steps:
-            - env:
-              INPUT_TOKEN: "" # See https://github.com/JS-DevTools/npm-publish/issues/15
-
             - name: Checkout
               uses: actions/checkout@v2
 
