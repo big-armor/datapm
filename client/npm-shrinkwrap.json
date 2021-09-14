@@ -1,6 +1,6 @@
 {
     "name": "datapm-client",
-    "version": "0.6.269",
+    "version": "0.6.270",
     "lockfileVersion": 1,
     "requires": true,
     "dependencies": {
@@ -5212,9 +5212,9 @@
             "dev": true
         },
         "datapm-lib": {
-            "version": "0.6.265",
-            "resolved": "https://registry.npmjs.org/datapm-lib/-/datapm-lib-0.6.265.tgz",
-            "integrity": "sha512-DH00Zc72H7iD2FSC2Byg2cXwDq3xos9+GBdkfJ2+z8q8HJXfE7THz8JNO2XASlfeAwCj+Ola4B/fOzS/Smuphw==",
+            "version": "0.6.270",
+            "resolved": "https://registry.npmjs.org/datapm-lib/-/datapm-lib-0.6.270.tgz",
+            "integrity": "sha512-J+nYChOYD8tHx0zKnZU9QAXA3EbppzsWOdDWH1rPaI3pthJg6KV8o29tuT1kNK0QzCsCyMfOKmW4jMQWhgnEiw==",
             "requires": {
                 "@types/semver": "^7.3.4",
                 "ajv": "^6.12.6",
