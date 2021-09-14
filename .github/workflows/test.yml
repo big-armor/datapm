@@ -14,7 +14,7 @@ jobs:
 
             - uses: actions/setup-node@v2-beta
               with:
-                  node-version: "12"
+                  node-version: "14"
 
             - name: Print npm verion
               run: npm --version
@@ -47,7 +47,7 @@ jobs:
 
             - uses: actions/setup-node@v2-beta
               with:
-                  node-version: "12"
+                  node-version: "14"
 
             - name: Print npm verion
               run: npm --version
@@ -89,7 +89,7 @@ jobs:
 
             - uses: actions/setup-node@v2-beta
               with:
-                  node-version: "12"
+                  node-version: "14"
 
             - name: Print npm verion
               run: npm --version
@@ -152,7 +152,7 @@ jobs:
 
             - uses: actions/setup-node@v2-beta
               with:
-                  node-version: "12"
+                  node-version: "14"
 
             - name: Print npm verion
               run: npm --version
@@ -173,14 +173,14 @@ jobs:
               run: npm ci
               working-directory: lib
 
-            - name: Link Lib
-              run: npm link
-              working-directory: lib/dist
-
             - name: Build Lib
               id: build-lib-Dependencies
               run: npm run build
               working-directory: lib
+
+            - name: Link Lib
+              run: npm link
+              working-directory: lib/dist
 
             - name: Cache Frontend Node_modules
               id: cache-frontend-node-modules
@@ -215,7 +215,7 @@ jobs:
 
             - uses: actions/setup-node@v2-beta
               with:
-                  node-version: "12"
+                  node-version: "14"
 
             - name: Print npm verion
               run: npm --version
