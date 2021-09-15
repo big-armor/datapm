@@ -9,6 +9,9 @@ services:
         image: datapm-registry
         ports:
             - "4000:4000"
+        depends_on:
+            - "postgres"
+            - "smtp"
         env_file:
             - Docker-env
         volumes:
@@ -17,7 +20,7 @@ services:
               target: /var/lib/datapm-registry/data
               consistency: cached
     postgres:
-        image: postgres:11
+        image: postgres:13.3
         volumes:
             - type: volume
               source: postgres_data_local

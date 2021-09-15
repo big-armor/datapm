@@ -35,7 +35,7 @@ describe("Big Query Source Test", function () {
             "package",
             ["bigQuery://"],
             promptInputs,
-            (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
+            async (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
                 if (promptIndex === prompts.length && line.includes("Should be a SELECT query")) {
                     results.messageFound = true;
                     cmdProcess.kill("SIGINT");
@@ -90,7 +90,7 @@ describe("Big Query Source Test", function () {
             "package",
             ["bigQuery://"],
             promptInputs,
-            (line: string, promptIndex: number) => {
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("datapm publish ")) {
                     results.messageFound = true;
                 }
@@ -197,8 +197,7 @@ describe("Big Query Source Test", function () {
             "package",
             ["bigQuery://"],
             promptInputs,
-            (line: string, promptIndex: number) => {
-                console.log(line);
+            async (line: string, promptIndex: number) => {
                 if (promptIndex === prompts.length && line.includes("datapm publish ")) {
                     results.messageFound = true;
                 }

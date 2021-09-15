@@ -1,0 +1,28 @@
+version: "3.7"
+
+volumes:
+    postgres_data_local: {}
+    registry_file_store: {}
+
+services:
+    postgres:
+        image: postgres:13.3
+        volumes:
+            - type: volume
+              source: postgres_data_local
+              target: /var/lib/postgresql/data
+              consistency: delegated
+            - ./init-database.sh:/docker-entrypoint-initdb.d/init-database.sh
+        ports:
+            - "5432:5432"
+        environment:
+            - POSTGRES_HOST=postgres
+            - POSTGRES_PORT=5432
+            - POSTGRES_DB=datapm
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+    smtp:
+        image: maildev/maildev:latest
+        ports:
+            - "25:25"
+            - "1080:80"

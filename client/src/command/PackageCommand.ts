@@ -3,7 +3,9 @@ import { Command } from "./Command";
 
 export class PackageArguments {
     defaults?: boolean;
-    sourceConfiguration?: string;
+    connection?: string;
+    credentials?: string;
+    configuration?: string;
     references?: string[];
 }
 
@@ -25,8 +27,16 @@ export class PackageCommand implements Command {
                         describe:
                             "Use default user friendly/short package name, starting version and short package description"
                     })
-                    .option("sourceConfiguration", {
-                        describe: "JSON object for configuring source",
+                    .option("connection", {
+                        describe: "JSON object for source connection",
+                        type: "string"
+                    })
+                    .option("credentials", {
+                        describe: "JSON object for source specific access credentials",
+                        type: "string"
+                    })
+                    .option("configuration", {
+                        describe: "JSON object for configuring source options",
                         type: "string"
                     })
                     .help(),
@@ -36,6 +46,12 @@ export class PackageCommand implements Command {
 }
 
 export async function packageCommand(args: PackageArguments): Promise<void> {
-    const fetchCommand = await import("./PackageCommandModule");
-    await fetchCommand.generatePackage(args);
+    try {
+        const command = await import("./PackageCommandModule");
+
+        await command.generatePackage(args);
+    } catch (e) {
+        console.error(e);
+        process.exit(1);
+    }
 }

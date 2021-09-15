@@ -24,8 +24,8 @@ import {
     createApiKey,
     createTestPackage,
     createTestUser,
-    removePackageFiles,
     KEYS,
+    removePackageFiles,
     TEST_SOURCE_FILES
 } from "./test-utils";
 
@@ -33,6 +33,8 @@ describe("Content Detection Tests", async function () {
     let packageA: PackageFile;
 
     before(async () => {
+        resetConfiguration();
+
         const userAClient = await createTestUser();
         const apiKey = await createApiKey(userAClient);
         addRegistry({
@@ -50,11 +52,11 @@ describe("Content Detection Tests", async function () {
                 [
                     {
                         message: "What does each content-detection record represent?",
-                        input: KEYS.ENTER
+                        input: "\n"
                     },
                     {
                         message: "Do you want to specify units for the",
-                        input: "n"
+                        input: "n" + KEYS.ENTER
                     }
                 ]
             );

@@ -18,6 +18,7 @@ import { PackageFileV020 } from "./PackageFile-v0.2.0";
 
 import deepEqual from "fast-deep-equal";
 import { CountPrecisionV030 } from "./PackageFile-v0.3.0";
+import { PackageFile050 } from "./PackageFile-v0.5.0";
 
 export type DPMRecordValue =
     | number
@@ -49,6 +50,8 @@ export enum DifferenceType {
     CHANGE_PACKAGE_DISPLAY_NAME = "CHANGE_PACKAGE_DISPLAY_NAME",
     CHANGE_PACKAGE_DESCRIPTION = "CHANGE_PACKAGE_DESCRIPTION",
     CHANGE_SOURCE = "CHANGE_SOURCE",
+    CHANGE_SOURCE_CONNECTION = "CHANGE_SOURCE_CONNECTION",
+    CHANGE_SOURCE_CREDENTIALS = "CHANGE_SOURCE_CREDENTIALS",
     CHANGE_SOURCE_CONFIGURATION = "CHANGE_SOURCE_CONFIGURATION",
     CHANGE_SOURCE_URIS = "CHANGE_SOURCE_URIS", // APPLIES ONLY TO PackageFileV040 and earlier
     CHANGE_STREAM_STATS = "CHANGE_SOURCE_STATS",
@@ -265,6 +268,17 @@ export function compareSource(priorSource: Source, newSource: Source, pointer = 
 
             if (!configComparison)
                 response.push({ type: DifferenceType.CHANGE_SOURCE_CONFIGURATION, pointer: pointer });
+
+            const connectionComparison = compareConfigObjects(
+                priorSource.connectionConfiguration,
+                newSource.connectionConfiguration
+            );
+
+            if (!connectionComparison)
+                response.push({ type: DifferenceType.CHANGE_SOURCE_CONNECTION, pointer: pointer });
+
+            if (priorSource.credentialsIdentifier !== newSource.credentialsIdentifier)
+                response.push({ type: DifferenceType.CHANGE_SOURCE_CREDENTIALS, pointer: pointer });
         }
     }
 
@@ -663,6 +677,17 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
 
         for (const oldSchema of oldPackageFile.sources) {
             (oldSchema.configuration as DPMConfiguration).uris = oldSchema.uris;
+        }
+    }
+
+    if (packageFileObject.$schema === "https://datapm.io/docs/package-file-schema-v0.5.0.json") {
+        packageFileObject.$schema = "https://datapm.io/docs/package-file-schema-v0.6.0.json";
+
+        const oldPackageFile = packageFileObject as PackageFile050;
+
+        for (const oldSource of oldPackageFile.sources) {
+            const newSource = oldSource as Source;
+            newSource.connectionConfiguration = oldSource.configuration || {};
         }
     }
 

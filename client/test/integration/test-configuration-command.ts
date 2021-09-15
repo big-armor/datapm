@@ -18,7 +18,7 @@ describe("Configuration Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("configuration", ["show"], [], (line: string) => {
+        const cmdResult = await testCmd("configuration", ["show"], [], async (line: string) => {
             if (line.includes(`registries: [ { url: 'http://localhost:${registryServerPort}' } ]`)) {
                 results.messageFound = true;
             }
@@ -34,7 +34,7 @@ describe("Configuration Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("configuration", ["reset"], [], (line: string) => {
+        const cmdResult = await testCmd("configuration", ["reset"], [], async (line: string) => {
             if (line.includes("has been reset")) {
                 results.messageFound = true;
             }

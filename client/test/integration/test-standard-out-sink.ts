@@ -8,6 +8,7 @@ describe("Standard Out Sink", function () {
     before(async function () {
         packageAFilePath = await createTestPackage(TEST_SOURCE_FILES.HTTP1, true);
         expect(packageAFilePath).to.not.equal(null);
+        expect(packageAFilePath).to.not.equal("");
     });
 
     beforeEach(async function () {
@@ -27,17 +28,21 @@ describe("Standard Out Sink", function () {
             nonJSONLineFound: false
         };
 
-        const cmdResult = await testCmd("fetch", [packageAFilePath, "--quiet", "--sink", "stdout"], [], (line) => {
-            results.oneLineFound = true;
-            if (
-                !line.startsWith("{") &&
-                !line.startsWith("Debugger attached.") &&
-                !line.startsWith("Waiting for the debugger")
-            ) {
-                console.log(line);
-                results.nonJSONLineFound = true;
+        const cmdResult = await testCmd(
+            "fetch",
+            [packageAFilePath, "--quiet", "--sink", "stdout"],
+            [],
+            async (line: string) => {
+                results.oneLineFound = true;
+                if (
+                    !line.startsWith("{") &&
+                    !line.startsWith("Debugger attached.") &&
+                    !line.startsWith("Waiting for the debugger")
+                ) {
+                    results.nonJSONLineFound = true;
+                }
             }
-        });
+        );
 
         expect(cmdResult.code, "Exit code").equals(0);
         expect(results.oneLineFound, "Should print a line").equals(true);
@@ -50,11 +55,16 @@ describe("Standard Out Sink", function () {
             warningMessageFound: false
         };
 
-        const cmdResult = await testCmd("fetch", [packageAFilePath, "--defaults", "--sink", "stdout"], [], (line) => {
-            if (line.includes("You should probably use the --quiet flag to disable all non-data output")) {
-                results.warningMessageFound = true;
+        const cmdResult = await testCmd(
+            "fetch",
+            [packageAFilePath, "--defaults", "--sink", "stdout"],
+            [],
+            async (line: string) => {
+                if (line.includes("You should probably use the --quiet flag to disable all non-data output")) {
+                    results.warningMessageFound = true;
+                }
             }
-        });
+        );
 
         expect(cmdResult.code, "Exit code").equals(0);
         expect(results.warningMessageFound, "Should print warning message").equals(true);

@@ -14,7 +14,7 @@ jobs:
 
             - uses: actions/setup-node@v2-beta
               with:
-                  node-version: "12"
+                  node-version: "14"
 
             - name: Print npm verion
               run: npm --version
@@ -47,7 +47,7 @@ jobs:
 
             - uses: actions/setup-node@v2-beta
               with:
-                  node-version: "12"
+                  node-version: "14"
 
             - name: Print npm verion
               run: npm --version
@@ -89,7 +89,7 @@ jobs:
 
             - uses: actions/setup-node@v2-beta
               with:
-                  node-version: "12"
+                  node-version: "14"
 
             - name: Print npm verion
               run: npm --version
@@ -115,6 +115,10 @@ jobs:
               run: npm run build
               working-directory: lib
 
+            - name: Link Lib
+              run: npm link
+              working-directory: lib/dist
+
             - name: Cache Backend Node_modules
               id: cache-backend-node-modules
               uses: actions/cache@v1
@@ -126,6 +130,10 @@ jobs:
               id: install-backend-Dependencies
               if: steps.cache-backend-node-modules.outputs.cache-hit != 'true'
               run: npm ci
+              working-directory: backend
+
+            - name: Link Lib for Backend
+              run: npm link datapm-lib
               working-directory: backend
 
             - name: Test Backend
@@ -144,7 +152,7 @@ jobs:
 
             - uses: actions/setup-node@v2-beta
               with:
-                  node-version: "12"
+                  node-version: "14"
 
             - name: Print npm verion
               run: npm --version
@@ -170,6 +178,10 @@ jobs:
               run: npm run build
               working-directory: lib
 
+            - name: Link Lib
+              run: npm link
+              working-directory: lib/dist
+
             - name: Cache Frontend Node_modules
               id: cache-frontend-node-modules
               uses: actions/cache@v1
@@ -181,6 +193,10 @@ jobs:
               id: install-fronend-dependencies
               if: steps.cache-frontend-node-modules.outputs.cache-hit != 'true'
               run: npm ci
+              working-directory: frontend
+
+            - name: Link Lib for Frontend
+              run: npm link datapm-lib
               working-directory: frontend
 
             - name: Test Frontend
@@ -199,7 +215,7 @@ jobs:
 
             - uses: actions/setup-node@v2-beta
               with:
-                  node-version: "12"
+                  node-version: "14"
 
             - name: Print npm verion
               run: npm --version
@@ -207,35 +223,57 @@ jobs:
             - name: Print node verion
               run: node --version
 
-            - name: Cache Lib Node_modules
-              id: cache-lib-node-modules
+            - name: Cache Lib Build
+              id: cache-lib-dist
               uses: actions/cache@v1
               with:
-                  path: lib/node_modules
-                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/package.json', 'lib/package-lock.json') }}
+                  path: lib
+                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/**') }}
 
             - name: Install Lib Dependencies
               id: install-lib-Dependencies
-              if: steps.cache-lib-node-modules.outputs.cache-hit != 'true'
+              if: steps.cache-lib-dist.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: lib
 
             - name: Build Lib
               id: build-lib-Dependencies
+              if: steps.cache-lib-dist.outputs.cache-hit != 'true'
               run: npm run build
               working-directory: lib
 
-            - name: Cache Backend Node_modules
-              id: cache-backend-node-modules
+            - name: Link Lib
+              run: npm link
+              working-directory: lib/dist
+
+            - name: Cache Backend Dependencies
+              id: cache-backend-dependencies
               uses: actions/cache@v1
               with:
                   path: backend/node_modules
-                  key: datampm-registry-${{ runner.OS }}-backend-${{ hashFiles('backend/package.json', 'backend/package-lock.json') }}
+                  key: datampm-registry-${{ runner.OS }}-backend-dependencies-${{ hashFiles('backend/package.json','backend/package-lock.json', 'lib/**') }}
 
             - name: Install Backend Dependencies
               id: install-backend-Dependencies
-              if: steps.cache-backend-node-modules.outputs.cache-hit != 'true'
+              if: steps.cache-backend-dependencies.outputs.cache-hit != 'true'
               run: npm ci
+              working-directory: backend
+
+            - name: Cache Backend Dist
+              id: cache-backend-dist
+              uses: actions/cache@v1
+              with:
+                  path: backend/dist
+                  key: datampm-registry-${{ runner.OS }}-backend-dist-${{ hashFiles('backend/**','lib/**') }}
+
+            - name: Link Lib for Backend
+              run: npm link datapm-lib
+              working-directory: backend
+
+            - name: Build Backend
+              id: build-backend
+              if: steps.cache-backend-dist.outputs.cache-hit != 'true'
+              run: npm run build
               working-directory: backend
 
             - name: Cache Client Node_modules
@@ -251,7 +289,13 @@ jobs:
               run: npm ci
               working-directory: client
 
+            - name: Link Lib for Client
+              run: npm link datapm-lib
+              working-directory: client
+
             - name: Test Client
               id: test-client-Dependencies
               run: npm run test
               working-directory: client
+              env:
+                  CREDENTIALS_SECRET_KEY: test-key-not-for-production

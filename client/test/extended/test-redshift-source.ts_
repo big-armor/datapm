@@ -47,7 +47,7 @@ describe("Redshift Source Test", function () {
 				JSON.stringify({ region, bucket: bucketName, schema: schemaName, tables: tableName })
 			],
 			[],
-			(line: string) => {
+			async (line: string) => {
 				if (line.includes("datapm publish ")) {
 					results.messageFound = true;
 				}

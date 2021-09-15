@@ -8,11 +8,10 @@
         "prebuild": "rm -rf dist; npm run codegen",
         "build": "tsc",
         "postbuild": "gulp",
-        "prestart": "npm run codegen",
+        "prestart": "npm run codegen && docker-compose -f ../docker/docker-compose-local-dev.yml  up -d ",
         "start": "TS_NODE_FILES=true . ./env.sh && nodemon --watch 'src' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts",
         "prestart-nowatch": "npm run codegen",
         "start-nowatch": ". ./env.sh && ts-node src/index.ts",
-        "prestart:server": "npm run codegen",
         "start:server": ". ./env.sh && cd dist && TYPEORM_IS_DIST=true  node index.js",
         "pretest": "npm run codegen",
         "test": "mocha -r ts-node/register --slow 2000 test/integration/*.ts src/**/*.spec.ts",
@@ -43,7 +42,7 @@
         "await-lock": "^2.1.0",
         "cron": "^1.8.2",
         "dataloader": "^2.0.0",
-        "datapm-lib": "file:../lib/dist",
+        "datapm-lib": "^0.6.270",
         "express-enforces-ssl": "^1.1.0",
         "express-http-proxy": "^1.6.0",
         "express-jwt": "^6.0.0",
@@ -121,10 +120,5 @@
         "tsc-watch": "^4.2.3",
         "tslint": "^6.1.2",
         "typescript": "^4.0.3"
-    },
-    "husky": {
-        "hooks": {
-            "pre-commit": "npm run lint:fix"
-        }
     }
 }

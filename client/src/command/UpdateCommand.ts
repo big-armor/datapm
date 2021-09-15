@@ -29,6 +29,11 @@ export class UpdateCommand implements Command {
 }
 
 export async function updateCommandHandler(args: UpdateArguments): Promise<void> {
-    const command = await import("./UpdateCommandModule");
-    await command.updatePackage(args);
+    try {
+        const command = await import("./UpdateCommandModule");
+        await command.updatePackage(args);
+    } catch (e) {
+        console.error(e);
+        process.exit(1);
+    }
 }

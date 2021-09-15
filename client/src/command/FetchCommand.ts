@@ -43,6 +43,12 @@ export class FetchCommand implements Command {
     }
 }
 export async function fetchPackage(args: FetchArguments): Promise<void> {
-    const fetchCommand = await import("./FetchCommandModule");
-    await fetchCommand.fetchPackage(args);
+    try {
+        const fetchCommand = await import("./FetchCommandModule");
+
+        await fetchCommand.fetchPackage(args);
+    } catch (e) {
+        console.error(e);
+        process.exit(1);
+    }
 }

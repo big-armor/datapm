@@ -2,8 +2,8 @@ import { DPMConfiguration, PackageFile, Schema } from "datapm-lib";
 import ON_DEATH from "death";
 import { Readable, Transform, Writable } from "stream";
 import { Maybe } from "../util/Maybe";
-import { Sink, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWithContext } from "../sink/Sink";
-import { RecordStreamContext, StreamSetPreview, UpdateMethod } from "../source/Source";
+import { Sink, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWithContext } from "../repository/Sink";
+import { RecordStreamContext, StreamSetPreview, UpdateMethod } from "../repository/Source";
 import { Parameter, ParameterType } from "./parameters/Parameter";
 import {
     checkSchemaDataTypeConflicts,
@@ -116,6 +116,8 @@ export async function fetch(
     packageFile: PackageFile,
     streamSetPreview: StreamSetPreview,
     sink: Sink,
+    sinkConnectionConfiguration: DPMConfiguration,
+    sinkCredentialsConfiguration: DPMConfiguration,
     sinkConfiguration: DPMConfiguration,
     sinkStateKey: SinkStateKey,
     sinkState: Maybe<SinkState>,
@@ -156,7 +158,7 @@ export async function fetch(
     let returnPromiseReject: (error: Error) => void;
     let returnPromiseResolve: (value: FetchResult | PromiseLike<FetchResult>) => void;
 
-    if (sink.isStronglyTyped(sinkConfiguration)) {
+    if (await sink.isStronglyTyped(sinkConfiguration)) {
         for (const schema of schemas) {
             const conflictedPropertyTypes = await checkSchemaDataTypeConflicts(schema);
             const conflictedTitles = Object.keys(conflictedPropertyTypes);
@@ -369,7 +371,13 @@ export async function fetch(
     const writablesWithContexts: WritableWithContext[] = [];
 
     for (const schema of packageFile.schemas) {
-        const writeableWithContext = await sink.getWriteable(schema, sinkConfiguration, updateMethod);
+        const writeableWithContext = await sink.getWriteable(
+            schema,
+            sinkConnectionConfiguration,
+            sinkCredentialsConfiguration,
+            sinkConfiguration,
+            updateMethod
+        );
         writablesWithContexts.push(writeableWithContext);
 
         if (writeableWithContext.transforms && writeableWithContext.transforms.length > 0) {
@@ -505,7 +513,13 @@ export async function fetch(
                 streamState.updateHash = stoppedEarly ? undefined : s.updateHash;
             });
             try {
-                await sink.saveSinkState(sinkConfiguration, sinkStateKey, finalSinkState);
+                await sink.saveSinkState(
+                    sinkConnectionConfiguration,
+                    sinkCredentialsConfiguration,
+                    sinkConfiguration,
+                    sinkStateKey,
+                    finalSinkState
+                );
             } catch (error) {
                 context.finish(
                     `Error saving stream state after successfully writing records. This puts the sink state in an inconsisent state with the reocrds written. You will need to delete the file/tables/records from the target sink and restart the full transfer`,

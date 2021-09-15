@@ -28,7 +28,7 @@ describe("S3 Source Test", function () {
                 JSON.stringify({ region: "us-east-2" })
             ],
             defaultPromptInputsForCSVs,
-            (line: string) => {
+            async (line: string) => {
                 if (line.includes("datapm publish ")) {
                     results.messageFound = true;
                 }

@@ -22,7 +22,7 @@ export async function handleSearch(argv: SearchArguments): Promise<void> {
         if (registries.length > 1) {
             const registryPromptResult = await prompts(
                 {
-                    type: "select",
+                    type: "autocomplete",
                     name: "registry",
                     message: "Registry to search?",
                     choices: [

@@ -50,7 +50,7 @@ export const getAllRegions = async (): Promise<string[]> => {
     return result.Regions?.map((region) => region.RegionName as string) || [];
 };
 
-export const getAwsParameters = async (configuration: DPMConfiguration): Promise<Parameter[]> => {
+export const getAwsAuthenticationParameters = async (configuration: DPMConfiguration): Promise<Parameter[]> => {
     const parameters: Parameter[] = [];
 
     if (configuration.awsProfile != null) {

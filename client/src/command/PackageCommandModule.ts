@@ -14,17 +14,24 @@ import numeral from "numeral";
 import ora from "ora";
 import { exit } from "process";
 import prompts from "prompts";
+import { getRepositoryDescriptionByType } from "../repository/RepositoryUtil";
 import {
     InspectionResults,
     InspectProgress,
     SourceInspectionContext,
-    SourceInterface,
+    Source as SourceImplementation,
     SourceStreamsInspectionResult,
     StreamSetPreview
-} from "../source/Source";
-import { findSourceForUri, generateSchemasFromSourceStreams, getSources, getSourceByType } from "../source/SourceUtil";
+} from "../repository/Source";
+import { RepositoryDescription } from "../repository/Repository";
+import {
+    findRepositoryForSourceUri,
+    generateSchemasFromSourceStreams,
+    getSourcesDescriptions
+} from "../repository/SourceUtil";
 import { validPackageDisplayName, validShortPackageDescription, validUnit, validVersion } from "../util/IdentifierUtil";
 import { LogType } from "../util/LoggingUtils";
+import { Maybe } from "../util/Maybe";
 import { nameToSlug } from "../util/NameUtil";
 import { writeLicenseFile, writePackageFile, writeReadmeFile, PublishType } from "../util/PackageUtil";
 import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
@@ -32,6 +39,8 @@ import { cliHandleParameters } from "../util/parameters/ParameterUtils";
 import * as SchemaUtil from "../util/SchemaUtil";
 import { PackageArguments } from "./PackageCommand";
 import { PublishPackageCommandModule } from "./PublishPackageCommandModule";
+import { obtainCredentialsConfiguration } from "../util/CredentialsUtil";
+import { obtainConnectionConfiguration } from "../util/ConnectionUtil";
 
 export async function generatePackage(argv: PackageArguments): Promise<void> {
     const oraRef = ora({
@@ -40,42 +49,63 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
         text: `Inspecting URIs...`
     });
 
+    let connectionConfiguration: DPMConfiguration = {};
+    let credentialsConfiguration: DPMConfiguration = {};
     let sourceConfiguration: DPMConfiguration = {};
-    if (argv.sourceConfiguration) {
+
+    if (argv.connection) {
         try {
-            const correctJson = argv.sourceConfiguration.replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, '"$2": ');
+            const correctJson = argv.connection.replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, '"$2": ');
+
+            connectionConfiguration = JSON.parse(correctJson);
+        } catch (error) {
+            oraRef.fail("Could not parse the connection parameter as JSON");
+            process.exit(1);
+        }
+    }
+
+    if (argv.credentials) {
+        try {
+            const correctJson = argv.credentials.replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, '"$2": ');
+
+            credentialsConfiguration = JSON.parse(correctJson);
+        } catch (error) {
+            oraRef.fail("Could not parse the credentials parameter as JSON");
+            process.exit(1);
+        }
+    }
+
+    if (argv.configuration) {
+        try {
+            const correctJson = argv.configuration.replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, '"$2": ');
 
             sourceConfiguration = JSON.parse(correctJson);
         } catch (error) {
-            oraRef.fail("Could not parse the sourceConfiguration parameter as JSON");
+            oraRef.fail("Could not parse the configuration parameter as JSON");
             process.exit(1);
         }
     }
 
     // Inspecting source
 
-    let source: SourceInterface;
+    let maybeRepositoryDescription: Maybe<RepositoryDescription>;
 
     if (argv.references == null || argv.references.length === 0) {
         const urlsPromptResult = await prompts(
             {
-                type: "select",
+                type: "autocomplete",
                 name: "source",
                 message: "Source?",
-                choices: getSources()
+                choices: (await getSourcesDescriptions())
                     .sort((a, b) => a.sourceType().localeCompare(b.sourceType()))
                     .map((s) => {
-                        return { value: s.sourceType(), title: s.sourceType() };
+                        return { value: s.sourceType(), title: s.getDisplayName() };
                     })
                     .sort((a, b) => a.title.localeCompare(b.title))
             },
             defaultPromptOptions
         );
-        const maybeSourceDescription = getSourceByType(urlsPromptResult.source);
-
-        if (maybeSourceDescription == null) throw new Error("SOURCE_NOT_FOUND - " + urlsPromptResult.source);
-
-        source = await maybeSourceDescription.getSource();
+        maybeRepositoryDescription = getRepositoryDescriptionByType(urlsPromptResult.source) || null;
     } else {
         let uris = [];
         if (Array.isArray(argv.references)) {
@@ -84,16 +114,56 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
             uris = [argv.references];
         }
 
-        sourceConfiguration.uris = uris;
+        connectionConfiguration.uris = uris;
         try {
-            source = await findSourceForUri(uris[0]);
-            oraRef.succeed(`Found ${source.sourceType()} source`);
+            maybeRepositoryDescription = (await findRepositoryForSourceUri(uris[0])) || null;
         } catch (error) {
             console.error(error);
             oraRef.fail("No source implementation found to inspect this data - " + uris[0]);
             exit(1);
         }
     }
+
+    if (maybeRepositoryDescription == null) {
+        oraRef.fail("No repository implementation found to inspect this data ");
+        process.exit(1);
+    }
+
+    const repository = await maybeRepositoryDescription.getRepository();
+    const sourceDescription = await maybeRepositoryDescription.getSourceDescription();
+
+    if (sourceDescription == null) {
+        oraRef.fail("No source impelementation found for " + maybeRepositoryDescription.getType());
+        process.exit(1);
+    }
+
+    const connectionConfigurationResults = await obtainConnectionConfiguration(
+        oraRef,
+        repository,
+        connectionConfiguration,
+        argv.defaults
+    );
+
+    if (connectionConfigurationResults === false) {
+        process.exit(1);
+    }
+    connectionConfiguration = connectionConfigurationResults.connectionConfiguration;
+
+    const credentialsConfigurationResults = await obtainCredentialsConfiguration(
+        oraRef,
+        repository,
+        connectionConfiguration,
+        credentialsConfiguration,
+        argv.defaults
+    );
+
+    if (credentialsConfigurationResults === false) {
+        process.exit(1);
+    }
+
+    credentialsConfiguration = credentialsConfigurationResults.credentialsConfiguration;
+
+    const source = await sourceDescription.getSource();
 
     const sourceInspectionContext: SourceInspectionContext = {
         defaults: argv.defaults || false,
@@ -109,7 +179,14 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
         }
     };
 
-    const uriInspectionResults = await inspectSource(source, sourceInspectionContext, oraRef, sourceConfiguration);
+    const uriInspectionResults = await inspectSource(
+        source,
+        sourceInspectionContext,
+        oraRef,
+        connectionConfiguration,
+        credentialsConfiguration,
+        sourceConfiguration
+    );
 
     console.log("");
     console.log(chalk.magenta("Inspecting Data Streams"));
@@ -145,14 +222,12 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
         streamSets.push(streamSet);
     }
 
-    const sanitizedSourceConfiguration = { ...sourceConfiguration };
-    source.removeSecretConfigValues(sanitizedSourceConfiguration);
-
     const sourceObject: Source = {
         slug: source.sourceType(),
         streamSets,
         type: source.sourceType(),
-        configuration: sanitizedSourceConfiguration
+        connectionConfiguration,
+        configuration: sourceConfiguration
     };
     // build sources array
 
@@ -394,15 +469,25 @@ async function schemaSpecificQuestions(schema: Schema) {
     const ignoreAttributesResponse = await prompts(
         [
             {
-                type: "confirm",
+                type: "autocomplete",
                 name: "ignoreAttributes",
                 message: `Exclude any attributes from ${schema.title}?`,
-                initial: false
+                choices: [
+                    {
+                        title: "No",
+                        value: false,
+                        selected: true
+                    },
+                    {
+                        title: "Yes",
+                        value: true
+                    }
+                ]
             }
         ],
         defaultPromptOptions
     );
-    if (ignoreAttributesResponse.ignoreAttributes) {
+    if (ignoreAttributesResponse.ignoreAttributes !== "No") {
         const attributesToIgnoreResponse = await prompts(
             [
                 {
@@ -426,15 +511,25 @@ async function schemaSpecificQuestions(schema: Schema) {
     const renameAttributesResponse = await prompts(
         [
             {
-                type: "confirm",
+                type: "autocomplete",
                 name: "renameAttributes",
                 message: `Rename attributes from ${schema.title}?`,
-                initial: false
+                choices: [
+                    {
+                        title: "No",
+                        value: false,
+                        selected: true
+                    },
+                    {
+                        title: "Yes",
+                        value: true
+                    }
+                ]
             }
         ],
         defaultPromptOptions
     );
-    if (renameAttributesResponse.renameAttributes) {
+    if (renameAttributesResponse.renameAttributes !== "No") {
         const attributeNameMap: Record<string, string> = {};
         const attributesToRenameResponse = await prompts(
             [
@@ -486,11 +581,11 @@ async function schemaSpecificQuestions(schema: Schema) {
         const wasDerivedResponse = await prompts(
             [
                 {
-                    type: "select",
+                    type: "autocomplete",
                     name: "wasDerived",
                     message: message,
                     choices: [
-                        { title: "No", value: false },
+                        { title: "No", value: false, selected: true },
                         {
                             title: "Yes",
                             value: true
@@ -501,7 +596,7 @@ async function schemaSpecificQuestions(schema: Schema) {
             defaultPromptOptions
         );
 
-        if (!wasDerivedResponse.wasDerived) break;
+        if (wasDerivedResponse.wasDerived === "No") break;
 
         const derivedFromUrlResponse = await prompts(
             [
@@ -594,15 +689,24 @@ async function schemaSpecificQuestions(schema: Schema) {
         const confirmContinueResponse = await prompts(
             [
                 {
-                    type: "confirm",
+                    type: "autocomplete",
                     name: "confirm",
                     message: `Do you want to specify units for the ${keys.length} number properties?`,
-                    initial: true
+                    choices: [
+                        {
+                            title: "Yes",
+                            value: true
+                        },
+                        {
+                            title: "No",
+                            value: false
+                        }
+                    ]
                 }
             ],
             defaultPromptOptions
         );
-        if (!confirmContinueResponse.confirm) {
+        if (confirmContinueResponse.confirm !== true) {
             promptForNumberUnits = false;
         }
     }
@@ -630,16 +734,20 @@ async function schemaSpecificQuestions(schema: Schema) {
 
 /** Inspect a one or more URIs, with a given config, and implementation. This is generally one schema */
 export async function inspectSource(
-    source: SourceInterface,
+    source: SourceImplementation,
     sourceInspectionContext: SourceInspectionContext,
     oraRef: ora.Ora,
+    connectionConfiguration: DPMConfiguration,
+    credentialsConfiguration: DPMConfiguration,
     configuration: DPMConfiguration
 ): Promise<InspectionResults> {
     // Inspecting URL
-    const uriInspectionResults = await source.inspectURIs(configuration, sourceInspectionContext).catch((error) => {
-        oraRef.fail(error.message);
-        process.exit(1);
-    });
+    const uriInspectionResults = await source
+        .inspectURIs(connectionConfiguration, credentialsConfiguration, configuration, sourceInspectionContext)
+        .catch((error) => {
+            oraRef.fail(error.message);
+            process.exit(1);
+        });
 
     return uriInspectionResults;
 }

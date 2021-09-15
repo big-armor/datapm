@@ -29,7 +29,7 @@ describe("Search Command Tests", async function () {
             },
             {
                 message: "Do you want to specify units for the 3 number properties?",
-                input: "n"
+                input: "n" + KEYS.ENTER
             }
         ]);
     });
@@ -47,7 +47,7 @@ describe("Search Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("search", ["keyword", "--registry", "unknown"], [], (line: string) => {
+        const cmdResult = await testCmd("search", ["keyword", "--registry", "unknown"], [], async (line: string) => {
             if (line.includes("Invalid values:")) {
                 results.messageFound = true;
             }
@@ -63,7 +63,7 @@ describe("Search Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("search", ["unknown"], [], (line: string) => {
+        const cmdResult = await testCmd("search", ["unknown"], [], async (line: string) => {
             if (line.includes("No matching packages found")) {
                 results.messageFound = true;
             }
@@ -79,7 +79,7 @@ describe("Search Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("search", ["package"], [], (line: string) => {
+        const cmdResult = await testCmd("search", ["package"], [], async (line: string) => {
             if (line.includes("Found 1 results")) {
                 results.messageFound = true;
             }

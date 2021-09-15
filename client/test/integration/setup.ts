@@ -7,9 +7,11 @@ import { setTestSourceFiles } from "./test-utils";
 import execa, { ExecaChildProcess } from "execa";
 
 import { RandomUuid } from "testcontainers/dist/uuid";
+import { Listr, ListrContext, ListrTask } from "listr2";
 // const log = require("why-is-node-running");
 
-export const TEMP_STORAGE_PATH = "tmp-registry-server-storage-" + new RandomUuid().nextUuid();
+const TEMP_STORAGE_PREFIX = "tmp-registry-server-storage-";
+export const TEMP_STORAGE_PATH = TEMP_STORAGE_PREFIX + new RandomUuid().nextUuid();
 export const TEMP_STORAGE_URL = "file://" + TEMP_STORAGE_PATH;
 const MAX_SERVER_LOG_LINES = 25;
 
@@ -33,6 +35,7 @@ export const registryServerPort: number = Math.floor(Math.random() * (65535 - 10
 export const dataServerPort: number = Math.floor(Math.random() * (65535 - 1024) + 1024);
 
 before(async function () {
+    this.timeout(90000);
     network = await new Network().start();
 
     const runName = getRandomFruitsName("en")
@@ -41,121 +44,137 @@ before(async function () {
 
     console.log("Run name is " + runName);
 
-    // eslint-disable-next-line no-async-promise-executor
-    const buildClientPromise = new Promise<void>(async (resolve) => {
-        console.log("building client");
+    const listrTasks: ListrTask[] = [];
 
-        await execa("npm", ["run", "build"]);
-        console.log("client built");
-
-        resolve();
+    listrTasks.push({
+        task: async function (): Promise<void> {
+            await execa("npm", ["run", "build"]);
+        },
+        title: "Build Client"
     });
 
-    // eslint-disable-next-line no-async-promise-executor
-    const startPostgres = new Promise<void>(async (resolve) => {
-        console.log("Starting postgres temporary container");
-
-        this.timeout(300000);
-        databaseContainer = await new GenericContainer("postgres", "13.3")
-            .withEnv("POSTGRES_USER", "postgres")
-            .withEnv("POSTGRES_PASSWORD", "postgres")
-            .withEnv("POSTGRES_DB", "datapm")
-            .withTmpFs({ "/temp_pgdata": "rw,noexec,nosuid,size=65536k" })
-            .withExposedPorts(5432)
-            .withName("database-" + runName)
-            .withNetworkMode(network.getName())
-            .withWaitStrategy(new LogWaitStrategy("database system is ready to accept connections"))
-            .start();
-
-        databasePortNumber = databaseContainer.getMappedPort(5432);
-        databaseIpAddress = databaseContainer.getContainerIpAddress();
-        console.log("Postgres started on " + databaseIpAddress + ":" + databasePortNumber);
-        resolve();
-    });
-
-    // eslint-disable-next-line no-async-promise-executor
-    const startMailDev = new Promise<void>(async (resolve) => {
-        console.log("Starting mail dev container");
-        mailDevContainer = await new GenericContainer("maildev/maildev")
-            .withExposedPorts(80, 25)
-            .withName("smtp-" + runName)
-            .withNetworkMode(network.getName())
-            .start();
-
-        mailDevWebPortNumber = mailDevContainer.getMappedPort(80);
-        mailDevSMTPPortNumber = mailDevContainer.getMappedPort(25);
-        mailDevIpAddress = mailDevContainer.getContainerIpAddress();
-        console.log(
-            "maildev started on " +
-                mailDevIpAddress +
-                ", web port " +
-                mailDevWebPortNumber +
-                " smtp port " +
-                mailDevSMTPPortNumber
-        );
-
-        resolve();
-    });
-
-    // eslint-disable-next-line no-async-promise-executor
-    const startTestDataServer = new Promise<void>(async (resolve) => {
-        testDataServerProcess = (
-            await startServerProcess(
-                "Test data",
-                "npm",
-                ["run", "start:test-data-server"],
-                "./",
-                {
-                    PORT: dataServerPort.toString()
-                },
-                [],
-                []
-            )
-        ).serverProcess;
-
-        console.log("Test data server started on port " + dataServerPort);
-
-        resolve();
-    });
-
-    // eslint-disable-next-line no-async-promise-executor
-
-    await Promise.all([
-        buildClientPromise,
-        Promise.all([startPostgres, startMailDev, startTestDataServer]).then(async () => {
-            // eslint-disable-next-line no-async-promise-executor
-            return new Promise<void>(async (resolve) => {
-                registryServerProcess = (
-                    await startServerProcess(
-                        "Registry",
-                        "npm",
-                        ["run", "start-nowatch"],
-                        "../backend",
-                        {
-                            PORT: registryServerPort.toString(),
-                            TYPEORM_PORT: databasePortNumber.toString(),
-                            SMTP_PORT: mailDevSMTPPortNumber.toString(),
-                            SMTP_SERVER: "localhost",
-                            SMTP_USER: "",
-                            SMTP_PASSWORD: "",
-                            SMTP_SECURE: "false",
-                            SMTP_FROM_ADDRESS: "test@localhost",
-                            SMTP_FROM_NAME: "local-test",
-                            STORAGE_URL: TEMP_STORAGE_URL,
-                            ACTIVITY_LOG: "false",
-                            LEADER_ELECTION_DISABLED: "true",
-                            SCHEDULER_KEY: "TEST_JOB_KEY"
-                        },
-                        serverLogLines,
-                        serverErrorLogLines
-                    )
-                ).serverProcess;
-                console.log("Registry server started on port " + registryServerPort);
-
-                resolve();
+    /* listrTasks.push({
+        task: async function (): Promise<void> {
+            await execa("npm", ["run", "build"], {
+                cwd: "../backend"
             });
-        })
-    ]);
+        },
+        title: "Build Server"
+    }); */
+
+    listrTasks.push({
+        task: async function (): Promise<void> {
+            databaseContainer = await new GenericContainer("postgres", "13.3")
+                .withEnv("POSTGRES_USER", "postgres")
+                .withEnv("POSTGRES_PASSWORD", "postgres")
+                .withEnv("POSTGRES_DB", "datapm")
+                .withTmpFs({ "/temp_pgdata": "rw,noexec,nosuid,size=65536k" })
+                .withExposedPorts(5432)
+                .withName("database-" + runName)
+                .withNetworkMode(network.getName())
+                .withWaitStrategy(new LogWaitStrategy("database system is ready to accept connections"))
+                .start();
+
+            databasePortNumber = databaseContainer.getMappedPort(5432);
+            databaseIpAddress = databaseContainer.getContainerIpAddress();
+            console.log("Postgres started on " + databaseIpAddress + ":" + databasePortNumber);
+        },
+        title: "Start Postgress"
+    });
+
+    listrTasks.push({
+        task: async function (): Promise<void> {
+            mailDevContainer = await new GenericContainer("maildev/maildev")
+                .withExposedPorts(80, 25)
+                .withName("smtp-" + runName)
+                .withNetworkMode(network.getName())
+                .start();
+
+            mailDevWebPortNumber = mailDevContainer.getMappedPort(80);
+            mailDevSMTPPortNumber = mailDevContainer.getMappedPort(25);
+            mailDevIpAddress = mailDevContainer.getContainerIpAddress();
+            console.log(
+                "maildev started on " +
+                    mailDevIpAddress +
+                    ", web port " +
+                    mailDevWebPortNumber +
+                    " smtp port " +
+                    mailDevSMTPPortNumber
+            );
+        },
+        title: "Start MailDev"
+    });
+
+    listrTasks.push({
+        task: async function (): Promise<void> {
+            testDataServerProcess = (
+                await startServerProcess(
+                    "Test data",
+                    "npm",
+                    ["run", "start:test-data-server"],
+                    "./",
+                    {
+                        PORT: dataServerPort.toString()
+                    },
+                    [],
+                    []
+                )
+            ).serverProcess;
+
+            console.log("Test data server started on port " + dataServerPort);
+        },
+        title: "Start test data server"
+    });
+
+    listrTasks.push({
+        task: async function (): Promise<void> {
+            fs.rmdirSync(TEMP_STORAGE_PATH, { recursive: true });
+        }
+    });
+
+    // eslint-disable-next-line no-async-promise-executor
+
+    const listr = new Listr<ListrContext>(listrTasks, {
+        concurrent: true,
+        rendererSilent: false
+    });
+
+    try {
+        await listr.run();
+    } catch (e) {
+        console.error(e);
+        process.exit(1);
+    }
+
+    console.log("Starting registry server for tests");
+
+    registryServerProcess = (
+        await startServerProcess(
+            "Registry",
+            "npm",
+            ["run", "start:server"],
+            "../backend",
+            {
+                PORT: registryServerPort.toString(),
+                TYPEORM_PORT: databasePortNumber.toString(),
+                SMTP_PORT: mailDevSMTPPortNumber.toString(),
+                SMTP_SERVER: "localhost",
+                SMTP_USER: "",
+                SMTP_PASSWORD: "",
+                SMTP_SECURE: "false",
+                SMTP_FROM_ADDRESS: "test@localhost",
+                SMTP_FROM_NAME: "local-test",
+                STORAGE_URL: TEMP_STORAGE_URL,
+                ACTIVITY_LOG: "false",
+                LEADER_ELECTION_DISABLED: "true",
+                SCHEDULER_KEY: "TEST_JOB_KEY"
+            },
+            serverLogLines,
+            serverErrorLogLines
+        )
+    ).serverProcess;
+
+    console.log("Registry server started on port " + registryServerPort);
 
     /* const registryContainerReadable = await registryContainer.logs();
 

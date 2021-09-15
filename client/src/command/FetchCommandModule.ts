@@ -2,24 +2,26 @@ import chalk from "chalk";
 import { CountPrecision, DPMConfiguration, leastPrecise, Source } from "datapm-lib";
 import numeral from "numeral";
 import ora from "ora";
-import prompts, { PromptObject } from "prompts";
+import prompts from "prompts";
 import { SemVer } from "semver";
-import { SinkState, SinkStateKey } from "../sink/Sink";
+import { SinkState, SinkStateKey } from "../repository/Sink";
 import { OraQuiet } from "../util/OraQuiet";
 import { getPackage } from "../util/PackageAccessUtil";
-import { cliHandleParameters, parametersToPrompts } from "../util/parameters/ParameterUtils";
+import { cliHandleParameters, repeatedlyPromptParameters } from "../util/parameters/ParameterUtils";
 import { inspectSourceConnection } from "../util/SchemaUtil";
 
 import ON_DEATH from "death";
 import { fetch, FetchOutcome, newRecordsAvailable } from "../util/StreamToSinkUtil";
-import { StreamSetPreview, InspectionResults } from "../source/Source";
+import { StreamSetPreview, InspectionResults } from "../repository/Source";
 import { formatRemainingTime } from "../util/DateUtil";
 import { Listr, ListrTask } from "listr2";
 import { FetchArguments } from "./FetchCommand";
-import { TYPE as STANDARD_OUT_SINK_TYPE } from "../sink/StandardOutSink";
+import { TYPE as STANDARD_OUT_SINK_TYPE } from "../repository/file-based/standard-out/StandardOutRepositoryDescription";
 import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
-import { Parameter } from "../util/parameters/Parameter";
-import { getSink, getSinks } from "../sink/SinkUtil";
+import { getSinkDescriptions } from "../repository/SinkUtil";
+import { getRepositoryDescriptionByType } from "../repository/RepositoryUtil";
+import { obtainConnectionConfiguration } from "../util/ConnectionUtil";
+import { obtainCredentialsConfiguration } from "../util/CredentialsUtil";
 
 export async function fetchPackage(argv: FetchArguments): Promise<void> {
     if (argv.quiet) {
@@ -70,7 +72,7 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
           });
 
     // Finding package
-    oraRef.start("Finding package...");
+    oraRef.start("Finding package " + argv.reference);
 
     const packageFileWithContext = await getPackage(argv.reference).catch((error) => {
         oraRef.fail();
@@ -112,15 +114,15 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
     } else if (argv.defaults) {
         sinkType = "file";
     } else {
-        const sinks = getSinks();
+        const sinkDescriptions = await getSinkDescriptions();
 
         const sinkSelect = await prompts(
             [
                 {
-                    type: "select",
+                    type: "autocomplete",
                     name: "type",
                     message: "Destination?",
-                    choices: sinks.map((sink) => {
+                    choices: sinkDescriptions.map((sink) => {
                         return {
                             title: sink.getDisplayName(),
                             value: sink.getType()
@@ -134,26 +136,62 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
         sinkType = sinkSelect.type;
     }
 
+    // Prompt parameters
+    const sinkConnectionConfiguration: DPMConfiguration = {};
+    const sinkCredentialsConfiguration: DPMConfiguration = {};
+    let sinkConfiguration: DPMConfiguration = {};
+
     // Finding sink
-    if (argv.sink) {
+    if (argv.sink || argv.defaults) {
         oraRef.start(`Finding the sink named ${sinkType}`);
     }
 
-    const sink = await getSink(sinkType);
+    const sinkRepositoryDescription = getRepositoryDescriptionByType(sinkType);
 
-    if (sink == null) {
+    if (sinkRepositoryDescription == null) throw new Error("Could not find repository description for " + sinkType);
+
+    const sinkRepository = await sinkRepositoryDescription?.getRepository();
+
+    if (sinkRepository == null) throw new Error("Could not find repository for " + sinkType);
+
+    const obtainConnectionConfigurationResult = await obtainConnectionConfiguration(
+        oraRef,
+        sinkRepository,
+        sinkConnectionConfiguration,
+        argv.defaults
+    );
+
+    if (obtainConnectionConfigurationResult === false) {
+        oraRef.fail("User canceled");
+        process.exit(1);
+    }
+
+    const obtainCredentialsConfigurationResult = await obtainCredentialsConfiguration(
+        oraRef,
+        sinkRepository,
+        sinkConnectionConfiguration,
+        sinkCredentialsConfiguration,
+        argv.defaults
+    );
+
+    if (obtainCredentialsConfigurationResult === false) {
+        oraRef.fail("User canceled");
+        process.exit(1);
+    }
+
+    let parameterCount =
+        obtainConnectionConfigurationResult.parameterCount + obtainCredentialsConfigurationResult.parameterCount;
+
+    const sinkDescription = await sinkRepositoryDescription.getSinkDescription();
+
+    if (sinkDescription == null) {
         oraRef.fail(`Could not find sink type: ${sinkType}`);
         return;
     }
 
-    if (argv.sink) {
-        oraRef.succeed(`Found the ${sink.getDisplayName()} sink`);
+    if (argv.sink || argv.defaults) {
+        oraRef.succeed(`Found the ${sinkDescription.getDisplayName()} sink`);
     }
-
-    // Prompt parameters
-    let sinkConfiguration: DPMConfiguration = {};
-
-    let parameterCount = 0;
 
     if (argv.sinkConfig) {
         try {
@@ -164,38 +202,15 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
         }
     }
 
-    if (argv.defaults) {
-        sinkConfiguration = await sink.getDefaultParameterValues(
-            packageFileWithContext.catalogSlug,
-            packageFile,
-            sinkConfiguration
-        );
-    } else {
-        let remainingParameters = await sink.getParameters(
-            packageFileWithContext.catalogSlug,
-            packageFile,
-            sinkConfiguration
-        );
+    const sink = await sinkDescription.loadSinkFromModule();
 
-        while (remainingParameters.length > 0) {
-            parameterCount += remainingParameters.length;
-            const promptObjects: PromptObject[] = parametersToPrompts(remainingParameters);
-
-            // TODO Skip existing configs
-            const newSinkConfig = await prompts(promptObjects, defaultPromptOptions);
-
-            Object.keys(newSinkConfig).forEach((key) => {
-                const parameter = remainingParameters.find((parameter) => parameter.name === key) as Parameter;
-                parameter.configuration[key] = newSinkConfig[key];
-            });
-
-            remainingParameters = await sink.getParameters(
-                packageFileWithContext.catalogSlug,
-                packageFile,
-                sinkConfiguration
-            );
-        }
-    }
+    parameterCount += await repeatedlyPromptParameters(
+        async () => {
+            return sink.getParameters(packageFileWithContext.catalogSlug, packageFile, sinkConfiguration);
+        },
+        sinkConfiguration,
+        argv.defaults || false
+    );
 
     // Write records
     oraRef.start("Writing first record");
@@ -217,7 +232,7 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
     for (const source of packageFile.sources) {
         if (interupted) break;
 
-        const schemaUriInspectionResults = await inspectSourceConnection(source);
+        const schemaUriInspectionResults = await inspectSourceConnection(oraRef, source, argv.defaults);
 
         for (const streamSetPreview of schemaUriInspectionResults.streamSetPreviews) {
             const sinkStateKey: SinkStateKey = {
@@ -226,7 +241,12 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
                 packageMajorVersion: new SemVer(packageFile.version).major
             };
 
-            let sinkState = await sink.getSinkState(sinkConfiguration, sinkStateKey);
+            let sinkState = await sink.getSinkState(
+                sinkConnectionConfiguration,
+                sinkCredentialsConfiguration,
+                sinkConfiguration,
+                sinkStateKey
+            );
 
             if (argv.forceUpdate) sinkState = null;
 
@@ -343,6 +363,8 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
                     packageFile,
                     fetchPreparation.streamSetPreview,
                     sink,
+                    sinkConnectionConfiguration,
+                    sinkCredentialsConfiguration,
                     sinkConfiguration,
                     fetchPreparation.sinkStateKey,
                     fetchPreparation.sinkState,

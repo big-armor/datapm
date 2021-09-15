@@ -5,7 +5,7 @@ import {
     convertValueByValueType,
     discoverValueType,
     discoverValueTypeFromString
-} from "../src/source/transforms/StatsTransform";
+} from "../src/transforms/StatsTransform";
 
 describe("String value type checks", () => {
     test("string detect number", () => {
