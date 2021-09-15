@@ -266,6 +266,10 @@ jobs:
                   path: backend/dist
                   key: datampm-registry-${{ runner.OS }}-backend-dist-${{ hashFiles('backend/**','lib/**') }}
 
+            - name: Link Lib for Backend
+              run: npm link datapm-lib
+              working-directory: backend
+
             - name: Build Backend
               id: build-backend
               if: steps.cache-backend-dist.outputs.cache-hit != 'true'
