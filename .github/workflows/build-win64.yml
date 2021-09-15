@@ -51,9 +51,18 @@ jobs:
               working-directory: lib
               if: steps.cache-lib-build.outputs.cache-hit != 'true'
 
-            - run: npm ci
+            - name: Link Lib
+              run: npm link
+              working-directory: lib/dist
+
+            - name: Install client dependencies
+              run: npm ci
               working-directory: client
               if: steps.cache-client-node-modules.outputs.cache-hit != 'true'
+
+            - name: Link Lib for Client
+              run: npm link datapm-lib
+              working-directory: client
 
             - name: Run Linters
               run: npm run lint
