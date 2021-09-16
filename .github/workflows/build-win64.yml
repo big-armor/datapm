@@ -4,7 +4,7 @@ on:
 jobs:
     build:
         runs-on: windows-latest
-        timeout-minutes: 10
+        timeout-minutes: 15
         name: Windows Build Node Client
         steps:
             - uses: actions/checkout@v2
