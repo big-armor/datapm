@@ -104,8 +104,9 @@ export class PackageDataStorageService {
         const maxBufferSize = Math.pow(2, 20);
         const bufferSize = maxBufferSize < contentLength ? maxBufferSize : contentLength;
 
+        const [rawFileBuffer, rawPeekStream] = await bufferPeek.promise(dataStream, bufferSize);
+
         const avroSchema = await new Promise<schema.RecordType>(async (resolve, reject) => {
-            const [rawFileBuffer, rawPeekStream] = await bufferPeek.promise(dataStream, bufferSize);
             const blockDecoder = new BlockDecoder();
             const avroBlockDecoder = Readable.from(rawFileBuffer).pipe(blockDecoder);
     
@@ -193,7 +194,7 @@ export class PackageDataStorageService {
 
         }
 
-        await this.fileStorageService.writeFileFromStream(namespace, fileName, dataStream);
+        await this.fileStorageService.writeFileFromStream(namespace, fileName, rawPeekStream);
 
         return timestamp;
     }

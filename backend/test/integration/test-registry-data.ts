@@ -6,7 +6,9 @@ import {
     UpdateCatalogDocument,
     UpdatePackageDocument,
     CreateVersionDocument,
-    LoginDocument
+    LoginDocument,
+    MovePackageDocument,
+    CreateCatalogDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import csvParser from "csv-parse/lib/sync";
@@ -14,7 +16,9 @@ import { DPM_AVRO_DOC_URL_V1, parsePackageFileJSON, loadPackageFileFromDisk, Pub
 import { describe, it } from "mocha";
 import request = require("superagent");
 import fs, { exists } from 'fs';
+import path from "path";
 import avro from "avsc";
+import { TEMP_STORAGE_PATH } from "./setup";
 
 
 /** Tests when the registry is used as a repository for the data of a package */
@@ -536,6 +540,56 @@ describe("Package Tests", async () => {
         expect(errorCaught).to.equal(true);
 
     });
+
+    it("Move the package", async function(){
+
+        const createCatalogresponse = await userAClient.mutate({
+            mutation: CreateCatalogDocument,
+            variables: {
+                value: {
+                    displayName: "testA-registry-data-2",
+                    slug: "testA-registry-data-2",
+                    isPublic: false
+                }
+            }
+        });
+
+        expect(createCatalogresponse.errors == null, "no errors").equal(true);
+
+
+        const movePackageResponse = await userAClient.mutate({
+            mutation: MovePackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "testA-registry-data",
+                    packageSlug: "simple"
+                },
+                catalogIdentifier: {
+                    catalogSlug: "testA-registry-data-2"
+                }
+            }
+        });
+
+        expect(movePackageResponse.errors == null, "no errors").equal(true);
+
+        const storageLocation = path.join(TEMP_STORAGE_PATH, 'data','testA-registry-data-2','simple','1','file','simple');
+
+     
+
+
+        const files = fs.readdirSync(storageLocation);
+
+        expect(files.length).to.equal(1);
+
+        const file = files[0];
+
+        const storedFile = fs.readFileSync(storageLocation + path.sep +  file).toString("base64");
+
+
+        const originalFile = fs.readFileSync("simple.avro");
+        expect(originalFile.toString("base64")).equal(storedFile);
+
+    })
 
     
 });
