@@ -79,7 +79,8 @@ export class PackageDataStorageService {
         sourceSlug: string,
         streamSetAndSchemaSlug: string,
         updateMethod: UpdateMethod,
-        dataStream: Readable
+        dataStream: Readable,
+        streamLength?: number
     ): Promise<string> {
 
 
@@ -97,8 +98,14 @@ export class PackageDataStorageService {
 
         await this.validatePackageSourceAndSchemaSlug(packageFile, sourceSlug, streamSetAndSchemaSlug);
 
+
+        const contentLength = streamLength ? streamLength : Number.MAX_VALUE;
+
+        const maxBufferSize = Math.pow(2, 20);
+        const bufferSize = maxBufferSize < contentLength ? maxBufferSize : contentLength;
+
         const avroSchema = await new Promise<schema.RecordType>(async (resolve, reject) => {
-            const [rawFileBuffer, rawPeekStream] = await bufferPeek.promise(dataStream, Math.pow(2, 20));
+            const [rawFileBuffer, rawPeekStream] = await bufferPeek.promise(dataStream, bufferSize);
             const blockDecoder = new BlockDecoder();
             const avroBlockDecoder = Readable.from(rawFileBuffer).pipe(blockDecoder);
     
@@ -155,7 +162,7 @@ export class PackageDataStorageService {
         });
 
         if(missingAvroProperties.length > 0) {
-            throw new Error("FIELD_MISSING_FROM_UPLOAD: " + missingAvroProperties.join(","));
+            throw new Error("FIELD_NOT_PRESENT_IN_UPLOAD: " + missingAvroProperties.join(","));
         }
 
         const namespace = this.buildStreamSetNamespace(

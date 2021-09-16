@@ -13,7 +13,7 @@ import csvParser from "csv-parse/lib/sync";
 import { DPM_AVRO_DOC_URL_V1, parsePackageFileJSON, loadPackageFileFromDisk, PublishMethod, base62, toAvroPropertyName } from "datapm-lib";
 import { describe, it } from "mocha";
 import request = require("superagent");
-import fs from 'fs';
+import fs, { exists } from 'fs';
 import avro from "avsc";
 
 
@@ -28,6 +28,21 @@ describe("Package Tests", async () => {
 
 
     before(async () => {});
+
+    after(async () => {
+
+        if(fs.existsSync("test-download.avro"))
+            fs.unlinkSync("test-download.avro");
+
+        if(fs.existsSync("simple.avro"))
+            fs.unlinkSync("simple.avro");
+
+        if(fs.existsSync("test-bad-data.avro"))
+            fs.unlinkSync("test-bad-data.avro");
+
+        if(fs.existsSync("test-bad-schema.schema.json"))
+            fs.unlinkSync("test-bad-schema.schema.json");
+    });
 
     it("Create users A & B", async function () {
         userAClient = await createUser(
@@ -212,7 +227,7 @@ describe("Package Tests", async () => {
     });
 
 
-    it("Convert csv to registry formated avro", async function(){
+    it("Create a test avro file", async function(){
 
 
         const csvFile = fs.readFileSync("test/data-files/simple/simple.csv");
@@ -268,7 +283,7 @@ describe("Package Tests", async () => {
                 dpm_YUCnH7eU_number_double: null,
                 dpm_22tiXZ5XlW_boolean: true,
                 dpm_1pyLWX_date: 1631631962,
-                dpm_ZaEwmvIyoBvx_datetime: 1631629762,
+                dpm_8cK5WDEvXG9_datetime: 1631629762,
                 dpm_BFmVA6pEofQIqsV_string: null
             }, undefined, (error) => {
                 if(error)
@@ -284,7 +299,7 @@ describe("Package Tests", async () => {
                 dpm_YUCnH7eU_number_double: 2.2,
                 dpm_22tiXZ5XlW_boolean: false,
                 dpm_1pyLWX_date: 1631630962,
-                dpm_ZaEwmvIyoBvx_datetime: 1621629762,
+                dpm_8cK5WDEvXG9_datetime: 1621629762,
                 dpm_BFmVA6pEofQIqsV_string: "something something dark side"
             }, undefined, (error) => {
                 if(error)
@@ -333,13 +348,51 @@ describe("Package Tests", async () => {
 
     it("User cannot upload avro data that doesn't match the sheet", async function () {
 
-        const dataFile = fs.readFileSync("test/data-files/start-small-donations.avro");
-        const response = await request.post(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/file/simple`)
-            .set("Authorization", userAToken)
-            .send(dataFile);
 
-        expect(response.status).equal(400);
-        expect(response.text).include("DATA_NOT_COMPATIBLE_WITH_PACKAGE");
+        const avroEncoder = avro.createFileEncoder("./test-bad-schema.avro", 
+        {
+            type: "record",
+            name: "simple",
+            doc: DPM_AVRO_DOC_URL_V1,
+            fields: 
+                [
+                    {
+                        name: "dpm_289lyu_string",
+                        type: "string"
+                    }
+                        
+                ]
+        });
+
+        await new Promise<void>((resolve,reject) => {
+            avroEncoder.write({
+                dpm_289lyu_string: "hey"
+            }, undefined, (error) => {
+                if(error)
+                    reject(error);
+                else resolve();
+            });
+        });
+
+        await new Promise((resolve,reject) => {avroEncoder.end(resolve)});
+
+        await new Promise((resolve,reject) => {setTimeout(resolve,500)});
+        
+        let errorCaught = false;
+        try {
+
+            const dataFile = fs.readFileSync("test-bad-schema.avro");
+            const response = await request.post(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/file/simple`)
+                .set("Authorization", userAToken)
+                .send(dataFile);
+            console.log(JSON.stringify(response));
+        } catch (e) {
+            errorCaught = true;
+            expect(e.status).equal(400);
+            expect(e.response.text as string).include("FIELD_NOT_PRESENT_IN_SCHEMA");
+        }
+
+        expect(errorCaught).to.equal(true);
 
     });
 
@@ -381,6 +434,22 @@ describe("Package Tests", async () => {
         expect(response.errors == null, "no errors").true;
     });
 
+
+    it("Anonymous user can not download data", async function() {
+
+        let errorCaught = false;
+        try {
+            const req = await request.get(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/file/simple`).send();
+        } catch (e) {
+            errorCaught = true;
+            expect(e.status).equal(401);
+            expect(e.response.text as string).include("NOT_AUTHORIZED");
+        }
+    
+        expect(errorCaught).to.equal(true);
+
+
+    });
 
 
     it("User A can set package public", async function () {
@@ -435,6 +504,19 @@ describe("Package Tests", async () => {
         
     });
 
+    it("Anonymous user can download data", async function() {
+
+        const req = request.get(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/file/simple`).buffer(false);
+
+        req.on('response', function(response:request.Response) {
+            if (response.status !== 200) {
+                req.abort();
+            }
+        }).pipe(fs.createWriteStream("./test-download.avro"));
+
+
+
+    });
 
     it("User still without any permission can not upload data", async function () {
 

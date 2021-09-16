@@ -350,6 +350,8 @@ async function main() {
                     res.status(404).send(err.message);
                 } else if(err.message.includes("NOT_AUTHORIZED")) {
                     res.status(401).send(err.message);
+                } else if(err.message.includes("_NOT_RECOGNIZED") || err.message.includes("_NOT_PRESENT_")) {
+                    res.status(400).send(err.message);
                 } else {
                     console.error(err);
                     res.status(500).send("There was a problem retreiving the latest offset name: " + err.message);
@@ -359,6 +361,11 @@ async function main() {
         .post(async (req, res, next) => {
             try {
                 const contextObject = await context({ req });
+
+                const contentLengthString = req.headers["content-length"];
+
+                const contentLength = contentLengthString ? Number(contentLengthString) : undefined;
+
                 await PackageDataStorageService.INSTANCE.writePackageDataFromStream(
                     contextObject,
                     req.params.catalogSlug,
@@ -367,7 +374,8 @@ async function main() {
                     req.params.sourceSlug,
                     req.params.streamSetSlug,
                     req.query["updateMethod"] as unknown as UpdateMethod,
-                    req
+                    req,
+                    contentLength
                 );
                 res.send();
             } catch (err) {
@@ -375,7 +383,7 @@ async function main() {
                     res.status(404).send(err.message);
                 } else if(err.message.includes("NOT_AUTHORIZED")) {
                     res.status(401).send(err.message);
-                } else if(err.message.includes("_NOT_RECOGNIZED")){
+                } else if(err.message.includes("_NOT_RECOGNIZED") || err.message.includes("_NOT_PRESENT_")) {
                     res.status(400).send(err.message);
                 }  else {
                     console.error(err);
@@ -406,6 +414,8 @@ async function main() {
                     res.status(401).send(err.message);
                 } else if(err.message.includes("_NOT_FOUND")) {
                     res.status(404).send(err.message);
+                } else if(err.message.includes("_NOT_RECOGNIZED") || err.message.includes("_NOT_PRESENT_")) {
+                    res.status(400).send(err.message);
                 } else {
                     console.error(err);
                     res.status(500).send("There was a problem finding the file: " + err.message);
