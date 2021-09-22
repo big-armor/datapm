@@ -32,6 +32,16 @@ This "local-build" of docker provides a [maildev] SMTP server - which does not f
 http://localhost:1080
 ```
 
+# How to prepare for development
+
+The following can should be done before you start coding and testing.
+
+```
+npm run prepare-dev-environment
+```
+
+That script builds the lib folder, then links the lib/dist folder to all other sub-projects and builds them.
+
 ## How to run Postgres and SMTP only
 
 You can run only Postgres and SMTP with the following command from the root of this project. This is useful for developers running the backend as an active service (though they should focus on an integration test work flow in the backend primarily).
