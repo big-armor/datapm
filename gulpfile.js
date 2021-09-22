@@ -276,6 +276,9 @@ function prepareRegistryDockerBuildAssets() {
 exports.default = series(
     installLibDependencies,
     buildLib,
+    linkLibBackend,
+    linkLibClient,
+    linkLibFrontend,
     //   testLib,
     installBackendDependencies,
     buildBackend,

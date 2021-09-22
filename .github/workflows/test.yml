@@ -4,6 +4,38 @@ on:
     push:
 
 jobs:
+    terraformCheck:
+        name: "Terraform Check"
+        timeout-minutes: 20
+        runs-on: ubuntu-latest
+        env:
+            INPUT_TOKEN: "" # See https://github.com/JS-DevTools/npm-publish/issues/15
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+
+            - uses: actions/setup-node@v2-beta
+              with:
+                  node-version: "14"
+
+            - name: Print npm verion
+              run: npm --version
+
+            - name: Print node verion
+              run: node --version
+
+            - name: Install Dependencies
+              run: npm ci
+
+            - name: Run ESLint
+              run: npm run lint
+
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v1
+
+            - name: Terraform Format
+              run: terraform fmt -check
+
     lint:
         name: "Lint"
         timeout-minutes: 5
