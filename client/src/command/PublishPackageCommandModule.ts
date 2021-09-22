@@ -189,11 +189,16 @@ export class PublishPackageCommandModule {
                 }
             }
 
-            targetRegistries.push({
+            const chosenRegistry = {
                 url: targetRegistryActionResponse.targetRegistry,
                 catalogSlug: catalogSlugActionResponse.catalogSlug,
                 publishMethod: publishMethod
-            });
+            };
+
+            packageFile.registries =
+                packageFile.registries == null ? [chosenRegistry] : [...packageFile.registries, chosenRegistry];
+
+            targetRegistries.push(chosenRegistry);
         }
 
         oraRef.start("Updating package file...");

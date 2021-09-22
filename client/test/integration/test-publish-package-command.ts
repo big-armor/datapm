@@ -16,7 +16,7 @@ import {
     TEST_SOURCE_FILES
 } from "./test-utils";
 
-const publishCommandPrompts = ["Target registry?", "Catalog short name?"];
+const publishCommandPrompts = ["Target registry?", "Catalog short name?", "Data Access Method?", "Is the above ok?"];
 
 const getPublishCommandPromptInputs = (inputs?: string[], skip = 0, count = 20) =>
     getPromptInputs(publishCommandPrompts, inputs, skip, count);

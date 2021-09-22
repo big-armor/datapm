@@ -103,6 +103,14 @@ describe("CSV Offset Tests", function () {
             {
                 message: "Catalog short name?",
                 input: KEYS.ENTER
+            },
+            {
+                message: "Data Access Method?",
+                input: "Publish schema, client direct connects for data" + KEYS.ENTER
+            },
+            {
+                message: "Is the above ok?",
+                input: "yes" + KEYS.ENTER
             }
         ];
 

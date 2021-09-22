@@ -26,7 +26,7 @@ import {
 } from "./test-utils";
 
 // Prompts
-const publishCommandPrompts = ["Target registry?", "Catalog short name?"];
+const publishCommandPrompts = ["Target registry?", "Catalog short name?", "Data Access Method?", "Is the above ok?"];
 
 const getPublishCommandPromptInputs = (inputs?: string[], skip = 0, count = 20) =>
     getPromptInputs(publishCommandPrompts, inputs, skip, count);
@@ -571,8 +571,8 @@ describe("Update Package Command Tests", async () => {
             "",
             "This is a short description",
             "https://old-website",
-            "10",
-            ""
+            "10", // number of records
+            "no" // publish to registry
         ]);
         const results: TestResults = {
             exitCode: -1,

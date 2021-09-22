@@ -365,7 +365,7 @@ export function getPromptInputs(
     defaultPrompts: string[],
     inputs?: Array<string | null>,
     skip = 0,
-    lastIndex = 20
+    lastIndex = Number.MAX_SAFE_INTEGER
 ): PromptInput[] {
     const defaultPromptInputs: PromptInput[] = defaultPrompts.map((message) => ({
         message,
@@ -433,7 +433,9 @@ export async function createTestPackage(
             "Number of sample records?",
             "Publish to registry?",
             "Target registry?",
-            "Catalog short name?"
+            "Catalog short name?",
+            "Data Access Method?",
+            "Is the above ok?"
         ];
         const prompts = getPromptInputs(generatePackageCommandPrompts, [
             "",
@@ -448,14 +450,22 @@ export async function createTestPackage(
             description,
             "https://test.datapm-not-a-site.io",
             "10",
-            KEYS.DOWN,
-            KEYS.DOWN,
-            ""
+            "yes", // publish to registry
+            KEYS.DOWN, // target registry
+            "", // default catalog
+            "", // data access method,
+            "yes" // is the above ok
         ]);
         prompts.splice(6, 0, ...unitPrompts);
         await testCmd("package", options, prompts, async (line: string) => {
             if (line.includes("datapm fetch ")) {
                 const matches = line.match(/datapm\sfetch\s(.*)/);
+                if (matches == null) throw new Error("No matches");
+                packageFilePath = matches[1];
+            }
+
+            if (line.includes("datapm publish ")) {
+                const matches = line.match(/datapm\spublish\s(.*)/);
                 if (matches == null) throw new Error("No matches");
                 packageFilePath = matches[1];
             }

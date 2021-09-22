@@ -181,11 +181,16 @@ describe("Fetch Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("fetch", [packageAFilePath, "--defaults"], [], async (line: string) => {
-            if (line.includes("Finished writing 51 records")) {
-                results.messageFound = true;
+        const cmdResult = await testCmd(
+            "fetch",
+            [packageAFilePath, "--defaults", "--forceUpdate"],
+            [],
+            async (line: string) => {
+                if (line.includes("Finished writing 51 records")) {
+                    results.messageFound = true;
+                }
             }
-        });
+        );
 
         expect(cmdResult.code, "Exit code").equals(0);
         expect(results.messageFound, "Found success message").equals(true);
@@ -239,7 +244,11 @@ describe("Fetch Command Tests", async function () {
             "Short package description?",
             "Website?",
             "Number of sample records?",
-            "Publish to registry?"
+            "Publish to registry?",
+            "Target registry?",
+            "Catalog short name?",
+            "Data Access Method",
+            "Is the above ok?"
         ];
         const promptInputs = getPromptInputs(generateCommandPrompts, [
             "",
@@ -255,7 +264,10 @@ describe("Fetch Command Tests", async function () {
             "package-b",
             "",
             "",
-            "Package B"
+            "Package B",
+            "",
+            "",
+            "No" // publish to registry
         ]);
         const results: TestResults = {
             exitCode: -1,
