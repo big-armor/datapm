@@ -39,11 +39,9 @@ jobs:
               run: terraform fmt -check
 
             - name: Set Git Author
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: git config user.name "$${{env.GITHUB_ACTOR}}" && git config user.email "gitHubActionDeployer@no-reply"
 
             - name: Bump Version
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: npm run bump-version
 
             - name: Install Lib Dependencies
@@ -57,7 +55,6 @@ jobs:
               working-directory: lib
 
             - uses: JS-DevTools/npm-publish@v1
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               with:
                   package: ./lib/dist/package.json
                   token: ${{ secrets.NPM_TOKEN }}
@@ -66,7 +63,6 @@ jobs:
               run: npm run bump-package-lib-versions
 
             - name: Tag
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: npm run tag
 
             - name: Install Backend Dependencies
@@ -116,7 +112,6 @@ jobs:
               run: npm run test
 
             - name: Echo Docker Password to file
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: echo $${{secrets.DOCKER_PASSWORD}} > ~/docker-password
 
             - name: Authorize Docker
@@ -126,42 +121,35 @@ jobs:
                   password: ${{ secrets.DOCKER_PASSWORD }}
 
             - name: Write Credentials file
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: echo $GOOGLE_CREDENTIALS > gcloud.key
               env:
                   PROJECT_ID: data-test-terraform
                   GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
 
             - name: Authenticate to Google Cloud
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: gcloud auth activate-service-account deployment@datapm-test-terraform.iam.gserviceaccount.com --key-file=gcloud.key
 
             - name: Authorize Docker for GCR
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: gcloud auth configure-docker --quiet
 
             - name: Deploy Assets
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: npm run deploy
               env:
                   PROJECT_ID: data-test-terraform
                   GOOGLE_CREDENTIALS: ~/gcloud.key
 
             - uses: JS-DevTools/npm-publish@v1
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               with:
                   package: ./client/package.json
                   token: ${{ secrets.NPM_TOKEN }}
 
             - name: Terraform Init to
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: terraform init
               env:
                   PROJECT_ID: data-test-terraform
                   GOOGLE_CREDENTIALS: gcloud.key
 
             - name: Terraform Plan
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: terraform plan
               env:
                   TF_VAR_APOLLO_KEY: ${{secrets.TF_VAR_APOLLO_KEY}}
@@ -170,14 +158,12 @@ jobs:
                   GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
 
             - name: Add GCR Revision
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: gcloud run deploy datapm-registry --project datapm-test-terraform --image gcr.io/datapm-test-terraform/datapm-registry --region us-central1 --platform managed
               env:
                   PROJECT_ID: data-test-terraform
                   GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
 
             - name: Terraform Apply
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: terraform apply -auto-approve
               env:
                   TF_VAR_APOLLO_KEY: ${{secrets.TF_VAR_APOLLO_KEY}}
@@ -186,14 +172,12 @@ jobs:
                   GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
 
             - name: Update GCR Traffic
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: gcloud run services update-traffic datapm-registry --project datapm-test-terraform --region us-central1 --platform managed --to-latest
               env:
                   PROJECT_ID: data-test-terraform
                   GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
 
             - name: Publish Apollo Graphql Update
-              if: github.ref == 'refs/heads/master' && github.event_name == 'push'
               run: npx apollo service:push --graph=datapm --key=${{secrets.TF_VAR_APOLLO_KEY}} --variant=test --localSchemaFile=backend/dist/schema.gql,backend/dist/auth-schema.gql,backend/dist/user-schema.gql,backend/dist/api-key-schema.gql,backend/dist/images-schema.gql
               env:
                   INPUT_TOKEN: ${{ secrets.NPM_TOKEN }}
