@@ -270,29 +270,39 @@ export const versionPackageFile = async (parent: any, _1: any, context: Authenti
     // then we need to replace the sources with the registry based source
     if(publishMethod === PublishMethod.SCHEMA_AND_DATA) {
         // This means that this registry contains the data, and therefore we need to replace the source with this registry
-        const registrySources: Source[] = packageFile.sources.map<Source>(source => {
+        const registrySources: Source[] = packageFile.schemas.map<Source>(schema => {
+
+
+            if(schema.title == null)
+                throw new Error("SCHEMA_HAS_NO_TITLE");
 
             return {
                 connectionConfiguration: {
                     url: process.env.REGISTRY_URL as string
                 },
-                slug: source.slug,
+                slug: schema.title,
                 type: "datapmRegistry",
                 configuration: {
                     catalogSlug: packageEntity.catalog.slug,
                     packageSlug: packageEntity.slug,
-                    sourceSlug: source.slug
+                    version: version.majorVersion
                 },
-                streamSets: source.streamSets.map(streamSet => {
-                    return {
-                        ...streamSet,
+                streamSets: [
+                    {
+                        schemaTitles: [schema.title],
+                        slug: schema.title,
                         configuration: {
-                            streamSetSlug: streamSet.slug
+                            schemaSlug: schema.title
+                        },
+                        streamStats: {
+                            inspectedCount: 0,
                         }
+                        // TODO implement lastUpdateHash and stream stats by 
+                        // keeping an index of the records at data storage time in index.ts
                     }
-                })
+                ]
             }
-
+            
         });
 
         packageFile.sources = registrySources;

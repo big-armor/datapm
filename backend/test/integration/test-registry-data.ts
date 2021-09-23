@@ -487,8 +487,9 @@ describe("Package Tests", async () => {
         expect(responsePackageFile.sources[0].type).equal("datapmRegistry");
         expect(responsePackageFile.sources[0].configuration!.catalogSlug).equal("testA-registry-data");
         expect(responsePackageFile.sources[0].configuration!.packageSlug).equal("simple");
+        expect(responsePackageFile.sources[0].configuration!.version).equal(1);
         expect(responsePackageFile.sources[0].streamSets[0].slug).equal("simple");
-        expect(responsePackageFile.sources[0].streamSets[0].configuration.streamSetSlug).equal("simple");
+        expect(responsePackageFile.sources[0].streamSets[0].configuration.schemaSlug).equal("simple");
         
     });
 
