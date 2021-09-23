@@ -76,8 +76,7 @@ export class PackageDataStorageService {
         catalogSlug: string,
         packageSlug: string,
         version: string,
-        sourceSlug: string,
-        streamSetAndSchemaSlug: string,
+        schemaSlug: string,
         updateMethod: UpdateMethod,
         dataStream: Readable,
         streamLength?: number
@@ -96,7 +95,7 @@ export class PackageDataStorageService {
             versionPatch: semVer.patch
         });
 
-        await this.validatePackageSourceAndSchemaSlug(packageFile, sourceSlug, streamSetAndSchemaSlug);
+        await this.validatePackageSourceAndSchemaSlug(packageFile, schemaSlug);
 
 
         const contentLength = streamLength ? streamLength : Number.MAX_VALUE;
@@ -128,13 +127,13 @@ export class PackageDataStorageService {
             throw new Error("AVRO_DOC_VALUE_NOT_RECOGNIZED: " + avroSchema.doc);
         }
         
-        const packageSchema = packageFile.schemas.find((s) => s.title === streamSetAndSchemaSlug);
+        const packageSchema = packageFile.schemas.find((s) => s.title === schemaSlug);
 
         if(packageSchema == undefined)
-            throw new Error("SCHEMA_NOT_FOUND: " + streamSetAndSchemaSlug);
+            throw new Error("SCHEMA_NOT_FOUND: " + schemaSlug);
 
         if(packageSchema.properties == undefined)
-            throw new Error("SCHEMA_HAS_NO_FIELDS: " + streamSetAndSchemaSlug);
+            throw new Error("SCHEMA_HAS_NO_FIELDS: " + schemaSlug);
 
 
         const schemaProperties = packageSchema.properties || {};
@@ -170,8 +169,7 @@ export class PackageDataStorageService {
             catalogSlug,
             packageSlug,
             semVer.major,
-            sourceSlug,
-            streamSetAndSchemaSlug
+            schemaSlug
         );
 
         const timestamp = new Date().getTime().toString();
@@ -204,8 +202,7 @@ export class PackageDataStorageService {
         catalogSlug: string,
         packageSlug: string,
         version: string,
-        sourceSlug: string,
-        streamSetAndSchemaSlug: string
+        schemaSlug: string,
     ): Promise<string | undefined> {
         const packageEntity = await this.getPackage(context, catalogSlug, packageSlug);
 
@@ -222,14 +219,13 @@ export class PackageDataStorageService {
         });
 
 
-        await this.validatePackageSourceAndSchemaSlug(packageFile,  sourceSlug, streamSetAndSchemaSlug);
+        await this.validatePackageSourceAndSchemaSlug(packageFile,  schemaSlug);
 
         const namespace = this.buildStreamSetNamespace(
             catalogSlug,
             packageSlug,
             semVer.major,
-            sourceSlug,
-            streamSetAndSchemaSlug
+            schemaSlug
         );
 
         const files = await this.fileStorageService.listFiles(namespace);
@@ -253,8 +249,7 @@ export class PackageDataStorageService {
         catalogSlug: string,
         packageSlug: string,
         version: string,
-        sourceSlug: string,
-        streamSetAndSchemaSlug: string,
+        schemaSlug: string,
         offsetHash?: string
     ): Promise<{ fileName: string; stream: Readable }> {
         const packageEntity = await this.getPackage(context, catalogSlug, packageSlug);
@@ -269,14 +264,13 @@ export class PackageDataStorageService {
             versionPatch: semVer.patch
         });
 
-        await this.validatePackageSourceAndSchemaSlug(packageFile, sourceSlug, streamSetAndSchemaSlug);
+        await this.validatePackageSourceAndSchemaSlug(packageFile, schemaSlug);
 
         const namespace = this.buildStreamSetNamespace(
             catalogSlug,
             packageSlug,
             semVer.major,
-            sourceSlug,
-            streamSetAndSchemaSlug
+            schemaSlug
         );
 
         const files = await this.fileStorageService.listFiles(namespace);
@@ -326,15 +320,9 @@ export class PackageDataStorageService {
 
     private async validatePackageSourceAndSchemaSlug(
         packageFile: PackageFile,
-        sourceSlug: string,
-        streamSetAndSchemaSlug: string
+        schemaSlug: string
     ): Promise<void> {
 
-
-        const source = packageFile.sources.find((s) => s.slug === sourceSlug);
-        if (!source) {
-            throw new Error("SOURCE_NOT_FOUND: " + sourceSlug);
-        }
 
         // Do not check the streamSet slug, becuase the original stream set in the package file
         // is from a different source (like a database or web server). 
@@ -342,10 +330,10 @@ export class PackageDataStorageService {
         // The registry will respond to the consuming client with a modified package file
         // that contians a streamSet pointed at the registry - where each schema is a streamSet
 
-        const schema = packageFile.schemas.find((s) => s.title === streamSetAndSchemaSlug);
+        const schema = packageFile.schemas.find((s) => s.title === schemaSlug);
 
         if(!schema) {
-            throw new Error("SCHEMA_NOT_FOUND: " + streamSetAndSchemaSlug);
+            throw new Error("SCHEMA_NOT_FOUND: " + schemaSlug);
         }
     }
 
@@ -353,19 +341,9 @@ export class PackageDataStorageService {
         catalogSlug: string,
         packageSlug: string,
         majorVersion: number,
-        sourceSlug: string,
-        streamSetSlug: string
+        schemaSlug: string
     ): string[] {
-        return [...this.buildSourceNamespace(catalogSlug, packageSlug, majorVersion, sourceSlug), streamSetSlug];
-    }
-
-    private buildSourceNamespace(
-        catalogSlug: string,
-        packageSlug: string,
-        majorVersion: number,
-        sourceSlug: string
-    ): string[] {
-        return [...this.buildVersionNamespace(catalogSlug, packageSlug, majorVersion), sourceSlug];
+        return [...this.buildVersionNamespace(catalogSlug, packageSlug, majorVersion), schemaSlug];
     }
 
     private buildVersionNamespace(catalogSlug: string, packageSlug: string, majorVersion: number): string[] {

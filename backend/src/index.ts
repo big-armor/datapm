@@ -328,7 +328,7 @@ async function main() {
         }
     });
 
-    app.route("/data/:catalogSlug/:packageSlug/:version/:sourceSlug/:streamSetSlug")
+    app.route("/data/:catalogSlug/:packageSlug/:version/:schemaSlug")
         .options(async (req, res) => {
             try {
                 const contextObject = await context({ req });
@@ -337,10 +337,8 @@ async function main() {
                     req.params.catalogSlug,
                     req.params.packageSlug,
                     req.params.version,
-                    req.params.sourceSlug,
-                    req.params.streamSetSlug
+                    req.params.schemaSlug
                 );
-
 
                 res.header("Etag", readDataResult);
                 res.send();
@@ -371,8 +369,7 @@ async function main() {
                     req.params.catalogSlug,
                     req.params.packageSlug,
                     req.params.version,
-                    req.params.sourceSlug,
-                    req.params.streamSetSlug,
+                    req.params.schemaSlug,
                     req.query["updateMethod"] as unknown as UpdateMethod,
                     req,
                     contentLength
@@ -399,8 +396,7 @@ async function main() {
                     req.params.catalogSlug,
                     req.params.packageSlug,
                     req.params.version,
-                    req.params.sourceSlug,
-                    req.params.streamSetSlug,
+                    req.params.schemaSlug,
                     req.query["offsetHash"] as string | undefined
                 );
                 res.header("Content-Type", "application/avro");

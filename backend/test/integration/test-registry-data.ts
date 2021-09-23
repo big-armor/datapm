@@ -167,7 +167,7 @@ describe("Package Tests", async () => {
         let errorCaught = false;
         try {
             const response = await request
-            .options(`http://localhost:4000/data/incorrect-catalog-name/simple/1.0.0/file/simple`).buffer(true).send();
+            .options(`http://localhost:4000/data/incorrect-catalog-name/simple/1.0.0/simple`).buffer(true).send();
         } catch (e) {
             errorCaught = true;
             expect(e.status).equal(404);
@@ -184,7 +184,7 @@ describe("Package Tests", async () => {
         let errorCaught = false;
         try {
             const response = await request
-            .options(`http://localhost:4000/data/testA-registry-data/incorrect-package-name/1.0.0/file/simple`).set("Authorization", userAToken).send();
+            .options(`http://localhost:4000/data/testA-registry-data/incorrect-package-name/1.0.0/simple`).set("Authorization", userAToken).send();
         } catch (e) {
             errorCaught = true;
             expect(e.status).equal(404);
@@ -196,29 +196,13 @@ describe("Package Tests", async () => {
 
 
     });
-
-    it("Source slug not found", async function () {
-
-        let errorCaught = false;
-        try {
-            const response = await request
-            .options(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/invalid-source-slug/simple`).set("Authorization", userAToken).send();
-        } catch (e) {
-            errorCaught = true;
-            expect(e.status).equal(404);
-            expect(e.response.text as string).include("SOURCE_NOT_FOUND");
-        }
-
-        expect(errorCaught).to.equal(true);
-
-    });
-
-    it("Stream set slug not found", async function () {
+    
+    it("Schema not found", async function () {
 
         let errorCaught = false;
         try {
             const response = await request
-            .options(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/file/invalid-stream-set`).set("Authorization", userAToken).send();
+            .options(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/invalid-schema`).set("Authorization", userAToken).send();
             console.log(JSON.stringify(response));
         } catch (e) {
             errorCaught = true;
@@ -322,7 +306,7 @@ describe("Package Tests", async () => {
     it("User A can upload avro data", async function () {
 
         const dataFile = fs.readFileSync("./simple.avro");
-        const response = await request.post(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/file/simple`)
+        const response = await request.post(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/simple`)
             .set("Authorization", userAToken)
             .send(dataFile);
 
@@ -336,7 +320,7 @@ describe("Package Tests", async () => {
         try {
 
             const dataFile = fs.readFileSync("test/data-files/start-small-donations.avro");
-            const response = await request.post(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/file/simple`)
+            const response = await request.post(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/simple`)
                 .set("Authorization", userAToken)
                 .send(dataFile);
             console.log(JSON.stringify(response));
@@ -386,7 +370,7 @@ describe("Package Tests", async () => {
         try {
 
             const dataFile = fs.readFileSync("test-bad-schema.avro");
-            const response = await request.post(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/file/simple`)
+            const response = await request.post(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/simple`)
                 .set("Authorization", userAToken)
                 .send(dataFile);
             console.log(JSON.stringify(response));
@@ -406,7 +390,7 @@ describe("Package Tests", async () => {
 
         let errorCaught = false;
         try {
-            const response = await request.post(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/file/simple`)
+            const response = await request.post(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/simple`)
             .set("Authorization", userBToken)
             .send(dataFile);
         } catch (e) {
@@ -443,7 +427,7 @@ describe("Package Tests", async () => {
 
         let errorCaught = false;
         try {
-            const req = await request.get(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/file/simple`).send();
+            const req = await request.get(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/simple`).send();
         } catch (e) {
             errorCaught = true;
             expect(e.status).equal(401);
@@ -510,7 +494,7 @@ describe("Package Tests", async () => {
 
     it("Anonymous user can download data", async function() {
 
-        const req = request.get(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/file/simple`).buffer(false);
+        const req = request.get(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/simple`).buffer(false);
 
         req.on('response', function(response:request.Response) {
             if (response.status !== 200) {
@@ -528,7 +512,7 @@ describe("Package Tests", async () => {
 
         let errorCaught = false;
         try {
-            const response = await request.post(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/file/simple`)
+            const response = await request.post(`http://localhost:4000/data/testA-registry-data/simple/1.0.0/simple`)
             .set("Authorization", userBToken)
             .send(dataFile);
         } catch (e) {
@@ -572,7 +556,7 @@ describe("Package Tests", async () => {
 
         expect(movePackageResponse.errors == null, "no errors").equal(true);
 
-        const storageLocation = path.join(TEMP_STORAGE_PATH, 'data','testA-registry-data-2','simple','1','file','simple');
+        const storageLocation = path.join(TEMP_STORAGE_PATH, 'data','testA-registry-data-2','simple','1','simple');
 
      
 
