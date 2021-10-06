@@ -1,12 +1,11 @@
 import chalk from "chalk";
-import { CountPrecision, Properties, Schema, Source } from "datapm-lib";
+import { SinkState, StreamState, CountPrecision, Properties, Schema, Source } from "datapm-lib";
 import moment from "moment";
 import numeral from "numeral";
 import { Choice } from "prompts";
 import { PassThrough, Readable, Transform } from "stream";
 import { BatchingTransform } from "../transforms/BatchingTransform";
 import { Maybe } from "../util/Maybe";
-import { SinkState, StreamState } from "../repository/Sink";
 import {
     RecordContext,
     InspectionResults,

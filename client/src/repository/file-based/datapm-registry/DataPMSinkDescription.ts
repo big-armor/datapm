@@ -1,6 +1,6 @@
 import { Sink, SinkDescription } from "../../Sink";
 import { TYPE, DISPLAY_NAME } from "./DataPMRepositoryDescription";
-export class S3SinkDescription implements SinkDescription {
+export class DataPMSinkDescription implements SinkDescription {
     getType(): string {
         return TYPE;
     }

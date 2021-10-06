@@ -1,4 +1,4 @@
-import { AvroBlockDecoder, base62, DPMConfiguration, DPMRecord, DPMRecordValue, Schema } from "datapm-lib";
+import { StreamState, AvroBlockDecoder, base62, DPMConfiguration, DPMRecord, DPMRecordValue, Schema } from "datapm-lib";
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
 import {
     InspectionResults,
@@ -11,7 +11,6 @@ import {
 import { TYPE } from "./DataPMRepositoryDescription";
 import { getPackage } from "../../../util/PackageAccessUtil";
 import { Maybe } from "../../../util/Maybe";
-import { StreamState } from "../../Sink";
 import { Transform } from "stream";
 import { BatchingTransform } from "../../../transforms/BatchingTransform";
 import request = require("superagent");

@@ -1,5 +1,5 @@
 import { Writable } from "stream";
-import { SinkState } from "../../repository/Sink";
+import { SinkState } from "datapm-lib";
 import { RecordStreamContext } from "../../repository/Source";
 
 /** this class updates the provided SinkState object with the observed records that are received to this writable.

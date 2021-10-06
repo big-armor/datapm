@@ -1,5 +1,5 @@
 import { S3 } from "aws-sdk";
-import { DPMConfiguration, PackageFile } from "datapm-lib";
+import { SinkState, SinkStateKey, DPMConfiguration, PackageFile } from "datapm-lib";
 import fs from "fs";
 import os from "os";
 import path from "path";
@@ -17,7 +17,7 @@ import {
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
 import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
 import { AbstractFileSink, RecordSerializedContext } from "../AbstractFileSink";
-import { SinkState, SinkStateKey, SinkSupportedStreamOptions } from "../../Sink";
+import { SinkSupportedStreamOptions } from "../../Sink";
 import { getRecordSerializer } from "../writer/RecordSerializerUtil";
 import { DPMRecordSerializer } from "../writer/RecordSerializer";
 import { RecordSerializerCSVDescription } from "../writer/RecordSerializerCSVDescription";

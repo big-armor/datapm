@@ -1,10 +1,9 @@
 import chalk from "chalk";
-import { CountPrecision, DPMConfiguration, leastPrecise, Source } from "datapm-lib";
+import { SinkState, SinkStateKey, CountPrecision, DPMConfiguration, leastPrecise, Source } from "datapm-lib";
 import numeral from "numeral";
 import ora from "ora";
 import prompts from "prompts";
 import { SemVer } from "semver";
-import { SinkState, SinkStateKey } from "../repository/Sink";
 import { OraQuiet } from "../util/OraQuiet";
 import { getPackage } from "../util/PackageAccessUtil";
 import { cliHandleParameters, repeatedlyPromptParameters } from "../util/parameters/ParameterUtils";

@@ -61,6 +61,61 @@ export class PackageDataStorageService {
         );
     }
 
+    public async writePackageStateFile(
+        context: Context,
+        catalogSlug: string,
+        packageSlug: string,
+        version: string,
+        dataStream: Readable,
+    ): Promise<string> {
+
+        const packageEntity = await this.getPackage(context, catalogSlug, packageSlug);
+        await this.validatePackageEditPermissions(context, packageEntity);
+
+        const semVer = new SemVer(version);
+        
+        // TODO validate the state file JSON schema
+
+        const namespace = this.buildVersionNamespace(
+            catalogSlug,
+            packageSlug,
+            semVer.major
+        );
+
+        const timestamp = new Date().getTime().toString();
+        const fileName = catalogSlug + "-" + packageSlug + "-" + semVer.major + ".state.json"
+
+        await this.fileStorageService.writeFileFromStream(namespace, fileName, dataStream);
+
+        return timestamp;
+    }
+
+    public async readPackageStateFile(
+        context: Context,
+        catalogSlug: string,
+        packageSlug: string,
+        version: string
+    ): Promise<Readable> {
+
+        const packageEntity = await this.getPackage(context, catalogSlug, packageSlug);
+        await this.validatePackageEditPermissions(context, packageEntity);
+
+        const semVer = new SemVer(version);
+     
+
+        const namespace = this.buildVersionNamespace(
+            catalogSlug,
+            packageSlug,
+            semVer.major
+        );
+
+        const timestamp = new Date().getTime().toString();
+        const fileName = catalogSlug + "-" + packageSlug + "-" + semVer.major + ".state.json"
+
+        return await this.fileStorageService.readFile(namespace, fileName);
+
+    }
+
     public async writePackageDataFromStream(
         context: Context,
         catalogSlug: string,

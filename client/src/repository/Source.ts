@@ -1,6 +1,5 @@
-import { DPMConfiguration, DPMRecord, Schema, StreamStats } from "datapm-lib";
+import { StreamState, DPMConfiguration, DPMRecord, Schema, StreamStats } from "datapm-lib";
 import { JSONSchema7TypeName } from "json-schema";
-import { StreamState } from "./Sink";
 import { Maybe } from "../util/Maybe";
 import { Readable, Transform } from "stream";
 import { LogType } from "../util/LoggingUtils";

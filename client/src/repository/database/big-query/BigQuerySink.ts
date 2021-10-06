@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { DPMConfiguration, DPMRecordValue, PackageFile, Schema } from "datapm-lib";
+import { SinkState, SinkStateKey, DPMConfiguration, DPMRecordValue, PackageFile, Schema } from "datapm-lib";
 import fs from "fs";
 import { BigQuery, TableField } from "@google-cloud/bigquery";
 import moment from "moment";
@@ -9,7 +9,7 @@ import { Maybe } from "../../../util/Maybe";
 import { ExtendedJSONSchema7TypeName, RecordStreamContext, UpdateMethod } from "../../Source";
 import { convertValueByValueType, discoverValueType } from "../../../transforms/StatsTransform";
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
-import { Sink, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
+import { Sink, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
 import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
 import { DISPLAY_NAME, TYPE } from "./BigQueryRepositoryDescription";
 

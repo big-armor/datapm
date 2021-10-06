@@ -328,26 +328,43 @@ async function main() {
         }
     });
 
-    app.route("/data/:catalogSlug/:packageSlug/:version/:schemaSlug/state")
+    app.route("/data/:catalogSlug/:packageSlug/:version/state")
         .post(async (req, res, next) => {
             try {
                 const contextObject = await context({ req });
-
-                const contentLengthString = req.headers["content-length"];
-
-                const contentLength = contentLengthString ? Number(contentLengthString) : undefined;
-
-                await PackageDataStorageService.INSTANCE.writeStateFile(
+                await PackageDataStorageService.INSTANCE.writePackageStateFile(
                     contextObject,
                     req.params.catalogSlug,
                     req.params.packageSlug,
                     req.params.version,
-                    req.params.schemaSlug,
-                    req.query["updateMethod"] as unknown as DataStorageUpdateMethod,
-                    req,
-                    contentLength
+                    req
                 );
                 res.send();
+            } catch (err) {
+                if(err.message.includes("_NOT_FOUND")) {
+                    res.status(404).send(err.message);
+                } else if(err.message.includes("NOT_AUTHORIZED")) {
+                    res.status(401).send(err.message);
+                } else if(err.message.includes("_NOT_RECOGNIZED") || err.message.includes("_NOT_PRESENT_")) {
+                    res.status(400).send(err.message);
+                }  else {
+                    console.error(err);
+                    res.status(500).send("There was a problem saving the file: " + err.message);
+                }
+            }
+        }).get(async (req, res, next) => {
+            try {
+                const contextObject = await context({ req });
+
+                const readDataResult = await PackageDataStorageService.INSTANCE.readPackageStateFile(
+                    contextObject,
+                    req.params.catalogSlug,
+                    req.params.packageSlug,
+                    req.params.version
+                );
+                res.header("Content-Type", "application/json");
+                res.header("Content-Disposition", `attachment; filename="${req.params.catalogSlug}-${req.params.packageSlug}-${req.params.version}.state.json"` );
+                readDataResult.pipe(res);
             } catch (err) {
                 if(err.message.includes("_NOT_FOUND")) {
                     res.status(404).send(err.message);

@@ -1,4 +1,4 @@
-import { DPMConfiguration, DPMRecordValue, PackageFile, Schema } from "datapm-lib";
+import { SinkState, SinkStateKey, DPMConfiguration, DPMRecordValue, PackageFile, Schema } from "datapm-lib";
 import mongoose, { Document, Model, Mongoose, SchemaDefinition } from "mongoose";
 import { SemVer } from "semver";
 import { Transform } from "stream";
@@ -8,7 +8,7 @@ import { convertValueByValueType, discoverValueType } from "../../../transforms/
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
 import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
 import { DISPLAY_NAME, TYPE } from "./MongoRepositoryDescription";
-import { Sink, SinkErrors, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
+import { Sink, SinkErrors, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
 
 export class MongoSinkModule implements Sink {
     client: Mongoose;

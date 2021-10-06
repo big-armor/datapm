@@ -1,10 +1,9 @@
 import { createApiKey, createTestUser, KEYS, testCmd, removePackageFiles, TEST_SOURCE_FILES } from "./test-utils";
-import { loadPackageFileFromDisk } from "datapm-lib";
+import { SinkState, loadPackageFileFromDisk } from "datapm-lib";
 import { expect } from "chai";
 import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
 import fs from "fs";
-import { SinkState } from "../../src/repository/Sink";
 
 describe("CSV Offset Tests", function () {
     before(async () => {

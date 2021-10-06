@@ -1,6 +1,5 @@
-import { DPMConfiguration } from "datapm-lib";
+import { StreamState, DPMConfiguration } from "datapm-lib";
 import { Readable, Transform } from "stream";
-import { StreamState } from "../../Sink";
 import { SourceInspectionContext, UpdateMethod } from "../../Source";
 import { Maybe } from "../../../util/Maybe";
 

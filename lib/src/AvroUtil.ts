@@ -90,3 +90,14 @@ export class AvroBlockDecoder extends avro.streams.BlockDecoder {
         callback();
     }
 }
+
+export class AvroBlockEncoder extends avro.streams.BlockEncoder {
+    // eslint-disable-next-line
+    _transform(chunk: any, _encoding: BufferEncoding, callback: TransformCallback) {
+        callback(null, chunk);
+    }
+
+    _flush(callback: TransformCallback): void {
+        callback();
+    }
+}

@@ -1,9 +1,9 @@
-import { DPMConfiguration, PackageFile, Schema } from "datapm-lib";
+import { DPMConfiguration, PackageFile, Schema, SinkState, SinkStateKey } from "datapm-lib";
 import { Readable, Transform, Writable } from "stream";
 import { Maybe } from "../../util/Maybe";
 import { RecordStreamContext, UpdateMethod } from "../Source";
 import { Parameter, ParameterType } from "../../util/parameters/Parameter";
-import { Sink, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWithContext } from "../Sink";
+import { Sink, SinkSupportedStreamOptions, WritableWithContext } from "../Sink";
 import { RecordSerializerJSON } from "./writer/RecordSerializerJSON";
 import { getRecordSerializer, getRecordSerializers } from "./writer/RecordSerializerUtil";
 import { DPMRecordSerializer } from "./writer/RecordSerializer";

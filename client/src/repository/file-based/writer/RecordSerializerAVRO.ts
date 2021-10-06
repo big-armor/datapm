@@ -128,7 +128,7 @@ export class RecordSerializerAVRO implements DPMRecordSerializer {
                 objectMode: true,
                 transform(chunk, _encoding, callback) {
                     const recordSerializedContext: RecordSerializedContext = {
-                        originalRecord: null,
+                        originalRecord: null, // TODO - would be best to get the block
                         serializedValue: chunk
                     };
 

@@ -1,6 +1,6 @@
 import bufferPeek from "buffer-peek-stream";
 import chalk from "chalk";
-import { DPMConfiguration } from "datapm-lib";
+import { StreamState, DPMConfiguration } from "datapm-lib";
 import numeral from "numeral";
 import streamMmmagic from "stream-mmmagic";
 import { Parameter, ParameterType } from "../../util/parameters/Parameter";
@@ -9,7 +9,6 @@ import { Maybe } from "../../util/Maybe";
 import { getParser, getParserByMimeType, getParsers } from "./parser/ParserUtil";
 import { LogType } from "../../util/LoggingUtils";
 import { nameFromFileUris } from "../../util/NameUtil";
-import { StreamState } from "../Sink";
 import { FileBufferSummary, FileStreamContext, Parser } from "./parser/Parser";
 import { asyncMap } from "../../util/AsyncUtils";
 

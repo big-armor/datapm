@@ -1,8 +1,8 @@
-import { DPMConfiguration, PackageFile, Schema } from "datapm-lib";
+import { SinkState, SinkStateKey, DPMConfiguration, PackageFile, Schema } from "datapm-lib";
 import ON_DEATH from "death";
 import { Readable, Transform, Writable } from "stream";
 import { Maybe } from "../util/Maybe";
-import { Sink, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWithContext } from "../repository/Sink";
+import { Sink, SinkSupportedStreamOptions, WritableWithContext } from "../repository/Sink";
 import { RecordStreamContext, StreamSetPreview, UpdateMethod } from "../repository/Source";
 import { Parameter, ParameterType } from "./parameters/Parameter";
 import {
