@@ -9,4 +9,5 @@ export * from "./PackageUtil";
 export * from "./Validators";
 export * from "./CountPrecisionUtil";
 export * from "./AvroUtil";
+export * from "./SinkState";
 export * as base62 from "./Base62Util";

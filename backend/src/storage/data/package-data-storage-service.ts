@@ -10,24 +10,14 @@ import { PackageFileStorageService } from "../packages/package-file-storage-serv
 import bufferPeek from "buffer-peek-stream";
 
 import avro, { schema, Type } from "avsc";
-import { PackageFile, base62, DPM_AVRO_DOC_URL_V1 } from "datapm-lib";
+import { PackageFile, base62, DPM_AVRO_DOC_URL_V1, AvroBlockDecoder } from "datapm-lib";
 
-export enum UpdateMethod {
+export enum DataStorageUpdateMethod {
     REPLACE_ALL, // for editors
     REPLACE_ALL_MINE, // for contributors
     APPEND_TO_MINE // for editors and contributors
 }
 
-class BlockDecoder extends avro.streams.BlockDecoder {
-    // eslint-disable-next-line
-    _transform(chunk: any, _encoding: BufferEncoding, callback: TransformCallback) {
-        callback(null, chunk);
-    }
-
-    _flush(callback: TransformCallback) {
-        callback();
-    }
-}
 
 export class PackageDataStorageService {
     public static readonly INSTANCE = new PackageDataStorageService();
@@ -77,7 +67,7 @@ export class PackageDataStorageService {
         packageSlug: string,
         version: string,
         schemaSlug: string,
-        updateMethod: UpdateMethod,
+        updateMethod: DataStorageUpdateMethod,
         dataStream: Readable,
         streamLength?: number
     ): Promise<string> {
@@ -106,7 +96,7 @@ export class PackageDataStorageService {
         const [rawFileBuffer, rawPeekStream] = await bufferPeek.promise(dataStream, bufferSize);
 
         const avroSchema = await new Promise<schema.RecordType>(async (resolve, reject) => {
-            const blockDecoder = new BlockDecoder();
+            const blockDecoder = new AvroBlockDecoder();
             const avroBlockDecoder = Readable.from(rawFileBuffer).pipe(blockDecoder);
     
             avroBlockDecoder.on("metadata",(type:schema.RecordType) => {
@@ -175,9 +165,9 @@ export class PackageDataStorageService {
         const timestamp = new Date().getTime().toString();
         const fileName = timestamp + "-" + context.me?.id;
 
-        if (updateMethod === UpdateMethod.REPLACE_ALL) {
+        if (updateMethod === DataStorageUpdateMethod.REPLACE_ALL) {
             await this.fileStorageService.deleteFiles(namespace);
-        } else if(updateMethod === UpdateMethod.REPLACE_ALL_MINE) {
+        } else if(updateMethod === DataStorageUpdateMethod.REPLACE_ALL_MINE) {
         
             // Find the list of files that are mine
             const files = await this.fileStorageService.listFiles(namespace);

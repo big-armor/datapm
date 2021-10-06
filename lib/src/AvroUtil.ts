@@ -1,4 +1,5 @@
 import avro from "avsc";
+import { TransformCallback } from "stream";
 import { encodeBase62 } from "./Base62Util";
 import { Schema } from "./main";
 
@@ -76,5 +77,16 @@ export function packageFileTypeToAvroType(packageFileType: string | string[]): s
             return "record";
         default:
             throw new Error("Unknown type: " + packageFileType);
+    }
+}
+
+export class AvroBlockDecoder extends avro.streams.BlockDecoder {
+    // eslint-disable-next-line
+    _transform(chunk: any, _encoding: BufferEncoding, callback: TransformCallback) {
+        callback(null, chunk);
+    }
+
+    _flush(callback: TransformCallback): void {
+        callback();
     }
 }

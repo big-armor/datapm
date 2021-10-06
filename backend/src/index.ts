@@ -21,7 +21,7 @@ import { UserRepository } from "./repository/UserRepository";
 import { PackageRepository } from "./repository/PackageRepository";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { CollectionRepository } from "./repository/CollectionRepository";
-import { PackageDataStorageService, UpdateMethod } from "./storage/data/package-data-storage-service";
+import { PackageDataStorageService, DataStorageUpdateMethod } from "./storage/data/package-data-storage-service";
 import { startLeaderElection, stopLeaderElection } from "./service/leader-election-service";
 import { SessionCache } from "./session-cache";
 
@@ -328,6 +328,41 @@ async function main() {
         }
     });
 
+    app.route("/data/:catalogSlug/:packageSlug/:version/:schemaSlug/state")
+        .post(async (req, res, next) => {
+            try {
+                const contextObject = await context({ req });
+
+                const contentLengthString = req.headers["content-length"];
+
+                const contentLength = contentLengthString ? Number(contentLengthString) : undefined;
+
+                await PackageDataStorageService.INSTANCE.writeStateFile(
+                    contextObject,
+                    req.params.catalogSlug,
+                    req.params.packageSlug,
+                    req.params.version,
+                    req.params.schemaSlug,
+                    req.query["updateMethod"] as unknown as DataStorageUpdateMethod,
+                    req,
+                    contentLength
+                );
+                res.send();
+            } catch (err) {
+                if(err.message.includes("_NOT_FOUND")) {
+                    res.status(404).send(err.message);
+                } else if(err.message.includes("NOT_AUTHORIZED")) {
+                    res.status(401).send(err.message);
+                } else if(err.message.includes("_NOT_RECOGNIZED") || err.message.includes("_NOT_PRESENT_")) {
+                    res.status(400).send(err.message);
+                }  else {
+                    console.error(err);
+                    res.status(500).send("There was a problem saving the file: " + err.message);
+                }
+            }
+        });
+
+    
     app.route("/data/:catalogSlug/:packageSlug/:version/:schemaSlug")
         .options(async (req, res) => {
             try {
@@ -370,7 +405,7 @@ async function main() {
                     req.params.packageSlug,
                     req.params.version,
                     req.params.schemaSlug,
-                    req.query["updateMethod"] as unknown as UpdateMethod,
+                    req.query["updateMethod"] as unknown as DataStorageUpdateMethod,
                     req,
                     contentLength
                 );

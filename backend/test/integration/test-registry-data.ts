@@ -12,7 +12,7 @@ import {
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import csvParser from "csv-parse/lib/sync";
-import { DPM_AVRO_DOC_URL_V1, parsePackageFileJSON, loadPackageFileFromDisk, PublishMethod, base62, toAvroPropertyName } from "datapm-lib";
+import { DPM_AVRO_DOC_URL_V1, parsePackageFileJSON, loadPackageFileFromDisk, PublishMethod } from "datapm-lib";
 import { describe, it } from "mocha";
 import request = require("superagent");
 import fs, { exists } from 'fs';
