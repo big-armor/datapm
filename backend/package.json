@@ -37,7 +37,7 @@
         "@types/nodemailer": "^6.4.0",
         "@types/sharp": "^0.26.0",
         "ajv": "^6.12.3",
-        "apollo-server": "^2.23.0",
+        "apollo-server": "^2.25.3",
         "atob": "^2.1.2",
         "await-lock": "^2.1.0",
         "cron": "^1.8.2",
