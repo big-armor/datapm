@@ -1,9 +1,9 @@
-import { SinkState, SinkStateKey, DPMConfiguration, PackageFile, Schema } from "datapm-lib";
+import { SinkState, SinkStateKey, DPMConfiguration, PackageFile, Schema, UpdateMethod } from "datapm-lib";
 import ON_DEATH from "death";
 import { Readable, Transform, Writable } from "stream";
 import { Maybe } from "../util/Maybe";
 import { Sink, SinkSupportedStreamOptions, WritableWithContext } from "../repository/Sink";
-import { RecordStreamContext, StreamSetPreview, UpdateMethod } from "../repository/Source";
+import { RecordStreamContext, StreamSetPreview } from "../repository/Source";
 import { Parameter, ParameterType } from "./parameters/Parameter";
 import {
     checkSchemaDataTypeConflicts,
@@ -370,50 +370,6 @@ export async function fetch(
     const schemaWriteables: Record<string, Writable> = {};
     const writablesWithContexts: WritableWithContext[] = [];
 
-    for (const schema of packageFile.schemas) {
-        const writeableWithContext = await sink.getWriteable(
-            schema,
-            sinkConnectionConfiguration,
-            sinkCredentialsConfiguration,
-            sinkConfiguration,
-            updateMethod
-        );
-        writablesWithContexts.push(writeableWithContext);
-
-        if (writeableWithContext.transforms && writeableWithContext.transforms.length > 0) {
-            let lastTransform: Transform | null = null;
-            for (const transform of writeableWithContext.transforms) {
-                if (lastTransform == null) {
-                    lastTransform = transform;
-                } else {
-                    lastTransform = lastTransform.pipe(transform);
-                }
-            }
-
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            lastTransform = lastTransform!.pipe(writeableWithContext.writable);
-
-            lastTransform.pipe(new SinkStateWritable(finalSinkState));
-
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            schemaWriteables[schema.title!] = writeableWithContext.transforms[0];
-        } else {
-            writeableWithContext.writable.pipe(new SinkStateWritable(finalSinkState));
-
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            schemaWriteables[schema.title!] = writeableWithContext.writable;
-        }
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        schemaWriteables[schema.title!].on("error", (error) => {
-            returnPromiseReject(new Error("Sink error: " + error.message));
-        });
-
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        schemaWriteables[schema.title!].on("finish", () => {
-            // returnPromiseResolve();
-        });
-    }
-
     return new Promise<FetchResult>((resolve, reject) => {
         returnPromiseReject = reject;
         returnPromiseResolve = resolve;
@@ -442,19 +398,43 @@ export async function fetch(
                 const writingPromises: Promise<void>[] = [];
 
                 for (const schemaSlug in writableBatches) {
-                    const schemaWritable = schemaWriteables[schemaSlug];
+                    const schema = packageFile.schemas.find((s) => s.title === schemaSlug);
+
+                    if (schema == null) {
+                        throw new Error("SCHEMA_NOT_FOUND: " + schemaSlug);
+                    }
+
+                    let schemaWritable = schemaWriteables[schemaSlug];
 
                     if (schemaWritable == null) {
-                        reject(new Error("UNRECOGNIZED_SCHEMA - " + schemaSlug));
-                        return;
+                        const writableWithContext = await createSchemaWritable(
+                            schemaWriteables,
+                            writablesWithContexts,
+                            sink,
+                            finalSinkState,
+                            schema,
+                            sinkConnectionConfiguration,
+                            sinkCredentialsConfiguration,
+                            sinkConfiguration,
+                            updateMethod
+                        );
+
+                        schemaWritable = writableWithContext.writable;
+
+                        schemaWritable.on("error", (error) => {
+                            returnPromiseReject(new Error("Sink error: " + error.message));
+                        });
+
+                        schemaWritable.on("finish", () => {
+                            // returnPromiseResolve();
+                        });
                     }
 
                     writingPromises.push(
-                        new Promise<void>((resolve, reject) => {
+                        new Promise<void>((resolve) => {
                             const ok = schemaWritable.write(writableBatches[schemaSlug]);
                             if (!ok) {
                                 schemaWritable.once("drain", resolve);
-                                schemaWritable.once("error", reject);
                             } else {
                                 resolve();
                             }
@@ -469,8 +449,9 @@ export async function fetch(
                     callback(error);
                 }
             },
-            final: (callback) => {
-                Promise.all(
+            final: async (callback) => {
+                // Close all open writables
+                await Promise.all(
                     Object.values(writablesWithContexts).map(
                         (w) =>
                             new Promise<void>((resolve) => {
@@ -480,11 +461,29 @@ export async function fetch(
                                           w.transforms![0]
                                         : w.writable;
 
-                                w.writable.once("finish", resolve);
+                                w.writable.once("finish", () => {
+                                    console.log("Finish called \n\n ");
+                                    resolve();
+                                });
+
+                                console.log("Calling end on targetWritable \n\n ");
                                 targetWritable.end();
                             })
                     )
-                ).then(() => callback());
+                );
+
+                console.log("Writables finished \n\n ");
+
+                // Get the commitKeys after the writable has been closed
+                const commitKeys = writablesWithContexts.flatMap((w) => w.getCommitKeys());
+
+                console.log("Using commit keys");
+                // Commit all writables at once
+                if (commitKeys.length > 0) {
+                    await sink.commitAfterWrites(commitKeys, sinkConnectionConfiguration, sinkCredentialsConfiguration);
+                }
+
+                callback();
             }
         });
 
@@ -553,4 +552,49 @@ export async function fetch(
         sourceStream.pipe(recordCounterTransform);
         recordCounterTransform.pipe(schemaSwitchingWritable);
     });
+}
+
+async function createSchemaWritable(
+    schemaWriteables: Record<string, Writable>,
+    writablesWithContexts: WritableWithContext[],
+    sink: Sink,
+    sinkState: SinkState,
+    schema: Schema,
+    sinkConnectionConfiguration: DPMConfiguration,
+    sinkCredentialsConfiguration: DPMConfiguration,
+    sinkConfiguration: DPMConfiguration,
+    updateMethod: UpdateMethod
+): Promise<WritableWithContext> {
+    const writeableWithContext = await sink.getWriteable(
+        schema,
+        sinkConnectionConfiguration,
+        sinkCredentialsConfiguration,
+        sinkConfiguration,
+        updateMethod
+    );
+    writablesWithContexts.push(writeableWithContext);
+
+    if (writeableWithContext.transforms && writeableWithContext.transforms.length > 0) {
+        let lastTransform: Transform | null = null;
+        for (const transform of writeableWithContext.transforms) {
+            if (lastTransform == null) {
+                lastTransform = transform;
+            } else {
+                lastTransform = lastTransform.pipe(transform);
+            }
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        lastTransform = lastTransform!.pipe(writeableWithContext.writable);
+
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        schemaWriteables[schema.title!] = writeableWithContext.transforms[0];
+    } else {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        schemaWriteables[schema.title!] = writeableWithContext.writable;
+    }
+
+    writeableWithContext.writable.pipe(new SinkStateWritable(sinkState));
+
+    return writeableWithContext;
 }

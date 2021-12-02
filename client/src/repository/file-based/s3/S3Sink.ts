@@ -1,11 +1,10 @@
 import { S3 } from "aws-sdk";
-import { SinkState, SinkStateKey, DPMConfiguration, PackageFile } from "datapm-lib";
+import { SinkState, SinkStateKey, DPMConfiguration, PackageFile, UpdateMethod } from "datapm-lib";
 import fs from "fs";
 import os from "os";
 import path from "path";
 import { Readable, Transform, Writable } from "stream";
 import { Maybe } from "../../../util/Maybe";
-import { UpdateMethod } from "../../Source";
 import {
     createS3Bucket,
     getAwsAuthenticationParameters,

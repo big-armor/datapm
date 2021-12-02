@@ -1,6 +1,6 @@
-import { StreamState, DPMConfiguration } from "datapm-lib";
+import { StreamState, DPMConfiguration, UpdateMethod } from "datapm-lib";
 import { Readable, Transform } from "stream";
-import { SourceInspectionContext, UpdateMethod } from "../../Source";
+import { SourceInspectionContext } from "../../Source";
 import { Maybe } from "../../../util/Maybe";
 
 /** A stream as returned by a file parser before being opened */

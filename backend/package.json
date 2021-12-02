@@ -59,9 +59,11 @@
         "helmet": "^3.23.3",
         "jsonwebtoken": "^8.5.1",
         "jwks-rsa": "^1.8.1",
+        "minizlib": "^2.1.2",
         "mixpanel": "^0.11.0",
         "mkdirp": "^1.0.4",
         "moment": "^2.27.0",
+        "msgpackr": "^1.4.7",
         "mustache": "^4.2.0",
         "nodemailer": "^6.4.14",
         "pg": "^8.3.0",
@@ -71,8 +73,12 @@
         "sanitize-filename": "^1.6.3",
         "semver": "^7.3.2",
         "sharp": "^0.26.2",
+        "snappystream": "^2.0.0",
+        "socket.io": "^4.2.0",
+        "socket.io-msgpack-parser": "^3.0.1",
         "typeorm": "0.2.25",
-        "uuid": "^8.2.0"
+        "uuid": "^8.2.0",
+        "zlib": "^1.0.5"
     },
     "devDependencies": {
         "@apollo/client": "^3.0.0",

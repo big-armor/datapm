@@ -142,12 +142,23 @@ export interface ValueTypeStatistics {
 export type Properties = { [key: string]: Schema };
 export type ValueTypes = { [key: string]: ValueTypeStatistics };
 
-export interface SchemaIdentifier {
+export interface MajorVersionIdentifier {
     registryUrl: string;
     catalogSlug: string;
     packageSlug: string;
-    version: string;
+    majorVersion: number;
+}
+
+export interface SchemaIdentifier extends MajorVersionIdentifier {
     schemaTitle: string;
+}
+
+export interface StreamSetIdentifier extends MajorVersionIdentifier {
+    streamSetSlug: string;
+}
+
+export interface StreamIdentifier extends StreamSetIdentifier {
+    streamSlug: string;
 }
 
 export interface DerivedFrom {

@@ -1,7 +1,6 @@
-import { DPMConfiguration, PackageFile, Schema, SinkState, SinkStateKey } from "datapm-lib";
+import { DPMConfiguration, PackageFile, Schema, SinkState, SinkStateKey, UpdateMethod } from "datapm-lib";
 import { Transform } from "stream";
 import { Maybe } from "../util/Maybe";
-import { UpdateMethod } from "./Source";
 import { Parameter } from "../util/parameters/Parameter";
 import { StreamSetProcessingMethod } from "../util/StreamToSinkUtil";
 
@@ -11,6 +10,7 @@ export enum SinkErrors {
     CONFIGURATION_FAILED = "CONFIGURATION_FAILED"
 }
 
+export type CommitKey = Record<string, unknown>;
 export interface WritableWithContext {
     /** While this is a writer, it should emit records that it has successfully written, so that the system
      * can track offsets accurately in case of errors.
@@ -22,6 +22,14 @@ export interface WritableWithContext {
 
     /** A string such as a URL, or file location, describing where the sink is writing records. For user informational purposes only. */
     outputLocation: string;
+
+    /** Optionally return a function that will be called after the writable is closed. This will return a set of keys
+     * that can later be used to "commit the transaction" of this writable along with other writables at the same time.
+     * See the #commitAfterWrites() method for more info
+     *
+     * Return an empty array if the sink does not support this.
+     */
+    getCommitKeys: () => CommitKey[];
 }
 
 export interface SinkSupportedStreamOptions {
@@ -71,6 +79,16 @@ export interface Sink {
         configuration: DPMConfiguration,
         updateMethod: UpdateMethod
     ): Promise<WritableWithContext>;
+
+    /** A set of keys provided by getWritable that are used to indiciate the
+     * sink should commit one or more writeable streams. This is useful for
+     * large multiple schema data sets that need to be committed transactionally.
+     */
+    commitAfterWrites(
+        commitKeys: CommitKey[],
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration
+    ): Promise<void>;
 
     /** For filtering default values from the configuration, for the purposes of showing the minimum necessary information to recreate the configuration.
      * This method should preserve properties who's defaults may change in the future. It should modify the configuration object passed in

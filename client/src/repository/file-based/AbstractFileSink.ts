@@ -1,9 +1,9 @@
-import { DPMConfiguration, PackageFile, Schema, SinkState, SinkStateKey } from "datapm-lib";
+import { DPMConfiguration, PackageFile, Schema, SinkState, SinkStateKey, UpdateMethod } from "datapm-lib";
 import { Readable, Transform, Writable } from "stream";
 import { Maybe } from "../../util/Maybe";
-import { RecordStreamContext, UpdateMethod } from "../Source";
+import { RecordStreamContext } from "../Source";
 import { Parameter, ParameterType } from "../../util/parameters/Parameter";
-import { Sink, SinkSupportedStreamOptions, WritableWithContext } from "../Sink";
+import { CommitKey, Sink, SinkSupportedStreamOptions, WritableWithContext } from "../Sink";
 import { RecordSerializerJSON } from "./writer/RecordSerializerJSON";
 import { getRecordSerializer, getRecordSerializers } from "./writer/RecordSerializerUtil";
 import { DPMRecordSerializer } from "./writer/RecordSerializer";
@@ -177,8 +177,8 @@ export abstract class AbstractFileSink implements Sink {
 
     async getWriteable(
         schema: Schema,
-        connectionConfiguration: DPMConfiguration,
-        credentialsConfiguration: DPMConfiguration,
+        _connectionConfiguration: DPMConfiguration,
+        _credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
         updateMethod: UpdateMethod
     ): Promise<WritableWithContext> {
@@ -205,8 +205,19 @@ export abstract class AbstractFileSink implements Sink {
         return {
             writable: writableStreamResponse.writingTransform,
             transforms: formatTransforms,
-            outputLocation: writableStreamResponse.outputUrl
+            outputLocation: writableStreamResponse.outputUrl,
+            getCommitKeys: () => {
+                return []; // TODO Implement file level commits (rename final files?)
+            }
         };
+    }
+
+    async commitAfterWrites(
+        _commitKeys: CommitKey[],
+        _connectionConfiguration: DPMConfiguration,
+        _credentialsConfiguration: DPMConfiguration
+    ): Promise<void> {
+        // todo have the files renamed
     }
 
     async filterDefaultConfigValues(

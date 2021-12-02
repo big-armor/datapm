@@ -184,7 +184,7 @@ export class VersionRepository {
             try {
                 await this.packageFileStorageService.deletePackageFile(version.package.id, versionIdentifier);
             } catch (error) {
-                if (error.message.includes("FILE_DOES_NOT_EXIST")) return;
+                if (error.message.includes("FILE_DOES_NOT_EXIST")) continue;
 
                 console.error(error.message);
             }

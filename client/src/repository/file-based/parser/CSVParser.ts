@@ -2,11 +2,11 @@ import BomStrippingStream from "bomstrip";
 import chalk from "chalk";
 import { ColumnOption } from "csv-parse";
 import csvParser from "csv-parse/lib/sync";
-import { StreamState, DPMConfiguration, DPMRecord } from "datapm-lib";
+import { StreamState, DPMConfiguration, DPMRecord, RecordContext, UpdateMethod } from "datapm-lib";
 import { Transform } from "stream";
 
 import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
-import { RecordContext, SourceInspectionContext, UpdateMethod } from "../../Source";
+import { SourceInspectionContext } from "../../Source";
 import { ByteBatchingTransform } from "../../../transforms/ByteBatchingTransform";
 import { RecordCountOffsetTransform } from "../../../transforms/RecordCountOffsetTransform";
 import { Maybe } from "../../../util/Maybe";

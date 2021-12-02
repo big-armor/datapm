@@ -1,12 +1,20 @@
 import chalk from "chalk";
-import { SinkState, SinkStateKey, DPMConfiguration, DPMRecordValue, PackageFile, Schema } from "datapm-lib";
+import {
+    SinkState,
+    SinkStateKey,
+    DPMConfiguration,
+    DPMRecordValue,
+    PackageFile,
+    Schema,
+    UpdateMethod
+} from "datapm-lib";
 import fs from "fs";
 import { BigQuery, TableField } from "@google-cloud/bigquery";
 import moment from "moment";
 import { SemVer } from "semver";
 import { Transform } from "stream";
 import { Maybe } from "../../../util/Maybe";
-import { ExtendedJSONSchema7TypeName, RecordStreamContext, UpdateMethod } from "../../Source";
+import { ExtendedJSONSchema7TypeName, RecordStreamContext } from "../../Source";
 import { convertValueByValueType, discoverValueType } from "../../../transforms/StatsTransform";
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
 import { Sink, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";

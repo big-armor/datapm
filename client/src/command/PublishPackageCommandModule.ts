@@ -93,7 +93,7 @@ export class PublishPackageCommandModule {
             const promptResponse = await prompts([
                 {
                     type: "autocomplete",
-                    message: "Publish to " + packageFile.registries.join(", ") + "?",
+                    message: "Publish to " + packageFile.registries.map((r) => r.url).join(", ") + "?",
                     name: "confirm",
                     choices: [
                         {
@@ -108,7 +108,7 @@ export class PublishPackageCommandModule {
                 }
             ]);
 
-            if (promptResponse.confirm === false) {
+            if (promptResponse.confirm.startsWith("No")) {
                 targetRegistries = [];
             } else {
                 targetRegistries = packageFile.registries;
@@ -702,23 +702,26 @@ export class PublishPackageCommandModule {
                     );
                 }
 
-                const confirmAccessRequirements = await prompts([
-                    {
-                        name: "confirmed",
-                        type: "autocomplete",
-                        message: "Is the above ok?",
-                        choices: [
-                            {
-                                title: "Yes",
-                                value: "yes"
-                            },
-                            {
-                                title: "No",
-                                value: "no"
-                            }
-                        ]
-                    }
-                ]);
+                const confirmAccessRequirements = await prompts(
+                    [
+                        {
+                            name: "confirmed",
+                            type: "autocomplete",
+                            message: "Is the above ok?",
+                            choices: [
+                                {
+                                    title: "Yes",
+                                    value: "yes"
+                                },
+                                {
+                                    title: "No",
+                                    value: "no"
+                                }
+                            ]
+                        }
+                    ],
+                    defaultPromptOptions
+                );
 
                 if (confirmAccessRequirements.confirmed === "no") {
                     continue;
@@ -734,23 +737,26 @@ export class PublishPackageCommandModule {
                 oraRef.info(
                     "Consumers will not receive data updates until you run the 'datapm update' command on this package."
                 );
-                const confirmDatacopy = await prompts([
-                    {
-                        type: "autocomplete",
-                        name: "confirmed",
-                        message: "Is the above ok?",
-                        choices: [
-                            {
-                                title: "Yes",
-                                value: "yes"
-                            },
-                            {
-                                title: "No",
-                                value: "no"
-                            }
-                        ]
-                    }
-                ]);
+                const confirmDatacopy = await prompts(
+                    [
+                        {
+                            type: "autocomplete",
+                            name: "confirmed",
+                            message: "Is the above ok?",
+                            choices: [
+                                {
+                                    title: "Yes",
+                                    value: "yes"
+                                },
+                                {
+                                    title: "No",
+                                    value: "no"
+                                }
+                            ]
+                        }
+                    ],
+                    defaultPromptOptions
+                );
 
                 if (confirmDatacopy.confirmed === "no") {
                     continue;
@@ -769,23 +775,26 @@ export class PublishPackageCommandModule {
                         "You should supply credentials with limited read-only access necessary to consume the required data."
                     );
 
-                    const confirmProxy = await prompts([
-                        {
-                            type: "autocomplete",
-                            name: "confirmed",
-                            message: "Is the above ok?",
-                            choices: [
-                                {
-                                    title: "Yes",
-                                    value: "yes"
-                                },
-                                {
-                                    title: "No",
-                                    value: "no"
-                                }
-                            ]
-                        }
-                    ]);
+                    const confirmProxy = await prompts(
+                        [
+                            {
+                                type: "autocomplete",
+                                name: "confirmed",
+                                message: "Is the above ok?",
+                                choices: [
+                                    {
+                                        title: "Yes",
+                                        value: "yes"
+                                    },
+                                    {
+                                        title: "No",
+                                        value: "no"
+                                    }
+                                ]
+                            }
+                        ],
+                        defaultPromptOptions
+                    );
 
                     if (confirmProxy.confirmed === "no") {
                         continue;

@@ -1,24 +1,42 @@
 import {
+    TimeoutPromise,
     DPMConfiguration,
     PackageFile,
-    packageFileSchemaToAvroSchema,
     Schema,
     SinkState,
-    SinkStateKey
+    SinkStateKey,
+    SocketEvent,
+    UpdateMethod,
+    SocketResponseType,
+    StreamIdentifier,
+    streamIdentifierToChannelName,
+    UploadRequest,
+    UploadRequestType,
+    UploadResponse,
+    ErrorResponse,
+    UploadDataRequest,
+    StartUploadRequest,
+    StartUploadResponse,
+    UploadStopRequest,
+    UploadStopResponse,
+    BatchIdentifier,
+    SetStreamActiveBatchesRequest,
+    SetStreamActiveBatchesResponse
 } from "datapm-lib";
 import { Maybe } from "../../../util/Maybe";
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
 import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
-import { Sink, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
-import { RecordStreamContext, UpdateMethod } from "../../Source";
+import { CommitKey, Sink, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
 import { DISPLAY_NAME, TYPE } from "./DataPMRepositoryDescription";
 import { Transform } from "stream";
-import avro from "avsc";
-import request = require("superagent");
+import { io, Socket } from "socket.io-client";
+import { getRegistryConfig } from "../../../util/ConfigUtil";
+import { PausingTransform } from "../../../transforms/PauseableTransform";
+import { RecordStreamContext } from "../../Source";
 
 export class DataPMSink implements Sink {
     isStronglyTyped(_configuration: DPMConfiguration): boolean | Promise<boolean> {
-        return true;
+        return false;
     }
 
     getParameters(
@@ -70,7 +88,7 @@ export class DataPMSink implements Sink {
     ): SinkSupportedStreamOptions {
         return {
             streamSetProcessingMethods: [StreamSetProcessingMethod.PER_STREAM],
-            updateMethods: [UpdateMethod.APPEND_ONLY_LOG, UpdateMethod.APPEND_ONLY_LOG]
+            updateMethods: [UpdateMethod.BATCH_FULL_SET, UpdateMethod.APPEND_ONLY_LOG]
         };
     }
 
@@ -79,55 +97,188 @@ export class DataPMSink implements Sink {
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
-        updateMethod: UpdateMethod
+        _updateMethod: UpdateMethod
     ): Promise<WritableWithContext> {
-        const uri =
-            `${connectionConfiguration.url}/data/${configuration.catalogSlug}/${configuration.packageSlug}/${configuration.majorVersion}/${schema.title}?updateMethod=` +
-            updateMethod.toString();
+        if (typeof connectionConfiguration.url !== "string") {
+            throw new Error("MISSING_CONNECITON_CONFIG_VALUE: url");
+        }
 
-        const req = request.post(uri);
+        const streamIdentifier: StreamIdentifier = {
+            registryUrl: connectionConfiguration.url,
+            catalogSlug: configuration.catalogSlug as string,
+            packageSlug: configuration.packageSlug as string,
+            majorVersion: configuration.majorVersion as number,
+            streamSetSlug: schema.title as string,
+            streamSlug: schema.title as string // TODO should this be the user's name? So that it could be removed by user?
+        };
 
-        const avroSchema = packageFileSchemaToAvroSchema(schema);
+        const socket = this.connectSocket(connectionConfiguration, credentialsConfiguration);
 
-        const avroEncoder = avro.Type.forSchema(avroSchema);
+        const uploadRequest = new StartUploadRequest(streamIdentifier, true); // TODO support appending
+
+        const uploadChannelName = streamIdentifierToChannelName(streamIdentifier);
+
+        const pausingTransform = new PausingTransform(true, {
+            objectMode: true
+        });
+
+        const writableTransform = new Transform({
+            objectMode: true,
+            transform: async (records: RecordStreamContext[], encoding, callback) => {
+                socket.emit(
+                    uploadChannelName,
+                    new UploadDataRequest(records.map((r) => r.recordContext)),
+                    (_response: StartUploadResponse) => {
+                        callback(null, records[records.length - 1]); // TODO have the server emit last committed offset and use that here
+                    }
+                );
+            },
+            final: async (callback) => {
+                console.log("Final claled on DataPMSink \n\n");
+                try {
+                    await new TimeoutPromise<void>(5000, (resolve) => {
+                        socket.emit(uploadChannelName, new UploadStopRequest(), (_response: UploadStopResponse) => {
+                            console.log("Received response \n\n");
+
+                            resolve();
+                        });
+                    });
+                } catch (error) {
+                    // TODO get a context to log an error
+                    console.log("error: " + JSON.stringify(error));
+                } finally {
+                    if (socket.connected) {
+                        socket.close();
+                    }
+                    callback();
+                }
+            }
+        });
+
+        socket.onAny((_event: SocketEvent) => {
+            // console.log("Socket event", event);
+        });
+
+        let batchIdentifier: BatchIdentifier;
+
+        await new TimeoutPromise<void>(5000, (resolve) => {
+            socket.once("connect", async () => {
+                socket.once(SocketEvent.READY.toString(), () => {
+                    socket.emit(
+                        SocketEvent.START_DATA_UPLOAD.toString(),
+                        uploadRequest,
+                        (response: StartUploadResponse | ErrorResponse) => {
+                            if (response.responseType === SocketResponseType.START_DATA_UPLOAD_RESPONSE) {
+                                batchIdentifier = (response as StartUploadResponse).batchIdentifier;
+                                pausingTransform.actuallyResume();
+                                resolve();
+                            } else if (response.responseType === SocketResponseType.ERROR) {
+                                const responseError = response as ErrorResponse;
+                                throw new Error(responseError.message);
+                            }
+                        }
+                    );
+                });
+            });
+        });
+
+        socket.on("connect_error", (error: unknown) => {
+            console.log("connect_error", error);
+            // TODO Handle error
+        });
+
+        socket.once("disconnect", (reason: string) => {
+            console.log("\n\ndisconnect: " + reason);
+        });
+
+        socket.on(uploadChannelName, (request: UploadRequest, callback: (uploadResponse: UploadResponse) => void) => {
+            if (request.requestType === UploadRequestType.UPLOAD_STOP) {
+                writableTransform.end();
+                callback(new UploadStopResponse());
+            } else {
+                throw new Error("UNKNOWN_SOCKET_EVENT:" + JSON.stringify(request));
+            }
+        });
 
         return {
-            outputLocation: uri,
-            writable: new Transform({
-                objectMode: true,
-                transform: (record: RecordAndChunk, encoding, callback) => {
-                    const value = req.write(record.serializedValue, encoding);
-                    if (!value) callback(new Error("FAILED_TO_WRITE"));
-                    else {
-                        callback(null, record.originalRecord);
-                    }
-                },
-                final: (callback) => {
-                    req.end((err, res) => {
-                        if (err == null) {
-                            callback(err);
-                        } else if (res.statusCode !== 200) {
-                            callback(new Error("RESPONSE_STATUS_CODE_NOT_OK: " + res.statusCode));
-                        }
-                    });
-                }
-            }),
-            transforms: [
-                new Transform({
-                    objectMode: true,
-                    transform: (chunks: RecordStreamContext[], _encoding, callback) => {
-                        const records: RecordAndChunk[] = chunks.map((chunk) => {
-                            return {
-                                serializedValue: avroEncoder.toBuffer(chunk.recordContext.record),
-                                originalRecord: chunk
-                            };
-                        });
-
-                        callback(null, records);
-                    }
-                })
-            ]
+            outputLocation: this.getConnectionUrl(connectionConfiguration),
+            writable: writableTransform,
+            transforms: [pausingTransform],
+            getCommitKeys: () => {
+                return [{ batchIdentifier }];
+            }
         };
+    }
+
+    getConnectionUrl(connectionConfiguration: DPMConfiguration): string {
+        if (typeof connectionConfiguration.url !== "string") {
+            throw new Error("MISSING_CONNECITON_CONFIG_VALUE: url");
+        }
+
+        const uri = connectionConfiguration.url.replace(/^https/, "wss").replace(/^http/, "ws");
+
+        return uri;
+    }
+
+    connectSocket(connectionConfiguration: DPMConfiguration, _credentialsConfiguration: DPMConfiguration): Socket {
+        if (typeof connectionConfiguration.url !== "string") {
+            throw new Error("connectionConfiguration does not include url value as string");
+        }
+
+        const uri = connectionConfiguration.url.replace(/^https/, "wss").replace(/^http/, "ws");
+
+        const registryConfiguration = getRegistryConfig(connectionConfiguration.url);
+
+        if (registryConfiguration == null) {
+            throw new Error("REGISTRY_CONFIG_NOT_FOUND: " + uri);
+        }
+
+        return io(uri, {
+            parser: require("socket.io-msgpack-parser"),
+            transports: ["polling", "websocket"],
+            auth: {
+                token: registryConfiguration.apiKey
+            }
+        });
+    }
+
+    async commitAfterWrites(
+        commitKeys: CommitKey[],
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration
+    ): Promise<void> {
+        const socket = this.connectSocket(connectionConfiguration, credentialsConfiguration);
+
+        const request = new SetStreamActiveBatchesRequest(commitKeys.map((c) => c.batchIdentifier as BatchIdentifier));
+
+        await new Promise<void>((resolve, reject) => {
+            socket.on("connect", async () => {
+                socket.once(SocketEvent.READY.toString(), () => {
+                    socket.emit(
+                        SocketEvent.SET_STREAM_ACTIVE_BATCHES.toString(),
+                        request,
+                        (response: SetStreamActiveBatchesResponse | ErrorResponse) => {
+                            if (response.responseType === SocketResponseType.SET_STREAM_ACTIVE_BATCHES) {
+                                // const batches = (response as SetStreamActiveBatchesResponse).batchIdentifiers;
+                                socket.close();
+                                resolve();
+                            } else if (response.responseType === SocketResponseType.ERROR) {
+                                const responseError = response as ErrorResponse;
+                                reject(responseError.message);
+                            }
+                        }
+                    );
+                });
+            });
+            socket.once("connect_error", (error: unknown) => {
+                console.log("connect_error", error);
+                // TODO Handle error
+            });
+
+            socket.once("disconnect", (reason: string) => {
+                console.log("\n\ndisconnect: " + reason);
+            });
+        });
     }
 
     filterDefaultConfigValues(
@@ -139,33 +290,24 @@ export class DataPMSink implements Sink {
     }
 
     async saveSinkState(
-        connectionConfiguration: DPMConfiguration,
-        credentialsConfiguration: DPMConfiguration,
-        configuration: DPMConfiguration,
-        sinkStateKey: SinkStateKey,
-        sinkState: SinkState
+        _connectionConfiguration: DPMConfiguration,
+        _credentialsConfiguration: DPMConfiguration,
+        _configuration: DPMConfiguration,
+        _sinkStateKey: SinkStateKey,
+        _sinkState: SinkState
     ): Promise<void> {
-        const uri = `${connectionConfiguration.url}/data/${sinkStateKey.catalogSlug}/${sinkStateKey.packageSlug}/${sinkStateKey.packageMajorVersion}/state`;
-        const res = await request.post(uri).attach("state", JSON.stringify(sinkState));
-        if (res.statusCode !== 200) {
-            throw new Error("RESPONSE_STATUS_CODE_NOT_OK: " + res.statusCode);
-        }
+        // Nothing to do, the sink state is managed by teh server
     }
 
     async getSinkState(
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
-        sinkStateKey: SinkStateKey
+        _sinkStateKey: SinkStateKey
     ): Promise<Maybe<SinkState>> {
-        const uri = `${connectionConfiguration.url}/data/${sinkStateKey.catalogSlug}/${sinkStateKey.packageSlug}/${sinkStateKey.packageMajorVersion}/state`;
-        const response = await request.get(uri).accept("application/json").send();
+        return null;
 
-        if (response.statusCode !== 200) {
-            throw new Error("RESPONSE_NOT_OK: " + response.statusCode);
-        }
-
-        return response.body as SinkState;
+        // TODO implement server side sink state
     }
 
     getType(): string {
@@ -175,9 +317,4 @@ export class DataPMSink implements Sink {
     getDisplayName(): string {
         return DISPLAY_NAME;
     }
-}
-
-export class RecordAndChunk {
-    originalRecord: RecordStreamContext | null;
-    serializedValue: Buffer;
 }

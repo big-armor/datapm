@@ -13,7 +13,6 @@ import { getPackage } from "../../../util/PackageAccessUtil";
 import { Maybe } from "../../../util/Maybe";
 import { Transform } from "stream";
 import { BatchingTransform } from "../../../transforms/BatchingTransform";
-import request = require("superagent");
 
 export class DataPMSource implements Source {
     sourceType(): string {

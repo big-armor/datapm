@@ -1,7 +1,7 @@
-import { DPMConfiguration, DPMRecord } from "datapm-lib";
+import { DPMConfiguration, DPMRecord, UpdateMethod } from "datapm-lib";
 import { Transform, TransformCallback } from "stream";
 import XLSX from "xlsx";
-import { RecordContext, SourceInspectionContext, UpdateMethod } from "../../Source";
+import { SourceInspectionContext } from "../../Source";
 import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
 import { DISPLAY_NAME, MIME_TYPE } from "./XLSXParserDescription";
 

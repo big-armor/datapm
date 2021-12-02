@@ -3,24 +3,24 @@ import {
     Schema,
     PackageFile,
     CountPrecision,
-    PackageFileV010,
-    PackageFileV030,
     Source,
     StreamSet,
     ValueTypeStatistics,
-    PackageFile040
-} from "./main";
+    PublishMethod,
+    RegistryReference
+} from "./PackageFile-v0.7.0";
 import fs from "fs";
 import path from "path";
 import AJV from "ajv";
 import fetch from "cross-fetch";
+import { PackageFileV010 } from "./PackageFile-v0.1.0";
 import { PackageFileV020 } from "./PackageFile-v0.2.0";
 
 import deepEqual from "fast-deep-equal";
-import { CountPrecisionV030 } from "./PackageFile-v0.3.0";
+import { PackageFileV030, CountPrecisionV030 } from "./PackageFile-v0.3.0";
+import { PackageFile040 } from "./PackageFile-v0.4.0";
 import { PackageFile050 } from "./PackageFile-v0.5.0";
 import { PackageFile060 } from "./PackageFile-v0.6.0";
-import { PublishMethod, RegistryReference } from "./PackageFile-v0.7.0";
 
 export type DPMRecordValue =
     | number
@@ -36,6 +36,18 @@ export type DPMConfiguration = Record<
     string,
     number | string | boolean | { [key: string]: unknown } | string[] | number[] | boolean[] | null
 >;
+
+/** Created by Source implementations to identify the record. And passed through the processes
+ * that transmit or persit the record
+ */
+export interface RecordContext {
+    schemaSlug: string;
+
+    record: DPMRecord;
+
+    /** The offset used to resume at this point */
+    offset?: number;
+}
 
 export enum Compability {
     Identical = 0,

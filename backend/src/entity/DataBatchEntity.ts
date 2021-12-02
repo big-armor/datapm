@@ -1,0 +1,44 @@
+import { Entity, Column, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { EntityBaseModel } from "./EntityBaseModel";
+import { PackageEntity } from "./PackageEntity";
+import { UserEntity } from "./UserEntity";
+
+@Entity({
+    name: "batch"
+})
+@Unique(["packageId","majorVersion", "streamSetSlug", "streamSlug", "batch"])
+export class DataBatchEntity extends EntityBaseModel {
+    
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @ManyToOne(() => PackageEntity, { eager: true })
+    @JoinColumn({ name: "package_id" })
+    package: PackageEntity;
+
+    @ManyToOne(() => UserEntity)
+    @JoinColumn({ name: "author_id" })
+    author: UserEntity;
+
+    @Column({ name: "package_id" })
+    packageId: number;
+
+    @Column({name: "major_version"})
+    majorVersion: number;
+
+    @Column({ name: "author_id" })
+    authorId: number;
+
+    @Column({name: "streamsetslug"})
+    streamSetSlug: string;
+
+    @Column({name: "streamslug"})
+    streamSlug: string;
+
+    @Column()
+    batch: number;
+
+    @Column()
+    default: boolean;
+
+}

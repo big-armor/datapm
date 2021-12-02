@@ -79,7 +79,7 @@ export class GoogleCloudStorage implements DPMStorage {
         });
     }
 
-    public async writeItem(namespace: string[], itemId: string, byteStream: Readable, transformer?: any): Promise<void> {
+    public async writeStream(namespace: string[], itemId: string, byteStream: Readable, transformer?: any): Promise<void> {
         this.ensureConnectionEstablished();
         const file = await this.getBucketFile(namespace, itemId);
         const writeStream = file.createWriteStream();

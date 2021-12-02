@@ -1,4 +1,4 @@
-import { SinkState, SinkStateKey, DPMConfiguration, PackageFile } from "datapm-lib";
+import { UpdateMethod, SinkState, SinkStateKey, DPMConfiguration, PackageFile } from "datapm-lib";
 import fs from "fs";
 import os from "os";
 import path from "path";
@@ -8,7 +8,6 @@ import { AbstractFileSink, RecordSerializedContext } from "../AbstractFileSink";
 import { Writable, Readable, Transform } from "stream";
 import { Maybe } from "../../../util/Maybe";
 import { SinkSupportedStreamOptions } from "../../Sink";
-import { UpdateMethod } from "../../Source";
 import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
 import { DPMRecordSerializer } from "../writer/RecordSerializer";
 import { RecordSerializerCSVDescription } from "../writer/RecordSerializerCSVDescription";

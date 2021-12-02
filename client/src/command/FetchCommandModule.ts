@@ -136,9 +136,27 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
     }
 
     // Prompt parameters
-    const sinkConnectionConfiguration: DPMConfiguration = {};
-    const sinkCredentialsConfiguration: DPMConfiguration = {};
+    let sinkConnectionConfiguration: DPMConfiguration = {};
+    let sinkCredentialsConfiguration: DPMConfiguration = {};
     let sinkConfiguration: DPMConfiguration = {};
+
+    if (argv.sinkConnectionConfig) {
+        try {
+            sinkConnectionConfiguration = JSON.parse(argv.sinkConnectionConfig);
+        } catch (error) {
+            console.error(chalk.red("ERROR_PARSING_SINK_CONNECTION_CONFIG"));
+            process.exit(1);
+        }
+    }
+
+    if (argv.sinkCredentialsConfig) {
+        try {
+            sinkCredentialsConfiguration = JSON.parse(argv.sinkCredentialsConfig);
+        } catch (error) {
+            console.error(chalk.red("ERROR_PARSING_SINK_CREDENTIALS_CONFIG"));
+            process.exit(1);
+        }
+    }
 
     // Finding sink
     if (argv.sink || argv.defaults) {
@@ -152,6 +170,10 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
     const sinkRepository = await sinkRepositoryDescription?.getRepository();
 
     if (sinkRepository == null) throw new Error("Could not find repository for " + sinkType);
+
+    if (argv.sink || argv.defaults) {
+        oraRef.succeed(`Found the sink named ${sinkType}`);
+    }
 
     const obtainConnectionConfigurationResult = await obtainConnectionConfiguration(
         oraRef,

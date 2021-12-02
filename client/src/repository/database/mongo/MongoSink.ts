@@ -1,9 +1,17 @@
-import { SinkState, SinkStateKey, DPMConfiguration, DPMRecordValue, PackageFile, Schema } from "datapm-lib";
+import {
+    SinkState,
+    SinkStateKey,
+    DPMConfiguration,
+    DPMRecordValue,
+    PackageFile,
+    Schema,
+    UpdateMethod
+} from "datapm-lib";
 import mongoose, { Document, Model, Mongoose, SchemaDefinition } from "mongoose";
 import { SemVer } from "semver";
 import { Transform } from "stream";
 import { Maybe } from "../../../util/Maybe";
-import { ExtendedJSONSchema7TypeName, RecordStreamContext, UpdateMethod } from "../../Source";
+import { ExtendedJSONSchema7TypeName, RecordStreamContext } from "../../Source";
 import { convertValueByValueType, discoverValueType } from "../../../transforms/StatsTransform";
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
 import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";

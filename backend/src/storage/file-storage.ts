@@ -57,7 +57,7 @@ export class FileStorage implements DPMStorage {
         return Promise.resolve(readStream);
     }
 
-    public async writeItem(namespace: string[], itemId: string, byteStream: Readable, transformer?: any): Promise<void> {
+    public async writeStream(namespace: string[], itemId: string, byteStream: Readable, transformer?: any): Promise<void> {
         this.createItemDirectoryIfMissing(namespace);
         const path = this.buildPath(namespace, itemId);
         const writeStream = fs.createWriteStream(path);
@@ -70,7 +70,9 @@ export class FileStorage implements DPMStorage {
             return;
         }
 
-        fs.unlinkSync(basePath);
+        fs.rmdirSync(basePath, {
+            recursive: true
+        });
     }
 
 
@@ -90,7 +92,7 @@ export class FileStorage implements DPMStorage {
     public async moveFile(oldNamespace: string[], oldItemId:string, newNamespace:string[], newItemId:string, callback?: any): Promise<void> {
         const oldFileFinalPath = this.buildPath(oldNamespace,oldItemId);
         if (!this.itemExistsInAbsolutePath(oldFileFinalPath)) {
-            throw new Error(StorageErrors.FILE_DOES_NOT_EXIST);
+            throw new Error(StorageErrors.FILE_DOES_NOT_EXIST + ": " + oldFileFinalPath);
         }
 
         const newFileFinalPath = this.buildPath(newNamespace,newItemId);

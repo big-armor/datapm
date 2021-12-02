@@ -19,7 +19,7 @@ export class FileStorageService {
         transformer?: any
     ): Promise<void> {
         const stream = this.convertBufferToStream(contents);
-        return this.storageService.writeItem(namespace, itemId, stream, transformer);
+        return this.storageService.writeStream(namespace, itemId, stream, transformer);
     }
 
     public async writeFileFromStream(
@@ -28,7 +28,7 @@ export class FileStorageService {
         stream: Readable,
         transformer?: any
     ): Promise<void> {
-        return this.storageService.writeItem(namespace, itemId, stream, transformer);
+        return this.storageService.writeStream(namespace, itemId, stream, transformer);
     }
 
     public async writeFileFromString(
@@ -38,19 +38,30 @@ export class FileStorageService {
         transformer?: any
     ): Promise<void> {
         const stream = this.convertStringToStream(contents);
-        return this.storageService.writeItem(namespace, itemId, stream, transformer);
+        return this.storageService.writeStream(namespace, itemId, stream, transformer);
     }
 
     public async writeFile(namespace: string[], itemId: string, stream: Readable, transformer?: any): Promise<void> {
-        return this.storageService.writeItem(namespace, itemId, stream, transformer);
+        return this.storageService.writeStream(namespace, itemId, stream, transformer);
     }
 
     public async fileExists(namespace: string[], itemId: string): Promise<boolean> {
         return this.storageService.itemExists(namespace, itemId);
     }
 
-    public async moveFile(oldNamespace: string[], oldItemId:string, newNamespace:string[], newItemId:string,  callback: any): Promise<void> {
-        return this.storageService.moveFile(oldNamespace, oldItemId, newNamespace, newItemId, callback);
+    public async moveFile(oldNamespace: string[], oldItemId:string, newNamespace:string[], newItemId:string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            return this.storageService.moveFile(oldNamespace, oldItemId, newNamespace, newItemId, (error) => {
+
+                if(error)  {
+                    reject(error);
+                } else {
+                    resolve();
+                }
+
+            });
+
+        });
     }
 
     public async deleteFiles(namespace: string[], fileNames:string[] = []): Promise<void> {

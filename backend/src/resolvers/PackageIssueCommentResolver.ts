@@ -18,6 +18,7 @@ import { UserRepository } from "../repository/UserRepository";
 import { getGraphQlRelationName } from "../util/relationNames";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 import { PackageIssueEntity } from "../entity/PackageIssueEntity";
+import { isAuthenticatedContext } from "../util/contextHelpers";
 
 export const getCommentsByByPackageIssue = async (
     _0: any,
@@ -226,11 +227,13 @@ async function hasPermissionsToEditComment(
     packageIdentifier: PackageIdentifierInput,
     context: Context
 ): Promise<boolean> {
-    if (!context.me) {
+
+    if (!isAuthenticatedContext(context)) {
         return false;
     }
+    const authenicatedContext = context as AuthenticatedContext;
 
-    const packagePermissions = await resolvePackagePermissions(context, packageIdentifier, context.me);
+    const packagePermissions = await resolvePackagePermissions(context, packageIdentifier, authenicatedContext.me);
     return hasEditPermissionsForComment(commentEntity, packagePermissions, context);
 }
 
@@ -239,15 +242,19 @@ function hasEditPermissionsForComment(
     packagePermissions: Permission[],
     context: Context
 ): boolean {
-    if (!context.me) {
+
+    if (!isAuthenticatedContext(context)) {
         return false;
     }
+
+    const authenicatedContext = context as AuthenticatedContext;
 
     if (packagePermissions.includes(Permission.MANAGE)) {
         return true;
     }
 
-    return commentEntity.authorId === context.me.id;
+
+    return commentEntity.authorId === authenicatedContext.me.id;
 }
 
 function throwNotAuthorizedError(): void {

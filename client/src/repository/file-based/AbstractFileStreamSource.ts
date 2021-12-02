@@ -1,10 +1,10 @@
 import bufferPeek from "buffer-peek-stream";
 import chalk from "chalk";
-import { StreamState, DPMConfiguration } from "datapm-lib";
+import { StreamState, DPMConfiguration, UpdateMethod } from "datapm-lib";
 import numeral from "numeral";
 import streamMmmagic from "stream-mmmagic";
 import { Parameter, ParameterType } from "../../util/parameters/Parameter";
-import { StreamSetPreview, SourceInspectionContext, InspectionResults, Source, UpdateMethod } from "../Source";
+import { StreamSetPreview, SourceInspectionContext, InspectionResults, Source } from "../Source";
 import { Maybe } from "../../util/Maybe";
 import { getParser, getParserByMimeType, getParsers } from "./parser/ParserUtil";
 import { LogType } from "../../util/LoggingUtils";

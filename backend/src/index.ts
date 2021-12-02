@@ -7,8 +7,8 @@ import express_enforces_ssl from "express-enforces-ssl";
 import proxy from "express-http-proxy";
 import { ApolloServer } from "apollo-server-express";
 
-import { Context } from "./context";
-import { getMeRequest } from "./util/me";
+import { AuthenticatedHTTPContext, AuthenticatedSocketContext, HTTPContext, SocketContext } from "./context";
+import { getMeFromAPIKey, getMeRequest } from "./util/me";
 import { makeSchema } from "./schema";
 import path from "path";
 import { getSecretVariable, setAppEngineServiceAccountJson } from "./util/secrets";
@@ -21,9 +21,12 @@ import { UserRepository } from "./repository/UserRepository";
 import { PackageRepository } from "./repository/PackageRepository";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { CollectionRepository } from "./repository/CollectionRepository";
-import { PackageDataStorageService, DataStorageUpdateMethod } from "./storage/data/package-data-storage-service";
-import { startLeaderElection, stopLeaderElection } from "./service/leader-election-service";
+import {  LeaderElectionService } from "./service/leader-election-service";
+import  { DistributedLockingService } from "./service/distributed-locking-service";
 import { SessionCache } from "./session-cache";
+import socketio from "socket.io";
+import http from "http";
+import { SocketConnectionHandler } from "./socket/SocketHandler";
 
 console.log("DataPM Registry Server Starting...");
 
@@ -36,6 +39,9 @@ const REFERER_REGEX = /\/graphql\/?$/;
 const app = express();
 
 async function main() {
+
+    process.title = "DataPM Registry Server";
+
     // get secrets from environment variable or from secret manager
     // NOTE: getSecretVariable does not throw/fail. If the secret is unable
     // to be retrieved, a warning message is logged. Let the system fail
@@ -55,19 +61,40 @@ async function main() {
     // Create Database Connection
     const connection = await superCreateConnection();
 
-    startLeaderElection(connection);
+    const distributedLockingService = new DistributedLockingService();
+
+    const leaderElectionService = new LeaderElectionService(distributedLockingService, connection);
+    
+    // Do not await the next line, as it is a long running operation
+    leaderElectionService.start();
 
     process.on("exit", async () => {
         console.log("DataPM Registry Server Stoping... ");
-        await stopLeaderElection();
+        await leaderElectionService.stop();
+        await distributedLockingService.stop();
     });
 
-    const context = async ({ req }: { req: express.Request }): Promise<Context> => ({
-        request: req,
-        me: await getMeRequest(req, connection.manager),
-        connection: connection,
-        cache: new SessionCache()
-    });
+
+
+    const context = async ({ req }: { req: express.Request }): Promise<HTTPContext | AuthenticatedHTTPContext> => {
+        const me = await getMeRequest(req, connection.manager);
+
+        if(!me) {
+            return {
+                request: req,
+                connection: connection,
+                cache: new SessionCache()
+            }
+        }
+
+        return {
+            request: req,
+            me,
+            connection: connection,
+            cache: new SessionCache()
+        }
+        
+    };
 
     const schema = await makeSchema();
 
@@ -328,152 +355,37 @@ async function main() {
         }
     });
 
-    app.route("/data/:catalogSlug/:packageSlug/:version/state")
-        .post(async (req, res, next) => {
-            try {
-                const contextObject = await context({ req });
-                await PackageDataStorageService.INSTANCE.writePackageStateFile(
-                    contextObject,
-                    req.params.catalogSlug,
-                    req.params.packageSlug,
-                    req.params.version,
-                    req
-                );
-                res.send();
-            } catch (err) {
-                if(err.message.includes("_NOT_FOUND")) {
-                    res.status(404).send(err.message);
-                } else if(err.message.includes("NOT_AUTHORIZED")) {
-                    res.status(401).send(err.message);
-                } else if(err.message.includes("_NOT_RECOGNIZED") || err.message.includes("_NOT_PRESENT_")) {
-                    res.status(400).send(err.message);
-                }  else {
-                    console.error(err);
-                    res.status(500).send("There was a problem saving the file: " + err.message);
-                }
-            }
-        }).get(async (req, res, next) => {
-            try {
-                const contextObject = await context({ req });
+    const httpServer = http.createServer(app); // TODO https?
+    const io = new socketio.Server(httpServer, {
+        httpCompression: true,
+        maxHttpBufferSize: 1e8,
+        parser: require("socket.io-msgpack-parser")
+    });
 
-                const readDataResult = await PackageDataStorageService.INSTANCE.readPackageStateFile(
-                    contextObject,
-                    req.params.catalogSlug,
-                    req.params.packageSlug,
-                    req.params.version
-                );
-                res.header("Content-Type", "application/json");
-                res.header("Content-Disposition", `attachment; filename="${req.params.catalogSlug}-${req.params.packageSlug}-${req.params.version}.state.json"` );
-                readDataResult.pipe(res);
-            } catch (err) {
-                if(err.message.includes("_NOT_FOUND")) {
-                    res.status(404).send(err.message);
-                } else if(err.message.includes("NOT_AUTHORIZED")) {
-                    res.status(401).send(err.message);
-                } else if(err.message.includes("_NOT_RECOGNIZED") || err.message.includes("_NOT_PRESENT_")) {
-                    res.status(400).send(err.message);
-                }  else {
-                    console.error(err);
-                    res.status(500).send("There was a problem saving the file: " + err.message);
-                }
-            }
-        });
+    io.on('connection', async (socket) => {
 
+
+        const contextObject:SocketContext | AuthenticatedSocketContext = {
+            connection,
+            cache: new SessionCache(),
+        }
+
+        if(socket.handshake.auth.token != null) {
+            if(Array.isArray(socket.handshake.auth.token)) {
+                throw new Error("TOKEN_MUST_BE_SINGLE_VALUE");
+            }
     
-    app.route("/data/:catalogSlug/:packageSlug/:version/:schemaSlug")
-        .options(async (req, res) => {
-            try {
-                const contextObject = await context({ req });
-                const readDataResult = await PackageDataStorageService.INSTANCE.getLatestFileNameForDataStream(
-                    contextObject,
-                    req.params.catalogSlug,
-                    req.params.packageSlug,
-                    req.params.version,
-                    req.params.schemaSlug
-                );
+            const token = socket.handshake.auth.token;;
+            
+            const user = await getMeFromAPIKey(token,connection.manager);
+            
+            (contextObject as AuthenticatedSocketContext).me = user;
 
-                res.header("Etag", readDataResult);
-                res.send();
-            } catch (err) {
+        }
 
-                if(err.message.includes("_NOT_FOUND")) {
-                    res.status(404).send(err.message);
-                } else if(err.message.includes("NOT_AUTHORIZED")) {
-                    res.status(401).send(err.message);
-                } else if(err.message.includes("_NOT_RECOGNIZED") || err.message.includes("_NOT_PRESENT_")) {
-                    res.status(400).send(err.message);
-                } else {
-                    console.error(err);
-                    res.status(500).send("There was a problem retreiving the latest offset name: " + err.message);
-                }
-            }
-        })
-        .post(async (req, res, next) => {
-            try {
-                const contextObject = await context({ req });
+        new SocketConnectionHandler(socket, contextObject, distributedLockingService);
 
-                const contentLengthString = req.headers["content-length"];
 
-                const contentLength = contentLengthString ? Number(contentLengthString) : undefined;
-
-                await PackageDataStorageService.INSTANCE.writePackageDataFromStream(
-                    contextObject,
-                    req.params.catalogSlug,
-                    req.params.packageSlug,
-                    req.params.version,
-                    req.params.schemaSlug,
-                    req.query["updateMethod"] as unknown as DataStorageUpdateMethod,
-                    req,
-                    contentLength
-                );
-                res.send();
-            } catch (err) {
-                if(err.message.includes("_NOT_FOUND")) {
-                    res.status(404).send(err.message);
-                } else if(err.message.includes("NOT_AUTHORIZED")) {
-                    res.status(401).send(err.message);
-                } else if(err.message.includes("_NOT_RECOGNIZED") || err.message.includes("_NOT_PRESENT_")) {
-                    res.status(400).send(err.message);
-                }  else {
-                    console.error(err);
-                    res.status(500).send("There was a problem saving the file: " + err.message);
-                }
-            }
-        })
-        .get(async (req, res, next) => {
-            try {
-                const contextObject = await context({ req });
-                const readDataResult = await PackageDataStorageService.INSTANCE.readPackageDataFromStream(
-                    contextObject,
-                    req.params.catalogSlug,
-                    req.params.packageSlug,
-                    req.params.version,
-                    req.params.schemaSlug,
-                    req.query["offsetHash"] as string | undefined
-                );
-                res.header("Content-Type", "application/avro");
-                res.header("Content-Disposition", `attachment; filename="${readDataResult.fileName}"` );
-                readDataResult.stream.pipe(res);
-            } catch (err) {
-
-                if(err.message === "NO_NEW_DATA_AVAILABLE") {
-                    res.status(204).send();
-                } else if(err.message.includes("NOT_AUTHORIZED")) {
-                    res.status(401).send(err.message);
-                } else if(err.message.includes("_NOT_FOUND")) {
-                    res.status(404).send(err.message);
-                } else if(err.message.includes("_NOT_RECOGNIZED") || err.message.includes("_NOT_PRESENT_")) {
-                    res.status(400).send(err.message);
-                } else {
-                    console.error(err);
-                    res.status(500).send("There was a problem finding the file: " + err.message);
-                }
-                
-            }
-        });
-
-    app.route("/data/*").get(async (req, res, next) => {
-        res.status(404).send();
     });
 
     // any route not yet defined goes to index.html
@@ -483,8 +395,9 @@ async function main() {
         res.sendFile(path.join(__dirname, "..", "static", "index.html"));
     });
 
-    app.listen({ port }, () => {
+    httpServer.listen(port,() => {
         console.log(`🚀 Server ready at http://localhost:${port}`);
     });
+
 }
 main().catch((error) => console.log(error));

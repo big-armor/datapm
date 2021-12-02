@@ -1,12 +1,39 @@
 import express from "express";
 import { EntityManager } from "typeorm";
 
-import { Jwt, parseJwt } from "./jwt";
+import { Jwt, getJwtFromRequest } from "./jwt";
 import { UserEntity } from "../entity/UserEntity";
 import { APIKeyEntity } from "../entity/APIKeyEntity";
 import { hashPassword } from "./PasswordUtil";
 import atob from "atob";
 import { AuthenticationError } from "apollo-server";
+
+export async function getMeFromAPIKey(apiKey:string, entityManager: EntityManager): Promise<UserEntity> {
+    return await entityManager.nestedTransaction(async (transaction) => {
+        const decodedKey = atob(apiKey);
+
+        const keyParts = decodedKey.split(".");
+        const keyId = keyParts[0];
+        const secret = keyParts[1];
+
+        const hash = hashPassword(secret, keyId);
+
+        const apiKeyRecord = await transaction
+            .getRepository(APIKeyEntity)
+            .findOne({ where: { id: keyId, hash: hash }, relations: ["user"] });
+
+        if (apiKeyRecord == null) {
+            throw new AuthenticationError("API_KEY_NOT_FOUND");
+        }
+
+        apiKeyRecord.lastUsed = new Date();
+        await transaction.save(apiKeyRecord);
+
+        const user = apiKeyRecord.user;
+
+        return user;
+    });
+}
 
 // get Me object based on express request
 // parses JWT from Authorization header
@@ -15,34 +42,11 @@ export async function getMeRequest(req: express.Request, manager: EntityManager)
     let user;
 
     if (req.header("X-API-Key") != null) {
-        return await manager.nestedTransaction(async (transaction) => {
-            const decodedKey = atob(req.header("X-API-Key")!);
-
-            const keyParts = decodedKey.split(".");
-            const keyId = keyParts[0];
-            const secret = keyParts[1];
-
-            const hash = hashPassword(secret, keyId);
-
-            const apiKeyRecord = await transaction
-                .getRepository(APIKeyEntity)
-                .findOne({ where: { id: keyId, hash: hash }, relations: ["user"] });
-
-            if (apiKeyRecord == null) {
-                throw new AuthenticationError("API_KEY_NOT_FOUND");
-            }
-
-            apiKeyRecord.lastUsed = new Date();
-            await transaction.save(apiKeyRecord);
-
-            const user = apiKeyRecord.user;
-
-            return user;
-        });
+        return getMeFromAPIKey(req.header("X-API-Key") as string, manager);
     } else if (req.header("Authorization") != null) {
         return new Promise<UserEntity | undefined>(async (success, error) => {
             try {
-                success(getMeJwt(await parseJwt(req), manager));
+                success(getMeJwt(await getJwtFromRequest(req), manager));
             } catch (err) {
                 if (err.name == "NoAuthenticationError") return success(undefined);
                 else error(err);

@@ -43,7 +43,6 @@ import { Connection, EntityManager } from "typeorm";
 import { VersionEntity } from "../entity/VersionEntity";
 import { getUserFromCacheOrDbById } from "./UserResolver";
 import { getCollectionFromCacheOrDbOrFail } from "./CollectionResolver";
-import { PackageDataStorageService } from "../storage/data/package-data-storage-service";
 import { getCatalogPermissionsFromCacheOrDb } from "./UserCatalogPermissionResolver";
 import {
     deleteFollowsByIds,
@@ -51,6 +50,7 @@ import {
     getPackageFollowsByPackageIssuesIds
 } from "./FollowResolver";
 import { PackageIssueRepository } from "../repository/PackageIssueRepository";
+import { isAuthenticatedContext } from "../util/contextHelpers";
 
 export const packageEntityToGraphqlObjectOrNull = async (
     context: Context,
@@ -292,9 +292,9 @@ export const findPackage = async (
         packageEntity.viewCount++;
         await transaction.save(packageEntity);
 
-        if (context.me) {
+        if (isAuthenticatedContext(context)) {
             await createActivityLog(transaction, {
-                userId: context.me?.id,
+                userId: (context as AuthenticatedContext).me.id,
                 eventType: ActivityLogEventType.PACKAGE_VIEWED,
                 targetPackageId: packageEntity.id
             });
@@ -490,12 +490,14 @@ export const movePackage = async (
             .getCustomRepository(PackagePermissionRepository)
             .storePackagePermissions(transaction, context.me.id, packageEntity.id, userPermission.permissions);
 
-        await PackageDataStorageService.INSTANCE.movePackageDataInNewCatalog(
+        // TODO Move the data from the old catalog to the new one
+        /* await PackageDataStorageService.INSTANCE.movePackageDataInNewCatalog(
             context,
             identifier.catalogSlug,
             targetCatalog.catalogSlug,
             identifier.packageSlug
         );
+        */
     });
 };
 

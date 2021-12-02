@@ -1,8 +1,16 @@
-import { SinkState, SinkStateKey, DPMConfiguration, DPMRecordValue, PackageFile, Schema } from "datapm-lib";
+import {
+    SinkState,
+    SinkStateKey,
+    DPMConfiguration,
+    DPMRecordValue,
+    PackageFile,
+    Schema,
+    UpdateMethod
+} from "datapm-lib";
 import Knex, { CreateTableBuilder, Ref, Transaction } from "knex";
 import { Transform } from "stream";
 import { Maybe } from "../../util/Maybe";
-import { ExtendedJSONSchema7TypeName, RecordStreamContext, UpdateMethod } from "../Source";
+import { ExtendedJSONSchema7TypeName, RecordStreamContext } from "../Source";
 import { convertValueByValueType, discoverValueType } from "../../transforms/StatsTransform";
 import { Parameter } from "../../util/parameters/Parameter";
 import { StreamSetProcessingMethod } from "../../util/StreamToSinkUtil";
