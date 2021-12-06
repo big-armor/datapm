@@ -462,22 +462,15 @@ export async function fetch(
                                         : w.writable;
 
                                 w.writable.once("finish", () => {
-                                    console.log("Finish called \n\n ");
                                     resolve();
                                 });
-
-                                console.log("Calling end on targetWritable \n\n ");
                                 targetWritable.end();
                             })
                     )
                 );
-
-                console.log("Writables finished \n\n ");
-
                 // Get the commitKeys after the writable has been closed
                 const commitKeys = writablesWithContexts.flatMap((w) => w.getCommitKeys());
 
-                console.log("Using commit keys");
                 // Commit all writables at once
                 if (commitKeys.length > 0) {
                     await sink.commitAfterWrites(commitKeys, sinkConnectionConfiguration, sinkCredentialsConfiguration);
