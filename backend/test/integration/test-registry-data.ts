@@ -17,6 +17,7 @@ import request = require("superagent");
 import fs, { exists } from 'fs';
 import path from "path";
 import { TEMP_STORAGE_PATH } from "./setup";
+import { io, Socket } from "socket.io-client";
 
 
 /** Tests when the registry is used as a repository for the data of a package */
@@ -28,6 +29,7 @@ describe("Package Tests", async () => {
     let userAToken: string = "Bearer ";
     let userBToken: string = "Bearer ";
 
+    let socket:Socket;
 
     before(async () => {});
 
@@ -150,7 +152,23 @@ describe("Package Tests", async () => {
         
     });
 
+    it("Connect to websocket for data uploads", async function(){
+
+        /* socket = io("http://localhost:4000", {
+            parser: require("socket.io-msgpack-parser"),
+            transports: ["polling", "websocket"],
+            auth: {
+                token: registryConfiguration.apiKey
+            }
+        }); */
+    });
+
     it("Catalog not found", async function () {
+
+        
+
+        
+
 
     });
 

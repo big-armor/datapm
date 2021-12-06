@@ -20,8 +20,9 @@ export class DataPMRepositoryDescription implements RepositoryDescription {
     }
 
     async getSourceDescription(): Promise<SourceDescription | null> {
-        const repository = await import("./DataPMSourceDescription");
-        return new repository.DataPMSourceDescription();
+        /* const repository = await import("./DataPMSourceDescription");
+        return new repository.DataPMSourceDescription(); */
+        return null;
     }
 
     async getSinkDescription(): Promise<SinkDescription | null> {
@@ -30,7 +31,7 @@ export class DataPMRepositoryDescription implements RepositoryDescription {
     }
 
     hasSource(): boolean {
-        return true;
+        return false;
     }
 
     hasSink(): boolean {

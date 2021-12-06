@@ -1,4 +1,4 @@
-import { DPMConfiguration, DPMRecord, UpdateMethod } from "datapm-lib";
+import { DPMConfiguration, DPMRecord, RecordContext, UpdateMethod } from "datapm-lib";
 import { Transform, TransformCallback } from "stream";
 import XLSX from "xlsx";
 import { SourceInspectionContext } from "../../Source";
