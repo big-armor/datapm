@@ -121,7 +121,7 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
 
         if(serverOrClient === "server") {
             try {
-                new TimeoutPromise<void>(1000,(resolve,reject) => {
+                new TimeoutPromise<void>(1000,(resolve:()=>void) => {
                     this.emit(this.channelName, new UploadStopRequest(), (response:UploadStopResponse)=> {
                         resolve()
                     });

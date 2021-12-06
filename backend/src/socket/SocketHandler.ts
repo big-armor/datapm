@@ -47,14 +47,9 @@ export class SocketConnectionHandler {
     }
 
     onDisconnect = ():void =>  {
-
-        console.log("Disconnecting socket: " + this.socket.id);
-
         this.socket.on(SocketEvent.FETCH_DATA_REQUEST.toString(), this.onFetchData);
         this.socket.on(SocketEvent.START_DATA_UPLOAD.toString(), this.onUploadData);
         this.socket.on(SocketEvent.GET_STREAM_INFO.toString(), this.onGetStreamInfo);
-
-        
     };
 
      onFetchData = async (data:FetchRequest,callback:(response:Response)=>void):Promise<void> => {

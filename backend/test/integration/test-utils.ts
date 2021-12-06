@@ -13,6 +13,8 @@ import fetch from "cross-fetch";
 import { mailObservable } from "./setup";
 import { expect } from "chai";
 import { AdminHolder } from "./admin-holder";
+import { io, Socket } from "socket.io-client";
+import { SocketEvent, TimeoutPromise } from "datapm-lib";
 
 export function createAnonymousClient() {
     return new ApolloClient({
@@ -211,5 +213,21 @@ export function createTestClient(headers: any) {
             },
             fetch
         })
+    });
+}
+
+
+export async function createAnonymousStreamingClient():Promise<Socket>  {
+    const socket = io("http://localhost:4000", {
+            parser: require("socket.io-msgpack-parser"),
+            transports: ["polling", "websocket"]
+        });
+
+    return new TimeoutPromise<Socket>(5000, (resolve) => {
+        socket.once("connect", async () => {
+            socket.once(SocketEvent.READY.toString(), () => {
+                resolve(socket)
+            });
+        });
     });
 }

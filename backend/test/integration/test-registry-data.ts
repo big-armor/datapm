@@ -1,4 +1,4 @@
-import { ApolloClient, NormalizedCacheObject, ServerError } from "@apollo/client/core";
+import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 import { expect } from "chai";
 import {
     CreatePackageDocument,
@@ -10,18 +10,18 @@ import {
     MovePackageDocument,
     CreateCatalogDocument
 } from "./registry-client";
-import { createAnonymousClient, createUser } from "./test-utils";
+import { createAnonymousClient, createAnonymousStreamingClient, createUser } from "./test-utils";
 import { parsePackageFileJSON, loadPackageFileFromDisk, PublishMethod } from "datapm-lib";
 import { describe, it } from "mocha";
 import request = require("superagent");
-import fs, { exists } from 'fs';
+import fs from 'fs';
 import path from "path";
 import { TEMP_STORAGE_PATH } from "./setup";
-import { io, Socket } from "socket.io-client";
+import { Socket } from "socket.io-client";
 
 
 /** Tests when the registry is used as a repository for the data of a package */
-describe("Package Tests", async () => {
+describe("Data Store on Registry", async () => {
     let userAClient: ApolloClient<NormalizedCacheObject>;
     let userBClient: ApolloClient<NormalizedCacheObject>;
     let anonymousClient = createAnonymousClient();
@@ -29,11 +29,15 @@ describe("Package Tests", async () => {
     let userAToken: string = "Bearer ";
     let userBToken: string = "Bearer ";
 
-    let socket:Socket;
+    let anonymousStreamingClient:Socket;
 
     before(async () => {});
 
     after(async () => {
+
+        if(anonymousStreamingClient) {
+            anonymousStreamingClient.disconnect();
+        }
 
         if(fs.existsSync("test-bad-schema.schema.json"))
             fs.unlinkSync("test-bad-schema.schema.json");
@@ -154,13 +158,10 @@ describe("Package Tests", async () => {
 
     it("Connect to websocket for data uploads", async function(){
 
-        /* socket = io("http://localhost:4000", {
-            parser: require("socket.io-msgpack-parser"),
-            transports: ["polling", "websocket"],
-            auth: {
-                token: registryConfiguration.apiKey
-            }
-        }); */
+        anonymousStreamingClient = await createAnonymousStreamingClient();
+
+
+
     });
 
     it("Catalog not found", async function () {
