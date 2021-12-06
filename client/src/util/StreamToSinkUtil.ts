@@ -407,7 +407,7 @@ export async function fetch(
                     let schemaWritable = schemaWriteables[schemaSlug];
 
                     if (schemaWritable == null) {
-                        const writableWithContext = await createSchemaWritable(
+                        await createSchemaWritable(
                             schemaWriteables,
                             writablesWithContexts,
                             sink,
@@ -419,7 +419,7 @@ export async function fetch(
                             updateMethod
                         );
 
-                        schemaWritable = writableWithContext.writable;
+                        schemaWritable = schemaWriteables[schemaSlug];
 
                         schemaWritable.on("error", (error) => {
                             returnPromiseReject(new Error("Sink error: " + error.message));
