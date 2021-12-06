@@ -310,14 +310,13 @@ describe("Package Tests", async () => {
 
         const storageLocation = path.join(TEMP_STORAGE_PATH, 'data','testA-registry-data-2','simple','1','simple');
 
-        const files = fs.readdirSync(storageLocation);
+        // const files = fs.readdirSync(storageLocation);
 
         // expect(files.length).to.equal(1);
 
-        const file = files[0];
+        // const file = files[0];
 
-        const storedFile = fs.readFileSync(storageLocation + path.sep +  file).toString("base64");
-
+        // const storedFile = fs.readFileSync(storageLocation + path.sep +  file).toString("base64");
 
         // const originalFile = fs.readFileSync("simple.avro");
         // expect(originalFile.toString("base64")).equal(storedFile);
