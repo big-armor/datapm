@@ -186,8 +186,15 @@ export class MongoSinkModule implements Sink {
                     await self.complete(this);
                     callback();
                 }
-            })
+            }),
+            getCommitKeys: () => {
+                return [];
+            }
         };
+    }
+
+    async commitAfterWrites(): Promise<void> {
+        // Nothing to do
     }
 
     async writeRecord(chunk: RecordStreamContext, transform: Transform): Promise<void> {

@@ -67,9 +67,11 @@ export class LocalDataStorageService {
         dataFormatter.pipe(compressor);
         stream.pipe(dataFormatter);
 
+        const fileName = new Date().getTime().toString();
+
         return this.fileStorageService.writeFileFromStream(
             namespace,
-            Prefixes.UPLOAD_FILE + ".msgpack.gz",
+            fileName + ".msgpack.gz",
             compressor
         );
     }

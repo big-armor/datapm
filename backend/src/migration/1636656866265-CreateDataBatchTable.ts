@@ -17,7 +17,7 @@ CREATE TABLE public.batch (
 
 ALTER TABLE public.batch ADD PRIMARY KEY (id);
 
-ALTER TABLE "batch" ADD CONSTRAINT uniqueBatchesPerPackage UNIQUE(package_id,major_version,streamSetSlug,streamSlug,batch)
+ALTER TABLE "batch" ADD CONSTRAINT uniqueBatchesPerPackage UNIQUE(package_id,major_version,streamSetSlug,streamSlug,batch);
 
 create unique index one_default_batch_per_package_major_version on public.batch(package_id,major_version,streamSetSlug,streamSlug,"default") where "default" is true;
 `

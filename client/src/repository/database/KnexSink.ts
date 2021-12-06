@@ -124,8 +124,15 @@ export abstract class KnexSink implements Sink {
                         callback(error);
                     }
                 }
-            })
+            }),
+            getCommitKeys: () => {
+                return [];
+            }
         };
+    }
+
+    async commitAfterWrites(): Promise<void> {
+        // Nothing to do
     }
 
     async writeRecord(chunks: RecordStreamContext[], transform: Transform): Promise<void> {
