@@ -74,6 +74,7 @@
         "@types/react": "^16.9.43",
         "@types/rfdc": "^1.1.0",
         "@types/semver": "^7.3.3",
+        "@types/superagent": "^4.1.13",
         "@types/tar-stream": "^2.2.0",
         "@types/through": "0.0.30",
         "@types/unzipper": "^0.10.3",
