@@ -10,7 +10,7 @@ import {
     MovePackageDocument,
     CreateCatalogDocument
 } from "./registry-client";
-import { createAnonymousClient, createAnonymousStreamingClient, createUser } from "./test-utils";
+import { createAnonymousClient, createAnonymousStreamingClient, createAuthenicatedStreamingClient, createUser } from "./test-utils";
 import { parsePackageFileJSON, loadPackageFileFromDisk, PublishMethod } from "datapm-lib";
 import { describe, it } from "mocha";
 import request = require("superagent");
@@ -30,6 +30,8 @@ describe("Data Store on Registry", async () => {
     let userBToken: string = "Bearer ";
 
     let anonymousStreamingClient:Socket;
+    let userAStreamingClient:Socket;
+    let userBStreamingClient:Socket;
 
     before(async () => {});
 
@@ -37,6 +39,14 @@ describe("Data Store on Registry", async () => {
 
         if(anonymousStreamingClient) {
             anonymousStreamingClient.disconnect();
+        }
+
+        if(userAStreamingClient) {
+            userAStreamingClient.disconnect();
+        }
+
+        if(userBStreamingClient) {
+            userBStreamingClient.disconnect();
         }
 
         if(fs.existsSync("test-bad-schema.schema.json"))
@@ -160,7 +170,13 @@ describe("Data Store on Registry", async () => {
 
         anonymousStreamingClient = await createAnonymousStreamingClient();
 
+        userAStreamingClient = await createAuthenicatedStreamingClient(
+                "testA-registry-data@test.datapm.io",
+                "passwordA!");
 
+        userBStreamingClient = await createAuthenicatedStreamingClient(
+            "testB-registry-data@test.datapm.io",
+            "passwordB!");
 
     });
 

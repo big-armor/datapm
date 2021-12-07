@@ -16,6 +16,7 @@ import {
     VerifyEmailAddressDocument
 } from "./registry-client";
 import { dataServerPort, mailDevWebPortNumber, registryServerPort } from "./setup";
+import { createAPIKeyFromParts } from "datapm-lib";
 
 export const KEYS = {
     ENTER: "\n",
@@ -251,9 +252,7 @@ export async function createApiKey(userClient: ApolloClient<NormalizedCacheObjec
 
     if (response.data == null) throw new Error("Error while creating api key");
 
-    const apiKey = Buffer.from(response.data.createAPIKey.id + "." + response.data.createAPIKey.secret).toString(
-        "base64"
-    );
+    const apiKey = createAPIKeyFromParts(response.data.createAPIKey.id, response.data.createAPIKey.secret);
     return apiKey;
 }
 
