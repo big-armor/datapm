@@ -6,7 +6,7 @@ import { UserEntity } from "./UserEntity";
 @Entity({
     name: "batch"
 })
-@Unique(["packageId","majorVersion", "streamSetSlug", "streamSlug", "batch"])
+@Unique(["packageId","majorVersion", "schemaTitle", "streamSlug", "batch"])
 export class DataBatchEntity extends EntityBaseModel {
     
     @PrimaryGeneratedColumn()
@@ -29,14 +29,17 @@ export class DataBatchEntity extends EntityBaseModel {
     @Column({ name: "author_id" })
     authorId: number;
 
-    @Column({name: "streamsetslug"})
-    streamSetSlug: string;
+    @Column({name: "schematitle"})
+    schemaTitle: string;
 
     @Column({name: "streamslug"})
     streamSlug: string;
 
     @Column()
     batch: number;
+
+    @Column({name: "lastoffset", type: "bigint"})
+    lastOffset: number;
 
     @Column()
     default: boolean;

@@ -43,7 +43,7 @@ export const hasPackageEntityPermissions = async (
     context: Context,
     packageEntity: PackageEntity,
     permission: Permission
-) => {
+):Promise<Boolean> => {
     if (permission == Permission.VIEW) {
         if (packageEntity?.isPublic) {
             return true;

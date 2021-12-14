@@ -11,15 +11,17 @@ CREATE TABLE public.batch (
     batch integer NOT NULL,
     author_id integer NOT NULL REFERENCES public.user(id) ON DELETE CASCADE,
     "default" boolean DEFAULT true NOT NULL,
-    streamSetSlug TEXT NOT NULL,
+    schemaTitle TEXT NOT NULL,
     streamSlug TEXT NOT NULL
 );
 
 ALTER TABLE public.batch ADD PRIMARY KEY (id);
 
-ALTER TABLE "batch" ADD CONSTRAINT uniqueBatchesPerPackage UNIQUE(package_id,major_version,streamSetSlug,streamSlug,batch);
+ALTER TABLE public.batch ADD COLUMN lastoffset bigint DEFAULT -1 NOT NULL;
 
-create unique index one_default_batch_per_package_major_version on public.batch(package_id,major_version,streamSetSlug,streamSlug,"default") where "default" is true;
+ALTER TABLE "batch" ADD CONSTRAINT uniqueBatchesPerPackage UNIQUE(package_id,major_version,schematitle,streamSlug,batch);
+
+create unique index one_default_batch_per_package_major_version on public.batch(package_id,major_version,schematitle,streamSlug,"default") where "default" is true;
 `
 
 export class CreateDataBatchTable1636656866265 implements MigrationInterface {

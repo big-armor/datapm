@@ -11,7 +11,7 @@ import {
     CreateCatalogDocument
 } from "./registry-client";
 import { createAnonymousClient, createAnonymousStreamingClient, createAuthenicatedStreamingClient, createUser } from "./test-utils";
-import { parsePackageFileJSON, loadPackageFileFromDisk, PublishMethod } from "datapm-lib";
+import { parsePackageFileJSON, loadPackageFileFromDisk, PublishMethod, SocketEvent, StartFetchRequest, ErrorResponse, StartFetchResponse, SocketResponseType, SocketError, StartUploadRequest, UploadDataRequest, UploadDataResponse, RecordContext, StartUploadResponse, UploadResponseType, UploadStopRequest, UploadStopResponse, SchemaInfoRequest, SchemaInfoResponse, OpenFetchChannelResponse, OpenFetchChannelRequest, DataSend, DataStop, FetchRequestType, SetStreamActiveBatchesResponse, SetStreamActiveBatchesRequest } from "datapm-lib";
 import { describe, it } from "mocha";
 import request = require("superagent");
 import fs from 'fs';
@@ -180,41 +180,389 @@ describe("Data Store on Registry", async () => {
 
     });
 
-    it("Catalog not found", async function () {
+    it("Anonymous catalog not found", async function () {
 
+        let notFoundErrorRecieved = false;
+
+        await new Promise<void>((resolve, reject) => {
+            anonymousStreamingClient.emit(SocketEvent.OPEN_FETCH_CHANNEL, new OpenFetchChannelRequest({
+                catalogSlug: "not-found",
+                packageSlug: "simple",
+                majorVersion: 1,
+                registryUrl: "http://localhost:4000",
+                schemaTitle: "simple",
+                streamSlug: "simple",
+                batch: 1
+            }),(response: StartFetchResponse | ErrorResponse) => {
+                if(response.responseType === SocketResponseType.ERROR) {
+
+                    const error = response as ErrorResponse;
+                    if(error.errorType === SocketError.NOT_FOUND) {
+                        notFoundErrorRecieved = true;
+                    }
+                    resolve();
+                } else {
+                    reject(new Error("Expected error"));
+                }
+            });
+        });
+
+        expect(notFoundErrorRecieved).to.equal(true);
         
-
-        
-
 
     });
 
 
     it("Package not found", async function () {
 
+        let notFoundErrorRecieved = false;
+
+        await new Promise<void>((resolve, reject) => {
+            anonymousStreamingClient.emit(SocketEvent.OPEN_FETCH_CHANNEL, new OpenFetchChannelRequest({
+                catalogSlug: "testA-registry-data",
+                packageSlug: "not-correct",
+                majorVersion: 1,
+                registryUrl: "http://localhost:4000",
+                schemaTitle: "simple",
+                streamSlug: "simple",
+                batch: 1
+            }),(response: StartFetchResponse | ErrorResponse) => {
+                if(response.responseType === SocketResponseType.ERROR) {
+
+                    const error = response as ErrorResponse;
+                    if(error.errorType === SocketError.NOT_FOUND) {
+                        notFoundErrorRecieved = true;
+                    }
+                    resolve();
+                } else {
+                    reject(new Error("Expected error"));
+                }
+            });
+        });
+
+        expect(notFoundErrorRecieved).to.equal(true);
+
     });
     
-    it("Schema not found", async function () {
+    it("Anonymous not authorized to access", async function () {
 
+        let notAuthorizedErrorRecieved = false;
+
+        await new Promise<void>((resolve, reject) => {
+            anonymousStreamingClient.emit(SocketEvent.OPEN_FETCH_CHANNEL, new OpenFetchChannelRequest({
+                catalogSlug: "testA-registry-data",
+                packageSlug: "simple",
+                majorVersion: 1,
+                registryUrl: "http://localhost:4000",
+                schemaTitle: "simple",
+                streamSlug: "simple",
+                batch: 1
+            }),(response: StartFetchResponse | ErrorResponse) => {
+                if(response.responseType === SocketResponseType.ERROR) {
+
+                    const error = response as ErrorResponse;
+                    if(error.errorType === SocketError.NOT_AUTHORIZED) {
+                        notAuthorizedErrorRecieved = true;
+                    }
+                    resolve();
+                } else {
+                    reject(new Error("Expected not authorized error"));
+                }
+            });
+        });
+
+        expect(notAuthorizedErrorRecieved).to.equal(true);
       
+    });
+
+
+    it("User A can not upload data to a non-specified schema", async function () {
+
+
+        let response = await new Promise<StartUploadResponse | ErrorResponse>((resolve, reject) => {
+            userAStreamingClient.emit(SocketEvent.START_DATA_UPLOAD, new StartUploadRequest({
+                catalogSlug: "testA-registry-data",
+                packageSlug: "simple",
+                majorVersion: 1,
+                registryUrl: "http://localhost:4000",
+                schemaTitle: "wrong-schema",
+                streamSlug: "simple"
+            },true),(response: StartUploadResponse) => {
+                resolve(response);
+            });
+        });
+
+        expect(response.responseType).equal(SocketResponseType.ERROR);
+
+        const uploadResponse:ErrorResponse = response as ErrorResponse;
+
+        expect(uploadResponse.errorType).equal(SocketError.NOT_VALID);
+        expect(uploadResponse.message).include("SCHEMA_NOT_VALID");
+
 
     });
+
+    const recordZeroDate: Date = new Date();
+    const recordZeroDateTime = new Date();
+    const recordOneDate: Date = new Date();
+    const recordOneDateTime = new Date();
 
     it("User A can upload data", async function () {
 
+        let response = await new Promise<StartUploadResponse | ErrorResponse>((resolve, reject) => {
+            userAStreamingClient.emit(SocketEvent.START_DATA_UPLOAD, new StartUploadRequest({
+                catalogSlug: "testA-registry-data",
+                packageSlug: "simple",
+                majorVersion: 1,
+                registryUrl: "http://localhost:4000",
+                schemaTitle: "simple",
+                streamSlug: "simple"
+            },true),(response: StartUploadResponse) => {
+                resolve(response);
+            });
+        });
+
+        expect(response.responseType).equal(SocketResponseType.START_DATA_UPLOAD_RESPONSE);
+
+        const startResponse:StartUploadResponse = response as StartUploadResponse;
+
+        expect(startResponse.batchIdentifier.registryUrl).equal("http://localhost:4000");
+        expect(startResponse.batchIdentifier.catalogSlug).equal("testA-registry-data");
+        expect(startResponse.batchIdentifier.majorVersion).equal(1);
+        expect(startResponse.batchIdentifier.packageSlug).equal("simple");
+        expect(startResponse.batchIdentifier.schemaTitle).equal("simple");
+        expect(startResponse.batchIdentifier.streamSlug).equal("simple");
+        expect(startResponse.batchIdentifier.batch).equal(1);
+
+        const records:RecordContext[] = [
+            {
+                schemaSlug: "simple",
+                offset: 0,
+                record: {
+                    string: "Test string",
+                    number: 3.1465,
+                    boolean: true,
+                    date: recordZeroDate,
+                    dateTime: recordZeroDateTime,
+                    stringNulls: null
+                } 
+            },
+            {
+                schemaSlug: "simple",
+                offset: 1,
+                record: {
+                    string: "Another string",
+                    number: 42,
+                    boolean: true,
+                    date: recordOneDate,
+                    dateTime: recordOneDateTime,
+                    stringNulls: "not a null"
+                } 
+            }
+        ];
+
+        let uploadDataResponse = await new Promise<UploadDataResponse>((resolve,reject) => {
+            userAStreamingClient.emit(startResponse.channelName, new UploadDataRequest(records),(response: UploadDataResponse | ErrorResponse) => {
+
+                if(response.responseType === SocketResponseType.ERROR) {
+                    reject(response as ErrorResponse);
+                }
+
+                resolve(response as UploadDataResponse);
+            });
+    
+        });
+
+
+        expect(uploadDataResponse.responseType).equal(UploadResponseType.UPLOAD_RESPONSE);
+
+
+
+        let stopUploadResponse = await new Promise<UploadStopResponse>((resolve,reject) => {
+            userAStreamingClient.emit(startResponse.channelName, new UploadStopRequest(),(response: UploadStopResponse | ErrorResponse) => {
+
+                if(response.responseType === SocketResponseType.ERROR) {
+                    reject(response as ErrorResponse);
+                }
+
+                resolve(response as UploadStopResponse);
+            });
+    
+        });
+
+
+        expect(stopUploadResponse.responseType).equal(UploadResponseType.UPLOAD_STOP_RESPONSE);
+
+        let updateDefaultResponse = await new Promise<SetStreamActiveBatchesResponse>((resolve,reject) => {
+            userAStreamingClient.emit(SocketEvent.SET_STREAM_ACTIVE_BATCHES, new SetStreamActiveBatchesRequest([{
+                catalogSlug: "testA-registry-data",
+                packageSlug: "simple",
+                majorVersion: 1,
+                registryUrl: "http://localhost:4000",
+                schemaTitle: "simple",
+                streamSlug: "simple",
+                batch: 1
+            }]),(response: SetStreamActiveBatchesResponse | ErrorResponse) => {
+
+                if(response.responseType === SocketResponseType.ERROR) {
+                    reject(response as ErrorResponse);
+                }
+
+                resolve(response as SetStreamActiveBatchesResponse);
+            });
+    
+        });
+
+        expect(updateDefaultResponse.responseType).equal(SocketResponseType.SET_STREAM_ACTIVE_BATCHES);
+
+        expect(updateDefaultResponse.batchIdentifiers[0].registryUrl).equal("http://localhost:4000");
+        expect(updateDefaultResponse.batchIdentifiers[0].catalogSlug).equal("testA-registry-data");
+        expect(updateDefaultResponse.batchIdentifiers[0].majorVersion).equal(1);
+        expect(updateDefaultResponse.batchIdentifiers[0].packageSlug).equal("simple");
+        expect(updateDefaultResponse.batchIdentifiers[0].schemaTitle).equal("simple");
+        expect(updateDefaultResponse.batchIdentifiers[0].streamSlug).equal("simple");
+        expect(updateDefaultResponse.batchIdentifiers[0].batch).equal(1);
+
     });
 
-    it("User cannot upload data that isn't generated by datapm", async function () {
+    /** Future strict mode 
+     * 
+     * it("User cannot upload data that doesn't match the sheet", async function () {
 
 
     });
-
-    it("User cannot upload data that doesn't match the sheet", async function () {
-
-
-    });
+    */
 
     it("User without any permission can not upload data", async function () {
+
+        let response = await new Promise<StartUploadResponse | ErrorResponse>((resolve, reject) => {
+            userBStreamingClient.emit(SocketEvent.START_DATA_UPLOAD, new StartUploadRequest({
+                catalogSlug: "testA-registry-data",
+                packageSlug: "simple",
+                majorVersion: 1,
+                registryUrl: "http://localhost:4000",
+                schemaTitle: "simple",
+                streamSlug: "simple"
+            },true),(response: StartUploadResponse) => {
+                resolve(response);
+            });
+        });
+
+        expect(response.responseType).equal(SocketResponseType.ERROR);
+
+        const errorResponse:ErrorResponse = response as ErrorResponse;
+        expect(errorResponse.errorType).equal(SocketError.NOT_AUTHORIZED);
+        expect(errorResponse.message).include("NOT_AUTHORIZED");
+
+
+    });
+
+    it("User A can download data", async function () {
+        
+        let streamInfoResponse = await new Promise<SchemaInfoResponse | ErrorResponse>((resolve, reject) => {
+        
+            userAStreamingClient.emit(SocketEvent.SCHEMA_INFO_REQUEST, new SchemaInfoRequest({
+                catalogSlug: "testA-registry-data",
+                packageSlug: "simple",
+                majorVersion: 1,
+                registryUrl: "http://localhost:4000",
+                schemaTitle: "simple"
+            }),(response: SchemaInfoResponse | ErrorResponse) => {
+                resolve(response);
+            });
+            
+        });
+
+        expect(streamInfoResponse.responseType).equal(SocketResponseType.SCHEMA_INFO_RESPONSE);
+
+        const schemaInfoResponse:SchemaInfoResponse = streamInfoResponse as SchemaInfoResponse;
+        expect(schemaInfoResponse.identifier.registryUrl).equal("http://localhost:4000");
+        expect(schemaInfoResponse.identifier.catalogSlug).equal("testA-registry-data");
+        expect(schemaInfoResponse.identifier.packageSlug).equal("simple");
+        expect(schemaInfoResponse.identifier.majorVersion).equal(1);
+        expect(schemaInfoResponse.identifier.schemaTitle).equal("simple");
+
+        expect(schemaInfoResponse.streams.length).equal(1);
+
+        expect(schemaInfoResponse.streams[0].batchIdentifier.batch).equal(1);
+        expect(schemaInfoResponse.streams[0].batchIdentifier.streamSlug).equal("simple");
+        expect(schemaInfoResponse.streams[0].highestOffset).equal(1);
+
+        let response = await new Promise<OpenFetchChannelResponse | ErrorResponse>((resolve, reject) => {
+            userAStreamingClient.emit(SocketEvent.START_DATA_UPLOAD, new OpenFetchChannelRequest(schemaInfoResponse.streams[0].batchIdentifier),(response: OpenFetchChannelResponse) => {
+                resolve(response);
+            });
+        });
+
+        expect(response.responseType).equal(SocketResponseType.FETCH_DATA_RESPONSE);
+
+        const openChannelResponse:OpenFetchChannelResponse = response as OpenFetchChannelResponse;
+
+        expect(openChannelResponse.channelName).not.equal(undefined);
+
+        const records:RecordContext[] = await new Promise<RecordContext[]>((resolve,reject) => {
+
+            const records:RecordContext[] = [];
+
+            userAStreamingClient.on(openChannelResponse.channelName,(event:DataSend | DataStop) => {
+            
+                if(event.requestType === FetchRequestType.DATA) {
+                    records.concat((event as DataSend).records);
+                }
+                else if(event.requestType === FetchRequestType.STOP) {
+                    resolve(records);
+                }
+            });
+    
+            userAStreamingClient.emit(openChannelResponse.channelName, new StartFetchRequest(0),(response: StartFetchRequest | ErrorResponse) => {
+                if((response as ErrorResponse).responseType === SocketResponseType.ERROR) {
+                    reject(response as ErrorResponse);
+                }
+            });
+        });
+
+        expect(records.length).equal(2);
+
+        expect(records[0].schemaSlug).equal("simple");
+        expect(records[0].offset).equal(0);
+        expect(records[0].record.string).equal("Test string");
+        expect(records[0].record.number).equal(3.1465);
+        expect(records[0].record.boolean).equal(true);
+        expect(records[0].record.date).equal(recordZeroDate);
+        expect(records[0].record.dateTime).equal(recordZeroDateTime);
+        expect(records[0].record.stringNulls).equal(null);
+
+        expect(records[1].schemaSlug).equal("simple");
+        expect(records[1].offset).equal(1);
+        expect(records[1].record.string).equal("Another string");
+        expect(records[1].record.number).equal(42);
+        expect(records[1].record.boolean).equal(true);
+        expect(records[1].record.date).equal(recordOneDate);
+        expect(records[1].record.dateTime).equal(recordOneDate);
+        expect(records[1].record.stringNulls).equal("not a null");
+    
+    });
+
+    it("Anonymous user can not download data", async function() {
+
+        let response = await new Promise<SchemaInfoResponse | ErrorResponse>((resolve, reject) => {
+        
+            anonymousStreamingClient.emit(SocketEvent.SCHEMA_INFO_REQUEST, new SchemaInfoRequest({
+                catalogSlug: "testA-registry-data",
+                packageSlug: "simple",
+                majorVersion: 1,
+                registryUrl: "http://localhost:4000",
+                schemaTitle: "simple"
+            }),(response: SchemaInfoResponse | ErrorResponse) => {
+                resolve(response);
+            });
+            
+        });
+
+
+        expect(response.responseType).equal(SocketResponseType.ERROR);
+
+        expect((response as ErrorResponse).errorType).equal(SocketError.NOT_AUTHORIZED);
 
 
 
@@ -239,11 +587,7 @@ describe("Data Store on Registry", async () => {
     });
 
 
-    it("Anonymous user can not download data", async function() {
 
-
-
-    });
 
 
     it("User A can set package public", async function () {
@@ -359,4 +703,4 @@ describe("Data Store on Registry", async () => {
     })
 
     
-});
+})

@@ -1,7 +1,6 @@
 import { FileStorageService } from "../files/file-storage-service";
 import { BatchIdentifier } from "datapm-lib";
 import { Readable } from "stream";
-import { queue } from "sharp";
 import { Gzip } from "minizlib";
 import { PackrStream } from "msgpackr";
 
@@ -9,13 +8,21 @@ enum Prefixes {
     DATA = "data",
     UPLOAD_FILE = "upload"
 }
-export class LocalDataStorageService {
-    public static readonly INSTANCE = new LocalDataStorageService();
+
+export interface DataFile {readable:Readable,startOffset:number, nextStartOffset:number | null}
+export interface IterableDataFiles {getNext:() => Promise<DataFile | null>}
+
+export class DataStorageService {
+    public static readonly INSTANCE = new DataStorageService();
     private fileStorageService = FileStorageService.INSTANCE;
 
-    public async readDataBatch(packageId: number, identifier: BatchIdentifier): Promise<{
-        getNext: () => Promise<{readable:Readable,startOffset:number, endOffset:number, nextStartOffset:number | null } | null>
-    }> {
+    /** Read the records from a batch for a given package. 
+     * 
+     * @param packageId The package id
+     * @param identifier The batch identifier
+     * @param offsetStart The offset to start reading from (this should be one more than the last end offset)
+     */
+    public async readDataBatch(packageId: number, identifier: BatchIdentifier, startOffset?:number): Promise<IterableDataFiles> {
 
         const namespace = this.getBatchNamespace(packageId, identifier);
 
@@ -23,27 +30,39 @@ export class LocalDataStorageService {
 
         let index = 0;
 
+        if (startOffset) {
+            index = files.filter(file => this.fileNameToStartOffset(file) >= startOffset).length;
+        }
+
+
         return {
-            getNext: async ():Promise<{readable:Readable,startOffset:number,endOffset:number,nextStartOffset:number | null } | null> => {
+            getNext: async ():Promise<DataFile | null> => {
                 if(index > files.length - 1) {
                     return null;
                 }
 
-                const currentRange = this.fileNameToRange(files[index]);
+                const currentStartOffSet = this.fileNameToStartOffset(files[index]);
 
-                let nextRange = null;
+                let nextStartOffset = null;
 
                 if(index < files.length - 1) {
-                    nextRange = this.fileNameToRange(files[index + 1]);
+                    nextStartOffset = this.fileNameToStartOffset(files[index + 1]);
                 }
 
                 index++;
 
+                const fileStream = await this.fileStorageService.readFile(namespace,files[index++]);
+
+                const dataFormatter = new PackrStream();
+                const decompressor = new Gzip();
+
+                fileStream.pipe(decompressor);
+                decompressor.pipe(dataFormatter);
+
                 return {
-                    readable: await this.fileStorageService.readFile(namespace,files[index++]),
-                    startOffset: currentRange.start,
-                    endOffset: currentRange.end,
-                    nextStartOffset: nextRange ? nextRange.start : null
+                    readable: dataFormatter,
+                    startOffset: currentStartOffSet,
+                    nextStartOffset
                 };
             }
         };
@@ -53,6 +72,7 @@ export class LocalDataStorageService {
     public async writeBatch(
         packageId: number,
         identifier: BatchIdentifier,
+        offsetStart: number,
         stream: Readable
     ): Promise<void> {
         const namespace = this.getBatchNamespace(packageId, identifier);
@@ -67,11 +87,9 @@ export class LocalDataStorageService {
         dataFormatter.pipe(compressor);
         stream.pipe(dataFormatter);
 
-        const fileName = new Date().getTime().toString();
-
         return this.fileStorageService.writeFileFromStream(
             namespace,
-            fileName + ".msgpack.gz",
+            offsetStart + ".msgpack.gz",
             compressor
         );
     }
@@ -90,7 +108,7 @@ export class LocalDataStorageService {
             Prefixes.DATA ,
             packageId.toString() ,
             identifier.majorVersion.toString() ,
-            identifier.streamSetSlug,
+            identifier.schemaTitle,
             identifier.streamSlug,
             identifier.batch.toString()
         ];
@@ -106,13 +124,13 @@ export class LocalDataStorageService {
 
         const sortedFiles = filteredFiles.sort((a, b) => {
 
-            const aInt = this.fileNameToRange(a);
-            const bInt = this.fileNameToRange(b);
+            const aInt = this.fileNameToStartOffset(a);
+            const bInt = this.fileNameToStartOffset(b);
 
-            if (aInt.start < bInt.start) {
+            if (aInt < bInt) {
                 return -1;
             }
-            if (aInt.start > bInt.start) {
+            if (aInt > bInt) {
                 return 1;
             }
             return 0;
@@ -121,28 +139,9 @@ export class LocalDataStorageService {
         return sortedFiles;
     }
 
-    private async getBatchRange(packageId: number, identifier: BatchIdentifier): Promise<{start:number, end:number} | null> {
-        const files = await this.getBatchFiles(packageId, identifier);
-
-        if(files.length === 0) {
-            return null;
-        }
-
-        const firstFileRange = this.fileNameToRange(files[0]);
-        const lastFileRange = this.fileNameToRange(files[files.length - 1]);
-
-        return {
-            start: firstFileRange.start,
-            end: lastFileRange.end
-        }
-    }
-
-    private fileNameToRange(fileName:string):{start:number, end:number} {
-        const parts = fileName.split("-");
-        return {
-            start: Number.parseInt(parts[0]),
-            end: Number.parseInt(parts[1])
-        }
+    private fileNameToStartOffset(fileName:string):number {
+        const numberOnly = fileName.replace(".msgpack.gz", "");
+        return Number.parseInt(numberOnly);
     }
 
 }

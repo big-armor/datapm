@@ -9,7 +9,6 @@ import {
     UpdateMethod,
     SocketResponseType,
     StreamIdentifier,
-    streamIdentifierToChannelName,
     UploadRequest,
     UploadRequestType,
     UploadResponse,
@@ -108,7 +107,7 @@ export class DataPMSink implements Sink {
             catalogSlug: configuration.catalogSlug as string,
             packageSlug: configuration.packageSlug as string,
             majorVersion: configuration.majorVersion as number,
-            streamSetSlug: schema.title as string,
+            schemaTitle: schema.title as string,
             streamSlug: schema.title as string // TODO should this be the user's name? So that it could be removed by user?
         };
 
@@ -116,7 +115,7 @@ export class DataPMSink implements Sink {
 
         const uploadRequest = new StartUploadRequest(streamIdentifier, true); // TODO support appending
 
-        const uploadChannelName = streamIdentifierToChannelName(streamIdentifier);
+        let uploadChannelName = "not-set";
 
         const pausingTransform = new PausingTransform(true, {
             objectMode: true
@@ -169,6 +168,7 @@ export class DataPMSink implements Sink {
                         uploadRequest,
                         (response: StartUploadResponse | ErrorResponse) => {
                             if (response.responseType === SocketResponseType.START_DATA_UPLOAD_RESPONSE) {
+                                uploadChannelName = (response as StartUploadResponse).channelName;
                                 batchIdentifier = (response as StartUploadResponse).batchIdentifier;
                                 pausingTransform.actuallyResume();
                                 resolve();

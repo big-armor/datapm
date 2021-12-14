@@ -1,3 +1,4 @@
+import { SchemaIdentifier } from "./main";
 import { StreamIdentifier } from "./PackageFile-v0.7.0";
 import { RecordContext } from "./PackageUtil";
 
@@ -13,20 +14,6 @@ export interface BatchIdentifier extends StreamIdentifier {
     batch: number;
 }
 
-export function streamIdentifierToChannelName(streamIdentifier: StreamIdentifier): string {
-    return (
-        streamIdentifier.catalogSlug +
-        "/" +
-        streamIdentifier.packageSlug +
-        "/" +
-        streamIdentifier.majorVersion +
-        "/" +
-        streamIdentifier.streamSetSlug +
-        "/" +
-        streamIdentifier.streamSlug
-    );
-}
-
 /**
  * TOP LEVEL EVENTS - These are generally sent by the client to
  * request that the server start a process. Process specific events
@@ -35,14 +22,16 @@ export function streamIdentifierToChannelName(streamIdentifier: StreamIdentifier
 
 export enum SocketEvent {
     READY = "ready",
-    FETCH_DATA_REQUEST = "fetchSchemaDataRequest",
+    OPEN_FETCH_CHANNEL = "openFetchChannel",
     START_DATA_UPLOAD = "uploadDataRequest",
     SET_STREAM_ACTIVE_BATCHES = "setStreamActiveBatchesRequest",
-    GET_STREAM_INFO = "getStreamInfo"
+    SCHEMA_INFO_REQUEST = "schemaInfoRequest"
 }
 
 export enum SocketError {
     NOT_AUTHORIZED = "notAuthorized",
+    NOT_FOUND = "notFound",
+    NOT_VALID = "notValid",
     STREAM_LOCKED = "streamLocked",
     SERVER_ERROR = "serverError",
     NOT_STARTED = "streamProcessNotStarted" // generic error for "you forgot to send a request to do something"
@@ -50,9 +39,11 @@ export enum SocketError {
 
 export enum SocketResponseType {
     ERROR = "error",
-    STREAM_INFO = "streamInfo",
+    SCHEMA_INFO_RESPONSE = "schemaInfoResponse",
     START_DATA_UPLOAD_RESPONSE = "startDataUploadResponse",
-    SET_STREAM_ACTIVE_BATCHES = "setStreamActiveBatchesResponse"
+    SET_STREAM_ACTIVE_BATCHES = "setStreamActiveBatchesResponse",
+    FETCH_DATA_RESPONSE = "fetchDataResponse",
+    OPEN_FETCH_CHANNEL_RESPONSE = "openFetchChannelResponse"
 }
 
 export interface Request {
@@ -74,18 +65,24 @@ export class ErrorResponse implements Response {
 /** STREAM INFO  */
 
 /** Sent by the client to request information about a given stream */
-export class StreamInfoRequest implements Request {
-    requestType = SocketEvent.GET_STREAM_INFO;
+export class SchemaInfoRequest implements Request {
+    requestType = SocketEvent.SCHEMA_INFO_REQUEST;
 
     // eslint-disable-next-line no-useless-constructor
-    constructor(public streamIdentifier: StreamIdentifier) {}
+    constructor(public identifier: SchemaIdentifier) {}
 }
 
-export class StreamInfoResponse implements Response {
-    responseType = SocketResponseType.STREAM_INFO;
+export class SchemaInfoResponse implements Response {
+    responseType = SocketResponseType.SCHEMA_INFO_RESPONSE;
 
     // eslint-disable-next-line no-useless-constructor
-    constructor(public streamIdentifier: StreamIdentifier, public activeBatch: number) {}
+    constructor(
+        public identifier: SchemaIdentifier,
+        public streams: {
+            batchIdentifier: BatchIdentifier;
+            highestOffset: number;
+        }[]
+    ) {}
 }
 
 /** Sent by the client to set the batches for given streams. All done in a transaction, so that other
@@ -140,7 +137,7 @@ export class StartUploadResponse implements Response {
     responseType = SocketResponseType.START_DATA_UPLOAD_RESPONSE;
 
     // eslint-disable-next-line no-useless-constructor
-    constructor(public batchIdentifier: BatchIdentifier) {}
+    constructor(public channelName: string, public batchIdentifier: BatchIdentifier) {}
 }
 
 /** Sent by the client to the server to upload data.  */
@@ -170,12 +167,75 @@ export class UploadStopResponse implements UploadResponse {
  * DATA FETCHING
  */
 
+/** This is sent on the SocketEvent.OPEN_FETCH_CHANNEL channel */
+export class OpenFetchChannelRequest implements Request {
+    requestType = SocketEvent.OPEN_FETCH_CHANNEL;
+
+    // eslint-disable-next-line no-useless-constructor
+    constructor(public batchIdentifier: BatchIdentifier) {}
+}
+
+/** This is sent by the server in response to the OpenFetchChannelRequest */
+export class OpenFetchChannelResponse implements Response {
+    responseType = SocketResponseType.OPEN_FETCH_CHANNEL_RESPONSE;
+
+    // eslint-disable-next-line no-useless-constructor
+    constructor(public channelName: string, public batchIdentifier: BatchIdentifier) {}
+}
+
 export enum SocketFetchEvent {
     FETCH_DATA_ACKNOWLEDGE = "fetchDataAcknowledge",
     FETCH_DATA_END = "fetchDataEnd"
 }
 
+export enum FetchRequestType {
+    START = "fetchDataStart",
+    DATA = "data",
+    STOP = "fetchDataStop"
+}
+
+export enum FetchResponseType {
+    START_ACKNOWLEDGE = "startAcknowledge",
+    DATA_ACKNOWLEDGE = "dataAcknowledge",
+    STOP_ACKNOWLEDGE = "fetchDataStopAcknowledge"
+}
+
 export interface FetchRequest {
-    streamIdentifier: StreamIdentifier;
-    offset: number;
+    requestType: FetchRequestType;
+}
+
+export interface FetchResponse {
+    responseType: FetchResponseType;
+}
+
+/** This is sent on the channel returned by the OpenFetchChannelResponse */
+export class StartFetchRequest implements FetchRequest {
+    requestType = FetchRequestType.START;
+
+    // eslint-disable-next-line no-useless-constructor
+    constructor(public offset: number) {}
+}
+
+/** This is sent by the server in response to the StartFetchRequest */
+export class StartFetchResponse implements FetchResponse {
+    responseType = FetchResponseType.START_ACKNOWLEDGE;
+}
+
+export class DataSend implements FetchRequest {
+    requestType = FetchRequestType.DATA;
+
+    // eslint-disable-next-line no-useless-constructor
+    constructor(public records: RecordContext[]) {}
+}
+
+export class DataAcknowledge implements FetchResponse {
+    responseType = FetchResponseType.DATA_ACKNOWLEDGE;
+}
+
+export class DataStop implements FetchRequest {
+    requestType = FetchRequestType.STOP;
+}
+
+export class DataStopAcknowledge implements FetchResponse {
+    responseType = FetchResponseType.STOP_ACKNOWLEDGE;
 }

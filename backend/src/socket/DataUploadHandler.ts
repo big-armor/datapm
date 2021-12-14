@@ -3,16 +3,34 @@ import { DistributedLockingService } from "../service/distributed-locking-servic
 import SocketIO from 'socket.io';
 import { checkPackagePermission, RequestHandler } from "./SocketHandler";
 import { Permission } from "../generated/graphql";
-import { BatchIdentifier, ErrorResponse, Response, SocketError, SocketEvent,  StartUploadRequest,  StartUploadResponse,  StreamIdentifier, streamIdentifierToChannelName, TimeoutPromise, UploadDataRequest, UploadDataResponse, UploadRequest, UploadRequestType, UploadResponse, UploadStopRequest, UploadStopResponse } from "datapm-lib";
+import { BatchIdentifier, ErrorResponse, RecordContext, Response, SocketError, SocketEvent,  StartUploadRequest,  StartUploadResponse,  StreamIdentifier, TimeoutPromise, UploadDataRequest, UploadDataResponse, UploadRequest, UploadRequestType, UploadResponse, UploadStopRequest, UploadStopResponse } from "datapm-lib";
 import EventEmitter from "events";
 import { PassThrough } from "stream";
 import { PackageRepository } from "../repository/PackageRepository";
-import { LocalDataStorageService } from "../storage/data/data-storage";
+import { DataStorageService } from "../storage/data/data-storage";
 import { DataBatchRepository } from "../repository/DataBatchRepository";
 import { DataBatchEntity } from "../entity/DataBatchEntity";
 import { Maybe } from "graphql/jsutils/Maybe";
+import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
+import { VersionRepository } from "../repository/VersionRepository";
 
 const LOCK_PREFIX = "streamSetDataUpload";
+
+
+export function streamIdentifierToChannelName(streamIdentifier: StreamIdentifier): string {
+    return (
+        streamIdentifier.catalogSlug +
+        "/" +
+        streamIdentifier.packageSlug +
+        "/" +
+        streamIdentifier.majorVersion +
+        "/" +
+        streamIdentifier.schemaTitle +
+        "/" +
+        streamIdentifier.streamSlug  +
+        "/fetch"
+    );
+}
 
 /** Manages the state of uploading data from a stream client. Only one upload per batch at at time.
  * 
@@ -32,7 +50,9 @@ const LOCK_PREFIX = "streamSetDataUpload";
  */
 export class DataUploadHandler extends EventEmitter implements RequestHandler{
     
-    private readonly dataStorageService = LocalDataStorageService.INSTANCE;
+    private readonly dataStorageService = DataStorageService.INSTANCE;
+    private readonly packageFileStorage = PackageFileStorageService.INSTANCE;
+
     private stream: PassThrough;
 
     namespace:string[];
@@ -42,6 +62,7 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
     fileName:string;
     paused:boolean = false;
     recordCount:number = 0;
+    lastSavedOffset = 0;
 
     private batchIdentifier:BatchIdentifier;
 
@@ -52,11 +73,7 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
 
     async start(callback:(response:Response) => void) {
 
-
-        console.log("data upload for " + JSON.stringify(this.uploadRequest.streamIdentifier) + " by " + this.socketContext.me.username);
-
-
-        if(!await checkPackagePermission(this.socket, this.socketContext, this.uploadRequest.streamIdentifier, Permission.EDIT)) {
+        if(!await checkPackagePermission(this.socket, this.socketContext, callback, this.uploadRequest.streamIdentifier, Permission.EDIT)) {
             return;
         }
                   
@@ -67,9 +84,31 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
         const packageEntity = await this.socketContext.connection.getCustomRepository(PackageRepository).findPackageOrFail({identifier: this.uploadRequest.streamIdentifier});
 
 
-        let batchEntity: Maybe<DataBatchEntity>;
+        let batchEntity = await this.socketContext.connection.getCustomRepository(DataBatchRepository).findLatestBatch({identifier: this.uploadRequest.streamIdentifier});
 
-        batchEntity = await this.socketContext.connection.getCustomRepository(DataBatchRepository).findLatestBatch({identifier: this.uploadRequest.streamIdentifier});
+        let latestVersionEntity = await this.socketContext.connection.getCustomRepository(VersionRepository).findLatestVersionByPackageId({packageId:packageEntity.id});
+
+        if(!latestVersionEntity) {
+            callback(new ErrorResponse("This package has no versions. Publish a version of this package first",SocketError.NOT_VALID));
+            return;
+        }
+
+        const packageFile = await this.packageFileStorage.readPackageFile(packageEntity.id, {
+            catalogSlug: this.uploadRequest.streamIdentifier.catalogSlug,
+            packageSlug: packageEntity.slug,
+            versionMajor: latestVersionEntity.majorVersion,
+            versionMinor: latestVersionEntity.minorVersion,
+            versionPatch: latestVersionEntity.patchVersion,
+        });
+
+
+        if(packageFile.schemas.find((s) => s.title === this.uploadRequest.streamIdentifier.schemaTitle) == null){ 
+            callback(new ErrorResponse("SCHEMA_NOT_VALID: This package does not have a schema with a title equal to the provdied streamSetSlug: " + this.uploadRequest.streamIdentifier.schemaTitle,SocketError.NOT_VALID));
+            return;
+        }
+
+
+        let offSet = 0;
 
         if(this.uploadRequest.newBatch || !batchEntity) {
             
@@ -86,30 +125,41 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
                 ...this.uploadRequest.streamIdentifier,
                 batch: batchEntity.batch
             }
+
+            offSet = batchEntity.lastOffset + 1;
+
         }
 
 
-
         this.paused = false;
+
+        // FIXME This will cause consistency issues because offset is updated before the data is actually written.
+        // Need to refactor the data storage service to pass through the records actually written, so that the 
+        // proper offset can be used. However that's tricky for Google Cloud Storage and S3 destinations - because
+        // they are not actually written until the stream is closed. 
         this.stream = new PassThrough({
-            objectMode: true
+            objectMode: true,
+            transform: (chunk:RecordContext, encoding, callback) => {
+
+                    if(chunk.offset && chunk.offset > this.lastSavedOffset) {
+                        this.lastSavedOffset = chunk.offset;
+                    }
+                callback(null, chunk);
+            }
         });
 
-        this.dataStorageService.writeBatch(packageEntity.id,this.batchIdentifier,this.stream)
+        this.dataStorageService.writeBatch(packageEntity.id,this.batchIdentifier,offSet,this.stream)
 
         this.socket.on(this.channelName, this.handleEvent);
         this.socket.on("disconnect",(reason) => this.stop("disconnect"));
         this.socket.on("connect_error", (reason) => this.stop("disconnect"));
 
-        callback(new StartUploadResponse(this.batchIdentifier));
+        callback(new StartUploadResponse(this.channelName, this.batchIdentifier));
 
     }
 
 
     async stop(serverOrClient: "server" | "client" | "disconnect") {
-
-
-        console.log("data upload stopped for " + JSON.stringify(this.uploadRequest.streamIdentifier) + " by " + this.socketContext.me.username + " because " +  serverOrClient);
 
         if(this.stopped) {
             return;
@@ -137,7 +187,22 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
             });
         });
 
-        // TODO send the client a final commit message
+        if(this.lastSavedOffset) {
+
+            let batchEntity = await this.socketContext.connection.getCustomRepository(DataBatchRepository).findLatestBatch({identifier: this.uploadRequest.streamIdentifier});
+
+            if(!batchEntity) {
+                throw new Error("BATCH_NOT_FOUND");
+            }
+
+            if(this.lastSavedOffset > batchEntity.lastOffset) {
+                batchEntity.lastOffset = this.lastSavedOffset;
+                this.socketContext.connection.getRepository(DataBatchEntity).save(batchEntity);
+            }
+
+        }
+
+
 
         this.removeLock(this.channelName);
 
