@@ -126,14 +126,14 @@ export class DataPMSink implements Sink {
             transform: async (records: RecordStreamContext[], encoding, callback) => {
                 socket.emit(
                     uploadChannelName,
-                    new UploadDataRequest(records.map((r) => r.recordContext)),
+                    new UploadDataRequest(records.map((r) => r.recordContext.record)),
                     (_response: StartUploadResponse) => {
                         callback(null, records[records.length - 1]); // TODO have the server emit last committed offset and use that here
                     }
                 );
             },
             final: async (callback) => {
-                console.log("Final claled on DataPMSink \n\n");
+                console.log("Final called on DataPMSink \n\n");
                 try {
                     await new TimeoutPromise<void>(5000, (resolve) => {
                         socket.emit(uploadChannelName, new UploadStopRequest(), (_response: UploadStopResponse) => {
