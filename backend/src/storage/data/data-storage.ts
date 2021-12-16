@@ -2,7 +2,7 @@ import { FileStorageService } from "../files/file-storage-service";
 import { BatchIdentifier } from "datapm-lib";
 import { Readable } from "stream";
 import { Gzip } from "minizlib";
-import { PackrStream } from "msgpackr";
+import { PackrStream, UnpackrStream } from "msgpackr";
 
 enum Prefixes {
     DATA = "data",
@@ -49,15 +49,16 @@ export class DataStorageService {
                     nextStartOffset = this.fileNameToStartOffset(files[index + 1]);
                 }
 
+
+                const fileStream = await this.fileStorageService.readFile(namespace,files[index]);
+
+                const dataFormatter = new UnpackrStream();
+                //const decompressor = new Gzip();
+
+                fileStream.pipe(dataFormatter);
+                //decompressor.pipe(dataFormatter);
+
                 index++;
-
-                const fileStream = await this.fileStorageService.readFile(namespace,files[index++]);
-
-                const dataFormatter = new PackrStream();
-                const decompressor = new Gzip();
-
-                fileStream.pipe(decompressor);
-                decompressor.pipe(dataFormatter);
 
                 return {
                     readable: dataFormatter,
@@ -82,15 +83,15 @@ export class DataStorageService {
 
         // TODO customize PackrStream??
         const dataFormatter = new PackrStream();
-        const compressor = new Gzip();
+        //const compressor = new Gzip();
 
-        dataFormatter.pipe(compressor);
+        //dataFormatter.pipe(compressor);
         stream.pipe(dataFormatter);
 
         return this.fileStorageService.writeFileFromStream(
             namespace,
             offsetStart + ".msgpack.gz",
-            compressor
+            dataFormatter
         );
     }
 

@@ -11,7 +11,7 @@ import {
     CreateCatalogDocument
 } from "./registry-client";
 import { createAnonymousClient, createAnonymousStreamingClient, createAuthenicatedStreamingClient, createUser } from "./test-utils";
-import { parsePackageFileJSON, loadPackageFileFromDisk, PublishMethod, SocketEvent, StartFetchRequest, ErrorResponse, StartFetchResponse, SocketResponseType, SocketError, StartUploadRequest, UploadDataRequest, UploadDataResponse, RecordContext, StartUploadResponse, UploadResponseType, UploadStopRequest, UploadStopResponse, SchemaInfoRequest, SchemaInfoResponse, OpenFetchChannelResponse, OpenFetchChannelRequest, DataSend, DataStop, FetchRequestType, SetStreamActiveBatchesResponse, SetStreamActiveBatchesRequest } from "datapm-lib";
+import { parsePackageFileJSON, loadPackageFileFromDisk, PublishMethod, SocketEvent, StartFetchRequest, ErrorResponse, StartFetchResponse, SocketResponseType, SocketError, StartUploadRequest, UploadDataRequest, UploadDataResponse, RecordContext, StartUploadResponse, UploadResponseType, UploadStopRequest, UploadStopResponse, SchemaInfoRequest, SchemaInfoResponse, OpenFetchChannelResponse, OpenFetchChannelRequest, DataSend, DataStop, FetchRequestType, SetStreamActiveBatchesResponse, SetStreamActiveBatchesRequest, FetchResponse, DataAcknowledge, DataStopAcknowledge } from "datapm-lib";
 import { describe, it } from "mocha";
 import request = require("superagent");
 import fs from 'fs';
@@ -489,12 +489,12 @@ describe("Data Store on Registry", async () => {
         expect(schemaInfoResponse.streams[0].highestOffset).equal(1);
 
         let response = await new Promise<OpenFetchChannelResponse | ErrorResponse>((resolve, reject) => {
-            userAStreamingClient.emit(SocketEvent.START_DATA_UPLOAD, new OpenFetchChannelRequest(schemaInfoResponse.streams[0].batchIdentifier),(response: OpenFetchChannelResponse) => {
+            userAStreamingClient.emit(SocketEvent.OPEN_FETCH_CHANNEL , new OpenFetchChannelRequest(schemaInfoResponse.streams[0].batchIdentifier),(response: OpenFetchChannelResponse) => {
                 resolve(response);
             });
         });
 
-        expect(response.responseType).equal(SocketResponseType.FETCH_DATA_RESPONSE);
+        expect(response.responseType).equal(SocketResponseType.OPEN_FETCH_CHANNEL_RESPONSE);
 
         const openChannelResponse:OpenFetchChannelResponse = response as OpenFetchChannelResponse;
 
@@ -502,16 +502,24 @@ describe("Data Store on Registry", async () => {
 
         const records:RecordContext[] = await new Promise<RecordContext[]>((resolve,reject) => {
 
-            const records:RecordContext[] = [];
+            let records:RecordContext[] = [];
 
-            userAStreamingClient.on(openChannelResponse.channelName,(event:DataSend | DataStop) => {
-            
+            userAStreamingClient.on(openChannelResponse.channelName,(event:DataSend | DataStop, callback:(response:FetchResponse | ErrorResponse) => void) => {
+        
                 if(event.requestType === FetchRequestType.DATA) {
-                    records.concat((event as DataSend).records);
+                    records = records.concat((event as DataSend).records);
+                    callback(new DataAcknowledge());
                 }
                 else if(event.requestType === FetchRequestType.STOP) {
+                    callback(new DataStopAcknowledge());
                     resolve(records);
+
+                } else {
+                    callback(new ErrorResponse("Unknown message type",SocketError.NOT_VALID));
+                    throw new Error("Unknown message type:" + JSON.stringify(event));
                 }
+
+
             });
     
             userAStreamingClient.emit(openChannelResponse.channelName, new StartFetchRequest(0),(response: StartFetchRequest | ErrorResponse) => {
@@ -528,8 +536,8 @@ describe("Data Store on Registry", async () => {
         expect(records[0].record.string).equal("Test string");
         expect(records[0].record.number).equal(3.1465);
         expect(records[0].record.boolean).equal(true);
-        expect(records[0].record.date).equal(recordZeroDate);
-        expect(records[0].record.dateTime).equal(recordZeroDateTime);
+        expect((records[0].record.date as Date).getTime()).equal(recordZeroDate.getTime());
+        expect((records[0].record.dateTime as Date).getTime()).equal(recordZeroDateTime.getTime());
         expect(records[0].record.stringNulls).equal(null);
 
         expect(records[1].schemaSlug).equal("simple");
@@ -537,8 +545,8 @@ describe("Data Store on Registry", async () => {
         expect(records[1].record.string).equal("Another string");
         expect(records[1].record.number).equal(42);
         expect(records[1].record.boolean).equal(true);
-        expect(records[1].record.date).equal(recordOneDate);
-        expect(records[1].record.dateTime).equal(recordOneDate);
+        expect((records[1].record.date as Date).getTime()).equal(recordOneDate.getTime());
+        expect((records[1].record.dateTime as Date).getTime()).equal(recordOneDate.getTime());
         expect(records[1].record.stringNulls).equal("not a null");
     
     });

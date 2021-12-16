@@ -38,7 +38,10 @@ export class DataBatchEntity extends EntityBaseModel {
     @Column()
     batch: number;
 
-    @Column({name: "lastoffset", type: "bigint"})
+    @Column({name: "lastoffset",  transformer: {
+        to: (value) => value,
+        from: (value) => parseInt(value),
+      }})
     lastOffset: number;
 
     @Column()

@@ -3,7 +3,7 @@ import { checkPackagePermission, RequestHandler } from "./SocketHandler";
 import SocketIO from 'socket.io';
 import { Permission } from "../generated/graphql";
 import { EventEmitter, Transform } from "stream";
-import { BatchIdentifier, BatchingTransform, DataAcknowledge, DataStop, DataStopAcknowledge, ErrorResponse, FetchRequest, FetchRequestType, FetchResponse, OpenFetchChannelRequest, OpenFetchChannelResponse, RecordContext, Request, Response, SocketError, SocketEvent, StartFetchRequest, StartFetchResponse } from "datapm-lib";
+import { BatchIdentifier, BatchingTransform, DataAcknowledge, DataSend, DataStop, DataStopAcknowledge, ErrorResponse, FetchRequest, FetchRequestType, FetchResponse, OpenFetchChannelRequest, OpenFetchChannelResponse, RecordContext, Request, Response, SocketError, SocketEvent, StartFetchRequest, StartFetchResponse } from "datapm-lib";
 import { PackageRepository } from "../repository/PackageRepository";
 import { DataStorageService, IterableDataFiles } from "../storage/data/data-storage";
 import { DataBatchRepository } from "../repository/DataBatchRepository";
@@ -33,8 +33,6 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
 
     private channelName:string;
 
-    private iterableDataStreams:IterableDataFiles;
-
     constructor(private openChannelRequest: OpenFetchChannelRequest, private socket: SocketIO.Socket, private socketContext:SocketContext) {
         super();
     }
@@ -51,7 +49,7 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
         await this.socketContext.connection.getCustomRepository(DataBatchRepository).findBatchOrFail(packageEntity.id,this.openChannelRequest.batchIdentifier.majorVersion,this.openChannelRequest.batchIdentifier.schemaTitle,this.openChannelRequest.batchIdentifier.streamSlug,this.openChannelRequest.batchIdentifier.batch);
 
 
-        this.socket.on(this.channelName,() => this.handleChannelEvents)
+        this.socket.on(this.channelName,this.handleChannelEvents)
 
 
         callback(new OpenFetchChannelResponse(this.channelName, this.openChannelRequest.batchIdentifier));
@@ -85,7 +83,7 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
             return;
         }
 
-        setTimeout(() => this.startSending(fetchRequest),1);
+        setTimeout(() => this.startSending(fetchRequest, packageEntity.id, this.openChannelRequest.batchIdentifier),1);
 
     }
 
@@ -105,18 +103,22 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
         } else if(reason === "disconnect") {
 
         } else if(reason === "server") {
-            this.socket.emit(this.channelName, new DataStop());
+            this.socket.emit(this.channelName, new DataStop(),(response:DataStopAcknowledge) => {
+                
+            });
         }
 
         
         
     }
 
-    async startSending(start:StartFetchRequest): Promise<void> {
+    async startSending(startRequest:StartFetchRequest, packageId: number, batchIdentifier: BatchIdentifier): Promise<void> {
+
+        const iterableDataStreams = await this.dataStorageService.readDataBatch(packageId, batchIdentifier, startRequest.offset);
 
         while(this.activeSending) {
 
-            const dataFile = await this.iterableDataStreams.getNext();
+            const dataFile = await iterableDataStreams.getNext();
 
             if(!dataFile) {
                 this.stop("server");
@@ -128,7 +130,7 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
                 const offsetFilterTransform = new Transform({
                     objectMode: true,
                     transform: (chunk: RecordContext, encoding, callback) => {
-                        if(chunk.offset && chunk.offset >= start.offset) {
+                        if(chunk.offset != undefined && chunk.offset >= startRequest.offset) {
                             callback(null, chunk);
                         } else {
                             callback();
@@ -140,7 +142,7 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
     
                 dataFile.readable.pipe(offsetFilterTransform);
                 offsetFilterTransform.pipe(batchTransform);
-                batchTransform.on("data", (data:RecordContext) => {
+                batchTransform.on("data", (data:RecordContext[]) => {
 
                     if(!this.activeSending) {
                         if(!batchTransform.destroyed)
@@ -149,7 +151,9 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
                     }
     
                     batchTransform.pause();
-                    this.socket.emit(this.channelName, data, (response: DataAcknowledge ) => {
+
+                    const dataSend = new DataSend(data);
+                    this.socket.emit(this.channelName, dataSend, (response: DataAcknowledge ) => {
                         batchTransform.resume();
                     });
     

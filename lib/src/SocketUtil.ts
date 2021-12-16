@@ -42,7 +42,6 @@ export enum SocketResponseType {
     SCHEMA_INFO_RESPONSE = "schemaInfoResponse",
     START_DATA_UPLOAD_RESPONSE = "startDataUploadResponse",
     SET_STREAM_ACTIVE_BATCHES = "setStreamActiveBatchesResponse",
-    FETCH_DATA_RESPONSE = "fetchDataResponse",
     OPEN_FETCH_CHANNEL_RESPONSE = "openFetchChannelResponse"
 }
 
