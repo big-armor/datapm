@@ -1,7 +1,7 @@
 import { FileStorageService } from "../files/file-storage-service";
 import { BatchIdentifier } from "datapm-lib";
 import { Readable } from "stream";
-import { Gzip } from "minizlib";
+import zlib  from "zlib";
 import { PackrStream, UnpackrStream } from "msgpackr";
 
 enum Prefixes {
@@ -53,10 +53,10 @@ export class DataStorageService {
                 const fileStream = await this.fileStorageService.readFile(namespace,files[index]);
 
                 const dataFormatter = new UnpackrStream();
-                //const decompressor = new Gzip();
+                const decompressor = zlib.createGunzip();
 
-                fileStream.pipe(dataFormatter);
-                //decompressor.pipe(dataFormatter);
+                fileStream.pipe(decompressor);
+                decompressor.pipe(dataFormatter);
 
                 index++;
 
@@ -83,15 +83,15 @@ export class DataStorageService {
 
         // TODO customize PackrStream??
         const dataFormatter = new PackrStream();
-        //const compressor = new Gzip();
+        const compressor = zlib.createGzip();
 
-        //dataFormatter.pipe(compressor);
+        dataFormatter.pipe(compressor);
         stream.pipe(dataFormatter);
 
         return this.fileStorageService.writeFileFromStream(
             namespace,
             offsetStart + ".msgpack.gz",
-            dataFormatter
+            compressor
         );
     }
 
