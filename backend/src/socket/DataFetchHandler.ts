@@ -3,7 +3,7 @@ import { checkPackagePermission, RequestHandler } from "./SocketHandler";
 import SocketIO from 'socket.io';
 import { Permission } from "../generated/graphql";
 import { EventEmitter, Transform } from "stream";
-import { BatchIdentifier, BatchingTransform, DataAcknowledge, DataSend, DataStop, DataStopAcknowledge, ErrorResponse, FetchRequest, FetchRequestType, FetchResponse, OpenFetchChannelRequest, OpenFetchChannelResponse, RecordContext, Request, Response, SocketError, SocketEvent, StartFetchRequest, StartFetchResponse } from "datapm-lib";
+import { BatchIdentifier, BatchingTransform, DataAcknowledge, DataSend, DataStop, DataStopAcknowledge, ErrorResponse, FetchRequest, FetchRequestType, FetchResponse, OpenFetchChannelRequest, OpenFetchChannelResponse, RecordContext, Request, Response, SocketError, SocketEvent, StartFetchRequest, DPMRecord, DataRecordContext } from "datapm-lib";
 import { PackageRepository } from "../repository/PackageRepository";
 import { DataStorageService, IterableDataFiles } from "../storage/data/data-storage";
 import { DataBatchRepository } from "../repository/DataBatchRepository";
@@ -142,7 +142,7 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
     
                 dataFile.readable.pipe(offsetFilterTransform);
                 offsetFilterTransform.pipe(batchTransform);
-                batchTransform.on("data", (data:RecordContext[]) => {
+                batchTransform.on("data", (data:DataRecordContext[]) => {
 
                     if(!this.activeSending) {
                         if(!batchTransform.destroyed)

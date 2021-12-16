@@ -3,7 +3,7 @@ import { DistributedLockingService } from "../service/distributed-locking-servic
 import SocketIO from 'socket.io';
 import { checkPackagePermission, RequestHandler } from "./SocketHandler";
 import { Permission } from "../generated/graphql";
-import { BatchIdentifier, ErrorResponse, RecordContext, Response, SocketError, SocketEvent,  StartUploadRequest,  StartUploadResponse,  StreamIdentifier, TimeoutPromise, UploadDataRequest, UploadDataResponse, UploadRequest, UploadRequestType, UploadResponse, UploadStopRequest, UploadStopResponse } from "datapm-lib";
+import { BatchIdentifier, DataRecordContext, DPMRecord, ErrorResponse, RecordContext, Response, SocketError, SocketEvent,  StartUploadRequest,  StartUploadResponse,  StreamIdentifier, TimeoutPromise, UploadDataRequest, UploadDataResponse, UploadRequest, UploadRequestType, UploadResponse, UploadStopRequest, UploadStopResponse } from "datapm-lib";
 import EventEmitter from "events";
 import { PassThrough } from "stream";
 import { PackageRepository } from "../repository/PackageRepository";
@@ -139,12 +139,14 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
         // they are not actually written until the stream is closed. 
         this.stream = new PassThrough({
             objectMode: true,
-            transform: (chunk:RecordContext, encoding, callback) => {
+            transform: (chunk:DPMRecord, encoding, callback) => {
 
-                    if(chunk.offset && chunk.offset > this.lastSavedOffset) {
-                        this.lastSavedOffset = chunk.offset;
-                    }
-                callback(null, chunk);
+                this.lastSavedOffset = offSet;
+                const recordContext:DataRecordContext = {
+                    offset: offSet++,
+                    record: chunk,
+                }
+                callback(null, recordContext);
             }
         });
 

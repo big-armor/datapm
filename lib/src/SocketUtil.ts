@@ -1,6 +1,6 @@
 import { SchemaIdentifier } from "./main";
 import { StreamIdentifier } from "./PackageFile-v0.7.0";
-import { RecordContext } from "./PackageUtil";
+import { DPMRecord } from "./PackageUtil";
 
 /** This identifiest a single batch upload (which can be a series of appended streams) to the
  * data registry service. This class is in SocketUtil.ts because it is specifically not part of the
@@ -144,7 +144,7 @@ export class UploadDataRequest implements UploadRequest {
     requestType = UploadRequestType.UPLOAD_DATA;
 
     // eslint-disable-next-line no-useless-constructor
-    constructor(public records: RecordContext[]) {}
+    constructor(public records: DPMRecord[]) {}
 }
 
 /** Sent by the server to the client to confirm data having been uploaded. */
@@ -220,11 +220,15 @@ export class StartFetchResponse implements FetchResponse {
     responseType = FetchResponseType.START_ACKNOWLEDGE;
 }
 
+export interface DataRecordContext {
+    record: DPMRecord;
+    offset: number;
+}
 export class DataSend implements FetchRequest {
     requestType = FetchRequestType.DATA;
 
     // eslint-disable-next-line no-useless-constructor
-    constructor(public records: RecordContext[]) {}
+    constructor(public records: DataRecordContext[]) {}
 }
 
 export class DataAcknowledge implements FetchResponse {
