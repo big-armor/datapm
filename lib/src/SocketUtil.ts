@@ -14,6 +14,11 @@ export interface BatchIdentifier extends StreamIdentifier {
     batch: number;
 }
 
+export interface DataRecordContext {
+    record: DPMRecord;
+    offset: number;
+}
+
 /**
  * TOP LEVEL EVENTS - These are generally sent by the client to
  * request that the server start a process. Process specific events
@@ -144,7 +149,7 @@ export class UploadDataRequest implements UploadRequest {
     requestType = UploadRequestType.UPLOAD_DATA;
 
     // eslint-disable-next-line no-useless-constructor
-    constructor(public records: DPMRecord[]) {}
+    constructor(public records: DataRecordContext[]) {}
 }
 
 /** Sent by the server to the client to confirm data having been uploaded. */
@@ -220,10 +225,6 @@ export class StartFetchResponse implements FetchResponse {
     responseType = FetchResponseType.START_ACKNOWLEDGE;
 }
 
-export interface DataRecordContext {
-    record: DPMRecord;
-    offset: number;
-}
 export class DataSend implements FetchRequest {
     requestType = FetchRequestType.DATA;
 

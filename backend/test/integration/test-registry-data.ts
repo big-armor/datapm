@@ -331,22 +331,29 @@ describe("Data Store on Registry", async () => {
         expect(startResponse.batchIdentifier.streamSlug).equal("simple");
         expect(startResponse.batchIdentifier.batch).equal(1);
 
-        const records:DPMRecord[] = [
+        const records:DataRecordContext[] = [
+
             {
-                string: "Test string",
-                number: 3.1465,
-                boolean: true,
-                date: recordZeroDate,
-                dateTime: recordZeroDateTime,
-                stringNulls: null
+                offset:0,
+                record:{
+                    string: "Test string",
+                    number: 3.1465,
+                    boolean: true,
+                    date: recordZeroDate,
+                    dateTime: recordZeroDateTime,
+                    stringNulls: null
+                }
             },
             {
-                string: "Another string",
-                number: 42,
-                boolean: true,
-                date: recordOneDate,
-                dateTime: recordOneDateTime,
-                stringNulls: "not a null"
+                offset:1,
+                record: {
+                    string: "Another string",
+                    number: 42,
+                    boolean: true,
+                    date: recordOneDate,
+                    dateTime: recordOneDateTime,
+                    stringNulls: "not a null"
+                }
             }
         ];
 
@@ -734,14 +741,17 @@ describe("Data Store on Registry", async () => {
 
         const startResponse:StartUploadResponse = response as StartUploadResponse;
 
-        const records:DPMRecord[] = [
+        const records:DataRecordContext[] = [
             {
-                string: "Third record",
-                number: -1,
-                boolean: false,
-                date: recordZeroDate,
-                dateTime: recordZeroDateTime,
-                stringNulls: "still not null"
+                offset: 2,
+                record: {
+                    string: "Third record",
+                    number: -1,
+                    boolean: false,
+                    date: recordZeroDate,
+                    dateTime: recordZeroDateTime,
+                    stringNulls: "still not null"
+                }
             }
         ];
 

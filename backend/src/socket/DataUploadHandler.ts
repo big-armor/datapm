@@ -62,7 +62,7 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
     fileName:string;
     paused:boolean = false;
     recordCount:number = 0;
-    lastSavedOffset = 0;
+    lastObservedOffset = -1;
 
     private batchIdentifier:BatchIdentifier;
 
@@ -108,10 +108,11 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
         }
 
 
-        let offSet = 0;
 
         if(this.uploadRequest.newBatch || !batchEntity) {
             
+            this.lastObservedOffset = -1;
+
             this.batchIdentifier = {
                 ... this.uploadRequest.streamIdentifier,
                 batch: batchEntity ? batchEntity.batch + 1 : 1
@@ -126,7 +127,7 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
                 batch: batchEntity.batch
             }
 
-            offSet = batchEntity.lastOffset + 1;
+            this.lastObservedOffset = batchEntity.lastOffset;
 
         }
 
@@ -139,18 +140,19 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
         // they are not actually written until the stream is closed. 
         this.stream = new PassThrough({
             objectMode: true,
-            transform: (chunk:DPMRecord, encoding, callback) => {
+            transform: (chunk:DataRecordContext, encoding, callback) => {
 
-                this.lastSavedOffset = offSet;
-                const recordContext:DataRecordContext = {
-                    offset: offSet++,
-                    record: chunk,
+                if(chunk.offset <= this.lastObservedOffset) {
+                    callback(new Error("Offset must be greater than the last saved offset"));
+                    return;    
                 }
-                callback(null, recordContext);
+
+                this.lastObservedOffset = chunk.offset;
+                callback(null, chunk);
             }
         });
 
-        this.dataStorageService.writeBatch(packageEntity.id,this.batchIdentifier,offSet,this.stream)
+        this.dataStorageService.writeBatch(packageEntity.id,this.batchIdentifier,this.lastObservedOffset,this.stream)
 
         this.socket.on(this.channelName, this.handleEvent);
         this.socket.on("disconnect",(reason) => this.stop("disconnect"));
@@ -189,7 +191,7 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
             });
         });
 
-        if(this.lastSavedOffset) {
+        if(this.lastObservedOffset) {
 
             let batchEntity = await this.socketContext.connection.getCustomRepository(DataBatchRepository).findLatestBatch({identifier: this.uploadRequest.streamIdentifier});
 
@@ -197,8 +199,8 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
                 throw new Error("BATCH_NOT_FOUND");
             }
 
-            if(this.lastSavedOffset > batchEntity.lastOffset) {
-                batchEntity.lastOffset = this.lastSavedOffset;
+            if(this.lastObservedOffset > batchEntity.lastOffset) {
+                batchEntity.lastOffset = this.lastObservedOffset;
                 this.socketContext.connection.getRepository(DataBatchEntity).save(batchEntity);
             }
 

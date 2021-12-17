@@ -121,12 +121,21 @@ export class DataPMSink implements Sink {
             objectMode: true
         });
 
+        let lastOffset = 0;
         const writableTransform = new Transform({
             objectMode: true,
             transform: async (records: RecordStreamContext[], encoding, callback) => {
                 socket.emit(
                     uploadChannelName,
-                    new UploadDataRequest(records.map((r) => r.recordContext.record)),
+                    new UploadDataRequest(
+                        records.map((r) => {
+                            lastOffset = r.recordContext.offset !== undefined ? r.recordContext.offset : lastOffset + 1;
+                            return {
+                                offset: lastOffset,
+                                record: r.recordContext.record
+                            };
+                        })
+                    ),
                     (_response: StartUploadResponse) => {
                         callback(null, records[records.length - 1]); // TODO have the server emit last committed offset and use that here
                     }
