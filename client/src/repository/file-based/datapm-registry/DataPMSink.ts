@@ -142,7 +142,7 @@ export class DataPMSink implements Sink {
                 );
             },
             final: async (callback) => {
-                console.log("Final called on DataPMSink \n\n");
+                // console.log("Final called on DataPMSink \n\n");
                 try {
                     await new TimeoutPromise<void>(5000, (resolve) => {
                         socket.emit(uploadChannelName, new UploadStopRequest(), (_response: UploadStopResponse) => {
@@ -192,12 +192,12 @@ export class DataPMSink implements Sink {
         });
 
         socket.on("connect_error", (error: unknown) => {
-            console.log("connect_error", error);
+            // console.log("connect_error", error);
             // TODO Handle error
         });
 
         socket.once("disconnect", (reason: string) => {
-            console.log("\n\ndisconnect: " + reason);
+            // console.log("\n\ndisconnect: " + reason);
         });
 
         socket.on(uploadChannelName, (request: UploadRequest, callback: (uploadResponse: UploadResponse) => void) => {
@@ -280,12 +280,12 @@ export class DataPMSink implements Sink {
                 });
             });
             socket.once("connect_error", (error: unknown) => {
-                console.log("connect_error", error);
+                // console.log("connect_error", error);
                 // TODO Handle error
             });
 
             socket.once("disconnect", (reason: string) => {
-                console.log("\n\ndisconnect: " + reason);
+                // console.log("\n\ndisconnect: " + reason);
             });
         });
     }

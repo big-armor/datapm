@@ -152,7 +152,7 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
             }
         });
 
-        this.dataStorageService.writeBatch(packageEntity.id,this.batchIdentifier,this.lastObservedOffset,this.stream)
+        this.dataStorageService.writeBatch(packageEntity.id,this.batchIdentifier,this.lastObservedOffset + 1,this.stream)
 
         this.socket.on(this.channelName, this.handleEvent);
         this.socket.on("disconnect",(reason) => this.stop("disconnect"));
