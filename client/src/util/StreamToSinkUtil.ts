@@ -1,9 +1,18 @@
-import { SinkState, SinkStateKey, DPMConfiguration, PackageFile, Schema, UpdateMethod } from "datapm-lib";
+import {
+    SinkState,
+    SinkStateKey,
+    DPMConfiguration,
+    PackageFile,
+    Schema,
+    UpdateMethod,
+    RecordStreamContext,
+    Source
+} from "datapm-lib";
 import ON_DEATH from "death";
 import { Readable, Transform, Writable } from "stream";
 import { Maybe } from "../util/Maybe";
 import { Sink, SinkSupportedStreamOptions, WritableWithContext } from "../repository/Sink";
-import { RecordStreamContext, StreamSetPreview } from "../repository/Source";
+import { StreamSetPreview } from "../repository/Source";
 import { Parameter, ParameterType } from "./parameters/Parameter";
 import {
     checkSchemaDataTypeConflicts,
@@ -114,6 +123,7 @@ export async function fetch(
         prompt: (parameters: Parameter[]) => Promise<void>;
     },
     packageFile: PackageFile,
+    source: Source,
     streamSetPreview: StreamSetPreview,
     sink: Sink,
     sinkConnectionConfiguration: DPMConfiguration,
@@ -229,6 +239,7 @@ export async function fetch(
     });
 
     const sourceStream: Readable = await streamRecords(
+        source,
         streamSetPreview,
         {
             startingStream: (

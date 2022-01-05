@@ -2,7 +2,7 @@ import { EntityRepository, EntityManager } from "typeorm";
 import { PackageRepository } from "./PackageRepository";
 import { Maybe } from "graphql/jsutils/Maybe";
 import { DataBatchEntity } from "../entity/DataBatchEntity";
-import { StreamIdentifier, BatchIdentifier } from "datapm-lib";
+import { SchemaUploadStreamIdentifier, BatchUploadIdentifier } from "datapm-lib";
 import { DataStorageService } from "../storage/data/data-storage";
 
 @EntityRepository()
@@ -73,7 +73,7 @@ export class DataBatchRepository {
             .getOne();
     }
 
-    async save(userId: number, identifier: BatchIdentifier) {
+    async save(userId: number, identifier: BatchUploadIdentifier) {
         return await this.manager.nestedTransaction(async (transaction) => {
 
             const packageEntity = await transaction.getCustomRepository(PackageRepository).findPackageOrFail({
@@ -106,7 +106,7 @@ export class DataBatchRepository {
         identifier,
         relations = []
     }: {
-        identifier: StreamIdentifier;
+        identifier: SchemaUploadStreamIdentifier;
         relations?: string[];
     }): Promise<Maybe<DataBatchEntity>> {
         const ALIAS = "findLatestBatch";
@@ -135,7 +135,7 @@ export class DataBatchRepository {
         identifier,
         relations = []
     }: {
-        identifier: StreamIdentifier;
+        identifier: SchemaUploadStreamIdentifier;
         relations?: string[];
     }): Promise<Maybe<DataBatchEntity>> {
         const ALIAS = "findDefault";
@@ -161,7 +161,7 @@ export class DataBatchRepository {
         identifier,
         relations = []
     }: {
-        identifier: StreamIdentifier;
+        identifier: SchemaUploadStreamIdentifier;
         relations?: string[];
     }): Promise<DataBatchEntity> {
         
@@ -179,7 +179,7 @@ export class DataBatchRepository {
         identifier,
         relations = []
     }: {
-        identifier: BatchIdentifier;
+        identifier: BatchUploadIdentifier;
         relations?: string[];
     }): Promise<DataBatchEntity> {
         let packageEntity = await this.manager.getCustomRepository(PackageRepository).findOrFail({ identifier });
@@ -208,7 +208,7 @@ export class DataBatchRepository {
         streamIdentifier,
         relations = []
     }: {
-        streamIdentifier: StreamIdentifier;
+        streamIdentifier: SchemaUploadStreamIdentifier;
         relations?: string[];
     }): Promise<DataBatchEntity[]> {
         const ALIAS = "batchesByPackageVersion";
@@ -235,7 +235,7 @@ export class DataBatchRepository {
     }
 
     async findBatchesWithLimitAndOffset(
-        streamIdentifier: StreamIdentifier,
+        streamIdentifier: SchemaUploadStreamIdentifier,
         offset: number,
         limit: number,
         relations?: string[]
@@ -270,7 +270,7 @@ export class DataBatchRepository {
         if (batches.length == 0) return;
 
         for (const batch of batches) {
-            const batchIdentifier: BatchIdentifier = {
+            const batchIdentifier: BatchUploadIdentifier = {
                 registryUrl: process.env.REGISTRY_URL as string,
                 catalogSlug: batch.package.catalog.slug,
                 packageSlug: batch.package.slug,

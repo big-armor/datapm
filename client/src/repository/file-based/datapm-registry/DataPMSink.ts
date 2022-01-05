@@ -8,7 +8,7 @@ import {
     SocketEvent,
     UpdateMethod,
     SocketResponseType,
-    StreamIdentifier,
+    SchemaUploadStreamIdentifier,
     UploadRequest,
     UploadRequestType,
     UploadResponse,
@@ -18,9 +18,12 @@ import {
     StartUploadResponse,
     UploadStopRequest,
     UploadStopResponse,
-    BatchIdentifier,
+    BatchUploadIdentifier,
     SetStreamActiveBatchesRequest,
-    SetStreamActiveBatchesResponse
+    SetStreamActiveBatchesResponse,
+    SchemaInfoResponse,
+    SchemaInfoRequest,
+    RecordStreamContext
 } from "datapm-lib";
 import { Maybe } from "../../../util/Maybe";
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
@@ -31,7 +34,6 @@ import { Transform } from "stream";
 import { io, Socket } from "socket.io-client";
 import { getRegistryConfig } from "../../../util/ConfigUtil";
 import { PausingTransform } from "../../../transforms/PauseableTransform";
-import { RecordStreamContext } from "../../Source";
 
 export class DataPMSink implements Sink {
     isStronglyTyped(_configuration: DPMConfiguration): boolean | Promise<boolean> {
@@ -78,6 +80,17 @@ export class DataPMSink implements Sink {
             ];
         }
 
+        if (configuration.streamSlug == null) {
+            return [
+                {
+                    type: ParameterType.Text,
+                    message: "Stream Slug?",
+                    name: "streamSlug",
+                    configuration: configuration
+                }
+            ];
+        }
+
         return [];
     }
 
@@ -102,13 +115,13 @@ export class DataPMSink implements Sink {
             throw new Error("MISSING_CONNECITON_CONFIG_VALUE: url");
         }
 
-        const streamIdentifier: StreamIdentifier = {
+        const streamIdentifier: SchemaUploadStreamIdentifier = {
             registryUrl: connectionConfiguration.url,
             catalogSlug: configuration.catalogSlug as string,
             packageSlug: configuration.packageSlug as string,
             majorVersion: configuration.majorVersion as number,
             schemaTitle: schema.title as string,
-            streamSlug: schema.title as string // TODO should this be the user's name? So that it could be removed by user?
+            streamSlug: configuration.streamSlug as string
         };
 
         const socket = this.connectSocket(connectionConfiguration, credentialsConfiguration);
@@ -167,7 +180,7 @@ export class DataPMSink implements Sink {
             // console.log("Socket event", event);
         });
 
-        let batchIdentifier: BatchIdentifier;
+        let batchIdentifier: BatchUploadIdentifier;
 
         await new TimeoutPromise<void>(5000, (resolve) => {
             socket.once("connect", async () => {
@@ -191,12 +204,12 @@ export class DataPMSink implements Sink {
             });
         });
 
-        socket.on("connect_error", (error: unknown) => {
+        socket.on("connect_error", (_error: unknown) => {
             // console.log("connect_error", error);
             // TODO Handle error
         });
 
-        socket.once("disconnect", (reason: string) => {
+        socket.once("disconnect", (_reason: string) => {
             // console.log("\n\ndisconnect: " + reason);
         });
 
@@ -258,7 +271,9 @@ export class DataPMSink implements Sink {
     ): Promise<void> {
         const socket = this.connectSocket(connectionConfiguration, credentialsConfiguration);
 
-        const request = new SetStreamActiveBatchesRequest(commitKeys.map((c) => c.batchIdentifier as BatchIdentifier));
+        const request = new SetStreamActiveBatchesRequest(
+            commitKeys.map((c) => c.batchIdentifier as BatchUploadIdentifier)
+        );
 
         await new Promise<void>((resolve, reject) => {
             socket.on("connect", async () => {
@@ -279,12 +294,12 @@ export class DataPMSink implements Sink {
                     );
                 });
             });
-            socket.once("connect_error", (error: unknown) => {
+            socket.once("connect_error", (_error: unknown) => {
                 // console.log("connect_error", error);
                 // TODO Handle error
             });
 
-            socket.once("disconnect", (reason: string) => {
+            socket.once("disconnect", (_reason: string) => {
                 // console.log("\n\ndisconnect: " + reason);
             });
         });
@@ -312,11 +327,43 @@ export class DataPMSink implements Sink {
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
-        _sinkStateKey: SinkStateKey
+        sinkStateKey: SinkStateKey
     ): Promise<Maybe<SinkState>> {
-        return null;
+        const socket = this.connectSocket(connectionConfiguration, credentialsConfiguration);
 
-        // TODO implement server side sink state
+        const response = await new Promise<SchemaInfoResponse[] | ErrorResponse>((resolve) => {
+            socket.emit(
+                SocketEvent.SCHEMA_INFO_REQUEST,
+                new SchemaInfoRequest({
+                    catalogSlug: sinkStateKey.catalogSlug,
+                    packageSlug: sinkStateKey.packageSlug,
+                    majorVersion: sinkStateKey.packageMajorVersion,
+                    registryUrl: connectionConfiguration.url as string,
+                    schemaTitle: "simple"
+                }),
+                (response: SchemaInfoResponse | ErrorResponse) => {
+                    resolve(response);
+                }
+            );
+        });
+
+        return {
+            packageVersion: "1.0.0", // FIX ME - does this property need to be present, or should it just be majorVersion?
+            timestamp: new Date(),
+            streamSets: {
+                simple: {
+                    streamStates: {
+                        stream1: {
+                            schemaStates: {
+                                simple: {
+                                    lastOffset: 0
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        };
     }
 
     getType(): string {

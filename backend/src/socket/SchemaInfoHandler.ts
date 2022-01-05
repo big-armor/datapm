@@ -17,7 +17,7 @@ export module SchemaInfoHandler {
 
         return {
             identifier: streamInfo.identifier,
-            streams: dataBatches.map(batch => {
+            batches: dataBatches.map(batch => {
                 return {
                     batchIdentifier: {
                         ...streamInfo.identifier,

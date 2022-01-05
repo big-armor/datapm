@@ -1,8 +1,7 @@
 import avro from "avsc";
-import { DPMConfiguration, PackageFile, Properties, Schema, UpdateMethod } from "datapm-lib";
+import { DPMConfiguration, PackageFile, Properties, Schema, UpdateMethod, RecordStreamContext } from "datapm-lib";
 import { JSONSchema7TypeName } from "json-schema";
 import { Transform, TransformCallback, Writable } from "stream";
-import { RecordStreamContext } from "../../Source";
 import { convertValueByValueType } from "../../../transforms/StatsTransform";
 import { Parameter } from "../../../util/parameters/Parameter";
 import { RecordSerializedContext } from "../AbstractFileSink";

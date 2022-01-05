@@ -7,7 +7,8 @@ import {
     Schema,
     Source,
     RecordContext,
-    BatchingTransform
+    BatchingTransform,
+    RecordStreamContext
 } from "datapm-lib";
 import moment from "moment";
 import numeral from "numeral";
@@ -19,7 +20,6 @@ import {
     StreamAndTransforms,
     StreamSetPreview,
     ExtendedJSONSchema7TypeName,
-    RecordStreamContext,
     StreamSummary
 } from "../repository/Source";
 import { convertValueByValueType, discoverValueType } from "../transforms/StatsTransform";
@@ -141,6 +141,7 @@ export async function inspectSourceConnection(
 }
 
 export async function streamRecords(
+    source: Source,
     streamSetPreview: StreamSetPreview,
     context: RecordStreamEventContext,
     schemas: Schema[],
@@ -192,6 +193,7 @@ export async function streamRecords(
         transform = createStreamAndTransformPipeLine(
             currentStreamSummary,
             context,
+            source,
             streamSetPreview,
             streamState,
             currentStreamAndTransform,
@@ -231,6 +233,7 @@ export async function streamRecords(
 function createStreamAndTransformPipeLine(
     streamSummary: StreamSummary,
     context: RecordStreamEventContext,
+    source: Source,
     streamSetPreview: StreamSetPreview,
     streamState: StreamState | undefined,
     streamAndTransforms: StreamAndTransforms,
@@ -300,6 +303,7 @@ function createStreamAndTransformPipeLine(
             for (const chunk of chunks) {
                 const recordStreamContext: RecordStreamContext = {
                     recordContext: chunk,
+                    sourceType: source.type,
                     streamSetSlug: streamSetPreview.slug,
                     streamSlug: streamSummary.name
                 };

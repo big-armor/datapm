@@ -3,12 +3,12 @@ import { checkPackagePermission, RequestHandler } from "./SocketHandler";
 import SocketIO from 'socket.io';
 import { Permission } from "../generated/graphql";
 import { EventEmitter, Transform } from "stream";
-import { BatchIdentifier, BatchingTransform, DataAcknowledge, DataSend, DataStop, DataStopAcknowledge, ErrorResponse, FetchRequest, FetchRequestType, FetchResponse, OpenFetchChannelRequest, OpenFetchChannelResponse, RecordContext, Request, Response, SocketError, SocketEvent, StartFetchRequest, DPMRecord, DataRecordContext } from "datapm-lib";
+import {BatchUploadIdentifier, BatchingTransform, DataAcknowledge, DataSend, DataStop, DataStopAcknowledge, ErrorResponse, FetchRequest, FetchRequestType, FetchResponse, OpenFetchChannelRequest, OpenFetchChannelResponse, RecordContext, Request, Response, SocketError, SocketEvent, StartFetchRequest, DPMRecord, DataRecordContext } from "datapm-lib";
 import { PackageRepository } from "../repository/PackageRepository";
 import { DataStorageService, IterableDataFiles } from "../storage/data/data-storage";
 import { DataBatchRepository } from "../repository/DataBatchRepository";
 
-export function batchIdentifierToChannelName(batchIdentifier: BatchIdentifier): string {
+export function batchIdentifierToChannelName(batchIdentifier:BatchUploadIdentifier): string {
     return (
         batchIdentifier.catalogSlug +
         "/" +
@@ -112,7 +112,7 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
         
     }
 
-    async startSending(startRequest:StartFetchRequest, packageId: number, batchIdentifier: BatchIdentifier): Promise<void> {
+    async startSending(startRequest:StartFetchRequest, packageId: number, batchIdentifier:BatchUploadIdentifier): Promise<void> {
 
         const iterableDataStreams = await this.dataStorageService.readDataBatch(packageId, batchIdentifier, startRequest.offset);
 

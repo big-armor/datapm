@@ -1,4 +1,4 @@
-import {Response, ErrorResponse, SocketError, SocketEvent, StreamIdentifier, StartUploadRequest, StartUploadResponse, SchemaInfoRequest, FetchRequest, SetStreamActiveBatchesRequest, StartFetchRequest, OpenFetchChannelRequest } from 'datapm-lib';
+import {Response, ErrorResponse, SocketError, SocketEvent,SchemaUploadStreamIdentifier, StartUploadRequest, StartUploadResponse, SchemaInfoRequest, FetchRequest, SetStreamActiveBatchesRequest, StartFetchRequest, OpenFetchChannelRequest, SchemaIdentifier } from 'datapm-lib';
 import EventEmitter from 'events';
 import SocketIO from 'socket.io';
 import { AuthenticatedSocketContext, SocketContext } from '../context';
@@ -138,7 +138,7 @@ export class SocketConnectionHandler {
 
 }
 
-export async function checkPackagePermission(socket: SocketIO.Socket, socketContext: SocketContext, callback: (response:Response) => void, schemaIdentifier:StreamIdentifier, permission:Permission):Promise<boolean> {
+export async function checkPackagePermission(socket: SocketIO.Socket, socketContext: SocketContext, callback: (response:Response) => void, schemaIdentifier:SchemaIdentifier, permission:Permission):Promise<boolean> {
 
     let packageEntity: PackageEntity;
     try {

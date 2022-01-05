@@ -23,6 +23,9 @@ export interface WritableWithContext {
     /** A string such as a URL, or file location, describing where the sink is writing records. For user informational purposes only. */
     outputLocation: string;
 
+    /** The last offset from previous writes, if this sink supports APPEND_ONLY_LOG mode */
+    lastOffset?: number;
+
     /** Optionally return a function that will be called after the writable is closed. This will return a set of keys
      * that can later be used to "commit the transaction" of this writable along with other writables at the same time.
      * See the #commitAfterWrites() method for more info

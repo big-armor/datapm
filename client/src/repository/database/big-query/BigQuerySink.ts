@@ -6,7 +6,8 @@ import {
     DPMRecordValue,
     PackageFile,
     Schema,
-    UpdateMethod
+    UpdateMethod,
+    RecordStreamContext
 } from "datapm-lib";
 import fs from "fs";
 import { BigQuery, TableField } from "@google-cloud/bigquery";
@@ -14,7 +15,7 @@ import moment from "moment";
 import { SemVer } from "semver";
 import { Transform } from "stream";
 import { Maybe } from "../../../util/Maybe";
-import { ExtendedJSONSchema7TypeName, RecordStreamContext } from "../../Source";
+import { ExtendedJSONSchema7TypeName } from "../../Source";
 import { convertValueByValueType, discoverValueType } from "../../../transforms/StatsTransform";
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
 import { Sink, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";

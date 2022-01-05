@@ -382,6 +382,7 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
                         }
                     },
                     packageFile,
+                    fetchPreparation.source,
                     fetchPreparation.streamSetPreview,
                     sink,
                     sinkConnectionConfiguration,

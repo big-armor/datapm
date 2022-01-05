@@ -1,5 +1,5 @@
 import { FileStorageService } from "../files/file-storage-service";
-import { BatchIdentifier } from "datapm-lib";
+import {BatchUploadIdentifier } from "datapm-lib";
 import { Readable } from "stream";
 import zlib  from "zlib";
 import { PackrStream, UnpackrStream } from "msgpackr";
@@ -22,7 +22,7 @@ export class DataStorageService {
      * @param identifier The batch identifier
      * @param offsetStart The offset to start reading from (this should be one more than the last end offset)
      */
-    public async readDataBatch(packageId: number, identifier: BatchIdentifier, startOffset?:number): Promise<IterableDataFiles> {
+    public async readDataBatch(packageId: number, identifier:BatchUploadIdentifier, startOffset?:number): Promise<IterableDataFiles> {
 
         const namespace = this.getBatchNamespace(packageId, identifier);
 
@@ -72,7 +72,7 @@ export class DataStorageService {
     /** Stream should be a stream of RecordContext */
     public async writeBatch(
         packageId: number,
-        identifier: BatchIdentifier,
+        identifier:BatchUploadIdentifier,
         offsetStart: number,
         stream: Readable
     ): Promise<void> {
@@ -95,7 +95,7 @@ export class DataStorageService {
         );
     }
 
-    deleteBatch(packageId: number, identifier: BatchIdentifier) {
+    deleteBatch(packageId: number, identifier:BatchUploadIdentifier) {
 
         const namespace = this.getBatchNamespace(packageId, identifier);
 
@@ -104,7 +104,7 @@ export class DataStorageService {
         );
     }
 
-    private getBatchNamespace(packageId: number, identifier: BatchIdentifier): string[] {
+    private getBatchNamespace(packageId: number, identifier:BatchUploadIdentifier): string[] {
         return [
             Prefixes.DATA ,
             packageId.toString() ,
@@ -115,7 +115,7 @@ export class DataStorageService {
         ];
     }
 
-    private async getBatchFiles(packageId: number, identifier: BatchIdentifier): Promise<string[]> {
+    private async getBatchFiles(packageId: number, identifier:BatchUploadIdentifier): Promise<string[]> {
         const namespace = this.getBatchNamespace(packageId, identifier);
         const files = await this.fileStorageService.listFiles(
             namespace

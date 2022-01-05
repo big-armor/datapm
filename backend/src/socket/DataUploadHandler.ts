@@ -3,7 +3,7 @@ import { DistributedLockingService } from "../service/distributed-locking-servic
 import SocketIO from 'socket.io';
 import { checkPackagePermission, RequestHandler } from "./SocketHandler";
 import { Permission } from "../generated/graphql";
-import { BatchIdentifier, DataRecordContext, DPMRecord, ErrorResponse, RecordContext, Response, SocketError, SocketEvent,  StartUploadRequest,  StartUploadResponse,  StreamIdentifier, TimeoutPromise, UploadDataRequest, UploadDataResponse, UploadRequest, UploadRequestType, UploadResponse, UploadStopRequest, UploadStopResponse } from "datapm-lib";
+import { BatchUploadIdentifier, DataRecordContext, DPMRecord, ErrorResponse, RecordContext, Response, SocketError, SocketEvent,  StartUploadRequest,  StartUploadResponse,  SchemaUploadStreamIdentifier, TimeoutPromise, UploadDataRequest, UploadDataResponse, UploadRequest, UploadRequestType, UploadResponse, UploadStopRequest, UploadStopResponse } from "datapm-lib";
 import EventEmitter from "events";
 import { PassThrough } from "stream";
 import { PackageRepository } from "../repository/PackageRepository";
@@ -17,7 +17,7 @@ import { VersionRepository } from "../repository/VersionRepository";
 const LOCK_PREFIX = "streamSetDataUpload";
 
 
-export function streamIdentifierToChannelName(streamIdentifier: StreamIdentifier): string {
+export function streamIdentifierToChannelName(streamIdentifier: SchemaUploadStreamIdentifier): string {
     return (
         streamIdentifier.catalogSlug +
         "/" +
@@ -64,16 +64,16 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
     recordCount:number = 0;
     lastObservedOffset = -1;
 
-    private batchIdentifier:BatchIdentifier;
+    private batchIdentifier:BatchUploadIdentifier;
 
     constructor(private uploadRequest: StartUploadRequest, private socket: SocketIO.Socket, private socketContext:AuthenticatedSocketContext, private distributedLockingService: DistributedLockingService) {
         super();
-        this.channelName = streamIdentifierToChannelName(this.uploadRequest.streamIdentifier);
+        this.channelName = streamIdentifierToChannelName(this.uploadRequest.schemaStreamIdentifier);
     }
 
     async start(callback:(response:Response) => void) {
 
-        if(!await checkPackagePermission(this.socket, this.socketContext, callback, this.uploadRequest.streamIdentifier, Permission.EDIT)) {
+        if(!await checkPackagePermission(this.socket, this.socketContext, callback, this.uploadRequest.schemaStreamIdentifier, Permission.EDIT)) {
             return;
         }
                   
@@ -81,10 +81,10 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
             return;
         }
 
-        const packageEntity = await this.socketContext.connection.getCustomRepository(PackageRepository).findPackageOrFail({identifier: this.uploadRequest.streamIdentifier});
+        const packageEntity = await this.socketContext.connection.getCustomRepository(PackageRepository).findPackageOrFail({identifier: this.uploadRequest.schemaStreamIdentifier});
 
 
-        let batchEntity = await this.socketContext.connection.getCustomRepository(DataBatchRepository).findLatestBatch({identifier: this.uploadRequest.streamIdentifier});
+        let batchEntity = await this.socketContext.connection.getCustomRepository(DataBatchRepository).findLatestBatch({identifier: this.uploadRequest.schemaStreamIdentifier});
 
         let latestVersionEntity = await this.socketContext.connection.getCustomRepository(VersionRepository).findLatestVersionByPackageId({packageId:packageEntity.id});
 
@@ -94,7 +94,7 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
         }
 
         const packageFile = await this.packageFileStorage.readPackageFile(packageEntity.id, {
-            catalogSlug: this.uploadRequest.streamIdentifier.catalogSlug,
+            catalogSlug: this.uploadRequest.schemaStreamIdentifier.catalogSlug,
             packageSlug: packageEntity.slug,
             versionMajor: latestVersionEntity.majorVersion,
             versionMinor: latestVersionEntity.minorVersion,
@@ -102,8 +102,8 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
         });
 
 
-        if(packageFile.schemas.find((s) => s.title === this.uploadRequest.streamIdentifier.schemaTitle) == null){ 
-            callback(new ErrorResponse("SCHEMA_NOT_VALID: This package does not have a schema with a title equal to the provdied streamSetSlug: " + this.uploadRequest.streamIdentifier.schemaTitle,SocketError.NOT_VALID));
+        if(packageFile.schemas.find((s) => s.title === this.uploadRequest.schemaStreamIdentifier.schemaTitle) == null){ 
+            callback(new ErrorResponse("SCHEMA_NOT_VALID: This package does not have a schema with a title equal to the provdied streamSetSlug: " + this.uploadRequest.schemaStreamIdentifier.schemaTitle,SocketError.NOT_VALID));
             return;
         }
 
@@ -114,7 +114,7 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
             this.lastObservedOffset = -1;
 
             this.batchIdentifier = {
-                ... this.uploadRequest.streamIdentifier,
+                ... this.uploadRequest.schemaStreamIdentifier,
                 batch: batchEntity ? batchEntity.batch + 1 : 1
             }
             
@@ -123,7 +123,7 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
         } else {
 
             this.batchIdentifier = {
-                ...this.uploadRequest.streamIdentifier,
+                ...this.uploadRequest.schemaStreamIdentifier,
                 batch: batchEntity.batch
             }
 
@@ -193,7 +193,7 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
 
         if(this.lastObservedOffset) {
 
-            let batchEntity = await this.socketContext.connection.getCustomRepository(DataBatchRepository).findLatestBatch({identifier: this.uploadRequest.streamIdentifier});
+            let batchEntity = await this.socketContext.connection.getCustomRepository(DataBatchRepository).findLatestBatch({identifier: this.uploadRequest.schemaStreamIdentifier});
 
             if(!batchEntity) {
                 throw new Error("BATCH_NOT_FOUND");

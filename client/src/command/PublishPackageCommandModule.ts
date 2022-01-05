@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { PackageFile, RegistryReference, PublishMethod, DPMConfiguration, Source } from "datapm-lib";
+import { PackageFile, RegistryReference, PublishMethod, DPMConfiguration, Source, Schema } from "datapm-lib";
 import ora, { Ora } from "ora";
 import prompts from "prompts";
 import { valid, SemVer } from "semver";
@@ -32,7 +32,6 @@ export enum PublishSchemaSteps {
 }
 
 export enum PublishDataSteps {
-    GENERATING_SCHEMAS = "generating_schemas",
     STARTING_UPLOAD = "starting_upload",
     UPLOADING_DATA = "uploading_data",
     FINISHED_UPLOAD = "finished_upload"
@@ -336,21 +335,20 @@ export class PublishPackageCommandModule {
             });
 
         if (targetRegistries.find((registry) => registry.publishMethod === PublishMethod.SCHEMA_AND_DATA)) {
-            /*
-             oraRef.start("Publishing data...");
-             await this.attemptPublishData(
-                oraRef,
-                packageFileWithContext,
-                targetRegistries.filter((registry) => registry.publishMethod === PublishMethod.SCHEMA_AND_DATA),
-                credentialsByPackageIdentifier
-            )
-                .then(() => {
-                    oraRef.succeed("Published data to registry");
-                })
-                .catch((error) => {
-                    oraRef.fail(`Failed to publish data: ${error.message}`);
-                    exit(1, error);
-                }); */
+            oraRef.start("Publishing data...");
+
+            try {
+                await this.attemptPublishData(
+                    oraRef,
+                    packageFileWithContext,
+                    targetRegistries.filter((registry) => registry.publishMethod === PublishMethod.SCHEMA_AND_DATA),
+                    credentialsByPackageIdentifier
+                );
+                oraRef.succeed("Published data to registry");
+            } catch (error) {
+                oraRef.fail(`Failed to publish data: ${error.message}`);
+                exit(1, error);
+            }
         }
 
         if (targetRegistries.length) {
@@ -455,19 +453,15 @@ export class PublishPackageCommandModule {
         });
     }
 
-    /* async attemptPublishData(
+    async attemptPublishData(
         oraRef: Ora,
         packageFileWithContext: PackageFileWithContext,
         targetRegistries: RegistryReference[],
         credentialsBySourceSlug: CredentialsByPackageIdentifier
     ): Promise<void> {
-         await this.publishData(packageFileWithContext, targetRegistries, credentialsBySourceSlug, {
+        await this.publishData(packageFileWithContext, targetRegistries, credentialsBySourceSlug, {
             updateStep: (step: PublishDataSteps, registryRef: RegistryReference, schema: Schema) => {
                 switch (step) {
-                    case PublishDataSteps.GENERATING_SCHEMAS:
-                        oraRef.start("Generating schema..." + schema.title);
-                        break;
-
                     case PublishDataSteps.STARTING_UPLOAD:
                         oraRef.start(
                             "Starting to upload... " +
@@ -510,8 +504,24 @@ export class PublishPackageCommandModule {
                         throw new Error("Unhandled PublishDataSteps: " + step);
                 }
             }
-        }); 
-    } */
+        });
+    }
+
+    async publishData(
+        packageFileWithContext: PackageFileWithContext,
+        targetRegistries: RegistryReference[],
+        credentialsBySourceSlug: CredentialsByPackageIdentifier,
+        callback: { updateStep: (step: PublishDataSteps, registryRef: RegistryReference, schema: Schema) => void }
+    ): Promise<void> {
+        for (const targetRegistry of targetRegistries) {
+            for (const source of sources) {
+                // lock uploads to the stream (new interface method on sink)
+                // determine whether to create a new batch or use the existing one (update vs replace)
+                // Get the last offset from the registry
+                // Get a stream of the data using the last offset, if supported by the source
+            }
+        }
+    }
 
     async publishPackageFile(
         packageFileWithContext: PackageFileWithContext,
@@ -772,7 +782,7 @@ export class PublishPackageCommandModule {
                     );
 
                     oraRef.info(
-                        "You should supply credentials with limited read-only access necessary to consume the required data."
+                        "For best security practices, you should supply credentials with limited read-only access as necessary to consume the required data."
                     );
 
                     const confirmProxy = await prompts(

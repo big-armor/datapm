@@ -14,9 +14,6 @@ import { createAnonymousClient, createAnonymousStreamingClient, createAuthenicat
 import { parsePackageFileJSON, loadPackageFileFromDisk, PublishMethod, SocketEvent, StartFetchRequest, ErrorResponse, StartFetchResponse, SocketResponseType, SocketError, StartUploadRequest, UploadDataRequest, UploadDataResponse, RecordContext, StartUploadResponse, UploadResponseType, UploadStopRequest, UploadStopResponse, SchemaInfoRequest, SchemaInfoResponse, OpenFetchChannelResponse, OpenFetchChannelRequest, DataSend, DataStop, FetchRequestType, SetStreamActiveBatchesResponse, SetStreamActiveBatchesRequest, FetchResponse, DataAcknowledge, DataStopAcknowledge, DPMRecord, DataRecordContext } from "datapm-lib";
 import { describe, it } from "mocha";
 import request = require("superagent");
-import fs from 'fs';
-import path from "path";
-import { TEMP_STORAGE_PATH } from "./setup";
 import { Socket } from "socket.io-client";
 
 
@@ -481,14 +478,14 @@ describe("Data Store on Registry", async () => {
         expect(schemaInfoResponse.identifier.majorVersion).equal(1);
         expect(schemaInfoResponse.identifier.schemaTitle).equal("simple");
 
-        expect(schemaInfoResponse.streams.length).equal(1);
+        expect(schemaInfoResponse.batches.length).equal(1);
 
-        expect(schemaInfoResponse.streams[0].batchIdentifier.batch).equal(1);
-        expect(schemaInfoResponse.streams[0].batchIdentifier.streamSlug).equal("simple");
-        expect(schemaInfoResponse.streams[0].highestOffset).equal(1);
+        expect(schemaInfoResponse.batches[0].batchIdentifier.batch).equal(1);
+        expect(schemaInfoResponse.batches[0].batchIdentifier.streamSlug).equal("simple");
+        expect(schemaInfoResponse.batches[0].highestOffset).equal(1);
 
         let response = await new Promise<OpenFetchChannelResponse | ErrorResponse>((resolve, reject) => {
-            socket.emit(SocketEvent.OPEN_FETCH_CHANNEL , new OpenFetchChannelRequest(schemaInfoResponse.streams[0].batchIdentifier),(response: OpenFetchChannelResponse) => {
+            socket.emit(SocketEvent.OPEN_FETCH_CHANNEL , new OpenFetchChannelRequest(schemaInfoResponse.batches[0].batchIdentifier),(response: OpenFetchChannelResponse) => {
                 resolve(response);
             });
         });
@@ -811,10 +808,10 @@ describe("Data Store on Registry", async () => {
         expect(streamInfoResponse.responseType).equal(SocketResponseType.SCHEMA_INFO_RESPONSE);
 
         const schemaInfoResponse:SchemaInfoResponse = streamInfoResponse as SchemaInfoResponse;
-        expect(schemaInfoResponse.streams[0].highestOffset).equal(2);
+        expect(schemaInfoResponse.batches[0].highestOffset).equal(2);
 
         let response = await new Promise<OpenFetchChannelResponse | ErrorResponse>((resolve, reject) => {
-            userAStreamingClient.emit(SocketEvent.OPEN_FETCH_CHANNEL , new OpenFetchChannelRequest(schemaInfoResponse.streams[0].batchIdentifier),(response: OpenFetchChannelResponse) => {
+            userAStreamingClient.emit(SocketEvent.OPEN_FETCH_CHANNEL , new OpenFetchChannelRequest(schemaInfoResponse.batches[0].batchIdentifier),(response: OpenFetchChannelResponse) => {
                 resolve(response);
             });
         });
