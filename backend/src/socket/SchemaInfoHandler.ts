@@ -21,6 +21,8 @@ export module SchemaInfoHandler {
                 return {
                     batchIdentifier: {
                         ...streamInfo.identifier,
+                        sourceType: batch.sourceType,
+                        streamSetSlug: batch.streamSetSlug,
                         streamSlug: batch.streamSlug,
                         batch: batch.batch
                     },

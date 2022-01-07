@@ -21,9 +21,9 @@ import {
     BatchUploadIdentifier,
     SetStreamActiveBatchesRequest,
     SetStreamActiveBatchesResponse,
-    SchemaInfoResponse,
-    SchemaInfoRequest,
-    RecordStreamContext
+    PackageVersionInfoResponse,
+    RecordStreamContext,
+    PackageVersionInfoRequest
 } from "datapm-lib";
 import { Maybe } from "../../../util/Maybe";
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
@@ -80,6 +80,28 @@ export class DataPMSink implements Sink {
             ];
         }
 
+        if (configuration.sourceType == null) {
+            return [
+                {
+                    type: ParameterType.Text,
+                    message: "Source Type?",
+                    name: "sourceType",
+                    configuration: configuration
+                }
+            ];
+        }
+
+        if (configuration.streamSetSlug == null) {
+            return [
+                {
+                    type: ParameterType.Text,
+                    message: "Stream Set Slug?",
+                    name: "streamSetSlug",
+                    configuration: configuration
+                }
+            ];
+        }
+
         if (configuration.streamSlug == null) {
             return [
                 {
@@ -120,8 +142,10 @@ export class DataPMSink implements Sink {
             catalogSlug: configuration.catalogSlug as string,
             packageSlug: configuration.packageSlug as string,
             majorVersion: configuration.majorVersion as number,
-            schemaTitle: schema.title as string,
-            streamSlug: configuration.streamSlug as string
+            sourceType: configuration.sourceType as string,
+            streamSetSlug: configuration.streamSetSlug as string,
+            streamSlug: configuration.streamSlug as string,
+            schemaTitle: schema.title as string
         };
 
         const socket = this.connectSocket(connectionConfiguration, credentialsConfiguration);
@@ -331,39 +355,26 @@ export class DataPMSink implements Sink {
     ): Promise<Maybe<SinkState>> {
         const socket = this.connectSocket(connectionConfiguration, credentialsConfiguration);
 
-        const response = await new Promise<SchemaInfoResponse[] | ErrorResponse>((resolve) => {
+        const response = await new Promise<PackageVersionInfoResponse | ErrorResponse>((resolve) => {
             socket.emit(
-                SocketEvent.SCHEMA_INFO_REQUEST,
-                new SchemaInfoRequest({
+                SocketEvent.PACKAGE_VERSION_DATA_INFO_REQUEST,
+                new PackageVersionInfoRequest({
                     catalogSlug: sinkStateKey.catalogSlug,
                     packageSlug: sinkStateKey.packageSlug,
                     majorVersion: sinkStateKey.packageMajorVersion,
-                    registryUrl: connectionConfiguration.url as string,
-                    schemaTitle: "simple"
+                    registryUrl: connectionConfiguration.url as string
                 }),
-                (response: SchemaInfoResponse | ErrorResponse) => {
+                (response: PackageVersionInfoResponse | ErrorResponse) => {
                     resolve(response);
                 }
             );
         });
 
-        return {
-            packageVersion: "1.0.0", // FIX ME - does this property need to be present, or should it just be majorVersion?
-            timestamp: new Date(),
-            streamSets: {
-                simple: {
-                    streamStates: {
-                        stream1: {
-                            schemaStates: {
-                                simple: {
-                                    lastOffset: 0
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        };
+        if (response.responseType === SocketResponseType.ERROR) {
+            throw new Error((response as ErrorResponse).message);
+        }
+
+        return (response as PackageVersionInfoResponse).state;
     }
 
     getType(): string {

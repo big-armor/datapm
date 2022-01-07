@@ -76,13 +76,15 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
         if(!await checkPackagePermission(this.socket, this.socketContext, callback, this.uploadRequest.schemaStreamIdentifier, Permission.EDIT)) {
             return;
         }
+
+        // TODO check permission to upload based on sourceType/streamSetSlug/streamSlug
+        // to allow collaboration across multiple users with fine-grained permissions
                   
         if(!await this.createLock()) {
             return;
         }
 
         const packageEntity = await this.socketContext.connection.getCustomRepository(PackageRepository).findPackageOrFail({identifier: this.uploadRequest.schemaStreamIdentifier});
-
 
         let batchEntity = await this.socketContext.connection.getCustomRepository(DataBatchRepository).findLatestBatch({identifier: this.uploadRequest.schemaStreamIdentifier});
 
@@ -101,13 +103,10 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
             versionPatch: latestVersionEntity.patchVersion,
         });
 
-
         if(packageFile.schemas.find((s) => s.title === this.uploadRequest.schemaStreamIdentifier.schemaTitle) == null){ 
             callback(new ErrorResponse("SCHEMA_NOT_VALID: This package does not have a schema with a title equal to the provdied streamSetSlug: " + this.uploadRequest.schemaStreamIdentifier.schemaTitle,SocketError.NOT_VALID));
             return;
         }
-
-
 
         if(this.uploadRequest.newBatch || !batchEntity) {
             
@@ -118,7 +117,7 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
                 batch: batchEntity ? batchEntity.batch + 1 : 1
             }
             
-            await this.socketContext.connection.getCustomRepository(DataBatchRepository).save(this.socketContext.me.id, this.batchIdentifier);
+            batchEntity = await this.socketContext.connection.getCustomRepository(DataBatchRepository).save(this.socketContext.me.id, this.batchIdentifier);
 
         } else {
 
@@ -152,7 +151,7 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
             }
         });
 
-        this.dataStorageService.writeBatch(packageEntity.id,this.batchIdentifier,this.lastObservedOffset + 1,this.stream)
+        this.dataStorageService.writeBatch(batchEntity.id, this.lastObservedOffset + 1, this.stream)
 
         this.socket.on(this.channelName, this.handleEvent);
         this.socket.on("disconnect",(reason) => this.stop("disconnect"));

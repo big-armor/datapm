@@ -16,9 +16,13 @@ export function batchIdentifierToChannelName(batchIdentifier:BatchUploadIdentifi
         "/" +
         batchIdentifier.majorVersion +
         "/" +
-        batchIdentifier.schemaTitle +
+        batchIdentifier.sourceType  +
+        "/" +
+        batchIdentifier.streamSetSlug  +
         "/" +
         batchIdentifier.streamSlug  +
+        "/" +
+        batchIdentifier.schemaTitle +
         "/" +
         batchIdentifier.batch + 
         "/fetch"
@@ -46,7 +50,17 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
 
         const packageEntity = await this.socketContext.connection.getCustomRepository(PackageRepository).findPackageOrFail({identifier: this.openChannelRequest.batchIdentifier});
 
-        await this.socketContext.connection.getCustomRepository(DataBatchRepository).findBatchOrFail(packageEntity.id,this.openChannelRequest.batchIdentifier.majorVersion,this.openChannelRequest.batchIdentifier.schemaTitle,this.openChannelRequest.batchIdentifier.streamSlug,this.openChannelRequest.batchIdentifier.batch);
+        await this.socketContext.connection
+            .getCustomRepository(DataBatchRepository)
+            .findBatchOrFail(
+                packageEntity.id,
+                this.openChannelRequest.batchIdentifier.majorVersion,
+                this.openChannelRequest.batchIdentifier.sourceType,
+                this.openChannelRequest.batchIdentifier.streamSetSlug,
+                this.openChannelRequest.batchIdentifier.streamSlug,
+                this.openChannelRequest.batchIdentifier.schemaTitle,
+                this.openChannelRequest.batchIdentifier.batch
+                );
 
 
         this.socket.on(this.channelName,this.handleChannelEvents)
@@ -73,9 +87,19 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
 
         const packageEntity = await this.socketContext.connection.getCustomRepository(PackageRepository).findPackageOrFail({identifier: this.openChannelRequest.batchIdentifier});
 
-        const batchEntity = await this.socketContext.connection.getCustomRepository(DataBatchRepository).findBatchOrFail(packageEntity.id,this.openChannelRequest.batchIdentifier.majorVersion,this.openChannelRequest.batchIdentifier.schemaTitle,this.openChannelRequest.batchIdentifier.streamSlug,this.openChannelRequest.batchIdentifier.batch);
+        const batchEntity = await this.socketContext.connection
+            .getCustomRepository(DataBatchRepository)
+            .findBatchOrFail(
+                packageEntity.id,
+                this.openChannelRequest.batchIdentifier.majorVersion,
+                this.openChannelRequest.batchIdentifier.sourceType,
+                this.openChannelRequest.batchIdentifier.streamSetSlug,
+                this.openChannelRequest.batchIdentifier.streamSlug,
+                this.openChannelRequest.batchIdentifier.schemaTitle,
+                this.openChannelRequest.batchIdentifier.batch
+                );
 
-        const iterableDataFiles = this.dataStorageService.readDataBatch(packageEntity.id, {...this.openChannelRequest.batchIdentifier, batch: batchEntity.batch}, fetchRequest.offset);
+        const iterableDataFiles = this.dataStorageService.readDataBatch(batchEntity.id, fetchRequest.offset);
     
         if(!iterableDataFiles) {
             callback(new ErrorResponse(`No data found for batch identifier ${this.openChannelRequest.batchIdentifier}`,SocketError.NOT_FOUND));
@@ -83,7 +107,7 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
             return;
         }
 
-        setTimeout(() => this.startSending(fetchRequest, packageEntity.id, this.openChannelRequest.batchIdentifier),1);
+        setTimeout(() => this.startSending(fetchRequest, batchEntity.id),1);
 
     }
 
@@ -112,9 +136,9 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
         
     }
 
-    async startSending(startRequest:StartFetchRequest, packageId: number, batchIdentifier:BatchUploadIdentifier): Promise<void> {
+    async startSending(startRequest:StartFetchRequest, batchId: number): Promise<void> {
 
-        const iterableDataStreams = await this.dataStorageService.readDataBatch(packageId, batchIdentifier, startRequest.offset);
+        const iterableDataStreams = await this.dataStorageService.readDataBatch(batchId, startRequest.offset);
 
         while(this.activeSending) {
 

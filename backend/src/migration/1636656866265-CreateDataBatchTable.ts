@@ -19,9 +19,13 @@ ALTER TABLE public.batch ADD PRIMARY KEY (id);
 
 ALTER TABLE public.batch ADD COLUMN lastoffset bigint DEFAULT -1 NOT NULL;
 
-ALTER TABLE "batch" ADD CONSTRAINT uniqueBatchesPerPackage UNIQUE(package_id,major_version,schematitle,streamSlug,batch);
+ALTER TABLE public.batch ADD COLUMN streamSetSlug TEXT NOT NULL;
 
-create unique index one_default_batch_per_package_major_version on public.batch(package_id,major_version,schematitle,streamSlug,"default") where "default" is true;
+ALTER TABLE public.batch ADD COLUMN sourceType TEXT NOT NULL;
+
+ALTER TABLE "batch" ADD CONSTRAINT uniqueBatchesPerPackage UNIQUE(package_id,major_version,sourceType,streamSetSlug,streamSlug,schematitle,batch);
+
+create unique index one_default_batch_per_package_major_version on public.batch(package_id,major_version,sourceType,streamSetSlug,streamSlug,schematitle,"default") where "default" is true;
 `
 
 export class CreateDataBatchTable1636656866265 implements MigrationInterface {

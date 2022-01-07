@@ -153,10 +153,6 @@ export interface SchemaIdentifier extends MajorVersionIdentifier {
     schemaTitle: string;
 }
 
-export interface SchemaUploadStreamIdentifier extends SchemaIdentifier {
-    streamSlug: string;
-}
-
 export interface DerivedFrom {
     /** User friendly name for the upstream data */
     displayName: string;

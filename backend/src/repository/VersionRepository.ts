@@ -79,6 +79,32 @@ export class VersionRepository {
             .getOne();
     }
 
+    async findLatestVersionByMajorVersion({
+        identifier,
+        majorVersion,
+        relations = []
+    }: {
+        identifier: PackageIdentifierInput;
+        majorVersion: number;
+        relations?: string[];
+    }): Promise<Maybe<VersionEntity>> {
+        const ALIAS = "findLatestVersion";
+
+        const packageRef = await this.manager.getCustomRepository(PackageRepository).findPackageOrFail({ identifier });
+
+        return this.manager
+            .getRepository(VersionEntity)
+            .createQueryBuilder(ALIAS)
+            .where({ packageId: packageRef.id, majorVersion })
+            .orderBy({
+                "findLatestVersion.majorVersion": "DESC",
+                "findLatestVersion.minorVersion": "DESC",
+                "findLatestVersion.patchVersion": "DESC"
+            })
+            .addRelations(ALIAS, relations)
+            .getOne();
+    }
+
     async findLatestVersionByPackageId({
         packageId,
         relations = []

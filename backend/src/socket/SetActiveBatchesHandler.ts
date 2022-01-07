@@ -30,13 +30,17 @@ export class SetActiveBatchesHandler extends EventEmitter implements RequestHand
 
                 await checkPackagePermission(this.socket, this.socketContext, callback, batchIdentifier, Permission.EDIT);
 
-                const dataBatchEntity = await entityManager.getCustomRepository(DataBatchRepository).findBatchOrFail(
+                const dataBatchEntity = await this.socketContext.connection
+                    .getCustomRepository(DataBatchRepository)
+                    .findBatchOrFail(
                         packageEntity.id,
                         batchIdentifier.majorVersion,
-                        batchIdentifier.schemaTitle,
+                        batchIdentifier.sourceType,
+                        batchIdentifier.streamSetSlug,
                         batchIdentifier.streamSlug,
+                        batchIdentifier.schemaTitle,
                         batchIdentifier.batch
-                    );
+                        );
 
                 const currentlyActiveBatch = await entityManager.getCustomRepository(DataBatchRepository).findDefaultBatch({identifier: batchIdentifier});
                 

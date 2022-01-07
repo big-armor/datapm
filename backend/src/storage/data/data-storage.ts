@@ -18,15 +18,14 @@ export class DataStorageService {
 
     /** Read the records from a batch for a given package. 
      * 
-     * @param packageId The package id
-     * @param identifier The batch identifier
+     * @param batchId The package id
      * @param offsetStart The offset to start reading from (this should be one more than the last end offset)
      */
-    public async readDataBatch(packageId: number, identifier:BatchUploadIdentifier, startOffset?:number): Promise<IterableDataFiles> {
+    public async readDataBatch(batchId: number, startOffset?:number): Promise<IterableDataFiles> {
 
-        const namespace = this.getBatchNamespace(packageId, identifier);
+        const namespace = this.getBatchNamespace(batchId);
 
-        const files = await this.getBatchFiles(packageId, identifier);
+        const files = await this.getBatchFiles(batchId);
 
         let index = 0;
 
@@ -71,12 +70,11 @@ export class DataStorageService {
 
     /** Stream should be a stream of RecordContext */
     public async writeBatch(
-        packageId: number,
-        identifier:BatchUploadIdentifier,
+        batchId: number,
         offsetStart: number,
         stream: Readable
     ): Promise<void> {
-        const namespace = this.getBatchNamespace(packageId, identifier);
+        const namespace = this.getBatchNamespace(batchId);
 
         // TODO Validate that the offsets being written arn't smaller than the offsets already written
         // do this in the database? or in the file system? (database seems stronger, but will causes consistency issues)
@@ -95,28 +93,24 @@ export class DataStorageService {
         );
     }
 
-    deleteBatch(packageId: number, identifier:BatchUploadIdentifier) {
+    deleteBatch(batchId: number) {
 
-        const namespace = this.getBatchNamespace(packageId, identifier);
+        const namespace = this.getBatchNamespace(batchId);
 
         return this.fileStorageService.deleteFiles(
             namespace
         );
     }
 
-    private getBatchNamespace(packageId: number, identifier:BatchUploadIdentifier): string[] {
+    private getBatchNamespace(batchId: number): string[] {
         return [
             Prefixes.DATA ,
-            packageId.toString() ,
-            identifier.majorVersion.toString() ,
-            identifier.schemaTitle,
-            identifier.streamSlug,
-            identifier.batch.toString()
+            batchId.toString()
         ];
     }
 
-    private async getBatchFiles(packageId: number, identifier:BatchUploadIdentifier): Promise<string[]> {
-        const namespace = this.getBatchNamespace(packageId, identifier);
+    private async getBatchFiles(batchId: number): Promise<string[]> {
+        const namespace = this.getBatchNamespace(batchId);
         const files = await this.fileStorageService.listFiles(
             namespace
         );

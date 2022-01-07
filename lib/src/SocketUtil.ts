@@ -1,6 +1,16 @@
-import { SchemaIdentifier } from "./main";
-import { SchemaUploadStreamIdentifier } from "./PackageFile-v0.7.0";
+import { MajorVersionIdentifier, SchemaIdentifier } from "./main";
 import { DPMRecord } from "./PackageUtil";
+import { SinkState } from "./SinkState";
+
+/** This identifies a single stream instance during upload. It is the same structure as Source implementations, but here
+ * meant for reference only during uploads to a DataPM registry. This is based on the SchemaIdentifier which is based on
+ * a PackageIdentifier.
+ */
+export interface SchemaUploadStreamIdentifier extends SchemaIdentifier {
+    sourceType: string;
+    streamSetSlug: string;
+    streamSlug: string;
+}
 
 /** This identifiest a single batch upload (which can be a series of appended streams) to the
  * data registry service. This class is in SocketUtil.ts because it is specifically not part of the
@@ -15,8 +25,8 @@ export interface BatchUploadIdentifier extends SchemaUploadStreamIdentifier {
 }
 
 export interface DataRecordContext {
-    record: DPMRecord;
     offset: number;
+    record: DPMRecord;
 }
 
 /**
@@ -30,7 +40,8 @@ export enum SocketEvent {
     OPEN_FETCH_CHANNEL = "openFetchChannel",
     START_DATA_UPLOAD = "uploadDataRequest",
     SET_STREAM_ACTIVE_BATCHES = "setStreamActiveBatchesRequest",
-    SCHEMA_INFO_REQUEST = "schemaInfoRequest"
+    SCHEMA_INFO_REQUEST = "schemaInfoRequest",
+    PACKAGE_VERSION_DATA_INFO_REQUEST = "packageDataStateRequest"
 }
 
 export enum SocketError {
@@ -47,7 +58,8 @@ export enum SocketResponseType {
     SCHEMA_INFO_RESPONSE = "schemaInfoResponse",
     START_DATA_UPLOAD_RESPONSE = "startDataUploadResponse",
     SET_STREAM_ACTIVE_BATCHES = "setStreamActiveBatchesResponse",
-    OPEN_FETCH_CHANNEL_RESPONSE = "openFetchChannelResponse"
+    OPEN_FETCH_CHANNEL_RESPONSE = "openFetchChannelResponse",
+    PACKAGE_VERSION_DATA_INFO_RESPONSE = "packageDataStateResponse"
 }
 
 export interface Request {
@@ -64,6 +76,23 @@ export class ErrorResponse implements Response {
 
     // eslint-disable-next-line no-useless-constructor
     constructor(public message: string, public errorType: SocketError) {}
+}
+
+/** PACKAGE INFO  */
+
+/** Sent by the client to request information about a given stream */
+export class PackageVersionInfoRequest implements Request {
+    requestType = SocketEvent.PACKAGE_VERSION_DATA_INFO_REQUEST;
+
+    // eslint-disable-next-line no-useless-constructor
+    constructor(public identifier: MajorVersionIdentifier) {}
+}
+
+export class PackageVersionInfoResponse implements Response {
+    responseType = SocketResponseType.PACKAGE_VERSION_DATA_INFO_RESPONSE;
+
+    // eslint-disable-next-line no-useless-constructor
+    constructor(public identifier: MajorVersionIdentifier, public state: SinkState) {}
 }
 
 /** STREAM INFO  */

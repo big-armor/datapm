@@ -13,5 +13,4 @@ export * from "./TimeoutPromise";
 export * from "./SocketUtil";
 export * from "./DataHandlingUtil";
 export * from "./APIKeyUtil";
-export * as base62 from "./Base62Util";
 export * from "./transforms/BatchingTransform";
