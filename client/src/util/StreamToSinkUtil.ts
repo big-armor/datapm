@@ -130,8 +130,7 @@ export async function fetch(
     sinkCredentialsConfiguration: DPMConfiguration,
     sinkConfiguration: DPMConfiguration,
     sinkStateKey: SinkStateKey,
-    sinkState: Maybe<SinkState>,
-    schemas: Schema[]
+    sinkState: Maybe<SinkState>
 ): Promise<FetchResult> {
     let bytesExpected = 0;
     let recordsExpected = 0;
@@ -169,7 +168,7 @@ export async function fetch(
     let returnPromiseResolve: (value: FetchResult | PromiseLike<FetchResult>) => void;
 
     if (await sink.isStronglyTyped(sinkConfiguration)) {
-        for (const schema of schemas) {
+        for (const schema of packageFile.schemas) {
             const conflictedPropertyTypes = await checkSchemaDataTypeConflicts(schema);
             const conflictedTitles = Object.keys(conflictedPropertyTypes);
             if (conflictedTitles.length > 0) {
@@ -280,7 +279,7 @@ export async function fetch(
                 streamExpectedStatus.bytesReceived = bytesTotal;
             }
         },
-        schemas,
+        packageFile.schemas,
         sinkState,
         deconflictOptions
     );

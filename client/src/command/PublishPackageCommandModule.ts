@@ -513,14 +513,14 @@ export class PublishPackageCommandModule {
         credentialsBySourceSlug: CredentialsByPackageIdentifier,
         callback: { updateStep: (step: PublishDataSteps, registryRef: RegistryReference, schema: Schema) => void }
     ): Promise<void> {
-        for (const targetRegistry of targetRegistries) {
+        /* for (const targetRegistry of targetRegistries) {
             for (const source of sources) {
                 // lock uploads to the stream (new interface method on sink)
                 // determine whether to create a new batch or use the existing one (update vs replace)
                 // Get the last offset from the registry
                 // Get a stream of the data using the last offset, if supported by the source
             }
-        }
+        } */
     }
 
     async publishPackageFile(

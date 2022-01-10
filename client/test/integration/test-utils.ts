@@ -46,7 +46,7 @@ export function setTestSourceFiles(): void {
     TEST_SOURCE_FILES = {
         HTTP1: `http://localhost:${dataServerPort}/state-codes.csv`,
         HTTP2: `http://localhost:${dataServerPort}/non-existing.csv`, // purposefully not-existing
-        GOOGLESHEET1: `https://docs.google.com/spreadsheets/d/1VexA0EwribV20dBUmpyM67esl1QjOwkL-QUuzIL2kjo/edit#gid=380454798`,
+        GOOGLESHEET1: `https://docs.google.com/spreadsheets/d/1KSrO9svsYoZQgVCOxmMEZTsNzDWe4N7Czazc6BhdPwc/edit?usp=sharing`,
         FILE1: "file://./test/sources/covid-02-01-2020.csv",
         FILE2: "file://./test/sources/covid-03-01-2020.csv",
         FILE3: "file://./test/sources/test-date-data.csv",
