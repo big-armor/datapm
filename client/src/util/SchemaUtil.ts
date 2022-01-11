@@ -69,7 +69,7 @@ export async function inspectSourceConnection(
 
     if (connectionParameters.length > 0) {
         throw new Error(
-            "SOURCE_CONNECTION_NOT_COMPLETE - The package maintianer needs to run the `datapm update ...` command to make it compatible with this version of datapm"
+            "SOURCE_CONNECTION_NOT_COMPLETE - The package maintianer needs to run the `datapm update ...` command to provide more connection information."
         );
     }
 
@@ -304,6 +304,7 @@ function createStreamAndTransformPipeLine(
                 const recordStreamContext: RecordStreamContext = {
                     recordContext: chunk,
                     sourceType: source.type,
+                    sourceSlug: source.slug,
                     streamSetSlug: streamSetPreview.slug,
                     streamSlug: streamSummary.name
                 };

@@ -74,7 +74,13 @@ export interface Sink {
     /** Return a list of supported update methods, based on the configuration, schema, and current sink state */
     getSupportedStreamOptions(configuration: DPMConfiguration, sinkState: Maybe<SinkState>): SinkSupportedStreamOptions;
 
-    /** Apply the configuration to the sink */
+    /** Apply the configuration to the sink.
+     * @param connectionConfiguration The configuration object that is the result of the Repository.getConnectionParameters(...) user responses.
+     * @param credentialsConfiguration The configuration object that is the result of the Repository.getCredentianlsParameters(...) user responses.
+     * @param configuration The same configuration object that is the result of the getParameters(...) user responses.
+     * @param schema The schema of the stream that is being written to the sink.
+     * @param updateMethod The update method that is being used to write to the sink.
+     */
     getWriteable(
         schema: Schema,
         connectionConfiguration: DPMConfiguration,

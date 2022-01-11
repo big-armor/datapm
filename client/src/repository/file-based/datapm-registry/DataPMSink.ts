@@ -13,17 +13,18 @@ import {
     UploadRequestType,
     UploadResponse,
     ErrorResponse,
-    UploadDataRequest,
     StartUploadRequest,
     StartUploadResponse,
-    UploadStopRequest,
     UploadStopResponse,
     BatchUploadIdentifier,
     SetStreamActiveBatchesRequest,
     SetStreamActiveBatchesResponse,
     PackageVersionInfoResponse,
     RecordStreamContext,
-    PackageVersionInfoRequest
+    PackageVersionInfoRequest,
+    SocketError,
+    UploadDataRequest,
+    UploadStopRequest
 } from "datapm-lib";
 import { Maybe } from "../../../util/Maybe";
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
@@ -33,9 +34,13 @@ import { DISPLAY_NAME, TYPE } from "./DataPMRepositoryDescription";
 import { Transform } from "stream";
 import { io, Socket } from "socket.io-client";
 import { getRegistryConfig } from "../../../util/ConfigUtil";
-import { PausingTransform } from "../../../transforms/PauseableTransform";
 
 export class DataPMSink implements Sink {
+    serverChannelForRecordKey: Record<string, string> = {};
+    offsetsByChannel: Record<string, number> = {};
+    commitKeys: CommitKey[] = [];
+    socket: Socket;
+
     isStronglyTyped(_configuration: DPMConfiguration): boolean | Promise<boolean> {
         return false;
     }
@@ -80,39 +85,6 @@ export class DataPMSink implements Sink {
             ];
         }
 
-        if (configuration.sourceType == null) {
-            return [
-                {
-                    type: ParameterType.Text,
-                    message: "Source Type?",
-                    name: "sourceType",
-                    configuration: configuration
-                }
-            ];
-        }
-
-        if (configuration.streamSetSlug == null) {
-            return [
-                {
-                    type: ParameterType.Text,
-                    message: "Stream Set Slug?",
-                    name: "streamSetSlug",
-                    configuration: configuration
-                }
-            ];
-        }
-
-        if (configuration.streamSlug == null) {
-            return [
-                {
-                    type: ParameterType.Text,
-                    message: "Stream Slug?",
-                    name: "streamSlug",
-                    configuration: configuration
-                }
-            ];
-        }
-
         return [];
     }
 
@@ -137,60 +109,89 @@ export class DataPMSink implements Sink {
             throw new Error("MISSING_CONNECITON_CONFIG_VALUE: url");
         }
 
-        const streamIdentifier: SchemaUploadStreamIdentifier = {
-            registryUrl: connectionConfiguration.url,
-            catalogSlug: configuration.catalogSlug as string,
-            packageSlug: configuration.packageSlug as string,
-            majorVersion: configuration.majorVersion as number,
-            sourceType: configuration.sourceType as string,
-            streamSetSlug: configuration.streamSetSlug as string,
-            streamSlug: configuration.streamSlug as string,
-            schemaTitle: schema.title as string
-        };
+        if (typeof configuration.catalogSlug !== "string") {
+            throw new Error("MISSING_CONFIG_VALUE: catalogSlug");
+        }
 
-        const socket = this.connectSocket(connectionConfiguration, credentialsConfiguration);
+        if (typeof configuration.packageSlug !== "string") {
+            throw new Error("MISSING_CONFIG_VALUE: packageSlug");
+        }
 
-        const uploadRequest = new StartUploadRequest(streamIdentifier, true); // TODO support appending
+        if (typeof configuration.majorVersion !== "number") {
+            throw new Error("MISSING_CONFIG_VALUE: majorVersion");
+        }
 
-        let uploadChannelName = "not-set";
+        const socket = await this.connectSocket(connectionConfiguration, credentialsConfiguration);
 
-        const pausingTransform = new PausingTransform(true, {
-            objectMode: true
-        });
-
-        let lastOffset = 0;
         const writableTransform = new Transform({
             objectMode: true,
-            transform: async (records: RecordStreamContext[], encoding, callback) => {
-                socket.emit(
-                    uploadChannelName,
-                    new UploadDataRequest(
-                        records.map((r) => {
-                            lastOffset = r.recordContext.offset !== undefined ? r.recordContext.offset : lastOffset + 1;
-                            return {
-                                offset: lastOffset,
-                                record: r.recordContext.record
-                            };
-                        })
-                    ),
-                    (_response: StartUploadResponse) => {
-                        callback(null, records[records.length - 1]); // TODO have the server emit last committed offset and use that here
+            transform: async (chunk: RecordStreamContext[], encoding, callback) => {
+                const recordsByChannel: Record<string, RecordStreamContext[]> = {};
+
+                for (const record of chunk) {
+                    let serverChannel = this.serverChannelForRecord(record);
+                    if (serverChannel == null) {
+                        serverChannel = await this.startUploadRequest(socket, {
+                            catalogSlug: configuration.catalogSlug as string,
+                            packageSlug: configuration.packageSlug as string,
+                            majorVersion: configuration.majorVersion as number,
+                            streamSetSlug: record.streamSetSlug,
+                            streamSlug: record.streamSlug,
+                            sourceSlug: record.sourceSlug,
+                            schemaTitle: record.recordContext.schemaSlug,
+                            registryUrl: connectionConfiguration.url as string
+                        });
+
+                        this.serverChannelForRecordKey[this.recordToChannelKey(record)] = serverChannel;
                     }
-                );
+
+                    if (recordsByChannel[serverChannel] == null) {
+                        recordsByChannel[serverChannel] = [];
+                    }
+
+                    recordsByChannel[serverChannel].push(record);
+                }
+
+                const sendPromises: Promise<void>[] = [];
+
+                for (const serverChannel of Object.keys(recordsByChannel)) {
+                    const records = recordsByChannel[serverChannel];
+
+                    const promise = this.sendRecords(socket, records, serverChannel);
+
+                    sendPromises.push(promise);
+                }
+
+                await Promise.all(sendPromises);
+
+                callback(null, chunk[chunk.length - 1]);
             },
             final: async (callback) => {
-                // console.log("Final called on DataPMSink \n\n");
-                try {
-                    await new TimeoutPromise<void>(5000, (resolve) => {
-                        socket.emit(uploadChannelName, new UploadStopRequest(), (_response: UploadStopResponse) => {
-                            console.log("Received response \n\n");
+                const promises: Promise<void>[] = [];
 
-                            resolve();
-                        });
+                for (const serverChannel of Object.values(this.serverChannelForRecordKey)) {
+                    const promise = new TimeoutPromise<void>(5000, (resolve, reject) => {
+                        socket.emit(
+                            serverChannel,
+                            new UploadStopRequest(),
+                            (response: UploadStopResponse | ErrorResponse) => {
+                                if (response.responseType === SocketResponseType.ERROR) {
+                                    const errorResponse = response as ErrorResponse;
+                                    reject(errorResponse.message);
+                                    return;
+                                }
+                                resolve();
+                            }
+                        );
                     });
+                    promises.push(promise);
+                }
+
+                try {
+                    await Promise.all(promises);
                 } catch (error) {
                     // TODO get a context to log an error
-                    console.log("error: " + JSON.stringify(error));
+                    console.log("error stopping upload: " + error.message);
                 } finally {
                     if (socket.connected) {
                         socket.close();
@@ -200,60 +201,84 @@ export class DataPMSink implements Sink {
             }
         });
 
-        socket.onAny((_event: SocketEvent) => {
-            // console.log("Socket event", event);
+        return {
+            outputLocation: this.getConnectionUrl(connectionConfiguration),
+            writable: writableTransform,
+            transforms: [],
+            getCommitKeys: () => {
+                return this.commitKeys;
+            }
+        };
+    }
+
+    serverChannelForRecord(record: RecordStreamContext): string {
+        return this.serverChannelForRecordKey[this.recordToChannelKey(record)];
+    }
+
+    recordToChannelKey(record: RecordStreamContext): string {
+        return record.sourceSlug + "-" + record.streamSetSlug + "-" + record.streamSlug;
+    }
+
+    async sendRecords(socket: Socket, records: RecordStreamContext[], serverChannel: string): Promise<void> {
+        return new TimeoutPromise<void>(5000, (resolve) => {
+            socket.emit(
+                serverChannel,
+                new UploadDataRequest(
+                    records.map((r) => {
+                        const offset: number =
+                            r.recordContext.offset !== undefined
+                                ? r.recordContext.offset
+                                : this.offsetsByChannel[serverChannel] + 1;
+
+                        this.offsetsByChannel[serverChannel] = offset;
+                        return {
+                            offset: offset,
+                            record: r.recordContext.record
+                        };
+                    })
+                ),
+                (_response: StartUploadResponse) => {
+                    resolve(); // TODO have the server emit last committed offset and use that here
+                }
+            );
         });
+    }
 
-        let batchIdentifier: BatchUploadIdentifier;
+    async startUploadRequest(socket: Socket, streamIdentifier: SchemaUploadStreamIdentifier): Promise<string> {
+        const uploadRequest = new StartUploadRequest(streamIdentifier, true); // TODO support appending
 
-        await new TimeoutPromise<void>(5000, (resolve) => {
-            socket.once("connect", async () => {
-                socket.once(SocketEvent.READY.toString(), () => {
-                    socket.emit(
-                        SocketEvent.START_DATA_UPLOAD.toString(),
-                        uploadRequest,
-                        (response: StartUploadResponse | ErrorResponse) => {
-                            if (response.responseType === SocketResponseType.START_DATA_UPLOAD_RESPONSE) {
-                                uploadChannelName = (response as StartUploadResponse).channelName;
-                                batchIdentifier = (response as StartUploadResponse).batchIdentifier;
-                                pausingTransform.actuallyResume();
-                                resolve();
-                            } else if (response.responseType === SocketResponseType.ERROR) {
-                                const responseError = response as ErrorResponse;
-                                throw new Error(responseError.message);
-                            }
-                        }
-                    );
-                });
-            });
-        });
+        let uploadChannelName = "not-set";
 
-        socket.on("connect_error", (_error: unknown) => {
-            // console.log("connect_error", error);
-            // TODO Handle error
-        });
-
-        socket.once("disconnect", (_reason: string) => {
-            // console.log("\n\ndisconnect: " + reason);
+        await new TimeoutPromise<void>(5000, (resolve, reject) => {
+            socket.emit(
+                SocketEvent.START_DATA_UPLOAD.toString(),
+                uploadRequest,
+                (response: StartUploadResponse | ErrorResponse) => {
+                    if (response.responseType === SocketResponseType.START_DATA_UPLOAD_RESPONSE) {
+                        uploadChannelName = (response as StartUploadResponse).channelName;
+                        const batchIdentifier = (response as StartUploadResponse).batchIdentifier;
+                        this.commitKeys.push({
+                            batchIdentifier
+                        });
+                        resolve();
+                    } else if (response.responseType === SocketResponseType.ERROR) {
+                        const responseError = response as ErrorResponse;
+                        reject(responseError.message);
+                    }
+                }
+            );
         });
 
         socket.on(uploadChannelName, (request: UploadRequest, callback: (uploadResponse: UploadResponse) => void) => {
             if (request.requestType === UploadRequestType.UPLOAD_STOP) {
-                writableTransform.end();
+                delete this.serverChannelForRecordKey[uploadChannelName];
                 callback(new UploadStopResponse());
             } else {
                 throw new Error("UNKNOWN_SOCKET_EVENT:" + JSON.stringify(request));
             }
         });
 
-        return {
-            outputLocation: this.getConnectionUrl(connectionConfiguration),
-            writable: writableTransform,
-            transforms: [pausingTransform],
-            getCommitKeys: () => {
-                return [{ batchIdentifier }];
-            }
-        };
+        return uploadChannelName;
     }
 
     getConnectionUrl(connectionConfiguration: DPMConfiguration): string {
@@ -266,9 +291,16 @@ export class DataPMSink implements Sink {
         return uri;
     }
 
-    connectSocket(connectionConfiguration: DPMConfiguration, _credentialsConfiguration: DPMConfiguration): Socket {
+    async connectSocket(
+        connectionConfiguration: DPMConfiguration,
+        _credentialsConfiguration: DPMConfiguration
+    ): Promise<Socket> {
         if (typeof connectionConfiguration.url !== "string") {
             throw new Error("connectionConfiguration does not include url value as string");
+        }
+
+        if (this.socket != null && this.socket.connected) {
+            return this.socket;
         }
 
         const uri = connectionConfiguration.url.replace(/^https/, "wss").replace(/^http/, "ws");
@@ -279,13 +311,23 @@ export class DataPMSink implements Sink {
             throw new Error("REGISTRY_CONFIG_NOT_FOUND: " + uri);
         }
 
-        return io(uri, {
+        this.socket = io(uri, {
             parser: require("socket.io-msgpack-parser"),
             transports: ["polling", "websocket"],
             auth: {
                 token: registryConfiguration.apiKey
             }
         });
+
+        await new TimeoutPromise<void>(5000, (resolve) => {
+            this.socket.once("connect", async () => {
+                this.socket.once(SocketEvent.READY.toString(), () => {
+                    resolve();
+                });
+            });
+        });
+
+        return this.socket;
     }
 
     async commitAfterWrites(
@@ -293,31 +335,27 @@ export class DataPMSink implements Sink {
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration
     ): Promise<void> {
-        const socket = this.connectSocket(connectionConfiguration, credentialsConfiguration);
+        const socket = await this.connectSocket(connectionConfiguration, credentialsConfiguration);
 
         const request = new SetStreamActiveBatchesRequest(
             commitKeys.map((c) => c.batchIdentifier as BatchUploadIdentifier)
         );
 
-        await new Promise<void>((resolve, reject) => {
-            socket.on("connect", async () => {
-                socket.once(SocketEvent.READY.toString(), () => {
-                    socket.emit(
-                        SocketEvent.SET_STREAM_ACTIVE_BATCHES.toString(),
-                        request,
-                        (response: SetStreamActiveBatchesResponse | ErrorResponse) => {
-                            if (response.responseType === SocketResponseType.SET_STREAM_ACTIVE_BATCHES) {
-                                // const batches = (response as SetStreamActiveBatchesResponse).batchIdentifiers;
-                                socket.close();
-                                resolve();
-                            } else if (response.responseType === SocketResponseType.ERROR) {
-                                const responseError = response as ErrorResponse;
-                                reject(responseError.message);
-                            }
-                        }
-                    );
-                });
-            });
+        await new TimeoutPromise<void>(10000, (resolve, reject) => {
+            socket.emit(
+                SocketEvent.SET_STREAM_ACTIVE_BATCHES.toString(),
+                request,
+                (response: SetStreamActiveBatchesResponse | ErrorResponse) => {
+                    if (response.responseType === SocketResponseType.SET_STREAM_ACTIVE_BATCHES) {
+                        // const batches = (response as SetStreamActiveBatchesResponse).batchIdentifiers;
+                        socket.close();
+                        resolve();
+                    } else if (response.responseType === SocketResponseType.ERROR) {
+                        const responseError = response as ErrorResponse;
+                        reject(responseError.message);
+                    }
+                }
+            );
             socket.once("connect_error", (_error: unknown) => {
                 // console.log("connect_error", error);
                 // TODO Handle error
@@ -353,7 +391,7 @@ export class DataPMSink implements Sink {
         configuration: DPMConfiguration,
         sinkStateKey: SinkStateKey
     ): Promise<Maybe<SinkState>> {
-        const socket = this.connectSocket(connectionConfiguration, credentialsConfiguration);
+        const socket = await this.connectSocket(connectionConfiguration, credentialsConfiguration);
 
         const response = await new Promise<PackageVersionInfoResponse | ErrorResponse>((resolve) => {
             socket.emit(
@@ -371,6 +409,12 @@ export class DataPMSink implements Sink {
         });
 
         if (response.responseType === SocketResponseType.ERROR) {
+            const errorResponse = response as ErrorResponse;
+
+            if (errorResponse.errorType === SocketError.NOT_FOUND) {
+                return null;
+            }
+
             throw new Error((response as ErrorResponse).message);
         }
 

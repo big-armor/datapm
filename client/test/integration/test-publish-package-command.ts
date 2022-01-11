@@ -84,7 +84,7 @@ describe("Publish Package Command Tests", async function () {
         };
 
         const cmdResult = await testCmd("publish", [packageAFilePath], [], async (line: string) => {
-            if (line.includes("You have not added a registry API key.")) {
+            if (line.includes("You have not logged a registry from the command line")) {
                 results.messageFound = true;
             }
         });

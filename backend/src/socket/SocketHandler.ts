@@ -63,7 +63,8 @@ export class SocketConnectionHandler {
             this.addRequestHandler(dataFetchHandler);
             await dataFetchHandler.start(callback);
         } catch (error) {
-            callback(new ErrorResponse(error.message, SocketError.SERVER_ERROR));
+            console.error(error);
+            callback(new ErrorResponse("An unknown error occured", SocketError.SERVER_ERROR));
             return;
         }
        
@@ -84,7 +85,8 @@ export class SocketConnectionHandler {
             await uploadRequestHandler.start(callback);
     
         } catch (error) {
-            callback(new ErrorResponse(error.message, SocketError.SERVER_ERROR));
+            console.error(error);
+            callback(new ErrorResponse("An unknown error occured", SocketError.SERVER_ERROR));
             return;
         }
     }
@@ -146,7 +148,8 @@ export class SocketConnectionHandler {
             await uploadRequestHandler.start(callback);
     
         } catch (error) {
-            callback(new ErrorResponse(error.message, SocketError.SERVER_ERROR));
+            console.error(error);
+            callback(new ErrorResponse("An unknown error occured", SocketError.SERVER_ERROR));
             return;
         }
 
@@ -164,10 +167,15 @@ export async function checkPackagePermission(socket: SocketIO.Socket, socketCont
             identifier: schemaIdentifier
         })
     } catch (error) {
-        if(error.message.includes("_NOT_FOUND")) {
+
+        if(error.message.includes("_NOT_VALID")) {
+            callback(new ErrorResponse(error.message, SocketError.NOT_VALID));
+            return false;
+        } else if(error.message.includes("_NOT_FOUND")) {
             callback(new ErrorResponse("PACKAGE_OR_CATALOG_NOT_FOUND", SocketError.NOT_FOUND));
         } else {
-            callback(new ErrorResponse(error.message, SocketError.SERVER_ERROR));
+            console.error(error);
+            callback(new ErrorResponse("An unknown error occured", SocketError.SERVER_ERROR));
         }
         return false;
     }

@@ -74,6 +74,11 @@ function validation(packageEntity: PackageEntity) {
     if (getNameLength(packageEntity.description) === 0) throw new Error("PACKAGE_DESCRIPTION_REQUIRED");
 }
 
+function validateIdentifier(packageIdentifier: PackageIdentifierInput) {
+    if(getNameLength(packageIdentifier.catalogSlug) === 0) throw new Error("PACKAGE_CATALOG_NOT_VALID: must be provided");
+    if(getNameLength(packageIdentifier.packageSlug) === 0) throw new Error("PACKAGE_SLUG__NOT_VALID: must be provided");
+}
+
 @EntityRepository(PackageEntity)
 export class PackageRepository extends Repository<PackageEntity> {
     async userPackages({
@@ -148,6 +153,9 @@ export class PackageRepository extends Repository<PackageEntity> {
         identifier: PackageIdentifierInput;
         relations?: string[];
     }): Promise<PackageEntity> {
+
+        validateIdentifier(identifier);
+
         const catalog = await this.manager.getRepository(CatalogEntity).findOneOrFail({ slug: identifier.catalogSlug });
 
         const packageEntity = await this.manager
@@ -197,6 +205,10 @@ export class PackageRepository extends Repository<PackageEntity> {
         identifier: PackageIdentifierInput;
         relations?: string[];
     }): Promise<PackageEntity | null> {
+
+        validateIdentifier(identifier);
+
+
         const packageEntity = await findPackage(
             this.manager,
             identifier.catalogSlug,
@@ -214,6 +226,9 @@ export class PackageRepository extends Repository<PackageEntity> {
         identifier: PackageIdentifierInput;
         relations?: string[];
     }): Promise<PackageEntity> {
+
+        validateIdentifier(identifier);
+
         const packageEntity = await this.findPackage({ identifier, relations });
 
         if (packageEntity == null)
@@ -377,6 +392,9 @@ export class PackageRepository extends Repository<PackageEntity> {
     }
 
     async updatePackageReadmeVectors(identifier: PackageIdentifierInput, readmeMarkdown: string | null | undefined) {
+
+        validateIdentifier(identifier);
+
         await this.manager.nestedTransaction(async (transaction) => {
             const packageEntity = await findPackage(transaction, identifier.catalogSlug, identifier.packageSlug, []);
 
@@ -403,6 +421,9 @@ export class PackageRepository extends Repository<PackageEntity> {
         identifier: PackageIdentifierInput;
         context?: AuthenticatedContext;
     }): Promise<void> {
+
+        validateIdentifier(identifier);
+
         const catalogSlug = identifier.catalogSlug;
         const packageSlug = identifier.packageSlug;
         const packageEntity = await findPackage(this.manager, catalogSlug, packageSlug, ["versions", "catalog"]);

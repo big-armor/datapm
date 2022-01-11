@@ -1,11 +1,13 @@
 import chalk from "chalk";
-import { PackageFile, RegistryReference, PublishMethod, DPMConfiguration, Source, Schema } from "datapm-lib";
+import { PackageFile, RegistryReference, PublishMethod, DPMConfiguration, Source } from "datapm-lib";
 import ora, { Ora } from "ora";
 import prompts from "prompts";
 import { valid, SemVer } from "semver";
 import { exit } from "yargs";
 import { Catalog, CreateVersionInput, PackageIdentifier } from "../generated/graphql";
+import { TYPE as DATAPM_SINK_TYPE } from "../repository/file-based/datapm-registry/DataPMRepositoryDescription";
 import { getRepositoryDescriptionByType } from "../repository/RepositoryUtil";
+import { getSinkDescription } from "../repository/SinkUtil";
 import { getRegistryConfigs, RegistryConfig } from "../util/ConfigUtil";
 import { promptForCredentials } from "../util/CredentialsUtil";
 import { identifierToString } from "../util/IdentifierUtil";
@@ -14,6 +16,7 @@ import { writePackageFile } from "../util/PackageUtil";
 import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
 import { ParameterOption } from "../util/parameters/Parameter";
 import { getRegistryClientWithConfig } from "../util/RegistryClient";
+import { fetchMultipleWithListr } from "./FetchCommandModule";
 import { PublishArguments } from "./PublishPackageCommand";
 
 export enum PublishSchemaSteps {
@@ -89,25 +92,28 @@ export class PublishPackageCommandModule {
             oraRef.info("Publishing to " + packageFile.registries.join(", "));
             targetRegistries = packageFile.registries;
         } else if (packageFile.registries && packageFile.registries.length > 0) {
-            const promptResponse = await prompts([
-                {
-                    type: "autocomplete",
-                    message: "Publish to " + packageFile.registries.map((r) => r.url).join(", ") + "?",
-                    name: "confirm",
-                    choices: [
-                        {
-                            title: "Yes, Continue",
-                            value: true
-                        },
-                        {
-                            title: "No, Choose A Different Registry",
-                            value: false
-                        }
-                    ]
-                }
-            ]);
+            const promptResponse = await prompts(
+                [
+                    {
+                        type: "autocomplete",
+                        message: "Publish to " + packageFile.registries.map((r) => r.url).join(", ") + "?",
+                        name: "confirm",
+                        choices: [
+                            {
+                                title: "Yes, Continue",
+                                value: true
+                            },
+                            {
+                                title: "No, Choose A Different Registry",
+                                value: false
+                            }
+                        ]
+                    }
+                ],
+                defaultPromptOptions
+            );
 
-            if (promptResponse.confirm.startsWith("No")) {
+            if (!promptResponse.confirm) {
                 targetRegistries = [];
             } else {
                 targetRegistries = packageFile.registries;
@@ -121,8 +127,10 @@ export class PublishPackageCommandModule {
             if (registries.length === 0) {
                 console.log(
                     chalk.yellow(
-                        "You have not added a registry API key. Visit datapm.io or another registry, create an account, create an API key, and then add that api key with the 'datapm registry add ...' command."
-                    )
+                        "You have not logged a registry from the command line. Use the command below to login."
+                    ) +
+                        "\n" +
+                        chalk.green("datapm registry login")
                 );
                 throw new Error();
             }
@@ -223,7 +231,7 @@ export class PublishPackageCommandModule {
 
         oraRef.start("Publishing schema...");
 
-        await this.attemptPublishSchema(
+        await this.attemptPublishPackageFile(
             oraRef,
             packageFileWithContext,
             targetRegistries,
@@ -311,7 +319,7 @@ export class PublishPackageCommandModule {
                     // oraRef.start("Publishing to registry after version update");
 
                     try {
-                        await this.attemptPublishSchema(
+                        await this.attemptPublishPackageFile(
                             oraRef,
                             packageFileWithContext,
                             targetRegistries,
@@ -335,16 +343,15 @@ export class PublishPackageCommandModule {
             });
 
         if (targetRegistries.find((registry) => registry.publishMethod === PublishMethod.SCHEMA_AND_DATA)) {
-            oraRef.start("Publishing data...");
+            oraRef.info("Publishing data...");
 
             try {
-                await this.attemptPublishData(
+                await this.publishData(
                     oraRef,
                     packageFileWithContext,
                     targetRegistries.filter((registry) => registry.publishMethod === PublishMethod.SCHEMA_AND_DATA),
                     credentialsByPackageIdentifier
                 );
-                oraRef.succeed("Published data to registry");
             } catch (error) {
                 oraRef.fail(`Failed to publish data: ${error.message}`);
                 exit(1, error);
@@ -389,7 +396,7 @@ export class PublishPackageCommandModule {
         process.exit(0);
     }
 
-    async attemptPublishSchema(
+    async attemptPublishPackageFile(
         oraRef: Ora,
         packageFileWithContext: PackageFileWithContext,
         targetRegistries: RegistryReference[],
@@ -453,74 +460,42 @@ export class PublishPackageCommandModule {
         });
     }
 
-    async attemptPublishData(
+    async publishData(
         oraRef: Ora,
         packageFileWithContext: PackageFileWithContext,
         targetRegistries: RegistryReference[],
-        credentialsBySourceSlug: CredentialsByPackageIdentifier
+        _credentialsByPackageIdentifier: CredentialsByPackageIdentifier // maybe not necessary? Publishign user should have already entered the source credentials
     ): Promise<void> {
-        await this.publishData(packageFileWithContext, targetRegistries, credentialsBySourceSlug, {
-            updateStep: (step: PublishDataSteps, registryRef: RegistryReference, schema: Schema) => {
-                switch (step) {
-                    case PublishDataSteps.STARTING_UPLOAD:
-                        oraRef.start(
-                            "Starting to upload... " +
-                                identifierToString({
-                                    registryURL: registryRef.url,
-                                    catalogSlug: registryRef.catalogSlug,
-                                    packageSlug: packageFileWithContext.packageFile.packageSlug
-                                }) +
-                                " " +
-                                schema.title
-                        );
-                        break;
+        for (const targetRegistry of targetRegistries) {
+            const dataPMRepositoryDescription = await getSinkDescription(DATAPM_SINK_TYPE);
 
-                    case PublishDataSteps.FINISHED_UPLOAD:
-                        oraRef.succeed(
-                            "Completed upload of ... " +
-                                identifierToString({
-                                    registryURL: registryRef.url,
-                                    catalogSlug: registryRef.catalogSlug,
-                                    packageSlug: packageFileWithContext.packageFile.packageSlug
-                                }) +
-                                " " +
-                                schema.title
-                        );
-                        break;
+            if (dataPMRepositoryDescription == null) throw new Error("Could not find datapm module");
 
-                    case PublishDataSteps.UPLOADING_DATA:
-                        oraRef.text =
-                            "Uploading... " +
-                            identifierToString({
-                                registryURL: registryRef.url,
-                                catalogSlug: registryRef.catalogSlug,
-                                packageSlug: packageFileWithContext.packageFile.packageSlug
-                            }) +
-                            " " +
-                            schema.title;
-                        break;
+            const dataPMSink = await dataPMRepositoryDescription.loadSinkFromModule();
 
-                    default:
-                        throw new Error("Unhandled PublishDataSteps: " + step);
-                }
-            }
-        });
-    }
-
-    async publishData(
-        packageFileWithContext: PackageFileWithContext,
-        targetRegistries: RegistryReference[],
-        credentialsBySourceSlug: CredentialsByPackageIdentifier,
-        callback: { updateStep: (step: PublishDataSteps, registryRef: RegistryReference, schema: Schema) => void }
-    ): Promise<void> {
-        /* for (const targetRegistry of targetRegistries) {
-            for (const source of sources) {
-                // lock uploads to the stream (new interface method on sink)
-                // determine whether to create a new batch or use the existing one (update vs replace)
-                // Get the last offset from the registry
-                // Get a stream of the data using the last offset, if supported by the source
-            }
-        } */
+            await fetchMultipleWithListr(
+                oraRef,
+                packageFileWithContext.packageFile,
+                {
+                    catalogSlug: targetRegistry.catalogSlug,
+                    packageSlug: packageFileWithContext.packageFile.packageSlug,
+                    packageMajorVersion: new SemVer(packageFileWithContext.packageFile.version).major
+                },
+                dataPMSink,
+                {
+                    url: targetRegistry.url
+                },
+                {},
+                {
+                    catalogSlug: targetRegistry.catalogSlug,
+                    packageSlug: packageFileWithContext.packageFile.packageSlug,
+                    majorVersion: new SemVer(packageFileWithContext.packageFile.version).major
+                },
+                true,
+                false,
+                false
+            );
+        }
     }
 
     async publishPackageFile(
@@ -606,7 +581,7 @@ export class PublishPackageCommandModule {
     generateCreateVersion(
         packageFileWithContext: PackageFileWithContext,
         registryReference: RegistryReference,
-        _credentialsByPackageIdentifier: CredentialsByPackageIdentifier
+        _credentialsByPackageIdentifier: CredentialsByPackageIdentifier // This will be used for proxy feature
     ): CreateVersionInput {
         // deep copy the package file
         const packageFile = JSON.parse(JSON.stringify(packageFileWithContext.packageFile)) as PackageFile;
@@ -614,10 +589,7 @@ export class PublishPackageCommandModule {
         // filter out all othe registries
         packageFile.registries = [registryReference];
 
-        if (registryReference.publishMethod === PublishMethod.SCHEMA_AND_DATA) {
-            // Change all sources to use the target registry as the data repository
-            throw new Error("Data publishing not yet implemented");
-        } else if (registryReference.publishMethod === PublishMethod.SCHEMA_PROXY_DATA) {
+        if (registryReference.publishMethod === PublishMethod.SCHEMA_PROXY_DATA) {
             throw new Error("Publishing with credentials not yet implemented");
         }
 
@@ -741,9 +713,7 @@ export class PublishPackageCommandModule {
             }
 
             if (publishTypeSelection.method === PublishMethod.SCHEMA_AND_DATA) {
-                oraRef.info(
-                    "The data in this package will be copied, as a current snapshot or update, to the registry."
-                );
+                oraRef.info("The data in this package will be copied to the registry.");
                 oraRef.info(
                     "Consumers will not receive data updates until you run the 'datapm update' command on this package."
                 );

@@ -492,7 +492,7 @@ describe("Package Command Tests", async () => {
                 helperMessageFound: false
             };
             const cmdResult = await testCmd("package", [TEST_SOURCE_FILES.HTTP1], prompts, async (line: string) => {
-                if (line.includes("You have not added a registry API key")) {
+                if (line.includes("You have not logged a registry from the command line")) {
                     results.errorMessageFound = true;
                 }
                 if (line.includes("You can publish the package file with the following command")) {

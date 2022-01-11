@@ -16,7 +16,7 @@ export function batchIdentifierToChannelName(batchIdentifier:BatchUploadIdentifi
         "/" +
         batchIdentifier.majorVersion +
         "/" +
-        batchIdentifier.sourceType  +
+        batchIdentifier.sourceSlug  +
         "/" +
         batchIdentifier.streamSetSlug  +
         "/" +
@@ -55,7 +55,7 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
             .findBatchOrFail(
                 packageEntity.id,
                 this.openChannelRequest.batchIdentifier.majorVersion,
-                this.openChannelRequest.batchIdentifier.sourceType,
+                this.openChannelRequest.batchIdentifier.sourceSlug,
                 this.openChannelRequest.batchIdentifier.streamSetSlug,
                 this.openChannelRequest.batchIdentifier.streamSlug,
                 this.openChannelRequest.batchIdentifier.schemaTitle,
@@ -92,7 +92,7 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
             .findBatchOrFail(
                 packageEntity.id,
                 this.openChannelRequest.batchIdentifier.majorVersion,
-                this.openChannelRequest.batchIdentifier.sourceType,
+                this.openChannelRequest.batchIdentifier.sourceSlug,
                 this.openChannelRequest.batchIdentifier.streamSetSlug,
                 this.openChannelRequest.batchIdentifier.streamSlug,
                 this.openChannelRequest.batchIdentifier.schemaTitle,

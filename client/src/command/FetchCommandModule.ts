@@ -309,7 +309,7 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
 /** Uses the Listr library to fetch multiple streams of data at one time. This is used by serveral command line
  * command implementations
  */
-async function fetchMultipleWithListr(
+export async function fetchMultipleWithListr(
     oraRef: ora.Ora,
     packageFile: PackageFile,
     sinkStateKey: SinkStateKey,
@@ -320,7 +320,7 @@ async function fetchMultipleWithListr(
     defaults: boolean,
     forceUpdate: boolean,
     quiet: boolean
-) {
+): Promise<{ [key: string]: number }> {
     const fetchPreparations: {
         source: Source;
         uriInspectionResults: InspectionResults;

@@ -27,8 +27,12 @@ export function streamIdentifierToChannelName(streamIdentifier: SchemaUploadStre
         "/" +
         streamIdentifier.schemaTitle +
         "/" +
+        streamIdentifier.sourceSlug  +
+        "/" +
+        streamIdentifier.streamSetSlug  +
+        "/" +
         streamIdentifier.streamSlug  +
-        "/fetch"
+        "/upload"
     );
 }
 
