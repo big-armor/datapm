@@ -52,7 +52,7 @@ export interface RecordContext {
 /** Created by the internal system to identify a record received from a source, and tag it with additional properties */
 export interface RecordStreamContext {
     /** The source type (unique identifier of the source implementation) from which the record was produced */
-    sourceType: string;
+    sourceSlug: string;
 
     /** The unique stream set slug from which the record was produced. */
     streamSetSlug: string;
