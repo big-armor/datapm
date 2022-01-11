@@ -27,6 +27,8 @@ export function streamIdentifierToChannelName(streamIdentifier: SchemaUploadStre
         "/" +
         streamIdentifier.schemaTitle +
         "/" +
+        streamIdentifier.sourceType  +
+        "/" +
         streamIdentifier.sourceSlug  +
         "/" +
         streamIdentifier.streamSetSlug  +

@@ -7,6 +7,7 @@ import { SinkState } from "./SinkState";
  * a PackageIdentifier.
  */
 export interface SchemaUploadStreamIdentifier extends SchemaIdentifier {
+    sourceType: string;
     sourceSlug: string;
     streamSetSlug: string;
     streamSlug: string;

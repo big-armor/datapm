@@ -35,6 +35,7 @@ export class SetActiveBatchesHandler extends EventEmitter implements RequestHand
                     .findBatchOrFail(
                         packageEntity.id,
                         batchIdentifier.majorVersion,
+                        batchIdentifier.sourceType,
                         batchIdentifier.sourceSlug,
                         batchIdentifier.streamSetSlug,
                         batchIdentifier.streamSlug,

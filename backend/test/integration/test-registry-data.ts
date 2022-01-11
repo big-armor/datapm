@@ -184,6 +184,7 @@ describe("Data Store on Registry", async () => {
                 packageSlug: "simple",
                 majorVersion: 1,
                 registryUrl: "http://localhost:4000",
+                sourceType: "test",
                 sourceSlug: "test",
                 streamSetSlug: "simple",
                 streamSlug: "simple",
@@ -219,6 +220,7 @@ describe("Data Store on Registry", async () => {
                 packageSlug: "not-correct",
                 majorVersion: 1,
                 registryUrl: "http://localhost:4000",
+                sourceType: "test",
                 sourceSlug: "test",
                 streamSetSlug: "simple",
                 streamSlug: "simple",
@@ -252,6 +254,7 @@ describe("Data Store on Registry", async () => {
                 packageSlug: "simple",
                 majorVersion: 1,
                 registryUrl: "http://localhost:4000",
+                sourceType: "test",
                 sourceSlug: "test",
                 streamSetSlug: "simple",
                 streamSlug: "simple",
@@ -285,6 +288,7 @@ describe("Data Store on Registry", async () => {
                 packageSlug: "simple",
                 majorVersion: 1,
                 registryUrl: "http://localhost:4000",
+                sourceType: "test",
                 sourceSlug: "test",
                 streamSetSlug: "simple",
                 streamSlug: "simple",
@@ -317,6 +321,7 @@ describe("Data Store on Registry", async () => {
                 packageSlug: "simple",
                 majorVersion: 1,
                 registryUrl: "http://localhost:4000",
+                sourceType: "test",
                 sourceSlug: "test",
                 streamSetSlug: "simple",
                 streamSlug: "simple",
@@ -334,6 +339,7 @@ describe("Data Store on Registry", async () => {
         expect(startResponse.batchIdentifier.catalogSlug).equal("testA-registry-data");
         expect(startResponse.batchIdentifier.majorVersion).equal(1);
         expect(startResponse.batchIdentifier.packageSlug).equal("simple");
+        expect(startResponse.batchIdentifier.sourceType).equal("test");
         expect(startResponse.batchIdentifier.sourceSlug).equal("test");
         expect(startResponse.batchIdentifier.streamSetSlug).equal("simple");
         expect(startResponse.batchIdentifier.streamSlug).equal("simple");
@@ -404,6 +410,7 @@ describe("Data Store on Registry", async () => {
                 packageSlug: "simple",
                 majorVersion: 1,
                 registryUrl: "http://localhost:4000",
+                sourceType: "test",
                 sourceSlug: "test",
                 streamSetSlug: "simple",
                 streamSlug: "simple",
@@ -426,6 +433,7 @@ describe("Data Store on Registry", async () => {
         expect(updateDefaultResponse.batchIdentifiers[0].catalogSlug).equal("testA-registry-data");
         expect(updateDefaultResponse.batchIdentifiers[0].majorVersion).equal(1);
         expect(updateDefaultResponse.batchIdentifiers[0].packageSlug).equal("simple");
+        expect(updateDefaultResponse.batchIdentifiers[0].sourceType).equal("test");
         expect(updateDefaultResponse.batchIdentifiers[0].sourceSlug).equal("test");
         expect(updateDefaultResponse.batchIdentifiers[0].streamSetSlug).equal("simple");
         expect(updateDefaultResponse.batchIdentifiers[0].streamSlug).equal("simple");
@@ -450,6 +458,7 @@ describe("Data Store on Registry", async () => {
                 packageSlug: "simple",
                 majorVersion: 1,
                 registryUrl: "http://localhost:4000",
+                sourceType: "test",
                 sourceSlug: "test",
                 streamSetSlug: "simple",
                 streamSlug: "simple",
@@ -678,6 +687,7 @@ describe("Data Store on Registry", async () => {
                 packageSlug: "simple",
                 majorVersion: 1,
                 registryUrl: "http://localhost:4000",
+                sourceType: "test",
                 sourceSlug: "test",
                 streamSetSlug: "simple",
                 streamSlug: "simple",
@@ -749,6 +759,7 @@ describe("Data Store on Registry", async () => {
                 packageSlug: "simple",
                 majorVersion: 1,
                 registryUrl: "http://localhost:4000",
+                sourceType: "test",
                 sourceSlug: "test",
                 streamSetSlug: "simple",
                 streamSlug: "simple",

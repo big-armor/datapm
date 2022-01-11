@@ -14,6 +14,7 @@ export class DataBatchRepository {
     public async findBatchOrFail(
         packageId: number,
         majorVersion: number,
+        sourceType: string,
         sourceSlug: string,
         streamSetSlug: string,
         streamSlug: string,
@@ -21,7 +22,7 @@ export class DataBatchRepository {
         batch:number
     ): Promise<DataBatchEntity> {
         
-        const batchEntity = await this.findBatch(packageId, majorVersion, sourceSlug, streamSetSlug, streamSlug, schemaTitle, batch);
+        const batchEntity = await this.findBatch(packageId, majorVersion, sourceType, sourceSlug, streamSetSlug, streamSlug, schemaTitle, batch);
 
         if(batchEntity === undefined) {
             throw new Error("BATCH_NOT_FOUND");
@@ -67,6 +68,7 @@ export class DataBatchRepository {
     public async findBatch(
         packageId: number,
         majorVersion: number,
+        sourceType: string,
         sourceSlug: string,
         streamSetSlug: string,
         streamSlug: string,
@@ -78,6 +80,7 @@ export class DataBatchRepository {
             .createQueryBuilder("BatchEntity")
             .where('"BatchEntity"."package_id" = :packageId')
             .andWhere('"BatchEntity"."major_version" = :majorVersion')
+            .andWhere('"BatchEntity"."sourcetype" = :sourceType')
             .andWhere('"BatchEntity"."sourceslug" = :sourceSlug')
             .andWhere('"BatchEntity"."streamsetslug" = :streamSetSlug')
             .andWhere('"BatchEntity"."streamslug" = :streamSlug')
@@ -85,6 +88,7 @@ export class DataBatchRepository {
             .andWhere('"BatchEntity"."batch" = :batch')
             .setParameter("packageId", packageId)
             .setParameter("majorVersion", majorVersion)
+            .setParameter("sourceType", sourceType)
             .setParameter("sourceSlug", sourceSlug)
             .setParameter("streamSetSlug", streamSetSlug)
             .setParameter("streamSlug", streamSlug)
@@ -107,6 +111,7 @@ export class DataBatchRepository {
                 packageId: packageEntity.id,
                 schemaTitle: identifier.schemaTitle,
                 streamSetSlug: identifier.streamSetSlug,
+                sourceType: identifier.sourceType,
                 sourceSlug: identifier.sourceSlug,
                 streamSlug: identifier.streamSlug,
                 majorVersion: identifier.majorVersion,
@@ -140,6 +145,7 @@ export class DataBatchRepository {
             .createQueryBuilder(ALIAS)
             .where({ packageId: packageObject.id })
             .andWhere('"findLatestBatch"."major_version" = :majorVersion')
+            .andWhere('"findLatestBatch"."sourcetype" = :sourceType')
             .andWhere('"findLatestBatch"."sourceslug" = :sourceSlug')
             .andWhere('"findLatestBatch"."streamsetslug" = :streamSetSlug')
             .andWhere('"findLatestBatch"."streamslug" = :streamSlug')
@@ -148,6 +154,7 @@ export class DataBatchRepository {
                 "findLatestBatch.batch": "DESC"
             })
             .setParameter("majorVersion", identifier.majorVersion)
+            .setParameter("sourceType", identifier.sourceType)
             .setParameter("sourceSlug", identifier.sourceSlug)
             .setParameter("streamSetSlug", identifier.streamSetSlug)
             .setParameter("streamSlug", identifier.streamSlug)
@@ -173,12 +180,14 @@ export class DataBatchRepository {
             .createQueryBuilder(ALIAS)
             .where({ packageId: packageObject.id })
             .andWhere('"findDefault"."major_version" = :majorVersion')
+            .andWhere('"findDefault"."sourcetype" = :sourceType')
             .andWhere('"findDefault"."sourceslug" = :sourceSlug')
             .andWhere('"findDefault"."streamsetslug" = :streamSetSlug')
             .andWhere('"findDefault"."streamslug" = :streamSlug')
             .andWhere('"findDefault"."schematitle" = :schemaTitle')
             .andWhere('"findDefault"."default" = true')
             .setParameter("majorVersion", identifier.majorVersion)
+            .setParameter("sourceType", identifier.sourceType)
             .setParameter("sourceSlug", identifier.sourceSlug)
             .setParameter("streamSetSlug", identifier.streamSetSlug)
             .setParameter("streamSlug", identifier.streamSlug)
@@ -250,12 +259,14 @@ export class DataBatchRepository {
             .createQueryBuilder(ALIAS)
             .where({ packageId: packageEntity.id })
             .andWhere('"DataBatchEntity"."majorVersion" = :majorVersion')
+            .andWhere('"DataBatchEntity"."sourcetype" = :sourceType')
             .andWhere('"DataBatchEntity"."sourceslug" = :sourceSlug')
             .andWhere('"DataBatchEntity"."streamsetslug" = :streamSetSlug')
             .andWhere('"DataBatchEntity"."streamSlug" = :streamSlug')
             .andWhere('"DataBatchEntity"."schematitle" = :schemaTitle')
             .addRelations(ALIAS, relations)
             .setParameter("majorVersion", streamIdentifier.majorVersion)  
+            .setParameter("sourceType", streamIdentifier.sourceType)
             .setParameter("sourceSlug", streamIdentifier.sourceSlug)
             .setParameter("streamSetSlug", streamIdentifier.streamSetSlug) 
             .setParameter("streamSlug", streamIdentifier.streamSlug)
@@ -284,13 +295,14 @@ export class DataBatchRepository {
             .createQueryBuilder(ALIAS)
             .where({ packageId: packageEntity.id })
             .andWhere('"DataBatchEntity"."majorVersion" = :majorVersion')
+            .andWhere('"DataBatchEntity"."sourcetype" = :sourceType')
             .andWhere('"DataBatchEntity"."sourceslug" = :sourceSlug')
             .andWhere('"DataBatchEntity"."streamsetslug" = :streamSetSlug')
             .andWhere('"DataBatchEntity"."streamslug" = :streamSlug')
             .andWhere('"DataBatchEntity"."schematitle" = :schemaTitle')
             .addRelations(ALIAS, relations)
             .setParameter("majorVersion", streamIdentifier.majorVersion)   
-            .setParameter("sourceSlug", streamIdentifier.sourceSlug)
+            .setParameter("sourceType", streamIdentifier.sourceType)
             .setParameter("streamSetSlug", streamIdentifier.streamSetSlug) 
             .setParameter("streamSlug", streamIdentifier.streamSlug)
             .setParameter("schemaTitle", streamIdentifier.schemaTitle)
@@ -308,17 +320,6 @@ export class DataBatchRepository {
         if (batches.length == 0) return;
 
         for (const batch of batches) {
-            const batchIdentifier: BatchUploadIdentifier = {
-                registryUrl: process.env.REGISTRY_URL as string,
-                catalogSlug: batch.package.catalog.slug,
-                packageSlug: batch.package.slug,
-                majorVersion: batch.majorVersion,
-                sourceSlug: batch.sourceSlug,
-                streamSetSlug: batch.streamSetSlug,
-                streamSlug: batch.streamSlug,
-                batch: batch.batch,
-                schemaTitle: batch.schemaTitle,
-            };
             try {
                 await this.dataStorageService.deleteBatch(batch.id);
             } catch (error) {

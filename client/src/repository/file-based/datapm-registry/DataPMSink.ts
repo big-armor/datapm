@@ -135,6 +135,7 @@ export class DataPMSink implements Sink {
                             catalogSlug: configuration.catalogSlug as string,
                             packageSlug: configuration.packageSlug as string,
                             majorVersion: configuration.majorVersion as number,
+                            sourceType: record.sourceType,
                             streamSetSlug: record.streamSetSlug,
                             streamSlug: record.streamSlug,
                             sourceSlug: record.sourceSlug,

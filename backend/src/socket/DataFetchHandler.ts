@@ -55,6 +55,7 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
             .findBatchOrFail(
                 packageEntity.id,
                 this.openChannelRequest.batchIdentifier.majorVersion,
+                this.openChannelRequest.batchIdentifier.sourceType,
                 this.openChannelRequest.batchIdentifier.sourceSlug,
                 this.openChannelRequest.batchIdentifier.streamSetSlug,
                 this.openChannelRequest.batchIdentifier.streamSlug,
@@ -92,6 +93,7 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
             .findBatchOrFail(
                 packageEntity.id,
                 this.openChannelRequest.batchIdentifier.majorVersion,
+                this.openChannelRequest.batchIdentifier.sourceType,
                 this.openChannelRequest.batchIdentifier.sourceSlug,
                 this.openChannelRequest.batchIdentifier.streamSetSlug,
                 this.openChannelRequest.batchIdentifier.streamSlug,

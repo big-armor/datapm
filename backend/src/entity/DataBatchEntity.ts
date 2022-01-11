@@ -32,6 +32,9 @@ export class DataBatchEntity extends EntityBaseModel {
     @Column({name: "schematitle"})
     schemaTitle: string;
 
+    @Column({name: "sourcetype"})
+    sourceType: string;
+
     @Column({name: "sourceslug"})
     sourceSlug: string;
 
