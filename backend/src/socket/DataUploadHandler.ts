@@ -44,8 +44,8 @@ export function streamIdentifierToChannelName(streamIdentifier: SchemaUploadStre
  * many sub versions (1.0.0 and 1.1.0 and 1.2.1, etc). An upload of data for any one major version of the
  * schema should validate against all subversions of the schema. 
  * 
- * A data batch is like a version of uploaded data. A batch of a stream is uploaded once, and then may be
- * uploaded again (batch 2). 
+ * A data batch is like a version of uploaded data. A new batch replaces an old batch. Each batch can be added to
+ * indefinitely. 
  * 
  * After a batch is uploaded, the client must tell the server to make the new batch the active batch - so that
  * other clients are served the correct batch. This can be done immediately after the upload is completed, 
