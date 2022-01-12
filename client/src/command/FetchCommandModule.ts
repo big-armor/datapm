@@ -354,7 +354,7 @@ export async function fetchMultipleWithListr(
                     continue;
                 }
 
-                oraRef.succeed("New records are available");
+                oraRef.succeed("New records may be available");
             }
 
             const streamSet = source.streamSets.find((s) => s.slug === streamSetPreview.slug);

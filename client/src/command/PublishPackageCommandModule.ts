@@ -18,6 +18,7 @@ import { ParameterOption } from "../util/parameters/Parameter";
 import { getRegistryClientWithConfig } from "../util/RegistryClient";
 import { fetchMultipleWithListr } from "./FetchCommandModule";
 import { PublishArguments } from "./PublishPackageCommand";
+import numeral from "numeral";
 
 export enum PublishSchemaSteps {
     CONNECT = "connect",
@@ -65,11 +66,11 @@ export class PublishPackageCommandModule {
 
         oraRef.start(`Resolving package file reference: ${argv.reference}`);
 
-        const packageFileWithContext = (await getPackage(argv.reference).catch((error) => {
+        const packageFileWithContext = await getPackage(argv.reference).catch((error) => {
             oraRef.fail();
             console.log(chalk.red(error.message));
-            throw error;
-        })) as PackageFileWithContext;
+            process.exit(1);
+        });
 
         const packageFile = packageFileWithContext.packageFile;
 
@@ -127,12 +128,12 @@ export class PublishPackageCommandModule {
             if (registries.length === 0) {
                 console.log(
                     chalk.yellow(
-                        "You have not logged a registry from the command line. Use the command below to login."
+                        "You have not logged into a registry from the command line. Use the command below to login."
                     ) +
                         "\n" +
                         chalk.green("datapm registry login")
                 );
-                throw new Error();
+                process.exit(1);
             }
 
             const targetRegistryActionResponse = await prompts(
@@ -342,19 +343,31 @@ export class PublishPackageCommandModule {
                 exit(1, error);
             });
 
-        if (targetRegistries.find((registry) => registry.publishMethod === PublishMethod.SCHEMA_AND_DATA)) {
+        const registryForDataPublishing = targetRegistries.filter(
+            (registry) => registry.publishMethod === PublishMethod.SCHEMA_AND_DATA
+        );
+
+        if (registryForDataPublishing.length > 0) {
             oraRef.info("Publishing data...");
 
-            try {
-                await this.publishData(
-                    oraRef,
-                    packageFileWithContext,
-                    targetRegistries.filter((registry) => registry.publishMethod === PublishMethod.SCHEMA_AND_DATA),
-                    credentialsByPackageIdentifier
-                );
-            } catch (error) {
-                oraRef.fail(`Failed to publish data: ${error.message}`);
-                exit(1, error);
+            for (const targetRegistry of registryForDataPublishing) {
+                try {
+                    const results = await this.publishData(
+                        oraRef,
+                        packageFileWithContext,
+                        targetRegistry,
+                        credentialsByPackageIdentifier
+                    );
+
+                    const totalRecordCount = Object.values(results).reduce((acc, result) => acc + result, 0);
+
+                    oraRef.succeed(
+                        `Finished uploading ${numeral(totalRecordCount).format("0,0")} records to ` + targetRegistry.url
+                    );
+                } catch (error) {
+                    oraRef.fail(`Failed to publish data: ${error.message}`);
+                    exit(1, error);
+                }
             }
         }
 
@@ -425,7 +438,7 @@ export class PublishPackageCommandModule {
                         break;
 
                     case PublishSchemaSteps.UPDATED_PACKAGE_LISTING:
-                        oraRef.succeed("Package description and name updated");
+                        oraRef.succeed("Updated package listing");
                         break;
 
                     case PublishSchemaSteps.NO_EXISTING_PACKAGE_FOUND:
@@ -463,39 +476,37 @@ export class PublishPackageCommandModule {
     async publishData(
         oraRef: Ora,
         packageFileWithContext: PackageFileWithContext,
-        targetRegistries: RegistryReference[],
+        targetRegistry: RegistryReference,
         _credentialsByPackageIdentifier: CredentialsByPackageIdentifier // maybe not necessary? Publishign user should have already entered the source credentials
-    ): Promise<void> {
-        for (const targetRegistry of targetRegistries) {
-            const dataPMRepositoryDescription = await getSinkDescription(DATAPM_SINK_TYPE);
+    ): Promise<{ [key: string]: number }> {
+        const dataPMRepositoryDescription = await getSinkDescription(DATAPM_SINK_TYPE);
 
-            if (dataPMRepositoryDescription == null) throw new Error("Could not find datapm module");
+        if (dataPMRepositoryDescription == null) throw new Error("Could not find datapm module");
 
-            const dataPMSink = await dataPMRepositoryDescription.loadSinkFromModule();
+        const dataPMSink = await dataPMRepositoryDescription.loadSinkFromModule();
 
-            await fetchMultipleWithListr(
-                oraRef,
-                packageFileWithContext.packageFile,
-                {
-                    catalogSlug: targetRegistry.catalogSlug,
-                    packageSlug: packageFileWithContext.packageFile.packageSlug,
-                    packageMajorVersion: new SemVer(packageFileWithContext.packageFile.version).major
-                },
-                dataPMSink,
-                {
-                    url: targetRegistry.url
-                },
-                {},
-                {
-                    catalogSlug: targetRegistry.catalogSlug,
-                    packageSlug: packageFileWithContext.packageFile.packageSlug,
-                    majorVersion: new SemVer(packageFileWithContext.packageFile.version).major
-                },
-                true,
-                false,
-                false
-            );
-        }
+        return await fetchMultipleWithListr(
+            oraRef,
+            packageFileWithContext.packageFile,
+            {
+                catalogSlug: targetRegistry.catalogSlug,
+                packageSlug: packageFileWithContext.packageFile.packageSlug,
+                packageMajorVersion: new SemVer(packageFileWithContext.packageFile.version).major
+            },
+            dataPMSink,
+            {
+                url: targetRegistry.url
+            },
+            {},
+            {
+                catalogSlug: targetRegistry.catalogSlug,
+                packageSlug: packageFileWithContext.packageFile.packageSlug,
+                majorVersion: new SemVer(packageFileWithContext.packageFile.version).major
+            },
+            true,
+            false,
+            false
+        );
     }
 
     async publishPackageFile(
@@ -569,7 +580,7 @@ export class PublishPackageCommandModule {
                     context.updateStep(PublishSchemaSteps.VERSION_EXISTS_SUCCESS, registryRef);
                 else throw serverResponse.errors[0];
             } else {
-                context.updateStep(PublishSchemaSteps.CREATE_VERSION_SUCCESS, registryRef);
+                context.updateStep(PublishSchemaSteps.CREATE_VERSION_SUCCESS, registryRef); // FIXME ONLY SHOW THIS IF THE VERSION HAS ACCTUALLY CHANGED
             }
 
             returnValue.set(registryRef, true);

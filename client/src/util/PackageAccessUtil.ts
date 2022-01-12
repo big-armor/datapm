@@ -92,9 +92,16 @@ export async function getPackage(identifier: string): Promise<PackageFileWithCon
         };
     } else if (fs.existsSync(identifier)) {
         const packageFile = loadPackageFileFromDisk(identifier);
-        const pathToPackageFile = path.isAbsolute(identifier)
-            ? path.dirname(identifier)
-            : process.cwd() + path.dirname(identifier);
+        let pathToPackageFile = path.dirname(identifier);
+
+        if (!path.isAbsolute(identifier)) {
+            pathToPackageFile = process.cwd();
+            const directory = path.dirname(identifier);
+
+            if (directory !== ".") {
+                pathToPackageFile += path.sep + directory;
+            }
+        }
         const packageFileName = path.basename(identifier);
 
         return {
