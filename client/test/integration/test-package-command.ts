@@ -492,16 +492,12 @@ describe("Package Command Tests", async () => {
                 helperMessageFound: false
             };
             const cmdResult = await testCmd("package", [TEST_SOURCE_FILES.HTTP1], prompts, async (line: string) => {
-                if (line.includes("You have not logged a registry from the command line")) {
+                if (line.includes("You have not logged into a registry from the command line")) {
                     results.errorMessageFound = true;
-                }
-                if (line.includes("You can publish the package file with the following command")) {
-                    results.helperMessageFound = true;
                 }
             });
             expect(cmdResult.code, "Exit code").equals(1);
             expect(results.errorMessageFound, "Found attempt message").equals(true);
-            expect(results.helperMessageFound, "Found helper message").equals(true);
             removePackageFiles(["package-a"]);
             addRegistry({
                 url: `http://localhost:${registryServerPort}`,

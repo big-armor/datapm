@@ -84,7 +84,7 @@ describe("Publish Package Command Tests", async function () {
         };
 
         const cmdResult = await testCmd("publish", [packageAFilePath], [], async (line: string) => {
-            if (line.includes("You have not logged a registry from the command line")) {
+            if (line.includes("You have not logged into a registry from the command line")) {
                 results.messageFound = true;
             }
         });
