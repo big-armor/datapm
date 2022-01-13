@@ -79,10 +79,18 @@ export async function getPackage(identifier: string): Promise<PackageFileWithCon
 
             // TODO support fetching specific package versions
 
-            return fetchPackage(registryClient, {
-                catalogSlug: pathParts[0],
-                packageSlug: pathParts[1]
-            });
+            try {
+                return await fetchPackage(registryClient, {
+                    catalogSlug: pathParts[0],
+                    packageSlug: pathParts[1]
+                });
+            } catch (e) {
+                if (typeof e.message === "string" && (e.message as string).includes("NOT_AUTHENTICATED")) {
+                    throw new Error("NOT_AUTHENTICATED_TO_REGISTRY");
+                } else {
+                    throw e;
+                }
+            }
         }
         if (!http.ok) throw new Error(`Failed to obtain ${http.status} ${http.statusText}`);
 

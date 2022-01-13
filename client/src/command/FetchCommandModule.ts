@@ -41,7 +41,7 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
             {
                 type: "text",
                 name: "reference",
-                message: "What is the package file name or url?",
+                message: "What is the package name, url, or file name?",
                 validate: (value) => {
                     if (!value) return "Package file name or url required";
                     return true;
@@ -84,7 +84,15 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
 
     const packageFileWithContext = await getPackage(argv.reference).catch((error) => {
         oraRef.fail();
-        console.error(chalk.red(error.message));
+
+        if (typeof error.message === "string" && error.message.includes("NOT_AUTHENTICATED_TO_REGISTRY")) {
+            console.error(
+                chalk.yellow("You are not authenticated to the registry. Use the following command to authenticate.")
+            );
+            console.error(chalk.green("datapm registry login"));
+        } else {
+            console.error(chalk.red(error.message));
+        }
         process.exit(1);
     });
 
