@@ -198,4 +198,6 @@ describe("Compare Command Tests", async function () {
         expect(cmdResult.code, "Exit code").equals(0);
         expect(results.messageFound, "Found success message").equals(true);
     });
+
+    // TODO add test for comparing modified (non-cononical) packages
 });

@@ -3,7 +3,6 @@ import { expect } from "chai";
 import { CreatePackageDocument, CreateVersionDocument } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
-import * as crypto from "crypto";
 import { loadPackageFileFromDisk, parsePackageFileJSON } from "datapm-lib";
 
 describe("Upgrading package files automatically", function () {
@@ -88,9 +87,11 @@ describe("Upgrading package files automatically", function () {
 
         const packageFile = parsePackageFileJSON(responsePackageFileContents);
 
-        expect(packageFile.$schema).equals("https://datapm.io/docs/package-file-schema-v0.7.0.json");
+        expect(packageFile.$schema).equals("https://datapm.io/docs/package-file-schema-v0.8.0.json");
         expect(packageFile.licenseMarkdown).includes("This is not a real license. Just a test.");
 
         expect(Array.isArray(packageFile.sources[0].configuration!.uris)).equal(true);
+
+        expect(packageFile.cononical).equal(true);
     });
 });

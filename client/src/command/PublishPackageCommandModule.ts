@@ -66,13 +66,21 @@ export class PublishPackageCommandModule {
 
         oraRef.start(`Resolving package file reference: ${argv.reference}`);
 
-        const packageFileWithContext = await getPackage(argv.reference).catch((error) => {
+        const packageFileWithContext = await getPackage(argv.reference, "cononical").catch((error) => {
             oraRef.fail();
             console.log(chalk.red(error.message));
             process.exit(1);
         });
 
         const packageFile = packageFileWithContext.packageFile;
+
+        if (packageFile.cononical === false) {
+            oraRef.fail(
+                "Package file is not cononical. This means it is a copy modified for security or convenience reasons."
+            );
+            console.log(chalk.yellow("Use a cononical package file, or contact the package file author."));
+            process.exit(1);
+        }
 
         oraRef.succeed(`Found target package file: ${packageFileWithContext.packageFileUrl.replace("file://", "")}`);
 

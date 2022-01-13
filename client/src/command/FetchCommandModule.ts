@@ -82,7 +82,7 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
     // Finding package
     oraRef.start("Finding package " + argv.reference);
 
-    const packageFileWithContext = await getPackage(argv.reference).catch((error) => {
+    const packageFileWithContext = await getPackage(argv.reference, "modified").catch((error) => {
         oraRef.fail();
 
         if (typeof error.message === "string" && error.message.includes("NOT_AUTHENTICATED_TO_REGISTRY")) {

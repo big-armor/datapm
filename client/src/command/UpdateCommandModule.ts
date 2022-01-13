@@ -285,7 +285,7 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
     // Finding package
     oraRef.start("Finding package...");
 
-    const packageFileWithContext = await getPackage(argv.reference).catch((error) => {
+    const packageFileWithContext = await getPackage(argv.reference, "cononicalIfAvailable").catch((error) => {
         oraRef.fail();
         console.log(chalk.red(error.message));
         process.exit(1);
@@ -323,6 +323,19 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
             );
             process.exit(1);
         }
+    }
+
+    if (packageFileWithContext.packageFile.cononical === false) {
+        oraRef.fail("Package is not cononical. It has been modified for security or convenience reasons.");
+
+        if (packageFileWithContext.packageFile.modifiedProperties !== undefined) {
+            oraRef.info(
+                "Modified properties include: " + packageFileWithContext.packageFile.modifiedProperties.join(", ")
+            );
+
+            oraRef.info("Use the original package file, or contact the package author.");
+        }
+        process.exit(1);
     }
 
     const sourceInspectionContext: SourceInspectionContext = {

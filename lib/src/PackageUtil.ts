@@ -8,7 +8,7 @@ import {
     ValueTypeStatistics,
     PublishMethod,
     RegistryReference
-} from "./PackageFile-v0.7.0";
+} from "./main";
 import fs from "fs";
 import path from "path";
 import AJV from "ajv";
@@ -21,6 +21,7 @@ import { PackageFileV030, CountPrecisionV030 } from "./PackageFile-v0.3.0";
 import { PackageFile040 } from "./PackageFile-v0.4.0";
 import { PackageFile050 } from "./PackageFile-v0.5.0";
 import { PackageFile060 } from "./PackageFile-v0.6.0";
+import { PackageFile070 } from "./PackageFile-v0.7.0";
 
 export type DPMRecordValue =
     | number
@@ -731,6 +732,16 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
         for (const oldRegistry of oldPackageFile.registries || []) {
             const newRegistry = oldRegistry as RegistryReference;
             newRegistry.publishMethod = PublishMethod.SCHEMA_ONLY;
+        }
+    }
+
+    if (packageFileObject.$schema === "https://datapm.io/docs/package-file-schema-v0.7.0.json") {
+        packageFileObject.$schema = "https://datapm.io/docs/package-file-schema-v0.8.0.json";
+
+        const oldPackageFile = packageFileObject as PackageFile070;
+
+        if ((oldPackageFile as PackageFile).cononical !== null) {
+            (oldPackageFile as PackageFile).cononical = true;
         }
     }
 

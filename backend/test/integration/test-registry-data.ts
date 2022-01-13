@@ -154,7 +154,7 @@ describe("Data Store on Registry", async () => {
         expect(responsePackageFile.licenseMarkdown).includes("License not defined");
 
         expect(responsePackageFile.registries![0].publishMethod).equal(PublishMethod.SCHEMA_AND_DATA);
-        expect(responsePackageFile.sources![0].type).equal("datapmRegistry");
+        expect(responsePackageFile.sources![0].type).equal("datapm");
         expect(responsePackageFile.sources![0].streamSets[0].slug).equal("simple");
         
         
@@ -667,7 +667,7 @@ describe("Data Store on Registry", async () => {
 
 
         expect(responsePackageFile.sources.length).to.equal(1);
-        expect(responsePackageFile.sources[0].type).equal("datapmRegistry");
+        expect(responsePackageFile.sources[0].type).equal("datapm");
         expect(responsePackageFile.sources[0].configuration!.catalogSlug).equal("testA-registry-data");
         expect(responsePackageFile.sources[0].configuration!.packageSlug).equal("simple");
         expect(responsePackageFile.sources[0].configuration!.version).equal(1);

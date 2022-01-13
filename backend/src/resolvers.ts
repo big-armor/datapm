@@ -63,8 +63,9 @@ import {
     versionCreatedAt,
     versionIdentifier,
     versionPackage,
-    versionPackageFile,
-    versionUpdatedAt
+    modifiedPackageFile,
+    versionUpdatedAt,
+    cononicalPackageFile
 } from "./resolvers/VersionResolver";
 import {
     setUserCollectionPermissions,
@@ -509,7 +510,8 @@ export const resolvers: {
     },
     Version: {
         identifier: versionIdentifier,
-        packageFile: versionPackageFile,
+        packageFile: modifiedPackageFile,
+        cononicalPackageFile: cononicalPackageFile,
         author: versionAuthor,
         createdAt: versionCreatedAt,
         package: versionPackage,

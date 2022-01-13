@@ -23,7 +23,8 @@ export interface PackageFileWithContext {
 
 async function fetchPackage(
     registryClient: RegistryClient,
-    identifier: PackageIdentifierInput
+    identifier: PackageIdentifierInput,
+    modifiedOrCononical: "modified" | "cononical" | "cononicalIfAvailable"
 ): Promise<PackageFileWithContext> {
     const response = await registryClient.getPackage({
         packageSlug: identifier.packageSlug,
@@ -41,8 +42,16 @@ async function fetchPackage(
         throw new Error("Found package, but it has no latest version");
     }
 
-    validatePackageFile(version.packageFile);
-    const packageFile = parsePackageFileJSON(version.packageFile);
+    let packageFileJSON = version.packageFile;
+
+    if (modifiedOrCononical === "cononicalIfAvailable" && version.cononicalPackageFile != null) {
+        packageFileJSON = version.cononicalPackageFile;
+    } else if (modifiedOrCononical === "cononical") {
+        packageFileJSON = version.cononicalPackageFile;
+    }
+
+    validatePackageFile(packageFileJSON);
+    const packageFile = parsePackageFileJSON(packageFileJSON);
     return {
         package: response.data?.package,
         packageFile,
@@ -52,7 +61,10 @@ async function fetchPackage(
     };
 }
 
-export async function getPackage(identifier: string): Promise<PackageFileWithContext> {
+export async function getPackage(
+    identifier: string,
+    modifiedOrCononical: "modified" | "cononical" | "cononicalIfAvailable"
+): Promise<PackageFileWithContext> {
     if (identifier.startsWith("http://") || identifier.startsWith("https://")) {
         const http = await fetch(identifier, {
             method: "GET"
@@ -80,10 +92,14 @@ export async function getPackage(identifier: string): Promise<PackageFileWithCon
             // TODO support fetching specific package versions
 
             try {
-                return await fetchPackage(registryClient, {
-                    catalogSlug: pathParts[0],
-                    packageSlug: pathParts[1]
-                });
+                return await fetchPackage(
+                    registryClient,
+                    {
+                        catalogSlug: pathParts[0],
+                        packageSlug: pathParts[1]
+                    },
+                    modifiedOrCononical
+                );
             } catch (e) {
                 if (typeof e.message === "string" && (e.message as string).includes("NOT_AUTHENTICATED")) {
                     throw new Error("NOT_AUTHENTICATED_TO_REGISTRY");
@@ -120,7 +136,7 @@ export async function getPackage(identifier: string): Promise<PackageFileWithCon
         const registryClient = getRegistryClientWithConfig({ url: "https://datapm.io" });
         const packageIdentifier = parsePackageIdentifier(identifier);
 
-        return fetchPackage(registryClient, packageIdentifier);
+        return fetchPackage(registryClient, packageIdentifier, modifiedOrCononical);
     } else {
         throw new Error(
             `Reference '${identifier}' is either not a valid package identifier, a valid package url, or url pointing to a valid package file.`

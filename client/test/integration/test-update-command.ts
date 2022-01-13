@@ -494,6 +494,7 @@ describe("Update Package Command Tests", async () => {
             [`http://localhost:${registryServerPort}/testa-update-command/test`],
             prompts,
             async (line: string) => {
+                console.log(line);
                 if (line.includes("The registry reports that you do not have permission to edit this package")) {
                     results.messageFound = true;
                 }
@@ -522,6 +523,7 @@ describe("Update Package Command Tests", async () => {
         };
 
         const cmdResult = await testCmd("update", [packageAFilePath, "--defaults"], [], async (line: string) => {
+            console.log(line);
             if (
                 line.includes(
                     "You do not have an API key configured for this registry. You must first create an API Key, and add it to this client. Then you can retry this command"

@@ -5,7 +5,7 @@ import fs from "fs";
 describe("PackageFile checks", () => {
     it("Should have correct schema value", function () {
         const test = new PackageFile();
-        expect(test.$schema).equal("https://datapm.io/docs/package-file-schema-v0.7.0.json");
+        expect(test.$schema).equal("https://datapm.io/docs/package-file-schema-v0.8.0.json");
     });
 
     it("Should parse dates", function () {
@@ -72,5 +72,10 @@ describe("PackageFile checks", () => {
         }
 
         expect(errorFound).equal(true);
+    });
+
+    it("Should have v0.8.0 cononical value true", function () {
+        const packageFile = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
+        expect(packageFile.cononical).equal(true);
     });
 });

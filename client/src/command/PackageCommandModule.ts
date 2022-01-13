@@ -346,6 +346,7 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
     // Writing Package, ReadMe, License Files
     const packageFile: PackageFile = {
         $schema: new PackageFile().$schema,
+        cononical: true,
         sources: [sourceObject],
         generatedBy:
             "`datapm package` command. Visit datapm.io to learn about the tools and to discover other data packages",

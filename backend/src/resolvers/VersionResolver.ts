@@ -38,6 +38,8 @@ import { hasPackagePermissions } from "./UserPackagePermissionResolver";
 import { getPackageFromCacheOrDbById, packageEntityToGraphqlObject } from "./PackageResolver";
 import { saveVersionComparison } from "../repository/VersionComparisonRepository";
 import { Connection, EntityManager } from "typeorm";
+import { getAllPackagePermissions, PackagePermissionRepository } from "../repository/PackagePermissionRepository";
+import { Maybe } from "graphql/jsutils/Maybe";
 
 export const versionEntityToGraphqlObject = async (
     context: Context,
@@ -239,7 +241,43 @@ export const deleteVersion = async (
     });
 };
 
-export const versionPackageFile = async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+/** Return the unmodified original package file, only when the requester has EDIT permission */
+export const cononicalPackageFile = async (parent: any, _1: any, context: AuthenticatedContext): Promise<Maybe<PackageFile>> => {
+
+    const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
+    const packageEntity = await getPackageFromCacheOrDbById(context, context.connection, version.packageId);
+
+    const permissions = await context.connection.getCustomRepository(PackagePermissionRepository).findPackagePermissions({
+        userId: context.me.id,
+        packageId: packageEntity.id,
+    });
+
+    if(permissions == null || permissions.permissions.includes(Permission.EDIT) === false) {
+        return null;
+    }
+
+    let packageFile:PackageFile;
+    try {
+        packageFile = await PackageFileStorageService.INSTANCE.readPackageFile(packageEntity.id, {
+            catalogSlug: packageEntity.catalog.slug,
+            packageSlug: packageEntity.slug,
+            versionMajor: version.majorVersion,
+            versionMinor: version.minorVersion,
+            versionPatch: version.patchVersion
+        });
+
+    } catch (error) {
+        if (error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST.toString())) {
+            throw new Error("PACKAGE_FILE_NOT_FOUND");
+        }
+
+        throw error;
+    }
+
+    return packageFile;
+}
+
+export const modifiedPackageFile = async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
     const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
     const packageEntity = await getPackageFromCacheOrDbById(context, context.connection, version.packageId);
 
@@ -281,7 +319,7 @@ export const versionPackageFile = async (parent: any, _1: any, context: Authenti
                     url: process.env.REGISTRY_URL as string
                 },
                 slug: schema.title,
-                type: "datapmRegistry",
+                type: "datapm",
                 configuration: {
                     catalogSlug: packageEntity.catalog.slug,
                     packageSlug: packageEntity.slug,
@@ -306,6 +344,10 @@ export const versionPackageFile = async (parent: any, _1: any, context: Authenti
         });
 
         packageFile.sources = registrySources;
+
+        packageFile.cononical = false;
+        packageFile.modifiedProperties = ["sources"];
+
     } else if(publishMethod === PublishMethod.SCHEMA_PROXY_DATA) {
         const registrySources: Source[] = packageFile.sources.map<Source>(source => {
             return {
@@ -331,6 +373,8 @@ export const versionPackageFile = async (parent: any, _1: any, context: Authenti
         });
 
         packageFile.sources = registrySources;
+        packageFile.cononical = false;
+        packageFile.modifiedProperties = ["sources"];
     }
 
     return packageFile;

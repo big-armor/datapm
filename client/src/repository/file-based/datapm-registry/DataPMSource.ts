@@ -40,7 +40,7 @@ export class DataPMSource implements Source {
     ): Promise<InspectionResults> {
         const url = connectionConfiguration.url + "/" + configuration.catalogSlug + "/" + configuration.packageSlug;
 
-        const packageFileWithContext = await getPackage(url);
+        const packageFileWithContext = await getPackage(url, "modified");
 
         const socket = await this.connectSocket(connectionConfiguration, credentialsConfiguration);
 
