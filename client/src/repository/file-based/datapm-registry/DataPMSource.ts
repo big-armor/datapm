@@ -14,12 +14,15 @@ import {
     RecordContext,
     SocketEvent,
     SocketResponseType,
+    StartFetchRequest,
+    StreamState,
     TimeoutPromise,
     UpdateMethod
 } from "datapm-lib";
 import { SemVer } from "semver";
 import { Socket } from "socket.io-client";
-import { Duplex } from "stream";
+import { PassThrough } from "stream";
+import { Maybe } from "../../../util/Maybe";
 import { getPackage } from "../../../util/PackageAccessUtil";
 import { InspectionResults, Source, SourceInspectionContext, StreamSetPreview, StreamSummary } from "../../Source";
 import { connectSocket } from "./DataPMRepository";
@@ -92,7 +95,7 @@ export class DataPMSource implements Source {
                                         batch.batchIdentifier.streamSlug,
                                     expectedTotalRawBytes: batch.highestOffset,
                                     updateHash: batch.updatedAt.toISOString(),
-                                    openStream: async () => {
+                                    openStream: async (streamState: Maybe<StreamState>) => {
                                         const socket = await this.connectSocket(
                                             connectionConfiguration,
                                             credentialsConfiguration
@@ -115,7 +118,7 @@ export class DataPMSource implements Source {
                                             }
                                         );
 
-                                        const duplex = new Duplex({
+                                        const duplex = new PassThrough({
                                             objectMode: true
                                         });
 
@@ -150,6 +153,18 @@ export class DataPMSource implements Source {
                                                 }
                                             }
                                         );
+
+                                        let offSet = 0;
+
+                                        if (streamState) {
+                                            const schemaState =
+                                                streamState.schemaStates[batch.batchIdentifier.schemaTitle];
+
+                                            if (schemaState.lastOffset != null) {
+                                                offSet = schemaState.lastOffset;
+                                            }
+                                        }
+                                        socket.emit(openChannelResponse.channelName, new StartFetchRequest(offSet));
 
                                         return {
                                             stream: duplex

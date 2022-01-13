@@ -85,6 +85,7 @@ export async function connectSocket(
     }
 
     const socket = io(uri, {
+        path: "/ws/",
         parser: require("socket.io-msgpack-parser"),
         transports: ["polling", "websocket"],
         auth: {

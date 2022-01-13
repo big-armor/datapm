@@ -222,6 +222,7 @@ export function createTestClient(headers: any) {
 
 export async function createAnonymousStreamingClient():Promise<Socket>  {
     const socket = io("http://localhost:4000", {
+            path: "/ws/",
             parser: require("socket.io-msgpack-parser"),
             transports: ["polling", "websocket"]
         });
@@ -253,6 +254,7 @@ export async function createAuthenicatedStreamingClient(username:String, passwor
     const apiKey = createAPIKeyFromParts(response.data!.createAPIKey.id, response.data!.createAPIKey.secret);
                        
     const socket = io("http://localhost:4000", {
+            path: "/ws/",
             parser: require("socket.io-msgpack-parser"),
             transports: ["polling", "websocket"],
             auth: {

@@ -359,6 +359,7 @@ async function main() {
     const io = new socketio.Server(httpServer, {
         httpCompression: true,
         maxHttpBufferSize: 1e8,
+        path: "/ws/",
         parser: require("socket.io-msgpack-parser")
     });
 

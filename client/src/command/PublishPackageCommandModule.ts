@@ -122,7 +122,7 @@ export class PublishPackageCommandModule {
                 defaultPromptOptions
             );
 
-            if (!promptResponse.confirm) {
+            if ((promptResponse.confirm as string).startsWith("No")) {
                 targetRegistries = [];
             } else {
                 targetRegistries = packageFile.registries;

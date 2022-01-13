@@ -108,7 +108,7 @@ export async function getPackage(
                 }
             }
         }
-        if (!http.ok) throw new Error(`Failed to obtain ${http.status} ${http.statusText}`);
+        if (!http.ok) throw new Error(`Failed to obtain: HTTP code ${http.status} HTTP status ${http.statusText}`);
 
         return {
             packageFile: parsePackageFileJSON(await http.text()),

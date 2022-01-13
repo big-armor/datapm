@@ -14,7 +14,8 @@ export class DataPMSourceDescription implements SourceDescription {
         return uri.indexOf("http://") === 0 || uri.indexOf("https://") === 0;
     }
 
-    getSource(): Promise<Source> {
-        throw new Error("Method not implemented.");
+    async getSource(): Promise<Source> {
+        const module = await import("./DataPMSource");
+        return new module.DataPMSource();
     }
 }
