@@ -6,7 +6,7 @@ import { SinkState } from "./SinkState";
  * meant for reference only during uploads to a DataPM registry. This is based on the SchemaIdentifier which is based on
  * a PackageIdentifier.
  */
-export interface SchemaUploadStreamIdentifier extends SchemaIdentifier {
+export interface SchemaRepositoryStreamIdentifier extends SchemaIdentifier {
     sourceType: string;
     sourceSlug: string;
     streamSetSlug: string;
@@ -21,7 +21,7 @@ export interface SchemaUploadStreamIdentifier extends SchemaIdentifier {
  * over a very long period of time), or start a new batch and append to it. The term version was not used
  * because that is reserved for the package version number. A batch is related to one major version of a package.
  */
-export interface BatchUploadIdentifier extends SchemaUploadStreamIdentifier {
+export interface BatchRepositoryIdentifier extends SchemaRepositoryStreamIdentifier {
     batch: number;
 }
 
@@ -39,10 +39,10 @@ export interface DataRecordContext {
 export enum SocketEvent {
     READY = "ready",
     OPEN_FETCH_CHANNEL = "openFetchChannel",
-    START_DATA_UPLOAD = "uploadDataRequest",
+    START_DATA_UPLOAD = "startDataUpload",
     SET_STREAM_ACTIVE_BATCHES = "setStreamActiveBatchesRequest",
     SCHEMA_INFO_REQUEST = "schemaInfoRequest",
-    PACKAGE_VERSION_DATA_INFO_REQUEST = "packageDataStateRequest"
+    PACKAGE_VERSION_SINK_STATE_REQUEST = "packageVersionSinkStateRequest"
 }
 
 export enum SocketError {
@@ -60,7 +60,7 @@ export enum SocketResponseType {
     START_DATA_UPLOAD_RESPONSE = "startDataUploadResponse",
     SET_STREAM_ACTIVE_BATCHES = "setStreamActiveBatchesResponse",
     OPEN_FETCH_CHANNEL_RESPONSE = "openFetchChannelResponse",
-    PACKAGE_VERSION_DATA_INFO_RESPONSE = "packageDataStateResponse"
+    PACKAGE_VERSION_SINK_STATE_RESPONSE = "packageVersionSinkStateResponse"
 }
 
 export interface Request {
@@ -79,18 +79,18 @@ export class ErrorResponse implements Response {
     constructor(public message: string, public errorType: SocketError) {}
 }
 
-/** PACKAGE INFO  */
+/** Sink state INFO  */
 
 /** Sent by the client to request information about a given stream */
-export class PackageVersionInfoRequest implements Request {
-    requestType = SocketEvent.PACKAGE_VERSION_DATA_INFO_REQUEST;
+export class PackageSinkStateRequest implements Request {
+    requestType = SocketEvent.PACKAGE_VERSION_SINK_STATE_REQUEST;
 
     // eslint-disable-next-line no-useless-constructor
     constructor(public identifier: MajorVersionIdentifier) {}
 }
 
-export class PackageVersionInfoResponse implements Response {
-    responseType = SocketResponseType.PACKAGE_VERSION_DATA_INFO_RESPONSE;
+export class PackageSinkStateResponse implements Response {
+    responseType = SocketResponseType.PACKAGE_VERSION_SINK_STATE_RESPONSE;
 
     // eslint-disable-next-line no-useless-constructor
     constructor(public identifier: MajorVersionIdentifier, public state: SinkState) {}
@@ -98,25 +98,29 @@ export class PackageVersionInfoResponse implements Response {
 
 /** STREAM INFO  */
 
-/** Sent by the client to request information about a given stream */
-export class SchemaInfoRequest implements Request {
+/** Sent by the client to request information about the streams available for a version of package */
+export class PackageStreamsRequest implements Request {
     requestType = SocketEvent.SCHEMA_INFO_REQUEST;
 
     // eslint-disable-next-line no-useless-constructor
-    constructor(public identifier: SchemaIdentifier) {}
+    constructor(public identifier: MajorVersionIdentifier) {}
 }
 
-export class SchemaInfoResponse implements Response {
+export interface BatchInfo {
+    batchIdentifier: BatchRepositoryIdentifier;
+    highestOffset: number;
+    // TODO estimated record count
+    updatedAt: Date;
+}
+export interface BatchesBySchema {
+    [schema: string]: BatchInfo[];
+}
+
+export class PackageStreamsResponse implements Response {
     responseType = SocketResponseType.SCHEMA_INFO_RESPONSE;
 
     // eslint-disable-next-line no-useless-constructor
-    constructor(
-        public identifier: SchemaIdentifier,
-        public batches: {
-            batchIdentifier: BatchUploadIdentifier;
-            highestOffset: number;
-        }[]
-    ) {}
+    constructor(public identifier: MajorVersionIdentifier, public batchesBySchema: BatchesBySchema) {}
 }
 
 /** Sent by the client to set the batches for given streams. All done in a transaction, so that other
@@ -126,14 +130,14 @@ export class SetStreamActiveBatchesRequest implements Request {
     requestType = SocketEvent.SET_STREAM_ACTIVE_BATCHES;
 
     // eslint-disable-next-line no-useless-constructor
-    constructor(public batchIdentifiers: BatchUploadIdentifier[]) {}
+    constructor(public batchIdentifiers: BatchRepositoryIdentifier[]) {}
 }
 
 export class SetStreamActiveBatchesResponse implements Response {
     responseType = SocketResponseType.SET_STREAM_ACTIVE_BATCHES;
 
     // eslint-disable-next-line no-useless-constructor
-    constructor(public batchIdentifiers: BatchUploadIdentifier[]) {}
+    constructor(public batchIdentifiers: BatchRepositoryIdentifier[]) {}
 }
 
 /**
@@ -163,7 +167,7 @@ export class StartUploadRequest implements Request {
     requestType = SocketEvent.START_DATA_UPLOAD;
 
     // eslint-disable-next-line no-useless-constructor
-    constructor(public schemaStreamIdentifier: SchemaUploadStreamIdentifier, public newBatch: boolean) {}
+    constructor(public schemaStreamIdentifier: SchemaRepositoryStreamIdentifier, public newBatch: boolean) {}
 }
 
 /** This is sent by the server in response to the StreamUploadRequest */
@@ -171,7 +175,7 @@ export class StartUploadResponse implements Response {
     responseType = SocketResponseType.START_DATA_UPLOAD_RESPONSE;
 
     // eslint-disable-next-line no-useless-constructor
-    constructor(public channelName: string, public batchIdentifier: BatchUploadIdentifier) {}
+    constructor(public channelName: string, public batchIdentifier: BatchRepositoryIdentifier) {}
 }
 
 /** Sent by the client to the server to upload data.  */
@@ -206,7 +210,7 @@ export class OpenFetchChannelRequest implements Request {
     requestType = SocketEvent.OPEN_FETCH_CHANNEL;
 
     // eslint-disable-next-line no-useless-constructor
-    constructor(public batchIdentifier: BatchUploadIdentifier) {}
+    constructor(public batchIdentifier: BatchRepositoryIdentifier) {}
 }
 
 /** This is sent by the server in response to the OpenFetchChannelRequest */
@@ -214,7 +218,7 @@ export class OpenFetchChannelResponse implements Response {
     responseType = SocketResponseType.OPEN_FETCH_CHANNEL_RESPONSE;
 
     // eslint-disable-next-line no-useless-constructor
-    constructor(public channelName: string, public batchIdentifier: BatchUploadIdentifier) {}
+    constructor(public channelName: string, public batchIdentifier: BatchRepositoryIdentifier) {}
 }
 
 export enum SocketFetchEvent {

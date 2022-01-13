@@ -1,4 +1,4 @@
-import {Response, ErrorResponse, SocketError, SocketEvent,SchemaUploadStreamIdentifier, StartUploadRequest, StartUploadResponse, SchemaInfoRequest, FetchRequest, SetStreamActiveBatchesRequest, StartFetchRequest, OpenFetchChannelRequest, SchemaIdentifier, PackageVersionInfoRequest } from 'datapm-lib';
+import {Response, ErrorResponse, SocketError, SocketEvent, StartUploadRequest, PackageStreamsRequest, SetStreamActiveBatchesRequest, OpenFetchChannelRequest, SchemaIdentifier, PackageSinkStateRequest as PackageSinkStateRequest } from 'datapm-lib';
 import EventEmitter from 'events';
 import SocketIO from 'socket.io';
 import { AuthenticatedSocketContext, SocketContext } from '../context';
@@ -11,8 +11,8 @@ import { isAuthenticatedContext } from '../util/contextHelpers';
 import { DataFetchHandler } from './DataFetchHandler';
 import { DataUploadHandler } from './DataUploadHandler';
 import { SetActiveBatchesHandler } from './SetActiveBatchesHandler';
-import { SchemaInfoHandler } from './SchemaInfoHandler';
-import { PackageInfoHandler } from './PackageInfoHandler';
+import { SchemaInfoHandler } from './PackageStreamsHandler';
+import { PackageSinkStateHandler } from './PackageSinkStateHandler';
 
 export interface RequestHandler extends EventEmitter {
     start(callback:(response:Response) => void):Promise<void>;
@@ -39,7 +39,7 @@ export class SocketConnectionHandler {
 
         socket.on(SocketEvent.OPEN_FETCH_CHANNEL.toString(), this.openFetchChannelHandler);
         socket.on(SocketEvent.START_DATA_UPLOAD.toString(), this.onUploadData);
-        socket.on(SocketEvent.PACKAGE_VERSION_DATA_INFO_REQUEST.toString(), this.onGetPackageInfo);
+        socket.on(SocketEvent.PACKAGE_VERSION_SINK_STATE_REQUEST.toString(), this.onGetPackageSinkState);
         socket.on(SocketEvent.SCHEMA_INFO_REQUEST.toString(), this.onGetSchemaInfo);
         socket.on(SocketEvent.SET_STREAM_ACTIVE_BATCHES.toString(), this.onSetStreamActiveBatches);
 
@@ -91,7 +91,7 @@ export class SocketConnectionHandler {
         }
     }
 
-    onGetPackageInfo = async (request:PackageVersionInfoRequest, callback:(response:Response)=>void): Promise<void>  => {
+    onGetPackageSinkState = async (request:PackageSinkStateRequest, callback:(response:Response)=>void): Promise<void>  => {
 
         const packageEntity = await this.socketContext.connection.getCustomRepository(PackageRepository).findPackageOrFail({identifier: request.identifier});
 
@@ -102,12 +102,12 @@ export class SocketConnectionHandler {
             return;
         };
 
-       const response = await PackageInfoHandler.handle(this.socketContext,request);
+       const response = await PackageSinkStateHandler.handle(this.socketContext,request);
 
         callback(response);
     };
 
-    onGetSchemaInfo = async (request:SchemaInfoRequest, callback:(response:Response)=>void): Promise<void>  => {
+    onGetSchemaInfo = async (request:PackageStreamsRequest, callback:(response:Response)=>void): Promise<void>  => {
 
         const packageEntity = await this.socketContext.connection.getCustomRepository(PackageRepository).findPackageOrFail({identifier: request.identifier});
 
@@ -122,7 +122,6 @@ export class SocketConnectionHandler {
 
         callback(response);
     };
-
 
     addRequestHandler(handler:RequestHandler):void {
 

@@ -1,12 +1,12 @@
-import { SocketResponseType, PackageVersionInfoRequest, PackageVersionInfoResponse, StreamSetState, ErrorResponse, SocketError } from "datapm-lib";
+import { SocketResponseType, PackageSinkStateRequest, PackageSinkStateResponse, StreamSetState, ErrorResponse, SocketError } from "datapm-lib";
 import { SocketContext } from "../context";
 import { DataBatchRepository } from "../repository/DataBatchRepository";
 import { PackageRepository } from "../repository/PackageRepository";
 import { VersionRepository } from "../repository/VersionRepository";
 
-export module PackageInfoHandler {
+export module PackageSinkStateHandler {
 
-    export async function handle(streamContext: SocketContext, packageInfoRequest: PackageVersionInfoRequest): Promise<PackageVersionInfoResponse | ErrorResponse> {
+    export async function handle(streamContext: SocketContext, packageInfoRequest: PackageSinkStateRequest): Promise<PackageSinkStateResponse | ErrorResponse> {
 
         const packageEntity = await streamContext.connection.getCustomRepository(PackageRepository).findPackageOrFail({identifier: packageInfoRequest.identifier});
 
@@ -23,7 +23,7 @@ export module PackageInfoHandler {
         }
 
         return {
-            responseType: SocketResponseType.PACKAGE_VERSION_DATA_INFO_RESPONSE,
+            responseType: SocketResponseType.PACKAGE_VERSION_SINK_STATE_RESPONSE,
             identifier: packageInfoRequest.identifier,
             state: {
                 packageVersion: latestVersion.majorVersion + "." + latestVersion.minorVersion + "." + latestVersion.patchVersion,

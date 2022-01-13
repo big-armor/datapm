@@ -1,7 +1,9 @@
-import { DPMConfiguration } from "datapm-lib";
+import { DPMConfiguration, SocketEvent, TimeoutPromise } from "datapm-lib";
+import { io, Socket } from "socket.io-client";
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
 import { Repository } from "../../Repository";
 import { TYPE } from "./DataPMRepositoryDescription";
+import { getRegistryConfig } from "../../../util/ConfigUtil";
 
 export class DataPMRepository implements Repository {
     getType(): string {
@@ -64,4 +66,39 @@ export class DataPMRepository implements Repository {
     ): Promise<string | true> {
         return true; // TODO implement authentication
     }
+}
+
+export async function connectSocket(
+    connectionConfiguration: DPMConfiguration,
+    _credentialsConfiguration: DPMConfiguration
+): Promise<Socket> {
+    if (typeof connectionConfiguration.url !== "string") {
+        throw new Error("connectionConfiguration does not include url value as string");
+    }
+
+    const uri = connectionConfiguration.url.replace(/^https/, "wss").replace(/^http/, "ws");
+
+    const registryConfiguration = getRegistryConfig(connectionConfiguration.url);
+
+    if (registryConfiguration == null) {
+        throw new Error("REGISTRY_CONFIG_NOT_FOUND: " + uri);
+    }
+
+    const socket = io(uri, {
+        parser: require("socket.io-msgpack-parser"),
+        transports: ["polling", "websocket"],
+        auth: {
+            token: registryConfiguration.apiKey
+        }
+    });
+
+    await new TimeoutPromise<void>(5000, (resolve) => {
+        socket.once("connect", async () => {
+            socket.once(SocketEvent.READY.toString(), () => {
+                resolve();
+            });
+        });
+    });
+
+    return socket;
 }

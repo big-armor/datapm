@@ -2,7 +2,7 @@ import { EntityRepository, EntityManager } from "typeorm";
 import { PackageRepository } from "./PackageRepository";
 import { Maybe } from "graphql/jsutils/Maybe";
 import { DataBatchEntity } from "../entity/DataBatchEntity";
-import { SchemaUploadStreamIdentifier, BatchUploadIdentifier } from "datapm-lib";
+import { SchemaRepositoryStreamIdentifier, BatchRepositoryIdentifier } from "datapm-lib";
 import { DataStorageService } from "../storage/data/data-storage";
 
 @EntityRepository()
@@ -35,7 +35,8 @@ export class DataBatchRepository {
     public async findDefaultBatchesForSchema(
         packageId: number,
         majorVersion: number,
-        schemaTitle: string
+        schemaTitle: string,
+        relations: string[] = []
     ): Promise<DataBatchEntity[]> {
         return this.manager
             .getRepository(DataBatchEntity)
@@ -47,12 +48,14 @@ export class DataBatchRepository {
             .setParameter("packageId", packageId)
             .setParameter("majorVersion", majorVersion)
             .setParameter("schemaTitle", schemaTitle)
+            .addRelations("BatchEntity", relations)
             .getMany();
     }
 
     public async findDefaultBatchesForPackage(
         packageId: number,
-        majorVersion: number
+        majorVersion: number,
+        relations: string[] = []
     ): Promise<DataBatchEntity[]> {
         return this.manager
             .getRepository(DataBatchEntity)
@@ -62,6 +65,7 @@ export class DataBatchRepository {
             .andWhere('"BatchEntity"."default" = true')
             .setParameter("packageId", packageId)
             .setParameter("majorVersion", majorVersion)
+            .addRelations("BatchEntity", relations)
             .getMany();
     }
 
@@ -97,7 +101,7 @@ export class DataBatchRepository {
             .getOne();
     }
 
-    async save(userId: number, identifier: BatchUploadIdentifier) {
+    async save(userId: number, identifier: BatchRepositoryIdentifier) {
         return await this.manager.nestedTransaction(async (transaction) => {
 
             const packageEntity = await transaction.getCustomRepository(PackageRepository).findPackageOrFail({
@@ -133,7 +137,7 @@ export class DataBatchRepository {
         identifier,
         relations = []
     }: {
-        identifier: SchemaUploadStreamIdentifier;
+        identifier: SchemaRepositoryStreamIdentifier;
         relations?: string[];
     }): Promise<Maybe<DataBatchEntity>> {
         const ALIAS = "findLatestBatch";
@@ -168,7 +172,7 @@ export class DataBatchRepository {
         identifier,
         relations = []
     }: {
-        identifier: SchemaUploadStreamIdentifier;
+        identifier: SchemaRepositoryStreamIdentifier;
         relations?: string[];
     }): Promise<Maybe<DataBatchEntity>> {
         const ALIAS = "findDefault";
@@ -200,7 +204,7 @@ export class DataBatchRepository {
         identifier,
         relations = []
     }: {
-        identifier: SchemaUploadStreamIdentifier;
+        identifier: SchemaRepositoryStreamIdentifier;
         relations?: string[];
     }): Promise<DataBatchEntity> {
         
@@ -218,7 +222,7 @@ export class DataBatchRepository {
         identifier,
         relations = []
     }: {
-        identifier: BatchUploadIdentifier;
+        identifier: BatchRepositoryIdentifier;
         relations?: string[];
     }): Promise<DataBatchEntity> {
         let packageEntity = await this.manager.getCustomRepository(PackageRepository).findOrFail({ identifier });
@@ -247,7 +251,7 @@ export class DataBatchRepository {
         streamIdentifier,
         relations = []
     }: {
-        streamIdentifier: SchemaUploadStreamIdentifier;
+        streamIdentifier: SchemaRepositoryStreamIdentifier;
         relations?: string[];
     }): Promise<DataBatchEntity[]> {
         const ALIAS = "batchesByPackageVersion";
@@ -280,7 +284,7 @@ export class DataBatchRepository {
     }
 
     async findBatchesWithLimitAndOffset(
-        streamIdentifier: SchemaUploadStreamIdentifier,
+        streamIdentifier: SchemaRepositoryStreamIdentifier,
         offset: number,
         limit: number,
         relations?: string[]

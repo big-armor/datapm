@@ -22,9 +22,9 @@ import {
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
-import { CatalogRepository, getCatalogOrFail } from "./repository/CatalogRepository";
+import { CatalogRepository } from "./repository/CatalogRepository";
 import { UserCatalogPermissionRepository } from "./repository/CatalogPermissionRepository";
-import { isAuthenticatedContext, isRequestingUserOrAdmin } from "./util/contextHelpers";
+import { isRequestingUserOrAdmin } from "./util/contextHelpers";
 import { parsePackageFileJSON, validatePackageFile } from "datapm-lib";
 import graphqlFields from "graphql-fields";
 import {

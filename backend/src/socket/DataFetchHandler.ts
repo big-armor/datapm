@@ -3,12 +3,12 @@ import { checkPackagePermission, RequestHandler } from "./SocketHandler";
 import SocketIO from 'socket.io';
 import { Permission } from "../generated/graphql";
 import { EventEmitter, Transform } from "stream";
-import {BatchUploadIdentifier, BatchingTransform, DataAcknowledge, DataSend, DataStop, DataStopAcknowledge, ErrorResponse, FetchRequest, FetchRequestType, FetchResponse, OpenFetchChannelRequest, OpenFetchChannelResponse, RecordContext, Request, Response, SocketError, SocketEvent, StartFetchRequest, DPMRecord, DataRecordContext } from "datapm-lib";
+import {BatchRepositoryIdentifier, BatchingTransform, DataAcknowledge, DataSend, DataStop, DataStopAcknowledge, ErrorResponse, FetchRequest, FetchRequestType, FetchResponse, OpenFetchChannelRequest, OpenFetchChannelResponse, RecordContext, Request, Response, SocketError, SocketEvent, StartFetchRequest, DPMRecord, DataRecordContext } from "datapm-lib";
 import { PackageRepository } from "../repository/PackageRepository";
 import { DataStorageService, IterableDataFiles } from "../storage/data/data-storage";
 import { DataBatchRepository } from "../repository/DataBatchRepository";
 
-export function batchIdentifierToChannelName(batchIdentifier:BatchUploadIdentifier): string {
+export function batchIdentifierToChannelName(batchIdentifier:BatchRepositoryIdentifier): string {
     return (
         batchIdentifier.catalogSlug +
         "/" +

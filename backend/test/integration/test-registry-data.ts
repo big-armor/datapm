@@ -11,7 +11,7 @@ import {
     CreateCatalogDocument
 } from "./registry-client";
 import { createAnonymousClient, createAnonymousStreamingClient, createAuthenicatedStreamingClient, createUser } from "./test-utils";
-import { parsePackageFileJSON, loadPackageFileFromDisk, PublishMethod, SocketEvent, StartFetchRequest, ErrorResponse, StartFetchResponse, SocketResponseType, SocketError, StartUploadRequest, UploadDataRequest, UploadDataResponse, StartUploadResponse, UploadResponseType, UploadStopRequest, UploadStopResponse, SchemaInfoRequest, SchemaInfoResponse, OpenFetchChannelResponse, OpenFetchChannelRequest, DataSend, DataStop, FetchRequestType, SetStreamActiveBatchesResponse, SetStreamActiveBatchesRequest, FetchResponse, DataAcknowledge, DataStopAcknowledge, DPMRecord, DataRecordContext, PackageVersionInfoRequest, PackageVersionInfoResponse } from "datapm-lib";
+import { parsePackageFileJSON, loadPackageFileFromDisk, PublishMethod, SocketEvent, StartFetchRequest, ErrorResponse, StartFetchResponse, SocketResponseType, SocketError, StartUploadRequest, UploadDataRequest, UploadDataResponse, StartUploadResponse, UploadResponseType, UploadStopRequest, UploadStopResponse, PackageStreamsRequest, PackageStreamsResponse, OpenFetchChannelResponse, OpenFetchChannelRequest, DataSend, DataStop, FetchRequestType, SetStreamActiveBatchesResponse, SetStreamActiveBatchesRequest, FetchResponse, DataAcknowledge, DataStopAcknowledge, DPMRecord, DataRecordContext, PackageSinkStateRequest, PackageSinkStateResponse } from "datapm-lib";
 import { describe, it } from "mocha";
 import request = require("superagent");
 import { Socket } from "socket.io-client";
@@ -478,15 +478,14 @@ describe("Data Store on Registry", async () => {
     });
 
     const downloadAndValidateData = async (socket:Socket, catalogSlug:string) => {
-        let streamInfoResponse = await new Promise<SchemaInfoResponse | ErrorResponse>((resolve, reject) => {
+        let streamInfoResponse = await new Promise<PackageStreamsResponse | ErrorResponse>((resolve, reject) => {
         
-            socket.emit(SocketEvent.SCHEMA_INFO_REQUEST, new SchemaInfoRequest({
+            socket.emit(SocketEvent.SCHEMA_INFO_REQUEST, new PackageStreamsRequest({
                 catalogSlug,
                 packageSlug: "simple",
                 majorVersion: 1,
                 registryUrl: "http://localhost:4000",
-                schemaTitle: "simple"
-            }),(response: SchemaInfoResponse | ErrorResponse) => {
+            }),(response: PackageStreamsResponse | ErrorResponse) => {
                 resolve(response);
             });
             
@@ -498,23 +497,22 @@ describe("Data Store on Registry", async () => {
 
         expect(streamInfoResponse.responseType).equal(SocketResponseType.SCHEMA_INFO_RESPONSE);
 
-        const schemaInfoResponse:SchemaInfoResponse = streamInfoResponse as SchemaInfoResponse;
-        expect(schemaInfoResponse.identifier.registryUrl).equal("http://localhost:4000");
-        expect(schemaInfoResponse.identifier.catalogSlug).equal(catalogSlug);
-        expect(schemaInfoResponse.identifier.packageSlug).equal("simple");
-        expect(schemaInfoResponse.identifier.majorVersion).equal(1);
-        expect(schemaInfoResponse.identifier.schemaTitle).equal("simple");
+        const packageStreamsResponse:PackageStreamsResponse = streamInfoResponse as PackageStreamsResponse;
+        expect(packageStreamsResponse.identifier.registryUrl).equal("http://localhost:4000");
+        expect(packageStreamsResponse.identifier.catalogSlug).equal(catalogSlug);
+        expect(packageStreamsResponse.identifier.packageSlug).equal("simple");
+        expect(packageStreamsResponse.identifier.majorVersion).equal(1);
 
-        expect(schemaInfoResponse.batches.length).equal(1);
+        expect(packageStreamsResponse.batchesBySchema["simple"].length).equal(1);
 
-        expect(schemaInfoResponse.batches[0].batchIdentifier.batch).equal(1);
-        expect(schemaInfoResponse.batches[0].batchIdentifier.sourceSlug).equal("test");
-        expect(schemaInfoResponse.batches[0].batchIdentifier.streamSetSlug).equal("simple");
-        expect(schemaInfoResponse.batches[0].batchIdentifier.streamSlug).equal("simple");
-        expect(schemaInfoResponse.batches[0].highestOffset).equal(1);
+        expect(packageStreamsResponse.batchesBySchema["simple"][0].batchIdentifier.batch).equal(1);
+        expect(packageStreamsResponse.batchesBySchema["simple"][0].batchIdentifier.sourceSlug).equal("test");
+        expect(packageStreamsResponse.batchesBySchema["simple"][0].batchIdentifier.streamSetSlug).equal("simple");
+        expect(packageStreamsResponse.batchesBySchema["simple"][0].batchIdentifier.streamSlug).equal("simple");
+        expect(packageStreamsResponse.batchesBySchema["simple"][0].highestOffset).equal(1);
 
         let response = await new Promise<OpenFetchChannelResponse | ErrorResponse>((resolve, reject) => {
-            socket.emit(SocketEvent.OPEN_FETCH_CHANNEL , new OpenFetchChannelRequest(schemaInfoResponse.batches[0].batchIdentifier),(response: OpenFetchChannelResponse) => {
+            socket.emit(SocketEvent.OPEN_FETCH_CHANNEL , new OpenFetchChannelRequest(packageStreamsResponse.batchesBySchema["simple"][0].batchIdentifier),(response: OpenFetchChannelResponse) => {
                 resolve(response);
             });
         });
@@ -581,15 +579,14 @@ describe("Data Store on Registry", async () => {
 
     it("Anonymous user can not download data", async function() {
 
-        let response = await new Promise<SchemaInfoResponse | ErrorResponse>((resolve, reject) => {
+        let response = await new Promise<PackageStreamsResponse | ErrorResponse>((resolve, reject) => {
         
-            anonymousStreamingClient.emit(SocketEvent.SCHEMA_INFO_REQUEST, new SchemaInfoRequest({
+            anonymousStreamingClient.emit(SocketEvent.SCHEMA_INFO_REQUEST, new PackageStreamsRequest({
                 catalogSlug: "testA-registry-data",
                 packageSlug: "simple",
                 majorVersion: 1,
                 registryUrl: "http://localhost:4000",
-                schemaTitle: "simple"
-            }),(response: SchemaInfoResponse | ErrorResponse) => {
+            }),(response: PackageStreamsResponse | ErrorResponse) => {
                 resolve(response);
             });
             
@@ -822,15 +819,14 @@ describe("Data Store on Registry", async () => {
 
 
     it("Expect to be able to read new records only", async function() {
-        let streamInfoResponse = await new Promise<SchemaInfoResponse | ErrorResponse>((resolve, reject) => {
+        let streamInfoResponse = await new Promise<PackageStreamsResponse | ErrorResponse>((resolve, reject) => {
         
-            userAStreamingClient.emit(SocketEvent.SCHEMA_INFO_REQUEST, new SchemaInfoRequest({
+            userAStreamingClient.emit(SocketEvent.SCHEMA_INFO_REQUEST, new PackageStreamsRequest({
                 catalogSlug: "testA-registry-data-2",
                 packageSlug: "simple",
                 majorVersion: 1,
                 registryUrl: "http://localhost:4000",
-                schemaTitle: "simple"
-            }),(response: SchemaInfoResponse | ErrorResponse) => {
+            }),(response: PackageStreamsResponse | ErrorResponse) => {
                 resolve(response);
             });
             
@@ -842,11 +838,11 @@ describe("Data Store on Registry", async () => {
 
         expect(streamInfoResponse.responseType).equal(SocketResponseType.SCHEMA_INFO_RESPONSE);
 
-        const schemaInfoResponse:SchemaInfoResponse = streamInfoResponse as SchemaInfoResponse;
-        expect(schemaInfoResponse.batches[0].highestOffset).equal(2);
+        const packageStreamsResponse:PackageStreamsResponse = streamInfoResponse as PackageStreamsResponse;
+        expect(packageStreamsResponse.batchesBySchema["simple"][0].highestOffset).equal(2);
 
         let response = await new Promise<OpenFetchChannelResponse | ErrorResponse>((resolve, reject) => {
-            userAStreamingClient.emit(SocketEvent.OPEN_FETCH_CHANNEL , new OpenFetchChannelRequest(schemaInfoResponse.batches[0].batchIdentifier),(response: OpenFetchChannelResponse) => {
+            userAStreamingClient.emit(SocketEvent.OPEN_FETCH_CHANNEL , new OpenFetchChannelRequest(packageStreamsResponse.batchesBySchema["simple"][0].batchIdentifier),(response: OpenFetchChannelResponse) => {
                 resolve(response);
             });
         });
@@ -893,14 +889,14 @@ describe("Data Store on Registry", async () => {
 
     it("Read version data state", async function() {
 
-        let response = await new Promise<PackageVersionInfoResponse | ErrorResponse>((resolve, reject) => {
+        let response = await new Promise<PackageSinkStateResponse | ErrorResponse>((resolve, reject) => {
         
-            userAStreamingClient.emit(SocketEvent.PACKAGE_VERSION_DATA_INFO_REQUEST, new PackageVersionInfoRequest({
+            userAStreamingClient.emit(SocketEvent.PACKAGE_VERSION_SINK_STATE_REQUEST, new PackageSinkStateRequest({
                 catalogSlug: "testA-registry-data-2",
                 packageSlug: "simple",
                 majorVersion: 1,
                 registryUrl: "http://localhost:4000",
-            }),(response: PackageVersionInfoResponse | ErrorResponse) => {
+            }),(response: PackageSinkStateResponse | ErrorResponse) => {
                 resolve(response);
             });
             
@@ -910,9 +906,9 @@ describe("Data Store on Registry", async () => {
             console.log(JSON.stringify(response));
         }
 
-        expect(response.responseType).equal(SocketResponseType.PACKAGE_VERSION_DATA_INFO_RESPONSE);
+        expect(response.responseType).equal(SocketResponseType.PACKAGE_VERSION_SINK_STATE_RESPONSE);
 
-        const pacakgeDataInfoResponse = response as PackageVersionInfoResponse;
+        const pacakgeDataInfoResponse = response as PackageSinkStateResponse;
 
         expect(pacakgeDataInfoResponse.identifier.catalogSlug).equal("testA-registry-data-2");
         expect(pacakgeDataInfoResponse.identifier.packageSlug).equal("simple");

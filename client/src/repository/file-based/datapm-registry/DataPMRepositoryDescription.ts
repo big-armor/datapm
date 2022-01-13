@@ -20,9 +20,8 @@ export class DataPMRepositoryDescription implements RepositoryDescription {
     }
 
     async getSourceDescription(): Promise<SourceDescription | null> {
-        /* const repository = await import("./DataPMSourceDescription");
-        return new repository.DataPMSourceDescription(); */
-        return null;
+        const repository = await import("./DataPMSourceDescription");
+        return new repository.DataPMSourceDescription();
     }
 
     async getSinkDescription(): Promise<SinkDescription | null> {

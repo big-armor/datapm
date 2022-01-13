@@ -1,5 +1,5 @@
 import { FileStorageService } from "../files/file-storage-service";
-import {BatchUploadIdentifier } from "datapm-lib";
+import {BatchRepositoryIdentifier } from "datapm-lib";
 import { Readable } from "stream";
 import zlib  from "zlib";
 import { PackrStream, UnpackrStream } from "msgpackr";

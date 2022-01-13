@@ -1,4 +1,4 @@
-import {BatchUploadIdentifier, Response, SetStreamActiveBatchesRequest, SetStreamActiveBatchesResponse } from "datapm-lib";
+import {BatchRepositoryIdentifier, Response, SetStreamActiveBatchesRequest, SetStreamActiveBatchesResponse } from "datapm-lib";
 import { EventEmitter } from "stream";
 import { checkPackagePermission, RequestHandler } from "./SocketHandler";
 import SocketIO from 'socket.io';
@@ -24,7 +24,7 @@ export class SetActiveBatchesHandler extends EventEmitter implements RequestHand
 
         await this.socketContext.connection.transaction(async (entityManager) => {
 
-            await batchIdentifiers.asyncForEach(async (batchIdentifier: BatchUploadIdentifier) => {
+            await batchIdentifiers.asyncForEach(async (batchIdentifier: BatchRepositoryIdentifier) => {
               
                 const packageEntity = await entityManager.getCustomRepository(PackageRepository).findPackageOrFail({identifier: batchIdentifier});
 

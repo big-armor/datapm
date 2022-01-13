@@ -3,7 +3,7 @@ import { DistributedLockingService } from "../service/distributed-locking-servic
 import SocketIO from 'socket.io';
 import { checkPackagePermission, RequestHandler } from "./SocketHandler";
 import { Permission } from "../generated/graphql";
-import { BatchUploadIdentifier, DataRecordContext, DPMRecord, ErrorResponse, RecordContext, Response, SocketError, SocketEvent,  StartUploadRequest,  StartUploadResponse,  SchemaUploadStreamIdentifier, TimeoutPromise, UploadDataRequest, UploadDataResponse, UploadRequest, UploadRequestType, UploadResponse, UploadStopRequest, UploadStopResponse } from "datapm-lib";
+import { BatchRepositoryIdentifier, DataRecordContext, ErrorResponse, Response, SocketError, StartUploadRequest,  StartUploadResponse,  SchemaRepositoryStreamIdentifier, TimeoutPromise, UploadDataRequest, UploadDataResponse, UploadRequest, UploadRequestType, UploadResponse, UploadStopRequest, UploadStopResponse } from "datapm-lib";
 import EventEmitter from "events";
 import { PassThrough } from "stream";
 import { PackageRepository } from "../repository/PackageRepository";
@@ -17,7 +17,7 @@ import { VersionRepository } from "../repository/VersionRepository";
 const LOCK_PREFIX = "streamSetDataUpload";
 
 
-export function streamIdentifierToChannelName(streamIdentifier: SchemaUploadStreamIdentifier): string {
+export function streamIdentifierToChannelName(streamIdentifier: SchemaRepositoryStreamIdentifier): string {
     return (
         streamIdentifier.catalogSlug +
         "/" +
@@ -70,7 +70,7 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
     recordCount:number = 0;
     lastObservedOffset = -1;
 
-    private batchIdentifier:BatchUploadIdentifier;
+    private batchIdentifier:BatchRepositoryIdentifier;
 
     constructor(private uploadRequest: StartUploadRequest, private socket: SocketIO.Socket, private socketContext:AuthenticatedSocketContext, private distributedLockingService: DistributedLockingService) {
         super();

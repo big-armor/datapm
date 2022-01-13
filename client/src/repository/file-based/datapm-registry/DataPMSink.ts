@@ -8,7 +8,7 @@ import {
     SocketEvent,
     UpdateMethod,
     SocketResponseType,
-    SchemaUploadStreamIdentifier,
+    SchemaRepositoryStreamIdentifier,
     UploadRequest,
     UploadRequestType,
     UploadResponse,
@@ -16,12 +16,12 @@ import {
     StartUploadRequest,
     StartUploadResponse,
     UploadStopResponse,
-    BatchUploadIdentifier,
+    BatchRepositoryIdentifier,
     SetStreamActiveBatchesRequest,
     SetStreamActiveBatchesResponse,
-    PackageVersionInfoResponse,
+    PackageSinkStateResponse,
     RecordStreamContext,
-    PackageVersionInfoRequest,
+    PackageSinkStateRequest,
     SocketError,
     UploadDataRequest,
     UploadStopRequest
@@ -32,8 +32,8 @@ import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
 import { CommitKey, Sink, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
 import { DISPLAY_NAME, TYPE } from "./DataPMRepositoryDescription";
 import { Transform } from "stream";
-import { io, Socket } from "socket.io-client";
-import { getRegistryConfig } from "../../../util/ConfigUtil";
+import { Socket } from "socket.io-client";
+import { connectSocket } from "./DataPMRepository";
 
 export class DataPMSink implements Sink {
     serverChannelForRecordKey: Record<string, string> = {};
@@ -245,7 +245,7 @@ export class DataPMSink implements Sink {
         });
     }
 
-    async startUploadRequest(socket: Socket, streamIdentifier: SchemaUploadStreamIdentifier): Promise<string> {
+    async startUploadRequest(socket: Socket, streamIdentifier: SchemaRepositoryStreamIdentifier): Promise<string> {
         const uploadRequest = new StartUploadRequest(streamIdentifier, true); // TODO support appending
 
         let uploadChannelName = "not-set";
@@ -294,41 +294,13 @@ export class DataPMSink implements Sink {
 
     async connectSocket(
         connectionConfiguration: DPMConfiguration,
-        _credentialsConfiguration: DPMConfiguration
+        credentialsConfiguration: DPMConfiguration
     ): Promise<Socket> {
-        if (typeof connectionConfiguration.url !== "string") {
-            throw new Error("connectionConfiguration does not include url value as string");
-        }
-
         if (this.socket != null && this.socket.connected) {
             return this.socket;
         }
 
-        const uri = connectionConfiguration.url.replace(/^https/, "wss").replace(/^http/, "ws");
-
-        const registryConfiguration = getRegistryConfig(connectionConfiguration.url);
-
-        if (registryConfiguration == null) {
-            throw new Error("REGISTRY_CONFIG_NOT_FOUND: " + uri);
-        }
-
-        this.socket = io(uri, {
-            parser: require("socket.io-msgpack-parser"),
-            transports: ["polling", "websocket"],
-            auth: {
-                token: registryConfiguration.apiKey
-            }
-        });
-
-        await new TimeoutPromise<void>(5000, (resolve) => {
-            this.socket.once("connect", async () => {
-                this.socket.once(SocketEvent.READY.toString(), () => {
-                    resolve();
-                });
-            });
-        });
-
-        return this.socket;
+        return connectSocket(connectionConfiguration, credentialsConfiguration);
     }
 
     async commitAfterWrites(
@@ -339,7 +311,7 @@ export class DataPMSink implements Sink {
         const socket = await this.connectSocket(connectionConfiguration, credentialsConfiguration);
 
         const request = new SetStreamActiveBatchesRequest(
-            commitKeys.map((c) => c.batchIdentifier as BatchUploadIdentifier)
+            commitKeys.map((c) => c.batchIdentifier as BatchRepositoryIdentifier)
         );
 
         await new TimeoutPromise<void>(10000, (resolve, reject) => {
@@ -394,16 +366,16 @@ export class DataPMSink implements Sink {
     ): Promise<Maybe<SinkState>> {
         const socket = await this.connectSocket(connectionConfiguration, credentialsConfiguration);
 
-        const response = await new Promise<PackageVersionInfoResponse | ErrorResponse>((resolve) => {
+        const response = await new Promise<PackageSinkStateResponse | ErrorResponse>((resolve) => {
             socket.emit(
-                SocketEvent.PACKAGE_VERSION_DATA_INFO_REQUEST,
-                new PackageVersionInfoRequest({
+                SocketEvent.PACKAGE_VERSION_SINK_STATE_REQUEST,
+                new PackageSinkStateRequest({
                     catalogSlug: sinkStateKey.catalogSlug,
                     packageSlug: sinkStateKey.packageSlug,
                     majorVersion: sinkStateKey.packageMajorVersion,
                     registryUrl: connectionConfiguration.url as string
                 }),
-                (response: PackageVersionInfoResponse | ErrorResponse) => {
+                (response: PackageSinkStateResponse | ErrorResponse) => {
                     resolve(response);
                 }
             );
@@ -419,7 +391,7 @@ export class DataPMSink implements Sink {
             throw new Error((response as ErrorResponse).message);
         }
 
-        return (response as PackageVersionInfoResponse).state;
+        return (response as PackageSinkStateResponse).state;
     }
 
     getType(): string {

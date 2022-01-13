@@ -64,7 +64,7 @@ export interface StreamSetPreview {
     /** The summary for each stream of data avilable, should be returned in sorted order */
     streamSummaries?: StreamSummary[];
 
-    /** The iterator for each stream of data available */
+    /** Used only if streamSummaries is not provided. An iterator that provides an indetermined number of StreamSummaries - until none are available. Useful in big data situations */
     moveToNextStream?(): Promise<StreamSummary | null>;
 }
 
