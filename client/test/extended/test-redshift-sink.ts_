@@ -12,7 +12,7 @@ import {
 	TEST_SOURCE_FILES
 } from "../integration/test-utils";
 
-const redshiftSinkPrompts = ["Do you want to use the default options?", "Region?", "S3 Bucket?", "Redshift Cluster?", "Schema?"];
+const redshiftSinkPrompts = ["Region?", "S3 Bucket?", "Redshift Cluster?", "Schema?"];
 
 const getRedshiftSinkPromptInputs = (inputs?: string[], skip = 0, count = 20) =>
 	getPromptInputs(redshiftSinkPrompts, inputs, skip, count);
@@ -54,7 +54,7 @@ describe("Redshift Sink Test", function () {
 	});
 
 	it("Should import data without error", async function () {
-		const prompts = getRedshiftSinkPromptInputs([KEYS.DOWN, region, "", "", schemaName]);
+		const prompts = getRedshiftSinkPromptInputs([region, "", "", schemaName]);
 		const results: TestResults = {
 			messageFound: false
 		};
@@ -210,7 +210,7 @@ describe("Redshift Sink Test", function () {
 	});
 
 	it("Should import data again if force update flag set", async function () {
-		const prompts = getRedshiftSinkPromptInputs([KEYS.DOWN, region, "", "", schemaName]);
+		const prompts = getRedshiftSinkPromptInputs([region, "", "", schemaName]);
 		const results: TestResults = {
 			messageFound: false
 		};

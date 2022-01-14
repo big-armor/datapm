@@ -5,12 +5,7 @@ import fs from "fs";
 describe("CSV Sink", function () {
     let packageAFilePath: string;
 
-    const csvSinkPrompts = [
-        "Do you want to use the default options?",
-        "File Location?",
-        "Include header row?",
-        "Wrap all values in quotes?"
-    ];
+    const csvSinkPrompts = ["File Location?", "Include header row?", "Wrap all values in quotes?"];
 
     const getCSVSinkPrompts = (inputs?: string[], skip = 0, count = 20) =>
         getPromptInputs(csvSinkPrompts, inputs, skip, count);
@@ -29,7 +24,7 @@ describe("CSV Sink", function () {
     });
 
     it("Should write headers and quotes by default", async () => {
-        const prompts = getCSVSinkPrompts([KEYS.DOWN, "./", KEYS.ENTER, KEYS.ENTER]);
+        const prompts = getCSVSinkPrompts(["./", KEYS.ENTER, KEYS.ENTER]);
 
         const cmdResult = await testCmd(
             "fetch",
@@ -48,7 +43,7 @@ describe("CSV Sink", function () {
     });
 
     it("Should not write headers and quotes", async () => {
-        const prompts = getCSVSinkPrompts([KEYS.DOWN, "./", "n", "n"]);
+        const prompts = getCSVSinkPrompts(["./", "n", "n"]);
 
         const cmdResult = await testCmd(
             "fetch",

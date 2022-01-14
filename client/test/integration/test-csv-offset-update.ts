@@ -129,10 +129,6 @@ describe("CSV Offset Tests", function () {
             ["countries.datapm.json"],
             [
                 {
-                    message: "Do you want to use the default options?",
-                    input: KEYS.DOWN + KEYS.ENTER
-                },
-                {
                     message: "Destination?",
                     input: "Local" + KEYS.ENTER
                 },
@@ -175,10 +171,6 @@ describe("CSV Offset Tests", function () {
             "fetch",
             ["countries.datapm.json"],
             [
-                {
-                    message: "Do you want to use the default options?",
-                    input: KEYS.DOWN + KEYS.ENTER
-                },
                 {
                     message: "Destination?",
                     input: "Local" + KEYS.ENTER

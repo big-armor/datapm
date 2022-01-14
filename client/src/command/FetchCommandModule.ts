@@ -55,23 +55,6 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
 
     if (argv.reference == null) throw new Error("The package file path or URL is required");
 
-    if (!argv.defaults) {
-        const defaultsPromptResult = await prompts(
-            {
-                type: "select",
-                name: "defaults",
-                message: "Do you want to use the default options?",
-                choices: [
-                    { title: "Yes, answer fewer questions", value: true },
-                    { title: "No, answer more detailed questions", value: false }
-                ],
-                initial: 0
-            },
-            defaultPromptOptions
-        );
-        argv.defaults = defaultsPromptResult.defaults;
-    }
-
     const oraRef: ora.Ora = argv.quiet
         ? new OraQuiet()
         : ora({
