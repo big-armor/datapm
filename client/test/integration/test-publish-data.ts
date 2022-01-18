@@ -4,9 +4,9 @@ import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
 import {
     createApiKey,
-    createTestPackage,
     createUser,
     getPromptInputs,
+    KEYS,
     removePackageFiles,
     testCmd,
     TestResults,
@@ -14,18 +14,12 @@ import {
 } from "./test-utils";
 import fs from "fs";
 
-const publishCommandPrompts = ["Target registry?", "Catalog short name?", "Data Access Method?", "Is the above ok?"];
-
-const getPublishCommandPromptInputs = (inputs?: string[], skip = 0, count = 20) =>
-    getPromptInputs(publishCommandPrompts, inputs, skip, count);
-
 const fetchCommandPrompts = ["Destination?", "File Format?", "File Location?"];
 
 const getFetchCommandPromptInputs = (inputs?: string[], skip = 0) => getPromptInputs(fetchCommandPrompts, inputs, skip);
 
 describe("Publish Packge & Data Tests", async function () {
     let apiKey = "";
-    let packageAFilePath = "";
 
     let userAClient: ApolloClient<NormalizedCacheObject>;
 
@@ -45,44 +39,105 @@ describe("Publish Packge & Data Tests", async function () {
             apiKey
         });
 
-        packageAFilePath = await createTestPackage(TEST_SOURCE_FILES.HTTP1, true);
+        if (fs.existsSync("tmp-files")) fs.rmdirSync("tmp-files", { recursive: true });
+
+        fs.mkdirSync("tmp-files");
+
+        fs.copyFileSync(TEST_SOURCE_FILES.FILE19.replace("file://", ""), "tmp-files/countries.csv");
     });
 
     after(() => {
-        removePackageFiles(["state-codes"]);
+        removePackageFiles(["countries"]);
         resetConfiguration();
 
         if (fs.existsSync("tmp-files")) fs.rmdirSync("tmp-files", { recursive: true });
         resetConfiguration();
     });
 
-    it("Publish package and Data", async function () {
-        const prompts = getPublishCommandPromptInputs([
-            `http://localhost:${registryServerPort}`,
-            "test-publish-data-A",
-            "Publish schema and data to registry"
-        ]);
-        const results: TestResults = {
-            exitCode: -1,
-            messageFound: false
-        };
+    it("Create Package", async function () {
+        const prompts = [
+            {
+                message: "Is there a header line above?",
+                input: KEYS.ENTER
+            },
+            {
+                message: "Header row line number?",
+                input: KEYS.ENTER
+            },
+            {
+                message: "How are files updated?",
+                input: KEYS.DOWN + KEYS.ENTER
+            },
+            {
+                message: "Exclude any attributes",
+                input: KEYS.ENTER
+            },
+            {
+                message: "Rename attributes",
+                input: KEYS.ENTER
+            },
+            {
+                message: "derived from other 'upstream data'?",
+                input: KEYS.ENTER
+            },
 
-        const cmdResult = await testCmd(
-            "publish",
-            [packageAFilePath],
-            prompts,
-            async (line: string, promptIndex: number) => {
-                if (
-                    promptIndex === prompts.length &&
-                    line.includes("Share the command below to fetch the data in this package")
-                ) {
-                    results.messageFound = true;
-                }
+            {
+                message: "What does each countries record represent?",
+                input: "country" + KEYS.ENTER
+            },
+            {
+                message: "Unit for attribute 'id'?",
+                input: KEYS.ENTER
+            },
+            {
+                message: "User friendly package name?",
+                input: "countries" + KEYS.ENTER
+            },
+            {
+                message: "Package short name?",
+                input: KEYS.ENTER
+            },
+            {
+                message: "Starting version?",
+                input: KEYS.ENTER
+            },
+            {
+                message: "Short package description?",
+                input: "somthing short" + KEYS.ENTER
+            },
+            {
+                message: "Website?",
+                input: KEYS.ENTER
+            },
+            {
+                message: "Number of sample records?",
+                input: KEYS.ENTER
+            },
+            {
+                message: "Publish to registry?",
+                input: KEYS.ENTER
+            },
+            {
+                message: "Target registry?",
+                input: KEYS.ENTER
+            },
+            {
+                message: "Catalog short name?",
+                input: KEYS.ENTER
+            },
+            {
+                message: "Data Access Method?",
+                input: "Publish schema and data to registry" + KEYS.ENTER
+            },
+            {
+                message: "Is the above ok?",
+                input: "yes" + KEYS.ENTER
             }
-        );
+        ];
 
-        expect(cmdResult.code, "Exit code").equals(0);
-        expect(results.messageFound, "Found success message").equals(true);
+        const exitCode = await testCmd("package", ["file://./tmp-files/countries.csv"], prompts);
+
+        expect(exitCode.code).equal(0);
     });
 
     it("Should download the data", async function () {
@@ -94,10 +149,10 @@ describe("Publish Packge & Data Tests", async function () {
 
         const cmdResult = await testCmd(
             "fetch",
-            [`http://localhost:${registryServerPort}/test-publish-data-A/state-codes`],
+            [`http://localhost:${registryServerPort}/test-publish-data-A/countries`],
             prompts,
             async (line: string) => {
-                if (line.includes("Finished writing 51 records")) {
+                if (line.includes("Finished writing 5 records")) {
                     results.messageFound = true;
                 }
             }
@@ -106,11 +161,71 @@ describe("Publish Packge & Data Tests", async function () {
         expect(cmdResult.code, "Exit code").equals(0);
         expect(results.messageFound, "Found success message").equals(true);
 
-        const content = fs.readFileSync("tmp-files/state-codes.json").toString();
-        const firstRecord = JSON.parse(content.split("\n")[0]);
-        // eslint-disable-next-line no-unused-expressions
-        expect(firstRecord["State Code"]).equal("AL");
-        // eslint-disable-next-line no-unused-expressions
-        expect(firstRecord["State Name"]).equal("Alabama");
+        const content = fs.readFileSync("tmp-files/countries.json").toString();
+        const lines = content.split("\n");
+        const firstRecord = JSON.parse(lines[0]);
+        expect(firstRecord.code).equal("AD");
+        expect(firstRecord.name).equal("Andorra");
+    });
+
+    it("Should update the source file and republish", async function () {
+        fs.copyFileSync(TEST_SOURCE_FILES.FILE20.replace("file://", ""), "tmp-files/countries.csv");
+
+        const prompts = [
+            {
+                message: "Exclude any attributes?",
+                input: KEYS.ENTER
+            },
+            {
+                message: "Rename attributes?",
+                input: KEYS.ENTER
+            },
+            {
+                message: "What does each countries record represent?",
+                input: KEYS.ENTER
+            },
+            {
+                message: "User friendly package name?",
+                input: KEYS.ENTER
+            },
+            {
+                message: "Next version?",
+                input: KEYS.ENTER
+            },
+            {
+                message: "Short package description?",
+                input: KEYS.ENTER
+            },
+            {
+                message: "Website?",
+                input: KEYS.ENTER
+            },
+            {
+                message: "Number of sample records?",
+                input: KEYS.ENTER
+            },
+            {
+                message: "Publish to ",
+                input: KEYS.ENTER
+            }
+        ];
+
+        let foundUploadedRecordsMessage = false;
+        const exitCode = await testCmd(
+            "update",
+            [`http://localhost:${registryServerPort}/test-publish-data-A/countries`],
+            prompts,
+            async (line) => {
+                console.log(line);
+
+                if (line.indexOf("Finished uploading 3 records to") > -1) {
+                    foundUploadedRecordsMessage = true;
+                }
+            }
+        );
+
+        expect(exitCode.code).equal(0);
+
+        expect(foundUploadedRecordsMessage).equal(true);
     });
 });

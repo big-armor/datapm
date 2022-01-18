@@ -24,7 +24,7 @@ export interface PackageFileWithContext {
 async function fetchPackage(
     registryClient: RegistryClient,
     identifier: PackageIdentifierInput,
-    modifiedOrCononical: "modified" | "cononical" | "cononicalIfAvailable"
+    modifiedOrCanonical: "modified" | "canonical" | "canonicalIfAvailable"
 ): Promise<PackageFileWithContext> {
     const response = await registryClient.getPackage({
         packageSlug: identifier.packageSlug,
@@ -44,10 +44,16 @@ async function fetchPackage(
 
     let packageFileJSON = version.packageFile;
 
-    if (modifiedOrCononical === "cononicalIfAvailable" && version.cononicalPackageFile != null) {
-        packageFileJSON = version.cononicalPackageFile;
-    } else if (modifiedOrCononical === "cononical") {
-        packageFileJSON = version.cononicalPackageFile;
+    if (modifiedOrCanonical === "canonicalIfAvailable" && version.canonicalPackageFile != null) {
+        packageFileJSON = version.canonicalPackageFile;
+    } else if (modifiedOrCanonical === "canonical") {
+        if (version.canonicalPackageFile == null) {
+            throw new Error(
+                "Found package, but it has no canonical version. Likely need to login to the server first."
+            );
+        }
+
+        packageFileJSON = version.canonicalPackageFile;
     }
 
     validatePackageFile(packageFileJSON);
@@ -63,7 +69,7 @@ async function fetchPackage(
 
 export async function getPackage(
     identifier: string,
-    modifiedOrCononical: "modified" | "cononical" | "cononicalIfAvailable"
+    modifiedOrCanonical: "modified" | "canonical" | "canonicalIfAvailable"
 ): Promise<PackageFileWithContext> {
     if (identifier.startsWith("http://") || identifier.startsWith("https://")) {
         const http = await fetch(identifier, {
@@ -98,7 +104,7 @@ export async function getPackage(
                         catalogSlug: pathParts[0],
                         packageSlug: pathParts[1]
                     },
-                    modifiedOrCononical
+                    modifiedOrCanonical
                 );
             } catch (e) {
                 if (typeof e.message === "string" && (e.message as string).includes("NOT_AUTHENTICATED")) {
@@ -136,7 +142,7 @@ export async function getPackage(
         const registryClient = getRegistryClientWithConfig({ url: "https://datapm.io" });
         const packageIdentifier = parsePackageIdentifier(identifier);
 
-        return fetchPackage(registryClient, packageIdentifier, modifiedOrCononical);
+        return fetchPackage(registryClient, packageIdentifier, modifiedOrCanonical);
     } else {
         throw new Error(
             `Reference '${identifier}' is either not a valid package identifier, a valid package url, or url pointing to a valid package file.`

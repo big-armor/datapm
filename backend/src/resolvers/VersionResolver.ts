@@ -242,7 +242,11 @@ export const deleteVersion = async (
 };
 
 /** Return the unmodified original package file, only when the requester has EDIT permission */
-export const cononicalPackageFile = async (parent: any, _1: any, context: AuthenticatedContext): Promise<Maybe<PackageFile>> => {
+export const canonicalPackageFile = async (parent: any, _1: any, context: AuthenticatedContext): Promise<Maybe<PackageFile>> => {
+
+    if(context.me == null) {
+        return null;
+    }
 
     const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
     const packageEntity = await getPackageFromCacheOrDbById(context, context.connection, version.packageId);
@@ -345,7 +349,7 @@ export const modifiedPackageFile = async (parent: any, _1: any, context: Authent
 
         packageFile.sources = registrySources;
 
-        packageFile.cononical = false;
+        packageFile.canonical = false;
         packageFile.modifiedProperties = ["sources"];
 
     } else if(publishMethod === PublishMethod.SCHEMA_PROXY_DATA) {
@@ -373,7 +377,7 @@ export const modifiedPackageFile = async (parent: any, _1: any, context: Authent
         });
 
         packageFile.sources = registrySources;
-        packageFile.cononical = false;
+        packageFile.canonical = false;
         packageFile.modifiedProperties = ["sources"];
     }
 

@@ -218,9 +218,9 @@ export class PackageFile {
      *
      * The datapm server will return modified copies of package files for security and convenience purposes. Those copies will have a false value for this property.
      */
-    cononical: boolean;
+    canonical: boolean;
 
-    /** If this is not a cononical copy, this should hold an array of package file property names that have been modified. */
+    /** If this is not a canonical copy, this should hold an array of package file property names that have been modified. */
     modifiedProperties?: string[];
 
     /** The short name that identifies this package, in the context of the catalog that it is published. */

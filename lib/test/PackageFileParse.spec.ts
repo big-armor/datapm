@@ -74,8 +74,8 @@ describe("PackageFile checks", () => {
         expect(errorFound).equal(true);
     });
 
-    it("Should have v0.8.0 cononical value true", function () {
+    it("Should have v0.8.0 canonical value true", function () {
         const packageFile = loadPackageFileFromDisk("test/packageFiles/congressional-legislators.datapm.json");
-        expect(packageFile.cononical).equal(true);
+        expect(packageFile.canonical).equal(true);
     });
 });

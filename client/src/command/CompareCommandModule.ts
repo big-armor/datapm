@@ -14,7 +14,7 @@ export async function comparePackagesCommand(argv: CompareArguments): Promise<vo
     // Fetching prior package
     oraRef.start("Fetching prior package");
 
-    const priorPackageWithContext = await getPackage(argv.priorPackage, "cononicalIfAvailable").catch((error) => {
+    const priorPackageWithContext = await getPackage(argv.priorPackage, "canonicalIfAvailable").catch((error) => {
         oraRef.fail();
         console.log(chalk.red(error.message));
         process.exit(1);
@@ -25,7 +25,7 @@ export async function comparePackagesCommand(argv: CompareArguments): Promise<vo
     // Fetching new package
     oraRef.start("Fetching new package");
 
-    const newPackageWithContext = await getPackage(argv.newPackage, "cononicalIfAvailable").catch((error) => {
+    const newPackageWithContext = await getPackage(argv.newPackage, "canonicalIfAvailable").catch((error) => {
         oraRef.fail();
         console.log(chalk.red(error.message));
         process.exit(1);
@@ -36,8 +36,8 @@ export async function comparePackagesCommand(argv: CompareArguments): Promise<vo
     // Comparing packages
     oraRef.start("Comparing packages");
 
-    if (priorPackageWithContext.packageFile.cononical === false) {
-        oraRef.warn("The prior packageFile is a modified copy. Not a cononical original. Comparing may not be useful.");
+    if (priorPackageWithContext.packageFile.canonical === false) {
+        oraRef.warn("The prior packageFile is a modified copy. Not a canonical original. Comparing may not be useful.");
 
         if (priorPackageWithContext.packageFile.modifiedProperties != null)
             oraRef.info(
@@ -45,8 +45,8 @@ export async function comparePackagesCommand(argv: CompareArguments): Promise<vo
             );
     }
 
-    if (newPackageWithContext.packageFile.cononical === false) {
-        oraRef.warn("The new packageFile is a modified copy. Not a cononical original. Comparing may not be useful.");
+    if (newPackageWithContext.packageFile.canonical === false) {
+        oraRef.warn("The new packageFile is a modified copy. Not a canonical original. Comparing may not be useful.");
         if (priorPackageWithContext.packageFile.modifiedProperties != null)
             oraRef.info(
                 "Modified properties are: " + priorPackageWithContext.packageFile.modifiedProperties.join(", ")

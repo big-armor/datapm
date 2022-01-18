@@ -92,6 +92,6 @@ describe("Upgrading package files automatically", function () {
 
         expect(Array.isArray(packageFile.sources[0].configuration!.uris)).equal(true);
 
-        expect(packageFile.cononical).equal(true);
+        expect(packageFile.canonical).equal(true);
     });
 });

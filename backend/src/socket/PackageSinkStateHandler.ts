@@ -42,8 +42,14 @@ export module PackageSinkStateHandler {
                         }
                     }
 
-                    map[batch.streamSetSlug].streamStates[batch.streamSlug].schemaStates[batch.schemaTitle] = {
+                    const streamState = map[batch.streamSetSlug].streamStates[batch.streamSlug];
+
+                    streamState.schemaStates[batch.schemaTitle] = {
                         lastOffset: batch.lastOffset
+                    }
+
+                    if(streamState.streamOffset == undefined || streamState.streamOffset < batch.lastOffset) { 
+                        streamState.streamOffset = batch.lastOffset;
                     }
 
                     return map

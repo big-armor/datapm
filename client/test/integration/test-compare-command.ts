@@ -199,5 +199,5 @@ describe("Compare Command Tests", async function () {
         expect(results.messageFound, "Found success message").equals(true);
     });
 
-    // TODO add test for comparing modified (non-cononical) packages
+    // TODO add test for comparing modified (non-canonical) packages
 });

@@ -13,10 +13,10 @@
         "description",
         "schemas",
         "sources",
-        "cononical"
+        "canonical"
     ],
     "properties": {
-        "cononical": {
+        "canonical": {
             "$id": "#/generatedBy",
             "type": "boolean",
             "description": "Whether or not this package an unmodified original copy. If true, the package is not modified and can be safely saved and used later. If false, this package has been modified for security or convience purposes and should not be saved"
@@ -24,7 +24,7 @@
         "modifiedProperties": {
             "$id": "#/generatedBy",
             "type": "array",
-            "description": "If cononical is false, this will contain an array of the package file properties that contain modified content.",
+            "description": "If canonical is false, this will contain an array of the package file properties that contain modified content.",
             "items": {
                 "type": "string"
             }

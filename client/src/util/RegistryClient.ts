@@ -166,6 +166,7 @@ export class RegistryClient {
                             versionPatch
                         }
                         packageFile
+                        canonicalPackageFile
                         updatedAt
                     }
                 }

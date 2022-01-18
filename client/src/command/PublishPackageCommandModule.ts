@@ -66,7 +66,7 @@ export class PublishPackageCommandModule {
 
         oraRef.start(`Resolving package file reference: ${argv.reference}`);
 
-        const packageFileWithContext = await getPackage(argv.reference, "cononical").catch((error) => {
+        const packageFileWithContext = await getPackage(argv.reference, "canonical").catch((error) => {
             oraRef.fail();
             console.log(chalk.red(error.message));
             process.exit(1);
@@ -74,11 +74,11 @@ export class PublishPackageCommandModule {
 
         const packageFile = packageFileWithContext.packageFile;
 
-        if (packageFile.cononical === false) {
+        if (packageFile.canonical === false) {
             oraRef.fail(
-                "Package file is not cononical. This means it is a copy modified for security or convenience reasons."
+                "Package file is not canonical. This means it is a copy modified for security or convenience reasons."
             );
-            console.log(chalk.yellow("Use a cononical package file, or contact the package file author."));
+            console.log(chalk.yellow("Use a canonical package file, or contact the package file author."));
             process.exit(1);
         }
 
@@ -110,11 +110,11 @@ export class PublishPackageCommandModule {
                         choices: [
                             {
                                 title: "Yes, Continue",
-                                value: true
+                                value: "true"
                             },
                             {
                                 title: "No, Choose A Different Registry",
-                                value: false
+                                value: "false"
                             }
                         ]
                     }
@@ -122,7 +122,7 @@ export class PublishPackageCommandModule {
                 defaultPromptOptions
             );
 
-            if ((promptResponse.confirm as string).startsWith("No")) {
+            if (promptResponse.confirm === "false") {
                 targetRegistries = [];
             } else {
                 targetRegistries = packageFile.registries;

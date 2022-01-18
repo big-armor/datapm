@@ -740,8 +740,8 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
 
         const oldPackageFile = packageFileObject as PackageFile070;
 
-        if ((oldPackageFile as PackageFile).cononical !== null) {
-            (oldPackageFile as PackageFile).cononical = true;
+        if ((oldPackageFile as PackageFile).canonical == null) {
+            (oldPackageFile as PackageFile).canonical = true;
         }
     }
 

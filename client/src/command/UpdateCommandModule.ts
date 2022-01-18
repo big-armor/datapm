@@ -285,7 +285,7 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
     // Finding package
     oraRef.start("Finding package...");
 
-    const packageFileWithContext = await getPackage(argv.reference, "cononicalIfAvailable").catch((error) => {
+    const packageFileWithContext = await getPackage(argv.reference, "canonical").catch((error) => {
         oraRef.fail();
         console.log(chalk.red(error.message));
         process.exit(1);
@@ -323,10 +323,28 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
             );
             process.exit(1);
         }
+
+        const registryReference = packageFileWithContext.packageFile.registries?.find(
+            (s) => packageFileWithContext.registryURL === s.url
+        );
+
+        if (registryReference === undefined) {
+            console.log(
+                chalk.red(
+                    "The registry URL is not configured in this package. The registry URL has likely changed. Contact the package author and ask them to republish to the new registry URL"
+                )
+            );
+            process.exit(1);
+            return;
+        }
+
+        // Replace all registry references for the purposes of this update command
+        // use only the registry the package file came from
+        packageFileWithContext.packageFile.registries = [registryReference];
     }
 
-    if (packageFileWithContext.packageFile.cononical === false) {
-        oraRef.fail("Package is not cononical. It has been modified for security or convenience reasons.");
+    if (packageFileWithContext.packageFile.canonical === false) {
+        oraRef.fail("Package is not canonical. It has been modified for security or convenience reasons.");
 
         if (packageFileWithContext.packageFile.modifiedProperties !== undefined) {
             oraRef.info(
