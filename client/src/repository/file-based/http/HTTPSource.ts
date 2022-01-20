@@ -5,6 +5,7 @@ import { FileOpenStreamContext, FileStreamContext } from "../parser/Parser";
 import { Parameter } from "../../../util/parameters/Parameter";
 import { AbstractFileStreamSource } from "../AbstractFileStreamSource";
 import { TYPE, DISPLAY_NAME } from "./HTTPRepositoryDescription";
+import { fileNameFromUrl } from "../../../util/NameUtil";
 
 export class HTTPSource extends AbstractFileStreamSource {
     sourceType(): string {
@@ -36,30 +37,6 @@ export class HTTPSource extends AbstractFileStreamSource {
         return client;
     }
 
-    getFileName(url: string, response?: IncomingMessage): string {
-        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-
-        let fileName: string | null = null;
-
-        if (response?.headers["content-disposition"]) {
-            const disposition = response.headers["content-disposition"];
-            const matches = filenameRegex.exec(disposition);
-            if (matches != null && matches[1]) fileName = matches[1].replace(/['"]/g, "");
-        }
-
-        if (!fileName) {
-            // TODO support URLs with query parameters, etc
-
-            // Use the last part of the path
-            const urlParts = url.split("/");
-
-            fileName = urlParts[url.endsWith("/") ? urlParts.length - 2 : urlParts.length - 1];
-            fileName = fileName.split("?")[0];
-        }
-
-        return fileName;
-    }
-
     async getFileStreams(
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
@@ -75,7 +52,7 @@ export class HTTPSource extends AbstractFileStreamSource {
         return Promise.all(
             uris.map<Promise<FileStreamContext>>((uri) => {
                 return new Promise<FileStreamContext>((resolve) => {
-                    const fileName = this.getFileName(uri as string);
+                    const fileName = fileNameFromUrl(uri as string);
 
                     this.getClient(uri)
                         .request(uri, { method: "HEAD" }, (response: IncomingMessage) => {
@@ -88,7 +65,7 @@ export class HTTPSource extends AbstractFileStreamSource {
                                 openStream: () => {
                                     return new Promise((resolve, reject) => {
                                         const request = this.getClient(uri).get(uri, (response: IncomingMessage) => {
-                                            const fileName = this.getFileName(uri as string, response);
+                                            const fileName = fileNameFromUrl(uri as string, response);
 
                                             let expectedBytes = 0;
 

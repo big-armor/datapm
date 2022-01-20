@@ -227,7 +227,6 @@ describe("Activity Log Tests", async () => {
 
             expect.fail("There was an error - " + error.message);
         }
-
         expect(response.errors == null, "no errors").true;
 
         const activityLogResponse = await userOneClient.query({

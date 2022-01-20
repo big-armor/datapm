@@ -34,11 +34,13 @@ const generateCommandPromptsWithDerivedFrom = [
     "Number of sample records?",
     "Publish to registry?",
     "Target registry?",
-    "Catalog short name?"
+    "Catalog short name?",
+    "Data Access Method?",
+    "Is the above ok?"
 ];
 
-const getGenerateCommandPromptInputs = (inputs?: string[], skip = 0, count = 20) =>
-    getPromptInputs(generateCommandPromptsWithDerivedFrom, inputs, skip, count);
+const getGenerateCommandPromptInputs = (inputs?: string[], skip = 0) =>
+    getPromptInputs(generateCommandPromptsWithDerivedFrom, inputs, skip);
 
 describe("Package - Derived From", () => {
     let apiKey = "";
@@ -72,9 +74,11 @@ describe("Package - Derived From", () => {
             "This is a short description",
             "",
             "10",
-            KEYS.DOWN,
-            KEYS.DOWN,
-            ""
+            "yes", // publish to registry
+            KEYS.DOWN, // registry
+            "", // catalog
+            "Publish schema, client direct connects for data",
+            "yes"
         ]);
         prompts.splice(10, 0, {
             message: "What does each state-codes record represent?",

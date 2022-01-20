@@ -8,6 +8,7 @@ import { CatalogIdentifierInput, Permission, SetUserCatalogPermissionInput, User
 import { UserCatalogPermissionRepository } from "../repository/CatalogPermissionRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { asyncForEach } from "../util/AsyncUtils";
+import { isAuthenticatedContext } from "../util/contextHelpers";
 import { sendInviteUser, sendShareNotification, validateMessageContents } from "../util/smtpUtil";
 import { getCatalogFromCacheOrDbOrFail } from "./CatalogResolver";
 import { deleteCatalogFollowByUserId } from "./FollowResolver";
@@ -20,9 +21,12 @@ export const hasCatalogPermissions = async (context: Context, catalog: CatalogEn
         }
     }
 
-    if (context.me == null) {
+    if (!isAuthenticatedContext(context)) {
         return false;
     }
+
+    const authenicatedContext = context as AuthenticatedContext;
+
 
     return await getCatalogPermissionsStatusFromCacheOrDb(context, catalog.id, permission);
 };
@@ -143,11 +147,13 @@ export const getCatalogPermissionsStatusFromCacheOrDb = async (
     catalogId: number,
     permission: Permission
 ) => {
-    if (!context.me) {
+    if (!isAuthenticatedContext(context)) {
         return false;
     }
 
-    const userId = context.me.id;
+    const authenicatedContext = context as AuthenticatedContext;
+
+    const userId = authenicatedContext.me.id;
     const permissionsPromiseFunction = () =>
         context.connection
             .getCustomRepository(UserCatalogPermissionRepository)

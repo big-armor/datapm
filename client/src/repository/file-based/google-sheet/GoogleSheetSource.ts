@@ -1,7 +1,7 @@
 import bufferPeek from "buffer-peek-stream";
 import chalk from "chalk";
 import csvParser from "csv-parse/lib/sync";
-import { DPMConfiguration, DPMRecord } from "datapm-lib";
+import { DPMConfiguration, DPMRecord, RecordContext, UpdateMethod } from "datapm-lib";
 import { https } from "follow-redirects";
 import { Readable, Transform } from "stream";
 import { getOAuth2Client, getSpreadsheetMetadata } from "../../../util/GoogleUtil";
@@ -13,9 +13,7 @@ import {
     StreamSetPreview,
     SourceInspectionContext as URIInspectionContext,
     InspectionResults,
-    Source,
-    UpdateMethod,
-    RecordContext
+    Source
 } from "../../Source";
 import BomStrippingStream from "bomstrip";
 import { ColumnOption } from "csv-parse";

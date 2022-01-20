@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "es2018",
+        "target": "es2019",
         "module": "commonjs",
         "outDir": "./dist",
         "emitDecoratorMetadata": true,
@@ -19,7 +19,8 @@
         "alwaysStrict": true,
         "sourceMap": true,
         "esModuleInterop": true,
-        "declaration": true
+        "declaration": true,
+        "typeRoots": ["src/types", "node_modules/@types"]
     },
     "exclude": ["node_modules"],
     "include": ["src/**/*", "test/**/*"]

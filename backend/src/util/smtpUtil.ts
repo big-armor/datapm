@@ -268,7 +268,6 @@ async function sendEmail(user: UserEntity, subject: string, bodyText: string, bo
         .catch((err) => {
             console.error("Error sending email");
             console.error(JSON.stringify(err));
-            throw err;
         });
 }
 

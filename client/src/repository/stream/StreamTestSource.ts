@@ -1,19 +1,11 @@
-import { DPMConfiguration, DPMRecord } from "datapm-lib";
+import { DPMConfiguration, DPMRecord, UpdateMethod, RecordContext } from "datapm-lib";
 import faker from "faker";
 import prompts from "prompts";
 import { Readable } from "stream";
 import { FakerCategories, FakerTypes } from "../../util/FakerUtil";
 import { toSentenceCase } from "../../util/NameUtil";
 import { Parameter } from "../../util/parameters/Parameter";
-import {
-    StreamSetPreview,
-    SourceInspectionContext,
-    InspectionResults,
-    Source,
-    StreamSummary,
-    UpdateMethod,
-    RecordContext
-} from "../Source";
+import { StreamSetPreview, SourceInspectionContext, InspectionResults, Source, StreamSummary } from "../Source";
 import { TYPE } from "./StreamTestRepositoryDescription";
 
 interface TestSourceAttribute {

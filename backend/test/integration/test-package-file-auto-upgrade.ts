@@ -3,7 +3,6 @@ import { expect } from "chai";
 import { CreatePackageDocument, CreateVersionDocument } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
-import * as crypto from "crypto";
 import { loadPackageFileFromDisk, parsePackageFileJSON } from "datapm-lib";
 
 describe("Upgrading package files automatically", function () {
@@ -86,16 +85,13 @@ describe("Upgrading package files automatically", function () {
 
         const responsePackageFileContents = response.data!.createVersion.packageFile;
 
-        const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
-
-        // have to update this hash value if the package file contents change
-        expect(responseHash).equal("42cd14a3205d519637551648ef8ba533551c6230ee45d7fe97c28c02bd123d1f");
-
         const packageFile = parsePackageFileJSON(responsePackageFileContents);
 
-        expect(packageFile.$schema).equals("https://datapm.io/docs/package-file-schema-v0.6.0.json");
+        expect(packageFile.$schema).equals("https://datapm.io/docs/package-file-schema-v0.8.0.json");
         expect(packageFile.licenseMarkdown).includes("This is not a real license. Just a test.");
 
         expect(Array.isArray(packageFile.sources[0].configuration!.uris)).equal(true);
+
+        expect(packageFile.canonical).equal(true);
     });
 });

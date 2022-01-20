@@ -16,7 +16,7 @@ import {
     TEST_SOURCE_FILES
 } from "./test-utils";
 
-const publishCommandPrompts = ["Target registry?", "Catalog short name?"];
+const publishCommandPrompts = ["Target registry?", "Catalog short name?", "Data Access Method?", "Is the above ok?"];
 
 const getPublishCommandPromptInputs = (inputs?: string[], skip = 0, count = 20) =>
     getPromptInputs(publishCommandPrompts, inputs, skip, count);
@@ -84,7 +84,7 @@ describe("Publish Package Command Tests", async function () {
         };
 
         const cmdResult = await testCmd("publish", [packageAFilePath], [], async (line: string) => {
-            if (line.includes("You have not added a registry API key.")) {
+            if (line.includes("You have not logged into a registry from the command line")) {
                 results.messageFound = true;
             }
         });

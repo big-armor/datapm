@@ -1,14 +1,23 @@
-import { DPMConfiguration, DPMRecordValue, PackageFile, Schema } from "datapm-lib";
+import {
+    SinkState,
+    SinkStateKey,
+    DPMConfiguration,
+    DPMRecordValue,
+    PackageFile,
+    Schema,
+    UpdateMethod,
+    RecordStreamContext
+} from "datapm-lib";
 import mongoose, { Document, Model, Mongoose, SchemaDefinition } from "mongoose";
 import { SemVer } from "semver";
 import { Transform } from "stream";
 import { Maybe } from "../../../util/Maybe";
-import { ExtendedJSONSchema7TypeName, RecordStreamContext, UpdateMethod } from "../../Source";
+import { ExtendedJSONSchema7TypeName } from "../../Source";
 import { convertValueByValueType, discoverValueType } from "../../../transforms/StatsTransform";
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
 import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
 import { DISPLAY_NAME, TYPE } from "./MongoRepositoryDescription";
-import { Sink, SinkErrors, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
+import { Sink, SinkErrors, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
 
 export class MongoSinkModule implements Sink {
     client: Mongoose;
@@ -178,8 +187,15 @@ export class MongoSinkModule implements Sink {
                     await self.complete(this);
                     callback();
                 }
-            })
+            }),
+            getCommitKeys: () => {
+                return [];
+            }
         };
+    }
+
+    async commitAfterWrites(): Promise<void> {
+        // Nothing to do
     }
 
     async writeRecord(chunk: RecordStreamContext, transform: Transform): Promise<void> {
