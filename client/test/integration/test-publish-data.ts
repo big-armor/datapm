@@ -226,4 +226,30 @@ describe("Publish Packge & Data Tests", async function () {
 
         expect(foundUploadedRecordsMessage).equal(true);
     });
+
+    it("Should download only the new records", async function () {
+        const prompts = getFetchCommandPromptInputs(["Local", "JSON", "tmp-files"]);
+        const results: TestResults = {
+            exitCode: -1,
+            messageFound: false
+        };
+
+        const cmdResult = await testCmd(
+            "fetch",
+            [`http://localhost:${registryServerPort}/test-publish-data-A/countries`],
+            prompts,
+            async (line: string) => {
+                if (line.includes("Finished writing 3 records")) {
+                    results.messageFound = true;
+                }
+            }
+        );
+
+        expect(cmdResult.code, "Exit code").equals(0);
+        expect(results.messageFound, "Found success message").equals(true);
+
+        const content = fs.readFileSync("tmp-files/countries.json").toString();
+        const lines = content.split("\n");
+        expect(lines.length).equals(9);
+    });
 });
