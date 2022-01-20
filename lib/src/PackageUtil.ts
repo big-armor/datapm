@@ -1,14 +1,4 @@
 import { SemVer } from "semver";
-import {
-    Schema,
-    PackageFile,
-    CountPrecision,
-    Source,
-    StreamSet,
-    ValueTypeStatistics,
-    PublishMethod,
-    RegistryReference
-} from "./main";
 import fs from "fs";
 import path from "path";
 import AJV from "ajv";
@@ -22,6 +12,16 @@ import { PackageFile040 } from "./PackageFile-v0.4.0";
 import { PackageFile050 } from "./PackageFile-v0.5.0";
 import { PackageFile060 } from "./PackageFile-v0.6.0";
 import { PackageFile070 } from "./PackageFile-v0.7.0";
+import {
+    CountPrecision,
+    PackageFile,
+    PublishMethod,
+    RegistryReference,
+    Schema,
+    Source,
+    StreamSet,
+    ValueTypeStatistics
+} from "./PackageFile-v0.8.0";
 
 export type DPMRecordValue =
     | number
