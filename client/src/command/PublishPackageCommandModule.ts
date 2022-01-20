@@ -66,7 +66,7 @@ export class PublishPackageCommandModule {
 
         oraRef.start(`Resolving package file reference: ${argv.reference}`);
 
-        const packageFileWithContext = await getPackage(argv.reference, "canonical").catch((error) => {
+        const packageFileWithContext = await getPackage(argv.reference, "canonicalIfAvailable").catch((error) => {
             oraRef.fail();
             console.log(chalk.red(error.message));
             process.exit(1);

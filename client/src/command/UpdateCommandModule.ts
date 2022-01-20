@@ -15,11 +15,10 @@ import prompts, { Choice } from "prompts";
 import { SemVer } from "semver";
 import { Permission } from "../generated/graphql";
 import { getSourceByType } from "../repository/SourceUtil";
-import { getRegistryConfig, getRepositoryCredential } from "../util/ConfigUtil";
+import { getRepositoryCredential } from "../util/ConfigUtil";
 import { validPackageDisplayName, validShortPackageDescription, validUnit, validVersion } from "../util/IdentifierUtil";
 import { getPackage } from "../util/PackageAccessUtil";
 import { writeLicenseFile, writePackageFile, writeReadmeFile, differenceToString } from "../util/PackageUtil";
-import { RegistryClient } from "../util/RegistryClient";
 import { publishPackage } from "./PublishPackageCommand";
 import clone from "rfdc";
 import { LogType } from "../util/LoggingUtils";
@@ -31,6 +30,7 @@ import { SourceInspectionContext } from "../repository/Source";
 import { getRepositoryDescriptionByType } from "../repository/RepositoryUtil";
 import { obtainConnectionConfiguration } from "../util/ConnectionUtil";
 import { obtainCredentialsConfiguration } from "../util/CredentialsUtil";
+import { checkPackagePermissionsOnRegistry } from "../util/RegistryPermissions";
 
 async function schemaPrompts(schema: Schema): Promise<void> {
     if (schema.properties == null) return;
@@ -285,45 +285,44 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
     // Finding package
     oraRef.start("Finding package...");
 
-    const packageFileWithContext = await getPackage(argv.reference, "canonical").catch((error) => {
+    const packageFileWithContext = await getPackage(argv.reference, "canonicalIfAvailable").catch((error) => {
         oraRef.fail();
         console.log(chalk.red(error.message));
         process.exit(1);
     });
 
+    if (packageFileWithContext.registryURL != null) {
+        try {
+            await checkPackagePermissionsOnRegistry(
+                {
+                    catalogSlug: packageFileWithContext.catalogSlug as string,
+                    packageSlug: packageFileWithContext.packageFile.packageSlug
+                },
+                packageFileWithContext.registryURL,
+                Permission.EDIT
+            );
+        } catch (error) {
+            if (error.message === "NOT_AUTHORIZED") {
+                oraRef.fail(
+                    "You do not have permission to edit this package. Contact the package manager to request edit permission"
+                );
+                process.exit(1);
+            } else if (error.message === "NOT_AUTHENTICATED") {
+                oraRef.fail("You are not logged in to the registry. Use the following command to login");
+                console.log(chalk.green("datapm registry login " + packageFileWithContext.registryURL));
+                process.exit(1);
+            }
+
+            oraRef.fail("There was an error checking package permissions: " + error.message);
+            process.exit(1);
+        }
+    }
+
     const oldPackageFile = packageFileWithContext.packageFile;
     oraRef.succeed();
 
     // Validate the package registry URL and the permission to update
-    if (packageFileWithContext.registryURL) {
-        // Check if the API key was configured for the package registry URL
-        const registryConfig = getRegistryConfig(packageFileWithContext.registryURL);
-        if (!registryConfig?.apiKey) {
-            console.log(
-                chalk.red(
-                    "You do not have an API key configured for this registry. You must first create an API Key, and add it to this client. Then you can retry this command"
-                )
-            );
-            process.exit(1);
-        }
-        // Check if the user has EDIT permission before continuing
-        const registryClient = new RegistryClient(registryConfig);
-        const result = await registryClient.getCatalogs();
-        if (
-            result.data.myCatalogs.find(
-                (c) =>
-                    c.identifier.catalogSlug === packageFileWithContext.catalogSlug &&
-                    c.myPermissions?.includes(Permission.EDIT)
-            ) == null
-        ) {
-            console.log(
-                chalk.red(
-                    "The registry reports that you do not have permission to edit this package. Contact the author to request permissions."
-                )
-            );
-            process.exit(1);
-        }
-
+    if (packageFileWithContext.registryURL != null) {
         const registryReference = packageFileWithContext.packageFile.registries?.find(
             (s) => packageFileWithContext.registryURL === s.url
         );
@@ -335,12 +334,7 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
                 )
             );
             process.exit(1);
-            return;
         }
-
-        // Replace all registry references for the purposes of this update command
-        // use only the registry the package file came from
-        packageFileWithContext.packageFile.registries = [registryReference];
     }
 
     if (packageFileWithContext.packageFile.canonical === false) {

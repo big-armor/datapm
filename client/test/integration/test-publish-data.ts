@@ -216,8 +216,6 @@ describe("Publish Packge & Data Tests", async function () {
             [`http://localhost:${registryServerPort}/test-publish-data-A/countries`],
             prompts,
             async (line) => {
-                console.log(line);
-
                 if (line.indexOf("Finished uploading 3 records to") > -1) {
                     foundUploadedRecordsMessage = true;
                 }

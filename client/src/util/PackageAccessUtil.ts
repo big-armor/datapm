@@ -24,7 +24,7 @@ export interface PackageFileWithContext {
 async function fetchPackage(
     registryClient: RegistryClient,
     identifier: PackageIdentifierInput,
-    modifiedOrCanonical: "modified" | "canonical" | "canonicalIfAvailable"
+    modifiedOrCanonical: "modified" | "canonicalIfAvailable"
 ): Promise<PackageFileWithContext> {
     const response = await registryClient.getPackage({
         packageSlug: identifier.packageSlug,
@@ -46,14 +46,6 @@ async function fetchPackage(
 
     if (modifiedOrCanonical === "canonicalIfAvailable" && version.canonicalPackageFile != null) {
         packageFileJSON = version.canonicalPackageFile;
-    } else if (modifiedOrCanonical === "canonical") {
-        if (version.canonicalPackageFile == null) {
-            throw new Error(
-                "Found package, but it has no canonical version. Likely need to login to the server first."
-            );
-        }
-
-        packageFileJSON = version.canonicalPackageFile;
     }
 
     validatePackageFile(packageFileJSON);
@@ -69,7 +61,7 @@ async function fetchPackage(
 
 export async function getPackage(
     identifier: string,
-    modifiedOrCanonical: "modified" | "canonical" | "canonicalIfAvailable"
+    modifiedOrCanonical: "modified" | "canonicalIfAvailable"
 ): Promise<PackageFileWithContext> {
     if (identifier.startsWith("http://") || identifier.startsWith("https://")) {
         const http = await fetch(identifier, {

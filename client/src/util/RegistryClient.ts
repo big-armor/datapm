@@ -147,6 +147,7 @@ export class RegistryClient {
                 package(identifier: $identifier) {
                     displayName
                     description
+                    myPermissions
                     identifier {
                         registryURL
                         catalogSlug
