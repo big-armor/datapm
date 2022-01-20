@@ -276,7 +276,6 @@ describe("Fetch Command Tests", async function () {
             ["package-b.datapm.json", "--forceUpdate"],
             prompts,
             async (line: string) => {
-                console.log(line);
                 if (line.includes("Finished writing 51 records")) {
                     results.messageFound = true;
                 }
