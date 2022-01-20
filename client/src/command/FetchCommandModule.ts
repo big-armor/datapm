@@ -1,10 +1,16 @@
 import chalk from "chalk";
-import { CountPrecision, DPMConfiguration, leastPrecise, Source } from "datapm-lib";
+import {
+    SinkState,
+    SinkStateKey,
+    CountPrecision,
+    DPMConfiguration,
+    leastPrecise,
+    Source,
+    PackageFile
+} from "datapm-lib";
 import numeral from "numeral";
 import ora from "ora";
 import prompts from "prompts";
-import { SemVer } from "semver";
-import { SinkState, SinkStateKey } from "../repository/Sink";
 import { OraQuiet } from "../util/OraQuiet";
 import { getPackage } from "../util/PackageAccessUtil";
 import { cliHandleParameters, repeatedlyPromptParameters } from "../util/parameters/ParameterUtils";
@@ -22,6 +28,8 @@ import { getSinkDescriptions } from "../repository/SinkUtil";
 import { getRepositoryDescriptionByType } from "../repository/RepositoryUtil";
 import { obtainConnectionConfiguration } from "../util/ConnectionUtil";
 import { obtainCredentialsConfiguration } from "../util/CredentialsUtil";
+import { Sink } from "../repository/Sink";
+import { SemVer } from "semver";
 
 export async function fetchPackage(argv: FetchArguments): Promise<void> {
     if (argv.quiet) {
@@ -33,7 +41,7 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
             {
                 type: "text",
                 name: "reference",
-                message: "What is the package file name or url?",
+                message: "What is the package name, url, or file name?",
                 validate: (value) => {
                     if (!value) return "Package file name or url required";
                     return true;
@@ -47,23 +55,6 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
 
     if (argv.reference == null) throw new Error("The package file path or URL is required");
 
-    if (!argv.defaults) {
-        const defaultsPromptResult = await prompts(
-            {
-                type: "select",
-                name: "defaults",
-                message: "Do you want to use the default options?",
-                choices: [
-                    { title: "Yes, answer fewer questions", value: true },
-                    { title: "No, answer more detailed questions", value: false }
-                ],
-                initial: 0
-            },
-            defaultPromptOptions
-        );
-        argv.defaults = defaultsPromptResult.defaults;
-    }
-
     const oraRef: ora.Ora = argv.quiet
         ? new OraQuiet()
         : ora({
@@ -74,9 +65,17 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
     // Finding package
     oraRef.start("Finding package " + argv.reference);
 
-    const packageFileWithContext = await getPackage(argv.reference).catch((error) => {
+    const packageFileWithContext = await getPackage(argv.reference, "modified").catch((error) => {
         oraRef.fail();
-        console.error(chalk.red(error.message));
+
+        if (typeof error.message === "string" && error.message.includes("NOT_AUTHENTICATED_TO_REGISTRY")) {
+            console.error(
+                chalk.yellow("You are not authenticated to the registry. Use the following command to authenticate.")
+            );
+            console.error(chalk.green("datapm registry login"));
+        } else {
+            console.error(chalk.red(error.message));
+        }
         process.exit(1);
     });
 
@@ -137,9 +136,27 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
     }
 
     // Prompt parameters
-    const sinkConnectionConfiguration: DPMConfiguration = {};
-    const sinkCredentialsConfiguration: DPMConfiguration = {};
+    let sinkConnectionConfiguration: DPMConfiguration = {};
+    let sinkCredentialsConfiguration: DPMConfiguration = {};
     let sinkConfiguration: DPMConfiguration = {};
+
+    if (argv.sinkConnectionConfig) {
+        try {
+            sinkConnectionConfiguration = JSON.parse(argv.sinkConnectionConfig);
+        } catch (error) {
+            console.error(chalk.red("ERROR_PARSING_SINK_CONNECTION_CONFIG"));
+            process.exit(1);
+        }
+    }
+
+    if (argv.sinkCredentialsConfig) {
+        try {
+            sinkCredentialsConfiguration = JSON.parse(argv.sinkCredentialsConfig);
+        } catch (error) {
+            console.error(chalk.red("ERROR_PARSING_SINK_CREDENTIALS_CONFIG"));
+            process.exit(1);
+        }
+    }
 
     // Finding sink
     if (argv.sink || argv.defaults) {
@@ -153,6 +170,10 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
     const sinkRepository = await sinkRepositoryDescription?.getRepository();
 
     if (sinkRepository == null) throw new Error("Could not find repository for " + sinkType);
+
+    if (argv.sink || argv.defaults) {
+        oraRef.succeed(`Found the sink named ${sinkType}`);
+    }
 
     const obtainConnectionConfigurationResult = await obtainConnectionConfiguration(
         oraRef,
@@ -221,6 +242,76 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
         interupted = signal;
     });
 
+    const listrStatuses = await fetchMultipleWithListr(
+        oraRef,
+        packageFile,
+        {
+            catalogSlug: packageFileWithContext.catalogSlug || "_no_catalog",
+            packageSlug: packageFileWithContext.packageFile.packageSlug,
+            packageMajorVersion: new SemVer(packageFileWithContext.packageFile.version).major
+        },
+        sink,
+        sinkConnectionConfiguration,
+        sinkCredentialsConfiguration,
+        sinkConfiguration,
+        argv.defaults || false,
+        argv.forceUpdate || false,
+        argv.quiet || false
+    );
+
+    const totalRecordCount = Object.values(listrStatuses).reduce((prev, curr) => {
+        return prev + curr;
+    }, 0);
+
+    if (!argv.quiet) oraRef.succeed(`Finished writing ${numeral(totalRecordCount).format("0,0")} records`);
+
+    if (interupted !== false) {
+        if (!argv.quiet) console.log(chalk.red(`Recieved ${interupted}, stopping early.`));
+    } else if (parameterCount > 0) {
+        console.log("");
+        console.log(chalk.grey("Next time you can run this same configuration in a single command."));
+
+        const defaultRemovedParameterValues: DPMConfiguration = { ...sinkConfiguration };
+        sink.filterDefaultConfigValues(packageFileWithContext.catalogSlug, packageFile, defaultRemovedParameterValues);
+        // This prints the password on the console :/
+
+        let command = `datapm fetch ${argv.reference} `;
+        if (sink.getType() === STANDARD_OUT_SINK_TYPE) {
+            command += "--quiet ";
+        }
+        command += `--sink ${sink.getType()} --sinkConfig '${JSON.stringify(
+            defaultRemovedParameterValues
+        )}' --defaults`;
+
+        console.log(chalk.green(command));
+    }
+
+    if (sinkType === "stdout" && !argv.quiet) {
+        console.error(
+            chalk.yellow(
+                "You should probably use the --quiet flag to disable all non-data output, so that your data in standard out is clean"
+            )
+        );
+    }
+
+    process.exit(0);
+}
+
+/** Uses the Listr library to fetch multiple streams of data at one time. This is used by serveral command line
+ * command implementations
+ */
+export async function fetchMultipleWithListr(
+    oraRef: ora.Ora,
+    packageFile: PackageFile,
+    sinkStateKey: SinkStateKey,
+    sink: Sink,
+    sinkConnectionConfiguration: DPMConfiguration,
+    sinkCredentialsConfiguration: DPMConfiguration,
+    sinkConfiguration: DPMConfiguration,
+    defaults: boolean,
+    forceUpdate: boolean,
+    quiet: boolean
+): Promise<{ [key: string]: number }> {
     const fetchPreparations: {
         source: Source;
         uriInspectionResults: InspectionResults;
@@ -230,17 +321,9 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
     }[] = [];
 
     for (const source of packageFile.sources) {
-        if (interupted) break;
-
-        const schemaUriInspectionResults = await inspectSourceConnection(oraRef, source, argv.defaults);
+        const schemaUriInspectionResults = await inspectSourceConnection(oraRef, source, defaults);
 
         for (const streamSetPreview of schemaUriInspectionResults.streamSetPreviews) {
-            const sinkStateKey: SinkStateKey = {
-                catalogSlug: packageFileWithContext.catalogSlug || "_no_catalog",
-                packageSlug: packageFile.packageSlug,
-                packageMajorVersion: new SemVer(packageFile.version).major
-            };
-
             let sinkState = await sink.getSinkState(
                 sinkConnectionConfiguration,
                 sinkCredentialsConfiguration,
@@ -248,9 +331,9 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
                 sinkStateKey
             );
 
-            if (argv.forceUpdate) sinkState = null;
+            if (forceUpdate) sinkState = null;
 
-            if (!argv.forceUpdate) {
+            if (!forceUpdate) {
                 oraRef.start("Checking if new records are available for " + streamSetPreview.slug);
 
                 if (!(await newRecordsAvailable(streamSetPreview, sinkState))) {
@@ -262,7 +345,7 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
                     continue;
                 }
 
-                oraRef.succeed("New records are available");
+                oraRef.succeed("New records may be available");
             }
 
             const streamSet = source.streamSets.find((s) => s.slug === streamSetPreview.slug);
@@ -357,19 +440,18 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
                             else throw new Error("Unknown line type " + result);
                         },
                         prompt: async (parameters) => {
-                            return cliHandleParameters(argv.defaults || false, parameters);
+                            return cliHandleParameters(defaults || false, parameters);
                         }
                     },
                     packageFile,
+                    fetchPreparation.source,
                     fetchPreparation.streamSetPreview,
                     sink,
                     sinkConnectionConfiguration,
                     sinkCredentialsConfiguration,
                     sinkConfiguration,
                     fetchPreparation.sinkStateKey,
-                    fetchPreparation.sinkState,
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    packageFile.schemas
+                    fetchPreparation.sinkState
                 );
             }
         };
@@ -379,49 +461,14 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
 
     const listr = new Listr<ListrContext>(listrTasks, {
         concurrent: true,
-        rendererSilent: argv.quiet
+        rendererSilent: quiet
     });
 
     try {
         await listr.run();
     } catch (e) {
-        if (!argv.quiet) console.error(e);
+        if (!quiet) console.error(e);
     }
 
-    const totalRecordCount = Object.values(latestStatuses).reduce((prev, curr) => {
-        return prev + curr;
-    }, 0);
-
-    if (!argv.quiet) oraRef.succeed(`Finished writing ${numeral(totalRecordCount).format("0,0")} records`);
-
-    if (interupted !== false) {
-        if (!argv.quiet) console.log(chalk.red(`Recieved ${interupted}, stopping early.`));
-    } else if (parameterCount > 0) {
-        console.log("");
-        console.log(chalk.grey("Next time you can run this same configuration in a single command."));
-
-        const defaultRemovedParameterValues: DPMConfiguration = { ...sinkConfiguration };
-        sink.filterDefaultConfigValues(packageFileWithContext.catalogSlug, packageFile, defaultRemovedParameterValues);
-        // This prints the password on the console :/
-
-        let command = `datapm fetch ${argv.reference} `;
-        if (sink.getType() === STANDARD_OUT_SINK_TYPE) {
-            command += "--quiet ";
-        }
-        command += `--sink ${sink.getType()} --sinkConfig '${JSON.stringify(
-            defaultRemovedParameterValues
-        )}' --defaults`;
-
-        console.log(chalk.green(command));
-    }
-
-    if (sinkType === "stdout" && !argv.quiet) {
-        console.error(
-            chalk.yellow(
-                "You should probably use the --quiet flag to disable all non-data output, so that your data in standard out is clean"
-            )
-        );
-    }
-
-    process.exit(0);
+    return latestStatuses;
 }

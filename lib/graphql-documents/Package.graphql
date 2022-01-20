@@ -23,6 +23,7 @@ query Package($identifier: PackageIdentifierInput!) {
                 versionPatch
             }
             packageFile
+            canonicalPackageFile
             createdAt
         }
         versions {

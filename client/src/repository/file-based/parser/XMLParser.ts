@@ -1,6 +1,6 @@
-import { DPMConfiguration, DPMRecord } from "datapm-lib";
+import { DPMConfiguration, DPMRecord, RecordContext, UpdateMethod } from "datapm-lib";
 import { Transform } from "stream";
-import { RecordContext, SourceInspectionContext, UpdateMethod } from "../../Source";
+import { SourceInspectionContext } from "../../Source";
 import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
 
 import XmlParser from "xml-streamer";

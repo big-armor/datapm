@@ -1,18 +1,21 @@
 import { ApolloClient, FetchResult, HttpLink, InMemoryCache, NormalizedCacheObject } from "@apollo/client/core";
 import {
+    CreateAPIKeyDocument,
     CreateMeDocument,
     CreateMeMutation,
     CreateMeMutationVariables,
     LoginDocument,
     LoginMutation,
     MeDocument,
+    Scope,
     VerifyEmailAddressDocument,
     VerifyEmailAddressMutation
 } from "./registry-client";
 import fetch from "cross-fetch";
 import { mailObservable } from "./setup";
 import { expect } from "chai";
-import { AdminHolder } from "./admin-holder";
+import { io, Socket } from "socket.io-client";
+import { SocketEvent, TimeoutPromise, createAPIKeyFromParts } from "datapm-lib";
 
 export function createAnonymousClient() {
     return new ApolloClient({
@@ -154,36 +157,38 @@ export async function createUser(
                             >).errors == null
                         ).true;
 
-                        createAnonymousClient()
-                            .mutate({
-                                mutation: LoginDocument,
-                                variables: {
-                                    username,
-                                    password
-                                }
-                            })
-                            .catch((error) => reject(error))
-                            .then((responseRaw) => {
-                                const response = responseRaw as FetchResult<
-                                    LoginMutation,
-                                    Record<string, any>,
-                                    Record<string, any>
-                                >;
-
-                                if (response.errors != null) {
-                                    reject(response);
-                                    return;
-                                }
-
-                                let authenticatedClient = createTestClient({
-                                    Authorization: "Bearer " + response.data!.login
-                                });
-
-                                resolve(authenticatedClient);
-                            });
+                        const authenticatedClient = createAuthenticatedClient(username,password);
+                        resolve(authenticatedClient);
                     });
             });
     });
+}
+
+export async function createAuthenticatedClient(username:String, password:String):Promise<ApolloClient<NormalizedCacheObject>> {
+    const responseRaw = await createAnonymousClient()
+    .mutate({
+        mutation: LoginDocument,
+        variables: {
+            username,
+            password
+        }
+    });
+
+    const response = responseRaw as FetchResult<
+            LoginMutation,
+            Record<string, any>,
+            Record<string, any>
+        >;
+
+    if (response.errors != null) {
+        throw new Error(JSON.stringify(response.errors));
+    }
+
+    let authenticatedClient = createTestClient({
+        Authorization: "Bearer " + response.data!.login
+    });
+
+    return authenticatedClient;
 }
 
 export function createTestClient(headers: any) {
@@ -211,5 +216,62 @@ export function createTestClient(headers: any) {
             },
             fetch
         })
+    });
+}
+
+
+export async function createAnonymousStreamingClient():Promise<Socket>  {
+    const socket = io("http://localhost:4000", {
+            path: "/ws/",
+            parser: require("socket.io-msgpack-parser"),
+            transports: ["polling", "websocket"]
+        });
+
+    return new TimeoutPromise<Socket>(5000, (resolve) => {
+        socket.once("connect", async () => {
+            socket.once(SocketEvent.READY.toString(), () => {
+                resolve(socket)
+            });
+        });
+    });
+}
+
+export async function createAuthenicatedStreamingClient(username:String, password:String):Promise<Socket>  {
+
+    const authenticatedClient = await createAuthenticatedClient(username, password);
+
+
+    const response = await authenticatedClient.mutate({
+        mutation: CreateAPIKeyDocument,
+        variables: {
+            value: {
+                label: "test-" + new Date().getTime().toString(),
+                scopes: [Scope.MANAGE_API_KEYS, Scope.MANAGE_PRIVATE_ASSETS, Scope.READ_PRIVATE_ASSETS]
+            }
+        }
+    })
+
+    const apiKey = createAPIKeyFromParts(response.data!.createAPIKey.id, response.data!.createAPIKey.secret);
+                       
+    const socket = io("http://localhost:4000", {
+            path: "/ws/",
+            parser: require("socket.io-msgpack-parser"),
+            transports: ["polling", "websocket"],
+            auth: {
+                token:  apiKey
+            }
+        });
+
+    return new TimeoutPromise<Socket>(5000, (resolve,reject) => {
+        socket.once("connect", async () => {
+            socket.once(SocketEvent.READY.toString(), () => {
+                resolve(socket)
+            });
+        });
+
+        socket.on("connect_error", (error) => {
+            console.error(error);
+            reject(error);
+        });
     });
 }

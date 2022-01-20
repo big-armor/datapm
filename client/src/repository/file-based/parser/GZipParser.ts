@@ -1,6 +1,6 @@
 import { Transform } from "stream";
 import { AbstractPassThroughParser } from "./AbstractPassthroughParser";
-import zlip from "zlib";
+import zlib from "zlib";
 import { DPMConfiguration } from "datapm-lib";
 import { DISPLAY_NAME, FILE_EXTENSIONS, MIME_TYPE, MIME_TYPES } from "./GZipParserDescription";
 
@@ -22,6 +22,6 @@ export class GZipParser extends AbstractPassThroughParser {
     }
 
     getPassThroughTransforms(_configuration: DPMConfiguration): Transform[] {
-        return [zlip.createGunzip()];
+        return [zlib.createGunzip()];
     }
 }

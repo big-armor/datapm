@@ -46,7 +46,7 @@ describe("Publish trival package changes", function () {
 
     let packageFile: PackageFile;
 
-    it("User A publish old package file v0.1.0", async function () {
+    it("For trivial changes test, user A publish old package file v0.1.0", async function () {
         let packageFileContents = loadPackageFileFromDisk(
             "test/packageFiles/v0.1.0/congressional-legislators-schema-v0.1.0.datapm.json"
         );
@@ -77,11 +77,6 @@ describe("Publish trival package changes", function () {
         expect(response.data!.createVersion.author?.username).equal("testA-publish-trivial-changes");
 
         const responsePackageFileContents = response.data!.createVersion.packageFile;
-
-        const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
-
-        // have to update this hash value if the package file contents change
-        expect(responseHash).equal("42cd14a3205d519637551648ef8ba533551c6230ee45d7fe97c28c02bd123d1f");
 
         packageFile = parsePackageFileJSON(responsePackageFileContents);
     });
@@ -115,8 +110,6 @@ describe("Publish trival package changes", function () {
         expect(response.errors == null, "no errors").true;
 
         const responsePackageFileContents = response.data!.createVersion.packageFile;
-
-        const responseHash = crypto.createHash("sha256").update(responsePackageFileContents, "utf8").digest("hex");
 
         packageFile = parsePackageFileJSON(responsePackageFileContents);
 

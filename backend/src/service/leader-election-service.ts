@@ -1,68 +1,60 @@
 import PGMutexLock from "pg-mutex-lock";
 import { Connection } from "typeorm";
+import { DistributedLockingService } from "./distributed-locking-service";
 import { startNotificationService, stopNotificationService } from "./notification-service";
-
-let mutex: PGMutexLock | null;
 
 const LEADER_KEY = "datapm-leader";
 
-let continueAttempting = true;
 
-let leader = false;
 
-export async function startLeaderElection(connection: Connection) {
-    if (process.env["LEADER_ELECTION_DISABLED"] === "true") {
-        console.log(
-            "LEADER_ELECTION_DISABLED is true. Not starting leader election, no background services will run on this instance."
-        );
-        return;
+export class LeaderElectionService {
+
+    leader = false;
+
+    continueAttempting = true;
+
+    constructor(private distributedLockingService: DistributedLockingService, private connection: Connection) {}
+
+    async start() {
+        if (process.env["LEADER_ELECTION_DISABLED"] === "true") {
+            console.log(
+                "LEADER_ELECTION_DISABLED is true. Not starting leader election, no background services will run on this instance."
+            );
+            return;
+        }
+
+        while (this.continueAttempting) {
+            try {
+                this.leader = await this.distributedLockingService.lock(LEADER_KEY);
+                if (this.leader) {
+                    console.log("I am the leader");
+                    this.startLeaderServices();
+                    this.continueAttempting = false;
+                }
+            } catch (error) {
+                await new Promise((resolve) => {
+                    setTimeout(resolve, 1000);
+                });
+            }
+        }
+
     }
 
-    mutex = new PGMutexLock({
-        database: {
-            host: process.env["TYPEORM_HOST"] || "localhost",
-            port: Number.parseInt(process.env["TYPEORM_PORT"] as string),
-            database: process.env["TYPEORM_DATABASE"],
-            password: process.env["TYPEORM_PASSWORD"],
-            user: process.env["TYPEORM_USERNAME"]
-        },
-        retryCount: 1,
-        timeout: 2 * 1000
-    });
+    async stop() {
 
-    process.once("SIGINT", () => {
-        //  stopLeaderElection();
-    });
+        this.continueAttempting = false;
 
-    while (continueAttempting) {
-        try {
-            leader = await mutex.acquireLock(LEADER_KEY);
-            if (leader) {
-                console.log("I am the leader");
-                startLeaderServices(connection);
-            }
-        } catch (error) {
-            await new Promise((resolve) => {
-                setTimeout(resolve, 1000);
-            });
+        if (this.leader) {
+            await this.stopLeaderServices();
+            await this.distributedLockingService.unlock(LEADER_KEY);
         }
     }
-}
 
-export async function stopLeaderElection() {
-    continueAttempting = false;
-
-    if (leader) {
-        await stopLeaderServices();
-        await mutex?.releaseLock(LEADER_KEY);
+    startLeaderServices():void {
+        startNotificationService(this.connection);
     }
-    await mutex?.end();
-}
 
-function startLeaderServices(connection: Connection) {
-    startNotificationService(connection);
-}
-
-async function stopLeaderServices() {
-    await stopNotificationService();
+    async stopLeaderServices() {
+        stopNotificationService();
+    }
 }

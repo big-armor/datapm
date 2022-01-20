@@ -1,7 +1,7 @@
 import "./util/prototypeExtensions";
 import { GraphQLScalarType } from "graphql";
 import { getUserByUserName, UserRepository } from "./repository/UserRepository";
-import { AuthenticatedContext, AutoCompleteContext, Context } from "./context";
+import { AuthenticatedContext, AutoCompleteContext, Context, HTTPContext } from "./context";
 import { PackageRepository } from "./repository/PackageRepository";
 import {
     MutationResolvers,
@@ -22,7 +22,7 @@ import {
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
-import { CatalogRepository, getCatalogOrFail } from "./repository/CatalogRepository";
+import { CatalogRepository } from "./repository/CatalogRepository";
 import { UserCatalogPermissionRepository } from "./repository/CatalogPermissionRepository";
 import { isRequestingUserOrAdmin } from "./util/contextHelpers";
 import { parsePackageFileJSON, validatePackageFile } from "datapm-lib";
@@ -63,8 +63,9 @@ import {
     versionCreatedAt,
     versionIdentifier,
     versionPackage,
-    versionPackageFile,
-    versionUpdatedAt
+    modifiedPackageFile,
+    versionUpdatedAt,
+    canonicalPackageFile
 } from "./resolvers/VersionResolver";
 import {
     setUserCollectionPermissions,
@@ -450,13 +451,13 @@ export const resolvers: {
             return user.status;
         },
         uiDarkModeEnabled: async (parent: User, _1: any, context: Context) => {
-            if (!context.me || context.me.username != parent.username) {
-                return false;
-            }
+            if (Object.hasOwnProperty.call(context, "me")) {
+                const authenticatedContext = context as AuthenticatedContext;
 
-            const user = await getUserFromCacheOrDbByUsername(context, parent.username);
-            if (isRequestingUserOrAdmin(context, user.username)) {
-                return user.uiDarkModeEnabled;
+                const user = await getUserFromCacheOrDbByUsername(authenticatedContext, parent.username);
+                if (isRequestingUserOrAdmin(authenticatedContext, user.username)) {
+                    return user.uiDarkModeEnabled;
+                }
             }
 
             return false;
@@ -509,7 +510,8 @@ export const resolvers: {
     },
     Version: {
         identifier: versionIdentifier,
-        packageFile: versionPackageFile,
+        packageFile: modifiedPackageFile,
+        canonicalPackageFile: canonicalPackageFile,
         author: versionAuthor,
         createdAt: versionCreatedAt,
         package: versionPackage,
@@ -694,7 +696,7 @@ export const resolvers: {
         setUserCollectionPermissions: setUserCollectionPermissions,
         deleteUserCollectionPermissions: deleteUserCollectionPermissions,
 
-        // Version
+        // Version 
         createVersion: createVersion,
         deleteVersion: deleteVersion,
 
@@ -707,6 +709,6 @@ export const resolvers: {
 
         runJob,
 
-        track: (_, { actions }, context: Context) => mixpanel.track(actions, context.request)
+        track: (_, { actions }, context: HTTPContext) => mixpanel.track(actions, context.request)
     }
 };

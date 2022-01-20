@@ -1,15 +1,24 @@
 import chalk from "chalk";
-import { DPMConfiguration, DPMRecordValue, PackageFile, Schema } from "datapm-lib";
+import {
+    SinkState,
+    SinkStateKey,
+    DPMConfiguration,
+    DPMRecordValue,
+    PackageFile,
+    Schema,
+    UpdateMethod,
+    RecordStreamContext
+} from "datapm-lib";
 import fs from "fs";
 import { BigQuery, TableField } from "@google-cloud/bigquery";
 import moment from "moment";
 import { SemVer } from "semver";
 import { Transform } from "stream";
 import { Maybe } from "../../../util/Maybe";
-import { ExtendedJSONSchema7TypeName, RecordStreamContext, UpdateMethod } from "../../Source";
+import { ExtendedJSONSchema7TypeName } from "../../Source";
 import { convertValueByValueType, discoverValueType } from "../../../transforms/StatsTransform";
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
-import { Sink, SinkState, SinkStateKey, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
+import { Sink, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
 import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
 import { DISPLAY_NAME, TYPE } from "./BigQueryRepositoryDescription";
 
@@ -205,8 +214,15 @@ export class BigQuerySink implements Sink {
                     await self.complete(this);
                     callback();
                 }
-            })
+            }),
+            getCommitKeys: () => {
+                return [];
+            }
         };
+    }
+
+    async commitAfterWrites(): Promise<void> {
+        // Nothing to do
     }
 
     async writeRecord(recordStreamContext: RecordStreamContext, transform: Transform): Promise<void> {

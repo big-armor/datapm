@@ -23,7 +23,8 @@ export interface PackageFileWithContext {
 
 async function fetchPackage(
     registryClient: RegistryClient,
-    identifier: PackageIdentifierInput
+    identifier: PackageIdentifierInput,
+    modifiedOrCanonical: "modified" | "canonicalIfAvailable"
 ): Promise<PackageFileWithContext> {
     const response = await registryClient.getPackage({
         packageSlug: identifier.packageSlug,
@@ -41,8 +42,14 @@ async function fetchPackage(
         throw new Error("Found package, but it has no latest version");
     }
 
-    validatePackageFile(version.packageFile);
-    const packageFile = parsePackageFileJSON(version.packageFile);
+    let packageFileJSON = version.packageFile;
+
+    if (modifiedOrCanonical === "canonicalIfAvailable" && version.canonicalPackageFile != null) {
+        packageFileJSON = version.canonicalPackageFile;
+    }
+
+    validatePackageFile(packageFileJSON);
+    const packageFile = parsePackageFileJSON(packageFileJSON);
     return {
         package: response.data?.package,
         packageFile,
@@ -52,7 +59,10 @@ async function fetchPackage(
     };
 }
 
-export async function getPackage(identifier: string): Promise<PackageFileWithContext> {
+export async function getPackage(
+    identifier: string,
+    modifiedOrCanonical: "modified" | "canonicalIfAvailable"
+): Promise<PackageFileWithContext> {
     if (identifier.startsWith("http://") || identifier.startsWith("https://")) {
         const http = await fetch(identifier, {
             method: "GET"
@@ -79,12 +89,24 @@ export async function getPackage(identifier: string): Promise<PackageFileWithCon
 
             // TODO support fetching specific package versions
 
-            return fetchPackage(registryClient, {
-                catalogSlug: pathParts[0],
-                packageSlug: pathParts[1]
-            });
+            try {
+                return await fetchPackage(
+                    registryClient,
+                    {
+                        catalogSlug: pathParts[0],
+                        packageSlug: pathParts[1]
+                    },
+                    modifiedOrCanonical
+                );
+            } catch (e) {
+                if (typeof e.message === "string" && (e.message as string).includes("NOT_AUTHENTICATED")) {
+                    throw new Error("NOT_AUTHENTICATED_TO_REGISTRY");
+                } else {
+                    throw e;
+                }
+            }
         }
-        if (!http.ok) throw new Error(`Failed to obtain ${http.status} ${http.statusText}`);
+        if (!http.ok) throw new Error(`Failed to obtain: HTTP code ${http.status} HTTP status ${http.statusText}`);
 
         return {
             packageFile: parsePackageFileJSON(await http.text()),
@@ -92,9 +114,16 @@ export async function getPackage(identifier: string): Promise<PackageFileWithCon
         };
     } else if (fs.existsSync(identifier)) {
         const packageFile = loadPackageFileFromDisk(identifier);
-        const pathToPackageFile = path.isAbsolute(identifier)
-            ? path.dirname(identifier)
-            : process.cwd() + path.dirname(identifier);
+        let pathToPackageFile = path.dirname(identifier);
+
+        if (!path.isAbsolute(identifier)) {
+            pathToPackageFile = process.cwd();
+            const directory = path.dirname(identifier);
+
+            if (directory !== ".") {
+                pathToPackageFile += path.sep + directory;
+            }
+        }
         const packageFileName = path.basename(identifier);
 
         return {
@@ -105,7 +134,7 @@ export async function getPackage(identifier: string): Promise<PackageFileWithCon
         const registryClient = getRegistryClientWithConfig({ url: "https://datapm.io" });
         const packageIdentifier = parsePackageIdentifier(identifier);
 
-        return fetchPackage(registryClient, packageIdentifier);
+        return fetchPackage(registryClient, packageIdentifier, modifiedOrCanonical);
     } else {
         throw new Error(
             `Reference '${identifier}' is either not a valid package identifier, a valid package url, or url pointing to a valid package file.`

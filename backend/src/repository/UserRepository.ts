@@ -394,6 +394,8 @@ export class UserRepository extends Repository<UserEntity> {
 
                 return user;
             })
+
+            // FIX ME this should just use an await above, and handled errors in sendVerifyEmail
             .then(async (user: UserEntity) => {
                 if (!user.emailVerified) await sendVerifyEmail(user, emailVerificationToken);
 

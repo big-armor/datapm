@@ -1,7 +1,6 @@
 import { Transform } from "stream";
-import { PackageFile, Schema, DPMConfiguration } from "datapm-lib";
+import { PackageFile, Schema, DPMConfiguration, UpdateMethod } from "datapm-lib";
 
-import { UpdateMethod } from "../../Source";
 import { Parameter } from "../../../util/parameters/Parameter";
 
 export interface DPMRecordSerializerDescription {

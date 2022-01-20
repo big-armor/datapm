@@ -1,6 +1,5 @@
-import { DPMConfiguration, DPMRecord, Schema, StreamStats } from "datapm-lib";
+import { StreamState, DPMConfiguration, Schema, StreamStats, UpdateMethod } from "datapm-lib";
 import { JSONSchema7TypeName } from "json-schema";
-import { StreamState } from "./Sink";
 import { Maybe } from "../util/Maybe";
 import { Readable, Transform } from "stream";
 import { LogType } from "../util/LoggingUtils";
@@ -12,35 +11,7 @@ export enum SourceErrors {
     DATABASE_NOT_FOUND = "DATABASE_NOT_FOUND"
 }
 
-/** How updates are provided from the source */
-export enum UpdateMethod {
-    BATCH_FULL_SET = "BATCH_FULL_SET", // All records, every time
-    APPEND_ONLY_LOG = "APPEND_ONLY_LOG" // New records are append (uses offsets)
-}
-
 export type ExtendedJSONSchema7TypeName = JSONSchema7TypeName | "binary" | "date";
-
-/** Created by Source implementations to identify the record. */
-export interface RecordContext {
-    schemaSlug: string;
-
-    record: DPMRecord;
-
-    /** The offset used to resume at this point */
-    offset?: number;
-}
-
-/** Created by the internal system to identify a record received from a source, and tag it with additional properties */
-export interface RecordStreamContext {
-    /** The unique stream set slug from which the record was produced. */
-    streamSetSlug: string;
-
-    /** The unique stream slug from which the record was produced.  */
-    streamSlug: string;
-
-    /** The wrapped recordContext - which comes from the Source */
-    recordContext: RecordContext;
-}
 
 /** represents a single real data stream before opening that stream. For example, an enumeration of HTTP or local files - but without doing any expensive operations to discover the meta data about those files.  */
 export interface StreamSummary {
@@ -93,7 +64,7 @@ export interface StreamSetPreview {
     /** The summary for each stream of data avilable, should be returned in sorted order */
     streamSummaries?: StreamSummary[];
 
-    /** The iterator for each stream of data available */
+    /** Used only if streamSummaries is not provided. An iterator that provides an indetermined number of StreamSummaries - until none are available. Useful in big data situations */
     moveToNextStream?(): Promise<StreamSummary | null>;
 }
 

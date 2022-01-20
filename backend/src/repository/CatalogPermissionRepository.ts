@@ -55,7 +55,7 @@ export async function grantUserCatalogPermission({
     const userCatalogPermission = await manager.nestedTransaction(async (transaction) => {
         // find the user
         const user = await transaction.getCustomRepository(UserRepository).findOne({ id: userId });
-        if (user == null) throw new Error("USER_NOT_FOUND");
+        if (user == null) throw new Error("USER_NOT_FOUND: " + userId);
 
         // find the catalog
         const catalog = await transaction
@@ -63,7 +63,7 @@ export async function grantUserCatalogPermission({
             .findCatalogBySlug({ slug: catalogSlug });
 
         if (catalog == null) {
-            throw new UserInputError("CATALOG_NOT_FOUND");
+            throw new UserInputError("CATALOG_NOT_FOUND: " + catalogSlug);
         }
 
         // Check that the user does not already have this permission.

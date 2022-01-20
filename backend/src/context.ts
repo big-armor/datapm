@@ -10,21 +10,34 @@ enum Scope {
     DELETE_PRIVATE_PACKAGES_CATALOGS
 }
 
+
 export interface Context {
     connection: Connection;
-    request: Request;
-    me?: UserEntity;
     scopes?: Scope[];
     cache: SessionCache;
 }
 
-export interface AuthenticatedContext extends Context {
-    connection: Connection;
+export interface HTTPContext extends Context{
     request: Request;
+}
+
+export interface SocketContext extends Context{
+}
+
+
+export interface AuthenticatedContext extends Context {
     me: UserEntity;
-    scopes: [];
+}
+
+export interface AuthenticatedHTTPContext extends AuthenticatedContext, HTTPContext {
+    // HTTP authentication specific context info
+}
+
+export interface AuthenticatedSocketContext extends AuthenticatedContext, SocketContext {
+    // Socket authentication specific context info
 }
 
 export interface AutoCompleteContext extends Context {
+    me?: UserEntity;
     query: string;
 }

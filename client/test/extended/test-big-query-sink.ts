@@ -10,13 +10,7 @@ import {
     TEST_SOURCE_FILES
 } from "../integration/test-utils";
 
-const bigQuerySinkPrompts = [
-    "Do you want to use the default options?",
-    "Project ID?",
-    "Dataset?",
-    "Table Name?",
-    "Insert Method?"
-];
+const bigQuerySinkPrompts = ["Project ID?", "Dataset?", "Table Name?", "Insert Method?"];
 
 const getBigQuerySinkPromptInputs = (inputs?: string[], skip = 0, count = 20) =>
     getPromptInputs(bigQuerySinkPrompts, inputs, skip, count);
@@ -51,7 +45,7 @@ describe("Big Query Sink Test", function () {
     it("Can't access to big query without service account credentials path set", async function () {
         process.env.GOOGLE_APPLICATION_CREDENTIALS = "";
 
-        const prompts = getBigQuerySinkPromptInputs([KEYS.DOWN]);
+        const prompts = getBigQuerySinkPromptInputs([]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -75,7 +69,7 @@ describe("Big Query Sink Test", function () {
     it("Can't access to big query with non-existing service account credentials path", async function () {
         process.env.GOOGLE_APPLICATION_CREDENTIALS = "non-existing";
 
-        const prompts = getBigQuerySinkPromptInputs([KEYS.DOWN]);
+        const prompts = getBigQuerySinkPromptInputs([]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -99,9 +93,7 @@ describe("Big Query Sink Test", function () {
     it("Can't insert records to the wrong project", async function () {
         process.env.GOOGLE_APPLICATION_CREDENTIALS = process.env.GOOGLE_APPLICATION_FREE_CREDENTIALS;
 
-        const prompts = getBigQuerySinkPromptInputs([KEYS.DOWN, "", "", "", KEYS.DOWN]).filter(
-            (_prompt, index) => index !== 1
-        );
+        const prompts = getBigQuerySinkPromptInputs(["", "", "", KEYS.DOWN]).filter((_prompt, index) => index !== 1);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -128,7 +120,7 @@ describe("Big Query Sink Test", function () {
     it("Can't insert records using streaming insert on the free tier", async function () {
         process.env.GOOGLE_APPLICATION_CREDENTIALS = process.env.GOOGLE_APPLICATION_FREE_CREDENTIALS;
 
-        const prompts = getBigQuerySinkPromptInputs([KEYS.DOWN, "", "", "", KEYS.DOWN]);
+        const prompts = getBigQuerySinkPromptInputs(["", "", "", KEYS.DOWN]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -155,7 +147,7 @@ describe("Big Query Sink Test", function () {
     it("Should import data using bulk insert without error on the free plan", async function () {
         process.env.GOOGLE_APPLICATION_CREDENTIALS = process.env.GOOGLE_APPLICATION_FREE_CREDENTIALS;
 
-        const prompts = getBigQuerySinkPromptInputs([KEYS.DOWN, "", "", tableDName, ""]);
+        const prompts = getBigQuerySinkPromptInputs(["", "", tableDName, ""]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -207,7 +199,7 @@ describe("Big Query Sink Test", function () {
     it("Should import data using streaming insert without error on the paid plan", async function () {
         process.env.GOOGLE_APPLICATION_CREDENTIALS = process.env.GOOGLE_APPLICATION_PAID_CREDENTIALS;
 
-        const prompts = getBigQuerySinkPromptInputs([KEYS.DOWN, "", "", tableAName, KEYS.DOWN]);
+        const prompts = getBigQuerySinkPromptInputs(["", "", tableAName, KEYS.DOWN]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -231,7 +223,7 @@ describe("Big Query Sink Test", function () {
     it("Should not rewrite if there isn't any new records", async function () {
         process.env.GOOGLE_APPLICATION_CREDENTIALS = process.env.GOOGLE_APPLICATION_PAID_CREDENTIALS;
 
-        const prompts = getBigQuerySinkPromptInputs([KEYS.DOWN, "", "", tableAName, KEYS.DOWN]);
+        const prompts = getBigQuerySinkPromptInputs(["", "", tableAName, KEYS.DOWN]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -256,7 +248,7 @@ describe("Big Query Sink Test", function () {
         process.env.GOOGLE_APPLICATION_CREDENTIALS = process.env.GOOGLE_APPLICATION_PAID_CREDENTIALS;
 
         const prompts = [
-            ...getBigQuerySinkPromptInputs([KEYS.DOWN, "", "", tableBName, ""]),
+            ...getBigQuerySinkPromptInputs(["", "", tableBName, ""]),
             {
                 message: "Integer_Float has integer and number values.",
                 input: `${KEYS.ENTER}`
@@ -371,7 +363,7 @@ describe("Big Query Sink Test", function () {
         process.env.GOOGLE_APPLICATION_CREDENTIALS = process.env.GOOGLE_APPLICATION_PAID_CREDENTIALS;
 
         const prompts = [
-            ...getBigQuerySinkPromptInputs([KEYS.DOWN, "", "", tableCName, ""]),
+            ...getBigQuerySinkPromptInputs(["", "", tableCName, ""]),
             {
                 message: "facebook has integer and string values.",
                 input: `${KEYS.DOWN}${KEYS.ENTER}`

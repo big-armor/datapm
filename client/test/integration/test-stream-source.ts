@@ -181,7 +181,7 @@ describe("Test Stream Source Test", function () {
                 "test",
                 "https://test.datapm-not-a-site.io",
                 "10",
-                ""
+                "no"
             ])
         ];
 

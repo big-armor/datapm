@@ -1,19 +1,25 @@
 import chalk from "chalk";
-import { CountPrecision, Properties, Schema, Source } from "datapm-lib";
+import {
+    SinkState,
+    StreamState,
+    CountPrecision,
+    Properties,
+    Schema,
+    Source,
+    RecordContext,
+    BatchingTransform,
+    RecordStreamContext
+} from "datapm-lib";
 import moment from "moment";
 import numeral from "numeral";
 import { Choice } from "prompts";
 import { PassThrough, Readable, Transform } from "stream";
-import { BatchingTransform } from "../transforms/BatchingTransform";
 import { Maybe } from "../util/Maybe";
-import { SinkState, StreamState } from "../repository/Sink";
 import {
-    RecordContext,
     InspectionResults,
     StreamAndTransforms,
     StreamSetPreview,
     ExtendedJSONSchema7TypeName,
-    RecordStreamContext,
     StreamSummary
 } from "../repository/Source";
 import { convertValueByValueType, discoverValueType } from "../transforms/StatsTransform";
@@ -63,7 +69,7 @@ export async function inspectSourceConnection(
 
     if (connectionParameters.length > 0) {
         throw new Error(
-            "SOURCE_CONNECTION_NOT_COMPLETE - The package maintianer needs to run the `datapm update ...` command to make it compatible with this version of datapm"
+            "SOURCE_CONNECTION_NOT_COMPLETE - The package maintianer needs to run the `datapm update ...` command to provide more connection information."
         );
     }
 
@@ -135,6 +141,7 @@ export async function inspectSourceConnection(
 }
 
 export async function streamRecords(
+    source: Source,
     streamSetPreview: StreamSetPreview,
     context: RecordStreamEventContext,
     schemas: Schema[],
@@ -186,6 +193,7 @@ export async function streamRecords(
         transform = createStreamAndTransformPipeLine(
             currentStreamSummary,
             context,
+            source,
             streamSetPreview,
             streamState,
             currentStreamAndTransform,
@@ -225,6 +233,7 @@ export async function streamRecords(
 function createStreamAndTransformPipeLine(
     streamSummary: StreamSummary,
     context: RecordStreamEventContext,
+    source: Source,
     streamSetPreview: StreamSetPreview,
     streamState: StreamState | undefined,
     streamAndTransforms: StreamAndTransforms,
@@ -294,6 +303,8 @@ function createStreamAndTransformPipeLine(
             for (const chunk of chunks) {
                 const recordStreamContext: RecordStreamContext = {
                     recordContext: chunk,
+                    sourceType: source.type,
+                    sourceSlug: source.slug,
                     streamSetSlug: streamSetPreview.slug,
                     streamSlug: streamSummary.name
                 };

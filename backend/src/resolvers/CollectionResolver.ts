@@ -35,6 +35,7 @@ import { activtyLogEntityToGraphQL } from "./ActivityLogResolver";
 import { getUserFromCacheOrDbById, getUserFromCacheOrDbByUsername } from "./UserResolver";
 import { Connection, EntityManager } from "typeorm";
 import { deleteFollowsByIds, getCollectionFollowsByCollectionId } from "./FollowResolver";
+import { isAuthenticatedContext } from "../util/contextHelpers";
 
 export const collectionEntityToGraphQLOrNull = (collectionEntity: CollectionEntity): Collection | null => {
     if (!collectionEntity) {
@@ -457,12 +458,15 @@ export const userCollections = async (
 };
 
 export const myPermissions = async (parent: Collection, _0: any, context: Context) => {
+
+    const username = isAuthenticatedContext(context) ? (context as AuthenticatedContext).me.username : undefined;
+
     return userCollectionPermissions(
         context,
         {
             collectionSlug: parent.identifier.collectionSlug!
         },
-        context.me?.username
+        username
     );
 };
 

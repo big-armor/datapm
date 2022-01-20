@@ -1,18 +1,11 @@
-import { DPMConfiguration, PackageFile, Schema } from "datapm-lib";
+import { SinkState, SinkStateKey, DPMConfiguration, PackageFile, Schema, UpdateMethod } from "datapm-lib";
 import fs from "fs";
 import { getRecordSerializer, getRecordSerializers } from "../../../repository/file-based/writer/RecordSerializerUtil";
-import {
-    Sink,
-    SinkState,
-    SinkStateKey,
-    SinkSupportedStreamOptions,
-    WritableWithContext
-} from "../../../repository/Sink";
+import { CommitKey, Sink, SinkSupportedStreamOptions, WritableWithContext } from "../../../repository/Sink";
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
 import { RecordSerializerJSON } from "../../../repository/file-based/writer/RecordSerializerJSON";
 import { Maybe } from "../../../util/Maybe";
 import { Transform } from "stream";
-import { UpdateMethod } from "../../../repository/Source";
 import { RecordSerializedContext } from "../../../repository/file-based/AbstractFileSink";
 import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
 import { DISPLAY_NAME, TYPE } from "./StandardOutRepositoryDescription";
@@ -29,8 +22,8 @@ export class StandardOutSinkModule implements Sink {
     }
 
     async saveSinkState(
-        connectionConfiguration: DPMConfiguration,
-        credentialsConfiguration: DPMConfiguration,
+        _connectionConfiguration: DPMConfiguration,
+        _credentialsConfiguration: DPMConfiguration,
         _configuration: DPMConfiguration,
         _sinkStateKey: SinkStateKey,
         _sinkState: SinkState
@@ -41,9 +34,9 @@ export class StandardOutSinkModule implements Sink {
     }
 
     async getSinkState(
-        connectionConfiguration: DPMConfiguration,
-        credentialsConfiguration: DPMConfiguration,
-        configuration: DPMConfiguration,
+        _connectionConfiguration: DPMConfiguration,
+        _credentialsConfiguration: DPMConfiguration,
+        _configuration: DPMConfiguration,
         _sinkStateKey: SinkStateKey
     ): Promise<Maybe<SinkState>> {
         const stateFilePath = `${_sinkStateKey.catalogSlug}_${_sinkStateKey.packageSlug}_v${_sinkStateKey.packageMajorVersion}.datapm.state.json`;
@@ -70,8 +63,8 @@ export class StandardOutSinkModule implements Sink {
     }
 
     getDefaultParameterValues(
-        catalogSlug: string | undefined,
-        packageFile: PackageFile,
+        _catalogSlug: string | undefined,
+        _packageFile: PackageFile,
         _configuration: DPMConfiguration
     ): DPMConfiguration {
         return {
@@ -119,8 +112,8 @@ export class StandardOutSinkModule implements Sink {
 
     async getWriteable(
         schema: Schema,
-        connectionConfiguration: DPMConfiguration,
-        credentialsConfiguration: DPMConfiguration,
+        _connectionConfiguration: DPMConfiguration,
+        _credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
         updateMethod: UpdateMethod
     ): Promise<WritableWithContext> {
@@ -135,7 +128,7 @@ export class StandardOutSinkModule implements Sink {
         return {
             writable: new Transform({
                 objectMode: true,
-                transform: (chunk: RecordSerializedContext, encoding, callback) => {
+                transform: (chunk: RecordSerializedContext, _encoding, callback) => {
                     process.stdout.write(chunk.serializedValue, (error) => {
                         if (error != null) {
                             callback(error);
@@ -147,7 +140,19 @@ export class StandardOutSinkModule implements Sink {
                 }
             }),
             transforms: serializerTransforms,
-            outputLocation: "stdout"
+            outputLocation: "stdout",
+            getCommitKeys: () => {
+                return []; // Nothing to do
+            }
         };
+    }
+
+    async commitAfterWrites(
+        _commitKeys: CommitKey[],
+        _connectionConfiguration: DPMConfiguration,
+        _credentialsConfiguration: DPMConfiguration
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+    ): Promise<void> {
+        // Nothing to do, because there is no commit
     }
 }

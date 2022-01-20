@@ -62,17 +62,13 @@ export class PackageFileStorageService {
         });
     }
 
-    private versionIdentifierPath(packageId: number, identifier: VersionIdentifierInput): string {
-        return (
-            Prefixes.PACKAGE +
-            "/" +
-            packageId +
-            "/" +
-            identifier.versionMajor +
-            "." +
-            identifier.versionMinor +
-            "." +
-            identifier.versionPatch
-        );
+    private versionIdentifierPath(packageId: number, identifier: VersionIdentifierInput): string[] {
+        return [
+            Prefixes.PACKAGE ,
+            packageId.toString() ,
+            identifier.versionMajor.toString() ,
+            identifier.versionMinor.toString(),
+            identifier.versionPatch.toString()
+        ];
     }
 }
