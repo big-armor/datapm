@@ -1,6 +1,6 @@
 # DataPM Registry Server
 
-This project contains the DataPM Registry Server, including the frontend angular project, backend apollo-graphql project, and documentation. You will find a README.md in the folder for each.
+This project contains the DataPM Registry Server, including the frontend angular project, backend apollo-graphql project, and documentation. There is a README.md in the folder for each.
 
 ## How to run in Docker (without first building locally)
 
