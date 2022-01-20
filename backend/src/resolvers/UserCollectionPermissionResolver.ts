@@ -17,6 +17,7 @@ import { asyncForEach } from "../util/AsyncUtils";
 import { ValidationError } from "apollo-server";
 import { getCollectionFromCacheOrDbOrFail } from "./CollectionResolver";
 import { deleteCollectionFollowByUserId } from "./FollowResolver";
+import { isAuthenticatedContext } from "../util/contextHelpers";
 
 export const hasCollectionPermissions = async (
     context: Context,
@@ -27,7 +28,7 @@ export const hasCollectionPermissions = async (
         if (collection?.isPublic) return true;
     }
 
-    if (context.me == null) {
+    if (!isAuthenticatedContext(context)) {
         return false;
     }
 
@@ -169,11 +170,11 @@ export const getCollectionPermissionsFromCacheOrDb = async (
     collection: CollectionEntity,
     permission: Permission
 ) => {
-    if (!context.me) {
+    if (!isAuthenticatedContext(context)) {
         return false;
     }
 
-    const userId = context.me.id;
+    const userId = (context as AuthenticatedContext).me.id;
     const collectionPromiseFunction = () =>
         context.connection
             .getCustomRepository(UserCollectionPermissionRepository)

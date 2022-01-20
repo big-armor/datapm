@@ -23,7 +23,9 @@ describe("AVRO Source Tests", function () {
             "Number of sample records?",
             "Publish to registry?",
             "Target registry?",
-            "Catalog short name?"
+            "Catalog short name?",
+            "Data Access Method?",
+            "Is the above ok?"
         ];
 
         const prompts = getPromptInputs(generatePackageCommandPrompts, [
@@ -38,7 +40,7 @@ describe("AVRO Source Tests", function () {
             "Test",
             "https://test.datapm-not-a-site.io",
             "10",
-            ""
+            "no"
         ]);
 
         const exitCode = await testCmd("package", [TEST_SOURCE_FILES.FILE22], prompts);

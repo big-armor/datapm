@@ -1,6 +1,5 @@
-import { DPMConfiguration, PackageFile, Schema } from "datapm-lib";
+import { DPMConfiguration, PackageFile, Schema, UpdateMethod, RecordStreamContext } from "datapm-lib";
 import { Transform, Writable } from "stream";
-import { RecordStreamContext, UpdateMethod } from "../../Source";
 import { Parameter } from "../../../util/parameters/Parameter";
 import { RecordSerializedContext } from "../AbstractFileSink";
 import { DPMRecordSerializer } from "./RecordSerializer";

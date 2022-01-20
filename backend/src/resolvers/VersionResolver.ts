@@ -7,7 +7,9 @@ import {
     PackageFile,
     Compability,
     upgradePackageFile,
-    Difference
+    Difference,
+    PublishMethod,
+    Source
 } from "datapm-lib";
 import { VersionRepository } from "./../repository/VersionRepository";
 import { PackageFileStorageService } from "./../storage/packages/package-file-storage-service";
@@ -36,6 +38,8 @@ import { hasPackagePermissions } from "./UserPackagePermissionResolver";
 import { getPackageFromCacheOrDbById, packageEntityToGraphqlObject } from "./PackageResolver";
 import { saveVersionComparison } from "../repository/VersionComparisonRepository";
 import { Connection, EntityManager } from "typeorm";
+import { getAllPackagePermissions, PackagePermissionRepository } from "../repository/PackagePermissionRepository";
+import { Maybe } from "graphql/jsutils/Maybe";
 
 export const versionEntityToGraphqlObject = async (
     context: Context,
@@ -85,6 +89,17 @@ export const createVersion = async (
         const rawPackageFile = value.packageFile as PackageFile;
 
         const newPackageFile = upgradePackageFile(rawPackageFile);
+
+        const registryReference = newPackageFile.registries?.find(registry => registry.url === process.env["REGISTRY_URL"]);
+
+        const publishMethod = registryReference?.publishMethod || PublishMethod.SCHEMA_ONLY;
+
+        if(publishMethod === PublishMethod.SCHEMA_PROXY_DATA) {
+            // TODO check that the referenced credentials are available
+            // TODO check that the data can be accessed
+        } else if(publishMethod === PublishMethod.SCHEMA_ONLY) {
+            // TODO check that the data can be accessed??? (or maybe it doesn't matter until they try to set it public)
+        }
 
         // get the latest version
         latestVersion = await transaction
@@ -226,18 +241,35 @@ export const deleteVersion = async (
     });
 };
 
-export const versionPackageFile = async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+/** Return the unmodified original package file, only when the requester has EDIT permission */
+export const canonicalPackageFile = async (parent: any, _1: any, context: AuthenticatedContext): Promise<Maybe<PackageFile>> => {
+
+    if(context.me == null) {
+        return null;
+    }
+
     const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
     const packageEntity = await getPackageFromCacheOrDbById(context, context.connection, version.packageId);
 
+    const permissions = await context.connection.getCustomRepository(PackagePermissionRepository).findPackagePermissions({
+        userId: context.me.id,
+        packageId: packageEntity.id,
+    });
+
+    if(permissions == null || permissions.permissions.includes(Permission.EDIT) === false) {
+        return null;
+    }
+
+    let packageFile:PackageFile;
     try {
-        return await PackageFileStorageService.INSTANCE.readPackageFile(packageEntity.id, {
+        packageFile = await PackageFileStorageService.INSTANCE.readPackageFile(packageEntity.id, {
             catalogSlug: packageEntity.catalog.slug,
             packageSlug: packageEntity.slug,
             versionMajor: version.majorVersion,
             versionMinor: version.minorVersion,
             versionPatch: version.patchVersion
         });
+
     } catch (error) {
         if (error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST.toString())) {
             throw new Error("PACKAGE_FILE_NOT_FOUND");
@@ -245,6 +277,113 @@ export const versionPackageFile = async (parent: any, _1: any, context: Authenti
 
         throw error;
     }
+
+    return packageFile;
+}
+
+export const modifiedPackageFile = async (parent: any, _1: any, context: AuthenticatedContext, info: any) => {
+    const version = await getPackageVersionFromCacheOrDbByIdentifier(context, parent.identifier);
+    const packageEntity = await getPackageFromCacheOrDbById(context, context.connection, version.packageId);
+
+    let packageFile:PackageFile;
+    try {
+        packageFile = await PackageFileStorageService.INSTANCE.readPackageFile(packageEntity.id, {
+            catalogSlug: packageEntity.catalog.slug,
+            packageSlug: packageEntity.slug,
+            versionMajor: version.majorVersion,
+            versionMinor: version.minorVersion,
+            versionPatch: version.patchVersion
+        });
+
+    } catch (error) {
+        if (error.message.includes(StorageErrors.FILE_DOES_NOT_EXIST.toString())) {
+            throw new Error("PACKAGE_FILE_NOT_FOUND");
+        }
+
+        throw error;
+    }
+    // Find this registry in the package file
+    const registry = (packageFile.registries || []).find(reg => reg.url === process.env.REGISTRY_URL);
+
+
+    const publishMethod = registry?.publishMethod || PublishMethod.SCHEMA_ONLY;
+
+    // If the publish method was to store data or proxy, 
+    // then we need to replace the sources with the registry based source
+    if(publishMethod === PublishMethod.SCHEMA_AND_DATA) {
+        // This means that this registry contains the data, and therefore we need to replace the source with this registry
+        const registrySources: Source[] = packageFile.schemas.map<Source>(schema => {
+
+
+            if(schema.title == null)
+                throw new Error("SCHEMA_HAS_NO_TITLE");
+
+            return {
+                connectionConfiguration: {
+                    url: process.env.REGISTRY_URL as string
+                },
+                slug: schema.title,
+                type: "datapm",
+                configuration: {
+                    catalogSlug: packageEntity.catalog.slug,
+                    packageSlug: packageEntity.slug,
+                    version: version.majorVersion
+                },
+                streamSets: [
+                    {
+                        schemaTitles: [schema.title],
+                        slug: schema.title,
+                        configuration: {
+                            schemaSlug: schema.title
+                        },
+                        streamStats: {
+                            inspectedCount: 0,
+                        }
+                        // TODO implement lastUpdateHash and stream stats by 
+                        // keeping an index of the records at data storage time in index.ts
+                    }
+                ]
+            }
+            
+        });
+
+        packageFile.sources = registrySources;
+
+        packageFile.canonical = false;
+        packageFile.modifiedProperties = ["sources"];
+
+    } else if(publishMethod === PublishMethod.SCHEMA_PROXY_DATA) {
+        const registrySources: Source[] = packageFile.sources.map<Source>(source => {
+            return {
+                connectionConfiguration: {
+                    url: process.env.REGISTRY_URL as string
+                },
+                slug: source.slug,
+                type: "datapmRegistryProxy",
+                configuration: {
+                    catalogSlug: packageEntity.catalog.slug,
+                    packageSlug: packageEntity.slug,
+                    sourceSlug: source.slug
+                },
+                streamSets: source.streamSets.map(streamSet => {
+                    return {
+                        ...streamSet,
+                        configuration: {
+                            streamSetSlug: streamSet.slug
+                        }
+                    }
+                })
+            }
+        });
+
+        packageFile.sources = registrySources;
+        packageFile.canonical = false;
+        packageFile.modifiedProperties = ["sources"];
+    }
+
+    return packageFile;
+
+
 };
 
 export const versionAuthor = async (

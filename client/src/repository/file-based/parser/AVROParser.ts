@@ -1,7 +1,7 @@
 import avro from "avsc";
-import { DPMConfiguration, DPMRecord } from "datapm-lib";
+import { DPMConfiguration, DPMRecord, RecordContext, UpdateMethod } from "datapm-lib";
 import { Transform, TransformCallback } from "stream";
-import { RecordContext, SourceInspectionContext, UpdateMethod } from "../../Source";
+import { SourceInspectionContext } from "../../Source";
 import { DISPLAY_NAME, MIME_TYPE } from "./AVROParserDescription";
 import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
 

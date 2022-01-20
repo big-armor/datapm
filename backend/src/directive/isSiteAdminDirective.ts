@@ -1,6 +1,7 @@
 import { SchemaDirectiveVisitor, AuthenticationError, ForbiddenError } from "apollo-server";
 import { GraphQLObjectType, GraphQLField, defaultFieldResolver, GraphQLArgument, GraphQLInterfaceType } from "graphql";
-import { Context } from "../context";
+import { AuthenticatedContext, Context } from "../context";
+import { isAuthenticatedContext } from "../util/contextHelpers";
 
 export class IsAdminDirective extends SchemaDirectiveVisitor {
     visitObject(object: GraphQLObjectType) {
@@ -13,8 +14,12 @@ export class IsAdminDirective extends SchemaDirectiveVisitor {
     public visitFieldDefinition(field: GraphQLField<any, any>): void {
         const { resolve = defaultFieldResolver } = field;
         field.resolve = function (source, args, context: Context, info) {
-            if (!context.me) throw new AuthenticationError("NOT_AUTHENTICATED");
-            if (!context.me.isAdmin) throw new ForbiddenError("NOT_AUTHORIZED");
+            if (!isAuthenticatedContext(context)) throw new AuthenticationError("NOT_AUTHENTICATED");
+
+            const authenicatedContext = context as AuthenticatedContext;
+
+            if (!authenicatedContext.me.isAdmin) throw new ForbiddenError("NOT_AUTHORIZED");
+            
             return resolve.apply(this, [source, args, context, info]);
         };
     }
@@ -30,8 +35,11 @@ export class IsAdminDirective extends SchemaDirectiveVisitor {
         details.field.resolve = function (source, args, context: Context, info) {
             if (args[argument.name] !== undefined) {
                 // argument was specified. check for isAdmin
-                if (!context.me) throw new AuthenticationError("NOT_AUTHENTICATED");
-                if (!context.me.isAdmin) throw new ForbiddenError("NOT_AUTHORIZED");
+                if (!isAuthenticatedContext(context)) throw new AuthenticationError("NOT_AUTHENTICATED");
+
+                const authenicatedContext = context as AuthenticatedContext;
+    
+                if (!authenicatedContext.me.isAdmin) throw new ForbiddenError("NOT_AUTHORIZED");
             }
 
             return resolve.apply(this, [source, args, context, info]);

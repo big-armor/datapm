@@ -1,9 +1,8 @@
 import bufferPeek from "buffer-peek-stream";
-import { DPMConfiguration } from "datapm-lib";
+import { StreamState, DPMConfiguration } from "datapm-lib";
 import mime from "mime-types";
 import { Readable, Transform } from "stream";
 import streamMmmagic from "stream-mmmagic";
-import { StreamState } from "../../Sink";
 import { findParser } from "../AbstractFileStreamSource";
 import { SourceInspectionContext } from "../../Source";
 import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
@@ -56,20 +55,21 @@ export abstract class AbstractPassThroughParser implements Parser {
             prev.pipe(current)
         );
 
-        decompressorTransform.on("error", (error) => {
-            console.error("DECOMPRESSION_ERROR: " + error.message);
-        });
-
-        const [magicMimeResults, decompressedReadable] = await streamMmmagic.promise(
-            Readable.from(fileStreamSummary.buffer).pipe(decompressorTransform),
-            {
-                magicFile: "node_modules/mmmagic/magic/magic.mgc"
-            }
-        );
+        decompressorTransform.on("error", decompressorErrorHandler);
 
         const decompressedStream = Readable.from(fileStreamSummary.stream).pipe(decompressorTransform);
-        const [decompressedBuffer] = await bufferPeek.promise(decompressedReadable, Math.pow(2, 20));
+        const [decompressedBuffer, decompressedReadable] = await bufferPeek.promise(
+            decompressedStream,
+            Math.pow(2, 20)
+        );
 
+        const decompressedBufferReadable = Readable.from(decompressedBuffer);
+
+        const [magicMimeResults] = await streamMmmagic.promise(decompressedBufferReadable, {
+            magicFile: "node_modules/mmmagic/magic/magic.mgc"
+        });
+
+        decompressorTransform.off("error", decompressorErrorHandler);
         decompressorTransform.destroy();
 
         let innerFileName = fileStreamSummary?.fileName;
@@ -88,7 +88,7 @@ export abstract class AbstractPassThroughParser implements Parser {
             reportedMimeType: typeof innerFileNameMimeType === "string" ? innerFileNameMimeType : undefined,
             fileName: innerFileName,
             buffer: decompressedBuffer,
-            stream: decompressedStream,
+            stream: decompressedReadable,
             lastUpdatedHash: fileStreamSummary.lastUpdatedHash
         };
 
@@ -112,4 +112,8 @@ export abstract class AbstractPassThroughParser implements Parser {
 
         return innerFileResults;
     }
+}
+
+function decompressorErrorHandler(error: Error) {
+    throw error;
 }

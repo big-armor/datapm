@@ -147,6 +147,7 @@ export class RegistryClient {
                 package(identifier: $identifier) {
                     displayName
                     description
+                    myPermissions
                     identifier {
                         registryURL
                         catalogSlug
@@ -166,6 +167,7 @@ export class RegistryClient {
                             versionPatch
                         }
                         packageFile
+                        canonicalPackageFile
                         updatedAt
                     }
                 }

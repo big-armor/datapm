@@ -25,7 +25,7 @@ describe("Fallback command", async function () {
     it("Should fallback for fetch command", async () => {
         let lineFound = false;
         await testCmd("fetch", [], [], async (line: string, index, process) => {
-            if (line.includes("What is the package file name or url?")) {
+            if (line.includes("What is the package name, url, or file name?")) {
                 lineFound = true;
                 process.kill(9);
             }
@@ -49,7 +49,7 @@ describe("Fallback command", async function () {
     it("Should fallback for update command", async () => {
         let lineFound = false;
         await testCmd("update", [], [], async (line: string, index, process) => {
-            if (line.includes("What is the package file name or url?")) {
+            if (line.includes("What is the package name, url, or file name?")) {
                 lineFound = true;
                 process.kill(9);
             }

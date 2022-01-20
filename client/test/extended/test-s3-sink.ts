@@ -11,7 +11,7 @@ import {
     TEST_SOURCE_FILES
 } from "../integration/test-utils";
 
-const s3SinkPrompts = ["Do you want to use the default options?", "File Format?", "Region?", "S3 Bucket?", "S3 Path?"];
+const s3SinkPrompts = ["File Format?", "Region?", "S3 Bucket?", "S3 Path?"];
 
 const getS3SinkPromptInputs = (inputs?: string[], skip = 0, count = 20) =>
     getPromptInputs(s3SinkPrompts, inputs, skip, count);
@@ -45,7 +45,7 @@ describe("S3 Sink Test", function () {
     });
 
     it("Should import data without error", async function () {
-        const prompts = getS3SinkPromptInputs([KEYS.DOWN, "", region, "", s3OutputPath]);
+        const prompts = getS3SinkPromptInputs(["", region, "", s3OutputPath]);
         const results: TestResults = {
             messageFound: false
         };
@@ -117,7 +117,7 @@ describe("S3 Sink Test", function () {
     });
 
     it("Should not rewrite if there isn't any new records", async function () {
-        const prompts = getS3SinkPromptInputs([KEYS.DOWN, "", region, "", s3OutputPath]);
+        const prompts = getS3SinkPromptInputs(["", region, "", s3OutputPath]);
         const results: TestResults = {
             messageFound: false
         };
@@ -138,7 +138,7 @@ describe("S3 Sink Test", function () {
     });
 
     it("Should import data again if force-update flag set", async function () {
-        const prompts = getS3SinkPromptInputs([KEYS.DOWN, "", region, "", s3OutputPath]);
+        const prompts = getS3SinkPromptInputs(["", region, "", s3OutputPath]);
         const results: TestResults = {
             messageFound: false
         };

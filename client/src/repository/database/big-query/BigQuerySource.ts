@@ -1,17 +1,10 @@
 import chalk from "chalk";
-import { DPMConfiguration } from "datapm-lib";
+import { DPMConfiguration, RecordContext, UpdateMethod } from "datapm-lib";
 import fs from "fs";
 import { BigQuery, BigQueryDatetime, BigQueryTimestamp } from "@google-cloud/bigquery";
 import { Transform } from "stream";
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
-import {
-    RecordContext,
-    SourceInspectionContext,
-    Source,
-    StreamSetPreview,
-    UpdateMethod,
-    InspectionResults
-} from "../../Source";
+import { SourceInspectionContext, Source, StreamSetPreview, InspectionResults } from "../../Source";
 import { TYPE } from "./BigQueryRepositoryDescription";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires

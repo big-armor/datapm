@@ -1,6 +1,7 @@
 import { DPMStorage } from "../dpm-storage";
 import { StorageProvider } from "../storage-provider";
 import { Readable } from "stream";
+import { off } from "process";
 
 export enum StorageErrors {
     FILE_DOES_NOT_EXIST = "FILE_DOES_NOT_EXIST"
@@ -12,47 +13,69 @@ export class FileStorageService {
     private readonly storageService: DPMStorage = StorageProvider.getStorage();
 
     public async writeFileFromBuffer(
-        namespace: string,
+        namespace: string[],
         itemId: string,
         contents: Buffer,
         transformer?: any
     ): Promise<void> {
         const stream = this.convertBufferToStream(contents);
-        return this.storageService.writeItem(namespace, itemId, stream, transformer);
+        return this.storageService.writeStream(namespace, itemId, stream, transformer);
     }
 
     public async writeFileFromStream(
-        namespace: string,
+        namespace: string[],
         itemId: string,
         stream: Readable,
         transformer?: any
     ): Promise<void> {
-        return this.storageService.writeItem(namespace, itemId, stream, transformer);
+        return this.storageService.writeStream(namespace, itemId, stream, transformer);
     }
 
     public async writeFileFromString(
-        namespace: string,
+        namespace: string[],
         itemId: string,
         contents: string,
         transformer?: any
     ): Promise<void> {
         const stream = this.convertStringToStream(contents);
-        return this.storageService.writeItem(namespace, itemId, stream, transformer);
+        return this.storageService.writeStream(namespace, itemId, stream, transformer);
     }
 
-    public async writeFile(namespace: string, itemId: string, stream: Readable, transformer?: any): Promise<void> {
-        return this.storageService.writeItem(namespace, itemId, stream, transformer);
+    public async writeFile(namespace: string[], itemId: string, stream: Readable, transformer?: any): Promise<void> {
+        return this.storageService.writeStream(namespace, itemId, stream, transformer);
     }
 
-    public async fileExists(namespace: string, itemId: string): Promise<boolean> {
+    public async fileExists(namespace: string[], itemId: string): Promise<boolean> {
         return this.storageService.itemExists(namespace, itemId);
     }
 
-    public async moveFile(oldFilePath: string, newFilePath: string, callback: any): Promise<void> {
-        return this.storageService.moveFile(oldFilePath, newFilePath, callback);
+    public async moveFile(oldNamespace: string[], oldItemId:string, newNamespace:string[], newItemId:string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            return this.storageService.moveFile(oldNamespace, oldItemId, newNamespace, newItemId, (error) => {
+
+                if(error)  {
+                    reject(error);
+                } else {
+                    resolve();
+                }
+
+            });
+
+        });
     }
 
-    public async deleteFile(namespace: string, itemId: string): Promise<void> {
+    public async deleteFiles(namespace: string[], fileNames:string[] = []): Promise<void> {
+        
+        if(fileNames.length === 0) 
+            return this.storageService.deleteAllItems(namespace);
+        else {
+            for(let i = 0; i < fileNames.length; i++) {
+                await this.deleteFile(namespace, fileNames[i]);
+            }
+        }
+    }
+
+    public async deleteFile(namespace: string[], itemId: string): Promise<void> {
         try {
             return this.storageService.deleteItem(namespace, itemId);
         } catch (error) {
@@ -65,7 +88,11 @@ export class FileStorageService {
         }
     }
 
-    public async readFile(namespace: string, itemId: string): Promise<Readable> {
+    public async listFiles(namespace:string[]): Promise<string[]> {
+        return this.storageService.listItems(namespace);
+    }
+
+    public async readFile(namespace: string[], itemId: string): Promise<Readable> {
         return this.storageService.getItem(namespace, itemId);
     }
 

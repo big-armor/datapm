@@ -7,16 +7,17 @@ import {
     GraphQLInterfaceType,
     EnumValueNode
 } from "graphql";
-import { Context } from "../context";
+import { AuthenticatedContext, Context } from "../context";
 import { CatalogEntity } from "../entity/CatalogEntity";
 import { UserEntity } from "../entity/UserEntity";
 import { CatalogIdentifierInput, Permission } from "../generated/graphql";
 import { getCatalogFromCacheOrDbOrFail } from "../resolvers/CatalogResolver";
 import { getCatalogPermissionsFromCacheOrDb } from "../resolvers/UserCatalogPermissionResolver";
+import { isAuthenticatedAsAdmin, isAuthenticatedContext } from "../util/contextHelpers";
 
 export const buildUnclaimedCatalogPermissions = (context: Context): Permission[] => {
     const permissions = [Permission.VIEW];
-    if (context.me?.isAdmin) {
+    if (isAuthenticatedAsAdmin(context)) {
         permissions.push(Permission.EDIT, Permission.MANAGE);
     }
     return permissions;
@@ -106,7 +107,7 @@ export class HasCatalogPermissionDirective extends SchemaDirectiveVisitor {
             return;
         }
 
-        if (context.me == null) {
+        if (!isAuthenticatedContext(context)) {
             throw new AuthenticationError(`NOT_AUTHENTICATED`);
         }
 
@@ -117,7 +118,13 @@ export class HasCatalogPermissionDirective extends SchemaDirectiveVisitor {
         if (catalog.unclaimed) {
             return buildUnclaimedCatalogPermissions(context);
         } else {
-            return await resolveCatalogPermissionsForEntity(context, catalog, context.me);
+
+            if(isAuthenticatedContext(context)) {
+                const authenticatedContext = context as AuthenticatedContext;
+                return await resolveCatalogPermissionsForEntity(context, catalog, authenticatedContext.me);
+            } else {
+                return await resolveCatalogPermissionsForEntity(context, catalog);
+            }
         }
     }
 }

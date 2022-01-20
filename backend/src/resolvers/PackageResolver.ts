@@ -43,7 +43,6 @@ import { Connection, EntityManager } from "typeorm";
 import { VersionEntity } from "../entity/VersionEntity";
 import { getUserFromCacheOrDbById } from "./UserResolver";
 import { getCollectionFromCacheOrDbOrFail } from "./CollectionResolver";
-import { PackageDataStorageService } from "../storage/data/package-data-storage-service";
 import { getCatalogPermissionsFromCacheOrDb } from "./UserCatalogPermissionResolver";
 import {
     deleteFollowsByIds,
@@ -51,6 +50,7 @@ import {
     getPackageFollowsByPackageIssuesIds
 } from "./FollowResolver";
 import { PackageIssueRepository } from "../repository/PackageIssueRepository";
+import { isAuthenticatedContext } from "../util/contextHelpers";
 
 export const packageEntityToGraphqlObjectOrNull = async (
     context: Context,
@@ -187,7 +187,7 @@ export const packageCatalog = async (
         getRelationNames(graphqlFields(info))
     );
     if (!catalog) {
-        throw new Error("CATALOG_NOT_FOUND");
+        throw new Error("CATALOG_NOT_FOUND: " + packageEntity.catalogId);
     }
 
     if (!(await hasPackageEntityPermissions(context, packageEntity, Permission.VIEW))) {
@@ -262,7 +262,7 @@ export const myPackagePermissions = async (parent: Package, _0: any, context: Au
 
     const catalog = await getCatalogFromCacheOrDbById(context, packageEntity.catalogId);
     if (catalog == null) {
-        throw new Error("CATALOG_NOT_FOUND - " + packageEntity.catalogId);
+        throw new Error("CATALOG_NOT_FOUND: " + packageEntity.catalogId);
     }
 
     return resolvePackagePermissions(
@@ -292,9 +292,9 @@ export const findPackage = async (
         packageEntity.viewCount++;
         await transaction.save(packageEntity);
 
-        if (context.me) {
+        if (isAuthenticatedContext(context)) {
             await createActivityLog(transaction, {
-                userId: context.me?.id,
+                userId: (context as AuthenticatedContext).me.id,
                 eventType: ActivityLogEventType.PACKAGE_VIEWED,
                 targetPackageId: packageEntity.id
             });
@@ -375,8 +375,8 @@ export const createPackage = async (
 
             return await packageEntityToGraphqlObject(context, transaction, packageEntity);
         } catch (error) {
-            if (error.message == "CATALOG_NOT_FOUND") {
-                throw new UserInputError("CATALOG_NOT_FOUND");
+            if (error.message.startsWith("CATALOG_NOT_FOUND")) {
+                throw new UserInputError(error.message);
             }
 
             throw new ApolloError("UNKNOWN_ERROR - " + error.message);
@@ -490,12 +490,14 @@ export const movePackage = async (
             .getCustomRepository(PackagePermissionRepository)
             .storePackagePermissions(transaction, context.me.id, packageEntity.id, userPermission.permissions);
 
-        await PackageDataStorageService.INSTANCE.movePackageDataInNewCatalog(
+        // TODO Move the data from the old catalog to the new one
+        /* await PackageDataStorageService.INSTANCE.movePackageDataInNewCatalog(
             context,
             identifier.catalogSlug,
             targetCatalog.catalogSlug,
             identifier.packageSlug
         );
+        */
     });
 };
 
