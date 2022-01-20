@@ -15,12 +15,7 @@ import {
     TEST_SOURCE_FILES
 } from "./test-utils";
 
-const fetchCommandPrompts = [
-    "Do you want to use the default options?",
-    "Destination?",
-    "File Format?",
-    "File Location?"
-];
+const fetchCommandPrompts = ["Destination?", "File Format?", "File Location?"];
 
 const getFetchCommandPromptInputs = (inputs?: string[], skip = 0) => getPromptInputs(fetchCommandPrompts, inputs, skip);
 
@@ -62,12 +57,7 @@ describe("Fetch Command Tests", async function () {
     });
 
     it("Can't fetch package from invalid package identifier", async function () {
-        const prompts = [
-            {
-                message: "Do you want to use the default options?",
-                input: KEYS.DOWN + KEYS.ENTER
-            }
-        ];
+        const prompts = undefined;
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -105,12 +95,7 @@ describe("Fetch Command Tests", async function () {
     });
 
     it("Can't fetch package from non-existing URL", async function () {
-        const prompts = [
-            {
-                message: "Do you want to use the default options?",
-                input: KEYS.DOWN + KEYS.ENTER
-            }
-        ];
+        const prompts = undefined;
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -127,12 +112,7 @@ describe("Fetch Command Tests", async function () {
     });
 
     it("Can't fetch package from non-existing registry", async function () {
-        const prompts = [
-            {
-                message: "Do you want to use the default options?",
-                input: KEYS.DOWN + KEYS.ENTER
-            }
-        ];
+        const prompts = undefined;
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -154,7 +134,7 @@ describe("Fetch Command Tests", async function () {
     });
 
     it("Can't fetch package with invalid sink configuration", async function () {
-        const prompts = getFetchCommandPromptInputs([KEYS.DOWN + KEYS.ENTER]);
+        const prompts = getFetchCommandPromptInputs([]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -181,18 +161,23 @@ describe("Fetch Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("fetch", [packageAFilePath, "--defaults"], [], async (line: string) => {
-            if (line.includes("Finished writing 51 records")) {
-                results.messageFound = true;
+        const cmdResult = await testCmd(
+            "fetch",
+            [packageAFilePath, "--defaults", "--forceUpdate"],
+            [],
+            async (line: string) => {
+                if (line.includes("Finished writing 51 records")) {
+                    results.messageFound = true;
+                }
             }
-        });
+        );
 
         expect(cmdResult.code, "Exit code").equals(0);
         expect(results.messageFound, "Found success message").equals(true);
     });
 
     it("Fetch package with file sink", async function () {
-        const prompts = getFetchCommandPromptInputs([KEYS.DOWN, "Local", "JSON"]);
+        const prompts = getFetchCommandPromptInputs(["Local", "JSON"]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false
@@ -239,7 +224,11 @@ describe("Fetch Command Tests", async function () {
             "Short package description?",
             "Website?",
             "Number of sample records?",
-            "Publish to registry?"
+            "Publish to registry?",
+            "Target registry?",
+            "Catalog short name?",
+            "Data Access Method",
+            "Is the above ok?"
         ];
         const promptInputs = getPromptInputs(generateCommandPrompts, [
             "",
@@ -255,7 +244,10 @@ describe("Fetch Command Tests", async function () {
             "package-b",
             "",
             "",
-            "Package B"
+            "Package B",
+            "",
+            "",
+            "No" // publish to registry
         ]);
         const results: TestResults = {
             exitCode: -1,
@@ -273,7 +265,7 @@ describe("Fetch Command Tests", async function () {
     });
 
     it("Should honor the excluded and renamed attributes", async function () {
-        const prompts = getFetchCommandPromptInputs([KEYS.DOWN, "Local", "JSON", "tmp-files"]);
+        const prompts = getFetchCommandPromptInputs(["Local", "JSON", "tmp-files"]);
         const results: TestResults = {
             exitCode: -1,
             messageFound: false

@@ -45,7 +45,7 @@ describe("XLSX Source Tests", function () {
             "Test",
             "https://test.datapm-not-a-site.io",
             "10",
-            ""
+            "no"
         ]);
 
         const exitCode = await testCmd("package", [TEST_SOURCE_FILES.FILE23], prompts);

@@ -10,12 +10,17 @@ export enum ParameterType {
     Password = "password"
 }
 
+export interface ParameterOption {
+    title: string;
+    value?: string | boolean | number;
+    selected?: boolean;
+}
 export interface Parameter {
     type: ParameterType;
     name: string;
     defaultValue?: string | boolean | number;
     message: string;
-    options?: { title: string; value?: string | boolean | number; selected?: boolean }[];
+    options?: ParameterOption[];
     numberMinimumValue?: number;
     numberMaximumValue?: number;
     stringMinimumLength?: number;

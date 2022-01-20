@@ -1,7 +1,8 @@
 import { SchemaDirectiveVisitor, AuthenticationError } from "apollo-server";
 import { GraphQLObjectType, GraphQLField, defaultFieldResolver } from "graphql";
-import { Context } from "../context";
+import { AuthenticatedContext, Context } from "../context";
 import { UserRepository } from "../repository/UserRepository";
+import { isAuthenticatedContext } from "../util/contextHelpers";
 
 export class IsUserOrAdminDirective extends SchemaDirectiveVisitor {
     visitObject(object: GraphQLObjectType) {
@@ -14,7 +15,10 @@ export class IsUserOrAdminDirective extends SchemaDirectiveVisitor {
     visitFieldDefinition(field: GraphQLField<any, any>) {
         const { resolve = defaultFieldResolver } = field;
         field.resolve = function (source, args, context: Context, info) {
-            if (!context.me) throw new AuthenticationError("Not logged in");
+            
+            if (!isAuthenticatedContext(context)) throw new AuthenticationError("Not logged in");
+
+            const authenicatedContext = context as AuthenticatedContext;
 
             const username: string | undefined = args.username || args.value.username || undefined;
 
@@ -25,7 +29,7 @@ export class IsUserOrAdminDirective extends SchemaDirectiveVisitor {
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: username })
                 .then((user) => {
-                    if (context.me?.id !== user.id) throw new Error(`You are trying to alter a user that is not you`);
+                    if (authenicatedContext.me.id !== user.id) throw new Error(`You are trying to alter a user that is not you`);
 
                     return resolve.apply(this, [source, args, context, info]);
                 });

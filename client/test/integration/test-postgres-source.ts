@@ -60,10 +60,6 @@ describe("Postgres Source Test", function () {
 
         packageAFilePath = await createTestPackage(TEST_SOURCE_FILES.FILE1, true);
         const prompts = [
-            {
-                message: "Do you want to use the default options?",
-                input: KEYS.DOWN + KEYS.ENTER
-            },
             ...getPostgresSourcePromptInputs([
                 postgresHost,
                 postgresPort.toString(),

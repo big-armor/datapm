@@ -1,0 +1,3 @@
+string,number,boolean,date,datetime,stringNulls
+hey,1,true,11/12/1980,"Tue, 14 Sep 2021 19:23:11 GMT",
+yo,2.2,false,1/1/2001,"Tue, 14 Sep 2021 19:23:11 GMT",something here

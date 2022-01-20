@@ -450,9 +450,24 @@ type Version {
     identifier: VersionIdentifier!
     createdAt: Date
     updatedAt: Date
+
     package: Package
+
+    """
+    The user that created this version
+    """
     author: User
+
+    """
+    A package file that may be modified by the server to remove sensitive information. See the PackageFile.canonical value
+    to determine whether it has been modified.
+    """
     packageFile: PackageFileJSON
+
+    """
+    An unmodified copy of the package file that is only returned when the requesting user has EDIT permissions on the package.
+    """
+    canonicalPackageFile: PackageFileJSON
 }
 
 """

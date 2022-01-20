@@ -9,6 +9,7 @@ import { PackagePermissionRepository } from "../repository/PackagePermissionRepo
 import { PackageRepository } from "../repository/PackageRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { asyncForEach } from "../util/AsyncUtils";
+import { isAuthenticatedContext } from "../util/contextHelpers";
 import { sendInviteUser, sendShareNotification, validateMessageContents } from "../util/smtpUtil";
 import { deletePackageFollowByUserId, deletePackageIssuesFollowsByUserId } from "./FollowResolver";
 import { getPackageFromCacheOrDbOrFail, getPackageFromCacheOrDbByIdOrFail } from "./PackageResolver";
@@ -25,11 +26,11 @@ export const hasPackagePermissions = async (context: Context, packageId: number,
         }
     }
 
-    if (context.me == null) {
+    if (!isAuthenticatedContext(context)) {
         return false;
     }
 
-    const userId = context.me.id;
+    const userId = (context as AuthenticatedContext).me.id;
     const permissionPromiseFunction = () =>
         context.connection
             .getCustomRepository(PackagePermissionRepository)
@@ -42,18 +43,18 @@ export const hasPackageEntityPermissions = async (
     context: Context,
     packageEntity: PackageEntity,
     permission: Permission
-) => {
+):Promise<Boolean> => {
     if (permission == Permission.VIEW) {
         if (packageEntity?.isPublic) {
             return true;
         }
     }
 
-    if (context.me == null) {
+    if (!isAuthenticatedContext(context)) {
         return false;
     }
 
-    const userId = context.me.id;
+    const userId = (context as AuthenticatedContext).me.id;
     const permissionPromiseFunction = () =>
         context.connection
             .getCustomRepository(PackagePermissionRepository)

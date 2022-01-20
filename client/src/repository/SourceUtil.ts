@@ -6,12 +6,12 @@ import {
     Properties,
     Schema,
     StreamStats,
-    ValueTypes
+    ValueTypes,
+    BatchingTransform
 } from "datapm-lib";
 import { Writable } from "stream";
 import { clearInterval } from "timers";
 import { Maybe } from "../util/Maybe";
-import { BatchingTransform } from "../transforms/BatchingTransform";
 import { InflatedByteCountTransform } from "../transforms/InflatedByteCountTransform";
 import { StatsTransform } from "../transforms/StatsTransform";
 import { ContentLabelDetector } from "../content-detector/ContentLabelDetector";

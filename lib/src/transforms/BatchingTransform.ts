@@ -12,7 +12,7 @@ export class BatchingTransform extends Transform {
         this.maxSize = maxSize;
     }
 
-    _transform(chunk: unknown, encoding: BufferEncoding, callback: TransformCallback): void {
+    _transform(chunk: unknown, _encoding: BufferEncoding, callback: TransformCallback): void {
         if (Array.isArray(chunk)) {
             this.buffer = this.buffer.concat(chunk);
         } else this.buffer.push(chunk);

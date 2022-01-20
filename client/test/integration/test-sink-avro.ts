@@ -1,6 +1,6 @@
 import avro from "avsc";
 import { expect } from "chai";
-import { createTestPackage, getPromptInputs, testCmd, TEST_SOURCE_FILES, removePackageFiles, KEYS } from "./test-utils";
+import { createTestPackage, getPromptInputs, testCmd, TEST_SOURCE_FILES, removePackageFiles } from "./test-utils";
 import fs from "fs";
 
 describe("AVRO Sink Test", function () {
@@ -31,10 +31,7 @@ describe("AVRO Sink Test", function () {
     });
 
     it("Should write AVRO output", async () => {
-        const prompts = getPromptInputs(
-            ["Do you want to use the default options?", "File Location?"],
-            [KEYS.DOWN, "."]
-        );
+        const prompts = getPromptInputs(["File Location?"], ["."]);
         const cmdResult = await testCmd(
             "fetch",
             [packageAFilePath, "--sink", "file", "--sinkConfig", '{"format":"application/avro"}'],
@@ -45,10 +42,7 @@ describe("AVRO Sink Test", function () {
     });
 
     it("Should write AVRO output - even with weird headers", async () => {
-        const prompts = getPromptInputs(
-            ["Do you want to use the default options?", "File Location?"],
-            [KEYS.DOWN, "."]
-        );
+        const prompts = getPromptInputs(["File Location?"], ["."]);
         const cmdResult = await testCmd(
             "fetch",
             [packageBFilePath, "--sink", "file", "--sinkConfig", '{"format":"application/avro"}'],

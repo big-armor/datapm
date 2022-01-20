@@ -4,20 +4,20 @@ export class DpmStorageStreamHolder {
     private readonly OPEN_READ_STREAMS: Readable[] = [];
     private readonly OPEN_WRITE_STREAMS: Writable[] = [];
 
-    public copyToStream(dataStream: Readable, targetStream: Writable, transformer?: any): Promise<void> {
-        this.registerWriteStream(targetStream);
-        this.addPipesToDataStream(dataStream, targetStream, transformer);
+    public copyToStream(readable: Readable, writable: Writable, transformer?: any): Promise<void> {
+        this.registerWriteStream(writable);
+        this.addPipesToDataStream(readable, writable, transformer);
 
         return new Promise<void>((resolve, reject) => {
-            targetStream.on("finish", async () => {
+            writable.on("finish", async () => {
                 resolve();
             });
-            dataStream.on("error", (error) => {
-                targetStream.destroy();
+            readable.on("error", (error) => {
+                writable.destroy();
                 reject(error);
             });
-            targetStream.on("error", (error) => {
-                dataStream.destroy();
+            writable.on("error", (error) => {
+                readable.destroy();
                 reject(error);
             });
         });
@@ -39,11 +39,11 @@ export class DpmStorageStreamHolder {
         }
     }
 
-    private addPipesToDataStream(dataStream: Stream, targetStream: Writable, transformer: any): void {
+    private addPipesToDataStream(readable: Stream, writable: Writable, transformer: any): void {
         if (transformer) {
-            dataStream.pipe(transformer).pipe(targetStream);
+            readable.pipe(transformer).pipe(writable);
         } else {
-            dataStream.pipe(targetStream);
+            readable.pipe(writable);
         }
     }
 
