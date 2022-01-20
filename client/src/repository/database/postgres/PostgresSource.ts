@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { DPMConfiguration } from "datapm-lib";
+import { DPMConfiguration, UpdateMethod, RecordContext } from "datapm-lib";
 import Knex from "knex";
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
 import {
@@ -7,9 +7,7 @@ import {
     SourceErrors,
     SourceInspectionContext as URIInspectionContext,
     InspectionResults,
-    Source,
-    UpdateMethod,
-    RecordContext
+    Source
 } from "../../Source";
 import { Transform } from "stream";
 import { table } from "console";

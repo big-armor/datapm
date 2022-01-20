@@ -1,9 +1,8 @@
 import bufferPeek from "buffer-peek-stream";
-import { DPMConfiguration } from "datapm-lib";
+import { StreamState, DPMConfiguration } from "datapm-lib";
 import mime from "mime-types";
 import { Transform } from "stream";
 import streamMmmagic from "stream-mmmagic";
-import { StreamState } from "../../Sink";
 import { findParser } from "../AbstractFileStreamSource";
 import { SourceInspectionContext } from "../../Source";
 import { FileBufferSummary, ParserInspectionResults, Parser, FileStreamContext } from "./Parser";

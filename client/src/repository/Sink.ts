@@ -1,7 +1,6 @@
-import { DPMConfiguration, PackageFile, Schema } from "datapm-lib";
+import { DPMConfiguration, PackageFile, Schema, SinkState, SinkStateKey, UpdateMethod } from "datapm-lib";
 import { Transform } from "stream";
 import { Maybe } from "../util/Maybe";
-import { UpdateMethod } from "./Source";
 import { Parameter } from "../util/parameters/Parameter";
 import { StreamSetProcessingMethod } from "../util/StreamToSinkUtil";
 
@@ -11,6 +10,7 @@ export enum SinkErrors {
     CONFIGURATION_FAILED = "CONFIGURATION_FAILED"
 }
 
+export type CommitKey = Record<string, unknown>;
 export interface WritableWithContext {
     /** While this is a writer, it should emit records that it has successfully written, so that the system
      * can track offsets accurately in case of errors.
@@ -22,53 +22,17 @@ export interface WritableWithContext {
 
     /** A string such as a URL, or file location, describing where the sink is writing records. For user informational purposes only. */
     outputLocation: string;
-}
 
-/** Used by the Sink to create a unique key for the SinkState object.  */
-export interface SinkStateKey {
-    catalogSlug: string;
-    packageSlug: string;
-    packageMajorVersion: number;
-}
+    /** The last offset from previous writes, if this sink supports APPEND_ONLY_LOG mode */
+    lastOffset?: number;
 
-/** Describes the state of a schema from a single stream. Schemas may be present in more than one stream, and this
- * object does not describe the state of the schema across all streams.
- */
-
-export interface SchemaState {
-    lastOffset: number | null;
-}
-
-/** The state of an individual stream from a streamSet as written to a sink */
-export interface StreamState {
-    /** A hash value indicating when the contents of a stream have changed */
-    updateHash?: string;
-
-    /** The status of writing records for each schema from a single stream */
-    schemaStates: Record<string, SchemaState>;
-
-    /** The last read offset value for a single stream */
-    streamOffset?: number;
-}
-
-export interface StreamSetState {
-    /** A hash value indicating when the contents of a stream have changed */
-    updateHash?: string;
-
-    /** The state of reading each stream in the streamSet */
-    streamStates: Record<string, StreamState>;
-}
-
-/** Stored by the sink to understand the state of a particular stream of data */
-export interface SinkState {
-    /** The package version applied to a single sink state */
-    packageVersion: string; // TODO is this needed?
-
-    /** The time the sink state was saved */
-    timestamp: Date;
-
-    /** The state of reading each stream in the streamSet */
-    streamSets: Record<string, StreamSetState>;
+    /** Optionally return a function that will be called after the writable is closed. This will return a set of keys
+     * that can later be used to "commit the transaction" of this writable along with other writables at the same time.
+     * See the #commitAfterWrites() method for more info
+     *
+     * Return an empty array if the sink does not support this.
+     */
+    getCommitKeys: () => CommitKey[];
 }
 
 export interface SinkSupportedStreamOptions {
@@ -110,7 +74,13 @@ export interface Sink {
     /** Return a list of supported update methods, based on the configuration, schema, and current sink state */
     getSupportedStreamOptions(configuration: DPMConfiguration, sinkState: Maybe<SinkState>): SinkSupportedStreamOptions;
 
-    /** Apply the configuration to the sink */
+    /** Apply the configuration to the sink.
+     * @param connectionConfiguration The configuration object that is the result of the Repository.getConnectionParameters(...) user responses.
+     * @param credentialsConfiguration The configuration object that is the result of the Repository.getCredentianlsParameters(...) user responses.
+     * @param configuration The same configuration object that is the result of the getParameters(...) user responses.
+     * @param schema The schema of the stream that is being written to the sink.
+     * @param updateMethod The update method that is being used to write to the sink.
+     */
     getWriteable(
         schema: Schema,
         connectionConfiguration: DPMConfiguration,
@@ -118,6 +88,16 @@ export interface Sink {
         configuration: DPMConfiguration,
         updateMethod: UpdateMethod
     ): Promise<WritableWithContext>;
+
+    /** A set of keys provided by getWritable that are used to indiciate the
+     * sink should commit one or more writeable streams. This is useful for
+     * large multiple schema data sets that need to be committed transactionally.
+     */
+    commitAfterWrites(
+        commitKeys: CommitKey[],
+        connectionConfiguration: DPMConfiguration,
+        credentialsConfiguration: DPMConfiguration
+    ): Promise<void>;
 
     /** For filtering default values from the configuration, for the purposes of showing the minimum necessary information to recreate the configuration.
      * This method should preserve properties who's defaults may change in the future. It should modify the configuration object passed in

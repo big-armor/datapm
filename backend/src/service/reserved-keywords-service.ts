@@ -4,6 +4,7 @@ export class ReservedKeywordsService {
         "USER",
         "CATALOG",
         "COLLECTION",
+        "WS",
         "LATEST",
         "TRENDING",
         "TOP",

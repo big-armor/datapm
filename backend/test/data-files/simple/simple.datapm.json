@@ -1,0 +1,200 @@
+{
+ "$schema": "https://datapm.io/docs/package-file-schema-v0.6.0.json",
+ "sources": [
+  {
+   "slug": "file",
+   "streamSets": [
+    {
+     "slug": "simple",
+     "configuration": {},
+     "schemaTitles": [
+      "simple"
+     ],
+     "streamStats": {
+      "inspectedCount": 1,
+      "byteCount": 171,
+      "byteCountPrecision": "EXACT",
+      "recordCount": 2,
+      "recordCountPrecision": "EXACT"
+     }
+    }
+   ],
+   "type": "file",
+   "connectionConfiguration": {},
+   "configuration": {
+    "uris": [
+     "file://simple.csv"
+    ],
+    "delimiter": ",",
+    "hasHeaderRow": true,
+    "headerRowNumber": 0,
+    "updateMethod": "BATCH_FULL_SET"
+   }
+  }
+ ],
+ "generatedBy": "`datapm package` command. Visit datapm.io to learn about the tools and to discover other data packages",
+ "updatedDate": "2021-09-15T17:40:40.723Z",
+ "displayName": "Simple",
+ "packageSlug": "simple",
+ "version": "1.0.0",
+ "description": "Simple data for testing",
+ "readmeFile": "simple.README.md",
+ "licenseFile": "simple.LICENSE.md",
+ "website": "",
+ "schemas": [
+  {
+   "$schema": "http://json-schema.org/draft-07/schema",
+   "type": "object",
+   "title": "simple",
+   "properties": {
+    "string": {
+     "title": "string",
+     "recordCount": 2,
+     "valueTypes": {
+      "string": {
+       "recordCount": 2,
+       "valueType": "string",
+       "stringOptions": {
+        "hey": 1,
+        "yo": 1
+       },
+       "stringMaxLength": 3,
+       "stringMinLength": 2,
+       "contentLabels": []
+      }
+     },
+     "format": "string",
+     "type": [
+      "string"
+     ]
+    },
+    "number": {
+     "title": "number",
+     "recordCount": 2,
+     "valueTypes": {
+      "number": {
+       "recordCount": 2,
+       "valueType": "number",
+       "stringOptions": {
+        "1": 1,
+        "2.2": 1
+       },
+       "numberMaxValue": 2.2,
+       "numberMinValue": 1,
+       "contentLabels": []
+      }
+     },
+     "format": "number",
+     "type": [
+      "number"
+     ]
+    },
+    "boolean": {
+     "title": "boolean",
+     "recordCount": 2,
+     "valueTypes": {
+      "boolean": {
+       "recordCount": 2,
+       "valueType": "boolean",
+       "stringOptions": {
+        "true": 1,
+        "false": 1
+       },
+       "contentLabels": []
+      }
+     },
+     "format": "boolean",
+     "type": [
+      "boolean"
+     ]
+    },
+    "date": {
+     "title": "date",
+     "recordCount": 2,
+     "valueTypes": {
+      "date": {
+       "recordCount": 2,
+       "valueType": "date",
+       "stringOptions": {
+        "11/12/1980": 1,
+        "1/1/2001": 1
+       },
+       "dateMaxValue": "2001-01-01T05:00:00.000Z",
+       "dateMinValue": "2001-01-01T05:00:00.000Z"
+      }
+     },
+     "format": "date",
+     "type": [
+      "string"
+     ]
+    },
+    "datetime": {
+     "title": "datetime",
+     "recordCount": 2,
+     "valueTypes": {
+      "date": {
+       "recordCount": 2,
+       "valueType": "date",
+       "stringOptions": {
+        "Tue, 14 Sep 2021 19:23:11 GMT": 2
+       },
+       "dateMaxValue": "2021-09-14T19:23:11.000Z",
+       "dateMinValue": "2021-09-14T19:23:11.000Z"
+      }
+     },
+     "format": "date-time",
+     "type": [
+      "string"
+     ]
+    },
+    "stringNulls": {
+     "title": "stringNulls",
+     "recordCount": 2,
+     "valueTypes": {
+      "null": {
+       "recordCount": 1,
+       "valueType": "null",
+       "stringOptions": {}
+      },
+      "string": {
+       "recordCount": 1,
+       "valueType": "string",
+       "stringOptions": {
+        "something here": 1
+       },
+       "stringMaxLength": 14,
+       "stringMinLength": 14,
+       "contentLabels": []
+      }
+     },
+     "format": "null,string",
+     "type": [
+      "null",
+      "string"
+     ]
+    }
+   },
+   "recordsInspectedCount": 0,
+   "recordCount": 2,
+   "sampleRecords": [
+    {
+     "string": "hey",
+     "number": 1,
+     "boolean": true,
+     "date": "1980-11-12T00:00:00.000Z",
+     "datetime": "2021-09-14T19:23:11.000Z",
+     "stringNulls": null
+    },
+    {
+     "string": "yo",
+     "number": 2.2,
+     "boolean": false,
+     "date": "2001-01-01T00:00:00.000Z",
+     "datetime": "2021-09-14T19:23:11.000Z",
+     "stringNulls": "something here"
+    }
+   ],
+   "recordCountPrecision": "EXACT"
+  }
+ ]
+}

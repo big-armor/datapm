@@ -1,10 +1,9 @@
 import { createApiKey, createTestUser, KEYS, testCmd, removePackageFiles, TEST_SOURCE_FILES } from "./test-utils";
-import { loadPackageFileFromDisk } from "datapm-lib";
+import { SinkState, loadPackageFileFromDisk } from "datapm-lib";
 import { expect } from "chai";
 import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
 import fs from "fs";
-import { SinkState } from "../../src/repository/Sink";
 
 describe("CSV Offset Tests", function () {
     before(async () => {
@@ -103,6 +102,14 @@ describe("CSV Offset Tests", function () {
             {
                 message: "Catalog short name?",
                 input: KEYS.ENTER
+            },
+            {
+                message: "Data Access Method?",
+                input: "Publish schema, client direct connects for data" + KEYS.ENTER
+            },
+            {
+                message: "Is the above ok?",
+                input: "yes" + KEYS.ENTER
             }
         ];
 
@@ -121,10 +128,6 @@ describe("CSV Offset Tests", function () {
             "fetch",
             ["countries.datapm.json"],
             [
-                {
-                    message: "Do you want to use the default options?",
-                    input: KEYS.DOWN + KEYS.ENTER
-                },
                 {
                     message: "Destination?",
                     input: "Local" + KEYS.ENTER
@@ -168,10 +171,6 @@ describe("CSV Offset Tests", function () {
             "fetch",
             ["countries.datapm.json"],
             [
-                {
-                    message: "Do you want to use the default options?",
-                    input: KEYS.DOWN + KEYS.ENTER
-                },
                 {
                     message: "Destination?",
                     input: "Local" + KEYS.ENTER

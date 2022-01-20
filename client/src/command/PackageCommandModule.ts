@@ -33,7 +33,7 @@ import { validPackageDisplayName, validShortPackageDescription, validUnit, valid
 import { LogType } from "../util/LoggingUtils";
 import { Maybe } from "../util/Maybe";
 import { nameToSlug } from "../util/NameUtil";
-import { writeLicenseFile, writePackageFile, writeReadmeFile, PublishType } from "../util/PackageUtil";
+import { writeLicenseFile, writePackageFile, writeReadmeFile } from "../util/PackageUtil";
 import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
 import { cliHandleParameters } from "../util/parameters/ParameterUtils";
 import * as SchemaUtil from "../util/SchemaUtil";
@@ -346,6 +346,7 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
     // Writing Package, ReadMe, License Files
     const packageFile: PackageFile = {
         $schema: new PackageFile().$schema,
+        canonical: true,
         sources: [sourceObject],
         generatedBy:
             "`datapm package` command. Visit datapm.io to learn about the tools and to discover other data packages",
@@ -405,21 +406,21 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
     const schemaPublishResponse = await prompts(
         [
             {
-                type: "select",
+                type: "autocomplete",
                 name: "publish",
                 message: "Publish to registry?",
                 choices: [
-                    { title: "Do not publish", value: PublishType.DO_NOT_PUBLISH },
-                    { title: "Schema only", value: PublishType.SCHEMA_ONLY }
+                    { title: "Yes", value: "yes" },
+                    { title: "No", value: "no" }
                 ]
             }
         ],
         defaultPromptOptions
     );
 
-    const publishType = schemaPublishResponse.publish as PublishType;
+    const publishType = schemaPublishResponse.publish;
 
-    if (publishType === PublishType.DO_NOT_PUBLISH) {
+    if (publishType !== "yes") {
         console.log("");
         console.log(chalk.grey("When you are ready, you can publish with the following command"));
         console.log(chalk.green(`datapm publish ${packageFileLocation}`));

@@ -1,7 +1,8 @@
 import { SchemaDirectiveVisitor, AuthenticationError, ValidationError } from "apollo-server";
 import { GraphQLObjectType, GraphQLField, defaultFieldResolver } from "graphql";
-import { Context } from "../context";
+import { AuthenticatedContext, Context } from "../context";
 import { AUTHENTICATION_ERROR, UserStatus } from "../generated/graphql";
+import { isAuthenticatedContext } from "../util/contextHelpers";
 
 export class IsAuthenticatedDirective extends SchemaDirectiveVisitor {
     visitObject(object: GraphQLObjectType) {
@@ -14,13 +15,15 @@ export class IsAuthenticatedDirective extends SchemaDirectiveVisitor {
     visitFieldDefinition(field: GraphQLField<any, any>) {
         const { resolve = defaultFieldResolver } = field;
         field.resolve = function (source, args, context: Context, info) {
-            if (!context.me) throw new AuthenticationError("NOT_AUTHENTICATED");
+            if (!isAuthenticatedContext(context)) throw new AuthenticationError("NOT_AUTHENTICATED");
 
-            if (!context.me.emailVerified) {
+            const authenicatedContext = context as AuthenticatedContext;
+
+            if (!authenicatedContext.me.emailVerified) {
                 throw new ValidationError("EMAIL_ADDRESS_NOT_VERIFIED");
             }
 
-            if (UserStatus.SUSPENDED == context.me.status) {
+            if (UserStatus.SUSPENDED == authenicatedContext.me.status) {
                 throw new ValidationError(AUTHENTICATION_ERROR.ACCOUNT_SUSPENDED);
             }
 

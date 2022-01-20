@@ -31,7 +31,9 @@ const generateCommandPrompts = [
     "Number of sample records?",
     "Publish to registry?",
     "Target registry?",
-    "Catalog short name?"
+    "Catalog short name?",
+    "Data Access Method",
+    "Is the above ok?"
 ];
 
 const getGenerateCommandPromptInputs = (inputs?: string[], skip = 0, count = 20) =>
@@ -308,8 +310,7 @@ describe("Package Command Tests", async () => {
             "Package A",
             "https://test.datapm-not-a-site.io",
             "10",
-            "",
-            ""
+            "no"
         ]);
         prompts.splice(
             6,
@@ -370,8 +371,7 @@ describe("Package Command Tests", async () => {
             "Package A",
             "https://test.datapm-not-a-site.io",
             "10",
-            "",
-            ""
+            "no"
         ]);
         prompts.splice(
             6,
@@ -419,20 +419,23 @@ describe("Package Command Tests", async () => {
             "Publish to registry?"
         ];
         const promptInputs = getPromptInputs(generateCommandPrompts, [
-            "",
+            "yes",
             "0",
             "",
-            "Y",
-            `${KEYS.DOWN}${KEYS.DOWN} `,
-            "Y",
-            `${KEYS.DOWN} `,
-            "New State Name",
-            "",
-            "",
-            "package-b",
-            "",
-            "",
-            "Package B"
+            "Y", // exclude attrbiutes
+            `${KEYS.DOWN}${KEYS.DOWN} `, // attrbiutes to exclude
+            "Y", // rename attributes
+            `${KEYS.DOWN} `, // attributes to rename
+            "New State Name", // new attribute name
+            "", // derived from other data
+            "", // what does each record represent
+            "package-b", // package name
+            "", // package short name
+            "", // starting version
+            "some short description", // short package description
+            "", // website
+            "", // number of sample records
+            "no" // publish to registry
         ]);
         const results: TestResults = {
             exitCode: -1,
@@ -476,8 +479,8 @@ describe("Package Command Tests", async () => {
                 "",
                 "Package A",
                 "",
-                "10",
-                KEYS.DOWN
+                "10", // number of sample records
+                "yes" // publish to registry
             ]);
             prompts.splice(6, 0, {
                 message: "What does each state-codes record represent?",
@@ -489,16 +492,12 @@ describe("Package Command Tests", async () => {
                 helperMessageFound: false
             };
             const cmdResult = await testCmd("package", [TEST_SOURCE_FILES.HTTP1], prompts, async (line: string) => {
-                if (line.includes("You have not added a registry API key")) {
+                if (line.includes("You have not logged into a registry from the command line")) {
                     results.errorMessageFound = true;
-                }
-                if (line.includes("You can publish the package file with the following command")) {
-                    results.helperMessageFound = true;
                 }
             });
             expect(cmdResult.code, "Exit code").equals(1);
             expect(results.errorMessageFound, "Found attempt message").equals(true);
-            expect(results.helperMessageFound, "Found helper message").equals(true);
             removePackageFiles(["package-a"]);
             addRegistry({
                 url: `http://localhost:${registryServerPort}`,
@@ -520,7 +519,7 @@ describe("Package Command Tests", async () => {
                 "Package A",
                 "https://test.datapm-not-a-site.io",
                 "10",
-                ""
+                "no"
             ]);
             prompts.splice(6, 0, {
                 message: "What does each state-codes record represent?",
@@ -577,7 +576,11 @@ describe("Package Command Tests", async () => {
                 "Package A",
                 "https://test.datapm-not-a-site.io",
                 "10",
-                KEYS.DOWN
+                "yes", // publish to registry
+                "", // target registry
+                "", // catalog name
+                "", // publish method
+                "" // is it ok
             ]);
             prompts.splice(6, 0, {
                 message: "What does each state-codes record represent?",

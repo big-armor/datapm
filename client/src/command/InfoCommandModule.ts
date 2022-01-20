@@ -12,7 +12,7 @@ export async function getInfo(argv: InfoArguments): Promise<void> {
         text: `Getting package info: ${argv.reference}`
     });
 
-    const packageFileWithContext = await getPackage(argv.reference.toString()).catch((error) => {
+    const packageFileWithContext = await getPackage(argv.reference.toString(), "modified").catch((error) => {
         if (Array.isArray(error)) {
             if (error.find((_error) => _error.message === "NOT_FOUND")) {
                 oraRef.fail("Package not found"); // TODO state the specific package not found

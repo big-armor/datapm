@@ -14,6 +14,7 @@ import { UserEntity } from "../entity/UserEntity";
 import { getPackageFromCacheOrDbOrFail } from "../resolvers/PackageResolver";
 import { UserPackagePermissionEntity } from "../entity/UserPackagePermissionEntity";
 import { getCatalogPermissionsFromCacheOrDb } from "../resolvers/UserCatalogPermissionResolver";
+import { isAuthenticatedContext } from "../util/contextHelpers";
 
 export async function resolvePackagePermissions(
     context: Context,
@@ -66,14 +67,17 @@ async function hasPermission(
     context: Context,
     identifier: PackageIdentifierInput
 ): Promise<void> {
+
+    const isAuthenicatedContext = isAuthenticatedContext(context);
+
     // Check that the package exists
-    const permissions = await resolvePackagePermissions(context, identifier, context.me);
+    const permissions = await resolvePackagePermissions(context, identifier,  isAuthenicatedContext ? (context as AuthenticatedContext).me : undefined);
 
     if (permissions.includes(permission)) {
         return;
     }
 
-    if (context.me == null) {
+    if (!isAuthenicatedContext) {
         throw new AuthenticationError("NOT_AUTHENTICATED");
     }
 

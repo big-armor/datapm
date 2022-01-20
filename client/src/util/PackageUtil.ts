@@ -2,12 +2,6 @@ import { Difference, DifferenceType, PackageFile } from "datapm-lib";
 import fs from "fs";
 import path from "path";
 
-export enum PublishType {
-    SCHEMA_ONLY = "schema_only",
-    DATA_AND_SCHEMA = "data_and_schema",
-    DO_NOT_PUBLISH = "do_not_publish"
-}
-
 export const DifferenceTypeMessages: Record<DifferenceType, string> = {
     [DifferenceType.REMOVE_SCHEMA]: "Removed Schema",
     [DifferenceType.ADD_SCHEMA]: "Added Schema",

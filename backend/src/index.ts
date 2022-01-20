@@ -7,8 +7,8 @@ import express_enforces_ssl from "express-enforces-ssl";
 import proxy from "express-http-proxy";
 import { ApolloServer } from "apollo-server-express";
 
-import { Context } from "./context";
-import { getMeRequest } from "./util/me";
+import { AuthenticatedHTTPContext, AuthenticatedSocketContext, HTTPContext, SocketContext } from "./context";
+import { getMeFromAPIKey, getMeRequest } from "./util/me";
 import { makeSchema } from "./schema";
 import path from "path";
 import { getSecretVariable, setAppEngineServiceAccountJson } from "./util/secrets";
@@ -21,9 +21,12 @@ import { UserRepository } from "./repository/UserRepository";
 import { PackageRepository } from "./repository/PackageRepository";
 import { CatalogRepository } from "./repository/CatalogRepository";
 import { CollectionRepository } from "./repository/CollectionRepository";
-import { PackageDataStorageService } from "./storage/data/package-data-storage-service";
-import { startLeaderElection, stopLeaderElection } from "./service/leader-election-service";
+import {  LeaderElectionService } from "./service/leader-election-service";
+import  { DistributedLockingService } from "./service/distributed-locking-service";
 import { SessionCache } from "./session-cache";
+import socketio from "socket.io";
+import http from "http";
+import { SocketConnectionHandler } from "./socket/SocketHandler";
 
 console.log("DataPM Registry Server Starting...");
 
@@ -36,6 +39,9 @@ const REFERER_REGEX = /\/graphql\/?$/;
 const app = express();
 
 async function main() {
+
+    process.title = "DataPM Registry Server";
+
     // get secrets from environment variable or from secret manager
     // NOTE: getSecretVariable does not throw/fail. If the secret is unable
     // to be retrieved, a warning message is logged. Let the system fail
@@ -55,19 +61,40 @@ async function main() {
     // Create Database Connection
     const connection = await superCreateConnection();
 
-    startLeaderElection(connection);
+    const distributedLockingService = new DistributedLockingService();
+
+    const leaderElectionService = new LeaderElectionService(distributedLockingService, connection);
+    
+    // Do not await the next line, as it is a long running operation
+    leaderElectionService.start();
 
     process.on("exit", async () => {
         console.log("DataPM Registry Server Stoping... ");
-        await stopLeaderElection();
+        await leaderElectionService.stop();
+        await distributedLockingService.stop();
     });
 
-    const context = async ({ req }: { req: express.Request }): Promise<Context> => ({
-        request: req,
-        me: await getMeRequest(req, connection.manager),
-        connection: connection,
-        cache: new SessionCache()
-    });
+
+
+    const context = async ({ req }: { req: express.Request }): Promise<HTTPContext | AuthenticatedHTTPContext> => {
+        const me = await getMeRequest(req, connection.manager);
+
+        if(!me) {
+            return {
+                request: req,
+                connection: connection,
+                cache: new SessionCache()
+            }
+        }
+
+        return {
+            request: req,
+            me,
+            connection: connection,
+            cache: new SessionCache()
+        }
+        
+    };
 
     const schema = await makeSchema();
 
@@ -328,39 +355,39 @@ async function main() {
         }
     });
 
-    app.route("/data/:catalogSlug/:packageSlug/:version/:sourceSlug")
-        .post(async (req, res, next) => {
-            try {
-                const contextObject = await context({ req });
-                await PackageDataStorageService.INSTANCE.writePackageDataFromStream(
-                    contextObject,
-                    req.params.catalogSlug,
-                    req.params.packageSlug,
-                    req.params.version,
-                    req.params.sourceSlug,
-                    req
-                );
-                res.send();
-            } catch (err) {
-                res.status(400).send();
+    const httpServer = http.createServer(app); // TODO https?
+    const io = new socketio.Server(httpServer, {
+        httpCompression: true,
+        maxHttpBufferSize: 1e8,
+        path: "/ws/",
+        parser: require("socket.io-msgpack-parser")
+    });
+
+    io.on('connection', async (socket) => {
+
+
+        const contextObject:SocketContext | AuthenticatedSocketContext = {
+            connection,
+            cache: new SessionCache(),
+        }
+
+        if(socket.handshake.auth.token != null) {
+            if(Array.isArray(socket.handshake.auth.token)) {
+                throw new Error("TOKEN_MUST_BE_SINGLE_VALUE");
             }
-        })
-        .get(async (req, res, next) => {
-            try {
-                res.header("Content-Type", "application/octet-stream");
-                const contextObject = await context({ req });
-                const stream = await PackageDataStorageService.INSTANCE.readPackageDataFromStream(
-                    contextObject,
-                    req.params.catalogSlug,
-                    req.params.packageSlug,
-                    req.params.version,
-                    req.params.sourceSlug
-                );
-                stream.pipe(res);
-            } catch (err) {
-                res.status(400).send();
-            }
-        });
+    
+            const token = socket.handshake.auth.token;;
+            
+            const user = await getMeFromAPIKey(token,connection.manager);
+            
+            (contextObject as AuthenticatedSocketContext).me = user;
+
+        }
+
+        new SocketConnectionHandler(socket, contextObject, distributedLockingService);
+
+
+    });
 
     // any route not yet defined goes to index.html
     app.use("*", (req, res, next) => {
@@ -369,8 +396,9 @@ async function main() {
         res.sendFile(path.join(__dirname, "..", "static", "index.html"));
     });
 
-    app.listen({ port }, () => {
+    httpServer.listen(port,() => {
         console.log(`🚀 Server ready at http://localhost:${port}`);
     });
+
 }
 main().catch((error) => console.log(error));
