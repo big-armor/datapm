@@ -198,6 +198,8 @@ export class PublishPackageCommandModule {
             const publishMethod = await this.obtainPublishMethod(oraRef, packageFile, PublishMethod.SCHEMA_ONLY);
 
             if (publishMethod === PublishMethod.SCHEMA_PROXY_DATA) {
+                throw new Error("Proxying data is not yet supported");
+
                 const sourceCredentials = new Map<string, DPMConfiguration>();
                 credentialsByPackageIdentifier.packages.set(
                     targetRegistryActionResponse.targetRegistry + "/" + catalogSlugActionResponse.catalogSlug,
@@ -662,12 +664,12 @@ export class PublishPackageCommandModule {
                     title: "Publish schema, client direct connects for data",
                     selected: defaultValue === PublishMethod.SCHEMA_ONLY,
                     value: PublishMethod.SCHEMA_ONLY
-                },
+                } /*,
                 {
                     title: "Publish schema, proxy data through registry",
                     selected: defaultValue === PublishMethod.SCHEMA_PROXY_DATA,
                     value: PublishMethod.SCHEMA_PROXY_DATA
-                },
+                } */,
                 {
                     title: "Publish schema and data to registry",
                     selected: defaultValue === PublishMethod.SCHEMA_AND_DATA,
