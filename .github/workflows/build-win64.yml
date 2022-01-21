@@ -13,6 +13,15 @@ jobs:
                   node-version: "14"
                   architecture: "x64" # optional, x64 or x86. If not specified, x64 will be used by default
 
+            - name: Update NPM
+              run: npm install -g npm@8.3.2
+
+            - name: Print npm verion
+              run: npm --version
+
+            - name: Print node verion
+              run: node --version
+
             - name: Cache Root Node_modules
               if: steps.cache-root-node-modules.outputs.cache-hit != 'true'
               id: cache-root-node-modules
