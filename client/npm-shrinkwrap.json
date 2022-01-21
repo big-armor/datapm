@@ -1,12 +1,12 @@
 {
     "name": "datapm-client",
-    "version": "0.6.273",
+    "version": "0.8.2",
     "lockfileVersion": 2,
     "requires": true,
     "packages": {
         "": {
             "name": "datapm-client",
-            "version": "0.6.273",
+            "version": "0.8.2",
             "license": "CC-BY-NC-ND-4.0",
             "dependencies": {
                 "@apollo/client": "^3.2.5",
@@ -23,7 +23,7 @@
                 "crypto": "^1.0.1",
                 "csv-parse": "^4.11.1",
                 "csv-stringify": "^5.5.0",
-                "datapm-lib": "^0.6.273",
+                "datapm-lib": "^0.8.2",
                 "death": "^1.1.0",
                 "dockerode": "^3.2.1",
                 "faker": "^5.1.0",
@@ -4848,6 +4848,14 @@
                 "node": ">=0.12.0"
             }
         },
+        "node_modules/base62": {
+            "version": "2.0.1",
+            "resolved": "https://registry.npmjs.org/base62/-/base62-2.0.1.tgz",
+            "integrity": "sha512-4t4WQK7mdbcWzqEBiq6tfo2qDCeIZGXvjifJZyxHIVcjQkZJxpFtu/pa2Va69OouCkg6izZ08hKnPxroeDyzew==",
+            "engines": {
+                "node": ">=6.0.0"
+            }
+        },
         "node_modules/base64-arraybuffer": {
             "version": "1.0.1",
             "resolved": "https://registry.npmjs.org/base64-arraybuffer/-/base64-arraybuffer-1.0.1.tgz",
@@ -6387,12 +6395,13 @@
             "dev": true
         },
         "node_modules/datapm-lib": {
-            "version": "0.6.273",
-            "resolved": "https://registry.npmjs.org/datapm-lib/-/datapm-lib-0.6.273.tgz",
-            "integrity": "sha512-40xiqAjFflTvaiJTFJxiX65T0E1hdij2uk6nnoMDBPKK+1uRjFQ3nPyf2vl+kABNiNiNdZT3tcfInZLh2aAQ+w==",
+            "version": "0.8.2",
+            "resolved": "https://registry.npmjs.org/datapm-lib/-/datapm-lib-0.8.2.tgz",
+            "integrity": "sha512-76sCF3glqG/FEkkPuRkQM6GbG98IVYT+4PYdgIBw5Cnjb0mpQDR4QlmU4o6byj6YHP4gbFHbjYOmDVcz8u77uQ==",
             "dependencies": {
                 "@types/semver": "^7.3.4",
                 "ajv": "^6.12.6",
+                "base62": "^2.0.1",
                 "cross-fetch": "^3.0.6",
                 "fast-deep-equal": "^3.1.3",
                 "semver": "^7.3.2"
@@ -15842,6 +15851,7 @@
             "version": "0.5.3",
             "resolved": "https://registry.npmjs.org/source-map-resolve/-/source-map-resolve-0.5.3.tgz",
             "integrity": "sha512-Htz+RnsXWk5+P2slx5Jh3Q66vhQj1Cllm0zvnaY98+NFx+Dv2CF/f5O/t8x+KaNdrdIAsruNzoh/KpialbqAnw==",
+            "deprecated": "See https://github.com/lydell/source-map-resolve#deprecated",
             "dependencies": {
                 "atob": "^2.1.2",
                 "decode-uri-component": "^0.2.0",
@@ -15872,7 +15882,8 @@
         "node_modules/source-map-url": {
             "version": "0.4.1",
             "resolved": "https://registry.npmjs.org/source-map-url/-/source-map-url-0.4.1.tgz",
-            "integrity": "sha512-cPiFOTLUKvJFIg4SKVScy4ilPPW6rFgMgfuZJPNoDuMs3nC1HbMUycBoJw77xFIp6z1UJQJOfx6C9GMH80DiTw=="
+            "integrity": "sha512-cPiFOTLUKvJFIg4SKVScy4ilPPW6rFgMgfuZJPNoDuMs3nC1HbMUycBoJw77xFIp6z1UJQJOfx6C9GMH80DiTw==",
+            "deprecated": "See https://github.com/lydell/source-map-url#deprecated"
         },
         "node_modules/sparkles": {
             "version": "1.0.1",
@@ -16241,6 +16252,7 @@
             "version": "6.1.0",
             "resolved": "https://registry.npmjs.org/superagent/-/superagent-6.1.0.tgz",
             "integrity": "sha512-OUDHEssirmplo3F+1HWKUrUjvnQuA+nZI6i/JJBdXb5eq9IyEQwPyPpqND+SSsxf6TygpBEkUjISVRN4/VOpeg==",
+            "deprecated": "Please upgrade to v7.0.2+ of superagent.  We have fixed numerous issues with streams, form-data, attach(), filesystem errors not bubbling up (ENOENT on attach()), and all tests are now passing.  See the releases tab for more information at <https://github.com/visionmedia/superagent/releases>. Thanks to @shadowgate15, @spence-s, and @niftylettuce. Superagent is sponsored by Forward Email at <https://forwardemail.net>.",
             "dev": true,
             "dependencies": {
                 "component-emitter": "^1.3.0",
@@ -22052,6 +22064,11 @@
             "integrity": "sha1-tYLexpPC8R6JPPBk7mrFthMaIgI=",
             "dev": true
         },
+        "base62": {
+            "version": "2.0.1",
+            "resolved": "https://registry.npmjs.org/base62/-/base62-2.0.1.tgz",
+            "integrity": "sha512-4t4WQK7mdbcWzqEBiq6tfo2qDCeIZGXvjifJZyxHIVcjQkZJxpFtu/pa2Va69OouCkg6izZ08hKnPxroeDyzew=="
+        },
         "base64-arraybuffer": {
             "version": "1.0.1",
             "resolved": "https://registry.npmjs.org/base64-arraybuffer/-/base64-arraybuffer-1.0.1.tgz",
@@ -23320,12 +23337,13 @@
             "dev": true
         },
         "datapm-lib": {
-            "version": "0.6.273",
-            "resolved": "https://registry.npmjs.org/datapm-lib/-/datapm-lib-0.6.273.tgz",
-            "integrity": "sha512-40xiqAjFflTvaiJTFJxiX65T0E1hdij2uk6nnoMDBPKK+1uRjFQ3nPyf2vl+kABNiNiNdZT3tcfInZLh2aAQ+w==",
+            "version": "0.8.2",
+            "resolved": "https://registry.npmjs.org/datapm-lib/-/datapm-lib-0.8.2.tgz",
+            "integrity": "sha512-76sCF3glqG/FEkkPuRkQM6GbG98IVYT+4PYdgIBw5Cnjb0mpQDR4QlmU4o6byj6YHP4gbFHbjYOmDVcz8u77uQ==",
             "requires": {
                 "@types/semver": "^7.3.4",
                 "ajv": "^6.12.6",
+                "base62": "^2.0.1",
                 "cross-fetch": "^3.0.6",
                 "fast-deep-equal": "^3.1.3",
                 "semver": "^7.3.2"

@@ -40,7 +40,7 @@
         "cron": "^1.8.2",
         "csv-parse": "^4.16.3",
         "dataloader": "^2.0.0",
-        "datapm-lib": "^0.6.273",
+        "datapm-lib": "^0.8.2",
         "express-enforces-ssl": "^1.1.0",
         "express-http-proxy": "^1.6.0",
         "express-jwt": "^6.0.0",
@@ -88,13 +88,10 @@
         "@types/cron": "^1.7.2",
         "@types/express-enforces-ssl": "^1.1.1",
         "@types/express-http-proxy": "^1.6.1",
-        "@types/graphql-fields": "^1.3.2",
-        "@types/gulp": "^4.0.6",
         "@types/fs-extra": "^9.0.11",
+        "@types/graphql-fields": "^1.3.2",
         "@types/graphql-upload": "^8.0.6",
-        "@types/node-fetch": "^2.5.11",
-        "@types/nodemailer": "^6.4.0",
-        "@types/sharp": "^0.26.0",
+        "@types/gulp": "^4.0.6",
         "@types/gulp-install": "^0.6.31",
         "@types/helmet": "0.0.47",
         "@types/json-schema": "^7.0.5",
@@ -104,7 +101,10 @@
         "@types/mocha": "^8.0.3",
         "@types/mustache": "^4.1.1",
         "@types/node": "^12.19.0",
+        "@types/node-fetch": "^2.5.11",
+        "@types/nodemailer": "^6.4.0",
         "@types/semver": "^7.3.4",
+        "@types/sharp": "^0.26.0",
         "@types/superagent": "^4.1.10",
         "@types/uuid": "^8.0.0",
         "apollo-link-error": "^1.1.13",
@@ -129,5 +129,6 @@
         "tsc-watch": "^4.2.3",
         "tslint": "^6.1.2",
         "typescript": "^4.4.2"
-    }
+    },
+    "version": "0.8.0"
 }
