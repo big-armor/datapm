@@ -110,7 +110,7 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
             return;
         }
 
-        setTimeout(() => this.startSending(fetchRequest, batchEntity.id),1);
+        setTimeout(() => this.startSendingWrapper(fetchRequest, batchEntity.id),1);
 
     }
 
@@ -137,6 +137,19 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
 
         
         
+    }
+
+    async startSendingWrapper(startRequest: StartFetchRequest, batchId: number): Promise<void> {
+        try {
+            await this.startSending(startRequest, batchId);
+        } catch (error) {
+            console.log("Error while reading data.");
+            console.log("Start Request: " + JSON.stringify(startRequest));
+            console.log("Batch Id: " + batchId);
+            console.log("Error: " + JSON.stringify(error));
+            this.socket.emit(this.channelName, new ErrorResponse("ERROR_READING_DATA", SocketError.SERVER_ERROR));
+            this.stop("server");
+        }
     }
 
     async startSending(startRequest:StartFetchRequest, batchId: number): Promise<void> {

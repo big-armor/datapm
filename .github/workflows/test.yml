@@ -71,7 +71,7 @@ jobs:
     testLib:
         name: "Test Lib"
         needs: lint
-        timeout-minutes: 5
+        timeout-minutes: 10
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -113,7 +113,7 @@ jobs:
     testBackend:
         name: "Test Backend"
         needs: lint
-        timeout-minutes: 5
+        timeout-minutes: 10
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -177,7 +177,7 @@ jobs:
     testFrontend:
         name: "Test Frontend"
         needs: lint
-        timeout-minutes: 5
+        timeout-minutes: 10
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
