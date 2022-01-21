@@ -14,4 +14,3 @@ export * from "./TimeoutPromise";
 export * from "./SocketUtil";
 export * from "./DataHandlingUtil";
 export * from "./APIKeyUtil";
-export * from "./transforms/BatchingTransform";

@@ -7,7 +7,6 @@ import {
     Schema,
     Source,
     RecordContext,
-    BatchingTransform,
     RecordStreamContext
 } from "datapm-lib";
 import moment from "moment";
@@ -28,6 +27,7 @@ import { getRepositoryDescriptionByType } from "../repository/RepositoryUtil";
 import { getRepositoryCredential } from "./ConfigUtil";
 import { obtainCredentialsConfiguration } from "./CredentialsUtil";
 import { Ora } from "ora";
+import { BatchingTransform } from "../transforms/BatchingTransform";
 
 export enum DeconflictOptions {
     CAST_TO_BOOLEAN = "CAST_TO_BOOLEAN",

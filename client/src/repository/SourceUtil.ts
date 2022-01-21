@@ -6,8 +6,7 @@ import {
     Properties,
     Schema,
     StreamStats,
-    ValueTypes,
-    BatchingTransform
+    ValueTypes
 } from "datapm-lib";
 import { Writable } from "stream";
 import { clearInterval } from "timers";
@@ -27,6 +26,7 @@ import {
 import { RepositoryDescription } from "./Repository";
 import { JSONSchema7TypeName } from "json-schema";
 import { EXTENDED_REPOSITORIES } from "./RepositoryUtil";
+import { BatchingTransform } from "../transforms/BatchingTransform";
 
 export async function getSourcesDescriptions(): Promise<SourceDescription[]> {
     const returnValue: SourceDescription[] = [];
