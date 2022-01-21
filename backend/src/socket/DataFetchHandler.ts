@@ -3,7 +3,7 @@ import { checkPackagePermission, RequestHandler } from "./SocketHandler";
 import SocketIO from 'socket.io';
 import { Permission } from "../generated/graphql";
 import { EventEmitter, Transform } from "stream";
-import {BatchRepositoryIdentifier, DataAcknowledge, DataSend, DataStop, DataStopAcknowledge, ErrorResponse, FetchRequest, FetchRequestType, FetchResponse, OpenFetchChannelRequest, OpenFetchChannelResponse, RecordContext, Request, Response, SocketError, SocketEvent, StartFetchRequest, DPMRecord, DataRecordContext } from "datapm-lib";
+import {BatchRepositoryIdentifier, DataAcknowledge, DataSend, DataStop, DataStopAcknowledge, ErrorResponse, FetchRequest, FetchRequestType, FetchResponse, OpenFetchChannelRequest, OpenFetchChannelResponse, RecordContext, Request, Response, SocketError, SocketEvent, StartFetchRequest, DPMRecord, DataRecordContext, SocketResponseType } from "datapm-lib";
 import { PackageRepository } from "../repository/PackageRepository";
 import { DataStorageService, IterableDataFiles } from "../storage/data/data-storage";
 import { DataBatchRepository } from "../repository/DataBatchRepository";
@@ -178,7 +178,7 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
                     }
                 })
 
-                const batchTransform = new BatchingTransform(10);
+                const batchTransform = new BatchingTransform(250);
     
                 dataFile.readable.pipe(offsetFilterTransform);
                 offsetFilterTransform.pipe(batchTransform);
@@ -193,7 +193,12 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
                     batchTransform.pause();
 
                     const dataSend = new DataSend(data);
-                    this.socket.emit(this.channelName, dataSend, (response: DataAcknowledge ) => {
+                    this.socket.emit(this.channelName, dataSend, (response: DataAcknowledge | ErrorResponse) => {
+
+                        if(response.responseType == SocketResponseType.ERROR) {
+                            console.log("Error from client: " + JSON.stringify(response));
+                        }
+
                         batchTransform.resume();
                     });
     
