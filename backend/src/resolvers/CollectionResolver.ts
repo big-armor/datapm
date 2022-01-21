@@ -63,7 +63,18 @@ export const collectionSlugAvailable = async (
         return false;
     }
 
-    return (await getCollectionFromCacheOrDbOrFail(context, context.connection, collectionSlug)) == null;
+    try {
+
+        const collection = await getCollectionFromCacheOrDbOrFail(context, context.connection, collectionSlug)
+
+        return collection == null;
+        
+    } catch (e) {
+        if(e.message.includes("NOT_FOUND")) {
+            return true;
+        }
+        throw e;
+    }
 };
 
 export const usersByCollection = async (

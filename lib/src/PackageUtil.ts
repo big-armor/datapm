@@ -824,26 +824,21 @@ export function validatePackageFile(packageFile: string): void {
 
     const schemaVersion = getSchemaVersionFromPackageFile(packageFileObject);
 
+    const schemaFileName = "packageFileSchema-v" + schemaVersion + ".json";
+
     try {
-        const pathToDataPmLib = "../";
-        packageSchemaFile = fs.readFileSync(
-            path.join(pathToDataPmLib, "packageFileSchema-v" + schemaVersion + ".json"),
-            "utf8"
-        );
+        const pathToSchemaFile = path.join(__dirname, "..", schemaFileName);
+        packageSchemaFile = fs.readFileSync(pathToSchemaFile, "utf8");
     } catch (error) {
         try {
-            packageSchemaFile = fs.readFileSync(
-                "node_modules" + path.sep + "datapm-lib" + path.sep + "packageFileSchema-v" + schemaVersion + ".json",
-                "utf8"
-            );
+            const pathToSchemaFile = path.join("node_modules", "datapm-lib", schemaFileName);
+            packageSchemaFile = fs.readFileSync(pathToSchemaFile, "utf8");
         } catch (error) {
             try {
-                packageSchemaFile = fs.readFileSync("packageFileSchema-v" + schemaVersion + ".json", "utf8");
+                packageSchemaFile = fs.readFileSync(schemaFileName, "utf8");
             } catch (error) {
-                packageSchemaFile = fs.readFileSync(
-                    path.join("..", "lib", "packageFileSchema-v" + schemaVersion + ".json"),
-                    "utf8"
-                );
+                const pathToSchemaFile = path.join(__dirname, "..", "lib", schemaFileName);
+                packageSchemaFile = fs.readFileSync(pathToSchemaFile, "utf8");
             }
         }
     }

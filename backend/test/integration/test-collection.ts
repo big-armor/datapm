@@ -14,7 +14,8 @@ import {
     CollectionPackagesDocument,
     CreateVersionDocument,
     UserCollectionsDocument,
-    RemovePackageFromCollectionDocument
+    RemovePackageFromCollectionDocument,
+    CollectionSlugAvailableDocument
 } from "./registry-client";
 import { createAnonymousClient, createUser } from "./test-utils";
 import { describe, it } from "mocha";
@@ -98,6 +99,42 @@ describe("Collection Tests", async () => {
 
         expect(findMyCollectionsA.data.myCollections.count).to.equal(1);
         expect(findMyCollectionsB.data.myCollections.count).to.equal(2);
+    });
+
+    it("Should return Collection slug not available", async function() {
+        let response = await userBClient.query({
+            query: CollectionSlugAvailableDocument,
+            variables: {
+                collectionSlug: "testA-collection"
+            }
+        });
+
+        expect(response.errors == null).equal(true);
+        expect(response.data.collectionSlugAvailable).equal(false);
+    });
+
+    it("Should return Collection slug not available for reserved word", async function() {
+        let response = await userBClient.query({
+            query: CollectionSlugAvailableDocument,
+            variables: {
+                collectionSlug: "trending"
+            }
+        });
+
+        expect(response.errors == null).equal(true);
+        expect(response.data.collectionSlugAvailable).equal(false);
+    });
+
+    it("Should return Collection slug available", async function() {
+        let response = await userBClient.query({
+            query: CollectionSlugAvailableDocument,
+            variables: {
+                collectionSlug: "something-that-is-not-taken-96"
+            }
+        });
+
+        expect(response.errors == null).equal(true);
+        expect(response.data.collectionSlugAvailable).equal(true);
     });
 
     it("Should allow user to create a package", async function () {
