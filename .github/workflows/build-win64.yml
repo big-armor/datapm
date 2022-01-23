@@ -79,12 +79,14 @@ jobs:
               working-directory: client
 
             - run: npm run package:win64
+              if: github.ref == 'refs/heads/master'
               working-directory: client
               env:
                   CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_BASE64 }}
                   CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_PASSWORD }}
 
             - name: "Save Windows Executable"
+              if: github.ref == 'refs/heads/master'
               uses: actions/upload-artifact@v2
               with:
                   name: datapm-client-windows
