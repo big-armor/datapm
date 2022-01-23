@@ -3,7 +3,7 @@ import { checkPackagePermission, RequestHandler } from "./SocketHandler";
 import SocketIO from 'socket.io';
 import { Permission } from "../generated/graphql";
 import { EventEmitter, Transform } from "stream";
-import {BatchRepositoryIdentifier, DataAcknowledge, DataSend, DataStop, DataStopAcknowledge, ErrorResponse, FetchRequest, FetchRequestType, FetchResponse, OpenFetchChannelRequest, OpenFetchChannelResponse, RecordContext, Request, Response, SocketError, SocketEvent, StartFetchRequest, DPMRecord, DataRecordContext } from "datapm-lib";
+import {BatchRepositoryIdentifier, DataAcknowledge, DataSend, DataStop, DataStopAcknowledge, ErrorResponse, FetchRequest, FetchRequestType, FetchResponse, OpenFetchChannelRequest, OpenFetchChannelResponse, RecordContext, Request, Response, SocketError, SocketEvent, StartFetchRequest, DPMRecord, DataRecordContext, SocketResponseType } from "datapm-lib";
 import { PackageRepository } from "../repository/PackageRepository";
 import { DataStorageService, IterableDataFiles } from "../storage/data/data-storage";
 import { DataBatchRepository } from "../repository/DataBatchRepository";
@@ -110,7 +110,7 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
             return;
         }
 
-        setTimeout(() => this.startSending(fetchRequest, batchEntity.id),1);
+        setTimeout(() => this.startSendingWrapper(fetchRequest, batchEntity.id),1);
 
     }
 
@@ -139,6 +139,19 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
         
     }
 
+    async startSendingWrapper(startRequest: StartFetchRequest, batchId: number): Promise<void> {
+        try {
+            await this.startSending(startRequest, batchId);
+        } catch (error) {
+            console.log("Error while reading data.");
+            console.log("Start Request: " + JSON.stringify(startRequest));
+            console.log("Batch Id: " + batchId);
+            console.log("Error: " + JSON.stringify(error));
+            this.socket.emit(this.channelName, new ErrorResponse("ERROR_READING_DATA", SocketError.SERVER_ERROR));
+            this.stop("server");
+        }
+    }
+
     async startSending(startRequest:StartFetchRequest, batchId: number): Promise<void> {
 
         const iterableDataStreams = await this.dataStorageService.readDataBatch(batchId, startRequest.offset);
@@ -165,7 +178,7 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
                     }
                 })
 
-                const batchTransform = new BatchingTransform(10);
+                const batchTransform = new BatchingTransform(250);
     
                 dataFile.readable.pipe(offsetFilterTransform);
                 offsetFilterTransform.pipe(batchTransform);
@@ -180,7 +193,12 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
                     batchTransform.pause();
 
                     const dataSend = new DataSend(data);
-                    this.socket.emit(this.channelName, dataSend, (response: DataAcknowledge ) => {
+                    this.socket.emit(this.channelName, dataSend, (response: DataAcknowledge | ErrorResponse) => {
+
+                        if(response.responseType == SocketResponseType.ERROR) {
+                            console.log("Error from client: " + JSON.stringify(response));
+                        }
+
                         batchTransform.resume();
                     });
     

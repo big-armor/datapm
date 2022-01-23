@@ -73,7 +73,7 @@ export class GoogleCloudStorage implements DPMStorage {
     public async listItems(namespace: string[]): Promise<string[]> {
         this.ensureConnectionEstablished();
         const fileList = await this.bucket.getFiles({ prefix: this.buildPath(namespace, "") });
-        return fileList.map((file) => {
+        return fileList[0].map((file) => {
             const parts = file.name.split("/");
             return parts[parts.length - 1];
         });

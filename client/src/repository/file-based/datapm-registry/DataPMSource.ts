@@ -125,9 +125,19 @@ export class DataPMSource implements Source {
                                         socket.on(
                                             openChannelResponse.channelName,
                                             async (
-                                                data: DataSend | DataStop,
+                                                dataOrError: DataSend | DataStop | ErrorResponse,
                                                 callback: (response: FetchResponse | ErrorResponse) => void
                                             ) => {
+                                                if (
+                                                    (dataOrError as ErrorResponse).responseType ===
+                                                    SocketResponseType.ERROR
+                                                ) {
+                                                    // TODO provide context to alert of errors
+                                                    return;
+                                                }
+
+                                                const data = dataOrError as DataSend | DataStop;
+
                                                 if (data.requestType === FetchRequestType.STOP) {
                                                     duplex.end();
                                                     socket.off(openChannelResponse.channelName);
