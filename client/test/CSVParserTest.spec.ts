@@ -1,10 +1,10 @@
 import { expect } from "chai";
+import { RecordContext } from "datapm-lib";
 import fs from "fs";
 import { test } from "mocha";
 import { Transform } from "stream";
 
 import { CSVParser } from "../src/repository/file-based/parser/CSVParser";
-import { RecordContext } from "../src/repository/Source";
 
 describe("Checking transforms", () => {
     test("DPM record transform test", () => {

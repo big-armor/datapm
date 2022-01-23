@@ -1,11 +1,11 @@
 import { expect } from "chai";
-import { createTestPackage, getPromptInputs, testCmd, TEST_SOURCE_FILES, removePackageFiles, KEYS } from "./test-utils";
+import { createTestPackage, getPromptInputs, testCmd, TEST_SOURCE_FILES, removePackageFiles } from "./test-utils";
 import fs from "fs";
 
 describe("JSON Sink", function () {
     let packageAFilePath: string;
 
-    const jsonSinkPrompts = ["Do you want to use the default options?", "File Location?"];
+    const jsonSinkPrompts = ["File Location?"];
 
     const getJSONSinkPrompts = (inputs?: string[], skip = 0, count = 20) =>
         getPromptInputs(jsonSinkPrompts, inputs, skip, count);
@@ -24,7 +24,7 @@ describe("JSON Sink", function () {
     });
 
     it("Should write JSON output", async () => {
-        const prompts = getJSONSinkPrompts([KEYS.DOWN, "./"]);
+        const prompts = getJSONSinkPrompts(["./"]);
 
         const cmdResult = await testCmd(
             "fetch",

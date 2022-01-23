@@ -1,3 +1,4 @@
+import { IncomingMessage } from "http";
 import url from "url";
 
 export function nameToSlug(name: string): string {
@@ -12,7 +13,31 @@ export function nameToSlug(name: string): string {
     return withoutSurroundingDashes2;
 }
 
-export function nameFromUrls(uris: string[]): string {
+export function fileNameFromUrl(url: string, response?: IncomingMessage): string {
+    const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+
+    let fileName: string | null = null;
+
+    if (response?.headers["content-disposition"]) {
+        const disposition = response.headers["content-disposition"];
+        const matches = filenameRegex.exec(disposition);
+        if (matches != null && matches[1]) fileName = matches[1].replace(/['"]/g, "");
+    }
+
+    if (!fileName) {
+        // TODO support URLs with query parameters, etc
+
+        // Use the last part of the path
+        const urlParts = url.split("/");
+
+        fileName = urlParts[url.endsWith("/") ? urlParts.length - 2 : urlParts.length - 1];
+        fileName = fileName.split("?")[0];
+    }
+
+    return fileName;
+}
+
+export function nameFromFileUris(uris: string[]): string {
     const names: string[] = [];
 
     for (const uri of uris) {

@@ -4,6 +4,7 @@ import { Connection, EntityManager } from "typeorm";
 import { AuthenticatedContext, Context } from "../context";
 import { resolveCatalogPermissions } from "../directive/hasCatalogPermissionDirective";
 import { CatalogEntity } from "../entity/CatalogEntity";
+import { UserEntity } from "../entity/UserEntity";
 import {
     ActivityLogChangeType,
     ActivityLogEventType,
@@ -20,6 +21,7 @@ import { getAllCatalogPermissions, UserCatalogPermissionRepository } from "../re
 import { CatalogRepository } from "../repository/CatalogRepository";
 import { PackageRepository } from "../repository/PackageRepository";
 import { ImageStorageService } from "../storage/images/image-storage-service";
+import { isAuthenticatedContext } from "../util/contextHelpers";
 import { getEnvVariable } from "../util/getEnvVariable";
 import { getGraphQlRelationName, getRelationNames } from "../util/relationNames";
 import { deleteFollowsByIds, getCatalogFollowsByCatalogId } from "./FollowResolver";
@@ -116,7 +118,14 @@ export const catalogCreator = async (parent: Catalog, _1: any, context: Context,
 
 export const myCatalogPermissions = async (parent: Catalog, _1: any, context: Context) => {
     const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
-    return resolveCatalogPermissions(context, { catalogSlug: catalog.slug }, context.me);
+
+    let user: UserEntity | undefined;
+
+    if(isAuthenticatedContext(context)) {
+        user = (context as AuthenticatedContext).me;
+    }
+
+    return resolveCatalogPermissions(context, { catalogSlug: catalog.slug }, user);
 };
 
 export const userCatalogs = async (
@@ -139,13 +148,16 @@ export const userCatalogs = async (
 
 export const catalogPackagesForUser = async (parent: Catalog, _1: any, context: Context, info: any) => {
     const catalog = await getCatalogFromCacheOrDbOrFail(context, parent.identifier);
+    
+    const user: UserEntity | undefined = (context as AuthenticatedContext).me;
+
     if (!(await hasCatalogPermissions(context, catalog, Permission.VIEW))) {
         return [];
     }
 
     const packages = await context.connection.getCustomRepository(PackageRepository).catalogPackagesForUser({
         catalogId: catalog.id,
-        user: context.me,
+        user,
         relations: getGraphQlRelationName(info)
     });
 
@@ -374,7 +386,7 @@ export const getCatalogByIdentifierOrFail = async (
     );
 
     if (catalog == null) {
-        throw new UserInputError("CATALOG_NOT_FOUND");
+        throw new UserInputError("CATALOG_NOT_FOUND: " + identifier.catalogSlug);
     }
 
     return catalogEntityToGraphQL(catalog);

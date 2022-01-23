@@ -26,7 +26,7 @@ import {
 } from "./test-utils";
 
 // Prompts
-const publishCommandPrompts = ["Target registry?", "Catalog short name?"];
+const publishCommandPrompts = ["Target registry?", "Catalog short name?", "Data Access Method?", "Is the above ok?"];
 
 const getPublishCommandPromptInputs = (inputs?: string[], skip = 0, count = 20) =>
     getPromptInputs(publishCommandPrompts, inputs, skip, count);
@@ -494,7 +494,11 @@ describe("Update Package Command Tests", async () => {
             [`http://localhost:${registryServerPort}/testa-update-command/test`],
             prompts,
             async (line: string) => {
-                if (line.includes("The registry reports that you do not have permission to edit this package")) {
+                if (
+                    line.includes(
+                        "You do not have permission to edit this package. Contact the package manager to request edit permission"
+                    )
+                ) {
                     results.messageFound = true;
                 }
             }
@@ -522,11 +526,7 @@ describe("Update Package Command Tests", async () => {
         };
 
         const cmdResult = await testCmd("update", [packageAFilePath, "--defaults"], [], async (line: string) => {
-            if (
-                line.includes(
-                    "You do not have an API key configured for this registry. You must first create an API Key, and add it to this client. Then you can retry this command"
-                )
-            ) {
+            if (line.includes("You are not logged in to the registry. Use the following command to login")) {
                 results.messageFound = true;
             }
         });
@@ -571,8 +571,8 @@ describe("Update Package Command Tests", async () => {
             "",
             "This is a short description",
             "https://old-website",
-            "10",
-            ""
+            "10", // number of records
+            "no" // publish to registry
         ]);
         const results: TestResults = {
             exitCode: -1,

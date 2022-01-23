@@ -1,15 +1,14 @@
 import bufferPeek from "buffer-peek-stream";
 import chalk from "chalk";
-import { DPMConfiguration } from "datapm-lib";
+import { StreamState, DPMConfiguration, UpdateMethod } from "datapm-lib";
 import numeral from "numeral";
 import streamMmmagic from "stream-mmmagic";
 import { Parameter, ParameterType } from "../../util/parameters/Parameter";
-import { StreamSetPreview, SourceInspectionContext, InspectionResults, Source, UpdateMethod } from "../Source";
+import { StreamSetPreview, SourceInspectionContext, InspectionResults, Source } from "../Source";
 import { Maybe } from "../../util/Maybe";
 import { getParser, getParserByMimeType, getParsers } from "./parser/ParserUtil";
 import { LogType } from "../../util/LoggingUtils";
-import { nameFromUrls } from "../../util/NameUtil";
-import { StreamState } from "../Sink";
+import { nameFromFileUris } from "../../util/NameUtil";
 import { FileBufferSummary, FileStreamContext, Parser } from "./parser/Parser";
 import { asyncMap } from "../../util/AsyncUtils";
 
@@ -60,7 +59,7 @@ export abstract class AbstractFileStreamSource implements Source {
             );
         }
 
-        const displayName = nameFromUrls(uris);
+        const displayName = nameFromFileUris(uris);
 
         return {
             defaultDisplayName: displayName,
@@ -84,7 +83,7 @@ export abstract class AbstractFileStreamSource implements Source {
             configuration
         );
 
-        const commonFileName = nameFromUrls(fileStreamSummaries.map((f) => f.uri));
+        const commonFileName = nameFromFileUris(fileStreamSummaries.map((f) => f.uri));
 
         if (fileStreamSummaries.length === 0) {
             throw new Error("NO_FILE_STREAM_FOUND");

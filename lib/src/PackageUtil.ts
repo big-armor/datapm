@@ -1,24 +1,27 @@
 import { SemVer } from "semver";
-import {
-    Schema,
-    PackageFile,
-    CountPrecision,
-    PackageFileV010,
-    PackageFileV030,
-    Source,
-    StreamSet,
-    ValueTypeStatistics,
-    PackageFile040
-} from "./main";
 import fs from "fs";
 import path from "path";
 import AJV from "ajv";
 import fetch from "cross-fetch";
+import { PackageFileV010 } from "./PackageFile-v0.1.0";
 import { PackageFileV020 } from "./PackageFile-v0.2.0";
 
 import deepEqual from "fast-deep-equal";
-import { CountPrecisionV030 } from "./PackageFile-v0.3.0";
+import { PackageFileV030, CountPrecisionV030 } from "./PackageFile-v0.3.0";
+import { PackageFile040 } from "./PackageFile-v0.4.0";
 import { PackageFile050 } from "./PackageFile-v0.5.0";
+import { PackageFile060 } from "./PackageFile-v0.6.0";
+import { PackageFile070 } from "./PackageFile-v0.7.0";
+import {
+    CountPrecision,
+    PackageFile,
+    PublishMethod,
+    RegistryReference,
+    Schema,
+    Source,
+    StreamSet,
+    ValueTypeStatistics
+} from "./PackageFile-v0.8.0";
 
 export type DPMRecordValue =
     | number
@@ -34,6 +37,36 @@ export type DPMConfiguration = Record<
     string,
     number | string | boolean | { [key: string]: unknown } | string[] | number[] | boolean[] | null
 >;
+
+/** Created by Source implementations to identify the record. And passed through the processes
+ * that transmit or persit the record
+ */
+export interface RecordContext {
+    schemaSlug: string;
+
+    record: DPMRecord;
+
+    /** The offset used to resume at this point */
+    offset?: number;
+}
+
+/** Created by the internal system to identify a record received from a source, and tag it with additional properties */
+export interface RecordStreamContext {
+    /** The source type (unique identifier of the source implementation) from which the record was produced */
+    sourceType: string;
+
+    /** The source slug defined by the source implementation, that uniquely identifies this source configuration in the package file */
+    sourceSlug: string;
+
+    /** The unique stream set slug from which the record was produced. */
+    streamSetSlug: string;
+
+    /** The unique stream slug from which the record was produced.  */
+    streamSlug: string;
+
+    /** The wrapped recordContext - which comes from the Source */
+    recordContext: RecordContext;
+}
 
 export enum Compability {
     Identical = 0,
@@ -691,6 +724,27 @@ export function upgradePackageFile(packageFileObject: any): PackageFile {
         }
     }
 
+    if (packageFileObject.$schema === "https://datapm.io/docs/package-file-schema-v0.6.0.json") {
+        packageFileObject.$schema = "https://datapm.io/docs/package-file-schema-v0.7.0.json";
+
+        const oldPackageFile = packageFileObject as PackageFile060;
+
+        for (const oldRegistry of oldPackageFile.registries || []) {
+            const newRegistry = oldRegistry as RegistryReference;
+            newRegistry.publishMethod = PublishMethod.SCHEMA_ONLY;
+        }
+    }
+
+    if (packageFileObject.$schema === "https://datapm.io/docs/package-file-schema-v0.7.0.json") {
+        packageFileObject.$schema = "https://datapm.io/docs/package-file-schema-v0.8.0.json";
+
+        const oldPackageFile = packageFileObject as PackageFile070;
+
+        if ((oldPackageFile as PackageFile).canonical == null) {
+            (oldPackageFile as PackageFile).canonical = true;
+        }
+    }
+
     return packageFileObject as PackageFile;
 }
 
@@ -770,26 +824,21 @@ export function validatePackageFile(packageFile: string): void {
 
     const schemaVersion = getSchemaVersionFromPackageFile(packageFileObject);
 
+    const schemaFileName = "packageFileSchema-v" + schemaVersion + ".json";
+
     try {
-        const pathToDataPmLib = require.resolve("datapm-lib").replace(path.sep + "src" + path.sep + "main.js", "");
-        packageSchemaFile = fs.readFileSync(
-            path.join(pathToDataPmLib, "packageFileSchema-v" + schemaVersion + ".json"),
-            "utf8"
-        );
+        const pathToSchemaFile = path.join(__dirname, "..", schemaFileName);
+        packageSchemaFile = fs.readFileSync(pathToSchemaFile, "utf8");
     } catch (error) {
         try {
-            packageSchemaFile = fs.readFileSync(
-                "node_modules" + path.sep + "datapm-lib" + path.sep + "packageFileSchema-v" + schemaVersion + ".json",
-                "utf8"
-            );
+            const pathToSchemaFile = path.join("node_modules", "datapm-lib", schemaFileName);
+            packageSchemaFile = fs.readFileSync(pathToSchemaFile, "utf8");
         } catch (error) {
             try {
-                packageSchemaFile = fs.readFileSync("packageFileSchema-v" + schemaVersion + ".json", "utf8");
+                packageSchemaFile = fs.readFileSync(schemaFileName, "utf8");
             } catch (error) {
-                packageSchemaFile = fs.readFileSync(
-                    path.join("..", "lib", "packageFileSchema-v" + schemaVersion + ".json"),
-                    "utf8"
-                );
+                const pathToSchemaFile = path.join(__dirname, "..", "lib", schemaFileName);
+                packageSchemaFile = fs.readFileSync(pathToSchemaFile, "utf8");
             }
         }
     }

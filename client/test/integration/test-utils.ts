@@ -16,6 +16,7 @@ import {
     VerifyEmailAddressDocument
 } from "./registry-client";
 import { dataServerPort, mailDevWebPortNumber, registryServerPort } from "./setup";
+import { createAPIKeyFromParts } from "datapm-lib";
 
 export const KEYS = {
     ENTER: "\n",
@@ -45,7 +46,7 @@ export function setTestSourceFiles(): void {
     TEST_SOURCE_FILES = {
         HTTP1: `http://localhost:${dataServerPort}/state-codes.csv`,
         HTTP2: `http://localhost:${dataServerPort}/non-existing.csv`, // purposefully not-existing
-        GOOGLESHEET1: `https://docs.google.com/spreadsheets/d/1VexA0EwribV20dBUmpyM67esl1QjOwkL-QUuzIL2kjo/edit#gid=380454798`,
+        GOOGLESHEET1: `https://docs.google.com/spreadsheets/d/1KSrO9svsYoZQgVCOxmMEZTsNzDWe4N7Czazc6BhdPwc/edit?usp=sharing`,
         FILE1: "file://./test/sources/covid-02-01-2020.csv",
         FILE2: "file://./test/sources/covid-03-01-2020.csv",
         FILE3: "file://./test/sources/test-date-data.csv",
@@ -251,9 +252,7 @@ export async function createApiKey(userClient: ApolloClient<NormalizedCacheObjec
 
     if (response.data == null) throw new Error("Error while creating api key");
 
-    const apiKey = Buffer.from(response.data.createAPIKey.id + "." + response.data.createAPIKey.secret).toString(
-        "base64"
-    );
+    const apiKey = createAPIKeyFromParts(response.data.createAPIKey.id, response.data.createAPIKey.secret);
     return apiKey;
 }
 
@@ -365,7 +364,7 @@ export function getPromptInputs(
     defaultPrompts: string[],
     inputs?: Array<string | null>,
     skip = 0,
-    lastIndex = 20
+    lastIndex = Number.MAX_SAFE_INTEGER
 ): PromptInput[] {
     const defaultPromptInputs: PromptInput[] = defaultPrompts.map((message) => ({
         message,
@@ -433,7 +432,9 @@ export async function createTestPackage(
             "Number of sample records?",
             "Publish to registry?",
             "Target registry?",
-            "Catalog short name?"
+            "Catalog short name?",
+            "Data Access Method?",
+            "Is the above ok?"
         ];
         const prompts = getPromptInputs(generatePackageCommandPrompts, [
             "",
@@ -448,14 +449,22 @@ export async function createTestPackage(
             description,
             "https://test.datapm-not-a-site.io",
             "10",
-            KEYS.DOWN,
-            KEYS.DOWN,
-            ""
+            "yes", // publish to registry
+            KEYS.DOWN, // target registry
+            "", // default catalog
+            "", // data access method,
+            "yes" // is the above ok
         ]);
         prompts.splice(6, 0, ...unitPrompts);
         await testCmd("package", options, prompts, async (line: string) => {
             if (line.includes("datapm fetch ")) {
                 const matches = line.match(/datapm\sfetch\s(.*)/);
+                if (matches == null) throw new Error("No matches");
+                packageFilePath = matches[1];
+            }
+
+            if (line.includes("datapm publish ")) {
+                const matches = line.match(/datapm\spublish\s(.*)/);
                 if (matches == null) throw new Error("No matches");
                 packageFilePath = matches[1];
             }

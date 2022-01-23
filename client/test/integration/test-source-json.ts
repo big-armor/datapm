@@ -41,7 +41,9 @@ describe("JSON Tests", function () {
         "Number of sample records?",
         "Publish to registry?",
         "Target registry?",
-        "Catalog short name?"
+        "Catalog short name?",
+        "Data Access Method?",
+        "Is the above ok?"
     ];
 
     it("Should read JSON", async () => {

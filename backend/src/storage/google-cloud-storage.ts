@@ -33,7 +33,12 @@ export class GoogleCloudStorage implements DPMStorage {
         this.ensureConnectionEstablished();
     }
 
-    public async deleteItem(namespace: string, itemId: string) {
+    public async deleteAllItems(namespace: string[]): Promise<void> {
+        this.ensureConnectionEstablished();
+        await this.bucket.deleteFiles({ prefix: this.buildPath(namespace, "") });
+    }
+
+    public async deleteItem(namespace: string[], itemId: string) {
         this.ensureConnectionEstablished();
         const file = await this.getBucketFile(namespace, itemId);
 
@@ -44,14 +49,14 @@ export class GoogleCloudStorage implements DPMStorage {
         await file.delete();
     }
 
-    public async itemExists(namespace: string, itemId: string): Promise<boolean> {
+    public async itemExists(namespace: string[], itemId: string): Promise<boolean> {
         this.ensureConnectionEstablished();
         const file = await this.getBucketFile(namespace, itemId);
 
         return (await file.exists())[0];
     }
 
-    public async getItem(namespace: string, itemId: string): Promise<Readable> {
+    public async getItem(namespace: string[], itemId: string): Promise<Readable> {
         this.ensureConnectionEstablished();
         const file = await this.getBucketFile(namespace, itemId);
 
@@ -65,14 +70,26 @@ export class GoogleCloudStorage implements DPMStorage {
         return Promise.resolve(fileReadStream);
     }
 
-    public async writeItem(namespace: string, itemId: string, byteStream: Readable, transformer?: any): Promise<void> {
+    public async listItems(namespace: string[]): Promise<string[]> {
+        this.ensureConnectionEstablished();
+        const fileList = await this.bucket.getFiles({ prefix: this.buildPath(namespace, "") });
+        return fileList[0].map((file) => {
+            const parts = file.name.split("/");
+            return parts[parts.length - 1];
+        });
+    }
+
+    public async writeStream(namespace: string[], itemId: string, byteStream: Readable, transformer?: any): Promise<void> {
         this.ensureConnectionEstablished();
         const file = await this.getBucketFile(namespace, itemId);
         const writeStream = file.createWriteStream();
         return this.streamHelper.copyToStream(byteStream, writeStream, transformer);
     }
 
-    public async moveFile(oldFilePath: string, newFilePath: string, callback: any): Promise<void> {
+    public async moveFile(oldNamespace: string[], oldItemId:string, newNamespace:string[], newItemId:string, callback: any): Promise<void> {
+        
+        const oldFilePath = this.buildPath(oldNamespace, oldItemId);
+        const newFilePath = this.buildPath(newNamespace, newItemId);
         const oldFile = await this.getBucketFileByPath(oldFilePath);
         oldFile.move(newFilePath, callback as MoveCallback);
     }
@@ -81,7 +98,7 @@ export class GoogleCloudStorage implements DPMStorage {
         return this.streamHelper.destroyOpenStreams();
     }
 
-    private async getBucketFile(namespace: string, itemId: string): Promise<File> {
+    private async getBucketFile(namespace: string[], itemId: string): Promise<File> {
         const filePath = this.buildPath(namespace, itemId);
         return this.getBucketFileByPath(filePath);
     }
@@ -90,8 +107,8 @@ export class GoogleCloudStorage implements DPMStorage {
         return this.bucket.file(path);
     }
 
-    private buildPath(namespace: string, itemId: string): string {
-        const itemPath = `${namespace}/${itemId}`;
+    private buildPath(namespace: string[], itemId: string): string {
+        const itemPath = `${namespace.join('/')}/${itemId}`;
         if (!this.pathPrefix) {
             return itemPath;
         }

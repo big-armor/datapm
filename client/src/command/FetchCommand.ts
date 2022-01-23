@@ -5,6 +5,8 @@ export class FetchArguments {
     sink?: string;
     defaults?: boolean;
     sinkConfig?: string;
+    sinkConnectionConfig?: string;
+    sinkCredentialsConfig?: string;
     quiet?: boolean;
     forceUpdate?: boolean;
 }
@@ -36,6 +38,12 @@ export class FetchCommand implements Command {
                     .option("sinkConfig", {
                         type: "string"
                     })
+                    .option("sinkConnectionConfig", {
+                        type: "string"
+                    })
+                    .option("sinkCredentialsConfig", {
+                        type: "string"
+                    })
                     .help();
             },
             handler: fetchPackage
@@ -49,6 +57,7 @@ export async function fetchPackage(args: FetchArguments): Promise<void> {
         await fetchCommand.fetchPackage(args);
     } catch (e) {
         console.error(e);
+        // TODO print full error message in debug mode
         process.exit(1);
     }
 }

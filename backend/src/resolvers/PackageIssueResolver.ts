@@ -20,6 +20,7 @@ import { getGraphQlRelationName } from "../util/relationNames";
 import { createActivityLog } from "../repository/ActivityLogRepository";
 import { PackageEntity } from "../entity/PackageEntity";
 import { Connection, EntityManager } from "typeorm";
+import { isAuthenticatedContext } from "../util/contextHelpers";
 
 export const getPackageIssue = async (
     _0: any,
@@ -405,11 +406,14 @@ async function hasPermissionsToEditIssue(
     packageIdentifier: PackageIdentifierInput,
     context: Context
 ): Promise<boolean> {
-    if (!context.me) {
+
+    if (!isAuthenticatedContext(context)) {
         return false;
     }
 
-    const packagePermissions = await resolvePackagePermissions(context, packageIdentifier, context.me);
+    const authenicatedContext = context as AuthenticatedContext;
+
+    const packagePermissions = await resolvePackagePermissions(context, packageIdentifier, authenicatedContext.me);
     return canEditIssue(issueEntity, packagePermissions, context);
 }
 
@@ -418,11 +422,15 @@ async function hasEditPermissionsForIssues(
     packageIdentifier: PackageIdentifierInput,
     context: Context
 ): Promise<boolean> {
-    if (!context.me) {
+
+    if (!isAuthenticatedContext(context)) {
         return false;
     }
 
-    const packagePermissions = await resolvePackagePermissions(context, packageIdentifier, context.me);
+    const authenicatedContext = context as AuthenticatedContext;
+
+
+    const packagePermissions = await resolvePackagePermissions(context, packageIdentifier, authenicatedContext.me);
     return hasPermissionsToEditIssues(issues, packagePermissions, context);
 }
 
@@ -435,15 +443,18 @@ function hasPermissionsToEditIssues(
 }
 
 function canEditIssue(issueEntity: PackageIssueEntity, packagePermissions: Permission[], context: Context): boolean {
-    if (!context.me) {
+
+    if (!isAuthenticatedContext(context)) {
         return false;
     }
+
+    const authenicatedContext = context as AuthenticatedContext;
 
     if (packagePermissions.includes(Permission.MANAGE)) {
         return true;
     }
 
-    return issueEntity.authorId === context.me.id;
+    return issueEntity.authorId === authenicatedContext.me.id;
 }
 
 function throwNotAuthorizedError() {

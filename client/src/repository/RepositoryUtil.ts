@@ -9,6 +9,7 @@ import { LocalFileRepositoryDescription } from "./file-based/local-file/LocalFil
 import { StandardOutRepositoryDescription } from "./file-based/standard-out/StandardOutRepositoryDescription";
 import { RepositoryDescription } from "./Repository";
 import { StreamTestRepositoryDescription } from "./stream/StreamTestRepositoryDescription";
+import { DataPMRepositoryDescription } from "./file-based/datapm-registry/DataPMRepositoryDescription";
 
 export const REPOSITORIES: RepositoryDescription[] = [
     new BigQueryRepositoryDescription(),
@@ -19,7 +20,8 @@ export const REPOSITORIES: RepositoryDescription[] = [
     new GoogleSheetRepositoryDescription(),
     new HTTPRepositoryDescription(),
     new LocalFileRepositoryDescription(),
-    new StandardOutRepositoryDescription()
+    new StandardOutRepositoryDescription(),
+    new DataPMRepositoryDescription()
 ];
 
 /** These are never presented to the user as an option, but are available if the user knows they exist.

@@ -28,7 +28,7 @@ export class ImageStorageService {
 
     public async savePackageCoverImage(packageId: number, imageBase64: string) {
         return this.saveImageFromBase64(
-            Prefixes.PACKAGE + "/" + packageId,
+            [Prefixes.PACKAGE ,packageId.toString()],
             ImageTypes.PACKAGE_COVER_IMAGE,
             imageBase64,
             new PackageCoverImageProcessor("image/jpeg")
@@ -37,7 +37,7 @@ export class ImageStorageService {
 
     public async saveCollectionCoverImage(collectionId: number, imageBase64: string) {
         return this.saveImageFromBase64(
-            Prefixes.COLLECTION + "/" + collectionId,
+            [Prefixes.COLLECTION ,collectionId.toString()],
             ImageTypes.COLLECTION_COVER_IMAGE,
             imageBase64,
             new CollectionCoverImageProcessor("image/jpeg")
@@ -46,7 +46,7 @@ export class ImageStorageService {
 
     public async saveCatalogAvatarImage(catalogId: number, imageBase64: string) {
         return this.saveImageFromBase64(
-            Prefixes.CATALOG + "/" + catalogId,
+            [Prefixes.CATALOG ,catalogId.toString()],
             ImageTypes.CATALOG_AVATAR,
             imageBase64,
             new CatalogAvatarImageProcessor("image/jpeg")
@@ -55,7 +55,7 @@ export class ImageStorageService {
 
     public async saveCatalogCoverImage(catalogId: number, imageBase64: string) {
         return this.saveImageFromBase64(
-            Prefixes.CATALOG + "/" + catalogId,
+            [Prefixes.CATALOG ,catalogId.toString()],
             ImageTypes.CATALOG_COVER_IMAGE,
             imageBase64,
             new CatalogCoverImageProcessor("image/jpeg")
@@ -64,7 +64,7 @@ export class ImageStorageService {
 
     public async saveUserAvatarImage(userId: number, imageBase64: string) {
         return this.saveImageFromBase64(
-            Prefixes.USER + "/" + userId,
+            [Prefixes.USER ,userId.toString()],
             ImageTypes.USER_AVATAR_IMAGE,
             imageBase64,
             new UserAvatarImageProcessor("image/jpeg")
@@ -73,7 +73,7 @@ export class ImageStorageService {
 
     public async saveUserCoverImage(userId: number, imageBase64: string) {
         return this.saveImageFromBase64(
-            Prefixes.USER + "/" + userId,
+            [Prefixes.USER ,userId.toString()],
             ImageTypes.USER_COVER_IMAGE,
             imageBase64,
             new UserCoverImageProcessor("image/jpeg")
@@ -81,7 +81,7 @@ export class ImageStorageService {
     }
 
     private async saveImageFromBase64(
-        namespace: string,
+        namespace: string[],
         itemId: string,
         base64: string,
         processor: ImageProcessor
@@ -90,7 +90,7 @@ export class ImageStorageService {
     }
 
     private async saveImage(
-        namespace: string,
+        namespace: string[],
         itemId: string,
         base64: string,
         processor: ImageProcessor
@@ -100,61 +100,61 @@ export class ImageStorageService {
     }
 
     public async readUserCoverImage(userId: number): Promise<Readable> {
-        return this.readImage(Prefixes.USER + "/" + userId, ImageTypes.USER_COVER_IMAGE);
+        return this.readImage([Prefixes.USER,userId.toString()], ImageTypes.USER_COVER_IMAGE);
     }
 
     public async readUserAvatarImage(userId: number): Promise<Readable> {
-        return this.readImage(Prefixes.USER + "/" + userId, ImageTypes.USER_AVATAR_IMAGE);
+        return this.readImage([Prefixes.USER, userId.toString()], ImageTypes.USER_AVATAR_IMAGE);
     }
 
     public async readCatalogCoverImage(catalogId: number): Promise<Readable> {
-        return this.readImage(Prefixes.CATALOG + "/" + catalogId, ImageTypes.CATALOG_COVER_IMAGE);
+        return this.readImage([Prefixes.CATALOG,catalogId.toString()], ImageTypes.CATALOG_COVER_IMAGE);
     }
 
     public async readCatalogAvatarImage(catalogId: number): Promise<Readable> {
-        return this.readImage(Prefixes.CATALOG + "/" + catalogId, ImageTypes.CATALOG_AVATAR);
+        return this.readImage([Prefixes.CATALOG,catalogId.toString()], ImageTypes.CATALOG_AVATAR);
     }
 
     public async readCollectionCoverImage(collectionId: number): Promise<Readable> {
-        return this.readImage(Prefixes.COLLECTION + "/" + collectionId, ImageTypes.COLLECTION_COVER_IMAGE);
+        return this.readImage([Prefixes.COLLECTION, collectionId.toString()], ImageTypes.COLLECTION_COVER_IMAGE);
     }
 
     public async readPackageCoverImage(packageId: number): Promise<Readable> {
-        return this.readImage(Prefixes.PACKAGE + "/" + packageId, ImageTypes.PACKAGE_COVER_IMAGE);
+        return this.readImage([Prefixes.PACKAGE, packageId.toString()], ImageTypes.PACKAGE_COVER_IMAGE);
     }
 
     public async deleteUserCoverImage(userId: number): Promise<void> {
-        return this.deleteImage(Prefixes.USER + "/" + userId, ImageTypes.USER_COVER_IMAGE);
+        return this.deleteImage([Prefixes.USER, userId.toString()], ImageTypes.USER_COVER_IMAGE);
     }
 
     public async deleteUserAvatarImage(userId: number): Promise<void> {
-        return this.deleteImage(Prefixes.USER + "/" + userId, ImageTypes.USER_AVATAR_IMAGE);
+        return this.deleteImage([Prefixes.USER,userId.toString()], ImageTypes.USER_AVATAR_IMAGE);
     }
 
     public async deleteCatalogAvatarImage(catalogId: number): Promise<void> {
-        return this.deleteImage(Prefixes.CATALOG + "/" + catalogId, ImageTypes.CATALOG_AVATAR);
+        return this.deleteImage([Prefixes.CATALOG , catalogId.toString()], ImageTypes.CATALOG_AVATAR);
     }
 
     public async deleteCatalogCoverImage(catalogId: number): Promise<void> {
-        return this.deleteImage(Prefixes.CATALOG + "/" + catalogId, ImageTypes.CATALOG_COVER_IMAGE);
+        return this.deleteImage([Prefixes.CATALOG , catalogId.toString()], ImageTypes.CATALOG_COVER_IMAGE);
     }
 
     public async deleteCollectionCoverImage(catalogId: number): Promise<void> {
-        return this.deleteImage(Prefixes.COLLECTION + "/" + catalogId, ImageTypes.COLLECTION_COVER_IMAGE);
+        return this.deleteImage([Prefixes.COLLECTION, catalogId.toString()], ImageTypes.COLLECTION_COVER_IMAGE);
     }
 
     public async deletePackageCoverImage(packageId: number): Promise<void> {
-        return this.deleteImage(Prefixes.PACKAGE + "/" + packageId, ImageTypes.PACKAGE_COVER_IMAGE);
+        return this.deleteImage([Prefixes.PACKAGE ,packageId.toString()], ImageTypes.PACKAGE_COVER_IMAGE);
     }
 
-    private async deleteImage(namespace: string, imageId: string): Promise<void> {
+    private async deleteImage(namespace: string[], imageId: string): Promise<void> {
         const fileExists = await this.fileStorageService.fileExists(namespace, imageId);
         if (fileExists) {
             return this.fileStorageService.deleteFile(namespace, imageId);
         }
     }
 
-    private async readImage(namespace: string, imageId: string): Promise<Readable> {
+    private async readImage(namespace: string[], imageId: string): Promise<Readable> {
         return this.fileStorageService.readFile(namespace, imageId);
     }
 

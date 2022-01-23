@@ -11,7 +11,6 @@ import {
 import { Writable } from "stream";
 import { clearInterval } from "timers";
 import { Maybe } from "../util/Maybe";
-import { BatchingTransform } from "../transforms/BatchingTransform";
 import { InflatedByteCountTransform } from "../transforms/InflatedByteCountTransform";
 import { StatsTransform } from "../transforms/StatsTransform";
 import { ContentLabelDetector } from "../content-detector/ContentLabelDetector";
@@ -27,6 +26,7 @@ import {
 import { RepositoryDescription } from "./Repository";
 import { JSONSchema7TypeName } from "json-schema";
 import { EXTENDED_REPOSITORIES } from "./RepositoryUtil";
+import { BatchingTransform } from "../transforms/BatchingTransform";
 
 export async function getSourcesDescriptions(): Promise<SourceDescription[]> {
     const returnValue: SourceDescription[] = [];

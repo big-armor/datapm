@@ -180,7 +180,7 @@ export class FollowDialogComponent {
                 changeType: ActivityLogChangeType.VERSION_MAJOR_CHANGE
             },
             {
-                label: "Adaptive",
+                label: "Additive",
                 changeType: ActivityLogChangeType.VERSION_MINOR_CHANGE
             },
             {
