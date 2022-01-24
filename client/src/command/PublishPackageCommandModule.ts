@@ -216,7 +216,18 @@ export class PublishPackageCommandModule {
             };
 
             packageFile.registries =
-                packageFile.registries == null ? [chosenRegistry] : [...packageFile.registries, chosenRegistry];
+                packageFile.registries == null
+                    ? [chosenRegistry]
+                    : [
+                          ...packageFile.registries.filter(
+                              (r) =>
+                                  !(
+                                      r.url.toLowerCase() === chosenRegistry.url.toLowerCase() &&
+                                      r.catalogSlug.toLowerCase() === chosenRegistry.catalogSlug.toLowerCase()
+                                  )
+                          ),
+                          chosenRegistry
+                      ];
 
             targetRegistries.push(chosenRegistry);
         }
