@@ -11,7 +11,7 @@ import {
     CreateCatalogDocument
 } from "./registry-client";
 import { createAnonymousClient, createAnonymousStreamingClient, createAuthenicatedStreamingClient, createUser } from "./test-utils";
-import { parsePackageFileJSON, loadPackageFileFromDisk, PublishMethod, SocketEvent, StartFetchRequest, ErrorResponse, StartFetchResponse, SocketResponseType, SocketError, StartUploadRequest, UploadDataRequest, UploadDataResponse, StartUploadResponse, UploadResponseType, UploadStopRequest, UploadStopResponse, PackageStreamsRequest, PackageStreamsResponse, OpenFetchChannelResponse, OpenFetchChannelRequest, DataSend, DataStop, FetchRequestType, SetStreamActiveBatchesResponse, SetStreamActiveBatchesRequest, FetchResponse, DataAcknowledge, DataStopAcknowledge, DPMRecord, DataRecordContext, PackageSinkStateRequest, PackageSinkStateResponse } from "datapm-lib";
+import { parsePackageFileJSON, loadPackageFileFromDisk, PublishMethod, SocketEvent, StartFetchRequest, ErrorResponse, StartFetchResponse, SocketResponseType, SocketError, StartUploadRequest, UploadDataRequest, UploadDataResponse, StartUploadResponse, UploadResponseType, UploadStopRequest, UploadStopResponse, PackageStreamsRequest, PackageStreamsResponse, OpenFetchChannelResponse, OpenFetchChannelRequest, DataSend, DataStop, FetchRequestType, SetStreamActiveBatchesResponse, SetStreamActiveBatchesRequest, FetchResponse, DataAcknowledge, DataStopAcknowledge, DPMRecord, DataRecordContext, PackageSinkStateRequest, PackageSinkStateResponse, UpdateMethod } from "datapm-lib";
 import { describe, it } from "mocha";
 import request = require("superagent");
 import { Socket } from "socket.io-client";
@@ -293,7 +293,7 @@ describe("Data Store on Registry", async () => {
                 streamSetSlug: "simple",
                 streamSlug: "simple",
                 schemaTitle: "wrong-schema",
-            },true),(response: StartUploadResponse) => {
+            },true, UpdateMethod.BATCH_FULL_SET),(response: StartUploadResponse) => {
                 resolve(response);
             });
         });
@@ -326,7 +326,7 @@ describe("Data Store on Registry", async () => {
                 streamSetSlug: "simple",
                 streamSlug: "simple",
                 schemaTitle: "simple",
-            },true),(response: StartUploadResponse) => {
+            },true, UpdateMethod.APPEND_ONLY_LOG),(response: StartUploadResponse) => {
                 resolve(response);
             });
         });
@@ -463,7 +463,7 @@ describe("Data Store on Registry", async () => {
                 streamSetSlug: "simple",
                 streamSlug: "simple",
                 schemaTitle: "simple",
-            },true),(response: StartUploadResponse) => {
+            },true, UpdateMethod.BATCH_FULL_SET),(response: StartUploadResponse) => {
                 resolve(response);
             });
         });
@@ -619,10 +619,6 @@ describe("Data Store on Registry", async () => {
         expect(response.errors == null, "no errors").true;
     });
 
-
-
-
-
     it("User A can set package public", async function () {
         let response = await userAClient.mutate({
             mutation: UpdatePackageDocument,
@@ -689,7 +685,7 @@ describe("Data Store on Registry", async () => {
                 streamSetSlug: "simple",
                 streamSlug: "simple",
                 schemaTitle: "simple",
-            },true),(response: StartUploadResponse) => {
+            },true, UpdateMethod.BATCH_FULL_SET),(response: StartUploadResponse) => {
                 resolve(response);
             });
         });
@@ -761,7 +757,7 @@ describe("Data Store on Registry", async () => {
                 streamSetSlug: "simple",
                 streamSlug: "simple",
                 schemaTitle: "simple",
-            },false),(response: StartUploadResponse) => {
+            },false, UpdateMethod.APPEND_ONLY_LOG),(response: StartUploadResponse) => {
                 resolve(response);
             });
         });
@@ -840,6 +836,7 @@ describe("Data Store on Registry", async () => {
 
         const packageStreamsResponse:PackageStreamsResponse = streamInfoResponse as PackageStreamsResponse;
         expect(packageStreamsResponse.batchesBySchema["simple"][0].highestOffset).equal(2);
+        expect(packageStreamsResponse.batchesBySchema["simple"][0].updateMethod).equal(UpdateMethod.APPEND_ONLY_LOG);
 
         let response = await new Promise<OpenFetchChannelResponse | ErrorResponse>((resolve, reject) => {
             userAStreamingClient.emit(SocketEvent.OPEN_FETCH_CHANNEL , new OpenFetchChannelRequest(packageStreamsResponse.batchesBySchema["simple"][0].batchIdentifier),(response: OpenFetchChannelResponse) => {

@@ -1,6 +1,6 @@
 import { Ora } from "ora";
 import prompts from "prompts";
-import { DPMConfiguration } from "datapm-lib";
+import { DPMConfiguration, Source } from "datapm-lib";
 import { Repository } from "../repository/Repository";
 import {
     getRepositoryConfigs,
@@ -9,6 +9,35 @@ import {
     saveRepositoryCredential
 } from "./ConfigUtil";
 import { repeatedlyPromptParameters } from "./parameters/ParameterUtils";
+import { getRepositoryDescriptionByType } from "../repository/RepositoryUtil";
+
+export async function obtainCredentials(oraRef: Ora, source: Source): Promise<DPMConfiguration> {
+    const repositoryDescription = getRepositoryDescriptionByType(source.type);
+
+    if (repositoryDescription === undefined) {
+        throw new Error(`Could not find repository description for type ${source.type}`);
+    }
+    const repository = await repositoryDescription?.getRepository();
+
+    if (repository === undefined) {
+        throw new Error(`Could not find repository implementation for type ${source.type}`);
+    }
+
+    const connectionIdentifier = repository.getConnectionIdentifierFromConfiguration(source.connectionConfiguration);
+
+    console.log(`For the ${repositoryDescription.getDisplayName()} repository ${connectionIdentifier}`);
+
+    const credentialsPromptResponse = await promptForCredentials(
+        oraRef,
+        repository,
+        source.connectionConfiguration,
+        {},
+        false,
+        {}
+    );
+
+    return credentialsPromptResponse.credentialsConfiguration;
+}
 
 /** Given a repository and a potentially preconfigured connection and credentials configuration pair,
  * prompt the user for information necessary to successfully authenticate. Then save the credentials

@@ -94,7 +94,8 @@ export class DataPMSource implements Source {
                                         "-" +
                                         batch.batchIdentifier.streamSlug,
                                     expectedTotalRawBytes: batch.highestOffset,
-                                    updateHash: batch.updatedAt.toISOString(),
+                                    updateHash: batch.batchIdentifier + "-" + batch.updatedAt.toISOString(),
+                                    updateMethod: batch.updateMethod,
                                     openStream: async (streamState: Maybe<StreamState>) => {
                                         const socket = await this.connectSocket(
                                             connectionConfiguration,

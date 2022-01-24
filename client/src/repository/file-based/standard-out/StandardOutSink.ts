@@ -21,10 +21,11 @@ export class StandardOutSinkModule implements Sink {
         };
     }
 
-    async saveSinkState(
+    async commitAfterWrites(
         _connectionConfiguration: DPMConfiguration,
         _credentialsConfiguration: DPMConfiguration,
         _configuration: DPMConfiguration,
+        _commitKeys: CommitKey[],
         _sinkStateKey: SinkStateKey,
         _sinkState: SinkState
     ): Promise<void> {
@@ -145,14 +146,5 @@ export class StandardOutSinkModule implements Sink {
                 return []; // Nothing to do
             }
         };
-    }
-
-    async commitAfterWrites(
-        _commitKeys: CommitKey[],
-        _connectionConfiguration: DPMConfiguration,
-        _credentialsConfiguration: DPMConfiguration
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-    ): Promise<void> {
-        // Nothing to do, because there is no commit
     }
 }

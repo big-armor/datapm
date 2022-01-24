@@ -127,6 +127,7 @@ export class StreamTestSource implements Source {
         const streamSummaries: StreamSummary[] = [
             {
                 name: "random",
+                updateMethod: UpdateMethod.BATCH_FULL_SET,
                 openStream: async () => {
                     const stream = new Readable({ objectMode: true });
 
@@ -160,7 +161,6 @@ export class StreamTestSource implements Source {
 
         return {
             streamSummaries,
-            supportedUpdateMethods: [UpdateMethod.BATCH_FULL_SET],
             updateHash,
             configuration: {}, // TODO Probably not needed
             slug: "random"

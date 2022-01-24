@@ -15,7 +15,7 @@ import { ExtendedJSONSchema7TypeName } from "../Source";
 import { convertValueByValueType, discoverValueType } from "../../transforms/StatsTransform";
 import { Parameter } from "../../util/parameters/Parameter";
 import { StreamSetProcessingMethod } from "../../util/StreamToSinkUtil";
-import { Sink, SinkSupportedStreamOptions, WritableWithContext } from "../Sink";
+import { CommitKey, Sink, SinkSupportedStreamOptions, WritableWithContext } from "../Sink";
 
 export abstract class KnexSink implements Sink {
     client: Knex;
@@ -130,10 +130,6 @@ export abstract class KnexSink implements Sink {
                 return [];
             }
         };
-    }
-
-    async commitAfterWrites(): Promise<void> {
-        // Nothing to do
     }
 
     async writeRecord(chunks: RecordStreamContext[], transform: Transform): Promise<void> {
@@ -282,12 +278,13 @@ export abstract class KnexSink implements Sink {
         return tableExists;
     }
 
-    async saveSinkState(
+    async commitAfterWrites(
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
-        _sinkStateKey: SinkStateKey,
-        _sinkState: SinkState
+        commitKeys: CommitKey[], // TODO use this to rename temporary tables during batch uploads
+        sinkStateKey: SinkStateKey,
+        sinkState: SinkState
     ): Promise<void> {
         const client = await this.createClient(connectionConfiguration, credentialsConfiguration, configuration);
         await this.checkDBExistence(client, configuration);
@@ -308,20 +305,20 @@ export abstract class KnexSink implements Sink {
                 .table(tableRef)
                 .select(...["streamSets", "packageVersion", "timestamp"].map(this.mapSinkStateKeyToColumnName))
                 .where({
-                    [this.mapSinkStateKeyToColumnName("catalogSlug")]: _sinkStateKey.catalogSlug,
-                    [this.mapSinkStateKeyToColumnName("packageSlug")]: _sinkStateKey.packageSlug,
-                    [this.mapSinkStateKeyToColumnName("packageMajorVersion")]: _sinkStateKey.packageMajorVersion
+                    [this.mapSinkStateKeyToColumnName("catalogSlug")]: sinkStateKey.catalogSlug,
+                    [this.mapSinkStateKeyToColumnName("packageSlug")]: sinkStateKey.packageSlug,
+                    [this.mapSinkStateKeyToColumnName("packageMajorVersion")]: sinkStateKey.packageMajorVersion
                 });
 
             if (!oldStates || oldStates.length === 0) {
                 const records = [
                     {
-                        [this.mapSinkStateKeyToColumnName("catalogSlug")]: _sinkStateKey.catalogSlug,
-                        [this.mapSinkStateKeyToColumnName("packageSlug")]: _sinkStateKey.packageSlug,
-                        [this.mapSinkStateKeyToColumnName("packageMajorVersion")]: _sinkStateKey.packageMajorVersion,
-                        [this.mapSinkStateKeyToColumnName("streamSets")]: JSON.stringify(_sinkState.streamSets),
-                        [this.mapSinkStateKeyToColumnName("packageVersion")]: _sinkState.packageVersion,
-                        [this.mapSinkStateKeyToColumnName("timestamp")]: _sinkState.timestamp
+                        [this.mapSinkStateKeyToColumnName("catalogSlug")]: sinkStateKey.catalogSlug,
+                        [this.mapSinkStateKeyToColumnName("packageSlug")]: sinkStateKey.packageSlug,
+                        [this.mapSinkStateKeyToColumnName("packageMajorVersion")]: sinkStateKey.packageMajorVersion,
+                        [this.mapSinkStateKeyToColumnName("streamSets")]: JSON.stringify(sinkState.streamSets),
+                        [this.mapSinkStateKeyToColumnName("packageVersion")]: sinkState.packageVersion,
+                        [this.mapSinkStateKeyToColumnName("timestamp")]: sinkState.timestamp
                     }
                 ];
                 await tx.table(tableRef).insert(records);
@@ -329,14 +326,14 @@ export abstract class KnexSink implements Sink {
                 await tx
                     .table(tableRef)
                     .where({
-                        [this.mapSinkStateKeyToColumnName("catalogSlug")]: _sinkStateKey.catalogSlug,
-                        [this.mapSinkStateKeyToColumnName("packageSlug")]: _sinkStateKey.packageSlug,
-                        [this.mapSinkStateKeyToColumnName("packageMajorVersion")]: _sinkStateKey.packageMajorVersion
+                        [this.mapSinkStateKeyToColumnName("catalogSlug")]: sinkStateKey.catalogSlug,
+                        [this.mapSinkStateKeyToColumnName("packageSlug")]: sinkStateKey.packageSlug,
+                        [this.mapSinkStateKeyToColumnName("packageMajorVersion")]: sinkStateKey.packageMajorVersion
                     })
                     .update({
-                        [this.mapSinkStateKeyToColumnName("packageVersion")]: _sinkState.packageVersion,
-                        [this.mapSinkStateKeyToColumnName("timestamp")]: _sinkState.timestamp,
-                        [this.mapSinkStateKeyToColumnName("streamSets")]: JSON.stringify(_sinkState.streamSets)
+                        [this.mapSinkStateKeyToColumnName("packageVersion")]: sinkState.packageVersion,
+                        [this.mapSinkStateKeyToColumnName("timestamp")]: sinkState.timestamp,
+                        [this.mapSinkStateKeyToColumnName("streamSets")]: JSON.stringify(sinkState.streamSets)
                     });
             }
 

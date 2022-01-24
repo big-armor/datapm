@@ -103,7 +103,7 @@ export class DataPMSink implements Sink {
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
-        _updateMethod: UpdateMethod
+        updateMethod: UpdateMethod
     ): Promise<WritableWithContext> {
         if (typeof connectionConfiguration.url !== "string") {
             throw new Error("MISSING_CONNECITON_CONFIG_VALUE: url");
@@ -131,17 +131,21 @@ export class DataPMSink implements Sink {
                 for (const record of chunk) {
                     let serverChannel = this.serverChannelForRecord(record);
                     if (serverChannel == null) {
-                        serverChannel = await this.startUploadRequest(socket, {
-                            catalogSlug: configuration.catalogSlug as string,
-                            packageSlug: configuration.packageSlug as string,
-                            majorVersion: configuration.majorVersion as number,
-                            sourceType: record.sourceType,
-                            streamSetSlug: record.streamSetSlug,
-                            streamSlug: record.streamSlug,
-                            sourceSlug: record.sourceSlug,
-                            schemaTitle: record.recordContext.schemaSlug,
-                            registryUrl: connectionConfiguration.url as string
-                        });
+                        serverChannel = await this.startUploadRequest(
+                            socket,
+                            {
+                                catalogSlug: configuration.catalogSlug as string,
+                                packageSlug: configuration.packageSlug as string,
+                                majorVersion: configuration.majorVersion as number,
+                                sourceType: record.sourceType,
+                                streamSetSlug: record.streamSetSlug,
+                                streamSlug: record.streamSlug,
+                                sourceSlug: record.sourceSlug,
+                                schemaTitle: record.recordContext.schemaSlug,
+                                registryUrl: connectionConfiguration.url as string
+                            },
+                            updateMethod
+                        );
 
                         this.serverChannelForRecordKey[this.recordToChannelKey(record)] = serverChannel;
                     }
@@ -245,8 +249,14 @@ export class DataPMSink implements Sink {
         });
     }
 
-    async startUploadRequest(socket: Socket, streamIdentifier: SchemaRepositoryStreamIdentifier): Promise<string> {
-        const uploadRequest = new StartUploadRequest(streamIdentifier, true); // TODO support appending
+    async startUploadRequest(
+        socket: Socket,
+        streamIdentifier: SchemaRepositoryStreamIdentifier,
+        updateMethod: UpdateMethod
+    ): Promise<string> {
+        const startNewBatch = updateMethod === UpdateMethod.BATCH_FULL_SET;
+
+        const uploadRequest = new StartUploadRequest(streamIdentifier, startNewBatch, updateMethod);
 
         let uploadChannelName = "not-set";
 
@@ -303,10 +313,21 @@ export class DataPMSink implements Sink {
         return connectSocket(connectionConfiguration, credentialsConfiguration);
     }
 
+    filterDefaultConfigValues(
+        _catalogSlug: string | undefined,
+        _packageFile: PackageFile,
+        _configuration: DPMConfiguration
+    ): void {
+        // Nothing to do
+    }
+
     async commitAfterWrites(
-        commitKeys: CommitKey[],
         connectionConfiguration: DPMConfiguration,
-        credentialsConfiguration: DPMConfiguration
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        commitKeys: CommitKey[],
+        _sinkStateKey: SinkStateKey, // TODO Save this stuff
+        _sinkState: SinkState
     ): Promise<void> {
         const socket = await this.connectSocket(connectionConfiguration, credentialsConfiguration);
 
@@ -338,24 +359,6 @@ export class DataPMSink implements Sink {
                 // console.log("\n\ndisconnect: " + reason);
             });
         });
-    }
-
-    filterDefaultConfigValues(
-        _catalogSlug: string | undefined,
-        _packageFile: PackageFile,
-        _configuration: DPMConfiguration
-    ): void {
-        // Nothing to do
-    }
-
-    async saveSinkState(
-        _connectionConfiguration: DPMConfiguration,
-        _credentialsConfiguration: DPMConfiguration,
-        _configuration: DPMConfiguration,
-        _sinkStateKey: SinkStateKey,
-        _sinkState: SinkState
-    ): Promise<void> {
-        // Nothing to do, the sink state is managed by teh server
     }
 
     async getSinkState(

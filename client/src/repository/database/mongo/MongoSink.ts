@@ -17,7 +17,7 @@ import { convertValueByValueType, discoverValueType } from "../../../transforms/
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
 import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
 import { DISPLAY_NAME, TYPE } from "./MongoRepositoryDescription";
-import { Sink, SinkErrors, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
+import { CommitKey, Sink, SinkErrors, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
 
 export class MongoSinkModule implements Sink {
     client: Mongoose;
@@ -194,10 +194,6 @@ export class MongoSinkModule implements Sink {
         };
     }
 
-    async commitAfterWrites(): Promise<void> {
-        // Nothing to do
-    }
-
     async writeRecord(chunk: RecordStreamContext, transform: Transform): Promise<void> {
         const record = chunk.recordContext.record;
 
@@ -339,12 +335,13 @@ export class MongoSinkModule implements Sink {
         this.pendingInserts = [];
     }
 
-    async saveSinkState(
+    async commitAfterWrites(
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
-        _sinkStateKey: SinkStateKey,
-        _sinkState: SinkState
+        commitKeys: CommitKey[], // TODO use this to rename bulk upload tables to "commit" them
+        sinkStateKey: SinkStateKey,
+        sinkState: SinkState
     ): Promise<void> {
         const client = await this.getConnection(connectionConfiguration, credentialsConfiguration, configuration);
         const collectionInfo = client.connection.db.listCollections({ name: this.stateCollectionName });
@@ -363,21 +360,21 @@ export class MongoSinkModule implements Sink {
         );
 
         const newState: { [key: string]: DPMRecordValue } = {
-            catalogSlug: _sinkStateKey.catalogSlug,
-            packageSlug: _sinkStateKey.packageSlug,
-            packageMajorVersion: _sinkStateKey.packageMajorVersion,
-            streamSets: JSON.stringify(_sinkState.streamSets),
-            packageVersion: _sinkState.packageVersion,
-            timestamp: _sinkState.timestamp
+            catalogSlug: sinkStateKey.catalogSlug,
+            packageSlug: sinkStateKey.packageSlug,
+            packageMajorVersion: sinkStateKey.packageMajorVersion,
+            streamSets: JSON.stringify(sinkState.streamSets),
+            packageVersion: sinkState.packageVersion,
+            timestamp: sinkState.timestamp
         };
         if (!collectionInfo) {
             await StateModel.create(newState);
         } else {
             await StateModel.findOneAndUpdate(
                 {
-                    catalogSlug: _sinkStateKey.catalogSlug,
-                    packageSlug: _sinkStateKey.packageSlug,
-                    packageMajorVersion: _sinkStateKey.packageMajorVersion
+                    catalogSlug: sinkStateKey.catalogSlug,
+                    packageSlug: sinkStateKey.packageSlug,
+                    packageMajorVersion: sinkStateKey.packageMajorVersion
                 },
                 newState,
                 {

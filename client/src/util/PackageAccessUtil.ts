@@ -5,27 +5,169 @@ import {
     catalogSlugValid,
     packageSlugValid,
     PackageFile,
-    validatePackageFile
+    validatePackageFile,
+    RegistryReference
 } from "datapm-lib";
 import fs from "fs";
+import { Ora } from "ora";
 import path from "path";
-import url from "url";
-import { Package, PackageIdentifier, PackageIdentifierInput } from "../generated/graphql";
-import { getRegistryClientWithConfig, RegistryClient } from "./RegistryClient";
+import { Package, PackageIdentifierInput, Permission } from "../generated/graphql";
+import { publishPackageFile, writeLicenseFile, writePackageFile, writeReadmeFile } from "./PackageUtil";
+import { getRegistryClientWithConfig } from "./RegistryClient";
 
 export interface PackageFileWithContext {
-    package?: Package;
     packageFile: PackageFile;
-    registryURL?: string;
+    contextType: "localFile" | "registry" | "http";
     catalogSlug?: string;
+    permitsSaving: boolean;
+    hasPermissionToSave: boolean;
     packageFileUrl: string;
+
+    save(oraRef: Ora, packageFile: PackageFile): Promise<void>;
+}
+export class RegistryPackageFileContext implements PackageFileWithContext {
+    constructor(public packageFile: PackageFile, public packageObject: Package) {}
+
+    get contextType(): "registry" {
+        return "registry";
+    }
+
+    get permitsSaving(): boolean {
+        return true;
+    }
+
+    get hasPermissionToSave(): boolean {
+        return this.packageObject.myPermissions?.includes(Permission.EDIT) || false;
+    }
+
+    get packageFileUrl(): string {
+        return (
+            this.packageObject.identifier.registryURL +
+            "/" +
+            this.packageObject.identifier.catalogSlug +
+            "/" +
+            this.packageObject.identifier.packageSlug
+        );
+    }
+
+    get registryUrl(): string {
+        return this.packageObject.identifier.registryURL;
+    }
+
+    get catalogSlug(): string {
+        return this.packageObject.identifier.catalogSlug;
+    }
+
+    async save(oraRef: Ora, packageFile: PackageFile): Promise<void> {
+        const publishMethod = packageFile.registries?.find(
+            (r) =>
+                r.url.toLowerCase() === this.registryUrl.toLowerCase() &&
+                r.catalogSlug === this.packageObject.identifier.catalogSlug
+        )?.publishMethod;
+
+        if (publishMethod == null) {
+            // need to obtain a publish method
+            throw new Error("Target registry not found in Package File. Could not determine the publish method");
+        }
+
+        const targetRegistries: RegistryReference[] = [
+            {
+                catalogSlug: this.catalogSlug,
+                publishMethod,
+                url: this.registryUrl
+            }
+        ];
+
+        await publishPackageFile(oraRef, packageFile, targetRegistries);
+    }
+}
+
+export class LocalPackageFileContext implements PackageFileWithContext {
+    constructor(public packageFile: PackageFile, public packageFilePath: string) {}
+
+    get contextType(): "localFile" {
+        return "localFile";
+    }
+
+    get permitsSaving(): boolean {
+        return true;
+    }
+
+    get hasPermissionToSave(): boolean {
+        const fileStats = fs.statSync(this.packageFileUrl);
+
+        return !!parseInt((fileStats.mode & parseInt("777", 8)).toString(8)[0]);
+    }
+
+    get packageFileUrl(): string {
+        return this.packageFilePath;
+    }
+
+    async save(oraRef: Ora, packageFile: PackageFile): Promise<void> {
+        // Write updates to the target package file in place
+        oraRef.start("Writing package file...");
+        let packageFileLocation;
+
+        try {
+            packageFileLocation = writePackageFile(packageFile);
+
+            oraRef.succeed(`Wrote package file ${packageFileLocation}`);
+        } catch (error) {
+            oraRef.fail(`Unable to write the package file: ${error.message}`);
+            process.exit(1);
+        }
+
+        oraRef.start("Writing README file...");
+        try {
+            const readmeFileLocation = writeReadmeFile(packageFile);
+            oraRef.succeed(`Wrote README file ${readmeFileLocation}`);
+        } catch (error) {
+            oraRef.fail(`Unable to write the README file: ${error.message}`);
+            process.exit(1);
+        }
+
+        oraRef.start("Writing LICENSE file...");
+        try {
+            const licenseFileLocation = writeLicenseFile(packageFile);
+            oraRef.succeed(`Wrote LICENSE file ${licenseFileLocation}`);
+        } catch (error) {
+            oraRef.fail(`Unable to write the LICENSE file: ${error.message}`);
+            process.exit(1);
+        }
+    }
+}
+
+export class HttpPackageFileContext implements PackageFileWithContext {
+    constructor(public packageFile: PackageFile, public url: string) {}
+
+    get contextType(): "http" {
+        return "http";
+    }
+
+    get permitsSaving(): boolean {
+        return true;
+    }
+
+    get hasPermissionToSave(): boolean {
+        throw new Error("HttpPackageFileContext does not support saving");
+    }
+
+    get packageFileUrl(): string {
+        return this.url;
+    }
+
+    save(): Promise<void> {
+        throw new Error("HttpPackageFileContext does not support saving");
+    }
 }
 
 async function fetchPackage(
-    registryClient: RegistryClient,
+    registryUrl: string,
     identifier: PackageIdentifierInput,
     modifiedOrCanonical: "modified" | "canonicalIfAvailable"
-): Promise<PackageFileWithContext> {
+): Promise<RegistryPackageFileContext> {
+    const registryClient = getRegistryClientWithConfig({ url: registryUrl });
+
     const response = await registryClient.getPackage({
         packageSlug: identifier.packageSlug,
         catalogSlug: identifier.catalogSlug
@@ -50,13 +192,8 @@ async function fetchPackage(
 
     validatePackageFile(packageFileJSON);
     const packageFile = parsePackageFileJSON(packageFileJSON);
-    return {
-        package: response.data?.package,
-        packageFile,
-        registryURL: registryClient.registryConfig.url,
-        catalogSlug: identifier.catalogSlug,
-        packageFileUrl: `${registryClient.registryConfig.url}/${identifier.catalogSlug}/${identifier.packageSlug}`
-    };
+
+    return new RegistryPackageFileContext(packageFile, packageEntity);
 }
 
 export async function getPackage(
@@ -68,36 +205,13 @@ export async function getPackage(
             method: "GET"
         });
 
-        if (http.headers.get("x-datapm-version") != null) {
-            const parsedUrl = new url.URL(identifier);
-            let serverUrl = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
+        if (http.headers.get("x-datapm-registry-url") != null) {
+            const registryUrl = http.headers.get("x-datapm-registry-url") as string;
 
-            if (parsedUrl.port != null) serverUrl = `${serverUrl}:${parsedUrl.port}`;
-
-            const registryClient = getRegistryClientWithConfig({ url: serverUrl });
-
-            // TODO handle registries that are not hosted at the root path
-
-            let path = parsedUrl.pathname;
-
-            // const graphqlPath = http.headers.get("x-datapm-graphql-path");
-
-            if (path?.startsWith("/")) {
-                path = path.substr(1, path.length - 1);
-            }
-            const pathParts = path?.split("/") || [];
-
-            // TODO support fetching specific package versions
+            const packageIdentifier = parsePackageIdentifier(identifier);
 
             try {
-                return await fetchPackage(
-                    registryClient,
-                    {
-                        catalogSlug: pathParts[0],
-                        packageSlug: pathParts[1]
-                    },
-                    modifiedOrCanonical
-                );
+                return await fetchPackage(registryUrl, packageIdentifier, modifiedOrCanonical);
             } catch (e) {
                 if (typeof e.message === "string" && (e.message as string).includes("NOT_AUTHENTICATED")) {
                     throw new Error("NOT_AUTHENTICATED_TO_REGISTRY");
@@ -108,10 +222,8 @@ export async function getPackage(
         }
         if (!http.ok) throw new Error(`Failed to obtain: HTTP code ${http.status} HTTP status ${http.statusText}`);
 
-        return {
-            packageFile: parsePackageFileJSON(await http.text()),
-            packageFileUrl: identifier
-        };
+        const packageFile = parsePackageFileJSON(await http.text());
+        return new HttpPackageFileContext(packageFile, identifier);
     } else if (fs.existsSync(identifier)) {
         const packageFile = loadPackageFileFromDisk(identifier);
         let pathToPackageFile = path.dirname(identifier);
@@ -126,15 +238,16 @@ export async function getPackage(
         }
         const packageFileName = path.basename(identifier);
 
-        return {
-            packageFile,
-            packageFileUrl: `file://${pathToPackageFile}${path.sep}${packageFileName}`
-        };
-    } else if (isValidPackageIdentifier(identifier) !== false) {
-        const registryClient = getRegistryClientWithConfig({ url: "https://datapm.io" });
-        const packageIdentifier = parsePackageIdentifier(identifier);
+        const filePAth = path.join(pathToPackageFile, packageFileName);
 
-        return fetchPackage(registryClient, packageIdentifier, modifiedOrCanonical);
+        return new LocalPackageFileContext(packageFile, filePAth);
+    } else if (isValidPackageIdentifier(identifier) !== false) {
+        const packageIdentifier: PackageIdentifierInput = {
+            catalogSlug: identifier.split("/")[0],
+            packageSlug: identifier.split("/")[1]
+        };
+
+        return fetchPackage("https://datapm.io", packageIdentifier, modifiedOrCanonical);
     } else {
         throw new Error(
             `Reference '${identifier}' is either not a valid package identifier, a valid package url, or url pointing to a valid package file.`
@@ -142,15 +255,12 @@ export async function getPackage(
     }
 }
 
-// TODO Move these functions to datapm-lib
-/** After validating, parse the identifier string into a PackageIdentifier for the datapm.io domain */
-export function parsePackageIdentifier(identifier: string): PackageIdentifier {
-    const parts = identifier.split("/");
+function parsePackageIdentifier(url: string): PackageIdentifierInput {
+    const pathParts = url.split("/");
 
     return {
-        registryURL: "https://datapm.io",
-        catalogSlug: parts[0],
-        packageSlug: parts[1]
+        catalogSlug: pathParts[pathParts.length - 2],
+        packageSlug: pathParts[pathParts.length - 1]
     };
 }
 

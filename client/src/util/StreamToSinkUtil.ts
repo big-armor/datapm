@@ -9,9 +9,9 @@ import {
     Source
 } from "datapm-lib";
 import ON_DEATH from "death";
-import { Readable, Transform, Writable } from "stream";
+import { Transform, Writable } from "stream";
 import { Maybe } from "../util/Maybe";
-import { Sink, SinkSupportedStreamOptions, WritableWithContext } from "../repository/Sink";
+import { Sink, WritableWithContext } from "../repository/Sink";
 import { StreamSetPreview } from "../repository/Source";
 import { Parameter, ParameterType } from "./parameters/Parameter";
 import {
@@ -197,28 +197,6 @@ export async function fetch(
         }
     }
 
-    const sourceSupportedUpdateMethod = streamSetPreview.supportedUpdateMethods;
-
-    const sinkStreamOptions: SinkSupportedStreamOptions = sink.getSupportedStreamOptions(sinkConfiguration, sinkState);
-
-    if (!sourceSupportedUpdateMethod.find((s) => sinkStreamOptions.updateMethods.find((ss) => s === ss))) {
-        throw new Error(
-            "Source only supports update methods: " +
-                sourceSupportedUpdateMethod.join(",") +
-                " and sink only supports update methods " +
-                sinkStreamOptions.updateMethods.join(",") +
-                " Therefore there is no way to stream from this source to this sink"
-        ); // TODO This could be more leanient, but warn of lost or duplicated datat
-    }
-
-    let updateMethod =
-        sinkStreamOptions.updateMethods.includes(UpdateMethod.APPEND_ONLY_LOG) &&
-        sourceSupportedUpdateMethod.includes(UpdateMethod.APPEND_ONLY_LOG)
-            ? UpdateMethod.APPEND_ONLY_LOG
-            : UpdateMethod.BATCH_FULL_SET;
-
-    if (sinkState == null) updateMethod = UpdateMethod.BATCH_FULL_SET;
-
     const expectedStreamStats = Object.fromEntries(
         streamSetPreview.streamSummaries?.map((s) => [
             s.name,
@@ -237,7 +215,9 @@ export async function fetch(
         }
     });
 
-    const sourceStream: Readable = await streamRecords(
+    const sinkSupportedUpdateMethods = sink.getSupportedStreamOptions(sinkConfiguration, sinkState).updateMethods;
+
+    const sourceStream = await streamRecords(
         source,
         streamSetPreview,
         {
@@ -281,6 +261,7 @@ export async function fetch(
         },
         packageFile.schemas,
         sinkState,
+        sinkSupportedUpdateMethods,
         deconflictOptions
     );
 
@@ -356,11 +337,11 @@ export async function fetch(
         });
     }, 500);
 
-    sourceStream.once("close", () => {
+    sourceStream.readable.once("close", () => {
         clearInterval(statusUpdateInterval);
     });
 
-    sourceStream.once("end", () => {
+    sourceStream.readable.once("end", () => {
         context.state({
             resource: {
                 name: streamSetPreview.slug,
@@ -386,7 +367,7 @@ export async function fetch(
 
         let stoppedEarly = false;
 
-        sourceStream.on("error", (error) => {
+        sourceStream.readable.on("error", (error) => {
             reject(new Error("Source error: " + error.message));
 
             // TODO tell sink to clean up?
@@ -426,7 +407,7 @@ export async function fetch(
                             sinkConnectionConfiguration,
                             sinkCredentialsConfiguration,
                             sinkConfiguration,
-                            updateMethod
+                            sourceStream.getCurrentUpdateMethod() // TODO will this work for multi-source packages with a mix of update methods?
                         );
 
                         schemaWritable = schemaWriteables[schemaSlug];
@@ -478,19 +459,15 @@ export async function fetch(
                             })
                     )
                 );
-                // Get the commitKeys after the writable has been closed
-                const commitKeys = writablesWithContexts.flatMap((w) => w.getCommitKeys());
-
-                // Commit all writables at once
-                if (commitKeys.length > 0) {
-                    await sink.commitAfterWrites(commitKeys, sinkConnectionConfiguration, sinkCredentialsConfiguration);
-                }
 
                 callback();
             }
         });
 
         schemaSwitchingWritable.on("finish", async () => {
+            // Get the commitKeys after the writable has been closed
+            const commitKeys = writablesWithContexts.flatMap((w) => w.getCommitKeys());
+
             finalSinkState.packageVersion = packageFile.version;
             streamSetPreview.streamSummaries?.forEach((s) => {
                 let streamSet = finalSinkState.streamSets[streamSetPreview.slug];
@@ -515,10 +492,11 @@ export async function fetch(
                 streamState.updateHash = stoppedEarly ? undefined : s.updateHash;
             });
             try {
-                await sink.saveSinkState(
+                await sink.commitAfterWrites(
                     sinkConnectionConfiguration,
                     sinkCredentialsConfiguration,
                     sinkConfiguration,
+                    commitKeys,
                     sinkStateKey,
                     finalSinkState
                 );
@@ -544,15 +522,15 @@ export async function fetch(
 
         const OFF_DEATH = ON_DEATH({})(() => {
             stoppedEarly = true;
-            sourceStream.unpipe();
+            sourceStream.readable.unpipe();
             recordCounterTransform.end();
         });
 
-        sourceStream.once("close", () => {
+        sourceStream.readable.once("close", () => {
             OFF_DEATH();
         });
 
-        sourceStream.pipe(recordCounterTransform);
+        sourceStream.readable.pipe(recordCounterTransform);
         recordCounterTransform.pipe(schemaSwitchingWritable);
     });
 }

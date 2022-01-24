@@ -2,6 +2,7 @@ import { Entity, Column, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique }
 import { EntityBaseModel } from "./EntityBaseModel";
 import { PackageEntity } from "./PackageEntity";
 import { UserEntity } from "./UserEntity";
+import {  UpdateMethod } from "datapm-lib";
 
 @Entity({
     name: "batch"
@@ -46,6 +47,9 @@ export class DataBatchEntity extends EntityBaseModel {
 
     @Column()
     batch: number;
+
+    @Column("enum", { name: "updatemethod", enum: UpdateMethod })
+    updateMethod: UpdateMethod;
 
     @Column({name: "lastoffset",  transformer: {
         to: (value) => value,

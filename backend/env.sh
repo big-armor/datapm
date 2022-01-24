@@ -1,4 +1,4 @@
-export REGISTRY_URL="http://localhost:4200"
+export REGISTRY_URL=${REGISTRY_URL:="http://localhost:4200"}
 export REGISTRY_NAME="DataPM Local Development"
 export JWT_AUDIENCE="localhost"
 export JWT_ISSUER="localhost"

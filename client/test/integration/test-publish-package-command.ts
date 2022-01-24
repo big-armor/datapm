@@ -10,6 +10,7 @@ import {
     createTestUser,
     getPromptInputs,
     KEYS,
+    PromptInput,
     removePackageFiles,
     testCmd,
     TestResults,
@@ -228,5 +229,55 @@ describe("Publish Package Command Tests", async function () {
         expect(results.messageFound, "Found success message").equals(true);
 
         fs.unlinkSync(newPackageFileLocation);
+    });
+
+    it("Publish package A again, no registry duplication", async function () {
+        const prompts: PromptInput[] = [
+            {
+                message: "Publish to http://localhost",
+                input: "No, Choose A Different Registry" + KEYS.ENTER
+            },
+            {
+                message: "Target registry?",
+                input: `http://localhost:` + registryServerPort + KEYS.ENTER
+            },
+            {
+                message: "Catalog short name?",
+                input: KEYS.ENTER
+            },
+            {
+                message: "Data Access Method?",
+                input: KEYS.ENTER
+            },
+            {
+                message: "Is the above ok?",
+                input: "Yes" + KEYS.ENTER
+            }
+        ];
+        const results: TestResults = {
+            exitCode: -1,
+            messageFound: false
+        };
+
+        const cmdResult = await testCmd(
+            "publish",
+            [packageAFilePath],
+            prompts,
+            async (line: string, promptIndex: number) => {
+                if (
+                    promptIndex === prompts.length &&
+                    line.includes("Share the command below to fetch the data in this package")
+                ) {
+                    results.messageFound = true;
+                }
+            }
+        );
+
+        expect(cmdResult.code, "Exit code").equals(0);
+        expect(results.messageFound, "Found success message").equals(true);
+
+        const packageFile: PackageFile = loadPackageFileFromDisk(packageAFilePath);
+
+        expect(packageFile.registries?.length).equals(1);
     });
 });

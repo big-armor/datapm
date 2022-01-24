@@ -1,6 +1,18 @@
-import { Difference, DifferenceType, PackageFile } from "datapm-lib";
+import { Difference, DifferenceType, PackageFile, PublishMethod, RegistryReference } from "datapm-lib";
 import fs from "fs";
+import { Ora } from "ora";
 import path from "path";
+import { SemVer } from "semver";
+import { fetchMultipleWithListr } from "../command/FetchCommandModule";
+import { CredentialsBySourceSlug } from "../command/PublishPackageCommandModule";
+import { CreateVersionInput } from "../generated/graphql";
+import { getSinkDescription } from "../repository/SinkUtil";
+import { obtainCredentials } from "./CredentialsUtil";
+import { identifierToString } from "./IdentifierUtil";
+import { getRegistryClientWithConfig } from "./RegistryClient";
+import { exit } from "yargs";
+import { TYPE as DATAPM_SINK_TYPE } from "../repository/file-based/datapm-registry/DataPMRepositoryDescription";
+import numeral from "numeral";
 
 export const DifferenceTypeMessages: Record<DifferenceType, string> = {
     [DifferenceType.REMOVE_SCHEMA]: "Removed Schema",
@@ -83,4 +95,312 @@ export function writeLicenseFile(packageFile: PackageFile): string {
     fs.writeFileSync(fileLocation, contents, "utf8");
 
     return fileLocation;
+}
+
+export enum PublishSchemaSteps {
+    CONNECT = "connect",
+    FIND_EXISTING_PACKAGE = "find_existing_package",
+    UPDATING_PACKAGE_LISTING = "updating_package_listing",
+    UPDATED_PACKAGE_LISTING = "updated_package_listing",
+    FOUND_EXISTING_PACKAGE = "found_existing_package",
+    NO_EXISTING_PACKAGE_FOUND = "no_existing_package_found",
+
+    CREATE_PACKAGE = "publish_package_file",
+    CREATE_PACKAGE_SUCCESS = "publish_package_file_success",
+    CREATE_VERSION = "publish_version",
+    CREATE_VERSION_SUCCESS = "publish_version_success",
+    VERSION_EXISTS_SUCCESS = "version_exists_success"
+}
+
+export interface PublishProgress {
+    updateStep(step: PublishSchemaSteps, registry: RegistryReference): void;
+}
+
+export async function publishPackageFile(
+    oraRef: Ora,
+    packageFile: PackageFile,
+    targetRegistries: RegistryReference[]
+): Promise<void> {
+    const credentialsBySourceSlug: CredentialsBySourceSlug = new Map();
+
+    for (const source of packageFile.sources) {
+        const credentials = await obtainCredentials(oraRef, source);
+        credentialsBySourceSlug.set(source.slug, credentials);
+    }
+
+    await attemptPublishPackageFile(oraRef, packageFile, targetRegistries, credentialsBySourceSlug)
+        .catch(async (error) => {
+            if (error.networkError) {
+                if (error.networkError.result) {
+                    if (error.networkError.result.errors[0].message.indexOf("API_KEY_NOT_FOUND") !== -1) {
+                        oraRef.fail("Failed to publish: Your API KEY is out of date.");
+                        oraRef.info("Genarate a new API Key in this registry's web console");
+                    } else {
+                        oraRef.fail(`Failed to publish: ${error.networkError.result.errors[0].message}`);
+                    }
+                } else oraRef.fail(`Failed to publish: ${error.networkError.bodyText || error.networkError.message}`);
+
+                throw error;
+            }
+
+            if (error.message === "README_FILE_NOT_FOUND") {
+                oraRef.fail(`Could not find the README file with the relative path of ${packageFile.readmeFile}`);
+                throw error;
+            }
+
+            if (error.message === "LICENSE_FILE_NOT_FOUND") {
+                oraRef.fail(`Could not find the LICENSE file with the relative path of ${packageFile.licenseFile}`);
+                throw error;
+            }
+
+            if (error.extensions?.code === "HIGHER_VERSION_REQUIRED") {
+                oraRef.warn(
+                    `Because of the changes in this file, the version number must be at least ${error.extensions?.minNextVersion}`
+                );
+
+                packageFile.version = error.extensions?.minNextVersion;
+
+                try {
+                    await attemptPublishPackageFile(oraRef, packageFile, targetRegistries, credentialsBySourceSlug);
+                } catch (error) {
+                    oraRef.fail(`Error publishing version after version change. ${error.messasge}`);
+                    throw error;
+                }
+                oraRef.succeed("Published to registry after version update");
+            } else {
+                throw error;
+            }
+        })
+        .then(() => {
+            oraRef.succeed("Published package file to registry");
+        })
+        .catch((error) => {
+            oraRef.fail(`Failed to publish: ${error.message}`);
+            process.exit(1);
+        });
+
+    const registryForDataPublishing = targetRegistries.filter(
+        (registry) => registry.publishMethod === PublishMethod.SCHEMA_AND_DATA
+    );
+
+    if (registryForDataPublishing.length > 0) {
+        oraRef.info("Publishing data...");
+
+        for (const targetRegistry of registryForDataPublishing) {
+            try {
+                const results = await publishData(oraRef, packageFile, targetRegistry);
+
+                const totalRecordCount = Object.values(results).reduce((acc, result) => acc + result, 0);
+
+                oraRef.succeed(
+                    `Finished uploading ${numeral(totalRecordCount).format("0,0")} records to ` +
+                        targetRegistry.url +
+                        "/" +
+                        targetRegistry.catalogSlug +
+                        "/" +
+                        packageFile.packageSlug
+                );
+            } catch (error) {
+                oraRef.fail(`Failed to publish data: ${error.message}`);
+                exit(1, error);
+            }
+        }
+    }
+}
+
+async function publishData(
+    oraRef: Ora,
+    packageFile: PackageFile,
+    targetRegistry: RegistryReference
+): Promise<{ [key: string]: number }> {
+    const dataPMRepositoryDescription = await getSinkDescription(DATAPM_SINK_TYPE);
+
+    if (dataPMRepositoryDescription == null) throw new Error("Could not find datapm module");
+
+    const dataPMSink = await dataPMRepositoryDescription.loadSinkFromModule();
+
+    return await fetchMultipleWithListr(
+        oraRef,
+        packageFile,
+        {
+            catalogSlug: targetRegistry.catalogSlug,
+            packageSlug: packageFile.packageSlug,
+            packageMajorVersion: new SemVer(packageFile.version).major
+        },
+        dataPMSink,
+        {
+            url: targetRegistry.url
+        },
+        {},
+        {
+            catalogSlug: targetRegistry.catalogSlug,
+            packageSlug: packageFile.packageSlug,
+            majorVersion: new SemVer(packageFile.version).major
+        },
+        true,
+        false,
+        false
+    );
+}
+
+async function attemptPublishPackageFile(
+    oraRef: Ora,
+    packageFile: PackageFile,
+    targetRegistries: RegistryReference[],
+    credentialsBySourceSlug: CredentialsBySourceSlug
+): Promise<void> {
+    await uploadPackageFile(packageFile, targetRegistries, credentialsBySourceSlug, {
+        updateStep: (step: PublishSchemaSteps, registryRef: RegistryReference) => {
+            switch (step) {
+                case PublishSchemaSteps.FIND_EXISTING_PACKAGE:
+                    oraRef.start("Finding existing package...");
+                    break;
+
+                case PublishSchemaSteps.FOUND_EXISTING_PACKAGE:
+                    oraRef.succeed(
+                        "Found the existing package - " +
+                            identifierToString({
+                                registryURL: registryRef.url,
+                                catalogSlug: registryRef.catalogSlug,
+                                packageSlug: packageFile.packageSlug
+                            })
+                    );
+                    break;
+
+                case PublishSchemaSteps.UPDATING_PACKAGE_LISTING:
+                    oraRef.start("Updating package description and name");
+                    break;
+
+                case PublishSchemaSteps.UPDATED_PACKAGE_LISTING:
+                    oraRef.succeed("Updated package listing");
+                    break;
+
+                case PublishSchemaSteps.NO_EXISTING_PACKAGE_FOUND:
+                    oraRef.succeed("Existing package not found.");
+                    break;
+
+                case PublishSchemaSteps.CREATE_PACKAGE:
+                    oraRef.start(`Creating new package listing ${registryRef.catalogSlug}/${packageFile.packageSlug}`);
+                    break;
+
+                case PublishSchemaSteps.CREATE_PACKAGE_SUCCESS:
+                    oraRef.succeed(`Created new package listing ${registryRef.catalogSlug}/${packageFile.packageSlug}`);
+                    break;
+
+                case PublishSchemaSteps.CREATE_VERSION:
+                    oraRef.start(`Publishing version ${packageFile.version}`);
+                    break;
+
+                case PublishSchemaSteps.CREATE_VERSION_SUCCESS:
+                    oraRef.succeed(`Published version ${packageFile.version}`);
+                    break;
+
+                case PublishSchemaSteps.VERSION_EXISTS_SUCCESS:
+                    oraRef.succeed(`Updated existing version ${packageFile.version}`);
+                    break;
+            }
+        }
+    });
+}
+
+export async function uploadPackageFile(
+    packageFile: PackageFile,
+    targetRegistries: RegistryReference[],
+    credentialsBySourceSlug: CredentialsBySourceSlug,
+    context: PublishProgress
+): Promise<Map<RegistryReference, boolean>> {
+    const returnValue: Map<RegistryReference, boolean> = new Map();
+
+    for (const registryRef of targetRegistries) {
+        context.updateStep(PublishSchemaSteps.FIND_EXISTING_PACKAGE, registryRef);
+
+        const registry = getRegistryClientWithConfig(registryRef);
+
+        try {
+            const existingPackage = await registry.getPackage({
+                catalogSlug: registryRef.catalogSlug,
+                packageSlug: packageFile.packageSlug
+            });
+
+            if (existingPackage.errors) {
+                throw existingPackage.errors[0];
+            }
+
+            context.updateStep(PublishSchemaSteps.FOUND_EXISTING_PACKAGE, registryRef);
+
+            context.updateStep(PublishSchemaSteps.UPDATING_PACKAGE_LISTING, registryRef);
+
+            await registry.updatePackage(
+                {
+                    catalogSlug: registryRef.catalogSlug,
+                    packageSlug: packageFile.packageSlug
+                },
+                {
+                    description: packageFile.description,
+                    displayName: packageFile.displayName
+                }
+            );
+
+            context.updateStep(PublishSchemaSteps.UPDATED_PACKAGE_LISTING, registryRef);
+        } catch (error) {
+            if (!error.message.includes("PACKAGE_NOT_FOUND")) {
+                throw error;
+            }
+
+            context.updateStep(PublishSchemaSteps.NO_EXISTING_PACKAGE_FOUND, registryRef);
+
+            context.updateStep(PublishSchemaSteps.CREATE_PACKAGE, registryRef);
+
+            await registry.createPackage({
+                catalogSlug: registryRef.catalogSlug,
+                packageSlug: packageFile.packageSlug,
+                description: packageFile.description,
+                displayName: packageFile.displayName
+            });
+            context.updateStep(PublishSchemaSteps.CREATE_PACKAGE_SUCCESS, registryRef);
+        }
+
+        context.updateStep(PublishSchemaSteps.CREATE_VERSION, registryRef);
+
+        const versions = generateCreateVersion(packageFile, registryRef, credentialsBySourceSlug);
+
+        const serverResponse = await registry.createVersion(versions, {
+            catalogSlug: registryRef.catalogSlug,
+            packageSlug: packageFile.packageSlug
+        });
+
+        if (serverResponse.errors) {
+            if (serverResponse.errors.find((error) => error.extensions?.code === "VERSION_EXISTS") !== undefined)
+                context.updateStep(PublishSchemaSteps.VERSION_EXISTS_SUCCESS, registryRef);
+            else throw serverResponse.errors[0];
+        } else {
+            context.updateStep(PublishSchemaSteps.CREATE_VERSION_SUCCESS, registryRef); // FIXME ONLY SHOW THIS IF THE VERSION HAS ACCTUALLY CHANGED
+        }
+
+        returnValue.set(registryRef, true);
+    }
+
+    return returnValue;
+}
+
+function generateCreateVersion(
+    packageFileObject: PackageFile,
+    registryReference: RegistryReference,
+    _credentialsBySourceSlug: CredentialsBySourceSlug // This will be used for proxy feature
+): CreateVersionInput {
+    // deep copy the package file
+    const packageFile = JSON.parse(JSON.stringify(packageFileObject)) as PackageFile;
+
+    // filter out all othe registries
+    packageFile.registries = [registryReference];
+
+    if (registryReference.publishMethod === PublishMethod.SCHEMA_PROXY_DATA) {
+        throw new Error("Publishing with credentials not yet implemented");
+    }
+
+    const version: CreateVersionInput = {
+        packageFile: JSON.stringify(packageFileObject)
+    };
+
+    return version;
 }

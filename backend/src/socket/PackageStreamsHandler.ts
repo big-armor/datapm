@@ -21,7 +21,8 @@ export module SchemaInfoHandler {
                 acc[batch.schemaTitle].push({
                     batchIdentifier: entityToIdentifier(batch),
                     highestOffset: batch.lastOffset,
-                    updatedAt: batch.updatedAt
+                    updatedAt: batch.updatedAt,
+                    updateMethod: batch.updateMethod
                 });
                 return acc;
 

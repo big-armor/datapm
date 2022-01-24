@@ -7,7 +7,8 @@ import {
     Schema,
     Source,
     RecordContext,
-    RecordStreamContext
+    RecordStreamContext,
+    UpdateMethod
 } from "datapm-lib";
 import moment from "moment";
 import numeral from "numeral";
@@ -146,8 +147,9 @@ export async function streamRecords(
     context: RecordStreamEventContext,
     schemas: Schema[],
     sinkState: Maybe<SinkState>,
+    sinkSupportedUpdateMethods: UpdateMethod[],
     deconflictOptions?: Record<string, DeconflictOptions> | null
-): Promise<Readable> {
+): Promise<{ readable: Readable; getCurrentUpdateMethod: () => UpdateMethod }> {
     const returnReadable = new Transform({
         objectMode: true,
         transform: (chunk, encoding, callback) => {
@@ -158,6 +160,8 @@ export async function streamRecords(
     let transform: Transform;
 
     let index = 0;
+
+    const getCurrentUpdateMethod = UpdateMethod.BATCH_FULL_SET;
 
     const moveToNextStream = async function () {
         let currentStreamSummary: StreamSummary;
@@ -175,6 +179,28 @@ export async function streamRecords(
             }
             currentStreamSummary = streamSummary;
         }
+
+        const streamSupportedUpdateMethod = currentStreamSummary.updateMethod;
+
+        if (!sinkSupportedUpdateMethods.find((s) => s === streamSupportedUpdateMethod)) {
+            throw new Error(
+                "Source update method: " +
+                    streamSupportedUpdateMethod +
+                    " and sink only supports update methods " +
+                    sinkSupportedUpdateMethods.join(",") +
+                    " Therefore there is no way to stream from this source to this sink"
+            ); // TODO This could be more leanient, but warn of lost or duplicated data
+        }
+
+        let updateMethod =
+            streamSupportedUpdateMethod === UpdateMethod.APPEND_ONLY_LOG &&
+            sinkSupportedUpdateMethods.includes(UpdateMethod.APPEND_ONLY_LOG)
+                ? UpdateMethod.APPEND_ONLY_LOG
+                : UpdateMethod.BATCH_FULL_SET;
+
+        if (sinkState == null) updateMethod = UpdateMethod.BATCH_FULL_SET;
+
+        if (updateMethod === UpdateMethod.BATCH_FULL_SET) sinkState = null;
 
         const streamState = sinkState?.streamSets[streamSetPreview.slug]?.streamStates[currentStreamSummary.name];
 
@@ -227,7 +253,12 @@ export async function streamRecords(
 
     await moveToNextStream();
 
-    return returnReadable;
+    return {
+        readable: returnReadable,
+        getCurrentUpdateMethod() {
+            return getCurrentUpdateMethod;
+        }
+    };
 }
 
 function createStreamAndTransformPipeLine(

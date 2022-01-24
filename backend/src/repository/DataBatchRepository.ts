@@ -2,7 +2,7 @@ import { EntityRepository, EntityManager } from "typeorm";
 import { PackageRepository } from "./PackageRepository";
 import { Maybe } from "graphql/jsutils/Maybe";
 import { DataBatchEntity } from "../entity/DataBatchEntity";
-import { SchemaRepositoryStreamIdentifier, BatchRepositoryIdentifier } from "datapm-lib";
+import { SchemaRepositoryStreamIdentifier, BatchRepositoryIdentifier, UpdateMethod } from "datapm-lib";
 import { DataStorageService } from "../storage/data/data-storage";
 
 @EntityRepository()
@@ -101,7 +101,7 @@ export class DataBatchRepository {
             .getOne();
     }
 
-    async save(userId: number, identifier: BatchRepositoryIdentifier) {
+    async save(userId: number, identifier: BatchRepositoryIdentifier, updateMethod: UpdateMethod) {
         return await this.manager.nestedTransaction(async (transaction) => {
 
             const packageEntity = await transaction.getCustomRepository(PackageRepository).findPackageOrFail({
@@ -120,6 +120,7 @@ export class DataBatchRepository {
                 streamSlug: identifier.streamSlug,
                 majorVersion: identifier.majorVersion,
                 batch: identifier.batch,
+                updateMethod,
                 default: false,
                 authorId: userId,
                 createdAt: new Date(),

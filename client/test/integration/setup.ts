@@ -155,6 +155,7 @@ before(async function () {
             ["run", "start:server"],
             "../backend",
             {
+                REGISTRY_URL: "http://localhost:" + registryServerPort,
                 PORT: registryServerPort.toString(),
                 TYPEORM_PORT: databasePortNumber.toString(),
                 SMTP_PORT: mailDevSMTPPortNumber.toString(),

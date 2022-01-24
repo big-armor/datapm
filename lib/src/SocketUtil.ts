@@ -1,3 +1,4 @@
+import { UpdateMethod } from "./DataHandlingUtil";
 import { MajorVersionIdentifier, SchemaIdentifier } from "./main";
 import { DPMRecord } from "./PackageUtil";
 import { SinkState } from "./SinkState";
@@ -111,6 +112,7 @@ export interface BatchInfo {
     highestOffset: number;
     // TODO estimated record count
     updatedAt: Date;
+    updateMethod: UpdateMethod;
 }
 export interface BatchesBySchema {
     [schema: string]: BatchInfo[];
@@ -167,7 +169,11 @@ export class StartUploadRequest implements Request {
     requestType = SocketEvent.START_DATA_UPLOAD;
 
     // eslint-disable-next-line no-useless-constructor
-    constructor(public schemaStreamIdentifier: SchemaRepositoryStreamIdentifier, public newBatch: boolean) {}
+    constructor(
+        public schemaStreamIdentifier: SchemaRepositoryStreamIdentifier,
+        public newBatch: boolean,
+        public updateMethod: UpdateMethod
+    ) {}
 }
 
 /** This is sent by the server in response to the StreamUploadRequest */
