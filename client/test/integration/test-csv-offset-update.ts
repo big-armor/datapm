@@ -183,7 +183,10 @@ describe("CSV Offset Tests", function () {
                     message: "File Location?",
                     input: "./" + KEYS.ENTER
                 }
-            ]
+            ],
+            async (line) => {
+                console.log(line);
+            }
         );
 
         expect(exitCode.code).equal(0);

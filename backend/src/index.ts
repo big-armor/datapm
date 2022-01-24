@@ -392,7 +392,7 @@ async function main() {
     // any route not yet defined goes to index.html
     app.use("*", (req, res, next) => {
         res.setHeader("x-datapm-version", REGISTRY_API_VERSION);
-        res.setHeader("x-datapm-graphql-path", "/graphql"); // TODO support other paths
+        res.setHeader("x-datapm-registry-url", process.env["REGISTRY_URL"] as string); // TODO support other paths
         res.sendFile(path.join(__dirname, "..", "static", "index.html"));
     });
 

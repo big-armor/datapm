@@ -41,10 +41,11 @@ export abstract class AbstractFileSink implements Sink {
         configuration: DPMConfiguration
     ): Promise<Maybe<Readable>>;
 
-    async saveSinkState(
+    async commitAfterWrites(
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
+        commitKeys: CommitKey[], // TODO Use this to rename bulk upload files
         sinkStateKey: SinkStateKey,
         sinkState: SinkState
     ): Promise<void> {
@@ -217,14 +218,6 @@ export abstract class AbstractFileSink implements Sink {
                 return []; // TODO Implement file level commits (rename final files?)
             }
         };
-    }
-
-    async commitAfterWrites(
-        _commitKeys: CommitKey[],
-        _connectionConfiguration: DPMConfiguration,
-        _credentialsConfiguration: DPMConfiguration
-    ): Promise<void> {
-        // todo have the files renamed
     }
 
     async filterDefaultConfigValues(

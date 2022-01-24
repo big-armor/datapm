@@ -18,7 +18,7 @@ import { Maybe } from "../../../util/Maybe";
 import { ExtendedJSONSchema7TypeName } from "../../Source";
 import { convertValueByValueType, discoverValueType } from "../../../transforms/StatsTransform";
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
-import { Sink, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
+import { CommitKey, Sink, SinkSupportedStreamOptions, WritableWithContext } from "../../Sink";
 import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
 import { DISPLAY_NAME, TYPE } from "./BigQueryRepositoryDescription";
 
@@ -219,10 +219,6 @@ export class BigQuerySink implements Sink {
                 return [];
             }
         };
-    }
-
-    async commitAfterWrites(): Promise<void> {
-        // Nothing to do
     }
 
     async writeRecord(recordStreamContext: RecordStreamContext, transform: Transform): Promise<void> {
@@ -464,10 +460,11 @@ export class BigQuerySink implements Sink {
         return csvContent;
     }
 
-    async saveSinkState(
+    async commitAfterWrites(
         connectionConfiguration: DPMConfiguration,
         credentialsConfiguration: DPMConfiguration,
         configuration: DPMConfiguration,
+        commitKeys: CommitKey[], // TODO possibly use this to commit tables, but BigQuery may not support this. Might need to do some row flags somehow
         sinkStateKey: SinkStateKey,
         sinkState: SinkState
     ): Promise<void> {

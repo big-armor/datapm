@@ -12,7 +12,7 @@ import numeral from "numeral";
 import ora from "ora";
 import prompts from "prompts";
 import { OraQuiet } from "../util/OraQuiet";
-import { getPackage } from "../util/PackageAccessUtil";
+import { getPackage, RegistryPackageFileContext } from "../util/PackageAccessUtil";
 import { cliHandleParameters, repeatedlyPromptParameters } from "../util/parameters/ParameterUtils";
 import { inspectSourceConnection } from "../util/SchemaUtil";
 
@@ -227,7 +227,11 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
 
     parameterCount += await repeatedlyPromptParameters(
         async () => {
-            return sink.getParameters(packageFileWithContext.catalogSlug, packageFile, sinkConfiguration);
+            return sink.getParameters(
+                (packageFileWithContext as RegistryPackageFileContext).packageObject?.identifier.catalogSlug,
+                packageFile,
+                sinkConfiguration
+            );
         },
         sinkConfiguration,
         argv.defaults || false

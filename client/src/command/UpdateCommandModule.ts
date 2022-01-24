@@ -17,9 +17,8 @@ import { Permission } from "../generated/graphql";
 import { getSourceByType } from "../repository/SourceUtil";
 import { getRepositoryCredential } from "../util/ConfigUtil";
 import { validPackageDisplayName, validShortPackageDescription, validUnit, validVersion } from "../util/IdentifierUtil";
-import { getPackage } from "../util/PackageAccessUtil";
-import { writeLicenseFile, writePackageFile, writeReadmeFile, differenceToString } from "../util/PackageUtil";
-import { publishPackage } from "./PublishPackageCommand";
+import { getPackage, RegistryPackageFileContext } from "../util/PackageAccessUtil";
+import { differenceToString } from "../util/PackageUtil";
 import clone from "rfdc";
 import { LogType } from "../util/LoggingUtils";
 import { UpdateArguments } from "./UpdateCommand";
@@ -291,14 +290,16 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
         process.exit(1);
     });
 
-    if (packageFileWithContext.registryURL != null) {
+    if (packageFileWithContext.contextType === "registry") {
+        const registryPackageFileContext = packageFileWithContext as RegistryPackageFileContext;
+
         try {
             await checkPackagePermissionsOnRegistry(
                 {
                     catalogSlug: packageFileWithContext.catalogSlug as string,
                     packageSlug: packageFileWithContext.packageFile.packageSlug
                 },
-                packageFileWithContext.registryURL,
+                registryPackageFileContext.registryUrl,
                 Permission.EDIT
             );
         } catch (error) {
@@ -309,7 +310,7 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
                 process.exit(1);
             } else if (error.message === "NOT_AUTHENTICATED") {
                 oraRef.fail("You are not logged in to the registry. Use the following command to login");
-                console.log(chalk.green("datapm registry login " + packageFileWithContext.registryURL));
+                console.log(chalk.green("datapm registry login " + registryPackageFileContext.registryUrl));
                 process.exit(1);
             }
 
@@ -321,20 +322,16 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
     const oldPackageFile = packageFileWithContext.packageFile;
     oraRef.succeed();
 
-    // Validate the package registry URL and the permission to update
-    if (packageFileWithContext.registryURL != null) {
-        const registryReference = packageFileWithContext.packageFile.registries?.find(
-            (s) => packageFileWithContext.registryURL === s.url
-        );
+    if (!packageFileWithContext.permitsSaving) {
+        oraRef.fail("Packages can not be saved to " + packageFileWithContext.contextType);
+        process.exit(1);
+    }
 
-        if (registryReference === undefined) {
-            console.log(
-                chalk.red(
-                    "The registry URL is not configured in this package. The registry URL has likely changed. Contact the package author and ask them to republish to the new registry URL"
-                )
-            );
-            process.exit(1);
-        }
+    if (!packageFileWithContext.hasPermissionToSave) {
+        oraRef.fail(
+            "You do not have permission to save to " + packageFileWithContext.packageFileUrl.replace("file://", "")
+        );
+        process.exit(1);
     }
 
     if (packageFileWithContext.packageFile.canonical === false) {
@@ -634,47 +631,14 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
         website: promptResponses.website
     };
 
-    // Write updates to the target package file in place
-    oraRef.start("Writing package file...");
-    let packageFileLocation;
+    await packageFileWithContext.save(oraRef, newPackageFile);
 
-    try {
-        packageFileLocation = writePackageFile(newPackageFile);
-
-        oraRef.succeed(`Wrote package file ${packageFileLocation}`);
-    } catch (error) {
-        oraRef.fail(`Unable to write the package file: ${error.message}`);
-        process.exit(1);
-    }
-
-    oraRef.start("Writing README file...");
-    try {
-        const readmeFileLocation = writeReadmeFile(newPackageFile);
-        oraRef.succeed(`Wrote README file ${readmeFileLocation}`);
-    } catch (error) {
-        oraRef.fail(`Unable to write the README file: ${error.message}`);
-        process.exit(1);
-    }
-
-    oraRef.start("Writing LICENSE file...");
-    try {
-        const licenseFileLocation = writeLicenseFile(newPackageFile);
-        oraRef.succeed(`Wrote LICENSE file ${licenseFileLocation}`);
-    } catch (error) {
-        oraRef.fail(`Unable to write the LICENSE file: ${error.message}`);
-        process.exit(1);
-    }
-
-    // If it's just a local package, give the user the correct "datapm publish" command
-    if (!packageFileWithContext.registryURL) {
+    if (packageFileWithContext.contextType === "localFile") {
         console.log("");
         console.log(chalk.grey("When you are ready, you can publish with the following command"));
-        console.log(chalk.green(`datapm publish ${packageFileLocation}`));
+        console.log(chalk.green(`datapm publish ${packageFileWithContext.packageFileUrl.replace("file://", "")}`));
         process.exit(0);
     }
-
-    // For PackageFileWithContext that includes a registryUrl, publish the package
-    await publishPackage({ reference: packageFileLocation, defaults: argv.defaults });
 
     process.exit(0);
 }

@@ -28,7 +28,7 @@ export interface WritableWithContext {
 
     /** Optionally return a function that will be called after the writable is closed. This will return a set of keys
      * that can later be used to "commit the transaction" of this writable along with other writables at the same time.
-     * See the #commitAfterWrites() method for more info
+     * See the #commitAfterWrites() method for more info.
      *
      * Return an empty array if the sink does not support this.
      */
@@ -89,14 +89,28 @@ export interface Sink {
         updateMethod: UpdateMethod
     ): Promise<WritableWithContext>;
 
-    /** A set of keys provided by getWritable that are used to indiciate the
+    /**
+     * Called after all writes for a set of streams has completed. If possible,
+     * this should be done transactionally so that it entirely succeeds or
+     * fails.
+     *
+     * @commitKeys A set of keys provided by #getWritable() that are used to indiciate the
      * sink should commit one or more writeable streams. This is useful for
      * large multiple schema data sets that need to be committed transactionally.
+     *
+     * An example of committing a write might be deleting the old file/table and replacing it
+     * with the new one. Not all sinks support this.
+     *
+     * @sinkStateKey The key that will later be used to fetch the sinkState object.
+     * @sinkState An object containing the state of the sink as compared to the source it came from.
      */
     commitAfterWrites(
-        commitKeys: CommitKey[],
         connectionConfiguration: DPMConfiguration,
-        credentialsConfiguration: DPMConfiguration
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        commitKeys: CommitKey[],
+        sinkStateKey: SinkStateKey,
+        sinkState: SinkState
     ): Promise<void>;
 
     /** For filtering default values from the configuration, for the purposes of showing the minimum necessary information to recreate the configuration.
@@ -107,24 +121,6 @@ export interface Sink {
         packageFile: PackageFile,
         configuration: DPMConfiguration
     ): void;
-
-    /** Called after updating a sink. The Sink implementation should persist all values of the
-     * sinkState object using the sinkStateKey as a reference.
-     *
-     * @param configuration The same configuration object that is the result of the getParameters(...) user responses.
-     *
-     * @param sinkStateKey Use all of the properties of this object to create a unique instance of the SinkState object;
-     *
-     * @param sinkState An object that identifies the last observed state of the sink. This method should create or
-     * overwrite the value referenced by the sinkStatekey.
-     */
-    saveSinkState(
-        connectionConfiguration: DPMConfiguration,
-        credentialsConfiguration: DPMConfiguration,
-        configuration: DPMConfiguration,
-        sinkStateKey: SinkStateKey,
-        sinkState: SinkState
-    ): Promise<void>;
 
     /** Called when evaluating the current state of a sink, usually before writing new records. The Sink
      * implementation should use the

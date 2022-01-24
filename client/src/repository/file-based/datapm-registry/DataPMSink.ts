@@ -303,10 +303,21 @@ export class DataPMSink implements Sink {
         return connectSocket(connectionConfiguration, credentialsConfiguration);
     }
 
+    filterDefaultConfigValues(
+        _catalogSlug: string | undefined,
+        _packageFile: PackageFile,
+        _configuration: DPMConfiguration
+    ): void {
+        // Nothing to do
+    }
+
     async commitAfterWrites(
-        commitKeys: CommitKey[],
         connectionConfiguration: DPMConfiguration,
-        credentialsConfiguration: DPMConfiguration
+        credentialsConfiguration: DPMConfiguration,
+        configuration: DPMConfiguration,
+        commitKeys: CommitKey[],
+        _sinkStateKey: SinkStateKey, // TODO Save this stuff
+        _sinkState: SinkState
     ): Promise<void> {
         const socket = await this.connectSocket(connectionConfiguration, credentialsConfiguration);
 
@@ -338,24 +349,6 @@ export class DataPMSink implements Sink {
                 // console.log("\n\ndisconnect: " + reason);
             });
         });
-    }
-
-    filterDefaultConfigValues(
-        _catalogSlug: string | undefined,
-        _packageFile: PackageFile,
-        _configuration: DPMConfiguration
-    ): void {
-        // Nothing to do
-    }
-
-    async saveSinkState(
-        _connectionConfiguration: DPMConfiguration,
-        _credentialsConfiguration: DPMConfiguration,
-        _configuration: DPMConfiguration,
-        _sinkStateKey: SinkStateKey,
-        _sinkState: SinkState
-    ): Promise<void> {
-        // Nothing to do, the sink state is managed by teh server
     }
 
     async getSinkState(

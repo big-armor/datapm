@@ -478,19 +478,15 @@ export async function fetch(
                             })
                     )
                 );
-                // Get the commitKeys after the writable has been closed
-                const commitKeys = writablesWithContexts.flatMap((w) => w.getCommitKeys());
-
-                // Commit all writables at once
-                if (commitKeys.length > 0) {
-                    await sink.commitAfterWrites(commitKeys, sinkConnectionConfiguration, sinkCredentialsConfiguration);
-                }
 
                 callback();
             }
         });
 
         schemaSwitchingWritable.on("finish", async () => {
+            // Get the commitKeys after the writable has been closed
+            const commitKeys = writablesWithContexts.flatMap((w) => w.getCommitKeys());
+
             finalSinkState.packageVersion = packageFile.version;
             streamSetPreview.streamSummaries?.forEach((s) => {
                 let streamSet = finalSinkState.streamSets[streamSetPreview.slug];
@@ -515,10 +511,11 @@ export async function fetch(
                 streamState.updateHash = stoppedEarly ? undefined : s.updateHash;
             });
             try {
-                await sink.saveSinkState(
+                await sink.commitAfterWrites(
                     sinkConnectionConfiguration,
                     sinkCredentialsConfiguration,
                     sinkConfiguration,
+                    commitKeys,
                     sinkStateKey,
                     finalSinkState
                 );

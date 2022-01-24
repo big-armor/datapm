@@ -19,6 +19,7 @@ const PROXY_CONFIG = [
         ], 
         bypass: (req, res, proxyOptions) => {
             res.setHeader('x-datapm-version', 'local-dev');
+            res.setHeader('x-datapm-registry-url', 'http://localhost:4200');
         }
     }
 ]
