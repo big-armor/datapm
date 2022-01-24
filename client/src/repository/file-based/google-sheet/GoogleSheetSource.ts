@@ -87,11 +87,11 @@ export class GoogleSheetSource implements Source {
             const sheetStream: StreamSetPreview = {
                 slug: sheetTitle,
                 configuration: {},
-                supportedUpdateMethods: [UpdateMethod.BATCH_FULL_SET],
                 updateHash: new Date().toISOString(),
                 streamSummaries: [
                     {
                         name: sheetTitle,
+                        updateMethod: UpdateMethod.BATCH_FULL_SET,
                         openStream: async () => {
                             return new Promise((resolve, reject) => {
                                 const request = https.get(sheetUri, async (response) => {

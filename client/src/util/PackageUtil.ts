@@ -193,7 +193,12 @@ export async function publishPackageFile(
                 const totalRecordCount = Object.values(results).reduce((acc, result) => acc + result, 0);
 
                 oraRef.succeed(
-                    `Finished uploading ${numeral(totalRecordCount).format("0,0")} records to ` + targetRegistry.url
+                    `Finished uploading ${numeral(totalRecordCount).format("0,0")} records to ` +
+                        targetRegistry.url +
+                        "/" +
+                        targetRegistry.catalogSlug +
+                        "/" +
+                        packageFile.packageSlug
                 );
             } catch (error) {
                 oraRef.fail(`Failed to publish data: ${error.message}`);

@@ -350,13 +350,13 @@ export function testCmd(
 async function writeSlowlyToBuffer(writable: Writable, charactersRemaining: string): Promise<void> {
     const indexOfEnter = charactersRemaining.lastIndexOf("\n");
 
+    writable.write(charactersRemaining.substring(0, indexOfEnter));
+    await delay(100);
+
     if (indexOfEnter === -1) {
-        writable.write(charactersRemaining);
         return;
     }
 
-    writable.write(charactersRemaining.substring(0, indexOfEnter));
-    await delay(10);
     writable.write(charactersRemaining.substring(indexOfEnter));
 }
 

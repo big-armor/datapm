@@ -18,7 +18,7 @@ const fetchCommandPrompts = ["Destination?", "File Format?", "File Location?"];
 
 const getFetchCommandPromptInputs = (inputs?: string[], skip = 0) => getPromptInputs(fetchCommandPrompts, inputs, skip);
 
-describe("Publish Packge & Data Tests", async function () {
+describe("Publish Data Append Log Tests", async function () {
     let apiKey = "";
 
     let userAClient: ApolloClient<NormalizedCacheObject>;
@@ -54,7 +54,7 @@ describe("Publish Packge & Data Tests", async function () {
         resetConfiguration();
     });
 
-    it("Create Package", async function () {
+    it("Create Package & publish data as append log", async function () {
         const prompts = [
             {
                 message: "Is there a header line above?",
@@ -227,7 +227,7 @@ describe("Publish Packge & Data Tests", async function () {
         expect(foundUploadedRecordsMessage).equal(true);
     });
 
-    it("Should download only the new records", async function () {
+    it("Should download only the newly appended records", async function () {
         const prompts = getFetchCommandPromptInputs(["Local", "JSON", "tmp-files"]);
         const results: TestResults = {
             exitCode: -1,
@@ -250,6 +250,6 @@ describe("Publish Packge & Data Tests", async function () {
 
         const content = fs.readFileSync("tmp-files/countries.json").toString();
         const lines = content.split("\n");
-        expect(lines.length).equals(9);
+        expect(lines.length).equals(4);
     });
 });

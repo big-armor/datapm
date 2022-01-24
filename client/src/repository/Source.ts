@@ -24,6 +24,8 @@ export interface StreamSummary {
     /** The number of records expected before opening the stream */
     expectedRecordCount?: number;
 
+    updateMethod: UpdateMethod;
+
     updateHash?: string;
 
     openStream: (sinkState: Maybe<StreamState>) => Promise<StreamAndTransforms>;
@@ -48,9 +50,6 @@ export interface StreamSetPreview {
 
     // TODO This may not ever be needed.
     configuration: DPMConfiguration;
-
-    /** The update methods  supported by this source */
-    supportedUpdateMethods: UpdateMethod[];
 
     /** The source provides this value to determine whether this particular stream has been updated since it was last read */
     updateHash?: string;

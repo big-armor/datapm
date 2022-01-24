@@ -166,11 +166,11 @@ export class PostgresSource implements Source {
         return {
             slug: tableName,
             configuration: {}, // TODO Probably not needed?
-            supportedUpdateMethods: [UpdateMethod.BATCH_FULL_SET],
             updateHash,
             streamSummaries: [
                 {
                     name: tableName,
+                    updateMethod: UpdateMethod.BATCH_FULL_SET,
                     // TODO provide expectedRecordCount
                     openStream: async () => {
                         const stream = client.table(`${configuration?.schema}.${tableName}`).stream({

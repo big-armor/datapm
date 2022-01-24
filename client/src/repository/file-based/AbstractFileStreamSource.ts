@@ -148,14 +148,8 @@ export abstract class AbstractFileStreamSource implements Source {
 
         const updateMethod = UpdateMethod[configuration.updateMethod as keyof typeof UpdateMethod];
 
-        const sourceSupportedUpdateMethods =
-            updateMethod !== UpdateMethod.BATCH_FULL_SET
-                ? [UpdateMethod.BATCH_FULL_SET, updateMethod]
-                : [UpdateMethod.BATCH_FULL_SET];
-
         const streamSetPreview: StreamSetPreview = {
             slug: commonFileName as string,
-            supportedUpdateMethods: sourceSupportedUpdateMethods,
             configuration: {}, // TODO Probably not needed
             expectedBytesTotal: fileStreamSummaries.reduce((prev, curr) => {
                 return prev + (curr.fileSize || 0);
@@ -166,6 +160,7 @@ export abstract class AbstractFileStreamSource implements Source {
             streamSetPreview.streamSummaries = await asyncMap(fileStreamSummaries, async (f) => {
                 return {
                     name: f.fileName,
+                    updateMethod,
                     expectedTotalRawBytes: f.fileSize,
                     updateHash: f.lastUpdatedHash,
                     openStream: async (sinkState: Maybe<StreamState>) => {
@@ -191,6 +186,7 @@ export abstract class AbstractFileStreamSource implements Source {
                 return {
                     name: fileInspectionResult.fileName as string,
                     expectedTotalRawBytes: fileInspectionResult.fileSize,
+                    updateMethod,
                     updateHash: fileInspectionResult.lastUpdatedHash,
                     openStream: async (sinkState: Maybe<StreamState>) => {
                         const fileStream = await fileInspectionResult.openStream(sinkState);

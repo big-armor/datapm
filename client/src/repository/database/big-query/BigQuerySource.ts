@@ -224,6 +224,7 @@ export class BigQuerySource implements Source {
                 {
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     name: fullPath.tableName!,
+                    updateMethod: UpdateMethod.BATCH_FULL_SET,
                     openStream: async () => {
                         return {
                             stream: client.createQueryStream(options),
@@ -255,7 +256,6 @@ export class BigQuerySource implements Source {
                 }
             ],
             slug: `${fullPath.tableName}`,
-            supportedUpdateMethods: [UpdateMethod.BATCH_FULL_SET],
             updateHash
         };
     }

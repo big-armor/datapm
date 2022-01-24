@@ -123,7 +123,7 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
                 batch: batchEntity ? batchEntity.batch + 1 : 1
             }
             
-            batchEntity = await this.socketContext.connection.getCustomRepository(DataBatchRepository).save(this.socketContext.me.id, this.batchIdentifier);
+            batchEntity = await this.socketContext.connection.getCustomRepository(DataBatchRepository).save(this.socketContext.me.id, this.batchIdentifier, this.uploadRequest.updateMethod);
 
         } else {
 
