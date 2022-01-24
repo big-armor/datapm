@@ -1,6 +1,6 @@
 {
     "name": "datapm-client",
-    "version": "0.8.12",
+    "version": "0.8.13",
     "description": "The client for manipulating data",
     "scripts": {
         "prebuild": "npm run codegen",
@@ -114,7 +114,7 @@
         "crypto": "^1.0.1",
         "csv-parse": "^4.11.1",
         "csv-stringify": "^5.5.0",
-        "datapm-lib": "^0.8.12",
+        "datapm-lib": "^0.8.13",
         "death": "^1.1.0",
         "dockerode": "^3.2.1",
         "faker": "^5.1.0",
