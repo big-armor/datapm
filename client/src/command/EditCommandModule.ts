@@ -18,6 +18,7 @@ import clone from "rfdc";
 import { EditArguments } from "./EditCommand";
 import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
 import { checkPackagePermissionsOnRegistry } from "../util/RegistryPermissions";
+import * as SchemaUtil from "../util/SchemaUtil";
 
 async function schemaPrompts(schema: Schema): Promise<void> {
     if (schema.properties == null) return;
@@ -338,11 +339,17 @@ export async function editPackage(argv: EditArguments): Promise<void> {
     let newPackageFile: PackageFile = clone()(oldPackageFile);
 
     console.log("");
+    console.log(chalk.magenta("Inspection Result"));
+    console.log(`${chalk.gray("Package slug: ")} ${chalk.yellow(oldPackageFile.packageSlug)}`);
+    console.log(`${chalk.gray("Existing package description: ")} ${chalk.yellow(oldPackageFile.description)}`);
+    console.log(`${chalk.gray("Last updated date: ")} ${chalk.yellow(oldPackageFile.updatedDate)}`);
 
     console.log("");
     console.log(chalk.magenta("Schema Refinement"));
 
     for (const schema of newPackageFile.schemas) {
+        SchemaUtil.print(schema);
+
         await schemaPrompts(schema);
     }
 

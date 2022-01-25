@@ -249,9 +249,6 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
     console.log(chalk.magenta("Inspection Result"));
     console.log(`${chalk.gray("Package slug: ")} ${chalk.yellow(oldPackageFile.packageSlug)}`);
     console.log(`${chalk.gray("Existing package description: ")} ${chalk.yellow(oldPackageFile.description)}`);
-    for (const schema of oldPackageFile.schemas) {
-        console.log(`${chalk.gray("Record count: ")} ${chalk.yellow(schema.recordCount)}`);
-    }
     console.log(`${chalk.gray("Last updated date: ")} ${chalk.yellow(oldPackageFile.updatedDate)}`);
 
     let differences = comparePackages(oldPackageFile, newPackageFile);
