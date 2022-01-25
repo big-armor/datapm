@@ -81,7 +81,7 @@ type CatalogIdentifier {
 
 #### Catalog Queries and Mutations
 
-Here are some queries and mutations of interest for catalogs. More methods exist, and you can find them in the [playground](/playground).
+Here are some queries and mutations of interest for catalogs. More methods exist, and you can find them in the [playground](/graphql).
 
 ```gql
 query myCatalogs: [Catalog]!
@@ -126,7 +126,7 @@ type PackageIdentifier {
 
 #### Package Queries and Mutations
 
-Here are some queries and mutations of interest for packages.More methods exist, and you can find them in the [playground](/playground).
+Here are some queries and mutations of interest for packages.More methods exist, and you can find them in the [playground](/graphql).
 
 ```gql
 query package(identifier: PackageIdentifierInput!): Package
@@ -173,7 +173,7 @@ type CollectionIdentifier {
 
 #### Collection Queries and Mutations
 
-Here are some queries and mutations of interest for collections. More methods exist, and you can find them in the [playground](/playground).
+Here are some queries and mutations of interest for collections. More methods exist, and you can find them in the [playground](/graphql).
 
 ```
 query collection(identifier: CollectionIdentifierInput!): Collection
@@ -223,4 +223,4 @@ mutation removePackagePermissions(identifier: PackageIdentifierInput!, username:
 
 ### Other Objects
 
-There are more objects that you will find defined in the [playground](/playground).
+There are more objects that you will find defined in the [playground](/graphql).
