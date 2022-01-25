@@ -44,11 +44,11 @@ You can submit an API key in the "X-API-Key" HTTP request header to authenticate
 
 ## Object Overview
 
-The [DataPM Concepts](concepts.md) page contains details about logical of a DataPM registry. The following describes the high level concepts of the registry API GraphQL object types and how they map to those concepts.
+The [DataPM Concepts](concepts.md) page contains details about logical concepts of a DataPM registry. The following describes the high level concepts of the registry API GraphQL object types and how they map to those concepts.
 
 ### Object: Catalog
 
-A catalog is, like a real world magazine catalog, published by a person or organization and contains a list of available DataPM Packages. Catalogs are uniquely identified by their "slug" or "catalogSlug" reference.
+A catalog is, like a real world magazine catalog, published by a person or organization and contains a list of available Packages. Catalogs are uniquely identified by their "slug" (often called "catalogSlug") reference.
 
 Catalogs may be public or private, and may have one or more user with a Permission to access or edit them. Every user has a catalog that matches their username.
 
@@ -63,10 +63,16 @@ type Catalog {
     packages: [Package]
 }
 
+"""
+Used only in requests to the API
+"""
 type CatalogIdentifierInput {
     catalogSlug: String!
 }
 
+"""
+Included in responses from the API
+"""
 type CatalogIdentifier {
     registryURL: String!
     catalogSlug: String!
@@ -103,6 +109,7 @@ type Package {
     description: String
     latestVersion: Version
     versions: [Version]!
+    myPermissions: [Permission!]
 }
 
 type PackageIdentifierInput {
@@ -140,7 +147,7 @@ mutation removePackagePermissions(identifier: PackageIdentifierInput!, username:
 
 ### Object: Collections
 
-Collections are groupings of two or more packages for the purposes of organizing packages into logical groups. Collections are curated by one or more users, and may be private or public.
+Collections are groupings of two or more packages for the purposes of organizing packages into logical groups. Collections are curated by one or more users, and may be private or public. Collections are uniquely identified by their "collectionSlug" which must be unique within the registry.
 
 Packages may be added to zero or more collections.
 

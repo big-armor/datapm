@@ -14,7 +14,7 @@ The global public registry at [datapm.io](https://datapm.io), and the similarly 
 -   Browse organization/team catalogs
 -   Browse curated collections
 
-The [command line client](command-line-client.md) includes a basic search feature for discovering packages.
+The [command line client](command-line-client.md) also includes a search feature for discovering packages.
 
 ```text
 datapm search "example keywords"

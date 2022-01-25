@@ -9,33 +9,25 @@ DataPM stands for Data Package Manager, and consists of three major components.
 -   [Registry](registry-api.md)
 -   Clients: [Command Line](command-line-client.md) & Web Interface
 
-The registry holds packages, and the client performs actions such as searching for packages and fetching data.
+The registry holds packages, and the client performs actions such as searching for packages and fetching data from those packages.
 
 This document explains the details of each component and important associated concepts.
 
 ## Registries
 
-The public global registry is available at [datapm.io](https://datapm.io) - and this is where you should start. Data publishers push data packages (currently consiting only of schemas) to this global public registry. The public registry supports both public and private data access use cases.
+The public global registry is available at [datapm.io](https://datapm.io) - and this is where you should start. Data publishers push data packages to this global public registry. The public registry supports both public and private data access use cases.
 
-You can host your own private DataPM registry, which is useful when your data security requirements do not allow for even meta-data about your data to leave your network.
+You can [host your own private DataPM registry](private-registry.md). This is useful when your data security requirements do not allow for even meta-data about your data to leave your network.
 
 ### What is in a registry?
 
-A DataPM registry holds "Data Packages". These package contain the descriptions, schemas, formats, and locations of available data. Think of a registry like a library index. It doesn't hold the data - just what it is, and where to get it.
-
-_Important Note:_ Right now, DataPM only supports publishing data schemas. So you must host the actual dataset in another location - such as GitHub or a public web server. And that hosting must be publicly available. In the future, DataPM will also support hosting the data itself.
-
-### Where are the registries?
-
-The primary global public registry is [datapm.io](https://datapm.io) - try it out! It's free to use, and offers tons of great data packages.
-
-You can also run your own private registry - which requires providing your own cloud or on-premises hosting using a Kubernetes, Docker, VMware, or some other similar container service.
+A DataPM registry holds "data packages". These package contain the descriptions, schemas, formats, and locations of available data. Think of a registry like a library index. It MIGHT also hold the data - or just point to where the client should find the data.
 
 ### Why would I want to host my own private registry?
 
-Hosting your own DataPM registry allows your team to combine highly sensitive private data and 3rd party data to create rich insights and competitive advantages.
+A private DataPM registry is a great way to create catalogs of your organization's data, while maintaining absolute control over every aspect of the data's presence. Imagine having a complete index of all of the data in your organization - without copying data or changing your existing architecture.
 
-Also, a private DataPM registry is a great way to create catalogs of your organization's data, while maintaining absolute control over every aspect of the data's presence. Imagine having a complete index of all of the data in your organization - without copying data or changing your existing architecture.
+A private DataPM registry also gives you a super secure way to share data inside and outside of your organization.
 
 ## Package Files
 
@@ -43,7 +35,7 @@ Package Files contain metadata information, descriptions, and statistics about o
 
 ### What is in a package file?
 
-DataPM package files contain the following information.
+DataPM [package files](package-files.md) contain the following information.
 
 -   Name
 -   Description
@@ -62,7 +54,7 @@ DataPM package files are written in JSON format, and have their own JSON Schema'
 
 ### How are package files generated?
 
-The DataPM Command Line Client's "package" command automatically creates package files from common file formats, databases, and other repositories. The client will prompt you with simple questions about the discovered contents, and then write the final package file to your local disk.
+The DataPM Command Line Client's "package" command automatically creates package files from common file formats, databases, and other data repositories. The client will prompt you with simple questions about the discovered contents, and then write the final package file to your local disk.
 
 ### Do I have to have a package file to get data?
 
@@ -80,12 +72,12 @@ The web client is intended to be user friendly, but does not provide all of the 
 
 ### Command Line Client
 
-The DataPM Command Line Client is the most powerful way to interact with and automate your data publishing and consuming processes. Use the command line client to do the following.
+The [DataPM Command Line Client](command-line-client.md) is the most powerful way to interact with and automate your data publishing and consuming processes. Use the command line client to do the following.
 
 -   Generate package files automatically
 -   Update package files
 -   Search for package files on a registry
--   Fetch/Stream data - even without a registry
+-   Fetch data - even without a registry
 
 #### Easy ETL Data Delivery
 
@@ -100,4 +92,4 @@ DataPM takes care of the entire ETL process for every data package in a registry
 
 #### Automated Data Delivery
 
-Use the DataPM client in your devops processes to automate the publishing and consuming of data packages. DataPM ensures that your publishing process provides high quality results, and that your consuming processes deliver clean fault tolerant data.
+Use the DataPM client in your devops processes to automate the publishing and consuming of data packages. DataPM ensures that your publishing process provides high quality results, and that your consuming processes deliver clean fault tolerant data. Read more about [DataPM's DevOps Use Cases](devops.md).

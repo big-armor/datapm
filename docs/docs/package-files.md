@@ -8,9 +8,9 @@ DataPM Package Files contain the description, schema, and access information for
 
 ## Concepts
 
-It is important to note that package files do not contain the data itself - which is accessed via a method described in the package file. Package files are intended to describe every aspect necessary to discovering, evaluating, obtaining, parsing, and deploying data - such that a computer instead of a human can perform those tasks.
+It is important to note that package files do not contain the data itself - which is accessed via a method described in the package file. Package files are intended to describe every aspect necessary to discover, evaluate, obtain, parse, and deploy data - such that a computer instead of a human can perform those tasks.
 
-Package Files must reference data in the way that the target audience and the target DataPM registry can access the data. In the future DataPM registries will support deploying the data and schema, but for now the registry only supports deploying the schema. Therefore you must host the data on another solution.
+Package Files must reference data in the way that the target audience and the target DataPM registry can access the data. Data can be hosted directly in the DataPM Registry or may be hosted elsewhere and simply referenced by the package file.
 
 ## Examples
 
@@ -24,11 +24,7 @@ Here are a few example DataPM package files for your reference.
 
 A DataPM package file is stored in JSON format, and adheres to the published [DataPM Package File JSON Schema spec](/docs/datapm-package-file-schema-current.json) - which is itself a restricting extension of the [JSON Schema Draft 07 specification](https://json-schema.org/specification-links.html#draft-7).
 
-## Validating
-
-DataPM registries validate submitted package files against the specification linked above. Therefore you may wish to use a [JSON Schema validator](https://json-schema.org/implementations.html#validators) in your pre-publishing process.
-
-### Online Validation
+### Validating Package File Formats
 
 [https://jsonschema.dev](https://jsonschema.dev) is the official JSON Schema validator. You can copy the contents of [datapm-package-file-schema-current.json](/docs/datapm-package-file-schema-current.json) into the "JSON Schema" field, and your package file into the "JSON instance" to validate.
 
