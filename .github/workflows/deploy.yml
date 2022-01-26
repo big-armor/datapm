@@ -6,10 +6,76 @@ on:
             - master
 
 jobs:
+    build-win-x64-client:
+      runs-on: windows-latest
+        timeout-minutes: 15
+        name: Windows Build Node Client
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: "14.18.3"
+                  architecture: "x64" # optional, x64 or x86. If not specified, x64 will be used by default
+
+            - name: Print npm verion
+              run: npm --version
+
+            - name: Print node verion
+              run: node --version
+
+            - name: Install Root Dependencies
+              run: npm ci
+              if: steps.cache-root-node-modules.outputs.cache-hit != 'true'
+
+            - name: Install Lib Dependencies
+              run: npm ci
+              working-directory: lib
+              if: steps.cache-lib-build.outputs.cache-hit != 'true'
+
+            - name: Build Lib
+              run: npm run build
+              working-directory: lib
+              if: steps.cache-lib-build.outputs.cache-hit != 'true'
+
+            - name: Link Lib
+              run: npm link
+              working-directory: lib/dist
+
+            - name: Install client dependencies
+              run: npm ci
+              working-directory: client
+              if: steps.cache-client-node-modules.outputs.cache-hit != 'true'
+
+            - name: Link Lib for Client
+              run: npm link datapm-lib
+              working-directory: client
+
+            - name: Run Linters
+              run: npm run lint
+              working-directory: client
+
+            - name: Run build
+              run: npm run build
+              working-directory: client
+
+            - run: npm run package:win64
+              working-directory: client
+              env:
+                  CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_BASE64 }}
+                  CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_PASSWORD }}
+
+            - name: "Save Windows Executable"
+              uses: actions/upload-artifact@v2
+              with:
+                  name: datapm-client-windows-x64
+                  path: client/datapm-*-x64.msix
+                  retention-days: 5
+
     buildAndDeploy:
         name: "Build And Deploy"
         timeout-minutes: 20
         runs-on: ubuntu-latest
+        needs: build-win-x64-client
         env:
             INPUT_TOKEN: "" # See https://github.com/JS-DevTools/npm-publish/issues/15
         steps:
@@ -104,6 +170,12 @@ jobs:
               id: build-client-Dependencies
               run: npm run build
               working-directory: client
+
+            - name: Retrieve saved Docker image
+              uses: actions/download-artifact@v2
+              with:
+                name: datapm-client-windows-x64
+                path: client/dist-installers/
 
             - name: Build Registry Docker Container
               run: gulp buildRegistryDockerImage

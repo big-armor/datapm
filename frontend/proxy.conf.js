@@ -7,7 +7,8 @@ const PROXY_CONFIG = [
             "/graphql",
             "/ws",
             "/images",
-            "/proxy"
+            "/proxy",
+            "/client-installers"
         ],
         target: "http://localhost:4000",
         secure: false,

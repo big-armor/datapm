@@ -256,13 +256,13 @@ async function main() {
     // Set express for the Apollo GraphQL server
     server.applyMiddleware({ app, bodyParserConfig: { limit: "20mb" } });
 
-    const respondWithImage = async (imageStream: Readable, response: express.Response) => {
+    const respondWithReadable = async (readable: Readable, response: express.Response) => {
         const imageBuffer = await new Promise<Buffer>((res) => {
             const bufferedData: any[] = [];
-            imageStream.on("data", (d) => {
+            readable.on("data", (d) => {
                 bufferedData.push(d);
             });
-            imageStream.on("end", () => {
+            readable.on("end", () => {
                 const buffer = Buffer.concat(bufferedData);
                 res(buffer);
             });
@@ -281,7 +281,7 @@ async function main() {
             const user = await (await contextObject).connection
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: req.params.username });
-            await respondWithImage(await imageService.readUserAvatarImage(user.id), res);
+            await respondWithReadable(await imageService.readUserAvatarImage(user.id), res);
         } catch (err) {
             res.status(404).send();
             return;
@@ -294,7 +294,7 @@ async function main() {
             const user = await (await contextObject).connection
                 .getCustomRepository(UserRepository)
                 .findUserByUserName({ username: req.params.username });
-            await respondWithImage(await imageService.readUserCoverImage(user.id), res);
+            await respondWithReadable(await imageService.readUserCoverImage(user.id), res);
         } catch (err) {
             res.status(404).send();
             return;
@@ -309,7 +309,7 @@ async function main() {
                 .findPackageOrFail({
                     identifier: { catalogSlug: req.params.catalogSlug, packageSlug: req.params.packageSlug }
                 });
-            await respondWithImage(await imageService.readPackageCoverImage(user.id), res);
+            await respondWithReadable(await imageService.readPackageCoverImage(user.id), res);
         } catch (err) {
             res.status(404).send();
             return;
@@ -322,7 +322,7 @@ async function main() {
             const user = await (await contextObject).connection
                 .getCustomRepository(CatalogRepository)
                 .findCatalogBySlugOrFail(req.params.catalogSlug);
-            await respondWithImage(await imageService.readCatalogAvatarImage(user.id), res);
+            await respondWithReadable(await imageService.readCatalogAvatarImage(user.id), res);
         } catch (err) {
             res.status(404).send();
             return;
@@ -335,7 +335,7 @@ async function main() {
             const user = await (await contextObject).connection
                 .getCustomRepository(CatalogRepository)
                 .findCatalogBySlugOrFail(req.params.catalogSlug);
-            await respondWithImage(await imageService.readCatalogCoverImage(user.id), res);
+            await respondWithReadable(await imageService.readCatalogCoverImage(user.id), res);
         } catch (err) {
             res.status(404).send();
             return;
@@ -348,12 +348,47 @@ async function main() {
             const collection = await (await contextObject).connection
                 .getCustomRepository(CollectionRepository)
                 .findCollectionBySlugOrFail(req.params.collectionSlug);
-            await respondWithImage(await imageService.readCollectionCoverImage(collection.id), res);
+            await respondWithReadable(await imageService.readCollectionCoverImage(collection.id), res);
         } catch (err) {
             res.status(404).send();
             return;
         }
     });
+
+
+    /** Client Installer Downloads */
+    app.use("/client-installers/:type", async (req, res, next) => {
+        let installerFileNameEndsWith = "not-found.something";
+
+        switch(req.params.type) {
+            case "win64": {
+                installerFileNameEndsWith = "-win64.msix";
+            }
+        }
+
+        const clientInstallersPath = path.join(__dirname, "client-installers");
+
+        console.log(clientInstallersPath);
+
+        if(!fs.existsSync(clientInstallersPath)) {
+            res.sendStatus(404);
+            return;
+        }
+
+        const installerFiles = fs.readdirSync(clientInstallersPath);
+
+        const installerFile = installerFiles.find((file) => file.endsWith(installerFileNameEndsWith));
+
+        if(!installerFile) {
+            res.sendStatus(404);
+            return;
+        }
+
+        res.sendFile(path.join(__dirname, "client-installers", installerFile));
+
+    });
+
+    /** Data Web Socket Server */
 
     const httpServer = http.createServer(app); // TODO https?
     const io = new socketio.Server(httpServer, {
