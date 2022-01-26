@@ -7,6 +7,7 @@ import { CatalogEntity } from "./CatalogEntity";
 import { CollectionEntity } from "./CollectionEntity";
 import { ActivityLogChangeType, ActivityLogEventType } from "../generated/graphql";
 import { PackageIssueEntity } from "./PackageIssueEntity";
+import { DataBatchEntity } from "./DataBatchEntity";
 
 @Entity({ name: "activity_log" })
 @Index(["userId", "eventType"])
@@ -67,12 +68,28 @@ export class ActivityLogEntity extends EntityBaseModel {
     @Column({ name: "target_collection_id", nullable: true })
     public targetCollectionId?: number;
 
+    @Column({ name: "target_data_batch_id", nullable: true })
+    public targetDataBatchId?: number;
+    
+    @ManyToOne(() => PackageEntity, { onDelete: "CASCADE", eager: true })
+    @JoinColumn({ name: "target_data_batch_id" })
+    public targetDataBatch?: DataBatchEntity | null;
+
     @ManyToOne(() => CollectionEntity, { onDelete: "CASCADE", eager: true })
     @JoinColumn({ name: "target_collection_id" })
     public targetCollection: CollectionEntity | null;
 
     @Column({ name: "properties_edited", array: true, type: "text" })
     public propertiesEdited?: string[];
+
+    @Column({
+        name: "additional_properties",
+        type: 'jsonb',
+        array: false,
+        default: () => "'{}'::jsonb",
+        nullable: false,
+    })
+    public additionalProperties?: {[key: string]: any};
 
     // The following are not persisted to the database
     // but are used during logging to the console.
@@ -82,4 +99,5 @@ export class ActivityLogEntity extends EntityBaseModel {
     public targetCollectionSlug?: string;
     public username?: string;
     public targetUsername?: string;
+    public targetBatchNumber?: number;
 }

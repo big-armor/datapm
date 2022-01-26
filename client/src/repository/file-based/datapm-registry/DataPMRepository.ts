@@ -80,16 +80,12 @@ export async function connectSocket(
 
     const registryConfiguration = getRegistryConfig(connectionConfiguration.url);
 
-    if (registryConfiguration == null) {
-        throw new Error("REGISTRY_CONFIG_NOT_FOUND: " + uri);
-    }
-
     const socket = io(uri, {
         path: "/ws/",
         parser: require("socket.io-msgpack-parser"),
         transports: ["polling", "websocket"],
         auth: {
-            token: registryConfiguration.apiKey
+            token: registryConfiguration?.apiKey
         }
     });
 
