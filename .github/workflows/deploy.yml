@@ -77,7 +77,7 @@ jobs:
               run: npm link datapm-lib
               working-directory: client
 
-            - name: Run lint client
+            - name: Run lint on client code
               run: npm run lint
               working-directory: client
 
@@ -199,7 +199,7 @@ jobs:
               uses: actions/download-artifact@v2
               with:
                   name: datapm-client-windows-x64
-                  path: client-installers
+                  path: dist/client-installers
 
             - name: Build Registry Docker Container
               run: gulp buildRegistryDockerImage

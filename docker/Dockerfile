@@ -4,7 +4,7 @@ COPY lib/dist /build/lib/dist
 COPY docs/ /usr/src/static/docs/
 COPY frontend/ /usr/src/static/
 COPY backend/dist/ /usr/src/app/
-COPY client-installers/ /usr/src/app/client-installers/
+COPY client-installers /usr/src/app/client-installers/
 
 RUN ls /usr/src/app/util/*
 
