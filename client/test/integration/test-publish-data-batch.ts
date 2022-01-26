@@ -1,6 +1,6 @@
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 import { expect } from "chai";
-import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
+import { addRegistry, removeRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
 import {
     createApiKey,
@@ -13,6 +13,7 @@ import {
     TEST_SOURCE_FILES
 } from "./test-utils";
 import fs from "fs";
+import { UpdateCatalogDocument, UpdatePackageDocument } from "../../src/generated/graphql";
 
 const fetchCommandPrompts = ["Destination?", "File Format?", "File Location?"];
 
@@ -237,6 +238,80 @@ describe("Publish Data Batch Tests", async function () {
         const cmdResult = await testCmd(
             "fetch",
             [`http://localhost:${registryServerPort}/test-publish-data-batch-A/countries`],
+            prompts,
+            async (line: string) => {
+                if (line.includes("Finished writing 8 records")) {
+                    results.messageFound = true;
+                }
+            }
+        );
+
+        expect(cmdResult.code, "Exit code").equals(0);
+        expect(results.messageFound, "Found success message").equals(true);
+
+        const content = fs.readFileSync("tmp-files/countries.json").toString();
+        const lines = content.split("\n");
+        expect(lines.length).equals(9);
+    });
+
+    it("Should not allow anonymous user to fetch non-public data", async function () {
+        removeRegistry(`http://localhost:${registryServerPort}`);
+
+        const prompts = getFetchCommandPromptInputs(["Local", "JSON", "tmp-files"]);
+        const results: TestResults = {
+            exitCode: -1,
+            messageFound: false
+        };
+
+        const cmdResult = await testCmd(
+            "fetch",
+            [`http://localhost:${registryServerPort}/test-publish-data-batch-A/countries`, "--forceUpdate"],
+            prompts,
+            async (line: string) => {
+                if (line.includes("You are not authenticated to the registry")) {
+                    results.messageFound = true;
+                }
+            }
+        );
+
+        expect(cmdResult.code, "Exit code").equals(1);
+        expect(results.messageFound, "Found success message").equals(true);
+    });
+
+    it("Should allow anonymous user to fetch public data", async function () {
+        await userAClient.mutate({
+            mutation: UpdateCatalogDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "test-publish-data-batch-A"
+                },
+                value: {
+                    isPublic: true
+                }
+            }
+        });
+        await userAClient.mutate({
+            mutation: UpdatePackageDocument,
+            variables: {
+                identifier: {
+                    catalogSlug: "test-publish-data-batch-A",
+                    packageSlug: "countries"
+                },
+                value: {
+                    isPublic: true
+                }
+            }
+        });
+
+        const prompts = getFetchCommandPromptInputs(["Local", "JSON", "tmp-files"]);
+        const results: TestResults = {
+            exitCode: -1,
+            messageFound: false
+        };
+
+        const cmdResult = await testCmd(
+            "fetch",
+            [`http://localhost:${registryServerPort}/test-publish-data-batch-A/countries`, "--forceUpdate"],
             prompts,
             async (line: string) => {
                 if (line.includes("Finished writing 8 records")) {

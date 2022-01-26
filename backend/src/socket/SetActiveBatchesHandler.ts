@@ -5,7 +5,8 @@ import SocketIO from 'socket.io';
 import { AuthenticatedSocketContext } from "../context";
 import { DataBatchRepository } from "../repository/DataBatchRepository";
 import { PackageRepository } from "../repository/PackageRepository";
-import { Permission } from "../generated/graphql";
+import { ActivityLogEventType, Permission } from "../generated/graphql";
+import { createActivityLog } from "../repository/ActivityLogRepository";
 
 export class SetActiveBatchesHandler extends EventEmitter implements RequestHandler{
 
@@ -53,6 +54,17 @@ export class SetActiveBatchesHandler extends EventEmitter implements RequestHand
                 dataBatchEntity.default = true;
 
                 await entityManager.save(dataBatchEntity);
+
+                await createActivityLog(this.socketContext.connection, {
+                    userId: this.socketContext.me.id,
+                    eventType: ActivityLogEventType.DATA_BATCH_ACTIVE_CHANGED,
+                    targetPackageId: packageEntity.id,
+                    targetDataBatchId: dataBatchEntity.id,
+                    additionalProperties: {
+                        priorActiveBatchId: currentlyActiveBatch?.id,
+                        priorActiveBatch: currentlyActiveBatch?.batch
+                    }
+                });
 
             });
 

@@ -1,13 +1,16 @@
-import { SocketContext } from "../context";
+import { SocketContext,AuthenticatedContext } from "../context";
 import { checkPackagePermission, RequestHandler } from "./SocketHandler";
 import SocketIO from 'socket.io';
-import { Permission } from "../generated/graphql";
+import { ActivityLogEventType, Permission } from "../generated/graphql";
 import { EventEmitter, Transform } from "stream";
 import {BatchRepositoryIdentifier, DataAcknowledge, DataSend, DataStop, DataStopAcknowledge, ErrorResponse, FetchRequest, FetchRequestType, FetchResponse, OpenFetchChannelRequest, OpenFetchChannelResponse, RecordContext, Request, Response, SocketError, SocketEvent, StartFetchRequest, DPMRecord, DataRecordContext, SocketResponseType } from "datapm-lib";
 import { PackageRepository } from "../repository/PackageRepository";
 import { DataStorageService, IterableDataFiles } from "../storage/data/data-storage";
 import { DataBatchRepository } from "../repository/DataBatchRepository";
 import { BatchingTransform } from "../transforms/BatchingTransform";
+import { createActivityLog } from "../repository/ActivityLogRepository";
+import { DataBatchEntity } from "../entity/DataBatchEntity";
+import { PackageEntity } from "../entity/PackageEntity";
 
 export function batchIdentifierToChannelName(batchIdentifier:BatchRepositoryIdentifier): string {
     return (
@@ -36,10 +39,16 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
 
     private activeSending = true;
 
+    private packageEntity: PackageEntity;
+    private batchEntity: DataBatchEntity;
+    private authenticatedContext: AuthenticatedContext | null;
+
     private channelName:string;
 
     constructor(private openChannelRequest: OpenFetchChannelRequest, private socket: SocketIO.Socket, private socketContext:SocketContext) {
         super();
+        this.authenticatedContext = (socketContext as any).me != null ? socketContext as AuthenticatedContext : null;
+
     }
 
     async start(callback:(response:Response) => void): Promise<void> {
@@ -49,12 +58,12 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
             return;
         }
 
-        const packageEntity = await this.socketContext.connection.getCustomRepository(PackageRepository).findPackageOrFail({identifier: this.openChannelRequest.batchIdentifier});
+        this.packageEntity = await this.socketContext.connection.getCustomRepository(PackageRepository).findPackageOrFail({identifier: this.openChannelRequest.batchIdentifier});
 
         await this.socketContext.connection
             .getCustomRepository(DataBatchRepository)
             .findBatchOrFail(
-                packageEntity.id,
+                this.packageEntity.id,
                 this.openChannelRequest.batchIdentifier.majorVersion,
                 this.openChannelRequest.batchIdentifier.sourceType,
                 this.openChannelRequest.batchIdentifier.sourceSlug,
@@ -87,12 +96,10 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
 
     async handleStartRequest(fetchRequest:StartFetchRequest, callback:(response:FetchResponse | ErrorResponse) => void) {
 
-        const packageEntity = await this.socketContext.connection.getCustomRepository(PackageRepository).findPackageOrFail({identifier: this.openChannelRequest.batchIdentifier});
-
-        const batchEntity = await this.socketContext.connection
+        this.batchEntity = await this.socketContext.connection
             .getCustomRepository(DataBatchRepository)
             .findBatchOrFail(
-                packageEntity.id,
+                this.packageEntity.id,
                 this.openChannelRequest.batchIdentifier.majorVersion,
                 this.openChannelRequest.batchIdentifier.sourceType,
                 this.openChannelRequest.batchIdentifier.sourceSlug,
@@ -102,15 +109,22 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
                 this.openChannelRequest.batchIdentifier.batch
                 );
 
-        const iterableDataFiles = this.dataStorageService.readDataBatch(batchEntity.id, fetchRequest.offset);
+        const iterableDataFiles = this.dataStorageService.readDataBatch(this.batchEntity.id, fetchRequest.offset);
     
+        await createActivityLog(this.socketContext.connection, {
+            userId: this.authenticatedContext?.me.id,
+            eventType: ActivityLogEventType.DATA_BATCH_DOWNLOAD_STARTED,
+            targetPackageId: this.packageEntity.id,
+            targetDataBatchId: this.batchEntity.id
+        });
+
         if(!iterableDataFiles) {
             callback(new ErrorResponse(`No data found for batch identifier ${this.openChannelRequest.batchIdentifier}`,SocketError.NOT_FOUND));
             this.stop("server");
             return;
         }
 
-        setTimeout(() => this.startSendingWrapper(fetchRequest, batchEntity.id),1);
+        setTimeout(() => this.startSendingWrapper(fetchRequest, this.batchEntity.id),1);
 
     }
 
@@ -125,6 +139,14 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
 
         this.socket.off(this.channelName, this.handleChannelEvents);
 
+
+        await createActivityLog(this.socketContext.connection, {
+            userId: this.authenticatedContext?.me.id,
+            eventType: ActivityLogEventType.DATA_BATCH_DOWNLOAD_STOPPED,
+            targetPackageId: this.packageEntity.id,
+            targetDataBatchId: this.batchEntity.id
+        });
+
         if(reason === "client") {
             this.socket.emit(this.channelName, new DataStopAcknowledge());
         } else if(reason === "disconnect") {
@@ -134,9 +156,8 @@ export class DataFetchHandler extends EventEmitter implements RequestHandler {
                 
             });
         }
-
         
-        
+    
     }
 
     async startSendingWrapper(startRequest: StartFetchRequest, batchId: number): Promise<void> {

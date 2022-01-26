@@ -1,5 +1,7 @@
 import { SocketResponseType, PackageSinkStateRequest, PackageSinkStateResponse, StreamSetState, ErrorResponse, SocketError } from "datapm-lib";
-import { SocketContext } from "../context";
+import { AuthenticatedContext, SocketContext } from "../context";
+import { ActivityLogEventType } from "../generated/graphql";
+import { createActivityLog } from "../repository/ActivityLogRepository";
 import { DataBatchRepository } from "../repository/DataBatchRepository";
 import { PackageRepository } from "../repository/PackageRepository";
 import { VersionRepository } from "../repository/VersionRepository";
@@ -21,6 +23,17 @@ export module PackageSinkStateHandler {
         if(dataBatches.length == 0) {
             return new ErrorResponse('DATA_NOT_FOUND', SocketError.NOT_FOUND);
         }
+
+        const authenicatedContext = (streamContext as any).me != null ? streamContext as AuthenticatedContext : null;
+
+        await createActivityLog(streamContext.connection, {
+            userId: authenicatedContext?.me.id,
+            eventType: ActivityLogEventType.DATA_SINK_STATE_REQUESTED,
+            targetPackageId: packageEntity.id,
+            additionalProperties: {
+                majorVersion: packageInfoRequest.identifier.majorVersion
+            }
+        });
 
         return {
             responseType: SocketResponseType.PACKAGE_VERSION_SINK_STATE_RESPONSE,

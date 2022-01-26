@@ -8,7 +8,7 @@ import fs from "fs";
 import { before } from "mocha";
 import { RandomUuid } from "testcontainers/dist/uuid";
 import { createTestClient, createUser } from "./test-utils";
-import { RegistryStatusDocument } from "./registry-client";
+import { ActivityLogChangeType, ActivityLogEventType, RegistryStatusDocument } from "./registry-client";
 import { expect } from "chai";
 import { AdminHolder } from "./admin-holder";
 const maildev = require("maildev");
@@ -25,6 +25,31 @@ const MAX_SERVER_LOG_LINES = 25;
 // These hold the standard out log lines from the datapm server
 export let serverLogLines: string[] = [];
 export let serverErrorLogLines: string[] = [];
+
+/** The object logged to the console */
+export interface ActivityLogLine {
+    _type: string;
+    date: Date;
+    username: string;
+    eventType: ActivityLogEventType;
+    changeType?: ActivityLogChangeType;
+    targetPackageIdentifier?: string;
+    targetVersionNumber?: string;
+    targetCatalogSlug?: string;
+    targetCollectionSlug?: string;
+    targetUsername?: string;
+    propertiesEdited?: string[];
+}
+
+
+export function findActivityLogLine(line: string, callback: (activityLogLine: ActivityLogLine) => boolean): Boolean {
+    if (!line.startsWith("{")) return false;
+
+    const lineObject = JSON.parse(line) as ActivityLogLine;
+    if (lineObject._type == "ActivityLog" && callback(lineObject)) return true;
+
+    return false;
+}
 
 before(async function () {
     console.log("Starting postgres temporary container");

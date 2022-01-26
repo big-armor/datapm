@@ -2,7 +2,7 @@ import { AuthenticatedSocketContext } from "../context";
 import { DistributedLockingService } from "../service/distributed-locking-service";
 import SocketIO from 'socket.io';
 import { checkPackagePermission, RequestHandler } from "./SocketHandler";
-import { Permission } from "../generated/graphql";
+import { ActivityLogEventType, Permission } from "../generated/graphql";
 import { BatchRepositoryIdentifier, DataRecordContext, ErrorResponse, Response, SocketError, StartUploadRequest,  StartUploadResponse,  SchemaRepositoryStreamIdentifier, TimeoutPromise, UploadDataRequest, UploadDataResponse, UploadRequest, UploadRequestType, UploadResponse, UploadStopRequest, UploadStopResponse } from "datapm-lib";
 import EventEmitter from "events";
 import { PassThrough } from "stream";
@@ -13,6 +13,7 @@ import { DataBatchEntity } from "../entity/DataBatchEntity";
 import { Maybe } from "graphql/jsutils/Maybe";
 import { PackageFileStorageService } from "../storage/packages/package-file-storage-service";
 import { VersionRepository } from "../repository/VersionRepository";
+import { createActivityLog } from "../repository/ActivityLogRepository";
 
 const LOCK_PREFIX = "streamSetDataUpload";
 
@@ -157,6 +158,14 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
             }
         });
 
+        await createActivityLog(this.socketContext.connection, {
+            userId: this.socketContext.me.id,
+            eventType: ActivityLogEventType.DATA_BATCH_UPLOAD_STARTED,
+            targetPackageId: packageEntity.id,
+            targetPackageVersionId: latestVersionEntity.id,
+            targetDataBatchId: batchEntity.id,
+        });
+
         this.dataStorageService.writeBatch(batchEntity.id, this.lastObservedOffset + 1, this.stream)
 
         this.socket.on(this.channelName, this.handleEvent);
@@ -196,13 +205,24 @@ export class DataUploadHandler extends EventEmitter implements RequestHandler{
             });
         });
 
+        let batchEntity = await this.socketContext.connection.getCustomRepository(DataBatchRepository).findLatestBatch({identifier: this.uploadRequest.schemaStreamIdentifier});
+
+        if(!batchEntity) {
+            throw new Error("BATCH_NOT_FOUND");
+        }
+
+        await createActivityLog(this.socketContext.connection, {
+            userId: this.socketContext.me.id,
+            eventType: ActivityLogEventType.DATA_BATCH_UPLOAD_STOPPED,
+            targetPackageId: batchEntity.packageId,
+            targetDataBatchId: batchEntity.id,
+            additionalProperties: {
+                reason: serverOrClient
+            }
+        });
+
         if(this.lastObservedOffset) {
 
-            let batchEntity = await this.socketContext.connection.getCustomRepository(DataBatchRepository).findLatestBatch({identifier: this.uploadRequest.schemaStreamIdentifier});
-
-            if(!batchEntity) {
-                throw new Error("BATCH_NOT_FOUND");
-            }
 
             if(this.lastObservedOffset > batchEntity.lastOffset) {
                 batchEntity.lastOffset = this.lastObservedOffset;

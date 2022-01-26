@@ -25,31 +25,9 @@ import {
 } from "./registry-client";
 import { expect } from "chai";
 import { loadPackageFileFromDisk } from "datapm-lib";
-import { serverLogLines } from "./setup";
+import { ActivityLogLine, findActivityLogLine, serverLogLines } from "./setup";
 
-/** The object logged to the console */
-export interface ActivityLogLine {
-    _type: string;
-    date: Date;
-    username: string;
-    eventType: ActivityLogEventType;
-    changeType?: ActivityLogChangeType;
-    targetPackageIdentifier?: string;
-    targetVersionNumber?: string;
-    targetCatalogSlug?: string;
-    targetCollectionSlug?: string;
-    targetUsername?: string;
-    propertiesEdited?: string[];
-}
 
-function findActivityLogLine(line: string, callback: (activityLogLine: ActivityLogLine) => boolean): Boolean {
-    if (!line.startsWith("{")) return false;
-
-    const lineObject = JSON.parse(line) as ActivityLogLine;
-    if (lineObject._type == "ActivityLog" && callback(lineObject)) return true;
-
-    return false;
-}
 
 describe("Activity Log Tests", async () => {
     let userOne: any;

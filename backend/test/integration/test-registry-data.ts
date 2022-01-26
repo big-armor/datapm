@@ -8,13 +8,15 @@ import {
     CreateVersionDocument,
     LoginDocument,
     MovePackageDocument,
-    CreateCatalogDocument
+    CreateCatalogDocument,
+    ActivityLogEventType
 } from "./registry-client";
 import { createAnonymousClient, createAnonymousStreamingClient, createAuthenicatedStreamingClient, createUser } from "./test-utils";
 import { parsePackageFileJSON, loadPackageFileFromDisk, PublishMethod, SocketEvent, StartFetchRequest, ErrorResponse, StartFetchResponse, SocketResponseType, SocketError, StartUploadRequest, UploadDataRequest, UploadDataResponse, StartUploadResponse, UploadResponseType, UploadStopRequest, UploadStopResponse, PackageStreamsRequest, PackageStreamsResponse, OpenFetchChannelResponse, OpenFetchChannelRequest, DataSend, DataStop, FetchRequestType, SetStreamActiveBatchesResponse, SetStreamActiveBatchesRequest, FetchResponse, DataAcknowledge, DataStopAcknowledge, DPMRecord, DataRecordContext, PackageSinkStateRequest, PackageSinkStateResponse, UpdateMethod } from "datapm-lib";
 import { describe, it } from "mocha";
 import request = require("superagent");
 import { Socket } from "socket.io-client";
+import { ActivityLogLine, findActivityLogLine, serverLogLines } from "./setup";
 
 
 /** Tests when the registry is used as a repository for the data of a package */
@@ -346,6 +348,18 @@ describe("Data Store on Registry", async () => {
         expect(startResponse.batchIdentifier.schemaTitle).equal("simple");
         expect(startResponse.batchIdentifier.batch).equal(1);
 
+        expect(
+            serverLogLines.find((l: any) =>
+                findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
+                    return (
+                        activityLogLine.eventType == ActivityLogEventType.DATA_BATCH_UPLOAD_STARTED &&
+                        activityLogLine.username == "testA-registry-data" &&
+                        activityLogLine.targetPackageIdentifier == "testA-registry-data/simple" 
+                    );
+                })
+            )
+        ).to.be.not.undefined;
+
         const records:DataRecordContext[] = [
 
             {
@@ -404,6 +418,18 @@ describe("Data Store on Registry", async () => {
 
         expect(stopUploadResponse.responseType).equal(UploadResponseType.UPLOAD_STOP_RESPONSE);
 
+        expect(
+            serverLogLines.find((l: any) =>
+                findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
+                    return (
+                        activityLogLine.eventType == ActivityLogEventType.DATA_BATCH_UPLOAD_STOPPED &&
+                        activityLogLine.username == "testA-registry-data" &&
+                        activityLogLine.targetPackageIdentifier == "testA-registry-data/simple" 
+                    );
+                })
+            )
+        ).to.be.not.undefined;
+
         let updateDefaultResponse = await new Promise<SetStreamActiveBatchesResponse>((resolve,reject) => {
             userAStreamingClient.emit(SocketEvent.SET_STREAM_ACTIVE_BATCHES, new SetStreamActiveBatchesRequest([{
                 catalogSlug: "testA-registry-data",
@@ -428,6 +454,18 @@ describe("Data Store on Registry", async () => {
         });
 
         expect(updateDefaultResponse.responseType).equal(SocketResponseType.SET_STREAM_ACTIVE_BATCHES);
+
+        expect(
+            serverLogLines.find((l: any) =>
+                findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
+                    return (
+                        activityLogLine.eventType == ActivityLogEventType.DATA_BATCH_ACTIVE_CHANGED &&
+                        activityLogLine.username == "testA-registry-data" &&
+                        activityLogLine.targetPackageIdentifier == "testA-registry-data/simple" 
+                    );
+                })
+            )
+        ).to.be.not.undefined;
 
         expect(updateDefaultResponse.batchIdentifiers[0].registryUrl).equal("http://localhost:4000");
         expect(updateDefaultResponse.batchIdentifiers[0].catalogSlug).equal("testA-registry-data");
@@ -535,7 +573,23 @@ describe("Data Store on Registry", async () => {
                 }
                 else if(event.requestType === FetchRequestType.STOP) {
                     callback(new DataStopAcknowledge());
-                    resolve(records);
+
+               
+                    const serverLineFound = serverLogLines.find((l: any) =>
+                            findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
+                                return (
+                                    activityLogLine.eventType == ActivityLogEventType.DATA_BATCH_DOWNLOAD_STOPPED &&
+                                    (activityLogLine.username == "testA-registry-data" || activityLogLine.username == null) &&
+                                    activityLogLine.targetPackageIdentifier == "testA-registry-data/simple" 
+                                );
+                            })
+                        );
+                    
+                    if(!serverLineFound) {
+                        reject(new Error("Server log line not found"));
+                    } else {
+                        resolve(records);
+                    }
 
                 } else {
                     callback(new ErrorResponse("Unknown message type",SocketError.NOT_VALID));
@@ -549,6 +603,21 @@ describe("Data Store on Registry", async () => {
                 if((response as ErrorResponse).responseType === SocketResponseType.ERROR) {
                     reject(response as ErrorResponse);
                 }
+
+                const serverLineFound = serverLogLines.find((l: any) =>
+                        findActivityLogLine(l, (activityLogLine: ActivityLogLine) => {
+                            return (
+                                activityLogLine.eventType == ActivityLogEventType.DATA_BATCH_DOWNLOAD_STARTED &&
+                                (activityLogLine.username == "testA-registry-data" || activityLogLine.username == null) &&
+                                activityLogLine.targetPackageIdentifier == "testA-registry-data/simple" 
+                            );
+                        })
+                    );
+
+                if(!serverLineFound) {
+                    reject(new Error("No server log line found for data batch download started"));
+                }
+
             });
         });
 
