@@ -26,9 +26,14 @@ jobs:
             - name: Install Root Dependencies
               run: npm ci
 
-            - name: Run Linters
+            - name: Run ESLint
               run: npm run lint
-              working-directory: client
+
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v1
+
+            - name: Terraform Format
+              run: terraform fmt -check
 
     build-win-x64-client:
         runs-on: windows-latest
@@ -70,6 +75,10 @@ jobs:
 
             - name: Link Lib for Client
               run: npm link datapm-lib
+              working-directory: client
+
+            - name: Run lint client
+              run: npm run lint
               working-directory: client
 
             - name: Run build
