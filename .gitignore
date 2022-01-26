@@ -7,6 +7,8 @@ terraform.tfstate*
 terraform.tfstate
 terraform.tfvars*
 
+client-installers/
+
 .DS_Store
 
 backend/test/integration/registry-client.ts

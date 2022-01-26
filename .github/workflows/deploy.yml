@@ -6,9 +6,35 @@ on:
             - master
 
 jobs:
+    lint:
+        runs-on: ubuntu-latest
+        timeout-minutes: 3
+        name: Lint Source Code
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v2
+                with:
+                    node-version: "14.18.3"
+                    architecture: "x64" # optional, x64 or x86. If not specified, x64 will be used by default
+
+            - name: Print npm verion
+                run: npm --version
+
+            - name: Print node verion
+                run: node --version
+
+            - name: Install Root Dependencies
+                run: npm ci
+
+            - name: Run Linters
+              run: npm run lint
+              working-directory: client
+
+
     build-win-x64-client:
         runs-on: windows-latest
         timeout-minutes: 15
+        needs: lint
         name: Windows Build Node Client
         steps:
             - uses: actions/checkout@v2
@@ -25,17 +51,14 @@ jobs:
 
             - name: Install Root Dependencies
               run: npm ci
-              if: steps.cache-root-node-modules.outputs.cache-hit != 'true'
 
             - name: Install Lib Dependencies
               run: npm ci
               working-directory: lib
-              if: steps.cache-lib-build.outputs.cache-hit != 'true'
 
             - name: Build Lib
               run: npm run build
               working-directory: lib
-              if: steps.cache-lib-build.outputs.cache-hit != 'true'
 
             - name: Link Lib
               run: npm link
@@ -48,10 +71,6 @@ jobs:
 
             - name: Link Lib for Client
               run: npm link datapm-lib
-              working-directory: client
-
-            - name: Run Linters
-              run: npm run lint
               working-directory: client
 
             - name: Run build
@@ -94,9 +113,6 @@ jobs:
 
             - name: Install Dependencies
               run: npm ci
-
-            - name: Run ESLint
-              run: npm run lint
 
             - name: Setup Terraform
               uses: hashicorp/setup-terraform@v1
@@ -171,11 +187,11 @@ jobs:
               run: npm run build
               working-directory: client
 
-            - name: Retrieve saved Docker image
+            - name: Download Win64 Installer
               uses: actions/download-artifact@v2
               with:
                   name: datapm-client-windows-x64
-                  path: client/dist-installers/
+                  path: client-installers
 
             - name: Build Registry Docker Container
               run: gulp buildRegistryDockerImage
