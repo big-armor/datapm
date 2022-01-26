@@ -368,8 +368,6 @@ async function main() {
 
         const clientInstallersPath = path.join(__dirname, "client-installers");
 
-        console.log(clientInstallersPath);
-
         if(!fs.existsSync(clientInstallersPath)) {
             res.sendStatus(404);
             return;
@@ -383,6 +381,8 @@ async function main() {
             res.sendStatus(404);
             return;
         }
+
+        res.setHeader('Transfer-Encoding', 'chunked');
 
         res.sendFile(path.join(__dirname, "client-installers", installerFile));
 
