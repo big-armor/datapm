@@ -362,7 +362,7 @@ async function main() {
 
         switch(req.params.type) {
             case "win64": {
-                installerFileNameEndsWith = "-win64.msix";
+                installerFileNameEndsWith = "-x64.msix";
             }
         }
 
