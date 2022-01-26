@@ -7,7 +7,7 @@ on:
 
 jobs:
     build-win-x64-client:
-      runs-on: windows-latest
+        runs-on: windows-latest
         timeout-minutes: 15
         name: Windows Build Node Client
         steps:
@@ -174,8 +174,8 @@ jobs:
             - name: Retrieve saved Docker image
               uses: actions/download-artifact@v2
               with:
-                name: datapm-client-windows-x64
-                path: client/dist-installers/
+                  name: datapm-client-windows-x64
+                  path: client/dist-installers/
 
             - name: Build Registry Docker Container
               run: gulp buildRegistryDockerImage
