@@ -4,26 +4,11 @@ title: DataPM Connectors
 sidebar_label: Connectors
 ---
 
-DataPM supports many popular data repositories, and in the future will feature a developer kit to enable creating your own custom data connectors.
+DataPM supports many popular data repositories (file systems, databases, cloud services), and in the future will feature a developer kit to enable creating your own custom data connectors.
 
 # Concepts
 
-The datapm command line tool makes moving data between systems seamless and easily repeatable. For example, datapm can pull multiple schemas from multiple Gzipped XML files on a web server, and write that data into a cloud database or your local file system. And the datapm client can help you automate these processes. The command line tool currently supports the following systems for reading and writing data.
-
-# Databases
-
-DataPM supports reading and writing records for the following databases.
-
-| Name              |    Read Data    |    Write Data    |
-| :---------------- | :-------------: | :--------------: |
-| Google Big Query  |    (future)     |      Write       |
-| PostgreSQL        |      Read       |      Write       |
-| MariaDB           | Read (untested) | Write (untested) |
-| MySQL             |      Read       |      Write       |
-| MongoDB           |    (future)     |      Write       |
-| Oracle            |    (future)     |     (future)     |
-| GCP Cloud Spanner |    (future)     |     (future)     |
-| Snowflake         |    (future)     |     (future)     |
+The datapm command line tool makes moving data between systems seamless and easily repeatable. For example, datapm can pull multiple schemas from Gzipped XML files on a web server, and write that data into a cloud database or your local file system. And the datapm client can help you automate these processes. The command line tool currently supports the following systems for reading and writing data.
 
 # File Repositories
 
@@ -37,7 +22,7 @@ DataPM supports reading and writing files of specific formats (below) to the fol
 | SFTP                           | (future)  |           (future)           |
 | FTP                            | (future)  |           (future)           |
 | Azure Blob Storage             | (future)  |           (future)           |
-| AWS S3                         | (future)  |           (future)           |
+| AWS S3                         |   Read    |            Write             |
 | Google Cloud Storage           | (future)  |           (future)           |
 | Azure Blob Storage             | (future)  |           (future)           |
 
@@ -49,9 +34,9 @@ DataPM can read and write records in the following file formats.
 | :---- | :-------: | :--------: |
 | CSV   |   Read    |   Write    |
 | XML   |   Read    |  (future)  |
-| JSON  | (future)  |  (future)  |
-| Avro  | (future)  |  (future)  |
-| Excel | (future)  |  (future)  |
+| JSON  |   Read    |   Write    |
+| Avro  |   Read    |  (future)  |
+| Excel |   Read    |  (future)  |
 
 ## File Archive Formats
 
@@ -61,5 +46,20 @@ DataPM can unwrap and read files from within the following archive file formats.
 | :---- | :-------: | :--------: |
 | GZip  |   Read    |  (future)  |
 | BZip2 |   Read    |  (future)  |
-| Zip   | (future)  |  (future)  |
-| Tar   | (future)  |  (future)  |
+| Zip   |   Read    |  (future)  |
+| Tar   |   Read    |  (future)  |
+
+# Databases
+
+DataPM supports reading and writing records for the following databases.
+
+| Name              |    Read Data    |    Write Data    |
+| :---------------- | :-------------: | :--------------: |
+| Google Big Query  |      Read       |      Write       |
+| PostgreSQL        |      Read       |      Write       |
+| MariaDB           | Read (untested) | Write (untested) |
+| MySQL             |      Read       |      Write       |
+| MongoDB           |    (future)     |      Write       |
+| Oracle            |    (future)     |     (future)     |
+| GCP Cloud Spanner |    (future)     |     (future)     |
+| Snowflake         |    (future)     |     (future)     |

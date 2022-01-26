@@ -18,15 +18,19 @@ You set the privacy controls and terms under which consumers may access and use 
 
 You can [host your own private registry](private-registry.md) for ultimate control over the data - so that it never leaves your network.
 
-## Schema Only For Now
+## Data Hosting
 
-Currently, DataPM only supports hosting the package files (schema) in the registry. This means you must host the data in a separate location - such as GitHub, AWS S3, Google Storage, or other similar services.
+DataPM offers two methods of accessing data.
 
-In the future, DataPM will support publishing the data along with the schema to datapm registries.
+1. The data is hosted elsewhere, and only the schema and description of the data is published to the DataPM registry.
+
+    - This is useful when the data is already readily available.
+
+2. The data and the schema are published to the DataPM Registry.
 
 ## Generate A Package File
 
-DataPM registries hold package files that contain only the schema of one or more data sets (which we call a data package). These package files also contain human descriptions, and the basic information necessary to access publicly available data.
+DataPM registries hold package files that contain the schema of one or more data sets (which we call a data package). These package files also contain human descriptions and the basic information necessary to access the data.
 
 To generate your first package file, install the [command line client](command-line-client.md).
 
@@ -36,17 +40,43 @@ Use the following command to create a package file for the following CSV file
 datapm package https://datapm.io/docs/test-data/state-codes.csv
 ```
 
-You will be prompted to provide human descriptions, and to view a summary of the data contents. After you complete these prompts, your DataPM package file will be written to your local disk.
+You will be prompted to provide human descriptions, and to view a summary of the data contents. After you complete these prompts, your DataPM package file will be written to your local disk. Optionally, you may choose to immediately publish the package file.
 
-Use the cat command to view the contents of your package. Optionally, edit it as you see fit, according to [DataPM Package File Specification](package-files.md).
+## Edit The Package File
+
+You can use the "edit" command to edit the contents of your package file.
 
 ```text
-cat state-codes.datapm.json
+datapm edit my-package-file.datapm.json
+```
+
+You can even edit the context of the package file directly on the registry.
+
+```text
+datapm edit my-catalog/my-package
+```
+
+You can modify many of the descriptions in the package file directly in the web client. Just visit the package file listing in your browser.
+
+Or you can manually view the contents of your package and edit it as you see fit, according to [DataPM Package File Specification](package-files.md).
+
+## Update The Package File
+
+You can use the "update" command to refresh the data statistics and schema of your package file.
+
+```text
+datapm update my-package-file.datapm.json
+```
+
+You can also use the "update" command directly against the package file on the registry.
+
+```text
+datapm update my-catalog/my-package
 ```
 
 ## Publish The Package File
 
-When you are satisfied with the contents of the package file, you can publish it to a registry.
+When you are satisfied with the contents of the package file, you can publish it to a public or private registry.
 
 ```text
 datapm publish state-codes.datapm.json
@@ -69,7 +99,3 @@ Your consumers will use the following command to fetch the data. You will likely
 ```text
 datapm fetch catalog-name/package-name
 ```
-
-## Additional Data Sources
-
-DataPM will in the future support more than CSV data sources, and many more data sinks (destination formats & systems). Currently, if you need to support additional data source formats, reach out to support@datapm.io

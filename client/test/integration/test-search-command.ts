@@ -22,7 +22,7 @@ describe("Search Command Tests", async function () {
             apiKey
         });
 
-        await createTestPackage(TEST_SOURCE_FILES.FILE1, false, "package-a", "Package A", "", [
+        await createTestPackage(TEST_SOURCE_FILES.FILE1, false, "package-a", "Package A - Man bear pig", "", [
             {
                 message: "What does each covid-02-01-2020 record represent?",
                 input: KEYS.ENTER
@@ -79,7 +79,7 @@ describe("Search Command Tests", async function () {
             messageFound: false
         };
 
-        const cmdResult = await testCmd("search", ["package"], [], async (line: string) => {
+        const cmdResult = await testCmd("search", ["man bear pig"], [], async (line: string) => {
             if (line.includes("Found 1 results")) {
                 results.messageFound = true;
             }

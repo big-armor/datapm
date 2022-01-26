@@ -6,9 +6,9 @@ sidebar_label: Private Registry
 
 You can host your own DataPM registry for private or public use. Be sure to read the DataPM Software License page to learn about allowed and not allowed uses of DataPM software.
 
-## How To Deploy
+## Hosting via Docker
 
-Docker compose is the simplest method to deploy a DataPM Registry and supporting Postgres server. Use the following template as a start - or adapt it for your Kubernetes or Docker Swarm hosts.
+Docker compose is the simplest method to deploy a DataPM Registry and supporting Postgres server. Use the following template as a start - or adapt it for your Kubernetes.
 
 ```text
 version: "3.7"
@@ -33,9 +33,9 @@ services:
       - REGISTRY_URL=http://localhost:4000
       - JWT_KEY=!!!!REPLACE_ME!!!
       - JWT_AUDIENCE=localhost
+      - JWT_ISSUER=localhost
       - SCHEDULER_KEY="!!!!REPLACE_ME!!!!"
       - LEADER_ELECTION_DISABLED=false
-      - JWT_ISSUER=localhost
       - STORAGE_URL="file:///var/lib/datapm-registry/data"
       - TYPEORM_IS_DIST=true
       - TYPEORM_PORT=5432
@@ -81,24 +81,40 @@ Therefore, DataPM offers you the ability to host your own private registry. This
 
 When using a private DataPM registry, you'll still have access with all the great tools in the DataPM ecosystem, and you'll be able to dramatically improve your organization's collaborations around data.
 
-## Requirements
-
-Hosting a DataPM registry is relatively simple, and requires little hardware - especially if you are using DataPM only for schema management, and not the data itself (as most organizations likely choose to do).
-
-### Software requirements
+## Software requirements
 
 DataPM Registry requires a PostgreSQL version 12 database server. Your choose to use an existing instance, a cloud based instance, or to create a standalone instance using a simple Docker image from Postgres.
 
-### Hardware requirements
+## Hardware requirements
 
-DataPM Registry server does not require significant hardware resources, and runs well in a virtualized environment. These specs are given a simple minimum requirements set.
+DataPM Registry server does not require significant hardware resources, and runs well in a virtualized environment. These specs are given a simple minimums.
 
-## Scaling The Registry
+-   CPU: 1 core
+-   RAM: 2GB
+-   Storage: As much as necessary to hold the data that may be published to the server
+
+## Scaling The Registry Server
 
 DataPM Registry server scales both horizontally and vertically with-in reason. You may create a cluster of DataPM Registry server instances behind a load balancer to scale horizontally. The load balancer should be configured with
 
 -   Terminate SSL
 -   No session or connection affinity
+
+## Data Storage
+
+The server can be configured to store data and other assets either on local mounted disk, or to Google Cloud Storage. (We will likely add AWS S3 storage in the future. Please reach out if that is your requirements).
+
+To store assets and data locally, set the following environment variable to the absolute path of the local directory for storage.
+
+```text
+STORAGE_URL="file://tmp-registry-server-storage"
+```
+
+To store assets on Google Cloud Storage, set the STORAGE_URL to a Google Cloud Storage bucket and path. Note that the Google Cloud Storage library used by DataPM Registry will attempt to resolve the GCP credentials using the standard methods (i.e. environment variables, machine associated service account, etc).
+
+```text
+STORAGE_URL="gs://your-bucket"
+```
 
 ## Activity Logs
 
@@ -108,9 +124,9 @@ This server outputs logs via standard out (stdout) and standard error (stderr). 
 
 DataPM like all software requires regular software updates. If you are using our published Docker images, upgrading is as simple as referencing the "latest" tag during a container version update. This works well in a Kubernetes or Docker Swarm cluster.
 
-DataPM Registry server includes migration scripts that run automatically at startup. Therefore you do not have to apply database patches automatically, and generally rolling updates are acceptable - except across major versions of the registry.
+Each new version of DataPM Registry server includes database migration scripts that run automatically at startup. Therefore you do not have to apply database patches. For minor and patch updates, you can perform rolling updates across clusters of servers - but this is not recommended for major version upgrades.
 
-You should capture a database backup before each upgrade.
+You should capture a database backup before each software upgrade.
 
 ### Backup requirements
 

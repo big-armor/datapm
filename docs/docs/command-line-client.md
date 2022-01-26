@@ -31,6 +31,8 @@ node -v
 npm -v
 ```
 
+Install C++ tools. In macOS use the `xcode-select --install` command. In linux install the gcc and make packages. In windows [follow these instructions](https://github.com/nodejs/node-gyp).
+
 Install the datapm-client package globally. This allows you to run the datapm command from any working directory.
 
 ```text
@@ -65,18 +67,6 @@ Use the following command to login directly from the command line client.
 datapm registry login
 ```
 
-#### OR Create API Key Via Web Browser
-
-1. Using a web browser, [visit the registry](/)
-1. Log in or sign up as a new user
-1. Click your profile icon in the upper right
-1. Click "My Profiles"
-1. Near the bottom, enter a new label and click "Create New API Key"
-1. Copy the command provided
-1. Paste the command into your terminal
-
-You will now have an API Key associated with the registry. Your command line client will authenticate as your user, and perform actions on your behalf. If the registry is private, it will also have been added to the DataPM command line client configuration - so it will be used for searches, etc.
-
 ## Search Registries
 
 You can [search the registry](/) registry using a modern web browser. Or use the following command to search via the command line client.
@@ -103,12 +93,10 @@ datapm fetch https://datapm-example.company.com/catalog/package
 
 ## Publish Data
 
-_Important Note:_ Right now, DataPM only supports publishing data schemas. So you must host the actual data in another location - such as GitHub or a public web server. And that hosting must be publicly available. In the future, DataPM will also support hosting the data itself for public and private data hosting.
-
-Use the command line client to create a data package file based on any publicly available data set.
+Use the command line client to create a data package file.
 
 ```text
-datapm package https://some-web-server.com/path/to/data.csv
+datapm package
 ```
 
 Follow the prompts to complete the package file. Then use the following command to publish the package.
@@ -131,9 +119,8 @@ By default the command line client only interacts with the the [datapm.io](https
 
 ```text
 datapm registry add https://hostname.td
+datapm registry login https://my.private.registry.com
 ```
-
-Use the [Generate An API Key](#generate-an-api-key) section above to add a specific API for that registry.
 
 You can also remove a registry with the following command
 
@@ -143,10 +130,14 @@ datapm registry remove https://hostname.tld
 
 ## Manage Configuration
 
-You can view and remove the local configuration using the following commands.
+You can view the local client configuration using the following commands.
 
 ```text
 datapm configuration show
+```
 
+Use the following command to reset the configuration to the default.
+
+```text
 datapm configuration reset
 ```

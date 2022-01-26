@@ -1,7 +1,23 @@
 {
     "docs": {
-        "Overview": ["quick-start", "concepts", "about", "unclaimed-listings"],
-        "Use Cases": ["find-data", "publish-data", "devops"],
-        "Documentation": ["command-line-client", "package-files", "connectors", "registry-api", "private-registry"]
+        "Overview": [
+            "quick-start",
+            "concepts",
+            "about",
+            "unclaimed-listings",
+            "license"
+        ],
+        "Use Cases": [
+            "find-data",
+            "publish-data",
+            "devops"
+        ],
+        "Documentation": [
+            "command-line-client",
+            "package-files",
+            "connectors",
+            "registry-api",
+            "private-registry"
+        ]
     }
 }

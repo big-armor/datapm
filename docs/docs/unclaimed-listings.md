@@ -3,15 +3,19 @@ id: unclaimed-listings
 title: Unclaimed Listings
 ---
 
-This page describes some functionalities of DataPM.
+We believe in the power of open data, and the rights of data IP owners.
+
+## What are unclaimed listings in DataPM?
+
+An unclaimed listing is a listing that has no explicit owner, and where no copyrights are asserted. The listing was created by someone who found the data to be useful, but that user did not claim copyright ownership.
+
+## How do I claim an unclaimed listing?
+
+Be sure to [Sign Up](/signup), for an account. Then use the [Contact Form](/contact) to contact the administrator of the registry. Provide evidence of your claim, and your email address. The administrator, once approved, can assign the listing to your DataPM account.
 
 ## Where is the data stored?
 
-The data that is referenced by a Package isn't hosted in DataPM, instead it lies somewhere else, and the package files describe every aspect necessary to discovering, evaluating, obtaining, parsing, and deploying data - such that a computer instead of a human can perform those tasks.
-
-Package Files must reference data in the way that the target audience and the target DataPM registry can access the data. In the future DataPM registries will support deploying the data and schema, but for now the registry only supports deploying the schema. Therefore you must host the data on another solution.
-
-The unclaimed data has not been rehosted or republished, instead it was collected by our system in order to catalog them and make them available to more users publicly.
+For unclaimed listings, the data is not hosted in the DataPM registry. Instead it is simply referenced by the registry. The unclaimed listing contains only a description of the data, sample records, and how to access the data.
 
 ## The advantages of publishing with DataPM
 
@@ -19,19 +23,8 @@ Publishing your data in DataPM gives you multiple advantages.
 
 1. Your data will be cataloged under your name.
 2. Your data will be protected by DataPM's advanced security and permission systems.
-3. Your data will be available to a big number of users and it'll be very easy to consume from our provided connectors.
+3. Your data will be easily consumable using the DataPM tools.
 
-## Private vs public DataPM repositories
+## What if I don't want my data listed on DataPM?
 
-The primary global public registry is [datapm.io](https://datapm.io), it's free and offers tons of great data packages, catalogs and collections.
-It has a lot of data and is very useful for finding data from various categories.
-
-Private registries require providing your own cloud or on-premises hosting using a Kubernetes, Docker, VMware, or some other similar container service.
-
-Hosting your own DataPM registry allows your team to combine highly sensitive private data and 3rd party data to create rich insights and competitive advantages.
-
-Also, a private DataPM registry is a great way to create catalogs of your organization's data, while maintaining absolute control over every aspect of the data's presence. Imagine having a complete index of all of the data in your organization - without copying data or changing your existing architecture.
-
-## Claiming a listing
-
-To claim a listing you should contact us at our email <info@datapm.io>
+Use the [Contact Form](/contact) to request that your data be removed. Please provide the URL of the exact listing(s) you want removed, and proof of IP ownership.
