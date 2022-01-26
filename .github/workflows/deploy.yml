@@ -18,18 +18,17 @@ jobs:
                   architecture: "x64" # optional, x64 or x86. If not specified, x64 will be used by default
 
             - name: Print npm verion
-                run: npm --version
+              run: npm --version
 
             - name: Print node verion
-                run: node --version
+              run: node --version
 
             - name: Install Root Dependencies
-                run: npm ci
+              run: npm ci
 
             - name: Run Linters
               run: npm run lint
               working-directory: client
-
 
     build-win-x64-client:
         runs-on: windows-latest
