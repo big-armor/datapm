@@ -382,9 +382,23 @@ async function main() {
             return;
         }
 
+        res.setHeader('Content-Type', 'application/octet-stream');
         res.setHeader('Transfer-Encoding', 'chunked');
+        res.setHeader('Content-Disposition', `attachment; filename="${installerFile}"`);
 
-        res.sendFile(path.join(__dirname, "client-installers", installerFile));
+        const filePath = path.join(__dirname, "client-installers", installerFile);
+
+        const reader = fs.createReadStream(filePath);
+
+
+        reader.once("close",()=> {
+            res.end();
+        })
+
+        reader.once("open",()=> {
+            reader.pipe(res);
+        })
+
 
     });
 
