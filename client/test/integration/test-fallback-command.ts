@@ -46,6 +46,30 @@ describe("Fallback command", async function () {
         expect(lineFound).equal(true);
     });
 
+    it("Should fallback for publish command", async () => {
+        let lineFound = false;
+        await testCmd("publish", [], [], async (line: string, index, process) => {
+            if (line.includes("What is the package name, url, or file name?")) {
+                lineFound = true;
+                process.kill(9);
+            }
+        });
+
+        expect(lineFound).equal(true);
+    });
+
+    it("Should fallback for edit command", async () => {
+        let lineFound = false;
+        await testCmd("edit", [], [], async (line: string, index, process) => {
+            if (line.includes("What is the package name, url, or file name?")) {
+                lineFound = true;
+                process.kill(9);
+            }
+        });
+
+        expect(lineFound).equal(true);
+    });
+
     it("Should fallback for update command", async () => {
         let lineFound = false;
         await testCmd("update", [], [], async (line: string, index, process) => {

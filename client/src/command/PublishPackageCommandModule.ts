@@ -27,8 +27,26 @@ export class PublishPackageCommandModule {
             spinner: "dots"
         });
 
-        console.log("");
-        console.log(chalk.magenta("Publishing Options"));
+        if (argv.reference == null) {
+            const referencePromptResult = await prompts(
+                {
+                    type: "text",
+                    name: "reference",
+                    message: "What is the package name, url, or file name?",
+                    validate: (value) => {
+                        if (!value) return "Package file name or url required";
+                        return true;
+                    }
+                },
+                defaultPromptOptions
+            );
+            argv.reference = referencePromptResult.reference;
+        }
+
+        if (argv.reference == null) {
+            oraRef.fail("No package reference provided");
+            process.exit(1);
+        }
 
         oraRef.start(`Resolving package file reference: ${argv.reference}`);
 
@@ -49,6 +67,9 @@ export class PublishPackageCommandModule {
         }
 
         oraRef.succeed(`Found target package file: ${packageFileWithContext.packageFileUrl.replace("file://", "")}`);
+
+        console.log("");
+        console.log(chalk.magenta("Publishing Options"));
 
         if (!packageFile.registries || packageFile.registries.length === 0) {
             if (argv.defaults) {

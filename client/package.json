@@ -9,7 +9,7 @@
         "start:test-data-server": "node -r ts-node/register test/test-data-server.ts",
         "start-registry": "DATAPM_VERSION=latest docker-compose -f node_modules/datapm-lib/docker-compose.yml up",
         "codegen": "graphql-codegen --config codegen.yml && cp src/generated/graphql.ts test/integration/registry-client.ts",
-        "package-macos": "tsc && npx pkg package.json --out-path pkg --target node12-macos-x64",
+        "package:macos:x64": "tsc && npx pkg package.json --out-path pkg --target node14-macos-x64",
         "package:win86": "gulp buildWindows86",
         "package:win64": "gulp buildWindows64",
         "pretest": "npm run codegen",

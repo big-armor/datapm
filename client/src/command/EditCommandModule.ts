@@ -257,7 +257,7 @@ export async function editPackage(argv: EditArguments): Promise<void> {
             {
                 type: "text",
                 name: "reference",
-                message: "What is the package reference, url , or file name?",
+                message: "What is the package name, url, or file name?",
                 validate: (value) => {
                     if (!value) return "Package file name or url required";
                     return true;
