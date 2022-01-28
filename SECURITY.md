@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Below are the version of DataPM that are being maintained for security purposes.
+Below are the versions of DataPM that are being maintained for security purposes.
 
 | Version | Supported          |
 | ------- | ------------------ |
