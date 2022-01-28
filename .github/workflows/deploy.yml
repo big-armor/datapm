@@ -85,7 +85,7 @@ jobs:
               run: npm run build
               working-directory: client
 
-            - run: npm run package:win64
+            - run: npm run package:win:x64
               working-directory: client
               env:
                   CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_BASE64 }}

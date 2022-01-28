@@ -229,6 +229,6 @@ exports.buildWindows86 = series(
     createMsiWin86,
     signMsiWin86
 );
-exports.buildMac64 = series(cleanMac64, runPkgMac64, copyDepsMac64, copyAssetsMac64);
+exports.buildMacOS64 = series(cleanMac64, runPkgMac64, copyDepsMac64, copyAssetsMac64);
 
 exports.copyAppManifiestWin64 = copyAppManifiestWin64;
