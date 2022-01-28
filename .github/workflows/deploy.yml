@@ -2,8 +2,8 @@ name: "Build & Deploy"
 
 on:
     push:
-        branches:
-            - master
+#        branches:
+#            - master
 
 jobs:
     lint:
@@ -15,7 +15,6 @@ jobs:
             - uses: actions/setup-node@v2
               with:
                   node-version: "14.18.3"
-                  architecture: "x64" # optional, x64 or x86. If not specified, x64 will be used by default
 
             - name: Print npm verion
               run: npm --version
@@ -29,32 +28,52 @@ jobs:
             - name: Run ESLint
               run: npm run lint
 
+            - name: Install Client Dependencies
+              run: npm ci
+              working-directory: client
+
+            - name: Run lint on client code
+              run: npm run lint
+              working-directory: client
+
             - name: Setup Terraform
               uses: hashicorp/setup-terraform@v1
 
             - name: Terraform Format
               run: terraform fmt -check
 
+    bumpVersion:
+        name: "Bump Version"
+        timeout-minutes: 5
+        runs-on: "ubuntu-latest"
+        needs: lint
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+
+            - uses: actions/setup-node@v2-beta
+              with:
+                  node-version: "14.18.3"
+
+            - name: Install Dependencies
+              run: npm ci
+
+            - name: Set Git Author
+              run: git config user.name "$${{env.GITHUB_ACTOR}}" && git config user.email "gitHubActionDeployer@no-reply"
+
+            - name: Bump Version
+              run: npm run bump-version
+
     build-win-x64-client:
         runs-on: windows-latest
         timeout-minutes: 15
-        needs: lint
-        name: Windows Build Node Client
+        needs: bumpVersion
+        name: Windows Build DataPM Client
         steps:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v2
               with:
                   node-version: "14.18.3"
-                  architecture: "x64" # optional, x64 or x86. If not specified, x64 will be used by default
-
-            - name: Print npm verion
-              run: npm --version
-
-            - name: Print node verion
-              run: node --version
-
-            - name: Install Root Dependencies
-              run: npm ci
 
             - name: Install Lib Dependencies
               run: npm ci
@@ -77,10 +96,6 @@ jobs:
               run: npm link datapm-lib
               working-directory: client
 
-            - name: Run lint on client code
-              run: npm run lint
-              working-directory: client
-
             - name: Run build
               run: npm run build
               working-directory: client
@@ -98,11 +113,77 @@ jobs:
                   path: client/datapm-*-x64.msix
                   retention-days: 5
 
+    build-macos-x64-client:
+        runs-on: macos-latest
+        timeout-minutes: 15
+        needs: bumpVersion
+        name: Windows MacOS DataPM Client
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: "14.18.3"
+
+            - name: Install Lib Dependencies
+              run: npm ci
+              working-directory: lib
+
+            - name: Build Lib
+              run: npm run build
+              working-directory: lib
+
+            - name: Link Lib
+              run: npm link
+              working-directory: lib/dist
+
+            - name: Install client dependencies
+              run: npm ci
+              working-directory: client
+              if: steps.cache-client-node-modules.outputs.cache-hit != 'true'
+
+            - name: Link Lib for Client
+              run: npm link datapm-lib
+              working-directory: client
+
+            - name: Run build
+              run: npm run build
+              working-directory: client
+
+            - run: npm run package:macos:x64
+              working-directory: client
+              env:
+                  CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_BASE64 }}
+                  CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_PASSWORD }}
+
+            - name: "Save MacOS Executable"
+              uses: actions/upload-artifact@v2
+              with:
+                  name: datapm-client-windows-x64
+                  path: client/datapm-*-x64.msix
+                  retention-days: 5
+
+            - name: Codesign executable
+                env: 
+                  MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+                  MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+                  MACOS_KEYCHAIN_TEMPORARY_PASSWORD: ${{ secrets.MACOS_KEYCHAIN_TEMPORARY_PASSWORD }}
+                run: |
+                  echo $MACOS_CERTIFICATE | base64 -D > certificate.p12
+                  security create-keychain -p $MACOS_KEYCHAIN_TEMPORARY_PASSWORD build.keychain 
+                  security default-keychain -s build.keychain
+                  security unlock-keychain -p $MACOS_KEYCHAIN_TEMPORARY_PASSWORD build.keychain
+                  security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
+                  security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $MACOS_KEYCHAIN_TEMPORARY_PASSWORD build.keychain
+                  /usr/bin/codesign --force -s 2DE76EE559DC8E3F669954AC5BE56B9312247C9E ./client/pkg -v
+
     buildAndDeploy:
         name: "Build And Deploy"
         timeout-minutes: 20
         runs-on: ubuntu-latest
-        needs: build-win-x64-client
+        needs:
+            - build-macos-x64-client
+            - build-win-x64-client
+        if: false # DISABLED FOR TESTING
         env:
             INPUT_TOKEN: "" # See https://github.com/JS-DevTools/npm-publish/issues/15
         steps:
@@ -122,18 +203,6 @@ jobs:
             - name: Install Dependencies
               run: npm ci
 
-            - name: Setup Terraform
-              uses: hashicorp/setup-terraform@v1
-
-            - name: Terraform Format
-              run: terraform fmt -check
-
-            - name: Set Git Author
-              run: git config user.name "$${{env.GITHUB_ACTOR}}" && git config user.email "gitHubActionDeployer@no-reply"
-
-            - name: Bump Version
-              run: npm run bump-version
-
             - name: Install Lib Dependencies
               id: install-lib-Dependencies
               run: npm ci
@@ -143,6 +212,10 @@ jobs:
               id: build-lib-Dependencies
               run: npm run build
               working-directory: lib
+
+            - name: Link Lib
+              run: npm link
+              working-directory: lib/dist
 
             - uses: JS-DevTools/npm-publish@v1
               with:
@@ -160,6 +233,10 @@ jobs:
               run: npm ci
               working-directory: backend
 
+            - name: Link Lib for Backend
+              run: npm link datapm-lib
+              working-directory: backend
+
             - name: Build Backend
               id: build-backend-Dependencies
               run: npm run build
@@ -168,6 +245,10 @@ jobs:
             - name: Install Frontend Dependencies
               id: install-frontend-dependencies
               run: npm ci
+              working-directory: frontend
+
+            - name: Link Lib for Frontend
+              run: npm link datapm-lib
               working-directory: frontend
 
             - name: Build Frontend
@@ -184,16 +265,6 @@ jobs:
               id: build-docs-Dependencies
               run: npm run build
               working-directory: docs/website
-
-            - name: Install Client Dependencies
-              id: install-client-dependencies
-              run: npm ci
-              working-directory: client
-
-            - name: Build Client
-              id: build-client-Dependencies
-              run: npm run build
-              working-directory: client
 
             - name: Download Win64 Installer
               uses: actions/download-artifact@v2
@@ -277,3 +348,24 @@ jobs:
               run: npx apollo service:push --graph=datapm --key=${{secrets.TF_VAR_APOLLO_KEY}} --variant=test --localSchemaFile=backend/dist/schema.gql,backend/dist/auth-schema.gql,backend/dist/user-schema.gql,backend/dist/api-key-schema.gql,backend/dist/images-schema.gql
               env:
                   INPUT_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    github-release-clients:
+        runs-on: ubuntu-latest
+        name: "Client Releases on GitHub"
+        needs:
+            - "build-macos-x64-client"
+            - "build-win-x64-client"
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+            - name: Build
+              run: echo ${{ github.sha }} > Release.txt
+            - name: Test
+              run: cat Release.txt
+            - name: Release
+              uses: softprops/action-gh-release@v1
+              if: startsWith(github.ref, 'refs/tags/')
+              with:
+                  files: |
+                      Release.txt
+                      LICENSE
