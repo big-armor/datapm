@@ -163,11 +163,11 @@ jobs:
                   retention-days: 5
 
             - name: Codesign executable
-                env: 
+              env:
                   MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
                   MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
                   MACOS_KEYCHAIN_TEMPORARY_PASSWORD: ${{ secrets.MACOS_KEYCHAIN_TEMPORARY_PASSWORD }}
-                run: |
+              run: |
                   echo $MACOS_CERTIFICATE | base64 -D > certificate.p12
                   security create-keychain -p $MACOS_KEYCHAIN_TEMPORARY_PASSWORD build.keychain 
                   security default-keychain -s build.keychain
