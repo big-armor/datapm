@@ -1,4 +1,4 @@
-# Security Policy
+# DataPM Security Policy
 
 ## Supported Versions
 
