@@ -1,11 +1,5 @@
 # Data Package Manager Library (datapm-lib)
 
-A library of server and client side shared resources for Data Package Manager (datapm). This is for development purposes.
+[DataPM.io](https://datapm.io) is a free, open-source, and easy-to-use data management platform. Use DataPM to quickly create accurate data catalogs, publish high quality data sets, and ETL data into your production systems.
 
-For client concerns, visit:
-
-https://github.com/big-armor/datapm-client
-
-For registry (server) concerns, visit:
-
-https://github.com/big-armor/datapm-registry
+This folder contains a NodeJS library that defines the GraphQL Schema for the backend server, and commonly used NodeJS classes for both the backend and client.
