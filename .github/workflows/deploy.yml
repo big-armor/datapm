@@ -118,7 +118,7 @@ jobs:
 
             - name: get-npm-version
               id: package-version
-              run: echo ::set-output name=DATAPM_VERSION::`jq .version package.json`
+              run: echo ::set-output name=DATAPM_VERSION::`jq .version package.json  | tr -d '"'`
 
             - name: Install Lib Dependencies
               run: npm ci
