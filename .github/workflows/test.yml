@@ -1,7 +1,7 @@
 name: "Test"
 
 on:
-    push:
+#    push: UNCOMMENT ME WHEN DONE TESTING
 
 jobs:
     terraformCheck:
