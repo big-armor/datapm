@@ -35,7 +35,7 @@ security import installer-certificate.p12 -k build.keychain -P $MACOS_INSTALLER_
 
 echo ""
 echo "###   Completing temporary keychain"
-security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $MACOS_KEYCHAIN_TEMPORARY_PASSWORD build.keychain
+security set-key-partition-list -S apple-tool:,apple:,teamid:$APPLE_TEAM_ID -s -k $MACOS_KEYCHAIN_TEMPORARY_PASSWORD build.keychain
 
 # Sign the application 
 signFile ./pkg-mac64/datapm
