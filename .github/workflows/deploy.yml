@@ -155,15 +155,19 @@ jobs:
               env:
                   MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
                   MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+                  MACOS_INSTALLER_CERTIFICATE: ${{ secrets.MACOS_INSTALLER_CERTIFICATE_PWD }}
+                  MACOS_INSTALLER_CERTIFICATE_PWD: ${{ secrets.MACOS_INSTALLER_CERTIFICATE_PWD }}
                   MACOS_KEYCHAIN_TEMPORARY_PASSWORD: ${{ secrets.MACOS_KEYCHAIN_TEMPORARY_PASSWORD }}
                   APPLE_DEVELOPER_CERTIFICATE_ID: ${{secrets.APPLE_DEVELOPER_CERTIFICATE_ID}}
                   DATAPM_VERSION: ${{ steps.package-version.outputs.DATAPM_VERSION}}
               run: |
                   echo $MACOS_CERTIFICATE | base64 -D > certificate.p12
+                  echo $MACOS_INSTALLER_CERTIFICATE | base64 -D > license-certificate.p12
                   security create-keychain -p $MACOS_KEYCHAIN_TEMPORARY_PASSWORD build.keychain 
                   security default-keychain -s build.keychain
                   security unlock-keychain -p $MACOS_KEYCHAIN_TEMPORARY_PASSWORD build.keychain
                   security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
+                  security import installer-certificate.p12 -k build.keychain -P $MACOS_INSTALLER_CERTIFICATE_PWD -T /usr/bin/codesign
                   security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $MACOS_KEYCHAIN_TEMPORARY_PASSWORD build.keychain
                   /usr/bin/codesign --force --options runtime --entitlements ./client/installers/macos/macOS-x64/macos-runtime-entitlements.plist -s $APPLE_DEVELOPER_CERTIFICATE_ID --timestamp ./client/pkg-mac64/datapm -v
                   mkdir -p ./client/installers/macos/macOS-x64/application
