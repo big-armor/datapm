@@ -23,7 +23,9 @@ export async function obtainCredentials(oraRef: Ora, source: Source): Promise<DP
         throw new Error(`Could not find repository implementation for type ${source.type}`);
     }
 
-    const connectionIdentifier = await repository.getConnectionIdentifierFromConfiguration(source.connectionConfiguration);
+    const connectionIdentifier = await repository.getConnectionIdentifierFromConfiguration(
+        source.connectionConfiguration
+    );
 
     console.log(`For the ${repositoryDescription.getDisplayName()} repository ${connectionIdentifier}`);
 
