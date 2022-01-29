@@ -28,14 +28,6 @@ jobs:
             - name: Run ESLint
               run: npm run lint
 
-            - name: Install Client Dependencies
-              run: npm ci
-              working-directory: client
-
-            - name: Run lint on client code
-              run: npm run lint
-              working-directory: client
-
             - name: Setup Terraform
               uses: hashicorp/setup-terraform@v1
 
@@ -117,12 +109,16 @@ jobs:
         runs-on: macos-latest
         timeout-minutes: 15
         needs: bumpVersion
-        name: Windows MacOS DataPM Client
+        name: MacOS DataPM Client
         steps:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v2
               with:
                   node-version: "14.18.3"
+
+            - name: get-npm-version
+              id: package-version
+              uses: martinbeentjes/npm-get-version-action@master
 
             - name: Install Lib Dependencies
               run: npm ci
@@ -155,18 +151,13 @@ jobs:
                   CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_BASE64 }}
                   CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_PASSWORD }}
 
-            - name: "Save MacOS Executable"
-              uses: actions/upload-artifact@v2
-              with:
-                  name: datapm-client-windows-x64
-                  path: client/datapm-*-x64.msix
-                  retention-days: 5
-
-            - name: Codesign executable
+            - name: Codesign & Generate MacOS Installer
               env:
                   MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
                   MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
                   MACOS_KEYCHAIN_TEMPORARY_PASSWORD: ${{ secrets.MACOS_KEYCHAIN_TEMPORARY_PASSWORD }}
+                  APPLE_DEVELOPER_CERTIFICATE_ID: ${{secrets.APPLE_DEVELOPER_CERTIFICATE_ID}}
+                  DATAPM_VERSION: ${{ steps.package-version.outputs.current-version}}
               run: |
                   echo $MACOS_CERTIFICATE | base64 -D > certificate.p12
                   security create-keychain -p $MACOS_KEYCHAIN_TEMPORARY_PASSWORD build.keychain 
@@ -174,7 +165,17 @@ jobs:
                   security unlock-keychain -p $MACOS_KEYCHAIN_TEMPORARY_PASSWORD build.keychain
                   security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
                   security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $MACOS_KEYCHAIN_TEMPORARY_PASSWORD build.keychain
-                  /usr/bin/codesign --force -s 2DE76EE559DC8E3F669954AC5BE56B9312247C9E ./client/pkg -v
+                  /usr/bin/codesign --force --options runtime --entitlements ./client/installers/macos/macOS-x64/macos-runtime-entitlements.plist -s $APPLE_DEVELOPER_CERTIFICATE_ID --timestamp ./client/pkg-mac64/datapm -v
+                  cp -R ./client/pkg-mac64/* ./client/installers/macos/macOS-x64/application
+                  cd client/installers/macos/macOS-x64
+                  ./build-macos-x64.sh DataPM $DATAPM_VERSION
+
+            - name: "Create MacOS Installer Artifact"
+              uses: actions/upload-artifact@v2
+              with:
+                  name: datapm-client-windows-x64
+                  path: ./client/installers/macos/macOS-x64/target/pkg-signed/*.dmg
+                  retention-days: 7
 
     buildAndDeploy:
         name: "Build And Deploy"
@@ -358,14 +359,23 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-            - name: Build
-              run: echo ${{ github.sha }} > Release.txt
-            - name: Test
-              run: cat Release.txt
+
+            - name: Download Win64 Installer
+              uses: actions/download-artifact@v2
+              with:
+                  name: datapm-client-windows-x64
+                  path: dist/client-installers
+
+            - name: Download MacOSx64 Installer
+              uses: actions/download-artifact@v2
+              with:
+                  name: datapm-client-macos-x64
+                  path: dist/client-installers
+
             - name: Release
               uses: softprops/action-gh-release@v1
               if: startsWith(github.ref, 'refs/tags/')
               with:
                   files: |
-                      Release.txt
-                      LICENSE
+                      dist/client-installers/*.msix
+                      dist/client-installers/*.dmg
