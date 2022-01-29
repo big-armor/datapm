@@ -166,6 +166,7 @@ jobs:
                   security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
                   security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $MACOS_KEYCHAIN_TEMPORARY_PASSWORD build.keychain
                   /usr/bin/codesign --force --options runtime --entitlements ./client/installers/macos/macOS-x64/macos-runtime-entitlements.plist -s $APPLE_DEVELOPER_CERTIFICATE_ID --timestamp ./client/pkg-mac64/datapm -v
+                  mkdir -p ./client/installers/macos/macOS-x64/application
                   cp -R ./client/pkg-mac64/* ./client/installers/macos/macOS-x64/application
                   cd client/installers/macos/macOS-x64
                   ./build-macos-x64.sh DataPM $DATAPM_VERSION
