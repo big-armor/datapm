@@ -162,7 +162,7 @@ jobs:
                   DATAPM_VERSION: ${{ steps.package-version.outputs.DATAPM_VERSION}}
               run: |
                   echo $MACOS_CERTIFICATE | base64 -D > certificate.p12
-                  echo $MACOS_INSTALLER_CERTIFICATE | base64 -D > license-certificate.p12
+                  echo $MACOS_INSTALLER_CERTIFICATE | base64 -D > installer-certificate.p12
                   security create-keychain -p $MACOS_KEYCHAIN_TEMPORARY_PASSWORD build.keychain 
                   security default-keychain -s build.keychain
                   security unlock-keychain -p $MACOS_KEYCHAIN_TEMPORARY_PASSWORD build.keychain
