@@ -118,7 +118,7 @@ jobs:
 
             - name: get-npm-version
               id: package-version
-              uses: martinbeentjes/npm-get-version-action@master
+              run: echo ::set-output name=DATAPM_VERSION::`jq .version package.json`
 
             - name: Install Lib Dependencies
               run: npm ci
@@ -157,7 +157,7 @@ jobs:
                   MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
                   MACOS_KEYCHAIN_TEMPORARY_PASSWORD: ${{ secrets.MACOS_KEYCHAIN_TEMPORARY_PASSWORD }}
                   APPLE_DEVELOPER_CERTIFICATE_ID: ${{secrets.APPLE_DEVELOPER_CERTIFICATE_ID}}
-                  DATAPM_VERSION: ${{ steps.package-version.outputs.current-version}}
+                  DATAPM_VERSION: ${{ steps.package-version.outputs.DATAPM_VERSION}}
               run: |
                   echo $MACOS_CERTIFICATE | base64 -D > certificate.p12
                   security create-keychain -p $MACOS_KEYCHAIN_TEMPORARY_PASSWORD build.keychain 
