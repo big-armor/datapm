@@ -162,9 +162,9 @@ function signProduct() {
 function createInstaller() {
     log_info "Application installer generation process started.(3 Steps)"
     buildPackage
-    buildProduct ${PRODUCT}-macos-installer-x64-${VERSION}.pkg
+    buildProduct ${PRODUCT}-macos-installer-${VERSION}-x64.pkg
     log_info "Signing the installer package"
-    signProduct ${PRODUCT}-macos-installer-x64-${VERSION}.pkg
+    signProduct ${PRODUCT}-macos-installer-${VERSION}-x64.pkg
     log_info "Application installer generation steps finished."
 }
 

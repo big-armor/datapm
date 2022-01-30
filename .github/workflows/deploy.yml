@@ -1,9 +1,7 @@
-name: "Build & Deploy"
+name: "Test, Build, Deploy"
 
 on:
     push:
-#        branches:
-#            - master
 
 jobs:
     lint:
@@ -34,32 +32,296 @@ jobs:
             - name: Terraform Format
               run: terraform fmt -check
 
-    bumpVersion:
-        name: "Bump Version"
-        timeout-minutes: 5
-        runs-on: "ubuntu-latest"
+    testLib:
+        name: "Test Lib"
         needs: lint
+        timeout-minutes: 10
+        runs-on: ubuntu-latest
         steps:
             - name: Checkout
               uses: actions/checkout@v2
 
             - uses: actions/setup-node@v2-beta
               with:
-                  node-version: "14.18.3"
+                  node-version: "14"
 
-            - name: Install Dependencies
+            - name: Print npm verion
+              run: npm --version
+
+            - name: Print node verion
+              run: node --version
+
+            - name: Cache Lib Node_modules
+              id: cache-lib-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: lib/node_modules
+                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/package.json', 'lib/package-lock.json') }}
+
+            - name: Install Lib Dependencies
+              id: install-lib-Dependencies
+              if: steps.cache-lib-node-modules.outputs.cache-hit != 'true'
               run: npm ci
+              working-directory: lib
 
-            - name: Set Git Author
-              run: git config user.name "$${{env.GITHUB_ACTOR}}" && git config user.email "gitHubActionDeployer@no-reply"
+            - name: Test Lib
+              id: test-lib-Dependencies
+              run: npm run test
+              working-directory: lib
 
-            - name: Bump Version
-              run: npm run bump-version
+            - name: Build Lib
+              id: build-lib-Dependencies
+              run: npm run build
+              working-directory: lib
+
+    testBackend:
+        name: "Test Backend"
+        needs: lint
+        timeout-minutes: 10
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+
+            - uses: actions/setup-node@v2-beta
+              with:
+                  node-version: "14"
+
+            - name: Print npm verion
+              run: npm --version
+
+            - name: Print node verion
+              run: node --version
+
+            - name: Cache Lib Build
+              id: cache-lib
+              uses: actions/cache@v1
+              with:
+                  path: lib
+                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/**') }}
+
+            - name: Install Lib Dependencies
+              id: install-lib-dependencies
+              if: steps.cache-lib.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: lib
+
+            - name: Build Lib
+              id: build-lib-dependencies
+              if: steps.cache-lib.outputs.cache-hit != 'true'
+              run: npm run build
+              working-directory: lib
+
+            - name: Link Lib
+              run: npm link
+              working-directory: lib/dist
+
+            - name: Cache Backend Node_modules
+              id: cache-backend-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: backend/node_modules
+                  key: datampm-registry-${{ runner.OS }}-backend-${{ hashFiles('backend/package.json', 'backend/package-lock.json') }}
+
+            - name: Install Backend Dependencies
+              id: install-backend-Dependencies
+              if: steps.cache-backend-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: backend
+
+            - name: Link Lib for Backend
+              run: npm link datapm-lib
+              working-directory: backend
+
+            - name: Test Backend
+              id: test-backend-Dependencies
+              run: npm run test
+              working-directory: backend
+
+    testFrontend:
+        name: "Test Frontend"
+        needs: lint
+        timeout-minutes: 10
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+
+            - uses: actions/setup-node@v2-beta
+              with:
+                  node-version: "14"
+
+            - name: Print npm verion
+              run: npm --version
+
+            - name: Print node verion
+              run: node --version
+
+            - name: Cache Lib Build
+              id: cache-lib
+              uses: actions/cache@v1
+              with:
+                  path: lib
+                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/**') }}
+
+            - name: Install Lib Dependencies
+              id: install-lib-dependencies
+              if: steps.cache-lib.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: lib
+
+            - name: Build Lib
+              id: build-lib-dependencies
+              if: steps.cache-lib.outputs.cache-hit != 'true'
+              run: npm run build
+              working-directory: lib
+
+            - name: Link Lib
+              run: npm link
+              working-directory: lib/dist
+
+            - name: Cache Backend Node_modules
+              id: cache-backend-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: backend/node_modules
+                  key: datampm-registry-${{ runner.OS }}-backend-${{ hashFiles('backend/package.json', 'backend/package-lock.json') }}
+
+            - name: Install Backend Dependencies
+              id: install-backend-Dependencies
+              if: steps.cache-backend-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: backend
+
+            - name: Link Lib for Backend
+              run: npm link datapm-lib
+              working-directory: backend
+
+            - name: Build Backend
+              id: build-backend
+              if: steps.cache-backend.outputs.cache-hit != 'true'
+              run: npm run build
+              working-directory: backend
+
+            - name: Cache Frontend Node_modules
+              id: cache-frontend-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: frontend/node_modules
+                  key: datampm-registry-${{ runner.OS }}-frontend-${{ hashFiles('frontend/package.json', 'frontend/package-lock.json') }}
+
+            - name: Install Frontend Dependencies
+              id: install-fronend-dependencies
+              if: steps.cache-frontend-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: frontend
+
+            - name: Link Lib for Frontend
+              run: npm link datapm-lib
+              working-directory: frontend
+
+            - name: Test Frontend
+              id: test-frontend-Dependencies
+              run: npm run test:ci
+              working-directory: frontend
+
+    testClient:
+        name: "Test Client"
+        needs: lint
+        timeout-minutes: 20
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+
+            - uses: actions/setup-node@v2-beta
+              with:
+                  node-version: "14"
+
+            - name: Print npm verion
+              run: npm --version
+
+            - name: Print node verion
+              run: node --version
+
+            - name: Cache Lib Build
+              id: cache-lib
+              uses: actions/cache@v1
+              with:
+                  path: lib
+                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/**') }}
+
+            - name: Install Lib Dependencies
+              id: install-lib-dependencies
+              if: steps.cache-lib.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: lib
+
+            - name: Build Lib
+              id: build-lib-dependencies
+              if: steps.cache-lib.outputs.cache-hit != 'true'
+              run: npm run build
+              working-directory: lib
+
+            - name: Link Lib
+              run: npm link
+              working-directory: lib/dist
+
+            - name: Cache Backend Dependencies
+              id: cache-backend-dependencies
+              uses: actions/cache@v1
+              with:
+                  path: backend/node_modules
+                  key: datampm-registry-${{ runner.OS }}-backend-${{ hashFiles('backend/package*.json') }}
+
+            - name: Install Backend Dependencies
+              id: install-backend-Dependencies
+              if: steps.cache-backend-dependencies.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: backend
+
+            - name: Link Lib for Backend
+              run: npm link datapm-lib
+              working-directory: backend
+
+            - name: Build Backend
+              id: build-backend
+              run: npm run build
+              working-directory: backend
+
+            - name: Cache Client Node_modules
+              id: cache-client-node-modules
+              uses: actions/cache@v1
+              with:
+                  path: client/node_modules
+                  key: datampm-client-${{ runner.OS }}-${{ hashFiles('client/package.json', 'client/package-lock.json', 'client/npm-shrinkwrap.json') }}
+
+            - name: Install Client Dependencies
+              id: install-client-dependencies
+              if: steps.cache-client-node-modules.outputs.cache-hit != 'true'
+              run: npm ci
+              working-directory: client
+
+            - name: Link Lib for Client
+              run: npm link datapm-lib
+              working-directory: client
+
+            - name: Test Client
+              id: test-client-Dependencies
+              run: npm run test
+              working-directory: client
+              env:
+                  CREDENTIALS_SECRET_KEY: test-key-not-for-production
 
     build-win-x64-client:
         runs-on: windows-latest
         timeout-minutes: 15
-        needs: bumpVersion
+        needs:
+            - testLib
+            - testBackend
+            - testFrontend
+            - testClient
+        if: github.ref == 'refs/heads/master'
         name: Windows Build DataPM Client
         steps:
             - uses: actions/checkout@v2
@@ -108,7 +370,12 @@ jobs:
     build-macos-x64-client:
         runs-on: macos-latest
         timeout-minutes: 15
-        needs: bumpVersion
+        needs:
+            - testLib
+            - testBackend
+            - testFrontend
+            - testClient
+        if: github.ref == 'refs/heads/master'
         name: MacOS DataPM Client
         steps:
             - uses: actions/checkout@v2
@@ -169,7 +436,7 @@ jobs:
             - name: "Create MacOS Installer Artifact"
               uses: actions/upload-artifact@v2
               with:
-                  name: datapm-client-windows-x64
+                  name: datapm-client-macos-x64
                   path: ./client/installers/macos/macOS-x64/target/pkg-signed/*.pkg
                   retention-days: 7
 
@@ -177,10 +444,10 @@ jobs:
         name: "Build And Deploy"
         timeout-minutes: 20
         runs-on: ubuntu-latest
+        if: github.ref == 'refs/heads/master'
         needs:
             - build-macos-x64-client
             - build-win-x64-client
-        if: false # DISABLED FOR TESTING
         env:
             INPUT_TOKEN: "" # See https://github.com/JS-DevTools/npm-publish/issues/15
         steps:
@@ -218,9 +485,6 @@ jobs:
               with:
                   package: ./lib/dist/package.json
                   token: ${{ secrets.NPM_TOKEN }}
-
-            - name: Bump Package Files Lib Versions
-              run: npm run bump-package-lib-versions
 
             - name: Tag
               run: npm run tag
@@ -349,6 +613,7 @@ jobs:
     github-release-clients:
         runs-on: ubuntu-latest
         name: "Client Releases on GitHub"
+        if: github.ref == 'refs/heads/master'
         needs:
             - "build-macos-x64-client"
             - "build-win-x64-client"
@@ -370,8 +635,33 @@ jobs:
 
             - name: Release
               uses: softprops/action-gh-release@v1
-              if: startsWith(github.ref, 'refs/tags/')
               with:
                   files: |
                       dist/client-installers/*.msix
                       dist/client-installers/*.pkg
+
+    bumpVersion:
+        name: "Bump Version"
+        timeout-minutes: 5
+        runs-on: "ubuntu-latest"
+        needs: buildAndDeploy
+        if: always() && github.ref == 'refs/heads/master'
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+
+            - uses: actions/setup-node@v2-beta
+              with:
+                  node-version: "14.18.3"
+
+            - name: Install Dependencies
+              run: npm ci
+
+            - name: Set Git Author
+              run: git config user.name "$${{env.GITHUB_ACTOR}}" && git config user.email "gitHubActionDeployer@no-reply"
+
+            - name: Bump Version
+              run: npm run bump-version
+
+            - name: Bump Package Files Lib Versions
+              run: npm run bump-package-lib-versions
