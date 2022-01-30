@@ -73,11 +73,11 @@ cd ../../../
 # Submit the installer for notarization by Apple
 echo ""
 echo "###   Submitting installer for notarization"
-# xcrun notarytool submit ./installers/macos/macOS-x64/target/pkg-signed/*.pkg --apple-id $APPLE_ID --password $APPLE_ID_PASSWORD --team-id $APPLE_TEAM_ID --wait
+xcrun notarytool submit ./installers/macos/macOS-x64/target/pkg-signed/*.pkg --apple-id $APPLE_ID --password $APPLE_ID_PASSWORD --team-id $APPLE_TEAM_ID --wait
 
 echo ""
 echo "###   Attaching notarization ticket"
-# xcrun stapler staple ./installers/macos/macOS-x64/target/pkg-signed/*.pkg
+xcrun stapler staple ./installers/macos/macOS-x64/target/pkg-signed/*.pkg
 
 echo ""
 echo "###   Cleanup temporary key chain"
