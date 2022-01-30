@@ -86,3 +86,7 @@ security delete-keychain build.keychain
 echo ""
 echo "###   Revert back to login keychain as default"
 security list-keychains -d user -s login.keychain
+
+echo ""
+echo "###   Set login as the default key chain again"
+security default-keychain -d user -s login.keychain

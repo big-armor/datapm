@@ -162,6 +162,7 @@ jobs:
                   DATAPM_VERSION: ${{ steps.package-version.outputs.DATAPM_VERSION}}
                   APPLE_ID: ${{ secrets.APPLE_ID }}
                   APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+                  APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
               run: ./installers/macos/sign-apps.sh
               working-directory: client
 
