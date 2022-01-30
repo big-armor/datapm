@@ -4,11 +4,14 @@
 # Run this from the ./client directory of the root of this project
 ########
 
+# Exit when any command fails
+set -e
+
 # $1 The path to the file to be signed
 function signFile {
     echo ""
-echo "### Signing $1"
-    /usr/bin/codesign --force --options runtime --entitlements ./installers/macos/macOS-x64/macos-runtime-entitlements.plist -s $APPLE_DEVELOPER_CERTIFICATE_ID --timestamp $1 -v
+    echo "### Signing $1 with $APPLE_DEVELOPER_CERTIFICATE_ID"
+    /usr/bin/codesign --force --options runtime --entitlements ./installers/macos/macOS-x64/macos-runtime-entitlements.plist -s "Developer ID Application: $APPLE_DEVELOPER_CERTIFICATE_ID" --timestamp $1 -v
 }
 
 
@@ -21,7 +24,7 @@ echo $MACOS_INSTALLER_CERTIFICATE | base64 -D > installer-certificate.p12
 # Create a temporary keychain (will fail if the key chain already exists)
 echo ""
 echo "###   Creating temporary keychain"
-security create-keychain -p $MACOS_KEYCHAIN_TEMPORARY_PASSWORD build.keychain 
+security create-keychain -p $MACOS_KEYCHAIN_TEMPORARY_PASSWORD build.keychain  || true
 security default-keychain -s build.keychain
 security unlock-keychain -p $MACOS_KEYCHAIN_TEMPORARY_PASSWORD build.keychain
 
@@ -34,8 +37,12 @@ echo "###   Importing installer signing certificate"
 security import installer-certificate.p12 -k build.keychain -P $MACOS_INSTALLER_CERTIFICATE_PWD -T /usr/bin/codesign
 
 echo ""
-echo "###   Completing temporary keychain"
+echo "###   Partitioning temporary keychain"
 security set-key-partition-list -S apple-tool:,apple:,teamid:$APPLE_TEAM_ID -s -k $MACOS_KEYCHAIN_TEMPORARY_PASSWORD build.keychain
+
+echo ""
+echo "###    Listing keys in keychain"
+security find-identity -v -p basic build.keychain
 
 # Sign the application 
 signFile ./pkg-mac64/datapm
