@@ -29,12 +29,16 @@ security default-keychain -s build.keychain
 security unlock-keychain -p $MACOS_KEYCHAIN_TEMPORARY_PASSWORD build.keychain
 
 echo ""
+echo "###  Setting temporary keychain as to search list"
+security list-keychains -d user -s build.keychain
+
+echo ""
 echo "###   Importing app signing certificate"
-security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
+security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign -T /usr/bin/productsign
 
 echo ""
 echo "###   Importing installer signing certificate"
-security import installer-certificate.p12 -k build.keychain -P $MACOS_INSTALLER_CERTIFICATE_PWD -T /usr/bin/codesign
+security import installer-certificate.p12 -k build.keychain -P $MACOS_INSTALLER_CERTIFICATE_PWD -T /usr/bin/productsign
 
 echo ""
 echo "###   Partitioning temporary keychain"
@@ -69,8 +73,16 @@ cd ../../../
 # Submit the installer for notarization by Apple
 echo ""
 echo "###   Submitting installer for notarization"
-xcrun notarytool submit ./installers/macos/macOS-x64/target/pkg-signed/*.pkg --apple-id $APPLE_ID --password $APPLE_ID_PASSWORD --team-id $APPLE_TEAM_ID --wait
+# xcrun notarytool submit ./installers/macos/macOS-x64/target/pkg-signed/*.pkg --apple-id $APPLE_ID --password $APPLE_ID_PASSWORD --team-id $APPLE_TEAM_ID --wait
 
 echo ""
 echo "###   Attaching notarization ticket"
-xcrun stapler staple ./installers/macos/macOS-x64/target/pkg-signed/*.pkg
+# xcrun stapler staple ./installers/macos/macOS-x64/target/pkg-signed/*.pkg
+
+echo ""
+echo "###   Cleanup temporary key chain"
+security delete-keychain build.keychain
+
+echo ""
+echo "###   Revert back to login keychain as default"
+security list-keychains -d user -s login.keychain
