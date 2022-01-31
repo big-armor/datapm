@@ -149,6 +149,11 @@ function cleanWin86() {
     return cleanDir("pkg-win86");
 }
 
+function cleanMacOSInstaller() {
+    cleanDir(path.join("installers","macos","macOS-x64","target"));
+    return cleanDir(path.join("installers","macos","macOS-x64","application"))
+}
+
 function writeCertificateFile() {
     fs.writeFileSync("signing-certificate.pfx", process.env.CERTIFICATE_BASE64, { encoding: "base64" }, function () {
         console.log("Signing Certificate");
@@ -201,6 +206,10 @@ function cleanMac64() {
     return cleanDir("pkg-mac64");
 }
 
+function cleanDist() {
+    return cleanDir("dist");
+}
+
 function copyDepsMac64() {
     return copyDeps("pkg-mac64");
 }
@@ -218,7 +227,7 @@ function linkDataPMLib() {
     const libPackageFile = JSON.parse(fileContents);
 
     if (libPackageFile.name !== "datapm-lib") return;
-
+    
     return spawnAndLog("link-datapm-lib", "npm", ["link", "datapm-lib"]);
 }
 
@@ -243,6 +252,7 @@ exports.buildWindows86 = series(
     signMsiWin86
 );
 exports.buildMacOSx64 = series(cleanMac64, runPkgMac64, copyDepsMac64, copyAssetsMac64);
+exports.clean = series(cleanDist,cleanMac64,cleanWin64,cleanWin86)
 
 exports.copyAppManifiestWin64 = copyAppManifiestWin64;
 exports.postinstall = linkDataPMLib;

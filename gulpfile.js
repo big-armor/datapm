@@ -281,6 +281,18 @@ function prepareRegistryDockerBuildAssets() {
     return merge(task1, task2, task3, task4, task5);
 }
 
+function cleanRoot() {
+    return new Promise((resolve) => {
+        if (fs.existsSync("dist")) fs.rmSync("dist", { recursive: true, force: true });
+
+        resolve();
+    });
+}
+
+function cleanLib() {
+    return spawnAndLog("clean-lib", "npm", ["run", "clean"]);
+}
+
 exports.default = series(
     installLibDependencies,
     buildLib,
@@ -357,3 +369,5 @@ exports.prepareDevEnvironment = series(
     parallel(linkLibBackend, linkLibClient, linkLibFrontend),
     parallel(buildBackend)
 );
+
+exports.clean = series(cleanLib, cleanRoot);
