@@ -235,6 +235,15 @@ function linkDataPMLib() {
     return spawnAndLog("link-datapm-lib", "npm", ["link", "datapm-lib"]);
 }
 
+function postCodegen() {
+    fs.copyFileSync(
+        path.join("src", "generated", "graphql.ts"),
+        path.join("test", "integration", "registry-client.ts")
+    );
+
+    return Promise.resolve();
+}
+
 exports.buildWindows64 = series(
     cleanWin64,
     writeCertificateFile,
@@ -260,3 +269,4 @@ exports.clean = series(cleanDist, cleanMac64, cleanWin64, cleanWin86, cleanMacOS
 
 exports.copyAppManifiestWin64 = copyAppManifiestWin64;
 exports.postinstall = linkDataPMLib;
+exports.postCodegen = postCodegen;
