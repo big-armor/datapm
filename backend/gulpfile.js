@@ -67,6 +67,15 @@ function linkDataPMLib() {
     
 }
 
+function clean() {
+    return new Promise((resolve) => {
+        if (fs.existsSync("dist")) fs.rmSync("dist", { recursive: true, force: true });
+
+        resolve();
+    });
+}
+
 exports.default = series(copyFiles, copyEmailTemplates, copyModules, copyDataPMLib, slimTypeOrmDist);
 exports.copyDependencies = series(copyModules, copyDataPMLib);
 exports.postinstall = series(linkDataPMLib)
+exports.clean = clean;

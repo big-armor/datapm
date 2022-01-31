@@ -76,8 +76,12 @@ function copyAppManfifest(directory) {
 }
 
 function spawnAndLog(prefix, command, args, opts) {
-    const child = spawn(command, args, opts);
+    let systemCommand = command;
+    if (command === "npm") {
+        if (process.platform === "win32") systemCommand = "npm.cmd";
+    }
 
+    const child = spawn(systemCommand, args, opts);
     child.stdout.on("data", function (chunk) {
         console.log("[" + prefix + "] " + chunk.toString());
     });
@@ -149,6 +153,11 @@ function cleanWin86() {
     return cleanDir("pkg-win86");
 }
 
+function cleanMacOSInstaller() {
+    cleanDir(path.join("installers", "macos", "macOS-x64", "target"));
+    return cleanDir(path.join("installers", "macos", "macOS-x64", "application"));
+}
+
 function writeCertificateFile() {
     fs.writeFileSync("signing-certificate.pfx", process.env.CERTIFICATE_BASE64, { encoding: "base64" }, function () {
         console.log("Signing Certificate");
@@ -201,6 +210,10 @@ function cleanMac64() {
     return cleanDir("pkg-mac64");
 }
 
+function cleanDist() {
+    return cleanDir("dist");
+}
+
 function copyDepsMac64() {
     return copyDeps("pkg-mac64");
 }
@@ -243,6 +256,7 @@ exports.buildWindows86 = series(
     signMsiWin86
 );
 exports.buildMacOSx64 = series(cleanMac64, runPkgMac64, copyDepsMac64, copyAssetsMac64);
+exports.clean = series(cleanDist, cleanMac64, cleanWin64, cleanWin86, cleanMacOSInstaller);
 
 exports.copyAppManifiestWin64 = copyAppManifiestWin64;
 exports.postinstall = linkDataPMLib;

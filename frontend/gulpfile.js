@@ -3,7 +3,14 @@ const spawn = require("child_process").spawn;
 const path = require("path");
 
 function spawnAndLog(prefix, command, args, opts) {
-    const child = spawn(command, args, opts);
+
+    let systemCommand = command;
+    if(command === "npm") {
+        if(process.platform === "win32")
+            systemCommand = "npm.cmd";
+    }
+
+    const child = spawn(systemCommand, args, opts);
 
     child.stdout.on("data", function (chunk) {
         console.log("[" + prefix + "] " + chunk.toString());
@@ -29,4 +36,13 @@ function linkDataPMLib() {
     return spawnAndLog("link-datapm-lib", "npm", ["link", "datapm-lib"]);
 }
 
+function clean() {
+    return new Promise((resolve) => {
+        if (fs.existsSync("dist")) fs.rmSync("dist", { recursive: true, force: true });
+
+        resolve();
+    });
+}
+
 exports.postinstall = linkDataPMLib;
+exports.clean = clean;

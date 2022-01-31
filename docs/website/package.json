@@ -1,7 +1,9 @@
 {
     "scripts": {
+        "clean": "gulp clean",
         "examples": "docusaurus-examples",
         "start": "docusaurus-start",
+        "prebuild": "npm run clean",
         "build": "docusaurus-build",
         "publish-gh-pages": "docusaurus-publish",
         "write-translations": "docusaurus-write-translations",
@@ -9,6 +11,7 @@
         "rename-version": "docusaurus-rename-version"
     },
     "devDependencies": {
-        "docusaurus": "^1.14.6"
+        "docusaurus": "^1.14.6",
+        "gulp": "^4.0.2"
     }
 }

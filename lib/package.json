@@ -6,7 +6,8 @@
     "scripts": {
         "lint": "tslint -p tsconfig.json",
         "pretty-quick": "pretty-quick --pattern \"(src|test)/**/*.ts\"",
-        "prebuild": "rm -rf dist",
+        "clean": "gulp clean",
+        "prebuild": "npm run clean",
         "build": "gulp && tsc",
         "postbuild": "npx copy-node-modules ./ dist",
         "test": "gqlint schema.gql && mocha --slow 3000 --timeout 60000 -r ts-node/register test/*.ts"
