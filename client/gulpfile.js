@@ -76,8 +76,12 @@ function copyAppManfifest(directory) {
 }
 
 function spawnAndLog(prefix, command, args, opts) {
-    const child = spawn(command, args, opts);
+    let systemCommand = command;
+    if (command === "npm") {
+        if (process.platform === "win32") systemCommand = "npm.cmd";
+    }
 
+    const child = spawn(systemCommand, args, opts);
     child.stdout.on("data", function (chunk) {
         console.log("[" + prefix + "] " + chunk.toString());
     });
