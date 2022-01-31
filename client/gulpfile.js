@@ -150,8 +150,8 @@ function cleanWin86() {
 }
 
 function cleanMacOSInstaller() {
-    cleanDir(path.join("installers","macos","macOS-x64","target"));
-    return cleanDir(path.join("installers","macos","macOS-x64","application"))
+    cleanDir(path.join("installers", "macos", "macOS-x64", "target"));
+    return cleanDir(path.join("installers", "macos", "macOS-x64", "application"));
 }
 
 function writeCertificateFile() {
@@ -227,7 +227,7 @@ function linkDataPMLib() {
     const libPackageFile = JSON.parse(fileContents);
 
     if (libPackageFile.name !== "datapm-lib") return;
-    
+
     return spawnAndLog("link-datapm-lib", "npm", ["link", "datapm-lib"]);
 }
 
@@ -252,7 +252,7 @@ exports.buildWindows86 = series(
     signMsiWin86
 );
 exports.buildMacOSx64 = series(cleanMac64, runPkgMac64, copyDepsMac64, copyAssetsMac64);
-exports.clean = series(cleanDist,cleanMac64,cleanWin64,cleanWin86)
+exports.clean = series(cleanDist, cleanMac64, cleanWin64, cleanWin86, cleanMacOSInstaller);
 
 exports.copyAppManifiestWin64 = copyAppManifiestWin64;
 exports.postinstall = linkDataPMLib;

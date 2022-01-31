@@ -6,7 +6,8 @@
     "module": "dist/index.js",
     "scripts": {
         "postinstall": "gulp postinstall",
-        "prebuild": "rm -rf dist; npm run codegen",
+        "clean": "gulp clean",
+        "prebuild": "npm run clean; npm run codegen",
         "build": "tsc",
         "postbuild": "gulp",
         "prestart": "npm run codegen && docker-compose -f ../docker/docker-compose-local-dev.yml  up -d ",

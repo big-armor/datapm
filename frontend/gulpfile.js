@@ -29,4 +29,13 @@ function linkDataPMLib() {
     return spawnAndLog("link-datapm-lib", "npm", ["link", "datapm-lib"]);
 }
 
+function clean() {
+    return new Promise((resolve) => {
+        if (fs.existsSync("dist")) fs.rmSync("dist", { recursive: true, force: true });
+
+        resolve();
+    });
+}
+
 exports.postinstall = linkDataPMLib;
+exports.clean = clean;
