@@ -322,7 +322,7 @@ jobs:
             - testFrontend
             - testClient
         if: github.ref == 'refs/heads/master'
-        name: Windows Build DataPM Client
+        name: Build Windows x64 Client
         steps:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v2
@@ -376,7 +376,7 @@ jobs:
             - testFrontend
             - testClient
         if: github.ref == 'refs/heads/master'
-        name: MacOS DataPM Client
+        name: Build MacOS x64 Client
         steps:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v2

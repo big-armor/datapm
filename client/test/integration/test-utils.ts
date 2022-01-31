@@ -351,7 +351,7 @@ async function writeSlowlyToBuffer(writable: Writable, charactersRemaining: stri
     const indexOfEnter = charactersRemaining.lastIndexOf("\n");
 
     writable.write(charactersRemaining.substring(0, indexOfEnter));
-    await delay(100);
+    await delay(20);
 
     if (indexOfEnter === -1) {
         return;

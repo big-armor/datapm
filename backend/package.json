@@ -5,6 +5,7 @@
     "typings": "dist/index.d.ts",
     "module": "dist/index.js",
     "scripts": {
+        "postinstall": "gulp postinstall",
         "prebuild": "rm -rf dist; npm run codegen",
         "build": "tsc",
         "postbuild": "gulp",
@@ -41,7 +42,6 @@
         "cron": "^1.8.2",
         "csv-parse": "^4.16.3",
         "dataloader": "^2.0.0",
-        "datapm-lib": "^0.8.21",
         "express-enforces-ssl": "^1.1.0",
         "express-http-proxy": "^1.6.0",
         "express-jwt": "^6.0.0",
