@@ -1,54 +1,66 @@
 # Data Package Manager (datapm) Registry Server
 
-This is a data schema registry service for the Data Package Manager (datapm) ecosystem. It is based on graphql and runs in an express middleware server. This server holds only the schema information - and is not a repository for data.
+[DataPM.io](https://datapm.io) is a free, open-source, and easy-to-use data management platform. Use DataPM to quickly create accurate data catalogs, publish high quality data sets, and ETL data into your production systems.
 
-Visit datapm.io for more information.
+See the [Private Registry](https://datapm.io/docs/registry) docs on how to run your own DataPM registry.
 
-# How Run This Service
-
-This service is available on docker hub, but requires setting some environment variables.
-
-1. Review `env.sh` and edit as necessary to set the appropriate values.
-2. `source ./env.sh` to apply the environment variables to your session.
-3. `docker run datapm/datapm-registry` to start the registry service
-4. See the command line output for next steps, or visit datapm.io for more documentation.
-
-# Developer Instructions
+# Developer Guide
 
 You can offer pull requests for this project. Instructions to build and run the project are below.
 
 ## Developer Prerequisites:
 
-1. node 12 or newer
-2. npm latest
-3. Docker with docker-compose or an accessible postgresql database
+1. node 14 or newer
+1. Docker with docker-compose
 
-## Run registry server in developer mode
+# Prepare the project
 
-1. `npm ci` command will install and build dependencies
-2. `source ./env.sh` will set the local environment variables for the dev setup
-3. `npm run start` command will start the docker based postgres server, and start the registry server with auto-restarts when code files are changed.
+The following should be done before you start coding and testing.
 
-## Build and run production server
+```
+npm run prepare-dev-environment
+```
 
-This registry service can be built and run locally with the native node client. This still requires the use of docker compose to start a postgres server (or you can modify the environment variables to point to an external postgres server)
+That script builds the lib folder, then links the lib/dist folder to all other sub-projects and builds them. This is required so that the correct copy of the lib is linked to your project. (We're looking for better ways to do this, submit an issue if you have ideas.)
 
-1. `npm ci` command will install and build dependencies
-2. `source ./env.sh` will set the local environment variables for the dev setup
-3. `npm run start:server` will compile the typescript, copy assets into the "dist" folder, start the docker based postgres server, and start the registry server from the "dist" folder.
+## Start Postgres and SMTP Server
 
-## Build and run docker image locally
+Before you can run the registry server locally, you must have Postgres and SMTP running. Use the following command to start local Postgres and SMTP services using docker.
 
-This registry service can be built and run locally via docker-compose. This command will build the registry service, and then use the docker-compose command to start the service.
+```
+cd ../docker
+docker-compose up postgres smtp
+cd ../backend
+```
 
-1. `npm ci` command will install and build dependencies
-2. `npm run start` will compile the typescript, copy assets into the "dist" folder, and then use docker compose to build a docker image and start the postgres server.
+## Start Backend Dev Server
+
+Use the following command to start the backend app server in developer mode.
+
+```
+# from the "backend" directory
+npm run start
+```
+
+## Start the Frontend Dev Server
+
+Use the following command to start the frontend web server in developer mode.
+
+```
+cd ../frontend
+npm run start
+```
+
+Once started, open a browser to [http://localhost:4200]
+
+The GraphQL playground is available at [http://localhost:4200/graphql]
 
 ## Database Migrations
 
+If you change any of the backend/src/entity files, you will need to create a database migration. These migrations automatically update the postgresql database schemas. To create a migration, use the following command:
+
+```
+npx typeorm migration:create -n CamelCaseMigrationName
+```
+
 TypeORM is used to interact with the database and perform migrations. See [TypeORM Migrations](https://github.com/typeorm/typeorm/blob/master/docs/migrations.md) for reference.
-
-1. Create a Migration (use a descriptive name).
-
-    1. `npx typeorm migration:create -n CamelCaseMigrationName`
-        - This will create a Typescript file with scaffolding to write your own migration

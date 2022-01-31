@@ -65,7 +65,7 @@ export async function addRegistryCommand(argv: RegistryAddArguments): Promise<vo
 }
 
 export async function removeRegistryCommand(argv: RegistryRemoveArguments): Promise<void> {
-    await promptForRegistryUrl(argv);
+    await promptForRegistryUrl(argv, true);
 
     removeRegistry(argv.url);
 }
@@ -77,27 +77,21 @@ export function listRegistries(): void {
 }
 
 export async function logoutFromRegistry(args: RegistryLogoutArguments): Promise<void> {
-    await promptForRegistryUrl(args);
+    await promptForRegistryUrl(args, true);
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (getRegistryConfig(args.url!) == null) {
+    if (!args.url) {
+        console.error(chalk.red("No registry URL specified"));
+        exit(1);
+    }
+
+    if (getRegistryConfig(args.url) == null) {
         console.error(chalk.red("The local registry config does not have an entry for that url. Nothing to do."));
         console.error(
             "Use the " + chalk.green("datapm registry list") + " command to view the locally configured registries"
         );
         exit(1);
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    else if (getRegistryConfig(args.url!)?.apiKey == null) {
-        console.error(
-            chalk.red(
-                "Your registry config has an entry for that URL, but does not have an API key included. Nothing to do."
-            )
-        );
-        console.error(
-            "Use the " + chalk.green("datapm registry list") + " command to view the locally configured registries"
-        );
+    } else if (getRegistryConfig(args.url)?.apiKey == null) {
+        removeRegistry(args.url);
         exit(1);
     }
 
@@ -162,7 +156,7 @@ export async function logoutFromRegistry(args: RegistryLogoutArguments): Promise
 }
 
 /** Assigns a valid URL to args.url */
-async function promptForRegistryUrl(args: { url?: string }): Promise<void> {
+async function promptForRegistryUrl(args: { url?: string }, failOk = false): Promise<void> {
     if (args.url == null) {
         while (true) {
             const urlResponse = await prompts(
@@ -180,7 +174,7 @@ async function promptForRegistryUrl(args: { url?: string }): Promise<void> {
             );
 
             const registryUrlValidation = await validateRegistryUrl(urlResponse.url);
-            if (registryUrlValidation === true) {
+            if (registryUrlValidation === true || failOk) {
                 args.url = urlResponse.url;
                 break;
             } else {
@@ -190,7 +184,7 @@ async function promptForRegistryUrl(args: { url?: string }): Promise<void> {
     } else {
         const registryUrlValidation = await validateRegistryUrl(args.url);
 
-        if (registryUrlValidation !== true) {
+        if (registryUrlValidation !== true && !failOk) {
             console.error(chalk.red(registryUrlValidation));
             exit(1);
         }

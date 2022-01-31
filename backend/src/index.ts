@@ -363,7 +363,17 @@ async function main() {
         switch(req.params.type) {
             case "win64": {
                 installerFileNameEndsWith = "-x64.msix";
+                break;
             }
+            case "macos64": {
+                installerFileNameEndsWith = "-x64.pkg";
+                break;
+            }
+            default:  {
+                res.sendStatus(404);
+                return;
+            }
+                
         }
 
         const clientInstallersPath = path.join(__dirname, "client-installers");

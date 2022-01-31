@@ -138,6 +138,14 @@ function bumpClientVersion() {
     return spawnAndLog("bump-client-version", "npm", ["version", readPackageVersion()], { cwd: "client" });
 }
 
+function bumpBackendVersion() {
+    return spawnAndLog("bump-backend-version", "npm", ["version", readPackageVersion()], { cwd: "backend" });
+}
+
+function bumpFrontendVersion() {
+    return spawnAndLog("bump-frontend-version", "npm", ["version", readPackageVersion()], { cwd: "frontend" });
+}
+
 function tagRegistryGCRDockerImageVersion() {
     return spawnAndLog("registry-docker-tag", "docker", [
         "tag",
@@ -306,7 +314,14 @@ exports.buildParallel = series(
     series(prepareRegistryDockerBuildAssets, buildRegistryDockerImage)
 );
 
-exports.bumpVersion = series(showGitDiff, bumpRootVersion, bumpLibVersion, bumpClientVersion);
+exports.bumpVersion = series(
+    showGitDiff,
+    bumpRootVersion,
+    bumpLibVersion,
+    bumpClientVersion,
+    bumpBackendVersion,
+    bumpFrontendVersion
+);
 exports.bumpPackageLibVersions = parallel(bumpBackendLibVersion, bumpClientLibVersion, bumpFrontendLibVersion);
 
 exports.linkLib = parallel(linkLibBackend, linkLibClient, linkLibFrontend);

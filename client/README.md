@@ -1,67 +1,39 @@
 # Data Package Manager (datapm) Command Line Client
 
-datapm.io is the easiest way to discover, deploy, query, and manage data. Use this client with the public datapm.io registry, or host your own private registry and repo.
+[DataPM.io](https://datapm.io) is a free, open-source, and easy-to-use data management platform. Use DataPM to quickly create accurate data catalogs, publish high quality data sets, and ETL data into your production systems.
 
-## How To Build This Code
+Read the [Command Line Client](https://datapm.io/docs/command-line-client/) docs for more information about how to use this client.
 
-Use Node version 12 to build and test this client.
+# Developer Guide
+
+Use Node version 14 to build and test this client.
 
 ```
+# From the "client" directory
 npm ci
 npm run build
 ```
 
 ### How to test this client without building
 
+Use the following command to build and run the client in developer mode.
+
 ```
-npm ci
-npm run start [append command options]
+npm run start
 ```
 
-For example you can run
+For example you can run the search command like this:
 
 ```
 npm run start search weather
 ```
 
-## Search packages
+If you need to use command line arguments, add -- as an escape for the tailing arguments. Like this:
 
-Use the following command to search for data packages. This example searches for weather data. This will return a list of packages and their descriptions. Use the -V switch to learn more about each package.
+```
+npm run start -- fetch noaa/weather --forceUpdate
+```
 
-    datapm search weather
+## Debugging
 
-## Full package information
-
-Use the "info" command to view the details of package - including the data types, all their attributes, and statistics about the types of data in each attribute. Use the -V switch for all information.
-
-    datapm info noaa/weather
-
-## Fetch a data package
-
-Use the "fetch" command to deploy a data set to a file, database, cloud server, etc. Answer the simple prompts choose your desired storage and format.
-
-    datapm fetch noaa/weather
-
-## Publish a package
-
-Use the "generate-package" command to create a package file from an existing data source.
-
-    datapm generate-package https://myserver.com/path/to/my.csv
-
-You will have the opportunity to publish the package during the prompts. Or you may later use the following command.
-
-    datapm publish my-package.datapm.json
-
-## Update a package
-
-You can update the schema and statistics in the package file using the following command.
-
-    datapm update my-package-file.datapm.json
-
-    datapm publish my-package-file.datapm.json
-
-And then you can re-publish the updates using the same publish command above.
-
-# Developer Information
-
-To debug, use the `node --inspect -r ts-node/register src/main.ts ....` command to attach a remote debugger. This project includes the .vscode/launch.json configuration that will start the remote debugger.
+To debug, simply open this project in VSCode. Install the recommend extensions (should see a popup on first open). Then open a Javascript Debug Terminal and run any command as shown above. The debugger should automatically start and attach.

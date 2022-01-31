@@ -1,26 +1,21 @@
 # DataPM
 
-This project contains the DataPM Registry Server, including the frontend angular project, backend apollo-graphql project, and documentation. There is a README.md in the folder for each.
+[DataPM.io](https://datapm.io) is a free, open-source, and easy-to-use data management platform. Use DataPM to quickly create accurate data catalogs, publish high quality data sets, and ETL data into your production systems.
 
-## How to run in Docker (without first building locally)
+See the [backend/README.md](backend/README.md) file for server side development instructions.
 
-Use the `docker/docker-compose.yml` file to run a copy of the registry from the docker hub.
+See the [client/README.md](client/README.md) file for client developer instructions.
 
-```
-cd docker
-docker-compose up
-```
+# Full Project Build Instructions
 
-## How to build and run locally
-
-Use npm in this top level directory to build all submodules and produce a docker image.
+Use npm in the top level directory to build all submodules and produce a docker image.
 
 ```
 npm ci
 npm run build
 ```
 
-This produces a docker image labeled datapm-registry. You can then use the following command to run the locally built image and all of it's supporting services.
+This produces a docker image labeled datapm-registry. You can then use the following command to run the locally built docker image and all of it's supporting services.
 
 ```
 npm run start
@@ -32,24 +27,9 @@ This "local-build" of docker provides a [maildev] SMTP server - which does not f
 http://localhost:1080
 ```
 
-# How to prepare for development
+## Report Security Vulnerabilities
 
-The following can should be done before you start coding and testing.
-
-```
-npm run prepare-dev-environment
-```
-
-That script builds the lib folder, then links the lib/dist folder to all other sub-projects and builds them.
-
-## How to run Postgres and SMTP only
-
-You can run only Postgres and SMTP with the following command from the root of this project. This is useful for developers running the backend as an active service (though they should focus on an integration test work flow in the backend primarily).
-
-```
-cd docker
-docker-compose up postgres smtp
-```
+View the [Security.MD](SECURITY.md) file for instructions on how to report vulnerabilities.
 
 ## License
 

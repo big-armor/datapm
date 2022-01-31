@@ -9,6 +9,9 @@ terraform.tfvars*
 
 client-installers/
 
+# Build files from pkg 
+datapm-client*
+
 .DS_Store
 
 backend/test/integration/registry-client.ts
@@ -17,3 +20,5 @@ gc.json
 
 backend/tmp-registry-server-storage
 backend/tmp-registry-server-storage-*
+
+*.p12

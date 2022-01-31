@@ -51,31 +51,26 @@ export class ClientWizardComponent implements OnInit {
                 this.username = "username";
             }
 
-            this.loading = false;
-            this.hasApiKeys = apiKeys != null && apiKeys.length > 0;
-            if (this.hasApiKeys) {
-                setTimeout(() => this.move(3), 200);
-            }
         });
     }
 
     public moveToDownloadStep() {
         if (this.currentUser) {
-            this.move(3);
-        } else {
             this.move(2);
+        } else {
+            this.move(1);
         }
     }
 
     public isDownloadStepActive() {
         if (this.currentUser) {
-            if (this.currentIndex == 3) {
+            if (this.currentIndex == 2) {
                 return true;
             } else {
                 return false;
             }
         } else {
-            if (this.currentIndex == 2) {
+            if (this.currentIndex == 1) {
                 return true;
             } else {
                 return false;

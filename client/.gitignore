@@ -21,3 +21,4 @@ temp
 /signing-certificiate.*
 temp
 /*.msix
+*.p12

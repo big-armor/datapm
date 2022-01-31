@@ -209,6 +209,19 @@ function copyAssetsMac64() {
     return copyAssets("pkg-mac64");
 }
 
+function linkDataPMLib() {
+    const libPackageJsonFilePath = path.join(__dirname, "..", "lib", "package.json");
+
+    if (!fs.existsSync(libPackageJsonFilePath)) return;
+
+    const fileContents = fs.readFileSync(libPackageJsonFilePath);
+    const libPackageFile = JSON.parse(fileContents);
+
+    if (libPackageFile.name !== "datapm-lib") return;
+
+    return spawnAndLog("link-datapm-lib", "npm", ["link", "datapm-lib"]);
+}
+
 exports.buildWindows64 = series(
     cleanWin64,
     writeCertificateFile,
@@ -229,6 +242,7 @@ exports.buildWindows86 = series(
     createMsiWin86,
     signMsiWin86
 );
-exports.buildMac64 = series(cleanMac64, runPkgMac64, copyDepsMac64, copyAssetsMac64);
+exports.buildMacOSx64 = series(cleanMac64, runPkgMac64, copyDepsMac64, copyAssetsMac64);
 
 exports.copyAppManifiestWin64 = copyAppManifiestWin64;
+exports.postinstall = linkDataPMLib;

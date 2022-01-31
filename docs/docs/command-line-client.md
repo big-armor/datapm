@@ -19,31 +19,12 @@ The DataPM client is easily installed, and almost every task is a self explanato
 
 ## Install the DataPM Command Line Client
 
-If you do not already have NodeJS and NPM, install them using the following link
+Download a DataPM Client Installer from the list below.
 
-https://nodejs.org/en/
+-   [Windows Intel 64-bit DataPM Client Installer](/client-installers/win64)
+-   [MacOS Intel 64-bit DataPM Client Installer](/client-installers/macos64)
 
-Verify that you have installed Node 12 or greater, and the latest npm client.
-
-```text
-node -v
-
-npm -v
-```
-
-Install C++ tools. In macOS use the `xcode-select --install` command. In linux install the gcc and make packages. In windows [follow these instructions](https://github.com/nodejs/node-gyp).
-
-Install the datapm-client package globally. This allows you to run the datapm command from any working directory.
-
-```text
-npm install -g datapm-client
-```
-
-Verify that the datapm-client package is installed
-
-```text
-datapm --version
-```
+Run the installer by double clicking on it. Follow the instructions.
 
 ## View Help Options
 

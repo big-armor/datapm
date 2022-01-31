@@ -14,12 +14,12 @@ Visit [datapm.io](https://datapm.io) to search and discover packages of data. Th
 
 ## Install the DataPM Command Line Client
 
-If you do not already have NodeJS and NPM, <a href="https://nodejs.org/en/" target="_blank">install NodeJS and NPM</a>.
-Then use the following command to install the datapm-client.
+Download a DataPM Client Installer from the list below.
 
-```text
-npm install -g datapm-client
-```
+-   [Windows Intel 64-bit DataPM Client Installer](/client-installers/win64)
+-   [MacOS Intel 64-bit DataPM Client Installer](/client-installers/macos64)
+
+Run the installer by double clicking on it. Follow the instructions.
 
 [View full install instructions](command-line-client.md)
 

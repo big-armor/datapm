@@ -2,6 +2,7 @@ const { series, src, dest } = require("gulp");
 const exec = require("child_process").exec;
 const path = require("path");
 var through = require("through2");
+const fs = require("fs");
 
 const DESTINATION_DIR = path.join(__dirname, "dist");
 const SCHEMA_DIR = path.join(__dirname, "node_modules", "datapm-lib");
@@ -47,5 +48,25 @@ function execLogCb(err, stdout, stderr) {
     return err; // makes gulp continue even if the command failed
 }
 
+function linkDataPMLib() {
+
+    const libPackageJsonFilePath = path.join(__dirname,"..","lib","package.json");
+
+    if(!fs.existsSync(libPackageJsonFilePath))
+        return;
+
+    const fileContents = fs.readFileSync(libPackageJsonFilePath);
+    const libPackageFile = JSON.parse(fileContents);
+
+    if(libPackageFile.name !== "datapm-lib")
+        return;
+
+    console.log("Linking datapm-lib");
+    
+    return exec("npm link datapm-lib");
+    
+}
+
 exports.default = series(copyFiles, copyEmailTemplates, copyModules, copyDataPMLib, slimTypeOrmDist);
 exports.copyDependencies = series(copyModules, copyDataPMLib);
+exports.postinstall = series(linkDataPMLib)
