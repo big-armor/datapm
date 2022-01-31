@@ -5,7 +5,7 @@
     "scripts": {
         "postinstall": "gulp postinstall",
         "clean": "gulp clean",
-        "prebuild": "npm run clean ; npm run codegen",
+        "prebuild": "npm run \"clean\"; npm run codegen",
         "build": "tsc",
         "start": "CREDENTIALS_SECRET_KEY=test node --trace-warnings --inspect -r ts-node/register src/main.ts",
         "start:test-data-server": "node -r ts-node/register test/test-data-server.ts",
