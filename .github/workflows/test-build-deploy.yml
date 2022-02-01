@@ -490,6 +490,9 @@ jobs:
                   package: ./lib/dist/package.json
                   token: ${{ secrets.NPM_TOKEN }}
 
+            - name: setup git config
+              run: git config user.name "$${{env.GITHUB_ACTOR}}" && git config user.email "gitHubActionDeployer@no-reply"
+
             - name: Tag
               run: npm run git-tag
 
@@ -664,11 +667,11 @@ jobs:
             - name: Set Git Author
               run: git config user.name "$${{env.GITHUB_ACTOR}}" && git config user.email "gitHubActionDeployer@no-reply"
 
-            - name: Bump Version
-              run: npm run bump-version
-
             - name: Bump Package Files Lib Versions
               run: npm run bump-package-lib-versions
+
+            - name: Bump Version
+              run: npm run bump-version
 
             - name: Git Commit
               run: npm run git-commit-push

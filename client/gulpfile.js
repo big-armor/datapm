@@ -267,6 +267,5 @@ exports.buildWindows86 = series(
 exports.buildMacOSx64 = series(cleanMac64, runPkgMac64, copyDepsMac64, copyAssetsMac64);
 exports.clean = series(cleanDist, cleanMac64, cleanWin64, cleanWin86, cleanMacOSInstaller);
 
-exports.copyAppManifiestWin64 = copyAppManifiestWin64;
 exports.postinstall = linkDataPMLib;
 exports.postCodegen = postCodegen;
