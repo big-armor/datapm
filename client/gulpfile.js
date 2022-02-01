@@ -132,7 +132,7 @@ function signMsiWin64() {
         "signing-certificate.pfx",
         "/p",
         process.env.CERTIFICATE_PASSWORD,
-        "datapm-client-" + readPackageVersion() + "-x64.msix"
+        "installers/windows/dist/datapm-client-" + readPackageVersion() + "-x64.msix"
     ]);
 }
 
@@ -193,7 +193,7 @@ function signMsiWin86() {
         "signing-certificate.pfx",
         "/p",
         process.env.CERTIFICATE_PASSWORD,
-        "datapm-client-" + readPackageVersion() + "-x86.msix"
+        "installers/windows/dist/datapm-client-" + readPackageVersion() + "-x86.msix"
     ]);
 }
 /** Mac 64 Bit Intel */
