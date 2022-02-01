@@ -53,7 +53,7 @@ function copyAssets(directory) {
 
 function copyAppManfifest(directory) {
     // Read config.xml file synchronously
-    const xmlBuffer = fs.readFileSync("./appxmanifest.xml");
+    const xmlBuffer = fs.readFileSync("./installers/windows/appxmanifest.xml");
     let xmlString = xmlBuffer.toString();
 
     // Use cheerio to parse the xml and extract the version number
@@ -118,7 +118,7 @@ function createMsiWin64() {
         "/d",
         "pkg-win64",
         "/p",
-        "windows-installers/datapm-client-" + readPackageVersion() + "-x64.msix"
+        "installers/windows/dist/datapm-client-" + readPackageVersion() + "-x64.msix"
     ]);
 }
 
@@ -179,7 +179,7 @@ function createMsiWin86() {
         "/d",
         "pkg-win86",
         "/p",
-        "datapm-client-" + readPackageVersion() + "-x86.msix"
+        "installers/windows/dist/datapm-client-" + readPackageVersion() + "-x86.msix"
     ]);
 }
 
