@@ -244,11 +244,7 @@ function gitStageChanges() {
 }
 
 function gitCommit() {
-    return spawnAndLog("git-commit", "git", [
-        "commit",
-        "-m",
-        "Commit after version bump during build " + readPackageVersion()
-    ]);
+    return spawnAndLog("git-commit", "git", ["commit", "-m", "Commit after version bump to" + readPackageVersion()]);
 }
 
 function gitPush() {
