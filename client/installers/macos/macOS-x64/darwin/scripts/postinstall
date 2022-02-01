@@ -4,7 +4,7 @@
 APPLICATION_FILE_PATH=datapm
 
 #Parameters
-PRODUCT_HOME=/Library/__PRODUCT__/__VERSION__
+PRODUCT_HOME=/Library/__PRODUCT__/__VERSION__/$(/usr/bin/uname -m)
 
 echo "Post installation process started"
 
@@ -16,5 +16,5 @@ chmod -R 755 .
 
 #Add application shortcut to /usr/local/bin
 rm -f /usr/local/bin/__PRODUCT__-__VERSION__
-ln -s ${PRODUCT_HOME}/${APPLICATION_FILE_PATH} /usr/local/bin/__PRODUCT__-__VERSION__
+ln -s ${PRODUCT_HOME}/${APPLICATION_FILE_PATH} /usr/local/bin/datapm
 echo "Post installation process finished"

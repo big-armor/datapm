@@ -197,24 +197,41 @@ function signMsiArm64() {
     ]);
 }
 /** Mac 64 Bit Intel */
-function runPkgMac64() {
+function runPkgMacIntel64() {
     return runPkg("macos", "x64", "pkg-mac64");
 }
 
-function cleanMac64() {
+function cleanMacIntel64() {
     return cleanDir("pkg-mac64");
+}
+
+function copyDepsMacIntel64() {
+    return copyDeps("pkg-mac64");
+}
+
+function copyAssetsMacIntel64() {
+    return copyAssets("pkg-mac64");
+}
+
+/** Arm 64 Bit */
+function runPkgMacArm64() {
+    return runPkg("macos", "arm64", "pkg-mac64");
+}
+
+function cleanMacArm64() {
+    return cleanDir("pkg-arm64");
+}
+
+function copyDepsMacArm64() {
+    return copyDeps("pkg-arm64");
+}
+
+function copyAssetsMacArm64() {
+    return copyAssets("pkg-arm64");
 }
 
 function cleanDist() {
     return cleanDir("dist");
-}
-
-function copyDepsMac64() {
-    return copyDeps("pkg-mac64");
-}
-
-function copyAssetsMac64() {
-    return copyAssets("pkg-mac64");
 }
 
 function linkDataPMLib() {
@@ -272,20 +289,30 @@ exports.buildWindows = series(
     copyAppManifiestWin64,
     createMsiWin64,
     signMsiWin64,
-    cleanArm64,
+    /* 
+    cleanArm64
     writeCertificateFile,
     runPkgArm64,
     copyDepsArm64,
     copyAssetsArm64,
     copyAppManifiestArm64,
     createMsiArm64,
-    signMsiArm64,
+    signMsiArm64, */
     bundleWinInstallers,
     signWinBundle
 );
 
-exports.buildMacOS = series(cleanMac64, runPkgMac64, copyDepsMac64, copyAssetsMac64);
-exports.clean = series(cleanDist, cleanMac64, cleanWin64, cleanArm64, cleanMacOSInstaller);
+exports.buildMacOS = series(
+    /* cleanMacArm64,
+    runPkgMacArm64,
+    copyDepsMacArm64,
+    copyAssetsMacArm64, */
+    cleanMacIntel64,
+    runPkgMacIntel64,
+    copyDepsMacIntel64,
+    copyAssetsMacIntel64
+);
+exports.clean = series(cleanDist, cleanMacIntel64, cleanWin64, cleanArm64, cleanMacOSInstaller);
 
 exports.postinstall = linkDataPMLib;
 exports.postCodegen = postCodegen;
