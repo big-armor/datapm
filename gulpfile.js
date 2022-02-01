@@ -110,23 +110,35 @@ function buildClient() {
 }
 
 function bumpRootVersion() {
-    return spawnAndLog("bump-root-version", "npm", ["version", "patch"]);
+    return spawnAndLog("bump-root-version", "npm", ["version", "patch", "--no-git-tag-version"]);
 }
 
 function bumpLibVersion() {
-    return spawnAndLog("bump-lib-version", "npm", ["version", readPackageVersion()], { cwd: "lib" });
+    return spawnAndLog("bump-lib-version", "npm", ["version", readPackageVersion(), "--no-git-tag-version"], {
+        cwd: "lib"
+    });
 }
 
 function bumpBackendLibVersion() {
-    return spawnAndLog("bump-backend-lib-version", "npm", ["install", "datapm-lib@" + readPackageVersion()], {
-        cwd: "backend"
-    });
+    return spawnAndLog(
+        "bump-backend-lib-version",
+        "npm",
+        ["install", "datapm-lib@" + readPackageVersion(), "--no-git-tag-version"],
+        {
+            cwd: "backend"
+        }
+    );
 }
 
 function bumpClientLibVersion() {
-    return spawnAndLog("bump-backend-lib-version", "npm", ["install", "datapm-lib@" + readPackageVersion()], {
-        cwd: "client"
-    });
+    return spawnAndLog(
+        "bump-backend-lib-version",
+        "npm",
+        ["install", "datapm-lib@" + readPackageVersion(), "--no-git-tag-version"],
+        {
+            cwd: "client"
+        }
+    );
 }
 function bumpFrontendLibVersion() {
     return spawnAndLog("bump-backend-lib-version", "npm", ["install", "datapm-lib@" + readPackageVersion()], {
