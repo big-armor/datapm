@@ -39,6 +39,7 @@ jobs:
     testLib:
         name: "Test Lib"
         needs: lint
+        if: false
         timeout-minutes: 10
         runs-on: ubuntu-latest
         steps:
@@ -79,6 +80,7 @@ jobs:
               working-directory: lib
 
     testBackend:
+        if: false
         name: "Test Backend"
         needs: lint
         timeout-minutes: 10
@@ -143,6 +145,7 @@ jobs:
               working-directory: backend
 
     testFrontend:
+        if: false
         name: "Test Frontend"
         needs: lint
         timeout-minutes: 10
@@ -230,6 +233,7 @@ jobs:
               working-directory: frontend
 
     testClient:
+        if: false
         name: "Test Client"
         needs: lint
         timeout-minutes: 20
