@@ -364,11 +364,17 @@ jobs:
                   CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_BASE64 }}
                   CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_PASSWORD }}
 
+            - run: npm run package:win:x86
+              working-directory: client
+              env:
+                  CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_BASE64 }}
+                  CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_PASSWORD }}
+
             - name: "Save Windows Executable"
               uses: actions/upload-artifact@v2
               with:
                   name: datapm-client-windows-x64
-                  path: client/datapm-*-x64.msix
+                  path: client/datapm-*.msixbundle
                   retention-days: 5
 
     build-macos-x64-client:
@@ -642,7 +648,7 @@ jobs:
               run: git config user.name "$${{env.GITHUB_ACTOR}}" && git config user.email "gitHubActionDeployer@no-reply"
 
             - name: Tag
-              run: git tag -a $DATAPM_VERSION -m "Release $DATAPM_VERSION"
+              run: git tag -a $DATAPM_VERSION -m "Release $DATAPM_VERSION" && git push origin $DATAPM_VERSION
               env:
                   DATAPM_VERSION: ${{ steps.datapm-version.outputs.DATAPM_VERSION}}
 

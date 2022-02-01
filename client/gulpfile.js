@@ -61,11 +61,6 @@ function copyAppManfifest(directory) {
     const manifestObject = JSON.parse(manifestJson);
     const versionNumber = manifestObject.Package.Identity._attributes.Version;
 
-    const versionParts = versionNumber.split(".");
-    const lastNumber = Number.parseInt(versionParts[3]) + 1;
-
-    versionParts[3] = lastNumber.toString();
-
     xmlString = xmlString.replace(versionNumber, readPackageVersion() + "." + process.env.GITHUB_RUN_NUMBER);
 
     if (!fs.existsSync(directory)) fs.mkdirSync(directory);
@@ -244,6 +239,30 @@ function postCodegen() {
     return Promise.resolve();
 }
 
+function bundleWinInstallers() {
+    return spawnAndLog("bundle-win-installers", "makeappx.exe", [
+        "bundle",
+        "/d",
+        "win-installers",
+        "/p",
+        "datapm-client-" + readPackageVersion() + ".msixbundle"
+    ]);
+}
+
+function signWinBundle() {
+    return spawnAndLog("sign-win-bundle", "SignTool", [
+        "sign",
+        "/fd",
+        "SHA256",
+        "/a",
+        "/f",
+        "signing-certificate.pfx",
+        "/p",
+        process.env.CERTIFICATE_PASSWORD,
+        "datapm-client-" + readPackageVersion() + ".msixbundle"
+    ]);
+}
+
 exports.buildWindows64 = series(
     cleanWin64,
     writeCertificateFile,
@@ -264,6 +283,9 @@ exports.buildWindows86 = series(
     createMsiWin86,
     signMsiWin86
 );
+
+exports.buildWindowsBundle = series(bundleWinInstallers, signWinBundle);
+
 exports.buildMacOSx64 = series(cleanMac64, runPkgMac64, copyDepsMac64, copyAssetsMac64);
 exports.clean = series(cleanDist, cleanMac64, cleanWin64, cleanWin86, cleanMacOSInstaller);
 
