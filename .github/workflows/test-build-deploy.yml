@@ -491,7 +491,7 @@ jobs:
                   token: ${{ secrets.NPM_TOKEN }}
 
             - name: Tag
-              run: npm run tag
+              run: npm run git-tag
 
             - name: Install Backend Dependencies
               id: install-backend-Dependencies
@@ -669,3 +669,6 @@ jobs:
 
             - name: Bump Package Files Lib Versions
               run: npm run bump-package-lib-versions
+
+            - name: Git Commit
+              run: npm run git-commit-push

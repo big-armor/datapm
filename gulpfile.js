@@ -223,8 +223,8 @@ function pushClientDockerImageLatest() {
 }
 */
 
-function gitPushTag() {
-    return spawnAndLog("git-tag-push", "git", ["push", "origin", "v" + readPackageVersion()]);
+function gitTag() {
+    return spawnAndLog("git-tag", "git", ["tag", "-a", readPackageVersion(), "-m", "Release " + readPackageVersion()]);
 }
 
 function gitStageChanges() {
@@ -232,16 +232,16 @@ function gitStageChanges() {
 }
 
 function gitCommit() {
-    return spawnAndLog("git-commit", "git", ["commit", "-m 'Commit after version bump during build [ci skip]'"]);
+    return spawnAndLog("git-commit", "git", [
+        "commit",
+        "-m",
+        "Commit after version bump during build " + readPackageVersion()
+    ]);
 }
 
 function gitPush() {
     return spawnAndLog("git-push", "git", ["push"]);
 }
-
-/* function libPublish() {
-    return spawnAndLog("lib-publish", "npm", ["publish"], { cwd: "lib" });
-} */
 
 function spawnAndLog(prefix, command, args, opts) {
     const child = spawn(command, args, opts);
@@ -338,7 +338,8 @@ exports.bumpPackageLibVersions = parallel(bumpBackendLibVersion, bumpClientLibVe
 
 exports.linkLib = parallel(linkLibBackend, linkLibClient, linkLibFrontend);
 
-exports.gitPushTag = series(gitStageChanges, gitCommit, gitPush, gitPushTag);
+exports.gitTag = series(gitTag, gitPush);
+exports.gitCommitPush = series(gitStageChanges, gitCommit, gitPush);
 exports.deployAssets = series(
     // libPublish, // current done in the github action
     tagRegistryGCRDockerImageLatest,
