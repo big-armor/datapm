@@ -373,7 +373,7 @@ jobs:
 
     build-macos-x64-client:
         runs-on: macos-latest
-        timeout-minutes: 15
+        timeout-minutes: 25
         needs:
             - testLib
             - testBackend
