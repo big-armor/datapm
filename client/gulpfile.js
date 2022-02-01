@@ -184,7 +184,7 @@ function createMsiArm64() {
 }
 
 function signMsiArm64() {
-    return spawnAndLog("sign-arm64", "SignTool", [
+    return spawnAndLog("sign-arm64", "C:\\Program Files (x86)\\Windows Kits\\10\\App Certification Kit\\signtool.exe", [
         "sign",
         "/fd",
         "SHA256",
@@ -271,17 +271,21 @@ function bundleWinInstallers() {
 }
 
 function signWinBundle() {
-    return spawnAndLog("sign-win-bundle", "SignTool", [
-        "sign",
-        "/fd",
-        "SHA256",
-        "/a",
-        "/f",
-        "signing-certificate.pfx",
-        "/p",
-        process.env.CERTIFICATE_PASSWORD,
-        "installers/windows/dist/datapm-client-" + readPackageVersion() + ".msixbundle"
-    ]);
+    return spawnAndLog(
+        "sign-win-bundle",
+        "C:\\Program Files (x86)\\Windows Kits\\10\\App Certification Kit\\signtool.exe",
+        [
+            "sign",
+            "/fd",
+            "SHA256",
+            "/a",
+            "/f",
+            "signing-certificate.pfx",
+            "/p",
+            process.env.CERTIFICATE_PASSWORD,
+            "installers/windows/dist/datapm-client-" + readPackageVersion() + ".msixbundle"
+        ]
+    );
 }
 
 exports.buildWindows = series(
