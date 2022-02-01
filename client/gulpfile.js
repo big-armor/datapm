@@ -123,7 +123,7 @@ function createMsiWin64() {
         "/d",
         "pkg-win64",
         "/p",
-        "datapm-client-" + readPackageVersion() + "-x64.msix"
+        "windows-installers/datapm-client-" + readPackageVersion() + "-x64.msix"
     ]);
 }
 
