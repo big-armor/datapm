@@ -22,3 +22,5 @@ temp
 temp
 /*.msix
 *.p12
+*.pfx
+windows-installers
