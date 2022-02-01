@@ -371,7 +371,7 @@ jobs:
                   path: client/installers/windows/dist/datapm-*.msixbundle
                   retention-days: 5
 
-    build-macos-x64-client:
+    build-macos-client:
         runs-on: macos-latest
         timeout-minutes: 25
         needs:
@@ -380,7 +380,7 @@ jobs:
             - testFrontend
             - testClient
         if: github.ref == 'refs/heads/master'
-        name: Build MacOS x64 Client
+        name: Build MacOS Client Installer
         steps:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v2
@@ -450,8 +450,8 @@ jobs:
         runs-on: ubuntu-latest
         if: github.ref == 'refs/heads/master'
         needs:
-            - build-macos-x64-client
-            - build-win-x64-client
+            - build-macos-client
+            - build-win-client
         env:
             INPUT_TOKEN: "" # See https://github.com/JS-DevTools/npm-publish/issues/15
         steps:
