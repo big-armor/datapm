@@ -1,6 +1,6 @@
 {
     "name": "datapm-client",
-    "version": "0.8.25",
+    "version": "0.8.27",
     "description": "The client for manipulating data",
     "scripts": {
         "postinstall": "gulp postinstall",
