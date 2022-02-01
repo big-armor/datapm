@@ -136,16 +136,16 @@ function signMsiWin64() {
     ]);
 }
 
-/** Windows x86 */
+/** Windows arm64 */
 
-function runPkgWin86() {
-    return runPkg("win", "x86", "pkg-win86");
+function runPkgArm64() {
+    return runPkg("win", "arm64", "pkg-arm64");
 }
 
-function cleanWin86() {
-    if (fs.existsSync("datapm-client-" + readPackageVersion() + "-x86.msix"))
-        del("datapm-client-" + readPackageVersion() + "-x86.msix");
-    return cleanDir("pkg-win86");
+function cleanArm64() {
+    if (fs.existsSync("datapm-client-" + readPackageVersion() + "-arm64.msix"))
+        del("datapm-client-" + readPackageVersion() + "-arm64.msix");
+    return cleanDir("pkg-arm64");
 }
 
 function cleanMacOSInstaller() {
@@ -161,30 +161,30 @@ function writeCertificateFile() {
     return Promise.resolve();
 }
 
-function copyDepsWin86() {
-    return copyDeps("pkg-win86");
+function copyDepsArm64() {
+    return copyDeps("pkg-arm64");
 }
 
-function copyAssetsWin86() {
-    return copyAssets("pkg-win86");
+function copyAssetsArm64() {
+    return copyAssets("pkg-arm64");
 }
 
-function copyAppManifiestWin86() {
-    return copyAppManfifest("pkg-win86");
+function copyAppManifiestArm64() {
+    return copyAppManfifest("pkg-arm64");
 }
 
-function createMsiWin86() {
-    return spawnAndLog("msi-win86", "makeappx.exe", [
+function createMsiArm64() {
+    return spawnAndLog("msi-arm64", "makeappx.exe", [
         "pack",
         "/d",
-        "pkg-win86",
+        "pkg-arm64",
         "/p",
-        "installers/windows/dist/datapm-client-" + readPackageVersion() + "-x86.msix"
+        "installers/windows/dist/datapm-client-" + readPackageVersion() + "-arm64.msix"
     ]);
 }
 
-function signMsiWin86() {
-    return spawnAndLog("sign-win86", "SignTool", [
+function signMsiArm64() {
+    return spawnAndLog("sign-arm64", "SignTool", [
         "sign",
         "/fd",
         "SHA256",
@@ -193,7 +193,7 @@ function signMsiWin86() {
         "signing-certificate.pfx",
         "/p",
         process.env.CERTIFICATE_PASSWORD,
-        "installers/windows/dist/datapm-client-" + readPackageVersion() + "-x86.msix"
+        "installers/windows/dist/datapm-client-" + readPackageVersion() + "-arm64.msix"
     ]);
 }
 /** Mac 64 Bit Intel */
@@ -272,20 +272,20 @@ exports.buildWindows = series(
     copyAppManifiestWin64,
     createMsiWin64,
     signMsiWin64,
-    cleanWin86,
+    cleanArm64,
     writeCertificateFile,
-    runPkgWin86,
-    copyDepsWin86,
-    copyAssetsWin86,
-    copyAppManifiestWin86,
-    createMsiWin86,
-    signMsiWin86,
+    runPkgArm64,
+    copyDepsArm64,
+    copyAssetsArm64,
+    copyAppManifiestArm64,
+    createMsiArm64,
+    signMsiArm64,
     bundleWinInstallers,
     signWinBundle
 );
 
 exports.buildMacOS = series(cleanMac64, runPkgMac64, copyDepsMac64, copyAssetsMac64);
-exports.clean = series(cleanDist, cleanMac64, cleanWin64, cleanWin86, cleanMacOSInstaller);
+exports.clean = series(cleanDist, cleanMac64, cleanWin64, cleanArm64, cleanMacOSInstaller);
 
 exports.postinstall = linkDataPMLib;
 exports.postCodegen = postCodegen;
