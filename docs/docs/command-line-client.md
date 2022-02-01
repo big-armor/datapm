@@ -21,8 +21,8 @@ The DataPM client is easily installed, and almost every task is a self explanato
 
 Download a DataPM Client Installer from the list below.
 
--   [Windows Intel 64-bit DataPM Client Installer](/client-installers/win64)
--   [MacOS Intel 64-bit DataPM Client Installer](/client-installers/macos64)
+-   [Windows DataPM Client Installer](/client-installers/windows)
+-   [MacOS DataPM Client Installer](/client-installers/macos)
 
 Run the installer by double clicking on it. Follow the instructions.
 

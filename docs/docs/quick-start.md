@@ -16,8 +16,8 @@ Visit [datapm.io](https://datapm.io) to search and discover packages of data. Th
 
 Download a DataPM Client Installer from the list below.
 
--   [Windows Intel 64-bit DataPM Client Installer](/client-installers/win64)
--   [MacOS Intel 64-bit DataPM Client Installer](/client-installers/macos64)
+-   [Windows DataPM Client Installer](/client-installers/windows)
+-   [MacOS DataPM Client Installer](/client-installers/macos)
 
 Run the installer by double clicking on it. Follow the instructions.
 
