@@ -257,13 +257,17 @@ function postCodegen() {
 }
 
 function bundleWinInstallers() {
-    return spawnAndLog("bundle-win-installers", "makeappx.exe", [
-        "bundle",
-        "/d",
-        "installers/windows/dist",
-        "/p",
-        "installers/windows/dist/datapm-client-" + readPackageVersion() + ".msixbundle"
-    ]);
+    return spawnAndLog(
+        "bundle-win-installers",
+        "C:\\Program Files (x86)\\Windows Kits\\10\\App Certification Kit\\makeappx.exe",
+        [
+            "bundle",
+            "/d",
+            "installers/windows/dist",
+            "/p",
+            "installers/windows/dist/datapm-client-" + readPackageVersion() + ".msixbundle"
+        ]
+    );
 }
 
 function signWinBundle() {

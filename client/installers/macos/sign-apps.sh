@@ -41,6 +41,11 @@ echo "###   Importing installer signing certificate"
 security import installer-certificate.p12 -k build.keychain -P $MACOS_INSTALLER_CERTIFICATE_PWD -T /usr/bin/productsign
 
 echo ""
+echo "###   Clean up certificate files"
+rm -f certificate.p12
+rm -f installer-certificate.p12
+
+echo ""
 echo "###   Partitioning temporary keychain"
 security set-key-partition-list -S apple-tool:,apple:,teamid:$APPLE_TEAM_ID -s -k $MACOS_KEYCHAIN_TEMPORARY_PASSWORD build.keychain
 
