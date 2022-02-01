@@ -361,12 +361,12 @@ async function main() {
         let installerFileNameEndsWith = "not-found.something";
 
         switch(req.params.type) {
-            case "win64": {
-                installerFileNameEndsWith = "-x64.msix";
+            case "windows": {
+                installerFileNameEndsWith = ".msixbundle";
                 break;
             }
-            case "macos64": {
-                installerFileNameEndsWith = "-x64.pkg";
+            case "macos": {
+                installerFileNameEndsWith = ".pkg";
                 break;
             }
             default:  {

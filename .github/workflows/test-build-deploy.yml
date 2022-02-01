@@ -317,7 +317,7 @@ jobs:
               env:
                   CREDENTIALS_SECRET_KEY: test-key-not-for-production
 
-    build-win-x64-client:
+    build-win-client:
         runs-on: windows-latest
         timeout-minutes: 15
         needs:
@@ -326,7 +326,7 @@ jobs:
             - testFrontend
             - testClient
         if: github.ref == 'refs/heads/master'
-        name: Build Windows x64 Client
+        name: Build Windows Client Installer
         steps:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v2
@@ -358,13 +358,7 @@ jobs:
               run: npm run build
               working-directory: client
 
-            - run: npm run package:win:x64
-              working-directory: client
-              env:
-                  CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_BASE64 }}
-                  CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_PASSWORD }}
-
-            - run: npm run package:win:x86
+            - run: npm run package:win
               working-directory: client
               env:
                   CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_BASE64 }}

@@ -263,7 +263,7 @@ function signWinBundle() {
     ]);
 }
 
-exports.buildWindows64 = series(
+exports.buildWindows = series(
     cleanWin64,
     writeCertificateFile,
     runPkgWin64,
@@ -271,9 +271,7 @@ exports.buildWindows64 = series(
     copyAssetsWin64,
     copyAppManifiestWin64,
     createMsiWin64,
-    signMsiWin64
-);
-exports.buildWindows86 = series(
+    signMsiWin64,
     cleanWin86,
     writeCertificateFile,
     runPkgWin86,
@@ -281,12 +279,12 @@ exports.buildWindows86 = series(
     copyAssetsWin86,
     copyAppManifiestWin86,
     createMsiWin86,
-    signMsiWin86
+    signMsiWin86,
+    bundleWinInstallers,
+    signWinBundle
 );
 
-exports.buildWindowsBundle = series(bundleWinInstallers, signWinBundle);
-
-exports.buildMacOSx64 = series(cleanMac64, runPkgMac64, copyDepsMac64, copyAssetsMac64);
+exports.buildMacOS = series(cleanMac64, runPkgMac64, copyDepsMac64, copyAssetsMac64);
 exports.clean = series(cleanDist, cleanMac64, cleanWin64, cleanWin86, cleanMacOSInstaller);
 
 exports.postinstall = linkDataPMLib;
