@@ -374,7 +374,7 @@ jobs:
               uses: actions/upload-artifact@v2
               with:
                   name: datapm-client-windows-x64
-                  path: client/datapm-*.msixbundle
+                  path: client/installers/windows/dist/datapm-*.msixbundle
                   retention-days: 5
 
     build-macos-x64-client:

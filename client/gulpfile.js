@@ -243,9 +243,9 @@ function bundleWinInstallers() {
     return spawnAndLog("bundle-win-installers", "makeappx.exe", [
         "bundle",
         "/d",
-        "win-installers",
+        "installers/windows/dist",
         "/p",
-        "datapm-client-" + readPackageVersion() + ".msixbundle"
+        "installers/windows/dist/datapm-client-" + readPackageVersion() + ".msixbundle"
     ]);
 }
 
@@ -259,7 +259,7 @@ function signWinBundle() {
         "signing-certificate.pfx",
         "/p",
         process.env.CERTIFICATE_PASSWORD,
-        "datapm-client-" + readPackageVersion() + ".msixbundle"
+        "installers/windows/dist/datapm-client-" + readPackageVersion() + ".msixbundle"
     ]);
 }
 
