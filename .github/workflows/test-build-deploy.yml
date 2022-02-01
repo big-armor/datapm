@@ -367,7 +367,7 @@ jobs:
             - name: "Save Windows Executable"
               uses: actions/upload-artifact@v2
               with:
-                  name: datapm-client-windows-x64
+                  name: datapm-client-windows
                   path: client/installers/windows/dist/datapm-*.msixbundle
                   retention-days: 5
 
@@ -440,7 +440,7 @@ jobs:
             - name: "Create MacOS Installer Artifact"
               uses: actions/upload-artifact@v2
               with:
-                  name: datapm-client-macos-x64
+                  name: datapm-client-macos
                   path: ./client/installers/macos/macOS-x64/target/pkg-signed/*.pkg
                   retention-days: 7
 
@@ -528,10 +528,16 @@ jobs:
               run: npm run build
               working-directory: docs/website
 
-            - name: Download Win64 Installer
+            - name: Download Windows Installer
               uses: actions/download-artifact@v2
               with:
-                  name: datapm-client-windows-x64
+                  name: datapm-client-windows
+                  path: dist/client-installers
+
+            - name: Download MacOS Installer
+              uses: actions/download-artifact@v2
+              with:
+                  name: datapm-client-macos
                   path: dist/client-installers
 
             - name: Build Registry Docker Container
@@ -622,16 +628,16 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v2
 
-            - name: Download Win64 Installer
+            - name: Download Windows Installer
               uses: actions/download-artifact@v2
               with:
-                  name: datapm-client-windows-x64
+                  name: datapm-client-windows
                   path: dist/client-installers
 
-            - name: Download MacOSx64 Installer
+            - name: Download MacOS Installer
               uses: actions/download-artifact@v2
               with:
-                  name: datapm-client-macos-x64
+                  name: datapm-client-macos
                   path: dist/client-installers
 
             - name: Find DataPM Version
@@ -646,12 +652,10 @@ jobs:
               env:
                   DATAPM_VERSION: ${{ steps.datapm-version.outputs.DATAPM_VERSION}}
 
-            - name: Push Tag
-              run: git push
-
             - name: Release
               uses: softprops/action-gh-release@v1
               with:
+                  tag_name: ${{ steps.datapm-version.outputs.DATAPM_VERSION}}
                   files: |
                       dist/client-installers/*.msix
                       dist/client-installers/*.pkg
