@@ -98,17 +98,6 @@ function cleanWin64() {
     if (fs.existsSync("datapm-client-" + readPackageVersion() + "-x64.msix"))
         del("datapm-client-" + readPackageVersion() + "-x64.msix");
 
-    if (process.platform === "win32") {
-        const path = `${process.env.LOCALAPPDATA}/node-gyp/Cache`;
-
-        // https://github.com/nodejs/node-gyp/issues/2482
-        console.log("Cleaning node-gyp/Cache directory at " + path);
-
-        if (fs.existsSync(path)) {
-            del(path);
-        }
-    }
-
     return cleanDir("pkg-win64");
 }
 
@@ -287,6 +276,24 @@ function signWinBundle() {
     );
 }
 
+function cleanNodeGyp() {
+    if (process.platform === "win32") {
+        const path = `${process.env.LOCALAPPDATA}/node-gyp/Cache`;
+
+        // https://github.com/nodejs/node-gyp/issues/2482
+        console.log("Cleaning node-gyp/Cache directory at " + path);
+
+        if (fs.existsSync(path)) {
+            del(path);
+            console.log("node-gyp/Cache directory cleaned");
+        } else {
+            console.log("node-gyp/Cache directory does not exist at " + path);
+        }
+    }
+
+    return Promise.resolve();
+}
+
 exports.buildWindows = series(
     cleanWin64,
     writeCertificateFile,
@@ -322,3 +329,5 @@ exports.buildMacOS = series(
 exports.clean = series(cleanDist, cleanMacIntel64, cleanWin64, cleanArm64, cleanMacOSInstaller);
 
 exports.postCodegen = postCodegen;
+
+exports.cleanNodeGyp = cleanNodeGyp;
