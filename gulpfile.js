@@ -31,22 +31,6 @@ function buildLib() {
     return spawnAndLog("lib-build", "npm", ["run", "build"], { cwd: "lib" });
 }
 
-function linkLib() {
-    return spawnAndLog("link-lib", "npm", ["link"], { cwd: "lib/dist" });
-}
-
-function linkLibBackend() {
-    return spawnAndLog("link-lib", "npm", ["link", "datapm-lib"], { cwd: "backend" });
-}
-
-function linkLibClient() {
-    return spawnAndLog("link-lib", "npm", ["link", "datapm-lib"], { cwd: "client" });
-}
-
-function linkLibFrontend() {
-    return spawnAndLog("link-lib", "npm", ["link", "datapm-lib"], { cwd: "frontend" });
-}
-
 function installBackendDependencies() {
     return spawnAndLog("backend-deps", "npm", ["ci"], { cwd: "backend" });
 }
@@ -304,9 +288,6 @@ function cleanLib() {
 exports.default = series(
     installLibDependencies,
     buildLib,
-    linkLibBackend,
-    linkLibClient,
-    linkLibFrontend,
     //   testLib,
     installBackendDependencies,
     buildBackend,
@@ -344,8 +325,6 @@ exports.bumpVersion = series(
 );
 exports.bumpPackageLibVersions = parallel(bumpBackendLibVersion, bumpClientLibVersion, bumpFrontendLibVersion);
 
-exports.linkLib = parallel(linkLibBackend, linkLibClient, linkLibFrontend);
-
 exports.gitTag = series(gitTag, gitPush);
 exports.gitCommitPush = series(gitStageChanges, gitCommit, gitPush);
 exports.deployAssets = series(
@@ -370,13 +349,11 @@ exports.prepareDevEnvironment = series(
     installRootDependencies,
     installLibDependencies,
     buildLib,
-    linkLib,
     installBackendDependencies,
     installFrontendDependencies,
     installDocsDependencies,
     installClientDependencies,
-    parallel(linkLibBackend, linkLibClient, linkLibFrontend),
-    parallel(buildBackend)
+    buildBackend
 );
 
 exports.clean = series(cleanLib, cleanRoot);

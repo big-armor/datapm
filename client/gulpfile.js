@@ -7,7 +7,7 @@ const convert = require("xml-js");
 
 const path = require("path");
 
-const NODE_VERSION = "node14";
+const NODE_VERSION = "node16.13.2";
 
 function readPackageVersion() {
     const fileContents = fs.readFileSync("package.json");
@@ -215,7 +215,7 @@ function copyAssetsMacIntel64() {
 
 /** Arm 64 Bit */
 function runPkgMacArm64() {
-    return runPkg("macos", "arm64", "pkg-mac64");
+    return runPkg("macos", "arm64", "pkg-arm64");
 }
 
 function cleanMacArm64() {
@@ -298,10 +298,10 @@ exports.buildWindows = series(
 );
 
 exports.buildMacOS = series(
-    /* cleanMacArm64,
+    cleanMacArm64,
     runPkgMacArm64,
     copyDepsMacArm64,
-    copyAssetsMacArm64, */
+    copyAssetsMacArm64,
     cleanMacIntel64,
     runPkgMacIntel64,
     copyDepsMacIntel64,
