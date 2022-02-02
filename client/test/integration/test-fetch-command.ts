@@ -52,7 +52,7 @@ describe("Fetch Command Tests", async function () {
     after(() => {
         removePackageFiles(["package-a", "package-b"]);
 
-        if (fs.existsSync("tmp-files")) fs.rmdirSync("tmp-files", { recursive: true });
+        if (fs.existsSync("tmp-files")) fs.rmSync("tmp-files", { recursive: true });
         resetConfiguration();
     });
 

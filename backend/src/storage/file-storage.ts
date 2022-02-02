@@ -72,7 +72,7 @@ export class FileStorage implements DPMStorage {
             return;
         }
 
-        await fs.rm(basePath, {
+        fs.rmSync(basePath, {
             recursive: true
         });
     }

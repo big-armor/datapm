@@ -187,28 +187,31 @@ after(async function () {
     const storageFolderPath = TEMP_STORAGE_URL.replace("file://", "");
 
     if(fs.existsSync(storageFolderPath)) {
-            fs.rmdirSync(storageFolderPath, { recursive: true });
+            fs.rmSync(storageFolderPath, { recursive: true });
     }
 
     serverProcess.stdout!.destroy();
     serverProcess.stderr!.destroy();
 
-    try {
-        let pids = pidtree(serverProcess.pid, { root: true });
+    if(serverProcess.pid !== undefined) {
+        try {
+                let pids = pidtree(serverProcess.pid, { root: true });
 
-        // recursively kill all child processes
-        (await pids).forEach((p) => {
-            console.log("Killing process " + p);
-            try {
-                process.kill(p);
+                // recursively kill all child processes
+                (await pids).forEach((p) => {
+                    console.log("Killing process " + p);
+                    try {
+                        process.kill(p);
+                    } catch (error) {
+                        console.error("Error killing process " + p);
+                        console.error(error);
+                    }
+                });
             } catch (error) {
-                console.error("Error killing process " + p);
-                console.error(error);
+                console.log("error stopping processes " + error.message);
             }
-        });
-    } catch (error) {
-        console.log("error stopping processes " + error.message);
     }
+    
 
     if (container) {
         await container.stop();

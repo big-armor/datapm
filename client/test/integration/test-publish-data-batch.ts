@@ -40,7 +40,7 @@ describe("Publish Data Batch Tests", async function () {
             apiKey
         });
 
-        if (fs.existsSync("tmp-files")) fs.rmdirSync("tmp-files", { recursive: true });
+        if (fs.existsSync("tmp-files")) fs.rmSync("tmp-files", { recursive: true });
 
         fs.mkdirSync("tmp-files");
 
@@ -51,7 +51,7 @@ describe("Publish Data Batch Tests", async function () {
         removePackageFiles(["countries"]);
         resetConfiguration();
 
-        if (fs.existsSync("tmp-files")) fs.rmdirSync("tmp-files", { recursive: true });
+        if (fs.existsSync("tmp-files")) fs.rmSync("tmp-files", { recursive: true });
         resetConfiguration();
     });
 

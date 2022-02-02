@@ -129,7 +129,7 @@ before(async function () {
     listrTasks.push({
         task: async function (): Promise<void> {
             if (fs.existsSync(TEMP_STORAGE_PATH)) {
-                fs.rmdirSync(TEMP_STORAGE_PATH, { recursive: true });
+                fs.rmSync(TEMP_STORAGE_PATH, { recursive: true });
             }
         }
     });
@@ -276,49 +276,53 @@ after(async function () {
     registryServerProcess.stdout?.destroy();
     registryServerProcess.stderr?.destroy();
 
-    try {
-        const pids = pidtree(registryServerProcess.pid, { root: true });
+    if (registryServerProcess.pid !== undefined) {
+        try {
+            const pids = pidtree(registryServerProcess.pid, { root: true });
 
-        // recursively kill all child processes
-        (await pids).forEach((p) => {
-            console.log("Killing process " + p);
-            try {
-                process.kill(p);
-            } catch (error) {
-                console.error("Error killing process " + p);
-                console.error(error);
-            }
-        });
-        console.log("datapm registry container stopped normally");
-    } catch (error) {
-        console.log("error stopping processes " + error.message);
+            // recursively kill all child processes
+            (await pids).forEach((p) => {
+                console.log("Killing process " + p);
+                try {
+                    process.kill(p);
+                } catch (error) {
+                    console.error("Error killing process " + p);
+                    console.error(error);
+                }
+            });
+            console.log("datapm registry container stopped normally");
+        } catch (error) {
+            console.log("error stopping processes " + error.message);
+        }
     }
 
     const tempStoragePathRelative = TEMP_STORAGE_URL.replace("file://", "./../backend/");
 
     if (fs.existsSync(tempStoragePathRelative)) {
-        fs.rmdirSync(tempStoragePathRelative, { recursive: true });
+        fs.rmSync(tempStoragePathRelative, { recursive: true });
     }
 
     testDataServerProcess.stdout?.destroy();
     testDataServerProcess.stderr?.destroy();
 
-    try {
-        const pids = pidtree(testDataServerProcess.pid, { root: true });
+    if (testDataServerProcess.pid !== undefined) {
+        try {
+            const pids = pidtree(testDataServerProcess.pid, { root: true });
 
-        // recursively kill all child processes
-        (await pids).forEach((p) => {
-            console.log("Killing process " + p);
-            try {
-                process.kill(p);
-            } catch (error) {
-                console.error("Error killing process " + p);
-                console.error(error);
-            }
-        });
-        console.log("test data server stopped normally");
-    } catch (error) {
-        console.log("error stopping processes " + error.message);
+            // recursively kill all child processes
+            (await pids).forEach((p) => {
+                console.log("Killing process " + p);
+                try {
+                    process.kill(p);
+                } catch (error) {
+                    console.error("Error killing process " + p);
+                    console.error(error);
+                }
+            });
+            console.log("test data server stopped normally");
+        } catch (error) {
+            console.log("error stopping processes " + error.message);
+        }
     }
 
     if (databaseContainer) await databaseContainer.stop();
