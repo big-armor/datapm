@@ -184,7 +184,11 @@ describe("Server should start", async function () {
 after(async function () {
     this.timeout(30000);
 
-    fs.rmdirSync(TEMP_STORAGE_URL.replace("file://", ""), { recursive: true });
+    const storageFolderPath = TEMP_STORAGE_URL.replace("file://", "");
+
+    if(fs.existsSync(storageFolderPath)) {
+            fs.rmdirSync(storageFolderPath, { recursive: true });
+    }
 
     serverProcess.stdout!.destroy();
     serverProcess.stderr!.destroy();

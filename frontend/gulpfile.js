@@ -23,18 +23,6 @@ function spawnAndLog(prefix, command, args, opts) {
     return child;
 }
 
-function linkDataPMLib() {
-    const libPackageJsonFilePath = path.join(__dirname, "..", "lib", "package.json");
-
-    if (!fs.existsSync(libPackageJsonFilePath)) return;
-
-    const fileContents = fs.readFileSync(libPackageJsonFilePath);
-    const libPackageFile = JSON.parse(fileContents);
-
-    if (libPackageFile.name !== "datapm-lib") return;
-
-    return spawnAndLog("link-datapm-lib", "npm", ["link", "datapm-lib"]);
-}
 
 function clean() {
     return new Promise((resolve) => {
@@ -44,5 +32,4 @@ function clean() {
     });
 }
 
-exports.postinstall = linkDataPMLib;
 exports.clean = clean;

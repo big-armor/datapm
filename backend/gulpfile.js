@@ -48,25 +48,6 @@ function execLogCb(err, stdout, stderr) {
     return err; // makes gulp continue even if the command failed
 }
 
-function linkDataPMLib() {
-
-    const libPackageJsonFilePath = path.join(__dirname,"..","lib","package.json");
-
-    if(!fs.existsSync(libPackageJsonFilePath))
-        return;
-
-    const fileContents = fs.readFileSync(libPackageJsonFilePath);
-    const libPackageFile = JSON.parse(fileContents);
-
-    if(libPackageFile.name !== "datapm-lib")
-        return;
-
-    console.log("Linking datapm-lib");
-    
-    return exec("npm link datapm-lib");
-    
-}
-
 function clean() {
     return new Promise((resolve) => {
         if (fs.existsSync("dist")) fs.rmSync("dist", { recursive: true, force: true });
@@ -77,5 +58,4 @@ function clean() {
 
 exports.default = series(copyFiles, copyEmailTemplates, copyModules, copyDataPMLib, slimTypeOrmDist);
 exports.copyDependencies = series(copyModules, copyDataPMLib);
-exports.postinstall = series(linkDataPMLib)
 exports.clean = clean;

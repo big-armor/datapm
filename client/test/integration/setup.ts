@@ -128,7 +128,9 @@ before(async function () {
 
     listrTasks.push({
         task: async function (): Promise<void> {
-            fs.rmdirSync(TEMP_STORAGE_PATH, { recursive: true });
+            if (fs.existsSync(TEMP_STORAGE_PATH)) {
+                fs.rmdirSync(TEMP_STORAGE_PATH, { recursive: true });
+            }
         }
     });
 
@@ -292,7 +294,11 @@ after(async function () {
         console.log("error stopping processes " + error.message);
     }
 
-    fs.rmdirSync(TEMP_STORAGE_URL.replace("file://", "./../backend/"), { recursive: true });
+    const tempStoragePathRelative = TEMP_STORAGE_URL.replace("file://", "./../backend/");
+
+    if (fs.existsSync(tempStoragePathRelative)) {
+        fs.rmdirSync(tempStoragePathRelative, { recursive: true });
+    }
 
     testDataServerProcess.stdout?.destroy();
     testDataServerProcess.stderr?.destroy();
