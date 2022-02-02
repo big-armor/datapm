@@ -7,7 +7,7 @@ const convert = require("xml-js");
 
 const path = require("path");
 
-const NODE_VERSION = "node16.13.2";
+const NODE_VERSION = "node16.12.0";
 
 function readPackageVersion() {
     const fileContents = fs.readFileSync("package.json");
@@ -311,4 +311,3 @@ exports.buildMacOS = series(
 exports.clean = series(cleanDist, cleanMacIntel64, cleanWin64, cleanArm64, cleanMacOSInstaller);
 
 exports.postCodegen = postCodegen;
-
