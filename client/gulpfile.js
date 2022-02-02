@@ -97,6 +97,18 @@ function runPkgWin64() {
 function cleanWin64() {
     if (fs.existsSync("datapm-client-" + readPackageVersion() + "-x64.msix"))
         del("datapm-client-" + readPackageVersion() + "-x64.msix");
+
+    if (process.platform === "win32") {
+        const path = `${process.env.LOCALAPPDATA}/node-gyp/Cache`;
+
+        // https://github.com/nodejs/node-gyp/issues/2482
+        console.log("Cleaning node-gyp/Cache directory at " + path);
+
+        if (fs.existsSync(path)) {
+            del(path);
+        }
+    }
+
     return cleanDir("pkg-win64");
 }
 
@@ -298,10 +310,10 @@ exports.buildWindows = series(
 );
 
 exports.buildMacOS = series(
-    cleanMacArm64,
+    /* cleanMacArm64,
     runPkgMacArm64,
     copyDepsMacArm64,
-    copyAssetsMacArm64,
+    copyAssetsMacArm64, */
     cleanMacIntel64,
     runPkgMacIntel64,
     copyDepsMacIntel64,
