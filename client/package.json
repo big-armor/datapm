@@ -3,7 +3,6 @@
     "version": "0.8.32",
     "description": "The client for manipulating data",
     "scripts": {
-        "preinstall": "gulp cleanNodeGyp",
         "clean": "gulp clean",
         "prebuild": "npm run codegen",
         "build": "tsc",

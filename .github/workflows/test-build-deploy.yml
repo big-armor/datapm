@@ -116,10 +116,6 @@ jobs:
               run: npm run build
               working-directory: lib
 
-            - name: Link Lib
-              run: npm link
-              working-directory: lib/dist
-
             - name: Cache Backend Node_modules
               id: cache-backend-node-modules
               uses: actions/cache@v1
@@ -131,10 +127,6 @@ jobs:
               id: install-backend-Dependencies
               if: steps.cache-backend-node-modules.outputs.cache-hit != 'true'
               run: npm ci
-              working-directory: backend
-
-            - name: Link Lib for Backend
-              run: npm link datapm-lib
               working-directory: backend
 
             - name: Test Backend
@@ -180,10 +172,6 @@ jobs:
               run: npm run build
               working-directory: lib
 
-            - name: Link Lib
-              run: npm link
-              working-directory: lib/dist
-
             - name: Cache Backend Node_modules
               id: cache-backend-node-modules
               uses: actions/cache@v1
@@ -195,10 +183,6 @@ jobs:
               id: install-backend-Dependencies
               if: steps.cache-backend-node-modules.outputs.cache-hit != 'true'
               run: npm ci
-              working-directory: backend
-
-            - name: Link Lib for Backend
-              run: npm link datapm-lib
               working-directory: backend
 
             - name: Build Backend
@@ -218,10 +202,6 @@ jobs:
               id: install-fronend-dependencies
               if: steps.cache-frontend-node-modules.outputs.cache-hit != 'true'
               run: npm ci
-              working-directory: frontend
-
-            - name: Link Lib for Frontend
-              run: npm link datapm-lib
               working-directory: frontend
 
             - name: Test Frontend
@@ -267,10 +247,6 @@ jobs:
               run: npm run build
               working-directory: lib
 
-            - name: Link Lib
-              run: npm link
-              working-directory: lib/dist
-
             - name: Cache Backend Dependencies
               id: cache-backend-dependencies
               uses: actions/cache@v1
@@ -282,10 +258,6 @@ jobs:
               id: install-backend-Dependencies
               if: steps.cache-backend-dependencies.outputs.cache-hit != 'true'
               run: npm ci
-              working-directory: backend
-
-            - name: Link Lib for Backend
-              run: npm link datapm-lib
               working-directory: backend
 
             - name: Build Backend
@@ -304,10 +276,6 @@ jobs:
               id: install-client-dependencies
               if: steps.cache-client-node-modules.outputs.cache-hit != 'true'
               run: npm ci
-              working-directory: client
-
-            - name: Link Lib for Client
-              run: npm link datapm-lib
               working-directory: client
 
             - name: Test Client
@@ -333,6 +301,10 @@ jobs:
               with:
                   node-version: "16.13.2"
 
+            - name: Clean NodeGypCache
+              run: npx gulp -f gulpfile-pre-install.js
+              working-directory: client
+
             - name: Install Lib Dependencies
               run: npm ci
               working-directory: lib
@@ -341,18 +313,10 @@ jobs:
               run: npm run build
               working-directory: lib
 
-            - name: Link Lib
-              run: npm link
-              working-directory: lib/dist
-
             - name: Install client dependencies
               run: npm ci
               working-directory: client
               if: steps.cache-client-node-modules.outputs.cache-hit != 'true'
-
-            - name: Link Lib for Client
-              run: npm link datapm-lib
-              working-directory: client
 
             - name: Run build
               run: npm run build
@@ -399,18 +363,10 @@ jobs:
               run: npm run build
               working-directory: lib
 
-            - name: Link Lib
-              run: npm link
-              working-directory: lib/dist
-
             - name: Install client dependencies
               run: npm ci
               working-directory: client
               if: steps.cache-client-node-modules.outputs.cache-hit != 'true'
-
-            - name: Link Lib for Client
-              run: npm link datapm-lib
-              working-directory: client
 
             - name: Run build
               run: npm run build
@@ -481,10 +437,6 @@ jobs:
               run: npm run build
               working-directory: lib
 
-            - name: Link Lib
-              run: npm link
-              working-directory: lib/dist
-
             - uses: JS-DevTools/npm-publish@v1
               with:
                   package: ./lib/dist/package.json
@@ -495,10 +447,6 @@ jobs:
               run: npm ci
               working-directory: backend
 
-            - name: Link Lib for Backend
-              run: npm link datapm-lib
-              working-directory: backend
-
             - name: Build Backend
               id: build-backend-Dependencies
               run: npm run build
@@ -507,10 +455,6 @@ jobs:
             - name: Install Frontend Dependencies
               id: install-frontend-dependencies
               run: npm ci
-              working-directory: frontend
-
-            - name: Link Lib for Frontend
-              run: npm link datapm-lib
               working-directory: frontend
 
             - name: Build Frontend

@@ -276,24 +276,6 @@ function signWinBundle() {
     );
 }
 
-function cleanNodeGyp() {
-    if (process.platform === "win32") {
-        const path = `${process.env.LOCALAPPDATA}/node-gyp/Cache`;
-
-        // https://github.com/bugsnag/bugsnag-js/issues/1593#issuecomment-1022640647
-        console.log("Cleaning node-gyp/Cache directory at " + path);
-
-        if (fs.existsSync(path)) {
-            del(path);
-            console.log("node-gyp/Cache directory cleaned");
-        } else {
-            console.log("node-gyp/Cache directory does not exist at " + path);
-        }
-    }
-
-    return Promise.resolve();
-}
-
 exports.buildWindows = series(
     cleanWin64,
     writeCertificateFile,
@@ -302,7 +284,7 @@ exports.buildWindows = series(
     copyAssetsWin64,
     copyAppManifiestWin64,
     createMsiWin64,
-    signMsiWin64,
+    signMsiWin64
     /* 
     cleanArm64
     writeCertificateFile,
@@ -312,9 +294,9 @@ exports.buildWindows = series(
     copyAppManifiestArm64,
     createMsiArm64,
     signMsiArm64, */
-    bundleWinInstallers,
-    signWinBundle
 );
+
+exports.buildWindowsBundle = series(bundleWinInstallers, signWinBundle);
 
 exports.buildMacOS = series(
     /* cleanMacArm64,
@@ -330,4 +312,3 @@ exports.clean = series(cleanDist, cleanMacIntel64, cleanWin64, cleanArm64, clean
 
 exports.postCodegen = postCodegen;
 
-exports.cleanNodeGyp = cleanNodeGyp;
