@@ -657,7 +657,7 @@ jobs:
               with:
                   tag_name: ${{ steps.datapm-version.outputs.DATAPM_VERSION}}
                   files: |
-                      dist/client-installers/*.msix
+                      dist/client-installers/*.msixbundle
                       dist/client-installers/*.pkg
 
     bumpVersion:
