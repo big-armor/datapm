@@ -234,19 +234,6 @@ function cleanDist() {
     return cleanDir("dist");
 }
 
-function linkDataPMLib() {
-    const libPackageJsonFilePath = path.join(__dirname, "..", "lib", "package.json");
-
-    if (!fs.existsSync(libPackageJsonFilePath)) return;
-
-    const fileContents = fs.readFileSync(libPackageJsonFilePath);
-    const libPackageFile = JSON.parse(fileContents);
-
-    if (libPackageFile.name !== "datapm-lib") return;
-
-    return spawnAndLog("link-datapm-lib", "npm", ["link", "datapm-lib"]);
-}
-
 function postCodegen() {
     fs.copyFileSync(
         path.join("src", "generated", "graphql.ts"),
@@ -322,5 +309,4 @@ exports.buildMacOS = series(
 );
 exports.clean = series(cleanDist, cleanMacIntel64, cleanWin64, cleanArm64, cleanMacOSInstaller);
 
-exports.postinstall = linkDataPMLib;
 exports.postCodegen = postCodegen;

@@ -5,7 +5,6 @@
     "typings": "dist/index.d.ts",
     "module": "dist/index.js",
     "scripts": {
-        "postinstall": "gulp postinstall",
         "clean": "gulp clean",
         "prebuild": "npm run clean; npm run codegen",
         "build": "tsc",
@@ -43,11 +42,11 @@
         "cron": "^1.8.2",
         "csv-parse": "^4.16.3",
         "dataloader": "^2.0.0",
-        "datapm-lib": "^0.8.31",
+        "datapm-lib": "./../lib/dist",
         "express-enforces-ssl": "^1.1.0",
         "express-http-proxy": "^1.6.0",
         "express-jwt": "^6.0.0",
-        "fs-extra": "^10.0.0",
+        "fs-extra": "^9.1.0",
         "graphql": "^15.3.0",
         "graphql-fields": "^2.0.3",
         "graphql-scalars": "^1.2.2",
@@ -68,7 +67,7 @@
         "reflect-metadata": "^0.1.13",
         "sanitize-filename": "^1.6.3",
         "semver": "^7.3.2",
-        "sharp": "^0.26.2",
+        "sharp": "^v0.28.0",
         "snappystream": "^2.0.0",
         "socket.io": "^4.2.0",
         "socket.io-client": "^4.4.0",
@@ -103,7 +102,7 @@
         "@types/mkdirp": "^1.0.1",
         "@types/mocha": "^8.0.3",
         "@types/mustache": "^4.1.1",
-        "@types/node": "^12.19.0",
+        "@types/node": "^16.11.22",
         "@types/node-fetch": "^2.5.11",
         "@types/nodemailer": "^6.4.0",
         "@types/semver": "^7.3.4",
@@ -112,7 +111,6 @@
         "@types/uuid": "^8.0.0",
         "apollo-link-error": "^1.1.13",
         "chai": "^4.2.0",
-        "cross-fetch": "^3.0.6",
         "execa": "^4.0.3",
         "expect": "^26.5.3",
         "gulp": "^4.0.2",
@@ -131,7 +129,7 @@
         "ts-node": "^8.8.1",
         "tsc-watch": "^4.2.3",
         "tslint": "^6.1.2",
-        "typescript": "^4.4.2"
+        "typescript": "^4.5.5"
     },
     "version": "0.8.32"
 }

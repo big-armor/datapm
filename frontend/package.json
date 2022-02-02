@@ -3,7 +3,6 @@
     "version": "0.8.32",
     "scripts": {
         "clean": "gulp clean",
-        "postinstall": "gulp postinstall",
         "ng": "ng",
         "prestart": "npm run codegen",
         "start": "ng serve --aot --proxy-config proxy.conf.js ",
@@ -42,7 +41,7 @@
         "apollo-link-schema": "^1.2.5",
         "bootstrap": "^4.6.0",
         "crypto": "^1.0.1",
-        "datapm-lib": "^0.8.31",
+        "datapm-lib": "./../lib/dist",
         "graphql-upload": "^11.0.0",
         "jwt-decode": "^2.2.0",
         "ng-table-virtual-scroll": "^1.3.4",

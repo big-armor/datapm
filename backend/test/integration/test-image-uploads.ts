@@ -82,7 +82,7 @@ describe("Image Upload Tests", async () => {
             .parse(request.parse.image);
 
         let hash = crypto.createHash("sha256").update(imageWithData.body, "utf8").digest("hex");
-        expect(hash).equal("a847c9488f535513fa06cfab75989ae767cae7381ddab701d6927e2886c1982f");
+        expect(hash).equal("72ad6af0bfc6c6091e6104b45388e1fa431d5696059ebbd31e5f50eca336a081");
     });
 
     it("Download user avatar image", async function () {
@@ -122,7 +122,7 @@ describe("Image Upload Tests", async () => {
             .parse(request.parse.image);
 
         let hash = crypto.createHash("sha256").update(imageWithData.body, "utf8").digest("hex");
-        expect(hash).equal("6df1299de51ce7178d906575a6877a3d16d9e193bf382ec9f97bdd7654a661f7");
+        expect(hash).equal("af7835de83d877afeda68a13f8497205cf666ea045ca421ab811095732493b8b");
     });
 
     it("setMyAvatarImage_WithUnsupportedImageFormat_ReturnsErrorWithInvalidFormatErrorCode", async () => {

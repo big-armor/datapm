@@ -371,7 +371,10 @@ export abstract class KnexSink implements Sink {
                                 )]: _sinkStateKey.packageMajorVersion
                             });
 
-                        if (state == null || state.length === 0) resolve(null);
+                        if (state == null || state.length === 0) {
+                            resolve(null);
+                            return;
+                        }
 
                         const dbState = state[0];
 
