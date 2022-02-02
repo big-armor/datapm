@@ -301,8 +301,8 @@ jobs:
               with:
                   node-version: "16.13.2"
 
-            - name: Clean NodeGypCache
-              run: npx gulp -f gulpfile-pre-install.js
+            - name: Clean Node-Gyp Cache
+              run: Remove-Item -Recurse -Force $env:LOCALAPPDATA\node-gyp\Cache
               working-directory: client
 
             - name: Install Lib Dependencies
