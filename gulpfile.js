@@ -103,33 +103,6 @@ function bumpLibVersion() {
     });
 }
 
-function bumpBackendLibVersion() {
-    return spawnAndLog(
-        "bump-backend-lib-version",
-        "npm",
-        ["install", "datapm-lib@" + readPackageVersion(), "--no-git-tag-version"],
-        {
-            cwd: "backend"
-        }
-    );
-}
-
-function bumpClientLibVersion() {
-    return spawnAndLog(
-        "bump-backend-lib-version",
-        "npm",
-        ["install", "datapm-lib@" + readPackageVersion(), "--no-git-tag-version"],
-        {
-            cwd: "client"
-        }
-    );
-}
-function bumpFrontendLibVersion() {
-    return spawnAndLog("bump-backend-lib-version", "npm", ["install", "datapm-lib@" + readPackageVersion()], {
-        cwd: "frontend"
-    });
-}
-
 function bumpClientVersion() {
     return spawnAndLog("bump-client-version", "npm", ["version", readPackageVersion()], { cwd: "client" });
 }
@@ -323,7 +296,6 @@ exports.bumpVersion = series(
     bumpBackendVersion,
     bumpFrontendVersion
 );
-exports.bumpPackageLibVersions = parallel(bumpBackendLibVersion, bumpClientLibVersion, bumpFrontendLibVersion);
 
 exports.gitTag = series(gitTag, gitPush);
 exports.gitCommitPush = series(gitStageChanges, gitCommit, gitPush);

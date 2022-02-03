@@ -1,4 +1,4 @@
-FROM node:16.13.1-alpine3.14
+FROM node:16.12.0-alpine3.14
 
 COPY lib/dist /build/lib/dist
 COPY docs/ /usr/src/static/docs/
