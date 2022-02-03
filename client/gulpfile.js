@@ -284,7 +284,7 @@ exports.buildWindows = series(
     copyAssetsWin64,
     copyAppManifiestWin64,
     createMsiWin64,
-    signMsiWin64
+    signMsiWin64,
     /* 
     cleanArm64
     writeCertificateFile,
@@ -294,6 +294,8 @@ exports.buildWindows = series(
     copyAppManifiestArm64,
     createMsiArm64,
     signMsiArm64, */
+    bundleWinInstallers,
+    signWinBundle
 );
 
 exports.buildWindowsBundle = series(bundleWinInstallers, signWinBundle);
