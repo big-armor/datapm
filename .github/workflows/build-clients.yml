@@ -9,12 +9,6 @@ jobs:
     build-clients:
         runs-on: ubuntu-latest
         timeout-minutes: 15
-        needs:
-            - testLib
-            - testBackend
-            - testFrontend
-            - testClient
-        if: github.ref == 'refs/heads/master'
         name: Build client executables
         steps:
             - uses: actions/checkout@v2
@@ -100,7 +94,6 @@ jobs:
         timeout-minutes: 15
         needs:
             - build-clients
-        if: github.ref == 'refs/heads/master'
         name: Build Windows Client Installer
         steps:
             - uses: actions/checkout@v2
@@ -135,7 +128,6 @@ jobs:
         timeout-minutes: 25
         needs:
             - build-clients
-        if: github.ref == 'refs/heads/master'
         name: Build MacOS Client Installer
         steps:
             - uses: actions/checkout@v2
