@@ -342,7 +342,7 @@ jobs:
             - name: "Save MacOS ARM 64bit Executable"
               uses: actions/upload-artifact@v2
               with:
-                  name: datapm-macos-intel64-executable
+                  name: datapm-macos-arm64-executable
                   path: client/pkg-mac-arm64
                   retention-days: 1
 
@@ -356,7 +356,7 @@ jobs:
             - name: "Save Windows ARM 64bit Executable"
               uses: actions/upload-artifact@v2
               with:
-                  name: datapm-windows-intel64-executable
+                  name: datapm-windows-arm64-executable
                   path: client/pkg-windows-arm64
                   retention-days: 1
 
