@@ -17,7 +17,7 @@ jobs:
                   node-version: "16.13.2"
 
             - name: Install Build Tools
-              run: apt-get install g++ gcc make
+              run: sudo apt-get install g++ gcc make
 
             - name: Install Lib Dependencies
               run: npm ci
