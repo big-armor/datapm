@@ -7,7 +7,7 @@ const convert = require("xml-js");
 
 const path = require("path");
 
-const NODE_VERSION = "node16.12.0";
+const NODE_VERSION = "node16.13";
 
 function readPackageVersion() {
     const fileContents = fs.readFileSync("package.json");
