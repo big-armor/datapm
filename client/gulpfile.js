@@ -25,10 +25,6 @@ function runPkg(platform, architecture, destination) {
     return spawnAndLog("run-pkg-" + platform + "-" + architecture, cmd, [
         "pkg",
         "package.json",
-        "--no-byte-code",
-        "--public-packages",
-        "*",
-        "--public",
         "--out-path",
         destination,
         "--target",
