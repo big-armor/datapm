@@ -283,7 +283,6 @@ function signWinBundle() {
 }
 
 exports.buildWindows = series(
-    writeCertificateFile,
     cleanWin64,
     runPkgWin64,
     copyDepsWin64,
@@ -297,6 +296,7 @@ exports.buildWindows = series(
 );
 
 exports.signAndBundleWindows = series(
+    writeCertificateFile,
     createMsiWin64,
     signMsiWin64,
     createMsiWindowsArm64,
