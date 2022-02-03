@@ -68,9 +68,11 @@ for i in "${ar[@]}"; do signFile $i; done
 # Prepare for Installer creation
 echo ""
 echo "###   Preparing for installer creation"
-mkdir -p ./installers/macos/macOS-x64/application
-cp -R ./pkg-macos-intel64/* ./installers/macos/macOS-x64/application/x86_64
-cp -R ./pkg-macos-intel64/* ./installers/macos/macOS-x64/application/arm64
+mkdir -p ./installers/macos/macOS-x64/application/x86_64
+cp -R ./pkg-macos-intel64/. ./installers/macos/macOS-x64/application/x86_64
+
+mkdir -p ./installers/macos/macOS-x64/application/arm64
+cp -R ./pkg-macos-arm64/. ./installers/macos/macOS-x64/application/arm64
 
 # Create the installer
 echo ""

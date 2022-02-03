@@ -61,7 +61,7 @@ exports.signMsiWin64 = function () {
             "SHA256",
             "/a",
             "/f",
-            "signing-certificate.pfx",
+            "signing-certificate.p12",
             "/p",
             process.env.CERTIFICATE_PASSWORD,
             "installers/windows/dist/datapm-client-" + readPackageVersion() + "-x64.msix"
@@ -87,7 +87,7 @@ exports.cleanMacOSInstaller = function () {
 };
 
 exports.writeCertificateFile = function () {
-    fs.writeFileSync("signing-certificate.pfx", process.env.CERTIFICATE_BASE64, { encoding: "base64" });
+    fs.writeFileSync("signing-certificate.p12", process.env.CERTIFICATE_BASE64, { encoding: "base64" });
 
     return Promise.resolve();
 };
@@ -121,7 +121,7 @@ exports.signMsiWindowsArm64 = function () {
         "SHA256",
         "/a",
         "/f",
-        "signing-certificate.pfx",
+        "signing-certificate.p12",
         "/p",
         process.env.CERTIFICATE_PASSWORD,
         "installers/windows/dist/datapm-client-" + readPackageVersion() + "-arm64.msix"
@@ -152,7 +152,7 @@ exports.signWinBundle = function () {
             "SHA256",
             "/a",
             "/f",
-            "signing-certificate.pfx",
+            "signing-certificate.p12",
             "/p",
             process.env.CERTIFICATE_PASSWORD,
             "installers/windows/dist/datapm-client-" + readPackageVersion() + ".msixbundle"
