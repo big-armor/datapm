@@ -110,6 +110,10 @@ jobs:
                   name: datapm-windows-arm64-executable
                   path: client/pkg-windows-arm64
 
+            - name: Install client dependencies
+              working-directory: client
+              run: npm ci
+
             - run: npm run package:win:bundle
               working-directory: client
               env:

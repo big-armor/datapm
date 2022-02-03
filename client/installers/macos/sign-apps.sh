@@ -54,15 +54,15 @@ echo "###    Listing keys in keychain"
 security find-identity -v -p basic build.keychain
 
 # Sign the applications
-signFile ./pkg-mac-intel64/datapm
-signFile ./pkg-mac-arm64/datapm
+signFile ./pkg-macos-intel64/datapm
+signFile ./pkg-macos-arm64/datapm
 
 
 # Sign the node modules as well
-ar=( $(find pkg-mac-intel64/**/*.node ) ); 
-ar+=( $(find pkg-mac-intel64/**/*.node.bak ) ); 
-ar=( $(find pkg-mac-arm64/**/*.node ) ); 
-ar+=( $(find pkg-mac-arm64/**/*.node.bak ) ); 
+ar=( $(find pkg-macos-intel64/**/*.node ) ); 
+ar+=( $(find pkg-macos-intel64/**/*.node.bak ) ); 
+ar=( $(find pkg-macos-arm64/**/*.node ) ); 
+ar+=( $(find pkg-macos-arm64/**/*.node.bak ) ); 
 for i in "${ar[@]}"; do signFile $i; done
 
 # Prepare for Installer creation
