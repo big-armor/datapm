@@ -5,7 +5,7 @@ APPLICATION_FILE_PATH=datapm
 
 #Parameters
 # IN THE FUTURE APPEND $(/usr/bin/uname -m) TO GET THE ARCHITECTURE
-PRODUCT_HOME=/Library/__PRODUCT__/__VERSION__
+PRODUCT_HOME=/Library/__PRODUCT__/__VERSION__/$(/usr/bin/uname -m)
 
 echo "Post installation process started"
 
