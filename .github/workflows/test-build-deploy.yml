@@ -309,6 +309,7 @@ jobs:
               run: npm run build
               working-directory: lib
 
+            #https://github.com/nodejs/node-gyp/issues/2584
             - name: Pre-install Node Gyp cache
               run: npx node-gyp install 16.13.2
               working-directory: client

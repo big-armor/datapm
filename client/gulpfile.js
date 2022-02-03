@@ -25,14 +25,18 @@ function runPkg(platform, architecture, destination) {
     return spawnAndLog("run-pkg-" + platform + "-" + architecture, cmd, [
         "pkg",
         "package.json",
+        "--no-byte-code",
+        "--public-packages",
+        "*",
+        "--public",
         "--out-path",
         destination,
         "--target",
         NODE_VERSION + "-" + platform + "-" + architecture
     ]).addListener("close", () => {
         renameBinary(
-            path.join(destination, "datapm-client" + (process.platform === "win32" ? ".exe" : "")),
-            path.join(destination, "datapm" + (process.platform === "win32" ? ".exe" : ""))
+            path.join(destination, "datapm-client" + (platform === "win" ? ".exe" : "")),
+            path.join(destination, "datapm" + (platform === "win" ? ".exe" : ""))
         );
     });
 }
