@@ -76,10 +76,10 @@ jobs:
               run: npm run build
 
             - name: Build Windows executables
-              run: npm run package:win:intel64
+              run: npm run package:windows:tel64
               working-directory: client
 
-            - run: npm run package:win:bundle
+            - run: npm run package:windows:bundle
               working-directory: client
               env:
                   CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_BASE64 }}

@@ -16,7 +16,7 @@
         "package:linux:arm64": "gulp buildLinuxArm64",
         "package:windows:intel64": "gulp buildWindowsIntel64",
         "package:windows:arm64": "gulp buildWindowsArm64",
-        "package:win:bundle": "gulp bundleWindows",
+        "package:windows:bundle": "gulp bundleWindows",
         "pretest": "npm run codegen",
         "test": "CREDENTIALS_SECRET_KEY=test mocha --slow 3000 --timeout 60000 -r ts-node/register test/integration/*.ts",
         "test:debug": "CREDENTIALS_SECRET_KEY=test npx mocha --slow 3000 --timeout 999999 -r ts-node/register",
