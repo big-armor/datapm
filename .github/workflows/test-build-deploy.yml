@@ -360,7 +360,10 @@ jobs:
         runs-on: windows-latest
         timeout-minutes: 15
         needs:
-            - build-clients
+            - testLib
+            - testBackend
+            - testFrontend
+            - testClient
         if: github.ref == 'refs/heads/master'
         name: Build Windows Client Installer
         steps:
@@ -372,6 +375,10 @@ jobs:
             - name: Install client dependencies
               working-directory: client
               run: npm ci
+
+            - name: Build Client
+              working-directory: client
+              run: npm run build
 
             - name: Build Windows executables
               run: npm run package:win

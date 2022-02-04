@@ -87,6 +87,10 @@ jobs:
               working-directory: client
               run: npm ci
 
+            - name: Build client
+              working-directory: client
+              run: npm run build
+
             - name: Build Windows executables
               run: npm run package:win
               working-directory: client
