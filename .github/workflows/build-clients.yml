@@ -85,7 +85,7 @@ jobs:
             - name: "Save Linux ARM 64bit Executable"
               uses: actions/upload-artifact@v2
               with:
-                  name: datapm-linux-intel64-executable
+                  name: datapm-linux-arm64-executable
                   path: client/pkg-linux-arm64
                   retention-days: 1
 
