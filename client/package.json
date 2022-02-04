@@ -5,7 +5,7 @@
     "scripts": {
         "clean": "gulp clean",
         "prebuild": "npm run codegen",
-        "build": "NODE_OPTIONS=--max-old-space-size=8192 tsc",
+        "build": "tsc",
         "start": "CREDENTIALS_SECRET_KEY=test node --trace-warnings --inspect -r ts-node/register src/main.ts",
         "start:test-data-server": "node -r ts-node/register test/test-data-server.ts",
         "start-registry": "DATAPM_VERSION=latest docker-compose -f node_modules/datapm-lib/docker-compose.yml up",

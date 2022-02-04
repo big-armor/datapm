@@ -73,7 +73,7 @@ exports.bundleWindows = series(bundleWinInstallers, signWinBundle);
 
 exports.buildMacOSArm64 = series(cleanMacArm64, runPkgMacArm64, copyDepsMacArm64, copyAssetsMacArm64);
 
-exports.buildMacIntel64 = series(cleanMacIntel64, runPkgMacIntel64, copyDepsMacIntel64, copyAssetsMacIntel64);
+exports.buildMacOSIntel64 = series(cleanMacIntel64, runPkgMacIntel64, copyDepsMacIntel64, copyAssetsMacIntel64);
 
 exports.buildLinuxIntel64 = series(cleanLinuxIntel64, runPkgLinuxIntel64, copyDepsLinuxIntel64, copyAssetsLinuxIntel64);
 

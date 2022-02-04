@@ -9,7 +9,7 @@ jobs:
     build-client-linux-intel64:
         runs-on: ubuntu-latest
         timeout-minutes: 15
-        name: Build Linux executables
+        name: Build Linux Intel64
         steps:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v2
