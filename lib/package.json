@@ -16,7 +16,7 @@
         "**/*"
     ],
     "author": "Travis Collins",
-    "license": "CC-BY-NC-ND-4.0",
+    "license": "https://datapm.io/docs/license",
     "devDependencies": {
         "@types/chai": "^4.2.14",
         "@types/json-schema": "^7.0.5",

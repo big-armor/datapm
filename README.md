@@ -33,4 +33,4 @@ View the [Security.MD](SECURITY.md) file for instructions on how to report vulne
 
 ## License
 
-See https://datapm.io/docs/license
+See [https://datapm.io/docs/license](https://datapm.io/docs/license)
