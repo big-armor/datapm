@@ -76,7 +76,7 @@ jobs:
               run: npm run build
 
             - name: Build Windows executables
-              run: npm run package:windows:tel64
+              run: npm run package:windows:intel64
               working-directory: client
 
             - run: npm run package:windows:bundle
