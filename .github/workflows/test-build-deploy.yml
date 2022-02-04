@@ -369,12 +369,15 @@ jobs:
             - name: Build Windows executables
               run: npm run package:windows:intel64
               working-directory: client
+              env:
+                  WINDOWS_CLIENT_CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_BASE64 }}
+                  WINDOWS_CLIENT_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_PASSWORD }}
 
             - run: npm run package:windows:bundle
               working-directory: client
               env:
-                  CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_BASE64 }}
-                  CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_PASSWORD }}
+                  WINDOWS_CLIENT_CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_BASE64 }}
+                  WINDOWS_CLIENT_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CLIENT_CERTIFICATE_PASSWORD }}
 
             - name: "Save Windows Executable"
               uses: actions/upload-artifact@v2
