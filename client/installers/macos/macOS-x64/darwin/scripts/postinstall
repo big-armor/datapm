@@ -4,8 +4,8 @@
 APPLICATION_FILE_PATH=datapm
 
 #Parameters
-# IN THE FUTURE APPEND $(/usr/bin/uname -m) TO GET THE ARCHITECTURE
-PRODUCT_HOME=/Library/__PRODUCT__/__VERSION__/$(/usr/bin/uname -m)
+# IN THE FUTURE REPLACE x86_64 below with $(/usr/bin/uname -m) TO GET THE ARCHITECTURE
+PRODUCT_HOME=/Library/__PRODUCT__/__VERSION__/x86_64
 
 echo "Post installation process started"
 
