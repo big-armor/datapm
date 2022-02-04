@@ -7,7 +7,7 @@ const convert = require("xml-js");
 
 const path = require("path");
 
-const NODE_VERSION = "node16.13";
+const NODE_VERSION = "node16";
 
 exports.postCodegen = function () {
     fs.copyFileSync(
@@ -53,9 +53,9 @@ exports.renameBinary = function (binaryFile, destinationFile) {
 };
 
 exports.copyDeps = function (directory) {
-    return src(["node_modules/mmmagic/**/*", "node_modules/node-expat/**/*"], { base: "./node_modules/" }).pipe(
-        dest(path.join(directory, "node_modules"))
-    );
+    return src(["node_modules/mmmagic/**/*", "node_modules/node-expat/**/*"], {
+        base: "./node_modules/"
+    }).pipe(dest(path.join(directory, "node_modules")));
 };
 
 exports.copyAssets = function (directory) {

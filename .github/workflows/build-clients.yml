@@ -39,10 +39,6 @@ jobs:
               run: npm run package:macos
               working-directory: client
 
-            - name: Build Windows executables
-              run: npm run package:win
-              working-directory: client
-
             - name: Build Linux executables
               run: npm run package:linux
               working-directory: client
@@ -61,20 +57,6 @@ jobs:
                   path: client/pkg-macos-arm64
                   retention-days: 1
 
-            - name: "Save Windows Intel 64bit Executable"
-              uses: actions/upload-artifact@v2
-              with:
-                  name: datapm-windows-intel64-executable
-                  path: client/pkg-windows-intel64
-                  retention-days: 1
-
-            - name: "Save Windows ARM 64bit Executable"
-              uses: actions/upload-artifact@v2
-              with:
-                  name: datapm-windows-arm64-executable
-                  path: client/pkg-windows-arm64
-                  retention-days: 1
-
             - name: "Save Linux Intel 64bit Executable"
               uses: actions/upload-artifact@v2
               with:
@@ -89,7 +71,7 @@ jobs:
                   path: client/pkg-linux-arm64
                   retention-days: 1
 
-    bundle-win-client:
+    buil-bundle-win-client:
         runs-on: windows-latest
         timeout-minutes: 15
         needs:
@@ -98,24 +80,16 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            - name: Download Windows Intel64 Executable
-              uses: actions/download-artifact@v2
-              with:
-                  name: datapm-windows-intel64-executable
-                  path: client/pkg-windows-intel64
-
-            - name: Download Windows ARM64 Executable
-              uses: actions/download-artifact@v2
-              with:
-                  name: datapm-windows-arm64-executable
-                  path: client/pkg-windows-arm64
-
             - name: Presinstall node-gyp cache
               run: npx node-gyp install 16.13.2
 
             - name: Install client dependencies
               working-directory: client
               run: npm ci
+
+            - name: Build Windows executables
+              run: npm run package:win
+              working-directory: client
 
             - run: npm run package:win:bundle
               working-directory: client
