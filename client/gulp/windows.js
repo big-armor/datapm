@@ -87,7 +87,9 @@ exports.cleanMacOSInstaller = function () {
 };
 
 exports.writeCertificateFile = function () {
-    fs.writeFileSync("signing-certificate.p12", process.env.WINDOWS_CLIENT_CERTIFICATE_BASE64, { encoding: "base64" });
+    const base64EncodedString = process.env.WINDOWS_CLIENT_CERTIFICATE_BASE64;
+    const fileContents = Buffer.from(base64EncodedString, "base64").toString();
+    fs.writeFileSync("signing-certificate.p12", fileContents, { encoding: "base64" });
 
     return Promise.resolve();
 };
