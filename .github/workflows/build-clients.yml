@@ -74,8 +74,6 @@ jobs:
     buil-bundle-win-client:
         runs-on: windows-latest
         timeout-minutes: 15
-        needs:
-            - build-clients
         name: Build Windows Client Installer
         steps:
             - uses: actions/checkout@v2
