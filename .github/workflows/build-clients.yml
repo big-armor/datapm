@@ -71,7 +71,7 @@ jobs:
                   path: client/pkg-linux-arm64
                   retention-days: 1
 
-    buil-bundle-win-client:
+    build-bundle-win-client:
         runs-on: windows-latest
         timeout-minutes: 15
         name: Build Windows Client Installer
@@ -80,6 +80,14 @@ jobs:
 
             - name: Presinstall node-gyp cache
               run: npx node-gyp install 16.13.2
+
+            - name: Install Lib dependencies
+              working-directory: lib
+              run: npm ci
+
+            - name: Build Lib
+              working-directory: lib
+              run: npm run build
 
             - name: Install client dependencies
               working-directory: client

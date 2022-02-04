@@ -372,6 +372,14 @@ jobs:
             - name: Presinstall node-gyp cache
               run: npx node-gyp install 16.13.2
 
+            - name: Install Lib dependencies
+              working-directory: lib
+              run: npm ci
+
+            - name: Build Lib
+              working-directory: lib
+              run: npm run build
+
             - name: Install client dependencies
               working-directory: client
               run: npm ci
@@ -452,7 +460,7 @@ jobs:
         if: github.ref == 'refs/heads/master'
         needs:
             - bundle-macos-client
-            - bundle-win-client
+            - build-bundle-win-client
         env:
             INPUT_TOKEN: "" # See https://github.com/JS-DevTools/npm-publish/issues/15
         steps:
