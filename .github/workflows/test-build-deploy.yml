@@ -387,7 +387,10 @@ jobs:
         runs-on: macos-latest
         timeout-minutes: 25
         needs:
-            - build-clients
+            - testLib
+            - testBackend
+            - testFrontend
+            - testClient
         if: github.ref == 'refs/heads/master'
         name: Build MacOS Client Installer
         steps:
