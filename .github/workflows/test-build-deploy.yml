@@ -285,7 +285,7 @@ jobs:
               env:
                   CREDENTIALS_SECRET_KEY: test-key-not-for-production
 
-    build-clients:
+    build-client-linux-intel64:
         runs-on: ubuntu-latest
         timeout-minutes: 15
         needs:
@@ -294,7 +294,7 @@ jobs:
             - testFrontend
             - testClient
         if: github.ref == 'refs/heads/master'
-        name: Build client executables
+        name: Build Linux executables
         steps:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v2
@@ -302,7 +302,7 @@ jobs:
                   node-version: "16.13.2"
 
             - name: Install Build Tools
-              run: sudo apt-get install g++ gcc make qemu binfmt-support qemu-user-static
+              run: sudo apt-get install g++ gcc make
 
             - name: Install Lib Dependencies
               run: npm ci
@@ -320,43 +320,18 @@ jobs:
               run: npm run build
               working-directory: client
 
-            - name: Build MacOS executables
-              run: npm run package:macos
+            - name: Build Linux Intel64 executables
+              run: npm run package:linux:intel64
               working-directory: client
-
-            - name: Build Linux executables
-              run: npm run package:linux
-              working-directory: client
-
-            - name: "Save MacOS Intel 64bit Executable"
-              uses: actions/upload-artifact@v2
-              with:
-                  name: datapm-macos-intel64-executable
-                  path: client/pkg-macos-intel64
-                  retention-days: 1
-
-            - name: "Save MacOS ARM 64bit Executable"
-              uses: actions/upload-artifact@v2
-              with:
-                  name: datapm-macos-arm64-executable
-                  path: client/pkg-macos-arm64
-                  retention-days: 1
 
             - name: "Save Linux Intel 64bit Executable"
               uses: actions/upload-artifact@v2
               with:
-                  name: datapm-linux-intel64-executable
+                  name: datapm-macos-intel64-executable
                   path: client/pkg-linux-intel64
                   retention-days: 1
 
-            - name: "Save Linux ARM 64bit Executable"
-              uses: actions/upload-artifact@v2
-              with:
-                  name: datapm-linux-arm64-executable
-                  path: client/pkg-linux-arm64
-                  retention-days: 1
-
-    build-bundle-win-client:
+    build-client-windows-intel64:
         runs-on: windows-latest
         timeout-minutes: 15
         needs:
@@ -368,6 +343,9 @@ jobs:
         name: Build Windows Client Installer
         steps:
             - uses: actions/checkout@v2
+            - uses: actions/setup-node@v2-beta
+              with:
+                  node-version: "16.13.2"
 
             - name: Presinstall node-gyp cache
               run: npx node-gyp install 16.13.2
@@ -389,7 +367,7 @@ jobs:
               run: npm run build
 
             - name: Build Windows executables
-              run: npm run package:win
+              run: npm run package:win:intel64
               working-directory: client
 
             - run: npm run package:win:bundle
@@ -401,11 +379,11 @@ jobs:
             - name: "Save Windows Executable"
               uses: actions/upload-artifact@v2
               with:
-                  name: datapm-client-windows
-                  path: client/installers/windows/dist/datapm-*.msixbundle
+                  name: client-windows
+                  path: client/installers/windows/dist/datapm-*.msix
                   retention-days: 5
 
-    bundle-macos-client:
+    build-client-macos-intel64:
         runs-on: macos-latest
         timeout-minutes: 25
         needs:
@@ -419,17 +397,30 @@ jobs:
               id: package-version
               run: echo ::set-output name=DATAPM_VERSION::`jq .version package.json  | tr -d '"'`
 
-            - name: Download MacOS Intel64 Executable
-              uses: actions/download-artifact@v2
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v2
               with:
-                  name: datapm-macos-intel64-executable
-                  path: client/pkg-macos-intel64
+                  node-version: "16.13.2"
 
-            - name: Download MacOS ARM64 Executable
-              uses: actions/download-artifact@v2
-              with:
-                  name: datapm-macos-arm64-executable
-                  path: client/pkg-macos-arm64
+            - name: Install Lib Dependencies
+              run: npm ci
+              working-directory: lib
+
+            - name: Build Lib
+              run: npm run build
+              working-directory: lib
+
+            - name: Install client dependencies
+              run: npm ci
+              working-directory: client
+
+            - name: Run build
+              run: npm run build
+              working-directory: client
+
+            - name: Build MacOS Intel64 executables
+              run: npm run package:macos:intel64
+              working-directory: client
 
             - name: Codesign & Generate MacOS Installer
               env:
@@ -449,7 +440,7 @@ jobs:
             - name: "Create MacOS Installer Artifact"
               uses: actions/upload-artifact@v2
               with:
-                  name: datapm-client-macos
+                  name: client-macos
                   path: ./client/installers/macos/macOS-x64/target/pkg-signed/*.pkg
                   retention-days: 7
 
@@ -459,8 +450,8 @@ jobs:
         runs-on: ubuntu-latest
         if: github.ref == 'refs/heads/master'
         needs:
-            - bundle-macos-client
-            - build-bundle-win-client
+            - build-client-macos-intel64
+            - build-client-windows-intel64
         env:
             INPUT_TOKEN: "" # See https://github.com/JS-DevTools/npm-publish/issues/15
         steps:
@@ -528,13 +519,13 @@ jobs:
             - name: Download Windows Installer
               uses: actions/download-artifact@v2
               with:
-                  name: datapm-client-windows
+                  name: client-windows
                   path: dist/client-installers
 
             - name: Download MacOS Installer
               uses: actions/download-artifact@v2
               with:
-                  name: datapm-client-macos
+                  name: client-macos
                   path: dist/client-installers
 
             - name: Build Registry Docker Container

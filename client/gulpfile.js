@@ -47,52 +47,37 @@ const {
 const { cleanDist } = require("./gulp/common");
 const { series } = require("gulp");
 
-exports.buildWindows = series(
+exports.buildWindowsIntel64 = series(
     cleanWin64,
     runPkgWin64,
     copyDepsWin64,
     copyAssetsWin64,
     copyAppManifiestWin64,
+    writeCertificateFile,
+    createMsiWin64,
+    signMsiWin64
+);
+
+exports.buildWindowsArm64 = series(
     cleanWindowsArm64,
     runPkgWindowsArm64,
     copyDepsWindowsArm64,
     copyAssetsWindowsArm64,
-    copyAppManifiestWindowsArm64
-);
-
-exports.signAndBundleWindows = series(
+    copyAppManifiestWindowsArm64,
     writeCertificateFile,
-    createMsiWin64,
-    signMsiWin64,
     createMsiWindowsArm64,
-    signMsiWindowsArm64,
-    bundleWinInstallers,
-    signWinBundle
+    signMsiWindowsArm64
 );
 
 exports.bundleWindows = series(bundleWinInstallers, signWinBundle);
 
-exports.buildMacOS = series(
-    cleanMacArm64,
-    runPkgMacArm64,
-    copyDepsMacArm64,
-    copyAssetsMacArm64,
-    cleanMacIntel64,
-    runPkgMacIntel64,
-    copyDepsMacIntel64,
-    copyAssetsMacIntel64
-);
+exports.buildMacOSArm64 = series(cleanMacArm64, runPkgMacArm64, copyDepsMacArm64, copyAssetsMacArm64);
 
-exports.buildLinux = series(
-    cleanLinuxArm64,
-    runPkgLinuxArm64,
-    copyDepsLinuxArm64,
-    copyAssetsLinuxArm64,
-    cleanLinuxIntel64,
-    runPkgLinuxIntel64,
-    copyDepsLinuxIntel64,
-    copyAssetsLinuxIntel64
-);
+exports.buildMacIntel64 = series(cleanMacIntel64, runPkgMacIntel64, copyDepsMacIntel64, copyAssetsMacIntel64);
+
+exports.buildLinuxIntel64 = series(cleanLinuxIntel64, runPkgLinuxIntel64, copyDepsLinuxIntel64, copyAssetsLinuxIntel64);
+
+exports.buildLinuxArm64 = series(cleanLinuxArm64, runPkgLinuxArm64, copyDepsLinuxArm64, copyAssetsLinuxArm64);
 
 exports.clean = series(
     cleanDist,

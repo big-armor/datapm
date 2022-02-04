@@ -1,10 +1,10 @@
+**/node_modules
 node_modules
 npm-debug.log
 .git
 .terraform
-node_modules
-frontend
-backend
-backend
-docs
-lib
+client/installers/macos/macOS-x64/application/*
+client/pkg-*
+**/dist
+dist
+backend/tmp-registry-server-*
