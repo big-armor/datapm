@@ -59,7 +59,7 @@ exports.signMsiWin64 = function () {
             "sign",
             "/debug",
             "/fd",
-            "certHash",
+            "SHA1",
             "/a",
             "/f",
             "signing-certificate.p12",
@@ -121,7 +121,7 @@ exports.signMsiWindowsArm64 = function () {
     return spawnAndLog("sign-arm64", "C:\\Program Files (x86)\\Windows Kits\\10\\App Certification Kit\\signtool.exe", [
         "sign",
         "/fd",
-        "certHash",
+        "SHA1",
         "/a",
         "/f",
         "signing-certificate.p12",
@@ -152,7 +152,7 @@ exports.signWinBundle = function () {
         [
             "sign",
             "/fd",
-            "certHash",
+            "SHA1",
             "/a",
             "/f",
             "signing-certificate.p12",
