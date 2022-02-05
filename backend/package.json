@@ -25,7 +25,7 @@
         "url": "git+https://github.com/big-armor/datapm-registery.git"
     },
     "author": "Travis Collins",
-    "license": "CC-BY-NC-ND-4.0",
+    "license": "https://datapm.io/docs/license",
     "bugs": {
         "url": "https://github.com/big-armor/datapm-registry/issues"
     },

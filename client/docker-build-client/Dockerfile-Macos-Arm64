@@ -1,0 +1,38 @@
+FROM arm64v8/ubuntu:20.04
+
+# Must be run from tkhe root of the project (not the client directory)
+
+COPY . /datapm/src
+
+RUN apt update
+
+RUN apt-get install -y gcc g++ make curl python3
+
+ENV NODE_VERSION 16.13.2
+
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash \ 
+    && . ~/.nvm/nvm.sh \
+    && nvm install $NODE_VERSION \
+    && nvm alias default $NODE_VERSION \
+    && nvm use default
+
+ENV NODE_PATH ~/.nvm/versions/node/v$NODE_VERSION/lib/node_modules
+ENV PATH      ~/.nvm/versions/node/v$NODE_VERSION/bin:$PATH
+
+RUN ln -sf ~/.nvm/versions/node/v$NODE_VERSION/bin/node /usr/bin/nodejs
+RUN ln -sf ~/.nvm/versions/node/v$NODE_VERSION/bin/node /usr/bin/node
+RUN ln -sf ~/.nvm/versions/node/v$NODE_VERSION/bin/npm /usr/bin/npm
+RUN ln -sf ~/.nvm/versions/node/v$NODE_VERSION/bin/npx /usr/bin/npx
+
+WORKDIR /datapm/src/lib
+
+RUN npm ci
+RUN npm run build
+
+WORKDIR /datapm/src/client
+
+RUN npm ci 
+RUN npm run build
+
+RUN npm run package:macos:arm64
+

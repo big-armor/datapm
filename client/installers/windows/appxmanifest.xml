@@ -1,48 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Package
-	xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
-    xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3"
-  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-  IgnorableNamespaces="uap3">
-  <Identity Name="DataPM" Version="0.0.1.0"  Publisher="O=DataPM, C=US" ProcessorArchitecture="x86" />
-    <Properties>
-       <DisplayName>DataPM Client</DisplayName>
-       <PublisherDisplayName>DataPM</PublisherDisplayName>
-			 <Description>The DataPM command line client for windows.</Description>
-      <Logo>assets/datapm-logo.jpg</Logo>
-    </Properties>
-    <Resources>
-      <Resource Language="en-us" />
-    </Resources>
-	  <Dependencies>
-	  <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19042.867" MaxVersionTested="10.0.19042.867" />
-	  </Dependencies>
-	  <Capabilities>
-	    <rescap:Capability Name="runFullTrust"/>
-	  </Capabilities>
-    <Applications>
-      <Application Id="datapmClient" Executable="datapm.exe" EntryPoint="Windows.FullTrustApplication">
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" IgnorableNamespaces="uap3">
+  <Identity Name="DataPM" Version="0.0.1.0" Publisher="CN=TTSEK LLC, O=Big Armor, L=Fairfax, S=Virginia, C=US" ProcessorArchitecture="x86" />
+  <Properties>
+    <DisplayName>DataPM Client</DisplayName>
+    <PublisherDisplayName>Big Armor</PublisherDisplayName>
+    <Description>The DataPM command line client for windows.</Description>
+    <Logo>assets/datapm-logo.jpg</Logo>
+  </Properties>
+  <Resources>
+    <Resource Language="en-us" />
+  </Resources>
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19042.867" MaxVersionTested="10.0.19042.867" />
+  </Dependencies>
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust"/>
+  </Capabilities>
+  <Applications>
+    <Application Id="datapmClient" Executable="datapm.exe" EntryPoint="Windows.FullTrustApplication">
 
-   <uap:VisualElements DisplayName="DataPM Command Line Client" 
-   Square150x150Logo="assets\datapm-logo.jpg" 
-   Square44x44Logo="assets\datapm-logo.jpg" 
-   Description="The DataPM command line client for windows." 
-   BackgroundColor="#0078d7" 
-   AppListEntry="none"/>
-   <Extensions>
-     <uap3:Extension Category="windows.appExtensionHost">
-       <uap3:AppExtensionHost>
-         <uap3:Name>com.datapm</uap3:Name>
-       </uap3:AppExtensionHost>
-     </uap3:Extension>
-     <uap3:Extension Category="windows.appExecutionAlias">
-       <uap3:AppExecutionAlias>
-         <desktop:ExecutionAlias Alias="datapm.exe"/>
-       </uap3:AppExecutionAlias>
-     </uap3:Extension>
-   </Extensions>
-</Application>
-     </Applications>
-  </Package>
+      <uap:VisualElements DisplayName="DataPM Command Line Client" Square150x150Logo="assets\datapm-logo.jpg" Square44x44Logo="assets\datapm-logo.jpg" Description="The DataPM command line client for windows." BackgroundColor="#0078d7" AppListEntry="none"/>
+      <Extensions>
+        <uap3:Extension Category="windows.appExtensionHost">
+          <uap3:AppExtensionHost>
+            <uap3:Name>com.datapm</uap3:Name>
+          </uap3:AppExtensionHost>
+        </uap3:Extension>
+        <uap3:Extension Category="windows.appExecutionAlias">
+          <uap3:AppExecutionAlias>
+            <desktop:ExecutionAlias Alias="datapm.exe"/>
+          </uap3:AppExecutionAlias>
+        </uap3:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+</Package>
