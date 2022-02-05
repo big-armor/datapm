@@ -383,7 +383,7 @@ jobs:
               uses: actions/upload-artifact@v2
               with:
                   name: client-windows
-                  path: client/installers/windows/dist/datapm-*.msix
+                  path: client/installers/windows/dist/datapm-*.msixbundle
                   retention-days: 5
 
     build-client-macos-intel64:
@@ -458,6 +458,7 @@ jobs:
         needs:
             - build-client-macos-intel64
             - build-client-windows-intel64
+            - build-client-linux-intel64
         env:
             INPUT_TOKEN: "" # See https://github.com/JS-DevTools/npm-publish/issues/15
         steps:
