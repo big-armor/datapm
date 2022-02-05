@@ -625,13 +625,13 @@ jobs:
             - name: Download Windows Installer
               uses: actions/download-artifact@v2
               with:
-                  name: datapm-client-windows
+                  name: client-windows
                   path: dist/client-installers
 
             - name: Download MacOS Installer
               uses: actions/download-artifact@v2
               with:
-                  name: datapm-client-macos
+                  name: client-macos
                   path: dist/client-installers
 
             - name: Find DataPM Version

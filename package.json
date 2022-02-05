@@ -68,6 +68,7 @@
         "why-is-node-running": "^2.2.0"
     },
     "dependencies": {
+        "apollo": "^2.33.9",
         "through2": "^4.0.2"
     },
     "husky": {
