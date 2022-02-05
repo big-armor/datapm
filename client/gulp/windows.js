@@ -57,6 +57,7 @@ exports.signMsiWin64 = function () {
         "C:\\Program Files (x86)\\Windows Kits\\10\\App Certification Kit\\signtool.exe",
         [
             "sign",
+            "/debug",
             "/fd",
             "SHA256",
             "/a",
