@@ -43,6 +43,7 @@ exports.createMsiWin64 = function () {
         "C:\\Program Files (x86)\\Windows Kits\\10\\App Certification Kit\\makeappx.exe",
         [
             "pack",
+            "/o",
             "/d",
             "pkg-windows-intel64",
             "/p",
@@ -59,7 +60,7 @@ exports.signMsiWin64 = function () {
             "sign",
             "/debug",
             "/fd",
-            "SHA1",
+            "SHA256",
             "/a",
             "/f",
             "signing-certificate.p12",
@@ -110,6 +111,7 @@ exports.copyAppManifiestWindowsArm64 = function () {
 exports.createMsiWindowsArm64 = function () {
     return spawnAndLog("msi-arm64", "C:\\Program Files (x86)\\Windows Kits\\10\\App Certification Kit\\makeappx.exe", [
         "pack",
+        "/o",
         "/d",
         "pkg-windows-arm64",
         "/p",
@@ -121,7 +123,7 @@ exports.signMsiWindowsArm64 = function () {
     return spawnAndLog("sign-arm64", "C:\\Program Files (x86)\\Windows Kits\\10\\App Certification Kit\\signtool.exe", [
         "sign",
         "/fd",
-        "SHA1",
+        "SHA256",
         "/a",
         "/f",
         "signing-certificate.p12",
@@ -137,6 +139,7 @@ exports.bundleWinInstallers = function () {
         "C:\\Program Files (x86)\\Windows Kits\\10\\App Certification Kit\\makeappx.exe",
         [
             "bundle",
+            "/o",
             "/d",
             "installers/windows/dist",
             "/p",
@@ -152,7 +155,7 @@ exports.signWinBundle = function () {
         [
             "sign",
             "/fd",
-            "SHA1",
+            "SHA256",
             "/a",
             "/f",
             "signing-certificate.p12",
