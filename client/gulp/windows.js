@@ -108,7 +108,7 @@ exports.copyAppManifiestWindowsArm64 = function () {
 };
 
 exports.createMsiWindowsArm64 = function () {
-    return spawnAndLog("msi-arm64", "makeappx.exe", [
+    return spawnAndLog("msi-arm64", "C:\\Program Files (x86)\\Windows Kits\\10\\App Certification Kit\\makeappx.exe", [
         "pack",
         "/d",
         "pkg-windows-arm64",
