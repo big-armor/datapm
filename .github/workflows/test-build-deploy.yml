@@ -617,8 +617,9 @@ jobs:
         name: "Client Releases on GitHub"
         if: github.ref == 'refs/heads/master'
         needs:
-            - "build-client-macos-intel64"
-            - "build-client-windows-intel64"
+            - build-client-macos-intel64
+            - build-client-windows-intel64
+            - build-client-linux-intel64
         steps:
             - name: Checkout
               uses: actions/checkout@v2
