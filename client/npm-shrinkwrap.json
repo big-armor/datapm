@@ -1,12 +1,12 @@
 {
     "name": "datapm-client",
-    "version": "0.8.39",
+    "version": "0.8.40",
     "lockfileVersion": 2,
     "requires": true,
     "packages": {
         "": {
             "name": "datapm-client",
-            "version": "0.8.39",
+            "version": "0.8.40",
             "license": "https://datapm.io/docs/license",
             "dependencies": {
                 "@apollo/client": "^3.2.5",
