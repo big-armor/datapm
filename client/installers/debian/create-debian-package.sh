@@ -13,7 +13,7 @@ mkdir -p build/DEBIAN
 
 # Move files into place
 echo "Copy package files..."
-cp changelog control datapm-client.links datapm-client.install rules build/DEBIAN
+cp changelog control datapm-client.links datapm-client.install postinstall prerm build/DEBIAN
 
 # Move build files into place
 echo "Copy source..."

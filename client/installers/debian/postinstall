@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e
+
+DATAPM_LOCATION="/usr/lib/datapm/datapm"
+
+if [ -d $DATAPM_LOCATION ]; then
+     rm -rf $DATAPM_LOCATION
+fi
+
+ln -s $DATAPM_LOCATION /usr/bin/datapm
+
+exit 0
