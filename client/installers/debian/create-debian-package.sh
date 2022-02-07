@@ -8,7 +8,7 @@ rm -rf build || true
 rm -f *.deb || true
 
 # Create disk file
-mkdir -p build/DEBIAN
+mkdir -p build/debian
 
 
 # Move files into place
