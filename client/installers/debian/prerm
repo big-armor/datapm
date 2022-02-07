@@ -2,10 +2,9 @@
 
 set -e
 
-DATAPM_LOCATION="/usr/lib/datapm/datapm"
-
-if [ -f $DATAPM_LOCATION ]; then
-     rm -f $DATAPM_LOCATION
+DATAPM_LINK_LOCATION="/usr/bin/datapm"
+if [ -f $DATAPM_LINK_LOCATION ]; then
+     rm -f $DATAPM_LINK_LOCATION
 fi
 
 exit 0
