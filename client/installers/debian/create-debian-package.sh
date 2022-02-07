@@ -21,7 +21,7 @@ cp -R ../../pkg-linux-intel64/* build/debian/source
 
 # Extract version number from package.json
 DATAPM_VERSION=`jq .version ../../../package.json  | tr -d '"'`
-ecoh "DATAPM_VERSION: $DATAPM_VERSION"
+echo "DATAPM_VERSION: $DATAPM_VERSION"
 
 # Replace version number in control file
 echo "Replacing datapm version in control file..."
