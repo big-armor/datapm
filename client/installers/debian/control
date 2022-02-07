@@ -1,14 +1,10 @@
 Source: datapm-client
-Section: unknown
-Priority: optional
-Maintainer: Travis Collins <hello@bigarmor.com>
-Build-Depends: debhelper-compat (= 12), libsecret-1-0
-Standards-Version: 4.4.1
-Homepage: https://datapm.io
-
+Version: x.x.x
 Package: datapm-client
+Homepage: https://datapm.io
+Maintainer: Travis Collins <hello@bigarmor.com>
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: libsecret-1-0
 Description: DataPM is a package manager for data. See more at https://datapm.io
     DataPM is a package manager for data. You can publish packages to a registry,
     such as https://datapm.io (or host your own registry). You an consume pages
