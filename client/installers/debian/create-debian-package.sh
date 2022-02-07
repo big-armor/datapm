@@ -8,11 +8,11 @@ rm -rf build || true
 rm -f *.deb || true
 
 # Create disk file
-mkdir -p build/debian
+mkdir -p build/DEBIAN
 
 
 # Move files into place
-cp datapm-client.links control build/debian
+cp datapm-client.links control build/DEBIAN
 
 # Move build files into place
 cp -R ../../pkg-linux-intel64/* build
@@ -21,7 +21,7 @@ cp -R ../../pkg-linux-intel64/* build
 DATAPM_VERSION=`jq .version ../../../package.json  | tr -d '"'`
 
 # Replace version number in control file
-sed -i "s/x\.x\.x/$DATAPM_VERSION/g" build/debian/control
+sed -i "s/x\.x\.x/$DATAPM_VERSION/g" build/DEBIAN/control
 
 # Build package file
 dpkg-deb --build build
