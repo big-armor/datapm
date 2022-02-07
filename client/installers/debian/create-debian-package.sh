@@ -9,7 +9,7 @@ rm -f *.deb || true
 
 # Create directory
 echo "Creating build directory..."
-mkdir -p build/
+mkdir -p build/DEBIAN
 
 # Move files into place
 echo "Copy package files..."
