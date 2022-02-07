@@ -302,7 +302,7 @@ jobs:
                   node-version: "16.13.2"
 
             - name: Install Build Tools
-              run: sudo apt-get install g++ gcc make jq git-buildpackage dh-make libsecret-1-0
+              run: sudo apt-get install g++ gcc make jq git-buildpackage libsecret-1-0
 
             - name: Install Lib Dependencies
               run: npm ci
