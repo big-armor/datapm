@@ -369,6 +369,10 @@ async function main() {
                 installerFileNameEndsWith = ".pkg";
                 break;
             }
+            case "debian": {
+                installerFileNameEndsWith = ".deb";
+                break;
+            }
             default:  {
                 res.sendStatus(404);
                 return;
