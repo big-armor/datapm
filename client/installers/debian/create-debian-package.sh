@@ -24,7 +24,8 @@ DATAPM_VERSION=`jq .version ../../../package.json  | tr -d '"'`
 sed -i "s/x\.x\.x/$DATAPM_VERSION/g" build/debian/control
 
 # Build package file
-dpkg-deb --build build
+dpkg-buildpackage -uc -tc -rfakeroot
 
-# Rename package file
-mv build.deb datapm-client_${DATAPM_VERSION}_x64.deb
+# Build Package
+dpkg --contents ../datapm-client_$DATAPM_VERSION*.deb
+
