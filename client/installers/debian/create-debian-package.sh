@@ -12,7 +12,7 @@ mkdir -p build/DEBIAN
 
 
 # Move files into place
-cp datapm-client.links postinstall control build/DEBIAN
+cp datapm-client.links control build/debian
 
 # Move build files into place
 cp -R ../../pkg-linux-intel64/* build
