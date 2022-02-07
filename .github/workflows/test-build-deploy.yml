@@ -331,7 +331,7 @@ jobs:
             - name: "Save Debian Intell64 Package"
               uses: actions/upload-artifact@v2
               with:
-                  name: datapm-macos-intel64-executable
+                  name: client-debian
                   path: client/installers/debian/datapm-*.deb
                   retention-days: 1
 
@@ -539,6 +539,12 @@ jobs:
                   name: client-macos
                   path: dist/client-installers
 
+            - name: Download Debian Installer
+              uses: actions/download-artifact@v2
+              with:
+                  name: client-debian
+                  path: dist/client-installers
+
             - name: Build Registry Docker Container
               run: gulp buildRegistryDockerImage
 
@@ -640,6 +646,12 @@ jobs:
                   name: client-macos
                   path: dist/client-installers
 
+            - name: Download Debian Installer
+              uses: actions/download-artifact@v2
+              with:
+                  name: client-debian
+                  path: dist/client-installers
+
             - name: Find DataPM Version
               id: datapm-version
               run: echo ::set-output name=DATAPM_VERSION::`jq .version package.json  | tr -d '"'`
@@ -659,6 +671,7 @@ jobs:
                   files: |
                       dist/client-installers/*.msixbundle
                       dist/client-installers/*.pkg
+                      dist/client-installers/*.deb
 
     bumpVersion:
         name: "Bump Package Versions"
