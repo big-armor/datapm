@@ -1,13 +1,13 @@
 Source: datapm-client
 Section: unknown
 Priority: optional
-Version: x.x.x
 Maintainer: Travis Collins <hello@bigarmor.com>
 Build-Depends: debhelper-compat (= 12)
 Standards-Version: 4.4.1
 Homepage: https://datapm.io
 
 Package: datapm-client
+Version: x.x.x
 Architecture: amd64
 Depends: ${misc:Depends}
 Description: DataPM is a package manager for data. See more at https://datapm.io
