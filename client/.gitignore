@@ -24,3 +24,5 @@ temp
 *.p12
 *.pfx
 windows-installers
+
+*.deb

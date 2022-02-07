@@ -1,0 +1,5 @@
+Package: datapm-client
+Version: x.x.x
+Maintainer: Travis Collins
+Architecture: all
+Description: DataPM is a package manager for data. See more at https://datapm.io
