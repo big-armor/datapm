@@ -21,7 +21,7 @@ cp -R ../../pkg-linux-intel64/* build
 DATAPM_VERSION=`jq .version ../../../package.json  | tr -d '"'`
 
 # Replace version number in control file
-sed -i "s/x\.x\.x/$DATAPM_VERSION/g" build/DEBIAN/control
+sed -i "s/x\.x\.x/$DATAPM_VERSION/g" build/debian/control
 
 # Build package file
 dpkg-deb --build build
