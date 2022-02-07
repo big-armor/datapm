@@ -29,11 +29,7 @@ sed -i "s/x\.x\.x/$DATAPM_VERSION/g" build/debian/changelog
 
 
 # Build package file
-echo "Building package..."
-cd build
-dpkg-buildpackage -uc -tc -rfakeroot
+dpkg-deb --build build
 
-# Build Package
-echo "Creating Package"
-dpkg --contents ../datapm-client_$DATAPM_VERSION*.deb
-
+# Rename package file
+mv build.deb datapm-client_${DATAPM_VERSION}_x64.deb
