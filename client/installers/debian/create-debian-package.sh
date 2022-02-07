@@ -27,4 +27,4 @@ sed -i "s/x\.x\.x/$DATAPM_VERSION/g" build/DEBIAN/control
 dpkg-deb --build build
 
 # Rename package file
-mv build.deb datapm-$DATAPM_VERSION-x64.deb
+mv build.deb datapm-client_$DATAPM_VERSION_x64.deb
