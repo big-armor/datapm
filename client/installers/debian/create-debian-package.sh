@@ -10,9 +10,8 @@ rm -f *.deb || true
 # Create disk file
 mkdir -p build/debian/source
 
-
 # Move files into place
-cp control datapm-client.links datapm-client.install rules build/debian
+cp changelog control datapm-client.links datapm-client.install rules build/debian
 
 # Move build files into place
 cp -R ../../pkg-linux-intel64/* build/debian/source

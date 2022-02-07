@@ -302,7 +302,7 @@ jobs:
                   node-version: "16.13.2"
 
             - name: Install Build Tools
-              run: sudo apt-get install g++ gcc make jq
+              run: sudo apt-get install g++ gcc make jq git-buildpackage dh-make
 
             - name: Install Lib Dependencies
               run: npm ci
