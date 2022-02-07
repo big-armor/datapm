@@ -11,7 +11,6 @@ terraform.tfvars*
 client-installers/
 
 # Build files from pkg 
-datapm-client*
 
 .DS_Store
 
