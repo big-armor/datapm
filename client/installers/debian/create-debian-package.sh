@@ -9,7 +9,7 @@ rm -f *.deb || true
 
 # Create directory
 echo "Creating build directory..."
-mkdir -p build/DEBIAN/source
+mkdir -p build/
 
 # Move files into place
 echo "Copy package files..."
@@ -17,7 +17,7 @@ cp changelog control datapm-client.links datapm-client.install rules build/DEBIA
 
 # Move build files into place
 echo "Copy source..."
-cp -R ../../pkg-linux-intel64/* build/DEBIAN/source
+cp -R ../../pkg-linux-intel64/* build/
 
 # Extract version number from package.json
 DATAPM_VERSION=`jq .version ../../../package.json  | tr -d '"'`
