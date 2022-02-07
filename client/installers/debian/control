@@ -1,8 +1,7 @@
 Package: datapm-client
-SourcE: datapm-client-source
+Source: datapm-client-source
 Version: x.x.x
 Maintainer: Travis Collins
 Homepage: https://datapm.io
 Architecture: amd64
-
 Description: DataPM is a package manager for data. See more at https://datapm.io
