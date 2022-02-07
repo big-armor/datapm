@@ -25,6 +25,7 @@ echo "DATAPM_VERSION: $DATAPM_VERSION"
 
 # Replace version number in control file
 echo "Replacing datapm version in control file..."
+sed -i "s/x\.x\.x/$DATAPM_VERSION/g" build/DEBIAN/control
 sed -i "s/x\.x\.x/$DATAPM_VERSION/g" build/DEBIAN/changelog
 
 
