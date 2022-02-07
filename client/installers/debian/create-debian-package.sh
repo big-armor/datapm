@@ -17,7 +17,7 @@ cp changelog control datapm-client.links datapm-client.install rules build/DEBIA
 
 # Move build files into place
 echo "Copy source..."
-cp -R ../../pkg-linux-intel64/* build/debian/DEBIAN
+cp -R ../../pkg-linux-intel64/* build/DEBIAN/source
 
 # Extract version number from package.json
 DATAPM_VERSION=`jq .version ../../../package.json  | tr -d '"'`
