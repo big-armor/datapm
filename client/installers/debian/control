@@ -1,0 +1,12 @@
+Source: datapm-client-source
+Version: x.x.x
+Package: datapm-client
+Homepage: https://datapm.io
+Maintainer: Travis Collins <hello@bigarmor.com>
+Architecture: amd64
+Depends: libsecret-1-0
+Description: DataPM is a package manager for data. See more at https://datapm.io
+    DataPM is a package manager for data. You can publish packages to a registry,
+    such as https://datapm.io (or host your own registry). You an consume pages
+    and ETL them directly to a database, file system, or cloud storage system using
+    the datapm client in this package.

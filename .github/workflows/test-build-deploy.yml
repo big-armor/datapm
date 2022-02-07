@@ -302,7 +302,7 @@ jobs:
                   node-version: "16.13.2"
 
             - name: Install Build Tools
-              run: sudo apt-get install g++ gcc make
+              run: sudo apt-get install g++ gcc make jq git-buildpackage libsecret-1-0
 
             - name: Install Lib Dependencies
               run: npm ci
@@ -324,11 +324,15 @@ jobs:
               run: npm run package:linux:intel64
               working-directory: client
 
-            - name: "Save Linux Intel 64bit Executable"
+            - name: Build Debian Intel64 Package
+              run: ./create-debian-package.sh
+              working-directory: client/installers/debian
+
+            - name: "Save Debian Intell64 Package"
               uses: actions/upload-artifact@v2
               with:
-                  name: datapm-macos-intel64-executable
-                  path: client/pkg-linux-intel64
+                  name: client-debian
+                  path: client/installers/debian/datapm-*.deb
                   retention-days: 1
 
     build-client-windows-intel64:
@@ -535,6 +539,12 @@ jobs:
                   name: client-macos
                   path: dist/client-installers
 
+            - name: Download Debian Installer
+              uses: actions/download-artifact@v2
+              with:
+                  name: client-debian
+                  path: dist/client-installers
+
             - name: Build Registry Docker Container
               run: gulp buildRegistryDockerImage
 
@@ -636,6 +646,12 @@ jobs:
                   name: client-macos
                   path: dist/client-installers
 
+            - name: Download Debian Installer
+              uses: actions/download-artifact@v2
+              with:
+                  name: client-debian
+                  path: dist/client-installers
+
             - name: Find DataPM Version
               id: datapm-version
               run: echo ::set-output name=DATAPM_VERSION::`jq .version package.json  | tr -d '"'`
@@ -655,6 +671,7 @@ jobs:
                   files: |
                       dist/client-installers/*.msixbundle
                       dist/client-installers/*.pkg
+                      dist/client-installers/*.deb
 
     bumpVersion:
         name: "Bump Package Versions"

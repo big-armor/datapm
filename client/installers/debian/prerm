@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e
+
+DATAPM_LINK_LOCATION="/usr/bin/datapm"
+if [ -f $DATAPM_LINK_LOCATION ]; then
+     rm -f $DATAPM_LINK_LOCATION
+fi
+
+exit 0
