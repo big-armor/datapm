@@ -45,11 +45,12 @@ export async function handleSearch(argv: SearchArguments): Promise<void> {
     }
 
     if (argv.query == null) {
+        console.log("Below you can use basic boolean logic (& |)");
         const queryPromptResult = await prompts(
             {
                 type: "text",
                 name: "query",
-                message: "Search query with basic boolean logic (&, |)?",
+                message: "Search terms?",
                 validate: (value) => {
                     if (!value) return "Search query required";
                     return true;

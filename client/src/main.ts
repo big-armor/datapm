@@ -14,7 +14,7 @@ import { UpdateCommand } from "./command/UpdateCommand";
 import { FallbackCommand } from "./command/FallbackCommand";
 import { RepositoryCommand } from "./command/RepositoryCommand";
 import { EditCommand } from "./command/EditCommand";
-import path from "path";
+import { readDataPMVersion } from "./util/DatapmVersionUtil";
 
 let argv = yargs;
 
@@ -44,9 +44,11 @@ commands.forEach((command) => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 if ((argv as any).quiet === undefined) {
+    const version = readDataPMVersion();
+
     console.log("");
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    console.log("datapm client version " + require(path.join(__dirname, "..", "package.json")).version);
+    console.log("datapm client version " + version);
     console.log("");
 }
 
