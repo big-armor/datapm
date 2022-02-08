@@ -15,6 +15,41 @@ body {
     background-color: var(--body-background);
 }
 
+.beta {
+    color: red !important;
+    font-size: 12px;
+}
+
+.navigationSlider .slidingNav ul li {
+    box-shadow: none;
+    border: 1px solid var(--lightgray-2-color);
+    background: var(--custom-light-color);
+    border-radius: 3px;
+}
+.navigationSlider .slidingNav ul li a:hover,
+.navigationSlider .slidingNav ul li a:active,
+.navigationSlider .slidingNav ul li a:focus,
+.navigationSlider .slidingNav ul li a:focus-within {
+    background-color: var(--lightgray-2-color);
+    text-decoration: none;
+    color: var(--gray-3-color);
+}
+.navigationSlider .slidingNav ul li:hover {
+    background-color: var(--custom-light-color);
+}
+.navigationSlider .slidingNav ul li a {
+    font-family: "RobotoLight";
+    font-style: normal;
+    font-weight: normal;
+    font-size: 15px;
+    line-height: 20px;
+    align-items: center;
+    text-align: center;
+    color: var(--gray-3-color);
+    text-transform: none;
+    padding: 5px 25px;
+}
+
 @media only screen and (max-width: 576px) {
     .footer-wrapper {
         display: block !important;
@@ -42,44 +77,13 @@ body {
         top: 115px;
         flex: 0 0 190px;
     }
-    .navigationSlider .slidingNav ul li {
-        box-shadow: none;
-        border: 1px solid var(--lightgray-2-color);
-        background: var(--custom-light-color);
-        border-radius: 3px;
-    }
-    .navigationSlider .slidingNav ul li a:hover,
-    .navigationSlider .slidingNav ul li a:active,
-    .navigationSlider .slidingNav ul li a:focus,
-    .navigationSlider .slidingNav ul li a:focus-within {
-        background-color: var(--lightgray-2-color);
-        text-decoration: none;
-        color: var(--gray-3-color);
-    }
-    .navigationSlider .slidingNav ul li:hover {
-        background-color: var(--custom-light-color);
-    }
-    .navigationSlider .slidingNav ul li a {
-        font-family: "RobotoLight";
-        font-style: normal;
-        font-weight: normal;
-        font-size: 15px;
-        line-height: 20px;
-        align-items: center;
-        text-align: center;
-        color: var(--gray-3-color);
-        text-transform: none;
-        padding: 5px 25px;
-    }
+
     .toc {
         padding: 25px 0;
     }
 }
 
 @media only screen and (max-width: 1023px) {
-    .fixedHeaderContainer header .headerTitle {
-        margin-bottom: 30px;
-    }
     .mainContainer .wrapper .post .postHeaderTitle {
         margin-top: 15px;
     }
@@ -107,6 +111,18 @@ body {
     .tocActive .onPageNav,
     .docsSliderActive .toc section .navGroups {
         background-color: var(--body-background);
+    }
+
+    .navigationSlider .slidingNav ul {
+        width: 25%;
+        float: right;
+        position: relative;
+        top: -40px;
+        left: -25px;
+    }
+
+    .navigationSlider .slidingNav ul li a {
+        padding: 0px 15px;
     }
 }
 
@@ -376,7 +392,7 @@ table tr:nth-child(even) {
 }
 
 .fixedHeaderContainer {
-    padding: 25px 0px;
+    padding: 25px 0px 10px; /** Remove bottom padding after removing beta banner */
     background-color: var(--body-background);
     background: var(--body-background);
     box-shadow: none;

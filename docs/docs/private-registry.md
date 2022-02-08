@@ -6,6 +6,10 @@ sidebar_label: Private Registry
 
 You can host your own DataPM registry for private or public use. Be sure to read the DataPM Software License page to learn about allowed and not allowed uses of DataPM software.
 
+## Beta Software Notice
+
+DataPM is currently software that is in beta preview. You are welcome to use it within the constraints of the [license](license.md) - but you should be very careful about using it in production.
+
 ## Hosting via Docker
 
 Docker compose is the simplest method to deploy a DataPM Registry and supporting Postgres server. Use the following template as a start - or adapt it for your Kubernetes.
