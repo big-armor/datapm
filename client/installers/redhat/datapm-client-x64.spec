@@ -18,7 +18,7 @@ mkdir -p build/BUILDROOT/datapm-client-${RPM_PACKAGE_VERSION}-${RPM_PACKAGE_RELE
 cp -R ../../../../pkg-linux-intel64/* build/BUILDROOT/datapm-client-${RPM_PACKAGE_VERSION}-${RPM_PACKAGE_RELEASE}.${RPM_ARCH}/
 
 %install
-
+echo "Install"
 
 %clean
 rm -rf $RPM_BUILD_ROOT
