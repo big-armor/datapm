@@ -29,6 +29,9 @@ ln -s %{base_install_dir}/datapm /usr/bin/datapm
 %postun
 rm -f /usr/bin/datapm
 
+%files
+%defattr(-,root,root,-)
+
 %changelog
 * Mon Feb 07 2021 Travis Collins <hello@datapm.io> - 0.0.1
 - These changelogs are not maintained.
