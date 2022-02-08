@@ -2,7 +2,7 @@ Name:           datapm-client
 Version:        x.x.x
 Release:        1%{?dist}
 Summary:        A simple hello world script
-BuildArch:      noarch
+BuildArch:      x86_64
 URL:            https://datapm.io
 License:        https://datapm.io/docs/license
 Source0:        %{name}-%{version}.tar.gz
