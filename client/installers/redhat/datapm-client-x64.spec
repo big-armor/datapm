@@ -9,7 +9,7 @@ Source0:        %{name}-%{version}.tar.gz
 
 Requires:       bash libsecret
 
-%descriFtion
+%description
 DataPM is a package manager for data. See more at https://datapm.io
 
 %prep
