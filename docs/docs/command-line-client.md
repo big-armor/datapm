@@ -35,7 +35,7 @@ If you are using the GUI, double click on the file and follow the onscreen instr
 If you are using the command line, run the following command, replacing the last argument with a path to the downloaded file.
 
 ```text
-sudo apt-get install -f <path-to-datapm-client.deb>
+sudo apt-get install -f &lt;path-to-datapm-client.deb&gt;
 ```
 
 ### Redhat & Centos Installation
@@ -45,7 +45,7 @@ If you are using the GUI, double click on the file and follow the onscreen instr
 If you are using the command line, run the following command, replacing the last argument with a path to the downloaded file.
 
 ```text
-sudo yum install localinstall <path-to-datapm-client.rpm>
+sudo yum install localinstall &lt;path-to-datapm-client.rpm&gt;
 ```
 
 ## View Help Options

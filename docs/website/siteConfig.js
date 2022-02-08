@@ -23,7 +23,7 @@ const users = [
 const siteConfig = {
     title: "datapm", // Title for your website.
     tagline: "Less Wrangling, More Data",
-    url: "", // Your website URL
+    url: "/", // Your website URL
     baseUrl: "/docs/", // Base URL for your project */
     docsUrl: "",
     // For github.io type URLs, you would set the url and baseUrl like:
