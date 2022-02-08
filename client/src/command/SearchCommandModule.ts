@@ -70,7 +70,7 @@ export async function handleSearch(argv: SearchArguments): Promise<void> {
     for (const registry of registries) {
         if (argv.registry !== "all" && argv.registry !== registry.url) continue;
 
-        oraRef.start(`Searching ${registry.url}`);
+        console.log(chalk.magenta(`Searching ${registry.url}`));
 
         const client = getRegistryClientWithConfig(registry);
         const LIMIT = 20;
@@ -81,34 +81,36 @@ export async function handleSearch(argv: SearchArguments): Promise<void> {
         } catch (error) {
             if (error.networkError?.result?.errors) {
                 oraRef.fail(error.networkError?.result?.errors[0].message);
+                console.log("");
                 continue;
             }
             oraRef.fail(error.message);
+            console.log("");
             continue;
         }
         if (result.errors) {
             oraRef.fail(`Error while searching registry: ${result.errors[0].message}`);
+            console.log("");
             continue;
         }
 
         const count = result.data?.searchPackages.count;
 
         if (count === undefined || count === 0) {
-            oraRef.fail("No matching packages found");
+            oraRef.info("No matching packages found");
+            console.log("");
             continue;
         }
 
-        oraRef.succeed();
-
-        console.log("");
         if (count <= LIMIT) {
-            console.log(chalk.magenta(`Found ${count} results`));
+            oraRef.succeed(`Found ${count} results`);
         } else {
-            console.log(chalk.magenta(`Showing the first ${LIMIT} of ${count} packages`));
+            oraRef.succeed(`Showing the first ${LIMIT} of ${count} packages`);
         }
 
+        console.log("");
         for (const packageRef of result.data?.searchPackages?.packages || []) {
-            console.log(chalk.white(packageRef.displayName));
+            console.log(chalk.yellow(packageRef.displayName));
             console.log(chalk.green(packageString(packageRef.identifier)));
             console.log(packageRef.description?.trim());
             console.log("");

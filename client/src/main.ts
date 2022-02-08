@@ -14,6 +14,7 @@ import { UpdateCommand } from "./command/UpdateCommand";
 import { FallbackCommand } from "./command/FallbackCommand";
 import { RepositoryCommand } from "./command/RepositoryCommand";
 import { EditCommand } from "./command/EditCommand";
+import path from "path";
 
 let argv = yargs;
 
@@ -40,6 +41,12 @@ const commands = [
 commands.forEach((command) => {
     argv = command.prepareCommand(argv);
 });
+
+if ((argv as any).quiet === undefined) {
+    console.log("");
+    console.log("datapm client version " + require(path.join(__dirname, "..", "package.json")).version);
+    console.log("");
+}
 
 // eslint-disable-next-line no-unused-expressions
 yargs
