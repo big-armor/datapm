@@ -373,6 +373,10 @@ async function main() {
                 installerFileNameEndsWith = ".deb";
                 break;
             }
+            case "redhat": {
+                installerFileNameEndsWith = ".rpm";
+                break;
+            }
             default:  {
                 res.sendStatus(404);
                 return;
