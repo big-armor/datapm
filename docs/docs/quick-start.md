@@ -18,6 +18,7 @@ Download a DataPM Client Installer from the list below.
 
 -   [Windows DataPM Client Installer](/client-installers/windows)
 -   [MacOS DataPM Client Installer](/client-installers/macos)
+-   [Debian & Ubuntu DataPM Client Package](/client-installers/debian)
 
 Run the installer by double clicking on it. Follow the instructions.
 
