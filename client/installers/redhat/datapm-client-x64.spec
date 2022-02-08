@@ -13,9 +13,10 @@ Requires:       bash libsecret
 DataPM is a package manager for data. See more at https://datapm.io
 
 %prep
+%setup
 rm -rf $RPM_BUILD_ROOT
 mkdir -p build/BUILDROOT/datapm-client-${DATAPM_VERSION}
-cp -R ../../../../pkg-linux-intel64/* build/BUILDROOT/datapm-client-${DATAPM_VERSION}/
+cp -R ../../../../pkg-linux-intel64/* build/BUILDROOT/datapm-client-${DATAPM_VERSION}./
 
 %install
 
