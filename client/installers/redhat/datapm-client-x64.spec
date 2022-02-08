@@ -16,9 +16,11 @@ DataPM is a package manager for data. See more at https://datapm.io
 %setup -q
 
 %install
-
+mkdir -p build/BUILD/datapm-client-${DATAPM_VERSION}
+cp -R ../../pkg-linux-intel64/* build/BUILD/datapm-client-${DATAPM_VERSION}/
 
 %clean
+rm -rf $RPM_BUILD_ROOT
 
 %files
 %{_bindir}/datapm
