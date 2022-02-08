@@ -68,7 +68,7 @@
                     {{ package?.latestVersion?.createdAt | timeAgo }}
                 </p>
             </div>
-            <div class="col-6">
+            <div class="col-6" *ngIf="packageSizeBytes > 0">
                 <p class="text-light-gray">unpacked size</p>
                 <p class="text-dark-gray">{{ packageFile | packageSize }}</p>
             </div>
