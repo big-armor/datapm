@@ -31,6 +31,7 @@ rm -f /usr/bin/datapm
 
 %files
 %defattr(-,root,root,-)
+/usr/lib/datapm
 
 %changelog
 * Mon Feb 07 2021 Travis Collins <hello@datapm.io> - 0.0.1
