@@ -18,8 +18,8 @@ mkdir -p build/SOURCES
 mkdir -p build/SPECS
 mkdir -p build/SRPMS
 
-echo "Linting spec file..."
-rpmlint datapm-client-x64.spec
+# echo "Linting spec file..."
+# rpmlint datapm-client-x64.spec
 
 echo "Copying Spec file..."
 cp datapm-client-x64.xspec build/SPECS/datapm-client-x64.spec
