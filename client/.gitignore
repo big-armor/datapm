@@ -1,4 +1,4 @@
-/node_modules
+node_modules
 .DS_Store
 dist
 pkg
@@ -28,6 +28,7 @@ windows-installers
 *.cert
 *.pkg
 *.deb
+pkg-*
 
 installers/macos/macOS-x64/application
 installers/debian/build

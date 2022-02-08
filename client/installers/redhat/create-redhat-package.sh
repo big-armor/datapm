@@ -20,7 +20,7 @@ mkdir -p build/SRPMS
 
 echo "Creating source file..."
 cd ../../
-tar -czvf --exclude-from=".gitignore" installers/redhat/build/SOURCES/datapm-client-${DATAPM_VERSION}.tar.gz ./
+tar --exclude-from=".gitignore" -czvf installers/redhat/build/SOURCES/datapm-client-${DATAPM_VERSION}.tar.gz ./
 cd installers/redhat
 
 # echo "Linting spec file..."
