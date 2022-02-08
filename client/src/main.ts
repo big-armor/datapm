@@ -42,8 +42,10 @@ commands.forEach((command) => {
     argv = command.prepareCommand(argv);
 });
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 if ((argv as any).quiet === undefined) {
     console.log("");
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     console.log("datapm client version " + require(path.join(__dirname, "..", "package.json")).version);
     console.log("");
 }
