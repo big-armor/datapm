@@ -20,7 +20,7 @@ mkdir -p build/SRPMS
 
 echo "Creating source file..."
 cd ../../
-tar --exclude-from=.gitignore -czvf installers/redhat/build/SOURCES/datapm-client-${DATAPM_VERSION}.tar.gz ./
+tar --exclude-from=.gitignore -czvf installers/redhat/build/SOURCES/datapm-client-${DATAPM_VERSION}-source.tar.gz ./
 cd installers/redhat
 
 # echo "Linting spec file..."
@@ -36,6 +36,6 @@ echo "Copying build files..."
 cp -R ../../pkg-linux-intel64/* build/BUILD/datapm-client-${DATAPM_VERSION}
 
 echo "Building RPM..."
-rpmbuild -bb build/SPECS/datapm-client-x64.spec
+rpmbuild -bb -v build/SPECS/datapm-client-x64.spec --define '_topdir ./build'
 
 
