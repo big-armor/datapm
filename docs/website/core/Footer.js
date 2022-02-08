@@ -23,14 +23,14 @@ class Footer extends React.Component {
                         {" "}
                         <div className="first-row">
                             {" "}
-                            <p className="footer-title">about</p> <p className="footer-subtitle">documentation</p>{" "}
-                            <p className="footer-subtitle">contact</p>{" "}
+                            <p className="footer-title">about</p> <p className="footer-subtitle"><a href="/docs">documentation</a></p>{" "}
+                            <p className="footer-subtitle"><a href="/contact">contact</a></p>{" "}
                         </div>{" "}
                         <div className="second-row">
                             {" "}
                             <p className="footer-title">terms and policies</p>{" "}
-                            <p className="footer-subtitle">terms of use</p>{" "}
-                            <p className="footer-subtitle">privacy policy</p>{" "}
+                            <p className="footer-subtitle"><a href="/terms">terms of use</a></p>{" "}
+                            <p className="footer-subtitle"><a href="/privacy">privacy policy</a></p>{" "}
                         </div>{" "}
                     </div>
                 </section>

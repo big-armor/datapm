@@ -29,6 +29,8 @@ export class PackageInfoComponent implements OnInit, OnChanges {
     public currentUser: User;
     public packageUnit: string;
 
+    public packageSizeBytes: number = 0;
+
     private unsubscribe$ = new Subject();
 
     constructor(
@@ -45,6 +47,12 @@ export class PackageInfoComponent implements OnInit, OnChanges {
 
     public ngOnChanges(): void {
         this.packageUnit = this.parsePackageUnit();
+
+        this.packageSizeBytes =
+            this.packageFile.sources.reduce(
+                (sum, item) => sum + item.streamSets.reduce((sum, item) => sum + item.streamStats.byteCount, 0),
+                0
+            ) || 0;
     }
 
     public getRecordCount(packageFile: PackageFile): string {

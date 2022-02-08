@@ -54,6 +54,10 @@ h3 {
     }
 }
 
+.text-light-gray {
+    margin-bottom: 0px !important;
+}
+
 .alert-warn,
 .alert-error {
     font-size: $small-font;
@@ -736,13 +740,12 @@ mat-select {
 }
 
 .header-border {
-    border-bottom: none;
+    border-bottom: 1px solid var(--gray-5-color);
     position: relative;
     top: 0.5rem;
+    border-top: 0px;
     height: 14px;
-    border: 0;
     margin: 6px 0px;
-    box-shadow: var(--box-shadow);
 }
 
 .header-line {
