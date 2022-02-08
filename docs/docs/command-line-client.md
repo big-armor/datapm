@@ -51,7 +51,7 @@ datapm publish --help
 
 To publish packages or perform any authenticated tasks, you'll need to add an API key to your command line client. Here are the instructions to generate an API Key.
 
-#### Either Login with Command Line Client
+#### Login with Command Line Client
 
 Use the following command to login directly from the command line client.
 
