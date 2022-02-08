@@ -13,7 +13,7 @@ Requires:       bash libsecret
 DataPM is a package manager for data. See more at https://datapm.io
 
 %prep
-%setup -q
+echo "prepping"
 
 %install
 mkdir -p build/BUILD/datapm-client-${DATAPM_VERSION}
