@@ -11,7 +11,7 @@ rm -rf build || true
 rm -rf *.rpm || true
 
 echo "Creating build directories..."
-mkdir -p build/BUILD
+mkdir -p build/BUILD/datapm-client-${DATAPM_VERSION}
 mkdir -p build/BUILDROOT
 mkdir -p build/RPMS
 mkdir -p build/SOURCES
