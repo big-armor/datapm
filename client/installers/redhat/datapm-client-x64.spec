@@ -16,9 +16,7 @@ DataPM is a package manager for data. See more at https://datapm.io
 %setup -q
 
 %install
-rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT/%{_bindir}
-cp * $RPM_BUILD_ROOT/%{_bindir}
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
