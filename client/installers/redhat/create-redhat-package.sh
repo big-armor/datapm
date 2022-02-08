@@ -36,6 +36,6 @@ echo "Copying build files..."
 cp -R ../../pkg-linux-intel64/* build/BUILD/datapm-client-${DATAPM_VERSION}
 
 echo "Building RPM..."
-rpmbuild -bb -v build/SPECS/datapm-client-x64.spec --define '_topdir ./build'
+rpmbuild -bb -v build/SPECS/datapm-client-x64.spec --define "_topdir `pwd`/build" 
 
 
