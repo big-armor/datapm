@@ -5,6 +5,7 @@ Summary:        A simple hello world script
 BuildArch:      x86_64
 URL:            https://datapm.io
 License:        https://datapm.io/docs/license
+Source0:        %{name}-%{version}.tar.gz
 
 Requires:       bash libsecret
 

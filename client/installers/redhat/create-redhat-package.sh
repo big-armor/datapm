@@ -18,6 +18,11 @@ mkdir -p build/SOURCES
 mkdir -p build/SPECS
 mkdir -p build/SRPMS
 
+echo "Creating source file..."
+cd ../../
+tar -czvf --exclude-from=".gitignore" installers/redhat/build/SOURCES/datapm-client-${DATAPM_VERSION}.tar.gz ./
+cd installers/redhat
+
 # echo "Linting spec file..."
 # rpmlint datapm-client-x64.spec
 
