@@ -21,7 +21,7 @@ cp -R ../../../../pkg-linux-intel64/* build/BUILDROOT/datapm-client-${RPM_PACKAG
 echo "Install"
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+echo "Clean"
 
 %post
 ln -s %{base_install_dir}/datapm /usr/bin/datapm
