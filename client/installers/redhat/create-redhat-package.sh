@@ -31,6 +31,6 @@ echo "Copying build files..."
 cp -R ../../pkg-linux-intel64/* build/BUILD/datapm-client-${DATAPM_VERSION}
 
 echo "Building RPM..."
-rpmbuild -bb ~/build/SPECS/datapm-client-x64.spec
+rpmbuild -bb build/SPECS/datapm-client-x64.spec
 
 
