@@ -23,8 +23,11 @@ import {
     RepositoryRemoveArguments,
     RepositoryUpdateArguments
 } from "./RepositoryCommand";
+import { printDataPMVersion } from "../util/DatapmVersionUtil";
 
 export async function defaultRepositoryCommandHandler(argv: RepositoryDefaultArguments): Promise<void> {
+    printDataPMVersion(argv);
+
     const commandPromptResult = await prompts({
         type: "autocomplete",
         name: "command",
@@ -102,6 +105,8 @@ async function promptForRepositoryType(
 }
 
 export async function removeRepository(argv: RepositoryRemoveArguments): Promise<void> {
+    printDataPMVersion(argv);
+
     const oraRef = ora({
         color: "yellow",
         spinner: "dots",
@@ -173,6 +178,8 @@ export async function removeRepository(argv: RepositoryRemoveArguments): Promise
 }
 
 export async function updateRepository(argv: RepositoryUpdateArguments): Promise<void> {
+    printDataPMVersion(argv);
+
     const oraRef = ora({
         color: "yellow",
         spinner: "dots",
@@ -290,6 +297,8 @@ export async function updateRepository(argv: RepositoryUpdateArguments): Promise
 }
 
 export async function addRepository(argv: RepositoryAddArguments): Promise<void> {
+    printDataPMVersion(argv);
+
     const oraRef = ora({
         color: "yellow",
         spinner: "dots",
@@ -367,6 +376,8 @@ export async function addRepository(argv: RepositoryAddArguments): Promise<void>
 }
 
 export async function addCredentials(argv: CredentialsAddArguments): Promise<void> {
+    printDataPMVersion(argv);
+
     const oraRef = ora({
         color: "yellow",
         spinner: "dots",
@@ -491,6 +502,8 @@ export async function addCredentials(argv: CredentialsAddArguments): Promise<voi
 }
 
 export async function removeCredentials(argv: CredentialsRemoveArguments): Promise<void> {
+    printDataPMVersion(argv);
+
     const oraRef = ora({
         color: "yellow",
         spinner: "dots",

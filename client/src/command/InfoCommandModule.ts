@@ -1,11 +1,14 @@
 import chalk from "chalk";
 import { Schema } from "datapm-lib";
 import ora from "ora";
+import { printDataPMVersion } from "../util/DatapmVersionUtil";
 import { getPackage } from "../util/PackageAccessUtil";
 import * as SchemaUtil from "../util/SchemaUtil";
 import { InfoArguments } from "./InfoCommand";
 
 export async function getInfo(argv: InfoArguments): Promise<void> {
+    printDataPMVersion(argv);
+
     const oraRef = ora({
         color: "yellow",
         spinner: "dots",

@@ -41,8 +41,11 @@ import { PackageArguments } from "./PackageCommand";
 import { PublishPackageCommandModule } from "./PublishPackageCommandModule";
 import { obtainCredentialsConfiguration } from "../util/CredentialsUtil";
 import { obtainConnectionConfiguration } from "../util/ConnectionUtil";
+import { printDataPMVersion } from "../util/DatapmVersionUtil";
 
 export async function generatePackage(argv: PackageArguments): Promise<void> {
+    printDataPMVersion(argv);
+
     const oraRef = ora({
         color: "yellow",
         spinner: "dots",

@@ -3,9 +3,12 @@ import chalk from "chalk";
 import ora from "ora";
 import { Catalog } from "../generated/graphql";
 import { getRegistryConfigs } from "../util/ConfigUtil";
+import { printDataPMVersion } from "../util/DatapmVersionUtil";
 import { RegistryClient } from "../util/RegistryClient";
 
 export async function viewCatalogs(): Promise<void> {
+    printDataPMVersion({});
+
     const oraRef = ora({
         color: "yellow",
         spinner: "dots"
@@ -13,7 +16,9 @@ export async function viewCatalogs(): Promise<void> {
 
     const registries = getRegistryConfigs();
     if (registries.length === 0) {
-        console.log(chalk.yellow("No registries added yet"));
+        console.log(chalk.yellow("You are not logged in to any registries."));
+        console.log("Use the command below to login to a registry:");
+        console.log(chalk.green("datapm registry login"));
         process.exit(0);
     }
 

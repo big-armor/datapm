@@ -19,6 +19,7 @@ import { EditArguments } from "./EditCommand";
 import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
 import { checkPackagePermissionsOnRegistry } from "../util/RegistryPermissions";
 import * as SchemaUtil from "../util/SchemaUtil";
+import { printDataPMVersion } from "../util/DatapmVersionUtil";
 
 async function schemaPrompts(schema: Schema): Promise<void> {
     if (schema.properties == null) return;
@@ -247,6 +248,8 @@ async function schemaPrompts(schema: Schema): Promise<void> {
 }
 
 export async function editPackage(argv: EditArguments): Promise<void> {
+    printDataPMVersion(argv);
+
     const oraRef: ora.Ora = ora({
         color: "yellow",
         spinner: "dots"

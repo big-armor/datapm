@@ -26,6 +26,7 @@ import {
     RegistryRemoveArguments
 } from "./RegistryCommand";
 import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
+import { printDataPMVersion } from "../util/DatapmVersionUtil";
 
 export async function defaultRegistryCommandHandler(args: unknown): Promise<void> {
     const commandPromptResult = await prompts({
@@ -53,6 +54,8 @@ export async function defaultRegistryCommandHandler(args: unknown): Promise<void
 }
 
 export async function addRegistryCommand(argv: RegistryAddArguments): Promise<void> {
+    printDataPMVersion(argv);
+
     await promptForRegistryUrl(argv);
 
     const registryConf: RegistryConfig = {
@@ -65,18 +68,24 @@ export async function addRegistryCommand(argv: RegistryAddArguments): Promise<vo
 }
 
 export async function removeRegistryCommand(argv: RegistryRemoveArguments): Promise<void> {
+    printDataPMVersion(argv);
+
     await promptForRegistryUrl(argv, true);
 
     removeRegistry(argv.url);
 }
 
-export function listRegistries(): void {
+export function listRegistries(args: unknown): void {
+    printDataPMVersion(args);
+
     const registries = getRegistryConfigs();
 
     registries.forEach((registry) => console.log(registry.url));
 }
 
 export async function logoutFromRegistry(args: RegistryLogoutArguments): Promise<void> {
+    printDataPMVersion(args);
+
     await promptForRegistryUrl(args, true);
 
     if (!args.url) {
@@ -192,6 +201,8 @@ async function promptForRegistryUrl(args: { url?: string }, failOk = false): Pro
 }
 
 export async function authenticateToRegistry(args: RegistryAuthenticateArguments): Promise<void> {
+    printDataPMVersion(args);
+
     await promptForRegistryUrl(args);
 
     if (args.username == null) {

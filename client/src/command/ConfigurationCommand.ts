@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import { Argv } from "yargs";
 import { getConfiguration, getConfigurationPath, resetConfiguration } from "../util/ConfigUtil";
+import { printDataPMVersion } from "../util/DatapmVersionUtil";
 import { Command } from "./Command";
 
 export class ConfigurationCommand implements Command {
@@ -28,12 +29,16 @@ export class ConfigurationCommand implements Command {
         });
     }
 
-    showConfiguration(): void {
+    showConfiguration(argv: unknown): void {
+        printDataPMVersion(argv);
+
         console.log(chalk.yellow(`Configuration stored at ${getConfigurationPath()}`));
         console.log(getConfiguration());
     }
 
-    resetConfiguration(): void {
+    resetConfiguration(argv: unknown): void {
+        printDataPMVersion(argv);
+
         resetConfiguration();
         console.log(chalk.yellow(`Configuration stored at ${getConfigurationPath()} has been reset`));
     }

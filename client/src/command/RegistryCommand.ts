@@ -68,9 +68,9 @@ export class RegistryCommand implements Command {
                     .command({
                         command: "list",
                         describe: "",
-                        handler: async () => {
+                        handler: async (args: unknown) => {
                             const module = await import("./RegistryCommandModule");
-                            module.listRegistries();
+                            module.listRegistries(args);
                         }
                     })
                     .command({

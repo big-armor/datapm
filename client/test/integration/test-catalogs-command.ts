@@ -22,7 +22,7 @@ describe("Catalogs Command Tests", async function () {
         };
 
         const cmdResult = await testCmd("catalogs", [], [], async (line: string) => {
-            if (line.includes("No registries added yet")) {
+            if (line.includes("You are not logged in to any registries")) {
                 results.messageFound = true;
             }
         });

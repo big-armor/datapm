@@ -11,6 +11,7 @@ import { ParameterOption } from "../util/parameters/Parameter";
 import { getRegistryClientWithConfig } from "../util/RegistryClient";
 import { PublishArguments } from "./PublishPackageCommand";
 import { publishPackageFile } from "../util/PackageUtil";
+import { printDataPMVersion } from "../util/DatapmVersionUtil";
 
 export enum PublishDataSteps {
     STARTING_UPLOAD = "starting_upload",
@@ -22,6 +23,8 @@ export type CredentialsBySourceSlug = Map<string, DPMConfiguration>;
 
 export class PublishPackageCommandModule {
     async handleCommand(argv: PublishArguments): Promise<void> {
+        printDataPMVersion(argv);
+
         const oraRef = ora({
             color: "yellow",
             spinner: "dots"

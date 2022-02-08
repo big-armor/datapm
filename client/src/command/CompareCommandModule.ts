@@ -4,12 +4,15 @@ import ora from "ora";
 import { getPackage } from "../util/PackageAccessUtil";
 import { differenceToString } from "../util/PackageUtil";
 import { CompareArguments } from "./CompareCommand";
+import { printDataPMVersion } from "../util/DatapmVersionUtil";
 
 export async function comparePackagesCommand(argv: CompareArguments): Promise<void> {
     const oraRef = ora({
         color: "yellow",
         spinner: "dots"
     });
+
+    printDataPMVersion(argv);
 
     // Fetching prior package
     oraRef.start("Fetching prior package");

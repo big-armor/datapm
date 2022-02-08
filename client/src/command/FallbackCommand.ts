@@ -1,5 +1,6 @@
 import prompts from "prompts";
 import { Argv } from "yargs";
+import { printDataPMVersion } from "../util/DatapmVersionUtil";
 import { Command } from "./Command";
 import { editPackage } from "./EditCommandModule";
 import { fetchPackage } from "./FetchCommand";
@@ -62,6 +63,8 @@ export class FallbackCommand implements Command {
                     });
             },
             handler: async () => {
+                printDataPMVersion(argv);
+
                 const commandPromptResult = await prompts({
                     type: "autocomplete",
                     name: "command",

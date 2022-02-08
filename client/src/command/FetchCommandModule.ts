@@ -30,11 +30,14 @@ import { obtainConnectionConfiguration } from "../util/ConnectionUtil";
 import { obtainCredentialsConfiguration } from "../util/CredentialsUtil";
 import { Sink } from "../repository/Sink";
 import { SemVer } from "semver";
+import { printDataPMVersion } from "../util/DatapmVersionUtil";
 
 export async function fetchPackage(argv: FetchArguments): Promise<void> {
     if (argv.quiet) {
         argv.defaults = true;
     }
+
+    printDataPMVersion(argv);
 
     if (argv.reference == null) {
         const referencePromptResult = await prompts(

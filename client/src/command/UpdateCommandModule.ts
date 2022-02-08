@@ -20,8 +20,11 @@ import { obtainConnectionConfiguration } from "../util/ConnectionUtil";
 import { obtainCredentialsConfiguration } from "../util/CredentialsUtil";
 import { checkPackagePermissionsOnRegistry } from "../util/RegistryPermissions";
 import { SemVer } from "semver";
+import { printDataPMVersion } from "../util/DatapmVersionUtil";
 
 export async function updatePackage(argv: UpdateArguments): Promise<void> {
+    printDataPMVersion(argv);
+
     const oraRef: ora.Ora = ora({
         color: "yellow",
         spinner: "dots"
