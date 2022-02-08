@@ -125,6 +125,10 @@ body {
     .navigationSlider .slidingNav ul li a {
         padding: 0px 15px;
     }
+
+    .fixedHeaderContainer {
+        min-height: 100px;
+    }
 }
 
 @media only screen and (min-width: 1400px) {
