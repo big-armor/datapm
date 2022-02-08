@@ -18,6 +18,7 @@ body {
 .beta {
     color: red !important;
     font-size: 12px;
+    display: inline !important;
 }
 
 .navigationSlider .slidingNav ul li {
@@ -117,7 +118,7 @@ body {
         width: 25%;
         float: right;
         position: relative;
-        top: -40px;
+        top: -30px;
         left: -25px;
     }
 
