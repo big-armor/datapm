@@ -27,6 +27,9 @@ cp datapm-client-x64.xspec build/SPECS/datapm-client-x64.spec
 echo "Updating Spec file version..."
 sed -i "s/x\.x\.x/$DATAPM_VERSION/g" build/SPECS/datapm-client-x64.spec
 
+echo "Copying build files..."
+cp -R ../../pkg-linux-intel64/* build/BUILD/datapm-client-${DATAPM_VERSION}
+
 echo "Building RPM..."
 rpmbuild -bb ~/build/SPECS/datapm-client-x64.spec
 
