@@ -22,7 +22,7 @@ mkdir -p build/SRPMS
 # rpmlint datapm-client-x64.spec
 
 echo "Copying Spec file..."
-cp datapm-client-x64.xspec build/SPECS/datapm-client-x64.spec
+cp datapm-client-x64.spec build/SPECS/datapm-client-x64.spec
 
 echo "Updating Spec file version..."
 sed -i "s/x\.x\.x/$DATAPM_VERSION/g" build/SPECS/datapm-client-x64.spec
