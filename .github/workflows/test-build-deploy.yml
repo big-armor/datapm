@@ -335,7 +335,7 @@ jobs:
             - name: "Save Redhat Intell64 Package"
               uses: actions/upload-artifact@v2
               with:
-                  name: client-debian
+                  name: client-redhat
                   path: client/installers/redhat/build/RPMS/x86_64/datapm-*.rpm
                   retention-days: 1
 
