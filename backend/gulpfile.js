@@ -3,6 +3,7 @@ const exec = require("child_process").exec;
 const path = require("path");
 var through = require("through2");
 const fs = require("fs");
+const { join } = require("path/posix");
 
 const DESTINATION_DIR = path.join(__dirname, "dist");
 const SCHEMA_DIR = path.join(__dirname, "node_modules", "datapm-lib");
@@ -41,7 +42,7 @@ function createTeraformScriptsDirectory() {
 }
 
 function createGCPTeraformScriptZip() {
-    return exec("zip " + path.join("dist","static","terraform-scripts","datapm-gcp-terraform-" + readPackageVersion() + ".zip") + " ../main.tf");
+    return exec("zip " + path.join("dist","static","terraform-scripts","datapm-gcp-terraform-" + readPackageVersion() + ".zip") + " " + path.join("..","main.tf"));
 }
 
 function copyDataPMLib() {
