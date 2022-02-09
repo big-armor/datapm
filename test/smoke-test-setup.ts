@@ -61,7 +61,6 @@ before(async function () {
     registryContainer = await new GenericContainer("datapm-registry")
         .withEnv("REGISTRY_NAME", "client-integration-test")
         .withEnv("REGISTRY_URL", "http://localhost:4000")
-        .withEnv("REGISTRY_HOSTNAME", "localhost")
         .withEnv("PORT", "4000")
         .withEnv("JWT_AUDIENCE", "localhost")
         .withEnv("JWT_KEY", "!!!REPLACE_ME!!!")

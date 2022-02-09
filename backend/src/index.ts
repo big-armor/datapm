@@ -27,6 +27,7 @@ import { SessionCache } from "./session-cache";
 import socketio from "socket.io";
 import http from "http";
 import { SocketConnectionHandler } from "./socket/SocketHandler";
+import { start } from "repl";
 
 console.log("DataPM Registry Server Starting...");
 
@@ -225,6 +226,47 @@ async function main() {
             default:
                 res.sendFile(path.join(__dirname, "robots.txt"));
         }
+    });
+
+
+    /** Client Installer Downloads */
+    app.use("/static/terraform-scripts/:type", async (req, res, next) => {
+        const files = fs.readdirSync(path.join(__dirname, "..","static","terraform-scripts"));
+
+        let startsWith: string | undefined = undefined;
+
+        if(req.params.type === "gcp") {
+            startsWith = "datapm-gcp-terraform-";
+        }
+
+        if(startsWith === undefined) {
+            res.sendStatus(403);
+            return;
+        }
+
+        const file = files.find((f) => f.startsWith(startsWith as string) && f.endsWith(".zip"));
+
+        if(file == null) {
+            res.sendStatus(404);
+            return;
+        }
+
+        res.setHeader('Content-Type', 'application/zip');
+        res.setHeader('Transfer-Encoding', 'chunked');
+        res.setHeader('Content-Disposition', `attachment; filename="${file}"`);
+
+        const filePath = path.join(__dirname, "..", "static", "terraform-scripts", file);
+
+        const reader = fs.createReadStream(filePath);
+
+        reader.once("close",()=> {
+            res.end();
+        })
+
+        reader.once("open",()=> {
+            reader.pipe(res);
+        })
+
     });
 
     // These three routes serve angular static content

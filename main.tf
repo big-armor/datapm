@@ -207,10 +207,6 @@ resource "google_cloud_run_service" "default" {
           value = "https://test.datapm.io"
         }
         env {
-          name  = "REGISTRY_HOSTNAME"
-          value = "test.datapm.io"
-        }
-        env {
           name  = "TYPEORM_IS_DIST"
           value = "true"
         }

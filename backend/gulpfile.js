@@ -23,12 +23,25 @@ function copyFiles() {
     ]).pipe(dest(DESTINATION_DIR));
 }
 
+function readPackageVersion() {
+    const packageJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
+    return packageJson.version;
+}
+
 function copyEmailTemplates() {
     return src(["static/email-templates/*"]).pipe(dest(path.join(DESTINATION_DIR, "static", "email-templates")));
 }
 
 function copyModules() {
     return exec("npx copy-node-modules ./ dist/", execLogCb);
+}
+
+function createTeraformScriptsDirectory() {
+    return exec("mkdir -p " + path.join("dist","static","terraform-scripts"), execLogCb);
+}
+
+function createGCPTeraformScriptZip() {
+    return exec("zip " + path.join("dist","static","terraform-scripts","datapm-gcp-terraform-" + readPackageVersion() + ".zip") + " ../main.tf");
 }
 
 function copyDataPMLib() {
@@ -56,6 +69,6 @@ function clean() {
     });
 }
 
-exports.default = series(copyFiles, copyEmailTemplates, copyModules, copyDataPMLib, slimTypeOrmDist);
+exports.default = series(createTeraformScriptsDirectory, createGCPTeraformScriptZip, copyFiles, copyEmailTemplates, copyModules, copyDataPMLib, slimTypeOrmDist);
 exports.copyDependencies = series(copyModules, copyDataPMLib);
 exports.clean = clean;
