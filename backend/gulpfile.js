@@ -14,8 +14,8 @@ function copyFiles() {
         "ormconfig.js",
         "startServer.sh",
         "package.json",
-        "static/robots.txt",
-        "static/robots-production.txt",
+        "static" + path.sep + "robots.txt",
+        "static" + path.sep + "robots-production.txt",
         "package-lock.json",
         path.join(SCHEMA_DIR, "schema.gql"),
         path.join(SCHEMA_DIR, "auth-schema.gql"),
@@ -31,18 +31,20 @@ function readPackageVersion() {
 }
 
 function copyEmailTemplates() {
-    return src(["static/email-templates/*"]).pipe(dest(path.join(DESTINATION_DIR, "static", "email-templates")));
+    return src([path.join("static","email-templates","*")]).pipe(dest(path.join(DESTINATION_DIR, "static", "email-templates")));
 }
 
 function copyModules() {
-    return exec("npx copy-node-modules ./ dist/", execLogCb);
+    return exec("npx copy-node-modules . dist", execLogCb);
 }
 
 function createTeraformScriptsDirectory() {
 
     const scriptsPath = path.join("dist","static","terraform-scripts");
     if(!fs.existsSync(scriptsPath)) {
-        fs.mkdirSync(scriptsPath);
+        fs.mkdirSync(scriptsPath, {
+            recursive: true
+        });
     }
 
     return Promise.resolve();
@@ -66,14 +68,38 @@ async function createGCPTeraformScriptZip() {
 }
 
 function copyDataPMLib() {
-    return exec("cp -R ../lib/dist dist/node_modules/datapm-lib");
+   //  return exec("cp -R " + path.join("..","lib","dist") + path.join("dist","node_modules","datapm-lib"));
+
+   return Promise.resolve();
 }
 
+/** The TypeORM distribution is way too big. Slim to make it much smaller */
 function slimTypeOrmDist() {
-    return exec(
-        "rm -rf browser aurora-data-api* cockroachdb cordova expo mongodb mysql react-native sap sqlite* sqljs sqlserver",
-        { cwd: "dist/node_modules/typeorm" }
-    );
+
+    
+    const deleteDirectory = function(directory) {
+        const typeOrmDir = path.join("dist","node_modules","typeorm");
+        fs.rmSync(path.join(typeOrmDir,directory),{
+            force: true,
+            recursive: true
+        });
+
+    }
+
+    deleteDirectory("browser");
+    deleteDirectory("aurora-data-api*");
+    deleteDirectory("cockroachdb");
+    deleteDirectory("cordova");
+    deleteDirectory("expo");
+    deleteDirectory("mysql");
+    deleteDirectory("mongodb");
+    deleteDirectory("react-native");
+    deleteDirectory("sap");
+    deleteDirectory("sqlite*");
+    deleteDirectory("sqljs");
+    deleteDirectory("sqlserver");
+
+    return Promise.resolve();
 }
 
 function execLogCb(err, stdout, stderr) {
@@ -92,4 +118,5 @@ function clean() {
 
 exports.default = series(createTeraformScriptsDirectory, createGCPTeraformScriptZip, copyFiles, copyEmailTemplates, copyModules, copyDataPMLib, slimTypeOrmDist);
 exports.copyDependencies = series(copyModules, copyDataPMLib);
+exports.copyDataPMLib = copyDataPMLib;
 exports.clean = clean;
