@@ -4,6 +4,7 @@ const path = require("path");
 var through = require("through2");
 const fs = require("fs");
 const { join } = require("path/posix");
+const JSZip = require("jszip");
 
 const DESTINATION_DIR = path.join(__dirname, "dist");
 const SCHEMA_DIR = path.join(__dirname, "node_modules", "datapm-lib");
@@ -38,11 +39,30 @@ function copyModules() {
 }
 
 function createTeraformScriptsDirectory() {
-    return exec("mkdir -p " + path.join("dist","static","terraform-scripts"), execLogCb);
+
+    const scriptsPath = path.join("dist","static","terraform-scripts");
+    if(!fs.existsSync(scriptsPath)) {
+        fs.mkdirSync(scriptsPath);
+    }
+
+    return Promise.resolve();
+
 }
 
-function createGCPTeraformScriptZip() {
-    return exec("zip " + path.join("dist","static","terraform-scripts","datapm-gcp-terraform-" + readPackageVersion() + ".zip") + " " + path.join("..","main.tf"));
+async function createGCPTeraformScriptZip() {
+   const zip = new JSZip();
+
+    const mainTfContents = fs.readFileSync(path.join("..","main.tf"),"utf-8");
+
+    zip.file("main.tf",mainTfContents);
+
+    const zipContent = await zip.generateAsync({type: "uint8array"});
+
+    const destinationZipFile = path.join("dist","static","terraform-scripts","datapm-gcp-terraform-" + readPackageVersion() + ".zip");
+
+    fs.writeFileSync(destinationZipFile, zipContent);
+
+
 }
 
 function copyDataPMLib() {
