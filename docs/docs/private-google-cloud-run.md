@@ -27,11 +27,20 @@ title: Host A Private DataPM Registry in Google Cloud Run
 
 While these instructions are thorough, they are not complete and will require your own research and experimentation.
 
-1. [Install Teraform Command Line Client](https://learn.hashicorp.com/tutorials/terraform/install-cli) or [Use the Terraform Cloud](https://learn.hashicorp.com/collections/terraform/cloud-get-started)
+1. [Install Terraform Command Line Client](https://learn.hashicorp.com/tutorials/terraform/install-cli) or [Use the Terraform Cloud](https://learn.hashicorp.com/collections/terraform/cloud-get-started)
 1. [Create a GCP project](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
     - You will need to [enable billing](https://cloud.google.com/billing/docs/how-to/modify-project)
-1. Download the [DataPM Terraform deployment script](https://github.com/big-armor/datapm-registry/blob/master/main.tf) from the DataPM repository.
-    - It may be easiest to simply checkout the entire code repository
+1. Download the [DataPM GCP Deployment Scripts](/static/terraform-scripts/gcp).
     - You will need to periodically download new versions of the script as it is updated.
-    - Be sure to get the latest script from master, or the release branch that corresponds to your target version.
-1.
+1. Modify the secrets.tvars file
+    - Reffer to [Terraform's Protecting Secrets documentation](https://learn.hashicorp.com/tutorials/terraform/sensitive-variables)
+    - You should protect this file, and never check it into source control.
+1. Create a GCP service account for deployments
+    - This will be used to deploy the GCP resources
+1. Create a key for the service account
+    - This key file will be used during the terraform deployment process
+    - You should protect this file, and never check it into source control.
+1. Run the `terraform init` command.
+1. Run the `terraform plan -var-file="secrets.tvars"` command.
+    - Besure to review the output for changes
+1. Run the `terraform apply -var-file="secrets.tvars"` command.

@@ -231,7 +231,16 @@ async function main() {
 
     /** Client Installer Downloads */
     app.use("/static/terraform-scripts/:type", async (req, res, next) => {
-        const files = fs.readdirSync(path.join(__dirname, "..","static","terraform-scripts"));
+
+        const terraFormScriptsDirectory = path.join(__dirname, "static","terraform-scripts");
+
+
+        if(!fs.existsSync(terraFormScriptsDirectory)) {
+            res.sendStatus(404);
+            return;
+        }
+
+        const files = fs.readdirSync(terraFormScriptsDirectory);
 
         let startsWith: string | undefined = undefined;
 
@@ -255,7 +264,7 @@ async function main() {
         res.setHeader('Transfer-Encoding', 'chunked');
         res.setHeader('Content-Disposition', `attachment; filename="${file}"`);
 
-        const filePath = path.join(__dirname, "..", "static", "terraform-scripts", file);
+        const filePath = path.join(terraFormScriptsDirectory, file);
 
         const reader = fs.createReadStream(filePath);
 

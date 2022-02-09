@@ -163,10 +163,6 @@ resource "google_cloud_run_service" "default" {
           value = "dev"
         }
         env {
-          name  = "GCLOUD_STORAGE_BUCKET_NAME"
-          value = "media"
-        }
-        env {
           name  = "GOOGLE_CLOUD_PROJECT"
           value = google_project.project.project_id
         }

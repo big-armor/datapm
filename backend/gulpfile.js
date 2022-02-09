@@ -37,11 +37,11 @@ function copyModules() {
     return exec("npx copy-node-modules ./ dist/", execLogCb);
 }
 
-function createTeraformScriptsDirectory() {
+function createTerraformScriptsDirectory() {
     return exec("mkdir -p " + path.join("dist","static","terraform-scripts"), execLogCb);
 }
 
-function createGCPTeraformScriptZip() {
+function createGCPTerraformScriptZip() {
     return exec("zip " + path.join("dist","static","terraform-scripts","datapm-gcp-terraform-" + readPackageVersion() + ".zip") + " " + path.join("..","main.tf"));
 }
 
@@ -70,6 +70,6 @@ function clean() {
     });
 }
 
-exports.default = series(createTeraformScriptsDirectory, createGCPTeraformScriptZip, copyFiles, copyEmailTemplates, copyModules, copyDataPMLib, slimTypeOrmDist);
+exports.default = series(createTerraformScriptsDirectory, createGCPTerraformScriptZip, copyFiles, copyEmailTemplates, copyModules, copyDataPMLib, slimTypeOrmDist);
 exports.copyDependencies = series(copyModules, copyDataPMLib);
 exports.clean = clean;
