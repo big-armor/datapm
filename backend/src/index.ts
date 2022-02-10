@@ -11,7 +11,7 @@ import { AuthenticatedHTTPContext, AuthenticatedSocketContext, HTTPContext, Sock
 import { getMeFromAPIKey, getMeRequest } from "./util/me";
 import { makeSchema } from "./schema";
 import path from "path";
-import { getSecretVariable, setAppEngineServiceAccountJson } from "./util/secrets";
+import { getSecretVariable } from "./util/secrets";
 import { GraphQLError } from "graphql";
 import { superCreateConnection } from "./util/databaseCreation";
 import { Readable } from "stream";
@@ -27,6 +27,7 @@ import { SessionCache } from "./session-cache";
 import socketio from "socket.io";
 import http from "http";
 import { SocketConnectionHandler } from "./socket/SocketHandler";
+import { start } from "repl";
 
 console.log("DataPM Registry Server Starting...");
 
@@ -55,8 +56,6 @@ async function main() {
     await getSecretVariable("SMTP_SECURE");
     await getSecretVariable("SMTP_USER");
     await getSecretVariable("SMTP_PASSWORD");
-
-    await setAppEngineServiceAccountJson();
 
     // Create Database Connection
     const connection = await superCreateConnection();
@@ -225,6 +224,56 @@ async function main() {
             default:
                 res.sendFile(path.join(__dirname, "robots.txt"));
         }
+    });
+
+
+    /** Client Installer Downloads */
+    app.use("/static/terraform-scripts/:type", async (req, res, next) => {
+
+        const terraFormScriptsDirectory = path.join(__dirname, "static","terraform-scripts");
+
+
+        if(!fs.existsSync(terraFormScriptsDirectory)) {
+            res.sendStatus(404);
+            return;
+        }
+
+        const files = fs.readdirSync(terraFormScriptsDirectory);
+
+        let startsWith: string | undefined = undefined;
+
+        if(req.params.type === "gcp") {
+            startsWith = "datapm-gcp-terraform-";
+        }
+
+        if(startsWith === undefined) {
+            res.sendStatus(403);
+            return;
+        }
+
+        const file = files.find((f) => f.startsWith(startsWith as string) && f.endsWith(".zip"));
+
+        if(file == null) {
+            res.sendStatus(404);
+            return;
+        }
+
+        res.setHeader('Content-Type', 'application/zip');
+        res.setHeader('Transfer-Encoding', 'chunked');
+        res.setHeader('Content-Disposition', `attachment; filename="${file}"`);
+
+        const filePath = path.join(terraFormScriptsDirectory, file);
+
+        const reader = fs.createReadStream(filePath);
+
+        reader.once("close",()=> {
+            res.end();
+        })
+
+        reader.once("open",()=> {
+            reader.pipe(res);
+        })
+
     });
 
     // These three routes serve angular static content

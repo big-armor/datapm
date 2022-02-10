@@ -3,6 +3,8 @@ const exec = require("child_process").exec;
 const path = require("path");
 var through = require("through2");
 const fs = require("fs");
+const { join } = require("path/posix");
+const JSZip = require("jszip");
 
 const DESTINATION_DIR = path.join(__dirname, "dist");
 const SCHEMA_DIR = path.join(__dirname, "node_modules", "datapm-lib");
@@ -12,8 +14,8 @@ function copyFiles() {
         "ormconfig.js",
         "startServer.sh",
         "package.json",
-        "static/robots.txt",
-        "static/robots-production.txt",
+        "static" + path.sep + "robots.txt",
+        "static" + path.sep + "robots-production.txt",
         "package-lock.json",
         path.join(SCHEMA_DIR, "schema.gql"),
         path.join(SCHEMA_DIR, "auth-schema.gql"),
@@ -23,23 +25,85 @@ function copyFiles() {
     ]).pipe(dest(DESTINATION_DIR));
 }
 
+function readPackageVersion() {
+    const packageJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
+    return packageJson.version;
+}
+
 function copyEmailTemplates() {
-    return src(["static/email-templates/*"]).pipe(dest(path.join(DESTINATION_DIR, "static", "email-templates")));
+    return src([path.join("static","email-templates","*")]).pipe(dest(path.join(DESTINATION_DIR, "static", "email-templates")));
 }
 
 function copyModules() {
-    return exec("npx copy-node-modules ./ dist/", execLogCb);
+    return exec("npx copy-node-modules . dist", execLogCb);
+}
+
+function createTerraformScriptsDirectory() {
+
+    const scriptsPath = path.join("dist","static","terraform-scripts");
+    if(!fs.existsSync(scriptsPath)) {
+        fs.mkdirSync(scriptsPath, {
+            recursive: true
+        });
+    }
+
+    return Promise.resolve();
+
+}
+
+async function createGCPTerraformScriptZip() {
+   const zip = new JSZip();
+
+    const mainTfContents = fs.readFileSync(path.join("..","terraform","main.tf"),"utf-8");
+    const secretsExampleContents = fs.readFileSync(path.join("..","terraform","environment-example.tfvars"),"utf-8");
+    const backendConfigContents = fs.readFileSync(path.join("..","terraform","backend-example.config"),"utf-8");
+
+    zip.file("main.tf",mainTfContents);
+    zip.file("environment-example.tfvars",secretsExampleContents);
+    zip.file("backend-example.config",backendConfigContents);
+
+    const zipContent = await zip.generateAsync({type: "uint8array"});
+
+    const destinationZipFile = path.join("dist","static","terraform-scripts","datapm-gcp-terraform-" + readPackageVersion() + ".zip");
+
+    fs.writeFileSync(destinationZipFile, zipContent);
+
+
 }
 
 function copyDataPMLib() {
-    return exec("cp -R ../lib/dist dist/node_modules/datapm-lib");
+   //  return exec("cp -R " + path.join("..","lib","dist") + path.join("dist","node_modules","datapm-lib"));
+
+   return Promise.resolve();
 }
 
+/** The TypeORM distribution is way too big. Slim to make it much smaller */
 function slimTypeOrmDist() {
-    return exec(
-        "rm -rf browser aurora-data-api* cockroachdb cordova expo mongodb mysql react-native sap sqlite* sqljs sqlserver",
-        { cwd: "dist/node_modules/typeorm" }
-    );
+
+    
+    const deleteDirectory = function(directory) {
+        const typeOrmDir = path.join("dist","node_modules","typeorm");
+        fs.rmSync(path.join(typeOrmDir,directory),{
+            force: true,
+            recursive: true
+        });
+
+    }
+
+    deleteDirectory("browser");
+    deleteDirectory("aurora-data-api*");
+    deleteDirectory("cockroachdb");
+    deleteDirectory("cordova");
+    deleteDirectory("expo");
+    deleteDirectory("mysql");
+    deleteDirectory("mongodb");
+    deleteDirectory("react-native");
+    deleteDirectory("sap");
+    deleteDirectory("sqlite*");
+    deleteDirectory("sqljs");
+    deleteDirectory("sqlserver");
+
+    return Promise.resolve();
 }
 
 function execLogCb(err, stdout, stderr) {
@@ -56,6 +120,7 @@ function clean() {
     });
 }
 
-exports.default = series(copyFiles, copyEmailTemplates, copyModules, copyDataPMLib, slimTypeOrmDist);
+exports.default = series(createTerraformScriptsDirectory, createGCPTerraformScriptZip, copyFiles, copyEmailTemplates, copyModules, copyDataPMLib, slimTypeOrmDist);
 exports.copyDependencies = series(copyModules, copyDataPMLib);
+exports.copyDataPMLib = copyDataPMLib;
 exports.clean = clean;

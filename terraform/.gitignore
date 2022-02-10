@@ -1,0 +1,4 @@
+secrets
+*.json
+*.p12
+.terraform.lock.hcl

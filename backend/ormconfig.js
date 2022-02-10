@@ -1,6 +1,6 @@
 const IS_DIST =
-    process.env.TYPEORM_IS_DIST &&
-    (process.env.TYPEORM_IS_DIST.toLowerCase() === "true" || process.env.TYPEORM_IS_DIST === "1");
+    process.env.TYPEORM_IS_DIST == null ||
+    (process.env.TYPEORM_IS_DIST.toLowerCase() !== "false");
 const PATH_PREFIX = IS_DIST ? "" : "src/";
 const FILE_EXTENSION = IS_DIST ? "js" : "ts";
 

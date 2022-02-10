@@ -4,8 +4,10 @@ import { Request } from "express";
 // grab the Mixpanel factory
 import * as Mixpanel from "mixpanel";
 
+const MIXPANEL_NOT_SET_TOKEN = "not-set";
+
 // initialize mixpanel client configured to communicate over https
-export const mixpanel = process.env.MIXPANEL_TOKEN
+export const mixpanel = process.env.MIXPANEL_TOKEN != null && process.env.MIXPANEL_TOKEN != MIXPANEL_NOT_SET_TOKEN
     ? Mixpanel.init(process.env.MIXPANEL_TOKEN ?? "", {
           protocol: "https"
       })
@@ -24,6 +26,11 @@ export function engage(userInfo: object, request: Request): Promise<number> {
 }
 
 async function forwardMixpanel(url: string, data: object, request: Request): Promise<number> {
+
+    if(mixpanel == null) {
+        return 200;
+    }
+
     const ip = (request.headers["x-forwarded-for"] as string) || request.connection.remoteAddress || "";
 
     const result = await fetch(url, {

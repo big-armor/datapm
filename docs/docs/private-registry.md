@@ -36,12 +36,7 @@ services:
       - REGISTRY_NAME="Private DataPM Registry"
       - REGISTRY_URL=http://localhost:4000
       - JWT_KEY=!!!!REPLACE_ME!!!
-      - JWT_AUDIENCE=localhost
-      - JWT_ISSUER=localhost
-      - SCHEDULER_KEY="!!!!REPLACE_ME!!!!"
-      - LEADER_ELECTION_DISABLED=false
       - STORAGE_URL="file:///var/lib/datapm-registry/data"
-      - TYPEORM_IS_DIST=true
       - TYPEORM_PORT=5432
       - TYPEORM_HOST=postgres
       - TYPEORM_DATABASE=postgres
@@ -87,7 +82,7 @@ When using a private DataPM registry, you'll still have access with all the grea
 
 ## Software requirements
 
-DataPM Registry requires a PostgreSQL version 12 database server. Your choose to use an existing instance, a cloud based instance, or to create a standalone instance using a simple Docker image from Postgres.
+DataPM Registry requires a PostgreSQL version 13 database server. Your choose to use an existing instance, a cloud based instance, or to create a standalone instance using a simple Docker image from Postgres.
 
 ## Hardware requirements
 
@@ -137,3 +132,5 @@ You should capture a database backup before each software upgrade.
 When hosting your DataPM registry, you must backup your Postgres server on a regular basis. We suggest at least daily. DataPM is a robust service, but is not considered a backup solution for data.
 
 We recommend Google Cloud SQL or AWS RDS Postgres instances - as they have robust backup capabilities built-in.
+
+You should also regularly backup the "media" directory. This directory contains all of the assets (package files, user images, data itself, etc) that are published to the registry.

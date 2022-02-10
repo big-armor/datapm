@@ -22,8 +22,8 @@ export class NoAuthenticationError extends ApolloError {
 }
 
 const jwtOptions = {
-    audience: getEnvVariable("JWT_AUDIENCE"),
-    issuer: getEnvVariable("JWT_ISSUER")
+    audience: getEnvVariable("REGISTRY_URL"),
+    issuer: getEnvVariable("REGISTRY_URL")
 };
 
 const verifyToken = (token: string, secretOrPublicKey: jwt.Secret, options?: jwt.VerifyOptions) => {
@@ -94,7 +94,7 @@ export function createJwt(user: UserEntity): string {
         subject: user.id.toString(),
         expiresIn: "1d",
         keyid: "JWT_KEY",
-        audience: getEnvVariable("JWT_AUDIENCE"),
-        issuer: getEnvVariable("JWT_ISSUER")
+        audience: getEnvVariable("REGISTRY_URL"),
+        issuer: getEnvVariable("REGISTRY_URL")
     });
 }

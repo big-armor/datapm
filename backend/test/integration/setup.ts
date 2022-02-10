@@ -45,8 +45,13 @@ export interface ActivityLogLine {
 export function findActivityLogLine(line: string, callback: (activityLogLine: ActivityLogLine) => boolean): Boolean {
     if (!line.startsWith("{")) return false;
 
-    const lineObject = JSON.parse(line) as ActivityLogLine;
-    if (lineObject._type == "ActivityLog" && callback(lineObject)) return true;
+    try {
+        const lineObject = JSON.parse(line) as ActivityLogLine;
+        if (lineObject._type == "ActivityLog" && callback(lineObject)) return true;
+    } catch (e) {
+        console.log("Error parsing line: " + line);
+    }
+
 
     return false;
 }
@@ -97,7 +102,6 @@ before(async function () {
             SMTP_FROM_ADDRESS: "test@localhost",
             SMTP_FROM_NAME: "local-test",
             STORAGE_URL: TEMP_STORAGE_URL,
-            ACTIVITY_LOG: "false",
             LEADER_ELECTION_DISABLED: "true",
             SCHEDULER_KEY: "TEST_JOB_KEY"
         }
