@@ -1,9 +1,14 @@
 ---
 id: private-registry-google-cloud-run
-title: Host A Private DataPM Registry in Google Cloud Run
+title: Host DataPM Registry in Google Cloud Run
 ---
 
-[Google Coud Run](https://cloud.google.com/run) (GCR) can be used to host a public or private DataPM registry. First be sure to review the advntages and challanges of using GCR below.
+[Google Coud Run](https://cloud.google.com/run) (GCR) can be used to host a public or private DataPM registry.
+
+You can host your own DataPM registry for private or public use. Be sure to understand the following:
+
+-   Read the [DataPM License](license.md)
+-   DataPM is currently [Beta software](beta-notice.md).
 
 ## Advantages
 
