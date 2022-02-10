@@ -10,71 +10,17 @@ You can host your own DataPM registry for private or public use. Be sure to read
 
 DataPM is currently software that is in beta preview. You are welcome to use it within the constraints of the [license](license.md) - but you should be very careful about using it in production.
 
-## Hosting via Docker
+## How To Deploy DataPM Registry?
 
-Docker compose is the simplest method to deploy a DataPM Registry and supporting Postgres server. Use the following template as a start - or adapt it for your Kubernetes.
+DataPM registry server is a simple NodeJS application that can be deployed in most modern architectures. Below are some detailed deployment options.
 
-```text
-version: "3.7"
+Our [instructions for Docker Compose](private-docker-compose.md) are great for test and small private deployments.
 
-volumes:
-  postgres_data_local: {}
-  registry_file_store: {}
-
-services:
-  datapm-registry:
-    image: datapm-registry:latest
-    ports:
-      - "4000:4000"
-    volumes:
-      - type: volume
-        source: registry_file_store
-        target: /var/lib/datapm-registry/data
-        consistency: cached
-    environment:
-      - ACTIVITY_LOG=true
-      - REGISTRY_NAME="Private DataPM Registry"
-      - REGISTRY_URL=http://localhost:4000
-      - JWT_KEY=!!!!REPLACE_ME!!!
-      - STORAGE_URL="file:///var/lib/datapm-registry/data"
-      - TYPEORM_PORT=5432
-      - TYPEORM_HOST=postgres
-      - TYPEORM_DATABASE=postgres
-      - TYPEORM_SCHEMA=public
-      - TYPEORM_USERNAME=postgres
-      - TYPEORM_PASSWORD=postgres
-      - SMTP_SERVER=localhost
-      - SMTP_PORT=25
-      - SMTP_USER=
-      - SMTP_PASSWORD=
-      - SMTP_FROM_NAME="Localhost DataPM Registry"
-      - SMTP_FROM_ADDRESS="datapm@localhost"
-      - SMTP_SECURE=false
-  postgres:
-    image: postgres:13.3
-    volumes:
-      - type: volume
-        source: postgres_data_local
-        target: /var/lib/postgresql/data
-        consistency: delegated
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB=datapm
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-  smtp:
-    image: namshi/smtp:latest
-    ports:
-        - "25:25"
-
-```
+Our [instructions for Google Cloud Run](private-cloud-run.md) are great for production deployments at extremely low cost and high scalability.
 
 ## Why Host A Private Registry?
 
-DataPM is a tool that dramatically simplifies data collaborations with other teams inside and outside your organization. While [datapm.io](https://datapm.io) offers a fantastic method to publish data packages privately on the public repository - you may have the requirement that no information about your data moves outside of your network.
+DataPM is a tool that dramatically simplifies data collaborations with teams inside and outside your organization. While [datapm.io](https://datapm.io) offers a fantastic method to publish data packages privately on the public repository - you may have the requirement that no information about your data moves outside of your network.
 
 Therefore, DataPM offers you the ability to host your own private registry. This private registry will be entirely in your control at a network firewall level, and thus the risk of an inadvertent data leak is greatly reduced.
 
