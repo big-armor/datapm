@@ -119,7 +119,7 @@ function tagRegistryGCRDockerImageVersion() {
     return spawnAndLog("registry-docker-tag", "docker", [
         "tag",
         "datapm-registry",
-        "gcr.io/datapm-test-terraform/datapm-registry:" + readPackageVersion()
+        "gcr.io/datapm-containers/datapm-registry:" + readPackageVersion()
     ]);
 }
 
@@ -127,21 +127,21 @@ function tagRegistryGCRDockerImageLatest() {
     return spawnAndLog("registry-docker-tag", "docker", [
         "tag",
         "datapm-registry",
-        "gcr.io/datapm-test-terraform/datapm-registry:latest"
+        "gcr.io/datapm-containers/datapm-registry:latest"
     ]);
 }
 
 function pushRegistryGCRImage() {
     return spawnAndLog("registry-docker-push-gcr", "docker", [
         "push",
-        "gcr.io/datapm-test-terraform/datapm-registry:" + readPackageVersion()
+        "gcr.io/datapm-containers/datapm-registry:" + readPackageVersion()
     ]);
 }
 
 function pushRegistryGCRImageLatest() {
     return spawnAndLog("registry-docker-push-gcr", "docker", [
         "push",
-        "gcr.io/datapm-test-terraform/datapm-registry:latest"
+        "gcr.io/datapm-containers/datapm-registry:latest"
     ]);
 }
 
