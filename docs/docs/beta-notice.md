@@ -1,6 +1,7 @@
 ---
 id: beta-notice
 title: DataPM Beta Notice
+sidebar_label: Beta Notice
 ---
 
 DataPM is software that is in beta preview. You are welcome to use it within the constraints of the [license](license.md) - but you should be very careful about using it in production.

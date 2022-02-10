@@ -4,7 +4,7 @@ title: Host A Private DataPM Registry
 sidebar_label: Private Registry
 ---
 
-You can host your own DataPM registry for private or public use. Be sure to read the DataPM Software License page to learn about allowed and not allowed uses of DataPM software.
+You can host your own DataPM registry for private or public use. Be sure to read the [DataPM Software License](license.md) page to learn about allowed and not allowed uses of DataPM software.
 
 ## Beta Software Notice
 

@@ -1,6 +1,6 @@
 ---
 id: find-data
-title: DataPM Use Case: Find Data
+title: Use Case: Find Data
 sidebar_label: Find Data
 ---
 

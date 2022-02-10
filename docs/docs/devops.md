@@ -1,6 +1,6 @@
 ---
 id: devops
-title: DataPM Use Case: DevOps
+title: Use Case: DevOps
 sidebar_label: DevOps
 ---
 

@@ -29,7 +29,7 @@ You may not alter, remove, or obscure any licensing, copyright, or other notices
 
 # Allowances
 
-You may use the software to provide a service that generates revenue only for you and does not generate revenue for any other party.
+You may use the software to provide a service that generates revenue only for you. That service may not generate revenue for any other party.
 
 # Patents
 
