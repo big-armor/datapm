@@ -1,4 +1,4 @@
-NODE_ENV=development
+PORT=4000
 REGISTRY_NAME="DataPM Local Docker"
 REGISTRY_URL=http://localhost:4000
 JWT_KEY=!!!!REPLACE_ME!!!
