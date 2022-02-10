@@ -12,12 +12,12 @@
         "prestart": "npm run codegen && docker-compose -f ../docker/docker-compose-local-dev.yml  up -d ",
         "start": "TYPEORM_IS_DIST=false TS_NODE_FILES=true . ./env.sh && nodemon --watch 'src' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts",
         "prestart-nowatch": "npm run codegen",
-        "start-nowatch": ". ./env.sh && ts-node src/index.ts",
+        "start-nowatch": "TYPEORM_IS_DIST=false . ./env.sh && ts-node src/index.ts",
         "prestart:server": "npm run build",
         "start:server": ". ./env.sh && cd dist && node index.js",
         "pretest": "npm run codegen",
-        "test": "mocha -r ts-node/register --slow 2000 test/integration/*.ts src/**/*.spec.ts",
-        "test:debug": "npm run build && npx mocha --slow 3000 --timeout 999999 -r ts-node/register",
+        "test": "TYPEORM_IS_DIST=false mocha -r ts-node/register --slow 2000 test/integration/*.ts src/**/*.spec.ts",
+        "test:debug": "TYPEORM_IS_DIST=false npm run build && npx mocha --slow 3000 --timeout 999999 -r ts-node/register",
         "codegen": "graphql-codegen --config codegen.yml && graphql-codegen --config codegen-test.yml"
     },
     "repository": {
