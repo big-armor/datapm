@@ -56,6 +56,3 @@ enagement analytics and troubleshooting.
 
 This is not a secret */
 # mixpanel_token = "not-set"
-
-/* Whether to enable user activity logging, default true */
-# datapm_enable_activity_log = true

@@ -94,7 +94,7 @@ export async function createActivityLog(connection: EntityManager | Connection, 
 export class ActivityLogRepository extends Repository<ActivityLogEntity> {
     async createLog(activityLog: ActivityLogEntity): Promise<void> {
 
-        if (process.env.ACTIVITY_LOG === "true")
+        if (process.env.ACTIVITY_LOG !== "false")
                 console.info(
                     JSON.stringify({
                         _type: "ActivityLog",

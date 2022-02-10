@@ -27,7 +27,7 @@ export function engage(userInfo: object, request: Request): Promise<number> {
 
 async function forwardMixpanel(url: string, data: object, request: Request): Promise<number> {
 
-    if(process.env.MIXPANEL_TOKEN == null || process.env.MIXPANEL_TOKEN == MIXPANEL_NOT_SET_TOKEN) {
+    if(mixpanel == null) {
         return 200;
     }
 

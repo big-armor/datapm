@@ -49,6 +49,3 @@ You can uncomment these to override them */
 sending activity events to MixPanel for user
 enagement analytics and troubleshooting */
 # mixpanel_token = "not-set"
-
-## Whether to enable user activity logging, default true
-# datapm_enable_activity_log = true

@@ -67,12 +67,6 @@ variable "mixpanel_token" {
   default     = "not-set" # This will disable mixpanel sending
 }
 
-variable "datapm_enable_activity_log" {
-  description = "Whether to enable activity logging"
-  type        = bool
-  default     = true
-}
-
 variable "datapm_domain_name" {
   description = "Domain name for the datapm registry server"
   type        = string
@@ -219,15 +213,7 @@ resource "google_cloud_run_service" "default" {
         env {
           name  = "NODE_ENV"
           value = "production"
-        }
-        env {
-          name  = "JWT_AUDIENCE"
-          value = var.datapm_domain_name
-        }
-        env {
-          name  = "JWT_ISSUER"
-          value = var.datapm_domain_name
-        }
+        } 
         env {
           name  = "JWT_KEY"
           value = random_password.jwt_key.result
@@ -272,10 +258,7 @@ resource "google_cloud_run_service" "default" {
           name  = "REGISTRY_URL"
           value = "https://${var.datapm_domain_name}"
         }
-        env {
-          name  = "TYPEORM_IS_DIST"
-          value = "true"
-        }
+
         env {
           name  = "SMTP_SERVER"
           value = var.smtp_host
@@ -307,10 +290,6 @@ resource "google_cloud_run_service" "default" {
         env {
           name  = "STORAGE_URL"
           value = "gs://${google_storage_bucket.media.name}"
-        }
-        env {
-          name  = "ACTIVITY_LOG"
-          value = var.datapm_enable_activity_log
         }
 
         env {

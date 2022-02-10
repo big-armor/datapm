@@ -11,7 +11,7 @@ import { AuthenticatedHTTPContext, AuthenticatedSocketContext, HTTPContext, Sock
 import { getMeFromAPIKey, getMeRequest } from "./util/me";
 import { makeSchema } from "./schema";
 import path from "path";
-import { getSecretVariable, setAppEngineServiceAccountJson } from "./util/secrets";
+import { getSecretVariable } from "./util/secrets";
 import { GraphQLError } from "graphql";
 import { superCreateConnection } from "./util/databaseCreation";
 import { Readable } from "stream";
@@ -56,8 +56,6 @@ async function main() {
     await getSecretVariable("SMTP_SECURE");
     await getSecretVariable("SMTP_USER");
     await getSecretVariable("SMTP_PASSWORD");
-
-    await setAppEngineServiceAccountJson();
 
     // Create Database Connection
     const connection = await superCreateConnection();
