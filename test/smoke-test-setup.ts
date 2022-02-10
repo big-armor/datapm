@@ -65,7 +65,6 @@ before(async function () {
         .withEnv("JWT_AUDIENCE", "localhost")
         .withEnv("JWT_KEY", "!!!REPLACE_ME!!!")
         .withEnv("JWT_ISSUER", "localhost")
-        .withEnv("APOLLO_GRAPH_VARIANT", "client-integration-tests")
         .withEnv("GOOGLE_CLOUD_PROJECT", "adsfasdf")
         .withEnv("MIXPANEL_TOKEN", "asdfasdfasdf")
         .withEnv("TYPEORM_IS_DIST", "true")

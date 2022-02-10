@@ -601,15 +601,16 @@ jobs:
                   token: ${{ secrets.NPM_TOKEN }}
 
             - name: Terraform Init to
-              run: terraform init
+              run: terraform init -backend-config=secrets/test.config
+              working-directory: terraform
               env:
                   PROJECT_ID: data-test-terraform
                   GOOGLE_CREDENTIALS: gcloud.key
 
             - name: Terraform Plan
               run: terraform plan
+              working-directory: terraform
               env:
-                  TF_VAR_APOLLO_KEY: ${{secrets.TF_VAR_APOLLO_KEY}}
                   TF_VAR_smtp_password: ${{secrets.TF_VAR_SMTP_PASSWORD}}
                   PROJECT_ID: data-test-terraform
                   GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
@@ -622,8 +623,8 @@ jobs:
 
             - name: Terraform Apply
               run: terraform apply -auto-approve
+              working-directory: terraform
               env:
-                  TF_VAR_APOLLO_KEY: ${{secrets.TF_VAR_APOLLO_KEY}}
                   TF_VAR_smtp_password: ${{secrets.TF_VAR_SMTP_PASSWORD}}
                   PROJECT_ID: data-test-terraform
                   GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
@@ -635,7 +636,7 @@ jobs:
                   GOOGLE_CREDENTIALS: ${{secrets.GOOGLE_APPLICATION_CREDENTIALS}}
 
             - name: Publish Apollo Graphql Update
-              run: npx apollo service:push --graph=datapm --key=${{secrets.TF_VAR_APOLLO_KEY}} --variant=test --localSchemaFile=backend/dist/schema.gql,backend/dist/auth-schema.gql,backend/dist/user-schema.gql,backend/dist/api-key-schema.gql,backend/dist/images-schema.gql
+              run: npx apollo service:push --graph=datapm --key=${{secrets.APOLLO_KEY}} --variant=test --localSchemaFile=backend/dist/schema.gql,backend/dist/auth-schema.gql,backend/dist/user-schema.gql,backend/dist/api-key-schema.gql,backend/dist/images-schema.gql
               env:
                   INPUT_TOKEN: ${{ secrets.NPM_TOKEN }}
 

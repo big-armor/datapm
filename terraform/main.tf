@@ -1,46 +1,121 @@
+variable "datapm_environment" {
+  description = "Name of the environment (test, staging, production, etc.)"
+  type        = string
+}
+
+variable "gcp_billing_account_id" {
+  description = "Billing account ID for the GCP project"
+  type        = string
+}
+
 variable "smtp_password" {
   description = "password for the SMTP server"
   type        = string
+  sensitive   = true
 }
 
-variable "APOLLO_KEY" {
-  description = "Apollo GraphlQL Key"
+variable "smtp_from_name" {
+  description = "name of the sender"
   type        = string
 }
 
-locals {
+variable "smtp_from_email" {
+  description = "email of the sender"
+  type        = string
+}
 
-  environments = {
-    default = {
-      media_bucket_name = "datapm-test-media"
-      log_bucket_name   = "datapm-test-logging"
-      log_object_prefix = "datapm-test"
-      location          = "US"
-      labels            = [{ "source" : "terraform" }]
-      registry_name     = "DataPM Test"
-    }
-  }
+variable "smtp_secure" {
+  description = "whether to use TLS or not"
+  type        = bool
+}
 
-  environmentvars = contains(keys(local.environments), terraform.workspace) ? terraform.workspace : "default"
-  workspace       = merge(local.environments["default"], local.environments[local.environmentvars])
+variable "smtp_host" {
+  description = "hostname for the SMTP server"
+  type        = string
+}
+
+variable "smtp_port" {
+  description = "port for the SMTP server"
+  type        = number
+  default     = 25
+}
+
+variable "smtp_user" {
+  description = "user for the SMTP server"
+  type        = string
+}
+
+variable "gcp_location" {
+  description = "location of the GCP project (us-central1, us-east1, etc)"
+  type        = string
+}
+
+variable "datapm_registry_name" {
+  description = "name of the registry"
+  type        = string
+}
+
+variable "gcp_project_id" {
+  description = "GCP project ID to host the registry"
+  type        = string
+}
+
+variable "mixpanel_token" {
+  description = "Mixpanel.com token for the project"
+  type        = string
+  sensitive   = true
+  default     = "not-set" # This will disable mixpanel sending
+}
+
+variable "datapm_enable_activity_log" {
+  description = "Whether to enable activity logging"
+  type        = bool
+  default     = true
+}
+
+variable "datapm_domain_name" {
+  description = "Domain name for the datapm registry server"
+  type        = string
+}
+
+variable "google_sql_name" {
+  description = "Name of the Google SQL instance"
+  type        = string
+  default     = "defaut"
+}
+
+variable "gcp_project_folder" {
+  description = "Name of the Google project folder"
+  type        = string
+  default     = null
+}
+
+variable "gcp_sql_tier" {
+  description = "Google SQL tier"
+  type        = string
+  default     = "db-f1-micro"
 }
 
 terraform {
-  backend "gcs" {
-    bucket = "datapm-registry-test"
-    prefix = "test/state"
+  backend "gcs" {}
+
+  required_providers {
+    google = {
+      version = "~> 4.10.0"
+    }
   }
 }
 
 data "google_billing_account" "acct" {
-  display_name = "Big Armor Corporate"
-  open         = true
+  billing_account = var.gcp_billing_account_id
+  open            = true
 }
 
 resource "google_project" "project" {
-  name            = "datapm TEST"
-  project_id      = "datapm-test-terraform"
+  name            = var.datapm_registry_name
+  project_id      = var.gcp_project_id
   billing_account = data.google_billing_account.acct.id
+  folder_id       =  var.gcp_project_folder
   lifecycle {
     prevent_destroy = true
   }
@@ -70,7 +145,8 @@ resource "google_project_service" "service" {
     "cloudtrace.googleapis.com",
     "servicemanagement.googleapis.com",
     "run.googleapis.com",
-    "dns.googleapis.com"
+    "dns.googleapis.com",
+    "cloudscheduler.googleapis.com",
   ])
 
   service = each.key
@@ -82,7 +158,9 @@ resource "google_project_service" "service" {
 resource "google_service_account" "cloudrun-sa" {
   account_id = "cloudrun-sa"
   project    = google_project.project.project_id
+  depends_on = [google_project_service.service]
 }
+
 resource "google_project_iam_member" "cloudrun-sa-cloudsql-role" {
   project = google_project.project.project_id
   role    = "roles/cloudsql.client"
@@ -90,8 +168,8 @@ resource "google_project_iam_member" "cloudrun-sa-cloudsql-role" {
 }
 
 resource "google_storage_bucket" "logging" {
-  name          = local.workspace["log_bucket_name"]
-  location      = local.workspace["location"]
+  name          = "datapm-${var.datapm_environment}-logs-${google_project.project.project_id}"
+  location      = var.gcp_location
   force_destroy = false
   project       = google_project.project.project_id
 
@@ -107,13 +185,13 @@ resource "google_storage_bucket" "logging" {
 }
 
 resource "google_storage_bucket" "media" {
-  name          = local.workspace["media_bucket_name"]
-  location      = local.workspace["location"]
+  name          = "datapm-${var.datapm_environment}-media-${google_project.project.project_id}"
+  location      = var.gcp_location
   force_destroy = false
   project       = google_project.project.project_id
 
   logging {
-    log_bucket        = local.workspace["log_bucket_name"]
+    log_bucket        = google_storage_bucket.logging.name
     log_object_prefix = "media"
   }
 
@@ -130,37 +208,29 @@ resource "google_storage_bucket_acl" "media-store-acl" {
 
 
 resource "google_cloud_run_service" "default" {
-  name     = "datapm-registry"
-  location = "us-central1"
+  name     = "datapm-registry-${var.datapm_environment}"
+  location = var.gcp_location
   project  = google_project.project.project_id
   template {
     spec {
       service_account_name = google_service_account.cloudrun-sa.email
       containers {
-        image = "gcr.io/${google_project.project.project_id}/datapm-registry"
+        image = "gcr.io/datapm-containers/datapm-registry"
         env {
           name  = "NODE_ENV"
           value = "production"
         }
         env {
           name  = "JWT_AUDIENCE"
-          value = "test.datapm.io"
+          value = var.datapm_domain_name
         }
         env {
           name  = "JWT_ISSUER"
-          value = "test.datapm.io"
+          value = var.datapm_domain_name
         }
         env {
           name  = "JWT_KEY"
           value = random_password.jwt_key.result
-        }
-        env {
-          name  = "APOLLO_KEY"
-          value = var.APOLLO_KEY
-        }
-        env {
-          name  = "APOLLO_GRAPH_VARIANT"
-          value = "dev"
         }
         env {
           name  = "GOOGLE_CLOUD_PROJECT"
@@ -168,11 +238,11 @@ resource "google_cloud_run_service" "default" {
         }
         env {
           name  = "MIXPANEL_TOKEN"
-          value = "asdfasdfasdf"
+          value = var.mixpanel_token
         }
         env {
           name  = "TYPEORM_HOST"
-          value = "/cloudsql/${google_project.project.project_id}:us-central1:${google_sql_database_instance.instance.name}"
+          value = "/cloudsql/${google_project.project.project_id}:${google_sql_database_instance.instance.region}:${google_sql_database_instance.instance.name}"
         }
         env {
           name  = "TYPEORM_PORT"
@@ -196,11 +266,11 @@ resource "google_cloud_run_service" "default" {
         }
         env {
           name  = "REGISTRY_NAME"
-          value = "DataPM TEST Registry"
+          value = var.datapm_registry_name
         }
         env {
           name  = "REGISTRY_URL"
-          value = "https://test.datapm.io"
+          value = "https://${var.datapm_domain_name}"
         }
         env {
           name  = "TYPEORM_IS_DIST"
@@ -208,15 +278,15 @@ resource "google_cloud_run_service" "default" {
         }
         env {
           name  = "SMTP_SERVER"
-          value = "smtp.sendgrid.net"
+          value = var.smtp_host
         }
         env {
           name  = "SMTP_PORT"
-          value = "465"
+          value = var.smtp_port
         }
         env {
           name  = "SMTP_USER"
-          value = "apikey"
+          value = var.smtp_user
         }
         env {
           name  = "SMTP_PASSWORD"
@@ -224,23 +294,23 @@ resource "google_cloud_run_service" "default" {
         }
         env {
           name  = "SMTP_FROM_NAME"
-          value = "DataPM Support"
+          value = var.smtp_from_name
         }
         env {
           name  = "SMTP_FROM_ADDRESS"
-          value = "support@datapm.io"
+          value = var.smtp_from_email
         }
         env {
           name  = "SMTP_SECURE"
-          value = "true"
+          value = var.smtp_secure
         }
         env {
           name  = "STORAGE_URL"
-          value = "gs://${local.workspace["media_bucket_name"]}"
+          value = "gs://${google_storage_bucket.media.name}"
         }
         env {
           name  = "ACTIVITY_LOG"
-          value = "true"
+          value = var.datapm_enable_activity_log
         }
 
         env {
@@ -248,6 +318,8 @@ resource "google_cloud_run_service" "default" {
           value = random_password.scheduler_key.result
         }
         env {
+          ## Leader election must be disabled for google cloud run
+          ## google cloud cron jobs are used instead
           name  = "LEADER_ELECTION_DISABLED"
           value = "true"
         }
@@ -259,7 +331,7 @@ resource "google_cloud_run_service" "default" {
       annotations = {
         "autoscaling.knative.dev/minScale"      = "1"
         "autoscaling.knative.dev/maxScale"      = "2"
-        "run.googleapis.com/cloudsql-instances" = "${google_project.project.project_id}:us-central1:${google_sql_database_instance.instance.name}"
+        "run.googleapis.com/cloudsql-instances" = "${google_project.project.project_id}:${google_sql_database_instance.instance.region}:${google_sql_database_instance.instance.name}"
         "run.googleapis.com/client-name"        = "terraform"
       }
     }
@@ -303,12 +375,13 @@ resource "random_password" "dbpassword" {
 }
 
 resource "google_sql_database_instance" "instance" {
-  name             = "registry-v3"
+  name             = "datapm-registry-${var.datapm_environment}"
   project          = google_project.project.project_id
-  region           = "us-central1"
-  database_version = "POSTGRES_12"
+  region           = var.gcp_location
+  database_version = "POSTGRES_13"
   settings {
-    tier = "db-f1-micro"
+    tier = var.gcp_sql_tier
+    availability_type = "REGIONAL"
     backup_configuration {
       enabled                        = true
       start_time                     = "01:00"
@@ -343,8 +416,8 @@ resource "google_sql_database" "database" {
 }
 
 resource "google_cloud_run_domain_mapping" "default" {
-  location = "us-central1"
-  name     = "test.datapm.io"
+  location = var.gcp_location
+  name     = var.datapm_domain_name
   project  = google_project.project.project_id
 
   metadata {
@@ -358,9 +431,10 @@ resource "google_cloud_run_domain_mapping" "default" {
 
 
 resource "google_cloud_scheduler_job" "instant_notifications_job" {
-  name             = "datapm-instant-notifications"
+  depends_on = [google_project_service.service]
+  name             = "datapm-${var.datapm_environment}-instant-notifications"
   project          = google_project.project.project_id
-  region           = "us-central1"
+  region           = var.gcp_location
   description      = "To invoke sending daily notifications"
   schedule         = "* * * * *"
   time_zone        = "America/New_York"
@@ -372,7 +446,7 @@ resource "google_cloud_scheduler_job" "instant_notifications_job" {
 
   http_target {
     http_method = "POST"
-    uri         = "https://test.datapm.io/graphql"
+    uri         = "https://${var.datapm_domain_name}/graphql"
     headers = {
       Content-Type = "application/json"
     }
@@ -381,9 +455,10 @@ resource "google_cloud_scheduler_job" "instant_notifications_job" {
 }
 
 resource "google_cloud_scheduler_job" "hourly_notifications_job" {
-  name             = "datapm-hourly-notifications"
+  depends_on = [google_project_service.service]
+  name             = "datapm-${var.datapm_environment}-hourly-notifications"
   project          = google_project.project.project_id
-  region           = "us-central1"
+  region           = var.gcp_location
   description      = "To invoke sending hourly notifications"
   schedule         = "0 * * * *"
   time_zone        = "America/New_York"
@@ -395,7 +470,7 @@ resource "google_cloud_scheduler_job" "hourly_notifications_job" {
 
   http_target {
     http_method = "POST"
-    uri         = "https://test.datapm.io/graphql"
+    uri         = "https://${var.datapm_domain_name}/graphql"
     headers = {
       Content-Type = "application/json"
     }
@@ -404,9 +479,10 @@ resource "google_cloud_scheduler_job" "hourly_notifications_job" {
 }
 
 resource "google_cloud_scheduler_job" "daily_notifications_job" {
-  name             = "datapm-daily-notifications"
+  depends_on = [google_project_service.service]
+  name             = "datapm-${var.datapm_environment}-daily-notifications"
   project          = google_project.project.project_id
-  region           = "us-central1"
+  region           = var.gcp_location
   description      = "To invoke sending daily notifications"
   schedule         = "0 8 * * *"
   time_zone        = "America/New_York"
@@ -418,7 +494,7 @@ resource "google_cloud_scheduler_job" "daily_notifications_job" {
 
   http_target {
     http_method = "POST"
-    uri         = "https://test.datapm.io/graphql"
+    uri         = "https://${var.datapm_domain_name}/graphql"
     headers = {
       Content-Type = "application/json"
     }
@@ -429,9 +505,10 @@ resource "google_cloud_scheduler_job" "daily_notifications_job" {
 
 
 resource "google_cloud_scheduler_job" "weekly_notifications_job" {
-  name             = "datapm-weekly-notifications"
+  depends_on = [google_project_service.service]
+  name             = "datapm-${var.datapm_environment}-weekly-notifications"
   project          = google_project.project.project_id
-  region           = "us-central1"
+  region           = var.gcp_location
   description      = "To invoke sending weekly notifications"
   schedule         = "0 8 * * MON"
   time_zone        = "America/New_York"
@@ -443,7 +520,7 @@ resource "google_cloud_scheduler_job" "weekly_notifications_job" {
 
   http_target {
     http_method = "POST"
-    uri         = "https://test.datapm.io/graphql"
+    uri         = "https://${var.datapm_domain_name}/graphql"
     headers = {
       Content-Type = "application/json"
     }
@@ -453,9 +530,10 @@ resource "google_cloud_scheduler_job" "weekly_notifications_job" {
 
 
 resource "google_cloud_scheduler_job" "monthly_notifications_job" {
-  name             = "datapm-monthly-notifications"
+  depends_on = [google_project_service.service]
+  name             = "datapm-${var.datapm_environment}-monthly-notifications"
   project          = google_project.project.project_id
-  region           = "us-central1"
+  region           = var.gcp_location
   description      = "To invoke sending monthly notifications"
   schedule         = "0 8 1 * *"
   time_zone        = "America/New_York"
@@ -467,7 +545,7 @@ resource "google_cloud_scheduler_job" "monthly_notifications_job" {
 
   http_target {
     http_method = "POST"
-    uri         = "https://test.datapm.io/graphql"
+    uri         = "https://${var.datapm_domain_name}/graphql"
     headers = {
       Content-Type = "application/json"
     }

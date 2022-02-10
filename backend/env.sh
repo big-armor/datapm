@@ -16,10 +16,8 @@ export SCHEDULER_KEY=${SCHEDULER_KEY:="!!!!REPLACE_ME!!!!"}
 # This is an alternative to the SCHEDULER_KEY solution above. 
 export LEADER_ELECTION_DISABLED=false
 
-# export APOLLO_KEY="service:service-name:asdfasdfasdfasdf"
-export APOLLO_GRAPH_VARIANT="dev"
 export GOOGLE_CLOUD_PROJECT="adsfasdf"
-export MIXPANEL_TOKEN="asdfasdfasdf"
+export MIXPANEL_TOKEN="not-set"
 export TYPEORM_PORT=${TYPEORM_PORT:=5432}
 export TYPEORM_DATABASE="datapm"
 export TYPEORM_SCHEMA="public"
