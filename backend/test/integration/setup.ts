@@ -45,8 +45,13 @@ export interface ActivityLogLine {
 export function findActivityLogLine(line: string, callback: (activityLogLine: ActivityLogLine) => boolean): Boolean {
     if (!line.startsWith("{")) return false;
 
-    const lineObject = JSON.parse(line) as ActivityLogLine;
-    if (lineObject._type == "ActivityLog" && callback(lineObject)) return true;
+    try {
+        const lineObject = JSON.parse(line) as ActivityLogLine;
+        if (lineObject._type == "ActivityLog" && callback(lineObject)) return true;
+    } catch (e) {
+        console.log("Error parsing line: " + line);
+    }
+
 
     return false;
 }
