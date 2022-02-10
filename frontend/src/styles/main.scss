@@ -571,10 +571,16 @@ mat-select {
     width: 40px;
     height: 40px;
     background: var(--secondary-color);
-    box-shadow: var(--outer-shadow-1) !important;
+    box-shadow: none;
+    border: 1px solid var(--gray-5-color);
 
     &:focus {
         outline: none !important;
+        box-shadow: none !important;
+    }
+
+    &:hover {
+        background: var(--custom-secondary-hover-color);
     }
 
     .mat-button-wrapper {

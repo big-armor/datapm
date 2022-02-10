@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const betaLink = document.createElement("a");
     betaLink.setAttribute("href", "/docs/beta-notice");
     betaLink.classList.add("beta");
-    betaLink.innerHTML = "Beta";
+    betaLink.innerHTML = "beta";
     betaDiv.appendChild(betaLink);
     themeSwitch.appendChild(betaDiv);
 
