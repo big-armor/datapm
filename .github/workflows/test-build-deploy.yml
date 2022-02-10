@@ -600,7 +600,7 @@ jobs:
                   token: ${{ secrets.NPM_TOKEN }}
 
             - name: Cleanup Deployer Credentials File
-              rune: rm -f container-deployer-gcloud.key
+              run: rm -f container-deployer-gcloud.key
 
     updateTestEnvironment:
         name: "Updated Test Environment"
