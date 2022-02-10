@@ -7,7 +7,7 @@ title: Host A Private DataPM Registry in Google Cloud Run
 
 ## Advantages
 
-1. GCR is very cost efficient, and can even be completely free.
+1. GCR is very cost efficient.
 1. GCR is extremely performance scalable.
 1. GCR is a very secure platform.
 1. GCR is serverless, and therefore operational maintenance is relatively low.
@@ -21,7 +21,7 @@ title: Host A Private DataPM Registry in Google Cloud Run
 1. GCR is a serverless platform that is not as widely known as other cloud platforms.
     - You will need to be familiar with GCR
     - Operating GCR is very different than other cloud platforms
-1. GCR limits a single instance to 60 minutes, and therefore may not be suitable for storing some continuously streaming or very large data sets.
+1. GCR limits a single HTTP connection lifetime to 60 minutes, and therefore may not be suitable for storing some continuously streaming or very large data sets.
 
 ## WARNING
 
@@ -32,7 +32,7 @@ By using this guide, you agree to the [DataPM License](https://datapm.io/docs/li
 ### Install Terraform Command Line Client
 
 1. [Install Terraform Command Line Client](https://learn.hashicorp.com/tutorials/terraform/install-cli)
-    - or [Use the Terraform Cloud](https://learn.hashicorp.com/collections/terraform/cloud-get-started)
+    - MacOS [Homebrew](https://brew.sh/): `brew install terraform`
 
 ### Prepare Google Cloud Resources
 
@@ -52,7 +52,7 @@ By using this guide, you agree to the [DataPM License](https://datapm.io/docs/li
     - Use standard storage class
     - Enable version retentions with about 5 versions retained for at least 7 days
 
-### Set Local GCloud Authentication
+### Set Local Google Cloud Authentication
 
 Use one of the two options below to set gcloud authentication for use by the Terraform command.
 
@@ -82,21 +82,24 @@ Use one of the two options below to set gcloud authentication for use by the Ter
 
 1. Download the [DataPM GCP Terraform Scripts](/static/terraform-scripts/gcp).
     - You will need to periodically download new versions of the script as they are updated.
-1. Rename and modify the secrets-example.tvars file
+1. Rename and modify the environment-example.tvars file
     - Reffer to [Terraform's Protecting Secrets documentation](https://learn.hashicorp.com/tutorials/terraform/sensitive-variables)
-1. Rename and modify the backend-config-example.config file
+1. Rename and modify the backend-example.config file
     - The bucket is the name of the Google Cloud Storage bucket you created above.
 
 ### Run Terraform Commands
 
 1. Open a terminal and "cd" into the directory with the scripts
 1. Run the `terraform init --backend-config="backend.config"` command.
-1. Run the `terraform import -var-file="secrets/test.tfvars" google_project.project <google-project-id>` command.
-    - This will import the exiting GCP project into the Terraform state
-1. Run the `terraform plan -var-file="secrets.tfvars"` command.
+1. Run the `terraform import -var-file="environment.tfvars" google_project.project <google-project-id>` command.
+    - This will import the existing GCP project into the Terraform state
+1. Run the `terraform plan -var-file="environment.tfvars"` command.
     - Be sure to review the output for changes and errors
-1. Run the `terraform apply -var-file="secrets.tfvars"` command.
-1. You can modify the files, and re-run the terraform pland and apply commands above.
+1. Run the `terraform apply -var-file="environment.tfvars"` command.
+    - The SQL server can take up to 30 minutes to deploy
+    - The domain certificate will be provisioned immediately, but will take up to 30 minutes to become active
+    - The GCP global load balancers will return a "Server Error" until the certificate is active
+1. You can modify the terraform files, and re-run the terraform plan and apply commands above.
 
 ## Ongoing Maintenance
 

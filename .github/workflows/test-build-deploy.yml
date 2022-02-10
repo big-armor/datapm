@@ -614,7 +614,7 @@ jobs:
               uses: actions/checkout@v2
 
             - name: Terraform Init to
-              run: terraform init -backend-config='environments/test/backend-test.config'
+              run: terraform init -backend-config='environments/test/test.config'
               working-directory: terraform
               env:
                   GOOGLE_CREDENTIALS: ${{secrets.TEST_GOOGLE_CREDENTIALS}}

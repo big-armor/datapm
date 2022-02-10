@@ -56,11 +56,11 @@ async function createGCPTerraformScriptZip() {
 
     const mainTfContents = fs.readFileSync(path.join("..","terraform","main.tf"),"utf-8");
     const secretsExampleContents = fs.readFileSync(path.join("..","terraform","secrets-example.tfvars"),"utf-8");
-    const backendConfigContents = fs.readFileSync(path.join("..","terraform","backend-config-example.config"),"utf-8");
+    const backendConfigContents = fs.readFileSync(path.join("..","terraform","backend-example.config"),"utf-8");
 
     zip.file("main.tf",mainTfContents);
     zip.file("secrets-example.tfvars",secretsExampleContents);
-    zip.file("backend-config-example.config",backendConfigContents);
+    zip.file("backend-example.config",backendConfigContents);
 
     const zipContent = await zip.generateAsync({type: "uint8array"});
 
