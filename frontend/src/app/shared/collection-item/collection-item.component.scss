@@ -3,8 +3,8 @@
 
 .collection-item {
     cursor: pointer;
-    border: 1px solid var(--gray-9-color);
-    box-shadow: none;
+    border: 1px solid var(--gray-5-color);
+    box-shadow: none !important;
     background-color: var(--gray-7-color);
     transition: background-color 0.5s ease;
 
