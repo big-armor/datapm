@@ -1,46 +1,26 @@
-<mat-card class="collection-item my-3">
+<mat-card class="collection-item box-line my-3">
     <mat-card-content>
-        <div class="d-flex align-items-center mb-2 collection-creator">
-            <img src="../../../assets/images/user-female.png" alt="Creator" class="photo" />
-            <span class="name mb-2">{{ item.name }}</span>
-            <div class="ml-auto px-4 py-2 bd-highlight slide-right">
-                <form [formGroup]="form">
-                    <mat-slide-toggle
-                        color="primary"
-                        [checked]="isPublic"
-                        (change)="toggleCollectionIsPublic($event)"
-                        (click)="updateIsPublic()"
-                    ></mat-slide-toggle>
-                    <div class="collections-public">
-                        <span *ngIf="isPublic" class="public-text">public</span>
-                        <span *ngIf="!isPublic" class="not-public-text">not public</span>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <div class="d-flex mb-3">
-            <!-- To be updated later -->
-            <div class="flex-1 pr-4" *ngIf="hasImage">
-                <img
-                    class="collection-image"
-                    src="https://www.publicdomainpictures.net/pictures/320000/velka/background-image.png"
-                    alt="collection"
-                />
-            </div>
-            <div class="flex-1 px-3 py-1">
-                <div class="collection-identifier mb-2">
-                    {{ item.identifier.collectionSlug }}
+        <div class="d-flex bd-highlight d-flex align-items-top">
+            <div class="p-1 pl-2 flex-grow-1 bd-highlight align-self-center">
+                <div [class.public-text]="item?.isPublic" [class.not-public-text]="!item?.isPublic">
+                    {{ item.isPublic ? "public" : "not public" }}
                 </div>
-                <div class="collection-description">
-                    {{ truncatedDescription }}
-                </div>
+                <a class="box-name">{{ item.name }}</a>
+                <div class="text-light-gray">{{ item.description }}</div>
             </div>
-        </div>
-        <div class="collection-actions pt-2">
-            <div class="d-flex bd-highlight">
-                <div class="ml-auto p-2 bd-highlight">
-                    <a class="edit-button" (click)="deleteCollection()">Delete</a>
-                </div>
+            <div class="p-1 bd-highlight action-div text-center">
+                <!-- <div class="text-light-gray mb-2">
+                    {{ collectionPermission(collection) }} Permission
+                </div> -->
+
+                <button class="app-outlined-button mr-1" [hidden]="!hasPermission(Permission.EDIT)" [disabled]="!hasPermission(Permission.EDIT)"
+                    (click)="editCollection($event, item)">
+                    Edit
+                </button>
+                <button class="app-outlined-button" [hidden]="!hasPermission(Permission.MANAGE)" [disabled]="!hasPermission(Permission.MANAGE)"
+                    (click)="deleteCollection($event, item)">
+                    <span class="delete-txt">Delete</span>
+                </button>
             </div>
         </div>
     </mat-card-content>

@@ -1,6 +1,6 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Router } from "@angular/router";
-import { Collection, UpdateCollectionGQL, DeleteCollectionGQL } from "../../../generated/graphql";
+import { Collection, UpdateCollectionGQL, DeleteCollectionGQL, Permission } from "../../../generated/graphql";
 import * as timeago from "timeago.js";
 import { FormGroup, FormControl } from "@angular/forms";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
@@ -9,6 +9,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { DeleteCollectionComponent } from "../delete-collection/delete-collection.component";
 
 import { Subject } from "rxjs";
+import { EditCollectionComponent } from "../edit-collection/edit-collection.component";
 
 enum State {
     INIT,
@@ -24,14 +25,21 @@ enum State {
     styleUrls: ["./collection-item.component.scss"]
 })
 export class CollectionItemComponent implements OnInit {
+
+    public Permission = Permission;
+
     public isPublic: boolean;
     public form: FormGroup;
     private collection: Collection;
     private subscription = new Subject();
     @Input() item: Collection;
-    @Input() hasImage: boolean;
     updatePublicState = State.INIT;
-    deleteCollectionState = State.INIT;
+
+    @Output()
+    public edited = new EventEmitter();
+
+    @Output()
+    public deleted = new EventEmitter();
 
     constructor(
         private router: Router,
@@ -102,26 +110,43 @@ export class CollectionItemComponent implements OnInit {
             });
     }
 
-    deleteCollection() {
-        const dialog = this.dialog.open(DeleteCollectionComponent, {
-            data: {
-                collectionSlug: this.item.identifier.collectionSlug
-            }
-        });
-
-        dialog.afterClosed().subscribe((confirmed: boolean) => {
-            if (confirmed) {
-                this.deleteCollectionGQL
-                    .mutate({
-                        identifier: {
-                            collectionSlug: this.item.identifier.collectionSlug
-                        }
-                    })
-                    .subscribe(() => {
-                        location.reload();
-                        this.deleteCollectionState = State.SUCCESS;
-                    });
-            }
-        });
+    collectionPermission(collection: Collection): string {
+        if (collection.myPermissions.includes(Permission.MANAGE)) return "Manage";
+        if (collection.myPermissions.includes(Permission.EDIT)) return "Edit";
+        if (collection.myPermissions.includes(Permission.VIEW)) return "View";
+        return "";
     }
+
+    editCollection(ev, collection: Collection): void {
+        ev.stopPropagation();
+        this.dialog
+            .open(EditCollectionComponent, {
+                data: collection
+            })
+            .afterClosed()
+            .subscribe((newCollection: Collection) => {
+               // emit event to update collection
+               this.edited.emit(newCollection);
+            });
+    }
+
+    deleteCollection(ev, collection: Collection): void {
+        ev.stopPropagation();
+        this.dialog
+            .open(DeleteCollectionComponent, {
+                data: {
+                    collectionSlug: collection.identifier.collectionSlug
+                }
+            })
+            .afterClosed()
+            .subscribe((confirmed: boolean) => {
+                // emit event to update collection list
+                this.deleted.emit(confirmed);
+            });
+    }
+
+    hasPermission(permission: Permission): boolean {
+        return this.item.myPermissions.includes(permission);
+    }
+
 }

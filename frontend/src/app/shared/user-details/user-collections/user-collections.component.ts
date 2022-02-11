@@ -101,45 +101,6 @@ export class UserCollectionsComponent implements OnInit {
             });
     }
 
-    editCollection(ev, collection: Collection): void {
-        ev.stopPropagation();
-        this.dialog
-            .open(EditCollectionComponent, {
-                data: collection
-            })
-            .afterClosed()
-            .subscribe((newCollection: Collection) => {
-                if (newCollection) {
-                    this.collections = this.collections.map((c) =>
-                        c.identifier.collectionSlug === collection.identifier.collectionSlug ? newCollection : c
-                    );
-                }
-            });
-    }
-
-    deleteCollection(ev, collection: Collection): void {
-        ev.stopPropagation();
-        this.dialog
-            .open(DeleteCollectionComponent, {
-                data: {
-                    collectionSlug: collection.identifier.collectionSlug
-                }
-            })
-            .afterClosed()
-            .subscribe((confirmed: boolean) => {
-                if (confirmed) {
-                    this.loadMyCollections();
-                }
-            });
-    }
-
-    collectionPermission(collection: Collection): string {
-        if (collection.myPermissions.includes(Permission.MANAGE)) return "Manage";
-        if (collection.myPermissions.includes(Permission.EDIT)) return "Edit";
-        if (collection.myPermissions.includes(Permission.VIEW)) return "View";
-        return "";
-    }
-
     public goToCollection(collection: Collection): void {
         this.router.navigate(["/collection/" + collection.identifier.collectionSlug]);
     }

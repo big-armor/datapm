@@ -17,6 +17,11 @@ export class CollectionFollowersComponent {
     constructor(private collectionFollowersGQL: CollectionFollowersGQL) {}
 
     public loadFollowers(request: FollowersRequest): void {
+        setTimeout(() => this.loadFollowersInternal(request),1);
+        
+    }
+
+    loadFollowersInternal(request: FollowersRequest) {
         this.loadingFollowers = true;
         this.collectionFollowersGQL
             .fetch({
