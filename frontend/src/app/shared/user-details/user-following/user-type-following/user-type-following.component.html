@@ -8,7 +8,7 @@
         </ng-container>
 
         <ng-container matColumnDef="frequency">
-            <th mat-header-cell *matHeaderCellDef scope="col">Frequency</th>
+            <th mat-header-cell *matHeaderCellDef scope="col">Notification Frequency</th>
             <td mat-cell *matCellDef="let follow">
                 <mat-form-field appearance="fill" class="permission-div">
                     <mat-select [(value)]="follow.notificationFrequency" (selectionChange)="updateFollow(follow)">

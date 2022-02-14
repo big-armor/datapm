@@ -10,6 +10,7 @@ import { DeleteCatalogComponent } from "../../delete-catalog/delete-catalog.comp
 import { DialogService } from "../../../services/dialog/dialog.service";
 import { MatSlideToggle, MatSlideToggleChange } from "@angular/material/slide-toggle";
 import { FormControl } from "@angular/forms";
+import { Router } from "@angular/router";
 
 enum State {
     INIT,
@@ -50,7 +51,9 @@ export class UserCatalogsComponent implements OnInit {
         private deleteCatalogGQL: DeleteCatalogGQL,
         private authenticationService: AuthenticationService,
         private dialog: MatDialog,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private router: Router
+
     ) {}
 
     public ngOnInit(): void {
@@ -171,5 +174,9 @@ export class UserCatalogsComponent implements OnInit {
         if (collection.myPermissions.includes(Permission.EDIT)) return "Edit";
         if (collection.myPermissions.includes(Permission.VIEW)) return "View";
         return "";
+    }
+
+    public clickCatalog(catalog: Catalog): void {
+        this.router.navigate([catalog.identifier.catalogSlug]);
     }
 }

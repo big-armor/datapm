@@ -1,0 +1,27 @@
+<mat-card class="catalog-item box-line my-3">
+    <mat-card-content>
+        <div class="d-flex bd-highlight d-flex align-items-top">
+            <div class="p-1 pl-2 flex-grow-1 bd-highlight align-self-center">
+                <div [class.public-text]="item?.isPublic" [class.not-public-text]="!item?.isPublic">
+                    {{ item.isPublic ? "public" : "not public" }}
+                </div>
+                <a class="box-name">{{ item.displayName }}</a>
+                <div class="text-light-gray">{{ item.description }}</div>
+            </div>
+            <div class="p-1 bd-highlight action-div text-center">
+                <!-- <div class="text-light-gray mb-2">
+                    {{ catalogPermission(catalog) }} Permission
+                </div> -->
+
+                <button class="app-outlined-button mr-1" [hidden]="!hasPermission(Permission.EDIT)"
+                    [disabled]="!hasPermission(Permission.EDIT)" (click)="editCatalog($event, item)">
+                    Edit
+                </button>
+                <button class="app-outlined-button" [hidden]="!hasPermission(Permission.MANAGE)"
+                    [disabled]="!hasPermission(Permission.MANAGE)" (click)="deleteCatalog($event, item)">
+                    <span class="delete-txt">Delete</span>
+                </button>
+            </div>
+        </div>
+    </mat-card-content>
+</mat-card>
