@@ -142,7 +142,12 @@ export class PostgresSink extends KnexSink {
         // Check DB Existence
         await this.checkDBExistence(this.client, configuration);
 
-        const writable = super.getWriteable(schema, connectionConfiguration, credentialsConfiguration, configuration);
+        const writable = await super.getWriteable(
+            schema,
+            connectionConfiguration,
+            credentialsConfiguration,
+            configuration
+        );
 
         await this.client.transaction(async (tx) => {
             await tx.raw(`CREATE SCHEMA IF NOT EXISTS "${configuration.schema}"`);
