@@ -59,7 +59,7 @@ By using this guide, you agree to the [DataPM License](https://datapm.io/docs/li
 
 ### Set Local Google Cloud Authentication
 
-Use one of the two options below to set gcloud authentication for use by the Terraform command.
+Use one of the options below to set gcloud authentication for use by the Terraform command.
 
 #### Authentication Option 1: Use GCloud Application Default Credentials
 
@@ -82,6 +82,8 @@ Use one of the two options below to set gcloud authentication for use by the Ter
 1. Set your local `GOOGLE_APPLICATION_CREDENTIALS` environment variable to the path of the key file
     - Linux and MacOS `export GOOGLE_APPLICATION_CREDENTIALS=<path>`
     - Windows `$env:GOOGLE_APPLICATION_CREDENTIALS="<path>"`
+1. Add the new service account as a Billing Account Principal
+    - Give it the "Billing Account Viewer" role
 
 ### Download and Prepare Terraform Files
 
