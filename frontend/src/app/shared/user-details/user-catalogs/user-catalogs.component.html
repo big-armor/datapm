@@ -35,46 +35,13 @@
                     </ng-container>
 
                     <div class="col-lg-10 col-md-12 no-pd-mobile">
-                        <mat-card
-                            class="box-line my-3"
+                        <app-catalog-item
                             *ngFor="let catalog of myCatalogs"
-                            [routerLink]="'/' + catalog.identifier.catalogSlug"
-                        >
-                            <mat-card-content>
-                                <div class="d-flex bd-highlight d-flex align-items-top">
-                                    <div class="p-1 pl-2 flex-grow-1 bd-highlight align-self-center">
-                                        <div
-                                            [class.public-text]="catalog?.isPublic"
-                                            [class.not-public-text]="!catalog?.isPublic"
-                                        >
-                                            {{ catalog.isPublic ? "public" : "not public" }}
-                                        </div>
-                                        <a class="box-name">{{ catalog.displayName }}</a>
-                                        <div class="text-light-gray">{{ catalog.description }}</div>
-                                    </div>
-                                    <div class="p-1 bd-highlight action-div text-center">
-                                        <div class="text-light-gray mb-2">
-                                            {{ catalogPermission(catalog) }} Permission
-                                        </div>
-
-                                        <button
-                                            class="app-outlined-button mr-1"
-                                            [class.disabled]="!canModifyCatalog(catalog)"
-                                            (click)="editCatalog($event, catalog)"
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            class="app-outlined-button"
-                                            [class.disabled]="!canModifyCatalog(catalog)"
-                                            (click)="deleteCatalog($event, catalog)"
-                                        >
-                                            <span class="delete-txt">Delete</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </mat-card-content>
-                        </mat-card>
+                            [item]="catalog"
+                            (click)="clickCatalog(catalog)"
+                            (edited)="refreshCatalogs()" 
+                            (deleted)="refreshCatalogs()" 
+                        ></app-catalog-item>
                         <div class="loading-container" *ngIf="catalogState === State.LOADING">
                             <mat-spinner [diameter]="40"></mat-spinner>
                         </div>

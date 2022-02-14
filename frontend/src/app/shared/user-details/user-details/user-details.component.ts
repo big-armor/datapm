@@ -82,6 +82,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
+        this.subscription.next();
         this.subscription.unsubscribe();
     }
 

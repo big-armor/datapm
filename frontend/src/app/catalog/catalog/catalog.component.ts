@@ -1,9 +1,11 @@
+import { I } from "@angular/cdk/keycodes";
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, ParamMap } from "@angular/router";
-import { Subject } from "rxjs";
+import { Subject, Subscriber, Subscription } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { PlatformSettingsComponent } from "src/app/home/admin-dashboard/platform-settings/platform-settings.component";
 import { PageState } from "src/app/models/page-state";
+import { AuthenticationService } from "src/app/services/authentication.service";
 import { BuilderIOSettings, Catalog, GetPageContentGQL, User } from "src/generated/graphql";
 
 enum PageType {
@@ -28,6 +30,7 @@ export class CatalogComponent implements OnInit {
 
     public user: User;
     public currentUser: User;
+    public currentUserSubscription: Subscription;
 
     public catalog: Catalog;
 
@@ -36,19 +39,35 @@ export class CatalogComponent implements OnInit {
 
     private subscription = new Subject();
 
-    constructor(private route: ActivatedRoute, private pageContentGQL: GetPageContentGQL) {}
+    constructor(private route: ActivatedRoute, private pageContentGQL: GetPageContentGQL, private authService: AuthenticationService) {
+        this.currentUserSubscription = this.authService.currentUser.subscribe((user) => {
+            this.currentUser = user;
+
+            if(this.currentUser?.username == this.user?.username) {
+                this.user = this.currentUser;
+            }
+        });
+    }
+
 
     public ngOnInit(): void {
         this.route.paramMap.pipe(takeUntil(this.subscription)).subscribe((paramMap: ParamMap) => {
-            const catalogSlug = paramMap.get("catalogSlug");
-            this.state = "LOADING";
-            this.loadData(catalogSlug);
+            this.reloadData();
         });
+    }
+
+    private reloadData(): void {
+        const paramMap = this.route.snapshot.paramMap;
+        const catalogSlug = paramMap.get("catalogSlug");
+        this.state = "LOADING";
+        this.loadData(catalogSlug);
     }
 
     public ngOnDestroy(): void {
         this.subscription.next();
         this.subscription.complete();
+
+        this.currentUserSubscription.unsubscribe();
     }
 
     private loadData(route: string): void {

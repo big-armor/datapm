@@ -5,7 +5,8 @@ on:
         branches:
             - master
     pull_request:
-        types: [open, synchronize]
+        branches:
+            - master
 
 jobs:
     lint:

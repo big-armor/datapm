@@ -1,0 +1,102 @@
+@import "../../../styles/variables";
+@import "../../../styles/colors";
+
+.catalog-item {
+    cursor: pointer;
+    border: 1px solid var(--gray-5-color);
+    box-shadow: none !important;
+    background-color: var(--gray-7-color);
+    transition: background-color 0.5s ease;
+
+    &:hover {
+        background-color: var(--custom-secondary-color);
+        transition: background-color 0.5s ease;
+    }
+
+    .catalog-identifier {
+        font-family: $family-roboto;
+        font-weight: $weight-500;
+        font-size: ($title-font + 2);
+        line-height: 26px;
+        color: var(--gray-1-color);
+        letter-spacing: 0.6px;
+    }
+
+    .catalog-description {
+        font-family: $family-roboto;
+        font-style: $style-normal;
+        font-weight: $weight-300;
+        font-size: $text-font;
+        line-height: 18px;
+        letter-spacing: 0.6px;
+        color: var(--gray-2-color);
+        max-height: 111px;
+        overflow: hidden;
+    }
+
+    .catalog-image {
+        width: 100%;
+        max-height: 150px;
+        object-fit: cover;
+    }
+
+    .catalog-creator {
+        .catalogs-public {
+            display: inline-block;
+            vertical-align: middle;
+            margin-bottom: 10px;
+            margin-left: 5px;
+            font-family: $family-roboto;
+            font-style: $style-normal;
+            font-weight: $weight-400;
+            font-size: $xsmall-font;
+            line-height: 13px;
+            letter-spacing: 0.6px;
+
+            .public-text {
+                color: var(--gray-1-color);
+            }
+            .not-public-text {
+                color: var(--gray-3-color);
+            }
+        }
+
+        .name {
+            font-family: $family-roboto;
+            font-style: $style-normal;
+            letter-spacing: 0.6px;
+            font-weight: $weight-300;
+            font-size: $text-font;
+            line-height: 18px;
+            color: var(--gray-3-color);
+            padding: 4px 10px;
+            margin-bottom: 0 !important;
+        }
+
+        .photo {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
+    }
+
+    .catalog-actions {
+        .edit-button {
+            font-family: $family-roboto;
+            font-style: $style-normal;
+            font-weight: $weight-400;
+            font-size: $small-font;
+            line-height: 13px;
+            letter-spacing: 0.6px;
+            color: var(--info-color);
+            border: 1px solid var(--gray-9-color);
+            padding: 3px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            &:hover {
+                text-decoration: none;
+                background-color: var(--gray-9-color);
+            }
+        }
+    }
+}
