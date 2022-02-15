@@ -467,9 +467,14 @@ mat-select {
     }
 }
 
+/** 
+Hero Builder Section
+*/
+
 .hero-section {
-    border-radius: 6px;
-    padding: 22px 15px 20px 15px;
+    p:first-of-type {
+        margin-bottom: 12px !important;
+    }
 }
 
 .hero-blue-btn {
@@ -1045,10 +1050,6 @@ button:disabled {
 
 .border-none {
     border: none;
-}
-
-.paragraph-txt {
-    color: var(--gray-2-color) !important;
 }
 
 .font-22 {
