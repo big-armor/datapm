@@ -43,6 +43,7 @@ By using this guide, you agree to the [DataPM License](https://datapm.io/docs/li
 
 1. Open the [GCP Console](https://console.cloud.google.com) with your Google Account
 1. Create a GCP [billing account](https://cloud.google.com/billing/docs/how-to/manage-billing-account)
+    - You may already have an active billing account
 1. (Optional) Create a new [project folder](https://cloud.google.com/resource-manager/docs/creating-managing-folders) in your GCP organization
     - All datapm projects will be placed in this folder
     - You can then share access to GCP resources at the folder level
@@ -57,7 +58,7 @@ By using this guide, you agree to the [DataPM License](https://datapm.io/docs/li
     - Use standard storage class
     - Enable version retentions with about 5 versions retained for at least 7 days
 
-### Set Local Google Cloud Authentication
+### Local Google Cloud Authentication
 
 Use one of the options below to set gcloud authentication for use by the Terraform command.
 

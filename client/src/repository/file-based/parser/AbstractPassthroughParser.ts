@@ -7,6 +7,7 @@ import { findParser } from "../AbstractFileStreamSource";
 import { SourceInspectionContext } from "../../Source";
 import { FileBufferSummary, ParserInspectionResults, Parser } from "./Parser";
 import { getParserByMimeType } from "./ParserUtil";
+import path from "path";
 
 export abstract class AbstractPassThroughParser implements Parser {
     abstract getDisplayName(): string;
@@ -65,8 +66,10 @@ export abstract class AbstractPassThroughParser implements Parser {
 
         const decompressedBufferReadable = Readable.from(decompressedBuffer);
 
+        const pathToMagicFile = path.join(path.dirname(process.execPath), "node_modules/mmmagic/magic/magic.mgc");
+
         const [magicMimeResults] = await streamMmmagic.promise(decompressedBufferReadable, {
-            magicFile: "node_modules/mmmagic/magic/magic.mgc"
+            magicFile: pathToMagicFile
         });
 
         decompressorTransform.off("error", decompressorErrorHandler);
