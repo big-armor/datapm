@@ -37,7 +37,7 @@ export class DialogService {
         } else {
             message =
                 "This package will be marked private and will not be available to other users in this registry" +
-                " unless they have specific permissions set";
+                " unless they have specific permissions.";
             confirmText = "Disable Public Access";
         }
 

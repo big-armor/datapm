@@ -1212,7 +1212,7 @@ button:disabled {
     font-weight: $weight-400;
     font-size: ($text-font - 1);
     letter-spacing: 0.4px;
-    color: var(--gray-2-color);
+    color: var(--gray-2-color) !important;
     margin-bottom: 5px !important;
 }
 
