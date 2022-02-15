@@ -652,13 +652,14 @@ jobs:
               env:
                   GOOGLE_CREDENTIALS: ${{secrets.TEST_GOOGLE_CREDENTIALS}}
 
-            - name: Install dependencies
-              run: npm ci
+            #            - name: Install dependencies
+            #              run: npm ci
 
-            - name: Publish Apollo Graphql Update
-              run: npx apollo service:push --graph=datapm --key=${{secrets.APOLLO_KEY}} --variant=test --localSchemaFile=backend/dist/schema.gql,backend/dist/auth-schema.gql,backend/dist/user-schema.gql,backend/dist/api-key-schema.gql,backend/dist/images-schema.gql
-              env:
-                  INPUT_TOKEN: ${{ secrets.NPM_TOKEN }}
+            #            - name: Publish Apollo Graphql Update
+            #              run: npx apollo service:push --graph=datapm --key=${{secrets.APOLLO_KEY}} --variant=test --localSchemaFile=backend/dist/schema.gql,backend/dist/auth-schema.gql,backend/dist/user-schema.gql,backend/dist/api-key-schema.gql,backend/dist/images-schema.gql
+            #              env:
+            #                  INPUT_TOKEN: ${{ secrets.NPM_TOKEN }}
+            #                  APOLLO_KEY: ${{secrets.APOLLO_KEY}}
 
             - name: Cleanup Deployer Credentials File
               run: rm -f gcloud.key
