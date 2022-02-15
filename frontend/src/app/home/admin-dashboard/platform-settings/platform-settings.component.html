@@ -14,7 +14,7 @@
                         <h3 class="mb-1 mt-3">Templates</h3>
                     </div>
                     <div class="bd-highlight ml-auto d-flex align-items-center">
-                        <button (click)="addNewEntry()" [disabled]="isLoading" class="btn-link">Add Entry</button>
+                        <button (click)="addNewEntry()" [disabled]="state == State.LOADING" class="btn-link">Add Entry</button>
                     </div>
                 </div>
                 <div *ngFor="let template of templates; let i = index" class="div-wrapper">
@@ -41,7 +41,7 @@
                 <div class="">
                     <button
                         (click)="saveBuilderIOSettings()"
-                        [disabled]="isLoading"
+                        [disabled]="state == State.LOADING"
                         class="app-outlined-button"
                         style="width: 120px; height: 30px"
                     >

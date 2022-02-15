@@ -8,7 +8,7 @@
 
     <div *ngIf="packages.length">
         <div class="container mt-5">
-            <div class="text-main-title text-left no-pd-mobile">Packages</div>
+            <div class="text-main-title text-left no-pd-mobile">{{title}}</div>
             <div *ngFor="let package of packages">
                 <app-package-item [item]="package"></app-package-item>
             </div>

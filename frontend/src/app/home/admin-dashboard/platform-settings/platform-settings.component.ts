@@ -27,6 +27,9 @@ enum State {
     styleUrls: ["./platform-settings.component.scss"]
 })
 export class PlatformSettingsComponent implements OnInit {
+
+    public State = State;
+
     public static readonly BUILDER_IO_SETTINGS_KEY = "builder-io-settings";
     public static readonly NOT_FOUND_PAGE_ENTRY_KEY = "404";
     private static readonly REQUIRED_PLATFORM_KEYS = [PlatformSettingsComponent.NOT_FOUND_PAGE_ENTRY_KEY, "footer"];
@@ -43,10 +46,6 @@ export class PlatformSettingsComponent implements OnInit {
 
     public ngOnInit(): void {
         this.loadPlatformSettings();
-    }
-
-    public get isLoading(): boolean {
-        return State.LOADING === this.state;
     }
 
     public get hasValidationErrors(): boolean {
@@ -117,9 +116,26 @@ export class PlatformSettingsComponent implements OnInit {
         this.state = State.LOADING;
         this.platformSettingsGQL.fetch().subscribe(
             (result) => {
-                const builderIOPlatformSettings = result.data.platformSettings.find(
+                let builderIOPlatformSettings = result.data.platformSettings.find(
                     (p) => p.key === PlatformSettingsComponent.BUILDER_IO_SETTINGS_KEY
                 );
+
+                if(builderIOPlatformSettings == null) {
+
+                    const builderIOSettings: BuilderIOSettings = {
+                        apiKey: null,
+                        templates: []
+                    }
+
+                    const serializedSettings = JSON.stringify(builderIOSettings);
+
+                    builderIOPlatformSettings = {
+                        key: PlatformSettingsComponent.BUILDER_IO_SETTINGS_KEY,
+                        isPublic: true,
+                        serializedSettings
+                    }
+                }
+
                 this.setUpBuilderIOSettings(builderIOPlatformSettings);
                 this.state = State.LOADED;
             },
@@ -128,6 +144,10 @@ export class PlatformSettingsComponent implements OnInit {
     }
 
     private setUpBuilderIOSettings(builderIOPlatformSettings: PlatformSettings): void {
+
+        
+        
+
         const deserializedSettings = JSON.parse(builderIOPlatformSettings.serializedSettings) as BuilderIOSettings;
         this.builderIOApiKeyControl = this.buildFormControlWithValue(deserializedSettings.apiKey);
         this.templates = deserializedSettings.templates.map((t) => this.buildTemplateWithControl(t.key, t.entry));
