@@ -3,7 +3,7 @@ name: "Deploy to Production"
 on:
     workflow_dispatch:
         inputs:
-            logLevel:
+            version:
                 description: "Version"
                 required: true
                 default: "latest"
