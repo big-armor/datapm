@@ -101,7 +101,7 @@ export class PackageSchemaComponent implements OnInit, OnDestroy, OnChanges, Aft
 
     public getPropertyTypes(property: Schema): string {
         const keys = Object.keys(property.valueTypes).sort();
-        return keys.join(",");
+        return keys.join(", ");
     }
 
     public schemaPropertiesLength(schema: Schema): number {
