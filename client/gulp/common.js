@@ -34,7 +34,6 @@ exports.runPkg = function (platform, architecture, destination) {
     return exports
         .spawnAndLog("run-pkg-" + platform + "-" + architecture, cmd, [
             "pkg",
-            "--debug",
             "package.json",
             "--out-path",
             destination,
