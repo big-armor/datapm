@@ -27,7 +27,7 @@ datapm_environment = "test"
 /* This is the domain name that will be mapped to the 
 google cloud run service. You should have the ability
 modify DNS as required by google cloud run. */
-datapm_domain_name = "test.datapm.io"
+datapm_domain_names = ["test.datapm.io"]
 
 /* SMTP relay sending information. You can use Google Workspace, MailChip, SendGrid, 
 or many others. */

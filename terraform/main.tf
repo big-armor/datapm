@@ -67,9 +67,9 @@ variable "mixpanel_token" {
   default     = "not-set" # This will disable mixpanel sending
 }
 
-variable "datapm_domain_name" {
+variable "datapm_domain_names" {
   description = "Domain name for the datapm registry server"
-  type        = string
+  type        = list
 }
 
 variable "google_sql_name" {
@@ -256,7 +256,7 @@ resource "google_cloud_run_service" "default" {
         }
         env {
           name  = "REGISTRY_URL"
-          value = "https://${var.datapm_domain_name}"
+          value = "https://${var.datapm_domain_names[0]}"
         }
 
         env {
@@ -393,10 +393,12 @@ resource "google_sql_database" "database" {
   instance = google_sql_database_instance.instance.name
   project  = google_project.project.project_id
 }
-
 resource "google_cloud_run_domain_mapping" "default" {
+
+  for_each = toset(var.datapm_domain_names)
+
   location = var.gcp_location
-  name     = var.datapm_domain_name
+  name     = each.value
   project  = google_project.project.project_id
 
   metadata {
@@ -425,7 +427,7 @@ resource "google_cloud_scheduler_job" "instant_notifications_job" {
 
   http_target {
     http_method = "POST"
-    uri         = "https://${var.datapm_domain_name}/graphql"
+    uri         = "https://${var.datapm_domain_names[0]}/graphql"
     headers = {
       Content-Type = "application/json"
     }
@@ -449,7 +451,7 @@ resource "google_cloud_scheduler_job" "hourly_notifications_job" {
 
   http_target {
     http_method = "POST"
-    uri         = "https://${var.datapm_domain_name}/graphql"
+    uri         = "https://${var.datapm_domain_names[0]}/graphql"
     headers = {
       Content-Type = "application/json"
     }
@@ -473,7 +475,7 @@ resource "google_cloud_scheduler_job" "daily_notifications_job" {
 
   http_target {
     http_method = "POST"
-    uri         = "https://${var.datapm_domain_name}/graphql"
+    uri         = "https://${var.datapm_domain_names[0]}/graphql"
     headers = {
       Content-Type = "application/json"
     }
@@ -499,7 +501,7 @@ resource "google_cloud_scheduler_job" "weekly_notifications_job" {
 
   http_target {
     http_method = "POST"
-    uri         = "https://${var.datapm_domain_name}/graphql"
+    uri         = "https://${var.datapm_domain_names[0]}/graphql"
     headers = {
       Content-Type = "application/json"
     }
@@ -524,7 +526,7 @@ resource "google_cloud_scheduler_job" "monthly_notifications_job" {
 
   http_target {
     http_method = "POST"
-    uri         = "https://${var.datapm_domain_name}/graphql"
+    uri         = "https://${var.datapm_domain_names[0]}/graphql"
     headers = {
       Content-Type = "application/json"
     }

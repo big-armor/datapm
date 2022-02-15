@@ -28,6 +28,8 @@ import socketio from "socket.io";
 import http from "http";
 import { SocketConnectionHandler } from "./socket/SocketHandler";
 import { start } from "repl";
+import { url } from "inspector";
+import { parse } from "url";
 
 console.log("DataPM Registry Server Starting...");
 
@@ -507,6 +509,20 @@ async function main() {
 
     // any route not yet defined goes to index.html
     app.use("*", (req, res, next) => {
+
+        const registryHostName = parse(process.env["REGISTRY_URL"] as string).hostname;
+
+        // If the request was to a hostname other than the  
+        // hostname in hte registry_url environment variable,
+        // redirect to the equivalent url on the correct name
+        if(req.hostname != registryHostName) {
+            const redirectDestination = `${process.env["REGISTRY_URL"]}${req.originalUrl}`;
+            console.log("Redirecting to: " + redirectDestination);
+            res.redirect(301,redirectDestination);
+            return;
+        }
+
+        
         res.setHeader("x-datapm-version", REGISTRY_API_VERSION);
         res.setHeader("x-datapm-registry-url", process.env["REGISTRY_URL"] as string); // TODO support other paths
         res.sendFile(path.join(__dirname, "..", "static", "index.html"));
