@@ -64,7 +64,7 @@ export class PackageInfoComponent implements OnInit, OnChanges {
         const streamSets = packageFile
             .sources.reduce((a,b) => [...a,...b.streamSets],new Array<StreamSet>());
             
-        const count = streamSets.reduce((a, b) => a + (b.streamStats.inspectedCount || 0), 0);
+        const count = streamSets.reduce((a, b) => a + (b.streamStats.recordCount || 0), 0);
 
         let prefix = "";
 
