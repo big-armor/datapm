@@ -1,0 +1,57 @@
+on:
+    workflow_dispatch:
+        inputs:
+            logLevel:
+                description: "Version"
+                required: true
+                default: "latest"
+
+    steps:
+        buildAndDeploy:
+            name: "Deploy To Production"
+            timeout-minutes: 20
+            runs-on: ubuntu-latest
+
+            - name: Checkout
+              uses: actions/checkout@v2
+
+            - name: Write Container Deployer Credentials file
+              run: echo $GOOGLE_CREDENTIALS > gcloud.key
+              env:
+                  GOOGLE_CREDENTIALS: ${{secrets.PRODUCTION_GOOGLE_CREDENTIALS}}
+
+            - name: Authenticate to Google Cloud
+              run: gcloud auth activate-service-account deployer@datapm-production.iam.gserviceaccount.com --key-file=gcloud.key
+
+            - name: Terraform Init to
+              run: terraform init -backend-config='environments/production.config'
+              working-directory: terraform
+              env:
+                  GOOGLE_CREDENTIALS: ${{secrets.PRODUCTION_GOOGLE_CREDENTIALS}}
+
+            - name: Terraform Plan
+              run: terraform plan -var-file='environments/production.tfvars'
+              working-directory: terraform
+              env:
+                  TF_VAR_smtp_password: ${{secrets.TF_VAR_SMTP_PASSWORD}}
+                  GOOGLE_CREDENTIALS: ${{secrets.PRODUCTION_GOOGLE_CREDENTIALS}}
+
+            - name: Add GCR Revision
+              run: gcloud run deploy datapm-registry-production --project datapm-production --image gcr.io/datapm-containers/datapm-registry:${{github.event.inputs.version}} --region us-central1 --platform managed --tag ${{github.event.inputs.version}}
+              env:
+                  GOOGLE_CREDENTIALS: ${{secrets.PRODUCTION_GOOGLE_CREDENTIALS}}
+
+            - name: Terraform Apply
+              run: terraform apply -auto-approve  -var-file='environments/production.tfvars'
+              working-directory: terraform
+              env:
+                  TF_VAR_smtp_password: ${{secrets.TF_VAR_SMTP_PASSWORD}}
+                  GOOGLE_CREDENTIALS: ${{secrets.PRODUCTION_GOOGLE_CREDENTIALS}}
+
+            - name: Update GCR Traffic
+              run: gcloud run services update-traffic datapm-registry-production --project datapm-production --region us-central1 --platform managed --to-tags ${{github.event.inputs.version}}=100
+              env:
+                  GOOGLE_CREDENTIALS: ${{secrets.PRODUCTION_GOOGLE_CREDENTIALS}}
+
+            - name: Cleanup Deployer Credentials File
+              run: rm -f gcloud.key
