@@ -61,17 +61,18 @@ export class PackageInfoComponent implements OnInit, OnChanges {
             return "";
         }
 
-        const count = packageFile
-            .sources.reduce((a,b) => [...a,...b.streamSets],new Array<StreamSet>())
-            .reduce((a, b) => a + (b.streamStats.inspectedCount || 0), 0);
+        const streamSets = packageFile
+            .sources.reduce((a,b) => [...a,...b.streamSets],new Array<StreamSet>());
+            
+        const count = streamSets.reduce((a, b) => a + (b.streamStats.inspectedCount || 0), 0);
 
         let prefix = "";
 
         let highestPrecision = CountPrecision.EXACT;
 
-        if (packageFile.schemas.find((s) => s.recordCountPrecision == CountPrecision.GREATER_THAN) != null)
+        if (streamSets.find((s) => s.streamStats.recordCountPrecision == CountPrecision.GREATER_THAN) != null)
             highestPrecision = CountPrecision.GREATER_THAN;
-        else if (packageFile.schemas.find((s) => s.recordCountPrecision == CountPrecision.APPROXIMATE) != null)
+        else if (streamSets.find((s) => s.streamStats.recordCountPrecision == CountPrecision.APPROXIMATE) != null)
             highestPrecision = CountPrecision.APPROXIMATE;
 
         if (highestPrecision == CountPrecision.GREATER_THAN) {
