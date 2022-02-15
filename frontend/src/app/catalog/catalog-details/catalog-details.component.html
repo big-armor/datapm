@@ -3,16 +3,18 @@
         <div class="container">
             <app-cover [catalogSlug]="catalog?.identifier.catalogSlug"></app-cover>
             <div class="d-flex flex-row bd-highlight">
-                <div class="pl-3 bd-highlight">
+                <div class="bd-highlight">
                     <app-avatar class="catalog-avatar" [catalog]="catalog" [circled]="false" [size]="80"> </app-avatar>
                 </div>
-                <div class="px-2 bd-highlight d-flex align-items-end">
+                <div class="px-2 bd-highlight d-flex">
                     <div class="catalog-header">
+                        <div *ngIf="catalog" class="collections-public">
+                            <span *ngIf="catalog?.isPublic" class="public-text">public</span>
+                            <span *ngIf="!catalog?.isPublic" class="not-public-text">not public</span>
+                        </div>
                         <div class="text-main-title mb-0">{{ catalog?.displayName }}</div>
                         <div class="text-light-gray mb-1">@{{ catalog?.identifier.catalogSlug }}</div>
-                        <p class="text-dark-gray" style="margin-bottom: 0px !important; line-height: 11px">
-                            {{ catalog?.description }}
-                        </p>
+
                     </div>
                 </div>
                 <div class="d-flex flex-row bd-highlight ml-auto align-self-end">
@@ -22,10 +24,9 @@
                     </button>
                 </div>
             </div>
-            <div *ngIf="catalog" class="collections-public pl-3">
-                <span *ngIf="catalog?.isPublic" class="public-text">public</span>
-                <span *ngIf="!catalog?.isPublic" class="not-public-text">not public</span>
-            </div>
+            <p class="text-dark-gray mt-3" style="margin-left: 90px">
+                {{ catalog?.description }} This is a lot of extra words.This is a lot of extra words.This is a lot of extra words.This is a lot of extra words.This is a lot of extra words.This is a lot of extra words.This is a lot of extra words.This is a lot of extra words.This is a lot of extra words.This is a lot of extra words.This is a lot of extra words.This is a lot of extra words.
+            </p>
 
             <div *ngIf="catalog?.unclaimed" class="pl-3 text-dark-gray pt-2">
                 Are you the data originator? <a href="/docs/unclaimed-listings">Click here to learn more.</a>
