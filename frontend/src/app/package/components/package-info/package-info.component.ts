@@ -1,6 +1,7 @@
+import { formatNumber } from "@angular/common";
 import { Component, Input, OnChanges, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { CountPrecision, PackageFile } from "datapm-lib";
+import { CountPrecision, PackageFile, StreamSet } from "datapm-lib";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { AddPackageComponent } from "src/app/collection-details/add-package/add-package.component";
@@ -60,7 +61,9 @@ export class PackageInfoComponent implements OnInit, OnChanges {
             return "";
         }
 
-        const count = packageFile.schemas.reduce((a, b) => a + (b.recordCount || 0), 0);
+        const count = packageFile
+            .sources.reduce((a,b) => [...a,...b.streamSets],new Array<StreamSet>())
+            .reduce((a, b) => a + (b.streamStats.inspectedCount || 0), 0);
 
         let prefix = "";
 
@@ -77,7 +80,7 @@ export class PackageInfoComponent implements OnInit, OnChanges {
             prefix = "~";
         }
 
-        return prefix + count;
+        return prefix + formatNumber(count, "en-US" );
     }
 
     public get generatedFetchCommand() {
