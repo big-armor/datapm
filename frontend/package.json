@@ -1,6 +1,6 @@
 {
     "name": "datapm-registry-frontend",
-    "version": "0.8.58",
+    "version": "0.8.59",
     "license": "https://datapm.io/docs/license",
     "scripts": {
         "clean": "gulp clean",
