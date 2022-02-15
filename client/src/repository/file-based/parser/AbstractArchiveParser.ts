@@ -7,6 +7,7 @@ import { findParser } from "../AbstractFileStreamSource";
 import { SourceInspectionContext } from "../../Source";
 import { FileBufferSummary, ParserInspectionResults, Parser, FileStreamContext } from "./Parser";
 import { getParserByMimeType } from "./ParserUtil";
+import path from "path";
 
 export interface FileIterator {
     moveToNextFile(): Promise<FileStreamContext | null>;
@@ -82,8 +83,10 @@ export abstract class AbstractArchiveParser implements Parser {
             schemaStates: {}
         });
 
+        const pathToMagicFile = path.join(path.dirname(process.execPath), "node_modules/mmmagic/magic/magic.mgc");
+
         const [magicMimeResults, firstInnerFileReadable] = await streamMmmagic.promise(fileStreamContext.stream, {
-            magicFile: "node_modules/mmmagic/magic/magic.mgc"
+            magicFile: pathToMagicFile
         });
 
         const [firstInnerFilebuffer, firstInnerFileReadable2] = await bufferPeek.promise(

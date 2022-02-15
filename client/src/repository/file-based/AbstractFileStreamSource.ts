@@ -11,6 +11,7 @@ import { LogType } from "../../util/LoggingUtils";
 import { nameFromFileUris } from "../../util/NameUtil";
 import { FileBufferSummary, FileStreamContext, Parser } from "./parser/Parser";
 import { asyncMap } from "../../util/AsyncUtils";
+import path from "path";
 
 export abstract class AbstractFileStreamSource implements Source {
     abstract sourceType(): string;
@@ -214,8 +215,10 @@ export async function getFileBufferSummary(
 
     let fileStream = streamContext.stream;
 
+    const pathToMagicFile = path.join(path.dirname(process.execPath), "node_modules/mmmagic/magic/magic.mgc");
+
     const [magicMimeResults, mimeForkStream] = await streamMmmagic.promise(fileStream, {
-        magicFile: "node_modules/mmmagic/magic/magic.mgc"
+        magicFile: pathToMagicFile
     });
 
     fileStream = mimeForkStream;

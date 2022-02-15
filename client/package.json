@@ -38,7 +38,6 @@
     "pkg": {
         "assets": [
             "./node_modules/@types",
-            "node_modules/mmmagic/build/Release/magic.node",
             "./node_modules/@apollo/client",
             "./node_modules/typescript/lib/*.d.ts",
             "src/**/*.ts",

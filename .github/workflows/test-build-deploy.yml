@@ -614,6 +614,14 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v2
 
+            - name: Write Container Deployer Credentials file
+              run: echo $GOOGLE_CREDENTIALS > gcloud.key
+              env:
+                  GOOGLE_CREDENTIALS: ${{secrets.TEST_GOOGLE_CREDENTIALS}}
+
+            - name: Authenticate to Google Cloud
+              run: gcloud auth activate-service-account deployer@datapm-test-v4.iam.gserviceaccount.com --key-file=gcloud.key
+
             - name: Terraform Init to
               run: terraform init -backend-config='environments/test.config'
               working-directory: terraform
@@ -628,7 +636,7 @@ jobs:
                   GOOGLE_CREDENTIALS: ${{secrets.TEST_GOOGLE_CREDENTIALS}}
 
             - name: Add GCR Revision
-              run: gcloud run deploy datapm-registry --project datapm-test-v4 --image gcr.io/datapm-containers/datapm-registry --region us-central1 --platform managed
+              run: gcloud run deploy datapm-registry-test --project datapm-test-v4 --image gcr.io/datapm-containers/datapm-registry --region us-central1 --platform managed
               env:
                   GOOGLE_CREDENTIALS: ${{secrets.TEST_GOOGLE_CREDENTIALS}}
 
@@ -640,7 +648,7 @@ jobs:
                   GOOGLE_CREDENTIALS: ${{secrets.TEST_GOOGLE_CREDENTIALS}}
 
             - name: Update GCR Traffic
-              run: gcloud run services update-traffic datapm-registry --project datapm-test-v4 --region us-central1 --platform managed --to-latest
+              run: gcloud run services update-traffic datapm-registry-test --project datapm-test-v4 --region us-central1 --platform managed --to-latest
               env:
                   GOOGLE_CREDENTIALS: ${{secrets.TEST_GOOGLE_CREDENTIALS}}
 
@@ -648,6 +656,9 @@ jobs:
               run: npx apollo service:push --graph=datapm --key=${{secrets.APOLLO_KEY}} --variant=test --localSchemaFile=backend/dist/schema.gql,backend/dist/auth-schema.gql,backend/dist/user-schema.gql,backend/dist/api-key-schema.gql,backend/dist/images-schema.gql
               env:
                   INPUT_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Cleanup Deployer Credentials File
+              run: rm -f gcloud.key
 
     github-release-clients:
         runs-on: ubuntu-latest
