@@ -23,7 +23,7 @@
                                 </div>
                                 <div class="bd-highlight">
                                     <mat-chip-list class="header-chips">
-                                        <mat-chip *ngFor="let cl of getAllPropertyChips(property)">{{
+                                        <mat-chip *ngFor="let cl of getAllPropertyChips(property)" [hidden]="cl.hidden">{{
                                             cl.label
                                         }}</mat-chip>
                                     </mat-chip-list>
@@ -60,11 +60,10 @@
                                     <ul>
                                         <li *ngIf="getPropertyChips(type).length">
                                             content labels:
-                                            <span
-                                                *ngFor="let cl of getPropertyChips(type); last as isLast"
-                                                [hidden]="cl.hidden"
-                                                >{{ cl.label }}<span *ngIf="!isLast">, </span>
-                                            </span>
+                                            <mat-chip *ngFor="let cl of getPropertyChips(type); last as isLast" [hidden]="cl.hidden">{{
+                                                cl.label
+                                                }}</mat-chip>
+                                     
                                         </li>
                                         <li>
                                             present in {{ type.recordCount | number }} ({{

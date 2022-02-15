@@ -11,7 +11,7 @@ import {
 } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute, Router } from "@angular/router";
-import { PackageFile, Schema, ValueTypeStatistics } from "datapm-lib";
+import { ContentLabel, PackageFile, Schema, ValueTypeStatistics } from "datapm-lib";
 import { Subject } from "rxjs";
 import { Clipboard } from "@angular/cdk/clipboard";
 import { SnackBarService } from "src/app/services/snackBar.service";
@@ -173,7 +173,7 @@ export class PackageSchemaComponent implements OnInit, OnDestroy, OnChanges, Aft
     }
 
     public getPropertyChips(value) {
-        let labels = new Set();
+        let labels = new Set<ContentLabel>();
 
         if (value.contentLabels) {
             value.contentLabels.forEach((l) => {
@@ -182,6 +182,6 @@ export class PackageSchemaComponent implements OnInit, OnDestroy, OnChanges, Aft
         } else {
             value.contentLabels = [];
         }
-        return [...labels];
+        return [...labels].filter(l => !l.hidden);
     }
 }
