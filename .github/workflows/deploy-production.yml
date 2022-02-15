@@ -6,12 +6,12 @@ on:
                 required: true
                 default: "latest"
 
-    steps:
-        buildAndDeploy:
-            name: "Deploy To Production"
-            timeout-minutes: 20
-            runs-on: ubuntu-latest
-
+jobs:
+    buildAndDeploy:
+        name: "Deploy To Production"
+        timeout-minutes: 20
+        runs-on: ubuntu-latest
+        steps:
             - name: Checkout
               uses: actions/checkout@v2
 
