@@ -33,7 +33,6 @@ export const DifferenceTypeMessages: Record<DifferenceType, string> = {
     [DifferenceType.REMOVE_SOURCE]: "Removed Source",
     [DifferenceType.REMOVE_HIDDEN_SCHEMA]: "Removed Hidden Schema",
     [DifferenceType.CHANGE_PROPERTY_TYPE]: "Changed Property Type",
-    [DifferenceType.CHANGE_PROPERTY_UNIT]: "Change Property Unit",
     [DifferenceType.CHANGE_PROPERTY_FORMAT]: "Changed Property Format",
     [DifferenceType.CHANGE_PROPERTY_UNIT]: "Changed Property Unit",
     [DifferenceType.CHANGE_PROPERTY_DESCRIPTION]: "Changed Property Description",

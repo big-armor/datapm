@@ -94,6 +94,8 @@ export function getReadableChangeFromDifference(difference: PackageDifference): 
             break;
         case PackageDifferenceType.CHANGE_VERSION:
             return null;
+        case PackageDifferenceType.CHANGE_PROPERTY_UNIT:
+            changeLabel = "Changed property units";
     }
 
     let changeFieldName = difference.pointer === "#" ? "" : difference.pointer;
