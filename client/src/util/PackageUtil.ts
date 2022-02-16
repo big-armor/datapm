@@ -6,12 +6,11 @@ import { SemVer } from "semver";
 import { fetchMultipleWithListr } from "../command/FetchCommandModule";
 import { CredentialsBySourceSlug } from "../command/PublishPackageCommandModule";
 import { CreateVersionInput } from "../generated/graphql";
-import { getSinkDescription } from "../repository/SinkUtil";
 import { obtainCredentials } from "./CredentialsUtil";
 import { identifierToString } from "./IdentifierUtil";
 import { getRegistryClientWithConfig } from "./RegistryClient";
 import { exit } from "yargs";
-import { TYPE as DATAPM_SINK_TYPE } from "../repository/file-based/datapm-registry/DataPMRepositoryDescription";
+import { DataPMRepositoryDescription } from "../repository/file-based/datapm-registry/DataPMRepositoryDescription";
 import numeral from "numeral";
 
 export const DifferenceTypeMessages: Record<DifferenceType, string> = {
@@ -212,11 +211,15 @@ async function publishData(
     packageFile: PackageFile,
     targetRegistry: RegistryReference
 ): Promise<{ [key: string]: number }> {
-    const dataPMRepositoryDescription = await getSinkDescription(DATAPM_SINK_TYPE);
+    const dataPMRepositoryDescription = new DataPMRepositoryDescription();
 
-    if (dataPMRepositoryDescription == null) throw new Error("Could not find datapm module");
+    const dataPMSinkDescription = await dataPMRepositoryDescription.getSinkDescription();
 
-    const dataPMSink = await dataPMRepositoryDescription.loadSinkFromModule();
+    if (dataPMSinkDescription == null) {
+        throw new Error("DATAPM_SINK_DESCRIPTION_NOT_FOUND");
+    }
+
+    const dataPMSink = await dataPMSinkDescription.loadSinkFromModule();
 
     return await fetchMultipleWithListr(
         oraRef,
