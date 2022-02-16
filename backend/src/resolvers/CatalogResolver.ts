@@ -365,7 +365,10 @@ export const myCatalogs = async (_0: any, {}, context: AuthenticatedContext) => 
         const unclaimedCatalogs = await context.connection.manager
             .getCustomRepository(CatalogRepository)
             .findAllUnclaimed();
-        catalogs.push(...unclaimedCatalogs);
+            
+        const filteredUnclaimedCatalogs = unclaimedCatalogs.filter((c) => !catalogs.some((c2) => c2.id === c.id));
+
+        catalogs.push(...filteredUnclaimedCatalogs);
     }
 
     return catalogs.map((c) => catalogEntityToGraphQL(c));
