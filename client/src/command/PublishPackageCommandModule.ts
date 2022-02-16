@@ -256,7 +256,8 @@ export class PublishPackageCommandModule {
             targetRegistries.push(chosenRegistry);
         }
 
-        oraRef.start("Publishing schema...");
+        console.log("");
+        console.log(chalk.magenta("Publish Schema to Registry"));
 
         // Update package file with selected registries
         for (const targetRegistry of targetRegistries) {
@@ -364,24 +365,34 @@ export class PublishPackageCommandModule {
                 }
             ]);
 
+            console.log("");
             if (publishTypeSelection.method === PublishMethod.SCHEMA_ONLY) {
                 if (packageFile.sources.find((s) => s.credentialsIdentifier !== undefined) !== undefined) {
                     // Credentials are required, so tell the user they will have to enter
                     oraRef.info(
-                        "Access to this data requires access credentials, and those access credentials will not be published to the server. You will need to share the access credentials with the users of this package manually. Or they will need to obtain their own access credentials to the data source(s) for this package"
+                        "Access to this data requires access credentials, and those access credentials will not be published to the server."
+                    );
+                    oraRef.info(
+                        "You will need to share the access credentials with the users of this package manually."
                     );
 
                     oraRef.info(
+                        " Or they will need to obtain their own access credentials to the data source(s) for this package"
+                    );
+
+                    oraRef.warn(
                         "Because this package requires access credentials, this package can not be made public"
                     );
 
                     break;
                 } else {
                     oraRef.info(
-                        "The package will be published to the registry, and consumers will access the data directly. This requires direct connectivity from the client."
+                        "The package will be published to the registry, and consumers will access the data directly."
                     );
+                    oraRef.info("This requires direct connectivity from the client.");
                 }
 
+                console.log("");
                 const confirmAccessRequirements = await prompts(
                     [
                         {
@@ -415,6 +426,7 @@ export class PublishPackageCommandModule {
                 oraRef.info(
                     "Consumers will not receive data updates until you run the 'datapm update' command on this package."
                 );
+                console.log("");
                 const confirmDatacopy = await prompts(
                     [
                         {
@@ -445,14 +457,14 @@ export class PublishPackageCommandModule {
 
             if (publishTypeSelection.method === PublishMethod.SCHEMA_PROXY_DATA) {
                 if (packageFile.sources.find((s) => s.credentialsIdentifier !== undefined) !== undefined) {
-                    oraRef.info(
-                        "The registry will act as a proxy for this data, and therefore you must provide the registry with access credentials for the data."
-                    );
+                    oraRef.info("The registry will act as a proxy for this data.");
 
-                    oraRef.info(
+                    oraRef.info("Therefore you must provide the registry with access credentials for the data.");
+                    oraRef.warn(
                         "For best security practices, you should supply credentials with limited read-only access as necessary to consume the required data."
                     );
 
+                    console.log(" ");
                     const confirmProxy = await prompts(
                         [
                             {

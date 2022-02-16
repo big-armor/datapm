@@ -364,6 +364,8 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
         schemas: Object.values(schemas)
     };
 
+    console.log("");
+    console.log(chalk.magenta("Saving Files"));
     oraRef.start("Writing package file...");
     let packageFileLocation;
 
