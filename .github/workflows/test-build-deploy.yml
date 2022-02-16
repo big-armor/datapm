@@ -628,13 +628,6 @@ jobs:
               env:
                   GOOGLE_CREDENTIALS: ${{secrets.TEST_GOOGLE_CREDENTIALS}}
 
-            - name: Terraform Plan
-              run: terraform plan -var-file='environments/test.tfvars'
-              working-directory: terraform
-              env:
-                  TF_VAR_smtp_password: ${{secrets.TF_VAR_SMTP_PASSWORD}}
-                  GOOGLE_CREDENTIALS: ${{secrets.TEST_GOOGLE_CREDENTIALS}}
-
             - name: Add GCR Revision
               run: gcloud run deploy datapm-registry-test --project datapm-test-v4 --image gcr.io/datapm-containers/datapm-registry --region us-central1 --platform managed
               env:

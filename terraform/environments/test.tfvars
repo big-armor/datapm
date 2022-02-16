@@ -8,7 +8,7 @@
 /* Needs to be an established billing account */
 gcp_billing_account_id = "01FAC5-979F7E-18046B"
 
-gcp_project_folder = "237521069674"
+gcp_project_folder = "266086752443"
 
 /* The desired or existing project-id for hosting the resources */
 gcp_project_id = "datapm-test-v4"
@@ -31,7 +31,7 @@ datapm_domain_names = ["test.datapm.io"]
 
 /* SMTP relay sending information. You can use Google Workspace, MailChip, SendGrid, 
 or many others. */
-smtp_host       = "smtp.sendgrid.net"
+smtp_host = "smtp.sendgrid.net"
 # smtp_password   = See TF_VARS_stmp_password in deployment config
 smtp_port       = 465
 smtp_user       = "apikey"
