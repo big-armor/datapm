@@ -15,6 +15,14 @@ query GetLatestPackages($offset: Int!, $limit: Int!) {
                 lastName
                 nameIsPublic
             }
+            catalog {
+                identifier {
+                    catalogSlug
+                }
+                displayName
+                isPublic
+                unclaimed
+            }
         }
         hasMore
         count

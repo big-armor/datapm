@@ -13,6 +13,14 @@ query Collection($identifier: CollectionIdentifierInput!) {
                 catalogSlug
                 packageSlug
             }
+            catalog {
+                identifier {
+                    catalogSlug
+                }
+                displayName
+                isPublic
+                unclaimed
+            }
             displayName
             description
             latestVersion {

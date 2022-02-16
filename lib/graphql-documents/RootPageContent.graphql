@@ -15,6 +15,14 @@ query GetPageContent($route: String!) {
                     catalogSlug
                     packageSlug
                 }
+                catalog {
+                    identifier {
+                        catalogSlug
+                    }
+                    displayName
+                    isPublic
+                    unclaimed
+                }
                 displayName
                 description
                 latestVersion {

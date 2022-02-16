@@ -10,6 +10,14 @@ query AutoComplete($startsWith: String!) {
             isPublic
         }
         packages {
+            catalog {
+                identifier {
+                    catalogSlug
+                }
+                displayName
+                isPublic
+                unclaimed
+            }
             creator {
                 username
                 firstName
@@ -70,6 +78,14 @@ query AutoCompletePackage($startsWith: String!) {
                 registryURL
                 catalogSlug
                 packageSlug
+            }
+            catalog {
+                identifier {
+                    catalogSlug
+                }
+                displayName
+                isPublic
+                unclaimed
             }
             creator {
                 username

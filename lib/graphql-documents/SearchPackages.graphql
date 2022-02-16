@@ -12,6 +12,14 @@ query SearchPackages($query: String!, $limit: Int!, $offset: Int!) {
                 catalogSlug
                 packageSlug
             }
+            catalog {
+                identifier {
+                    catalogSlug
+                }
+                displayName
+                isPublic
+                unclaimed
+            }
             displayName
             description
             latestVersion {

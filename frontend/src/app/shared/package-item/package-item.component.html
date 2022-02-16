@@ -4,7 +4,8 @@
             <div class="bd-highlight">
                 <div class="d-flex package-wrapper">
                     <div class="d-flex align-items-start img-cover">
-                        <app-avatar class="align-top user-img" [user]="item.creator" [size]="40"> </app-avatar>
+                        <app-avatar class="align-top user-img" [user]="item.creator" [size]="40" *ngIf="!item.catalog.unclaimed"> </app-avatar>
+                        <app-avatar class="align-top user-img" [catalog]="item.catalog" [circled]="false"  [size]="40" *ngIf="item.catalog.unclaimed"> </app-avatar>
                     </div>
                     <div class="text-left">
                         <div
