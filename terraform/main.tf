@@ -69,7 +69,7 @@ variable "mixpanel_token" {
 
 variable "datapm_domain_names" {
   description = "Domain name for the datapm registry server"
-  type        = list
+  type        = list(any)
 }
 
 variable "google_sql_name" {
@@ -109,7 +109,7 @@ resource "google_project" "project" {
   name            = var.datapm_registry_name
   project_id      = var.gcp_project_id
   billing_account = data.google_billing_account.acct.id
-  folder_id       =  var.gcp_project_folder
+  folder_id       = var.gcp_project_folder
   lifecycle {
     prevent_destroy = true
   }
@@ -213,7 +213,7 @@ resource "google_cloud_run_service" "default" {
         env {
           name  = "NODE_ENV"
           value = "production"
-        } 
+        }
         env {
           name  = "JWT_KEY"
           value = random_password.jwt_key.result
@@ -316,6 +316,11 @@ resource "google_cloud_run_service" "default" {
     }
   }
   autogenerate_revision_name = true
+
+  traffic {
+    revision_name = google_cloud_run_revision.default.revision_name
+    percent       = 100
+  }
 }
 
 data "google_iam_policy" "noauth" {
@@ -359,7 +364,7 @@ resource "google_sql_database_instance" "instance" {
   region           = var.gcp_location
   database_version = "POSTGRES_13"
   settings {
-    tier = var.gcp_sql_tier
+    tier              = var.gcp_sql_tier
     availability_type = "REGIONAL"
     backup_configuration {
       enabled                        = true
@@ -412,7 +417,7 @@ resource "google_cloud_run_domain_mapping" "default" {
 
 
 resource "google_cloud_scheduler_job" "instant_notifications_job" {
-  depends_on = [google_project_service.service]
+  depends_on       = [google_project_service.service]
   name             = "datapm-${var.datapm_environment}-instant-notifications"
   project          = google_project.project.project_id
   region           = var.gcp_location
@@ -436,7 +441,7 @@ resource "google_cloud_scheduler_job" "instant_notifications_job" {
 }
 
 resource "google_cloud_scheduler_job" "hourly_notifications_job" {
-  depends_on = [google_project_service.service]
+  depends_on       = [google_project_service.service]
   name             = "datapm-${var.datapm_environment}-hourly-notifications"
   project          = google_project.project.project_id
   region           = var.gcp_location
@@ -460,7 +465,7 @@ resource "google_cloud_scheduler_job" "hourly_notifications_job" {
 }
 
 resource "google_cloud_scheduler_job" "daily_notifications_job" {
-  depends_on = [google_project_service.service]
+  depends_on       = [google_project_service.service]
   name             = "datapm-${var.datapm_environment}-daily-notifications"
   project          = google_project.project.project_id
   region           = var.gcp_location
@@ -486,7 +491,7 @@ resource "google_cloud_scheduler_job" "daily_notifications_job" {
 
 
 resource "google_cloud_scheduler_job" "weekly_notifications_job" {
-  depends_on = [google_project_service.service]
+  depends_on       = [google_project_service.service]
   name             = "datapm-${var.datapm_environment}-weekly-notifications"
   project          = google_project.project.project_id
   region           = var.gcp_location
@@ -511,7 +516,7 @@ resource "google_cloud_scheduler_job" "weekly_notifications_job" {
 
 
 resource "google_cloud_scheduler_job" "monthly_notifications_job" {
-  depends_on = [google_project_service.service]
+  depends_on       = [google_project_service.service]
   name             = "datapm-${var.datapm_environment}-monthly-notifications"
   project          = google_project.project.project_id
   region           = var.gcp_location
