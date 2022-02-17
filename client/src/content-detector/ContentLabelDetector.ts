@@ -57,6 +57,9 @@ export interface ContentLabelDetectorInterface {
 
     getValueTestCount(): number;
 
+    /** Wehther the detection threshold (percentage, match confidence, etc) has been met */
+    isThresholdMet(): boolean;
+
     /** Based on the observed state, and the existing labels applied by the same implementation, return a complete set of content labels that should be applied  */
     getContentLabels(propertyName: string, existingLabels: ContentLabel[]): ContentLabel[];
 }
@@ -118,6 +121,10 @@ export class ContentLabelDetector {
                     if (contentLabelDetectors == null) continue;
 
                     for (const contentLabelDetector of contentLabelDetectors) {
+                        if (!contentLabelDetector.isThresholdMet()) {
+                            continue;
+                        }
+
                         const existingLabels = property.valueTypes[valueType].contentLabels;
 
                         const newLabels = contentLabelDetector.getContentLabels(propertyName, existingLabels || []);

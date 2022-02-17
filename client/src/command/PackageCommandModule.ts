@@ -7,7 +7,8 @@ import {
     Properties,
     Schema,
     Source,
-    StreamSet
+    StreamSet,
+    nameToSlug
 } from "datapm-lib";
 import { JSONSchema7TypeName } from "json-schema";
 import numeral from "numeral";
@@ -32,7 +33,6 @@ import {
 import { validPackageDisplayName, validShortPackageDescription, validUnit, validVersion } from "../util/IdentifierUtil";
 import { LogType } from "../util/LoggingUtils";
 import { Maybe } from "../util/Maybe";
-import { nameToSlug } from "../util/NameUtil";
 import { writeLicenseFile, writePackageFile, writeReadmeFile } from "../util/PackageUtil";
 import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
 import { cliHandleParameters } from "../util/parameters/ParameterUtils";

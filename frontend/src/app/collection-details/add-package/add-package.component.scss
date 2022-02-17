@@ -30,6 +30,10 @@
     }
 }
 
+.mat-selected {
+    color: var(--gray-1-color) !important;
+}
+
 @media (max-width: 576px) {
     #addPackage {
         .add-package-text {

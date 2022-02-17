@@ -23,6 +23,10 @@ export abstract class RegexDetector implements ContentLabelDetectorInterface {
         return this.valueTestedCount;
     }
 
+    isThresholdMet(): boolean {
+        return this.ocurrenceCount / this.valueTestedCount > 0.66;
+    }
+
     inspectValue(value: string | number): void {
         const stringValue = typeof value === "number" ? value.toString() : value;
 
