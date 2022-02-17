@@ -208,9 +208,11 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
         );
 
         sourceStreamInspectionResults.schemas.forEach((schema) => {
-            if (schema.title == null) throw new Error("SCHEMA_HAS_NO_TITLE");
+            if (schema.title == null || schema.title === "") throw new Error("SCHEMA_HAS_NO_TITLE");
 
             schemas[schema.title] = schema;
+
+            schema.properties = filterBadSchemaProperties(schema);
         });
 
         console.log("");
@@ -736,6 +738,14 @@ async function schemaSpecificQuestions(schema: Schema) {
             }
         }
     }
+}
+
+export function filterBadSchemaProperties(schema: Schema): Properties | undefined {
+    if (schema.properties != null) {
+        return Object.fromEntries(Object.entries(schema.properties).filter(([t]) => t != null && t !== ""));
+    }
+
+    return undefined;
 }
 
 /** Inspect a one or more URIs, with a given config, and implementation. This is generally one schema */

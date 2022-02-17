@@ -201,9 +201,9 @@ export class PublishPackageCommandModule {
             let registryCatalogSlugs;
             try {
                 const result = await registry.getCatalogs();
-                registryCatalogSlugs = result.data.myCatalogs.map(
-                    (catalog: Catalog) => catalog.identifier.catalogSlug as string
-                );
+                registryCatalogSlugs = result.data.myCatalogs
+                    .map((catalog: Catalog) => catalog.identifier.catalogSlug as string)
+                    .sort((a, b) => a.localeCompare(b));
                 oraRef.succeed("Fetched catalogs from registry");
             } catch (error) {
                 oraRef.fail("Failed to fetch catalogs");
