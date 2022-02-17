@@ -1,13 +1,11 @@
 <mat-card class="package-item my-3" (click)="goToComponent()">
     <mat-card-content>
-        <div class="d-flex bd-highlight" id="packageItem">
-            <div class="bd-highlight">
-                <div class="d-flex package-wrapper">
-                    <div class="d-flex align-items-start img-cover">
+                <div class="d-flex bd-highlight d-flex align-items-top">
+                    <div class="d-flex align-self-center img-cover">
                         <app-avatar class="align-top user-img" [user]="item.creator" [size]="40" *ngIf="!item.catalog.unclaimed"> </app-avatar>
                         <app-avatar class="align-top user-img" [catalog]="item.catalog" [circled]="false"  [size]="40" *ngIf="item.catalog.unclaimed"> </app-avatar>
                     </div>
-                    <div class="text-left">
+                    <div class="pl-2 pr-2 flex-grow-1 bd-highlight align-self-center text-overflow-elipses">
                         <div
                             class="ml-2 package-privacy"
                             *ngIf="this.item?.myPermissions?.includes('MANAGE')"
@@ -16,25 +14,15 @@
                         >
                             {{ item?.isPublic ? "public" : "not public" }}
                         </div>
-                        <div class="package-identifier mb-2 ml-2">
-                            {{ item.identifier.catalogSlug }}/{{ item.identifier.packageSlug }}
-                        </div>
-                        <div class="flex-1 ml-2">
-                            <div class="text-light-gray">
-                                {{ truncatedDescription }}
-                            </div>
+                        <a class="box-name">{{ item.identifier.catalogSlug }}/{{ item.identifier.packageSlug }}</a>
+
+                        <div class="text-light-gray text-overflow-elipses">
+                            {{ truncatedDescription }}
                         </div>
                     </div>
+                    <div class="p-1 d-flex flex-grow-2 bd-highlight action-div text-center">
+                        <button class="app-outlined-button" *ngIf="shouldShowActionButton" (click)="handleAction($event)">{{actionButtonText }}</button>
+                    </div>
                 </div>
-            </div>
-            <div class="ml-auto bd-highlight align-self-center package-btn">
-                <a
-                    class="app-outlined-button ctaButton"
-                    *ngIf="shouldShowActionButton"
-                    (click)="handleAction($event)"
-                    >{{ actionButtonText }}</a
-                >
-            </div>
-        </div>
     </mat-card-content>
 </mat-card>

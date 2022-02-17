@@ -32,6 +32,7 @@ import { ValuesPipe } from "./pipes/values.pipe";
 import { SortByPipe } from "./pipes/sort.pipe";
 import { InputComponent } from "./input/input.component";
 import { InputErrorPipe } from "./pipes/input-error.pipe";
+import { TruncatePipe } from "./pipes/truncate.pipe";
 import { EditCollectionComponent } from "./edit-collection/edit-collection.component";
 import { ConfirmationDialogComponent } from "./confirmation-dialog/confirmation-dialog.component";
 import { EditCatalogComponent } from "./edit-catalog/edit-catalog.component";
@@ -93,6 +94,7 @@ import { FollowersComponent } from "./followers/followers.component";
         SortByPipe,
         InputComponent,
         InputErrorPipe,
+        TruncatePipe,
         EditCollectionComponent,
         ConfirmationDialogComponent,
         EditCatalogComponent,
@@ -167,6 +169,7 @@ import { FollowersComponent } from "./followers/followers.component";
         PercentPipe,
         ValuesPipe,
         SortByPipe,
+        TruncatePipe,
         InputComponent,
         InputErrorPipe,
         EditCollectionComponent,

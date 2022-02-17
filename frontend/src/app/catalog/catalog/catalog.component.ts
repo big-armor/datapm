@@ -60,7 +60,9 @@ export class CatalogComponent implements OnInit {
         const paramMap = this.route.snapshot.paramMap;
         const catalogSlug = paramMap.get("catalogSlug");
         this.state = "LOADING";
+
         this.loadData(catalogSlug);
+
     }
 
     public ngOnDestroy(): void {

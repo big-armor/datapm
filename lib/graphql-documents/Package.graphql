@@ -6,10 +6,19 @@ query Package($identifier: PackageIdentifierInput!) {
             packageSlug
         }
         catalog {
+            identifier {
+                catalogSlug
+            }
             displayName
             myPermissions
             isPublic
             unclaimed
+        }
+        creator {
+            username
+            firstName
+            lastName
+            nameIsPublic
         }
         isPublic
         myPermissions

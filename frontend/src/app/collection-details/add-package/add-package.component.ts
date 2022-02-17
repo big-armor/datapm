@@ -19,6 +19,10 @@ import {
     UserCollectionsGQL
 } from "src/generated/graphql";
 
+import {
+    nameToSlug
+} from "datapm-lib";
+
 enum ErrorType {
     PACKAGE_NOT_FOUND = "PACKAGE_NOT_FOUND",
     CATALOG_NOT_FOUND = "CATALOG_NOT_FOUND",
@@ -26,7 +30,7 @@ enum ErrorType {
 }
 
 class AddPackageToCollectionData {
-    collectionIdentifier: CollectionIdentifierInput;
+    collection: Collection;
     packageIdentifier: PackageIdentifierInput;
 }
 
@@ -45,7 +49,7 @@ export class AddPackageComponent implements OnInit, OnDestroy {
     public collections: Collection[];
 
     public selectedCollection: Collection;
-    public selectedCollectionSlug: string;
+    public selectedCollectionName: string;
 
     public packageKeyDownHasHappened = false;
     public autoCompleteResult: AutoCompleteResult;
@@ -78,11 +82,13 @@ export class AddPackageComponent implements OnInit, OnDestroy {
     public ngOnInit(): void {
         this.form = new FormGroup({
             packageSlug: this.packageNameControl,
-            collectionSlug: this.collectionNameControl
+            collectionName: this.collectionNameControl
         });
 
-        if (this.data.collectionIdentifier) {
-            this.selectedCollectionSlug = this.data.collectionIdentifier.collectionSlug;
+        if (this.data.collection) {
+            this.selectedCollection = this.data.collection;
+            this.selectedCollectionName = this.selectedCollection.name;
+            this.collectionNameControl.setValue(this.selectedCollection);
         }
 
         if (this.data.packageIdentifier)
@@ -158,18 +164,18 @@ export class AddPackageComponent implements OnInit, OnDestroy {
         return (
             this.selectedCollection == null &&
             this.state != "ERROR" &&
-            this.selectedCollectionSlug != null &&
-            this.selectedCollectionSlug.trim().length > 0
+            this.selectedCollectionName != null &&
+            this.selectedCollectionName.trim().length > 0
         );
     }
 
     public displayCollection(collection: Collection): string {
-        return collection?.identifier?.collectionSlug;
+        return collection.name;
     }
 
     public selectCollection(collection: Collection): void {
         this.selectedCollection = collection;
-        this.selectedCollectionSlug = collection.identifier.collectionSlug;
+        this.selectedCollectionName = collection.name;
         this.selectedValidCollectionSlug = true;
     }
 
@@ -194,19 +200,22 @@ export class AddPackageComponent implements OnInit, OnDestroy {
 
     private searchCollections(searchValue: string): void {
         this.selectedCollection = null;
-        this.selectedCollectionSlug = searchValue;
+        const collectionSlug = nameToSlug(searchValue);
         if (!searchValue) {
             this.collections = this.userCollections;
         } else {
             this.collections = this.userCollections.filter(
-                (c) => c.name.includes(searchValue) || c.identifier.collectionSlug.includes(searchValue)
+                (c) => c.name.includes(searchValue) || c.name.includes(searchValue)
             );
             if (!this.collections.length) {
                 this.collectionSlugAvailableGQL
-                    .fetch({ collectionSlug: searchValue })
-                    .subscribe((result) => (this.selectedValidCollectionSlug = result.data?.collectionSlugAvailable));
+                    .fetch({ collectionSlug })
+                    .subscribe((result) => {
+                        this.selectedValidCollectionSlug = result.data?.collectionSlugAvailable;
+                        this.selectedCollectionName = searchValue;
+                    });
             } else {
-                this.selectedCollection = this.userCollections.find((c) => c.identifier.collectionSlug === searchValue);
+                this.selectedCollection = this.userCollections.find((c) => c.name === searchValue);
                 this.selectedValidCollectionSlug = true;
             }
         }
@@ -217,12 +226,13 @@ export class AddPackageComponent implements OnInit, OnDestroy {
     private createCollectionAndAddPackage(): void {
         this.state = "LOADING";
         const collection = {
-            collectionSlug: this.selectedCollectionSlug,
-            name: this.selectedCollectionSlug
+            collectionSlug: nameToSlug(this.selectedCollectionName),
+            name: this.selectedCollectionName
         };
 
         this.createCollectionGQL.mutate({ value: collection }).subscribe((result) => {
             if (result.data.createCollection) {
+                this.selectedCollection = result.data.createCollection;
                 this.addPackageToCollection(true);
             } else if (result.errors) {
                 this.state = "ERROR";
@@ -237,7 +247,7 @@ export class AddPackageComponent implements OnInit, OnDestroy {
         this.addPackageToCollectionGQL
             .mutate({
                 collectionIdentifier: {
-                    collectionSlug: this.selectedCollectionSlug
+                    collectionSlug: this.selectedCollection.identifier.collectionSlug
                 },
                 packageIdentifier: {
                     catalogSlug,
@@ -259,10 +269,10 @@ export class AddPackageComponent implements OnInit, OnDestroy {
                         return;
                     }
                     this.dialogRef.close(data.addPackageToCollection);
-                    this.snackBar.openSnackBar("Package added to collection " + this.selectedCollectionSlug, "ok");
+                    this.snackBar.openSnackBar("Package added to collection " + this.selectedCollectionName, "ok");
 
                     if (navigateToCollection) {
-                        this.router.navigate(["collection", this.selectedCollectionSlug]);
+                        this.router.navigate(["collection", this.selectedCollection.identifier.collectionSlug]);
                     }
                 },
                 () => {

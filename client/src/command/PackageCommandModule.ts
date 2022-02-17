@@ -234,7 +234,11 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
         connectionConfiguration,
         configuration: sourceConfiguration
     };
-    // build sources array
+
+    if (schemas.length === 0) {
+        oraRef.fail("No schemas found");
+        process.exit(1);
+    }
 
     for (const schema of Object.values(schemas)) {
         SchemaUtil.print(schema);
