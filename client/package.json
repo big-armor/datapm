@@ -1,6 +1,6 @@
 {
     "name": "datapm-client",
-    "version": "0.8.74",
+    "version": "0.8.75",
     "description": "The client for manipulating data",
     "scripts": {
         "clean": "gulp clean",
