@@ -326,6 +326,7 @@ export class PublishPackageCommandModule {
             console.log(chalk.green(`datapm update ${argv.reference}`));
         }
 
+        console.log("");
         process.exit(0);
     }
 
