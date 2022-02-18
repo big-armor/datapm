@@ -289,7 +289,13 @@ export class PublishPackageCommandModule {
             oraRef.warn("Use the new package location for future publishing.");
         }
 
-        await publishPackageFile(oraRef, packageFile, targetRegistries);
+        const packageFileChanged = await publishPackageFile(oraRef, packageFile, targetRegistries);
+
+        if (packageFileChanged) {
+            oraRef.start("Saving updated package file...");
+            await packageFileWithContext.save(oraRef, packageFile);
+            oraRef.succeed("Saved updated package file");
+        }
 
         if (targetRegistries.length) {
             const urls = targetRegistries.map((registryRef) => {
