@@ -28,7 +28,7 @@ import { CatalogFollowersComponent } from "./catalog-details/catalog-followers/c
         UserDetailsPageComponent,
         AddUserComponent,
         CatalogPermissionsComponent,
-        CatalogFollowersComponent
+        CatalogFollowersComponent,
     ],
     imports: [
         CommonModule,

@@ -1,12 +1,11 @@
-import { I } from "@angular/cdk/keycodes";
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, ParamMap } from "@angular/router";
-import { Subject, Subscriber, Subscription } from "rxjs";
+import { Subject, Subscription } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { PlatformSettingsComponent } from "src/app/home/admin-dashboard/platform-settings/platform-settings.component";
 import { PageState } from "src/app/models/page-state";
 import { AuthenticationService } from "src/app/services/authentication.service";
-import { BuilderIOSettings, Catalog, GetPageContentGQL, User } from "src/generated/graphql";
+import { Catalog, GetPageContentGQL, PageContent, User } from "src/generated/graphql";
 
 enum PageType {
     USER,
@@ -93,16 +92,15 @@ export class CatalogComponent implements OnInit {
         this.catalog = catalog;
     }
 
-    private updatePageType(route: string, content: any): void {
+    private updatePageType(route: string, content: PageContent): void {
         if (content.user) {
             this.updateUserSettings(content);
         } else if (content.catalog) {
             this.updateCatalogSettings(content);
-        } else if (content.builderIOSettings) {
+        } else if (content.builderIOPage) {
             this.updateTemplateSettings(route, content);
         } else {
             this.pageType = PageType.UNKNOWN;
-            this.state = "ERROR";
         }
     }
 
@@ -116,16 +114,15 @@ export class CatalogComponent implements OnInit {
         this.pageType = PageType.CATALOG;
     }
 
-    private updateTemplateSettings(route: string, content: any): void {
-        const settings: BuilderIOSettings = content.builderIOSettings;
+    private updateTemplateSettings(route: string, content: PageContent): void {
+        const settings = content.builderIOPage;
         this.builderIOApiKey = settings.apiKey;
-        const template = settings.templates.find((t) => t.key === route);
-        if (!template) {
+        if (!settings.template) {
             this.pageType = PageType.UNKNOWN;
             return;
         }
 
-        this.builderIOPageEntry = template.entry;
+        this.builderIOPageEntry = settings.template.entry;
         this.pageType = PageType.BUILDER_IO_TEMPLATE;
     }
 }
