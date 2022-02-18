@@ -1,5 +1,8 @@
 <ng-container *ngIf="packageFile; else noPackageFileTemplate">
     <div *ngIf="packageFile?.readmeMarkdown" class="pb-4">
+        <div class="text-dark-gray" *ngIf="canEdit()">
+            <a class="color-info cursor-pointer" (click)="editReadme()">edit readme</a>
+        </div>
         <div [class.limitTextHeight]="shouldShowMoreReadMeButton && !isShowingMoreReadMeText">
             <markdown [data]="packageFile?.readmeMarkdown"></markdown>
         </div>
@@ -9,12 +12,12 @@
                 {{ isShowingMoreReadMeText ? "Show Less" : "Show More" }}
             </a>
         </p>
-        <div class="text-dark-gray" *ngIf="canEdit()">
-            <a class="color-info cursor-pointer" (click)="editReadme()">edit readme</a>
-        </div>
     </div>
 
     <div *ngIf="packageFile?.licenseMarkdown" class="pb-4">
+        <div class="text-dark-gray" *ngIf="canEdit()">
+            <a class="color-info cursor-pointer" (click)="editLicense()">edit license</a>
+        </div>
         <div [class.limitTextHeight]="shouldShowMoreLicenseButton && !isShowingMoreLicenseText">
             <markdown [data]="packageFile?.licenseMarkdown"></markdown>
         </div>
@@ -24,9 +27,6 @@
                 {{ isShowingMoreLicenseText ? "Show Less" : "Show More" }}
             </a>
         </p>
-        <div class="text-dark-gray" *ngIf="canEdit()">
-            <a class="color-info cursor-pointer" (click)="editLicense()">edit license</a>
-        </div>
     </div>
     <h1>Preview</h1>
 
