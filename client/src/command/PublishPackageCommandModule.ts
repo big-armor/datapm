@@ -276,6 +276,8 @@ export class PublishPackageCommandModule {
             }
         }
 
+        await publishPackageFile(oraRef, packageFile, targetRegistries);
+
         if (packageFileWithContext.permitsSaving) {
             if (packageFileWithContext.hasPermissionToSave) {
                 await packageFileWithContext.save(oraRef, packageFile);
@@ -288,8 +290,6 @@ export class PublishPackageCommandModule {
             oraRef.warn("Can not save package the original package file, so these publish settings will not be saved.");
             oraRef.warn("Use the new package location for future publishing.");
         }
-
-        await publishPackageFile(oraRef, packageFile, targetRegistries);
 
         if (targetRegistries.length) {
             const urls = targetRegistries.map((registryRef) => {

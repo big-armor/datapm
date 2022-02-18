@@ -517,7 +517,6 @@ async function main() {
         // redirect to the equivalent url on the correct name
         if(req.hostname != registryHostName) {
             const redirectDestination = `${process.env["REGISTRY_URL"]}${req.originalUrl}`;
-            console.log("Redirecting to: " + redirectDestination);
             res.redirect(301,redirectDestination);
             return;
         }

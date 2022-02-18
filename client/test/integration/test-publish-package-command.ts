@@ -280,4 +280,33 @@ describe("Publish Package Command Tests", async function () {
 
         expect(packageFile.registries?.length).equals(1);
     });
+
+    it("Should save the updated package file version after change during publishing", async function () {
+        const packageFile: PackageFile = loadPackageFileFromDisk(packageAFilePath);
+        const newPackageFileLocation = "package-a-updated.datapm.json";
+
+        packageFile.schemas = [packageFile.schemas[0]];
+
+        fs.writeFileSync(newPackageFileLocation, JSON.stringify(packageFile));
+
+        const results: TestResults = {
+            exitCode: -1,
+            messageFound: false
+        };
+
+        const cmdResult = await testCmd("publish", [newPackageFileLocation, "--defaults"], [], async (line: string) => {
+            if (line.includes("Share the command below to fetch the data in this package")) {
+                results.messageFound = true;
+            }
+        });
+
+        expect(cmdResult.code, "Exit code").equals(0);
+        expect(results.messageFound, "Found success message").equals(true);
+
+        const packageFileAfterPublish: PackageFile = loadPackageFileFromDisk(newPackageFileLocation);
+
+        expect(packageFileAfterPublish.version).equals("2.0.0");
+
+        fs.unlinkSync(newPackageFileLocation);
+    });
 });

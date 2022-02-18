@@ -114,12 +114,15 @@ export interface PublishProgress {
     updateStep(step: PublishSchemaSteps, registry: RegistryReference): void;
 }
 
+/** Returns boolean of whether the package file was changed during the saving process */
 export async function publishPackageFile(
     oraRef: Ora,
     packageFile: PackageFile,
     targetRegistries: RegistryReference[]
-): Promise<void> {
+): Promise<boolean> {
     const credentialsBySourceSlug: CredentialsBySourceSlug = new Map();
+
+    let packageFileChanged = false;
 
     for (const source of packageFile.sources) {
         const credentials = await obtainCredentials(oraRef, source);
@@ -157,6 +160,7 @@ export async function publishPackageFile(
                 );
 
                 packageFile.version = error.extensions?.minNextVersion;
+                packageFileChanged = true;
 
                 try {
                     await attemptPublishPackageFile(oraRef, packageFile, targetRegistries, credentialsBySourceSlug);
@@ -204,6 +208,8 @@ export async function publishPackageFile(
             }
         }
     }
+
+    return packageFileChanged;
 }
 
 async function publishData(

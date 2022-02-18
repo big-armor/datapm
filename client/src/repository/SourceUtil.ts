@@ -169,11 +169,6 @@ export async function generateSchemasFromSourceStreams(
                 if (completedStreamsRecordCount + currentStreamRecordCount >= MAX_COUNT_RECORDS) {
                     if (!flushingFinalRecords) {
                         flushingFinalRecords = true;
-
-                        // statsTransform._final(() => {
-                        // 	//
-                        // });
-                        finalize(false);
                     }
 
                     return "END";

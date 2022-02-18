@@ -98,11 +98,12 @@
 
 <div class="mobile-menu">
     <div class="row pt-3 px-3">
-        <div class="col-7 logo-div">
+        <div class="col-7 logo-div d-flex align-items-center">
             <h1 routerLink="/"><a class="dpm-text-logo" (click)="goHome()">datapm</a></h1>
+            <p class="text-light-gray ml-1"><a href="/docs/beta-notice" style="color: red">beta</a></p>
         </div>
 
-        <div class="col-5 text-right">
+        <div class="col-5 text-right d-flex justify-content-end align-items-center">
             <div class="d-flex flex-row bd-highlight d-flex justify-content-end">
                 <div class="bd-highlight mobile-person">
                     <app-avatar [user]="currentUser" [matMenuTriggerFor]="beforeMenu" *ngIf="currentUser"></app-avatar>

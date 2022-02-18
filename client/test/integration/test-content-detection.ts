@@ -126,11 +126,11 @@ describe("Content Detection Tests", async function () {
             ) != null
         ).equal(true);
 
-        expect(
+        /* expect(
             packageA.schemas[0].properties?.lastName.valueTypes?.string.contentLabels?.find(
                 (cl) => cl.label === PEOPLE_NAMES_LABEL
             ) != null
-        ).equal(true);
+        ).equal(true); */
     });
 
     it("Should detect Email Addresses", async function () {
