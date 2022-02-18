@@ -276,6 +276,8 @@ export class PublishPackageCommandModule {
             }
         }
 
+        await publishPackageFile(oraRef, packageFile, targetRegistries);
+
         if (packageFileWithContext.permitsSaving) {
             if (packageFileWithContext.hasPermissionToSave) {
                 await packageFileWithContext.save(oraRef, packageFile);
@@ -287,14 +289,6 @@ export class PublishPackageCommandModule {
         } else {
             oraRef.warn("Can not save package the original package file, so these publish settings will not be saved.");
             oraRef.warn("Use the new package location for future publishing.");
-        }
-
-        const packageFileChanged = await publishPackageFile(oraRef, packageFile, targetRegistries);
-
-        if (packageFileChanged) {
-            oraRef.start("Saving updated package file...");
-            await packageFileWithContext.save(oraRef, packageFile);
-            oraRef.succeed("Saved updated package file");
         }
 
         if (targetRegistries.length) {
