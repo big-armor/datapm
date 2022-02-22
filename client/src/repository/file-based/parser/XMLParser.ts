@@ -62,7 +62,7 @@ export class XMLParser implements Parser {
             new Transform({
                 objectMode: true,
                 transform: (xmlRecord: { [key: string]: unknown }, encoding: BufferEncoding, callback) => {
-                    const record = recurseXMLNodes(xmlRecord);
+                    const record = flattenXMLNodes("", {}, xmlRecord);
 
                     const recordContext: RecordContext = {
                         record,
@@ -77,31 +77,24 @@ export class XMLParser implements Parser {
     }
 }
 
-function recurseXMLNodes(xmlNodes: { [key: string]: unknown }): DPMRecord {
-    const returnValue: DPMRecord = {};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function flattenXMLNodes(prefix: string, object: { [key: string]: any }, xmlNodes: { [key: string]: any }): DPMRecord {
+    const topKeys = Object.keys(xmlNodes);
 
-    const keys = Object.keys(xmlNodes);
+    for (const topKey of topKeys) {
+        const keyWithPrefix = prefix === "" ? topKey : prefix + "." + topKey;
 
-    for (const key of keys) {
-        const property = xmlNodes[key] as Record<string, unknown>;
-
-        const propertyKeys = Object.keys(property);
-
-        for (const propertyKey of propertyKeys) {
-            if (propertyKey === "_") {
-                returnValue[key] = property._ as string;
-            } else if (propertyKey === "$") {
-                const attributes = property.$ as Record<string, string | boolean | number>;
-                const attributeKeys = Object.keys(attributes);
-
-                for (const attributeKey of attributeKeys) {
-                    returnValue[key + "." + attributeKey] = attributes[attributeKey];
-                }
-            } else {
-                returnValue[key] = recurseXMLNodes(property[propertyKey] as { [key: string]: unknown });
-            }
+        if (topKey === "$") {
+            flattenXMLNodes("", object, xmlNodes.$ as { [key: string]: unknown });
+        } else if (topKey === "_") {
+            object[prefix] = xmlNodes._ as string;
+        } else if (typeof xmlNodes[topKey] === "object") {
+            // TODO handle arrays?
+            flattenXMLNodes(keyWithPrefix, object, xmlNodes[topKey] as { [key: string]: unknown });
+        } else {
+            object[keyWithPrefix] = xmlNodes[topKey];
         }
     }
 
-    return returnValue as DPMRecord;
+    return object as DPMRecord;
 }
