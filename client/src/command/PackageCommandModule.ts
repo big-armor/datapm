@@ -235,7 +235,7 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
         configuration: sourceConfiguration
     };
 
-    if (schemas.length === 0) {
+    if (Object.keys(schemas).length === 0) {
         oraRef.fail("No schemas found");
         process.exit(1);
     }
@@ -706,12 +706,12 @@ async function schemaSpecificQuestions(schema: Schema) {
                     message: `Do you want to specify units for the ${keys.length} number properties?`,
                     choices: [
                         {
-                            title: "Yes",
-                            value: true
-                        },
-                        {
                             title: "No",
                             value: false
+                        },
+                        {
+                            title: "Yes",
+                            value: true
                         }
                     ]
                 }

@@ -99,7 +99,12 @@ export class ContentLabelDetector {
 
             if (valueTestedCount > 100) inspect = Math.random() < 1 / valueTestedCount;
 
-            if (inspect) contentLabelDetector.inspectValue(value as string | number);
+            try {
+                if (inspect) contentLabelDetector.inspectValue(value as string | number);
+            } catch (error) {
+                // TODO note a warning that content lable detection didn't work
+                // TODO debug log error
+            }
         }
     }
 
