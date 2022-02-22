@@ -38,7 +38,7 @@ describe("Compare Command Tests", async function () {
                     },
                     {
                         message: "Do you want to specify units for the",
-                        input: KEYS.ENTER
+                        input: "Y" + KEYS.ENTER
                     },
                     {
                         message: "Unit for attribute 'Confirmed'?",
@@ -68,7 +68,7 @@ describe("Compare Command Tests", async function () {
                     },
                     {
                         message: "Do you want to specify units for the",
-                        input: KEYS.ENTER
+                        input: "Y" + KEYS.ENTER
                     },
                     {
                         message: "Unit for attribute 'Confirmed'?",
