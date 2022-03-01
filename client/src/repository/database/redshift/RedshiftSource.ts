@@ -112,9 +112,8 @@ export class RedshiftSource extends AbstractFileStreamSource implements Source {
 
     async copyToS3(configuration: DPMConfiguration): Promise<string[]> {
         const s3PathList: string[] = [];
-        const tables = (configuration.tables as string).split(",");
 
-        for (const table of tables) {
+        for (const table of configuration.tables as string[]) {
             const s3Path = `s3://${configuration.bucket}/${table}_${Date.now()}_`;
             s3PathList.push(`${s3Path}0000_part_00`);
 

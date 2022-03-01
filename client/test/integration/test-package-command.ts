@@ -157,7 +157,7 @@ describe("Package Command Tests", async () => {
             }
         );
 
-        expect(cmdResult.signal, "Exit code").equals("SIGINT");
+        expect(cmdResult.code, "Exit code").not.equals(0);
         expect(results.messageFound, "Found error message").equals(true);
     });
 
@@ -185,7 +185,7 @@ describe("Package Command Tests", async () => {
             }
         );
 
-        expect(cmdResult.signal, "Exit code").equals("SIGINT");
+        expect(cmdResult.code, "Exit code").not.equals(0);
         expect(results.messageFound, "Found error message").equals(true);
     });
 
@@ -213,7 +213,7 @@ describe("Package Command Tests", async () => {
             }
         );
 
-        expect(cmdResult.signal, "Exit code").equals("SIGINT");
+        expect(cmdResult.code, "Exit code").not.equals(0);
         expect(results.messageFound, "Found error message").equals(true);
     });
 
@@ -240,7 +240,7 @@ describe("Package Command Tests", async () => {
             }
         );
 
-        expect(cmdResult.signal, "Exit code").equals("SIGINT");
+        expect(cmdResult.code, "Exit code").not.equals(0);
         expect(results.messageFound, "Found error message").equals(true);
     });
 

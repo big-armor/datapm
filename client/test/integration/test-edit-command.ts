@@ -185,10 +185,11 @@ describe("Edit Package Command Tests", async () => {
             }
         });
 
-        const newPackageFile: PackageFile = loadPackageFileFromDisk("test.datapm.json");
-
         expect(cmdResult.code, "Exit code").equals(0);
         expect(results.messageFound, "Found success message").equals(true);
+
+        const newPackageFile: PackageFile = loadPackageFileFromDisk("test.datapm.json");
+
         expect(newPackageFile.displayName).to.be.string("updated package 100");
         expect(newPackageFile.packageSlug).to.be.string("test");
         expect(newPackageFile.version).to.be.string("1.0.1");

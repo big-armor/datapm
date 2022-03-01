@@ -1,12 +1,13 @@
 import prompts, { PromptObject } from "prompts";
 import { DPMConfiguration } from "datapm-lib";
 import { defaultPromptOptions } from "./DefaultParameterOptions";
-import { Parameter, ParameterType } from "./Parameter";
+import { Parameter, ParameterAnswer, ParameterType } from "./Parameter";
+import { JobContext } from "../../task/Task";
 
 /** Continuously calls the call back until it returns no parameters. Returns the number of prompts completed */
 export async function repeatedlyPromptParameters(
+    jobContext: JobContext,
     callBack: () => Promise<Parameter[]>,
-    configuration: DPMConfiguration,
     defaults: boolean,
     overrideDefaultValues: DPMConfiguration = {}
 ): Promise<number> {
@@ -39,14 +40,12 @@ export async function repeatedlyPromptParameters(
         }
 
         parameterCount += remainingParameters.length;
-        const promptObjects = parametersToPrompts(remainingParameters);
 
-        // TODO Skip existing configs
-        const newSinkConfig = await prompts(promptObjects, defaultPromptOptions);
+        const parameterAnswers = await jobContext.parameterPrompt(remainingParameters);
 
-        Object.keys(newSinkConfig).forEach((key) => {
+        Object.keys(parameterAnswers).forEach((key) => {
             const parameter = remainingParameters.find((parameter) => parameter.name === key) as Parameter;
-            parameter.configuration[key] = newSinkConfig[key];
+            parameter.configuration[key] = parameterAnswers[key];
         });
 
         remainingParameters = await callBack();
@@ -116,6 +115,7 @@ export function parametersToPrompts(parameters: Parameter[]): PromptObject[] {
                 message: promptParameter.message,
                 min: promptParameter.numberMinimumValue,
                 max: promptParameter.numberMaximumValue,
+                hint: promptParameter.hint,
                 choices: [
                     {
                         title: "Yes",
@@ -133,6 +133,7 @@ export function parametersToPrompts(parameters: Parameter[]): PromptObject[] {
                 message: promptParameter.message,
                 initial: promptParameter.defaultValue,
                 min: promptParameter.numberMinimumValue,
+                hint: promptParameter.hint,
                 validate: (value) => validatePromptResponse(value, promptParameter)
             };
         } else if (
@@ -150,6 +151,7 @@ export function parametersToPrompts(parameters: Parameter[]): PromptObject[] {
                 type: promptParameter.type,
                 name: promptParameter.name,
                 message: promptParameter.message,
+                hint: promptParameter.hint,
                 choices: promptParameter.options,
                 min: promptParameter.numberMinimumValue,
                 validate: (value) => validatePromptResponse(value, promptParameter)
@@ -160,7 +162,12 @@ export function parametersToPrompts(parameters: Parameter[]): PromptObject[] {
     });
 }
 
-export async function cliHandleParameters(defaults: boolean, parameters: Parameter[]): Promise<void> {
+export async function cliHandleParameters<T extends string>(
+    defaults: boolean,
+    parameters: Array<Parameter<T>>
+): Promise<ParameterAnswer<T>> {
+    const answers: ParameterAnswer<string> = {};
+
     for (const parameter of parameters) {
         let defaultFound = false;
         if (defaults) {
@@ -171,6 +178,7 @@ export async function cliHandleParameters(defaults: boolean, parameters: Paramet
                     parameter.type === ParameterType.Password)
             ) {
                 parameter.configuration[parameter.name] = parameter.defaultValue;
+                answers[parameter.name] = parameter.defaultValue;
                 defaultFound = true;
             } else if (parameter.type === ParameterType.Select && parameter.options?.find((o) => o.selected) != null) {
                 const selectedOption = parameter.options?.find((o) => o.selected);
@@ -178,6 +186,8 @@ export async function cliHandleParameters(defaults: boolean, parameters: Paramet
                 if (selectedOption == null) throw new Error("SELECTED_OPTION_NOT_FOUND");
 
                 parameter.configuration[parameter.name] = selectedOption?.value as string | number | boolean;
+                answers[parameter.name] = selectedOption?.value as string | number | boolean;
+
                 defaultFound = true;
             } else if (
                 parameter.type === ParameterType.MultiSelect &&
@@ -185,7 +195,8 @@ export async function cliHandleParameters(defaults: boolean, parameters: Paramet
             ) {
                 const selectOptions = parameter.options?.filter((o) => o.selected).map((o) => o.value);
 
-                parameter.configuration[parameter.name] = selectOptions?.join(",");
+                parameter.configuration[parameter.name] = selectOptions as string[];
+                answers[parameter.name] = selectOptions;
                 defaultFound = true;
             }
         }
@@ -195,9 +206,9 @@ export async function cliHandleParameters(defaults: boolean, parameters: Paramet
         const promptObjects: PromptObject[] = parametersToPrompts([parameter]);
         const newConfigValues = await prompts(promptObjects, defaultPromptOptions);
         Object.keys(newConfigValues).forEach((key) => {
-            if (Array.isArray(newConfigValues[key])) {
-                parameter.configuration[key] = newConfigValues[key].join(",");
-            } else parameter.configuration[key] = newConfigValues[key];
+            parameter.configuration[key] = newConfigValues[key];
+            answers[key] = newConfigValues[key];
         });
     }
+    return answers;
 }

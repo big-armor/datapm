@@ -1,6 +1,10 @@
 import { CatalogIdentifier, PackageIdentifier, VersionIdentifier } from "../generated/graphql";
 
-export function validVersion(value: string): boolean | string {
+export function validVersion(value: string | number | boolean): boolean | string {
+    if (typeof value !== "string") {
+        return "Must be a string";
+    }
+
     const regex = /^[0-9]+\.[0-9]+\.[0-9]+$/;
 
     const trimmedValue = value.trim();
@@ -10,8 +14,12 @@ export function validVersion(value: string): boolean | string {
     return true;
 }
 
-export function validPackageDisplayName(value: string): boolean | string {
+export function validPackageDisplayName(value: string | number | boolean): boolean | string {
     if (value == null) return false;
+
+    if (typeof value === "number") return "Must be a string";
+
+    if (typeof value === "boolean") return "Must be a string";
 
     if (value.length < 3) return "Must be longer than 3 characters";
 
@@ -22,8 +30,10 @@ export function validPackageDisplayName(value: string): boolean | string {
     return true;
 }
 
-export function validShortPackageDescription(value: string): boolean | string {
+export function validShortPackageDescription(value: string | number | boolean): boolean | string {
     if (value == null) return false;
+
+    if (typeof value !== "string") return "Must be a string";
 
     if (value.length < 3) return "Must be longer than 3 characters";
 
@@ -32,9 +42,9 @@ export function validShortPackageDescription(value: string): boolean | string {
     return true;
 }
 
-export function validUnit(value: string): boolean | string {
+export function validUnit(value: string | number | boolean): boolean | string {
+    if (typeof value !== "string") return "Must be a string";
     if (value && value.length > 128) return "Must be less than 128 characters";
-
     return true;
 }
 

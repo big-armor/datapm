@@ -1,9 +1,5 @@
 import { Difference, DifferenceType, PackageFile, PublishMethod, RegistryReference } from "datapm-lib";
-import fs from "fs";
-import { Ora } from "ora";
-import path from "path";
 import { SemVer } from "semver";
-import { fetchMultipleWithListr } from "../command/FetchCommandModule";
 import { CredentialsBySourceSlug } from "../command/PublishPackageCommandModule";
 import { CreateVersionInput } from "../generated/graphql";
 import { obtainCredentials } from "./CredentialsUtil";
@@ -12,6 +8,9 @@ import { getRegistryClientWithConfig } from "./RegistryClient";
 import { exit } from "yargs";
 import { DataPMRepositoryDescription } from "../repository/file-based/datapm-registry/DataPMRepositoryDescription";
 import numeral from "numeral";
+import { JobContext, Task } from "../task/Task";
+import { fetchMultiple } from "../task/FetchPackageJob";
+import internal from "stream";
 
 export const DifferenceTypeMessages: Record<DifferenceType, string> = {
     [DifferenceType.REMOVE_SCHEMA]: "Removed Schema",
@@ -67,32 +66,59 @@ export function differenceToString(difference: Difference): string {
     return message;
 }
 
-export function writePackageFile(packageFile: PackageFile): string {
-    const packageFileName = `${packageFile.packageSlug}.datapm.json`;
-    const packageFileLocation = path.join(process.cwd(), packageFileName);
+async function writeFile(writable: internal.Writable, contents: string) {
+    return new Promise<void>((resolve, reject) => {
+        writable.write(contents, (err) => {
+            writable.end();
+            if (err) {
+                reject(err);
+            } else {
+                resolve();
+            }
+        });
+    });
+}
+
+export async function writePackageFile(
+    jobContext: JobContext,
+    catalogSlug: string | undefined,
+    packageFile: PackageFile
+): Promise<string> {
     const json = JSON.stringify(packageFile, null, " ");
 
-    fs.writeFileSync(packageFileLocation, json, "utf8");
+    const semver = new SemVer(packageFile.version);
+    const response = await jobContext.getPackageFileWritable(catalogSlug, packageFile.packageSlug, semver);
 
-    return packageFileLocation;
+    await writeFile(response.writable, json);
+
+    return response.location;
 }
 
-export function writeReadmeFile(packageFile: PackageFile): string {
-    const fileLocation = path.join(process.cwd(), `${packageFile.packageSlug}.README.md`);
+export async function writeReadmeFile(
+    jobContext: JobContext,
+    catalogSlug: string | undefined,
+    packageFile: PackageFile
+): Promise<string> {
     const contents = `# ${packageFile.displayName}\n \n ${packageFile.description}`;
+    const semver = new SemVer(packageFile.version);
 
-    fs.writeFileSync(fileLocation, contents, "utf8");
-
-    return fileLocation;
+    const response = await jobContext.getReadMeFileWritable(catalogSlug, packageFile.packageSlug, semver);
+    await writeFile(response.writable, contents);
+    return response.location;
 }
 
-export function writeLicenseFile(packageFile: PackageFile): string {
-    const fileLocation = path.join(process.cwd(), `${packageFile.packageSlug}.LICENSE.md`);
+export async function writeLicenseFile(
+    jobContext: JobContext,
+    catalogSlug: string | undefined,
+    packageFile: PackageFile
+): Promise<string> {
     const contents = "# License\n\nLicense not defined. Contact author.";
 
-    fs.writeFileSync(fileLocation, contents, "utf8");
+    const semver = new SemVer(packageFile.version);
 
-    return fileLocation;
+    const response = await jobContext.getLicenseFileWritable(catalogSlug, packageFile.packageSlug, semver);
+    await writeFile(response.writable, contents);
+    return response.location;
 }
 
 export enum PublishSchemaSteps {
@@ -111,12 +137,12 @@ export enum PublishSchemaSteps {
 }
 
 export interface PublishProgress {
-    updateStep(step: PublishSchemaSteps, registry: RegistryReference): void;
+    updateStep(step: PublishSchemaSteps, registry: RegistryReference): Promise<void>;
 }
 
 /** Returns boolean of whether the package file was changed during the saving process */
 export async function publishPackageFile(
-    oraRef: Ora,
+    jobContext: JobContext,
     packageFile: PackageFile,
     targetRegistries: RegistryReference[]
 ): Promise<boolean> {
@@ -125,37 +151,48 @@ export async function publishPackageFile(
     let packageFileChanged = false;
 
     for (const source of packageFile.sources) {
-        const credentials = await obtainCredentials(oraRef, source);
+        const credentials = await obtainCredentials(jobContext, source);
         credentialsBySourceSlug.set(source.slug, credentials);
     }
 
-    await attemptPublishPackageFile(oraRef, packageFile, targetRegistries, credentialsBySourceSlug)
+    await attemptPublishPackageFile(jobContext, packageFile, targetRegistries, credentialsBySourceSlug)
         .catch(async (error) => {
             if (error.networkError) {
                 if (error.networkError.result) {
                     if (error.networkError.result.errors[0].message.indexOf("API_KEY_NOT_FOUND") !== -1) {
-                        oraRef.fail("Failed to publish: Your API KEY is out of date.");
-                        oraRef.info("Genarate a new API Key in this registry's web console");
+                        jobContext.print("ERROR", "Failed to publish: Your API KEY is out of date.");
+                        jobContext.print("INFO", "Genarate a new API Key in this registry's web console");
                     } else {
-                        oraRef.fail(`Failed to publish: ${error.networkError.result.errors[0].message}`);
+                        jobContext.print("ERROR", `Failed to publish: ${error.networkError.result.errors[0].message}`);
                     }
-                } else oraRef.fail(`Failed to publish: ${error.networkError.bodyText || error.networkError.message}`);
+                } else
+                    jobContext.print(
+                        "ERROR",
+                        `Failed to publish: ${error.networkError.bodyText || error.networkError.message}`
+                    );
 
                 throw error;
             }
 
             if (error.message === "README_FILE_NOT_FOUND") {
-                oraRef.fail(`Could not find the README file with the relative path of ${packageFile.readmeFile}`);
+                jobContext.print(
+                    "ERROR",
+                    `Could not find the README file with the relative path of ${packageFile.readmeFile}`
+                );
                 throw error;
             }
 
             if (error.message === "LICENSE_FILE_NOT_FOUND") {
-                oraRef.fail(`Could not find the LICENSE file with the relative path of ${packageFile.licenseFile}`);
+                jobContext.print(
+                    "ERROR",
+                    `Could not find the LICENSE file with the relative path of ${packageFile.licenseFile}`
+                );
                 throw error;
             }
 
             if (error.extensions?.code === "HIGHER_VERSION_REQUIRED") {
-                oraRef.warn(
+                jobContext.print(
+                    "WARN",
                     `Because of the changes in this file, the version number must be at least ${error.extensions?.minNextVersion}`
                 );
 
@@ -163,21 +200,21 @@ export async function publishPackageFile(
                 packageFileChanged = true;
 
                 try {
-                    await attemptPublishPackageFile(oraRef, packageFile, targetRegistries, credentialsBySourceSlug);
+                    await attemptPublishPackageFile(jobContext, packageFile, targetRegistries, credentialsBySourceSlug);
                 } catch (error) {
-                    oraRef.fail(`Error publishing version after version change. ${error.messasge}`);
+                    jobContext.print("ERROR", `Error publishing version after version change. ${error.messasge}`);
                     throw error;
                 }
-                oraRef.succeed("Published to registry after version update");
+                jobContext.print("SUCCESS", "Published to registry after version update");
             } else {
                 throw error;
             }
         })
         .then(() => {
-            oraRef.succeed("Published package file to registry");
+            jobContext.print("SUCCESS", "Published package file to registry");
         })
         .catch((error) => {
-            oraRef.fail(`Failed to publish: ${error.message}`);
+            jobContext.print("ERROR", `Failed to publish: ${error.message}`);
             process.exit(1);
         });
 
@@ -186,15 +223,16 @@ export async function publishPackageFile(
     );
 
     if (registryForDataPublishing.length > 0) {
-        oraRef.info("Publishing data...");
+        jobContext.print("INFO", "Publishing data...");
 
         for (const targetRegistry of registryForDataPublishing) {
             try {
-                const results = await publishData(oraRef, packageFile, targetRegistry);
+                const results = await publishData(jobContext, packageFile, targetRegistry);
 
                 const totalRecordCount = Object.values(results).reduce((acc, result) => acc + result, 0);
 
-                oraRef.succeed(
+                jobContext.print(
+                    "SUCCESS",
                     `Finished uploading ${numeral(totalRecordCount).format("0,0")} records to ` +
                         targetRegistry.url +
                         "/" +
@@ -203,7 +241,7 @@ export async function publishPackageFile(
                         packageFile.packageSlug
                 );
             } catch (error) {
-                oraRef.fail(`Failed to publish data: ${error.message}`);
+                jobContext.print("ERROR", `Failed to publish data: ${error.message}`);
                 exit(1, error);
             }
         }
@@ -213,7 +251,7 @@ export async function publishPackageFile(
 }
 
 async function publishData(
-    oraRef: Ora,
+    jobContext: JobContext,
     packageFile: PackageFile,
     targetRegistry: RegistryReference
 ): Promise<{ [key: string]: number }> {
@@ -227,8 +265,8 @@ async function publishData(
 
     const dataPMSink = await dataPMSinkDescription.loadSinkFromModule();
 
-    return await fetchMultipleWithListr(
-        oraRef,
+    return await fetchMultiple(
+        jobContext,
         packageFile,
         {
             catalogSlug: targetRegistry.catalogSlug,
@@ -246,26 +284,28 @@ async function publishData(
             majorVersion: new SemVer(packageFile.version).major
         },
         true,
-        false,
         false
     );
 }
 
 async function attemptPublishPackageFile(
-    oraRef: Ora,
+    jobContext: JobContext,
     packageFile: PackageFile,
     targetRegistries: RegistryReference[],
     credentialsBySourceSlug: CredentialsBySourceSlug
 ): Promise<void> {
+    let task: Task | undefined;
+
     await uploadPackageFile(packageFile, targetRegistries, credentialsBySourceSlug, {
-        updateStep: (step: PublishSchemaSteps, registryRef: RegistryReference) => {
+        updateStep: async (step: PublishSchemaSteps, registryRef: RegistryReference) => {
             switch (step) {
                 case PublishSchemaSteps.FIND_EXISTING_PACKAGE:
-                    oraRef.start("Finding existing package...");
+                    task = await jobContext.startTask("Finding existing package...");
                     break;
 
                 case PublishSchemaSteps.FOUND_EXISTING_PACKAGE:
-                    oraRef.succeed(
+                    await task?.end(
+                        "SUCCESS",
                         "Found the existing package - " +
                             identifierToString({
                                 registryURL: registryRef.url,
@@ -276,35 +316,40 @@ async function attemptPublishPackageFile(
                     break;
 
                 case PublishSchemaSteps.UPDATING_PACKAGE_LISTING:
-                    oraRef.start("Updating package description and name");
+                    task = await jobContext.startTask("Updating package description and name");
                     break;
 
                 case PublishSchemaSteps.UPDATED_PACKAGE_LISTING:
-                    oraRef.succeed("Updated package listing");
+                    await task?.end("SUCCESS", "Updated package listing");
                     break;
 
                 case PublishSchemaSteps.NO_EXISTING_PACKAGE_FOUND:
-                    oraRef.succeed("Existing package not found.");
+                    await task?.end("SUCCESS", "Existing package not found.");
                     break;
 
                 case PublishSchemaSteps.CREATE_PACKAGE:
-                    oraRef.start(`Creating new package listing ${registryRef.catalogSlug}/${packageFile.packageSlug}`);
+                    task = await jobContext.startTask(
+                        `Creating new package listing ${registryRef.catalogSlug}/${packageFile.packageSlug}`
+                    );
                     break;
 
                 case PublishSchemaSteps.CREATE_PACKAGE_SUCCESS:
-                    oraRef.succeed(`Created new package listing ${registryRef.catalogSlug}/${packageFile.packageSlug}`);
+                    await task?.end(
+                        "SUCCESS",
+                        `Created new package listing ${registryRef.catalogSlug}/${packageFile.packageSlug}`
+                    );
                     break;
 
                 case PublishSchemaSteps.CREATE_VERSION:
-                    oraRef.start(`Publishing version ${packageFile.version}`);
+                    task = await jobContext.startTask(`Publishing version ${packageFile.version}`);
                     break;
 
                 case PublishSchemaSteps.CREATE_VERSION_SUCCESS:
-                    oraRef.succeed(`Published version ${packageFile.version}`);
+                    await task?.end("SUCCESS", `Published version ${packageFile.version}`);
                     break;
 
                 case PublishSchemaSteps.VERSION_EXISTS_SUCCESS:
-                    oraRef.succeed(`Updated existing version ${packageFile.version}`);
+                    await task?.end("SUCCESS", `Updated existing version ${packageFile.version}`);
                     break;
             }
         }
@@ -320,7 +365,7 @@ export async function uploadPackageFile(
     const returnValue: Map<RegistryReference, boolean> = new Map();
 
     for (const registryRef of targetRegistries) {
-        context.updateStep(PublishSchemaSteps.FIND_EXISTING_PACKAGE, registryRef);
+        await context.updateStep(PublishSchemaSteps.FIND_EXISTING_PACKAGE, registryRef);
 
         const registry = getRegistryClientWithConfig(registryRef);
 
@@ -334,9 +379,9 @@ export async function uploadPackageFile(
                 throw existingPackage.errors[0];
             }
 
-            context.updateStep(PublishSchemaSteps.FOUND_EXISTING_PACKAGE, registryRef);
+            await context.updateStep(PublishSchemaSteps.FOUND_EXISTING_PACKAGE, registryRef);
 
-            context.updateStep(PublishSchemaSteps.UPDATING_PACKAGE_LISTING, registryRef);
+            await context.updateStep(PublishSchemaSteps.UPDATING_PACKAGE_LISTING, registryRef);
 
             await registry.updatePackage(
                 {
@@ -349,15 +394,15 @@ export async function uploadPackageFile(
                 }
             );
 
-            context.updateStep(PublishSchemaSteps.UPDATED_PACKAGE_LISTING, registryRef);
+            await context.updateStep(PublishSchemaSteps.UPDATED_PACKAGE_LISTING, registryRef);
         } catch (error) {
             if (!error.message.includes("PACKAGE_NOT_FOUND")) {
                 throw error;
             }
 
-            context.updateStep(PublishSchemaSteps.NO_EXISTING_PACKAGE_FOUND, registryRef);
+            await context.updateStep(PublishSchemaSteps.NO_EXISTING_PACKAGE_FOUND, registryRef);
 
-            context.updateStep(PublishSchemaSteps.CREATE_PACKAGE, registryRef);
+            await context.updateStep(PublishSchemaSteps.CREATE_PACKAGE, registryRef);
 
             await registry.createPackage({
                 catalogSlug: registryRef.catalogSlug,
@@ -365,10 +410,10 @@ export async function uploadPackageFile(
                 description: packageFile.description,
                 displayName: packageFile.displayName
             });
-            context.updateStep(PublishSchemaSteps.CREATE_PACKAGE_SUCCESS, registryRef);
+            await context.updateStep(PublishSchemaSteps.CREATE_PACKAGE_SUCCESS, registryRef);
         }
 
-        context.updateStep(PublishSchemaSteps.CREATE_VERSION, registryRef);
+        await context.updateStep(PublishSchemaSteps.CREATE_VERSION, registryRef);
 
         const versions = generateCreateVersion(packageFile, registryRef, credentialsBySourceSlug);
 
@@ -379,10 +424,10 @@ export async function uploadPackageFile(
 
         if (serverResponse.errors) {
             if (serverResponse.errors.find((error) => error.extensions?.code === "VERSION_EXISTS") !== undefined)
-                context.updateStep(PublishSchemaSteps.VERSION_EXISTS_SUCCESS, registryRef);
+                await context.updateStep(PublishSchemaSteps.VERSION_EXISTS_SUCCESS, registryRef);
             else throw serverResponse.errors[0];
         } else {
-            context.updateStep(PublishSchemaSteps.CREATE_VERSION_SUCCESS, registryRef); // FIXME ONLY SHOW THIS IF THE VERSION HAS ACCTUALLY CHANGED
+            await context.updateStep(PublishSchemaSteps.CREATE_VERSION_SUCCESS, registryRef); // FIXME ONLY SHOW THIS IF THE VERSION HAS ACCTUALLY CHANGED
         }
 
         returnValue.set(registryRef, true);

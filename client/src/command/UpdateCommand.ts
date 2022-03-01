@@ -1,10 +1,6 @@
 import { Argv } from "yargs";
+import { UpdateArguments } from "../task/UpdateJob";
 import { Command } from "./Command";
-export class UpdateArguments {
-    reference?: string;
-    defaults?: boolean;
-    forceUpdate?: boolean;
-}
 
 export class UpdateCommand implements Command {
     prepareCommand(argv: Argv): Argv {

@@ -9,9 +9,9 @@ import {
     RegistryReference
 } from "datapm-lib";
 import fs from "fs";
-import { Ora } from "ora";
 import path from "path";
 import { Package, PackageIdentifierInput, Permission } from "../generated/graphql";
+import { JobContext } from "../task/Task";
 import { publishPackageFile, writeLicenseFile, writePackageFile, writeReadmeFile } from "./PackageUtil";
 import { getRegistryClientWithConfig } from "./RegistryClient";
 
@@ -23,7 +23,7 @@ export interface PackageFileWithContext {
     hasPermissionToSave: boolean;
     packageFileUrl: string;
 
-    save(oraRef: Ora, packageFile: PackageFile): Promise<void>;
+    save(jobContext: JobContext, packageFile: PackageFile): Promise<void>;
 }
 export class RegistryPackageFileContext implements PackageFileWithContext {
     constructor(public packageFile: PackageFile, public packageObject: Package) {}
@@ -58,7 +58,7 @@ export class RegistryPackageFileContext implements PackageFileWithContext {
         return this.packageObject.identifier.catalogSlug;
     }
 
-    async save(oraRef: Ora, packageFile: PackageFile): Promise<void> {
+    async save(jobContext: JobContext, packageFile: PackageFile): Promise<void> {
         const publishMethod = packageFile.registries?.find(
             (r) =>
                 r.url.toLowerCase() === this.registryUrl.toLowerCase() &&
@@ -78,7 +78,7 @@ export class RegistryPackageFileContext implements PackageFileWithContext {
             }
         ];
 
-        await publishPackageFile(oraRef, packageFile, targetRegistries);
+        await publishPackageFile(jobContext, packageFile, targetRegistries);
     }
 }
 
@@ -103,36 +103,36 @@ export class LocalPackageFileContext implements PackageFileWithContext {
         return this.packageFilePath;
     }
 
-    async save(oraRef: Ora, packageFile: PackageFile): Promise<void> {
+    async save(jobContext: JobContext, packageFile: PackageFile): Promise<void> {
         // Write updates to the target package file in place
-        oraRef.start("Writing package file...");
+        let task = await jobContext.startTask("Writing package file...");
         let packageFileLocation;
 
         try {
-            packageFileLocation = writePackageFile(packageFile);
+            packageFileLocation = await writePackageFile(jobContext, undefined, packageFile);
 
-            oraRef.succeed(`Wrote package file ${packageFileLocation}`);
+            await task.end("SUCCESS", `Wrote package file ${packageFileLocation}`);
         } catch (error) {
-            oraRef.fail(`Unable to write the package file: ${error.message}`);
-            process.exit(1);
+            await task.end("ERROR", `Unable to write the package file: ${error.message}`);
+            throw error;
         }
 
-        oraRef.start("Writing README file...");
+        task = await jobContext.startTask("Writing README file...");
         try {
-            const readmeFileLocation = writeReadmeFile(packageFile);
-            oraRef.succeed(`Wrote README file ${readmeFileLocation}`);
+            const readmeFileLocation = writeReadmeFile(jobContext, undefined, packageFile);
+            await task.end("SUCCESS", `Wrote README file ${readmeFileLocation}`);
         } catch (error) {
-            oraRef.fail(`Unable to write the README file: ${error.message}`);
-            process.exit(1);
+            await task.end("ERROR", `Unable to write the README file: ${error.message}`);
+            throw error;
         }
 
-        oraRef.start("Writing LICENSE file...");
+        task = await jobContext.startTask("Writing LICENSE file...");
         try {
-            const licenseFileLocation = writeLicenseFile(packageFile);
-            oraRef.succeed(`Wrote LICENSE file ${licenseFileLocation}`);
+            const licenseFileLocation = writeLicenseFile(jobContext, undefined, packageFile);
+            await task.end("SUCCESS", `Wrote LICENSE file ${licenseFileLocation}`);
         } catch (error) {
-            oraRef.fail(`Unable to write the LICENSE file: ${error.message}`);
-            process.exit(1);
+            await task.end("ERROR", `Unable to write the LICENSE file: ${error.message}`);
+            throw error;
         }
     }
 }

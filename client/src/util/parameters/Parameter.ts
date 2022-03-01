@@ -12,14 +12,18 @@ export enum ParameterType {
 
 export interface ParameterOption {
     title: string;
-    value?: string | boolean | number;
+    value?: string | boolean | number | unknown;
     selected?: boolean;
 }
-export interface Parameter {
+
+export type ValueOrFunc<T extends string> = T;
+
+export interface Parameter<T extends string = string> {
     type: ParameterType;
-    name: string;
+    name: ValueOrFunc<T>;
     defaultValue?: string | boolean | number;
     message: string;
+    hint?: string;
     options?: ParameterOption[];
     numberMinimumValue?: number;
     numberMaximumValue?: number;
@@ -33,3 +37,6 @@ export interface Parameter {
      */
     configuration: DPMConfiguration;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ParameterAnswer<T extends string> = { [id in T]: any };

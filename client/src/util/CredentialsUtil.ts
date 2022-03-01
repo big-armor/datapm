@@ -1,4 +1,3 @@
-import { Ora } from "ora";
 import prompts from "prompts";
 import { DPMConfiguration, Source } from "datapm-lib";
 import { Repository } from "../repository/Repository";
@@ -10,8 +9,9 @@ import {
 } from "./ConfigUtil";
 import { repeatedlyPromptParameters } from "./parameters/ParameterUtils";
 import { getRepositoryDescriptionByType } from "../repository/RepositoryUtil";
+import { JobContext } from "../task/Task";
 
-export async function obtainCredentials(oraRef: Ora, source: Source): Promise<DPMConfiguration> {
+export async function obtainCredentials(jobContext: JobContext, source: Source): Promise<DPMConfiguration> {
     const repositoryDescription = getRepositoryDescriptionByType(source.type);
 
     if (repositoryDescription === undefined) {
@@ -30,7 +30,7 @@ export async function obtainCredentials(oraRef: Ora, source: Source): Promise<DP
     // console.log(`For the ${repositoryDescription.getDisplayName()} repository ${connectionIdentifier}`);
         */
     const credentialsPromptResponse = await promptForCredentials(
-        oraRef,
+        jobContext,
         repository,
         source.connectionConfiguration,
         {},
@@ -45,7 +45,7 @@ export async function obtainCredentials(oraRef: Ora, source: Source): Promise<DP
  * prompt the user for information necessary to successfully authenticate. Then save the credentials
  * to the local configuration object */
 export async function obtainCredentialsConfiguration(
-    oraRef: Ora,
+    jobContext: JobContext,
     repository: Repository,
     connectionConfiguration: DPMConfiguration,
     credentialsConfiguration: DPMConfiguration,
@@ -115,7 +115,8 @@ export async function obtainCredentialsConfiguration(
                     credentialsPromptResult.credentialsIdentifier
                 );
             } catch (error) {
-                oraRef.warn(
+                jobContext.print(
+                    "WARN",
                     `There was an error reading the credentials. It is likely the credentials were encrypted with a key other than the one found on the keychain. This means you will need to re-enter the credentials. Choose 'Add or Update Credentials' and re-enter them.`
                 );
             }
@@ -123,7 +124,7 @@ export async function obtainCredentialsConfiguration(
     }
 
     const credentialsPromptResponse = await promptForCredentials(
-        oraRef,
+        jobContext,
         repository,
         connectionConfiguration,
         credentialsConfiguration,
@@ -151,7 +152,7 @@ export async function obtainCredentialsConfiguration(
 }
 
 export async function promptForCredentials(
-    oraRef: Ora,
+    jobContext: JobContext,
     repository: Repository,
     connectionConfiguration: DPMConfiguration,
     credentialsConfiguration: DPMConfiguration,
@@ -162,10 +163,10 @@ export async function promptForCredentials(
     let parameterCount = 0;
     while (!credentialsSuccess) {
         parameterCount += await repeatedlyPromptParameters(
+            jobContext,
             async () => {
                 return repository.getCredentialsParameters(connectionConfiguration, credentialsConfiguration);
             },
-            credentialsConfiguration,
             defaults || false,
             overrideDefaultValues
         );
@@ -176,7 +177,7 @@ export async function promptForCredentials(
         );
 
         if (typeof credentialsTestResult === "string") {
-            oraRef.fail("Authentication failed: " + credentialsTestResult);
+            jobContext.print("FAIL", "Authentication failed: " + credentialsTestResult);
             credentialsConfiguration = {};
             continue;
         } else {

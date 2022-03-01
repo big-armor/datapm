@@ -2,8 +2,8 @@ import { StreamState, DPMConfiguration, Schema, StreamStats, UpdateMethod } from
 import { JSONSchema7TypeName } from "json-schema";
 import { Maybe } from "../util/Maybe";
 import { Readable, Transform } from "stream";
-import { LogType } from "../util/LoggingUtils";
 import { Parameter } from "../util/parameters/Parameter";
+import { JobContext } from "../task/Task";
 
 export enum SourceErrors {
     AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED",
@@ -79,8 +79,7 @@ export interface SourceInspectionContext {
     /** Request information from the user. */
     parameterPrompt: (parameters: Parameter[]) => Promise<void>;
 
-    /** Add to the output console log */
-    log(type: LogType, message: string): void;
+    jobContext: JobContext;
 
     /** Whether defaults flag is enabled. Sources should then not prompt, but use defaults when possible.  */
     defaults: boolean;
@@ -136,7 +135,6 @@ export interface StreamStatusContext {
     onStart(streamName: string): void;
     onProgress(progress: InspectProgress): void;
     onComplete(progress: InspectProgress): void;
-    onError(error: Error): void;
 }
 
 export interface SourceStreamsInspectionResult {

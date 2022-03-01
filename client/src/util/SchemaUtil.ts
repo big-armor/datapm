@@ -27,8 +27,8 @@ import { mergeValueFormats } from "../repository/SourceUtil";
 import { getRepositoryDescriptionByType } from "../repository/RepositoryUtil";
 import { getRepositoryCredential } from "./ConfigUtil";
 import { obtainCredentialsConfiguration } from "./CredentialsUtil";
-import { Ora } from "ora";
 import { BatchingTransform } from "../transforms/BatchingTransform";
+import { JobContext } from "../task/Task";
 
 export enum DeconflictOptions {
     CAST_TO_BOOLEAN = "CAST_TO_BOOLEAN",
@@ -56,7 +56,7 @@ export interface RecordStreamEventContext {
  * fetching data unnecessarily.
  */
 export async function inspectSourceConnection(
-    oraRef: Ora,
+    jobContext: JobContext,
     source: Source,
     defaults: boolean | undefined
 ): Promise<InspectionResults> {
@@ -88,12 +88,12 @@ export async function inspectSourceConnection(
                 source.credentialsIdentifier
             );
         } catch (error) {
-            oraRef.warn("The credential " + source.credentialsIdentifier + " could not be found or read.");
+            jobContext.print("WARN", "The credential " + source.credentialsIdentifier + " could not be found or read.");
         }
     }
 
     credentialsConfiguration = await obtainCredentialsConfiguration(
-        oraRef,
+        jobContext,
         repository,
         source.connectionConfiguration,
         credentialsConfiguration,
@@ -113,6 +113,7 @@ export async function inspectSourceConnection(
         {
             defaults: true,
             quiet: true,
+            jobContext,
             parameterPrompt: async (parameters) => {
                 for (const parameter of parameters) {
                     if (parameter.defaultValue == null) {
@@ -131,9 +132,6 @@ export async function inspectSourceConnection(
                 }
 
                 // TODO support this?
-            },
-            log: (type, message) => {
-                console.log(message);
             }
         }
     );

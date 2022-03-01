@@ -15,11 +15,15 @@ export class RepositoryDefaultArguments {}
 
 export class RepositoryAddArguments {
     repositoryType?: string;
+    default?: boolean | undefined;
+    quiet?: boolean | undefined;
 }
 
 export class RepositoryUpdateArguments {
     repositoryType?: string;
     repositoryIdentifier?: string;
+    default?: boolean | undefined;
+    quiet?: boolean | undefined;
 }
 
 export class RepositoryRemoveArguments {
@@ -30,6 +34,8 @@ export class RepositoryRemoveArguments {
 export class CredentialsAddArguments {
     repositoryType?: string;
     repositoryIdentifier?: string;
+    defaults?: boolean | undefined;
+    quiet?: boolean | undefined;
 }
 
 export class CredentialsRemoveArguments {

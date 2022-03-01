@@ -1,18 +1,8 @@
 import chalk from "chalk";
-import ora, { Ora } from "ora";
+import ora from "ora";
 import prompts from "prompts";
-import { DPMConfiguration } from "datapm-lib";
-import { Repository, RepositoryDescription } from "../repository/Repository";
 import { getRepositoryDescriptionByType, getRepositoryDescriptions } from "../repository/RepositoryUtil";
-import {
-    getRepositoryConfigs,
-    removeCredentialsConfig,
-    removeRepositoryConfig,
-    saveRepositoryConfig,
-    saveRepositoryCredential
-} from "../util/ConfigUtil";
-import { promptForConnectionConfiguration } from "../util/ConnectionUtil";
-import { obtainCredentialsConfiguration, promptForCredentials } from "../util/CredentialsUtil";
+import { getRepositoryConfigs, removeCredentialsConfig, removeRepositoryConfig } from "../util/ConfigUtil";
 import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
 import {
     Commands,
@@ -24,6 +14,10 @@ import {
     RepositoryUpdateArguments
 } from "./RepositoryCommand";
 import { printDataPMVersion } from "../util/DatapmVersionUtil";
+import { CLIJobContext } from "./CommandTaskUtil";
+import { AddRepositoryCredentialsJob } from "../task/AddRepositoryCredentialsJob";
+import { AddRepositoryJob } from "../task/AddRepositoryJob";
+import { UpdateRepositoryJob } from "../task/UpdateRepositoryJob";
 
 export async function defaultRepositoryCommandHandler(argv: RepositoryDefaultArguments): Promise<void> {
     printDataPMVersion(argv);
@@ -51,57 +45,6 @@ export async function defaultRepositoryCommandHandler(argv: RepositoryDefaultArg
     } else if (commandPromptResult.command === Commands.REMOVE_CREDENTIALS) {
         // await removeRegistryCommand(args as RegistryRemoveArguments);
     }
-}
-
-async function promptForRepositoryType(
-    oraRef: Ora,
-    repositoryType?: string
-): Promise<{ repository: Repository; repositoryDescription: RepositoryDescription }> {
-    if (!repositoryType) {
-        const repositoryTypeResult = await prompts(
-            {
-                type: "autocomplete",
-                name: "type",
-                message: "Type?",
-                choices: getRepositoryDescriptions()
-                    .sort((a, b) => a.getDisplayName().localeCompare(b.getDisplayName()))
-                    .map((s) => {
-                        return { value: s.getType(), title: s.getDisplayName() };
-                    })
-            },
-            defaultPromptOptions
-        );
-
-        repositoryType = repositoryTypeResult.type;
-    }
-
-    if (repositoryType == null) {
-        throw new Error("Repository type is required.");
-    }
-
-    const maybeRepositoryDescription = getRepositoryDescriptionByType(repositoryType);
-
-    if (maybeRepositoryDescription == null) {
-        throw new Error(`Unknown repository type: ${repositoryType}`);
-    }
-
-    const repositoryDescription = maybeRepositoryDescription;
-
-    const repository = await repositoryDescription.getRepository();
-
-    if (!repository.requiresConnectionConfiguration()) {
-        oraRef.warn(repositoryDescription.getDisplayName() + " does not require connection configuration");
-        process.exit(1);
-    }
-
-    if (!repository.userSelectableConnectionHistory()) {
-        oraRef.warn(
-            repositoryDescription.getDisplayName() + " does not support saving repository connection information"
-        );
-        process.exit(1);
-    }
-
-    return { repository, repositoryDescription };
 }
 
 export async function removeRepository(argv: RepositoryRemoveArguments): Promise<void> {
@@ -186,114 +129,23 @@ export async function updateRepository(argv: RepositoryUpdateArguments): Promise
         text: `Starting...`
     });
 
-    console.log(chalk.magenta("Update a Repository"));
+    const jobContext = new CLIJobContext(oraRef, argv);
 
-    const { repository, repositoryDescription } = await promptForRepositoryType(oraRef, argv.repositoryType);
+    const job = new UpdateRepositoryJob(jobContext, argv);
 
-    argv.repositoryType = repositoryDescription.getType();
+    const result = await job.execute();
 
-    if (argv.repositoryIdentifier == null) {
-        // select repository from configuration
-        const existingConnectionConfigurations = getRepositoryConfigs(repositoryDescription.getType());
-
-        if (existingConnectionConfigurations.length === 0) {
-            oraRef.fail(
-                "There are no saved " +
-                    repositoryDescription.getDisplayName() +
-                    " repositories. Use the 'datapm repository add' command."
-            );
-            process.exit(1);
-        }
-
-        const connectionConfigurationResult = await prompts(
-            [
-                {
-                    name: "connectionConfiguration",
-                    type: "autocomplete",
-                    message: "Repository to Update?",
-                    choices: existingConnectionConfigurations.map((c) => {
-                        return { value: c, title: c.identifier };
-                    })
-                }
-            ],
-            defaultPromptOptions
-        );
-
-        argv.repositoryIdentifier = connectionConfigurationResult.connectionConfiguration.identifier;
-    }
-
-    if (argv.repositoryIdentifier == null) {
-        throw new Error("Repository identifier not provided.");
-    }
-
-    const repositoryConfig = getRepositoryConfigs(repositoryDescription.getType()).find(
-        (c) => c.identifier === argv.repositoryIdentifier
+    console.log("\n");
+    console.log(chalk.grey("Updated " + argv.repositoryIdentifier + " to " + result.result?.newRepositoryIdentifier));
+    console.log(
+        chalk.green(
+            "datapm repository update " +
+                result.result?.repository.getType() +
+                " " +
+                result.result?.newRepositoryIdentifier
+        )
     );
-
-    if (repositoryConfig == null) {
-        throw new Error("Repository configuration " + argv.repositoryIdentifier + " not found.");
-    }
-
-    const existingConnectionConfiguration = repositoryConfig.connectionConfiguration;
-
-    const { connectionConfiguration: newConnectionConfiguration } = await promptForConnectionConfiguration(
-        oraRef,
-        repository,
-        {},
-        false,
-        existingConnectionConfiguration
-    );
-
-    const newRepositoryIdentifier = await repository.getConnectionIdentifierFromConfiguration(
-        newConnectionConfiguration
-    );
-
-    removeRepositoryConfig(argv.repositoryType, argv.repositoryIdentifier);
-
-    saveRepositoryConfig(repositoryDescription.getType(), {
-        identifier: newRepositoryIdentifier,
-        connectionConfiguration: newConnectionConfiguration,
-        credentials: repositoryConfig.credentials
-    });
-
-    // TODO: read and update all existing packages that use the old repository to the new one
-
-    oraRef.succeed("Updated " + argv.repositoryIdentifier + " to " + newRepositoryIdentifier);
-
-    if (repository.requiresCredentialsConfiguration()) {
-        console.log("\n");
-        console.log(chalk.magenta("Repository Credentials"));
-
-        const credentialsResult = await obtainCredentialsConfiguration(
-            oraRef,
-            repository,
-            newConnectionConfiguration,
-            {},
-            false,
-            {}
-        );
-
-        if (credentialsResult === false) {
-            defaultPromptOptions.onCancel();
-            return;
-        }
-
-        const credentialsConfiguration = credentialsResult.credentialsConfiguration;
-
-        await repository.getCredentialsIdentifierFromConfiguration(
-            newConnectionConfiguration,
-            credentialsConfiguration
-        );
-
-        console.log("\n");
-        console.log(chalk.grey("Updated " + argv.repositoryIdentifier + " to " + newRepositoryIdentifier));
-        console.log(chalk.green("datapm repository update " + repository.getType() + " " + newRepositoryIdentifier));
-        console.log("\n");
-    } else {
-        console.log("\n");
-        console.log(chalk.grey("Updated " + argv.repositoryIdentifier + " to " + newRepositoryIdentifier));
-        console.log("\n");
-    }
+    console.log("\n");
 }
 
 export async function addRepository(argv: RepositoryAddArguments): Promise<void> {
@@ -304,73 +156,24 @@ export async function addRepository(argv: RepositoryAddArguments): Promise<void>
         spinner: "dots",
         text: `Starting...`
     });
-    console.log(chalk.magenta("Adding a Repository"));
 
-    const { repository, repositoryDescription } = await promptForRepositoryType(oraRef, argv.repositoryType);
+    const jobContext = new CLIJobContext(oraRef, argv);
 
-    let connectionConfiguration: DPMConfiguration = {};
+    const job = new AddRepositoryJob(jobContext, argv);
 
-    console.log(chalk.magenta(repositoryDescription.getDisplayName() + " Connection Information"));
+    const result = await job.execute();
 
-    const connectionConfigurationResponse = await promptForConnectionConfiguration(
-        oraRef,
-        repository,
-        connectionConfiguration,
-        false
+    console.log("\n");
+    console.log(chalk.grey("You can update this repository with the following command."));
+    console.log(
+        chalk.green(
+            "datapm repository update " +
+                result.result?.repository.getType() +
+                " " +
+                result.result?.repositoryIdentifier
+        )
     );
-
-    connectionConfiguration = connectionConfigurationResponse.connectionConfiguration;
-
-    const repositoryIdentifier = await repository.getConnectionIdentifierFromConfiguration(connectionConfiguration);
-
-    oraRef.start("Saving connection configuration...");
-
-    const existingRepsitoryConfig = getRepositoryConfigs(repositoryDescription.getType()).find(
-        (c) => c.identifier === repositoryIdentifier
-    );
-
-    saveRepositoryConfig(repositoryDescription.getType(), {
-        identifier: repositoryIdentifier,
-        connectionConfiguration,
-        credentials: existingRepsitoryConfig ? existingRepsitoryConfig.credentials : []
-    });
-
-    oraRef.succeed(
-        "Saved " + repositoryDescription.getDisplayName() + " connection configuration for " + repositoryIdentifier
-    );
-
-    if (repository.requiresCredentialsConfiguration()) {
-        console.log("\n");
-        console.log(chalk.magenta(repositoryIdentifier + " Credentials"));
-
-        const credentialsResult = await obtainCredentialsConfiguration(
-            oraRef,
-            repository,
-            connectionConfiguration,
-            {},
-            false,
-            {}
-        );
-
-        if (credentialsResult === false) {
-            defaultPromptOptions.onCancel();
-            return;
-        }
-
-        const credentialsConfiguration = credentialsResult.credentialsConfiguration;
-
-        await repository.getCredentialsIdentifierFromConfiguration(connectionConfiguration, credentialsConfiguration);
-
-        console.log("\n");
-        console.log(chalk.grey("You can update this repository and credentials with the following command."));
-        console.log(chalk.green("datapm repository update " + repository.getType() + " " + repositoryIdentifier));
-        console.log("\n");
-    } else {
-        console.log("\n");
-        console.log(chalk.grey("You can update this repository with the following command."));
-        console.log(chalk.green("datapm repository update " + repository.getType() + " " + repositoryIdentifier));
-        console.log("\n");
-    }
+    console.log("\n");
 
     process.exit(0);
 }
@@ -384,121 +187,22 @@ export async function addCredentials(argv: CredentialsAddArguments): Promise<voi
         text: `Starting...`
     });
 
-    console.log(chalk.magenta("Adding Credentials"));
+    const jobContext = new CLIJobContext(oraRef, argv);
 
-    if (!argv.repositoryType) {
-        const repositoryTypeResult = await prompts(
-            {
-                type: "autocomplete",
-                name: "type",
-                message: "Repository Type?",
-                choices: getRepositoryDescriptions()
-                    .sort((a, b) => a.getDisplayName().localeCompare(b.getDisplayName()))
-                    .map((s) => {
-                        return { value: s.getType(), title: s.getDisplayName() };
-                    })
-            },
-            defaultPromptOptions
-        );
+    const job = new AddRepositoryCredentialsJob(jobContext, argv);
 
-        argv.repositoryType = repositoryTypeResult.type;
-    }
+    try {
+        const result = await job.execute();
 
-    if (argv.repositoryType === undefined) {
-        oraRef.fail("Repository type " + argv.repositoryType + " not provided.");
+        if (result.exitCode !== 0) {
+            process.exit(result.exitCode);
+        }
+
+        process.exit(0);
+    } catch (error) {
+        console.log(chalk.red(error.message));
         process.exit(1);
     }
-
-    const repositoryDescription = getRepositoryDescriptionByType(argv.repositoryType);
-
-    if (repositoryDescription === undefined) {
-        throw new Error("Repository type " + argv.repositoryType + " not found.");
-    }
-
-    const existingConfiguration = getRepositoryConfigs(argv.repositoryType);
-
-    if (existingConfiguration.length === 0) {
-        oraRef.info("There are no saved configurations or credentials for " + argv.repositoryType + " repositories");
-        process.exit(1);
-    }
-
-    if (argv.repositoryIdentifier == null) {
-        const choices: {
-            value: string;
-            title: string;
-        }[] = [
-            ...existingConfiguration.map((c) => {
-                return { value: c.identifier, title: c.identifier };
-            })
-        ];
-
-        const existingConfigurationPromptResult = await prompts({
-            name: "connectionConfiguration",
-            type: "autocomplete",
-            message: "Repository?",
-            choices
-        });
-
-        argv.repositoryIdentifier = existingConfigurationPromptResult.connectionConfiguration;
-    }
-
-    if (argv.repositoryIdentifier == null) {
-        throw new Error("Repository identifier not provided.");
-    }
-
-    const repositoryConfig = existingConfiguration.find((c) => c.identifier === argv.repositoryIdentifier);
-
-    if (repositoryConfig === undefined) {
-        throw new Error("Repository configuration for " + argv.repositoryIdentifier + " not found.");
-    }
-
-    const repository = await repositoryDescription.getRepository();
-
-    if (!repository.requiresCredentialsConfiguration()) {
-        console.log("Repository type " + repositoryDescription.getType() + " does not require credentials");
-        process.exit(1);
-    }
-
-    console.log("\n");
-    console.log(chalk.magenta("Repository Credentials"));
-
-    const credentialsResult = await promptForCredentials(
-        oraRef,
-        repository,
-        repositoryConfig.connectionConfiguration,
-        {},
-        false,
-        {}
-    );
-
-    const credentialsConfiguration = credentialsResult.credentialsConfiguration;
-
-    const credentialsIdentifier = await repository.getCredentialsIdentifierFromConfiguration(
-        credentialsResult.credentialsConfiguration,
-        credentialsConfiguration
-    );
-
-    const repositoryIdentifier = await repository.getConnectionIdentifierFromConfiguration(
-        repositoryConfig.connectionConfiguration
-    );
-
-    await saveRepositoryCredential(
-        repository.getType(),
-        repositoryIdentifier,
-        credentialsIdentifier,
-        credentialsConfiguration
-    );
-
-    oraRef.succeed(
-        "Saved " +
-            repository.getType() +
-            " " +
-            repositoryConfig.identifier +
-            " credentials for " +
-            credentialsIdentifier
-    );
-
-    process.exit(0);
 }
 
 export async function removeCredentials(argv: CredentialsRemoveArguments): Promise<void> {

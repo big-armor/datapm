@@ -1,12 +1,12 @@
-import { Ora } from "ora";
 import prompts from "prompts";
 import { DPMConfiguration } from "datapm-lib";
 import { Repository } from "../repository/Repository";
 import { getRepositoryConfigs, RepositoryConfig } from "./ConfigUtil";
 import { repeatedlyPromptParameters } from "./parameters/ParameterUtils";
+import { JobContext } from "../task/Task";
 
 export async function obtainConnectionConfiguration(
-    oraRef: Ora,
+    jobContext: JobContext,
     repository: Repository,
     connectionConfiguration: DPMConfiguration,
     defaults: boolean | undefined,
@@ -58,7 +58,7 @@ export async function obtainConnectionConfiguration(
     }
 
     return promptForConnectionConfiguration(
-        oraRef,
+        jobContext,
         repository,
         connectionConfiguration,
         defaults,
@@ -67,7 +67,7 @@ export async function obtainConnectionConfiguration(
 }
 
 export async function promptForConnectionConfiguration(
-    oraRef: Ora,
+    jobContext: JobContext,
     repository: Repository,
     connectionConfiguration: DPMConfiguration,
     defaults: boolean | undefined,
@@ -78,12 +78,12 @@ export async function promptForConnectionConfiguration(
     let parameterCount = 0;
     while (!connectionSuccess) {
         parameterCount += await repeatedlyPromptParameters(
+            jobContext,
             async () => {
                 const parameters = await repository.getConnectionParameters(connectionConfiguration);
 
                 return parameters;
             },
-            connectionConfiguration,
             defaults || false,
             overrideDefaultValues
         );
@@ -91,7 +91,7 @@ export async function promptForConnectionConfiguration(
         const connectionTestResults = await repository.testConnection(connectionConfiguration);
 
         if (typeof connectionTestResults === "string") {
-            oraRef.warn("Connection failed: " + connectionTestResults);
+            jobContext.print("ERROR", "Connection failed: " + connectionTestResults);
             connectionConfiguration = {};
         } else {
             connectionSuccess = true;

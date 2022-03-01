@@ -1,7 +1,6 @@
 import { S3 } from "aws-sdk";
 import { SinkState, SinkStateKey, DPMConfiguration, PackageFile, UpdateMethod } from "datapm-lib";
 import fs from "fs";
-import os from "os";
 import path from "path";
 import { Readable, Transform, Writable } from "stream";
 import { Maybe } from "../../../util/Maybe";
@@ -21,6 +20,7 @@ import { getRecordSerializer } from "../writer/RecordSerializerUtil";
 import { DPMRecordSerializer } from "../writer/RecordSerializer";
 import { RecordSerializerCSVDescription } from "../writer/RecordSerializerCSVDescription";
 import { TYPE, DISPLAY_NAME } from "./S3RepositoryDescription";
+import { getLocalDataPath } from "../../../util/LocalDataUtil";
 
 export class S3Sink extends AbstractFileSink {
     s3Client: S3;
@@ -42,15 +42,9 @@ export class S3Sink extends AbstractFileSink {
             (configuration.format as string) || new RecordSerializerCSVDescription().getOutputMimeType()
         )) as DPMRecordSerializer;
 
-        const location = path.join(
-            os.homedir(),
-            "datapm",
-            "data",
-            catalogSlug !== undefined ? catalogSlug : "_no-catalog",
-            packageFile.packageSlug,
-            packageFile.version,
-            serializerTransform.getFileExtension()
-        );
+        const localDataPath = getLocalDataPath(catalogSlug, packageFile.packageSlug);
+
+        const location = path.join(localDataPath, packageFile.version, serializerTransform.getFileExtension());
 
         return {
             ...(await super.getDefaultParameterValues(catalogSlug, packageFile, configuration)),

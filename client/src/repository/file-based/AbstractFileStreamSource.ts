@@ -7,7 +7,6 @@ import { Parameter, ParameterType } from "../../util/parameters/Parameter";
 import { StreamSetPreview, SourceInspectionContext, InspectionResults, Source } from "../Source";
 import { Maybe } from "../../util/Maybe";
 import { getParser, getParserByMimeType, getParsers } from "./parser/ParserUtil";
-import { LogType } from "../../util/LoggingUtils";
 import { nameFromFileUris } from "../../util/NameUtil";
 import { FileBufferSummary, FileStreamContext, Parser } from "./parser/Parser";
 import { asyncMap } from "../../util/AsyncUtils";
@@ -97,14 +96,14 @@ export abstract class AbstractFileStreamSource implements Source {
 
         if (!context.quiet) {
             if (fileBufferSummary.fileName) {
-                context.log(LogType.INFO, `File Name: ${fileBufferSummary.fileName}`);
+                context.jobContext.log("INFO", `File Name: ${fileBufferSummary.fileName}`);
             }
             if (fileBufferSummary.fileSize) {
                 const fileSizeString = numeral(fileBufferSummary.fileSize).format("0.0b");
-                context.log(LogType.INFO, `File Size: ${fileSizeString}`); // TODO - This is probably not right
+                context.jobContext.log("INFO", `File Size: ${fileSizeString}`); // TODO - This is probably not right
             }
             if (fileBufferSummary.detectedMimeType) {
-                context.log(LogType.INFO, `File Type: ${fileBufferSummary.detectedMimeType}`);
+                context.jobContext.log("INFO", `File Type: ${fileBufferSummary.detectedMimeType}`);
             }
         }
 

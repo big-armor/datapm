@@ -17,7 +17,6 @@ import {
 } from "../../Source";
 import BomStrippingStream from "bomstrip";
 import { ColumnOption } from "csv-parse";
-import { LogType } from "../../../util/LoggingUtils";
 import { getSpreadsheetID } from "./GoogleSheetSourceDescription";
 import { TYPE } from "./GoogleSheetRepositoryDescription";
 
@@ -96,7 +95,7 @@ export class GoogleSheetSource implements Source {
                             return new Promise((resolve, reject) => {
                                 const request = https.get(sheetUri, async (response) => {
                                     if (!context.quiet) {
-                                        context.log(LogType.INFO, `Sheet Name: ${sheetTitle}`);
+                                        context.jobContext.log("INFO", `Sheet Name: ${sheetTitle}`);
                                     }
 
                                     const stream = await this.inspectSheet(response, sheetConfiguration, context);

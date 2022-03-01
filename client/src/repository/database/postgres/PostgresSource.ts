@@ -111,7 +111,7 @@ export class PostgresSource implements Source {
 
         const tableStreams: StreamSetPreview[] = [];
 
-        for (const table of (configuration.tables as string).split(",")) {
+        for (const table of configuration.tables as string[]) {
             const tableStream = await this.getTableStream(
                 table,
                 connectionConfiguration,

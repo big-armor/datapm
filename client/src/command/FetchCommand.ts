@@ -1,15 +1,6 @@
 import { Command } from "./Command";
 import { Argv } from "yargs";
-export class FetchArguments {
-    reference?: string;
-    sink?: string;
-    defaults?: boolean;
-    sinkConfig?: string;
-    sinkConnectionConfig?: string;
-    sinkCredentialsConfig?: string;
-    quiet?: boolean;
-    forceUpdate?: boolean;
-}
+import { FetchArguments } from "../task/FetchPackageJob";
 
 export class FetchCommand implements Command {
     prepareCommand(argv: Argv): Argv {

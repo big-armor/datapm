@@ -1,10 +1,7 @@
 import { Argv } from "yargs";
+import { PublishJobArguments } from "../task/PublishJob";
 import { Command } from "./Command";
 
-export class PublishArguments {
-    defaults?: boolean;
-    reference?: string;
-}
 export class PublishPackageCommand implements Command {
     prepareCommand(argv: Argv): Argv {
         return argv.command({
@@ -20,7 +17,7 @@ export class PublishPackageCommand implements Command {
     }
 }
 
-export async function publishPackage(args: PublishArguments): Promise<void> {
+export async function publishPackage(args: PublishJobArguments): Promise<void> {
     try {
         const publishCommand = await import("./PublishPackageCommandModule");
 

@@ -1,6 +1,5 @@
 import { UpdateMethod, SinkState, SinkStateKey, DPMConfiguration, PackageFile } from "datapm-lib";
 import fs from "fs";
-import os from "os";
 import path from "path";
 import { getRecordSerializer } from "../writer/RecordSerializerUtil";
 import { Parameter, ParameterType } from "../../../util/parameters/Parameter";
@@ -12,6 +11,7 @@ import { StreamSetProcessingMethod } from "../../../util/StreamToSinkUtil";
 import { DPMRecordSerializer } from "../writer/RecordSerializer";
 import { RecordSerializerCSVDescription } from "../writer/RecordSerializerCSVDescription";
 import { DISPLAY_NAME, TYPE } from "./LocalFileRepositoryDescription";
+import { getLocalDataPath } from "../../../util/LocalDataUtil";
 
 export class LocalFileSink extends AbstractFileSink {
     getType(): string {
@@ -31,15 +31,9 @@ export class LocalFileSink extends AbstractFileSink {
             (configuration.format as string) || new RecordSerializerCSVDescription().getOutputMimeType()
         )) as DPMRecordSerializer;
 
-        const location = path.join(
-            os.homedir(),
-            "datapm",
-            "data",
-            catalogSlug !== undefined ? catalogSlug : "_no-catalog",
-            packageFile.packageSlug,
-            packageFile.version,
-            serializerTransform.getFileExtension()
-        );
+        const localDataPath = getLocalDataPath(catalogSlug, packageFile.packageSlug);
+
+        const location = path.join(localDataPath, packageFile.version, serializerTransform.getFileExtension());
 
         return {
             ...(await super.getDefaultParameterValues(catalogSlug, packageFile, configuration)),
