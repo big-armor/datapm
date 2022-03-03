@@ -9,7 +9,11 @@
     "postbuild": "gulp postbuild",
     "pretest": "npm run codegen",
     "codegen": "graphql-codegen --config codegen.yml",
-    "test": "CREDENTIALS_SECRET_KEY=test mocha --slow 3000 --timeout 60000 -r ts-node/register test/**/*.ts"
+    "test": "CREDENTIALS_SECRET_KEY=test mocha --slow 3000 --timeout 60000 -r ts-node/register test/**/*.ts",
+    "lint": "npm run eslint",
+    "lint:fix": "npm run eslint:fix",
+    "eslint": "npx eslint \"src/**/*.ts\" \"test/**/*.ts\"",
+    "eslint:fix": "npx eslint --fix \"src/**/*.ts\" \"test/**/*.ts\""
   },
   "files": [
     "src/**/*"

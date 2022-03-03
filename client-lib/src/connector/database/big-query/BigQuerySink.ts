@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import {
     SinkState,
     SinkStateKey,

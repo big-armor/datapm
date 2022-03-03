@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import { DPMConfiguration, PackageFile, Schema, Parameter, ParameterType } from "datapm-lib";
 import Knex, { Ref, Transaction } from "knex";
 import { SemVer } from "semver";

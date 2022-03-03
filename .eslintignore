@@ -5,6 +5,7 @@ docs
 
 # Has its own linting
 client
+client-lib
 
 # Never Lint
 node_modules

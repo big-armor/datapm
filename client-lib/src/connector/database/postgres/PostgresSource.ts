@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import { DPMConfiguration, UpdateMethod, RecordContext, Parameter, ParameterType } from "datapm-lib";
 import Knex from "knex";
 import {

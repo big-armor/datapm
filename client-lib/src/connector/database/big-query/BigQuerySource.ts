@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import { DPMConfiguration, RecordContext, UpdateMethod, Parameter, ParameterType } from "datapm-lib";
 import fs from "fs";
 import { BigQuery, BigQueryDatetime, BigQueryTimestamp } from "@google-cloud/bigquery";
