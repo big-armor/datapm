@@ -2,12 +2,19 @@ import chalk from "chalk";
 import ora from "ora";
 import fs from "fs";
 import path from "path";
-import { JobContext, Task } from "../task/Task";
-import { getRepositoryConfigs, RepositoryConfig } from "../util/ConfigUtil";
-import { Parameter, ParameterAnswer } from "../util/parameters/Parameter";
-import { cliHandleParameters } from "../util/parameters/ParameterUtils";
+import { JobContext, Task, RepositoryConfig, RegistryConfig } from "datapm-client-lib";
 import { Writable } from "stream";
 import { SemVer } from "semver";
+import { DPMConfiguration, Parameter, ParameterAnswer } from "datapm-lib";
+import { cliHandleParameters } from "../util/CLIParameterUtils";
+import {
+    getRegistryConfigs,
+    getRepositoryConfigs,
+    getRepositoryCredential,
+    removeRepositoryConfig,
+    saveRepositoryConfig,
+    saveRepositoryCredential
+} from "../util/ConfigUtil";
 
 export class CLIJobContext implements JobContext {
     constructor(private oraRef: ora.Ora, private argv: { defaults?: boolean; quiet?: boolean }) {}
@@ -133,5 +140,38 @@ export class CLIJobContext implements JobContext {
     setCurrentStep(step: string): void {
         console.log("");
         console.log(chalk.magenta(step));
+    }
+
+    async saveRepositoryCredential(
+        connectorType: string,
+        repositoryIdentifier: string,
+        credentialsIdentifier: string,
+        credentials: DPMConfiguration
+    ): Promise<void> {
+        await saveRepositoryCredential(connectorType, repositoryIdentifier, credentialsIdentifier, credentials);
+    }
+
+    saveRepositoryConfig(type: string, repositoryConfig: RepositoryConfig): void {
+        saveRepositoryConfig(type, repositoryConfig);
+    }
+
+    removeRepositoryConfig(type: string, repositoryIdentifer: string): void {
+        removeRepositoryConfig(type, repositoryIdentifer);
+    }
+
+    async getRepositoryCredential(
+        connectorType: string,
+        repositoryIdentifier: string,
+        credentialsIdentifier: string
+    ): Promise<DPMConfiguration> {
+        return getRepositoryCredential(connectorType, repositoryIdentifier, credentialsIdentifier);
+    }
+
+    getRegistryConfigs(): RegistryConfig[] {
+        return getRegistryConfigs();
+    }
+
+    getRegistryConfig(url: string): RegistryConfig | undefined {
+        return getRegistryConfigs().find((registryConfig) => registryConfig.url === url);
     }
 }

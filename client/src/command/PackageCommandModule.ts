@@ -1,12 +1,12 @@
 import chalk from "chalk";
 import ora from "ora";
 import { printDataPMVersion } from "../util/DatapmVersionUtil";
-import { PackageJob } from "../task/PackageJob";
+import { PackageJob } from "datapm-client-lib";
 import { CLIJobContext } from "./CommandTaskUtil";
 import { PackageCommandArguments } from "./PackageCommand";
 import { exit } from "process";
-import { ParameterType } from "../util/parameters/Parameter";
 import { PublishPackageCommandModule } from "./PublishPackageCommandModule";
+import { ParameterType } from "datapm-lib";
 
 export async function generatePackage(args: PackageCommandArguments): Promise<void> {
     printDataPMVersion(args);

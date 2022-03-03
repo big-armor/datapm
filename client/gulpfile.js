@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const fs = require("fs");
-const path = require("path");
 const {
     cleanWin64,
     runPkgWin64,
@@ -89,12 +87,3 @@ exports.clean = series(
     cleanWindowsArm64,
     cleanMacOSInstaller
 );
-
-exports.postCodegen = function () {
-    fs.copyFileSync(
-        path.join("src", "generated", "graphql.ts"),
-        path.join("test", "integration", "registry-client.ts")
-    );
-
-    return Promise.resolve();
-};

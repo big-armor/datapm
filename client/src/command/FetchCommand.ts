@@ -1,6 +1,6 @@
 import { Command } from "./Command";
 import { Argv } from "yargs";
-import { FetchArguments } from "../task/FetchPackageJob";
+import { FetchArguments } from "datapm-client-lib";
 
 export class FetchCommand implements Command {
     prepareCommand(argv: Argv): Argv {

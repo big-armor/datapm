@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { addRegistry, getRegistryConfigs, resetConfiguration } from "../../src/util/ConfigUtil";
-import { RegistryClient } from "../../src/util/RegistryClient";
+import { RegistryClient } from "datapm-client-lib";
 import { registryServerPort } from "./setup";
 import { createApiKey, createTestUser, testCmd, TestResults } from "./test-utils";
 

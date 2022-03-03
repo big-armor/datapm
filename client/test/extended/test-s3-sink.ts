@@ -1,6 +1,6 @@
 import { S3 } from "aws-sdk";
 import { expect } from "chai";
-import { getAllRegions } from "../../src/util/AwsUtil";
+import { getAllRegions } from "datapm-client-lib";
 import {
     createTestPackage,
     getPromptInputs,

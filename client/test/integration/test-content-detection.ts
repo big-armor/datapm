@@ -1,23 +1,26 @@
 import { expect } from "chai";
 import { loadPackageFileFromDisk, PackageFile } from "datapm-lib";
-import { AGE_LABEL } from "../../src/content-detector/AgePropertyNameDetector";
-import { CREDIT_CARD_NUMBER } from "../../src/content-detector/CreditCardNumberDetector";
-import { DOB_LABEL } from "../../src/content-detector/DateOfBirthPropertyNameDetector";
-import { DRIVERS_LICENSE_LABEL } from "../../src/content-detector/DriversLicensePropertyNameDetector";
-import { EMAIL_ADDRESS_LABEL } from "../../src/content-detector/EmailContentDetector";
-import { ETHNICITY_LABEL } from "../../src/content-detector/EthnicityPropertyNameDetector";
-import { GENDER_LABEL } from "../../src/content-detector/GenderPropertyNameDetector";
-import { GEO_LATITUDE_LABEL } from "../../src/content-detector/GeoLatitudePropertyNameDetector";
-import { GEO_LONGITUDE_LABEL } from "../../src/content-detector/GeoLongitudePropertyNameDetector";
-import { IP_V4_ADDRESS_LABEL } from "../../src/content-detector/Ipv4AddressDetector";
-import { IP_V6_ADDRESS_LABEL } from "../../src/content-detector/Ipv6AddressDetector";
-import { NPI_LABEL } from "../../src/content-detector/NPIPropertyNameDetector";
-import { PASSPORT_LABEL } from "../../src/content-detector/PassportPropertyNameDetector";
-import { SECRET_LABEL } from "../../src/content-detector/PasswordPropertyNameDetector";
-import { PEOPLE_NAMES_LABEL } from "../../src/content-detector/PersonNameDetector";
-import { PHONE_NUMBER_LABEL } from "../../src/content-detector/RegexDetector";
-import { SOCIAL_SECURITY_NUMBER_LABEL } from "../../src/content-detector/SocialSecurityNumberDetector";
-import { USERNAME_LABEL } from "../../src/content-detector/UsernamePropertyNameDetector";
+import {
+    AGE_LABEL,
+    CREDIT_CARD_NUMBER,
+    DOB_LABEL,
+    DRIVERS_LICENSE_LABEL,
+    EMAIL_ADDRESS_LABEL,
+    ETHNICITY_LABEL,
+    GENDER_LABEL,
+    GEO_LATITUDE_LABEL,
+    GEO_LONGITUDE_LABEL,
+    IP_V4_ADDRESS_LABEL,
+    IP_V6_ADDRESS_LABEL,
+    NPI_LABEL,
+    PASSPORT_LABEL,
+    SECRET_LABEL,
+    PEOPLE_NAMES_LABEL,
+    PHONE_NUMBER_LABEL,
+    SOCIAL_SECURITY_NUMBER_LABEL,
+    USERNAME_LABEL
+} from "datapm-client-lib";
+
 import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
 import {

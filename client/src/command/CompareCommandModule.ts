@@ -1,8 +1,7 @@
 import { comparePackages } from "datapm-lib";
 import chalk from "chalk";
 import ora from "ora";
-import { getPackage } from "../util/PackageAccessUtil";
-import { differenceToString } from "../util/PackageUtil";
+import { getPackage, differenceToString } from "datapm-client-lib";
 import { CompareArguments } from "./CompareCommand";
 import { printDataPMVersion } from "../util/DatapmVersionUtil";
 

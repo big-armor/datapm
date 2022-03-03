@@ -21,7 +21,7 @@
 		"alwaysStrict": true,
 		"sourceMap": true,
 		"esModuleInterop": true,
-		"typeRoots": ["src/types", "node_modules/@types"]
+		"typeRoots": ["src/types", "node_modules/datapm-client-lib/src/types", "node_modules/@types"]
 	},
 	"exclude": ["node_modules"],
 	"include": ["src/**/*", "test/**/*", "ormconfig.js", "src/modules/dateDetector.d.ts"]

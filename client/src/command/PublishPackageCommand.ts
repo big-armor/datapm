@@ -1,5 +1,5 @@
 import { Argv } from "yargs";
-import { PublishJobArguments } from "../task/PublishJob";
+import { PublishJobArguments } from "datapm-client-lib";
 import { Command } from "./Command";
 
 export class PublishPackageCommand implements Command {

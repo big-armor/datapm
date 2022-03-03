@@ -1,0 +1,28 @@
+{
+	"compilerOptions": {
+		"lib": ["es2020", "dom"],
+		"target": "es2020",
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"outDir": "./dist",
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"downlevelIteration": true,
+		"noImplicitAny": true,
+		"noImplicitReturns": true,
+		"noImplicitThis": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUnusedLocals": false,
+		"noUnusedParameters": false,
+		"strictNullChecks": true,
+		"strictFunctionTypes": true,
+		"removeComments": true,
+		"preserveConstEnums": true,
+		"alwaysStrict": true,
+		"sourceMap": true,
+		"esModuleInterop": true,
+		"typeRoots": ["src/types", "node_modules/@types"]
+	},
+	"exclude": ["node_modules"],
+	"include": ["src/**/*", "test/**/*", "ormconfig.js", "src/modules/dateDetector.d.ts"]
+}

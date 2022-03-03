@@ -1,6 +1,6 @@
 import { expect } from "chai";
-import { TYPE as POSTGRES_TYPE } from "../../src/repository/database/postgres/PostgresRepositoryDescription";
-import { getRepositoryConfigs, RepositoryCredentialsConfig, resetConfiguration } from "../../src/util/ConfigUtil";
+import { POSTGRES_TYPE, RepositoryCredentialsConfig } from "datapm-client-lib";
+import { getRepositoryConfigs, resetConfiguration } from "../../src/util/ConfigUtil";
 import { KEYS, testCmd } from "./test-utils";
 
 describe("Repository Command Tests", async function () {

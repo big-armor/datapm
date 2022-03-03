@@ -1,23 +1,28 @@
 import chalk from "chalk";
 import ora from "ora";
 import prompts from "prompts";
-import { getRepositoryDescriptionByType, getRepositoryDescriptions } from "../repository/RepositoryUtil";
+import {
+    getConnectorDescriptionByType,
+    getConnectorDescriptions,
+    CredentialsAddArguments,
+    RepositoryAddArguments,
+    RepositoryUpdateArguments,
+    AddRepositoryJob,
+    UpdateRepositoryJob,
+    AddRepositoryCredentialsJob
+} from "datapm-client-lib";
 import { getRepositoryConfigs, removeCredentialsConfig, removeRepositoryConfig } from "../util/ConfigUtil";
-import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
 import {
     Commands,
-    CredentialsAddArguments,
     CredentialsRemoveArguments,
-    RepositoryAddArguments,
     RepositoryDefaultArguments,
-    RepositoryRemoveArguments,
-    RepositoryUpdateArguments
+    RepositoryRemoveArguments
 } from "./RepositoryCommand";
+
 import { printDataPMVersion } from "../util/DatapmVersionUtil";
 import { CLIJobContext } from "./CommandTaskUtil";
-import { AddRepositoryCredentialsJob } from "../task/AddRepositoryCredentialsJob";
-import { AddRepositoryJob } from "../task/AddRepositoryJob";
-import { UpdateRepositoryJob } from "../task/UpdateRepositoryJob";
+
+import { defaultPromptOptions } from "../util/DefaultParameterOptions";
 
 export async function defaultRepositoryCommandHandler(argv: RepositoryDefaultArguments): Promise<void> {
     printDataPMVersion(argv);
@@ -64,7 +69,7 @@ export async function removeRepository(argv: RepositoryRemoveArguments): Promise
                 type: "autocomplete",
                 name: "type",
                 message: "Type?",
-                choices: getRepositoryDescriptions()
+                choices: getConnectorDescriptions()
                     .sort((a, b) => a.getDisplayName().localeCompare(b.getDisplayName()))
                     .map((s) => {
                         return { value: s.getType(), title: s.getDisplayName() };
@@ -140,7 +145,7 @@ export async function updateRepository(argv: RepositoryUpdateArguments): Promise
     console.log(
         chalk.green(
             "datapm repository update " +
-                result.result?.repository.getType() +
+                result.result?.connector.getType() +
                 " " +
                 result.result?.newRepositoryIdentifier
         )
@@ -167,10 +172,7 @@ export async function addRepository(argv: RepositoryAddArguments): Promise<void>
     console.log(chalk.grey("You can update this repository with the following command."));
     console.log(
         chalk.green(
-            "datapm repository update " +
-                result.result?.repository.getType() +
-                " " +
-                result.result?.repositoryIdentifier
+            "datapm repository update " + result.result?.connector.getType() + " " + result.result?.repositoryIdentifier
         )
     );
     console.log("\n");
@@ -222,7 +224,7 @@ export async function removeCredentials(argv: CredentialsRemoveArguments): Promi
                 type: "autocomplete",
                 name: "type",
                 message: "Repository Type?",
-                choices: getRepositoryDescriptions()
+                choices: getConnectorDescriptions()
                     .sort((a, b) => a.getDisplayName().localeCompare(b.getDisplayName()))
                     .map((s) => {
                         return { value: s.getType(), title: s.getDisplayName() };
@@ -239,9 +241,9 @@ export async function removeCredentials(argv: CredentialsRemoveArguments): Promi
         process.exit(1);
     }
 
-    const repositoryDescription = getRepositoryDescriptionByType(argv.repositoryType);
+    const connectorDescription = getConnectorDescriptionByType(argv.repositoryType);
 
-    if (repositoryDescription === undefined) {
+    if (connectorDescription === undefined) {
         throw new Error("Repository type " + argv.repositoryType + " not found.");
     }
 

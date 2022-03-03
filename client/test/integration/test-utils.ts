@@ -14,7 +14,7 @@ import {
     LoginDocument,
     Scope,
     VerifyEmailAddressDocument
-} from "./registry-client";
+} from "datapm-client-lib";
 import { dataServerPort, mailDevWebPortNumber, registryServerPort } from "./setup";
 import { createAPIKeyFromParts } from "datapm-lib";
 

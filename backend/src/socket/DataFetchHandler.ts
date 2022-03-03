@@ -5,7 +5,7 @@ import { ActivityLogEventType, Permission } from "../generated/graphql";
 import { EventEmitter, Transform } from "stream";
 import {BatchRepositoryIdentifier, DataAcknowledge, DataSend, DataStop, DataStopAcknowledge, ErrorResponse, FetchRequest, FetchRequestType, FetchResponse, OpenFetchChannelRequest, OpenFetchChannelResponse, RecordContext, Request, Response, SocketError, SocketEvent, StartFetchRequest, DPMRecord, DataRecordContext, SocketResponseType } from "datapm-lib";
 import { PackageRepository } from "../repository/PackageRepository";
-import { DataStorageService, IterableDataFiles } from "../storage/data/data-storage";
+import { DataStorageService } from "../storage/data/data-storage";
 import { DataBatchRepository } from "../repository/DataBatchRepository";
 import { BatchingTransform } from "../transforms/BatchingTransform";
 import { createActivityLog } from "../repository/ActivityLogRepository";

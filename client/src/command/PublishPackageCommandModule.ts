@@ -1,10 +1,7 @@
 import chalk from "chalk";
-import { DPMConfiguration } from "datapm-lib";
 import ora from "ora";
-import { PackageIdentifier } from "../generated/graphql";
-import { identifierToString } from "../util/IdentifierUtil";
+import { PackageIdentifier, PublishJob, PublishJobArguments, identifierToString } from "datapm-client-lib";
 import { printDataPMVersion } from "../util/DatapmVersionUtil";
-import { PublishJob, PublishJobArguments } from "../task/PublishJob";
 import { CLIJobContext } from "./CommandTaskUtil";
 import { exit } from "process";
 
@@ -13,8 +10,6 @@ export enum PublishDataSteps {
     UPLOADING_DATA = "uploading_data",
     FINISHED_UPLOAD = "finished_upload"
 }
-
-export type CredentialsBySourceSlug = Map<string, DPMConfiguration>;
 
 export class PublishPackageCommandModule {
     async handleCommand(argv: PublishJobArguments): Promise<void> {

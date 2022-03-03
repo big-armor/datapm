@@ -1,10 +1,9 @@
 import chalk from "chalk";
 import { DPMConfiguration } from "datapm-lib";
-import { TYPE as STANDARD_OUT_SINK_TYPE } from "../repository/file-based/standard-out/StandardOutRepositoryDescription";
+import { STANDARD_OUT_SINK_TYPE, FetchArguments, FetchPackageJob } from "datapm-client-lib";
 import { printDataPMVersion } from "../util/DatapmVersionUtil";
 import ora from "ora";
 import { OraQuiet } from "../util/OraQuiet";
-import { FetchArguments, FetchPackageJob } from "../task/FetchPackageJob";
 import { CLIJobContext } from "./CommandTaskUtil";
 import { exit } from "process";
 

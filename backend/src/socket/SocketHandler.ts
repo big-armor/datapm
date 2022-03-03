@@ -1,9 +1,9 @@
-import {Response, ErrorResponse, SocketError, SocketEvent, StartUploadRequest, PackageStreamsRequest, SetStreamActiveBatchesRequest, OpenFetchChannelRequest, SchemaIdentifier, PackageSinkStateRequest as PackageSinkStateRequest } from 'datapm-lib';
+import {Response, ErrorResponse, SocketError, SocketEvent, StartUploadRequest, PackageStreamsRequest, SetStreamActiveBatchesRequest, OpenFetchChannelRequest, SchemaIdentifier, PackageSinkStateRequest as PackageSinkStateRequest, StartPackageUpdateRequest } from 'datapm-lib';
 import EventEmitter from 'events';
 import SocketIO from 'socket.io';
 import { AuthenticatedSocketContext, SocketContext } from '../context';
 import { PackageEntity } from '../entity/PackageEntity';
-import { Permission } from '../generated/graphql';
+import { PackageIdentifierInput, Permission } from '../generated/graphql';
 import { PackageRepository } from '../repository/PackageRepository';
 import { hasPackageEntityPermissions } from '../resolvers/UserPackagePermissionResolver';
 import { DistributedLockingService } from '../service/distributed-locking-service';
@@ -13,6 +13,7 @@ import { DataUploadHandler } from './DataUploadHandler';
 import { SetActiveBatchesHandler } from './SetActiveBatchesHandler';
 import { SchemaInfoHandler } from './PackageStreamsHandler';
 import { PackageSinkStateHandler } from './PackageSinkStateHandler';
+import { PackageUpdateHandler } from './PackageUpdateHandler';
 
 export interface RequestHandler extends EventEmitter {
     start(callback:(response:Response) => void):Promise<void>;
@@ -42,6 +43,7 @@ export class SocketConnectionHandler {
         socket.on(SocketEvent.PACKAGE_VERSION_SINK_STATE_REQUEST.toString(), this.onGetPackageSinkState);
         socket.on(SocketEvent.SCHEMA_INFO_REQUEST.toString(), this.onGetSchemaInfo);
         socket.on(SocketEvent.SET_STREAM_ACTIVE_BATCHES.toString(), this.onSetStreamActiveBatches);
+        socket.on(SocketEvent.START_PACKAGE_UPDATE.toString(), this.onStartPackageUpdate);
 
         socket.on('disconnect', this.onDisconnect);
         socket.on('error', () => console.log("Error"));
@@ -54,6 +56,25 @@ export class SocketConnectionHandler {
         this.socket.on(SocketEvent.START_DATA_UPLOAD.toString(), this.onUploadData);
         this.socket.on(SocketEvent.SCHEMA_INFO_REQUEST.toString(), this.onGetSchemaInfo);
     };
+
+    onStartPackageUpdate = async (request:StartPackageUpdateRequest, callback:(response:Response)=>void):Promise<void> => {
+        if(!isAuthenticatedContext(this.socketContext)) {
+            callback(new ErrorResponse("Not authenticated", SocketError.NOT_AUTHORIZED));
+            return;
+        }
+        
+        try {
+            const handler = new PackageUpdateHandler(request, this.socket, this.socketContext as AuthenticatedSocketContext, this.distributedLockingService);
+            this.addRequestHandler(handler);
+            await handler.start(callback);
+        } catch (error) {
+            console.error(error);
+            callback(new ErrorResponse("An unknown error occured", SocketError.SERVER_ERROR));
+            return;
+        }
+
+
+    }
 
     openFetchChannelHandler = async (data:OpenFetchChannelRequest, callback:(response:Response)=>void):Promise<void> => {
 
@@ -140,11 +161,11 @@ export class SocketConnectionHandler {
         }
 
         try {
-            const uploadRequestHandler = new SetActiveBatchesHandler(request,this.socket,this.socketContext as AuthenticatedSocketContext);
+            const handler = new SetActiveBatchesHandler(request,this.socket,this.socketContext as AuthenticatedSocketContext);
 
-            this.addRequestHandler(uploadRequestHandler);
+            this.addRequestHandler(handler);
         
-            await uploadRequestHandler.start(callback);
+            await handler.start(callback);
     
         } catch (error) {
             console.error(error);
@@ -158,7 +179,7 @@ export class SocketConnectionHandler {
 
 }
 
-export async function checkPackagePermission(socket: SocketIO.Socket, socketContext: SocketContext, callback: (response:Response) => void, schemaIdentifier:SchemaIdentifier, permission:Permission):Promise<boolean> {
+export async function checkPackagePermission(socket: SocketIO.Socket, socketContext: SocketContext, callback: (response:Response) => void, schemaIdentifier:PackageIdentifierInput, permission:Permission):Promise<boolean> {
 
     let packageEntity: PackageEntity;
     try {

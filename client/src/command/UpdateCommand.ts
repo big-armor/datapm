@@ -1,5 +1,5 @@
 import { Argv } from "yargs";
-import { UpdateArguments } from "../task/UpdateJob";
+import { UpdateArguments } from "datapm-client-lib";
 import { Command } from "./Command";
 
 export class UpdateCommand implements Command {

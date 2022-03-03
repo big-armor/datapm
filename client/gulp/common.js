@@ -9,15 +9,6 @@ const path = require("path");
 
 const NODE_VERSION = "node16";
 
-exports.postCodegen = function () {
-    fs.copyFileSync(
-        path.join("src", "generated", "graphql.ts"),
-        path.join("test", "integration", "registry-client.ts")
-    );
-
-    return Promise.resolve();
-};
-
 exports.readPackageVersion = function () {
     const fileContents = fs.readFileSync("package.json");
     const packageFile = JSON.parse(fileContents);

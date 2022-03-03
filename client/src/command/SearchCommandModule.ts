@@ -1,12 +1,12 @@
 import chalk from "chalk";
 import ora from "ora";
 import prompts from "prompts";
-import { getRegistryConfigs, RegistryConfig } from "../util/ConfigUtil";
+import { getRegistryConfigs } from "../util/ConfigUtil";
 import { printDataPMVersion } from "../util/DatapmVersionUtil";
-import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
-import { getRegistryClientWithConfig } from "../util/RegistryClient";
-import { packageString } from "../util/RegistryReferenceUtil";
+import { getRegistryClientWithConfig, packageString, RegistryConfig } from "datapm-client-lib";
+
 import { SearchArguments } from "./SearchCommand";
+import { defaultPromptOptions } from "../util/DefaultParameterOptions";
 
 export async function handleSearch(argv: SearchArguments): Promise<void> {
     printDataPMVersion(argv);

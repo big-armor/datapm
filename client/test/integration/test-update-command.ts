@@ -9,7 +9,7 @@ import {
     SetUserCatalogPermissionDocument,
     UpdateCatalogDocument,
     UpdatePackageDocument
-} from "../../src/generated/graphql";
+} from "datapm-client-lib";
 import { addRegistry, resetConfiguration } from "../../src/util/ConfigUtil";
 import { registryServerPort } from "./setup";
 import {

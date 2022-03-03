@@ -12,10 +12,13 @@ import {
     MeDocument,
     MyAPIKeysDocument,
     RegistryStatusDocument,
-    Scope
-} from "../generated/graphql";
-import { addRegistry, getRegistryConfigs, getRegistryConfig, removeRegistry, RegistryConfig } from "../util/ConfigUtil";
-import { getRegistryClientWithConfig, RegistryClient } from "../util/RegistryClient";
+    Scope,
+    getRegistryClientWithConfig,
+    RegistryClient,
+    RegistryConfig
+} from "datapm-client-lib";
+import { addRegistry, getRegistryConfigs, getRegistryConfig, removeRegistry } from "../util/ConfigUtil";
+
 import os from "os";
 import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from "@apollo/client";
 import {
@@ -25,8 +28,8 @@ import {
     RegistryLogoutArguments,
     RegistryRemoveArguments
 } from "./RegistryCommand";
-import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
 import { printDataPMVersion } from "../util/DatapmVersionUtil";
+import { defaultPromptOptions } from "../util/DefaultParameterOptions";
 
 export async function defaultRegistryCommandHandler(args: unknown): Promise<void> {
     const commandPromptResult = await prompts({
@@ -110,7 +113,7 @@ export async function logoutFromRegistry(args: RegistryLogoutArguments): Promise
     });
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const userRegistryClient = getRegistryClientWithConfig({ url: args.url! });
+    const userRegistryClient = getRegistryClientWithConfig(jobContext, { url: args.url! });
 
     oraRef.start("Deleting API Key from Registry");
 
@@ -254,6 +257,14 @@ export async function authenticateToRegistry(args: RegistryAuthenticateArguments
         );
 
         args.password = passwordResponse.password;
+    }
+
+    if (args.password == null) {
+        throw new Error("Password is required");
+    }
+
+    if (args.username == null) {
+        throw new Error("Username is required");
     }
 
     const oraRef = ora({

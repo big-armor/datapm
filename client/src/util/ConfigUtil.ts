@@ -3,6 +3,7 @@ import { DPMConfiguration } from "datapm-lib";
 import { getPassword, setPassword } from "keytar";
 import * as crypto from "crypto";
 import { v4 as uuid } from "uuid";
+import { RegistryConfig, RepositoryConfig, RepositoryType } from "datapm-client-lib";
 
 const configSchema = {
     registries: {
@@ -48,34 +49,6 @@ const config = new Conf({
         repositories: []
     }
 });
-
-export interface RegistryConfig {
-    url: string;
-    apiPath?: string;
-    apiKey?: string;
-}
-
-export interface RepositoryCredentialsConfig {
-    identifier: string;
-    encryptedConfiguration: string;
-    iv: string; // cryto hash iv value
-}
-export interface RepositoryConfig {
-    /** The unique identifer of the repository */
-    identifier: string;
-
-    /** The connection configuration object for the repository, that is used to connect to the repository */
-    connectionConfiguration: DPMConfiguration;
-
-    /** An array of string identifiers for each access credential. */
-    credentials?: RepositoryCredentialsConfig[];
-}
-
-export interface RepositoryType {
-    type: string;
-
-    configs: RepositoryConfig[];
-}
 
 export function getConfigurationPath(): string {
     return config.path;

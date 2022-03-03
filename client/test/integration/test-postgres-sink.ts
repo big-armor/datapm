@@ -2,7 +2,7 @@ import { expect } from "chai";
 import Knex from "knex";
 import { GenericContainer, StartedTestContainer } from "testcontainers";
 import { LogWaitStrategy } from "testcontainers/dist/wait-strategy";
-import { SinkErrors } from "../../src/repository/Sink";
+import { SinkErrors } from "datapm-client-lib";
 import { resetConfiguration } from "../../src/util/ConfigUtil";
 import {
     createTestPackage,

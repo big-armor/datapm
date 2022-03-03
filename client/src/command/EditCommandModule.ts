@@ -3,7 +3,7 @@ import ora from "ora";
 import { EditArguments } from "./EditCommand";
 import { printDataPMVersion } from "../util/DatapmVersionUtil";
 import { CLIJobContext } from "./CommandTaskUtil";
-import { EditJob } from "../task/EditJob";
+import { EditJob } from "datapm-client-lib";
 
 export async function editPackage(argv: EditArguments): Promise<void> {
     printDataPMVersion(argv);
