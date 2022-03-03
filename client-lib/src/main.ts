@@ -12,6 +12,7 @@ export * from "./task/PublishJob";
 export * from "./task/UpdateJob";
 export * from "./task/UpdateRepositoryJob";
 export * from "./task/InfoJob";
+export * from "./task/SearchJob";
 
 /** Various Utils */
 export * from "./util/IdentifierUtil";

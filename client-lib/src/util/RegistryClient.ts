@@ -7,7 +7,7 @@ import {
     HttpLink,
     InMemoryCache,
     NormalizedCacheObject
-} from "@apollo/client";
+} from "@apollo/client/core";
 import { setContext } from "@apollo/client/link/context";
 import * as fetch from "node-fetch";
 import {

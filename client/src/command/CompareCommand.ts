@@ -4,6 +4,8 @@ import { Command } from "./Command";
 export class CompareArguments {
     priorPackage: string;
     newPackage: string;
+    defaults?: boolean;
+    quiet?: boolean;
 }
 
 export class CompareCommand implements Command {

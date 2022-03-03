@@ -1,11 +1,12 @@
 {
-  "name": "client-lib",
+  "name": "datapm-client-lib",
   "version": "1.0.0",
   "description": "DataPM Client library, which includes all logic used by the the command line and server to generate, manage, and fetch packages. ",
   "main": "src/main.ts",
   "scripts": {
-    "prebuild": "npm run codegen",
+    "prebuild": "gulp prebuild && npm run codegen",
     "build": "tsc",
+    "postbuild": "gulp postbuild",
     "pretest": "npm run codegen",
     "codegen": "graphql-codegen --config codegen.yml",
     "test": "CREDENTIALS_SECRET_KEY=test mocha --slow 3000 --timeout 60000 -r ts-node/register test/**/*.ts"
@@ -54,6 +55,7 @@
     "eslint": "^7.19.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-standard": "^4.1.0",
+    "gulp": "^4.0.2",
     "husky": "^4.3.0",
     "maildev": "^1.1.0",
     "mocha": "^8.2.0",
@@ -95,7 +97,7 @@
     "knex": "^0.21.2",
     "mime-types": "^2.1.27",
     "moment": "^2.29.1",
-    "mongoose": "^5.12.1",
+    "mongoose": "^5.13.14",
     "mysql": "^2.18.1",
     "node-fetch": "2.6.1",
     "node-gyp": "^8.4.1",

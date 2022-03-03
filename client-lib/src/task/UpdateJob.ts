@@ -28,7 +28,7 @@ export class UpdateArguments {
     forceUpdate?: boolean;
 }
 
-export class UpdatePackageTask extends Job<PackageFileWithContext> {
+export class UpdatePackageJob extends Job<PackageFileWithContext> {
     constructor(private jobContext: JobContext, private argv: UpdateArguments) {
         super(jobContext);
     }

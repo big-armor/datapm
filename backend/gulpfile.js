@@ -8,7 +8,7 @@ const JSZip = require("jszip");
 
 const DESTINATION_DIR = path.join(__dirname, "dist");
 const SCHEMA_DIR = path.join(__dirname, "node_modules", "datapm-lib");
-
+const CLIENT_LIB_DIR = path.join(__dirname, "..","client-lib");
 function copyFiles() {
     return src([
         "ormconfig.js",
@@ -77,6 +77,14 @@ function copyDataPMLib() {
    return Promise.resolve();
 }
 
+function copyDataPMClientLib() {
+
+    return src([
+        path.join(CLIENT_LIB_DIR, "dist","**","*"),
+    ]).pipe(dest( path.join("dist","node_modules","datapm-client-lib")));
+
+}
+
 /** The TypeORM distribution is way too big. Slim to make it much smaller */
 function slimTypeOrmDist() {
 
@@ -120,7 +128,8 @@ function clean() {
     });
 }
 
-exports.default = series(createTerraformScriptsDirectory, createGCPTerraformScriptZip, copyFiles, copyEmailTemplates, copyModules, copyDataPMLib, slimTypeOrmDist);
+exports.default = series(createTerraformScriptsDirectory, createGCPTerraformScriptZip, copyFiles, copyEmailTemplates, copyModules, copyDataPMLib, copyDataPMClientLib, slimTypeOrmDist);
 exports.copyDependencies = series(copyModules, copyDataPMLib);
 exports.copyDataPMLib = copyDataPMLib;
+exports.copyDataPMClientLib = copyDataPMClientLib;
 exports.clean = clean;

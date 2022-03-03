@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import ora from "ora";
-import { UpdateArguments, UpdatePackageTask as UpdatePackageJob } from "datapm-client-lib";
+import { UpdateArguments, UpdatePackageJob } from "datapm-client-lib";
 import { printDataPMVersion } from "../util/DatapmVersionUtil";
 import { CLIJobContext } from "./CommandTaskUtil";
 

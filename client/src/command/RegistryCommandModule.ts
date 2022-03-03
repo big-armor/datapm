@@ -15,7 +15,8 @@ import {
     Scope,
     getRegistryClientWithConfig,
     RegistryClient,
-    RegistryConfig
+    RegistryConfig,
+    APIKey
 } from "datapm-client-lib";
 import { addRegistry, getRegistryConfigs, getRegistryConfig, removeRegistry } from "../util/ConfigUtil";
 
@@ -30,6 +31,7 @@ import {
 } from "./RegistryCommand";
 import { printDataPMVersion } from "../util/DatapmVersionUtil";
 import { defaultPromptOptions } from "../util/DefaultParameterOptions";
+import { CLIJobContext } from "./CommandTaskUtil";
 
 export async function defaultRegistryCommandHandler(args: unknown): Promise<void> {
     const commandPromptResult = await prompts({
@@ -89,6 +91,13 @@ export function listRegistries(args: unknown): void {
 export async function logoutFromRegistry(args: RegistryLogoutArguments): Promise<void> {
     printDataPMVersion(args);
 
+    const oraRef = ora({
+        color: "yellow",
+        spinner: "dots"
+    });
+
+    const jobContext = new CLIJobContext(oraRef, args);
+
     await promptForRegistryUrl(args, true);
 
     if (!args.url) {
@@ -106,11 +115,6 @@ export async function logoutFromRegistry(args: RegistryLogoutArguments): Promise
         removeRegistry(args.url);
         exit(1);
     }
-
-    const oraRef = ora({
-        color: "yellow",
-        spinner: "dots"
-    });
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const userRegistryClient = getRegistryClientWithConfig(jobContext, { url: args.url! });
@@ -298,7 +302,7 @@ export async function authenticateToRegistry(args: RegistryAuthenticateArguments
 
     oraRef.start("Looking for existing API Key named " + hostname);
 
-    const getAPIKeysResponse = await userRegistryClient.query({
+    const getAPIKeysResponse = await userRegistryClient.query<{ myAPIKeys: APIKey[] }>({
         query: MyAPIKeysDocument
     });
 

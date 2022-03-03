@@ -1,5 +1,4 @@
 import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject } from "@apollo/client/core";
-import fetch from "cross-fetch";
 import execa from "execa";
 import faker from "faker";
 import fs from "fs";

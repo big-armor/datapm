@@ -9,6 +9,8 @@ import { ActivityLogEventType, Permission } from "../generated/graphql";
 import { PackageRepository } from "../repository/PackageRepository";
 import { VersionRepository } from "../repository/VersionRepository";
 import { createActivityLog } from "../repository/ActivityLogRepository";
+import { BackendContext } from "../job/BackendContext";
+import { UpdatePackageJob } from "datapm-client-lib";
 
 const PACKAGE_LOCK_PREFIX = "package";
 
@@ -97,9 +99,11 @@ export class PackageUpdateHandler extends EventEmitter implements RequestHandler
     async startJob() {
         const context = new BackendContext(this.socketContext);
 
-        const job = new UpdateJob(context, {
-
+        const job = new UpdatePackageJob(context, {
+            defaults: true
         });
+
+        await job.execute();
     }
 
 
