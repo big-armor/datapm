@@ -56,44 +56,23 @@ jobs:
             - name: Print node verion
               run: node --version
 
-            - name: Cache Lib Node_modules
-              id: cache-lib-node-modules
-              uses: actions/cache@v1
-              with:
-                  path: lib/node_modules
-                  key: datampm-registry-${{ runner.OS }}-lib-${{ hashFiles('lib/package.json', 'lib/package-lock.json') }}
-
-            - name: Cache Client Lib Node_modules
-              id: cache-client-lib-node-modules
-              uses: actions/cache@v1
-              with:
-                  path: client-lib/node_modules
-                  key: datampm-registry-${{ runner.OS }}-client-lib-${{ hashFiles('client-lib/package.json', 'client-lib/package-lock.json') }}
-
             - name: Install Lib Dependencies
-              id: install-lib-Dependencies
-              if: steps.cache-lib-node-modules.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: lib
 
             - name: Test Lib
-              id: test-lib-Dependencies
               run: npm run test
               working-directory: lib
 
             - name: Build Lib
-              id: build-lib-Dependencies
               run: npm run build
               working-directory: lib
 
             - name: Install Client Lib Dependencies
-              id: install-client-lib-Dependencies
-              if: steps.cache-client-lib-node-modules.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: client-lib
 
             - name: Test Client Lib
-              id: test-client-lib-Dependencies
               run: npm run test
               working-directory: client-lib
 
