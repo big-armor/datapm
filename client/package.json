@@ -1,6 +1,6 @@
 {
     "name": "datapm-client",
-    "version": "0.8.78",
+    "version": "0.8.81",
     "description": "The DataPM client which is used to create and fetch packages.",
     "scripts": {
         "clean": "gulp clean",
