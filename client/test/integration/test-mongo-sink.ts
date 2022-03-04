@@ -95,7 +95,6 @@ describe("Mongo Sink Test", function () {
             [packageAFilePath, "--sink", "mongo"],
             prompts,
             async (line: string, promptIndex: number) => {
-                console.log(line);
                 if (promptIndex === prompts.length && line.includes(SinkErrors.AUTHENTICATION_FAILED)) {
                     results.messageFound = true;
                 }
