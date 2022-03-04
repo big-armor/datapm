@@ -500,7 +500,7 @@ async function schemaPrompts(jobContext: JobContext, schema: Schema): Promise<vo
     }
 }
 
-function validUrl(value: string | number | boolean): boolean | string {
+function validUrl(value: string | number | boolean): true | string {
     if (typeof value !== "string") {
         return "Must be a string";
     }
@@ -518,7 +518,7 @@ function validUrl(value: string | number | boolean): boolean | string {
     return true;
 }
 
-function validSampleRecordCount(value: number | string | boolean): boolean | string {
+function validSampleRecordCount(value: number | string | boolean): true | string {
     if (typeof value !== "number") {
         return "Must be a number";
     }

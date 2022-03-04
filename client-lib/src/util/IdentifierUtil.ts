@@ -1,6 +1,6 @@
 import { CatalogIdentifier, PackageIdentifier, VersionIdentifier } from "../generated/graphql";
 
-export function validVersion(value: string | number | boolean): boolean | string {
+export function validVersion(value: string | number | boolean): true | string {
     if (typeof value !== "string") {
         return "Must be a string";
     }
@@ -14,8 +14,8 @@ export function validVersion(value: string | number | boolean): boolean | string
     return true;
 }
 
-export function validPackageDisplayName(value: string | number | boolean): boolean | string {
-    if (value == null) return false;
+export function validPackageDisplayName(value: string | number | boolean): true | string {
+    if (value == null) return "Must not be null";
 
     if (typeof value === "number") return "Must be a string";
 
@@ -30,8 +30,8 @@ export function validPackageDisplayName(value: string | number | boolean): boole
     return true;
 }
 
-export function validShortPackageDescription(value: string | number | boolean): boolean | string {
-    if (value == null) return false;
+export function validShortPackageDescription(value: string | number | boolean): true | string {
+    if (value == null) return "Must not be null";
 
     if (typeof value !== "string") return "Must be a string";
 
@@ -42,7 +42,7 @@ export function validShortPackageDescription(value: string | number | boolean): 
     return true;
 }
 
-export function validUnit(value: string | number | boolean): boolean | string {
+export function validUnit(value: string | number | boolean): true | string {
     if (typeof value !== "string") return "Must be a string";
     if (value && value.length > 128) return "Must be less than 128 characters";
     return true;

@@ -150,7 +150,7 @@ describe("Package Command Tests", async () => {
             [TEST_SOURCE_FILES.HTTP1],
             prompts,
             async (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
-                console.log(line);
+                // console.log(line);
                 if (line.includes("Must be a valid name")) {
                     results.messageFound = true;
                     cmdProcess.kill("SIGINT");
@@ -179,7 +179,7 @@ describe("Package Command Tests", async () => {
             [TEST_SOURCE_FILES.HTTP1],
             prompts,
             async (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
-                console.log(line);
+                // console.log(line);
                 if (line.includes("Must include only letters, numbers, periods, underscores, and hyphens")) {
                     results.messageFound = true;
                     cmdProcess.kill("SIGINT");
@@ -208,7 +208,7 @@ describe("Package Command Tests", async () => {
             [TEST_SOURCE_FILES.HTTP1],
             prompts,
             async (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
-                console.log(line);
+                // console.log(line);
                 if (line.includes("Must be in format of 1.2.3")) {
                     results.messageFound = true;
                     cmdProcess.kill("SIGINT");
@@ -236,7 +236,7 @@ describe("Package Command Tests", async () => {
             [TEST_SOURCE_FILES.HTTP1],
             prompts,
             async (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
-                console.log(line);
+                // console.log(line);
                 if (line.includes("Must be longer than 3 characters")) {
                     results.messageFound = true;
                     cmdProcess.kill("SIGINT");

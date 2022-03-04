@@ -60,6 +60,11 @@ function parametersToPrompts(parameters: Parameter[]): PromptObject[] {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function validatePromptResponse(value: any, parameter: Parameter): string | true {
+    if (parameter.validate2) {
+        const valid = parameter.validate2(value);
+        if (valid !== true) return valid;
+    }
+
     if (parameter.type === ParameterType.Text || parameter.type === ParameterType.Password) {
         if (parameter.stringRegExp !== undefined) {
             if (value === undefined) return "Please enter a value";

@@ -550,7 +550,7 @@ function validUrl(value: string | number | boolean): true | string {
     return true;
 }
 
-function validSampleRecordCount(value: number | string | boolean): boolean | string {
+function validSampleRecordCount(value: number | string | boolean): true | string {
     if (typeof value === "string") return "Must be a number";
 
     if (typeof value === "boolean") return "Must be a boolean";
