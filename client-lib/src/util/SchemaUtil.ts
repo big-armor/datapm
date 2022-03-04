@@ -619,11 +619,10 @@ export function printSchema(jobContext: JobContext, schema: Schema): void {
 
     jobContext.print("NONE", schema.title);
 
-    if(schema.properties == null || Object.keys(schema.properties).length === 0) {
+    if (schema.properties == null || Object.keys(schema.properties).length === 0) {
         jobContext.print("WARN", "Has no properties");
         return;
     }
-
 
     jobContext.print("NONE", `${chalk.gray("Record Count: ")} ${chalk.yellow(recordCount)}`);
     jobContext.print("NONE", chalk.gray("Attributes"));

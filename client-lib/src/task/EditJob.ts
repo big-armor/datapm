@@ -8,8 +8,7 @@ import {
     Schema,
     nextVersion as getNextVersion,
     ParameterOption,
-    ParameterType,
-    Parameter
+    ParameterType
 } from "datapm-lib";
 import { validPackageDisplayName, validShortPackageDescription, validUnit, validVersion } from "../util/IdentifierUtil";
 import { getPackage, PackageFileWithContext, RegistryPackageFileContext } from "../util/PackageAccessUtil";

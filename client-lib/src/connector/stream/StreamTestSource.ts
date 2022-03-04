@@ -12,13 +12,7 @@ interface TestSourceAttribute {
     type?: string;
 }
 
-interface TestSourceConfiguration {
-    recordCount: number;
-    attributes?: TestSourceAttribute[];
-}
-
 export class StreamTestSource implements Source {
-
     sourceType(): string {
         return TYPE;
     }
@@ -37,7 +31,7 @@ export class StreamTestSource implements Source {
                 name: "recordCount",
                 configuration,
                 message: "How many test records?",
-                defaultValue: configuration.recordCount != null ? configuration.recordCount as number : 10,
+                defaultValue: configuration.recordCount != null ? (configuration.recordCount as number) : 10,
                 numberMinimumValue: 1
             }
         ]);
@@ -136,15 +130,17 @@ export class StreamTestSource implements Source {
 
                     for (let i = 0; i < (configuration.recordCount as number); i += 1) {
                         const record: DPMRecord = {};
-                        Object.values(configuration.attributes as {[key:string]: TestSourceAttribute}).forEach((attribute) => {
-                            if (attribute.type) {
-                                /* eslint-disable  @typescript-eslint/no-explicit-any */
-                                record[attribute.name] = (faker as any)[attribute.category][attribute.type]();
-                            } else {
-                                /* eslint-disable  @typescript-eslint/no-explicit-any */
-                                record[attribute.name] = (faker as any)[attribute.category]();
+                        Object.values(configuration.attributes as { [key: string]: TestSourceAttribute }).forEach(
+                            (attribute) => {
+                                if (attribute.type) {
+                                    /* eslint-disable  @typescript-eslint/no-explicit-any */
+                                    record[attribute.name] = (faker as any)[attribute.category][attribute.type]();
+                                } else {
+                                    /* eslint-disable  @typescript-eslint/no-explicit-any */
+                                    record[attribute.name] = (faker as any)[attribute.category]();
+                                }
                             }
-                        });
+                        );
 
                         const recordContext: RecordContext = {
                             schemaSlug: "random",

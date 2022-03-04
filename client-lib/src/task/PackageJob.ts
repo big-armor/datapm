@@ -261,19 +261,21 @@ export class PackageJob extends Job<PackageJobResult> {
             return { exitCode: 1 };
         }
 
-        if(Object.values(schemas).find((s) =>{
-            const properties = s.properties;
+        if (
+            Object.values(schemas).find((s) => {
+                const properties = s.properties;
 
-            if(properties == null) {
-                return false;
-            }
+                if (properties == null) {
+                    return false;
+                }
 
-            if(Object.keys(properties).length === 0) {
-                return false;
-            }
+                if (Object.keys(properties).length === 0) {
+                    return false;
+                }
 
-            return true;
-        }) == null) {
+                return true;
+            }) == null
+        ) {
             this.jobContext.print("ERROR", "No schemas found with properties");
             return { exitCode: 1 };
         }
@@ -283,7 +285,7 @@ export class PackageJob extends Job<PackageJobResult> {
 
             SchemaUtil.printSchema(this.jobContext, schema);
 
-            if(schema.properties == null || Object.keys(schema.properties).length === 0) {
+            if (schema.properties == null || Object.keys(schema.properties).length === 0) {
                 delete schemas[key];
                 continue;
             }
@@ -576,8 +578,7 @@ function validUrl(value: string | number | boolean): true | string {
 }
 
 function validSampleRecordCount(value: number | string | boolean, parameter: Parameter): true | string {
-
-    if(value === "" && parameter.defaultValue != null) return true; 
+    if (value === "" && parameter.defaultValue != null) return true;
 
     if (typeof value === "string") return "Must be a number";
 
@@ -788,7 +789,6 @@ async function schemaSpecificQuestions(jobContext: JobContext, schema: Schema) {
     }
     // Prompt Column Unit per "number" Type Column
     properties = schema.properties as Properties;
-
 
     const keys = Object.keys(properties).filter((key) => {
         const property = properties[key] as Schema;
