@@ -2,7 +2,24 @@ import { Argv } from "yargs";
 
 import { Command } from "./Command";
 
-import { CredentialsAddArguments, RepositoryAddArguments, RepositoryUpdateArguments } from "datapm-client-lib";
+export class RepositoryUpdateArguments {
+    repositoryType?: string;
+    repositoryIdentifier?: string;
+    default?: boolean | undefined;
+    quiet?: boolean | undefined;
+}
+
+export class RepositoryAddArguments {
+    repositoryType?: string;
+    default?: boolean | undefined;
+    quiet?: boolean | undefined;
+}
+
+export class CredentialsAddArguments {
+    repositoryType?: string;
+    repositoryIdentifier?: string;
+    defaults?: boolean | undefined;
+}
 
 export const enum Commands {
     ADD = "ADD",

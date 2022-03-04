@@ -6,7 +6,7 @@
     "module": "dist/index.js",
     "scripts": {
         "clean": "gulp clean",
-        "prebuild": "npm run clean && npm run codegen",
+        "prebuild": "cd ../client-lib && npm run build && cd ../backend && npm run clean && npm run codegen",
         "build": "tsc",
         "postbuild": "gulp",
         "prestart": "npm run codegen && docker-compose -f ../docker/docker-compose-local-dev.yml  up -d ",
@@ -16,7 +16,7 @@
         "prestart:server": "npm run build",
         "start:server": ". ./env.sh && cd dist && node index.js",
         "pretest": "npm run codegen",
-        "test": "TYPEORM_IS_DIST=false mocha -r ts-node/register --slow 2000 test/integration/*.ts src/**/*.spec.ts",
+        "test": "TYPEORM_IS_DIST=false mocha --max_old_space_size=8192 -r ts-node/register --slow 2000 test/integration/*.ts src/**/*.spec.ts",
         "test:debug": "TYPEORM_IS_DIST=false npm run build && npx mocha --slow 3000 --timeout 999999 -r ts-node/register",
         "codegen": "graphql-codegen --config codegen.yml && graphql-codegen --config codegen-test.yml"
     },

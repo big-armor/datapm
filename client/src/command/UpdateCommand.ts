@@ -1,7 +1,10 @@
 import { Argv } from "yargs";
-import { UpdateArguments } from "datapm-client-lib";
 import { Command } from "./Command";
-
+export class UpdateArguments {
+    reference?: string;
+    defaults?: boolean;
+    forceUpdate?: boolean;
+}
 export class UpdateCommand implements Command {
     prepareCommand(argv: Argv): Argv {
         return argv.command({

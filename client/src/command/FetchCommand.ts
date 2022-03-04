@@ -1,6 +1,16 @@
 import { Command } from "./Command";
 import { Argv } from "yargs";
-import { FetchArguments } from "datapm-client-lib";
+
+export class FetchArguments {
+    reference?: string;
+    sink?: string;
+    defaults?: boolean;
+    sinkConfig?: string;
+    sinkConnectionConfig?: string;
+    sinkCredentialsConfig?: string;
+    quiet?: boolean;
+    forceUpdate?: boolean;
+}
 
 export class FetchCommand implements Command {
     prepareCommand(argv: Argv): Argv {

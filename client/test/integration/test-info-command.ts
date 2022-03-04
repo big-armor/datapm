@@ -47,6 +47,7 @@ describe("Info Command Tests", async function () {
         };
 
         const cmdResult = await testCmd("info", [packageAFilePath], [], async (line: string) => {
+            console.log(line);
             if (line.includes("NOT_AUTHENTICATED")) {
                 results.messageFound = true;
             }

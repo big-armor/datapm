@@ -1,8 +1,13 @@
 import { Argv } from "yargs";
-import { PackageJobArguments } from "datapm-client-lib";
 import { Command } from "./Command";
-export class PackageCommandArguments extends PackageJobArguments {
+export class PackageCommandArguments {
     publish?: boolean;
+    defaults?: boolean;
+    connection?: string;
+    credentials?: string;
+    configuration?: string;
+    references?: string[];
+    catalogSlug?: string;
 }
 export class PackageCommand implements Command {
     prepareCommand(argv: Argv): Argv {

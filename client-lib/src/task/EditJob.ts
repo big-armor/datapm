@@ -137,7 +137,7 @@ export class EditJob extends Job<EditJobResult> {
 
         task.end("SUCCESS", "You have edit permission");
 
-        task = await this.jobContext.startTask("Checking package contents...");
+        task = await this.jobContext.startTask("Checking package is cononical...");
 
         if (packageFileWithContext.packageFile.canonical === false) {
             await task.end(
@@ -157,6 +157,8 @@ export class EditJob extends Job<EditJobResult> {
                 exitCode: 1
             };
         }
+
+        task.end("SUCCESS", "Package is canonical");
 
         let newPackageFile: PackageFile = clone()(oldPackageFile);
 

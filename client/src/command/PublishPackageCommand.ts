@@ -1,6 +1,10 @@
 import { Argv } from "yargs";
-import { PublishJobArguments } from "datapm-client-lib";
 import { Command } from "./Command";
+
+export class PublishJobArguments {
+    defaults?: boolean;
+    reference?: string;
+}
 
 export class PublishPackageCommand implements Command {
     prepareCommand(argv: Argv): Argv {

@@ -1,4 +1,3 @@
-import fetch from "cross-fetch";
 import {
     loadPackageFileFromDisk,
     parsePackageFileJSON,
@@ -14,6 +13,7 @@ import { Package, PackageIdentifierInput, Permission } from "../generated/graphq
 import { JobContext } from "../task/Task";
 import { publishPackageFile, writeLicenseFile, writePackageFile, writeReadmeFile } from "./PackageUtil";
 import { getRegistryClientWithConfig } from "./RegistryClient";
+import fetch from "cross-fetch";
 
 export interface PackageFileWithContext {
     packageFile: PackageFile;

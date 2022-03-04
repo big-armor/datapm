@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+const { series } = require("gulp");
+
 const {
     cleanWin64,
     runPkgWin64,
@@ -42,8 +44,7 @@ const {
     copyAssetsLinuxIntel64
 } = require("./gulp/linux");
 
-const { cleanDist } = require("./gulp/common");
-const { series } = require("gulp");
+const { cleanDist, copyDataPMClientLib } = require("./gulp/common");
 
 exports.buildWindowsIntel64 = series(
     cleanWin64,
@@ -87,3 +88,5 @@ exports.clean = series(
     cleanWindowsArm64,
     cleanMacOSInstaller
 );
+
+exports.postbuild = series(copyDataPMClientLib);

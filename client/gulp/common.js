@@ -43,10 +43,19 @@ exports.renameBinary = function (binaryFile, destinationFile) {
     fs.renameSync(binaryFile, destinationFile);
 };
 
+exports.copyDataPMClientLib = function () {
+    return src([path.join(__dirname, "..", "..", "client-lib", "dist", "**", "*")]).pipe(
+        dest(path.join("dist", "node_modules", "datapm-client-lib"))
+    );
+};
+
 exports.copyDeps = function (directory) {
-    return src(["node_modules/mmmagic/**/*", "node_modules/node-expat/**/*"], {
+    src(["node_modules/mmmagic/**/*", "node_modules/node-expat/**/*"], {
         base: "./node_modules/"
     }).pipe(dest(path.join(directory, "node_modules")));
+
+    exports.copyDataPMClientLib();
+    return Promise.resolve();
 };
 
 exports.copyAssets = function (directory) {

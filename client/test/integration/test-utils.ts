@@ -16,6 +16,7 @@ import {
 } from "datapm-client-lib";
 import { dataServerPort, mailDevWebPortNumber, registryServerPort } from "./setup";
 import { createAPIKeyFromParts } from "datapm-lib";
+import fetch from "cross-fetch";
 
 export const KEYS = {
     ENTER: "\n",
