@@ -57,7 +57,7 @@ export class SearchJob extends Job<SearchJobResult> {
                     name: "query",
                     message: "Search terms?",
                     configuration: {},
-                    validate2: (value) => {
+                    validate: (value) => {
                         if (!value) return "Search query required";
                         return true;
                     }

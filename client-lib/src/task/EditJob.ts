@@ -8,7 +8,8 @@ import {
     Schema,
     nextVersion as getNextVersion,
     ParameterOption,
-    ParameterType
+    ParameterType,
+    Parameter
 } from "datapm-lib";
 import { validPackageDisplayName, validShortPackageDescription, validUnit, validVersion } from "../util/IdentifierUtil";
 import { getPackage, PackageFileWithContext, RegistryPackageFileContext } from "../util/PackageAccessUtil";
@@ -39,7 +40,7 @@ export class EditJob extends Job<EditJobResult> {
                     name: "reference",
                     message: "What is the package name, url, or file name?",
                     configuration: {},
-                    validate2: (value) => {
+                    validate: (value) => {
                         if (!value) return "Package file name or url required";
                         return true;
                     }
@@ -193,7 +194,7 @@ export class EditJob extends Job<EditJobResult> {
                 name: "displayName",
                 message: "User friendly package name?",
                 defaultValue: oldPackageFile.displayName,
-                validate2: validPackageDisplayName,
+                validate: validPackageDisplayName,
                 configuration: {}
             }
         ]);
@@ -210,7 +211,7 @@ export class EditJob extends Job<EditJobResult> {
                     name: "version",
                     message: "Next version?",
                     defaultValue: nextVersion,
-                    validate2: validVersion,
+                    validate: validVersion,
                     configuration: {}
                 },
                 {
@@ -218,7 +219,7 @@ export class EditJob extends Job<EditJobResult> {
                     name: "description",
                     message: "Short package description?",
                     defaultValue: oldPackageFile.description,
-                    validate2: validShortPackageDescription,
+                    validate: validShortPackageDescription,
                     configuration: {}
                 },
                 {
@@ -226,7 +227,7 @@ export class EditJob extends Job<EditJobResult> {
                     name: "website",
                     message: "Website?",
                     defaultValue: oldPackageFile.website,
-                    validate2: validUrl,
+                    validate: validUrl,
                     configuration: {}
                 },
                 {
@@ -234,7 +235,8 @@ export class EditJob extends Job<EditJobResult> {
                     name: "sampleRecordCount",
                     message: "Number of sample records?",
                     defaultValue: defaultSampleRecordCount,
-                    validate2: validSampleRecordCount,
+                    numberMinimumValue: 0,
+                    numberMaximumValue: 100,
                     configuration: {}
                 }
             ]))
@@ -443,7 +445,7 @@ async function schemaPrompts(jobContext: JobContext, schema: Schema): Promise<vo
             name: "recordUnit",
             message: `What does each ${schema.title} record represent?`,
             defaultValue: schema?.unit,
-            validate2: validUnit,
+            validate: validUnit,
             configuration: {}
         }
     ]);
@@ -489,7 +491,7 @@ async function schemaPrompts(jobContext: JobContext, schema: Schema): Promise<vo
                         message: `Unit for attribute '${property.title}'?`,
                         defaultValue: property?.unit,
                         configuration: {},
-                        validate2: validUnit
+                        validate: validUnit
                     }
                 ]);
                 if (columnUnitResponse.columnUnit) {
@@ -515,15 +517,5 @@ function validUrl(value: string | number | boolean): true | string {
         return "Not a valid URL - not long enough";
     }
 
-    return true;
-}
-
-function validSampleRecordCount(value: number | string | boolean): true | string {
-    if (typeof value !== "number") {
-        return "Must be a number";
-    }
-
-    if (value == null) return "Number, 0 to 100, required";
-    if (value > 100) return "Number less than 100 required";
     return true;
 }

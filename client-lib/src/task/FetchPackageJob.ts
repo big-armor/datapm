@@ -56,7 +56,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                     configuration: {},
                     name: "reference",
                     message: "What is the package name, url, or file name?",
-                    validate2: (value) => {
+                    validate: (value) => {
                         if (!value) return "Package file name or url required";
                         return true;
                     }
@@ -76,7 +76,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         try {
             packageFileWithContext = await getPackage(this.jobContext, this.args.reference, "modified");
         } catch (error) {
-            if (typeof error.message === "string" && error.message.includes("NOT_AUTHENTICATED_TO_REGISTRY")) {
+            if (typeof error.message === "string" && error.message.includes("NOT_AUTHENTICATED")) {
                 await task.end("ERROR", "You are not authenticated to the registry.");
 
                 this.jobContext.print("INFO", "Use the following command to authenticate.");

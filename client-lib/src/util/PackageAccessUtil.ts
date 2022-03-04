@@ -216,7 +216,7 @@ export async function getPackage(
                 return await fetchPackage(jobContext, registryUrl, packageIdentifier, modifiedOrCanonical);
             } catch (e) {
                 if (typeof e.message === "string" && (e.message as string).includes("NOT_AUTHENTICATED")) {
-                    throw new Error("NOT_AUTHENTICATED_TO_REGISTRY");
+                    throw new Error("NOT_AUTHENTICATED");
                 } else {
                     throw e;
                 }

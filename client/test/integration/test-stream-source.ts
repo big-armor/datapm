@@ -30,35 +30,6 @@ describe("Test Stream Source Test", function () {
         removePackageFiles(["test"]);
     });
 
-    it("Record count should be greater than 1", async function () {
-        const prompts = [
-            {
-                message: "How many test records?",
-                input: KEYS.ENTER
-            }
-        ];
-
-        const results: TestResults = {
-            exitCode: -1,
-            messageFound: false
-        };
-
-        const cmdResult = await testCmd(
-            "package",
-            ["test://"],
-            prompts,
-            async (line: string, promptIndex: number, cmdProcess: execa.ExecaChildProcess) => {
-                if (promptIndex === 1 && line.includes("Record count should be greater than 1")) {
-                    results.messageFound = true;
-                    cmdProcess.kill("SIGINT");
-                }
-            }
-        );
-
-        expect(cmdResult.signal, "Exit code").equals("SIGINT");
-        expect(results.messageFound, "Found error message").equals(true);
-    });
-
     it("There should be at least 1 attribute", async function () {
         const prompts = [
             {

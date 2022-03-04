@@ -10,7 +10,8 @@ import {
     Source,
     StreamSet,
     ParameterAnswer,
-    ParameterType
+    ParameterType,
+    Parameter
 } from "datapm-lib";
 import { ConnectorDescription } from "../connector/Connector";
 import { getConnectorDescriptionByType } from "../connector/ConnectorUtil";
@@ -260,8 +261,32 @@ export class PackageJob extends Job<PackageJobResult> {
             return { exitCode: 1 };
         }
 
-        for (const schema of Object.values(schemas)) {
+        if(Object.values(schemas).find((s) =>{
+            const properties = s.properties;
+
+            if(properties == null) {
+                return false;
+            }
+
+            if(Object.keys(properties).length === 0) {
+                return false;
+            }
+
+            return true;
+        }) == null) {
+            this.jobContext.print("ERROR", "No schemas found with properties");
+            return { exitCode: 1 };
+        }
+
+        for (const key of Object.keys(schemas)) {
+            const schema = schemas[key];
+
             SchemaUtil.printSchema(this.jobContext, schema);
+
+            if(schema.properties == null || Object.keys(schema.properties).length === 0) {
+                delete schemas[key];
+                continue;
+            }
 
             if (!this.args.defaults) await schemaSpecificQuestions(this.jobContext, schema);
         }
@@ -287,7 +312,7 @@ export class PackageJob extends Job<PackageJobResult> {
                     configuration: {},
                     name: "displayName",
                     message: "User friendly package name?",
-                    validate2: validPackageDisplayName
+                    validate: validPackageDisplayName
                 }
             ]);
         }
@@ -316,7 +341,7 @@ export class PackageJob extends Job<PackageJobResult> {
                     configuration: {},
                     message: "Package short name?",
                     defaultValue: suggestedSlug,
-                    validate2: (value) => {
+                    validate: (value) => {
                         if (typeof value !== "string") {
                             return "Must be a string";
                         }
@@ -340,21 +365,21 @@ export class PackageJob extends Job<PackageJobResult> {
                     configuration: {},
                     message: "Starting version?",
                     defaultValue: "1.0.0",
-                    validate2: validVersion
+                    validate: validVersion
                 },
                 {
                     type: ParameterType.Text,
                     name: "description",
                     configuration: {},
                     message: "Short package description?",
-                    validate2: validShortPackageDescription
+                    validate: validShortPackageDescription
                 },
                 {
                     type: ParameterType.Text,
                     name: "website",
                     configuration: {},
                     message: "Website?",
-                    validate2: validUrl
+                    validate: validUrl
                 },
                 {
                     type: ParameterType.Number,
@@ -362,7 +387,7 @@ export class PackageJob extends Job<PackageJobResult> {
                     message: "Number of sample records?",
                     configuration: {},
                     defaultValue: 100,
-                    validate2: validSampleRecordCount
+                    validate: validSampleRecordCount
                 }
             ]);
         }
@@ -550,7 +575,10 @@ function validUrl(value: string | number | boolean): true | string {
     return true;
 }
 
-function validSampleRecordCount(value: number | string | boolean): true | string {
+function validSampleRecordCount(value: number | string | boolean, parameter: Parameter): true | string {
+
+    if(value === "" && parameter.defaultValue != null) return true; 
+
     if (typeof value === "string") return "Must be a number";
 
     if (typeof value === "boolean") return "Must be a boolean";
@@ -728,7 +756,7 @@ async function schemaSpecificQuestions(jobContext: JobContext, schema: Schema) {
                 type: ParameterType.Text,
                 message: "What SQL or other process was used to derive this data?",
                 configuration: {},
-                validate2: (value: string | number | boolean) => {
+                validate: (value: string | number | boolean) => {
                     if (typeof value !== "string") {
                         return "Must be a string";
                     }
@@ -752,7 +780,7 @@ async function schemaSpecificQuestions(jobContext: JobContext, schema: Schema) {
             name: "recordUnit",
             configuration: {},
             message: `What does each ${schema.title} record represent?`,
-            validate2: validUnit
+            validate: validUnit
         }
     ]);
     if (recordUnitResponse.recordUnit) {
@@ -760,6 +788,8 @@ async function schemaSpecificQuestions(jobContext: JobContext, schema: Schema) {
     }
     // Prompt Column Unit per "number" Type Column
     properties = schema.properties as Properties;
+
+
     const keys = Object.keys(properties).filter((key) => {
         const property = properties[key] as Schema;
         const type = property.type as JSONSchema7TypeName[];
@@ -802,7 +832,7 @@ async function schemaSpecificQuestions(jobContext: JobContext, schema: Schema) {
                     name: "columnUnit",
                     configuration: {},
                     message: `Unit for attribute '${property.title}'?`,
-                    validate2: validUnit
+                    validate: validUnit
                 }
             ]);
             if (columnUnitResponse.columnUnit) {

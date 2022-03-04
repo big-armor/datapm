@@ -18,7 +18,6 @@ interface TestSourceConfiguration {
 }
 
 export class StreamTestSource implements Source {
-    configuration: TestSourceConfiguration;
 
     sourceType(): string {
         return TYPE;
@@ -28,8 +27,7 @@ export class StreamTestSource implements Source {
         context: SourceInspectionContext,
         configuration: DPMConfiguration
     ): Promise<Parameter[]> {
-        this.configuration = { recordCount: 0 };
-        this.configuration.attributes = [];
+        configuration.attributes = {} as { [key: string]: TestSourceAttribute };
         const attributeNames: string[] = [];
         let attributeCount = 0;
 
@@ -39,7 +37,8 @@ export class StreamTestSource implements Source {
                 name: "recordCount",
                 configuration,
                 message: "How many test records?",
-                validate2: (value) => (value < 1 ? "Record count should be greater than 1" : true)
+                defaultValue: configuration.recordCount != null ? configuration.recordCount as number : 10,
+                numberMinimumValue: 1
             }
         ]);
 
@@ -50,7 +49,7 @@ export class StreamTestSource implements Source {
                     name: "attributeName",
                     message: "Name of attribute?",
                     configuration: {},
-                    validate2: (value) => {
+                    validate: (value) => {
                         if (attributeCount === 0 && !value) return "There should be at least 1 attribute";
                         if (value && attributeNames.includes(value as string)) {
                             return `'${value}' attribute is already existing`;
@@ -94,11 +93,11 @@ export class StreamTestSource implements Source {
                 attributeType = attributeTypeResponse.attributeType;
             }
 
-            this.configuration.attributes.push({
+            configuration.attributes[attributeNameResponse.attributeName] = {
                 name: attributeNameResponse.attributeName,
                 category: attributeCategoryResponse.attributeCategory,
                 type: attributeType
-            });
+            };
             attributeNames.push(attributeNameResponse.attributeName);
             attributeCount += 1;
         }
@@ -135,9 +134,9 @@ export class StreamTestSource implements Source {
                 openStream: async () => {
                     const stream = new Readable({ objectMode: true });
 
-                    for (let i = 0; i < this.configuration.recordCount; i += 1) {
+                    for (let i = 0; i < (configuration.recordCount as number); i += 1) {
                         const record: DPMRecord = {};
-                        this.configuration.attributes?.forEach((attribute) => {
+                        Object.values(configuration.attributes as {[key:string]: TestSourceAttribute}).forEach((attribute) => {
                             if (attribute.type) {
                                 /* eslint-disable  @typescript-eslint/no-explicit-any */
                                 record[attribute.name] = (faker as any)[attribute.category][attribute.type]();

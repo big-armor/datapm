@@ -139,7 +139,9 @@ export class CSVParser implements Parser {
                     configuration,
                     message: "Header row line number?",
                     type: ParameterType.Number,
-                    name: "headerRowNumber"
+                    name: "headerRowNumber",
+                    defaultValue: 1,
+                    numberMinimumValue: 1
                 }
             ]);
             configuration.headerRowNumber = configuration.headerRowNumber ? +configuration.headerRowNumber - 1 : 0;

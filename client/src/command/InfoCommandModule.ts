@@ -21,5 +21,7 @@ export async function getInfo(argv: InfoArguments): Promise<void> {
 
     const job = new InfoJob(jobContext, argv);
 
-    await job.execute();
+    const result = await job.execute();
+
+    process.exit(result.exitCode);
 }

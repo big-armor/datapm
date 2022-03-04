@@ -41,7 +41,7 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
                     name: "reference",
                     configuration: {},
                     message: "What is the package name, url, or file name?",
-                    validate2: (value) => {
+                    validate: (value) => {
                         if (!value) return "Package file name or url required";
                         return true;
                     }
