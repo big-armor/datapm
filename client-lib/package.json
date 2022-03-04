@@ -38,7 +38,6 @@
     "@types/graphql-upload": "^8.0.3",
     "@types/is-glob": "^4.0.1",
     "@types/is-number": "^7.0.0",
-    "@types/json-schema": "^7.0.8",
     "@types/knex": "^0.16.1",
     "@types/mime-types": "^2.1.0",
     "@types/mocha": "^8.0.3",
