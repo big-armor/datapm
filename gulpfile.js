@@ -103,6 +103,12 @@ function bumpLibVersion() {
     });
 }
 
+function bumpClientLibVersion() {
+    return spawnAndLog("bump-lib-version", "npm", ["version", readPackageVersion(), "--no-git-tag-version"], {
+        cwd: "client-lib"
+    });
+}
+
 function bumpClientVersion() {
     return spawnAndLog("bump-client-version", "npm", ["version", readPackageVersion()], { cwd: "client" });
 }
@@ -292,6 +298,7 @@ exports.bumpVersion = series(
     showGitDiff,
     bumpRootVersion,
     bumpLibVersion,
+    bumpClientLibVersion,
     bumpClientVersion,
     bumpBackendVersion,
     bumpFrontendVersion
