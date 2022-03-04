@@ -26,7 +26,7 @@ const re_en = new RegExp(
     "m"
 );
 // 00:00:00, 00:00, 0:0, 0:0:00.0 and with or without three letter timezone or Z
-const re_time = /(\d{1,2}:\d{1,2})(:\d{1,2}(\.[0-9]{3})?)?((?:\s?[A-Z]{2,3})|(?:-?\d{4})|Z)?$/;
+const re_time = /(\d{1,2}:\d{1,2})(:\d{1,2}(\.[0-9]{3})?)?((?:\s?[A-Z]{2,3})|(?:[-+]?\d{4})|Z)?$/;
 
 function normalizeDate(date: any) {
     return moment(new Date(date)).format("YYYY-MM-DD");
