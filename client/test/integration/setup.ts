@@ -35,7 +35,7 @@ export const registryServerPort: number = Math.floor(Math.random() * (65535 - 10
 export const dataServerPort: number = Math.floor(Math.random() * (65535 - 1024) + 1024);
 
 before(async function () {
-    this.timeout(320 * 1000);
+    this.timeout(500 * 1000);
     network = await new Network().start();
 
     const runName = getRandomFruitsName("en")
@@ -276,25 +276,25 @@ after(async function () {
     if (registryServerProcess) {
         registryServerProcess.stdout?.destroy();
         registryServerProcess.stderr?.destroy();
-    }
 
-    if (registryServerProcess.pid !== undefined) {
-        try {
-            const pids = pidtree(registryServerProcess.pid, { root: true });
+        if (registryServerProcess.pid !== undefined) {
+            try {
+                const pids = pidtree(registryServerProcess.pid, { root: true });
 
-            // recursively kill all child processes
-            (await pids).forEach((p) => {
-                console.log("Killing process " + p);
-                try {
-                    process.kill(p);
-                } catch (error) {
-                    console.error("Error killing process " + p);
-                    console.error(error);
-                }
-            });
-            console.log("datapm registry container stopped normally");
-        } catch (error) {
-            console.log("error stopping processes " + error.message);
+                // recursively kill all child processes
+                (await pids).forEach((p) => {
+                    console.log("Killing process " + p);
+                    try {
+                        process.kill(p);
+                    } catch (error) {
+                        console.error("Error killing process " + p);
+                        console.error(error);
+                    }
+                });
+                console.log("datapm registry container stopped normally");
+            } catch (error) {
+                console.log("error stopping processes " + error.message);
+            }
         }
     }
 
@@ -304,26 +304,28 @@ after(async function () {
         fs.rmSync(tempStoragePathRelative, { recursive: true });
     }
 
-    testDataServerProcess.stdout?.destroy();
-    testDataServerProcess.stderr?.destroy();
+    if (testDataServerProcess) {
+        testDataServerProcess.stdout?.destroy();
+        testDataServerProcess.stderr?.destroy();
 
-    if (testDataServerProcess.pid !== undefined) {
-        try {
-            const pids = pidtree(testDataServerProcess.pid, { root: true });
+        if (testDataServerProcess.pid !== undefined) {
+            try {
+                const pids = pidtree(testDataServerProcess.pid, { root: true });
 
-            // recursively kill all child processes
-            (await pids).forEach((p) => {
-                console.log("Killing process " + p);
-                try {
-                    process.kill(p);
-                } catch (error) {
-                    console.error("Error killing process " + p);
-                    console.error(error);
-                }
-            });
-            console.log("test data server stopped normally");
-        } catch (error) {
-            console.log("error stopping processes " + error.message);
+                // recursively kill all child processes
+                (await pids).forEach((p) => {
+                    console.log("Killing process " + p);
+                    try {
+                        process.kill(p); // TODO Wait for process to actually exit, then kill it with sign 9 (SIGKILL) after a timeout
+                    } catch (error) {
+                        console.error("Error killing process " + p);
+                        console.error(error);
+                    }
+                });
+                console.log("test data server stopped normally");
+            } catch (error) {
+                console.log("error stopping processes " + error.message);
+            }
         }
     }
 
