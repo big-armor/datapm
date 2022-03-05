@@ -368,7 +368,6 @@ describe("Update Package Command Tests", async () => {
         };
 
         const cmdResult = await testCmd("update", [packageAFilePath, "--defaults"], [], async (line: string) => {
-            console.log(line);
             if (line.includes("You are not logged in to the registry.")) {
                 results.messageFound = true;
             }

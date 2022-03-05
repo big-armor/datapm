@@ -154,7 +154,7 @@ before(async function () {
         await startServerProcess(
             "Registry",
             "npm",
-            ["run", "start"],
+            ["run", "start-nowatch"],
             "../backend",
             {
                 REGISTRY_URL: "http://localhost:" + registryServerPort,

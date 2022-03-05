@@ -238,39 +238,16 @@ jobs:
               run: npm ci
               working-directory: client-lib
 
-            - name: Cache Backend Dependencies
-              id: cache-backend-dependencies
-              uses: actions/cache@v1
-              with:
-                  path: backend/node_modules
-                  key: datampm-registry-${{ runner.OS }}-backend-${{ hashFiles('backend/package*.json') }}
-
             - name: Install Backend Dependencies
               id: install-backend-Dependencies
-              if: steps.cache-backend-dependencies.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: backend
 
-            - name: Build Backend
-              id: build-backend
-              run: npm run build
-              working-directory: backend
-
-            - name: Cache Client Node_modules
-              id: cache-client-node-modules
-              uses: actions/cache@v1
-              with:
-                  path: client/node_modules
-                  key: datampm-client-${{ runner.OS }}-${{ hashFiles('client/package.json', 'client/package-lock.json', 'client/npm-shrinkwrap.json') }}
-
             - name: Install Client Dependencies
-              id: install-client-dependencies
-              if: steps.cache-client-node-modules.outputs.cache-hit != 'true'
               run: npm ci
               working-directory: client
 
             - name: Test Client
-              id: test-client-Dependencies
               run: npm run test
               working-directory: client
               env:
