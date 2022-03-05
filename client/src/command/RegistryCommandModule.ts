@@ -3,7 +3,7 @@ import { passwordValid, validateUsernameOrEmail } from "datapm-lib";
 import ora from "ora";
 import { exit } from "process";
 import prompts from "prompts";
-import * as fetch from "node-fetch";
+import fetch from "cross-fetch";
 
 import {
     CreateAPIKeyDocument,

@@ -9,7 +9,7 @@ import {
     NormalizedCacheObject
 } from "@apollo/client/core";
 import { setContext } from "@apollo/client/link/context";
-import * as fetch from "node-fetch";
+import fetch from "cross-fetch";
 import {
     Catalog,
     CreatePackageInput,
