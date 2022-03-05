@@ -113,7 +113,7 @@ describe("CSV Offset Tests", function () {
             }
         ];
 
-        const exitCode = await testCmd("package", ["file://./countries.csv"], prompts, async(line) => {
+        const exitCode = await testCmd("package", ["file://./countries.csv"], prompts, async (line) => {
             console.log(line);
         });
 
