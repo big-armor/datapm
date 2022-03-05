@@ -50,7 +50,7 @@ exports.linkDataPMClientLib = function () {
     }
 
     const targetPath = path.join(libPath, "datapm-client-lib");
-    if (!targetPath) {
+    if (!fs.existsSync(targetPath)) {
         fs.symlinkSync(path.join(__dirname, "..", "..", "client-lib", "dist"), targetPath, "dir");
     }
 
