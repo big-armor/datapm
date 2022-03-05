@@ -224,22 +224,18 @@ jobs:
               run: node --version
 
             - name: Install Lib Dependencies
-              id: install-lib-dependencies
               run: npm ci
               working-directory: lib
 
             - name: Build Lib
-              id: build-lib-dependencies
               run: npm run build
               working-directory: lib
 
             - name: Install Client Lib Dependencies
-              id: install-client-lib-dependencies
               run: npm ci
               working-directory: client-lib
 
             - name: Install Backend Dependencies
-              id: install-backend-Dependencies
               run: npm ci
               working-directory: backend
 
