@@ -62,7 +62,7 @@ export class CLIJobContext implements JobContext {
         return getRepositoryConfigs(type);
     }
 
-    async parameterPrompt(parameters: Parameter[]): Promise<ParameterAnswer<string>> {
+    async parameterPrompt(parameters: Parameter<string>[]): Promise<ParameterAnswer<string>> {
         return await cliHandleParameters(this.argv.defaults || false, parameters);
     }
 
