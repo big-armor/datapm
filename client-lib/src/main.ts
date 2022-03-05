@@ -8,7 +8,6 @@ export * from "./task/EditJob";
 export * from "./task/FetchPackageJob";
 export * from "./task/PackageJob";
 export * from "./task/PublishJob";
-export * from "./task/PublishJob";
 export * from "./task/UpdateJob";
 export * from "./task/UpdateRepositoryJob";
 export * from "./task/InfoJob";
