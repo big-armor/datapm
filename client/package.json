@@ -98,7 +98,7 @@
         "chalk": "^4.1.0",
         "conf": "^7.1.1",
         "datapm-client-lib": "./../client-lib",
-        "datapm-lib": "./../lib/dist",
+        "datapm-lib": "./../lib",
         "keytar": "^7.7.0",
         "ora": "^4.0.5",
         "prompts": "^2.3.2",
