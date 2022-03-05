@@ -34,10 +34,6 @@ function copyEmailTemplates() {
     return src([path.join("static","email-templates","*")]).pipe(dest(path.join(DESTINATION_DIR, "static", "email-templates")));
 }
 
-function copyModules() {
-    return exec("npx copy-node-modules . dist", execLogCb);
-}
-
 function createTerraformScriptsDirectory() {
 
     const scriptsPath = path.join("dist","static","terraform-scripts");
@@ -71,19 +67,21 @@ async function createGCPTerraformScriptZip() {
 
 }
 
-function copyDataPMLib() {
-   //  return exec("cp -R " + path.join("..","lib","dist") + path.join("dist","node_modules","datapm-lib"));
+function linkDataPMClientLib() {
+    const libPath = path.join(__dirname,"dist", "node_modules");
+    if (!fs.existsSync(libPath)) {
+        fs.mkdirSync(libPath, { recursive: true });
+    }
 
-   return Promise.resolve();
-}
 
-function copyDataPMClientLib() {
 
-    return src([
-        path.join(CLIENT_LIB_DIR, "dist","**","*"),
-    ]).pipe(dest( path.join("dist","node_modules","datapm-client-lib")));
+    const targetPath = path.join(libPath, "datapm-client-lib");
+    if (!fs.existsSync(targetPath)) {
+        fs.symlinkSync(path.join(__dirname, "..", "client-lib", "dist"), targetPath, "dir");
+    }
 
-}
+    return Promise.resolve();
+};
 
 /** The TypeORM distribution is way too big. Slim to make it much smaller */
 function slimTypeOrmDist() {
@@ -128,8 +126,21 @@ function clean() {
     });
 }
 
-exports.default = series(createTerraformScriptsDirectory, createGCPTerraformScriptZip, copyFiles, copyEmailTemplates, copyModules, copyDataPMLib, copyDataPMClientLib, slimTypeOrmDist);
-exports.copyDependencies = series(copyModules, copyDataPMLib);
-exports.copyDataPMLib = copyDataPMLib;
-exports.copyDataPMClientLib = copyDataPMClientLib;
+function linkDataPMLib() {
+     const libPath = path.join(__dirname, "dist", "node_modules");
+    if (!fs.existsSync(libPath)) {
+        fs.mkdirSync(libPath, { recursive: true });
+    }
+
+    const targetPath = path.join(libPath, "datapm-lib");
+    if (!fs.existsSync(targetPath)) {
+        fs.symlinkSync(path.join(__dirname, "..", "lib", "dist"), targetPath, "dir");
+    }
+
+    return Promise.resolve();
+}
+
+exports.default = series(createTerraformScriptsDirectory, createGCPTerraformScriptZip, copyFiles, copyEmailTemplates,  linkDataPMClientLib, linkDataPMLib, slimTypeOrmDist);
+exports.linkDataPMClientLib = linkDataPMClientLib;
+exports.linkDataPMLib = linkDataPMLib;
 exports.clean = clean;

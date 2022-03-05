@@ -43,18 +43,26 @@ exports.renameBinary = function (binaryFile, destinationFile) {
     fs.renameSync(binaryFile, destinationFile);
 };
 
-exports.copyDataPMClientLib = function () {
-    return src([path.join(__dirname, "..", "..", "client-lib", "dist", "**", "*")]).pipe(
-        dest(path.join("dist", "node_modules", "datapm-client-lib"))
-    );
+exports.linkDataPMClientLib = function () {
+    const libPath = path.join(__dirname, "..", "dist", "node_modules");
+    if (!fs.existsSync(libPath)) {
+        fs.mkdirSync(libPath, { recursive: true });
+    }
+
+    const targetPath = path.join(libPath, "datapm-client-lib");
+    if (!targetPath) {
+        fs.symlinkSync(path.join(__dirname, "..", "..", "client-lib", "dist"), targetPath, "dir");
+    }
+
+    return Promise.resolve();
 };
 
 exports.copyDeps = function (directory) {
-    src(["node_modules/mmmagic/**/*", "node_modules/node-expat/**/*"], {
-        base: "./node_modules/"
-    }).pipe(dest(path.join(directory, "node_modules")));
+    // src(["node_modules/mmmagic/**/*", "node_modules/node-expat/**/*"], {
+    //    base: "./node_modules/"
+    // }).pipe(dest(path.join(directory, "node_modules")));
 
-    exports.copyDataPMClientLib();
+    // exports.linkDataPMClientLib();
     return Promise.resolve();
 };
 

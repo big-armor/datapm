@@ -44,7 +44,7 @@
         "csv-parse": "^4.16.3",
         "dataloader": "^2.0.0",
         "datapm-client-lib": "./../client-lib",
-        "datapm-lib": "./../lib/dist",
+        "datapm-lib": "./../lib",
         "express-enforces-ssl": "^1.1.0",
         "express-http-proxy": "^1.6.0",
         "express-jwt": "^6.0.0",

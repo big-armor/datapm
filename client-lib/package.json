@@ -4,7 +4,7 @@
   "description": "DataPM Client library, which includes all logic used by the the command line and server to generate, manage, and fetch packages. ",
   "main": "src/main.ts",
   "scripts": {
-    "prebuild": "gulp prebuild && npm run codegen",
+    "prebuild": "cd ../lib && npm run build && cd ../client-lib && gulp prebuild && npm run codegen",
     "build": "tsc",
     "postbuild": "gulp postbuild",
     "pretest": "npm run codegen",
@@ -87,7 +87,7 @@
     "crypto": "^1.0.1",
     "csv-parse": "^4.11.1",
     "csv-stringify": "^5.5.0",
-    "datapm-lib": "./../lib/dist",
+    "datapm-lib": "./../lib",
     "death": "^1.1.0",
     "faker": "^5.1.0",
     "follow-redirects": "^1.13.3",
