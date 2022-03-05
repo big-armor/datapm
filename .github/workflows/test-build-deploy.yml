@@ -218,6 +218,10 @@ jobs:
               run: npm ci
               working-directory: client
 
+            - name: Print TSC Version
+              run: npx tsc --version
+              working-directory: client
+
             - name: Test Client
               run: npm run test
               working-directory: client
