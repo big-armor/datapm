@@ -44,7 +44,7 @@ const {
     copyAssetsLinuxIntel64
 } = require("./gulp/linux");
 
-const { cleanDist, linkDataPMClientLib } = require("./gulp/common");
+const { cleanDist, linkDataPMClientLib, linkDataPMLib } = require("./gulp/common");
 
 exports.buildWindowsIntel64 = series(
     cleanWin64,
@@ -89,4 +89,4 @@ exports.clean = series(
     cleanMacOSInstaller
 );
 
-exports.postbuild = series(linkDataPMClientLib);
+exports.postbuild = series(linkDataPMClientLib, linkDataPMLib);

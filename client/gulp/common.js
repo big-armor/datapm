@@ -57,6 +57,20 @@ exports.linkDataPMClientLib = function () {
     return Promise.resolve();
 };
 
+exports.linkDataPMLib = function () {
+    const libPath = path.join(__dirname, "..", "dist", "node_modules");
+    if (!fs.existsSync(libPath)) {
+        fs.mkdirSync(libPath, { recursive: true });
+    }
+
+    const targetPath = path.join(libPath, "datapm-lib");
+    if (!fs.existsSync(targetPath)) {
+        fs.symlinkSync(path.join(__dirname, "..", "..", "lib", "dist"), targetPath, "dir");
+    }
+
+    return Promise.resolve();
+};
+
 exports.copyDeps = function (directory) {
     // src(["node_modules/mmmagic/**/*", "node_modules/node-expat/**/*"], {
     //    base: "./node_modules/"
