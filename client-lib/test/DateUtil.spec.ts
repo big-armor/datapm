@@ -11,9 +11,9 @@ describe("Check package suggestion name", () => {
 
     it("Should normalize ISO string", () => {
         expect(isDate("Tue, 30 Aug 2016 03:01:19 GMT")).to.be.oneOf(["2016-08-30", "2016-08-29"]);
-        expect(isDate("Tue Aug 30 2016 11:02:45 GMT+0800")).equal("2016-08-29"); // is this right?
-        expect(isDate("2016-08-30T03:01:19.543Z")).equal("2016-08-30");
-        expect(isDate("Tue Aug 30 2016")).equal("2016-08-30");
+        expect(isDate("Tue Aug 30 2016 11:02:45 GMT+0800")).to.be.oneOf(["2016-08-30", "2016-08-29"]);
+        expect(isDate("2016-08-30T03:01:19.543Z")).to.be.oneOf(["2016-08-30", "2016-08-29"]);
+        expect(isDate("Tue Aug 30 2016")).to.be.oneOf(["2016-08-30", "2016-08-29"]);
     });
 
     it("Should not find dates deep in strings", () => {
@@ -25,9 +25,9 @@ describe("Check package suggestion name", () => {
 
     it("Should normalize ISO string", () => {
         expect(isDate("  Tue, 30 Aug 2016 03:01:19 GMT")).to.be.oneOf(["2016-08-30", "2016-08-29"]);
-        expect(isDate("  Tue Aug 30 2016 11:02:45 GMT+0800")).equal("2016-08-29"); // is this right?
-        expect(isDate("  2016-08-30T03:01:19.543Z")).equal("2016-08-30");
-        expect(isDate("  Tue Aug 30 2016")).equal("2016-08-30");
+        expect(isDate("  Tue Aug 30 2016 11:02:45 GMT+0800")).to.be.oneOf(["2016-08-30", "2016-08-29"]);
+        expect(isDate("  2016-08-30T03:01:19.543Z")).to.be.oneOf(["2016-08-30", "2016-08-29"]);
+        expect(isDate("  Tue Aug 30 2016")).to.be.oneOf(["2016-08-30", "2016-08-29"]);
     });
 
     it("Should support Big Query Date Format", () => {
