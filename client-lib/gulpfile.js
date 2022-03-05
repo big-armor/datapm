@@ -30,7 +30,7 @@ function linkDataPMLib() {
     }
 
     const targetPath = path.join(libPath, "datapm-lib");
-    if (!targetPath) {
+    if (!fs.existsSync(targetPath)) {
         fs.symlinkSync(path.join(__dirname, "..", "lib", "dist"), targetPath, "dir");
     }
 
