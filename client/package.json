@@ -18,7 +18,7 @@
         "package:windows:intel64": "gulp buildWindowsIntel64",
         "package:windows:arm64": "gulp buildWindowsArm64",
         "package:windows:bundle": "gulp bundleWindows",
-        "pretest": "cd ../client-lib && npm run codgen",
+        "pretest": "cd ../client-lib && npm run codegen",
         "test": "CREDENTIALS_SECRET_KEY=test mocha --slow 3000 --timeout 60000 --max-old-space-size=8192 -r ts-node/register test/integration/*.ts",
         "test:debug": "CREDENTIALS_SECRET_KEY=test npx mocha --slow 3000 --timeout 999999 --max-old-space-size=8192 -r ts-node/register",
         "test:full": "CREDENTIALS_SECRET_KEY=test mocha --slow 3000 --timeout 60000 --max-old-space-size=8192 -r ts-node/register test/**/*.ts",
