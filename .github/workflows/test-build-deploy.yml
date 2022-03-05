@@ -115,11 +115,6 @@ jobs:
               run: npm ci
               working-directory: client-lib
 
-            - name: Build Client Lib
-              id: build-client-lib-dependencies
-              run: npm run build
-              working-directory: client-lib
-
             - name: Cache Backend Node_modules
               id: cache-backend-node-modules
               uses: actions/cache@v1
@@ -170,11 +165,6 @@ jobs:
             - name: Install Client Lib Dependencies
               id: install-client-lib-dependencies
               run: npm ci
-              working-directory: client-lib
-
-            - name: Build Client Lib
-              id: build-client-lib-dependencies
-              run: npm run build
               working-directory: client-lib
 
             - name: Cache Backend Node_modules
@@ -248,11 +238,6 @@ jobs:
               run: npm ci
               working-directory: client-lib
 
-            - name: Build Client Lib
-              id: build-client-lib-dependencies
-              run: npm run build
-              working-directory: client-lib
-
             - name: Cache Backend Dependencies
               id: cache-backend-dependencies
               uses: actions/cache@v1
@@ -322,10 +307,6 @@ jobs:
               run: npm ci
               working-directory: client-lib
 
-            - name: Build Client Lib
-              run: npm run build
-              working-directory: client-lib
-
             - name: Install client dependencies
               run: npm ci
               working-directory: client
@@ -391,10 +372,6 @@ jobs:
               run: npm ci
               working-directory: client-lib
 
-            - name: Build Client Lib
-              run: npm run build
-              working-directory: client-lib
-
             - name: Install client dependencies
               working-directory: client
               run: npm ci
@@ -455,10 +432,6 @@ jobs:
 
             - name: Install Client Lib Dependencies
               run: npm ci
-              working-directory: client-lib
-
-            - name: Build Client Lib
-              run: npm run build
               working-directory: client-lib
 
             - name: Install client dependencies
@@ -540,10 +513,6 @@ jobs:
 
             - name: Install Client Lib Dependencies
               run: npm ci
-              working-directory: client-lib
-
-            - name: Build Client Lib
-              run: npm run build
               working-directory: client-lib
 
             - name: Install Backend Dependencies
