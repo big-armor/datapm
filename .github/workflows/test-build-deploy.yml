@@ -158,7 +158,7 @@ jobs:
               working-directory: lib
 
             - name: Build Lib
-              name: npm run build
+              run: npm run build
               working-directory: lib
 
             - name: Cache Frontend Node_modules
