@@ -188,6 +188,7 @@ describe("Fetch Command Tests", async function () {
             [packageAFilePath],
             prompts,
             async (line: string, promptIndex: number) => {
+                console.log(line);
                 if (
                     promptIndex === prompts.length &&
                     line.includes("Next time you can run this same configuration in a single command.")
