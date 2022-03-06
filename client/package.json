@@ -95,7 +95,7 @@
         "xml-js": "^1.6.11"
     },
     "dependencies": {
-        "@apollo/client": "^3.5.9",
+        "@apollo/client": "^3.3.21",
         "chalk": "^4.1.0",
         "conf": "^7.1.1",
         "datapm-client-lib": "./../client-lib",
