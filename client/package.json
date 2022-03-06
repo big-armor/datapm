@@ -100,6 +100,7 @@
         "conf": "^7.1.1",
         "datapm-client-lib": "./../client-lib",
         "datapm-lib": "./../lib",
+        "graphql": "^15.5.0",
         "keytar": "^7.7.0",
         "ora": "^4.0.5",
         "prompts": "^2.3.2",

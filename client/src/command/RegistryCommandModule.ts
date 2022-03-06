@@ -21,7 +21,7 @@ import {
 import { addRegistry, getRegistryConfigs, getRegistryConfig, removeRegistry } from "../util/ConfigUtil";
 
 import os from "os";
-import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from "@apollo/client";
+import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from "@apollo/client/core";
 import {
     Commands,
     RegistryAddArguments,
@@ -126,7 +126,7 @@ export async function logoutFromRegistry(args: RegistryLogoutArguments): Promise
             query: MeDocument
         });
 
-        const apiKeysResponse = await userRegistryClient.getClient().query({
+        const apiKeysResponse = await userRegistryClient.getClient().query<{ myAPIKeys: APIKey[] }>({
             query: MyAPIKeysDocument
         });
 

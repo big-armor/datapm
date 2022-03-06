@@ -14,6 +14,7 @@
                 "conf": "^7.1.1",
                 "datapm-client-lib": "./../client-lib",
                 "datapm-lib": "./../lib",
+                "graphql": "^15.5.0",
                 "keytar": "^7.7.0",
                 "ora": "^4.0.5",
                 "prompts": "^2.3.2",
@@ -5384,15 +5385,11 @@
             "dev": true
         },
         "node_modules/graphql": {
-            "version": "14.7.0",
-            "resolved": "https://registry.npmjs.org/graphql/-/graphql-14.7.0.tgz",
-            "integrity": "sha512-l0xWZpoPKpppFzMfvVyFmp9vLN7w/ZZJPefUicMCepfJeQ8sMcztloGYY9DfjVPo6tIUDzU5Hw3MUbIjj9AVVA==",
-            "peer": true,
-            "dependencies": {
-                "iterall": "^1.2.2"
-            },
+            "version": "15.5.0",
+            "resolved": "https://registry.npmjs.org/graphql/-/graphql-15.5.0.tgz",
+            "integrity": "sha512-OmaM7y0kaK31NKG31q4YbD2beNYa6jBBKtMFT6gLYJljHLJr42IqJ8KX08u3Li/0ifzTU5HjmoOOrwa5BRLeDA==",
             "engines": {
-                "node": ">= 6.x"
+                "node": ">= 10.x"
             }
         },
         "node_modules/graphql-tag": {
@@ -6437,6 +6434,7 @@
             "version": "1.3.0",
             "resolved": "https://registry.npmjs.org/iterall/-/iterall-1.3.0.tgz",
             "integrity": "sha512-QZ9qOMdF+QLHxy1QIpUHUU1D5pS2CG2P69LF6L6CPjPYA/XMOmKV3PZpawHoAjHNyB0swdVTRxdYT4tbBbxqwg==",
+            "optional": true,
             "peer": true
         },
         "node_modules/jmespath": {
@@ -16488,13 +16486,9 @@
             "dev": true
         },
         "graphql": {
-            "version": "14.7.0",
-            "resolved": "https://registry.npmjs.org/graphql/-/graphql-14.7.0.tgz",
-            "integrity": "sha512-l0xWZpoPKpppFzMfvVyFmp9vLN7w/ZZJPefUicMCepfJeQ8sMcztloGYY9DfjVPo6tIUDzU5Hw3MUbIjj9AVVA==",
-            "peer": true,
-            "requires": {
-                "iterall": "^1.2.2"
-            }
+            "version": "15.5.0",
+            "resolved": "https://registry.npmjs.org/graphql/-/graphql-15.5.0.tgz",
+            "integrity": "sha512-OmaM7y0kaK31NKG31q4YbD2beNYa6jBBKtMFT6gLYJljHLJr42IqJ8KX08u3Li/0ifzTU5HjmoOOrwa5BRLeDA=="
         },
         "graphql-tag": {
             "version": "2.12.4",
@@ -17299,6 +17293,7 @@
             "version": "1.3.0",
             "resolved": "https://registry.npmjs.org/iterall/-/iterall-1.3.0.tgz",
             "integrity": "sha512-QZ9qOMdF+QLHxy1QIpUHUU1D5pS2CG2P69LF6L6CPjPYA/XMOmKV3PZpawHoAjHNyB0swdVTRxdYT4tbBbxqwg==",
+            "optional": true,
             "peer": true
         },
         "jmespath": {
