@@ -239,7 +239,6 @@ describe("Publish Data Append Log Tests", async function () {
             [`http://localhost:${registryServerPort}/test-publish-data-A/countries`],
             prompts,
             async (line: string) => {
-                console.log(line);
                 if (line.includes("Finished writing 3 records")) {
                     results.messageFound = true;
                 }

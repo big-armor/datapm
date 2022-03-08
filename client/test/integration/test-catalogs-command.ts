@@ -22,6 +22,7 @@ describe("Catalogs Command Tests", async function () {
         };
 
         const cmdResult = await testCmd("catalogs", [], [], async (line: string) => {
+            console.log(line);
             if (line.includes("You are not logged in to any registries")) {
                 results.messageFound = true;
             }
@@ -125,7 +126,6 @@ describe("Catalogs Command Tests", async function () {
         };
 
         const cmdResult = await testCmd("catalogs", [], [], async (line: string) => {
-            console.log(line);
             if (line.includes(data.myCatalogs[0].displayName as string)) {
                 results.messageFound = true;
             }

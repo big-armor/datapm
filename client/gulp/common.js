@@ -72,12 +72,11 @@ exports.linkDataPMLib = function () {
 };
 
 exports.copyDeps = function (directory) {
-    // src(["node_modules/mmmagic/**/*", "node_modules/node-expat/**/*"], {
-    //    base: "./node_modules/"
-    // }).pipe(dest(path.join(directory, "node_modules")));
-
-    // exports.linkDataPMClientLib();
-    return Promise.resolve();
+    const destination = path.join(__dirname, "..", directory, "node_modules");
+    console.log(destination);
+    return src(["../client-lib/node_modules/mmmagic/**/*", "../client-lib/node_modules/node-expat/**/*"], {
+        base: "../client-lib/node_modules"
+    }).pipe(dest(destination));
 };
 
 exports.copyAssets = function (directory) {
