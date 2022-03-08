@@ -380,4 +380,33 @@ export class CatalogRepository extends Repository<CatalogEntity> {
             return Promise.resolve();
         }
     }
+
+
+
+    async getPublicCatalogs(
+        limit: number,
+        offSet: number,
+        relations?: string[]
+    ): Promise<CatalogEntity[]> {
+        const ALIAS = "PublicCatalogs";
+        return this.createQueryBuilder(ALIAS)
+            // .orderBy('"PackageEntity"."created_at"', "DESC") // TODO Sort by views (or popularity)
+            .where(
+                `("PublicCatalogs"."isPublic" = true)`,
+            )
+            .limit(limit)
+            .offset(offSet)
+            .addRelations(ALIAS, relations)
+            .getMany();
+    }
+
+    async countPublicCatalogs(
+    ): Promise<number> {
+        const ALIAS = "CountPublicCatalogs";
+        return this.createQueryBuilder(ALIAS)
+            .where(
+                `("CountPublicCatalogs"."isPublic" = true)`,
+            )
+            .getCount();
+    }
 }

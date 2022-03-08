@@ -29,6 +29,7 @@ import http from "http";
 import { SocketConnectionHandler } from "./socket/SocketHandler";
 import { parse } from "url";
 import { libPackageVersion } from "datapm-lib";
+import { generateCatalogSiteMap, generateCollectionsSiteMap, generatePackageSiteMap, generateSiteMapIndex } from "./util/SiteMapUtil";
 
 console.log("DataPM Registry Server Starting...");
 
@@ -217,12 +218,36 @@ async function main() {
     });
 
     app.use("/robots.txt", function (req, res, next) {
-        switch (req.hostname) {
-            case "datapm.io":
-                res.sendFile(path.join(__dirname, "robots-production.txt"));
+        switch (process.env["ALLOW_WEB_CRAWLERS"]) {
+            case "true":
+            case "1":
+            case "yes":
+                const localRobotsTxt = path.join(__dirname, "robots-production.txt")
+                const staticRobotsTxt = path.join(__dirname, "..", "static","robots-production.txt");
+                let content = "";
+                if(fs.existsSync(localRobotsTxt))
+                    content = fs.readFileSync(localRobotsTxt,'utf-8').toString();
+                else if(fs.existsSync(staticRobotsTxt))
+                    content = fs.readFileSync(staticRobotsTxt, 'utf-8').toString();
+                else {
+                    res.sendStatus(404);
+                    return;
+                }
+
+                content = content.replace("${REGISTRY_URL}", process.env["REGISTRY_URL"] as string);
+
+                res.header("Content-Type","text/plain").send(content);
+
                 break;
             default:
-                res.sendFile(path.join(__dirname, "robots.txt"));
+
+                const localRobotsTxt2 = path.join(__dirname, "robots.txt")
+                const staticRobotsTxt2 = path.join(__dirname, "..", "static","robots.txt");
+
+                if(fs.existsSync(localRobotsTxt2))
+                    res.header("Content-Type","text/plain").sendFile(localRobotsTxt2);
+                else if(fs.existsSync(staticRobotsTxt2))
+                    res.header("Content-Type","text/plain").sendFile(staticRobotsTxt2);
         }
     });
 
@@ -466,6 +491,60 @@ async function main() {
             reader.pipe(res);
         })
 
+
+    });
+
+    app.use("/sitemap.xml", async (req, res, next) => {
+
+        const contextObject = await context({ req });
+
+        const siteMapContents = await generateSiteMapIndex(contextObject);
+        res.setHeader('Content-Type', 'application/xml');
+        res.setHeader('Content-Length', siteMapContents.length);
+
+        res.send(siteMapContents);
+
+    });
+
+    app.use("/sitemap_collections_:mapNumber.xml", async (req, res, next) => {
+
+        const contextObject = await context({ req });
+
+        const mapNumber = parseInt(req.params.mapNumber);
+
+        const siteMapContents = await generateCollectionsSiteMap(mapNumber,contextObject);
+        res.setHeader('Content-Type', 'application/xml');
+        res.setHeader('Content-Length', siteMapContents.length);
+
+        res.send(siteMapContents);
+
+    });
+
+    app.use("/sitemap_catalogs_:mapNumber.xml", async (req, res, next) => {
+
+        const contextObject = await context({ req });
+
+        const mapNumber = parseInt(req.params.mapNumber);
+
+        const siteMapContents = await generateCatalogSiteMap(mapNumber,contextObject);
+        res.setHeader('Content-Type', 'application/xml');
+        res.setHeader('Content-Length', siteMapContents.length);
+
+        res.send(siteMapContents);
+
+    });
+
+    app.use("/sitemap_packages_:mapNumber.xml", async (req, res, next) => {
+
+        const contextObject = await context({ req });
+
+        const mapNumber = parseInt(req.params.mapNumber);
+
+        const siteMapContents = await generatePackageSiteMap(mapNumber,contextObject);
+        res.setHeader('Content-Type', 'application/xml');
+        res.setHeader('Content-Length', siteMapContents.length);
+
+        res.send(siteMapContents);
 
     });
 

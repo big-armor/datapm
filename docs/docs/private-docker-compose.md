@@ -50,6 +50,7 @@ services:
       - SMTP_FROM_NAME=Localhost DataPM Registry
       - SMTP_FROM_ADDRESS=datapm@localhost
       - SMTP_SECURE=false
+      - ALLOW_WEB_CRAWLERS=false
   postgres:
     image: postgres:13.3
     volumes:
