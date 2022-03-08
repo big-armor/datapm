@@ -16,3 +16,4 @@ SMTP_PASSWORD=
 SMTP_FROM_NAME="Localhost DataPM Registry"
 SMTP_FROM_ADDRESS="datapm@localhost"
 SMTP_SECURE=false
+ALLOW_WEB_CRAWLERS=false

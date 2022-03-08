@@ -8,7 +8,9 @@ const PROXY_CONFIG = [
             "/ws",
             "/images",
             "/proxy",
-            "/client-installers"
+            "/client-installers",
+            "/sitemap.xml",
+            "/robots.txt",
         ],
         target: "http://localhost:4000",
         secure: false,
