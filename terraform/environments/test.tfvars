@@ -39,6 +39,9 @@ smtp_from_name  = "DataPM Support"
 smtp_from_email = "support@datapm.io"
 smtp_secure     = true
 
+/** Wether or not to enable robots.txt to allow crawling of the website */
+allow_web_crawlers = false
+
 ###################
 # Optional
 ###################

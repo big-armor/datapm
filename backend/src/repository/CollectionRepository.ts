@@ -2,7 +2,7 @@ import { UserInputError } from "apollo-server";
 import { EntityRepository, Repository, SelectQueryBuilder } from "typeorm";
 import { CollectionEntity } from "../entity/CollectionEntity";
 import { UserEntity } from "../entity/UserEntity";
-import { CreateCollectionInput, UpdateCollectionInput } from "../generated/graphql";
+import { Collection, CreateCollectionInput, UpdateCollectionInput } from "../generated/graphql";
 import { StorageErrors } from "../storage/files/file-storage-service";
 import { ImageStorageService } from "../storage/images/image-storage-service";
 import { UserRepository } from "./UserRepository";
@@ -229,5 +229,35 @@ export class CollectionRepository extends Repository<CollectionEntity> {
                 `(("CollectionEntity"."is_public") OR ("CollectionEntity"."id" IN (SELECT collection_id FROM collection_user WHERE user_id = :userId AND 'VIEW' = any(permissions))))`
             )
             .setParameter("userId", userId);
+    }
+
+
+
+
+    async getPublicCollections(
+        limit: number,
+        offSet: number,
+        relations?: string[]
+    ): Promise<CollectionEntity[]> {
+        const ALIAS = "PublicCollections";
+        return this.createQueryBuilder(ALIAS)
+            // .orderBy('"PublishCollections"."created_at"', "DESC") // TODO Sort by views (or popularity)
+            .where(
+                `("PublicCollections"."is_public" = true)`,
+            )
+            .limit(limit)
+            .offset(offSet)
+            .addRelations(ALIAS, relations)
+            .getMany();
+    }
+
+    async countPublicCollections(
+    ): Promise<number> {
+        const ALIAS = "CountCollections";
+        return this.createQueryBuilder(ALIAS)
+            .where(
+                `("CountCollections"."is_public" = true)`,
+            )
+            .getCount();
     }
 }

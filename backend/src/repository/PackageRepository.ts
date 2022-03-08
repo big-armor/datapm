@@ -560,4 +560,33 @@ export class PackageRepository extends Repository<PackageEntity> {
             .addRelations(ALIAS, relations)
             .getManyAndCount();
     }
+
+    async getPublicPackages(
+        limit: number,
+        offSet: number,
+        relations?: string[]
+    ): Promise<PackageEntity[]> {
+        const ALIAS = "PublicPackages";
+        return this.createQueryBuilder(ALIAS)
+            // .orderBy('"PackageEntity"."created_at"', "DESC") // TODO Sort by views (or popularity)
+            .where(
+                `("PublicPackages"."isPublic" = true)`,
+            )
+            .limit(limit)
+            .offset(offSet)
+            .addRelations(ALIAS, relations)
+            .getMany();
+    }
+
+    async countPublicPackages(
+    ): Promise<number> {
+        const ALIAS = "CountPublicPackages";
+        return this.createQueryBuilder(ALIAS)
+            .where(
+                `("CountPublicPackages"."isPublic" = true)`,
+            )
+            .getCount();
+    }
+
+
 }
