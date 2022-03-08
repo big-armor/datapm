@@ -308,7 +308,6 @@ jobs:
         timeout-minutes: 25
         needs:
             - lint
-        if: github.ref == 'refs/heads/master'
         name: Build MacOS Intel 64-Bit Client
         steps:
             - uses: actions/checkout@v2
