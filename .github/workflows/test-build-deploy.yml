@@ -325,9 +325,9 @@ jobs:
               run: npm ci
               working-directory: lib
 
-            - name: Build Lib
-              run: npm run build
-              working-directory: lib
+            - name: Install Backend Dependencies
+              run: npm ci
+              working-directory: backend
 
             - name: Install Client Lib Dependencies
               run: npm ci
@@ -335,10 +335,6 @@ jobs:
 
             - name: Install client dependencies
               run: npm ci
-              working-directory: client
-
-            - name: Run build
-              run: npm run build
               working-directory: client
 
             - name: Build MacOS Intel64 executables
