@@ -350,8 +350,8 @@ jobs:
               run: npm run test
               working-directory: client
               env:
-                  - DATAPM_CLIENT_TEST_COMMAND: pkg-macos-intel64/datapm
-                  - CREDENTIALS_SECRET_KEY: test-key-not-for-production
+                  DATAPM_CLIENT_TEST_COMMAND: pkg-macos-intel64/datapm
+                  CREDENTIALS_SECRET_KEY: test-key-not-for-production
 
             - name: Codesign & Generate MacOS Installer
               env:
