@@ -218,6 +218,10 @@ jobs:
               run: npm run package:linux:intel64
               working-directory: client
 
+            - name: Install Backend Dependencies
+              run: npm ci
+              working-directory: backend
+
             - name: Build Backend
               run: npm run build
               working-directory: backend
