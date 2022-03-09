@@ -183,10 +183,7 @@ jobs:
         runs-on: ubuntu-latest
         timeout-minutes: 15
         needs:
-            - testLib
-            - testBackend
-            - testFrontend
-            - build-client-macos-intel64
+            - lint
         if: github.ref == 'refs/heads/master'
         name: Build Linux Intel 64-bit Client
         steps:
@@ -222,6 +219,17 @@ jobs:
               run: npm run package:linux:intel64
               working-directory: client
 
+            - name: Build Backend
+              run: npm run build
+              working-directory: backend
+
+            - name: Run Client Tests
+              run: npm run test
+              working-directory: client
+              env:
+                  DATAPM_CLIENT_TEST_COMMAND: pkg-intel-intel64/datapm
+                  CREDENTIALS_SECRET_KEY: test-key-not-for-production
+
             - name: Build Debian Intel64 Package
               run: ./create-debian-package.sh
               working-directory: client/installers/debian
@@ -251,7 +259,7 @@ jobs:
             - testLib
             - testBackend
             - testFrontend
-            - build-client-macos-intel64
+            - build-client-linux-intel64
         if: github.ref == 'refs/heads/master'
         name: Build Windows Intel 64-Bit Client
         steps:
@@ -283,7 +291,7 @@ jobs:
               working-directory: client
               run: npm run build
 
-            - name: Build Windows executables
+            - name: Build Windows Executables
               run: npm run package:windows:intel64
               working-directory: client
               env:
@@ -307,7 +315,10 @@ jobs:
         runs-on: macos-latest
         timeout-minutes: 25
         needs:
-            - lint
+            - testLib
+            - testBackend
+            - testFrontend
+            - build-client-linux-intel64
         name: Build MacOS Intel 64-Bit Client
         steps:
             - uses: actions/checkout@v2
@@ -345,13 +356,6 @@ jobs:
               run: npm run package:macos:intel64
               working-directory: client
 
-            - name: Run tests
-              run: npm run test
-              working-directory: client
-              env:
-                  DATAPM_CLIENT_TEST_COMMAND: pkg-macos-intel64/datapm
-                  CREDENTIALS_SECRET_KEY: test-key-not-for-production
-
             - name: Codesign & Generate MacOS Installer
               env:
                   MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
@@ -380,9 +384,8 @@ jobs:
         runs-on: ubuntu-latest
         if: github.ref == 'refs/heads/master'
         needs:
-            - build-client-macos-intel64
             - build-client-windows-intel64
-            - build-client-linux-intel64
+            - build-client-macos-intel64
         env:
             INPUT_TOKEN: "" # See https://github.com/JS-DevTools/npm-publish/issues/15
         steps:
@@ -576,7 +579,6 @@ jobs:
         needs:
             - build-client-macos-intel64
             - build-client-windows-intel64
-            - build-client-linux-intel64
         steps:
             - name: Checkout
               uses: actions/checkout@v2

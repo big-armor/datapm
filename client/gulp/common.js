@@ -74,9 +74,16 @@ exports.linkDataPMLib = function () {
 exports.copyDeps = function (directory) {
     const destination = path.join(__dirname, "..", directory, "node_modules");
     console.log(destination);
-    return src(["../client-lib/node_modules/mmmagic/**/*", "../client-lib/node_modules/node-expat/**/*"], {
-        base: "../client-lib/node_modules"
-    }).pipe(dest(destination));
+    return src(
+        [
+            "../client-lib/node_modules/open",
+            "../client-lib/node_modules/mmmagic/**/*",
+            "../client-lib/node_modules/node-expat/**/*"
+        ],
+        {
+            base: "../client-lib/node_modules"
+        }
+    ).pipe(dest(destination));
 };
 
 exports.copyAssets = function (directory) {
