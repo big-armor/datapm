@@ -230,7 +230,7 @@ jobs:
               run: npm run test
               working-directory: client
               env:
-                  DATAPM_CLIENT_TEST_COMMAND: pkg-intel-intel64/datapm
+                  DATAPM_CLIENT_TEST_COMMAND: pkg-linux-intel64/datapm
                   CREDENTIALS_SECRET_KEY: test-key-not-for-production
 
             - name: Build Debian Intel64 Package
