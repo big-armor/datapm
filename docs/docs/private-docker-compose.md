@@ -1,7 +1,7 @@
 ---
 id: private-registry-docker-compose
 title: Host A Private DataPM Registry
-sidebar_label: Private Registry
+sidebar_label: Docker Compose
 ---
 
 You can host your own DataPM registry for private or public use. Be sure to understand the following:
