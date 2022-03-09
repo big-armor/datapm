@@ -34,8 +34,10 @@ export SMTP_SECURE=${SMTP_SECURE:="false"}
 # Where to store package files, data, user images, etc.
 export STORAGE_URL=${STORAGE_URL:="file://tmp-registry-server-storage"}
 
+export ALLOW_WEB_CRAWLERS=${ALLOW_WEB_CRAWLERS:="false"}
+
 # Other file storage examples Examples
-# export STORAGE_URL="file:///~/datapm-storage" # - File storage url example
+# export STORAGE_URL="file://~/datapm-storage" # - File storage url example
 # export STORAGE_URL="gs://datapm-test-bucket" # Google cloud storage example
 
 # SCHEDULER_KEY is only necessary for short lived instance environments (like aws lambda and google-cloud-run)

@@ -35,7 +35,7 @@ export const registryServerPort: number = Math.floor(Math.random() * (65535 - 10
 export const dataServerPort: number = Math.floor(Math.random() * (65535 - 1024) + 1024);
 
 before(async function () {
-    this.timeout(90000);
+    this.timeout(320 * 1000);
     network = await new Network().start();
 
     const runName = getRandomFruitsName("en")
@@ -273,8 +273,10 @@ async function startServerProcess(
 after(async function () {
     this.timeout(30000);
 
-    registryServerProcess.stdout?.destroy();
-    registryServerProcess.stderr?.destroy();
+    if (registryServerProcess) {
+        registryServerProcess.stdout?.destroy();
+        registryServerProcess.stderr?.destroy();
+    }
 
     if (registryServerProcess.pid !== undefined) {
         try {

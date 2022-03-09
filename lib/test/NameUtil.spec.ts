@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { test } from "mocha";
+import { nameToSlug } from "../src/NameUtil";
 
-import { nameToSlug } from "../src/util/NameUtil";
 describe("Check package suggestion name", () => {
     test("Package name tests", () => {
         expect(nameToSlug("US Federal Websites")).equal("us-federal-websites");

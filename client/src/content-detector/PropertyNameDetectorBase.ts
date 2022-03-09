@@ -20,6 +20,12 @@ export abstract class PropertyNameDetectorBase implements ContentLabelDetectorIn
         return this.valueTestCount;
     }
 
+    /* The threshold is always met, so the contentLabels are always applied if they exist 
+    for propertyname detectors */
+    isThresholdMet(): boolean {
+        return true;
+    }
+
     getContentLabels(propertyName: string, _existingLabels: ContentLabel[]): ContentLabel[] {
         const propertyNameMatches = this.getPropertyNameMatches();
 

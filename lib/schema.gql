@@ -216,6 +216,7 @@ enum PackageDifferenceType {
     CHANGE_PROPERTY_TYPE
     CHANGE_PROPERTY_FORMAT
     CHANGE_PROPERTY_DESCRIPTION
+    CHANGE_PROPERTY_UNIT
     CHANGE_GENERATED_BY
     CHANGE_UPDATED_DATE
     CHANGE_VERSION
@@ -729,6 +730,14 @@ type BuilderIOSettings {
 }
 
 """
+Represents a single builderIO page
+"""
+type BuilderIOPage {
+    apiKey: String!
+    template: BuilderIOTemplate
+}
+
+"""
 Template type
 """
 type BuilderIOTemplate {
@@ -740,7 +749,7 @@ type BuilderIOTemplate {
 Root page content
 """
 type PageContent {
-    builderIOSettings: BuilderIOSettings
+    builderIOPage: BuilderIOPage
     catalog: Catalog
     user: User
 }

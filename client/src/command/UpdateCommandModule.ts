@@ -11,7 +11,7 @@ import { differenceToString } from "../util/PackageUtil";
 import clone from "rfdc";
 import { LogType } from "../util/LoggingUtils";
 import { UpdateArguments } from "./UpdateCommand";
-import { inspectSource, inspectStreamSet } from "./PackageCommandModule";
+import { filterBadSchemaProperties, inspectSource, inspectStreamSet } from "./PackageCommandModule";
 import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
 import { cliHandleParameters } from "../util/parameters/ParameterUtils";
 import { SourceInspectionContext } from "../repository/Source";
@@ -223,6 +223,10 @@ export async function updatePackage(argv: UpdateArguments): Promise<void> {
             ...sourceObject,
             streamSets: streamSets
         });
+    }
+
+    for (const newSchema of newPackageFile.schemas) {
+        newSchema.properties = filterBadSchemaProperties(newSchema);
     }
 
     // Apply attribute names to new schemas

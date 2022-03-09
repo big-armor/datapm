@@ -34,13 +34,16 @@ datapm_domain_name = "datapm.company.com"
 
 /* SMTP relay sending information. You can use Google Workspace, MailChip, SendGrid, 
 or many others. */
-smtp_host       = "smtp.yourcompany.com"
+smtp_host = "smtp.yourcompany.com"
 # smtp_password   = Recommend using environment variable TF_VARS_smtp_password to avoid putting secrets here
 smtp_port       = 465
 smtp_user       = "email-username"
 smtp_from_name  = "Some Name"
 smtp_from_email = "support@yourcompany.com"
 smtp_secure     = true
+
+/** Wether or not to enable robots.txt to allow crawling of the website */
+allow_web_crawlers = false
 
 ###################
 # Optional

@@ -6,12 +6,11 @@ import { SemVer } from "semver";
 import { fetchMultipleWithListr } from "../command/FetchCommandModule";
 import { CredentialsBySourceSlug } from "../command/PublishPackageCommandModule";
 import { CreateVersionInput } from "../generated/graphql";
-import { getSinkDescription } from "../repository/SinkUtil";
 import { obtainCredentials } from "./CredentialsUtil";
 import { identifierToString } from "./IdentifierUtil";
 import { getRegistryClientWithConfig } from "./RegistryClient";
 import { exit } from "yargs";
-import { TYPE as DATAPM_SINK_TYPE } from "../repository/file-based/datapm-registry/DataPMRepositoryDescription";
+import { DataPMRepositoryDescription } from "../repository/file-based/datapm-registry/DataPMRepositoryDescription";
 import numeral from "numeral";
 
 export const DifferenceTypeMessages: Record<DifferenceType, string> = {
@@ -33,7 +32,6 @@ export const DifferenceTypeMessages: Record<DifferenceType, string> = {
     [DifferenceType.REMOVE_SOURCE]: "Removed Source",
     [DifferenceType.REMOVE_HIDDEN_SCHEMA]: "Removed Hidden Schema",
     [DifferenceType.CHANGE_PROPERTY_TYPE]: "Changed Property Type",
-    [DifferenceType.CHANGE_PROPERTY_UNIT]: "Change Property Unit",
     [DifferenceType.CHANGE_PROPERTY_FORMAT]: "Changed Property Format",
     [DifferenceType.CHANGE_PROPERTY_UNIT]: "Changed Property Unit",
     [DifferenceType.CHANGE_PROPERTY_DESCRIPTION]: "Changed Property Description",
@@ -116,12 +114,15 @@ export interface PublishProgress {
     updateStep(step: PublishSchemaSteps, registry: RegistryReference): void;
 }
 
+/** Returns boolean of whether the package file was changed during the saving process */
 export async function publishPackageFile(
     oraRef: Ora,
     packageFile: PackageFile,
     targetRegistries: RegistryReference[]
-): Promise<void> {
+): Promise<boolean> {
     const credentialsBySourceSlug: CredentialsBySourceSlug = new Map();
+
+    let packageFileChanged = false;
 
     for (const source of packageFile.sources) {
         const credentials = await obtainCredentials(oraRef, source);
@@ -159,6 +160,7 @@ export async function publishPackageFile(
                 );
 
                 packageFile.version = error.extensions?.minNextVersion;
+                packageFileChanged = true;
 
                 try {
                     await attemptPublishPackageFile(oraRef, packageFile, targetRegistries, credentialsBySourceSlug);
@@ -206,6 +208,8 @@ export async function publishPackageFile(
             }
         }
     }
+
+    return packageFileChanged;
 }
 
 async function publishData(
@@ -213,11 +217,15 @@ async function publishData(
     packageFile: PackageFile,
     targetRegistry: RegistryReference
 ): Promise<{ [key: string]: number }> {
-    const dataPMRepositoryDescription = await getSinkDescription(DATAPM_SINK_TYPE);
+    const dataPMRepositoryDescription = new DataPMRepositoryDescription();
 
-    if (dataPMRepositoryDescription == null) throw new Error("Could not find datapm module");
+    const dataPMSinkDescription = await dataPMRepositoryDescription.getSinkDescription();
 
-    const dataPMSink = await dataPMRepositoryDescription.loadSinkFromModule();
+    if (dataPMSinkDescription == null) {
+        throw new Error("DATAPM_SINK_DESCRIPTION_NOT_FOUND");
+    }
+
+    const dataPMSink = await dataPMSinkDescription.loadSinkFromModule();
 
     return await fetchMultipleWithListr(
         oraRef,

@@ -20,14 +20,14 @@ export const REPOSITORIES: RepositoryDescription[] = [
     new GoogleSheetRepositoryDescription(),
     new HTTPRepositoryDescription(),
     new LocalFileRepositoryDescription(),
-    new StandardOutRepositoryDescription(),
-    new DataPMRepositoryDescription()
+    new StandardOutRepositoryDescription()
 ];
 
 /** These are never presented to the user as an option, but are available if the user knows they exist.
  * This can be used for hiding 'test' and depreciated implementations */
 export const EXTENDED_REPOSITORIES: RepositoryDescription[] = REPOSITORIES.concat([
-    new StreamTestRepositoryDescription()
+    new StreamTestRepositoryDescription(),
+    new DataPMRepositoryDescription()
 ]);
 
 export function getRepositoryDescriptions(): RepositoryDescription[] {

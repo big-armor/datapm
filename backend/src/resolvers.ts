@@ -18,7 +18,9 @@ import {
     PackageIssueResolvers,
     PackageIssueCommentResolvers,
     FollowResolvers,
-    ActivityLogResolvers
+    ActivityLogResolvers,
+    BuilderIOSettings,
+    BuilderIOPage
 } from "./generated/graphql";
 import * as mixpanel from "./util/mixpanel";
 import { getGraphQlRelationName, getRelationNames } from "./util/relationNames";
@@ -240,8 +242,22 @@ export const getPageContentByRoute = async (
         { key: "builder-io-settings" },
         context,
         info
-    );
-    return { builderIOSettings };
+    ) as BuilderIOSettings;
+
+
+    let template = builderIOSettings.templates?.find(t => t.key === route);
+
+    if(!template) {
+        template = builderIOSettings.templates?.find(t => t.key === "404");
+
+    }
+
+    const builderIOPage: BuilderIOPage = {
+        apiKey: builderIOSettings.apiKey,
+        template
+    }
+
+    return { builderIOPage };
 };
 
 export const resolvers: {

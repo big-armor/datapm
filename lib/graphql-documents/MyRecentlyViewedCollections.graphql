@@ -7,14 +7,6 @@ query MyRecentlyViewedCollections($offset: Int!, $limit: Int!) {
                 }
                 name
                 description
-                packages {
-                    identifier {
-                        catalogSlug
-                        packageSlug
-                    }
-                    displayName
-                    description
-                }
                 isPublic
                 isRecommended
             }

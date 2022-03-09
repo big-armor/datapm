@@ -157,13 +157,23 @@ export class PackageSchemaComponent implements OnInit, OnDestroy, OnChanges, Aft
     }
 
     public getAllPropertyChips(property) {
-        let labels = new Set();
+        let labels = new Set<ContentLabel>();
         let values: any[] = Object.values(property.valueTypes);
 
         values.forEach((value) => {
             if (value.contentLabels) {
                 value.contentLabels.forEach((l) => {
-                    labels.add(l);
+
+                    let foundLabel = false;
+                    
+                    labels.forEach((existingLabel) => {
+                        if(existingLabel.label == l.label) {
+                            foundLabel = true;
+                        }
+                    })
+
+                    if(!foundLabel)
+                        labels.add(l);
                 });
             } else {
                 value.contentLabels = [];

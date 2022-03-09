@@ -96,15 +96,21 @@ export class PackageRepository extends Repository<PackageEntity> {
     }): Promise<[PackageEntity[], number]> {
         const targetUser = await this.manager.getCustomRepository(UserRepository).findUserByUserName({ username });
 
+
+        const modifiedRelations = [...relations || []];
+
+        if(!relations?.includes("catalog")) {
+            modifiedRelations.push("catalog");
+        }
+
         const response = await this.createQueryBuilderWithUserConditions(user, Permission.VIEW)
             .andWhere(
-                `("PackageEntity"."creator_id" = :targetUserId or "PackageEntity"."id" in (select package_id from user_package_permission up where up.user_id  = :targetUserId))`
+                `("PackageEntity"."creator_id" = :targetUserId AND "PackageEntitycatalog"."unclaimed" = false)`
             )
-
             .setParameter("targetUserId", targetUser.id)
             .offset(offSet)
             .limit(limit)
-            .addRelations("PackageEntity", relations)
+            .addRelations("PackageEntity", modifiedRelations)
             .getManyAndCount();
 
         return response;
@@ -521,16 +527,21 @@ export class PackageRepository extends Repository<PackageEntity> {
         relations?: string[]
     ): Promise<[PackageEntity[], number]> {
         const ALIAS = "myPackages";
+
+        const modifiedRelations = [...relations || []];
+
+
+
         return this.manager
             .getRepository(PackageEntity)
             .createQueryBuilder("Package")
             .where(
-                `("Package"."creator_id" = :userId or "Package".id in (select package_id from user_package_permission up where up.user_id = :userId))`
+                `("Package"."creator_id" = :userId)`,
             )
             .orderBy('"Package"."updated_at"', "DESC")
             .limit(limit)
             .offset(offSet)
-            .addRelations(ALIAS, relations)
+            .addRelations(ALIAS, modifiedRelations)
             .setParameter("userId", user.id)
             .getManyAndCount();
     }
@@ -549,4 +560,33 @@ export class PackageRepository extends Repository<PackageEntity> {
             .addRelations(ALIAS, relations)
             .getManyAndCount();
     }
+
+    async getPublicPackages(
+        limit: number,
+        offSet: number,
+        relations?: string[]
+    ): Promise<PackageEntity[]> {
+        const ALIAS = "PublicPackages";
+        return this.createQueryBuilder(ALIAS)
+            // .orderBy('"PackageEntity"."created_at"', "DESC") // TODO Sort by views (or popularity)
+            .where(
+                `("PublicPackages"."isPublic" = true)`,
+            )
+            .limit(limit)
+            .offset(offSet)
+            .addRelations(ALIAS, relations)
+            .getMany();
+    }
+
+    async countPublicPackages(
+    ): Promise<number> {
+        const ALIAS = "CountPublicPackages";
+        return this.createQueryBuilder(ALIAS)
+            .where(
+                `("CountPublicPackages"."isPublic" = true)`,
+            )
+            .getCount();
+    }
+
+
 }

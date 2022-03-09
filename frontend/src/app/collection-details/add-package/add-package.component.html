@@ -63,7 +63,7 @@
                         <app-input
                             class="flat-input px-0"
                             [group]="form"
-                            controlName="collectionSlug"
+                            controlName="collectionName"
                             inputStyle="flat"
                             placeholder="Collection"
                             matInput
@@ -76,7 +76,7 @@
                             [displayWith]="displayCollection"
                         >
                             <mat-option *ngFor="let collection of collections" [value]="collection">
-                                {{ collection.name }} ({{ collection.identifier.collectionSlug }})
+                                {{ collection.name }}
                             </mat-option>
                         </mat-autocomplete>
                     </div>
@@ -102,7 +102,7 @@
 
                 <ng-container *ngIf="!searchCollectionsTimeout">
                     <div
-                        class="text-danger mt-3"
+                        class="text-warn mt-3"
                         *ngIf="shouldShowCreatingNewCollectionLabel && selectedValidCollectionSlug"
                     >
                         A new collection will be created.

@@ -21,6 +21,10 @@ export class PersonNameDetector implements ContentLabelDetectorInterface {
         return this.valueTestedCount;
     }
 
+    isThresholdMet(): boolean {
+        return this.foundCount / this.valueTestedCount > 0.66;
+    }
+
     inspectValue(value: string): void {
         if (value.length > 40 && value.split(/\s/).length > 0) {
             const names = peopleNames.parseNames(value);

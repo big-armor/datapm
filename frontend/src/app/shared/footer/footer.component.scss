@@ -4,35 +4,25 @@
 .footer-bg {
     padding: 20px 15px 20px 15px;
     width: 100%;
+}
 
-    .darkmode-div {
-        cursor: pointer;
-        text-align: right;
-        align-self: flex-end;
-    }
-
-    .display-mobile {
-        display: none;
-    }
+.darkmode-div {
+    cursor: pointer;
+    text-align: right;
 }
 
 @media (max-width: 992px) {
+    .darkmode-div {
+        text-align: right;
+    }
     .main-col-footer {
         margin-bottom: 20px;
     }
 }
 
-@media (max-width: 768px) {
-    .footer-bg {
-        .darkmode-div {
-            text-align: left;
-            align-self: flex-start;
-            .display-desktop {
-                display: none;
-            }
-            .display-mobile {
-                display: inline !important;
-            }
-        }
+@media (max-width: 575px) {
+    .darkmode-div {
+        text-align: left;
+        align-self: flex-start;
     }
 }

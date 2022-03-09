@@ -3,7 +3,7 @@ import { Observable, ReplaySubject } from "rxjs";
 import { map, tap } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
 import { PlatformSettingsComponent } from "../home/admin-dashboard/platform-settings/platform-settings.component";
-import { BuilderIOSettings, PublicPlatformSettingsByKeyGQL } from "src/generated/graphql";
+import { BuilderIOPage, BuilderIOSettings, PublicPlatformSettingsByKeyGQL } from "src/generated/graphql";
 
 @Injectable({
     providedIn: "root"

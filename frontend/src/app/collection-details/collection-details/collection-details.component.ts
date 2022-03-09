@@ -155,9 +155,7 @@ export class CollectionDetailsComponent implements OnDestroy {
     public addPackage() {
         const dialogRef = this.dialog.open(AddPackageComponent, {
             data: {
-                collectionIdentifier: {
-                    collectionSlug: this.collectionSlug
-                }
+                collection: this.collection
             },
             width: "600px"
         });

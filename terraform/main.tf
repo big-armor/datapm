@@ -29,6 +29,12 @@ variable "smtp_secure" {
   type        = bool
 }
 
+variable "allow_web_crawlers" {
+  description = "whether to enable robots.txt"
+  type        = bool
+  default     = false
+}
+
 variable "smtp_host" {
   description = "hostname for the SMTP server"
   type        = string
@@ -286,6 +292,11 @@ resource "google_cloud_run_service" "default" {
         env {
           name  = "SMTP_SECURE"
           value = var.smtp_secure
+        }
+
+        env {
+          name  = "ALLOW_WEB_CRAWLERS"
+          value = var.allow_web_crawlers
         }
         env {
           name  = "STORAGE_URL"

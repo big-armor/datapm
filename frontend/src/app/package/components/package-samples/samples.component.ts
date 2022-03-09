@@ -52,7 +52,7 @@ export class SamplesComponent implements OnChanges {
             for (const key of Object.keys(schema.properties)) {
                 const propertyTitle = schema.properties[key].title;
 
-                const value = r[key];
+                const value = r[propertyTitle];
                 if (value == null) {
                     returnValue[propertyTitle] = null;
                     continue;

@@ -2,6 +2,7 @@ query GetPageContent($route: String!) {
     pageContent(route: $route) {
         catalog {
             identifier {
+                registryURL
                 catalogSlug
             }
             displayName
@@ -12,13 +13,23 @@ query GetPageContent($route: String!) {
             unclaimed
             packages {
                 identifier {
+                    registryURL
                     catalogSlug
                     packageSlug
+                }
+                catalog {
+                    identifier {
+                        catalogSlug
+                    }
+                    displayName
+                    isPublic
+                    unclaimed
                 }
                 displayName
                 description
                 latestVersion {
                     identifier {
+                        registryURL
                         catalogSlug
                         packageSlug
                         versionMajor
@@ -31,6 +42,7 @@ query GetPageContent($route: String!) {
                 }
                 creator {
                     username
+                    displayName
                 }
             }
         }
@@ -54,9 +66,9 @@ query GetPageContent($route: String!) {
             description
         }
 
-        builderIOSettings {
+        builderIOPage {
             apiKey
-            templates {
+            template {
                 key
                 entry
             }

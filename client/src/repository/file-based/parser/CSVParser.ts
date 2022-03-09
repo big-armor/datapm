@@ -188,6 +188,7 @@ export class CSVParser implements Parser {
 
                     const records = csvParser(chunk, {
                         columns: columns,
+                        relax: true,
                         quote: (configuration?.quote as string) || '"',
                         delimiter: configuration?.delimiter as string,
                         from_line:

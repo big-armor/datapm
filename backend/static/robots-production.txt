@@ -1,2 +1,3 @@
 User-agent: *
 Disallow:
+Sitemap: ${REGISTRY_URL}/sitemap.xml

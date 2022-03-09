@@ -8,8 +8,13 @@ query UserPackages($username: String!, $offSet: Int!, $limit: Int!) {
                 packageSlug
             }
             catalog {
+                identifier {
+                    catalogSlug
+                }
                 myPermissions
                 displayName
+                isPublic
+                unclaimed
             }
             isPublic
             displayName

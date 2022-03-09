@@ -14,6 +14,14 @@ query GetCatalog($identifier: CatalogIdentifierInput!) {
                 catalogSlug
                 packageSlug
             }
+            catalog {
+                identifier {
+                    catalogSlug
+                }
+                displayName
+                isPublic
+                unclaimed
+            }
             displayName
             description
             latestVersion {

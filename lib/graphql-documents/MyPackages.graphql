@@ -8,8 +8,13 @@ query MyPackages($offset: Int!, $limit: Int!) {
                 packageSlug
             }
             catalog {
+                identifier {
+                    catalogSlug
+                }
                 myPermissions
                 displayName
+                isPublic
+                unclaimed
             }
             isPublic
             displayName

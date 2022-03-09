@@ -270,7 +270,8 @@ export async function fetchPackage(argv: FetchArguments): Promise<void> {
         return prev + curr;
     }, 0);
 
-    if (!argv.quiet) oraRef.succeed(`Finished writing ${numeral(totalRecordCount).format("0,0")} records`);
+    if (!argv.quiet && totalRecordCount > 0)
+        oraRef.succeed(`Finished writing ${numeral(totalRecordCount).format("0,0")} records`);
 
     if (interupted !== false) {
         if (!argv.quiet) console.log(chalk.red(`Recieved ${interupted}, stopping early.`));

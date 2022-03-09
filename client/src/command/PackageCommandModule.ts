@@ -7,7 +7,8 @@ import {
     Properties,
     Schema,
     Source,
-    StreamSet
+    StreamSet,
+    nameToSlug
 } from "datapm-lib";
 import { JSONSchema7TypeName } from "json-schema";
 import numeral from "numeral";
@@ -32,7 +33,6 @@ import {
 import { validPackageDisplayName, validShortPackageDescription, validUnit, validVersion } from "../util/IdentifierUtil";
 import { LogType } from "../util/LoggingUtils";
 import { Maybe } from "../util/Maybe";
-import { nameToSlug } from "../util/NameUtil";
 import { writeLicenseFile, writePackageFile, writeReadmeFile } from "../util/PackageUtil";
 import { defaultPromptOptions } from "../util/parameters/DefaultParameterOptions";
 import { cliHandleParameters } from "../util/parameters/ParameterUtils";
@@ -208,9 +208,11 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
         );
 
         sourceStreamInspectionResults.schemas.forEach((schema) => {
-            if (schema.title == null) throw new Error("SCHEMA_HAS_NO_TITLE");
+            if (schema.title == null || schema.title === "") throw new Error("SCHEMA_HAS_NO_TITLE");
 
             schemas[schema.title] = schema;
+
+            schema.properties = filterBadSchemaProperties(schema);
         });
 
         console.log("");
@@ -232,7 +234,11 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
         connectionConfiguration,
         configuration: sourceConfiguration
     };
-    // build sources array
+
+    if (Object.keys(schemas).length === 0) {
+        oraRef.fail("No schemas found");
+        process.exit(1);
+    }
 
     for (const schema of Object.values(schemas)) {
         SchemaUtil.print(schema);
@@ -364,6 +370,8 @@ export async function generatePackage(argv: PackageArguments): Promise<void> {
         schemas: Object.values(schemas)
     };
 
+    console.log("");
+    console.log(chalk.magenta("Saving Files"));
     oraRef.start("Writing package file...");
     let packageFileLocation;
 
@@ -698,12 +706,12 @@ async function schemaSpecificQuestions(schema: Schema) {
                     message: `Do you want to specify units for the ${keys.length} number properties?`,
                     choices: [
                         {
-                            title: "Yes",
-                            value: true
-                        },
-                        {
                             title: "No",
                             value: false
+                        },
+                        {
+                            title: "Yes",
+                            value: true
                         }
                     ]
                 }
@@ -734,6 +742,14 @@ async function schemaSpecificQuestions(schema: Schema) {
             }
         }
     }
+}
+
+export function filterBadSchemaProperties(schema: Schema): Properties | undefined {
+    if (schema.properties != null) {
+        return Object.fromEntries(Object.entries(schema.properties).filter(([t]) => t != null && t !== ""));
+    }
+
+    return undefined;
 }
 
 /** Inspect a one or more URIs, with a given config, and implementation. This is generally one schema */
