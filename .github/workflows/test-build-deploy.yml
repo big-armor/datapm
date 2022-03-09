@@ -181,7 +181,7 @@ jobs:
 
     build-client-linux-intel64:
         runs-on: ubuntu-latest
-        timeout-minutes: 15
+        timeout-minutes: 25
         needs:
             - lint
         name: Build Linux Intel 64-bit Client
@@ -220,10 +220,6 @@ jobs:
 
             - name: Install Backend Dependencies
               run: npm ci
-              working-directory: backend
-
-            - name: Build Backend
-              run: npm run build
               working-directory: backend
 
             - name: Run Client Tests
