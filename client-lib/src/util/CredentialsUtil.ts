@@ -1,4 +1,4 @@
-import { DPMConfiguration, ParameterType, Source } from "datapm-lib";
+import { DPMConfiguration, ParameterOption, ParameterType, Source } from "datapm-lib";
 import { Connector } from "../connector/Connector";
 import { repeatedlyPromptParameters } from "./parameters/ParameterUtils";
 import { getConnectorDescriptionByType } from "../connector/ConnectorUtil";
@@ -42,6 +42,7 @@ export async function obtainCredentialsConfiguration(
     connector: Connector,
     connectionConfiguration: DPMConfiguration,
     credentialsConfiguration: DPMConfiguration,
+    allowDontSelect: boolean,
     defaults: boolean | undefined,
     overrideDefaultValues: DPMConfiguration = {}
 ): Promise<{ credentialsConfiguration: DPMConfiguration; parameterCount: number } | false> {
@@ -74,15 +75,13 @@ export async function obtainCredentialsConfiguration(
         repositoryConfig.credentials &&
         repositoryConfig.credentials.length > 0
     ) {
-        const options: {
-            value: string | null;
-            title: string;
-        }[] = [
-            { value: "**NEW**", title: "Add Credentials" },
-            { value: "**EXIT**", title: "Don't add or update credentials" },
+        const options:ParameterOption[] = [
             ...repositoryConfig.credentials.map((c) => {
                 return { value: c.identifier, title: c.identifier };
-            })
+            }),
+            { value: "**NEW**", title: "Add Credentials" },
+            { value: "**EXIT**", title: "Don't add or update credentials", disabled: !allowDontSelect},
+
         ];
 
         const credentialsPromptResult = await jobContext.parameterPrompt([

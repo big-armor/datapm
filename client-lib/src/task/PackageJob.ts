@@ -170,6 +170,7 @@ export class PackageJob extends Job<PackageJobResult> {
             repository,
             connectionConfiguration,
             credentialsConfiguration,
+            false,
             this.args.defaults
         );
 

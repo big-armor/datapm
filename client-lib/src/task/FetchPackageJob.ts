@@ -198,11 +198,14 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
             };
         }
 
+        sinkConnectionConfiguration = obtainConnectionConfigurationResult.connectionConfiguration;
+
         const obtainCredentialsConfigurationResult = await obtainCredentialsConfiguration(
             this.jobContext,
             sinkRepository,
             sinkConnectionConfiguration,
             sinkCredentialsConfiguration,
+            false,
             this.args.defaults
         );
 
@@ -212,6 +215,8 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
                 exitCode: 1
             };
         }
+
+        sinkCredentialsConfiguration = obtainCredentialsConfigurationResult.credentialsConfiguration;
 
         let parameterCount =
             obtainConnectionConfigurationResult.parameterCount + obtainCredentialsConfigurationResult.parameterCount;

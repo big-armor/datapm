@@ -113,6 +113,7 @@ export class UpdateRepositoryJob extends Job<UpdateRepositoryJobResult> {
                 connector,
                 newConnectionConfiguration,
                 {},
+                true,
                 false,
                 {}
             );

@@ -10,7 +10,7 @@ export interface Task {
     /** After calling end, setStatus should never be called. */
     end(status: TaskStatus, message?: string): Promise<void>;
 
-    addSubTask(message: string): Task;
+    // addSubTask(message: string): Task;
 }
 
 /** A JobContext is given to a Job. The context is an implementation specific to

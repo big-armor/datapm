@@ -263,7 +263,7 @@ export abstract class KnexSink implements Sink {
                     tableBuilder.string(this.mapSinkStateKeyToColumnName("catalogSlug"));
                     tableBuilder.string(this.mapSinkStateKeyToColumnName("packageSlug"));
                     tableBuilder.integer(this.mapSinkStateKeyToColumnName("packageMajorVersion"));
-                    tableBuilder.string(this.mapSinkStateKeyToColumnName("streamSets"));
+                    tableBuilder.text(this.mapSinkStateKeyToColumnName("streamSets"));
                     tableBuilder.string(this.mapSinkStateKeyToColumnName("packageVersion"));
                     tableBuilder.dateTime(this.mapSinkStateKeyToColumnName("timestamp"), { useTz: false });
                     resolve();

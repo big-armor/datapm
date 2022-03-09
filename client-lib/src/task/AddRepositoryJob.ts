@@ -69,6 +69,7 @@ export class AddRepositoryJob extends Job<AddRepositoryJobResult> {
                 connector,
                 connectionConfiguration,
                 {},
+                true,
                 false,
                 {}
             );

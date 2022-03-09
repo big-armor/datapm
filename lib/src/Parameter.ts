@@ -13,6 +13,7 @@ export enum ParameterType {
 export interface ParameterOption {
     title: string;
     value?: string | boolean | number | unknown;
+    disabled?: boolean;
     selected?: boolean;
 }
 

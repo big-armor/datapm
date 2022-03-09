@@ -237,6 +237,7 @@ export class UpdatePackageJob extends Job<PackageFileWithContext> {
                 connector,
                 connectionConfiguration,
                 credentialsConfiguration,
+                false,
                 this.argv.defaults
             );
 

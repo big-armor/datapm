@@ -97,6 +97,7 @@ export async function inspectSourceConnection(
         connector,
         source.connectionConfiguration,
         credentialsConfiguration,
+        false,
         defaults
     );
 

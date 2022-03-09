@@ -17,6 +17,8 @@ import {
 } from "../util/ConfigUtil";
 
 export class CLIJobContext implements JobContext {
+    currentOraSpinner: ora.Ora | undefined;
+
     constructor(private oraRef: ora.Ora, private argv: { defaults?: boolean; quiet?: boolean }) {}
 
     async getPackageFileWritable(
@@ -63,15 +65,18 @@ export class CLIJobContext implements JobContext {
     }
 
     async parameterPrompt(parameters: Parameter<string>[]): Promise<ParameterAnswer<string>> {
-        return await cliHandleParameters(this.argv.defaults || false, parameters);
+        if (this.currentOraSpinner) this.currentOraSpinner.stop();
+
+        const answers = await cliHandleParameters(this.argv.defaults || false, parameters);
+
+        if (this.currentOraSpinner) this.currentOraSpinner.start();
+
+        return answers;
     }
 
     async startTask(taskTitle: string): Promise<Task> {
         if (this.argv.quiet) {
             return {
-                addSubTask: () => {
-                    throw new Error("Not implemented");
-                },
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 end: async () => {},
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -79,22 +84,28 @@ export class CLIJobContext implements JobContext {
             };
         }
 
-        const oraSpinner = this.oraRef.start(taskTitle);
+        // Disable becuase we need to allow for multiple fetches at once, but
+        // dont' currently have a reliable way to do that
+        // So we just show the last one for now
+        // if (this.currentOraSpinner) throw new Error("Trying to start a new task when the old task has not yet ended");
+
+        this.currentOraSpinner = this.oraRef.start(taskTitle);
 
         return {
-            addSubTask: (_subTask) => {
-                throw new Error("Not implemented");
-            },
             end: async (status, message) => {
-                oraSpinner.text = message || oraSpinner.text;
+                if (!this.currentOraSpinner) return;
+
+                this.currentOraSpinner.text = message || this.currentOraSpinner.text;
                 if (status === "SUCCESS") {
-                    oraSpinner.succeed();
+                    this.currentOraSpinner.succeed();
                 } else {
-                    oraSpinner.fail();
+                    this.currentOraSpinner.fail();
                 }
             },
             setMessage: (message) => {
-                oraSpinner.text = message || oraSpinner.text;
+                if (!this.currentOraSpinner) return;
+
+                this.currentOraSpinner.text = message || this.currentOraSpinner.text;
             }
         };
     }
