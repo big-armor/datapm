@@ -6,6 +6,8 @@ set -e
 DATAPM_VERSION=`jq .version ../../../package.json  | tr -d '"'`
 echo "DATAPM_VERSION: $DATAPM_VERSION"
 
+echo "BUILD_NUMBER: $BUILD_NUMBER"
+
 echo "Cleaning build files..."
 rm -rf build || true
 rm -rf *.rpm || true
