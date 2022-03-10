@@ -81,8 +81,10 @@ export class AddRepositoryJob extends Job<AddRepositoryJobResult> {
                 };
             }
 
-            this.jobContext.print("INFO", "Saved " + credentialsResult.credentialsIdentifier + " credentials for " + repositoryIdentifier);
-            
+            this.jobContext.print(
+                "INFO",
+                "Saved " + credentialsResult.credentialsIdentifier + " credentials for " + repositoryIdentifier
+            );
         }
 
         return {
