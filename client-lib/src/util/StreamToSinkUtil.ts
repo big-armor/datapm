@@ -8,8 +8,7 @@ import {
     RecordStreamContext,
     Source,
     Parameter,
-    ParameterType,
-    DPMRecord
+    ParameterType
 } from "datapm-lib";
 import ON_DEATH from "death";
 import { Transform, Writable } from "stream";
@@ -176,11 +175,13 @@ export async function fetch(
             const conflictedPropertyTypes = await checkSchemaDataTypeConflicts(schema);
             const conflictedTitles = Object.keys(conflictedPropertyTypes);
             if (conflictedTitles.length > 0) {
-                deconflictOptions = sinkConfiguration.deconflictOptions as Record<string, DeconflictOptions> || {};
+                deconflictOptions = (sinkConfiguration.deconflictOptions as Record<string, DeconflictOptions>) || {};
                 for (const title of conflictedTitles) {
-
-                    if(deconflictOptions[title] != null) {
-                        jobContext.print("INFO", "Deconflicting " + schema.title + " property '" + title + "' by " + deconflictOptions[title]);
+                    if (deconflictOptions[title] != null) {
+                        jobContext.print(
+                            "INFO",
+                            "Deconflicting " + schema.title + " property '" + title + "' by " + deconflictOptions[title]
+                        );
                         continue;
                     }
 

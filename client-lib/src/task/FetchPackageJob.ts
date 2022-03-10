@@ -53,12 +53,11 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
     }
 
     async _execute(): Promise<JobResult<FetchPackageJobResult>> {
-
-        if(this.args.repositoryIdentifier != undefined && this.args.sinkConnectionConfig != undefined) {
+        if (this.args.repositoryIdentifier != null && this.args.sinkConnectionConfig != null) {
             throw new Error("Cannot specify both repositoryIdentifier and sinkConnectionConfig");
         }
 
-        if(this.args.credentialsIdentifier != undefined && this.args.sinkCredentialsConfig != null) {
+        if (this.args.credentialsIdentifier != null && this.args.sinkCredentialsConfig != null) {
             throw new Error("Cannot specify both credentialsIdentifier and sinkCredentialsConfig");
         }
 
@@ -120,7 +119,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
 
         await task.end("SUCCESS", `Found ${packageFile.displayName}`);
 
-        let recordCountText = numeral(schemaDescriptionRecordCount).format("0.0a") + "";
+        let recordCountText = numeral(schemaDescriptionRecordCount).format("0a") + "";
         if (recordCountPrecision === CountPrecision.APPROXIMATE) {
             recordCountText = `approximpately ${recordCountText} `;
         } else if (recordCountPrecision === CountPrecision.GREATER_THAN) {
@@ -197,8 +196,7 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
 
         await task.end("SUCCESS", `Found the connector named ${sinkType}`);
 
-
-        let parameterCount = 0
+        let parameterCount = 0;
 
         const obtainConnectionConfigurationResult = await obtainConnectionConfiguration(
             this.jobContext,
@@ -218,14 +216,14 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
         sinkConnectionConfiguration = obtainConnectionConfigurationResult.connectionConfiguration;
 
         parameterCount += obtainConnectionConfigurationResult.parameterCount;
-        
+
         const obtainCredentialsConfigurationResult = await obtainCredentialsConfiguration(
             this.jobContext,
             sinkConnector,
             sinkConnectionConfiguration,
             sinkCredentialsConfiguration,
             false,
-            this.args.credentialsIdentifier, 
+            this.args.credentialsIdentifier,
             this.args.defaults
         );
 
@@ -238,11 +236,8 @@ export class FetchPackageJob extends Job<FetchPackageJobResult> {
 
         sinkCredentialsConfiguration = obtainCredentialsConfigurationResult.credentialsConfiguration;
 
+        parameterCount += obtainCredentialsConfigurationResult.parameterCount;
 
-        parameterCount += obtainCredentialsConfigurationResult.parameterCount
-    
-
-        
         const sinkDescription = await sinkConnectorDescription.getSinkDescription();
 
         if (sinkDescription == null) {

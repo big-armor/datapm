@@ -187,7 +187,7 @@ export abstract class KnexSink implements Sink {
     }
 
     getSafeColumnName(schemaPropertyName: string): string {
-        return schemaPropertyName.replace(".","_");
+        return schemaPropertyName.replace(".", "_");
     }
 
     getSafeTableName(name: string): string {

@@ -47,15 +47,17 @@ export async function obtainCredentialsConfiguration(
     credentialsIdentifier: string | undefined,
     defaults: boolean | undefined,
     overrideDefaultValues: DPMConfiguration = {}
-): Promise<{ credentialsIdentifier:string | undefined, credentialsConfiguration: DPMConfiguration; parameterCount: number } | false> {
+): Promise<
+    | { credentialsIdentifier: string | undefined; credentialsConfiguration: DPMConfiguration; parameterCount: number }
+    | false
+> {
     if (!connector.requiresCredentialsConfiguration()) {
         return { credentialsIdentifier: undefined, credentialsConfiguration, parameterCount: 0 };
     }
 
     const repositoryIdentifier = await connector.getRepositoryIdentifierFromConfiguration(connectionConfiguration);
 
-    if(repositoryIdentifier == null)
-        throw new Error("Could not find repository identifier");
+    if (repositoryIdentifier == null) throw new Error("Could not find repository identifier");
 
     let repositoryConfig = jobContext
         .getRepositoryConfigsByType(connector.getType())
@@ -69,19 +71,20 @@ export async function obtainCredentialsConfiguration(
         };
     }
 
-
     let parameterCount = 0;
 
+    if (credentialsIdentifier != null) {
+        const savedCredentials = await jobContext.getRepositoryCredential(
+            connector.getType(),
+            repositoryIdentifier,
+            credentialsIdentifier
+        );
 
-    if(credentialsIdentifier != null) {
-
-        const savedCredentials = await jobContext.getRepositoryCredential(connector.getType(), repositoryIdentifier, credentialsIdentifier);
-        
         // purposefully prioritized the credentialsConfiguration over the savedCredentials
-        credentialsConfiguration = { ...savedCredentials, ...credentialsConfiguration }
+        credentialsConfiguration = { ...savedCredentials, ...credentialsConfiguration };
 
         jobContext.print("INFO", "Using saved credentials for " + credentialsIdentifier);
-    } 
+    }
 
     const pendingParameters = await connector.getCredentialsParameters(
         connectionConfiguration,
@@ -95,16 +98,14 @@ export async function obtainCredentialsConfiguration(
         repositoryConfig.credentials &&
         repositoryConfig.credentials.length > 0
     ) {
-
         parameterCount++;
-        
-        const options:ParameterOption[] = [
+
+        const options: ParameterOption[] = [
             ...repositoryConfig.credentials.map((c) => {
                 return { value: c.identifier, title: c.identifier };
             }),
             { value: "**NEW**", title: "Add Credentials" },
-            { value: "**EXIT**", title: "Don't add or update credentials", disabled: !allowDontSelect},
-
+            { value: "**EXIT**", title: "Don't add or update credentials", disabled: !allowDontSelect }
         ];
 
         const credentialsPromptResult = await jobContext.parameterPrompt([
@@ -151,7 +152,6 @@ export async function obtainCredentialsConfiguration(
     );
 
     parameterCount += credentialsPromptResponse.parameterCount;
-
 
     if (Object.keys(credentialsConfiguration).length > 0) {
         credentialsIdentifier = await connector.getCredentialsIdentifierFromConfiguration(

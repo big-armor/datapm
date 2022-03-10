@@ -11,20 +11,22 @@ export async function obtainConnectionConfiguration(
     repositoryIdentifier: string | undefined,
     defaults: boolean | undefined,
     overrideDefaultValues: DPMConfiguration = {}
-): Promise<{ repositoryIdentifier:string | undefined, connectionConfiguration: DPMConfiguration; parameterCount: number } | false> {
-    if (!connector.requiresConnectionConfiguration()) return { repositoryIdentifier: undefined, connectionConfiguration, parameterCount: 0 };
+): Promise<
+    | { repositoryIdentifier: string | undefined; connectionConfiguration: DPMConfiguration; parameterCount: number }
+    | false
+> {
+    if (!connector.requiresConnectionConfiguration())
+        return { repositoryIdentifier: undefined, connectionConfiguration, parameterCount: 0 };
 
-    if(repositoryIdentifier != null) {
+    if (repositoryIdentifier != null) {
         const repository = jobContext.getRepositoryConfig(connector.getType(), repositoryIdentifier);
 
-        if(repository == null)
-            throw new Error(`Could not find repository with identifier ${repositoryIdentifier}`);
+        if (repository == null) throw new Error(`Could not find repository with identifier ${repositoryIdentifier}`);
 
         // purposefully made connectionConfiguration overwrite the saved repostiory config
-        connectionConfiguration = { ...repository.connectionConfiguration, ...connectionConfiguration, }
+        connectionConfiguration = { ...repository.connectionConfiguration, ...connectionConfiguration };
 
         jobContext.print("INFO", "Using saved connection info for " + repositoryIdentifier);
-
     }
 
     let parameterCount = 0;
@@ -37,7 +39,7 @@ export async function obtainConnectionConfiguration(
     let connectionIdentifier: string | undefined;
 
     if (
-        !repositoryIdentifier && 
+        !repositoryIdentifier &&
         connector.userSelectableConnectionHistory() &&
         pendingParameters.length > 0 &&
         existingConfiguration.length > 0
@@ -80,25 +82,27 @@ export async function obtainConnectionConfiguration(
         }
     }
 
-    const connectionConfigurationResponse =  await promptForConnectionConfiguration(
+    const connectionConfigurationResponse = await promptForConnectionConfiguration(
         jobContext,
         connector,
         connectionConfiguration,
         defaults,
-        overrideDefaultValues,
+        overrideDefaultValues
     );
 
     parameterCount += connectionConfigurationResponse.parameterCount;
 
     if (connector.userSelectableConnectionHistory() && connectionConfigurationResponse.connectionConfiguration) {
-        connectionIdentifier = await connector.getRepositoryIdentifierFromConfiguration(connectionConfigurationResponse.connectionConfiguration);
+        connectionIdentifier = await connector.getRepositoryIdentifierFromConfiguration(
+            connectionConfigurationResponse.connectionConfiguration
+        );
     }
-    
+
     return {
         connectionConfiguration: connectionConfigurationResponse.connectionConfiguration,
         parameterCount,
         repositoryIdentifier: connectionIdentifier
-    }
+    };
 }
 
 export async function promptForConnectionConfiguration(
@@ -132,6 +136,6 @@ export async function promptForConnectionConfiguration(
             connectionSuccess = true;
         }
     }
-    
+
     return { connectionConfiguration, parameterCount };
 }
