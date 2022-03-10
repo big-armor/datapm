@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
-import { SourceDescription } from "datapm-lib/src/capabilities/SourceDescription";
-import { SourcesSchema } from "datapm-lib/src/capabilities/SourcesSchema";
-import { CapabilitiesService } from "datapm-lib/src/capabilities/CapabilitiesService";
+import { SourceDescription } from "datapm-lib";
+import { SourcesSchema } from "datapm-lib";
+import { CapabilitiesService } from "datapm-lib";
 
 import * as capabilitiesModule from "datapm-lib/sources.json";
 

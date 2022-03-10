@@ -1,6 +1,6 @@
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client/core";
 import { expect } from "chai";
-import { loadPackageFileFromDisk } from "datapm-lib/src/PackageUtil";
+import { loadPackageFileFromDisk } from "datapm-lib";
 import { AdminHolder } from "./admin-holder";
 import {
     ActivityLogChangeType,

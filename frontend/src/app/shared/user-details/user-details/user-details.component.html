@@ -26,6 +26,28 @@
                     </div>
                 </div>
 
+                <div class="mt-4 mb-4 pb-2" *ngIf="catalog">
+                    <div class="text-main-title">Public Package Access</div>
+                    <p class="text-dark-gray col-md-12 p-0">
+                        Enabling public access here allows you to enable public access for packages in your personal catalog.
+                    </p>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center public-toggle">
+                            <div class="ml-auto pr-2 pb-1 slide-right">
+                                <mat-slide-toggle class="app-slide-toggle" [checked]="isCatalogPublic" (change)="updatePublic($event)"
+                                    [disabled]="!catalog.myPermissions.includes(Permission.MANAGE)"></mat-slide-toggle>
+                            </div>
+                            <div class="pr-2 text-dark-gray" style="margin-bottom: 0px !important">
+                                <span class="public-text" *ngIf="isCatalogPublic">Public</span>
+                                <span class="not-public-text" *ngIf="!isCatalogPublic">Not Public</span>
+                            </div>
+                        </div>
+                        <div *ngIf="publicAccessSavingError">
+                            Error occurred when saving public access. Please refresh the page and try again.
+                        </div>
+                    </div>
+                </div>
+
                 <div class="package-div panel-div">
                     <div *ngIf="myAPIKeys && myAPIKeys.length > 0" class="text-main-title">My API Keys</div>
                     <div *ngIf="myAPIKeys && myAPIKeys.length === 0" class="text-main-title api-keys-title">

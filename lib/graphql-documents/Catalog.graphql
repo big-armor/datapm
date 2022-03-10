@@ -1,6 +1,7 @@
 query GetCatalog($identifier: CatalogIdentifierInput!) {
     catalog(identifier: $identifier) {
         identifier {
+            registryURL
             catalogSlug
         }
         displayName
@@ -9,36 +10,5 @@ query GetCatalog($identifier: CatalogIdentifierInput!) {
         myPermissions
         isPublic
         unclaimed
-        packages {
-            identifier {
-                catalogSlug
-                packageSlug
-            }
-            catalog {
-                identifier {
-                    catalogSlug
-                }
-                displayName
-                isPublic
-                unclaimed
-            }
-            displayName
-            description
-            latestVersion {
-                identifier {
-                    catalogSlug
-                    packageSlug
-                    versionMajor
-                    versionMinor
-                    versionPatch
-                }
-                createdAt
-                updatedAt
-                packageFile
-            }
-            creator {
-                username
-            }
-        }
     }
 }
