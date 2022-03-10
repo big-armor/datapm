@@ -522,4 +522,36 @@ describe("Postgres Sink Test", function () {
         expect(cmdResult.code, "Exit code").equals(0);
         expect(results.messageFound, "Found success message").equals(true);
     });
+
+    it("Should allow refetch without any additional info", async function () {
+        const results: TestResults = {
+            exitCode: -1,
+            messageFound: false
+        };
+
+        const cmdResult = await testCmd(
+            "fetch",
+            [
+                packageCFilePath,
+                "--forceUpdate",
+                "--sink",
+                "postgres",
+                "--repository",
+                postgresHost + ":" + postgresPort,
+                "--credentials",
+                "postgres",
+                "--sinkConfig",
+                '{"database":"postgres","schema":"undefined_legislators-v1","deconflictOptions":{"facebook":"CAST_TO_NULL"}}'
+            ],
+            [],
+            async (line: string) => {
+                if (line.includes("Finished writing 538 records")) {
+                    results.messageFound = true;
+                }
+            }
+        );
+
+        expect(cmdResult.code, "Exit code").equals(0);
+        expect(results.messageFound, "Found success message").equals(true);
+    });
 });

@@ -9,6 +9,9 @@ export class BackendContext implements JobContext {
     constructor(private socketContext:SocketContext) {
         
     }
+    getRepositoryConfig(type: string, identifier: string): RepositoryConfig | undefined {
+        throw new Error("Method not implemented.");
+    }
     
     saveRepositoryCredential(connectorType: string, repositoryIdentifier: string, credentialsIdentifier: string, credentials: DPMConfiguration): Promise<void> {
         throw new Error("Method not implemented.");

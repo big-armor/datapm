@@ -581,7 +581,6 @@ describe("Catalog Tests", async () => {
         expect(response.data!.catalog.displayName).to.equal("Display after update");
         expect(response.data!.catalog.identifier.catalogSlug).to.equal("user-a-second-catalog-v2");
         expect(response.data!.catalog.website).to.equal("https://second-website.co.uk");
-        expect(response.data!.catalog.packages!.length).to.equal(0);
         expect(response.data!.catalog.myPermissions![0]).to.equal(Permission.VIEW);
     });
 
@@ -798,7 +797,6 @@ describe("Catalog Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.catalog.packages!.length).to.equal(0);
         expect(response.data!.catalog.myPermissions!.includes(Permission.VIEW)).equal(true);
         expect(response.data!.catalog.myPermissions!.includes(Permission.EDIT)).equal(true);
         expect(response.data!.catalog.myPermissions!.includes(Permission.MANAGE)).equal(true);
@@ -851,7 +849,20 @@ describe("Catalog Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.catalog.packages!.length).to.equal(1);
+
+                let packagesResponse = await userBClient.query({
+            query: CatalogPackagesDocument,
+            variables: {
+                limit: 100,
+                offset: 0,
+                identifier: {
+                    catalogSlug: "user-a-second-catalog-v2"
+                }
+            }
+        });
+
+        expect(packagesResponse.data!.catalogPackages!.length).to.equal(1);
+
     });
 
     it("User B can't delete permissions of creator User A", async function () {
@@ -922,7 +933,19 @@ describe("Catalog Tests", async () => {
         });
 
         expect(response.errors == null, "no errors").to.equal(true);
-        expect(response.data!.catalog.packages!.length).to.equal(1);
+
+        let packagesResponse = await userBClient.query({
+            query: CatalogPackagesDocument,
+            variables: {
+                limit: 100,
+                offset: 0,
+                identifier: {
+                    catalogSlug: "user-a-second-catalog-v2"
+                }
+            }
+        });
+
+        expect(packagesResponse.data!.catalogPackages!.length).to.equal(1);
     });
 
     it("Delete catalog", async function () {
